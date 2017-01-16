@@ -15,6 +15,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
+import javax.swing.JTable;
 import javax.swing.event.MouseInputAdapter;
 
 import megamek.common.Aero;
@@ -43,11 +44,12 @@ import mekhq.gui.dialog.EditKillLogDialog;
 import mekhq.gui.dialog.EditLogEntryDialog;
 import mekhq.gui.dialog.EditPersonnelInjuriesDialog;
 import mekhq.gui.dialog.EditPersonnelLogDialog;
+import mekhq.gui.dialog.ImageChoiceDialog;
 import mekhq.gui.dialog.KillDialog;
 import mekhq.gui.dialog.PopupValueChoiceDialog;
-import mekhq.gui.dialog.ImageChoiceDialog;
 import mekhq.gui.dialog.RetirementDefectionDialog;
 import mekhq.gui.dialog.TextAreaDialog;
+import mekhq.gui.model.PersonnelTableModel;
 import mekhq.gui.utilities.MenuScroller;
 import mekhq.gui.utilities.StaticChecks;
 
@@ -115,16 +117,17 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
     private static final String FALSE = String.valueOf(false);
 
     private CampaignGUI gui;
+    private JTable personnelTable;
+    private PersonnelTableModel personnelModel;
     private ResourceBundle resourceMap = null;
 
-    public PersonnelTableMouseAdapter(CampaignGUI gui) {
+    public PersonnelTableMouseAdapter(CampaignGUI gui, JTable personnelTable,
+            PersonnelTableModel personnelModel) {
         super();
         this.gui = gui;
+        this.personnelTable = personnelTable;
+        this.personnelModel = personnelModel;
         resourceMap = ResourceBundle.getBundle("mekhq.resources.PersonnelTableMouseAdapter", new EncodeControl()); //$NON-NLS-1$
-    }
-
-    public PersonnelTableMouseAdapter() {
-        this(null);
     }
 
     private static final String OPT_SURNAME_NO_CHANGE = "no_change"; //$NON-NLS-1$
@@ -159,16 +162,16 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
 
     @Override
     public void actionPerformed(ActionEvent action) {
-        int row = gui.getPersonnelTable().getSelectedRow();
+        int row = personnelTable.getSelectedRow();
         if (row < 0) {
             return;
         }
-        Person selectedPerson = gui.getPersonnelModel().getPerson(gui.getPersonnelTable()
+        Person selectedPerson = personnelModel.getPerson(personnelTable
                 .convertRowIndexToModel(row));
-        int[] rows = gui.getPersonnelTable().getSelectedRows();
+        int[] rows = personnelTable.getSelectedRows();
         Person[] people = new Person[rows.length];
         for (int i = 0; i < rows.length; i++) {
-            people[i] = gui.getPersonnelModel().getPerson(gui.getPersonnelTable()
+            people[i] = personnelModel.getPerson(personnelTable
                     .convertRowIndexToModel(rows[i]));
         }
 
@@ -532,7 +535,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                         selected, true);
                 gui.getCampaign().personUpdated(selectedPerson);
                 selectedPerson.setXp(selectedPerson.getXp() - cost);
-                // TODO: add gui.getCampaign() report
+                // TODO: add personnelTab.getCampaign() report
                 break;
             }
             case CMD_ACQUIRE_WEAPON_SPECIALIST:
@@ -923,22 +926,6 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
     }
 
     @Override
-    public void mouseClicked(MouseEvent e) {
-        if (e.getClickCount() == 2) {
-            if ((gui.getSplitPersonnel().getSize().width
-                    - gui.getSplitPersonnel().getDividerLocation() + gui.getSplitPersonnel()
-                        .getDividerSize()) < CampaignGUI.PERSONNEL_VIEW_WIDTH) {
-                // expand
-                gui.getSplitPersonnel().resetToPreferredSizes();
-            } else {
-                // collapse
-                gui.getSplitPersonnel().setDividerLocation(1.0);
-            }
-
-        }
-    }
-
-    @Override
     public void mousePressed(MouseEvent e) {
         maybeShowPopup(e);
     }
@@ -948,22 +935,32 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
         maybeShowPopup(e);
     }
 
+    private Person[] getSelectedPeople() {
+        Person[] selected = new Person[personnelTable.getSelectedRowCount()];
+        int[] rows = personnelTable.getSelectedRows();
+        for (int i = 0; i < rows.length; i++) {
+            Person person = personnelModel.getPerson(personnelTable.convertRowIndexToModel(rows[i]));
+            selected[i] = person;
+        }
+        return selected;
+    }
+
     private void maybeShowPopup(MouseEvent e) {
         JPopupMenu popup = new JPopupMenu();
 
         if (e.isPopupTrigger()) {
-            if (gui.getPersonnelTable().getSelectedRowCount() == 0) {
+            if (personnelTable.getSelectedRowCount() == 0) {
                 return;
             }
-            int row = gui.getPersonnelTable().getSelectedRow();
-            boolean oneSelected = gui.getPersonnelTable().getSelectedRowCount() == 1;
-            Person person = gui.getPersonnelModel().getPerson(gui.getPersonnelTable()
+            int row = personnelTable.getSelectedRow();
+            boolean oneSelected = personnelTable.getSelectedRowCount() == 1;
+            Person person = personnelModel.getPerson(personnelTable
                     .convertRowIndexToModel(row));
             JMenuItem menuItem = null;
             JMenu menu = null;
             JMenu submenu = null;
             JCheckBoxMenuItem cbMenuItem = null;
-            Person[] selected = gui.getSelectedPeople();
+            Person[] selected = getSelectedPeople();
             // **lets fill the pop up menu**//
             if (StaticChecks.areAllEligible(selected)) {
                 menu = new JMenu(resourceMap.getString("changeRank.text")); //$NON-NLS-1$
@@ -1827,12 +1824,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 popup.add(menuItem);
             }
             menuItem = new JMenuItem(resourceMap.getString("exportPersonnel.text")); //$NON-NLS-1$
-            menuItem.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    gui.miExportPersonActionPerformed(evt);
-                }
-            });
+            menuItem.addActionListener(ev -> gui.miExportPersonActionPerformed(ev));
             menuItem.setEnabled(true);
             popup.add(menuItem);
             if (gui.getCampaign().getCampaignOptions().getUseAtB()

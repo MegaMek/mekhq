@@ -41,6 +41,7 @@ import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
+import mekhq.gui.PersonnelTab;
 import mekhq.gui.model.PersonnelTableModel;
 import mekhq.gui.model.XTableColumnModel;
 import mekhq.gui.sorter.FormattedNumberSorter;
@@ -138,7 +139,7 @@ public class PersonnelMarketDialog extends JDialog {
         panelFilterBtns.add(lblPersonChoice, gridBagConstraints);
 
         DefaultComboBoxModel<String> personTypeModel = new DefaultComboBoxModel<String>();
-        for (int i = 0; i < CampaignGUI.PG_RETIRE; i++) {
+        for (int i = 0; i < PersonnelTab.PG_RETIRE; i++) {
         	personTypeModel.addElement(getPersonnelGroupName(i));
         }
         comboPersonType.setSelectedItem(0);
@@ -414,27 +415,27 @@ public class PersonnelMarketDialog extends JDialog {
                     PersonnelTableModel personModel = entry.getModel();
                 	Person person = personModel.getPerson(entry.getIdentifier());
                 	int type = person.getPrimaryRole();
-                    if ((nGroup == CampaignGUI.PG_ACTIVE) ||
-                            (nGroup == CampaignGUI.PG_COMBAT && type <= Person.T_SPACE_GUNNER) ||
-                            (nGroup == CampaignGUI.PG_SUPPORT && type > Person.T_SPACE_GUNNER) ||
-                            (nGroup == CampaignGUI.PG_MW && type == Person.T_MECHWARRIOR) ||
-                            (nGroup == CampaignGUI.PG_CREW && (type == Person.T_GVEE_DRIVER || type == Person.T_NVEE_DRIVER || type == Person.T_VTOL_PILOT || type == Person.T_VEE_GUNNER)) ||
-                            (nGroup == CampaignGUI.PG_PILOT && type == Person.T_AERO_PILOT) ||
-                            (nGroup == CampaignGUI.PG_CPILOT && type == Person.T_CONV_PILOT) ||
-                            (nGroup == CampaignGUI.PG_PROTO && type == Person.T_PROTO_PILOT) ||
-                            (nGroup == CampaignGUI.PG_BA && type == Person.T_BA) ||
-                            (nGroup == CampaignGUI.PG_SOLDIER && type == Person.T_INFANTRY) ||
-                            (nGroup == CampaignGUI.PG_VESSEL && (type == Person.T_SPACE_PILOT || type == Person.T_SPACE_CREW || type == Person.T_SPACE_GUNNER || type == Person.T_NAVIGATOR)) ||
-                            (nGroup == CampaignGUI.PG_TECH && type >= Person.T_MECH_TECH && type < Person.T_DOCTOR) ||
-                            (nGroup == CampaignGUI.PG_DOC && ((type == Person.T_DOCTOR) || (type == Person.T_MEDIC))) ||
-                            (nGroup == CampaignGUI.PG_ADMIN && type > Person.T_MEDIC)
+                    if ((nGroup == PersonnelTab.PG_ACTIVE) ||
+                            (nGroup == PersonnelTab.PG_COMBAT && type <= Person.T_SPACE_GUNNER) ||
+                            (nGroup == PersonnelTab.PG_SUPPORT && type > Person.T_SPACE_GUNNER) ||
+                            (nGroup == PersonnelTab.PG_MW && type == Person.T_MECHWARRIOR) ||
+                            (nGroup == PersonnelTab.PG_CREW && (type == Person.T_GVEE_DRIVER || type == Person.T_NVEE_DRIVER || type == Person.T_VTOL_PILOT || type == Person.T_VEE_GUNNER)) ||
+                            (nGroup == PersonnelTab.PG_PILOT && type == Person.T_AERO_PILOT) ||
+                            (nGroup == PersonnelTab.PG_CPILOT && type == Person.T_CONV_PILOT) ||
+                            (nGroup == PersonnelTab.PG_PROTO && type == Person.T_PROTO_PILOT) ||
+                            (nGroup == PersonnelTab.PG_BA && type == Person.T_BA) ||
+                            (nGroup == PersonnelTab.PG_SOLDIER && type == Person.T_INFANTRY) ||
+                            (nGroup == PersonnelTab.PG_VESSEL && (type == Person.T_SPACE_PILOT || type == Person.T_SPACE_CREW || type == Person.T_SPACE_GUNNER || type == Person.T_NAVIGATOR)) ||
+                            (nGroup == PersonnelTab.PG_TECH && type >= Person.T_MECH_TECH && type < Person.T_DOCTOR) ||
+                            (nGroup == PersonnelTab.PG_DOC && ((type == Person.T_DOCTOR) || (type == Person.T_MEDIC))) ||
+                            (nGroup == PersonnelTab.PG_ADMIN && type > Person.T_MEDIC)
                             ) {
                         return person.isActive();
-                    } else if(nGroup == CampaignGUI.PG_RETIRE) {
+                    } else if(nGroup == PersonnelTab.PG_RETIRE) {
                         return person.getStatus() == Person.S_RETIRED;
-                    } else if(nGroup == CampaignGUI.PG_MIA) {
+                    } else if(nGroup == PersonnelTab.PG_MIA) {
                         return person.getStatus() == Person.S_MIA;
-                    } else if(nGroup == CampaignGUI.PG_KIA) {
+                    } else if(nGroup == PersonnelTab.PG_KIA) {
                         return person.getStatus() == Person.S_KIA;
                     }
                     return false;
@@ -543,39 +544,39 @@ public class PersonnelMarketDialog extends JDialog {
 
 	public static String getPersonnelGroupName(int group) {
         switch(group) {
-        case CampaignGUI.PG_ACTIVE:
+        case PersonnelTab.PG_ACTIVE:
             return "All Personnel";
-        case CampaignGUI.PG_COMBAT:
+        case PersonnelTab.PG_COMBAT:
             return "Combat Personnel";
-        case CampaignGUI.PG_MW:
+        case PersonnelTab.PG_MW:
             return "Mechwarriors";
-        case CampaignGUI.PG_CREW:
+        case PersonnelTab.PG_CREW:
             return "Vehicle Crews";
-        case CampaignGUI.PG_PILOT:
+        case PersonnelTab.PG_PILOT:
             return "Aerospace Pilots";
-        case CampaignGUI.PG_CPILOT:
+        case PersonnelTab.PG_CPILOT:
             return "Conventional Pilots";
-        case CampaignGUI.PG_PROTO:
+        case PersonnelTab.PG_PROTO:
             return "Protomech Pilots";
-        case CampaignGUI.PG_BA:
+        case PersonnelTab.PG_BA:
             return "Battle Armor Infantry";
-        case CampaignGUI.PG_SOLDIER:
+        case PersonnelTab.PG_SOLDIER:
             return "Conventional Infantry";
-        case CampaignGUI.PG_SUPPORT:
+        case PersonnelTab.PG_SUPPORT:
             return "Support Personnel";
-        case CampaignGUI.PG_VESSEL:
+        case PersonnelTab.PG_VESSEL:
             return "Large Vessel Crews";
-        case CampaignGUI.PG_TECH:
+        case PersonnelTab.PG_TECH:
             return "Techs";
-        case CampaignGUI.PG_DOC:
+        case PersonnelTab.PG_DOC:
             return "Medical Staff";
-        case CampaignGUI.PG_ADMIN:
+        case PersonnelTab.PG_ADMIN:
             return "Administrators";
-        case CampaignGUI.PG_RETIRE:
+        case PersonnelTab.PG_RETIRE:
             return "Retired Personnel";
-        case CampaignGUI.PG_MIA:
+        case PersonnelTab.PG_MIA:
             return "Personnel MIA";
-        case CampaignGUI.PG_KIA:
+        case PersonnelTab.PG_KIA:
             return "Rolls of Honor (KIA)";
         default:
             return "?";

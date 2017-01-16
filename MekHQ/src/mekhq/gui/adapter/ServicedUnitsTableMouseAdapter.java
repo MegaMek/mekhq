@@ -9,6 +9,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
+import javax.swing.JTable;
 import javax.swing.event.MouseInputAdapter;
 
 import megamek.common.AmmoType;
@@ -18,29 +19,36 @@ import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.dialog.MassRepairSalvageDialog;
+import mekhq.gui.model.UnitTableModel;
 import mekhq.gui.utilities.MenuScroller;
 import mekhq.gui.utilities.StaticChecks;
 
 public class ServicedUnitsTableMouseAdapter extends MouseInputAdapter
         implements ActionListener {
+    
     private CampaignGUI gui;
+    private JTable servicedUnitTable;
+    private UnitTableModel servicedUnitModel;
 
-    public ServicedUnitsTableMouseAdapter(CampaignGUI gui) {
+    public ServicedUnitsTableMouseAdapter(CampaignGUI gui, JTable servicedUnitTable,
+            UnitTableModel servicedUnitModel) {
         super();
         this.gui = gui;
+        this.servicedUnitTable = servicedUnitTable;
+        this.servicedUnitModel = servicedUnitModel;
     }
 
     public void actionPerformed(ActionEvent action) {
         String command = action.getActionCommand();
         @SuppressWarnings("unused")
-        Unit selectedUnit = gui.getServicedUnitModel()
-                .getUnit(gui.getServicedUnitTable()
-                        .convertRowIndexToModel(gui.getServicedUnitTable()
+        Unit selectedUnit = servicedUnitModel
+                .getUnit(servicedUnitTable
+                        .convertRowIndexToModel(servicedUnitTable
                                 .getSelectedRow()));
-        int[] rows = gui.getServicedUnitTable().getSelectedRows();
+        int[] rows = servicedUnitTable.getSelectedRows();
         Unit[] units = new Unit[rows.length];
         for (int i = 0; i < rows.length; i++) {
-            units[i] = gui.getServicedUnitModel().getUnit(gui.getServicedUnitTable()
+            units[i] = servicedUnitModel.getUnit(servicedUnitTable
                     .convertRowIndexToModel(rows[i]));
         }
         if (command.contains("ASSIGN_TECH")) {
@@ -175,17 +183,17 @@ public class ServicedUnitsTableMouseAdapter extends MouseInputAdapter
     private void maybeShowPopup(MouseEvent e) {
         JPopupMenu popup = new JPopupMenu();
         if (e.isPopupTrigger()) {
-            if (gui.getServicedUnitTable().getSelectedRowCount() == 0) {
+            if (servicedUnitTable.getSelectedRowCount() == 0) {
                 return;
             }
-            int[] rows = gui.getServicedUnitTable().getSelectedRows();
-            int row = gui.getServicedUnitTable().getSelectedRow();
-            boolean oneSelected = gui.getServicedUnitTable().getSelectedRowCount() == 1;
-            Unit unit = gui.getServicedUnitModel().getUnit(gui.getServicedUnitTable()
+            int[] rows = servicedUnitTable.getSelectedRows();
+            int row = servicedUnitTable.getSelectedRow();
+            boolean oneSelected = servicedUnitTable.getSelectedRowCount() == 1;
+            Unit unit = servicedUnitModel.getUnit(servicedUnitTable
                     .convertRowIndexToModel(row));
             Unit[] units = new Unit[rows.length];
             for (int i = 0; i < rows.length; i++) {
-                units[i] = gui.getUnitModel().getUnit(gui.getUnitTable()
+                units[i] = servicedUnitModel.getUnit(servicedUnitTable
                         .convertRowIndexToModel(rows[i]));
             }
             JMenuItem menuItem = null;

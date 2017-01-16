@@ -10,29 +10,36 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
+import javax.swing.JTable;
 import javax.swing.event.MouseInputAdapter;
 
 import mekhq.campaign.finances.Loan;
 import mekhq.campaign.parts.Part;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.dialog.PayCollateralDialog;
+import mekhq.gui.model.LoanTableModel;
 
 public class LoanTableMouseAdapter extends MouseInputAdapter implements
         ActionListener {
     private CampaignGUI gui;
+    private JTable loanTable;
+    private LoanTableModel loanModel;
 
-    public LoanTableMouseAdapter(CampaignGUI gui) {
+    public LoanTableMouseAdapter(CampaignGUI gui, JTable loanTable,
+            LoanTableModel loanModel) {
         super();
         this.gui = gui;
+        this.loanTable = loanTable;
+        this.loanModel = loanModel;
     }
 
     public void actionPerformed(ActionEvent action) {
         String command = action.getActionCommand();
-        int row = gui.getLoanTable().getSelectedRow();
+        int row = loanTable.getSelectedRow();
         if (row < 0) {
             return;
         }
-        Loan selectedLoan = gui.getLoanModel().getLoan(gui.getLoanTable()
+        Loan selectedLoan = loanModel.getLoan(loanTable
                 .convertRowIndexToModel(row));
         if (null == selectedLoan) {
             return;
@@ -98,11 +105,11 @@ public class LoanTableMouseAdapter extends MouseInputAdapter implements
     private void maybeShowPopup(MouseEvent e) {
         JPopupMenu popup = new JPopupMenu();
         if (e.isPopupTrigger()) {
-            if (gui.getLoanTable().getSelectedRowCount() == 0) {
+            if (loanTable.getSelectedRowCount() == 0) {
                 return;
             }
-            int row = gui.getLoanTable().getSelectedRow();
-            Loan loan = gui.getLoanModel().getLoan(gui.getLoanTable()
+            int row = loanTable.getSelectedRow();
+            Loan loan = loanModel.getLoan(loanTable
                     .convertRowIndexToModel(row));
             JMenuItem menuItem = null;
             JMenu menu = null;

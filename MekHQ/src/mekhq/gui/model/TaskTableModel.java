@@ -16,6 +16,7 @@ import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Skill;
 import mekhq.gui.CampaignGUI;
+import mekhq.gui.ITechWorkPanel;
 import mekhq.gui.RepairTaskInfo;
 
 /**
@@ -25,7 +26,8 @@ public class TaskTableModel extends DataTableModel {
     private static final long serialVersionUID = -6256038046416893994L;
     private static Map<String, Person> techCache = new HashMap<String, Person>();
     
-    private CampaignGUI campaignGUI;
+    private CampaignGUI gui;
+    private ITechWorkPanel panel;
     
     private interface REPAIR_STATE {
     	public static final int AVAILABLE = 0;
@@ -35,13 +37,13 @@ public class TaskTableModel extends DataTableModel {
     	public static final int SCHEDULED = 4;
     }
     
-    public TaskTableModel(CampaignGUI campaignGUI) {
+    public TaskTableModel(CampaignGUI gui, ITechWorkPanel panel) {
         columnNames = new String[] { "Tasks" };
         data = new ArrayList<Part>();
-        
-        this.campaignGUI = campaignGUI;
+        this.gui = gui;
+        this.panel = panel;
     }
-
+    
     public Object getValueAt(int row, int col) {
         return ((Part) data.get(row)).getDesc();
     }
@@ -95,7 +97,7 @@ public class TaskTableModel extends DataTableModel {
             } else {            	
             	if (part instanceof MissingPart) {
             		if (!((MissingPart)part).isReplacementAvailable()) {
-	            		String[] inventories = campaignGUI.getCampaign().getPartInventory(((MissingPart) part).getNewPart());
+	            		String[] inventories = gui.getCampaign().getPartInventory(((MissingPart) part).getNewPart());
 	            		
 	            		//int inStock = processInventoryString(inventories[0]);
 	            		int inTransit = processInventoryString(inventories[1]);
@@ -110,11 +112,11 @@ public class TaskTableModel extends DataTableModel {
             	}
             	
             	if (availableLevel == REPAIR_STATE.AVAILABLE) {
-	                Person tech = campaignGUI.getSelectedTech();
+	                Person tech = panel.getSelectedTech();
 	                
 	                if (null == tech) {
 	                	//Find a valid tech that we can copy their skill from
-	                	ArrayList<Person> techs = campaignGUI.getCampaign().getTechs(false);
+	                	ArrayList<Person> techs = gui.getCampaign().getTechs(false);
 	                	
 	        			for (int i = techs.size() - 1; i >= 0; i--) {
 	        				Person techTemp = techs.get(i);
@@ -135,7 +137,7 @@ public class TaskTableModel extends DataTableModel {
 	        				if (null == tech) {
 			        			//Create a dummy elite tech with the proper skill and 1 minute and put it in our cache for later use
 			        			
-			        			tech = new Person(String.format("Temp Tech (%s)", skillName), campaignGUI.getCampaign());
+			        			tech = new Person(String.format("Temp Tech (%s)", skillName), gui.getCampaign());
 			        			tech.addSkill(skillName, partSkill.getType().getEliteLevel(), 1);
 			        			tech.setMinutesLeft(1);
 			        			
@@ -145,7 +147,7 @@ public class TaskTableModel extends DataTableModel {
 	                }
 	                
 	                if (null != tech) {
-	                	TargetRoll roll = campaignGUI.getCampaign().getTargetFor(part, tech);
+	                	TargetRoll roll = gui.getCampaign().getTargetFor(part, tech);
 	                	
 	                	if ((roll.getValue() == TargetRoll.IMPOSSIBLE) || (roll.getValue() == TargetRoll.AUTOMATIC_FAIL) || (roll.getValue() == TargetRoll.CHECK_FALSE)) {
 	                		availableLevel = REPAIR_STATE.BLOCKED;

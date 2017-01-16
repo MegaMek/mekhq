@@ -9,27 +9,34 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
+import javax.swing.JTable;
 import javax.swing.event.MouseInputAdapter;
 
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.dialog.CustomizeScenarioDialog;
+import mekhq.gui.model.ScenarioTableModel;
 
 public class ScenarioTableMouseAdapter extends MouseInputAdapter implements
         ActionListener {
+    
     private CampaignGUI gui;
+    private JTable scenarioTable;
+    private ScenarioTableModel scenarioModel;
 
-    public ScenarioTableMouseAdapter(CampaignGUI gui) {
+    public ScenarioTableMouseAdapter(CampaignGUI gui, JTable scenarioTable,
+            ScenarioTableModel scenarioModel) {
         super();
         this.gui = gui;
+        this.scenarioTable = scenarioTable;
+        this.scenarioModel = scenarioModel;
     }
 
     public void actionPerformed(ActionEvent action) {
         String command = action.getActionCommand();
-        Scenario scenario = gui.getScenarioModel().getScenario(gui.getScenarioTable()
-                .getSelectedRow());
-        Mission mission = gui.getCampaign().getMission(gui.getSelectedMission());
+        Scenario scenario = scenarioModel.getScenario(scenarioTable.getSelectedRow());
+        Mission mission = gui.getCampaign().getMission(scenario.getMissionId());
         if (command.equalsIgnoreCase("EDIT")) {
             if (null != mission && null != scenario) {
                 CustomizeScenarioDialog csd = new CustomizeScenarioDialog(
@@ -65,13 +72,13 @@ public class ScenarioTableMouseAdapter extends MouseInputAdapter implements
     private void maybeShowPopup(MouseEvent e) {
         JPopupMenu popup = new JPopupMenu();
         if (e.isPopupTrigger()) {
-            int row = gui.getScenarioTable().getSelectedRow();
+            int row = scenarioTable.getSelectedRow();
             if (row < 0) {
                 return;
             }
             @SuppressWarnings("unused")
             // FIXME
-            Scenario scenario = gui.getScenarioModel().getScenario(row);
+            Scenario scenario = scenarioModel.getScenario(row);
             JMenuItem menuItem = null;
             JMenu menu = null;
             @SuppressWarnings("unused")

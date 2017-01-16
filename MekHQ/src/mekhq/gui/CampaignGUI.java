@@ -23,24 +23,14 @@ package mekhq.gui;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Font;
-import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.awt.Image;
-import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.image.ImageObserver;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -50,10 +40,8 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.lang.reflect.Method;
 import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Collection;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -62,55 +50,27 @@ import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.BorderFactory;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.DropMode;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
-import javax.swing.JTextArea;
-import javax.swing.JTextPane;
 import javax.swing.JToggleButton;
-import javax.swing.JTree;
-import javax.swing.KeyStroke;
-import javax.swing.ListSelectionModel;
-import javax.swing.RowFilter;
-import javax.swing.RowSorter;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.event.MouseInputAdapter;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
 import javax.swing.filechooser.FileFilter;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableColumnModel;
-import javax.swing.table.TableRowSorter;
-import javax.swing.tree.TreeSelectionModel;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -123,61 +83,33 @@ import chat.ChatClient;
 import megamek.client.RandomNameGenerator;
 import megamek.client.RandomUnitGenerator;
 import megamek.client.ui.swing.GameOptionsDialog;
-import megamek.common.AmmoType;
 import megamek.common.Crew;
 import megamek.common.Dropship;
 import megamek.common.Entity;
-import megamek.common.EntityListFile;
 import megamek.common.Jumpship;
 import megamek.common.MULParser;
-import megamek.common.MechView;
-import megamek.common.MiscType;
-import megamek.common.TargetRoll;
 import megamek.common.TechConstants;
-import megamek.common.UnitType;
-import megamek.common.WeaponType;
 import megamek.common.loaders.EntityLoadingException;
-import megamek.common.options.GameOptions;
 import megamek.common.options.PilotOptions;
 import megamek.common.util.EncodeControl;
-import megameklab.com.util.UnitPrintManager;
 import mekhq.IconPackage;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.Version;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
-import mekhq.campaign.JumpPath;
 import mekhq.campaign.RandomSkillPreferences;
-import mekhq.campaign.ResolveScenarioTracker;
+import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.force.Force;
-import mekhq.campaign.force.Lance;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
-import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
-import mekhq.campaign.parts.Armor;
-import mekhq.campaign.parts.BaArmor;
-import mekhq.campaign.parts.EnginePart;
-import mekhq.campaign.parts.MekActuator;
-import mekhq.campaign.parts.MekGyro;
-import mekhq.campaign.parts.MekLifeSupport;
-import mekhq.campaign.parts.MekLocation;
-import mekhq.campaign.parts.MekSensor;
 import mekhq.campaign.parts.Part;
-import mekhq.campaign.parts.PartInUse;
-import mekhq.campaign.parts.ProtomekArmor;
 import mekhq.campaign.parts.Refit;
-import mekhq.campaign.parts.TankLocation;
-import mekhq.campaign.parts.equipment.AmmoBin;
-import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.SpecialAbility;
-import mekhq.campaign.rating.IUnitRating;
-import mekhq.campaign.rating.UnitRatingFactory;
 import mekhq.campaign.report.CargoReport;
 import mekhq.campaign.report.HangarReport;
 import mekhq.campaign.report.PersonnelReport;
@@ -186,41 +118,19 @@ import mekhq.campaign.report.Report;
 import mekhq.campaign.report.TransportReport;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.NewsItem;
-import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.RandomFactionGenerator;
-import mekhq.campaign.work.IAcquisitionWork;
-import mekhq.campaign.work.WorkTime;
-import mekhq.gui.adapter.FinanceTableMouseAdapter;
-import mekhq.gui.adapter.LoanTableMouseAdapter;
-import mekhq.gui.adapter.OrgTreeMouseAdapter;
-import mekhq.gui.adapter.PartsTableMouseAdapter;
-import mekhq.gui.adapter.PersonnelTableMouseAdapter;
-import mekhq.gui.adapter.ProcurementTableMouseAdapter;
-import mekhq.gui.adapter.ScenarioTableMouseAdapter;
-import mekhq.gui.adapter.ServicedUnitsTableMouseAdapter;
-import mekhq.gui.adapter.UnitTableMouseAdapter;
-import mekhq.gui.dialog.AddFundsDialog;
 import mekhq.gui.dialog.AdvanceDaysDialog;
 import mekhq.gui.dialog.BatchXPDialog;
 import mekhq.gui.dialog.BloodnameDialog;
 import mekhq.gui.dialog.CampaignOptionsDialog;
-import mekhq.gui.dialog.ChooseMulFilesDialog;
-import mekhq.gui.dialog.CompleteMissionDialog;
 import mekhq.gui.dialog.ContractMarketDialog;
-import mekhq.gui.dialog.CustomizeAtBContractDialog;
-import mekhq.gui.dialog.CustomizeMissionDialog;
-import mekhq.gui.dialog.CustomizeScenarioDialog;
 import mekhq.gui.dialog.DailyReportLogDialog;
 import mekhq.gui.dialog.DataLoadingDialog;
 import mekhq.gui.dialog.GMToolsDialog;
 import mekhq.gui.dialog.HireBulkPersonnelDialog;
 import mekhq.gui.dialog.MaintenanceReportDialog;
-import mekhq.gui.dialog.ManageAssetsDialog;
-import mekhq.gui.dialog.MassRepairSalvageDialog;
 import mekhq.gui.dialog.MekHQAboutBox;
 import mekhq.gui.dialog.MercRosterDialog;
-import mekhq.gui.dialog.MissionTypeDialog;
-import mekhq.gui.dialog.NewLoanDialog;
 import mekhq.gui.dialog.NewRecruitDialog;
 import mekhq.gui.dialog.NewsReportDialog;
 import mekhq.gui.dialog.PartsStoreDialog;
@@ -228,125 +138,20 @@ import mekhq.gui.dialog.PersonnelMarketDialog;
 import mekhq.gui.dialog.PopupValueChoiceDialog;
 import mekhq.gui.dialog.RefitNameDialog;
 import mekhq.gui.dialog.ReportDialog;
-import mekhq.gui.dialog.ResolveScenarioWizardDialog;
 import mekhq.gui.dialog.RetirementDefectionDialog;
 import mekhq.gui.dialog.ShipSearchDialog;
 import mekhq.gui.dialog.UnitMarketDialog;
 import mekhq.gui.dialog.UnitSelectorDialog;
-import mekhq.gui.handler.OrgTreeTransferHandler;
-import mekhq.gui.model.AcquisitionTableModel;
-import mekhq.gui.model.DocTableModel;
-import mekhq.gui.model.FinanceTableModel;
-import mekhq.gui.model.LoanTableModel;
-import mekhq.gui.model.OrgTreeModel;
-import mekhq.gui.model.PartsInUseTableModel;
-import mekhq.gui.model.PartsInUseTableModel.ButtonColumn;
 import mekhq.gui.model.PartsTableModel;
-import mekhq.gui.model.PatientTableModel;
-import mekhq.gui.model.PersonnelTableModel;
-import mekhq.gui.model.ProcurementTableModel;
-import mekhq.gui.model.ScenarioTableModel;
-import mekhq.gui.model.TaskTableModel;
-import mekhq.gui.model.TechTableModel;
-import mekhq.gui.model.UnitTableModel;
-import mekhq.gui.model.XTableColumnModel;
-import mekhq.gui.sorter.BonusSorter;
-import mekhq.gui.sorter.FormattedNumberSorter;
-import mekhq.gui.sorter.LevelSorter;
-import mekhq.gui.sorter.PartsDetailSorter;
-import mekhq.gui.sorter.RankSorter;
-import mekhq.gui.sorter.TargetSorter;
-import mekhq.gui.sorter.TaskSorter;
-import mekhq.gui.sorter.TechSorter;
-import mekhq.gui.sorter.TwoNumbersSorter;
-import mekhq.gui.sorter.UnitStatusSorter;
-import mekhq.gui.sorter.UnitTypeSorter;
-import mekhq.gui.sorter.WeightClassSorter;
-import mekhq.gui.utilities.JSuggestField;
-import mekhq.gui.view.AtBContractViewPanel;
-import mekhq.gui.view.AtBScenarioViewPanel;
-import mekhq.gui.view.ContractViewPanel;
-import mekhq.gui.view.ForceViewPanel;
-import mekhq.gui.view.JumpPathViewPanel;
-import mekhq.gui.view.LanceAssignmentView;
-import mekhq.gui.view.MissionViewPanel;
-import mekhq.gui.view.PersonViewPanel;
-import mekhq.gui.view.PlanetViewPanel;
-import mekhq.gui.view.ScenarioViewPanel;
-import mekhq.gui.view.UnitViewPanel;
 
 /**
  * The application's main frame.
  */
 public class CampaignGUI extends JPanel {
     private static final long serialVersionUID = -687162569841072579L;
-
-    public static final int UNIT_VIEW_WIDTH = 450;
-    public static final int PERSONNEL_VIEW_WIDTH = 500;
+    
     public static final int MAX_START_WIDTH = 1400;
     public static final int MAX_START_HEIGHT = 900;
-
-    // personnel filter groups
-    public static final int PG_ACTIVE = 0;
-    public static final int PG_COMBAT = 1;
-    public static final int PG_SUPPORT = 2;
-    public static final int PG_MW = 3;
-    public static final int PG_CREW = 4;
-    public static final int PG_PILOT = 5;
-    public static final int PG_CPILOT = 6;
-    public static final int PG_PROTO = 7;
-    public static final int PG_BA = 8;
-    public static final int PG_SOLDIER = 9;
-    public static final int PG_VESSEL = 10;
-    public static final int PG_TECH = 11;
-    public static final int PG_DOC = 12;
-    public static final int PG_ADMIN = 13;
-    public static final int PG_DEPENDENT = 14;
-    public static final int PG_RETIRE = 15;
-    public static final int PG_MIA = 16;
-    public static final int PG_KIA = 17;
-    public static final int PG_NUM = 18;
-
-    // parts filter groups
-    private static final int SG_ALL = 0;
-    private static final int SG_ARMOR = 1;
-    private static final int SG_SYSTEM = 2;
-    private static final int SG_EQUIP = 3;
-    private static final int SG_LOC = 4;
-    private static final int SG_WEAP = 5;
-    private static final int SG_AMMO = 6;
-    private static final int SG_AMMO_BIN = 7;
-    private static final int SG_MISC = 8;
-    private static final int SG_ENGINE = 9;
-    private static final int SG_GYRO = 10;
-    private static final int SG_ACT = 11;
-    private static final int SG_NUM = 12;
-
-    // parts views
-    private static final int SV_ALL = 0;
-    private static final int SV_IN_TRANSIT = 1;
-    private static final int SV_RESERVED = 2;
-    private static final int SV_UNDAMAGED = 3;
-    private static final int SV_DAMAGED = 4;
-    private static final int SV_NUM = 5;
-
-    // personnel views
-    private static final int PV_GRAPHIC = 0;
-    private static final int PV_GENERAL = 1;
-    private static final int PV_PILOT = 2;
-    private static final int PV_INF = 3;
-    private static final int PV_TACTIC = 4;
-    private static final int PV_TECH = 5;
-    private static final int PV_ADMIN = 6;
-    private static final int PV_FLUFF = 7;
-    private static final int PV_NUM = 8;
-
-    // unit views
-    private static final int UV_GRAPHIC = 0;
-    private static final int UV_GENERAL = 1;
-    private static final int UV_DETAILS = 2;
-    private static final int UV_STATUS = 3;
-    private static final int UV_NUM = 4;
 
     private JFrame frame;
 
@@ -369,115 +174,8 @@ public class CampaignGUI extends JPanel {
     private JMenuItem miShipSearch;
     private JMenuItem miRetirementDefectionDialog;
     private JCheckBoxMenuItem miShowOverview;
-
-    /* For the TO&E tab */
-    private JPanel panOrganization;
-    private JTree orgTree;
-    private JSplitPane splitOrg;
-    private JScrollPane scrollForceView;
-
-    /* For the briefing room tab */
-    private JPanel panBriefing;
-    private JPanel panScenario;
-    private LanceAssignmentView panLanceAssignment;
-    private JSplitPane splitScenario;
-    private JSplitPane splitBrief;
-    private JSplitPane splitMission;
-    private JTable scenarioTable;
-    private JComboBox<String> choiceMission;
-    private JScrollPane scrollMissionView;
-    private JScrollPane scrollScenarioView;
-    private JPanel panMissionButtons;
-    private JPanel panScenarioButtons;
-    private JButton btnAddScenario;
-    private JButton btnAddMission;
-    private JButton btnEditMission;
-    private JButton btnCompleteMission;
-    private JButton btnDeleteMission;
-    private JButton btnStartGame;
-    private JButton btnJoinGame;
-    private JButton btnLoadGame;
-    private JButton btnPrintRS;
-    private JButton btnGetMul;
-    private JButton btnClearAssignedUnits;
-    private JButton btnResolveScenario;
-
-    /* For the map tab */
-    private JPanel panMapView;
-    InterstellarMapPanel panMap;
-    private JSplitPane splitMap;
-    private JScrollPane scrollPlanetView;
-    JSuggestField suggestPlanet;
-
-    /* For the personnel tab */
-    private JPanel panPersonnel;
-    private JSplitPane splitPersonnel;
-    private JTable personnelTable;
-    private JComboBox<String> choicePerson;
-    private JComboBox<String> choicePersonView;
-    private JScrollPane scrollPersonnelView;
-
-    /* For the hangar tab */
-    private JPanel panHangar;
-    private JSplitPane splitUnit;
-    private JTable unitTable;
-    private JTable acquireUnitsTable;
-    private JComboBox<String> choiceUnit;
-    private JComboBox<String> choiceUnitView;
-    private JScrollPane scrollUnitView;
-
-    /* For the warehouse tab */
-    private JPanel panSupplies;
-    private JSplitPane splitWarehouse;
-    private JTable partsTable;
-    private JTable acquirePartsTable;
-    private JTable whTechTable;
-    private JButton btnDoTaskWarehouse;
-    private JToggleButton btnShowAllTechsWarehouse;
-    private JLabel lblTargetNumWarehouse;
-    private JTextArea textTargetWarehouse;
-    private JLabel astechPoolLabelWarehouse;
-    private JComboBox<String> choiceParts;
-    private JComboBox<String> choicePartsView;
-
-    /* For the repair bay tab */
-    private JPanel panRepairBay;
-    private JPanel panDoTask;
-    private JTabbedPane tabTasks;
-    private JSplitPane splitServicedUnits;
-    private JTable servicedUnitTable;
-    private JTable taskTable;
-    private JTable acquisitionTable;
-    private JTable techTable;
-    private JButton btnDoTask;
-    private JButton btnUseBonusPart;
-    private JToggleButton btnShowAllTechs;
-    private JScrollPane scrTextTarget;
-    private JScrollPane scrollPartsTable;
-    private JLabel lblTargetNum;
-    private JTextPane txtServicedUnitView;
-    private JTextArea textTarget;
-    private JLabel astechPoolLabel;
-    private JComboBox<String> choiceLocation;
-
-    /* For the infirmary tab */
-    private JPanel panInfirmary;
-    private JTable docTable;
-    private JButton btnAssignDoc;
-    private JButton btnUnassignDoc;
-    private JList<Person> listAssignedPatient;
-    private JList<Person> listUnassignedPatient;
-
-    /* For the mek lab tab */
-    private MekLabPanel panMekLab;
-
-    /* For the finances tab */
-    private JPanel panFinances;
-    private JTable financeTable;
-    private JTable loanTable;
-    private JTextArea areaNetWorth;
-    private JButton btnAddFunds;
-    private JButton btnManageAssets;
+    
+    private EnumMap<GuiTabType,CampaignGuiTab> standardTabs;
 
     /* Components for the status panel */
     private JPanel statusPanel;
@@ -495,65 +193,7 @@ public class CampaignGUI extends JPanel {
     private JToggleButton btnOvertime;
     private JButton btnAdvanceDay;
 
-    /* Table models that we will need */
-    private TaskTableModel taskModel;
-    private AcquisitionTableModel acquireModel;
-    // private ServicedUnitTableModel servicedUnitModel;
-    private UnitTableModel servicedUnitModel;
-    private TechTableModel techsModel;
-    private PatientTableModel assignedPatientModel;
-    private PatientTableModel unassignedPatientModel;
-    private DocTableModel doctorsModel;
-    private PersonnelTableModel personModel;
-    private UnitTableModel unitModel;
-    private PartsTableModel partsModel;
-    private ProcurementTableModel acquirePartsModel;
-    private ProcurementTableModel acquireUnitsModel;
-    private FinanceTableModel financeModel;
-    private LoanTableModel loanModel;
-    private ScenarioTableModel scenarioModel;
-    private OrgTreeModel orgModel;
-    private PartsInUseTableModel overviewPartsModel;
-
-
-    /* table sorters for tables that can be filtered */
-    private TableRowSorter<PersonnelTableModel> personnelSorter;
-    private TableRowSorter<PartsTableModel> partsSorter;
-    private TableRowSorter<ProcurementTableModel> acquirePartsSorter;
-    private TableRowSorter<UnitTableModel> unitSorter;
-    private TableRowSorter<UnitTableModel> servicedUnitSorter;
-    private TableRowSorter<TaskTableModel> taskSorter;
-    private TableRowSorter<TechTableModel> techSorter;
-    private TableRowSorter<TechTableModel> whTechSorter;
-    private TableRowSorter<PartsInUseTableModel> partsInUseSorter;
-
-    // Start Overview Tab
-    private JPanel panOverview;
-    private JTabbedPane tabOverview;
-    // Overview Parts In Use
-    private JScrollPane scrollOverviewParts;
-    private JPanel overviewPartsPanel;
-    private JTable overviewPartsInUseTable;
-    // Overview Transport
-    private JScrollPane scrollOverviewTransport;
-    // Overview Personnel
-    private JScrollPane scrollOverviewCombatPersonnel;
-    private JScrollPane scrollOverviewSupportPersonnel;
-    private JSplitPane splitOverviewPersonnel;
-    // Overview Hangar
-    private JScrollPane scrollOverviewHangar;
-    private JTextArea overviewHangarArea;
-    private JSplitPane splitOverviewHangar;
-    // Overview Rating
-    private JScrollPane scrollOverviewUnitRating;
-    private IUnitRating rating;
-    // Overview Cargo
-    private JScrollPane scrollOverviewCargo;
-    // End Overview Tab
-
     ReportHyperlinkListener reportHLL;
-
-    public int selectedMission;
 
     private DailyReportLogDialog logDialog;
     private AdvanceDaysDialog advanceDaysDialog;
@@ -562,7 +202,7 @@ public class CampaignGUI extends JPanel {
     public CampaignGUI(MekHQ app) {
         this.app = app;
         reportHLL = new ReportHyperlinkListener(this);
-        selectedMission = -1;
+    	standardTabs = new EnumMap<>(GuiTabType.class);
         initComponents();
     }
 
@@ -614,22 +254,17 @@ public class CampaignGUI extends JPanel {
     }
 
     public void toggleOverviewTab() {
-        getTabOverview().setVisible(!getTabOverview().isVisible());
-        miShowOverview.setSelected(getTabOverview().isVisible());
-        showHideTabOverview();
+    	boolean show = !hasTab(GuiTabType.OVERVIEW);
+        miShowOverview.setSelected(show);
+        showOverviewTab(show);
     }
-
-    public void showHideTabOverview() {
-        miShowOverview.setSelected(tabOverview.isVisible());
-        int drIndex = getTabMain().indexOfComponent(panOverview);
-        if (drIndex > -1 && !tabOverview.isVisible()) {
-            getTabMain().removeTabAt(drIndex);
-        } else {
-            if (drIndex == -1) {
-                getTabMain().addTab(resourceMap.getString("panOverview.TabConstraints.tabTitle"),
-                        panOverview);
-            }
-        }
+    
+    public void showOverviewTab(boolean show) {
+    	if (show) {
+    		addStandardTab(GuiTabType.OVERVIEW);
+    	} else {
+    		removeStandardTab(GuiTabType.OVERVIEW);
+    	}    	
     }
 
     public void showGMToolsDialog() {
@@ -688,66 +323,25 @@ public class CampaignGUI extends JPanel {
         tabMain.setMinimumSize(new java.awt.Dimension(600, 200));
         tabMain.setPreferredSize(new java.awt.Dimension(900, 300));
 
-        initToeTab();
-        tabMain.addTab(resourceMap
-                .getString("panOrganization.TabConstraints.tabTitle"),
-                panOrganization); // NOI18N
-
-        initBriefingTab();
-        tabMain.addTab(
-                resourceMap.getString("panBriefing.TabConstraints.tabTitle"),
-                splitBrief); // NOI18N
-
-        initMap();
-        tabMain.addTab(resourceMap.getString("panMap.TabConstraints.tabTitle"),
-                splitMap); // NOI18N
-
-        initPersonnelTab();
-        tabMain.addTab(
-                resourceMap.getString("panPersonnel.TabConstraints.tabTitle"),
-                panPersonnel); // NOI18N
-
-        initHangarTab();
-        tabMain.addTab(
-                resourceMap.getString("panHangar.TabConstraints.tabTitle"),
-                panHangar); // NOI18N
-
-        initWarehouseTab();
-        tabMain.addTab(
-                resourceMap.getString("panSupplies.TabConstraints.tabTitle"),
-                splitWarehouse); // NOI18N
-
-        initRepairTab();
-        tabMain.addTab(
-                resourceMap.getString("panRepairBay.TabConstraints.tabTitle"),
-                panRepairBay); // NOI18N
-
-        initInfirmaryTab();
-        tabMain.addTab(
-                resourceMap.getString("panInfirmary.TabConstraints.tabTitle"),
-                panInfirmary); // NOI18N
-
-        panMekLab = new MekLabPanel(this);
-        tabMain.addTab(
-                resourceMap.getString("panMekLab.TabConstraints.tabTitle"),
-                new JScrollPane(getPanMekLab())); // NOI18N
-
-        initFinanceTab();
-        tabMain.addTab(
-                resourceMap.getString("panFinances.TabConstraints.tabTitle"),
-                panFinances); // NOI18N
-
-        initOverviewTab();
-        tabMain.addTab(
-                resourceMap.getString("panOverview.TabConstraints.tabTitle"),
-                panOverview); // NOI18N
+        addStandardTab(GuiTabType.TOE);
+        addStandardTab(GuiTabType.BRIEFING);
+        addStandardTab(GuiTabType.MAP);
+        addStandardTab(GuiTabType.PERSONNEL);
+        addStandardTab(GuiTabType.HANGAR);
+        addStandardTab(GuiTabType.WAREHOUSE);
+        addStandardTab(GuiTabType.REPAIR);
+        addStandardTab(GuiTabType.INFIRMARY);
+        addStandardTab(GuiTabType.MEKLAB);
+        addStandardTab(GuiTabType.FINANCES);
+        addStandardTab(GuiTabType.OVERVIEW);
 
         // The finance tab can be a pain to update when dealing with large units.
         // Refresh it on tab change to that panel instead.
         tabMain.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
-                if(tabMain.getSelectedComponent() == panFinances) { // Yes, identity check
+                if(((CampaignGuiTab)tabMain.getSelectedComponent()).tabType()
+                		.equals(GuiTabType.FINANCES)) {
                     refreshFinancialTransactions();
                 }
                 
@@ -762,29 +356,16 @@ public class CampaignGUI extends JPanel {
         add(mainPanel, BorderLayout.CENTER);
         add(btnPanel, BorderLayout.PAGE_START);
         add(statusPanel, BorderLayout.PAGE_END);
+        
+        standardTabs.values().forEach(t -> t.refreshAll());
 
-        refreshServicedUnitList();
-        refreshUnitList();
-        refreshPersonnelList();
-        changePersonnelView();
-        refreshTaskList();
-        refreshAcquireList();
-        refreshTechsList();
-        refreshPatientList();
-        refreshDoctorsList();
-        refreshPartsList();
         refreshCalendar();
         initReport();
         refreshFunds();
         refreshRating();
-        refreshFinancialTransactions();
-        refreshOrganization();
-        refreshMissions();
         refreshLocation();
         refreshTempAstechs();
         refreshTempMedics();
-        refreshScenarioList();
-        refreshOverview();
 
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 
@@ -820,1890 +401,170 @@ public class CampaignGUI extends JPanel {
 
         mainPanel.setDividerLocation(0.75);
     }
-
-    private void initToeTab() {
-        GridBagConstraints gridBagConstraints;
-
-        panOrganization = new JPanel(new GridBagLayout());
-
-        orgModel = new OrgTreeModel(getCampaign());
-        orgTree = new JTree(orgModel);
-        orgTree.addMouseListener(new OrgTreeMouseAdapter(this));
-        orgTree.setCellRenderer(new ForceRenderer(getIconPackage()));
-        orgTree.setRowHeight(60);
-        orgTree.getSelectionModel().setSelectionMode(
-                TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
-        orgTree.addTreeSelectionListener(new TreeSelectionListener() {
-            @Override
-            public void valueChanged(TreeSelectionEvent e) {
-                refreshForceView();
-            }
-        });
-        orgTree.setDragEnabled(true);
-        orgTree.setDropMode(DropMode.ON);
-        orgTree.setTransferHandler(new OrgTreeTransferHandler(this));
-
-        scrollForceView = new JScrollPane();
-        scrollForceView.setMinimumSize(new java.awt.Dimension(550, 600));
-        scrollForceView.setPreferredSize(new java.awt.Dimension(550, 600));
-        scrollForceView
-                .setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-
-        splitOrg = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, new JScrollPane(orgTree), scrollForceView);
-        splitOrg.setOneTouchExpandable(true);
-        splitOrg.setResizeWeight(1.0);
-        splitOrg.addPropertyChangeListener(
-                JSplitPane.DIVIDER_LOCATION_PROPERTY,
-                new PropertyChangeListener() {
-                    @Override
-                    public void propertyChange(PropertyChangeEvent pce) {
-                        // this can mess up the unit view panel so refresh it
-                        refreshForceView();
-                    }
-                });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        panOrganization.add(splitOrg, gridBagConstraints);
-
+    
+    public CampaignGuiTab getTab(GuiTabType tabType) {
+    	return standardTabs.get(tabType);
     }
-
-    private void initBriefingTab() {
-        GridBagConstraints gridBagConstraints;
-
-        panBriefing = new JPanel(new GridBagLayout());
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.CENTER;
-        gridBagConstraints.weightx = 0.0;
-        gridBagConstraints.weighty = 0.0;
-        panBriefing.add(new JLabel(resourceMap.getString("lblMission.text")),
-                gridBagConstraints);
-
-        choiceMission = new JComboBox<String>();
-        choiceMission.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                changeMission();
-            }
-        });
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 0.0;
-        panBriefing.add(choiceMission, gridBagConstraints);
-
-        panMissionButtons = new JPanel(new GridLayout(2, 3));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridheight = 2;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 0.0;
-        panBriefing.add(panMissionButtons, gridBagConstraints);
-
-        btnAddMission = new JButton(resourceMap.getString("btnAddMission.text")); // NOI18N
-        btnAddMission.setToolTipText(resourceMap
-                .getString("btnAddMission.toolTipText")); // NOI18N
-        btnAddMission.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                addMission();
-            }
-        });
-        panMissionButtons.add(btnAddMission);
-
-        btnAddScenario = new JButton(
-                resourceMap.getString("btnAddScenario.text")); // NOI18N
-        btnAddScenario.setToolTipText(resourceMap
-                .getString("btnAddScenario.toolTipText")); // NOI18N
-        btnAddScenario.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                addScenario();
-            }
-        });
-        panMissionButtons.add(btnAddScenario);
-
-        btnEditMission = new JButton(
-                resourceMap.getString("btnEditMission.text")); // NOI18N
-        btnEditMission.setToolTipText(resourceMap
-                .getString("btnEditMission.toolTipText")); // NOI18N
-        btnEditMission.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                editMission();
-            }
-        });
-        panMissionButtons.add(btnEditMission);
-
-        btnCompleteMission = new JButton(
-                resourceMap.getString("btnCompleteMission.text")); // NOI18N
-        btnCompleteMission.setToolTipText(resourceMap
-                .getString("btnCompleteMission.toolTipText")); // NOI18N
-        btnCompleteMission.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                completeMission();
-            }
-        });
-        panMissionButtons.add(btnCompleteMission);
-
-        btnDeleteMission = new JButton(
-                resourceMap.getString("btnDeleteMission.text")); // NOI18N
-        btnDeleteMission.setToolTipText(resourceMap
-                .getString("btnDeleteMission.toolTipText")); // NOI18N
-        btnDeleteMission.setName("btnDeleteMission"); // NOI18N
-        btnDeleteMission.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                deleteMission();
-            }
-        });
-        panMissionButtons.add(btnDeleteMission);
-
-        scrollMissionView = new JScrollPane();
-        scrollMissionView
-                .setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        scrollMissionView.setViewportView(null);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        panBriefing.add(scrollMissionView, gridBagConstraints);
-
-        scenarioModel = new ScenarioTableModel(getCampaign());
-        scenarioTable = new JTable(scenarioModel);
-        scenarioTable.setShowGrid(false);
-        scenarioTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        scenarioTable.addMouseListener(new ScenarioTableMouseAdapter(this));
-        scenarioTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-        scenarioTable.setIntercellSpacing(new Dimension(0, 0));
-        scenarioTable.getSelectionModel().addListSelectionListener(
-                new javax.swing.event.ListSelectionListener() {
-                    @Override
-                    public void valueChanged(
-                            javax.swing.event.ListSelectionEvent evt) {
-                        refreshScenarioView();
-                    }
-                });
-        JScrollPane scrollScenarioTable = new JScrollPane(scenarioTable);
-        scrollScenarioTable.setMinimumSize(new java.awt.Dimension(200, 200));
-        scrollScenarioTable.setPreferredSize(new java.awt.Dimension(200, 200));
-
-        splitMission = new JSplitPane(JSplitPane.VERTICAL_SPLIT, panBriefing, scrollScenarioTable);
-        splitMission.setOneTouchExpandable(true);
-        splitMission.setResizeWeight(1.0);
-
-        panScenario = new JPanel(new GridBagLayout());
-
-        panScenarioButtons = new JPanel(new GridLayout(3, 3));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 0.0;
-        panScenario.add(panScenarioButtons, gridBagConstraints);
-
-        btnStartGame = new JButton(resourceMap.getString("btnStartGame.text")); // NOI18N
-        btnStartGame.setToolTipText(resourceMap
-                .getString("btnStartGame.toolTipText")); // NOI18N
-        btnStartGame.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                startScenario();
-            }
-        });
-        btnStartGame.setEnabled(false);
-        panScenarioButtons.add(btnStartGame);
-
-        btnJoinGame = new JButton(resourceMap.getString("btnJoinGame.text")); // NOI18N
-        btnJoinGame.setToolTipText(resourceMap
-                .getString("btnJoinGame.toolTipText")); // NOI18N
-        btnJoinGame.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                joinScenario();
-            }
-        });
-        btnJoinGame.setEnabled(false);
-        panScenarioButtons.add(btnJoinGame);
-
-        btnLoadGame = new JButton(resourceMap.getString("btnLoadGame.text")); // NOI18N
-        btnLoadGame.setToolTipText(resourceMap
-                .getString("btnLoadGame.toolTipText")); // NOI18N
-        btnLoadGame.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                loadScenario();
-            }
-        });
-        btnLoadGame.setEnabled(false);
-        panScenarioButtons.add(btnLoadGame);
-
-        btnPrintRS = new JButton(resourceMap.getString("btnPrintRS.text")); // NOI18N
-        btnPrintRS.setToolTipText(resourceMap
-                .getString("btnPrintRS.toolTipText")); // NOI18N
-        btnPrintRS.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                printRecordSheets();
-            }
-        });
-        btnPrintRS.setEnabled(false);
-        panScenarioButtons.add(btnPrintRS);
-
-        btnGetMul = new JButton(resourceMap.getString("btnGetMul.text")); // NOI18N
-        btnGetMul
-                .setToolTipText(resourceMap.getString("btnGetMul.toolTipText")); // NOI18N
-        btnGetMul.setName("btnGetMul"); // NOI18N
-        btnGetMul.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                deployListFile();
-            }
-        });
-        btnGetMul.setEnabled(false);
-        panScenarioButtons.add(btnGetMul);
-
-        btnResolveScenario = new JButton(
-                resourceMap.getString("btnResolveScenario.text")); // NOI18N
-        btnResolveScenario.setToolTipText(resourceMap
-                .getString("btnResolveScenario.toolTipText")); // NOI18N
-        btnResolveScenario.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                resolveScenario();
-            }
-        });
-        btnResolveScenario.setEnabled(false);
-        panScenarioButtons.add(btnResolveScenario);
-
-        btnClearAssignedUnits = new JButton(
-                resourceMap.getString("btnClearAssignedUnits.text")); // NOI18N
-        btnClearAssignedUnits.setToolTipText(resourceMap
-                .getString("btnClearAssignedUnits.toolTipText")); // NOI18N
-        btnClearAssignedUnits.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                clearAssignedUnits();
-            }
-        });
-        btnClearAssignedUnits.setEnabled(false);
-        panScenarioButtons.add(btnClearAssignedUnits);
-
-        scrollScenarioView = new JScrollPane();
-        scrollScenarioView.setViewportView(null);
-        scrollScenarioView.setMinimumSize(new java.awt.Dimension(450, 600));
-        scrollScenarioView.setPreferredSize(new java.awt.Dimension(450, 600));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        panScenario.add(scrollScenarioView, gridBagConstraints);
-
-        /* ATB */
-        panLanceAssignment = new LanceAssignmentView(getCampaign());
-        JScrollPane paneLanceDeployment = new JScrollPane(panLanceAssignment);
-        paneLanceDeployment.setMinimumSize(new java.awt.Dimension(200, 300));
-        paneLanceDeployment.setPreferredSize(new java.awt.Dimension(200, 300));
-        paneLanceDeployment.setVisible(getCampaign().getCampaignOptions()
-                .getUseAtB());
-        splitScenario = new javax.swing.JSplitPane(
-                javax.swing.JSplitPane.VERTICAL_SPLIT, panScenario,
-                paneLanceDeployment);
-        splitScenario.setOneTouchExpandable(true);
-        splitScenario.setResizeWeight(1.0);
-
-        splitBrief = new javax.swing.JSplitPane(
-                javax.swing.JSplitPane.HORIZONTAL_SPLIT, splitMission,
-                splitScenario);
-        splitBrief.setOneTouchExpandable(true);
-        splitBrief.setResizeWeight(0.5);
-        splitBrief.addPropertyChangeListener(
-                JSplitPane.DIVIDER_LOCATION_PROPERTY,
-                new PropertyChangeListener() {
-                    @Override
-                    public void propertyChange(PropertyChangeEvent pce) {
-                        // this can mess up the view panel so refresh it
-                        changeMission();
-                        refreshScenarioView();
-                    }
-                });
+    
+    public boolean hasTab(GuiTabType tabType) {
+    	return standardTabs.containsKey(tabType);
     }
-
-    private void initMap() {
-        GridBagConstraints gridBagConstraints;
-
-        panMapView = new JPanel(new GridBagLayout());
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.weightx = 0.0;
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        panMapView.add(new JLabel(resourceMap.getString("lblFindPlanet.text")),
-                gridBagConstraints);
-
-        suggestPlanet = new JSuggestField(getFrame(), getCampaign().getPlanetNames());
-        suggestPlanet.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                Planet p = getCampaign().getPlanet(suggestPlanet.getText());
-                if (null != p) {
-                    panMap.setSelectedPlanet(p);
-                    refreshPlanetView();
-                }
-            }
-        });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 0.0;
-        panMapView.add(suggestPlanet, gridBagConstraints);
-
-        JButton btnCalculateJumpPath = new JButton(
-                resourceMap.getString("btnCalculateJumpPath.text")); // NOI18N
-        btnCalculateJumpPath.setToolTipText(resourceMap
-                .getString("btnCalculateJumpPath.toolTipText")); // NOI18N
-        btnCalculateJumpPath.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                calculateJumpPath();
-            }
-        });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 0.5;
-        gridBagConstraints.weighty = 0.0;
-        panMapView.add(btnCalculateJumpPath, gridBagConstraints);
-
-        JButton btnBeginTransit = new JButton(
-                resourceMap.getString("btnBeginTransit.text")); // NOI18N
-        btnBeginTransit.setToolTipText(resourceMap
-                .getString("btnBeginTransit.toolTipText")); // NOI18N
-        btnBeginTransit.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                beginTransit();
-            }
-        });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 3;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 0.5;
-        gridBagConstraints.weighty = 0.0;
-        panMapView.add(btnBeginTransit, gridBagConstraints);
-
-        panMap = new InterstellarMapPanel(getCampaign(), this);
-        // lets go ahead and zoom in on the current location
-        panMap.setSelectedPlanet(getCampaign().getLocation().getCurrentPlanet());
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = 4;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        panMapView.add(panMap, gridBagConstraints);
-
-        scrollPlanetView = new JScrollPane();
-        scrollPlanetView.setMinimumSize(new java.awt.Dimension(400, 600));
-        scrollPlanetView.setPreferredSize(new java.awt.Dimension(400, 600));
-        scrollPlanetView
-                .setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        scrollPlanetView.setViewportView(null);
-        splitMap = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, panMapView, scrollPlanetView);
-        splitMap.setOneTouchExpandable(true);
-        splitMap.setResizeWeight(1.0);
-        splitMap.addPropertyChangeListener(
-                JSplitPane.DIVIDER_LOCATION_PROPERTY,
-                new PropertyChangeListener() {
-                    @Override
-                    public void propertyChange(PropertyChangeEvent pce) {
-                        // this can mess up the planet view panel so refresh it
-                        refreshPlanetView();
-                    }
-                });
-
-        panMap.setCampaign(getCampaign());
+    
+    /**
+     * Adds one of the built-in tabs to the gui, if it is not already present.
+     * 
+     * @param tab The type of tab to add
+     */
+    public void addStandardTab(GuiTabType tab) {
+    	if (tab.equals(GuiTabType.CUSTOM)) {
+    		throw new IllegalArgumentException("Attempted to add custom tab as standard");
+    	}
+    	if (!standardTabs.containsKey(tab)) {
+    		CampaignGuiTab t = tab.createTab(this);
+    		standardTabs.put(tab, t);
+    		int index = tabMain.getTabCount();
+    		for (int i = 0; i < tabMain.getTabCount(); i++) {
+    			if (((CampaignGuiTab)tabMain.getComponentAt(i)).tabType().getDefaultPos() > tab.getDefaultPos()) {
+    				index = i;
+    				break;
+    			}
+    		}
+    		tabMain.insertTab(t.getTabName(), null, t, null, index);
+    	}
     }
-
-    private void initOverviewTab() {
-        GridBagConstraints gridBagConstraints;
-
-        panOverview = new JPanel();
-        setTabOverview(new JTabbedPane());
-        scrollOverviewParts = new JScrollPane();
-        initOverviewPartsInUse();
-        scrollOverviewTransport = new JScrollPane();
-        scrollOverviewCombatPersonnel = new JScrollPane();
-        scrollOverviewSupportPersonnel = new JScrollPane();
-        scrollOverviewHangar = new JScrollPane();
-        overviewHangarArea = new JTextArea();
-        splitOverviewHangar = new JSplitPane();
-        scrollOverviewUnitRating = new JScrollPane();
-        scrollOverviewCargo = new JScrollPane();
-
-        // Overview tab
-        panOverview.setName("panelOverview"); // NOI18N
-        panOverview.setLayout(new java.awt.GridBagLayout());
-
-        getTabOverview().setToolTipText(resourceMap.getString("tabOverview.toolTipText")); // NOI18N
-        getTabOverview().setMinimumSize(new java.awt.Dimension(250, 250));
-        getTabOverview().setName("tabOverview"); // NOI18N
-        getTabOverview().setPreferredSize(new java.awt.Dimension(800, 300));
-
-        scrollOverviewTransport.setToolTipText(resourceMap.getString("scrollOverviewTransport.TabConstraints.toolTipText")); // NOI18N
-        scrollOverviewTransport.setMinimumSize(new java.awt.Dimension(350, 400));
-        scrollOverviewTransport.setPreferredSize(new java.awt.Dimension(350, 400));
-        scrollOverviewTransport.setViewportView(new TransportReport(getCampaign()).getReport());
-        getTabOverview().addTab(resourceMap.getString("scrollOverviewTransport.TabConstraints.tabTitle"), scrollOverviewTransport);
-
-        scrollOverviewCargo.setToolTipText(resourceMap.getString("scrollOverviewCargo.TabConstraints.toolTipText")); // NOI18N
-        scrollOverviewCargo.setMinimumSize(new java.awt.Dimension(350, 400));
-        scrollOverviewCargo.setPreferredSize(new java.awt.Dimension(350, 400));
-        scrollOverviewCargo.setViewportView(new CargoReport(getCampaign()).getReport());
-        getTabOverview().addTab(resourceMap.getString("scrollOverviewCargo.TabConstraints.tabTitle"), scrollOverviewCargo);
-
-        scrollOverviewCombatPersonnel.setMinimumSize(new java.awt.Dimension(350, 400));
-        scrollOverviewCombatPersonnel.setPreferredSize(new java.awt.Dimension(350, 400));
-        scrollOverviewCombatPersonnel.setViewportView(new PersonnelReport(getCampaign()).getCombatPersonnelReport());
-        scrollOverviewSupportPersonnel.setMinimumSize(new java.awt.Dimension(350, 400));
-        scrollOverviewSupportPersonnel.setPreferredSize(new java.awt.Dimension(350, 400));
-        scrollOverviewSupportPersonnel.setViewportView(new PersonnelReport(getCampaign()).getSupportPersonnelReport());
-
-        splitOverviewPersonnel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scrollOverviewCombatPersonnel, scrollOverviewSupportPersonnel);
-        splitOverviewPersonnel.setName("splitOverviewPersonnel");
-        splitOverviewPersonnel.setOneTouchExpandable(true);
-        splitOverviewPersonnel.setResizeWeight(0.5);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        getTabOverview().addTab(resourceMap.getString("scrollOverviewPersonnel.TabConstraints.tabTitle"), splitOverviewPersonnel);
-
-        scrollOverviewHangar.setViewportView(new HangarReport(getCampaign()).getHangarTree());
-        overviewHangarArea.setName("overviewHangarArea"); // NOI18N
-        overviewHangarArea.setLineWrap(false);
-        overviewHangarArea.setFont(new Font("Courier New", Font.PLAIN, 18));
-        overviewHangarArea.setText("");
-        overviewHangarArea.setEditable(false);
-        overviewHangarArea.setName("overviewHangarArea"); // NOI18N
-        splitOverviewHangar = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scrollOverviewHangar, overviewHangarArea);
-        splitOverviewHangar.setName("splitOverviewHangar");
-        splitOverviewHangar.setOneTouchExpandable(true);
-        splitOverviewHangar.setResizeWeight(0.5);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        getTabOverview().addTab(resourceMap.getString("scrollOverviewHangar.TabConstraints.tabTitle"), splitOverviewHangar);
-
-        overviewPartsPanel.setName("overviewPartsPanel"); // NOI18N
-        scrollOverviewParts.setViewportView(overviewPartsPanel);
-        getTabOverview().addTab(resourceMap.getString("scrollOverviewParts.TabConstraints.tabTitle"), scrollOverviewParts);
-
-        rating = UnitRatingFactory.getUnitRating(getCampaign());
-        rating.reInitialize();
-        scrollOverviewUnitRating.setViewportView(new RatingReport(getCampaign()).getReport());
-        getTabOverview().addTab(resourceMap.getString("scrollOverviewDragoonsRating.TabConstraints.tabTitle"), scrollOverviewUnitRating);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        //gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
-        panOverview.add(getTabOverview(), gridBagConstraints);
+    
+    /**
+     * Adds a custom tab to the gui at the end
+     * 
+     * @param tab The tab to add
+     */
+    public void addCustomTab(CampaignGuiTab tab) {
+    	if (tabMain.indexOfComponent(tab) >= 0) {
+    		return;
+    	}
+    	if (tab.tabType().equals(GuiTabType.CUSTOM)) {
+    		tabMain.addTab(tab.getTabName(), tab);
+    	} else {
+    		addStandardTab(tab.tabType());
+    	}
     }
-
-    private void initPersonnelTab() {
-        GridBagConstraints gridBagConstraints;
-
-        panPersonnel = new JPanel(new GridBagLayout());
-
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.weightx = 0.0;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-        panPersonnel.add(
-                new JLabel(resourceMap.getString("lblPersonChoice.text")),
-                gridBagConstraints);
-
-        DefaultComboBoxModel<String> personGroupModel = new DefaultComboBoxModel<String>();
-        for (int i = 0; i < PG_NUM; i++) {
-            personGroupModel.addElement(getPersonnelGroupName(i));
-        }
-        choicePerson = new JComboBox<String>(personGroupModel);
-        choicePerson.setSelectedIndex(0);
-        choicePerson.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent evt) {
-                filterPersonnel();
-            }
-        });
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.weightx = 0.0;
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-        panPersonnel.add(choicePerson, gridBagConstraints);
-
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-        panPersonnel.add(
-                new JLabel(resourceMap.getString("lblPersonView.text")),
-                gridBagConstraints);
-
-        DefaultComboBoxModel<String> personViewModel = new DefaultComboBoxModel<String>();
-        for (int i = 0; i < PV_NUM; i++) {
-            personViewModel.addElement(getPersonnelViewName(i));
-        }
-        choicePersonView = new JComboBox<String>(personViewModel);
-        choicePersonView.setSelectedIndex(PV_GENERAL);
-        choicePersonView.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                changePersonnelView();
-            }
-        });
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 3;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-        panPersonnel.add(choicePersonView, gridBagConstraints);
-
-        personModel = new PersonnelTableModel(getCampaign());
-        personnelTable = new JTable(personModel);
-        personnelTable
-                .setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-        personnelTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-        XTableColumnModel personColumnModel = new XTableColumnModel();
-        personnelTable.setColumnModel(personColumnModel);
-        personnelTable.createDefaultColumnsFromModel();
-        personnelSorter = new TableRowSorter<PersonnelTableModel>(personModel);
-        personnelSorter.setComparator(PersonnelTableModel.COL_RANK,
-                new RankSorter(getCampaign()));
-        personnelSorter.setComparator(PersonnelTableModel.COL_SKILL, new LevelSorter());
-        for (int i = PersonnelTableModel.COL_MECH; i < PersonnelTableModel.N_COL; i++) {
-            personnelSorter.setComparator(i, new BonusSorter());
-        }
-        personnelSorter.setComparator(PersonnelTableModel.COL_SALARY,
-                new FormattedNumberSorter());
-        personnelSorter.setComparator(PersonnelTableModel.COL_AGE,
-                new FormattedNumberSorter());
-        personnelTable.setRowSorter(personnelSorter);
-        ArrayList<RowSorter.SortKey> sortKeys = new ArrayList<RowSorter.SortKey>();
-        sortKeys.add(new RowSorter.SortKey(PersonnelTableModel.COL_RANK,
-                SortOrder.DESCENDING));
-        sortKeys.add(new RowSorter.SortKey(PersonnelTableModel.COL_SKILL,
-                SortOrder.DESCENDING));
-        personnelSorter.setSortKeys(sortKeys);
-        personnelTable.addMouseListener(new PersonnelTableMouseAdapter(this));
-        TableColumn column = null;
-        for (int i = 0; i < PersonnelTableModel.N_COL; i++) {
-            column = personnelTable.getColumnModel().getColumn(i);
-            column.setPreferredWidth(personModel.getColumnWidth(i));
-            column.setCellRenderer(personModel.getRenderer(
-                    choicePersonView.getSelectedIndex() == PV_GRAPHIC,
-                    getIconPackage()));
-        }
-        personnelTable.setIntercellSpacing(new Dimension(0, 0));
-        personnelTable.setShowGrid(false);
-        changePersonnelView();
-        personnelTable.getSelectionModel().addListSelectionListener(
-                new javax.swing.event.ListSelectionListener() {
-                    @Override
-                    public void valueChanged(ListSelectionEvent evt) {
-                        refreshPersonnelView();
-                    }
-                });
-
-        scrollPersonnelView = new JScrollPane();
-        scrollPersonnelView.setMinimumSize(new java.awt.Dimension(
-                PERSONNEL_VIEW_WIDTH, 600));
-        scrollPersonnelView.setPreferredSize(new java.awt.Dimension(
-                PERSONNEL_VIEW_WIDTH, 600));
-        scrollPersonnelView
-                .setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        scrollPersonnelView.setViewportView(null);
-
-        splitPersonnel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
-                new JScrollPane(personnelTable), scrollPersonnelView);
-        splitPersonnel.setOneTouchExpandable(true);
-        splitPersonnel.setResizeWeight(1.0);
-        splitPersonnel.addPropertyChangeListener(
-                JSplitPane.DIVIDER_LOCATION_PROPERTY,
-                new PropertyChangeListener() {
-                    @Override
-                    public void propertyChange(PropertyChangeEvent pce) {
-                        // this can mess up the pilot view pane so refresh it
-                        refreshPersonnelView();
-                    }
-                });
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = 4;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        panPersonnel.add(splitPersonnel, gridBagConstraints);
-
-        filterPersonnel();
-
+    
+    /**
+     * Adds a custom tab to the gui in the specified position. If <code>tab</code> is a built-in
+     * type it will be placed in its normal position if it does not already exist.
+     * 
+     * @param tab	The tab to add
+     * @param index	The position to place the tab
+     */
+    public void insertCustomTab(CampaignGuiTab tab, int index) {
+    	if (tabMain.indexOfComponent(tab) >= 0) {
+    		return;
+    	}
+    	if (tab.tabType().equals(GuiTabType.CUSTOM)) {
+    		tabMain.insertTab(tab.getTabName(), null, tab, null, Math.min(index, tabMain.getTabCount()));
+    	} else {
+    		addStandardTab(tab.tabType());
+    	}
     }
-
-    private void initHangarTab() {
-        GridBagConstraints gridBagConstraints;
-
-        panHangar = new JPanel(new GridBagLayout());
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.weightx = 0.0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(5, 5, 0, 0);
-        panHangar.add(new JLabel(resourceMap.getString("lblUnitChoice.text")),
-                gridBagConstraints);
-
-        DefaultComboBoxModel<String> unitGroupModel = new DefaultComboBoxModel<String>();
-        unitGroupModel.addElement("All Units");
-        for (int i = 0; i < UnitType.SIZE; i++) {
-            unitGroupModel.addElement(UnitType.getTypeDisplayableName(i));
-        }
-        choiceUnit = new JComboBox<String>(unitGroupModel);
-        choiceUnit.setSelectedIndex(0);
-        choiceUnit.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                filterUnits();
-            }
-        });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-        gridBagConstraints.weightx = 0.0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-        panHangar.add(choiceUnit, gridBagConstraints);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-        panHangar.add(new JLabel(resourceMap.getString("lblUnitView.text")),
-                gridBagConstraints);
-
-        DefaultComboBoxModel<String> unitViewModel = new DefaultComboBoxModel<String>();
-        for (int i = 0; i < UV_NUM; i++) {
-            unitViewModel.addElement(getUnitViewName(i));
-        }
-        choiceUnitView = new JComboBox<String>(unitViewModel);
-        choiceUnitView.setSelectedIndex(UV_GENERAL);
-        choiceUnitView.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                changeUnitView();
-            }
-        });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 3;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-        panHangar.add(choiceUnitView, gridBagConstraints);
-
-        unitModel = new UnitTableModel(getCampaign());
-        unitTable = new JTable(getUnitModel());
-        getUnitTable()
-                .setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-        XTableColumnModel unitColumnModel = new XTableColumnModel();
-        getUnitTable().setColumnModel(unitColumnModel);
-        getUnitTable().createDefaultColumnsFromModel();
-        unitSorter = new TableRowSorter<UnitTableModel>(getUnitModel());
-        unitSorter.setComparator(UnitTableModel.COL_STATUS,
-                new UnitStatusSorter());
-        unitSorter.setComparator(UnitTableModel.COL_TYPE, new UnitTypeSorter());
-        unitSorter.setComparator(UnitTableModel.COL_WCLASS,
-                new WeightClassSorter());
-        unitSorter.setComparator(UnitTableModel.COL_COST,
-                new FormattedNumberSorter());
-        getUnitTable().setRowSorter(unitSorter);
-        ArrayList<RowSorter.SortKey> sortKeys = new ArrayList<RowSorter.SortKey>();
-        sortKeys.add(new RowSorter.SortKey(UnitTableModel.COL_TYPE,
-                SortOrder.DESCENDING));
-        sortKeys.add(new RowSorter.SortKey(UnitTableModel.COL_WCLASS,
-                SortOrder.DESCENDING));
-        unitSorter.setSortKeys(sortKeys);
-        getUnitTable().addMouseListener(new UnitTableMouseAdapter(this));
-        getUnitTable().setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-        TableColumn column = null;
-        for (int i = 0; i < UnitTableModel.N_COL; i++) {
-            column = getUnitTable().getColumnModel().getColumn(i);
-            column.setPreferredWidth(getUnitModel().getColumnWidth(i));
-            column.setCellRenderer(getUnitModel().getRenderer(
-                    choiceUnitView.getSelectedIndex() == UV_GRAPHIC,
-                    getIconPackage()));
-        }
-        getUnitTable().setIntercellSpacing(new Dimension(0, 0));
-        getUnitTable().setShowGrid(false);
-        changeUnitView();
-        getUnitTable().getSelectionModel().addListSelectionListener(
-                new javax.swing.event.ListSelectionListener() {
-                    @Override
-                    public void valueChanged(
-                            javax.swing.event.ListSelectionEvent evt) {
-                        refreshUnitView();
-                    }
-                });
-
-        acquireUnitsModel = new ProcurementTableModel(getCampaign());
-        acquireUnitsTable = new JTable(acquireUnitsModel);
-        TableRowSorter<ProcurementTableModel> acquireUnitsSorter = new TableRowSorter<ProcurementTableModel>(
-                acquireUnitsModel);
-        acquireUnitsSorter.setComparator(ProcurementTableModel.COL_COST,
-                new FormattedNumberSorter());
-        acquireUnitsSorter.setComparator(ProcurementTableModel.COL_TARGET,
-                new TargetSorter());
-        acquireUnitsTable.setRowSorter(acquireUnitsSorter);
-        column = null;
-        for (int i = 0; i < ProcurementTableModel.N_COL; i++) {
-            column = acquireUnitsTable.getColumnModel().getColumn(i);
-            column.setPreferredWidth(acquireUnitsModel.getColumnWidth(i));
-            column.setCellRenderer(acquireUnitsModel.getRenderer());
-        }
-        acquireUnitsTable.setIntercellSpacing(new Dimension(0, 0));
-        acquireUnitsTable.setShowGrid(false);
-        acquireUnitsTable.addMouseListener(new ProcurementTableMouseAdapter(this));
-        acquireUnitsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-
-        acquireUnitsTable.getInputMap(JComponent.WHEN_FOCUSED).put(
-                KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0), "ADD");
-        acquireUnitsTable.getInputMap(JComponent.WHEN_FOCUSED).put(
-                KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, 0), "ADD");
-        acquireUnitsTable.getInputMap(JComponent.WHEN_FOCUSED).put(
-                KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0), "REMOVE");
-        acquireUnitsTable.getInputMap(JComponent.WHEN_FOCUSED).put(
-                KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, 0), "REMOVE");
-
-        acquireUnitsTable.getActionMap().put("ADD", new AbstractAction() {
-            /**
-             *
-             */
-            private static final long serialVersionUID = 4958203340754214211L;
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (acquireUnitsTable.getSelectedRow() < 0) {
-                    return;
-                }
-                acquireUnitsModel.incrementItem(acquireUnitsTable
-                        .convertRowIndexToModel(acquireUnitsTable
-                                .getSelectedRow()));
-            }
-        });
-
-        acquireUnitsTable.getActionMap().put("REMOVE", new AbstractAction() {
-            /**
-             *
-             */
-            private static final long serialVersionUID = -8377486575329708963L;
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (acquireUnitsTable.getSelectedRow() < 0) {
-                    return;
-                }
-                if (acquireUnitsModel.getAcquisition(
-                        acquireUnitsTable
-                                .convertRowIndexToModel(acquireUnitsTable
-                                        .getSelectedRow())).getQuantity() > 0) {
-                    acquireUnitsModel.decrementItem(acquireUnitsTable
-                            .convertRowIndexToModel(acquireUnitsTable
-                                    .getSelectedRow()));
-                }
-            }
-        });
-
-        JScrollPane scrollAcquireUnitTable = new JScrollPane(acquireUnitsTable);
-        JPanel panAcquireUnit = new JPanel(new GridLayout(0, 1));
-        panAcquireUnit.setBorder(BorderFactory
-                .createTitledBorder("Procurement List"));
-        panAcquireUnit.add(scrollAcquireUnitTable);
-        panAcquireUnit.setMinimumSize(new Dimension(200, 200));
-        panAcquireUnit.setPreferredSize(new Dimension(200, 200));
-
-        JSplitPane splitLeftUnit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, new JScrollPane(getUnitTable()), panAcquireUnit);
-        splitLeftUnit.setOneTouchExpandable(true);
-        splitLeftUnit.setResizeWeight(1.0);
-
-        scrollUnitView = new JScrollPane();
-        scrollUnitView.setMinimumSize(new java.awt.Dimension(UNIT_VIEW_WIDTH,
-                600));
-        scrollUnitView.setPreferredSize(new java.awt.Dimension(UNIT_VIEW_WIDTH,
-                600));
-        scrollUnitView
-                .setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        scrollUnitView.setViewportView(null);
-
-        splitUnit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, splitLeftUnit, scrollUnitView);
-        getSplitUnit().setOneTouchExpandable(true);
-        getSplitUnit().setResizeWeight(1.0);
-        getSplitUnit().addPropertyChangeListener(
-                JSplitPane.DIVIDER_LOCATION_PROPERTY,
-                new PropertyChangeListener() {
-                    @Override
-                    public void propertyChange(PropertyChangeEvent pce) {
-                        // this can mess up the unit view panel so refresh it
-                        refreshUnitView();
-                    }
-                });
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = 6;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        panHangar.add(getSplitUnit(), gridBagConstraints);
+    
+    /**
+     * Adds a custom tab to the gui positioned after one of the built-in tabs
+     * 
+     * @param tab		The tab to add
+     * @param stdTab	The build-in tab after which to place the new one
+     */
+    public void insertCustomTabAfter(CampaignGuiTab tab, GuiTabType stdTab) {
+    	if (tabMain.indexOfComponent(tab) >= 0) {
+    		return;
+    	}
+    	if (tab.tabType().equals(GuiTabType.CUSTOM)) {
+	    	int index = tabMain.indexOfTab(stdTab.getTabName());
+	    	if (index < 0) {
+	    		if (stdTab.getDefaultPos() == 0) {
+	    			index = tabMain.getTabCount();
+	    		} else {
+		    		for (int i = stdTab.getDefaultPos() - 1; i >= 0; i--) {
+		    			index = tabMain.indexOfTab(GuiTabType.values()[i].getTabName());
+		    			if (index >= 0) {
+		    				break;
+		    			}
+		    		}
+	    		}
+	    	}
+			insertCustomTab(tab, index);
+    	} else {
+    		addStandardTab(tab.tabType());
+    	}
     }
-
-    private void initWarehouseTab() {
-        GridBagConstraints gridBagConstraints;
-
-        panSupplies = new JPanel(new GridBagLayout());
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.weightx = 0.0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 0);
-        panSupplies.add(
-                new JLabel(resourceMap.getString("lblPartsChoice.text")),
-                gridBagConstraints);
-
-        DefaultComboBoxModel<String> partsGroupModel = new DefaultComboBoxModel<String>();
-        for (int i = 0; i < SG_NUM; i++) {
-            partsGroupModel.addElement(getPartsGroupName(i));
-        }
-        choiceParts = new JComboBox<String>(partsGroupModel);
-        choiceParts.setSelectedIndex(0);
-        choiceParts.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                filterParts();
-            }
-        });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 0);
-        panSupplies.add(choiceParts, gridBagConstraints);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.weightx = 0.0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 0);
-        panSupplies.add(
-                new JLabel(resourceMap.getString("lblPartsChoiceView.text")),
-                gridBagConstraints);
-
-        DefaultComboBoxModel<String> partsGroupViewModel = new DefaultComboBoxModel<String>();
-        for (int i = 0; i < SV_NUM; i++) {
-            partsGroupViewModel.addElement(getPartsGroupViewName(i));
-        }
-        choicePartsView = new JComboBox<String>(partsGroupViewModel);
-        choicePartsView.setSelectedIndex(0);
-        choicePartsView.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                filterParts();
-            }
-        });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 3;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 0);
-        panSupplies.add(choicePartsView, gridBagConstraints);
-
-        partsModel = new PartsTableModel();
-        partsTable = new JTable(partsModel);
-        partsSorter = new TableRowSorter<PartsTableModel>(partsModel);
-        partsSorter.setComparator(PartsTableModel.COL_COST,
-                new FormattedNumberSorter());
-        partsSorter.setComparator(PartsTableModel.COL_DETAIL,
-                new PartsDetailSorter());
-        partsTable.setRowSorter(partsSorter);
-        TableColumn column = null;
-        for (int i = 0; i < PartsTableModel.N_COL; i++) {
-            column = partsTable.getColumnModel().getColumn(i);
-            column.setPreferredWidth(partsModel.getColumnWidth(i));
-            column.setCellRenderer(partsModel.getRenderer());
-        }
-        partsTable.setIntercellSpacing(new Dimension(0, 0));
-        partsTable.setShowGrid(false);
-        partsTable.getSelectionModel().addListSelectionListener(
-                new javax.swing.event.ListSelectionListener() {
-                    @Override
-                    public void valueChanged(
-                            javax.swing.event.ListSelectionEvent evt) {
-                        PartsTableValueChanged(evt);
-                    }
-                });
-        partsTable.addMouseListener(new PartsTableMouseAdapter(this));
-
-        scrollPartsTable = new JScrollPane(partsTable);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = 4;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        panSupplies.add(scrollPartsTable, gridBagConstraints);
-
-        acquirePartsModel = new ProcurementTableModel(getCampaign());
-        acquirePartsTable = new JTable(acquirePartsModel);
-        acquirePartsSorter = new TableRowSorter<ProcurementTableModel>(
-                acquirePartsModel);
-        acquirePartsSorter.setComparator(ProcurementTableModel.COL_COST,
-                new FormattedNumberSorter());
-        acquirePartsSorter.setComparator(ProcurementTableModel.COL_TARGET,
-                new TargetSorter());
-        acquirePartsTable.setRowSorter(acquirePartsSorter);
-        column = null;
-        for (int i = 0; i < ProcurementTableModel.N_COL; i++) {
-            column = acquirePartsTable.getColumnModel().getColumn(i);
-            column.setPreferredWidth(acquirePartsModel.getColumnWidth(i));
-            column.setCellRenderer(acquirePartsModel.getRenderer());
-        }
-        acquirePartsTable.setIntercellSpacing(new Dimension(0, 0));
-        acquirePartsTable.setShowGrid(false);
-        acquirePartsTable.addMouseListener(new ProcurementTableMouseAdapter(this));
-        acquirePartsTable
-                .setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-
-        acquirePartsTable.getInputMap(JComponent.WHEN_FOCUSED).put(
-                KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0), "ADD");
-        acquirePartsTable.getInputMap(JComponent.WHEN_FOCUSED).put(
-                KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, 0), "ADD");
-        acquirePartsTable.getInputMap(JComponent.WHEN_FOCUSED).put(
-                KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0), "REMOVE");
-        acquirePartsTable.getInputMap(JComponent.WHEN_FOCUSED).put(
-                KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, 0), "REMOVE");
-
-        acquirePartsTable.getActionMap().put("ADD", new AbstractAction() {
-            /**
-             *
-             */
-            private static final long serialVersionUID = 1L;
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (acquirePartsTable.getSelectedRow() < 0) {
-                    return;
-                }
-                acquirePartsModel.incrementItem(acquirePartsTable
-                        .convertRowIndexToModel(acquirePartsTable
-                                .getSelectedRow()));
-            }
-        });
-
-        acquirePartsTable.getActionMap().put("REMOVE", new AbstractAction() {
-            /**
-             *
-             */
-            private static final long serialVersionUID = 1L;
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (acquirePartsTable.getSelectedRow() < 0) {
-                    return;
-                }
-                if (acquirePartsModel.getAcquisition(
-                        acquirePartsTable
-                                .convertRowIndexToModel(acquirePartsTable
-                                        .getSelectedRow())).getQuantity() > 0) {
-                    acquirePartsModel.decrementItem(acquirePartsTable
-                            .convertRowIndexToModel(acquirePartsTable
-                                    .getSelectedRow()));
-                }
-            }
-        });
-
-        JScrollPane scrollPartsAcquireTable = new JScrollPane(acquirePartsTable);
-
-        JPanel acquirePartsPanel = new JPanel(new GridBagLayout());
-        acquirePartsPanel.setBorder(BorderFactory
-                .createTitledBorder("Procurement List"));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        acquirePartsPanel.add(scrollPartsAcquireTable, gridBagConstraints);
-        acquirePartsPanel.setMinimumSize(new Dimension(200, 200));
-        acquirePartsPanel.setPreferredSize(new Dimension(200, 200));
-
-        JPanel panelDoTaskWarehouse = new JPanel(new GridBagLayout());
-
-        btnDoTaskWarehouse = new JButton(
-                resourceMap.getString("btnDoTask.text")); // NOI18N
-        btnDoTaskWarehouse.setToolTipText(resourceMap
-                .getString("btnDoTask.toolTipText")); // NOI18N
-        btnDoTaskWarehouse.setEnabled(false);
-        btnDoTaskWarehouse.setName("btnDoTask"); // NOI18N
-        btnDoTaskWarehouse.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                doTask();
-            }
-        });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        panelDoTaskWarehouse.add(btnDoTaskWarehouse, gridBagConstraints);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.SOUTH;
-        panelDoTaskWarehouse.add(
-                new JLabel(resourceMap.getString("lblTarget.text")),
-                gridBagConstraints);
-
-        lblTargetNumWarehouse = new JLabel(
-                resourceMap.getString("lblTargetNum.text"));
-        lblTargetNumWarehouse
-                .setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTH;
-        panelDoTaskWarehouse.add(lblTargetNumWarehouse, gridBagConstraints);
-
-        textTargetWarehouse = new JTextArea();
-        textTargetWarehouse.setColumns(20);
-        textTargetWarehouse.setEditable(false);
-        textTargetWarehouse.setLineWrap(true);
-        textTargetWarehouse.setRows(5);
-        textTargetWarehouse.setText(resourceMap.getString("textTarget.text")); // NOI18N
-        textTargetWarehouse.setWrapStyleWord(true);
-        textTargetWarehouse.setBorder(null);
-        JScrollPane scrTargetWarehouse = new JScrollPane(textTargetWarehouse);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridheight = 3;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        panelDoTaskWarehouse.add(scrTargetWarehouse, gridBagConstraints);
-
-        btnShowAllTechsWarehouse = new JToggleButton(
-                resourceMap.getString("btnShowAllTechs.text"));
-        btnShowAllTechsWarehouse.setToolTipText(resourceMap
-                .getString("btnShowAllTechs.toolTipText")); // NOI18N
-        btnShowAllTechsWarehouse.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                filterTechs(true);
-            }
-        });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        panelDoTaskWarehouse.add(btnShowAllTechsWarehouse, gridBagConstraints);
-
-        techsModel = new TechTableModel(this);
-        whTechTable = new JTable(techsModel);
-        whTechTable.setRowHeight(60);
-        whTechTable.getColumnModel().getColumn(0)
-                .setCellRenderer(techsModel.getRenderer(getIconPackage()));
-        whTechTable.getSelectionModel().addListSelectionListener(
-                new javax.swing.event.ListSelectionListener() {
-                    @Override
-                    public void valueChanged(
-                            javax.swing.event.ListSelectionEvent evt) {
-                        updateTechTarget();
-                    }
-                });
-        whTechSorter = new TableRowSorter<TechTableModel>(techsModel);
-        whTechSorter.setComparator(0, new TechSorter());
-        whTechTable.setRowSorter(whTechSorter);
-        ArrayList<RowSorter.SortKey> sortKeys = new ArrayList<RowSorter.SortKey>();
-        sortKeys.add(new RowSorter.SortKey(0, SortOrder.ASCENDING));
-        whTechSorter.setSortKeys(sortKeys);
-        JScrollPane scrollWhTechTable = new JScrollPane(whTechTable);
-        scrollWhTechTable.setMinimumSize(new java.awt.Dimension(200, 200));
-        scrollWhTechTable.setPreferredSize(new java.awt.Dimension(300, 300));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 4;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        panelDoTaskWarehouse.add(scrollWhTechTable, gridBagConstraints);
-
-        astechPoolLabelWarehouse = new JLabel(
-                "<html><b>Astech Pool Minutes:</> "
-                        + getCampaign().getAstechPoolMinutes() + " ("
-                        + getCampaign().getNumberAstechs() + " Astechs)</html>"); // NOI18N
-        astechPoolLabelWarehouse
-                .setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 5;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        panelDoTaskWarehouse.add(astechPoolLabelWarehouse, gridBagConstraints);
-
-        JSplitPane splitLeft = new JSplitPane(JSplitPane.VERTICAL_SPLIT, panSupplies, acquirePartsPanel);
-        splitLeft.setOneTouchExpandable(true);
-        splitLeft.setResizeWeight(1.0);
-        splitWarehouse = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, splitLeft, panelDoTaskWarehouse);
-        splitWarehouse.setOneTouchExpandable(true);
-        splitWarehouse.setResizeWeight(1.0);
+    
+    /**
+     * Adds a custom tab to the gui positioned before one of the built-in tabs
+     * 
+     * @param tab		The tab to add
+     * @param stdTab	The build-in tab before which to place the new one
+     */
+    public void insertCustomTabBefore(CampaignGuiTab tab, GuiTabType stdTab) {
+    	if (tabMain.indexOfComponent(tab) >= 0) {
+    		return;
+    	}
+    	if (tab.tabType().equals(GuiTabType.CUSTOM)) {
+	    	int index = tabMain.indexOfTab(stdTab.getTabName());
+	    	if (index < 0) {
+	    		if (stdTab.getDefaultPos() == GuiTabType.values().length - 1) {
+	    			index = tabMain.getTabCount();
+	    		} else {
+		    		for (int i = stdTab.getDefaultPos() + 1; i >= GuiTabType.values().length; i++) {
+		    			index = tabMain.indexOfTab(GuiTabType.values()[i].getTabName());
+		    			if (index >= 0) {
+		    				break;
+		    			}
+		    		}
+	    		}
+	    	}
+			insertCustomTab(tab, Math.max(0, index - 1));
+    	} else {
+    		addStandardTab(tab.tabType());
+    	}
     }
-
-    private void initRepairTab() {
-        GridBagConstraints gridBagConstraints;
-
-        panRepairBay = new JPanel(new GridBagLayout());
-
-        JPanel panServicedUnits = new JPanel(new GridBagLayout());
-
-        //Add panel for MRMS buttons
-        JPanel massRepairButtons = new JPanel(new GridBagLayout());
-        
-        JButton btnMRMSDialog = new JButton();
-        btnMRMSDialog.setText("Mass Repair/Salvage"); // NOI18N
-        btnMRMSDialog.setToolTipText("Start Mass Repair/Salvage from dialog");
-        btnMRMSDialog.setName("btnMRMSDialog"); // NOI18N
-        btnMRMSDialog.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-	            MassRepairSalvageDialog dlg = new MassRepairSalvageDialog(getFrame(), true, getCampaignGUI(), null, MassRepairSalvageDialog.MODE.UNITS);
-	            dlg.setVisible(true);
-
-	            getCampaignGUI().refreshServicedUnitList();
-	            getCampaignGUI().refreshUnitList();
-	            getCampaignGUI().refreshOverview();
-			}
-		});
-        
-        JButton btnMRMSInstantAll = new JButton();
-        btnMRMSInstantAll.setText("Instant Mass Repair/Salvage All"); // NOI18N
-        btnMRMSInstantAll.setToolTipText("Perform Mass Repair/Salvage immediately on all units using active configuration");
-        btnMRMSInstantAll.setName("btnMRMSInstantAll"); // NOI18N
-        btnMRMSInstantAll.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				MassRepairSalvageDialog.massRepairSalvageAllUnits(getCampaignGUI());
-
-	            getCampaignGUI().refreshServicedUnitList();
-	            getCampaignGUI().refreshUnitList();
-	            getCampaignGUI().refreshOverview();
-			}
-		});
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.weightx = 0.5;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        massRepairButtons.add(btnMRMSDialog, gridBagConstraints);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.weightx = 0.5;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        massRepairButtons.add(btnMRMSInstantAll, gridBagConstraints);
-        
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.insets = new Insets(5, 0, 5, 0);
-        panServicedUnits.add(massRepairButtons, gridBagConstraints);
-        
-        servicedUnitModel = new UnitTableModel(getCampaign());
-        servicedUnitTable = new JTable(servicedUnitModel);
-        servicedUnitTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-        servicedUnitTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        servicedUnitTable.setColumnModel(new XTableColumnModel());
-        servicedUnitTable.createDefaultColumnsFromModel();
-        servicedUnitSorter = new TableRowSorter<UnitTableModel>(
-                servicedUnitModel);
-        servicedUnitSorter.setComparator(UnitTableModel.COL_STATUS,
-                new UnitStatusSorter());
-        servicedUnitSorter.setComparator(UnitTableModel.COL_TYPE,
-                new UnitTypeSorter());
-        servicedUnitTable.setRowSorter(servicedUnitSorter);
-        ArrayList<RowSorter.SortKey> sortKeys = new ArrayList<RowSorter.SortKey>();
-        sortKeys.add(new RowSorter.SortKey(UnitTableModel.COL_TYPE,
-                SortOrder.DESCENDING));
-        servicedUnitSorter.setSortKeys(sortKeys);
-        TableColumn column = null;
-        for (int i = 0; i < UnitTableModel.N_COL; i++) {
-            column = ((XTableColumnModel) servicedUnitTable.getColumnModel())
-                    .getColumnByModelIndex(i);
-            column.setPreferredWidth(servicedUnitModel.getColumnWidth(i));
-            column.setCellRenderer(servicedUnitModel.getRenderer(false,
-                    getIconPackage()));
-            if (i != UnitTableModel.COL_NAME && i != UnitTableModel.COL_STATUS
-                    && i != UnitTableModel.COL_REPAIR
-                    && i != UnitTableModel.COL_PARTS
-                    && i != UnitTableModel.COL_SITE
-                    && i != UnitTableModel.COL_TYPE) {
-                ((XTableColumnModel) servicedUnitTable.getColumnModel())
-                        .setColumnVisible(column, false);
-            }
-        }
-        servicedUnitTable.setIntercellSpacing(new Dimension(0, 0));
-        servicedUnitTable.setShowGrid(false);
-        servicedUnitTable.getSelectionModel().addListSelectionListener(
-                new javax.swing.event.ListSelectionListener() {
-                    @Override
-                    public void valueChanged(
-                            javax.swing.event.ListSelectionEvent evt) {
-                        servicedUnitTableValueChanged(evt);
-                    }
-                });
-        servicedUnitTable
-                .addMouseListener(new ServicedUnitsTableMouseAdapter(this));
-        JScrollPane scrollServicedUnitTable = new JScrollPane(servicedUnitTable);
-        scrollServicedUnitTable
-                .setMinimumSize(new java.awt.Dimension(350, 200));
-        scrollServicedUnitTable.setPreferredSize(new java.awt.Dimension(350,
-                200));
-
-        txtServicedUnitView = new JTextPane();
-        txtServicedUnitView.setEditable(false);
-        txtServicedUnitView.setContentType("text/html");
-        JScrollPane scrollServicedUnitView = new JScrollPane(
-                txtServicedUnitView);
-        scrollServicedUnitView.setMinimumSize(new java.awt.Dimension(350, 400));
-        scrollServicedUnitView
-                .setPreferredSize(new java.awt.Dimension(350, 400));
-
-        splitServicedUnits = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
-                scrollServicedUnitTable, scrollServicedUnitView);
-        splitServicedUnits.setOneTouchExpandable(true);
-        splitServicedUnits.setResizeWeight(0.0);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        panServicedUnits.add(splitServicedUnits, gridBagConstraints);
-
-        JPanel panTasks = new JPanel(new GridBagLayout());
-
-        techTable = new JTable(techsModel);
-        techTable.setRowHeight(60);
-        techTable.getColumnModel().getColumn(0)
-                .setCellRenderer(techsModel.getRenderer(getIconPackage()));
-        techTable.getSelectionModel().addListSelectionListener(
-                new ListSelectionListener() {
-                    @Override
-                    public void valueChanged(
-                            ListSelectionEvent evt) {
-                    	techTableValueChanged(evt);
-                    }
-                });
-        techSorter = new TableRowSorter<TechTableModel>(techsModel);
-        techSorter.setComparator(0, new TechSorter());
-        techTable.setRowSorter(techSorter);
-        sortKeys = new ArrayList<RowSorter.SortKey>();
-        sortKeys.add(new RowSorter.SortKey(0, SortOrder.ASCENDING));
-        techSorter.setSortKeys(sortKeys);
-        JScrollPane scrollTechTable = new JScrollPane(techTable);
-        scrollTechTable.setMinimumSize(new java.awt.Dimension(200, 200));
-        scrollTechTable.setPreferredSize(new java.awt.Dimension(300, 300));
-
-        tabTasks = new JTabbedPane();
-        tabTasks.setMinimumSize(new java.awt.Dimension(300, 200));
-        tabTasks.setName("tabTasks"); // NOI18N
-        tabTasks.setPreferredSize(new java.awt.Dimension(300, 300));
-
-        panDoTask = new JPanel(new GridBagLayout());
-        panDoTask.setMinimumSize(new java.awt.Dimension(300, 100));
-        panDoTask.setName("panelDoTask"); // NOI18N
-        panDoTask.setPreferredSize(new java.awt.Dimension(300, 100));
-
-        btnDoTask = new JButton(resourceMap.getString("btnDoTask.text")); // NOI18N
-        btnDoTask
-                .setToolTipText(resourceMap.getString("btnDoTask.toolTipText")); // NOI18N
-        btnDoTask.setEnabled(false);
-        btnDoTask.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                doTask();
-            }
-        });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        panDoTask.add(btnDoTask, gridBagConstraints);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.SOUTH;
-        panDoTask.add(new JLabel(resourceMap.getString("lblTarget.text")),
-                gridBagConstraints);
-
-        lblTargetNum = new JLabel(resourceMap.getString("lblTargetNum.text")); // NOI18N
-        lblTargetNum.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        lblTargetNum.setName("lblTargetNum"); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTH;
-        panDoTask.add(lblTargetNum, gridBagConstraints);
-
-        textTarget = new JTextArea();
-        textTarget.setColumns(20);
-        textTarget.setEditable(false);
-        textTarget.setLineWrap(true);
-        textTarget.setRows(5);
-        textTarget.setText(resourceMap.getString("textTarget.text")); // NOI18N
-        textTarget.setWrapStyleWord(true);
-        textTarget.setBorder(null);
-        textTarget.setName("textTarget"); // NOI18N
-        scrTextTarget = new JScrollPane(textTarget);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridheight = 4;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        panDoTask.add(scrTextTarget, gridBagConstraints);
-
-        choiceLocation = new JComboBox<String>();
-        choiceLocation.removeAllItems();
-        choiceLocation.addItem("All");
-        choiceLocation.setEnabled(false);
-        choiceLocation.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent evt) {
-                filterTasks();
-            }
-        });
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.gridheight = 1;
-        panDoTask.add(choiceLocation, gridBagConstraints);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 1.0;
-        panTasks.add(panDoTask, gridBagConstraints);
-
-        taskModel = new TaskTableModel(this);
-        taskTable = new JTable(taskModel);
-        taskTable.setRowHeight(70);
-        taskTable.getColumnModel().getColumn(0)
-                .setCellRenderer(taskModel.getRenderer(getIconPackage()));
-        taskTable.getSelectionModel().addListSelectionListener(
-                new javax.swing.event.ListSelectionListener() {
-                    @Override
-                    public void valueChanged(
-                            javax.swing.event.ListSelectionEvent evt) {
-                        taskTableValueChanged(evt);
-                    }
-                });
-        taskSorter = new TableRowSorter<TaskTableModel>(taskModel);
-        taskSorter.setComparator(0, new TaskSorter());
-        taskTable.setRowSorter(taskSorter);
-        sortKeys = new ArrayList<RowSorter.SortKey>();
-        sortKeys.add(new RowSorter.SortKey(0, SortOrder.ASCENDING));
-        taskSorter.setSortKeys(sortKeys);
-        taskTable.addMouseListener(new TaskTableMouseAdapter());
-        JScrollPane scrollTaskTable = new JScrollPane(taskTable);
-        scrollTaskTable.setMinimumSize(new java.awt.Dimension(200, 200));
-        scrollTaskTable.setPreferredSize(new java.awt.Dimension(300, 300));
-
-        btnUseBonusPart = new JButton();
-        btnUseBonusPart.setVisible(false);
-        btnUseBonusPart.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                useBonusPart();
-            }
-        });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        panTasks.add(btnUseBonusPart, gridBagConstraints);
-
-        acquireModel = new AcquisitionTableModel();
-        acquisitionTable = new JTable(acquireModel);
-        acquisitionTable.setName("AcquisitionTable"); // NOI18N
-        acquisitionTable.setRowHeight(70);
-        acquisitionTable.getColumnModel().getColumn(0)
-                .setCellRenderer(acquireModel.getRenderer(getIconPackage()));
-        acquisitionTable.getSelectionModel().addListSelectionListener(
-                new javax.swing.event.ListSelectionListener() {
-                    @Override
-                    public void valueChanged(
-                            javax.swing.event.ListSelectionEvent evt) {
-                        acquisitionTableValueChanged(evt);
-                    }
-                });
-        acquisitionTable.addMouseListener(new AcquisitionTableMouseAdapter());
-        JScrollPane scrollAcquisitionTable = new JScrollPane(acquisitionTable);
-        scrollAcquisitionTable.setMinimumSize(new java.awt.Dimension(200, 200));
-        scrollAcquisitionTable
-                .setPreferredSize(new java.awt.Dimension(300, 300));
-
-        tabTasks.addTab(resourceMap
-                .getString("scrollTaskTable.TabConstraints.tabTasks"),
-                scrollTaskTable); // NOI18N
-        tabTasks.addTab(resourceMap
-                .getString("scrollAcquisitionTable.TabConstraints.tabTasks"),
-                scrollAcquisitionTable); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        panTasks.add(tabTasks, gridBagConstraints);
-
-        tabTasks.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent evt) {
-                taskTabChanged();
-            }
-        });
-
-        JPanel panTechs = new JPanel(new GridBagLayout());
-
-        btnShowAllTechs = new JToggleButton(
-                resourceMap.getString("btnShowAllTechs.text")); // NOI18N
-        btnShowAllTechs.setToolTipText(resourceMap
-                .getString("btnShowAllTechs.toolTipText")); // NOI18N
-        btnShowAllTechs.setName("btnShowAllTechs"); // NOI18N
-        btnShowAllTechs.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                filterTechs(false);
-            }
-        });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        panTechs.add(btnShowAllTechs, gridBagConstraints);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        panTechs.add(scrollTechTable, gridBagConstraints);
-
-        astechPoolLabel = new JLabel("<html><b>Astech Pool Minutes:</> "
-                + getCampaign().getAstechPoolMinutes() + " ("
-                + getCampaign().getNumberAstechs() + " Astechs)</html>"); // NOI18N
-        astechPoolLabel
-                .setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        astechPoolLabel.setName("astechPoolLabel"); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        panTechs.add(astechPoolLabel, gridBagConstraints);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        panRepairBay.add(panServicedUnits, gridBagConstraints);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        panRepairBay.add(panTasks, gridBagConstraints);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        panRepairBay.add(panTechs, gridBagConstraints);
-
-        filterTechs(true);
-        filterTechs(false);
+    
+    /**
+     * Removes one of the built-in tabs from the gui.
+     * 
+     * @param tabType	The tab to remove
+     */
+    public void removeStandardTab(GuiTabType tabType) {
+    	CampaignGuiTab tab = standardTabs.get(tabType);
+    	if (tab != null) {
+    		MekHQ.unregisterHandler(tab);
+        	removeTab(tab);
+    	}
     }
-
-    private void initInfirmaryTab() {
-        GridBagConstraints gridBagConstraints;
-
-        panInfirmary = new JPanel(new GridBagLayout()) {
-            private static final long serialVersionUID = -4380823251614946212L;
-            
-            private Image bg = null;
-            {
-                String bgImageFile = getIconPackage().getGuiElement("infirmary_background");
-                if(null != bgImageFile && !bgImageFile.isEmpty()) {
-                    bg = Toolkit.getDefaultToolkit().createImage(bgImageFile);
-                }
-            }
-            
-            @Override
-            protected void paintComponent(Graphics g)
-            {
-                super.paintComponent(g);
-                if(null == bg) {
-                    return;
-                }
-                int size = Math.max(getWidth(), getHeight());
-                g.drawImage(bg, 0, 0, size, size, new ImageObserver() {
-                    @Override
-                    public boolean imageUpdate(Image img, int infoflags, int x, int y, int width, int height) {
-                        if((infoflags & ImageObserver.ALLBITS) != 0) {
-                            repaint();
-                            return false;
-                        }
-                        return true;
-                    }
-                });
-            }
-        };
-
-        doctorsModel = new DocTableModel(getCampaign());
-        docTable = new JTable(doctorsModel);
-        docTable.setRowHeight(60);
-        docTable.getColumnModel().getColumn(0).setCellRenderer(doctorsModel.getRenderer(getIconPackage()));
-        docTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-            @Override
-            public void valueChanged(ListSelectionEvent evt) {
-                docTableValueChanged(evt);
-            }
-        });
-        docTable.setOpaque(false);
-        JScrollPane scrollDocTable = new JScrollPane(docTable);
-        scrollDocTable.setMinimumSize(new java.awt.Dimension(300, 300));
-        scrollDocTable.setPreferredSize(new java.awt.Dimension(300, 300));
-        scrollDocTable.setOpaque(false);
-        scrollDocTable.getViewport().setOpaque(false);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridheight = 3;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.weightx = 0.0;
-        gridBagConstraints.weighty = 1.0;
-        panInfirmary.add(scrollDocTable, gridBagConstraints);
-
-        btnAssignDoc = new JButton(resourceMap.getString("btnAssignDoc.text")); // NOI18N
-        btnAssignDoc.setToolTipText(resourceMap.getString("btnAssignDoc.toolTipText")); // NOI18N
-        btnAssignDoc.setEnabled(false);
-        btnAssignDoc.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent evt) {
-                assignDoctor();
-            }
-        });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        panInfirmary.add(btnAssignDoc, gridBagConstraints);
-
-        btnUnassignDoc = new JButton(resourceMap.getString("btnUnassignDoc.text")); // NOI18N
-        btnUnassignDoc.setEnabled(false);
-        btnUnassignDoc.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent evt) {
-                unassignDoctor();
-            }
-        });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        panInfirmary.add(btnUnassignDoc, gridBagConstraints);
-
-        assignedPatientModel = new PatientTableModel(getCampaign());
-        listAssignedPatient = new JList<Person>(assignedPatientModel);
-        listAssignedPatient.setCellRenderer(assignedPatientModel
-                .getRenderer(getIconPackage()));
-        listAssignedPatient.setLayoutOrientation(JList.HORIZONTAL_WRAP);
-        listAssignedPatient.setVisibleRowCount(-1);
-        listAssignedPatient.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-            @Override
-            public void valueChanged(ListSelectionEvent evt) {
-                patientTableValueChanged();
-            }
-        });
-        listAssignedPatient.setOpaque(false);
-        JScrollPane scrollAssignedPatient = new JScrollPane(listAssignedPatient);
-        scrollAssignedPatient.setMinimumSize(new java.awt.Dimension(300, 360));
-        scrollAssignedPatient.setPreferredSize(new java.awt.Dimension(300, 360));
-        scrollAssignedPatient.setOpaque(false);
-        scrollAssignedPatient.getViewport().setOpaque(false);
-        unassignedPatientModel = new PatientTableModel(getCampaign());
-        listUnassignedPatient = new JList<Person>(unassignedPatientModel);
-        listUnassignedPatient.setCellRenderer(unassignedPatientModel
-                .getRenderer(getIconPackage()));
-        listUnassignedPatient.setLayoutOrientation(JList.HORIZONTAL_WRAP);
-        listUnassignedPatient.setVisibleRowCount(-1);
-        listUnassignedPatient.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-            @Override
-            public void valueChanged(ListSelectionEvent evt) {
-                patientTableValueChanged();
-            }
-        });
-        listUnassignedPatient.setOpaque(false);
-        JScrollPane scrollUnassignedPatient = new JScrollPane(listUnassignedPatient);
-        scrollUnassignedPatient.setMinimumSize(new java.awt.Dimension(300, 200));
-        scrollUnassignedPatient.setPreferredSize(new java.awt.Dimension(300, 300));
-        scrollUnassignedPatient.setOpaque(false);
-        scrollUnassignedPatient.getViewport().setOpaque(false);
-        listAssignedPatient.setBorder(BorderFactory.createTitledBorder(
-                resourceMap.getString("panAssignedPatient.title")));
-        listUnassignedPatient.setBorder(BorderFactory.createTitledBorder(
-                resourceMap.getString("panUnassignedPatient.title")));
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 0.0;
-        panInfirmary.add(scrollAssignedPatient, gridBagConstraints);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        panInfirmary.add(scrollUnassignedPatient, gridBagConstraints);
+    
+    /**
+     * Removes a tab from the gui.
+     * 
+     * @param tab	The tab to remove
+     */
+    public void removeTab(CampaignGuiTab tab) {
+    	removeTab(tab.getTabName());
     }
-
-    private void initFinanceTab() {
-        GridBagConstraints gridBagConstraints;
-
-        panFinances = new JPanel(new GridBagLayout());
-
-        financeModel = new FinanceTableModel();
-        financeTable = new JTable(financeModel);
-        financeTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        financeTable.addMouseListener(new FinanceTableMouseAdapter(this));
-        financeTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-        TableColumn column = null;
-        for (int i = 0; i < FinanceTableModel.N_COL; i++) {
-            column = financeTable.getColumnModel().getColumn(i);
-            column.setPreferredWidth(financeModel.getColumnWidth(i));
-            column.setCellRenderer(financeModel.getRenderer());
-        }
-        financeTable.setIntercellSpacing(new Dimension(0, 0));
-        financeTable.setShowGrid(false);
-
-        loanModel = new LoanTableModel();
-        loanTable = new JTable(loanModel);
-        loanTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        loanTable.addMouseListener(new LoanTableMouseAdapter(this));
-        loanTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-        column = null;
-        for (int i = 0; i < LoanTableModel.N_COL; i++) {
-            column = loanTable.getColumnModel().getColumn(i);
-            column.setPreferredWidth(loanModel.getColumnWidth(i));
-            column.setCellRenderer(loanModel.getRenderer());
-        }
-        loanTable.setIntercellSpacing(new Dimension(0, 0));
-        loanTable.setShowGrid(false);
-        JScrollPane scrollLoanTable = new JScrollPane(loanTable);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        JPanel panBalance = new JPanel(new GridBagLayout());
-        panBalance.add(new JScrollPane(financeTable), gridBagConstraints);
-        panBalance.setBorder(BorderFactory.createTitledBorder("Balance Sheet"));
-        JPanel panLoan = new JPanel(new GridBagLayout());
-        panLoan.add(scrollLoanTable, gridBagConstraints);
-        scrollLoanTable.setMinimumSize(new java.awt.Dimension(450, 150));
-        scrollLoanTable.setPreferredSize(new java.awt.Dimension(450, 150));
-        panLoan.setBorder(BorderFactory.createTitledBorder("Active Loans"));
-        //JSplitPane splitFinances = new JSplitPane(JSplitPane.VERTICAL_SPLIT,panBalance, panLoan);
-        //splitFinances.setOneTouchExpandable(true);
-        //splitFinances.setResizeWeight(1.0);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        panFinances.add(panBalance, gridBagConstraints);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 0.0;
-        panFinances.add(panLoan, gridBagConstraints);
-
-        JPanel panelFinanceRight = new JPanel(new BorderLayout());
-
-        JPanel pnlFinanceBtns = new JPanel(new GridLayout(2, 2));
-        btnAddFunds = new JButton("Add Funds (GM)");
-        btnAddFunds.addActionListener(this::addFundsActionPerformed);
-        btnAddFunds.setEnabled(getCampaign().isGM());
-        pnlFinanceBtns.add(btnAddFunds);
-        JButton btnGetLoan = new JButton("Get Loan");
-        btnGetLoan.addActionListener(e -> showNewLoanDialog());
-        pnlFinanceBtns.add(btnGetLoan);
-
-        btnManageAssets = new JButton("Manage Assets (GM)");
-        btnManageAssets.addActionListener(e -> manageAssets());
-        btnManageAssets.setEnabled(getCampaign().isGM());
-        pnlFinanceBtns.add(btnManageAssets);
-
-        panelFinanceRight.add(pnlFinanceBtns, BorderLayout.NORTH);
-
-        areaNetWorth = new JTextArea();
-        areaNetWorth.setLineWrap(true);
-        areaNetWorth.setWrapStyleWord(true);
-        areaNetWorth.setFont(new Font("Courier New", Font.PLAIN, 12));
-        areaNetWorth.setText(getCampaign().getFinancialReport());
-        areaNetWorth.setEditable(false);
-
-        JScrollPane descriptionScroll = new JScrollPane(areaNetWorth);
-        panelFinanceRight.add(descriptionScroll, BorderLayout.CENTER);
-        areaNetWorth.setCaretPosition(0);
-        descriptionScroll.setMinimumSize(new Dimension(300, 200));
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridheight = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.weightx = 0.0;
-        gridBagConstraints.weighty = 1.0;
-        panFinances.add(panelFinanceRight, gridBagConstraints);
-
+    
+    /**
+     * Removes a tab from the gui.
+     * 
+     * @param tabName	The name of the tab to remove
+     */
+    public void removeTab(String tabName) {
+    	int index = tabMain.indexOfTab(tabName);
+    	if (index >= 0) {
+        	CampaignGuiTab tab = (CampaignGuiTab)tabMain.getComponentAt(index);
+        	if (standardTabs.containsKey(tab.tabType())) {
+        		standardTabs.remove(tab.tabType());
+        	}
+    		tabMain.removeTabAt(index);
+    	}
     }
-
+    
     private void initMenu() {
 
         menuBar = new JMenuBar();
@@ -2762,10 +623,10 @@ public class CampaignGUI extends JPanel {
 
         JMenuItem miExportPersonCSV = new JMenuItem(
                 resourceMap.getString("miExportPersonCSV.text")); // NOI18N
-        miExportPersonCSV.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                exportTable(personnelTable, getCampaign().getName()
+        miExportPersonCSV.addActionListener(ev -> {
+        		if (getTab(GuiTabType.PERSONNEL) != null) {
+        			exportTable(((PersonnelTab)getTab(GuiTabType.PERSONNEL)).getPersonnelTable(),
+        					getCampaign().getName()
                         + getCampaign().getShortDateAsString()
                         + "_ExportedPersonnel" + ".csv");
             }
@@ -2774,10 +635,10 @@ public class CampaignGUI extends JPanel {
 
         JMenuItem miExportUnitCSV = new JMenuItem(
                 resourceMap.getString("miExportUnitCSV.text")); // NOI18N
-        miExportUnitCSV.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                exportTable(getUnitTable(), getCampaign().getName()
+        miExportUnitCSV.addActionListener(ev -> {
+        	if (getTab(GuiTabType.HANGAR) != null) {
+                exportTable(((HangarTab)getTab(GuiTabType.HANGAR)).getUnitTable(),
+                		getCampaign().getName()
                         + getCampaign().getShortDateAsString()
                         + "_ExportedUnit" + ".csv");
             }
@@ -3200,7 +1061,7 @@ public class CampaignGUI extends JPanel {
         menuView.add(miRetirementDefectionDialog);
 
         miShowOverview = new JCheckBoxMenuItem("Show Overview Tab");
-        miShowOverview.setSelected(getTabOverview().isVisible());
+        miShowOverview.setSelected(hasTab(GuiTabType.OVERVIEW));
         miShowOverview.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent evt) {
@@ -3399,20 +1260,6 @@ public class CampaignGUI extends JPanel {
         return System.getProperty("os.name").indexOf("Mac OS X") >= 0;
     }
 
-    /**
-     * @return the tabOverview
-     */
-    public JTabbedPane getTabOverview() {
-        return tabOverview;
-    }
-
-    /**
-     * @param tabOverview the tabOverview to set
-     */
-    public void setTabOverview(JTabbedPane tabOverview) {
-        this.tabOverview = tabOverview;
-    }
-
     private void miChatActionPerformed(ActionEvent evt) {
         JDialog chatDialog = new JDialog(getFrame(), "MekHQ Chat", false); //$NON-NLS-1$
 
@@ -3422,37 +1269,6 @@ public class CampaignGUI extends JPanel {
         chatDialog.add(new JLabel("Testing"));
         chatDialog.setResizable(true);
         chatDialog.setVisible(true);
-    }
-
-    private void addMission() {
-        MissionTypeDialog mtd = new MissionTypeDialog(getFrame(), true,
-                getCampaign(), this);
-        mtd.setVisible(true);
-    }
-
-    private void editMission() {
-        Mission mission = getCampaign().getMission(selectedMission);
-        if (null != mission) {
-            if (getCampaign().getCampaignOptions().getUseAtB()
-                    && mission instanceof AtBContract) {
-                CustomizeAtBContractDialog cmd = new CustomizeAtBContractDialog(
-                        getFrame(), true, (AtBContract) mission, getCampaign(),
-                        getIconPackage().getCamos());
-                cmd.setVisible(true);
-                if (cmd.getMissionId() != -1) {
-                    selectedMission = cmd.getMissionId();
-                }
-            } else {
-                CustomizeMissionDialog cmd = new CustomizeMissionDialog(
-                        getFrame(), true, mission, getCampaign());
-                cmd.setVisible(true);
-                if (cmd.getMissionId() != -1) {
-                    selectedMission = cmd.getMissionId();
-                }
-            }
-            refreshMissions();
-        }
-
     }
 
     private void changeTheme(java.awt.event.ActionEvent evt) {
@@ -3493,497 +1309,16 @@ public class CampaignGUI extends JPanel {
             });
         }
     }
-
-    private void completeMission() {
-        Mission mission = getCampaign().getMission(selectedMission);
-        if (null != mission) {
-            if (mission.hasPendingScenarios()) {
-                JOptionPane
-                        .showMessageDialog(
-                                getFrame(),
-                                "You cannot complete a mission that has pending scenarios",
-                                "Pending Scenarios",
-                                JOptionPane.WARNING_MESSAGE);
-            } else {
-                CompleteMissionDialog cmd = new CompleteMissionDialog(
-                        getFrame(), true, mission);
-                cmd.setVisible(true);
-                if (cmd.getStatus() > Mission.S_ACTIVE) {
-                    getCampaign().completeMission(mission.getId(),
-                            cmd.getStatus());
-
-                    if (getCampaign().getCampaignOptions().getUseAtB()
-                            && mission instanceof AtBContract) {
-                        if (((AtBContract) mission)
-                                .contractExtended(getCampaign())) {
-                            mission.setStatus(Mission.S_ACTIVE);
-                        } else {
-                            if (getCampaign().getCampaignOptions()
-                                    .doRetirementRolls()) {
-                                RetirementDefectionDialog rdd = new RetirementDefectionDialog(
-                                        this, (AtBContract) mission, true);
-                                rdd.setVisible(true);
-                                if (rdd.wasAborted()) {
-                                    /*
-                                     * Once the retirement rolls have been made,
-                                     * the outstanding payouts can be resolved
-                                     * without reference to the contract and the
-                                     * dialog can be accessed through the menu.
-                                     */
-                                    if (!getCampaign()
-                                            .getRetirementDefectionTracker()
-                                            .isOutstanding(mission.getId())) {
-                                        mission.setStatus(Mission.S_ACTIVE);
-                                    }
-                                } else {
-                                    if (null != getCampaign()
-                                            .getRetirementDefectionTracker()
-                                            .getRetirees((AtBContract) mission)
-                                            && getCampaign().getFinances()
-                                                    .getBalance() >= rdd
-                                                    .totalPayout()) {
-                                        final int[] admins = {Person.T_ADMIN_COM, Person.T_ADMIN_HR,
-                                                Person.T_ADMIN_LOG, Person.T_ADMIN_TRA};
-                                        for (int role : admins) {
-                                            Person admin = getCampaign().findBestInRole(role, SkillType.S_ADMIN);
-                                            if (admin != null) {
-                                                admin.setXp(admin.getXp() + 1);
-                                                getCampaign()
-                                                        .addReport(
-                                                                admin.getHyperlinkedName()
-                                                                        + " has gained 1 XP.");
-                                            }
-                                        }
-                                    }
-                                    if (!getCampaign().applyRetirement(
-                                            rdd.totalPayout(),
-                                            rdd.getUnitAssignments())) {
-                                        mission.setStatus(Mission.S_ACTIVE);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                if (!mission.isActive()) {
-                    if (getCampaign().getCampaignOptions().getUseAtB()
-                            && mission instanceof AtBContract) {
-                        ((AtBContract) mission).checkForFollowup(getCampaign());
-                    }
-                    if (getCampaign().getSortedMissions().size() > 0) {
-                        selectedMission = getCampaign().getSortedMissions()
-                                .get(0).getId();
-                    } else {
-                        selectedMission = -1;
-                    }
-                    refreshMissions();
-                }
-            }
-
-        }
-        refreshReport();
-        refreshFunds();
-        refreshFinancialTransactions();
-        refreshRating();
+    //TODO: trigger from event
+    public void filterTasks() {
+    	if (getTab(GuiTabType.REPAIR) != null) {
+    		((RepairTab)getTab(GuiTabType.REPAIR)).filterTasks();
+    	}
     }
-
-    private void deleteMission() {
-        Mission mission = getCampaign().getMission(selectedMission);
-        MekHQ.logMessage("Attempting to Delete Mission, Mission ID: "
-                + mission.getId());
-        if (0 != JOptionPane.showConfirmDialog(null,
-                "Are you sure you want to delete this mission?",
-                "Delete mission?", JOptionPane.YES_NO_OPTION)) {
-            return;
-        }
-        getCampaign().removeMission(mission.getId());
-        if (getCampaign().getSortedMissions().size() > 0) {
-            selectedMission = getCampaign().getSortedMissions().get(0).getId();
-        } else {
-            selectedMission = -1;
-        }
-        refreshMissions();
-        refreshReport();
-        refreshFunds();
-        refreshFinancialTransactions();
-        refreshRating();
-    }
-
-    private void addScenario() {
-        Mission m = getCampaign().getMission(selectedMission);
-        if (null != m) {
-            CustomizeScenarioDialog csd = new CustomizeScenarioDialog(
-                    getFrame(), true, null, m, getCampaign());
-            csd.setVisible(true);
-            refreshScenarioList();
-        }
-    }
-
-    private void calculateJumpPath() {
-        if (null != panMap.getSelectedPlanet()) {
-            panMap.setJumpPath(getCampaign().calculateJumpPath(
-                    getCampaign().getCurrentPlanet(),
-                    panMap.getSelectedPlanet()));
-            refreshPlanetView();
-        }
-    }
-
-    private void beginTransit() {
-        if (panMap.getJumpPath().isEmpty()) {
-            return;
-        }
-        getCampaign().getLocation().setJumpPath(panMap.getJumpPath());
-        refreshPlanetView();
-        refreshLocation();
-        panMap.setJumpPath(new JumpPath());
-        panMap.repaint();
-    }
-
-    private void doTask() {// GEN-FIRST:event_btnDoTaskActionPerformed
-        int selectedRow = -1;
-        int partId = -1;
-        int selectedLocation = -1;
-        Unit selectedUnit = null;
-        // int selectedTechRow = -1;
-        Person tech = getSelectedTech();
-        if (onWarehouseTab()) {
-            selectedRow = partsTable.getSelectedRow();
-            // selectedTechRow = whTechTable.getSelectedRow();
-            Part part = getSelectedTask();
-            if (null == part) {
-                return;
-            }
-            if (null == tech) {
-                return;
-            }
-            partId = part.getId();
-            
-            Part repairable = getCampaign().fixWarehousePart(part, tech);
-            // if the break off part failed to be repaired, then follow it with
-            // the focus
-            // otherwise keep the focus on the current row
-            if (repairable.needsFixing() && !repairable.isBeingWorkedOn()) {
-                partId = repairable.getId();
-            }
-        } else if (repairsSelected()) {
-            selectedRow = taskTable.getSelectedRow();
-            // selectedTechRow = TechTable.getSelectedRow();
-            selectedLocation = choiceLocation.getSelectedIndex();
-            selectedUnit = getSelectedServicedUnit();
-            Part part = getSelectedTask();
-            if (null == part) {
-                return;
-            }
-            Unit u = part.getUnit();
-            if (null != u && u.isSelfCrewed()) {
-                tech = u.getEngineer();
-            }
-            if (null == tech) {
-                return;
-            }
-            if (part.onBadHipOrShoulder() && !part.isSalvaging()) {
-                if (part instanceof MekLocation
-                        && ((MekLocation) part).isBreached()
-                        && 0 != JOptionPane
-                                .showConfirmDialog(
-                                        frame,
-                                        "You are sealing a limb with a bad shoulder or hip.\n"
-                                                + "You may continue, but this limb cannot be repaired and you will have to\n"
-                                                + "scrap it in order to repair the internal structure and fix the shoulder/hip.\n"
-                                                + "Do you wish to continue?",
-                                        "Busted Hip/Shoulder",
-                                        JOptionPane.YES_NO_OPTION)) {
-                    return;
-                } else if (part instanceof MekLocation
-                        && ((MekLocation) part).isBlownOff()
-                        && 0 != JOptionPane
-                                .showConfirmDialog(
-                                        frame,
-                                        "You are re-attaching a limb with a bad shoulder or hip.\n"
-                                                + "You may continue, but this limb cannot be repaired and you will have to\n"
-                                                + "scrap it in order to repair the internal structure and fix the shoulder/hip.\n"
-                                                + "Do you wish to continue?",
-                                        "Busted Hip/Shoulder",
-                                        JOptionPane.YES_NO_OPTION)) {
-                    return;
-                } else if (0 != JOptionPane
-                        .showConfirmDialog(
-                                frame,
-                                "You are repairing/replacing a part on a limb with a bad shoulder or hip.\n"
-                                        + "You may continue, but this limb cannot be repaired and you will have to\n"
-                                        + "remove this equipment if you wish to scrap and then replace the limb.\n"
-                                        + "Do you wish to continue?",
-                                "Busted Hip/Shoulder",
-                                JOptionPane.YES_NO_OPTION)) {
-                    return;
-                }
-            }
-            getCampaign().fixPart(part, tech);
-            if (null != u && !u.isRepairable()
-                    && u.getSalvageableParts().size() == 0) {
-                selectedRow = -1;
-                getCampaign().removeUnit(u.getId());
-            }
-            if (null != u && !getCampaign().getServiceableUnits().contains(u)) {
-                selectedRow = -1;
-            }
-        } else if (acquireSelected()) {
-            selectedRow = acquisitionTable.getSelectedRow();
-            IAcquisitionWork acquisition = getSelectedAcquisition();
-            if (null == acquisition) {
-                return;
-            }
-            getCampaign().getShoppingList().addShoppingItem(acquisition, 1,
-                    getCampaign());
-        }
-
-        refreshServicedUnitList();
-        refreshUnitList();
-        refreshPersonnelList();
-        refreshTaskList();
-        refreshAcquireList();
-        refreshTechsList();
-        refreshPartsList();
-        refreshReport();
-        refreshFunds();
-        refreshFinancialTransactions();
-        refreshOverview();
-        filterTasks();
-
-        // get the selected row back for tasks
-        if (selectedRow != -1) {
-            if (acquireSelected()) {
-                if (acquisitionTable.getRowCount() > 0) {
-                    if (acquisitionTable.getRowCount() == selectedRow) {
-                        acquisitionTable.setRowSelectionInterval(
-                                selectedRow - 1, selectedRow - 1);
-                    } else {
-                        acquisitionTable.setRowSelectionInterval(selectedRow,
-                                selectedRow);
-                    }
-                }
-            } else if (onWarehouseTab()) {
-                boolean found = false;
-                for (int i = 0; i < partsTable.getRowCount(); i++) {
-                    Part p = partsModel.getPartAt(partsTable
-                            .convertRowIndexToModel(i));
-                    if (p.getId() == partId) {
-                        partsTable.setRowSelectionInterval(i, i);
-                        partsTable.scrollRectToVisible(partsTable.getCellRect(
-                                i, 0, true));
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found) {
-                    // then set to the current selected row
-                    if (partsTable.getRowCount() > 0) {
-                        if (partsTable.getRowCount() == selectedRow) {
-                            partsTable.setRowSelectionInterval(selectedRow - 1,
-                                    selectedRow - 1);
-                            // partsTable.scrollRectToVisible(partsTable.getCellRect(selectedRow-1,
-                            // 0, true));
-                        } else {
-                            partsTable.setRowSelectionInterval(selectedRow,
-                                    selectedRow);
-                            // partsTable.scrollRectToVisible(partsTable.getCellRect(selectedRow,
-                            // 0, true));
-                        }
-                    }
-                }
-            } else if (repairsSelected()) {
-                if (taskTable.getRowCount() > 0) {
-                    if (taskTable.getRowCount() == selectedRow) {
-                        taskTable.setRowSelectionInterval(selectedRow - 1,
-                                selectedRow - 1);
-                    } else {
-                        taskTable.setRowSelectionInterval(selectedRow,
-                                selectedRow);
-                    }
-                }
-            }
-
-            JTable table = techTable;
-            if (onWarehouseTab()) {
-                table = whTechTable;
-            }
-
-            // If requested, switch to top entry
-            if(getCampaign().getCampaignOptions().useResetToFirstTech() && table.getRowCount() > 0) {
-                table.setRowSelectionInterval(0, 0);
-            } else {
-                // Or get the selected tech back
-                for (int i = 0; i < table.getRowCount(); i++) {
-                    Person p = techsModel
-                            .getTechAt(table.convertRowIndexToModel(i));
-                    if (tech.getId().equals(p.getId())) {
-                        table.setRowSelectionInterval(i, i);
-                        break;
-                    }
-                }
-            }
-        }
-        if (selectedLocation != -1) {
-            if (selectedUnit == null || getSelectedServicedUnit() == null
-                    || !selectedUnit.equals(getSelectedServicedUnit())
-                    || selectedLocation >= choiceLocation.getItemCount()) {
-                selectedLocation = 0;
-            }
-            choiceLocation.setSelectedIndex(selectedLocation);
-        }
-
-    }// GEN-LAST:event_btnDoTaskActionPerformed
-
-    private void useBonusPart() {
-        int selectedRow = -1;
-        if (acquireSelected()) {
-            selectedRow = acquisitionTable.getSelectedRow();
-            IAcquisitionWork acquisition = getSelectedAcquisition();
-            if (null == acquisition) {
-                return;
-            }
-            if(acquisition instanceof AmmoBin) {
-                acquisition = ((AmmoBin) acquisition).getAcquisitionWork();
-            }
-            String report = acquisition.find(0);
-            if (report.endsWith("0 days.")) {
-                AtBContract contract = getCampaign().getAttachedAtBContract(
-                        getSelectedAcquisition().getUnit());
-                if (null == contract) {
-                    for (Mission m : getCampaign().getMissions()) {
-                        if (m.isActive() && m instanceof AtBContract
-                                && ((AtBContract) m).getNumBonusParts() > 0) {
-                            contract = (AtBContract) m;
-                            break;
-                        }
-                    }
-                }
-                if (null == contract) {
-                    MekHQ.logError("AtB: used bonus part but no contract has bonus parts available.");
-                } else {
-                    contract.useBonusPart();
-                }
-            }
-        }
-
-        refreshServicedUnitList();
-        refreshUnitList();
-        refreshPersonnelList();
-        refreshTaskList();
-        refreshAcquireList();
-        refreshTechsList();
-        refreshPartsList();
-        refreshReport();
-        refreshFunds();
-        refreshFinancialTransactions();
-        filterTasks();
-
-        if (selectedRow != -1) {
-            if (acquireSelected()) {
-                if (acquisitionTable.getRowCount() > 0) {
-                    if (acquisitionTable.getRowCount() == selectedRow) {
-                        acquisitionTable.setRowSelectionInterval(
-                                selectedRow - 1, selectedRow - 1);
-                    } else {
-                        acquisitionTable.setRowSelectionInterval(selectedRow,
-                                selectedRow);
-                    }
-                }
-            }
-        }
-    }
-
-    public Person getSelectedTech() {
-        JTable table = techTable;
-        if (onWarehouseTab()) {
-            table = whTechTable;
-        }
-        int row = table.getSelectedRow();
-        if (row < 0) {
-            return null;
-        }
-        return techsModel.getTechAt(table.convertRowIndexToModel(row));
-    }
-
-    private Person getSelectedDoctor() {
-        int row = docTable.getSelectedRow();
-        if (row < 0) {
-            return null;
-        }
-        return doctorsModel.getDoctorAt(docTable.convertRowIndexToModel(row));
-    }
-
-    public Part getSelectedTask() {
-        if (onWarehouseTab()) {
-            int row = partsTable.getSelectedRow();
-            if (row < 0) {
-                return null;
-            }
-            return partsModel.getPartAt(partsTable.convertRowIndexToModel(row));
-        }
-        int row = taskTable.getSelectedRow();
-        if (row < 0) {
-            return null;
-        }
-        return taskModel.getTaskAt(taskTable.convertRowIndexToModel(row));
-    }
-
-    private IAcquisitionWork getSelectedAcquisition() {
-        int row = acquisitionTable.getSelectedRow();
-        if (row < 0) {
-            return null;
-        }
-        return acquireModel.getAcquisitionAt(acquisitionTable
-                .convertRowIndexToModel(row));
-    }
-
-    private Unit getSelectedServicedUnit() {
-        int row = servicedUnitTable.getSelectedRow();
-        if (row < 0) {
-            return null;
-        }
-        return servicedUnitModel.getUnit(servicedUnitTable
-                .convertRowIndexToModel(row));
-    }
-
-    private void taskTableValueChanged(javax.swing.event.ListSelectionEvent evt) {
-        filterTechs(false);
-        updateTechTarget();
-    }
-
-    private void acquisitionTableValueChanged(
-            javax.swing.event.ListSelectionEvent evt) {
-        filterTechs(false);
-        updateTechTarget();
-    }
-
-    private void servicedUnitTableValueChanged(
-            javax.swing.event.ListSelectionEvent evt) {
-        refreshTaskList();
-        refreshAcquireList();
-        int selected = servicedUnitTable.getSelectedRow();
-        txtServicedUnitView.setText("");
-        if (selected > -1) {
-            Unit unit = servicedUnitModel.getUnit(servicedUnitTable
-                    .convertRowIndexToModel(selected));
-            if (null != unit) {
-                MechView mv = new MechView(unit.getEntity(), true, true);
-                txtServicedUnitView
-                        .setText("<div style='font: 12pt monospaced'>"
-                                + mv.getMechReadoutBasic() + "<br>"
-                                + mv.getMechReadoutLoadout() + "</div>");
-            }
-        }
-    }
-
-    private void techTableValueChanged(javax.swing.event.ListSelectionEvent evt) {
-        updateTechTarget();
         
-        taskTable.repaint();
-    }
-    
     public void focusOnUnit(UUID id) {
-        if (null == id) {
+    	HangarTab ht = (HangarTab)getTab(GuiTabType.HANGAR);
+        if (null == id || null == ht) {
             return;
         }
         if (mainPanel.getDividerLocation() < 700) {
@@ -3994,70 +1329,37 @@ public class CampaignGUI extends JPanel {
                 mainPanel.resetToPreferredSizes();
             }
         }
-        getSplitUnit().resetToPreferredSizes();
+        ht.focusOnUnit(id);
         tabMain.setSelectedIndex(getTabIndexByName(resourceMap
                 .getString("panHangar.TabConstraints.tabTitle")));
-        int row = -1;
-        for (int i = 0; i < getUnitTable().getRowCount(); i++) {
-            if (getUnitModel().getUnit(getUnitTable().convertRowIndexToModel(i)).getId()
-                    .equals(id)) {
-                row = i;
-                break;
-            }
-        }
-        if (row == -1) {
-            // try expanding the filter to all units
-            choiceUnit.setSelectedIndex(0);
-            for (int i = 0; i < getUnitTable().getRowCount(); i++) {
-                if (getUnitModel().getUnit(getUnitTable().convertRowIndexToModel(i))
-                        .getId().equals(id)) {
-                    row = i;
-                    break;
-                }
-            }
-
-        }
-        if (row != -1) {
-            getUnitTable().setRowSelectionInterval(row, row);
-            getUnitTable().scrollRectToVisible(getUnitTable().getCellRect(row, 0, true));
-        }
-
     }
 
     public void focusOnUnitInRepairBay(UUID id) {
         if (null == id) {
             return;
         }
-        if (mainPanel.getDividerLocation() < 700) {
-            if (mainPanel.getLastDividerLocation() > 700) {
-                mainPanel
-                        .setDividerLocation(mainPanel.getLastDividerLocation());
-            } else {
-                mainPanel.resetToPreferredSizes();
+        if (getTab(GuiTabType.REPAIR) != null) {
+            if (mainPanel.getDividerLocation() < 700) {
+                if (mainPanel.getLastDividerLocation() > 700) {
+                    mainPanel
+                            .setDividerLocation(mainPanel.getLastDividerLocation());
+                } else {
+                    mainPanel.resetToPreferredSizes();
+                }
             }
+            ((RepairTab)getTab(GuiTabType.REPAIR)).focusOnUnit(id);
+	        tabMain.setSelectedComponent(getTab(GuiTabType.REPAIR));
         }
-        tabMain.setSelectedIndex(6);
-        int row = -1;
-        for (int i = 0; i < servicedUnitTable.getRowCount(); i++) {
-            if (servicedUnitModel
-                    .getUnit(servicedUnitTable.convertRowIndexToModel(i))
-                    .getId().equals(id)) {
-                row = i;
-                break;
-            }
-        }
-        if (row != -1) {
-            servicedUnitTable.setRowSelectionInterval(row, row);
-            servicedUnitTable.scrollRectToVisible(servicedUnitTable
-                    .getCellRect(row, 0, true));
-        }
-
     }
 
     public void focusOnPerson(UUID id) {
         if (null == id) {
             return;
         }
+        PersonnelTab pt = (PersonnelTab)getTab(GuiTabType.PERSONNEL);
+        if (pt == null) {
+        	return;
+        }
         if (mainPanel.getDividerLocation() < 700) {
             if (mainPanel.getLastDividerLocation() > 700) {
                 mainPanel
@@ -4066,35 +1368,8 @@ public class CampaignGUI extends JPanel {
                 mainPanel.resetToPreferredSizes();
             }
         }
-        splitPersonnel.resetToPreferredSizes();
-        tabMain.setSelectedIndex(getTabIndexByName(resourceMap
-                .getString("panPersonnel.TabConstraints.tabTitle")));
-        int row = -1;
-        for (int i = 0; i < personnelTable.getRowCount(); i++) {
-            if (personModel.getPerson(personnelTable.convertRowIndexToModel(i))
-                    .getId().equals(id)) {
-                row = i;
-                break;
-            }
-        }
-        if (row == -1) {
-            // try expanding the filter to all units
-            choicePerson.setSelectedIndex(0);
-            for (int i = 0; i < personnelTable.getRowCount(); i++) {
-                if (personModel
-                        .getPerson(personnelTable.convertRowIndexToModel(i))
-                        .getId().equals(id)) {
-                    row = i;
-                    break;
-                }
-            }
-
-        }
-        if (row != -1) {
-            personnelTable.setRowSelectionInterval(row, row);
-            personnelTable.scrollRectToVisible(personnelTable.getCellRect(row,
-                    0, true));
-        }
+        pt.focusOnPerson(id);
+        tabMain.setSelectedComponent(pt);
     }
 
     public void showNews(int id) {
@@ -4103,29 +1378,6 @@ public class CampaignGUI extends JPanel {
             NewsReportDialog nrd = new NewsReportDialog(frame, news);
             nrd.setVisible(true);
         }
-    }
-
-    private void taskTabChanged() {
-        filterTechs(false);
-        updateTechTarget();
-    }
-
-    private void patientTableValueChanged() {
-        updateAssignDoctorEnabled();
-    }
-
-    private void docTableValueChanged(ListSelectionEvent evt) {
-        refreshPatientList();
-        updateAssignDoctorEnabled();
-    }
-
-    private void PartsTableValueChanged(javax.swing.event.ListSelectionEvent evt) {
-        filterTechs(true);
-        updateTechTarget();
-    }
-
-    public InterstellarMapPanel getMapPanel() {
-        return panMap;
     }
 
     private void advanceDay() {
@@ -4178,8 +1430,6 @@ public class CampaignGUI extends JPanel {
         refreshFinancialTransactions();
         refreshOverview();
         refreshPlanetView();
-        panMap.repaint();
-        suggestPlanet.setSuggestData(getCampaign().getPlanetNames());
     }// GEN-LAST:event_btnAdvanceDayActionPerformed
 
     public boolean nagShortMaintenance() {
@@ -4268,54 +1518,6 @@ public class CampaignGUI extends JPanel {
             }
         }
         return false;
-    }
-
-    private void assignDoctor() {
-        Person doctor = getSelectedDoctor();
-        if(null == doctor) {
-            return;
-        }
-        Collection<Person> selectedPatients = getSelectedUnassignedPatients();
-        if(selectedPatients.isEmpty()) {
-            // Pick the first in the list ... if there are any
-            int patientSize = unassignedPatientModel.getSize();
-            for(int i = 0; i < patientSize; ++ i) {
-                Person p = unassignedPatientModel.getElementAt(i);
-                if((null != p)
-                        && (p.needsFixing() || (getCampaign().getCampaignOptions().useAdvancedMedical() && p.needsAMFixing()))
-                        && (getCampaign().getPatientsFor(doctor) < 25)
-                        && (getCampaign().getTargetFor(p, doctor).getValue() != TargetRoll.IMPOSSIBLE)) {
-                        p.setDoctorId(doctor.getId(), getCampaign().getCampaignOptions().getHealingWaitingPeriod());
-                        break;
-                    }
-            }
-            
-        } else {
-            for (Person p : selectedPatients) {
-                if((null != p)
-                    && (p.needsFixing() || (getCampaign().getCampaignOptions().useAdvancedMedical() && p.needsAMFixing()))
-                    && (getCampaign().getPatientsFor(doctor) < 25)
-                    && (getCampaign().getTargetFor(p, doctor).getValue() != TargetRoll.IMPOSSIBLE)) {
-                    p.setDoctorId(doctor.getId(), getCampaign().getCampaignOptions().getHealingWaitingPeriod());
-                }
-            }
-        }
-        refreshTechsList();
-        refreshDoctorsList();
-        refreshPatientList();
-    }
-
-    private void unassignDoctor() {
-        for (Person p : getSelectedAssignedPatients()) {
-            if ((null != p)) {
-                p.setDoctorId(null, getCampaign().getCampaignOptions()
-                        .getNaturalHealingWaitingPeriod());
-            }
-        }
-
-        refreshTechsList();
-        refreshDoctorsList();
-        refreshPatientList();
     }
 
     private void hirePerson(java.awt.event.ActionEvent evt) {
@@ -4466,135 +1668,6 @@ public class CampaignGUI extends JPanel {
         return file;
     }
 
-    public static String getPersonnelGroupName(int group) {
-        switch (group) {
-            case PG_ACTIVE:
-                return "Active Personnel";
-            case PG_COMBAT:
-                return "Combat Personnel";
-            case PG_MW:
-                return "Mechwarriors";
-            case PG_CREW:
-                return "Vehicle Crews";
-            case PG_PILOT:
-                return "Aerospace Pilots";
-            case PG_CPILOT:
-                return "Conventional Pilots";
-            case PG_PROTO:
-                return "Protomech Pilots";
-            case PG_BA:
-                return "Battle Armor Infantry";
-            case PG_SOLDIER:
-                return "Conventional Infantry";
-            case PG_SUPPORT:
-                return "Support Personnel";
-            case PG_VESSEL:
-                return "Large Vessel Crews";
-            case PG_TECH:
-                return "Techs";
-            case PG_DOC:
-                return "Medical Staff";
-            case PG_ADMIN:
-                return "Administrators";
-            case PG_DEPENDENT:
-                return "Dependents";
-            case PG_RETIRE:
-                return "Retired Personnel";
-            case PG_MIA:
-                return "Personnel MIA";
-            case PG_KIA:
-                return "Rolls of Honor (KIA)";
-            default:
-                return "?";
-        }
-    }
-
-    public static String getPartsGroupName(int group) {
-        switch (group) {
-            case SG_ALL:
-                return "All Parts";
-            case SG_ARMOR:
-                return "Armor";
-            case SG_SYSTEM:
-                return "System Components";
-            case SG_EQUIP:
-                return "Equipment";
-            case SG_LOC:
-                return "Locations";
-            case SG_WEAP:
-                return "Weapons";
-            case SG_AMMO:
-                return "Ammunition";
-            case SG_AMMO_BIN:
-                return "Ammunition Bins";
-            case SG_MISC:
-                return "Miscellaneous Equipment";
-            case SG_ENGINE:
-                return "Engines";
-            case SG_GYRO:
-                return "Gyros";
-            case SG_ACT:
-                return "Actuators";
-            default:
-                return "?";
-        }
-    }
-
-    public static String getPartsGroupViewName(int view) {
-        switch (view) {
-            case SV_ALL:
-                return "All";
-            case SV_IN_TRANSIT:
-                return "In Transit";
-            case SV_RESERVED:
-                return "Reserved for Refit/Repair";
-            case SV_UNDAMAGED:
-                return "Undamaged";
-            case SV_DAMAGED:
-                return "Damaged";
-            default:
-                return "?";
-        }
-    }
-
-    public static String getPersonnelViewName(int group) {
-        switch (group) {
-            case PV_GRAPHIC:
-                return "Graphic";
-            case PV_GENERAL:
-                return "General";
-            case PV_PILOT:
-                return "Piloting/Gunnery Skills";
-            case PV_INF:
-                return "Infantry Skills";
-            case PV_TACTIC:
-                return "Tactical Skills";
-            case PV_TECH:
-                return "Tech Skills";
-            case PV_ADMIN:
-                return "Admin Skills";
-            case PV_FLUFF:
-                return "Fluff Information";
-            default:
-                return "?";
-        }
-    }
-
-    public static String getUnitViewName(int group) {
-        switch (group) {
-            case UV_GRAPHIC:
-                return "Graphic";
-            case UV_GENERAL:
-                return "General";
-            case UV_DETAILS:
-                return "Details";
-            case UV_STATUS:
-                return "Status";
-            default:
-                return "?";
-        }
-    }
-
     private void btnOvertimeActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnOvertimeActionPerformed
         getCampaign().setOvertime(btnOvertime.isSelected());
         refreshTechsList();
@@ -4604,9 +1677,8 @@ public class CampaignGUI extends JPanel {
     }// GEN-LAST:event_btnOvertimeActionPerformed
 
     private void btnGMModeActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnGMModeActionPerformed
+    	
         getCampaign().setGMMode(btnGMMode.isSelected());
-        btnAddFunds.setEnabled(btnGMMode.isSelected());
-        btnManageAssets.setEnabled(btnGMMode.isSelected());
         refreshOverview();
     }// GEN-LAST:event_btnGMModeActionPerformed
 
@@ -4621,9 +1693,6 @@ public class CampaignGUI extends JPanel {
                 getCampaign().initAtB();
                 refreshLanceAssignments();
             }
-            splitScenario.getBottomComponent().setVisible(
-                    getCampaign().getCampaignOptions().getUseAtB());
-            splitScenario.resetToPreferredSizes();
             miContractMarket.setVisible(getCampaign().getCampaignOptions()
                     .getUseAtB());
             miUnitMarket.setVisible(getCampaign().getCampaignOptions()
@@ -4663,10 +1732,7 @@ public class CampaignGUI extends JPanel {
         }
         refreshCalendar();
         getCampaign().reloadNews();
-        changePersonnelView();
-        refreshPersonnelList();
         refreshOverview();
-        panMap.repaint();
     }// GEN-LAST:event_menuOptionsActionPerformed
 
     private void menuOptionsMMActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_menuOptionsActionPerformed
@@ -4678,8 +1744,6 @@ public class CampaignGUI extends JPanel {
             getCampaign().setGameOptions(god.getOptions());
             setCampaignOptionsFromGameOptions();
             refreshCalendar();
-            changePersonnelView();
-            refreshPersonnelList();
             refreshOverview();
         }
     }// GEN-LAST:event_menuOptionsActionPerformed
@@ -4767,15 +1831,6 @@ public class CampaignGUI extends JPanel {
         refreshPartsList();
         refreshAcquireList();
         refreshOverview();
-    }
-
-    private void showNewLoanDialog() {
-        NewLoanDialog nld = new NewLoanDialog(getFrame(), true, getCampaign());
-        nld.setVisible(true);
-        refreshFinancialTransactions();
-        refreshFunds();
-        refreshReport();
-        refreshRating();
     }
 
     private void showMercRosterDialog() {
@@ -4887,7 +1942,9 @@ public class CampaignGUI extends JPanel {
             return;
         }
         getCampaign().refit(r);
-        getPanMekLab().clearUnit();
+        if (hasTab(GuiTabType.MEKLAB)) {
+        	((MekLabTab)getTab(GuiTabType.MEKLAB)).clearUnit();
+        }
         refreshReport();
         refreshFunds();
         refreshFinancialTransactions();
@@ -4954,346 +2011,46 @@ public class CampaignGUI extends JPanel {
         return getCampaign().getPartsStore().getByNameAndDetails(pnd);
     }
 
-    public void refreshOverview() {
-        int drIndex = getTabOverview().indexOfComponent(scrollOverviewUnitRating);
-        if (!getCampaign().getCampaignOptions().useDragoonRating() && drIndex != -1) {
-            getTabOverview().removeTabAt(drIndex);
-        } else {
-            if (drIndex == -1) {
-                getTabOverview().addTab(resourceMap.getString("scrollOverviewDragoonsRating.TabConstraints.tabTitle"), scrollOverviewUnitRating);
-            }
-        }
-
-        scrollOverviewUnitRating.setViewportView(new RatingReport(getCampaign()).getReport());
-        scrollOverviewCombatPersonnel.setViewportView(new PersonnelReport(getCampaign()).getCombatPersonnelReport());
-        scrollOverviewSupportPersonnel.setViewportView(new PersonnelReport(getCampaign()).getSupportPersonnelReport());
-        scrollOverviewTransport.setViewportView(new TransportReport(getCampaign()).getReport());
-        scrollOverviewCargo.setViewportView(new CargoReport(getCampaign()).getReport());
-        HangarReport hr = new HangarReport(getCampaign());
-        overviewHangarArea.setText(hr.getHangarTotals());
-        scrollOverviewHangar.setViewportView(hr.getHangarTree());
-        refreshOverviewPartsInUse();
-    }
-
-    private void initOverviewPartsInUse() {
-        overviewPartsPanel = new JPanel(new GridBagLayout());
-        
-        overviewPartsModel = new PartsInUseTableModel();
-        overviewPartsInUseTable = new JTable(overviewPartsModel);
-        overviewPartsInUseTable.setRowSelectionAllowed(false);
-        overviewPartsInUseTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-        TableColumn column = null;
-        for(int i = 0; i < overviewPartsModel.getColumnCount(); ++ i) {
-            column = overviewPartsInUseTable.getColumnModel().getColumn(i);
-            column.setCellRenderer(overviewPartsModel.getRenderer());
-            if(overviewPartsModel.hasConstantWidth(i)) {
-                column.setMinWidth(overviewPartsModel.getWidth(i));
-                column.setMaxWidth(overviewPartsModel.getWidth(i));
-            } else {
-                column.setPreferredWidth(overviewPartsModel.getPreferredWidth(i));
-            }
-        }
-        overviewPartsInUseTable.setIntercellSpacing(new Dimension(0, 0));
-        overviewPartsInUseTable.setShowGrid(false);
-        partsInUseSorter = new TableRowSorter<PartsInUseTableModel>(overviewPartsModel);
-        partsInUseSorter.setSortsOnUpdates(true);
-        // Don't sort the buttons
-        partsInUseSorter.setSortable(PartsInUseTableModel.COL_BUTTON_BUY, false);
-        partsInUseSorter.setSortable(PartsInUseTableModel.COL_BUTTON_BUY_BULK, false);
-        partsInUseSorter.setSortable(PartsInUseTableModel.COL_BUTTON_GMADD, false);
-        partsInUseSorter.setSortable(PartsInUseTableModel.COL_BUTTON_GMADD_BULK, false);
-        // Numeric columns
-        partsInUseSorter.setComparator(PartsInUseTableModel.COL_IN_USE, new FormattedNumberSorter());
-        partsInUseSorter.setComparator(PartsInUseTableModel.COL_STORED, new FormattedNumberSorter());
-        partsInUseSorter.setComparator(PartsInUseTableModel.COL_TONNAGE, new FormattedNumberSorter());
-        partsInUseSorter.setComparator(PartsInUseTableModel.COL_IN_TRANSFER, new TwoNumbersSorter());
-        partsInUseSorter.setComparator(PartsInUseTableModel.COL_COST, new FormattedNumberSorter());
-        // Default starting sort
-        partsInUseSorter.setSortKeys(Arrays.asList(new RowSorter.SortKey(0, SortOrder.ASCENDING)));
-        overviewPartsInUseTable.setRowSorter(partsInUseSorter);
-        
-        // Add buttons and actions. TODO: Only refresh the row we are working on, not the whole table
-        @SuppressWarnings("serial")
-        Action buy = new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                int row = Integer.valueOf(e.getActionCommand());
-                PartInUse piu = overviewPartsModel.getPartInUse(row);
-                IAcquisitionWork partToBuy = piu.getPartToBuy();
-                getCampaign().getShoppingList().addShoppingItem(partToBuy, 1, getCampaign());
-                refreshReport();
-                refreshAcquireList();
-                refreshPartsList();
-                refreshOverviewSpecificPart(row, piu, partToBuy);
-            }
-        };
-        @SuppressWarnings("serial")
-        Action buyInBulk = new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                int row = Integer.valueOf(e.getActionCommand());
-                PartInUse piu = overviewPartsModel.getPartInUse(row);
-                int quantity = 1;
-                PopupValueChoiceDialog pcd = new PopupValueChoiceDialog(getFrame(), true, "How Many " + piu.getPartToBuy().getAcquisitionName(), quantity, 1, 100);
-                pcd.setVisible(true);
-                quantity = pcd.getValue();
-                IAcquisitionWork partToBuy = piu.getPartToBuy();
-                getCampaign().getShoppingList().addShoppingItem(partToBuy, quantity, getCampaign());
-                refreshReport();
-                refreshAcquireList();
-                refreshPartsList();
-                refreshOverviewSpecificPart(row, piu, partToBuy);
-            }
-        };
-        @SuppressWarnings("serial")
-        Action add = new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                int row = Integer.valueOf(e.getActionCommand());
-                PartInUse piu = overviewPartsModel.getPartInUse(row);
-                IAcquisitionWork partToBuy = piu.getPartToBuy();
-                getCampaign().addPart((Part) partToBuy.getNewEquipment(), 0);
-                refreshAcquireList();
-                refreshPartsList();
-                refreshOverviewSpecificPart(row, piu, partToBuy);
-            }
-        };
-        @SuppressWarnings("serial")
-        Action addInBulk = new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                int row = Integer.valueOf(e.getActionCommand());
-                PartInUse piu = overviewPartsModel.getPartInUse(row);
-                int quantity = 1;
-                PopupValueChoiceDialog pcd = new PopupValueChoiceDialog(getFrame(), true, "How Many " + piu.getPartToBuy().getAcquisitionName(), quantity, 1, 100);
-                pcd.setVisible(true);
-                quantity = pcd.getValue();
-                IAcquisitionWork partToBuy = piu.getPartToBuy();
-                while(quantity > 0) {
-                    getCampaign().addPart((Part) partToBuy.getNewEquipment(), 0);
-                    -- quantity;
-                }
-                refreshAcquireList();
-                refreshPartsList();
-                refreshOverviewSpecificPart(row, piu, partToBuy);
-            }
-        };
-
-        new PartsInUseTableModel.ButtonColumn(overviewPartsInUseTable,
-            buy, PartsInUseTableModel.COL_BUTTON_BUY);
-        new PartsInUseTableModel.ButtonColumn(overviewPartsInUseTable,
-            buyInBulk, PartsInUseTableModel.COL_BUTTON_BUY_BULK);
-        new PartsInUseTableModel.ButtonColumn(overviewPartsInUseTable,
-            add, PartsInUseTableModel.COL_BUTTON_GMADD);
-        new PartsInUseTableModel.ButtonColumn(overviewPartsInUseTable,
-            addInBulk, PartsInUseTableModel.COL_BUTTON_GMADD_BULK);
-
-        GridBagConstraints gridBagConstraints = new GridBagConstraints();
-
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-
-        overviewPartsPanel.add(new JScrollPane(overviewPartsInUseTable), gridBagConstraints);
-    }
-    
-    private void refreshOverviewSpecificPart(int row, PartInUse piu, IAcquisitionWork newPart) {
-        if(piu.equals(new PartInUse((Part) newPart))) {
-            // Simple update
-            getCampaign().updatePartInUse(piu);
-            overviewPartsModel.fireTableRowsUpdated(row, row);
-        } else {
-            // Some other part changed; fire a full refresh to be sure
-            refreshOverviewPartsInUse();
-        }
-    }
-    public void refreshOverviewPartsInUse() {
-        overviewPartsModel.setData(getCampaign().getPartsInUse());
-        TableColumnModel tcm = overviewPartsInUseTable.getColumnModel();
-        PartsInUseTableModel.ButtonColumn column = (ButtonColumn)tcm.getColumn(PartsInUseTableModel.COL_BUTTON_GMADD).getCellRenderer();
-        column.setEnabled(getCampaign().isGM());
-        column = (ButtonColumn)tcm.getColumn(PartsInUseTableModel.COL_BUTTON_GMADD_BULK).getCellRenderer();
-        column.setEnabled(getCampaign().isGM());
-    }
-
+    //TODO: trigger from event
     public void refreshPersonnelView() {
-        int row = personnelTable.getSelectedRow();
-        if (row < 0) {
-            scrollPersonnelView.setViewportView(null);
-            return;
-        }
-        Person selectedPerson = personModel.getPerson(personnelTable
-                .convertRowIndexToModel(row));
-        scrollPersonnelView.setViewportView(new PersonViewPanel(selectedPerson, getCampaign(), getIconPackage()));
-        // This odd code is to make sure that the scrollbar stays at the top
-        // I can't just call it here, because it ends up getting reset somewhere
-        // later
-        javax.swing.SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                scrollPersonnelView.getVerticalScrollBar().setValue(0);
-            }
-        });
+    	if (getTab(GuiTabType.PERSONNEL) != null) {
+    		((PersonnelTab)getTab(GuiTabType.PERSONNEL)).refreshPersonnelView();
+    	}
     }
 
+    //TODO: trigger from event
+    public void filterPersonnel() {
+    	if (getTab(GuiTabType.PERSONNEL) != null) {
+    		((PersonnelTab)getTab(GuiTabType.PERSONNEL)).filterPersonnel();
+    	}
+    }
+
+    //TODO: Trigger from event
     public void refreshUnitView() {
-        int row = getUnitTable().getSelectedRow();
-        if (row < 0) {
-            scrollUnitView.setViewportView(null);
-            return;
-        }
-        Unit selectedUnit = getUnitModel().getUnit(getUnitTable()
-                .convertRowIndexToModel(row));
-        scrollUnitView.setViewportView(new UnitViewPanel(selectedUnit,
-                getCampaign(), getIconPackage().getCamos(), getIconPackage()
-                        .getMechTiles()));
-        // This odd code is to make sure that the scrollbar stays at the top
-        // I can't just call it here, because it ends up getting reset somewhere
-        // later
-        javax.swing.SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                scrollUnitView.getVerticalScrollBar().setValue(0);
-            }
-        });
+    	if (getTab(GuiTabType.HANGAR) != null) {
+    		((HangarTab)getTab(GuiTabType.HANGAR)).refreshUnitView();
+    	}
     }
 
-    private void refreshScenarioView() {
-        int row = scenarioTable.getSelectedRow();
-        if (row < 0) {
-            scrollScenarioView.setViewportView(null);
-            btnStartGame.setEnabled(false);
-            btnJoinGame.setEnabled(false);
-            btnLoadGame.setEnabled(false);
-            btnGetMul.setEnabled(false);
-            btnClearAssignedUnits.setEnabled(false);
-            btnResolveScenario.setEnabled(false);
-            btnPrintRS.setEnabled(false);
-            return;
-        }
-        Scenario scenario = scenarioModel.getScenario(scenarioTable
-                .convertRowIndexToModel(row));
-        if (getCampaign().getCampaignOptions().getUseAtB()
-                && (scenario instanceof AtBScenario)) {
-            scrollScenarioView.setViewportView(new AtBScenarioViewPanel(
-                    (AtBScenario) scenario, getCampaign(), getIconPackage(),
-                    frame));
-        } else {
-            scrollScenarioView.setViewportView(new ScenarioViewPanel(scenario,
-                    getCampaign(), getIconPackage()));
-        }
-        // This odd code is to make sure that the scrollbar stays at the top
-        // I can't just call it here, because it ends up getting reset somewhere
-        // later
-        javax.swing.SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                scrollScenarioView.getVerticalScrollBar().setValue(0);
-            }
-        });
-        boolean unitsAssigned = scenario.getForces(getCampaign()).getAllUnits()
-                .size() > 0;
-        boolean canStartGame = scenario.isCurrent() && unitsAssigned;
-        if (getCampaign().getCampaignOptions().getUseAtB()
-                && scenario instanceof AtBScenario) {
-            canStartGame = canStartGame
-                    && getCampaign().getDate().equals(scenario.getDate());
-        }
-        btnStartGame.setEnabled(canStartGame);
-        btnJoinGame.setEnabled(canStartGame);
-        btnLoadGame.setEnabled(canStartGame);
-        btnGetMul.setEnabled(scenario.isCurrent() && unitsAssigned);
-        btnClearAssignedUnits.setEnabled(scenario.isCurrent() && unitsAssigned);
-        btnResolveScenario.setEnabled(canStartGame);
-        btnPrintRS.setEnabled(scenario.isCurrent() && unitsAssigned);
-
-    }
-
+    //TODO: Trigger from event
     public void refreshForceView() {
-        Object node = orgTree.getLastSelectedPathComponent();
-        if (null == node
-                || -1 == orgTree.getRowForPath(orgTree.getSelectionPath())) {
-            scrollForceView.setViewportView(null);
-            return;
-        }
-        if (node instanceof Unit) {
-            Unit u = ((Unit) node);
-            JTabbedPane tabUnit = new JTabbedPane();
-            Person p = u.getCommander();
-            if (p != null) {
-                String name = "Commander";
-                if (u.usesSoloPilot()) {
-                    name = "Pilot";
-                }
-                tabUnit.add(name, new PersonViewPanel(p, getCampaign(), getIconPackage()));
-            }
-            tabUnit.add("Unit", new UnitViewPanel(u, getCampaign(),
-                    getIconPackage().getCamos(), getIconPackage()
-                            .getMechTiles()));
-            scrollForceView.setViewportView(tabUnit);
-            // This odd code is to make sure that the scrollbar stays at the top
-            // I can't just call it here, because it ends up getting reset
-            // somewhere later
-            javax.swing.SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    scrollForceView.getVerticalScrollBar().setValue(0);
-                }
-            });
-        } else if (node instanceof Force) {
-            scrollForceView.setViewportView(new ForceViewPanel((Force) node,
-                    getCampaign(), getIconPackage()));
-            javax.swing.SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    scrollForceView.getVerticalScrollBar().setValue(0);
-                }
-            });
-        }
+    	if (getTab(GuiTabType.TOE) != null) {
+    		((TOETab)getTab(GuiTabType.TOE)).refreshForceView();
+    	}
     }
 
+    //TODO: Trigger from event
     public void refreshLanceAssignments() {
-        panLanceAssignment.refresh();
+    	if (getTab(GuiTabType.BRIEFING) != null) {
+    		((BriefingTab)getTab(GuiTabType.BRIEFING)).refreshLanceAssignments();
+    	}
     }
 
+    //TODO: Trigger from event
     public void refreshPlanetView() {
-        JumpPath path = panMap.getJumpPath();
-        if (null != path && !path.isEmpty()) {
-            scrollPlanetView.setViewportView(new JumpPathViewPanel(path,
-                    getCampaign()));
-            return;
-        }
-        Planet planet = panMap.getSelectedPlanet();
-        if (null != planet) {
-            scrollPlanetView.setViewportView(new PlanetViewPanel(planet,
-                    getCampaign()));
-        }
-    }
-
-    private void addFundsActionPerformed(ActionEvent evt) {
-        AddFundsDialog addFundsDialog = new AddFundsDialog(getFrame(), true);
-        addFundsDialog.setVisible(true);
-        if (addFundsDialog.getClosedType() == JOptionPane.OK_OPTION) {
-            long funds = addFundsDialog.getFundsQuantity();
-            String description = addFundsDialog.getFundsDescription();
-            int category = addFundsDialog.getCategory();
-            getCampaign().addFunds(funds, description, category);
-            refreshReport();
-            refreshFunds();
-            refreshFinancialTransactions();
-        }
-    }
-
-    private void manageAssets() {
-        ManageAssetsDialog mad = new ManageAssetsDialog(getFrame(),
-                getCampaign());
-        mad.setVisible(true);
-        refreshReport();
-        refreshFunds();
-        refreshFinancialTransactions();
+    	if (getTab(GuiTabType.MAP) != null) {
+    		((MapTab)getTab(GuiTabType.MAP)).refreshPlanetView();
+    	}
     }
 
     protected void loadListFile(boolean allowNewPilots) throws IOException {
@@ -5478,6 +2235,7 @@ public class CampaignGUI extends JPanel {
         refreshOverview();
     }
 
+    //TODO: disable if not using personnel tab
     private void savePersonFile() throws IOException {
         JFileChooser savePersonnel = new JFileChooser(".");
         savePersonnel.setDialogTitle("Save Personnel");
@@ -5529,17 +2287,18 @@ public class CampaignGUI extends JPanel {
         PrintWriter pw = null;
 
         try {
-            int row = personnelTable.getSelectedRow();
+        	PersonnelTab pt = (PersonnelTab)getTab(GuiTabType.PERSONNEL);
+            int row = pt.getPersonnelTable().getSelectedRow();
             if (row < 0) {
                 MekHQ.logMessage("ERROR: Cannot export person if no one is selected! Ignoring.");
                 return;
             }
-            Person selectedPerson = personModel.getPerson(personnelTable
+            Person selectedPerson = pt.getPersonModel().getPerson(pt.getPersonnelTable()
                     .convertRowIndexToModel(row));
-            int[] rows = personnelTable.getSelectedRows();
+            int[] rows = pt.getPersonnelTable().getSelectedRows();
             Person[] people = new Person[rows.length];
             for (int i = 0; i < rows.length; i++) {
-                people[i] = personModel.getPerson(personnelTable
+                people[i] = pt.getPersonModel().getPerson(pt.getPersonnelTable()
                         .convertRowIndexToModel(rows[i]));
             }
             fos = new FileOutputStream(file);
@@ -5929,13 +2688,11 @@ public class CampaignGUI extends JPanel {
             }
 
             MekHQ.logMessage("Finished load of campaign options file");
+            MekHQ.triggerEvent(new OptionsChangedEvent(getCampaign(), options));
         }
 
         refreshCalendar();
         getCampaign().reloadNews();
-        changePersonnelView();
-        refreshPersonnelList();
-        panMap.repaint();
     }
 
     private void savePartsFile() throws IOException {
@@ -5988,66 +2745,70 @@ public class CampaignGUI extends JPanel {
         FileOutputStream fos = null;
         PrintWriter pw = null;
 
-        try {
-            int row = partsTable.getSelectedRow();
-            if (row < 0) {
-                MekHQ.logMessage("ERROR: Cannot export parts if none are selected! Ignoring.");
-                return;
-            }
-            Part selectedPart = partsModel.getPartAt(partsTable
-                    .convertRowIndexToModel(row));
-            int[] rows = partsTable.getSelectedRows();
-            Part[] parts = new Part[rows.length];
-            for (int i = 0; i < rows.length; i++) {
-                parts[i] = partsModel.getPartAt(partsTable
-                        .convertRowIndexToModel(rows[i]));
-            }
-            fos = new FileOutputStream(file);
-            pw = new PrintWriter(new OutputStreamWriter(fos, "UTF-8"));
-
-            // File header
-            pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-
-            ResourceBundle resourceMap = ResourceBundle
-                    .getBundle("mekhq.resources.MekHQ");
-            // Start the XML root.
-            pw.println("<parts version=\""
-                    + resourceMap.getString("Application.version") + "\">");
-
-            if (rows.length > 1) {
-                for (int i = 0; i < rows.length; i++) {
-                    parts[i].writeToXml(pw, 1);
-                }
-            } else {
-                selectedPart.writeToXml(pw, 1);
-            }
-            // Okay, we're done.
-            // Close everything out and be done with it.
-            pw.println("</parts>");
-            pw.flush();
-            pw.close();
-            fos.close();
-            // delete the backup file because we didn't need it
-            if (backupFile.exists()) {
-                backupFile.delete();
-            }
-            MekHQ.logMessage("Parts saved to " + file);
-        } catch (Exception ex) {
-            MekHQ.logError(ex);
-            JOptionPane
-                    .showMessageDialog(
-                            getFrame(),
-                            "Oh no! The program was unable to correctly export your parts. We know this\n"
-                                    + "is annoying and apologize. Please help us out and submit a bug with the\n"
-                                    + "mekhqlog.txt file from this game so we can prevent this from happening in\n"
-                                    + "the future.", "Could not export parts",
-                            JOptionPane.ERROR_MESSAGE);
-            // restore the backup file
-            file.delete();
-            if (backupFile.exists()) {
-                Utilities.copyfile(backupFile, file);
-                backupFile.delete();
-            }
+        if (getTab(GuiTabType.WAREHOUSE) != null) {
+	        try {
+	        	JTable partsTable = ((WarehouseTab)getTab(GuiTabType.WAREHOUSE)).getPartsTable();
+	        	PartsTableModel partsModel = ((WarehouseTab)getTab(GuiTabType.WAREHOUSE)).getPartsModel();
+	            int row = partsTable.getSelectedRow();
+	            if (row < 0) {
+	                MekHQ.logMessage("ERROR: Cannot export parts if none are selected! Ignoring.");
+	                return;
+	            }
+	            Part selectedPart = partsModel.getPartAt(partsTable
+	                    .convertRowIndexToModel(row));
+	            int[] rows = partsTable.getSelectedRows();
+	            Part[] parts = new Part[rows.length];
+	            for (int i = 0; i < rows.length; i++) {
+	                parts[i] = partsModel.getPartAt(partsTable
+	                        .convertRowIndexToModel(rows[i]));
+	            }
+	            fos = new FileOutputStream(file);
+	            pw = new PrintWriter(new OutputStreamWriter(fos, "UTF-8"));
+	
+	            // File header
+	            pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+	
+	            ResourceBundle resourceMap = ResourceBundle
+	                    .getBundle("mekhq.resources.MekHQ");
+	            // Start the XML root.
+	            pw.println("<parts version=\""
+	                    + resourceMap.getString("Application.version") + "\">");
+	
+	            if (rows.length > 1) {
+	                for (int i = 0; i < rows.length; i++) {
+	                    parts[i].writeToXml(pw, 1);
+	                }
+	            } else {
+	                selectedPart.writeToXml(pw, 1);
+	            }
+	            // Okay, we're done.
+	            // Close everything out and be done with it.
+	            pw.println("</parts>");
+	            pw.flush();
+	            pw.close();
+	            fos.close();
+	            // delete the backup file because we didn't need it
+	            if (backupFile.exists()) {
+	                backupFile.delete();
+	            }
+	            MekHQ.logMessage("Parts saved to " + file);
+	        } catch (Exception ex) {
+	            MekHQ.logError(ex);
+	            JOptionPane
+	                    .showMessageDialog(
+	                            getFrame(),
+	                            "Oh no! The program was unable to correctly export your parts. We know this\n"
+	                                    + "is annoying and apologize. Please help us out and submit a bug with the\n"
+	                                    + "mekhqlog.txt file from this game so we can prevent this from happening in\n"
+	                                    + "the future.", "Could not export parts",
+	                            JOptionPane.ERROR_MESSAGE);
+	            // restore the backup file
+	            file.delete();
+	            if (backupFile.exists()) {
+	                Utilities.copyfile(backupFile, file);
+	                backupFile.delete();
+	            }
+	        }
         }
     }
 
@@ -6098,734 +2859,135 @@ public class CampaignGUI extends JPanel {
         Utilities.exportTabletoCSV(table, file);
     }
 
-    protected void clearAssignedUnits() {
-        if (0 == JOptionPane.showConfirmDialog(null,
-                "Do you really want to remove all units from this scenario?",
-                "Clear Units?", JOptionPane.YES_NO_OPTION)) {
-            int row = scenarioTable.getSelectedRow();
-            Scenario scenario = scenarioModel.getScenario(scenarioTable
-                    .convertRowIndexToModel(row));
-            if (null == scenario) {
-                return;
-            }
-            scenario.clearAllForcesAndPersonnel(getCampaign());
-            refreshPersonnelList();
-            refreshServicedUnitList();
-            refreshUnitList();
-            refreshOrganization();
-            refreshTaskList();
-            refreshUnitView();
-            refreshPartsList();
-            refreshAcquireList();
-            refreshReport();
-            refreshPatientList();
-            refreshPersonnelList();
-            refreshScenarioList();
-            refreshOverview();
-            filterTasks();
-        }
-    }
-
-    protected void resolveScenario() {
-        int row = scenarioTable.getSelectedRow();
-        Scenario scenario = scenarioModel.getScenario(scenarioTable
-                .convertRowIndexToModel(row));
-        if (null == scenario) {
-            return;
-        }
-        boolean control = JOptionPane
-                .showConfirmDialog(
-                        getFrame(),
-                        "Did your side control the battlefield at the end of the scenario?",
-                        "Control of Battlefield?", JOptionPane.YES_NO_OPTION,
-                        JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION;
-        ResolveScenarioTracker tracker = new ResolveScenarioTracker(scenario,
-                getCampaign(), control);
-        ChooseMulFilesDialog chooseFilesDialog = new ChooseMulFilesDialog(
-                getFrame(), true, tracker);
-        chooseFilesDialog.setVisible(true);
-        if (chooseFilesDialog.wasCancelled()) {
-            return;
-        }
-        // tracker.postProcessEntities(control);
-        ResolveScenarioWizardDialog resolveDialog = new ResolveScenarioWizardDialog(
-                getFrame(), true, tracker);
-        resolveDialog.setVisible(true);
-        if (getCampaign().getCampaignOptions().getUseAtB()
-                && getCampaign().getMission(scenario.getMissionId()) instanceof AtBContract
-                && getCampaign().getRetirementDefectionTracker().getRetirees()
-                        .size() > 0) {
-            RetirementDefectionDialog rdd = new RetirementDefectionDialog(
-                    getCampaignGUI(), (AtBContract) getCampaign().getMission(
-                            scenario.getMissionId()), false);
-            rdd.setVisible(true);
-            if (!rdd.wasAborted()) {
-                getCampaign().applyRetirement(rdd.totalPayout(),
-                        rdd.getUnitAssignments());
-            }
-        }
-
-        refreshScenarioList();
-        refreshOrganization();
-        refreshServicedUnitList();
-        refreshUnitList();
-        refreshPersonnelList();
-        filterPersonnel();
-        refreshDoctorsList();
-        refreshPatientList();
-        refreshReport();
-        changeMission();
-        refreshFinancialTransactions();
-        refreshOverview();
-    }
-
-    protected void printRecordSheets() {
-        int row = scenarioTable.getSelectedRow();
-        if (row < 0) {
-            return;
-        }
-        Scenario scenario = scenarioModel.getScenario(scenarioTable
-                .convertRowIndexToModel(row));
-        Vector<UUID> uids = scenario.getForces(getCampaign()).getAllUnits();
-
-        if (uids.size() == 0) {
-            return;
-        }
-
-        Vector<Entity> chosen = new Vector<Entity>();
-        // ArrayList<Unit> toDeploy = new ArrayList<Unit>();
-        StringBuffer undeployed = new StringBuffer();
-
-        for (UUID uid : uids) {
-            Unit u = getCampaign().getUnit(uid);
-            if (null != u.getEntity()) {
-                if (null == u.checkDeployment()) {
-                    chosen.add(u.getEntity());
-                } else {
-                    undeployed.append("\n").append(u.getName()).append(" (")
-                            .append(u.checkDeployment()).append(")");
-                }
-            }
-        }
-
-        if (undeployed.length() > 0) {
-            Object[] options = {"Continue",
-            "Cancel"};
-            int n = JOptionPane.showOptionDialog(getFrame(),
-                    "The following units could not be deployed:"
-                            + undeployed.toString(),
-                            "Could not deploy some units",
-                        JOptionPane.OK_CANCEL_OPTION,
-                        JOptionPane.WARNING_MESSAGE,
-                        null,
-                        options,
-                        options[1]);
-            if(n==1) {
-                return;
-            }
-        }
-
-        if (chosen.size() > 0) {
-            UnitPrintManager.printAllUnits(chosen, true);
-        }
-    }
-
-    protected void loadScenario() {
-        int row = scenarioTable.getSelectedRow();
-        if (row < 0) {
-            return;
-        }
-        Scenario scenario = scenarioModel.getScenario(scenarioTable
-                .convertRowIndexToModel(row));
-        if (null != scenario) {
-            ((MekHQ) getApplication()).startHost(scenario, true, null);
-        }
-    }
-
-    protected void startScenario() {
-        int row = scenarioTable.getSelectedRow();
-        if (row < 0) {
-            return;
-        }
-        Scenario scenario = scenarioModel.getScenario(scenarioTable
-                .convertRowIndexToModel(row));
-        Vector<UUID> uids = scenario.getForces(getCampaign()).getAllUnits();
-
-        if (uids.size() == 0) {
-            return;
-        }
-
-        ArrayList<Unit> chosen = new ArrayList<Unit>();
-        // ArrayList<Unit> toDeploy = new ArrayList<Unit>();
-        StringBuffer undeployed = new StringBuffer();
-
-        for (UUID uid : uids) {
-            Unit u = getCampaign().getUnit(uid);
-            if (null != u.getEntity()) {
-                if (null == u.checkDeployment()) {
-                    // Make sure the unit's entity and pilot are fully up to date!
-                    u.resetPilotAndEntity();
-
-                    // Add and run
-                    chosen.add(u);
-
-                    // So MegaMek has correct crew sizes
-                    u.getEntity().getCrew().setSize(u.getActiveCrew().size());
-                } else {
-                    undeployed.append("\n").append(u.getName()).append(" (")
-                            .append(u.checkDeployment()).append(")");
-                }
-            }
-        }
-
-        if (undeployed.length() > 0) {
-            Object[] options = {"Continue",
-                    "Cancel"};
-            int n = JOptionPane.showOptionDialog(getFrame(),
-                    "The following units could not be deployed:"
-                            + undeployed.toString(),
-                    "Could not deploy some units",
-                            JOptionPane.OK_CANCEL_OPTION,
-                            JOptionPane.WARNING_MESSAGE,
-                            null,
-                            options,
-                            options[1]);
-
-            if(n==1) {
-                return;
-            }
-        }
-
-        if (getCampaign().getCampaignOptions().getUseAtB()
-                && scenario instanceof AtBScenario) {
-            ((AtBScenario) scenario).refresh(getCampaign());
-
-            /*
-             * For standard battles, any deployed unit not part of the lance
-             * assigned to the battle is assumed to be reinforcements.
-             */
-            if (null != ((AtBScenario) scenario).getLance(getCampaign())) {
-                int assignedForceId = ((AtBScenario) scenario).getLance(
-                        getCampaign()).getForceId();
-                int cmdrStrategy = 0;
-                Person commander = getCampaign().getPerson(
-                        Lance.findCommander(assignedForceId, getCampaign()));
-                if (null != commander
-                        && null != commander
-                                .getSkill(SkillType.S_STRATEGY)) {
-                    cmdrStrategy = commander.getSkill(
-                            SkillType.S_STRATEGY).getLevel();
-                }
-                for (Force f : scenario.getForces(getCampaign()).getSubForces()) {
-                    if (f.getId() != assignedForceId) {
-                        Vector<UUID> units = f.getAllUnits();
-                        int slowest = 12;
-                        for (UUID id : units) {
-                            if (chosen.contains(getCampaign().getUnit(id))) {
-                                int speed = getCampaign().getUnit(id).getEntity().getWalkMP();
-                                if (getCampaign().getUnit(id).getEntity().getJumpMP() > 0) {
-                                    if (getCampaign().getUnit(id).getEntity() instanceof megamek.common.Infantry) {
-                                        speed = getCampaign().getUnit(id).getEntity().getJumpMP();
-                                    } else {
-                                        speed++;
-                                    }
-                                }
-                                slowest = Math.min(slowest, speed);
-                            }
-                        }
-                        int deployRound = Math.max(0, 12 - slowest - cmdrStrategy);
-
-                        for (UUID id : units) {
-                            if (chosen.contains(getCampaign().getUnit(id))) {
-                                getCampaign().getUnit(id).getEntity()
-                                        .setDeployRound(deployRound);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        if (chosen.size() > 0) {
-            // Ensure that the MegaMek year GameOption matches the campaign year
-            GameOptions gameOpts = getCampaign().getGameOptions();
-            int campaignYear = getCampaign().getCalendar().get(Calendar.YEAR);
-            if (gameOpts.intOption("year") != campaignYear) {
-                gameOpts.getOption("year").setValue(campaignYear);
-            }
-            ((MekHQ) getApplication()).startHost(scenario, false, chosen);
-        }
-    }
-
-    protected void joinScenario() {
-        int row = scenarioTable.getSelectedRow();
-        if (row < 0) {
-            return;
-        }
-        Scenario scenario = scenarioModel.getScenario(scenarioTable
-                .convertRowIndexToModel(row));
-        Vector<UUID> uids = scenario.getForces(getCampaign()).getAllUnits();
-
-        if (uids.size() == 0) {
-            return;
-        }
-
-        ArrayList<Unit> chosen = new ArrayList<Unit>();
-        // ArrayList<Unit> toDeploy = new ArrayList<Unit>();
-        StringBuffer undeployed = new StringBuffer();
-
-        for (UUID uid : uids) {
-            Unit u = getCampaign().getUnit(uid);
-            if (null != u.getEntity()) {
-                if (null == u.checkDeployment()) {
-                    // Make sure the unit's entity and pilot are fully up to date!
-                    u.resetPilotAndEntity();
-
-                    // Add and run
-                    chosen.add(u);
-
-                    // So MegaMek has correct crew sizes
-                    u.getEntity().getCrew().setSize(u.getActiveCrew().size());
-                } else {
-                    undeployed.append("\n").append(u.getName()).append(" (")
-                            .append(u.checkDeployment()).append(")");
-                }
-            }
-        }
-
-        if (undeployed.length() > 0) {
-            Object[] options = {"Continue",
-            "Cancel"};
-            int n = JOptionPane.showOptionDialog(getFrame(),
-                    "The following units could not be deployed:"
-                            + undeployed.toString(),
-                            "Could not deploy some units",
-                        JOptionPane.OK_CANCEL_OPTION,
-                        JOptionPane.WARNING_MESSAGE,
-                        null,
-                        options,
-                        options[1]);
-            if(n==1) {
-                return;
-            }
-        }
-
-        if (chosen.size() > 0) {
-            ((MekHQ) getApplication()).joinGame(scenario, chosen);
-        }
-    }
-
-    protected void deployListFile() {
-        int row = scenarioTable.getSelectedRow();
-        if (row < 0) {
-            return;
-        }
-        Scenario scenario = scenarioModel.getScenario(scenarioTable
-                .convertRowIndexToModel(row));
-        Vector<UUID> uids = scenario.getForces(getCampaign()).getAllUnits();
-
-        if (uids.size() == 0) {
-            return;
-        }
-
-        ArrayList<Entity> chosen = new ArrayList<Entity>();
-        // ArrayList<Unit> toDeploy = new ArrayList<Unit>();
-        StringBuffer undeployed = new StringBuffer();
-
-        for (UUID uid : uids) {
-            Unit u = getCampaign().getUnit(uid);
-            if (null != u.getEntity()) {
-                if (null == u.checkDeployment()) {
-                    // Make sure the unit's entity and pilot are fully up to date!
-                    u.resetPilotAndEntity();
-
-                    // So MegaMek has correct crew sizes
-                    u.getEntity().getCrew().setSize(u.getActiveCrew().size());
-                    
-                    // Add the entity
-                    chosen.add(u.getEntity());
-                } else {
-                    undeployed.append("\n").append(u.getName()).append(" (")
-                            .append(u.checkDeployment()).append(")");
-                }
-            }
-        }
-
-        if (undeployed.length() > 0) {
-            Object[] options = {"Continue",
-            "Cancel"};
-            int n = JOptionPane.showOptionDialog(getFrame(),
-                    "The following units could not be deployed:"
-                            + undeployed.toString(),
-                            "Could not deploy some units",
-                        JOptionPane.OK_CANCEL_OPTION,
-                        JOptionPane.WARNING_MESSAGE,
-                        null,
-                        options,
-                        options[1]);
-            if(n==1) {
-                return;
-            }
-        }
-
-        JFileChooser saveList = new JFileChooser(".");
-        saveList.setDialogTitle("Deploy Units");
-
-        saveList.setFileFilter(new FileFilter() {
-            @Override
-            public boolean accept(File dir) {
-                if (dir.isDirectory()) {
-                    return true;
-                }
-                return dir.getName().endsWith(".mul");
-            }
-
-            @Override
-            public String getDescription() {
-                return "MUL file";
-            }
-        });
-
-        saveList.setSelectedFile(new File(scenario.getName() + ".mul")); //$NON-NLS-1$
-        int returnVal = saveList.showSaveDialog(mainPanel);
-
-        if ((returnVal != JFileChooser.APPROVE_OPTION)
-                || (saveList.getSelectedFile() == null)) {
-            // I want a file, y'know!
-            return;
-        }
-
-        File unitFile = saveList.getSelectedFile();
-
-        if (unitFile != null) {
-            if (!(unitFile.getName().toLowerCase().endsWith(".mul") //$NON-NLS-1$
-            || unitFile.getName().toLowerCase().endsWith(".xml"))) { //$NON-NLS-1$
-                try {
-                    unitFile = new File(unitFile.getCanonicalPath() + ".mul"); //$NON-NLS-1$
-                } catch (IOException ie) {
-                    // nothing needs to be done here
-                    return;
-                }
-            }
-
-            try {
-                // Save the player's entities to the file.
-                // FIXME: this is not working
-                EntityListFile.saveTo(unitFile, chosen);
-
-            } catch (IOException excep) {
-                excep.printStackTrace(System.err);
-            }
-        }
-
-        refreshServicedUnitList();
-        refreshUnitList();
-        refreshPatientList();
-        refreshPersonnelList();
-        refreshOverview();
-
-        if (undeployed.length() > 0) {
-            JOptionPane.showMessageDialog(
-                    getFrame(),
-                    "The following units could not be deployed:"
-                            + undeployed.toString(),
-                    "Could not deploy some units", JOptionPane.WARNING_MESSAGE);
-        }
-    }
-
+    //TODO: Trigger from event
     public void refreshServicedUnitList() {
-        int selected = servicedUnitTable.getSelectedRow();
-        servicedUnitModel.setData(getCampaign().getServiceableUnits());
-        if (selected == servicedUnitTable.getRowCount()) {
-            selected--;
-        }
-        if ((selected > -1) && (selected < servicedUnitTable.getRowCount())) {
-            servicedUnitTable.setRowSelectionInterval(selected, selected);
-        }
-        refreshRating();
+    	if (getTab(GuiTabType.REPAIR) != null) {
+    		((RepairTab)getTab(GuiTabType.REPAIR)).refreshServicedUnitList();
+    	}
     }
 
+    //TODO: Trigger from event
     public void refreshPersonnelList() {
-        UUID selectedUUID = null;
-        int selectedRow = personnelTable.getSelectedRow();
-        if (selectedRow != -1) {
-            Person p = personModel.getPerson(personnelTable
-                    .convertRowIndexToModel(selectedRow));
-            if (null != p) {
-                selectedUUID = p.getId();
-            }
-        }
-        personModel.refreshData();
-        // try to put the focus back on same person if they are still available
-        for (int row = 0; row < personnelTable.getRowCount(); row++) {
-            Person p = personModel.getPerson(personnelTable
-                    .convertRowIndexToModel(row));
-            if (p.getId().equals(selectedUUID)) {
-                personnelTable.setRowSelectionInterval(row, row);
-                refreshPersonnelView();
-                break;
-            }
-        }
-        refreshRating();
+    	if (getTab(GuiTabType.PERSONNEL) != null) {
+    		((PersonnelTab)getTab(GuiTabType.PERSONNEL)).refreshPersonnelList();
+    	}
     }
 
+    //TODO: Trigger from event
     public void changeMission() {
-        int idx = choiceMission.getSelectedIndex();
-        btnEditMission.setEnabled(false);
-        btnCompleteMission.setEnabled(false);
-        btnDeleteMission.setEnabled(false);
-        btnAddScenario.setEnabled(false);
-        if (idx >= 0 && idx < getCampaign().getSortedMissions().size()) {
-            Mission m = getCampaign().getSortedMissions().get(idx);
-            if (null != m) {
-                selectedMission = m.getId();
-                if (getCampaign().getCampaignOptions().getUseAtB()
-                        && m instanceof AtBContract) {
-                    scrollMissionView.setViewportView(new AtBContractViewPanel(
-                            (AtBContract) m, getCampaign()));
-                } else if (m instanceof Contract) {
-                    scrollMissionView.setViewportView(new ContractViewPanel(
-                            (Contract) m));
-                } else {
-                    scrollMissionView.setViewportView(new MissionViewPanel(m));
-                }
-                // This odd code is to make sure that the scrollbar stays at the
-                // top
-                // I can't just call it here, because it ends up getting reset
-                // somewhere later
-                javax.swing.SwingUtilities.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        scrollMissionView.getVerticalScrollBar().setValue(0);
-                    }
-                });
-                btnEditMission.setEnabled(true);
-                btnCompleteMission.setEnabled(m.isActive());
-                btnDeleteMission.setEnabled(true);
-                btnAddScenario.setEnabled(m.isActive());
-            }
-
-        } else {
-            selectedMission = -1;
-            scrollMissionView.setViewportView(null);
-        }
-        refreshScenarioList();
+    	if (getTab(GuiTabType.BRIEFING) != null) {
+    		((BriefingTab)getTab(GuiTabType.BRIEFING)).changeMission();
+    	}
     }
 
-    public void refreshScenarioList() {
-        Mission m = getCampaign().getMission(selectedMission);
-        if (null != m) {
-            scenarioModel.setData(m.getScenarios());
-        } else {
-            scenarioModel.setData(new ArrayList<Scenario>());
-        }
-    }
-
-    public void refreshUnitList() {
-        UUID selectedUUID = null;
-        int selectedRow = getUnitTable().getSelectedRow();
-        if (selectedRow != -1) {
-            Unit u = getUnitModel().getUnit(getUnitTable()
-                    .convertRowIndexToModel(selectedRow));
-            if (null != u) {
-                selectedUUID = u.getId();
-            }
-        }
-        getUnitModel().setData(getCampaign().getUnits());
-        // try to put the focus back on same person if they are still available
-        for (int row = 0; row < getUnitTable().getRowCount(); row++) {
-            Unit u = getUnitModel().getUnit(getUnitTable().convertRowIndexToModel(row));
-            if (u.getId().equals(selectedUUID)) {
-                getUnitTable().setRowSelectionInterval(row, row);
-                refreshUnitView();
-                break;
-            }
-        }
-        acquireUnitsModel
-                .setData(getCampaign().getShoppingList().getUnitList());
-        refreshLab();
-        refreshRating();
-    }
-
-    public void refreshTaskList() {
-        UUID uuid = null;
-        if (null != getSelectedServicedUnit()) {
-            uuid = getSelectedServicedUnit().getId();
-        }
-        taskModel.setData(getCampaign().getPartsNeedingServiceFor(uuid));
-
-        if (getSelectedServicedUnit() != null
-                && getSelectedServicedUnit().getEntity() != null) {
-            int index = choiceLocation.getSelectedIndex();
-            int numLocations = choiceLocation.getModel().getSize();
-            choiceLocation.removeAllItems();
-            choiceLocation.addItem("All");
-            for (String s : getSelectedServicedUnit().getEntity()
-                    .getLocationAbbrs()) {
-                choiceLocation.addItem(s);
-            }
-            choiceLocation.setSelectedIndex(0);
-            if (index > -1 && choiceLocation.getModel().getSize() == numLocations) {
-                choiceLocation.setSelectedIndex(index);
-            }
-            choiceLocation.setEnabled(true);
-        } else {
-            choiceLocation.removeAllItems();
-            choiceLocation.setEnabled(false);
-        }
-    }
-
-    public void refreshAcquireList() {
-        UUID uuid = null;
-        if (null != getSelectedServicedUnit()) {
-            uuid = getSelectedServicedUnit().getId();
-        }
-        acquireModel.setData(getCampaign().getAcquisitionsForUnit(uuid));
-    }
-
+    //TODO: Trigger from event
     public void refreshMissions() {
-        choiceMission.removeAllItems();
-        for (Mission m : getCampaign().getSortedMissions()) {
-            String desc = m.getName();
-            if (!m.isActive()) {
-                desc += " (Complete)";
-            }
-            choiceMission.addItem(desc);
-            if (m.getId() == selectedMission) {
-                choiceMission.setSelectedItem(m.getName());
-            }
-        }
-        if (choiceMission.getSelectedIndex() == -1
-                && getCampaign().getSortedMissions().size() > 0) {
-            selectedMission = getCampaign().getSortedMissions().get(0).getId();
-            choiceMission.setSelectedIndex(0);
-        }
-        changeMission();
-        refreshRating();
-        if (getCampaign().getCampaignOptions().getUseAtB()) {
-            refreshLanceAssignments();
-        }
+    	if (getTab(GuiTabType.BRIEFING) != null) {
+    		((BriefingTab)getTab(GuiTabType.BRIEFING)).refreshMissions();
+    	}
+    }
+
+    //TODO: Trigger from event
+    public void refreshScenarioList() {
+    	if (getTab(GuiTabType.BRIEFING) != null) {
+    		((BriefingTab)getTab(GuiTabType.BRIEFING)).refreshScenarioList();
+    	}
+    }
+
+    //TODO: Trigger from event
+    public void refreshUnitList() {
+    	if (getTab(GuiTabType.HANGAR) != null) {
+    		((HangarTab)getTab(GuiTabType.HANGAR)).refreshUnitList();
+    	}
+    }
+
+    //TODO: Trigger from event
+    public void refreshTaskList() {
+    	if (getTab(GuiTabType.REPAIR) != null) {
+    		((RepairTab)getTab(GuiTabType.REPAIR)).refreshTaskList();
+    	}
+    }
+
+    //TODO: Trigger from event
+    public void refreshAcquireList() {
+    	if (getTab(GuiTabType.REPAIR) != null) {
+    		((RepairTab)getTab(GuiTabType.REPAIR)).refreshAcquireList();
+    	}
     }
 
     public void refreshLab() {
-        if (null == getPanMekLab()) {
-            return;
-        }
-        Unit u = getPanMekLab().getUnit();
-        if (null == u) {
-            return;
-        }
-        if (null == getCampaign().getUnit(u.getId())) {
-            // this unit has been removed so clear the mek lab
-            getPanMekLab().clearUnit();
-        } else {
-            // put a try-catch here so that bugs in the meklab don't screw up
-            // other stuff
-            try {
-                getPanMekLab().refreshSummary();
-            } catch (Exception err) {
-                err.printStackTrace();
-            }
-        }
+    	MekLabTab lab = (MekLabTab)getTab(GuiTabType.MEKLAB);
+    	if (null == lab) {
+    		return;
+    	}
+    	Unit u = lab.getUnit();
+    	if (null == u) {
+    		return;
+    	}
+    	if (null == getCampaign().getUnit(u.getId())) {
+    		// this unit has been removed so clear the mek lab
+    		lab.clearUnit();
+    	} else {
+    		// put a try-catch here so that bugs in the meklab don't screw up
+    		// other stuff
+    		try {
+    			lab.refreshSummary();
+    		} catch (Exception err) {
+    			err.printStackTrace();
+    		}
+    	}
     }
 
+    //TODO: Trigger from event
     public void refreshTechsList() {
-        int selected = techTable.getSelectedRow();
-        ArrayList<Person> techs = getCampaign().getTechs(true, null);
-        techsModel.setData(techs);
-        if ((selected > -1)
-                && (selected < techs.size())) {
-            techTable.setRowSelectionInterval(selected, selected);
+        if (getTab(GuiTabType.WAREHOUSE) != null) {
+        	((WarehouseTab)getTab(GuiTabType.WAREHOUSE)).refreshTechsList(); // NOI18N
         }
-        String astechString = "<html><b>Astech Pool Minutes:</> "
-                + getCampaign().getAstechPoolMinutes();
-        if (getCampaign().isOvertimeAllowed()) {
-            astechString += " [" + getCampaign().getAstechPoolOvertime()
-                    + " overtime]";
+        if (getTab(GuiTabType.REPAIR) != null) {
+        	((RepairTab)getTab(GuiTabType.REPAIR)).refreshTechsList(); // NOI18N
         }
-        astechString += " (" + getCampaign().getNumberAstechs()
-                + " Astechs)</html>";
-        astechPoolLabel.setText(astechString); // NOI18N
-        astechPoolLabelWarehouse.setText(astechString); // NOI18N
     }
 
+    //TODO: Trigger from event
     public void refreshDoctorsList() {
-        int selected = docTable.getSelectedRow();
-        doctorsModel.setData(getCampaign().getDoctors());
-        if ((selected > -1) && (selected < getCampaign().getDoctors().size())) {
-            docTable.setRowSelectionInterval(selected, selected);
-        }
+    	if (getTab(GuiTabType.INFIRMARY) != null) {
+    		((InfirmaryTab)getTab(GuiTabType.INFIRMARY)).refreshDoctorsList();
+    	}
     }
 
+    //TODO: Trigger from event
     public void refreshPatientList() {
-        Person doctor = getSelectedDoctor();
-        ArrayList<Person> assigned = new ArrayList<Person>();
-        ArrayList<Person> unassigned = new ArrayList<Person>();
-        for (Person patient : getCampaign().getPatients()) {
-            // Knock out inactive doctors
-            if((patient != null)
-                && (patient.getDoctorId() != null)
-                && (getCampaign().getPerson(patient.getDoctorId()) != null)
-                && getCampaign().getPerson(patient.getDoctorId()).isInActive()) {
-                patient.setDoctorId(null, getCampaign().getCampaignOptions()
-                        .getNaturalHealingWaitingPeriod());
-            }
-            if(patient.getDoctorId() == null) {
-                unassigned.add(patient);
-            } else if((doctor != null) && patient.getDoctorId().equals(doctor.getId())) {
-                assigned.add(patient);
-            }
-        }
-        List<Person> assignedPatients = getSelectedAssignedPatients();
-        List<Person> unassignedPatients = getSelectedUnassignedPatients();
-        int[] assignedIndices = new int[assignedPatients.size()];
-        Arrays.fill(assignedIndices, Integer.MAX_VALUE);
-        int[] unassignedIndices = new int[unassignedPatients.size()];
-        Arrays.fill(unassignedIndices, Integer.MAX_VALUE);
-        
-        assignedPatientModel.setData(assigned);
-        unassignedPatientModel.setData(unassigned);
-        
-        int i = 0;
-        for(Person patient : assignedPatients) {
-            int idx = assigned.indexOf(patient);
-            assignedIndices[i] = (idx >= 0) ? idx : Integer.MAX_VALUE;
-            ++ i;
-        }
-        i = 0;
-        for(Person patient : unassignedPatients) {
-            int idx = unassigned.indexOf(patient);
-            unassignedIndices[i] = (idx >= 0) ? idx : Integer.MAX_VALUE;
-            ++ i;
-        }
-        listAssignedPatient.setSelectedIndices(assignedIndices);
-        listUnassignedPatient.setSelectedIndices(unassignedIndices);
+    	if (getTab(GuiTabType.INFIRMARY) != null) {
+    		((InfirmaryTab)getTab(GuiTabType.INFIRMARY)).refreshPatientList();
+    	}
     }
 
+    //TODO: Trigger from event
     public void refreshPartsList() {
-        partsModel.setData(getCampaign().getSpareParts());
-        getCampaign().getShoppingList().removeZeroQuantityFromList(); // To
-                                                                      // prevent
-                                                                      // zero
-                                                                      // quantity
-                                                                      // from
-                                                                      // hanging
-                                                                      // around
-        acquirePartsModel
-                .setData(getCampaign().getShoppingList().getPartList());
+    	if (getTab(GuiTabType.WAREHOUSE) != null) {
+    		((WarehouseTab)getTab(GuiTabType.WAREHOUSE)).refreshPartsList();
+    	}
     }
 
+    //TODO: Trigger from event
     public void refreshFinancialTransactions() {
-        financeModel.setData(getCampaign().getFinances().getAllTransactions());
-        loanModel.setData(getCampaign().getFinances().getAllLoans());
-        refreshFunds();
-        refreshRating();
-        refreshFinancialReport();
+    	if (getTab(GuiTabType.FINANCES) != null) {
+    		((FinancesTab)getTab(GuiTabType.FINANCES)).refreshFinancialTransactions();
+    	}
     }
 
+    //TODO: Trigger from event
     public void refreshFinancialReport() {
-        areaNetWorth.setText(getCampaign().getFinancialReport());
-        areaNetWorth.setCaretPosition(0);
+    	if (getTab(GuiTabType.FINANCES) != null) {
+    		((FinancesTab)getTab(GuiTabType.FINANCES)).refreshFinancialReport();
+    	}
+    }
+
+    //TODO: Trigger from event
+    public void refreshOverview() {
+    	if (getTab(GuiTabType.OVERVIEW) != null) {
+    		((OverviewTab)getTab(GuiTabType.OVERVIEW)).refreshOverview();
+    	}
     }
 
     public void refreshCalendar() {
@@ -6845,22 +3007,11 @@ public class CampaignGUI extends JPanel {
         getCampaign().fetchAndClearNewReports();
     }
 
+    //TODO: Trigger from event
     public void refreshOrganization() {
-        javax.swing.SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                orgTree.updateUI();
-                // This seems like bad juju since it makes it annoying as hell to
-                // add multiple units to a force if it's de-selected every single time
-                // So, commenting it out - ralgith
-                // orgTree.setSelectionPath(null);
-                refreshForceView();
-                if (getCampaign().getCampaignOptions().getUseAtB()) {
-                    refreshLanceAssignments();
-                }
-            }
-        });
-        refreshRating();
+    	if (getTab(GuiTabType.TOE) != null) {
+    		((TOETab)getTab(GuiTabType.TOE)).refreshOrganization();
+    	}
     }
 
     public void refreshFunds() {
@@ -6902,1619 +3053,6 @@ public class CampaignGUI extends JPanel {
                 getCampaign().getCalendar().getTime()));
     }
 
-    protected ArrayList<Person> getSelectedUnassignedPatients() {
-        ArrayList<Person> patients = new ArrayList<Person>();
-        int[] indices = listUnassignedPatient.getSelectedIndices();
-        if (unassignedPatientModel.getSize() == 0) {
-            return patients;
-        }
-        for (int idx : indices) {
-            Person p = unassignedPatientModel.getElementAt(idx);
-            if (p == null) {
-                continue;
-            }
-            patients.add(p);
-        }
-        return patients;
-    }
-
-    protected ArrayList<Person> getSelectedAssignedPatients() {
-        ArrayList<Person> patients = new ArrayList<Person>();
-        int[] indices = listAssignedPatient.getSelectedIndices();
-        if (assignedPatientModel.getSize() == 0) {
-            return patients;
-        }
-        for (int idx : indices) {
-            Person p = assignedPatientModel.getElementAt(idx);
-            if (p == null) {
-                continue;
-            }
-            patients.add(p);
-        }
-        return patients;
-    }
-
-    protected void updateAssignDoctorEnabled() {
-        Person doctor = getSelectedDoctor();
-        btnAssignDoc.setEnabled((null != doctor)
-            && (getCampaign().getPatientsFor(doctor) < 25)
-            && (unassignedPatientModel.getSize() > 0));
-        btnUnassignDoc.setEnabled(!getSelectedAssignedPatients().isEmpty());
-    }
-
-    protected void updateTechTarget() {
-        TargetRoll target = null;
-        
-        if (acquireSelected()) {
-            IAcquisitionWork acquire = getSelectedAcquisition();
-            if (null != acquire) {
-                Person admin = getCampaign().getLogisticsPerson();
-                target = getCampaign().getTargetForAcquisition(acquire, admin);
-            }
-        } else {
-            Part part = getSelectedTask();
-            if (null != part) {
-                Unit u = part.getUnit();
-                Person tech = getSelectedTech();
-                if (null != u && u.isSelfCrewed()) {
-                    tech = u.getEngineer();
-                    if (null == tech) {
-                        target = new TargetRoll(TargetRoll.IMPOSSIBLE,
-                                "You must have a crew assigned to large vessels to attempt repairs.");
-                    }
-                }
-                if (null != tech) {
-                    boolean wasNull = false;
-                    // Temporarily set the Team ID if it isn't already.
-                    // This is needed for the Clan Tech flag
-                    if (part.getTeamId() == null) {
-                        part.setTeamId(tech.getId());
-                        wasNull = true;
-                    }
-                    target = getCampaign().getTargetFor(part, tech);
-                    if (wasNull) { // If it was null, make it null again
-                        part.setTeamId(null);
-                    }
-                }
-            }
-            ((TechSorter) techSorter.getComparator(0)).clearPart();
-        }
-        JButton btn = btnDoTask;
-        JTextArea text = textTarget;
-        JLabel lbl = lblTargetNum;
-        if (onWarehouseTab()) {
-            btn = btnDoTaskWarehouse;
-            text = textTargetWarehouse;
-            lbl = lblTargetNumWarehouse;
-        }
-        if (null != target) {
-            btn.setEnabled(target.getValue() != TargetRoll.IMPOSSIBLE);
-            text.setText(target.getDesc());
-            lbl.setText(target.getValueAsString());
-        } else {
-            btn.setEnabled(false);
-            text.setText("");
-            lbl.setText("-");
-        }
-        if (getCampaign().getCampaignOptions().getUseAtB()) {
-            int numBonusParts = 0;
-            if (acquireSelected() && null != getSelectedAcquisition()) {
-                AtBContract contract = getCampaign().getAttachedAtBContract(
-                        getSelectedAcquisition().getUnit());
-                if (null == contract) {
-                    numBonusParts = getCampaign().totalBonusParts();
-                } else {
-                    numBonusParts = contract.getNumBonusParts();
-                }
-            }
-            if (numBonusParts > 0) {
-                btnUseBonusPart.setText("Use Bonus Part (" + numBonusParts
-                        + ")");
-                btnUseBonusPart.setVisible(true);
-            } else {
-                btnUseBonusPart.setVisible(false);
-            }
-        }
-    }
-
-    public void filterTasks() {
-        RowFilter<TaskTableModel, Integer> taskLocationFilter = null;
-        final String loc = (String) choiceLocation.getSelectedItem();
-        taskLocationFilter = new RowFilter<TaskTableModel, Integer>() {
-            @Override
-            public boolean include(
-                    Entry<? extends TaskTableModel, ? extends Integer> entry) {
-                TaskTableModel taskModel = entry.getModel();
-                Part part = taskModel.getTaskAt(entry.getIdentifier());
-                if (part == null) {
-                    return false;
-                }
-                if (loc != null && !loc.isEmpty()) {
-                    if (loc.equals("All")) {
-                        return true;
-                    }
-                    return part.isInLocation(loc);
-                }
-                return false;
-
-            }
-        };
-        taskSorter.setRowFilter(taskLocationFilter);
-    }
-
-    public void filterPersonnel() {
-        RowFilter<PersonnelTableModel, Integer> personTypeFilter = null;
-        final int nGroup = choicePerson.getSelectedIndex();
-        personTypeFilter = new RowFilter<PersonnelTableModel, Integer>() {
-            @Override
-            public boolean include(
-                    Entry<? extends PersonnelTableModel, ? extends Integer> entry) {
-                PersonnelTableModel personModel = entry.getModel();
-                Person person = personModel.getPerson(entry.getIdentifier());
-                int type = person.getPrimaryRole();
-                if ((nGroup == PG_ACTIVE)
-                        || (nGroup == PG_COMBAT && type <= Person.T_SPACE_GUNNER)
-                        || (nGroup == PG_SUPPORT && type > Person.T_SPACE_GUNNER)
-                        || (nGroup == PG_MW && type == Person.T_MECHWARRIOR)
-                        || (nGroup == PG_CREW && (type == Person.T_GVEE_DRIVER
-                                || type == Person.T_NVEE_DRIVER
-                                || type == Person.T_VTOL_PILOT || type == Person.T_VEE_GUNNER))
-                        || (nGroup == PG_PILOT && type == Person.T_AERO_PILOT)
-                        || (nGroup == PG_CPILOT && type == Person.T_CONV_PILOT)
-                        || (nGroup == PG_PROTO && type == Person.T_PROTO_PILOT)
-                        || (nGroup == PG_BA && type == Person.T_BA)
-                        || (nGroup == PG_SOLDIER && type == Person.T_INFANTRY)
-                        || (nGroup == PG_VESSEL && (type == Person.T_SPACE_PILOT
-                                || type == Person.T_SPACE_CREW
-                                || type == Person.T_SPACE_GUNNER || type == Person.T_NAVIGATOR))
-                        || (nGroup == PG_TECH && type >= Person.T_MECH_TECH && type < Person.T_DOCTOR)
-                        || (nGroup == PG_DOC && ((type == Person.T_DOCTOR) || (type == Person.T_MEDIC)))
-                        || (nGroup == PG_ADMIN && type > Person.T_MEDIC)) {
-                    return person.isActive();
-                } else if (nGroup == PG_DEPENDENT) {
-                    return person.isDependent() == true;
-                } else if (nGroup == PG_RETIRE) {
-                    return person.getStatus() == Person.S_RETIRED;
-                } else if (nGroup == PG_MIA) {
-                    return person.getStatus() == Person.S_MIA;
-                } else if (nGroup == PG_KIA) {
-                    return person.getStatus() == Person.S_KIA;
-                }
-                return false;
-            }
-        };
-        personnelSorter.setRowFilter(personTypeFilter);
-    }
-
-    public void filterParts() {
-        RowFilter<PartsTableModel, Integer> partsTypeFilter = null;
-        final int nGroup = choiceParts.getSelectedIndex();
-        final int nGroupView = choicePartsView.getSelectedIndex();
-        partsTypeFilter = new RowFilter<PartsTableModel, Integer>() {
-            @Override
-            public boolean include(
-                    Entry<? extends PartsTableModel, ? extends Integer> entry) {
-                PartsTableModel partsModel = entry.getModel();
-                Part part = partsModel.getPartAt(entry.getIdentifier());
-                boolean inGroup = false;
-                boolean inView = false;
-
-                // Check grouping
-                if (nGroup == SG_ALL) {
-                    inGroup = true;
-                } else if (nGroup == SG_ARMOR) {
-                    inGroup = (part instanceof Armor
-                            || part instanceof ProtomekArmor || part instanceof BaArmor);
-                } else if (nGroup == SG_SYSTEM) {
-                    inGroup = part instanceof MekGyro
-                            || part instanceof EnginePart
-                            || part instanceof MekActuator
-                            || part instanceof MekLifeSupport
-                            || part instanceof MekSensor;
-                } else if (nGroup == SG_EQUIP) {
-                    inGroup = part instanceof EquipmentPart;
-                } else if (nGroup == SG_LOC) {
-                    inGroup = part instanceof MekLocation
-                            || part instanceof TankLocation;
-                } else if (nGroup == SG_WEAP) {
-                    inGroup = part instanceof EquipmentPart
-                            && ((EquipmentPart) part).getType() instanceof WeaponType;
-                } else if (nGroup == SG_AMMO) {
-                    inGroup = part instanceof EquipmentPart
-                            && !(part instanceof AmmoBin)
-                            && ((EquipmentPart) part).getType() instanceof AmmoType;
-                } else if (nGroup == SG_AMMO_BIN) {
-                    inGroup = part instanceof EquipmentPart
-                            && (part instanceof AmmoBin)
-                            && ((EquipmentPart) part).getType() instanceof AmmoType;
-                } else if (nGroup == SG_MISC) {
-                    inGroup = part instanceof EquipmentPart
-                            && ((EquipmentPart) part).getType() instanceof MiscType;
-                } else if (nGroup == SG_ENGINE) {
-                    inGroup = part instanceof EnginePart;
-                } else if (nGroup == SG_GYRO) {
-                    inGroup = part instanceof MekGyro;
-                } else if (nGroup == SG_ACT) {
-                    inGroup = part instanceof MekActuator;
-                }
-
-                // Check view
-                if (nGroupView == SV_ALL) {
-                    inView = true;
-                } else if (nGroupView == SV_IN_TRANSIT) {
-                    inView = !part.isPresent();
-                } else if (nGroupView == SV_RESERVED) {
-                    inView = part.isReservedForRefit() || part.isReservedForReplacement();
-                } else if (nGroupView == SV_UNDAMAGED) {
-                    inView = !part.needsFixing();
-                } else if (nGroupView == SV_DAMAGED) {
-                    inView = part.needsFixing();
-                }
-                return (inGroup && inView);
-            }
-        };
-        partsSorter.setRowFilter(partsTypeFilter);
-    }
-
-    public void filterUnits() {
-        RowFilter<UnitTableModel, Integer> unitTypeFilter = null;
-        final int nGroup = choiceUnit.getSelectedIndex() - 1;
-        unitTypeFilter = new RowFilter<UnitTableModel, Integer>() {
-            @Override
-            public boolean include(
-                    Entry<? extends UnitTableModel, ? extends Integer> entry) {
-                if (nGroup < 0) {
-                    return true;
-                }
-                UnitTableModel unitModel = entry.getModel();
-                Unit unit = unitModel.getUnit(entry.getIdentifier());
-                Entity en = unit.getEntity();
-                int type = -1;
-                if (null != en) {
-                    type = UnitType.determineUnitTypeCode(en);
-                }
-                return type == nGroup;
-            }
-        };
-        unitSorter.setRowFilter(unitTypeFilter);
-    }
-
-    public void filterTechs(boolean warehouse) {
-        RowFilter<TechTableModel, Integer> techTypeFilter = null;
-        final Part part = getSelectedTask();
-        final Unit unit = getSelectedServicedUnit();
-        techTypeFilter = new RowFilter<TechTableModel, Integer>() {
-            @Override
-            public boolean include(
-                    Entry<? extends TechTableModel, ? extends Integer> entry) {
-                if (acquireSelected()) {
-                    return false;
-                }
-                if (null == part) {
-                    return false;
-                }
-                if (!part.needsFixing() && !part.isSalvaging()) {
-                    return false;
-                }
-                TechTableModel techModel = entry.getModel();
-                Person tech = techModel.getTechAt(entry.getIdentifier());
-                if(null != unit && unit.isSelfCrewed()) {
-                    if(tech.getPrimaryRole() != Person.T_SPACE_CREW) {
-                        return false;
-                    }
-                    //check whether the engineer is assigned to the correct unit
-                    return unit.getId().equals(tech.getUnitId());
-                }
-                if (tech.getPrimaryRole() == Person.T_SPACE_CREW
-                        && (null != unit) && !unit.isSelfCrewed()) {
-                    return false;
-                }
-                if (!onWarehouseTab() && !tech.isRightTechTypeFor(part)
-                        && !btnShowAllTechs.isSelected()) {
-                    return false;
-                }
-                if (onWarehouseTab() && !tech.isRightTechTypeFor(part)
-                        && !btnShowAllTechsWarehouse.isSelected()) {
-                    return false;
-                }
-                Skill skill = tech.getSkillForWorkingOn(part);
-                int modePenalty = part.getMode().expReduction;
-                if (skill == null) {
-                    return false;
-                }
-                if (part.getSkillMin() > SkillType.EXP_ELITE) {
-                    return false;
-                }
-                if (tech.getMinutesLeft() <= 0) {
-                	return false;
-                }
-                return (getCampaign().getCampaignOptions().isDestroyByMargin() || part
-                        .getSkillMin() <= (skill.getExperienceLevel() - modePenalty));
-            }
-        };
-        if (warehouse) {
-            whTechSorter.setRowFilter(techTypeFilter);
-        } else {
-            if (getCampaign().getCampaignOptions().useAssignedTechFirst()) {
-                ((TechSorter) techSorter.getComparator(0)).setPart(part);
-            }
-            techSorter.setRowFilter(techTypeFilter);
-        }
-    }
-
-    private void changePersonnelView() {
-
-        int view = choicePersonView.getSelectedIndex();
-        XTableColumnModel columnModel = (XTableColumnModel) personnelTable
-                .getColumnModel();
-        personnelTable.setRowHeight(15);
-
-        // set the renderer
-        TableColumn column = null;
-        for (int i = 0; i < PersonnelTableModel.N_COL; i++) {
-            column = columnModel.getColumnByModelIndex(i);
-            column.setCellRenderer(personModel.getRenderer(
-                    choicePersonView.getSelectedIndex() == PV_GRAPHIC,
-                    getIconPackage()));
-            if (i == PersonnelTableModel.COL_RANK) {
-                if (view == PV_GRAPHIC) {
-                    column.setPreferredWidth(125);
-                    column.setHeaderValue("Person");
-                } else {
-                    column.setPreferredWidth(personModel.getColumnWidth(i));
-                    column.setHeaderValue("Rank");
-                }
-            }
-        }
-
-        if (view == PV_GRAPHIC) {
-            personnelTable.setRowHeight(80);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_RANK), true);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_NAME),
-                            false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_CALL),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_AGE), false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_GENDER),
-                    false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_TYPE),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_SKILL),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_ASSIGN),
-                    true);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_FORCE),
-                            true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_DEPLOY),
-                    false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_MECH),
-                            false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_AERO),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_JET), false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_SPACE),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_VEE), false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_NVEE),
-                            false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_VTOL),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_GUN_BA),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_SMALL_ARMS),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_ANTI_MECH),
-                    false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_ARTY),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TACTICS),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_STRATEGY),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TECH_MECH),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TECH_AERO),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TECH_VEE),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TECH_BA),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_MEDICAL),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_ADMIN),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_NEG), false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_SCROUNGE),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TOUGH),
-                    false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_EDGE),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_NABIL),
-                    false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_NIMP),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_HITS), true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_SALARY),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_KILLS),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_XP), false);
-        } else if (view == PV_GENERAL) {
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_RANK), true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_NAME), true);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_CALL),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_AGE), false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_GENDER),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TYPE), true);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_SKILL),
-                            true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_ASSIGN),
-                    true);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_FORCE),
-                            true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_DEPLOY),
-                    true);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_MECH),
-                            false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_AERO),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_JET), false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_SPACE),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_VEE), false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_NVEE),
-                            false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_VTOL),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_GUN_BA),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_SMALL_ARMS),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_ANTI_MECH),
-                    false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_ARTY),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TACTICS),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_STRATEGY),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TECH_MECH),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TECH_AERO),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TECH_VEE),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TECH_BA),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_MEDICAL),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_ADMIN),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_NEG), false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_SCROUNGE),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TOUGH),
-                    false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_EDGE),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_NABIL),
-                    false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_NIMP),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_HITS), true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_SALARY),
-                    getCampaign().getCampaignOptions().payForSalaries());
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_KILLS),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_XP), true);
-        } else if (view == PV_PILOT) {
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_RANK), true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_NAME), true);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_CALL),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_AGE), false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_GENDER),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TYPE), true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_SKILL),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_ASSIGN),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_FORCE),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_DEPLOY),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_MECH), true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_AERO), true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_JET), true);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_SPACE),
-                            true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_VEE), true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_NVEE), true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_VTOL), true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_GUN_BA),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_SMALL_ARMS),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_ANTI_MECH),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_ARTY), true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TACTICS),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_STRATEGY),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TECH_MECH),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TECH_AERO),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TECH_VEE),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TECH_BA),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_MEDICAL),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_ADMIN),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_NEG), false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_SCROUNGE),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TOUGH),
-                    false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_EDGE),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_NABIL),
-                    false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_NIMP),
-                            false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_HITS),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_SALARY),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_KILLS),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_XP), false);
-        } else if (view == PV_INF) {
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_RANK), true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_NAME), true);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_CALL),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_AGE), false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_GENDER),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TYPE), true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_SKILL),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_ASSIGN),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_FORCE),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_DEPLOY),
-                    false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_MECH),
-                            false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_AERO),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_JET), false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_SPACE),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_VEE), false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_NVEE),
-                            false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_VTOL),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_GUN_BA),
-                    true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_SMALL_ARMS),
-                    true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_ANTI_MECH),
-                    true);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_ARTY),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TACTICS),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_STRATEGY),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TECH_MECH),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TECH_AERO),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TECH_VEE),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TECH_BA),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_MEDICAL),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_ADMIN),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_NEG), false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_SCROUNGE),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TOUGH),
-                    false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_EDGE),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_NABIL),
-                    false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_NIMP),
-                            false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_HITS),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_SALARY),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_KILLS),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_XP), false);
-        } else if (view == PV_TACTIC) {
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_RANK), true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_NAME), true);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_CALL),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_AGE), false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_GENDER),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TYPE), true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_SKILL),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_ASSIGN),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_FORCE),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_DEPLOY),
-                    false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_MECH),
-                            false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_AERO),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_JET), false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_SPACE),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_VEE), false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_NVEE),
-                            false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_VTOL),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_GUN_BA),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_SMALL_ARMS),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_ANTI_MECH),
-                    false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_ARTY),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TACTICS),
-                    true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_STRATEGY),
-                    true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TECH_MECH),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TECH_AERO),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TECH_VEE),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TECH_BA),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_MEDICAL),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_ADMIN),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_NEG), false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_SCROUNGE),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TOUGH),
-                    false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_EDGE),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_NABIL),
-                    false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_NIMP),
-                            false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_HITS),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_SALARY),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_KILLS),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_XP), false);
-        } else if (view == PV_TECH) {
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_RANK), true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_NAME), true);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_CALL),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_AGE), false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_GENDER),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TYPE), true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_SKILL),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_ASSIGN),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_FORCE),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_DEPLOY),
-                    false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_MECH),
-                            false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_AERO),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_JET), false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_SPACE),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_VEE), false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_NVEE),
-                            false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_VTOL),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_GUN_BA),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_SMALL_ARMS),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_ANTI_MECH),
-                    false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_ARTY),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TACTICS),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_STRATEGY),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TECH_MECH),
-                    true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TECH_AERO),
-                    true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TECH_VEE),
-                    true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TECH_BA),
-                    true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_MEDICAL),
-                    true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_ADMIN),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_NEG), false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_SCROUNGE),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TOUGH),
-                    false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_EDGE),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_NABIL),
-                    false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_NIMP),
-                            false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_HITS),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_SALARY),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_KILLS),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_XP), false);
-        } else if (view == PV_ADMIN) {
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_RANK), true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_NAME), true);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_CALL),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_AGE), false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_GENDER),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TYPE), true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_SKILL),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_ASSIGN),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_FORCE),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_DEPLOY),
-                    false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_MECH),
-                            false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_AERO),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_JET), false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_SPACE),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_VEE), false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_NVEE),
-                            false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_VTOL),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_GUN_BA),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_SMALL_ARMS),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_ANTI_MECH),
-                    false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_ARTY),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TACTICS),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_STRATEGY),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TECH_MECH),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TECH_AERO),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TECH_VEE),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TECH_BA),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_MEDICAL),
-                    false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_ADMIN),
-                            true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_NEG), true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_SCROUNGE),
-                    true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TOUGH),
-                    false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_EDGE),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_NABIL),
-                    false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_NIMP),
-                            false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_HITS),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_SALARY),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_KILLS),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_XP), false);
-        } else if (view == PV_FLUFF) {
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_RANK), true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_NAME), true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_CALL), true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_AGE), true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_GENDER),
-                    true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TYPE), true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_SKILL),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_ASSIGN),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_FORCE),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_DEPLOY),
-                    false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_MECH),
-                            false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_AERO),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_JET), false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_SPACE),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_VEE), false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_NVEE),
-                            false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_VTOL),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_GUN_BA),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_SMALL_ARMS),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_ANTI_MECH),
-                    false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_ARTY),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TACTICS),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_STRATEGY),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TECH_MECH),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TECH_AERO),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TECH_VEE),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TECH_BA),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_MEDICAL),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_ADMIN),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_NEG), false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_SCROUNGE),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_TOUGH),
-                    false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_EDGE),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_NABIL),
-                    false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_NIMP),
-                            false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_HITS),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_SALARY),
-                    false);
-            columnModel
-                    .setColumnVisible(
-                            columnModel
-                                    .getColumnByModelIndex(PersonnelTableModel.COL_KILLS),
-                            true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(PersonnelTableModel.COL_XP), false);
-        }
-    }
-
-    private void changeUnitView() {
-
-        int view = choiceUnitView.getSelectedIndex();
-        XTableColumnModel columnModel = (XTableColumnModel) getUnitTable()
-                .getColumnModel();
-        getUnitTable().setRowHeight(15);
-
-        // set the renderer
-        TableColumn column = null;
-        for (int i = 0; i < UnitTableModel.N_COL; i++) {
-            column = columnModel.getColumnByModelIndex(i);
-            column.setCellRenderer(getUnitModel().getRenderer(
-                    choiceUnitView.getSelectedIndex() == UV_GRAPHIC,
-                    getIconPackage()));
-            if (i == UnitTableModel.COL_WCLASS) {
-                if (view == UV_GRAPHIC) {
-                    column.setPreferredWidth(125);
-                    column.setHeaderValue("Unit");
-                } else {
-                    column.setPreferredWidth(personModel.getColumnWidth(i));
-                    column.setHeaderValue("Weight Class");
-                }
-            }
-        }
-
-        if (view == UV_GRAPHIC) {
-            getUnitTable().setRowHeight(80);
-            columnModel.setColumnVisible(
-                    columnModel.getColumnByModelIndex(UnitTableModel.COL_NAME),
-                    false);
-            columnModel.setColumnVisible(
-                    columnModel.getColumnByModelIndex(UnitTableModel.COL_TYPE),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(UnitTableModel.COL_WCLASS), true);
-            columnModel.setColumnVisible(
-                    columnModel.getColumnByModelIndex(UnitTableModel.COL_TECH),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(UnitTableModel.COL_WEIGHT), false);
-            columnModel.setColumnVisible(
-                    columnModel.getColumnByModelIndex(UnitTableModel.COL_COST),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(UnitTableModel.COL_MAINTAIN), false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(UnitTableModel.COL_QUALITY), false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(UnitTableModel.COL_STATUS), false);
-            columnModel
-                    .setColumnVisible(columnModel
-                            .getColumnByModelIndex(UnitTableModel.COL_PILOT),
-                            true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(UnitTableModel.COL_TECH_CRW), true);
-            columnModel.setColumnVisible(
-                    columnModel.getColumnByModelIndex(UnitTableModel.COL_CREW),
-                    false);
-            columnModel.setColumnVisible(
-                    columnModel.getColumnByModelIndex(UnitTableModel.COL_BV),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(UnitTableModel.COL_REPAIR), false);
-            columnModel
-                    .setColumnVisible(columnModel
-                            .getColumnByModelIndex(UnitTableModel.COL_PARTS),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(UnitTableModel.COL_QUIRKS), false);
-            columnModel.setColumnVisible(
-                    columnModel.getColumnByModelIndex(UnitTableModel.COL_SITE),
-                    false);
-            columnModel.setColumnVisible(
-                    columnModel.getColumnByModelIndex(UnitTableModel.COL_RSTATUS),
-                    false);
-        } else if (view == UV_GENERAL) {
-            columnModel.setColumnVisible(
-                    columnModel.getColumnByModelIndex(UnitTableModel.COL_NAME),
-                    true);
-            columnModel.setColumnVisible(
-                    columnModel.getColumnByModelIndex(UnitTableModel.COL_TYPE),
-                    true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(UnitTableModel.COL_WCLASS), true);
-            columnModel.setColumnVisible(
-                    columnModel.getColumnByModelIndex(UnitTableModel.COL_TECH),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(UnitTableModel.COL_WEIGHT), false);
-            columnModel.setColumnVisible(
-                    columnModel.getColumnByModelIndex(UnitTableModel.COL_COST),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(UnitTableModel.COL_MAINTAIN), false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(UnitTableModel.COL_QUALITY), false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(UnitTableModel.COL_STATUS), true);
-            columnModel
-                    .setColumnVisible(columnModel
-                            .getColumnByModelIndex(UnitTableModel.COL_PILOT),
-                            true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(UnitTableModel.COL_TECH_CRW), true);
-            columnModel.setColumnVisible(
-                    columnModel.getColumnByModelIndex(UnitTableModel.COL_CREW),
-                    false);
-            columnModel.setColumnVisible(
-                    columnModel.getColumnByModelIndex(UnitTableModel.COL_BV),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(UnitTableModel.COL_REPAIR), false);
-            columnModel
-                    .setColumnVisible(columnModel
-                            .getColumnByModelIndex(UnitTableModel.COL_PARTS),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(UnitTableModel.COL_QUIRKS), false);
-            columnModel.setColumnVisible(
-                    columnModel.getColumnByModelIndex(UnitTableModel.COL_SITE),
-                    false);
-            columnModel.setColumnVisible(
-                    columnModel.getColumnByModelIndex(UnitTableModel.COL_RSTATUS),
-                    false);
-        } else if (view == UV_DETAILS) {
-            columnModel.setColumnVisible(
-                    columnModel.getColumnByModelIndex(UnitTableModel.COL_NAME),
-                    true);
-            columnModel.setColumnVisible(
-                    columnModel.getColumnByModelIndex(UnitTableModel.COL_TYPE),
-                    true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(UnitTableModel.COL_WCLASS), true);
-            columnModel.setColumnVisible(
-                    columnModel.getColumnByModelIndex(UnitTableModel.COL_TECH),
-                    true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(UnitTableModel.COL_WEIGHT), true);
-            columnModel.setColumnVisible(
-                    columnModel.getColumnByModelIndex(UnitTableModel.COL_COST),
-                    true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(UnitTableModel.COL_MAINTAIN), false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(UnitTableModel.COL_QUALITY), false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(UnitTableModel.COL_STATUS), false);
-            columnModel
-                    .setColumnVisible(columnModel
-                            .getColumnByModelIndex(UnitTableModel.COL_PILOT),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(UnitTableModel.COL_TECH_CRW), false);
-            columnModel.setColumnVisible(
-                    columnModel.getColumnByModelIndex(UnitTableModel.COL_CREW),
-                    false);
-            columnModel.setColumnVisible(
-                    columnModel.getColumnByModelIndex(UnitTableModel.COL_BV),
-                    true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(UnitTableModel.COL_REPAIR), false);
-            columnModel
-                    .setColumnVisible(columnModel
-                            .getColumnByModelIndex(UnitTableModel.COL_PARTS),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(UnitTableModel.COL_QUIRKS), true);
-            columnModel.setColumnVisible(
-                    columnModel.getColumnByModelIndex(UnitTableModel.COL_SITE),
-                    false);
-            columnModel.setColumnVisible(
-                    columnModel.getColumnByModelIndex(UnitTableModel.COL_RSTATUS),
-                    false);
-        } else if (view == UV_STATUS) {
-            columnModel.setColumnVisible(
-                    columnModel.getColumnByModelIndex(UnitTableModel.COL_NAME),
-                    true);
-            columnModel.setColumnVisible(
-                    columnModel.getColumnByModelIndex(UnitTableModel.COL_TYPE),
-                    true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(UnitTableModel.COL_WCLASS), false);
-            columnModel.setColumnVisible(
-                    columnModel.getColumnByModelIndex(UnitTableModel.COL_TECH),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(UnitTableModel.COL_WEIGHT), false);
-            columnModel.setColumnVisible(
-                    columnModel.getColumnByModelIndex(UnitTableModel.COL_COST),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(UnitTableModel.COL_MAINTAIN),
-                    getCampaign().getCampaignOptions().payForMaintain());
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(UnitTableModel.COL_QUALITY), true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(UnitTableModel.COL_STATUS), true);
-            columnModel
-                    .setColumnVisible(columnModel
-                            .getColumnByModelIndex(UnitTableModel.COL_PILOT),
-                            false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(UnitTableModel.COL_TECH_CRW), false);
-            columnModel.setColumnVisible(
-                    columnModel.getColumnByModelIndex(UnitTableModel.COL_CREW),
-                    true);
-            columnModel.setColumnVisible(
-                    columnModel.getColumnByModelIndex(UnitTableModel.COL_BV),
-                    false);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(UnitTableModel.COL_REPAIR), true);
-            columnModel
-                    .setColumnVisible(columnModel
-                            .getColumnByModelIndex(UnitTableModel.COL_PARTS),
-                            true);
-            columnModel.setColumnVisible(columnModel
-                    .getColumnByModelIndex(UnitTableModel.COL_QUIRKS), false);
-            columnModel.setColumnVisible(
-                    columnModel.getColumnByModelIndex(UnitTableModel.COL_SITE),
-                    true);
-            columnModel.setColumnVisible(
-                    columnModel.getColumnByModelIndex(UnitTableModel.COL_RSTATUS),
-                    false);
-        }
-    }
-
     protected MekHQ getApplication() {
         return app;
     }
@@ -8535,19 +3073,6 @@ public class CampaignGUI extends JPanel {
         return this;
     }
 
-    protected boolean repairsSelected() {
-        return tabTasks.getSelectedIndex() == 0;
-    }
-
-    protected boolean acquireSelected() {
-        return tabTasks.getSelectedIndex() == 1 && !onWarehouseTab();
-    }
-
-    protected boolean onWarehouseTab() {
-        return tabMain.getTitleAt(tabMain.getSelectedIndex()).equals(
-                resourceMap.getString("panSupplies.TabConstraints.tabTitle"));
-    }
-
     public int getTabIndexByName(String tabTitle) {
         int retVal = -1;
         for (int i = 0; i < tabMain.getTabCount(); i++) {
@@ -8557,220 +3082,6 @@ public class CampaignGUI extends JPanel {
             }
         }
         return retVal;
-    }
-
-    public class TaskTableMouseAdapter extends MouseInputAdapter implements
-            ActionListener {
-
-        @Override
-        public void actionPerformed(ActionEvent action) {
-            String command = action.getActionCommand();
-            Part part = taskModel.getTaskAt(taskTable
-                    .convertRowIndexToModel(taskTable.getSelectedRow()));
-            if (null == part) {
-                return;
-            }
-            if (command.equalsIgnoreCase("SCRAP")) {
-                if (null != part.checkScrappable()) {
-                    JOptionPane.showMessageDialog(frame,
-                            part.checkScrappable(), "Cannot scrap part",
-                            JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-                Unit u = part.getUnit();
-                getCampaign().addReport(part.scrap());
-                if (null != u && !u.isRepairable()
-                        && u.getSalvageableParts().size() == 0) {
-                    getCampaign().removeUnit(u.getId());
-                }
-                refreshServicedUnitList();
-                refreshUnitList();
-                refreshTaskList();
-                refreshUnitView();
-                refreshPartsList();
-                refreshAcquireList();
-                refreshReport();
-                refreshOverview();
-                filterTasks();
-            } else if (command.contains("SWAP_AMMO")) {
-                /*
-                 * WorkItem task =
-                 * taskModel.getTaskAt(TaskTable.getSelectedRow()); if (task
-                 * instanceof ReloadItem) { ReloadItem reload = (ReloadItem)
-                 * task; Entity en = reload.getUnit().getEntity(); Mounted m =
-                 * reload.getMounted(); if (null == m) { return; } AmmoType
-                 * curType = (AmmoType) m.getType(); String sel =
-                 * command.split(":")[1]; int selType = Integer.parseInt(sel);
-                 * AmmoType newType = Utilities.getMunitionsFor(en, curType)
-                 * .get(selType); reload.swapAmmo(newType); refreshTaskList();
-                 * refreshUnitView(); refreshAcquireList(); }
-                 */
-            } else if (command.contains("CHANGE_MODE")) {
-                String sel = command.split(":")[1];
-                part.setMode(WorkTime.of(sel));
-                refreshServicedUnitList();
-                refreshUnitList();
-                refreshTaskList();
-                refreshUnitView();
-                refreshAcquireList();
-                refreshOverview();
-            } else if (command.contains("UNASSIGN")) {
-                /*
-                 * for (WorkItem task : tasks) { task.resetTimeSpent();
-                 * task.setTeam(null); refreshServicedUnitList();
-                 * refreshUnitList(); refreshTaskList(); refreshAcquireList();
-                 * refreshCargo(); refreshOverview(); }
-                 */
-            } else if (command.contains("FIX")) {
-                /*
-                 * for (WorkItem task : tasks) { if (task.checkFixable() ==
-                 * null) { if ((task instanceof ReplacementItem) &&
-                 * !((ReplacementItem) task).hasPart()) { ReplacementItem
-                 * replace = (ReplacementItem) task; Part part =
-                 * replace.partNeeded(); replace.setPart(part);
-                 * getCampaign().addPart(part); } task.succeed(); if
-                 * (task.isCompleted()) { getCampaign().removeTask(task); } }
-                 * refreshServicedUnitList(); refreshUnitList();
-                 * refreshTaskList(); refreshAcquireList(); refreshPartsList();
-                 * refreshCargo(); refreshOverview(); }
-                 */
-                if (part.checkFixable() == null) {
-                    getCampaign().addReport(part.succeed());
-
-                    refreshServicedUnitList();
-                    refreshUnitList();
-                    refreshTaskList();
-                    refreshAcquireList();
-                    refreshPartsList();
-                    refreshOverview();
-                }
-            }
-        }
-
-        @Override
-        public void mousePressed(MouseEvent e) {
-            maybeShowPopup(e);
-        }
-
-        @Override
-        public void mouseReleased(MouseEvent e) {
-            maybeShowPopup(e);
-        }
-
-        private void maybeShowPopup(MouseEvent e) {
-            JPopupMenu popup = new JPopupMenu();
-            if (e.isPopupTrigger()) {
-                int row = taskTable.getSelectedRow();
-                if (row < 0) {
-                    return;
-                }
-                Part part = taskModel.getTaskAt(taskTable.convertRowIndexToModel(row));
-                JMenuItem menuItem = null;
-                JMenu menu = null;
-                JCheckBoxMenuItem cbMenuItem = null;
-                // Mode (extra time, rush job, ...
-                // dont allow automatic success jobs to change mode
-                if (part.getAllMods(null).getValue() != TargetRoll.AUTOMATIC_SUCCESS) {
-                    menu = new JMenu("Mode");
-                    for(WorkTime wt : WorkTime.DEFAULT_TIMES) {
-                        cbMenuItem = new JCheckBoxMenuItem(wt.name);
-                        if (part.getMode() == wt) {
-                            cbMenuItem.setSelected(true);
-                        } else {
-                            cbMenuItem.setActionCommand("CHANGE_MODE:" + wt.id);
-                            cbMenuItem.addActionListener(this);
-                        }
-                        cbMenuItem.setEnabled(!part.isBeingWorkedOn());
-                        menu.add(cbMenuItem);
-                    }
-                    popup.add(menu);
-                }
-                // Scrap component
-                if (!part.canNeverScrap()) {
-                    menuItem = new JMenuItem("Scrap component");
-                    menuItem.setActionCommand("SCRAP");
-                    menuItem.addActionListener(this);
-                    menuItem.setEnabled(!part.isBeingWorkedOn());
-                    popup.add(menuItem);
-                }
-
-                menu = new JMenu("GM Mode");
-                popup.add(menu);
-                // Auto complete task
-
-                menuItem = new JMenuItem("Complete Task");
-                menuItem.setActionCommand("FIX");
-                menuItem.addActionListener(this);
-                menuItem.setEnabled(getCampaign().isGM()
-                        && (null == part.checkFixable()));
-                menu.add(menuItem);
-
-                popup.show(e.getComponent(), e.getX(), e.getY());
-            }
-        }
-    }
-
-    public class AcquisitionTableMouseAdapter extends MouseInputAdapter
-            implements ActionListener {
-        @Override
-        public void actionPerformed(ActionEvent action) {
-            String command = action.getActionCommand();
-            IAcquisitionWork acquisitionWork = acquireModel
-                    .getAcquisitionAt(acquisitionTable
-                            .convertRowIndexToModel(acquisitionTable
-                                    .getSelectedRow()));
-            if (acquisitionWork instanceof AmmoBin) {
-                acquisitionWork = ((AmmoBin) acquisitionWork)
-                        .getAcquisitionWork();
-            }
-            if (null == acquisitionWork) {
-                return;
-            }
-            if (command.contains("FIX")) {
-                getCampaign().addReport(acquisitionWork.find(0));
-
-                refreshServicedUnitList();
-                refreshUnitList();
-                refreshTaskList();
-                refreshAcquireList();
-                refreshPartsList();
-                refreshOverview();
-                filterTasks();
-            }
-        }
-
-        @Override
-        public void mousePressed(MouseEvent e) {
-            maybeShowPopup(e);
-        }
-
-        @Override
-        public void mouseReleased(MouseEvent e) {
-            maybeShowPopup(e);
-        }
-
-        private void maybeShowPopup(MouseEvent e) {
-            JPopupMenu popup = new JPopupMenu();
-            if (e.isPopupTrigger()) {
-                int row = acquisitionTable.getSelectedRow();
-                if (row < 0) {
-                    return;
-                }
-                JMenuItem menuItem = null;
-                JMenu menu = null;
-                menu = new JMenu("GM Mode");
-                popup.add(menu);
-                // Auto complete task
-
-                menuItem = new JMenuItem("Complete Task");
-                menuItem.setActionCommand("FIX");
-                menuItem.addActionListener(this);
-                menuItem.setEnabled(getCampaign().isGM());
-                menu.add(menuItem);
-
-                popup.show(e.getComponent(), e.getX(), e.getY());
-            }
-        }
     }
 
     public void undeployUnit(Unit u) {
@@ -8823,45 +3134,6 @@ public class CampaignGUI extends JPanel {
         }
     }
 
-    public Person[] getSelectedPeople() {
-        Person[] selected = new Person[personnelTable.getSelectedRowCount()];
-        int[] rows = personnelTable.getSelectedRows();
-        for (int i = 0; i < rows.length; i++) {
-            Person person = personModel.getPerson(personnelTable
-                    .convertRowIndexToModel(rows[i]));
-            selected[i] = person;
-        }
-        return selected;
-    }
-
-    /**
-     * @return the unitModel
-     */
-    public UnitTableModel getUnitModel() {
-        return unitModel;
-    }
-
-    /**
-     * @return the unitTable
-     */
-    public JTable getUnitTable() {
-        return unitTable;
-    }
-
-    /**
-     * @return the panMekLab
-     */
-    public MekLabPanel getPanMekLab() {
-        return panMekLab;
-    }
-
-    /**
-     * @return the splitUnit
-     */
-    public JSplitPane getSplitUnit() {
-        return splitUnit;
-    }
-
     public JTabbedPane getTabMain() {
         return tabMain;
     }
@@ -8871,97 +3143,6 @@ public class CampaignGUI extends JPanel {
      */
     public ResourceBundle getResourceMap() {
         return resourceMap;
-    }
-
-    /**
-     * @return the loanTable
-     */
-    public JTable getLoanTable() {
-        return loanTable;
-    }
-
-    /**
-     * @return the loanModel
-     */
-    public LoanTableModel getLoanModel() {
-        return loanModel;
-    }
-
-    /**
-     * @return the financeTable
-     */
-    public JTable getFinanceTable() {
-        return financeTable;
-    }
-
-    /**
-     * @return the scenarioModel
-     */
-    public ScenarioTableModel getScenarioModel() {
-        return scenarioModel;
-    }
-
-    /**
-     * @return the scenarioTable
-     */
-    public JTable getScenarioTable() {
-        return scenarioTable;
-    }
-
-    /**
-     * @return the selectedMission
-     */
-    public int getSelectedMission() {
-        return selectedMission;
-    }
-
-    /**
-     * @return the personnelTable
-     */
-    public JTable getPersonnelTable() {
-        return personnelTable;
-    }
-
-    /**
-     * @return the personModel
-     */
-    public PersonnelTableModel getPersonnelModel() {
-        return personModel;
-    }
-
-    /**
-     * @return the splitPersonnel
-     */
-    public JSplitPane getSplitPersonnel() {
-        return splitPersonnel;
-    }
-
-    /**
-     * @return the partsTable
-     */
-    public JTable getPartsTable() {
-        return partsTable;
-    }
-
-    /**
-     * @return the partsModel
-     */
-    public PartsTableModel getPartsModel() {
-        return partsModel;
-    }
-
-    /**
-     * @return the servicedUnitTable
-     */
-    public JTable getServicedUnitTable() {
-        return servicedUnitTable;
-    }
-
-    /**
-     * @return the servicedUnitModel
-     */
-    public UnitTableModel getServicedUnitModel() {
-        return servicedUnitModel;
     }
 
     private void setCampaignOptionsFromGameOptions() {
@@ -8975,5 +3156,6 @@ public class CampaignGUI extends JPanel {
         getCampaign().getCampaignOptions().setQuirks(getCampaign().getGameOptions().getOption("stratops_quirks").booleanValue());
         getCampaign().getCampaignOptions().setAllowCanonOnly(getCampaign().getGameOptions().getOption("canon_only").booleanValue());
         getCampaign().getCampaignOptions().setTechLevel(TechConstants.getSimpleLevel(getCampaign().getGameOptions().getOption("techlevel").stringValue()));
+        MekHQ.triggerEvent(new OptionsChangedEvent(getCampaign()));
     }
 }

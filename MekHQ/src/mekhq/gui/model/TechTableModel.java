@@ -12,6 +12,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.BasicInfo;
 import mekhq.gui.CampaignGUI;
+import mekhq.gui.ITechWorkPanel;
 
 /**
  * A table model for displaying work items
@@ -19,14 +20,17 @@ import mekhq.gui.CampaignGUI;
 public class TechTableModel extends DataTableModel {
     private static final long serialVersionUID = 2738333372316332962L;
 
-    private CampaignGUI gui;
+    private CampaignGUI tab;
+    private ITechWorkPanel panel;
 
-    public TechTableModel(CampaignGUI gui) {
+    public TechTableModel(CampaignGUI tab, ITechWorkPanel panel) {
         columnNames = new String[] { "Techs" };
         data = new ArrayList<Person>();
-        this.gui = gui;
+        this.tab = tab;
+        this.panel = panel;
     }
 
+    @Override
     public Object getValueAt(int row, int col) {
         return getTechAt(row);
     }
@@ -36,7 +40,7 @@ public class TechTableModel extends DataTableModel {
     }
 
     public Campaign getCampaign() {
-        return gui.getCampaign();
+        return tab.getCampaign();
     }
 
     public TechTableModel.Renderer getRenderer(IconPackage icons) {
@@ -50,14 +54,15 @@ public class TechTableModel extends DataTableModel {
 
         private static final long serialVersionUID = -4951696376098422679L;
 
-        public Component getTableCellRendererComponent(JTable table,
-                Object value, boolean isSelected, boolean hasFocus,
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
                 int row, int column) {
             Component c = this;
             int actualRow = table.convertRowIndexToModel(row);
             setOpaque(true);
             setPortrait(getTechAt(actualRow));
-            setText(getTechAt(actualRow).getTechDesc(getCampaign().isOvertimeAllowed(), gui.getSelectedTask()), "black");
+            setText(getTechAt(actualRow).getTechDesc(getCampaign().isOvertimeAllowed(), panel.getSelectedTask()),
+                    "black");
             if (isSelected) {
                 highlightBorder();
             } else {

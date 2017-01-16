@@ -7,6 +7,7 @@ import java.awt.event.MouseEvent;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
+import javax.swing.JTable;
 import javax.swing.event.MouseInputAdapter;
 
 import mekhq.campaign.finances.Transaction;
@@ -17,19 +18,23 @@ import mekhq.gui.model.FinanceTableModel;
 public class FinanceTableMouseAdapter extends MouseInputAdapter implements
         ActionListener {
     private CampaignGUI gui;
+    private JTable financeTable;
+    private FinanceTableModel financeModel;
 
-    public FinanceTableMouseAdapter(CampaignGUI gui) {
+    public FinanceTableMouseAdapter(CampaignGUI gui,
+            JTable financeTable,
+            FinanceTableModel financeModel) {
         super();
         this.gui = gui;
+        this.financeTable = financeTable;
+        this.financeModel = financeModel;
     }
 
     public void actionPerformed(ActionEvent action) {
         String command = action.getActionCommand();
-        FinanceTableModel financeModel = (FinanceTableModel) gui.getFinanceTable()
-                .getModel();
-        Transaction transaction = financeModel.getTransaction(gui.getFinanceTable()
+        Transaction transaction = financeModel.getTransaction(financeTable
                 .getSelectedRow());
-        int row = gui.getFinanceTable().getSelectedRow();
+        int row = financeTable.getSelectedRow();
         if (null == transaction) {
             return;
         }
@@ -65,7 +70,7 @@ public class FinanceTableMouseAdapter extends MouseInputAdapter implements
     private void maybeShowPopup(MouseEvent e) {
         JPopupMenu popup = new JPopupMenu();
         if (e.isPopupTrigger()) {
-            int row = gui.getFinanceTable().getSelectedRow();
+            int row = financeTable.getSelectedRow();
             if (row < 0) {
                 return;
             }

@@ -9,9 +9,9 @@ package mekhq.gui.dialog;
 import java.awt.Frame;
 import java.util.ResourceBundle;
 
+import javax.swing.JButton;
+
 import megamek.common.util.EncodeControl;
-import mekhq.campaign.Campaign;
-import mekhq.gui.CampaignGUI;
 
 /**
  *
@@ -19,18 +19,13 @@ import mekhq.gui.CampaignGUI;
  */
 public class MissionTypeDialog extends javax.swing.JDialog {
 
-	private Campaign campaign;
-	private CampaignGUI hqview;
-	private Frame frame;
+	private boolean contract;
 	
 	private static final long serialVersionUID = 8376874926997734492L;
 	/** Creates new form */
-    public MissionTypeDialog(java.awt.Frame parent, boolean modal, Campaign c, CampaignGUI view) {
+    public MissionTypeDialog(Frame parent, boolean modal) {
         super(parent, modal);
-        frame = parent;
-        this.campaign = c;
-        this.hqview = view;
-        initComponents();      
+        initComponents();
         this.setLocationRelativeTo(parent);
     }
 
@@ -44,56 +39,28 @@ public class MissionTypeDialog extends javax.swing.JDialog {
         
         getContentPane().setLayout(new java.awt.GridLayout(2,1));
       
-        btnMission = new javax.swing.JButton(resourceMap.getString("btnMission.text"));
+        JButton btnMission = new javax.swing.JButton(resourceMap.getString("btnMission.text"));
         btnMission.setToolTipText(resourceMap.getString("btnMission.tooltip"));
         btnMission.setName("btnMission"); // NOI18N
-        btnMission.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                newMission();
-            }
+        btnMission.addActionListener(ev -> {
+        	contract = false;
+        	setVisible(false);
         });
         getContentPane().add(btnMission);
         
-        btnContract = new javax.swing.JButton(resourceMap.getString("btnContract.text"));
+        JButton btnContract = new javax.swing.JButton(resourceMap.getString("btnContract.text"));
         btnContract.setToolTipText(resourceMap.getString("btnContract.tooltip"));
         btnContract.setName("btnContract"); // NOI18N
-        btnContract.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                newContract();
-            }
+        btnContract.addActionListener(ev -> {
+        	contract = true;
+        	setVisible(false);
         });
         getContentPane().add(btnContract);
 
         setSize(250, 150);
     }
     
-    private void newMission() {
-    	CustomizeMissionDialog cmd = new CustomizeMissionDialog(frame, true, null, campaign);
-    	new CustomizeMissionDialog(frame, true, null, campaign);
-		cmd.setVisible(true);
-		this.setVisible(false);
-		if(cmd.getMissionId() != -1) {
-			hqview.selectedMission = cmd.getMissionId();
-		}
-		hqview.refreshMissions();
+    public boolean isContract() {
+    	return contract;
     }
-    
-    private void newContract() {
-    	NewContractDialog ncd = campaign.getCampaignOptions().getUseAtB()?
-    			new NewAtBContractDialog(frame, true, campaign):
-    			new NewContractDialog(frame, true, campaign);
-		ncd.setVisible(true);
-		this.setVisible(false);
-		if(ncd.getContractId() != -1) {
-			hqview.selectedMission = ncd.getContractId();
-		}
-		hqview.refreshMissions();
-		hqview.refreshFinancialTransactions();
-    }
-
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnMission;
-    private javax.swing.JButton btnContract;
-    // End of variables declaration//GEN-END:variables
-
 }

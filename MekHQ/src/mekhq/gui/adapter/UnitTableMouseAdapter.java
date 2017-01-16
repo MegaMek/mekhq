@@ -17,6 +17,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
+import javax.swing.JTable;
 import javax.swing.event.MouseInputAdapter;
 
 import megamek.client.ui.swing.UnitEditorDialog;
@@ -41,11 +42,14 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
+import mekhq.gui.GuiTabType;
+import mekhq.gui.MekLabTab;
 import mekhq.gui.dialog.BombsDialog;
 import mekhq.gui.dialog.CamoChoiceDialog;
 import mekhq.gui.dialog.ChooseRefitDialog;
 import mekhq.gui.dialog.QuirksDialog;
 import mekhq.gui.dialog.TextAreaDialog;
+import mekhq.gui.model.UnitTableModel;
 import mekhq.gui.utilities.MenuScroller;
 import mekhq.gui.utilities.StaticChecks;
 
@@ -53,20 +57,25 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
         ActionListener {
 
     private CampaignGUI gui;
+    private JTable unitTable;
+    private UnitTableModel unitModel;
 
-    public UnitTableMouseAdapter(CampaignGUI gui) {
+    public UnitTableMouseAdapter(CampaignGUI gui, JTable unitTable,
+            UnitTableModel unitModel) {
         super();
         this.gui = gui;
+        this.unitTable = unitTable;
+        this.unitModel = unitModel;
     }
 
     public void actionPerformed(ActionEvent action) {
         String command = action.getActionCommand();
-        Unit selectedUnit = gui.getUnitModel().getUnit(gui.getUnitTable()
-                .convertRowIndexToModel(gui.getUnitTable().getSelectedRow()));
-        int[] rows = gui.getUnitTable().getSelectedRows();
+        Unit selectedUnit = unitModel.getUnit(unitTable
+                .convertRowIndexToModel(unitTable.getSelectedRow()));
+        int[] rows = unitTable.getSelectedRows();
         Unit[] units = new Unit[rows.length];
         for (int i = 0; i < rows.length; i++) {
-            units[i] = gui.getUnitModel().getUnit(gui.getUnitTable()
+            units[i] = unitModel.getUnit(unitTable
                     .convertRowIndexToModel(rows[i]));
         }
         if (command.equalsIgnoreCase("REMOVE_ALL_PERSONNEL")) {
@@ -390,7 +399,10 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
             gui.refreshTechsList();
         } else if (command.contains("CUSTOMIZE")
                 && !command.contains("CANCEL")) {
-            gui.getPanMekLab().loadUnit(selectedUnit);
+        	if (gui.hasTab(GuiTabType.MEKLAB)) {
+        		((MekLabTab)gui.getTab(GuiTabType.MEKLAB))
+        			.loadUnit(selectedUnit);
+        	}
             gui.getTabMain().setSelectedIndex(8);
         } else if (command.contains("CANCEL_CUSTOMIZE")) {
             if (selectedUnit.isRefitting()) {
@@ -624,21 +636,6 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
     }
 
     @Override
-    public void mouseClicked(MouseEvent e) {
-        if (e.getClickCount() == 2) {
-            if ((gui.getSplitUnit().getSize().width - gui.getSplitUnit().getDividerLocation() + gui.getSplitUnit()
-                    .getDividerSize()) < CampaignGUI.UNIT_VIEW_WIDTH) {
-                // expand
-                gui.getSplitUnit().resetToPreferredSizes();
-            } else {
-                // collapse
-                gui.getSplitUnit().setDividerLocation(1.0);
-            }
-
-        }
-    }
-
-    @Override
     public void mousePressed(MouseEvent e) {
         maybeShowPopup(e);
     }
@@ -651,17 +648,17 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
     private void maybeShowPopup(MouseEvent e) {
         JPopupMenu popup = new JPopupMenu();
         if (e.isPopupTrigger()) {
-            if (gui.getUnitTable().getSelectedRowCount() == 0) {
+            if (unitTable.getSelectedRowCount() == 0) {
                 return;
             }
-            int[] rows = gui.getUnitTable().getSelectedRows();
-            int row = gui.getUnitTable().getSelectedRow();
-            boolean oneSelected = gui.getUnitTable().getSelectedRowCount() == 1;
-            Unit unit = gui.getUnitModel().getUnit(gui.getUnitTable()
+            int[] rows = unitTable.getSelectedRows();
+            int row = unitTable.getSelectedRow();
+            boolean oneSelected = unitTable.getSelectedRowCount() == 1;
+            Unit unit = unitModel.getUnit(unitTable
                     .convertRowIndexToModel(row));
             Unit[] units = new Unit[rows.length];
             for (int i = 0; i < rows.length; i++) {
-                units[i] = gui.getUnitModel().getUnit(gui.getUnitTable()
+                units[i] = unitModel.getUnit(unitTable
                         .convertRowIndexToModel(rows[i]));
             }
             JMenuItem menuItem = null;
@@ -866,16 +863,18 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                                 || unit.getEntity() instanceof BattleArmor
                                 || unit.getEntity() instanceof megamek.common.Protomech));
                 menu.add(menuItem);
-                menuItem = new JMenuItem("Customize in Mek Lab...");
-                menuItem.setActionCommand("CUSTOMIZE");
-                menuItem.addActionListener(this);
-                menuItem.setEnabled(unit.isAvailable()
-                        && (unit.getEntity() instanceof megamek.common.Mech
-                                || unit.getEntity() instanceof megamek.common.Tank
-                                || (unit.getEntity() instanceof megamek.common.Aero && unit
-                                        .getEntity().getClass() == Aero.class) || (unit
-                                    .getEntity() instanceof Infantry)));
-                menu.add(menuItem);
+                if (gui.hasTab(GuiTabType.MEKLAB)) {
+	                menuItem = new JMenuItem("Customize in Mek Lab...");
+	                menuItem.setActionCommand("CUSTOMIZE");
+	                menuItem.addActionListener(this);
+	                menuItem.setEnabled(unit.isAvailable()
+	                        && (unit.getEntity() instanceof megamek.common.Mech
+	                                || unit.getEntity() instanceof megamek.common.Tank
+	                                || (unit.getEntity() instanceof megamek.common.Aero && unit
+	                                        .getEntity().getClass() == Aero.class) || (unit
+	                                    .getEntity() instanceof Infantry)));
+	                menu.add(menuItem);
+                }
                 if (unit.isRefitting()) {
                     menuItem = new JMenuItem("Cancel Customization");
                     menuItem.setActionCommand("CANCEL_CUSTOMIZE");

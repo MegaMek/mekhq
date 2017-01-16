@@ -1915,7 +1915,7 @@ public class MassRepairSalvageDialog extends JDialog {
 			campaignOptions.addMassRepairOption(mro);
 		}
 
-		MekHQ.EVENT_BUS.trigger(new OptionsChangedEvent(campaignGUI.getCampaign(), campaignOptions));
+		MekHQ.triggerEvent(new OptionsChangedEvent(campaignGUI.getCampaign(), campaignOptions));
 
 		JOptionPane.showMessageDialog(this, "Current settings saved as default options", "Default options saved",
 				JOptionPane.INFORMATION_MESSAGE);

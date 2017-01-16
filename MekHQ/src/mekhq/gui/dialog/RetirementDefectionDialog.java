@@ -60,6 +60,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.RetirementDefectionTracker;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
+import mekhq.gui.PersonnelTab;
 import mekhq.gui.model.PersonnelTableModel;
 import mekhq.gui.model.RetirementTableModel;
 import mekhq.gui.model.UnitAssignmentTableModel;
@@ -184,8 +185,8 @@ public class RetirementDefectionDialog extends JDialog {
         	JPanel panOverview = new JPanel(new BorderLayout());
 
         	cbGroupOverview = new JComboBox<String>();
-        	for (int i = 0; i < CampaignGUI.PG_RETIRE; i++) {
-        		cbGroupOverview.addItem(CampaignGUI.getPersonnelGroupName(i));
+        	for (int i = 0; i < PersonnelTab.PG_RETIRE; i++) {
+        		cbGroupOverview.addItem(PersonnelTab.getPersonnelGroupName(i));
         	}
         	JPanel panTop = new JPanel();
         	panTop.setLayout(new BoxLayout(panTop, BoxLayout.X_AXIS));
@@ -303,8 +304,8 @@ public class RetirementDefectionDialog extends JDialog {
 
 		cbGroupResults = new JComboBox<String>();
 		cbGroupResults.addItem("All Personnel");
-        for (int i = 1; i < CampaignGUI.PG_NUM; i++) {
-        	cbGroupResults.addItem(CampaignGUI.getPersonnelGroupName(i));
+        for (int i = 1; i < PersonnelTab.PG_NUM; i++) {
+        	cbGroupResults.addItem(PersonnelTab.getPersonnelGroupName(i));
         }
         JPanel panTop = new JPanel();
         panTop.setLayout(new BoxLayout(panTop, BoxLayout.X_AXIS));
@@ -637,25 +638,25 @@ public class RetirementDefectionDialog extends JDialog {
                 }
                 int type = person.getPrimaryRole();
                 if ((nGroup == 0) ||
-                    (nGroup == CampaignGUI.PG_COMBAT && type <= Person.T_SPACE_GUNNER) ||
-                    (nGroup == CampaignGUI.PG_SUPPORT && type > Person.T_SPACE_GUNNER) ||
-                    (nGroup == CampaignGUI.PG_MW && type == Person.T_MECHWARRIOR) ||
-                    (nGroup == CampaignGUI.PG_CREW && (type == Person.T_GVEE_DRIVER || type == Person.T_NVEE_DRIVER || type == Person.T_VTOL_PILOT || type == Person.T_VEE_GUNNER)) ||
-                    (nGroup == CampaignGUI.PG_PILOT && type == Person.T_AERO_PILOT) ||
-                    (nGroup == CampaignGUI.PG_CPILOT && type == Person.T_CONV_PILOT) ||
-                    (nGroup == CampaignGUI.PG_PROTO && type == Person.T_PROTO_PILOT) ||
-                    (nGroup == CampaignGUI.PG_BA && type == Person.T_BA) ||
-                    (nGroup == CampaignGUI.PG_SOLDIER && type == Person.T_INFANTRY) ||
-                    (nGroup == CampaignGUI.PG_VESSEL && (type == Person.T_SPACE_PILOT || type == Person.T_SPACE_CREW || type == Person.T_SPACE_GUNNER || type == Person.T_NAVIGATOR)) ||
-                    (nGroup == CampaignGUI.PG_TECH && type >= Person.T_MECH_TECH && type < Person.T_DOCTOR) ||
-                    (nGroup == CampaignGUI.PG_DOC && ((type == Person.T_DOCTOR) || (type == Person.T_MEDIC))) ||
-                    (nGroup == CampaignGUI.PG_ADMIN && type > Person.T_MEDIC)
+                    (nGroup == PersonnelTab.PG_COMBAT && type <= Person.T_SPACE_GUNNER) ||
+                    (nGroup == PersonnelTab.PG_SUPPORT && type > Person.T_SPACE_GUNNER) ||
+                    (nGroup == PersonnelTab.PG_MW && type == Person.T_MECHWARRIOR) ||
+                    (nGroup == PersonnelTab.PG_CREW && (type == Person.T_GVEE_DRIVER || type == Person.T_NVEE_DRIVER || type == Person.T_VTOL_PILOT || type == Person.T_VEE_GUNNER)) ||
+                    (nGroup == PersonnelTab.PG_PILOT && type == Person.T_AERO_PILOT) ||
+                    (nGroup == PersonnelTab.PG_CPILOT && type == Person.T_CONV_PILOT) ||
+                    (nGroup == PersonnelTab.PG_PROTO && type == Person.T_PROTO_PILOT) ||
+                    (nGroup == PersonnelTab.PG_BA && type == Person.T_BA) ||
+                    (nGroup == PersonnelTab.PG_SOLDIER && type == Person.T_INFANTRY) ||
+                    (nGroup == PersonnelTab.PG_VESSEL && (type == Person.T_SPACE_PILOT || type == Person.T_SPACE_CREW || type == Person.T_SPACE_GUNNER || type == Person.T_NAVIGATOR)) ||
+                    (nGroup == PersonnelTab.PG_TECH && type >= Person.T_MECH_TECH && type < Person.T_DOCTOR) ||
+                    (nGroup == PersonnelTab.PG_DOC && ((type == Person.T_DOCTOR) || (type == Person.T_MEDIC))) ||
+                    (nGroup == PersonnelTab.PG_ADMIN && type > Person.T_MEDIC)
                         ) {
                     return person.isActive() || results;
                 }
-                if ((nGroup == CampaignGUI.PG_MIA && person.getStatus() == Person.S_MIA) ||
-                		(nGroup == CampaignGUI.PG_KIA && person.getStatus() == Person.S_KIA) ||
-                		(nGroup == CampaignGUI.PG_RETIRE && person.getStatus() == Person.S_RETIRED)) {
+                if ((nGroup == PersonnelTab.PG_MIA && person.getStatus() == Person.S_MIA) ||
+                		(nGroup == PersonnelTab.PG_KIA && person.getStatus() == Person.S_KIA) ||
+                		(nGroup == PersonnelTab.PG_RETIRE && person.getStatus() == Person.S_RETIRED)) {
                 	return true;
                 }
                 return false;

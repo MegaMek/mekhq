@@ -80,7 +80,7 @@ public class RATManager implements IUnitGenerator {
         allRATs = new HashMap<>();
         selectedCollections = new ArrayList<>();
         loadAltFactions();
-        MekHQ.EVENT_BUS.register(this);
+        MekHQ.registerHandler(this);
     }
     
     @Subscribe

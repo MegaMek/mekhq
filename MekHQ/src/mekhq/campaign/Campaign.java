@@ -111,6 +111,7 @@ import mekhq.NullEntityException;
 import mekhq.Utilities;
 import mekhq.Version;
 import mekhq.campaign.event.DayEndingEvent;
+import mekhq.campaign.event.GMModeEvent;
 import mekhq.campaign.event.NewDayEvent;
 import mekhq.campaign.finances.Asset;
 import mekhq.campaign.finances.Finances;
@@ -176,6 +177,7 @@ import mekhq.campaign.universe.RATManager;
 import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
+import mekhq.gui.GuiTabType;
 import mekhq.gui.utilities.PortraitFileFactory;
 
 /**
@@ -482,7 +484,7 @@ public class Campaign implements Serializable {
      */
     public void initUnitGenerator() {
         if (unitGenerator != null && unitGenerator instanceof RATManager) {
-            MekHQ.EVENT_BUS.unregister(unitGenerator);
+            MekHQ.unregisterHandler(unitGenerator);
         }
 		if (campaignOptions.useStaticRATs()) {
     		RATManager rm = new RATManager();
@@ -2064,7 +2066,7 @@ public class Campaign implements Serializable {
 
     /** @return <code>true</code> if the new day arrived */
     public boolean newDay() {
-        if(MekHQ.EVENT_BUS.trigger(new DayEndingEvent(this))) {
+        if(MekHQ.triggerEvent(new DayEndingEvent(this))) {
             return false;
         }
         calendar.add(Calendar.DAY_OF_MONTH, 1);
@@ -2617,7 +2619,7 @@ public class Campaign implements Serializable {
         }
         // check for anything else in finances
         finances.newDay(this);
-        MekHQ.EVENT_BUS.trigger(new NewDayEvent(this));
+        MekHQ.triggerEvent(new NewDayEvent(this));
         return true;
     }
 
@@ -3041,6 +3043,7 @@ public class Campaign implements Serializable {
 
     public void setGMMode(boolean b) {
         this.gmMode = b;
+        MekHQ.triggerEvent(new GMModeEvent(b));
     }
 
     public Faction getFaction() {
@@ -3316,7 +3319,8 @@ public class Campaign implements Serializable {
                                        rng.getPercentFemale());
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "overtime", overtime);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "gmMode", gmMode);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "showOverview", app.getCampaigngui().getTabOverview().isVisible());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "showOverview", app.getCampaigngui()
+        		.hasTab(GuiTabType.OVERVIEW));
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "astechPool", astechPool);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "astechPoolMinutes",
                                        astechPoolMinutes);
