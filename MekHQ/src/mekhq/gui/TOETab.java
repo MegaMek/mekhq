@@ -37,7 +37,7 @@ import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.event.NetworkChangedEvent;
 import mekhq.campaign.event.OrganizationChangedEvent;
 import mekhq.campaign.event.ScenarioResolvedEvent;
-import mekhq.campaign.event.UnitRemovedEvent;
+import mekhq.campaign.event.UnitEvent;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
@@ -184,7 +184,7 @@ public final class TOETab extends CampaignGuiTab {
     }
 
     @Subscribe
-    public void unitRemoved(UnitRemovedEvent ev) {
+    public void unitHandler(UnitEvent ev) {
         organizationScheduler.schedule();
     }
 }

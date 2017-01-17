@@ -28,7 +28,7 @@ import mekhq.campaign.unit.Unit;
  *
  */
 public class UnitRepairStatusChangedEvent extends UnitEvent {
-
+    
     public UnitRepairStatusChangedEvent(Unit unit) {
         super(unit);
     }

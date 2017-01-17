@@ -54,9 +54,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.event.AssignmentChangedEvent;
 import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.event.ScenarioResolvedEvent;
-import mekhq.campaign.event.UnitChangedEvent;
-import mekhq.campaign.event.UnitRemovedEvent;
-import mekhq.campaign.event.UnitRepairStatusChangedEvent;
+import mekhq.campaign.event.UnitEvent;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.parts.MekLocation;
@@ -957,17 +955,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
     }
 
     @Subscribe
-    public void unitRemoved(UnitRemovedEvent ev) {
-        servicedUnitListScheduler.schedule();
-    }
-
-    @Subscribe
-    public void unitChanged(UnitChangedEvent ev) {
-        servicedUnitListScheduler.schedule();
-    }
-
-    @Subscribe
-    public void unitRepairStatusChanged(UnitRepairStatusChangedEvent ev) {
+    public void unitHandler(UnitEvent ev) {
         servicedUnitListScheduler.schedule();
     }
 
