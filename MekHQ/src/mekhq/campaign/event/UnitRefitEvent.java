@@ -22,14 +22,13 @@ package mekhq.campaign.event;
 import mekhq.campaign.unit.Unit;
 
 /**
- * Triggered when a damaged unit has the repair location changed or is toggled between
- * salvage and repair. The repair site can be found with getUnit().getSite() and the
- * repair/salvage flag with getUnit().isSalvage().
+ * Triggered when a refit is started, finished, or canceled.
  *
  */
-public class UnitRepairStatusChangedEvent extends UnitEvent {
+public class UnitRefitEvent extends UnitEvent {
     
-    public UnitRepairStatusChangedEvent(Unit unit) {
+    public UnitRefitEvent(Unit unit) {
         super(unit);
     }
+
 }

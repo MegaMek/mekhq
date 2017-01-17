@@ -29,6 +29,8 @@ import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.event.MouseInputAdapter;
 
+import mekhq.MekHQ;
+import mekhq.campaign.event.UnitChangedEvent;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.gui.CampaignGUI;
@@ -61,14 +63,7 @@ public class AcquisitionTableMouseAdapter extends MouseInputAdapter implements A
         }
         if (command.contains("FIX")) {
             gui.getCampaign().addReport(acquisitionWork.find(0));
-
-            gui.refreshServicedUnitList();
-            gui.refreshUnitList();
-            gui.refreshTaskList();
-            gui.refreshAcquireList();
-            gui.refreshPartsList();
-            gui.refreshOverview();
-            gui.filterTasks();
+            MekHQ.triggerEvent(new UnitChangedEvent(acquisitionWork.getUnit()));
         }
     }
 

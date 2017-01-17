@@ -1937,11 +1937,7 @@ public class CampaignGUI extends JPanel {
         refreshReport();
         refreshFunds();
         refreshFinancialTransactions();
-        refreshUnitList();
-        refreshServicedUnitList();
-        refreshOrganization();
         refreshPartsList();
-        refreshOverview();
     }
 
     private void showReport(Report report) {
@@ -2095,12 +2091,9 @@ public class CampaignGUI extends JPanel {
             }
         }
 
-        refreshServicedUnitList();
-        refreshUnitList();
         refreshPersonnelList();
         refreshPatientList();
         refreshReport();
-        refreshOverview();
     }
 
     protected void loadPersonFile() throws IOException {

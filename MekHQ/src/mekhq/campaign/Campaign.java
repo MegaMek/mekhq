@@ -110,6 +110,7 @@ import mekhq.MekHqXmlUtil;
 import mekhq.NullEntityException;
 import mekhq.Utilities;
 import mekhq.Version;
+import mekhq.campaign.event.AcquisitionEvent;
 import mekhq.campaign.event.AssignmentChangedEvent;
 import mekhq.campaign.event.DayEndingEvent;
 import mekhq.campaign.event.DeploymentChangedEvent;
@@ -118,7 +119,9 @@ import mekhq.campaign.event.MissionNewEvent;
 import mekhq.campaign.event.NetworkChangedEvent;
 import mekhq.campaign.event.NewDayEvent;
 import mekhq.campaign.event.OrganizationChangedEvent;
+import mekhq.campaign.event.ProcurementEvent;
 import mekhq.campaign.event.ScenarioChangedEvent;
+import mekhq.campaign.event.UnitNewEvent;
 import mekhq.campaign.event.UnitRemovedEvent;
 import mekhq.campaign.finances.Asset;
 import mekhq.campaign.finances.Finances;
@@ -1004,6 +1007,7 @@ public class Campaign implements Serializable {
 
         checkDuplicateNamesDuringAdd(en);
         addReport(unit.getHyperlinkedName() + " has been added to the unit roster.");
+        MekHQ.triggerEvent(new UnitNewEvent(unit));
     }
 
     public ArrayList<Unit> getUnits() {
@@ -1796,6 +1800,11 @@ public class Campaign implements Serializable {
             report += " (" + xpGained + "XP gained) ";
         }
 
+        if (found) {
+            MekHQ.triggerEvent(new AcquisitionEvent(acquisition));
+        } else {
+            MekHQ.triggerEvent(new ProcurementEvent(acquisition));            
+        }
         addReport(report);
         return found;
     }

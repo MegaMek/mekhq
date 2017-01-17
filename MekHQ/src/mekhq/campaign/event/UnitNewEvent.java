@@ -25,9 +25,9 @@ import mekhq.campaign.unit.Unit;
  * Triggered when a unit is added to the campaign.
  *
  */
-public class UnitsNewEvent extends UnitEvent {
+public class UnitNewEvent extends UnitEvent {
 
-    public UnitsNewEvent(Unit unit) {
+    public UnitNewEvent(Unit unit) {
         super(unit);
     }
 

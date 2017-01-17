@@ -347,7 +347,7 @@ public class UnitMarketDialog extends JDialog {
 			long cost = (long)Math.ceil(offer.unit.getCost() * offer.pct / 100.0);
 			if (campaign.getFunds() < cost) {
 				 campaign.addReport("<font color='red'><b> You cannot afford this unit. Transaction cancelled</b>.</font>");
-				 refreshHqView();
+				 hqView.refreshReport();
 				 return;
 			}
 
@@ -387,8 +387,6 @@ public class UnitMarketDialog extends JDialog {
 	}
 
     private void refreshHqView() {
-        hqView.refreshUnitList();
-        hqView.refreshServicedUnitList();
         hqView.refreshFinancialTransactions();
         hqView.refreshReport();
     }

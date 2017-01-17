@@ -57,6 +57,7 @@ import megamek.common.event.Subscribe;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.event.AssignmentChangedEvent;
+import mekhq.campaign.event.UnitChangedEvent;
 import mekhq.campaign.event.UnitRemovedEvent;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.BaArmor;
@@ -687,10 +688,6 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
             partId = repairable.getId();
         }
 
-        // TODO: This list is for both the warehouse and repair tabs; some of
-        // these may not be necessary
-        getCampaignGui().refreshServicedUnitList();
-        getCampaignGui().refreshUnitList();
         getCampaignGui().refreshPersonnelList();
         getCampaignGui().refreshTaskList();
         getCampaignGui().refreshAcquireList();
@@ -700,10 +697,6 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         }
         refreshPartsList();
         getCampaignGui().refreshReport();
-        getCampaignGui().refreshFunds();
-        getCampaignGui().refreshFinancialTransactions();
-        getCampaignGui().refreshOverview();
-        getCampaignGui().filterTasks();
 
         // get the selected row back for tasks
         if (selectedRow != -1) {
@@ -775,6 +768,11 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
 
     @Subscribe
     public void unitRemoved(UnitRemovedEvent ev) {
+        partsScheduler.schedule();
+    }
+    
+    @Subscribe
+    public void unitChanged(UnitChangedEvent ev) {
         partsScheduler.schedule();
     }
     

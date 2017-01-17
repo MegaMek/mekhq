@@ -54,6 +54,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.event.AssignmentChangedEvent;
 import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.event.ScenarioResolvedEvent;
+import mekhq.campaign.event.UnitChangedEvent;
 import mekhq.campaign.event.UnitEvent;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Mission;
@@ -144,10 +145,6 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
             MassRepairSalvageDialog dlg = new MassRepairSalvageDialog(getFrame(), true, getCampaignGui(), null,
                     MassRepairSalvageDialog.MODE.UNITS);
             dlg.setVisible(true);
-
-            refreshServicedUnitList();
-            getCampaignGui().refreshUnitList();
-            getCampaignGui().refreshOverview();
         });
 
         JButton btnMRMSInstantAll = new JButton();
@@ -157,10 +154,6 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         btnMRMSInstantAll.setName("btnMRMSInstantAll"); // NOI18N
         btnMRMSInstantAll.addActionListener(ev -> {
             MassRepairSalvageDialog.massRepairSalvageAllUnits(getCampaignGui());
-
-            refreshServicedUnitList();
-            getCampaignGui().refreshUnitList();
-            getCampaignGui().refreshOverview();
         });
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -661,6 +654,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
             if (null != u && !getCampaign().getServiceableUnits().contains(u)) {
                 selectedRow = -1;
             }
+            MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
         } else if (acquireSelected()) {
             selectedRow = acquisitionTable.getSelectedRow();
             IAcquisitionWork acquisition = getSelectedAcquisition();
@@ -670,8 +664,6 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
             getCampaign().getShoppingList().addShoppingItem(acquisition, 1, getCampaign());
         }
 
-        refreshServicedUnitList();
-        getCampaignGui().refreshUnitList();
         getCampaignGui().refreshPersonnelList();
         refreshTaskList();
         refreshAcquireList();
@@ -682,9 +674,6 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         getCampaignGui().refreshPartsList();
         getCampaignGui().refreshReport();
         getCampaignGui().refreshFunds();
-        getCampaignGui().refreshFinancialTransactions();
-        getCampaignGui().refreshOverview();
-        filterTasks();
 
         // get the selected row back for tasks
         if (selectedRow != -1) {
@@ -761,8 +750,6 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
             }
         }
 
-        refreshServicedUnitList();
-        getCampaignGui().refreshUnitList();
         getCampaignGui().refreshPersonnelList();
         refreshTaskList();
         refreshAcquireList();
@@ -774,7 +761,6 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         getCampaignGui().refreshReport();
         getCampaignGui().refreshFunds();
         getCampaignGui().refreshFinancialTransactions();
-        filterTasks();
 
         if (selectedRow != -1) {
             if (acquireSelected()) {

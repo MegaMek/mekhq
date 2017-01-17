@@ -46,6 +46,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.CampaignOptions.MassRepairOption;
 import mekhq.campaign.event.OptionsChangedEvent;
+import mekhq.campaign.event.UnitChangedEvent;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.MekLocation;
 import mekhq.campaign.parts.MissingMekLocation;
@@ -1014,6 +1015,7 @@ public class MassRepairSalvageDialog extends JDialog {
 				repairsCompleted += performUnitMassRepairOrSalvage(campaignGUI, unit, unit.isSalvage(), activeMROs,
 						useExtraTimeBox.isSelected(), useRushJobBox.isSelected(), allowCarryoverBox.isSelected(),
 						scrapImpossibleBox.isSelected());
+				MekHQ.triggerEvent(new UnitChangedEvent(unit));
 			}
 
 			if (repairsCompleted == 1) {
@@ -1158,6 +1160,7 @@ public class MassRepairSalvageDialog extends JDialog {
 			repairsCompleted += performUnitMassRepairOrSalvage(campaignGUI, unit, unit.isSalvage(), activeMROs,
 					options.massRepairUseExtraTime(), options.massRepairUseRushJob(),
 					options.massRepairAllowCarryover(), options.massRepairScrapImpossible());
+			MekHQ.triggerEvent(new UnitChangedEvent(unit));
 		}
 
 		if (repairsCompleted == 1) {

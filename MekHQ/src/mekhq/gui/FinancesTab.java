@@ -38,6 +38,7 @@ import javax.swing.table.TableColumn;
 
 import megamek.common.event.Subscribe;
 import mekhq.MekHQ;
+import mekhq.campaign.event.AcquisitionEvent;
 import mekhq.campaign.event.AssignmentChangedEvent;
 import mekhq.campaign.event.GMModeEvent;
 import mekhq.campaign.event.MissionChangedEvent;
@@ -284,9 +285,14 @@ public final class FinancesTab extends CampaignGuiTab {
     }
 
     @Subscribe
-    public void missionChangedEvent(MissionChangedEvent ev) {
+    public void missionChanged(MissionChangedEvent ev) {
         if (ev.getMission() instanceof Contract) {
             financialTransactionsScheduler.schedule();
         }
+    }
+    
+    @Subscribe
+    public void acquisition(AcquisitionEvent ev) {
+        financialTransactionsScheduler.schedule();
     }
 }

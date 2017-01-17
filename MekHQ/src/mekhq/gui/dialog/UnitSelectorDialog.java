@@ -442,11 +442,7 @@ public class UnitSelectorDialog extends JDialog {
 	            return;
 	        }*/
 	        campaign.getShoppingList().addShoppingItem(selectedUnit, 1, campaign);
-	        hqView.refreshUnitList();
-	        hqView.refreshServicedUnitList();
-	        hqView.refreshFinancialTransactions();
 	        hqView.refreshReport();
-	        hqView.refreshOverview();
 	    }
 	    // Necessary if the user wants to buy the same unit twice without reselecting it
 	    UnitChanged(null);
@@ -455,10 +451,7 @@ public class UnitSelectorDialog extends JDialog {
 	private void addUnitGM() {
 	    if(null != selectedUnit && null != selectedUnit.getEntity()) {
 	        campaign.addUnit(selectedUnit.getEntity(), false, 0);
-	        hqView.refreshUnitList();
-            hqView.refreshServicedUnitList();
             hqView.refreshReport();
-            hqView.refreshOverview();
 	    }
 	    // Necessary if the GM wants to add the same unit twice without reselecting it
 	    UnitChanged(null);

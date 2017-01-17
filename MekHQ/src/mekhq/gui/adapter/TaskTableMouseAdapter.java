@@ -32,6 +32,8 @@ import javax.swing.JTable;
 import javax.swing.event.MouseInputAdapter;
 
 import megamek.common.TargetRoll;
+import mekhq.MekHQ;
+import mekhq.campaign.event.UnitChangedEvent;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.WorkTime;
@@ -70,15 +72,8 @@ public class TaskTableMouseAdapter extends MouseInputAdapter implements ActionLi
             if (null != u && !u.isRepairable() && u.getSalvageableParts().size() == 0) {
                 gui.getCampaign().removeUnit(u.getId());
             }
-            gui.refreshServicedUnitList();
-            gui.refreshUnitList();
-            gui.refreshTaskList();
-            gui.refreshUnitView();
-            gui.refreshPartsList();
-            gui.refreshAcquireList();
+            MekHQ.triggerEvent(new UnitChangedEvent(u));
             gui.refreshReport();
-            gui.refreshOverview();
-            gui.filterTasks();
         } else if (command.contains("SWAP_AMMO")) {
             /*
              * WorkItem task =

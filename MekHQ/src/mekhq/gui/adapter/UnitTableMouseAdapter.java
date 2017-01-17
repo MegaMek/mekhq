@@ -34,7 +34,7 @@ import megamek.common.loaders.BLKFile;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.event.UnitChangedEvent;
-import mekhq.campaign.event.UnitRepairStatusChangedEvent;
+import mekhq.campaign.event.RepairStatusChangedEvent;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.MissingPart;
@@ -212,23 +212,22 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                     int selected = Integer.parseInt(sel);
                     if ((selected > -1) && (selected < Unit.SITE_N)) {
                         unit.setSite(selected);
-                        MekHQ.triggerEvent(new UnitRepairStatusChangedEvent(unit));
+                        MekHQ.triggerEvent(new RepairStatusChangedEvent(unit));
                     }
                 }
             }
-            gui.refreshUnitList();
         } else if (command.equalsIgnoreCase("SALVAGE")) {
             for (Unit unit : units) {
                 if (!unit.isDeployed()) {
                     unit.setSalvage(true);
-                    MekHQ.triggerEvent(new UnitRepairStatusChangedEvent(unit));
+                    MekHQ.triggerEvent(new RepairStatusChangedEvent(unit));
                 }
             }
         } else if (command.equalsIgnoreCase("REPAIR")) {
             for (Unit unit : units) {
                 if (!unit.isDeployed() && unit.isRepairable()) {
                     unit.setSalvage(false);
-                    MekHQ.triggerEvent(new UnitRepairStatusChangedEvent(unit));
+                    MekHQ.triggerEvent(new RepairStatusChangedEvent(unit));
                 }
             }
         } else if (command.equalsIgnoreCase("TAG_CUSTOM")) {
@@ -353,22 +352,10 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
             if (selectedUnit.isRefitting()) {
                 selectedUnit.getRefit().cancel();
             }
-            gui.refreshServicedUnitList();
-            gui.refreshUnitList();
-            gui.refreshForceView();
-            gui.refreshOrganization();
-            gui.refreshPartsList();
-            gui.refreshOverview();
         } else if (command.contains("REFIT_GM_COMPLETE")) {
             if (selectedUnit.isRefitting()) {
                 gui.getCampaign().addReport(selectedUnit.getRefit().succeed());
             }
-            gui.refreshServicedUnitList();
-            gui.refreshUnitList();
-            gui.refreshForceView();
-            gui.refreshOrganization();
-            gui.refreshPartsList();
-            gui.refreshOverview();
         } else if (command.contains("REFURBISH")) {
             Refit r = new Refit(selectedUnit, selectedUnit.getEntity(),false, true);
             gui.refitUnit(r, false);
@@ -419,19 +406,14 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                         Transaction.C_EQUIP,
                         "refund for cancelled equipmemt sale",
                         gui.getCampaign().getDate());
-
             }
             gui.refreshFinancialTransactions();
-            gui.refreshUnitList();
             gui.refreshReport();
-            gui.refreshOverview();
         } else if (command.equalsIgnoreCase("ARRIVE")) {
             if (null != selectedUnit) {
                 selectedUnit.setDaysToArrival(0);
             }
-            gui.refreshUnitList();
             gui.refreshReport();
-            gui.refreshOverview();
         } else if (command.equalsIgnoreCase("MOTHBALL")) {
             UUID id = null;
             if (!selectedUnit.isSelfCrewed()) {
@@ -442,11 +424,9 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
             }
             if (null != selectedUnit) {
                 selectedUnit.startMothballing(id);
+                MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
             }
-            gui.refreshUnitList();
-            gui.refreshServicedUnitList();
             gui.refreshReport();
-            gui.refreshOverview();
         } else if (command.equalsIgnoreCase("ACTIVATE")) {
             UUID id = null;
             if (!selectedUnit.isSelfCrewed()) {
@@ -457,19 +437,15 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
             }
             if (null != selectedUnit) {
                 selectedUnit.startMothballing(id);
+                MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
             }
-            gui.refreshUnitList();
-            gui.refreshServicedUnitList();
             gui.refreshReport();
-            gui.refreshOverview();
         } else if (command.equalsIgnoreCase("CANCEL_MOTHBALL")) {
             if (null != selectedUnit) {
                 selectedUnit.setMothballTime(0);
+                MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
             }
-            gui.refreshUnitList();
-            gui.refreshServicedUnitList();
             gui.refreshReport();
-            gui.refreshOverview();
         } else if (command.equalsIgnoreCase("BOMBS")) {
             if (null != selectedUnit
                     && selectedUnit.getEntity() instanceof Aero) {
@@ -477,14 +453,14 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                         (Aero) selectedUnit.getEntity(), gui.getCampaign(),
                         gui.getFrame());
                 dialog.setVisible(true);
-                gui.refreshUnitList();
+                MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
             }
         } else if (command.equalsIgnoreCase("QUIRKS")) {
             if (null != selectedUnit) {
                 QuirksDialog dialog = new QuirksDialog(
                         selectedUnit.getEntity(), gui.getFrame());
                 dialog.setVisible(true);
-                gui.refreshUnitList();
+                MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
             }
         } else if (command.equalsIgnoreCase("EDIT_DAMAGE")) {
             if (null != selectedUnit) {
@@ -492,12 +468,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                 UnitEditorDialog med = new UnitEditorDialog(gui.getFrame(), entity);
                 med.setVisible(true);
                 selectedUnit.runDiagnostic(false);
-                gui.refreshServicedUnitList();
-                gui.refreshUnitList();
-                gui.refreshTaskList();
-                gui.refreshUnitView();
-                gui.refreshAcquireList();
-                gui.refreshOrganization();
+                MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
             }
         } else if (command.equalsIgnoreCase("FLUFF_NAME")) {
             if (selectedUnit != null) {
@@ -507,11 +478,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                         selectedUnit.getFluffName() == null ? ""
                                 : selectedUnit.getFluffName());
                 selectedUnit.setFluffName(fluffName);
-                gui.refreshServicedUnitList();
-                gui.refreshUnitList();
-                gui.refreshTaskList();
-                gui.refreshUnitView();
-                gui.refreshOrganization();
+                MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
             }
         } else if(command.equalsIgnoreCase("RESTORE_UNIT")) {
             for (Unit unit : units) {
@@ -567,12 +534,8 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                     unit.initializeParts(true);
                     partsToFix = new HashSet<>(unit.getParts());
                 }
+                MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
             }
-            gui.refreshServicedUnitList();
-            gui.refreshUnitList();
-            gui.refreshTaskList();
-            gui.refreshUnitView();
-            gui.refreshOrganization();
         }
     }
 

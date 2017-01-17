@@ -100,6 +100,7 @@ import mekhq.Utilities;
 import mekhq.Version;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.event.AssignmentChangedEvent;
+import mekhq.campaign.event.UnitArrivedEvent;
 import mekhq.campaign.parts.AeroHeatSink;
 import mekhq.campaign.parts.AeroLifeSupport;
 import mekhq.campaign.parts.AeroSensor;
@@ -3343,7 +3344,10 @@ public class Unit implements MekHqXmlSerializable {
     public boolean checkArrival() {
         if(daysToArrival > 0) {
             daysToArrival--;
-            return (daysToArrival == 0);
+            if (daysToArrival == 0) {
+                MekHQ.triggerEvent(new UnitArrivedEvent(this));
+                return true;
+            }
         }
         return false;
     }

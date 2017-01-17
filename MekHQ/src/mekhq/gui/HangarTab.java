@@ -54,11 +54,14 @@ import megamek.common.UnitType;
 import megamek.common.event.Subscribe;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
+import mekhq.campaign.event.AcquisitionEvent;
 import mekhq.campaign.event.AssignmentChangedEvent;
 import mekhq.campaign.event.DeploymentChangedEvent;
+import mekhq.campaign.event.ProcurementEvent;
 import mekhq.campaign.event.ScenarioResolvedEvent;
 import mekhq.campaign.event.UnitEvent;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.unit.UnitOrder;
 import mekhq.gui.adapter.ProcurementTableMouseAdapter;
 import mekhq.gui.adapter.UnitTableMouseAdapter;
 import mekhq.gui.model.ProcurementTableModel;
@@ -527,12 +530,16 @@ public final class HangarTab extends CampaignGuiTab {
                 break;
             }
         }
-        acquireUnitsModel.setData(getCampaign().getShoppingList().getUnitList());
         getCampaignGui().refreshLab();
         getCampaignGui().refreshRating();
     }
+    
+    private void refreshAcquisitionList() {
+        acquireUnitsModel.setData(getCampaign().getShoppingList().getUnitList());
+    }
 
     private ActionScheduler unitListScheduler = new ActionScheduler(this::refreshUnitList);
+    private ActionScheduler acquisitionListScheduler = new ActionScheduler(this::refreshAcquisitionList);
 
     @Subscribe
     public void deploymentChanged(DeploymentChangedEvent ev) {
@@ -552,5 +559,19 @@ public final class HangarTab extends CampaignGuiTab {
     @Subscribe
     public void unitHandler(UnitEvent ev) {
         unitListScheduler.schedule();
+    }
+    
+    @Subscribe
+    public void acquisition(AcquisitionEvent ev) {
+        if (ev.getAcquisition() instanceof UnitOrder) {
+            unitListScheduler.schedule();
+        }
+    }
+    
+    @Subscribe
+    public void procurement(ProcurementEvent ev) {
+        if (ev.getAcquisition() instanceof UnitOrder) {
+            acquisitionListScheduler.schedule();
+        }
     }
 }

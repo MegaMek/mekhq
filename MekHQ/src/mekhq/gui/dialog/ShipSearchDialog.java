@@ -274,10 +274,8 @@ public class ShipSearchDialog extends JDialog {
 	private void purchase() {
 		gui.getCampaign().purchaseShipSearchResult();
 		gui.refreshReport();
-		gui.refreshAcquireList();
 		gui.refreshFinancialTransactions();
 		gui.refreshFunds();
-		gui.refreshUnitList();
 		setVisible(false);
 	}
 }

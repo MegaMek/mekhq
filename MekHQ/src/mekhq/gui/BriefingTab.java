@@ -809,12 +809,6 @@ public final class BriefingTab extends CampaignGuiTab {
             }
         }
 
-        getCampaignGui().refreshServicedUnitList();
-        getCampaignGui().refreshUnitList();
-        getCampaignGui().refreshPatientList();
-        getCampaignGui().refreshPersonnelList();
-        getCampaignGui().refreshOverview();
-
         if (undeployed.length() > 0) {
             JOptionPane.showMessageDialog(getFrame(),
                     "The following units could not be deployed:" + undeployed.toString(), "Could not deploy some units",
