@@ -19,36 +19,15 @@
 
 package mekhq.campaign.event;
 
-import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.Scenario;
-import mekhq.campaign.unit.Unit;
 
 /**
- * Triggered when a force or unit is deployed to a scenario or undeployed from it.
+ * Triggered when a scenario is removed (deleted) from a mission or contract.
  *
  */
-public class DeploymentChangedEvent extends ScenarioEvent {
+public class ScenarioRemovedEvent extends ScenarioEvent {
 
-    final private Unit unit;
-    final private Force force;
-    
-    public DeploymentChangedEvent(Unit unit, Scenario scenario) {
+    public ScenarioRemovedEvent(Scenario scenario) {
         super(scenario);
-        this.unit = unit;
-        this.force = null;
-    }
-    
-    public DeploymentChangedEvent(Force force, Scenario scenario) {
-        super(scenario);
-        this.force = force;
-        this.unit = null;
-    }
-    
-    public Unit getUnit() {
-        return unit;
-    }
-    
-    public Force getForce() {
-        return force;
     }
 }

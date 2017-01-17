@@ -2840,7 +2840,7 @@ public class Campaign implements Serializable {
             mission.removeScenario(scenario.getId());
         }
         scenarioIds.remove(new Integer(id));
-        MekHQ.triggerEvent(new ScenarioChangedEvent(scenario, true));
+        MekHQ.triggerEvent(new ScenarioChangedEvent(scenario));
     }
 
     public void removeMission(int id) {

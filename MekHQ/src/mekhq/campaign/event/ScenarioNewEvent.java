@@ -19,24 +19,15 @@
 
 package mekhq.campaign.event;
 
-import java.util.Objects;
-
-import megamek.common.event.MMEvent;
 import mekhq.campaign.mission.Scenario;
 
 /**
  * Triggered when a scenario is added to a mission or contract.
  *
  */
-public class ScenarioNewEvent extends MMEvent {
+public class ScenarioNewEvent extends ScenarioEvent {
 
-    private final Scenario scenario;
-    
     public ScenarioNewEvent(Scenario scenario) {
-        this.scenario = Objects.requireNonNull(scenario);
-    }
-    
-    public Scenario getScenario() {
-        return scenario;
+        super(scenario);
     }
 }

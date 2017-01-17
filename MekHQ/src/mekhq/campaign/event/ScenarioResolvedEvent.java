@@ -19,24 +19,15 @@
 
 package mekhq.campaign.event;
 
-import java.util.Objects;
-
-import megamek.common.event.MMEvent;
 import mekhq.campaign.mission.Scenario;
 
 /**
  * Triggered when a scenario is resolved.
  *
  */
-public class ScenarioResolvedEvent extends MMEvent {
+public class ScenarioResolvedEvent extends ScenarioEvent {
 
-    private final Scenario scenario;
-    
     public ScenarioResolvedEvent(Scenario scenario) {
-        this.scenario = Objects.requireNonNull(scenario);
-    }
-    
-    public Scenario getScenario() {
-        return scenario;
+        super(scenario);
     }
 }

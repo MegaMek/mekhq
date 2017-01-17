@@ -19,36 +19,25 @@
 
 package mekhq.campaign.event;
 
-import mekhq.campaign.force.Force;
+import java.util.Objects;
+
+import megamek.common.event.MMEvent;
 import mekhq.campaign.mission.Scenario;
-import mekhq.campaign.unit.Unit;
 
 /**
- * Triggered when a force or unit is deployed to a scenario or undeployed from it.
+ * Abstract base class for all events involving a scenario.
  *
  */
-public class DeploymentChangedEvent extends ScenarioEvent {
+public abstract class ScenarioEvent extends MMEvent {
+    
+    private final Scenario scenario;
+    
+    public ScenarioEvent(Scenario scenario) {
+        this.scenario = Objects.requireNonNull(scenario);
+    }
+    
+    public Scenario getScenario() {
+        return scenario;
+    }
 
-    final private Unit unit;
-    final private Force force;
-    
-    public DeploymentChangedEvent(Unit unit, Scenario scenario) {
-        super(scenario);
-        this.unit = unit;
-        this.force = null;
-    }
-    
-    public DeploymentChangedEvent(Force force, Scenario scenario) {
-        super(scenario);
-        this.force = force;
-        this.unit = null;
-    }
-    
-    public Unit getUnit() {
-        return unit;
-    }
-    
-    public Force getForce() {
-        return force;
-    }
 }
