@@ -19,25 +19,16 @@
 
 package mekhq.campaign.event;
 
-import java.util.List;
-
-import megamek.common.event.MMEvent;
 import mekhq.campaign.unit.Unit;
 
 /**
- * Triggered when units are added to or removed from a network, or a C3 master is toggled
- * between independent and company command.
+ * Triggered when a unit is removed from a campaign by any means.
+ *
  */
+public class UnitRemovedEvent extends UnitEvent {
 
-public class NetworkChangedEvent extends MMEvent {
-    
-    private final List<Unit> units;
-    
-    public NetworkChangedEvent(List<Unit> units) {
-        this.units = units;
+    public UnitRemovedEvent(Unit unit) {
+        super(unit);
     }
-    
-    public List<Unit> getUnits() {
-        return units;
-    }
+
 }

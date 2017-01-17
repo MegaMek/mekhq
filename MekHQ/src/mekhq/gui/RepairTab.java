@@ -54,6 +54,9 @@ import mekhq.MekHQ;
 import mekhq.campaign.event.AssignmentChangedEvent;
 import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.event.ScenarioResolvedEvent;
+import mekhq.campaign.event.UnitChangedEvent;
+import mekhq.campaign.event.UnitRemovedEvent;
+import mekhq.campaign.event.UnitRepairStatusChangedEvent;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.parts.MekLocation;
@@ -915,6 +918,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
             choiceLocation.removeAllItems();
             choiceLocation.setEnabled(false);
         }
+        filterTasks();
     }
 
     public void refreshTechsList() {
@@ -941,7 +945,6 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
     }
     
     private ActionScheduler servicedUnitListScheduler = new ActionScheduler(this::refreshServicedUnitList);
-    private ActionScheduler techsListScheduler = new ActionScheduler(this::refreshTechsList);
 
     @Subscribe
     public void deploymentChanged(DeploymentChangedEvent ev) {
@@ -954,7 +957,22 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
     }
 
     @Subscribe
+    public void unitRemoved(UnitRemovedEvent ev) {
+        servicedUnitListScheduler.schedule();
+    }
+
+    @Subscribe
+    public void unitChanged(UnitChangedEvent ev) {
+        servicedUnitListScheduler.schedule();
+    }
+
+    @Subscribe
+    public void unitRepairStatusChanged(UnitRepairStatusChangedEvent ev) {
+        servicedUnitListScheduler.schedule();
+    }
+
+    @Subscribe
     public void assigmentChanged(AssignmentChangedEvent ev) {
-        techsListScheduler.schedule();
+        servicedUnitListScheduler.schedule();
     }
 }

@@ -2871,6 +2871,7 @@ public class Unit implements MekHqXmlSerializable {
         p.setUnitId(getId());
         resetPilotAndEntity();
         p.addLogEntry(campaign.getDate(), "Assigned to " + getName());
+        MekHQ.triggerEvent(new AssignmentChangedEvent(p, this));
     }
 
     public void addDriver(Person p, boolean useTransfers) {
@@ -2883,6 +2884,7 @@ public class Unit implements MekHqXmlSerializable {
         } else {
             p.addLogEntry(campaign.getDate(), "Assigned to " + getName());
         }
+        MekHQ.triggerEvent(new AssignmentChangedEvent(p, this));
     }
 
     public void addGunner(Person p) {
@@ -2891,6 +2893,7 @@ public class Unit implements MekHqXmlSerializable {
         p.setUnitId(getId());
         resetPilotAndEntity();
         p.addLogEntry(campaign.getDate(), "Assigned to " + getName());
+        MekHQ.triggerEvent(new AssignmentChangedEvent(p, this));
     }
 
     public void addGunner(Person p, boolean useTransfers) {
@@ -2903,6 +2906,7 @@ public class Unit implements MekHqXmlSerializable {
         } else {
             p.addLogEntry(campaign.getDate(), "Assigned to " + getName());
         }
+        MekHQ.triggerEvent(new AssignmentChangedEvent(p, this));
     }
 
     public void addVesselCrew(Person p) {
@@ -2911,6 +2915,7 @@ public class Unit implements MekHqXmlSerializable {
         p.setUnitId(getId());
         resetPilotAndEntity();
         p.addLogEntry(campaign.getDate(), "Assigned to " + getName());
+        MekHQ.triggerEvent(new AssignmentChangedEvent(p, this));
     }
 
     public void addVesselCrew(Person p, boolean useTransfers) {
@@ -2923,6 +2928,7 @@ public class Unit implements MekHqXmlSerializable {
         } else {
             p.addLogEntry(campaign.getDate(), "Assigned to " + getName());
         }
+        MekHQ.triggerEvent(new AssignmentChangedEvent(p, this));
     }
 
     public void setNavigator(Person p) {
@@ -2931,6 +2937,7 @@ public class Unit implements MekHqXmlSerializable {
         p.setUnitId(getId());
         resetPilotAndEntity();
         p.addLogEntry(campaign.getDate(), "Assigned to " + getName());
+        MekHQ.triggerEvent(new AssignmentChangedEvent(p, this));
     }
 
     public void setNavigator(Person p, boolean useTransfers) {
@@ -2943,6 +2950,7 @@ public class Unit implements MekHqXmlSerializable {
         } else {
             p.addLogEntry(campaign.getDate(), "Assigned to " + getName());
         }
+        MekHQ.triggerEvent(new AssignmentChangedEvent(p, this));
     }
 
     public void setTech(Person p) {
@@ -2950,6 +2958,7 @@ public class Unit implements MekHqXmlSerializable {
         tech = p.getId();
         p.addTechUnitID(getId());
         p.addLogEntry(campaign.getDate(), "Assigned to " + getName());
+        MekHQ.triggerEvent(new AssignmentChangedEvent(p, this));
     }
 
     public void setTech(UUID pid) {
@@ -2975,6 +2984,7 @@ public class Unit implements MekHqXmlSerializable {
         p.setUnitId(getId());
         resetPilotAndEntity();
         p.addLogEntry(campaign.getDate(), "Assigned to " + getName());
+        MekHQ.triggerEvent(new AssignmentChangedEvent(p, this));
     }
 
     public void addPilotOrSoldier(Person p, boolean useTransfers) {
@@ -2988,6 +2998,7 @@ public class Unit implements MekHqXmlSerializable {
         } else {
             p.addLogEntry(campaign.getDate(), "Assigned to " + getName());
         }
+        MekHQ.triggerEvent(new AssignmentChangedEvent(p, this));
     }
 
     public void remove(Person p, boolean log) {

@@ -19,23 +19,23 @@
 
 package mekhq.campaign.event;
 
-import java.util.List;
+import java.util.Objects;
 
 import megamek.common.event.MMEvent;
 import mekhq.campaign.unit.Unit;
 
 /**
- * Base class for events that can involve multiple units
+ * Abstract base class for events involving a unit.
  */
-public class UnitListEvent extends MMEvent {
+abstract public class UnitEvent extends MMEvent {
 
-    private final List<Unit> units;
+    private final Unit unit;
     
-    public UnitListEvent(List<Unit> units) {
-        this.units = units;
+    public UnitEvent(Unit unit) {
+        this.unit = Objects.requireNonNull(unit);
     }
     
-    public List<Unit> getUnits() {
-        return units;
+    public Unit getUnit() {
+        return unit;
     }
 }

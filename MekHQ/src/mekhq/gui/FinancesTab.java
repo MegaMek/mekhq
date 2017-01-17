@@ -38,6 +38,7 @@ import javax.swing.table.TableColumn;
 
 import megamek.common.event.Subscribe;
 import mekhq.MekHQ;
+import mekhq.campaign.event.AssignmentChangedEvent;
 import mekhq.campaign.event.GMModeEvent;
 import mekhq.campaign.event.MissionChangedEvent;
 import mekhq.campaign.event.MissionNewEvent;
@@ -263,6 +264,11 @@ public final class FinancesTab extends CampaignGuiTab {
     public void gmMode(GMModeEvent ev) {
         btnAddFunds.setEnabled(ev.isGMMode());
         btnManageAssets.setEnabled(ev.isGMMode());
+    }
+
+    @Subscribe
+    public void assignmentChanged(AssignmentChangedEvent ev) {
+        financialTransactionsScheduler.schedule();
     }
 
     @Subscribe

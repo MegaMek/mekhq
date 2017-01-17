@@ -119,6 +119,7 @@ import mekhq.campaign.event.NetworkChangedEvent;
 import mekhq.campaign.event.NewDayEvent;
 import mekhq.campaign.event.OrganizationChangedEvent;
 import mekhq.campaign.event.ScenarioChangedEvent;
+import mekhq.campaign.event.UnitRemovedEvent;
 import mekhq.campaign.finances.Asset;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Loan;
@@ -2741,8 +2742,9 @@ public class Campaign implements Serializable {
         unitIds.remove(unit.getId());
         checkDuplicateNamesDuringDelete(unit.getEntity());
         addReport(unit.getName() + " has been removed from the unit roster.");
-
+        MekHQ.triggerEvent(new UnitRemovedEvent(unit));
     }
+    
     public void removePerson(UUID id) {
         removePerson(id, true);
     }
@@ -3181,6 +3183,7 @@ public class Campaign implements Serializable {
         finances.credit(sellValue, Transaction.C_UNIT_SALE,
                         "Sale of " + unit.getName(), calendar.getTime());
         removeUnit(id);
+        MekHQ.triggerEvent(new UnitRemovedEvent(unit));
     }
 
     public void sellPart(Part part, int quantity) {

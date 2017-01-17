@@ -47,6 +47,9 @@ import mekhq.MekHQ;
 import mekhq.campaign.event.AssignmentChangedEvent;
 import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.event.ScenarioResolvedEvent;
+import mekhq.campaign.event.UnitChangedEvent;
+import mekhq.campaign.event.UnitRemovedEvent;
+import mekhq.campaign.event.UnitRepairStatusChangedEvent;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PartInUse;
 import mekhq.campaign.rating.IUnitRating;
@@ -429,6 +432,21 @@ public final class OverviewTab extends CampaignGuiTab {
 
     @Subscribe
     public void scenarioResolved(ScenarioResolvedEvent ev) {
+        overviewScheduler.schedule();
+    }
+
+    @Subscribe
+    public void unitRemoved(UnitRemovedEvent ev) {
+        overviewScheduler.schedule();
+    }
+
+    @Subscribe
+    public void unitChanged(UnitChangedEvent ev) {
+        overviewScheduler.schedule();
+    }
+
+    @Subscribe
+    public void unitRepairStatusChanged(UnitRepairStatusChangedEvent ev) {
         overviewScheduler.schedule();
     }
 }

@@ -53,7 +53,11 @@ import megamek.common.AmmoType;
 import megamek.common.MiscType;
 import megamek.common.TargetRoll;
 import megamek.common.WeaponType;
+import megamek.common.event.Subscribe;
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
+import mekhq.campaign.event.AssignmentChangedEvent;
+import mekhq.campaign.event.UnitRemovedEvent;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.BaArmor;
 import mekhq.campaign.parts.EnginePart;
@@ -136,6 +140,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
 
     WarehouseTab(CampaignGUI gui, String name) {
         super(gui, name);
+        MekHQ.registerHandler(this);
     }
 
     /*
@@ -763,5 +768,18 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
 
     public void refreshAstechPool(String astechString) {
         astechPoolLabel.setText(astechString);
+    }
+    
+    ActionScheduler partsScheduler = new ActionScheduler(this::refreshPartsList);
+    ActionScheduler techsScheduler = new ActionScheduler(this::refreshTechsList);
+
+    @Subscribe
+    public void unitRemoved(UnitRemovedEvent ev) {
+        partsScheduler.schedule();
+    }
+    
+    @Subscribe
+    public void assignmentChanged(AssignmentChangedEvent ev) {
+        techsScheduler.schedule();
     }
 }
