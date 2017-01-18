@@ -949,13 +949,13 @@ public final class BriefingTab extends CampaignGuiTab {
     private ActionScheduler lanceAssignmentScheduler = new ActionScheduler(this::refreshLanceAssignments);
 
     @Subscribe
-    public void optionsChanged(OptionsChangedEvent ev) {
+    public void handle(OptionsChangedEvent ev) {
         splitScenario.getBottomComponent().setVisible(getCampaignOptions().getUseAtB());
         splitScenario.resetToPreferredSizes();
     }
     
     @Subscribe
-    public void scenarioChanged(ScenarioChangedEvent ev) {
+    public void handle(ScenarioChangedEvent ev) {
         if (ev.getScenario() != null && ev.getScenario().getMissionId() == selectedMission) {
             scenarioTable.repaint();
             if (ev.getScenario().getId() == selectedScenario) {
@@ -965,7 +965,7 @@ public final class BriefingTab extends CampaignGuiTab {
     }
     
     @Subscribe
-    public void organizationChanged(OrganizationChangedEvent ev) {
+    public void handle(OrganizationChangedEvent ev) {
         scenarioDataScheduler.schedule();
         if (getCampaignOptions().getUseAtB()) {
             lanceAssignmentScheduler.schedule();
@@ -973,27 +973,27 @@ public final class BriefingTab extends CampaignGuiTab {
     }
     
     @Subscribe
-    public void scenarioNew(ScenarioNewEvent ev) {
+    public void handle(ScenarioNewEvent ev) {
         scenarioDataScheduler.schedule();
     }
     
     @Subscribe
-    public void scenarioRemoved(ScenarioRemovedEvent ev) {
+    public void handle(ScenarioRemovedEvent ev) {
         scenarioDataScheduler.schedule();
     }
     
     @Subscribe
-    public void missionNew(MissionNewEvent ev) {
+    public void handle(MissionNewEvent ev) {
         missionsScheduler.schedule();
     }
     
     @Subscribe
-    public void missionRemoved(MissionRemovedEvent ev) {
+    public void handle(MissionRemovedEvent ev) {
         missionsScheduler.schedule();
     }
     
     @Subscribe
-    public void missionChanged(MissionChangedEvent ev) {
+    public void handle(MissionChangedEvent ev) {
         if (ev.getMission().getId() == selectedMission) {
             changeMission();
         }

@@ -801,43 +801,43 @@ public final class PersonnelTab extends CampaignGuiTab {
     private ActionScheduler filterPersonnelScheduler = new ActionScheduler(this::filterPersonnel);
 
     @Subscribe
-    public void optionsChanged(OptionsChangedEvent ev) {
+    public void handle(OptionsChangedEvent ev) {
         changePersonnelView();
         personnelListScheduler.schedule();
     }
     
     @Subscribe
-    public void deploymentChanged(DeploymentChangedEvent ev) {
+    public void handle(DeploymentChangedEvent ev) {
         filterPersonnelScheduler.schedule();
     }
     
     @Subscribe
-    public void personChanged(PersonChangedEvent ev) {
+    public void handle(PersonChangedEvent ev) {
         filterPersonnelScheduler.schedule();
     }
     
     @Subscribe
-    public void personNew(PersonNewEvent ev) {
+    public void handle(PersonNewEvent ev) {
         personnelListScheduler.schedule();
     }
     
     @Subscribe
-    public void personRemoved(PersonRemovedEvent ev) {
+    public void handle(PersonRemovedEvent ev) {
         personnelListScheduler.schedule();
     }
     
     @Subscribe
-    public void personLog(PersonLogEvent ev) {
+    public void handle(PersonLogEvent ev) {
         refreshPersonnelView();
     }
 
     @Subscribe
-    public void scenarioResolved(ScenarioResolvedEvent ev) {
+    public void handle(ScenarioResolvedEvent ev) {
         personnelListScheduler.schedule();
     }
 
     @Subscribe
-    public void unitRemoved(UnitRemovedEvent ev) {
+    public void handle(UnitRemovedEvent ev) {
         filterPersonnelScheduler.schedule();
     }
 }

@@ -198,13 +198,13 @@ public final class MapTab extends CampaignGuiTab {
     }
 
     @Subscribe
-    public void newDay(NewDayEvent ev) {
+    public void handle(NewDayEvent ev) {
         panMap.repaint();
         suggestPlanet.setSuggestData(getCampaign().getPlanetNames());
     }
 
     @Subscribe
-    public void optionsChanged(OptionsChangedEvent ev) {
+    public void handle(OptionsChangedEvent ev) {
         panMap.repaint();
     }
 }

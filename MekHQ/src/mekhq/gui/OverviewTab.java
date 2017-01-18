@@ -419,22 +419,22 @@ public final class OverviewTab extends CampaignGuiTab {
     private ActionScheduler overviewScheduler = new ActionScheduler(this::refreshOverview);
     
     @Subscribe
-    public void deploymentChanged(DeploymentChangedEvent ev) {
+    public void handle(DeploymentChangedEvent ev) {
         overviewScheduler.schedule();
     }
     
     @Subscribe
-    public void scenarioResolved(ScenarioResolvedEvent ev) {
+    public void handle(ScenarioResolvedEvent ev) {
         overviewScheduler.schedule();
     }
 
     @Subscribe
-    public void unitHandler(UnitEvent ev) {
+    public void handle(UnitEvent ev) {
         overviewScheduler.schedule();
     }
     
     @Subscribe
-    public void personHandler(PersonEvent ev) {
+    public void handle(PersonEvent ev) {
         overviewScheduler.schedule();
     }
 }

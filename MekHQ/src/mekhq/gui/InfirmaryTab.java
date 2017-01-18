@@ -373,13 +373,13 @@ public final class InfirmaryTab extends CampaignGuiTab {
     private ActionScheduler patientListScheduler = new ActionScheduler(this::refreshPatientList);    
     
     @Subscribe
-    public void scenarioResolved(ScenarioResolvedEvent ev) {
+    public void handle(ScenarioResolvedEvent ev) {
         doctorListScheduler.schedule();
         patientListScheduler.schedule();
     }
     
     @Subscribe
-    public void personHandler(PersonEvent ev) {
+    public void handle(PersonEvent ev) {
         doctorListScheduler.schedule();
         patientListScheduler.schedule();
     }

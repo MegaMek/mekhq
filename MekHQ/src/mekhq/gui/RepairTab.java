@@ -52,9 +52,7 @@ import megamek.common.event.Subscribe;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.event.DeploymentChangedEvent;
-import mekhq.campaign.event.PersonChangedEvent;
-import mekhq.campaign.event.PersonNewEvent;
-import mekhq.campaign.event.PersonRemovedEvent;
+import mekhq.campaign.event.PersonEvent;
 import mekhq.campaign.event.ScenarioResolvedEvent;
 import mekhq.campaign.event.UnitChangedEvent;
 import mekhq.campaign.event.UnitEvent;
@@ -934,32 +932,22 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
     private ActionScheduler techsScheduler = new ActionScheduler(this::refreshTechsList);
 
     @Subscribe
-    public void deploymentChanged(DeploymentChangedEvent ev) {
+    public void handle(DeploymentChangedEvent ev) {
         servicedUnitListScheduler.schedule();
     }
     
     @Subscribe
-    public void scenarioResolved(ScenarioResolvedEvent ev) {
-        servicedUnitListScheduler.schedule();
-    }
-
-    @Subscribe
-    public void unitHandler(UnitEvent ev) {
+    public void handle(ScenarioResolvedEvent ev) {
         servicedUnitListScheduler.schedule();
     }
 
     @Subscribe
-    public void personChanged(PersonChangedEvent ev) {
-        filterTechs();
+    public void handle(UnitEvent ev) {
+        servicedUnitListScheduler.schedule();
     }
-    
+
     @Subscribe
-    public void personNew(PersonNewEvent ev) {
-        techsScheduler.schedule();
-    }
-    
-    @Subscribe
-    public void personRemoved(PersonRemovedEvent ev) {
+    public void handle(PersonEvent ev) {
         techsScheduler.schedule();
     }
 }

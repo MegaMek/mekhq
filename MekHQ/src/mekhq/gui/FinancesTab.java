@@ -263,42 +263,42 @@ public final class FinancesTab extends CampaignGuiTab {
     ActionScheduler financialTransactionsScheduler = new ActionScheduler(this::refreshFinancialTransactions);
 
     @Subscribe
-    public void gmMode(GMModeEvent ev) {
+    public void handle(GMModeEvent ev) {
         btnAddFunds.setEnabled(ev.isGMMode());
         btnManageAssets.setEnabled(ev.isGMMode());
     }
 
     @Subscribe
-    public void assignmentChanged(PersonAssignmentChangedEvent ev) {
+    public void handle(PersonAssignmentChangedEvent ev) {
         financialTransactionsScheduler.schedule();
     }
 
     @Subscribe
-    public void personNew(PersonNewEvent ev) {
+    public void handle(PersonNewEvent ev) {
         financialTransactionsScheduler.schedule();
     }
 
     @Subscribe
-    public void scenarioResolved(ScenarioResolvedEvent ev) {
+    public void handle(ScenarioResolvedEvent ev) {
         financialTransactionsScheduler.schedule();
     }
 
     @Subscribe
-    public void missionNew(MissionNewEvent ev) {
+    public void handle(MissionNewEvent ev) {
         if (ev.getMission() instanceof Contract) {
             financialTransactionsScheduler.schedule();
         }
     }
 
     @Subscribe
-    public void missionChanged(MissionChangedEvent ev) {
+    public void handle(MissionChangedEvent ev) {
         if (ev.getMission() instanceof Contract) {
             financialTransactionsScheduler.schedule();
         }
     }
     
     @Subscribe
-    public void acquisition(AcquisitionEvent ev) {
+    public void handle(AcquisitionEvent ev) {
         financialTransactionsScheduler.schedule();
     }
 }

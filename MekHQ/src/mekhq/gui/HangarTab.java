@@ -545,44 +545,44 @@ public final class HangarTab extends CampaignGuiTab {
     private ActionScheduler acquisitionListScheduler = new ActionScheduler(this::refreshAcquisitionList);
 
     @Subscribe
-    public void deploymentChanged(DeploymentChangedEvent ev) {
+    public void handle(DeploymentChangedEvent ev) {
         filterUnitScheduler.schedule();;
     }
     
     @Subscribe
-    public void personChanged(PersonChangedEvent ev) {
+    public void handle(PersonChangedEvent ev) {
         filterUnitScheduler.schedule();;
     }
     
     @Subscribe
-    public void scenarioResolved(ScenarioResolvedEvent ev) {
+    public void handle(ScenarioResolvedEvent ev) {
         unitListScheduler.schedule();
     }
 
     @Subscribe
-    public void unitChanged(UnitChangedEvent ev) {
+    public void handle(UnitChangedEvent ev) {
         filterUnitScheduler.schedule();;
     }
     
     @Subscribe
-    public void unitNew(UnitNewEvent ev) {
+    public void handle(UnitNewEvent ev) {
         unitListScheduler.schedule();
     }
     
     @Subscribe
-    public void unitRemoved(UnitRemovedEvent ev) {
+    public void handle(UnitRemovedEvent ev) {
         unitListScheduler.schedule();
     }
     
     @Subscribe
-    public void acquisition(AcquisitionEvent ev) {
+    public void handle(AcquisitionEvent ev) {
         if (ev.getAcquisition() instanceof UnitOrder) {
             unitListScheduler.schedule();
         }
     }
     
     @Subscribe
-    public void procurement(ProcurementEvent ev) {
+    public void handle(ProcurementEvent ev) {
         if (ev.getAcquisition() instanceof UnitOrder) {
             acquisitionListScheduler.schedule();
         }
