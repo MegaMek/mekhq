@@ -57,6 +57,8 @@ import megamek.common.event.Subscribe;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.event.PersonChangedEvent;
+import mekhq.campaign.event.PersonNewEvent;
+import mekhq.campaign.event.PersonRemovedEvent;
 import mekhq.campaign.event.UnitChangedEvent;
 import mekhq.campaign.event.UnitRemovedEvent;
 import mekhq.campaign.parts.Armor;
@@ -764,7 +766,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
     }
     
     //private ActionScheduler partsScheduler = new ActionScheduler(this::refreshPartsList);
-    //private ActionScheduler techsScheduler = new ActionScheduler(this::refreshTechsList);
+    private ActionScheduler techsScheduler = new ActionScheduler(this::refreshTechsList);
 
     @Subscribe
     public void unitRemoved(UnitRemovedEvent ev) {
@@ -779,5 +781,15 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
     @Subscribe
     public void personChanged(PersonChangedEvent ev) {
         filterTechs();
+    }
+    
+    @Subscribe
+    public void personNew(PersonNewEvent ev) {
+        techsScheduler.schedule();
+    }
+    
+    @Subscribe
+    public void personRemoved(PersonRemovedEvent ev) {
+        techsScheduler.schedule();
     }
 }

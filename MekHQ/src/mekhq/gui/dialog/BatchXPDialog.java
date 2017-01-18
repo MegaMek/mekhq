@@ -284,7 +284,6 @@ public final class BatchXPDialog extends JDialog {
                 p.improveSkill(skillName);
                 campaign.personUpdated(p);
                 p.setXp(p.getXp() - cost);
-                MekHQ.triggerEvent(new PersonChangedEvent(p));
                 
                 // The next part is bollocks and doesn't belong here, but as long as we hardcode AtB ...
                 if(campaign.getCampaignOptions().getUseAtB()) {
@@ -301,6 +300,7 @@ public final class BatchXPDialog extends JDialog {
                         }
                     }
                 }
+                MekHQ.triggerEvent(new PersonChangedEvent(p));
             }
             // Refresh the filter and continue if we still have anyone available
             updatePersonnelTable();

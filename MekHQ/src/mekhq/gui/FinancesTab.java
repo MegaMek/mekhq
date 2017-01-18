@@ -39,10 +39,11 @@ import javax.swing.table.TableColumn;
 import megamek.common.event.Subscribe;
 import mekhq.MekHQ;
 import mekhq.campaign.event.AcquisitionEvent;
-import mekhq.campaign.event.PersonAssignmentChangedEvent;
 import mekhq.campaign.event.GMModeEvent;
 import mekhq.campaign.event.MissionChangedEvent;
 import mekhq.campaign.event.MissionNewEvent;
+import mekhq.campaign.event.PersonAssignmentChangedEvent;
+import mekhq.campaign.event.PersonNewEvent;
 import mekhq.campaign.event.ScenarioResolvedEvent;
 import mekhq.campaign.mission.Contract;
 import mekhq.gui.adapter.FinanceTableMouseAdapter;
@@ -269,6 +270,11 @@ public final class FinancesTab extends CampaignGuiTab {
 
     @Subscribe
     public void assignmentChanged(PersonAssignmentChangedEvent ev) {
+        financialTransactionsScheduler.schedule();
+    }
+
+    @Subscribe
+    public void personNew(PersonNewEvent ev) {
         financialTransactionsScheduler.schedule();
     }
 

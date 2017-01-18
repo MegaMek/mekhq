@@ -295,7 +295,6 @@ public class CampaignGUI extends JPanel {
         batchXPDialog.setVisible(true);
         
         if(batchXPDialog.hasDataChanged()) {
-            refreshPersonnelList();
             refreshReport();
         }
     }
@@ -1985,13 +1984,6 @@ public class CampaignGUI extends JPanel {
         return getCampaign().getPartsStore().getByNameAndDetails(pnd);
     }
 
-    //TODO: trigger from event
-    public void refreshPersonnelView() {
-    	if (getTab(GuiTabType.PERSONNEL) != null) {
-    		((PersonnelTab)getTab(GuiTabType.PERSONNEL)).refreshPersonnelView();
-    	}
-    }
-
     //TODO: Trigger from event
     public void refreshPlanetView() {
     	if (getTab(GuiTabType.MAP) != null) {
@@ -2065,9 +2057,6 @@ public class CampaignGUI extends JPanel {
                 }
             }
         }
-
-        refreshPersonnelList();
-        refreshPatientList();
         refreshReport();
     }
 
@@ -2169,13 +2158,7 @@ public class CampaignGUI extends JPanel {
             MekHQ.logMessage("Finished load of personnel file");
         }
 
-        refreshPersonnelList();
-        refreshPatientList();
-        refreshTechsList();
-        refreshDoctorsList();
         refreshReport();
-        refreshFinancialTransactions();
-        refreshOverview();
     }
 
     //TODO: disable if not using personnel tab

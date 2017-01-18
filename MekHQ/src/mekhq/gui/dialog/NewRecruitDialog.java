@@ -209,17 +209,7 @@ public class NewRecruitDialog extends javax.swing.JDialog {
         	campaign.changeRank(person, campaign.getRanks().getRankNumericFromNameAndProfession(person.getProfession(), (String)choiceRanks.getSelectedItem()), false);
     	}
         refreshView();
-        refreshHqView();
-    }
-
-    private void refreshHqView() {
-        hqView.refreshPersonnelList();
-        hqView.refreshPatientList();
-        hqView.refreshTechsList();
-        hqView.refreshDoctorsList();
         hqView.refreshReport();
-        hqView.refreshFinancialTransactions();
-        hqView.refreshOverview();
     }
 
     private void randomName() {

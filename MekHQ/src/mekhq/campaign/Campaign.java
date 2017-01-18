@@ -121,6 +121,7 @@ import mekhq.campaign.event.NewDayEvent;
 import mekhq.campaign.event.OrganizationChangedEvent;
 import mekhq.campaign.event.PersonAssignmentChangedEvent;
 import mekhq.campaign.event.PersonChangedEvent;
+import mekhq.campaign.event.PersonNewEvent;
 import mekhq.campaign.event.PersonRemovedEvent;
 import mekhq.campaign.event.ProcurementEvent;
 import mekhq.campaign.event.ScenarioChangedEvent;
@@ -1101,12 +1102,14 @@ public class Campaign implements Serializable {
                 p.addLogEntry(getDate(), "Joined " + getName() + rankEntry);
             }
         }
+        MekHQ.triggerEvent(new PersonNewEvent(p));
         return true;
     }
 
     private void addPersonWithoutId(Person p) {
         personnel.add(p);
         personnelIds.put(p.getId(), p);
+        MekHQ.triggerEvent(new PersonNewEvent(p));
     }
 
     private void addAncestorsWithoutId(Ancestors a) {

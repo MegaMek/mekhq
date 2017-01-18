@@ -290,13 +290,7 @@ public class HireBulkPersonnelDialog extends JDialog {
                 number--;
             }
         }
-        hqView.refreshPersonnelList();
-        hqView.refreshPatientList();
-        hqView.refreshTechsList();
-        hqView.refreshDoctorsList();
         hqView.refreshReport();
-        hqView.refreshFinancialTransactions();
-        hqView.refreshOverview();
     }
    
     private void refreshRanksCombo() {
