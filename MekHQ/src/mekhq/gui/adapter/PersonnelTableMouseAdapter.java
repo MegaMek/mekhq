@@ -31,6 +31,8 @@ import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Kill;
 import mekhq.campaign.LogEntry;
+import mekhq.campaign.event.PersonChangedEvent;
+import mekhq.campaign.event.PersonLogEvent;
 import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Rank;
@@ -149,15 +151,6 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
 
     private String makeCommand(String ... parts) {
         return Utilities.combineString(Arrays.asList(parts), SEPARATOR);
-    }
-
-    private void refreshLists() {
-        gui.refreshServicedUnitList();
-        gui.refreshUnitList();
-        gui.refreshPatientList();
-        gui.refreshPersonnelList();
-        gui.refreshTechsList();
-        gui.refreshDoctorsList();
     }
 
     @Override
@@ -449,7 +442,9 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     }
                 }
                 selectedPerson.getSpouse().setSpouseID(null);
+                MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson.getSpouse()));
                 selectedPerson.setSpouseID(null);
+                MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
                 break;
             }
             case CMD_ADD_SPOUSE:
@@ -492,6 +487,8 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 spouse.addLogEntry(gui.getCampaign().getDate(), String.format(resourceMap.getString("marries.format"), selectedPerson.getFullName())); //$NON-NLS-1$
                 selectedPerson.setSpouseID(spouse.getId());
                 selectedPerson.addLogEntry(gui.getCampaign().getDate(), String.format(resourceMap.getString("marries.format"), spouse.getFullName())); //$NON-NLS-1$
+                MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
+                MekHQ.triggerEvent(new PersonChangedEvent(spouse));
                 break;
             }
             case CMD_IMPROVE:
@@ -502,6 +499,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 selectedPerson.improveSkill(type);
                 gui.getCampaign().personUpdated(selectedPerson);
                 selectedPerson.setXp(selectedPerson.getXp() - cost);
+                MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
                 gui.getCampaign().addReport(String.format(resourceMap.getString("improved.format"), selectedPerson.getHyperlinkedName(), type)); //$NON-NLS-1$
                 if (gui.getCampaign().getCampaignOptions().getUseAtB()
                 		&& gui.getCampaign().getCampaignOptions().useAbilities()) {
@@ -535,6 +533,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                         selected, true);
                 gui.getCampaign().personUpdated(selectedPerson);
                 selectedPerson.setXp(selectedPerson.getXp() - cost);
+                MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
                 // TODO: add personnelTab.getCampaign() report
                 break;
             }
@@ -546,6 +545,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                         "weapon_specialist", selected); //$NON-NLS-1$
                 gui.getCampaign().personUpdated(selectedPerson);
                 selectedPerson.setXp(selectedPerson.getXp() - cost);
+                MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
                 // TODO: add campaign report
                 break;
             }
@@ -557,6 +557,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                         "specialist", selected); //$NON-NLS-1$
                 gui.getCampaign().personUpdated(selectedPerson);
                 selectedPerson.setXp(selectedPerson.getXp() - cost);
+                MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
                 // TODO: add campaign report
                 break;
             }
@@ -568,6 +569,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                         "range_master", selected); //$NON-NLS-1$
                 gui.getCampaign().personUpdated(selectedPerson);
                 selectedPerson.setXp(selectedPerson.getXp() - cost);
+                MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
                 // TODO: add campaign report
                 break;
             }
@@ -713,6 +715,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                         gui.getFrame(), true, selectedPerson, gui.getCampaign());
                 npd.setVisible(true);
                 gui.getCampaign().personUpdated(selectedPerson);
+                MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
                 break;
             case CMD_HEAL:
                 for (Person person : people) {
@@ -721,6 +724,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                             .getNaturalHealingWaitingPeriod());
                 }
                 gui.getCampaign().personUpdated(selectedPerson);
+                MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
                 break;
             case CMD_EDIT_PORTRAIT:
                 ImageChoiceDialog pcd = new ImageChoiceDialog(gui.getFrame(),
@@ -732,6 +736,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     selectedPerson.setPortraitCategory(pcd.getCategory());
                     selectedPerson.setPortraitFileName(pcd.getFileName());
                     gui.getCampaign().personUpdated(selectedPerson);
+                    MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
                 }
                 break;
             case CMD_EDIT_BIOGRAPHY:
@@ -740,11 +745,13 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 tad.setVisible(true);
                 if (tad.wasChanged()) {
                     selectedPerson.setBiography(tad.getText());
+                    MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
                 }
                 break;
             case CMD_ADD_XP:
                 for (Person person : people) {
                     person.setXp(person.getXp() + 1);
+                    MekHQ.triggerEvent(new PersonChangedEvent(person));
                 }
                 break;
             case CMD_SET_XP:
@@ -758,6 +765,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 int i = pvcd.getValue();
                 for (Person person : people) {
                     person.setXp(i);
+                    MekHQ.triggerEvent(new PersonChangedEvent(person));
                 }
                 break;
             }
@@ -774,6 +782,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 for (Person person : people) {
                     person.setEdge(i);
                     gui.getCampaign().personUpdated(person);
+                    MekHQ.triggerEvent(new PersonChangedEvent(person));
                 }
                 break;
             }
@@ -806,10 +815,12 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             case CMD_EDIT_KILL_LOG:
                 EditKillLogDialog ekld = new EditKillLogDialog(gui.getFrame(), true, gui.getCampaign(), selectedPerson);
                 ekld.setVisible(true);
+                MekHQ.triggerEvent(new PersonLogEvent(selectedPerson));
                 break;
             case CMD_EDIT_PERSONNEL_LOG:
                 EditPersonnelLogDialog epld = new EditPersonnelLogDialog(gui.getFrame(), true, gui.getCampaign(), selectedPerson);
                 epld.setVisible(true);
+                MekHQ.triggerEvent(new PersonLogEvent(selectedPerson));
                 break;
             case CMD_EDIT_LOG_ENTRY:
                 EditLogEntryDialog eeld = new EditLogEntryDialog(gui.getFrame(), true, new LogEntry(gui.getCampaign().getDate(), "")); //$NON-NLS-1$
@@ -818,6 +829,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 if (null != entry) {
                     for (Person person : people) {
                         person.addLogEntry(entry.clone());
+                        MekHQ.triggerEvent(new PersonLogEvent(selectedPerson));
                     }
                 }
                 break;
@@ -830,10 +842,12 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                             p.setCommander(false);
                             gui.getCampaign().addReport(String.format(resourceMap.getString("removedCommander.format"), p.getHyperlinkedFullTitle())); //$NON-NLS-1$
                             gui.getCampaign().personUpdated(p);
+                            MekHQ.triggerEvent(new PersonChangedEvent(p));
                         }
                     }
                     gui.getCampaign().addReport(String.format(resourceMap.getString("setAsCommander.format"), selectedPerson.getHyperlinkedFullTitle())); //$NON-NLS-1$
                     gui.getCampaign().personUpdated(selectedPerson);
+                    MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
                 }
                 break;
             }
@@ -844,10 +858,12 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     for (Person person : people) {
                         person.setDependent(status);
                         gui.getCampaign().personUpdated(person);
+                        MekHQ.triggerEvent(new PersonChangedEvent(person));
                     }
                 } else {
                     selectedPerson.setDependent(!selectedPerson.isDependent());
                     gui.getCampaign().personUpdated(selectedPerson);
+                    MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
                 }
                 break;
             }
@@ -858,8 +874,9 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                         selectedPerson.getCallsign());
                 if (null != s) {
                     selectedPerson.setCallsign(s);
+                    MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
+                    gui.getCampaign().personUpdated(selectedPerson);
                 }
-                gui.getCampaign().personUpdated(selectedPerson);
                 break;
             case CMD_CLEAR_INJURIES:
                 for (Person person : people) {
@@ -893,6 +910,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 EditPersonnelInjuriesDialog epid = new EditPersonnelInjuriesDialog(
                         gui.getFrame(), true, gui.getCampaign(), selectedPerson);
                 epid.setVisible(true);
+                MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
                 break;
             case CMD_BLOODNAME:
                 for (Person p : people) {
@@ -916,13 +934,14 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 }
                 for (Person person : people) {
                     person.setSalary(salary);
+                    MekHQ.triggerEvent(new PersonChangedEvent(person));
                 }
                 break;
             }
         default:
             break;
         }
-        refreshLists();
+        gui.refreshReport();
     }
 
     @Override

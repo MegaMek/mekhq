@@ -76,6 +76,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.ExtraData;
 import mekhq.campaign.LogEntry;
+import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.mod.am.InjuryUtil;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.unit.Unit;
@@ -669,6 +670,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
             || (secondaryRole == T_DOCTOR && primaryRole == T_MEDIC)) {
             secondaryRole = T_NONE;
         }
+        MekHQ.triggerEvent(new PersonChangedEvent(this));
     }
 
     public int getSecondaryRole() {
@@ -677,6 +679,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     public void setSecondaryRole(int t) {
         this.secondaryRole = t;
+        MekHQ.triggerEvent(new PersonChangedEvent(this));
     }
 
     public int getStatus() {
@@ -1843,6 +1846,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     	} else {
         	ranks = new Ranks(rankSystem);
     	}
+    	MekHQ.triggerEvent(new PersonChangedEvent(this));
     }
 
     public Ranks getRanks() {
@@ -1934,6 +1938,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
 	public void setManeiDominiClass(int maneiDominiClass) {
 		this.maneiDominiClass = maneiDominiClass;
+        MekHQ.triggerEvent(new PersonChangedEvent(this));
 	}
 
     public int getManeiDominiRank() {
@@ -1942,6 +1947,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
 	public void setManeiDominiRank(int maneiDominiRank) {
 		this.maneiDominiRank = maneiDominiRank;
+        MekHQ.triggerEvent(new PersonChangedEvent(this));
 	}
 
 	public String getManeiDominiClassNames() {
@@ -2346,6 +2352,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
      */
     public void setPrimaryDesignator(int primaryDesignator) {
         this.primaryDesignator = primaryDesignator;
+        MekHQ.triggerEvent(new PersonChangedEvent(this));
     }
 
     /**
@@ -2360,6 +2367,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
      */
     public void setSecondaryDesignator(int secondaryDesignator) {
         this.secondaryDesignator = secondaryDesignator;
+        MekHQ.triggerEvent(new PersonChangedEvent(this));
     }
 
     public int getHealingDifficulty() {
@@ -2425,6 +2433,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         } else {
             addSkill(skillName, 0, 0);
         }
+        MekHQ.triggerEvent(new PersonChangedEvent(this));
     }
 
     public int getCostToImprove(String skillName) {
@@ -2613,6 +2622,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 ability.setValue(status);
             }
         }
+        MekHQ.triggerEvent(new PersonChangedEvent(this));
     }
 
     /**
@@ -2627,6 +2637,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 ability.setValue(!ability.booleanValue());
             }
         }
+        MekHQ.triggerEvent(new PersonChangedEvent(this));
     }
 
     /**
@@ -3203,10 +3214,12 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
         // Clear the doctor if there is one
         doctorId = null;
+        MekHQ.triggerEvent(new PersonChangedEvent(this));
     }
 
     public void removeInjury(Injury i) {
         injuries.remove(i);
+        MekHQ.triggerEvent(new PersonChangedEvent(this));
     }
 
     public String getInjuriesDesc() {

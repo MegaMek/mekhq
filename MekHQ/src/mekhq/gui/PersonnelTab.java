@@ -46,6 +46,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.event.PersonChangedEvent;
+import mekhq.campaign.event.PersonLogEvent;
 import mekhq.campaign.event.PersonNewEvent;
 import mekhq.campaign.event.PersonRemovedEvent;
 import mekhq.campaign.event.ScenarioResolvedEvent;
@@ -825,6 +826,11 @@ public final class PersonnelTab extends CampaignGuiTab {
         personnelListScheduler.schedule();
     }
     
+    @Subscribe
+    public void personLog(PersonLogEvent ev) {
+        refreshPersonnelView();
+    }
+
     @Subscribe
     public void scenarioResolved(ScenarioResolvedEvent ev) {
         personnelListScheduler.schedule();

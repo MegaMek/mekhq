@@ -121,6 +121,7 @@ import mekhq.campaign.event.NewDayEvent;
 import mekhq.campaign.event.OrganizationChangedEvent;
 import mekhq.campaign.event.PersonAssignmentChangedEvent;
 import mekhq.campaign.event.PersonChangedEvent;
+import mekhq.campaign.event.PersonRemovedEvent;
 import mekhq.campaign.event.ProcurementEvent;
 import mekhq.campaign.event.ScenarioChangedEvent;
 import mekhq.campaign.event.UnitNewEvent;
@@ -2789,6 +2790,7 @@ public class Campaign implements Serializable {
             astechPoolMinutes = Math.max(0, astechPoolMinutes - 240);
             astechPoolOvertime = Math.max(0, astechPoolOvertime - 120);
         }
+        MekHQ.triggerEvent(new PersonRemovedEvent(person));        
     }
 
     private void awardTrainingXP(Lance l) {
@@ -5472,6 +5474,7 @@ public class Campaign implements Serializable {
     						calendar.get(Calendar.YEAR)).getName());
     		}
         }
+        MekHQ.triggerEvent(new PersonChangedEvent(person));
     }
 
 	public String rollSPA(int type, Person person) {
@@ -6327,6 +6330,7 @@ public class Campaign implements Serializable {
                 u.remove(p, true);
             }
         }
+        MekHQ.triggerEvent(new PersonChangedEvent(p));
     }
 
     public void changeStatus(Person person, int status) {
@@ -6378,6 +6382,7 @@ public class Campaign implements Serializable {
                 }
             }
         }
+        MekHQ.triggerEvent(new PersonChangedEvent(person));
     }
 
     public void changeRank(Person person, int rank, boolean report) {
@@ -6390,6 +6395,7 @@ public class Campaign implements Serializable {
         person.setRankNumeric(rank);
         person.setRankLevel(rankLevel);
         personUpdated(person);
+        MekHQ.triggerEvent(new PersonChangedEvent(person));
         if (report) {
             if (rank > oldRank || (rank == oldRank && rankLevel > oldRankLevel)) {
                 person.addLogEntry(getDate(), "Promoted to " + person.getRankName());
@@ -6432,6 +6438,7 @@ public class Campaign implements Serializable {
                 Person p = getPerson(k.getPilotId());
                 if (null != p) {
                     p.setXp(p.getXp() + getCampaignOptions().getKillXPAward());
+                    MekHQ.triggerEvent(new PersonChangedEvent(p));
                 }
             }
         }

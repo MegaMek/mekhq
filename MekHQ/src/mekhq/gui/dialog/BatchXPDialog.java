@@ -37,7 +37,9 @@ import javax.swing.table.TableRowSorter;
 
 import megamek.common.options.PilotOptions;
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
@@ -282,6 +284,7 @@ public final class BatchXPDialog extends JDialog {
                 p.improveSkill(skillName);
                 campaign.personUpdated(p);
                 p.setXp(p.getXp() - cost);
+                MekHQ.triggerEvent(new PersonChangedEvent(p));
                 
                 // The next part is bollocks and doesn't belong here, but as long as we hardcode AtB ...
                 if(campaign.getCampaignOptions().getUseAtB()) {
