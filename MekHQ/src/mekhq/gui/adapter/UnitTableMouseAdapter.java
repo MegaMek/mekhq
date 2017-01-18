@@ -390,9 +390,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
             if (ccd.clickedSelect() == true) {
                 selectedUnit.getEntity().setCamoCategory(ccd.getCategory());
                 selectedUnit.getEntity().setCamoFileName(ccd.getFileName());
-
-                gui.refreshForceView();
-                gui.refreshUnitView();
+                MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
             }
             gui.refreshOverview();
         } else if (command.equalsIgnoreCase("CANCEL_ORDER")) {

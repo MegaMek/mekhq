@@ -43,9 +43,11 @@ import javax.swing.table.TableRowSorter;
 import megamek.common.event.Subscribe;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
-import mekhq.campaign.event.PersonAssignmentChangedEvent;
 import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.event.OptionsChangedEvent;
+import mekhq.campaign.event.PersonChangedEvent;
+import mekhq.campaign.event.PersonNewEvent;
+import mekhq.campaign.event.PersonRemovedEvent;
 import mekhq.campaign.event.ScenarioResolvedEvent;
 import mekhq.campaign.event.UnitRemovedEvent;
 import mekhq.campaign.personnel.Person;
@@ -795,6 +797,7 @@ public final class PersonnelTab extends CampaignGuiTab {
     }
 
     private ActionScheduler personnelListScheduler = new ActionScheduler(this::refreshPersonnelList);
+    private ActionScheduler filterPersonnelScheduler = new ActionScheduler(this::filterPersonnel);
 
     @Subscribe
     public void optionsChanged(OptionsChangedEvent ev) {
@@ -804,12 +807,22 @@ public final class PersonnelTab extends CampaignGuiTab {
     
     @Subscribe
     public void deploymentChanged(DeploymentChangedEvent ev) {
-        filterPersonnel();
+        filterPersonnelScheduler.schedule();
     }
     
     @Subscribe
-    public void assignmentChanged(PersonAssignmentChangedEvent ev) {
-        filterPersonnel();
+    public void personChanged(PersonChangedEvent ev) {
+        filterPersonnelScheduler.schedule();
+    }
+    
+    @Subscribe
+    public void personNew(PersonNewEvent ev) {
+        personnelListScheduler.schedule();
+    }
+    
+    @Subscribe
+    public void personRemoved(PersonRemovedEvent ev) {
+        personnelListScheduler.schedule();
     }
     
     @Subscribe
@@ -819,6 +832,6 @@ public final class PersonnelTab extends CampaignGuiTab {
 
     @Subscribe
     public void unitRemoved(UnitRemovedEvent ev) {
-        filterPersonnel();
+        filterPersonnelScheduler.schedule();
     }
 }

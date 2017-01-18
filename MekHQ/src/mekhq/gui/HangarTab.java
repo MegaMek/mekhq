@@ -55,8 +55,8 @@ import megamek.common.event.Subscribe;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.event.AcquisitionEvent;
-import mekhq.campaign.event.PersonAssignmentChangedEvent;
 import mekhq.campaign.event.DeploymentChangedEvent;
+import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.event.ProcurementEvent;
 import mekhq.campaign.event.ScenarioResolvedEvent;
 import mekhq.campaign.event.UnitChangedEvent;
@@ -541,16 +541,17 @@ public final class HangarTab extends CampaignGuiTab {
     }
 
     private ActionScheduler unitListScheduler = new ActionScheduler(this::refreshUnitList);
+    private ActionScheduler filterUnitScheduler = new ActionScheduler(this::filterUnits);
     private ActionScheduler acquisitionListScheduler = new ActionScheduler(this::refreshAcquisitionList);
 
     @Subscribe
     public void deploymentChanged(DeploymentChangedEvent ev) {
-        filterUnits();
+        filterUnitScheduler.schedule();;
     }
     
     @Subscribe
-    public void assignmentChanged(PersonAssignmentChangedEvent ev) {
-        filterUnits();
+    public void personChanged(PersonChangedEvent ev) {
+        filterUnitScheduler.schedule();;
     }
     
     @Subscribe
@@ -560,7 +561,7 @@ public final class HangarTab extends CampaignGuiTab {
 
     @Subscribe
     public void unitChanged(UnitChangedEvent ev) {
-        filterUnits();
+        filterUnitScheduler.schedule();;
     }
     
     @Subscribe

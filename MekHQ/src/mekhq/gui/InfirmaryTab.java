@@ -41,6 +41,7 @@ import megamek.common.TargetRoll;
 import megamek.common.event.Subscribe;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
+import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.event.ScenarioResolvedEvent;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.model.DocTableModel;
@@ -373,6 +374,12 @@ public final class InfirmaryTab extends CampaignGuiTab {
     
     @Subscribe
     public void scenarioResolved(ScenarioResolvedEvent ev) {
+        doctorListScheduler.schedule();
+        patientListScheduler.schedule();
+    }
+    
+    @Subscribe
+    public void personChanged(PersonChangedEvent ev) {
         doctorListScheduler.schedule();
         patientListScheduler.schedule();
     }

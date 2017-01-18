@@ -111,7 +111,6 @@ import mekhq.NullEntityException;
 import mekhq.Utilities;
 import mekhq.Version;
 import mekhq.campaign.event.AcquisitionEvent;
-import mekhq.campaign.event.PersonAssignmentChangedEvent;
 import mekhq.campaign.event.DayEndingEvent;
 import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.event.GMModeEvent;
@@ -120,6 +119,8 @@ import mekhq.campaign.event.MissionNewEvent;
 import mekhq.campaign.event.NetworkChangedEvent;
 import mekhq.campaign.event.NewDayEvent;
 import mekhq.campaign.event.OrganizationChangedEvent;
+import mekhq.campaign.event.PersonAssignmentChangedEvent;
+import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.event.ProcurementEvent;
 import mekhq.campaign.event.ScenarioChangedEvent;
 import mekhq.campaign.event.UnitNewEvent;
@@ -5783,6 +5784,7 @@ public class Campaign implements Serializable {
         if (null != u) {
             u.resetPilotAndEntity();
         }
+        MekHQ.triggerEvent(new PersonChangedEvent(p));
     }
 
     public TargetRoll getTargetFor(IPartWork partWork, Person tech) {

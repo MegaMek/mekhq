@@ -90,10 +90,7 @@ public class TaskTableMouseAdapter extends MouseInputAdapter implements ActionLi
         } else if (command.contains("CHANGE_MODE")) {
             String sel = command.split(":")[1];
             part.setMode(WorkTime.of(sel));
-            gui.refreshServicedUnitList();
-            gui.refreshUnitList();
             gui.refreshTaskList();
-            gui.refreshUnitView();
             gui.refreshAcquireList();
             gui.refreshOverview();
         } else if (command.contains("UNASSIGN")) {

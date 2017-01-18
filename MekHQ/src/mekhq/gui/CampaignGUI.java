@@ -288,12 +288,6 @@ public class CampaignGUI extends JPanel {
             getCampaign().checkBloodnameAdd(p, p.getPrimaryRole());
             getCampaign().personUpdated(p);
         }
-        refreshPatientList();
-        refreshDoctorsList();
-        refreshServicedUnitList();
-        refreshUnitList();
-        refreshPersonnelList();
-        refreshOrganization();
     }
 
     public void spendBatchXP() {
@@ -1805,13 +1799,8 @@ public class CampaignGUI extends JPanel {
                 getCampaign(), true);
 
         usd.setVisible(true);
-        refreshServicedUnitList();
-        refreshUnitList();
-        refreshPersonnelList();
         refreshReport();
         refreshFunds();
-        refreshFinancialTransactions();
-        refreshOverview();
     }// GEN-LAST:event_miPurchaseUnitActionPerformed
 
     private void buyParts() {
@@ -2000,20 +1989,6 @@ public class CampaignGUI extends JPanel {
     public void refreshPersonnelView() {
     	if (getTab(GuiTabType.PERSONNEL) != null) {
     		((PersonnelTab)getTab(GuiTabType.PERSONNEL)).refreshPersonnelView();
-    	}
-    }
-
-    //TODO: Trigger from event
-    public void refreshUnitView() {
-    	if (getTab(GuiTabType.HANGAR) != null) {
-    		((HangarTab)getTab(GuiTabType.HANGAR)).refreshUnitView();
-    	}
-    }
-
-    //TODO: Trigger from event
-    public void refreshForceView() {
-    	if (getTab(GuiTabType.TOE) != null) {
-    		((TOETab)getTab(GuiTabType.TOE)).refreshForceView();
     	}
     }
 
@@ -2958,13 +2933,6 @@ public class CampaignGUI extends JPanel {
         panLog.refreshLog(report);
         logDialog.refreshLog(report);
         getCampaign().fetchAndClearNewReports();
-    }
-
-    //TODO: Trigger from event
-    public void refreshOrganization() {
-    	if (getTab(GuiTabType.TOE) != null) {
-    		((TOETab)getTab(GuiTabType.TOE)).refreshOrganization();
-    	}
     }
 
     public void refreshFunds() {

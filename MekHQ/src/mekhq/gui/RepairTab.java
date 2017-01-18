@@ -51,8 +51,8 @@ import megamek.common.TargetRoll;
 import megamek.common.event.Subscribe;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
-import mekhq.campaign.event.PersonAssignmentChangedEvent;
 import mekhq.campaign.event.DeploymentChangedEvent;
+import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.event.ScenarioResolvedEvent;
 import mekhq.campaign.event.UnitChangedEvent;
 import mekhq.campaign.event.UnitEvent;
@@ -946,7 +946,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
     }
 
     @Subscribe
-    public void assigmentChanged(PersonAssignmentChangedEvent ev) {
+    public void personChanged(PersonChangedEvent ev) {
         filterTechs();
     }
 }

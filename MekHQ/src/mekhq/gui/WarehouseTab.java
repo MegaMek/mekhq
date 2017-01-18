@@ -56,7 +56,7 @@ import megamek.common.WeaponType;
 import megamek.common.event.Subscribe;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
-import mekhq.campaign.event.PersonAssignmentChangedEvent;
+import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.event.UnitChangedEvent;
 import mekhq.campaign.event.UnitRemovedEvent;
 import mekhq.campaign.parts.Armor;
@@ -777,7 +777,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
     }
     
     @Subscribe
-    public void assignmentChanged(PersonAssignmentChangedEvent ev) {
+    public void personChanged(PersonChangedEvent ev) {
         filterTechs();
     }
 }
