@@ -56,7 +56,14 @@ import megamek.common.WeaponType;
 import megamek.common.event.Subscribe;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
+import mekhq.campaign.event.AcquisitionEvent;
+import mekhq.campaign.event.OvertimeModeEvent;
+import mekhq.campaign.event.PartChangedEvent;
+import mekhq.campaign.event.PartNewEvent;
+import mekhq.campaign.event.PartRemovedEvent;
+import mekhq.campaign.event.PartWorkEvent;
 import mekhq.campaign.event.PersonEvent;
+import mekhq.campaign.event.ProcurementEvent;
 import mekhq.campaign.event.UnitChangedEvent;
 import mekhq.campaign.event.UnitRemovedEvent;
 import mekhq.campaign.parts.Armor;
@@ -661,7 +668,10 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
                                                                       // from
                                                                       // hanging
                                                                       // around
-        acquirePartsModel.setData(getCampaign().getShoppingList().getPartList());
+    }
+    
+    public void refreshProcurementList() {
+        acquirePartsModel.setData(getCampaign().getShoppingList().getPartList());        
     }
 
     private void doTask() {
@@ -688,14 +698,6 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
             partId = repairable.getId();
         }
 
-        getCampaignGui().refreshPersonnelList();
-        getCampaignGui().refreshTaskList();
-        getCampaignGui().refreshAcquireList();
-        refreshTechsList();
-        if (getCampaignGui().getTab(GuiTabType.REPAIR) != null) {
-            ((RepairTab) getCampaignGui().getTab(GuiTabType.REPAIR)).refreshTechsList(); // NOI18N
-        }
-        refreshPartsList();
         getCampaignGui().refreshReport();
 
         // get the selected row back for tasks
@@ -763,8 +765,9 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         astechPoolLabel.setText(astechString);
     }
     
-    //private ActionScheduler partsScheduler = new ActionScheduler(this::refreshPartsList);
+    private ActionScheduler partsScheduler = new ActionScheduler(this::refreshPartsList);
     private ActionScheduler techsScheduler = new ActionScheduler(this::refreshTechsList);
+    private ActionScheduler procurementScheduler = new ActionScheduler(this::refreshProcurementList);
 
     @Subscribe
     public void handle(UnitRemovedEvent ev) {
@@ -779,5 +782,44 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
     @Subscribe
     public void handle(PersonEvent ev) {
         techsScheduler.schedule();
+    }
+    
+    @Subscribe
+    public void handle(PartNewEvent ev) {
+        partsScheduler.schedule();
+    }
+    
+    @Subscribe
+    public void handle(PartRemovedEvent ev) {
+        partsScheduler.schedule();
+    }
+    
+    @Subscribe
+    public void handle(PartChangedEvent ev) {
+        filterParts();
+    }
+    
+    @Subscribe
+    public void handle(AcquisitionEvent ev) {
+        partsScheduler.schedule();
+        procurementScheduler.schedule();
+    }
+    
+    @Subscribe
+    public void handle(ProcurementEvent ev) {
+        procurementScheduler.schedule();
+    }
+    
+    @Subscribe
+    public void handle(PartWorkEvent ev) {
+        if (ev.getPartWork().getUnit() == null) {
+            partsScheduler.schedule();
+        }
+        techsScheduler.schedule();
+    }
+    
+    @Subscribe
+    public void handle(OvertimeModeEvent ev) {
+        filterTechs();
     }
 }

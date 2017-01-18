@@ -18,16 +18,22 @@
  */
 package mekhq.campaign.event;
 
-import mekhq.campaign.parts.Part;
+import megamek.common.event.MMEvent;
 
 /**
- * Triggered by an attempt to repair a part.
+ * Triggered when the "allow overtime" button is toggled.
  *
  */
-public class PartRepairEvent extends PartChangedEvent {
-
-    public PartRepairEvent(Part part) {
-        super(part);
+public class OvertimeModeEvent extends MMEvent {
+    
+    private final boolean allowed;
+    
+    public OvertimeModeEvent(boolean allowed) {
+        this.allowed = allowed;
+    }
+    
+    public boolean isAllowed() {
+        return allowed;
     }
 
 }

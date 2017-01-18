@@ -16,28 +16,25 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.event;
 
 import megamek.common.event.MMEvent;
-import mekhq.campaign.work.IAcquisitionWork;
+import mekhq.campaign.finances.Transaction;
 
 /**
- * Triggered when a unit or part is added to the procurement list following a failed acquisition role.
- * A successful acquisition role should trigger a AcquisitionEvent.
- * 
- * This event can also be triggered by removing an item from the procurement list.
+ * Abstract base class for events involving financial transactions.
  *
  */
-public class ProcurementEvent extends MMEvent {
+abstract public class TransactionEvent extends MMEvent {
+    
+    private final Transaction transaction;
+    
+    public TransactionEvent(Transaction transaction) {
+        this.transaction = transaction;
+    }
+    
+    public Transaction getTransaction() {
+        return transaction;
+    }
 
-    private final IAcquisitionWork acquisition;
-    
-    public ProcurementEvent(IAcquisitionWork acquisition) {
-        this.acquisition = acquisition;
-    }
-    
-    public IAcquisitionWork getAcquisition() {
-        return acquisition;
-    }
 }

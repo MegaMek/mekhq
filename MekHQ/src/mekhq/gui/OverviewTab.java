@@ -45,6 +45,8 @@ import megamek.common.event.Subscribe;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.event.DeploymentChangedEvent;
+import mekhq.campaign.event.PartEvent;
+import mekhq.campaign.event.PartWorkEvent;
 import mekhq.campaign.event.PersonEvent;
 import mekhq.campaign.event.ScenarioResolvedEvent;
 import mekhq.campaign.event.UnitEvent;
@@ -435,6 +437,16 @@ public final class OverviewTab extends CampaignGuiTab {
     
     @Subscribe
     public void handle(PersonEvent ev) {
+        overviewScheduler.schedule();
+    }
+    
+    @Subscribe
+    public void handle(PartEvent ev) {
+        overviewScheduler.schedule();
+    }
+    
+    @Subscribe
+    public void handle(PartWorkEvent ev) {
         overviewScheduler.schedule();
     }
 }

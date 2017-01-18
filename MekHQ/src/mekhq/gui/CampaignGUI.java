@@ -1651,16 +1651,10 @@ public class CampaignGUI extends JPanel {
 
     private void btnOvertimeActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnOvertimeActionPerformed
         getCampaign().setOvertime(btnOvertime.isSelected());
-        refreshTechsList();
-        refreshTaskList();
-        refreshAcquireList();
-        filterTasks();
     }// GEN-LAST:event_btnOvertimeActionPerformed
 
     private void btnGMModeActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnGMModeActionPerformed
-    	
         getCampaign().setGMMode(btnGMMode.isSelected());
-        refreshOverview();
     }// GEN-LAST:event_btnGMModeActionPerformed
 
     private void menuOptionsActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_menuOptionsActionPerformed
@@ -2799,23 +2793,9 @@ public class CampaignGUI extends JPanel {
     }
 
     //TODO: Trigger from event
-    public void refreshPersonnelList() {
-    	if (getTab(GuiTabType.PERSONNEL) != null) {
-    		((PersonnelTab)getTab(GuiTabType.PERSONNEL)).refreshPersonnelList();
-    	}
-    }
-
-    //TODO: Trigger from event
     public void refreshUnitList() {
     	if (getTab(GuiTabType.HANGAR) != null) {
     		((HangarTab)getTab(GuiTabType.HANGAR)).refreshUnitList();
-    	}
-    }
-
-    //TODO: Trigger from event
-    public void refreshTaskList() {
-    	if (getTab(GuiTabType.REPAIR) != null) {
-    		((RepairTab)getTab(GuiTabType.REPAIR)).refreshTaskList();
     	}
     }
 

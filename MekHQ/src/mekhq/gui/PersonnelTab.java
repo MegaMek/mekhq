@@ -45,6 +45,8 @@ import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.event.OptionsChangedEvent;
+import mekhq.campaign.event.OvertimeModeEvent;
+import mekhq.campaign.event.PartWorkEvent;
 import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.event.PersonLogEvent;
 import mekhq.campaign.event.PersonNewEvent;
@@ -838,6 +840,16 @@ public final class PersonnelTab extends CampaignGuiTab {
 
     @Subscribe
     public void handle(UnitRemovedEvent ev) {
+        filterPersonnelScheduler.schedule();
+    }
+
+    @Subscribe
+    public void handle(PartWorkEvent ev) {
+        filterPersonnelScheduler.schedule();
+    }
+    
+    @Subscribe
+    public void handle(OvertimeModeEvent ev) {
         filterPersonnelScheduler.schedule();
     }
 }

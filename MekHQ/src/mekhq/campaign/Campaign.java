@@ -119,11 +119,16 @@ import mekhq.campaign.event.MissionNewEvent;
 import mekhq.campaign.event.NetworkChangedEvent;
 import mekhq.campaign.event.NewDayEvent;
 import mekhq.campaign.event.OrganizationChangedEvent;
+import mekhq.campaign.event.OvertimeModeEvent;
+import mekhq.campaign.event.PartArrivedEvent;
+import mekhq.campaign.event.PartChangedEvent;
+import mekhq.campaign.event.PartNewEvent;
+import mekhq.campaign.event.PartRemovedEvent;
+import mekhq.campaign.event.PartWorkEvent;
 import mekhq.campaign.event.PersonAssignmentChangedEvent;
 import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.event.PersonNewEvent;
 import mekhq.campaign.event.PersonRemovedEvent;
-import mekhq.campaign.event.ProcurementEvent;
 import mekhq.campaign.event.ScenarioChangedEvent;
 import mekhq.campaign.event.UnitNewEvent;
 import mekhq.campaign.event.UnitRemovedEvent;
@@ -1241,6 +1246,7 @@ public class Campaign implements Serializable {
                     ((Armor) spare).setAmount(((Armor) spare).getAmount()
                                               + ((Armor) p).getAmount());
                     lastPartId = lastPartId - 1;
+                    MekHQ.triggerEvent(new PartChangedEvent(spare));
                     return;
                 }
             } else if (p instanceof AmmoStorage) {
@@ -1248,16 +1254,19 @@ public class Campaign implements Serializable {
                     ((AmmoStorage) spare).changeShots(((AmmoStorage) p)
                                                               .getShots());
                     lastPartId = lastPartId - 1;
+                    MekHQ.triggerEvent(new PartChangedEvent(spare));
                     return;
                 }
             } else {
                 spare.incrementQuantity();
                 lastPartId = lastPartId - 1;
+                MekHQ.triggerEvent(new PartChangedEvent(spare));
                 return;
             }
         }
         parts.add(p);
         partIds.put(new Integer(id), p);
+        MekHQ.triggerEvent(new PartNewEvent(p));
     }
 
     /**
@@ -1301,6 +1310,9 @@ public class Campaign implements Serializable {
                 }
                 removePart(p);
             }
+            MekHQ.triggerEvent(new PartArrivedEvent(spare));
+        } else {
+            MekHQ.triggerEvent(new PartArrivedEvent(p));            
         }
     }
 
@@ -1808,8 +1820,6 @@ public class Campaign implements Serializable {
 
         if (found) {
             MekHQ.triggerEvent(new AcquisitionEvent(acquisition));
-        } else {
-            MekHQ.triggerEvent(new ProcurementEvent(acquisition));            
         }
         addReport(report);
         return found;
@@ -1906,6 +1916,7 @@ public class Campaign implements Serializable {
                 report += wrongType;
             }
         }
+        MekHQ.triggerEvent(new PartWorkEvent(tech, r));
         addReport(report);
     }
 
@@ -1998,6 +2009,7 @@ public class Campaign implements Serializable {
                 partWork.setTeamId(tech.getId());
                 partWork.reservePart();
                 report += " - <b>Not enough time, the remainder of the task will be finished tomorrow.</b>";
+                MekHQ.triggerEvent(new PartWorkEvent(tech, partWork));
                 addReport(report);
                 return;
             }
@@ -2067,6 +2079,7 @@ public class Campaign implements Serializable {
         partWork.resetOvertime();
         partWork.setTeamId(null);
         partWork.cancelReservation();
+        MekHQ.triggerEvent(new PartWorkEvent(tech, partWork));
         addReport(report);
     }
 
@@ -2899,6 +2912,7 @@ public class Campaign implements Serializable {
         		removePart(childPart);
         	}
         }
+        MekHQ.triggerEvent(new PartRemovedEvent(part));
     }
 
     public void removeKill(Kill k) {
@@ -3069,6 +3083,7 @@ public class Campaign implements Serializable {
 
     public void setOvertime(boolean b) {
         this.overtime = b;
+        MekHQ.triggerEvent(new OvertimeModeEvent(b));
     }
 
     public boolean isGM() {
@@ -3222,6 +3237,7 @@ public class Campaign implements Serializable {
             part.decrementQuantity();
             quantity--;
         }
+        MekHQ.triggerEvent(new PartRemovedEvent(part));
     }
 
     public void sellAmmo(AmmoStorage ammo, int shots) {
@@ -3235,6 +3251,7 @@ public class Campaign implements Serializable {
         } else {
             ammo.changeShots(-1 * shots);
         }
+        MekHQ.triggerEvent(new PartRemovedEvent(ammo));
     }
 
     public void sellArmor(Armor armor, int points) {
@@ -3253,6 +3270,7 @@ public class Campaign implements Serializable {
         } else {
             armor.changeAmountAvailable(-1 * points);
         }
+        MekHQ.triggerEvent(new PartRemovedEvent(armor));
     }
 
     public boolean buyRefurbishment(Part part) {
@@ -3281,6 +3299,7 @@ public class Campaign implements Serializable {
             	} else {
             		addPart(part, transitDays);
             	}
+            	MekHQ.triggerEvent(new PartNewEvent(part));
                 return true;
             } else {
                 return false;
@@ -3291,6 +3310,7 @@ public class Campaign implements Serializable {
         	} else {
         		addPart(part, transitDays);
         	}
+            MekHQ.triggerEvent(new PartNewEvent(part));
             return true;
         }
     }

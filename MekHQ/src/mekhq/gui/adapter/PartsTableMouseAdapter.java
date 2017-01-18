@@ -12,6 +12,9 @@ import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.event.MouseInputAdapter;
 
+import mekhq.MekHQ;
+import mekhq.campaign.event.PartChangedEvent;
+import mekhq.campaign.event.PartModeChangedEvent;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Armor;
@@ -53,14 +56,8 @@ public class PartsTableMouseAdapter extends MouseInputAdapter implements ActionL
                     gui.getCampaign().sellPart(p, 1);
                 }
             }
-            gui.refreshPartsList();
-            gui.refreshTaskList();
-            gui.refreshAcquireList();
             gui.refreshReport();
             gui.refreshFunds();
-            gui.refreshFinancialTransactions();
-            gui.refreshOverview();
-            gui.filterTasks();
         } else if (command.equalsIgnoreCase("SELL_ALL")) {
             for (Part p : parts) {
                 if (null != p) {
@@ -73,13 +70,8 @@ public class PartsTableMouseAdapter extends MouseInputAdapter implements ActionL
                     }
                 }
             }
-            gui.refreshPartsList();
-            gui.refreshTaskList();
-            gui.refreshAcquireList();
             gui.refreshReport();
             gui.refreshFunds();
-            gui.refreshFinancialTransactions();
-            gui.refreshOverview();
         } else if (command.equalsIgnoreCase("SELL_N")) {
             if (null != selectedPart) {
                 int n = selectedPart.getQuantity();
@@ -98,12 +90,7 @@ public class PartsTableMouseAdapter extends MouseInputAdapter implements ActionL
                 int q = pvcd.getValue();
                 gui.getCampaign().sellPart(selectedPart, q);
             }
-            gui.refreshFinancialTransactions();
-            gui.refreshPartsList();
-            gui.refreshTaskList();
-            gui.refreshAcquireList();
             gui.refreshReport();
-            gui.refreshOverview();
         } else if (command.equalsIgnoreCase("CANCEL_ORDER")) {
             double refund = gui.getCampaign().getCampaignOptions().GetCanceledOrderReimbursement();
             long refundAmount = 0;
@@ -115,34 +102,21 @@ public class PartsTableMouseAdapter extends MouseInputAdapter implements ActionL
             }
             gui.getCampaign().getFinances().credit(refundAmount, Transaction.C_EQUIP,
                     "refund for cancelled equipmemt sale", gui.getCampaign().getDate());
-            gui.refreshFinancialTransactions();
-            gui.refreshPartsList();
-            gui.refreshTaskList();
-            gui.refreshAcquireList();
             gui.refreshReport();
-            gui.refreshOverview();
         } else if (command.equalsIgnoreCase("ARRIVE")) {
             for (Part p : parts) {
                 if (null != p) {
                     gui.getCampaign().arrivePart(p);
                 }
             }
-            gui.refreshPartsList();
-            gui.refreshTaskList();
-            gui.refreshAcquireList();
             gui.refreshReport();
-            gui.refreshOverview();
         } else if (command.equalsIgnoreCase("REMOVE")) {
             for (Part p : parts) {
                 if (null != p) {
                     gui.getCampaign().removePart(p);
                 }
             }
-            gui.refreshPartsList();
-            gui.refreshTaskList();
-            gui.refreshAcquireList();
             gui.refreshReport();
-            gui.refreshOverview();
         } else if (command.contains("SET_QUALITY")) {
             int q = -1;
             boolean reverse = gui.getCampaign().getCampaignOptions().reverseQualityNames();
@@ -163,21 +137,18 @@ public class PartsTableMouseAdapter extends MouseInputAdapter implements ActionL
                 for (Part p : parts) {
                     if (p != null) {
                         p.setQuality(q);
+                        MekHQ.triggerEvent(new PartChangedEvent(p));
                     }
                 }
             }
         } else if (command.contains("CHANGE_MODE")) {
             String sel = command.split(":")[1];
             selectedPart.setMode(WorkTime.of(sel));
-            gui.refreshPartsList();
-            gui.refreshOverview();
+            MekHQ.triggerEvent(new PartModeChangedEvent(selectedPart));
         } else if (command.contains("MASS_REPAIR")) {
             MassRepairSalvageDialog dlg = new MassRepairSalvageDialog(gui.getFrame(), true, gui,
                     MassRepairSalvageDialog.MODE.WAREHOUSE);
             dlg.setVisible(true);
-
-            gui.refreshPartsList();
-            gui.refreshOverview();
         }
     }
 

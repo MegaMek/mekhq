@@ -56,8 +56,12 @@ import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.event.AcquisitionEvent;
 import mekhq.campaign.event.DeploymentChangedEvent;
+import mekhq.campaign.event.OvertimeModeEvent;
+import mekhq.campaign.event.PartEvent;
+import mekhq.campaign.event.PartWorkEvent;
 import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.event.ProcurementEvent;
+import mekhq.campaign.event.RepairStatusChangedEvent;
 import mekhq.campaign.event.ScenarioResolvedEvent;
 import mekhq.campaign.event.UnitChangedEvent;
 import mekhq.campaign.event.UnitNewEvent;
@@ -575,9 +579,15 @@ public final class HangarTab extends CampaignGuiTab {
     }
     
     @Subscribe
+    public void handle(RepairStatusChangedEvent ev) {
+        filterUnitScheduler.schedule();
+    }
+
+    @Subscribe
     public void handle(AcquisitionEvent ev) {
         if (ev.getAcquisition() instanceof UnitOrder) {
             unitListScheduler.schedule();
+            acquisitionListScheduler.schedule();
         }
     }
     
@@ -586,5 +596,24 @@ public final class HangarTab extends CampaignGuiTab {
         if (ev.getAcquisition() instanceof UnitOrder) {
             acquisitionListScheduler.schedule();
         }
+    }
+    
+    @Subscribe
+    public void handle(PartEvent ev) {
+        if (ev.getPart().getUnit() != null) {
+            filterUnitScheduler.schedule();
+        }
+    }
+    
+    @Subscribe
+    public void handle(PartWorkEvent ev) {
+        if (ev.getPartWork().getUnit() != null) {
+            filterUnitScheduler.schedule();
+        }
+    }
+    
+    @Subscribe
+    public void handle(OvertimeModeEvent ev) {
+        filterUnitScheduler.schedule();
     }
 }

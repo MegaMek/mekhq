@@ -45,6 +45,7 @@ import mekhq.campaign.event.MissionNewEvent;
 import mekhq.campaign.event.PersonAssignmentChangedEvent;
 import mekhq.campaign.event.PersonNewEvent;
 import mekhq.campaign.event.ScenarioResolvedEvent;
+import mekhq.campaign.event.TransactionEvent;
 import mekhq.campaign.mission.Contract;
 import mekhq.gui.adapter.FinanceTableMouseAdapter;
 import mekhq.gui.adapter.LoanTableMouseAdapter;
@@ -299,6 +300,11 @@ public final class FinancesTab extends CampaignGuiTab {
     
     @Subscribe
     public void handle(AcquisitionEvent ev) {
+        financialTransactionsScheduler.schedule();
+    }
+    
+    @Subscribe
+    public void handle(TransactionEvent ev) {
         financialTransactionsScheduler.schedule();
     }
 }

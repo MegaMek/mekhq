@@ -16,28 +16,34 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.event;
 
+import java.util.Objects;
+
 import megamek.common.event.MMEvent;
-import mekhq.campaign.work.IAcquisitionWork;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.work.IPartWork;
 
 /**
- * Triggered when a unit or part is added to the procurement list following a failed acquisition role.
- * A successful acquisition role should trigger a AcquisitionEvent.
- * 
- * This event can also be triggered by removing an item from the procurement list.
+ * Triggered by an attempt to perform a repait.
  *
  */
-public class ProcurementEvent extends MMEvent {
+public class PartWorkEvent extends MMEvent {
+    
+    private final Person tech;
+    private final IPartWork partWork;
 
-    private final IAcquisitionWork acquisition;
-    
-    public ProcurementEvent(IAcquisitionWork acquisition) {
-        this.acquisition = acquisition;
+    public PartWorkEvent(Person tech, IPartWork partWork) {
+        this.tech = Objects.requireNonNull(tech);
+        this.partWork = Objects.requireNonNull(partWork);
     }
     
-    public IAcquisitionWork getAcquisition() {
-        return acquisition;
+    public Person getTech() {
+        return tech;
     }
+    
+    public IPartWork getPartWork() {
+        return partWork;
+    }
+
 }

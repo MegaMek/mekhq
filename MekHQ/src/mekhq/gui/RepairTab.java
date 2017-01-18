@@ -51,10 +51,15 @@ import megamek.common.TargetRoll;
 import megamek.common.event.Subscribe;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
+import mekhq.campaign.event.AcquisitionEvent;
 import mekhq.campaign.event.DeploymentChangedEvent;
+import mekhq.campaign.event.OvertimeModeEvent;
+import mekhq.campaign.event.PartEvent;
+import mekhq.campaign.event.PartWorkEvent;
 import mekhq.campaign.event.PersonEvent;
+import mekhq.campaign.event.ProcurementEvent;
+import mekhq.campaign.event.RepairStatusChangedEvent;
 import mekhq.campaign.event.ScenarioResolvedEvent;
-import mekhq.campaign.event.UnitChangedEvent;
 import mekhq.campaign.event.UnitEvent;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Mission;
@@ -654,7 +659,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
             if (null != u && !getCampaign().getServiceableUnits().contains(u)) {
                 selectedRow = -1;
             }
-            MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
+            MekHQ.triggerEvent(new PartWorkEvent(tech, part));
         } else if (acquireSelected()) {
             selectedRow = acquisitionTable.getSelectedRow();
             IAcquisitionWork acquisition = getSelectedAcquisition();
@@ -664,14 +669,6 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
             getCampaign().getShoppingList().addShoppingItem(acquisition, 1, getCampaign());
         }
 
-        getCampaignGui().refreshPersonnelList();
-        refreshTaskList();
-        refreshAcquireList();
-        refreshTechsList();
-        if (getCampaignGui().getTab(GuiTabType.WAREHOUSE) != null) {
-            ((WarehouseTab) getCampaignGui().getTab(GuiTabType.WAREHOUSE)).refreshTechsList(); // NOI18N
-        }
-        getCampaignGui().refreshPartsList();
         getCampaignGui().refreshReport();
         getCampaignGui().refreshFunds();
 
@@ -750,17 +747,8 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
             }
         }
 
-        getCampaignGui().refreshPersonnelList();
-        refreshTaskList();
-        refreshAcquireList();
-        refreshTechsList();
-        if (getCampaignGui().getTab(GuiTabType.WAREHOUSE) != null) {
-            ((WarehouseTab) getCampaignGui().getTab(GuiTabType.WAREHOUSE)).refreshTechsList(); // NOI18N
-        }
-        getCampaignGui().refreshPartsList();
         getCampaignGui().refreshReport();
         getCampaignGui().refreshFunds();
-        getCampaignGui().refreshFinancialTransactions();
 
         if (selectedRow != -1) {
             if (acquireSelected()) {
@@ -930,6 +918,8 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
     
     private ActionScheduler servicedUnitListScheduler = new ActionScheduler(this::refreshServicedUnitList);
     private ActionScheduler techsScheduler = new ActionScheduler(this::refreshTechsList);
+    private ActionScheduler taskScheduler = new ActionScheduler(this::refreshTaskList);
+    private ActionScheduler acquireScheduler = new ActionScheduler(this::refreshAcquireList);
 
     @Subscribe
     public void handle(DeploymentChangedEvent ev) {
@@ -947,7 +937,50 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
     }
 
     @Subscribe
+    public void handle(RepairStatusChangedEvent ev) {
+        servicedUnitListScheduler.schedule();
+    }
+
+    @Subscribe
     public void handle(PersonEvent ev) {
         techsScheduler.schedule();
+    }
+
+    @Subscribe
+    public void handle(PartEvent ev) {
+        if (ev.getPart().getUnit() == null) {
+            acquireScheduler.schedule();
+            taskScheduler.schedule();
+        } else {
+            servicedUnitListScheduler.schedule();
+        }
+    }
+    
+    @Subscribe
+    public void handle(AcquisitionEvent ev) {
+        acquireScheduler.schedule();
+        taskScheduler.schedule();
+    }
+    
+    @Subscribe
+    public void handle(ProcurementEvent ev) {
+        filterTasks();
+        acquireScheduler.schedule();
+    }
+    
+    @Subscribe
+    public void handle(PartWorkEvent ev) {
+        if (ev.getPartWork().getUnit() == null) {
+            acquireScheduler.schedule();
+            taskScheduler.schedule();
+        } else {
+            servicedUnitListScheduler.schedule();
+        }
+        techsScheduler.schedule();
+    }
+    
+    @Subscribe
+    public void handle(OvertimeModeEvent ev) {
+        filterTechs();
     }
 }
