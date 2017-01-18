@@ -44,7 +44,7 @@ import javax.swing.table.TableRowSorter;
 import megamek.common.event.Subscribe;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
-import mekhq.campaign.event.AssignmentChangedEvent;
+import mekhq.campaign.event.PersonAssignmentChangedEvent;
 import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.event.ScenarioResolvedEvent;
 import mekhq.campaign.event.UnitEvent;
@@ -424,7 +424,7 @@ public final class OverviewTab extends CampaignGuiTab {
     }
     
     @Subscribe
-    public void assignmentChanged(AssignmentChangedEvent ev) {
+    public void assignmentChanged(PersonAssignmentChangedEvent ev) {
         overviewScheduler.schedule();
     }
 

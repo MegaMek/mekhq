@@ -55,7 +55,7 @@ import megamek.common.event.Subscribe;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.event.AcquisitionEvent;
-import mekhq.campaign.event.AssignmentChangedEvent;
+import mekhq.campaign.event.PersonAssignmentChangedEvent;
 import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.event.ProcurementEvent;
 import mekhq.campaign.event.ScenarioResolvedEvent;
@@ -549,7 +549,7 @@ public final class HangarTab extends CampaignGuiTab {
     }
     
     @Subscribe
-    public void assignmentChanged(AssignmentChangedEvent ev) {
+    public void assignmentChanged(PersonAssignmentChangedEvent ev) {
         filterUnits();
     }
     

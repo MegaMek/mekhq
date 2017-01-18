@@ -1,18 +1,18 @@
 /*
- * Copyright (c) 2017 The MegaMek Team. All rights reserved.
+ * Copyright (C) 2017 MegaMek team
  *
  * This file is part of MekHQ.
  *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
+ * the Free Software Foundation, either version 2 of the License, or
  * (at your option) any later version.
- *
+ * 
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -20,27 +20,15 @@
 package mekhq.campaign.event;
 
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.unit.Unit;
 
 /**
- * Triggered when a crew, tech, or doctor assignment changes.
+ * Triggered when a Person is added to the campaign.
  *
  */
-public class AssignmentChangedEvent extends PersonEvent {
-    
-    final private Unit unit;
+public class PersonNewEvent extends PersonEvent {
 
-    public AssignmentChangedEvent(Person person) {
+    public PersonNewEvent(Person person) {
         super(person);
-        unit = null;
     }
 
-    public AssignmentChangedEvent(Person person, Unit unit) {
-        super(person);
-        this.unit = unit;
-    }
-
-    public Unit getUnit() {
-        return unit;
-    }
 }

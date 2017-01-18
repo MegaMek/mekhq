@@ -111,7 +111,7 @@ import mekhq.NullEntityException;
 import mekhq.Utilities;
 import mekhq.Version;
 import mekhq.campaign.event.AcquisitionEvent;
-import mekhq.campaign.event.AssignmentChangedEvent;
+import mekhq.campaign.event.PersonAssignmentChangedEvent;
 import mekhq.campaign.event.DayEndingEvent;
 import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.event.GMModeEvent;
@@ -782,13 +782,13 @@ public class Campaign implements Serializable {
                 if (null != u.getTech()) {
                     Person oldTech = u.getTech();
                     oldTech.removeTechUnitId(u.getId());
-                    MekHQ.triggerEvent(new AssignmentChangedEvent(oldTech));
+                    MekHQ.triggerEvent(new PersonAssignmentChangedEvent(oldTech));
                 }
             	Person forceTech = getPerson(force.getTechID());
             	if (forceTech.canTech(u.getEntity())) {
             	    u.setTech(force.getTechID());
             	    forceTech.addTechUnitID(u.getId());
-                    MekHQ.triggerEvent(new AssignmentChangedEvent(forceTech, u));
+                    MekHQ.triggerEvent(new PersonAssignmentChangedEvent(forceTech, u));
             	} else {
             	    String cantTech = forceTech.getName() + " cannot maintain " + u.getName() + "\n"
             	            + "You will need to assign a tech manually.";

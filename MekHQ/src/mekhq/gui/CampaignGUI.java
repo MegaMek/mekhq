@@ -1419,8 +1419,7 @@ public class CampaignGUI extends JPanel {
         initReport();
         refreshFunds();
         
-        int createWarning;
-//        refreshAllTabs();
+        refreshAllTabs();
     }// GEN-LAST:event_btnAdvanceDayActionPerformed
 
     public boolean nagShortMaintenance() {

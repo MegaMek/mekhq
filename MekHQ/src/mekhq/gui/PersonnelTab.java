@@ -43,7 +43,7 @@ import javax.swing.table.TableRowSorter;
 import megamek.common.event.Subscribe;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
-import mekhq.campaign.event.AssignmentChangedEvent;
+import mekhq.campaign.event.PersonAssignmentChangedEvent;
 import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.event.ScenarioResolvedEvent;
@@ -808,7 +808,7 @@ public final class PersonnelTab extends CampaignGuiTab {
     }
     
     @Subscribe
-    public void assignmentChanged(AssignmentChangedEvent ev) {
+    public void assignmentChanged(PersonAssignmentChangedEvent ev) {
         filterPersonnel();
     }
     
