@@ -22,7 +22,8 @@ package mekhq.campaign.event;
 import mekhq.campaign.mission.Scenario;
 
 /**
- * Triggered when a scenario is modified in any way not covered by another ScenarioEvent.
+ * Triggered when a scenario is modified in any way. More specific changes should extend
+ * this class.
  */
 public class ScenarioChangedEvent extends ScenarioEvent {
 

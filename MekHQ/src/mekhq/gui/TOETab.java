@@ -37,7 +37,8 @@ import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.event.NetworkChangedEvent;
 import mekhq.campaign.event.OrganizationChangedEvent;
 import mekhq.campaign.event.ScenarioResolvedEvent;
-import mekhq.campaign.event.UnitEvent;
+import mekhq.campaign.event.UnitChangedEvent;
+import mekhq.campaign.event.UnitRemovedEvent;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
@@ -156,35 +157,40 @@ public final class TOETab extends CampaignGuiTab {
         }
     }
     
-    private ActionScheduler organizationScheduler = new ActionScheduler(this::refreshOrganization);
+    private ActionScheduler orgRefreshScheduler = new ActionScheduler(this::refreshOrganization);
     
     @Subscribe
     public void deploymentChanged(DeploymentChangedEvent ev) {
-        organizationScheduler.schedule();
+        orgTree.repaint();
     }
     
     @Subscribe
     public void organizationChanged(OrganizationChangedEvent ev) {
-        organizationScheduler.schedule();
+        orgRefreshScheduler.schedule();
     }
     
     @Subscribe
     public void networkChanged(NetworkChangedEvent ev) {
-        organizationScheduler.schedule();
+        orgTree.repaint();
     }
     
     @Subscribe
     public void scenarioResolved(ScenarioResolvedEvent ev) {
-        organizationScheduler.schedule();
+        orgRefreshScheduler.schedule();
     }
 
     @Subscribe
     public void assignmentChanged(AssignmentChangedEvent ev) {
-        organizationScheduler.schedule();
+        orgTree.repaint();
     }
 
     @Subscribe
-    public void unitHandler(UnitEvent ev) {
-        organizationScheduler.schedule();
+    public void unitChanged(UnitChangedEvent ev) {
+        orgTree.repaint();
+    }
+
+    @Subscribe
+    public void unitRemoved(UnitRemovedEvent ev) {
+        orgRefreshScheduler.schedule();
     }
 }

@@ -22,10 +22,10 @@ package mekhq.campaign.event;
 import mekhq.campaign.unit.Unit;
 
 /**
- * @author cwspain
+ * Triggered when a unit is delivered.
  *
  */
-public class UnitArrivedEvent extends UnitEvent {
+public class UnitArrivedEvent extends UnitChangedEvent {
 
     public UnitArrivedEvent(Unit unit) {
         super(unit);

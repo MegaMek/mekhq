@@ -19,16 +19,23 @@
 
 package mekhq.campaign.event;
 
-import mekhq.campaign.unit.Unit;
+import megamek.common.event.MMEvent;
+import mekhq.campaign.work.IAcquisitionWork;
 
 /**
- * Triggered when a refit is started, finished, or canceled.
+ * Triggered when a unit or part is scheduled for delivery following a successful acquisition role.
+ * A failed acquisition role should trigger a ProcurementEvent.
  *
  */
-public class UnitRefitEvent extends UnitChangedEvent {
-    
-    public UnitRefitEvent(Unit unit) {
-        super(unit);
-    }
+public class AcquisitionEvent extends MMEvent {
 
+    private final IAcquisitionWork acquisition;
+    
+    public AcquisitionEvent(IAcquisitionWork acquisition) {
+        this.acquisition = acquisition;
+    }
+    
+    public IAcquisitionWork getAcquisition() {
+        return acquisition;
+    }
 }

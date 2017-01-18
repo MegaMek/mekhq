@@ -115,6 +115,7 @@ import mekhq.campaign.event.AssignmentChangedEvent;
 import mekhq.campaign.event.DayEndingEvent;
 import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.event.GMModeEvent;
+import mekhq.campaign.event.MissionCompletedEvent;
 import mekhq.campaign.event.MissionNewEvent;
 import mekhq.campaign.event.NetworkChangedEvent;
 import mekhq.campaign.event.NewDayEvent;
@@ -7021,6 +7022,7 @@ public class Campaign implements Serializable {
                           + contract.getName());
             }
         }
+        MekHQ.triggerEvent(new MissionCompletedEvent(mission));
     }
 
     public int calculatePartTransitTime(int mos) {

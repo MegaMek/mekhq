@@ -947,6 +947,6 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
 
     @Subscribe
     public void assigmentChanged(AssignmentChangedEvent ev) {
-        servicedUnitListScheduler.schedule();
+        filterTechs();
     }
 }

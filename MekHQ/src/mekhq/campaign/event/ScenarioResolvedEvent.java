@@ -25,7 +25,7 @@ import mekhq.campaign.mission.Scenario;
  * Triggered when a scenario is resolved.
  *
  */
-public class ScenarioResolvedEvent extends ScenarioEvent {
+public class ScenarioResolvedEvent extends ScenarioChangedEvent {
 
     public ScenarioResolvedEvent(Scenario scenario) {
         super(scenario);

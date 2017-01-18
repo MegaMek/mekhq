@@ -22,8 +22,8 @@ package mekhq.campaign.event;
 import mekhq.campaign.unit.Unit;
 
 /**
- * Triggered when something about a unit itself changes. This does not include removal from the campaign,
- * changes in deployment, or crew/tech assignments.
+ * Triggered when something about a unit itself changes, other than adding to or removal
+ * from a campaign. More specific change events should extend this class.
  */
 public class UnitChangedEvent extends UnitEvent {
     

@@ -754,6 +754,9 @@ public final class PersonnelTab extends CampaignGuiTab {
         }
     }
 
+    /**
+     * Refreshes personnel table model.
+     */
     public void refreshPersonnelList() {
         UUID selectedUUID = null;
         int selectedRow = personnelTable.getSelectedRow();
@@ -801,12 +804,12 @@ public final class PersonnelTab extends CampaignGuiTab {
     
     @Subscribe
     public void deploymentChanged(DeploymentChangedEvent ev) {
-        personnelListScheduler.schedule();
+        filterPersonnel();
     }
     
     @Subscribe
     public void assignmentChanged(AssignmentChangedEvent ev) {
-        personnelListScheduler.schedule();
+        filterPersonnel();
     }
     
     @Subscribe
@@ -816,6 +819,6 @@ public final class PersonnelTab extends CampaignGuiTab {
 
     @Subscribe
     public void unitRemoved(UnitRemovedEvent ev) {
-        personnelListScheduler.schedule();
+        filterPersonnel();
     }
 }

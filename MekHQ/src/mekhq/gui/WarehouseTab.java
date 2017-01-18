@@ -763,21 +763,21 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         astechPoolLabel.setText(astechString);
     }
     
-    ActionScheduler partsScheduler = new ActionScheduler(this::refreshPartsList);
-    ActionScheduler techsScheduler = new ActionScheduler(this::refreshTechsList);
+    //private ActionScheduler partsScheduler = new ActionScheduler(this::refreshPartsList);
+    //private ActionScheduler techsScheduler = new ActionScheduler(this::refreshTechsList);
 
     @Subscribe
     public void unitRemoved(UnitRemovedEvent ev) {
-        partsScheduler.schedule();
+        filterParts();
     }
     
     @Subscribe
     public void unitChanged(UnitChangedEvent ev) {
-        partsScheduler.schedule();
+        filterParts();
     }
     
     @Subscribe
     public void assignmentChanged(AssignmentChangedEvent ev) {
-        techsScheduler.schedule();
+        filterTechs();
     }
 }

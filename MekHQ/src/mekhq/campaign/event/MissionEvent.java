@@ -19,16 +19,29 @@
 
 package mekhq.campaign.event;
 
-import mekhq.campaign.unit.Unit;
+import java.util.Objects;
+
+import megamek.common.event.MMEvent;
+import mekhq.campaign.mission.Contract;
+import mekhq.campaign.mission.Mission;
 
 /**
- * Triggered when a refit is started, finished, or canceled.
+ * Abstract base class for events involving missions or contracts.
  *
  */
-public class UnitRefitEvent extends UnitChangedEvent {
+abstract public class MissionEvent extends MMEvent {
     
-    public UnitRefitEvent(Unit unit) {
-        super(unit);
+    private final Mission mission;
+    
+    public MissionEvent(Mission mission) {
+        this.mission = Objects.requireNonNull(mission);
     }
 
+    public Mission getMission() {
+        return mission;
+    }
+    
+    public boolean isContract() {
+        return mission instanceof Contract;
+    }
 }

@@ -19,23 +19,14 @@
 
 package mekhq.campaign.event;
 
-import java.util.Objects;
-
-import megamek.common.event.MMEvent;
 import mekhq.campaign.mission.Mission;
 
 /**
  * Triggered when a new mission or contract is added to the campaign.
  */
-public class MissionNewEvent extends MMEvent {
+public class MissionNewEvent extends MissionEvent {
 
-    private final Mission mission;
-    
     public MissionNewEvent(Mission mission) {
-        this.mission = Objects.requireNonNull(mission);
-    }
-    
-    public Mission getMission() {
-        return mission;
+        super(mission);
     }
 }

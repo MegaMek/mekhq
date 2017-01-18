@@ -59,7 +59,9 @@ import mekhq.campaign.event.AssignmentChangedEvent;
 import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.event.ProcurementEvent;
 import mekhq.campaign.event.ScenarioResolvedEvent;
-import mekhq.campaign.event.UnitEvent;
+import mekhq.campaign.event.UnitChangedEvent;
+import mekhq.campaign.event.UnitNewEvent;
+import mekhq.campaign.event.UnitRemovedEvent;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.UnitOrder;
 import mekhq.gui.adapter.ProcurementTableMouseAdapter;
@@ -543,12 +545,12 @@ public final class HangarTab extends CampaignGuiTab {
 
     @Subscribe
     public void deploymentChanged(DeploymentChangedEvent ev) {
-        unitListScheduler.schedule();;
+        filterUnits();
     }
     
     @Subscribe
     public void assignmentChanged(AssignmentChangedEvent ev) {
-        unitListScheduler.schedule();;
+        filterUnits();
     }
     
     @Subscribe
@@ -557,7 +559,17 @@ public final class HangarTab extends CampaignGuiTab {
     }
 
     @Subscribe
-    public void unitHandler(UnitEvent ev) {
+    public void unitChanged(UnitChangedEvent ev) {
+        filterUnits();
+    }
+    
+    @Subscribe
+    public void unitNew(UnitNewEvent ev) {
+        unitListScheduler.schedule();
+    }
+    
+    @Subscribe
+    public void unitRemoved(UnitRemovedEvent ev) {
         unitListScheduler.schedule();
     }
     

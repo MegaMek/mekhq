@@ -53,12 +53,14 @@ import megamek.common.util.EncodeControl;
 import megameklab.com.util.UnitPrintManager;
 import mekhq.MekHQ;
 import mekhq.campaign.ResolveScenarioTracker;
-import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.event.MissionChangedEvent;
 import mekhq.campaign.event.MissionNewEvent;
+import mekhq.campaign.event.MissionRemovedEvent;
 import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.event.OrganizationChangedEvent;
-import mekhq.campaign.event.ScenarioEvent;
+import mekhq.campaign.event.ScenarioChangedEvent;
+import mekhq.campaign.event.ScenarioNewEvent;
+import mekhq.campaign.event.ScenarioRemovedEvent;
 import mekhq.campaign.event.ScenarioResolvedEvent;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.force.Lance;
@@ -125,10 +127,12 @@ public final class BriefingTab extends CampaignGuiTab {
     private ScenarioTableModel scenarioModel;
 
     public int selectedMission;
+    public int selectedScenario;
 
     BriefingTab(CampaignGUI gui, String tabName) {
         super(gui, tabName);
         selectedMission = -1;
+        selectedScenario = -1;
         MekHQ.registerHandler(this);
     }
 
@@ -431,12 +435,11 @@ public final class BriefingTab extends CampaignGuiTab {
                     }
                 }
             }
-
+            refreshMissions();
+            getCampaignGui().refreshReport();
+            getCampaignGui().refreshFunds();
+            getCampaignGui().refreshRating();
         }
-        MekHQ.triggerEvent(new MissionChangedEvent(mission));
-        getCampaignGui().refreshReport();
-        getCampaignGui().refreshFunds();
-        getCampaignGui().refreshRating();
     }
 
     private void deleteMission() {
@@ -452,7 +455,7 @@ public final class BriefingTab extends CampaignGuiTab {
         } else {
             selectedMission = -1;
         }
-        MekHQ.triggerEvent(new MissionChangedEvent(mission, true));
+        MekHQ.triggerEvent(new MissionRemovedEvent(mission));
         getCampaignGui().refreshReport();
         getCampaignGui().refreshFunds();
         getCampaignGui().refreshRating();
@@ -463,7 +466,7 @@ public final class BriefingTab extends CampaignGuiTab {
         if (null != m) {
             CustomizeScenarioDialog csd = new CustomizeScenarioDialog(getFrame(), true, null, m, getCampaign());
             csd.setVisible(true);
-            refreshScenarioList();
+            refreshScenarioTableData();
         }
     }
 
@@ -850,9 +853,11 @@ public final class BriefingTab extends CampaignGuiTab {
             btnClearAssignedUnits.setEnabled(false);
             btnResolveScenario.setEnabled(false);
             btnPrintRS.setEnabled(false);
+            selectedScenario = -1;
             return;
         }
         Scenario scenario = scenarioModel.getScenario(scenarioTable.convertRowIndexToModel(row));
+        selectedScenario = scenario.getId();
         if (getCampaign().getCampaignOptions().getUseAtB() && (scenario instanceof AtBScenario)) {
             scrollScenarioView.setViewportView(
                     new AtBScenarioViewPanel((AtBScenario) scenario, getCampaign(), getIconPackage(), getFrame()));
@@ -890,7 +895,7 @@ public final class BriefingTab extends CampaignGuiTab {
     @Override
     public void refreshAll() {
         refreshMissions();
-        refreshScenarioList();
+        refreshScenarioTableData();
     }
 
     public void changeMission() {
@@ -925,19 +930,21 @@ public final class BriefingTab extends CampaignGuiTab {
             selectedMission = -1;
             scrollMissionView.setViewportView(null);
         }
-        refreshScenarioList();
+        refreshScenarioTableData();
     }
 
-    public void refreshScenarioList() {
+    public void refreshScenarioTableData() {
         Mission m = getCampaign().getMission(selectedMission);
         if (null != m) {
             scenarioModel.setData(m.getScenarios());
         } else {
             scenarioModel.setData(new ArrayList<Scenario>());
         }
+        selectedScenario = -1;
     }
 
-    private ActionScheduler scenarioListScheduler = new ActionScheduler(this::refreshScenarioList);
+    private ActionScheduler scenarioDataScheduler = new ActionScheduler(this::refreshScenarioTableData);
+    private ActionScheduler scenarioViewScheduler = new ActionScheduler(this::refreshScenarioView);
     private ActionScheduler missionsScheduler = new ActionScheduler(this::refreshMissions);
     private ActionScheduler lanceAssignmentScheduler = new ActionScheduler(this::refreshLanceAssignments);
 
@@ -948,23 +955,31 @@ public final class BriefingTab extends CampaignGuiTab {
     }
     
     @Subscribe
-    public void deploymentChanged(DeploymentChangedEvent ev) {
+    public void scenarioChanged(ScenarioChangedEvent ev) {
         if (ev.getScenario() != null && ev.getScenario().getMissionId() == selectedMission) {
-            scenarioListScheduler.schedule();
+            scenarioTable.repaint();
+            if (ev.getScenario().getId() == selectedScenario) {
+                scenarioViewScheduler.schedule();
+            }
         }
     }
     
     @Subscribe
     public void organizationChanged(OrganizationChangedEvent ev) {
-        scenarioListScheduler.schedule();
+        scenarioDataScheduler.schedule();
         if (getCampaignOptions().getUseAtB()) {
             lanceAssignmentScheduler.schedule();
         }
     }
     
     @Subscribe
-    public void scenarioHandler(ScenarioEvent ev) {
-        scenarioListScheduler.schedule();
+    public void scenarioNew(ScenarioNewEvent ev) {
+        scenarioDataScheduler.schedule();
+    }
+    
+    @Subscribe
+    public void scenarioRemoved(ScenarioRemovedEvent ev) {
+        scenarioDataScheduler.schedule();
     }
     
     @Subscribe
@@ -973,7 +988,14 @@ public final class BriefingTab extends CampaignGuiTab {
     }
     
     @Subscribe
-    public void missionChanged(MissionChangedEvent ev) {
+    public void missionRemoved(MissionRemovedEvent ev) {
         missionsScheduler.schedule();
+    }
+    
+    @Subscribe
+    public void missionChanged(MissionChangedEvent ev) {
+        if (ev.getMission().getId() == selectedMission) {
+            changeMission();
+        }
     }
 }

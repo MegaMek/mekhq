@@ -19,34 +19,16 @@
 
 package mekhq.campaign.event;
 
-import java.util.Objects;
-
-import megamek.common.event.MMEvent;
 import mekhq.campaign.mission.Mission;
 
 /**
- * Triggered when a mission or contract is modified, including resolution or deletion.
+ * Triggered when a mission or contract is modified. Specific changes not involving addition
+ * or deletion should extend this class.
  *
  */
-public class MissionChangedEvent extends MMEvent {
+public class MissionChangedEvent extends MissionEvent {
 
-    private final Mission mission;
-    private final boolean removed;
-    
-    public MissionChangedEvent(Mission mission, boolean removed) {
-        this.mission = Objects.requireNonNull(mission);
-        this.removed = removed;
-    }
-    
     public MissionChangedEvent(Mission mission) {
-        this(mission, false);
-    }
-    
-    public Mission getMission() {
-        return mission;
-    }
-    
-    public boolean wasRemoved() {
-        return removed;
+        super(mission);
     }
 }

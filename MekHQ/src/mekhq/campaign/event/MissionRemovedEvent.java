@@ -19,16 +19,16 @@
 
 package mekhq.campaign.event;
 
-import mekhq.campaign.unit.Unit;
+import mekhq.campaign.mission.Mission;
 
 /**
- * Triggered when a refit is started, finished, or canceled.
+ * Triggered when a mission or contract is removed from the campaign.
  *
  */
-public class UnitRefitEvent extends UnitChangedEvent {
-    
-    public UnitRefitEvent(Unit unit) {
-        super(unit);
+public class MissionRemovedEvent extends MissionEvent {
+
+    public MissionRemovedEvent(Mission mission) {
+        super(mission);
     }
 
 }

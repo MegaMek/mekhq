@@ -27,7 +27,7 @@ import mekhq.campaign.unit.Unit;
  * Triggered when a force or unit is deployed to a scenario or undeployed from it.
  *
  */
-public class DeploymentChangedEvent extends ScenarioEvent {
+public class DeploymentChangedEvent extends ScenarioChangedEvent {
 
     final private Unit unit;
     final private Force force;
