@@ -115,6 +115,7 @@ import mekhq.campaign.event.AstechPoolChangedEvent;
 import mekhq.campaign.event.DayEndingEvent;
 import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.event.GMModeEvent;
+import mekhq.campaign.event.MedicPoolChangedEvent;
 import mekhq.campaign.event.MissionCompletedEvent;
 import mekhq.campaign.event.MissionNewEvent;
 import mekhq.campaign.event.NetworkChangedEvent;
@@ -126,10 +127,10 @@ import mekhq.campaign.event.PartChangedEvent;
 import mekhq.campaign.event.PartNewEvent;
 import mekhq.campaign.event.PartRemovedEvent;
 import mekhq.campaign.event.PartWorkEvent;
-import mekhq.campaign.event.PersonAssignmentChangedEvent;
 import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.event.PersonNewEvent;
 import mekhq.campaign.event.PersonRemovedEvent;
+import mekhq.campaign.event.PersonTechAssignmentEvent;
 import mekhq.campaign.event.ScenarioChangedEvent;
 import mekhq.campaign.event.UnitNewEvent;
 import mekhq.campaign.event.UnitRemovedEvent;
@@ -791,13 +792,13 @@ public class Campaign implements Serializable {
                 if (null != u.getTech()) {
                     Person oldTech = u.getTech();
                     oldTech.removeTechUnitId(u.getId());
-                    MekHQ.triggerEvent(new PersonAssignmentChangedEvent(oldTech));
+                    MekHQ.triggerEvent(new PersonTechAssignmentEvent(oldTech, u));
                 }
             	Person forceTech = getPerson(force.getTechID());
             	if (forceTech.canTech(u.getEntity())) {
             	    u.setTech(force.getTechID());
             	    forceTech.addTechUnitID(u.getId());
-                    MekHQ.triggerEvent(new PersonAssignmentChangedEvent(forceTech, u));
+                    MekHQ.triggerEvent(new PersonTechAssignmentEvent(forceTech, u));
             	} else {
             	    String cantTech = forceTech.getName() + " cannot maintain " + u.getName() + "\n"
             	            + "You will need to assign a tech manually.";
@@ -6317,10 +6318,12 @@ public class Campaign implements Serializable {
 
     public void increaseMedicPool(int i) {
         medicPool += i;
+        MekHQ.triggerEvent(new MedicPoolChangedEvent(this, i));
     }
 
     public void decreaseMedicPool(int i) {
         medicPool = Math.max(0, medicPool - i);
+        MekHQ.triggerEvent(new MedicPoolChangedEvent(this, -i));
     }
 
     public void changePrisonerStatus(Person p, int status) {

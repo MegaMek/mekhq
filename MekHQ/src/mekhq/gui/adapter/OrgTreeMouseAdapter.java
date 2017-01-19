@@ -17,10 +17,10 @@ import javax.swing.tree.TreePath;
 
 import megamek.common.GunEmplacement;
 import mekhq.MekHQ;
-import mekhq.campaign.event.PersonAssignmentChangedEvent;
 import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.event.NetworkChangedEvent;
 import mekhq.campaign.event.OrganizationChangedEvent;
+import mekhq.campaign.event.PersonTechAssignmentEvent;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.Mission;
@@ -116,7 +116,6 @@ public class OrgTreeMouseAdapter extends MouseInputAdapter implements
             			Person oldTech = gui.getCampaign().getPerson(singleForce.getTechID());
             			oldTech.clearTechUnitIDs();
             			oldTech.addLogEntry(gui.getCampaign().getDate(), "Removed from " + singleForce.getName());
-            			MekHQ.triggerEvent(new PersonAssignmentChangedEvent(oldTech));
             		}
                 	singleForce.setTechID(tech.getId());
                 	tech.addLogEntry(gui.getCampaign().getDate(), "Assigned to " + singleForce.getFullName());
@@ -128,12 +127,12 @@ public class OrgTreeMouseAdapter extends MouseInputAdapter implements
                 			    if (null != u.getTech()) {
                 			        Person oldTech = u.getTech();
                 			        oldTech.removeTechUnitId(u.getId());
-                                    MekHQ.triggerEvent(new PersonAssignmentChangedEvent(oldTech, u));
+                			        u.removeTech();
                 			    }
                 			    if (tech.canTech(u.getEntity())) {
                 			        u.setTech(tech.getId());
                                     tech.addTechUnitID(u.getId());
-                                    MekHQ.triggerEvent(new PersonAssignmentChangedEvent(tech, u));
+                                    MekHQ.triggerEvent(new PersonTechAssignmentEvent(tech, u));
                 			    } else {
                 			        cantTech += tech.getName() + " cannot maintain " + u.getName() + "\n";
                 			    }
@@ -230,10 +229,14 @@ public class OrgTreeMouseAdapter extends MouseInputAdapter implements
     			Person oldTech = gui.getCampaign().getPerson(singleForce.getTechID());
     			oldTech.clearTechUnitIDs();
     			oldTech.addLogEntry(gui.getCampaign().getDate(), "Removed from " + singleForce.getName());
-    	        MekHQ.triggerEvent(new PersonAssignmentChangedEvent(oldTech));
     			if (singleForce.getAllUnits() !=null) {
            			for (UUID uuid : singleForce.getAllUnits()) {
            				Unit u = gui.getCampaign().getUnit(uuid);
+                        if (null != u.getTech()) {
+                            oldTech = u.getTech();
+                            oldTech.removeTechUnitId(u.getId());
+                            MekHQ.triggerEvent(new PersonTechAssignmentEvent(oldTech, u));
+                        }
            				if (u != null) {
            					u.setTech((UUID)null);
            				}
@@ -251,7 +254,7 @@ public class OrgTreeMouseAdapter extends MouseInputAdapter implements
                            	unit.removeTech();
                            	Person forceTech = gui.getCampaign().getPerson(parentForce.getTechID());
                             forceTech.removeTechUnitId(unit.getId());
-                            MekHQ.triggerEvent(new PersonAssignmentChangedEvent(forceTech));
+                            MekHQ.triggerEvent(new PersonTechAssignmentEvent(forceTech, unit));
                         }
                     }
                     MekHQ.triggerEvent(new OrganizationChangedEvent(parentForce, unit));

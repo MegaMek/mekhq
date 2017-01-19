@@ -42,7 +42,6 @@ import mekhq.campaign.event.AcquisitionEvent;
 import mekhq.campaign.event.GMModeEvent;
 import mekhq.campaign.event.MissionChangedEvent;
 import mekhq.campaign.event.MissionNewEvent;
-import mekhq.campaign.event.PersonAssignmentChangedEvent;
 import mekhq.campaign.event.PersonNewEvent;
 import mekhq.campaign.event.ScenarioResolvedEvent;
 import mekhq.campaign.event.TransactionEvent;
@@ -267,11 +266,6 @@ public final class FinancesTab extends CampaignGuiTab {
     public void handle(GMModeEvent ev) {
         btnAddFunds.setEnabled(ev.isGMMode());
         btnManageAssets.setEnabled(ev.isGMMode());
-    }
-
-    @Subscribe
-    public void handle(PersonAssignmentChangedEvent ev) {
-        financialTransactionsScheduler.schedule();
     }
 
     @Subscribe

@@ -16,31 +16,26 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.event;
 
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 
 /**
- * Triggered when a crew, tech, or doctor assignment changes.
+ * Triggered when a person is assigned to or removed from a unit as pilot or crew.
  *
  */
-public class PersonAssignmentChangedEvent extends PersonEvent {
+public class PersonCrewAssignmentEvent extends PersonChangedEvent {
     
-    final private Unit unit;
-
-    public PersonAssignmentChangedEvent(Person person) {
-        super(person);
-        unit = null;
-    }
-
-    public PersonAssignmentChangedEvent(Person person, Unit unit) {
-        super(person);
+    private final Unit unit;
+    
+    public PersonCrewAssignmentEvent(Person crew, Unit unit) {
+        super(crew);
         this.unit = unit;
     }
-
+    
     public Unit getUnit() {
         return unit;
     }
+
 }
