@@ -1684,7 +1684,6 @@ public class CampaignGUI extends JPanel {
         }
         refreshCalendar();
         getCampaign().reloadNews();
-        refreshOverview();
     }// GEN-LAST:event_menuOptionsActionPerformed
 
     private void menuOptionsMMActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_menuOptionsActionPerformed
@@ -1696,7 +1695,6 @@ public class CampaignGUI extends JPanel {
             getCampaign().setGameOptions(god.getOptions());
             setCampaignOptionsFromGameOptions();
             refreshCalendar();
-            refreshOverview();
         }
     }// GEN-LAST:event_menuOptionsActionPerformed
 
@@ -2774,13 +2772,6 @@ public class CampaignGUI extends JPanel {
     		} catch (Exception err) {
     			err.printStackTrace();
     		}
-    	}
-    }
-
-    //TODO: Trigger from event
-    public void refreshOverview() {
-    	if (getTab(GuiTabType.OVERVIEW) != null) {
-    		((OverviewTab)getTab(GuiTabType.OVERVIEW)).refreshOverview();
     	}
     }
 

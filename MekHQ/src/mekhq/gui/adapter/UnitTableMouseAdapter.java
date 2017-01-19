@@ -105,8 +105,6 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                 	unit.remove(engineer, true);
                 }
             }
-            
-            gui.refreshOverview();
         }/* else if (command.contains("QUIRK")) {
             String sel = command.split(":")[1];
                 selectedUnit.acquireQuirk(sel, true);
@@ -308,7 +306,6 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                 }
             }
             gui.refreshReport();
-            gui.refreshOverview();
         } else if (command.equalsIgnoreCase("DISBAND")) {
             for (Unit unit : units) {
                 if (!unit.isDeployed()) {
@@ -391,7 +388,6 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                 selectedUnit.getEntity().setCamoFileName(ccd.getFileName());
                 MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
             }
-            gui.refreshOverview();
         } else if (command.equalsIgnoreCase("CANCEL_ORDER")) {
             double refund = gui.getCampaign().getCampaignOptions()
                     .GetCanceledOrderReimbursement();

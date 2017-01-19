@@ -441,7 +441,6 @@ public class MekHQ implements GameListener {
             if (getCampaign().getCampaignOptions().getUseAtB()) {
                 megamek.client.RandomUnitGenerator.getInstance();
                 megamek.client.RandomNameGenerator.getInstance();
-                campaigngui.refreshOverview();
             }
             MekHQ.triggerEvent(new ScenarioResolvedEvent(currentScenario));
             campaigngui.initReport();

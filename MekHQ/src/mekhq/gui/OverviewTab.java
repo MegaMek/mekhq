@@ -37,6 +37,7 @@ import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.RowSorter;
 import javax.swing.SortOrder;
+import javax.swing.SwingUtilities;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableRowSorter;
@@ -45,6 +46,7 @@ import megamek.common.event.Subscribe;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.event.DeploymentChangedEvent;
+import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.event.PartEvent;
 import mekhq.campaign.event.PartWorkEvent;
 import mekhq.campaign.event.PersonEvent;
@@ -368,25 +370,27 @@ public final class OverviewTab extends CampaignGuiTab {
     }
 
     public void refreshOverview() {
-        int drIndex = getTabOverview().indexOfComponent(scrollOverviewUnitRating);
-        if (!getCampaign().getCampaignOptions().useDragoonRating() && drIndex != -1) {
-            getTabOverview().removeTabAt(drIndex);
-        } else {
-            if (drIndex == -1) {
-                getTabOverview().addTab(resourceMap.getString("scrollOverviewDragoonsRating.TabConstraints.tabTitle"),
-                        scrollOverviewUnitRating);
+        SwingUtilities.invokeLater(() -> {
+            int drIndex = getTabOverview().indexOfComponent(scrollOverviewUnitRating);
+            if (!getCampaign().getCampaignOptions().useDragoonRating() && drIndex != -1) {
+                getTabOverview().removeTabAt(drIndex);
+            } else {
+                if (drIndex == -1) {
+                    getTabOverview().addTab(resourceMap.getString("scrollOverviewDragoonsRating.TabConstraints.tabTitle"),
+                            scrollOverviewUnitRating);
+                }
             }
-        }
-
-        scrollOverviewUnitRating.setViewportView(new RatingReport(getCampaign()).getReport());
-        scrollOverviewCombatPersonnel.setViewportView(new PersonnelReport(getCampaign()).getCombatPersonnelReport());
-        scrollOverviewSupportPersonnel.setViewportView(new PersonnelReport(getCampaign()).getSupportPersonnelReport());
-        scrollOverviewTransport.setViewportView(new TransportReport(getCampaign()).getReport());
-        scrollOverviewCargo.setViewportView(new CargoReport(getCampaign()).getReport());
-        HangarReport hr = new HangarReport(getCampaign());
-        overviewHangarArea.setText(hr.getHangarTotals());
-        scrollOverviewHangar.setViewportView(hr.getHangarTree());
-        refreshOverviewPartsInUse();
+    
+            scrollOverviewUnitRating.setViewportView(new RatingReport(getCampaign()).getReport());
+            scrollOverviewCombatPersonnel.setViewportView(new PersonnelReport(getCampaign()).getCombatPersonnelReport());
+            scrollOverviewSupportPersonnel.setViewportView(new PersonnelReport(getCampaign()).getSupportPersonnelReport());
+            scrollOverviewTransport.setViewportView(new TransportReport(getCampaign()).getReport());
+            scrollOverviewCargo.setViewportView(new CargoReport(getCampaign()).getReport());
+            HangarReport hr = new HangarReport(getCampaign());
+            overviewHangarArea.setText(hr.getHangarTotals());
+            scrollOverviewHangar.setViewportView(hr.getHangarTree());
+            refreshOverviewPartsInUse();
+        });
     }
 
     private void refreshOverviewSpecificPart(int row, PartInUse piu, IAcquisitionWork newPart) {
@@ -411,6 +415,11 @@ public final class OverviewTab extends CampaignGuiTab {
     }
 
     private ActionScheduler overviewScheduler = new ActionScheduler(this::refreshOverview);
+    
+    @Subscribe
+    public void handle(OptionsChangedEvent ev) {
+        overviewScheduler.schedule();
+    }
     
     @Subscribe
     public void handle(DeploymentChangedEvent ev) {

@@ -3010,6 +3010,7 @@ public class Unit implements MekHqXmlSerializable {
         if(p.getId().equals(tech)) {
             tech = null;
             p.removeTechUnitId(getId());
+            MekHQ.triggerEvent(new PersonTechAssignmentEvent(p, this));
         } else {
             p.setUnitId(null);
             drivers.remove(p.getId());
@@ -3022,11 +3023,11 @@ public class Unit implements MekHqXmlSerializable {
             	engineer = null;
             }
             resetPilotAndEntity();
+            MekHQ.triggerEvent(new PersonCrewAssignmentEvent(p, this));
         }
         if(log) {
             p.addLogEntry(campaign.getDate(), "Removed from " + getName());
         }
-        MekHQ.triggerEvent(new PersonCrewAssignmentEvent(p, this));
     }
 
     public boolean isUnmanned() {
