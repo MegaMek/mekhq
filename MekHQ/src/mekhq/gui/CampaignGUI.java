@@ -99,8 +99,10 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.event.AssetEvent;
+import mekhq.campaign.event.AstechPoolChangedEvent;
 import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.event.LoanEvent;
+import mekhq.campaign.event.MedicPoolChangedEvent;
 import mekhq.campaign.event.MissionEvent;
 import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.event.OrganizationChangedEvent;
@@ -818,7 +820,6 @@ public class CampaignGUI extends JPanel {
                     return;
                 }
                 getCampaign().increaseAstechPool(pvcd.getValue());
-                refreshTempAstechs();
             }
         });
         menuAstechPool.add(miHireAstechs);
@@ -835,7 +836,6 @@ public class CampaignGUI extends JPanel {
                     return;
                 }
                 getCampaign().decreaseAstechPool(pvcd.getValue());
-                refreshTempAstechs();
             }
         });
         menuAstechPool.add(miFireAstechs);
@@ -850,7 +850,6 @@ public class CampaignGUI extends JPanel {
                 if (need > 0) {
                     getCampaign().increaseAstechPool(need);
                 }
-                refreshTempAstechs();
             }
         });
         menuAstechPool.add(miFullStrengthAstechs);
@@ -861,7 +860,6 @@ public class CampaignGUI extends JPanel {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 getCampaign().decreaseAstechPool(getCampaign().getAstechPool());
-                refreshTempAstechs();
             }
         });
         menuAstechPool.add(miFireAllAstechs);
@@ -879,7 +877,6 @@ public class CampaignGUI extends JPanel {
                     return;
                 }
                 getCampaign().increaseMedicPool(pvcd.getValue());
-                refreshTempMedics();
             }
         });
         menuMedicPool.add(miHireMedics);
@@ -896,7 +893,6 @@ public class CampaignGUI extends JPanel {
                     return;
                 }
                 getCampaign().decreaseMedicPool(pvcd.getValue());
-                refreshTempMedics();
             }
         });
         menuMedicPool.add(miFireMedics);
@@ -910,7 +906,6 @@ public class CampaignGUI extends JPanel {
                 if (need > 0) {
                     getCampaign().increaseMedicPool(need);
                 }
-                refreshTempMedics();
             }
         });
         menuMedicPool.add(miFullStrengthMedics);
@@ -920,7 +915,6 @@ public class CampaignGUI extends JPanel {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 getCampaign().decreaseMedicPool(getCampaign().getMedicPool());
-                refreshTempMedics();
             }
         });
         menuMedicPool.add(miFireAllMedics);
@@ -1770,8 +1764,6 @@ public class CampaignGUI extends JPanel {
                 getCampaign(), true);
 
         usd.setVisible(true);
-        refreshReport();
-        refreshFunds();
     }// GEN-LAST:event_miPurchaseUnitActionPerformed
 
     private void buyParts() {
@@ -1891,8 +1883,6 @@ public class CampaignGUI extends JPanel {
         if (hasTab(GuiTabType.MEKLAB)) {
         	((MekLabTab)getTab(GuiTabType.MEKLAB)).clearUnit();
         }
-        refreshReport();
-        refreshFunds();
     }
 
     private void showReport(Report report) {
@@ -2024,7 +2014,6 @@ public class CampaignGUI extends JPanel {
                 }
             }
         }
-        refreshReport();
     }
 
     protected void loadPersonFile() throws IOException {
@@ -2124,8 +2113,6 @@ public class CampaignGUI extends JPanel {
             }
             MekHQ.logMessage("Finished load of personnel file");
         }
-
-        refreshReport();
     }
 
     //TODO: disable if not using personnel tab
@@ -2433,8 +2420,6 @@ public class CampaignGUI extends JPanel {
             }
             MekHQ.logMessage("Finished load of parts file");
         }
-
-        refreshReport();
     }
 
     protected void loadOptionsFile() throws IOException {
@@ -2818,6 +2803,18 @@ public class CampaignGUI extends JPanel {
         }
     }
 
+    private void refreshTempAstechs() {
+        String text = "<html><b>Temp Astechs:</b> "
+                + getCampaign().getAstechPool() + "</html>";
+        lblTempAstechs.setText(text);
+    }
+    
+    private void refreshTempMedics() {
+        String text = "<html><b>Temp Medics:</b> "
+                + getCampaign().getMedicPool() + "</html>";
+        lblTempMedics.setText(text);
+    }
+
     private ActionScheduler reportScheduler = new ActionScheduler(this::refreshReport);
     private ActionScheduler fundsScheduler = new ActionScheduler(this::refreshFunds);
     private ActionScheduler ratingScheduler = new ActionScheduler(this::refreshRating);
@@ -2866,16 +2863,14 @@ public class CampaignGUI extends JPanel {
         ratingScheduler.schedule();
     }
     
-    protected void refreshTempAstechs() {
-        String text = "<html><b>Temp Astechs:</b> "
-                + getCampaign().getAstechPool() + "</html>";
-        lblTempAstechs.setText(text);
+    @Subscribe
+    public void handle(AstechPoolChangedEvent ev) {
+        refreshTempAstechs();
     }
-
-    protected void refreshTempMedics() {
-        String text = "<html><b>Temp Medics:</b> "
-                + getCampaign().getMedicPool() + "</html>";
-        lblTempMedics.setText(text);
+    
+    @Subscribe
+    public void handle(MedicPoolChangedEvent ev) {
+        refreshTempMedics();
     }
 
     public void refreshLocation() {

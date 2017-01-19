@@ -135,6 +135,7 @@ import mekhq.campaign.event.PersonRemovedEvent;
 import mekhq.campaign.event.PersonTechAssignmentEvent;
 import mekhq.campaign.event.ReportEvent;
 import mekhq.campaign.event.ScenarioChangedEvent;
+import mekhq.campaign.event.ScenarioNewEvent;
 import mekhq.campaign.event.UnitNewEvent;
 import mekhq.campaign.event.UnitRemovedEvent;
 import mekhq.campaign.finances.Asset;
@@ -878,7 +879,7 @@ public class Campaign implements Serializable {
         m.addScenario(s);
         scenarioIds.put(new Integer(id), s);
         lastScenarioId = id;
-
+        MekHQ.triggerEvent(new ScenarioNewEvent(s));
     }
 
     /**

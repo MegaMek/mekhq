@@ -460,7 +460,6 @@ public final class BriefingTab extends CampaignGuiTab {
         if (null != m) {
             CustomizeScenarioDialog csd = new CustomizeScenarioDialog(getFrame(), true, null, m, getCampaign());
             csd.setVisible(true);
-            refreshScenarioTableData();
         }
     }
 
