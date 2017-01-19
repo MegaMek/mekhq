@@ -54,6 +54,7 @@ import megameklab.com.util.UnitPrintManager;
 import mekhq.MekHQ;
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.event.MissionChangedEvent;
+import mekhq.campaign.event.MissionCompletedEvent;
 import mekhq.campaign.event.MissionNewEvent;
 import mekhq.campaign.event.MissionRemovedEvent;
 import mekhq.campaign.event.OptionsChangedEvent;
@@ -435,8 +436,6 @@ public final class BriefingTab extends CampaignGuiTab {
                     }
                 }
             }
-            refreshMissions();
-            getCampaignGui().refreshRating();
         }
     }
 
@@ -454,7 +453,6 @@ public final class BriefingTab extends CampaignGuiTab {
             selectedMission = -1;
         }
         MekHQ.triggerEvent(new MissionRemovedEvent(mission));
-        getCampaignGui().refreshRating();
     }
 
     private void addScenario() {
@@ -831,7 +829,6 @@ public final class BriefingTab extends CampaignGuiTab {
             choiceMission.setSelectedIndex(0);
         }
         changeMission();
-        getCampaignGui().refreshRating();
         if (getCampaign().getCampaignOptions().getUseAtB()) {
             refreshLanceAssignments();
         }
@@ -984,6 +981,11 @@ public final class BriefingTab extends CampaignGuiTab {
     
     @Subscribe
     public void handle(MissionRemovedEvent ev) {
+        missionsScheduler.schedule();
+    }
+    
+    @Subscribe
+    public void handle(MissionCompletedEvent ev) {
         missionsScheduler.schedule();
     }
     

@@ -125,7 +125,6 @@ public final class TOETab extends CampaignGuiTab {
             // orgTree.setSelectionPath(null);
             refreshForceView();
         });
-        getCampaignGui().refreshRating();
     }
 
     public void refreshForceView() {

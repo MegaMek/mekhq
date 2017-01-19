@@ -100,10 +100,14 @@ import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.event.AssetEvent;
 import mekhq.campaign.event.DeploymentChangedEvent;
+import mekhq.campaign.event.LoanEvent;
+import mekhq.campaign.event.MissionEvent;
 import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.event.OrganizationChangedEvent;
+import mekhq.campaign.event.PersonEvent;
 import mekhq.campaign.event.ReportEvent;
 import mekhq.campaign.event.TransactionEvent;
+import mekhq.campaign.event.UnitEvent;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
@@ -252,9 +256,6 @@ public class CampaignGUI extends JPanel {
             getCampaign().applyRetirement(rdd.totalPayout(),
                     rdd.getUnitAssignments());
         }
-        refreshReport();
-        refreshFunds();
-        refreshRating();
     }
 
     public void toggleOverviewTab() {
@@ -2807,7 +2808,7 @@ public class CampaignGUI extends JPanel {
         lblFunds.setText(text);
     }
 
-    protected void refreshRating() {
+    private void refreshRating() {
         if (getCampaign().getCampaignOptions().useDragoonRating()) {
             String text = "<html><b>Dragoons Rating:</b> "
                     + getCampaign().getUnitRating() + "</html>";
@@ -2827,13 +2828,42 @@ public class CampaignGUI extends JPanel {
     }
     
     @Subscribe
+    public void handle(OptionsChangedEvent ev) {
+        fundsScheduler.schedule();
+        ratingScheduler.schedule();
+    }
+    
+    @Subscribe
     public void handle(TransactionEvent ev) {
         fundsScheduler.schedule();
+        ratingScheduler.schedule();
+    }
+    
+    @Subscribe
+    public void handle(LoanEvent ev) {
+        fundsScheduler.schedule();
+        ratingScheduler.schedule();
     }
     
     @Subscribe
     public void handle(AssetEvent ev) {
         fundsScheduler.schedule();
+        ratingScheduler.schedule();
+    }
+    
+    @Subscribe
+    public void handle(MissionEvent ev) {
+        ratingScheduler.schedule();
+    }
+    
+    @Subscribe
+    public void handle(PersonEvent ev) {
+        ratingScheduler.schedule();
+    }
+    
+    @Subscribe
+    public void handle(UnitEvent ev) {
+        ratingScheduler.schedule();
     }
     
     protected void refreshTempAstechs() {

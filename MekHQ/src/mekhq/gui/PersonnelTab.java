@@ -782,7 +782,6 @@ public final class PersonnelTab extends CampaignGuiTab {
             }
         }
         filterPersonnel();
-        getCampaignGui().refreshRating();
     }
 
     public void refreshPersonnelView() {

@@ -233,7 +233,6 @@ public final class FinancesTab extends CampaignGuiTab {
     private void showNewLoanDialog() {
         NewLoanDialog nld = new NewLoanDialog(getFrame(), true, getCampaign());
         nld.setVisible(true);
-        getCampaignGui().refreshRating();
     }
 
     private void manageAssets() {
@@ -245,7 +244,6 @@ public final class FinancesTab extends CampaignGuiTab {
         SwingUtilities.invokeLater(() -> { 
             financeModel.setData(getCampaign().getFinances().getAllTransactions());
             loanModel.setData(getCampaign().getFinances().getAllLoans());
-            getCampaignGui().refreshRating();
             refreshFinancialReport();
         });
     }

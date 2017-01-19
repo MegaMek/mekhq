@@ -537,7 +537,6 @@ public final class HangarTab extends CampaignGuiTab {
             }
         }
         getCampaignGui().refreshLab();
-        getCampaignGui().refreshRating();
     }
     
     private void refreshAcquisitionList() {
