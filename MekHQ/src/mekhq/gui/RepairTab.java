@@ -52,6 +52,7 @@ import megamek.common.event.Subscribe;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.event.AcquisitionEvent;
+import mekhq.campaign.event.AstechPoolChangedEvent;
 import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.event.OvertimeModeEvent;
 import mekhq.campaign.event.PartEvent;
@@ -981,6 +982,11 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
     
     @Subscribe
     public void handle(OvertimeModeEvent ev) {
+        filterTechs();
+    }
+    
+    @Subscribe
+    public void handle(AstechPoolChangedEvent ev) {
         filterTechs();
     }
 }

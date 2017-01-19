@@ -13,6 +13,8 @@ import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.event.MouseInputAdapter;
 
+import mekhq.MekHQ;
+import mekhq.campaign.event.PartRemovedEvent;
 import mekhq.campaign.finances.Loan;
 import mekhq.campaign.parts.Part;
 import mekhq.gui.CampaignGUI;
@@ -70,6 +72,7 @@ public class LoanTableMouseAdapter extends MouseInputAdapter implements
                             while (quantity > 0 && p.getQuantity() > 0) {
                                 p.decrementQuantity();
                                 quantity--;
+                                MekHQ.triggerEvent(new PartRemovedEvent(p));
                             }
                         }
                     }
@@ -77,10 +80,7 @@ public class LoanTableMouseAdapter extends MouseInputAdapter implements
                             pcd.getRemainingAssets());
                 }
                 gui.refreshFinancialTransactions();
-                gui.refreshUnitList();
                 gui.refreshReport();
-                gui.refreshPartsList();
-                gui.refreshOverview();
             }
         } else if (command.equalsIgnoreCase("PAY_BALANCE")) {
             gui.getCampaign().payOffLoan(selectedLoan);

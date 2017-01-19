@@ -297,8 +297,6 @@ public final class OverviewTab extends CampaignGuiTab {
                 IAcquisitionWork partToBuy = piu.getPartToBuy();
                 getCampaign().getShoppingList().addShoppingItem(partToBuy, 1, getCampaign());
                 getCampaignGui().refreshReport();
-                getCampaignGui().refreshAcquireList();
-                getCampaignGui().refreshPartsList();
                 refreshOverviewSpecificPart(row, piu, partToBuy);
             }
         };
@@ -316,8 +314,6 @@ public final class OverviewTab extends CampaignGuiTab {
                 IAcquisitionWork partToBuy = piu.getPartToBuy();
                 getCampaign().getShoppingList().addShoppingItem(partToBuy, quantity, getCampaign());
                 getCampaignGui().refreshReport();
-                getCampaignGui().refreshAcquireList();
-                getCampaignGui().refreshPartsList();
                 refreshOverviewSpecificPart(row, piu, partToBuy);
             }
         };
@@ -329,8 +325,6 @@ public final class OverviewTab extends CampaignGuiTab {
                 PartInUse piu = overviewPartsModel.getPartInUse(row);
                 IAcquisitionWork partToBuy = piu.getPartToBuy();
                 getCampaign().addPart((Part) partToBuy.getNewEquipment(), 0);
-                getCampaignGui().refreshAcquireList();
-                getCampaignGui().refreshPartsList();
                 refreshOverviewSpecificPart(row, piu, partToBuy);
             }
         };
@@ -350,8 +344,6 @@ public final class OverviewTab extends CampaignGuiTab {
                     getCampaign().addPart((Part) partToBuy.getNewEquipment(), 0);
                     --quantity;
                 }
-                getCampaignGui().refreshAcquireList();
-                getCampaignGui().refreshPartsList();
                 refreshOverviewSpecificPart(row, piu, partToBuy);
             }
         };

@@ -111,6 +111,7 @@ import mekhq.NullEntityException;
 import mekhq.Utilities;
 import mekhq.Version;
 import mekhq.campaign.event.AcquisitionEvent;
+import mekhq.campaign.event.AstechPoolChangedEvent;
 import mekhq.campaign.event.DayEndingEvent;
 import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.event.GMModeEvent;
@@ -1351,6 +1352,7 @@ public class Campaign implements Serializable {
         if (p.getId() > lastPartId) {
             lastPartId = p.getId();
         }
+        MekHQ.triggerEvent(new PartNewEvent(p));
     }
 
     /**
@@ -6195,6 +6197,7 @@ public class Campaign implements Serializable {
         astechPool += i;
         astechPoolMinutes += (480 * i);
         astechPoolOvertime += (240 * i);
+        MekHQ.triggerEvent(new AstechPoolChangedEvent(this, i));
     }
 
     public void decreaseAstechPool(int i) {
@@ -6202,6 +6205,7 @@ public class Campaign implements Serializable {
         // always assume that we fire the ones who have not yet worked
         astechPoolMinutes = Math.max(0, astechPoolMinutes - 480 * i);
         astechPoolOvertime = Math.max(0, astechPoolOvertime - 240 * i);
+        MekHQ.triggerEvent(new AstechPoolChangedEvent(this, -i));
     }
 
     public int getNumberAstechs() {

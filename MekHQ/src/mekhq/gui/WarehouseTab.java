@@ -57,6 +57,7 @@ import megamek.common.event.Subscribe;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.event.AcquisitionEvent;
+import mekhq.campaign.event.AstechPoolChangedEvent;
 import mekhq.campaign.event.OvertimeModeEvent;
 import mekhq.campaign.event.PartChangedEvent;
 import mekhq.campaign.event.PartNewEvent;
@@ -65,6 +66,7 @@ import mekhq.campaign.event.PartWorkEvent;
 import mekhq.campaign.event.PersonEvent;
 import mekhq.campaign.event.ProcurementEvent;
 import mekhq.campaign.event.UnitChangedEvent;
+import mekhq.campaign.event.UnitRefitEvent;
 import mekhq.campaign.event.UnitRemovedEvent;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.BaArmor;
@@ -780,6 +782,12 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
     }
     
     @Subscribe
+    public void handle(UnitRefitEvent ev) {
+        partsScheduler.schedule();
+        procurementScheduler.schedule();
+    }
+    
+    @Subscribe
     public void handle(PersonEvent ev) {
         techsScheduler.schedule();
     }
@@ -820,6 +828,11 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
     
     @Subscribe
     public void handle(OvertimeModeEvent ev) {
+        filterTechs();
+    }
+    
+    @Subscribe
+    public void handle(AstechPoolChangedEvent ev) {
         filterTechs();
     }
 }

@@ -827,7 +827,6 @@ public class CampaignGUI extends JPanel {
                     return;
                 }
                 getCampaign().increaseAstechPool(pvcd.getValue());
-                refreshTechsList();
                 refreshTempAstechs();
             }
         });
@@ -845,7 +844,6 @@ public class CampaignGUI extends JPanel {
                     return;
                 }
                 getCampaign().decreaseAstechPool(pvcd.getValue());
-                refreshTechsList();
                 refreshTempAstechs();
             }
         });
@@ -861,7 +859,6 @@ public class CampaignGUI extends JPanel {
                 if (need > 0) {
                     getCampaign().increaseAstechPool(need);
                 }
-                refreshTechsList();
                 refreshTempAstechs();
             }
         });
@@ -873,7 +870,6 @@ public class CampaignGUI extends JPanel {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 getCampaign().decreaseAstechPool(getCampaign().getAstechPool());
-                refreshTechsList();
                 refreshTempAstechs();
             }
         });
@@ -1799,9 +1795,6 @@ public class CampaignGUI extends JPanel {
     private void buyParts() {
         PartsStoreDialog psd = new PartsStoreDialog(true, this);
         psd.setVisible(true);
-        refreshPartsList();
-        refreshAcquireList();
-        refreshOverview();
     }
 
     private void showMercRosterDialog() {
@@ -1919,7 +1912,6 @@ public class CampaignGUI extends JPanel {
         refreshReport();
         refreshFunds();
         refreshFinancialTransactions();
-        refreshPartsList();
     }
 
     private void showReport(Report report) {
@@ -2461,7 +2453,6 @@ public class CampaignGUI extends JPanel {
             MekHQ.logMessage("Finished load of parts file");
         }
 
-        refreshPartsList();
         refreshReport();
         refreshFinancialTransactions();
     }
@@ -2799,13 +2790,6 @@ public class CampaignGUI extends JPanel {
     	}
     }
 
-    //TODO: Trigger from event
-    public void refreshAcquireList() {
-    	if (getTab(GuiTabType.REPAIR) != null) {
-    		((RepairTab)getTab(GuiTabType.REPAIR)).refreshAcquireList();
-    	}
-    }
-
     public void refreshLab() {
     	MekLabTab lab = (MekLabTab)getTab(GuiTabType.MEKLAB);
     	if (null == lab) {
@@ -2850,13 +2834,6 @@ public class CampaignGUI extends JPanel {
     public void refreshPatientList() {
     	if (getTab(GuiTabType.INFIRMARY) != null) {
     		((InfirmaryTab)getTab(GuiTabType.INFIRMARY)).refreshPatientList();
-    	}
-    }
-
-    //TODO: Trigger from event
-    public void refreshPartsList() {
-    	if (getTab(GuiTabType.WAREHOUSE) != null) {
-    		((WarehouseTab)getTab(GuiTabType.WAREHOUSE)).refreshPartsList();
     	}
     }
 
