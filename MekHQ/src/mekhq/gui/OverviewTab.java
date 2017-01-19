@@ -298,7 +298,6 @@ public final class OverviewTab extends CampaignGuiTab {
                 PartInUse piu = overviewPartsModel.getPartInUse(row);
                 IAcquisitionWork partToBuy = piu.getPartToBuy();
                 getCampaign().getShoppingList().addShoppingItem(partToBuy, 1, getCampaign());
-                getCampaignGui().refreshReport();
                 refreshOverviewSpecificPart(row, piu, partToBuy);
             }
         };
@@ -315,7 +314,6 @@ public final class OverviewTab extends CampaignGuiTab {
                 quantity = pcd.getValue();
                 IAcquisitionWork partToBuy = piu.getPartToBuy();
                 getCampaign().getShoppingList().addShoppingItem(partToBuy, quantity, getCampaign());
-                getCampaignGui().refreshReport();
                 refreshOverviewSpecificPart(row, piu, partToBuy);
             }
         };

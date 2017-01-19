@@ -56,7 +56,6 @@ public class PartsTableMouseAdapter extends MouseInputAdapter implements ActionL
                     gui.getCampaign().sellPart(p, 1);
                 }
             }
-            gui.refreshReport();
             gui.refreshFunds();
         } else if (command.equalsIgnoreCase("SELL_ALL")) {
             for (Part p : parts) {
@@ -70,7 +69,6 @@ public class PartsTableMouseAdapter extends MouseInputAdapter implements ActionL
                     }
                 }
             }
-            gui.refreshReport();
             gui.refreshFunds();
         } else if (command.equalsIgnoreCase("SELL_N")) {
             if (null != selectedPart) {
@@ -90,7 +88,6 @@ public class PartsTableMouseAdapter extends MouseInputAdapter implements ActionL
                 int q = pvcd.getValue();
                 gui.getCampaign().sellPart(selectedPart, q);
             }
-            gui.refreshReport();
         } else if (command.equalsIgnoreCase("CANCEL_ORDER")) {
             double refund = gui.getCampaign().getCampaignOptions().GetCanceledOrderReimbursement();
             long refundAmount = 0;
@@ -102,21 +99,18 @@ public class PartsTableMouseAdapter extends MouseInputAdapter implements ActionL
             }
             gui.getCampaign().getFinances().credit(refundAmount, Transaction.C_EQUIP,
                     "refund for cancelled equipmemt sale", gui.getCampaign().getDate());
-            gui.refreshReport();
         } else if (command.equalsIgnoreCase("ARRIVE")) {
             for (Part p : parts) {
                 if (null != p) {
                     gui.getCampaign().arrivePart(p);
                 }
             }
-            gui.refreshReport();
         } else if (command.equalsIgnoreCase("REMOVE")) {
             for (Part p : parts) {
                 if (null != p) {
                     gui.getCampaign().removePart(p);
                 }
             }
-            gui.refreshReport();
         } else if (command.contains("SET_QUALITY")) {
             int q = -1;
             boolean reverse = gui.getCampaign().getCampaignOptions().reverseQualityNames();

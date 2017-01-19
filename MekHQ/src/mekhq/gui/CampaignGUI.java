@@ -87,6 +87,7 @@ import megamek.common.Entity;
 import megamek.common.Jumpship;
 import megamek.common.MULParser;
 import megamek.common.TechConstants;
+import megamek.common.event.Subscribe;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.options.PilotOptions;
 import megamek.common.util.EncodeControl;
@@ -100,6 +101,7 @@ import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.event.OrganizationChangedEvent;
+import mekhq.campaign.event.ReportEvent;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
@@ -204,6 +206,7 @@ public class CampaignGUI extends JPanel {
         reportHLL = new ReportHyperlinkListener(this);
     	standardTabs = new EnumMap<>(GuiTabType.class);
         initComponents();
+        MekHQ.registerHandler(this);
     }
 
     public void showAboutBox() {
@@ -1495,19 +1498,17 @@ public class CampaignGUI extends JPanel {
 
     private void hireBulkPersonnel() {
         HireBulkPersonnelDialog hbpd = new HireBulkPersonnelDialog(getFrame(),
-                true, getCampaign(), this);
+                true, getCampaign());
         hbpd.setVisible(true);
     }
 
     public void showContractMarket() {
-        ContractMarketDialog cmd = new ContractMarketDialog(getFrame(), this,
-                getCampaign());
+        ContractMarketDialog cmd = new ContractMarketDialog(getFrame(), getCampaign());
         cmd.setVisible(true);
     }
 
     public void showUnitMarket() {
-        UnitMarketDialog umd = new UnitMarketDialog(getFrame(), this,
-                getCampaign());
+        UnitMarketDialog umd = new UnitMarketDialog(getFrame(), getCampaign());
         umd.setVisible(true);
     }
 
@@ -1762,7 +1763,7 @@ public class CampaignGUI extends JPanel {
     }// GEN-LAST:event_miExportPersonActionPerformed
 
     private void miPurchaseUnitActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_miPurchaseUnitActionPerformed
-        UnitSelectorDialog usd = new UnitSelectorDialog(getFrame(), this,
+        UnitSelectorDialog usd = new UnitSelectorDialog(getFrame(),
                 getCampaign(), true);
 
         usd.setVisible(true);
@@ -2779,10 +2780,17 @@ public class CampaignGUI extends JPanel {
         getFrame().setTitle(getCampaign().getTitle());
     }
 
-    public void refreshReport() {
+    private void refreshReport() {
         List<String> newLogEntries = getCampaign().fetchAndClearNewReports();
         panLog.appendLog(newLogEntries);
         logDialog.appendLog(newLogEntries);
+    }
+    
+    private ActionScheduler reportScheduler = new ActionScheduler(this::refreshReport);
+    
+    @Subscribe
+    public void handle(ReportEvent ev) {
+        reportScheduler.schedule();
     }
     
     public void initReport() {

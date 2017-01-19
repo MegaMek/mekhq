@@ -132,6 +132,7 @@ import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.event.PersonNewEvent;
 import mekhq.campaign.event.PersonRemovedEvent;
 import mekhq.campaign.event.PersonTechAssignmentEvent;
+import mekhq.campaign.event.ReportEvent;
 import mekhq.campaign.event.ScenarioChangedEvent;
 import mekhq.campaign.event.UnitNewEvent;
 import mekhq.campaign.event.UnitRemovedEvent;
@@ -622,7 +623,6 @@ public class Campaign implements Serializable {
 			}
 		}
 		addReport(report.toString());
-		app.getCampaigngui().refreshReport();
     }
     
     public void purchaseShipSearchResult() {
@@ -3133,6 +3133,7 @@ public class Campaign implements Serializable {
         	currentReportHTML = r;
             newReports.add(r);
         }
+        MekHQ.triggerEvent(new ReportEvent(this, r));
     }
 
     public void addReports(ArrayList<String> reports) {

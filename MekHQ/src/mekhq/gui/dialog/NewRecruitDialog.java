@@ -209,7 +209,6 @@ public class NewRecruitDialog extends javax.swing.JDialog {
         	campaign.changeRank(person, campaign.getRanks().getRankNumericFromNameAndProfession(person.getProfession(), (String)choiceRanks.getSelectedItem()), false);
     	}
         refreshView();
-        hqView.refreshReport();
     }
 
     private void randomName() {

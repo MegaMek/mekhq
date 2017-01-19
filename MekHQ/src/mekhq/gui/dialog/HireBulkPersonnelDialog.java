@@ -42,7 +42,6 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Rank;
 import mekhq.campaign.personnel.Ranks;
-import mekhq.gui.CampaignGUI;
 
 
 /**
@@ -69,18 +68,15 @@ public class HireBulkPersonnelDialog extends JDialog {
     private JSpinner minAge;
     private JSpinner maxAge;
 
-    private CampaignGUI hqView;
-    
     private boolean useAge = false;
     private int minAgeVal = 19;
     private int maxAgeVal = 99;
     
     private ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.HireBulkPersonnelDialog", new EncodeControl()); //$NON-NLS-1$
 
-    public HireBulkPersonnelDialog(Frame parent, boolean modal, Campaign c, CampaignGUI view) {
+    public HireBulkPersonnelDialog(Frame parent, boolean modal, Campaign c) {
         super(parent, modal);
         this.campaign = c;
-        this.hqView = view;
         initComponents();
         setLocationRelativeTo(getParent());
     }
@@ -290,7 +286,6 @@ public class HireBulkPersonnelDialog extends JDialog {
                 number--;
             }
         }
-        hqView.refreshReport();
     }
    
     private void refreshRanksCombo() {

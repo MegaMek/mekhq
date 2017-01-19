@@ -75,7 +75,6 @@ public class TaskTableMouseAdapter extends MouseInputAdapter implements ActionLi
                 gui.getCampaign().removeUnit(u.getId());
             }
             MekHQ.triggerEvent(new UnitChangedEvent(u));
-            gui.refreshReport();
         } else if (command.contains("SWAP_AMMO")) {
             /*
              * WorkItem task =

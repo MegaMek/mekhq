@@ -80,11 +80,9 @@ public class LoanTableMouseAdapter extends MouseInputAdapter implements
                     gui.getCampaign().getFinances().setAssets(
                             pcd.getRemainingAssets());
                 }
-                gui.refreshReport();
             }
         } else if (command.equalsIgnoreCase("PAY_BALANCE")) {
             gui.getCampaign().payOffLoan(selectedLoan);
-            gui.refreshReport();
         } else if (command.equalsIgnoreCase("REMOVE")) {
             gui.getCampaign().getFinances().removeLoan(selectedLoan);
             MekHQ.triggerEvent(new LoanRemovedEvent(selectedLoan));

@@ -168,7 +168,6 @@ public class ProcurementTableMouseAdapter extends MouseInputAdapter {
                             }
                         }
                     }
-                    gui.refreshReport();
                 }
             });
             menuItem.setEnabled(gui.getCampaign().isGM());
@@ -298,8 +297,6 @@ public class ProcurementTableMouseAdapter extends MouseInputAdapter {
                             }
                         }
                     }
-
-                    gui.refreshReport();
                 }
             });
             menuItem.setEnabled(gui.getCampaign().isGM());

@@ -45,7 +45,6 @@ public class FinanceTableMouseAdapter extends MouseInputAdapter implements
             gui.getCampaign().addReport(transaction.voidTransaction());
             financeModel.deleteTransaction(row);
             MekHQ.triggerEvent(new TransactionVoidedEvent(transaction));
-            gui.refreshReport();
         } else if (command.contains("EDIT")) {
             EditTransactionDialog dialog = new EditTransactionDialog(
                     transaction, gui.getFrame(), true);
@@ -56,7 +55,6 @@ public class FinanceTableMouseAdapter extends MouseInputAdapter implements
             gui.getCampaign().addReport(
                     transaction.updateTransaction(dialog
                             .getOldTransaction()));
-            gui.refreshReport();
         }
     }
 

@@ -329,7 +329,6 @@ public class PersonnelMarketDialog extends JDialog {
 	    			personnelModel.setData(personnelMarket.getPersonnel());
 	    		}
 	    	}
-	    	hqView.refreshReport();
 	    	refreshPersonView();
 	    }
 	}//GEN-LAST:event_btnHireActionPerformed
@@ -344,7 +343,6 @@ public class PersonnelMarketDialog extends JDialog {
 		    	personnelMarket.removePerson(selectedPerson);
 	    		personnelModel.setData(personnelMarket.getPersonnel());
 				personnelMarket.removeAttachedEntity(pid);
-		    	hqView.refreshReport();
 		    	refreshPersonView();
 		    }
 		}

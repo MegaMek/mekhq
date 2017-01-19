@@ -941,7 +941,6 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
         default:
             break;
         }
-        gui.refreshReport();
     }
 
     @Override

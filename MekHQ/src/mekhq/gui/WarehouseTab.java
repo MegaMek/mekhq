@@ -700,8 +700,6 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
             partId = repairable.getId();
         }
 
-        getCampaignGui().refreshReport();
-
         // get the selected row back for tasks
         if (selectedRow != -1) {
             boolean found = false;

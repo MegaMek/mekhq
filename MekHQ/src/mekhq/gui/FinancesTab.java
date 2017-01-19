@@ -227,7 +227,6 @@ public final class FinancesTab extends CampaignGuiTab {
             String description = addFundsDialog.getFundsDescription();
             int category = addFundsDialog.getCategory();
             getCampaign().addFunds(funds, description, category);
-            getCampaignGui().refreshReport();
             getCampaignGui().refreshFunds();
             refreshFinancialTransactions();
         }
@@ -238,14 +237,12 @@ public final class FinancesTab extends CampaignGuiTab {
         nld.setVisible(true);
         refreshFinancialTransactions();
         getCampaignGui().refreshFunds();
-        getCampaignGui().refreshReport();
         getCampaignGui().refreshRating();
     }
 
     private void manageAssets() {
         ManageAssetsDialog mad = new ManageAssetsDialog(getFrame(), getCampaign());
         mad.setVisible(true);
-        getCampaignGui().refreshReport();
         getCampaignGui().refreshFunds();
         refreshFinancialTransactions();
     }
