@@ -1,6 +1,8 @@
 VERSION HISTORY:
 ----------------
 v0.43.0-git
++ Improve Mass Repair/Mass Salvage technician selection by providing additional configuration options
++ Fix #313: Prisoners counting towards combatants total for defection rolls. 
 
 v0.42.0 (2017-01-01 14:00 UTC)
 + Fix #266: PayForTransport option ignored when estimating total contract profit
