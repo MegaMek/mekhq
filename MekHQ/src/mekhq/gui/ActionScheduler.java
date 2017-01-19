@@ -38,12 +38,17 @@ public class ActionScheduler {
         void act();
     }
     
-    public static final int DELAY = 100;
+    public static final int DELAY = 50;
     
     private final Timer timer;
     
     public ActionScheduler(Action action) {
         timer = new Timer(DELAY, ev -> action.act());
+        timer.setRepeats(false);
+    }
+    
+    public ActionScheduler(Action action, int delay) {
+        timer = new Timer(delay, ev -> action.act());
         timer.setRepeats(false);
     }
     
