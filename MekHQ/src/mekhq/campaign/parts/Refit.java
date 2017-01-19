@@ -55,6 +55,7 @@ import mekhq.MekHqXmlUtil;
 import mekhq.MhqFileUtil;
 import mekhq.Utilities;
 import mekhq.Version;
+import mekhq.campaign.event.PartChangedEvent;
 import mekhq.campaign.event.UnitRefitEvent;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.equipment.EquipmentPart;
@@ -715,6 +716,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 		} else {
 			for(Part part : shoppingList) {
     			part.setUnit(null);
+    			MekHQ.triggerEvent(new PartChangedEvent(part));
 			}
 		    checkForArmorSupplies();
 		    if(shoppingList.isEmpty() && (null == newArmorSupplies || newArmorSupplies.getAmountNeeded() == 0)) {

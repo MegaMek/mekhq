@@ -180,7 +180,6 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                     }
                 }
             }
-            gui.refreshFinancialTransactions();
             gui.refreshReport();
             gui.refreshFunds();
         } else if (command.equalsIgnoreCase("LOSS")) {
@@ -405,7 +404,6 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                         "refund for cancelled equipmemt sale",
                         gui.getCampaign().getDate());
             }
-            gui.refreshFinancialTransactions();
             gui.refreshReport();
         } else if (command.equalsIgnoreCase("ARRIVE")) {
             if (null != selectedUnit) {

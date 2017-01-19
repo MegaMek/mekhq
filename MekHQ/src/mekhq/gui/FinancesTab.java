@@ -34,17 +34,20 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
 import javax.swing.table.TableColumn;
 
 import megamek.common.event.Subscribe;
 import mekhq.MekHQ;
 import mekhq.campaign.event.AcquisitionEvent;
 import mekhq.campaign.event.GMModeEvent;
+import mekhq.campaign.event.LoanEvent;
 import mekhq.campaign.event.MissionChangedEvent;
 import mekhq.campaign.event.MissionNewEvent;
-import mekhq.campaign.event.PersonNewEvent;
+import mekhq.campaign.event.PartEvent;
 import mekhq.campaign.event.ScenarioResolvedEvent;
 import mekhq.campaign.event.TransactionEvent;
+import mekhq.campaign.event.UnitEvent;
 import mekhq.campaign.mission.Contract;
 import mekhq.gui.adapter.FinanceTableMouseAdapter;
 import mekhq.gui.adapter.LoanTableMouseAdapter;
@@ -248,29 +251,29 @@ public final class FinancesTab extends CampaignGuiTab {
     }
 
     public void refreshFinancialTransactions() {
-        financeModel.setData(getCampaign().getFinances().getAllTransactions());
-        loanModel.setData(getCampaign().getFinances().getAllLoans());
-        getCampaignGui().refreshFunds();
-        getCampaignGui().refreshRating();
-        refreshFinancialReport();
+        SwingUtilities.invokeLater(() -> { 
+            financeModel.setData(getCampaign().getFinances().getAllTransactions());
+            loanModel.setData(getCampaign().getFinances().getAllLoans());
+            getCampaignGui().refreshFunds();
+            getCampaignGui().refreshRating();
+            refreshFinancialReport();
+        });
     }
 
     public void refreshFinancialReport() {
-        areaNetWorth.setText(getCampaign().getFinancialReport());
-        areaNetWorth.setCaretPosition(0);
+        SwingUtilities.invokeLater(() -> { 
+            areaNetWorth.setText(getCampaign().getFinancialReport());
+            areaNetWorth.setCaretPosition(0);
+        });
     }
     
     ActionScheduler financialTransactionsScheduler = new ActionScheduler(this::refreshFinancialTransactions);
+    ActionScheduler financialReportScheduler = new ActionScheduler(this::refreshFinancialReport);
 
     @Subscribe
     public void handle(GMModeEvent ev) {
         btnAddFunds.setEnabled(ev.isGMMode());
         btnManageAssets.setEnabled(ev.isGMMode());
-    }
-
-    @Subscribe
-    public void handle(PersonNewEvent ev) {
-        financialTransactionsScheduler.schedule();
     }
 
     @Subscribe
@@ -281,14 +284,14 @@ public final class FinancesTab extends CampaignGuiTab {
     @Subscribe
     public void handle(MissionNewEvent ev) {
         if (ev.getMission() instanceof Contract) {
-            financialTransactionsScheduler.schedule();
+            financialReportScheduler.schedule();
         }
     }
 
     @Subscribe
     public void handle(MissionChangedEvent ev) {
         if (ev.getMission() instanceof Contract) {
-            financialTransactionsScheduler.schedule();
+            financialReportScheduler.schedule();
         }
     }
     
@@ -300,5 +303,20 @@ public final class FinancesTab extends CampaignGuiTab {
     @Subscribe
     public void handle(TransactionEvent ev) {
         financialTransactionsScheduler.schedule();
+    }
+    
+    @Subscribe
+    public void handle(LoanEvent ev) {
+        financialTransactionsScheduler.schedule();
+    }
+    
+    @Subscribe
+    public void handle(UnitEvent ev) {
+        financialReportScheduler.schedule();
+    }
+    
+    @Subscribe
+    public void handle(PartEvent ev) {
+        financialReportScheduler.schedule();
     }
 }

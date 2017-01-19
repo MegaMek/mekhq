@@ -38,6 +38,7 @@ import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.event.LoanDefaultedEvent;
 import mekhq.campaign.event.TransactionCreditEvent;
 import mekhq.campaign.event.TransactionDebitEvent;
 
@@ -300,6 +301,7 @@ public class Finances implements Serializable {
             failCollateral++;
         }
         removeLoan(loan);
+        MekHQ.triggerEvent(new LoanDefaultedEvent(loan));
     }
 
 	public int getLoanDefaults() {

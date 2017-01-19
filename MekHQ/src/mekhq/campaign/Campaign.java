@@ -115,6 +115,7 @@ import mekhq.campaign.event.AstechPoolChangedEvent;
 import mekhq.campaign.event.DayEndingEvent;
 import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.event.GMModeEvent;
+import mekhq.campaign.event.LoanPaidEvent;
 import mekhq.campaign.event.MedicPoolChangedEvent;
 import mekhq.campaign.event.MissionCompletedEvent;
 import mekhq.campaign.event.MissionNewEvent;
@@ -7299,6 +7300,7 @@ public class Campaign implements Serializable {
                     loan.getRemainingValue()) + "on "
                       + loan.getDescription());
             finances.removeLoan(loan);
+            MekHQ.triggerEvent(new LoanPaidEvent(loan));
         } else {
             addReport("<font color='red'>You do not have enough funds to pay off "
                       + loan.getDescription() + "</font>");

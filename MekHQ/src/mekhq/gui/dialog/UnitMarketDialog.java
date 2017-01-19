@@ -387,7 +387,6 @@ public class UnitMarketDialog extends JDialog {
 	}
 
     private void refreshHqView() {
-        hqView.refreshFinancialTransactions();
         hqView.refreshReport();
     }
 

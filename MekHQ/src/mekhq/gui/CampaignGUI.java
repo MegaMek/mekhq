@@ -68,8 +68,6 @@ import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileFilter;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -251,7 +249,6 @@ public class CampaignGUI extends JPanel {
         }
         refreshReport();
         refreshFunds();
-        refreshFinancialTransactions();
         refreshRating();
     }
 
@@ -330,18 +327,6 @@ public class CampaignGUI extends JPanel {
         addStandardTab(GuiTabType.FINANCES);
         addStandardTab(GuiTabType.OVERVIEW);
 
-        // The finance tab can be a pain to update when dealing with large units.
-        // Refresh it on tab change to that panel instead.
-        tabMain.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                if(((CampaignGuiTab)tabMain.getSelectedComponent()).tabType()
-                		.equals(GuiTabType.FINANCES)) {
-                    refreshFinancialTransactions();
-                }
-                
-            }
-        });
         initMain();
         initTopButtons();
         initStatusBar();
@@ -1372,7 +1357,6 @@ public class CampaignGUI extends JPanel {
         // these are addressed
         if (getCampaign().checkOverDueLoans()) {
             refreshFunds();
-            refreshFinancialTransactions();
             refreshReport();
             return;
         }
@@ -1907,7 +1891,6 @@ public class CampaignGUI extends JPanel {
         }
         refreshReport();
         refreshFunds();
-        refreshFinancialTransactions();
     }
 
     private void showReport(Report report) {
@@ -2450,7 +2433,6 @@ public class CampaignGUI extends JPanel {
         }
 
         refreshReport();
-        refreshFinancialTransactions();
     }
 
     protected void loadOptionsFile() throws IOException {
@@ -2792,20 +2774,6 @@ public class CampaignGUI extends JPanel {
     		} catch (Exception err) {
     			err.printStackTrace();
     		}
-    	}
-    }
-
-    //TODO: Trigger from event
-    public void refreshFinancialTransactions() {
-    	if (getTab(GuiTabType.FINANCES) != null) {
-    		((FinancesTab)getTab(GuiTabType.FINANCES)).refreshFinancialTransactions();
-    	}
-    }
-
-    //TODO: Trigger from event
-    public void refreshFinancialReport() {
-    	if (getTab(GuiTabType.FINANCES) != null) {
-    		((FinancesTab)getTab(GuiTabType.FINANCES)).refreshFinancialReport();
     	}
     }
 
