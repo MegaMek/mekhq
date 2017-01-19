@@ -98,10 +98,12 @@ import mekhq.Version;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.RandomSkillPreferences;
+import mekhq.campaign.event.AssetEvent;
 import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.event.OrganizationChangedEvent;
 import mekhq.campaign.event.ReportEvent;
+import mekhq.campaign.event.TransactionEvent;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
@@ -2786,13 +2788,6 @@ public class CampaignGUI extends JPanel {
         logDialog.appendLog(newLogEntries);
     }
     
-    private ActionScheduler reportScheduler = new ActionScheduler(this::refreshReport);
-    
-    @Subscribe
-    public void handle(ReportEvent ev) {
-        reportScheduler.schedule();
-    }
-    
     public void initReport() {
         String report = getCampaign().getCurrentReportHTML();
         panLog.refreshLog(report);
@@ -2800,7 +2795,7 @@ public class CampaignGUI extends JPanel {
         getCampaign().fetchAndClearNewReports();
     }
 
-    public void refreshFunds() {
+    private void refreshFunds() {
         long funds = getCampaign().getFunds();
         NumberFormat numberFormat = NumberFormat.getIntegerInstance();
         String inDebt = "";
@@ -2822,6 +2817,25 @@ public class CampaignGUI extends JPanel {
         }
     }
 
+    private ActionScheduler reportScheduler = new ActionScheduler(this::refreshReport);
+    private ActionScheduler fundsScheduler = new ActionScheduler(this::refreshFunds);
+    private ActionScheduler ratingScheduler = new ActionScheduler(this::refreshRating);
+    
+    @Subscribe
+    public void handle(ReportEvent ev) {
+        reportScheduler.schedule();
+    }
+    
+    @Subscribe
+    public void handle(TransactionEvent ev) {
+        fundsScheduler.schedule();
+    }
+    
+    @Subscribe
+    public void handle(AssetEvent ev) {
+        fundsScheduler.schedule();
+    }
+    
     protected void refreshTempAstechs() {
         String text = "<html><b>Temp Astechs:</b> "
                 + getCampaign().getAstechPool() + "</html>";

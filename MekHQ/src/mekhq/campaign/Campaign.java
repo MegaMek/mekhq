@@ -115,6 +115,7 @@ import mekhq.campaign.event.AstechPoolChangedEvent;
 import mekhq.campaign.event.DayEndingEvent;
 import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.event.GMModeEvent;
+import mekhq.campaign.event.LoanNewEvent;
 import mekhq.campaign.event.LoanPaidEvent;
 import mekhq.campaign.event.MedicPoolChangedEvent;
 import mekhq.campaign.event.MissionCompletedEvent;
@@ -7287,9 +7288,11 @@ public class Campaign implements Serializable {
                   + DecimalFormat.getInstance().format(loan.getPrincipal())
                   + " for the principal amount.");
         finances.addLoan(loan);
+        MekHQ.triggerEvent(new LoanNewEvent(loan));
         finances.credit(loan.getPrincipal(), Transaction.C_LOAN_PRINCIPAL,
                         "loan principal for " + loan.getDescription(),
                         calendar.getTime());
+        
     }
 
     public void payOffLoan(Loan loan) {

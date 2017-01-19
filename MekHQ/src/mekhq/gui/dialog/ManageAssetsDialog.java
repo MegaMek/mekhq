@@ -40,7 +40,11 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
 
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.event.AssetChangedEvent;
+import mekhq.campaign.event.AssetNewEvent;
+import mekhq.campaign.event.AssetRemovedEvent;
 import mekhq.campaign.finances.Asset;
 import mekhq.campaign.finances.Finances;
 import mekhq.gui.model.DataTableModel;
@@ -160,6 +164,7 @@ public class ManageAssetsDialog extends JDialog {
         ead.setVisible(true);
         if(!ead.wasCancelled()) {
             campaign.getFinances().getAllAssets().add(a);
+            MekHQ.triggerEvent(new AssetNewEvent(a));
         }
         refreshTable();
     }
@@ -168,13 +173,15 @@ public class ManageAssetsDialog extends JDialog {
         Asset a = assetModel.getAssetAt(assetTable.getSelectedRow());
         if(null != a) {
             EditAssetDialog ead = new EditAssetDialog(frame, a);
-            ead.setVisible(true);        
+            ead.setVisible(true);
+            MekHQ.triggerEvent(new AssetChangedEvent(a));
             refreshTable();
         }
     }
     
     private void deleteAsset() {
         campaign.getFinances().getAllAssets().remove(assetTable.getSelectedRow());
+        MekHQ.triggerEvent(new AssetRemovedEvent(assetModel.getAssetAt(assetTable.getSelectedRow())));
         refreshTable();
     }
     

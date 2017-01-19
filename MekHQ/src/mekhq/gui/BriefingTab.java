@@ -436,7 +436,6 @@ public final class BriefingTab extends CampaignGuiTab {
                 }
             }
             refreshMissions();
-            getCampaignGui().refreshFunds();
             getCampaignGui().refreshRating();
         }
     }
@@ -455,7 +454,6 @@ public final class BriefingTab extends CampaignGuiTab {
             selectedMission = -1;
         }
         MekHQ.triggerEvent(new MissionRemovedEvent(mission));
-        getCampaignGui().refreshFunds();
         getCampaignGui().refreshRating();
     }
 

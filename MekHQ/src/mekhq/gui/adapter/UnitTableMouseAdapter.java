@@ -177,7 +177,6 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                     }
                 }
             }
-            gui.refreshFunds();
         } else if (command.equalsIgnoreCase("LOSS")) {
             for (Unit unit : units) {
                 if (0 == JOptionPane.showConfirmDialog(null,

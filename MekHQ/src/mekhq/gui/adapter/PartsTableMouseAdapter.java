@@ -56,7 +56,6 @@ public class PartsTableMouseAdapter extends MouseInputAdapter implements ActionL
                     gui.getCampaign().sellPart(p, 1);
                 }
             }
-            gui.refreshFunds();
         } else if (command.equalsIgnoreCase("SELL_ALL")) {
             for (Part p : parts) {
                 if (null != p) {
@@ -69,7 +68,6 @@ public class PartsTableMouseAdapter extends MouseInputAdapter implements ActionL
                     }
                 }
             }
-            gui.refreshFunds();
         } else if (command.equalsIgnoreCase("SELL_N")) {
             if (null != selectedPart) {
                 int n = selectedPart.getQuantity();

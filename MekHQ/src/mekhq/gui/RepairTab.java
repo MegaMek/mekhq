@@ -670,8 +670,6 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
             getCampaign().getShoppingList().addShoppingItem(acquisition, 1, getCampaign());
         }
 
-        getCampaignGui().refreshFunds();
-
         // get the selected row back for tasks
         if (selectedRow != -1) {
             if (acquireSelected()) {
@@ -746,7 +744,6 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
                 }
             }
         }
-        getCampaignGui().refreshFunds();
 
         if (selectedRow != -1) {
             if (acquireSelected()) {

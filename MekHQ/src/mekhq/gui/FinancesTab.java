@@ -16,7 +16,6 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.gui;
 
 import java.awt.BorderLayout;
@@ -40,6 +39,7 @@ import javax.swing.table.TableColumn;
 import megamek.common.event.Subscribe;
 import mekhq.MekHQ;
 import mekhq.campaign.event.AcquisitionEvent;
+import mekhq.campaign.event.AssetEvent;
 import mekhq.campaign.event.GMModeEvent;
 import mekhq.campaign.event.LoanEvent;
 import mekhq.campaign.event.MissionChangedEvent;
@@ -227,31 +227,24 @@ public final class FinancesTab extends CampaignGuiTab {
             String description = addFundsDialog.getFundsDescription();
             int category = addFundsDialog.getCategory();
             getCampaign().addFunds(funds, description, category);
-            getCampaignGui().refreshFunds();
-            refreshFinancialTransactions();
         }
     }
 
     private void showNewLoanDialog() {
         NewLoanDialog nld = new NewLoanDialog(getFrame(), true, getCampaign());
         nld.setVisible(true);
-        refreshFinancialTransactions();
-        getCampaignGui().refreshFunds();
         getCampaignGui().refreshRating();
     }
 
     private void manageAssets() {
         ManageAssetsDialog mad = new ManageAssetsDialog(getFrame(), getCampaign());
         mad.setVisible(true);
-        getCampaignGui().refreshFunds();
-        refreshFinancialTransactions();
     }
 
     public void refreshFinancialTransactions() {
         SwingUtilities.invokeLater(() -> { 
             financeModel.setData(getCampaign().getFinances().getAllTransactions());
             loanModel.setData(getCampaign().getFinances().getAllLoans());
-            getCampaignGui().refreshFunds();
             getCampaignGui().refreshRating();
             refreshFinancialReport();
         });
@@ -314,6 +307,11 @@ public final class FinancesTab extends CampaignGuiTab {
     
     @Subscribe
     public void handle(PartEvent ev) {
+        financialReportScheduler.schedule();
+    }
+    
+    @Subscribe
+    public void handle(AssetEvent ev) {
         financialReportScheduler.schedule();
     }
 }
