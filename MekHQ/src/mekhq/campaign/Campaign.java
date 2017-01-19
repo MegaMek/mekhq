@@ -7365,8 +7365,8 @@ public class Campaign implements Serializable {
     }
 
     /**
-     * Calculate the total value of units in the TO&E. This serves as the basis for contract payments in the StellarOps
-     * Beta.
+     * Calculate the total value of units in the TO&E. This serves as the basis for contract payments in Campaign
+     * Operations.
      *
      * @return
      */
@@ -7375,8 +7375,8 @@ public class Campaign implements Serializable {
     }
 
     /**
-     * Calculate the total value of units in the TO&E. This serves as the basis for contract payments in the StellarOps
-     * Beta.
+     * Calculate the total value of units in the TO&E. This serves as the basis for contract payments in Campaign
+     * Operations.
      *
      * @return
      */
@@ -7431,9 +7431,12 @@ public class Campaign implements Serializable {
     }
 
     public long getContractBase() {
-        if (getCampaignOptions().useEquipmentContractBase()) {
-            return (long) ((getCampaignOptions().getEquipmentContractPercent() / 100.0)
-            		* getForceValue(getCampaignOptions().useInfantryDontCount()));
+        if (getCampaignOptions().usePeacetimeCost()) {
+            double peacetimecost = (getPeacetimeCost() * .75) +
+                    getForceValue(getCampaignOptions().useInfantryDontCount());
+            return (long) peacetimecost;
+        } else if (getCampaignOptions().useEquipmentContractBase()) {
+            return getForceValue(getCampaignOptions().useInfantryDontCount());
         } else {
             return getPayRoll(getCampaignOptions().useInfantryDontCount());
         }

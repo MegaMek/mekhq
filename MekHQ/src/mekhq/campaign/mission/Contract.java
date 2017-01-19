@@ -386,7 +386,11 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
 		long profit = getTotalAmountPlusFeesAndBonuses();
 		profit -= c.getOverheadExpenses() * getLength();
 		profit -= c.getMaintenanceCosts() * getLength();
-		profit -= c.getPayRoll() * getLength();
+		if (c.getCampaignOptions().usePeacetimeCost()) {
+            profit -= c.getPeacetimeCost() * getLength();
+        } else {
+            profit -= c.getPayRoll() * getLength();
+        }
 		if(null != c.getPlanet(planetName) && c.getCampaignOptions().payForTransport()) {
 			profit -= 2 * c.calculateCostPerJump(true) * c.calculateJumpPath(c.getCurrentPlanet(), getPlanet()).getJumps();
 		}
