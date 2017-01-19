@@ -1941,13 +1941,6 @@ public class CampaignGUI extends JPanel {
         return getCampaign().getPartsStore().getByNameAndDetails(pnd);
     }
 
-    //TODO: Trigger from event
-    public void refreshPlanetView() {
-    	if (getTab(GuiTabType.MAP) != null) {
-    		((MapTab)getTab(GuiTabType.MAP)).refreshPlanetView();
-    	}
-    }
-
     protected void loadListFile(boolean allowNewPilots) throws IOException {
         JFileChooser loadList = new JFileChooser(".");
         loadList.setDialogTitle("Load Units");
