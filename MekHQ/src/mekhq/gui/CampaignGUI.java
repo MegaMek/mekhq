@@ -888,7 +888,6 @@ public class CampaignGUI extends JPanel {
                     return;
                 }
                 getCampaign().increaseMedicPool(pvcd.getValue());
-                refreshDoctorsList();
                 refreshTempMedics();
             }
         });
@@ -906,7 +905,6 @@ public class CampaignGUI extends JPanel {
                     return;
                 }
                 getCampaign().decreaseMedicPool(pvcd.getValue());
-                refreshDoctorsList();
                 refreshTempMedics();
             }
         });
@@ -921,7 +919,6 @@ public class CampaignGUI extends JPanel {
                 if (need > 0) {
                     getCampaign().increaseMedicPool(need);
                 }
-                refreshDoctorsList();
                 refreshTempMedics();
             }
         });
@@ -932,7 +929,6 @@ public class CampaignGUI extends JPanel {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 getCampaign().decreaseMedicPool(getCampaign().getMedicPool());
-                refreshDoctorsList();
                 refreshTempMedics();
             }
         });
@@ -2776,20 +2772,6 @@ public class CampaignGUI extends JPanel {
         }
     }
 
-    //TODO: Trigger from event
-    public void refreshServicedUnitList() {
-    	if (getTab(GuiTabType.REPAIR) != null) {
-    		((RepairTab)getTab(GuiTabType.REPAIR)).refreshServicedUnitList();
-    	}
-    }
-
-    //TODO: Trigger from event
-    public void refreshUnitList() {
-    	if (getTab(GuiTabType.HANGAR) != null) {
-    		((HangarTab)getTab(GuiTabType.HANGAR)).refreshUnitList();
-    	}
-    }
-
     public void refreshLab() {
     	MekLabTab lab = (MekLabTab)getTab(GuiTabType.MEKLAB);
     	if (null == lab) {
@@ -2810,30 +2792,6 @@ public class CampaignGUI extends JPanel {
     		} catch (Exception err) {
     			err.printStackTrace();
     		}
-    	}
-    }
-
-    //TODO: Trigger from event
-    public void refreshTechsList() {
-        if (getTab(GuiTabType.WAREHOUSE) != null) {
-        	((WarehouseTab)getTab(GuiTabType.WAREHOUSE)).refreshTechsList(); // NOI18N
-        }
-        if (getTab(GuiTabType.REPAIR) != null) {
-        	((RepairTab)getTab(GuiTabType.REPAIR)).refreshTechsList(); // NOI18N
-        }
-    }
-
-    //TODO: Trigger from event
-    public void refreshDoctorsList() {
-    	if (getTab(GuiTabType.INFIRMARY) != null) {
-    		((InfirmaryTab)getTab(GuiTabType.INFIRMARY)).refreshDoctorsList();
-    	}
-    }
-
-    //TODO: Trigger from event
-    public void refreshPatientList() {
-    	if (getTab(GuiTabType.INFIRMARY) != null) {
-    		((InfirmaryTab)getTab(GuiTabType.INFIRMARY)).refreshPatientList();
     	}
     }
 
