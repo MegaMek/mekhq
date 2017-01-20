@@ -50,7 +50,7 @@ public class MissingAeroSensor extends MissingPart {
     }
     
     public MissingAeroSensor(int tonnage, boolean drop, Campaign c) {
-    	super(0, c);
+    	super(tonnage, c);
     	this.name = "Aero Sensors";
     	this.dropship = drop;
     }
