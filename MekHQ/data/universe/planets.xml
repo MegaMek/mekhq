@@ -9766,6 +9766,24 @@ Bolan was primarily colonized by settlers from India, Pakistan and Afghanistan.<
 			<date>3071-07-14</date>
 			<faction>CJF</faction>
 		</factionChange>
+		<spectralClass>G</spectralClass>
+		<subtype>6</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>2</sysPos>
+		<satellite>Devil’s Pinch</satellite>
+		<gravity>0.92</gravity>
+		<pressure>3</pressure>
+		<climate>3</climate>
+		<temperature>24</temperature>
+		<percentWater>65</percentWater>
+		<hpg>B</hpg>
+		<lifeForm>6</lifeForm>
+		<socioIndustrial>C-D-D-B-C</socioIndustrial>
+		<landMass>Hapsburg (Redstone)</landMass>
+		<landMass>Renick</landMass>
+		<desc>Bone-Norman is a desolate world on the fringes of the Inner Sphere.
+
+The large Hapsburg continent is dominated by sharp mountain peaks of the Ruckens range to the west. The mountains hold back the incredible tidal swells of the ocean, which can rise hundreds of meters. The eastern side of these mountains are buffeted by tremendously high winds that have created stark badlands with no vegetation. The interior of the continent is filled with wind-made networks of canyons, caverns, and haunting rock formations. Further east, the badlands give way to rolling plains of blue grass and thick forests dominated by ‘werewillows’. The trees are relatively short but have leafy, willow-like branches, that can be several times longer than the tree’s trunk and are usually billowing east-ward in the near constant howling winds. The trees also have high metal content and play havoc with modern sensors.</desc>
 	</planet>
 	<planet>
 		<name>Bonneau</name>
@@ -11329,11 +11347,15 @@ Recently, a large island in the eastern basin has been taken over for secret tes
 		<ycood>462.398</ycood>
 		<faction>UND</faction>
 		<factionChange>
-			<date>2750-01-01</date>
+			<date>2597-01-01</date>
+			<faction>PIND</faction>
+		</factionChange>
+		<factionChange>
+			<date>2617-01-01</date>
 			<faction>RWR</faction>
 		</factionChange>
 		<factionChange>
-			<date>2779-01-01</date>
+			<date>2777-01-01</date>
 			<faction>PIND</faction>
 		</factionChange>
 		<factionChange>
@@ -11356,12 +11378,26 @@ Recently, a large island in the eastern basin has been taken over for secret tes
 			<date>3100-02-07</date>
 			<faction>TB</faction>
 		</factionChange>
-		<lifeForm>3</lifeForm>
 		<spectralClass>G</spectralClass>
 		<subtype>8</subtype>
+		<luminosity>V</luminosity>
 		<sysPos>3</sysPos>
-		<hpg>C</hpg>
-		<desc>No description available.</desc>
+		<gravity>1.02</gravity>
+		<pressure>3</pressure>
+		<climate>4</climate>
+		<temperature>39</temperature>
+		<percentWater>43</percentWater>
+		<hpg>B</hpg>
+		<lifeForm>3</lifeForm>
+		<socioIndustrial>D-F-F-D-B</socioIndustrial>
+		<landMass>Throline (Butte Hold, aka Raider’s Roost)</landMass>
+		<desc>Butte Hold was originally settled by aqua-culturalists seeking to breed the fish-analogous species of Butte Hold into a source of food for the Rim World Republic in 2597. The Rim World Republic claimed the world and began settling it two decades later and unfortunately those efforts brought about the unsavory criminal organizations that would come to rule the world for centuries to come.
+
+While the scientists were successful in their original work, the newly modified species was found to be better suited to life on Apollo and Crellacor, taking the planet’s largest employer with it. This move sunk the planet into economic depression that lasted centuries.
+
+Bandits and organized crime flourished in the resulting conditions and in 2640, the Rim Worlds Republic pulled its forces from the planet and told the locals to police themselves. This left locals at the mercy of the bandits and quality of life declined further. While still technically considered part of the RWR, the planet was essentially on its own.
+
+Unlike many planets, Butte Hold was unaffected by the fall of the Star League and the Rim Worlds Republic. The lawless life of petty crime lords and bandits continued with power exchanging regularly and pirates using the planet as a base of operations when convenient.</desc>
 	</planet>
 	<planet>
 		<name>Butzfleth</name>
@@ -40450,6 +40486,25 @@ Most of the population lives in small cities dotting the 4 continents.  There ar
 			<date>3067-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
+		<spectralClass>F</spectralClass>
+		<subtype>3</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>3</sysPos>
+		<satellite>The Pearls (Fragmented)</satellite>
+		<gravity>0.98</gravity>
+		<pressure>3</pressure>
+		<climate>5</climate>
+		<temperature>25</temperature>
+		<percentWater>63</percentWater>
+		<hpg>B</hpg>
+		<lifeForm>5</lifeForm>
+		<socioIndustrial>D-D-B-C-D</socioIndustrial>
+		<landMass>Stonewall (Bull Run)</landMass>
+		<desc>The planet Manassas sports a single supercontinent named Stonewall. Named after a mid-nineteenth century general and the large mountain range that cuts off the southeast third of the continent from the rest. This smaller portion of the continent is where the majority of the inhabitants of Manassas live along the southern ‘green zones’ along the ocean and is made up of four provinces. The capital, Bull Run, lies along the southern tip of the Virginia Peninsula.
+
+Initial colonists were drawn to the abundant aquatic ecosystem, despite a damaged terrestrial biome. The result of millennia earlier impacts, from a massive asteroid that hit the planet’s moon. The moon was shattered and debris struck Manassas, killing most terrestrial life. While the moon has begun to recombine by the time of human settlement, it is still thousands of years from completion. For now, the fragmented moon makes the night skies of Manassas beautiful, though causes dangers for interstellar travel above the equatorial belt.
+
+The planet suffered a major setback during the First Succession War when the DCMS hit Federated Suns research facilities with orbital bombardment as well as chemical and biological weaponry that left the atmosphere tainted for centuries to come. Following the destruction, the planet struggled to hold on and lawlessness eventually took hold.</desc>
 	</planet>
 	<planet>
 		<name>Mandaoaaru</name>
@@ -48046,7 +48101,7 @@ Niops V and VI were settled primarily to expand the available resources to the N
 		<socioIndustrial>B-B-C-B-C</socioIndustrial>
 		<landMass>Mahoken</landMass>
 		<landMass>Romaha</landMass>
-		<landMass>Teppokhan Prime</landMass>
+		<landMass>Teppokhan (Teppokhan Prime)</landMass>
 		<desc>Noisiel is a planet with a mix of industry and agriculture located deep in the Lyran Commonwealth. The planet also boasts large tracts of uninhabited, unspoiled wilderness, which supports a sizable tourist trade. The tourists come attracted by a unique martial tradition established in 3047 by the wealthy Alextep family, hereditary landholders of Noisiel. The Noisiel Summer Games began as a challenge between father and son, Duke Michael, CEO of Alextep Engineering services and his son and primary rival, Heinrich, CEO of Heinrich SuppoTech Interstellar. The unique duel was planned to take place in the rolling hills of Duke Michael’s estate on the continent of Teppokhan Prime. All citizens of the planet were invited to watch, for a small ticket price (which was intended to pay for any repairs necessary to the two family-owned Atlases. The duel itself ended up being a ‘Mech-sized game of rugby, using a half-ton ballistic-polymer ‘ball’ and the game covered a full square kilometer of the estate.
 
 The event was advertised all over planet and on several surrounding and attracted a large crowd. And thus, after the Clan Invasion, which saw Heinrich serve a tour of duty with the AFFC, the tradition of the Noisiel Summer Games began. Now the Games are a 12 day event and mercenaries and solaris jocks alike are invited to join in to show off their ‘Mechs and piloting skills. The MechWarriors take part in a variety of sports on ‘Mech scale, including baseball, football, hocket, and chess, as well as unique ‘Mech-based “talent shows”, parades and pageants.</desc>
@@ -53348,6 +53403,38 @@ While the planet was once home to a sprawling Brigadier Corporation ‘Mech fact
 			<date>3145-01-01</date>
 			<faction>DTA</faction>
 		</factionChange>
+		<spectralClass>G</spectralClass>
+		<subtype>8</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>2</sysPos>
+		<satellite>Mana</satellite>
+		<gravity>1.7</gravity>
+		<pressure>3</pressure>
+		<climate>4</climate>
+		<temperature>19</temperature>
+		<percentWater>50</percentWater>
+		<nadirCharge>True</nadirCharge>
+		<zenithCharge>True</zenithCharge>
+		<hpg>A</hpg>
+		<lifeForm>7</lifeForm>
+		<socioIndustrial>B-B-A-B-B</socioIndustrial>
+		<landMass>Avalon</landMass>
+		<landMass>Camelot</landMass>
+		<landMass>Eden</landMass>
+		<landMass>El Dorado</landMass>
+		<landMass>Elysium</landMass>
+		<landMass>Hyperborea</landMass>
+		<landMass>Jannah</landMass>
+		<landMass>Mahoroba</landMass>
+		<landMass>Shambhala</landMass>
+		<landMass>Shangri La</landMass>
+		<landMass>Utopia</landMass>
+		<landMass>Valhalla</landMass>
+		<landMass>Xanadu</landMass>
+		<landMass>Xion (Chaffinsopolis)</landMass>
+		<desc>During humanities rush to colonize the stars, some colonization corporations realized that marketing was more important than solid facts. Promised Land had its name selected entirely to attract new colonists and sell land. The planet was touted for its large size and abundance of land and water, the clean air and moderate temperatures, and good soil.
+
+The marketing campaign forgot to mention that there were fewer areas with moderate temperature and good soil on the massive planet than on Earth. Or that much of the abundant water was highly salinated. The ads also failed to mention the extremely high gravity, almost double that on Earth. There were very narrow temperate zones, with massive desserts between. There was also the problem of native life that required vaccines, anti-allergy medication to fight the smaller-scale life forms, and for the larger and more aggressive and intelligent, possibly body armor and weapons training.</desc>
 	</planet>
 	<planet>
 		<name>Propus</name>
@@ -75220,9 +75307,32 @@ However, the Devil's Brigade had one striking success: they found the ancient st
 		<ycood>-493.992</ycood>
 		<faction>UND</faction>
 		<factionChange>
-			<date>3081-01-01</date>
+			<date>2740-01-01</date>
+			<faction>TH</faction>
+		</factionChange>
+		<factionChange>
+			<date>2754-01-01</date>
 			<faction>ABN</faction>
 		</factionChange>
+		<spectralClass>K</spectralClass>
+		<subtype>4</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>2</sysPos>
+		<satellite>Gossamer</satellite>
+		<gravity>1.08</gravity>
+		<pressure>3</pressure>
+		<climate>2</climate>
+		<temperature>20</temperature>
+		<percentWater>77</percentWater>
+		<hpg>X</hpg>
+		<lifeForm>6</lifeForm>
+		<socioIndustrial>F-F-F-B-B</socioIndustrial>
+		<landMass>Equatorial Zone (Camp McEvedy)</landMass>
+		<desc>McEvedy’s Folly was one of many planets skipped over in initial colonization because it would have required terraforming to comfortably inhabit and the planet was deemed of scientific interest in its natural state. The planet was in the grips of an ice age and scientists were curious to study the effects if the ice age was reversed. Unfortunately for the planet, it was not until the mid 2700s that experimental terraforming efforts began under Doctor Alpheus McEvedy. While initial work went well, the doctor slowly became obsessed with bringing terrestrial life that had gone extinct on Earth and other planets back to life and superiors back in the Hegemony and assistants on planet began to suspect he was losing his grip on reality.
+
+The planet was eventually raided by unknown forces, which took most of the terraforming station’s supplies and the Hegemony used it as an excuse to recall the scientist and his crew. However, McEvedy refused orders to leave, stating his projects were not done. He continued to work on them even after his staff eventually rebelled and abandoned them. With the turmoil of Amaris’ rise to power and the resulting Civil War, the scientific project was lost and forgotten for centuries.
+
+When the planet was rediscovered in the 31st century, the world was full of strange hybrid creatures from Dr. McEvedy’s experimentations. The last human on the planet, Dr. McEvedy, had further lost his mind and eventually killed himself in 2783.</desc>
 	</planet>
 	<planet>
 		<name>Skyfog</name>
@@ -79270,9 +79380,33 @@ However, the Devil's Brigade had one striking success: they found the ancient st
 			<faction>CC</faction>
 		</factionChange>
 		<factionChange>
-			<date>2925-01-01</date>
+			<date>2862-01-01</date>
 			<faction>ABN</faction>
 		</factionChange>
+		<spectralClass>K</spectralClass>
+		<subtype>3</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>2</sysPos>
+		<satellite>(Rings)</satellite>
+		<gravity>0.9</gravity>
+		<pressure>3</pressure>
+		<climate>4</climate>
+		<temperature>22</temperature>
+		<percentWater>75</percentWater>
+		<hpg>B</hpg>
+		<lifeForm>0</lifeForm>
+		<socioIndustrial>A-A-A-A-A</socioIndustrial>
+		<landMass>Florida</landMass>
+		<landMass>Illinois</landMass>
+		<landMass>Indiana</landMass>
+		<landMass>Iowa</landMass>
+		<landMass>Ohio</landMass>
+		<landMass>Texas (Dallas)</landMass>
+		<desc>Brownsville was not immediately inhabitable but proved to be easily terraformed and minimal efforts by the Terran Hegemony resulted in a world with a stable, flourishing ecosystem. The first settlers in early the 2300s found a paradise in the continental interiors. Young forests. Green meadows. Rains and clean water filled with fish.
+
+Temperate continents like Indiana and Iowa were settled more heavily than the steamy equatorial lands of California or the arid, fjord-pierced continent of Texas. Most cities and habitations were settled well inland, away from the brown, polluted looking oceans. The planet thrived for hundreds of years, with abundant resources, agriculture, and industry.
+
+Unfortunately, the planet suffered heavily during the Amaris civil war and never truly recovered. Even more tragic, the planet was susceptible to the loss of atmospheric processors and the atmosphere became slowly more tainted by the 2800s and by 2850 most animal life had died from low oxygen levels and humans required respirators. The planet was formally abandoned in 2862. While thousands were evacuated by ComStar, millions more were left to die.</desc>
 	</planet>
 	<planet>
 		<name>Burnt Rock</name>
@@ -80574,9 +80708,27 @@ However, the Devil's Brigade had one striking success: they found the ancient st
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
-			<date>2821-01-01</date>
+			<date>2815-01-01</date>
 			<faction>ABN</faction>
 		</factionChange>
+		<spectralClass>M</spectralClass>
+		<subtype>1</subtype>
+		<luminosity>IV</luminosity>
+		<sysPos>1</sysPos>
+		<satellite>Riesenschild</satellite>
+		<gravity>1.1</gravity>
+		<pressure>3</pressure>
+		<climate>15</climate>
+		<temperature>2</temperature>
+		<percentWater>72</percentWater>
+		<hpg>X</hpg>
+		<lifeForm>6</lifeForm>
+		<socioIndustrial>C-D-D-D-D</socioIndustrial>
+		<landMass>Ketzerheimat</landMass>
+		<landMass>Klüfterlande (Krimhildshausen - 2765)</landMass>
+		<landMass>Lamarae</landMass>
+		<landMass>Lunarblessed (Ruprecht - 3130)</landMass>	
+		<desc>Dunklewälderdunklerflüssenschattenwelt (later known as “Bob”) was never a wealthy or vibrant planet, however, it did manage to support a population of almost 350 million at its peak. However, the planet was almost completely destroyed during the First Succession War. Despite being written off by ComStar and the universe at large, small pockets of survivors lived on and despite a tainted atmosphere clung to life. Basic settlements were constructed and remain as of 3130, although technology barely exists and the world has barely clung to the basic engineering and manufacturing for artificial lighting and indoor plumbing, their technology is more on par with the 19th century than the 32nd.</desc>
 	</planet>
 	<planet>
 		<name>Durabon</name>
@@ -82404,9 +82556,35 @@ However, the Devil's Brigade had one striking success: they found the ancient st
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
-			<date>2864-01-01</date>
+			<date>2822-01-01</date>
 			<faction>ABN</faction>
 		</factionChange>
+		<spectralClass>G</spectralClass>
+		<subtype>7</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>2</sysPos>
+		<satellite>Martim Vaz</satellite>
+		<gravity>0.92</gravity>
+		<pressure>3</pressure>
+		<climate>3</climate>
+		<temperature>22</temperature>
+		<percentWater>70</percentWater>
+		<nadirCharge>True</nadirCharge>
+		<zenithCharge>True</zenithCharge>
+		<hpg>A</hpg>
+		<lifeForm>0</lifeForm>
+		<socioIndustrial>A-A-A-A-A</socioIndustrial>
+		<landMass>Para</landMass>
+		<landMass>Ceara (Doosamontana - 3150</landMass>
+		<landMass>Amazonas</landMass>
+		<landMass>Catarina (Novas Brasilia - 2787)</landMass>
+		<landMass>Ionus</landMass>
+		<landMass>Serhipe</landMass>
+		<desc>Inglesmond is one of many planets within the Terran Hegemony that was only colonized thanks to terraforming efforts in the late 23rd century. Despite extremely short and severe seasons that freeze the planet in the short winters and bake it during the summers, the planet thrived for centuries under the Hegemony and more than a billion people called it home. The planet was home to thriving agriculture, technology, and industry, including massive orbital shipyards.
+
+Unfortunately, Inglesmond shared its fate with so many other Hegemony worlds. Crippled  during the Civil War and finished during the First Succession War when the planet found itself in the midst of a four-way battle between the Inglesmond defenders, Draconis Combine, Federated Suns, and Lyran Commonwealth that ended in scorched earth tactics by all three Houses and left the planet in ruins from nuclear and biological weapons.
+
+The planet was declared uninhabited by Comstar in 2822 and removed from star charts. Not all the human inhabitants were dead, however, those that remained returned to hunter-gatherer levels of society.</desc>
 	</planet>
 	<planet>
 		<name>Ingvolstand</name>
@@ -83735,6 +83913,37 @@ However, the Devil's Brigade had one striking success: they found the ancient st
 			<date>2864-01-01</date>
 			<faction>ABN</faction>
 		</factionChange>
+		<spectralClass>M</spectralClass>
+		<subtype>1</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>5</sysPos>
+		<satellite>Vespa</satellite>
+		<gravity>0.8</gravity>
+		<pressure>3</pressure>
+		<climate>4</climate>
+		<temperature>22</temperature>
+		<percentWater>40</percentWater>
+		<hpg>A</hpg>
+		<lifeForm>0</lifeForm>
+		<socioIndustrial>A-A-A-A-A</socioIndustrial>
+		<landMass>The Belt (Volgadon)</landMass>
+		<desc>The Terran Hegemony spent more than a century terraforming Lone Star for inhabitation in 2533. A process made more challenging due to the planet’s distance from its sun and a thin, nitrogenous atmosphere and the movement of a local astroid into the planet’s orbit to act as a moon for mining and to host a skyhook.
+
+However, the efforts were extremely successful and within 70 years Lone Star was flourishing. The planet was home to hundreds of millions, industry was booming, and it had more than enough agriculture to feed its population and export a wide range of luxury foods.
+
+Lone Star technically has five linked continents which follow the prime meridian around the poles, however, residents started to refer to them simply as “The Belt” and that was the only name that stuck.
+
+While terraformed, most of the planet’s free water was concentrated in two highly saline oceans, Big Pond and Other Pond, that were roughly circular and situated antipodal in the eastern and western hemispheres. The majority of the planet’s freshwater was locked in the massive polar ice caps, with the areas between poles being predominantly arid.
+
+Despite the prominent amount of arid land, there were still large regions with comfortable climates and settlements naturally congregated to these locations in nine major metropolitan regions. Eight of these cities were evenly split between the northern and southern coasts of both ‘ponds’. The cities and surrounding regions remained temperate year round thanks to the oceans and had ample freshwater from ice cap fed rivers and ocean-driven precipitation.
+
+Driven by strict government zoning, no suburbs ever materialized and immediately outside of the bustling metropolises land immediately turned to agriculture or nature preserves. The immense tidal swells of the ‘ponds’ required each of the eight cities to be built highly raised above ground level or on natural high ground, such as the case with Cliffside, where much of the city was built into and out of the granite cliff face it was situated on.
+
+The ninth and final megacity was also the capital, Volgadon. The capital was situated between both oceans and  was surrounded by two major polar rivers, which drained into Big Pond and Other Pond. The city itself was built on a massive, complex canal-and-lock system that linked both rivers and effectively both oceans. 
+
+Lone Star remained a gem of the Terran Hegemony until both fell alongside the Star League. There was fierce fighting between Stefan Amaris’ forces and the Star League the devastated cities and Volgadon in particular. The planet’s industry was shattered in the civil war and the planet lost its HPG, Zenith and Nadir recharge stations, and the plants maintaining its pleasant atmosphere were damaged. They continued to break down in the proceeding years and were destroyed completely by 2803. Without the atmospheric processors, the planet’s pleasant average 22 degrees celsius at the equator dropped to -5 by 2822.
+
+While the air was still breathable, the planet is locked in ice and uninhabited by the end of the 2nd Succession War.</desc>
 	</planet>
 	<planet>
 		<name>Lorkdal</name>
@@ -87985,7 +88194,19 @@ However, the Devil's Brigade had one striking success: they found the ancient st
 		<ycood>-28.321</ycood>
 		<faction>UND</faction>
 		<factionChange>
-			<date>2367-01-01</date>
+			<date>2225-01-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2314-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
+			<date>2330-01-01</date>
+			<faction>ABN</faction>
+		</factionChange>
+		<factionChange>
+			<date>2350-01-01</date>
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
@@ -88001,9 +88222,40 @@ However, the Devil's Brigade had one striking success: they found the ancient st
 			<faction>FWL</faction>
 		</factionChange>
 		<factionChange>
-			<date>2864-01-01</date>
+			<date>2824-01-01</date>
 			<faction>ABN</faction>
 		</factionChange>
+		<spectralClass>F</spectralClass>
+		<subtype>6</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>5</sysPos>
+		<satellite>Dvalli</satellite>
+		<satellite>Durin</satellite>
+		<gravity>1.04</gravity>
+		<pressure>3</pressure>
+		<climate>4</climate>
+		<temperature>33</temperature>
+		<percentWater>47</percentWater>
+		<nadirCharge>True</nadirCharge>
+		<zenithCharge>True</zenithCharge>
+		<hpg>B</hpg>
+		<lifeForm>1</lifeForm>
+		<socioIndustrial>A-A-A-B-B</socioIndustrial>
+		<landMass>Angantyr</landMass>
+		<landMass>Arngrim (Hjalmar)</landMass>
+		<landMass>Heidrek</landMass>
+		<landMass>Svafrlami</landMass>
+		<desc>Tyrfing was discovered in the early days of humanity’s exploration of the stars but passed over for early colonization due to a carbon-dioxide rich and oxygen poor atmosphere. By the early 2200s the planet was re-evaluated due to the discovery of an abundance of industrial-grade minerals.
+
+Originally settled as nothing more than a mining operation, after a contract awarded to Pacific Trans-Stellar, with miners required to live in self-contained outposts. Despite a lack of interest in making the planet fit for true colonization the corporation as part of their contract was required to try to terraform it. They hired another firm to seed the planet with plants to scrub the CO2 and replace it with O2. Unknown to the Terran Alliance or Pacific Trans-Stellar, the company hired was also seeding colonists. By the time of the Outer Reaches Rebellion, the planet had almost 100,000 unregistered residents living in hidden cities throughout fast-growing jungles.
+
+Cutoff from the rest of humanity, the colonists and miners were forced into conflict but eventually, neither were able to survive on the planet and within 20 years, the planet was again uninhabited. However, the jungles continued to grow and work to reduce the carbon dioxide in the atmosphere.
+
+In 2350, new settlers found the planet and completed the terraforming processes started decades before. This time, colonization was successful and Tyrfing became a bustling, if unremarkable world by Terran Hegemony standards for the next four centuries.
+
+Unfortunately, like so many other worlds, Tyrfing fell along with the Star League during the Amaris Civil War and the following First Succession War. An outbreak of disease and a lack of medical facilities meant a crippled world became a dying world. The Free Worlds League quarantined the world in 2824 and it was lost from the records after.
+
+After its fall, humans continued to live on Tyrfing at a basic hunter-gatherer level of civilization.</desc>
 	</planet>
 	<planet>
 		<name>Tyrlon</name>
