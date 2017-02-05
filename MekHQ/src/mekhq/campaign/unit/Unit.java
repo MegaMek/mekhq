@@ -3884,4 +3884,28 @@ public class Unit implements MekHqXmlSerializable {
         return techRating;
     }
 
+    public String displayMonthlyCost() {
+        String unitMonthlyCost = "<b>Spare Parts</b>: " + getSparePartsCost() + " C-bills<br>"
+                               + "<b>Ammunition</b>: " + getAmmoCost() + " C-bills<br>"
+                               + "<b>Fuel</b>: " + getFuelCost() + " C-bills<br>";
+        return unitMonthlyCost;
+    }
+
+    public long getSparePartsCost() {
+        long partsCost = 0;
+
+        return partsCost;
+    }
+
+    public long getAmmoCost() {
+        long ammoCost = 0;
+
+        return ammoCost;
+    }
+
+    public long getFuelCost() {
+        long fuelCost = 0;
+
+        return fuelCost;
+    }
 }
