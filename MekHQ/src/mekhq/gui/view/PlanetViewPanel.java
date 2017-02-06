@@ -147,7 +147,7 @@ public class PlanetViewPanel extends JPanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         add(txtDesc, gridBagConstraints);
         
-        planetIcon = ImageUtil.loadImageFromFile("data/" + StarUtil.getIconImage(planet), getToolkit());
+        planetIcon = ImageUtil.loadImageFromFile("data/" + StarUtil.getIconImage(planet));
     }
 
     private void getNeighbors() {
