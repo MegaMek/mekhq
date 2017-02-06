@@ -3908,7 +3908,18 @@ public class Unit implements MekHqXmlSerializable {
                 || ((Infantry) entity).isMechanized()) {
             partsCost += ((long)entity.getWeight()) * .001 * 10000;
         } else if (entity instanceof Infantry) {
-            partsCost += ((long)entity.getWeight()) * .01 * 10000;
+            if (entity.getMovementMode() == EntityMovementMode.INF_LEG) {
+                partsCost += 3 * .01 * 10000;
+            } else if (entity.getMovementMode() == EntityMovementMode.INF_JUMP) {
+                partsCost += 4 * .01 * 10000;
+            } else if (entity.getMovementMode() == EntityMovementMode.INF_MOTORIZED) {
+                partsCost += 6 * .01 * 10000;
+            } else {
+                partsCost += ((long)entity.getWeight()) * .01 * 10000;
+                MekHQ.logMessage(getName() + " is not a generic CI. Movement mode is "
+                        + entity.getMovementModeAsString(), 5);
+            }
+
         } else {
             // Only protomechs should fall here. Anything else needs to be logged
             if (!(entity instanceof Protomech)) {
