@@ -15,7 +15,7 @@
 # 
 
 # Define script constants.
-cd $(dirname $0)
+cd $(dirname "${BASH_SOURCE[0]}")
 
 # Try to find the executable for Java.
 JAVA=/usr/bin/java
