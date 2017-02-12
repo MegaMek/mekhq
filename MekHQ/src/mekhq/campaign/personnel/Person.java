@@ -1022,6 +1022,35 @@ public class Person implements Serializable, MekHqXmlSerializable {
         }
     }
 
+    public void addPregnancy() {
+        GregorianCalendar tCal = (GregorianCalendar) campaign.getCalendar().clone();
+        tCal.add(GregorianCalendar.DAY_OF_YEAR, PREGNANCY_DURATION.getAsInt());
+        setDueDate(tCal);
+        int size = PREGNANCY_SIZE.getAsInt();
+        extraData.set(PREGNANCY_CHILDREN_DATA, size);
+        extraData.set(PREGNANCY_FATHER_DATA,
+            (null != getSpouseID()) ? getSpouseID().toString() : null);
+
+        String sizeString = (size < PREGNANCY_MULTIPLE_NAMES.length) ? PREGNANCY_MULTIPLE_NAMES[size] : null;
+        if(null == sizeString) {
+            campaign.addReport(getHyperlinkedName()+" has conceived");
+            if (campaign.getCampaignOptions().logConception()) {
+                addLogEntry(campaign.getDate(), "Has conceived");
+            }
+        } else {
+            campaign.addReport(getHyperlinkedName()+" has conceived " + sizeString);
+            if (campaign.getCampaignOptions().logConception()) {
+                addLogEntry(campaign.getDate(), "Has conceived " + sizeString);
+            }
+        }
+    }
+
+    public void removePregnancy() {
+        setDueDate(null);
+        extraData.set(PREGNANCY_CHILDREN_DATA, 0);
+        extraData.set(PREGNANCY_FATHER_DATA, null);
+    }
+
 	public boolean safeSpouse(Person p) {
 		// Huge convoluted return statement
 		return (

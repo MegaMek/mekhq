@@ -103,6 +103,8 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
     private static final String CMD_IMPROVE = "IMPROVE"; //$NON-NLS-1$
     private static final String CMD_ADD_SPOUSE = "SPOUSE"; //$NON-NLS-1$
     private static final String CMD_REMOVE_SPOUSE = "REMOVE_SPOUSE"; //$NON-NLS-1$
+    private static final String CMD_ADD_PREGNANCY = "ADD_PREGNANCY"; //$NON-NLS-1$
+    private static final String CMD_REMOVE_PREGNANCY = "PREGNANCY_SPOUSE"; //$NON-NLS-1$
     private static final String CMD_ADD_TECH = "ADD_TECH"; //$NON-NLS-1$
 
     private static final String CMD_IMPRISON = "IMPRISON"; //$NON-NLS-1$
@@ -427,6 +429,22 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 }
                 u.resetPilotAndEntity();
                 u.runDiagnostic(false);
+                break;
+            }
+            case CMD_ADD_PREGNANCY:
+            {
+                if (selectedPerson.isFemale()) {
+                    selectedPerson.addPregnancy();
+                    gui.refreshReport();
+                }
+                break;
+            }
+            case CMD_REMOVE_PREGNANCY:
+            {
+                if (selectedPerson.isPregnant()) {
+                    selectedPerson.removePregnancy();
+                    gui.refreshPersonnelList();
+                }
                 break;
             }
             case CMD_REMOVE_SPOUSE:
@@ -1491,6 +1509,20 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             cbMenuItem.setActionCommand(makeCommand(CMD_REMOVE_UNIT, "-1")); //$NON-NLS-1$
             cbMenuItem.addActionListener(this);
             menu.add(cbMenuItem);
+            if (oneSelected) {
+                if ((person.getAge(gui.getCampaign().getCalendar()) > 13) && (person.isFemale()) && !person.isPregnant()) {
+                    menuItem = new JMenuItem(resourceMap.getString("addPregnancy.text")); //$NON-NLS-1$
+                    menuItem.setActionCommand(CMD_ADD_PREGNANCY);
+                    menuItem.addActionListener(this);
+                    popup.add(menuItem);
+                }
+                if (person.isPregnant()) {
+                    menuItem = new JMenuItem(resourceMap.getString("removePregnancy.text")); //$NON-NLS-1$
+                    menuItem.setActionCommand(CMD_REMOVE_PREGNANCY);
+                    menuItem.addActionListener(this);
+                    popup.add(menuItem);
+                }
+            }
             if (oneSelected && person.isActive()) {
                 if ((person.getAge(gui.getCampaign().getCalendar()) > 13) && (person.getSpouseID() == null)) {
                     menu = new JMenu(resourceMap.getString("changeSpouse.text")); //$NON-NLS-1$
