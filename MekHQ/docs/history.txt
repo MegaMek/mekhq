@@ -1,5 +1,7 @@
 VERSION HISTORY:
 ----------------
+v0.43.1-git
+
 v0.43.0 (2017-02-13 03:30 UTC)
 + Improve Mass Repair/Mass Salvage technician selection by providing additional configuration options
 + Fix #313: Prisoners counting towards combatants total for defection rolls. 
