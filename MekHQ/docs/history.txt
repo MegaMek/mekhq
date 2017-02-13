@@ -1,8 +1,9 @@
 VERSION HISTORY:
 ----------------
-v0.42.1-git
+v0.42.1 (2017-02-13 03:30 UTC)
 + Fix #313: Prisoners counting towards combatants total for defection rolls
 + Fix #314: Purchasing aerospace sensors via 'purchase parts' are always 0 ton
++ Updated MegaMek.jar and MegaMekLab.jar to 0.42.1
 
 v0.42.0 (2017-01-01 14:00 UTC)
 + Fix #266: PayForTransport option ignored when estimating total contract profit
