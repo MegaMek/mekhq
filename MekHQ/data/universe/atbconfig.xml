@@ -107,7 +107,7 @@ of 4. An entry of the form <entry>option</entry> has a weight of 1.
 			</weightedTable>
 			<weightedTable weightClass="A">
 				<entry weight="1">MHHAA</entry>
-				<entry weight="2">HHHAAA</entry>
+				<entry weight="2">HHHAA</entry>
 				<entry weight="2">HHAAA</entry>
 				<entry weight="1">AAAAA</entry>
 			</weightedTable>
@@ -122,11 +122,11 @@ of 4. An entry of the form <entry>option</entry> has a weight of 1.
 			</weightedTable>
 			<weightedTable weightClass="M">
 				<entry weight="1">LLLMMM</entry>
-				<entry weight="1">LLMMMMM</entry>
-				<entry weight="1">LMMMMMM</entry>
-				<entry weight="1">MMMMMMM</entry>
-				<entry weight="1">MMMMMMH</entry>
-				<entry weight="1">MMMMMHH</entry>
+				<entry weight="1">LLMMMM</entry>
+				<entry weight="1">LMMMMM</entry>
+				<entry weight="1">MMMMMM</entry>
+				<entry weight="1">MMMMMH</entry>
+				<entry weight="1">MMMMHH</entry>
 			</weightedTable>
 			<weightedTable weightClass="H">
 				<entry>MMMHHH</entry>
