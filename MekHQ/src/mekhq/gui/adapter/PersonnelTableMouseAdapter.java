@@ -1514,12 +1514,14 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     menuItem = new JMenuItem(resourceMap.getString("addPregnancy.text")); //$NON-NLS-1$
                     menuItem.setActionCommand(CMD_ADD_PREGNANCY);
                     menuItem.addActionListener(this);
+                    menuItem.setEnabled(gui.getCampaign().isGM());
                     popup.add(menuItem);
                 }
                 if (person.isPregnant()) {
                     menuItem = new JMenuItem(resourceMap.getString("removePregnancy.text")); //$NON-NLS-1$
                     menuItem.setActionCommand(CMD_REMOVE_PREGNANCY);
                     menuItem.addActionListener(this);
+                    menuItem.setEnabled(gui.getCampaign().isGM());
                     popup.add(menuItem);
                 }
             }
