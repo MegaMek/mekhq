@@ -434,15 +434,20 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
 		}
 
 		//calculate support amount
-		long maintCosts = 0;
-		for (Unit u : c.getUnits()) {
-            if (u.getEntity() instanceof Infantry && !(u.getEntity() instanceof BattleArmor)) {
-            	continue;
-            }
-            maintCosts += u.getWeeklyMaintenanceCost();
-        }
-		maintCosts *= 4;
-		supportAmount = (long)((straightSupport/100.0) * maintCosts * getLength());
+		if (c.getCampaignOptions().usePeacetimeCost()
+		        && c.getCampaignOptions().getUnitRatingMethod().equals(mekhq.campaign.rating.UnitRatingMethod.CAMPAIGN_OPS)) {
+		    supportAmount = (long)((straightSupport/100.0) * c.getPeacetimeCost() * getLength());
+		} else {
+		    long maintCosts = 0;
+	        for (Unit u : c.getUnits()) {
+	            if (u.getEntity() instanceof Infantry && !(u.getEntity() instanceof BattleArmor)) {
+	                continue;
+	            }
+	            maintCosts += u.getWeeklyMaintenanceCost();
+	        }
+	        maintCosts *= 4;
+	        supportAmount = (long)((straightSupport/100.0) * maintCosts * getLength());
+		}
 
 		//calculate transportation costs
 		if(null != Planets.getInstance().getPlanetById(planetName)) {
