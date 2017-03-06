@@ -23,7 +23,11 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.common.AmmoType;
+import megamek.common.BombType;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.Mounted;
@@ -35,9 +39,6 @@ import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Era;
 import mekhq.campaign.work.IAcquisitionWork;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  * This will be a special type of part that will only exist as spares
@@ -122,9 +123,17 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
     
     @Override
     public boolean isSamePartType(Part part) {
-        return part instanceof AmmoStorage
-                && ((AmmoType)getType()).getMunitionType() == ((AmmoType)((AmmoStorage)part).getType()).getMunitionType()
-                && ((AmmoType)getType()).equals( (Object)((EquipmentPart)part).getType());
+        if (part instanceof AmmoStorage) {
+            if (getType() instanceof BombType) {
+                return ((EquipmentPart)part).getType() instanceof BombType
+                        && ((BombType)getType()).getBombType() == ((BombType)((EquipmentPart)part).getType()).getBombType();
+            } else {
+                return ((AmmoType)getType()).getMunitionType() == ((AmmoType)((AmmoStorage)part).getType()).getMunitionType()
+                        && ((AmmoType)getType()).equals( (Object)((EquipmentPart)part).getType());
+            }
+            
+        }
+        return false;
     }
     
     public void changeShots(int s) {
