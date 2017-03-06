@@ -104,6 +104,7 @@ public class MekLabTab extends CampaignGuiTab {
 
     MekLabTab(CampaignGUI gui, String name) {
         super(gui, name);
+        this.campaignGUI = gui;
 
         this.repaint();
     }

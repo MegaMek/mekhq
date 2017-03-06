@@ -3,6 +3,7 @@ VERSION HISTORY:
 v0.43.1-git
 + Change to require GM Mode for the add/remove pregnancy context menu commands
 Fix #334: Problems purchasing bombs.
+Fix #326: Cannot use Meklab to customize units from within MekHQ using v43.0
 
 v0.43.0 (2017-02-13 03:30 UTC)
 + Improve Mass Repair/Mass Salvage technician selection by providing additional configuration options
