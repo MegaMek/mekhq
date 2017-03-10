@@ -329,7 +329,6 @@ public class PersonnelMarketDialog extends JDialog {
 	    			personnelModel.setData(personnelMarket.getPersonnel());
 	    		}
 	    	}
-	    	refreshHqView();
 	    	refreshPersonView();
 	    }
 	}//GEN-LAST:event_btnHireActionPerformed
@@ -344,7 +343,6 @@ public class PersonnelMarketDialog extends JDialog {
 		    	personnelMarket.removePerson(selectedPerson);
 	    		personnelModel.setData(personnelMarket.getPersonnel());
 				personnelMarket.removeAttachedEntity(pid);
-		    	refreshHqView();
 		    	refreshPersonView();
 		    }
 		}
@@ -384,16 +382,6 @@ public class PersonnelMarketDialog extends JDialog {
 
 		campaign.hirePersonnelFor(unit.getId());
 	}
-
-    private void refreshHqView() {
-        hqView.refreshPersonnelList();
-        hqView.refreshUnitList();
-        hqView.refreshPatientList();
-        hqView.refreshTechsList();
-        hqView.refreshDoctorsList();
-        hqView.refreshReport();
-        hqView.refreshFinancialTransactions();
-    }
 
 	private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
 	    selectedPerson = null;

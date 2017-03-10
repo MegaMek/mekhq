@@ -11,6 +11,8 @@ import javax.swing.JTable;
 import javax.swing.event.MouseInputAdapter;
 
 import megamek.common.Entity;
+import mekhq.MekHQ;
+import mekhq.campaign.event.ProcurementEvent;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.gui.CampaignGUI;
@@ -166,14 +168,6 @@ public class ProcurementTableMouseAdapter extends MouseInputAdapter {
                             }
                         }
                     }
-
-                    gui.refreshPartsList();
-                    gui.refreshUnitList();
-                    gui.refreshTaskList();
-                    gui.refreshAcquireList();
-                    gui.refreshReport();
-                    gui.refreshOverview();
-                    gui.filterTasks();
                 }
             });
             menuItem.setEnabled(gui.getCampaign().isGM());
@@ -303,14 +297,6 @@ public class ProcurementTableMouseAdapter extends MouseInputAdapter {
                             }
                         }
                     }
-
-                    gui.refreshPartsList();
-                    gui.refreshUnitList();
-                    gui.refreshTaskList();
-                    gui.refreshAcquireList();
-                    gui.refreshReport();
-                    gui.refreshOverview();
-                    gui.filterTasks();
                 }
             });
             menuItem.setEnabled(gui.getCampaign().isGM());
@@ -323,22 +309,22 @@ public class ProcurementTableMouseAdapter extends MouseInputAdapter {
                         return;
                     }
                     if (oneSelected) {
+                        IAcquisitionWork acquisition = model
+                                .getAcquisition(row);
                         model.removeRow(row);
+                        MekHQ.triggerEvent(new ProcurementEvent(acquisition));
                     } else {
                         for (int curRow : rows) {
                             if (curRow < 0) {
                                 continue;
                             }
                             int row = table.convertRowIndexToModel(curRow);
+                            IAcquisitionWork acquisition = model
+                                    .getAcquisition(row);
                             model.removeRow(row);
+                            MekHQ.triggerEvent(new ProcurementEvent(acquisition));
                         }
                     }
-                    gui.refreshPartsList();
-                    gui.refreshUnitList();
-                    gui.refreshTaskList();
-                    gui.refreshAcquireList();
-                    gui.refreshOverview();
-                    gui.filterTasks();
                 }
             });
             menuItem.setEnabled(gui.getCampaign().isGM());

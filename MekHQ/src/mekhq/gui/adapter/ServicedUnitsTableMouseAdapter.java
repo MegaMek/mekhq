@@ -13,7 +13,10 @@ import javax.swing.JTable;
 import javax.swing.event.MouseInputAdapter;
 
 import megamek.common.AmmoType;
+import mekhq.MekHQ;
 import mekhq.Utilities;
+import mekhq.campaign.event.UnitChangedEvent;
+import mekhq.campaign.event.RepairStatusChangedEvent;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.unit.Unit;
@@ -76,12 +79,7 @@ public class ServicedUnitsTableMouseAdapter extends MouseInputAdapter
             sel = command.split(":")[2];
             long munition = Long.parseLong(sel);
             ammo.changeMunition(munition);
-            gui.refreshTaskList();
-            gui.refreshAcquireList();
-            gui.refreshServicedUnitList();
-            gui.refreshUnitList();
-            gui.refreshOverview();
-            gui.filterTasks();
+            MekHQ.triggerEvent(new UnitChangedEvent(part.getUnit()));
         } else if (command.contains("CHANGE_SITE")) {
             for (Unit unit : units) {
                 if (!unit.isDeployed()) {
@@ -89,32 +87,24 @@ public class ServicedUnitsTableMouseAdapter extends MouseInputAdapter
                     int selected = Integer.parseInt(sel);
                     if ((selected > -1) && (selected < Unit.SITE_N)) {
                         unit.setSite(selected);
+                        MekHQ.triggerEvent(new RepairStatusChangedEvent(unit));
                     }
                 }
             }
-            gui.refreshServicedUnitList();
-            gui.refreshUnitList();
-            gui.refreshTaskList();
-            gui.refreshAcquireList();
-            gui.refreshOverview();
         } else if (command.equalsIgnoreCase("SALVAGE")) {
             for (Unit unit : units) {
                 if (!unit.isDeployed()) {
                     unit.setSalvage(true);
+                    MekHQ.triggerEvent(new RepairStatusChangedEvent(unit));
                 }
             }
-            gui.refreshServicedUnitList();
-            gui.refreshUnitList();
-            gui.refreshOverview();
         } else if (command.equalsIgnoreCase("REPAIR")) {
             for (Unit unit : units) {
                 if (!unit.isDeployed() && unit.isRepairable()) {
                     unit.setSalvage(false);
+                    MekHQ.triggerEvent(new RepairStatusChangedEvent(unit));
                 }
             }
-            gui.refreshServicedUnitList();
-            gui.refreshUnitList();
-            gui.refreshOverview();
         } else if (command.contains("MASS_REPAIR_SALVAGE")) {
             Unit unit = null;
             
@@ -128,45 +118,8 @@ public class ServicedUnitsTableMouseAdapter extends MouseInputAdapter
     					"Unit is deployed", JOptionPane.ERROR_MESSAGE);
             } else {
 				MassRepairSalvageDialog.performSingleUnitMassRepairOrSalvage(gui, unit);
-	
-				gui.refreshServicedUnitList();
-				gui.refreshUnitList();
-				gui.refreshOverview();
+				MekHQ.triggerEvent(new UnitChangedEvent(unit));
             }
-        } else if (command.equalsIgnoreCase("REMOVE")) {
-            for (Unit unit : units) {
-                if (!unit.isDeployed()) {
-                    if (0 == JOptionPane.showConfirmDialog(
-                            null,
-                            "Do you really want to remove "
-                                    + unit.getName() + "?", "Remove Unit?",
-                            JOptionPane.YES_NO_OPTION)) {
-                        gui.getCampaign().removeUnit(unit.getId());
-                    }
-                }
-            }
-            gui.refreshServicedUnitList();
-            gui.refreshUnitList();
-            gui.refreshReport();
-            gui.refreshOverview();
-        } else if (command.equalsIgnoreCase("UNDEPLOY")) {
-            for (Unit unit : units) {
-                if (unit.isDeployed()) {
-                    gui.undeployUnit(unit);
-                }
-            }
-            gui.refreshPersonnelList();
-            gui.refreshServicedUnitList();
-            gui.refreshUnitList();
-            gui.refreshOrganization();
-            gui.refreshTaskList();
-            gui.refreshUnitView();
-            gui.refreshPartsList();
-            gui.refreshAcquireList();
-            gui.refreshReport();
-            gui.refreshPatientList();
-            gui.refreshScenarioList();
-            gui.refreshOverview();
         }
     }
 

@@ -988,7 +988,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 			return " <font color='green'><b> fixed.</b></font>";
 		}
 	}
-
+	
 	@Override
     public String getDetails() {
         return hits + " hit(s)";

@@ -68,8 +68,6 @@ import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileFilter;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -89,6 +87,7 @@ import megamek.common.Entity;
 import megamek.common.Jumpship;
 import megamek.common.MULParser;
 import megamek.common.TechConstants;
+import megamek.common.event.Subscribe;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.options.PilotOptions;
 import megamek.common.util.EncodeControl;
@@ -99,7 +98,18 @@ import mekhq.Version;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.RandomSkillPreferences;
+import mekhq.campaign.event.AssetEvent;
+import mekhq.campaign.event.AstechPoolChangedEvent;
+import mekhq.campaign.event.DeploymentChangedEvent;
+import mekhq.campaign.event.LoanEvent;
+import mekhq.campaign.event.MedicPoolChangedEvent;
+import mekhq.campaign.event.MissionEvent;
 import mekhq.campaign.event.OptionsChangedEvent;
+import mekhq.campaign.event.OrganizationChangedEvent;
+import mekhq.campaign.event.PersonEvent;
+import mekhq.campaign.event.ReportEvent;
+import mekhq.campaign.event.TransactionEvent;
+import mekhq.campaign.event.UnitEvent;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
@@ -204,6 +214,7 @@ public class CampaignGUI extends JPanel {
         reportHLL = new ReportHyperlinkListener(this);
     	standardTabs = new EnumMap<>(GuiTabType.class);
         initComponents();
+        MekHQ.registerHandler(this);
     }
 
     public void showAboutBox() {
@@ -247,10 +258,6 @@ public class CampaignGUI extends JPanel {
             getCampaign().applyRetirement(rdd.totalPayout(),
                     rdd.getUnitAssignments());
         }
-        refreshReport();
-        refreshFunds();
-        refreshFinancialTransactions();
-        refreshRating();
     }
 
     public void toggleOverviewTab() {
@@ -286,12 +293,6 @@ public class CampaignGUI extends JPanel {
             getCampaign().checkBloodnameAdd(p, p.getPrimaryRole());
             getCampaign().personUpdated(p);
         }
-        refreshPatientList();
-        refreshDoctorsList();
-        refreshServicedUnitList();
-        refreshUnitList();
-        refreshPersonnelList();
-        refreshOrganization();
     }
 
     public void spendBatchXP() {
@@ -299,7 +300,6 @@ public class CampaignGUI extends JPanel {
         batchXPDialog.setVisible(true);
         
         if(batchXPDialog.hasDataChanged()) {
-            refreshPersonnelList();
             refreshReport();
         }
     }
@@ -335,18 +335,6 @@ public class CampaignGUI extends JPanel {
         addStandardTab(GuiTabType.FINANCES);
         addStandardTab(GuiTabType.OVERVIEW);
 
-        // The finance tab can be a pain to update when dealing with large units.
-        // Refresh it on tab change to that panel instead.
-        tabMain.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                if(((CampaignGuiTab)tabMain.getSelectedComponent()).tabType()
-                		.equals(GuiTabType.FINANCES)) {
-                    refreshFinancialTransactions();
-                }
-                
-            }
-        });
         initMain();
         initTopButtons();
         initStatusBar();
@@ -832,8 +820,6 @@ public class CampaignGUI extends JPanel {
                     return;
                 }
                 getCampaign().increaseAstechPool(pvcd.getValue());
-                refreshTechsList();
-                refreshTempAstechs();
             }
         });
         menuAstechPool.add(miHireAstechs);
@@ -850,8 +836,6 @@ public class CampaignGUI extends JPanel {
                     return;
                 }
                 getCampaign().decreaseAstechPool(pvcd.getValue());
-                refreshTechsList();
-                refreshTempAstechs();
             }
         });
         menuAstechPool.add(miFireAstechs);
@@ -866,8 +850,6 @@ public class CampaignGUI extends JPanel {
                 if (need > 0) {
                     getCampaign().increaseAstechPool(need);
                 }
-                refreshTechsList();
-                refreshTempAstechs();
             }
         });
         menuAstechPool.add(miFullStrengthAstechs);
@@ -878,8 +860,6 @@ public class CampaignGUI extends JPanel {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 getCampaign().decreaseAstechPool(getCampaign().getAstechPool());
-                refreshTechsList();
-                refreshTempAstechs();
             }
         });
         menuAstechPool.add(miFireAllAstechs);
@@ -897,8 +877,6 @@ public class CampaignGUI extends JPanel {
                     return;
                 }
                 getCampaign().increaseMedicPool(pvcd.getValue());
-                refreshDoctorsList();
-                refreshTempMedics();
             }
         });
         menuMedicPool.add(miHireMedics);
@@ -915,8 +893,6 @@ public class CampaignGUI extends JPanel {
                     return;
                 }
                 getCampaign().decreaseMedicPool(pvcd.getValue());
-                refreshDoctorsList();
-                refreshTempMedics();
             }
         });
         menuMedicPool.add(miFireMedics);
@@ -930,8 +906,6 @@ public class CampaignGUI extends JPanel {
                 if (need > 0) {
                     getCampaign().increaseMedicPool(need);
                 }
-                refreshDoctorsList();
-                refreshTempMedics();
             }
         });
         menuMedicPool.add(miFullStrengthMedics);
@@ -941,8 +915,6 @@ public class CampaignGUI extends JPanel {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 getCampaign().decreaseMedicPool(getCampaign().getMedicPool());
-                refreshDoctorsList();
-                refreshTempMedics();
             }
         });
         menuMedicPool.add(miFireAllMedics);
@@ -1385,7 +1357,6 @@ public class CampaignGUI extends JPanel {
         // these are addressed
         if (getCampaign().checkOverDueLoans()) {
             refreshFunds();
-            refreshFinancialTransactions();
             refreshReport();
             return;
         }
@@ -1411,25 +1382,13 @@ public class CampaignGUI extends JPanel {
         if(!getCampaign().newDay()) {
             return;
         }
-        refreshScenarioList();
-        refreshMissions();
-        refreshServicedUnitList();
-        refreshUnitList();
-        refreshPersonnelList();
-        refreshTaskList();
-        refreshAcquireList();
-        refreshTechsList();
-        refreshPartsList();
-        refreshPatientList();
-        refreshDoctorsList();
+        
         refreshCalendar();
         refreshLocation();
-        refreshOrganization();
         initReport();
         refreshFunds();
-        refreshFinancialTransactions();
-        refreshOverview();
-        refreshPlanetView();
+        
+        refreshAllTabs();
     }// GEN-LAST:event_btnAdvanceDayActionPerformed
 
     public boolean nagShortMaintenance() {
@@ -1536,21 +1495,17 @@ public class CampaignGUI extends JPanel {
 
     private void hireBulkPersonnel() {
         HireBulkPersonnelDialog hbpd = new HireBulkPersonnelDialog(getFrame(),
-                true, getCampaign(), this);
+                true, getCampaign());
         hbpd.setVisible(true);
     }
 
     public void showContractMarket() {
-        ContractMarketDialog cmd = new ContractMarketDialog(getFrame(), this,
-                getCampaign());
+        ContractMarketDialog cmd = new ContractMarketDialog(getFrame(), getCampaign());
         cmd.setVisible(true);
-        refreshMissions();
-        refreshFinancialTransactions();
     }
 
     public void showUnitMarket() {
-        UnitMarketDialog umd = new UnitMarketDialog(getFrame(), this,
-                getCampaign());
+        UnitMarketDialog umd = new UnitMarketDialog(getFrame(), getCampaign());
         umd.setVisible(true);
     }
 
@@ -1670,16 +1625,10 @@ public class CampaignGUI extends JPanel {
 
     private void btnOvertimeActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnOvertimeActionPerformed
         getCampaign().setOvertime(btnOvertime.isSelected());
-        refreshTechsList();
-        refreshTaskList();
-        refreshAcquireList();
-        filterTasks();
     }// GEN-LAST:event_btnOvertimeActionPerformed
 
     private void btnGMModeActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnGMModeActionPerformed
-    	
         getCampaign().setGMMode(btnGMMode.isSelected());
-        refreshOverview();
     }// GEN-LAST:event_btnGMModeActionPerformed
 
     private void menuOptionsActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_menuOptionsActionPerformed
@@ -1691,7 +1640,8 @@ public class CampaignGUI extends JPanel {
         if (atb != getCampaign().getCampaignOptions().getUseAtB()) {
             if (getCampaign().getCampaignOptions().getUseAtB()) {
                 getCampaign().initAtB();
-                refreshLanceAssignments();
+                //refresh lance assignment table
+                MekHQ.triggerEvent(new OrganizationChangedEvent(getCampaign().getForces()));
             }
             miContractMarket.setVisible(getCampaign().getCampaignOptions()
                     .getUseAtB());
@@ -1732,7 +1682,6 @@ public class CampaignGUI extends JPanel {
         }
         refreshCalendar();
         getCampaign().reloadNews();
-        refreshOverview();
     }// GEN-LAST:event_menuOptionsActionPerformed
 
     private void menuOptionsMMActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_menuOptionsActionPerformed
@@ -1744,7 +1693,6 @@ public class CampaignGUI extends JPanel {
             getCampaign().setGameOptions(god.getOptions());
             setCampaignOptionsFromGameOptions();
             refreshCalendar();
-            refreshOverview();
         }
     }// GEN-LAST:event_menuOptionsActionPerformed
 
@@ -1812,25 +1760,15 @@ public class CampaignGUI extends JPanel {
     }// GEN-LAST:event_miExportPersonActionPerformed
 
     private void miPurchaseUnitActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_miPurchaseUnitActionPerformed
-        UnitSelectorDialog usd = new UnitSelectorDialog(getFrame(), this,
+        UnitSelectorDialog usd = new UnitSelectorDialog(getFrame(),
                 getCampaign(), true);
 
         usd.setVisible(true);
-        refreshServicedUnitList();
-        refreshUnitList();
-        refreshPersonnelList();
-        refreshReport();
-        refreshFunds();
-        refreshFinancialTransactions();
-        refreshOverview();
     }// GEN-LAST:event_miPurchaseUnitActionPerformed
 
     private void buyParts() {
         PartsStoreDialog psd = new PartsStoreDialog(true, this);
         psd.setVisible(true);
-        refreshPartsList();
-        refreshAcquireList();
-        refreshOverview();
     }
 
     private void showMercRosterDialog() {
@@ -1945,14 +1883,6 @@ public class CampaignGUI extends JPanel {
         if (hasTab(GuiTabType.MEKLAB)) {
         	((MekLabTab)getTab(GuiTabType.MEKLAB)).clearUnit();
         }
-        refreshReport();
-        refreshFunds();
-        refreshFinancialTransactions();
-        refreshUnitList();
-        refreshServicedUnitList();
-        refreshOrganization();
-        refreshPartsList();
-        refreshOverview();
     }
 
     private void showReport(Report report) {
@@ -2009,48 +1939,6 @@ public class CampaignGUI extends JPanel {
 
     public Part getPartByNameAndDetails(String pnd) {
         return getCampaign().getPartsStore().getByNameAndDetails(pnd);
-    }
-
-    //TODO: trigger from event
-    public void refreshPersonnelView() {
-    	if (getTab(GuiTabType.PERSONNEL) != null) {
-    		((PersonnelTab)getTab(GuiTabType.PERSONNEL)).refreshPersonnelView();
-    	}
-    }
-
-    //TODO: trigger from event
-    public void filterPersonnel() {
-    	if (getTab(GuiTabType.PERSONNEL) != null) {
-    		((PersonnelTab)getTab(GuiTabType.PERSONNEL)).filterPersonnel();
-    	}
-    }
-
-    //TODO: Trigger from event
-    public void refreshUnitView() {
-    	if (getTab(GuiTabType.HANGAR) != null) {
-    		((HangarTab)getTab(GuiTabType.HANGAR)).refreshUnitView();
-    	}
-    }
-
-    //TODO: Trigger from event
-    public void refreshForceView() {
-    	if (getTab(GuiTabType.TOE) != null) {
-    		((TOETab)getTab(GuiTabType.TOE)).refreshForceView();
-    	}
-    }
-
-    //TODO: Trigger from event
-    public void refreshLanceAssignments() {
-    	if (getTab(GuiTabType.BRIEFING) != null) {
-    		((BriefingTab)getTab(GuiTabType.BRIEFING)).refreshLanceAssignments();
-    	}
-    }
-
-    //TODO: Trigger from event
-    public void refreshPlanetView() {
-    	if (getTab(GuiTabType.MAP) != null) {
-    		((MapTab)getTab(GuiTabType.MAP)).refreshPlanetView();
-    	}
     }
 
     protected void loadListFile(boolean allowNewPilots) throws IOException {
@@ -2119,13 +2007,6 @@ public class CampaignGUI extends JPanel {
                 }
             }
         }
-
-        refreshServicedUnitList();
-        refreshUnitList();
-        refreshPersonnelList();
-        refreshPatientList();
-        refreshReport();
-        refreshOverview();
     }
 
     protected void loadPersonFile() throws IOException {
@@ -2225,14 +2106,6 @@ public class CampaignGUI extends JPanel {
             }
             MekHQ.logMessage("Finished load of personnel file");
         }
-
-        refreshPersonnelList();
-        refreshPatientList();
-        refreshTechsList();
-        refreshDoctorsList();
-        refreshReport();
-        refreshFinancialTransactions();
-        refreshOverview();
     }
 
     //TODO: disable if not using personnel tab
@@ -2540,10 +2413,6 @@ public class CampaignGUI extends JPanel {
             }
             MekHQ.logMessage("Finished load of parts file");
         }
-
-        refreshPartsList();
-        refreshReport();
-        refreshFinancialTransactions();
     }
 
     protected void loadOptionsFile() throws IOException {
@@ -2858,61 +2727,11 @@ public class CampaignGUI extends JPanel {
 
         Utilities.exportTabletoCSV(table, file);
     }
-
-    //TODO: Trigger from event
-    public void refreshServicedUnitList() {
-    	if (getTab(GuiTabType.REPAIR) != null) {
-    		((RepairTab)getTab(GuiTabType.REPAIR)).refreshServicedUnitList();
-    	}
-    }
-
-    //TODO: Trigger from event
-    public void refreshPersonnelList() {
-    	if (getTab(GuiTabType.PERSONNEL) != null) {
-    		((PersonnelTab)getTab(GuiTabType.PERSONNEL)).refreshPersonnelList();
-    	}
-    }
-
-    //TODO: Trigger from event
-    public void changeMission() {
-    	if (getTab(GuiTabType.BRIEFING) != null) {
-    		((BriefingTab)getTab(GuiTabType.BRIEFING)).changeMission();
-    	}
-    }
-
-    //TODO: Trigger from event
-    public void refreshMissions() {
-    	if (getTab(GuiTabType.BRIEFING) != null) {
-    		((BriefingTab)getTab(GuiTabType.BRIEFING)).refreshMissions();
-    	}
-    }
-
-    //TODO: Trigger from event
-    public void refreshScenarioList() {
-    	if (getTab(GuiTabType.BRIEFING) != null) {
-    		((BriefingTab)getTab(GuiTabType.BRIEFING)).refreshScenarioList();
-    	}
-    }
-
-    //TODO: Trigger from event
-    public void refreshUnitList() {
-    	if (getTab(GuiTabType.HANGAR) != null) {
-    		((HangarTab)getTab(GuiTabType.HANGAR)).refreshUnitList();
-    	}
-    }
-
-    //TODO: Trigger from event
-    public void refreshTaskList() {
-    	if (getTab(GuiTabType.REPAIR) != null) {
-    		((RepairTab)getTab(GuiTabType.REPAIR)).refreshTaskList();
-    	}
-    }
-
-    //TODO: Trigger from event
-    public void refreshAcquireList() {
-    	if (getTab(GuiTabType.REPAIR) != null) {
-    		((RepairTab)getTab(GuiTabType.REPAIR)).refreshAcquireList();
-    	}
+    
+    public void refreshAllTabs() {
+        for (int i = 0; i < tabMain.getTabCount(); i++) {
+            ((CampaignGuiTab)tabMain.getComponentAt(i)).refreshAll();
+        }
     }
 
     public void refreshLab() {
@@ -2938,63 +2757,11 @@ public class CampaignGUI extends JPanel {
     	}
     }
 
-    //TODO: Trigger from event
-    public void refreshTechsList() {
-        if (getTab(GuiTabType.WAREHOUSE) != null) {
-        	((WarehouseTab)getTab(GuiTabType.WAREHOUSE)).refreshTechsList(); // NOI18N
-        }
-        if (getTab(GuiTabType.REPAIR) != null) {
-        	((RepairTab)getTab(GuiTabType.REPAIR)).refreshTechsList(); // NOI18N
-        }
-    }
-
-    //TODO: Trigger from event
-    public void refreshDoctorsList() {
-    	if (getTab(GuiTabType.INFIRMARY) != null) {
-    		((InfirmaryTab)getTab(GuiTabType.INFIRMARY)).refreshDoctorsList();
-    	}
-    }
-
-    //TODO: Trigger from event
-    public void refreshPatientList() {
-    	if (getTab(GuiTabType.INFIRMARY) != null) {
-    		((InfirmaryTab)getTab(GuiTabType.INFIRMARY)).refreshPatientList();
-    	}
-    }
-
-    //TODO: Trigger from event
-    public void refreshPartsList() {
-    	if (getTab(GuiTabType.WAREHOUSE) != null) {
-    		((WarehouseTab)getTab(GuiTabType.WAREHOUSE)).refreshPartsList();
-    	}
-    }
-
-    //TODO: Trigger from event
-    public void refreshFinancialTransactions() {
-    	if (getTab(GuiTabType.FINANCES) != null) {
-    		((FinancesTab)getTab(GuiTabType.FINANCES)).refreshFinancialTransactions();
-    	}
-    }
-
-    //TODO: Trigger from event
-    public void refreshFinancialReport() {
-    	if (getTab(GuiTabType.FINANCES) != null) {
-    		((FinancesTab)getTab(GuiTabType.FINANCES)).refreshFinancialReport();
-    	}
-    }
-
-    //TODO: Trigger from event
-    public void refreshOverview() {
-    	if (getTab(GuiTabType.OVERVIEW) != null) {
-    		((OverviewTab)getTab(GuiTabType.OVERVIEW)).refreshOverview();
-    	}
-    }
-
     public void refreshCalendar() {
         getFrame().setTitle(getCampaign().getTitle());
     }
 
-    public void refreshReport() {
+    private void refreshReport() {
         List<String> newLogEntries = getCampaign().fetchAndClearNewReports();
         panLog.appendLog(newLogEntries);
         logDialog.appendLog(newLogEntries);
@@ -3007,14 +2774,7 @@ public class CampaignGUI extends JPanel {
         getCampaign().fetchAndClearNewReports();
     }
 
-    //TODO: Trigger from event
-    public void refreshOrganization() {
-    	if (getTab(GuiTabType.TOE) != null) {
-    		((TOETab)getTab(GuiTabType.TOE)).refreshOrganization();
-    	}
-    }
-
-    public void refreshFunds() {
+    private void refreshFunds() {
         long funds = getCampaign().getFunds();
         NumberFormat numberFormat = NumberFormat.getIntegerInstance();
         String inDebt = "";
@@ -3026,7 +2786,7 @@ public class CampaignGUI extends JPanel {
         lblFunds.setText(text);
     }
 
-    protected void refreshRating() {
+    private void refreshRating() {
         if (getCampaign().getCampaignOptions().useDragoonRating()) {
             String text = "<html><b>Dragoons Rating:</b> "
                     + getCampaign().getUnitRating() + "</html>";
@@ -3036,16 +2796,74 @@ public class CampaignGUI extends JPanel {
         }
     }
 
-    protected void refreshTempAstechs() {
+    private void refreshTempAstechs() {
         String text = "<html><b>Temp Astechs:</b> "
                 + getCampaign().getAstechPool() + "</html>";
         lblTempAstechs.setText(text);
     }
-
-    protected void refreshTempMedics() {
+    
+    private void refreshTempMedics() {
         String text = "<html><b>Temp Medics:</b> "
                 + getCampaign().getMedicPool() + "</html>";
         lblTempMedics.setText(text);
+    }
+
+    private ActionScheduler reportScheduler = new ActionScheduler(this::refreshReport);
+    private ActionScheduler fundsScheduler = new ActionScheduler(this::refreshFunds);
+    private ActionScheduler ratingScheduler = new ActionScheduler(this::refreshRating);
+    
+    @Subscribe
+    public void handle(ReportEvent ev) {
+        reportScheduler.schedule();
+    }
+    
+    @Subscribe
+    public void handle(OptionsChangedEvent ev) {
+        fundsScheduler.schedule();
+        ratingScheduler.schedule();
+    }
+    
+    @Subscribe
+    public void handle(TransactionEvent ev) {
+        fundsScheduler.schedule();
+        ratingScheduler.schedule();
+    }
+    
+    @Subscribe
+    public void handle(LoanEvent ev) {
+        fundsScheduler.schedule();
+        ratingScheduler.schedule();
+    }
+    
+    @Subscribe
+    public void handle(AssetEvent ev) {
+        fundsScheduler.schedule();
+        ratingScheduler.schedule();
+    }
+    
+    @Subscribe
+    public void handle(MissionEvent ev) {
+        ratingScheduler.schedule();
+    }
+    
+    @Subscribe
+    public void handle(PersonEvent ev) {
+        ratingScheduler.schedule();
+    }
+    
+    @Subscribe
+    public void handle(UnitEvent ev) {
+        ratingScheduler.schedule();
+    }
+    
+    @Subscribe
+    public void handle(AstechPoolChangedEvent ev) {
+        refreshTempAstechs();
+    }
+    
+    @Subscribe
+    public void handle(MedicPoolChangedEvent ev) {
+        refreshTempMedics();
     }
 
     public void refreshLocation() {
@@ -3089,8 +2907,10 @@ public class CampaignGUI extends JPanel {
         if (f != null) {
             undeployForce(f, false);
         }
-        getCampaign().getScenario(u.getScenarioId()).removeUnit(u.getId());
+        Scenario s = getCampaign().getScenario(u.getScenarioId());
+        s.removeUnit(u.getId());
         u.undeploy();
+        MekHQ.triggerEvent(new DeploymentChangedEvent(u, s));
     }
 
     public void undeployForce(Force f) {
@@ -3132,6 +2952,7 @@ public class CampaignGUI extends JPanel {
                 prevId = parent.getId();
             }
         }
+        MekHQ.triggerEvent(new DeploymentChangedEvent(f, scenario));
     }
 
     public JTabbedPane getTabMain() {

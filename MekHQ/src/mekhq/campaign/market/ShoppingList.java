@@ -24,21 +24,22 @@ package mekhq.campaign.market;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.common.Entity;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.Version;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.event.ProcurementEvent;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.unit.UnitOrder;
 import mekhq.campaign.work.IAcquisitionWork;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  *  An arraylist of IAcquisitionWork
@@ -133,6 +134,7 @@ public class ShoppingList implements MekHqXmlSerializable {
                 quantity--;
             }
             shoppingList.add(newWork);
+            MekHQ.triggerEvent(new ProcurementEvent(newWork));
         }
     }
 

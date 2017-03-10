@@ -37,11 +37,21 @@ import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.RowSorter;
 import javax.swing.SortOrder;
+import javax.swing.SwingUtilities;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableRowSorter;
 
+import megamek.common.event.Subscribe;
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
+import mekhq.campaign.event.DeploymentChangedEvent;
+import mekhq.campaign.event.OptionsChangedEvent;
+import mekhq.campaign.event.PartEvent;
+import mekhq.campaign.event.PartWorkEvent;
+import mekhq.campaign.event.PersonEvent;
+import mekhq.campaign.event.ScenarioResolvedEvent;
+import mekhq.campaign.event.UnitEvent;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PartInUse;
 import mekhq.campaign.rating.IUnitRating;
@@ -93,6 +103,7 @@ public final class OverviewTab extends CampaignGuiTab {
 
     OverviewTab(CampaignGUI gui, String name) {
         super(gui, name);
+        MekHQ.registerHandler(this);
     }
 
     /*
@@ -287,9 +298,6 @@ public final class OverviewTab extends CampaignGuiTab {
                 PartInUse piu = overviewPartsModel.getPartInUse(row);
                 IAcquisitionWork partToBuy = piu.getPartToBuy();
                 getCampaign().getShoppingList().addShoppingItem(partToBuy, 1, getCampaign());
-                getCampaignGui().refreshReport();
-                getCampaignGui().refreshAcquireList();
-                getCampaignGui().refreshPartsList();
                 refreshOverviewSpecificPart(row, piu, partToBuy);
             }
         };
@@ -306,9 +314,6 @@ public final class OverviewTab extends CampaignGuiTab {
                 quantity = pcd.getValue();
                 IAcquisitionWork partToBuy = piu.getPartToBuy();
                 getCampaign().getShoppingList().addShoppingItem(partToBuy, quantity, getCampaign());
-                getCampaignGui().refreshReport();
-                getCampaignGui().refreshAcquireList();
-                getCampaignGui().refreshPartsList();
                 refreshOverviewSpecificPart(row, piu, partToBuy);
             }
         };
@@ -320,8 +325,6 @@ public final class OverviewTab extends CampaignGuiTab {
                 PartInUse piu = overviewPartsModel.getPartInUse(row);
                 IAcquisitionWork partToBuy = piu.getPartToBuy();
                 getCampaign().addPart((Part) partToBuy.getNewEquipment(), 0);
-                getCampaignGui().refreshAcquireList();
-                getCampaignGui().refreshPartsList();
                 refreshOverviewSpecificPart(row, piu, partToBuy);
             }
         };
@@ -341,8 +344,6 @@ public final class OverviewTab extends CampaignGuiTab {
                     getCampaign().addPart((Part) partToBuy.getNewEquipment(), 0);
                     --quantity;
                 }
-                getCampaignGui().refreshAcquireList();
-                getCampaignGui().refreshPartsList();
                 refreshOverviewSpecificPart(row, piu, partToBuy);
             }
         };
@@ -367,25 +368,27 @@ public final class OverviewTab extends CampaignGuiTab {
     }
 
     public void refreshOverview() {
-        int drIndex = getTabOverview().indexOfComponent(scrollOverviewUnitRating);
-        if (!getCampaign().getCampaignOptions().useDragoonRating() && drIndex != -1) {
-            getTabOverview().removeTabAt(drIndex);
-        } else {
-            if (drIndex == -1) {
-                getTabOverview().addTab(resourceMap.getString("scrollOverviewDragoonsRating.TabConstraints.tabTitle"),
-                        scrollOverviewUnitRating);
+        SwingUtilities.invokeLater(() -> {
+            int drIndex = getTabOverview().indexOfComponent(scrollOverviewUnitRating);
+            if (!getCampaign().getCampaignOptions().useDragoonRating() && drIndex != -1) {
+                getTabOverview().removeTabAt(drIndex);
+            } else {
+                if (drIndex == -1) {
+                    getTabOverview().addTab(resourceMap.getString("scrollOverviewDragoonsRating.TabConstraints.tabTitle"),
+                            scrollOverviewUnitRating);
+                }
             }
-        }
-
-        scrollOverviewUnitRating.setViewportView(new RatingReport(getCampaign()).getReport());
-        scrollOverviewCombatPersonnel.setViewportView(new PersonnelReport(getCampaign()).getCombatPersonnelReport());
-        scrollOverviewSupportPersonnel.setViewportView(new PersonnelReport(getCampaign()).getSupportPersonnelReport());
-        scrollOverviewTransport.setViewportView(new TransportReport(getCampaign()).getReport());
-        scrollOverviewCargo.setViewportView(new CargoReport(getCampaign()).getReport());
-        HangarReport hr = new HangarReport(getCampaign());
-        overviewHangarArea.setText(hr.getHangarTotals());
-        scrollOverviewHangar.setViewportView(hr.getHangarTree());
-        refreshOverviewPartsInUse();
+    
+            scrollOverviewUnitRating.setViewportView(new RatingReport(getCampaign()).getReport());
+            scrollOverviewCombatPersonnel.setViewportView(new PersonnelReport(getCampaign()).getCombatPersonnelReport());
+            scrollOverviewSupportPersonnel.setViewportView(new PersonnelReport(getCampaign()).getSupportPersonnelReport());
+            scrollOverviewTransport.setViewportView(new TransportReport(getCampaign()).getReport());
+            scrollOverviewCargo.setViewportView(new CargoReport(getCampaign()).getReport());
+            HangarReport hr = new HangarReport(getCampaign());
+            overviewHangarArea.setText(hr.getHangarTotals());
+            scrollOverviewHangar.setViewportView(hr.getHangarTree());
+            refreshOverviewPartsInUse();
+        });
     }
 
     private void refreshOverviewSpecificPart(int row, PartInUse piu, IAcquisitionWork newPart) {
@@ -409,4 +412,40 @@ public final class OverviewTab extends CampaignGuiTab {
         column.setEnabled(getCampaign().isGM());
     }
 
+    private ActionScheduler overviewScheduler = new ActionScheduler(this::refreshOverview);
+    
+    @Subscribe
+    public void handle(OptionsChangedEvent ev) {
+        overviewScheduler.schedule();
+    }
+    
+    @Subscribe
+    public void handle(DeploymentChangedEvent ev) {
+        overviewScheduler.schedule();
+    }
+    
+    @Subscribe
+    public void handle(ScenarioResolvedEvent ev) {
+        overviewScheduler.schedule();
+    }
+
+    @Subscribe
+    public void handle(UnitEvent ev) {
+        overviewScheduler.schedule();
+    }
+    
+    @Subscribe
+    public void handle(PersonEvent ev) {
+        overviewScheduler.schedule();
+    }
+    
+    @Subscribe
+    public void handle(PartEvent ev) {
+        overviewScheduler.schedule();
+    }
+    
+    @Subscribe
+    public void handle(PartWorkEvent ev) {
+        overviewScheduler.schedule();
+    }
 }

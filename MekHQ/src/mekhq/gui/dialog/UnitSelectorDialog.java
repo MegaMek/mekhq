@@ -60,7 +60,6 @@ import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.unit.UnitOrder;
-import mekhq.gui.CampaignGUI;
 
 /**
  *
@@ -81,8 +80,6 @@ public class UnitSelectorDialog extends JDialog {
     private TableRowSorter<MechTableModel> sorter;
 
     private Campaign campaign;
-
-    private CampaignGUI hqView;
 
     private DecimalFormat formatter;
 
@@ -113,7 +110,7 @@ public class UnitSelectorDialog extends JDialog {
     private JPanel panelSearchBtns;
 
     /** Creates new form UnitSelectorDialog */
-    public UnitSelectorDialog(Frame frame, CampaignGUI view, Campaign c, boolean add) {
+    public UnitSelectorDialog(Frame frame, Campaign c, boolean add) {
         super(frame, true);
         unitModel = new MechTableModel();
         addToCampaign = add;
@@ -121,7 +118,6 @@ public class UnitSelectorDialog extends JDialog {
         //TODO: the proper way to do this would be to create a listener interface that has
         //methods like buyUnit, addUnit, etc. that we could register with this dialog
         //and then update when needed
-        this.hqView = view;
         this.campaign = c;
         formatter = new DecimalFormat();
         asd = new AdvancedSearchDialog(frame, campaign.getCalendar().get(GregorianCalendar.YEAR));
@@ -442,11 +438,6 @@ public class UnitSelectorDialog extends JDialog {
 	            return;
 	        }*/
 	        campaign.getShoppingList().addShoppingItem(selectedUnit, 1, campaign);
-	        hqView.refreshUnitList();
-	        hqView.refreshServicedUnitList();
-	        hqView.refreshFinancialTransactions();
-	        hqView.refreshReport();
-	        hqView.refreshOverview();
 	    }
 	    // Necessary if the user wants to buy the same unit twice without reselecting it
 	    UnitChanged(null);
@@ -455,10 +446,6 @@ public class UnitSelectorDialog extends JDialog {
 	private void addUnitGM() {
 	    if(null != selectedUnit && null != selectedUnit.getEntity()) {
 	        campaign.addUnit(selectedUnit.getEntity(), false, 0);
-	        hqView.refreshUnitList();
-            hqView.refreshServicedUnitList();
-            hqView.refreshReport();
-            hqView.refreshOverview();
 	    }
 	    // Necessary if the GM wants to add the same unit twice without reselecting it
 	    UnitChanged(null);

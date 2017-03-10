@@ -48,8 +48,20 @@ import javax.swing.table.TableRowSorter;
 
 import megamek.common.MechView;
 import megamek.common.TargetRoll;
+import megamek.common.event.Subscribe;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
+import mekhq.campaign.event.AcquisitionEvent;
+import mekhq.campaign.event.AstechPoolChangedEvent;
+import mekhq.campaign.event.DeploymentChangedEvent;
+import mekhq.campaign.event.OvertimeModeEvent;
+import mekhq.campaign.event.PartEvent;
+import mekhq.campaign.event.PartWorkEvent;
+import mekhq.campaign.event.PersonEvent;
+import mekhq.campaign.event.ProcurementEvent;
+import mekhq.campaign.event.RepairStatusChangedEvent;
+import mekhq.campaign.event.ScenarioResolvedEvent;
+import mekhq.campaign.event.UnitEvent;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.parts.MekLocation;
@@ -110,6 +122,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
 
     RepairTab(CampaignGUI gui, String name) {
         super(gui, name);
+        MekHQ.registerHandler(this);
     }
 
     /*
@@ -138,10 +151,6 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
             MassRepairSalvageDialog dlg = new MassRepairSalvageDialog(getFrame(), true, getCampaignGui(), null,
                     MassRepairSalvageDialog.MODE.UNITS);
             dlg.setVisible(true);
-
-            refreshServicedUnitList();
-            getCampaignGui().refreshUnitList();
-            getCampaignGui().refreshOverview();
         });
 
         JButton btnMRMSInstantAll = new JButton();
@@ -151,10 +160,6 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         btnMRMSInstantAll.setName("btnMRMSInstantAll"); // NOI18N
         btnMRMSInstantAll.addActionListener(ev -> {
             MassRepairSalvageDialog.massRepairSalvageAllUnits(getCampaignGui());
-
-            refreshServicedUnitList();
-            getCampaignGui().refreshUnitList();
-            getCampaignGui().refreshOverview();
         });
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -655,6 +660,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
             if (null != u && !getCampaign().getServiceableUnits().contains(u)) {
                 selectedRow = -1;
             }
+            MekHQ.triggerEvent(new PartWorkEvent(tech, part));
         } else if (acquireSelected()) {
             selectedRow = acquisitionTable.getSelectedRow();
             IAcquisitionWork acquisition = getSelectedAcquisition();
@@ -663,22 +669,6 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
             }
             getCampaign().getShoppingList().addShoppingItem(acquisition, 1, getCampaign());
         }
-
-        refreshServicedUnitList();
-        getCampaignGui().refreshUnitList();
-        getCampaignGui().refreshPersonnelList();
-        refreshTaskList();
-        refreshAcquireList();
-        refreshTechsList();
-        if (getCampaignGui().getTab(GuiTabType.WAREHOUSE) != null) {
-            ((WarehouseTab) getCampaignGui().getTab(GuiTabType.WAREHOUSE)).refreshTechsList(); // NOI18N
-        }
-        getCampaignGui().refreshPartsList();
-        getCampaignGui().refreshReport();
-        getCampaignGui().refreshFunds();
-        getCampaignGui().refreshFinancialTransactions();
-        getCampaignGui().refreshOverview();
-        filterTasks();
 
         // get the selected row back for tasks
         if (selectedRow != -1) {
@@ -754,21 +744,6 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
                 }
             }
         }
-
-        refreshServicedUnitList();
-        getCampaignGui().refreshUnitList();
-        getCampaignGui().refreshPersonnelList();
-        refreshTaskList();
-        refreshAcquireList();
-        refreshTechsList();
-        if (getCampaignGui().getTab(GuiTabType.WAREHOUSE) != null) {
-            ((WarehouseTab) getCampaignGui().getTab(GuiTabType.WAREHOUSE)).refreshTechsList(); // NOI18N
-        }
-        getCampaignGui().refreshPartsList();
-        getCampaignGui().refreshReport();
-        getCampaignGui().refreshFunds();
-        getCampaignGui().refreshFinancialTransactions();
-        filterTasks();
 
         if (selectedRow != -1) {
             if (acquireSelected()) {
@@ -883,7 +858,6 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         if ((selected > -1) && (selected < servicedUnitTable.getRowCount())) {
             servicedUnitTable.setRowSelectionInterval(selected, selected);
         }
-        getCampaignGui().refreshRating();
     }
 
     public void refreshTaskList() {
@@ -910,6 +884,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
             choiceLocation.removeAllItems();
             choiceLocation.setEnabled(false);
         }
+        filterTasks();
     }
 
     public void refreshTechsList() {
@@ -933,5 +908,78 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
             uuid = getSelectedServicedUnit().getId();
         }
         acquireModel.setData(getCampaign().getAcquisitionsForUnit(uuid));
+    }
+    
+    private ActionScheduler servicedUnitListScheduler = new ActionScheduler(this::refreshServicedUnitList);
+    private ActionScheduler techsScheduler = new ActionScheduler(this::refreshTechsList);
+    private ActionScheduler taskScheduler = new ActionScheduler(this::refreshTaskList);
+    private ActionScheduler acquireScheduler = new ActionScheduler(this::refreshAcquireList);
+
+    @Subscribe
+    public void handle(DeploymentChangedEvent ev) {
+        servicedUnitListScheduler.schedule();
+    }
+    
+    @Subscribe
+    public void handle(ScenarioResolvedEvent ev) {
+        servicedUnitListScheduler.schedule();
+    }
+
+    @Subscribe
+    public void handle(UnitEvent ev) {
+        servicedUnitListScheduler.schedule();
+    }
+
+    @Subscribe
+    public void handle(RepairStatusChangedEvent ev) {
+        servicedUnitListScheduler.schedule();
+    }
+
+    @Subscribe
+    public void handle(PersonEvent ev) {
+        techsScheduler.schedule();
+    }
+
+    @Subscribe
+    public void handle(PartEvent ev) {
+        if (ev.getPart().getUnit() == null) {
+            acquireScheduler.schedule();
+            taskScheduler.schedule();
+        } else {
+            servicedUnitListScheduler.schedule();
+        }
+    }
+    
+    @Subscribe
+    public void handle(AcquisitionEvent ev) {
+        acquireScheduler.schedule();
+        taskScheduler.schedule();
+    }
+    
+    @Subscribe
+    public void handle(ProcurementEvent ev) {
+        filterTasks();
+        acquireScheduler.schedule();
+    }
+    
+    @Subscribe
+    public void handle(PartWorkEvent ev) {
+        if (ev.getPartWork().getUnit() == null) {
+            acquireScheduler.schedule();
+            taskScheduler.schedule();
+        } else {
+            servicedUnitListScheduler.schedule();
+        }
+        techsScheduler.schedule();
+    }
+    
+    @Subscribe
+    public void handle(OvertimeModeEvent ev) {
+        filterTechs();
+    }
+    
+    @Subscribe
+    public void handle(AstechPoolChangedEvent ev) {
+        filterTechs();
     }
 }

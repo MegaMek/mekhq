@@ -16,6 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package mekhq.gui;
 
 import java.awt.BorderLayout;
@@ -52,7 +53,16 @@ import megamek.common.util.EncodeControl;
 import megameklab.com.util.UnitPrintManager;
 import mekhq.MekHQ;
 import mekhq.campaign.ResolveScenarioTracker;
+import mekhq.campaign.event.MissionChangedEvent;
+import mekhq.campaign.event.MissionCompletedEvent;
+import mekhq.campaign.event.MissionNewEvent;
+import mekhq.campaign.event.MissionRemovedEvent;
 import mekhq.campaign.event.OptionsChangedEvent;
+import mekhq.campaign.event.OrganizationChangedEvent;
+import mekhq.campaign.event.ScenarioChangedEvent;
+import mekhq.campaign.event.ScenarioNewEvent;
+import mekhq.campaign.event.ScenarioRemovedEvent;
+import mekhq.campaign.event.ScenarioResolvedEvent;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.force.Lance;
 import mekhq.campaign.mission.AtBContract;
@@ -118,10 +128,12 @@ public final class BriefingTab extends CampaignGuiTab {
     private ScenarioTableModel scenarioModel;
 
     public int selectedMission;
+    public int selectedScenario;
 
     BriefingTab(CampaignGUI gui, String tabName) {
         super(gui, tabName);
         selectedMission = -1;
+        selectedScenario = -1;
         MekHQ.registerHandler(this);
     }
 
@@ -328,8 +340,6 @@ public final class BriefingTab extends CampaignGuiTab {
             if (ncd.getContractId() != -1) {
                 selectedMission = ncd.getContractId();
             }
-            refreshMissions();
-            getCampaignGui().refreshFinancialTransactions();
         } else {
             CustomizeMissionDialog cmd = new CustomizeMissionDialog(getFrame(), true, null, getCampaign());
             cmd.setVisible(true);
@@ -337,7 +347,6 @@ public final class BriefingTab extends CampaignGuiTab {
             if (cmd.getMissionId() != -1) {
                 selectedMission = cmd.getMissionId();
             }
-            refreshMissions();
         }
     }
 
@@ -358,7 +367,7 @@ public final class BriefingTab extends CampaignGuiTab {
                     selectedMission = cmd.getMissionId();
                 }
             }
-            refreshMissions();
+            MekHQ.triggerEvent(new MissionChangedEvent(mission));
         }
 
     }
@@ -425,15 +434,9 @@ public final class BriefingTab extends CampaignGuiTab {
                     } else {
                         selectedMission = -1;
                     }
-                    refreshMissions();
                 }
             }
-
         }
-        getCampaignGui().refreshReport();
-        getCampaignGui().refreshFunds();
-        getCampaignGui().refreshFinancialTransactions();
-        getCampaignGui().refreshRating();
     }
 
     private void deleteMission() {
@@ -449,11 +452,7 @@ public final class BriefingTab extends CampaignGuiTab {
         } else {
             selectedMission = -1;
         }
-        refreshMissions();
-        getCampaignGui().refreshReport();
-        getCampaignGui().refreshFunds();
-        getCampaignGui().refreshFinancialTransactions();
-        getCampaignGui().refreshRating();
+        MekHQ.triggerEvent(new MissionRemovedEvent(mission));
     }
 
     private void addScenario() {
@@ -461,7 +460,6 @@ public final class BriefingTab extends CampaignGuiTab {
         if (null != m) {
             CustomizeScenarioDialog csd = new CustomizeScenarioDialog(getFrame(), true, null, m, getCampaign());
             csd.setVisible(true);
-            refreshScenarioList();
         }
     }
 
@@ -474,20 +472,6 @@ public final class BriefingTab extends CampaignGuiTab {
                 return;
             }
             scenario.clearAllForcesAndPersonnel(getCampaign());
-            getCampaignGui().refreshPersonnelList();
-            getCampaignGui().refreshServicedUnitList();
-            getCampaignGui().refreshUnitList();
-            getCampaignGui().refreshOrganization();
-            getCampaignGui().refreshTaskList();
-            getCampaignGui().refreshUnitView();
-            getCampaignGui().refreshPartsList();
-            getCampaignGui().refreshAcquireList();
-            getCampaignGui().refreshReport();
-            getCampaignGui().refreshPatientList();
-            getCampaignGui().refreshPersonnelList();
-            refreshScenarioList();
-            getCampaignGui().refreshOverview();
-            getCampaignGui().filterTasks();
         }
     }
 
@@ -520,18 +504,7 @@ public final class BriefingTab extends CampaignGuiTab {
             }
         }
 
-        refreshScenarioList();
-        getCampaignGui().refreshOrganization();
-        getCampaignGui().refreshServicedUnitList();
-        getCampaignGui().refreshUnitList();
-        getCampaignGui().refreshPersonnelList();
-        getCampaignGui().filterPersonnel();
-        getCampaignGui().refreshDoctorsList();
-        getCampaignGui().refreshPatientList();
-        getCampaignGui().refreshReport();
-        changeMission();
-        getCampaignGui().refreshFinancialTransactions();
-        getCampaignGui().refreshOverview();
+        MekHQ.triggerEvent(new ScenarioResolvedEvent(scenario));
     }
 
     protected void printRecordSheets() {
@@ -831,12 +804,6 @@ public final class BriefingTab extends CampaignGuiTab {
             }
         }
 
-        getCampaignGui().refreshServicedUnitList();
-        getCampaignGui().refreshUnitList();
-        getCampaignGui().refreshPatientList();
-        getCampaignGui().refreshPersonnelList();
-        getCampaignGui().refreshOverview();
-
         if (undeployed.length() > 0) {
             JOptionPane.showMessageDialog(getFrame(),
                     "The following units could not be deployed:" + undeployed.toString(), "Could not deploy some units",
@@ -861,7 +828,6 @@ public final class BriefingTab extends CampaignGuiTab {
             choiceMission.setSelectedIndex(0);
         }
         changeMission();
-        getCampaignGui().refreshRating();
         if (getCampaign().getCampaignOptions().getUseAtB()) {
             refreshLanceAssignments();
         }
@@ -878,9 +844,11 @@ public final class BriefingTab extends CampaignGuiTab {
             btnClearAssignedUnits.setEnabled(false);
             btnResolveScenario.setEnabled(false);
             btnPrintRS.setEnabled(false);
+            selectedScenario = -1;
             return;
         }
         Scenario scenario = scenarioModel.getScenario(scenarioTable.convertRowIndexToModel(row));
+        selectedScenario = scenario.getId();
         if (getCampaign().getCampaignOptions().getUseAtB() && (scenario instanceof AtBScenario)) {
             scrollScenarioView.setViewportView(
                     new AtBScenarioViewPanel((AtBScenario) scenario, getCampaign(), getIconPackage(), getFrame()));
@@ -918,7 +886,7 @@ public final class BriefingTab extends CampaignGuiTab {
     @Override
     public void refreshAll() {
         refreshMissions();
-        refreshScenarioList();
+        refreshScenarioTableData();
     }
 
     public void changeMission() {
@@ -953,21 +921,77 @@ public final class BriefingTab extends CampaignGuiTab {
             selectedMission = -1;
             scrollMissionView.setViewportView(null);
         }
-        refreshScenarioList();
+        refreshScenarioTableData();
     }
 
-    public void refreshScenarioList() {
+    public void refreshScenarioTableData() {
         Mission m = getCampaign().getMission(selectedMission);
         if (null != m) {
             scenarioModel.setData(m.getScenarios());
         } else {
             scenarioModel.setData(new ArrayList<Scenario>());
         }
+        selectedScenario = -1;
     }
 
+    private ActionScheduler scenarioDataScheduler = new ActionScheduler(this::refreshScenarioTableData);
+    private ActionScheduler scenarioViewScheduler = new ActionScheduler(this::refreshScenarioView);
+    private ActionScheduler missionsScheduler = new ActionScheduler(this::refreshMissions);
+    private ActionScheduler lanceAssignmentScheduler = new ActionScheduler(this::refreshLanceAssignments);
+
     @Subscribe
-    public void optionsChanged(OptionsChangedEvent ev) {
+    public void handle(OptionsChangedEvent ev) {
         splitScenario.getBottomComponent().setVisible(getCampaignOptions().getUseAtB());
         splitScenario.resetToPreferredSizes();
+    }
+    
+    @Subscribe
+    public void handle(ScenarioChangedEvent ev) {
+        if (ev.getScenario() != null && ev.getScenario().getMissionId() == selectedMission) {
+            scenarioTable.repaint();
+            if (ev.getScenario().getId() == selectedScenario) {
+                scenarioViewScheduler.schedule();
+            }
+        }
+    }
+    
+    @Subscribe
+    public void handle(OrganizationChangedEvent ev) {
+        scenarioDataScheduler.schedule();
+        if (getCampaignOptions().getUseAtB()) {
+            lanceAssignmentScheduler.schedule();
+        }
+    }
+    
+    @Subscribe
+    public void handle(ScenarioNewEvent ev) {
+        scenarioDataScheduler.schedule();
+    }
+    
+    @Subscribe
+    public void handle(ScenarioRemovedEvent ev) {
+        scenarioDataScheduler.schedule();
+    }
+    
+    @Subscribe
+    public void handle(MissionNewEvent ev) {
+        missionsScheduler.schedule();
+    }
+    
+    @Subscribe
+    public void handle(MissionRemovedEvent ev) {
+        missionsScheduler.schedule();
+    }
+    
+    @Subscribe
+    public void handle(MissionCompletedEvent ev) {
+        missionsScheduler.schedule();
+    }
+    
+    @Subscribe
+    public void handle(MissionChangedEvent ev) {
+        if (ev.getMission().getId() == selectedMission) {
+            changeMission();
+        }
     }
 }

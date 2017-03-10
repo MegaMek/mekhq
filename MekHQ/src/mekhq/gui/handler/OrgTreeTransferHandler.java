@@ -12,6 +12,8 @@ import javax.swing.JTree;
 import javax.swing.TransferHandler;
 import javax.swing.tree.TreePath;
 
+import mekhq.MekHQ;
+import mekhq.campaign.event.OrganizationChangedEvent;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
@@ -37,7 +39,12 @@ public class OrgTreeTransferHandler extends TransferHandler {
     @Override
     public void exportDone(JComponent c, Transferable t, int action) {
         if (action == MOVE) {
-            gui.refreshOrganization();
+            Object node = ((JTree)c).getLastSelectedPathComponent();
+            if (node instanceof Unit) {
+                MekHQ.triggerEvent(new OrganizationChangedEvent((Unit)node));
+            } else if (node instanceof Force) {
+                MekHQ.triggerEvent(new OrganizationChangedEvent((Force)node));
+            }
         }
     }
 

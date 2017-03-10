@@ -38,7 +38,13 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 
 import megamek.common.TargetRoll;
+import megamek.common.event.Subscribe;
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
+import mekhq.campaign.event.MedicPoolChangedEvent;
+import mekhq.campaign.event.PersonEvent;
+import mekhq.campaign.event.PersonMedicalAssignmentEvent;
+import mekhq.campaign.event.ScenarioResolvedEvent;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.model.DocTableModel;
 import mekhq.gui.model.PatientTableModel;
@@ -65,6 +71,7 @@ public final class InfirmaryTab extends CampaignGuiTab {
 
     InfirmaryTab(CampaignGUI gui, String name) {
         super(gui, name);
+        MekHQ.registerHandler(this);
     }
 
     /*
@@ -293,24 +300,22 @@ public final class InfirmaryTab extends CampaignGuiTab {
                         && (getCampaign().getPatientsFor(doctor) < 25)
                         && (getCampaign().getTargetFor(p, doctor).getValue() != TargetRoll.IMPOSSIBLE)) {
                     p.setDoctorId(doctor.getId(), getCampaign().getCampaignOptions().getHealingWaitingPeriod());
+                    MekHQ.triggerEvent(new PersonMedicalAssignmentEvent(doctor, p));
                 }
             }
         }
-        getCampaignGui().refreshTechsList();
-        refreshDoctorsList();
-        refreshPatientList();
     }
 
     private void unassignDoctor() {
+        Person doctor = getSelectedDoctor();
         for (Person p : getSelectedAssignedPatients()) {
             if ((null != p)) {
                 p.setDoctorId(null, getCampaign().getCampaignOptions().getNaturalHealingWaitingPeriod());
+                if (doctor != null) {
+                    MekHQ.triggerEvent(new PersonMedicalAssignmentEvent(doctor, p));
+                }
             }
         }
-
-        getCampaignGui().refreshTechsList();
-        refreshDoctorsList();
-        refreshPatientList();
     }
 
     public void refreshDoctorsList() {
@@ -364,4 +369,23 @@ public final class InfirmaryTab extends CampaignGuiTab {
         listUnassignedPatient.setSelectedIndices(unassignedIndices);
     }
 
+    private ActionScheduler doctorListScheduler = new ActionScheduler(this::refreshDoctorsList);
+    private ActionScheduler patientListScheduler = new ActionScheduler(this::refreshPatientList);    
+    
+    @Subscribe
+    public void handle(ScenarioResolvedEvent ev) {
+        doctorListScheduler.schedule();
+        patientListScheduler.schedule();
+    }
+    
+    @Subscribe
+    public void handle(PersonEvent ev) {
+        doctorListScheduler.schedule();
+        patientListScheduler.schedule();
+    }
+    
+    @Subscribe
+    public void handle(MedicPoolChangedEvent ev) {
+        doctorListScheduler.schedule();
+    }
 }

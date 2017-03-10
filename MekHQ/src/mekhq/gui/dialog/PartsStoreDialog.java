@@ -439,11 +439,6 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 				quantity--;
 			}
 		}
-		campaignGUI.refreshReport();
-		campaignGUI.refreshAcquireList();
-		campaignGUI.refreshPartsList();
-		campaignGUI.refreshFinancialTransactions();
-        campaignGUI.refreshOverview();
     }
 
     private void setSelectedPart() {

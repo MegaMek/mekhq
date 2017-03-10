@@ -37,7 +37,9 @@ import javax.swing.table.TableRowSorter;
 
 import megamek.common.options.PilotOptions;
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
@@ -298,6 +300,7 @@ public final class BatchXPDialog extends JDialog {
                         }
                     }
                 }
+                MekHQ.triggerEvent(new PersonChangedEvent(p));
             }
             // Refresh the filter and continue if we still have anyone available
             updatePersonnelTable();

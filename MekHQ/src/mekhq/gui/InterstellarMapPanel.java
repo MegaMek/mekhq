@@ -371,7 +371,7 @@ public class InterstellarMapPanel extends JPanel {
                             jumpPath = campaign.calculateJumpPath(campaign.getCurrentPlanet(), target);
                             selectedPlanet = target;
                             repaint();
-                            hqview.refreshPlanetView();
+                            notifyListeners();
                             return;
 
                         }
@@ -388,7 +388,7 @@ public class InterstellarMapPanel extends JPanel {
                             jumpPath.addPlanets(addPath.getPlanets());
                               selectedPlanet = target;
                               repaint();
-                              hqview.refreshPlanetView();
+                              notifyListeners();
                               return;
                         }
                         changeSelectedPlanet(target);
@@ -960,7 +960,7 @@ public class InterstellarMapPanel extends JPanel {
     private void changeSelectedPlanet(Planet p) {
         selectedPlanet = p;
         jumpPath = new JumpPath();
-        hqview.refreshPlanetView();
+        notifyListeners();
     }
 
     private void openPlanetEventEditor(Planet p) {
@@ -971,7 +971,7 @@ public class InterstellarMapPanel extends JPanel {
             Planets.getInstance().updatePlanetaryEvents(p.getId(), result, true);
             Planets.getInstance().recalcHPGNetwork();
             repaint();
-            hqview.refreshPlanetView();
+            notifyListeners();
         }
     }
     
@@ -1012,4 +1012,23 @@ public class InterstellarMapPanel extends JPanel {
          */
         int planetID;
     }
+    
+    
+    private transient List<ActionListener> listeners = new ArrayList<>();
+    
+    public void addActionListener(ActionListener l) {
+        if (!listeners.contains(l)) {
+            listeners.add(l);
+        }
+    }
+    
+    public void removeActionListener(ActionListener l) {
+        listeners.remove(l);
+    }
+    
+    private void notifyListeners() {
+        ActionEvent ev = new ActionEvent(this, ActionEvent.ACTION_FIRST, "refresh");
+        listeners.forEach(l -> l.actionPerformed(ev));
+    }
+
 }

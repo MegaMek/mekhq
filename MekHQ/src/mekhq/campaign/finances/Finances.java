@@ -30,13 +30,17 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
-import mekhq.MekHqXmlUtil;
-import mekhq.Utilities;
-import mekhq.campaign.Campaign;
-
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import mekhq.MekHQ;
+import mekhq.MekHqXmlUtil;
+import mekhq.Utilities;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.event.LoanDefaultedEvent;
+import mekhq.campaign.event.TransactionCreditEvent;
+import mekhq.campaign.event.TransactionDebitEvent;
 
 /**
  *
@@ -124,18 +128,22 @@ public class Finances implements Serializable {
 	    if(getBalance() < amount) {
 	        return false;
 	    }
-		transactions.add(new Transaction(-1 * amount, category, reason, date));
+	    Transaction t = new Transaction(-1 * amount, category, reason, date);
+		transactions.add(t);
 		if(null != wentIntoDebt && !isInDebt()) {
             wentIntoDebt = null;
         }
+        MekHQ.triggerEvent(new TransactionDebitEvent(t));
 		return true;
 	}
 
 	public void credit(long amount, int category, String reason, Date date) {
-		transactions.add(new Transaction(amount, category, reason, date));
+	    Transaction t = new Transaction(amount, category, reason, date);
+		transactions.add(t);
 		if(null == wentIntoDebt && isInDebt()) {
 		    wentIntoDebt = date;
 		}
+		MekHQ.triggerEvent(new TransactionCreditEvent(t));
 	}
 
 	/**
@@ -293,6 +301,7 @@ public class Finances implements Serializable {
             failCollateral++;
         }
         removeLoan(loan);
+        MekHQ.triggerEvent(new LoanDefaultedEvent(loan));
     }
 
 	public int getLoanDefaults() {

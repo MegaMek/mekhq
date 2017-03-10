@@ -69,7 +69,6 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.market.UnitMarket;
-import mekhq.gui.CampaignGUI;
 import mekhq.gui.model.UnitMarketTableModel;
 import mekhq.gui.model.XTableColumnModel;
 import mekhq.gui.sorter.WeightClassSorter;
@@ -94,7 +93,6 @@ public class UnitMarketDialog extends JDialog {
 
 	private UnitMarketTableModel marketModel;
 	private Campaign campaign;
-	private CampaignGUI hqView;
     private UnitMarket unitMarket;
     boolean addToCampaign;
     Entity selectedEntity = null;
@@ -121,9 +119,8 @@ public class UnitMarketDialog extends JDialog {
     private JSplitPane splitMain;
 
     /** Creates new form UnitSelectorDialog */
-    public UnitMarketDialog(Frame frame, CampaignGUI view, Campaign c) {
+    public UnitMarketDialog(Frame frame, Campaign c) {
         super(frame, true);
-        hqView = view;
         campaign = c;
         unitMarket = c.getUnitMarket();
         marketModel = new UnitMarketTableModel();
@@ -347,7 +344,6 @@ public class UnitMarketDialog extends JDialog {
 			long cost = (long)Math.ceil(offer.unit.getCost() * offer.pct / 100.0);
 			if (campaign.getFunds() < cost) {
 				 campaign.addReport("<font color='red'><b> You cannot afford this unit. Transaction cancelled</b>.</font>");
-				 refreshHqView();
 				 return;
 			}
 
@@ -369,8 +365,6 @@ public class UnitMarketDialog extends JDialog {
 			UnitMarket.MarketOffer selected = ((UnitMarketTableModel)tableUnits.getModel()).getOffer(tableUnits.convertRowIndexToModel(tableUnits.getSelectedRow()));
 			unitMarket.removeOffer(selected);
 			((UnitMarketTableModel)tableUnits.getModel()).setData(unitMarket.getOffers());
-
-	    	refreshHqView();
 	    	refreshOfferView();
 	    }
 	}
@@ -381,17 +375,9 @@ public class UnitMarketDialog extends JDialog {
         	UnitMarket.MarketOffer selected = ((UnitMarketTableModel)tableUnits.getModel()).getOffer(tableUnits.convertRowIndexToModel(tableUnits.getSelectedRow()));
 	    	unitMarket.removeOffer(selected);
 	    	((UnitMarketTableModel)tableUnits.getModel()).setData(unitMarket.getOffers());
-			refreshHqView();
 			refreshOfferView();
 		}
 	}
-
-    private void refreshHqView() {
-        hqView.refreshUnitList();
-        hqView.refreshServicedUnitList();
-        hqView.refreshFinancialTransactions();
-        hqView.refreshReport();
-    }
 
 	private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {
 	    selectedEntity = null;

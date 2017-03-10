@@ -21,6 +21,8 @@ package mekhq.gui;
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ResourceBundle;
 
 import javax.swing.JButton;
@@ -45,7 +47,7 @@ import mekhq.gui.view.PlanetViewPanel;
  * Displays interstellar map and contains transit controls.
  *
  */
-public final class MapTab extends CampaignGuiTab {
+public final class MapTab extends CampaignGuiTab implements ActionListener {
 
     private static final long serialVersionUID = 31953140144022679L;
 
@@ -151,6 +153,7 @@ public final class MapTab extends CampaignGuiTab {
         splitMap.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, ev -> refreshPlanetView());
 
         panMap.setCampaign(getCampaign());
+        panMap.addActionListener(this);
 
         setLayout(new BorderLayout());
         add(splitMap, BorderLayout.CENTER);
@@ -163,8 +166,7 @@ public final class MapTab extends CampaignGuiTab {
      */
     @Override
     public void refreshAll() {
-        // nothing
-
+        refreshPlanetView();
     }
 
     private void calculateJumpPath() {
@@ -186,7 +188,7 @@ public final class MapTab extends CampaignGuiTab {
         panMap.repaint();
     }
 
-    public void refreshPlanetView() {
+    protected void refreshPlanetView() {
         JumpPath path = panMap.getJumpPath();
         if (null != path && !path.isEmpty()) {
             scrollPlanetView.setViewportView(new JumpPathViewPanel(path, getCampaign()));
@@ -198,14 +200,21 @@ public final class MapTab extends CampaignGuiTab {
         }
     }
 
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource() == panMap) {
+            refreshPlanetView();
+        }
+    }
+
     @Subscribe
-    public void newDay(NewDayEvent ev) {
+    public void handle(NewDayEvent ev) {
         panMap.repaint();
         suggestPlanet.setSuggestData(getCampaign().getPlanetNames());
     }
 
     @Subscribe
-    public void optionsChanged(OptionsChangedEvent ev) {
+    public void handle(OptionsChangedEvent ev) {
         panMap.repaint();
     }
 }

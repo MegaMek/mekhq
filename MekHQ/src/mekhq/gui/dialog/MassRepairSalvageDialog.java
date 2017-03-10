@@ -1205,8 +1205,6 @@ public class MassRepairSalvageDialog extends JDialog {
 		JOptionPane.showMessageDialog(this, msg, "Complete", JOptionPane.INFORMATION_MESSAGE);
 
 		campaignGUI.getCampaign().addReport(msg);
-
-		campaignGUI.refreshReport();
 	}
 
 	private void btnSaveAsDefaultActionPerformed(ActionEvent evt) {
@@ -1255,8 +1253,6 @@ public class MassRepairSalvageDialog extends JDialog {
 		JOptionPane.showMessageDialog(campaignGUI.getFrame(), msg, "Complete", JOptionPane.INFORMATION_MESSAGE);
 
 		campaignGUI.getCampaign().addReport(msg);
-
-		campaignGUI.refreshReport();
 	}
 
 	public static void massRepairSalvageAllUnits(CampaignGUI campaignGUI) {
@@ -1312,9 +1308,6 @@ public class MassRepairSalvageDialog extends JDialog {
 		JOptionPane.showMessageDialog(campaignGUI.getFrame(), msg, "Complete", JOptionPane.INFORMATION_MESSAGE);
 
 		campaignGUI.getCampaign().addReport(msg);
-
-		campaignGUI.refreshReport();
-
 	}
 
 	public static int performUnitMassRepairOrSalvage(CampaignGUI campaignGUI, Unit unit, boolean isSalvage,

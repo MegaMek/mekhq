@@ -16,6 +16,11 @@ import javax.swing.event.MouseInputAdapter;
 import javax.swing.tree.TreePath;
 
 import megamek.common.GunEmplacement;
+import mekhq.MekHQ;
+import mekhq.campaign.event.DeploymentChangedEvent;
+import mekhq.campaign.event.NetworkChangedEvent;
+import mekhq.campaign.event.OrganizationChangedEvent;
+import mekhq.campaign.event.PersonTechAssignmentEvent;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.Mission;
@@ -97,8 +102,9 @@ public class OrgTreeMouseAdapter extends MouseInputAdapter implements
                         "Enter the force name", "Force Name",
                         JOptionPane.PLAIN_MESSAGE, null, null, "My Lance");
                 if (null != name) {
-                    gui.getCampaign().addForce(new Force(name), singleForce);
-                    gui.refreshOrganization();
+                    Force f = new Force(name);
+                    gui.getCampaign().addForce(f, singleForce);
+                    MekHQ.triggerEvent(new OrganizationChangedEvent(f));
                 }
             }
         }
@@ -121,10 +127,12 @@ public class OrgTreeMouseAdapter extends MouseInputAdapter implements
                 			    if (null != u.getTech()) {
                 			        Person oldTech = u.getTech();
                 			        oldTech.removeTechUnitId(u.getId());
+                			        u.removeTech();
                 			    }
                 			    if (tech.canTech(u.getEntity())) {
                 			        u.setTech(tech.getId());
                                     tech.addTechUnitID(u.getId());
+                                    MekHQ.triggerEvent(new PersonTechAssignmentEvent(tech, u));
                 			    } else {
                 			        cantTech += tech.getName() + " cannot maintain " + u.getName() + "\n";
                 			    }
@@ -135,11 +143,6 @@ public class OrgTreeMouseAdapter extends MouseInputAdapter implements
                 		    JOptionPane.showMessageDialog(null, cantTech, "Warning", JOptionPane.WARNING_MESSAGE);
                 		}
                 	}
-                	gui.refreshOrganization();
-                	gui.refreshScenarioList();
-                	gui.refreshPersonnelList();
-                	gui.refreshUnitList();
-                	gui.refreshServicedUnitList();
                 }
           	}
         }
@@ -148,24 +151,13 @@ public class OrgTreeMouseAdapter extends MouseInputAdapter implements
                 Unit u = gui.getCampaign().getUnit(UUID.fromString(target));
                 if (null != u) {
                     gui.getCampaign().addUnitToForce(u, singleForce.getId());
-                    gui.refreshOrganization();
-                    gui.refreshScenarioList();
-                    gui.refreshPersonnelList();
-                    gui.refreshUnitList();
-                    gui.refreshServicedUnitList();
-                    gui.refreshOverview();
                 }
             }
         } else if (command.contains("UNDEPLOY_FORCE")) {
             for (Force force : forces) {
                 gui.undeployForce(force);
+                //Event triggered from undeployForce
             }
-            gui.refreshOrganization();
-            gui.refreshPersonnelList();
-            gui.refreshUnitList();
-            gui.refreshServicedUnitList();
-            gui.refreshScenarioList();
-            gui.refreshOverview();
         } else if (command.contains("DEPLOY_FORCE")) {
             int sid = Integer.parseInt(target);
             Scenario scenario = gui.getCampaign().getScenario(sid);
@@ -181,13 +173,8 @@ public class OrgTreeMouseAdapter extends MouseInputAdapter implements
                         }
                     }
                 }
+                MekHQ.triggerEvent(new DeploymentChangedEvent(force, scenario));
             }
-            gui.refreshScenarioList();
-            gui.refreshOrganization();
-            gui.refreshPersonnelList();
-            gui.refreshUnitList();
-            gui.refreshServicedUnitList();
-            gui.refreshOverview();
         } else if (command.contains("CHANGE_ICON")) {
             if (null != singleForce) {
                 ImageChoiceDialog pcd = new ImageChoiceDialog(
@@ -199,7 +186,7 @@ public class OrgTreeMouseAdapter extends MouseInputAdapter implements
                     singleForce.setIconCategory(pcd.getCategory());
                     singleForce.setIconFileName(pcd.getFileName());
                     singleForce.setIconMap(pcd.getIconMap());
-                    gui.refreshOrganization();
+                    MekHQ.triggerEvent(new OrganizationChangedEvent(singleForce));
                 }
             }
         } else if (command.contains("CHANGE_NAME")) {
@@ -211,7 +198,7 @@ public class OrgTreeMouseAdapter extends MouseInputAdapter implements
                 if (name != null) {
                     singleForce.setName(name);
                 }
-                gui.refreshOrganization();
+                MekHQ.triggerEvent(new OrganizationChangedEvent(singleForce));
             }
         } else if (command.contains("CHANGE_DESC")) {
             if (null != singleForce) {
@@ -221,7 +208,7 @@ public class OrgTreeMouseAdapter extends MouseInputAdapter implements
                 tad.setVisible(true);
                 if (tad.wasChanged()) {
                     singleForce.setDescription(tad.getText());
-                    gui.refreshOrganization();
+                    MekHQ.triggerEvent(new OrganizationChangedEvent(singleForce));
                 }
             }
         } else if (command.contains("REMOVE_FORCE")) {
@@ -237,11 +224,6 @@ public class OrgTreeMouseAdapter extends MouseInputAdapter implements
                     gui.getCampaign().removeForce(force);
                 }
             }
-            gui.refreshOrganization();
-            gui.refreshPersonnelList();
-            gui.refreshScenarioList();
-            gui.refreshUnitList();
-            gui.refreshOverview();
         } else if (command.contains("REMOVE_LANCE_TECH")) {
            	if (singleForce.getTechID() != null) {
     			Person oldTech = gui.getCampaign().getPerson(singleForce.getTechID());
@@ -250,17 +232,17 @@ public class OrgTreeMouseAdapter extends MouseInputAdapter implements
     			if (singleForce.getAllUnits() !=null) {
            			for (UUID uuid : singleForce.getAllUnits()) {
            				Unit u = gui.getCampaign().getUnit(uuid);
+                        if (null != u.getTech()) {
+                            oldTech = u.getTech();
+                            oldTech.removeTechUnitId(u.getId());
+                            MekHQ.triggerEvent(new PersonTechAssignmentEvent(oldTech, u));
+                        }
            				if (u != null) {
            					u.setTech((UUID)null);
            				}
            			}
            		}
     			singleForce.setTechID(null);
-
-    			gui.refreshOrganization();
-    			gui.refreshPersonnelList();
-                gui.refreshScenarioList();
-                gui.refreshUnitList();
     		}
         } else if (command.contains("REMOVE_UNIT")) {
             for (Unit unit : units) {
@@ -272,25 +254,17 @@ public class OrgTreeMouseAdapter extends MouseInputAdapter implements
                            	unit.removeTech();
                            	Person forceTech = gui.getCampaign().getPerson(parentForce.getTechID());
                             forceTech.removeTechUnitId(unit.getId());
+                            MekHQ.triggerEvent(new PersonTechAssignmentEvent(forceTech, unit));
                         }
                     }
+                    MekHQ.triggerEvent(new OrganizationChangedEvent(parentForce, unit));
                 }
             }
-            gui.refreshOrganization();
-            gui.refreshPersonnelList();
-            gui.refreshScenarioList();
-            gui.refreshUnitList();
-            gui.refreshOverview();
         } else if (command.contains("UNDEPLOY_UNIT")) {
             for (Unit unit : units) {
                 gui.undeployUnit(unit);
+                //Event triggered from undeployUnit
             }
-            gui.refreshScenarioList();
-            gui.refreshOrganization();
-            gui.refreshPersonnelList();
-            gui.refreshUnitList();
-            gui.refreshServicedUnitList();
-            gui.refreshOverview();
         } else if (command.contains("GOTO_UNIT")) {
             if (null != singleUnit) {
                 gui.focusOnUnit(singleUnit.getId());
@@ -306,15 +280,9 @@ public class OrgTreeMouseAdapter extends MouseInputAdapter implements
                 if (null != unit && null != scenario) {
                     scenario.addUnit(unit.getId());
                     unit.setScenarioId(scenario.getId());
-
+                    MekHQ.triggerEvent(new DeploymentChangedEvent(unit, scenario));
                 }
             }
-            gui.refreshScenarioList();
-            gui.refreshOrganization();
-            gui.refreshPersonnelList();
-            gui.refreshUnitList();
-            gui.refreshServicedUnitList();
-            gui.refreshOverview();
         } else if (command.contains("C3I")) {
             // don't set them directly, set the C3i UUIDs and then
             // run gui.refreshNetworks on the campaign
@@ -336,24 +304,22 @@ public class OrgTreeMouseAdapter extends MouseInputAdapter implements
                 }
             }
             gui.getCampaign().refreshNetworks();
-            gui.refreshOrganization();
+            MekHQ.triggerEvent(new NetworkChangedEvent(units));
         } else if (command.contains("REMOVE_NETWORK")) {
             gui.getCampaign().removeUnitsFromNetwork(units);
-            gui.refreshOrganization();
+            MekHQ.triggerEvent(new NetworkChangedEvent(units));
         } else if (command.contains("DISBAND_NETWORK")) {
             if (null != singleUnit) {
                 gui.getCampaign().disbandNetworkOf(singleUnit);
             }
-            gui.refreshOrganization();
         } else if (command.contains("ADD_NETWORK")) {
             gui.getCampaign().addUnitsToNetwork(units, target);
-            gui.refreshOrganization();
         } else if (command.contains("ADD_SLAVES")) {
             for (Unit u : units) {
                 u.getEntity().setC3MasterIsUUIDAsString(target);
             }
             gui.getCampaign().refreshNetworks();
-            gui.refreshOrganization();
+            MekHQ.triggerEvent(new NetworkChangedEvent(units));
         } else if (command.contains("SET_MM")) {
             for (Unit u : units) {
                 gui.getCampaign().removeUnitsFromC3Master(u);
@@ -361,7 +327,7 @@ public class OrgTreeMouseAdapter extends MouseInputAdapter implements
                         u.getEntity().getC3UUIDAsString());
             }
             gui.getCampaign().refreshNetworks();
-            gui.refreshOrganization();
+            MekHQ.triggerEvent(new NetworkChangedEvent(units));
         } else if (command.contains("SET_IND_M")) {
             for (Unit u : units) {
                 u.getEntity().setC3MasterIsUUIDAsString(null);
@@ -369,7 +335,7 @@ public class OrgTreeMouseAdapter extends MouseInputAdapter implements
                 gui.getCampaign().removeUnitsFromC3Master(u);
             }
             gui.getCampaign().refreshNetworks();
-            gui.refreshOrganization();
+            MekHQ.triggerEvent(new NetworkChangedEvent(units));
         }
         if (command.contains("REMOVE_C3")) {
             for (Unit u : units) {
@@ -377,7 +343,7 @@ public class OrgTreeMouseAdapter extends MouseInputAdapter implements
                 u.getEntity().setC3Master(null, true);
             }
             gui.getCampaign().refreshNetworks();
-            gui.refreshOrganization();
+            MekHQ.triggerEvent(new NetworkChangedEvent(units));
         }
     }
 

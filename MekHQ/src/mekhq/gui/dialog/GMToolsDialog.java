@@ -212,10 +212,6 @@ public class GMToolsDialog extends JDialog implements ActionListener {
                 try {
                     e = new MechFileParser(ms.getSourceFile(),ms.getEntryName()).getEntity();
                     gui.getCampaign().addUnit(e, false, 0);
-                    gui.refreshUnitList();
-                    gui.refreshServicedUnitList();
-                    gui.refreshReport();
-                    gui.refreshOverview();
                 } catch (EntityLoadingException e1) {
                     e1.printStackTrace();
                     MekHQ.logError("Failed to load entity " + ms.getName() + " from " + ms.getSourceFile().toString());

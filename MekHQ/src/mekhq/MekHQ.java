@@ -64,6 +64,7 @@ import megamek.common.util.EncodeControl;
 import megamek.server.Server;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.ResolveScenarioTracker;
+import mekhq.campaign.event.ScenarioResolvedEvent;
 import mekhq.campaign.handler.XPHandler;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
@@ -440,19 +441,9 @@ public class MekHQ implements GameListener {
             if (getCampaign().getCampaignOptions().getUseAtB()) {
                 megamek.client.RandomUnitGenerator.getInstance();
                 megamek.client.RandomNameGenerator.getInstance();
-                campaigngui.refreshOverview();
             }
-            campaigngui.refreshScenarioList();
-            campaigngui.refreshOrganization();
-            campaigngui.refreshServicedUnitList();
-            campaigngui.refreshUnitList();
-            campaigngui.refreshPersonnelList();
-            campaigngui.filterPersonnel();
-            campaigngui.refreshDoctorsList();
-            campaigngui.refreshPatientList();
+            MekHQ.triggerEvent(new ScenarioResolvedEvent(currentScenario));
             campaigngui.initReport();
-            campaigngui.changeMission();
-            campaigngui.refreshFinancialTransactions();
 
         }// end try
         catch (Exception ex) {

@@ -16,7 +16,6 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.gui;
 
 import java.awt.BorderLayout;
@@ -34,11 +33,22 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
 import javax.swing.table.TableColumn;
 
 import megamek.common.event.Subscribe;
 import mekhq.MekHQ;
+import mekhq.campaign.event.AcquisitionEvent;
+import mekhq.campaign.event.AssetEvent;
 import mekhq.campaign.event.GMModeEvent;
+import mekhq.campaign.event.LoanEvent;
+import mekhq.campaign.event.MissionChangedEvent;
+import mekhq.campaign.event.MissionNewEvent;
+import mekhq.campaign.event.PartEvent;
+import mekhq.campaign.event.ScenarioResolvedEvent;
+import mekhq.campaign.event.TransactionEvent;
+import mekhq.campaign.event.UnitEvent;
+import mekhq.campaign.mission.Contract;
 import mekhq.gui.adapter.FinanceTableMouseAdapter;
 import mekhq.gui.adapter.LoanTableMouseAdapter;
 import mekhq.gui.dialog.AddFundsDialog;
@@ -217,45 +227,89 @@ public final class FinancesTab extends CampaignGuiTab {
             String description = addFundsDialog.getFundsDescription();
             int category = addFundsDialog.getCategory();
             getCampaign().addFunds(funds, description, category);
-            getCampaignGui().refreshReport();
-            getCampaignGui().refreshFunds();
-            refreshFinancialTransactions();
         }
     }
 
     private void showNewLoanDialog() {
         NewLoanDialog nld = new NewLoanDialog(getFrame(), true, getCampaign());
         nld.setVisible(true);
-        refreshFinancialTransactions();
-        getCampaignGui().refreshFunds();
-        getCampaignGui().refreshReport();
-        getCampaignGui().refreshRating();
     }
 
     private void manageAssets() {
         ManageAssetsDialog mad = new ManageAssetsDialog(getFrame(), getCampaign());
         mad.setVisible(true);
-        getCampaignGui().refreshReport();
-        getCampaignGui().refreshFunds();
-        refreshFinancialTransactions();
     }
 
     public void refreshFinancialTransactions() {
-        financeModel.setData(getCampaign().getFinances().getAllTransactions());
-        loanModel.setData(getCampaign().getFinances().getAllLoans());
-        getCampaignGui().refreshFunds();
-        getCampaignGui().refreshRating();
-        refreshFinancialReport();
+        SwingUtilities.invokeLater(() -> { 
+            financeModel.setData(getCampaign().getFinances().getAllTransactions());
+            loanModel.setData(getCampaign().getFinances().getAllLoans());
+            refreshFinancialReport();
+        });
     }
 
     public void refreshFinancialReport() {
-        areaNetWorth.setText(getCampaign().getFinancialReport());
-        areaNetWorth.setCaretPosition(0);
+        SwingUtilities.invokeLater(() -> { 
+            areaNetWorth.setText(getCampaign().getFinancialReport());
+            areaNetWorth.setCaretPosition(0);
+        });
+    }
+    
+    ActionScheduler financialTransactionsScheduler = new ActionScheduler(this::refreshFinancialTransactions);
+    ActionScheduler financialReportScheduler = new ActionScheduler(this::refreshFinancialReport);
+
+    @Subscribe
+    public void handle(GMModeEvent ev) {
+        btnAddFunds.setEnabled(ev.isGMMode());
+        btnManageAssets.setEnabled(ev.isGMMode());
     }
 
     @Subscribe
-    public void gmMode(GMModeEvent ev) {
-        btnAddFunds.setEnabled(ev.isGMMode());
-        btnManageAssets.setEnabled(ev.isGMMode());
+    public void handle(ScenarioResolvedEvent ev) {
+        financialTransactionsScheduler.schedule();
+    }
+
+    @Subscribe
+    public void handle(MissionNewEvent ev) {
+        if (ev.getMission() instanceof Contract) {
+            financialReportScheduler.schedule();
+        }
+    }
+
+    @Subscribe
+    public void handle(MissionChangedEvent ev) {
+        if (ev.getMission() instanceof Contract) {
+            financialReportScheduler.schedule();
+        }
+    }
+    
+    @Subscribe
+    public void handle(AcquisitionEvent ev) {
+        financialTransactionsScheduler.schedule();
+    }
+    
+    @Subscribe
+    public void handle(TransactionEvent ev) {
+        financialTransactionsScheduler.schedule();
+    }
+    
+    @Subscribe
+    public void handle(LoanEvent ev) {
+        financialTransactionsScheduler.schedule();
+    }
+    
+    @Subscribe
+    public void handle(UnitEvent ev) {
+        financialReportScheduler.schedule();
+    }
+    
+    @Subscribe
+    public void handle(PartEvent ev) {
+        financialReportScheduler.schedule();
+    }
+    
+    @Subscribe
+    public void handle(AssetEvent ev) {
+        financialReportScheduler.schedule();
     }
 }

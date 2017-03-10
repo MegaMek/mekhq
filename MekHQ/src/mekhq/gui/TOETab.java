@@ -30,6 +30,16 @@ import javax.swing.JTree;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.tree.TreeSelectionModel;
 
+import megamek.common.event.Subscribe;
+import mekhq.MekHQ;
+import mekhq.campaign.event.DeploymentChangedEvent;
+import mekhq.campaign.event.NetworkChangedEvent;
+import mekhq.campaign.event.OrganizationChangedEvent;
+import mekhq.campaign.event.PersonChangedEvent;
+import mekhq.campaign.event.PersonRemovedEvent;
+import mekhq.campaign.event.ScenarioResolvedEvent;
+import mekhq.campaign.event.UnitChangedEvent;
+import mekhq.campaign.event.UnitRemovedEvent;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
@@ -56,6 +66,7 @@ public final class TOETab extends CampaignGuiTab {
 
     TOETab(CampaignGUI gui, String name) {
         super(gui, name);
+        MekHQ.registerHandler(this);
     }
 
     @Override
@@ -102,7 +113,6 @@ public final class TOETab extends CampaignGuiTab {
     @Override
     public void refreshAll() {
         refreshOrganization();
-        refreshForceView();
     }
 
     public void refreshOrganization() {
@@ -114,11 +124,7 @@ public final class TOETab extends CampaignGuiTab {
             // So, commenting it out - ralgith
             // orgTree.setSelectionPath(null);
             refreshForceView();
-            if (getCampaign().getCampaignOptions().getUseAtB()) {
-                getCampaignGui().refreshLanceAssignments();
-            }
         });
-        getCampaignGui().refreshRating();
     }
 
     public void refreshForceView() {
@@ -149,5 +155,47 @@ public final class TOETab extends CampaignGuiTab {
             scrollForceView.setViewportView(new ForceViewPanel((Force) node, getCampaign(), getIconPackage()));
             javax.swing.SwingUtilities.invokeLater(() -> scrollForceView.getVerticalScrollBar().setValue(0));
         }
+    }
+    
+    private ActionScheduler orgRefreshScheduler = new ActionScheduler(this::refreshOrganization);
+    
+    @Subscribe
+    public void deploymentChanged(DeploymentChangedEvent ev) {
+        orgTree.repaint();
+    }
+    
+    @Subscribe
+    public void organizationChanged(OrganizationChangedEvent ev) {
+        orgRefreshScheduler.schedule();
+    }
+    
+    @Subscribe
+    public void networkChanged(NetworkChangedEvent ev) {
+        orgTree.repaint();
+    }
+    
+    @Subscribe
+    public void scenarioResolved(ScenarioResolvedEvent ev) {
+        orgRefreshScheduler.schedule();
+    }
+
+    @Subscribe
+    public void personChanged(PersonChangedEvent ev) {
+        orgTree.repaint();
+    }
+
+    @Subscribe
+    public void personRemoved(PersonRemovedEvent ev) {
+        orgTree.repaint();
+    }
+
+    @Subscribe
+    public void unitChanged(UnitChangedEvent ev) {
+        orgTree.repaint();
+    }
+
+    @Subscribe
+    public void unitRemoved(UnitRemovedEvent ev) {
+        orgRefreshScheduler.schedule();
     }
 }

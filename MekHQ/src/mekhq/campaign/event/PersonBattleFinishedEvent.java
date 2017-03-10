@@ -30,7 +30,7 @@ import mekhq.campaign.personnel.Person;
  * up in the list of prisoners made; this is a way to "filter out" specific
  * people who shouldn't be taken prisoner.
  */
-public class PersonBattleFinishedEvent extends PersonEvent {
+public class PersonBattleFinishedEvent extends PersonChangedEvent {
     private PersonStatus status;
     
     public PersonBattleFinishedEvent(Person person, PersonStatus status) {

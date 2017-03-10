@@ -297,7 +297,7 @@ public class LootDialog extends javax.swing.JDialog {
     }
 
     private void addUnit() {
-        UnitSelectorDialog usd = new UnitSelectorDialog(frame, null, campaign, false);
+        UnitSelectorDialog usd = new UnitSelectorDialog(frame, campaign, false);
         usd.setVisible(true);
         Entity e = usd.getEntity();
         if(null != e) {

@@ -12,6 +12,8 @@ import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.event.MouseInputAdapter;
 
+import mekhq.MekHQ;
+import mekhq.campaign.event.ScenarioChangedEvent;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.gui.CampaignGUI;
@@ -42,18 +44,13 @@ public class ScenarioTableMouseAdapter extends MouseInputAdapter implements
                 CustomizeScenarioDialog csd = new CustomizeScenarioDialog(
                         gui.getFrame(), true, scenario, mission, gui.getCampaign());
                 csd.setVisible(true);
-                gui.refreshScenarioList();
+                MekHQ.triggerEvent(new ScenarioChangedEvent(scenario));
             }
         } else if (command.equalsIgnoreCase("REMOVE")) {
             if (0 == JOptionPane.showConfirmDialog(null,
                     "Do you really want to delete the scenario?",
                     "Delete Scenario?", JOptionPane.YES_NO_OPTION)) {
                 gui.getCampaign().removeScenario(scenario.getId());
-                gui.refreshScenarioList();
-                gui.refreshOrganization();
-                gui.refreshPersonnelList();
-                gui.refreshUnitList();
-                gui.refreshOverview();
             }
 
         }

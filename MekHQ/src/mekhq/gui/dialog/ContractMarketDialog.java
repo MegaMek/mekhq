@@ -68,7 +68,6 @@ import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.universe.Faction;
-import mekhq.gui.CampaignGUI;
 import mekhq.gui.FactionComboBox;
 import mekhq.gui.view.ContractSummaryPanel;
 
@@ -88,7 +87,6 @@ public class ContractMarketDialog extends JDialog {
 	private Campaign campaign;
 	private ContractMarket contractMarket;
 	private Contract selectedContract = null;
-	private CampaignGUI hqView;
 	private ArrayList<String> possibleRetainerContracts;
 	
 	private JScrollPane scrollTableContracts;
@@ -119,9 +117,8 @@ public class ContractMarketDialog extends JDialog {
 	private FactionComboBox cbRetainerEmployer;
 	private JButton btnStartRetainer;
 	
-	public ContractMarketDialog(Frame frame, CampaignGUI view, Campaign c) {
+	public ContractMarketDialog(Frame frame, Campaign c) {
 		super(frame, true);
-		hqView = view;
 		campaign = c;
 		contractMarket = c.getContractMarket();
 		possibleRetainerContracts = new ArrayList<String>();
@@ -479,16 +476,9 @@ public class ContractMarketDialog extends JDialog {
 	    	campaign.addMission(selectedContract);
 	    	contractMarket.removeContract(selectedContract);
 	    	((DefaultTableModel)tblContracts.getModel()).removeRow(tblContracts.convertRowIndexToModel(tblContracts.getSelectedRow()));
-	    	refreshHqView();
 	    	refreshContractView();
 	    }
 	}
-	
-    private void refreshHqView() {
-    	hqView.refreshMissions();
-        hqView.refreshReport();
-        hqView.refreshFinancialTransactions();
-    }
 	
 	private void btnCloseActionPerformed(ActionEvent evt) {
 	    selectedContract = null;

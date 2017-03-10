@@ -55,6 +55,8 @@ import mekhq.MekHqXmlUtil;
 import mekhq.MhqFileUtil;
 import mekhq.Utilities;
 import mekhq.Version;
+import mekhq.campaign.event.PartChangedEvent;
+import mekhq.campaign.event.UnitRefitEvent;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.MissingAmmoBin;
@@ -714,6 +716,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 		} else {
 			for(Part part : shoppingList) {
     			part.setUnit(null);
+    			MekHQ.triggerEvent(new PartChangedEvent(part));
 			}
 		    checkForArmorSupplies();
 		    if(shoppingList.isEmpty() && (null == newArmorSupplies || newArmorSupplies.getAmountNeeded() == 0)) {
@@ -730,6 +733,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 	            campaign.addReport("You cannot afford to refurbish " + oldUnit.getEntity().getShortName() + ". Transaction cancelled");
 	        }
 	    }
+        MekHQ.triggerEvent(new UnitRefitEvent(oldUnit));
 	}
 
 	public void reserveNewParts() {
@@ -913,6 +917,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 			oldUnit.campaign.removePart(newArmorSupplies);
 			newArmorSupplies.changeAmountAvailable(newArmorSupplies.getAmount());
 		}
+		MekHQ.triggerEvent(new UnitRefitEvent(oldUnit));
 	}
 
 	private void complete() {
@@ -1028,6 +1033,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 	            }
 	        }
 	    }
+        MekHQ.triggerEvent(new UnitRefitEvent(oldUnit));
 	}
 
 	public void saveCustomization() throws EntityLoadingException, IOException {

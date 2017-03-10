@@ -43,7 +43,16 @@ import javax.swing.table.TableRowSorter;
 import megamek.common.event.Subscribe;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
+import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.event.OptionsChangedEvent;
+import mekhq.campaign.event.OvertimeModeEvent;
+import mekhq.campaign.event.PartWorkEvent;
+import mekhq.campaign.event.PersonChangedEvent;
+import mekhq.campaign.event.PersonLogEvent;
+import mekhq.campaign.event.PersonNewEvent;
+import mekhq.campaign.event.PersonRemovedEvent;
+import mekhq.campaign.event.ScenarioResolvedEvent;
+import mekhq.campaign.event.UnitRemovedEvent;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.adapter.PersonnelTableMouseAdapter;
 import mekhq.gui.model.PersonnelTableModel;
@@ -750,6 +759,9 @@ public final class PersonnelTab extends CampaignGuiTab {
         }
     }
 
+    /**
+     * Refreshes personnel table model.
+     */
     public void refreshPersonnelList() {
         UUID selectedUUID = null;
         int selectedRow = personnelTable.getSelectedRow();
@@ -769,7 +781,7 @@ public final class PersonnelTab extends CampaignGuiTab {
                 break;
             }
         }
-        getCampaignGui().refreshRating();
+        filterPersonnel();
     }
 
     public void refreshPersonnelView() {
@@ -786,9 +798,57 @@ public final class PersonnelTab extends CampaignGuiTab {
         javax.swing.SwingUtilities.invokeLater(() -> scrollPersonnelView.getVerticalScrollBar().setValue(0));
     }
 
+    private ActionScheduler personnelListScheduler = new ActionScheduler(this::refreshPersonnelList);
+    private ActionScheduler filterPersonnelScheduler = new ActionScheduler(this::filterPersonnel);
+
     @Subscribe
-    public void optionsChanged(OptionsChangedEvent ev) {
+    public void handle(OptionsChangedEvent ev) {
         changePersonnelView();
-        refreshPersonnelList();
+        personnelListScheduler.schedule();
+    }
+    
+    @Subscribe
+    public void handle(DeploymentChangedEvent ev) {
+        filterPersonnelScheduler.schedule();
+    }
+    
+    @Subscribe
+    public void handle(PersonChangedEvent ev) {
+        filterPersonnelScheduler.schedule();
+    }
+    
+    @Subscribe
+    public void handle(PersonNewEvent ev) {
+        personnelListScheduler.schedule();
+    }
+    
+    @Subscribe
+    public void handle(PersonRemovedEvent ev) {
+        personnelListScheduler.schedule();
+    }
+    
+    @Subscribe
+    public void handle(PersonLogEvent ev) {
+        refreshPersonnelView();
+    }
+
+    @Subscribe
+    public void handle(ScenarioResolvedEvent ev) {
+        personnelListScheduler.schedule();
+    }
+
+    @Subscribe
+    public void handle(UnitRemovedEvent ev) {
+        filterPersonnelScheduler.schedule();
+    }
+
+    @Subscribe
+    public void handle(PartWorkEvent ev) {
+        filterPersonnelScheduler.schedule();
+    }
+    
+    @Subscribe
+    public void handle(OvertimeModeEvent ev) {
+        filterPersonnelScheduler.schedule();
     }
 }

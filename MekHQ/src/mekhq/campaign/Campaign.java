@@ -110,9 +110,34 @@ import mekhq.MekHqXmlUtil;
 import mekhq.NullEntityException;
 import mekhq.Utilities;
 import mekhq.Version;
+import mekhq.campaign.event.AcquisitionEvent;
+import mekhq.campaign.event.AstechPoolChangedEvent;
 import mekhq.campaign.event.DayEndingEvent;
+import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.event.GMModeEvent;
+import mekhq.campaign.event.LoanNewEvent;
+import mekhq.campaign.event.LoanPaidEvent;
+import mekhq.campaign.event.MedicPoolChangedEvent;
+import mekhq.campaign.event.MissionCompletedEvent;
+import mekhq.campaign.event.MissionNewEvent;
+import mekhq.campaign.event.NetworkChangedEvent;
 import mekhq.campaign.event.NewDayEvent;
+import mekhq.campaign.event.OrganizationChangedEvent;
+import mekhq.campaign.event.OvertimeModeEvent;
+import mekhq.campaign.event.PartArrivedEvent;
+import mekhq.campaign.event.PartChangedEvent;
+import mekhq.campaign.event.PartNewEvent;
+import mekhq.campaign.event.PartRemovedEvent;
+import mekhq.campaign.event.PartWorkEvent;
+import mekhq.campaign.event.PersonChangedEvent;
+import mekhq.campaign.event.PersonNewEvent;
+import mekhq.campaign.event.PersonRemovedEvent;
+import mekhq.campaign.event.PersonTechAssignmentEvent;
+import mekhq.campaign.event.ReportEvent;
+import mekhq.campaign.event.ScenarioChangedEvent;
+import mekhq.campaign.event.ScenarioNewEvent;
+import mekhq.campaign.event.UnitNewEvent;
+import mekhq.campaign.event.UnitRemovedEvent;
 import mekhq.campaign.finances.Asset;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Loan;
@@ -600,7 +625,6 @@ public class Campaign implements Serializable {
 			}
 		}
 		addReport(report.toString());
-		app.getCampaigngui().refreshReport();
     }
     
     public void purchaseShipSearchResult() {
@@ -754,6 +778,7 @@ public class Campaign implements Serializable {
         Force prevForce = forceIds.get(u.getForceId());
         if (null != prevForce) {
             prevForce.removeUnit(u.getId());
+            MekHQ.triggerEvent(new OrganizationChangedEvent(prevForce, u));
             if (null != prevForce.getTechID()) {
                 u.removeTech();
                 Person forceTech = getPerson(prevForce.getTechID());
@@ -765,15 +790,18 @@ public class Campaign implements Serializable {
             u.setForceId(id);
             force.addUnit(u.getId());
             u.setScenarioId(force.getScenarioId());
+            MekHQ.triggerEvent(new OrganizationChangedEvent(force, u));
             if (null != force.getTechID()) {
                 if (null != u.getTech()) {
                     Person oldTech = u.getTech();
                     oldTech.removeTechUnitId(u.getId());
+                    MekHQ.triggerEvent(new PersonTechAssignmentEvent(oldTech, u));
                 }
             	Person forceTech = getPerson(force.getTechID());
             	if (forceTech.canTech(u.getEntity())) {
             	    u.setTech(force.getTechID());
             	    forceTech.addTechUnitID(u.getId());
+                    MekHQ.triggerEvent(new PersonTechAssignmentEvent(forceTech, u));
             	} else {
             	    String cantTech = forceTech.getName() + " cannot maintain " + u.getName() + "\n"
             	            + "You will need to assign a tech manually.";
@@ -817,6 +845,7 @@ public class Campaign implements Serializable {
         missions.add(m);
         missionIds.put(new Integer(id), m);
         lastMissionId = id;
+        MekHQ.triggerEvent(new MissionNewEvent(m));
         return id;
     }
 
@@ -827,6 +856,7 @@ public class Campaign implements Serializable {
         if (m.getId() > lastMissionId) {
             lastMissionId = m.getId();
         }
+        MekHQ.triggerEvent(new MissionNewEvent(m));
     }
 
     /**
@@ -849,7 +879,7 @@ public class Campaign implements Serializable {
         m.addScenario(s);
         scenarioIds.put(new Integer(id), s);
         lastScenarioId = id;
-
+        MekHQ.triggerEvent(new ScenarioNewEvent(s));
     }
 
     /**
@@ -991,6 +1021,7 @@ public class Campaign implements Serializable {
 
         checkDuplicateNamesDuringAdd(en);
         addReport(unit.getHyperlinkedName() + " has been added to the unit roster.");
+        MekHQ.triggerEvent(new UnitNewEvent(unit));
     }
 
     public ArrayList<Unit> getUnits() {
@@ -1081,12 +1112,14 @@ public class Campaign implements Serializable {
                 p.addLogEntry(getDate(), "Joined " + getName() + rankEntry);
             }
         }
+        MekHQ.triggerEvent(new PersonNewEvent(p));
         return true;
     }
 
     private void addPersonWithoutId(Person p) {
         personnel.add(p);
         personnelIds.put(p.getId(), p);
+        MekHQ.triggerEvent(new PersonNewEvent(p));
     }
 
     private void addAncestorsWithoutId(Ancestors a) {
@@ -1218,6 +1251,7 @@ public class Campaign implements Serializable {
                     ((Armor) spare).setAmount(((Armor) spare).getAmount()
                                               + ((Armor) p).getAmount());
                     lastPartId = lastPartId - 1;
+                    MekHQ.triggerEvent(new PartChangedEvent(spare));
                     return;
                 }
             } else if (p instanceof AmmoStorage) {
@@ -1225,16 +1259,19 @@ public class Campaign implements Serializable {
                     ((AmmoStorage) spare).changeShots(((AmmoStorage) p)
                                                               .getShots());
                     lastPartId = lastPartId - 1;
+                    MekHQ.triggerEvent(new PartChangedEvent(spare));
                     return;
                 }
             } else {
                 spare.incrementQuantity();
                 lastPartId = lastPartId - 1;
+                MekHQ.triggerEvent(new PartChangedEvent(spare));
                 return;
             }
         }
         parts.add(p);
         partIds.put(new Integer(id), p);
+        MekHQ.triggerEvent(new PartNewEvent(p));
     }
 
     /**
@@ -1278,6 +1315,9 @@ public class Campaign implements Serializable {
                 }
                 removePart(p);
             }
+            MekHQ.triggerEvent(new PartArrivedEvent(spare));
+        } else {
+            MekHQ.triggerEvent(new PartArrivedEvent(p));            
         }
     }
 
@@ -1316,6 +1356,7 @@ public class Campaign implements Serializable {
         if (p.getId() > lastPartId) {
             lastPartId = p.getId();
         }
+        MekHQ.triggerEvent(new PartNewEvent(p));
     }
 
     /**
@@ -1783,6 +1824,9 @@ public class Campaign implements Serializable {
             report += " (" + xpGained + "XP gained) ";
         }
 
+        if (found) {
+            MekHQ.triggerEvent(new AcquisitionEvent(acquisition));
+        }
         addReport(report);
         return found;
     }
@@ -1878,6 +1922,7 @@ public class Campaign implements Serializable {
                 report += wrongType;
             }
         }
+        MekHQ.triggerEvent(new PartWorkEvent(tech, r));
         addReport(report);
     }
 
@@ -1970,6 +2015,7 @@ public class Campaign implements Serializable {
                 partWork.setTeamId(tech.getId());
                 partWork.reservePart();
                 report += " - <b>Not enough time, the remainder of the task will be finished tomorrow.</b>";
+                MekHQ.triggerEvent(new PartWorkEvent(tech, partWork));
                 addReport(report);
                 return;
             }
@@ -2039,6 +2085,7 @@ public class Campaign implements Serializable {
         partWork.resetOvertime();
         partWork.setTeamId(null);
         partWork.cancelReservation();
+        MekHQ.triggerEvent(new PartWorkEvent(tech, partWork));
         addReport(report);
     }
 
@@ -2405,6 +2452,7 @@ public class Campaign implements Serializable {
 										u.setScenarioId(s.getId());
 									}
 								}
+								MekHQ.triggerEvent(new DeploymentChangedEvent(forceIds.get(forceId), s));
 							}
         				}
         			}
@@ -2728,8 +2776,9 @@ public class Campaign implements Serializable {
         unitIds.remove(unit.getId());
         checkDuplicateNamesDuringDelete(unit.getEntity());
         addReport(unit.getName() + " has been removed from the unit roster.");
-
+        MekHQ.triggerEvent(new UnitRemovedEvent(unit));
     }
+    
     public void removePerson(UUID id) {
         removePerson(id, true);
     }
@@ -2763,6 +2812,7 @@ public class Campaign implements Serializable {
             astechPoolMinutes = Math.max(0, astechPoolMinutes - 240);
             astechPoolOvertime = Math.max(0, astechPoolOvertime - 120);
         }
+        MekHQ.triggerEvent(new PersonRemovedEvent(person));        
     }
 
     private void awardTrainingXP(Lance l) {
@@ -2825,6 +2875,7 @@ public class Campaign implements Serializable {
             mission.removeScenario(scenario.getId());
         }
         scenarioIds.remove(new Integer(id));
+        MekHQ.triggerEvent(new ScenarioChangedEvent(scenario));
     }
 
     public void removeMission(int id) {
@@ -2867,6 +2918,7 @@ public class Campaign implements Serializable {
         		removePart(childPart);
         	}
         }
+        MekHQ.triggerEvent(new PartRemovedEvent(part));
     }
 
     public void removeKill(Kill k) {
@@ -2889,6 +2941,7 @@ public class Campaign implements Serializable {
                 }
             }
         }
+        MekHQ.triggerEvent(new OrganizationChangedEvent(force));
         // also remove this force's id from any scenarios
         if (force.isDeployed()) {
             Scenario s = getScenario(force.getScenarioId());
@@ -2908,6 +2961,7 @@ public class Campaign implements Serializable {
         }
         for (Force sub : subs) {
             removeForce(sub);
+            MekHQ.triggerEvent(new OrganizationChangedEvent(sub));
         }
     }
 
@@ -3035,6 +3089,7 @@ public class Campaign implements Serializable {
 
     public void setOvertime(boolean b) {
         this.overtime = b;
+        MekHQ.triggerEvent(new OvertimeModeEvent(b));
     }
 
     public boolean isGM() {
@@ -3080,6 +3135,7 @@ public class Campaign implements Serializable {
         	currentReportHTML = r;
             newReports.add(r);
         }
+        MekHQ.triggerEvent(new ReportEvent(this, r));
     }
 
     public void addReports(ArrayList<String> reports) {
@@ -3165,6 +3221,7 @@ public class Campaign implements Serializable {
         finances.credit(sellValue, Transaction.C_UNIT_SALE,
                         "Sale of " + unit.getName(), calendar.getTime());
         removeUnit(id);
+        MekHQ.triggerEvent(new UnitRemovedEvent(unit));
     }
 
     public void sellPart(Part part, int quantity) {
@@ -3187,6 +3244,7 @@ public class Campaign implements Serializable {
             part.decrementQuantity();
             quantity--;
         }
+        MekHQ.triggerEvent(new PartRemovedEvent(part));
     }
 
     public void sellAmmo(AmmoStorage ammo, int shots) {
@@ -3200,6 +3258,7 @@ public class Campaign implements Serializable {
         } else {
             ammo.changeShots(-1 * shots);
         }
+        MekHQ.triggerEvent(new PartRemovedEvent(ammo));
     }
 
     public void sellArmor(Armor armor, int points) {
@@ -3218,6 +3277,7 @@ public class Campaign implements Serializable {
         } else {
             armor.changeAmountAvailable(-1 * points);
         }
+        MekHQ.triggerEvent(new PartRemovedEvent(armor));
     }
 
     public boolean buyRefurbishment(Part part) {
@@ -3246,6 +3306,7 @@ public class Campaign implements Serializable {
             	} else {
             		addPart(part, transitDays);
             	}
+            	MekHQ.triggerEvent(new PartNewEvent(part));
                 return true;
             } else {
                 return false;
@@ -3256,6 +3317,7 @@ public class Campaign implements Serializable {
         	} else {
         		addPart(part, transitDays);
         	}
+            MekHQ.triggerEvent(new PartNewEvent(part));
             return true;
         }
     }
@@ -5442,6 +5504,7 @@ public class Campaign implements Serializable {
     						calendar.get(Calendar.YEAR)).getName());
     		}
         }
+        MekHQ.triggerEvent(new PersonChangedEvent(person));
     }
 
 	public String rollSPA(int type, Person person) {
@@ -5754,6 +5817,7 @@ public class Campaign implements Serializable {
         if (null != u) {
             u.resetPilotAndEntity();
         }
+        MekHQ.triggerEvent(new PersonChangedEvent(p));
     }
 
     public TargetRoll getTargetFor(IPartWork partWork, Person tech) {
@@ -6138,6 +6202,7 @@ public class Campaign implements Serializable {
         astechPool += i;
         astechPoolMinutes += (480 * i);
         astechPoolOvertime += (240 * i);
+        MekHQ.triggerEvent(new AstechPoolChangedEvent(this, i));
     }
 
     public void decreaseAstechPool(int i) {
@@ -6145,6 +6210,7 @@ public class Campaign implements Serializable {
         // always assume that we fire the ones who have not yet worked
         astechPoolMinutes = Math.max(0, astechPoolMinutes - 480 * i);
         astechPoolOvertime = Math.max(0, astechPoolOvertime - 240 * i);
+        MekHQ.triggerEvent(new AstechPoolChangedEvent(this, -i));
     }
 
     public int getNumberAstechs() {
@@ -6256,10 +6322,12 @@ public class Campaign implements Serializable {
 
     public void increaseMedicPool(int i) {
         medicPool += i;
+        MekHQ.triggerEvent(new MedicPoolChangedEvent(this, i));
     }
 
     public void decreaseMedicPool(int i) {
         medicPool = Math.max(0, medicPool - i);
+        MekHQ.triggerEvent(new MedicPoolChangedEvent(this, -i));
     }
 
     public void changePrisonerStatus(Person p, int status) {
@@ -6296,6 +6364,7 @@ public class Campaign implements Serializable {
                 u.remove(p, true);
             }
         }
+        MekHQ.triggerEvent(new PersonChangedEvent(p));
     }
 
     public void changeStatus(Person person, int status) {
@@ -6347,6 +6416,7 @@ public class Campaign implements Serializable {
                 }
             }
         }
+        MekHQ.triggerEvent(new PersonChangedEvent(person));
     }
 
     public void changeRank(Person person, int rank, boolean report) {
@@ -6359,6 +6429,7 @@ public class Campaign implements Serializable {
         person.setRankNumeric(rank);
         person.setRankLevel(rankLevel);
         personUpdated(person);
+        MekHQ.triggerEvent(new PersonChangedEvent(person));
         if (report) {
             if (rank > oldRank || (rank == oldRank && rankLevel > oldRankLevel)) {
                 person.addLogEntry(getDate(), "Promoted to " + person.getRankName());
@@ -6401,6 +6472,7 @@ public class Campaign implements Serializable {
                 Person p = getPerson(k.getPilotId());
                 if (null != p) {
                     p.setXp(p.getXp() + getCampaignOptions().getKillXPAward());
+                    MekHQ.triggerEvent(new PersonChangedEvent(p));
                 }
             }
         }
@@ -6782,6 +6854,7 @@ public class Campaign implements Serializable {
             }
         }
         refreshNetworks();
+        MekHQ.triggerEvent(new NetworkChangedEvent(networkedUnits));
     }
 
     public void removeUnitsFromNetwork(Vector<Unit> removedUnits) {
@@ -6844,6 +6917,7 @@ public class Campaign implements Serializable {
             }
         }
         refreshNetworks();
+        MekHQ.triggerEvent(new NetworkChangedEvent(addedUnits));
     }
 
     public Vector<String[]> getAvailableC3iNetworks() {
@@ -6938,15 +7012,18 @@ public class Campaign implements Serializable {
     }
 
     public void removeUnitsFromC3Master(Unit master) {
+        List<Unit> removed = new ArrayList<>();
         for (Unit unit : getUnits()) {
             if (null != unit.getEntity().getC3MasterIsUUIDAsString()
                 && unit.getEntity().getC3MasterIsUUIDAsString()
                        .equals(master.getEntity().getC3UUIDAsString())) {
                 unit.getEntity().setC3MasterIsUUIDAsString(null);
                 unit.getEntity().setC3Master(null, true);
+                removed.add(unit);
             }
         }
         refreshNetworks();
+        MekHQ.triggerEvent(new NetworkChangedEvent(removed));
     }
 
     /**
@@ -6988,6 +7065,7 @@ public class Campaign implements Serializable {
                           + contract.getName());
             }
         }
+        MekHQ.triggerEvent(new MissionCompletedEvent(mission));
     }
 
     public int calculatePartTransitTime(int mos) {
@@ -7211,9 +7289,11 @@ public class Campaign implements Serializable {
                   + DecimalFormat.getInstance().format(loan.getPrincipal())
                   + " for the principal amount.");
         finances.addLoan(loan);
+        MekHQ.triggerEvent(new LoanNewEvent(loan));
         finances.credit(loan.getPrincipal(), Transaction.C_LOAN_PRINCIPAL,
                         "loan principal for " + loan.getDescription(),
                         calendar.getTime());
+        
     }
 
     public void payOffLoan(Loan loan) {
@@ -7225,6 +7305,7 @@ public class Campaign implements Serializable {
                     loan.getRemainingValue()) + "on "
                       + loan.getDescription());
             finances.removeLoan(loan);
+            MekHQ.triggerEvent(new LoanPaidEvent(loan));
         } else {
             addReport("<font color='red'>You do not have enough funds to pay off "
                       + loan.getDescription() + "</font>");

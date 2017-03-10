@@ -10,6 +10,9 @@ import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.event.MouseInputAdapter;
 
+import mekhq.MekHQ;
+import mekhq.campaign.event.TransactionChangedEvent;
+import mekhq.campaign.event.TransactionVoidedEvent;
 import mekhq.campaign.finances.Transaction;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.dialog.EditTransactionDialog;
@@ -41,19 +44,17 @@ public class FinanceTableMouseAdapter extends MouseInputAdapter implements
         if (command.equalsIgnoreCase("DELETE")) {
             gui.getCampaign().addReport(transaction.voidTransaction());
             financeModel.deleteTransaction(row);
-            gui.refreshFinancialTransactions();
-            gui.refreshReport();
+            MekHQ.triggerEvent(new TransactionVoidedEvent(transaction));
         } else if (command.contains("EDIT")) {
             EditTransactionDialog dialog = new EditTransactionDialog(
                     transaction, gui.getFrame(), true);
             dialog.setVisible(true);
             transaction = dialog.getNewTransaction();
             financeModel.setTransaction(row, transaction);
+            MekHQ.triggerEvent(new TransactionChangedEvent(dialog.getOldTransaction(), transaction));
             gui.getCampaign().addReport(
                     transaction.updateTransaction(dialog
                             .getOldTransaction()));
-            gui.refreshFinancialTransactions();
-            gui.refreshReport();
         }
     }
 

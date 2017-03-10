@@ -32,6 +32,10 @@ import javax.swing.JTable;
 import javax.swing.event.MouseInputAdapter;
 
 import megamek.common.TargetRoll;
+import mekhq.MekHQ;
+import mekhq.campaign.event.PartChangedEvent;
+import mekhq.campaign.event.PartModeChangedEvent;
+import mekhq.campaign.event.UnitChangedEvent;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.WorkTime;
@@ -70,15 +74,7 @@ public class TaskTableMouseAdapter extends MouseInputAdapter implements ActionLi
             if (null != u && !u.isRepairable() && u.getSalvageableParts().size() == 0) {
                 gui.getCampaign().removeUnit(u.getId());
             }
-            gui.refreshServicedUnitList();
-            gui.refreshUnitList();
-            gui.refreshTaskList();
-            gui.refreshUnitView();
-            gui.refreshPartsList();
-            gui.refreshAcquireList();
-            gui.refreshReport();
-            gui.refreshOverview();
-            gui.filterTasks();
+            MekHQ.triggerEvent(new UnitChangedEvent(u));
         } else if (command.contains("SWAP_AMMO")) {
             /*
              * WorkItem task =
@@ -95,12 +91,7 @@ public class TaskTableMouseAdapter extends MouseInputAdapter implements ActionLi
         } else if (command.contains("CHANGE_MODE")) {
             String sel = command.split(":")[1];
             part.setMode(WorkTime.of(sel));
-            gui.refreshServicedUnitList();
-            gui.refreshUnitList();
-            gui.refreshTaskList();
-            gui.refreshUnitView();
-            gui.refreshAcquireList();
-            gui.refreshOverview();
+            MekHQ.triggerEvent(new PartModeChangedEvent(part));
         } else if (command.contains("UNASSIGN")) {
             /*
              * for (WorkItem task : tasks) { task.resetTimeSpent();
@@ -123,13 +114,7 @@ public class TaskTableMouseAdapter extends MouseInputAdapter implements ActionLi
              */
             if (part.checkFixable() == null) {
                 gui.getCampaign().addReport(part.succeed());
-
-                gui.refreshServicedUnitList();
-                gui.refreshUnitList();
-                gui.refreshTaskList();
-                gui.refreshAcquireList();
-                gui.refreshPartsList();
-                gui.refreshOverview();
+                MekHQ.triggerEvent(new PartChangedEvent(part));
             }
         }
     }

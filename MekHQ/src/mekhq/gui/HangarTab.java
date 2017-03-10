@@ -51,8 +51,23 @@ import javax.swing.table.TableRowSorter;
 
 import megamek.common.Entity;
 import megamek.common.UnitType;
+import megamek.common.event.Subscribe;
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
+import mekhq.campaign.event.AcquisitionEvent;
+import mekhq.campaign.event.DeploymentChangedEvent;
+import mekhq.campaign.event.OvertimeModeEvent;
+import mekhq.campaign.event.PartEvent;
+import mekhq.campaign.event.PartWorkEvent;
+import mekhq.campaign.event.PersonChangedEvent;
+import mekhq.campaign.event.ProcurementEvent;
+import mekhq.campaign.event.RepairStatusChangedEvent;
+import mekhq.campaign.event.ScenarioResolvedEvent;
+import mekhq.campaign.event.UnitChangedEvent;
+import mekhq.campaign.event.UnitNewEvent;
+import mekhq.campaign.event.UnitRemovedEvent;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.unit.UnitOrder;
 import mekhq.gui.adapter.ProcurementTableMouseAdapter;
 import mekhq.gui.adapter.UnitTableMouseAdapter;
 import mekhq.gui.model.ProcurementTableModel;
@@ -95,6 +110,7 @@ public final class HangarTab extends CampaignGuiTab {
 
     HangarTab(CampaignGUI gui, String name) {
         super(gui, name);
+        MekHQ.registerHandler(this);
     }
 
     @Override
@@ -520,9 +536,83 @@ public final class HangarTab extends CampaignGuiTab {
                 break;
             }
         }
-        acquireUnitsModel.setData(getCampaign().getShoppingList().getUnitList());
         getCampaignGui().refreshLab();
-        getCampaignGui().refreshRating();
+    }
+    
+    private void refreshAcquisitionList() {
+        acquireUnitsModel.setData(getCampaign().getShoppingList().getUnitList());
     }
 
+    private ActionScheduler unitListScheduler = new ActionScheduler(this::refreshUnitList);
+    private ActionScheduler filterUnitScheduler = new ActionScheduler(this::filterUnits);
+    private ActionScheduler acquisitionListScheduler = new ActionScheduler(this::refreshAcquisitionList);
+
+    @Subscribe
+    public void handle(DeploymentChangedEvent ev) {
+        filterUnitScheduler.schedule();;
+    }
+    
+    @Subscribe
+    public void handle(PersonChangedEvent ev) {
+        filterUnitScheduler.schedule();;
+    }
+    
+    @Subscribe
+    public void handle(ScenarioResolvedEvent ev) {
+        unitListScheduler.schedule();
+    }
+
+    @Subscribe
+    public void handle(UnitChangedEvent ev) {
+        filterUnitScheduler.schedule();;
+    }
+    
+    @Subscribe
+    public void handle(UnitNewEvent ev) {
+        unitListScheduler.schedule();
+    }
+    
+    @Subscribe
+    public void handle(UnitRemovedEvent ev) {
+        unitListScheduler.schedule();
+    }
+    
+    @Subscribe
+    public void handle(RepairStatusChangedEvent ev) {
+        filterUnitScheduler.schedule();
+    }
+
+    @Subscribe
+    public void handle(AcquisitionEvent ev) {
+        if (ev.getAcquisition() instanceof UnitOrder) {
+            unitListScheduler.schedule();
+            acquisitionListScheduler.schedule();
+        }
+    }
+    
+    @Subscribe
+    public void handle(ProcurementEvent ev) {
+        if (ev.getAcquisition() instanceof UnitOrder) {
+            acquisitionListScheduler.schedule();
+        }
+    }
+    
+    @Subscribe
+    public void handle(PartEvent ev) {
+        if (ev.getPart().getUnit() != null) {
+            filterUnitScheduler.schedule();
+        }
+    }
+    
+    @Subscribe
+    public void handle(PartWorkEvent ev) {
+        if (ev.getPartWork().getUnit() != null) {
+            filterUnitScheduler.schedule();
+        }
+    }
+    
+    @Subscribe
+    public void handle(OvertimeModeEvent ev) {
+        filterUnitScheduler.schedule();
+    }
 }
