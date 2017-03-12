@@ -81,7 +81,8 @@ public final class PersonnelTab extends CampaignGuiTab {
     public static final int PG_RETIRE = 15;
     public static final int PG_MIA = 16;
     public static final int PG_KIA = 17;
-    public static final int PG_NUM = 18;
+    public static final int PG_PRISONER = 18;
+    public static final int PG_NUM = 19;
 
     // personnel views
     private static final int PV_GRAPHIC = 0;
@@ -308,6 +309,8 @@ public final class PersonnelTab extends CampaignGuiTab {
             return "Personnel MIA";
         case PG_KIA:
             return "Rolls of Honor (KIA)";
+        case PG_PRISONER:
+            return "Prisoners";
         default:
             return "?";
         }
@@ -345,7 +348,7 @@ public final class PersonnelTab extends CampaignGuiTab {
                 PersonnelTableModel personModel = entry.getModel();
                 Person person = personModel.getPerson(entry.getIdentifier());
                 int type = person.getPrimaryRole();
-                if ((nGroup == PG_ACTIVE) || (nGroup == PG_COMBAT && type <= Person.T_SPACE_GUNNER)
+                if (((nGroup == PG_ACTIVE) || (nGroup == PG_COMBAT && type <= Person.T_SPACE_GUNNER)
                         || (nGroup == PG_SUPPORT && type > Person.T_SPACE_GUNNER)
                         || (nGroup == PG_MW && type == Person.T_MECHWARRIOR)
                         || (nGroup == PG_CREW && (type == Person.T_GVEE_DRIVER || type == Person.T_NVEE_DRIVER
@@ -359,7 +362,8 @@ public final class PersonnelTab extends CampaignGuiTab {
                                 || type == Person.T_SPACE_GUNNER || type == Person.T_NAVIGATOR))
                         || (nGroup == PG_TECH && type >= Person.T_MECH_TECH && type < Person.T_DOCTOR)
                         || (nGroup == PG_DOC && ((type == Person.T_DOCTOR) || (type == Person.T_MEDIC)))
-                        || (nGroup == PG_ADMIN && type > Person.T_MEDIC)) {
+                        || (nGroup == PG_ADMIN && type > Person.T_MEDIC))
+                        && !person.isPrisoner()) {
                     return person.isActive();
                 } else if (nGroup == PG_DEPENDENT) {
                     return person.isDependent() == true;
@@ -369,6 +373,8 @@ public final class PersonnelTab extends CampaignGuiTab {
                     return person.getStatus() == Person.S_MIA;
                 } else if (nGroup == PG_KIA) {
                     return person.getStatus() == Person.S_KIA;
+                } else if (nGroup == PG_PRISONER) {
+                    return person.isPrisoner();
                 }
                 return false;
             }
