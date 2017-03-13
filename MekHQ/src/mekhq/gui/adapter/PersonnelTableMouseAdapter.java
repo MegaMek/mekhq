@@ -428,7 +428,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             {
                 if (selectedPerson.isFemale()) {
                     selectedPerson.addPregnancy();
-                    gui.refreshReport();
+                    MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
                 }
                 break;
             }
@@ -436,7 +436,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             {
                 if (selectedPerson.isPregnant()) {
                     selectedPerson.removePregnancy();
-                    gui.refreshPersonnelList();
+                    MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
                 }
                 break;
             }
