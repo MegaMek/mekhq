@@ -38,15 +38,15 @@ public class HeatSink extends EquipmentPart {
 	private static final long serialVersionUID = 2892728320891712304L;
 
 	public HeatSink() {
-    	this(0, null, -1, null);
+    	this(0, null, -1, false, null);
     }
     
-    public HeatSink(int tonnage, EquipmentType et, int equipNum, Campaign c) {
-        super(tonnage, et, equipNum, c);
+    public HeatSink(int tonnage, EquipmentType et, int equipNum, boolean omniPodded, Campaign c) {
+        super(tonnage, et, equipNum, omniPodded, c);
     }
     
     public HeatSink clone() {
-    	HeatSink clone = new HeatSink(getUnitTonnage(), getType(), getEquipmentNum(), campaign);
+    	HeatSink clone = new HeatSink(getUnitTonnage(), getType(), getEquipmentNum(), omniPodded, campaign);
         clone.copyBaseData(this);
     	return clone;
     }
@@ -66,7 +66,7 @@ public class HeatSink extends EquipmentPart {
 
 	@Override
 	public MissingPart getMissingPart() {
-		return new MissingHeatSink(getUnitTonnage(), type, equipmentNum, campaign);
+		return new MissingHeatSink(getUnitTonnage(), type, equipmentNum, omniPodded, campaign);
 	}
 
 	@Override

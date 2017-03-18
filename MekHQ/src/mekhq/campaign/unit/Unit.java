@@ -1706,6 +1706,7 @@ public class Unit implements MekHqXmlSerializable {
         Part landingGear = null;
         Part turretLock = null;
         ArrayList<Part> aeroHeatSinks = new ArrayList<Part>();
+        int podAeroHeatSinks = 0;
         Part motiveType = null;
         Part primaryW = null;
         Part secondaryW = null;
@@ -1891,6 +1892,9 @@ public class Unit implements MekHqXmlSerializable {
                 landingGear = part;
             } else if(part instanceof AeroHeatSink || part instanceof MissingAeroHeatSink) {
                 aeroHeatSinks.add(part);
+                if (part.isOmniPodded()) {
+                    podAeroHeatSinks++;
+                }
             } else if(part instanceof MotiveSystem) {
                 motiveSystem = part;
             } else if(part instanceof TurretLock) {
@@ -2046,7 +2050,8 @@ public class Unit implements MekHqXmlSerializable {
                     if(entity instanceof BattleArmor) {
                         apart = new BattleArmorAmmoBin((int)entity.getWeight(), m.getType(), eqnum, ((BattleArmor)entity).getSquadSize() * (fullShots - m.getBaseShotsLeft()), oneShot, campaign);
                     } else {
-                        apart = new AmmoBin((int)entity.getWeight(), m.getType(), eqnum, fullShots - m.getBaseShotsLeft(), oneShot, campaign);
+                        apart = new AmmoBin((int)entity.getWeight(), m.getType(), eqnum,
+                                fullShots - m.getBaseShotsLeft(), oneShot, m.isOmniPodMounted(), campaign);
                     }
                     addPart(apart);
                     partsToAdd.add(apart);
@@ -2060,7 +2065,8 @@ public class Unit implements MekHqXmlSerializable {
                 int eqnum = entity.getEquipmentNum(m);
                 Part epart = heatSinks.get(eqnum);
                 if(null == epart) {
-                    epart = new HeatSink((int)entity.getWeight(), m.getType(), eqnum, campaign);
+                    epart = new HeatSink((int)entity.getWeight(), m.getType(), eqnum,
+                            m.isOmniPodMounted(), campaign);
                     addPart(epart);
                     partsToAdd.add(epart);
                 }
@@ -2068,7 +2074,8 @@ public class Unit implements MekHqXmlSerializable {
                 int eqnum = entity.getEquipmentNum(m);
                 Part epart = jumpJets.get(eqnum);
                 if(null == epart) {
-                    epart = new JumpJet((int)entity.getWeight(), m.getType(), eqnum, campaign);
+                    epart = new JumpJet((int)entity.getWeight(), m.getType(), eqnum,
+                            m.isOmniPodMounted(), campaign);
                     addPart(epart);
                     partsToAdd.add(epart);
                 }
@@ -2100,7 +2107,8 @@ public class Unit implements MekHqXmlSerializable {
                             //weapon bays aren't real parts
                             continue;
                         }
-                        epart = new EquipmentPart((int)entity.getWeight(), type, eqnum, campaign);
+                        epart = new EquipmentPart((int)entity.getWeight(), type, eqnum,
+                                m.isOmniPodMounted(), campaign);
                         if(type instanceof MiscType && type.hasFlag(MiscType.F_MASC)) {
                             epart = new MASC((int)entity.getWeight(), type, eqnum, campaign, erating);
                         }
@@ -2274,11 +2282,16 @@ public class Unit implements MekHqXmlSerializable {
                 partsToAdd.add(dropCollar);
             }
             int hsinks = ((Aero)entity).getOHeatSinks() - aeroHeatSinks.size();
+            int podhsinks = ((Aero)entity).getPodHeatSinks() - podAeroHeatSinks;
             while(hsinks > 0) {
-                AeroHeatSink aHeatSink = new AeroHeatSink((int)entity.getWeight(), ((Aero)entity).getHeatType(), campaign);
+                AeroHeatSink aHeatSink = new AeroHeatSink((int)entity.getWeight(),
+                        ((Aero)entity).getHeatType(), podhsinks > 0, campaign);
                 addPart(aHeatSink);
                 partsToAdd.add(aHeatSink);
                 hsinks--;
+                if (podhsinks > 0) {
+                    podhsinks--;
+                }
             }
             if (aeroThrustersLeft == null) {
                 aeroThrustersLeft = new Thrusters(0, campaign, true);

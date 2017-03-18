@@ -34,11 +34,11 @@ public class MissingJumpJet extends MissingEquipmentPart {
 	private static final long serialVersionUID = 2892728320891712304L;
 
 	public MissingJumpJet() {
-    	this(0, null, -1, null);
+    	this(0, null, -1, false, null);
     }
     
-    public MissingJumpJet(int tonnage, EquipmentType et, int equipNum, Campaign c) {
-        super(tonnage, et, equipNum, c, 1);
+    public MissingJumpJet(int tonnage, EquipmentType et, int equipNum, boolean omniPodded, Campaign c) {
+        super(tonnage, et, equipNum, c, 1, omniPodded);
     }
     
     @Override 
@@ -53,7 +53,7 @@ public class MissingJumpJet extends MissingEquipmentPart {
     
     @Override
 	public Part getNewPart() {
-		return new JumpJet(getUnitTonnage(), type, -1, campaign);
+		return new JumpJet(getUnitTonnage(), type, -1, omniPodded, campaign);
 	}
     
     @Override

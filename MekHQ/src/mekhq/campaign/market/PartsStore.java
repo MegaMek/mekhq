@@ -192,11 +192,11 @@ public class PartsStore implements Serializable {
 					parts.add(new AmmoStorage(0, et, ((AmmoType)et).getShots(), c));
 				}
 			} else if(et instanceof MiscType && (((MiscType)et).hasFlag(MiscType.F_HEAT_SINK) || ((MiscType)et).hasFlag(MiscType.F_DOUBLE_HEAT_SINK))) {
-            	parts.add(new HeatSink(0, et, -1, c));
+            	parts.add(new HeatSink(0, et, -1, false, c));
 			} else if(et instanceof MiscType && ((MiscType)et).hasFlag(MiscType.F_JUMP_JET)) {
 				//need to do it by rating and unit tonnage
 				for(int ton = 10; ton <= 100; ton += 5) {
-					parts.add(new JumpJet(ton, et, -1, c));
+					parts.add(new JumpJet(ton, et, -1, false, c));
 				}
 			} else if ((et instanceof MiscType && ((MiscType)et).hasFlag(MiscType.F_TANK_EQUIPMENT) && ((MiscType)et).hasFlag(MiscType.F_CHASSIS_MODIFICATION))
 					|| et instanceof BayWeapon
@@ -248,8 +248,8 @@ public class PartsStore implements Serializable {
 			}
         }
         //lets throw aero heat sinks in here as well
-        parts.add(new AeroHeatSink(0, Aero.HEAT_SINGLE, c));
-        parts.add(new AeroHeatSink(0, Aero.HEAT_DOUBLE, c));
+        parts.add(new AeroHeatSink(0, Aero.HEAT_SINGLE, false, c));
+        parts.add(new AeroHeatSink(0, Aero.HEAT_DOUBLE, false, c));
 	}
 
 	private void stockMekActuators(Campaign c) {
@@ -385,8 +385,8 @@ public class PartsStore implements Serializable {
 	}
 
 	private void stockAeroComponents(Campaign c) {
-		parts.add(new AeroHeatSink(0, Aero.HEAT_SINGLE, c));
-		parts.add(new AeroHeatSink(0, Aero.HEAT_DOUBLE, c));
+		parts.add(new AeroHeatSink(0, Aero.HEAT_SINGLE, false, c));
+		parts.add(new AeroHeatSink(0, Aero.HEAT_DOUBLE, false, c));
 		for(int ton = 5; ton <= 200; ton += 5) {
 			parts.add(new AeroSensor(ton, false, c));
 		}

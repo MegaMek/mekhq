@@ -124,7 +124,8 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	//even when off the unit. actual tonnage is returned via the
 	//getTonnage() method
 	protected int unitTonnage;
-
+	
+	protected boolean omniPodded;
 	
 	//hits to this part
 	protected int hits;
@@ -196,12 +197,17 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	protected int replacementId;
 
 	public Part() {
-		this(0, null);
+		this(0, false, null);
+	}
+	
+	public Part(int tonnage, Campaign c) {
+	    this(tonnage, false, c);
 	}
 
-	public Part(int tonnage, Campaign c) {
+	public Part(int tonnage, boolean omniPodded, Campaign c) {
 		this.name = "Unknown";
 		this.unitTonnage = tonnage;
+		this.omniPodded = omniPodded;
 		this.hits = 0;
 		this.skillMin = SkillType.EXP_GREEN;
 		this.mode = WorkTime.NORMAL;
@@ -339,6 +345,14 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	}
 
 	public abstract double getTonnage();
+	
+	public boolean isOmniPodded() {
+	    return omniPodded;
+	}
+	
+	public void setOmniPodded(boolean omniPod) {
+	    this.omniPodded = omniPod;
+	}
 
 	public Unit getUnit() {
 		return unit;
@@ -552,6 +566,9 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 				+"<name>"
 				+MekHqXmlUtil.escape(name)
 				+"</name>");
+		if (omniPodded) {
+		    pw1.println(MekHqXmlUtil.indentStr(indent+1) + "<omniPodded/>");
+		}
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<unitTonnage>"
 				+unitTonnage
@@ -691,8 +708,10 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 					retVal.id = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("name")) {
 					retVal.name = wn2.getTextContent();
-				} else if (wn2.getNodeName().equalsIgnoreCase("unitTonnage")) {
-					retVal.unitTonnage = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("unitTonnage")) {
+                    retVal.unitTonnage = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("omniPodded")) {
+                    retVal.omniPodded = true;
 				} else if (wn2.getNodeName().equalsIgnoreCase("quantity")) {
 					retVal.quantity = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("hits")) {
@@ -1042,6 +1061,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
         this.mode = part.mode;
         this.hits = part.hits;
         this.brandNew = part.brandNew;
+        this.omniPodded = part.omniPodded;
     }
 
 	public void setRefitId(UUID rid) {

@@ -42,11 +42,12 @@ public class MissingAmmoBin extends MissingEquipmentPart {
 	protected boolean oneShot;
 	
     public MissingAmmoBin() {
-    	this(0, null, -1, false, null);
+    	this(0, null, -1, false, false, null);
     }
     
-    public MissingAmmoBin(int tonnage, EquipmentType et, int equipNum, boolean singleShot, Campaign c) {
-        super(tonnage, et, equipNum, c, 1);
+    public MissingAmmoBin(int tonnage, EquipmentType et, int equipNum, boolean singleShot,
+            boolean omniPodded, Campaign c) {
+        super(tonnage, et, equipNum, c, 1, omniPodded);
         this.oneShot = singleShot;
         if(null != name) {
         	this.name += " Bin";
@@ -97,7 +98,7 @@ public class MissingAmmoBin extends MissingEquipmentPart {
 	
 	@Override
 	public Part getNewPart() {
-		return new AmmoBin(getUnitTonnage(), type, -1, getFullShots(), oneShot, campaign);
+		return new AmmoBin(getUnitTonnage(), type, -1, getFullShots(), oneShot, omniPodded, campaign);
 	}
 	
 	@Override

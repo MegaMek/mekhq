@@ -5,7 +5,7 @@ F
 Config:Biped Omnimech
 TechBase:Clan
 Era:3073
-Source:WoR
+Source:WoR - Jihad
 Rules Level:4
 
 Mass:85
@@ -34,45 +34,45 @@ RTR Armor:12
 RTC Armor:12
 
 Weapons:13
-Rotary AC/5, Right Arm
 Gauss Rifle, Left Arm
-ER Large Laser, Head
+Rotary AC/5, Right Arm
+Machine Gun Array, Left Torso
 Machine Gun, Left Torso
 Machine Gun, Left Torso
 Machine Gun, Left Torso
-Machine Gun, Right Torso
-Machine Gun, Right Torso
-Machine Gun, Right Torso
-Machine Gun, Right Torso
 Machine Gun, Left Torso
 Machine Gun Array, Right Torso
-Machine Gun Array, Left Torso
+Machine Gun, Right Torso
+Machine Gun, Right Torso
+Machine Gun, Right Torso
+Machine Gun, Right Torso
+ER Large Laser, Head
 
 Left Arm:
 Shoulder
 Upper Arm Actuator
-CLGaussRifle
-CLGaussRifle
-CLGaussRifle
-CLGaussRifle
-CLGaussRifle
-CLGaussRifle
-Clan Gauss Ammo
-Clan Gauss Ammo
+CLGaussRifle (omnipod)
+CLGaussRifle (omnipod)
+CLGaussRifle (omnipod)
+CLGaussRifle (omnipod)
+CLGaussRifle (omnipod)
+CLGaussRifle (omnipod)
+Clan Gauss Ammo (omnipod)
+Clan Gauss Ammo (omnipod)
 Clan Ferro-Lamellor
 Clan Ferro-Lamellor
 
 Right Arm:
 Shoulder
 Upper Arm Actuator
-CLRotaryAC5
-CLRotaryAC5
-CLRotaryAC5
-CLRotaryAC5
-CLRotaryAC5
-CLRotaryAC5
-CLRotaryAC5
-CLRotaryAC5
+CLRotaryAC5 (omnipod)
+CLRotaryAC5 (omnipod)
+CLRotaryAC5 (omnipod)
+CLRotaryAC5 (omnipod)
+CLRotaryAC5 (omnipod)
+CLRotaryAC5 (omnipod)
+CLRotaryAC5 (omnipod)
+CLRotaryAC5 (omnipod)
 Clan Ferro-Lamellor
 Clan Ferro-Lamellor
 
@@ -80,12 +80,12 @@ Left Torso:
 Fusion Engine
 Fusion Engine
 Life Support
-CLMGA
-CLMG
-CLMG
-CLMG
-CLMG
-Clan Machine Gun Ammo - Full
+CLMGA (omnipod)
+CLMG (omnipod)
+CLMG (omnipod)
+CLMG (omnipod)
+CLMG (omnipod)
+Clan Machine Gun Ammo - Half (omnipod)
 Clan Ferro-Lamellor
 Clan Ferro-Lamellor
 -Empty-
@@ -94,15 +94,15 @@ Right Torso:
 Fusion Engine
 Fusion Engine
 Life Support
-CLMGA
-CLMG
-CLMG
-CLMG
-CLMG
+CLMGA (omnipod)
+CLMG (omnipod)
+CLMG (omnipod)
+CLMG (omnipod)
+CLMG (omnipod)
+CLRotaryAC5 Ammo (omnipod)
+CLRotaryAC5 Ammo (omnipod)
 Clan Ferro-Lamellor
 Clan Ferro-Lamellor
--Empty-
--Empty-
 
 Center Torso:
 Fusion Engine
@@ -122,9 +122,9 @@ Head:
 Sensors
 Sensors
 NovaCEWS
-CLRotaryAC5 Ammo
-CLRotaryAC5 Ammo
-CLERLargeLaser
+CLRotaryAC5 Ammo (omnipod)
+CLRotaryAC5 Ammo (omnipod)
+CLERLargeLaser (omnipod)
 -Empty-
 -Empty-
 -Empty-

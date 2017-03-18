@@ -63,10 +63,15 @@ public class MissingEquipmentPart extends MissingPart {
     }
 
     public MissingEquipmentPart() {
-    	this(0, null, -1, null, 0);
+    	this(0, null, -1, null, 0, false);
+    }
+    
+    public MissingEquipmentPart(int tonnage, EquipmentType et, int equipNum, Campaign c, double eTonnage) {
+        this(tonnage, et, equipNum, c, eTonnage, false);
     }
 
-    public MissingEquipmentPart(int tonnage, EquipmentType et, int equipNum, Campaign c, double eTonnage) {
+    public MissingEquipmentPart(int tonnage, EquipmentType et, int equipNum, Campaign c,
+            double eTonnage, boolean omniPodded) {
         // TODO Memorize all entity attributes needed to calculate cost
         // As it is a part bought with one entity can be used on another entity
         // on which it would have a different price (only tonnage is taken into
@@ -79,6 +84,7 @@ public class MissingEquipmentPart extends MissingPart {
         }
         this.equipmentNum = equipNum;
         this.equipTonnage = eTonnage;
+        this.omniPodded = omniPodded;
     }
 
     @Override
@@ -272,7 +278,7 @@ public class MissingEquipmentPart extends MissingPart {
 
 	@Override
 	public Part getNewPart() {
-		EquipmentPart epart = new EquipmentPart(getUnitTonnage(), type, -1, campaign);
+		EquipmentPart epart = new EquipmentPart(getUnitTonnage(), type, -1, omniPodded, campaign);
 		epart.setEquipTonnage(equipTonnage);
 		return epart;
 	}

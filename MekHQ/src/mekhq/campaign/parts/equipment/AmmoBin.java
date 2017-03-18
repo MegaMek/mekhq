@@ -65,11 +65,12 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 	protected boolean oneShot;
 
     public AmmoBin() {
-    	this(0, null, -1, 0, false, null);
+    	this(0, null, -1, 0, false, false, null);
     }
 
-    public AmmoBin(int tonnage, EquipmentType et, int equipNum, int shots, boolean singleShot, Campaign c) {
-        super(tonnage, et, equipNum, c);
+    public AmmoBin(int tonnage, EquipmentType et, int equipNum, int shots, boolean singleShot,
+            boolean omniPodded, Campaign c) {
+        super(tonnage, et, equipNum, omniPodded, c);
         this.shotsNeeded = shots;
         this.oneShot = singleShot;
         this.checkedToday = false;
@@ -82,7 +83,8 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     }
 
     public AmmoBin clone() {
-    	AmmoBin clone = new AmmoBin(getUnitTonnage(), getType(), getEquipmentNum(), shotsNeeded, oneShot, campaign);
+    	AmmoBin clone = new AmmoBin(getUnitTonnage(), getType(), getEquipmentNum(), shotsNeeded, oneShot,
+    	        omniPodded, campaign);
         clone.copyBaseData(this);
         clone.shotsNeeded = this.shotsNeeded;
         clone.munition = this.munition;
@@ -357,7 +359,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 
 	@Override
 	public MissingPart getMissingPart() {
-		return new MissingAmmoBin(getUnitTonnage(), type, equipmentNum, oneShot, campaign);
+		return new MissingAmmoBin(getUnitTonnage(), type, equipmentNum, oneShot, omniPodded, campaign);
 	}
 
 	public boolean isOneShot() {
@@ -415,6 +417,14 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 		}
 		return 15;
 	}
+
+    @Override
+    public int getActualTime() {
+        if (isOmniPodded()) {
+            return (int)Math.ceil(getBaseTime() * mode.timeMultiplier * 0.5);
+        }
+        return (int) Math.ceil(getBaseTime() * mode.timeMultiplier);
+    }
 
 	@Override
 	public int getDifficulty() {
@@ -740,5 +750,19 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     @Override
     public int getMassRepairOptionType() {
     	return Part.REPAIR_PART_TYPE.AMMO;
+    }
+    
+    @Override
+    public boolean isOmniPoddable() {
+        return true;
+    }
+    
+    /**
+     * Since ammo bins aren't real parts they can't be podded in the warehouse, and
+     * whether they're podded on the unit depends entirely on the unit they're installed on.
+     */
+    @Override
+    public boolean isOmniPodded() {
+        return getUnit() != null && getUnit().getEntity().getEquipment(equipmentNum).isOmniPodMounted();
     }
 }

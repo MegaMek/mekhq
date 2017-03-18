@@ -181,6 +181,11 @@ public class MissingMekActuator extends MissingPart {
 	public boolean isOmniPoddable() {
 		return type == Mech.ACTUATOR_LOWER_ARM || type == Mech.ACTUATOR_HAND;
 	}
+	
+	@Override
+	public boolean isOmniPodded() {
+	    return isOmniPoddable() && getUnit() != null && getUnit().getEntity().isOmni();
+	}
 
 	@Override
 	public String getLocationName() {

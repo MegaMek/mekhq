@@ -45,11 +45,11 @@ public class AeroHeatSink extends Part {
     private int type;
     
     public AeroHeatSink() {
-        this(0, Aero.HEAT_SINGLE, null);
+        this(0, Aero.HEAT_SINGLE, false, null);
     }
     
-    public AeroHeatSink(int tonnage, int type, Campaign c) {
-        super(tonnage, c);
+    public AeroHeatSink(int tonnage, int type, boolean omniPodded, Campaign c) {
+        super(tonnage, omniPodded, c);
         this.name = "Aero Heat Sink";
         this.type = type;
         if(type == Aero.HEAT_DOUBLE) {
@@ -59,7 +59,7 @@ public class AeroHeatSink extends Part {
     
     @Override
     public AeroHeatSink clone() {
-        AeroHeatSink clone = new AeroHeatSink(getUnitTonnage(), type, campaign);
+        AeroHeatSink clone = new AeroHeatSink(getUnitTonnage(), type, omniPodded, campaign);
         clone.copyBaseData(this);
         return clone;
     }
@@ -149,7 +149,7 @@ public class AeroHeatSink extends Part {
 
     @Override
     public MissingPart getMissingPart() {
-        return new MissingAeroHeatSink(getUnitTonnage(), type, campaign);
+        return new MissingAeroHeatSink(getUnitTonnage(), type, omniPodded, campaign);
     }
 
     @Override
@@ -207,7 +207,8 @@ public class AeroHeatSink extends Part {
 
     @Override
     public boolean isSamePartType(Part part) {
-        return part instanceof AeroHeatSink && type == ((AeroHeatSink)part).getType();
+        return part instanceof AeroHeatSink && type == ((AeroHeatSink)part).getType()
+                && isOmniPodded() == part.isOmniPodded();
     }
 
     public int getType() {
@@ -278,5 +279,10 @@ public class AeroHeatSink extends Part {
     @Override
     public int getReIntroDate() {
         return 3040;
+    }
+    
+    @Override
+    public boolean isOmniPoddable() {
+        return true;
     }
 }

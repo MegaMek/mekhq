@@ -33,11 +33,11 @@ public class MissingHeatSink extends MissingEquipmentPart {
 	private static final long serialVersionUID = 2892728320891712304L;
 
 	public MissingHeatSink() {
-    	this(0, null, -1, null);
+    	this(0, null, -1, false, null);
     }
     
-    public MissingHeatSink(int tonnage, EquipmentType et, int equipNum, Campaign c) {
-        super(tonnage, et, equipNum, c, 1);
+    public MissingHeatSink(int tonnage, EquipmentType et, int equipNum, boolean omniPodded, Campaign c) {
+        super(tonnage, et, equipNum, c, 1, omniPodded);
     }
     
     @Override 
@@ -52,7 +52,7 @@ public class MissingHeatSink extends MissingEquipmentPart {
 
 	@Override
 	public Part getNewPart() {
-		return new HeatSink(getUnitTonnage(), type, -1, campaign);
+		return new HeatSink(getUnitTonnage(), type, -1, omniPodded, campaign);
 	}
 	
 	@Override

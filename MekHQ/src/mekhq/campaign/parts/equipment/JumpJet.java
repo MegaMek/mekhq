@@ -37,19 +37,19 @@ public class JumpJet extends EquipmentPart {
 	private static final long serialVersionUID = 2892728320891712304L;
 
 	public JumpJet() {
-    	this(0, null, -1, null);
+    	this(0, null, -1, false, null);
     }
     
-    public JumpJet(int tonnage, EquipmentType et, int equipNum, Campaign c) {
+    public JumpJet(int tonnage, EquipmentType et, int equipNum, boolean omniPodded, Campaign c) {
         // TODO Memorize all entity attributes needed to calculate cost
         // As it is a part bought with one entity can be used on another entity
         // on which it would have a different price (only tonnage is taken into
         // account for compatibility)
-        super(tonnage, et, equipNum, c);
+        super(tonnage, et, equipNum, omniPodded, c);
     }
     
     public JumpJet clone() {
-    	JumpJet clone = new JumpJet(getUnitTonnage(), getType(), getEquipmentNum(), campaign);
+    	JumpJet clone = new JumpJet(getUnitTonnage(), getType(), getEquipmentNum(), omniPodded, campaign);
         clone.copyBaseData(this);
     	return clone;
     }
@@ -87,7 +87,7 @@ public class JumpJet extends EquipmentPart {
 
 	@Override
 	public MissingPart getMissingPart() {
-		return new MissingJumpJet(getUnitTonnage(), type, equipmentNum, campaign);
+		return new MissingJumpJet(getUnitTonnage(), type, equipmentNum, omniPodded, campaign);
 	}
 
 	@Override

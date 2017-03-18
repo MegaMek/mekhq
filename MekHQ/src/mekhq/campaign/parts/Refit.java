@@ -300,7 +300,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 			} else if(null != movedPart) {
 				newUnitParts.add(movedPart.getId());
 				oldUnitParts.remove(moveIndex);
-				if(isOmni && movedPart.isOmniPoddable()) {
+				if(isOmni && movedPart.isOmniPodded()) {
 					updateRefitClass(CLASS_OMNI);
 				} else {
 					updateRefitClass(CLASS_C);

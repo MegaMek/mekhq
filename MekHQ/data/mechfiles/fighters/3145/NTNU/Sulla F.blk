@@ -21,7 +21,7 @@ F
 </Model>
 
 <year>
-3130
+3108
 </year>
 
 <type>
@@ -47,6 +47,10 @@ Aerodyne
 <sink_type>
 1
 </sink_type>
+
+<omnipodheatsinks>
+5
+</omnipodheatsinks>
 
 <fuel>
 400
@@ -79,17 +83,25 @@ Aerodyne
 </Nose Equipment>
 
 <Left Wing Equipment>
-CLImprovedHeavyLargeLaser
+CLImprovedHeavyLargeLaser:OMNI
+CLCASE:OMNI
+CLCASE:OMNI
+CLCASE
+CLCASE
 CLCASE
 </Left Wing Equipment>
 
 <Right Wing Equipment>
-CLImprovedHeavyLargeLaser
+CLImprovedHeavyLargeLaser:OMNI
+CLCASE:OMNI
+CLCASE:OMNI
+CLCASE
+CLCASE
 CLCASE
 </Right Wing Equipment>
 
 <Aft Equipment>
-WatchdogECMSuite
+WatchdogECMSuite:OMNI
 </Aft Equipment>
 
 <source>

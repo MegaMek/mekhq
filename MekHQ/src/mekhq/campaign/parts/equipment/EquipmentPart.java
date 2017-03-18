@@ -77,11 +77,15 @@ public class EquipmentPart extends Part {
     }
 
     public EquipmentPart() {
-    	this(0, null, -1, null);
+    	this(0, null, -1, false, null);
+    }
+    
+    public EquipmentPart(int tonnage, EquipmentType et, int equipNum, Campaign c) {
+        this(0, et, equipNum, false, c);
     }
 
-    public EquipmentPart(int tonnage, EquipmentType et, int equipNum, Campaign c) {
-        super(tonnage, c);
+    public EquipmentPart(int tonnage, EquipmentType et, int equipNum, boolean omniPodded, Campaign c) {
+        super(tonnage, omniPodded, c);
         this.type =et;
         if(null != type) {
         	this.name = type.getName();
@@ -114,7 +118,7 @@ public class EquipmentPart extends Part {
     }
 
     public EquipmentPart clone() {
-    	EquipmentPart clone = new EquipmentPart(getUnitTonnage(), type, equipmentNum, campaign);
+    	EquipmentPart clone = new EquipmentPart(getUnitTonnage(), type, equipmentNum, omniPodded, campaign);
         clone.copyBaseData(this);
         if(hasVariableTonnage(type)) {
             clone.setEquipTonnage(equipTonnage);
@@ -159,7 +163,8 @@ public class EquipmentPart extends Part {
     	return part instanceof EquipmentPart
         		&& getType().equals(((EquipmentPart)part).getType())
         		&& getTonnage() == part.getTonnage()
-        		&& getStickerPrice() == part.getStickerPrice();
+        		&& getStickerPrice() == part.getStickerPrice()
+        		&& isOmniPodded() == part.isOmniPodded();
     }
 
     @Override
@@ -256,7 +261,7 @@ public class EquipmentPart extends Part {
 
 	@Override
 	public MissingPart getMissingPart() {
-		return new MissingEquipmentPart(getUnitTonnage(), type, equipmentNum, campaign, equipTonnage);
+		return new MissingEquipmentPart(getUnitTonnage(), type, equipmentNum, campaign, equipTonnage, omniPodded);
 	}
 
 	@Override
@@ -305,6 +310,7 @@ public class EquipmentPart extends Part {
 				if(mounted.isSplit()) {
 				hits += unit.getEntity().getDamagedCriticals(CriticalSlot.TYPE_EQUIPMENT, equipmentNum, mounted.getSecondLocation());
 				}
+				omniPodded = mounted.isOmniPodMounted();
 			}
 			if(checkForDestruction
 					&& hits > priorHits
@@ -403,6 +409,7 @@ public class EquipmentPart extends Part {
 			        mounted.setRepairable(true);
 			        unit.repairSystem(CriticalSlot.TYPE_EQUIPMENT, equipmentNum);
 				}
+				setOmniPodded(mounted.isOmniPodMounted());
 			}
 			checkWeaponBay();
 		}
@@ -657,8 +664,7 @@ public class EquipmentPart extends Part {
 
     @Override
     public boolean isOmniPoddable() {
-    	//TODO: is this on equipment type?
-    	return true;
+        return !type.isOmniFixedOnly();
     }
 
 	@Override
