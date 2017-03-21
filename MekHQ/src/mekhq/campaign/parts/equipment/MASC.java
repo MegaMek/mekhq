@@ -46,17 +46,17 @@ public class MASC extends EquipmentPart {
 	protected int engineRating;
 	
 	public MASC() {
-    	this(0, null, -1, null, 0);
+    	this(0, null, -1, null, 0, false);
     }
     
-    public MASC(int tonnage, EquipmentType et, int equipNum, Campaign c, int rating) {
-        super(tonnage, et, equipNum, c);
+    public MASC(int tonnage, EquipmentType et, int equipNum, Campaign c, int rating, boolean omniPodded) {
+        super(tonnage, et, equipNum, omniPodded, c);
         this.engineRating = rating;
         equipTonnage = calculateTonnage();
     }
     
     public MASC clone() {
-    	MASC clone = new MASC(getUnitTonnage(), getType(), getEquipmentNum(), campaign, engineRating);
+    	MASC clone = new MASC(getUnitTonnage(), getType(), getEquipmentNum(), campaign, engineRating, omniPodded);
         clone.copyBaseData(this);
     	return clone;
     }
@@ -155,7 +155,8 @@ public class MASC extends EquipmentPart {
 	
 	@Override
 	public MissingPart getMissingPart() {
-		return new MissingMASC(getUnitTonnage(), type, equipmentNum, campaign, equipTonnage, engineRating);
+		return new MissingMASC(getUnitTonnage(), type, equipmentNum, campaign, equipTonnage, engineRating,
+		        omniPodded);
 	}
 	
 	@Override
@@ -171,6 +172,6 @@ public class MASC extends EquipmentPart {
 	
 	@Override
     public boolean isOmniPoddable() {
-    	return false;
+    	return isSupercharger();
     }
 }

@@ -2118,7 +2118,8 @@ public class Unit implements MekHqXmlSerializable {
                         epart = new EquipmentPart((int)entity.getWeight(), type, eqnum,
                                 m.isOmniPodMounted(), campaign);
                         if(type instanceof MiscType && type.hasFlag(MiscType.F_MASC)) {
-                            epart = new MASC((int)entity.getWeight(), type, eqnum, campaign, erating);
+                            epart = new MASC((int)entity.getWeight(), type, eqnum, campaign,
+                                    erating, m.isOmniPodMounted());
                         }
                         addPart(epart);
                         partsToAdd.add(epart);

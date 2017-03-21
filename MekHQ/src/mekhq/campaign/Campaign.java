@@ -4878,7 +4878,7 @@ public class Campaign implements Serializable {
                 && ((EquipmentPart) p).getType().hasFlag(MiscType.F_MASC)
                 && !(p instanceof MASC)) {
                 p = new MASC(p.getUnitTonnage(), ((EquipmentPart) p).getType(),
-                             ((EquipmentPart) p).getEquipmentNum(), retVal, 0);
+                             ((EquipmentPart) p).getEquipmentNum(), retVal, 0, p.isOmniPodded());
                 p.setId(pid);
             }
             if (p instanceof MissingEquipmentPart
@@ -4887,7 +4887,7 @@ public class Campaign implements Serializable {
                 p = new MissingMASC(p.getUnitTonnage(),
                                     ((MissingEquipmentPart) p).getType(),
                                     ((MissingEquipmentPart) p).getEquipmentNum(), retVal,
-                                    ((MissingEquipmentPart) p).getTonnage(), 0);
+                                    ((MissingEquipmentPart) p).getTonnage(), 0, p.isOmniPodded());
                 p.setId(pid);
             }
             // deal with true values for sensor and life support on non-Mech
