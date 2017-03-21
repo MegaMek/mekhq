@@ -150,6 +150,7 @@ import mekhq.campaign.parts.MissingVeeSensor;
 import mekhq.campaign.parts.MissingVeeStabiliser;
 import mekhq.campaign.parts.MotiveSystem;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.PodSpace;
 import mekhq.campaign.parts.ProtomekArmActuator;
 import mekhq.campaign.parts.ProtomekArmor;
 import mekhq.campaign.parts.ProtomekJumpJet;
@@ -236,6 +237,7 @@ public class Unit implements MekHqXmlSerializable {
 
     private ArrayList<Part> parts;
     private String lastMaintenanceReport;
+    private ArrayList<PodSpace> podSpace;
 
     private Refit refit;
 
@@ -265,6 +267,12 @@ public class Unit implements MekHqXmlSerializable {
         this.salvaged = false;
         this.campaign = c;
         this.parts = new ArrayList<Part>();
+        this.podSpace = new ArrayList<>();
+        if (en.isOmni()) {
+            for (int loc = 0; loc < en.locations(); loc++) {
+                podSpace.add(new PodSpace(loc, this));
+            }
+        }
         this.drivers = new ArrayList<UUID>();
         this.gunners = new ArrayList<UUID>();
         this.vesselCrew = new ArrayList<UUID>();
@@ -2404,6 +2412,9 @@ public class Unit implements MekHqXmlSerializable {
             for(Part p : partsToAdd) {
                 campaign.addPart(p, 0);
             }
+        }
+        if (getEntity().isOmni()) {
+            podSpace.forEach(ps -> ps.updateConditionFromEntity(false));
         }
     }
 

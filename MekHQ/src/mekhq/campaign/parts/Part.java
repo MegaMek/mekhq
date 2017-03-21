@@ -80,6 +80,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	public static final int PART_TYPE_GENERIC_SPARE_PART = 10;
 	public static final int PART_TYPE_OTHER = 11;
 	public static final int PART_TYPE_MEK_COCKPIT = 12;
+	public static final int PART_TYPE_OMNI_SPACE = 13;
 
 	public static final int T_UNKNOWN = -1;
 	public static final int T_BOTH = 0;
@@ -104,14 +105,15 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 		public static final int ELECTRONICS = 7;
 		public static final int GENERAL = 8;
 		public static final int HEATSINK = 9;
-		public static final int MEK_LOCATION = 10;		
-		public static final int PHYSICAL_WEAPON = 11;		
+		public static final int MEK_LOCATION = 10;
+		public static final int PHYSICAL_WEAPON = 11;
+		public static final int POD_SPACE = 12;
 	}
     
 	private static final String[] partTypeLabels = { "Armor", "Weapon", "Ammo",
 			"Equipment Part", "Mek Actuator", "Mek Engine", "Mek Gyro",
 			"Mek Life Support", "Mek Body Part", "Mek Sensor",
-			"Generic Spare Part", "Other" };
+			"Generic Spare Part", "Other", "Mek Cockpit", "Pod Space" };
 
 	public static String[] getPartTypeLabels() {
 		return partTypeLabels;
