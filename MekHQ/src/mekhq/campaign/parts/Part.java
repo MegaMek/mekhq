@@ -1373,7 +1373,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 		}
 	}
 	
-	public static int findCorrectRepairType(Part part) {
+	public static int findCorrectRepairType(IPartWork part) {
 		if ((part instanceof EquipmentPart && ((EquipmentPart)part).getType() instanceof WeaponType) ||
 				(part instanceof MissingEquipmentPart && ((MissingEquipmentPart)part).getType() instanceof WeaponType)) {
 			return Part.REPAIR_PART_TYPE.WEAPON;
@@ -1386,7 +1386,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 		}
 	}
 
-	public static String[] findPartImage(Part part) {
+	public static String[] findPartImage(IPartWork part) {
 		String imgBase = null;
         int repairType = Part.findCorrectRepairType(part);
         

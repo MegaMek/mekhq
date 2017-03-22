@@ -59,7 +59,7 @@ public class TaskTableMouseAdapter extends MouseInputAdapter implements ActionLi
     @Override
     public void actionPerformed(ActionEvent action) {
         String command = action.getActionCommand();
-        Part part = taskModel.getTaskAt(taskTable.convertRowIndexToModel(taskTable.getSelectedRow()));
+        Part part = (Part)taskModel.getTaskAt(taskTable.convertRowIndexToModel(taskTable.getSelectedRow()));
         if (null == part) {
             return;
         }
@@ -136,7 +136,7 @@ public class TaskTableMouseAdapter extends MouseInputAdapter implements ActionLi
             if (row < 0) {
                 return;
             }
-            Part part = taskModel.getTaskAt(taskTable.convertRowIndexToModel(row));
+            Part part = (Part)taskModel.getTaskAt(taskTable.convertRowIndexToModel(row));
             JMenuItem menuItem = null;
             JMenu menu = null;
             JCheckBoxMenuItem cbMenuItem = null;

@@ -78,7 +78,6 @@ import mekhq.campaign.ExtraData;
 import mekhq.campaign.LogEntry;
 import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.mod.am.InjuryUtil;
-import mekhq.campaign.parts.Part;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
@@ -3083,9 +3082,9 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return getTechDesc(overtimeAllowed, null);
     }
 
-    public String getTechDesc(boolean overtimeAllowed, Part part) {
+    public String getTechDesc(boolean overtimeAllowed, IPartWork part) {
         String toReturn = "<html><font size='2'><b>" + getFullName() + "</b><br/>";
-        if (null != part && getTechUnitIDs().contains(part.getUnitId())) {
+        if (null != part && getTechUnitIDs().contains(part.getUnit().getId())) {
             toReturn = "<html><font size='2' color='green'><b>@" + getFullName() + "</b><br/>";
         }
         Skill mechSkill = getSkill(SkillType.S_TECH_MECH);

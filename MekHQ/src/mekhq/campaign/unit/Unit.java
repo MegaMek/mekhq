@@ -2425,6 +2425,10 @@ public class Unit implements MekHqXmlSerializable {
     public void setParts(ArrayList<Part> newParts) {
         parts = newParts;
     }
+    
+    public ArrayList<PodSpace> getPodSpace() {
+        return podSpace;
+    }
 
     public ArrayList<AmmoBin> getWorkingAmmoBins() {
         ArrayList<AmmoBin> ammo = new ArrayList<AmmoBin>();

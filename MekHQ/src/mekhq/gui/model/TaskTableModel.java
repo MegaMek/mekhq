@@ -15,6 +15,7 @@ import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Skill;
+import mekhq.campaign.work.IPartWork;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.ITechWorkPanel;
 import mekhq.gui.RepairTaskInfo;
@@ -39,24 +40,24 @@ public class TaskTableModel extends DataTableModel {
     
     public TaskTableModel(CampaignGUI gui, ITechWorkPanel panel) {
         columnNames = new String[] { "Tasks" };
-        data = new ArrayList<Part>();
+        data = new ArrayList<IPartWork>();
         this.gui = gui;
         this.panel = panel;
     }
     
     public Object getValueAt(int row, int col) {
-        return ((Part) data.get(row)).getDesc();
+        return ((IPartWork) data.get(row)).getDesc();
     }
 
-    public Part getTaskAt(int row) {
-        return (Part) data.get(row);
+    public IPartWork getTaskAt(int row) {
+        return (IPartWork) data.get(row);
     }
 
-    public Part[] getTasksAt(int[] rows) {
-        Part[] tasks = new Part[rows.length];
+    public IPartWork[] getTasksAt(int[] rows) {
+        IPartWork[] tasks = new IPartWork[rows.length];
         for (int i = 0; i < rows.length; i++) {
             int row = rows[i];
-            tasks[i] = (Part) data.get(row);
+            tasks[i] = (IPartWork) data.get(row);
         }
         return tasks;
     }
@@ -88,7 +89,7 @@ public class TaskTableModel extends DataTableModel {
                 unhighlightBorder();
             }
             
-            Part part = getTaskAt(actualRow);
+            IPartWork part = getTaskAt(actualRow);
             
             int availableLevel = REPAIR_STATE.AVAILABLE;
             
