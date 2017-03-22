@@ -74,6 +74,9 @@ public class JumpJet extends EquipmentPart {
      */
     @Override
     public long getStickerPrice() {
+        if (isOmniPodded()) {
+            return 250 * getUnitTonnage();
+        }
     	return 200 * getUnitTonnage();	
     }
     

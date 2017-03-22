@@ -268,11 +268,6 @@ public class Unit implements MekHqXmlSerializable {
         this.campaign = c;
         this.parts = new ArrayList<Part>();
         this.podSpace = new ArrayList<>();
-        if (en.isOmni()) {
-            for (int loc = 0; loc < en.locations(); loc++) {
-                podSpace.add(new PodSpace(loc, this));
-            }
-        }
         this.drivers = new ArrayList<UUID>();
         this.gunners = new ArrayList<UUID>();
         this.vesselCrew = new ArrayList<UUID>();
@@ -2415,6 +2410,10 @@ public class Unit implements MekHqXmlSerializable {
             }
         }
         if (getEntity().isOmni()) {
+            podSpace.clear();
+            for (int loc = 0; loc < getEntity().locations(); loc++) {
+                podSpace.add(new PodSpace(loc, this));
+            }
             podSpace.forEach(ps -> ps.updateConditionFromEntity(false));
         }
     }

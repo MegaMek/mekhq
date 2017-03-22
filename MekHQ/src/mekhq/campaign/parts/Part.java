@@ -1012,6 +1012,9 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	
 	@Override
     public String getDetails() {
+	    if (isOmniPodded()) {
+	        return String.format("%d hit(s), OmniPod", hits);
+	    }
         return hits + " hit(s)";
     }
 

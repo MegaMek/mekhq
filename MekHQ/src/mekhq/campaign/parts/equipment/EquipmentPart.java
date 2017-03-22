@@ -538,6 +538,9 @@ public class EquipmentPart extends Part {
             }
             type.getCost(en, isArmored, getLocation());
     	}
+        if (isOmniPodded()) {
+            itemCost *= 1.25;
+        }
     	int finalCost = (int)itemCost;
     	if (isArmored) {
             //need a getCriticals command - but how does this work?

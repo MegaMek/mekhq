@@ -193,10 +193,12 @@ public class PartsStore implements Serializable {
 				}
 			} else if(et instanceof MiscType && (((MiscType)et).hasFlag(MiscType.F_HEAT_SINK) || ((MiscType)et).hasFlag(MiscType.F_DOUBLE_HEAT_SINK))) {
             	parts.add(new HeatSink(0, et, -1, false, c));
+            	parts.add(new HeatSink(0, et, -1, true, c));
 			} else if(et instanceof MiscType && ((MiscType)et).hasFlag(MiscType.F_JUMP_JET)) {
 				//need to do it by rating and unit tonnage
 				for(int ton = 10; ton <= 100; ton += 5) {
-					parts.add(new JumpJet(ton, et, -1, false, c));
+                    parts.add(new JumpJet(ton, et, -1, false, c));
+                    parts.add(new JumpJet(ton, et, -1, true, c));
 				}
 			} else if ((et instanceof MiscType && ((MiscType)et).hasFlag(MiscType.F_TANK_EQUIPMENT) && ((MiscType)et).hasFlag(MiscType.F_CHASSIS_MODIFICATION))
 					|| et instanceof BayWeapon
@@ -217,8 +219,11 @@ public class PartsStore implements Serializable {
 							if(eton < minweight || eton > maxweight) {
 								continue;
 							}
-							MASC sp = new MASC(0, et, -1 , c, rating);
-							sp.setEquipTonnage(eton);
+                            MASC sp = new MASC(0, et, -1 , c, rating, false);
+                            sp.setEquipTonnage(eton);
+                            parts.add(sp);
+                            sp = new MASC(0, et, -1 , c, rating, true);
+                            sp.setEquipTonnage(eton);
 							parts.add(sp);
 						}
 					}
@@ -229,7 +234,8 @@ public class PartsStore implements Serializable {
 							if(rating < ton || (rating % ton) != 0) {
 								continue;
 							}
-							parts.add(new MASC(ton, et, -1, c, rating));
+                            parts.add(new MASC(ton, et, -1, c, rating, false));
+                            parts.add(new MASC(ton, et, -1, c, rating, true));
 						}
 					}
 				}
@@ -237,19 +243,27 @@ public class PartsStore implements Serializable {
 				if(EquipmentPart.hasVariableTonnage(et)) {
 					EquipmentPart epart;
 					for(double ton = EquipmentPart.getStartingTonnage(et); ton <= EquipmentPart.getMaxTonnage(et); ton += EquipmentPart.getTonnageIncrement(et)) {
-						epart = new EquipmentPart(0, et, -1, c);
+						epart = new EquipmentPart(0, et, -1, false, c);
 						epart.setEquipTonnage(ton);
 						parts.add(epart);
+						if (!et.isOmniFixedOnly()) {
+						    epart = new EquipmentPart(0, et, -1, true, c);
+	                        epart.setEquipTonnage(ton);
+	                        parts.add(epart);
+						}
 						//TODO: still need to deal with talons (unit tonnage) and masc (engine rating)
 					}
 				} else {
-					parts.add(new EquipmentPart(0, et, -1, c));
+                    parts.add(new EquipmentPart(0, et, -1, false, c));
+                    parts.add(new EquipmentPart(0, et, -1, true, c));
 				}
 			}
         }
         //lets throw aero heat sinks in here as well
         parts.add(new AeroHeatSink(0, Aero.HEAT_SINGLE, false, c));
-        parts.add(new AeroHeatSink(0, Aero.HEAT_DOUBLE, false, c));
+        parts.add(new AeroHeatSink(0, Aero.HEAT_DOUBLE, true, c));
+        parts.add(new AeroHeatSink(0, Aero.HEAT_SINGLE, false, c));
+        parts.add(new AeroHeatSink(0, Aero.HEAT_DOUBLE, true, c));
 	}
 
 	private void stockMekActuators(Campaign c) {
