@@ -5,6 +5,8 @@ import java.awt.Image;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
@@ -13,6 +15,7 @@ import megamek.common.TargetRoll;
 import mekhq.IconPackage;
 import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.PodSpace;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.work.IPartWork;
@@ -110,6 +113,20 @@ public class TaskTableModel extends DataTableModel {
 	            			availableLevel = REPAIR_STATE.NOT_AVAILABLE;
 	            		}
             		}
+            	} else if (part instanceof PodSpace && !part.isSalvaging()) {
+            	    Matcher m = Pattern.compile(".*(\\d+)/(\\d+).*(\\d+) in transit, (\\d+) on order.*").matcher(part.getDetails());
+            	    if (m.matches()) {
+            	        //Show available if at least one replacement can be made
+            	        if (m.group(2).equals("0")) {
+                            availableLevel = REPAIR_STATE.BLOCKED;
+            	        } else if (!m.group(1).equals("0")) {
+                            availableLevel = REPAIR_STATE.AVAILABLE;
+            	        } else if (m.group(3).equals("0") && m.group(4).equals("0")) {
+            	            availableLevel = REPAIR_STATE.NOT_AVAILABLE;
+            	        } else {
+                            availableLevel = REPAIR_STATE.IN_TRANSIT;
+            	        }
+            	    }
             	}
             	
             	if (availableLevel == REPAIR_STATE.AVAILABLE) {

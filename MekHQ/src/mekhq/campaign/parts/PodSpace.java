@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import megamek.common.Aero;
 import megamek.common.Entity;
@@ -74,6 +75,11 @@ public class PodSpace implements Serializable, IPartWork {
     @Override
     public int getBaseTime() {
         return 30;
+    }
+    
+    public List<Part> getPartList() {
+        return childPartIds.stream().map(id -> campaign.getPart(id))
+                .filter(Objects::nonNull).collect(Collectors.toList());
     }
 
     @Override
@@ -314,7 +320,7 @@ public class PodSpace implements Serializable, IPartWork {
         }
 
         toReturn += ">";
-        toReturn += "<b>" + action + getPartName() + "</b><br/>";
+        toReturn += "<b>" + action + getPartName() + " Equipment</b><br/>";
         toReturn += getDetails() + "<br/>";
         if(getSkillMin() > SkillType.EXP_ELITE) {
             toReturn += "<font color='red'>Impossible</font>";
@@ -331,7 +337,47 @@ public class PodSpace implements Serializable, IPartWork {
 
     @Override
     public String getDetails() {
-        return getPartName();
+        int allParts = 0;
+        int replacements = 0;
+        int inTransit = 0;
+        int onOrder = 0;
+        for (int id : childPartIds) {
+            Part part = campaign.getPart(id);
+            if (part != null) {
+                if (mode.equals(Mode.REPLACE) && part.needsFixing()) {
+                    allParts++;
+                    MissingPart missing;
+                    if (part instanceof MissingPart) {
+                        missing = (MissingPart)part;
+                    } else {
+                        missing = part.getMissingPart();
+                    }
+                    if (missing.isReplacementAvailable()) {
+                        replacements++;
+                    } else {
+                        //FIXME: This won't work if there are multiple items of the same type that need replacing and the number on order or in transit is less than the required number
+                        String[] inventories = campaign.getPartInventory(missing.getNewPart());
+                        if (inventories[1].indexOf(" ") >= 0
+                                && Integer.parseInt(inventories[1].substring(0, inventories[1].indexOf(" "))) > 0) {
+                            inTransit++;
+                        }
+                        if (inventories[2].indexOf(" ") >= 0
+                                && Integer.parseInt(inventories[2].substring(0, inventories[2].indexOf(" "))) > 0) {
+                            onOrder++;
+                        }
+                    }
+                } else if (mode.equals(Mode.REMOVE) && !(part instanceof MissingPart)) {
+                    allParts++;
+                }
+                //TODO: add string for reconfiguring
+            }
+        }
+        if (mode.equals(Mode.REPLACE)) {
+            return replacements + "/" + allParts + " available<br />"
+                    + inTransit + " in transit, " + onOrder + " on order";            
+        } else {
+            return allParts + " parts remaining";
+        }
     }
 
     @Override

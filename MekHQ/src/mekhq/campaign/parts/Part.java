@@ -1432,6 +1432,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
         		
         		break;
         	case Part.REPAIR_PART_TYPE.MEK_LOCATION:
+        	case Part.REPAIR_PART_TYPE.POD_SPACE:
         		imgBase = "location_mek";
         		break;
         	case Part.REPAIR_PART_TYPE.PHYSICAL_WEAPON:
