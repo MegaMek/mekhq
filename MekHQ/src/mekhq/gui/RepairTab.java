@@ -621,7 +621,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
             // selectedTechRow = TechTable.getSelectedRow();
             selectedLocation = choiceLocation.getSelectedIndex();
             selectedUnit = getSelectedServicedUnit();
-            Part part = (Part)getSelectedTask();
+            IPartWork part = (IPartWork)getSelectedTask();
             if (null == part) {
                 return;
             }
@@ -632,7 +632,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
             if (null == tech) {
                 return;
             }
-            if (part.onBadHipOrShoulder() && !part.isSalvaging()) {
+            if (part instanceof Part && ((Part)part).onBadHipOrShoulder() && !part.isSalvaging()) {
                 if (part instanceof MekLocation && ((MekLocation) part).isBreached()
                         && 0 != JOptionPane.showConfirmDialog(getFrame(),
                                 "You are sealing a limb with a bad shoulder or hip.\n"

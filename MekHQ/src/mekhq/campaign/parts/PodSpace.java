@@ -112,7 +112,7 @@ public class PodSpace implements Serializable, IPartWork {
         shorthandedMod = 0;
         for (int pid : childPartIds) {
             final Part part = campaign.getPart(pid);
-            if (part != null && part.needsFixing()) {
+            if (part != null && !(part instanceof MissingPart) && part.needsFixing()) {
                 part.remove(true);
             }
         }
@@ -189,7 +189,7 @@ public class PodSpace implements Serializable, IPartWork {
     @Override
     public String succeed() {
         if (isSalvaging()) {
-            fix();
+            remove(true);
             return " <font color='green'><b> removed.</b></font>";
         } else if (isReconfiguring()) {
             fix();
