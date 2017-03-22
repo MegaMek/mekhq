@@ -183,6 +183,7 @@ import mekhq.campaign.parts.equipment.MissingJumpJet;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.work.IAcquisitionWork;
+import mekhq.campaign.work.IPartWork;
 
 /**
  * This is a wrapper class for entity, so that we can add some functionality to
@@ -546,21 +547,31 @@ public class Unit implements MekHqXmlSerializable {
         }
     }
 
-    public ArrayList<Part> getPartsNeedingFixing() {
-        ArrayList<Part> brokenParts = new ArrayList<Part>();
+    public ArrayList<IPartWork> getPartsNeedingFixing() {
+        ArrayList<IPartWork> brokenParts = new ArrayList<IPartWork>();
         for(Part part: parts) {
             if(part.needsFixing()) {
                 brokenParts.add(part);
             }
         }
+        for (PodSpace pod : podSpace) {
+            if (pod.needsFixing()) {
+                brokenParts.add(pod);
+            }
+        }
         return brokenParts;
     }
 
-    public ArrayList<Part> getSalvageableParts() {
-        ArrayList<Part> salvageParts = new ArrayList<Part>();
+    public ArrayList<IPartWork> getSalvageableParts() {
+        ArrayList<IPartWork> salvageParts = new ArrayList<IPartWork>();
         for(Part part: parts) {
             if(part.isSalvaging()) {
                 salvageParts.add(part);
+            }
+        }
+        for (PodSpace pod : podSpace) {
+            if (pod.hasSalvageableParts()) {
+                salvageParts.add(pod);
             }
         }
         return salvageParts;

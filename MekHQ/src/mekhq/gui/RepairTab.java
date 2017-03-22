@@ -66,6 +66,7 @@ import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.parts.MekLocation;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.PodSpace;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Skill;
@@ -101,7 +102,6 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
     private JTable servicedUnitTable;
     private JTable taskTable;
     private JTable acquisitionTable;
-    private JTable podTable;
     private JTable techTable;
     private JButton btnDoTask;
     private JButton btnUseBonusPart;
@@ -116,7 +116,6 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
     private UnitTableModel servicedUnitModel;
     private TaskTableModel taskModel;
     private AcquisitionTableModel acquireModel;
-    private TaskTableModel podModel;
     private TechTableModel techsModel;
 
     private TableRowSorter<UnitTableModel> servicedUnitSorter;
@@ -365,23 +364,9 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         scrollAcquisitionTable.setMinimumSize(new java.awt.Dimension(200, 200));
         scrollAcquisitionTable.setPreferredSize(new java.awt.Dimension(300, 300));
 
-        podModel = new TaskTableModel(getCampaignGui(), this);
-        podTable = new JTable(podModel);
-        podTable.setName("PodTable"); // NOI18N
-        podTable.setRowHeight(70);
-        podTable.getColumnModel().getColumn(0).setCellRenderer(podModel.getRenderer(getIconPackage()));
-        podTable.getSelectionModel().addListSelectionListener(ev -> podTableValueChanged());
-//        podTable.addMouseListener(new PodTableMouseAdapter(getCampaignGui(),
-//                podTable, podModel));
-        JScrollPane scrollPodTable = new JScrollPane(podTable);
-        scrollAcquisitionTable.setMinimumSize(new java.awt.Dimension(200, 200));
-        scrollAcquisitionTable.setPreferredSize(new java.awt.Dimension(300, 300));
-
         tabTasks.addTab(resourceMap.getString("scrollTaskTable.TabConstraints.tabTasks"), scrollTaskTable); // NOI18N
         tabTasks.addTab(resourceMap.getString("scrollAcquisitionTable.TabConstraints.tabTasks"),
                 scrollAcquisitionTable); // NOI18N
-        tabTasks.addTab(resourceMap.getString("scrollPodTable.TabConstraints.tabTasks"),
-                scrollPodTable); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
@@ -547,7 +532,6 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         refreshServicedUnitList();
         refreshTaskList();
         refreshAcquireList();
-        refreshPodList();
         refreshTechsList();
     }
 
@@ -587,14 +571,6 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         return acquireModel.getAcquisitionAt(acquisitionTable.convertRowIndexToModel(row));
     }
     
-    private IPartWork getSelectedPodLocation() {
-        int row = podTable.getSelectedRow();
-        if (row < 0) {
-            return null;
-        }
-        return podModel.getTaskAt(podTable.convertRowIndexToModel(row));
-    }
-
     private Unit getSelectedServicedUnit() {
         int row = servicedUnitTable.getSelectedRow();
         if (row < 0) {
@@ -613,15 +589,9 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         updateTechTarget();
     }
 
-    private void podTableValueChanged() {
-        filterTechs();
-        updateTechTarget();
-    }
-
     private void servicedUnitTableValueChanged(javax.swing.event.ListSelectionEvent evt) {
         refreshTaskList();
         refreshAcquireList();
-        refreshPodList();
         int selected = servicedUnitTable.getSelectedRow();
         txtServicedUnitView.setText("");
         if (selected > -1) {
@@ -704,29 +674,6 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
                 return;
             }
             getCampaign().getShoppingList().addShoppingItem(acquisition, 1, getCampaign());
-        } else if (podSelected()) {
-            selectedRow = podTable.getSelectedRow();
-            selectedUnit = getSelectedServicedUnit();
-            IPartWork part = getSelectedPodLocation();
-            if (null == part) {
-                return;
-            }
-            Unit u = part.getUnit();
-            if (null != u && u.isSelfCrewed()) {
-                tech = u.getEngineer();
-            }
-            if (null == tech) {
-                return;
-            }
-            getCampaign().fixPart(part, tech);
-            if (null != u && !u.isRepairable() && u.getSalvageableParts().size() == 0) {
-                selectedRow = -1;
-                getCampaign().removeUnit(u.getId());
-            }
-            if (null != u && !getCampaign().getServiceableUnits().contains(u)) {
-                selectedRow = -1;
-            }
-            MekHQ.triggerEvent(new PartWorkEvent(tech, part));            
         }
 
         // get the selected row back for tasks
@@ -824,15 +771,20 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
             @Override
             public boolean include(Entry<? extends TaskTableModel, ? extends Integer> entry) {
                 TaskTableModel taskModel = entry.getModel();
-                Part part = (Part)taskModel.getTaskAt(entry.getIdentifier());
+                IPartWork part = (IPartWork)taskModel.getTaskAt(entry.getIdentifier());
                 if (part == null) {
                     return false;
                 }
                 if (loc != null && !loc.isEmpty()) {
                     if (loc.equals("All")) {
                         return true;
+                    } else if (loc.equals("OmniPod")) {
+                        return part instanceof PodSpace;
+                    } else if (part instanceof PodSpace) {
+                        return ((PodSpace)part).getLocation() == part.getUnit().getEntity().getLocationFromAbbr(loc);
+                    } else {
+                        return ((Part)part).isInLocation(loc);
                     }
-                    return part.isInLocation(loc);
                 }
                 return false;
 
@@ -934,6 +886,9 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
             for (String s : getSelectedServicedUnit().getEntity().getLocationAbbrs()) {
                 choiceLocation.addItem(s);
             }
+            if (getSelectedServicedUnit().getEntity().isOmni()) {
+                choiceLocation.addItem("OmniPod");
+            }
             choiceLocation.setSelectedIndex(0);
             if (index > -1 && choiceLocation.getModel().getSize() == numLocations) {
                 choiceLocation.setSelectedIndex(index);
@@ -969,17 +924,10 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         acquireModel.setData(getCampaign().getAcquisitionsForUnit(uuid));
     }
     
-    public void refreshPodList() {
-        if (null != getSelectedServicedUnit()) {
-            podModel.setData(getSelectedServicedUnit().getPodSpace());
-        }
-    }
-    
     private ActionScheduler servicedUnitListScheduler = new ActionScheduler(this::refreshServicedUnitList);
     private ActionScheduler techsScheduler = new ActionScheduler(this::refreshTechsList);
     private ActionScheduler taskScheduler = new ActionScheduler(this::refreshTaskList);
     private ActionScheduler acquireScheduler = new ActionScheduler(this::refreshAcquireList);
-    private ActionScheduler podScheduler = new ActionScheduler(this::refreshPodList);
 
     @Subscribe
     public void handle(DeploymentChangedEvent ev) {
@@ -1011,7 +959,6 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         if (ev.getPart().getUnit() == null) {
             acquireScheduler.schedule();
             taskScheduler.schedule();
-            podScheduler.schedule();
         } else {
             servicedUnitListScheduler.schedule();
         }
@@ -1021,7 +968,6 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
     public void handle(AcquisitionEvent ev) {
         acquireScheduler.schedule();
         taskScheduler.schedule();
-        podScheduler.schedule();
     }
     
     @Subscribe
@@ -1035,7 +981,6 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         if (ev.getPartWork().getUnit() == null) {
             acquireScheduler.schedule();
             taskScheduler.schedule();
-            podScheduler.schedule();
         } else {
             servicedUnitListScheduler.schedule();
         }

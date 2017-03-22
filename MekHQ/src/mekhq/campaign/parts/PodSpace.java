@@ -391,6 +391,16 @@ public class PodSpace implements Serializable, IPartWork {
     public boolean isReconfiguring() {
         return false;
     }
+    
+    public boolean hasSalvageableParts() {
+        for (int id : childPartIds) {
+            final Part p = campaign.getPart(id);
+            if (p != null && p.isSalvaging()) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     @Override
     public void reservePart() {

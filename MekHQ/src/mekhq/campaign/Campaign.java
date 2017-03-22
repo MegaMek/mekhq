@@ -5586,9 +5586,9 @@ public class Campaign implements Serializable {
         return finances;
     }
 
-    public ArrayList<Part> getPartsNeedingServiceFor(UUID uid) {
+    public ArrayList<IPartWork> getPartsNeedingServiceFor(UUID uid) {
         if (null == uid) {
-            return new ArrayList<Part>();
+            return new ArrayList<IPartWork>();
         }
         Unit u = getUnit(uid);
         if (u != null) {
@@ -5598,7 +5598,7 @@ public class Campaign implements Serializable {
                 return u.getPartsNeedingFixing();
             }
         }
-        return new ArrayList<Part>();
+        return new ArrayList<IPartWork>();
     }
 
     public ArrayList<IAcquisitionWork> getAcquisitionsForUnit(UUID uid) {

@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
@@ -1367,7 +1368,9 @@ public class MassRepairSalvageDialog extends JDialog {
 		int totalActionsPerformed = 0;
 		String actionDescriptor = salvaging ? "salvage" : "repair";
 
-		List<Part> parts = campaignGUI.getCampaign().getPartsNeedingServiceFor(unit.getId());
+		//TODO: support omni pod work in MRMS
+		List<Part> parts = campaignGUI.getCampaign().getPartsNeedingServiceFor(unit.getId())
+		        .stream().filter(pw -> pw instanceof Part).map(pw -> (Part)pw).collect(Collectors.toList());
 
 		/*
 		 * If we're repairing a unit and we allow auto-scrapping of parts that
@@ -1385,7 +1388,8 @@ public class MassRepairSalvageDialog extends JDialog {
 			}
 
 			if (refreshParts) {
-				parts = campaignGUI.getCampaign().getPartsNeedingServiceFor(unit.getId());
+		        parts = campaignGUI.getCampaign().getPartsNeedingServiceFor(unit.getId())
+		                .stream().filter(pw -> pw instanceof Part).map(pw -> (Part)pw).collect(Collectors.toList());
 			}
 		}
 
@@ -1441,7 +1445,8 @@ public class MassRepairSalvageDialog extends JDialog {
 				scrappingLimbMode = true;
 				unit.setSalvage(true);
 
-				List<Part> partsTemp = campaignGUI.getCampaign().getPartsNeedingServiceFor(unit.getId());
+				List<Part> partsTemp = campaignGUI.getCampaign().getPartsNeedingServiceFor(unit.getId())
+                        .stream().filter(pw -> pw instanceof Part).map(pw -> (Part)pw).collect(Collectors.toList());
 				List<Part> partsToBeRemoved = new ArrayList<Part>();
 				Map<Integer, Integer> countOfPartsPerLocation = new HashMap<Integer, Integer>();
 
@@ -1478,7 +1483,8 @@ public class MassRepairSalvageDialog extends JDialog {
 					scrappingLimbMode = false;
 					unit.setSalvage(false);
 
-					parts = campaignGUI.getCampaign().getPartsNeedingServiceFor(unit.getId());
+	                parts = campaignGUI.getCampaign().getPartsNeedingServiceFor(unit.getId())
+	                        .stream().filter(pw -> pw instanceof Part).map(pw -> (Part)pw).collect(Collectors.toList());
 				} else {
 					for (int locId : countOfPartsPerLocation.keySet()) {
 						boolean unfixable = false;
