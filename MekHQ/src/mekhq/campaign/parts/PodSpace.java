@@ -48,14 +48,11 @@ public class PodSpace implements Serializable, IPartWork {
 
     private static final long serialVersionUID = -9022671736030862210L;
     
-    public enum Mode { REPLACE, REMOVE, RECONFIGURE };
-
     protected Campaign campaign;
     protected Unit unit;
     protected int location;
     protected List<Integer> childPartIds = new ArrayList<>();
     
-    protected Mode mode = Mode.REPLACE;
     protected UUID teamId;
     protected int timeSpent = 0;
     protected int skillMin = SkillType.EXP_GREEN;
@@ -191,18 +188,16 @@ public class PodSpace implements Serializable, IPartWork {
 
     @Override
     public String succeed() {
-        switch(mode) {
-        case REPLACE:
-            fix();
-            return " <font color='green'><b> fixed.</b></font>";
-        case REMOVE:
+        if (isSalvaging()) {
             fix();
             return " <font color='green'><b> removed.</b></font>";
-        case RECONFIGURE:
+        } else if (isReconfiguring()) {
             fix();
-            return " <font color='green'><b> reconfigured.</b></font>";
+            return " <font color='green'><b> reconfigured.</b></font>";            
+        } else {
+            fix();
+            return " <font color='green'><b> fixed.</b></font>";
         }
-        return "";
     }
 
     @Override
@@ -344,7 +339,7 @@ public class PodSpace implements Serializable, IPartWork {
         for (int id : childPartIds) {
             Part part = campaign.getPart(id);
             if (part != null) {
-                if (mode.equals(Mode.REPLACE) && part.needsFixing()) {
+                if (!isSalvaging() && part.needsFixing()) {
                     allParts++;
                     MissingPart missing;
                     if (part instanceof MissingPart) {
@@ -366,17 +361,17 @@ public class PodSpace implements Serializable, IPartWork {
                             onOrder++;
                         }
                     }
-                } else if (mode.equals(Mode.REMOVE) && !(part instanceof MissingPart)) {
+                } else if (isSalvaging() && !(part instanceof MissingPart)) {
                     allParts++;
                 }
                 //TODO: add string for reconfiguring
             }
         }
-        if (mode.equals(Mode.REPLACE)) {
+        if (isSalvaging()) {
+            return allParts + " parts remaining";
+        } else {
             return replacements + "/" + allParts + " available<br />"
                     + inTransit + " in transit, " + onOrder + " on order";            
-        } else {
-            return allParts + " parts remaining";
         }
     }
 
@@ -387,11 +382,14 @@ public class PodSpace implements Serializable, IPartWork {
 
     @Override
     public boolean isSalvaging() {
-        return mode.equals(Mode.REMOVE);
+        if (unit != null) {
+            return unit.isSalvage() || unit.isLocationDestroyed(location);
+        }
+        return false;
     }
     
     public boolean isReconfiguring() {
-        return mode.equals(Mode.RECONFIGURE);
+        return false;
     }
 
     @Override
