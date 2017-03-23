@@ -55,7 +55,6 @@ public class PodSpace implements Serializable, IPartWork {
     
     protected UUID teamId;
     protected int timeSpent = 0;
-    protected int skillMin = SkillType.EXP_GREEN;
     protected boolean workingOvertime = false;
     protected int shorthandedMod = 0;
     
@@ -96,6 +95,7 @@ public class PodSpace implements Serializable, IPartWork {
 
     @Override
     public void remove(boolean salvage) {
+        shorthandedMod = 0;
         //Iterate through all pod-mounted equipment in space and remove them.
         for (int pid : childPartIds) {
             final Part part = campaign.getPart(pid);
@@ -108,7 +108,6 @@ public class PodSpace implements Serializable, IPartWork {
     
     @Override
     public void fix() {
-        skillMin = SkillType.EXP_GREEN;
         shorthandedMod = 0;
         for (int pid : childPartIds) {
             final Part part = campaign.getPart(pid);
@@ -151,8 +150,9 @@ public class PodSpace implements Serializable, IPartWork {
 
     @Override
     public boolean needsFixing() {
-        return childPartIds.stream().map(id -> campaign.getPart(id))
-                .filter(Objects::nonNull).anyMatch(Part::needsFixing);
+        return childPartIds.stream()
+                .map(id -> campaign.getPart(id)).filter(Objects::nonNull)
+                .anyMatch(Part::needsFixing);
     }
 
     @Override
@@ -202,10 +202,21 @@ public class PodSpace implements Serializable, IPartWork {
 
     @Override
     public String fail(int rating) {
-        skillMin = ++rating;
         timeSpent = 0;
         shorthandedMod = 0;
-        return " <font color='red'><b> failed.</b></font>";
+        boolean replacing = false;
+        for (int id : childPartIds) {
+            final Part part = campaign.getPart(id);
+            if (part != null && (isSalvaging() || part.needsFixing())) {
+                part.fail(rating);
+                replacing |= part instanceof MissingPart;
+            }
+        }
+        if(rating >= SkillType.EXP_ELITE && replacing) {
+                return " <font color='red'><b> failed and part(s) destroyed.</b></font>";
+        } else {
+            return " <font color='red'><b> failed.</b></font>";
+        }
     }
 
     @Override
@@ -220,7 +231,17 @@ public class PodSpace implements Serializable, IPartWork {
 
     @Override
     public int getSkillMin() {
-        return skillMin;
+        int minSkill = SkillType.EXP_GREEN;
+        for (int id : childPartIds) {
+            final Part part = campaign.getPart(id);
+            if (part != null) {
+                if ((isSalvaging() && !(part instanceof MissingPart))
+                        || (!isSalvaging() && (part instanceof MissingPart) || part.needsFixing())) {
+                    minSkill = Math.max(minSkill, part.getSkillMin());
+                }
+            }
+        }
+        return minSkill;
     }
 
     @Override

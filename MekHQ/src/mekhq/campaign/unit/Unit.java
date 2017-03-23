@@ -2440,6 +2440,10 @@ public class Unit implements MekHqXmlSerializable {
     public ArrayList<PodSpace> getPodSpace() {
         return podSpace;
     }
+    
+    public void refreshPodSpace() {
+        podSpace.forEach(ps -> ps.updateConditionFromEntity(false));
+    }
 
     public ArrayList<AmmoBin> getWorkingAmmoBins() {
         ArrayList<AmmoBin> ammo = new ArrayList<AmmoBin>();

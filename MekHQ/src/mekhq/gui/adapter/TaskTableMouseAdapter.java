@@ -71,6 +71,7 @@ public class TaskTableMouseAdapter extends MouseInputAdapter implements ActionLi
             }
             Unit u = part.getUnit();
             gui.getCampaign().addReport(part.scrap());
+            u.refreshPodSpace();
             if (null != u && !u.isRepairable() && u.getSalvageableParts().size() == 0) {
                 gui.getCampaign().removeUnit(u.getId());
             }
@@ -114,6 +115,9 @@ public class TaskTableMouseAdapter extends MouseInputAdapter implements ActionLi
              */
             if (part.checkFixable() == null) {
                 gui.getCampaign().addReport(part.succeed());
+                if (part.getUnit() != null) {
+                    part.getUnit().refreshPodSpace();
+                }
                 MekHQ.triggerEvent(new PartChangedEvent(part));
             }
         }

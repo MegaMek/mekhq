@@ -659,12 +659,15 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
                 }
             }
             getCampaign().fixPart(part, tech);
-            if (null != u && !u.isRepairable() && u.getSalvageableParts().size() == 0) {
-                selectedRow = -1;
-                getCampaign().removeUnit(u.getId());
-            }
-            if (null != u && !getCampaign().getServiceableUnits().contains(u)) {
-                selectedRow = -1;
+            if (null != u) {
+                if (!u.isRepairable() && u.getSalvageableParts().size() == 0) {
+                    selectedRow = -1;
+                    getCampaign().removeUnit(u.getId());
+                }
+                if (!getCampaign().getServiceableUnits().contains(u)) {
+                    selectedRow = -1;
+                }
+                u.refreshPodSpace();
             }
             MekHQ.triggerEvent(new PartWorkEvent(tech, part));
         } else if (acquireSelected()) {
