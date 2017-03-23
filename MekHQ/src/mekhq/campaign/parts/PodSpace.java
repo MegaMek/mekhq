@@ -32,6 +32,7 @@ import megamek.common.Mech;
 import megamek.common.Tank;
 import megamek.common.TargetRoll;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
@@ -115,14 +116,17 @@ public class PodSpace implements Serializable, IPartWork {
         shorthandedMod = 0;
         for (int pid : childPartIds) {
             final Part part = campaign.getPart(pid);
-            if (part != null && !(part instanceof MissingPart) && part.needsFixing()) {
+            if (part != null && !(part instanceof MissingPart)
+                    && !(part instanceof AmmoBin)
+                    && part.needsFixing()) {
                 part.remove(true);
             }
         }
         updateConditionFromEntity(false);
         for (int pid : childPartIds) {
             final Part part = campaign.getPart(pid);
-            if (part != null && part.needsFixing()) {
+            if (part != null && part.needsFixing()
+                    && !(part instanceof AmmoBin)) {
                 part.fix();
             }
         }
@@ -156,7 +160,7 @@ public class PodSpace implements Serializable, IPartWork {
     public boolean needsFixing() {
         return childPartIds.stream()
                 .map(id -> campaign.getPart(id)).filter(Objects::nonNull)
-                .anyMatch(Part::needsFixing);
+                .anyMatch(p -> !(p instanceof AmmoBin) && p.needsFixing());
     }
 
     @Override
@@ -218,7 +222,8 @@ public class PodSpace implements Serializable, IPartWork {
         boolean replacing = false;
         for (int id : childPartIds) {
             final Part part = campaign.getPart(id);
-            if (part != null && (isSalvaging() || part.needsFixing())) {
+            if (part != null && (isSalvaging() ||
+                    (!(part instanceof AmmoBin) && part.needsFixing()))) {
                 part.fail(rating);
                 replacing |= part instanceof MissingPart;
             }
@@ -247,7 +252,8 @@ public class PodSpace implements Serializable, IPartWork {
             final Part part = campaign.getPart(id);
             if (part != null) {
                 if ((isSalvaging() && !(part instanceof MissingPart))
-                        || (!isSalvaging() && (part instanceof MissingPart) || part.needsFixing())) {
+                        || (!isSalvaging() && (part instanceof MissingPart)
+                                || (!(part instanceof AmmoBin) && part.needsFixing()))) {
                     minSkill = Math.max(minSkill, part.getSkillMin());
                 }
             }
@@ -371,7 +377,7 @@ public class PodSpace implements Serializable, IPartWork {
         for (int id : childPartIds) {
             Part part = campaign.getPart(id);
             if (part != null) {
-                if (!isSalvaging() && part.needsFixing()) {
+                if (!isSalvaging() && !(part instanceof AmmoBin) && part.needsFixing()) {
                     allParts++;
                     MissingPart missing;
                     if (part instanceof MissingPart) {
