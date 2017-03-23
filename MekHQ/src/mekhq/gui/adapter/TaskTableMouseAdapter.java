@@ -36,8 +36,10 @@ import mekhq.MekHQ;
 import mekhq.campaign.event.PartChangedEvent;
 import mekhq.campaign.event.PartModeChangedEvent;
 import mekhq.campaign.event.UnitChangedEvent;
+import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.work.IPartWork;
 import mekhq.campaign.work.WorkTime;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.model.TaskTableModel;
@@ -140,34 +142,42 @@ public class TaskTableMouseAdapter extends MouseInputAdapter implements ActionLi
             if (row < 0) {
                 return;
             }
-            Part part = (Part)taskModel.getTaskAt(taskTable.convertRowIndexToModel(row));
+            IPartWork partWork = (IPartWork)taskModel.getTaskAt(taskTable.convertRowIndexToModel(row));
+            Part part = null;
+            if (partWork instanceof Part) {
+                part = (Part)partWork;
+            }
             JMenuItem menuItem = null;
             JMenu menu = null;
             JCheckBoxMenuItem cbMenuItem = null;
             // Mode (extra time, rush job, ...
             // dont allow automatic success jobs to change mode
-            if (part.getAllMods(null).getValue() != TargetRoll.AUTOMATIC_SUCCESS) {
-                menu = new JMenu("Mode");
-                for (WorkTime wt : WorkTime.DEFAULT_TIMES) {
-                    cbMenuItem = new JCheckBoxMenuItem(wt.name);
-                    if (part.getMode() == wt) {
-                        cbMenuItem.setSelected(true);
-                    } else {
-                        cbMenuItem.setActionCommand("CHANGE_MODE:" + wt.id);
-                        cbMenuItem.addActionListener(this);
+            // dont allow pod space or pod-mounted equipment to change mode when removing or replacing
+            if (part != null) {
+                if (partWork.getAllMods(null).getValue() != TargetRoll.AUTOMATIC_SUCCESS
+                        && (!part.isOmniPodded() || (!part.isSalvaging() && !(part instanceof MissingPart)))) {
+                    menu = new JMenu("Mode");
+                    for (WorkTime wt : WorkTime.DEFAULT_TIMES) {
+                        cbMenuItem = new JCheckBoxMenuItem(wt.name);
+                        if (partWork.getMode() == wt) {
+                            cbMenuItem.setSelected(true);
+                        } else {
+                            cbMenuItem.setActionCommand("CHANGE_MODE:" + wt.id);
+                            cbMenuItem.addActionListener(this);
+                        }
+                        cbMenuItem.setEnabled(!part.isBeingWorkedOn());
+                        menu.add(cbMenuItem);
                     }
-                    cbMenuItem.setEnabled(!part.isBeingWorkedOn());
-                    menu.add(cbMenuItem);
+                    popup.add(menu);
                 }
-                popup.add(menu);
-            }
-            // Scrap component
-            if (!part.canNeverScrap()) {
-                menuItem = new JMenuItem("Scrap component");
-                menuItem.setActionCommand("SCRAP");
-                menuItem.addActionListener(this);
-                menuItem.setEnabled(!part.isBeingWorkedOn());
-                popup.add(menuItem);
+                // Scrap component
+                if (!part.canNeverScrap()) {
+                    menuItem = new JMenuItem("Scrap component");
+                    menuItem.setActionCommand("SCRAP");
+                    menuItem.addActionListener(this);
+                    menuItem.setEnabled(!part.isBeingWorkedOn());
+                    popup.add(menuItem);
+                }
             }
 
             menu = new JMenu("GM Mode");
@@ -177,7 +187,7 @@ public class TaskTableMouseAdapter extends MouseInputAdapter implements ActionLi
             menuItem = new JMenuItem("Complete Task");
             menuItem.setActionCommand("FIX");
             menuItem.addActionListener(this);
-            menuItem.setEnabled(gui.getCampaign().isGM() && (null == part.checkFixable()));
+            menuItem.setEnabled(gui.getCampaign().isGM() && (null == partWork.checkFixable()));
             menu.add(menuItem);
 
             popup.show(e.getComponent(), e.getX(), e.getY());
