@@ -121,8 +121,7 @@ public class MissingAeroHeatSink extends MissingPart {
 
 	@Override
 	public String getLocationName() {
-		// TODO Auto-generated method stub
-		return null;
+		return "Fuselage";
 	}
 
 	@Override

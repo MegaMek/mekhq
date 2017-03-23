@@ -23,8 +23,11 @@ package mekhq.campaign.parts.equipment;
 
 import java.io.PrintWriter;
 
+import megamek.common.Aero;
 import megamek.common.AmmoType;
 import megamek.common.EquipmentType;
+import megamek.common.Jumpship;
+import megamek.common.SmallCraft;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.Part;
@@ -54,7 +57,36 @@ public class MissingAmmoBin extends MissingEquipmentPart {
         }
     }
 	
-	@Override
+    /* Per TM, ammo for fighters is stored in the fuselage. This makes a difference for omnifighter
+     * pod space, so we're going to stick them in LOC_NONE where the heat sinks are */ 
+    @Override
+    public String getLocationName() {
+        if (unit.getEntity() instanceof Aero
+                && !((unit.getEntity() instanceof SmallCraft) || (unit.getEntity() instanceof Jumpship))){
+            return "Fuselage";
+        }
+        return super.getLocationName();
+    }
+    
+    @Override
+    public int getLocation() {
+        if (unit.getEntity() instanceof Aero
+                && !((unit.getEntity() instanceof SmallCraft) || (unit.getEntity() instanceof Jumpship))){
+            return Aero.LOC_NONE;
+        }
+        return super.getLocation();
+    }
+    
+    @Override
+    public boolean isInLocation(String loc) {
+        if (unit.getEntity() instanceof Aero
+                && !((unit.getEntity() instanceof SmallCraft) || (unit.getEntity() instanceof Jumpship))){
+            return loc.equals("FSLG");
+        }
+        return super.isInLocation(loc);
+    }
+
+    @Override
 	public int getDifficulty() {
 		return -2;
 	}

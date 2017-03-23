@@ -66,6 +66,10 @@ public class PodSpace implements Serializable, IPartWork {
         this.location = location;
         this.unit = unit;
         this.campaign = unit.campaign;
+        //We don't need a LOC_WINGS podspace, but we do need one for the fuselage equipment, which is stored at LOC_NONE.
+        if (unit.getEntity() instanceof Aero && location == Aero.LOC_WINGS) {
+            this.location = -1;
+        }
     }
     
     @Override
@@ -132,7 +136,7 @@ public class PodSpace implements Serializable, IPartWork {
 
     @Override
     public String checkFixable() {
-        if(isSalvaging()) {
+        if(isSalvaging() || location < 0) {
             return null;
         }
         // The part is only fixable if the location is not destroyed.
@@ -165,7 +169,11 @@ public class PodSpace implements Serializable, IPartWork {
 
     public String getLocationName() {
         if (getUnit() != null) {
-            return getUnit().getEntity().getLocationName(location);
+            if (getUnit().getEntity() instanceof Aero && location == Entity.LOC_NONE) {
+                return "Fuselage";
+            } else {
+                return getUnit().getEntity().getLocationName(location);
+            }
         }
         return null;
     }

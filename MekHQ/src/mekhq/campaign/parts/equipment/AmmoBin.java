@@ -25,11 +25,17 @@ import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.HashSet;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import megamek.common.Aero;
 import megamek.common.AmmoType;
 import megamek.common.CriticalSlot;
 import megamek.common.EquipmentType;
+import megamek.common.Jumpship;
 import megamek.common.Mounted;
 import megamek.common.Protomech;
+import megamek.common.SmallCraft;
 import megamek.common.TargetRoll;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
@@ -42,9 +48,6 @@ import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Era;
 import mekhq.campaign.work.IAcquisitionWork;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  *
@@ -89,6 +92,35 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
         clone.shotsNeeded = this.shotsNeeded;
         clone.munition = this.munition;
         return clone;
+    }
+    
+    /* Per TM, ammo for fighters is stored in the fuselage. This makes a difference for omnifighter
+     * pod space, so we're going to stick them in LOC_NONE where the heat sinks are */ 
+    @Override
+    public String getLocationName() {
+        if (unit.getEntity() instanceof Aero
+                && !((unit.getEntity() instanceof SmallCraft) || (unit.getEntity() instanceof Jumpship))){
+            return "Fuselage";
+        }
+        return super.getLocationName();
+    }
+    
+    @Override
+    public int getLocation() {
+        if (unit.getEntity() instanceof Aero
+                && !((unit.getEntity() instanceof SmallCraft) || (unit.getEntity() instanceof Jumpship))){
+            return Aero.LOC_NONE;
+        }
+        return super.getLocation();
+    }
+    
+    @Override
+    public boolean isInLocation(String loc) {
+        if (unit.getEntity() instanceof Aero
+                && !((unit.getEntity() instanceof SmallCraft) || (unit.getEntity() instanceof Jumpship))){
+            return loc.equals("FSLG");
+        }
+        return super.isInLocation(loc);
     }
 
     @Override

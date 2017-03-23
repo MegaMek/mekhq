@@ -360,18 +360,6 @@ public class EquipmentPart extends Part {
 		return hits > 0;
 	}
 
-
-    @Override
-    public String getDetails() {
-    	if(null != unit) {
-			Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
-			if(null != mounted && mounted.getLocation() != -1) {
-				return unit.getEntity().getLocationName(mounted.getLocation()) + ", " + super.getDetails();
-			}
-    	}
-    	return super.getDetails();
-    }
-
     public int getLocation() {
     	if(null != unit) {
     		Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
@@ -707,7 +695,7 @@ public class EquipmentPart extends Part {
 		if(mounted.getLocation() == location) {
 			return true;
 		}
-		if(mounted.getSecondLocation() == location) {
+		if(location != Entity.LOC_NONE && mounted.getSecondLocation() == location) {
 			return true;
 		}
 		return false;

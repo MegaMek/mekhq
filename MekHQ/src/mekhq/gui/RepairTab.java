@@ -887,10 +887,15 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
             choiceLocation.removeAllItems();
             choiceLocation.addItem("All");
             for (String s : getSelectedServicedUnit().getEntity().getLocationAbbrs()) {
-                choiceLocation.addItem(s);
+                if (s.equals("WNG")) {
+                    choiceLocation.addItem("FSLG");
+                } else {
+                    choiceLocation.addItem(s);
+                }
             }
             if (getSelectedServicedUnit().getEntity().isOmni()) {
                 choiceLocation.addItem("OmniPod");
+                numLocations++;
             }
             choiceLocation.setSelectedIndex(0);
             if (index > -1 && choiceLocation.getModel().getSize() == numLocations) {

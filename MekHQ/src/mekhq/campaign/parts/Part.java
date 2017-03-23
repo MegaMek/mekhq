@@ -25,12 +25,14 @@ import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.StringJoiner;
 import java.util.UUID;
 
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.MiscType;
 import megamek.common.TargetRoll;
@@ -1012,10 +1014,15 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	
 	@Override
     public String getDetails() {
-	    if (isOmniPodded()) {
-	        return String.format("%d hit(s), OmniPod", hits);
+	    StringJoiner sj = new StringJoiner(", ");
+	    if (getLocationName() != null) {
+	        sj.add(getLocationName());
 	    }
-        return hits + " hit(s)";
+	    if (isOmniPodded()) {
+	        sj.add("OmniPod");
+	    }
+        sj.add(hits + " hit(s)");
+        return sj.toString();
     }
 
 	@Override
@@ -1315,9 +1322,13 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
     }
     
     public boolean isInLocation(String loc) {
-    	return null != unit 
-    		&& null != unit.getEntity() 
-    		&& getLocation() == getUnit().getEntity().getLocationFromAbbr(loc);
+        if (null == unit || null == unit.getEntity()) {
+            return false;
+        }
+        if (loc.equals("FSLG")) {
+            return getLocation() == Entity.LOC_NONE;
+        }
+    	return getLocation() == getUnit().getEntity().getLocationFromAbbr(loc);
     }
     
     @Override

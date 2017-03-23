@@ -248,8 +248,7 @@ public class AeroHeatSink extends Part {
 
     @Override
     public String getLocationName() {
-        // TODO Auto-generated method stub
-        return null;
+        return "Fuselage";
     }
 
     @Override
