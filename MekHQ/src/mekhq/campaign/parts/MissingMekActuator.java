@@ -64,7 +64,7 @@ public class MissingMekActuator extends MissingPart {
     
     @Override 
 	public int getBaseTime() {
-		return 90;
+		return isOmniPodded()? 30 : 90;
 	}
 	
 	@Override

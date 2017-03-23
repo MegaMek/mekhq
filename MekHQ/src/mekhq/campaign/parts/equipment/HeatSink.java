@@ -93,7 +93,7 @@ public class HeatSink extends EquipmentPart {
 	@Override 
 	public int getBaseTime() {
 		if(isSalvaging()) {
-			return 90;
+			return isOmniPodded()? 30 : 90;
 		}
 		return 120;
 	}
@@ -101,7 +101,7 @@ public class HeatSink extends EquipmentPart {
 	@Override
 	public int getDifficulty() {
 		if(isSalvaging()) {
-			return -2;
+			return isOmniPodded()? -4 : -2;
 		}
 		return -1;
 	}

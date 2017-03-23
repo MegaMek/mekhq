@@ -35,6 +35,7 @@ import org.w3c.dom.NodeList;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.MiscType;
+import megamek.common.Tank;
 import megamek.common.TargetRoll;
 import megamek.common.TechConstants;
 import megamek.common.WeaponType;
@@ -848,7 +849,12 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 
 	@Override
 	public TargetRoll getAllMods(Person tech) {
-		TargetRoll mods = new TargetRoll(getDifficulty(), "difficulty");
+	    int difficulty = getDifficulty();
+	    if (isOmniPodded() && (isSalvaging() || this instanceof MissingPart)
+	            && !(unit.getEntity() instanceof Tank)) {
+	        difficulty -= 2;
+	    }
+		TargetRoll mods = new TargetRoll(difficulty, "difficulty");
 		int modeMod = mode.getMod(campaign.getCampaignOptions().isDestroyByMargin());
 		if (modeMod != 0) {
 			mods.addModifier(modeMod, getCurrentModeName());

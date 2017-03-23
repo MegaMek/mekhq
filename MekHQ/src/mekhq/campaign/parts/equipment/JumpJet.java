@@ -117,7 +117,7 @@ public class JumpJet extends EquipmentPart {
 	@Override 
 	public int getBaseTime() {
 		if(isSalvaging()) {
-			return 60;
+			return isOmniPodded()? 30 : 60;
 		}
 		return 100;
 	}

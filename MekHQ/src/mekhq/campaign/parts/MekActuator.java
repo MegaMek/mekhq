@@ -235,7 +235,7 @@ public class MekActuator extends Part {
 	@Override 
 	public int getBaseTime() {
 		if(isSalvaging()) {
-			return 90;
+			return isOmniPodded()? 30 : 90;
 		}
 		return 120;
 	}

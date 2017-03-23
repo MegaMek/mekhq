@@ -95,6 +95,9 @@ public class AeroHeatSink extends Part {
     
     @Override 
     public int getBaseTime() {
+        if (isSalvaging() && isOmniPodded()) {
+            return 30;
+        }
         return 90;
     }
     

@@ -433,7 +433,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 	@Override
 	public int getBaseTime() {
 		if(isSalvaging()) {
-			return 120;
+			return isOmniPodded()? 30 : 120;
 		}
 		if(null != unit) {
 			Mounted mounted = unit.getEntity().getEquipment(equipmentNum);

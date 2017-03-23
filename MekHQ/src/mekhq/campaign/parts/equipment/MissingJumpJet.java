@@ -43,7 +43,7 @@ public class MissingJumpJet extends MissingEquipmentPart {
     
     @Override 
 	public int getBaseTime() {
-		return 60;
+		return isOmniPodded()? 30 : 60;
 	}
 	
 	@Override

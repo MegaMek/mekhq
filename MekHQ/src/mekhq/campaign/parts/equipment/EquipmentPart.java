@@ -25,6 +25,9 @@ import java.util.GregorianCalendar;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.common.Compute;
 import megamek.common.CriticalSlot;
 import megamek.common.Entity;
@@ -41,9 +44,6 @@ import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Era;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  * This part covers most of the equipment types in WeaponType, AmmoType, and MiscType
@@ -324,7 +324,7 @@ public class EquipmentPart extends Part {
 	@Override
 	public int getBaseTime() {
 		if(isSalvaging()) {
-			return 120;
+			return isOmniPodded()? 30 : 120;
 		}
 		if(hits == 1) {
 			return 100;

@@ -89,7 +89,7 @@ public class MissingEquipmentPart extends MissingPart {
 
     @Override
 	public int getBaseTime() {
-		return 120;
+		return isOmniPodded()? 30 : 120;
 	}
 
 	@Override
