@@ -157,6 +157,9 @@ public class PodSpace implements Serializable, IPartWork {
 
     @Override
     public int getDifficulty() {
+        if (unit.getEntity() instanceof Tank) {
+            return 0;
+        }
         return -2;
     }
 
