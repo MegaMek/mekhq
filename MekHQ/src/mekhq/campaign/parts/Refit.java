@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.UUID;
@@ -229,13 +228,17 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 		Unit newUnit = new Unit(newEntity, oldUnit.campaign);
 		newUnit.initializeParts(false);
 		refitClass = NO_CHANGE;
-		boolean isOmni = oldUnit.getEntity().isOmni();
+		boolean isOmniRefit = oldUnit.getEntity().isOmni() && newEntity.isOmni();
+		if (isOmniRefit && !Utilities.isOmniVariant(oldUnit.getEntity(), newEntity)) {
+            fixableString = "A unit loses omni capabilities if any fixed equipment is modified.";
+            return;
+		}
 		time = 0;
 		sameArmorType = newEntity.getArmorType(0) == oldUnit.getEntity().getArmorType(0);
 		int recycledArmorPoints = 0;
 		boolean replacingLocations = false;
 		boolean[] locationHasNewStuff = new boolean[newEntity.locations()];
-		Arrays.fill(locationHasNewStuff, Boolean.FALSE);
+		boolean[] locationLostOldStuff = new boolean[newEntity.locations()];
 		HashMap<AmmoType,Integer> ammoNeeded = new HashMap<AmmoType,Integer>();
 		HashMap<AmmoType,Integer> ammoRemoved = new HashMap<AmmoType,Integer>();
 		ArrayList<Part> newPartList = new ArrayList<Part>();
@@ -243,6 +246,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 		//Step 1: put all of the parts from the current unit into a new arraylist so they can
 		//be removed when we find a match.
 		for(Part p : oldUnit.getParts()) {
+		    if (!isOmniRefit || p.isOmniPodded())
 			oldUnitParts.add(p.getId());
 		}
 
@@ -258,6 +262,9 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 		//this to the newequipment arraylist from step 3.  Don't change anything in terms of refit
 		//stats yet, that will happen later.
 		for(Part part : newUnit.getParts()) {
+		    if (isOmniRefit && !part.isOmniPodded()) {
+		        continue;
+		    }
 			boolean partFound = false;
 			Part movedPart = null;
 			int moveIndex = 0;
@@ -265,6 +272,9 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 			for(int pid : oldUnitParts) {
 				Part oPart = oldUnit.campaign.getPart(pid);
 				i++;
+				if (isOmniRefit && !oPart.isOmniPodded()) {
+				    continue;
+				}
 				//FIXME: There have been instances of null oParts here. Save/load will fix these, but
 				//I would like to figure out the source. From experimentation, I think it has to do with
 				//cancelling a prior refit.
@@ -300,7 +310,8 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 			} else if(null != movedPart) {
 				newUnitParts.add(movedPart.getId());
 				oldUnitParts.remove(moveIndex);
-				if(isOmni && movedPart.isOmniPodded()) {
+                locationLostOldStuff[movedPart.getLocation()] = true;
+				if(isOmniRefit && movedPart.isOmniPodded()) {
 					updateRefitClass(CLASS_OMNI);
 				} else {
 					updateRefitClass(CLASS_C);
@@ -410,8 +421,8 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 					updateRefitClass(CLASS_F);
 				}
 				if(((MissingEnginePart)nPart).getEngine().getSideTorsoCriticalSlots().length > 0) {
-					locationHasNewStuff[Mech.LOC_LT] = true;
-					locationHasNewStuff[Mech.LOC_RT] = true;
+				    locationHasNewStuff[Mech.LOC_LT] = true;
+				    locationHasNewStuff[Mech.LOC_RT] = true;
 				}
 			} else if(nPart instanceof MissingMekGyro) {
 				updateRefitClass(CLASS_F);
@@ -429,7 +440,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 				updateRefitClass(CLASS_F);
 				locationHasNewStuff[Mech.LOC_HEAD] = true;
 			}else if(nPart instanceof MissingMekActuator) {
-				if(isOmni && nPart.isOmniPoddable()) {
+				if(isOmniRefit && nPart.isOmniPoddable()) {
 					updateRefitClass(CLASS_OMNI);
 				} else {
 					updateRefitClass(CLASS_D);
@@ -446,13 +457,13 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 					if(nPart instanceof MissingEquipmentPart) {
 						loc = ((MissingEquipmentPart)nPart).getLocation();
 						if(loc > -1 && loc < newEntity.locations()) {
-							locationHasNewStuff[loc] = true;
+						    locationHasNewStuff[loc] = true;
 						}
 						type = ((MissingEquipmentPart)nPart).getType();
 					} else {
 						loc = ((AmmoBin)nPart).getLocation();
 						if(loc > -1 && loc < newEntity.locations()) {
-							locationHasNewStuff[loc] = true;
+						    locationHasNewStuff[loc] = true;
 						}
 						type = ((AmmoBin)nPart).getType();
 					}
@@ -502,7 +513,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 							//don't break because we may find something better
 						}
 					}
-					if(isOmni && nPart.isOmniPoddable()) {
+					if(isOmniRefit && nPart.isOmniPoddable()) {
 						rClass = CLASS_OMNI;
 					}
 					updateRefitClass(rClass);
@@ -516,12 +527,17 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 		//if oldUnitParts is not empty we are removing some stuff and so this should
 		//be at least a Class A refit
 		if(!oldUnitParts.isEmpty()) {
-			updateRefitClass(CLASS_A);
+		    if (isOmniRefit) {
+		        updateRefitClass(CLASS_OMNI);
+		    } else {
+		        updateRefitClass(CLASS_A);
+		    }
 		}
 		
 		//Step 4: loop through remaining equipment on oldunit parts and add time for removing.
 		for(int pid : oldUnitParts) {
 			Part oPart = oldUnit.campaign.getPart(pid);
+			locationLostOldStuff[oPart.getLocation()] = true;
 			if(oPart instanceof MissingPart) {
 				continue;
 			}
@@ -588,7 +604,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 					&& !(newEntity.isClan() && newEntity instanceof Mech))
 					|| (newEntity instanceof Mech
 							&& ((Mech)newEntity).hasCASEII(loc) != ((Mech)oldUnit.getEntity()).hasCASEII(loc))) {
-				if(isOmni) {
+				if(isOmniRefit) {
 					updateRefitClass(CLASS_OMNI);
 				} else {
 					time += 60;
@@ -607,8 +623,8 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 		//TODO: some class D stuff is not omnipodable
 		if(refitClass == CLASS_OMNI) {
 			int nloc = 0;
-			for(boolean newStuff : locationHasNewStuff) {
-				if(newStuff) {
+			for(int loc = 0; loc < newEntity.locations(); loc++) {
+				if(locationHasNewStuff[loc] || locationLostOldStuff[loc]) {
 					nloc++;
 				}
 			}
