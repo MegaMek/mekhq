@@ -63,18 +63,27 @@ public class TaskTableMouseAdapter extends MouseInputAdapter implements ActionLi
         if (null == part) {
             return;
         }
+
+        int[] rows = taskTable.getSelectedRows();
+        Part[] parts = new Part[rows.length];
+        for (int i = 0; i < rows.length; i++) {
+            parts[i] = taskModel.getTaskAt(taskTable.convertRowIndexToModel(rows[i]));
+        }
+
         if (command.equalsIgnoreCase("SCRAP")) {
-            if (null != part.checkScrappable()) {
-                JOptionPane.showMessageDialog(gui.getFrame(), part.checkScrappable(), "Cannot scrap part",
-                        JOptionPane.ERROR_MESSAGE);
-                return;
+            for (Part p : parts) {
+                if (null != p.checkScrappable()) {
+                    JOptionPane.showMessageDialog(gui.getFrame(), p.checkScrappable(), "Cannot scrap part",
+                            JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                Unit u = p.getUnit();
+                gui.getCampaign().addReport(p.scrap());
+                if (null != u && !u.isRepairable() && u.getSalvageableParts().size() == 0) {
+                    gui.getCampaign().removeUnit(u.getId());
+                }
+                MekHQ.triggerEvent(new UnitChangedEvent(u));
             }
-            Unit u = part.getUnit();
-            gui.getCampaign().addReport(part.scrap());
-            if (null != u && !u.isRepairable() && u.getSalvageableParts().size() == 0) {
-                gui.getCampaign().removeUnit(u.getId());
-            }
-            MekHQ.triggerEvent(new UnitChangedEvent(u));
         } else if (command.contains("SWAP_AMMO")) {
             /*
              * WorkItem task =
@@ -90,8 +99,10 @@ public class TaskTableMouseAdapter extends MouseInputAdapter implements ActionLi
              */
         } else if (command.contains("CHANGE_MODE")) {
             String sel = command.split(":")[1];
-            part.setMode(WorkTime.of(sel));
-            MekHQ.triggerEvent(new PartModeChangedEvent(part));
+            for (Part p : parts) {
+                p.setMode(WorkTime.of(sel));
+                MekHQ.triggerEvent(new PartModeChangedEvent(p));
+            }
         } else if (command.contains("UNASSIGN")) {
             /*
              * for (WorkItem task : tasks) { task.resetTimeSpent();

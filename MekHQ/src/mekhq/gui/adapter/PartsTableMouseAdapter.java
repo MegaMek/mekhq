@@ -135,8 +135,10 @@ public class PartsTableMouseAdapter extends MouseInputAdapter implements ActionL
             }
         } else if (command.contains("CHANGE_MODE")) {
             String sel = command.split(":")[1];
-            selectedPart.setMode(WorkTime.of(sel));
-            MekHQ.triggerEvent(new PartModeChangedEvent(selectedPart));
+            for (Part p : parts) {
+                p.setMode(WorkTime.of(sel));
+                MekHQ.triggerEvent(new PartModeChangedEvent(p));
+            }
         } else if (command.contains("MASS_REPAIR")) {
             MassRepairSalvageDialog dlg = new MassRepairSalvageDialog(gui.getFrame(), true, gui,
                     MassRepairSalvageDialog.MODE.WAREHOUSE);
