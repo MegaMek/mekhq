@@ -1,5 +1,6 @@
 package mekhq.gui.dialog;
 
+import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -16,7 +17,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
-import java.util.stream.Collectors;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
@@ -51,12 +51,15 @@ import mekhq.campaign.force.Force;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.MekLocation;
 import mekhq.campaign.parts.MissingMekLocation;
+import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.PodSpace;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.work.IPartWork;
 import mekhq.campaign.work.WorkTime;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.model.PartsTableModel;
@@ -105,6 +108,7 @@ public class MassRepairSalvageDialog extends JDialog {
 	private JCheckBox optimizeToCompleteTodayBox;
 	private JCheckBox scrapImpossibleBox;
 	private JCheckBox useAssignedTechsFirstBox;
+	private JCheckBox replacePodPartsBox;
 
 	private Map<Integer, MassRepairOptionControl> massRepairOptionControlMap = null;
 
@@ -264,7 +268,7 @@ public class MassRepairSalvageDialog extends JDialog {
 		int quantity = 0;
 
 		for (Part part : completePartsList) {
-			int partType = Part.findCorrectMassRepairType(part);
+			int partType = IPartWork.findCorrectMassRepairType(part);
 
 			if (activeMROMap.containsKey(partType)) {
 				filteredPartsList.add(part);
@@ -292,7 +296,7 @@ public class MassRepairSalvageDialog extends JDialog {
 		}
 
 		final Container content = getContentPane();
-		content.setLayout(new GridBagLayout());
+		content.setLayout(new BorderLayout());
 
 		JPanel pnlMain = new JPanel();
 		pnlMain.setLayout(new GridBagLayout());
@@ -307,8 +311,8 @@ public class MassRepairSalvageDialog extends JDialog {
 
 		pnlMain.add(createOptionsPanel(resourceMap), createBaseConstraints(2));
 
-		content.add(pnlMain, createBaseConstraints(0));
-		content.add(createActionButtons(), createBaseConstraints(1));
+		content.add(new JScrollPane(pnlMain), BorderLayout.CENTER);
+		content.add(createActionButtons(), BorderLayout.SOUTH);
 
 		pack();
 	}
@@ -320,7 +324,7 @@ public class MassRepairSalvageDialog extends JDialog {
 		gridBagConstraints.gridy = rowIdx;
 		gridBagConstraints.weightx = 1;
 		gridBagConstraints.weighty = 1;
-		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 
 		return gridBagConstraints;
@@ -524,6 +528,18 @@ public class MassRepairSalvageDialog extends JDialog {
 			gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
 			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 			pnlOptions.add(scrapImpossibleBox, gridBagConstraints);
+
+            replacePodPartsBox = new JCheckBox();
+            replacePodPartsBox.setText(resourceMap.getString("replacePodPartsBox.text"));
+            replacePodPartsBox.setToolTipText(resourceMap.getString("replacePodPartsBox.toolTipText"));
+            replacePodPartsBox.setName("replacePodParts");
+            replacePodPartsBox.setSelected(campaignOptions.massRepairReplacePod());
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = gridRowIdx++;
+            gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+            gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+            pnlOptions.add(replacePodPartsBox, gridBagConstraints);
 		}
 
 		JPanel pnlItems = new JPanel(new GridBagLayout());
@@ -624,15 +640,21 @@ public class MassRepairSalvageDialog extends JDialog {
 		massRepairOptionControlMap.put(Part.REPAIR_PART_TYPE.ACTUATOR,
 				createMassRepairOptionControls(Part.REPAIR_PART_TYPE.ACTUATOR, "Repair/Salvage Actuators",
 						"Allow mass repair/salvage of actuators", "massRepairItemActuators", pnlItems, rowIdx++));
-		massRepairOptionControlMap.put(Part.REPAIR_PART_TYPE.ELECTRONICS,
-				createMassRepairOptionControls(Part.REPAIR_PART_TYPE.ELECTRONICS,
-						"Repair/Salvage Cockpits/Sensors/Life Support",
-						"Allow mass repair/salvage of cockpits, life support, and sensors", "massRepairItemHead",
-						pnlItems, rowIdx++));
-		massRepairOptionControlMap.put(Part.REPAIR_PART_TYPE.GENERAL,
-				createMassRepairOptionControls(Part.REPAIR_PART_TYPE.GENERAL, "Repair/Salvage Other",
-						"Allow mass repair/salvage of items which do not fall into the specific categories",
-						"massRepairItemOther", pnlItems, rowIdx++));
+        massRepairOptionControlMap.put(Part.REPAIR_PART_TYPE.ELECTRONICS,
+                createMassRepairOptionControls(Part.REPAIR_PART_TYPE.ELECTRONICS,
+                        "Repair/Salvage Cockpits/Sensors/Life Support",
+                        "Allow mass repair/salvage of cockpits, life support, and sensors", "massRepairItemHead",
+                        pnlItems, rowIdx++));
+        massRepairOptionControlMap.put(Part.REPAIR_PART_TYPE.GENERAL,
+                createMassRepairOptionControls(Part.REPAIR_PART_TYPE.GENERAL, "Repair/Salvage Other",
+                        "Allow mass repair/salvage of items which do not fall into the specific categories",
+                        "massRepairItemOther", pnlItems, rowIdx++));
+        massRepairOptionControlMap.put(Part.REPAIR_PART_TYPE.POD_SPACE,
+                createMassRepairOptionControls(Part.REPAIR_PART_TYPE.POD_SPACE,
+                        "Replace/Salvage OmniPod Equipment",
+                        "All pod-mounted equipment will be replaced or salvaged regardless of other categories selected", "massRepairItemPod",
+                        pnlItems, rowIdx++));
+		
 
 		return pnlOptions;
 	}
@@ -1089,7 +1111,7 @@ public class MassRepairSalvageDialog extends JDialog {
 		for (int i = 0; i < MassRepairOption.VALID_REPAIR_TYPES.length; i++) {
 			int type = MassRepairOption.VALID_REPAIR_TYPES[i];
 
-			MassRepairOptionControl mroc = massRepairOptionControlMap.get(i);
+			MassRepairOptionControl mroc = massRepairOptionControlMap.get(type);
 
 			if ((null == mroc) || !mroc.activeBox.isSelected()) {
 				continue;
@@ -1169,7 +1191,7 @@ public class MassRepairSalvageDialog extends JDialog {
 				return;
 			}
 
-			List<Part> parts = new ArrayList<Part>();
+			List<IPartWork> parts = new ArrayList<IPartWork>();
 
 			for (int i = 0; i < selectedRows.length; i++) {
 				int rowIdx = partsTable.convertRowIndexToModel(selectedRows[i]);
@@ -1368,10 +1390,7 @@ public class MassRepairSalvageDialog extends JDialog {
 		int totalActionsPerformed = 0;
 		String actionDescriptor = salvaging ? "salvage" : "repair";
 
-		//TODO: support omni pod work in MRMS
-		List<Part> parts = campaignGUI.getCampaign().getPartsNeedingServiceFor(unit.getId())
-		        .stream().filter(pw -> pw instanceof Part).map(pw -> (Part)pw).collect(Collectors.toList());
-
+		List<IPartWork> parts = campaignGUI.getCampaign().getPartsNeedingServiceFor(unit.getId());
 		/*
 		 * If we're repairing a unit and we allow auto-scrapping of parts that
 		 * can't be fixed by an elite tech, let's first get rid of those parts
@@ -1380,17 +1399,35 @@ public class MassRepairSalvageDialog extends JDialog {
 		if (configuredOptions.isScrapImpossible() && !salvaging) {
 			boolean refreshParts = false;
 
-			for (Part part : parts) {
-				if (part.getSkillMin() > SkillType.EXP_ELITE) {
-					campaign.addReport(part.scrap());
+			for (IPartWork partWork : parts) {
+				if (partWork instanceof Part && partWork.getSkillMin() > SkillType.EXP_ELITE) {
+					campaign.addReport(((Part)partWork).scrap());
 					refreshParts = true;
 				}
 			}
 
 			if (refreshParts) {
-		        parts = campaignGUI.getCampaign().getPartsNeedingServiceFor(unit.getId())
-		                .stream().filter(pw -> pw instanceof Part).map(pw -> (Part)pw).collect(Collectors.toList());
+		        parts = campaignGUI.getCampaign().getPartsNeedingServiceFor(unit.getId());
 			}
+		}
+		
+		if (unit.getEntity().isOmni() && !unit.isSalvage()) {
+		    for (PodSpace ps : unit.getPodSpace()) {
+		        ps.setRepairInPlace(!configuredOptions.isReplacePodParts());
+		    }
+		    //If we're replacing damaged parts, we want to remove any that have an available replacement
+		    //from the list since the pod space repair will cover it.
+		    List<IPartWork> temp = new ArrayList<>();
+		    for (IPartWork p : parts) {
+		        if (p instanceof Part) {
+		            MissingPart m = ((Part)p).getMissingPart();
+		            if (m != null && m.isReplacementAvailable()) {
+		                continue;
+		            }
+		        }
+		        temp.add(p);
+		    }
+		    parts = temp;
 		}
 
 		if (techs.isEmpty()) {
@@ -1419,11 +1456,11 @@ public class MassRepairSalvageDialog extends JDialog {
 		if ((unit.getEntity() instanceof Mech) && !salvaging) {
 			Map<Integer, Part> locationMap = new HashMap<Integer, Part>();
 
-			for (Part part : parts) {
-				if ((part instanceof MekLocation) && part.onBadHipOrShoulder()) {
-					locationMap.put(((MekLocation) part).getLoc(), part);
-				} else if (part instanceof MissingMekLocation) {
-					locationMap.put(((MissingMekLocation) part).getLoc(), part);
+			for (IPartWork partWork : parts) {
+				if ((partWork instanceof MekLocation) && ((MekLocation)partWork).onBadHipOrShoulder()) {
+					locationMap.put(partWork.getLocation(), (MekLocation)partWork);
+				} else if (partWork instanceof MissingMekLocation) {
+					locationMap.put(partWork.getLocation(), (MissingMekLocation)partWork);
 				}
 			}
 
@@ -1445,25 +1482,24 @@ public class MassRepairSalvageDialog extends JDialog {
 				scrappingLimbMode = true;
 				unit.setSalvage(true);
 
-				List<Part> partsTemp = campaignGUI.getCampaign().getPartsNeedingServiceFor(unit.getId())
-                        .stream().filter(pw -> pw instanceof Part).map(pw -> (Part)pw).collect(Collectors.toList());
-				List<Part> partsToBeRemoved = new ArrayList<Part>();
+				List<IPartWork> partsTemp = campaignGUI.getCampaign().getPartsNeedingServiceFor(unit.getId());
+				List<IPartWork> partsToBeRemoved = new ArrayList<IPartWork>();
 				Map<Integer, Integer> countOfPartsPerLocation = new HashMap<Integer, Integer>();
 
-				for (Part part : partsTemp) {
-					if (!(part instanceof MekLocation) && !(part instanceof MissingMekLocation)
-							&& locationMap.containsKey(part.getLocation()) && part.isSalvaging()) {
-						partsToBeRemoved.add(part);
+				for (IPartWork partWork : partsTemp) {
+					if (!(partWork instanceof MekLocation) && !(partWork instanceof MissingMekLocation)
+							&& locationMap.containsKey(partWork.getLocation()) && partWork.isSalvaging()) {
+						partsToBeRemoved.add(partWork);
 
 						int count = 0;
 
-						if (countOfPartsPerLocation.containsKey(part.getLocation())) {
-							count = countOfPartsPerLocation.get(part.getLocation());
+						if (countOfPartsPerLocation.containsKey(partWork.getLocation())) {
+							count = countOfPartsPerLocation.get(partWork.getLocation());
 						}
 
 						count++;
 
-						countOfPartsPerLocation.put(part.getLocation(), count);
+						countOfPartsPerLocation.put(partWork.getLocation(), count);
 					}
 				}
 
@@ -1483,8 +1519,7 @@ public class MassRepairSalvageDialog extends JDialog {
 					scrappingLimbMode = false;
 					unit.setSalvage(false);
 
-	                parts = campaignGUI.getCampaign().getPartsNeedingServiceFor(unit.getId())
-	                        .stream().filter(pw -> pw instanceof Part).map(pw -> (Part)pw).collect(Collectors.toList());
+	                parts = campaignGUI.getCampaign().getPartsNeedingServiceFor(unit.getId());
 				} else {
 					for (int locId : countOfPartsPerLocation.keySet()) {
 						boolean unfixable = false;
@@ -1540,7 +1575,7 @@ public class MassRepairSalvageDialog extends JDialog {
 			return totalActionsPerformed;
 		}
 
-		for (Part part : parts) {
+		for (IPartWork partWork : parts) {
 			if (techs.isEmpty()) {
 				campaign.addReport(
 						String.format("Unable to %s any more parts from %s because there are no available techs.",
@@ -1550,7 +1585,7 @@ public class MassRepairSalvageDialog extends JDialog {
 
 			// Search the list of techs each time for a variety of checks. We'll
 			// create a temporary truncated list of techs
-			if (repairPart(campaignGUI, part, unit, techs, mroByTypeMap, configuredOptions, false)) {
+			if (repairPart(campaignGUI, partWork, unit, techs, mroByTypeMap, configuredOptions, false)) {
 				totalActionsPerformed++;
 			}
 		}
@@ -1562,7 +1597,7 @@ public class MassRepairSalvageDialog extends JDialog {
 		return totalActionsPerformed;
 	}
 
-	private int performWarehouseMassRepair(List<Part> selectedParts, List<MassRepairOption> mroList,
+	private int performWarehouseMassRepair(List<IPartWork> selectedParts, List<MassRepairOption> mroList,
 			MassRepairConfiguredOptions configuredOptions) {
 		Campaign campaign = campaignGUI.getCampaign();
 
@@ -1586,13 +1621,14 @@ public class MassRepairSalvageDialog extends JDialog {
 			 * or those that meet our criteria as defined in the campaign
 			 * configurations
 			 */
-			List<Part> parts = filterParts(selectedParts, mroByTypeMap);
+			List<IPartWork> parts = filterParts(selectedParts, mroByTypeMap);
 
 			if (parts.isEmpty()) {
 				return totalActionsPerformed;
 			}
 
-			for (Part part : parts) {
+			for (IPartWork partWork : parts) {
+			    Part part = (Part)partWork;
 				if (techs.isEmpty()) {
 					campaign.addReport("Unable to repair any more parts because there are no available techs.");
 					continue;
@@ -1611,11 +1647,11 @@ public class MassRepairSalvageDialog extends JDialog {
 		return totalActionsPerformed;
 	}
 
-	private static boolean repairPart(CampaignGUI campaignGUI, Part part, Unit unit, List<Person> techs,
+	private static boolean repairPart(CampaignGUI campaignGUI, IPartWork partWork, Unit unit, List<Person> techs,
 			Map<Integer, MassRepairOption> mroByTypeMap, MassRepairConfiguredOptions configuredOptions,
 			boolean warehouseMode) {
 		Map<String, WorkTime> techToWorktimeMap = new HashMap<String, WorkTime>();
-		int modePenalty = part.getMode().expReduction;
+		int modePenalty = partWork.getMode().expReduction;
 		Campaign campaign = campaignGUI.getCampaign();
 		List<Person> sameDayTechs = new ArrayList<Person>();
 		List<Person> overflowDayTechs = new ArrayList<Person>();
@@ -1628,16 +1664,18 @@ public class MassRepairSalvageDialog extends JDialog {
 			 * necessary
 			 */
 			WorkTime selectedWorktime = WorkTime.NORMAL;
-			part.setMode(WorkTime.of(selectedWorktime.id));
+			if (partWork instanceof Part) {
+			    ((Part)partWork).setMode(WorkTime.of(selectedWorktime.id));
+			}
 
 			Person tech = techs.get(i);
 
-			if (warehouseMode && !tech.isRightTechTypeFor(part)) {
+			if (warehouseMode && !tech.isRightTechTypeFor(partWork)) {
 				continue;
 			}
 
-			Skill skill = tech.getSkillForWorkingOn(part);
-			MassRepairOption mro = mroByTypeMap.get(Part.findCorrectMassRepairType(part));
+			Skill skill = tech.getSkillForWorkingOn(partWork);
+			MassRepairOption mro = mroByTypeMap.get(IPartWork.findCorrectMassRepairType(partWork));
 
 			if (null == mro) {
 				continue;
@@ -1655,7 +1693,7 @@ public class MassRepairSalvageDialog extends JDialog {
 				continue;
 			}
 
-			if (part.getSkillMin() > (skill.getExperienceLevel() - modePenalty)) {
+			if (partWork.getSkillMin() > (skill.getExperienceLevel() - modePenalty)) {
 				continue;
 			}
 
@@ -1664,7 +1702,7 @@ public class MassRepairSalvageDialog extends JDialog {
 			}
 
 			// Check if we can actually even repair this part
-			TargetRoll targetRoll = campaign.getTargetFor(part, tech);
+			TargetRoll targetRoll = campaign.getTargetFor(partWork, tech);
 
 			if ((targetRoll.getValue() == TargetRoll.IMPOSSIBLE) || (targetRoll.getValue() == TargetRoll.AUTOMATIC_FAIL)
 					|| (targetRoll.getValue() == TargetRoll.CHECK_FALSE)) {
@@ -1677,7 +1715,7 @@ public class MassRepairSalvageDialog extends JDialog {
 					continue;
 				}
 
-				WorkTime newWorkTime = calculateNewMassRepairWorktime(part, tech, mro, campaign, true);
+				WorkTime newWorkTime = calculateNewMassRepairWorktime(partWork, tech, mro, campaign, true);
 
 				if (null == newWorkTime) {
 					continue;
@@ -1687,7 +1725,7 @@ public class MassRepairSalvageDialog extends JDialog {
 			} else if (targetRoll.getValue() < mro.getBthMax()) {
 				// Or decrease the time to meet the max BTH
 				if (configuredOptions.isUseRushJob()) {
-					WorkTime newWorkTime = calculateNewMassRepairWorktime(part, tech, mro, campaign, false);
+					WorkTime newWorkTime = calculateNewMassRepairWorktime(partWork, tech, mro, campaign, false);
 
 					// This should never happen, but...
 					if (null != newWorkTime) {
@@ -1718,7 +1756,7 @@ public class MassRepairSalvageDialog extends JDialog {
 
 			boolean isSameDayTech = false;
 
-			if ((tech.getMinutesLeft() < part.getActualTime())) {
+			if ((tech.getMinutesLeft() < partWork.getActualTime())) {
 				if (!configuredOptions.isAllowCarryover()) {
 					continue;
 				}
@@ -1750,14 +1788,16 @@ public class MassRepairSalvageDialog extends JDialog {
 
 			techToWorktimeMap.put(tech.getId().toString(), selectedWorktime);
 
-			part.setMode(WorkTime.of(WorkTime.NORMAL.id));
+			if (partWork instanceof Part) {
+			    ((Part)partWork).setMode(WorkTime.of(WorkTime.NORMAL.id));
+			}
 		}
 
 		if (overflowDayTechs.isEmpty() && sameDayTechs.isEmpty()) {
 			return false;
 		}
 
-		TechSorter sorter = new TechSorter(part);
+		TechSorter sorter = new TechSorter(partWork);
 
 		if (!overflowDayTechs.isEmpty()) {
 			Collections.sort(overflowDayTechs, sorter);
@@ -1785,14 +1825,16 @@ public class MassRepairSalvageDialog extends JDialog {
 		
 		//campaign.addReport(String.format("... first tech -> %s", tech.getName()));
 		
-		WorkTime wt = techToWorktimeMap.get(tech.getId().toString());
-
-		part.setMode(wt);
+		if (partWork instanceof Part) {
+    		WorkTime wt = techToWorktimeMap.get(tech.getId().toString());
+    
+    		((Part)partWork).setMode(wt);
+		}
 
 		if (warehouseMode) {
-			campaign.fixWarehousePart(part, tech);
+			campaign.fixWarehousePart((Part)partWork, tech);
 		} else {
-			campaign.fixPart(part, tech);
+			campaign.fixPart(partWork, tech);
 		}
 
 		// If this tech has no time left, filter them out so we don't
@@ -1806,21 +1848,21 @@ public class MassRepairSalvageDialog extends JDialog {
 		return true;
 	}
 
-	private static List<Part> filterParts(List<Part> parts, Map<Integer, MassRepairOption> mroByTypeMap) {
-		List<Part> newParts = new ArrayList<Part>();
+	private static List<IPartWork> filterParts(List<IPartWork> parts, Map<Integer, MassRepairOption> mroByTypeMap) {
+		List<IPartWork> newParts = new ArrayList<IPartWork>();
 
-		for (Part part : parts) {
-			if (!part.isBeingWorkedOn()) {
-				int repairType = Part.findCorrectMassRepairType(part);
+		for (IPartWork partWork : parts) {
+			if (!partWork.isBeingWorkedOn()) {
+				int repairType = IPartWork.findCorrectMassRepairType(partWork);
 
 				MassRepairOption mro = mroByTypeMap.get(repairType);
 
 				if ((null != mro) && mro.isActive()) {
-					if (!checkArmorSupply(part)) {
+					if (!checkArmorSupply(partWork)) {
 						continue;
 					}
 
-					newParts.add(part);
+					newParts.add(partWork);
 				}
 			}
 		}
@@ -1828,7 +1870,7 @@ public class MassRepairSalvageDialog extends JDialog {
 		return newParts;
 	}
 
-	private static boolean checkArmorSupply(Part part) {
+	private static boolean checkArmorSupply(IPartWork part) {
 		if (part.isSalvaging()) {
 			return true;
 		}
@@ -1840,7 +1882,7 @@ public class MassRepairSalvageDialog extends JDialog {
 		return true;
 	}
 
-	private static WorkTime calculateNewMassRepairWorktime(Part part, Person tech, MassRepairOption mro,
+	private static WorkTime calculateNewMassRepairWorktime(IPartWork part, Person tech, MassRepairOption mro,
 			Campaign campaign, boolean increaseTime) {
 		WorkTime newWorkTime = part.getMode();
 		WorkTime previousNewWorkTime = newWorkTime;
@@ -1858,7 +1900,9 @@ public class MassRepairSalvageDialog extends JDialog {
 				}
 			}
 
-			part.setMode(newWorkTime);
+			if (part instanceof Part) {
+			    ((Part)part).setMode(newWorkTime);
+			}
 
 			targetRoll = campaign.getTargetFor(part, tech);
 
@@ -1891,13 +1935,14 @@ public class MassRepairSalvageDialog extends JDialog {
 
 		if (!isModeWarehouse()) {
 			campaignOptions.setMassRepairScrapImpossible(scrapImpossibleBox.isSelected());
-			campaignOptions.setMassRepairUseAssignedTechsFirst(useAssignedTechsFirstBox.isSelected());
+            campaignOptions.setMassRepairUseAssignedTechsFirst(useAssignedTechsFirstBox.isSelected());
+            campaignOptions.setMassRepairReplacePod(replacePodPartsBox.isSelected());
 		}
 
 		for (int i = 0; i < MassRepairOption.VALID_REPAIR_TYPES.length; i++) {
 			int type = MassRepairOption.VALID_REPAIR_TYPES[i];
 
-			MassRepairOptionControl mroc = massRepairOptionControlMap.get(i);
+			MassRepairOptionControl mroc = massRepairOptionControlMap.get(type);
 
 			if (null == mroc) {
 				continue;
@@ -1935,6 +1980,7 @@ public class MassRepairSalvageDialog extends JDialog {
 		private boolean optimizeToCompleteToday;
 		private boolean useAssignedTechsFirst;
 		private boolean scrapImpossible;
+		private boolean replacePodParts;
 
 		public boolean isUseExtraTime() {
 			return useExtraTime;
@@ -1983,6 +2029,14 @@ public class MassRepairSalvageDialog extends JDialog {
 		public void setScrapImpossible(boolean scrapImpossible) {
 			this.scrapImpossible = scrapImpossible;
 		}
+		
+		public boolean isReplacePodParts() {
+		    return replacePodParts;
+		}
+		
+		public void setReplacePodParts(boolean replacePodParts) {
+		    this.replacePodParts = replacePodParts;
+		}
 
 		public void setup(CampaignOptions options) {
 			setUseExtraTime(options.massRepairUseExtraTime());
@@ -1991,6 +2045,7 @@ public class MassRepairSalvageDialog extends JDialog {
 			setOptimizeToCompleteToday(options.massRepairOptimizeToCompleteToday());
 			setScrapImpossible(options.massRepairScrapImpossible());
 			setUseAssignedTechsFirst(options.massRepairUseAssignedTechsFirst());
+			setReplacePodParts(options.massRepairReplacePod());
 		}
 
 		public void setup(MassRepairSalvageDialog dlg) {
@@ -2006,14 +2061,18 @@ public class MassRepairSalvageDialog extends JDialog {
 			if (null != dlg.useAssignedTechsFirstBox) {
 				setUseAssignedTechsFirst(dlg.useAssignedTechsFirstBox.isSelected());
 			}
+			
+			if (null != dlg.replacePodPartsBox) {
+			    setReplacePodParts(dlg.replacePodPartsBox.isSelected());
+			}
 		}
 	}
 
 	private static class TechSorter implements Comparator<Person> {
-		private Part part = null;
+		private IPartWork partWork = null;
 
-		public TechSorter(Part _part) {
-			this.part = _part;
+		public TechSorter(IPartWork _part) {
+			this.partWork = _part;
 		}
 
 		@Override
@@ -2025,8 +2084,8 @@ public class MassRepairSalvageDialog extends JDialog {
 			 * put the one with the lesser XP in the front.
 			 */
 
-			Skill skill1 = tech1.getSkillForWorkingOn(part);
-			Skill skill2 = tech2.getSkillForWorkingOn(part);
+			Skill skill1 = tech1.getSkillForWorkingOn(partWork);
+			Skill skill2 = tech2.getSkillForWorkingOn(partWork);
 
 			if (skill1.getExperienceLevel() == skill2.getExperienceLevel()) {
 				if (tech1.getXp() == tech2.getXp()) {

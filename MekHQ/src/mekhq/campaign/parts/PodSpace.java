@@ -59,6 +59,8 @@ public class PodSpace implements Serializable, IPartWork {
     protected boolean workingOvertime = false;
     protected int shorthandedMod = 0;
     
+    protected boolean repairInPlace = false;
+    
     public PodSpace() {
         this(Entity.LOC_NONE, null);
     }
@@ -118,15 +120,15 @@ public class PodSpace implements Serializable, IPartWork {
             final Part part = campaign.getPart(pid);
             if (part != null && !(part instanceof MissingPart)
                     && !(part instanceof AmmoBin)
-                    && part.needsFixing()) {
+                    && part.needsFixing()
+                    && !repairInPlace) {
                 part.remove(true);
             }
         }
         updateConditionFromEntity(false);
         for (int pid : childPartIds) {
             final Part part = campaign.getPart(pid);
-            if (part != null && part.needsFixing()
-                    && !(part instanceof AmmoBin)) {
+            if (part != null && part instanceof MissingPart) {
                 part.fix();
             }
         }
@@ -151,6 +153,33 @@ public class PodSpace implements Serializable, IPartWork {
             }
             if (unit.isLocationDestroyed(location)) {
                 return unit.getEntity().getLocationName(location) + " is destroyed.";
+            }
+            if (repairInPlace) {
+                for (int id : childPartIds) {
+                    final Part p = unit.campaign.getPart(id);
+                    if (p != null && p instanceof MissingPart) {
+                        return null;
+                    }
+                }
+                return unit.getEntity().getLocationName(location) + " is not missing any pod-mounted equipment.";
+            } else {
+                for (int id : childPartIds) {
+                    final Part p = unit.campaign.getPart(id);
+                    if (p == null || !p.needsFixing()) {
+                        continue;
+                    }
+                    MissingPart missing = null;
+                    if (p instanceof MissingPart) {
+                        missing = (MissingPart)p;
+                    } else {
+                        missing = p.getMissingPart();
+                    }
+                    if (missing.isReplacementAvailable()) {
+                        return null;
+                    }
+                }
+                return "There are no replacement parts available for "
+                    + unit.getEntity().getLocationName(location) + ".";
             }
         }
         return null;
@@ -206,9 +235,6 @@ public class PodSpace implements Serializable, IPartWork {
         if (isSalvaging()) {
             remove(true);
             return " <font color='green'><b> removed.</b></font>";
-        } else if (isReconfiguring()) {
-            fix();
-            return " <font color='green'><b> reconfigured.</b></font>";            
         } else {
             fix();
             return " <font color='green'><b> fixed.</b></font>";
@@ -238,6 +264,11 @@ public class PodSpace implements Serializable, IPartWork {
     @Override
     public UUID getTeamId() {
         return teamId;
+    }
+    
+    @Override
+    public boolean isBeingWorkedOn() {
+        return teamId != null;
     }
 
     @Override
@@ -344,8 +375,6 @@ public class PodSpace implements Serializable, IPartWork {
         String action = "Replace ";
         if(isSalvaging()) {
             action = "Salvage ";
-        } else if (isReconfiguring()) {
-            action = "Reconfigure ";
         }
         String scheduled = "";
         if (getTeamId() != null) {
@@ -426,8 +455,12 @@ public class PodSpace implements Serializable, IPartWork {
         return false;
     }
     
-    public boolean isReconfiguring() {
-        return false;
+    public boolean shouldRepairInPlace() {
+        return repairInPlace;
+    }
+    
+    public void setRepairInPlace(boolean repairInPlace) {
+        this.repairInPlace = repairInPlace;
     }
     
     public boolean hasSalvageableParts() {

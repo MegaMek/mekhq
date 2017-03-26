@@ -23,8 +23,13 @@ package mekhq.campaign.work;
 
 import java.util.UUID;
 
+import megamek.common.MiscType;
 import megamek.common.TargetRoll;
+import megamek.common.WeaponType;
 import mekhq.campaign.parts.MissingPart;
+import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.equipment.EquipmentPart;
+import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.unit.Unit;
 
 public interface IPartWork extends IWork {
@@ -58,6 +63,7 @@ public interface IPartWork extends IWork {
     
     String getDesc();
     String getDetails();
+    int getLocation();
     
     Unit getUnit();
     
@@ -67,7 +73,29 @@ public interface IPartWork extends IWork {
     
     void reservePart();
     void cancelReservation();
+    boolean isBeingWorkedOn();
     
     int getMassRepairOptionType();
     int getRepairPartType();
+    
+    public static int findCorrectMassRepairType(IPartWork part) {
+        if (part instanceof EquipmentPart && ((EquipmentPart)part).getType() instanceof WeaponType) {
+            return Part.REPAIR_PART_TYPE.WEAPON;
+        } else {            
+            return part.getMassRepairOptionType();
+        }
+    }
+    
+    public static int findCorrectRepairType(IPartWork part) {
+        if ((part instanceof EquipmentPart && ((EquipmentPart)part).getType() instanceof WeaponType) ||
+                (part instanceof MissingEquipmentPart && ((MissingEquipmentPart)part).getType() instanceof WeaponType)) {
+            return Part.REPAIR_PART_TYPE.WEAPON;
+        } else {
+            if (part instanceof EquipmentPart && ((EquipmentPart)part).getType().hasFlag(MiscType.F_CLUB)) {
+                return Part.REPAIR_PART_TYPE.PHYSICAL_WEAPON;
+            }
+            
+            return part.getRepairPartType();
+        }
+    }
 }

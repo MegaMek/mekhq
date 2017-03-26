@@ -34,7 +34,6 @@ import org.w3c.dom.NodeList;
 
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
-import megamek.common.MiscType;
 import megamek.common.Tank;
 import megamek.common.TargetRoll;
 import megamek.common.TechConstants;
@@ -844,7 +843,9 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	}
 
 	public void setMode(WorkTime wt) {
-		this.mode = wt;
+	    if (!isOmniPodded()) {
+	        this.mode = wt;
+	    }
 	}
 
 	@Override
@@ -1259,8 +1260,6 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 
     public abstract String getLocationName();
 
-    public abstract int getLocation();
-    
     public void setParentPartId(int id) {
     	parentPartId = id;
     }
@@ -1381,31 +1380,10 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
     			return "Other Items";
 		}
 	}
-	
-	public static int findCorrectMassRepairType(Part part) {
-		if (part instanceof EquipmentPart && ((EquipmentPart)part).getType() instanceof WeaponType) {
-			return Part.REPAIR_PART_TYPE.WEAPON;
-		} else {			
-			return part.getMassRepairOptionType();
-		}
-	}
-	
-	public static int findCorrectRepairType(IPartWork part) {
-		if ((part instanceof EquipmentPart && ((EquipmentPart)part).getType() instanceof WeaponType) ||
-				(part instanceof MissingEquipmentPart && ((MissingEquipmentPart)part).getType() instanceof WeaponType)) {
-			return Part.REPAIR_PART_TYPE.WEAPON;
-		} else {
-			if (part instanceof EquipmentPart && ((EquipmentPart)part).getType().hasFlag(MiscType.F_CLUB)) {
-				return Part.REPAIR_PART_TYPE.PHYSICAL_WEAPON;
-			}
-			
-			return part.getRepairPartType();
-		}
-	}
 
 	public static String[] findPartImage(IPartWork part) {
 		String imgBase = null;
-        int repairType = Part.findCorrectRepairType(part);
+        int repairType = IPartWork.findCorrectRepairType(part);
         
         switch (repairType) {
         	case Part.REPAIR_PART_TYPE.ARMOR:

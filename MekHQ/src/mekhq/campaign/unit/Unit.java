@@ -1770,7 +1770,7 @@ public class Unit implements MekHqXmlSerializable {
             } else if(part instanceof MekLocation) {
                 locations[((MekLocation)part).getLoc()] = part;
             } else if(part instanceof MissingMekLocation) {
-                locations[((MissingMekLocation)part).getLoc()] = part;
+                locations[part.getLocation()] = part;
             } else if(part instanceof TankLocation) {
                 locations[((TankLocation)part).getLoc()] = part;
             } else if(part instanceof Rotor) {
