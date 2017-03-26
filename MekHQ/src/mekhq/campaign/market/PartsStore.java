@@ -254,8 +254,11 @@ public class PartsStore implements Serializable {
 						//TODO: still need to deal with talons (unit tonnage) and masc (engine rating)
 					}
 				} else {
-                    parts.add(new EquipmentPart(0, et, -1, false, c));
-                    parts.add(new EquipmentPart(0, et, -1, true, c));
+				    Part p = new EquipmentPart(0, et, -1, false, c);
+				    parts.add(p);
+                    if (p.isOmniPoddable()) {
+                        parts.add(new EquipmentPart(0, et, -1, true, c));
+                    }
 				}
 			}
         }

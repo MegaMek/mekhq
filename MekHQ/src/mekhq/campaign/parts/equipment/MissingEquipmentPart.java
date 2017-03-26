@@ -26,7 +26,9 @@ import java.io.PrintWriter;
 import megamek.common.CriticalSlot;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
+import megamek.common.MiscType;
 import megamek.common.Mounted;
+import megamek.common.WeaponType;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.MissingPart;
@@ -343,8 +345,20 @@ public class MissingEquipmentPart extends MissingPart {
 
 	@Override
     public boolean isOmniPoddable() {
-    	//TODO: is this on equipment type?
-    	return true;
+        if (type.isOmniFixedOnly()) {
+            return false;
+        }
+        if (type instanceof MiscType) {
+            return type.hasFlag(MiscType.F_MECH_EQUIPMENT)
+                    || type.hasFlag(MiscType.F_TANK_EQUIPMENT)
+                    || type.hasFlag(MiscType.F_AERO_EQUIPMENT);
+        } else if (type instanceof WeaponType) {
+            return (type.hasFlag(WeaponType.F_MECH_WEAPON)
+                    || type.hasFlag(WeaponType.F_TANK_WEAPON)
+                    || type.hasFlag(WeaponType.F_AERO_WEAPON))
+                    && !((WeaponType)type).isCapital();
+        }
+        return true;
     }
 
 	@Override

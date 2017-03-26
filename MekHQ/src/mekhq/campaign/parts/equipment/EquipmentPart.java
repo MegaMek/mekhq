@@ -655,7 +655,20 @@ public class EquipmentPart extends Part {
 
     @Override
     public boolean isOmniPoddable() {
-        return !type.isOmniFixedOnly();
+        if (type.isOmniFixedOnly()) {
+            return false;
+        }
+        if (type instanceof MiscType) {
+            return type.hasFlag(MiscType.F_MECH_EQUIPMENT)
+                    || type.hasFlag(MiscType.F_TANK_EQUIPMENT)
+                    || type.hasFlag(MiscType.F_AERO_EQUIPMENT);
+        } else if (type instanceof WeaponType) {
+            return (type.hasFlag(WeaponType.F_MECH_WEAPON)
+                    || type.hasFlag(WeaponType.F_TANK_WEAPON)
+                    || type.hasFlag(WeaponType.F_AERO_WEAPON))
+                    && !((WeaponType)type).isCapital();
+        }
+        return true;
     }
 
 	@Override
