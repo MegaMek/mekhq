@@ -652,9 +652,8 @@ public class MassRepairSalvageDialog extends JDialog {
         massRepairOptionControlMap.put(Part.REPAIR_PART_TYPE.POD_SPACE,
                 createMassRepairOptionControls(Part.REPAIR_PART_TYPE.POD_SPACE,
                         "Replace/Salvage OmniPod Equipment",
-                        "All pod-mounted equipment will be replaced or salvaged regardless of other categories selected", "massRepairItemPod",
-                        pnlItems, rowIdx++));
-		
+                        "All pod-mounted equipment will be replaced or salvaged regardless of other categories selected",
+                        "massRepairItemPod", pnlItems, rowIdx++));
 
 		return pnlOptions;
 	}
@@ -757,10 +756,16 @@ public class MassRepairSalvageDialog extends JDialog {
 		optionItemBox.setToolTipText(toolTipText);
 		optionItemBox.setName(name);
 		optionItemBox.setSelected(selected);
+		if (name.equals("massRepairItemPod")) {
+            replacePodPartsBox.setEnabled(selected);
+		}
 		optionItemBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				mroOptionChecked();
+				if (((JCheckBox)e.getSource()).getName().equals("massRepairItemPod")) {
+				    replacePodPartsBox.setEnabled(((JCheckBox)e.getSource()).isSelected());
+				}
 			}
 		});
 
