@@ -100,8 +100,10 @@ public class TaskTableMouseAdapter extends MouseInputAdapter implements ActionLi
         } else if (command.contains("CHANGE_MODE")) {
             String sel = command.split(":")[1];
             for (Part p : parts) {
-                p.setMode(WorkTime.of(sel));
-                MekHQ.triggerEvent(new PartModeChangedEvent(p));
+                if (p.getAllMods(null).getValue() != TargetRoll.AUTOMATIC_SUCCESS) {
+                    p.setMode(WorkTime.of(sel));
+                    MekHQ.triggerEvent(new PartModeChangedEvent(p));
+                }
             }
         } else if (command.contains("UNASSIGN")) {
             /*
