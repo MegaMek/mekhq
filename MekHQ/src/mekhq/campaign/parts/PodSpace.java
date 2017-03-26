@@ -31,7 +31,9 @@ import megamek.common.Entity;
 import megamek.common.Mech;
 import megamek.common.Tank;
 import megamek.common.TargetRoll;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.event.PartChangedEvent;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
@@ -108,6 +110,7 @@ public class PodSpace implements Serializable, IPartWork {
             final Part part = campaign.getPart(pid);
             if (part != null) {
                 part.remove(salvage);
+                MekHQ.triggerEvent(new PartChangedEvent(part));
             }
         }
         updateConditionFromEntity(false);
@@ -123,6 +126,7 @@ public class PodSpace implements Serializable, IPartWork {
                     && part.needsFixing()
                     && !repairInPlace) {
                 part.remove(true);
+                MekHQ.triggerEvent(new PartChangedEvent(part));
             }
         }
         updateConditionFromEntity(false);
@@ -130,6 +134,7 @@ public class PodSpace implements Serializable, IPartWork {
             final Part part = campaign.getPart(pid);
             if (part != null && part instanceof MissingPart) {
                 part.fix();
+                MekHQ.triggerEvent(new PartChangedEvent(part));
             }
         }
         updateConditionFromEntity(false);

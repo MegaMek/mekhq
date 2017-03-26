@@ -234,6 +234,11 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 	}
 	
 	@Override
+	public boolean canChangeWorkMode() {
+	    return !isOmniPodded();
+	}
+	
+	@Override
 	public TargetRoll getAllAcquisitionMods() {
         TargetRoll target = new TargetRoll();   
         if(getTechBase() == T_CLAN && campaign.getCampaignOptions().getClanAcquisitionPenalty() > 0) {

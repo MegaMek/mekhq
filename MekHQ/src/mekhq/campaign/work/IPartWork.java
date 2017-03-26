@@ -46,6 +46,9 @@ public interface IPartWork extends IWork {
     void resetTimeSpent();
     void resetOvertime();
     boolean isRightTechType(String skillType);
+    default boolean canChangeWorkMode() {
+        return false;
+    }
     
     TargetRoll getAllModsForMaintenance();
     

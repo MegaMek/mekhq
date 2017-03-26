@@ -843,9 +843,16 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	}
 
 	public void setMode(WorkTime wt) {
-	    if (!isOmniPodded()) {
+	    if (canChangeWorkMode()) {
 	        this.mode = wt;
+	    } else {
+	        this.mode = WorkTime.NORMAL;
 	    }
+	}
+	
+	@Override
+	public boolean canChangeWorkMode() {
+	    return !(isOmniPodded() && isSalvaging());
 	}
 
 	@Override
