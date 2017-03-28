@@ -261,6 +261,9 @@ public class AeroHeatSink extends Part {
 
     @Override
     public int getIntroDate() {
+        if (isOmniPodded()) {
+            return isClanTechBase()? 2850 : 3052;
+        }
         if(type == Aero.HEAT_DOUBLE) {
             return 2567;
         }

@@ -226,6 +226,13 @@ public class EquipmentPart extends Part {
 
 	@Override
     public int getIntroDate() {
+	    if (isOmniPodded()) {
+	        if (isClanTechBase()) {
+	            return Math.max(2850, getType().getIntroductionDate());
+	        } else {
+	            return Math.max(3052, getType().getIntroductionDate());
+	        }
+	    }
     	return getType().getIntroductionDate();
     }
 
