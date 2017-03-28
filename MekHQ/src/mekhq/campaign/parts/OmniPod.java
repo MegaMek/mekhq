@@ -42,15 +42,11 @@ public class OmniPod extends Part {
     private static final long serialVersionUID = -8236359530423260992L;
     
     // Pods are specific to the type of equipment they contain.
-    private MissingPart partType;
+    private Part partType;
 
     public OmniPod(Part partType, Campaign c) {
         super(0, false, c);
-        if (partType instanceof MissingPart) {
-            this.partType = (MissingPart)partType;
-        } else {
-            this.partType = partType.getMissingPart();
-        }
+        this.partType = partType;
         partType.setOmniPodded(false);
         name = "OmniPod";
     }
@@ -78,7 +74,10 @@ public class OmniPod extends Part {
 
     @Override
     public String checkFixable() {
-        return null;
+        if (partType.getMissingPart().isReplacementAvailable()) {
+            return null;
+        }
+        return "No equipment available to install";
     }
 
     //Podding equipment is a Class D (Maintenance) refit, which carries a +2 modifier.
@@ -88,7 +87,7 @@ public class OmniPod extends Part {
     }
 
     public Part getNewPart() {
-        Part part = partType.getNewPart();
+        Part part = partType.clone();
         part.setOmniPodded(true);
         return part;
     }
@@ -170,12 +169,24 @@ public class OmniPod extends Part {
 
     @Override
     public boolean needsFixing() {
-        return false;
+        return true;
     }
-
+    
+    @Override
+    public void fix() {
+        Part newPart = partType.clone();
+        Part oldPart = campaign.checkForExistingSparePart(newPart.clone());
+        if(null != oldPart) {
+            newPart.setOmniPodded(true);
+            campaign.addPart(newPart, 0);
+            oldPart.decrementQuantity();
+            campaign.checkForExistingSparePart(this).decrementQuantity();
+        }
+    }
+    
     @Override
     public long getStickerPrice() {
-        return (long)Math.ceil(partType.getNewPart().getStickerPrice() / 5.0);
+        return (long)Math.ceil(partType.getStickerPrice() / 5.0);
     }
 
     @Override
