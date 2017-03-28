@@ -1932,7 +1932,9 @@ public class Campaign implements Serializable {
         Part repairable = part.clone();
         part.decrementQuantity();
         fixPart(repairable, tech);
-        addPart(repairable, 0);
+        if (!(repairable instanceof OmniPod)) {
+            addPart(repairable, 0);
+        }
         
         return repairable;
     }

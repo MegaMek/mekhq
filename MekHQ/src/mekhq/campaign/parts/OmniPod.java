@@ -174,7 +174,6 @@ public class OmniPod extends Part {
             newPart.setOmniPodded(true);
             campaign.addPart(newPart, 0);
             oldPart.decrementQuantity();
-            campaign.checkForExistingSparePart(this).decrementQuantity();
         }
     }
     
