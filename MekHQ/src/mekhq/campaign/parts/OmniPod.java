@@ -20,7 +20,6 @@
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
-import java.util.Calendar;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -181,10 +180,10 @@ public class OmniPod extends Part {
 
     @Override
     public int getTechLevel() {
-        if (campaign.getCalendar().get(Calendar.YEAR) < 3052) {
+        if (partType.isClanTechBase()) {
             return TechConstants.T_CLAN_TW;
         }
-        return TechConstants.T_ALLOWED_ALL;
+        return TechConstants.T_IS_TW_ALL;
     }
 
     @Override

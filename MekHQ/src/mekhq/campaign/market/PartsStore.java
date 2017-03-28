@@ -62,6 +62,7 @@ import mekhq.campaign.parts.MekGyro;
 import mekhq.campaign.parts.MekLifeSupport;
 import mekhq.campaign.parts.MekLocation;
 import mekhq.campaign.parts.MekSensor;
+import mekhq.campaign.parts.OmniPod;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.ProtomekArmActuator;
 import mekhq.campaign.parts.ProtomekArmor;
@@ -258,15 +259,20 @@ public class PartsStore implements Serializable {
 				    parts.add(p);
                     if (p.isOmniPoddable()) {
                         parts.add(new EquipmentPart(0, et, -1, true, c));
+                        parts.add(new OmniPod(p, c));
                     }
 				}
 			}
         }
         //lets throw aero heat sinks in here as well
-        parts.add(new AeroHeatSink(0, Aero.HEAT_SINGLE, false, c));
-        parts.add(new AeroHeatSink(0, Aero.HEAT_DOUBLE, true, c));
-        parts.add(new AeroHeatSink(0, Aero.HEAT_SINGLE, false, c));
-        parts.add(new AeroHeatSink(0, Aero.HEAT_DOUBLE, true, c));
+        AeroHeatSink hs = new AeroHeatSink(0, Aero.HEAT_SINGLE, false, c);
+        parts.add(hs);
+        parts.add(new OmniPod(hs, c));
+        hs = new AeroHeatSink(0, Aero.HEAT_SINGLE, true, c);
+        hs = new AeroHeatSink(0, Aero.HEAT_DOUBLE, false, c);
+        parts.add(hs);
+        parts.add(new OmniPod(hs, c));
+        hs = new AeroHeatSink(0, Aero.HEAT_DOUBLE, true, c);
 	}
 
 	private void stockMekActuators(Campaign c) {
