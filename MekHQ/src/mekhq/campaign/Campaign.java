@@ -165,6 +165,7 @@ import mekhq.campaign.parts.MekLocation;
 import mekhq.campaign.parts.MissingEnginePart;
 import mekhq.campaign.parts.MissingMekActuator;
 import mekhq.campaign.parts.MissingPart;
+import mekhq.campaign.parts.OmniPod;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PartInUse;
 import mekhq.campaign.parts.ProtomekArmor;
@@ -3278,6 +3279,33 @@ public class Campaign implements Serializable {
             armor.changeAmountAvailable(-1 * points);
         }
         MekHQ.triggerEvent(new PartRemovedEvent(armor));
+    }
+
+    public void depodPart(Part part, int quantity) {
+        Part unpodded = part.clone();
+        unpodded.setOmniPodded(false);
+        OmniPod pod = new OmniPod(unpodded, this);
+        Part sparePart = this.checkForExistingSparePart(unpodded);
+        Part sparePod = this.checkForExistingSparePart(pod);
+        while (quantity > 0 && part.getQuantity() > 0) {
+            if (null == sparePart) {
+                addPart(unpodded, 0);
+                sparePart = unpodded;
+            } else {
+                sparePart.incrementQuantity();
+            }
+            if (null == sparePod) {
+                addPart(pod, 0);
+                sparePod = pod;
+            } else {
+                sparePod.incrementQuantity();
+            }
+            part.decrementQuantity();
+            quantity--;
+        }
+        MekHQ.triggerEvent(new PartRemovedEvent(part));
+        MekHQ.triggerEvent(new PartRemovedEvent(pod));
+        MekHQ.triggerEvent(new PartRemovedEvent(unpodded));
     }
 
     public boolean buyRefurbishment(Part part) {
