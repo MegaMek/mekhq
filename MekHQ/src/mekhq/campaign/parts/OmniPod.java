@@ -86,12 +86,6 @@ public class OmniPod extends Part {
         return partType.getDifficulty() + 2;
     }
 
-    public Part getNewPart() {
-        Part part = partType.clone();
-        part.setOmniPodded(true);
-        return part;
-    }
-
     //Weight is negligible
     @Override
     public double getTonnage() {
@@ -212,7 +206,9 @@ public class OmniPod extends Part {
 
     @Override
     public Part clone() {
-        return new OmniPod(partType, campaign);
+        Part p = new OmniPod(partType, campaign);
+        p.copyBaseData(this);
+        return p;
     }
 
 }
