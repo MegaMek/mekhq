@@ -192,6 +192,29 @@ public class OmniPod extends Part {
             return " <font color='red'><b> failed.</b></font>";
         }
     }
+    
+    @Override
+    public String getStatus() {
+        String toReturn = "Empty";
+        if(isReservedForRefit()) {
+            toReturn = "Reserved for Refit";
+        }
+        if(isReservedForReplacement()) {
+            toReturn = "Reserved for Repair";
+        }
+        if(isBeingWorkedOn()) {
+            toReturn = "Being worked on";
+        }
+        if(!isPresent()) {
+            //toReturn = "" + getDaysToArrival() + " days to arrival";
+            String dayName = "day";
+            if(getDaysToArrival() > 1) {
+                dayName += "s";
+            }
+            toReturn = "In transit (" + getDaysToArrival() + " " + dayName + ")";
+        }
+        return toReturn;
+    }
 
     @Override
     public long getStickerPrice() {
