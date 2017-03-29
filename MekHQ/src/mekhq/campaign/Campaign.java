@@ -3288,8 +3288,8 @@ public class Campaign implements Serializable {
         unpodded.setOmniPodded(false);
         OmniPod pod = new OmniPod(unpodded, this);
         while (quantity > 0 && part.getQuantity() > 0) {
-            addPart(unpodded, 0);
-            addPart(pod, 0);
+            addPart(unpodded.clone(), 0);
+            addPart(pod.clone(), 0);
             part.decrementQuantity();
             quantity--;
         }
