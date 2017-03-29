@@ -87,10 +87,10 @@ public final class PersonnelTab extends CampaignGuiTab {
     public static final int PG_DOC = 12;
     public static final int PG_ADMIN = 13;
     public static final int PG_DEPENDENT = 14;
-    public static final int PG_RETIRE = 15;
-    public static final int PG_MIA = 16;
-    public static final int PG_KIA = 17;
-    public static final int PG_PRISONER = 18;
+    public static final int PG_PRISONER = 15;
+    public static final int PG_RETIRE = 16;
+    public static final int PG_MIA = 17;
+    public static final int PG_KIA = 18;
     public static final int PG_NUM = 19;
 
     // personnel views
