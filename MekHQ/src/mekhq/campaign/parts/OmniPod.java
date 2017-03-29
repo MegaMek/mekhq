@@ -29,6 +29,7 @@ import megamek.common.TechConstants;
 import mekhq.MekHqXmlUtil;
 import mekhq.Version;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.personnel.SkillType;
 
 /**
  * An empty omnipod, which can be purchased or created when equipment is removed from a pod.
@@ -177,6 +178,21 @@ public class OmniPod extends Part {
         }
     }
     
+    
+    @Override
+    public String fail(int rating) {
+        skillMin = ++rating;
+        timeSpent = 0;
+        shorthandedMod = 0;
+        if(skillMin > SkillType.EXP_ELITE) {
+            return " <font color='red'><b> failed and part destroyed.</b></font>";
+        } else {
+            //OmniPod is only added back to warehouse if repair fails without destroying part. 
+            campaign.addPart(this, 0);
+            return " <font color='red'><b> failed.</b></font>";
+        }
+    }
+
     @Override
     public long getStickerPrice() {
         return (long)Math.ceil(partType.getStickerPrice() / 5.0);
