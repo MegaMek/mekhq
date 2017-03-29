@@ -87,6 +87,15 @@ public class OmniPod extends Part {
         return partType.getDifficulty() + 2;
     }
 
+    @Override
+    public String getRepairDesc() {
+        if (partType.getMissingPart().isReplacementAvailable()) {
+            return super.getRepairDesc();
+        } else {
+            return "Part not available";
+        }
+    }
+    
     //Weight is negligible
     @Override
     public double getTonnage() {
