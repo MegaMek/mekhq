@@ -2761,7 +2761,7 @@ public class CampaignGUI extends JPanel {
         getFrame().setTitle(getCampaign().getTitle());
     }
 
-    private void refreshReport() {
+    synchronized private void refreshReport() {
         List<String> newLogEntries = getCampaign().fetchAndClearNewReports();
         panLog.appendLog(newLogEntries);
         logDialog.appendLog(newLogEntries);
