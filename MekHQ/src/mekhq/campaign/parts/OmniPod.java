@@ -59,7 +59,7 @@ public class OmniPod extends Part {
     
     @Override
     public int getBaseTime() {
-        return partType.getBaseTime();
+        return partType.getMissingPart().getBaseTime();
     }
 
     @Override
