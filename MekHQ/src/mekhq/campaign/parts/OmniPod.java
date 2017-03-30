@@ -183,28 +183,30 @@ public class OmniPod extends Part {
                         partType = new AeroHeatSink(0, hsType, false, campaign);
                     } else {
                         EquipmentType et = EquipmentType.get(type);
-                        if (null != et) {
-                            if (et instanceof MiscType
-                                    && (et.hasFlag(MiscType.F_HEAT_SINK)
-                                            || et.hasFlag(MiscType.F_DOUBLE_HEAT_SINK)
-                                            || et.hasFlag(MiscType.F_IS_DOUBLE_HEAT_SINK_PROTOTYPE))) {
-                                partType = new HeatSink(0, et, -1, false, campaign);
-                            } else if (et instanceof MiscType && et.hasFlag(MiscType.F_JUMP_JET)) {
-                                partType = new JumpJet(tonnage, et, -1, false, campaign);
-                            } else if (et instanceof MiscType
-                                    && et.hasFlag(MiscType.F_MASC)
-                                    && (et.getSubType() & MiscType.S_SUPERCHARGER) == 0) {
-                                if (null != wn2.getAttributes().getNamedItem("rating")) {
-                                    int rating = Integer.parseInt(wn2.getAttributes().getNamedItem("rating").getTextContent());
-                                    partType = new MASC(tonnage, et, -1, campaign, rating, false);
-                                } else {
-                                    MekHQ.logError("OmniPod for MASC lacks engine rating");
-                                }
+                        if (null == et) {
+                            MekHQ.logError("Unknown part type " + type + " for OmniPod");
+                            //Throw a generic value in there to prevent NPE but still indicate a problem
+                            et = EquipmentType.get(EquipmentType
+                                    .getStructureTypeName(EquipmentType.T_STRUCTURE_STANDARD));
+                        }
+                        if (et instanceof MiscType
+                                && (et.hasFlag(MiscType.F_HEAT_SINK)
+                                        || et.hasFlag(MiscType.F_DOUBLE_HEAT_SINK)
+                                        || et.hasFlag(MiscType.F_IS_DOUBLE_HEAT_SINK_PROTOTYPE))) {
+                            partType = new HeatSink(0, et, -1, false, campaign);
+                        } else if (et instanceof MiscType && et.hasFlag(MiscType.F_JUMP_JET)) {
+                            partType = new JumpJet(tonnage, et, -1, false, campaign);
+                        } else if (et instanceof MiscType
+                                && et.hasFlag(MiscType.F_MASC)
+                                && (et.getSubType() & MiscType.S_SUPERCHARGER) == 0) {
+                            if (null != wn2.getAttributes().getNamedItem("rating")) {
+                                int rating = Integer.parseInt(wn2.getAttributes().getNamedItem("rating").getTextContent());
+                                partType = new MASC(tonnage, et, -1, campaign, rating, false);
                             } else {
-                                partType = new EquipmentPart(tonnage, et, -1, false, campaign);
+                                MekHQ.logError("OmniPod for MASC lacks engine rating");
                             }
                         } else {
-                            MekHQ.logError("Unknown part type " + type + " for OmniPod");
+                            partType = new EquipmentPart(tonnage, et, -1, false, campaign);
                         }
                     }
                 }
@@ -317,6 +319,8 @@ public class OmniPod extends Part {
             if (partType instanceof MASC) {
                 pw1.print("' rating='" + ((MASC)partType).getEngineRating());
             }
+        } else {
+            MekHQ.logError("OmniPod partType is not EquipmentType");
         }
         pw1.println("'/>");
         writeToXmlEnd(pw1, indent);
