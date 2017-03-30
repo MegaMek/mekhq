@@ -76,6 +76,7 @@ import mekhq.campaign.parts.MekLifeSupport;
 import mekhq.campaign.parts.MekLocation;
 import mekhq.campaign.parts.MekSensor;
 import mekhq.campaign.parts.MissingPart;
+import mekhq.campaign.parts.OmniPod;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.ProtomekArmActuator;
 import mekhq.campaign.parts.ProtomekArmor;
@@ -112,7 +113,8 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 	private static final int SG_ACT      = 10;
 	private static final int SG_COCKPIT  = 11;
 	private static final int SG_BA_SUIT  = 12;
-	private static final int SG_NUM      = 13;
+	private static final int SG_OMNI_POD = 13;
+	private static final int SG_NUM      = 14;
 
     @SuppressWarnings("unused")
 	private Frame frame; // FIXME: Unused? Do we need it?
@@ -387,8 +389,10 @@ public class PartsStoreDialog extends javax.swing.JDialog {
         			return part instanceof MekActuator || part instanceof ProtomekArmActuator || part instanceof ProtomekLegActuator;
         		} else if(nGroup == SG_COCKPIT) {
         			return part instanceof MekCockpit;
-        		} else if(nGroup == SG_BA_SUIT) {
-        			return part instanceof BattleArmorSuit;
+                } else if(nGroup == SG_BA_SUIT) {
+                    return part instanceof BattleArmorSuit;
+                } else if(nGroup == SG_OMNI_POD) {
+                    return part instanceof OmniPod;
         		}
         		return false;
         	}
@@ -481,6 +485,8 @@ public class PartsStoreDialog extends javax.swing.JDialog {
     		return "Cockpits";
     	case SG_BA_SUIT:
     		return "Battle Armor Suits";
+    	case SG_OMNI_POD:
+    	    return "Empty OmniPods";
     	default:
     		return "?";
     	}
