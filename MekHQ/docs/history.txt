@@ -5,6 +5,7 @@ v0.43.1-git
 + Fix #334: Problems purchasing bombs.
 + Fix #326: Cannot use Meklab to customize units from within MekHQ using v43.0
 + PR #344: Separate list item for Prisoners on the personnel tab
++ Omni units: faster salvage/replacement (including whole location at once), separate podded parts in warehouse.
 
 v0.43.0 (2017-02-13 03:30 UTC)
 + Improve Mass Repair/Mass Salvage technician selection by providing additional configuration options
