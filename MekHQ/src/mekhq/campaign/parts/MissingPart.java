@@ -50,7 +50,11 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 	private static final long serialVersionUID = 300672661487966982L;	
 	
 	public MissingPart(int tonnage, Campaign c) {
-		super(tonnage, c);
+	    super(tonnage, false, c);
+	}
+	
+	public MissingPart(int tonnage, boolean isOmniPodded, Campaign c) {
+		super(tonnage, isOmniPodded, c);
 	}
 	
 	public MissingPart clone() {
@@ -230,6 +234,11 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 	}
 	
 	@Override
+	public boolean canChangeWorkMode() {
+	    return !isOmniPodded();
+	}
+	
+	@Override
 	public TargetRoll getAllAcquisitionMods() {
         TargetRoll target = new TargetRoll();   
         if(getTechBase() == T_CLAN && campaign.getCampaignOptions().getClanAcquisitionPenalty() > 0) {
@@ -267,7 +276,16 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 		toReturn += ">";
 		toReturn += "<b>" + getAcquisitionName() + "</b> " + bonus + "<br/>";
 		String[] inventories = campaign.getPartInventory(getNewPart());
-		toReturn += inventories[1] + " in transit, " + inventories[2] + " on order<br>"; 
+		toReturn += inventories[1] + " in transit, " + inventories[2] + " on order";
+		if (!isOmniPodded()) {
+		    Part newPart = getNewPart();
+		    newPart.setOmniPodded(true);
+		    inventories = campaign.getPartInventory(newPart);
+		    if (Integer.parseInt(inventories[0]) > 0) { 
+		        toReturn += ", " + inventories[0] + " OmniPod";
+		    }
+		}
+		toReturn += "<br/>";
 		toReturn += Utilities.getCurrencyString(getBuyCost()) + "<br/>";
 		toReturn += "</font></html>";
 		return toReturn;

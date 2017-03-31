@@ -33,7 +33,7 @@ VTOL
 </motion_type>
 
 <transporters>
-battlearmorbay:36:1
+battlearmorbay:4.5:1
 </transporters>
 
 <cruiseMP>
@@ -87,10 +87,9 @@ battlearmorbay:36:1
 </barrating>
 
 <source>
-TRO 3085s
+TRO 3085 - Early Republic
 </source>
 
 <tonnage>
 60.0
 </tonnage>
-

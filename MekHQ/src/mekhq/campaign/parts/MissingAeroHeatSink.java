@@ -42,18 +42,18 @@ public class MissingAeroHeatSink extends MissingPart {
 	private int type;
 
 	public MissingAeroHeatSink() {
-    	this(0, Aero.HEAT_SINGLE, null);
+    	this(0, Aero.HEAT_SINGLE, false, null);
     }
 
-    public MissingAeroHeatSink(int tonnage, int type, Campaign c) {
-    	super(tonnage, c);
+    public MissingAeroHeatSink(int tonnage, int type, boolean omniPodded, Campaign c) {
+    	super(tonnage, omniPodded, c);
     	this.type = type;
     	this.name = "Aero Heat Sink";
     }
     
     @Override 
 	public int getBaseTime() {
-		return 90;
+		return isOmniPodded()? 30 : 90;
 	}
 	
 	@Override
@@ -68,7 +68,7 @@ public class MissingAeroHeatSink extends MissingPart {
 
 	@Override
 	public Part getNewPart() {
-		return new AeroHeatSink(getUnitTonnage(), type, campaign);
+		return new AeroHeatSink(getUnitTonnage(), type, omniPodded, campaign);
 	}
 
 	@Override
@@ -121,8 +121,7 @@ public class MissingAeroHeatSink extends MissingPart {
 
 	@Override
 	public String getLocationName() {
-		// TODO Auto-generated method stub
-		return null;
+		return "Fuselage";
 	}
 
 	@Override
@@ -152,5 +151,10 @@ public class MissingAeroHeatSink extends MissingPart {
 	@Override
 	public int getReIntroDate() {
 		return 3040;
+	}
+	
+	@Override
+	public boolean isOmniPoddable() {
+	    return true;
 	}
 }

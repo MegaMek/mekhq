@@ -38,6 +38,7 @@ import mekhq.campaign.event.PartModeChangedEvent;
 import mekhq.campaign.event.UnitChangedEvent;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.work.IPartWork;
 import mekhq.campaign.work.WorkTime;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.model.TaskTableModel;
@@ -59,26 +60,29 @@ public class TaskTableMouseAdapter extends MouseInputAdapter implements ActionLi
     @Override
     public void actionPerformed(ActionEvent action) {
         String command = action.getActionCommand();
-        Part part = taskModel.getTaskAt(taskTable.convertRowIndexToModel(taskTable.getSelectedRow()));
-        if (null == part) {
+        IPartWork partWork = taskModel.getTaskAt(taskTable.convertRowIndexToModel(taskTable.getSelectedRow()));
+        if (null == partWork) {
             return;
         }
-
+        
         int[] rows = taskTable.getSelectedRows();
-        Part[] parts = new Part[rows.length];
+        IPartWork[] parts = new IPartWork[rows.length];
         for (int i = 0; i < rows.length; i++) {
             parts[i] = taskModel.getTaskAt(taskTable.convertRowIndexToModel(rows[i]));
         }
-
+        
         if (command.equalsIgnoreCase("SCRAP")) {
-            for (Part p : parts) {
-                if (null != p.checkScrappable()) {
-                    JOptionPane.showMessageDialog(gui.getFrame(), p.checkScrappable(), "Cannot scrap part",
+            for (IPartWork p : parts) {
+            	if (!(p instanceof Part)) {
+            		continue;
+		        }
+                if (null != ((Part)p).checkScrappable()) {
+                    JOptionPane.showMessageDialog(gui.getFrame(), ((Part)p).checkScrappable(), "Cannot scrap part",
                             JOptionPane.ERROR_MESSAGE);
                     return;
                 }
                 Unit u = p.getUnit();
-                gui.getCampaign().addReport(p.scrap());
+                gui.getCampaign().addReport(((Part)p).scrap());
                 if (null != u && !u.isRepairable() && u.getSalvageableParts().size() == 0) {
                     gui.getCampaign().removeUnit(u.getId());
                 }
@@ -99,10 +103,10 @@ public class TaskTableMouseAdapter extends MouseInputAdapter implements ActionLi
              */
         } else if (command.contains("CHANGE_MODE")) {
             String sel = command.split(":")[1];
-            for (Part p : parts) {
-                if (p.getAllMods(null).getValue() != TargetRoll.AUTOMATIC_SUCCESS) {
-                    p.setMode(WorkTime.of(sel));
-                    MekHQ.triggerEvent(new PartModeChangedEvent(p));
+            for (IPartWork p : parts) {
+                if (p instanceof Part && p.getAllMods(null).getValue() != TargetRoll.AUTOMATIC_SUCCESS) {
+                    ((Part)p).setMode(WorkTime.of(sel));
+                    MekHQ.triggerEvent(new PartModeChangedEvent((Part)p));
                 }
             }
         } else if (command.contains("UNASSIGN")) {
@@ -125,9 +129,17 @@ public class TaskTableMouseAdapter extends MouseInputAdapter implements ActionLi
              * refreshTaskList(); refreshAcquireList(); refreshPartsList();
              * refreshCargo(); refreshOverview(); }
              */
-            if (part.checkFixable() == null) {
-                gui.getCampaign().addReport(part.succeed());
-                MekHQ.triggerEvent(new PartChangedEvent(part));
+            if (partWork.checkFixable() == null) {
+                for (IPartWork p : parts) {
+                    gui.getCampaign().addReport(p.succeed());
+                    if (p.getUnit() != null) {
+                        p.getUnit().refreshPodSpace();
+                    }
+                    //PodSpace triggers event for each child part
+                    if (p instanceof Part) {
+                        MekHQ.triggerEvent(new PartChangedEvent((Part)p));
+                    }
+                }
             }
         }
     }
@@ -149,45 +161,69 @@ public class TaskTableMouseAdapter extends MouseInputAdapter implements ActionLi
             if (row < 0) {
                 return;
             }
-            Part part = taskModel.getTaskAt(taskTable.convertRowIndexToModel(row));
+            IPartWork partWork = taskModel.getTaskAt(taskTable.convertRowIndexToModel(row));
+            if (null == partWork) {
+                return;
+            }
+            
+            int[] rows = taskTable.getSelectedRows();
+            IPartWork[] parts = new IPartWork[rows.length];
+            for (int i = 0; i < rows.length; i++) {
+                parts[i] = taskModel.getTaskAt(taskTable.convertRowIndexToModel(rows[i]));
+            }
+
             JMenuItem menuItem = null;
             JMenu menu = null;
             JCheckBoxMenuItem cbMenuItem = null;
             // Mode (extra time, rush job, ...
             // dont allow automatic success jobs to change mode
-            if (part.getAllMods(null).getValue() != TargetRoll.AUTOMATIC_SUCCESS) {
-                menu = new JMenu("Mode");
-                for (WorkTime wt : WorkTime.DEFAULT_TIMES) {
-                    cbMenuItem = new JCheckBoxMenuItem(wt.name);
-                    if (part.getMode() == wt) {
-                        cbMenuItem.setSelected(true);
-                    } else {
-                        cbMenuItem.setActionCommand("CHANGE_MODE:" + wt.id);
-                        cbMenuItem.addActionListener(this);
-                    }
-                    cbMenuItem.setEnabled(!part.isBeingWorkedOn());
-                    menu.add(cbMenuItem);
+            // dont allow pod space or pod-mounted equipment to change mode when removing or replacing
+            if (partWork != null) {
+                boolean canChangeMode = true;
+                boolean isScrappable = true;
+                boolean isBeingWorked = false;
+                boolean isFixable = true;
+                for (IPartWork p : parts) {
+                    canChangeMode &= p.canChangeWorkMode()
+                            && p.getAllMods(null).getValue() != TargetRoll.AUTOMATIC_SUCCESS;
+                    isScrappable &= (p instanceof Part) && !((Part)p).canNeverScrap();
+                    isBeingWorked |= (p instanceof Part) && ((Part)p).isBeingWorkedOn();
+                    isFixable &= (null == p.checkFixable());
                 }
+                if (canChangeMode) {
+                    menu = new JMenu("Mode");
+                    for (WorkTime wt : WorkTime.DEFAULT_TIMES) {
+                        cbMenuItem = new JCheckBoxMenuItem(wt.name);
+                        if (partWork.getMode() == wt) {
+                            cbMenuItem.setSelected(true);
+                        } else {
+                            cbMenuItem.setActionCommand("CHANGE_MODE:" + wt.id);
+                            cbMenuItem.addActionListener(this);
+                        }
+                        cbMenuItem.setEnabled(!isBeingWorked);
+                        menu.add(cbMenuItem);
+                    }
+                    popup.add(menu);
+                }
+                // Scrap component
+                if (isScrappable) {
+                    menuItem = new JMenuItem("Scrap component");
+                    menuItem.setActionCommand("SCRAP");
+                    menuItem.addActionListener(this);
+                    menuItem.setEnabled(!isBeingWorked);
+                    popup.add(menuItem);
+                }
+
+                menu = new JMenu("GM Mode");
                 popup.add(menu);
-            }
-            // Scrap component
-            if (!part.canNeverScrap()) {
-                menuItem = new JMenuItem("Scrap component");
-                menuItem.setActionCommand("SCRAP");
+                // Auto complete task
+
+                menuItem = new JMenuItem("Complete Task");
+                menuItem.setActionCommand("FIX");
                 menuItem.addActionListener(this);
-                menuItem.setEnabled(!part.isBeingWorkedOn());
-                popup.add(menuItem);
+                menuItem.setEnabled(gui.getCampaign().isGM() && isFixable);
+                menu.add(menuItem);
             }
-
-            menu = new JMenu("GM Mode");
-            popup.add(menu);
-            // Auto complete task
-
-            menuItem = new JMenuItem("Complete Task");
-            menuItem.setActionCommand("FIX");
-            menuItem.addActionListener(this);
-            menuItem.setEnabled(gui.getCampaign().isGM() && (null == part.checkFixable()));
-            menu.add(menuItem);
 
             popup.show(e.getComponent(), e.getX(), e.getY());
         }

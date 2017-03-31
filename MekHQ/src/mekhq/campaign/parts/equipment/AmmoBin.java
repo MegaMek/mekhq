@@ -25,11 +25,17 @@ import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.HashSet;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import megamek.common.Aero;
 import megamek.common.AmmoType;
 import megamek.common.CriticalSlot;
 import megamek.common.EquipmentType;
+import megamek.common.Jumpship;
 import megamek.common.Mounted;
 import megamek.common.Protomech;
+import megamek.common.SmallCraft;
 import megamek.common.TargetRoll;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
@@ -42,9 +48,6 @@ import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Era;
 import mekhq.campaign.work.IAcquisitionWork;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  *
@@ -65,11 +68,12 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 	protected boolean oneShot;
 
     public AmmoBin() {
-    	this(0, null, -1, 0, false, null);
+    	this(0, null, -1, 0, false, false, null);
     }
 
-    public AmmoBin(int tonnage, EquipmentType et, int equipNum, int shots, boolean singleShot, Campaign c) {
-        super(tonnage, et, equipNum, c);
+    public AmmoBin(int tonnage, EquipmentType et, int equipNum, int shots, boolean singleShot,
+            boolean omniPodded, Campaign c) {
+        super(tonnage, et, equipNum, omniPodded, c);
         this.shotsNeeded = shots;
         this.oneShot = singleShot;
         this.checkedToday = false;
@@ -82,11 +86,41 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     }
 
     public AmmoBin clone() {
-    	AmmoBin clone = new AmmoBin(getUnitTonnage(), getType(), getEquipmentNum(), shotsNeeded, oneShot, campaign);
+    	AmmoBin clone = new AmmoBin(getUnitTonnage(), getType(), getEquipmentNum(), shotsNeeded, oneShot,
+    	        omniPodded, campaign);
         clone.copyBaseData(this);
         clone.shotsNeeded = this.shotsNeeded;
         clone.munition = this.munition;
         return clone;
+    }
+    
+    /* Per TM, ammo for fighters is stored in the fuselage. This makes a difference for omnifighter
+     * pod space, so we're going to stick them in LOC_NONE where the heat sinks are */ 
+    @Override
+    public String getLocationName() {
+        if (unit.getEntity() instanceof Aero
+                && !((unit.getEntity() instanceof SmallCraft) || (unit.getEntity() instanceof Jumpship))){
+            return "Fuselage";
+        }
+        return super.getLocationName();
+    }
+    
+    @Override
+    public int getLocation() {
+        if (unit.getEntity() instanceof Aero
+                && !((unit.getEntity() instanceof SmallCraft) || (unit.getEntity() instanceof Jumpship))){
+            return Aero.LOC_NONE;
+        }
+        return super.getLocation();
+    }
+    
+    @Override
+    public boolean isInLocation(String loc) {
+        if (unit.getEntity() instanceof Aero
+                && !((unit.getEntity() instanceof SmallCraft) || (unit.getEntity() instanceof Jumpship))){
+            return loc.equals("FSLG");
+        }
+        return super.isInLocation(loc);
     }
 
     @Override
@@ -357,7 +391,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 
 	@Override
 	public MissingPart getMissingPart() {
-		return new MissingAmmoBin(getUnitTonnage(), type, equipmentNum, oneShot, campaign);
+		return new MissingAmmoBin(getUnitTonnage(), type, equipmentNum, oneShot, omniPodded, campaign);
 	}
 
 	public boolean isOneShot() {
@@ -399,7 +433,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 	@Override
 	public int getBaseTime() {
 		if(isSalvaging()) {
-			return 120;
+			return isOmniPodded()? 30 : 120;
 		}
 		if(null != unit) {
 			Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
@@ -415,6 +449,14 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 		}
 		return 15;
 	}
+
+    @Override
+    public int getActualTime() {
+        if (isOmniPodded()) {
+            return (int)Math.ceil(getBaseTime() * mode.timeMultiplier * 0.5);
+        }
+        return (int) Math.ceil(getBaseTime() * mode.timeMultiplier);
+    }
 
 	@Override
 	public int getDifficulty() {
@@ -740,5 +782,19 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     @Override
     public int getMassRepairOptionType() {
     	return Part.REPAIR_PART_TYPE.AMMO;
+    }
+    
+    @Override
+    public boolean isOmniPoddable() {
+        return true;
+    }
+    
+    /**
+     * Since ammo bins aren't real parts they can't be podded in the warehouse, and
+     * whether they're podded on the unit depends entirely on the unit they're installed on.
+     */
+    @Override
+    public boolean isOmniPodded() {
+        return getUnit() != null && getUnit().getEntity().getEquipment(equipmentNum).isOmniPodMounted();
     }
 }

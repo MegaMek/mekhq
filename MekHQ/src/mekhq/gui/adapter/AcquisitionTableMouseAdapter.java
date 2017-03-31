@@ -30,7 +30,10 @@ import javax.swing.JTable;
 import javax.swing.event.MouseInputAdapter;
 
 import mekhq.MekHQ;
+import mekhq.campaign.event.PartChangedEvent;
 import mekhq.campaign.event.UnitChangedEvent;
+import mekhq.campaign.parts.MissingPart;
+import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.gui.CampaignGUI;
@@ -61,6 +64,15 @@ public class AcquisitionTableMouseAdapter extends MouseInputAdapter implements A
         if (null == acquisitionWork) {
             return;
         }
+        if (command.contains("DEPOD")) {
+            MissingPart podded = ((MissingPart)acquisitionWork).getNewPart().getMissingPart();
+            podded.setOmniPodded(true);
+            Part replacement =  podded.findReplacement(false);
+            if (null != replacement) {
+                gui.getCampaign().depodPart(replacement, 1);
+                MekHQ.triggerEvent(new PartChangedEvent(replacement));
+            }
+        }
         if (command.contains("FIX")) {
             gui.getCampaign().addReport(acquisitionWork.find(0));
             MekHQ.triggerEvent(new UnitChangedEvent(acquisitionWork.getUnit()));
@@ -84,8 +96,24 @@ public class AcquisitionTableMouseAdapter extends MouseInputAdapter implements A
             if (row < 0) {
                 return;
             }
+            IAcquisitionWork aw = acquireModel.getAcquisitionAt(acquisitionTable.convertRowIndexToModel(row));
+            
             JMenuItem menuItem = null;
             JMenu menu = null;
+
+            if (aw instanceof MissingPart) {
+                MissingPart part = (MissingPart)aw;
+                if (!part.isOmniPodded()) {
+                    MissingPart podded = part.getNewPart().getMissingPart();
+                    podded.setOmniPodded(true);
+                    if (podded.isReplacementAvailable()) {
+                        menuItem = new JMenuItem("Remove replacement from pod");
+                        menuItem.setActionCommand("DEPOD");
+                        menuItem.addActionListener(this);
+                        popup.add(menuItem);
+                    }
+                }
+            }
             menu = new JMenu("GM Mode");
             popup.add(menu);
             // Auto complete task

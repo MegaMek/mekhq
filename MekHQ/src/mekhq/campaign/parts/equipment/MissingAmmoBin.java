@@ -23,8 +23,11 @@ package mekhq.campaign.parts.equipment;
 
 import java.io.PrintWriter;
 
+import megamek.common.Aero;
 import megamek.common.AmmoType;
 import megamek.common.EquipmentType;
+import megamek.common.Jumpship;
+import megamek.common.SmallCraft;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.Part;
@@ -42,18 +45,48 @@ public class MissingAmmoBin extends MissingEquipmentPart {
 	protected boolean oneShot;
 	
     public MissingAmmoBin() {
-    	this(0, null, -1, false, null);
+    	this(0, null, -1, false, false, null);
     }
     
-    public MissingAmmoBin(int tonnage, EquipmentType et, int equipNum, boolean singleShot, Campaign c) {
-        super(tonnage, et, equipNum, c, 1);
+    public MissingAmmoBin(int tonnage, EquipmentType et, int equipNum, boolean singleShot,
+            boolean omniPodded, Campaign c) {
+        super(tonnage, et, equipNum, c, 1, omniPodded);
         this.oneShot = singleShot;
         if(null != name) {
         	this.name += " Bin";
         }
     }
 	
-	@Override
+    /* Per TM, ammo for fighters is stored in the fuselage. This makes a difference for omnifighter
+     * pod space, so we're going to stick them in LOC_NONE where the heat sinks are */ 
+    @Override
+    public String getLocationName() {
+        if (unit.getEntity() instanceof Aero
+                && !((unit.getEntity() instanceof SmallCraft) || (unit.getEntity() instanceof Jumpship))){
+            return "Fuselage";
+        }
+        return super.getLocationName();
+    }
+    
+    @Override
+    public int getLocation() {
+        if (unit.getEntity() instanceof Aero
+                && !((unit.getEntity() instanceof SmallCraft) || (unit.getEntity() instanceof Jumpship))){
+            return Aero.LOC_NONE;
+        }
+        return super.getLocation();
+    }
+    
+    @Override
+    public boolean isInLocation(String loc) {
+        if (unit.getEntity() instanceof Aero
+                && !((unit.getEntity() instanceof SmallCraft) || (unit.getEntity() instanceof Jumpship))){
+            return loc.equals("FSLG");
+        }
+        return super.isInLocation(loc);
+    }
+
+    @Override
 	public int getDifficulty() {
 		return -2;
 	}
@@ -97,7 +130,7 @@ public class MissingAmmoBin extends MissingEquipmentPart {
 	
 	@Override
 	public Part getNewPart() {
-		return new AmmoBin(getUnitTonnage(), type, -1, getFullShots(), oneShot, campaign);
+		return new AmmoBin(getUnitTonnage(), type, -1, getFullShots(), oneShot, omniPodded, campaign);
 	}
 	
 	@Override

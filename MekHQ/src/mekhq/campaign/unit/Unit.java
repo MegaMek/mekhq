@@ -150,6 +150,7 @@ import mekhq.campaign.parts.MissingVeeSensor;
 import mekhq.campaign.parts.MissingVeeStabiliser;
 import mekhq.campaign.parts.MotiveSystem;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.PodSpace;
 import mekhq.campaign.parts.ProtomekArmActuator;
 import mekhq.campaign.parts.ProtomekArmor;
 import mekhq.campaign.parts.ProtomekJumpJet;
@@ -182,6 +183,7 @@ import mekhq.campaign.parts.equipment.MissingJumpJet;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.work.IAcquisitionWork;
+import mekhq.campaign.work.IPartWork;
 
 /**
  * This is a wrapper class for entity, so that we can add some functionality to
@@ -236,6 +238,7 @@ public class Unit implements MekHqXmlSerializable {
 
     private ArrayList<Part> parts;
     private String lastMaintenanceReport;
+    private ArrayList<PodSpace> podSpace;
 
     private Refit refit;
 
@@ -265,6 +268,7 @@ public class Unit implements MekHqXmlSerializable {
         this.salvaged = false;
         this.campaign = c;
         this.parts = new ArrayList<Part>();
+        this.podSpace = new ArrayList<>();
         this.drivers = new ArrayList<UUID>();
         this.gunners = new ArrayList<UUID>();
         this.vesselCrew = new ArrayList<UUID>();
@@ -543,21 +547,31 @@ public class Unit implements MekHqXmlSerializable {
         }
     }
 
-    public ArrayList<Part> getPartsNeedingFixing() {
-        ArrayList<Part> brokenParts = new ArrayList<Part>();
+    public ArrayList<IPartWork> getPartsNeedingFixing() {
+        ArrayList<IPartWork> brokenParts = new ArrayList<IPartWork>();
         for(Part part: parts) {
             if(part.needsFixing()) {
                 brokenParts.add(part);
             }
         }
+        for (PodSpace pod : podSpace) {
+            if (pod.needsFixing()) {
+                brokenParts.add(pod);
+            }
+        }
         return brokenParts;
     }
 
-    public ArrayList<Part> getSalvageableParts() {
-        ArrayList<Part> salvageParts = new ArrayList<Part>();
+    public ArrayList<IPartWork> getSalvageableParts() {
+        ArrayList<IPartWork> salvageParts = new ArrayList<IPartWork>();
         for(Part part: parts) {
             if(part.isSalvaging()) {
                 salvageParts.add(part);
+            }
+        }
+        for (PodSpace pod : podSpace) {
+            if (pod.hasSalvageableParts()) {
+                salvageParts.add(pod);
             }
         }
         return salvageParts;
@@ -1706,6 +1720,7 @@ public class Unit implements MekHqXmlSerializable {
         Part landingGear = null;
         Part turretLock = null;
         ArrayList<Part> aeroHeatSinks = new ArrayList<Part>();
+        int podAeroHeatSinks = 0;
         Part motiveType = null;
         Part primaryW = null;
         Part secondaryW = null;
@@ -1755,7 +1770,7 @@ public class Unit implements MekHqXmlSerializable {
             } else if(part instanceof MekLocation) {
                 locations[((MekLocation)part).getLoc()] = part;
             } else if(part instanceof MissingMekLocation) {
-                locations[((MissingMekLocation)part).getLoc()] = part;
+                locations[part.getLocation()] = part;
             } else if(part instanceof TankLocation) {
                 locations[((TankLocation)part).getLoc()] = part;
             } else if(part instanceof Rotor) {
@@ -1891,6 +1906,9 @@ public class Unit implements MekHqXmlSerializable {
                 landingGear = part;
             } else if(part instanceof AeroHeatSink || part instanceof MissingAeroHeatSink) {
                 aeroHeatSinks.add(part);
+                if (part.isOmniPodded()) {
+                    podAeroHeatSinks++;
+                }
             } else if(part instanceof MotiveSystem) {
                 motiveSystem = part;
             } else if(part instanceof TurretLock) {
@@ -2046,7 +2064,8 @@ public class Unit implements MekHqXmlSerializable {
                     if(entity instanceof BattleArmor) {
                         apart = new BattleArmorAmmoBin((int)entity.getWeight(), m.getType(), eqnum, ((BattleArmor)entity).getSquadSize() * (fullShots - m.getBaseShotsLeft()), oneShot, campaign);
                     } else {
-                        apart = new AmmoBin((int)entity.getWeight(), m.getType(), eqnum, fullShots - m.getBaseShotsLeft(), oneShot, campaign);
+                        apart = new AmmoBin((int)entity.getWeight(), m.getType(), eqnum,
+                                fullShots - m.getBaseShotsLeft(), oneShot, m.isOmniPodMounted(), campaign);
                     }
                     addPart(apart);
                     partsToAdd.add(apart);
@@ -2060,7 +2079,8 @@ public class Unit implements MekHqXmlSerializable {
                 int eqnum = entity.getEquipmentNum(m);
                 Part epart = heatSinks.get(eqnum);
                 if(null == epart) {
-                    epart = new HeatSink((int)entity.getWeight(), m.getType(), eqnum, campaign);
+                    epart = new HeatSink((int)entity.getWeight(), m.getType(), eqnum,
+                            m.isOmniPodMounted(), campaign);
                     addPart(epart);
                     partsToAdd.add(epart);
                 }
@@ -2068,7 +2088,8 @@ public class Unit implements MekHqXmlSerializable {
                 int eqnum = entity.getEquipmentNum(m);
                 Part epart = jumpJets.get(eqnum);
                 if(null == epart) {
-                    epart = new JumpJet((int)entity.getWeight(), m.getType(), eqnum, campaign);
+                    epart = new JumpJet((int)entity.getWeight(), m.getType(), eqnum,
+                            m.isOmniPodMounted(), campaign);
                     addPart(epart);
                     partsToAdd.add(epart);
                 }
@@ -2100,9 +2121,11 @@ public class Unit implements MekHqXmlSerializable {
                             //weapon bays aren't real parts
                             continue;
                         }
-                        epart = new EquipmentPart((int)entity.getWeight(), type, eqnum, campaign);
+                        epart = new EquipmentPart((int)entity.getWeight(), type, eqnum,
+                                m.isOmniPodMounted(), campaign);
                         if(type instanceof MiscType && type.hasFlag(MiscType.F_MASC)) {
-                            epart = new MASC((int)entity.getWeight(), type, eqnum, campaign, erating);
+                            epart = new MASC((int)entity.getWeight(), type, eqnum, campaign,
+                                    erating, m.isOmniPodMounted());
                         }
                         addPart(epart);
                         partsToAdd.add(epart);
@@ -2274,11 +2297,16 @@ public class Unit implements MekHqXmlSerializable {
                 partsToAdd.add(dropCollar);
             }
             int hsinks = ((Aero)entity).getOHeatSinks() - aeroHeatSinks.size();
+            int podhsinks = ((Aero)entity).getPodHeatSinks() - podAeroHeatSinks;
             while(hsinks > 0) {
-                AeroHeatSink aHeatSink = new AeroHeatSink((int)entity.getWeight(), ((Aero)entity).getHeatType(), campaign);
+                AeroHeatSink aHeatSink = new AeroHeatSink((int)entity.getWeight(),
+                        ((Aero)entity).getHeatType(), podhsinks > 0, campaign);
                 addPart(aHeatSink);
                 partsToAdd.add(aHeatSink);
                 hsinks--;
+                if (podhsinks > 0) {
+                    podhsinks--;
+                }
             }
             if (aeroThrustersLeft == null) {
                 aeroThrustersLeft = new Thrusters(0, campaign, true);
@@ -2392,6 +2420,13 @@ public class Unit implements MekHqXmlSerializable {
                 campaign.addPart(p, 0);
             }
         }
+        if (getEntity().isOmni()) {
+            podSpace.clear();
+            for (int loc = 0; loc < getEntity().locations(); loc++) {
+                podSpace.add(new PodSpace(loc, this));
+            }
+            podSpace.forEach(ps -> ps.updateConditionFromEntity(false));
+        }
     }
 
     public ArrayList<Part> getParts() {
@@ -2400,6 +2435,14 @@ public class Unit implements MekHqXmlSerializable {
 
     public void setParts(ArrayList<Part> newParts) {
         parts = newParts;
+    }
+    
+    public ArrayList<PodSpace> getPodSpace() {
+        return podSpace;
+    }
+    
+    public void refreshPodSpace() {
+        podSpace.forEach(ps -> ps.updateConditionFromEntity(false));
     }
 
     public ArrayList<AmmoBin> getWorkingAmmoBins() {

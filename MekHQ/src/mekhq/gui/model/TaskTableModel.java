@@ -5,6 +5,8 @@ import java.awt.Image;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
@@ -13,8 +15,10 @@ import megamek.common.TargetRoll;
 import mekhq.IconPackage;
 import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.PodSpace;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Skill;
+import mekhq.campaign.work.IPartWork;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.ITechWorkPanel;
 import mekhq.gui.RepairTaskInfo;
@@ -39,24 +43,24 @@ public class TaskTableModel extends DataTableModel {
     
     public TaskTableModel(CampaignGUI gui, ITechWorkPanel panel) {
         columnNames = new String[] { "Tasks" };
-        data = new ArrayList<Part>();
+        data = new ArrayList<IPartWork>();
         this.gui = gui;
         this.panel = panel;
     }
     
     public Object getValueAt(int row, int col) {
-        return ((Part) data.get(row)).getDesc();
+        return ((IPartWork) data.get(row)).getDesc();
     }
 
-    public Part getTaskAt(int row) {
-        return (Part) data.get(row);
+    public IPartWork getTaskAt(int row) {
+        return (IPartWork) data.get(row);
     }
 
-    public Part[] getTasksAt(int[] rows) {
-        Part[] tasks = new Part[rows.length];
+    public IPartWork[] getTasksAt(int[] rows) {
+        IPartWork[] tasks = new IPartWork[rows.length];
         for (int i = 0; i < rows.length; i++) {
             int row = rows[i];
-            tasks[i] = (Part) data.get(row);
+            tasks[i] = (IPartWork) data.get(row);
         }
         return tasks;
     }
@@ -88,7 +92,7 @@ public class TaskTableModel extends DataTableModel {
                 unhighlightBorder();
             }
             
-            Part part = getTaskAt(actualRow);
+            IPartWork part = getTaskAt(actualRow);
             
             int availableLevel = REPAIR_STATE.AVAILABLE;
             
@@ -109,6 +113,20 @@ public class TaskTableModel extends DataTableModel {
 	            			availableLevel = REPAIR_STATE.NOT_AVAILABLE;
 	            		}
             		}
+            	} else if (part instanceof PodSpace && !part.isSalvaging()) {
+            	    Matcher m = Pattern.compile(".*(\\d+)/(\\d+).*(\\d+) in transit, (\\d+) on order.*").matcher(part.getDetails());
+            	    if (m.matches()) {
+            	        //Show available if at least one replacement can be made
+            	        if (m.group(2).equals("0")) {
+                            availableLevel = REPAIR_STATE.BLOCKED;
+            	        } else if (!m.group(1).equals("0")) {
+                            availableLevel = REPAIR_STATE.AVAILABLE;
+            	        } else if (m.group(3).equals("0") && m.group(4).equals("0")) {
+            	            availableLevel = REPAIR_STATE.NOT_AVAILABLE;
+            	        } else {
+                            availableLevel = REPAIR_STATE.IN_TRANSIT;
+            	        }
+            	    }
             	}
             	
             	if (availableLevel == REPAIR_STATE.AVAILABLE) {
