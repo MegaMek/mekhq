@@ -1,5 +1,7 @@
 VERSION HISTORY:
 ----------------
+v0.43.2-git
+
 v0.43.1 (2017-02-13 01:15 UTC)
 + Change to require GM Mode for the add/remove pregnancy context menu commands
 + Fix #334: Problems purchasing bombs.
