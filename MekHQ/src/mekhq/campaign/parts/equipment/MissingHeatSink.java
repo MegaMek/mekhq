@@ -59,4 +59,9 @@ public class MissingHeatSink extends MissingEquipmentPart {
 	public int getRepairPartType() {
     	return Part.REPAIR_PART_TYPE.HEATSINK;
     }
+	
+	@Override
+	public boolean isOmniPoddable() {
+	    return true;
+	}
 }
