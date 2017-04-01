@@ -146,6 +146,30 @@ public class PartsTableMouseAdapter extends MouseInputAdapter implements ActionL
             MassRepairSalvageDialog dlg = new MassRepairSalvageDialog(gui.getFrame(), true, gui,
                     MassRepairSalvageDialog.MODE.WAREHOUSE);
             dlg.setVisible(true);
+        } else if (command.equalsIgnoreCase("DEPOD")) {
+            for (Part p : parts) {
+                if (null != p) {
+                    gui.getCampaign().depodPart(p, 1);
+                }
+            }
+        } else if (command.equalsIgnoreCase("DEPOD_ALL")) {
+            for (Part p : parts) {
+                if (null != p) {
+                    gui.getCampaign().depodPart(p, p.getQuantity());
+                }
+            }
+        } else if (command.equalsIgnoreCase("DEPOD_N")) {
+            if (null != selectedPart) {
+                int n = selectedPart.getQuantity();
+                PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(gui.getFrame(), true,
+                        "Remove How Many Pods" + selectedPart.getName() + "s?", 1, 1, n);
+                pvcd.setVisible(true);
+                if (pvcd.getValue() < 0) {
+                    return;
+                }
+                int q = pvcd.getValue();
+                gui.getCampaign().depodPart(selectedPart, q);
+            }
         }
     }
 
@@ -198,6 +222,15 @@ public class PartsTableMouseAdapter extends MouseInputAdapter implements ActionL
     public boolean areAllPartsInTransit(Part[] parts) {
         for (Part p : parts) {
             if (p.isPresent()) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    public boolean areAllPartsPodded(Part[] parts) {
+        for (Part p : parts) {
+            if (!p.isOmniPodded()) {
                 return false;
             }
         }
@@ -304,6 +337,26 @@ public class PartsTableMouseAdapter extends MouseInputAdapter implements ActionL
             menuItem.addActionListener(ev -> gui.miExportPartsActionPerformed(ev));
             menuItem.setEnabled(true);
             popup.add(menuItem);
+            
+            // remove from omnipods
+            if (areAllPartsPodded(parts)) {
+                menu = new JMenu("Remove Pod");
+                menuItem = new JMenuItem("Remove Single Pod of This Type");
+                menuItem.setActionCommand("DEPOD");
+                menuItem.addActionListener(this);
+                menu.add(menuItem);
+                menuItem = new JMenuItem("Remove All Pods of This Type");
+                menuItem.setActionCommand("DEPOD_ALL");
+                menuItem.addActionListener(this);
+                menu.add(menuItem);
+                if (oneSelected && part.getQuantity() > 2) {
+                    menuItem = new JMenuItem("Remove # Pods of This Type...");
+                    menuItem.setActionCommand("DEPOD_N");
+                    menuItem.addActionListener(this);
+                    menu.add(menuItem);
+                }
+                popup.add(menu);
+            }
             // GM mode
             menu = new JMenu("GM Mode");
             if (areAllPartsInTransit(parts)) {

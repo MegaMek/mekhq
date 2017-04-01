@@ -266,6 +266,7 @@ public class CampaignOptions implements Serializable {
     private boolean massRepairOptimizeToCompleteToday;
     private boolean massRepairScrapImpossible;
     private boolean massRepairUseAssignedTechsFirst;
+    private boolean massRepairReplacePod;
     private List<MassRepairOption> massRepairOptions;
 
     public CampaignOptions() {
@@ -470,6 +471,7 @@ public class CampaignOptions implements Serializable {
         massRepairOptimizeToCompleteToday = false;
         massRepairScrapImpossible = false;
         massRepairUseAssignedTechsFirst = false;
+        massRepairReplacePod = true;
         massRepairOptions = new ArrayList<MassRepairOption>();
         
         for (int i = 0; i < MassRepairOption.VALID_REPAIR_TYPES.length; i++) {
@@ -1798,7 +1800,7 @@ public class CampaignOptions implements Serializable {
 	public boolean massRepairScrapImpossible() {
 		return massRepairScrapImpossible;
 	}
-
+	
 	public void setMassRepairScrapImpossible(boolean b) {
 		this.massRepairScrapImpossible = b;
 	}
@@ -1810,6 +1812,14 @@ public class CampaignOptions implements Serializable {
 	public void setMassRepairUseAssignedTechsFirst(boolean massRepairUseAssignedTechsFirst) {
 		this.massRepairUseAssignedTechsFirst = massRepairUseAssignedTechsFirst;
 	}
+
+    public void setMassRepairReplacePod(boolean setMassRepairReplacePod) {
+        this.massRepairReplacePod = setMassRepairReplacePod;
+    }
+
+    public boolean massRepairReplacePod() {
+        return massRepairReplacePod;
+    }
 
 	public List<MassRepairOption> getMassRepairOptions() {
 		return massRepairOptions;
@@ -2017,6 +2027,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "massRepairOptimizeToCompleteToday", massRepairOptimizeToCompleteToday);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "massRepairScrapImpossible", massRepairScrapImpossible);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "massRepairUseAssignedTechsFirst", massRepairUseAssignedTechsFirst);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "massRepairReplacePod", massRepairReplacePod);
         
         pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<massRepairOptions>");
 
@@ -2474,6 +2485,8 @@ public class CampaignOptions implements Serializable {
                 retVal.massRepairScrapImpossible = Boolean.parseBoolean(wn2.getTextContent().trim());        
             } else if (wn2.getNodeName().equalsIgnoreCase("massRepairUseAssignedTechsFirst")) {
                 retVal.massRepairUseAssignedTechsFirst = Boolean.parseBoolean(wn2.getTextContent().trim());                        
+            } else if (wn2.getNodeName().equalsIgnoreCase("massRepairReplacePod")) {
+                retVal.massRepairReplacePod = Boolean.parseBoolean(wn2.getTextContent().trim());                        
             } else if (wn2.getNodeName().equalsIgnoreCase("massRepairOptions")) {
                 NodeList mroList = wn2.getChildNodes();
 
@@ -2553,8 +2566,8 @@ public class CampaignOptions implements Serializable {
 
     	public static int[] VALID_REPAIR_TYPES = new int[] { Part.REPAIR_PART_TYPE.ARMOR, Part.REPAIR_PART_TYPE.AMMO, 
     			Part.REPAIR_PART_TYPE.WEAPON, Part.REPAIR_PART_TYPE.GENERAL_LOCATION, Part.REPAIR_PART_TYPE.ENGINE, 
-    			Part.REPAIR_PART_TYPE.GYRO, Part.REPAIR_PART_TYPE.ACTUATOR, Part.REPAIR_PART_TYPE.ELECTRONICS, 
-    			Part.REPAIR_PART_TYPE.GENERAL };
+    			Part.REPAIR_PART_TYPE.GYRO, Part.REPAIR_PART_TYPE.ACTUATOR, Part.REPAIR_PART_TYPE.ELECTRONICS,
+    			Part.REPAIR_PART_TYPE.POD_SPACE, Part.REPAIR_PART_TYPE.GENERAL };
     	
 		private int type;
     	private boolean active = true;

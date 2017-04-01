@@ -64,7 +64,7 @@ public class MissingMekActuator extends MissingPart {
     
     @Override 
 	public int getBaseTime() {
-		return 90;
+		return isOmniPodded()? 30 : 90;
 	}
 	
 	@Override
@@ -180,6 +180,11 @@ public class MissingMekActuator extends MissingPart {
 	@Override
 	public boolean isOmniPoddable() {
 		return type == Mech.ACTUATOR_LOWER_ARM || type == Mech.ACTUATOR_HAND;
+	}
+	
+	@Override
+	public boolean isOmniPodded() {
+	    return isOmniPoddable() && getUnit() != null && getUnit().getEntity().isOmni();
 	}
 
 	@Override

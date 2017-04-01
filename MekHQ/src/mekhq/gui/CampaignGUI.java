@@ -2761,7 +2761,7 @@ public class CampaignGUI extends JPanel {
         getFrame().setTitle(getCampaign().getTitle());
     }
 
-    private void refreshReport() {
+    synchronized private void refreshReport() {
         List<String> newLogEntries = getCampaign().fetchAndClearNewReports();
         panLog.appendLog(newLogEntries);
         logDialog.appendLog(newLogEntries);
@@ -2808,13 +2808,12 @@ public class CampaignGUI extends JPanel {
         lblTempMedics.setText(text);
     }
 
-    private ActionScheduler reportScheduler = new ActionScheduler(this::refreshReport);
     private ActionScheduler fundsScheduler = new ActionScheduler(this::refreshFunds);
     private ActionScheduler ratingScheduler = new ActionScheduler(this::refreshRating);
     
     @Subscribe
     public void handle(ReportEvent ev) {
-        reportScheduler.schedule();
+        refreshReport();
     }
     
     @Subscribe

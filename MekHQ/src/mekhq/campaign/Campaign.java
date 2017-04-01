@@ -165,6 +165,7 @@ import mekhq.campaign.parts.MekLocation;
 import mekhq.campaign.parts.MissingEnginePart;
 import mekhq.campaign.parts.MissingMekActuator;
 import mekhq.campaign.parts.MissingPart;
+import mekhq.campaign.parts.OmniPod;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PartInUse;
 import mekhq.campaign.parts.ProtomekArmor;
@@ -1931,7 +1932,9 @@ public class Campaign implements Serializable {
         Part repairable = part.clone();
         part.decrementQuantity();
         fixPart(repairable, tech);
-        addPart(repairable, 0);
+        if (!(repairable instanceof OmniPod)) {
+            addPart(repairable, 0);
+        }
         
         return repairable;
     }
@@ -3278,6 +3281,21 @@ public class Campaign implements Serializable {
             armor.changeAmountAvailable(-1 * points);
         }
         MekHQ.triggerEvent(new PartRemovedEvent(armor));
+    }
+
+    public void depodPart(Part part, int quantity) {
+        Part unpodded = part.clone();
+        unpodded.setOmniPodded(false);
+        OmniPod pod = new OmniPod(unpodded, this);
+        while (quantity > 0 && part.getQuantity() > 0) {
+            addPart(unpodded.clone(), 0);
+            addPart(pod.clone(), 0);
+            part.decrementQuantity();
+            quantity--;
+        }
+        MekHQ.triggerEvent(new PartRemovedEvent(part));
+        MekHQ.triggerEvent(new PartRemovedEvent(pod));
+        MekHQ.triggerEvent(new PartRemovedEvent(unpodded));
     }
 
     public boolean buyRefurbishment(Part part) {
@@ -4878,7 +4896,7 @@ public class Campaign implements Serializable {
                 && ((EquipmentPart) p).getType().hasFlag(MiscType.F_MASC)
                 && !(p instanceof MASC)) {
                 p = new MASC(p.getUnitTonnage(), ((EquipmentPart) p).getType(),
-                             ((EquipmentPart) p).getEquipmentNum(), retVal, 0);
+                             ((EquipmentPart) p).getEquipmentNum(), retVal, 0, p.isOmniPodded());
                 p.setId(pid);
             }
             if (p instanceof MissingEquipmentPart
@@ -4887,7 +4905,7 @@ public class Campaign implements Serializable {
                 p = new MissingMASC(p.getUnitTonnage(),
                                     ((MissingEquipmentPart) p).getType(),
                                     ((MissingEquipmentPart) p).getEquipmentNum(), retVal,
-                                    ((MissingEquipmentPart) p).getTonnage(), 0);
+                                    ((MissingEquipmentPart) p).getTonnage(), 0, p.isOmniPodded());
                 p.setId(pid);
             }
             // deal with true values for sensor and life support on non-Mech
@@ -5586,9 +5604,9 @@ public class Campaign implements Serializable {
         return finances;
     }
 
-    public ArrayList<Part> getPartsNeedingServiceFor(UUID uid) {
+    public ArrayList<IPartWork> getPartsNeedingServiceFor(UUID uid) {
         if (null == uid) {
-            return new ArrayList<Part>();
+            return new ArrayList<IPartWork>();
         }
         Unit u = getUnit(uid);
         if (u != null) {
@@ -5598,7 +5616,7 @@ public class Campaign implements Serializable {
                 return u.getPartsNeedingFixing();
             }
         }
-        return new ArrayList<Part>();
+        return new ArrayList<IPartWork>();
     }
 
     public ArrayList<IAcquisitionWork> getAcquisitionsForUnit(UUID uid) {

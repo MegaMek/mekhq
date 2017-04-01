@@ -43,11 +43,12 @@ public class MissingMASC extends MissingEquipmentPart {
 	protected int engineRating;
 	
 	public MissingMASC() {
-    	this(0, null, -1, null, 0, 0);
+    	this(0, null, -1, null, 0, 0, false);
     }
     
-    public MissingMASC(int tonnage, EquipmentType et, int equipNum, Campaign c, double etonnage, int rating) {
-        super(tonnage, et, equipNum, c, etonnage);
+    public MissingMASC(int tonnage, EquipmentType et, int equipNum, Campaign c, double etonnage,
+            int rating, boolean omniPodded) {
+        super(tonnage, et, equipNum, c, etonnage, omniPodded);
         this.engineRating = rating;
     }
  
@@ -132,13 +133,13 @@ public class MissingMASC extends MissingEquipmentPart {
 	
 	@Override
 	public Part getNewPart() {
-		MASC epart = new MASC(getUnitTonnage(), type, -1, campaign, engineRating);
+		MASC epart = new MASC(getUnitTonnage(), type, -1, campaign, engineRating, omniPodded);
 		epart.setEquipTonnage(equipTonnage);
 		return epart;
 	}
 	
 	@Override
     public boolean isOmniPoddable() {
-    	return false;
+    	return isSupercharger();
     }
 }

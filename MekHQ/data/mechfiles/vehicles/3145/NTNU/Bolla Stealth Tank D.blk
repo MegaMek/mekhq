@@ -13,7 +13,7 @@ Tank
 </UnitType>
 
 <Name>
-Bolla Stealth Tank (RotS) 
+Bolla Stealth Tank (RotS)
 </Name>
 
 <Model>
@@ -21,7 +21,7 @@ D
 </Model>
 
 <year>
-3130
+3091
 </year>
 
 <type>
@@ -37,7 +37,7 @@ troopspace:4.0
 </transporters>
 
 <transporters>
-
+BattleArmorHandles - troopers:-1
 </transporters>
 
 <cruiseMP>
@@ -69,18 +69,20 @@ troopspace:4.0
 </armor>
 
 <Body Equipment>
+IS Vehicular Stealth
+IS Vehicular Stealth
 ISC3SlaveUnit
 ISGuardianECMSuite
-CLSniperCannonAmmo
-CLSniperCannonAmmo
-CLMediumChemLaserAmmo
+CLSniperCannonAmmo:OMNI
+CLSniperCannonAmmo:OMNI
+CLMediumChemLaserAmmo:OMNI
 IS Machine Gun Ammo - Half
 </Body Equipment>
 
 <Front Equipment>
-CLMediumChemLaser
+CLMediumChemLaser:OMNI
 Machine Gun
-Machine Gun
+Machine Gun:OMNI
 </Front Equipment>
 
 <Right Equipment>
@@ -93,14 +95,18 @@ Machine Gun
 </Rear Equipment>
 
 <Turret Equipment>
-ISSniperCannon
+ISSniperCannon:OMNI
 </Turret Equipment>
 
 <source>
-RS 3145 NT NU
+RS 3145 NTNU - Early Republic
 </source>
 
 <tonnage>
 60.0
 </tonnage>
+
+<baseChassisTurretWeight>
+1.5
+</baseChassisTurretWeight>
 

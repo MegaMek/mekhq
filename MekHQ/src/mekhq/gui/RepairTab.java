@@ -66,12 +66,14 @@ import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.parts.MekLocation;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.PodSpace;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IAcquisitionWork;
+import mekhq.campaign.work.IPartWork;
 import mekhq.gui.adapter.AcquisitionTableMouseAdapter;
 import mekhq.gui.adapter.ServicedUnitsTableMouseAdapter;
 import mekhq.gui.adapter.TaskTableMouseAdapter;
@@ -445,6 +447,10 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
     protected boolean acquireSelected() {
         return tabTasks.getSelectedIndex() == 1;
     }
+    
+    protected boolean podSelected() {
+        return tabTasks.getSelectedIndex() == 2;
+    }
 
     private void taskTabChanged() {
         filterTechs();
@@ -461,7 +467,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
                 target = getCampaign().getTargetForAcquisition(acquire, admin);
             }
         } else {
-            Part part = getSelectedTask();
+            IPartWork part = getSelectedTask();
             if (null != part) {
                 Unit u = part.getUnit();
                 Person tech = getSelectedTech();
@@ -549,7 +555,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
     }
 
     @Override
-    public Part getSelectedTask() {
+    public IPartWork getSelectedTask() {
         int row = taskTable.getSelectedRow();
         if (row < 0) {
             return null;
@@ -564,7 +570,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         }
         return acquireModel.getAcquisitionAt(acquisitionTable.convertRowIndexToModel(row));
     }
-
+    
     private Unit getSelectedServicedUnit() {
         int row = servicedUnitTable.getSelectedRow();
         if (row < 0) {
@@ -615,7 +621,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
             // selectedTechRow = TechTable.getSelectedRow();
             selectedLocation = choiceLocation.getSelectedIndex();
             selectedUnit = getSelectedServicedUnit();
-            Part part = getSelectedTask();
+            IPartWork part = (IPartWork)getSelectedTask();
             if (null == part) {
                 return;
             }
@@ -626,7 +632,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
             if (null == tech) {
                 return;
             }
-            if (part.onBadHipOrShoulder() && !part.isSalvaging()) {
+            if (part instanceof Part && ((Part)part).onBadHipOrShoulder() && !part.isSalvaging()) {
                 if (part instanceof MekLocation && ((MekLocation) part).isBreached()
                         && 0 != JOptionPane.showConfirmDialog(getFrame(),
                                 "You are sealing a limb with a bad shoulder or hip.\n"
@@ -653,12 +659,15 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
                 }
             }
             getCampaign().fixPart(part, tech);
-            if (null != u && !u.isRepairable() && u.getSalvageableParts().size() == 0) {
-                selectedRow = -1;
-                getCampaign().removeUnit(u.getId());
-            }
-            if (null != u && !getCampaign().getServiceableUnits().contains(u)) {
-                selectedRow = -1;
+            if (null != u) {
+                if (!u.isRepairable() && u.getSalvageableParts().size() == 0) {
+                    selectedRow = -1;
+                    getCampaign().removeUnit(u.getId());
+                }
+                if (!getCampaign().getServiceableUnits().contains(u)) {
+                    selectedRow = -1;
+                }
+                u.refreshPodSpace();
             }
             MekHQ.triggerEvent(new PartWorkEvent(tech, part));
         } else if (acquireSelected()) {
@@ -765,15 +774,20 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
             @Override
             public boolean include(Entry<? extends TaskTableModel, ? extends Integer> entry) {
                 TaskTableModel taskModel = entry.getModel();
-                Part part = taskModel.getTaskAt(entry.getIdentifier());
+                IPartWork part = (IPartWork)taskModel.getTaskAt(entry.getIdentifier());
                 if (part == null) {
                     return false;
                 }
                 if (loc != null && !loc.isEmpty()) {
                     if (loc.equals("All")) {
                         return true;
+                    } else if (loc.equals("OmniPod")) {
+                        return part instanceof PodSpace;
+                    } else if (part instanceof PodSpace) {
+                        return ((PodSpace)part).getLocation() == part.getUnit().getEntity().getLocationFromAbbr(loc);
+                    } else {
+                        return ((Part)part).isInLocation(loc);
                     }
-                    return part.isInLocation(loc);
                 }
                 return false;
 
@@ -784,7 +798,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
 
     public void filterTechs() {
         RowFilter<TechTableModel, Integer> techTypeFilter = null;
-        final Part part = getSelectedTask();
+        final IPartWork part = getSelectedTask();
         final Unit unit = getSelectedServicedUnit();
         techTypeFilter = new RowFilter<TechTableModel, Integer>() {
             @Override
@@ -873,7 +887,15 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
             choiceLocation.removeAllItems();
             choiceLocation.addItem("All");
             for (String s : getSelectedServicedUnit().getEntity().getLocationAbbrs()) {
-                choiceLocation.addItem(s);
+                if (s.equals("WNG")) {
+                    choiceLocation.addItem("FSLG");
+                } else {
+                    choiceLocation.addItem(s);
+                }
+            }
+            if (getSelectedServicedUnit().getEntity().isOmni()) {
+                choiceLocation.addItem("OmniPod");
+                numLocations++;
             }
             choiceLocation.setSelectedIndex(0);
             if (index > -1 && choiceLocation.getModel().getSize() == numLocations) {

@@ -60,6 +60,7 @@ import mekhq.campaign.event.AcquisitionEvent;
 import mekhq.campaign.event.AstechPoolChangedEvent;
 import mekhq.campaign.event.OvertimeModeEvent;
 import mekhq.campaign.event.PartChangedEvent;
+import mekhq.campaign.event.PartModeChangedEvent;
 import mekhq.campaign.event.PartNewEvent;
 import mekhq.campaign.event.PartRemovedEvent;
 import mekhq.campaign.event.PartWorkEvent;
@@ -832,5 +833,10 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
     @Subscribe
     public void handle(AstechPoolChangedEvent ev) {
         filterTechs();
+    }
+    
+    @Subscribe
+    public void handle(PartModeChangedEvent ev) {
+        updateTechTarget();
     }
 }

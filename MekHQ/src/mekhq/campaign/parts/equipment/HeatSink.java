@@ -38,15 +38,15 @@ public class HeatSink extends EquipmentPart {
 	private static final long serialVersionUID = 2892728320891712304L;
 
 	public HeatSink() {
-    	this(0, null, -1, null);
+    	this(0, null, -1, false, null);
     }
     
-    public HeatSink(int tonnage, EquipmentType et, int equipNum, Campaign c) {
-        super(tonnage, et, equipNum, c);
+    public HeatSink(int tonnage, EquipmentType et, int equipNum, boolean omniPodded, Campaign c) {
+        super(tonnage, et, equipNum, omniPodded, c);
     }
     
     public HeatSink clone() {
-    	HeatSink clone = new HeatSink(getUnitTonnage(), getType(), getEquipmentNum(), campaign);
+    	HeatSink clone = new HeatSink(getUnitTonnage(), getType(), getEquipmentNum(), omniPodded, campaign);
         clone.copyBaseData(this);
     	return clone;
     }
@@ -58,15 +58,15 @@ public class HeatSink extends EquipmentPart {
     @Override
     public long getStickerPrice() {		
     	if(type.hasFlag(MiscType.F_DOUBLE_HEAT_SINK) || type.hasFlag(MiscType.F_LASER_HEAT_SINK)) {
-    		return 6000;
+    		return isOmniPodded()? 7500 : 6000;
     	} else {
-    		return 2000;	
+    		return isOmniPodded()? 2500 : 2000;
     	}
     }
 
 	@Override
 	public MissingPart getMissingPart() {
-		return new MissingHeatSink(getUnitTonnage(), type, equipmentNum, campaign);
+		return new MissingHeatSink(getUnitTonnage(), type, equipmentNum, omniPodded, campaign);
 	}
 
 	@Override
@@ -93,7 +93,7 @@ public class HeatSink extends EquipmentPart {
 	@Override 
 	public int getBaseTime() {
 		if(isSalvaging()) {
-			return 90;
+			return isOmniPodded()? 30 : 90;
 		}
 		return 120;
 	}
@@ -101,7 +101,7 @@ public class HeatSink extends EquipmentPart {
 	@Override
 	public int getDifficulty() {
 		if(isSalvaging()) {
-			return -2;
+			return isOmniPodded()? -4 : -2;
 		}
 		return -1;
 	}
