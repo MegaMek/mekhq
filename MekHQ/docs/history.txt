@@ -1,7 +1,8 @@
 VERSION HISTORY:
 ----------------
 v0.42.2-git
-Fix #334: Problems purchasing bombs.
++ Fix #334: Problems purchasing bombs.
++ Fix #364: MekHq Calculates Naval Vee Piloting skill using Ground Vee piloting skill.
 
 v0.42.1 (2017-02-13 03:30 UTC)
 + Fix #313: Prisoners counting towards combatants total for defection rolls

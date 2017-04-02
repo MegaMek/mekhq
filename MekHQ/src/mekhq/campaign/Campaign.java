@@ -93,7 +93,6 @@ import megamek.common.Protomech;
 import megamek.common.SmallCraft;
 import megamek.common.Tank;
 import megamek.common.TargetRoll;
-import megamek.common.VTOL;
 import megamek.common.loaders.BLKFile;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.options.GameOptions;
@@ -6491,10 +6490,19 @@ public class Campaign implements Serializable {
                 p = newPerson(Person.T_CONV_PILOT);
             } else if (unit.getEntity() instanceof Aero) {
                 p = newPerson(Person.T_AERO_PILOT);
-            } else if (unit.getEntity() instanceof VTOL) {
-                p = newPerson(Person.T_VTOL_PILOT);
             } else if (unit.getEntity() instanceof Tank) {
-                p = newPerson(Person.T_GVEE_DRIVER);
+                switch (unit.getEntity().getMovementMode()) {
+                case VTOL:
+                    p = newPerson(Person.T_VTOL_PILOT);
+                    break;
+                case NAVAL:
+                case HYDROFOIL:
+                case SUBMARINE:
+                    p = newPerson(Person.T_NVEE_DRIVER);
+                    break;
+                default:
+                    p = newPerson(Person.T_GVEE_DRIVER);
+                }
             } else if (unit.getEntity() instanceof Protomech) {
                 p = newPerson(Person.T_PROTO_PILOT);
             } else if (unit.getEntity() instanceof BattleArmor) {
