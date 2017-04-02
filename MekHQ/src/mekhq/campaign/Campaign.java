@@ -6764,11 +6764,16 @@ public class Campaign implements Serializable {
         entity.setNeverDeployed(true);
         entity.setStuck(false);
         entity.resetCoolantFailureAmount();
-        entity.setCoolingFlawActive(false);
 
         if (!entity.getSensors().isEmpty()) {
             entity.setNextSensor(entity.getSensors().firstElement());
         }
+
+        if (entity instanceof Mech) {
+            Mech m = (Mech) entity;
+            m.setCoolingFlawActive(false);
+        }
+
         if (entity instanceof Aero) {
             Aero a = (Aero) entity;
             int[] bombChoices = a.getBombChoices();
