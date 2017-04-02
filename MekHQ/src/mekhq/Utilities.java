@@ -51,6 +51,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.StringTokenizer;
 import java.util.Vector;
+import java.util.stream.Collectors;
 
 import javax.swing.JTable;
 import javax.swing.table.TableModel;
@@ -67,6 +68,7 @@ import megamek.common.ConvFighter;
 import megamek.common.Coords;
 import megamek.common.Crew;
 import megamek.common.Entity;
+import megamek.common.EquipmentType;
 import megamek.common.Infantry;
 import megamek.common.Jumpship;
 import megamek.common.Mech;
@@ -393,6 +395,72 @@ public class Utilities {
 			variants.add(summary.getModel());
 		}
 		return variants;
+	}
+	
+	public static boolean isOmniVariant(Entity entity1, Entity entity2) {
+	    if (!entity1.isOmni() || !entity2.isOmni()) {
+	        return false;
+	    }
+	    if (entity1.getWeight() != entity2.getWeight()) {
+	        return false;
+	    }
+	    if (entity1.getClass() != entity2.getClass()) {
+	        return false;
+	    }
+	    if (entity1.getEngine().getRating() != entity2.getEngine().getRating()
+	            || entity1.getEngine().getEngineType() != entity2.getEngine().getEngineType()
+	            || entity1.getEngine().getFlags() != entity2.getEngine().getFlags()) {
+	        return false;
+	    }
+	    if (entity1.getStructureType() != entity2.getStructureType()) {
+	        return false;
+	    }
+	    if (entity1 instanceof Mech) {
+            if (((Mech)entity1).getCockpitType() != ((Mech)entity2).getCockpitType()) {
+                return false;
+            }
+            if (((Mech)entity1).getGyroType() != ((Mech)entity2).getGyroType()) {
+                return false;
+            }
+	    }
+	    if (entity1 instanceof Aero) {
+            if (((Aero)entity1).getCockpitType() != ((Aero)entity2).getCockpitType()) {
+                return false;
+            }
+	    }
+	    if (entity1 instanceof Tank) {
+	        if (entity1.getMovementMode() != entity2.getMovementMode()) {
+	            return false;
+	        }
+	    }
+	    for (int loc = 0; loc < entity1.locations(); loc++) {
+	        if (entity1.getArmorType(loc) != entity2.getArmorType(loc)
+	                || entity1.getOArmor(loc) != entity2.getOArmor(loc)) {
+	            return false;
+	        }
+	    }
+	    //Generated a list of all fixed equipment in each location for entity1
+	    Map<Integer,List<EquipmentType>> fixed = entity1.getEquipment().stream()
+	            .filter(m -> !m.isOmniPodMounted() && !m.getType().getInternalName().equals("CLCASE")
+	                    && !m.isWeaponGroup())
+	            .collect(Collectors.groupingBy(Mounted::getLocation,
+	                    Collectors.mapping(m -> m.getType(), Collectors.toList())));
+	    //Go through all fixed equipment in entity2 and remove it from the list. If not found,
+	    //or if there is any left over after this, the base chassis differ.
+	    for (Mounted m : entity2.getEquipment()) {
+	        if (m.isOmniPodMounted() || m.getType().getInternalName().equals("CLCASE")
+	                || m.isWeaponGroup()) {
+	            continue;
+	        }
+	        if (!fixed.containsKey(m.getLocation())
+	                || !fixed.get(m.getLocation()).remove(m.getType())) {
+	            return false;
+	        }
+	        if (fixed.get(m.getLocation()).isEmpty()) {
+	            fixed.remove(m.getLocation());
+	        }
+	    }
+	    return fixed.isEmpty();
 	}
 
 	public static int generateExpLevel(int bonus) {

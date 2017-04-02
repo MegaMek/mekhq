@@ -25,14 +25,16 @@ import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.StringJoiner;
 import java.util.UUID;
 
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import megamek.common.Entity;
 import megamek.common.EquipmentType;
-import megamek.common.MiscType;
+import megamek.common.Tank;
 import megamek.common.TargetRoll;
 import megamek.common.TechConstants;
 import megamek.common.WeaponType;
@@ -80,6 +82,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	public static final int PART_TYPE_GENERIC_SPARE_PART = 10;
 	public static final int PART_TYPE_OTHER = 11;
 	public static final int PART_TYPE_MEK_COCKPIT = 12;
+	public static final int PART_TYPE_OMNI_SPACE = 13;
 
 	public static final int T_UNKNOWN = -1;
 	public static final int T_BOTH = 0;
@@ -104,14 +107,15 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 		public static final int ELECTRONICS = 7;
 		public static final int GENERAL = 8;
 		public static final int HEATSINK = 9;
-		public static final int MEK_LOCATION = 10;		
-		public static final int PHYSICAL_WEAPON = 11;		
+		public static final int MEK_LOCATION = 10;
+		public static final int PHYSICAL_WEAPON = 11;
+		public static final int POD_SPACE = 12;
 	}
     
 	private static final String[] partTypeLabels = { "Armor", "Weapon", "Ammo",
 			"Equipment Part", "Mek Actuator", "Mek Engine", "Mek Gyro",
 			"Mek Life Support", "Mek Body Part", "Mek Sensor",
-			"Generic Spare Part", "Other" };
+			"Generic Spare Part", "Other", "Mek Cockpit", "Pod Space" };
 
 	public static String[] getPartTypeLabels() {
 		return partTypeLabels;
@@ -124,7 +128,8 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	//even when off the unit. actual tonnage is returned via the
 	//getTonnage() method
 	protected int unitTonnage;
-
+	
+	protected boolean omniPodded;
 	
 	//hits to this part
 	protected int hits;
@@ -196,12 +201,17 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	protected int replacementId;
 
 	public Part() {
-		this(0, null);
+		this(0, false, null);
+	}
+	
+	public Part(int tonnage, Campaign c) {
+	    this(tonnage, false, c);
 	}
 
-	public Part(int tonnage, Campaign c) {
+	public Part(int tonnage, boolean omniPodded, Campaign c) {
 		this.name = "Unknown";
 		this.unitTonnage = tonnage;
+		this.omniPodded = omniPodded;
 		this.hits = 0;
 		this.skillMin = SkillType.EXP_GREEN;
 		this.mode = WorkTime.NORMAL;
@@ -339,6 +349,14 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	}
 
 	public abstract double getTonnage();
+	
+	public boolean isOmniPodded() {
+	    return omniPodded;
+	}
+	
+	public void setOmniPodded(boolean omniPod) {
+	    this.omniPodded = omniPod;
+	}
 
 	public Unit getUnit() {
 		return unit;
@@ -552,6 +570,9 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 				+"<name>"
 				+MekHqXmlUtil.escape(name)
 				+"</name>");
+		if (omniPodded) {
+		    pw1.println(MekHqXmlUtil.indentStr(indent+1) + "<omniPodded/>");
+		}
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<unitTonnage>"
 				+unitTonnage
@@ -691,8 +712,10 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 					retVal.id = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("name")) {
 					retVal.name = wn2.getTextContent();
-				} else if (wn2.getNodeName().equalsIgnoreCase("unitTonnage")) {
-					retVal.unitTonnage = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("unitTonnage")) {
+                    retVal.unitTonnage = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("omniPodded")) {
+                    retVal.omniPodded = true;
 				} else if (wn2.getNodeName().equalsIgnoreCase("quantity")) {
 					retVal.quantity = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("hits")) {
@@ -820,12 +843,26 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	}
 
 	public void setMode(WorkTime wt) {
-		this.mode = wt;
+	    if (canChangeWorkMode()) {
+	        this.mode = wt;
+	    } else {
+	        this.mode = WorkTime.NORMAL;
+	    }
+	}
+	
+	@Override
+	public boolean canChangeWorkMode() {
+	    return !(isOmniPodded() && isSalvaging());
 	}
 
 	@Override
 	public TargetRoll getAllMods(Person tech) {
-		TargetRoll mods = new TargetRoll(getDifficulty(), "difficulty");
+	    int difficulty = getDifficulty();
+	    if (isOmniPodded() && (isSalvaging() || this instanceof MissingPart)
+	            && !(unit.getEntity() instanceof Tank)) {
+	        difficulty -= 2;
+	    }
+		TargetRoll mods = new TargetRoll(difficulty, "difficulty");
 		int modeMod = mode.getMod(campaign.getCampaignOptions().isDestroyByMargin());
 		if (modeMod != 0) {
 			mods.addModifier(modeMod, getCurrentModeName());
@@ -991,7 +1028,15 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	
 	@Override
     public String getDetails() {
-        return hits + " hit(s)";
+	    StringJoiner sj = new StringJoiner(", ");
+	    if (getLocationName() != null) {
+	        sj.add(getLocationName());
+	    }
+	    if (isOmniPodded()) {
+	        sj.add("OmniPod");
+	    }
+        sj.add(hits + " hit(s)");
+        return sj.toString();
     }
 
 	@Override
@@ -1042,6 +1087,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
         this.mode = part.mode;
         this.hits = part.hits;
         this.brandNew = part.brandNew;
+        this.omniPodded = part.omniPodded;
     }
 
 	public void setRefitId(UUID rid) {
@@ -1221,8 +1267,6 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 
     public abstract String getLocationName();
 
-    public abstract int getLocation();
-    
     public void setParentPartId(int id) {
     	parentPartId = id;
     }
@@ -1290,9 +1334,13 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
     }
     
     public boolean isInLocation(String loc) {
-    	return null != unit 
-    		&& null != unit.getEntity() 
-    		&& getLocation() == getUnit().getEntity().getLocationFromAbbr(loc);
+        if (null == unit || null == unit.getEntity()) {
+            return false;
+        }
+        if (loc.equals("FSLG")) {
+            return getLocation() == Entity.LOC_NONE;
+        }
+    	return getLocation() == getUnit().getEntity().getLocationFromAbbr(loc);
     }
     
     @Override
@@ -1339,31 +1387,10 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
     			return "Other Items";
 		}
 	}
-	
-	public static int findCorrectMassRepairType(Part part) {
-		if (part instanceof EquipmentPart && ((EquipmentPart)part).getType() instanceof WeaponType) {
-			return Part.REPAIR_PART_TYPE.WEAPON;
-		} else {			
-			return part.getMassRepairOptionType();
-		}
-	}
-	
-	public static int findCorrectRepairType(Part part) {
-		if ((part instanceof EquipmentPart && ((EquipmentPart)part).getType() instanceof WeaponType) ||
-				(part instanceof MissingEquipmentPart && ((MissingEquipmentPart)part).getType() instanceof WeaponType)) {
-			return Part.REPAIR_PART_TYPE.WEAPON;
-		} else {
-			if (part instanceof EquipmentPart && ((EquipmentPart)part).getType().hasFlag(MiscType.F_CLUB)) {
-				return Part.REPAIR_PART_TYPE.PHYSICAL_WEAPON;
-			}
-			
-			return part.getRepairPartType();
-		}
-	}
 
-	public static String[] findPartImage(Part part) {
+	public static String[] findPartImage(IPartWork part) {
 		String imgBase = null;
-        int repairType = Part.findCorrectRepairType(part);
+        int repairType = IPartWork.findCorrectRepairType(part);
         
         switch (repairType) {
         	case Part.REPAIR_PART_TYPE.ARMOR:
@@ -1407,6 +1434,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
         		
         		break;
         	case Part.REPAIR_PART_TYPE.MEK_LOCATION:
+        	case Part.REPAIR_PART_TYPE.POD_SPACE:
         		imgBase = "location_mek";
         		break;
         	case Part.REPAIR_PART_TYPE.PHYSICAL_WEAPON:

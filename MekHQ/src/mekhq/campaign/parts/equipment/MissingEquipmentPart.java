@@ -26,7 +26,9 @@ import java.io.PrintWriter;
 import megamek.common.CriticalSlot;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
+import megamek.common.MiscType;
 import megamek.common.Mounted;
+import megamek.common.WeaponType;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.MissingPart;
@@ -63,10 +65,15 @@ public class MissingEquipmentPart extends MissingPart {
     }
 
     public MissingEquipmentPart() {
-    	this(0, null, -1, null, 0);
+    	this(0, null, -1, null, 0, false);
+    }
+    
+    public MissingEquipmentPart(int tonnage, EquipmentType et, int equipNum, Campaign c, double eTonnage) {
+        this(tonnage, et, equipNum, c, eTonnage, false);
     }
 
-    public MissingEquipmentPart(int tonnage, EquipmentType et, int equipNum, Campaign c, double eTonnage) {
+    public MissingEquipmentPart(int tonnage, EquipmentType et, int equipNum, Campaign c,
+            double eTonnage, boolean omniPodded) {
         // TODO Memorize all entity attributes needed to calculate cost
         // As it is a part bought with one entity can be used on another entity
         // on which it would have a different price (only tonnage is taken into
@@ -79,11 +86,12 @@ public class MissingEquipmentPart extends MissingPart {
         }
         this.equipmentNum = equipNum;
         this.equipTonnage = eTonnage;
+        this.omniPodded = omniPodded;
     }
 
     @Override
 	public int getBaseTime() {
-		return 120;
+		return isOmniPodded()? 30 : 120;
 	}
 
 	@Override
@@ -272,7 +280,7 @@ public class MissingEquipmentPart extends MissingPart {
 
 	@Override
 	public Part getNewPart() {
-		EquipmentPart epart = new EquipmentPart(getUnitTonnage(), type, -1, campaign);
+		EquipmentPart epart = new EquipmentPart(getUnitTonnage(), type, -1, omniPodded, campaign);
 		epart.setEquipTonnage(equipTonnage);
 		return epart;
 	}
@@ -337,8 +345,20 @@ public class MissingEquipmentPart extends MissingPart {
 
 	@Override
     public boolean isOmniPoddable() {
-    	//TODO: is this on equipment type?
-    	return true;
+        if (type.isOmniFixedOnly()) {
+            return false;
+        }
+        if (type instanceof MiscType) {
+            return type.hasFlag(MiscType.F_MECH_EQUIPMENT)
+                    || type.hasFlag(MiscType.F_TANK_EQUIPMENT)
+                    || type.hasFlag(MiscType.F_AERO_EQUIPMENT);
+        } else if (type instanceof WeaponType) {
+            return (type.hasFlag(WeaponType.F_MECH_WEAPON)
+                    || type.hasFlag(WeaponType.F_TANK_WEAPON)
+                    || type.hasFlag(WeaponType.F_AERO_WEAPON))
+                    && !((WeaponType)type).isCapital();
+        }
+        return true;
     }
 
 	@Override

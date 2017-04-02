@@ -5,7 +5,7 @@ D
 Config:Biped Omnimech
 TechBase:Mixed (Clan Chassis)
 Era:3072
-Source:WoR Supplement
+Source:WoR - Jihad Supplement
 Rules Level:4
 
 Mass:25
@@ -70,9 +70,9 @@ Fusion Engine
 Fusion Engine
 Fusion Engine
 Fusion Engine
-CLImprovedHeavyLargeLaser
-CLImprovedHeavyLargeLaser
-CLImprovedHeavyLargeLaser
+CLImprovedHeavyLargeLaser (omnipod)
+CLImprovedHeavyLargeLaser (omnipod)
+CLImprovedHeavyLargeLaser (omnipod)
 Clan Endo Steel
 Clan Endo Steel
 Mek Null Signature System
@@ -84,9 +84,9 @@ Fusion Engine
 Fusion Engine
 Fusion Engine
 Fusion Engine
-CLImprovedSmallHeavyLaser
-CLImprovedSmallHeavyLaser
-CLImprovedSmallHeavyLaser
+CLImprovedSmallHeavyLaser (omnipod)
+CLImprovedSmallHeavyLaser (omnipod)
+CLImprovedSmallHeavyLaser (omnipod)
 Clan Endo Steel
 Mek Null Signature System
 Chameleon Light Polarization Shield

@@ -19,8 +19,8 @@
 
 package mekhq.gui;
 
-import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.work.IPartWork;
 
 /**
  * Interface implemented by any panel that manages tech work. Needed to provide selectedTask
@@ -29,7 +29,7 @@ import mekhq.campaign.personnel.Person;
  */
 public interface ITechWorkPanel {
 
-    public Part getSelectedTask();
+    public IPartWork getSelectedTask();
     
     public Person getSelectedTech();
 }

@@ -728,7 +728,11 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
             // Customize
             if (oneSelected) {
                 menu = new JMenu("Customize");
-                menuItem = new JMenuItem("Choose Refit Kit...");
+                if (unit.getEntity().isOmni()) {
+                    menuItem = new JMenuItem("Choose configuration...");
+                } else {
+                    menuItem = new JMenuItem("Choose Refit Kit...");
+                }
                 menuItem.setActionCommand("REFIT_KIT");
                 menuItem.addActionListener(this);
                 menuItem.setEnabled(unit.isAvailable()

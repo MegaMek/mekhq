@@ -49,10 +49,6 @@ public class MissingMekLocation extends MissingPart {
     	this(0, 0, 0, false, false, null);
     }
 
-    public int getLoc() {
-        return loc;
-    }
-
     public boolean isTsm() {
         return tsm;
     }

@@ -1,11 +1,19 @@
 VERSION HISTORY:
 ----------------
-v0.43.1-git
+v0.43.2-git
++ Fix #362: Omni Refits calculating additional HS incorrectly
+
+v0.43.1 (2017-03-31 01:15 UTC)
 + Change to require GM Mode for the add/remove pregnancy context menu commands
 + Fix #334: Problems purchasing bombs.
 + Fix #326: Cannot use Meklab to customize units from within MekHQ using v43.0
 + PR #344: Separate list item for Prisoners on the personnel tab
-
++ Omni units: faster salvage/replacement (including whole location at once), separate podded parts in warehouse.
++ Data: These are a series of commits updating MekHQ data (boards, Unit files, and sprites)
+	 to match MM repo as of March 31/2017
+ + Updated MegaMek.jar to 0.43.1
+ + Updated MegaMekLab.jar to 0.43.1
+	 
 v0.43.0 (2017-02-13 03:30 UTC)
 + Improve Mass Repair/Mass Salvage technician selection by providing additional configuration options
 + Fix #313: Prisoners counting towards combatants total for defection rolls. 

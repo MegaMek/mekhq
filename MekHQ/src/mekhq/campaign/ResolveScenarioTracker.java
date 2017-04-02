@@ -186,8 +186,9 @@ public class ResolveScenarioTracker {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
+        } else {
+            initUnitsAndPilotsWithoutBattle();
         }
-        initUnitsAndPilotsWithoutBattle();
         checkStatusOfPersonnel();
     }
 
@@ -940,6 +941,7 @@ public class ResolveScenarioTracker {
     	for (Unit u : units) {
     		UnitStatus status = unitsStatus.get(u.getId());
     		status.assignFoundEntity(u.getEntity(), false);
+    		u.getEntity().setDeployed(true);
     		Crew crew = u.getEntity().getCrew();
             if(null != crew && !crew.getExternalIdAsString().equals("-1")) {
             	pilots.put(UUID.fromString(crew.getExternalIdAsString()), crew);

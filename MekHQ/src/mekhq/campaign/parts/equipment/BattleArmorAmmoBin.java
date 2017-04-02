@@ -53,7 +53,7 @@ public class BattleArmorAmmoBin extends AmmoBin implements IAcquisitionWork {
     }
     
     public BattleArmorAmmoBin(int tonnage, EquipmentType et, int equipNum, int shots, boolean singleShot, Campaign c) {
-        super(tonnage, et, equipNum, shots, singleShot, c);
+        super(tonnage, et, equipNum, shots, singleShot, false, c);
     }
     
     public int getNumTroopers() {

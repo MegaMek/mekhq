@@ -235,7 +235,7 @@ public class MekActuator extends Part {
 	@Override 
 	public int getBaseTime() {
 		if(isSalvaging()) {
-			return 90;
+			return isOmniPodded()? 30 : 90;
 		}
 		return 120;
 	}
@@ -312,6 +312,11 @@ public class MekActuator extends Part {
 	@Override
 	public boolean isOmniPoddable() {
 		return type == Mech.ACTUATOR_LOWER_ARM || type == Mech.ACTUATOR_HAND;
+	}
+	
+	@Override
+	public boolean isOmniPodded() {
+	    return isOmniPoddable() && getUnit() != null && getUnit().getEntity().isOmni();
 	}
 
 	@Override
