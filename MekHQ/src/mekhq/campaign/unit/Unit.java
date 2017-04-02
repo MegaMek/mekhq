@@ -3581,4 +3581,11 @@ public class Unit implements MekHqXmlSerializable {
         return false;
     }
 
+    public String toString() {
+        String entName = "None";
+        if (getEntity() != null) {
+            entName = getEntity().getDisplayName();
+        }
+        return "Unit for Entity: " + entName;
+    }
 }
