@@ -6764,6 +6764,9 @@ public class Campaign implements Serializable {
         entity.setNeverDeployed(true);
         entity.setStuck(false);
         entity.resetCoolantFailureAmount();
+        if (entity.hasQuirk("flawed_cooling")) {
+            entity.setCoolingFlawActive(false);
+        }
         if (!entity.getSensors().isEmpty()) {
             entity.setNextSensor(entity.getSensors().firstElement());
         }
