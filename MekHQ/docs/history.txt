@@ -2,6 +2,7 @@ VERSION HISTORY:
 ----------------
 v0.43.2-git
 + Fix #362: Omni Refits calculating additional HS incorrectly
++ Bug: Cannot begin refit when creating custom omni configuration in MekLab.
 
 v0.43.1 (2017-03-31 01:15 UTC)
 + Change to require GM Mode for the add/remove pregnancy context menu commands

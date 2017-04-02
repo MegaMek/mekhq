@@ -51,7 +51,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.StringTokenizer;
 import java.util.Vector;
-import java.util.stream.Collectors;
 
 import javax.swing.JTable;
 import javax.swing.table.TableModel;
@@ -67,6 +66,7 @@ import megamek.common.Compute;
 import megamek.common.ConvFighter;
 import megamek.common.Coords;
 import megamek.common.Crew;
+import megamek.common.CriticalSlot;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.Infantry;
@@ -433,34 +433,45 @@ public class Utilities {
 	            return false;
 	        }
 	    }
+	    List<EquipmentType> fixedEquipment = new ArrayList<>();
 	    for (int loc = 0; loc < entity1.locations(); loc++) {
 	        if (entity1.getArmorType(loc) != entity2.getArmorType(loc)
 	                || entity1.getOArmor(loc) != entity2.getOArmor(loc)) {
 	            return false;
 	        }
+	        fixedEquipment.clear();
+	        //Go through the base entity and make a list of all fixed equipment in this location.
+	        for (int slot = 0; slot < entity1.getNumberOfCriticals(loc); slot++) {
+	            CriticalSlot crit = entity1.getCritical(loc, slot);
+	            if (null != crit && crit.getType() == CriticalSlot.TYPE_EQUIPMENT && null != crit.getMount()) {
+    	            if (!crit.getMount().isOmniPodMounted()) {
+    	                fixedEquipment.add(crit.getMount().getType());
+    	                if (null != crit.getMount2()) {
+    	                    fixedEquipment.add(crit.getMount2().getType());
+    	                }
+    	            }
+	            }
+	        }
+	        //Go through the critical slots in this location for the second entity and remove all fixed
+	        //equipment from the list. If not found or something is left over, there is a fixed equipment difference.
+            for (int slot = 0; slot < entity2.getNumberOfCriticals(loc); slot++) {
+                CriticalSlot crit = entity1.getCritical(loc, slot);
+                if (null != crit && crit.getType() == CriticalSlot.TYPE_EQUIPMENT && null != crit.getMount()) {
+                    if (!crit.getMount().isOmniPodMounted()) {
+                        if (!fixedEquipment.remove(crit.getMount().getType())) {
+                            return false;
+                        }
+                        if (null != crit.getMount2() && !fixedEquipment.remove(crit.getMount2().getType())) {
+                            return false;
+                        }
+                    }
+                }                
+            }
+            if (!fixedEquipment.isEmpty()) {
+                return false;
+            }
 	    }
-	    //Generated a list of all fixed equipment in each location for entity1
-	    Map<Integer,List<EquipmentType>> fixed = entity1.getEquipment().stream()
-	            .filter(m -> !m.isOmniPodMounted() && !m.getType().getInternalName().equals("CLCASE")
-	                    && !m.isWeaponGroup())
-	            .collect(Collectors.groupingBy(Mounted::getLocation,
-	                    Collectors.mapping(m -> m.getType(), Collectors.toList())));
-	    //Go through all fixed equipment in entity2 and remove it from the list. If not found,
-	    //or if there is any left over after this, the base chassis differ.
-	    for (Mounted m : entity2.getEquipment()) {
-	        if (m.isOmniPodMounted() || m.getType().getInternalName().equals("CLCASE")
-	                || m.isWeaponGroup()) {
-	            continue;
-	        }
-	        if (!fixed.containsKey(m.getLocation())
-	                || !fixed.get(m.getLocation()).remove(m.getType())) {
-	            return false;
-	        }
-	        if (fixed.get(m.getLocation()).isEmpty()) {
-	            fixed.remove(m.getLocation());
-	        }
-	    }
-	    return fixed.isEmpty();
+	    return true;
 	}
 
 	public static int generateExpLevel(int bonus) {
