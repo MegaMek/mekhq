@@ -6780,9 +6780,7 @@ public class Campaign implements Serializable {
         if (entity instanceof Mech) {
             Mech m = (Mech) entity;
             m.setCoolingFlawActive(false);
-        }
-
-        if (entity instanceof Aero) {
+        } else if (entity instanceof Aero) {
             Aero a = (Aero) entity;
             int[] bombChoices = a.getBombChoices();
             for (Mounted m : a.getBombs()) {
@@ -6802,8 +6800,7 @@ public class Campaign implements Serializable {
             a.setAltitude(5);
             a.setCurrentVelocity(0);
             a.setNextVelocity(0);
-        }
-        if(entity instanceof Tank) {
+        } else if(entity instanceof Tank) {
         	Tank t = (Tank)entity;
         	t.unjamTurret(t.getLocTurret());
         	t.unjamTurret(t.getLocTurret2());
