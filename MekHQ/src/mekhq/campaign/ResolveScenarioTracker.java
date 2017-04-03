@@ -1506,6 +1506,10 @@ public class ResolveScenarioTracker {
             }
         }
 
+        public String toString() {
+            return "Unit status for: " + getName() + ", loss: " + isTotalLoss();
+        }
+
         public String getName() {
             return name;
         }
