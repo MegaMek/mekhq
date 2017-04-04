@@ -121,6 +121,7 @@ public class CampaignOptions implements Serializable {
     private boolean allowClanPurchases;
     private boolean allowISPurchases;
     private boolean allowCanonOnly;
+    private boolean allowCanonRefitOnly;
     private int techLevel;
     private boolean useAmmoByType; // Unofficial
 
@@ -303,6 +304,7 @@ public class CampaignOptions implements Serializable {
         allowClanPurchases = true;
         allowISPurchases = true;
         allowCanonOnly = false;
+        allowCanonRefitOnly = false;
         useAmmoByType = false;
         usePercentageMaint = false;
         infantryDontCount = false;
@@ -929,6 +931,14 @@ public class CampaignOptions implements Serializable {
 
     public void setAllowCanonOnly(boolean b) {
         allowCanonOnly = b;
+    }
+
+    public boolean allowCanonRefitOnly() {
+        return allowCanonRefitOnly;
+    }
+
+    public void setAllowCanonRefitOnly(boolean b) {
+        allowCanonRefitOnly = b;
     }
 
     public boolean useAmmoByType() {
@@ -1915,6 +1925,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "allowClanPurchases", allowClanPurchases);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "allowISPurchases", allowISPurchases);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "allowCanonOnly", allowCanonOnly);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "allowCanonRefitOnly", allowCanonRefitOnly);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useAmmoByType", useAmmoByType);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "usePercentageMaint", usePercentageMaint);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "waitingPeriod", waitingPeriod);
@@ -2270,6 +2281,12 @@ public class CampaignOptions implements Serializable {
                     retVal.allowCanonOnly = true;
                 } else {
                     retVal.allowCanonOnly = false;
+                }
+            } else if (wn2.getNodeName().equalsIgnoreCase("allowCanonRefitOnly")) {
+                if (wn2.getTextContent().equalsIgnoreCase("true")) {
+                    retVal.allowCanonRefitOnly = true;
+                } else {
+                    retVal.allowCanonRefitOnly = false;
                 }
             } else if (wn2.getNodeName().equalsIgnoreCase("useAmmoByType")) {
                 if (wn2.getTextContent().equalsIgnoreCase("true")) {

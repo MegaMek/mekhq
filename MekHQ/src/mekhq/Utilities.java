@@ -380,7 +380,7 @@ public class Utilities {
 				continue;
 			}
 			// If we only allow canon units and this isn't canon we continue
-			if(!summary.isCanon() && options.allowCanonOnly()) {
+			if(!summary.isCanon() && options.allowCanonRefitOnly()) {
 				continue;
 			}
 			// If we're limiting by year and aren't to this unit's year yet we continue
