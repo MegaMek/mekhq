@@ -310,7 +310,9 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 			} else if(null != movedPart) {
 				newUnitParts.add(movedPart.getId());
 				oldUnitParts.remove(moveIndex);
-                locationLostOldStuff[movedPart.getLocation()] = true;
+				if (movedPart.getLocation() >= 0) {
+				    locationLostOldStuff[movedPart.getLocation()] = true;
+				}
 				if(isOmniRefit && movedPart.isOmniPodded()) {
 					updateRefitClass(CLASS_OMNI);
 				} else {
@@ -537,7 +539,9 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 		//Step 4: loop through remaining equipment on oldunit parts and add time for removing.
 		for(int pid : oldUnitParts) {
 			Part oPart = oldUnit.campaign.getPart(pid);
-			locationLostOldStuff[oPart.getLocation()] = true;
+			if (oPart.getLocation() >= 0) {
+			    locationLostOldStuff[oPart.getLocation()] = true;
+			}
 			if(oPart instanceof MissingPart) {
 				continue;
 			}
