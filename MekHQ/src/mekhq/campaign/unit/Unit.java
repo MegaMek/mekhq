@@ -2019,6 +2019,10 @@ public class Unit implements MekHqXmlSerializable {
             if (m.isWeaponGroup()) {
                 continue;
             }
+            // Anti-Mek attacks aren't actual parts
+            if (m.getType() instanceof InfantryAttack) {
+                continue;
+            }
             if(!m.getType().isHittable()) {
                 //there are some kind of non-hittable parts we might want to include for cost calculations
                 if(!(m.getType() instanceof MiscType)) {
