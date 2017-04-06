@@ -338,8 +338,8 @@ class CampaignOpsReputation extends AbstractUnitRating {
         }
 
         final BigDecimal eliteThreshold = new BigDecimal("4.99");
-        final BigDecimal vetThreshold = new BigDecimal("8.01");
-        final BigDecimal regThreshold = new BigDecimal("10.99");
+        final BigDecimal vetThreshold = new BigDecimal("7.99");
+        final BigDecimal regThreshold = new BigDecimal("9.99");
 
         if (experience.compareTo(regThreshold) > 0) {
             return SkillType.getExperienceLevelName(SkillType.EXP_GREEN);
