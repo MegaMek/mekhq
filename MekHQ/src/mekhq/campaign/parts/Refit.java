@@ -48,6 +48,7 @@ import megamek.common.TargetRoll;
 import megamek.common.WeaponType;
 import megamek.common.loaders.BLKFile;
 import megamek.common.loaders.EntityLoadingException;
+import megamek.common.weapons.InfantryAttack;
 import megameklab.com.util.UnitUtil;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
@@ -246,8 +247,9 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 		//Step 1: put all of the parts from the current unit into a new arraylist so they can
 		//be removed when we find a match.
 		for(Part p : oldUnit.getParts()) {
-		    if (!isOmniRefit || p.isOmniPodded())
-			oldUnitParts.add(p.getId());
+		    if (!isOmniRefit || p.isOmniPodded()) {
+		        oldUnitParts.add(p.getId());
+		    }
 		}
 
 		//Step 2: loop through the parts arraylist in the newUnit and attempt to find the
@@ -360,6 +362,12 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 		for(Part nPart : newPartList) {
 			//TODO: I don't think we need this here anymore
 			nPart.setUnit(oldUnit);
+			
+			//We don't actually want to order new BA suits; we're just pretending that we're altering the
+			//existing suits.
+			if (nPart instanceof MissingBattleArmorSuit) {
+			    continue;
+			}
 
 			/*ADD TIMES AND COSTS*/
 			if(nPart instanceof MissingPart) {
@@ -539,6 +547,13 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 		//Step 4: loop through remaining equipment on oldunit parts and add time for removing.
 		for(int pid : oldUnitParts) {
 			Part oPart = oldUnit.campaign.getPart(pid);
+			//We're pretending we're changing the old suit rather than removing it.
+			//We also want to avoid accounting for legacy InfantryAttack parts.
+			if (oPart instanceof BattleArmorSuit
+			        || (oPart instanceof EquipmentPart
+			                && ((EquipmentPart)oPart).getType() instanceof InfantryAttack)) {
+			    continue;
+			}
 			if (oPart.getLocation() >= 0) {
 			    locationLostOldStuff[oPart.getLocation()] = true;
 			}
@@ -966,7 +981,10 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 				continue;
 			}
 			// SI Should never be "kept" for the Warehouse
-			else if(part instanceof StructuralIntegrity) {
+			// We also don't want to generate new BA suits that have been replaced
+			// or allow legacy InfantryAttack BA parts to show up in the warehouse.
+			else if(part instanceof StructuralIntegrity || part instanceof BattleArmorSuit
+			        || (part instanceof EquipmentPart && ((EquipmentPart)part).getType() instanceof InfantryAttack)) {
 				part.setUnit(null);
 				oldUnit.campaign.removePart(part);
 				continue;
