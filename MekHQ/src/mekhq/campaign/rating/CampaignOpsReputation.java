@@ -28,18 +28,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import megamek.common.Aero;
-import megamek.common.BattleArmor;
 import megamek.common.Crew;
 import megamek.common.Entity;
 import megamek.common.FixedWingSupport;
 import megamek.common.Infantry;
 import megamek.common.Jumpship;
-import megamek.common.Mech;
 import megamek.common.SmallCraft;
-import megamek.common.Tank;
 import megamek.common.UnitType;
-import megamek.common.Warship;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
@@ -249,17 +244,18 @@ class CampaignOpsReputation extends AbstractUnitRating {
                 continue;
             }
 
-            if (u.getEntity() instanceof Warship) {
+            if ((u.getEntity().getEntityType() & Entity.ETYPE_WARSHIP) == Entity.ETYPE_WARSHIP) {
                 totalAero++;
-            } else if (u.getEntity() instanceof Jumpship) {
+            } else if ((u.getEntity().getEntityType() & Entity.ETYPE_JUMPSHIP) == Entity.ETYPE_JUMPSHIP) {
                 continue;
-            } else if (u.getEntity() instanceof Aero) {
+            } else if ((u.getEntity().getEntityType() & Entity.ETYPE_AERO) == Entity.ETYPE_AERO) {
                 totalAero++;
-            } else if ((u.getEntity() instanceof Mech) || (u.getEntity() instanceof Tank)) {
+            } else if (((u.getEntity().getEntityType() & Entity.ETYPE_MECH) == Entity.ETYPE_MECH) 
+                    || ((u.getEntity().getEntityType() & Entity.ETYPE_TANK) == Entity.ETYPE_TANK)) {
                 totalGround++;
-            } else if (u.getEntity() instanceof BattleArmor) {
+            } else if ((u.getEntity().getEntityType() & Entity.ETYPE_BATTLEARMOR) == Entity.ETYPE_BATTLEARMOR) {
                 totalBattleArmor++;
-            } else if (u.getEntity() instanceof Infantry) {
+            } else if ((u.getEntity().getEntityType() & Entity.ETYPE_INFANTRY) == Entity.ETYPE_INFANTRY) {
                 totalInfantry++;
             }
 
