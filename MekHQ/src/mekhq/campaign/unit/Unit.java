@@ -3938,6 +3938,9 @@ public class Unit implements MekHqXmlSerializable {
         if (entity.hasQuirk("non_standard")) {
             partsCost = (long)(partsCost * 2.0);
         }
+        if (entity.hasQuirk("ubiquitous_is")) {
+            partsCost = (long)(partsCost * .75);
+        }
         // TODO Obsolete quirk
 
         // Now for extended parts cost modifiers
