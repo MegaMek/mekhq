@@ -28,13 +28,18 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import megamek.common.Aero;
+import megamek.common.BattleArmor;
 import megamek.common.Crew;
 import megamek.common.Entity;
 import megamek.common.FixedWingSupport;
 import megamek.common.Infantry;
 import megamek.common.Jumpship;
+import megamek.common.Mech;
 import megamek.common.SmallCraft;
+import megamek.common.Tank;
 import megamek.common.UnitType;
+import megamek.common.Warship;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
@@ -228,9 +233,45 @@ class CampaignOpsReputation extends AbstractUnitRating {
         return totalCombatUnits;
     }
 
+    private int getTotalForceUnits() {
+        int totalGround = 0;
+        int totalAero = 0;
+        int totalInfantry = 0;
+        int totalBattleArmor = 0;
+        int forceTotal = 0;
+
+        List<Unit> unitList = getCampaign().getCopyOfUnits();
+        for (Unit u : unitList) {
+            if (u == null) {
+                continue;
+            }
+            if (u.isMothballed() || !u.hasPilot()) {
+                continue;
+            }
+
+            if (u.getEntity() instanceof Warship) {
+                totalAero++;
+            } else if (u.getEntity() instanceof Jumpship) {
+                continue;
+            } else if (u.getEntity() instanceof Aero) {
+                totalAero++;
+            } else if ((u.getEntity() instanceof Mech) || (u.getEntity() instanceof Tank)) {
+                totalGround++;
+            } else if (u.getEntity() instanceof BattleArmor) {
+                totalBattleArmor++;
+            } else if (u.getEntity() instanceof Infantry) {
+                totalInfantry++;
+            }
+
+        }
+
+        forceTotal = totalGround + totalAero + (totalInfantry / 28) + (totalBattleArmor /5);
+        return forceTotal;
+    }
+
     @Override
     protected BigDecimal calcAverageExperience() {
-        int totalCombatUnits = getTotalCombatUnits();
+        int totalCombatUnits = getTotalForceUnits();
 
         if (totalCombatUnits == 0) {
             return BigDecimal.ZERO;
