@@ -1016,9 +1016,17 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 
 		//dont forget to switch entities!
 		oldUnit.setEntity(newEntity);
-
+	
 		//set up new parts
 		ArrayList<Part> newParts = new ArrayList<Part>();
+		//We've already made the old suits go *poof*; now we materialize new ones.
+		if (newEntity instanceof BattleArmor) {
+		    for (int t = BattleArmor.LOC_TROOPER_1; t < newEntity.locations(); t++) {
+		        Part suit = new BattleArmorSuit((BattleArmor)newEntity, t, oldUnit.campaign);
+		        newParts.add(suit);
+		        suit.setUnit(oldUnit);
+		    }
+		}
 		for(int pid : newUnitParts) {
 			Part part = oldUnit.campaign.getPart(pid);
 			if(null == part) {
