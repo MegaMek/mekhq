@@ -3909,13 +3909,13 @@ public class Unit implements MekHqXmlSerializable {
             partsCost += ((long)entity.getWeight()) * .001 * 10000;
         } else if (entity instanceof Infantry) {
             if (entity.getMovementMode() == EntityMovementMode.INF_LEG) {
-                partsCost += 3 * .01 * 10000;
+                partsCost += 3 * .002 * 10000;
             } else if (entity.getMovementMode() == EntityMovementMode.INF_JUMP) {
-                partsCost += 4 * .01 * 10000;
+                partsCost += 4 * .002 * 10000;
             } else if (entity.getMovementMode() == EntityMovementMode.INF_MOTORIZED) {
-                partsCost += 6 * .01 * 10000;
+                partsCost += 6 * .002 * 10000;
             } else {
-                partsCost += ((long)entity.getWeight()) * .01 * 10000;
+                partsCost += ((long)entity.getWeight()) * .002 * 10000;
                 MekHQ.logMessage(getName() + " is not a generic CI. Movement mode is "
                         + entity.getMovementModeAsString(), 5);
             }
