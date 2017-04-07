@@ -277,7 +277,7 @@ class CampaignOpsReputation extends AbstractUnitRating {
             return BigDecimal.ZERO;
         }
 
-        return getTotalSkillLevels().divide(BigDecimal.valueOf(totalCombatUnits), 2, BigDecimal.ROUND_HALF_UP);
+        return getTotalSkillLevels().divide(BigDecimal.valueOf(totalCombatUnits), 2, BigDecimal.ROUND_HALF_DOWN);
     }
 
     private void calcNeededTechs() {
