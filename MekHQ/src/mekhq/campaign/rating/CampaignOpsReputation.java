@@ -109,6 +109,9 @@ class CampaignOpsReputation extends AbstractUnitRating {
             if (u.isMothballed()) {
                 continue;
             }
+            if (!u.isPresent()) {
+                continue;
+            }
 
             updateUnitCounts(u);
 
