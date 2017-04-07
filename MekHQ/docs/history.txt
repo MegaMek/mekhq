@@ -7,6 +7,7 @@ v0.43.2-git
 + Fix #364: MekHq Calculates Naval Vee Piloting skill using Ground Vee piloting skill.
 + Fix #369: Chose Refit Kit causing ArrayIndexOutOfBoundsException
 + Issue #356: Option to hide hide custom player refits from the purchase menu/unit cache #356
++ Fix #317: Unable to load campaign file after BattleArmor refit
 
 v0.43.1 (2017-03-31 01:15 UTC)
 + Change to require GM Mode for the add/remove pregnancy context menu commands
