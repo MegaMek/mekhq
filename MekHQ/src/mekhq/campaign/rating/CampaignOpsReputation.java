@@ -461,65 +461,109 @@ class CampaignOpsReputation extends AbstractUnitRating {
 
         // todo Superheavys.
         // Find out how short of transport bays we are.
-        boolean doubleCapacity = true;
+        boolean doubleExcessCapacity = true;
         boolean fullCapacity = true;
+        boolean excessCapacity = true;
         int heavyVeeBays = getHeavyVeeBayCount();
-        if (getMechBayCount() < getMechCount()) {
+
+        if (getMechBayCount() == getMechCount()) {
+            excessCapacity = false;
+            doubleExcessCapacity = false;
+        } else if (getMechBayCount() < getMechCount()) {
             fullCapacity = false;
-            doubleCapacity = false;
+            excessCapacity = false;
+            doubleExcessCapacity = false;
         } else if (getMechBayCount() < getMechCount() * 2) {
-            doubleCapacity = false;
-        }
-        if (getProtoBayCount() < getProtoCount()) {
             fullCapacity = false;
-            doubleCapacity = false;
+            doubleExcessCapacity = false;
+        }
+        if (getProtoBayCount() == getProtoCount()) {
+            excessCapacity = false;
+            doubleExcessCapacity = false;
+        } else if (getProtoBayCount() < getProtoCount()) {
+            fullCapacity = false;
+            excessCapacity = false;
+            doubleExcessCapacity = false;
         } else if (getProtoBayCount() < getProtoCount() * 2) {
-            doubleCapacity = false;
-        }
-        if (getHeavyVeeBayCount() < getHeavyVeeCount()) {
             fullCapacity = false;
-            doubleCapacity = false;
+            doubleExcessCapacity = false;
+        }
+        if (getHeavyVeeBayCount() == getHeavyVeeCount()) {
+            excessCapacity = false;
+            doubleExcessCapacity = false;
+        } else if (getHeavyVeeBayCount() < getHeavyVeeCount()) {
+            fullCapacity = false;
+            excessCapacity = false;
+            doubleExcessCapacity = false;
         } else if (getHeavyVeeBayCount() < getHeavyVeeCount() * 2) {
-            doubleCapacity = false;
+            fullCapacity = false;
+            doubleExcessCapacity = false;
         }
         heavyVeeBays -= getHeavyVeeBayCount();
         int lightVeeBays = getLightVeeBayCount() + heavyVeeBays;
-        if (lightVeeBays < getLightVeeCount()) {
+        if (lightVeeBays == getLightVeeCount()) {
+            excessCapacity = false;
+            doubleExcessCapacity = false;
+        } else if (lightVeeBays < getLightVeeCount()) {
             fullCapacity = false;
-            doubleCapacity = false;
+            excessCapacity = false;
+            doubleExcessCapacity = false;
         } else if (lightVeeBays < getLightVeeCount() * 2) {
-            doubleCapacity = false;
-        }
-        if (getFighterBayCount() < getFighterCount()) {
             fullCapacity = false;
-            doubleCapacity = false;
+            doubleExcessCapacity = false;
+        }
+        if (getFighterBayCount() == getFighterCount()) {
+            excessCapacity = false;
+            doubleExcessCapacity = false;
+        } else if (getFighterBayCount() < getFighterCount()) {
+            fullCapacity = false;
+            excessCapacity = false;
+            doubleExcessCapacity = false;
         } else if (getFighterBayCount() < getFighterCount() * 2) {
-            doubleCapacity = false;
-        }
-        if ((getBaBayCount()) < getBattleArmorCount() / 5) {
             fullCapacity = false;
-            doubleCapacity = false;
+            doubleExcessCapacity = false;
+        }
+        if ((getBaBayCount()) == getBattleArmorCount() / 5) {
+            excessCapacity = false;
+            doubleExcessCapacity = false;
+        } else if ((getBaBayCount()) < getBattleArmorCount() / 5) {
+            fullCapacity = false;
+            excessCapacity = false;
+            doubleExcessCapacity = false;
         } else if ((getBaBayCount() * 2) < 2 * getBattleArmorCount() / 5) {
-            doubleCapacity = false;
+            fullCapacity = false;
+            doubleExcessCapacity = false;
         }
         if (getInfantryBayCount() < getInfantryCount() / 28) {
+            excessCapacity = false;
+            doubleExcessCapacity = false;
+        } else if (getInfantryBayCount() < getInfantryCount() / 28) {
             fullCapacity = false;
-            doubleCapacity = false;
+            excessCapacity = false;
+            doubleExcessCapacity = false;
         } else if (getInfantryBayCount() < getInfantryCount() / 14) {
-            doubleCapacity = false;
-        }
-        if (getSmallCraftBayCount() < getSmallCraftCount()) {
             fullCapacity = false;
-            doubleCapacity = false;
+            doubleExcessCapacity = false;
+        }
+        if (getSmallCraftBayCount() == getSmallCraftCount()) {
+            excessCapacity = false;
+            doubleExcessCapacity = false;
+        } else if (getSmallCraftBayCount() < getSmallCraftCount()) {
+            fullCapacity = false;
+            excessCapacity = false;
+            doubleExcessCapacity = false;
         } else if (getSmallCraftBayCount() < (getSmallCraftCount() * 2)) {
-            doubleCapacity = false;
+            fullCapacity = false;
+            doubleExcessCapacity = false;
         }
 
         //Find the percentage of units that are transported.
-        if (doubleCapacity) {
+        if (doubleExcessCapacity) {
             totalValue += 10;
-        } else if (fullCapacity) {
+        } else if (excessCapacity) {
             totalValue += 5;
+        } else if (fullCapacity) {
+            totalValue += 0;
         } else {
             totalValue -= 5;
         }
