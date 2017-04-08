@@ -235,6 +235,9 @@ class CampaignOpsReputation extends AbstractUnitRating {
         int totalBattleArmor = 0;
         int forceTotal = 0;
 
+        // Count total units for transport
+        getTotalCombatUnits();
+
         List<Unit> unitList = getCampaign().getCopyOfUnits();
         for (Unit u : unitList) {
             if (u == null) {
