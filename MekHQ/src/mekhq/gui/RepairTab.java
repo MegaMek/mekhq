@@ -121,6 +121,12 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
     private TableRowSorter<UnitTableModel> servicedUnitSorter;
     private TableRowSorter<TaskTableModel> taskSorter;
     private TableRowSorter<TechTableModel> techSorter;
+    
+    //Maintain selections after refresh
+    private int selectedRow = -1;
+    private int selectedLocation = -1;
+    private Unit selectedUnit = null;
+    private Person selectedTech = getSelectedTech();    
 
     RepairTab(CampaignGUI gui, String name) {
         super(gui, name);
@@ -611,25 +617,20 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
     }
 
     private void doTask() {
-        int selectedRow = -1;
-        int selectedLocation = -1;
-        Unit selectedUnit = null;
-        // int selectedTechRow = -1;
-        Person tech = getSelectedTech();
         if (repairsSelected()) {
             selectedRow = taskTable.getSelectedRow();
-            // selectedTechRow = TechTable.getSelectedRow();
             selectedLocation = choiceLocation.getSelectedIndex();
             selectedUnit = getSelectedServicedUnit();
+            selectedTech = getSelectedTech();
             IPartWork part = (IPartWork)getSelectedTask();
             if (null == part) {
                 return;
             }
             Unit u = part.getUnit();
             if (null != u && u.isSelfCrewed()) {
-                tech = u.getEngineer();
+                selectedTech = u.getEngineer();
             }
-            if (null == tech) {
+            if (null == selectedTech) {
                 return;
             }
             if (part instanceof Part && ((Part)part).onBadHipOrShoulder() && !part.isSalvaging()) {
@@ -658,7 +659,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
                     return;
                 }
             }
-            getCampaign().fixPart(part, tech);
+            getCampaign().fixPart(part, selectedTech);
             if (null != u) {
                 if (!u.isRepairable() && u.getSalvageableParts().size() == 0) {
                     selectedRow = -1;
@@ -669,7 +670,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
                 }
                 u.refreshPodSpace();
             }
-            MekHQ.triggerEvent(new PartWorkEvent(tech, part));
+            MekHQ.triggerEvent(new PartWorkEvent(selectedTech, part));
         } else if (acquireSelected()) {
             selectedRow = acquisitionTable.getSelectedRow();
             IAcquisitionWork acquisition = getSelectedAcquisition();
@@ -683,19 +684,17 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         if (selectedRow != -1) {
             if (acquireSelected()) {
                 if (acquisitionTable.getRowCount() > 0) {
-                    if (acquisitionTable.getRowCount() == selectedRow) {
-                        acquisitionTable.setRowSelectionInterval(selectedRow - 1, selectedRow - 1);
-                    } else {
-                        acquisitionTable.setRowSelectionInterval(selectedRow, selectedRow);
+                    if (acquisitionTable.getRowCount() <= selectedRow) {
+                        selectedRow = acquisitionTable.getRowCount() - 1;
                     }
+                    acquisitionTable.setRowSelectionInterval(selectedRow, selectedRow);
                 }
             } else if (repairsSelected()) {
                 if (taskTable.getRowCount() > 0) {
-                    if (taskTable.getRowCount() == selectedRow) {
-                        taskTable.setRowSelectionInterval(selectedRow - 1, selectedRow - 1);
-                    } else {
-                        taskTable.setRowSelectionInterval(selectedRow, selectedRow);
+                    if (taskTable.getRowCount() <= selectedRow) {
+                        selectedRow = taskTable.getRowCount() - 1;
                     }
+                    taskTable.setRowSelectionInterval(selectedRow, selectedRow);
                 }
             }
 
@@ -706,7 +705,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
                 // Or get the selected tech back
                 for (int i = 0; i < techTable.getRowCount(); i++) {
                     Person p = techsModel.getTechAt(techTable.convertRowIndexToModel(i));
-                    if (tech.getId().equals(p.getId())) {
+                    if (selectedTech.getId().equals(p.getId())) {
                         techTable.setRowSelectionInterval(i, i);
                         break;
                     }
@@ -757,11 +756,10 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         if (selectedRow != -1) {
             if (acquireSelected()) {
                 if (acquisitionTable.getRowCount() > 0) {
-                    if (acquisitionTable.getRowCount() == selectedRow) {
-                        acquisitionTable.setRowSelectionInterval(selectedRow - 1, selectedRow - 1);
-                    } else {
-                        acquisitionTable.setRowSelectionInterval(selectedRow, selectedRow);
+                    if (acquisitionTable.getRowCount() <= selectedRow) {
+                        selectedRow = acquisitionTable.getRowCount() - 1;
                     }
+                    acquisitionTable.setRowSelectionInterval(selectedRow, selectedRow);
                 }
             }
         }
@@ -882,8 +880,6 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         taskModel.setData(getCampaign().getPartsNeedingServiceFor(uuid));
 
         if (getSelectedServicedUnit() != null && getSelectedServicedUnit().getEntity() != null) {
-            int index = choiceLocation.getSelectedIndex();
-            int numLocations = choiceLocation.getModel().getSize();
             choiceLocation.removeAllItems();
             choiceLocation.addItem("All");
             for (String s : getSelectedServicedUnit().getEntity().getLocationAbbrs()) {
@@ -895,11 +891,11 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
             }
             if (getSelectedServicedUnit().getEntity().isOmni()) {
                 choiceLocation.addItem("OmniPod");
-                numLocations++;
             }
-            choiceLocation.setSelectedIndex(0);
-            if (index > -1 && choiceLocation.getModel().getSize() == numLocations) {
-                choiceLocation.setSelectedIndex(index);
+            if (selectedLocation > -1 && choiceLocation.getModel().getSize() > selectedLocation) {
+                choiceLocation.setSelectedIndex(selectedLocation);
+            } else {
+                choiceLocation.setSelectedIndex(0);
             }
             choiceLocation.setEnabled(true);
         } else {
@@ -907,6 +903,22 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
             choiceLocation.setEnabled(false);
         }
         filterTasks();
+        
+        if (selectedRow != -1 && taskTable.getRowCount() > 0) {
+            if (taskTable.getRowCount() <= selectedRow) {
+                selectedRow = taskTable.getRowCount() - 1;
+            }
+            taskTable.setRowSelectionInterval(selectedRow,
+                    selectedRow);
+        }
+        if (selectedLocation != -1 && choiceLocation.getItemCount() > 0) {
+            if (selectedUnit == null || getSelectedServicedUnit() == null
+                    || !selectedUnit.equals(getSelectedServicedUnit())
+                    || selectedLocation >= choiceLocation.getItemCount()) {
+                selectedLocation = 0;
+            }
+            choiceLocation.setSelectedIndex(selectedLocation);
+        }
     }
 
     public void refreshTechsList() {
@@ -922,6 +934,21 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         }
         astechString += " (" + getCampaign().getNumberAstechs() + " Astechs)</html>";
         astechPoolLabel.setText(astechString); // NOI18N
+
+        // If requested, switch to top entry
+        if(getCampaign().getCampaignOptions().useResetToFirstTech() && techTable.getRowCount() > 0) {
+            techTable.setRowSelectionInterval(0, 0);
+        } else {
+            // Or get the selected tech back
+            for (int i = 0; i < techTable.getRowCount(); i++) {
+                Person p = techsModel
+                        .getTechAt(techTable.convertRowIndexToModel(i));
+                if (selectedTech.getId().equals(p.getId())) {
+                    techTable.setRowSelectionInterval(i, i);
+                    break;
+                }
+            }
+        }
     }
 
     public void refreshAcquireList() {
@@ -930,6 +957,14 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
             uuid = getSelectedServicedUnit().getId();
         }
         acquireModel.setData(getCampaign().getAcquisitionsForUnit(uuid));
+        
+        if (selectedRow != -1 && acquisitionTable.getRowCount() > 0) {
+            if (acquisitionTable.getRowCount() <= selectedRow) {
+                selectedRow = acquisitionTable.getRowCount() - 1;
+            }
+            acquisitionTable.setRowSelectionInterval(selectedRow,
+                    selectedRow);
+        }
     }
     
     private ActionScheduler servicedUnitListScheduler = new ActionScheduler(this::refreshServicedUnitList);
