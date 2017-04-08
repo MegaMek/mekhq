@@ -678,7 +678,7 @@ class CampaignOpsReputation extends AbstractUnitRating {
     // Campaign Ops counts both Doctors and Admins as admins.
     private int calcAdminSupportValue() {
         int admins = getCampaign().getAdmins().size();
-        int docs = getCampaign().getAdmins().size();
+        int docs = getCampaign().getDoctors().size();
         if (getAdminsNeeded() > (admins + docs)) {
             return -5;
         }
