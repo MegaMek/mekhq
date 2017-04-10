@@ -355,6 +355,7 @@ public final class HangarTab extends CampaignGuiTab {
             }
         };
         unitSorter.setRowFilter(unitTypeFilter);
+        refreshUnitView();
     }
 
     public static String getUnitViewName(int group) {
