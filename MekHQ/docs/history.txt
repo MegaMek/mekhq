@@ -9,6 +9,7 @@ v0.43.2-git
 + Issue #356: Option to hide hide custom player refits from the purchase menu/unit cache #356
 + Fix #317: Unable to load campaign file after BattleArmor refit
 + Fix #368: Selected tech in repair tab reset after every repair
++ Fix #376:  MekHQ unselects task in repair bay/won't autoselect next patient in sickbay
 
 v0.43.1 (2017-03-31 01:15 UTC)
 + Change to require GM Mode for the add/remove pregnancy context menu commands

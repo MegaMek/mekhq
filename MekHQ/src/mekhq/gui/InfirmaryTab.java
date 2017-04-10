@@ -288,6 +288,7 @@ public final class InfirmaryTab extends CampaignGuiTab {
                         && (getCampaign().getPatientsFor(doctor) < 25)
                         && (getCampaign().getTargetFor(p, doctor).getValue() != TargetRoll.IMPOSSIBLE)) {
                     p.setDoctorId(doctor.getId(), getCampaign().getCampaignOptions().getHealingWaitingPeriod());
+                    MekHQ.triggerEvent(new PersonMedicalAssignmentEvent(doctor, p));
                     break;
                 }
             }
