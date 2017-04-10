@@ -36,5 +36,10 @@ public class ReportEvent extends CampaignEvent {
     public String getReport() {
         return report;
     }
+    
+    @Override
+    public boolean isCancellable() {
+        return true;
+    }
 
 }
