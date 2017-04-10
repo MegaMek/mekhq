@@ -534,6 +534,7 @@ public class CampaignGUI extends JPanel {
      * @param tab	The tab to remove
      */
     public void removeTab(CampaignGuiTab tab) {
+        tab.disposeTab();
     	removeTab(tab.getTabName());
     }
     
@@ -1604,6 +1605,13 @@ public class CampaignGUI extends JPanel {
             RandomUnitGenerator.getInstance().dispose();
             RandomNameGenerator.getInstance().dispose();
         }
+        //Unregister event handlers for CampaignGUI and tabs
+        for (int i = 0; i < tabMain.getTabCount(); i++) {
+            if (tabMain.getComponentAt(i) instanceof CampaignGuiTab) {
+                ((CampaignGuiTab)tabMain.getComponentAt(i)).disposeTab();
+            }
+        }
+        MekHQ.unregisterHandler(this);
     }
 
     private File selectLoadCampaignFile() {

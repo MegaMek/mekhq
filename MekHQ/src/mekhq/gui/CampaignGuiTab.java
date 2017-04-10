@@ -23,6 +23,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import mekhq.IconPackage;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 
@@ -77,4 +78,11 @@ public abstract class CampaignGuiTab extends JPanel {
     abstract public void refreshAll();
 
     abstract public GuiTabType tabType();
+
+    /**
+     * Called when tab is removed from gui.
+     */
+    public void disposeTab() {
+        MekHQ.unregisterHandler(this);
+    }
 }
