@@ -13,6 +13,7 @@ v0.43.2-git
 + Fix #370: Attempting to use Hire Bulk Personnel results in log error
 + Fix #377: Advance Day Dialog not showing daily reports beyond the first.
 + Fix #343: Graphics Issue: MMLab screen does not fit in its MHQ window
++ Fix #298: Medical Details Window Size
 
 v0.43.1 (2017-03-31 01:15 UTC)
 + Change to require GM Mode for the add/remove pregnancy context menu commands
