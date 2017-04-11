@@ -4,6 +4,7 @@ v0.42.2-git
 + Fix #334: Problems purchasing bombs.
 + Fix #364: MekHq Calculates Naval Vee Piloting skill using Ground Vee piloting skill.
 + Fix #317: Unable to load campaign file after BattleArmor refit
++ Fix #298: Medical Details Window Size
 
 v0.42.1 (2017-02-13 03:30 UTC)
 + Fix #313: Prisoners counting towards combatants total for defection rolls
