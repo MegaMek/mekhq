@@ -756,14 +756,14 @@ public class MassRepairSalvageDialog extends JDialog {
 		optionItemBox.setToolTipText(toolTipText);
 		optionItemBox.setName(name);
 		optionItemBox.setSelected(selected);
-		if (name.equals("massRepairItemPod")) {
+		if (name.equals("massRepairItemPod") && !isModeWarehouse()) {
             replacePodPartsBox.setEnabled(selected);
 		}
 		optionItemBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				mroOptionChecked();
-				if (((JCheckBox)e.getSource()).getName().equals("massRepairItemPod")) {
+				if (((JCheckBox)e.getSource()).getName().equals("massRepairItemPod") && !isModeWarehouse()) {
 				    replacePodPartsBox.setEnabled(((JCheckBox)e.getSource()).isSelected());
 				}
 			}
@@ -1463,7 +1463,7 @@ public class MassRepairSalvageDialog extends JDialog {
 
 			for (IPartWork partWork : parts) {
 				if ((partWork instanceof MekLocation) && ((MekLocation)partWork).onBadHipOrShoulder()) {
-					locationMap.put(partWork.getLocation(), (MekLocation)partWork);
+					locationMap.put(((MekLocation)partWork).getLoc(), (MekLocation)partWork);
 				} else if (partWork instanceof MissingMekLocation) {
 					locationMap.put(partWork.getLocation(), (MissingMekLocation)partWork);
 				}
@@ -1494,6 +1494,9 @@ public class MassRepairSalvageDialog extends JDialog {
 				for (IPartWork partWork : partsTemp) {
 					if (!(partWork instanceof MekLocation) && !(partWork instanceof MissingMekLocation)
 							&& locationMap.containsKey(partWork.getLocation()) && partWork.isSalvaging()) {
+						campaign.addReport(
+								String.format("Planning to remove a %s due to a bad location.", partWork.getPartName()));
+						
 						partsToBeRemoved.add(partWork);
 
 						int count = 0;
