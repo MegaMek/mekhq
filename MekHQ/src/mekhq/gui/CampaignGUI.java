@@ -2959,7 +2959,10 @@ public class CampaignGUI extends JPanel {
                 prevId = parent.getId();
             }
         }
-        MekHQ.triggerEvent(new DeploymentChangedEvent(f, scenario));
+        
+        if (null != scenario) {
+        	MekHQ.triggerEvent(new DeploymentChangedEvent(f, scenario));
+        }
     }
 
     public JTabbedPane getTabMain() {
