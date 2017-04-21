@@ -3015,7 +3015,7 @@ public class Unit implements MekHqXmlSerializable {
     }
 
     public void removeTech() {
-        if (tech == null) {
+        if (tech != null) {
             MekHQ.triggerEvent(new PersonTechAssignmentEvent(campaign.getPerson(tech), this));
             tech = null;
         }
