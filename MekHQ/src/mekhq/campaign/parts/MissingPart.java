@@ -266,19 +266,14 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 	
 	@Override
 	public String getAcquisitionDesc() {
-		String bonus = getAllAcquisitionMods().getValueAsString();
-		if(getAllAcquisitionMods().getValue() > -1) {
-			bonus = "+" + bonus;
-		}
-		bonus = "(" + bonus + ")";
 		String toReturn = "<html><font size='2'";
 		
 		toReturn += ">";
-		toReturn += "<b>" + getAcquisitionName() + "</b> " + bonus + "<br/>";
+		toReturn += "<b>" + getAcquisitionDisplayName() + "</b> " + getAcquisitionBonus() + "<br/>";
 		String[] inventories = campaign.getPartInventory(getNewPart());
 		toReturn += inventories[1] + " in transit, " + inventories[2] + " on order";
 		if (!isOmniPodded()) {
-		    Part newPart = getNewPart();
+		    Part newPart = getAcquisitionPart();
 		    newPart.setOmniPodded(true);
 		    inventories = campaign.getPartInventory(newPart);
 		    if (Integer.parseInt(inventories[0]) > 0) { 
@@ -291,6 +286,31 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 		return toReturn;
 	}
 	
+    @Override
+    public String getAcquisitionDisplayName() {
+    	return getAcquisitionName();
+    }    
+
+	@Override
+	public String getAcquisitionExtraDesc() {
+		return "";
+	}
+
+	@Override
+    public String getAcquisitionBonus() {
+		String bonus = getAllAcquisitionMods().getValueAsString();
+		if(getAllAcquisitionMods().getValue() > -1) {
+			bonus = "+" + bonus;
+		}
+
+		return "(" + bonus + ")";
+    }
+
+	@Override
+	public Part getAcquisitionPart() {
+		return getNewPart();
+	}
+
 	@Override
 	public String find(int transitDays) {
 		Part newPart = getNewPart();

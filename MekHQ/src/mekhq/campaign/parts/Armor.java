@@ -560,26 +560,46 @@ public class Armor extends Part implements IAcquisitionWork {
 
 	@Override
 	public String getAcquisitionDesc() {
-		String bonus = getAllAcquisitionMods().getValueAsString();
-		if(getAllAcquisitionMods().getValue() > -1) {
-			bonus = "+" + bonus;
-		}
-		bonus = "(" + bonus + ")";
 		String toReturn = "<html><font size='2'";
 
 		toReturn += ">";
-		toReturn += "<b>" + getName() + "</b> " + bonus + "<br/>";
-		toReturn += ((int)Math.round(getArmorPointsPerTon())) * 5 + " points (5 tons)<br/>";
-		String[] inventories = campaign.getPartInventory(getNewPart());
+		toReturn += "<b>" + getAcquisitionDisplayName() + "</b> " + getAcquisitionBonus() + "<br/>";
+		toReturn += getAcquisitionExtraDesc() + "<br/>";
+		String[] inventories = campaign.getPartInventory(getAcquisitionPart());
         toReturn += inventories[1] + " in transit, " + inventories[2] + " on order<br>";
 		toReturn += Utilities.getCurrencyString(adjustCostsForCampaignOptions(getStickerPrice())) + "<br/>";
 		toReturn += "</font></html>";
 		return toReturn;
 	}
+	
+    @Override
+    public String getAcquisitionDisplayName() {
+    	return getName();
+    }    
 
+	@Override
+	public String getAcquisitionExtraDesc() {
+		return ((int)Math.round(getArmorPointsPerTon())) * 5 + " points (5 tons)";
+	}
+	
 	@Override
 	public String getAcquisitionName() {
 		return getName();
+	}
+
+	@Override
+    public String getAcquisitionBonus() {
+		String bonus = getAllAcquisitionMods().getValueAsString();
+		if(getAllAcquisitionMods().getValue() > -1) {
+			bonus = "+" + bonus;
+		}
+		
+		return "(" + bonus + ")";
+    }
+
+	@Override
+	public Part getAcquisitionPart() {
+		return getNewPart();
 	}
 
 	@Override

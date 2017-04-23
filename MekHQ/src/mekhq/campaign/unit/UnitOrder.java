@@ -51,6 +51,7 @@ import mekhq.MekHqXmlUtil;
 import mekhq.Version;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.Availability;
+import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.work.IAcquisitionWork;
 
@@ -143,6 +144,26 @@ public class UnitOrder extends Unit implements IAcquisitionWork, MekHqXmlSeriali
         return null;
     }
 
+    @Override
+    public String getAcquisitionDisplayName() {
+    	return null;
+    }
+    
+	@Override
+	public String getAcquisitionExtraDesc() {
+    	return null;
+	}
+
+	@Override
+    public String getAcquisitionBonus() {
+    	return null;
+    }
+
+	@Override
+	public Part getAcquisitionPart() {
+		return null;
+	}
+	
     @Override
     public Unit getUnit() {
         return this;
