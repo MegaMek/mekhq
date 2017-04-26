@@ -186,8 +186,17 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
 		btnAcquisitions.addPropertyChangeListener("counts", new PropertyChangeListener() {
 			@Override
 			public void propertyChange(PropertyChangeEvent evt) {
-				btnAcquisitions.setText("Parts Acquisition" + (PartsAcquisitionService.getTotalMissingCount() > 0
-						? String.format(" (%s missing)", PartsAcquisitionService.getTotalMissingCount()) : ""));
+				String txt = "Parts Acquisition";
+				
+				if (PartsAcquisitionService.getMissingCount() > 0) {
+					if (PartsAcquisitionService.getUnavailableCount() > 0) {
+						txt += String.format(" (%s missing, %s unavailable)", PartsAcquisitionService.getMissingCount(), PartsAcquisitionService.getUnavailableCount());
+					} else {
+						txt += String.format(" (%s missing)", PartsAcquisitionService.getMissingCount());
+					}
+				}
+				
+				btnAcquisitions.setText(txt);
 				
 				btnAcquisitions.repaint();
 			}
@@ -999,6 +1008,8 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
             acquisitionTable.setRowSelectionInterval(selectedRow,
                     selectedRow);
         }
+        
+        refreshPartsAcquisitionService(true);
     }
     
 	public void refreshPartsAcquisitionService(boolean rebuildPartsList) {
