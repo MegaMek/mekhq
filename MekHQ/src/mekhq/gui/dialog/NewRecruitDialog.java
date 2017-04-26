@@ -80,8 +80,6 @@ public class NewRecruitDialog extends javax.swing.JDialog {
     }
 
     private void initComponents() {
-        java.awt.GridBagConstraints gridBagConstraints;
-        
         scrollView = new JScrollPane();
         panBottomButtons = new javax.swing.JPanel();
         btnOk = new javax.swing.JButton();
@@ -104,6 +102,53 @@ public class NewRecruitDialog extends javax.swing.JDialog {
         setName("Form"); // NOI18N
         getContentPane().setLayout(new java.awt.BorderLayout());
 
+        initSidebar(resourceMap);
+ 
+        initButtonPanel(resourceMap);
+
+        scrollView.setMinimumSize(new java.awt.Dimension(450, 180));
+        scrollView.setPreferredSize(new java.awt.Dimension(450, 180));
+        scrollView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollView.setViewportView(null);
+        refreshView();
+        
+        getContentPane().add(panSidebar, BorderLayout.LINE_START);
+        getContentPane().add(scrollView, BorderLayout.CENTER);
+        getContentPane().add(panBottomButtons, BorderLayout.PAGE_END);
+
+        pack();
+    }
+
+    private void initButtonPanel(ResourceBundle resourceMap) {
+        java.awt.GridBagConstraints gridBagConstraints;
+        panBottomButtons.setName("panButtons"); // NOI18N
+        panBottomButtons.setLayout(new java.awt.GridBagLayout());
+        btnOk.setText(resourceMap.getString("btnHire.text")); // NOI18N
+        btnOk.setName("btnOk"); // NOI18N
+        btnOk.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                hire();
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+
+        panBottomButtons.add(btnOk, gridBagConstraints);
+        gridBagConstraints.gridx++;
+
+        btnClose.setText(resourceMap.getString("btnClose.text")); // NOI18N
+        btnClose.setName("btnClose"); // NOI18N
+        btnClose.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                setVisible(false);
+            }
+        });
+        panBottomButtons.add(btnClose, gridBagConstraints);
+    }
+
+    private void initSidebar(ResourceBundle resourceMap) {
         panSidebar.setName("panButtons"); // NOI18N
         panSidebar.setLayout(new java.awt.GridLayout(6,1));
         
@@ -162,44 +207,6 @@ public class NewRecruitDialog extends javax.swing.JDialog {
         });
         btnRegenerate.setEnabled(campaign.isGM());
         panSidebar.add(btnRegenerate);
- 
-        panBottomButtons.setName("panButtons"); // NOI18N
-        panBottomButtons.setLayout(new java.awt.GridBagLayout());
-        btnOk.setText(resourceMap.getString("btnHire.text")); // NOI18N
-        btnOk.setName("btnOk"); // NOI18N
-        btnOk.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                hire();
-            }
-        });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-
-        panBottomButtons.add(btnOk, gridBagConstraints);
-        gridBagConstraints.gridx++;
-
-        btnClose.setText(resourceMap.getString("btnClose.text")); // NOI18N
-        btnClose.setName("btnClose"); // NOI18N
-        btnClose.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                setVisible(false);
-            }
-        });
-        panBottomButtons.add(btnClose, gridBagConstraints);
-
-        scrollView.setMinimumSize(new java.awt.Dimension(450, 180));
-        scrollView.setPreferredSize(new java.awt.Dimension(450, 180));
-        scrollView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        scrollView.setViewportView(null);
-        refreshView();
-        
-        getContentPane().add(panSidebar, BorderLayout.LINE_START);
-        getContentPane().add(scrollView, BorderLayout.CENTER);
-        getContentPane().add(panBottomButtons, BorderLayout.PAGE_END);
-
-        pack();
     }
 
     private void hire() {
