@@ -7,7 +7,6 @@
 package mekhq.gui.dialog;
 
 import java.awt.BorderLayout;
-import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.util.ResourceBundle;
@@ -18,9 +17,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 
-import megamek.common.util.DirectoryItems;
 import megamek.common.util.EncodeControl;
-import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Ranks;
 import mekhq.gui.CampaignGUI;
@@ -38,32 +35,25 @@ public class NewRecruitDialog extends javax.swing.JDialog {
 	 */
 	private static final long serialVersionUID = -6265589976779860566L;
 	private Person person;
-    private Frame frame;
     private boolean newHire;
-    private DirectoryItems portraits;
-    
-    private Campaign campaign;
     
     private CampaignGUI hqView;
-    
+        
     private javax.swing.JComboBox<String> choiceRanks;
 
     private JScrollPane scrollView;
 
     /** Creates new form CustomizePilotDialog */
-    public NewRecruitDialog(java.awt.Frame parent, boolean modal, Person person, Campaign campaign, CampaignGUI view, DirectoryItems portraits) {
-        super(parent, modal);
-        this.campaign = campaign;
-        this.portraits = portraits;
-        this.hqView = view;
-        this.frame = parent;
+    public NewRecruitDialog(CampaignGUI hqView, boolean modal, Person person) {
+        super(hqView.getFrame(), modal);
+        this.hqView = hqView;
         this.person = person;
         initComponents();
-        setLocationRelativeTo(parent);
+        setLocationRelativeTo(hqView.getFrame());
     }
     
     private void refreshView() {
-    	scrollView.setViewportView(new PersonViewPanel(person, campaign, hqView.getIconPackage()));
+    	scrollView.setViewportView(new PersonViewPanel(person, hqView.getCampaign(), hqView.getIconPackage()));
 		//This odd code is to make sure that the scrollbar stays at the top
 		//I cant just call it here, because it ends up getting reset somewhere later
 		javax.swing.SwingUtilities.invokeLater(new Runnable() {
@@ -77,7 +67,8 @@ public class NewRecruitDialog extends javax.swing.JDialog {
         scrollView = new JScrollPane();
         choiceRanks = new javax.swing.JComboBox<String>();
 
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.NewRecruitDialog", new EncodeControl()); //$NON-NLS-1$
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.NewRecruitDialog",
+                new EncodeControl()); //$NON-NLS-1$
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
         setTitle(resourceMap.getString("Form.title")); // NOI18N
@@ -156,41 +147,43 @@ public class NewRecruitDialog extends javax.swing.JDialog {
         button = new JButton(resourceMap.getString("btnEditPerson.text")); // NOI18N
         button.setName("btnEditPerson"); // NOI18N
         button.addActionListener(e -> editPerson());
-        button.setEnabled(campaign.isGM());
+        button.setEnabled(hqView.getCampaign().isGM());
         panSidebar.add(button);
        
         button = new JButton(resourceMap.getString("btnRegenerate.text")); // NOI18N
         button.setName("btnRegenerate"); // NOI18N
         button.addActionListener(e -> regenerate());
-        button.setEnabled(campaign.isGM());
+        button.setEnabled(hqView.getCampaign().isGM());
         panSidebar.add(button);
         
         return panSidebar;
     }
 
     private void hire() {
-    	if(campaign.recruitPerson(person)) {
-        	person = campaign.newPerson(person.getPrimaryRole());
+    	if(hqView.getCampaign().recruitPerson(person)) {
+        	person = hqView.getCampaign().newPerson(person.getPrimaryRole());
         	refreshRanksCombo();
-        	campaign.changeRank(person, campaign.getRanks().getRankNumericFromNameAndProfession(person.getProfession(), (String)choiceRanks.getSelectedItem()), false);
+        	hqView.getCampaign().changeRank(person, hqView.getCampaign().getRanks()
+        	        .getRankNumericFromNameAndProfession(person.getProfession(),
+        	                (String)choiceRanks.getSelectedItem()), false);
     	}
         refreshView();
     }
 
     private void randomName() {
-    	person.setName(campaign.getRNG().generate(person.getGender() == Person.G_FEMALE));
+    	person.setName(hqView.getCampaign().getRNG().generate(person.getGender() == Person.G_FEMALE));
     	refreshView();
 	}
     
     private void randomPortrait() {
-    	campaign.assignRandomPortraitFor(person);
+    	hqView.getCampaign().assignRandomPortraitFor(person);
     	refreshView();
     }
     
     private void choosePortrait() {
-    	ImageChoiceDialog pcd = new ImageChoiceDialog(frame, true,
+    	ImageChoiceDialog pcd = new ImageChoiceDialog(hqView.getFrame(), true,
 				person.getPortraitCategory(),
-				person.getPortraitFileName(), portraits);
+				person.getPortraitFileName(), hqView.getIconPackage().getPortraits());
 		pcd.setVisible(true);
 		person.setPortraitCategory(pcd.getCategory());
 		person.setPortraitFileName(pcd.getFileName());
@@ -199,9 +192,8 @@ public class NewRecruitDialog extends javax.swing.JDialog {
     
     private void editPerson() {
     	int gender = person.getGender();
-    	CustomizePersonDialog npd = new CustomizePersonDialog(frame, true, 
-				person, 
-				campaign);
+    	CustomizePersonDialog npd = new CustomizePersonDialog(hqView.getFrame(), true, 
+				person, hqView.getCampaign());
 		npd.setVisible(true);
 		if(gender != person.getGender()) {
 			randomPortrait();
@@ -211,13 +203,15 @@ public class NewRecruitDialog extends javax.swing.JDialog {
     }
     
     private void regenerate() {
-    	person = campaign.newPerson(person.getPrimaryRole());
+    	person = hqView.getCampaign().newPerson(person.getPrimaryRole());
     	refreshRanksCombo();
         refreshView();
     }
     
     private void changeRank() {
-    	campaign.changeRank(person, campaign.getRanks().getRankNumericFromNameAndProfession(person.getProfession(), (String)choiceRanks.getSelectedItem()), false);
+    	hqView.getCampaign().changeRank(person, hqView.getCampaign().getRanks()
+    	        .getRankNumericFromNameAndProfession(person.getProfession(),
+    	                (String)choiceRanks.getSelectedItem()), false);
     	refreshView();
     }
    
@@ -226,10 +220,10 @@ public class NewRecruitDialog extends javax.swing.JDialog {
     	
     	// Determine correct profession to pass into the loop
     	int profession = person.getProfession();
-    	while (campaign.getRanks().isEmptyProfession(profession) && profession != Ranks.RPROF_MW) {
-    		profession = campaign.getRanks().getAlternateProfession(profession);
+    	while (hqView.getCampaign().getRanks().isEmptyProfession(profession) && profession != Ranks.RPROF_MW) {
+    		profession = hqView.getCampaign().getRanks().getAlternateProfession(profession);
     	}
-    	for (String rankName : campaign.getAllRankNamesFor(profession)) {
+    	for (String rankName : hqView.getCampaign().getAllRankNamesFor(profession)) {
     	    ranksModel.addElement(rankName);
     	}
         choiceRanks.setModel(ranksModel);

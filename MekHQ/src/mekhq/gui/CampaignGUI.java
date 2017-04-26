@@ -1482,9 +1482,8 @@ public class CampaignGUI extends JPanel {
 
     private void hirePerson(java.awt.event.ActionEvent evt) {
         int type = Integer.parseInt(evt.getActionCommand());
-        NewRecruitDialog npd = new NewRecruitDialog(getFrame(), true,
-                getCampaign().newPerson(type), getCampaign(), this,
-                getIconPackage().getPortraits());
+        NewRecruitDialog npd = new NewRecruitDialog(this, true,
+                getCampaign().newPerson(type));
         npd.setVisible(true);
     }
 
