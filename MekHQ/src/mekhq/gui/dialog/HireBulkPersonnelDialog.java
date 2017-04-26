@@ -40,7 +40,6 @@ import megamek.common.util.EncodeControl;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.Rank;
 import mekhq.campaign.personnel.Ranks;
 
 
@@ -307,21 +306,8 @@ public class HireBulkPersonnelDialog extends JDialog {
             profession = campaign.getRanks().getAlternateProfession(profession);
         }
         
-        for(Rank rank : campaign.getRanks().getAllRanks()) {
-            int p = profession;
-            // Grab rank from correct profession as needed
-            while (rank.getName(p).startsWith("--") && p != Ranks.RPROF_MW) { //$NON-NLS-1$
-                if (rank.getName(p).equals("--")) { //$NON-NLS-1$
-                    p = campaign.getRanks().getAlternateProfession(p);
-                } else if (rank.getName(p).startsWith("--")) { //$NON-NLS-1$
-                    p = campaign.getRanks().getAlternateProfession(rank.getName(p));
-                }
-            }
-            if (rank.getName(p).equals("-")) { //$NON-NLS-1$
-                continue;
-            }
-            
-            rankModel.addElement(rank.getName(p));
+        for (String rankName : campaign.getAllRankNamesFor(profession)) {
+            rankModel.addElement(rankName);
         }
         choiceRanks.setModel(rankModel);
         choiceRanks.setSelectedIndex(0);

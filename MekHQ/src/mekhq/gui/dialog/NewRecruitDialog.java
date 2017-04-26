@@ -22,7 +22,6 @@ import megamek.common.util.DirectoryItems;
 import megamek.common.util.EncodeControl;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.Rank;
 import mekhq.campaign.personnel.Ranks;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.view.PersonViewPanel;
@@ -230,23 +229,9 @@ public class NewRecruitDialog extends javax.swing.JDialog {
     	while (campaign.getRanks().isEmptyProfession(profession) && profession != Ranks.RPROF_MW) {
     		profession = campaign.getRanks().getAlternateProfession(profession);
     	}
-    	
-        for(Rank rank : campaign.getRanks().getAllRanks()) {
-        	int p = profession;
-        	// Grab rank from correct profession as needed
-        	while (rank.getName(p).startsWith("--") && p != Ranks.RPROF_MW) {
-            	if (rank.getName(p).equals("--")) {
-            		p = campaign.getRanks().getAlternateProfession(p);
-            	} else if (rank.getName(p).startsWith("--")) {
-            		p = campaign.getRanks().getAlternateProfession(rank.getName(p));
-            	}
-        	}
-        	if (rank.getName(p).equals("-")) {
-        		continue;
-        	}
-        	
-        	ranksModel.addElement(rank.getName(p));
-        }
+    	for (String rankName : campaign.getAllRankNamesFor(profession)) {
+    	    ranksModel.addElement(rankName);
+    	}
         choiceRanks.setModel(ranksModel);
         choiceRanks.setSelectedIndex(0);
     }

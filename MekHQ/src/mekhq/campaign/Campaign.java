@@ -179,6 +179,7 @@ import mekhq.campaign.parts.equipment.MissingMASC;
 import mekhq.campaign.personnel.Ancestors;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.Rank;
 import mekhq.campaign.personnel.RankTranslator;
 import mekhq.campaign.personnel.Ranks;
 import mekhq.campaign.personnel.RetirementDefectionTracker;
@@ -5589,6 +5590,28 @@ public class Campaign implements Serializable {
 
     public void setRankSystem(int system) {
         getRanks().setRankSystem(system);
+    }
+    
+    public List<String> getAllRankNamesFor(int profession) {
+        
+        List<String> retVal = new ArrayList<String>();
+        for(Rank rank : getRanks().getAllRanks()) {
+            int p = profession;
+            // Grab rank from correct profession as needed
+            while (rank.getName(p).startsWith("--") && p != Ranks.RPROF_MW) {
+                if (rank.getName(p).equals("--")) {
+                    p = getRanks().getAlternateProfession(p);
+                } else if (rank.getName(p).startsWith("--")) {
+                    p = getRanks().getAlternateProfession(rank.getName(p));
+                }
+            }
+            if (rank.getName(p).equals("-")) {
+                continue;
+            }
+            
+            retVal.add(rank.getName(p));
+        }
+        return retVal;
     }
 
     public ArrayList<Force> getAllForces() {
