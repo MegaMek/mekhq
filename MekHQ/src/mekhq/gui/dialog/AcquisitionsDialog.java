@@ -534,6 +534,10 @@ public class AcquisitionsDialog extends JDialog {
 				useBonusPart();
 			});
 
+			if (numBonusParts == 0) {
+				btnUseBonus.setVisible(false);
+			}
+			
 			actionButtons.add(btnUseBonus, gbcActions);
 			gbcActions.gridy++;
 
