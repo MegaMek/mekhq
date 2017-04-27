@@ -15,13 +15,13 @@ import mekhq.campaign.work.IAcquisitionWork;
 public class PartsAcquisitionService {
 	private static Map<String, List<IAcquisitionWork>> acquisitionMap = null;
 	private static Map<String, PartCountInfo> partCountInfoMap = new HashMap<String, PartCountInfo>();
-	
+
 	private static int inTransitCount = 0;
 	private static int onOrderCount = 0;
 	private static int omniPodCount = 0;
 	private static int missingCount = 0;
 	private static int requiredCount = 0;
-	private static int unavailableCount = 0;	
+	private static int unavailableCount = 0;
 	private static long missingTotalPrice = 0;
 
 	private PartsAcquisitionService() {
@@ -121,27 +121,27 @@ public class PartsAcquisitionService {
 				awList.add(aw);
 			}
 		}
-		
+
 		generateSummaryCounts(campaign);
 	}
 
 	public static void generateSummaryCounts(Campaign campaign) {
 		partCountInfoMap = new HashMap<String, PartCountInfo>();
-		
-        Person admin = campaign.getLogisticsPerson();
-		
+
+		Person admin = campaign.getLogisticsPerson();
+
 		for (List<IAcquisitionWork> awList : acquisitionMap.values()) {
-	        IAcquisitionWork awFirst = awList.get(0);
+			IAcquisitionWork awFirst = awList.get(0);
 			Part part = awFirst.getAcquisitionPart();
-	        TargetRoll target = campaign.getTargetForAcquisition(awFirst, admin);
+			TargetRoll target = campaign.getTargetForAcquisition(awFirst, admin);
 			PartCountInfo pci = new PartCountInfo();
-	        
+
 			int[] inventories = getInventories(part, campaign, pci);
 
 			int inTransit = inventories[1];
 			int onOrder = inventories[2];
 			int omniPod = 0;
-						
+
 			if (!part.isOmniPodded()) {
 				part.setOmniPodded(true);
 				inventories = getInventories(part, campaign, pci);
@@ -152,13 +152,14 @@ public class PartsAcquisitionService {
 
 				part.setOmniPodded(false);
 			}
-			
+
 			int missing = Math.max(0, awList.size() - inTransit - onOrder);
-			
+
+			pci.setKey(awFirst.getAcquisitionDisplayName());
 			pci.setRequiredCount(awList.size());
 			pci.setStickerPrice(part.getStickerPrice());
 			pci.setMissingCount(missing);
-			
+
 			if (target.getValue() == TargetRoll.IMPOSSIBLE) {
 				pci.setCanBeAcquired(false);
 				pci.setFailedMessage(target.getPlainDesc());
@@ -167,10 +168,10 @@ public class PartsAcquisitionService {
 				pci.setOnOrderCount(onOrder);
 				pci.setOmniPodCount(omniPod);
 			}
-			
+
 			partCountInfoMap.put(awList.get(0).getAcquisitionDisplayName(), pci);
 		}
-		
+
 		inTransitCount = 0;
 		onOrderCount = 0;
 		omniPodCount = 0;
@@ -178,6 +179,8 @@ public class PartsAcquisitionService {
 		requiredCount = 0;
 		unavailableCount = 0;
 		missingTotalPrice = 0;
+
+		//campaign.addReport("***START: generateSummaryCounts");
 		
 		for (PartCountInfo pci : partCountInfoMap.values()) {
 			inTransitCount += pci.getInTransitCount();
@@ -185,23 +188,27 @@ public class PartsAcquisitionService {
 			missingCount += pci.getMissingCount();
 			requiredCount += pci.getRequiredCount();
 			omniPodCount += pci.getOmniPodCount();
-			
+
 			if (pci.getMissingCount() > 0) {
 				if (!pci.isCanBeAcquired()) {
 					unavailableCount += pci.getMissingCount();
 				} else {
-					missingTotalPrice += (pci.getMissingCount() * pci.getStickerPrice());					
+					missingTotalPrice += (pci.getMissingCount() * pci.getStickerPrice());
 				}
 			}
-		}		
+
+			//campaign.addReport(pci.toString());
+		}
+		
+		//campaign.addReport("***END: generateSummaryCounts");
 	}
-	
+
 	private static int[] getInventories(Part part, Campaign campaign, PartCountInfo pci) {
 		String[] inventories = campaign.getPartInventory(part);
 		int[] parsedInventories = new int[inventories.length];
-		
+
 		int idx = 0;
-		
+
 		for (String s : inventories) {
 			if (s.indexOf(" ") > -1) {
 				parsedInventories[idx] = Integer.parseInt(s.substring(0, s.indexOf(" ")));
@@ -209,14 +216,15 @@ public class PartsAcquisitionService {
 			} else {
 				parsedInventories[idx] = Integer.parseInt(s);
 			}
-			
+
 			idx++;
 		}
-		
+
 		return parsedInventories;
 	}
 
 	public static class PartCountInfo {
+		private String key;
 		private int requiredCount;
 		private int missingCount;
 		private int inTransitCount;
@@ -226,7 +234,15 @@ public class PartsAcquisitionService {
 		private long stickerPrice;
 		private String failedMessage;
 		private boolean canBeAcquired = true;
-		
+
+		public String getKey() {
+			return key;
+		}
+
+		public void setKey(String key) {
+			this.key = key;
+		}
+
 		public int getRequiredCount() {
 			return requiredCount;
 		}
@@ -297,6 +313,25 @@ public class PartsAcquisitionService {
 
 		public void setCanBeAcquired(boolean canBeAcquired) {
 			this.canBeAcquired = canBeAcquired;
+		}
+
+		public String toString() {
+			StringBuilder sb = new StringBuilder();
+
+			sb.append(key);
+			sb.append("{");
+			sb.append("requiredCount=" + requiredCount);
+			sb.append(",missingCount=" + missingCount);
+			sb.append(",inTransitCount=" + inTransitCount);
+			sb.append(",onOrderCount=" + onOrderCount);
+			sb.append(",omniPodCount=" + omniPodCount);
+			sb.append(",countModifier='" + countModifier + "'");
+			sb.append(",stickerPrice=" + stickerPrice);
+			sb.append(",failedMessage='" + failedMessage + "'");
+			sb.append(",canBeAcquired=" + canBeAcquired);
+			sb.append("}");
+			
+			return sb.toString();
 		}
 	}
 }
