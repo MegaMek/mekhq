@@ -307,27 +307,47 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
     
     @Override
     public String getAcquisitionDesc() {
-        String bonus = getAllAcquisitionMods().getValueAsString();
-        if(getAllAcquisitionMods().getValue() > -1) {
-            bonus = "+" + bonus;
-        }
-        bonus = "(" + bonus + ")";
         String toReturn = "<html><font size='2'";
         
         toReturn += ">";
-        toReturn += "<b>" + type.getDesc() + "</b> " + bonus + "<br/>";
-        toReturn += ((AmmoType)type).getShots() + " shots (1 ton)<br/>";
-        String[] inventories = campaign.getPartInventory(getNewPart());
+        toReturn += "<b>" + getAcquisitionDisplayName() + "</b> " + getAcquisitionBonus() + "<br/>";
+        toReturn += getAcquisitionExtraDesc() + "<br/>";
+        String[] inventories = campaign.getPartInventory(getAcquisitionPart());
         toReturn += inventories[1] + " in transit, " + inventories[2] + " on order<br>"; 
         toReturn += Utilities.getCurrencyString(getStickerPrice()) + "<br/>";
         toReturn += "</font></html>";
         return toReturn;
     }
-    
+	
+    @Override
+    public String getAcquisitionDisplayName() {
+    	return type.getDesc();
+    }    
+
+	@Override
+	public String getAcquisitionExtraDesc() {
+		return ((AmmoType)type).getShots() + " shots (1 ton)";
+	}
+
     @Override
     public String getAcquisitionName() {
         return type.getDesc();
     }
+
+	@Override
+    public String getAcquisitionBonus() {
+        String bonus = getAllAcquisitionMods().getValueAsString();
+        if(getAllAcquisitionMods().getValue() > -1) {
+            bonus = "+" + bonus;
+        }
+
+        return "(" + bonus + ")";
+    }
+
+	@Override
+	public Part getAcquisitionPart() {
+		return getNewPart();
+	}
 
     @Override
     public TargetRoll getAllAcquisitionMods() {
