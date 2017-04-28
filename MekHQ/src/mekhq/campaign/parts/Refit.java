@@ -1626,6 +1626,26 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 	public String getAcquisitionDesc() {
 		return "Fill this in";
 	}
+	
+    @Override
+    public String getAcquisitionDisplayName() {
+    	return null;
+    }    
+
+	@Override
+	public String getAcquisitionExtraDesc() {
+    	return null;
+	}
+
+	@Override
+    public String getAcquisitionBonus() {
+    	return null;
+    }
+
+	@Override
+	public Part getAcquisitionPart() {
+		return null;
+	}
 
 	public long getStickerPrice() {
 		return cost;

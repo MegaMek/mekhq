@@ -18,6 +18,7 @@ v0.43.2-git
 + Fix #385: MRMS no longer fixes units with bad hip/shoulder
 + Fix #387: Fix assertion failure when undeploying a unit from a special operation
 + Fix #389: Remove all personnel tried to remove the tech only if it didn't have a tech
++ Feature: New parts acquisition functionality to group parts together and to be able to better see what is in transit/on order and what is missing
 
 v0.43.1 (2017-03-31 01:15 UTC)
 + Change to require GM Mode for the add/remove pregnancy context menu commands
