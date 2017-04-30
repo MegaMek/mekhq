@@ -92,15 +92,7 @@ public class SpecialAbility implements MekHqXmlSerializable {
     }
 
     public SpecialAbility(String name) {
-        lookupName = name;
-        displayName = "";
-        desc = "";
-        prereqAbilities = new Vector<String>();
-        invalidAbilities = new Vector<String>();
-        removeAbilities = new Vector<String>();
-        prereqSkills = new Vector<SkillPrereq>();
-        xpCost = 1;
-        weight = 1;
+        this(name, "", "");
     }
 
     public SpecialAbility(String name, String display, String description) {
