@@ -312,6 +312,7 @@ public class SpecialAbility implements MekHqXmlSerializable {
                 }
             }
         }
+        
         specialAbilities.put(retVal.lookupName, retVal);
     }
 
@@ -420,7 +421,7 @@ public class SpecialAbility implements MekHqXmlSerializable {
                 }
             }
         }
-
+        SpecialAbility.trackDefaultSPA();
     }
 
     public static SpecialAbility getAbility(String name) {
@@ -429,6 +430,14 @@ public class SpecialAbility implements MekHqXmlSerializable {
 
     public static Hashtable<String, SpecialAbility> getAllSpecialAbilities() {
         return specialAbilities;
+    }
+
+    public static SpecialAbility getDefaultAbility(String name) {
+        return defaultSpecialAbilities.get(name);
+    }
+
+    public static Hashtable<String, SpecialAbility> getAllDefaultSpecialAbilities() {
+        return defaultSpecialAbilities;
     }
 
     public static void replaceSpecialAbilities(Hashtable<String, SpecialAbility> spas) {
