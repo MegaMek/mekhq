@@ -19,6 +19,11 @@ v0.43.2-git
 + Fix #387: Fix assertion failure when undeploying a unit from a special operation
 + Fix #389: Remove all personnel tried to remove the tech only if it didn't have a tech
 + Feature: New parts acquisition functionality to group parts together and to be able to better see what is in transit/on order and what is missing
++ Feature: Implement custom SPA "Clan Technical Knowledge", which can be
+	purchased to give the bearer the same skill level with clan technology ad a
+	freeborn clan tech. This required implementing 99% of the code to
+	support custom SPAs that affect MHQ rather than MM. The rest will
+	come in once a plugin system is implemented.
 
 v0.43.1 (2017-03-31 01:15 UTC)
 + Change to require GM Mode for the add/remove pregnancy context menu commands
