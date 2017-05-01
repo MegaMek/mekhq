@@ -409,6 +409,9 @@ public class ContractMarket implements Serializable {
 
         contract.initContractDetails(campaign);
         contract.calculateContract(campaign);
+        
+        contract.setName(Faction.getFaction(employer).getFullName(campaign.getCalendar().get(Calendar.YEAR)) + " - " + AtBContract.missionTypeNames[contract.getMissionType()]);
+        
 		return contract;
 	}
 
