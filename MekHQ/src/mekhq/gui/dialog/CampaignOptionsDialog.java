@@ -4439,10 +4439,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         return cancelled;
     }
 
-    public Hashtable<String, SpecialAbility> getCurrentSPA() {
-    	return tempSPA;
-    }
-
     private void btnDateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDateActionPerformed
         // show the date chooser
         DateChooser dc = new DateChooser(frame, date);
@@ -4488,7 +4484,18 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     			}
     		}
     	}
+    	
+    	for (String key : SpecialAbility.getAllDefaultSpecialAbilities().keySet()) {
+            if(null == tempSPA.get(key) && !unused.contains(key)) {
+                unused.add(key);
+            }
+        }
+    	
     	return unused;
+    }
+
+    public Hashtable<String, SpecialAbility> getCurrentSPA() {
+        return tempSPA;
     }
 
     private void btnAddSPA() {
@@ -4522,7 +4529,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         }
         panSpecialAbilities.revalidate();
         panSpecialAbilities.repaint();
-
     }
 
     public void btnRemoveSPA(String name) {
