@@ -276,6 +276,21 @@
 	        <skill>Gunnery/Protomech::Regular</skill>	    		    	    	
 	    </skillPrereq>	
 	</ability>
+    
+    <!-- Tech SPA -->
+    <ability>
+        <lookupName>clan_tech_knowledge</lookupName> 
+        <displayName>Clan Tech Knowledge (Unofficial)</displayName>   
+        <xpCost>4</xpCost>
+        <weight>2</weight>
+        <skillPrereq>
+            <skill>Tech/Mech</skill>
+            <skill>Tech/Mechanic</skill>
+            <skill>Tech/Aero</skill>
+            <skill>Tech/BA</skill>
+            <skill>Tech/Vessel</skill>                             
+        </skillPrereq>
+    </ability>
 	
 	<!-- OTHER SPA -->
 	<ability>
