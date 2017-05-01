@@ -122,17 +122,27 @@ public class SpecialAbility implements MekHqXmlSerializable {
     }
 
     public boolean isEligible(Person p) {
+        // Already has this SPA
+        if (p.getSpas() != null && p.getSpas().containsKey(this.getName())) {
+            return false;
+        }
+        
+        // Do we have prerequisite skills?
         for(SkillPrereq sp : prereqSkills) {
             if(!sp.qualifies(p)) {
                 return false;
             }
         }
+        
+        // Do we have prerequisite abilities?
         for(String ability : prereqAbilities) {
             //TODO: will this work for choice options like weapon specialist?
             if(!p.getOptions().booleanOption(ability)) {
                 return false;
             }
         }
+        
+        // Do we have any incompatible abilities?
         for(String ability : invalidAbilities) {
             //TODO: will this work for choice options like weapon specialist?
             if(p.getOptions().booleanOption(ability)) {
