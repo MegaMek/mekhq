@@ -1,6 +1,6 @@
 VERSION HISTORY:
 ----------------
-v0.42.2-git
+v0.42.2 (2017-05-1 01:00 UTC)
 + Fix #334: Problems purchasing bombs.
 + Fix #364: MekHq Calculates Naval Vee Piloting skill using Ground Vee piloting skill.
 + Fix #317: Unable to load campaign file after BattleArmor refit
