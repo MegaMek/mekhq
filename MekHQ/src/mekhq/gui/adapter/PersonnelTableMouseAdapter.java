@@ -1718,7 +1718,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                                 menuItem.setEnabled(available);
                                 specialistMenu.add(menuItem);
                                 abMenu.add(specialistMenu);
-                            } else if (ability.getName().equals("human_tro")) { //$NON-NLS-1$
+                            } else if (spa.getName().equals("human_tro")) { //$NON-NLS-1$
                                 JMenu specialistMenu = new JMenu(resourceMap.getString("humantro.text")); //$NON-NLS-1$
                                 menuItem = new JMenuItem(String.format(resourceMap.getString("abilityDesc.format"), resourceMap.getString("humantro_mek.text"), costDesc)); //$NON-NLS-1$ //$NON-NLS-2$
                                 menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_HUMANTRO, Crew.HUMANTRO_MECH, String.valueOf(cost)));
