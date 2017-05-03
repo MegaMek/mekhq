@@ -2040,6 +2040,10 @@ public class Unit implements MekHqXmlSerializable {
             if (m.isWeaponGroup()) {
                 continue;
             }
+            // Anti-Mek attacks aren't actual parts
+            if (m.getType() instanceof InfantryAttack) {
+                continue;
+            }
             if(!m.getType().isHittable()) {
                 //there are some kind of non-hittable parts we might want to include for cost calculations
                 if(!(m.getType() instanceof MiscType)) {
@@ -3011,7 +3015,7 @@ public class Unit implements MekHqXmlSerializable {
     }
 
     public void removeTech() {
-        if (tech == null) {
+        if (tech != null) {
             MekHQ.triggerEvent(new PersonTechAssignmentEvent(campaign.getPerson(tech), this));
             tech = null;
         }
@@ -3624,4 +3628,11 @@ public class Unit implements MekHqXmlSerializable {
         return false;
     }
 
+    public String toString() {
+        String entName = "None";
+        if (getEntity() != null) {
+            entName = getEntity().getDisplayName();
+        }
+        return "Unit for Entity: " + entName;
+    }
 }

@@ -752,7 +752,7 @@ class CampaignOpsReputation extends AbstractUnitRating {
     }
 
     private int getTotalAdmins() {
-        return getCampaign().getAdmins().size() + getCampaign().getNumberMedics();
+        return getCampaign().getAdmins().size() + getCampaign().getDoctors().size();
     }
 
     @Override

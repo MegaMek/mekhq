@@ -69,4 +69,9 @@ public class MissingJumpJet extends MissingEquipmentPart {
     	}
     	return ton;
     }
+    
+    @Override
+    public boolean isOmniPoddable() {
+        return true;
+    }
 }

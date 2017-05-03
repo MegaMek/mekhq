@@ -820,7 +820,7 @@ public final class PersonnelTab extends CampaignGuiTab {
     
     @Subscribe
     public void handle(PersonChangedEvent ev) {
-        filterPersonnelScheduler.schedule();
+        personnelListScheduler.schedule();
     }
     
     @Subscribe

@@ -1,6 +1,33 @@
 VERSION HISTORY:
 ----------------
-v0.43.2-git
+v0.43.3-git
+
+v0.43.2 (2017-05-1 22:00 UTC)
++ Fix #362: Omni Refits calculating additional HS incorrectly
++ Bug: Cannot begin refit when creating custom omni configuration in MekLab.
++ Fix #365: Personnel actions not refreshing with options affecting person panel.
++ Fix #364: MekHq Calculates Naval Vee Piloting skill using Ground Vee piloting skill.
++ Fix #369: Chose Refit Kit causing ArrayIndexOutOfBoundsException
++ Issue #356: Option to hide hide custom player refits from the purchase menu/unit cache #356
++ Fix #317: Unable to load campaign file after BattleArmor refit
++ Fix #368: Selected tech in repair tab reset after every repair
++ Fix #376:  MekHQ unselects task in repair bay/won't autoselect next patient in sickbay
++ Fix #370: Attempting to use Hire Bulk Personnel results in log error
++ Fix #377: Advance Day Dialog not showing daily reports beyond the first.
++ Fix #343: Graphics Issue: MMLab screen does not fit in its MHQ window
++ Fix #298: Medical Details Window Size
++ Fix #382: MR-Warehouse no longer works
++ Fix #385: MRMS no longer fixes units with bad hip/shoulder
++ Fix #387: Fix assertion failure when undeploying a unit from a special operation
++ Fix #389: Remove all personnel tried to remove the tech only if it didn't have a tech
++ Feature: New parts acquisition functionality to group parts together and to be able to better see what is in transit/on order and what is missing
++ Feature: Implement custom SPA "Clan Technical Knowledge", which can be
+	purchased to give the bearer the same skill level with clan technology ad a
+	freeborn clan tech. This required implementing 99% of the code to
+	support custom SPAs that affect MHQ rather than MM. The rest will
+	come in once a plugin system is implemented.
++ Updated MegaMek.jar to 0.43.2
++ Updated MegaMekLab.jar to 0.43.2
 
 v0.43.1 (2017-03-31 01:15 UTC)
 + Change to require GM Mode for the add/remove pregnancy context menu commands

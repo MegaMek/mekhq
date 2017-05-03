@@ -103,17 +103,21 @@ public class DailyReportLogPanel extends JPanel {
     }
 
 	public void appendLog(List<String> newReports) {
-		String addedText = Utilities.combineString(newReports, ""); //$NON-NLS-1$
+		String addedText = Utilities.combineString(newReports, ""); //$NON-NLS-1$z
 		if((null != addedText) && (addedText.length() > 0)) {
-			HTMLDocument doc = (HTMLDocument) txtLog.getDocument();
-			try {
-				// Element 0 is <head>, Element 1 is <body>
-				doc.insertBeforeEnd(doc.getDefaultRootElement().getElement(1).getElement(0), addedText);
-				logText = logText + addedText;
-			} catch (BadLocationException | IOException e) {
-				// Shouldn't happen
-			}
-			txtLog.setCaretPosition(doc.getLength());
+		    if (logText.length() > 0) {
+    			HTMLDocument doc = (HTMLDocument) txtLog.getDocument();
+    			try {
+    				// Element 0 is <head>, Element 1 is <body>
+    				doc.insertBeforeEnd(doc.getDefaultRootElement().getElement(1).getElement(0), addedText);
+    				logText = logText + addedText;
+    			} catch (BadLocationException | IOException e) {
+    				// Shouldn't happen
+    			}
+    			txtLog.setCaretPosition(doc.getLength());
+		    } else {
+		        refreshLog(addedText);
+		    }
 		}
 	}
 

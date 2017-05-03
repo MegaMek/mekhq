@@ -18,6 +18,9 @@ import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
+import megamek.common.event.Subscribe;
+import mekhq.MekHQ;
+import mekhq.campaign.event.ReportEvent;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.DailyReportLogPanel;
 import mekhq.gui.ReportHyperlinkListener;
@@ -69,6 +72,7 @@ public class AdvanceDaysDialog extends JDialog implements ActionListener {
     public void actionPerformed(ActionEvent event) {
         if (event.getSource().equals(btnStart)) {
             boolean firstDay = true;
+            MekHQ.registerHandler(this);
             for (int numDays = (int)spnDays.getValue(); numDays > 0; numDays--) {
                 spnDays.setValue(numDays);
                 if (gui.getCampaign().checkOverDueLoans()
@@ -95,6 +99,7 @@ public class AdvanceDaysDialog extends JDialog implements ActionListener {
                     logPanel.appendLog(gui.getCampaign().fetchAndClearNewReports());
                 }
             }
+            MekHQ.unregisterHandler(this);
             
             gui.refreshCalendar();
             gui.refreshLocation();
@@ -102,5 +107,10 @@ public class AdvanceDaysDialog extends JDialog implements ActionListener {
 
             gui.refreshAllTabs();
         }
+    }
+    
+    @Subscribe(priority = 1)
+    public void reportOverride(ReportEvent ev) {
+        ev.cancel();
     }
 }

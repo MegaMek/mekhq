@@ -534,6 +534,7 @@ public class CampaignGUI extends JPanel {
      * @param tab	The tab to remove
      */
     public void removeTab(CampaignGuiTab tab) {
+        tab.disposeTab();
     	removeTab(tab.getTabName());
     }
     
@@ -1481,9 +1482,8 @@ public class CampaignGUI extends JPanel {
 
     private void hirePerson(java.awt.event.ActionEvent evt) {
         int type = Integer.parseInt(evt.getActionCommand());
-        NewRecruitDialog npd = new NewRecruitDialog(getFrame(), true,
-                getCampaign().newPerson(type), getCampaign(), this,
-                getIconPackage().getPortraits());
+        NewRecruitDialog npd = new NewRecruitDialog(this, true,
+                getCampaign().newPerson(type));
         npd.setVisible(true);
     }
 
@@ -1604,6 +1604,13 @@ public class CampaignGUI extends JPanel {
             RandomUnitGenerator.getInstance().dispose();
             RandomNameGenerator.getInstance().dispose();
         }
+        //Unregister event handlers for CampaignGUI and tabs
+        for (int i = 0; i < tabMain.getTabCount(); i++) {
+            if (tabMain.getComponentAt(i) instanceof CampaignGuiTab) {
+                ((CampaignGuiTab)tabMain.getComponentAt(i)).disposeTab();
+            }
+        }
+        MekHQ.unregisterHandler(this);
     }
 
     private File selectLoadCampaignFile() {
@@ -2951,7 +2958,10 @@ public class CampaignGUI extends JPanel {
                 prevId = parent.getId();
             }
         }
-        MekHQ.triggerEvent(new DeploymentChangedEvent(f, scenario));
+        
+        if (null != scenario) {
+        	MekHQ.triggerEvent(new DeploymentChangedEvent(f, scenario));
+        }
     }
 
     public JTabbedPane getTabMain() {

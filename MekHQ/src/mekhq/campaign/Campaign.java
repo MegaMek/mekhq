@@ -93,7 +93,6 @@ import megamek.common.Protomech;
 import megamek.common.SmallCraft;
 import megamek.common.Tank;
 import megamek.common.TargetRoll;
-import megamek.common.VTOL;
 import megamek.common.loaders.BLKFile;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.options.GameOptions;
@@ -180,6 +179,7 @@ import mekhq.campaign.parts.equipment.MissingMASC;
 import mekhq.campaign.personnel.Ancestors;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.Rank;
 import mekhq.campaign.personnel.RankTranslator;
 import mekhq.campaign.personnel.Ranks;
 import mekhq.campaign.personnel.RetirementDefectionTracker;
@@ -4526,7 +4526,6 @@ public class Campaign implements Serializable {
         MekHQ.logMessage("Loading Special Ability Nodes from XML...", 4);
 
         PilotOptions options = new PilotOptions();
-        SpecialAbility.trackDefaultSPA();
         SpecialAbility.clearSPA();
 
         NodeList wList = wn.getChildNodes();
@@ -4551,7 +4550,6 @@ public class Campaign implements Serializable {
 
             SpecialAbility.generateInstanceFromXML(wn2, options, version);
         }
-        SpecialAbility.nullifyDefaultSPA();
 
         MekHQ.logMessage("Load Special Ability Nodes Complete!", 4);
 }
@@ -5609,6 +5607,28 @@ public class Campaign implements Serializable {
     public void setRankSystem(int system) {
         getRanks().setRankSystem(system);
     }
+    
+    public List<String> getAllRankNamesFor(int profession) {
+        
+        List<String> retVal = new ArrayList<String>();
+        for(Rank rank : getRanks().getAllRanks()) {
+            int p = profession;
+            // Grab rank from correct profession as needed
+            while (rank.getName(p).startsWith("--") && p != Ranks.RPROF_MW) {
+                if (rank.getName(p).equals("--")) {
+                    p = getRanks().getAlternateProfession(p);
+                } else if (rank.getName(p).startsWith("--")) {
+                    p = getRanks().getAlternateProfession(rank.getName(p));
+                }
+            }
+            if (rank.getName(p).equals("-")) {
+                continue;
+            }
+            
+            retVal.add(rank.getName(p));
+        }
+        return retVal;
+    }
 
     public ArrayList<Force> getAllForces() {
         ArrayList<Force> allForces = new ArrayList<Force>();
@@ -6603,10 +6623,19 @@ public class Campaign implements Serializable {
                 p = newPerson(Person.T_CONV_PILOT);
             } else if (unit.getEntity() instanceof Aero) {
                 p = newPerson(Person.T_AERO_PILOT);
-            } else if (unit.getEntity() instanceof VTOL) {
-                p = newPerson(Person.T_VTOL_PILOT);
             } else if (unit.getEntity() instanceof Tank) {
-                p = newPerson(Person.T_GVEE_DRIVER);
+                switch (unit.getEntity().getMovementMode()) {
+                case VTOL:
+                    p = newPerson(Person.T_VTOL_PILOT);
+                    break;
+                case NAVAL:
+                case HYDROFOIL:
+                case SUBMARINE:
+                    p = newPerson(Person.T_NVEE_DRIVER);
+                    break;
+                default:
+                    p = newPerson(Person.T_GVEE_DRIVER);
+                }
             } else if (unit.getEntity() instanceof Protomech) {
                 p = newPerson(Person.T_PROTO_PILOT);
             } else if (unit.getEntity() instanceof BattleArmor) {
@@ -6782,10 +6811,15 @@ public class Campaign implements Serializable {
         entity.setNeverDeployed(true);
         entity.setStuck(false);
         entity.resetCoolantFailureAmount();
+
         if (!entity.getSensors().isEmpty()) {
             entity.setNextSensor(entity.getSensors().firstElement());
         }
-        if (entity instanceof Aero) {
+
+        if (entity instanceof Mech) {
+            Mech m = (Mech) entity;
+            m.setCoolingFlawActive(false);
+        } else if (entity instanceof Aero) {
             Aero a = (Aero) entity;
             int[] bombChoices = a.getBombChoices();
             for (Mounted m : a.getBombs()) {
@@ -6805,8 +6839,7 @@ public class Campaign implements Serializable {
             a.setAltitude(5);
             a.setCurrentVelocity(0);
             a.setNextVelocity(0);
-        }
-        if(entity instanceof Tank) {
+        } else if(entity instanceof Tank) {
         	Tank t = (Tank)entity;
         	t.unjamTurret(t.getLocTurret());
         	t.unjamTurret(t.getLocTurret2());

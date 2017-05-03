@@ -71,6 +71,7 @@ import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Loot;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
@@ -206,6 +207,10 @@ public class ResolveScenarioTracker {
             nu.setId(id);
         } else {
             nu.setId(UUID.fromString(e.getExternalIdAsString()));
+        }
+        
+        for (Part part : nu.getParts()) {
+            part.setBrandNew(false);
         }
         return nu;
     }
@@ -1504,6 +1509,10 @@ public class ResolveScenarioTracker {
                     e.printStackTrace();
                 }
             }
+        }
+
+        public String toString() {
+            return "Unit status for: " + getName() + ", loss: " + isTotalLoss();
         }
 
         public String getName() {

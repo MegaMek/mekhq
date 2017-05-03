@@ -36,6 +36,7 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 
 import megamek.common.Aero;
@@ -468,10 +469,10 @@ public class MekLabTab extends CampaignGuiTab {
             equipmentTab.addRefreshedListener(this);
             buildTab.addRefreshedListener(this);
 
-            addTab("Structure/Armor", structureTab);
-            addTab("Equipment", equipmentTab);
-            addTab("Assign Criticals", buildTab);
-            addTab("Preview", previewTab);
+            addTab("Structure/Armor", new JScrollPane(structureTab));
+            addTab("Equipment", new JScrollPane(equipmentTab));
+            addTab("Assign Criticals", new JScrollPane(buildTab));
+            addTab("Preview", new JScrollPane(previewTab));
             this.repaint();
         }
 
@@ -563,10 +564,10 @@ public class MekLabTab extends CampaignGuiTab {
             equipmentTab.addRefreshedListener(this);
             buildTab.addRefreshedListener(this);
 
-            addTab("Structure/Armor", structureTab);
-            addTab("Equipment", equipmentTab);
-            addTab("Assign Critical", buildTab);
-            addTab("Preview", previewTab);
+            addTab("Structure/Armor", new JScrollPane(structureTab));
+            addTab("Equipment", new JScrollPane(equipmentTab));
+            addTab("Assign Critical", new JScrollPane(buildTab));
+            addTab("Preview", new JScrollPane(previewTab));
             this.repaint();
         }
 
@@ -655,9 +656,9 @@ public class MekLabTab extends CampaignGuiTab {
             equipmentTab.addRefreshedListener(this);
             buildTab.addRefreshedListener(this);
 
-            addTab("Structure", structureTab);
-            addTab("Equipment", equipmentTab);
-            addTab("Build", buildTab);
+            addTab("Structure", new JScrollPane(structureTab));
+            addTab("Equipment", new JScrollPane(equipmentTab));
+            addTab("Build", new JScrollPane(buildTab));
             this.repaint();
         }
 
@@ -744,9 +745,9 @@ public class MekLabTab extends CampaignGuiTab {
             equipmentTab.addRefreshedListener(this);
             buildTab.addRefreshedListener(this);
 
-            addTab("Structure", structureTab);
-            addTab("Equipment", equipmentTab);
-            addTab("Assign Criticals", buildTab);
+            addTab("Structure", new JScrollPane(structureTab));
+            addTab("Equipment", new JScrollPane(equipmentTab));
+            addTab("Assign Criticals", new JScrollPane(buildTab));
             this.repaint();
         }
 
@@ -830,8 +831,8 @@ public class MekLabTab extends CampaignGuiTab {
             structureTab.addRefreshedListener(this);
             previewTab = new megameklab.com.ui.Infantry.tabs.PreviewTab(this);
 
-            addTab("Build", structureTab);
-            addTab("Preview", previewTab);
+            addTab("Build", new JScrollPane(structureTab));
+            addTab("Preview", new JScrollPane(previewTab));
             this.repaint();
         }
 

@@ -25,6 +25,9 @@ import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.Hashtable;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.common.Aero;
 import megamek.common.BattleArmor;
 import megamek.common.ConvFighter;
@@ -34,13 +37,9 @@ import megamek.common.Jumpship;
 import megamek.common.Protomech;
 import megamek.common.SmallCraft;
 import megamek.common.Tank;
-import megamek.common.VTOL;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.Version;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  * Skill type will hold static information for each skill type like base target number,
@@ -354,11 +353,23 @@ public class SkillType implements Serializable {
 
     public static String getDrivingSkillFor(Entity en) {
         if(en instanceof Tank) {
+            switch (en.getMovementMode()) {
+            case VTOL:
+                return S_PILOT_VTOL;
+            case NAVAL:
+            case HYDROFOIL:
+            case SUBMARINE:
+                return S_PILOT_NVEE;
+            default:
+                return S_PILOT_GVEE;
+            }
+            /*
             if(en instanceof VTOL) {
                 return S_PILOT_VTOL;
             }
             //TODO: identify naval vessel
             return S_PILOT_GVEE;
+            */
         }
         else if(en instanceof SmallCraft || en instanceof Jumpship) {
             return S_PILOT_SPACE;

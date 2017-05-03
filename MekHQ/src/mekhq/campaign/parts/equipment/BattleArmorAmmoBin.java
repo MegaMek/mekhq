@@ -222,32 +222,57 @@ public class BattleArmorAmmoBin extends AmmoBin implements IAcquisitionWork {
 		}
         return new AmmoStorage(1,type,shots,campaign);
     }
-    
+
     @Override
     public String getAcquisitionDesc() {
-        String bonus = getAllAcquisitionMods().getValueAsString();
-        if(getAllAcquisitionMods().getValue() > -1) {
-            bonus = "+" + bonus;
-        }
-        bonus = "(" + bonus + ")";
         String toReturn = "<html><font size='2'";
         
+        toReturn += ">";
+        toReturn += "<b>" + getAcquisitionDisplayName() + "</b> " + getAcquisitionBonus() + "<br/>";
+        toReturn += getAcquisitionExtraDesc() + "<br/>";
+        String[] inventories = campaign.getPartInventory(getAcquisitionPart());
+        toReturn += inventories[1] + " in transit, " + inventories[2] + " on order<br>"; 
+        toReturn += Utilities.getCurrencyString(getBuyCost()) + "<br/>";
+        toReturn += "</font></html>";
+        return toReturn;
+    }
+	
+    @Override
+    public String getAcquisitionDisplayName() {
+    	return type.getDesc();
+    }    
+
+    private int calculateShots() {
         int shots = (int) Math.floor(1000/((AmmoType)type).getKgPerShot());
 		if(shots <= 0) {
 			//FIXME: no idea what to do here, these really should be fixed on the MM side
 			//because presumably this is happening because KgperShot is -1 or 0
 			shots = 20;
 		}
-        toReturn += ">";
-        toReturn += "<b>" + type.getDesc() + "</b> " + bonus + "<br/>";
-        toReturn += shots + " shots<br/>";
-        String[] inventories = campaign.getPartInventory(getNewPart());
-        toReturn += inventories[1] + " in transit, " + inventories[2] + " on order<br>"; 
-        toReturn += Utilities.getCurrencyString(getBuyCost()) + "<br/>";
-        toReturn += "</font></html>";
-        return toReturn;
+		
+		return shots;
     }
     
+	@Override
+	public String getAcquisitionExtraDesc() {
+		return calculateShots() + " shots";
+	}
+
+	@Override
+    public String getAcquisitionBonus() {
+        String bonus = getAllAcquisitionMods().getValueAsString();
+        if(getAllAcquisitionMods().getValue() > -1) {
+            bonus = "+" + bonus;
+        }
+
+        return "(" + bonus + ")";
+    }
+
+	@Override
+	public Part getAcquisitionPart() {
+		return getNewPart();
+	}
+
     public boolean needsMaintenance() {
         return false;
     }

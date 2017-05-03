@@ -22,14 +22,23 @@
 package mekhq.campaign.work;
 
 import megamek.common.TargetRoll;
+import mekhq.campaign.parts.Part;
 import mekhq.campaign.unit.Unit;
 
 public interface IAcquisitionWork extends IWork {
     public String getAcquisitionName();
     
+    public String getAcquisitionDisplayName();
+    
     public Object getNewEquipment();
     
     public String getAcquisitionDesc();
+    
+    public String getAcquisitionExtraDesc();
+    
+    public String getAcquisitionBonus();
+    
+    public Part getAcquisitionPart();
     
     public Unit getUnit();
     

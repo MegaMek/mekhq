@@ -42,6 +42,7 @@ import megamek.common.LightVehicleBay;
 import megamek.common.MechBay;
 import megamek.common.SmallCraftBay;
 import megamek.common.UnitType;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.Person;
@@ -880,6 +881,6 @@ public abstract class AbstractUnitRating implements IUnitRating {
     }
 
     void logMessage(final String msg) {
-        System.out.println(msg);
+        MekHQ.logMessage(msg, 5); //verbosity level debug/informational
     }
 }

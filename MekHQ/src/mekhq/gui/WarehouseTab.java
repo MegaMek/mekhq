@@ -133,7 +133,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
     private JTable partsTable;
     private JTable acquirePartsTable;
     private JTable techTable;
-    private JButton btnDoTaskWarehouse;
+    private JButton btnDoTask;
     private JToggleButton btnShowAllTechsWarehouse;
     private JLabel lblTargetNumWarehouse;
     private JTextArea textTargetWarehouse;
@@ -149,6 +149,11 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
     private TableRowSorter<ProcurementTableModel> acquirePartsSorter;
     private TableRowSorter<TechTableModel> techSorter;
 
+    //remember current selections so they can be restored after refresh
+    private int selectedRow = -1;
+    private int partId = -1;
+    private Person selectedTech;
+    
     WarehouseTab(CampaignGUI gui, String name) {
         super(gui, name);
         MekHQ.registerHandler(this);
@@ -326,23 +331,23 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         acquirePartsPanel.setMinimumSize(new Dimension(200, 200));
         acquirePartsPanel.setPreferredSize(new Dimension(200, 200));
 
-        JPanel panelDoTaskWarehouse = new JPanel(new GridBagLayout());
+        JPanel panelDoTask = new JPanel(new GridBagLayout());
 
-        btnDoTaskWarehouse = new JButton(resourceMap.getString("btnDoTask.text")); // NOI18N
-        btnDoTaskWarehouse.setToolTipText(resourceMap.getString("btnDoTask.toolTipText")); // NOI18N
-        btnDoTaskWarehouse.setEnabled(false);
-        btnDoTaskWarehouse.setName("btnDoTask"); // NOI18N
-        btnDoTaskWarehouse.addActionListener(ev -> doTask());
+        btnDoTask = new JButton(resourceMap.getString("btnDoTask.text")); // NOI18N
+        btnDoTask.setToolTipText(resourceMap.getString("btnDoTask.toolTipText")); // NOI18N
+        btnDoTask.setEnabled(false);
+        btnDoTask.setName("btnDoTask"); // NOI18N
+        btnDoTask.addActionListener(ev -> doTask());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
-        panelDoTaskWarehouse.add(btnDoTaskWarehouse, gridBagConstraints);
+        panelDoTask.add(btnDoTask, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.SOUTH;
-        panelDoTaskWarehouse.add(new JLabel(resourceMap.getString("lblTarget.text")), gridBagConstraints);
+        panelDoTask.add(new JLabel(resourceMap.getString("lblTarget.text")), gridBagConstraints);
 
         lblTargetNumWarehouse = new JLabel(resourceMap.getString("lblTargetNum.text"));
         lblTargetNumWarehouse.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -350,7 +355,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTH;
-        panelDoTaskWarehouse.add(lblTargetNumWarehouse, gridBagConstraints);
+        panelDoTask.add(lblTargetNumWarehouse, gridBagConstraints);
 
         textTargetWarehouse = new JTextArea();
         textTargetWarehouse.setColumns(20);
@@ -371,7 +376,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 0.0;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        panelDoTaskWarehouse.add(scrTargetWarehouse, gridBagConstraints);
+        panelDoTask.add(scrTargetWarehouse, gridBagConstraints);
 
         btnShowAllTechsWarehouse = new JToggleButton(resourceMap.getString("btnShowAllTechs.text"));
         btnShowAllTechsWarehouse.setToolTipText(resourceMap.getString("btnShowAllTechs.toolTipText")); // NOI18N
@@ -385,7 +390,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 0.0;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        panelDoTaskWarehouse.add(btnShowAllTechsWarehouse, gridBagConstraints);
+        panelDoTask.add(btnShowAllTechsWarehouse, gridBagConstraints);
 
         techsModel = new TechTableModel(getCampaignGui(), this);
         techTable = new JTable(techsModel);
@@ -410,7 +415,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        panelDoTaskWarehouse.add(scrollTechTable, gridBagConstraints);
+        panelDoTask.add(scrollTechTable, gridBagConstraints);
 
         astechPoolLabel = new JLabel("<html><b>Astech Pool Minutes:</> " + getCampaign().getAstechPoolMinutes() + " ("
                 + getCampaign().getNumberAstechs() + " Astechs)</html>"); // NOI18N
@@ -421,12 +426,12 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        panelDoTaskWarehouse.add(astechPoolLabel, gridBagConstraints);
+        panelDoTask.add(astechPoolLabel, gridBagConstraints);
 
         JSplitPane splitLeft = new JSplitPane(JSplitPane.VERTICAL_SPLIT, panSupplies, acquirePartsPanel);
         splitLeft.setOneTouchExpandable(true);
         splitLeft.setResizeWeight(1.0);
-        splitWarehouse = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, splitLeft, panelDoTaskWarehouse);
+        splitWarehouse = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, splitLeft, panelDoTask);
         splitWarehouse.setOneTouchExpandable(true);
         splitWarehouse.setResizeWeight(1.0);
 
@@ -637,29 +642,40 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
             ((TechSorter) techSorter.getComparator(0)).clearPart();
         }
         if (null != target) {
-            btnDoTaskWarehouse.setEnabled(target.getValue() != TargetRoll.IMPOSSIBLE);
+            btnDoTask.setEnabled(target.getValue() != TargetRoll.IMPOSSIBLE);
             textTargetWarehouse.setText(target.getDesc());
             lblTargetNumWarehouse.setText(target.getValueAsString());
         } else {
-            btnDoTaskWarehouse.setEnabled(false);
+            btnDoTask.setEnabled(false);
             textTargetWarehouse.setText("");
             lblTargetNumWarehouse.setText("-");
         }
     }
 
     public void refreshTechsList() {
-        int selected = techTable.getSelectedRow();
         ArrayList<Person> techs = getCampaign().getTechs(true, null);
         techsModel.setData(techs);
-        if ((selected > -1) && (selected < techs.size())) {
-            techTable.setRowSelectionInterval(selected, selected);
-        }
         String astechString = "<html><b>Astech Pool Minutes:</> " + getCampaign().getAstechPoolMinutes();
         if (getCampaign().isOvertimeAllowed()) {
             astechString += " [" + getCampaign().getAstechPoolOvertime() + " overtime]";
         }
         astechString += " (" + getCampaign().getNumberAstechs() + " Astechs)</html>";
         refreshAstechPool(astechString);
+
+        // If requested, switch to top entry
+        if ((null == selectedTech || getCampaign().getCampaignOptions().useResetToFirstTech())
+                && techTable.getRowCount() > 0) {
+            techTable.setRowSelectionInterval(0, 0);
+        } else {
+            // Or get the selected tech back
+            for (int i = 0; i < techTable.getRowCount(); i++) {
+                Person p = techsModel.getTechAt(techTable.convertRowIndexToModel(i));
+                if (selectedTech.getId().equals(p.getId())) {
+                    techTable.setRowSelectionInterval(i, i);
+                    break;
+                }
+            }
+        }
     }
 
     public void refreshPartsList() {
@@ -671,36 +687,6 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
                                                                       // from
                                                                       // hanging
                                                                       // around
-    }
-    
-    public void refreshProcurementList() {
-        acquirePartsModel.setData(getCampaign().getShoppingList().getPartList());        
-    }
-
-    private void doTask() {
-        int selectedRow = -1;
-        int partId = -1;
-        // int selectedTechRow = -1;
-        Person tech = getSelectedTech();
-        selectedRow = partsTable.getSelectedRow();
-        // selectedTechRow = whTechTable.getSelectedRow();
-        Part part = getSelectedTask();
-        if (null == part) {
-            return;
-        }
-        if (null == tech) {
-            return;
-        }
-        partId = part.getId();
-
-        Part repairable = getCampaign().fixWarehousePart(part, tech);
-        // if the break off part failed to be repaired, then follow it with
-        // the focus
-        // otherwise keep the focus on the current row
-        if (repairable.needsFixing() && !repairable.isBeingWorkedOn()) {
-            partId = repairable.getId();
-        }
-
         // get the selected row back for tasks
         if (selectedRow != -1) {
             boolean found = false;
@@ -716,31 +702,38 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
             if (!found) {
                 // then set to the current selected row
                 if (partsTable.getRowCount() > 0) {
-                    if (partsTable.getRowCount() == selectedRow) {
-                        partsTable.setRowSelectionInterval(selectedRow - 1, selectedRow - 1);
-                        // partsTable.scrollRectToVisible(partsTable.getCellRect(selectedRow-1,
-                        // 0, true));
-                    } else {
-                        partsTable.setRowSelectionInterval(selectedRow, selectedRow);
-                        // partsTable.scrollRectToVisible(partsTable.getCellRect(selectedRow,
-                        // 0, true));
+                    if (partsTable.getRowCount() <= selectedRow) {
+                        selectedRow = partsTable.getRowCount() - 1;
                     }
+                    partsTable.setRowSelectionInterval(selectedRow, selectedRow);
                 }
             }
+        }
+    }
+    
+    public void refreshProcurementList() {
+        acquirePartsModel.setData(getCampaign().getShoppingList().getPartList());        
+    }
 
-            // If requested, switch to top entry
-            if (getCampaign().getCampaignOptions().useResetToFirstTech() && techTable.getRowCount() > 0) {
-                techTable.setRowSelectionInterval(0, 0);
-            } else {
-                // Or get the selected tech back
-                for (int i = 0; i < techTable.getRowCount(); i++) {
-                    Person p = techsModel.getTechAt(techTable.convertRowIndexToModel(i));
-                    if (tech.getId().equals(p.getId())) {
-                        techTable.setRowSelectionInterval(i, i);
-                        break;
-                    }
-                }
-            }
+    private void doTask() {
+        selectedTech = getSelectedTech();
+        selectedRow = partsTable.getSelectedRow();
+        
+        Part part = getSelectedTask();
+        if (null == part) {
+            return;
+        }
+        if (null == selectedTech) {
+            return;
+        }
+        partId = part.getId();
+
+        Part repairable = getCampaign().fixWarehousePart(part, selectedTech);
+        // if the break off part failed to be repaired, then follow it with
+        // the focus
+        // otherwise keep the focus on the current row
+        if (repairable.needsFixing() && !repairable.isBeingWorkedOn()) {
+            partId = repairable.getId();
         }
     }
 

@@ -135,7 +135,7 @@ public class MedicalViewDialog extends JDialog {
             MekHQ.logError(e);
         }
         
-        setMinimumSize(new Dimension(1024, 840));
+        setPreferredSize(new Dimension(1024, 840));
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(parent);
         

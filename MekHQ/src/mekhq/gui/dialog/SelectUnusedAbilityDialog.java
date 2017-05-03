@@ -54,9 +54,9 @@ public class SelectUnusedAbilityDialog extends JDialog {
     private boolean cancelled;
     private Hashtable<String, SpecialAbility> currentSPA;
         
-    public SelectUnusedAbilityDialog(Frame parent, Vector<String> s, Hashtable<String, SpecialAbility> c) {
+    public SelectUnusedAbilityDialog(Frame parent, Vector<String> unused, Hashtable<String, SpecialAbility> c) {
         super(parent, true);
-        choices = s;
+        choices = unused;
         currentSPA = c;
         cancelled = false;
         initComponents();
@@ -75,9 +75,11 @@ public class SelectUnusedAbilityDialog extends JDialog {
         
         JRadioButton chk;
         for(String name : choices) {
-        	chk = new JRadioButton(getDisplayName(name));
+        	chk = new JRadioButton(SpecialAbility.getDefaultAbility(name) == null
+        	        ? getDisplayName(name) : SpecialAbility.getDefaultAbility(name).getDisplayName());
         	chk.setActionCommand(name);
-        	chk.setToolTipText(getDesc(name));
+        	chk.setToolTipText(SpecialAbility.getDefaultAbility(name) == null
+        	        ? this.getDesc(name) : SpecialAbility.getDefaultAbility(name).getDescription());
         	group.add(chk);
         	panMain.add(chk);
         }
@@ -111,12 +113,6 @@ public class SelectUnusedAbilityDialog extends JDialog {
     }
     
     private void done() {
-    	/*selected = new Vector<String>();
-    	for(int i = 0; i < spaNames.size(); i++) {
-    		if(chkAbil.get(i).isSelected()) {
-    			selected.add(spaNames.get(i));
-    		}
-    	}*/
     	if(null != group.getSelection()) {
     		String name = group.getSelection().getActionCommand();
     		String displayName = "";
@@ -138,8 +134,13 @@ public class SelectUnusedAbilityDialog extends JDialog {
         			}
         		}
         	}
-    		
-    		SpecialAbility spa = new SpecialAbility(name, displayName, desc);
+
+            SpecialAbility spa;
+        	if (null != SpecialAbility.getDefaultAbility(name)) {
+        	    spa = SpecialAbility.getDefaultAbility(name).clone();
+        	} else {
+        	    spa = new SpecialAbility(name, displayName, desc);
+        	}
         	EditSpecialAbilityDialog esad = new EditSpecialAbilityDialog(null, spa, currentSPA);
         	esad.setVisible(true);
         	if(!esad.wasCancelled()) {

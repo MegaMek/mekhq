@@ -285,7 +285,7 @@ public final class BatchXPDialog extends JDialog {
                 campaign.personUpdated(p);
                 p.setXp(p.getXp() - cost);
                 
-                // The next part is bollocks and doesn't belong here, but as long as we hardcode AtB ...
+                // The next part is bollocks and doesn't belong here, but as long as we hard code AtB ...
                 if(campaign.getCampaignOptions().getUseAtB()) {
                     if((p.getPrimaryRole() > Person.T_NONE) && (p.getPrimaryRole() <= Person.T_CONV_PILOT)
                         && (p.getExperienceLevel(false) > experience) && (experience >= SkillType.EXP_REGULAR)) {
