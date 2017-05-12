@@ -714,4 +714,17 @@ Unfortunately for Victor Steiner-Davion, he returns home to find himself an Arch
 		<service>INN</service>
 		<location>Outreach</location>
 	</newsItem>
+	<newsItem>
+	  <headline>Allied Victory</headline>
+	  <date>3067-04-30</date>
+	  <desc><![CDATA[<p>Cheering crowds are celebrating across Davion and Steiner space with
+	  the victories on New Avalon and Tharkad this week of Allied forces that mark the
+	  end of major fighting in the long and bitter FedCom Civil War.</p>
+	  <p>The installation of Archon Peter Steiner-Davion and Regent Yvonne Steiner-Davion
+	  promise stability and reconciliation. How long it may last, no one can say, but the
+	  general mood is up-beat now that the divisive and tyrannical reign of Katherine
+	  Steiner-Davion has been put to it's terrible and inevitable end.]]></desc>
+	  <service>INN</service>
+	  <location>New Avalon</location>
+	</newsItem>
 </news>
