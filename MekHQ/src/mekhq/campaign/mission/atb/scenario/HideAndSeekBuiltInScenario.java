@@ -25,6 +25,11 @@ public class HideAndSeekBuiltInScenario extends AtBScenario {
 	}
 
 	@Override
+	public String getResourceKey() {
+		return "hideAndSeek";
+	}
+
+	@Override
 	public void setTerrain() {
 		do {
 			setTerrainType(terrainChart[Compute.d6(2) - 2]);

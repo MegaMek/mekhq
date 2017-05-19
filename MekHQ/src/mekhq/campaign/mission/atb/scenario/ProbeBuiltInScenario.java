@@ -24,6 +24,11 @@ public class ProbeBuiltInScenario extends AtBScenario {
 	}
 
 	@Override
+	public String getResourceKey() {
+		return "probe";
+	}
+
+	@Override
 	public void setTerrain() {
 		do {
 			setTerrainType(terrainChart[Compute.d6(2) - 2]);

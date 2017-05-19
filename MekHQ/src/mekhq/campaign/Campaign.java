@@ -2302,124 +2302,8 @@ public class Campaign implements Serializable {
         		}
         	}
 
-        	/* Iterate through the list of lances and make a battle roll for each,
-        	 * then sort them by date before adding them to the campaign.
-        	 * Contracts with enemy morale level of invincible have a base attack
-        	 * (defender) battle each week. If there is a base attack (attacker)
-        	 * battle, that is the only one for the week on that contract.
-        	 */
         	if (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY) {
-        		ArrayList<AtBScenario> sList = new ArrayList<AtBScenario>();
-        		AtBScenario baseAttack = null;
-
-        		for (Lance l : lances.values()) {
-        			if (null == l.getContract(this) || !l.getContract(this).isActive() ||
-        					!l.isEligible(this) ||
-        					getDate().before(l.getContract(this).getStartDate())) {
-        				continue;
-        			}
-        			if (l.getRole() == Lance.ROLE_TRAINING) {
-        				awardTrainingXP(l);
-        			}
-        			if (l.getContract(this).getMoraleLevel() <= AtBContract.MORALE_VERYLOW) {
-        				continue;
-        			}
-        			AtBScenario scenario = l.checkForBattle(this);
-        			if (null != scenario) {
-        				sList.add(scenario);
-        				if (scenario.getScenarioType() == AtBScenario.BASEATTACK && scenario.isAttacker()) {
-        					baseAttack = scenario;
-        					break;
-        				}
-        			}
-        		}
-
-        		/* If there is a base attack (attacker), all other battles on
-        		 * that contract are cleared.
-        		 */
-        		if (null != baseAttack) {
-        			ArrayList<Scenario> sameContract = new ArrayList<Scenario>();
-        			for (AtBScenario s : sList) {
-        				if (s != baseAttack && s.getMissionId() == baseAttack.getMissionId()) {
-        					sameContract.add(s);
-        				}
-        			}
-        			sList.removeAll(sameContract);
-        		}
-
-        		/* Make sure invincible morale has base attack */
-        		for (Mission m : missions) {
-        			if (m.isActive() && m instanceof AtBContract &&
-        					((AtBContract)m).getMoraleLevel() == AtBContract.MORALE_INVINCIBLE) {
-    					boolean hasBaseAttack = false;
-        				for (AtBScenario s : sList) {
-        					if (s.getMissionId() == m.getId() &&
-        							s.getScenarioType() == AtBScenario.BASEATTACK &&
-        							!s.isAttacker()) {
-        						hasBaseAttack = true;
-        						break;
-        					}
-        				}
-        				if (!hasBaseAttack) {
-        					/* find a lance to act as defender, giving preference
-        					 * first to those assigned to the same contract,
-        					 * then to those assigned to defense roles
-        					 */
-        					ArrayList<Lance> lList = new ArrayList<Lance>();
-	        				for (Lance l : lances.values()) {
-	        					if (l.getMissionId() == m.getId()
-	        							&& l.getRole() == Lance.ROLE_DEFEND
-	        							&& l.isEligible(this)) {
-	        						lList.add(l);
-	        					}
-	        				}
-	        				if (lList.size() == 0) {
-	        					for (Lance l : lances.values()) {
-	        						if (l.getMissionId() == m.getId()
-	        								&& l.isEligible(this)) {
-	        							lList.add(l);
-	        						}
-	        					}
-	        				}
-	        				if (lList.size() == 0) {
-	        					for (Lance l : lances.values()) {
-	        						if (l.isEligible(this)) {
-	        							lList.add(l);
-	        						}
-	        					}
-	        				}
-	        				if (lList.size() > 0) {
-	        					Lance lance = Utilities.getRandomItem(lList);
-	        					AtBScenario scenario = AtBScenarioFactory.createScenario(this, lance, AtBScenario.BASEATTACK, false,
-	        							Lance.getBattleDate(calendar));
-	        					for (int i = 0; i < sList.size(); i++) {
-	        						if (sList.get(i).getLanceForceId() ==
-	        								lance.getForceId()) {
-	        							sList.set(i, scenario);
-	        							break;
-	        						}
-	        					}
-	        					if (!sList.contains(scenario)) {
-	        						sList.add(scenario);
-	        					}
-	        				} else {
-	        					//TODO: What to do if there are no lances assigned to this contract?
-	        				}
-        				}
-        			}
-        		}
-
-        		/* Sort by date and add to the campaign */
-        		Collections.sort(sList, new Comparator<AtBScenario>() {
-					@Override
-                    public int compare(AtBScenario s1, AtBScenario s2) {
-						return s1.getDate().compareTo(s2.getDate());
-					}
-        		});
-        		for (AtBScenario s : sList) {
-        			addScenario(s, missionIds.get(s.getMissionId()));
-        			s.setForces(this);
-        		}
+        		AtBScenarioFactory.createScenariosForNewWeek(this);
         	}
 
         	for (Mission m : missions) {
@@ -2819,7 +2703,7 @@ public class Campaign implements Serializable {
         MekHQ.triggerEvent(new PersonRemovedEvent(person));        
     }
 
-    private void awardTrainingXP(Lance l) {
+    public void awardTrainingXP(Lance l) {
 		for (UUID trainerId : forceIds.get(l.getForceId()).getAllUnits()) {
 			if (getUnit(trainerId).getCommander() != null &&
 					getUnit(trainerId).getCommander().getRank().isOfficer() &&

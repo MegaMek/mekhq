@@ -32,6 +32,11 @@ public class OfficerDualBuiltInScenario extends AtBScenario {
 	}
 
 	@Override
+	public String getResourceKey() {
+		return "officerDuel";
+	}
+
+	@Override
 	public void setLightConditions() {
 		setLight(PlanetaryConditions.L_DAY);
 	}

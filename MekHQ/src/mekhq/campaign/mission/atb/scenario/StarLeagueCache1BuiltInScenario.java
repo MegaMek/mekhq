@@ -22,6 +22,11 @@ public class StarLeagueCache1BuiltInScenario extends AtBScenario {
 	private static final long serialVersionUID = 1994382390878571793L;
 
 	@Override
+	public boolean isSpecialMission() {
+		return true;
+	}
+
+	@Override
 	public int getScenarioType() {
 		return STARLEAGUECACHE1;
 	}
@@ -29,6 +34,11 @@ public class StarLeagueCache1BuiltInScenario extends AtBScenario {
 	@Override
 	public String getScenarioTypeDescription() {
 		return "Special Mission: Star League Cache 1";
+	}
+
+	@Override
+	public String getResourceKey() {
+		return "starLeagueCache1";
 	}
 
 	@Override

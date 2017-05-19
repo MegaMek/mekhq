@@ -1,6 +1,7 @@
 package mekhq.campaign.mission.atb;
 
 import java.util.ArrayList;
+import java.util.ResourceBundle;
 
 import megamek.common.Entity;
 import mekhq.campaign.Campaign;
@@ -13,4 +14,6 @@ public interface IAtBScenario {
 	public boolean isStandardMission();
 	public boolean isSpecialMission();
 	public boolean isBigBattle();
+	public String getResourceKey();
+	public ResourceBundle getResourceBundle();
 }

@@ -17,6 +17,11 @@ public class PirateFreeForAllBuiltInScenario extends AtBScenario {
 	private static final long serialVersionUID = 6410090692095923096L;
 
 	@Override
+	public boolean isBigBattle() {
+		return true;
+	}
+	
+	@Override
 	public int getScenarioType() {
 		return PIRATEFREEFORALL;
 	}
@@ -24,6 +29,11 @@ public class PirateFreeForAllBuiltInScenario extends AtBScenario {
 	@Override
 	public String getScenarioTypeDescription() {
 		return "Big Battle: Pirates Free-for-All";
+	}
+
+	@Override
+	public String getResourceKey() {
+		return "pirateFreeForAll";
 	}
 
 	@Override

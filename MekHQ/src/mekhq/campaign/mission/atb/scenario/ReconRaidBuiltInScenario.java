@@ -25,6 +25,11 @@ public class ReconRaidBuiltInScenario extends AtBScenario {
 	}
 
 	@Override
+	public String getResourceKey() {
+		return "reconRaid";
+	}
+
+	@Override
 	public void setExtraMissionForces(Campaign campaign, ArrayList<Entity> allyEntities,
 			ArrayList<Entity> enemyEntities) {
 		int enemyStart;

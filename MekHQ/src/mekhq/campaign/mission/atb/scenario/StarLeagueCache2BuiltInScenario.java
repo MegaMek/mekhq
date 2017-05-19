@@ -27,6 +27,11 @@ public class StarLeagueCache2BuiltInScenario extends StarLeagueCache1BuiltInScen
 	}
 
 	@Override
+	public String getResourceKey() {
+		return "starLeagueCache2";
+	}
+
+	@Override
 	public void setExtraMissionForces(Campaign campaign, ArrayList<Entity> allyEntities,
 			ArrayList<Entity> enemyEntities) {
 		setStart(Board.START_N);

@@ -16,6 +16,11 @@ public class ConvoyAttackBuiltInScenario extends AtBScenario {
 	private static final long serialVersionUID = 8487647534085152088L;
 
 	@Override
+	public boolean isBigBattle() {
+		return true;
+	}
+
+	@Override
 	public int getScenarioType() {
 		return CONVOYATTACK;
 	}
@@ -23,6 +28,11 @@ public class ConvoyAttackBuiltInScenario extends AtBScenario {
 	@Override
 	public String getScenarioTypeDescription() {
 		return "Big Battle: Convoy Attack";
+	}
+
+	@Override
+	public String getResourceKey() {
+		return "convoyAttack";
 	}
 
 	@Override

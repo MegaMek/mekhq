@@ -23,6 +23,11 @@ public class StandUpBuiltInScenario extends AtBScenario {
 	}
 
 	@Override
+	public String getResourceKey() {
+		return "standup";
+	}
+
+	@Override
 	public void setExtraMissionForces(Campaign campaign, ArrayList<Entity> allyEntities,
 			ArrayList<Entity> enemyEntities) {
 		int playerHome = startPos[Compute.randomInt(4)];

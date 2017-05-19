@@ -31,6 +31,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.ResourceBundle;
 import java.util.UUID;
 import java.util.Vector;
 import java.util.stream.Collectors;
@@ -58,6 +59,7 @@ import megamek.common.MechSummaryCache;
 import megamek.common.PlanetaryConditions;
 import megamek.common.Player;
 import megamek.common.UnitType;
+import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
@@ -217,6 +219,8 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     ArrayList<UUID> survivalBonus;
 
     HashMap<UUID, Entity> entityIds;
+
+    private static ResourceBundle defaultResourceBundle = ResourceBundle.getBundle("mekhq.resources.AtBScenarioBuiltIn", new EncodeControl()); //$NON-NLS-1$
     
     public AtBScenario () {
         super();
@@ -302,6 +306,11 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     @Override
     public boolean isBigBattle() {
     	return false;
+    }
+
+    @Override
+    public ResourceBundle getResourceBundle() {
+    	return defaultResourceBundle;
     }
     
     /**

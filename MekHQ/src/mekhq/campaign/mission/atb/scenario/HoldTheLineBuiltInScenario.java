@@ -25,6 +25,11 @@ public class HoldTheLineBuiltInScenario extends AtBScenario {
 	}
 
 	@Override
+	public String getResourceKey() {
+		return "holdTheLine";
+	}
+
+	@Override
 	public void setExtraMissionForces(Campaign campaign, ArrayList<Entity> allyEntities,
 			ArrayList<Entity> enemyEntities) {
 		int enemyStart;

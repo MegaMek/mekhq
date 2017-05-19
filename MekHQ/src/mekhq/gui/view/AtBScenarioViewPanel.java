@@ -134,18 +134,7 @@ public class AtBScenarioViewPanel extends JPanel {
 
     private StubTreeModel playerForceModel;
 
-    private static final String[] battleResourceKeys = {
-        "baseAttack", "extraction", "chase", "holdTheLine", "breakthrough",
-        "hideAndSeek", "standup", "reconRaid", "probe",
-
-        "officerDuel", "aceDuel", "ambush", "civilianHelp",
-        "alliedTraitors", "prisonBreak", "starLeagueCache1", "starLeagueCache2",
-
-        "allyRescue", "civilianRiot", "convoyRescue",
-        "convoyAttack", "pirateFreeForAll"
-    };
-
-public AtBScenarioViewPanel(AtBScenario s, Campaign c, IconPackage ip, JFrame frame) {
+    public AtBScenarioViewPanel(AtBScenario s, Campaign c, IconPackage ip, JFrame frame) {
         this.frame = frame;
         this.scenario = s;
         this.campaign = c;
@@ -529,35 +518,35 @@ public AtBScenarioViewPanel(AtBScenario s, Campaign c, IconPackage ip, JFrame fr
         
         if (scenario.isSpecialMission()) {
             txtDetails.setText("Details:\n" +
-                    resourceMap.getString("battleDetails." +
-                    battleResourceKeys[scenario.getScenarioType()] +
+                    scenario.getResourceBundle().getString("battleDetails." +
+                    scenario.getResourceKey() +
                     ".description"));
         } else if (scenario.isBigBattle()) {
             txtDetails.setText("Special Conditions:\n" +
-                    resourceMap.getString("battleDetails." +
-                    battleResourceKeys[scenario.getScenarioType()] +
+            		scenario.getResourceBundle().getString("battleDetails." +
+                    scenario.getResourceKey() +
                     ".specialConditions") + "\n\n" +
 
                     "Victory Conditions:\n" +
-                    resourceMap.getString("battleDetails." +
-                    battleResourceKeys[scenario.getScenarioType()] +
+                    scenario.getResourceBundle().getString("battleDetails." +
+                    scenario.getResourceKey() +
                     ".victory") + "\n\n" +
 
                     "Observations:\n" +
-                    resourceMap.getString("battleDetails." +
-                    battleResourceKeys[scenario.getScenarioType()] +
+                    scenario.getResourceBundle().getString("battleDetails." +
+                    scenario.getResourceKey() +
                     ".observations"));
         } else {
             txtDetails.setText("Victory Conditions:\n" +
-                    resourceMap.getString("battleDetails." +
-                    battleResourceKeys[scenario.getScenarioType()] +
+            		scenario.getResourceBundle().getString("battleDetails." +
+                    scenario.getResourceKey() +
                     (scenario.isAttacker()?
                             ".attacker.victory":
                                 ".defender.victory")) + "\n\n" +
 
                     "Observations:\n" +
-                    resourceMap.getString("battleDetails." +
-                    battleResourceKeys[scenario.getScenarioType()] +
+                    scenario.getResourceBundle().getString("battleDetails." +
+                    scenario.getResourceKey() +
                     (scenario.isAttacker()?
                             ".attacker.observations":
                                 ".defender.observations")));

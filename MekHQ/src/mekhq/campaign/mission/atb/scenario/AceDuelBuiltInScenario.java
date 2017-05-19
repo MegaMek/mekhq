@@ -17,6 +17,11 @@ public class AceDuelBuiltInScenario extends AtBScenario {
 	private static final long serialVersionUID = 2429065136640682497L;
 
 	@Override
+	public boolean isSpecialMission() {
+		return true;
+	}
+
+	@Override
 	public int getScenarioType() {
 		return ACEDUEL;
 	}
@@ -26,6 +31,11 @@ public class AceDuelBuiltInScenario extends AtBScenario {
 		return "Special Mission: Ace Duel";
 	}
 
+	@Override
+	public String getResourceKey() {
+		return "aceDuel";
+	}
+	
 	@Override
 	public void setLightConditions() {
 		setLight(PlanetaryConditions.L_DAY);

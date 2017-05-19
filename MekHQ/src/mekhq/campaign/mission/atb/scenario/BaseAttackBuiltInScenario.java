@@ -25,6 +25,11 @@ public class BaseAttackBuiltInScenario extends AtBScenario {
 	}
 
 	@Override
+	public String getResourceKey() {
+		return "baseAttack";
+	}
+
+	@Override
 	public void setTerrain() {
 		setTerrainType((Compute.d6() < 4) ? TER_LIGHTURBAN : TER_HEAVYURBAN);
 	}

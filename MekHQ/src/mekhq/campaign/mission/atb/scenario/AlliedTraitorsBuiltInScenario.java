@@ -15,6 +15,11 @@ public class AlliedTraitorsBuiltInScenario extends AtBScenario {
 	private static final long serialVersionUID = 1820229123054387445L;
 
 	@Override
+	public boolean isSpecialMission() {
+		return true;
+	}
+
+	@Override
 	public int getScenarioType() {
 		return ALLIEDTRAITORS;
 	}
@@ -22,6 +27,11 @@ public class AlliedTraitorsBuiltInScenario extends AtBScenario {
 	@Override
 	public String getScenarioTypeDescription() {
 		return "Special Mission: Allied Traitors";
+	}
+
+	@Override
+	public String getResourceKey() {
+		return "alliedTraitors";
 	}
 
 	@Override

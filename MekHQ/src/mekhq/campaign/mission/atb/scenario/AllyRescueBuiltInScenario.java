@@ -15,6 +15,11 @@ public class AllyRescueBuiltInScenario extends AtBScenario {
 	private static final long serialVersionUID = 6993274905243245321L;
 
 	@Override
+	public boolean isBigBattle() {
+		return true;
+	}
+
+	@Override
 	public int getScenarioType() {
 		return ALLYRESCUE;
 	}
@@ -22,6 +27,11 @@ public class AllyRescueBuiltInScenario extends AtBScenario {
 	@Override
 	public String getScenarioTypeDescription() {
 		return "Big Battle: Ally Rescue";
+	}
+
+	@Override
+	public String getResourceKey() {
+		return "allyRescue";
 	}
 
 	@Override

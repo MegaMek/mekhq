@@ -18,6 +18,11 @@ public class PrisonBreakBuiltInScenario extends AtBScenario {
 	private static final long serialVersionUID = -2079887460549545045L;
 
 	@Override
+	public boolean isSpecialMission() {
+		return true;
+	}
+
+	@Override
 	public int getScenarioType() {
 		return PRISONBREAK;
 	}
@@ -25,6 +30,11 @@ public class PrisonBreakBuiltInScenario extends AtBScenario {
 	@Override
 	public String getScenarioTypeDescription() {
 		return "Special Mission: Prison Break";
+	}
+
+	@Override
+	public String getResourceKey() {
+		return "prisonBreak";
 	}
 
 	@Override

@@ -21,6 +21,11 @@ public class CivilianRiotBuiltInScenario extends AtBScenario {
 	private static final long serialVersionUID = 6943760300767790979L;
 
 	@Override
+	public boolean isBigBattle() {
+		return true;
+	}
+
+	@Override
 	public int getScenarioType() {
 		return CIVILIANRIOT;
 	}
@@ -28,6 +33,11 @@ public class CivilianRiotBuiltInScenario extends AtBScenario {
 	@Override
 	public String getScenarioTypeDescription() {
 		return "Big Battle: Civilian Riot";
+	}
+
+	@Override
+	public String getResourceKey() {
+		return "civilianRiot";
 	}
 
 	@Override
