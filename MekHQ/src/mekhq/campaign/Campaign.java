@@ -153,6 +153,7 @@ import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.mission.atb.AtBScenarioFactory;
 import mekhq.campaign.mod.am.InjuryTypes;
 import mekhq.campaign.mod.am.InjuryUtil;
 import mekhq.campaign.parts.AmmoStorage;
@@ -2326,7 +2327,7 @@ public class Campaign implements Serializable {
         			AtBScenario scenario = l.checkForBattle(this);
         			if (null != scenario) {
         				sList.add(scenario);
-        				if (scenario.getBattleType() == AtBScenario.BASEATTACK && scenario.isAttacker()) {
+        				if (scenario.getScenarioType() == AtBScenario.BASEATTACK && scenario.isAttacker()) {
         					baseAttack = scenario;
         					break;
         				}
@@ -2353,7 +2354,7 @@ public class Campaign implements Serializable {
     					boolean hasBaseAttack = false;
         				for (AtBScenario s : sList) {
         					if (s.getMissionId() == m.getId() &&
-        							s.getBattleType() == AtBScenario.BASEATTACK &&
+        							s.getScenarioType() == AtBScenario.BASEATTACK &&
         							!s.isAttacker()) {
         						hasBaseAttack = true;
         						break;
@@ -2389,7 +2390,7 @@ public class Campaign implements Serializable {
 	        				}
 	        				if (lList.size() > 0) {
 	        					Lance lance = Utilities.getRandomItem(lList);
-	        					AtBScenario scenario = new AtBScenario(this, lance, AtBScenario.BASEATTACK, false,
+	        					AtBScenario scenario = AtBScenarioFactory.createScenario(this, lance, AtBScenario.BASEATTACK, false,
 	        							Lance.getBattleDate(calendar));
 	        					for (int i = 0; i < sList.size(); i++) {
 	        						if (sList.get(i).getLanceForceId() ==

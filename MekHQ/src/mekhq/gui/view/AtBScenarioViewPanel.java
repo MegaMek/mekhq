@@ -526,41 +526,43 @@ public AtBScenarioViewPanel(AtBScenario s, Campaign c, IconPackage ip, JFrame fr
         txtDetails.setLineWrap(true);
         txtDetails.setWrapStyleWord(true);
         txtDetails.setEditable(false);
-        if (scenario.getBattleType() < AtBScenario.SPECIALMISSIONS) {
+        
+        if (scenario.isSpecialMission()) {
+            txtDetails.setText("Details:\n" +
+                    resourceMap.getString("battleDetails." +
+                    battleResourceKeys[scenario.getScenarioType()] +
+                    ".description"));
+        } else if (scenario.isBigBattle()) {
+            txtDetails.setText("Special Conditions:\n" +
+                    resourceMap.getString("battleDetails." +
+                    battleResourceKeys[scenario.getScenarioType()] +
+                    ".specialConditions") + "\n\n" +
+
+                    "Victory Conditions:\n" +
+                    resourceMap.getString("battleDetails." +
+                    battleResourceKeys[scenario.getScenarioType()] +
+                    ".victory") + "\n\n" +
+
+                    "Observations:\n" +
+                    resourceMap.getString("battleDetails." +
+                    battleResourceKeys[scenario.getScenarioType()] +
+                    ".observations"));
+        } else {
             txtDetails.setText("Victory Conditions:\n" +
                     resourceMap.getString("battleDetails." +
-                    battleResourceKeys[scenario.getBattleType()] +
+                    battleResourceKeys[scenario.getScenarioType()] +
                     (scenario.isAttacker()?
                             ".attacker.victory":
                                 ".defender.victory")) + "\n\n" +
 
                     "Observations:\n" +
                     resourceMap.getString("battleDetails." +
-                    battleResourceKeys[scenario.getBattleType()] +
+                    battleResourceKeys[scenario.getScenarioType()] +
                     (scenario.isAttacker()?
                             ".attacker.observations":
                                 ".defender.observations")));
-        } else if (scenario.getBattleType() < AtBScenario.BIGBATTLES) {
-            txtDetails.setText("Details:\n" +
-                    resourceMap.getString("battleDetails." +
-                    battleResourceKeys[scenario.getBattleType()] +
-                    ".description"));
-        } else {
-            txtDetails.setText("Special Conditions:\n" +
-                    resourceMap.getString("battleDetails." +
-                    battleResourceKeys[scenario.getBattleType()] +
-                    ".specialConditions") + "\n\n" +
-
-                    "Victory Conditions:\n" +
-                    resourceMap.getString("battleDetails." +
-                    battleResourceKeys[scenario.getBattleType()] +
-                    ".victory") + "\n\n" +
-
-                    "Observations:\n" +
-                    resourceMap.getString("battleDetails." +
-                    battleResourceKeys[scenario.getBattleType()] +
-                    ".observations"));
         }
+
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y++;
         gridBagConstraints.gridwidth = 3;
