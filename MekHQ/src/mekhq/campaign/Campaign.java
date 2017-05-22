@@ -2303,7 +2303,7 @@ public class Campaign implements Serializable {
         	}
 
         	if (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY) {
-        		AtBScenarioFactory.createScenariosForNewWeek(this);
+        		AtBScenarioFactory.createScenariosForNewWeek(this, true);
         	}
 
         	for (Mission m : missions) {

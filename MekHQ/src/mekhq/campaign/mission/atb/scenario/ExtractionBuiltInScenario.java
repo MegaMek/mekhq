@@ -3,6 +3,8 @@ package mekhq.campaign.mission.atb.scenario;
 import java.util.ArrayList;
 import java.util.UUID;
 
+import megamek.client.bot.princess.BehaviorSettingsFactory;
+import megamek.client.bot.princess.PrincessException;
 import megamek.common.Board;
 import megamek.common.Compute;
 import megamek.common.Entity;
@@ -75,13 +77,24 @@ public class ExtractionBuiltInScenario extends AtBScenario {
 		ArrayList<Entity> otherForce = new ArrayList<Entity>();
 		addCivilianUnits(otherForce, 4, campaign);
 
-		if (isAttacker()) {
-			addBotForce(new BotForce("Civilians", 1, otherStart, otherStart, otherForce));
-			for (Entity en : otherForce) {
-				getSurvivalBonusIds().add(UUID.fromString(en.getExternalIdAsString()));
+		try {
+			if (isAttacker()) {
+				BotForce bf = new BotForce("Civilians", 1, otherStart, playerHome, otherForce);
+				bf.setBehaviorSettings(BehaviorSettingsFactory.getInstance().ESCAPE_BEHAVIOR.getCopy());
+
+				addBotForce(bf);
+				
+				for (Entity en : otherForce) {
+					getSurvivalBonusIds().add(UUID.fromString(en.getExternalIdAsString()));
+				}
+			} else {
+				BotForce bf = new BotForce("Civilians", 2, otherStart, enemyStart, otherForce);
+				bf.setBehaviorSettings(BehaviorSettingsFactory.getInstance().ESCAPE_BEHAVIOR.getCopy());
+				
+				addBotForce(bf);
 			}
-		} else {
-			addBotForce(new BotForce("Civilians", 2, otherStart, otherStart, otherForce));
+		} catch (PrincessException e) {
+			e.printStackTrace();
 		}
 	}
 }

@@ -134,13 +134,40 @@ public class AtBScenarioFactory {
 	 * (defender) battle each week. If there is a base attack (attacker)
 	 * battle, that is the only one for the week on that contract.
 	 */
-	public static void createScenariosForNewWeek(Campaign c) {
+	public static void createScenariosForNewWeek(Campaign c, boolean allowLancesToBeDuplicated) {
 		Hashtable<Integer, Lance> lances = c.getLances();
 		
 		ArrayList<AtBScenario> sList = new ArrayList<AtBScenario>();
 		AtBScenario baseAttack = null;
-
+		Map<Integer, Integer> assignedLances = new HashMap<Integer, Integer>();
+		
+		if (!allowLancesToBeDuplicated) {
+			for (Mission m : c.getMissions()) {
+				if (!m.isActive()) {
+					continue;
+				}
+				
+				for (Scenario s : m.getScenarios()) {
+					if (!s.isCurrent() || !AtBScenario.class.isAssignableFrom(s.getClass())) {
+						continue;
+					}
+					
+					AtBScenario atbScen = (AtBScenario)s;
+					
+					if (atbScen.getLanceForceId() == -1) {
+						continue;
+					}
+					
+					assignedLances.put(atbScen.getLanceForceId(), atbScen.getLanceForceId());
+				}
+			}
+		}
+		
 		for (Lance l : lances.values()) {
+			if (assignedLances.containsKey(l.getForceId())) {
+				continue;
+			}
+			
 			if (null == l.getContract(c) || !l.getContract(c).isActive() ||
 					!l.isEligible(c) ||
 					c.getDate().before(l.getContract(c).getStartDate())) {

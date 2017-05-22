@@ -476,7 +476,7 @@ public final class BriefingTab extends CampaignGuiTab {
             return;
         }
         
-        AtBScenarioFactory.createScenariosForNewWeek(getCampaign());
+        AtBScenarioFactory.createScenariosForNewWeek(getCampaign(), false);
     }
     
     private void addScenario() {
