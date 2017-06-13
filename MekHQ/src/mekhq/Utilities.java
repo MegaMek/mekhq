@@ -598,6 +598,7 @@ public class Utilities {
 		List<Person> gunners = new ArrayList<Person>();
 		List<Person> vesselCrew = new ArrayList<Person>();
 		Person navigator = null;
+		Person techOfficer = null;
 		int totalGunnery = 0;
 		int totalPiloting = 0;
 		drivers.clear();
@@ -679,8 +680,11 @@ public class Utilities {
 	    			p = c.newPerson(Person.T_VTOL_PILOT);
 	    			p.addSkill(SkillType.S_PILOT_VTOL, SkillType.getType(SkillType.S_PILOT_VTOL).getTarget() - oldCrew.getPiloting(), 0);
 	    			p.addSkill(SkillType.S_GUN_VEE, SkillType.getType(SkillType.S_GUN_VEE).getTarget() - oldCrew.getGunnery(), 0);
-	    		}
-	    		else {
+	    		} else if (u.getEntity() instanceof Mech) {
+	                p = c.newPerson(Person.T_MECHWARRIOR);
+	                p.addSkill(SkillType.S_PILOT_MECH, SkillType.getType(SkillType.S_PILOT_MECH).getTarget() - oldCrew.getPiloting(), 0);
+	                p.addSkill(SkillType.S_GUN_MECH, SkillType.getType(SkillType.S_GUN_MECH).getTarget() - oldCrew.getGunnery(), 0);
+	    		} else {
 	    			//assume tanker if we got here
 	    			p = c.newPerson(Person.T_GVEE_DRIVER);
 	    			p.addSkill(SkillType.S_PILOT_GVEE, SkillType.getType(SkillType.S_PILOT_GVEE).getTarget() - oldCrew.getPiloting(), 0);
@@ -730,6 +734,11 @@ public class Utilities {
 		    			p = c.newPerson(Person.T_SPACE_GUNNER);
 		    			p.addSkill(SkillType.S_GUN_SPACE, randomSkillFromTarget(SkillType.getType(SkillType.S_GUN_SPACE).getTarget() - oldCrew.getGunnery()), 0);
 		    			totalGunnery += p.getSkill(SkillType.S_GUN_SPACE).getFinalSkillValue();
+	                } else if (u.getEntity() instanceof Mech) {
+	                    p = c.newPerson(Person.T_MECHWARRIOR);
+	                    p.addSkill(SkillType.S_PILOT_MECH, SkillType.getType(SkillType.S_PILOT_MECH).getTarget() - oldCrew.getPiloting(), 0);
+	                    p.addSkill(SkillType.S_GUN_MECH, SkillType.getType(SkillType.S_GUN_MECH).getTarget() - oldCrew.getGunnery(), 0);
+	                    totalGunnery += p.getSkill(SkillType.S_GUN_MECH).getFinalSkillValue();
 		    		} else {
 		    			//assume tanker if we got here
 		    			p = c.newPerson(Person.T_VEE_GUNNER);
@@ -779,6 +788,11 @@ public class Utilities {
     		Person p = c.newPerson(Person.T_NAVIGATOR);
     		navigator = p;
     	}
+    	
+    	if (u.canTakeTechOfficer()) {
+    	    Person p = c.newPerson(Person.T_MECHWARRIOR);
+    	    techOfficer = p;
+    	}
 
 		for(Person p : drivers) {
             if (!nameset) {
@@ -801,11 +815,17 @@ public class Utilities {
             }
 		}
 
-		if(null != navigator) {
+		if (null != navigator) {
             if (!nameset) {
                 navigator.setName(commanderName);
                 nameset = true;
             }
+		}
+		if (null != techOfficer) {
+		    if (!nameset) {
+		        techOfficer.setName(commanderName);
+		        nameset = true;
+		    }
 		}
 		
         // Gather the data
@@ -827,6 +847,9 @@ public class Utilities {
         }
         if(null != navigator) {
             result.put(CrewType.NAVIGATOR, Collections.singletonList(navigator));
+        }
+        if (null != techOfficer) {
+            result.put(CrewType.TECH_OFFICER,  Collections.singletonList(techOfficer));
         }
 		return result;
 	}

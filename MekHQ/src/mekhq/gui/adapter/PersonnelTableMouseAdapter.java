@@ -21,6 +21,7 @@ import megamek.common.Aero;
 import megamek.common.BattleArmor;
 import megamek.common.Crew;
 import megamek.common.Infantry;
+import megamek.common.Mech;
 import megamek.common.Mounted;
 import megamek.common.Tank;
 import megamek.common.options.PilotOptions;
@@ -71,6 +72,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
     private static final String CMD_ADD_GUNNER = "ADD_GUNNER"; //$NON-NLS-1$
     private static final String CMD_ADD_CREW = "ADD_CREW"; //$NON-NLS-1$
     private static final String CMD_ADD_NAVIGATOR = "ADD_NAV"; //$NON-NLS-1$
+    private static final String CMD_ADD_TECH_OFFICER = "ADD_TECH_OFFICER"; //$NON-NLS-1$
 
     private static final String CMD_EDIT_SALARY = "SALARY"; //$NON-NLS-1$
     private static final String CMD_BLOODNAME = "BLOODNAME"; //$NON-NLS-1$
@@ -402,6 +404,28 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                                 useTransfers = gui.getCampaign().getCampaignOptions().useTransfers();
                             }
                             u.setNavigator(p, useTransfers);
+                        }
+                    }
+                }
+                u.resetPilotAndEntity();
+                u.runDiagnostic(false);
+                break;
+            }
+            case CMD_ADD_TECH_OFFICER:
+            {
+                UUID selected = UUID.fromString(data[1]);
+                Unit u = gui.getCampaign().getUnit(selected);
+                if (null != u) {
+                    for (Person p : people) {
+                        if (u.canTakeTechOfficer()) {
+                            Unit oldUnit = gui.getCampaign().getUnit(p.getUnitId());
+                            boolean useTransfers = false;
+                            boolean transferLog = !gui.getCampaign().getCampaignOptions().useTransfers();
+                            if (null != oldUnit) {
+                                oldUnit.remove(p, transferLog);
+                                useTransfers = gui.getCampaign().getCampaignOptions().useTransfers();
+                            }
+                            u.setTechOfficer(p, useTransfers);
                         }
                     }
                 }
@@ -1255,7 +1279,8 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             JMenu gunnerMenu = new JMenu(resourceMap.getString("assignAsGunner.text")); //$NON-NLS-1$
             JMenu soldierMenu = new JMenu(resourceMap.getString("assignAsSoldier.text")); //$NON-NLS-1$
             JMenu techMenu = new JMenu(resourceMap.getString("assignAsTech.text")); //$NON-NLS-1$
-            JMenu navMenu = new JMenu(resourceMap.getString("asignAsNavigator.text")); //$NON-NLS-1$
+            JMenu navMenu = new JMenu(resourceMap.getString("assignAsNavigator.text")); //$NON-NLS-1$
+            JMenu techOfficerMenu = new JMenu(resourceMap.getString("assignAsTechOfficer.text")); //$NON-NLS-1$
             /*
              * if(!person.isAssigned()) { cbMenuItem.setSelected(true); }
              */
@@ -1294,7 +1319,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                             // TODO: check the box
                             cbMenuItem.setActionCommand(makeCommand(CMD_ADD_DRIVER, unit.getId().toString()));
                             cbMenuItem.addActionListener(this);
-                            if (unit.getEntity() instanceof Aero) {
+                            if (unit.getEntity() instanceof Aero || unit.getEntity() instanceof Mech) {
                                 pilotMenu.add(cbMenuItem);
                             } else {
                                 driverMenu.add(cbMenuItem);
@@ -1326,6 +1351,14 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                             cbMenuItem.setActionCommand(makeCommand(CMD_ADD_NAVIGATOR, unit.getId().toString()));
                             cbMenuItem.addActionListener(this);
                             navMenu.add(cbMenuItem);
+                        }
+                        if (unit.canTakeTechOfficer()
+                                && person.canDrive(unit.getEntity())
+                                && person.canGun(unit.getEntity())) {
+                            cbMenuItem = new JCheckBoxMenuItem(unit.getName());
+                            cbMenuItem.setActionCommand(makeCommand(CMD_ADD_TECH_OFFICER, unit.getId().toString()));
+                            cbMenuItem.addActionListener(this);
+                            techOfficerMenu.add(cbMenuItem);
                         }
                     }
                     if (unit.canTakeTech() && person.canTech(unit.getEntity())
@@ -1372,6 +1405,12 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     menu.add(soldierMenu);
                     if (soldierMenu.getItemCount() > 20) {
                         MenuScroller.setScrollerFor(soldierMenu, 20);
+                    }
+                }
+                if (techOfficerMenu.getItemCount() > 0) {
+                    menu.add(techOfficerMenu);
+                    if (techOfficerMenu.getItemCount() > 20) {
+                        MenuScroller.setScrollerFor(techOfficerMenu, 20);
                     }
                 }
                 if (techMenu.getItemCount() > 0) {
