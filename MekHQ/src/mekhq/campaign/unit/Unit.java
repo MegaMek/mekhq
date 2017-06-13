@@ -3338,9 +3338,15 @@ public class Unit implements MekHqXmlSerializable {
                 crew.add(p);
             }
         }
-        if(navigator != null) {
+        if (null != navigator) {
             Person p = campaign.getPerson(navigator);
             if(null != p) {
+                crew.add(p);
+            }
+        }
+        if (techOfficer != null) {
+            Person p = campaign.getPerson(techOfficer);
+            if (null != p) {
                 crew.add(p);
             }
         }
