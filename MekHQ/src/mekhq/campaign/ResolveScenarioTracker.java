@@ -507,7 +507,7 @@ public class ResolveScenarioTracker {
             }
             //check for an ejected entity and if we find one then assign it instead to switch vees
             //over to infantry checks for casualties
-            Entity ejected = ejections.get(u.getCommander().getId());
+            Entity ejected = ejections.get(UUID.fromString(en.getCrew().getExternalIdAsString()));
             //determine total casualties for infantry and large craft
             int casualties = 0;
             int casualtiesAssigned = 0;
@@ -552,8 +552,17 @@ public class ResolveScenarioTracker {
             //try to find the crew in our pilot and mia vectors
             Crew pilot = pilots.get(u.getCommander().getId());
             boolean missingCrew = false;
-            if(null == pilot) {
-                pilot = mia.get(u.getCommander().getId());
+            //For multi-crew cockpits, the crew id is the first slot, which is not necessarily the commander
+            if (null == pilot && en.getCrew().getSlotCount() > 0) {
+                for (Person p : u.getCrew()) {
+                    if (pilots.containsKey(p.getId())) {
+                        pilot = pilots.get(p.getId());
+                        break;
+                    }
+                }
+            }
+            if (null == pilot) {
+                pilot = mia.get(UUID.fromString(en.getCrew().getExternalIdAsString()));
                 missingCrew = true;
             }
             for(Person p : crew) {
@@ -564,6 +573,15 @@ public class ResolveScenarioTracker {
                 if(null == pilot) {
                     status.setHits(6);
                     status.setDead(true);
+                }
+                //multi-crewed cockpit; set each crew member separately
+                else if (pilot.getSlotCount() > 0) {
+                    for (int slot = 0; slot < pilot.getSlotCount(); slot++) {
+                        if (p.getId().toString().equals(pilot.getExternalIdAsString())) {
+                            status.setHits(pilot.getHits(slot));
+                            break;
+                        }
+                    }
                 }
                 //cant do the following by u.usesSoloPilot because entity may be different if ejected
                 else if(en instanceof Mech
