@@ -553,7 +553,7 @@ public class ResolveScenarioTracker {
             Crew pilot = pilots.get(u.getCommander().getId());
             boolean missingCrew = false;
             //For multi-crew cockpits, the crew id is the first slot, which is not necessarily the commander
-            if (null == pilot && en.getCrew().getSlotCount() > 0) {
+            if (null == pilot && en.getCrew().getSlotCount() > 1) {
                 for (Person p : u.getCrew()) {
                     if (pilots.containsKey(p.getId())) {
                         pilot = pilots.get(p.getId());
@@ -575,7 +575,7 @@ public class ResolveScenarioTracker {
                     status.setDead(true);
                 }
                 //multi-crewed cockpit; set each crew member separately
-                else if (pilot.getSlotCount() > 0) {
+                else if (pilot.getSlotCount() > 1) {
                     for (int slot = 0; slot < pilot.getSlotCount(); slot++) {
                         if (p.getId().toString().equals(pilot.getExternalIdAsString(slot))) {
                             status.setHits(pilot.getHits(slot));
@@ -734,20 +734,32 @@ public class ResolveScenarioTracker {
                 for(Person p : crew) {
                     // Give them a UUID. We won't actually use this for the campaign, but to
                     //identify them in the prisonerStatus hash
-                    UUID id = UUID.randomUUID();
-                    while (prisonerStatus.get(id) != null) {
+                    UUID id = p.getId();
+                    if (null == id) {
                         id = UUID.randomUUID();
+                        while (prisonerStatus.get(id) != null) {
+                            id = UUID.randomUUID();
+                        }
+                        p.setId(id);
                     }
-                    p.setId(id);
                     PrisonerStatus status = new PrisonerStatus(p.getFullName(), u.getEntity().getDisplayName(), p);
-                    if(en instanceof Mech
+                    if (en instanceof Mech
                             || en instanceof Protomech
-                            || (en instanceof Aero && !(en instanceof SmallCraft || en instanceof Jumpship))) {
+                            || (en instanceof Aero && !(en instanceof SmallCraft || en instanceof Jumpship))
+                            || en instanceof MechWarrior) {
                         Crew pilot = en.getCrew();
                         if(null == pilot) {
                             continue;
                         }
-                        status.setHits(pilot.getHits());
+                        int slot = 0;
+                        //For multicrew cockpits the person id has been set to match the crew slot 
+                        for (int pos = 0; pos < pilot.getSlotCount(); pos++) {
+                            if (p.getId().toString().equals(pilot.getExternalIdAsString(pos))) {
+                                slot = pos;
+                                break;
+                            }
+                        }
+                        status.setHits(pilot.getHits(slot));
                     } else {
                         //we have a multi-crewed vee
                         boolean wounded = false;

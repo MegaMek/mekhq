@@ -50,6 +50,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.StringTokenizer;
+import java.util.UUID;
 import java.util.Vector;
 import java.util.stream.Collectors;
 
@@ -598,7 +599,6 @@ public class Utilities {
 		List<Person> gunners = new ArrayList<Person>();
 		List<Person> vesselCrew = new ArrayList<Person>();
 		Person navigator = null;
-		Person techOfficer = null;
 		int totalGunnery = 0;
 		int totalPiloting = 0;
 		drivers.clear();
@@ -649,6 +649,26 @@ public class Utilities {
     			p.addSkill(SkillType.S_GUN_VEE, SkillType.getType(SkillType.S_GUN_VEE).getTarget() - oldCrew.getGunnery(), 0);
     		}
 			drivers.add(p);
+		} else if (oldCrew.getSlotCount() > 1) {
+		    for (int slot = 0; slot < oldCrew.getSlotCount(); slot++) {
+		        Person p = null;
+	            if(u.getEntity() instanceof Mech) {
+	                p = c.newPerson(Person.T_MECHWARRIOR);
+	                p.addSkill(SkillType.S_PILOT_MECH, SkillType.getType(SkillType.S_PILOT_MECH).getTarget() - oldCrew.getPiloting(slot), 0);
+	                p.addSkill(SkillType.S_GUN_MECH, SkillType.getType(SkillType.S_GUN_MECH).getTarget() - oldCrew.getGunnery(slot), 0);
+	            } else if(u.getEntity() instanceof Aero) {
+	                p = c.newPerson(Person.T_AERO_PILOT);
+	                p.addSkill(SkillType.S_PILOT_AERO, SkillType.getType(SkillType.S_PILOT_AERO).getTarget() - oldCrew.getPiloting(slot), 0);
+	                p.addSkill(SkillType.S_GUN_AERO, SkillType.getType(SkillType.S_GUN_AERO).getTarget() - oldCrew.getGunnery(slot), 0);
+	            }
+	            if (null != p) {
+	                p.setName(oldCrew.getName(slot));
+	                if (!oldCrew.getExternalIdAsString().equals("-1")) {
+	                    p.setId(UUID.fromString(oldCrew.getExternalIdAsString(slot)));
+	                }
+	                drivers.add(p);
+	            }
+		    }
 		} else {
 			// Generate drivers for multi-crewed vehicles.
 
@@ -773,8 +793,8 @@ public class Utilities {
 		    	}
 			}
 		}
-
-		boolean nameset = false;
+		//Multi-slot crews already have the names set. Single-slot multi-crew units need to assign the commander's name.
+		boolean nameset = oldCrew.getSlotCount() > 1;
 		while(vesselCrew.size() < u.getTotalCrewNeeds()) {
     		Person p = c.newPerson(Person.T_SPACE_CREW);
     		if (!nameset) {
@@ -789,11 +809,6 @@ public class Utilities {
     		navigator = p;
     	}
     	
-    	if (u.canTakeTechOfficer()) {
-    	    Person p = c.newPerson(Person.T_MECHWARRIOR);
-    	    techOfficer = p;
-    	}
-
 		for(Person p : drivers) {
             if (!nameset) {
                 p.setName(commanderName);
@@ -821,12 +836,6 @@ public class Utilities {
                 nameset = true;
             }
 		}
-		if (null != techOfficer) {
-		    if (!nameset) {
-		        techOfficer.setName(commanderName);
-		        nameset = true;
-		    }
-		}
 		
         // Gather the data
         Map<CrewType, Collection<Person>> result = new HashMap<>();
@@ -847,9 +856,6 @@ public class Utilities {
         }
         if(null != navigator) {
             result.put(CrewType.NAVIGATOR, Collections.singletonList(navigator));
-        }
-        if (null != techOfficer) {
-            result.put(CrewType.TECH_OFFICER,  Collections.singletonList(techOfficer));
         }
 		return result;
 	}
