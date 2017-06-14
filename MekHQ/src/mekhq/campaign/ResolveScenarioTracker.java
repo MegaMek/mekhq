@@ -577,7 +577,7 @@ public class ResolveScenarioTracker {
                 //multi-crewed cockpit; set each crew member separately
                 else if (pilot.getSlotCount() > 0) {
                     for (int slot = 0; slot < pilot.getSlotCount(); slot++) {
-                        if (p.getId().toString().equals(pilot.getExternalIdAsString())) {
+                        if (p.getId().toString().equals(pilot.getExternalIdAsString(slot))) {
                             status.setHits(pilot.getHits(slot));
                             break;
                         }
