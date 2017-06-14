@@ -2822,8 +2822,6 @@ public class Unit implements MekHqXmlSerializable {
         entity.getCrew().setPiloting(Math.min(Math.max(piloting, 0), 8), 0);
         entity.getCrew().setGunnery(Math.min(Math.max(gunnery, 0), 7), 0);
         entity.getCrew().setArtillery(Math.min(Math.max(artillery, 7), 8), 0);
-        entity.getCrew().setGunnery(gunnery, 0);
-        entity.getCrew().setArtillery(artillery, 0);
         entity.getCrew().setSize(nCrew);
     }
     
