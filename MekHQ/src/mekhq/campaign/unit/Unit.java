@@ -1370,6 +1370,12 @@ public class Unit implements MekHqXmlSerializable {
                     +navigator.toString()
                     +"</navigatorId>");
         }
+        if(null != techOfficer) {
+            pw1.println(MekHqXmlUtil.indentStr(indentLvl+1)
+                    +"<techOfficerId>"
+                    +techOfficer.toString()
+                    +"</techOfficerId>");
+        }
         if(null != tech) {
             pw1.println(MekHqXmlUtil.indentStr(indentLvl+1)
                     +"<techId>"
@@ -1488,6 +1494,10 @@ public class Unit implements MekHqXmlSerializable {
                         if(!wn2.getTextContent().equals("null")) {
                             retVal.navigator = UUID.fromString(wn2.getTextContent());
                         }
+                    }
+                } else if (wn2.getNodeName().equalsIgnoreCase("techOfficerId")) {
+                    if(!wn2.getTextContent().equals("null")) {
+                        retVal.techOfficer = UUID.fromString(wn2.getTextContent());
                     }
                 }
                 else if (wn2.getNodeName().equalsIgnoreCase("techId")) {
@@ -2586,7 +2596,7 @@ public class Unit implements MekHqXmlSerializable {
                     Person to = null;
                     if (null != techOfficer) {
                         to = campaign.getPerson(techOfficer);
-                        if (!to.hasSkill(driveType) || to.hasSkill(gunType) || !to.isActive()) {
+                        if (!to.hasSkill(driveType) || !to.hasSkill(gunType) || !to.isActive()) {
                             to = null;
                         }
                     }
