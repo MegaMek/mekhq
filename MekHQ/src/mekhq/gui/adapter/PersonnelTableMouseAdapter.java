@@ -1281,6 +1281,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             JMenu techMenu = new JMenu(resourceMap.getString("assignAsTech.text")); //$NON-NLS-1$
             JMenu navMenu = new JMenu(resourceMap.getString("assignAsNavigator.text")); //$NON-NLS-1$
             JMenu techOfficerMenu = new JMenu(resourceMap.getString("assignAsTechOfficer.text")); //$NON-NLS-1$
+            JMenu consoleCmdrMenu = new JMenu(resourceMap.getString("assignAsConsoleCmdr.text")); //$NON-NLS-1$
             /*
              * if(!person.isAssigned()) { cbMenuItem.setSelected(true); }
              */
@@ -1352,13 +1353,22 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                             cbMenuItem.addActionListener(this);
                             navMenu.add(cbMenuItem);
                         }
-                        if (unit.canTakeTechOfficer()
-                                && person.canDrive(unit.getEntity())
-                                && person.canGun(unit.getEntity())) {
-                            cbMenuItem = new JCheckBoxMenuItem(unit.getName());
-                            cbMenuItem.setActionCommand(makeCommand(CMD_ADD_TECH_OFFICER, unit.getId().toString()));
-                            cbMenuItem.addActionListener(this);
-                            techOfficerMenu.add(cbMenuItem);
+                        if (unit.canTakeTechOfficer()) {
+                            //For a vehicle command console we will require the commander to be a driver or a gunner, but not necessarily both
+                            if (unit.getEntity() instanceof Tank) {
+                                if (person.canDrive(unit.getEntity()) || person.canGun(unit.getEntity())) {
+                                    cbMenuItem = new JCheckBoxMenuItem(unit.getName());
+                                    cbMenuItem.setActionCommand(makeCommand(CMD_ADD_TECH_OFFICER, unit.getId().toString()));
+                                    cbMenuItem.addActionListener(this);
+                                    consoleCmdrMenu.add(cbMenuItem);
+                                }
+                            } else if (person.canDrive(unit.getEntity())
+                                    && person.canGun(unit.getEntity())) {
+                                cbMenuItem = new JCheckBoxMenuItem(unit.getName());
+                                cbMenuItem.setActionCommand(makeCommand(CMD_ADD_TECH_OFFICER, unit.getId().toString()));
+                                cbMenuItem.addActionListener(this);
+                                techOfficerMenu.add(cbMenuItem);
+                            }
                         }
                     }
                     if (unit.canTakeTech() && person.canTech(unit.getEntity())
@@ -1411,6 +1421,12 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     menu.add(techOfficerMenu);
                     if (techOfficerMenu.getItemCount() > 20) {
                         MenuScroller.setScrollerFor(techOfficerMenu, 20);
+                    }
+                }
+                if (consoleCmdrMenu.getItemCount() > 0) {
+                    menu.add(consoleCmdrMenu);
+                    if (consoleCmdrMenu.getItemCount() > 20) {
+                        MenuScroller.setScrollerFor(consoleCmdrMenu, 20);
                     }
                 }
                 if (techMenu.getItemCount() > 0) {

@@ -6667,7 +6667,13 @@ public class Campaign implements Serializable {
             unit.setNavigator(p);
         }
         if (unit.canTakeTechOfficer()) {
-            Person p = newPerson(Person.T_MECHWARRIOR);
+            Person p = null;
+            //For vehicle command console we will default to gunner
+            if (unit.getEntity() instanceof Tank) {
+                p = newPerson(Person.T_VEE_GUNNER);
+            } else {
+                p = newPerson(Person.T_MECHWARRIOR);
+            }
             if (!recruitPerson(p)) {
                 return;
             }

@@ -599,6 +599,7 @@ public class Utilities {
 		List<Person> gunners = new ArrayList<Person>();
 		List<Person> vesselCrew = new ArrayList<Person>();
 		Person navigator = null;
+		Person consoleCmdr = null;
 		int totalGunnery = 0;
 		int totalPiloting = 0;
 		drivers.clear();
@@ -809,6 +810,11 @@ public class Utilities {
     		navigator = p;
     	}
     	
+    	if (u.canTakeTechOfficer()) {
+    	    Person p = c.newPerson(Person.T_VEE_GUNNER);
+    	    consoleCmdr = p;
+    	}
+    	
 		for(Person p : drivers) {
             if (!nameset) {
                 p.setName(commanderName);
@@ -837,9 +843,16 @@ public class Utilities {
             }
 		}
 		
+		if (null != consoleCmdr) {
+		    if (!nameset) {
+		        consoleCmdr.setName(commanderName);
+		        nameset = true;
+		    }
+		}
+		
         // Gather the data
         Map<CrewType, Collection<Person>> result = new HashMap<>();
-		if(!drivers.isEmpty()) {
+		if (!drivers.isEmpty()) {
 		    if(u.usesSoloPilot()) {
 		        result.put(CrewType.PILOT, drivers);
 		    } else if(u.usesSoldiers()) {
@@ -848,14 +861,17 @@ public class Utilities {
 		        result.put(CrewType.DRIVER, drivers);
 		    }
 		}
-		if(!gunners.isEmpty()) {
+		if (!gunners.isEmpty()) {
 		    result.put(CrewType.GUNNER, gunners);
 		}
-        if(!vesselCrew.isEmpty()) {
+        if (!vesselCrew.isEmpty()) {
             result.put(CrewType.VESSEL_CREW, vesselCrew);
         }
-        if(null != navigator) {
+        if (null != navigator) {
             result.put(CrewType.NAVIGATOR, Collections.singletonList(navigator));
+        }
+        if (null != consoleCmdr) {
+            result.put(CrewType.TECH_OFFICER, Collections.singletonList(consoleCmdr));
         }
 		return result;
 	}

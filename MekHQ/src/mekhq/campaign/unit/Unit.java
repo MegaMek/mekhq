@@ -2576,7 +2576,7 @@ public class Unit implements MekHqXmlSerializable {
                     entity.getCrew().setMissing(true, slot++);
                 }
             } else {
-                //tripod, quadvee, or dual cockpit; driver and gunner are assiged separately
+                //tripod, quadvee, or dual cockpit; driver and gunner are assigned separately
                 Optional<Person> person = drivers.stream().map(id -> campaign.getPerson(id))
                         .filter(p -> p.hasSkill(driveType) && p.isActive()).findFirst();
                 if (person.isPresent()) {
@@ -2742,6 +2742,19 @@ public class Unit implements MekHqXmlSerializable {
                 nCrew++;
             }
         }
+        //Using the tech officer field for the secondary commander; if nobody assigned to the command
+        //console we will flag the entity as using the console commander, which has the effect of limiting
+        //the tank to a single commander. As the console commander is not counted against crew requirements,
+        //we do not increase nCrew if present.
+        if (entity instanceof Tank && ((Tank)entity).hasWorkingMisc(MiscType.F_COMMAND_CONSOLE)) {
+            Person p = null;
+            if (null != techOfficer) {
+                p = campaign.getPerson(techOfficer);
+            }
+            if (null == p || p.getHits() > 0) {
+                ((Tank)entity).setUsingConsoleCommander(true);
+            }
+        }
 
         if(nDrivers > 0) {
             piloting = (int)Math.round(((double)sumPiloting)/nDrivers);
@@ -2803,7 +2816,7 @@ public class Unit implements MekHqXmlSerializable {
                 entity.getCrew().setSize(0);
                 entity.getCrew().setMissing(true, 0);
                 return;
-            }
+            } 
         } else if(entity instanceof SmallCraft || entity instanceof Jumpship) {
             //assign crew hits based on what percent of the crew is present
             int currentSize = nDrivers + nGunners + nCrew;
@@ -2823,6 +2836,7 @@ public class Unit implements MekHqXmlSerializable {
         entity.getCrew().setGunnery(Math.min(Math.max(gunnery, 0), 7), 0);
         entity.getCrew().setArtillery(Math.min(Math.max(artillery, 7), 8), 0);
         entity.getCrew().setSize(nCrew);
+        entity.getCrew().setMissing(false, 0);
     }
     
     /**
@@ -3004,7 +3018,10 @@ public class Unit implements MekHqXmlSerializable {
     }
 
     public boolean canTakeTechOfficer() {
-        return entity.getCrew().getCrewType().getTechPos() >= 0 && techOfficer == null;
+        return techOfficer == null &&
+                (entity.getCrew().getCrewType().getTechPos() >= 0
+                //Use techOfficer field for secondary commander
+                || (entity instanceof Tank && entity.hasWorkingMisc(MiscType.F_COMMAND_CONSOLE)));
     }
 
     public boolean canTakeTech() {
@@ -3103,6 +3120,10 @@ public class Unit implements MekHqXmlSerializable {
             p.addLogEntry(campaign.getDate(), "Assigned to " + getName());
         }
         MekHQ.triggerEvent(new PersonCrewAssignmentEvent(p, this));
+    }
+    
+    public boolean isTechOfficer(Person p) {
+        return null != techOfficer && techOfficer.equals(p.getId());
     }
 
     public void setTechOfficer(Person p) {

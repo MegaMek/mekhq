@@ -55,6 +55,7 @@ import megamek.common.MechFileParser;
 import megamek.common.MechSummary;
 import megamek.common.MechSummaryCache;
 import megamek.common.MechWarrior;
+import megamek.common.MiscType;
 import megamek.common.Mounted;
 import megamek.common.Protomech;
 import megamek.common.SmallCraft;
@@ -553,7 +554,7 @@ public class ResolveScenarioTracker {
             Crew pilot = pilots.get(u.getCommander().getId());
             boolean missingCrew = false;
             //For multi-crew cockpits, the crew id is the first slot, which is not necessarily the commander
-            if (null == pilot && en.getCrew().getSlotCount() > 1) {
+            if (null == pilot) {
                 for (Person p : u.getCrew()) {
                     if (pilots.containsKey(p.getId())) {
                         pilot = pilots.get(p.getId());
@@ -619,8 +620,18 @@ public class ResolveScenarioTracker {
                                 status.setHits(6);
                                 status.setDead(true);
                             }
-                        }
-                        else if(((Tank)en).isCommanderHit() && u.isCommander(p)) {
+                        } else if (((Tank)en).isCommanderHit() && (u.isCommander(p)
+                                || u.isTechOfficer(p))) {
+                            //If there is a command console, the commander hit flag is set on the second such critical,
+                            //which means both commanders have been hit.
+                            if(Compute.d6(2) >= 7) {
+                                wounded = true;
+                            } else {
+                                status.setHits(6);
+                                status.setDead(true);
+                            }
+                        } else if (((Tank)en).isUsingConsoleCommander() && u.isCommander(p)) {
+                            //This flag is set after the first commander hit critical.
                             if(Compute.d6(2) >= 7) {
                                 wounded = true;
                             } else {
@@ -694,6 +705,7 @@ public class ResolveScenarioTracker {
                 //For vees we may need to know the commander or driver, which aren't assigned for TestUnit.
                 Person commander = null;
                 Person driver = null;
+                Person console = null;
                 if (en instanceof Tank) {
                     //Prefer gunner over driver, as in Unit::getCommander
                     for (Person p : crew) {
@@ -703,6 +715,14 @@ public class ResolveScenarioTracker {
                                 || p.getPrimaryRole() == Person.T_VTOL_PILOT
                                 || p.getPrimaryRole() == Person.T_NVEE_DRIVER) {
                             driver = p;
+                        }
+                    }
+                    if (en.hasWorkingMisc(MiscType.F_COMMAND_CONSOLE)) {
+                        for (Person p : crew) {
+                            if (p != commander && p != driver) {
+                                console = p;
+                                break;
+                            }
                         }
                     }
                 }
@@ -769,30 +789,42 @@ public class ResolveScenarioTracker {
                                 if(loc == Tank.LOC_TURRET || loc == Tank.LOC_TURRET_2 || loc == Tank.LOC_BODY) {
                                     continue;
                                 }
-                                if(en.getInternal(loc) <= 0) {
+                                if (en.getInternal(loc) <= 0) {
                                     destroyed = true;
                                     break;
                                 }
                             }
                             if(destroyed || null == en.getCrew() || en.getCrew().isDead()) {
-                                if(Compute.d6(2) >= 7) {
+                                if (Compute.d6(2) >= 7) {
                                     wounded = true;
                                 } else {
                                     status.setHits(6);
                                 }
-                            }
-                            else if(((Tank)en).isDriverHit()
+                            } else if(((Tank)en).isDriverHit()
                                     && driver != null && driver.getId() == p.getId()) {
+                                if (Compute.d6(2) >= 7) {
+                                    wounded = true;
+                                } else {
+                                    status.setHits(6);
+                                    status.setDead(true);
+                                }
+                            } else if (((Tank)en).isCommanderHit()
+                                    && (((commander != null && commander.getId() == p.getId())
+                                            || (console != null && console.getId() == p.getId())))) {
+                                //If there is a command console, the commander hit flag does not
+                                //get set until after the second such critical, which means that
+                                //both commanders have been hit.
                                 if(Compute.d6(2) >= 7) {
                                     wounded = true;
                                 } else {
                                     status.setHits(6);
                                     status.setDead(true);
                                 }
-                            }
-                            else if(((Tank)en).isCommanderHit()
+                            } else if (((Tank)en).isUsingConsoleCommander()
                                     && commander != null
                                     && commander.getId() == p.getId()) {
+                                //If this flag is set we are using a command console and have already
+                                //taken one commander hit critical, which takes out the primary commander.
                                 if(Compute.d6(2) >= 7) {
                                     wounded = true;
                                 } else {
