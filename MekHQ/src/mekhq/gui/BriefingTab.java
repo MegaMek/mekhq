@@ -70,6 +70,7 @@ import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.mission.atb.AtBScenarioFactory;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
@@ -117,6 +118,7 @@ public final class BriefingTab extends CampaignGuiTab {
     private JButton btnEditMission;
     private JButton btnCompleteMission;
     private JButton btnDeleteMission;
+    private JButton btnGMGenerateScenarios;
     private JButton btnStartGame;
     private JButton btnJoinGame;
     private JButton btnLoadGame;
@@ -211,6 +213,12 @@ public final class BriefingTab extends CampaignGuiTab {
         btnDeleteMission.setName("btnDeleteMission"); // NOI18N
         btnDeleteMission.addActionListener(ev -> deleteMission());
         panMissionButtons.add(btnDeleteMission);
+
+        btnGMGenerateScenarios = new JButton(resourceMap.getString("btnGMGenerateScenarios.text")); // NOI18N
+        btnGMGenerateScenarios.setToolTipText(resourceMap.getString("btnGMGenerateScenarios.toolTipText")); // NOI18N
+        btnGMGenerateScenarios.setName("btnGMGenerateScenarios"); // NOI18N
+        btnGMGenerateScenarios.addActionListener(ev -> gmGenerateScenarios());
+        panMissionButtons.add(btnGMGenerateScenarios);
 
         scrollMissionView = new JScrollPane();
         scrollMissionView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
@@ -455,6 +463,22 @@ public final class BriefingTab extends CampaignGuiTab {
         MekHQ.triggerEvent(new MissionRemovedEvent(mission));
     }
 
+    private void gmGenerateScenarios() {
+    	if (!getCampaign().isGM()) {
+			JOptionPane.showMessageDialog(this,
+					"Only allowed for GM players",
+					"Not GM", JOptionPane.ERROR_MESSAGE);
+			return;
+    	}
+
+        if (0 != JOptionPane.showConfirmDialog(null, "Are you sure you want to generate a new set of missions?", "Generate missions?",
+                JOptionPane.YES_NO_OPTION)) {
+            return;
+        }
+        
+        AtBScenarioFactory.createScenariosForNewWeek(getCampaign(), false);
+    }
+    
     private void addScenario() {
         Mission m = getCampaign().getMission(selectedMission);
         if (null != m) {
@@ -895,6 +919,7 @@ public final class BriefingTab extends CampaignGuiTab {
         btnCompleteMission.setEnabled(false);
         btnDeleteMission.setEnabled(false);
         btnAddScenario.setEnabled(false);
+        btnGMGenerateScenarios.setEnabled(false);
         if (idx >= 0 && idx < getCampaign().getSortedMissions().size()) {
             Mission m = getCampaign().getSortedMissions().get(idx);
             if (null != m) {
@@ -915,6 +940,7 @@ public final class BriefingTab extends CampaignGuiTab {
                 btnCompleteMission.setEnabled(m.isActive());
                 btnDeleteMission.setEnabled(true);
                 btnAddScenario.setEnabled(m.isActive());
+                btnGMGenerateScenarios.setEnabled(m.isActive() && getCampaign().isGM());
             }
 
         } else {

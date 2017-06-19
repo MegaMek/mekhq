@@ -27,6 +27,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 import mekhq.MekHQ;
@@ -36,6 +37,8 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.force.ForceStub;
+import mekhq.campaign.mission.atb.AtBScenarioFactory;
+import mekhq.campaign.mission.atb.IAtBScenario;
 import mekhq.campaign.unit.Unit;
 
 import org.w3c.dom.NamedNodeMap;
@@ -270,7 +273,7 @@ public class Scenario implements Serializable {
                 +"\">");
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<name>"
-                +MekHqXmlUtil.escape(name)
+                +MekHqXmlUtil.escape(getName())
                 +"</name>");
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<desc>"
@@ -323,7 +326,39 @@ public class Scenario implements Serializable {
         
         try {
             // Instantiate the correct child class, and call its parsing function.
-            retVal = (Scenario) Class.forName(className).newInstance();
+        	if (className.equals(AtBScenario.class.getName())) {
+            	//Backwards compatibility when AtBScenarios were all part of the same class
+        		//Find the battle type and then load it through the AtBScenarioFactory
+        		
+                NodeList nl = wn.getChildNodes();
+                int battleType = -1;
+                
+                for (int x=0; x<nl.getLength(); x++) {
+                    Node wn2 = nl.item(x);
+                    
+                    if (wn2.getNodeName().equalsIgnoreCase("battleType")) {
+                        battleType = Integer.parseInt(wn2.getTextContent());
+                        break;
+                    }
+                }        		
+                
+                if (battleType == -1) {
+                	MekHQ.logMessage("Unable to load an old AtBScenario because we could not determine the battle type", 5);
+                	return null;
+                }
+                
+                List<Class<IAtBScenario>> scenarioClassList = AtBScenarioFactory.getScenarios(battleType);
+                
+                if ((null == scenarioClassList) || scenarioClassList.isEmpty()) {
+                	MekHQ.logMessage("Unable to load an old AtBScenario of battle type " + battleType, 5);
+                	return null;
+                }
+                
+                retVal = (Scenario) scenarioClassList.get(0).newInstance();	
+        	} else {
+        		retVal = (Scenario) Class.forName(className).newInstance();	
+        	}
+        	            
             retVal.loadFieldsFromXmlNode(wn);
             
             // Okay, now load Part-specific fields!
@@ -333,7 +368,7 @@ public class Scenario implements Serializable {
                 Node wn2 = nl.item(x);
                 
                 if (wn2.getNodeName().equalsIgnoreCase("name")) {
-                    retVal.name = wn2.getTextContent();
+                    retVal.setName(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("status")) {
                     retVal.status = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("id")) {
