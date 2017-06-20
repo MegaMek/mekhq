@@ -146,6 +146,7 @@ import mekhq.campaign.force.Lance;
 import mekhq.campaign.market.ContractMarket;
 import mekhq.campaign.market.PartsStore;
 import mekhq.campaign.market.PersonnelMarket;
+import mekhq.campaign.market.PirateContractMarket;
 import mekhq.campaign.market.ShoppingList;
 import mekhq.campaign.market.UnitMarket;
 import mekhq.campaign.mission.AtBContract;
@@ -194,6 +195,7 @@ import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Era;
 import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.Faction.Tag;
 import mekhq.campaign.universe.IUnitGenerator;
 import mekhq.campaign.universe.News;
 import mekhq.campaign.universe.NewsItem;
@@ -2998,6 +3000,12 @@ public class Campaign implements Serializable {
     }
 
     public void setFactionCode(String i) {
+    	
+    	if(Faction.getFaction(i).is(Tag.PIRATE))
+    	{
+    		contractMarket = new PirateContractMarket();
+    	}
+    	
         this.factionCode = i;
     }
 

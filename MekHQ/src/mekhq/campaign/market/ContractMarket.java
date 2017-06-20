@@ -67,19 +67,18 @@ public class ContractMarket implements Serializable {
 	private static final long serialVersionUID = 1303462872220110093L;
 
 	public static int TYPE_ATBMONTHLY = 0;
-	//TODO: Implement a method that rolls each day to see whether a new contract appears or an offer disappears
-
+	
 	public final static int CLAUSE_COMMAND = 0;
 	public final static int CLAUSE_SALVAGE = 1;
 	public final static int CLAUSE_SUPPORT = 2;
 	public final static int CLAUSE_TRANSPORT = 3;
 	public final static int CLAUSE_NUM = 4;
 
-	private int method = TYPE_ATBMONTHLY;
+	protected int method = TYPE_ATBMONTHLY;
 
-	private ArrayList<Contract> contracts;
-	private int lastId = 0;
-	private HashMap<Integer, Contract> contractIds;
+	protected ArrayList<Contract> contracts;
+	protected int lastId = 0;
+	protected HashMap<Integer, Contract> contractIds;
 	private HashMap<Integer, ClauseMods> clauseMods;
 
 	/* It is possible to call addFollowup more than once for the
@@ -290,7 +289,7 @@ public class ContractMarket implements Serializable {
 	/* If no suitable planet can be found or no jump path to the planet can be calculated after
 	 * the indicated number of retries, this will return null.
 	 */
-	private AtBContract generateAtBContract(Campaign campaign, int unitRatingMod) {
+	protected AtBContract generateAtBContract(Campaign campaign, int unitRatingMod) {
 		if (campaign.getFactionCode().equals("MERC")) {
 			if (null == campaign.getRetainerEmployerCode()) {
 				int retries = 3;
@@ -317,7 +316,7 @@ public class ContractMarket implements Serializable {
 		return generateAtBContract(campaign, employer, unitRatingMod, 3);
 	}
 
-	private AtBContract generateAtBContract(Campaign campaign,
+	protected AtBContract generateAtBContract(Campaign campaign,
 			String employer, int unitRatingMod, int retries) {
 		AtBContract contract = new AtBContract("New Contract");
         lastId++;
@@ -820,7 +819,14 @@ public class ContractMarket implements Serializable {
 
         try {
             // Instantiate the correct child class, and call its parsing function.
-            retVal = new ContractMarket();
+        	if(c.getFactionCode().equals("PIR"))
+        	{
+        		retVal = new PirateContractMarket();
+        	}
+        	else
+        	{
+        		retVal = new ContractMarket();
+        	}
 
             // Okay, now load Part-specific fields!
             NodeList nl = wn.getChildNodes();
