@@ -23,6 +23,7 @@ package mekhq.campaign.market;
 
 import java.io.PrintWriter;
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -319,7 +320,11 @@ public class ContractMarket implements Serializable {
 
 	private AtBContract generateAtBContract(Campaign campaign,
 			String employer, int unitRatingMod, int retries) {
-		AtBContract contract = new AtBContract("New Contract");
+		AtBContract contract = new AtBContract(employer
+				+"-"
+				+Contract.generateRandomContractName()
+				+"-"
+				+(new SimpleDateFormat("yyyyMM")).format(campaign.calendar.getTime()));
         lastId++;
         contract.setId(lastId);
         contractIds.put(lastId, contract);

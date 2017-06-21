@@ -27,5 +27,7 @@
 	<classpathentry kind="lib" path="lib/vecmath.jar"/>
 	<classpathentry kind="lib" path="MegaMek.jar"/>
 	<classpathentry kind="lib" path="MegaMekLab.jar"/>
+	<classpathentry kind="lib" path="lib/commons-lang3-3.5.jar"/>
+	<classpathentry kind="lib" path="lib/commons-text-1.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
