@@ -290,7 +290,10 @@ public class Mission implements Serializable, MekHqXmlSerializable {
 							continue;
 						}
 						Scenario s = Scenario.generateInstanceFromXML(wn3, c, version);
-						retVal.addScenario(s);
+						
+						if (null != s) {
+							retVal.addScenario(s);
+						}
 					}
 				} 
 			}

@@ -44,6 +44,7 @@ import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.market.UnitMarket;
+import mekhq.campaign.mission.atb.AtBScenarioFactory;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.rating.IUnitRating;
@@ -557,14 +558,11 @@ public class AtBContract extends Contract implements Serializable {
 			/* Special Missions get no points for victory and and only -1
 			 * for defeat.
 			 */
-			if (s instanceof AtBScenario &&
-					((AtBScenario)s).getBattleType() >= AtBScenario.SPECIALMISSIONS &&
-						((AtBScenario)s).getBattleType() < AtBScenario.BIGBATTLES) {
+			if (s instanceof AtBScenario && ((AtBScenario)s).isSpecialMission()) {
 				if (s.getStatus() == Scenario.S_DEFEAT ||
 						s.getStatus() == Scenario.S_MDEFEAT) {
 					score--;
-				}
-				
+				}				
 			} else {
 				switch (s.getStatus()) {
 				case Scenario.S_VICTORY:
@@ -583,7 +581,7 @@ public class AtBContract extends Contract implements Serializable {
 				}
 			}
 			if (s instanceof AtBScenario
-					&& ((AtBScenario)s).getBattleType() == AtBScenario.BASEATTACK
+					&& ((AtBScenario)s).getScenarioType() == AtBScenario.BASEATTACK
 					&& ((AtBScenario)s).isAttacker()
 					&& (s.getStatus() == Scenario.S_VICTORY ||
 					s.getStatus() == Scenario.S_MVICTORY)) {
@@ -878,9 +876,10 @@ public class AtBContract extends Contract implements Serializable {
 			}
 			nextMonday.add(Calendar.DAY_OF_WEEK, Calendar.MONDAY - c.getCalendar().get(Calendar.DAY_OF_WEEK));
 			if (specialEventScenarioDate.before(nextMonday.getTime())) {	
-				AtBScenario s = new AtBScenario(c, null,
+				AtBScenario s = AtBScenarioFactory.createScenario(c, null,
 						specialEventScenarioType, false,
 						specialEventScenarioDate);
+
 				c.addScenario(s, this);
 				if (c.getCampaignOptions().getUsePlanetaryConditions()) {
 					s.setPlanetaryConditions(this, c);
