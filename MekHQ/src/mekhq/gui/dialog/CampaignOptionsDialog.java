@@ -4128,8 +4128,15 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         if (gameOpts.intOption("year") != campaignYear) {
             gameOpts.getOption("year").setValue(campaignYear);
         }
+        
+        String oldFactionCode = campaign.getFactionCode();
         campaign.setFactionCode(Faction.getFactionFromFullNameAndEra
         		(String.valueOf(comboFaction.getSelectedItem()), Era.getEra(date.get(Calendar.YEAR))).getShortName());
+        if(!oldFactionCode.equals(campaign.getFactionCode()))
+        {
+        	campaign.initializeNewContractMarket();
+        }
+        
         if (null != comboFactionNames.getSelectedItem()) {
             campaign.getRNG().setChosenFaction((String) comboFactionNames.getSelectedItem());
         }

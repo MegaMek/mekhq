@@ -486,8 +486,18 @@ public class Campaign implements Serializable {
     	return contractMarket;
     }
 
-    public void generateNewContractMarket() {
-    	contractMarket.generateContractOffers(this);
+    // This function clears the campaign's existing contract market
+    // and generates a brand new instance based on the campaign's current faction
+    // use with caution :)
+    public void initializeNewContractMarket() {
+    	if(Faction.getFaction(factionCode).is(Tag.PIRATE))
+    	{
+    		contractMarket = new PirateContractMarket();
+    	}
+    	else
+    	{
+    		contractMarket = new ContractMarket();
+    	}
     }
 
     public UnitMarket getUnitMarket() {
@@ -3000,13 +3010,7 @@ public class Campaign implements Serializable {
     }
 
     public void setFactionCode(String i) {
-    	
-    	if(Faction.getFaction(i).is(Tag.PIRATE))
-    	{
-    		contractMarket = new PirateContractMarket();
-    	}
-    	
-        this.factionCode = i;
+    	this.factionCode = i;
     }
 
     public String getFactionCode() {

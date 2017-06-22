@@ -1,24 +1,17 @@
 package mekhq.campaign.market;
 
-import java.io.Console;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-import org.joda.time.DateTime;
-
 import megamek.client.RandomSkillsGenerator;
-import megamek.common.Compute;
-import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBPirateContract;
 import mekhq.campaign.mission.Contract;
-import mekhq.campaign.mission.Mission;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Faction.Tag;
@@ -26,6 +19,8 @@ import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.Planets;
 import mekhq.campaign.universe.RandomFactionGenerator;
 
+// This class handles functionality relating to "contract" generation 
+// for the pirate-specific contract market
 public class PirateContractMarket extends ContractMarket 
 {
 	private static final long serialVersionUID = 3597397030650454074L;
@@ -38,10 +33,11 @@ public class PirateContractMarket extends ContractMarket
 		random = new Random();
 	}
 	
+	@Override
 	public void generateContractOffers(Campaign campaign, boolean newCampaign) {
-		if ((method == TYPE_ATBMONTHLY && campaign.getCalendar().get(Calendar.DAY_OF_MONTH) == 1) ||
+		if ((getContractGenerationPeriod() == TYPE_ATBMONTHLY && campaign.getCalendar().get(Calendar.DAY_OF_MONTH) == 1) ||
 				newCampaign) {
-			Contract[] list = contracts.toArray(new Contract[contracts.size()]);
+			Contract[] list = getContracts().toArray(new Contract[getContracts().size()]);
 			for (Contract c : list) {
 				removeContract(c);
 			}
@@ -52,9 +48,9 @@ public class PirateContractMarket extends ContractMarket
 			
 			AtBContract c = generateAtBContract(campaign, IUnitRating.DRAGOON_F);
 			
-			if (c != null) {
-				
-				contracts.add(c);
+			if (c != null) 
+			{
+				getContracts().add(c);
 			}
 			
 	        if (campaign.getCampaignOptions().getContractMarketReportRefresh()) {
@@ -63,6 +59,7 @@ public class PirateContractMarket extends ContractMarket
 		}
 	}
 	
+	@Override
 	protected AtBContract generateAtBContract(Campaign campaign, int unitRatingMod)
 	{
 		// pirate "contract" generation works differently per AtB
@@ -97,14 +94,13 @@ public class PirateContractMarket extends ContractMarket
 		return generateAtBContract(campaign);
 	}
 	
-	// override of generateAtBContract from the base class (ContractMarket.java)
+	// overload of generateAtBContract from the base class (ContractMarket.java)
 	// returns an instance of an AtBPirateContract instead of an AtBContract
+	// takes only a campaign object, as a unit rating mod is unnecessary in this context
 	protected AtBPirateContract generateAtBContract(Campaign campaign) 
 	{
 		AtBPirateContract contract = new AtBPirateContract("New Pirate Contract");
-        lastId++;
-        contract.setId(lastId);
-        contractIds.put(lastId, contract);
+		incrementIDAndAddContract(contract);
 
         contract.setEmployerCode("PIR", campaign.getEra());
 		contract.setMissionType(findAtBMissionType());

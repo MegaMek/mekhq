@@ -23,6 +23,7 @@ public class AtBPirateContract extends AtBContract implements Serializable
 	
 	// override of initContractDetails from AtBContract
 	// pirates do not require any lances to be deployed, nor does anyone pay them overhead compensation
+	@Override
 	public void initContractDetails(Campaign campaign)
 	{
 		allyBotName = getEmployerName(campaign.getEra());
@@ -31,8 +32,9 @@ public class AtBPirateContract extends AtBContract implements Serializable
 		setRequiredLances(0);
 	}
 	
-	// override of getRequiredLanceType from AtBContract
+	// override of static getRequiredLanceType from AtBContract
 	// pirates don't require any kind of lance when looting and pillaging
+	// not marked with "@override" as it is not valid on static methods apparently
 	public static int getRequiredLanceType(int missionType)
 	{
 		return LanceAssignmentView.ROLE_NONE;

@@ -74,11 +74,11 @@ public class ContractMarket implements Serializable {
 	public final static int CLAUSE_TRANSPORT = 3;
 	public final static int CLAUSE_NUM = 4;
 
-	protected int method = TYPE_ATBMONTHLY;
+	private int method = TYPE_ATBMONTHLY;
 
-	protected ArrayList<Contract> contracts;
-	protected int lastId = 0;
-	protected HashMap<Integer, Contract> contractIds;
+	private ArrayList<Contract> contracts;
+	private int lastId = 0;
+	private HashMap<Integer, Contract> contractIds;
 	private HashMap<Integer, ClauseMods> clauseMods;
 
 	/* It is possible to call addFollowup more than once for the
@@ -100,7 +100,22 @@ public class ContractMarket implements Serializable {
 	public ArrayList<Contract> getContracts() {
 		return contracts;
 	}
+	
+	// This is a helper function that encapsulates the operation of
+	// incrementing the last ID and adding a contract to the contracts list and contractIds HashMap
+	protected void incrementIDAndAddContract(Contract c)
+	{
+		lastId++;
+        c.setId(lastId);
+        contractIds.put(lastId, c);
+	}
 
+	// Returns the type of time period used to generate contracts (currently, only monthly!)
+	protected int getContractGenerationPeriod()
+	{
+		return method;
+	}
+	
 	public void removeContract(Contract c) {
 		contracts.remove(c);
 		contractIds.remove(c.getId());
@@ -319,9 +334,7 @@ public class ContractMarket implements Serializable {
 	protected AtBContract generateAtBContract(Campaign campaign,
 			String employer, int unitRatingMod, int retries) {
 		AtBContract contract = new AtBContract("New Contract");
-        lastId++;
-        contract.setId(lastId);
-        contractIds.put(lastId, contract);
+		incrementIDAndAddContract(contract);
 
         if (employer.equals("MERC")) {
         	contract.setMercSubcontract(true);
@@ -432,9 +445,7 @@ public class ContractMarket implements Serializable {
 
 		contract.setParentContract(parent);
         contract.initContractDetails(campaign);
-		lastId++;
-		contract.setId(lastId);
-		contractIds.put(lastId, contract);
+        incrementIDAndAddContract(contract);
 
         /* The AtB rules say to roll the enemy, but also that the subcontract
          * takes place in the same planet/sector. Rebels and pirates can
@@ -529,9 +540,7 @@ public class ContractMarket implements Serializable {
 
         followup.initContractDetails(campaign);
         followup.calculateContract(campaign);
-		lastId++;
-		followup.setId(lastId);
-		contractIds.put(lastId, followup);
+        incrementIDAndAddContract(followup);
 
 		contracts.add(followup);
 		followupContracts.put(followup.getId(), contract.getId());
@@ -791,6 +800,7 @@ public class ContractMarket implements Serializable {
 
     public void writeToXml(PrintWriter pw1, int indent) {
         pw1.println(MekHqXmlUtil.indentStr(indent) + "<contractMarket>");
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "contractMarketType", getClass().getCanonicalName());
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "lastId", lastId);
         for (Contract c : contracts) {
             c.writeToXml(pw1, indent + 1);
@@ -818,16 +828,6 @@ public class ContractMarket implements Serializable {
         ContractMarket retVal = null;
 
         try {
-            // Instantiate the correct child class, and call its parsing function.
-        	if(c.getFactionCode().equals("PIR"))
-        	{
-        		retVal = new PirateContractMarket();
-        	}
-        	else
-        	{
-        		retVal = new ContractMarket();
-        	}
-
             // Okay, now load Part-specific fields!
             NodeList nl = wn.getChildNodes();
 
@@ -840,7 +840,9 @@ public class ContractMarket implements Serializable {
                     continue;
                 }
 
-                if (wn2.getNodeName().equalsIgnoreCase("lastId")) {
+                if (wn2.getNodeName().equalsIgnoreCase("contractMarketType")) { 
+                	retVal = Class.forName(wn2.getTextContent()).asSubclass(ContractMarket.class).getConstructor().newInstance();
+                } else if (wn2.getNodeName().equalsIgnoreCase("lastId")) {
                 	retVal.lastId = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("mission")) {
                 	Mission m = Mission.generateInstanceFromXML(wn2, c, version);
