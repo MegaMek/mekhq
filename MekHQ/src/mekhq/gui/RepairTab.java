@@ -83,6 +83,7 @@ import mekhq.gui.sorter.TaskSorter;
 import mekhq.gui.sorter.TechSorter;
 import mekhq.gui.sorter.UnitStatusSorter;
 import mekhq.gui.sorter.UnitTypeSorter;
+import mekhq.service.MassRepairService;
 import mekhq.service.PartsAcquisitionService;
 
 /**
@@ -161,7 +162,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
                 .setToolTipText("Perform Mass Repair/Salvage immediately on all units using active configuration");
         btnMRMSInstantAll.setName("btnMRMSInstantAll"); // NOI18N
         btnMRMSInstantAll.addActionListener(ev -> {
-            MassRepairSalvageDialog.massRepairSalvageAllUnits(getCampaignGui());
+            MassRepairService.massRepairSalvageAllUnits(getCampaignGui());
         });
 
 		btnAcquisitions = new JButton();
