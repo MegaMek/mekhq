@@ -23,6 +23,7 @@ package mekhq.campaign.market;
 
 import java.io.PrintWriter;
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -333,8 +334,19 @@ public class ContractMarket implements Serializable {
 
 	protected AtBContract generateAtBContract(Campaign campaign,
 			String employer, int unitRatingMod, int retries) {
+<<<<<<< HEAD
 		AtBContract contract = new AtBContract("New Contract");
 		incrementIDAndAddContract(contract);
+=======
+		AtBContract contract = new AtBContract(employer
+				+"-"
+				+Contract.generateRandomContractName()
+				+"-"
+				+(new SimpleDateFormat("yyyyMM")).format(campaign.calendar.getTime()));
+        lastId++;
+        contract.setId(lastId);
+        contractIds.put(lastId, contract);
+>>>>>>> branch 'master' of https://github.com/MegaMek/mekhq.git
 
         if (employer.equals("MERC")) {
         	contract.setMercSubcontract(true);
