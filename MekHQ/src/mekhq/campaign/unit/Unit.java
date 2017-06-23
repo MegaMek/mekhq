@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.w3c.dom.NamedNodeMap;
@@ -46,7 +47,6 @@ import megamek.common.Bay;
 import megamek.common.CargoBay;
 import megamek.common.Compute;
 import megamek.common.ConvFighter;
-import megamek.common.Crew;
 import megamek.common.CriticalSlot;
 import megamek.common.Dropship;
 import megamek.common.Engine;
@@ -216,6 +216,8 @@ public class Unit implements MekHqXmlSerializable {
     private ArrayList<UUID> drivers;
     private ArrayList<UUID> gunners;
     private ArrayList<UUID> vesselCrew;
+    //this is the id of the tech officer in a superheavy tripod
+    private UUID techOfficer;
     private UUID navigator;
     //this is the id of the tech assigned for maintenance if any
     private UUID tech;
@@ -1368,6 +1370,12 @@ public class Unit implements MekHqXmlSerializable {
                     +navigator.toString()
                     +"</navigatorId>");
         }
+        if(null != techOfficer) {
+            pw1.println(MekHqXmlUtil.indentStr(indentLvl+1)
+                    +"<techOfficerId>"
+                    +techOfficer.toString()
+                    +"</techOfficerId>");
+        }
         if(null != tech) {
             pw1.println(MekHqXmlUtil.indentStr(indentLvl+1)
                     +"<techId>"
@@ -1486,6 +1494,10 @@ public class Unit implements MekHqXmlSerializable {
                         if(!wn2.getTextContent().equals("null")) {
                             retVal.navigator = UUID.fromString(wn2.getTextContent());
                         }
+                    }
+                } else if (wn2.getNodeName().equalsIgnoreCase("techOfficerId")) {
+                    if(!wn2.getTextContent().equals("null")) {
+                        retVal.techOfficer = UUID.fromString(wn2.getTextContent());
                     }
                 }
                 else if (wn2.getNodeName().equalsIgnoreCase("techId")) {
@@ -2546,7 +2558,125 @@ public class Unit implements MekHqXmlSerializable {
     }
 
     public void resetPilotAndEntity() {
+        if (entity.getCrew().getSlotCount() > 1) {
+            final String driveType = SkillType.getDrivingSkillFor(entity);
+            final String gunType = SkillType.getGunnerySkillFor(entity);
+            if (entity.getCrew().getCrewType().getPilotPos() == entity.getCrew().getCrewType().getGunnerPos()) {
+                //Command console; each crew is assigned as both driver and gunner
+                int slot = 0;
+                for(UUID pid : gunners) {
+                    final Person p = campaign.getPerson(pid);
+                    if (p.hasSkill(gunType) && p.hasSkill(driveType) && p.isActive()
+                            && slot < entity.getCrew().getSlotCount()) {
+                        assignToCrewSlot(p, slot, gunType, driveType);
+                        slot++;
+                    }
+                }
+                while (slot < entity.getCrew().getSlotCount()) {
+                    entity.getCrew().setMissing(true, slot++);
+                }
+            } else {
+                //tripod, quadvee, or dual cockpit; driver and gunner are assigned separately
+                Optional<Person> person = drivers.stream().map(id -> campaign.getPerson(id))
+                        .filter(p -> p.hasSkill(driveType) && p.isActive()).findFirst();
+                if (person.isPresent()) {
+                    assignToCrewSlot(person.get(), 0, gunType, driveType);
+                } else {
+                    entity.getCrew().setMissing(true, 0);
+                }
+                person = gunners.stream().map(id -> campaign.getPerson(id))
+                        .filter(p -> p.hasSkill(driveType) && p.isActive()).findFirst();
+                if (person.isPresent()) {
+                    assignToCrewSlot(person.get(), 1, gunType, driveType);
+                } else {
+                    entity.getCrew().setMissing(true, 1);
+                }
+                int techPos = entity.getCrew().getCrewType().getTechPos();
+                if (techPos >= 0) {
+                    Person to = null;
+                    if (null != techOfficer) {
+                        to = campaign.getPerson(techOfficer);
+                        if (!to.hasSkill(driveType) || !to.hasSkill(gunType) || !to.isActive()) {
+                            to = null;
+                        }
+                    }
+                    if (null != to) {
+                        assignToCrewSlot(to, techPos, gunType, driveType);
+                    } else {
+                        entity.getCrew().setMissing(true, techPos);
+                    }
+                }
+            }
+        } else {
+            calcCompositeCrew();
+            if (entity.getCrew().isMissing(0)) {
+                return;
+            }
+            Person commander = getCommander();
+            if(null == commander) {
+                entity.getCrew().setMissing(true, 0);
+                return;
+            }
+            entity.getCrew().setName(commander.getFullTitle(), 0);
+            entity.getCrew().setNickname(commander.getCallsign(), 0);
+            entity.getCrew().setPortraitCategory(commander.getPortraitCategory(), 0);
+            entity.getCrew().setPortraitFileName(commander.getPortraitFileName(), 0);
+            entity.getCrew().setExternalIdAsString(commander.getId().toString(), 0);
+            entity.getCrew().setToughness(commander.getToughness(), 0);
+            
+            if (entity instanceof Tank) {
+                ((Tank)entity).setCommanderHit(commander.getHits() > 0);
+            }
+            entity.getCrew().setMissing(false, 0);
+        }
 
+        // Clear any stale game data that may somehow have gotten set incorrectly
+        campaign.clearGameData(entity);
+        //create a new set of options. For now we will just assign based on commander, but
+        //we really should be more detailed about this.
+        Person commander = getCommander();
+        if (null != commander) {
+            if (campaign.getCampaignOptions().useAbilities()) {
+                PilotOptions options = new PilotOptions();
+                for (Enumeration<IOptionGroup> i = options.getGroups(); i.hasMoreElements();) {
+                     IOptionGroup group = i.nextElement();
+                     for (Enumeration<IOption> j = group.getOptions(); j.hasMoreElements();) {
+                         IOption option = j.nextElement();
+                         option.setValue(commander.getOptions().getOption(option.getName()).getValue());
+                     }
+                }
+                entity.getCrew().setOptions(options);
+            }
+            if(usesSoloPilot()) {
+                if(!commander.isActive()) {
+                    entity.getCrew().setMissing(true, 0);;
+                    return;
+                }
+                entity.getCrew().setHits(commander.getHits(), 0);
+            }
+            resetEngineer();
+            //TODO: game option to use tactics as command and ind init bonus
+            if(commander.hasSkill(SkillType.S_TACTICS)) {
+                entity.getCrew().setCommandBonus(commander.getSkill(SkillType.S_TACTICS).getFinalSkillValue());
+            } else {
+                entity.getCrew().setCommandBonus(0);
+            }
+        }
+    }
+
+    /**
+     * For vehicles, infantry, and naval vessels, compute the piloting and gunnery skills based
+     * on the crew as a whole.
+     * 
+     * @return The size of the crew.
+     */
+    private void calcCompositeCrew() {
+        if (drivers.isEmpty() && gunners.isEmpty()) {
+            entity.getCrew().setMissing(true, 0);
+            entity.getCrew().setSize(0);
+            return;
+        }
+        
         int piloting = 13;
         int gunnery = 13;
         int artillery = 13;
@@ -2573,10 +2703,10 @@ public class Unit implements MekHqXmlSerializable {
             }
 
             if (entity instanceof Tank
-            		&& Compute.getFullCrewSize(entity) == 1
-            		&& p.hasSkill(gunType)) {
-            	sumGunnery += p.getSkill(gunType).getFinalSkillValue();
-            	nGunners++;
+                    && Compute.getFullCrewSize(entity) == 1
+                    && p.hasSkill(gunType)) {
+                sumGunnery += p.getSkill(gunType).getFinalSkillValue();
+                nGunners++;
             }
             if(campaign.getCampaignOptions().useAdvancedMedical()) {
                 sumPiloting += p.getPilotingInjuryMod();
@@ -2610,6 +2740,19 @@ public class Unit implements MekHqXmlSerializable {
             Person p = campaign.getPerson(navigator);
             if(null !=p && p.getHits() == 0) {
                 nCrew++;
+            }
+        }
+        //Using the tech officer field for the secondary commander; if nobody assigned to the command
+        //console we will flag the entity as using the console commander, which has the effect of limiting
+        //the tank to a single commander. As the console commander is not counted against crew requirements,
+        //we do not increase nCrew if present.
+        if (entity instanceof Tank && ((Tank)entity).hasWorkingMisc(MiscType.F_COMMAND_CONSOLE)) {
+            Person p = null;
+            if (null != techOfficer) {
+                p = campaign.getPerson(techOfficer);
+            }
+            if (null == p || p.getHits() > 0) {
+                ((Tank)entity).setUsingConsoleCommander(true);
             }
         }
 
@@ -2654,77 +2797,27 @@ public class Unit implements MekHqXmlSerializable {
             }
             entity.setInternal(nGunners, Infantry.LOC_INFANTRY);
         }
-        if(drivers.isEmpty() && gunners.isEmpty()) {
-            entity.setCrew(null);
-            return;
-        }
-        Person commander = getCommander();
-        if(null == commander) {
-            entity.setCrew(null);
-            return;
-        }
-
-        // Clear any stale game data that may somehow have gotten set incorrectly
-        campaign.clearGameData(entity);
         
-        //TODO: For the moment we need to max these out at 8 so people don't get errors
-        //when they customize in MM but we should put an option in MM to ignore those limits
-        //and set it to true when we start up through MHQ
-        gunnery = Math.min(Math.max(gunnery, 0), 7);
-        piloting = Math.min(Math.max(piloting, 0), 8);
-        artillery = Math.min(Math.max(artillery, 0), 7);
-        Crew pilot = new Crew(commander.getFullTitle(), 1, gunnery, piloting);
-        pilot.setPortraitCategory(commander.getPortraitCategory());
-        pilot.setPortraitFileName(commander.getPortraitFileName());
-        pilot.setNickname(commander.getCallsign());
-        pilot.setExternalIdAsString(commander.getId().toString());
-        pilot.setArtillery(artillery);
-        //create a new set of options. For now we will just assign based on commander, but
-        //we really should be more detailed about this.
-        if (campaign.getCampaignOptions().useAbilities()) {
-	        PilotOptions options = new PilotOptions();
-	        for (Enumeration<IOptionGroup> i = options.getGroups(); i.hasMoreElements();) {
-	             IOptionGroup group = i.nextElement();
-	             for (Enumeration<IOption> j = group.getOptions(); j.hasMoreElements();) {
-	                 IOption option = j.nextElement();
-	                 option.setValue(commander.getOptions().getOption(option.getName()).getValue());
-	             }
-	        }
-	        pilot.setOptions(options);
-        }
-        if(usesSoloPilot()) {
-            if(!commander.isActive()) {
-                entity.setCrew(null);
-                return;
-            }
-            pilot.setHits(commander.getHits());
-        }
-        else if(entity instanceof Tank) {
+        if(entity instanceof Tank) {
             if(nDrivers == 0 && nGunners == 0) {
                 //nobody is healthy
-                entity.setCrew(null);
+                entity.getCrew().setSize(0);
+                entity.getCrew().setMissing(true, 0);
                 return;
-            }
-            if(commander.getHits() > 0) {
-                ((Tank)entity).setCommanderHit(true);
-            } else {
-                ((Tank)entity).setCommanderHit(false);
-
             }
             if(nDrivers == 0) {
                 ((Tank)entity).setDriverHit(true);
             } else {
                 ((Tank)entity).setDriverHit(false);
             }
-        }
-        else if(entity instanceof Infantry) {
+        } else if(entity instanceof Infantry) {
             if(nDrivers == 0 && nGunners == 0) {
                 //nobody is healthy
-                entity.setCrew(null);
+                entity.getCrew().setSize(0);
+                entity.getCrew().setMissing(true, 0);
                 return;
-            }
-        }
-        else if(entity instanceof SmallCraft || entity instanceof Jumpship) {
+            } 
+        } else if(entity instanceof SmallCraft || entity instanceof Jumpship) {
             //assign crew hits based on what percent of the crew is present
             int currentSize = nDrivers + nGunners + nCrew;
             double percent = Math.max(0.0, 1.0 - (1.0 * currentSize)/getFullCrewSize());
@@ -2733,16 +2826,55 @@ public class Unit implements MekHqXmlSerializable {
                 //at least one hit if less than full staffed
                 hits = 1;
             }
-            pilot.setHits(hits);
-        }
-        resetEngineer();
-        pilot.setToughness(commander.getToughness());
-        //TODO: game option to use tactics as command and ind init bonus
-        if(commander.hasSkill(SkillType.S_TACTICS)) {
-            pilot.setCommandBonus(commander.getSkill(SkillType.S_TACTICS).getFinalSkillValue());
+            entity.getCrew().setHits(hits, 0);
         }
 
-        entity.setCrew(pilot);
+        //TODO: For the moment we need to max these out at 8 so people don't get errors
+        //when they customize in MM but we should put an option in MM to ignore those limits
+        //and set it to true when we start up through MHQ
+        entity.getCrew().setPiloting(Math.min(Math.max(piloting, 0), 8), 0);
+        entity.getCrew().setGunnery(Math.min(Math.max(gunnery, 0), 7), 0);
+        entity.getCrew().setArtillery(Math.min(Math.max(artillery, 7), 8), 0);
+        entity.getCrew().setSize(nCrew);
+        entity.getCrew().setMissing(false, 0);
+    }
+    
+    /**
+     * Sets the values of a slot in the entity crew for the indicated person.
+     * 
+     * @param p
+     * @param slot
+     * @param gunType
+     * @param driveType
+     */
+    private void assignToCrewSlot(Person p, int slot, String gunType, String driveType) {
+        entity.getCrew().setName(p.getFullTitle(), slot);
+        entity.getCrew().setNickname(p.getCallsign(), slot);
+        entity.getCrew().setPortraitCategory(p.getPortraitCategory(), slot);
+        entity.getCrew().setPortraitFileName(p.getPortraitFileName(), slot);
+        entity.getCrew().setHits(p.getHits(), slot);
+        int gunnery = 7;
+        int artillery = 7;
+        int piloting = 8;
+        if (p.hasSkill(gunType)) {
+            gunnery = p.getSkill(gunType).getFinalSkillValue();
+        }
+        if (campaign.getCampaignOptions().useAdvancedMedical()) {
+            gunnery += p.getGunneryInjuryMod();
+        }
+        if (p.hasSkill(driveType)) {
+            piloting = p.getSkill(driveType).getFinalSkillValue();
+        }
+        if (p.hasSkill(SkillType.S_ARTILLERY)
+                && p.getSkill(SkillType.S_ARTILLERY).getFinalSkillValue() < artillery) {
+            artillery = p.getSkill(SkillType.S_ARTILLERY).getFinalSkillValue();
+        }
+        entity.getCrew().setPiloting(Math.min(Math.max(piloting, 0), 8), slot);
+        entity.getCrew().setGunnery(Math.min(Math.max(gunnery, 0), 7), slot);
+        entity.getCrew().setArtillery(Math.min(Math.max(artillery, 0), 7), slot);
+        entity.getCrew().setToughness(p.getToughness(), slot);
+        entity.getCrew().setExternalIdAsString(p.getId().toString(), slot);
+        entity.getCrew().setMissing(false, slot);
     }
 
     public void resetEngineer() {
@@ -2880,9 +3012,16 @@ public class Unit implements MekHqXmlSerializable {
         }
         return false;
     }
-
+    
     public boolean canTakeNavigator() {
         return entity instanceof Jumpship && !(entity instanceof SpaceStation) && navigator == null;
+    }
+
+    public boolean canTakeTechOfficer() {
+        return techOfficer == null &&
+                (entity.getCrew().getCrewType().getTechPos() >= 0
+                //Use techOfficer field for secondary commander
+                || (entity instanceof Tank && entity.hasWorkingMisc(MiscType.F_COMMAND_CONSOLE)));
     }
 
     public boolean canTakeTech() {
@@ -2905,9 +3044,10 @@ public class Unit implements MekHqXmlSerializable {
         //Taharqa: I dont think we should do it based on computed size, but whether the unit logically
         //is the type of unit that has only one pilot. This is partly because there may be some vees
         //that only have one pilot and this is also a problem for BA units with only one active suit
-        return (entity instanceof Mech)
+        return ((entity instanceof Mech)
                 || (entity instanceof Protomech)
-                || (entity instanceof Aero && !(entity instanceof SmallCraft) && !(entity instanceof Jumpship));
+                || (entity instanceof Aero && !(entity instanceof SmallCraft) && !(entity instanceof Jumpship)))
+                && (entity.getCrew().getCrewType().getPilotPos() == entity.getCrew().getCrewType().getGunnerPos());
     }
 
     public boolean usesSoldiers() {
@@ -2915,12 +3055,7 @@ public class Unit implements MekHqXmlSerializable {
     }
 
     public void addDriver(Person p) {
-        ensurePersonIsRegistered(p);
-        drivers.add(p.getId());
-        p.setUnitId(getId());
-        resetPilotAndEntity();
-        p.addLogEntry(campaign.getDate(), "Assigned to " + getName());
-        MekHQ.triggerEvent(new PersonCrewAssignmentEvent(p, this));
+        addDriver(p, false);
     }
 
     public void addDriver(Person p, boolean useTransfers) {
@@ -2937,12 +3072,7 @@ public class Unit implements MekHqXmlSerializable {
     }
 
     public void addGunner(Person p) {
-        ensurePersonIsRegistered(p);
-        gunners.add(p.getId());
-        p.setUnitId(getId());
-        resetPilotAndEntity();
-        p.addLogEntry(campaign.getDate(), "Assigned to " + getName());
-        MekHQ.triggerEvent(new PersonCrewAssignmentEvent(p, this));
+        addGunner(p, false);
     }
 
     public void addGunner(Person p, boolean useTransfers) {
@@ -2959,12 +3089,7 @@ public class Unit implements MekHqXmlSerializable {
     }
 
     public void addVesselCrew(Person p) {
-        ensurePersonIsRegistered(p);
-        vesselCrew.add(p.getId());
-        p.setUnitId(getId());
-        resetPilotAndEntity();
-        p.addLogEntry(campaign.getDate(), "Assigned to " + getName());
-        MekHQ.triggerEvent(new PersonCrewAssignmentEvent(p, this));
+        addVesselCrew(p, false);
     }
 
     public void addVesselCrew(Person p, boolean useTransfers) {
@@ -2981,17 +3106,33 @@ public class Unit implements MekHqXmlSerializable {
     }
 
     public void setNavigator(Person p) {
+        setNavigator(p, false);
+    }
+    
+    public void setNavigator(Person p, boolean useTransfers) {
         ensurePersonIsRegistered(p);
         navigator = p.getId();
         p.setUnitId(getId());
         resetPilotAndEntity();
-        p.addLogEntry(campaign.getDate(), "Assigned to " + getName());
+        if (useTransfers) {
+            p.addLogEntry(campaign.getDate(), "Reassigned to " + getName());
+        } else {
+            p.addLogEntry(campaign.getDate(), "Assigned to " + getName());
+        }
         MekHQ.triggerEvent(new PersonCrewAssignmentEvent(p, this));
     }
+    
+    public boolean isTechOfficer(Person p) {
+        return null != techOfficer && techOfficer.equals(p.getId());
+    }
 
-    public void setNavigator(Person p, boolean useTransfers) {
+    public void setTechOfficer(Person p) {
+        setTechOfficer(p, false);
+    }
+
+    public void setTechOfficer(Person p, boolean useTransfers) {
         ensurePersonIsRegistered(p);
-        navigator = p.getId();
+        techOfficer = p.getId();
         p.setUnitId(getId());
         resetPilotAndEntity();
         if (useTransfers) {
@@ -3029,19 +3170,16 @@ public class Unit implements MekHqXmlSerializable {
     }
     
     public void addPilotOrSoldier(Person p) {
-        ensurePersonIsRegistered(p);
-        drivers.add(p.getId());
-        gunners.add(p.getId());
-        p.setUnitId(getId());
-        resetPilotAndEntity();
-        p.addLogEntry(campaign.getDate(), "Assigned to " + getName());
-        MekHQ.triggerEvent(new PersonCrewAssignmentEvent(p, this));
+        addPilotOrSoldier(p, false);
     }
 
     public void addPilotOrSoldier(Person p, boolean useTransfers) {
         ensurePersonIsRegistered(p);
         drivers.add(p.getId());
-        gunners.add(p.getId());
+        //Multi-crew cockpits should not set the pilot to the gunner position 
+        if (entity.getCrew().getCrewType().getPilotPos() == entity.getCrew().getCrewType().getGunnerPos()) {
+            gunners.add(p.getId());
+        }
         p.setUnitId(getId());
         resetPilotAndEntity();
         if (useTransfers) {
@@ -3065,6 +3203,9 @@ public class Unit implements MekHqXmlSerializable {
             vesselCrew.remove(p.getId());
             if(p.getId().equals(navigator)) {
                 navigator = null;
+            }
+            if (p.getId().equals(techOfficer)) {
+                techOfficer = null;
             }
             if((null != engineer) && p.getId().equals(engineer.getId())) {
             	engineer = null;
@@ -3122,6 +3263,12 @@ public class Unit implements MekHqXmlSerializable {
         if(navigator != null) {
             Person p = campaign.getPerson(navigator);
             if(null != p) {
+                crew.add(p);
+            }
+        }
+        if (techOfficer != null) {
+            Person p = campaign.getPerson(techOfficer);
+            if (null != p) {
                 crew.add(p);
             }
         }
@@ -3230,9 +3377,15 @@ public class Unit implements MekHqXmlSerializable {
                 crew.add(p);
             }
         }
-        if(navigator != null) {
+        if (null != navigator) {
             Person p = campaign.getPerson(navigator);
             if(null != p) {
+                crew.add(p);
+            }
+        }
+        if (techOfficer != null) {
+            Person p = campaign.getPerson(techOfficer);
+            if (null != p) {
                 crew.add(p);
             }
         }

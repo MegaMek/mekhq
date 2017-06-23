@@ -19,14 +19,19 @@
 
 package mekhq.gui;
 
+import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 
 import javax.swing.DropMode;
+import javax.swing.JList;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTree;
+import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.tree.TreeSelectionModel;
 
@@ -45,6 +50,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.adapter.OrgTreeMouseAdapter;
 import mekhq.gui.handler.OrgTreeTransferHandler;
+import mekhq.gui.model.CrewListModel;
 import mekhq.gui.model.OrgTreeModel;
 import mekhq.gui.view.ForceViewPanel;
 import mekhq.gui.view.PersonViewPanel;
@@ -136,13 +142,45 @@ public final class TOETab extends CampaignGuiTab {
         if (node instanceof Unit) {
             Unit u = ((Unit) node);
             JTabbedPane tabUnit = new JTabbedPane();
-            Person p = u.getCommander();
-            if (p != null) {
-                String name = "Commander";
+            int crewSize = u.getCrew().size(); 
+            if (crewSize > 0) {
+                JPanel crewPanel = new JPanel(new BorderLayout());
+                final JScrollPane scrollPerson = new JScrollPane();
+                crewPanel.add(scrollPerson, BorderLayout.CENTER);
+                CrewListModel model = new CrewListModel();
+                model.setData(u);
+                /* For units with multiple crew members, present a horizontal list above the PersonViewPanel.
+                 * This custom version of JList was the only way I could figure out how to limit the JList
+                 * to a single row with a horizontal scrollbar.
+                 */
+                final JList<Person> crewList = new JList<Person>(model) {
+                    private static final long serialVersionUID = 2138771416032676227L;
+                    @Override
+                    public Dimension getPreferredScrollableViewportSize() {
+                        Dimension d = super.getPreferredScrollableViewportSize();
+                        d.width = scrollPerson.getPreferredSize().width;
+                        return d;
+                    }
+                };
+                crewList.setCellRenderer(model.getRenderer(getIconPackage()));
+                crewList.setLayoutOrientation(JList.HORIZONTAL_WRAP);
+                crewList.setVisibleRowCount(1);
+                crewList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+                crewList.addListSelectionListener(e -> {
+                    if (null != model.getElementAt(crewList.getSelectedIndex())) {
+                        scrollPerson.setViewportView(new PersonViewPanel(model.getElementAt(crewList.getSelectedIndex()),
+                                getCampaign(), getIconPackage()));
+                    }
+                });
+                crewList.setSelectedIndex(0);
+                if (crewSize > 1) {
+                    crewPanel.add(new JScrollPane(crewList), BorderLayout.NORTH);
+                }
+                String name = "Crew";
                 if (u.usesSoloPilot()) {
                     name = "Pilot";
                 }
-                tabUnit.add(name, new PersonViewPanel(p, getCampaign(), getIconPackage()));
+                tabUnit.add(name, crewPanel);
             }
             tabUnit.add("Unit",
                     new UnitViewPanel(u, getCampaign(), getIconPackage().getCamos(), getIconPackage().getMechTiles()));

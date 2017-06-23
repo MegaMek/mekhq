@@ -6529,6 +6529,8 @@ public class Campaign implements Serializable {
             } else if (unit.getEntity() instanceof SmallCraft
                        || unit.getEntity() instanceof Jumpship) {
                 p = newPerson(Person.T_SPACE_GUNNER);
+            } else if (unit.getEntity() instanceof Mech) {
+                p = newPerson(Person.T_MECHWARRIOR);
             }
             if (!recruitPerson(p)) {
                 return;
@@ -6548,6 +6550,19 @@ public class Campaign implements Serializable {
                 return;
             }
             unit.setNavigator(p);
+        }
+        if (unit.canTakeTechOfficer()) {
+            Person p = null;
+            //For vehicle command console we will default to gunner
+            if (unit.getEntity() instanceof Tank) {
+                p = newPerson(Person.T_VEE_GUNNER);
+            } else {
+                p = newPerson(Person.T_MECHWARRIOR);
+            }
+            if (!recruitPerson(p)) {
+                return;
+            }
+            unit.setTechOfficer(p);
         }
         unit.resetPilotAndEntity();
         unit.runDiagnostic(false);

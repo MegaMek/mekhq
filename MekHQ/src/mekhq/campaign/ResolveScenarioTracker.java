@@ -55,6 +55,7 @@ import megamek.common.MechFileParser;
 import megamek.common.MechSummary;
 import megamek.common.MechSummaryCache;
 import megamek.common.MechWarrior;
+import megamek.common.MiscType;
 import megamek.common.Mounted;
 import megamek.common.Protomech;
 import megamek.common.SmallCraft;
@@ -507,7 +508,7 @@ public class ResolveScenarioTracker {
             }
             //check for an ejected entity and if we find one then assign it instead to switch vees
             //over to infantry checks for casualties
-            Entity ejected = ejections.get(u.getCommander().getId());
+            Entity ejected = ejections.get(UUID.fromString(en.getCrew().getExternalIdAsString()));
             //determine total casualties for infantry and large craft
             int casualties = 0;
             int casualtiesAssigned = 0;
@@ -552,8 +553,17 @@ public class ResolveScenarioTracker {
             //try to find the crew in our pilot and mia vectors
             Crew pilot = pilots.get(u.getCommander().getId());
             boolean missingCrew = false;
-            if(null == pilot) {
-                pilot = mia.get(u.getCommander().getId());
+            //For multi-crew cockpits, the crew id is the first slot, which is not necessarily the commander
+            if (null == pilot) {
+                for (Person p : u.getCrew()) {
+                    if (pilots.containsKey(p.getId())) {
+                        pilot = pilots.get(p.getId());
+                        break;
+                    }
+                }
+            }
+            if (null == pilot) {
+                pilot = mia.get(UUID.fromString(en.getCrew().getExternalIdAsString()));
                 missingCrew = true;
             }
             for(Person p : crew) {
@@ -564,6 +574,15 @@ public class ResolveScenarioTracker {
                 if(null == pilot) {
                     status.setHits(6);
                     status.setDead(true);
+                }
+                //multi-crewed cockpit; set each crew member separately
+                else if (pilot.getSlotCount() > 1) {
+                    for (int slot = 0; slot < pilot.getSlotCount(); slot++) {
+                        if (p.getId().toString().equals(pilot.getExternalIdAsString(slot))) {
+                            status.setHits(pilot.getHits(slot));
+                            break;
+                        }
+                    }
                 }
                 //cant do the following by u.usesSoloPilot because entity may be different if ejected
                 else if(en instanceof Mech
@@ -601,8 +620,18 @@ public class ResolveScenarioTracker {
                                 status.setHits(6);
                                 status.setDead(true);
                             }
-                        }
-                        else if(((Tank)en).isCommanderHit() && u.isCommander(p)) {
+                        } else if (((Tank)en).isCommanderHit() && (u.isCommander(p)
+                                || u.isTechOfficer(p))) {
+                            //If there is a command console, the commander hit flag is set on the second such critical,
+                            //which means both commanders have been hit.
+                            if(Compute.d6(2) >= 7) {
+                                wounded = true;
+                            } else {
+                                status.setHits(6);
+                                status.setDead(true);
+                            }
+                        } else if (((Tank)en).isUsingConsoleCommander() && u.isCommander(p)) {
+                            //This flag is set after the first commander hit critical.
                             if(Compute.d6(2) >= 7) {
                                 wounded = true;
                             } else {
@@ -676,6 +705,7 @@ public class ResolveScenarioTracker {
                 //For vees we may need to know the commander or driver, which aren't assigned for TestUnit.
                 Person commander = null;
                 Person driver = null;
+                Person console = null;
                 if (en instanceof Tank) {
                     //Prefer gunner over driver, as in Unit::getCommander
                     for (Person p : crew) {
@@ -685,6 +715,14 @@ public class ResolveScenarioTracker {
                                 || p.getPrimaryRole() == Person.T_VTOL_PILOT
                                 || p.getPrimaryRole() == Person.T_NVEE_DRIVER) {
                             driver = p;
+                        }
+                    }
+                    if (en.hasWorkingMisc(MiscType.F_COMMAND_CONSOLE)) {
+                        for (Person p : crew) {
+                            if (p != commander && p != driver) {
+                                console = p;
+                                break;
+                            }
                         }
                     }
                 }
@@ -716,20 +754,32 @@ public class ResolveScenarioTracker {
                 for(Person p : crew) {
                     // Give them a UUID. We won't actually use this for the campaign, but to
                     //identify them in the prisonerStatus hash
-                    UUID id = UUID.randomUUID();
-                    while (prisonerStatus.get(id) != null) {
+                    UUID id = p.getId();
+                    if (null == id) {
                         id = UUID.randomUUID();
+                        while (prisonerStatus.get(id) != null) {
+                            id = UUID.randomUUID();
+                        }
+                        p.setId(id);
                     }
-                    p.setId(id);
                     PrisonerStatus status = new PrisonerStatus(p.getFullName(), u.getEntity().getDisplayName(), p);
-                    if(en instanceof Mech
+                    if (en instanceof Mech
                             || en instanceof Protomech
-                            || (en instanceof Aero && !(en instanceof SmallCraft || en instanceof Jumpship))) {
+                            || (en instanceof Aero && !(en instanceof SmallCraft || en instanceof Jumpship))
+                            || en instanceof MechWarrior) {
                         Crew pilot = en.getCrew();
                         if(null == pilot) {
                             continue;
                         }
-                        status.setHits(pilot.getHits());
+                        int slot = 0;
+                        //For multicrew cockpits the person id has been set to match the crew slot 
+                        for (int pos = 0; pos < pilot.getSlotCount(); pos++) {
+                            if (p.getId().toString().equals(pilot.getExternalIdAsString(pos))) {
+                                slot = pos;
+                                break;
+                            }
+                        }
+                        status.setHits(pilot.getHits(slot));
                     } else {
                         //we have a multi-crewed vee
                         boolean wounded = false;
@@ -739,30 +789,42 @@ public class ResolveScenarioTracker {
                                 if(loc == Tank.LOC_TURRET || loc == Tank.LOC_TURRET_2 || loc == Tank.LOC_BODY) {
                                     continue;
                                 }
-                                if(en.getInternal(loc) <= 0) {
+                                if (en.getInternal(loc) <= 0) {
                                     destroyed = true;
                                     break;
                                 }
                             }
                             if(destroyed || null == en.getCrew() || en.getCrew().isDead()) {
-                                if(Compute.d6(2) >= 7) {
+                                if (Compute.d6(2) >= 7) {
                                     wounded = true;
                                 } else {
                                     status.setHits(6);
                                 }
-                            }
-                            else if(((Tank)en).isDriverHit()
+                            } else if(((Tank)en).isDriverHit()
                                     && driver != null && driver.getId() == p.getId()) {
+                                if (Compute.d6(2) >= 7) {
+                                    wounded = true;
+                                } else {
+                                    status.setHits(6);
+                                    status.setDead(true);
+                                }
+                            } else if (((Tank)en).isCommanderHit()
+                                    && (((commander != null && commander.getId() == p.getId())
+                                            || (console != null && console.getId() == p.getId())))) {
+                                //If there is a command console, the commander hit flag does not
+                                //get set until after the second such critical, which means that
+                                //both commanders have been hit.
                                 if(Compute.d6(2) >= 7) {
                                     wounded = true;
                                 } else {
                                     status.setHits(6);
                                     status.setDead(true);
                                 }
-                            }
-                            else if(((Tank)en).isCommanderHit()
+                            } else if (((Tank)en).isUsingConsoleCommander()
                                     && commander != null
                                     && commander.getId() == p.getId()) {
+                                //If this flag is set we are using a command console and have already
+                                //taken one commander hit critical, which takes out the primary commander.
                                 if(Compute.d6(2) >= 7) {
                                     wounded = true;
                                 } else {

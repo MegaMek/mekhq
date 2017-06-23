@@ -1014,7 +1014,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             }
         }
 
-        en.setCrew(new Crew(crewName,
+        en.setCrew(new Crew(en.getCrew().getCrewType(), crewName,
                             Compute.getFullCrewSize(en),
                             skills[0], skills[1]));
 
@@ -1072,7 +1072,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
         if (faction.isClan()) rsg.setType(RandomSkillsGenerator.T_CLAN);
         int[] skills = rsg.getRandomSkills(en);
-        en.setCrew(new Crew(rng.generate(),
+        en.setCrew(new Crew(en.getCrew().getCrewType(), rng.generate(),
                             Compute.getFullCrewSize(en),
                             skills[0], skills[1]));
 
@@ -1607,23 +1607,10 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
      */
     public static String writeEntityWithCrewToXmlString(Entity tgtEnt, int indentLvl, ArrayList<Entity> list) {
         String retVal = MekHqXmlUtil.writeEntityToXmlString(tgtEnt, indentLvl, list);
-
-        String crew = MekHqXmlUtil.indentStr(indentLvl+1)
-                + "<pilot name=\""
-                + MekHqXmlUtil.escape(tgtEnt.getCrew().getName())
-                + "\" size=\""
-                + tgtEnt.getCrew().getSize()
-                + "\" nick=\""
-                + MekHqXmlUtil.escape(tgtEnt.getCrew().getNickname())
-                + "\" gunnery=\""
-                + tgtEnt.getCrew().getGunnery()
-                + "\" piloting=\""
-                + tgtEnt.getCrew().getPiloting();
-
-        if (tgtEnt.getCrew().getToughness() != 0) {
-            crew += "\" toughness=\""
-                + String.valueOf(tgtEnt.getCrew().getToughness());
-        }
+        
+        String crew = MekHqXmlUtil.indentStr(indentLvl+1) + "<crew crewType=\""
+                    + tgtEnt.getCrew().getCrewType().toString().toLowerCase()
+                    + "\" size=\"" + tgtEnt.getCrew().getSize();
         if (tgtEnt.getCrew().getInitBonus() != 0) {
             crew += "\" initB=\""
                 + String.valueOf(tgtEnt.getCrew().getInitBonus());
@@ -1632,27 +1619,38 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             crew += "\" commandB=\""
                 + String.valueOf(tgtEnt.getCrew().getCommandBonus());
         }
-        if (tgtEnt.getCrew().isDead() || tgtEnt.getCrew().getHits() > 5) {
-            crew +="\" hits=\"Dead";
-        } else if (tgtEnt.getCrew().getHits() > 0) {
-            crew += "\" hits=\""
-                + String.valueOf(tgtEnt.getCrew().getHits());
-        }
-        crew += "\" ejected=\""
-                 + String.valueOf(tgtEnt.getCrew().isEjected());
-
-        crew += "\" externalId=\""
-                 + tgtEnt.getCrew().getExternalIdAsString();
-        
         if (tgtEnt instanceof Mech) {
-            if (((Mech) tgtEnt).isAutoEject()) {
-                crew += "\" autoeject=\"true";
-            } else {
-                crew += "\" autoeject=\"false";
-            }
+            crew += "\" autoeject=\"" + ((Mech)tgtEnt).isAutoEject();
         }
-        crew += "\"/>";
+        crew += "\" ejected=\"" + tgtEnt.getCrew().isEjected() + "\">\n";
+        for (int i = 0; i < tgtEnt.getCrew().getSlotCount(); i++) {
+            crew += MekHqXmlUtil.indentStr(indentLvl+2) + "<crewMember slot=\"" + i 
+                    + "\" name=\""
+                    + MekHqXmlUtil.escape(tgtEnt.getCrew().getName(i))
+                    + "\" nick=\""
+                    + MekHqXmlUtil.escape(tgtEnt.getCrew().getNickname(i))
+                    + "\" gunnery=\""
+                    + tgtEnt.getCrew().getGunnery(i)
+                    + "\" piloting=\""
+                    + tgtEnt.getCrew().getPiloting(i);
 
+            if (tgtEnt.getCrew().getToughness(i) != 0) {
+                crew += "\" toughness=\""
+                    + String.valueOf(tgtEnt.getCrew().getToughness(i));
+            }
+            if (tgtEnt.getCrew().isDead(i) || tgtEnt.getCrew().getHits(i) >= Crew.DEATH) {
+                crew +="\" hits=\"Dead";
+            } else if (tgtEnt.getCrew().getHits(i) > 0) {
+                crew += "\" hits=\""
+                    + String.valueOf(tgtEnt.getCrew().getHits(i));
+            }
+
+            crew += "\" externalId=\""
+                     + tgtEnt.getCrew().getExternalIdAsString(i);
+            crew += "\"/>\n";
+        }
+        crew += MekHqXmlUtil.indentStr(indentLvl+1) + "</crew>\n";
+        
         return retVal.replaceFirst(">", " deployment=\"" +
             tgtEnt.getDeployRound() + "\">\n" + crew + "\n");
     }
