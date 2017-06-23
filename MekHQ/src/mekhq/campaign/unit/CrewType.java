@@ -28,7 +28,8 @@ public enum CrewType {
     VESSEL_CREW((u, p) -> u.addVesselCrew(p)),
     NAVIGATOR((u, p) -> u.setNavigator(p)),
     PILOT((u, p) -> u.addPilotOrSoldier(p)),
-    SOLDIER((u, p) -> u.addPilotOrSoldier(p));
+    SOLDIER((u, p) -> u.addPilotOrSoldier(p)),
+    TECH_OFFICER((u, p) -> u.setTechOfficer(p));
     
     public final BiConsumer<Unit, Person> addMethod;
     

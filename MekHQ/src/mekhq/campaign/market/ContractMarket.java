@@ -110,13 +110,13 @@ public class ContractMarket implements Serializable {
         c.setId(lastId);
         contractIds.put(lastId, c);
 	}
-
-	// Returns the type of time period used to generate contracts (currently, only monthly!)
-	protected int getContractGenerationPeriod()
+	
+	//returns the method used to generate contracts
+	protected int getContractGenerationMethod()
 	{
 		return method;
 	}
-	
+
 	public void removeContract(Contract c) {
 		contracts.remove(c);
 		contractIds.remove(c.getId());
@@ -334,19 +334,12 @@ public class ContractMarket implements Serializable {
 
 	protected AtBContract generateAtBContract(Campaign campaign,
 			String employer, int unitRatingMod, int retries) {
-<<<<<<< HEAD
-		AtBContract contract = new AtBContract("New Contract");
-		incrementIDAndAddContract(contract);
-=======
 		AtBContract contract = new AtBContract(employer
 				+"-"
 				+Contract.generateRandomContractName()
 				+"-"
 				+(new SimpleDateFormat("yyyyMM")).format(campaign.calendar.getTime()));
-        lastId++;
-        contract.setId(lastId);
-        contractIds.put(lastId, contract);
->>>>>>> branch 'master' of https://github.com/MegaMek/mekhq.git
+		incrementIDAndAddContract(contract);
 
         if (employer.equals("MERC")) {
         	contract.setMercSubcontract(true);

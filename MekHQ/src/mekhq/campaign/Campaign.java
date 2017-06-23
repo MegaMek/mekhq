@@ -146,7 +146,6 @@ import mekhq.campaign.force.Lance;
 import mekhq.campaign.market.ContractMarket;
 import mekhq.campaign.market.PartsStore;
 import mekhq.campaign.market.PersonnelMarket;
-import mekhq.campaign.market.PirateContractMarket;
 import mekhq.campaign.market.ShoppingList;
 import mekhq.campaign.market.UnitMarket;
 import mekhq.campaign.mission.AtBContract;
@@ -195,7 +194,6 @@ import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Era;
 import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.Faction.Tag;
 import mekhq.campaign.universe.IUnitGenerator;
 import mekhq.campaign.universe.News;
 import mekhq.campaign.universe.NewsItem;
@@ -486,18 +484,8 @@ public class Campaign implements Serializable {
     	return contractMarket;
     }
 
-    // This function clears the campaign's existing contract market
-    // and generates a brand new instance based on the campaign's current faction
-    // use with caution :)
-    public void initializeNewContractMarket() {
-    	if(Faction.getFaction(factionCode).is(Tag.PIRATE))
-    	{
-    		contractMarket = new PirateContractMarket();
-    	}
-    	else
-    	{
-    		contractMarket = new ContractMarket();
-    	}
+    public void generateNewContractMarket() {
+    	contractMarket.generateContractOffers(this);
     }
 
     public UnitMarket getUnitMarket() {
@@ -3010,7 +2998,7 @@ public class Campaign implements Serializable {
     }
 
     public void setFactionCode(String i) {
-    	this.factionCode = i;
+        this.factionCode = i;
     }
 
     public String getFactionCode() {
@@ -6541,6 +6529,8 @@ public class Campaign implements Serializable {
             } else if (unit.getEntity() instanceof SmallCraft
                        || unit.getEntity() instanceof Jumpship) {
                 p = newPerson(Person.T_SPACE_GUNNER);
+            } else if (unit.getEntity() instanceof Mech) {
+                p = newPerson(Person.T_MECHWARRIOR);
             }
             if (!recruitPerson(p)) {
                 return;
@@ -6560,6 +6550,19 @@ public class Campaign implements Serializable {
                 return;
             }
             unit.setNavigator(p);
+        }
+        if (unit.canTakeTechOfficer()) {
+            Person p = null;
+            //For vehicle command console we will default to gunner
+            if (unit.getEntity() instanceof Tank) {
+                p = newPerson(Person.T_VEE_GUNNER);
+            } else {
+                p = newPerson(Person.T_MECHWARRIOR);
+            }
+            if (!recruitPerson(p)) {
+                return;
+            }
+            unit.setTechOfficer(p);
         }
         unit.resetPilotAndEntity();
         unit.runDiagnostic(false);

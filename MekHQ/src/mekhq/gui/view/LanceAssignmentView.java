@@ -396,9 +396,7 @@ class RequiredLancesTableModel extends DataTableModel {
 						t++;
 					}
 				}
-				// we want to retain the behavior where we round up "less than one" required lance to one
-				// but 0 lances should be 0.
-				int required = (int) Math.ceil(contract.getRequiredLances() / 2);
+				int required = Math.max(contract.getRequiredLances() / 2, 1);
 				if (t < required) {
 					return t + "/" + required;
 				}

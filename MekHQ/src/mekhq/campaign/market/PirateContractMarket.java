@@ -35,7 +35,7 @@ public class PirateContractMarket extends ContractMarket
 	
 	@Override
 	public void generateContractOffers(Campaign campaign, boolean newCampaign) {
-		if ((getContractGenerationPeriod() == TYPE_ATBMONTHLY && campaign.getCalendar().get(Calendar.DAY_OF_MONTH) == 1) ||
+		if ((getContractGenerationMethod() == TYPE_ATBMONTHLY && campaign.getCalendar().get(Calendar.DAY_OF_MONTH) == 1) ||
 				newCampaign) {
 			Contract[] list = getContracts().toArray(new Contract[getContracts().size()]);
 			for (Contract c : list) {
