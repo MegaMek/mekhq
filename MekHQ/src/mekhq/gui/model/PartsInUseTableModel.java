@@ -2,30 +2,20 @@ package mekhq.gui.model;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 import java.util.Set;
 
-import javax.swing.AbstractCellEditor;
-import javax.swing.Action;
-import javax.swing.Icon;
-import javax.swing.JButton;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
-import javax.swing.UIManager;
-import javax.swing.border.Border;
 import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.TableCellEditor;
-import javax.swing.table.TableCellRenderer;
-import javax.swing.table.TableColumnModel;
 
 import megamek.common.util.EncodeControl;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PartInUse;
+import mekhq.campaign.work.IAcquisitionWork;
 
 public class PartsInUseTableModel extends DataTableModel {
     private static final long serialVersionUID = -7166100476703184175L;
@@ -42,10 +32,6 @@ public class PartsInUseTableModel extends DataTableModel {
     public final static int COL_TONNAGE = 3;
     public final static int COL_IN_TRANSFER  = 4;
     public final static int COL_COST = 5;
-    public final static int COL_BUTTON_BUY  = 6;
-    public final static int COL_BUTTON_BUY_BULK  = 7;
-    public final static int COL_BUTTON_GMADD  = 8;
-    public final static int COL_BUTTON_GMADD_BULK  = 9;
 
     private ResourceBundle resourceMap;
 
@@ -61,7 +47,7 @@ public class PartsInUseTableModel extends DataTableModel {
 
     @Override
     public int getColumnCount() {
-        return COL_BUTTON_GMADD_BULK + 1;
+        return COL_COST + 1;
     }
 
     @Override
@@ -107,14 +93,6 @@ public class PartsInUseTableModel extends DataTableModel {
                 }
             case COL_COST:
                 return FORMATTER.format(piu.getCost());
-            case COL_BUTTON_BUY:
-                return resourceMap.getString("buy.text"); //$NON-NLS-1$
-            case COL_BUTTON_BUY_BULK:
-                return resourceMap.getString("buyInBulk.text"); //$NON-NLS-1$
-            case COL_BUTTON_GMADD:
-                return resourceMap.getString("add.text"); //$NON-NLS-1$
-            case COL_BUTTON_GMADD_BULK:
-                return resourceMap.getString("addInBulk.text"); //$NON-NLS-1$
             default:
                 return EMPTY_CELL;
         }
@@ -127,15 +105,7 @@ public class PartsInUseTableModel extends DataTableModel {
 
     @Override
     public boolean isCellEditable(int row, int col) {
-        switch(col) {
-            case COL_BUTTON_BUY:
-            case COL_BUTTON_BUY_BULK:
-            case COL_BUTTON_GMADD:
-            case COL_BUTTON_GMADD_BULK:
-                return true;
-            default:
-                return false;
-        }
+    	return true;
     }
     
     public void setData(Set<PartInUse> data) {
@@ -185,41 +155,17 @@ public class PartsInUseTableModel extends DataTableModel {
             case COL_IN_TRANSFER:
             case COL_COST:
                 return 20;
-            case COL_BUTTON_BUY:
-                return 50;
-            case COL_BUTTON_GMADD:
-                return 70;
-            case COL_BUTTON_BUY_BULK:
-                return 80;
             default:
                 return 100;
         }
     }
     
     public boolean hasConstantWidth(int col) {
-        switch(col) {
-            case COL_BUTTON_BUY:
-            case COL_BUTTON_BUY_BULK:
-            case COL_BUTTON_GMADD:
-            case COL_BUTTON_GMADD_BULK:
-                return true;
-            default:
-                return false;
-        }
+    	return false;
     }
     
     public int getWidth(int col) {
-        switch(col) {
-            case COL_BUTTON_BUY:
-            case COL_BUTTON_BUY_BULK:
-            case COL_BUTTON_GMADD:
-            case COL_BUTTON_GMADD_BULK:
-                // Calculate from button width, respecting style
-                JButton btn = new JButton(getValueAt(0, col).toString());
-                return btn.getPreferredSize().width;
-            default:
-                return Integer.MAX_VALUE;
-        }
+    	return Integer.MAX_VALUE;
     }
     
     public PartsInUseTableModel.Renderer getRenderer() {
@@ -251,143 +197,20 @@ public class PartsInUseTableModel extends DataTableModel {
             return this;
         }
     }
-    
-    public static class ButtonColumn extends AbstractCellEditor
-        implements TableCellRenderer, TableCellEditor, ActionListener, MouseListener {
 
-        private static final long serialVersionUID = 5632710519408125751L;
+    public void buyPart(int rowIndex, int quantity, Campaign campaign) {
+        PartInUse piu = getPartInUse(rowIndex);
+        IAcquisitionWork partToBuy = piu.getPartToBuy();
+        campaign.getShoppingList().addShoppingItem(partToBuy, quantity, campaign);
+    }
+
+    public void addPart(int rowIndex, int quantity, Campaign campaign) {
+        PartInUse piu = getPartInUse(rowIndex);
+        IAcquisitionWork partToBuy = piu.getPartToBuy();
         
-        private JTable table;
-        private Action action;
-        private Border originalBorder;
-        private Border focusBorder;
-
-        private JButton renderButton;
-        private JButton editButton;
-        private Object editorValue;
-        private boolean isButtonColumnEditor;
-        private boolean enabled;
-
-        public ButtonColumn(JTable table, Action action, int column) {
-            this.table = table;
-            this.action = action;
-
-            renderButton = new JButton();
-            editButton = new JButton();
-            editButton.setFocusPainted(false);
-            editButton.addActionListener(this);
-            originalBorder = editButton.getBorder();
-            enabled = true;
-
-            TableColumnModel columnModel = table.getColumnModel();
-            columnModel.getColumn(column).setCellRenderer(this);
-            columnModel.getColumn(column).setCellEditor(this);
-            table.addMouseListener(this);
-        }
-        
-        public Border getFocusBorder()
-        {
-            return focusBorder;
-        }
-
-        public void setFocusBorder(Border focusBorder)
-        {
-            this.focusBorder = focusBorder;
-            editButton.setBorder(focusBorder);
-        }
-
-        public void setEnabled(boolean enabled) {
-            this.enabled = enabled;
-            editButton.setEnabled(enabled);
-            renderButton.setEnabled(enabled);
-        }
-        
-        @Override
-        public Object getCellEditorValue() {
-            return editorValue;
-        }
-
-        @Override
-        public void mousePressed(MouseEvent e) {
-            if(table.isEditing() && (this == table.getCellEditor())) {
-                isButtonColumnEditor = true;
-            }
-        }
-
-        @Override
-        public void mouseReleased(MouseEvent e) {
-            if(isButtonColumnEditor && table.isEditing()) {
-                table.getCellEditor().stopCellEditing();
-            }
-            isButtonColumnEditor = false;
-        }
-
-        @Override public void mouseClicked(MouseEvent e) {}
-        @Override public void mouseEntered(MouseEvent e) {}
-        @Override public void mouseExited(MouseEvent e) {}
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            int row = table.convertRowIndexToModel(table.getEditingRow());
-            fireEditingStopped();
-
-            //  Invoke the Action
-            ActionEvent event = new ActionEvent(table, ActionEvent.ACTION_PERFORMED, "" + row); //$NON-NLS-1$
-            action.actionPerformed(event);
-        }
-
-        @Override
-        public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
-            boolean buyable = ((PartsInUseTableModel) table.getModel()).isBuyable(table.getRowSorter().convertRowIndexToModel(row));
-            
-            if(value == null) {
-                editButton.setText(EMPTY_CELL);
-                editButton.setIcon(null);
-            } else if(value instanceof Icon) {
-                editButton.setText(EMPTY_CELL);
-                editButton.setIcon((Icon)value);
-            } else {
-                editButton.setText(value.toString());
-                editButton.setIcon(null);
-            }
-            editButton.setEnabled(enabled && buyable);
-            
-            this.editorValue = value;
-            return editButton;
-        }
-
-        @Override
-        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-            boolean buyable = ((PartsInUseTableModel) table.getModel()).isBuyable(table.getRowSorter().convertRowIndexToModel(row));
-            
-            if(isSelected && enabled && buyable) {
-                renderButton.setForeground(table.getSelectionForeground());
-                 renderButton.setBackground(table.getSelectionBackground());
-            } else {
-                renderButton.setForeground(table.getForeground());
-                renderButton.setBackground(UIManager.getColor("Button.background")); //$NON-NLS-1$
-            }
-
-            if(hasFocus && enabled && buyable) {
-                renderButton.setBorder(focusBorder);
-            } else {
-                renderButton.setBorder(originalBorder);
-            }
-
-            if(value == null)
-            {
-                renderButton.setText(EMPTY_CELL);
-                renderButton.setIcon(null);
-            } else if (value instanceof Icon) {
-                renderButton.setText(EMPTY_CELL);
-                renderButton.setIcon((Icon)value);
-            } else {
-                renderButton.setText(value.toString());
-                renderButton.setIcon(null);
-            }
-            renderButton.setEnabled(enabled && buyable);
-            
-            return renderButton;
+        while (quantity > 0) {
+            campaign.addPart((Part) partToBuy.getNewEquipment(), 0);
+            --quantity;
         }
     }
 }

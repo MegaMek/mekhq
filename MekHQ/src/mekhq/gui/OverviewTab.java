@@ -23,27 +23,37 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.event.ActionEvent;
+import java.awt.GridLayout;
 import java.util.Arrays;
 import java.util.ResourceBundle;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.RowFilter;
 import javax.swing.RowSorter;
 import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.table.TableColumn;
-import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableRowSorter;
 
+import megamek.common.AmmoType;
+import megamek.common.MiscType;
+import megamek.common.WeaponType;
 import megamek.common.event.Subscribe;
 import megamek.common.util.EncodeControl;
+import megamek.common.util.StringUtil;
 import mekhq.MekHQ;
 import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.event.OptionsChangedEvent;
@@ -52,8 +62,20 @@ import mekhq.campaign.event.PartWorkEvent;
 import mekhq.campaign.event.PersonEvent;
 import mekhq.campaign.event.ScenarioResolvedEvent;
 import mekhq.campaign.event.UnitEvent;
+import mekhq.campaign.parts.Armor;
+import mekhq.campaign.parts.BaArmor;
+import mekhq.campaign.parts.EnginePart;
+import mekhq.campaign.parts.MekActuator;
+import mekhq.campaign.parts.MekGyro;
+import mekhq.campaign.parts.MekLifeSupport;
+import mekhq.campaign.parts.MekLocation;
+import mekhq.campaign.parts.MekSensor;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PartInUse;
+import mekhq.campaign.parts.ProtomekArmor;
+import mekhq.campaign.parts.TankLocation;
+import mekhq.campaign.parts.equipment.AmmoBin;
+import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.rating.UnitRatingFactory;
 import mekhq.campaign.report.CargoReport;
@@ -64,7 +86,6 @@ import mekhq.campaign.report.TransportReport;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.gui.dialog.PopupValueChoiceDialog;
 import mekhq.gui.model.PartsInUseTableModel;
-import mekhq.gui.model.PartsInUseTableModel.ButtonColumn;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.TwoNumbersSorter;
 
@@ -75,11 +96,44 @@ public final class OverviewTab extends CampaignGuiTab {
 
     private static final long serialVersionUID = -564451623308341081L;
 
+    public interface FILTER_PART_TYPE {
+        public static final int ALL = 0;
+        public static final int ARMOR = 1;
+        public static final int SYSTEM = 2;
+        public static final int EQUIP = 3;
+        public static final int LOC = 4;
+        public static final int WEAP = 5;
+        public static final int AMMO = 6;
+        public static final int AMMO_BIN = 7;
+        public static final int MISC = 8;
+        public static final int ENGINE = 9;
+        public static final int GYRO = 10;
+        public static final int ACT = 11;
+        public static final int MAX_INDEX = 11;
+    }
+    
+    public interface FILTER_IN_USE {
+    	public static final int ALL = 0;
+    	public static final int IN_USE = 1;
+    	public static final int NOT_IN_USE = 2;
+    	public static final int MAX_INDEX = 2;    	
+    }
+    
     private JTabbedPane tabOverview;
+    
     // Overview Parts In Use
     private JScrollPane scrollOverviewParts;
     private JPanel overviewPartsPanel;
     private JTable overviewPartsInUseTable;
+    private JComboBox<String> overviewPartsTypeSelector;
+    private JComboBox<String> overviewPartsInUseSelector;
+    private JTextField overviewPartsNameFilter;
+    private JButton overviewPartsBtnBuySingle;
+    private JButton overviewPartsBtnBuyMultiple;
+    private JButton overviewPartsBtnAddSingle;
+    private JButton overviewPartsBtnAddMultiple;
+    private int[] overviewPartsInUseSelectedRows = null;
+    
     // Overview Transport
     private JScrollPane scrollOverviewTransport;
     // Overview Personnel
@@ -256,7 +310,8 @@ public final class OverviewTab extends CampaignGuiTab {
 
         overviewPartsModel = new PartsInUseTableModel();
         overviewPartsInUseTable = new JTable(overviewPartsModel);
-        overviewPartsInUseTable.setRowSelectionAllowed(false);
+        overviewPartsInUseTable.setRowSelectionAllowed(true);
+        overviewPartsInUseTable.setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         overviewPartsInUseTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
         TableColumn column = null;
         for (int i = 0; i < overviewPartsModel.getColumnCount(); ++i) {
@@ -273,11 +328,7 @@ public final class OverviewTab extends CampaignGuiTab {
         overviewPartsInUseTable.setShowGrid(false);
         partsInUseSorter = new TableRowSorter<PartsInUseTableModel>(overviewPartsModel);
         partsInUseSorter.setSortsOnUpdates(true);
-        // Don't sort the buttons
-        partsInUseSorter.setSortable(PartsInUseTableModel.COL_BUTTON_BUY, false);
-        partsInUseSorter.setSortable(PartsInUseTableModel.COL_BUTTON_BUY_BULK, false);
-        partsInUseSorter.setSortable(PartsInUseTableModel.COL_BUTTON_GMADD, false);
-        partsInUseSorter.setSortable(PartsInUseTableModel.COL_BUTTON_GMADD_BULK, false);
+
         // Numeric columns
         partsInUseSorter.setComparator(PartsInUseTableModel.COL_IN_USE, new FormattedNumberSorter());
         partsInUseSorter.setComparator(PartsInUseTableModel.COL_STORED, new FormattedNumberSorter());
@@ -287,85 +338,246 @@ public final class OverviewTab extends CampaignGuiTab {
         // Default starting sort
         partsInUseSorter.setSortKeys(Arrays.asList(new RowSorter.SortKey(0, SortOrder.ASCENDING)));
         overviewPartsInUseTable.setRowSorter(partsInUseSorter);
+        
+        //START: Selector panel
+        DefaultComboBoxModel<String> partsGroupModel = new DefaultComboBoxModel<String>();
+        for (int i = 0; i <= FILTER_PART_TYPE.MAX_INDEX; i++) {
+            partsGroupModel.addElement(getPartsGroupName(i));
+        }
+        
+        overviewPartsTypeSelector = new JComboBox<String>(partsGroupModel);
+        overviewPartsTypeSelector.setSelectedIndex(0);
+        overviewPartsTypeSelector.addActionListener(ev -> filterParts());
+        
+        DefaultComboBoxModel<String> partsInUseSelectorModel = new DefaultComboBoxModel<String>();
+        for (int i = 0; i <= FILTER_IN_USE.MAX_INDEX; i++) {
+        	partsInUseSelectorModel.addElement(getPartsInUseFilterName(i));
+        }
+        
+        overviewPartsInUseSelector = new JComboBox<String>(partsInUseSelectorModel);
+        overviewPartsInUseSelector.setSelectedIndex(0);
+        overviewPartsInUseSelector.addActionListener(ev -> filterParts());
+        
+        JLabel lblPartsType = new JLabel(resourceMap.getString("lblPartsChoice.text"));
+        JLabel lblViewType = new JLabel("View:");
+        JLabel lblName = new JLabel("Name:");
+        
+        overviewPartsNameFilter = new JTextField();
+        overviewPartsNameFilter.setMinimumSize(new java.awt.Dimension(200, 20));
+        overviewPartsNameFilter.setPreferredSize(new java.awt.Dimension(200, 20));
+        overviewPartsNameFilter.getDocument().addDocumentListener(
+	        new DocumentListener() {
+	            public void changedUpdate(DocumentEvent e) {
+	                filterParts();
+	            }
+	            public void insertUpdate(DocumentEvent e) {
+	                filterParts();
+	            }
+	            public void removeUpdate(DocumentEvent e) {
+	                filterParts();
+	            }
+	        });
+        
+        JPanel pnlSelector = new JPanel(new GridBagLayout());
+        
+        GridBagConstraints gbcSelector = new GridBagConstraints();
+        gbcSelector = new java.awt.GridBagConstraints();
+        gbcSelector.gridx = 0;
+        gbcSelector.gridy = 0;
+        gbcSelector.weightx = 0.1;
+        gbcSelector.fill = GridBagConstraints.NONE;
+        gbcSelector.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gbcSelector.insets = new java.awt.Insets(5, 5, 5, 5);
+        
+        pnlSelector.add(lblPartsType, gbcSelector);
 
-        // Add buttons and actions. TODO: Only refresh the row we are working
-        // on, not the whole table
-        @SuppressWarnings("serial")
-        Action buy = new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                int row = Integer.valueOf(e.getActionCommand());
-                PartInUse piu = overviewPartsModel.getPartInUse(row);
-                IAcquisitionWork partToBuy = piu.getPartToBuy();
-                getCampaign().getShoppingList().addShoppingItem(partToBuy, 1, getCampaign());
-                refreshOverviewSpecificPart(row, piu, partToBuy);
-            }
-        };
-        @SuppressWarnings("serial")
-        Action buyInBulk = new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                int row = Integer.valueOf(e.getActionCommand());
-                PartInUse piu = overviewPartsModel.getPartInUse(row);
-                int quantity = 1;
-                PopupValueChoiceDialog pcd = new PopupValueChoiceDialog(getFrame(), true,
-                        "How Many " + piu.getPartToBuy().getAcquisitionName(), quantity, 1, 100);
-                pcd.setVisible(true);
-                quantity = pcd.getValue();
-                IAcquisitionWork partToBuy = piu.getPartToBuy();
-                getCampaign().getShoppingList().addShoppingItem(partToBuy, quantity, getCampaign());
-                refreshOverviewSpecificPart(row, piu, partToBuy);
-            }
-        };
-        @SuppressWarnings("serial")
-        Action add = new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                int row = Integer.valueOf(e.getActionCommand());
-                PartInUse piu = overviewPartsModel.getPartInUse(row);
-                IAcquisitionWork partToBuy = piu.getPartToBuy();
-                getCampaign().addPart((Part) partToBuy.getNewEquipment(), 0);
-                refreshOverviewSpecificPart(row, piu, partToBuy);
-            }
-        };
-        @SuppressWarnings("serial")
-        Action addInBulk = new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                int row = Integer.valueOf(e.getActionCommand());
-                PartInUse piu = overviewPartsModel.getPartInUse(row);
-                int quantity = 1;
-                PopupValueChoiceDialog pcd = new PopupValueChoiceDialog(getFrame(), true,
-                        "How Many " + piu.getPartToBuy().getAcquisitionName(), quantity, 1, 100);
-                pcd.setVisible(true);
-                quantity = pcd.getValue();
-                IAcquisitionWork partToBuy = piu.getPartToBuy();
-                while (quantity > 0) {
-                    getCampaign().addPart((Part) partToBuy.getNewEquipment(), 0);
-                    --quantity;
-                }
-                refreshOverviewSpecificPart(row, piu, partToBuy);
-            }
-        };
+        gbcSelector.gridx = 1;
+        pnlSelector.add(overviewPartsTypeSelector, gbcSelector);
+        
+        gbcSelector.gridx = 2;
+        pnlSelector.add(lblName, gbcSelector);
+        
+        gbcSelector.gridx = 3;
+        pnlSelector.add(overviewPartsNameFilter, gbcSelector);
 
-        new PartsInUseTableModel.ButtonColumn(overviewPartsInUseTable, buy, PartsInUseTableModel.COL_BUTTON_BUY);
-        new PartsInUseTableModel.ButtonColumn(overviewPartsInUseTable, buyInBulk,
-                PartsInUseTableModel.COL_BUTTON_BUY_BULK);
-        new PartsInUseTableModel.ButtonColumn(overviewPartsInUseTable, add, PartsInUseTableModel.COL_BUTTON_GMADD);
-        new PartsInUseTableModel.ButtonColumn(overviewPartsInUseTable, addInBulk,
-                PartsInUseTableModel.COL_BUTTON_GMADD_BULK);
+        gbcSelector.gridx = 0;
+        gbcSelector.gridy = 1;
+        pnlSelector.add(lblViewType, gbcSelector);
 
-        GridBagConstraints gridBagConstraints = new GridBagConstraints();
+        gbcSelector.gridx = 1;
+        pnlSelector.add(overviewPartsInUseSelector, gbcSelector);
+        //END: Selector panel
+        
+        //START: Action button panel
+        overviewPartsBtnBuySingle = new JButton();
+        overviewPartsBtnBuySingle.setText("Buy Selected Parts"); // NOI18N
+        overviewPartsBtnBuySingle.setToolTipText("Buy one of each selected part"); // NOI18N
+        overviewPartsBtnBuySingle.setName("overviewPartsBtnBuySingle"); // NOI18N
+        overviewPartsBtnBuySingle.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				if (overviewPartsInUseTable.getSelectedRowCount() == 0) {
+					JOptionPane.showMessageDialog(tabOverview,
+							"You must have at least one part selected",
+							"No parts selected", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+				
+				registerSelectedPartsInUse();
+				
+				for (int selectedIndex : overviewPartsInUseTable.getSelectedRows()) {
+					int rowIndex = overviewPartsInUseTable.convertRowIndexToModel(selectedIndex);
+					
+	            	overviewPartsModel.buyPart(rowIndex, 1, getCampaign());
+	            	refreshOverviewSpecificPart(rowIndex);
+				}
+			}
+		});
+        
+        overviewPartsBtnBuyMultiple = new JButton();
+        overviewPartsBtnBuyMultiple.setText("Buy Selected Parts (Bulk)"); // NOI18N
+        overviewPartsBtnBuyMultiple.setToolTipText("Buy multiple of each selected part"); // NOI18N
+        overviewPartsBtnBuyMultiple.setName("overviewPartsBtnBuyMultiple"); // NOI18N
+        overviewPartsBtnBuyMultiple.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				if (overviewPartsInUseTable.getSelectedRowCount() == 0) {
+					JOptionPane.showMessageDialog(tabOverview,
+							"You must have at least one part selected",
+							"No parts selected", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+				
+		        int quantity = 1;
+		        PopupValueChoiceDialog pcd = new PopupValueChoiceDialog(getFrame(), true,
+		                "How Many?", quantity, 1, 100);
+		        pcd.setVisible(true);
+		        quantity = pcd.getValue();
+				
+		        if (quantity <= 0) {
+		        	return;
+		        }
+		        
+				registerSelectedPartsInUse();
+				
+				for (int selectedIndex : overviewPartsInUseTable.getSelectedRows()) {
+					int rowIndex = overviewPartsInUseTable.convertRowIndexToModel(selectedIndex);
+					
+	            	overviewPartsModel.buyPart(rowIndex, quantity, getCampaign());
+	            	refreshOverviewSpecificPart(rowIndex);
+				}
+			}
+		});
 
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
+        overviewPartsBtnAddSingle = new JButton();
+        overviewPartsBtnAddSingle.setText("[GM] Add Selected Parts"); // NOI18N
+        overviewPartsBtnAddSingle.setToolTipText("GM add one of each selected part"); // NOI18N
+        overviewPartsBtnAddSingle.setName("overviewPartsBtnAddSingle"); // NOI18N
+        overviewPartsBtnAddSingle.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				if (overviewPartsInUseTable.getSelectedRowCount() == 0) {
+					JOptionPane.showMessageDialog(tabOverview,
+							"You must have at least one part selected",
+							"No parts selected", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+				
+				registerSelectedPartsInUse();
+				
+				for (int selectedIndex : overviewPartsInUseTable.getSelectedRows()) {
+					int rowIndex = overviewPartsInUseTable.convertRowIndexToModel(selectedIndex);
+					
+	            	overviewPartsModel.addPart(rowIndex, 1, getCampaign());
+	            	refreshOverviewSpecificPart(rowIndex);
+				}
+			}
+		});
+        
+        overviewPartsBtnAddMultiple = new JButton();
+        overviewPartsBtnAddMultiple.setText("[GM] Add Selected Parts (Bulk)"); // NOI18N
+        overviewPartsBtnAddMultiple.setToolTipText("GM add multiple of each selected part"); // NOI18N
+        overviewPartsBtnAddMultiple.setName("overviewPartsBtnAddMultiple"); // NOI18N
+        overviewPartsBtnAddMultiple.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				if (overviewPartsInUseTable.getSelectedRowCount() == 0) {
+					JOptionPane.showMessageDialog(tabOverview,
+							"You must have at least one part selected",
+							"No parts selected", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+				
+		        int quantity = 1;
+		        PopupValueChoiceDialog pcd = new PopupValueChoiceDialog(getFrame(), true,
+		                "How Many?", quantity, 1, 100);
+		        pcd.setVisible(true);
+		        quantity = pcd.getValue();
+				
+		        if (quantity <= 0) {
+		        	return;
+		        }
 
-        overviewPartsPanel.add(new JScrollPane(overviewPartsInUseTable), gridBagConstraints);
+				registerSelectedPartsInUse();
+				
+				for (int selectedIndex : overviewPartsInUseTable.getSelectedRows()) {
+					int rowIndex = overviewPartsInUseTable.convertRowIndexToModel(selectedIndex);
+					
+	            	overviewPartsModel.addPart(rowIndex, quantity, getCampaign());
+	            	refreshOverviewSpecificPart(rowIndex);
+				}
+			}
+		});
+        
+        JPanel pnlButtons = new JPanel();
+        pnlButtons.setLayout(new GridLayout(2, 2, 5, 5));
+        
+        pnlButtons.add(overviewPartsBtnBuySingle);
+        pnlButtons.add(overviewPartsBtnBuyMultiple);
+        pnlButtons.add(overviewPartsBtnAddSingle);
+        pnlButtons.add(overviewPartsBtnAddMultiple);        
+        //END: Action button panel
+        
+        GridBagConstraints gbcMain = new GridBagConstraints();
+        gbcMain = new java.awt.GridBagConstraints();
+        gbcMain.gridx = 0;
+        gbcMain.gridy = 0;
+        gbcMain.weightx = 0.1;
+        gbcMain.fill = GridBagConstraints.NONE;
+        gbcMain.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gbcMain.insets = new java.awt.Insets(5, 5, 5, 5);
+        
+        overviewPartsPanel.add(pnlSelector, gbcMain);
+
+        gbcMain.gridx = 1;
+        gbcMain.anchor = java.awt.GridBagConstraints.NORTHEAST;
+        
+        overviewPartsPanel.add(pnlButtons, gbcMain);
+        
+        gbcMain.gridx = 0;
+        gbcMain.gridy = 1;
+        gbcMain.gridwidth = 2;
+        gbcMain.fill = GridBagConstraints.BOTH;
+        gbcMain.weightx = 1.0;
+        gbcMain.weighty = 1.0;
+        gbcMain.anchor = java.awt.GridBagConstraints.NORTHWEST;
+
+        overviewPartsPanel.add(new JScrollPane(overviewPartsInUseTable), gbcMain);
     }
+
+	private void registerSelectedPartsInUse() {
+		overviewPartsInUseSelectedRows = overviewPartsInUseTable.getSelectedRows();
+	}
+    
+	private void reselectPartsInUseRows() {
+		if (null == overviewPartsInUseSelectedRows) {
+			return;
+		}
+
+		overviewPartsInUseTable.clearSelection();
+		
+		for (int rowIdx : overviewPartsInUseSelectedRows) {
+			overviewPartsInUseTable.addRowSelectionInterval(rowIdx, rowIdx);
+		}
+		
+		overviewPartsInUseSelectedRows = null;
+	}
 
     public void refreshOverview() {
         SwingUtilities.invokeLater(() -> {
@@ -388,10 +600,15 @@ public final class OverviewTab extends CampaignGuiTab {
             overviewHangarArea.setText(hr.getHangarTotals());
             scrollOverviewHangar.setViewportView(hr.getHangarTree());
             refreshOverviewPartsInUse();
+            
+            reselectPartsInUseRows();
         });
     }
 
-    private void refreshOverviewSpecificPart(int row, PartInUse piu, IAcquisitionWork newPart) {
+    private void refreshOverviewSpecificPart(int row) {
+        PartInUse piu = overviewPartsModel.getPartInUse(row);
+        IAcquisitionWork newPart = piu.getPartToBuy();
+    	
         if (piu.equals(new PartInUse((Part) newPart))) {
             // Simple update
             getCampaign().updatePartInUse(piu);
@@ -404,12 +621,9 @@ public final class OverviewTab extends CampaignGuiTab {
 
     public void refreshOverviewPartsInUse() {
         overviewPartsModel.setData(getCampaign().getPartsInUse());
-        TableColumnModel tcm = overviewPartsInUseTable.getColumnModel();
-        PartsInUseTableModel.ButtonColumn column = (ButtonColumn) tcm.getColumn(PartsInUseTableModel.COL_BUTTON_GMADD)
-                .getCellRenderer();
-        column.setEnabled(getCampaign().isGM());
-        column = (ButtonColumn) tcm.getColumn(PartsInUseTableModel.COL_BUTTON_GMADD_BULK).getCellRenderer();
-        column.setEnabled(getCampaign().isGM());
+        
+        overviewPartsBtnAddSingle.setEnabled(getCampaign().isGM());
+        overviewPartsBtnAddMultiple.setEnabled(getCampaign().isGM());
     }
 
     private ActionScheduler overviewScheduler = new ActionScheduler(this::refreshOverview);
@@ -447,5 +661,119 @@ public final class OverviewTab extends CampaignGuiTab {
     @Subscribe
     public void handle(PartWorkEvent ev) {
         overviewScheduler.schedule();
+    }
+
+    public void filterParts() {
+    	overviewPartsInUseTable.clearSelection();
+    	
+        RowFilter<PartsInUseTableModel, Integer> partsTypeFilter = null;
+        final int nGroup = overviewPartsTypeSelector.getSelectedIndex();
+        final int nInUse = overviewPartsInUseSelector.getSelectedIndex();
+        
+        partsTypeFilter = new RowFilter<PartsInUseTableModel, Integer>() {
+            @Override
+            public boolean include(Entry<? extends PartsInUseTableModel, ? extends Integer> entry) {
+            	PartsInUseTableModel partsModel = entry.getModel();
+                PartInUse piu = partsModel.getPartInUse(entry.getIdentifier());
+                Part part = piu.getPartToBuy().getAcquisitionPart();
+                boolean inGroup = false;
+                boolean inInUseFilter = false;
+                boolean inName = false;
+                
+                // Check grouping
+                if (nGroup == FILTER_PART_TYPE.ALL) {
+                    inGroup = true;
+                } else if (nGroup == FILTER_PART_TYPE.ARMOR) {
+                    inGroup = (part instanceof Armor || part instanceof ProtomekArmor || part instanceof BaArmor);
+                } else if (nGroup == FILTER_PART_TYPE.SYSTEM) {
+                    inGroup = part instanceof MekGyro || part instanceof EnginePart || part instanceof MekActuator
+                            || part instanceof MekLifeSupport || part instanceof MekSensor;
+                } else if (nGroup == FILTER_PART_TYPE.EQUIP) {
+                    inGroup = part instanceof EquipmentPart;
+                } else if (nGroup == FILTER_PART_TYPE.LOC) {
+                    inGroup = part instanceof MekLocation || part instanceof TankLocation;
+                } else if (nGroup == FILTER_PART_TYPE.WEAP) {
+                    inGroup = part instanceof EquipmentPart && ((EquipmentPart) part).getType() instanceof WeaponType;
+                } else if (nGroup == FILTER_PART_TYPE.AMMO) {
+                    inGroup = part instanceof EquipmentPart && !(part instanceof AmmoBin)
+                            && ((EquipmentPart) part).getType() instanceof AmmoType;
+                } else if (nGroup == FILTER_PART_TYPE.AMMO_BIN) {
+                    inGroup = part instanceof EquipmentPart && (part instanceof AmmoBin)
+                            && ((EquipmentPart) part).getType() instanceof AmmoType;
+                } else if (nGroup == FILTER_PART_TYPE.MISC) {
+                    inGroup = part instanceof EquipmentPart && ((EquipmentPart) part).getType() instanceof MiscType;
+                } else if (nGroup == FILTER_PART_TYPE.ENGINE) {
+                    inGroup = part instanceof EnginePart;
+                } else if (nGroup == FILTER_PART_TYPE.GYRO) {
+                    inGroup = part instanceof MekGyro;
+                } else if (nGroup == FILTER_PART_TYPE.ACT) {
+                    inGroup = part instanceof MekActuator;
+                }
+
+                if (nInUse == FILTER_IN_USE.ALL) {
+                	inInUseFilter = true;
+                } else if (nInUse == FILTER_IN_USE.IN_USE) {
+                	inInUseFilter = piu.getUseCount() > 0;
+                } else if (nInUse == FILTER_IN_USE.NOT_IN_USE) {
+                	inInUseFilter = piu.getUseCount() == 0;
+                }
+                
+                String nameFilter = overviewPartsNameFilter.getText();
+                
+                if (StringUtil.isNullOrEmpty(nameFilter)) {
+                	inName = true;
+                } else {
+                	inName = part.getName().toLowerCase().indexOf(nameFilter.toLowerCase()) > -1;
+                }
+                
+                return (inGroup && inInUseFilter && inName);
+            }
+        };
+        
+        partsInUseSorter.setRowFilter(partsTypeFilter);
+    }
+    
+    public static String getPartsGroupName(int group) {
+        switch (group) {
+        case FILTER_PART_TYPE.ALL:
+            return "All Parts";
+        case FILTER_PART_TYPE.ARMOR:
+            return "Armor";
+        case FILTER_PART_TYPE.SYSTEM:
+            return "System Components";
+        case FILTER_PART_TYPE.EQUIP:
+            return "Equipment";
+        case FILTER_PART_TYPE.LOC:
+            return "Locations";
+        case FILTER_PART_TYPE.WEAP:
+            return "Weapons";
+        case FILTER_PART_TYPE.AMMO:
+            return "Ammunition";
+        case FILTER_PART_TYPE.AMMO_BIN:
+            return "Ammunition Bins";
+        case FILTER_PART_TYPE.MISC:
+            return "Miscellaneous Equipment";
+        case FILTER_PART_TYPE.ENGINE:
+            return "Engines";
+        case FILTER_PART_TYPE.GYRO:
+            return "Gyros";
+        case FILTER_PART_TYPE.ACT:
+            return "Actuators";
+        default:
+            return "?";
+        }
+    }
+    
+    public static String getPartsInUseFilterName(int filterIdx) {
+        switch (filterIdx) {
+        case FILTER_IN_USE.ALL:
+            return "All Parts";
+        case FILTER_IN_USE.IN_USE:
+            return "'In Use' only";
+        case FILTER_IN_USE.NOT_IN_USE:
+            return "'Not In Use' only";
+        default:
+            return "?";
+        }
     }
 }
