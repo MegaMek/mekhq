@@ -122,7 +122,7 @@ public final class OverviewTab extends CampaignGuiTab {
 		public static final int MAX_INDEX = 2;
 	}
 
-	public interface FILTER_PURCHASEABLE {
+	public interface FILTER_PURCHASABLE {
 		public static final int ALL = 0;
 		public static final int YES_ONLY = 1;
 		public static final int NO_ONLY = 2;
@@ -137,7 +137,7 @@ public final class OverviewTab extends CampaignGuiTab {
 	private JTable overviewPartsInUseTable;
 	private JComboBox<String> overviewPartsTypeSelector;
 	private JComboBox<String> overviewPartsInUseSelector;
-	private JComboBox<String> overviewPartsPurchaseableSelector;
+	private JComboBox<String> overviewPartsPurchasableSelector;
 	private JTextField overviewPartsNameFilter;
 	private JButton overviewPartsBtnBuySingle;
 	private JButton overviewPartsBtnBuyMultiple;
@@ -372,16 +372,16 @@ public final class OverviewTab extends CampaignGuiTab {
 		JLabel lblPartsType = new JLabel(resourceMap.getString("lblPartsChoice.text"));
 		JLabel lblViewType = new JLabel("View:");
 		JLabel lblName = new JLabel("Name:");
-		JLabel lblPurchaseable = new JLabel("Purchaseable:");
+		JLabel lblPurchasable = new JLabel("Purchasable:");
 
-		DefaultComboBoxModel<String> partsInUsePurchaseableModel = new DefaultComboBoxModel<String>();
-		for (int i = 0; i <= FILTER_PURCHASEABLE.MAX_INDEX; i++) {
-			partsInUsePurchaseableModel.addElement(getPartsPurchaseableFilterName(i));
+		DefaultComboBoxModel<String> partsInUsePurchasableModel = new DefaultComboBoxModel<String>();
+		for (int i = 0; i <= FILTER_PURCHASABLE.MAX_INDEX; i++) {
+			partsInUsePurchasableModel.addElement(getPartsPurchasableFilterName(i));
 		}
 
-		overviewPartsPurchaseableSelector = new JComboBox<String>(partsInUsePurchaseableModel);
-		overviewPartsPurchaseableSelector.setSelectedIndex(0);
-		overviewPartsPurchaseableSelector.addActionListener(ev -> filterParts());
+		overviewPartsPurchasableSelector = new JComboBox<String>(partsInUsePurchasableModel);
+		overviewPartsPurchasableSelector.setSelectedIndex(0);
+		overviewPartsPurchasableSelector.addActionListener(ev -> filterParts());
 		
 		overviewPartsNameFilter = new JTextField();
 		overviewPartsNameFilter.setMinimumSize(new java.awt.Dimension(200, 20));
@@ -430,10 +430,10 @@ public final class OverviewTab extends CampaignGuiTab {
 		pnlSelector.add(overviewPartsInUseSelector, gbcSelector);		
 		
 		gbcSelector.gridx = 2;
-		pnlSelector.add(lblPurchaseable, gbcSelector);
+		pnlSelector.add(lblPurchasable, gbcSelector);
 		
 		gbcSelector.gridx = 3;
-		pnlSelector.add(overviewPartsPurchaseableSelector, gbcSelector);
+		pnlSelector.add(overviewPartsPurchasableSelector, gbcSelector);
 		// END: Selector panel
 
 		// START: Action button panel
@@ -744,7 +744,7 @@ public final class OverviewTab extends CampaignGuiTab {
 		RowFilter<PartsInUseTableModel, Integer> partsTypeFilter = null;
 		final int nGroup = overviewPartsTypeSelector.getSelectedIndex();
 		final int nInUse = overviewPartsInUseSelector.getSelectedIndex();
-		final int nPurchaseable = overviewPartsPurchaseableSelector.getSelectedIndex();
+		final int nPurchasable = overviewPartsPurchasableSelector.getSelectedIndex();
 		
 		partsTypeFilter = new RowFilter<PartsInUseTableModel, Integer>() {
 			@Override
@@ -755,7 +755,7 @@ public final class OverviewTab extends CampaignGuiTab {
 				boolean inGroup = isPartInGroup(part, nGroup);
 				boolean inInUseFilter = false;
 				boolean inName = false;
-				boolean inPurchaseable = false;
+				boolean inPurchasable = false;
 				
 				switch (nInUse) {
 				case FILTER_IN_USE.ALL:
@@ -771,17 +771,17 @@ public final class OverviewTab extends CampaignGuiTab {
 					break;
 				}
 				
-				switch (nPurchaseable) {
-				case FILTER_PURCHASEABLE.ALL:
-					inPurchaseable = true;
+				switch (nPurchasable) {
+				case FILTER_PURCHASABLE.ALL:
+					inPurchasable = true;
 					break;
 
-				case FILTER_PURCHASEABLE.YES_ONLY:
-					inPurchaseable = getCampaign().canAcquireEquipment(piu.getPartToBuy(), false);
+				case FILTER_PURCHASABLE.YES_ONLY:
+					inPurchasable = getCampaign().canAcquireEquipment(piu.getPartToBuy(), false);
 					break;
 
-				case FILTER_PURCHASEABLE.NO_ONLY:
-					inPurchaseable = !getCampaign().canAcquireEquipment(piu.getPartToBuy(), false);
+				case FILTER_PURCHASABLE.NO_ONLY:
+					inPurchasable = !getCampaign().canAcquireEquipment(piu.getPartToBuy(), false);
 					break;
 				}
 
@@ -793,7 +793,7 @@ public final class OverviewTab extends CampaignGuiTab {
 					inName = part.getName().toLowerCase().indexOf(nameFilter.toLowerCase()) > -1;
 				}
 				
-				return (inGroup && inInUseFilter && inName && inPurchaseable);
+				return (inGroup && inInUseFilter && inName && inPurchasable);
 			}
 		};
 
@@ -889,14 +889,14 @@ public final class OverviewTab extends CampaignGuiTab {
 		}
 	}
 
-	public static String getPartsPurchaseableFilterName(int filterIdx) {
+	public static String getPartsPurchasableFilterName(int filterIdx) {
 		switch (filterIdx) {
-		case FILTER_PURCHASEABLE.ALL:
+		case FILTER_PURCHASABLE.ALL:
 			return "All Parts";
-		case FILTER_PURCHASEABLE.YES_ONLY:
-			return "Purchaseable only";
-		case FILTER_PURCHASEABLE.NO_ONLY:
-			return "Not purchaseable only";
+		case FILTER_PURCHASABLE.YES_ONLY:
+			return "Purchasable only";
+		case FILTER_PURCHASABLE.NO_ONLY:
+			return "Not purchasable only";
 		default:
 			return "?";
 		}
