@@ -75,6 +75,7 @@ import megamek.common.Player;
 import megamek.common.Protomech;
 import megamek.common.ProtomechBay;
 import megamek.common.QuadMech;
+import megamek.common.QuadVee;
 import megamek.common.RefrigeratedCargoBay;
 import megamek.common.SmallCraft;
 import megamek.common.SmallCraftBay;
@@ -142,6 +143,7 @@ import mekhq.campaign.parts.MissingProtomekJumpJet;
 import mekhq.campaign.parts.MissingProtomekLegActuator;
 import mekhq.campaign.parts.MissingProtomekLocation;
 import mekhq.campaign.parts.MissingProtomekSensor;
+import mekhq.campaign.parts.MissingQuadVeeGear;
 import mekhq.campaign.parts.MissingRotor;
 import mekhq.campaign.parts.MissingSpacecraftEngine;
 import mekhq.campaign.parts.MissingThrusters;
@@ -157,6 +159,7 @@ import mekhq.campaign.parts.ProtomekJumpJet;
 import mekhq.campaign.parts.ProtomekLegActuator;
 import mekhq.campaign.parts.ProtomekLocation;
 import mekhq.campaign.parts.ProtomekSensor;
+import mekhq.campaign.parts.QuadVeeGear;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.parts.Rotor;
 import mekhq.campaign.parts.SpacecraftEngine;
@@ -1716,6 +1719,7 @@ public class Unit implements MekHqXmlSerializable {
         Part leftFrontFoot = null;
         Part leftLowerFrontLeg = null;
         Part leftUpperFrontLeg = null;
+        Part qvGear = null;
         Part structuralIntegrity = null;
         Part[] locations = new Part[entity.locations()];
         Part[] armor = new Part[entity.locations()];
@@ -1904,6 +1908,8 @@ public class Unit implements MekHqXmlSerializable {
                         leftFoot = part;
                     }
                 }
+            } else if(part instanceof QuadVeeGear || part instanceof MissingQuadVeeGear) {
+                qvGear = part;
             } else if(part instanceof Avionics || part instanceof MissingAvionics) {
                 avionics = part;
             } else if(part instanceof FireControlSystem || part instanceof MissingFireControlSystem) {
@@ -2272,6 +2278,13 @@ public class Unit implements MekHqXmlSerializable {
                 leftFrontFoot = new MekActuator((int)entity.getWeight(), Mech.ACTUATOR_FOOT, Mech.LOC_LARM, campaign);
                 addPart(leftFrontFoot);
                 partsToAdd.add(leftFrontFoot);
+            }
+        }
+        if (entity instanceof QuadVee && null == qvGear) {
+            if (null == qvGear) {
+                qvGear = new QuadVeeGear((int)entity.getWeight(), campaign);
+                addPart(qvGear);
+                partsToAdd.add(qvGear);
             }
         }
         if(entity instanceof Aero) {

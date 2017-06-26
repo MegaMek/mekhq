@@ -45,7 +45,7 @@ public class QuadVeeGear extends Part {
     @Override
     public void updateConditionFromEntity(boolean checkForDestruction) {
         if(null != unit) {
-            hits = unit.getHitCriticals(CriticalSlot.TYPE_EQUIPMENT,
+            hits = unit.getHitCriticals(CriticalSlot.TYPE_SYSTEM,
                         QuadVee.SYSTEM_CONVERSION_GEAR);
         }
     }

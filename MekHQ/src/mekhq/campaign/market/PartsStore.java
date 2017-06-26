@@ -70,6 +70,7 @@ import mekhq.campaign.parts.ProtomekJumpJet;
 import mekhq.campaign.parts.ProtomekLegActuator;
 import mekhq.campaign.parts.ProtomekLocation;
 import mekhq.campaign.parts.ProtomekSensor;
+import mekhq.campaign.parts.QuadVeeGear;
 import mekhq.campaign.parts.Rotor;
 import mekhq.campaign.parts.Turret;
 import mekhq.campaign.parts.VeeSensor;
@@ -399,6 +400,7 @@ public class PartsStore implements Serializable {
 		parts.add(new MekLifeSupport(0, c));
 		for(int ton = 20; ton <= 100; ton += 5) {
 			parts.add(new MekSensor(ton, c));
+			parts.add(new QuadVeeGear(ton, c));
 		}
 		for(int type = Mech.COCKPIT_STANDARD; type < Mech.COCKPIT_STRING.length; type++) {
 		    parts.add(new MekCockpit(0, type, false, c));
