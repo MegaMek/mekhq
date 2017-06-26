@@ -1768,21 +1768,41 @@ public class Campaign implements Serializable {
         return admin;
     }
 
-    public boolean acquireEquipment(IAcquisitionWork acquisition) {
-        boolean found = false;
-        String report = "";
-
+    public boolean canAcquireEquipment(IAcquisitionWork acquisition, boolean addReportMsg) {
         Person person = getLogisticsPerson();
+        
         if(null == person && !getCampaignOptions().getAcquisitionSkill().equals(CampaignOptions.S_AUTO)) {
-        	addReport("Your force has no one capable of acquiring equipment.");
+        	if (addReportMsg) {
+        		addReport("Your force has no one capable of acquiring equipment.");
+        	}
+        	
         	return false;
         }
 
         TargetRoll target = getTargetForAcquisition(acquisition, person, false);
+        
         if (target.getValue() == TargetRoll.IMPOSSIBLE) {
-            addReport(target.getDesc());
+        	if (addReportMsg) {
+        		addReport(target.getDesc());
+        	}
+        	
             return false;
         }
+        
+        return true;
+    }
+    
+    public boolean acquireEquipment(IAcquisitionWork acquisition) {
+        boolean found = false;
+        String report = "";
+
+        if (!canAcquireEquipment(acquisition, true)) {
+        	return false;
+        }
+        
+        Person person = getLogisticsPerson();
+        TargetRoll target = getTargetForAcquisition(acquisition, person, false);
+
         if (null != person) {
             report += person.getHyperlinkedFullTitle() + " ";
         }

@@ -13,6 +13,8 @@ import javax.swing.table.DefaultTableCellRenderer;
 
 import megamek.common.util.EncodeControl;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.parts.AmmoStorage;
+import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PartInUse;
 import mekhq.campaign.work.IAcquisitionWork;
@@ -32,12 +34,16 @@ public class PartsInUseTableModel extends DataTableModel {
     public final static int COL_TONNAGE = 3;
     public final static int COL_IN_TRANSFER  = 4;
     public final static int COL_COST = 5;
+    public final static int COL_PURCHASEABLE = 6;
+    public final static int COL_MAX_INDEX = 6;
 
     private ResourceBundle resourceMap;
-
-    public PartsInUseTableModel () {
+    private Campaign campaign;
+    
+    public PartsInUseTableModel (Campaign campaign) {
         resourceMap = ResourceBundle.getBundle("mekhq.resources.PartsInUseTableModel", new EncodeControl()); //$NON-NLS-1$
         data = new ArrayList<PartInUse>();
+        this.campaign = campaign;
     }
     
     @Override
@@ -47,7 +53,7 @@ public class PartsInUseTableModel extends DataTableModel {
 
     @Override
     public int getColumnCount() {
-        return COL_COST + 1;
+        return COL_MAX_INDEX + 1;
     }
 
     @Override
@@ -65,6 +71,8 @@ public class PartsInUseTableModel extends DataTableModel {
             return resourceMap.getString("ordered.heading"); //$NON-NLS-1$
         case COL_COST:
             return resourceMap.getString("cost.heading"); //$NON-NLS-1$
+        case COL_PURCHASEABLE:
+            return "Purchasable"; //$NON-NLS-1$
         default:
             return EMPTY_CELL;
         }
@@ -93,6 +101,8 @@ public class PartsInUseTableModel extends DataTableModel {
                 }
             case COL_COST:
                 return FORMATTER.format(piu.getCost());
+            case COL_PURCHASEABLE:
+                return campaign.canAcquireEquipment(piu.getPartToBuy(), false) ? "Yes" : "No";
             default:
                 return EMPTY_CELL;
         }
@@ -197,20 +207,123 @@ public class PartsInUseTableModel extends DataTableModel {
             return this;
         }
     }
-
-    public void buyPart(int rowIndex, int quantity, Campaign campaign) {
-        PartInUse piu = getPartInUse(rowIndex);
-        IAcquisitionWork partToBuy = piu.getPartToBuy();
-        campaign.getShoppingList().addShoppingItem(partToBuy, quantity, campaign);
+    
+    private void buyOrAddPart(IAcquisitionWork partToBuy, int quantity, boolean isBuy) {
+    	if (!campaign.canAcquireEquipment(partToBuy, false)) {
+    		return;
+    	}
+    	
+    	if (quantity <= 0) {
+    		return;
+    	}
+    	
+    	//campaign.addReport(String.format("%s %s for %s", isBuy ? "Buying" : "Adding", quantity, piu.getDescription()));
+    	
+    	if (isBuy) {
+    		campaign.getShoppingList().addShoppingItem(partToBuy, quantity, campaign);
+    	} else {
+            while (quantity > 0) {
+                campaign.addPart((Part) partToBuy.getNewEquipment(), 0);
+                --quantity;
+            }
+    	}
     }
 
-    public void addPart(int rowIndex, int quantity, Campaign campaign) {
+    public void buyOrAddPartByExactAmount(int rowIndex, int quantity, boolean isBuy, boolean isSingleAction) {
+    	if (quantity <= 0) {
+    		return;
+    	}
+    	
         PartInUse piu = getPartInUse(rowIndex);
         IAcquisitionWork partToBuy = piu.getPartToBuy();
-        
-        while (quantity > 0) {
-            campaign.addPart((Part) partToBuy.getNewEquipment(), 0);
-            --quantity;
+    	
+        if (!isSingleAction) {
+        	quantity = convertToPurchaseQuantity(piu, quantity);
         }
+        
+    	if (isBuy) {
+    		campaign.getShoppingList().addShoppingItem(partToBuy, quantity, campaign);
+    	} else {
+            while (quantity > 0) {
+                campaign.addPart((Part) partToBuy.getNewEquipment(), 0);
+                --quantity;
+            }
+    	}
     }
+
+	public void buyOrAddPartByMinimum(int rowIndex, int minimumQuantity, boolean isBuy) {
+        PartInUse piu = getPartInUse(rowIndex);
+
+		int inStorageAndTransit = convertToTonnage(piu, getStoredAndTransferAmount(piu));
+        
+        int amountToBuy = convertToPurchaseQuantity(piu, minimumQuantity - inStorageAndTransit);
+		
+		if (amountToBuy <= 0) {
+			return;
+		}
+
+        buyOrAddPart(piu.getPartToBuy(), amountToBuy, isBuy);
+	}
+
+	public void buyOrAddPartByPercentage(int rowIndex, int percentage, boolean isBuy) {
+        PartInUse piu = getPartInUse(rowIndex);
+
+        int inUse = piu.getUseCount();
+		int inStorageAndTransit = convertToTonnage(piu, getStoredAndTransferAmount(piu));
+		
+		int targetAmount = (int)Math.round((double)inUse * (double)percentage / 100d);
+        int amountToBuy = convertToPurchaseQuantity(piu, targetAmount - inStorageAndTransit);
+		
+		if (amountToBuy <= 0) {
+			return;
+		}
+
+        buyOrAddPart(piu.getPartToBuy(), amountToBuy, isBuy);
+	}
+
+	private int convertToTonnage(PartInUse piu, int quantity) {
+		if (quantity <= 0) {
+			return 0;
+		}
+
+        IAcquisitionWork partToBuy = piu.getPartToBuy();
+        Part part = partToBuy.getAcquisitionPart();
+        
+		if (part instanceof Armor) {
+			Armor a = (Armor)part;
+			double pointsPerTon = a.getArmorPointsPerTon();
+			quantity = (int)Math.round((double)quantity / pointsPerTon);
+		} if (part instanceof AmmoStorage) {
+			AmmoStorage a = (AmmoStorage)part;
+			int shots = a.getShots();
+			
+			quantity = (int)Math.round((double)quantity / (double)shots);
+		}
+		
+		return quantity;
+	}
+
+	private int convertToPurchaseQuantity(PartInUse piu, int quantity) {
+        IAcquisitionWork partToBuy = piu.getPartToBuy();
+        Part part = partToBuy.getAcquisitionPart();
+        
+		if (part instanceof Armor) {
+			Armor a = (Armor)part;
+			quantity = (int)Math.round(((double)quantity / a.getTonnage()));
+		}
+		
+		return quantity;
+	}
+	
+	private int getStoredAndTransferAmount(PartInUse piu) {
+		int amt = (piu.getStoreCount() > 0) ? piu.getStoreCount() : 0;
+		
+		if( piu.getTransferCount() > 0 && piu.getPlannedCount() <= 0 ) {
+			amt += piu.getTransferCount();					
+		} else if (piu.getPlannedCount() > 0) {
+			amt += piu.getPlannedCount();	
+		}
+		
+		return amt;
+	}
 }
