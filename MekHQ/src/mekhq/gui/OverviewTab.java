@@ -66,7 +66,6 @@ import mekhq.campaign.event.PersonEvent;
 import mekhq.campaign.event.ScenarioResolvedEvent;
 import mekhq.campaign.event.UnitEvent;
 import mekhq.campaign.parts.Armor;
-import mekhq.campaign.parts.BaArmor;
 import mekhq.campaign.parts.EnginePart;
 import mekhq.campaign.parts.MekActuator;
 import mekhq.campaign.parts.MekGyro;
@@ -75,7 +74,6 @@ import mekhq.campaign.parts.MekLocation;
 import mekhq.campaign.parts.MekSensor;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PartInUse;
-import mekhq.campaign.parts.ProtomekArmor;
 import mekhq.campaign.parts.TankLocation;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.equipment.EquipmentPart;
@@ -463,9 +461,13 @@ public final class OverviewTab extends CampaignGuiTab {
 							overviewPartsModel.buyOrAddPartByPercentage(rowIndex, amount, isBuy);
 					}
 					
-					refreshOverviewSpecificPart(rowIndex);
-					
 					Thread.yield();
+				}
+
+				for (int selectedIndex : overviewPartsInUseTable.getSelectedRows()) {
+					int rowIndex = overviewPartsInUseTable.convertRowIndexToModel(selectedIndex);
+				
+					refreshOverviewSpecificPart(rowIndex);
 				}
             }
         };
@@ -790,7 +792,7 @@ public final class OverviewTab extends CampaignGuiTab {
 				if (StringUtil.isNullOrEmpty(nameFilter)) {
 					inName = true;
 				} else {
-					inName = part.getName().toLowerCase().indexOf(nameFilter.toLowerCase()) > -1;
+					inName = piu.getDescription().toLowerCase().indexOf(nameFilter.toLowerCase()) > -1;
 				}
 				
 				return (inGroup && inInUseFilter && inName && inPurchasable);
@@ -806,14 +808,13 @@ public final class OverviewTab extends CampaignGuiTab {
 			return true;
 
 		case FILTER_PART_TYPE.ARMOR:
-			return (part instanceof Armor || part instanceof ProtomekArmor || part instanceof BaArmor);
+			return part instanceof Armor;
 
 		case FILTER_PART_TYPE.SYSTEM:
-			return part instanceof MekGyro || part instanceof EnginePart || part instanceof MekActuator
-					|| part instanceof MekLifeSupport || part instanceof MekSensor;
+			return part instanceof MekGyro || part instanceof MekLifeSupport || part instanceof MekSensor;
 
 		case FILTER_PART_TYPE.EQUIP:
-			return part instanceof EquipmentPart;
+			return ((part instanceof EquipmentPart) && !(part instanceof AmmoBin) && !(((EquipmentPart) part).getType() instanceof AmmoType)) && !(((EquipmentPart) part).getType() instanceof WeaponType);
 
 		case FILTER_PART_TYPE.LOC:
 			return part instanceof MekLocation || part instanceof TankLocation;

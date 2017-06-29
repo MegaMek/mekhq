@@ -209,7 +209,7 @@ public class PartsInUseTableModel extends DataTableModel {
     }
     
     private void buyOrAddPart(IAcquisitionWork partToBuy, int quantity, boolean isBuy) {
-    	if (!campaign.canAcquireEquipment(partToBuy, false)) {
+    	if (isBuy && !campaign.canAcquireEquipment(partToBuy, false)) {
     		return;
     	}
     	
