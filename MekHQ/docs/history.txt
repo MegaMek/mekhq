@@ -5,6 +5,7 @@ v0.43.3-git
 + Feature: Support for multiple crew in command consoles and tripod/quadvee/dual cockpits.
 + Fix #405: Properly set home side for Extraction scenario
 + Added QuadVee parts.
++ Bug [#955]: MekHQ deployed units would not print
 
 v0.43.2 (2017-05-1 22:00 UTC)
 + Fix #362: Omni Refits calculating additional HS incorrectly

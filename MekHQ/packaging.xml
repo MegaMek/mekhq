@@ -151,7 +151,7 @@
             </fileset>
         </copy>
         <!-- grab the megameklab recordsheets files -->
-        <copy todir="${pkgdir}/${datadir}/images/misc" encoding="UTF-8">
+        <copy todir="${pkgdir}/${datadir}/images" encoding="UTF-8">
             <fileset dir="${mml-pkgdir}/${datadir}/images">
                 <include name="recordsheets/" />
             </fileset>
