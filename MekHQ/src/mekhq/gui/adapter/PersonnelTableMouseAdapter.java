@@ -101,6 +101,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
     private static final String CMD_ACQUIRE_SPECIALIST = "SPECIALIST"; //$NON-NLS-1$
     private static final String CMD_ACQUIRE_WEAPON_SPECIALIST = "WSPECIALIST"; //$NON-NLS-1$
     private static final String CMD_ACQUIRE_RANGEMASTER = "RANGEMASTER"; //$NON-NLS-1$
+    private static final String CMD_ACQUIRE_HUMANTRO = "HUMANTRO"; //$NON-NLS-1$
     private static final String CMD_ACQUIRE_ABILITY = "ABILITY"; //$NON-NLS-1$
     private static final String CMD_IMPROVE = "IMPROVE"; //$NON-NLS-1$
     private static final String CMD_ADD_SPOUSE = "SPOUSE"; //$NON-NLS-1$
@@ -607,6 +608,18 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 int cost = Integer.parseInt(data[2]);
                 selectedPerson.acquireAbility(PilotOptions.LVL3_ADVANTAGES,
                         "range_master", selected); //$NON-NLS-1$
+                gui.getCampaign().personUpdated(selectedPerson);
+                selectedPerson.setXp(selectedPerson.getXp() - cost);
+                MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
+                // TODO: add campaign report
+                break;
+            }
+            case CMD_ACQUIRE_HUMANTRO:
+            {
+                String selected = data[1];
+                int cost = Integer.parseInt(data[2]);
+                selectedPerson.acquireAbility(PilotOptions.LVL3_ADVANTAGES,
+                        "human_tro", selected); //$NON-NLS-1$
                 gui.getCampaign().personUpdated(selectedPerson);
                 selectedPerson.setXp(selectedPerson.getXp() - cost);
                 MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
@@ -1719,6 +1732,29 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                                 }
                                 abMenu.add(specialistMenu);
                             }
+                        } else if (spa.getName().equals("human_tro")) { //$NON-NLS-1$
+                            JMenu specialistMenu = new JMenu(resourceMap.getString("humantro.text")); //$NON-NLS-1$
+                            menuItem = new JMenuItem(String.format(resourceMap.getString("abilityDesc.format"), resourceMap.getString("humantro_mek.text"), costDesc)); //$NON-NLS-1$ //$NON-NLS-2$
+                            menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_HUMANTRO, Crew.HUMANTRO_MECH, String.valueOf(cost)));
+                            menuItem.addActionListener(this);
+                            menuItem.setEnabled(available);
+                            specialistMenu.add(menuItem);
+                            menuItem = new JMenuItem(String.format(resourceMap.getString("abilityDesc.format"), resourceMap.getString("humantro_aero.text"), costDesc)); //$NON-NLS-1$ //$NON-NLS-2$
+                            menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_HUMANTRO, Crew.HUMANTRO_AERO, String.valueOf(cost)));
+                            menuItem.addActionListener(this);
+                            menuItem.setEnabled(available);
+                            specialistMenu.add(menuItem);
+                            menuItem = new JMenuItem(String.format(resourceMap.getString("abilityDesc.format"), resourceMap.getString("humantro_vee.text"), costDesc)); //$NON-NLS-1$ //$NON-NLS-2$
+                            menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_HUMANTRO, Crew.HUMANTRO_VEE, String.valueOf(cost)));
+                            menuItem.addActionListener(this);
+                            menuItem.setEnabled(available);
+                            specialistMenu.add(menuItem);
+                            menuItem = new JMenuItem(String.format(resourceMap.getString("abilityDesc.format"), resourceMap.getString("humantro_ba.text"), costDesc)); //$NON-NLS-1$ //$NON-NLS-2$
+                            menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_HUMANTRO, Crew.HUMANTRO_BA, String.valueOf(cost)));
+                            menuItem.addActionListener(this);
+                            menuItem.setEnabled(available);
+                            specialistMenu.add(menuItem);
+                            abMenu.add(specialistMenu);
                         } else if (spa.getName().equals("specialist")) { //$NON-NLS-1$
                             JMenu specialistMenu = new JMenu(resourceMap.getString("specialist.text")); //$NON-NLS-1$
                             menuItem = new JMenuItem(String.format(resourceMap.getString("abilityDesc.format"), resourceMap.getString("laserSpecialist.text"), costDesc)); //$NON-NLS-1$ //$NON-NLS-2$
