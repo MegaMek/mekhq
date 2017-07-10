@@ -109,6 +109,9 @@ class CampaignOpsReputation extends AbstractUnitRating {
             if (u.isMothballed()) {
                 continue;
             }
+            if (!u.isPresent()) {
+                continue;
+            }
 
             updateUnitCounts(u);
 
@@ -225,15 +228,55 @@ class CampaignOpsReputation extends AbstractUnitRating {
         return totalCombatUnits;
     }
 
+    private int getTotalForceUnits() {
+        int totalGround = 0;
+        int totalAero = 0;
+        int totalInfantry = 0;
+        int totalBattleArmor = 0;
+        int forceTotal = 0;
+
+        // Count total units for transport
+        getTotalCombatUnits();
+
+        List<Unit> unitList = getCampaign().getCopyOfUnits();
+        for (Unit u : unitList) {
+            if (u == null) {
+                continue;
+            }
+            if (u.isMothballed() || !u.hasPilot()) {
+                continue;
+            }
+
+            if ((u.getEntity().getEntityType() & Entity.ETYPE_WARSHIP) == Entity.ETYPE_WARSHIP) {
+                totalAero++;
+            } else if ((u.getEntity().getEntityType() & Entity.ETYPE_JUMPSHIP) == Entity.ETYPE_JUMPSHIP) {
+                continue;
+            } else if ((u.getEntity().getEntityType() & Entity.ETYPE_AERO) == Entity.ETYPE_AERO) {
+                totalAero++;
+            } else if (((u.getEntity().getEntityType() & Entity.ETYPE_MECH) == Entity.ETYPE_MECH) 
+                    || ((u.getEntity().getEntityType() & Entity.ETYPE_TANK) == Entity.ETYPE_TANK)) {
+                totalGround++;
+            } else if ((u.getEntity().getEntityType() & Entity.ETYPE_BATTLEARMOR) == Entity.ETYPE_BATTLEARMOR) {
+                totalBattleArmor++;
+            } else if ((u.getEntity().getEntityType() & Entity.ETYPE_INFANTRY) == Entity.ETYPE_INFANTRY) {
+                totalInfantry++;
+            }
+
+        }
+
+        forceTotal = totalGround + totalAero + (totalInfantry / 28) + (totalBattleArmor /5);
+        return forceTotal;
+    }
+
     @Override
     protected BigDecimal calcAverageExperience() {
-        int totalCombatUnits = getTotalCombatUnits();
+        int totalCombatUnits = getTotalForceUnits();
 
         if (totalCombatUnits == 0) {
             return BigDecimal.ZERO;
         }
 
-        return getTotalSkillLevels().divide(BigDecimal.valueOf(totalCombatUnits), 2, BigDecimal.ROUND_HALF_UP);
+        return getTotalSkillLevels().divide(BigDecimal.valueOf(totalCombatUnits), 2, BigDecimal.ROUND_HALF_DOWN);
     }
 
     private void calcNeededTechs() {
@@ -337,9 +380,9 @@ class CampaignOpsReputation extends AbstractUnitRating {
             return SkillType.getExperienceLevelName(-1);
         }
 
-        final BigDecimal eliteThreshold = new BigDecimal("4.99");
-        final BigDecimal vetThreshold = new BigDecimal("8.01");
-        final BigDecimal regThreshold = new BigDecimal("10.99");
+        final BigDecimal eliteThreshold = new BigDecimal("5.00");
+        final BigDecimal vetThreshold = new BigDecimal("7.00");
+        final BigDecimal regThreshold = new BigDecimal("9.00");
 
         if (experience.compareTo(regThreshold) > 0) {
             return SkillType.getExperienceLevelName(SkillType.EXP_GREEN);
@@ -418,65 +461,109 @@ class CampaignOpsReputation extends AbstractUnitRating {
 
         // todo Superheavys.
         // Find out how short of transport bays we are.
-        boolean doubleCapacity = true;
+        boolean doubleExcessCapacity = true;
         boolean fullCapacity = true;
+        boolean excessCapacity = true;
         int heavyVeeBays = getHeavyVeeBayCount();
-        if (getMechBayCount() < getMechCount()) {
+
+        if (getMechBayCount() == getMechCount()) {
+            excessCapacity = false;
+            doubleExcessCapacity = false;
+        } else if (getMechBayCount() < getMechCount()) {
             fullCapacity = false;
-            doubleCapacity = false;
+            excessCapacity = false;
+            doubleExcessCapacity = false;
         } else if (getMechBayCount() < getMechCount() * 2) {
-            doubleCapacity = false;
-        }
-        if (getProtoBayCount() < getProtoCount()) {
             fullCapacity = false;
-            doubleCapacity = false;
+            doubleExcessCapacity = false;
+        }
+        if (getProtoBayCount() == getProtoCount()) {
+            excessCapacity = false;
+            doubleExcessCapacity = false;
+        } else if (getProtoBayCount() < getProtoCount()) {
+            fullCapacity = false;
+            excessCapacity = false;
+            doubleExcessCapacity = false;
         } else if (getProtoBayCount() < getProtoCount() * 2) {
-            doubleCapacity = false;
-        }
-        if (getHeavyVeeBayCount() < getHeavyVeeCount()) {
             fullCapacity = false;
-            doubleCapacity = false;
+            doubleExcessCapacity = false;
+        }
+        if (getHeavyVeeBayCount() == getHeavyVeeCount()) {
+            excessCapacity = false;
+            doubleExcessCapacity = false;
+        } else if (getHeavyVeeBayCount() < getHeavyVeeCount()) {
+            fullCapacity = false;
+            excessCapacity = false;
+            doubleExcessCapacity = false;
         } else if (getHeavyVeeBayCount() < getHeavyVeeCount() * 2) {
-            doubleCapacity = false;
+            fullCapacity = false;
+            doubleExcessCapacity = false;
         }
         heavyVeeBays -= getHeavyVeeBayCount();
         int lightVeeBays = getLightVeeBayCount() + heavyVeeBays;
-        if (lightVeeBays < getLightVeeCount()) {
+        if (lightVeeBays == getLightVeeCount()) {
+            excessCapacity = false;
+            doubleExcessCapacity = false;
+        } else if (lightVeeBays < getLightVeeCount()) {
             fullCapacity = false;
-            doubleCapacity = false;
+            excessCapacity = false;
+            doubleExcessCapacity = false;
         } else if (lightVeeBays < getLightVeeCount() * 2) {
-            doubleCapacity = false;
-        }
-        if (getFighterBayCount() < getFighterCount()) {
             fullCapacity = false;
-            doubleCapacity = false;
+            doubleExcessCapacity = false;
+        }
+        if (getFighterBayCount() == getFighterCount()) {
+            excessCapacity = false;
+            doubleExcessCapacity = false;
+        } else if (getFighterBayCount() < getFighterCount()) {
+            fullCapacity = false;
+            excessCapacity = false;
+            doubleExcessCapacity = false;
         } else if (getFighterBayCount() < getFighterCount() * 2) {
-            doubleCapacity = false;
-        }
-        if ((getBaBayCount()) < getBattleArmorCount() / 5) {
             fullCapacity = false;
-            doubleCapacity = false;
+            doubleExcessCapacity = false;
+        }
+        if ((getBaBayCount()) == getBattleArmorCount() / 5) {
+            excessCapacity = false;
+            doubleExcessCapacity = false;
+        } else if ((getBaBayCount()) < getBattleArmorCount() / 5) {
+            fullCapacity = false;
+            excessCapacity = false;
+            doubleExcessCapacity = false;
         } else if ((getBaBayCount() * 2) < 2 * getBattleArmorCount() / 5) {
-            doubleCapacity = false;
+            fullCapacity = false;
+            doubleExcessCapacity = false;
         }
         if (getInfantryBayCount() < getInfantryCount() / 28) {
+            excessCapacity = false;
+            doubleExcessCapacity = false;
+        } else if (getInfantryBayCount() < getInfantryCount() / 28) {
             fullCapacity = false;
-            doubleCapacity = false;
+            excessCapacity = false;
+            doubleExcessCapacity = false;
         } else if (getInfantryBayCount() < getInfantryCount() / 14) {
-            doubleCapacity = false;
-        }
-        if (getSmallCraftBayCount() < getSmallCraftCount()) {
             fullCapacity = false;
-            doubleCapacity = false;
+            doubleExcessCapacity = false;
+        }
+        if (getSmallCraftBayCount() == getSmallCraftCount()) {
+            excessCapacity = false;
+            doubleExcessCapacity = false;
+        } else if (getSmallCraftBayCount() < getSmallCraftCount()) {
+            fullCapacity = false;
+            excessCapacity = false;
+            doubleExcessCapacity = false;
         } else if (getSmallCraftBayCount() < (getSmallCraftCount() * 2)) {
-            doubleCapacity = false;
+            fullCapacity = false;
+            doubleExcessCapacity = false;
         }
 
         //Find the percentage of units that are transported.
-        if (doubleCapacity) {
+        if (doubleExcessCapacity) {
             totalValue += 10;
-        } else if (fullCapacity) {
+        } else if (excessCapacity) {
             totalValue += 5;
+        } else if (fullCapacity) {
+            totalValue += 0;
         } else {
             totalValue -= 5;
         }
@@ -591,7 +678,7 @@ class CampaignOpsReputation extends AbstractUnitRating {
     // Campaign Ops counts both Doctors and Admins as admins.
     private int calcAdminSupportValue() {
         int admins = getCampaign().getAdmins().size();
-        int docs = getCampaign().getAdmins().size();
+        int docs = getCampaign().getDoctors().size();
         if (getAdminsNeeded() > (admins + docs)) {
             return -5;
         }
