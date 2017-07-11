@@ -68,8 +68,7 @@ public class ContractMarket implements Serializable {
 	private static final long serialVersionUID = 1303462872220110093L;
 
 	public static int TYPE_ATBMONTHLY = 0;
-	//TODO: Implement a method that rolls each day to see whether a new contract appears or an offer disappears
-
+	
 	public final static int CLAUSE_COMMAND = 0;
 	public final static int CLAUSE_SALVAGE = 1;
 	public final static int CLAUSE_SUPPORT = 2;
@@ -101,6 +100,21 @@ public class ContractMarket implements Serializable {
 
 	public ArrayList<Contract> getContracts() {
 		return contracts;
+	}
+	
+	// This is a helper function that encapsulates the operation of
+	// incrementing the last ID and adding a contract to the contracts list and contractIds HashMap
+	protected void incrementIDAndAddContract(Contract c)
+	{
+		lastId++;
+        c.setId(lastId);
+        contractIds.put(lastId, c);
+	}
+	
+	//returns the method used to generate contracts
+	protected int getContractGenerationMethod()
+	{
+		return method;
 	}
 
 	public void removeContract(Contract c) {
@@ -291,7 +305,7 @@ public class ContractMarket implements Serializable {
 	/* If no suitable planet can be found or no jump path to the planet can be calculated after
 	 * the indicated number of retries, this will return null.
 	 */
-	private AtBContract generateAtBContract(Campaign campaign, int unitRatingMod) {
+	protected AtBContract generateAtBContract(Campaign campaign, int unitRatingMod) {
 		if (campaign.getFactionCode().equals("MERC")) {
 			if (null == campaign.getRetainerEmployerCode()) {
 				int retries = 3;
@@ -318,16 +332,14 @@ public class ContractMarket implements Serializable {
 		return generateAtBContract(campaign, employer, unitRatingMod, 3);
 	}
 
-	private AtBContract generateAtBContract(Campaign campaign,
+	protected AtBContract generateAtBContract(Campaign campaign,
 			String employer, int unitRatingMod, int retries) {
 		AtBContract contract = new AtBContract(employer
 				+"-"
 				+Contract.generateRandomContractName()
 				+"-"
 				+(new SimpleDateFormat("yyyyMM")).format(campaign.calendar.getTime()));
-        lastId++;
-        contract.setId(lastId);
-        contractIds.put(lastId, contract);
+		incrementIDAndAddContract(contract);
 
         if (employer.equals("MERC")) {
         	contract.setMercSubcontract(true);
@@ -444,9 +456,7 @@ public class ContractMarket implements Serializable {
 
 		contract.setParentContract(parent);
         contract.initContractDetails(campaign);
-		lastId++;
-		contract.setId(lastId);
-		contractIds.put(lastId, contract);
+        incrementIDAndAddContract(contract);
 
         /* The AtB rules say to roll the enemy, but also that the subcontract
          * takes place in the same planet/sector. Rebels and pirates can
@@ -541,9 +551,7 @@ public class ContractMarket implements Serializable {
 
         followup.initContractDetails(campaign);
         followup.calculateContract(campaign);
-		lastId++;
-		followup.setId(lastId);
-		contractIds.put(lastId, followup);
+        incrementIDAndAddContract(followup);
 
 		contracts.add(followup);
 		followupContracts.put(followup.getId(), contract.getId());
@@ -803,6 +811,7 @@ public class ContractMarket implements Serializable {
 
     public void writeToXml(PrintWriter pw1, int indent) {
         pw1.println(MekHqXmlUtil.indentStr(indent) + "<contractMarket>");
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "contractMarketType", getClass().getCanonicalName());
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "lastId", lastId);
         for (Contract c : contracts) {
             c.writeToXml(pw1, indent + 1);
@@ -830,9 +839,6 @@ public class ContractMarket implements Serializable {
         ContractMarket retVal = null;
 
         try {
-            // Instantiate the correct child class, and call its parsing function.
-            retVal = new ContractMarket();
-
             // Okay, now load Part-specific fields!
             NodeList nl = wn.getChildNodes();
 
@@ -845,7 +851,9 @@ public class ContractMarket implements Serializable {
                     continue;
                 }
 
-                if (wn2.getNodeName().equalsIgnoreCase("lastId")) {
+                if (wn2.getNodeName().equalsIgnoreCase("contractMarketType")) { 
+                	retVal = Class.forName(wn2.getTextContent()).asSubclass(ContractMarket.class).getConstructor().newInstance();
+                } else if (wn2.getNodeName().equalsIgnoreCase("lastId")) {
                 	retVal.lastId = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("mission")) {
                 	Mission m = Mission.generateInstanceFromXML(wn2, c, version);

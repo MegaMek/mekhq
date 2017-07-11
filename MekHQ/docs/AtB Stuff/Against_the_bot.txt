@@ -68,7 +68,7 @@ If bonus parts are awarded through contract special events or rescuing civilian 
 3.1 Not implemented
 MekHQ does not (yet) implement the following parts of the AtB rules:
 * Unit creation
-* Pirate rules
+* Pirate rules (partially implemented)
 * Noble rules
 * "Other" factions (partial: independent planets and mercenary subcontracts are implemented, but corporations/regional governments/private citizens are not)
 * Special event related to Lostech units
@@ -88,6 +88,9 @@ The AtB rules are built around mercenary units, with optional rules for pirates 
 ComStar/Word of Blake units should set the unit organization in the campaign options to Level II, which increases the limit on lance size and weight by 50%. To run a ComStar campaign properly would required rules for covert missions, but ComStar is still a usable faction under the existing rules. It works best if played after the ComGuard was officially made public in 3030 and before they were disbanded in 3081. Opponents will include pirates, bandit kingdoms, rebels, independent worlds, Clans (after Tukayyid) and Word of Blake (after the loss of Terra). ComStar will also occasionally appear as an employer for mercernaries.
 
 Clan units should set the unit organization to Star, which not only increases the limits by 25%, but counts points rather than individual units. Players can also form novas (either standard 'Mechs and Battlearmor or vehicle+conventional infantry novas fielded by Hell's Horses) without crossing the limits.
+
+3.3.1 Playing pirates (partially implemented)
+When a unit goes pirate (either voluntarily or after a major breach of contract), they are much less likely be offered standard mercenary contracts. Any existing contracts in the contract market will no longer be offered. Instead, every month, the "contract" market will generate a new contract, by picking an arbitrary planet within zero to four jumps and generating a "Pirate Contract", which represents the unit leader picking a target (using a dartboard). The pirate-specific mechanisms are documented in the "Pirates" tab of the official AtB rules, but, to summarize, pirates tend to make money from Extraction Raid and Objective Raid "contracts". Occasionally (1/6 odds), a standard mercenary contract will be offered, which can be taken and completed as normal. None of the pirate-specific mechanisms have been implemented yet, so you will need to "roleplay" them directly from the AtB for now.
 
 3.4 Features changed from the official AtB ruleset
 I tried to avoid making any outright changes (as opposed to alternatives) from the AtB rules, but there were two situations where I thought there was a compelling reason to do so.
