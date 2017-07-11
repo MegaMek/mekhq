@@ -6,6 +6,9 @@ v0.43.3-git
 + Fix #405: Properly set home side for Extraction scenario
 + Added QuadVee parts.
 + Bug [#955]: MekHQ deployed units would not print
++ PR#375 - Bug-Bad CO Rating.
++ PR#366 - Human TRO
++ PR#249 - AtB Contract Names
 
 v0.43.2 (2017-05-1 22:00 UTC)
 + Fix #362: Omni Refits calculating additional HS incorrectly
