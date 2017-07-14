@@ -1675,10 +1675,6 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 light = Integer.parseInt(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("weather")) {
                 weather = Integer.parseInt(wn2.getTextContent());
-                if(weather > PlanetaryConditions.WE_SIZE || weather < PlanetaryConditions.WE_NONE)
-                {
-                	weather = PlanetaryConditions.WE_NONE;
-                }
             } else if (wn2.getNodeName().equalsIgnoreCase("wind")) {
                 wind = Integer.parseInt(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("fog")) {
