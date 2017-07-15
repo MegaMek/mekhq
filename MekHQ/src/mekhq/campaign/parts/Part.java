@@ -877,7 +877,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	        }
 		}
 		if(isClanTechBase() || (this instanceof MekLocation && this.getUnit() != null && this.getUnit().getEntity().isClan())) {
-			if (null != tech && !tech.isClanner() && !tech.getSpas().containsKey("clan_tech_knowledge")) {
+			if (null != tech && !tech.isClanner()) {
 				mods.addModifier(2, "clan tech");
 			}
 		}
