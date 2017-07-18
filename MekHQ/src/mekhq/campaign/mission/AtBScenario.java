@@ -386,8 +386,8 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             else if (r2 == 2) weather = PlanetaryConditions.WE_DOWNPOUR;
             else if (r2 == 3) weather = PlanetaryConditions.WE_SLEET;
             else if (r2 == 4) weather = PlanetaryConditions.WE_ICE_STORM;
-            else if (r2 == 5) weather = PlanetaryConditions.WI_TORNADO_F13;
-            else if (r2 == 6) weather = PlanetaryConditions.WI_TORNADO_F4;
+            else if (r2 == 5) wind = PlanetaryConditions.WI_TORNADO_F13; // tornadoes are classified as wind rather than weather.
+            else if (r2 == 6) wind = PlanetaryConditions.WI_TORNADO_F4;
         } else {
             if (r2 < 5) fog = PlanetaryConditions.FOG_LIGHT;
             else fog = PlanetaryConditions.FOG_HEAVY;
