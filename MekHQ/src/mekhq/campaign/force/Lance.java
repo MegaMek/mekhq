@@ -390,7 +390,7 @@ public class Lance implements Serializable, MekHqXmlSerializable {
                         getBattleDate(c.getCalendar()));
             } else if (roll < 41) {
                 return AtBScenarioFactory.createScenario(c, this,
-                        AtBScenario.PROBE, true,
+                        AtBScenario.PROBE, false,
                         getBattleDate(c.getCalendar()));
             } else if (roll < 41 + noBattle) {
                 return null;
