@@ -1,5 +1,7 @@
 VERSION HISTORY:
 ----------------
+v0.43.4-git
+
 v0.43.3 (2017-07-18 18:30 UTC)
 + Feature: Refactor AtBScenario to break up the monolithic AtBScenario class and to have a separate class for each scenario
 + Feature: Support for multiple crew in command consoles and tripod/quadvee/dual cockpits.
