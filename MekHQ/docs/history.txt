@@ -2,6 +2,7 @@ VERSION HISTORY:
 ----------------
 v0.43.4-git
 + Feature #363: Order from warehouse
++ Fix #398: Probe (Defender) missions can now occur
 
 v0.43.3 (2017-07-18 18:30 UTC)
 + Feature: Refactor AtBScenario to break up the monolithic AtBScenario class and to have a separate class for each scenario
