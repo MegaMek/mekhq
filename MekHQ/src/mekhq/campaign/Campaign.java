@@ -6017,16 +6017,16 @@ public class Campaign implements Serializable {
         		 * for non-flamer energy weapons, which was the reason this
         		 * rule was included in AtB to begin with.
         		 */
-        		if (et instanceof megamek.common.weapons.EnergyWeapon
-        				&& !(et instanceof megamek.common.weapons.FlamerWeapon)
+        		if (et instanceof megamek.common.weapons.lasers.EnergyWeapon
+        				&& !(et instanceof megamek.common.weapons.flamers.FlamerWeapon)
         				&& partAvailability < EquipmentType.RATING_C) {
         			partAvailability = EquipmentType.RATING_C;
         		}
-        		if (et instanceof megamek.common.weapons.ACWeapon) {
+        		if (et instanceof megamek.common.weapons.autocannons.ACWeapon) {
         			partAvailability -= 2;
         		}
-        		if (et instanceof megamek.common.weapons.GaussWeapon
-        				|| et instanceof megamek.common.weapons.FlamerWeapon) {
+        		if (et instanceof megamek.common.weapons.gaussrifles.GaussWeapon
+        				|| et instanceof megamek.common.weapons.flamers.FlamerWeapon) {
         			partAvailability--;
         		}
                 if (et instanceof megamek.common.AmmoType) {
