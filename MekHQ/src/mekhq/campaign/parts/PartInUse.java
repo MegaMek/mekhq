@@ -1,16 +1,12 @@
 package mekhq.campaign.parts;
 
 import java.util.Objects;
-import java.util.regex.Pattern;
 
 import megamek.common.AmmoType;
-import mekhq.campaign.unit.Unit;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.work.IAcquisitionWork;
 
 public class PartInUse {
-    private static final Pattern cleanUp1 = Pattern.compile("\\d+\\shit\\(s\\),\\s"); //$NON-NLS-1$
-    private static final Pattern cleanUp2 = Pattern.compile("\\d+\\shit\\(s\\)"); //$NON-NLS-1$
-
     private String description;
     private IAcquisitionWork partToBuy;
     private int useCount;
@@ -20,59 +16,27 @@ public class PartInUse {
     private int plannedCount;
     private long cost;
     
-    private void appendDetails(StringBuilder sb, Part part) {
-        String details = part.getDetails();
-        details = cleanUp1.matcher(details).replaceFirst(""); //$NON-NLS-1$
-        details = cleanUp2.matcher(details).replaceFirst(""); //$NON-NLS-1$
-        if(details.length() > 0) {
-            sb.append(" (").append(details).append(")"); //$NON-NLS-1$ //$NON-NLS-2$
-        }
-    }
-    
-    public PartInUse(Part part) {
-        StringBuilder sb = new StringBuilder(part.getName());
-        Unit u = part.getUnit();
-        if(!(part instanceof MissingBattleArmorSuit)) {
-            part.setUnit(null);
-        }
-        if(!(part instanceof Armor) && !(part instanceof AmmoStorage)) {
-            appendDetails(sb, part);
-        }
-        part.setUnit(u);
-        this.description = sb.toString();
+    public PartInUse(Part part, Campaign c) {
+        this.description = part.generateLongDescription(c);
         this.partToBuy = part.getAcquisitionWork();
         this.tonnagePerItem = part.getTonnage();
-        // AmmoBin are special: They aren't buyable (yet?), but instead buy you the ammo inside
-        // We redo the description based on that
+
         if(partToBuy instanceof AmmoStorage) {
-            sb.setLength(0);
-            sb.append(((AmmoStorage) partToBuy).getName());
-            appendDetails(sb, (Part) ((AmmoStorage) partToBuy).getAcquisitionWork());
-            this.description = sb.toString();
-            AmmoType ammoType = (AmmoType) ((AmmoStorage) partToBuy).getType();
-            if(ammoType.getKgPerShot() > 0) {
-                this.tonnagePerItem = ammoType.getKgPerShot() / 1000.0;
-            } else {
-                this.tonnagePerItem = 1.0 / ammoType.getShots();
-            }
-        }
-        if(part instanceof Armor) {
+	        AmmoType ammoType = (AmmoType) ((AmmoStorage) partToBuy).getType();
+	        
+	        if(ammoType.getKgPerShot() > 0) {
+	            this.tonnagePerItem = ammoType.getKgPerShot() / 1000.0;
+	        } else {
+	            this.tonnagePerItem = 1.0 / ammoType.getShots();
+	        }
+        } else if(part instanceof Armor) {
             // Armor needs different tonnage values
             this.tonnagePerItem = 1.0 / ((Armor) part).getArmorPointsPerTon();
         }
+        
         if(null != partToBuy) {
             this.cost = partToBuy.getBuyCost();
         }
-    }
-    
-    public PartInUse(String description, IAcquisitionWork partToBuy, long cost) {
-        this.description = Objects.requireNonNull(description);
-        this.partToBuy = Objects.requireNonNull(partToBuy);
-        this.cost = cost;
-    }
-    
-    public PartInUse(String description, IAcquisitionWork partToBuy) {
-        this(description, partToBuy, partToBuy.getBuyCost());
     }
     
     public String getDescription() {

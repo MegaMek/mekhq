@@ -686,7 +686,8 @@ public final class OverviewTab extends CampaignGuiTab {
 		PartInUse piu = overviewPartsModel.getPartInUse(row);
 		IAcquisitionWork newPart = piu.getPartToBuy();
 
-		if (piu.equals(new PartInUse((Part) newPart))) {
+		//TODO: This is horribly inefficient. Redo it. Why do we even bother doing this?
+		if (piu.equals(new PartInUse((Part) newPart, getCampaign()))) {
 			// Simple update
 			getCampaign().updatePartInUse(piu);
 			overviewPartsModel.fireTableRowsUpdated(row, row);

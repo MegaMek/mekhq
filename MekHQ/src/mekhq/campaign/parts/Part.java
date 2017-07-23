@@ -25,6 +25,7 @@ import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.StringJoiner;
 import java.util.UUID;
 
@@ -1452,6 +1453,83 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
         imgData[1] = imgBase;
 
         return imgData;
+	}
+	
+	protected String generateLongDescriptionDetails() {
+	    if (isOmniPodded()) {
+	        return " (OmniPod)";
+	    }
+
+	    return "";
+	}
+	
+	private String updateLongDescriptionTechBase(String description) {
+        int techBase = getTechBase();
+        
+        if (description.indexOf(" (Clan)") > -1) {
+        	description = description.replaceAll(" \\(Clan\\)", "");
+        	techBase = Part.T_CLAN;
+        }
+        
+        if (techBase == Part.T_UNKNOWN) {
+        	techBase = Part.T_BOTH;
+        }
+        
+        switch (techBase) {
+	    	case Part.T_CLAN:
+	    		description += (" [Clan]");
+	    		break;
+	    		
+	    	case Part.T_IS:
+	    		description += (" [IS]");
+	    		break;
+        }
+        
+        return description;
+	}
+	
+	public String generateLongDescription(Campaign c) {
+        // AmmoBin are special: They aren't buyable (yet?), but instead buy you the ammo inside
+        // We redo the description based on that
+        if(getAcquisitionWork() instanceof AmmoStorage) {
+        	IAcquisitionWork partToBuy = getAcquisitionWork();
+        	StringBuilder sb = new StringBuilder();
+            
+            sb.append(((AmmoStorage) partToBuy).getName());
+            sb.append(((Part) ((AmmoStorage) partToBuy).getAcquisitionWork()).generateLongDescriptionDetails());
+
+            return updateLongDescriptionTechBase(sb.toString());
+        }
+		
+        String desc = getName();
+        Unit u = getUnit();
+        
+        if(!(this instanceof Armor) && !(this instanceof AmmoStorage)) {
+        	desc += generateLongDescriptionDetails();
+        }
+        
+        setUnit(u);
+        
+        desc = updateLongDescriptionTechBase(desc);
+                 
+        List<Part> partsStoreList = c.getPartsStore().getByName(getName());
+        
+        if ((null != partsStoreList) && (partsStoreList.size() > 0)) {
+        	double lastTonnage = -1d;
+        	
+        	for (Part storePart : partsStoreList) {
+        		if (storePart.getTechBase() == getTechBase()) {
+        			if (lastTonnage == -1) {
+        				lastTonnage = storePart.getTonnage();
+        			} else if (lastTonnage != storePart.getTonnage()) {
+        				desc += String.format(" [%s ton]", getTonnage());
+        				break;
+        			}
+        		}
+        	}
+        }
+        
+        return desc;
 	}
 }
 

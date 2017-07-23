@@ -1944,10 +1944,6 @@ public class CampaignGUI extends JPanel {
         return techHash.get(s).getId();
     }
 
-    public Part getPartByNameAndDetails(String pnd) {
-        return getCampaign().getPartsStore().getByNameAndDetails(pnd);
-    }
-
     protected void loadListFile(boolean allowNewPilots) throws IOException {
         JFileChooser loadList = new JFileChooser(".");
         loadList.setDialogTitle("Load Units");

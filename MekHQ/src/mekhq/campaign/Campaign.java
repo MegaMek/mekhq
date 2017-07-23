@@ -172,9 +172,11 @@ import mekhq.campaign.parts.ProtomekArmor;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.parts.StructuralIntegrity;
 import mekhq.campaign.parts.equipment.AmmoBin;
+import mekhq.campaign.parts.equipment.BattleArmorEquipmentPart;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.HeatSink;
 import mekhq.campaign.parts.equipment.MASC;
+import mekhq.campaign.parts.equipment.MissingBattleArmorEquipmentPart;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.parts.equipment.MissingMASC;
 import mekhq.campaign.personnel.Ancestors;
@@ -1389,11 +1391,17 @@ public class Campaign implements Serializable {
         {
             return null;
         }
+        
+        // We don't buy parts for BA
+        if ((p instanceof MissingBattleArmorEquipmentPart) || (p instanceof BattleArmorEquipmentPart)) {
+        	return null;
+        }
+        
         // Replace a "missing" part with a corresponding "new" one.
         if(p instanceof MissingPart) {
             p = ((MissingPart) p).getNewPart();
         }
-        PartInUse result = new PartInUse(p);
+        PartInUse result = new PartInUse(p, this);
         return (null != result.getPartToBuy()) ? result : null;
     }
     
@@ -1434,31 +1442,38 @@ public class Campaign implements Serializable {
     public Set<PartInUse> getPartsInUse() {
         // java.util.Set doesn't supply a get(Object) method, so we have to use a java.util.Map
         Map<PartInUse, PartInUse> inUse = new HashMap<PartInUse, PartInUse>();
+        
         for(Part p : parts) {
             PartInUse piu = getPartInUse(p);
             if(null == piu) {
                 continue;
             }
+            
             if( inUse.containsKey(piu) ) {
                 piu = inUse.get(piu);
             } else {
                 inUse.put(piu, piu);
             }
+            
             updatePartInUseData(piu, p);
         }
+        
         for(IAcquisitionWork maybePart : shoppingList.getPartList()) {
             if(!(maybePart instanceof Part)) {
                 continue;
             }
+            
             PartInUse piu = getPartInUse((Part) maybePart);
             if(null == piu) {
                 continue;
             }
+            
             if( inUse.containsKey(piu) ) {
                 piu = inUse.get(piu);
             } else {
                 inUse.put(piu, piu);
             }
+            
             piu.setPlannedCount(piu.getPlannedCount()
                 + getQuantity((maybePart instanceof MissingPart) ? ((MissingPart) maybePart).getNewPart() : (Part) maybePart)
                 * maybePart.getQuantity());

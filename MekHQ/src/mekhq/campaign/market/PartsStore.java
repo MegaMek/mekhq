@@ -26,8 +26,8 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 import megamek.common.Aero;
 import megamek.common.AmmoType;
@@ -100,11 +100,11 @@ public class PartsStore implements Serializable {
 	private static int EXPECTED_SIZE = 50000;
 	
 	private ArrayList<Part> parts;
-	private Map<String, Part> nameAndDetailMap;
+	private Map<String, List<Part>> nameMap;
 
 	public PartsStore(Campaign c) {
 		parts = new ArrayList<Part>(EXPECTED_SIZE);
-		nameAndDetailMap = new HashMap<String, Part>(EXPECTED_SIZE);
+		nameMap = new HashMap<String, List<Part>>(EXPECTED_SIZE);
 		stock(c);
 	}
 
@@ -112,8 +112,8 @@ public class PartsStore implements Serializable {
 		return parts;
 	}
 	
-	public Part getByNameAndDetails(String nameAndDetails) {
-		return nameAndDetailMap.get(nameAndDetails);
+	public List<Part> getByName(String name) {
+		return nameMap.get(name);
 	}
 
 	public void stock(Campaign c) {
@@ -130,21 +130,19 @@ public class PartsStore implements Serializable {
 		stockProtomekComponents(c);
 		stockBattleArmorSuits(c);
 		
-		Pattern cleanUp1 = Pattern.compile("\\d+\\shit\\(s\\),\\s"); //$NON-NLS-1$
-		Pattern cleanUp2 = Pattern.compile("\\d+\\shit\\(s\\)"); //$NON-NLS-1$
-		StringBuilder sb = new StringBuilder();
 		for(Part p : parts) {
+			List<Part> namePartList = null;
+			
 			p.setBrandNew(true);
-			sb.setLength(0);
-			sb.append(p.getName());
-			if(!(p instanceof Armor || p instanceof BaArmor || p instanceof ProtomekArmor)) {
-				String details = p.getDetails();
-				details = cleanUp2.matcher(cleanUp1.matcher(details).replaceFirst("")).replaceFirst(""); //$NON-NLS-1$ //$NON-NLS-2$
-				if (details.length() > 0) {
-					sb.append(" (").append(details).append(")"); //$NON-NLS-1$ //$NON-NLS-2$
-				}
-		    }
-			nameAndDetailMap.put(sb.toString(), p);
+			
+			if (nameMap.containsKey(p.getName())) {
+				namePartList = nameMap.get(p.getName());
+			} else {
+				namePartList = new ArrayList<Part>();
+				nameMap.put(p.getName(), namePartList);
+			}
+			
+			namePartList.add(p);
 		}
 	}
 

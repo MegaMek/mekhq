@@ -398,5 +398,12 @@ public class MissingBattleArmorSuit extends MissingPart {
 	public int getReIntroDate() {
 		return EquipmentType.DATE_NONE;
 	}
+	
+	@Override
+	public String generateLongDescription(Campaign c) {
+		setUnit(null);
+		
+		return super.generateLongDescription(c);
+	}
 
 }
