@@ -864,6 +864,15 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
             optionComp.setSelected(option.stringValue());
         }
 
+        if ("human_tro".equals(option.getName())) { //$NON-NLS-1$
+            optionComp.addValue(Crew.HUMANTRO_NONE);
+            optionComp.addValue(Crew.HUMANTRO_MECH);
+            optionComp.addValue(Crew.HUMANTRO_AERO);
+            optionComp.addValue(Crew.HUMANTRO_VEE);
+            optionComp.addValue(Crew.HUMANTRO_BA);
+            optionComp.setSelected(option.stringValue());
+        }
+
         gridbag.setConstraints(optionComp, c);
         panOptions.add(optionComp);
 

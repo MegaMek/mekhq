@@ -548,7 +548,7 @@ public class PersonViewPanel extends JPanel {
             pnlStats.add(lblChildren2, gridBagConstraints);
         }
 
-        if(campaign.getCampaignOptions().useAbilities() && person.countSPAs() > 0) {
+        if(campaign.getCampaignOptions().useAbilities() && person.countOptions(PilotOptions.LVL3_ADVANTAGES) > 0) {
             secondy++;
             lblAbility1.setName("lblAbility1"); // NOI18N //$NON-NLS-1$
             lblAbility1.setText(resourceMap.getString("lblAbility1.text")); //$NON-NLS-1$
