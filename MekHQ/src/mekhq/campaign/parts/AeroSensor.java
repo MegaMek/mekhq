@@ -22,6 +22,9 @@
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
+import java.util.StringJoiner;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import megamek.common.Aero;
 import megamek.common.Compute;
@@ -221,6 +224,13 @@ public class AeroSensor extends Part {
 		return super.getDetails() + ", " + getUnitTonnage() + " tons" + dropper;
     }
 	
+	@Override
+	protected String generateLongDescriptionDetails() {
+		return Stream.of(super.generateLongDescriptionDetails(), String.format("%s tons%s", getUnitTonnage(), largeCraft ? " (dropship)" : ""))
+        	.filter(s -> s != null && !s.isEmpty())
+        	.collect(Collectors.joining(","));
+	}
+
 	@Override
 	public boolean isRightTechType(String skillType) {
 		return skillType.equals(SkillType.S_TECH_AERO);

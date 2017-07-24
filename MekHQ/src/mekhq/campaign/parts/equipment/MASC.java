@@ -27,6 +27,7 @@ import java.util.GregorianCalendar;
 import megamek.common.EquipmentType;
 import megamek.common.MiscType;
 import megamek.common.TechConstants;
+import megamek.common.util.StringUtil;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.MissingPart;
@@ -169,6 +170,24 @@ public class MASC extends EquipmentPart {
 		}
 		return super.getDetails() + ", " + getUnitTonnage() + " tons, " + getEngineRating() + " rating";
 	 }
+	
+	@Override
+	protected String generateLongDescriptionDetails() {
+		String superDetails = super.generateLongDescriptionDetails();
+		String localDetails = "";
+		
+		if(isSupercharger()) {
+			localDetails = getEngineRating() + " rating";
+		} else {
+			localDetails = getUnitTonnage() + " tons, " + getEngineRating() + " rating";
+		}
+		
+		if (!StringUtil.isNullOrEmpty(superDetails)) {
+			superDetails += ", ";
+		}
+		
+		return superDetails + localDetails;
+	}
 	
 	@Override
     public boolean isOmniPoddable() {

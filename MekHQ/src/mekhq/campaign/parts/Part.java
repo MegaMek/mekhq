@@ -23,6 +23,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 import java.io.Serializable;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
@@ -39,6 +40,7 @@ import megamek.common.Tank;
 import megamek.common.TargetRoll;
 import megamek.common.TechConstants;
 import megamek.common.WeaponType;
+import megamek.common.util.StringUtil;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
@@ -200,7 +202,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	//only relevant for acquisitionable parts
 	protected int daysToWait;
 	protected int replacementId;
-
+	
 	public Part() {
 		this(0, false, null);
 	}
@@ -1030,13 +1032,17 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	@Override
     public String getDetails() {
 	    StringJoiner sj = new StringJoiner(", ");
+	    
 	    if (getLocationName() != null) {
 	        sj.add(getLocationName());
 	    }
+	    
 	    if (isOmniPodded()) {
 	        sj.add("OmniPod");
 	    }
-        sj.add(hits + " hit(s)");
+	    
+	    sj.add(hits + " hit(s)");
+	    
         return sj.toString();
     }
 
@@ -1456,14 +1462,16 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	}
 	
 	protected String generateLongDescriptionDetails() {
+	    StringJoiner sj = new StringJoiner(", ");
+	    
 	    if (isOmniPodded()) {
-	        return " (OmniPod)";
+	        sj.add("OmniPod");
 	    }
-
-	    return "";
+	    
+        return sj.toString();
 	}
 	
-	private String updateLongDescriptionTechBase(String description) {
+	private final String updateLongDescription(String description) {
         int techBase = getTechBase();
         
         if (description.indexOf(" (Clan)") > -1) {
@@ -1488,45 +1496,57 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
         return description;
 	}
 	
+	private static DecimalFormat tonnageFormatter = new DecimalFormat("0.##");
+	
 	public String generateLongDescription(Campaign c) {
         // AmmoBin are special: They aren't buyable (yet?), but instead buy you the ammo inside
         // We redo the description based on that
         if(getAcquisitionWork() instanceof AmmoStorage) {
         	IAcquisitionWork partToBuy = getAcquisitionWork();
-        	StringBuilder sb = new StringBuilder();
             
-            sb.append(((AmmoStorage) partToBuy).getName());
-            sb.append(((Part) ((AmmoStorage) partToBuy).getAcquisitionWork()).generateLongDescriptionDetails());
-
-            return updateLongDescriptionTechBase(sb.toString());
+            String desc = ((AmmoStorage) partToBuy).getName(); 
+            String details = ((Part) ((AmmoStorage) partToBuy).getAcquisitionWork()).generateLongDescriptionDetails();
+            
+            desc = updateLongDescription(desc);
+            
+            if (!StringUtil.isNullOrEmpty(details)) {
+            	desc += String.format(" [%s]", details);
+            }
         }
 		
         String desc = getName();
+        String details = "";        		
         Unit u = getUnit();
         
+        setUnit(null);
+        
         if(!(this instanceof Armor) && !(this instanceof AmmoStorage)) {
-        	desc += generateLongDescriptionDetails();
+        	details = generateLongDescriptionDetails();
         }
         
         setUnit(u);
+		        
+		List<Part> partsStoreList = c.getPartsStore().getByName(getName());
+		
+		if ((null != partsStoreList) && (partsStoreList.size() > 0)) {
+			double lastTonnage = -1d;
+			
+			for (Part storePart : partsStoreList) {
+				if (storePart.getTechBase() == getTechBase()) {
+					if (lastTonnage == -1) {
+						lastTonnage = storePart.getTonnage();
+					} else if (lastTonnage != storePart.getTonnage()) {
+						desc += String.format(" [%s ton]", tonnageFormatter.format(getTonnage()));
+						break;
+					}
+				}
+			}
+		}
         
-        desc = updateLongDescriptionTechBase(desc);
-                 
-        List<Part> partsStoreList = c.getPartsStore().getByName(getName());
+        desc = updateLongDescription(desc);
         
-        if ((null != partsStoreList) && (partsStoreList.size() > 0)) {
-        	double lastTonnage = -1d;
-        	
-        	for (Part storePart : partsStoreList) {
-        		if (storePart.getTechBase() == getTechBase()) {
-        			if (lastTonnage == -1) {
-        				lastTonnage = storePart.getTonnage();
-        			} else if (lastTonnage != storePart.getTonnage()) {
-        				desc += String.format(" [%s ton]", getTonnage());
-        				break;
-        			}
-        		}
-        	}
+        if (!StringUtil.isNullOrEmpty(details)) {
+        	desc += String.format(" [%s]", details);
         }
         
         return desc;

@@ -588,6 +588,29 @@ public class BattleArmorSuit extends Part {
         }
         return super.getDetails();
     }
+	
+	@Override
+	protected String generateLongDescriptionDetails() {		
+    	int nEquip = 0;
+    	int armor = 0;
+    	
+    	if(getChildPartIds().size() > 0) {
+            for(int childId : getChildPartIds()) {
+            	Part p = campaign.getPart(childId);
+            	if(null != p) {
+            		if(p instanceof BaArmor) {
+            			armor = ((BaArmor)p).getAmount();
+            		} else {
+            			nEquip++;
+            		}
+            	}
+            }
+            
+            return nEquip + " pieces of equipment; " + armor + " armor points";
+    	}
+	
+    	return super.generateLongDescriptionDetails();
+	}
 
     @Override
     public void updateConditionFromPart() {

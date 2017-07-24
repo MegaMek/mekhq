@@ -529,6 +529,11 @@ public class EnginePart extends Part {
 		 }
 		 return super.getDetails() + ", " + getUnitTonnage() + " tons" + hvrString;
 	 }
+		
+	@Override
+	protected String generateLongDescriptionDetails() {
+		return String.format("%s ton%s unit", getUnitTonnage(), forHover ? " hover" : "");		
+	}
 
 	 @Override
 	 public boolean isPartForEquipmentNum(int index, int loc) {

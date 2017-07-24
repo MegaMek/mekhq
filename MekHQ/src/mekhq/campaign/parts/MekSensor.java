@@ -22,6 +22,9 @@
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
+import java.util.StringJoiner;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import megamek.common.Compute;
 import megamek.common.CriticalSlot;
@@ -236,8 +239,15 @@ public class MekSensor extends Part {
 
 	@Override
     public String getDetails() {
-		return super.getDetails() + ", " + getUnitTonnage() + " tons";
+		return super.getDetails() + ", " + getUnitTonnage() + " ton mek";
     }
+	
+	@Override
+	protected String generateLongDescriptionDetails() {
+		return Stream.of(super.generateLongDescriptionDetails(), String.format("%s ton mek", getUnitTonnage()))
+	        	.filter(s -> s != null && !s.isEmpty())
+	        	.collect(Collectors.joining(","));
+	}
 
 	@Override
 	public boolean isPartForEquipmentNum(int index, int loc) {

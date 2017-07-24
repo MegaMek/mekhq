@@ -84,7 +84,6 @@ import mekhq.campaign.report.HangarReport;
 import mekhq.campaign.report.PersonnelReport;
 import mekhq.campaign.report.RatingReport;
 import mekhq.campaign.report.TransportReport;
-import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.gui.dialog.PartsInUseBulkActionDialog;
 import mekhq.gui.model.PartsInUseTableModel;
 import mekhq.gui.sorter.FormattedNumberSorter;
@@ -105,18 +104,17 @@ public final class OverviewTab extends CampaignGuiTab {
 		public static final int LOC = 4;
 		public static final int WEAP = 5;
 		public static final int AMMO = 6;
-		public static final int AMMO_BIN = 7;
-		public static final int MISC = 8;
-		public static final int ENGINE = 9;
-		public static final int GYRO = 10;
-		public static final int ACT = 11;
-		public static final int MAX_INDEX = 11;
+		public static final int MISC = 7;
+		public static final int ENGINE = 8;
+		public static final int GYRO = 9;
+		public static final int ACT = 10;
+		public static final int MAX_INDEX = 10;
 	}
 
 	public interface FILTER_IN_USE {
 		public static final int ALL = 0;
-		public static final int IN_USE = 1;
-		public static final int NOT_IN_USE = 2;
+		public static final int IN_USE_ONLY = 1;
+		public static final int STORED_ONLY = 2;
 		public static final int MAX_INDEX = 2;
 	}
 
@@ -684,16 +682,10 @@ public final class OverviewTab extends CampaignGuiTab {
 
 	private void refreshOverviewSpecificPart(int row) {
 		PartInUse piu = overviewPartsModel.getPartInUse(row);
-		IAcquisitionWork newPart = piu.getPartToBuy();
 
-		//TODO: This is horribly inefficient. Redo it. Why do we even bother doing this?
-		if (piu.equals(new PartInUse((Part) newPart, getCampaign()))) {
-			// Simple update
+		if (null != piu) {
 			getCampaign().updatePartInUse(piu);
 			overviewPartsModel.fireTableRowsUpdated(row, row);
-		} else {
-			// Some other part changed; fire a full refresh to be sure
-			refreshOverviewPartsInUse();
 		}
 	}
 
@@ -765,11 +757,11 @@ public final class OverviewTab extends CampaignGuiTab {
 					inInUseFilter = true;
 					break;
 
-				case FILTER_IN_USE.IN_USE:
+				case FILTER_IN_USE.IN_USE_ONLY:
 					inInUseFilter = piu.getUseCount() > 0;
 					break;
 
-				case FILTER_IN_USE.NOT_IN_USE:
+				case FILTER_IN_USE.STORED_ONLY:
 					inInUseFilter = piu.getUseCount() == 0;
 					break;
 				}
@@ -824,12 +816,7 @@ public final class OverviewTab extends CampaignGuiTab {
 			return part instanceof EquipmentPart && ((EquipmentPart) part).getType() instanceof WeaponType;
 
 		case FILTER_PART_TYPE.AMMO:
-			return part instanceof EquipmentPart && !(part instanceof AmmoBin)
-					&& ((EquipmentPart) part).getType() instanceof AmmoType;
-
-		case FILTER_PART_TYPE.AMMO_BIN:
-			return part instanceof EquipmentPart && (part instanceof AmmoBin)
-					&& ((EquipmentPart) part).getType() instanceof AmmoType;
+			return part instanceof EquipmentPart && !(part instanceof AmmoBin) && ((EquipmentPart) part).getType() instanceof AmmoType;
 
 		case FILTER_PART_TYPE.MISC:
 			return part instanceof EquipmentPart && ((EquipmentPart) part).getType() instanceof MiscType;
@@ -863,8 +850,6 @@ public final class OverviewTab extends CampaignGuiTab {
 			return "Weapons";
 		case FILTER_PART_TYPE.AMMO:
 			return "Ammunition";
-		case FILTER_PART_TYPE.AMMO_BIN:
-			return "Ammunition Bins";
 		case FILTER_PART_TYPE.MISC:
 			return "Miscellaneous Equipment";
 		case FILTER_PART_TYPE.ENGINE:
@@ -882,10 +867,10 @@ public final class OverviewTab extends CampaignGuiTab {
 		switch (filterIdx) {
 		case FILTER_IN_USE.ALL:
 			return "All Parts";
-		case FILTER_IN_USE.IN_USE:
-			return "'In Use' only";
-		case FILTER_IN_USE.NOT_IN_USE:
-			return "'Not In Use' only";
+		case FILTER_IN_USE.IN_USE_ONLY:
+			return "In Use";
+		case FILTER_IN_USE.STORED_ONLY:
+			return "Stored only";
 		default:
 			return "?";
 		}

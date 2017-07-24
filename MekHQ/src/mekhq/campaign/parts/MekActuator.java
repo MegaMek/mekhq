@@ -260,6 +260,11 @@ public class MekActuator extends Part {
 		}
 		return getUnitTonnage() + " tons";
 	}
+	
+	@Override
+	protected String generateLongDescriptionDetails() {
+		return getUnitTonnage() + " ton mek";
+	}
 
 	@Override
 	public void updateConditionFromPart() {

@@ -1392,6 +1392,11 @@ public class Campaign implements Serializable {
             return null;
         }
         
+        //Ignore ammo bins
+        if (p instanceof AmmoBin) {
+        	return null;
+        }        
+        
         // We don't buy parts for BA
         if ((p instanceof MissingBattleArmorEquipmentPart) || (p instanceof BattleArmorEquipmentPart)) {
         	return null;

@@ -552,6 +552,35 @@ public class MekLocation extends Part {
 		}
 		return toReturn;
     }
+	
+	@Override
+	protected String generateLongDescriptionDetails() {
+	    String toReturn = getUnitTonnage() + " ton mek";
+		
+		if(loc == Mech.LOC_HEAD) {
+		    String components = "";
+		    
+    		if(hasSensors()) {
+                components += "Sensors";
+            }
+    		
+            if(hasLifeSupport()) {
+                if(components.length() > 0) {
+                    components += ", ";
+                }
+                
+                components += "Life Support";
+            }
+            
+            if(components.length() > 0) {
+                components = " [" + components + "]";
+            }
+            
+            toReturn += components;
+		}
+		
+		return toReturn;
+	}
 
 	@Override
 	public void updateConditionFromPart() {

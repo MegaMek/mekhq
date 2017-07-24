@@ -446,6 +446,11 @@ public class ProtomekLocation extends Part {
         toReturn += getUnitTonnage() + " tons" + " (" + Math.round(100*percent) + "%)";
         return toReturn;
     }
+	
+	@Override
+	protected String generateLongDescriptionDetails() {
+        return getUnitTonnage() + " tons";
+	}
 
     private int getAppropriateSystemIndex() {
     	switch(loc) {
