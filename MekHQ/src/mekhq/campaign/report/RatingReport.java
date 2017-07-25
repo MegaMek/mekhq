@@ -26,7 +26,6 @@ import javax.swing.JTextPane;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.rating.IUnitRating;
-import mekhq.campaign.rating.UnitRatingFactory;
 
 
 /**
@@ -40,7 +39,7 @@ public class RatingReport extends Report {
 
     public RatingReport(Campaign c) {
         super(c);
-        rating = UnitRatingFactory.getUnitRating(getCampaign());
+        rating = getCampaign().getUnitRating();
     }
 
     public String getTitle() {

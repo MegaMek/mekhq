@@ -187,8 +187,10 @@ import mekhq.campaign.personnel.RetirementDefectionTracker;
 import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.SpecialAbility;
+import mekhq.campaign.rating.CampaignOpsReputation;
+import mekhq.campaign.rating.FieldManualMercRevDragoonsRating;
 import mekhq.campaign.rating.IUnitRating;
-import mekhq.campaign.rating.UnitRatingFactory;
+import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.campaign.unit.CrewType;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
@@ -316,6 +318,7 @@ public class Campaign implements Serializable {
     private String shipSearchResult; //AtB
     private Calendar shipSearchExpiration; //AtB
     private IUnitGenerator unitGenerator;
+    private IUnitRating unitRating;
 
     public Campaign() {
         id = UUID.randomUUID();
@@ -2201,7 +2204,7 @@ public class Campaign implements Serializable {
 
             	RandomFactionGenerator.getInstance().updateTables(calendar.getTime(),
             			location.getCurrentPlanet(), campaignOptions);
-                IUnitRating rating = UnitRatingFactory.getUnitRating(this);
+                IUnitRating rating = getUnitRating();
                 rating.reInitialize();
 
                 for (Mission m : missions) {
@@ -5361,8 +5364,7 @@ public class Campaign implements Serializable {
     		}
     		//Higher rated units are more likely to have Bloodnamed
     		if (campaignOptions.useDragoonRating()) {
-    			IUnitRating rating = UnitRatingFactory.getUnitRating(this);
-    			rating.reInitialize();
+    			IUnitRating rating = getUnitRating();
     			bloodnameTarget += IUnitRating.DRAGOON_C - (campaignOptions.getUnitRatingMethod().equals(mekhq.campaign.rating.UnitRatingMethod.FLD_MAN_MERCS_REV)?
     					rating.getUnitRatingAsInteger():rating.getModifier());
     		}
@@ -6586,10 +6588,8 @@ public class Campaign implements Serializable {
         unit.runDiagnostic(false);
     }
 
-    public String getUnitRating() {
-        IUnitRating rating = UnitRatingFactory.getUnitRating(this);
-        rating.reInitialize();
-        return rating.getUnitRating();
+    public String getUnitRatingText() {
+        return getUnitRating().getUnitRating();
     }
 
 	/**
@@ -6605,8 +6605,7 @@ public class Campaign implements Serializable {
 		if (!getCampaignOptions().useDragoonRating()) {
 			return IUnitRating.DRAGOON_C;
 		}
-		IUnitRating rating = UnitRatingFactory.getUnitRating(this);
-		rating.reInitialize();
+		IUnitRating rating = getUnitRating();
 		return getCampaignOptions().getUnitRatingMethod().equals(mekhq.campaign.rating.UnitRatingMethod.FLD_MAN_MERCS_REV)?
 				rating.getUnitRatingAsInteger():rating.getModifier();
 	}
@@ -8454,4 +8453,22 @@ public class Campaign implements Serializable {
         }
         return false;
     }
+
+	/**
+	 * Returns the type of rating method as selected in the Campaign Options dialog. Lazy-loaded for performance.
+	 */
+	public IUnitRating getUnitRating() 
+	{
+		if(unitRating == null)
+		{
+			UnitRatingMethod method = getCampaignOptions().getUnitRatingMethod();
+		    if (method.equals(UnitRatingMethod.FLD_MAN_MERCS_REV)) {
+		        unitRating = new FieldManualMercRevDragoonsRating(this);
+		    }
+		
+		    unitRating = new CampaignOpsReputation(this);
+		}
+		
+		return unitRating;
+	}
 }

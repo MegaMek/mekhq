@@ -20,25 +20,11 @@
  */
 package mekhq.campaign.rating;
 
-import mekhq.campaign.Campaign;
-
 /**
  * @author Deric Page (deric (dot) page (at) usa.net)
  * @version %I% %G%
  * @since 3/16/2012
  */
 public class UnitRatingFactory {
-
-    /**
-     * Returns the Dragoons Rating method as selected in the Campaign Options dialog.
-     */
-    public static IUnitRating getUnitRating(Campaign campaign) {
-        UnitRatingMethod method = campaign.getCampaignOptions().getUnitRatingMethod();
-        if (method.equals(UnitRatingMethod.FLD_MAN_MERCS_REV)) {
-            return new FieldManualMercRevDragoonsRating(campaign);
-        }
-
-        return new CampaignOpsReputation(campaign);
-    }
 
 }
