@@ -28,8 +28,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
-//import org.apache.commons.text.CharacterPredicate;
-//import org.apache.commons.text.RandomStringGenerator;
+import org.apache.commons.text.CharacterPredicate;
+import org.apache.commons.text.RandomStringGenerator;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -368,19 +368,19 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
 	}
 	
 	public static String generateRandomContractName() {
-		//RandomStringGenerator generator = new RandomStringGenerator.Builder()
-		//	     .withinRange('0', 'Z').filteredBy(UpperCaseAndDigits.UPPERANDDIGITS).build();
-		return "lol";//generator.generate(15);
+		RandomStringGenerator generator = new RandomStringGenerator.Builder()
+			     .withinRange('0', 'Z').filteredBy(UpperCaseAndDigits.UPPERANDDIGITS).build();
+		return generator.generate(15);
 	}
 
-	/*public static enum UpperCaseAndDigits implements CharacterPredicate {
+	public static enum UpperCaseAndDigits implements CharacterPredicate {
 		UPPERANDDIGITS {
 			@Override
 			public boolean test(int codePoint) {
 				return (Character.isDigit(codePoint) || Character.isUpperCase(codePoint));
 			}
 		}
-	}*/
+	}
 
 	public long getEstimatedTotalProfit(Campaign c) {
 		long profit = getTotalAmountPlusFeesAndBonuses();
