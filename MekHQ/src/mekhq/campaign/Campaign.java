@@ -4173,6 +4173,8 @@ public class Campaign implements Serializable {
         MekHQ.logMessage(String.format("[Campaign Load] Warehouse cleaned up in %dms", System.currentTimeMillis() - timestamp));
         timestamp = System.currentTimeMillis();
 
+        retVal.unitRating = null;
+        
         MekHQ.logMessage("Load of campaign file complete!");
 
         return retVal;
@@ -8465,8 +8467,10 @@ public class Campaign implements Serializable {
 		    if (method.equals(UnitRatingMethod.FLD_MAN_MERCS_REV)) {
 		        unitRating = new FieldManualMercRevDragoonsRating(this);
 		    }
-		
-		    unitRating = new CampaignOpsReputation(this);
+		    else
+		    {
+		    	unitRating = new CampaignOpsReputation(this);
+		    }
 		}
 		
 		return unitRating;

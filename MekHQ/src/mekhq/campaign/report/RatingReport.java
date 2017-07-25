@@ -35,11 +35,8 @@ import mekhq.campaign.rating.IUnitRating;
  */
 public class RatingReport extends Report {
 
-    IUnitRating rating;
-
     public RatingReport(Campaign c) {
         super(c);
-        rating = getCampaign().getUnitRating();
     }
 
     public String getTitle() {
@@ -49,7 +46,7 @@ public class RatingReport extends Report {
     public JTextPane getReport() {
         JTextPane txtReport = new JTextPane();
         txtReport.setFont(new Font("Courier New", Font.PLAIN, 12));
-        txtReport.setText(rating.getDetails());
+        txtReport.setText(getCampaign().getUnitRating().getDetails());
         return txtReport;
     }
 

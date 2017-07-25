@@ -2795,8 +2795,11 @@ public class CampaignGUI extends JPanel {
 
     private void refreshRating() {
         if (getCampaign().getCampaignOptions().useDragoonRating()) {
-            String text = "<html><b>Dragoons Rating:</b> "
-                    + getCampaign().getUnitRating() + "</html>";
+        	// this is the one situation where we do want to refresh the rating,
+        	// as it means something has happened to influence it
+        	getCampaign().getUnitRating().reInitialize();
+        	
+            String text = "<html><b>Dragoons Rating:</b> " + getCampaign().getUnitRatingText() + "</html>";
             lblRating.setText(text);
         } else {
             lblRating.setText("");
