@@ -1,11 +1,13 @@
 package mekhq.campaign.mission.atb.scenario;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import megamek.common.Board;
 import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.EntityWeightClass;
+import megamek.common.UnitType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.atb.AtBScenarioEnabled;
@@ -91,18 +93,17 @@ public class BaseAttackBuiltInScenario extends AtBScenario {
 		addBotForce(getEnemyBotForce(getContract(campaign), enemyStart, getEnemyHome(), enemyEntities));
 
 		ArrayList<Entity> otherForce = new ArrayList<Entity>();
-		addCivilianUnits(otherForce, 10, campaign);
+		addCivilianUnits(otherForce, 8, campaign);
 		addBotForce(new BotForce("Civilians", isAttacker() ? 2 : 1, isAttacker() ? getEnemyHome() : playerHome,
 				isAttacker() ? enemyStart : getStart(), otherForce));
 
-		for (int i = 0; i < 6; i++) {
-			if (isAttacker()) {
-				enemyEntities.add(this.getEntityByName(randomGunEmplacement(), getContract(campaign).getEnemyCode(),
-						getContract(campaign).getEnemySkill(), campaign));
-			} else {
-				allyEntities.add(this.getEntityByName(randomGunEmplacement(), getContract(campaign).getEmployerCode(),
-						getContract(campaign).getAllySkill(), campaign));
-			}
+		if(isAttacker())
+		{
+			addTurrets(otherForce, 6, getContract(campaign).getEnemySkill(), getContract(campaign).getEnemyQuality(), campaign);
+		}
+		else
+		{
+			addTurrets(otherForce, 6, getContract(campaign).getAllySkill(), getContract(campaign).getAllyQuality(), campaign);
 		}
 	}
 
