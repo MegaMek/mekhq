@@ -941,12 +941,6 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                         .generate(faction, unitType, weightClass, campaign.getCalendar()
                                 .get(Calendar.YEAR), quality, v -> !v.getUnitType().equals("VTOL"));
             }
-        } 
-        else if (unitType == UnitType.GUN_EMPLACEMENT)
-        {
-        	ms = campaign.getUnitGenerator()
-                    .generate(faction, unitType, weightClass, campaign.getCalendar()
-                            .get(Calendar.YEAR), quality);
         }
         else {
             ms = campaign.getUnitGenerator()
