@@ -60,6 +60,9 @@ import megamek.common.event.GameSettingsChangeEvent;
 import megamek.common.event.GameTurnChangeEvent;
 import megamek.common.event.GameVictoryEvent;
 import megamek.common.event.MMEvent;
+import megamek.common.logging.DefaultMmLogger;
+import megamek.common.logging.LogLevel;
+import megamek.common.logging.MMLogger;
 import megamek.common.util.EncodeControl;
 import megamek.server.Server;
 import mekhq.campaign.Campaign;
@@ -89,6 +92,8 @@ public class MekHQ implements GameListener {
 	public static String PRESET_DIR = "./mmconf/mhqPresets/";
 
 	private static final EventBus EVENT_BUS = new EventBus();
+
+	private static MMLogger logger = null;
 	
 	//stuff related to MM games
     private Server myServer = null;
@@ -105,14 +110,61 @@ public class MekHQ implements GameListener {
 	private Properties preferences;
 
 	/**
+	 * Converts the MekHQ {@link #VERBOSITY_LEVEL} to {@link LogLevel}.
+	 *
+	 * @param verbosity The MekHQ verbosity to be converted.
+	 * @return The equivalent LogLevel.
+	 */
+	private static LogLevel verbosityToLogLevel(final int verbosity) {
+		if (verbosity < 0) {
+			return LogLevel.OFF;
+		}
+		switch (verbosity) {
+			case 0:
+				return LogLevel.FATAL;
+			case 1:
+				return LogLevel.ERROR;
+			case 2:
+				return LogLevel.WARNING;
+			case 3:
+				return LogLevel.INFO;
+			case 4:
+				return LogLevel.DEBUG;
+			case 5:
+				return LogLevel.TRACE;
+		}
+		return LogLevel.INFO;
+	}
+
+	/**
+	 * @param logger The logger to be used.
+	 */
+	public static void setLogger(final MMLogger logger) {
+		MekHQ.logger = logger;
+	}
+
+	/**
+	 * @return The logger that will handle log file output.  Will return the
+	 * {@link DefaultMmLogger} if a different logger has not been set.
+	 */
+	public static MMLogger getLogger() {
+		if (null == logger) {
+			logger = DefaultMmLogger.getInstance();
+		}
+		return logger;
+	}
+
+	/**
 	 * Designed to centralize output and logging.
 	 * Purely a pass-through to the version with a log level.
 	 * Default to log level 3.
 	 *
 	 * @param msg The message you want to log.
+	 * @deprecated Use {@link #getLogger()} instead.              
 	 */
+	@Deprecated
 	public static void logMessage(String msg) {
-		logMessage(msg, 3);
+		getLogger().log(MekHQ.class, "unknown", LogLevel.INFO, msg);
 	}
 
 	/**
@@ -120,19 +172,33 @@ public class MekHQ implements GameListener {
 	 *
 	 * @param msg The message you want to log.
 	 * @param logLevel The log level of the message.
+	 * @deprecated Use {@link #getLogger()} instead.              
 	 */
+	@Deprecated
 	public static void logMessage(String msg, int logLevel) {
-		if (logLevel <= VERBOSITY_LEVEL)
-			System.out.println(msg);
+		getLogger().log(MekHQ.class,
+						"unknown",
+						verbosityToLogLevel(logLevel),
+						msg);
 	}
 
+	/**
+	 * @deprecated Use {@link #getLogger()} instead.
+	 */
+	@Deprecated
 	public static void logError(String err) {
-		System.err.println(err);
+		getLogger().log(MekHQ.class, "unknown", LogLevel.ERROR, err);
 	}
 
+	/**
+	 * @deprecated Use {@link #getLogger()} instead.
+	 */
+	@Deprecated
 	public static void logError(Exception ex) {
-		System.err.println(ex);
-		ex.printStackTrace();
+		getLogger().log(MekHQ.class,
+						"unknown," +
+						LogLevel.ERROR,
+						ex);
 	}
 
 	protected static MekHQ getInstance() {
