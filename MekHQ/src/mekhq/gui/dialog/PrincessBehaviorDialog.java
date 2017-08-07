@@ -60,7 +60,7 @@ import megamek.client.bot.princess.PrincessException;
 import megamek.client.ui.Messages;
 import megamek.client.ui.swing.HelpDialog;
 import megamek.common.logging.LogLevel;
-import megamek.common.logging.Logger;
+import mekhq.MekHQ;
 
 /**
  * Code copied from megamek.client.ui.swing.BotConfigDialog and modified
@@ -491,8 +491,9 @@ public class PrincessBehaviorDialog extends JDialog implements ActionListener {
     }
 
     private void handleError(String method, Throwable t) {
-        JOptionPane.showMessageDialog(this, t.getMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);
-        new Logger().log(getClass(), method, t);
+        JOptionPane.showMessageDialog(this, t.getMessage(),
+                                      "ERROR", JOptionPane.ERROR_MESSAGE);
+        MekHQ.getLogger().log(getClass(), method, t);
     }
 
     public String getBotName() {

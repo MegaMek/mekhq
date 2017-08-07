@@ -34,6 +34,7 @@ import megamek.common.Jumpship;
 import megamek.common.LightVehicleBay;
 import megamek.common.MechBay;
 import megamek.common.Tank;
+import megamek.common.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.mission.Mission;
