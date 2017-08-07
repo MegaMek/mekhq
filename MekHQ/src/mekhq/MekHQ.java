@@ -37,6 +37,7 @@ import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
+import megamek.MegaMek;
 import megamek.client.Client;
 import megamek.common.event.EventBus;
 import megamek.common.event.GameBoardChangeEvent;
@@ -308,8 +309,14 @@ public class MekHQ implements GameListener {
             if (!logDir.exists()) {
                 logDir.mkdir();
             }
-            PrintStream ps = new PrintStream(new BufferedOutputStream(new FileOutputStream("logs" + File.separator + "mekhqlog.txt"), 64));
-            System.setOut(ps);
+			final String logFilename = "logs" + File.separator + "mekhqlog.txt";
+			MegaMek.resetLogFile(logFilename);
+			PrintStream ps = new PrintStream(
+					new BufferedOutputStream(
+							new FileOutputStream(logFilename,
+												 true),
+							64));
+			System.setOut(ps);
             System.setErr(ps);
         } catch (Exception e) {
             System.err.println("Unable to redirect output to mekhqlog.txt"); //$NON-NLS-1$
