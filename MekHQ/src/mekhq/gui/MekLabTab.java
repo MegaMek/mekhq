@@ -27,8 +27,6 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.io.File;
 import java.util.Calendar;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -163,7 +161,7 @@ public class MekLabTab extends CampaignGuiTab {
         try {
             entity = (new MechFileParser(mechSummary.getSourceFile(), mechSummary.getEntryName())).getEntity();
         } catch (EntityLoadingException ex) {
-            Logger.getLogger(CampaignGUI.class.getName()).log(Level.SEVERE, null, ex);
+            MekHQ.getLogger().log(getClass(), "loadUnit(Unit)", ex); //$NON-NLS-1$
         }
         entity.setYear(unit.campaign.getCalendar().get(Calendar.YEAR));
         UnitUtil.updateLoadedMech(entity);
@@ -189,7 +187,7 @@ public class MekLabTab extends CampaignGuiTab {
         try {
             entity = (new MechFileParser(mechSummary.getSourceFile(), mechSummary.getEntryName())).getEntity();
         } catch (EntityLoadingException ex) {
-            Logger.getLogger(CampaignGUI.class.getName()).log(Level.SEVERE, null, ex);
+            MekHQ.getLogger().log(getClass(), "resetUnit()", ex); //$NON-NLS-1$
         }
         entity.setYear(unit.campaign.getCalendar().get(Calendar.YEAR));
         UnitUtil.updateLoadedMech(entity);
