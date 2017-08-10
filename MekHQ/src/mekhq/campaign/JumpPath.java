@@ -25,13 +25,14 @@ import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-import mekhq.MekHQ;
-import mekhq.MekHqXmlUtil;
-import mekhq.campaign.universe.Planet;
-
 import org.joda.time.DateTime;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import megamek.common.logging.LogLevel;
+import mekhq.MekHQ;
+import mekhq.MekHqXmlUtil;
+import mekhq.campaign.universe.Planet;
 
 /**
  * This is an array list of planets for a jump path, from which we can derive
@@ -163,6 +164,8 @@ public class JumpPath implements Serializable {
 	}
 	
 	public static JumpPath generateInstanceFromXML(Node wn, Campaign c) {
+	    final String METHOD_NAME = "generateInstanceFromXML(Node,Campaign)"; //$NON-NLS-1$
+	    
 		JumpPath retVal = null;
 		
 		try {		
@@ -176,7 +179,8 @@ public class JumpPath implements Serializable {
 					if(null != p) {
 						retVal.addPlanet(p);
 					} else {
-						MekHQ.logError("Couldn't find planet named " + wn2.getTextContent());
+					    MekHQ.getLogger().log(JumpPath.class, METHOD_NAME, LogLevel.ERROR,
+					            "Couldn't find planet named " + wn2.getTextContent()); //$NON-NLS-1$
 					}
 				}
 			}
@@ -184,7 +188,7 @@ public class JumpPath implements Serializable {
 			// Errrr, apparently either the class name was invalid...
 			// Or the listed name doesn't exist.
 			// Doh!
-			MekHQ.logError(ex);
+            MekHQ.getLogger().log(JumpPath.class, METHOD_NAME, ex);
 		}
 		
 		return retVal;

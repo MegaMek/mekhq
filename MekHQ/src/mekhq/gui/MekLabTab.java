@@ -53,6 +53,7 @@ import megamek.common.Mounted;
 import megamek.common.Tank;
 import megamek.common.WeaponType;
 import megamek.common.loaders.EntityLoadingException;
+import megamek.common.logging.LogLevel;
 import megamek.common.verifier.EntityVerifier;
 import megamek.common.verifier.TestAero;
 import megamek.common.verifier.TestBattleArmor;
@@ -115,7 +116,8 @@ public class MekLabTab extends CampaignGuiTab {
         entityVerifier = EntityVerifier.getInstance(new File("data/mechfiles/UnitVerifierOptions.xml"));
         UnitUtil.loadFonts();
         new CConfig();
-        MekHQ.logMessage("Staring MegaMekLab version: " + MegaMekLab.VERSION);
+        MekHQ.getLogger().log(getClass(), "initTab()", LogLevel.INFO, //$NON-NLS-1$
+                "Staring MegaMekLab version: " + MegaMekLab.VERSION); //$NON-NLS-1$
         btnRefit = new JButton("Begin Refit");
         btnRefit.addActionListener(evt -> {
             Entity entity = labPanel.getEntity();

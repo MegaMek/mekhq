@@ -53,6 +53,7 @@ import org.w3c.dom.DOMException;
 import org.w3c.dom.Node;
 
 import megamek.common.EquipmentType;
+import megamek.common.logging.LogLevel;
 import mekhq.FileParser;
 import mekhq.MekHQ;
 import mekhq.Utilities;
@@ -74,7 +75,7 @@ public class Planets {
             // For debugging only!
             // unmarshaller.setEventHandler(new javax.xml.bind.helpers.DefaultValidationEventHandler());
         } catch(JAXBException e) {
-            MekHQ.logError(e);
+            MekHQ.getLogger().log(Planets.class, "<init>", e); //$NON-NLS-1$
         }
     }
     
@@ -105,7 +106,7 @@ public class Planets {
                     Thread.sleep(10);
                 }
             } catch(InterruptedException iex) {
-                MekHQ.logError(iex);
+                MekHQ.getLogger().log(Planets.class, "reload(boolean)", iex); //$NON-NLS-1$
             }
         }
     }
@@ -271,7 +272,7 @@ public class Planets {
         try {
             marshaller.marshal(planet, out);
         } catch (Exception e) {
-            MekHQ.logError(e);
+            MekHQ.getLogger().log(getClass(), "writePlanet(OutputStream,Planet)", e); //$NON-NLS-1$
         }
     }
     
@@ -279,7 +280,7 @@ public class Planets {
         try {
             marshaller.marshal(planet, out);
         } catch (Exception e) {
-            MekHQ.logError(e);
+            MekHQ.getLogger().log(getClass(), "writePlanet(Writer,Planet)", e); //$NON-NLS-1$
         }
     }
     
@@ -288,7 +289,7 @@ public class Planets {
         try {
             marshaller.marshal(event, out);
         } catch (Exception e) {
-            MekHQ.logError(e);
+            MekHQ.getLogger().log(getClass(), "writePlanet(OutputStream,Planet.PlanetaryEvent)", e); //$NON-NLS-1$
         }
     }
     
@@ -296,7 +297,7 @@ public class Planets {
         try {
             marshaller.marshal(event, out);
         } catch (Exception e) {
-            MekHQ.logError(e);
+            MekHQ.getLogger().log(getClass(), "writePlanet(Writer,Planet.PlanetaryEvent)", e); //$NON-NLS-1$
         }
     }
     
@@ -304,7 +305,7 @@ public class Planets {
         try {
             return (Planet.PlanetaryEvent) unmarshaller.unmarshal(node);
         } catch (JAXBException e) {
-            MekHQ.logError(e);
+            MekHQ.getLogger().log(getClass(), "readPlanetaryEvent(Node)", e); //$NON-NLS-1$
         }
         return null;
     }
@@ -315,7 +316,7 @@ public class Planets {
         try {
             marshaller.marshal(temp, out);
         } catch (Exception e) {
-            MekHQ.logError(e);
+            MekHQ.getLogger().log(getClass(), "writePlanets(OutputStream,List<Planet>)", e); //$NON-NLS-1$
         }
     }
     
@@ -325,8 +326,7 @@ public class Planets {
         try {
             generatePlanets();
         } catch (ParseException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            MekHQ.getLogger().log(getClass(), "initialize()", e); //$NON-NLS-1$
         }
     }
     
@@ -340,6 +340,7 @@ public class Planets {
     }
 
     private void updatePlanets(FileInputStream source) {
+        final String METHOD_NAME = "updatePlanets(FileInputStream)"; //$NON-NLS-1$
         // JAXB unmarshaller closes the stream it doesn't own. Bad JAXB. BAD.
         try(InputStream is = new FilterInputStream(source) {
                 @Override
@@ -370,14 +371,17 @@ public class Planets {
                 }
             }
         } catch (JAXBException e) {
-            MekHQ.logError(e);
+            MekHQ.getLogger().log(getClass(), METHOD_NAME, e);
         } catch(IOException e) {
-            MekHQ.logError(e);
+            MekHQ.getLogger().log(getClass(), METHOD_NAME, e);
         }
     }
     
     private void generatePlanets() throws DOMException, ParseException {
-        MekHQ.logMessage("Starting load of planetary data from XML..."); //$NON-NLS-1$
+        final String METHOD_NAME = "generatePlanets()"; //NON-NLS-1$
+        
+        MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO,
+                "Starting load of planetary data from XML..."); //$NON-NLS-1$
         long currentTime = System.currentTimeMillis();
         synchronized (LOADING_LOCK) {
             // Step 1: Initialize variables.
@@ -405,7 +409,7 @@ public class Planets {
             try(FileInputStream fis = new FileInputStream("data/universe/planets.xml")) { //$NON-NLS-1$
                 updatePlanets(fis);
             } catch (Exception ex) {
-                MekHQ.logError(ex);
+                MekHQ.getLogger().log(getClass(), METHOD_NAME, ex);
             }
             
             // Step 3: Load all the xml files within the planets subdirectory, if it exists
@@ -420,7 +424,8 @@ public class Planets {
             List<Planet> toRemove = new ArrayList<>();
             for (Planet planet : planetList.values()) {
                 if((null == planet.getX()) || (null == planet.getY())) {
-                    MekHQ.logError(String.format("Planet \"%s\" is missing coordinates", planet.getId())); //$NON-NLS-1$
+                    MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
+                            String.format("Planet \"%s\" is missing coordinates", planet.getId())); //$NON-NLS-1$
                     toRemove.add(planet);
                     continue;
                 }
@@ -441,18 +446,20 @@ public class Planets {
             }
             done();
         }
-        MekHQ.logMessage(String.format(Locale.ROOT,
-                "Loaded a total of %d planets in %.3fs.", //$NON-NLS-1$
-                planetList.size(), (System.currentTimeMillis() - currentTime) / 1000.0));
+        MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO,
+                String.format(Locale.ROOT,
+                        "Loaded a total of %d planets in %.3fs.", //$NON-NLS-1$
+                        planetList.size(), (System.currentTimeMillis() - currentTime) / 1000.0));
         // Planetary sanity check time!
         for(Planet planet : planetList.values()) {
             List<Planet> veryClosePlanets = getNearbyPlanets(planet, 1);
             if(veryClosePlanets.size() > 1) {
                 for(Planet closePlanet : veryClosePlanets) {
                     if(!planet.getId().equals(closePlanet.getId())) {
-                        MekHQ.logMessage(String.format(Locale.ROOT,
-                                "Extremly close planets detected. Data error? %s <-> %s: %.3f ly", //$NON-NLS-1$
-                                planet.getId(), closePlanet.getId(), planet.getDistanceTo(closePlanet)));
+                        MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.WARNING,
+                                String.format(Locale.ROOT,
+                                        "Extremly close planets detected. Data error? %s <-> %s: %.3f ly", //$NON-NLS-1$
+                                        planet.getId(), closePlanet.getId(), planet.getDistanceTo(closePlanet)));
                     }
                 }
             }

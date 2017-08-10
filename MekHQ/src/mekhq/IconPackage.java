@@ -92,7 +92,7 @@ public class IconPackage {
             try {
                 mt.loadFromFile("mechset.txt");
             } catch (IOException ex) {
-                MekHQ.logError(ex);
+                MekHQ.getLogger().log(getClass(), "loadDirectories()", ex);
                 //TODO: do something here
             }
         }
@@ -119,6 +119,7 @@ public class IconPackage {
     }
     
     public static Image buildForceIcon(String category, String filename, DirectoryItems items, LinkedHashMap<String, Vector<String>> iconMap) {
+        final String METHOD_NAME = "buildForceIcon(String,String, DirectoryItems,LinkedHashMap<String,Vector<String>>)"; //$NON-NLS-1$
         Image retVal = null;
         
         if(Crew.ROOT_PORTRAIT.equals(category)) {
@@ -163,7 +164,7 @@ public class IconPackage {
                     }
                 }
             } catch (Exception err) {
-                MekHQ.logError(err);
+                MekHQ.getLogger().log(IconPackage.class, METHOD_NAME, err);
             } finally {
                 if (null != g2d) {
                     g2d.dispose();
@@ -187,7 +188,7 @@ public class IconPackage {
                 }
                 retVal = scaledImage;
             } catch (Exception err) {
-                MekHQ.logError(err);
+                MekHQ.getLogger().log(IconPackage.class, METHOD_NAME, err);
             }
         }
         

@@ -19,6 +19,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
 
 /**
@@ -44,7 +45,7 @@ public class News {
             // For debugging only!
             unmarshaller.setEventHandler(new javax.xml.bind.helpers.DefaultValidationEventHandler());
         } catch(JAXBException e) {
-            MekHQ.logError(e);
+            MekHQ.getLogger().log(News.class, "<init>", e);
         }
     }
 
@@ -72,11 +73,13 @@ public class News {
     }
     
     public void loadNewsFor(int year, long seed) {
+        final String METHOD_NAME = "loadNewsFor(int,long)"; //$NON-NLS-1$
         synchronized(LOADING_LOCK) {
             archive = new HashMap<>();
             news = new HashMap<>();
             int id = 0;
-            MekHQ.logMessage("Starting load of news data for " + year + " from XML...");
+            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO,
+                    "Starting load of news data for " + year + " from XML..."); //$NON-NLS-1$
             // Initialize variables.
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             Document xmlDoc = null;
@@ -89,7 +92,7 @@ public class News {
                 // Parse using builder to get DOM representation of the XML file
                 xmlDoc = db.parse(fis);
             } catch (Exception ex) {
-                MekHQ.logError(ex);
+                MekHQ.getLogger().log(getClass(), METHOD_NAME, ex);
             }
         
             Element newsEle = xmlDoc.getDocumentElement();
@@ -120,11 +123,12 @@ public class News {
                         try {
                             newsItem = (NewsItem) unmarshaller.unmarshal(wn);
                         } catch(JAXBException e) {
-                            MekHQ.logError(e);
+                            MekHQ.getLogger().log(getClass(), METHOD_NAME, e);
                             continue;
                         }
                         if(null == newsItem.getDate()) {
-                            MekHQ.logMessage("The date is null for news Item " + newsItem.getHeadline());
+                            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
+                                    "The date is null for news Item " + newsItem.getHeadline()); //$NON-NLS-1$
                         }
                         if(!newsItem.isInYear(year)) {
                             continue;
@@ -146,7 +150,8 @@ public class News {
                     }
                 }
             }   
-            MekHQ.logMessage("loaded " + archive.size() + " days of news items for " + year);
+            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO,
+                    "loaded " + archive.size() + " days of news items for " + year); //$NON-NLS-1$
         }
     }
 }

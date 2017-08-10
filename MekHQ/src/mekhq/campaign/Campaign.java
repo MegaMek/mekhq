@@ -50,8 +50,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.Vector;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.JOptionPane;
 import javax.xml.parsers.DocumentBuilder;
@@ -95,6 +93,7 @@ import megamek.common.Tank;
 import megamek.common.TargetRoll;
 import megamek.common.loaders.BLKFile;
 import megamek.common.loaders.EntityLoadingException;
+import megamek.common.logging.LogLevel;
 import megamek.common.options.GameOptions;
 import megamek.common.options.IBasicOption;
 import megamek.common.options.IOption;
@@ -630,9 +629,11 @@ public class Campaign implements Serializable {
     }
     
     public void purchaseShipSearchResult() {
+        final String METHOD_NAME = "purchaseShipSearchResult()"; //$NON-NLS-1$
 		MechSummary ms = MechSummaryCache.getInstance().getMech(shipSearchResult);
 		if (ms == null) {
-            MekHQ.logError("Cannot find entry for " + shipSearchResult);
+            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
+                    "Cannot find entry for " + shipSearchResult); //$NON-NLS-1$
             return;
 		}
 
@@ -647,10 +648,11 @@ public class Campaign implements Serializable {
             mechFileParser = new MechFileParser(ms.getSourceFile(),
             		ms.getEntryName());
         } catch (Exception ex) {
-            MekHQ.logError(ex);
-            MekHQ.logError("Unable to load unit: " + ms.getEntryName());
+            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
+                    "Unable to load unit: " + ms.getEntryName()); //$NON-NLS-1$
+            MekHQ.getLogger().log(getClass(), METHOD_NAME, ex);
         }
-		Entity en = mechFileParser.getEntity();
+        Entity en = mechFileParser.getEntity();
 
 		int transitDays = getCampaignOptions().getInstantUnitMarketDelivery()?0:
     		calculatePartTransitTime(Compute.d6(2) - 2);
@@ -919,7 +921,8 @@ public class Campaign implements Serializable {
     }
 
     private void addUnit(Unit u) {
-        MekHQ.logMessage("Adding unit: (" + u.getId() + "):" + u, 5);
+        MekHQ.getLogger().log(getClass(), "addUnit()", LogLevel.INFO, //$NON-NLS-1$
+                "Adding unit: (" + u.getId() + "):" + u); //$NON-NLS-1$
         units.add(u);
         unitIds.put(u.getId(), u);
         checkDuplicateNamesDuringAdd(u.getEntity());
@@ -3236,8 +3239,7 @@ public class Campaign implements Serializable {
         try {
             mechFileParser = new MechFileParser(mechSummary.getSourceFile());
         } catch (EntityLoadingException ex) {
-            Logger.getLogger(Campaign.class.getName()).log(Level.SEVERE,
-                                                           "MechFileParse exception : " + entityShortName, ex);
+            MekHQ.getLogger().log(Campaign.class, "getBrandNewUndamagedEntity(String)", ex);
         }
         if (mechFileParser == null) {
             return null;
@@ -3510,8 +3512,7 @@ public class Campaign implements Serializable {
             try {
                 mechFileParser = new MechFileParser(ms.getSourceFile());
             } catch (EntityLoadingException ex) {
-                Logger.getLogger(Campaign.class.getName()).log(Level.SEVERE,
-                                                               "MechFileParse exception : " + name, ex);
+                MekHQ.getLogger().log(Campaign.class, "writeCustoms(PrintWriter)", ex);
             }
             if (mechFileParser == null) {
                 continue;
@@ -3551,7 +3552,10 @@ public class Campaign implements Serializable {
     public static Campaign createCampaignFromXMLFileInputStream(
             FileInputStream fis, MekHQ app) throws DOMException, ParseException,
                                         NullEntityException {
-        MekHQ.logMessage("Starting load of campaign file from XML...");
+        final String METHOD_NAME = "createCampaignFromXMLFileInputStream(FileInputStream,MekHQ)"; //$NON-NLS-1$
+
+        MekHQ.getLogger().log(Campaign.class, METHOD_NAME, LogLevel.INFO,
+                "Starting load of campaign file from XML..."); //$NON-NLS-1$
         // Initialize variables.
         Campaign retVal = new Campaign();
         retVal.app = app;
@@ -3565,7 +3569,7 @@ public class Campaign implements Serializable {
             // Parse using builder to get DOM representation of the XML file
             xmlDoc = db.parse(fis);
         } catch (Exception ex) {
-            MekHQ.logError(ex);
+            MekHQ.getLogger().log(Campaign.class, METHOD_NAME, ex);
         }
 
         Element campaignEle = xmlDoc.getDocumentElement();
@@ -3816,7 +3820,8 @@ public class Campaign implements Serializable {
             }
         }
 
-        MekHQ.logMessage(String.format("[Campaign Load] Force IDs set in %dms", System.currentTimeMillis() - timestamp));
+        MekHQ.getLogger().log(Campaign.class, METHOD_NAME, LogLevel.INFO,
+                String.format("[Campaign Load] Force IDs set in %dms", System.currentTimeMillis() - timestamp)); //$NON-NLS-1$
         timestamp = System.currentTimeMillis();
         
         // Process parts...
@@ -3945,7 +3950,9 @@ public class Campaign implements Serializable {
             retVal.removePart(prt);
         }
 
-        MekHQ.logMessage(String.format("[Campaign Load] Parts processed in %dms", System.currentTimeMillis() - timestamp));
+        MekHQ.getLogger().log(Campaign.class, METHOD_NAME, LogLevel.INFO,
+                String.format("[Campaign Load] Parts processed in %dms", //$NON-NLS-1$
+                        System.currentTimeMillis() - timestamp));
         timestamp = System.currentTimeMillis();
 
         // All personnel need the rank reference fixed
@@ -3983,7 +3990,9 @@ public class Campaign implements Serializable {
             }
         }
 
-        MekHQ.logMessage(String.format("[Campaign Load] Rank references fixed in %dms", System.currentTimeMillis() - timestamp));
+        MekHQ.getLogger().log(Campaign.class, METHOD_NAME, LogLevel.INFO,
+                String.format("[Campaign Load] Rank references fixed in %dms", //$NON-NLS-1$
+                        System.currentTimeMillis() - timestamp));
         timestamp = System.currentTimeMillis();
 
         // Okay, Units, need their pilot references fixed.
@@ -4051,7 +4060,9 @@ public class Campaign implements Serializable {
             }
         }
 
-        MekHQ.logMessage(String.format("[Campaign Load] Pilot references fixed in %dms", System.currentTimeMillis() - timestamp));
+        MekHQ.getLogger().log(Campaign.class, METHOD_NAME, LogLevel.INFO,
+                String.format("[Campaign Load] Pilot references fixed in %dms", //$NON-NLS-1$
+                        System.currentTimeMillis() - timestamp));
         timestamp = System.currentTimeMillis();
 
         for(Unit unit : retVal.units) {
@@ -4064,7 +4075,9 @@ public class Campaign implements Serializable {
         }
         retVal.refreshNetworks();
 
-        MekHQ.logMessage(String.format("[Campaign Load] C3 networks refreshed in %dms", System.currentTimeMillis() - timestamp));
+        MekHQ.getLogger().log(Campaign.class, METHOD_NAME, LogLevel.INFO,
+                String.format("[Campaign Load] C3 networks refreshed in %dms", //$NON-NLS-1$
+                        System.currentTimeMillis() - timestamp));
         timestamp = System.currentTimeMillis();
 
         // ok, once we are sure that campaign has been set for all units, we can
@@ -4087,12 +4100,16 @@ public class Campaign implements Serializable {
             }
         }
 
-        MekHQ.logMessage(String.format("[Campaign Load] Units initialized in %dms", System.currentTimeMillis() - timestamp));
+        MekHQ.getLogger().log(Campaign.class, METHOD_NAME, LogLevel.INFO,
+                String.format("[Campaign Load] Units initialized in %dms", //$NON-NLS-1$
+                        System.currentTimeMillis() - timestamp));
         timestamp = System.currentTimeMillis();
 
         retVal.reloadNews();
 
-        MekHQ.logMessage(String.format("[Campaign Load] News loaded in %dms", System.currentTimeMillis() - timestamp));
+        MekHQ.getLogger().log(Campaign.class, METHOD_NAME, LogLevel.INFO,
+                String.format("[Campaign Load] News loaded in %dms", //$NON-NLS-1$
+                        System.currentTimeMillis() - timestamp));
         timestamp = System.currentTimeMillis();
 
         //**EVERYTHING HAS BEEN LOADED. NOW FOR SANITY CHECKS**//
@@ -4109,7 +4126,9 @@ public class Campaign implements Serializable {
         	bin.unload();
         }
         
-        MekHQ.logMessage(String.format("[Campaign Load] Ammo bins cleared in %dms", System.currentTimeMillis() - timestamp));
+        MekHQ.getLogger().log(Campaign.class, METHOD_NAME, LogLevel.INFO,
+                String.format("[Campaign Load] Ammo bins cleared in %dms", //$NON-NLS-1$
+                        System.currentTimeMillis() - timestamp));
         timestamp = System.currentTimeMillis();
 
 
@@ -4124,7 +4143,9 @@ public class Campaign implements Serializable {
         	}
         }
 
-        MekHQ.logMessage(String.format("[Campaign Load] Reserved refit parts fixed in %dms", System.currentTimeMillis() - timestamp));
+        MekHQ.getLogger().log(Campaign.class, METHOD_NAME, LogLevel.INFO,
+                String.format("[Campaign Load] Reserved refit parts fixed in %dms", //$NON-NLS-1$
+                        System.currentTimeMillis() - timestamp));
         timestamp = System.currentTimeMillis();
 
         //try to stack as much as possible the parts in the warehouse that may be unstacked
@@ -4167,10 +4188,13 @@ public class Campaign implements Serializable {
         	retVal.removePart(toRemove);
         }
 
-        MekHQ.logMessage(String.format("[Campaign Load] Warehouse cleaned up in %dms", System.currentTimeMillis() - timestamp));
+        MekHQ.getLogger().log(Campaign.class, METHOD_NAME, LogLevel.INFO,
+                String.format("[Campaign Load] Warehouse cleaned up in %dms", //$NON-NLS-1$
+                        System.currentTimeMillis() - timestamp));
         timestamp = System.currentTimeMillis();
 
-        MekHQ.logMessage("Load of campaign file complete!");
+        MekHQ.getLogger().log(Campaign.class, METHOD_NAME, LogLevel.INFO,
+                "Load of campaign file complete!"); //$NON-NLS-1$
 
         return retVal;
     }
@@ -4263,13 +4287,17 @@ public class Campaign implements Serializable {
     }
 
     private static void processFinances(Campaign retVal, Node wn) {
-        MekHQ.logMessage("Loading Finances from XML...", 4);
+        MekHQ.getLogger().log(Campaign.class, "processFinances(Campaign,Node)", LogLevel.INFO, //$NON-NLS-1$
+                "Loading Finances from XML..."); //$NON-NLS-1$
         retVal.finances = Finances.generateInstanceFromXML(wn);
-        MekHQ.logMessage("Load of Finances complete!");
+        MekHQ.getLogger().log(Campaign.class, "processFinances(Campaign,Node)", LogLevel.INFO, //$NON-NLS-1$
+                "Load of Finances complete!"); //$NON-NLS-1$
     }
 
     private static void processForces(Campaign retVal, Node wn, Version version) {
-        MekHQ.logMessage("Loading Force Organization from XML...", 4);
+        final String METHOD_NAME = "processForces(Campaign,Node,Version)"; //$NON-NLS-1$
+        MekHQ.getLogger().log(Campaign.class, METHOD_NAME, LogLevel.INFO,
+                "Loading Force Organization from XML..."); //$NON-NLS-1$
 
         NodeList wList = wn.getChildNodes();
 
@@ -4286,7 +4314,8 @@ public class Campaign implements Serializable {
             if (!wn2.getNodeName().equalsIgnoreCase("force")) {
                 // Error condition of sorts!
                 // Errr, what should we do here?
-                MekHQ.logMessage("Unknown node type not loaded in Forces nodes: "
+                MekHQ.getLogger().log(Campaign.class, METHOD_NAME, LogLevel.ERROR,
+                        "Unknown node type not loaded in Forces nodes: " //$NON-NLS-1$
                                  + wn2.getNodeName());
 
                 continue;
@@ -4299,16 +4328,20 @@ public class Campaign implements Serializable {
                     foundForceAlready = true;
                 }
             } else {
-                MekHQ.logMessage("More than one type-level force found", 5);
+                MekHQ.getLogger().log(Campaign.class, METHOD_NAME, LogLevel.ERROR,
+                        "More than one type-level force found"); //$NON-NLS-1$
             }
         }
 
-        MekHQ.logMessage("Load of Force Organization complete!");
+        MekHQ.getLogger().log(Campaign.class, METHOD_NAME, LogLevel.INFO,
+                "Load of Force Organization complete!");
     }
 
     private static void processPersonnelNodes(Campaign retVal, Node wn,
                                               Version version) {
-        MekHQ.logMessage("Loading Personnel Nodes from XML...", 4);
+        final String METHOD_NAME = "processPersonnelNodes(Campaign,Node,Version)"; //$NON-NLS-1$
+        MekHQ.getLogger().log(Campaign.class, METHOD_NAME, LogLevel.INFO,
+                "Loading Personnel Nodes from XML..."); //$NON-NLS-1$
 
         NodeList wList = wn.getChildNodes();
 
@@ -4324,7 +4357,8 @@ public class Campaign implements Serializable {
             if (!wn2.getNodeName().equalsIgnoreCase("person")) {
                 // Error condition of sorts!
                 // Errr, what should we do here?
-                MekHQ.logMessage("Unknown node type not loaded in Personnel nodes: "
+                MekHQ.getLogger().log(Campaign.class, METHOD_NAME, LogLevel.ERROR,
+                        "Unknown node type not loaded in Personnel nodes: " //$NON-NLS-1$
                                  + wn2.getNodeName());
 
                 continue;
@@ -4337,12 +4371,16 @@ public class Campaign implements Serializable {
             }
         }
 
-        MekHQ.logMessage("Load Personnel Nodes Complete!", 4);
+        MekHQ.getLogger().log(Campaign.class, METHOD_NAME, LogLevel.INFO,
+                "Load Personnel Nodes Complete!"); //$NON-NLS-1$
     }
 
     private static void processAncestorNodes(Campaign retVal, Node wn,
                                               Version version) {
-        MekHQ.logMessage("Loading Ancestor Nodes from XML...", 4);
+        final String METHOD_NAME = "processAncestorNodes(Campaign,Node,Version)"; //$NON-NLS-1$
+        
+        MekHQ.getLogger().log(Campaign.class, METHOD_NAME, LogLevel.INFO,
+                "Loading Ancestor Nodes from XML..."); //$NON-NLS-1$
 
         NodeList wList = wn.getChildNodes();
 
@@ -4358,7 +4396,8 @@ public class Campaign implements Serializable {
             if (!wn2.getNodeName().equalsIgnoreCase("ancestor")) {
                 // Error condition of sorts!
                 // Errr, what should we do here?
-                MekHQ.logMessage("Unknown node type not loaded in Ancestor nodes: "
+                MekHQ.getLogger().log(Campaign.class, METHOD_NAME, LogLevel.ERROR,
+                        "Unknown node type not loaded in Ancestor nodes: " //$NON-NLS-1$
                                  + wn2.getNodeName());
 
                 continue;
@@ -4371,12 +4410,16 @@ public class Campaign implements Serializable {
             }
         }
 
-        MekHQ.logMessage("Load Ancestor Nodes Complete!", 4);
+        MekHQ.getLogger().log(Campaign.class, METHOD_NAME, LogLevel.INFO,
+                "Load Ancestor Nodes Complete!"); //$NON-NLS-1$
     }
 
     private static void processSkillTypeNodes(Campaign retVal, Node wn,
                                               Version version) {
-        MekHQ.logMessage("Loading Skill Type Nodes from XML...", 4);
+        final String METHOD_NAME = "processSkillTypeNodes(Campaign,Node,Version)"; //$NON-NLS-1$
+
+        MekHQ.getLogger().log(Campaign.class, METHOD_NAME, LogLevel.INFO,
+                "Loading Skill Type Nodes from XML..."); //$NON-NLS-1$
 
         NodeList wList = wn.getChildNodes();
 
@@ -4394,7 +4437,8 @@ public class Campaign implements Serializable {
             } else if (!wn2.getNodeName().equalsIgnoreCase("skillType")) {
                 // Error condition of sorts!
                 // Errr, what should we do here?
-                MekHQ.logMessage("Unknown node type not loaded in Skill Type nodes: "
+                MekHQ.getLogger().log(Campaign.class, METHOD_NAME, LogLevel.ERROR,
+                        "Unknown node type not loaded in Skill Type nodes: " //$NON-NLS-1$
                                  + wn2.getNodeName());
 
                 continue;
@@ -4403,12 +4447,16 @@ public class Campaign implements Serializable {
             SkillType.generateInstanceFromXML(wn2, version);
         }
 
-        MekHQ.logMessage("Load Skill Type Nodes Complete!", 4);
+        MekHQ.getLogger().log(Campaign.class, METHOD_NAME, LogLevel.INFO,
+                "Load Skill Type Nodes Complete!"); //$NON-NLS-1$
     }
 
     private static void processSpecialAbilityNodes(Campaign retVal, Node wn,
             Version version) {
-        MekHQ.logMessage("Loading Special Ability Nodes from XML...", 4);
+        final String METHOD_NAME = "processSpecialAbilityNodes(Campaign,Node,Version)"; //$NON-NLS-1$
+
+        MekHQ.getLogger().log(Campaign.class, METHOD_NAME, LogLevel.INFO,
+                "Loading Special Ability Nodes from XML..."); //$NON-NLS-1$
 
         PilotOptions options = new PilotOptions();
         SpecialAbility.clearSPA();
@@ -4427,7 +4475,8 @@ public class Campaign implements Serializable {
             if (!wn2.getNodeName().equalsIgnoreCase("ability")) {
                 // Error condition of sorts!
                 // Errr, what should we do here?
-                MekHQ.logMessage("Unknown node type not loaded in Special Ability nodes: "
+                MekHQ.getLogger().log(Campaign.class, METHOD_NAME, LogLevel.ERROR,
+                        "Unknown node type not loaded in Special Ability nodes: " //$NON-NLS-1$
                         + wn2.getNodeName());
 
                 continue;
@@ -4436,12 +4485,15 @@ public class Campaign implements Serializable {
             SpecialAbility.generateInstanceFromXML(wn2, options, version);
         }
 
-        MekHQ.logMessage("Load Special Ability Nodes Complete!", 4);
+        MekHQ.getLogger().log(Campaign.class, METHOD_NAME, LogLevel.INFO,
+                "Load Special Ability Nodes Complete!"); //$NON-NLS-1$
 }
 
     private static void processKillNodes(Campaign retVal, Node wn,
                                          Version version) {
-        MekHQ.logMessage("Loading Kill Nodes from XML...", 4);
+        final String METHOD_NAME = "processKillNodes(Campaign,Node,Version"; //$NON-NLS-1$
+        MekHQ.getLogger().log(Campaign.class, METHOD_NAME, LogLevel.INFO,
+                "Loading Kill Nodes from XML..."); //$NON-NLS-1$
 
         NodeList wList = wn.getChildNodes();
 
@@ -4455,7 +4507,8 @@ public class Campaign implements Serializable {
             } else if (!wn2.getNodeName().equalsIgnoreCase("kill")) {
                 // Error condition of sorts!
                 // Errr, what should we do here?
-                MekHQ.logMessage("Unknown node type not loaded in Kill nodes: "
+                MekHQ.getLogger().log(Campaign.class, METHOD_NAME, LogLevel.ERROR,
+                        "Unknown node type not loaded in Kill nodes: " //$NON-NLS-1$
                                  + wn2.getNodeName());
 
                 continue;
@@ -4464,11 +4517,14 @@ public class Campaign implements Serializable {
             retVal.kills.add(Kill.generateInstanceFromXML(wn2, version));
         }
 
-        MekHQ.logMessage("Load Kill Nodes Complete!", 4);
+        MekHQ.getLogger().log(Campaign.class, METHOD_NAME, LogLevel.INFO,
+                "Load Kill Nodes Complete!"); //$NON-NLS-1$
     }
 
     private static void processGameOptionNodes(Campaign retVal, Node wn) {
-        MekHQ.logMessage("Loading GameOption Nodes from XML...", 4);
+        final String METHOD_NAME = "processGameOptionNodes(Campaign,Node)"; //$NON-NLS-1$
+        MekHQ.getLogger().log(Campaign.class, METHOD_NAME, LogLevel.INFO,
+                "Loading GameOption Nodes from XML..."); //$NON-NLS-1$
 
         NodeList wList = wn.getChildNodes();
 
@@ -4482,7 +4538,8 @@ public class Campaign implements Serializable {
             } else if (!wn2.getNodeName().equalsIgnoreCase("gameoption")) {
                 // Error condition of sorts!
                 // Errr, what should we do here?
-                MekHQ.logMessage("Unknown node type not loaded in Game Option nodes: "
+                MekHQ.getLogger().log(Campaign.class, METHOD_NAME, LogLevel.ERROR,
+                        "Unknown node type not loaded in Game Option nodes: " //$NON-NLS-1$
                                  + wn2.getNodeName());
 
                 continue;
@@ -4524,19 +4581,25 @@ public class Campaign implements Serializable {
                                     
                             }
                         } catch (IllegalArgumentException iaEx) {
-                            MekHQ.logMessage("Error trying to load option '" + name + "' with a value of '" + value + "'."); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                            MekHQ.getLogger().log(Campaign.class, METHOD_NAME, LogLevel.ERROR,
+                                    "Error trying to load option '" + name + "' with a value of '" //$NON-NLS-1$
+                                    + value + "'.");
                         }
                     }
                 } else {
-                    MekHQ.logMessage("Invalid option '" + name + "' when trying to load options file."); //$NON-NLS-1$ //$NON-NLS-2$
+                    MekHQ.getLogger().log(Campaign.class, METHOD_NAME, LogLevel.ERROR,
+                            "Invalid option '" + name + "' when trying to load options file."); //$NON-NLS-1$
                 }
             }
         }
 
-        MekHQ.logMessage("Load Game Option Nodes Complete!", 4);
+        MekHQ.getLogger().log(Campaign.class, METHOD_NAME, LogLevel.INFO,
+                "Load Game Option Nodes Complete!"); //$NON-NLS-1$
     }
 
     private static void processCustom(Campaign retVal, Node wn) {
+        final String METHOD_NAME = "processCustom(Campaign,Node)"; //$NON-NLS-1$
+        
         String sCustomsDir = "data" + File.separator + "mechfiles"
                              + File.separator + "customs";
         String sCustomsDirCampaign = sCustomsDir + File.separator + retVal.getName();
@@ -4584,13 +4647,15 @@ public class Campaign implements Serializable {
                     || (new File(fileNameCampaign)).exists()) {
                     return;
                 }
-                MekHQ.logMessage("Loading Custom unit from XML...", 4);
+                MekHQ.getLogger().log(Campaign.class, METHOD_NAME, LogLevel.INFO,
+                        "Loading Custom unit from XML..."); //$NON-NLS-1$
                 FileOutputStream out = new FileOutputStream(fileNameCampaign);
                 PrintStream p = new PrintStream(out);
                 p.println(mtf);
                 p.close();
                 out.close();
-                MekHQ.logMessage("Loaded Custom Unit!", 4);
+                MekHQ.getLogger().log(Campaign.class, METHOD_NAME, LogLevel.INFO,
+                        "Loaded Custom unit!"); //$NON-NLS-1$
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
@@ -4606,13 +4671,15 @@ public class Campaign implements Serializable {
                     || (new File(fileNameCampaign)).exists()) {
                     return;
                 }
-                MekHQ.logMessage("Loading Custom unit from XML...", 4);
+                MekHQ.getLogger().log(Campaign.class, METHOD_NAME, LogLevel.INFO,
+                        "Loading Custom unit from XML..."); //$NON-NLS-1$
                 FileOutputStream out = new FileOutputStream(fileNameCampaign);
                 PrintStream p = new PrintStream(out);
                 p.println(blk);
                 p.close();
                 out.close();
-                MekHQ.logMessage("Loaded Custom Unit!", 4);
+                MekHQ.getLogger().log(Campaign.class, METHOD_NAME, LogLevel.INFO,
+                        "Loaded Custom unit!"); //$NON-NLS-1$
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
@@ -4620,7 +4687,10 @@ public class Campaign implements Serializable {
     }
 
     private static void processMissionNodes(Campaign retVal, Node wn, Version version) {
-        MekHQ.logMessage("Loading Mission Nodes from XML...", 4);
+        final String METHOD_NAME = "processMissionNodes(Campaign,Node,Version)"; //$NON-NLS-1$
+        
+        MekHQ.getLogger().log(Campaign.class, METHOD_NAME, LogLevel.INFO,
+                "Loading Mission Nodes from XML..."); //$NON-NLS-1$
 
         NodeList wList = wn.getChildNodes();
 
@@ -4636,7 +4706,8 @@ public class Campaign implements Serializable {
             if (!wn2.getNodeName().equalsIgnoreCase("mission")) {
                 // Error condition of sorts!
                 // Errr, what should we do here?
-                MekHQ.logMessage("Unknown node type not loaded in Mission nodes: "
+                MekHQ.getLogger().log(Campaign.class, METHOD_NAME, LogLevel.INFO,
+                        "Unknown node type not loaded in Mission nodes: " //$NON-NLS-1$
                                  + wn2.getNodeName());
 
                 continue;
@@ -4653,11 +4724,15 @@ public class Campaign implements Serializable {
             }
         }
 
-        MekHQ.logMessage("Load Mission Nodes Complete!", 4);
+        MekHQ.getLogger().log(Campaign.class, METHOD_NAME, LogLevel.INFO,
+                "Load Mission Nodes Complete!"); //$NON-NLS-1$
     }
 
     private static String checkUnits(Node wn) {
-        MekHQ.logMessage("Checking for missing entities...", 4);
+        final String METHOD_NAME = "checkUnits(Node)"; //$NON-NLS-1$
+        
+        MekHQ.getLogger().log(Campaign.class, METHOD_NAME, LogLevel.INFO, //$NON-NLS-1$
+                "Checking for missing entities..."); //$NON-NLS-1$
 
         ArrayList<String> unitList = new ArrayList<String>();
         NodeList wList = wn.getChildNodes();
@@ -4694,7 +4769,8 @@ public class Campaign implements Serializable {
                 }
             }
         }
-        MekHQ.logMessage("Finished checking for missing entities!", 4);
+        MekHQ.getLogger().log(Campaign.class, METHOD_NAME, LogLevel.INFO,
+                "Finished checking for missing entities!"); //$NON-NLS-1$
 
         if (unitList.isEmpty()) {
             return null;
@@ -4709,7 +4785,10 @@ public class Campaign implements Serializable {
 
     private static void processUnitNodes(Campaign retVal, Node wn,
                                          Version version) {
-        MekHQ.logMessage("Loading Unit Nodes from XML...", 4);
+        final String METHOD_NAME = "processUnitNodes(Campaign,Node,Version)"; //$NON-NLS-1$
+        
+        MekHQ.getLogger().log(Campaign.class, METHOD_NAME, LogLevel.INFO,
+                "Loading Unit Nodes from XML..."); //$NON-NLS-1$
 
         NodeList wList = wn.getChildNodes();
 
@@ -4725,7 +4804,8 @@ public class Campaign implements Serializable {
             if (!wn2.getNodeName().equalsIgnoreCase("unit")) {
                 // Error condition of sorts!
                 // Errr, what should we do here?
-                MekHQ.logMessage("Unknown node type not loaded in Unit nodes: "
+                MekHQ.getLogger().log(Campaign.class, METHOD_NAME, LogLevel.ERROR,
+                        "Unknown node type not loaded in Unit nodes: " //$NON-NLS-1$
                                  + wn2.getNodeName());
 
                 continue;
@@ -4738,12 +4818,16 @@ public class Campaign implements Serializable {
             }
         }
 
-        MekHQ.logMessage("Load Unit Nodes Complete!", 4);
+        MekHQ.getLogger().log(Campaign.class, METHOD_NAME, LogLevel.INFO,
+                "Load Unit Nodes Complete!"); //$NON-NLS-1$
     }
 
     private static void processPartNodes(Campaign retVal, Node wn,
                                          Version version) {
-        MekHQ.logMessage("Loading Part Nodes from XML...", 4);
+        final String METHOD_NAME = "processPartNodes(Campaign,Node,Version)"; //$NON-NLS-1$
+        
+        MekHQ.getLogger().log(Campaign.class, METHOD_NAME, LogLevel.INFO,
+                "Loading Part Nodes from XML..."); //$NON-NLS-1$
 
         NodeList wList = wn.getChildNodes();
 
@@ -4759,7 +4843,8 @@ public class Campaign implements Serializable {
             if (!wn2.getNodeName().equalsIgnoreCase("part")) {
                 // Error condition of sorts!
                 // Errr, what should we do here?
-                MekHQ.logMessage("Unknown node type not loaded in Part nodes: "
+                MekHQ.getLogger().log(Campaign.class, METHOD_NAME, LogLevel.ERROR,
+                        "Unknown node type not loaded in Part nodes: " //$NON-NLS-1$
                                  + wn2.getNodeName());
 
                 continue;
@@ -4817,7 +4902,8 @@ public class Campaign implements Serializable {
             }
         }
 
-        MekHQ.logMessage("Load Part Nodes Complete!", 4);
+        MekHQ.getLogger().log(Campaign.class, METHOD_NAME, LogLevel.INFO,
+                "Load Part Nodes Complete!"); //$NON-NLS-1$
     }
 
     /**
@@ -5012,7 +5098,8 @@ public class Campaign implements Serializable {
             if (!wn2.getNodeName().equalsIgnoreCase("lance")) {
                 // Error condition of sorts!
                 // Errr, what should we do here?
-                MekHQ.logMessage("Unknown node type not loaded in Lance nodes: "
+                MekHQ.getLogger().log(Campaign.class, "processLanceNodes(Campaign,Node)", LogLevel.ERROR, //$NON-NLS-1$
+                        "Unknown node type not loaded in Lance nodes: " //$NON-NLS-1$
                                  + wn2.getNodeName());
 
                 continue;
@@ -5428,7 +5515,7 @@ public class Campaign implements Serializable {
 		    String special = Crew.SPECIAL_NONE;
 		    switch (Compute.randomInt(2)) {
 		        case 0:
-		            special = Crew.SPECIAL_LASER;
+		            special = Crew.SPECIAL_ENERGY;
 		            break;
 		        case 1:
 		            special = Crew.SPECIAL_BALLISTIC;

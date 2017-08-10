@@ -5,7 +5,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Enumeration;
 import java.util.ResourceBundle;
 import java.util.TreeSet;
 import java.util.UUID;
@@ -25,7 +24,7 @@ import megamek.common.Infantry;
 import megamek.common.Mech;
 import megamek.common.Mounted;
 import megamek.common.Tank;
-import megamek.common.options.IOption;
+import megamek.common.logging.LogLevel;
 import megamek.common.options.PilotOptions;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
@@ -160,6 +159,8 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
 
     @Override
     public void actionPerformed(ActionEvent action) {
+        final String METHOD_NAME = "actionPerformed(ActionEvent)"; //$NON-NLS-1$
+        
         int row = personnelTable.getSelectedRow();
         if (row < 0) {
             return;
@@ -521,7 +522,8 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                         break;
                     default:
                         spouse.setName(spouseGivenname + SPACE + "ImaError"); //$NON-NLS-1$
-                        MekHQ.logMessage(String.format("Unknown error in Surname chooser between \"%s\" and \"%s\"", //$NON-NLS-1$
+                        MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
+                                String.format("Unknown error in Surname chooser between \"%s\" and \"%s\"", //$NON-NLS-1$
                             selectedPerson.getFullName(), spouse.getFullName()));
                         break;
                 }
@@ -1760,7 +1762,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                         } else if (spa.getName().equals("specialist")) { //$NON-NLS-1$
                             JMenu specialistMenu = new JMenu(resourceMap.getString("specialist.text")); //$NON-NLS-1$
                             menuItem = new JMenuItem(String.format(resourceMap.getString("abilityDesc.format"), resourceMap.getString("laserSpecialist.text"), costDesc)); //$NON-NLS-1$ //$NON-NLS-2$
-                            menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_SPECIALIST, Crew.SPECIAL_LASER, String.valueOf(cost)));
+                            menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_SPECIALIST, Crew.SPECIAL_ENERGY, String.valueOf(cost)));
                             menuItem.addActionListener(this);
                             menuItem.setEnabled(available);
                             specialistMenu.add(menuItem);
