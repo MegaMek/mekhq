@@ -2113,11 +2113,8 @@ public class CampaignOptions implements Serializable {
             }
 
             MekHQ.getLogger().log(CampaignOptions.class, METHOD_NAME, LogLevel.INFO,
-                    "---"); //$NON-NLS-1$
-            MekHQ.getLogger().log(CampaignOptions.class, METHOD_NAME, LogLevel.INFO,
-                    wn2.getNodeName());
-            MekHQ.getLogger().log(CampaignOptions.class, METHOD_NAME, LogLevel.INFO,
-                    "\t" + wn2.getTextContent()); //$NON-NLS-1$
+                    String.format("%s\n\t%s", //$NON-NLS-1$
+                            wn2.getNodeName(), wn2.getTextContent()));
 
             if (wn2.getNodeName().equalsIgnoreCase("clanPriceModifier")) {
                 retVal.clanPriceModifier = Double.parseDouble(wn2.getTextContent());
@@ -2537,12 +2534,8 @@ public class CampaignOptions implements Serializable {
                                 }
                      
                                 MekHQ.getLogger().log(CampaignOptions.class, METHOD_NAME, LogLevel.INFO,
-                                        "---"); //$NON-NLS-1$
-                                MekHQ.getLogger().log(CampaignOptions.class, METHOD_NAME, LogLevel.INFO,
-                                        "massRepairOption" + mroTypeIdx + "." + mroItemNode.getNodeName()); //$NON-NLS-1$
-                                MekHQ.getLogger().log(CampaignOptions.class, METHOD_NAME, LogLevel.INFO,
-                                        "\t" + mroItemNode.getTextContent()); //$NON-NLS-1$
-                                
+                                        String.format("massRepairOption %d.%s\n\t%s", //$NON-NLS-1$
+                                                mroTypeIdx, mroItemNode.getNodeName(), mroItemNode.getTextContent()));
                                 
                                 if (mroItemNode.getNodeName().equalsIgnoreCase("type")) {
                                 	mro.setType(Integer.parseInt(mroItemNode.getTextContent().trim()));
