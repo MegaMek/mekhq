@@ -57,6 +57,7 @@ import megamek.common.Entity;
 import megamek.common.EntityMovementMode;
 import megamek.common.Infantry;
 import megamek.common.Jumpship;
+import megamek.common.LandAirMech;
 import megamek.common.Mech;
 import megamek.common.Protomech;
 import megamek.common.SmallCraft;
@@ -2743,7 +2744,9 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public boolean canDrive(Entity ent) {
-        if (ent instanceof Mech) {
+        if (ent instanceof LandAirMech) {
+            return hasSkill(SkillType.S_PILOT_MECH) && hasSkill(SkillType.S_PILOT_AERO);
+        } else if (ent instanceof Mech) {
             return hasSkill(SkillType.S_PILOT_MECH);
         } else if (ent instanceof VTOL) {
             return hasSkill(SkillType.S_PILOT_VTOL);
@@ -2772,7 +2775,9 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public boolean canGun(Entity ent) {
-        if (ent instanceof Mech) {
+        if (ent instanceof LandAirMech) {
+            return hasSkill(SkillType.S_GUN_MECH) && hasSkill(SkillType.S_GUN_AERO);
+        } else if (ent instanceof Mech) {
             return hasSkill(SkillType.S_GUN_MECH);
         } else if (ent instanceof Tank) {
             return hasSkill(SkillType.S_GUN_VEE);
