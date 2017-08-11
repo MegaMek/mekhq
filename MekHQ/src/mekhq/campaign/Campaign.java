@@ -5135,6 +5135,9 @@ public class Campaign implements Serializable {
     }
     
     public Person newPerson(int type) {
+        if (type == Person.T_LAM_PILOT) {
+            return newPerson(Person.T_MECHWARRIOR, Person.T_AERO_PILOT);
+        }
         return newPerson(type, Person.T_NONE);
     }
 

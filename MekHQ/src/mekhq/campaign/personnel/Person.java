@@ -119,7 +119,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
     public static final int T_ADMIN_LOG = 23;
     public static final int T_ADMIN_TRA = 24;
     public static final int T_ADMIN_HR = 25;
-    public static final int T_NUM = 26;
+    public static final int T_LAM_PILOT = 26; // Not a separate type, but an alias for MW + Aero pilot
+    public static final int T_NUM = 27;
 
     public static final int S_ACTIVE = 0;
     public static final int S_RETIRED = 1;
@@ -766,6 +767,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 return "Admin/Transport";
             case (T_ADMIN_HR):
                 return "Admin/HR";
+            case (T_LAM_PILOT):
+                return "LAM Pilot";
             default:
                 return "??";
         }
