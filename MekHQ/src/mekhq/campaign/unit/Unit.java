@@ -63,6 +63,7 @@ import megamek.common.Infantry;
 import megamek.common.InfantryBay;
 import megamek.common.InsulatedCargoBay;
 import megamek.common.Jumpship;
+import megamek.common.LandAirMech;
 import megamek.common.LightVehicleBay;
 import megamek.common.LiquidCargoBay;
 import megamek.common.LivestockCargoBay;
@@ -2445,6 +2446,18 @@ public class Unit implements MekHqXmlSerializable {
                     partsToAdd.add(secondaryW);
                     number--;
                 }
+            }
+        }
+        if (getEntity() instanceof LandAirMech) {
+            if (null == avionics) {
+                avionics = new Avionics((int)entity.getWeight(), campaign);
+                addPart(avionics);
+                partsToAdd.add(avionics);
+            }
+            if (null == landingGear) {
+                landingGear = new LandingGear((int) entity.getWeight(), campaign);
+                addPart(landingGear);
+                partsToAdd.add(landingGear);
             }
         }
 
