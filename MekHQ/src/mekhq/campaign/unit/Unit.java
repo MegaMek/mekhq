@@ -63,6 +63,7 @@ import megamek.common.Infantry;
 import megamek.common.InfantryBay;
 import megamek.common.InsulatedCargoBay;
 import megamek.common.Jumpship;
+import megamek.common.LAMPilot;
 import megamek.common.LandAirMech;
 import megamek.common.LightVehicleBay;
 import megamek.common.LiquidCargoBay;
@@ -2638,7 +2639,11 @@ public class Unit implements MekHqXmlSerializable {
                 }
             }
         } else {
-            calcCompositeCrew();
+            if ((entity.getEntityType() & Entity.ETYPE_LAND_AIR_MECH) == 0) {
+                calcCompositeCrew();
+            } else {
+                refreshLAMPilot();
+            }
             if (entity.getCrew().isMissing(0)) {
                 return;
             }
@@ -2697,8 +2702,6 @@ public class Unit implements MekHqXmlSerializable {
     /**
      * For vehicles, infantry, and naval vessels, compute the piloting and gunnery skills based
      * on the crew as a whole.
-     * 
-     * @return The size of the crew.
      */
     private void calcCompositeCrew() {
         if (drivers.isEmpty() && gunners.isEmpty()) {
@@ -2866,6 +2869,56 @@ public class Unit implements MekHqXmlSerializable {
         entity.getCrew().setGunnery(Math.min(Math.max(gunnery, 0), 7), 0);
         entity.getCrew().setArtillery(Math.min(Math.max(artillery, 7), 8), 0);
         entity.getCrew().setSize(nCrew);
+        entity.getCrew().setMissing(false, 0);
+    }
+    
+    /**
+     * LAMs require a pilot that is cross-trained for mechs and fighters
+     */
+    private void refreshLAMPilot() {
+        Person pilot = getCommander();
+        if (null == pilot) {
+            entity.getCrew().setMissing(true, 0);
+            entity.getCrew().setSize(0);
+            return;
+        }
+        
+        int pilotingMech = 13;
+        int gunneryMech = 13;
+        int pilotingAero = 13;
+        int gunneryAero = 13;
+        int artillery = 13;
+        
+        if (pilot.hasSkill(SkillType.S_PILOT_MECH)) {
+            pilotingMech = pilot.getSkill(SkillType.S_PILOT_MECH).getFinalSkillValue();
+        }
+        if (pilot.hasSkill(SkillType.S_GUN_MECH)) {
+            gunneryMech = pilot.getSkill(SkillType.S_GUN_MECH).getFinalSkillValue();
+        }
+        if (pilot.hasSkill(SkillType.S_PILOT_AERO)) {
+            pilotingAero = pilot.getSkill(SkillType.S_PILOT_AERO).getFinalSkillValue();
+        }
+        if (pilot.hasSkill(SkillType.S_GUN_AERO)) {
+            gunneryAero = pilot.getSkill(SkillType.S_GUN_AERO).getFinalSkillValue();
+        }
+        if (pilot.hasSkill(SkillType.S_ARTILLERY)) {
+            artillery = pilot.getSkill(SkillType.S_ARTILLERY).getFinalSkillValue();
+        }
+
+        if (campaign.getCampaignOptions().useAdvancedMedical()) {
+            pilotingMech += pilot.getPilotingInjuryMod();
+            gunneryMech += pilot.getGunneryInjuryMod();
+            pilotingAero += pilot.getPilotingInjuryMod();
+            gunneryAero += pilot.getGunneryInjuryMod();
+            artillery += pilot.getGunneryInjuryMod();
+        }
+        LAMPilot crew = (LAMPilot)entity.getCrew();
+        crew.setPiloting(Math.min(Math.max(pilotingMech, 0), 8));
+        crew.setGunnery(Math.min(Math.max(gunneryMech, 0), 7));
+        crew.setPilotingAero(Math.min(Math.max(pilotingAero, 0), 8));
+        crew.setGunneryAero(Math.min(Math.max(gunneryAero, 0), 7));
+        entity.getCrew().setArtillery(Math.min(Math.max(artillery, 7), 8), 0);
+        entity.getCrew().setSize(1);
         entity.getCrew().setMissing(false, 0);
     }
     
