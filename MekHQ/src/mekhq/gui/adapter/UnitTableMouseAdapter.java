@@ -26,6 +26,7 @@ import megamek.common.AmmoType;
 import megamek.common.BattleArmor;
 import megamek.common.CriticalSlot;
 import megamek.common.Entity;
+import megamek.common.IBomber;
 import megamek.common.Infantry;
 import megamek.common.Mech;
 import megamek.common.MechSummaryCache;
@@ -33,8 +34,8 @@ import megamek.common.Player;
 import megamek.common.loaders.BLKFile;
 import mekhq.MekHQ;
 import mekhq.Utilities;
-import mekhq.campaign.event.UnitChangedEvent;
 import mekhq.campaign.event.RepairStatusChangedEvent;
+import mekhq.campaign.event.UnitChangedEvent;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.MissingPart;
@@ -428,9 +429,9 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
             }
         } else if (command.equalsIgnoreCase("BOMBS")) {
             if (null != selectedUnit
-                    && selectedUnit.getEntity() instanceof Aero) {
+                    && selectedUnit.getEntity().isBomber()) {
                 BombsDialog dialog = new BombsDialog(
-                        (Aero) selectedUnit.getEntity(), gui.getCampaign(),
+                        (IBomber)selectedUnit.getEntity(), gui.getCampaign(),
                         gui.getFrame());
                 dialog.setVisible(true);
                 MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
@@ -615,7 +616,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                 popup.add(menu);
             }
             // Select bombs.
-            if (oneSelected && (unit.getEntity() instanceof Aero)) {
+            if (oneSelected && (unit.getEntity().isBomber())) {
                 menuItem = new JMenuItem("Select Bombs");
                 menuItem.setActionCommand("BOMBS");
                 menuItem.addActionListener(this);
