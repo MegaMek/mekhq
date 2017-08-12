@@ -23,15 +23,17 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import org.w3c.dom.Node;
+
 import megamek.common.Aero;
 import megamek.common.Compute;
+import megamek.common.CriticalSlot;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
+import megamek.common.LandAirMech;
 import megamek.common.TechConstants;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.SkillType;
-
-import org.w3c.dom.Node;
 
 /**
  *
@@ -62,12 +64,16 @@ public class LandingGear extends Part {
 	@Override
 	public void updateConditionFromEntity(boolean checkForDestruction) {
 		int priorHits = hits;
-		if(null != unit && unit.getEntity() instanceof Aero) {
-			if(((Aero)unit.getEntity()).isGearHit()) {
-				hits = 1;
-			} else {
-				hits = 0;
-			}
+		if(null != unit) {
+		    if (unit.getEntity() instanceof Aero) {
+    			if(((Aero)unit.getEntity()).isGearHit()) {
+    				hits = 1;
+    			} else {
+    				hits = 0;
+    			}
+		    } else if (unit.getEntity() instanceof LandAirMech) {
+		        hits = unit.getHitCriticals(CriticalSlot.TYPE_SYSTEM, LandAirMech.LAM_LANDING_GEAR);
+		    }
 			if(checkForDestruction 
 					&& hits > priorHits 
 					&& Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
@@ -96,23 +102,34 @@ public class LandingGear extends Part {
 	@Override
 	public void updateConditionFromPart() {
 		if(null != unit && unit.getEntity() instanceof Aero) {
-			((Aero)unit.getEntity()).setGearHit(needsFixing());
+		        ((Aero)unit.getEntity()).setGearHit(needsFixing());
+		} else if (null != unit && unit.getEntity() instanceof LandAirMech) {
+		    if (hits == 0) {
+		        unit.repairSystem(CriticalSlot.TYPE_SYSTEM, LandAirMech.LAM_LANDING_GEAR);
+		    } else {
+		        unit.damageSystem(CriticalSlot.TYPE_SYSTEM, LandAirMech.LAM_LANDING_GEAR, hits);
+		    }
 		}
-		
 	}
 
 	@Override
 	public void fix() {
 		super.fix();
-		if(null != unit && unit.getEntity() instanceof Aero) {
+		if (null != unit && unit.getEntity() instanceof Aero) {
 			((Aero)unit.getEntity()).setGearHit(false);
+		} else if (null != unit && unit.getEntity() instanceof LandAirMech) {
+            unit.repairSystem(CriticalSlot.TYPE_SYSTEM, LandAirMech.LAM_LANDING_GEAR);
 		}
 	}
 
 	@Override
 	public void remove(boolean salvage) {
-		if(null != unit && unit.getEntity() instanceof Aero) {
-			((Aero)unit.getEntity()).setGearHit(true);
+		if(null != unit) {
+		    if (unit.getEntity() instanceof Aero) {
+		        ((Aero)unit.getEntity()).setGearHit(true);
+		    } else if (unit.getEntity() instanceof LandAirMech) {
+		        unit.damageSystem(CriticalSlot.TYPE_SYSTEM, LandAirMech.LAM_LANDING_GEAR, 3);
+		    }
 			Part spare = campaign.checkForExistingSparePart(this);
 			if(!salvage) {
 				campaign.removePart(this);
@@ -188,6 +205,9 @@ public class LandingGear extends Part {
 	
 	@Override
 	public boolean isRightTechType(String skillType) {
+        if (unit != null && unit.getEntity() instanceof LandAirMech) {
+            return skillType.equals(SkillType.S_TECH_MECH);
+        }
 		return skillType.equals(SkillType.S_TECH_AERO);
 	}
 

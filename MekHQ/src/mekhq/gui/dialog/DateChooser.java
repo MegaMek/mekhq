@@ -183,7 +183,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
             contentPane.add(dateField, BorderLayout.SOUTH);
             dateField.setColumns(10);
         } catch (ParseException e) {
-            MekHQ.logError(e);
+            MekHQ.getLogger().log(getClass(), "<init>(Frame,GregorianCalendar)", e);
         }
 
         setResizable(false);

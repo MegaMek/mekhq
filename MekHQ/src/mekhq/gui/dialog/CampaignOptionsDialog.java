@@ -85,6 +85,7 @@ import javax.swing.table.TableColumn;
 
 import megamek.client.ui.swing.util.PlayerColors;
 import megamek.common.Player;
+import megamek.common.logging.LogLevel;
 import megamek.common.options.GameOptions;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
@@ -4043,6 +4044,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     }
 
     private void btnSaveActionPerformed() {
+        final String METHOD_NAME = "btnSaveActionPerformed()"; //$NON-NLS-1$
     	if (txtName.getText().length() == 0) {
     		return;
     	}
@@ -4052,7 +4054,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         	return;
         }
 
-    	MekHQ.logMessage("Saving campaign options...");
+        MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO,
+                "Saving campaign options..."); //$NON-NLS-1$
         // Choose a file...
         JFileChooser saveOptions = new JFileChooser(MekHQ.PRESET_DIR);
         saveOptions.setDialogTitle("Save Campaign Options as Presets");
@@ -4102,9 +4105,10 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
             if (backupFile.exists()) {
                 backupFile.delete();
             }
-            MekHQ.logMessage("Campaign options saved to " + file);
+            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO,
+                    "Campaign options saved to " + file); //$NON-NLS-1$
         } catch (Exception ex) {
-            MekHQ.logError(ex);
+            MekHQ.getLogger().log(getClass(), METHOD_NAME, ex);
             JOptionPane
                     .showMessageDialog(
                             null,
@@ -4401,7 +4405,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
                     int cost = Integer.parseInt((String) tableXP.getValueAt(i, j));
                     SkillType.setCost(SkillType.skillList[i], cost, j);
                 } catch (NumberFormatException e) {
-                    MekHQ.logMessage("unreadable value in skill cost table for " + SkillType.skillList[i]);
+                    MekHQ.getLogger().log(getClass(), "updateXPCosts()", LogLevel.ERROR,
+                            "unreadable value in skill cost table for " + SkillType.skillList[i]); //$NON-NLS-1$
                 }
             }
         }

@@ -35,8 +35,12 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.common.Compute;
 import megamek.common.TargetRoll;
+import megamek.common.logging.LogLevel;
 import megamek.common.options.IOption;
 import megamek.common.options.PilotOptions;
 import mekhq.MekHQ;
@@ -46,9 +50,6 @@ import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Mission;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  * @author Neoancient
@@ -88,7 +89,9 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
 	 * @return The value of each share in C-bills
 	 */
 	public static long getShareValue(Campaign campaign) {
-		if (!campaign.getCampaignOptions().getUseShareSystem()) {
+        final String METHOD_NAME = "getShareValue(Campaign)"; //$NON-NLS-1$
+
+        if (!campaign.getCampaignOptions().getUseShareSystem()) {
 			return 0;
 		}
 		String financialReport = campaign.getFinancialReport();
@@ -107,8 +110,9 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
 				}
 			}
 		} catch (Exception e) {
-			MekHQ.logError("Error parsing net worth in financial report");
-			MekHQ.logError(e);
+            MekHQ.getLogger().log(RetirementDefectionTracker.class, METHOD_NAME, LogLevel.ERROR,
+                    "Error parsing net worth in financial report"); //$NON-NLS-1$
+            MekHQ.getLogger().log(RetirementDefectionTracker.class, METHOD_NAME, e);
 		}
 		int totalShares = 0;
 		for (Person p : campaign.getPersonnel()) {
@@ -631,6 +635,8 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
 	}
 
     public static RetirementDefectionTracker generateInstanceFromXML(Node wn, Campaign c) {
+        final String METHOD_NAME = "generateInstanceFromXML(Node,Campaign)"; //$NON-NLS-1$
+
         RetirementDefectionTracker retVal = null;
 
         try {
@@ -717,7 +723,7 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
             // Errrr, apparently either the class name was invalid...
             // Or the listed name doesn't exist.
             // Doh!
-            MekHQ.logError(ex);
+            MekHQ.getLogger().log(RetirementDefectionTracker.class, METHOD_NAME, ex);
         }
 
         return retVal;

@@ -5,6 +5,7 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
@@ -28,7 +29,9 @@ import mekhq.campaign.personnel.Ranks;
 
         @Override
         public int compare(String s0, String s1) {
-        	// get the numbers associated with each rank string, and compare
+            final String METHOD_NAME = "compare(String,String)"; //$NON-NLS-1$
+
+            // get the numbers associated with each rank string, and compare
         	matcher = pattern.matcher(s0);
         	matcher.find();
         	String s00 = matcher.group(1);
@@ -55,8 +58,9 @@ import mekhq.campaign.personnel.Ranks;
 	        	}
 	        	return Integer.compare(p0.getRankNumeric(), p1.getRankNumeric());
         	} catch (Exception e) {
-        		MekHQ.logError(String.format("[DEBUG] RankSorter Exception, s0: %s, s1: %s", s00, s11)); //$NON-NLS-1$
-        		e.printStackTrace();
+                MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
+                        String.format("[DEBUG] RankSorter Exception, s0: %s, s1: %s", s00, s11)); //$NON-NLS-1$
+                MekHQ.getLogger().log(getClass(), METHOD_NAME, e);
         		return 0;
         	}
         }

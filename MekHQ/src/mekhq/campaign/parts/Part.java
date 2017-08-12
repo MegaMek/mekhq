@@ -660,6 +660,8 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	}
 
 	public static Part generateInstanceFromXML(Node wn, Version version) {
+	    final String METHOD_NAME = "generateInstanceFromXML(Node,Version)"; //$NON-NLS-1$
+	    
 		Part retVal = null;
 		NamedNodeMap attrs = wn.getAttributes();
 		Node classNameNode = attrs.getNamedItem("type");
@@ -789,7 +791,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 			// Errrr, apparently either the class name was invalid...
 			// Or the listed name doesn't exist.
 			// Doh!
-			MekHQ.logError(ex);
+		    MekHQ.getLogger().log(Part.class, METHOD_NAME, ex);
 		}
 
 		// Refit protection of unit id

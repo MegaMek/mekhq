@@ -31,6 +31,9 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.UUID;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.client.RandomSkillsGenerator;
 import megamek.client.RandomUnitGenerator;
 import megamek.common.Compute;
@@ -40,6 +43,7 @@ import megamek.common.MechSummary;
 import megamek.common.Player;
 import megamek.common.UnitType;
 import megamek.common.loaders.EntityLoadingException;
+import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
@@ -52,9 +56,6 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.gui.view.LanceAssignmentView;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  * Contract class for use with Against the Bot rules
@@ -601,6 +602,8 @@ public class AtBContract extends Contract implements Serializable {
 	}
 	
 	public void doBonusRoll(Campaign c) {
+	    final String METHOD_NAME = "doBonusRoll(Campaign)"; //$NON-NLS-1$
+	    
 		int number;
 		String rat = null;
 		int roll = Compute.d6();
@@ -645,8 +648,9 @@ public class AtBContract extends Contract implements Serializable {
 					en = new MechFileParser(msl.get(0).getSourceFile(), msl.get(0).getEntryName()).getEntity();
 				} catch (EntityLoadingException ex) {
 		            en = null;
-		            MekHQ.logError("Unable to load entity: " + msl.get(0).getSourceFile() + ": " + msl.get(0).getEntryName() + ": " + ex.getMessage());
-		            MekHQ.logError(ex);
+		            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
+		                    "Unable to load entity: " + msl.get(0).getSourceFile() + ": " + msl.get(0).getEntryName() + ": " + ex.getMessage()); //$NON-NLS-1$
+		            MekHQ.getLogger().log(getClass(), METHOD_NAME, ex);
 				}
 				
 			}

@@ -37,6 +37,7 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.Version;
@@ -422,6 +423,8 @@ public class Force implements Serializable {
     }
     
     public static Force generateInstanceFromXML(Node wn, Campaign c, Version version) {
+        final String METHOD_NAME = "generateInstanceFromXML(Node,Campaign,Version)"; //$NON-NLS-1$
+        
         Force retVal = null;
         NamedNodeMap attrs = wn.getAttributes();
         Node idNameNode = attrs.getNamedItem("id");
@@ -461,7 +464,8 @@ public class Force implements Serializable {
                         if (!wn3.getNodeName().equalsIgnoreCase("force")) {
                             // Error condition of sorts!
                             // Errr, what should we do here?
-                            MekHQ.logMessage("Unknown node type not loaded in Forces nodes: "+wn3.getNodeName());
+                            MekHQ.getLogger().log(Force.class, METHOD_NAME, LogLevel.ERROR,
+                                    "Unknown node type not loaded in Forces nodes: " + wn3.getNodeName()); //$NON-NLS-1$
                             continue;
                         }
                         
@@ -474,7 +478,7 @@ public class Force implements Serializable {
             // Errrr, apparently either the class name was invalid...
             // Or the listed name doesn't exist.
             // Doh!
-            MekHQ.logError(ex);
+            MekHQ.getLogger().log(Force.class, METHOD_NAME, ex);
         }
         
         return retVal;

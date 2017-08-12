@@ -32,6 +32,7 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
@@ -170,6 +171,8 @@ public class ForceStub implements Serializable {
     }
     
     public static ForceStub generateInstanceFromXML(Node wn) {
+        final String METHOD_NAME = "generateInstanceFromXML(Node)"; //$NON-NLS-1$
+        
         ForceStub retVal = null;
         
         try {        
@@ -197,7 +200,8 @@ public class ForceStub implements Serializable {
                         if (!wn3.getNodeName().equalsIgnoreCase("unitStub")) {
                             // Error condition of sorts!
                             // Errr, what should we do here?
-                            MekHQ.logMessage("Unknown node type not loaded in ForceStub nodes: "+wn3.getNodeName());
+                            MekHQ.getLogger().log(ForceStub.class, METHOD_NAME, LogLevel.ERROR,
+                                    "Unknown node type not loaded in ForceStub nodes: " + wn3.getNodeName()); //$NON-NLS-1$
                             continue;
                         }
                         
@@ -214,7 +218,8 @@ public class ForceStub implements Serializable {
                         if (!wn3.getNodeName().equalsIgnoreCase("forceStub")) {
                             // Error condition of sorts!
                             // Errr, what should we do here?
-                            MekHQ.logMessage("Unknown node type not loaded in ForceStub nodes: "+wn3.getNodeName());
+                            MekHQ.getLogger().log(ForceStub.class, METHOD_NAME, LogLevel.ERROR,
+                                    "Unknown node type not loaded in ForceStub nodes: " + wn3.getNodeName()); //$NON-NLS-1$
                             continue;
                         }
                         
@@ -226,7 +231,7 @@ public class ForceStub implements Serializable {
             // Errrr, apparently either the class name was invalid...
             // Or the listed name doesn't exist.
             // Doh!
-            MekHQ.logError(ex);
+            MekHQ.getLogger().log(ForceStub.class, METHOD_NAME, ex);
         }
         
         return retVal;

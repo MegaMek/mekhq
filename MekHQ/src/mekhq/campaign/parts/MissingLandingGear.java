@@ -22,8 +22,10 @@
 package mekhq.campaign.parts;
 
 import megamek.common.Aero;
+import megamek.common.CriticalSlot;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
+import megamek.common.LandAirMech;
 import mekhq.campaign.Campaign;
 
 import org.w3c.dom.Node;
@@ -94,7 +96,9 @@ public class MissingLandingGear extends MissingPart {
 	public void updateConditionFromPart() {
 		if(null != unit && unit.getEntity() instanceof Aero) {
 			((Aero)unit.getEntity()).setGearHit(true);
-		}
+        } else if (null != unit && unit.getEntity() instanceof LandAirMech) {
+            unit.damageSystem(CriticalSlot.TYPE_SYSTEM, LandAirMech.LAM_LANDING_GEAR, 3);
+        }
 	}
 	
 	@Override
