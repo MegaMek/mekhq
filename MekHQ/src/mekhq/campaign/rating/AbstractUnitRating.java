@@ -23,7 +23,6 @@ package mekhq.campaign.rating;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,6 +41,8 @@ import megamek.common.LightVehicleBay;
 import megamek.common.MechBay;
 import megamek.common.SmallCraftBay;
 import megamek.common.UnitType;
+import megamek.common.logging.LogLevel;
+import megamek.common.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Mission;
@@ -54,6 +55,7 @@ import mekhq.campaign.unit.Unit;
  * @version %Id%
  * @since 3/15/2012
  */
+@SuppressWarnings("SameParameterValue")
 public abstract class AbstractUnitRating implements IUnitRating {
 
     static final int HEADER_LENGTH = 19;
@@ -68,11 +70,11 @@ public abstract class AbstractUnitRating implements IUnitRating {
     static final BigDecimal greenThreshold = new BigDecimal("5.5");
     static final BigDecimal regularThreshold = new BigDecimal("4.0");
     static final BigDecimal veteranThreshold = new BigDecimal("2.5");
+    private final Map<String, Integer> skillRatingCounts = new HashMap<>();
 
     private List<Person> commanderList = new ArrayList<>();
     private BigDecimal numberUnits = BigDecimal.ZERO;
     private BigDecimal totalSkillLevels = BigDecimal.ZERO;
-    private final Map<String, Integer> skillRatingCounts = new HashMap<>();
     private int mechCount = 0;
     private int protoCount = 0;
     private int fighterCount = 0;
@@ -154,7 +156,8 @@ public abstract class AbstractUnitRating implements IUnitRating {
             }
         }
 
-        return (getSuccessCount() * 5) - (getFailCount() * 10) - (getBreachCount() * 25);
+        return (getSuccessCount() * 5) - (getFailCount() * 10) -
+               (getBreachCount() * 25);
     }
 
     /**
@@ -162,7 +165,8 @@ public abstract class AbstractUnitRating implements IUnitRating {
      */
     protected BigDecimal calcAverageExperience() {
         if (getNumberUnits().compareTo(BigDecimal.ZERO) > 0) {
-            return getTotalSkillLevels().divide(getNumberUnits(), PRECISION, HALF_EVEN);
+            return getTotalSkillLevels().divide(getNumberUnits(), PRECISION,
+                                                HALF_EVEN);
         }
 
         return BigDecimal.ZERO;
@@ -191,15 +195,17 @@ public abstract class AbstractUnitRating implements IUnitRating {
                 return commander;
             }
 
-            // If we don't have a list of potential commanders, we cannot determine a commander.
+            // If we don't have a list of potential commanders, we cannot 
+            // determine a commander.
             List<Person> commanderList = getCommanderList();
             if (commanderList == null || commanderList.isEmpty()) {
                 commander = null;
                 return null;
             }
 
-            //Sort the list of personnel by rank from highest to lowest.  Whoever has the highest rank is the commander.
-            Collections.sort(commanderList, (p1, p2) -> {
+            //Sort the list of personnel by rank from highest to lowest.  
+            // Whoever has the highest rank is the commander.
+            commanderList.sort((p1, p2) -> {
                 // Active personnel outrank inactive personnel.
                 if (p1.isActive() && !p2.isActive()) {
                     return -1;
@@ -276,15 +282,21 @@ public abstract class AbstractUnitRating implements IUnitRating {
         setTransportPercent(getTransportPercent());
 
         //Compute the score.
-        BigDecimal scoredPercent = getTransportPercent().subtract(new BigDecimal(50));
+        BigDecimal scoredPercent = getTransportPercent().subtract(
+                new BigDecimal(50));
         if (scoredPercent.compareTo(BigDecimal.ZERO) < 0) {
             return value;
         }
-        BigDecimal percentageScore = scoredPercent.divide(new BigDecimal(10), 0, RoundingMode.DOWN);
-        value += percentageScore.multiply(new BigDecimal(5)).setScale(0, RoundingMode.DOWN).intValue();
+        BigDecimal percentageScore = scoredPercent.divide(new BigDecimal(10),
+                                                          0,
+                                                          RoundingMode.DOWN);
+        value += percentageScore.multiply(new BigDecimal(5))
+                                .setScale(0, RoundingMode.DOWN)
+                                .intValue();
         value = Math.min(value, 25);
 
-        //Only the highest of these values should be used, regardless of how many are actually owned.
+        //Only the highest of these values should be used, regardless of how 
+        // many are actually owned.
         if (isWarhipWithDocsOwner()) {
             value += 30;
         } else if (isWarshipOwner()) {
@@ -349,20 +361,23 @@ public abstract class AbstractUnitRating implements IUnitRating {
     }
 
     /**
-     * Calculates the weighted value of the unit based on if it is Infantry, Battle Armor or something else.
+     * Calculates the weighted value of the unit based on if it is Infantry, 
+     * Battle Armor or something else.
      *
      * @param u The {@code Unit} to be evaluated.
      */
     BigDecimal getUnitValue(Unit u) {
         BigDecimal value = BigDecimal.ONE;
-        if (isConventionalInfanry(u) && (((Infantry) u.getEntity()).getSquadN() == 1)) {
+        if (isConventionalInfanry(u) &&
+            (((Infantry) u.getEntity()).getSquadN() == 1)) {
             value = new BigDecimal("0.25");
         }
         return value;
     }
 
     boolean isConventionalInfanry(Unit u) {
-        return (u.getEntity() instanceof Infantry) && !(u.getEntity() instanceof BattleArmor);
+        return (u.getEntity() instanceof Infantry) &&
+               !(u.getEntity() instanceof BattleArmor);
     }
 
     /**
@@ -399,11 +414,12 @@ public abstract class AbstractUnitRating implements IUnitRating {
     protected abstract int calculateUnitRatingScore();
 
     /**
-     * Recalculates the dragoons rating.  If this has already been done, the initialized flag should already be set true
+     * Recalculates the dragoons rating.  If this has already been done, the 
+     * initialized flag should already be set true
      * and this method will immediately exit.
      */
     protected void initValues() {
-        logMessage("Initializing unit rating.");
+        getLogger().methodBegin(getClass(), "initValues()");
         setCommanderList(new ArrayList<>());
         setNumberUnits(BigDecimal.ZERO);
         setTotalSkillLevels(BigDecimal.ZERO);
@@ -443,7 +459,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
         setTransportPercent(BigDecimal.ZERO);
         setInitialized(true);
         clearSkillRatingCounts();
-        logMessage("Initialization of unit rating complete.");
+        getLogger().methodEnd(getClass(), "initValues()");
     }
 
     private void updateBayCount(Dropship ds) {
@@ -454,15 +470,20 @@ public abstract class AbstractUnitRating implements IUnitRating {
             } else if (bay instanceof BattleArmorBay) {
                 setBaBayCount(getBaBayCount() + (int)bay.getCapacity());
             } else if (bay instanceof InfantryBay) {
-                setInfantryBayCount(getInfantryBayCount() + (int)bay.getCapacity());
+                setInfantryBayCount(getInfantryBayCount() +
+                                    (int) bay.getCapacity());
             } else if (bay instanceof LightVehicleBay) {
-                setLightVeeBayCount(getLightVeeBayCount() + (int)bay.getCapacity());
+                setLightVeeBayCount(getLightVeeBayCount() +
+                                    (int) bay.getCapacity());
             } else if (bay instanceof HeavyVehicleBay) {
-                setHeavyVeeBayCount(getHeavyVeeBayCount() + (int)bay.getCapacity());
+                setHeavyVeeBayCount(getHeavyVeeBayCount() +
+                                    (int) bay.getCapacity());
             } else if (bay instanceof ASFBay) {
-                setFighterBayCount(getFighterBayCount() + (int)bay.getCapacity());
+                setFighterBayCount(getFighterBayCount() +
+                                   (int) bay.getCapacity());
             } else if (bay instanceof SmallCraftBay) {
-                setSmallCraftBayCount(getSmallCraftBayCount() + (int)bay.getCapacity());
+                setSmallCraftBayCount(getSmallCraftBayCount() +
+                                      (int) bay.getCapacity());
             }
         }
     }
@@ -478,15 +499,18 @@ public abstract class AbstractUnitRating implements IUnitRating {
     private void updateBayCount(Jumpship jumpship) {
         for (Bay bay : jumpship.getTransportBays()) {
             if (bay instanceof ASFBay) {
-                setFighterBayCount(getFighterBayCount() + (int)bay.getCapacity());
+                setFighterBayCount(getFighterBayCount() +
+                                   (int) bay.getCapacity());
             } else if (bay instanceof SmallCraftBay) {
-                setSmallCraftBayCount(getSmallCraftBayCount() + (int)bay.getCapacity());
+                setSmallCraftBayCount(getSmallCraftBayCount() +
+                                      (int) bay.getCapacity());
             }
         }
     }
 
     void updateDockingCollarCount(Jumpship jumpship) {
-        setDockingCollarCount(getDockingCollarCount() + jumpship.getDockingCollars().size());
+        setDockingCollarCount(getDockingCollarCount() +
+                              jumpship.getDockingCollars().size());
     }
 
     protected Campaign getCampaign() {
@@ -820,19 +844,26 @@ public abstract class AbstractUnitRating implements IUnitRating {
     }
 
     void updateUnitCounts(Unit u) {
+        final String METHOD_NAME = "updateUnitCounts(Unit)";
+        
         if (u.isMothballed()) {
             return;
         }
-        logMessage("Adding " + u.getName() + " to unit counts.");
+        getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
+                        "Adding " + u.getName() + " to unit counts.");
 
         Entity e = u.getEntity();
         if (null == e) {
-            logMessage("Unit " + u.getName() + " is not an Entity.  Skipping.");
+            getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
+                            "Unit " + u.getName() +
+                            " is not an Entity.  Skipping.");
             return;
         }
 
         int unitType = UnitType.determineUnitTypeCode(e);
-        logMessage("Unit " + u.getName() + " is a " + UnitType.getTypeDisplayableName(unitType));
+        getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
+                        "Unit " + u.getName() + " is a " +
+                        UnitType.getTypeDisplayableName(unitType));
         //todo: Add Airship when Megamek supports it.
         switch (unitType) {
             case UnitType.MEK:
@@ -844,7 +875,9 @@ public abstract class AbstractUnitRating implements IUnitRating {
             case UnitType.GUN_EMPLACEMENT:
             case UnitType.VTOL:
             case UnitType.TANK:
-                logMessage("Unit " + u.getName() + " weight is " + e.getWeight());
+                getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
+                                "Unit " + u.getName() + " weight is " +
+                                e.getWeight());
                 if (e.getWeight() <= 50f) {
                     incrementLightVeeCount();
                 } else if (e.getWeight() <= 100f) {
@@ -880,7 +913,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
         }
     }
 
-    void logMessage(final String msg) {
-        MekHQ.logMessage(msg, 5); //verbosity level debug/informational
+    MMLogger getLogger() {
+        return MekHQ.getLogger();
     }
 }

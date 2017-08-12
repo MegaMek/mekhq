@@ -122,27 +122,17 @@ public class SpecialAbility implements MekHqXmlSerializable {
     }
 
     public boolean isEligible(Person p) {
-        // Already has this SPA
-        if (p.getSpas() != null && p.getSpas().containsKey(this.getName())) {
-            return false;
-        }
-        
-        // Do we have prerequisite skills?
         for(SkillPrereq sp : prereqSkills) {
             if(!sp.qualifies(p)) {
                 return false;
             }
         }
-        
-        // Do we have prerequisite abilities?
         for(String ability : prereqAbilities) {
             //TODO: will this work for choice options like weapon specialist?
             if(!p.getOptions().booleanOption(ability)) {
                 return false;
             }
         }
-        
-        // Do we have any incompatible abilities?
         for(String ability : invalidAbilities) {
             //TODO: will this work for choice options like weapon specialist?
             if(p.getOptions().booleanOption(ability)) {
@@ -261,6 +251,8 @@ public class SpecialAbility implements MekHqXmlSerializable {
 
     @SuppressWarnings("unchecked")
     public static void generateInstanceFromXML(Node wn, PilotOptions options, Version v) {
+        final String METHOD_NAME = "generateInstanceFromXML(Node,PilotOptions,Version)"; //$NON-NLS-1$
+
         SpecialAbility retVal = null;
 
         try {
@@ -298,7 +290,7 @@ public class SpecialAbility implements MekHqXmlSerializable {
             // Errrr, apparently either the class name was invalid...
             // Or the listed name doesn't exist.
             // Doh!
-            MekHQ.logError(ex);
+            MekHQ.getLogger().log(SpecialAbility.class, METHOD_NAME, ex);
         }
 
         if(retVal.displayName.isEmpty()) {
@@ -327,6 +319,8 @@ public class SpecialAbility implements MekHqXmlSerializable {
     }
 
     public static void generateSeparateInstanceFromXML(Node wn, Hashtable<String, SpecialAbility> spHash, PilotOptions options) {
+        final String METHOD_NAME = "generateSeparateInstanceFromXML(Node,Hashtable<String, SpecialAbility>,PilotOptions)"; //$NON-NLS-1$
+
         SpecialAbility retVal = null;
 
         try {
@@ -364,7 +358,7 @@ public class SpecialAbility implements MekHqXmlSerializable {
             // Errrr, apparently either the class name was invalid...
             // Or the listed name doesn't exist.
             // Doh!
-            MekHQ.logError(ex);
+            MekHQ.getLogger().log(SpecialAbility.class, METHOD_NAME, ex);
         }
 
         if(retVal.displayName.isEmpty()) {
@@ -384,6 +378,7 @@ public class SpecialAbility implements MekHqXmlSerializable {
     }
 
     public static void initializeSPA() {
+        final String METHOD_NAME = "initializeSPA()"; //$NON-NLS-1$
         specialAbilities = new Hashtable<String, SpecialAbility>();
 
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -398,7 +393,7 @@ public class SpecialAbility implements MekHqXmlSerializable {
             // Parse using builder to get DOM representation of the XML file
             xmlDoc = db.parse(fis);
         } catch (Exception ex) {
-            MekHQ.logError(ex);
+            MekHQ.getLogger().log(SpecialAbility.class, METHOD_NAME, ex);
         }
 
         Element spaEle = xmlDoc.getDocumentElement();

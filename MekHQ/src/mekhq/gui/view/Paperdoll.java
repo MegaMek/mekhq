@@ -97,7 +97,7 @@ public class Paperdoll extends Component {
         try {
             loadShapeData(is);
         } catch(Exception ex) {
-            MekHQ.logError(ex);
+            MekHQ.getLogger().log(getClass(), "<init>(InputStream)", ex);
         }
         
         highlightColor = null;
@@ -106,6 +106,8 @@ public class Paperdoll extends Component {
     }
     
     public void loadShapeData(InputStream is) throws JAXBException {
+        final String METHOD_NAME = "loadShapeData(InputStream)"; //$NON-NLS-1$
+        
         JAXBContext context = JAXBContext.newInstance(OverlayLocDataList.class, OverlayLocData.class);
         Unmarshaller unmarshaller = context.createUnmarshaller();
         OverlayLocDataList dataList = (OverlayLocDataList) unmarshaller.unmarshal(is);
@@ -132,7 +134,7 @@ public class Paperdoll extends Component {
             try {
                 mt.waitForAll();
             } catch(InterruptedException iex) {
-                MekHQ.logError(iex);
+                MekHQ.getLogger().log(getClass(), METHOD_NAME, iex);
             }
         } else {
             base = new BufferedImage(DEFAULT_WIDTH, DEFAULT_HEIGHT, BufferedImage.TYPE_INT_ARGB);

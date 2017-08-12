@@ -127,12 +127,12 @@ public class MedicalViewDialog extends JDialog {
         try(InputStream fis = new FileInputStream(ip.getGuiElement("default_male_paperdoll"))) { //$NON-NLS-1$
             defaultMaleDoll = new Paperdoll(fis);
         } catch(IOException e) {
-            MekHQ.logError(e);
+            MekHQ.getLogger().log(getClass(), "<init>(Window,Campaign,Person,IconPackage)", e); //$NON-NLS-1$
         }
         try(InputStream fis = new FileInputStream(ip.getGuiElement("default_female_paperdoll"))) { //$NON-NLS-1$
             defaultFemaleDoll = new Paperdoll(fis);
         } catch(IOException e) {
-            MekHQ.logError(e);
+            MekHQ.getLogger().log(getClass(), "<init>(Window,Campaign,Person,IconPackage)", e); //$NON-NLS-1$
         }
         
         setPreferredSize(new Dimension(1024, 840));

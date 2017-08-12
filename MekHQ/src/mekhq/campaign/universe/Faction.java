@@ -48,6 +48,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import megamek.common.EquipmentType;
+import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
@@ -225,6 +226,8 @@ public class Faction {
     }
 
     public static Faction getFactionFromXML(Node wn) throws DOMException, ParseException {
+        final String METHOD_NAME = "getFactionFromXML(Node)"; //$NON-NLS-1$
+        
         Faction retVal = new Faction();
         NodeList nl = wn.getChildNodes();
 
@@ -278,15 +281,18 @@ public class Faction {
         }
 
         if(retVal.altNames.length < Era.E_NUM) {
-            MekHQ.logMessage(retVal.fullname + " faction did not have a long enough altNames vector");
+            MekHQ.getLogger().log(Faction.class, METHOD_NAME, LogLevel.WARNING,
+                    retVal.fullname + " faction did not have a long enough altNames vector"); //$NON-NLS-1$
         }
         if(retVal.eraMods.length < Era.E_NUM) {
-            MekHQ.logMessage(retVal.fullname + " faction did not have a long enough eraMods vector");
+            MekHQ.getLogger().log(Faction.class, METHOD_NAME, LogLevel.WARNING,
+                    retVal.fullname + " faction did not have a long enough eraMods vector"); //$NON-NLS-1$
         }
         if(!retVal.is(Tag.PIRATE) && !retVal.is(Tag.MERC) && !retVal.is(Tag.TRADER)) {
             // Planet checks
             if(retVal.startingPlanet.length < Era.E_NUM) {
-                MekHQ.logMessage(retVal.fullname + " faction did not have a long enough startingPlanet vector");
+                MekHQ.getLogger().log(Faction.class, METHOD_NAME, LogLevel.WARNING,
+                        retVal.fullname + " faction did not have a long enough startingPlanet vector"); //$NON-NLS-1$
             }
         }
 
@@ -294,7 +300,10 @@ public class Faction {
     }
 
     public static void generateFactions() throws DOMException, ParseException {
-        MekHQ.logMessage("Starting load of faction data from XML...");
+        final String METHOD_NAME = "generateFactions()";
+        
+        MekHQ.getLogger().log(Faction.class, METHOD_NAME, LogLevel.INFO,
+                "Starting load of faction data from XML..."); //$NON-NLS-1$
         // Initialize variables.
         factions = new HashMap<>();
         factionIdMap = new HashMap<>();
@@ -309,7 +318,7 @@ public class Faction {
             // Parse using builder to get DOM representation of the XML file
             xmlDoc = db.parse(fis);
         } catch (Exception ex) {
-            MekHQ.logError(ex);
+            MekHQ.getLogger().log(Faction.class, METHOD_NAME, ex);
         }
 
         Element factionEle = xmlDoc.getDocumentElement();
@@ -343,20 +352,24 @@ public class Faction {
                             if(!factionIdMap.containsKey(f.getId())) {
                                 factionIdMap.put(f.getId(), f);
                             } else {
-                                MekHQ.logError(String.format("Faction id \"%d\" already used for faction %s, can't re-use it for %s",
-                                        f.getId().intValue(), factionIdMap.get(f.getId()).getFullName(0), f.getFullName(0)));
+                                MekHQ.getLogger().log(Faction.class, METHOD_NAME, LogLevel.ERROR,
+                                        String.format("Faction id \"%d\" already used for faction %s, can't re-use it for %s", //$NON-NLS-1$
+                                                f.getId().intValue(), factionIdMap.get(f.getId()).getFullName(0),
+                                                f.getFullName(0)));
                             }
                         }
                     } else {
-                        MekHQ.logError(String.format("Faction code \"%s\" already used for faction %s, can't re-use it for %s",
-                            f.getShortName(), factions.get(f.getShortName()).getFullName(0), f.getFullName(0)));
+                        MekHQ.getLogger().log(Faction.class, METHOD_NAME, LogLevel.ERROR,
+                                String.format("Faction code \"%s\" already used for faction %s, can't re-use it for %s", //$NON-NLS-1$
+                                        f.getShortName(), factions.get(f.getShortName()).getFullName(0), f.getFullName(0)));
                     }
                 } else if (xn.equalsIgnoreCase("choosableFactionCodes")) {
                     choosableFactionCodes = wn.getTextContent().split(",");
                 }
             }
         }
-        MekHQ.logMessage("Loaded a total of " + factions.size() + " factions");
+        MekHQ.getLogger().log(Faction.class, METHOD_NAME, LogLevel.INFO,
+                "Loaded a total of " + factions.size() + " factions"); //$NON-NLS-1$
     }
 
     /** @return Sorted list of faction names as one string */

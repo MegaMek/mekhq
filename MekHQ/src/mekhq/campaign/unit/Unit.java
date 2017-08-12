@@ -88,6 +88,7 @@ import megamek.common.TechConstants;
 import megamek.common.VTOL;
 import megamek.common.Warship;
 import megamek.common.WeaponType;
+import megamek.common.logging.LogLevel;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.PilotOptions;
@@ -1442,6 +1443,8 @@ public class Unit implements MekHqXmlSerializable {
     }
 
     public static Unit generateInstanceFromXML(Node wn, Version version) {
+        final String METHOD_NAME = "generateInstanceFromXML(Node,Version)"; //$NON-NLS-1$
+
         Unit retVal = new Unit();
         NamedNodeMap attrs = wn.getAttributes();
         Node idNode = attrs.getNamedItem("id");
@@ -1536,11 +1539,12 @@ public class Unit implements MekHqXmlSerializable {
             }
         } catch (Exception ex) {
             // Doh!
-            MekHQ.logError(ex);
+            MekHQ.getLogger().log(Unit.class, METHOD_NAME, ex);
         }
 
         if (retVal.id == null) {
-            MekHQ.logMessage("ID not pre-defined; generating unit's ID.", 5);
+            MekHQ.getLogger().log(Unit.class, METHOD_NAME, LogLevel.WARNING,
+                    "ID not pre-defined; generating unit's ID."); //$NON-NLS-1$
             retVal.id = UUID.randomUUID();
         }
 

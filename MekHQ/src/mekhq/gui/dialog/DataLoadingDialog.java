@@ -42,6 +42,7 @@ import javax.swing.SwingWorker;
 import megamek.client.RandomNameGenerator;
 import megamek.common.MechSummaryCache;
 import megamek.common.QuirksHandler;
+import megamek.common.logging.LogLevel;
 import megamek.common.options.GameOptions;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
@@ -120,6 +121,8 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
 
         @Override
         public Void doInBackground() {
+            final String METHOD_NAME = "doInBackground()"; //$NON-NLS-1$
+            
             //Initialize progress property.
             setProgress(0);
             try {
@@ -178,7 +181,8 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
 					e.printStackTrace();
 				}
             } else {
-            	MekHQ.logMessage("Loading campaign file from XML...");
+                MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO,
+                        "Loading campaign file from XML..."); //$NON-NLS-1$
 
         		// And then load the campaign object from it.
         		FileInputStream fis = null;
