@@ -27,12 +27,12 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Objects;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  *
@@ -102,6 +102,8 @@ public class LogEntry implements MekHqXmlSerializable {
     }
     
     public static LogEntry generateInstanceFromXML(Node wn) {
+        final String METHOD_NAME = "generateInstanceFromXML(Node)"; //$NON-NLS-1$
+
         LogEntry retVal = new LogEntry();
         
         try {    
@@ -121,7 +123,7 @@ public class LogEntry implements MekHqXmlSerializable {
             }
         } catch (Exception ex) {
             // Doh!
-            MekHQ.logError(ex);
+            MekHQ.getLogger().log(LogEntry.class, METHOD_NAME, ex);
         }
         
         return retVal;

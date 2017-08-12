@@ -47,8 +47,6 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.UUID;
 import java.util.Vector;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
@@ -89,6 +87,7 @@ import megamek.common.MULParser;
 import megamek.common.TechConstants;
 import megamek.common.event.Subscribe;
 import megamek.common.loaders.EntityLoadingException;
+import megamek.common.logging.LogLevel;
 import megamek.common.options.PilotOptions;
 import megamek.common.util.EncodeControl;
 import mekhq.IconPackage;
@@ -1515,7 +1514,10 @@ public class CampaignGUI extends JPanel {
     }
 
     private void menuSaveXmlActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_menuSaveActionPerformed
-        MekHQ.logMessage("Saving campaign...");
+        final String METHOD_NAME = "menuSaveXmlActionPerformed(ActionEvent)";
+        
+        MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, //$NON-NLS-1$
+                "Saving campaign..."); //$NON-NLS-1$
         // Choose a file...
         File file = selectSaveCampaignFile();
         if (file == null) {
@@ -1550,9 +1552,10 @@ public class CampaignGUI extends JPanel {
             if (backupFile.exists()) {
                 backupFile.delete();
             }
-            MekHQ.logMessage("Campaign saved to " + file);
+            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, //$NON-NLS-1$
+                    "Campaign saved to " + file); //$NON-NLS-1$
         } catch (Exception ex) {
-            MekHQ.logError(ex);
+            MekHQ.getLogger().log(getClass(), METHOD_NAME, ex); //$NON-NLS-1$
             JOptionPane
                     .showMessageDialog(
                             getFrame(),
@@ -1707,8 +1710,7 @@ public class CampaignGUI extends JPanel {
         try {
             loadListFile(true);
         } catch (IOException ex) {
-            Logger.getLogger(CampaignGUI.class.getName()).log(Level.SEVERE,
-                    null, ex);
+            MekHQ.getLogger().log(getClass(), "miLoadForcesActionPerformed(ActionEvent)", ex);
         }
     }// GEN-LAST:event_miLoadForcesActionPerformed
 
@@ -1716,8 +1718,7 @@ public class CampaignGUI extends JPanel {
         try {
             loadPersonFile();
         } catch (IOException ex) {
-            Logger.getLogger(CampaignGUI.class.getName()).log(Level.SEVERE,
-                    null, ex);
+            MekHQ.getLogger().log(getClass(), "miImportPersonActionPerformed(ActionEvent)", ex);
         }
     }// GEN-LAST:event_miImportPersonActionPerformed
 
@@ -1725,8 +1726,7 @@ public class CampaignGUI extends JPanel {
         try {
             savePersonFile();
         } catch (IOException ex) {
-            Logger.getLogger(CampaignGUI.class.getName()).log(Level.SEVERE,
-                    null, ex);
+            MekHQ.getLogger().log(getClass(), "miExportPersonActionPerformed(ActionEvent)", ex);
         }
     }// GEN-LAST:event_miExportPersonActionPerformed
 
@@ -1734,8 +1734,7 @@ public class CampaignGUI extends JPanel {
         try {
             saveOptionsFile();
         } catch (IOException ex) {
-            Logger.getLogger(CampaignGUI.class.getName()).log(Level.SEVERE,
-                    null, ex);
+            MekHQ.getLogger().log(getClass(), "miExportOptionsActionPerformed(ActionEvent)", ex);
         }
     }// GEN-LAST:event_miExportPersonActionPerformed
 
@@ -1743,8 +1742,7 @@ public class CampaignGUI extends JPanel {
         try {
             loadOptionsFile();
         } catch (IOException ex) {
-            Logger.getLogger(CampaignGUI.class.getName()).log(Level.SEVERE,
-                    null, ex);
+            MekHQ.getLogger().log(getClass(), "miImportOptionsActionPerformed(ActionEvent)", ex);
         }
     }// GEN-LAST:event_miExportPersonActionPerformed
 
@@ -1752,8 +1750,7 @@ public class CampaignGUI extends JPanel {
         try {
             loadPartsFile();
         } catch (IOException ex) {
-            Logger.getLogger(CampaignGUI.class.getName()).log(Level.SEVERE,
-                    null, ex);
+            MekHQ.getLogger().log(getClass(), "miImportPartsActionPerformed(ActionEvent)", ex);
         }
     }// GEN-LAST:event_miImportPersonActionPerformed
 
@@ -1761,8 +1758,7 @@ public class CampaignGUI extends JPanel {
         try {
             savePartsFile();
         } catch (IOException ex) {
-            Logger.getLogger(CampaignGUI.class.getName()).log(Level.SEVERE,
-                    null, ex);
+            MekHQ.getLogger().log(getClass(), "miExportPartsActionPerformed(ActionEvent)", ex);
         }
     }// GEN-LAST:event_miExportPersonActionPerformed
 
@@ -1949,6 +1945,8 @@ public class CampaignGUI extends JPanel {
     }
 
     protected void loadListFile(boolean allowNewPilots) throws IOException {
+        final String METHOD_NAME = "loadListFile(boolean)";
+        
         JFileChooser loadList = new JFileChooser(".");
         loadList.setDialogTitle("Load Units");
 
@@ -1998,7 +1996,8 @@ public class CampaignGUI extends JPanel {
 
             // Was there any error in parsing?
             if (parser.hasWarningMessage()) {
-                MekHQ.logMessage(parser.getWarningMessage());
+                MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.WARNING, //$NON-NLS-1$
+                        parser.getWarningMessage());
             }
 
             // Add the units from the file.
@@ -2017,6 +2016,8 @@ public class CampaignGUI extends JPanel {
     }
 
     protected void loadPersonFile() throws IOException {
+        final String METHOD_NAME = "loadPersonFile()";
+        
         JFileChooser loadList = new JFileChooser(".");
         loadList.setDialogTitle("Load Personnel");
 
@@ -2049,7 +2050,8 @@ public class CampaignGUI extends JPanel {
             // Open up the file.
             InputStream fis = new FileInputStream(personnelFile);
 
-            MekHQ.logMessage("Starting load of personnel file from XML...");
+            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, //$NON-NLS-1$
+                    "Starting load of personnel file from XML..."); //$NON-NLS-1$
             // Initialize variables.
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             Document xmlDoc = null;
@@ -2061,7 +2063,7 @@ public class CampaignGUI extends JPanel {
                 // Parse using builder to get DOM representation of the XML file
                 xmlDoc = db.parse(fis);
             } catch (Exception ex) {
-                MekHQ.logError(ex);
+                MekHQ.getLogger().log(getClass(), METHOD_NAME, ex); //$NON-NLS-1$
             }
 
             Element personnelEle = xmlDoc.getDocumentElement();
@@ -2086,7 +2088,8 @@ public class CampaignGUI extends JPanel {
                 if (!wn2.getNodeName().equalsIgnoreCase("person")) {
                     // Error condition of sorts!
                     // Errr, what should we do here?
-                    MekHQ.logMessage("Unknown node type not loaded in Personnel nodes: "
+                    MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR, //$NON-NLS-1$
+                            "Unknown node type not loaded in Personnel nodes: " //$NON-NLS-1$
                             + wn2.getNodeName());
 
                     continue;
@@ -2097,8 +2100,9 @@ public class CampaignGUI extends JPanel {
                 if (getCampaign().getPerson(p.getId()) != null
                         && getCampaign().getPerson(p.getId()).getFullName()
                                 .equals(p.getFullName())) {
-                    MekHQ.logMessage("ERROR: Cannot load person who exists, ignoring. (Name: "
-                            + p.getFullName() + ")");
+                    MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR, //$NON-NLS-1$
+                            "ERROR: Cannot load person who exists, ignoring. (Name: " //$NON-NLS-1$
+                            + p.getFullName() + ")"); //$NON-NLS-1$
                     p = null;
                 }
                 if (p != null) {
@@ -2111,12 +2115,15 @@ public class CampaignGUI extends JPanel {
                 p.setUnitId(null);
                 p.clearTechUnitIDs();
             }
-            MekHQ.logMessage("Finished load of personnel file");
+            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, //$NON-NLS-1$
+                    "Finished load of personnel file"); //$NON-NLS-1$
         }
     }
 
     //TODO: disable if not using personnel tab
     private void savePersonFile() throws IOException {
+        final String METHOD_NAME = "savePersonFile()";
+        
         JFileChooser savePersonnel = new JFileChooser(".");
         savePersonnel.setDialogTitle("Save Personnel");
         savePersonnel.setFileFilter(new FileFilter() {
@@ -2170,7 +2177,8 @@ public class CampaignGUI extends JPanel {
         	PersonnelTab pt = (PersonnelTab)getTab(GuiTabType.PERSONNEL);
             int row = pt.getPersonnelTable().getSelectedRow();
             if (row < 0) {
-                MekHQ.logMessage("ERROR: Cannot export person if no one is selected! Ignoring.");
+                MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.WARNING, //$NON-NLS-1$
+                        "ERROR: Cannot export person if no one is selected! Ignoring."); //$NON-NLS-1$
                 return;
             }
             Person selectedPerson = pt.getPersonModel().getPerson(pt.getPersonnelTable()
@@ -2210,9 +2218,10 @@ public class CampaignGUI extends JPanel {
             if (backupFile.exists()) {
                 backupFile.delete();
             }
-            MekHQ.logMessage("Personnel saved to " + file);
+            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, //$NON-NLS-1$
+                    "Personnel saved to " + file); //$NON-NLS-1$
         } catch (Exception ex) {
-            MekHQ.logError(ex);
+            MekHQ.getLogger().log(getClass(), METHOD_NAME, ex); //$NON-NLS-1$
             JOptionPane
                     .showMessageDialog(
                             getFrame(),
@@ -2232,6 +2241,8 @@ public class CampaignGUI extends JPanel {
     }
 
     private void saveOptionsFile() throws IOException {
+        final String METHOD_NAME = "saveOptionsFile()";
+        
         JFileChooser saveOptions = new JFileChooser(".");
         saveOptions.setDialogTitle("Save Campaign Options");
         saveOptions.setFileFilter(new FileFilter() {
@@ -2315,9 +2326,10 @@ public class CampaignGUI extends JPanel {
             if (backupFile.exists()) {
                 backupFile.delete();
             }
-            MekHQ.logMessage("Campaign Options saved saved to " + file);
+            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, //$NON-NLS-1$
+                    "Campaign Options saved saved to " + file); //$NON-NLS-1$
         } catch (Exception ex) {
-            MekHQ.logError(ex);
+            MekHQ.getLogger().log(getClass(), METHOD_NAME, ex); //$NON-NLS-1$
             JOptionPane
                     .showMessageDialog(
                             getFrame(),
@@ -2337,6 +2349,7 @@ public class CampaignGUI extends JPanel {
     }
 
     protected void loadPartsFile() throws IOException {
+        final String METHOD_NAME = "loadPartsFile()";
         JFileChooser loadList = new JFileChooser(".");
         loadList.setDialogTitle("Load Parts");
 
@@ -2369,7 +2382,8 @@ public class CampaignGUI extends JPanel {
             // Open up the file.
             InputStream fis = new FileInputStream(partsFile);
 
-            MekHQ.logMessage("Starting load of parts file from XML...");
+            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, //$NON-NLS-1$
+                    "Starting load of parts file from XML..."); //$NON-NLS-1$
             // Initialize variables.
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             Document xmlDoc = null;
@@ -2381,7 +2395,7 @@ public class CampaignGUI extends JPanel {
                 // Parse using builder to get DOM representation of the XML file
                 xmlDoc = db.parse(fis);
             } catch (Exception ex) {
-                MekHQ.logError(ex);
+                MekHQ.getLogger().log(getClass(), METHOD_NAME, ex); //$NON-NLS-1$
             }
 
             Element partsEle = xmlDoc.getDocumentElement();
@@ -2406,7 +2420,8 @@ public class CampaignGUI extends JPanel {
                 if (!wn2.getNodeName().equalsIgnoreCase("part")) {
                     // Error condition of sorts!
                     // Errr, what should we do here?
-                    MekHQ.logMessage("Unknown node type not loaded in Parts nodes: "
+                    MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR, //$NON-NLS-1$
+                            "Unknown node type not loaded in Parts nodes: " //$NON-NLS-1$
                             + wn2.getNodeName());
 
                     continue;
@@ -2418,11 +2433,14 @@ public class CampaignGUI extends JPanel {
                     getCampaign().addPartWithoutId(p);
                 }
             }
-            MekHQ.logMessage("Finished load of parts file");
+            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, //$NON-NLS-1$
+                    "Finished load of parts file"); //$NON-NLS-1$
         }
     }
 
     protected void loadOptionsFile() throws IOException {
+        final String METHOD_NAME = "loadOptionsFile()";
+        
         JFileChooser loadList = new JFileChooser(".");
         loadList.setDialogTitle("Load Campaign Options");
 
@@ -2455,7 +2473,8 @@ public class CampaignGUI extends JPanel {
             // Open up the file.
             InputStream fis = new FileInputStream(optionsFile);
 
-            MekHQ.logMessage("Starting load of options file from XML...");
+            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, //$NON-NLS-1$
+                    "Starting load of options file from XML..."); //$NON-NLS-1$
             // Initialize variables.
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             Document xmlDoc = null;
@@ -2467,7 +2486,7 @@ public class CampaignGUI extends JPanel {
                 // Parse using builder to get DOM representation of the XML file
                 xmlDoc = db.parse(fis);
             } catch (Exception ex) {
-                MekHQ.logError(ex);
+                MekHQ.getLogger().log(getClass(), METHOD_NAME, ex); //$NON-NLS-1$
             }
 
             Element partsEle = xmlDoc.getDocumentElement();
@@ -2518,7 +2537,8 @@ public class CampaignGUI extends JPanel {
                                 "skillType")) {
                             // Error condition of sorts!
                             // Errr, what should we do here?
-                            MekHQ.logMessage("Unknown node type not loaded in Skill Type nodes: "
+                            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR, //$NON-NLS-1$
+                                    "Unknown node type not loaded in Skill Type nodes: " //$NON-NLS-1$
                                     + wn2.getNodeName());
 
                             continue;
@@ -2543,7 +2563,8 @@ public class CampaignGUI extends JPanel {
                         if (!wn2.getNodeName().equalsIgnoreCase("ability")) {
                             // Error condition of sorts!
                             // Errr, what should we do here?
-                            MekHQ.logMessage("Unknown node type not loaded in Special Ability nodes: "
+                            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR, //$NON-NLS-1$
+                                    "Unknown node type not loaded in Special Ability nodes: " //$NON-NLS-1$
                                     + wn2.getNodeName());
 
                             continue;
@@ -2563,7 +2584,8 @@ public class CampaignGUI extends JPanel {
                 this.getCampaign().setRandomSkillPreferences(rsp);
             }
 
-            MekHQ.logMessage("Finished load of campaign options file");
+            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, //$NON-NLS-1$
+                    "Finished load of campaign options file"); //$NON-NLS-1$
             MekHQ.triggerEvent(new OptionsChangedEvent(getCampaign(), options));
         }
 
@@ -2572,6 +2594,8 @@ public class CampaignGUI extends JPanel {
     }
 
     private void savePartsFile() throws IOException {
+        String METHOD_NAME = "savePartsFile()";
+        
         JFileChooser saveParts = new JFileChooser(".");
         saveParts.setDialogTitle("Save Parts");
         saveParts.setFileFilter(new FileFilter() {
@@ -2627,7 +2651,8 @@ public class CampaignGUI extends JPanel {
 	        	PartsTableModel partsModel = ((WarehouseTab)getTab(GuiTabType.WAREHOUSE)).getPartsModel();
 	            int row = partsTable.getSelectedRow();
 	            if (row < 0) {
-	                MekHQ.logMessage("ERROR: Cannot export parts if none are selected! Ignoring.");
+	                MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.WARNING, //$NON-NLS-1$
+	                        "ERROR: Cannot export parts if none are selected! Ignoring."); //$NON-NLS-1$
 	                return;
 	            }
 	            Part selectedPart = partsModel.getPartAt(partsTable
@@ -2667,9 +2692,10 @@ public class CampaignGUI extends JPanel {
 	            if (backupFile.exists()) {
 	                backupFile.delete();
 	            }
-	            MekHQ.logMessage("Parts saved to " + file);
+                MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, //$NON-NLS-1$
+                        "Parts saved to " + file); //$NON-NLS-1$
 	        } catch (Exception ex) {
-	            MekHQ.logError(ex);
+                MekHQ.getLogger().log(getClass(), METHOD_NAME, ex); //$NON-NLS-1$
 	            JOptionPane
 	                    .showMessageDialog(
 	                            getFrame(),

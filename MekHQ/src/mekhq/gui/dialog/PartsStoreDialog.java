@@ -55,6 +55,7 @@ import megamek.common.EquipmentType;
 import megamek.common.MiscType;
 import megamek.common.TargetRoll;
 import megamek.common.WeaponType;
+import megamek.common.logging.LogLevel;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.Utilities;
@@ -406,6 +407,8 @@ public class PartsStoreDialog extends javax.swing.JDialog {
     }
 
     private void addPart(boolean purchase, boolean bulk, boolean bonus) {
+        final String METHOD_NAME = "addPart(boolean,boolean,boolean)"; //$NON-NLS-1$
+        
     	int row = partsTable.getSelectedRow();
 		if(row < 0) {
 			return;
@@ -430,7 +433,8 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 					}
 				}
 				if (null == contract) {
-					MekHQ.logError("AtB: used bonus part but no contract has bonus parts available.");
+			        MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
+			                "AtB: used bonus part but no contract has bonus parts available."); //$NON-NLS-1$
 				} else {
 					contract.useBonusPart();
 				}

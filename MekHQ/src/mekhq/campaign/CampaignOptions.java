@@ -28,7 +28,11 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.common.TechConstants;
+import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
@@ -37,9 +41,6 @@ import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.rating.UnitRatingMethod;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  * @author natit
@@ -2093,7 +2094,10 @@ public class CampaignOptions implements Serializable {
     }
 
     public static CampaignOptions generateCampaignOptionsFromXml(Node wn) {
-        MekHQ.logMessage("Loading Campaign Options from XML...", 4);
+        final String METHOD_NAME = "generateCampaignOptionsFromXml(Node)"; //$NON-NLS-1$
+
+        MekHQ.getLogger().log(CampaignOptions.class, METHOD_NAME, LogLevel.INFO,
+                "Loading Campaign Options from XML..."); //$NON-NLS-1$
 
         wn.normalize();
         CampaignOptions retVal = new CampaignOptions();
@@ -2108,9 +2112,9 @@ public class CampaignOptions implements Serializable {
                 continue;
             }
 
-            MekHQ.logMessage("---", 5);
-            MekHQ.logMessage(wn2.getNodeName(), 5);
-            MekHQ.logMessage("\t" + wn2.getTextContent(), 5);
+            MekHQ.getLogger().log(CampaignOptions.class, METHOD_NAME, LogLevel.INFO,
+                    String.format("%s\n\t%s", //$NON-NLS-1$
+                            wn2.getNodeName(), wn2.getTextContent()));
 
             if (wn2.getNodeName().equalsIgnoreCase("clanPriceModifier")) {
                 retVal.clanPriceModifier = Double.parseDouble(wn2.getTextContent());
@@ -2529,10 +2533,9 @@ public class CampaignOptions implements Serializable {
                                     continue;
                                 }
                      
-                                MekHQ.logMessage("---", 5);
-                                MekHQ.logMessage("massRepairOption" + mroTypeIdx + "." + mroItemNode.getNodeName(), 5);
-                                MekHQ.logMessage("\t" + mroItemNode.getTextContent(), 5);
-                                
+                                MekHQ.getLogger().log(CampaignOptions.class, METHOD_NAME, LogLevel.INFO,
+                                        String.format("massRepairOption %d.%s\n\t%s", //$NON-NLS-1$
+                                                mroTypeIdx, mroItemNode.getNodeName(), mroItemNode.getTextContent()));
                                 
                                 if (mroItemNode.getNodeName().equalsIgnoreCase("type")) {
                                 	mro.setType(Integer.parseInt(mroItemNode.getTextContent().trim()));
@@ -2558,7 +2561,8 @@ public class CampaignOptions implements Serializable {
             }
         }
 
-        MekHQ.logMessage("Load Campaign Options Complete!", 4);
+        MekHQ.getLogger().log(CampaignOptions.class, METHOD_NAME, LogLevel.INFO,
+                "Load Campaign Options Complete!"); //$NON-NLS-1$
 
         return retVal;
     }

@@ -106,6 +106,8 @@ public class UnitStub implements Serializable {
     }
     
     public static UnitStub generateInstanceFromXML(Node wn) {
+        final String METHOD_NAME = "generateInstanceFromXML(Node)"; //$NON-NLS-1$
+
         UnitStub retVal = null;
         
         try {        
@@ -126,7 +128,7 @@ public class UnitStub implements Serializable {
             // Errrr, apparently either the class name was invalid...
             // Or the listed name doesn't exist.
             // Doh!
-            MekHQ.logError(ex);
+            MekHQ.getLogger().log(UnitStub.class, METHOD_NAME, ex);
         }
         return retVal;
     }

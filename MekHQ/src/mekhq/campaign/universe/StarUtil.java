@@ -613,6 +613,8 @@ public final class StarUtil {
     }
     
     public static String getIconImage(Planet planet) {
+        final String METHOD_NAME = "getIconImage(Planet)"; //$NON-NLS-1$
+
         if(!iconDataLoaded) {
             try(BufferedReader reader = new BufferedReader(new FileReader(new File("data", ICON_DATA_FILE)))) {
                 String line;
@@ -628,9 +630,9 @@ public final class StarUtil {
                 }
                 iconDataLoaded = true;
             } catch (FileNotFoundException e) {
-                MekHQ.logError(e);
+                MekHQ.getLogger().log(StarUtil.class, METHOD_NAME, e);
             } catch (IOException e) {
-                MekHQ.logError(e);
+                MekHQ.getLogger().log(StarUtil.class, METHOD_NAME, e);
             }
         }
         return ICON_DATA.get(Utilities.nonNull(planet.getIcon(), "default"));

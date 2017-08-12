@@ -220,7 +220,7 @@ public class Ancestors implements Serializable, MekHqXmlSerializable {
 			// Errrr, apparently either the class name was invalid...
             // Or the listed name doesn't exist.
             // Doh!
-            MekHQ.logError(e);
+		    MekHQ.getLogger().log(Ancestors.class, "generateInstanceFromXML(Node,Campaign,Version)", e); //$NON-NLS-1$
 		}
 		
 		return retVal;

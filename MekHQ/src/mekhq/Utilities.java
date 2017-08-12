@@ -82,6 +82,7 @@ import megamek.common.SmallCraft;
 import megamek.common.Tank;
 import megamek.common.TechConstants;
 import megamek.common.VTOL;
+import megamek.common.logging.LogLevel;
 import megamek.common.options.IOption;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
@@ -1464,6 +1465,8 @@ public class Utilities {
      * Run through the directory and call parser.parse(fis) for each XML file found.
      */
     public static void parseXMLFiles(String dirName, FileParser parser, boolean recurse) {
+        final String METHOD_NAME = "parseXMLFiles(String,FileParser,boolean)"; //$NON-NLS-1$
+
         if( null == dirName || null == parser ) {
             throw new NullPointerException();
         }
@@ -1490,8 +1493,9 @@ public class Utilities {
                             parser.parse(fis);
                         } catch(Exception ex) {
                             // Ignore this file then
-                            MekHQ.logError("Exception trying to parse " + file.getPath() + " - ignoring."); //$NON-NLS-1$ //$NON-NLS-2$
-                            MekHQ.logError(ex);
+                            MekHQ.getLogger().log(Utilities.class, METHOD_NAME, LogLevel.ERROR,
+                                    "Exception trying to parse " + file.getPath() + " - ignoring."); //$NON-NLS-1$ //$NON-NLS-2$
+                            MekHQ.getLogger().log(Utilities.class, METHOD_NAME, ex);
                         }
                     }
                 }

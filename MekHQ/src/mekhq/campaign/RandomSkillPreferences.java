@@ -32,6 +32,8 @@ import mekhq.campaign.personnel.Person;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import megamek.common.logging.LogLevel;
+
 /**
  *
  * @author Jay Lawson
@@ -220,7 +222,10 @@ public class RandomSkillPreferences implements Serializable {
 	}
 
 	public static RandomSkillPreferences generateRandomSkillPreferencesFromXml(Node wn) {
-		MekHQ.logMessage("Loading Random Skill Preferences from XML...", 4);
+	    final String METHOD_NAME = "generateRandomSkillPreferencesFromXml(Node)"; //$NON-NLS-1$
+	    
+	    MekHQ.getLogger().log(RandomSkillPreferences.class, METHOD_NAME, LogLevel.INFO,
+	            "Loading Random Skill Preferences from XML..."); //$NON-NLS-1$
 
 		wn.normalize();
 		RandomSkillPreferences retVal = new RandomSkillPreferences();
@@ -234,9 +239,12 @@ public class RandomSkillPreferences implements Serializable {
 			if (wn2.getNodeType() != Node.ELEMENT_NODE)
 				continue;
 			
-			MekHQ.logMessage("---",5);
-			MekHQ.logMessage(wn2.getNodeName(),5);
-			MekHQ.logMessage("\t"+wn2.getTextContent(),5);
+	        MekHQ.getLogger().log(RandomSkillPreferences.class, METHOD_NAME, LogLevel.INFO,
+	                "---"); //$NON-NLS-1$
+	        MekHQ.getLogger().log(RandomSkillPreferences.class, METHOD_NAME, LogLevel.INFO,
+	                wn2.getNodeName());
+	        MekHQ.getLogger().log(RandomSkillPreferences.class, METHOD_NAME, LogLevel.INFO,
+	                "\t" + wn2.getTextContent()); //$NON-NLS-1$
 
 			if (wn2.getNodeName().equalsIgnoreCase("overallRecruitBonus")) {
 				retVal.overallRecruitBonus = Integer.parseInt(wn2.getTextContent().trim());
@@ -294,7 +302,8 @@ public class RandomSkillPreferences implements Serializable {
 			} 
 		}
 
-		MekHQ.logMessage("Load Random Skill Preferences Complete!", 4);
+        MekHQ.getLogger().log(RandomSkillPreferences.class, METHOD_NAME, LogLevel.INFO,
+                "Load Random Skill Preferences Complete!"); //$NON-NLS-1$
 
 		return retVal;
 	}

@@ -850,7 +850,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         
         if ("specialist".equals(option.getName())) { //$NON-NLS-1$
             optionComp.addValue(Crew.SPECIAL_NONE);
-            optionComp.addValue(Crew.SPECIAL_LASER);
+            optionComp.addValue(Crew.SPECIAL_ENERGY);
             optionComp.addValue(Crew.SPECIAL_BALLISTIC);
             optionComp.addValue(Crew.SPECIAL_MISSILE);
             optionComp.setSelected(option.stringValue());
