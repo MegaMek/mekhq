@@ -123,8 +123,8 @@ public class StartUpGUI extends javax.swing.JPanel {
                 
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 	    
-        frame.setSize(500, 350);
-        frame.setResizable(false);
+        frame.setSize(1920, 1080);
+        frame.setResizable(true);
 	    // Determine the new location of the window
 	    int w = frame.getSize().width;
 	    int h = frame.getSize().height;

@@ -102,7 +102,7 @@ import megamek.common.options.IOptionGroup;
 import megamek.common.options.PilotOptions;
 import megamek.common.util.BuildingBlock;
 import megamek.common.util.DirectoryItems;
-import megamek.common.weapons.BayWeapon;
+import megamek.common.weapons.bayweapons.BayWeapon;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
@@ -5428,7 +5428,7 @@ public class Campaign implements Serializable {
 		    String special = Crew.SPECIAL_NONE;
 		    switch (Compute.randomInt(2)) {
 		        case 0:
-		            special = Crew.SPECIAL_LASER;
+		            special = Crew.SPECIAL_ENERGY;
 		            break;
 		        case 1:
 		            special = Crew.SPECIAL_BALLISTIC;
