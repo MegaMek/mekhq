@@ -196,8 +196,7 @@ public class PersonnelMarket {
 					for (int i = Person.T_NONE + 1; i < Person.T_NUM; i++) {
 						roll = Compute.d6(2);
 						// TODO: Modifiers for hiring hall, but first needs to track the hiring hall
-						switch(c.getUnitRatingMod())
-						{
+						switch(c.getUnitRatingMod()) {
 						case IUnitRating.DRAGOON_A:
 						case IUnitRating.DRAGOON_ASTAR:
 							roll += 3;
