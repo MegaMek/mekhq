@@ -33,7 +33,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import megamek.client.ui.swing.BombChoicePanel;
-import megamek.common.Aero;
+import megamek.common.IBomber;
 import mekhq.campaign.Campaign;
 
 /**
@@ -48,15 +48,15 @@ public class BombsDialog extends JDialog implements ActionListener {
      */
     private static final long serialVersionUID = -8333650539542692225L;
     private BombChoicePanel bombPanel;
-    private Aero aero;
+    private IBomber bomber;
     private Campaign campaign;
 
     private JButton okayButton;
     private JButton cancelButton;
 
-    public BombsDialog(Aero aero, Campaign campaign, JFrame parent) {
+    public BombsDialog(IBomber iBomber, Campaign campaign, JFrame parent) {
         super(parent, "Select Bombs", true);
-        this.aero = aero;
+        this.bomber = iBomber;
         this.campaign = campaign;
         initGUI();
         validate();
@@ -66,7 +66,7 @@ public class BombsDialog extends JDialog implements ActionListener {
 
     private void initGUI() {
 
-        bombPanel = new BombChoicePanel(aero, campaign.getGameOptions().booleanOption("at2_nukes"),
+        bombPanel = new BombChoicePanel(bomber, campaign.getGameOptions().booleanOption("at2_nukes"),
                 campaign.getGameOptions().booleanOption("allow_advanced_ammo"));
 
         //Set up the display of this dialog.

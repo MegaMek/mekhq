@@ -80,6 +80,7 @@ import megamek.common.Game;
 import megamek.common.GunEmplacement;
 import megamek.common.Infantry;
 import megamek.common.Jumpship;
+import megamek.common.LandAirMech;
 import megamek.common.Mech;
 import megamek.common.MechFileParser;
 import megamek.common.MechSummary;
@@ -5132,30 +5133,43 @@ public class Campaign implements Serializable {
     public Planet getPlanet(String name) {
         return Planets.getInstance().getPlanetByName(name, Utilities.getDateTimeDay(calendar));
     }
+    
+    public Person newPerson(int type) {
+        if (type == Person.T_LAM_PILOT) {
+            return newPerson(Person.T_MECHWARRIOR, Person.T_AERO_PILOT);
+        }
+        return newPerson(type, Person.T_NONE);
+    }
 
     /**
      * Generate a new pilotPerson of the given type using whatever randomization options have been given in the
      * CampaignOptions
      *
-     * @param type
+     * @param type The primary role
+     * @param secondary A secondary role; used for LAM pilots to generate MW + Aero pilot
      * @return
      */
-    public Person newPerson(int type) {
+    public Person newPerson(int type, int secondary) {
         boolean isFemale = getRNG().isFemale();
         Person person = new Person(this);
         if (isFemale) {
             person.setGender(Person.G_FEMALE);
         }
         person.setName(getRNG().generate(isFemale));
-        int expLvl = Utilities.generateExpLevel(rskillPrefs
-                                                        .getOverallRecruitBonus() + rskillPrefs.getRecruitBonus(type));
+        int bonus = rskillPrefs.getOverallRecruitBonus() + rskillPrefs.getRecruitBonus(type);
+        // LAM pilots get +3 to random experience roll
+        if (type == Person.T_MECHWARRIOR && secondary != Person.T_AERO_PILOT) {
+            bonus += 3;
+        }
+        int expLvl = Utilities.generateExpLevel(bonus);
         person.setPrimaryRole(type);
+        person.setSecondaryRole(secondary);
         if (getCampaignOptions().useDylansRandomXp()) {
             person.setXp(Utilities.generateRandomExp());
         }
         person.setDaysToWaitForHealing(getCampaignOptions().getNaturalHealingWaitingPeriod());
         //check for clan phenotypes
-        int bonus = 0;
+        bonus = 0;
         if (person.isClanner()) {
             switch (type) {
                 case (Person.T_MECHWARRIOR):
@@ -5191,6 +5205,10 @@ public class Campaign implements Serializable {
                     break;
             }
         }
+        // LAM pilots get -2 to the random skill roll.
+        if (type == Person.T_MECHWARRIOR && secondary != Person.T_AERO_PILOT) {
+            bonus -= 2;
+        }
         GregorianCalendar birthdate = (GregorianCalendar) getCalendar().clone();
         birthdate.set(Calendar.YEAR, birthdate.get(Calendar.YEAR) - Utilities.getAgeByExpLevel(expLvl, person.isClanner() && person.getPhenotype() != Person.PHENOTYPE_NONE));
         // choose a random day and month
@@ -5202,6 +5220,81 @@ public class Campaign implements Serializable {
         birthdate.set(Calendar.DAY_OF_YEAR, randomDay);
         person.setBirthday(birthdate);
         // set default skills
+        generateDefaultSkills(type, person, expLvl, bonus);
+        if (secondary != Person.T_NONE) {
+            generateDefaultSkills(secondary, person, expLvl, bonus);
+        }
+        // roll small arms skill
+        if (!person.hasSkill(SkillType.S_SMALL_ARMS)) {
+            int sarmsLvl = -12;
+            if (person.isSupport()) {
+                sarmsLvl = Utilities.generateExpLevel(rskillPrefs
+                                                              .getSupportSmallArmsBonus());
+            } else {
+                sarmsLvl = Utilities.generateExpLevel(rskillPrefs
+                                                              .getCombatSmallArmsBonus());
+            }
+            if (sarmsLvl > SkillType.EXP_ULTRA_GREEN) {
+                person.addSkill(SkillType.S_SMALL_ARMS, sarmsLvl,
+                                rskillPrefs.randomizeSkill(), bonus);
+            }
+
+        }
+        // roll tactics skill
+        if (!person.isSupport()) {
+            int tacLvl = Utilities.generateExpLevel(rskillPrefs
+                                                            .getTacticsMod(expLvl));
+            if (tacLvl > SkillType.EXP_ULTRA_GREEN) {
+                person.addSkill(SkillType.S_TACTICS, tacLvl,
+                                rskillPrefs.randomizeSkill(), bonus);
+            }
+        }
+        // roll artillery skill
+        if (getCampaignOptions().useArtillery()
+            && (type == Person.T_MECHWARRIOR || type == Person.T_VEE_GUNNER || type == Person.T_INFANTRY)
+            && Utilities.rollProbability(rskillPrefs.getArtilleryProb())) {
+            int artyLvl = Utilities.generateExpLevel(rskillPrefs
+                                                             .getArtilleryBonus());
+            if (artyLvl > SkillType.EXP_ULTRA_GREEN) {
+                person.addSkill(SkillType.S_ARTILLERY, artyLvl,
+                                rskillPrefs.randomizeSkill(), bonus);
+            }
+        }
+        // roll random secondary skill
+        if (Utilities.rollProbability(rskillPrefs.getSecondSkillProb())) {
+            ArrayList<String> possibleSkills = new ArrayList<String>();
+            for (String stype : SkillType.skillList) {
+                if (!person.hasSkill(stype)) {
+                    possibleSkills.add(stype);
+                }
+            }
+            String selSkill = possibleSkills.get(Compute
+                                                         .randomInt(possibleSkills.size()));
+            int secondLvl = Utilities.generateExpLevel(rskillPrefs
+                                                               .getSecondSkillBonus());
+            person.addSkill(selSkill, secondLvl, rskillPrefs.randomizeSkill(),
+                            bonus);
+        }
+        // TODO: roll special abilities
+        if (getCampaignOptions().useAbilities()) {
+            int nabil = Utilities.rollSpecialAbilities(rskillPrefs
+                                                               .getSpecialAbilBonus(expLvl));
+            while (nabil > 0 && null != rollSPA(type, person)) {
+                nabil--;
+            }
+        }
+        if (getCampaignOptions().usePortraitForType(type)) {
+            assignRandomPortraitFor(person);
+        }
+        //check for Bloodname
+        if (person.isClanner()) {
+        	checkBloodnameAdd(person, type);
+        }
+
+        return person;
+    }
+
+    private void generateDefaultSkills(int type, Person person, int expLvl, int bonus) {
         switch (type) {
             case (Person.T_MECHWARRIOR):
                 person.addSkill(SkillType.S_PILOT_MECH, expLvl,
@@ -5313,74 +5406,6 @@ public class Campaign implements Serializable {
                                 rskillPrefs.randomizeSkill(), bonus);
                 break;
         }
-        // roll small arms skill
-        if (!person.hasSkill(SkillType.S_SMALL_ARMS)) {
-            int sarmsLvl = -12;
-            if (person.isSupport()) {
-                sarmsLvl = Utilities.generateExpLevel(rskillPrefs
-                                                              .getSupportSmallArmsBonus());
-            } else {
-                sarmsLvl = Utilities.generateExpLevel(rskillPrefs
-                                                              .getCombatSmallArmsBonus());
-            }
-            if (sarmsLvl > SkillType.EXP_ULTRA_GREEN) {
-                person.addSkill(SkillType.S_SMALL_ARMS, sarmsLvl,
-                                rskillPrefs.randomizeSkill(), bonus);
-            }
-
-        }
-        // roll tactics skill
-        if (!person.isSupport()) {
-            int tacLvl = Utilities.generateExpLevel(rskillPrefs
-                                                            .getTacticsMod(expLvl));
-            if (tacLvl > SkillType.EXP_ULTRA_GREEN) {
-                person.addSkill(SkillType.S_TACTICS, tacLvl,
-                                rskillPrefs.randomizeSkill(), bonus);
-            }
-        }
-        // roll artillery skill
-        if (getCampaignOptions().useArtillery()
-            && (type == Person.T_MECHWARRIOR || type == Person.T_VEE_GUNNER || type == Person.T_INFANTRY)
-            && Utilities.rollProbability(rskillPrefs.getArtilleryProb())) {
-            int artyLvl = Utilities.generateExpLevel(rskillPrefs
-                                                             .getArtilleryBonus());
-            if (artyLvl > SkillType.EXP_ULTRA_GREEN) {
-                person.addSkill(SkillType.S_ARTILLERY, artyLvl,
-                                rskillPrefs.randomizeSkill(), bonus);
-            }
-        }
-        // roll random secondary skill
-        if (Utilities.rollProbability(rskillPrefs.getSecondSkillProb())) {
-            ArrayList<String> possibleSkills = new ArrayList<String>();
-            for (String stype : SkillType.skillList) {
-                if (!person.hasSkill(stype)) {
-                    possibleSkills.add(stype);
-                }
-            }
-            String selSkill = possibleSkills.get(Compute
-                                                         .randomInt(possibleSkills.size()));
-            int secondLvl = Utilities.generateExpLevel(rskillPrefs
-                                                               .getSecondSkillBonus());
-            person.addSkill(selSkill, secondLvl, rskillPrefs.randomizeSkill(),
-                            bonus);
-        }
-        // TODO: roll special abilities
-        if (getCampaignOptions().useAbilities()) {
-            int nabil = Utilities.rollSpecialAbilities(rskillPrefs
-                                                               .getSpecialAbilBonus(expLvl));
-            while (nabil > 0 && null != rollSPA(type, person)) {
-                nabil--;
-            }
-        }
-        if (getCampaignOptions().usePortraitForType(type)) {
-            assignRandomPortraitFor(person);
-        }
-        //check for Bloodname
-        if (person.isClanner()) {
-        	checkBloodnameAdd(person, type);
-        }
-
-        return person;
     }
 
     public void checkBloodnameAdd(Person person, int type) {
@@ -6586,7 +6611,9 @@ public class Campaign implements Serializable {
         }
         while (unit.canTakeMoreDrivers()) {
             Person p = null;
-            if (unit.getEntity() instanceof Mech) {
+            if (unit.getEntity() instanceof LandAirMech) {
+                p = newPerson(Person.T_MECHWARRIOR, Person.T_AERO_PILOT);
+            } else if (unit.getEntity() instanceof Mech) {
                 p = newPerson(Person.T_MECHWARRIOR);
             } else if (unit.getEntity() instanceof SmallCraft
                        || unit.getEntity() instanceof Jumpship) {
@@ -6798,6 +6825,7 @@ public class Campaign implements Serializable {
         entity.setNeverDeployed(true);
         entity.setStuck(false);
         entity.resetCoolantFailureAmount();
+        entity.setConversionMode(0);
 
         if (!entity.getSensors().isEmpty()) {
             entity.setNextSensor(entity.getSensors().firstElement());

@@ -57,6 +57,7 @@ import megamek.common.Entity;
 import megamek.common.EntityMovementMode;
 import megamek.common.Infantry;
 import megamek.common.Jumpship;
+import megamek.common.LandAirMech;
 import megamek.common.Mech;
 import megamek.common.Protomech;
 import megamek.common.SmallCraft;
@@ -118,7 +119,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
     public static final int T_ADMIN_LOG = 23;
     public static final int T_ADMIN_TRA = 24;
     public static final int T_ADMIN_HR = 25;
-    public static final int T_NUM = 26;
+    public static final int T_LAM_PILOT = 26; // Not a separate type, but an alias for MW + Aero pilot
+    public static final int T_NUM = 27;
 
     public static final int S_ACTIVE = 0;
     public static final int S_RETIRED = 1;
@@ -765,6 +767,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 return "Admin/Transport";
             case (T_ADMIN_HR):
                 return "Admin/HR";
+            case (T_LAM_PILOT):
+                return "LAM Pilot";
             default:
                 return "??";
         }
@@ -2743,7 +2747,9 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public boolean canDrive(Entity ent) {
-        if (ent instanceof Mech) {
+        if (ent instanceof LandAirMech) {
+            return hasSkill(SkillType.S_PILOT_MECH) && hasSkill(SkillType.S_PILOT_AERO);
+        } else if (ent instanceof Mech) {
             return hasSkill(SkillType.S_PILOT_MECH);
         } else if (ent instanceof VTOL) {
             return hasSkill(SkillType.S_PILOT_VTOL);
@@ -2772,7 +2778,9 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public boolean canGun(Entity ent) {
-        if (ent instanceof Mech) {
+        if (ent instanceof LandAirMech) {
+            return hasSkill(SkillType.S_GUN_MECH) && hasSkill(SkillType.S_GUN_AERO);
+        } else if (ent instanceof Mech) {
             return hasSkill(SkillType.S_GUN_MECH);
         } else if (ent instanceof Tank) {
             return hasSkill(SkillType.S_GUN_VEE);
