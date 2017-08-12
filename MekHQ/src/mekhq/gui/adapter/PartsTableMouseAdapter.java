@@ -170,24 +170,18 @@ public class PartsTableMouseAdapter extends MouseInputAdapter implements ActionL
                 int q = pvcd.getValue();
                 gui.getCampaign().depodPart(selectedPart, q);
             }
-        } else if(command.equalsIgnoreCase("BUY"))
-        {
-        	for (Part p : parts)
-        	{
-        		if(null != p)
-        		{
+        } else if(command.equalsIgnoreCase("BUY")) {
+        	for (Part p : parts) {
+        		if(null != p) {
         			gui.getCampaign().getShoppingList().addShoppingItem(p.getAcquisitionWork(), 1, gui.getCampaign());
         		}
         	}
-        } else if(command.equalsIgnoreCase("BUY_N"))
-        {
-        	if(null != selectedPart)
-        	{
+        } else if(command.equalsIgnoreCase("BUY_N")) {
+        	if(null != selectedPart) {
         		PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(gui.getFrame(), true,
         				"Buy How Much " + selectedPart.getName(), 1, 1);
         		pvcd.setVisible(true);
-        		if(pvcd.getValue() < 1)
-        		{
+        		if(pvcd.getValue() < 1) {
         			return;
         		}
         		int q = pvcd.getValue();
@@ -332,16 +326,14 @@ public class PartsTableMouseAdapter extends MouseInputAdapter implements ActionL
             }
             
             // also add the ability to order one or many parts, if we have at least one part selected
-            if(rows.length > 0)
-            {
+            if(rows.length > 0) {
 	            menu = new JMenu("Buy");
 	            menuItem = new JMenuItem("Buy Single Part of This Type");
 	        	menuItem.setActionCommand("BUY");
 	        	menuItem.addActionListener(this);
 	        	menu.add(menuItem);
 	        	
-	        	if(oneSelected)
-	        	{
+	        	if(oneSelected) {
 		        	menuItem = new JMenuItem ("Buy # Parts of This Type...");
 		        	menuItem.setActionCommand("BUY_N");
 		        	menuItem.addActionListener(this);
