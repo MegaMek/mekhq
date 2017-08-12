@@ -165,6 +165,8 @@ public class Rank implements MekHqXmlSerializable {
     }
 
     public static Rank generateInstanceFromXML(Node wn) {
+        final String METHOD_NAME = "generateInstanceFromXML(Node)"; //$NON-NLS-1$
+        
         Rank retVal = null;
 
         try {
@@ -199,7 +201,7 @@ public class Rank implements MekHqXmlSerializable {
             // Errrr, apparently either the class name was invalid...
             // Or the listed name doesn't exist.
             // Doh!
-            MekHQ.logError(ex);
+            MekHQ.getLogger().log(Rank.class, METHOD_NAME, ex);
         }
 
         return retVal;

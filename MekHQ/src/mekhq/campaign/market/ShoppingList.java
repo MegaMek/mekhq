@@ -182,6 +182,8 @@ public class ShoppingList implements MekHqXmlSerializable {
     }
 
     public static ShoppingList generateInstanceFromXML(Node wn, Campaign c, Version version) {
+        final String METHOD_NAME = "generateInstanceFromXML(Node,Campaign,Version)"; //$NON-NLS-1$
+
         ShoppingList retVal = new ShoppingList();
 
         NodeList nl = wn.getChildNodes();
@@ -206,7 +208,7 @@ public class ShoppingList implements MekHqXmlSerializable {
             }
         } catch (Exception ex) {
             // Doh!
-            MekHQ.logError(ex);
+            MekHQ.getLogger().log(ShoppingList.class, METHOD_NAME, ex);
         }
 
         return retVal;

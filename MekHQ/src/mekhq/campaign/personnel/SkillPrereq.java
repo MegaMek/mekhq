@@ -135,6 +135,8 @@ public class SkillPrereq implements MekHqXmlSerializable {
     }
     
     public static SkillPrereq generateInstanceFromXML(Node wn) {
+        final String METHOD_NAME = "generateInstanceFromXML(Node)"; //$NON-NLS-1$
+
         SkillPrereq retVal = null;
         
         try {       
@@ -160,7 +162,7 @@ public class SkillPrereq implements MekHqXmlSerializable {
             // Errrr, apparently either the class name was invalid...
             // Or the listed name doesn't exist.
             // Doh!
-            MekHQ.logError(ex);
+            MekHQ.getLogger().log(SkillPrereq.class, METHOD_NAME, ex);
         }
         return retVal;
     }

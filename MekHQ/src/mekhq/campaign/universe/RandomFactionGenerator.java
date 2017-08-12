@@ -44,6 +44,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import megamek.common.Compute;
+import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.CampaignOptions;
@@ -161,9 +162,9 @@ public class RandomFactionGenerator implements Serializable {
 		try {
 			loadFactionHints();
 		} catch (DOMException e) {
-			MekHQ.logError(e);
+		    MekHQ.getLogger().log(getClass(), "initialize()", e); //$NON-NLS-1$
 		} catch (ParseException e) {
-			MekHQ.logError(e);
+            MekHQ.getLogger().log(getClass(), "initialize()", e); //$NON-NLS-1$
 		}
 
 		initialized = true;
@@ -199,17 +200,20 @@ public class RandomFactionGenerator implements Serializable {
 
 	
 	private void loadFactionHints() throws DOMException, ParseException {
-		MekHQ.logMessage("Starting load of faction hint data from XML...");
+	    final String METHOD_NAME = "loadFactionHints()"; //$NON-NLS-1$
+	    
+	    MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO,
+	            "Starting load of faction hint data from XML..."); //$NON-NLS-1$
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		Document xmlDoc = null;
 		
 		try {
-			FileInputStream fis = new FileInputStream("data/universe/factionhints.xml");
+			FileInputStream fis = new FileInputStream("data/universe/factionhints.xml"); //$NON-NLS-1$
 			DocumentBuilder db = dbf.newDocumentBuilder();
 	
 			xmlDoc = db.parse(fis);
 		} catch (Exception ex) {
-			MekHQ.logError(ex);
+	        MekHQ.getLogger().log(getClass(), METHOD_NAME, ex);
 		}
 		
 		Element rootElement = xmlDoc.getDocumentElement();
@@ -234,14 +238,16 @@ public class RandomFactionGenerator implements Serializable {
 						neutralFactions.add(f);
 						addNeutralExceptions(f, wn);
 					} else {
-						MekHQ.logError("Invalid faction code in factionhints.xml: " + f);
+				        MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
+				                "Invalid faction code in factionhints.xml: " + f); //$NON-NLS-1$
 					}
 				} else if (nodeName.equalsIgnoreCase("deepPeriphery")) {
 					for (String f : wn.getTextContent().trim().split(",")) {
 						if (Faction.getFaction(f) != null) {
 							deepPeriphery.add(f);
 						} else {
-							MekHQ.logError("Invalid faction code in factionhints.xml: " + f);
+	                        MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
+	                                "Invalid faction code in factionhints.xml: " + f); //$NON-NLS-1$
 						}
 					}
 				} else if (nodeName.equalsIgnoreCase("majorPowers")) {
@@ -249,7 +255,8 @@ public class RandomFactionGenerator implements Serializable {
 						if (Faction.getFaction(f) != null) {
 							majorPowers.add(f);
 						} else {
-							MekHQ.logError("Invalid faction code in factionhints.xml: " + f);
+	                        MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
+	                                "Invalid faction code in factionhints.xml: " + f); //$NON-NLS-1$
 						}
 					}
 				} else if (nodeName.equalsIgnoreCase("rivals")) {
@@ -297,7 +304,8 @@ public class RandomFactionGenerator implements Serializable {
 						}
 						containedFactions.get(outer).get(inner).add(new AltLocation(start, end, fraction, opponents));
 					} else {
-						MekHQ.logError("Invalid faction code in factionhints.xml: " + outer + "/" + inner);
+                        MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
+                                "Invalid faction code in factionhints.xml: " + outer + "/" + inner); //$NON-NLS-1$
 					}
 				}
 			}
@@ -306,6 +314,8 @@ public class RandomFactionGenerator implements Serializable {
 	
 	private void setFactionHint(HashMap<String, HashMap<String, ArrayList<FactionHint>>> hint,
 			Node node) throws DOMException, ParseException {
+	    final String METHOD_NAME = "setFactionHint(HashMap<String,HashMap<String,ArrayList<FactionHint>>>,Node"; //$NON-NLS-1$
+	    
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 		final Date epoch_start = df.parse("0001-01-01");
 		final Date epoch_end = df.parse("9999-12-31");
@@ -338,12 +348,14 @@ public class RandomFactionGenerator implements Serializable {
 				
 				for (int i = 0; i < parties.length - 1; i++) {
 					if (Faction.getFaction(parties[i]) == null) {
-						MekHQ.logError("Invalid faction code in factionhints.xml: " + parties[i]);
+                        MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
+                                "Invalid faction code in factionhints.xml: " + parties[i]); //$NON-NLS-1$
 						continue;
 					}
 					for (int j = i + 1; j < parties.length; j++) {
 						if (Faction.getFaction(parties[j]) == null) {
-							MekHQ.logError("Invalid faction code in factionhints.xml: " + parties[j]);
+	                        MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
+	                                "Invalid faction code in factionhints.xml: " + parties[j]); //$NON-NLS-1$
 							continue;
 						}
 						if (hint.get(parties[i]) == null) {
@@ -360,6 +372,8 @@ public class RandomFactionGenerator implements Serializable {
 	}
 	
 	private void addNeutralExceptions(String faction, Node node) throws DOMException, ParseException {
+	    final String METHOD_NAME = "addNeutralExceptions(String,Node)"; //$NON-NLS-1$
+	    
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 		final Date epoch_start = df.parse("0001-01-01");
 		final Date epoch_end = df.parse("9999-12-31");
@@ -385,7 +399,8 @@ public class RandomFactionGenerator implements Serializable {
 				
 				for (int i = 0; i < parties.length; i++) {
 					if (Faction.getFaction(parties[i]) == null) {
-						MekHQ.logError("Invalid faction code in factionhints.xml: " + parties[i]);
+                        MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
+                                "Invalid faction code in factionhints.xml: " + parties[i]); //$NON-NLS-1$
 						continue;
 					}
 					if (neutralExceptions.get(faction) == null) {
@@ -567,6 +582,8 @@ public class RandomFactionGenerator implements Serializable {
 	}
 	
 	public String getEnemy(String fName, boolean useRebels) {
+	    final String METHOD_NAME = "getEnemy(String,boolean)"; //$NON-NLS-1$
+	    
 		/* Rebels occur on a 1-4 (d20) on nearly every enemy chart */
 		if (useRebels && Compute.randomInt(5) == 0) {
 			return "REB";
@@ -614,7 +631,8 @@ public class RandomFactionGenerator implements Serializable {
 				return Utilities.getRandomItem(enemiesList);
 			}
 		}
-		MekHQ.logMessage("Could not find enemy for " + fName);
+		MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
+		        "Could not find enemy for " + fName); //$NON-NLS-1$
 		return "PIR";
 	}
 	

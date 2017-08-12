@@ -33,6 +33,7 @@ import megamek.client.ratgenerator.UnitTable;
 import megamek.common.EntityMovementMode;
 import megamek.common.MechSummary;
 import megamek.common.UnitType;
+import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
 
 /**
@@ -58,6 +59,8 @@ public class RATGeneratorConnector implements IUnitGenerator {
 	
 	private UnitTable findTable(String faction, int unitType, int weightClass, int year,
 			int quality, Collection<EntityMovementMode> movementModes) {
+	    final String METHOD_NAME = "findTable(String,int,int,int,int,Collection<EntityMovementMode>)"; //$NON-NLS-1$
+	    
 		FactionRecord fRec = RATGenerator.getInstance().getFaction(faction);
 		if (fRec == null) {
 			Faction f = Faction.getFaction(faction);
@@ -71,7 +74,8 @@ public class RATGeneratorConnector implements IUnitGenerator {
 				}
 			}
 			if (fRec == null) {
-				MekHQ.logError("Could not locate faction record for " + faction);
+		        MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
+		                "Could not locate faction record for " + faction); //$NON-NLS-1$
 				return null;
 			}
 		}

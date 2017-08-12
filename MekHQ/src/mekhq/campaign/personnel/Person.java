@@ -64,6 +64,7 @@ import megamek.common.Tank;
 import megamek.common.TargetRoll;
 import megamek.common.VTOL;
 import megamek.common.annotations.Nullable;
+import megamek.common.logging.LogLevel;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.PilotOptions;
@@ -216,7 +217,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     private Hashtable<String, Skill> skills;
     private PilotOptions options = new PilotOptions();
-    private Hashtable<String, SpecialAbility>  spas = new Hashtable<String, SpecialAbility>();
     private int toughness;
 
     private int status;
@@ -230,6 +230,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     boolean dependent;
     boolean commander;
+    boolean isClanTech;
 
     //phenotype and background
     private int phenotype;
@@ -342,6 +343,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         prisonerStatus = PRISONER_NOT;
         dependent = false;
         commander = false;
+        isClanTech = false;
         techUnitIds = new ArrayList<UUID>();
         salary = -1;
         phenotype = PHENOTYPE_NONE;
@@ -1411,6 +1413,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public static Person generateInstanceFromXML(Node wn, Campaign c, Version version) {
+        final String METHOD_NAME = "generateInstanceFromXML(Node,Campaign,Version)"; //$NON-NLS-1$
+        
         Person retVal = null;
 
         try {
@@ -1590,7 +1594,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
                         if (!wn3.getNodeName().equalsIgnoreCase("id")) {
                             // Error condition of sorts!
                             // Errr, what should we do here?
-                            MekHQ.logMessage("Unknown node type not loaded in techUnitIds nodes: " + wn3.getNodeName());
+                            MekHQ.getLogger().log(Person.class, METHOD_NAME, LogLevel.ERROR,
+                                    "Unknown node type not loaded in techUnitIds nodes: " + wn3.getNodeName()); //$NON-NLS-1$
                             continue;
                         }
                         retVal.techUnitIds.add(UUID.fromString(wn3.getTextContent()));
@@ -1608,7 +1613,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
                         if (!wn3.getNodeName().equalsIgnoreCase("logEntry")) {
                             // Error condition of sorts!
                             // Errr, what should we do here?
-                            MekHQ.logMessage("Unknown node type not loaded in personnel log nodes: " + wn3.getNodeName());
+                            MekHQ.getLogger().log(Person.class, METHOD_NAME, LogLevel.ERROR,
+                                    "Unknown node type not loaded in personnel log nodes: " + wn3.getNodeName()); //$NON-NLS-1$
                             continue;
                         }
                         retVal.addLogEntry(LogEntry.generateInstanceFromXML(wn3));
@@ -1625,7 +1631,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
                         if (!wn3.getNodeName().equalsIgnoreCase("injury")) {
                             // Error condition of sorts!
                             // Errr, what should we do here?
-                            MekHQ.logMessage("Unknown node type not loaded in injury nodes: " + wn3.getNodeName());
+                            MekHQ.getLogger().log(Person.class, METHOD_NAME, LogLevel.ERROR,
+                                    "Unknown node type not loaded in injury nodes: " + wn3.getNodeName()); //$NON-NLS-1$
                             continue;
                         }
                         retVal.injuries.add(Injury.generateInstanceFromXML(wn3));
@@ -1692,7 +1699,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     try {
                         retVal.getOptions().getOption(advName).setValue(value);
                     } catch (Exception e) {
-                        MekHQ.logMessage("Error restoring advantage: " + adv);
+                        MekHQ.getLogger().log(Person.class, METHOD_NAME, LogLevel.ERROR,
+                                "Error restoring advantage: " + adv); //$NON-NLS-1$
                     }
                 }
             }
@@ -1706,7 +1714,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     try {
                         retVal.getOptions().getOption(advName).setValue(value);
                     } catch (Exception e) {
-                        MekHQ.logMessage("Error restoring edge: " + adv);
+                        MekHQ.getLogger().log(Person.class, METHOD_NAME, LogLevel.ERROR,
+                                "Error restoring edge: " + adv); //$NON-NLS-1$
                     }
                 }
             }
@@ -1720,7 +1729,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     try {
                         retVal.getOptions().getOption(advName).setValue(value);
                     } catch (Exception e) {
-                        MekHQ.logMessage("Error restoring implants: " + adv);
+                        MekHQ.getLogger().log(Person.class, METHOD_NAME, LogLevel.ERROR,
+                                "Error restoring implants: " + adv); //$NON-NLS-1$
                     }
                 }
             }
@@ -1761,11 +1771,12 @@ public class Person implements Serializable, MekHqXmlSerializable {
             // Errrr, apparently either the class name was invalid...
             // Or the listed name doesn't exist.
             // Doh!
-            MekHQ.logError(ex);
+            MekHQ.getLogger().log(Person.class, METHOD_NAME, ex);
         }
 
         if (retVal.id == null) {
-            MekHQ.logMessage("ID not pre-defined; generating person's ID.", 5);
+            MekHQ.getLogger().log(Person.class, METHOD_NAME, LogLevel.ERROR,
+                    "ID not pre-defined; generating person's ID."); //$NON-NLS-1$
             retVal.id = UUID.randomUUID();
         }
 
@@ -2512,22 +2523,24 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return " <font color='green'><b>Successfully healed one hit.</b></font>";
     }
 
-    /**
-     * @return the spas
-     */
-    public Hashtable<String, SpecialAbility> getSpas() {
-        return spas;
+    public PilotOptions getOptions() {
+        return options;
     }
 
     /**
-     * @param spas the spas to set
+     * Returns the options of the given category that this pilot has
      */
-    public void setSpas(Hashtable<String, SpecialAbility> spas) {
-        this.spas = spas;
-    }
-    
-    public int countSPAs() {
-        return spas.size();
+    public Enumeration<IOption> getOptions(String grpKey) {
+        for (Enumeration<IOptionGroup> i = options.getGroups(); i.hasMoreElements(); ) {
+            IOptionGroup group = i.nextElement();
+
+            if (group.getKey().equalsIgnoreCase(grpKey)) {
+                return group.getOptions();
+            }
+        }
+
+        // no pilot advantages -- return an empty Enumeration
+        return new Vector<IOption>().elements();
     }
 
     public ArrayList<SpecialAbility> getEligibleSPAs(boolean generation) {
@@ -2549,82 +2562,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
             }
         }
         return eligible;
-    }
-
-    /**
-     * This function returns an html-coded list that says what abilities are enabled for this pilot
-     *
-     * @return
-     */
-    public String getAbilityList(String type) {
-        String abilityString = "";
-        
-        // Add in SPAs
-        for (SpecialAbility spa : spas.values()) {
-            abilityString = abilityString + spa.getDisplayName() + "<br />";
-        }
-        
-        // Filter through pilot options, and add any that are needed
-        for (Enumeration<IOption> i = getOptions(type); i.hasMoreElements(); ) {
-            IOption ability = i.nextElement();
-            if (ability.booleanValue() && !spas.containsKey(ability.getName())) {
-                abilityString = abilityString + Utilities.getOptionDisplayName(ability) + "<br>";
-            }
-        }
-
-        if (abilityString.equals("")) {
-            return null;
-        }
-        return "<html>" + abilityString + "</html>";
-    }
-
-    public void acquireAbility(String type, String name, Object value) {
-        //we might also need to remove some prior abilities
-        SpecialAbility spa = SpecialAbility.getAbility(name);
-        Vector<String> toRemove = new Vector<String>();
-        if(null != spa) {
-            toRemove = spa.getRemovedAbilities();
-        }
-        
-        // Handle our hashmap of SPAs
-        spas.put(name, spa);
-        for (String remove : toRemove) {
-            spas.remove(remove);
-        }
-        
-        // Handle any options that are SPAs
-        for (Enumeration<IOption> i = getOptions(type); i.hasMoreElements(); ) {
-            IOption ability = i.nextElement();
-            if (ability.getName().equals(name)) {
-                ability.setValue(value);
-            } else {
-                for(String remove : toRemove) {
-                    if (ability.getName().equals(remove)) {
-                        ability.setValue(ability.getDefault());
-                    }
-                }
-            }
-        }
-    }
-
-    public PilotOptions getOptions() {
-        return options;
-    }
-
-    /**
-     * Returns the options of the given category that this pilot has
-     */
-    public Enumeration<IOption> getOptions(String grpKey) {
-        for (Enumeration<IOptionGroup> i = options.getGroups(); i.hasMoreElements(); ) {
-            IOptionGroup group = i.nextElement();
-
-            if (group.getKey().equalsIgnoreCase(grpKey)) {
-                return group.getOptions();
-            }
-        }
-
-        // no pilot advantages -- return an empty Enumeration
-        return new Vector<IOption>().elements();
     }
 
     public int countOptions() {
@@ -2759,6 +2696,46 @@ public class Person implements Serializable, MekHqXmlSerializable {
             return "No triggers set";
         }
         return "<html>" + edgett + "</html>";
+    }
+
+    /**
+     * This function returns an html-coded list that says what abilities are enabled for this pilot
+     *
+     * @return
+     */
+    public String getAbilityList(String type) {
+        String abilityString = "";
+        for (Enumeration<IOption> i = getOptions(type); i.hasMoreElements(); ) {
+            IOption ability = i.nextElement();
+            if (ability.booleanValue()) {
+                abilityString = abilityString + Utilities.getOptionDisplayName(ability) + "<br>";
+            }
+        }
+        if (abilityString.equals("")) {
+            return null;
+        }
+        return "<html>" + abilityString + "</html>";
+    }
+
+    public void acquireAbility(String type, String name, Object value) {
+        //we might also need to remove some prior abilities
+        SpecialAbility spa = SpecialAbility.getAbility(name);
+        Vector<String> toRemove = new Vector<String>();
+        if(null != spa) {
+            toRemove = spa.getRemovedAbilities();
+        }
+        for (Enumeration<IOption> i = getOptions(type); i.hasMoreElements(); ) {
+            IOption ability = i.nextElement();
+            if (ability.getName().equals(name)) {
+                ability.setValue(value);
+            } else {
+                for(String remove : toRemove) {
+                    if (ability.getName().equals(remove)) {
+                        ability.setValue(ability.getDefault());
+                    }
+                }
+            }
+        }
     }
 
     public boolean isSupport() {

@@ -62,6 +62,7 @@ import megamek.common.SmallCraft;
 import megamek.common.Tank;
 import megamek.common.event.GameVictoryEvent;
 import megamek.common.loaders.EntityLoadingException;
+import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.event.PersonBattleFinishedEvent;
@@ -471,6 +472,8 @@ public class ResolveScenarioTracker {
     }
 
     public void assignKills() {
+        final String METHOD_NAME = "assignKills()"; //$NON-NLS-1$
+
         for(Unit u : units) {
             for(String killed : killCredits.keySet()) {
                 if(killCredits.get(killed).equalsIgnoreCase("None")) {
@@ -481,7 +484,9 @@ public class ResolveScenarioTracker {
                         PersonStatus status = peopleStatus.get(p.getId());
                         if(null == status) {
                             //this shouldnt happen so report
-                            MekHQ.logError("A null person status was found for person id " + p.getId().toString() + " when trying to assign kills");
+                            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
+                                    "A null person status was found for person id " + p.getId().toString() //$NON-NLS-1$
+                                    + " when trying to assign kills"); //$NON-NLS-1$
                             continue;
                         }
                         status.addKill(new Kill(p.getId(), killed, u.getEntity().getShortNameRaw(), campaign.getCalendar().getTime()));
@@ -862,6 +867,7 @@ public class ResolveScenarioTracker {
     }
 
     private void loadUnitsAndPilots(File unitFile) throws IOException {
+        final String METHOD_NAME = "loadUnitsAndPilots(File)"; //$NON-NLS-1$
 
         if (unitFile != null) {
             // I need to get the parser myself, because I want to pull both
@@ -883,7 +889,8 @@ public class ResolveScenarioTracker {
 
             // Was there any error in parsing?
             if (parser.hasWarningMessage()) {
-                MekHQ.logMessage(parser.getWarningMessage());
+                MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.WARNING,
+                        parser.getWarningMessage());
             }
 
             killCredits = parser.getKills();

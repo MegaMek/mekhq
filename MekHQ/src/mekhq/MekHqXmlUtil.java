@@ -16,6 +16,9 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+
 import megamek.common.Aero;
 import megamek.common.BombType;
 import megamek.common.CommonConstants;
@@ -26,10 +29,8 @@ import megamek.common.IPlayer;
 import megamek.common.Jumpship;
 import megamek.common.MULParser;
 import megamek.common.Tank;
+import megamek.common.logging.LogLevel;
 import megamek.common.util.StringUtil;
-
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
 
 public class MekHqXmlUtil {
 	public static void writeSimpleXmlTag(PrintWriter pw1, int indent, String name, String val) {
@@ -440,14 +441,16 @@ public class MekHqXmlUtil {
 
 	public static Entity getEntityFromXmlString(Node xml)
 			throws UnsupportedEncodingException, TransformerException {
-		MekHQ.logMessage("Executing getEntityFromXmlString(Node)...", 4);
+	    MekHQ.getLogger().log(MekHqXmlUtil.class, "getEntityFromXmlString(Node)", LogLevel.TRACE,
+	            "Executing getEntityFromXmlString(Node)..."); //$NON-NLS-1$
 
 		return getEntityFromXmlString(MekHqXmlUtil.xmlToString(xml));
 	}
 
 	public static Entity getEntityFromXmlString(String xml)
 			throws UnsupportedEncodingException {
-		MekHQ.logMessage("Executing getEntityFromXmlString(String)...", 4);
+        MekHQ.getLogger().log(MekHqXmlUtil.class, "getEntityFromXmlString(String)", LogLevel.TRACE,
+                "Executing getEntityFromXmlString(Node)..."); //$NON-NLS-1$
 
 		Entity retVal = null;
 
@@ -460,7 +463,8 @@ public class MekHqXmlUtil {
 		else if (ents.size() != 0)
 			retVal = ents.get(0);
 
-		MekHQ.logMessage("Returning "+retVal+" from getEntityFromXmlString(String)...", 4);
+        MekHQ.getLogger().log(MekHqXmlUtil.class, "getEntityFromXmlString(String)", LogLevel.TRACE,
+                "Returning "+retVal+" from getEntityFromXmlString(String)..."); //$NON-NLS-1$
 
 		return retVal;
 	}

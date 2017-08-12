@@ -174,6 +174,8 @@ public class Skill implements Serializable, MekHqXmlSerializable {
     }
     
     public static Skill generateInstanceFromXML(Node wn) {
+        final String METHOD_NAME = "generateInstanceFromXML(Node)"; //$NON-NLS-1$
+
         Skill retVal = null;
         
         try {
@@ -197,7 +199,7 @@ public class Skill implements Serializable, MekHqXmlSerializable {
             // Errrr, apparently either the class name was invalid...
             // Or the listed name doesn't exist.
             // Doh!
-            MekHQ.logError(ex);
+            MekHQ.getLogger().log(Skill.class, METHOD_NAME, ex);
         }
         
         return retVal;

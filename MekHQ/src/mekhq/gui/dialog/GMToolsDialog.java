@@ -35,6 +35,7 @@ import megamek.common.MechFileParser;
 import megamek.common.MechSummary;
 import megamek.common.UnitType;
 import megamek.common.loaders.EntityLoadingException;
+import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
@@ -197,6 +198,8 @@ public class GMToolsDialog extends JDialog implements ActionListener {
     
     @Override
     public void actionPerformed(ActionEvent event) {
+        final String METHOD_NAME = "actionPerformed(ActionEvent)"; //$NON-NLS-1$
+
         if(event.getActionCommand().equals(GM_TOOL_DICE)) {
             performDiceRoll();
         }
@@ -213,8 +216,10 @@ public class GMToolsDialog extends JDialog implements ActionListener {
                     e = new MechFileParser(ms.getSourceFile(),ms.getEntryName()).getEntity();
                     gui.getCampaign().addUnit(e, false, 0);
                 } catch (EntityLoadingException e1) {
-                    e1.printStackTrace();
-                    MekHQ.logError("Failed to load entity " + ms.getName() + " from " + ms.getSourceFile().toString());
+                    MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
+                            "Failed to load entity " + ms.getName() + " from " //$NON-NLS-1$
+                                    + ms.getSourceFile().toString()); //$NON-NLS-1$
+                    MekHQ.getLogger().log(getClass(), METHOD_NAME, e1);
                     unitPicked.setText("Failed to load entity " + ms.getName());
                 }
             }
