@@ -6,6 +6,7 @@ v0.43.4-git
 + Make the log files reset between MHQ runs.
 + Fixing references to crew.special_energy to match fixes in MegaMek
 + PR #398 Fix for no probe defender missions #413
++ Feature #363: Feature Request: Order from Warehouse
 
 v0.43.3 (2017-07-18 18:30 UTC)
 + Feature: Refactor AtBScenario to break up the monolithic AtBScenario class and to have a separate class for each scenario
