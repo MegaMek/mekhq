@@ -685,10 +685,9 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 gui.getCampaign().changePrisonerStatus(selectedPerson, Person.PRISONER_NOT);
                 break;
             case CMD_RANSOM:
-                // ask the user if they want to sell off their prisoners. If y
+                // ask the user if they want to sell off their prisoners. If yes, then add a daily report entry, add the money and remove them all.
                 int total = 0;
-                for(Person person : people)
-                {
+                for(Person person : people) {
                     total += person.getRansomValue();
                 }
                 
@@ -1249,8 +1248,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             
             if(gui.getCampaign().getCampaignOptions().getUseAtB() &&
                gui.getCampaign().getCampaignOptions().getUseAtBCapture() &&
-               StaticChecks.areAllPrisoners(selected))
-            {
+               StaticChecks.areAllPrisoners(selected)) {
                 popup.add(newMenuItem(resourceMap.getString("ransom.text"), CMD_RANSOM));
             }
 
@@ -2091,7 +2089,6 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
         }
     }
     
-    @SuppressWarnings("unused")
     private JMenuItem newMenuItem(String text, String command) {
         return newMenuItem(text, command, true);
     }

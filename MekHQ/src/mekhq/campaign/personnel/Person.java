@@ -167,8 +167,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
     
     public static final String LOGTYPE_MEDICAL = "med";
     
-    private static final HashMap<Integer, Integer> MECHWARRIOR_AERO_RANSOM_VALUES; 
-    private static final HashMap<Integer, Integer> OTHER_RANSOM_VALUES;
+    private static final Map<Integer, Integer> MECHWARRIOR_AERO_RANSOM_VALUES; 
+    private static final Map<Integer, Integer> OTHER_RANSOM_VALUES;
 
     private static final IntSupplier PREGNANCY_DURATION = () -> {
         double gaussian = Math.sqrt(-2 * Math.log(Math.nextUp(Math.random())))
@@ -314,14 +314,14 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     // initializes the AtB ransom values
     static {
-        MECHWARRIOR_AERO_RANSOM_VALUES = new HashMap();
+        MECHWARRIOR_AERO_RANSOM_VALUES = new HashMap<>();
         MECHWARRIOR_AERO_RANSOM_VALUES.put(SkillType.EXP_ULTRA_GREEN, 5000);    // no official AtB rules for really inexperienced scrubs, but...
         MECHWARRIOR_AERO_RANSOM_VALUES.put(SkillType.EXP_GREEN, 10000);
         MECHWARRIOR_AERO_RANSOM_VALUES.put(SkillType.EXP_REGULAR, 25000);
         MECHWARRIOR_AERO_RANSOM_VALUES.put(SkillType.EXP_VETERAN, 75000);
         MECHWARRIOR_AERO_RANSOM_VALUES.put(SkillType.EXP_ELITE, 15000);
         
-        OTHER_RANSOM_VALUES = new HashMap();
+        OTHER_RANSOM_VALUES = new HashMap<>();
         OTHER_RANSOM_VALUES.put(SkillType.EXP_ULTRA_GREEN, 2500);
         OTHER_RANSOM_VALUES.put(SkillType.EXP_GREEN, 5000);
         OTHER_RANSOM_VALUES.put(SkillType.EXP_REGULAR, 10000);
@@ -3653,17 +3653,14 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return hasKids;
     }
     
-    // Returns the ransom value of this individual
-    // Useful for prisoner who you want to ransom or hand off to your employer in an AtB context
-    public int getRansomValue()
-    {
+    /** Returns the ransom value of this individual
+    * Useful for prisoner who you want to ransom or hand off to your employer in an AtB context */
+    public int getRansomValue() {
         // mechwarriors and aero pilots are worth more than the other types of scrubs
-        if(primaryRole == T_MECHWARRIOR || primaryRole == T_AERO_PILOT)
-        {
+        if(primaryRole == T_MECHWARRIOR || primaryRole == T_AERO_PILOT) {
             return MECHWARRIOR_AERO_RANSOM_VALUES.get(getExperienceLevel(false));
         }
-        else
-        {
+        else {
             return OTHER_RANSOM_VALUES.get(getExperienceLevel(false));
         }
     }
