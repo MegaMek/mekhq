@@ -25,6 +25,7 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -33,23 +34,32 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import megamek.client.ui.swing.BombChoicePanel;
+import megamek.common.BombType;
 import megamek.common.IBomber;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.parts.AmmoStorage;
+import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.equipment.EquipmentPart;
 
 /**
  * @author Deric Page (dericpage@users.sourceforge.net)
  * @version %I% %G%
  * @since 4/7/2012
+ * Modified 8/27/2017 by Joshua Bartz <jbartz at sbcglobal.net>
  */
 public class BombsDialog extends JDialog implements ActionListener {
 
-    /**
-     * 
-     */
     private static final long serialVersionUID = -8333650539542692225L;
     private BombChoicePanel bombPanel;
     private IBomber bomber;
     private Campaign campaign;
+    
+    private ArrayList<Part> spareParts;
+    private int[] bombCatalog = new int[BombType.B_NUM];
+    private int[] bombChoices = new int[BombType.B_NUM];
+    private int[] availBombs = new int[BombType.B_NUM];
+    private int[] typeMax = new int[BombType.B_NUM];
+    private int[] newLoadout = new int[BombType.B_NUM];
 
     private JButton okayButton;
     private JButton cancelButton;
@@ -58,6 +68,9 @@ public class BombsDialog extends JDialog implements ActionListener {
         super(parent, "Select Bombs", true);
         this.bomber = iBomber;
         this.campaign = campaign;
+        spareParts = this.campaign.getSpareParts();
+        bombChoices = bomber.getBombChoices();
+        
         initGUI();
         validate();
         pack();
@@ -65,9 +78,23 @@ public class BombsDialog extends JDialog implements ActionListener {
     }
 
     private void initGUI() {
-
+        //Using bombCatalog to store the part ID's of the bombs so don't have to keep full spare list in memory
+        //and for ease of access later
+        for(Part spare : spareParts) {
+            if(spare instanceof AmmoStorage && ((EquipmentPart)spare).getType() instanceof BombType && spare.isPresent()) {
+                int bombType = (BombType.getBombTypeFromInternalName(((AmmoStorage)spare).getType().getInternalName()));
+                bombCatalog[bombType] = spare.getId();
+                availBombs[bombType] = ((AmmoStorage)spare).getShots();
+            }
+        }
+        spareParts = null;
+        
+        for (int type = 0; type < BombType.B_NUM; type++) {
+            typeMax[type] = availBombs[type] + bombChoices[type];
+        }
+        
         bombPanel = new BombChoicePanel(bomber, campaign.getGameOptions().booleanOption("at2_nukes"),
-                campaign.getGameOptions().booleanOption("allow_advanced_ammo"));
+                campaign.getGameOptions().booleanOption("allow_advanced_ammo"), typeMax);
 
         //Set up the display of this dialog.
         JScrollPane scroller = new JScrollPane(bombPanel);
@@ -97,6 +124,23 @@ public class BombsDialog extends JDialog implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         if (okayButton.equals(e.getSource())) {
             bombPanel.applyChoice();
+            newLoadout = bombPanel.getChoice();
+            
+            //Get difference between starting bomb load and new bomb load
+            for (int type = 0; type < BombType.B_NUM; type++) {
+                if(bombChoices[type] != newLoadout[type]) {
+                    newLoadout[type] = bombChoices[type] - newLoadout[type];
+                } else newLoadout[type] = 0;
+            }
+            
+            for (int type = 0; type < BombType.B_NUM; type++) {
+                if(newLoadout[type] != 0 && bombCatalog[type] > 0) {
+                    AmmoStorage storedBombs = (AmmoStorage) campaign.getPart(bombCatalog[type]);
+                    storedBombs.changeShots(newLoadout[type]);
+                    if(storedBombs.getShots() == 0) campaign.removePart(storedBombs);
+                }
+            }
+            
             setVisible(false);
         } else if (cancelButton.equals(e.getSource())) {
             setVisible(false);
