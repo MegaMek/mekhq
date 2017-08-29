@@ -1449,24 +1449,20 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     	int currentYear = campaign.getCalendar().get(Calendar.YEAR);
     	int ratYear;
     	// From 2500 to 2750, we use the 2500 table
-    	if(currentYear < 2750)
-    	{
+    	if(currentYear < 2750) {
     		ratYear = 2500;
     	}
     	// From 2750 to 2866, we use the 2750 table
-    	else if(currentYear < 2866)
-    	{
+    	else if(currentYear < 2866) {
     		ratYear = 2750;
     	}
     	// From 2866 to ~3050, we use the 3025 table
     	// 2866 is when the second succession war ended, at which point we had a drastic reduction in available technology
-    	else if(currentYear < 3055)
-    	{
+    	else if(currentYear < 3055) {
     		ratYear = 3025;
     	}
     	// Once we hit 3050, there's a pretty serious tech revival across the inner sphere, so we can go back to using the 2750 table
-    	else
-    	{
+    	else {
     		ratYear = 2750;
     	}
     	
