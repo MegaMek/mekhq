@@ -119,6 +119,9 @@ import mekhq.campaign.parts.Refit;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.SpecialAbility;
+import mekhq.campaign.rating.CampaignOpsReputation;
+import mekhq.campaign.rating.FieldManualMercRevDragoonsRating;
+import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.campaign.report.CargoReport;
 import mekhq.campaign.report.HangarReport;
 import mekhq.campaign.report.PersonnelReport;
@@ -2825,7 +2828,14 @@ public class CampaignGUI extends JPanel {
         	// as it means something has happened to influence it
         	getCampaign().getUnitRating().reInitialize();
         	
-            String text = "<html><b>Dragoons Rating:</b> " + getCampaign().getUnitRatingText() + "</html>";
+            String text;
+        	if (UnitRatingMethod.FLD_MAN_MERCS_REV.equals(getCampaign().getCampaignOptions().getUnitRatingMethod())) {
+                text = String.format(resourceMap.getString("bottomRating.DragoonsRating"), getCampaign().getUnitRatingText());
+            }
+            else {
+                text = String.format(resourceMap.getString("bottomRating.CampaignOpsRating"), getCampaign().getUnitRatingText());
+            }
+        	
             lblRating.setText(text);
         } else {
             lblRating.setText("");

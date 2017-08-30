@@ -8545,12 +8545,19 @@ public class Campaign implements Serializable {
 
 	/**
 	 * Returns the type of rating method as selected in the Campaign Options dialog. Lazy-loaded for performance.
+	 * Default is CampaignOpsReputation
 	 */
 	public IUnitRating getUnitRating() {
+	    // if we switched unit rating methods, 
+	    if(unitRating != null && 
+	            (unitRating.getUnitRatingMethod() != getCampaignOptions().getUnitRatingMethod())) {
+	        unitRating = null;
+	    }
+	    
 		if(unitRating == null) {
 			UnitRatingMethod method = getCampaignOptions().getUnitRatingMethod();
 			
-		    if (method.equals(UnitRatingMethod.FLD_MAN_MERCS_REV)) {
+		    if (UnitRatingMethod.FLD_MAN_MERCS_REV.equals(method)) {
 		        unitRating = new FieldManualMercRevDragoonsRating(this);
 		    }
 		    else {

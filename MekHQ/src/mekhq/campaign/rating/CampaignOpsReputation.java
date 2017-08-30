@@ -69,6 +69,10 @@ public class CampaignOpsReputation extends AbstractUnitRating {
         super(campaign);
     }
 
+    public UnitRatingMethod getUnitRatingMethod() {
+        return UnitRatingMethod.CAMPAIGN_OPS;
+    }
+    
     int getNonAdminPersonnelCount() {
         return nonAdminPersonnelCount;
     }
