@@ -5158,7 +5158,7 @@ public class Campaign implements Serializable {
         person.setName(getRNG().generate(isFemale));
         int bonus = rskillPrefs.getOverallRecruitBonus() + rskillPrefs.getRecruitBonus(type);
         // LAM pilots get +3 to random experience roll
-        if (type == Person.T_MECHWARRIOR && secondary != Person.T_AERO_PILOT) {
+        if ((type == Person.T_MECHWARRIOR) && (secondary == Person.T_AERO_PILOT)) {
             bonus += 3;
         }
         int expLvl = Utilities.generateExpLevel(bonus);
@@ -5206,7 +5206,7 @@ public class Campaign implements Serializable {
             }
         }
         // LAM pilots get -2 to the random skill roll.
-        if (type == Person.T_MECHWARRIOR && secondary != Person.T_AERO_PILOT) {
+        if ((type == Person.T_MECHWARRIOR) && (secondary == Person.T_AERO_PILOT)) {
             bonus -= 2;
         }
         GregorianCalendar birthdate = (GregorianCalendar) getCalendar().clone();
