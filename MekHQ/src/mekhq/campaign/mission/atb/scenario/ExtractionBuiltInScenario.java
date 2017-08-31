@@ -36,8 +36,9 @@ public class ExtractionBuiltInScenario extends AtBScenario {
 			ArrayList<Entity> enemyEntities) {
 		int enemyStart;
 		int otherStart;
+		int otherHome;
 		int playerHome;
-
+		
 		if (isAttacker()) {
 			playerHome = startPos[Compute.randomInt(4)];
 			setStart(playerHome);
@@ -50,6 +51,7 @@ public class ExtractionBuiltInScenario extends AtBScenario {
 			}
 
 			otherStart = getStart() + 4;
+			otherHome = playerHome;
 		} else {
 			setStart(Board.START_CENTER);
 			enemyStart = startPos[Compute.randomInt(4)];
@@ -62,6 +64,7 @@ public class ExtractionBuiltInScenario extends AtBScenario {
 			}
 
 			otherStart = enemyStart + 4;
+			otherHome = enemyStart;
 		}
 		if (otherStart > 8) {
 			otherStart -= 8;
@@ -81,7 +84,8 @@ public class ExtractionBuiltInScenario extends AtBScenario {
 			if (isAttacker()) {
 				BotForce bf = new BotForce("Civilians", 1, otherStart, playerHome, otherForce);
 				bf.setBehaviorSettings(BehaviorSettingsFactory.getInstance().ESCAPE_BEHAVIOR.getCopy());
-
+				bf.getBehaviorSettings().setHomeEdge(bf.findHomeEdge(otherHome));
+				
 				addBotForce(bf);
 				
 				for (Entity en : otherForce) {
@@ -90,6 +94,7 @@ public class ExtractionBuiltInScenario extends AtBScenario {
 			} else {
 				BotForce bf = new BotForce("Civilians", 2, otherStart, enemyStart, otherForce);
 				bf.setBehaviorSettings(BehaviorSettingsFactory.getInstance().ESCAPE_BEHAVIOR.getCopy());
+				bf.getBehaviorSettings().setHomeEdge(bf.findHomeEdge(otherHome));
 				
 				addBotForce(bf);
 			}

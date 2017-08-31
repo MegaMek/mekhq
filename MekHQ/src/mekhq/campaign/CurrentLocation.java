@@ -30,6 +30,7 @@ import org.joda.time.DateTime;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
@@ -224,6 +225,8 @@ public class CurrentLocation implements Serializable {
 	}
 	
 	public static CurrentLocation generateInstanceFromXML(Node wn, Campaign c) {
+	    final String METHOD_NAME = "generateInstanceFromXML(Node,Campaign)"; //$NON-NLS-1$
+	    
 		CurrentLocation retVal = null;
 		
 		try {		
@@ -236,7 +239,8 @@ public class CurrentLocation implements Serializable {
 					Planet p = c.getPlanet(wn2.getTextContent());
 					if(null == p) {
 						//whoops we cant find your planet man, back to Earth
-						MekHQ.logError("Couldn't find planet named " + wn2.getTextContent());
+					    MekHQ.getLogger().log(CurrentLocation.class, METHOD_NAME, LogLevel.ERROR,
+					            "Couldn't find planet named " + wn2.getTextContent()); //$NON-NLS-1$
 						p = c.getPlanet("Terra");
 						if(null == p) {
 							//if that doesnt work then give the first planet we have
@@ -256,7 +260,7 @@ public class CurrentLocation implements Serializable {
 			// Errrr, apparently either the class name was invalid...
 			// Or the listed name doesn't exist.
 			// Doh!
-			MekHQ.logError(ex);
+            MekHQ.getLogger().log(CurrentLocation.class, METHOD_NAME, ex);
 		}
 
 		return retVal;

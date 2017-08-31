@@ -39,6 +39,11 @@ import java.util.function.Predicate;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.client.RandomUnitGenerator;
 import megamek.common.Compute;
 import megamek.common.EntityMovementMode;
@@ -46,13 +51,9 @@ import megamek.common.EntityWeightClass;
 import megamek.common.MechSummary;
 import megamek.common.UnitType;
 import megamek.common.event.Subscribe;
+import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
 import mekhq.campaign.event.OptionsChangedEvent;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  * Provides a front end to RandomUnitGenerator that allows the user to generate units
@@ -134,8 +135,11 @@ public class RATManager implements IUnitGenerator {
     }
 
     private boolean loadCollection(String name) {
+        final String METHOD_NAME = "loadCollection(String)"; //$NON-NLS-1$
+        
         if (!fileNames.containsKey(name)) {
-            MekHQ.logError("RAT collection " + name + " not found in " + RATINFO_DIR);
+            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
+                    "RAT collection " + name + " not found in " + RATINFO_DIR); //$NON-NLS-1$
             return false;
         }
         /* Need RUG to be loaded for validation */
@@ -160,7 +164,9 @@ public class RATManager implements IUnitGenerator {
             fis.close();
         } catch (Exception ex) {
             ex.printStackTrace();
-            MekHQ.logError("While loading RAT info from " + f.getName() + ": " + ex.getMessage());
+            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
+                    "While loading RAT info from " + f.getName() + ": "); //$NON-NLS-1$
+            MekHQ.getLogger().log(getClass(), METHOD_NAME, ex);
             return false;
         }
 
@@ -185,16 +191,19 @@ public class RATManager implements IUnitGenerator {
                             allRATs.get(name).put(era, new ArrayList<RAT>());
                             parseEraNode(eraNode, name, era);
                         } catch (NumberFormatException ex) {
-                            MekHQ.logError("Could not parse year " + year + " in " + name);
+                            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
+                                    "Could not parse year " + year + " in " + name); //$NON-NLS-1$
                         }
                     } else {
-                        MekHQ.logError("year attribute not found for era in RAT collection " + name);
+                        MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
+                                "year attribute not found for era in RAT collection " + name); //$NON-NLS-1$
                     }
                 }
             }
             return allRATs.get(name).size() > 0;
         } else {
-            MekHQ.logError("source attribute not found for RAT data in " + f.getName());
+            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
+                    "source attribute not found for RAT data in " + f.getName()); //$NON-NLS-1$
             return false;
         }
     }
@@ -218,6 +227,8 @@ public class RATManager implements IUnitGenerator {
      * RAT before checking generic ones.
      */
     private void loadAltFactions() {
+        final String METHOD_NAME = "loadAltFactions()"; //$NON-NLS-1$
+        
         altFactions = new HashMap<>();
 
         File f = new File(ALT_FACTION);
@@ -233,8 +244,9 @@ public class RATManager implements IUnitGenerator {
             xmlDoc = db.parse(fis);
             fis.close();
         } catch (Exception ex) {
-            ex.printStackTrace();
-            MekHQ.logError("While loading altFactions: " + ex.getMessage());
+            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO,
+                    "While loading altFactions: "); //$NON-NLS-1$
+            MekHQ.getLogger().log(getClass(), METHOD_NAME, ex);
         }
 
         Element elem = xmlDoc.getDocumentElement();
@@ -270,6 +282,8 @@ public class RATManager implements IUnitGenerator {
      * to provide a list.
      */
     public static void populateCollectionNames() {
+        final String METHOD_NAME = "populateCollectionNames()"; //$NON-NLS-1$
+        
         allCollections = new HashMap<>();
 
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -280,7 +294,8 @@ public class RATManager implements IUnitGenerator {
         FileInputStream fis = null;
 
         if (!dir.isDirectory()) {
-            MekHQ.logError("Ratinfo directory not found");
+            MekHQ.getLogger().log(RATManager.class, METHOD_NAME, LogLevel.ERROR,
+                    "Ratinfo directory not found"); //$NON-NLS-1$
             return;
         }
         for (File f : dir.listFiles()) {
@@ -291,8 +306,9 @@ public class RATManager implements IUnitGenerator {
                     xmlDoc = db.parse(fis);
                     fis.close();
                 } catch (Exception ex) {
-                    ex.printStackTrace();
-                    MekHQ.logError("While loading RAT info from " + f.getName() + ": " + ex.getMessage());
+                    MekHQ.getLogger().log(RATManager.class, METHOD_NAME, LogLevel.ERROR,
+                            "While loading RAT info from " + f.getName() + ": "); //$NON-NLS-1$
+                    MekHQ.getLogger().log(RATManager.class, METHOD_NAME, ex);
                 }
                 Element elem = xmlDoc.getDocumentElement();
                 NodeList nl = elem.getChildNodes();
@@ -311,10 +327,12 @@ public class RATManager implements IUnitGenerator {
                                 try {
                                     eras.add(Integer.parseInt(year));
                                 } catch (NumberFormatException ex) {
-                                    MekHQ.logError("Could not parse year " + year + " in " + f.getName());
+                                    MekHQ.getLogger().log(RATManager.class, METHOD_NAME, LogLevel.ERROR,
+                                            "Could not parse year " + year + " in " + f.getName()); //$NON-NLS-1$
                                 }
                             } else {
-                                MekHQ.logError("year attribute not found for era in " + f.getName());
+                                MekHQ.getLogger().log(RATManager.class, METHOD_NAME, LogLevel.ERROR,
+                                        "year attribute not found for era in " + f.getName()); //$NON-NLS-1$
                             }
                         }
                     }
@@ -322,7 +340,8 @@ public class RATManager implements IUnitGenerator {
                     Collections.sort(eras);
                     allCollections.put(name, eras);
                 } else {
-                    MekHQ.logError("source attribute not found for RAT data in " + f.getName());
+                    MekHQ.getLogger().log(RATManager.class, METHOD_NAME, LogLevel.ERROR,
+                            "source attribute not found for RAT data in " + f.getName()); //$NON-NLS-1$
                 }
             }
         }
@@ -509,9 +528,12 @@ public class RATManager implements IUnitGenerator {
         }
 
         public static RAT createFromXml(Node node) {
+            final String METHOD_NAME = "createFromXml(Node)"; //$NON-NLS-1$
+
             RAT retVal = new RAT();
             if (node.getAttributes().getNamedItem("name") == null) {
-                MekHQ.logError("name attribute missing");
+                MekHQ.getLogger().log(RATManager.class, METHOD_NAME, LogLevel.ERROR,
+                        "name attribute missing"); //$NON-NLS-1$
                 return null;
             }
             retVal.ratName = node.getAttributes().getNamedItem("name").getTextContent();

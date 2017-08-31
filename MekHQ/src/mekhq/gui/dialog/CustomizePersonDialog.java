@@ -850,7 +850,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         
         if ("specialist".equals(option.getName())) { //$NON-NLS-1$
             optionComp.addValue(Crew.SPECIAL_NONE);
-            optionComp.addValue(Crew.SPECIAL_LASER);
+            optionComp.addValue(Crew.SPECIAL_ENERGY);
             optionComp.addValue(Crew.SPECIAL_BALLISTIC);
             optionComp.addValue(Crew.SPECIAL_MISSILE);
             optionComp.setSelected(option.stringValue());
@@ -861,6 +861,15 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
             optionComp.addValue(Crew.RANGEMASTER_MEDIUM);
             optionComp.addValue(Crew.RANGEMASTER_LONG);
             optionComp.addValue(Crew.RANGEMASTER_EXTREME);
+            optionComp.setSelected(option.stringValue());
+        }
+
+        if ("human_tro".equals(option.getName())) { //$NON-NLS-1$
+            optionComp.addValue(Crew.HUMANTRO_NONE);
+            optionComp.addValue(Crew.HUMANTRO_MECH);
+            optionComp.addValue(Crew.HUMANTRO_AERO);
+            optionComp.addValue(Crew.HUMANTRO_VEE);
+            optionComp.addValue(Crew.HUMANTRO_BA);
             optionComp.setSelected(option.stringValue());
         }
 

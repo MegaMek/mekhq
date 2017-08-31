@@ -333,6 +333,10 @@ public class EquipmentPart extends Part {
 		if(isSalvaging()) {
 			return isOmniPodded()? 30 : 120;
 		}
+		// LAM bomb bays only take 60 minutes to repair.
+		if ((type instanceof MiscType) && type.hasFlag(MiscType.F_BOMB_BAY)) {
+		    return 60;
+		}
 		if(hits == 1) {
 			return 100;
 		} else if(hits == 2) {
@@ -350,6 +354,10 @@ public class EquipmentPart extends Part {
 		if(isSalvaging()) {
 			return 0;
 		}
+        // LAM bomb bays have a fixed -1 difficulty.
+        if ((type instanceof MiscType) && type.hasFlag(MiscType.F_BOMB_BAY)) {
+            return -1;
+        }
 		if(hits == 1) {
 			return -3;
 		} else if(hits == 2) {
@@ -447,7 +455,7 @@ public class EquipmentPart extends Part {
 		try {
 			return unit != null && unit.getEntity() != null && unit.getEntity().getEquipment(equipmentNum) != null && unit.isLocationDestroyed(unit.getEntity().getEquipment(equipmentNum).getLocation());
 		} catch (Exception e) {
-			MekHQ.logError(e);
+		    MekHQ.getLogger().log(getClass(), "isMountedOnDestroyedLocation()", e);
 		}
 		return false;
 		/*if(null == unit) {

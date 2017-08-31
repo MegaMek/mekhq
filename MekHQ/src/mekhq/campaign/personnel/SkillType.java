@@ -465,6 +465,8 @@ public class SkillType implements Serializable {
     }
     
     public static void generateInstanceFromXML(Node wn, Version version) {
+        final String METHOD_NAME = "generateInstanceFromXML(Node,Version)"; //$NON-NLS-1$
+
         SkillType retVal = null;
             
         try {        
@@ -502,7 +504,7 @@ public class SkillType implements Serializable {
             // Errrr, apparently either the class name was invalid...
             // Or the listed name doesn't exist.
             // Doh!
-            MekHQ.logError(ex);
+            MekHQ.getLogger().log(SkillType.class, METHOD_NAME, ex);
         }
         if(version.getMinorVersion() < 3) {
             //need to change negotiation and scrounge to be countUp=false with
@@ -516,6 +518,8 @@ public class SkillType implements Serializable {
     }
     
     public static void generateSeparateInstanceFromXML(Node wn, Hashtable<String, SkillType> hash) {
+        final String METHOD_NAME = "generateSeparateInstanceFromXML(Node,Hashtable<String, SkillType>)"; //$NON-NLS-1$
+
         SkillType retVal = null;
             
         try {        
@@ -553,7 +557,7 @@ public class SkillType implements Serializable {
             // Errrr, apparently either the class name was invalid...
             // Or the listed name doesn't exist.
             // Doh!
-            MekHQ.logError(ex);
+            MekHQ.getLogger().log(SkillType.class, METHOD_NAME, ex);
         }
         hash.put(retVal.name, retVal);
     }

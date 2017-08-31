@@ -63,6 +63,8 @@ import megamek.common.Infantry;
 import megamek.common.InfantryBay;
 import megamek.common.InsulatedCargoBay;
 import megamek.common.Jumpship;
+import megamek.common.LAMPilot;
+import megamek.common.LandAirMech;
 import megamek.common.LightVehicleBay;
 import megamek.common.LiquidCargoBay;
 import megamek.common.LivestockCargoBay;
@@ -75,6 +77,7 @@ import megamek.common.Player;
 import megamek.common.Protomech;
 import megamek.common.ProtomechBay;
 import megamek.common.QuadMech;
+import megamek.common.QuadVee;
 import megamek.common.RefrigeratedCargoBay;
 import megamek.common.SmallCraft;
 import megamek.common.SmallCraftBay;
@@ -87,6 +90,7 @@ import megamek.common.TechConstants;
 import megamek.common.VTOL;
 import megamek.common.Warship;
 import megamek.common.WeaponType;
+import megamek.common.logging.LogLevel;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.PilotOptions;
@@ -142,6 +146,7 @@ import mekhq.campaign.parts.MissingProtomekJumpJet;
 import mekhq.campaign.parts.MissingProtomekLegActuator;
 import mekhq.campaign.parts.MissingProtomekLocation;
 import mekhq.campaign.parts.MissingProtomekSensor;
+import mekhq.campaign.parts.MissingQuadVeeGear;
 import mekhq.campaign.parts.MissingRotor;
 import mekhq.campaign.parts.MissingSpacecraftEngine;
 import mekhq.campaign.parts.MissingThrusters;
@@ -157,6 +162,7 @@ import mekhq.campaign.parts.ProtomekJumpJet;
 import mekhq.campaign.parts.ProtomekLegActuator;
 import mekhq.campaign.parts.ProtomekLocation;
 import mekhq.campaign.parts.ProtomekSensor;
+import mekhq.campaign.parts.QuadVeeGear;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.parts.Rotor;
 import mekhq.campaign.parts.SpacecraftEngine;
@@ -1439,6 +1445,8 @@ public class Unit implements MekHqXmlSerializable {
     }
 
     public static Unit generateInstanceFromXML(Node wn, Version version) {
+        final String METHOD_NAME = "generateInstanceFromXML(Node,Version)"; //$NON-NLS-1$
+
         Unit retVal = new Unit();
         NamedNodeMap attrs = wn.getAttributes();
         Node idNode = attrs.getNamedItem("id");
@@ -1533,11 +1541,12 @@ public class Unit implements MekHqXmlSerializable {
             }
         } catch (Exception ex) {
             // Doh!
-            MekHQ.logError(ex);
+            MekHQ.getLogger().log(Unit.class, METHOD_NAME, ex);
         }
 
         if (retVal.id == null) {
-            MekHQ.logMessage("ID not pre-defined; generating unit's ID.", 5);
+            MekHQ.getLogger().log(Unit.class, METHOD_NAME, LogLevel.WARNING,
+                    "ID not pre-defined; generating unit's ID."); //$NON-NLS-1$
             retVal.id = UUID.randomUUID();
         }
 
@@ -1716,6 +1725,7 @@ public class Unit implements MekHqXmlSerializable {
         Part leftFrontFoot = null;
         Part leftLowerFrontLeg = null;
         Part leftUpperFrontLeg = null;
+        Part qvGear = null;
         Part structuralIntegrity = null;
         Part[] locations = new Part[entity.locations()];
         Part[] armor = new Part[entity.locations()];
@@ -1904,6 +1914,8 @@ public class Unit implements MekHqXmlSerializable {
                         leftFoot = part;
                     }
                 }
+            } else if(part instanceof QuadVeeGear || part instanceof MissingQuadVeeGear) {
+                qvGear = part;
             } else if(part instanceof Avionics || part instanceof MissingAvionics) {
                 avionics = part;
             } else if(part instanceof FireControlSystem || part instanceof MissingFireControlSystem) {
@@ -2274,6 +2286,13 @@ public class Unit implements MekHqXmlSerializable {
                 partsToAdd.add(leftFrontFoot);
             }
         }
+        if (entity instanceof QuadVee && null == qvGear) {
+            if (null == qvGear) {
+                qvGear = new QuadVeeGear((int)entity.getWeight(), campaign);
+                addPart(qvGear);
+                partsToAdd.add(qvGear);
+            }
+        }
         if(entity instanceof Aero) {
             if(null == structuralIntegrity) {
                 structuralIntegrity = new StructuralIntegrity((int)entity.getWeight(), campaign);
@@ -2428,6 +2447,18 @@ public class Unit implements MekHqXmlSerializable {
                     partsToAdd.add(secondaryW);
                     number--;
                 }
+            }
+        }
+        if (getEntity() instanceof LandAirMech) {
+            if (null == avionics) {
+                avionics = new Avionics((int)entity.getWeight(), campaign);
+                addPart(avionics);
+                partsToAdd.add(avionics);
+            }
+            if (null == landingGear) {
+                landingGear = new LandingGear((int) entity.getWeight(), campaign);
+                addPart(landingGear);
+                partsToAdd.add(landingGear);
             }
         }
 
@@ -2608,7 +2639,11 @@ public class Unit implements MekHqXmlSerializable {
                 }
             }
         } else {
-            calcCompositeCrew();
+            if ((entity.getEntityType() & Entity.ETYPE_LAND_AIR_MECH) == 0) {
+                calcCompositeCrew();
+            } else {
+                refreshLAMPilot();
+            }
             if (entity.getCrew().isMissing(0)) {
                 return;
             }
@@ -2667,8 +2702,6 @@ public class Unit implements MekHqXmlSerializable {
     /**
      * For vehicles, infantry, and naval vessels, compute the piloting and gunnery skills based
      * on the crew as a whole.
-     * 
-     * @return The size of the crew.
      */
     private void calcCompositeCrew() {
         if (drivers.isEmpty() && gunners.isEmpty()) {
@@ -2836,6 +2869,56 @@ public class Unit implements MekHqXmlSerializable {
         entity.getCrew().setGunnery(Math.min(Math.max(gunnery, 0), 7), 0);
         entity.getCrew().setArtillery(Math.min(Math.max(artillery, 7), 8), 0);
         entity.getCrew().setSize(nCrew);
+        entity.getCrew().setMissing(false, 0);
+    }
+    
+    /**
+     * LAMs require a pilot that is cross-trained for mechs and fighters
+     */
+    private void refreshLAMPilot() {
+        Person pilot = getCommander();
+        if (null == pilot) {
+            entity.getCrew().setMissing(true, 0);
+            entity.getCrew().setSize(0);
+            return;
+        }
+        
+        int pilotingMech = 13;
+        int gunneryMech = 13;
+        int pilotingAero = 13;
+        int gunneryAero = 13;
+        int artillery = 13;
+        
+        if (pilot.hasSkill(SkillType.S_PILOT_MECH)) {
+            pilotingMech = pilot.getSkill(SkillType.S_PILOT_MECH).getFinalSkillValue();
+        }
+        if (pilot.hasSkill(SkillType.S_GUN_MECH)) {
+            gunneryMech = pilot.getSkill(SkillType.S_GUN_MECH).getFinalSkillValue();
+        }
+        if (pilot.hasSkill(SkillType.S_PILOT_AERO)) {
+            pilotingAero = pilot.getSkill(SkillType.S_PILOT_AERO).getFinalSkillValue();
+        }
+        if (pilot.hasSkill(SkillType.S_GUN_AERO)) {
+            gunneryAero = pilot.getSkill(SkillType.S_GUN_AERO).getFinalSkillValue();
+        }
+        if (pilot.hasSkill(SkillType.S_ARTILLERY)) {
+            artillery = pilot.getSkill(SkillType.S_ARTILLERY).getFinalSkillValue();
+        }
+
+        if (campaign.getCampaignOptions().useAdvancedMedical()) {
+            pilotingMech += pilot.getPilotingInjuryMod();
+            gunneryMech += pilot.getGunneryInjuryMod();
+            pilotingAero += pilot.getPilotingInjuryMod();
+            gunneryAero += pilot.getGunneryInjuryMod();
+            artillery += pilot.getGunneryInjuryMod();
+        }
+        LAMPilot crew = (LAMPilot)entity.getCrew();
+        crew.setPiloting(Math.min(Math.max(pilotingMech, 0), 8));
+        crew.setGunnery(Math.min(Math.max(gunneryMech, 0), 7));
+        crew.setPilotingAero(Math.min(Math.max(pilotingAero, 0), 8));
+        crew.setGunneryAero(Math.min(Math.max(gunneryAero, 0), 7));
+        entity.getCrew().setArtillery(Math.min(Math.max(artillery, 7), 8), 0);
+        entity.getCrew().setSize(1);
         entity.getCrew().setMissing(false, 0);
     }
     

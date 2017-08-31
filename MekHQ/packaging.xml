@@ -20,7 +20,7 @@
     <!-- Global properties for this build -->
     <!-- Version and packaging properties -->
     <property name="project.name" value="mekhq" />
-    <property name="version" value="0.43.3-git"/>
+    <property name="version" value="0.43.4-git"/>
     <property name="osxdist" value="${project.name}-${version}-mac" />
     <property name="windist" value="${project.name}-${version}-windows" />
     <property name="nixdist" value="${project.name}-${version}" />
@@ -151,7 +151,7 @@
             </fileset>
         </copy>
         <!-- grab the megameklab recordsheets files -->
-        <copy todir="${pkgdir}/${datadir}/images/misc" encoding="UTF-8">
+        <copy todir="${pkgdir}/${datadir}/images" encoding="UTF-8">
             <fileset dir="${mml-pkgdir}/${datadir}/images">
                 <include name="recordsheets/" />
             </fileset>

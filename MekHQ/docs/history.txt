@@ -1,8 +1,27 @@
 VERSION HISTORY:
 ----------------
-v0.43.3-git
+v0.43.4-git
++ Updating the repo with 0.43.3 Data
++ Issue 418: Add log4j support to MekHQ.
++ Make the log files reset between MHQ runs.
++ Fixing references to crew.special_energy to match fixes in MegaMek
++ PR #398 Fix for no probe defender missions #413
++ Feature #363: Feature Request: Order from Warehouse
++ Support for LAM repairs and hiring/assigning LAM pilots.
+
+v0.43.3 (2017-07-18 18:30 UTC)
 + Feature: Refactor AtBScenario to break up the monolithic AtBScenario class and to have a separate class for each scenario
 + Feature: Support for multiple crew in command consoles and tripod/quadvee/dual cockpits.
++ Fix #405: Properly set home side for Extraction scenario
++ Added QuadVee parts.
++ Bug [#955]: MekHQ deployed units would not print
++ PR#375 - Bug-Bad CO Rating.
++ PR#366 - Human TRO
++ PR#249 - AtB Contract Names
++ Fix #395: SPAs do not appear in Pilot Info in MHQ
++ Commenting out PR#249 see commit notes.
++ PR#409 - Fix for incorrect treatment of tornadoes
+
 
 v0.43.2 (2017-05-1 22:00 UTC)
 + Fix #362: Omni Refits calculating additional HS incorrectly
