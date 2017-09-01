@@ -637,7 +637,7 @@ public class NewContractDialog extends javax.swing.JDialog {
         spnLength = new JSpinner(new SpinnerNumberModel(contract.getLength(), 1, 120, 1));
         spnLength.addChangeListener(contractUpdateChangeListener);
         
-        spnMultiplier = new JSpinner(new SpinnerNumberModel(contract.getMultiplier(), 1.0, 10.0, 0.1));
+        spnMultiplier = new JSpinner(new SpinnerNumberModel(contract.getMultiplier(), 0.5, 10.0, 0.1));
         spnMultiplier.addChangeListener(contractUpdateChangeListener);
         
         DefaultComboBoxModel<String> overheadModel = new DefaultComboBoxModel<String>();
