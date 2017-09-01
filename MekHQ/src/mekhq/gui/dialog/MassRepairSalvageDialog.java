@@ -217,7 +217,7 @@ public class MassRepairSalvageDialog extends JDialog {
 		for (int i = 0; i < MassRepairOption.VALID_REPAIR_TYPES.length; i++) {
 			int type = MassRepairOption.VALID_REPAIR_TYPES[i];
 
-			MassRepairOptionControl mroc = massRepairOptionControlMap.get(i);
+			MassRepairOptionControl mroc = massRepairOptionControlMap.get(type);
 
 			if ((null == mroc) || !mroc.activeBox.isSelected()) {
 				continue;

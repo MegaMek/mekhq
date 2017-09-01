@@ -852,6 +852,18 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	    }
 	}
 	
+	public void resetModeToNormal() {
+		if (!canChangeWorkMode()) {
+			return;
+		}
+		
+		/*
+		 * Reset our WorkTime back to normal so that we can adjust as
+		 * necessary
+		 */
+		setMode(WorkTime.of(WorkTime.NORMAL.id));
+	}
+	
 	@Override
 	public boolean canChangeWorkMode() {
 	    return !(isOmniPodded() && isSalvaging());

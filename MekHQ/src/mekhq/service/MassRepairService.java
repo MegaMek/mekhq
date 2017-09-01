@@ -98,8 +98,10 @@ public class MassRepairService {
 			}
 
 			for (IPartWork partWork : parts) {
+				((Part) partWork).resetModeToNormal();
+				
 				Part part = (Part) partWork;
-
+				
 				List<Person> validTechs = filterTechs(partWork, techs, mroByTypeMap, true, campaignGUI);
 
 				if (validTechs.isEmpty()) {
@@ -464,6 +466,8 @@ public class MassRepairService {
 		}
 
 		for (IPartWork partWork : parts) {
+			((Part) partWork).resetModeToNormal();
+			
 			List<Person> validTechs = filterTechs(partWork, techs, mroByTypeMap, false, campaignGUI);
 
 			if (validTechs.isEmpty()) {
@@ -521,20 +525,13 @@ public class MassRepairService {
 			}
 		}
 
+		WorkTime normalWorktime = WorkTime.NORMAL;
+		
 		for (int i = techs.size() - 1; i >= 0; i--) {
-			/*
-			 * Reset our WorkTime back to normal so that we can adjust as
-			 * necessary
-			 */
-			WorkTime selectedWorktime = WorkTime.NORMAL;
-
-			if (partWork instanceof Part) {
-				((Part) partWork).setMode(WorkTime.of(selectedWorktime.id));
-			}
-
 			Person tech = techs.get(i);
 			TargetRoll targetRoll = campaign.getTargetFor(partWork, tech);
-
+			WorkTime selectedWorktime = normalWorktime;
+			
 			// Check if we need to increase the time to meet the min BTH
 			if (targetRoll.getValue() > mro.getBthMin()) {
 				if (!configuredOptions.isUseExtraTime()) {
@@ -546,7 +543,6 @@ public class MassRepairService {
 
 				if (null == workTimeCalc.getWorkTime()) {
 					if (workTimeCalc.isReachedMaxSkill()) {
-						// TODO: Finish me
 						campaign.addReport(String.format(
 								"<font color='orange'>Unable to act on %s because it is not possible for the best currently available technician (%s) to achieve the configured BTH of %s.</font>",
 								partWork.getPartName(), SkillType.getExperienceLevelName(highestAvailableTechSkill),
@@ -617,10 +613,7 @@ public class MassRepairService {
 			}
 
 			techToWorktimeMap.put(tech.getId().toString(), selectedWorktime);
-
-			if (partWork instanceof Part) {
-				((Part) partWork).setMode(WorkTime.of(WorkTime.NORMAL.id));
-			}
+			((Part) partWork).resetModeToNormal();
 		}
 
 		if (overflowDayTechs.isEmpty() && sameDayTechs.isEmpty()) {
@@ -780,23 +773,32 @@ public class MassRepairService {
 		return true;
 	}
 
-	private static WorkTimeCalculation calculateNewMassRepairWorktime(IPartWork part, Person tech, MassRepairOption mro,
+	private static WorkTimeCalculation calculateNewMassRepairWorktime(IPartWork partWork, Person tech, MassRepairOption mro,
 			Campaign campaign, boolean increaseTime, int highestAvailableTechSkill) {
-		WorkTime newWorkTime = part.getMode();
+		WorkTime newWorkTime = partWork.getMode();
 		WorkTime previousNewWorkTime = newWorkTime;
-		TargetRoll targetRoll = campaign.getTargetFor(part, tech);
-
+		TargetRoll targetRoll = campaign.getTargetFor(partWork, tech);
+		Skill skill = tech.getSkillForWorkingOn(partWork);
+		
 		while (null != newWorkTime) {
 			previousNewWorkTime = newWorkTime;
 			newWorkTime = newWorkTime.moveTimeToNextLevel(increaseTime);
 
+			//If we're trying to a rush a job, our effective skill goes down
+			//Let's make sure we don't put it so high that we can't fix it anymore
+			if (!increaseTime) {
+				int modePenalty = partWork.getMode().expReduction;
+				
+				if (partWork.getSkillMin() > (skill.getExperienceLevel() - modePenalty)) {
+					return new WorkTimeCalculation(previousNewWorkTime);
+				}
+			}
+			
 			if (null == newWorkTime) {
 				if (!increaseTime) {
 					return new WorkTimeCalculation(previousNewWorkTime);
 				} else {
 					WorkTimeCalculation wtc = new WorkTimeCalculation();
-
-					Skill skill = tech.getSkillForWorkingOn(part);
 
 					if (skill.getExperienceLevel() >= highestAvailableTechSkill) {
 						wtc.setReachedMaxSkill(true);
@@ -806,11 +808,11 @@ public class MassRepairService {
 				}
 			}
 
-			if (part instanceof Part) {
-				((Part) part).setMode(newWorkTime);
+			if (partWork instanceof Part) {
+				((Part) partWork).setMode(newWorkTime);
 			}
 
-			targetRoll = campaign.getTargetFor(part, tech);
+			targetRoll = campaign.getTargetFor(partWork, tech);
 
 			if ((targetRoll.getValue() == TargetRoll.IMPOSSIBLE) || (targetRoll.getValue() == TargetRoll.AUTOMATIC_FAIL)
 					|| (targetRoll.getValue() == TargetRoll.CHECK_FALSE)) {
