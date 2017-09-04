@@ -54,7 +54,6 @@ public class BombsDialog extends JDialog implements ActionListener {
     private IBomber bomber;
     private Campaign campaign;
     
-    private ArrayList<Part> spareParts;
     private int[] bombCatalog = new int[BombType.B_NUM];
     private int[] bombChoices = new int[BombType.B_NUM];
     private int[] availBombs = new int[BombType.B_NUM];
@@ -68,7 +67,6 @@ public class BombsDialog extends JDialog implements ActionListener {
         super(parent, "Select Bombs", true);
         this.bomber = iBomber;
         this.campaign = campaign;
-        spareParts = this.campaign.getSpareParts();
         bombChoices = bomber.getBombChoices();
         
         initGUI();
@@ -80,6 +78,7 @@ public class BombsDialog extends JDialog implements ActionListener {
     private void initGUI() {
         //Using bombCatalog to store the part ID's of the bombs so don't have to keep full spare list in memory
         //and for ease of access later
+        ArrayList<Part> spareParts = campaign.getSpareParts();
         for(Part spare : spareParts) {
             if(spare instanceof AmmoStorage && ((EquipmentPart)spare).getType() instanceof BombType && spare.isPresent()) {
                 int bombType = (BombType.getBombTypeFromInternalName(((AmmoStorage)spare).getType().getInternalName()));
@@ -87,7 +86,6 @@ public class BombsDialog extends JDialog implements ActionListener {
                 availBombs[bombType] = ((AmmoStorage)spare).getShots();
             }
         }
-        spareParts = null;
         
         for (int type = 0; type < BombType.B_NUM; type++) {
             typeMax[type] = availBombs[type] + bombChoices[type];
