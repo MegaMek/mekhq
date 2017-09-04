@@ -34,6 +34,7 @@ import org.w3c.dom.NodeList;
 
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
+import megamek.common.ITechnology;
 import megamek.common.Tank;
 import megamek.common.TargetRoll;
 import megamek.common.TechConstants;
@@ -912,7 +913,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	    //according to StratOps you get a -1 mod when checking on individual parts
 	    //but we will make this user customizable
 	    TargetRoll mods = new TargetRoll(campaign.getCampaignOptions().getMaintenanceBonus(), "maintenance");
-        mods.addModifier(Availability.getTechModifier(getTechRating()), "tech rating " + EquipmentType.getRatingName(getTechRating()));
+        mods.addModifier(Availability.getTechModifier(getTechRating()), "tech rating " + ITechnology.getRatingName(getTechRating()));
 
 	    if(null != unit) {
 	        mods.append(unit.getSiteMod());

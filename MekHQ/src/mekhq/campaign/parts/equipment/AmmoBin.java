@@ -32,6 +32,7 @@ import megamek.common.Aero;
 import megamek.common.AmmoType;
 import megamek.common.CriticalSlot;
 import megamek.common.EquipmentType;
+import megamek.common.ITechnology;
 import megamek.common.Jumpship;
 import megamek.common.Mounted;
 import megamek.common.Protomech;
@@ -767,7 +768,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
         //availability mod
         int avail = getAvailability(campaign.getEra());
         int availabilityMod = Availability.getAvailabilityModifier(avail);
-        target.addModifier(availabilityMod, "availability (" + EquipmentType.getRatingName(avail) + ")");
+        target.addModifier(availabilityMod, "availability (" + ITechnology.getRatingName(avail) + ")");
         return target;
     }
 

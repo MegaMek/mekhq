@@ -30,6 +30,7 @@ import megamek.common.AmmoType;
 import megamek.common.BombType;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
+import megamek.common.ITechnology;
 import megamek.common.Mounted;
 import megamek.common.TargetRoll;
 import mekhq.MekHqXmlUtil;
@@ -362,7 +363,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
         //availability mod
         int avail = getAvailability(campaign.getEra());
         int availabilityMod = Availability.getAvailabilityModifier(avail);
-        target.addModifier(availabilityMod, "availability (" + EquipmentType.getRatingName(avail) + ")");
+        target.addModifier(availabilityMod, "availability (" + ITechnology.getRatingName(avail) + ")");
         return target;
     }
 

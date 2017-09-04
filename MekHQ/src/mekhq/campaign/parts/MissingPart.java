@@ -27,6 +27,7 @@ import java.util.Calendar;
 import java.util.UUID;
 
 import megamek.common.EquipmentType;
+import megamek.common.ITechnology;
 import megamek.common.TargetRoll;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
@@ -259,7 +260,7 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
         	avail = EquipmentType.RATING_X;
         }
         int availabilityMod = Availability.getAvailabilityModifier(avail);
-        target.addModifier(availabilityMod, "availability (" + EquipmentType.getRatingName(avail) + ")");
+        target.addModifier(availabilityMod, "availability (" + ITechnology.getRatingName(avail) + ")");
         
         return target;
     }

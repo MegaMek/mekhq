@@ -36,6 +36,7 @@ import megamek.common.Entity;
 import megamek.common.EntityMovementMode;
 import megamek.common.EntityWeightClass;
 import megamek.common.EquipmentType;
+import megamek.common.ITechnology;
 import megamek.common.Infantry;
 import megamek.common.Mech;
 import megamek.common.MechFileParser;
@@ -305,7 +306,7 @@ public class UnitOrder extends Unit implements IAcquisitionWork, MekHqXmlSeriali
         	avail = EquipmentType.RATING_X;
         }
         int availabilityMod = Availability.getAvailabilityModifier(avail);
-        target.addModifier(availabilityMod, "availability (" + EquipmentType.getRatingName(avail) + ")");      
+        target.addModifier(availabilityMod, "availability (" + ITechnology.getRatingName(avail) + ")");      
         return target;
     }
 

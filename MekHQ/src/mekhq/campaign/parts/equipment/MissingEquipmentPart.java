@@ -173,7 +173,7 @@ public class MissingEquipmentPart extends MissingPart {
 
     @Override
     public int getReIntroDate() {
-    	return getType().getReintruductionDate();
+    	return getType().getReintroductionDate();
     }
 
 	@Override

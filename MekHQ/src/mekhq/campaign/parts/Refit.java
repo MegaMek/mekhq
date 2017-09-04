@@ -39,6 +39,7 @@ import megamek.common.BattleArmor;
 import megamek.common.BipedMech;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
+import megamek.common.ITechnology;
 import megamek.common.Infantry;
 import megamek.common.Mech;
 import megamek.common.MechFileParser;
@@ -1755,7 +1756,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
             roll.addModifier(techBaseMod, "tech limit");
 		}
 		int availabilityMod = Availability.getAvailabilityModifier(avail);
-        roll.addModifier(availabilityMod, "availability (" + EquipmentType.getRatingName(avail) + ")");
+        roll.addModifier(availabilityMod, "availability (" + ITechnology.getRatingName(avail) + ")");
 		return roll;
 	}
 

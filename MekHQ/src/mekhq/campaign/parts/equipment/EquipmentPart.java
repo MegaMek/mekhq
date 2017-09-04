@@ -243,7 +243,7 @@ public class EquipmentPart extends Part {
 
     @Override
     public int getReIntroDate() {
-    	return getType().getReintruductionDate();
+    	return getType().getReintroductionDate();
     }
 
 	@Override

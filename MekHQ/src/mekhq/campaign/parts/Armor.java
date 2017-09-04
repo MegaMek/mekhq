@@ -27,10 +27,14 @@ import java.util.GregorianCalendar;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.common.Aero;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.IArmorState;
+import megamek.common.ITechnology;
 import megamek.common.Tank;
 import megamek.common.TargetRoll;
 import megamek.common.TechConstants;
@@ -40,9 +44,6 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.WorkTime;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  *
@@ -253,7 +254,7 @@ public class Armor extends Part implements IAcquisitionWork {
     	if(null == etype) {
     		return TechConstants.T_TECH_UNKNOWN;
     	}
-    	return etype.getReintruductionDate();
+    	return etype.getReintroductionDate();
     }
     
     @Override
@@ -615,7 +616,7 @@ public class Armor extends Part implements IAcquisitionWork {
         //availability mod
         int avail = getAvailability(campaign.getEra());
         int availabilityMod = Availability.getAvailabilityModifier(avail);
-        target.addModifier(availabilityMod, "availability (" + EquipmentType.getRatingName(avail) + ")");
+        target.addModifier(availabilityMod, "availability (" + ITechnology.getRatingName(avail) + ")");
         return target;
     }
 
