@@ -13,6 +13,7 @@ v0.43.4-git
 	o Make the process much more efficient by not making checks that aren't necessary over and over.
 	o Add additional color-coded messaging when parts can't be fixed due to configuration or
 	  existing techs.
++ Issue #431: When starting a scenario in MegaMek the camo for units seems to be the defaults.
 
 v0.43.3 (2017-07-18 18:30 UTC)
 + Feature: Refactor AtBScenario to break up the monolithic AtBScenario class and to have a separate class for each scenario
