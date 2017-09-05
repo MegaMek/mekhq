@@ -25,7 +25,7 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -54,11 +54,10 @@ public class BombsDialog extends JDialog implements ActionListener {
     private IBomber bomber;
     private Campaign campaign;
     
+    private int[] bombChoices;
     private int[] bombCatalog = new int[BombType.B_NUM];
-    private int[] bombChoices = new int[BombType.B_NUM];
     private int[] availBombs = new int[BombType.B_NUM];
     private int[] typeMax = new int[BombType.B_NUM];
-    private int[] newLoadout = new int[BombType.B_NUM];
 
     private JButton okayButton;
     private JButton cancelButton;
@@ -78,7 +77,7 @@ public class BombsDialog extends JDialog implements ActionListener {
     private void initGUI() {
         //Using bombCatalog to store the part ID's of the bombs so don't have to keep full spare list in memory
         //and for ease of access later
-        ArrayList<Part> spareParts = campaign.getSpareParts();
+        List<Part> spareParts = campaign.getSpareParts();
         for(Part spare : spareParts) {
             if(spare instanceof AmmoStorage && ((EquipmentPart)spare).getType() instanceof BombType && spare.isPresent()) {
                 int bombType = (BombType.getBombTypeFromInternalName(((AmmoStorage)spare).getType().getInternalName()));
@@ -122,20 +121,24 @@ public class BombsDialog extends JDialog implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         if (okayButton.equals(e.getSource())) {
             bombPanel.applyChoice();
-            newLoadout = bombPanel.getChoice();
+            int[] newLoadout = bombPanel.getChoice();
             
             //Get difference between starting bomb load and new bomb load
             for (int type = 0; type < BombType.B_NUM; type++) {
                 if(bombChoices[type] != newLoadout[type]) {
                     newLoadout[type] = bombChoices[type] - newLoadout[type];
-                } else newLoadout[type] = 0;
+                } else {
+                    newLoadout[type] = 0;
+                }
             }
             
             for (int type = 0; type < BombType.B_NUM; type++) {
                 if(newLoadout[type] != 0 && bombCatalog[type] > 0) {
                     AmmoStorage storedBombs = (AmmoStorage) campaign.getPart(bombCatalog[type]);
                     storedBombs.changeShots(newLoadout[type]);
-                    if(storedBombs.getShots() == 0) campaign.removePart(storedBombs);
+                    if(storedBombs.getShots() == 0) {
+                        campaign.removePart(storedBombs);
+                    }
                 }
             }
             
