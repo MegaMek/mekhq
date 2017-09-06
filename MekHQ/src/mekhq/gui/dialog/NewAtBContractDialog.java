@@ -486,7 +486,7 @@ public class NewAtBContractDialog extends NewContractDialog {
 		}
 		if ((contract.getMissionType() < AtBContract.MT_PLANETARYASSAULT ||
 				contract.getMissionType() == AtBContract.MT_RELIEFDUTY) &&
-				!contract.equals("REB")) {
+				!contract.getEnemyCode().equals("REB")) {
 			for (Planet p : RandomFactionGenerator.getInstance().
 					getMissionTargetList(getCurrentEnemyCode(), getCurrentEmployerCode(),
 							campaign.getDate())) {
