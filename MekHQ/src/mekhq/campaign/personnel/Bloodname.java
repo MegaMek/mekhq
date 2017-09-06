@@ -303,7 +303,7 @@ public class Bloodname implements Serializable {
 			 * to be used by those Clans but not by others.
 			 */
 			if (name.isInactive(year) ||
-					(name.isAbjured(year) && !name.getOrigClan().equals(faction)) ||
+					(name.isAbjured(year) && !name.getOrigClan().equals(faction.getCode())) ||
 					0 == name.phenotypeMultiplier(phenotype, year)) {
 				continue;
 			}
@@ -327,7 +327,7 @@ public class Bloodname implements Serializable {
 				 * 1/(number of Clans) instead.
 				 */
 				if (name.getOrigClan().equals(faction.getCode()) ||
-						(null != name.getAbsorbed() && faction.equals(name.getAbsorbed().clan) &&
+						(null != name.getAbsorbed() && faction.getCode().equals(name.getAbsorbed().clan) &&
 						name.getAbsorbed().year > year)) {
 					if (name.isExclusive() || numClans > 1) {
 						weight = new Fraction(1, numClans);
@@ -347,7 +347,7 @@ public class Bloodname implements Serializable {
 					 * among those Clans.
 					 */
 					for (Bloodname.NameAcquired a : name.getAcquiringClans()) {
-						if (faction.equals(a.clan)) {
+						if (faction.getCode().equals(a.clan)) {
 							weight = new Fraction(1, numClans);
 							break;
 						}

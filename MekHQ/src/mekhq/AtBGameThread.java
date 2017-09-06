@@ -102,6 +102,7 @@ public class AtBGameThread extends GameThread {
 
             	client.getLocalPlayer().setCamoCategory(app.getCampaign().getCamoCategory());
                 client.getLocalPlayer().setCamoFileName(app.getCampaign().getCamoFileName());
+                client.getLocalPlayer().setColorIndex(app.getCampaign().getColorIndex());
             	
                 if (started) {
                 	client.getGame().getOptions().loadOptions();
