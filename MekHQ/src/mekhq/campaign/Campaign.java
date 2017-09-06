@@ -6841,8 +6841,9 @@ public class Campaign implements Serializable {
                 if (!(m.getType() instanceof BombType)) {
                     continue;
                 }
-                bombChoices[BombType.getBombTypeFromInternalName(m.getType().getInternalName())]
-                        += m.getBaseShotsLeft();
+                if(m.getBaseShotsLeft() == 0) {
+                    bombChoices[BombType.getBombTypeFromInternalName(m.getType().getInternalName())] -= 1;
+                }
             }
             a.setBombChoices(bombChoices);
             a.clearBombs();

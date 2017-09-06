@@ -277,8 +277,7 @@ class CampaignOpsReputation extends AbstractUnitRating {
 
         }
 
-        forceTotal = totalGround + totalAero + (totalInfantry / 28) +
-                     (totalBattleArmor / 5);
+        forceTotal = totalGround + totalAero + totalInfantry + totalBattleArmor;
         return forceTotal;
     }
 
