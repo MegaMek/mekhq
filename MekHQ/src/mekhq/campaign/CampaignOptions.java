@@ -124,6 +124,7 @@ public class CampaignOptions implements Serializable {
     private boolean allowCanonOnly;
     private boolean allowCanonRefitOnly;
     private int techLevel;
+    private boolean variableTechLevel;
     private boolean useAmmoByType; // Unofficial
 
     //finance related
@@ -310,6 +311,7 @@ public class CampaignOptions implements Serializable {
         usePercentageMaint = false;
         infantryDontCount = false;
         techLevel = TECH_EXPERIMENTAL;
+        variableTechLevel = false;
         scenarioXP = 1;
         killsForXP = 0;
         killXPAward = 0;
@@ -940,6 +942,14 @@ public class CampaignOptions implements Serializable {
 
     public void setAllowCanonRefitOnly(boolean b) {
         allowCanonRefitOnly = b;
+    }
+    
+    public boolean variableTechLevel() {
+        return variableTechLevel;
+    }
+    
+    public void setVariableTechLevel(boolean b) {
+        variableTechLevel = b;
     }
 
     public boolean useAmmoByType() {
@@ -1927,6 +1937,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "allowISPurchases", allowISPurchases);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "allowCanonOnly", allowCanonOnly);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "allowCanonRefitOnly", allowCanonRefitOnly);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "variableTechLevel", variableTechLevel);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useAmmoByType", useAmmoByType);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "usePercentageMaint", usePercentageMaint);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "waitingPeriod", waitingPeriod);
@@ -2298,6 +2309,8 @@ public class CampaignOptions implements Serializable {
                 } else {
                     retVal.useAmmoByType = false;
                 }
+            } else if (wn2.getNodeName().equalsIgnoreCase("variableTechLevel")) {
+                retVal.variableTechLevel = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("usePercentageMaint")) {
                 if (wn2.getTextContent().equalsIgnoreCase("true")) {
                     retVal.usePercentageMaint = true;

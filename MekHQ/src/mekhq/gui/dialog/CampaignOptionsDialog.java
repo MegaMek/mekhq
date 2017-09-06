@@ -314,6 +314,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JCheckBox allowISPurchasesBox;
     private JCheckBox allowCanonOnlyBox;
     private JCheckBox allowCanonRefitOnlyBox;
+    private JCheckBox variableTechLevelBox;
     private JCheckBox useAmmoByTypeBox;
     //private JCheckBox disallowSLUnitsBox;
     private JLabel lblTechLevel;
@@ -489,6 +490,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         allowISPurchasesBox.setSelected(options.allowISPurchases());
         allowCanonOnlyBox.setSelected(options.allowCanonOnly());
         allowCanonRefitOnlyBox.setSelected(options.allowCanonRefitOnly());
+        variableTechLevelBox.setSelected(options.variableTechLevel());
         useAmmoByTypeBox.setSelected(options.useAmmoByType());
 
         useQuirksBox.setSelected(options.useQuirks());
@@ -572,6 +574,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         allowISPurchasesBox = new JCheckBox();
         allowCanonOnlyBox = new JCheckBox();
         allowCanonRefitOnlyBox = new JCheckBox();
+        variableTechLevelBox = new JCheckBox();
         useAmmoByTypeBox = new JCheckBox();
         choiceTechLevel = new JComboBox<String>();
         btnOkay = new JButton();
@@ -1275,12 +1278,23 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panTech.add(choiceTechLevel, gridBagConstraints);
 
+        variableTechLevelBox.setText(resourceMap.getString("variableTechLevel.text")); // NOI18N
+        variableTechLevelBox.setToolTipText(resourceMap.getString("variableTechLevel.toolTipText")); // NOI18N
+        variableTechLevelBox.setName("allowCanonRefitOnlyBox"); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 7;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panTech.add(variableTechLevelBox, gridBagConstraints);
+
         useAmmoByTypeBox.setText(resourceMap.getString("useAmmoByTypeBox.text")); // NOI18N
         useAmmoByTypeBox.setToolTipText(resourceMap.getString("useAmmoByTypeBox.toolTipText")); // NOI18N
         useAmmoByTypeBox.setName("useAmmoByTypeBox"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 7;
+        gridBagConstraints.gridy = 8;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
@@ -4254,6 +4268,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setAllowISPurchases(allowISPurchasesBox.isSelected());
         options.setAllowCanonOnly(allowCanonOnlyBox.isSelected());
         campaign.getGameOptions().getOption("canon_only").setValue(allowCanonOnlyBox.isSelected());
+        options.setVariableTechLevel(variableTechLevelBox.isSelected());
         options.setAllowCanonRefitOnly(allowCanonRefitOnlyBox.isSelected());
         options.setUseAmmoByType(useAmmoByTypeBox.isSelected());
         options.setTechLevel(choiceTechLevel.getSelectedIndex());
