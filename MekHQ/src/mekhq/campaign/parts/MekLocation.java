@@ -49,7 +49,7 @@ public class MekLocation extends Part {
 	private static final long serialVersionUID = -122291037522319765L;
 	protected int loc;
     protected int structureType;
-    protected boolean clan;
+    protected boolean clan; // Only need for Endo-Steel
     protected boolean tsm;
     double percent;
     boolean breached;
@@ -84,6 +84,10 @@ public class MekLocation extends Part {
 
     public int getStructureType() {
         return structureType;
+    }
+    
+    public void setClan(boolean clan) {
+        this.clan = clan;
     }
     
     public MekLocation(int loc, int tonnage, int structureType, boolean clan,

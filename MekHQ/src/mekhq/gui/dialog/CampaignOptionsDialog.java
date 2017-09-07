@@ -1278,8 +1278,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panTech.add(choiceTechLevel, gridBagConstraints);
 
-        variableTechLevelBox.setText(resourceMap.getString("variableTechLevel.text")); // NOI18N
-        variableTechLevelBox.setToolTipText(resourceMap.getString("variableTechLevel.toolTipText")); // NOI18N
+        variableTechLevelBox.setText(resourceMap.getString("variableTechLevelBox.text")); // NOI18N
+        variableTechLevelBox.setToolTipText(resourceMap.getString("variableTechLevelBox.toolTipText")); // NOI18N
         variableTechLevelBox.setName("allowCanonRefitOnlyBox"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;

@@ -92,6 +92,7 @@ import megamek.common.Protomech;
 import megamek.common.SmallCraft;
 import megamek.common.Tank;
 import megamek.common.TargetRoll;
+import megamek.common.TechConstants;
 import megamek.common.loaders.BLKFile;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.logging.LogLevel;
@@ -164,6 +165,7 @@ import mekhq.campaign.parts.MekActuator;
 import mekhq.campaign.parts.MekLocation;
 import mekhq.campaign.parts.MissingEnginePart;
 import mekhq.campaign.parts.MissingMekActuator;
+import mekhq.campaign.parts.MissingMekLocation;
 import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.OmniPod;
 import mekhq.campaign.parts.Part;
@@ -3945,6 +3947,24 @@ public class Campaign implements Serializable {
                 && prt.getTechBase() != Part.T_CLAN) {
                 ((MissingEnginePart) prt).fixClanFlag();
             }
+            
+            if (version.getMajorVersion() == 0
+                    && version.getMinorVersion() < 44
+                    && version.getSnapshot() < 5) {
+                if ((prt instanceof MekLocation)
+                        && (((MekLocation)prt).getStructureType() == EquipmentType.T_STRUCTURE_ENDO_STEEL)) {
+                    if (null != u) {
+                        ((MekLocation)prt).setClan(TechConstants.isClan(u.getEntity().getStructureTechLevel()));
+                    } else {
+                        ((MekLocation)prt).setClan(retVal.getFaction().isClan());
+                    }
+                } else if ((prt instanceof MissingMekLocation)
+                        && (((MissingMekLocation)prt).getStructureType() == EquipmentType.T_STRUCTURE_ENDO_STEEL)) {
+                    if (null != u) {
+                        ((MissingMekLocation)prt).setClan(TechConstants.isClan(u.getEntity().getStructureTechLevel()));
+                    }
+                }
+            }
 
         }
         for (Part prt : removeParts) {
@@ -4902,7 +4922,7 @@ public class Campaign implements Serializable {
                 retVal.addPartWithoutId(p);
             }
         }
-
+        
         MekHQ.getLogger().log(Campaign.class, METHOD_NAME, LogLevel.INFO,
                 "Load Part Nodes Complete!"); //$NON-NLS-1$
     }

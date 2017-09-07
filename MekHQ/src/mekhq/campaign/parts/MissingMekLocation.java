@@ -42,7 +42,7 @@ public class MissingMekLocation extends MissingPart {
 	private static final long serialVersionUID = -122291037522319765L;
 	protected int loc;
     protected int structureType;
-    protected boolean clan;
+    protected boolean clan; // Needed for Endo-steel
     protected boolean tsm;
     protected double percent;
     protected boolean forQuad;
@@ -57,6 +57,10 @@ public class MissingMekLocation extends MissingPart {
 
     public int getStructureType() {
         return structureType;
+    }
+
+    public void setClan(boolean clan) {
+        this.clan = clan;
     }
 
     public MissingMekLocation(int loc, int tonnage, int structureType, boolean clan, boolean hasTSM, boolean quad, Campaign c) {
