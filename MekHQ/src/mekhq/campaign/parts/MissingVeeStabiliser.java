@@ -25,6 +25,7 @@ import java.io.PrintWriter;
 
 import megamek.common.EquipmentType;
 import megamek.common.Tank;
+import megamek.common.TechAdvancement;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 
@@ -84,13 +85,8 @@ public class MissingVeeStabiliser extends MissingPart {
 	}
 
 	@Override
-	public int getTechRating() {
-		return EquipmentType.RATING_C;
-	}
-
-	@Override
 	public int getAvailability(int era) {
-		return EquipmentType.RATING_C;
+		return EquipmentType.RATING_B;
 	}
 	
 	@Override
@@ -147,20 +143,10 @@ public class MissingVeeStabiliser extends MissingPart {
 		return unit.getEntity().getLocationName(loc);
 	}
 	
-	@Override
-	public int getIntroDate() {
-		return EquipmentType.DATE_NONE;
-	}
-
-	@Override
-	public int getExtinctDate() {
-		return EquipmentType.DATE_NONE;
-	}
-
-	@Override
-	public int getReIntroDate() {
-		return EquipmentType.DATE_NONE;
-	}
+    @Override
+    public TechAdvancement getTechAdvancement() {
+        return TankLocation.TECH_ADVANCEMENT;
+    }
 	
 	
 }

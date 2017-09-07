@@ -23,15 +23,14 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import megamek.common.CriticalSlot;
-import megamek.common.EquipmentType;
-import megamek.common.Protomech;
-import megamek.common.TechConstants;
-import mekhq.MekHqXmlUtil;
-import mekhq.campaign.Campaign;
-
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import megamek.common.CriticalSlot;
+import megamek.common.Protomech;
+import megamek.common.TechAdvancement;
+import mekhq.MekHqXmlUtil;
+import mekhq.campaign.Campaign;
 
 /**
  *
@@ -105,30 +104,6 @@ public class MissingProtomekArmActuator extends MissingPart {
     }
 
     @Override
-    public int getAvailability(int era) {
-        if(era == EquipmentType.ERA_CLAN) {
-            return EquipmentType.RATING_D;
-        } else {
-            return EquipmentType.RATING_X;
-        }
-    }
-
-    @Override
-    public int getTechRating() {
-        return EquipmentType.RATING_D;
-    }
-    
-    @Override
-    public int getTechBase() {
-        return T_CLAN;
-    }
-    
-    @Override
-    public int getTechLevel() {
-        return TechConstants.T_CLAN_TW;
-    }
-
-    @Override
     public void updateConditionFromPart() {
         if(null != unit) {
               unit.destroySystem(CriticalSlot.TYPE_SYSTEM, Protomech.SYSTEM_ARMCRIT, location, 1);
@@ -181,18 +156,8 @@ public class MissingProtomekArmActuator extends MissingPart {
 	}
 	
 	@Override
-	public int getIntroDate() {
-		return 3055;
-	}
-
-	@Override
-	public int getExtinctDate() {
-		return EquipmentType.DATE_NONE;
-	}
-
-	@Override
-	public int getReIntroDate() {
-		return EquipmentType.DATE_NONE;
+	public TechAdvancement getTechAdvancement() {
+	    return ProtomekLocation.TECH_ADVANCEMENT;
 	}
 	
 	@Override

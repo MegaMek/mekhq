@@ -24,6 +24,9 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.common.BattleArmor;
 import megamek.common.Compute;
 import megamek.common.Entity;
@@ -35,7 +38,7 @@ import megamek.common.MechFileParser;
 import megamek.common.MechSummary;
 import megamek.common.MechSummaryCache;
 import megamek.common.TargetRoll;
-import megamek.common.TechConstants;
+import megamek.common.TechAdvancement;
 import megamek.common.loaders.EntityLoadingException;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
@@ -44,9 +47,6 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  * Battle Armor suits are crazy - you cant crit the equipment in them, so
@@ -413,51 +413,7 @@ public class BattleArmorSuit extends Part {
             }
         }
     }
-
-    @Override
-    public int getAvailability(int era) {
-        int chassisAvail = EquipmentType.RATING_E;
-        if(weightClass > EntityWeightClass.WEIGHT_ULTRA_LIGHT) {
-            if(era == EquipmentType.ERA_SW) {
-                chassisAvail = EquipmentType.RATING_F;
-            }
-        }
-        else if(era < EquipmentType.ERA_CLAN) {
-            chassisAvail = EquipmentType.RATING_X;
-        }
-        if(jumpType == EntityMovementMode.INF_UMU || jumpType == EntityMovementMode.VTOL) {
-            chassisAvail = EquipmentType.RATING_F;
-        }
-        return chassisAvail;
-    }
-
-    @Override
-    public int getTechRating() {
-        int rating = EquipmentType.RATING_E;
-        if(weightClass < EntityWeightClass.WEIGHT_LIGHT) {
-            rating = EquipmentType.RATING_D;
-        }
-        return rating;
-    }
-
-    @Override
-    public int getTechLevel() {
-        if(clan) {
-            return TechConstants.T_CLAN_TW;
-        } else {
-            return TechConstants.T_IS_TW_NON_BOX;
-        }
-    }
-
-    @Override
-    public int getTechBase() {
-        if(clan) {
-            return T_CLAN;
-        } else {
-            return T_IS;
-        }
-    }
-
+    
     @Override
     public void fix() {
         super.fix();
@@ -695,20 +651,15 @@ public class BattleArmorSuit extends Part {
     }
 
     @Override
-	public int getIntroDate() {
+	public int getIntroductionDate() {
     	return introYear;
 	}
 
-	@Override
-	public int getExtinctDate() {
-		return EquipmentType.DATE_NONE;
-	}
+    @Override
+    public TechAdvancement getTechAdvancement() {
+        return BattleArmor.getConstructionTechAdvancement(weightClass);
+    }
 
-	@Override
-	public int getReIntroDate() {
-		return EquipmentType.DATE_NONE;
-	}
-	
 	@Override
 	public int getMassRepairOptionType() {
     	return Part.REPAIR_PART_TYPE.ARMOR;

@@ -46,6 +46,7 @@ import megamek.common.MechFileParser;
 import megamek.common.MechSummary;
 import megamek.common.MechSummaryCache;
 import megamek.common.TargetRoll;
+import megamek.common.TechAdvancement;
 import megamek.common.WeaponType;
 import megamek.common.loaders.BLKFile;
 import megamek.common.loaders.EntityLoadingException;
@@ -1750,7 +1751,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 	                techBaseMod = penalty;
 	            }
 	        }
-		    avail = Math.max(avail, part.getAvailability(campaign.getEra()));
+		    avail = Math.max(avail, part.getAvailability());
 		}
 		if(techBaseMod > 0) {
             roll.addModifier(techBaseMod, "tech limit");
@@ -1997,21 +1998,16 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 	}
 
 	@Override
-	public int getIntroDate() {
-		return EquipmentType.DATE_NONE;
-	}
-
-	@Override
-	public int getExtinctDate() {
-		return EquipmentType.DATE_NONE;
-	}
-
-	@Override
-	public int getReIntroDate() {
-		return EquipmentType.DATE_NONE;
+	public TechAdvancement getTechAdvancement() {
+	    return TA_GENERIC;
 	}
 
 	public boolean isBeingRefurbished() {
         return isRefurbishing;
+    }
+
+    @Override
+    public boolean isExtinctIn(int year) {
+        return false;
     }
 }

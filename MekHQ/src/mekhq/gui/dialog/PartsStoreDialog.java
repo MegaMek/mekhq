@@ -338,6 +338,8 @@ public class PartsStoreDialog extends javax.swing.JDialog {
         	public boolean include(Entry<? extends PartsTableModel, ? extends Integer> entry) {
         		PartsTableModel partsModel = entry.getModel();
         		Part part = partsModel.getPartAt(entry.getIdentifier());
+        		int year = campaign.getCalendar().get(Calendar.YEAR);
+        		boolean clan = campaign.getFaction().isClan();
         		if(txtFilter.getText().length() > 0 && !part.getName().toLowerCase().contains(txtFilter.getText().toLowerCase())) {
                     return false;
                 }
@@ -347,14 +349,15 @@ public class PartsStoreDialog extends javax.swing.JDialog {
     			if(part.getTechBase() == Part.T_IS && !campaign.getCampaignOptions().allowISPurchases()) {
     				return false;
     			}
-    			if(campaign.getCampaignOptions().getTechLevel() < Utilities.getSimpleTechLevel(part.getTechLevel())) {
+    			if(campaign.getCampaignOptions().getTechLevel() < Utilities.getSimpleTechLevel(part.getTechLevel(year, clan))) {
     				return false;
     			}
-    			if(campaign.getCampaignOptions().limitByYear() && !part.isIntroducedBy(campaign.getCalendar().get(Calendar.YEAR))) {
+    			if(campaign.getCampaignOptions().limitByYear() && !part.isAvailableIn(year, clan)) {
     				return false;
     			}
     			if(campaign.getCampaignOptions().disallowExtinctStuff() &&
-    	        		(part.isExtinctIn(campaign.getCalendar().get(Calendar.YEAR)) || part.getAvailability(campaign.getEra()) == EquipmentType.RATING_X)) {
+    	        		(part.isExtinct(campaign.getCalendar().get(Calendar.YEAR), campaign.getFaction().isClan())
+    	        		        || part.getAvailability() == EquipmentType.RATING_X)) {
     	        	return false;
     	        }
     			//TODO: limit by year

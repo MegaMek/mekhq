@@ -24,11 +24,13 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 
+import megamek.common.BattleArmor;
 import megamek.common.EntityMovementMode;
 import megamek.common.EntityWeightClass;
 import megamek.common.EquipmentType;
 import megamek.common.IArmorState;
 import megamek.common.TargetRoll;
+import megamek.common.TechAdvancement;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.equipment.BattleArmorEquipmentPart;
@@ -384,19 +386,13 @@ public class MissingBattleArmorSuit extends MissingPart {
 		return bestPart;
 	}
 
-	@Override
-	public int getIntroDate() {
-    	return ((BattleArmorSuit)getNewPart()).getIntroDate();
-	}
+    @Override
+    public int getIntroductionDate() {
+        return ((BattleArmorSuit)getNewPart()).getIntroductionDate();
+    }
 
-	@Override
-	public int getExtinctDate() {
-		return EquipmentType.DATE_NONE;
-	}
-
-	@Override
-	public int getReIntroDate() {
-		return EquipmentType.DATE_NONE;
-	}
-
+    @Override
+    public TechAdvancement getTechAdvancement() {
+        return BattleArmor.getConstructionTechAdvancement(weightClass);
+    }
 }

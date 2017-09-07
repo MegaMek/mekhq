@@ -256,7 +256,7 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
         }
         //availability mod
         int avail = getAvailability(campaign.getEra());
-        if(this.isExtinctIn(campaign.getCalendar().get(Calendar.YEAR))) {
+        if(this.isExtinct(campaign.getCalendar().get(Calendar.YEAR), campaign.getFaction().isClan())) {
         	avail = EquipmentType.RATING_X;
         }
         int availabilityMod = Availability.getAvailabilityModifier(avail);
@@ -428,6 +428,16 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 	@Override
 	public boolean needsMaintenance() {
         return false;
+    }
+	
+	@Override
+	public int getAvailability(int era) {
+	    return getBaseAvailability(era);
+	}
+
+    @Override
+    public boolean isExtinctIn(int year) {
+        return this.isExtinct(year);
     }
 }
 

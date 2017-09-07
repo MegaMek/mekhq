@@ -6106,7 +6106,7 @@ public class Campaign implements Serializable {
         if (getCampaignOptions().getUseAtB() &&
         		getCampaignOptions().getRestrictPartsByMission() &&
         		acquisition instanceof Part) {
-        	int partAvailability = ((Part)acquisition).getAvailability(getEra());
+        	int partAvailability = ((Part)acquisition).getAvailability();
     		EquipmentType et = null;
     		if (acquisition instanceof EquipmentPart) {
     			et = ((EquipmentPart)acquisition).getType();

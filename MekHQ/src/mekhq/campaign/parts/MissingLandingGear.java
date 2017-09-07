@@ -26,6 +26,7 @@ import megamek.common.CriticalSlot;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.LandAirMech;
+import megamek.common.TechAdvancement;
 import mekhq.campaign.Campaign;
 
 import org.w3c.dom.Node;
@@ -87,12 +88,6 @@ public class MissingLandingGear extends MissingPart {
 	}
 
 	@Override
-	public int getAvailability(int era) {
-		//go with conventional fighter avionics
-		return EquipmentType.RATING_C;
-	}
-
-	@Override
 	public void updateConditionFromPart() {
 		if(null != unit && unit.getEntity() instanceof Aero) {
 			((Aero)unit.getEntity()).setGearHit(true);
@@ -117,19 +112,9 @@ public class MissingLandingGear extends MissingPart {
 		return Entity.LOC_NONE;
 	}
 	
-	@Override
-	public int getIntroDate() {
-		return EquipmentType.DATE_NONE;
-	}
-
-	@Override
-	public int getExtinctDate() {
-		return EquipmentType.DATE_NONE;
-	}
-
-	@Override
-	public int getReIntroDate() {
-		return EquipmentType.DATE_NONE;
-	}
+    @Override
+    public TechAdvancement getTechAdvancement() {
+        return TA_GENERIC;
+    }
 	
 }

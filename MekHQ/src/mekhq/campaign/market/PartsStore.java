@@ -531,25 +531,33 @@ public class PartsStore implements Serializable {
 		for(int loc = Mech.LOC_HEAD; loc <= Mech.LOC_LLEG; loc++) {
 			for(int ton = 20; ton <= 100; ton=ton+5) {
 				for(int type = 0; type < EquipmentType.structureNames.length; type++) {
-					if(loc == Mech.LOC_HEAD) {
-					    //for(int ctype = Mech.COCKPIT_STANDARD; ctype < Mech.COCKPIT_STRING.length; ctype++) {
-					        parts.add(new MekLocation(loc, ton, type, false, false, true, true, c));
-	                        parts.add(new MekLocation(loc, ton, type, true, false, true, true, c));
-					        parts.add(new MekLocation(loc, ton, type, false, false, false, false, c));
-	                        parts.add(new MekLocation(loc, ton, type, true, false, false, false, c));
-				        //}
-					} else {
-    				    parts.add(new MekLocation(loc, ton, type, false, false, false, false, c));
-    					parts.add(new MekLocation(loc, ton, type, true, false, false, false, c));
-    					if(loc > Mech.LOC_LT) {
-    						parts.add(new MekLocation(loc, ton, type, false, true, false, false, c));
-    						parts.add(new MekLocation(loc, ton, type, true, true, false, false, c));
-    					}
+					addMekLocation(c, loc, ton, type, false);
+					// The only structure that differs between IS and Clan versions is Endo-Steel
+					if (EquipmentType.T_STRUCTURE_ENDO_STEEL == type) {
+	                    addMekLocation(c, loc, ton, type, true);
 					}
 				}
 			}
 		}
 	}
+
+    private void addMekLocation(Campaign c, int loc, int ton, int type, boolean clan) {
+        if(loc == Mech.LOC_HEAD) {
+            //for(int ctype = Mech.COCKPIT_STANDARD; ctype < Mech.COCKPIT_STRING.length; ctype++) {
+                parts.add(new MekLocation(loc, ton, type, clan, false, false, true, true, c));
+                parts.add(new MekLocation(loc, ton, type, clan, true, false, true, true, c));
+                parts.add(new MekLocation(loc, ton, type, clan, false, false, false, false, c));
+                parts.add(new MekLocation(loc, ton, type, clan, true, false, false, false, c));
+            //}
+        } else {
+            parts.add(new MekLocation(loc, ton, type, clan, false, false, false, false, c));
+        	parts.add(new MekLocation(loc, ton, type, clan, true, false, false, false, c));
+        	if(loc > Mech.LOC_LT) {
+        		parts.add(new MekLocation(loc, ton, type, clan, false, true, false, false, c));
+        		parts.add(new MekLocation(loc, ton, type, clan, true, true, false, false, c));
+        	}
+        }
+    }
 
 	private void stockProtomekLocations(Campaign c) {
 	    for(int loc = Protomech.LOC_HEAD; loc <= Protomech.LOC_MAINGUN; loc++) {

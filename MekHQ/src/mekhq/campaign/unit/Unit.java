@@ -1974,7 +1974,9 @@ public class Unit implements MekHqXmlSerializable {
             }
             if(null == locations[i]) {
                 if(entity instanceof Mech) {
-                    MekLocation mekLocation = new MekLocation(i, (int) getEntity().getWeight(), getEntity().getStructureType(), hasTSM(), entity instanceof QuadMech, false, false, campaign);
+                    MekLocation mekLocation = new MekLocation(i, (int) getEntity().getWeight(),
+                            getEntity().getStructureType(), TechConstants.isClan(entity.getStructureTechLevel()),
+                            hasTSM(), entity instanceof QuadMech, false, false, campaign);
                     addPart(mekLocation);
                     partsToAdd.add(mekLocation);
                 } else if(entity instanceof Protomech && i != Protomech.LOC_NMISS) {
@@ -2120,6 +2122,9 @@ public class Unit implements MekHqXmlSerializable {
                             m.isOmniPodMounted(), campaign);
                     addPart(epart);
                     partsToAdd.add(epart);
+                    if (entity.hasETypeFlag(Entity.ETYPE_PROTOMECH)) {
+                        protoJumpJets.add(epart);
+                    }
                 }
             } else {
                 int eqnum = entity.getEquipmentNum(m);
@@ -2327,7 +2332,7 @@ public class Unit implements MekHqXmlSerializable {
                 ((AeroLifeSupport)lifeSupport).calculateCost();
             }
             if(null == dropCollar && entity instanceof Dropship) {
-                dropCollar = new DropshipDockingCollar((int) entity.getWeight(), campaign);
+                dropCollar = new DropshipDockingCollar((int) entity.getWeight(), campaign, true);
                 addPart(dropCollar);
                 partsToAdd.add(dropCollar);
             }
@@ -2416,14 +2421,19 @@ public class Unit implements MekHqXmlSerializable {
                 }
             }
             if(null == infantryArmor) {
-                infantryArmor = new InfantryArmorPart(0, campaign, ((Infantry)entity).getDamageDivisor(), ((Infantry)entity).isArmorEncumbering(), ((Infantry)entity).hasDEST(), ((Infantry)entity).hasSneakCamo(), ((Infantry)entity).hasSneakECM(), ((Infantry)entity).hasSneakIR(), ((Infantry)entity).hasSpaceSuit());
-                if(infantryArmor.getStickerPrice() > 0) {
-                    int number = ((Infantry)entity).getOInternal(Infantry.LOC_INFANTRY);
-                    while(number > 0) {
-                        infantryArmor = new InfantryArmorPart(0, campaign, ((Infantry)entity).getDamageDivisor(), ((Infantry)entity).isArmorEncumbering(), ((Infantry)entity).hasDEST(), ((Infantry)entity).hasSneakCamo(), ((Infantry)entity).hasSneakECM(), ((Infantry)entity).hasSneakIR(), ((Infantry)entity).hasSpaceSuit());
-                        addPart(infantryArmor);
-                        partsToAdd.add(infantryArmor);
-                        number--;
+                EquipmentType eq = ((Infantry)entity).getArmorKit();
+                if (null != eq) {
+                    infantryArmor = new EquipmentPart(0, eq, 0, false, campaign);
+                } else {
+                    infantryArmor = new InfantryArmorPart(0, campaign, ((Infantry)entity).getDamageDivisor(), ((Infantry)entity).isArmorEncumbering(), ((Infantry)entity).hasDEST(), ((Infantry)entity).hasSneakCamo(), ((Infantry)entity).hasSneakECM(), ((Infantry)entity).hasSneakIR(), ((Infantry)entity).hasSpaceSuit());
+                    if(infantryArmor.getStickerPrice() > 0) {
+                        int number = ((Infantry)entity).getOInternal(Infantry.LOC_INFANTRY);
+                        while(number > 0) {
+                            infantryArmor = new InfantryArmorPart(0, campaign, ((Infantry)entity).getDamageDivisor(), ((Infantry)entity).isArmorEncumbering(), ((Infantry)entity).hasDEST(), ((Infantry)entity).hasSneakCamo(), ((Infantry)entity).hasSneakECM(), ((Infantry)entity).hasSneakIR(), ((Infantry)entity).hasSpaceSuit());
+                            addPart(infantryArmor);
+                            partsToAdd.add(infantryArmor);
+                            number--;
+                        }
                     }
                 }
             }
@@ -3604,13 +3614,13 @@ public class Unit implements MekHqXmlSerializable {
         //take the highest availability of all parts
         int availability = EquipmentType.RATING_A;
         for(Part p : parts) {
-            int newAvailability = p.getAvailability(era);
+            int newAvailability = p.getAvailability();
             //Taharqa: its not clear whether a unit should really be considered extinct
             //when its parts are extinct as many probably outlive the production of parts
             //it would be better to just use the unit extinction date itself, but given
             //that there are no canon extinction/reintro dates for units, we will use this
             //instead
-            if(p.isExtinctIn(campaign.getCalendar().get(Calendar.YEAR))) {
+            if(p.isExtinct(campaign.getCalendar().get(Calendar.YEAR), campaign.getFaction().isClan())) {
                 newAvailability = EquipmentType.RATING_X;
             }
             if(newAvailability > availability) {

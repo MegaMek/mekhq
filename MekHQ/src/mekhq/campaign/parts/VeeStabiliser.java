@@ -23,16 +23,16 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.common.Compute;
 import megamek.common.EquipmentType;
 import megamek.common.Tank;
-import megamek.common.TechConstants;
+import megamek.common.TechAdvancement;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.SkillType;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  *
@@ -41,7 +41,7 @@ import org.w3c.dom.NodeList;
 public class VeeStabiliser extends Part {
 	private static final long serialVersionUID = 6708245721569856817L;
 
-	private int loc;
+    private int loc;
 	
 	public VeeStabiliser() {
 		this(0, 0, null);
@@ -88,18 +88,8 @@ public class VeeStabiliser extends Part {
 	}
 
 	@Override
-	public int getAvailability(int era) {
-		return EquipmentType.RATING_C;
-	}
-
-	@Override
-	public int getTechRating() {
-		return EquipmentType.RATING_C;
-	}
-
-    @Override
-	public int getTechLevel() {
-		return TechConstants.T_ALLOWED_ALL;
+	public int getBaseAvailability(int era) {
+		return EquipmentType.RATING_B;
 	}
 
 	@Override
@@ -229,19 +219,9 @@ public class VeeStabiliser extends Part {
 		return unit.getEntity().getLocationName(loc);
 	}
 	
-	@Override
-	public int getIntroDate() {
-		return EquipmentType.DATE_NONE;
-	}
-
-	@Override
-	public int getExtinctDate() {
-		return EquipmentType.DATE_NONE;
-	}
-
-	@Override
-	public int getReIntroDate() {
-		return EquipmentType.DATE_NONE;
-	}
+    @Override
+    public TechAdvancement getTechAdvancement() {
+        return TankLocation.TECH_ADVANCEMENT;
+    }
 	
 }

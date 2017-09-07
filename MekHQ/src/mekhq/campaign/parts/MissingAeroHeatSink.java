@@ -24,6 +24,7 @@ package mekhq.campaign.parts;
 import megamek.common.Aero;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
+import megamek.common.TechAdvancement;
 import mekhq.campaign.Campaign;
 
 import org.w3c.dom.Node;
@@ -129,31 +130,18 @@ public class MissingAeroHeatSink extends MissingPart {
 		return Entity.LOC_NONE;
 	}
 	
-	@Override
-	public int getIntroDate() {
-		if(type == Aero.HEAT_DOUBLE) {
-			return 2567;
-		}
-		return EquipmentType.DATE_NONE;
-	}
+    @Override
+    public TechAdvancement getTechAdvancement() {
+        if (type == Aero.HEAT_SINGLE) {
+            return AeroHeatSink.TA_SINGLE;
+        } else if (campaign.getFaction().isClan()) {
+            return AeroHeatSink.TA_CLAN_DOUBLE;
+        } else {
+            return AeroHeatSink.TA_IS_DOUBLE;
+        }
+    }
 
-	@Override
-	public int getExtinctDate() {
-		//TODO: we should distinguish clan and IS here for extinction purposes
-		/*if(type == Aero.HEAT_DOUBLE) {
-		 * if(!isClan()) {
-				return 2865;
-			}
-		}*/
-		return EquipmentType.DATE_NONE;
-	}
-
-	@Override
-	public int getReIntroDate() {
-		return 3040;
-	}
-	
-	@Override
+    @Override
 	public boolean isOmniPoddable() {
 	    return true;
 	}

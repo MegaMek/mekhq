@@ -23,6 +23,9 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.common.CriticalSlot;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
@@ -31,15 +34,12 @@ import megamek.common.ILocationExposureStatus;
 import megamek.common.Mech;
 import megamek.common.Mounted;
 import megamek.common.TargetRoll;
-import megamek.common.TechConstants;
+import megamek.common.TechAdvancement;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.work.WorkTime;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  *
@@ -49,6 +49,7 @@ public class MekLocation extends Part {
 	private static final long serialVersionUID = -122291037522319765L;
 	protected int loc;
     protected int structureType;
+    protected boolean clan;
     protected boolean tsm;
     double percent;
     boolean breached;
@@ -60,11 +61,12 @@ public class MekLocation extends Part {
     protected boolean lifeSupport;
 
     public MekLocation() {
-    	this(0, 0, 0, false, false, false, false, null);
+    	this(0, 0, 0, false, false, false, false, false, null);
     }
     
     public MekLocation clone() {
-    	MekLocation clone = new MekLocation(loc, getUnitTonnage(), structureType, tsm, forQuad, sensors, lifeSupport, campaign);
+    	MekLocation clone = new MekLocation(loc, getUnitTonnage(), structureType, clan,
+    	        tsm, forQuad, sensors, lifeSupport, campaign);
         clone.copyBaseData(this);
     	clone.percent = this.percent;
     	clone.breached = this.breached;
@@ -84,10 +86,12 @@ public class MekLocation extends Part {
         return structureType;
     }
     
-    public MekLocation(int loc, int tonnage, int structureType, boolean hasTSM, boolean quad, boolean sensors, boolean lifeSupport, Campaign c) {
+    public MekLocation(int loc, int tonnage, int structureType, boolean clan,
+            boolean hasTSM, boolean quad, boolean sensors, boolean lifeSupport, Campaign c) {
         super(tonnage, c);
         this.loc = loc;
         this.structureType = structureType;
+        this.clan = clan;
         this.tsm = hasTSM;
         this.percent = 1.0;
         this.forQuad = quad;
@@ -135,7 +139,9 @@ public class MekLocation extends Part {
         	}
             break;
         }
-        if(structureType != EquipmentType.T_STRUCTURE_STANDARD) {
+        if (EquipmentType.T_STRUCTURE_ENDO_STEEL == structureType) {
+            this.name += " (" + EquipmentType.getStructureTypeName(structureType, isClan()) + ")";
+        } else if(structureType != EquipmentType.T_STRUCTURE_STANDARD) {
             this.name += " (" + EquipmentType.getStructureTypeName(structureType) + ")";
         }
         if(tsm) {
@@ -181,6 +187,8 @@ public class MekLocation extends Part {
                 && getUnitTonnage() == ((MekLocation)part).getUnitTonnage()
                 && isTsm() == ((MekLocation)part).isTsm()
                 && getStructureType() == ((MekLocation) part).getStructureType()
+                && ((getStructureType() != EquipmentType.T_STRUCTURE_ENDO_STEEL)
+                        || (isClan() == part.isClan()))
                 && (!isArm() || forQuad == ((MekLocation)part).forQuad)
                 && hasSensors() == ((MekLocation)part).hasSensors()
                 && hasLifeSupport() == ((MekLocation)part).hasLifeSupport();
@@ -276,89 +284,6 @@ public class MekLocation extends Part {
 	}
 
 	@Override
-	public int getAvailability(int era) {
-		switch(structureType) {
-		case EquipmentType.T_STRUCTURE_ENDO_STEEL:
-		case EquipmentType.T_STRUCTURE_ENDO_PROTOTYPE:
-			if(era == EquipmentType.ERA_SL) {
-				return EquipmentType.RATING_D;
-			} else if(era == EquipmentType.ERA_SW) {
-				return EquipmentType.RATING_F;
-			} else {
-				return EquipmentType.RATING_E;
-			}
-		case EquipmentType.T_STRUCTURE_ENDO_COMPOSITE:
-			if(era == EquipmentType.ERA_SL) {
-				return EquipmentType.RATING_X;
-			} else if(era == EquipmentType.ERA_SW) {
-				return EquipmentType.RATING_X;
-			} else {
-				return EquipmentType.RATING_F;
-			}
-		case EquipmentType.T_STRUCTURE_REINFORCED:
-		case EquipmentType.T_STRUCTURE_COMPOSITE:
-			if(era == EquipmentType.ERA_SL) {
-				return EquipmentType.RATING_X;
-			} else if(era == EquipmentType.ERA_SW) {
-				return EquipmentType.RATING_X;
-			} else {
-				return EquipmentType.RATING_E;
-			}
-		case EquipmentType.T_STRUCTURE_INDUSTRIAL:
-		default:
-			return EquipmentType.RATING_C;	
-		}
-	}
-
-	@Override
-	public int getTechRating() {
-		switch(structureType) {
-		case EquipmentType.T_STRUCTURE_ENDO_STEEL:
-		case EquipmentType.T_STRUCTURE_ENDO_PROTOTYPE:
-			return EquipmentType.RATING_E;
-		case EquipmentType.T_STRUCTURE_ENDO_COMPOSITE:
-		case EquipmentType.T_STRUCTURE_REINFORCED:
-		case EquipmentType.T_STRUCTURE_COMPOSITE:
-			return EquipmentType.RATING_E;
-		case EquipmentType.T_STRUCTURE_INDUSTRIAL:
-			return EquipmentType.RATING_C;
-		default:
-			return EquipmentType.RATING_D;
-		}
-		
-	}
-	
-	@Override
-	public int getTechLevel() {
-		switch(structureType) {
-		case EquipmentType.T_STRUCTURE_ENDO_COMPOSITE:
-		case EquipmentType.T_STRUCTURE_REINFORCED:
-		case EquipmentType.T_STRUCTURE_COMPOSITE:
-	    case EquipmentType.T_STRUCTURE_ENDO_PROTOTYPE:
-			return TechConstants.T_IS_EXPERIMENTAL;
-	    case EquipmentType.T_STRUCTURE_ENDO_STEEL:
-            return TechConstants.T_IS_TW_NON_BOX;
-		default:
-		    if(tsm) {
-		        return TechConstants.T_IS_TW_NON_BOX;
-		    } else {
-		        return TechConstants.T_INTRO_BOXSET;
-		    }
-		}
-	}
-	
-	@Override
-	public int getTechBase() {
-		switch(structureType) {
-		case EquipmentType.T_STRUCTURE_COMPOSITE:
-			return T_IS;
-		default:
-			return T_BOTH;
-		}
-		
-	}
-
-	@Override
 	public void fix() {
 		super.fix();
 		if(isBlownOff()) {
@@ -401,7 +326,7 @@ public class MekLocation extends Part {
 
 	@Override
 	public MissingPart getMissingPart() {
-		return new MissingMekLocation(loc, getUnitTonnage(), structureType, tsm, forQuad, campaign);
+		return new MissingMekLocation(loc, getUnitTonnage(), structureType, clan, tsm, forQuad, campaign);
 	}
 
 	@Override
@@ -830,48 +755,8 @@ public class MekLocation extends Part {
 	}
 	
 	@Override
-	public int getIntroDate() {
-		//TODO: I need a clan tag in order to distinguish some of these
-		//I believe there is also a bug about differences between IS/Clan IS
-		int currentDate;
-		switch(structureType) {
-		case EquipmentType.T_STRUCTURE_ENDO_COMPOSITE:
-			currentDate = 3067;
-			break;
-		case EquipmentType.T_STRUCTURE_REINFORCED:
-			currentDate = 3057;
-			break;
-		case EquipmentType.T_STRUCTURE_COMPOSITE:
-			currentDate = 3061;
-			break;
-		case EquipmentType.T_STRUCTURE_INDUSTRIAL:
-			currentDate = 2350;
-			break;
-		case EquipmentType.T_STRUCTURE_STANDARD:
-			currentDate = 2439;
-			break;
-		case EquipmentType.T_STRUCTURE_ENDO_PROTOTYPE:
-		case EquipmentType.T_STRUCTURE_ENDO_STEEL:
-			currentDate = 2487;
-			break;
-		default:
-			currentDate = EquipmentType.DATE_NONE;
-		}
-		if(tsm && currentDate < 3050) {
-			currentDate = 3050;
-		}
-		return currentDate;
-	}
-
-	@Override
-	public int getExtinctDate() {
-		//TOD: endo steel should go extinct for IS, but I have no way to distinguish
-		return EquipmentType.DATE_NONE;
-	}
-
-	@Override
-	public int getReIntroDate() {
-		return EquipmentType.DATE_NONE;
+	public TechAdvancement getTechAdvancement() {
+	    return EquipmentType.getStructureTechAdvancement(structureType, clan);
 	}
 	
 	@Override

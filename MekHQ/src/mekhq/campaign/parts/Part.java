@@ -24,6 +24,7 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Hashtable;
 import java.util.StringJoiner;
 import java.util.UUID;
@@ -35,9 +36,10 @@ import org.w3c.dom.NodeList;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.ITechnology;
+import megamek.common.SimpleTechLevel;
 import megamek.common.Tank;
 import megamek.common.TargetRoll;
-import megamek.common.TechConstants;
+import megamek.common.TechAdvancement;
 import megamek.common.WeaponType;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
@@ -68,7 +70,7 @@ import mekhq.campaign.work.WorkTime;
  * this work
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public abstract class Part implements Serializable, MekHqXmlSerializable, IPartWork {
+public abstract class Part implements Serializable, MekHqXmlSerializable, IPartWork, ITechnology {
 	private static final long serialVersionUID = 6185232893259168810L;
 	public static final int PART_TYPE_ARMOR = 0;
 	public static final int PART_TYPE_WEAPON = 1;
@@ -117,6 +119,13 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 			"Equipment Part", "Mek Actuator", "Mek Engine", "Mek Gyro",
 			"Mek Life Support", "Mek Body Part", "Mek Sensor",
 			"Generic Spare Part", "Other", "Mek Cockpit", "Pod Space" };
+	
+	protected static final TechAdvancement TA_POD = Entity.getOmniAdvancement();
+	// Generic TechAdvancement for a number of basic components.
+    protected static final TechAdvancement TA_GENERIC = new TechAdvancement(TECH_BASE_ALL)
+            .setAdvancement(DATE_ES, DATE_ES, DATE_ES)
+            .setTechRating(RATING_C).setAvailability(RATING_C, RATING_C, RATING_C, RATING_C)
+            .setStaticTechLevel(SimpleTechLevel.STANDARD);
 
 	public static String[] getPartTypeLabels() {
 		return partTypeLabels;
@@ -459,25 +468,6 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 		return toReturn;
 	}
 
-	public abstract int getTechRating();
-
-	public abstract int getAvailability(int era);
-
-
-	public int getTechBase() {
-	    if(getTechLevel() == TechConstants.T_ALLOWED_ALL) {
-	        return T_BOTH;
-	    }
-	    if (getTechLevel() == TechConstants.T_TECH_UNKNOWN) {
-	        return T_UNKNOWN;
-	    }
-		if(isClanTechBase()) {
-			return T_CLAN;
-		} else {
-			return T_IS;
-		}
-	}
-
 	public String getTechBaseName() {
 		return getTechBaseName(getTechBase());
 	}
@@ -496,38 +486,37 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 			return "??";
 		}
 	}
+	
+    /**
+     * @return TechConstants tech level
+     */
+    public int getTechLevel() {
+        return getSimpleTechLevel().getCompoundTechLevel(campaign.getFaction().isClan());
+    }
 
-	abstract public int getTechLevel();
-	
-	abstract public int getIntroDate();
-	
-	abstract public int getExtinctDate();
-	
-	abstract public int getReIntroDate();
-	
+    /**
+     * @return TechConstants tech level
+     */
+    public SimpleTechLevel getSimpleTechLevel() {
+        if (campaign.getCampaignOptions().variableTechLevel()) {
+            return getSimpleLevel(campaign.getCalendar().get(Calendar.YEAR));
+        } else {
+            return getStaticTechLevel();
+        }
+    }
+
 	/**
 	 * We are going to only limit parts by year if they totally haven't been produced
 	 * otherwise, we will just replace the existing availability code with X
 	 */
 	public boolean isIntroducedBy(int year) {
-        if (year < getIntroDate()) {
+        if (year < getIntroductionDate()) {
             return false;
         }
         
         return true;
     }
 
-	public boolean isExtinctIn(int year) {
-		if ((getExtinctDate() == EquipmentType.DATE_NONE)) {
-			return false;
-		}
-		if (year >= getExtinctDate() && year < getReIntroDate()) {
-            return true;
-        }
-        return false;
-	}
-	
-	
 	/**
 	 * Checks if the current part is exactly the "same kind" of part as the part
 	 * given in argument. This is used to determine whether we need to add new spare
@@ -552,7 +541,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	}
 
     protected boolean isClanTechBase() {
-        return TechConstants.isClan(getTechLevel());
+        return getTechBase() == TECH_BASE_CLAN;
     }
 
 	public abstract void writeToXml(PrintWriter pw1, int indent);
@@ -1456,5 +1445,138 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 
         return imgData;
 	}
+	
+	public abstract TechAdvancement getTechAdvancement();
+
+    @Override
+    public boolean isClan() {
+        return getTechAdvancement().isClan();
+    }
+
+    @Override
+    public boolean isMixedTech() {
+        return false;
+    }
+
+    @Override
+    public int getTechBase() {
+        return getTechAdvancement().getTechBase();
+    }
+    
+    @Override
+    public int getTechRating() {
+        return getTechAdvancement().getTechRating();
+    }
+    
+    @Override
+    public int getIntroductionDate() {
+        if (omniPodded) {
+            return Math.max(getTechAdvancement().getIntroductionDate(), TA_POD.getIntroductionDate());
+        }
+        return getTechAdvancement().getIntroductionDate();
+    }
+
+    @Override
+    public int getPrototypeDate() {
+        if (omniPodded) {
+            return Math.max(getTechAdvancement().getPrototypeDate(), TA_POD.getPrototypeDate());
+        }
+        return getTechAdvancement().getPrototypeDate();
+    }
+
+    @Override
+    public int getProductionDate() {
+        if (omniPodded) {
+            return Math.max(getTechAdvancement().getProductionDate(), TA_POD.getProductionDate());
+        }
+        return getTechAdvancement().getProductionDate();
+    }
+
+    @Override
+    public int getCommonDate() {
+        if (omniPodded) {
+            return Math.max(getTechAdvancement().getCommonDate(), TA_POD.getCommonDate());
+        }
+        return getTechAdvancement().getCommonDate();
+    }
+    
+    @Override
+    public int getExtinctionDate() {
+        return getTechAdvancement().getExtinctionDate();
+    }
+
+    @Override
+    public int getReintroductionDate() {
+        return getTechAdvancement().getReintroductionDate();
+    }
+
+    @Override
+    public int getBaseAvailability(int era) {
+        if (omniPodded) {
+            return Math.max(getTechAdvancement().getBaseAvailability(era), TA_POD.getBaseAvailability(era));
+        }
+        return getTechAdvancement().getBaseAvailability(era);
+    }
+    
+    public int getAvailability() {
+        return calcYearAvailability(campaign.getCalendar().get(Calendar.YEAR), campaign.getFaction().isClan());
+    }
+    
+    @Override
+    public int calcYearAvailability(int year, boolean clan) {
+        int av = getTechAdvancement().calcYearAvailability(campaign.getCalendar().get(Calendar.YEAR),
+                campaign.getFaction().isClan());
+        if (omniPodded) {
+            av = Math.max(av, TA_POD.calcYearAvailability(campaign.getCalendar().get(Calendar.YEAR),
+                campaign.getFaction().isClan()));
+        }
+        return av;
+    }
+
+    @Override
+    public int getIntroductionDate(boolean clan, int faction) {
+        if (omniPodded) {
+            return Math.max(getTechAdvancement().getIntroductionDate(clan, faction),
+                    TA_POD.getIntroductionDate(clan, faction));
+        }
+        return getTechAdvancement().getIntroductionDate(clan, faction);
+    }
+
+    @Override
+    public int getPrototypeDate(boolean clan, int faction) {
+        if (omniPodded) {
+            return Math.max(getTechAdvancement().getPrototypeDate(clan, faction),
+                    TA_POD.getPrototypeDate(clan, faction));
+        }
+        return getTechAdvancement().getPrototypeDate(clan, faction);
+    }
+
+    @Override
+    public int getProductionDate(boolean clan, int faction) {
+        if (omniPodded) {
+            return Math.max(getTechAdvancement().getProductionDate(clan, faction),
+                    TA_POD.getProductionDate(clan, faction));
+        }
+        return getTechAdvancement().getProductionDate(clan, faction);
+    }
+
+    @Override
+    public int getExtinctionDate(boolean clan, int faction) {
+        return getTechAdvancement().getExtinctionDate(clan, faction);
+    }
+
+    @Override
+    public int getReintroductionDate(boolean clan, int faction) {
+        return getTechAdvancement().getReintroductionDate(clan, faction);
+    }
+
+    @Override
+    public SimpleTechLevel getStaticTechLevel() {
+        if (omniPodded) {
+            return SimpleTechLevel.max(getTechAdvancement().getStaticTechLevel(),
+                    SimpleTechLevel.STANDARD);
+        }
+        return getTechAdvancement().getStaticTechLevel();
+    }
 }
 

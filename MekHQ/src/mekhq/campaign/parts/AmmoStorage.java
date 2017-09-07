@@ -33,12 +33,12 @@ import megamek.common.EquipmentType;
 import megamek.common.ITechnology;
 import megamek.common.Mounted;
 import megamek.common.TargetRoll;
+import megamek.common.TechAdvancement;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.universe.Era;
 import mekhq.campaign.work.IAcquisitionWork;
 
 /**
@@ -181,22 +181,12 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
 		}
 		restore();
 	}
-
+	
 	@Override
-	public int getAvailability(int era) {		
-		return type.getAvailability(Era.convertEra(era));
-	}
-
-	@Override
-	public int getTechRating() {
-		return type.getTechRating();
+	public TechAdvancement getTechAdvancement() {
+	    return type.getTechAdvancement();
 	}
 	
-	//@Override
-	//public int getTechBase() {
-		//return T_BOTH;
-	//}
-
 	@Override
 	public void fix() {
 		//nothing to fix
@@ -401,6 +391,16 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
     @Override
     public boolean isPriceAdustedForAmount() {
         return true;
+    }
+
+    @Override
+    public boolean isExtinctIn(int year) {
+        return this.isExtinct(year);
+    }
+
+    @Override
+    public int getAvailability(int era) {
+        return getBaseAvailability(era);
     }
 }
 

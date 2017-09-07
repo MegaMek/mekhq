@@ -23,17 +23,17 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.common.Compute;
 import megamek.common.CriticalSlot;
-import megamek.common.EquipmentType;
 import megamek.common.Protomech;
+import megamek.common.TechAdvancement;
 import megamek.common.TechConstants;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.SkillType;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  *
@@ -41,8 +41,9 @@ import org.w3c.dom.NodeList;
  */
 public class ProtomekArmActuator extends Part {
     private static final long serialVersionUID = 719878556021696393L;
+    
     protected int location;
-
+    
     public ProtomekArmActuator() {
         this(0, 0, null);
     }
@@ -113,20 +114,6 @@ public class ProtomekArmActuator extends Part {
         }
     }
 
-    @Override
-    public int getAvailability(int era) {
-        if(era == EquipmentType.ERA_CLAN) {
-            return EquipmentType.RATING_D;
-        } else {
-            return EquipmentType.RATING_X;
-        }
-    }
-
-    @Override
-    public int getTechRating() {
-        return EquipmentType.RATING_D;
-    }
-    
     @Override
     public void fix() {
         super.fix();
@@ -289,20 +276,10 @@ public class ProtomekArmActuator extends Part {
 		return unit.getEntity().getLocationName(location);
 	}
 	
-	@Override
-	public int getIntroDate() {
-		return 3055;
-	}
-
-	@Override
-	public int getExtinctDate() {
-		return EquipmentType.DATE_NONE;
-	}
-
-	@Override
-	public int getReIntroDate() {
-		return EquipmentType.DATE_NONE;
-	}
+    @Override
+    public TechAdvancement getTechAdvancement() {
+        return ProtomekLocation.TECH_ADVANCEMENT;
+    }
     
     @Override
 	public int getMassRepairOptionType() {

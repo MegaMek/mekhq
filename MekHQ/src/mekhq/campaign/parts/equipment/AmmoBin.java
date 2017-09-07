@@ -38,6 +38,7 @@ import megamek.common.Mounted;
 import megamek.common.Protomech;
 import megamek.common.SmallCraft;
 import megamek.common.TargetRoll;
+import megamek.common.TechAdvancement;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
@@ -47,7 +48,6 @@ import mekhq.campaign.parts.Availability;
 import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.universe.Era;
 import mekhq.campaign.work.IAcquisitionWork;
 
 /**
@@ -288,23 +288,6 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 	public long getMunitionType() {
 		return munition;
 	}
-
-	@Override
-	public int getAvailability(int era) {
-		return type.getAvailability(Era.convertEra(era));
-	}
-
-	@Override
-	public int getTechRating() {
-		return type.getTechRating();
-	}
-
-	/*
-	@Override
-	public int getTechBase() {
-		return T_BOTH;
-	}
-	*/
 
 	@Override
 	public String getStatus() {
@@ -817,5 +800,20 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     @Override
     public boolean isOmniPodded() {
         return getUnit() != null && getUnit().getEntity().getEquipment(equipmentNum).isOmniPodMounted();
+    }
+    
+    @Override
+    public TechAdvancement getTechAdvancement() {
+        return type.getTechAdvancement();
+    }
+
+    @Override
+    public boolean isExtinctIn(int year) {
+        return isExtinct(year);
+    }
+
+    @Override
+    public int getAvailability(int era) {
+        return getBaseAvailability(era);
     }
 }
