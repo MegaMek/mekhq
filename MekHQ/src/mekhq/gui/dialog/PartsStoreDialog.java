@@ -52,6 +52,7 @@ import javax.swing.table.TableRowSorter;
 
 import megamek.common.AmmoType;
 import megamek.common.EquipmentType;
+import megamek.common.ITechnology;
 import megamek.common.MiscType;
 import megamek.common.SimpleTechLevel;
 import megamek.common.TargetRoll;
@@ -338,12 +339,26 @@ public class PartsStoreDialog extends javax.swing.JDialog {
         // If IS can purchase Clan equipment or vice-versa, we need to determine the lower of the two tech levels
         final boolean showAltBase = (clan && campaign.getCampaignOptions().allowISPurchases())
                 || (!clan && campaign.getCampaignOptions().allowClanPurchases());
-        final int faction = -1;
+        int useFaction = -1;
+        if (campaign.getCampaignOptions().useFactionIntroDate()) {
+            for (int i = 0; i < ITechnology.MM_FACTION_CODES.length; i++) {
+                if (campaign.getFactionCode().equals(ITechnology.MM_FACTION_CODES[i])) {
+                    useFaction = i;
+                    break;
+                }
+            }
+        }
+        final int faction = useFaction;
         partsTypeFilter = new RowFilter<PartsTableModel,Integer>() {
         	@Override
         	public boolean include(Entry<? extends PartsTableModel, ? extends Integer> entry) {
         		PartsTableModel partsModel = entry.getModel();
         		Part part = partsModel.getPartAt(entry.getIdentifier());
+        		if ((part instanceof EquipmentPart)
+        		        && (((EquipmentPart)part).getType() instanceof WeaponType)
+        		        && ((WeaponType)((EquipmentPart)part).getType()).hasFlag(WeaponType.F_ENERGY)) {
+        		    boolean found = true;
+        		}
         		if(txtFilter.getText().length() > 0 && !part.getName().toLowerCase().contains(txtFilter.getText().toLowerCase())) {
                     return false;
                 }

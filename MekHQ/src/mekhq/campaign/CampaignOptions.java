@@ -125,6 +125,7 @@ public class CampaignOptions implements Serializable {
     private boolean allowCanonRefitOnly;
     private int techLevel;
     private boolean variableTechLevel;
+    private boolean factionIntroDate;
     private boolean useAmmoByType; // Unofficial
 
     //finance related
@@ -312,6 +313,7 @@ public class CampaignOptions implements Serializable {
         infantryDontCount = false;
         techLevel = TECH_EXPERIMENTAL;
         variableTechLevel = false;
+        factionIntroDate = false;
         scenarioXP = 1;
         killsForXP = 0;
         killXPAward = 0;
@@ -950,6 +952,14 @@ public class CampaignOptions implements Serializable {
     
     public void setVariableTechLevel(boolean b) {
         variableTechLevel = b;
+    }
+    
+    public void setfactionIntroDate(boolean b) {
+        factionIntroDate = b;
+    }
+    
+    public boolean useFactionIntroDate() {
+        return factionIntroDate;
     }
 
     public boolean useAmmoByType() {
@@ -1938,6 +1948,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "allowCanonOnly", allowCanonOnly);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "allowCanonRefitOnly", allowCanonRefitOnly);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "variableTechLevel", variableTechLevel);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "factionIntroDate", factionIntroDate);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useAmmoByType", useAmmoByType);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "usePercentageMaint", usePercentageMaint);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "waitingPeriod", waitingPeriod);
@@ -2311,6 +2322,8 @@ public class CampaignOptions implements Serializable {
                 }
             } else if (wn2.getNodeName().equalsIgnoreCase("variableTechLevel")) {
                 retVal.variableTechLevel = Boolean.parseBoolean(wn2.getTextContent());
+            } else if (wn2.getNodeName().equalsIgnoreCase("factionIntroDate")) {
+                retVal.factionIntroDate = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("usePercentageMaint")) {
                 if (wn2.getTextContent().equalsIgnoreCase("true")) {
                     retVal.usePercentageMaint = true;
