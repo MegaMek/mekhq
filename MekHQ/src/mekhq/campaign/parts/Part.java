@@ -1577,7 +1577,9 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
     }
     
     public int getAvailability() {
-        return calcYearAvailability(campaign.getGameYear(), campaign.useClanTechBase());
+        return calcYearAvailability(campaign.getGameYear(),
+                campaign.useClanTechBase(),
+                campaign.getTechFaction());
     }
     
     @Override

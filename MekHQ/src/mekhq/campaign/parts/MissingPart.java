@@ -426,8 +426,13 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
     }
 
     @Override
-    public boolean isExtinctIn(int year) {
-        return this.isExtinct(year);
+    public boolean isIntroducedBy(int year, boolean clan, int techFaction) {
+        return getIntroductionDate(clan, techFaction) <= year;
+    }
+
+    @Override
+    public boolean isExtinctIn(int year, boolean clan, int techFaction) {
+        return isExtinct(year, clan, techFaction);
     }
 }
 

@@ -2001,7 +2001,12 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
     }
 
     @Override
-    public boolean isExtinctIn(int year) {
-        return false;
+    public boolean isIntroducedBy(int year, boolean clan, int techFaction) {
+        return getIntroductionDate(clan, techFaction) <= year;
+    }
+
+    @Override
+    public boolean isExtinctIn(int year, boolean clan, int techFaction) {
+        return isExtinct(year, clan, techFaction);
     }
 }

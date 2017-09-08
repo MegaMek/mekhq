@@ -6121,12 +6121,13 @@ public class Campaign implements Serializable, ITechManager {
             return new TargetRoll(TargetRoll.IMPOSSIBLE,
                                   "You cannot acquire parts of this tech level");
         }
-        if(getCampaignOptions().limitByYear() && !acquisition.isIntroducedBy(getCalendar().get(Calendar.YEAR))) {
+        if(getCampaignOptions().limitByYear()
+                && !acquisition.isIntroducedBy(getGameYear(), useClanTechBase(), getTechFaction())) {
         	return new TargetRoll(TargetRoll.IMPOSSIBLE,
                     "It has not been invented yet!");
         }
         if(getCampaignOptions().disallowExtinctStuff() &&
-        		(acquisition.isExtinctIn(getCalendar().get(Calendar.YEAR))
+        		(acquisition.isExtinctIn(getGameYear(), useClanTechBase(), getTechFaction())
         		        || acquisition.getAvailability() == EquipmentType.RATING_X)) {
         	return new TargetRoll(TargetRoll.IMPOSSIBLE,
                     "It is extinct!");

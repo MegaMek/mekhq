@@ -645,9 +645,14 @@ public class Armor extends Part implements IAcquisitionWork {
 	public int getMassRepairOptionType() {
     	return Part.REPAIR_PART_TYPE.ARMOR;
     }
-	
-	@Override
-	public boolean isExtinctIn(int year) {
-	    return isExtinct(year);
-	}
+
+    @Override
+    public boolean isIntroducedBy(int year, boolean clan, int techFaction) {
+        return getIntroductionDate(clan, techFaction) <= year;
+    }
+
+    @Override
+    public boolean isExtinctIn(int year, boolean clan, int techFaction) {
+        return isExtinct(year, clan, techFaction);
+    }
 }

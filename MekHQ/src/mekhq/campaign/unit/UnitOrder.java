@@ -396,4 +396,14 @@ public class UnitOrder extends Unit implements IAcquisitionWork, MekHqXmlSeriali
 
         return retVal;
     }
+
+    @Override
+    public boolean isIntroducedBy(int year, boolean clan, int techFaction) {
+        return getEntity().getIntroductionDate(clan) <= year;
+    }
+
+    @Override
+    public boolean isExtinctIn(int year, boolean clan, int techFaction) {
+        return getEntity().isExtinct(year, clan);
+    }
 }
