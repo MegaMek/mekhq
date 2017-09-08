@@ -5914,10 +5914,10 @@ public class Campaign implements Serializable, ITechManager {
         // basing this on Field Manual Mercs, although I think the costs are
         // f'ed up
         long dropshipCost = 0;
-        dropshipCost += nMech * 10000;
-        dropshipCost += nAero * 15000;
-        dropshipCost += (nLVee+nHVee) * 3000;
-        dropshipCost += nBA * 250;
+        dropshipCost += noMech * 10000;
+        dropshipCost += newNoASF * 15000;
+        dropshipCost += (newNolv+nohv) * 3000;
+        dropshipCost += noBA * 250;
         dropshipCost += nMechInf * 100;
         dropshipCost += nMotorInf * 50;
         dropshipCost += nFootInf * 10;
@@ -5927,13 +5927,13 @@ public class Campaign implements Serializable, ITechManager {
         // some of the canonical designs
         int collarsNeeded = 0;
         // for mechs assume a union or smaller
-        collarsNeeded += (int) Math.ceil(nMech / 12.0);
+        collarsNeeded += (int) Math.ceil(noMech / 12.0);
         // for aeros, they may ride for free on the union, if not assume a
         // leopard cv
         collarsNeeded += (int) Math
-                .ceil(Math.max(0, nAero - collarsNeeded * 2) / 6.0);
+                .ceil(Math.max(0, newNoASF - collarsNeeded * 2) / 6.0);
         // for vees, assume a Triumph
-        collarsNeeded += (int) Math.ceil((nLVee+nHVee) / 53.0);
+        collarsNeeded += (int) Math.ceil(((newNolv+nohv)) / 53.0);
         // for now I am going to let infantry and BA tag along because of cargo
         // space rules
 
