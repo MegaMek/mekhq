@@ -30,7 +30,6 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Comparator;
 import java.util.ResourceBundle;
 
@@ -51,10 +50,7 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
 import megamek.common.AmmoType;
-import megamek.common.EquipmentType;
-import megamek.common.ITechnology;
 import megamek.common.MiscType;
-import megamek.common.SimpleTechLevel;
 import megamek.common.TargetRoll;
 import megamek.common.WeaponType;
 import megamek.common.logging.LogLevel;
@@ -334,31 +330,11 @@ public class PartsStoreDialog extends javax.swing.JDialog {
     public void filterParts() {
         RowFilter<PartsTableModel, Integer> partsTypeFilter = null;
         final int nGroup = choiceParts.getSelectedIndex();
-        final int year = campaign.getCalendar().get(Calendar.YEAR);
-        final boolean clan = campaign.getFaction().isClan();
-        // If IS can purchase Clan equipment or vice-versa, we need to determine the lower of the two tech levels
-        final boolean showAltBase = (clan && campaign.getCampaignOptions().allowISPurchases())
-                || (!clan && campaign.getCampaignOptions().allowClanPurchases());
-        int useFaction = -1;
-        if (campaign.getCampaignOptions().useFactionIntroDate()) {
-            for (int i = 0; i < ITechnology.MM_FACTION_CODES.length; i++) {
-                if (campaign.getFactionCode().equals(ITechnology.MM_FACTION_CODES[i])) {
-                    useFaction = i;
-                    break;
-                }
-            }
-        }
-        final int faction = useFaction;
         partsTypeFilter = new RowFilter<PartsTableModel,Integer>() {
         	@Override
         	public boolean include(Entry<? extends PartsTableModel, ? extends Integer> entry) {
         		PartsTableModel partsModel = entry.getModel();
         		Part part = partsModel.getPartAt(entry.getIdentifier());
-        		if ((part instanceof EquipmentPart)
-        		        && (((EquipmentPart)part).getType() instanceof WeaponType)
-        		        && ((WeaponType)((EquipmentPart)part).getType()).hasFlag(WeaponType.F_ENERGY)) {
-        		    boolean found = true;
-        		}
         		if(txtFilter.getText().length() > 0 && !part.getName().toLowerCase().contains(txtFilter.getText().toLowerCase())) {
                     return false;
                 }
@@ -368,20 +344,9 @@ public class PartsStoreDialog extends javax.swing.JDialog {
     			if(part.getTechBase() == Part.T_IS && !campaign.getCampaignOptions().allowISPurchases()) {
     				return false;
     			}
-    			SimpleTechLevel techLevel = showAltBase?
-    			        part.getSimpleTechLevel(year) : part.getSimpleTechLevel(year, clan, faction);
-    			if (campaign.getCampaignOptions().getTechLevel() < techLevel.ordinal()) {
-    				return false;
+    			if (!campaign.isLegal(part)) {
+    			    return false;
     			}
-    			if(campaign.getCampaignOptions().limitByYear()
-    			        && (year < (showAltBase? part.getIntroductionDate() : part.getIntroductionDate(clan, faction)))) {
-    				return false;
-    			}
-    			if(campaign.getCampaignOptions().disallowExtinctStuff() &&
-    	        		(part.isExtinct(year, clan, faction)
-    	        		        || (part.calcYearAvailability(year, clan) == EquipmentType.RATING_X))) {
-    	        	return false;
-    	        }
         		if(nGroup == SG_ALL) {
         			return true;
         		} else if(nGroup == SG_ARMOR) {

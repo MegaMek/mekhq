@@ -795,7 +795,7 @@ public class CampaignGUI extends JPanel {
         JMenuItem miHire;
         for (int i = Person.T_MECHWARRIOR; i < Person.T_NUM; i++) {
             miHire = new JMenuItem(Person.getRoleDesc(i, getCampaign()
-                    .getFaction().isClan())); // NOI18N
+                    .getFaction().isClan()));
             miHire.setActionCommand(Integer.toString(i));
             miHire.addActionListener(new ActionListener() {
                 @Override

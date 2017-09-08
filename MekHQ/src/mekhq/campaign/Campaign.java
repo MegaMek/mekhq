@@ -78,6 +78,8 @@ import megamek.common.EquipmentType;
 import megamek.common.FighterSquadron;
 import megamek.common.Game;
 import megamek.common.GunEmplacement;
+import megamek.common.ITechManager;
+import megamek.common.ITechnology;
 import megamek.common.Infantry;
 import megamek.common.Jumpship;
 import megamek.common.LandAirMech;
@@ -89,6 +91,7 @@ import megamek.common.MiscType;
 import megamek.common.Mounted;
 import megamek.common.Player;
 import megamek.common.Protomech;
+import megamek.common.SimpleTechLevel;
 import megamek.common.SmallCraft;
 import megamek.common.Tank;
 import megamek.common.TargetRoll;
@@ -212,7 +215,7 @@ import mekhq.gui.utilities.PortraitFileFactory;
 /**
  * @author Taharqa The main campaign class, keeps track of teams and units
  */
-public class Campaign implements Serializable {
+public class Campaign implements Serializable, ITechManager {
     private static final String REPORT_LINEBREAK = "<br/><br/>"; //$NON-NLS-1$
 
 	private static final long serialVersionUID = -6312434701389973056L;
@@ -276,6 +279,7 @@ public class Campaign implements Serializable {
     private SimpleDateFormat shortDateFormat;
 
     private String factionCode;
+    private int techFactionCode;
     private String retainerEmployerCode; //AtB
     private Ranks ranks;
 
@@ -336,6 +340,7 @@ public class Campaign implements Serializable {
         overtime = false;
         gmMode = false;
         factionCode = "MERC";
+        techFactionCode = ITechnology.F_MERC;
         retainerEmployerCode = null;
         Ranks.initializeRankSystems();
         ranks = Ranks.getRanksFromSystem(Ranks.RS_SL);
@@ -3005,6 +3010,7 @@ public class Campaign implements Serializable {
 
     public void setFactionCode(String i) {
         this.factionCode = i;
+        updateTechFactionCode();
     }
 
     public String getFactionCode() {
@@ -5026,6 +5032,7 @@ public class Campaign implements Serializable {
                     } else {
                         retVal.factionCode = wn.getTextContent();
                     }
+                    retVal.updateTechFactionCode();
                 } else if (xn.equalsIgnoreCase("retainerEmployerCode")) {
                 	retVal.retainerEmployerCode = wn.getTextContent();
                 } else if (xn.equalsIgnoreCase("officerCut")) {
@@ -8589,5 +8596,76 @@ public class Campaign implements Serializable {
             }
         }
         return false;
+    }
+
+    @Override
+    public int getTechIntroYear() {
+        if (campaignOptions.limitByYear()) {
+            return calendar.get(Calendar.YEAR);
+        } else {
+            return 0;
+        }
+    }
+
+    @Override
+    public int getGameYear() {
+        return calendar.get(Calendar.YEAR);
+    }
+
+    @Override
+    public int getTechFaction() {
+        return techFactionCode;
+    }
+    
+    private void updateTechFactionCode() {
+        if (campaignOptions.useFactionIntroDate()) {
+            for (int i = 0; i < ITechnology.MM_FACTION_CODES.length; i++) {
+                if (ITechnology.MM_FACTION_CODES[i].equals(factionCode)) {
+                    techFactionCode = i;
+                    break;
+                }
+            }
+        } else {
+            techFactionCode = ITechnology.F_NONE;
+        }
+    }
+
+    @Override
+    public boolean useClanTechBase() {
+        return getFaction().isClan();
+    }
+
+    @Override
+    public boolean useMixedTech() {
+        if (useClanTechBase()) {
+            return campaignOptions.allowISPurchases();
+        } else {
+            return campaignOptions.allowClanPurchases();
+        }
+    }
+
+    @Override
+    public SimpleTechLevel getTechLevel() {
+        for (SimpleTechLevel lvl : SimpleTechLevel.values()) {
+            if (campaignOptions.getTechLevel() == lvl.ordinal()) {
+                return lvl;
+            }
+        }
+        return SimpleTechLevel.UNOFFICIAL;
+    }
+
+    @Override
+    public boolean unofficialNoYear() {
+        return false;
+    }
+
+    @Override
+    public boolean useVariableTechLevel() {
+        return campaignOptions.variableTechLevel();
+    }
+
+    @Override
+    public boolean showExtinct() {
+        return !campaignOptions.disallowExtinctStuff();
     }
 }
