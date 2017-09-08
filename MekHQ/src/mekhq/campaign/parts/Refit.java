@@ -1955,12 +1955,6 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
     }
 
     @Override
-    public int getAvailability(int era) {
-        // TODO Auto-generated method stub
-        return 0;
-    }
-
-    @Override
     public boolean isSamePartType(Part part) {
         // TODO Auto-generated method stub
         return false;

@@ -322,6 +322,13 @@ public class UnitOrder extends Unit implements IAcquisitionWork, MekHqXmlSeriali
         return 0;
     }
 
+
+    @Override
+    public int getAvailability() {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+    
     @Override
     public int getQuantity() {
         return quantity;
@@ -389,5 +396,4 @@ public class UnitOrder extends Unit implements IAcquisitionWork, MekHqXmlSeriali
 
         return retVal;
     }
-    
 }

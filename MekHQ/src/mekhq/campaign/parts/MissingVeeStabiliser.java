@@ -23,14 +23,13 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import megamek.common.EquipmentType;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.common.Tank;
 import megamek.common.TechAdvancement;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  *
@@ -84,11 +83,6 @@ public class MissingVeeStabiliser extends MissingPart {
 		return 0;
 	}
 
-	@Override
-	public int getAvailability(int era) {
-		return EquipmentType.RATING_B;
-	}
-	
 	@Override
 	public void writeToXml(PrintWriter pw1, int indent) {
 		writeToXmlBegin(pw1, indent);

@@ -6126,7 +6126,8 @@ public class Campaign implements Serializable, ITechManager {
                     "It has not been invented yet!");
         }
         if(getCampaignOptions().disallowExtinctStuff() &&
-        		(acquisition.isExtinctIn(getCalendar().get(Calendar.YEAR)) || acquisition.getAvailability(getEra()) == EquipmentType.RATING_X)) {
+        		(acquisition.isExtinctIn(getCalendar().get(Calendar.YEAR))
+        		        || acquisition.getAvailability() == EquipmentType.RATING_X)) {
         	return new TargetRoll(TargetRoll.IMPOSSIBLE,
                     "It is extinct!");
         }

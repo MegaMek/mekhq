@@ -68,7 +68,7 @@ public interface IAcquisitionWork extends IWork {
     
     public boolean isExtinctIn(int year);
     
-    public int getAvailability(int era);
+    public int getAvailability();
     
     public String getShoppingListReport(int quantity);
 

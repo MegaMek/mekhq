@@ -21,13 +21,12 @@
 
 package mekhq.campaign.parts;
 
+import org.w3c.dom.Node;
+
 import megamek.common.Aero;
 import megamek.common.Entity;
-import megamek.common.EquipmentType;
 import megamek.common.TechAdvancement;
 import mekhq.campaign.Campaign;
-
-import org.w3c.dom.Node;
 
 /**
  *
@@ -80,30 +79,6 @@ public class MissingAeroHeatSink extends MissingPart {
 	@Override
 	public double getTonnage() {
 		return 1;
-	}
-
-	@Override
-	public int getTechRating() {
-		if(type == Aero.HEAT_DOUBLE) {
-			return EquipmentType.RATING_D;
-		} else {
-			return EquipmentType.RATING_E;
-		}
-	}
-
-	@Override
-	public int getAvailability(int era) {
-		if(type == Aero.HEAT_DOUBLE) {
-		if(era == EquipmentType.ERA_SL) {
-			return EquipmentType.RATING_C;
-		} else if(era == EquipmentType.ERA_SW) {
-			return EquipmentType.RATING_E;
-		} else {
-			return EquipmentType.RATING_D;
-		}
-		} else {
-			return EquipmentType.RATING_B;
-		}
 	}
 
 	@Override

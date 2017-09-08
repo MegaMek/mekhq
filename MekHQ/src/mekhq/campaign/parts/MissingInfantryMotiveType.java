@@ -118,12 +118,6 @@ public class MissingInfantryMotiveType extends MissingPart {
 	}
 
 	@Override
-	public int getAvailability(int era) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-	
-	@Override
 	public void writeToXml(PrintWriter pw1, int indent) {
 		writeToXmlBegin(pw1, indent);
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)

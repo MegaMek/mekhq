@@ -351,7 +351,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
             target.addModifier(campaign.getCampaignOptions().getIsAcquisitionPenalty(), "Inner Sphere tech");
         }   
         //availability mod
-        int avail = getAvailability(campaign.getEra());
+        int avail = getAvailability();
         int availabilityMod = Availability.getAvailabilityModifier(avail);
         target.addModifier(availabilityMod, "availability (" + ITechnology.getRatingName(avail) + ")");
         return target;
@@ -396,11 +396,6 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
     @Override
     public boolean isExtinctIn(int year) {
         return this.isExtinct(year);
-    }
-
-    @Override
-    public int getAvailability(int era) {
-        return getBaseAvailability(era);
     }
 }
 
