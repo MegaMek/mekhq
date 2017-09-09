@@ -59,6 +59,7 @@ import megamek.common.HeavyVehicleBay;
 import megamek.common.IArmorState;
 import megamek.common.ILocationExposureStatus;
 import megamek.common.IPlayer;
+import megamek.common.ITechnology;
 import megamek.common.Infantry;
 import megamek.common.InfantryBay;
 import megamek.common.InsulatedCargoBay;
@@ -79,6 +80,7 @@ import megamek.common.ProtomechBay;
 import megamek.common.QuadMech;
 import megamek.common.QuadVee;
 import megamek.common.RefrigeratedCargoBay;
+import megamek.common.SimpleTechLevel;
 import megamek.common.SmallCraft;
 import megamek.common.SmallCraftBay;
 import megamek.common.SpaceStation;
@@ -197,7 +199,7 @@ import mekhq.campaign.work.IPartWork;
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class Unit implements MekHqXmlSerializable {
+public class Unit implements MekHqXmlSerializable, ITechnology {
     public static final int SITE_FIELD = 0;
     public static final int SITE_MOBILE_BASE = 1;
     public static final int SITE_BAY = 2;
@@ -3881,4 +3883,142 @@ public class Unit implements MekHqXmlSerializable {
         }
         return "Unit for Entity: " + entName;
     }
+    
+    /**
+     * @return Tech progression data for this unit, using the campaign faction if the useFactionIntroDate
+     *         option is enabled.
+     */
+    private ITechnology getTechProgression() {
+        return getTechProgression(campaign.getTechFaction());
+    }
+    
+    private ITechnology getTechProgression(int techFaction) {
+        // If useFactionIntroDate is false, use the base data that was calculated for the Entity when is was loaded.
+        if (techFaction < 0) {
+            return getEntity();
+        }
+        // First check whether it has already been calculated for this faction, but don't wait if
+        // it hasn't.
+        ITechnology techProgression = UnitTechProgression.getProgression(this, techFaction, false);
+        if (null != techProgression) {
+            return techProgression;
+        } else {
+            return getEntity().factionTechLevel(techFaction);
+        }
+    }
+
+    @Override
+    public boolean isClan() {
+        return getTechProgression().isClan();
+    }
+
+    @Override
+    public boolean isMixedTech() {
+        return getTechProgression().isMixedTech();
+    }
+
+    @Override
+    public int getTechBase() {
+        return getTechProgression().getTechBase();
+    }
+
+    @Override
+    public int getIntroductionDate() {
+        return getTechProgression().getIntroductionDate();
+    }
+
+    @Override
+    public int getPrototypeDate() {
+        return getTechProgression().getPrototypeDate();
+    }
+
+    @Override
+    public int getProductionDate() {
+        return getTechProgression().getProductionDate();
+    }
+
+    @Override
+    public int getCommonDate() {
+        return getTechProgression().getCommonDate();
+    }
+
+    @Override
+    public int getExtinctionDate() {
+        return getTechProgression().getExtinctionDate();
+    }
+
+    @Override
+    public int getReintroductionDate() {
+        return getTechProgression().getReintroductionDate();
+    }
+
+    @Override
+    public int getTechRating() {
+        return getTechProgression().getTechRating();
+    }
+
+    @Override
+    public int getBaseAvailability(int era) {
+        return getTechProgression().getBaseAvailability(era);
+    }
+    
+    @Override
+    public int getIntroductionDate(boolean clan, int faction) {
+        return getTechProgression(faction).getIntroductionDate(clan, faction);
+    }
+
+    @Override
+    public int getPrototypeDate(boolean clan, int faction) {
+        return getTechProgression(faction).getPrototypeDate(clan, faction);
+    }
+
+    @Override
+    public int getProductionDate(boolean clan, int faction) {
+        return getTechProgression(faction).getProductionDate(clan, faction);
+    }
+
+    @Override
+    public int getExtinctionDate(boolean clan, int faction) {
+        return getTechProgression(faction).getExtinctionDate(clan, faction);
+    }
+
+    @Override
+    public int getReintroductionDate(boolean clan, int faction) {
+        return getTechProgression(faction).getReintroductionDate(clan, faction);
+    }
+
+    public SimpleTechLevel getSimpleTechLevel() {
+        if (campaign.getCampaignOptions().variableTechLevel()) {
+            return getSimpleLevel(campaign.getCalendar().get(Calendar.YEAR));
+        } else {
+            return getStaticTechLevel();
+        }
+    }
+    
+    public SimpleTechLevel getSimpleTechLevel(int year) {
+        if (campaign.getCampaignOptions().variableTechLevel()) {
+            return getSimpleLevel(year);
+        } else {
+            return getStaticTechLevel();
+        }
+    }
+    
+    public SimpleTechLevel getSimpleTechLevel(int year, boolean clan, int faction) {
+        if (campaign.getCampaignOptions().variableTechLevel()) {
+            return getSimpleLevel(year, clan, faction);
+        } else {
+            return getStaticTechLevel();
+        }
+    }
+
+    @Override
+    public SimpleTechLevel getStaticTechLevel() {
+        return getEntity().getStaticTechLevel();
+    }
+
+    @Override
+    public int calcYearAvailability(int year, boolean clan, int faction) {
+        return getTechProgression(faction).calcYearAvailability(year, clan);
+    }
+    
 }

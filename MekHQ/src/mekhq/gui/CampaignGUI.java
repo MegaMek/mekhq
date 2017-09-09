@@ -1644,6 +1644,7 @@ public class CampaignGUI extends JPanel {
     private void menuOptionsActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_menuOptionsActionPerformed
         boolean atb = getCampaign().getCampaignOptions().getUseAtB();
         boolean staticRATs = getCampaign().getCampaignOptions().useStaticRATs();
+        boolean factionIntroDate = getCampaign().getCampaignOptions().useFactionIntroDate();
         CampaignOptionsDialog cod = new CampaignOptionsDialog(getFrame(), true,
                 getCampaign(), getIconPackage().getCamos());
         cod.setVisible(true);
@@ -1689,6 +1690,9 @@ public class CampaignGUI extends JPanel {
         }
         if (staticRATs != getCampaign().getCampaignOptions().useStaticRATs()) {
         	getCampaign().initUnitGenerator();
+        }
+        if (factionIntroDate != getCampaign().getCampaignOptions().useFactionIntroDate()) {
+            getCampaign().updateTechFactionCode();
         }
         refreshCalendar();
         getCampaign().reloadNews();

@@ -494,9 +494,6 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
         return getSimpleTechLevel().getCompoundTechLevel(campaign.getFaction().isClan());
     }
 
-    /**
-     * @return TechConstants tech level
-     */
     public SimpleTechLevel getSimpleTechLevel() {
         if (campaign.getCampaignOptions().variableTechLevel()) {
             return getSimpleLevel(campaign.getCalendar().get(Calendar.YEAR));

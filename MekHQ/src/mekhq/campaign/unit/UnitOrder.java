@@ -301,7 +301,7 @@ public class UnitOrder extends Unit implements IAcquisitionWork, MekHqXmlSeriali
             target.addModifier(+1, "Protomech");
         }
         //parts need to be initialized for this to work
-        int avail = getAvailability(campaign.getEra());
+        int avail = getAvailability();
         if(this.isExtinctIn(campaign.getCalendar().get(Calendar.YEAR))) {
         	avail = EquipmentType.RATING_X;
         }
@@ -310,23 +310,10 @@ public class UnitOrder extends Unit implements IAcquisitionWork, MekHqXmlSeriali
         return target;
     }
 
-    @Override
-    public int getTechBase() {
-        // TODO Auto-generated method stub
-        return 0;
-    }
-
-    @Override
-    public int getTechLevel() {
-        // TODO Auto-generated method stub
-        return 0;
-    }
-
 
     @Override
     public int getAvailability() {
-        // TODO Auto-generated method stub
-        return 0;
+        return calcYearAvailability(campaign.getGameYear(), campaign.useClanTechBase(), campaign.getTechFaction());
     }
     
     @Override
@@ -399,11 +386,18 @@ public class UnitOrder extends Unit implements IAcquisitionWork, MekHqXmlSeriali
 
     @Override
     public boolean isIntroducedBy(int year, boolean clan, int techFaction) {
-        return getEntity().getIntroductionDate(clan) <= year;
+        return getIntroductionDate(clan, techFaction) <= year;
     }
 
     @Override
     public boolean isExtinctIn(int year, boolean clan, int techFaction) {
-        return getEntity().isExtinct(year, clan);
+        return isExtinct(year, clan, techFaction);
+    }
+
+    /**
+     * @return TechConstants tech level
+     */
+    public int getTechLevel() {
+        return getSimpleTechLevel().getCompoundTechLevel(campaign.getFaction().isClan());
     }
 }

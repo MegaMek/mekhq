@@ -197,6 +197,7 @@ import mekhq.campaign.rating.UnitRatingFactory;
 import mekhq.campaign.unit.CrewType;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.unit.UnitTechProgression;
 import mekhq.campaign.universe.Era;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.IUnitGenerator;
@@ -8619,17 +8620,29 @@ public class Campaign implements Serializable, ITechManager {
         return techFactionCode;
     }
     
-    private void updateTechFactionCode() {
+    public void updateTechFactionCode() {
         if (campaignOptions.useFactionIntroDate()) {
             for (int i = 0; i < ITechnology.MM_FACTION_CODES.length; i++) {
                 if (ITechnology.MM_FACTION_CODES[i].equals(factionCode)) {
                     techFactionCode = i;
-                    break;
+                    UnitTechProgression.loadFaction(techFactionCode);
+                    return;
                 }
+            }
+            // If the tech progression data does not include the current faction,
+            // use a generic.
+            if (getFaction().isClan()) {
+                techFactionCode = ITechnology.F_CLAN;
+            } else if (getFaction().isPeriphery()) {
+                techFactionCode = ITechnology.F_PER;
+            } else {
+                techFactionCode = ITechnology.F_IS;
             }
         } else {
             techFactionCode = ITechnology.F_NONE;
         }
+        // Unit tech level will be calculated if the code has changed.
+        UnitTechProgression.loadFaction(techFactionCode);
     }
 
     @Override
