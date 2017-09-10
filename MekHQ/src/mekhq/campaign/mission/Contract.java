@@ -20,6 +20,21 @@
  */
 package mekhq.campaign.mission;
 
+import megamek.common.BattleArmor;
+import megamek.common.Infantry;
+import mekhq.MekHqXmlSerializable;
+import mekhq.MekHqXmlUtil;
+import mekhq.Utilities;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.JumpPath;
+import mekhq.campaign.unit.Unit;
+import mekhq.campaign.universe.Planets;
+import org.apache.commons.text.CharacterPredicate;
+import org.apache.commons.text.RandomStringGenerator;
+import org.joda.time.DateTime;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.text.ParseException;
@@ -27,20 +42,6 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-
-import org.apache.commons.text.CharacterPredicate;
-import org.apache.commons.text.RandomStringGenerator;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import megamek.common.BattleArmor;
-import megamek.common.Infantry;
-import mekhq.MekHqXmlSerializable;
-import mekhq.MekHqXmlUtil;
-import mekhq.Utilities;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.unit.Unit;
-import mekhq.campaign.universe.Planets;
 
 /**
  * Contracts - we need to track static amounts here because changes in the
@@ -400,9 +401,15 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
         } else {
             profit -= c.getPayRoll() * getLength();
         }
-        if (null != c.getPlanet(planetName) && c.getCampaignOptions().payForTransport()) {
-            profit -= 2 * c.calculateCostPerJump(true)
-                    * c.calculateJumpPath(c.getCurrentPlanet(), getPlanet()).getJumps();
+        if(null != c.getPlanet(planetName) && c.getCampaignOptions().payForTransport()) {
+            DateTime currentDate = Utilities.getDateTimeDay(c.getCalendar());
+            JumpPath jumpPath = c.calculateJumpPath(c.getCurrentPlanet(), getPlanet());
+            double days = Math.round(jumpPath.getTotalTime(currentDate, c.getLocation().getTransitTime())*100.0)/100.0;
+            int roundedMonths = (int) Math.ceil(days / 30.0);
+
+            // TODO: for Campaign Ops transport rules, use excludeOwnTransport = true.
+            transportAmount = (long)((transportComp/100.0) * 2 * c.calculateCostPerJump(false, false, jumpPath.getJumps(), roundedMonths) * jumpPath.getJumps());
+            profit -= 2 * c.calculateCostPerJump(false, false, jumpPath.getJumps(), roundedMonths) * jumpPath.getJumps();
         }
         return profit;
     }
@@ -461,9 +468,14 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
         }
 
         // calculate transportation costs
-        if (null != Planets.getInstance().getPlanetById(planetName)) {
-            transportAmount = (long) ((transportComp / 100.0) * 2 * c.calculateCostPerJump(false)
-                    * c.calculateJumpPath(c.getCurrentPlanet(), getPlanet()).getJumps());
+        if (null != Planets.getInstance().getPlanetById(planetName) && c.getCampaignOptions().payForTransport()) {
+            DateTime currentDate = Utilities.getDateTimeDay(c.getCalendar());
+            JumpPath jumpPath = c.calculateJumpPath(c.getCurrentPlanet(), getPlanet());
+            double days = Math.round(jumpPath.getTotalTime(currentDate, c.getLocation().getTransitTime())*100.0)/100.0;
+            int roundedMonths = (int) Math.ceil(days / 30.0);
+
+            // TODO: for Campaign Ops transport rules, use excludeOwnTransport = true.
+            transportAmount = (long)((transportComp/100.0) * c.calculateCostPerJump(false, false, jumpPath.getJumps(), roundedMonths) * jumpPath.getJumps());
         }
 
         // calculate transit amount for CO

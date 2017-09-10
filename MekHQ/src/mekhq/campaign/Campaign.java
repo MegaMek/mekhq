@@ -5858,16 +5858,29 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     /**
-     * Right now this is going to be a total hack because the rules from FM Merc would be a nightmare to calculate and I
-     * want to get something up and running so we can do contracts. There are two components to figure - the costs of
-     * leasing dropships for excess units and the cost of leasing jumpships based on the number of dropships. Right now, we
-     * are just going to calculate average costs per unit and then make some guesses about total dropship collar needs.
-     * <p/>
-     * Hopefully, StellarOps will clarify all of this.
-     * Cleaned this up some, to take advantage of my new methods, but it needs a lot more work - Dylan
+     * This method calculates the cost per jump for interstellar travel. It operates by fitting the part
+     * of the force not transported in owned DropShips into a number of prototypical DropShips of a few
+     * standard configurations, then adding the JumpShip charges on top. It remains fairly hacky, but
+     * improves slightly on the prior implementation as far as following the rulebooks goes.
+     *
+     * It can be used to calculate total travel costs in the style of FM:Mercs (excludeOwnTransports
+     * and campaignOpsCosts set to false), to calculate leased/rented travel costs only in the style
+     * of FM:Mercs (excludeOwnTransports true, campaignOpsCosts false), or to calculate travel costs
+     * for CampaignOps-style costs (excludeOwnTransports true, campaignOpsCosts true, jumps and months
+     * set as appropriate). When calculating CampaignOps costs, which have monthly DropShip charges, it
+     * requires the jumps and months parameters to be valid. It uses these to spread the monthly cost
+     * correctly per jump.
+     *
+     * @param excludeOwnTransports If true, do not display maintenance costs in the calculated travel cost.
+     * @param campaignOpsCosts If true, use the Campaign Ops method for calculating travel cost. (DropShip monthly fees
+     *                         of 0.5% of travel costs, 100,000 C-bills per collar.)
+     * @param jumps The number of jumps on this route. Only used for Campaign Ops costs.
+     * @param months The number of months this route will take. Only used for Campaign Ops costs.
      */
     @SuppressWarnings("unused") // FIXME: Waiting for Dylan to finish re-writing
-	public long calculateCostPerJump(boolean excludeOwnTransports) {
+	public long calculateCostPerJump(boolean excludeOwnTransports, boolean campaignOpsCosts, int jumps, int months) {
+        int collarCost = (campaignOpsCosts ? 100000 : 50000);
+
         // first we need to get the total number of units by type
         int nMech = getNumberOfUnitsByType(Entity.ETYPE_MECH);
         int nLVee = getNumberOfUnitsByType(Entity.ETYPE_TANK, false, true);
@@ -5882,10 +5895,13 @@ public class Campaign implements Serializable, ITechManager {
         int nProto = getNumberOfUnitsByType(Entity.ETYPE_PROTOMECH);
         int nDropship = getNumberOfUnitsByType(Entity.ETYPE_DROPSHIP);
         int nCollars = getTotalDockingCollars();
+        double nCargo = getTotalCargoCapacity(); // ignoring refrigerated/insulated/etc.
 
-        double cargoSpace = 0.0;
+        // get cargo tonnage including parts in transit, then get mothballed unit
+        // tonnage
+        double carriedCargo = getCargoTonnage(true, false) + getCargoTonnage(false, true);
 
-
+        // calculate the number of units left untransported
         int noMech = Math.max(nMech - getOccupiedBays(Entity.ETYPE_MECH), 0);
         int noDS = Math.max(nDropship - getOccupiedBays(Entity.ETYPE_DROPSHIP), 0);
         int noSC = Math.max(nSC - getOccupiedBays(Entity.ETYPE_SMALL_CRAFT), 0);
@@ -5900,7 +5916,7 @@ public class Campaign implements Serializable, ITechManager {
         int freeinf = Math.max(getTotalInfantryBays() - getOccupiedBays(Entity.ETYPE_INFANTRY), 0);
         int freeba = Math.max(getTotalBattleArmorBays() - getOccupiedBays(Entity.ETYPE_BATTLEARMOR), 0);
         int freeSC = Math.max(getTotalSmallCraftBays() - getOccupiedBays(Entity.ETYPE_SMALL_CRAFT), 0);
-        int mothballedAsCargo = Math.max(getNumberOfUnitsByType(Unit.ETYPE_MOTHBALLED), 0);
+        int noCargo = (int) Math.ceil(Math.max(carriedCargo - nCargo, 0));
 
         int newNoASF = Math.max(noASF - freeSC, 0);
         int placedASF = Math.max(noASF - newNoASF, 0);
@@ -5910,40 +5926,165 @@ public class Campaign implements Serializable, ITechManager {
         int placedlv = Math.max(nolv - newNolv, 0);
         freehv -= placedlv;
 
+        // figure out how much drop cargo we can carry, and how much it costs
+        // to run our large spacecraft, if any.
+        long weeklySpacecraftMaintenance = 0;
+        for(Unit u : getUnits()) {
+            if(!u.isMothballed()) {
+                Entity e = u.getEntity();
+                if((e.getEntityType() & Entity.ETYPE_DROPSHIP) != 0) {
+                    weeklySpacecraftMaintenance += u.getWeeklyMaintenanceCost();
+                }
+                else if((e.getEntityType() & Entity.ETYPE_JUMPSHIP) != 0) {
+                    weeklySpacecraftMaintenance += u.getWeeklyMaintenanceCost();
+                }
+            }
+        }
+
         // Ok, now the costs per unit - this is the dropship fee. I am loosely
         // basing this on Field Manual Mercs, although I think the costs are
         // f'ed up
         long dropshipCost = 0;
-        dropshipCost += noMech * 10000;
-        dropshipCost += newNoASF * 15000;
-        dropshipCost += (newNolv+nohv) * 3000;
-        dropshipCost += noBA * 250;
-        dropshipCost += nMechInf * 100;
-        dropshipCost += nMotorInf * 50;
-        dropshipCost += nFootInf * 10;
 
-        // ok, now how many dropship collars do we need for these units? base
-        // this on
-        // some of the canonical designs
-        int collarsNeeded = 0;
-        // for mechs assume a union or smaller
-        collarsNeeded += (int) Math.ceil(noMech / 12.0);
-        // for aeros, they may ride for free on the union, if not assume a
-        // leopard cv
-        collarsNeeded += (int) Math
-                .ceil(Math.max(0, newNoASF - collarsNeeded * 2) / 6.0);
-        // for vees, assume a Triumph
-        collarsNeeded += (int) Math.ceil(((newNolv+nohv)) / 53.0);
-        // for now I am going to let infantry and BA tag along because of cargo
-        // space rules
+        // The cost-figuring process: using prototypical dropships, figure out how
+        // many collars are required. Charge for the prototypical dropships and
+        // the docking collar, based on the rules selected. Allow prototypical
+        // dropships to be leased in 1/2 increments; designs of roughly 1/2
+        // size exist for all of the prototypical variants chosen.
 
-        // add the existing dropships
+        // DropShip costs are for the duration of the trip for FM:Mercs rules,
+        // and per month for Campaign Ops. It's assumed that, if the player
+        // has no DropShips and a mission requires a combat drop, the DropShip
+        // is provided by the employer gratis.
+
+        // n.b. the pre-existing code seems to follow the common house rule that
+        // the FM:Mercs costs are per jump, which brings them a little closer
+        // to the CO rules. I've left that as-is for now.
+
+        // Roughly a Union
+        int averageDropshipMechCapacity = 12;
+        int mechDropshipASFCapacity = 2;
+        int mechDropshipCargoCapacity = 75;
+        long mechDropshipCost = (campaignOpsCosts ? 1450000 : 150000);
+
+        // Roughly a Leopard CV
+        int averageDropshipASFCapacity = 6;
+        int asfDropshipCargoCapacity = 90;
+        long asfDropshipCost = (campaignOpsCosts ? 900000 : 80000);
+
+        // Roughly a Gazelle
+        int averageDropshipVehicleCapacity = 15;
+        int vehicleDropshipCargoCapacity = 65;
+        long vehicleDropshipCost = (campaignOpsCosts ? 900000 : 40000);
+
+        // Roughly a Monarch
+        int averageDropshipCargoCapacity = 1150;
+        long cargoDropshipCost = (campaignOpsCosts ? 700000 : 225000);
+
+        double leasedMechDropships = 0;
+        double leasedASFDropships = 0;
+        double leasedVehicleDropships = 0;
+        double leasedCargoDropships = 0;
+
+        int leasedASFCapacity = 0;
+        int leasedCargoCapacity = 0;
+
+        // For each type we're concerned with, calculate the number of dropships needed
+        // to transport the force. Smaller dropships are represented by half-dropships.
+        if(noMech > 0) {
+            leasedMechDropships = noMech / averageDropshipMechCapacity;
+            noMech -= leasedMechDropships * averageDropshipMechCapacity;
+
+            // If we can fit in a smaller dropship, lease one of those instead.
+            if(noMech > 0 && noMech < (averageDropshipMechCapacity / 2)) {
+                leasedMechDropships += 0.5;
+            }
+            else if(noMech > 0){
+                leasedMechDropships += 1;
+            }
+
+            // Our Union-ish dropship can carry some ASFs and cargo.
+            leasedASFCapacity = (int) Math.floor(leasedMechDropships * mechDropshipASFCapacity);
+            leasedCargoCapacity = (int) Math.floor(leasedMechDropships * mechDropshipCargoCapacity);
+        }
+
+        if(noASF > leasedASFCapacity) {
+            noASF -= leasedASFCapacity;
+
+            if(noASF > 0) {
+                leasedASFDropships = noASF / averageDropshipASFCapacity;
+                noASF -= leasedASFDropships * averageDropshipASFCapacity;
+
+                if (noASF > 0 && noASF < (averageDropshipASFCapacity / 2)) {
+                    leasedASFDropships += 0.5;
+                }
+                else if (noASF > 0) {
+                    leasedASFDropships += 1;
+                }
+            }
+
+            // Our Leopard-ish dropship can carry some cargo.
+            leasedCargoCapacity += (asfDropshipCargoCapacity * leasedASFDropships);
+        }
+
+        if(newNolv + nohv > 0) {
+            leasedVehicleDropships = (nohv + newNolv) / averageDropshipVehicleCapacity;
+
+            int noVehicles = (int)((nohv + newNolv) - leasedVehicleDropships * averageDropshipVehicleCapacity);
+
+            // Gazelles are pretty minimal, so no half-measures.
+            if(noVehicles > 0) {
+                leasedVehicleDropships += 1;
+            }
+
+            // Our Gazelle-ish dropship can carry some cargo.
+            leasedCargoCapacity += (vehicleDropshipCargoCapacity * leasedVehicleDropships);
+        }
+
+        if(noCargo > leasedCargoCapacity) {
+            leasedCargoDropships = noCargo / averageDropshipCargoCapacity;
+
+            noCargo -= leasedCargoCapacity * averageDropshipCargoCapacity;
+
+            if(noCargo > 0 && noCargo < (averageDropshipCargoCapacity / 2)) {
+                leasedCargoDropships += 0.5;
+            }
+            else if(noCargo > 0) {
+                leasedCargoDropships += 1;
+            }
+
+            // No need to update leased cargo capacity here, because we've already guaranteed we
+            // have enough cargo capacity.
+        }
+
+        dropshipCost = (long) (leasedMechDropships * mechDropshipCost);
+        dropshipCost += (long) (leasedASFDropships * asfDropshipCost);
+        dropshipCost += (long) (leasedVehicleDropships * vehicleDropshipCost);
+        dropshipCost += (long) (leasedCargoDropships * cargoDropshipCost);
+
+        // In Campaign Ops, DropShip costs are per month, so we need to find the
+        // total cost for the transit and divide it among the number of jumps.
+        if(campaignOpsCosts) {
+            dropshipCost = dropshipCost * months / jumps;
+        }
+
+        // Smaller/half-dropships are cheaper to rent, but still take one collar each
+        int collarsNeeded = (int) (Math.ceil(leasedMechDropships) + Math.ceil(leasedASFDropships) + Math.ceil(leasedVehicleDropships) + Math.ceil(leasedCargoDropships));
+
+        // add owned dropships
         collarsNeeded += nDropship;
 
         // now factor in owned jumpships
         collarsNeeded = Math.max(0, collarsNeeded - nCollars);
 
-        return dropshipCost + collarsNeeded * 50000;
+        long totalCost = dropshipCost + collarsNeeded * collarCost;
+
+        // FM:Mercs reimburses for transport
+        if(!excludeOwnTransports) {
+            totalCost += weeklySpacecraftMaintenance;
+        }
+
+        return totalCost;
     }
 
     public void personUpdated(Person p) {
