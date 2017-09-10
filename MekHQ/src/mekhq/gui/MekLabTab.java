@@ -239,6 +239,9 @@ public class MekLabTab extends CampaignGuiTab {
         double currentTonnage = testEntity.calculateWeight();
         currentTonnage += UnitUtil.getUnallocatedAmmoTonnage(entity);
         double tonnage = entity.getWeight();
+        if (entity instanceof BattleArmor) {
+            tonnage = ((BattleArmor)entity).getTrooperWeight() * ((BattleArmor)entity).getTroopers();
+        }
 
         if (entity.getWeight() < testEntity.calculateWeight()) {
             btnRefit.setEnabled(false);
