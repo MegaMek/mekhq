@@ -5977,9 +5977,9 @@ public class Campaign implements Serializable, ITechManager {
         int vehicleDropshipCargoCapacity = 65;
         long vehicleDropshipCost = (campaignOpsCosts ? 900000 : 40000);
 
-        // Roughly a Monarch
-        int averageDropshipCargoCapacity = 1150;
-        long cargoDropshipCost = (campaignOpsCosts ? 700000 : 225000);
+        // Roughly a Buccaneer
+        int averageDropshipCargoCapacity = 2300;
+        long cargoDropshipCost = (campaignOpsCosts ? 550000 : 250000);
 
         double leasedMechDropships = 0;
         double leasedASFDropships = 0;
