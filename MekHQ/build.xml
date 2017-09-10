@@ -12,6 +12,7 @@
     <property name="dir.test.src" location="unittests"/>
     <property name="dir.build.teststaging" location="${build}/teststaging"/>
     <property name="dir.build.testreport" location="${build}/testreport"/>
+    <property name="class.main" location="mekhq.MekHQ"/>
 
     <path id="project.classpath">
         <pathelement path="${build}">
@@ -48,6 +49,22 @@
         <path refid="classpath.compile-unittest"/>
         <pathelement location="${dir.build.test}"/>
     </path>
+
+    <!-- Runtime classpath to be added to the jar manifest's class-path. -->
+    <path id="classpath.runtime">
+        <fileset dir="${basedir}">
+            <include name="lib/*.jar"/>
+        </fileset>
+    </path>
+    <pathconvert property="classpath.manifest" pathsep=" ">
+        <path refid="classpath.runtime"/>
+        <mapper>
+            <chainedmapper>
+                <flattenmapper/>
+                <globmapper from="*.jar" to="lib/*.jar"/>
+            </chainedmapper>
+        </mapper>
+    </pathconvert>
 
     <target depends="clean" description="Initialize system before build" name="init">
         <!-- Create the time stamp -->
@@ -91,10 +108,18 @@
                 excludes=""
                 includes="**"
                 jarfile="${mekhq}"
-                manifest="manifest.txt"
                 >
+            <!-- Auto-generate the manifest file. -->
+            <manifest>
+                <attribute name="Built-By" value="${user.name}"/>
+                <attribute name="Main-Class" value="${class.main}"/>
+                <attribute name="Class-Path" value="${classpath.manifest}"/>
+            </manifest>
             <fileset dir="${src}" includes="**/*.properties"/>
         </jar>
+        <echo message="Built-By: ${user.name}"/>
+        <echo message="Main-Class: ${class.main}"/>
+        <echo message="Class-Path: ${classpath.manifest}"/>
     </target>
 
     <target name="compileTests" depends="compile" unless="skip.tests">

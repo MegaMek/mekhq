@@ -47,6 +47,7 @@ public class AmbushBuiltInScenario extends AtBScenario {
 		int enemyStart = Board.START_CENTER;
 
 		for (int weight = EntityWeightClass.WEIGHT_LIGHT; weight <= EntityWeightClass.WEIGHT_ASSAULT; weight++) {
+		    enemyEntities = new ArrayList<Entity>();
 			if (weight == EntityWeightClass.WEIGHT_LIGHT) {
 				enemyEntities.add(getEntity(getContract(campaign).getEnemyCode(), getContract(campaign).getEnemySkill(),
 						getContract(campaign).getEnemyQuality(), UnitType.MEK, weight, campaign));
