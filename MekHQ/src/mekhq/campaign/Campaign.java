@@ -5928,18 +5928,6 @@ public class Campaign implements Serializable, ITechManager {
 
         // figure out how much drop cargo we can carry, and how much it costs
         // to run our large spacecraft, if any.
-        long weeklySpacecraftMaintenance = 0;
-        for(Unit u : getUnits()) {
-            if(!u.isMothballed()) {
-                Entity e = u.getEntity();
-                if((e.getEntityType() & Entity.ETYPE_DROPSHIP) != 0) {
-                    weeklySpacecraftMaintenance += u.getWeeklyMaintenanceCost();
-                }
-                else if((e.getEntityType() & Entity.ETYPE_JUMPSHIP) != 0) {
-                    weeklySpacecraftMaintenance += u.getWeeklyMaintenanceCost();
-                }
-            }
-        }
 
         // Ok, now the costs per unit - this is the dropship fee. I am loosely
         // basing this on Field Manual Mercs, although I think the costs are
@@ -6081,7 +6069,28 @@ public class Campaign implements Serializable, ITechManager {
 
         // FM:Mercs reimburses for transport
         if(!excludeOwnTransports) {
-            totalCost += weeklySpacecraftMaintenance;
+            long ownDropshipCost = 0;
+            long ownJumpshipCost = 0;
+            for(Unit u : getUnits()) {
+                if(!u.isMothballed()) {
+                    Entity e = u.getEntity();
+                    if((e.getEntityType() & Entity.ETYPE_DROPSHIP) != 0) {
+                        ownDropshipCost += u.getMechCapacity() * (mechDropshipCost / averageDropshipMechCapacity);
+                        ownDropshipCost += u.getASFCapacity() * (asfDropshipCost / averageDropshipASFCapacity);
+                        ownDropshipCost += (u.getHeavyVehicleCapacity() + u.getLightVehicleCapacity()) * (vehicleDropshipCost / averageDropshipVehicleCapacity);
+                        ownDropshipCost += u.getCargoCapacity() * (cargoDropshipCost / averageDropshipCargoCapacity);
+                    }
+                    else if((e.getEntityType() & Entity.ETYPE_JUMPSHIP) != 0) {
+                        ownJumpshipCost += e.getDockingCollars().size() * collarCost;
+                    }
+                }
+            }
+
+            if(campaignOpsCosts) {
+                ownDropshipCost = ownDropshipCost * months / jumps;
+            }
+
+            totalCost = totalCost + ownDropshipCost + ownJumpshipCost;
         }
 
         return totalCost;
