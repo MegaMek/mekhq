@@ -22,6 +22,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
+import megamek.common.logging.LogLevel;
 import megamek.common.util.StringUtil;
 import mekhq.MekHQ;
 import mekhq.Utilities;
@@ -316,7 +317,8 @@ public class AcquisitionsDialog extends JDialog {
 				}
 
 				if (null == contract) {
-					MekHQ.logError("AtB: used bonus part but no contract has bonus parts available.");
+				    MekHQ.getLogger().log(getClass(), "useBonusPart()", LogLevel.ERROR, //$NON-NLS-1$
+				            "AtB: used bonus part but no contract has bonus parts available."); //$NON-NLS-1$
 				} else {
 					contract.useBonusPart();
 				}

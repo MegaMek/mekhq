@@ -32,6 +32,13 @@ import java.util.Hashtable;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.w3c.dom.DOMException;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import megamek.common.logging.LogLevel;
 import megamek.common.options.PilotOptions;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
@@ -40,12 +47,6 @@ import mekhq.NullEntityException;
 import mekhq.Utilities;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.SpecialAbility;
-
-import org.w3c.dom.DOMException;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  * This is an object which holds a set of objects that collectively define the game options
@@ -153,6 +154,7 @@ public class GamePreset implements MekHqXmlSerializable {
 	public static GamePreset createGamePresetFromXMLFileInputStream(
             FileInputStream fis) throws DOMException, ParseException,
                                         NullEntityException {
+	    final String METHOD_NAME = "createGamePresetFromXMLFileInputStream(FileInputStream)"; //$NON-NLS-1$
 
 		GamePreset preset = new GamePreset();
 
@@ -165,7 +167,7 @@ public class GamePreset implements MekHqXmlSerializable {
             // Parse using builder to get DOM representation of the XML file
             xmlDoc = db.parse(fis);
         } catch (Exception ex) {
-            MekHQ.logError(ex);
+            MekHQ.getLogger().log(GamePreset.class, METHOD_NAME, ex);
             return preset;
         }
 
@@ -209,7 +211,8 @@ public class GamePreset implements MekHqXmlSerializable {
                         } else if (!wn2.getNodeName().equalsIgnoreCase("skillType")) {
                             // Error condition of sorts!
                             // Errr, what should we do here?
-                            MekHQ.logMessage("Unknown node type not loaded in Skill Type nodes: "
+                            MekHQ.getLogger().log(GamePreset.class, METHOD_NAME, LogLevel.ERROR,
+                                    "Unknown node type not loaded in Skill Type nodes: " //$NON-NLS-1$
                                              + wn2.getNodeName());
 
                             continue;
@@ -229,8 +232,9 @@ public class GamePreset implements MekHqXmlSerializable {
                         if (!wn2.getNodeName().equalsIgnoreCase("ability")) {
                             // Error condition of sorts!
                             // Errr, what should we do here?
-                            MekHQ.logMessage("Unknown node type not loaded in Special Ability nodes: "
-                                    + wn2.getNodeName());
+                            MekHQ.getLogger().log(GamePreset.class, METHOD_NAME, LogLevel.ERROR,
+                                    "Unknown node type not loaded in Special Ability nodes: " //$NON-NLS-1$
+                                             + wn2.getNodeName());
                             continue;
                         }
 

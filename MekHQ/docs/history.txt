@@ -1,6 +1,23 @@
 VERSION HISTORY:
 ----------------
 v0.43.4-git
++ Updating the repo with 0.43.3 Data
++ Issue 418: Add log4j support to MekHQ.
++ Make the log files reset between MHQ runs.
++ Fixing references to crew.special_energy to match fixes in MegaMek
++ PR #398 Fix for no probe defender missions #413
++ Feature #363: Feature Request: Order from Warehouse
++ Support for LAM repairs and hiring/assigning LAM pilots.
++ Refactor MR/MS/MRW and move much of the code to a service level class from the dialog. 
+	o Fix multiple bugs related to 'impossible' fixes such as damaged hip/shoulders, missing parts, etc...
+	o Make the process much more efficient by not making checks that aren't necessary over and over.
+	o Add additional color-coded messaging when parts can't be fixed due to configuration or
+	  existing techs.
++ Issue #431: When starting a scenario in MegaMek the camo for units seems to be the defaults.
++ Issue #426: Adding or removing bombs from ASF does not update Warehouse
++ Issue #437: ATB ambush mission generates the incorrect amount of enemy units
++ issue #410: Allied traitors scenario no longer working
++ Issue #436: BA in MekHQ's mechlab has incorrect tonnage
 
 v0.43.3 (2017-07-18 18:30 UTC)
 + Feature: Refactor AtBScenario to break up the monolithic AtBScenario class and to have a separate class for each scenario

@@ -73,6 +73,7 @@ import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.Infantry;
 import megamek.common.Jumpship;
+import megamek.common.LandAirMech;
 import megamek.common.Mech;
 import megamek.common.MechSummary;
 import megamek.common.MechSummaryCache;
@@ -82,6 +83,7 @@ import megamek.common.SmallCraft;
 import megamek.common.Tank;
 import megamek.common.TechConstants;
 import megamek.common.VTOL;
+import megamek.common.logging.LogLevel;
 import megamek.common.options.IOption;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
@@ -618,32 +620,34 @@ public class Utilities {
 		// Generate solo crews
 		if (u.usesSoloPilot()) {
 			Person p = null;
-			if(u.getEntity() instanceof Mech) {
+			if (u.getEntity() instanceof LandAirMech) {
+                p = c.newPerson(Person.T_MECHWARRIOR);
+                p.addSkill(SkillType.S_PILOT_MECH, SkillType.getType(SkillType.S_PILOT_MECH).getTarget() - oldCrew.getPiloting(), 0);
+                p.addSkill(SkillType.S_GUN_MECH, SkillType.getType(SkillType.S_GUN_MECH).getTarget() - oldCrew.getGunnery(), 0);
+                p.addSkill(SkillType.S_PILOT_AERO, SkillType.getType(SkillType.S_PILOT_AERO).getTarget() - oldCrew.getPiloting(), 0);
+                p.addSkill(SkillType.S_GUN_AERO, SkillType.getType(SkillType.S_GUN_AERO).getTarget() - oldCrew.getGunnery(), 0);
+                p.setSecondaryRole(Person.T_AERO_PILOT);
+			} else if (u.getEntity() instanceof Mech) {
     			p = c.newPerson(Person.T_MECHWARRIOR);
     			p.addSkill(SkillType.S_PILOT_MECH, SkillType.getType(SkillType.S_PILOT_MECH).getTarget() - oldCrew.getPiloting(), 0);
     			p.addSkill(SkillType.S_GUN_MECH, SkillType.getType(SkillType.S_GUN_MECH).getTarget() - oldCrew.getGunnery(), 0);
-    		}
-    		else if(u.getEntity() instanceof Aero) {
+    		} else if (u.getEntity() instanceof Aero) {
     			p = c.newPerson(Person.T_AERO_PILOT);
     			p.addSkill(SkillType.S_PILOT_AERO, SkillType.getType(SkillType.S_PILOT_AERO).getTarget() - oldCrew.getPiloting(), 0);
     			p.addSkill(SkillType.S_GUN_AERO, SkillType.getType(SkillType.S_GUN_AERO).getTarget() - oldCrew.getGunnery(), 0);
-    		}
-    		else if(u.getEntity() instanceof ConvFighter) {
+    		} else if (u.getEntity() instanceof ConvFighter) {
     			p = c.newPerson(Person.T_CONV_PILOT);
     			p.addSkill(SkillType.S_PILOT_JET, SkillType.getType(SkillType.S_PILOT_JET).getTarget() - oldCrew.getPiloting(), 0);
     			p.addSkill(SkillType.S_GUN_JET, SkillType.getType(SkillType.S_GUN_JET).getTarget() - oldCrew.getPiloting(), 0);
-    		}
-    		else if(u.getEntity() instanceof Protomech) {
+    		} else if (u.getEntity() instanceof Protomech) {
     			p = c.newPerson(Person.T_PROTO_PILOT);
     			//p.addSkill(SkillType.S_PILOT_PROTO, SkillType.getType(SkillType.S_PILOT_PROTO).getTarget() - oldCrew.getPiloting(), 0);
     			p.addSkill(SkillType.S_GUN_PROTO, SkillType.getType(SkillType.S_GUN_PROTO).getTarget() - oldCrew.getGunnery(), 0);
-    		}
-    		else if(u.getEntity() instanceof VTOL) {
+    		} else if (u.getEntity() instanceof VTOL) {
     			p = c.newPerson(Person.T_VTOL_PILOT);
     			p.addSkill(SkillType.S_PILOT_VTOL, SkillType.getType(SkillType.S_PILOT_VTOL).getTarget() - oldCrew.getPiloting(), 0);
     			p.addSkill(SkillType.S_GUN_VEE, SkillType.getType(SkillType.S_GUN_VEE).getTarget() - oldCrew.getGunnery(), 0);
-    		}
-    		else {
+    		} else {
     			//assume tanker if we got here
     			p = c.newPerson(Person.T_GVEE_DRIVER);
     			p.addSkill(SkillType.S_PILOT_GVEE, SkillType.getType(SkillType.S_PILOT_GVEE).getTarget() - oldCrew.getPiloting(), 0);
@@ -701,10 +705,10 @@ public class Utilities {
 	    			p = c.newPerson(Person.T_VTOL_PILOT);
 	    			p.addSkill(SkillType.S_PILOT_VTOL, SkillType.getType(SkillType.S_PILOT_VTOL).getTarget() - oldCrew.getPiloting(), 0);
 	    			p.addSkill(SkillType.S_GUN_VEE, SkillType.getType(SkillType.S_GUN_VEE).getTarget() - oldCrew.getGunnery(), 0);
-	    		} else if (u.getEntity() instanceof Mech) {
-	                p = c.newPerson(Person.T_MECHWARRIOR);
-	                p.addSkill(SkillType.S_PILOT_MECH, SkillType.getType(SkillType.S_PILOT_MECH).getTarget() - oldCrew.getPiloting(), 0);
-	                p.addSkill(SkillType.S_GUN_MECH, SkillType.getType(SkillType.S_GUN_MECH).getTarget() - oldCrew.getGunnery(), 0);
+                } else if (u.getEntity() instanceof Mech) {
+                    p = c.newPerson(Person.T_MECHWARRIOR);
+                    p.addSkill(SkillType.S_PILOT_MECH, SkillType.getType(SkillType.S_PILOT_MECH).getTarget() - oldCrew.getPiloting(), 0);
+                    p.addSkill(SkillType.S_GUN_MECH, SkillType.getType(SkillType.S_GUN_MECH).getTarget() - oldCrew.getGunnery(), 0);
 	    		} else {
 	    			//assume tanker if we got here
 	    			p = c.newPerson(Person.T_GVEE_DRIVER);
@@ -1464,6 +1468,8 @@ public class Utilities {
      * Run through the directory and call parser.parse(fis) for each XML file found.
      */
     public static void parseXMLFiles(String dirName, FileParser parser, boolean recurse) {
+        final String METHOD_NAME = "parseXMLFiles(String,FileParser,boolean)"; //$NON-NLS-1$
+
         if( null == dirName || null == parser ) {
             throw new NullPointerException();
         }
@@ -1490,8 +1496,9 @@ public class Utilities {
                             parser.parse(fis);
                         } catch(Exception ex) {
                             // Ignore this file then
-                            MekHQ.logError("Exception trying to parse " + file.getPath() + " - ignoring."); //$NON-NLS-1$ //$NON-NLS-2$
-                            MekHQ.logError(ex);
+                            MekHQ.getLogger().log(Utilities.class, METHOD_NAME, LogLevel.ERROR,
+                                    "Exception trying to parse " + file.getPath() + " - ignoring."); //$NON-NLS-1$ //$NON-NLS-2$
+                            MekHQ.getLogger().log(Utilities.class, METHOD_NAME, ex);
                         }
                     }
                 }

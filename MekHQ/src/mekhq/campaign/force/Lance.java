@@ -390,7 +390,7 @@ public class Lance implements Serializable, MekHqXmlSerializable {
                         getBattleDate(c.getCalendar()));
             } else if (roll < 41) {
                 return AtBScenarioFactory.createScenario(c, this,
-                        AtBScenario.PROBE, true,
+                        AtBScenario.PROBE, false,
                         getBattleDate(c.getCalendar()));
             } else if (roll < 41 + noBattle) {
                 return null;
@@ -494,6 +494,8 @@ public class Lance implements Serializable, MekHqXmlSerializable {
     }
 
     public static Lance generateInstanceFromXML(Node wn) {
+        final String METHOD_NAME = "generateInstanceFromXML(Node)"; //$NON-NLS-1$
+        
         Lance retVal = null;
         NamedNodeMap attrs = wn.getAttributes();
         Node classNameNode = attrs.getNamedItem("type");
@@ -516,7 +518,7 @@ public class Lance implements Serializable, MekHqXmlSerializable {
                 }
             }
         } catch (Exception ex) {
-            MekHQ.logError(ex);
+            MekHQ.getLogger().log(Lance.class, METHOD_NAME, ex);
         }
         return retVal;
     }

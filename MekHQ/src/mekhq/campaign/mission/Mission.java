@@ -25,6 +25,11 @@ import java.io.Serializable;
 import java.text.ParseException;
 import java.util.ArrayList;
 
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
@@ -32,10 +37,6 @@ import mekhq.Version;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.Planets;
-
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 
 /**
@@ -246,6 +247,8 @@ public class Mission implements Serializable, MekHqXmlSerializable {
 	}
 	
 	public static Mission generateInstanceFromXML(Node wn, Campaign c, Version version) {
+	    final String METHOD_NAME = "generateInstanceFromXML(Node,Campaign,Version)"; //$NON-NLS-1$
+	    
 		Mission retVal = null;
 		NamedNodeMap attrs = wn.getAttributes();
 		Node classNameNode = attrs.getNamedItem("type");
@@ -285,7 +288,8 @@ public class Mission implements Serializable, MekHqXmlSerializable {
 						if (!wn3.getNodeName().equalsIgnoreCase("scenario")) {
 							// Error condition of sorts!
 							// Errr, what should we do here?
-							MekHQ.logMessage("Unknown node type not loaded in Scenario nodes: "+wn3.getNodeName());
+						    MekHQ.getLogger().log(Mission.class, METHOD_NAME, LogLevel.ERROR,
+						            "Unknown node type not loaded in Scenario nodes: " + wn3.getNodeName()); //$NON-NLS-1$
 
 							continue;
 						}
@@ -301,7 +305,7 @@ public class Mission implements Serializable, MekHqXmlSerializable {
 			// Errrr, apparently either the class name was invalid...
 			// Or the listed name doesn't exist.
 			// Doh!
-			MekHQ.logError(ex);
+            MekHQ.getLogger().log(Mission.class, METHOD_NAME, ex);
 		}
 		
 		return retVal;

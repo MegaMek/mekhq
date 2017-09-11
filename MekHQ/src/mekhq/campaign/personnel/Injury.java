@@ -66,7 +66,7 @@ public class Injury {
             // For debugging only!
             // unmarshaller.setEventHandler(new javax.xml.bind.helpers.DefaultValidationEventHandler());
         } catch(JAXBException e) {
-            MekHQ.logError(e);
+            MekHQ.getLogger().log(Injury.class, "<init>", e);
         }
     } 
     
@@ -79,7 +79,7 @@ public class Injury {
         try {    
             return unmarshaller.unmarshal(wn, Injury.class).getValue();
         } catch (Exception ex) {
-            MekHQ.logError(ex);
+            MekHQ.getLogger().log(Injury.class, "generateInstanceFromXML(Node)", ex); //$NON-NLS-1$
         }
         return null;
     }
@@ -284,7 +284,7 @@ public class Injury {
         try {
             marshaller.marshal(this, pw1);
         } catch(JAXBException ex) {
-            MekHQ.logError(ex);
+            MekHQ.getLogger().log(getClass(), "writeToXml(PrintWriter,int)", ex); //$NON-NLS-1$
         }
     }
     

@@ -33,13 +33,14 @@ import java.util.HashSet;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import megamek.common.Compute;
-import mekhq.MekHQ;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import megamek.common.Compute;
+import megamek.common.logging.LogLevel;
+import mekhq.MekHQ;
 
 /**
  * @author Neoancient
@@ -268,9 +269,10 @@ public class Bloodname implements Serializable {
 	 */
 	public static Bloodname randomBloodname(Clan faction, int phenotype, int year) {
 	    if (null == faction) {
-	        MekHQ.logError("Random Bloodname attempted for a clan that does not exist."
+	        MekHQ.getLogger().log(Bloodname.class, "randomBloodname(Clan,int,int)", LogLevel.ERROR, //$NON-NLS-1$
+	                "Random Bloodname attempted for a clan that does not exist." //$NON-NLS-1$
 	                + System.lineSeparator()
-	                + "Please ensure that your clan exists in both the clans.xml and bloodnames.xml files as appropriate.");
+	                + "Please ensure that your clan exists in both the clans.xml and bloodnames.xml files as appropriate."); //$NON-NLS-1$
 	        return null;
 	    }
 		if (Compute.randomInt(20) == 0) {
@@ -301,7 +303,7 @@ public class Bloodname implements Serializable {
 			 * to be used by those Clans but not by others.
 			 */
 			if (name.isInactive(year) ||
-					(name.isAbjured(year) && !name.getOrigClan().equals(faction)) ||
+					(name.isAbjured(year) && !name.getOrigClan().equals(faction.getCode())) ||
 					0 == name.phenotypeMultiplier(phenotype, year)) {
 				continue;
 			}
@@ -325,7 +327,7 @@ public class Bloodname implements Serializable {
 				 * 1/(number of Clans) instead.
 				 */
 				if (name.getOrigClan().equals(faction.getCode()) ||
-						(null != name.getAbsorbed() && faction.equals(name.getAbsorbed().clan) &&
+						(null != name.getAbsorbed() && faction.getCode().equals(name.getAbsorbed().clan) &&
 						name.getAbsorbed().year > year)) {
 					if (name.isExclusive() || numClans > 1) {
 						weight = new Fraction(1, numClans);
@@ -345,7 +347,7 @@ public class Bloodname implements Serializable {
 					 * among those Clans.
 					 */
 					for (Bloodname.NameAcquired a : name.getAcquiringClans()) {
-						if (faction.equals(a.clan)) {
+						if (faction.getCode().equals(a.clan)) {
 							weight = new Fraction(1, numClans);
 							break;
 						}
@@ -428,6 +430,8 @@ public class Bloodname implements Serializable {
 	}
 
 	public static void loadBloodnameData() {
+	    final String METHOD_NAME = "loadBloodnameData()"; //$NON-NLS-1$
+	    
 		Clan.loadClanData();
 		bloodnames = new ArrayList<Bloodname>();
 
@@ -436,7 +440,8 @@ public class Bloodname implements Serializable {
 		try {
 			fis = new FileInputStream(f);
 		} catch (FileNotFoundException e) {
-			MekHQ.logError("Cannot find file bloodnames.xml");
+		    MekHQ.getLogger().log(Bloodname.class, METHOD_NAME, LogLevel.ERROR,
+		            "Cannot find file bloodnames.xml"); //$NON-NLS-1$
 			return;
 		}
 
@@ -462,7 +467,8 @@ public class Bloodname implements Serializable {
 				}
 			}
 		}
-		MekHQ.logMessage("Loaded " + bloodnames.size() + " Bloodname records.");
+        MekHQ.getLogger().log(Bloodname.class, METHOD_NAME, LogLevel.INFO,
+                "Loaded " + bloodnames.size() + " Bloodname records."); //$NON-NLS-1$
 	}
 
 	public class NameAcquired {
@@ -591,7 +597,8 @@ class Clan {
 		try {
 			fis = new FileInputStream(f);
 		} catch (FileNotFoundException e) {
-			MekHQ.logError("Cannot find file clans.xml");
+            MekHQ.getLogger().log(Bloodname.class, "loadClanData()", LogLevel.ERROR,
+                    "Cannot find file clans.xml"); //$NON-NLS-1$
 			return;
 		}
 

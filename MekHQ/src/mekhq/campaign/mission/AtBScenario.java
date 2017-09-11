@@ -59,6 +59,7 @@ import megamek.common.MechSummaryCache;
 import megamek.common.PlanetaryConditions;
 import megamek.common.Player;
 import megamek.common.UnitType;
+import megamek.common.logging.LogLevel;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
@@ -963,13 +964,15 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
      */
     protected Entity createEntityWithCrew(String faction, int skill,
             Campaign campaign, MechSummary ms) {
+        final String METHOD_NAME = "createEntityWithCrew(String,int,Campaign,MechSummary)"; //$NON-NLS-1$
         Entity en = null;
         try {
             en = new MechFileParser(ms.getSourceFile(), ms.getEntryName()).getEntity();
         } catch (Exception ex) {
             en = null;
-            MekHQ.logError("Unable to load entity: " + ms.getSourceFile() + ": " + ms.getEntryName() + ": " + ex.getMessage());
-            MekHQ.logError(ex);
+            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
+                    "Unable to load entity: " + ms.getSourceFile() + ": " + ms.getEntryName() + ": " + ex.getMessage()); //$NON-NLS-1$
+            MekHQ.getLogger().log(getClass(), METHOD_NAME, ex);
             return null;
         }
 
@@ -1040,6 +1043,8 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
      * @return                A new Entity
      */
     protected Entity getEntityByName(String name, String fName, int skill, Campaign campaign) {
+        final String METHOD_NAME = "getEntityByName(String,String,int,Campaign"; //$NON-NLS-1$
+        
         MechSummary mechSummary = MechSummaryCache.getInstance().getMech(
                 name);
         if (mechSummary == null) {
@@ -1050,8 +1055,9 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         try {
             mechFileParser = new MechFileParser(mechSummary.getSourceFile(), mechSummary.getEntryName());
         } catch (Exception ex) {
-            MekHQ.logError(ex);
-            MekHQ.logError("Unable to load unit: " + name);
+            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
+                    "Unable to load unit: " + name); //$NON-NLS-1$
+            MekHQ.getLogger().log(getClass(), METHOD_NAME, ex);
         }
         if (mechFileParser == null) {
             return null;
@@ -1705,6 +1711,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
     @Override
     protected void loadFieldsFromXmlNode(Node wn) throws ParseException {
+        final String METHOD_NAME = "loadFieldsFromXmlNode(Node)"; //$NON-NLS-1$
         super.loadFieldsFromXmlNode(wn);
         NodeList nl = wn.getChildNodes();
 
@@ -1758,8 +1765,9 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                                         Integer.parseInt(wn3.getAttributes().getNamedItem("deployment").getTextContent())));
                             }
                         } catch (Exception e) {
-                            MekHQ.logError("Error loading allied unit in scenario");
-                            MekHQ.logError(e);
+                            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
+                                    "Error loading allied unit in scenario"); //$NON-NLS-1$
+                            MekHQ.getLogger().log(getClass(), METHOD_NAME, e);
                         }
                         if (en != null) {
                             alliesPlayer.add(en);
@@ -1781,8 +1789,9 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                                         Integer.parseInt(wn3.getAttributes().getNamedItem("deployment").getTextContent())));
                             }
                         } catch (Exception e) {
-                            MekHQ.logError("Error loading allied unit in scenario");
-                            MekHQ.logError(e);
+                            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
+                                    "Error loading allied unit in scenario"); //$NON-NLS-1$
+                            MekHQ.getLogger().log(getClass(), METHOD_NAME, e);
                         }
                         if (en != null) {
                             bigBattleAllies.add(en);
@@ -1812,8 +1821,9 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                                                 Integer.parseInt(wn4.getAttributes().getNamedItem("deployment").getTextContent())));
                                     }
                                 } catch (Exception e) {
-                                    MekHQ.logError("Error loading allied unit in scenario");
-                                    MekHQ.logError(e);
+                                    MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
+                                            "Error loading allied unit in scenario"); //$NON-NLS-1$
+                                    MekHQ.getLogger().log(getClass(), METHOD_NAME, e);
                                 }
                                 if (null != en) {
                                     specMissionEnemies.get(weightClass).add(en);
@@ -1828,8 +1838,9 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 try {
                     bf.setFieldsFromXmlNode(wn2);
                 } catch (Exception e) {
-                    MekHQ.logError("Error loading allied unit in scenario");
-                    MekHQ.logError(e);
+                    MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
+                            "Error loading allied unit in scenario"); //$NON-NLS-1$
+                    MekHQ.getLogger().log(getClass(), METHOD_NAME, e);
                     bf = null;
                 }
                 if (null != bf) {
@@ -2089,8 +2100,9 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             try {
                 behaviorSettings = BehaviorSettingsFactory.getInstance().DEFAULT_BEHAVIOR.getCopy();
             } catch (PrincessException ex) {
-                MekHQ.logError("Error getting Princess default behaviors");
-                MekHQ.logError(ex);
+                MekHQ.getLogger().log(getClass(), "BotForce()", LogLevel.ERROR, //$NON-NLS-1$
+                        "Error getting Princess default behaviors"); //$NON-NLS-1$
+                MekHQ.getLogger().log(getClass(), "BotForce()", ex); //$NON-NLS-1$
             }
         };
 
@@ -2104,6 +2116,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
         public BotForce(String name, int team, int start, int home, ArrayList<Entity> entityList,
                 String camoCategory, String camoFileName, int colorIndex) {
+            final String METHOD_NAME = "BotForce(String,int,int,int,ArrayList<Entity>,String,String,int)"; //$NON-NLS-1$
             this.name = name;
             this.team = team;
             this.start = start;
@@ -2114,8 +2127,9 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             try {
                 behaviorSettings = BehaviorSettingsFactory.getInstance().DEFAULT_BEHAVIOR.getCopy();
             } catch (PrincessException ex) {
-                MekHQ.logError("Error getting Princess default behaviors");
-                MekHQ.logError(ex);
+                MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
+                        "Error getting Princess default behaviors"); //$NON-NLS-1$
+                MekHQ.getLogger().log(getClass(), METHOD_NAME, ex);
             }
             behaviorSettings.setHomeEdge(findHomeEdge(home));
         }
@@ -2242,6 +2256,8 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         }
 
         public void setFieldsFromXmlNode(Node wn) {
+            final String METHOD_NAME = "setFieldsFromXmlNode(Node)"; //$NON-NLS-1$
+            
             NodeList nl = wn.getChildNodes();
             for (int x = 0; x < nl.getLength(); x++) {
                 Node wn2 = nl.item(x);
@@ -2270,8 +2286,9 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                                             Integer.parseInt(wn3.getAttributes().getNamedItem("deployment").getTextContent())));
                                 }
                             } catch (Exception e) {
-                                MekHQ.logError("Error loading allied unit in scenario");
-                                MekHQ.logError(e);
+                                MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
+                                        "Error loading allied unit in scenario"); //$NON-NLS-1$
+                                MekHQ.getLogger().log(getClass(), METHOD_NAME, e);
                             }
                             if (en != null) {
                                 entityList.add(en);

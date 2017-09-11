@@ -27,8 +27,6 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.io.File;
 import java.util.Calendar;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -53,6 +51,7 @@ import megamek.common.Mounted;
 import megamek.common.Tank;
 import megamek.common.WeaponType;
 import megamek.common.loaders.EntityLoadingException;
+import megamek.common.logging.LogLevel;
 import megamek.common.verifier.EntityVerifier;
 import megamek.common.verifier.TestAero;
 import megamek.common.verifier.TestBattleArmor;
@@ -115,7 +114,8 @@ public class MekLabTab extends CampaignGuiTab {
         entityVerifier = EntityVerifier.getInstance(new File("data/mechfiles/UnitVerifierOptions.xml"));
         UnitUtil.loadFonts();
         new CConfig();
-        MekHQ.logMessage("Staring MegaMekLab version: " + MegaMekLab.VERSION);
+        MekHQ.getLogger().log(getClass(), "initTab()", LogLevel.INFO, //$NON-NLS-1$
+                "Staring MegaMekLab version: " + MegaMekLab.VERSION); //$NON-NLS-1$
         btnRefit = new JButton("Begin Refit");
         btnRefit.addActionListener(evt -> {
             Entity entity = labPanel.getEntity();
@@ -161,7 +161,7 @@ public class MekLabTab extends CampaignGuiTab {
         try {
             entity = (new MechFileParser(mechSummary.getSourceFile(), mechSummary.getEntryName())).getEntity();
         } catch (EntityLoadingException ex) {
-            Logger.getLogger(CampaignGUI.class.getName()).log(Level.SEVERE, null, ex);
+            MekHQ.getLogger().log(getClass(), "loadUnit(Unit)", ex); //$NON-NLS-1$
         }
         entity.setYear(unit.campaign.getCalendar().get(Calendar.YEAR));
         UnitUtil.updateLoadedMech(entity);
@@ -187,7 +187,7 @@ public class MekLabTab extends CampaignGuiTab {
         try {
             entity = (new MechFileParser(mechSummary.getSourceFile(), mechSummary.getEntryName())).getEntity();
         } catch (EntityLoadingException ex) {
-            Logger.getLogger(CampaignGUI.class.getName()).log(Level.SEVERE, null, ex);
+            MekHQ.getLogger().log(getClass(), "resetUnit()", ex); //$NON-NLS-1$
         }
         entity.setYear(unit.campaign.getCalendar().get(Calendar.YEAR));
         UnitUtil.updateLoadedMech(entity);
@@ -239,6 +239,9 @@ public class MekLabTab extends CampaignGuiTab {
         double currentTonnage = testEntity.calculateWeight();
         currentTonnage += UnitUtil.getUnallocatedAmmoTonnage(entity);
         double tonnage = entity.getWeight();
+        if (entity instanceof BattleArmor) {
+            tonnage = ((BattleArmor)entity).getTrooperWeight() * ((BattleArmor)entity).getTroopers();
+        }
 
         if (entity.getWeight() < testEntity.calculateWeight()) {
             btnRefit.setEnabled(false);

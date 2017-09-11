@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
@@ -105,13 +106,19 @@ public class AtBScenarioFactory {
 
 	@SuppressWarnings("unchecked")
 	public static boolean registerScenario(IAtBScenario scenario) {
+	    final String METHOD_NAME = "registerScenario(IAtBScenario)"; //$NON-NLS-1$
+	    
 		if (!IAtBScenario.class.isAssignableFrom(scenario.getClass())) {
-			MekHQ.logMessage(String.format("Unable to register an AtBScenario of class '%s' because is does not implement '%s'.", scenario.getClass().getName(), IAtBScenario.class.getName()), 5);
+	        MekHQ.getLogger().log(AtBScenarioFactory.class, METHOD_NAME, LogLevel.ERROR,
+	                String.format("Unable to register an AtBScenario of class '%s' because is does not implement '%s'.", //$NON-NLS-1$
+	                        scenario.getClass().getName(), IAtBScenario.class.getName()));
 			return false;
 		}
 		
 		if (!scenario.getClass().isAnnotationPresent(AtBScenarioEnabled.class)) {
-			MekHQ.logMessage(String.format("Unable to register an AtBScenario of class '%s' because is does not have the '%s' annotation.", scenario.getClass().getName(), AtBScenarioEnabled.class.getName()), 5);
+            MekHQ.getLogger().log(AtBScenarioFactory.class, METHOD_NAME, LogLevel.ERROR,
+                    String.format("Unable to register an AtBScenario of class '%s' because is does not have the '%s' annotation.", //$NON-NLS-1$
+                            scenario.getClass().getName(), AtBScenarioEnabled.class.getName()));
 			return false;
 		}
 		

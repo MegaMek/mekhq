@@ -32,15 +32,16 @@ import javax.swing.JOptionPane;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import mekhq.MekHQ;
-import mekhq.MekHqXmlUtil;
-import mekhq.Version;
-import mekhq.gui.model.RankTableModel;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import megamek.common.logging.LogLevel;
+import mekhq.MekHQ;
+import mekhq.MekHqXmlUtil;
+import mekhq.Version;
+import mekhq.gui.model.RankTableModel;
 
 /**
  * This object will keep track of rank information. It will keep information
@@ -120,8 +121,11 @@ public class Ranks {
 	}
     
     public static void initializeRankSystems() {
+        final String METHOD_NAME = "initializeRankSystems()"; //$NON-NLS-1$
+
         rankSystems = new Hashtable<Integer, Ranks>();
-        MekHQ.logMessage("Starting load of Rank Systems from XML...");
+        MekHQ.getLogger().log(Ranks.class, METHOD_NAME, LogLevel.INFO,
+                "Starting load of Rank Systems from XML..."); //$NON-NLS-1$
         // Initialize variables.
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         Document xmlDoc = null;
@@ -135,7 +139,7 @@ public class Ranks {
             // Parse using builder to get DOM representation of the XML file
             xmlDoc = db.parse(fis);
         } catch (Exception ex) {
-            MekHQ.logError(ex);
+            MekHQ.getLogger().log(Ranks.class, METHOD_NAME, ex);
         }
     
         Element ranksEle = xmlDoc.getDocumentElement();
@@ -168,7 +172,8 @@ public class Ranks {
                 }
             }
         }   
-        MekHQ.logMessage("Done loading Rank Systems");
+        MekHQ.getLogger().log(Ranks.class, METHOD_NAME, LogLevel.INFO,
+                "Done loading Rank Systems"); //$NON-NLS-1$
     }
 	
 	public static Ranks getRanksFromSystem(int system) {
@@ -446,7 +451,9 @@ public class Ranks {
     }
 	
 	public static Ranks generateInstanceFromXML(Node wn, Version version) {
-		Ranks retVal = new Ranks();
+        final String METHOD_NAME = "generateInstanceFromXML(Node,Version)"; //$NON-NLS-1$
+
+        Ranks retVal = new Ranks();
 		boolean showMessage = false;
         
         // Dump the ranks ArrayList so we can re-use it.
@@ -510,7 +517,7 @@ public class Ranks {
             // Errrr, apparently either the class name was invalid...
             // Or the listed name doesn't exist.
             // Doh!
-            MekHQ.logError(ex);
+            MekHQ.getLogger().log(Ranks.class, METHOD_NAME, ex);
         }
         
         return retVal;
