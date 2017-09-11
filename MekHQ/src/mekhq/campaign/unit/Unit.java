@@ -3892,6 +3892,7 @@ public class Unit implements MekHqXmlSerializable {
     }
 
     public long getSparePartsCost() {
+        final String METHOD_NAME = "getSparePartsCost()"; //$NON-NLS-1$
         long partsCost = 0;
 
         entity = getEntity();
@@ -3916,15 +3917,17 @@ public class Unit implements MekHqXmlSerializable {
                 partsCost += 6 * .002 * 10000;
             } else {
                 partsCost += ((long)entity.getWeight()) * .002 * 10000;
-                MekHQ.logMessage(getName() + " is not a generic CI. Movement mode is "
-                        + entity.getMovementModeAsString(), 5);
+                MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
+                        getName() + " is not a generic CI. Movement mode is "
+                        + entity.getMovementModeAsString());
             }
 
         } else {
             // Only protomechs should fall here. Anything else needs to be logged
             if (!(entity instanceof Protomech)) {
-                MekHQ.logMessage(getName() + " has no Spare Parts value for unit type " 
-                        + Entity.getEntityTypeName(entity.getEntityType()), 5);
+                MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
+                        getName() + " has no Spare Parts value for unit type " 
+                        + Entity.getEntityTypeName(entity.getEntityType()));
             }
         }
 
