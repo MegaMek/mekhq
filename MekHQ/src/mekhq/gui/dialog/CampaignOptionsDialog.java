@@ -298,6 +298,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JCheckBox chkUseParentage;
     private JCheckBox chkLogConception;
     private JCheckBox chkUseTransfers;
+    private JCheckBox chkUseTimeInService;
 
 
     private JSpinner spnNDiceTransitTime;
@@ -1516,6 +1517,11 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.gridy = 21;
         panPersonnel.add(chkUseTransfers, gridBagConstraints);
 
+        chkUseTimeInService = new JCheckBox("Use Time In Service (Unofficial)"); // NOI18N
+        chkUseTimeInService.setSelected(options.getUseTimeInService());
+        gridBagConstraints.gridy = 22;
+        panPersonnel.add(chkUseTimeInService, gridBagConstraints);
+
         JPanel panSalary = new JPanel(new GridBagLayout());
         panSalary.setBorder(BorderFactory.createTitledBorder("Salary"));
 
@@ -1618,7 +1624,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridheight = 22;
+        gridBagConstraints.gridheight = 23;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
@@ -4272,6 +4278,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setUseParentage(chkUseParentage.isSelected());
         options.setLogConception(chkLogConception.isSelected());
         options.setUseTransfers(chkUseTransfers.isSelected());
+        options.setUseTimeInService(chkUseTimeInService.isSelected());
         options.setDefaultPrisonerStatus(comboPrisonerStatus.getSelectedIndex());
 
         rskillPrefs.setOverallRecruitBonus((Integer) spnOverallRecruitBonus.getModel().getValue());

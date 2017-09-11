@@ -1643,10 +1643,16 @@ public class CampaignGUI extends JPanel {
 
     private void menuOptionsActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_menuOptionsActionPerformed
         boolean atb = getCampaign().getCampaignOptions().getUseAtB();
+        boolean timein = getCampaign().getCampaignOptions().getUseTimeInService();
         boolean staticRATs = getCampaign().getCampaignOptions().useStaticRATs();
         CampaignOptionsDialog cod = new CampaignOptionsDialog(getFrame(), true,
                 getCampaign(), getIconPackage().getCamos());
         cod.setVisible(true);
+        if (timein != getCampaign().getCampaignOptions().getUseTimeInService()) {
+            if (getCampaign().getCampaignOptions().getUseTimeInService()) {
+                getCampaign().initTimeInService();
+            }
+        }
         if (atb != getCampaign().getCampaignOptions().getUseAtB()) {
             if (getCampaign().getCampaignOptions().getUseAtB()) {
                 getCampaign().initAtB();
