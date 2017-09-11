@@ -69,6 +69,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
     private Hashtable<String, JCheckBox> skillChks = new Hashtable<String, JCheckBox>();
     private PilotOptions options;
     private GregorianCalendar birthdate;
+    private GregorianCalendar recruitment;
     private SimpleDateFormat dateFormat;
     private Frame frame;
     
@@ -77,6 +78,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
     private javax.swing.JButton btnRandomName;
     private javax.swing.JButton btnRandomBloodname;
     private javax.swing.JButton btnDate;
+    private javax.swing.JButton btnServiceDate;
     private javax.swing.JComboBox<String> choiceGender;
     private javax.swing.JScrollPane scrOptions;
     private javax.swing.JScrollPane scrBio;
@@ -85,6 +87,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
     private javax.swing.JLabel lblName;
     private javax.swing.JLabel lblGender;
     private javax.swing.JLabel lblBday;
+    private javax.swing.JLabel lblRecruitment;
     private javax.swing.JLabel lblAge;
     private javax.swing.JLabel lblNickname;
     private javax.swing.JLabel lblBloodname;
@@ -122,7 +125,10 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
     }
 
     private void initializePilotAndOptions () {
-    	this.birthdate = (GregorianCalendar)person.getBirthday().clone();
+        this.birthdate = (GregorianCalendar)person.getBirthday().clone();
+    	if(campaign.getCampaignOptions().getUseTimeInService() && person.getRecruitment() != null) {
+            this.recruitment = (GregorianCalendar)person.getRecruitment().clone();
+        }
     	this.options = person.getOptions();	
     	initComponents();
     }
@@ -136,6 +142,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         lblName = new javax.swing.JLabel();
         lblGender = new javax.swing.JLabel();
         lblBday = new javax.swing.JLabel();
+        lblRecruitment = new javax.swing.JLabel();
         lblAge = new javax.swing.JLabel();
         lblNickname = new javax.swing.JLabel();
         lblBloodname = new javax.swing.JLabel();
@@ -158,6 +165,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         btnRandomName = new javax.swing.JButton();
         btnRandomBloodname = new javax.swing.JButton();
         btnDate = new javax.swing.JButton();
+        btnServiceDate = new javax.swing.JButton();
 
         ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CustomizePersonDialog", new EncodeControl()); //$NON-NLS-1$
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
@@ -366,8 +374,34 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
         panDemog.add(lblAge, gridBagConstraints);
-        
-        
+
+        if (campaign.getCampaignOptions().getUseTimeInService() && recruitment != null) {
+            lblRecruitment.setText(resourceMap.getString("lblRecruitment.text")); // NOI18N
+            lblRecruitment.setName("lblRecruitment"); // NOI18N
+            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = 6;
+            gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+            gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
+            panDemog.add(lblRecruitment, gridBagConstraints);
+
+            if (recruitment != null) {
+                btnServiceDate.setText(getDateAsString2());
+                btnServiceDate.setName("btnServiceDate"); // NOI18N
+                btnServiceDate.addActionListener(new java.awt.event.ActionListener() {
+                    public void actionPerformed(java.awt.event.ActionEvent evt) {
+                        btnServiceDateActionPerformed(evt);
+                    }
+                });
+            }
+            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = 6;
+            gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+            panDemog.add(btnServiceDate, gridBagConstraints);
+
+        }
+
         lblToughness.setText(resourceMap.getString("lblToughness.text")); // NOI18N
         lblToughness.setName("lblToughness"); // NOI18N
         
@@ -377,13 +411,13 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         if(campaign.getCampaignOptions().useToughness()) {
         	gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = 6;
+            gridBagConstraints.gridy = 7;
             gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
             gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
             panDemog.add(lblToughness, gridBagConstraints);
             gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 1;
-            gridBagConstraints.gridy = 6;
+            gridBagConstraints.gridy = 7;
             gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
             gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
             panDemog.add(textToughness, gridBagConstraints);
@@ -458,30 +492,30 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         
         if (campaign.getCampaignOptions().getUseAtB()) {
 	        gridBagConstraints.gridx = 0;
-	        gridBagConstraints.gridy = 7;
+	        gridBagConstraints.gridy = 8;
 	        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
 	        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
 	        panDemog.add(lblUnit, gridBagConstraints);
 	        
 	        gridBagConstraints.gridx = 1;
-	        gridBagConstraints.gridy = 7;
+	        gridBagConstraints.gridy = 8;
 	        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
 	        panDemog.add(choiceUnitWeight, gridBagConstraints);
 
 	        gridBagConstraints.gridx = 2;
-	        gridBagConstraints.gridy = 7;
+	        gridBagConstraints.gridy = 8;
 	        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
 	        panDemog.add(choiceUnitTech, gridBagConstraints);
 
 	        gridBagConstraints.gridx = 0;
-	        gridBagConstraints.gridy = 8;
+	        gridBagConstraints.gridy = 9;
 	        gridBagConstraints.gridwidth = 3;
 	        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
 	        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
 	        panDemog.add(choiceOriginalUnit, gridBagConstraints);
 	        
 	        gridBagConstraints.gridx = 0;
-	        gridBagConstraints.gridy = 9;
+	        gridBagConstraints.gridy = 10;
 	        gridBagConstraints.gridwidth = 2;
 	        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
 	        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
@@ -489,7 +523,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
 	        
 	        if (campaign.getCampaignOptions().getUseShareSystem()) {
 	        	gridBagConstraints.gridx = 2;
-	        	gridBagConstraints.gridy = 9;
+	        	gridBagConstraints.gridy = 10;
 	        	gridBagConstraints.gridwidth = 1;
 	        	gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
 	        	panDemog.add(lblShares, gridBagConstraints);
@@ -509,7 +543,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 10;
+        gridBagConstraints.gridy = 11;
         gridBagConstraints.gridwidth = 3;
         gridBagConstraints.weightx = 0.0;
         gridBagConstraints.weighty = 1.0;
@@ -602,7 +636,8 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         person.setBloodname(textBloodname.getText());
         person.setBiography(txtBio.getText());
         person.setGender(choiceGender.getSelectedIndex());
-        person.setBirthday(birthdate);  
+        person.setBirthday(birthdate);
+        person.setRecruitment(recruitment);
         person.setPhenotype(choicePheno.getSelectedIndex());
         person.setClanner(chkClan.isSelected());
         try {
@@ -897,7 +932,11 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
     private String getDateAsString() {
         return dateFormat.format(birthdate.getTime());
     }
-    
+
+    private String getDateAsString2() {
+        return dateFormat.format(recruitment.getTime());
+    }
+
     private void changeSkillValue(String type) {
     	if(!skillChks.get(type).isSelected()) {
     		skillValues.get(type).setText("-");
@@ -929,6 +968,16 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
             birthdate = dc.getDate();
             btnDate.setText(getDateAsString());
             lblAge.setText(getAge() + " " + resourceMap.getString("age")); // NOI18N
+        }
+    }
+
+    private void btnServiceDateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnServiceDateActionPerformed
+        // show the date chooser
+        DateChooser dc = new DateChooser(frame, recruitment);
+        // user can either choose a date or cancel by closing
+        if (dc.showDateChooser() == DateChooser.OK_OPTION) {
+            recruitment = dc.getDate();
+            btnServiceDate.setText(getDateAsString2());
         }
     }
 
