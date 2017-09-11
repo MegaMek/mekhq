@@ -424,6 +424,8 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 					shotsNeeded = getFullShots() - mounted.getBaseShotsLeft();
 				} else {
 					//we have a change of munitions
+					mounted.changeAmmoType((AmmoType) type);
+					this.unload();
 					shotsNeeded = getFullShots();
 				}
 			}
