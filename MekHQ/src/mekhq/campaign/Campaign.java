@@ -8709,4 +8709,44 @@ public class Campaign implements Serializable {
         }
         return ammoCost;
     }
+
+    public boolean isFactionComstar() {
+        if (getFactionCode().equals("CS")) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isFactionClan() {
+        switch (getFactionCode()) {
+            case "CBS":
+            case "CB":
+            case "CCC":
+            case "CCO":
+            case "SOC":
+            case "CDS":
+            case "CFM":
+            case "CGB":
+            case "CGS":
+            case "CHH":
+            case "CIH":
+            case "CJF":
+            case "CMG":
+            case "CNC":
+            case "CSJ":
+            case "CSR":
+            case "CSA":
+            case "CSV":
+            case "CSL":
+            case "CWI":
+            case "CW":
+            case "CWE":
+            case "CWIE":
+            case "CWOV":
+            case "CEI":
+            case "RA":
+                return true;
+            default: return false;
+        }
+    }
 }

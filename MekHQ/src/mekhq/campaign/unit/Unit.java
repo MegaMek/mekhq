@@ -3951,7 +3951,8 @@ public class Unit implements MekHqXmlSerializable {
             Engine en = entity.getEngine();
             int currentYear = campaign.getCalendar().get(Calendar.YEAR);
             int rating = getTechRating();
-            if ((currentYear > 2859) && (currentYear < 3040)) {
+            if (((currentYear > 2859) && (currentYear < 3040))
+                    && (!campaign.isFactionClan() && !campaign.isFactionComstar())) {
                 if (rating > EquipmentType.RATING_D) {
                     partsCost = (long)(partsCost * 5.0);
                 }
