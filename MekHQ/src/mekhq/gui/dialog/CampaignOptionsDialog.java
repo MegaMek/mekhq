@@ -89,6 +89,7 @@ import megamek.common.logging.LogLevel;
 import megamek.common.options.GameOptions;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
+import megamek.common.options.OptionsConstants;
 import megamek.common.options.PilotOptions;
 import megamek.common.util.DirectoryItems;
 import megamek.common.util.EncodeControl;
@@ -491,7 +492,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         allowISPurchasesBox.setSelected(options.allowISPurchases());
         allowCanonOnlyBox.setSelected(options.allowCanonOnly());
         allowCanonRefitOnlyBox.setSelected(options.allowCanonRefitOnly());
-        variableTechLevelBox.setSelected(options.variableTechLevel());
+        variableTechLevelBox.setSelected(campaign.getGameOptions()
+                .getOption(OptionsConstants.ALLOWED_ERA_BASED).booleanValue());
         factionIntroDateBox.setSelected(options.useFactionIntroDate());
         useAmmoByTypeBox.setSelected(options.useAmmoByType());
 
@@ -4282,7 +4284,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setAllowISPurchases(allowISPurchasesBox.isSelected());
         options.setAllowCanonOnly(allowCanonOnlyBox.isSelected());
         campaign.getGameOptions().getOption("canon_only").setValue(allowCanonOnlyBox.isSelected());
-        options.setVariableTechLevel(variableTechLevelBox.isSelected());
+        campaign.getGameOptions().getOption(OptionsConstants.ALLOWED_ERA_BASED).setValue(variableTechLevelBox.isSelected());
         options.setfactionIntroDate(factionIntroDateBox.isSelected());
         options.setAllowCanonRefitOnly(allowCanonRefitOnlyBox.isSelected());
         options.setUseAmmoByType(useAmmoByTypeBox.isSelected());

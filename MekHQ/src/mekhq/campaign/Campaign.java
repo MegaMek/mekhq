@@ -103,6 +103,7 @@ import megamek.common.options.GameOptions;
 import megamek.common.options.IBasicOption;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
+import megamek.common.options.OptionsConstants;
 import megamek.common.options.PilotOptions;
 import megamek.common.util.BuildingBlock;
 import megamek.common.util.DirectoryItems;
@@ -8676,7 +8677,7 @@ public class Campaign implements Serializable, ITechManager {
 
     @Override
     public boolean useVariableTechLevel() {
-        return campaignOptions.variableTechLevel();
+        return getGameOptions().getOption(OptionsConstants.ALLOWED_ERA_BASED).booleanValue();
     }
 
     @Override

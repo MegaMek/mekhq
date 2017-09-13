@@ -3988,7 +3988,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     }
 
     public SimpleTechLevel getSimpleTechLevel() {
-        if (campaign.getCampaignOptions().variableTechLevel()) {
+        if (campaign.useVariableTechLevel()) {
             return getSimpleLevel(campaign.getCalendar().get(Calendar.YEAR));
         } else {
             return getStaticTechLevel();
@@ -3996,7 +3996,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     }
     
     public SimpleTechLevel getSimpleTechLevel(int year) {
-        if (campaign.getCampaignOptions().variableTechLevel()) {
+        if (campaign.useVariableTechLevel()) {
             return getSimpleLevel(year);
         } else {
             return getStaticTechLevel();
@@ -4004,7 +4004,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     }
     
     public SimpleTechLevel getSimpleTechLevel(int year, boolean clan, int faction) {
-        if (campaign.getCampaignOptions().variableTechLevel()) {
+        if (campaign.useVariableTechLevel()) {
             return getSimpleLevel(year, clan, faction);
         } else {
             return getStaticTechLevel();
