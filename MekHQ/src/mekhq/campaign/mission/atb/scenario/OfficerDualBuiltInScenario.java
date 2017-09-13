@@ -85,6 +85,7 @@ public class OfficerDualBuiltInScenario extends AtBScenario {
 		}
 
 		for (int weight = EntityWeightClass.WEIGHT_LIGHT; weight <= EntityWeightClass.WEIGHT_ASSAULT; weight++) {
+		    enemyEntities = new ArrayList<Entity>();
 			Entity en = getEntity(getContract(campaign).getEnemyCode(), getContract(campaign).getEnemySkill(),
 					getContract(campaign).getEnemyQuality(), UnitType.MEK,
 					Math.min(weight + 1, EntityWeightClass.WEIGHT_ASSAULT), campaign);
