@@ -92,6 +92,7 @@ import megamek.common.Protomech;
 import megamek.common.SmallCraft;
 import megamek.common.Tank;
 import megamek.common.TargetRoll;
+import megamek.common.Warship;
 import megamek.common.loaders.BLKFile;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.logging.LogLevel;
@@ -2535,14 +2536,59 @@ public class Campaign implements Serializable {
             	}
             }
             // Payday!
-            if (campaignOptions.payForSalaries()) {
-                if (finances.debit(getPayRoll(), Transaction.C_SALARY,
-                                   "Monthly salaries", calendar.getTime())) {
-                    addReport("Payday! Your account has been debited for "
-                              + formatter.format(getPayRoll())
-                              + " C-bills in personnel salaries");
+            if (campaignOptions.usePeacetimeCost()) {
+                if (!campaignOptions.showPeacetimeCost()) {
+                    if (finances.debit(getPeacetimeCost(), Transaction.C_MAINTAIN, "Monthly Peacetime Operating Costs", calendar.getTime())) {
+                        addReport("Your account has been debited "
+                                + formatter.format(getPeacetimeCost())
+                                + " C-bills for peacetime operating costs");
+                    } else {
+                        addReport("<font color='red'><b>You cannot afford to pay operating costs!</b></font> Lucky for you that this does not appear to have any effect.");
+                    }
                 } else {
-                    addReport("<font color='red'><b>You cannot afford to pay payroll costs!</b></font> Lucky for you that personnel morale is not yet implemented.");
+                    if (finances.debit(getMonthlySpareParts(), Transaction.C_MAINTAIN,
+                            "Monthly Spare Parts", calendar.getTime())) {
+                        addReport("Your account has been debited "
+                                + formatter.format(getMonthlySpareParts())
+                                + " C-bills for spare parts");
+                    } else {
+                        addReport("<font color='red'><b>You cannot afford to pay for spare parts!</b></font> Lucky for you that this does not appear to have any effect.");
+                    }
+                    if (finances.debit(getMonthlyAmmo(), Transaction.C_MAINTAIN,
+                            "Monthly Ammunition", calendar.getTime())) {
+                        addReport("Your account has been debited "
+                                + formatter.format(getMonthlyAmmo())
+                                + " C-bills for training munitions");
+                    } else {
+                        addReport("<font color='red'><b>You cannot afford to pay for training munitions!</b></font> Lucky for you that this does not appear to have any effect.");
+                    }
+                    if (finances.debit(getMonthlyFuel(), Transaction.C_MAINTAIN,
+                            "Monthly Fuel bill", calendar.getTime())) {
+                        addReport("Your account has been debited "
+                                + formatter.format(getMonthlyFuel())
+                                + " C-bills for fuel");
+                    } else {
+                        addReport("<font color='red'><b>You cannot afford to pay for fuel!</b></font> Lucky for you that this does not appear to have any effect.");
+                    }
+                    if (finances.debit(getPayRoll(), Transaction.C_SALARY,
+                            "Monthly salaries", calendar.getTime())) {
+                        addReport("Payday! Your account has been debited for "
+                                  + formatter.format(getPayRoll())
+                                  + " C-bills in personnel salaries");
+                    } else {
+                        addReport("<font color='red'><b>You cannot afford to pay payroll costs!</b></font> Lucky for you that personnel morale is not yet implemented.");
+                    }
+                }
+            } else {
+                if (campaignOptions.payForSalaries()) {
+                    if (finances.debit(getPayRoll(), Transaction.C_SALARY,
+                                       "Monthly salaries", calendar.getTime())) {
+                        addReport("Payday! Your account has been debited for "
+                                  + formatter.format(getPayRoll())
+                                  + " C-bills in personnel salaries");
+                    } else {
+                        addReport("<font color='red'><b>You cannot afford to pay payroll costs!</b></font> Lucky for you that personnel morale is not yet implemented.");
+                    }
                 }
             }
             if (campaignOptions.payForOverhead()) {
@@ -7319,8 +7365,8 @@ public class Campaign implements Serializable {
     }
 
     /**
-     * Calculate the total value of units in the TO&E. This serves as the basis for contract payments in the StellarOps
-     * Beta.
+     * Calculate the total value of units in the TO&E. This serves as the basis for contract payments in Campaign
+     * Operations.
      *
      * @return
      */
@@ -7329,8 +7375,8 @@ public class Campaign implements Serializable {
     }
 
     /**
-     * Calculate the total value of units in the TO&E. This serves as the basis for contract payments in the StellarOps
-     * Beta.
+     * Calculate the total value of units in the TO&E. This serves as the basis for contract payments in Campaign
+     * Operations.
      *
      * @return
      */
@@ -7344,25 +7390,53 @@ public class Campaign implements Serializable {
             if (noInfantry && u.getEntity() instanceof Infantry && !(u.getEntity() instanceof BattleArmor)) {
             	continue;
             }
-            // lets exclude dropships and jumpships
-            if (u.getEntity() instanceof Dropship
-                || u.getEntity() instanceof Jumpship) {
-                continue;
-            }
-            // we will assume sale value for now, but make this customizable
-            if (getCampaignOptions().useEquipmentContractSaleValue()) {
-                value += u.getSellValue();
+            if (u.getEntity() instanceof Dropship) {
+                if (getCampaignOptions().getDropshipContractPercent() == 0) {
+                    continue;
+                }
+                if (getCampaignOptions().useEquipmentContractSaleValue()) {
+                    value += (getCampaignOptions().getDropshipContractPercent() / 100) * u.getSellValue();
+                } else {
+                    value += (getCampaignOptions().getDropshipContractPercent() / 100) * u.getBuyCost();
+                }
+            } else if (u.getEntity() instanceof Warship) {
+                if (getCampaignOptions().getWarshipContractPercent() == 0) {
+                    continue;
+                }
+                if (getCampaignOptions().useEquipmentContractSaleValue()) {
+                    value += (getCampaignOptions().getWarshipContractPercent() / 100) * u.getSellValue();
+                } else {
+                    value += (getCampaignOptions().getWarshipContractPercent() / 100) * u.getBuyCost();
+                }
+            } else if (u.getEntity() instanceof Jumpship) {
+                if (getCampaignOptions().getJumpshipContractPercent() == 0) {
+                    continue;
+                }
+                if (getCampaignOptions().useEquipmentContractSaleValue()) {
+                    value += (getCampaignOptions().getJumpshipContractPercent() / 100) * u.getSellValue();
+                } else {
+                    value += (getCampaignOptions().getJumpshipContractPercent() / 100) * u.getBuyCost();
+                }
             } else {
-                value += u.getBuyCost();
+                // we will assume sale value for now, but make this customizable
+                if (getCampaignOptions().useEquipmentContractSaleValue()) {
+                    value += (getCampaignOptions().getEquipmentContractPercent() / 100.0) * u.getSellValue();
+                } else {
+                    value += (getCampaignOptions().getEquipmentContractPercent() / 100.0) * u.getBuyCost();
+                }
             }
+
         }
         return value;
     }
 
     public long getContractBase() {
-        if (getCampaignOptions().useEquipmentContractBase()) {
-            return (long) ((getCampaignOptions().getEquipmentContractPercent() / 100.0)
-            		* getForceValue(getCampaignOptions().useInfantryDontCount()));
+        if (getCampaignOptions().usePeacetimeCost()) {
+            double peacetimecost = (getPeacetimeCost() * .75) +
+                    getForceValue(getCampaignOptions().useInfantryDontCount());
+            return (long) peacetimecost;
+        } else if (getCampaignOptions().useEquipmentContractBase()) {
+            return getForceValue(getCampaignOptions().useInfantryDontCount());
         } else {
             return getPayRoll(getCampaignOptions().useInfantryDontCount());
         }
@@ -7435,6 +7509,9 @@ public class Campaign implements Serializable {
 
         long monthlyIncome = 0;
         long monthlyExpenses = 0;
+        long coSpareParts = 0;
+        long coFuel = 0;
+        long coAmmo = 0;
         long maintenance = 0;
         long salaries = 0;
         long overhead = 0;
@@ -7448,11 +7525,16 @@ public class Campaign implements Serializable {
         if (campaignOptions.payForOverhead()) {
             overhead = getOverheadExpenses();
         }
+        if (campaignOptions.usePeacetimeCost()) {
+            coSpareParts = getMonthlySpareParts();
+            coAmmo = getMonthlyAmmo();
+            coFuel = getMonthlyFuel();
+        }
         for (Contract contract : getActiveContracts()) {
             contracts += contract.getMonthlyPayOut();
         }
         monthlyIncome += contracts;
-        monthlyExpenses = maintenance + salaries + overhead;
+        monthlyExpenses = maintenance + salaries + overhead + coSpareParts + coAmmo + coFuel;
 
         long assets = cash + mech + vee + ba + infantry + largeCraft
                       + smallCraft + proto + getFinances().getTotalAssetValue();
@@ -7558,6 +7640,17 @@ public class Campaign implements Serializable {
         sb.append("    Overhead............. ")
           .append(String.format(formatted, DecimalFormat.getInstance()
                                                         .format(overhead))).append("\n");
+        if (campaignOptions.usePeacetimeCost()) {
+            sb.append("    Spare Parts.......... ")
+              .append(String.format(formatted, DecimalFormat.getInstance()
+                                                          .format(coSpareParts))).append("\n");
+            sb.append("    Training Munitions... ")
+              .append(String.format(formatted, DecimalFormat.getInstance()
+                                                          .format(coAmmo))).append("\n");
+            sb.append("    Fuel................. ")
+              .append(String.format(formatted, DecimalFormat.getInstance()
+                                                          .format(coFuel))).append("\n");
+        }
 
         return new String(sb);
     }
@@ -8569,5 +8662,91 @@ public class Campaign implements Serializable {
             }
         }
         return false;
+    }
+
+    public int getPeacetimeCost() {
+        int cost = 0;
+
+        cost += getPayRoll(getCampaignOptions().useInfantryDontCount());
+        cost += getMonthlySpareParts();
+        cost += getMonthlyFuel();
+        cost += getMonthlyAmmo();
+        return cost;
+    }
+
+    public long getMonthlySpareParts() {
+        long partsCost = 0;
+
+        for (Unit u : getUnits()) {
+            if (u.isMothballed()) {
+                continue;
+            }
+            partsCost += u.getSparePartsCost();
+        }
+        return partsCost;
+    }
+
+    public long getMonthlyFuel() {
+        long fuelCost = 0;
+
+        for (Unit u : getUnits()) {
+            if (u.isMothballed()) {
+                continue;
+            }
+            fuelCost += u.getFuelCost();
+        }
+        return fuelCost;
+    }
+
+    public long getMonthlyAmmo() {
+        long ammoCost= 0;
+
+        for (Unit u : getUnits()) {
+            if (u.isMothballed()) {
+                continue;
+            }
+            ammoCost += u.getAmmoCost();
+        }
+        return ammoCost;
+    }
+
+    public boolean isFactionComstar() {
+        if (getFactionCode().equals("CS")) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isFactionClan() {
+        switch (getFactionCode()) {
+            case "CBS":
+            case "CB":
+            case "CCC":
+            case "CCO":
+            case "SOC":
+            case "CDS":
+            case "CFM":
+            case "CGB":
+            case "CGS":
+            case "CHH":
+            case "CIH":
+            case "CJF":
+            case "CMG":
+            case "CNC":
+            case "CSJ":
+            case "CSR":
+            case "CSA":
+            case "CSV":
+            case "CSL":
+            case "CWI":
+            case "CW":
+            case "CWE":
+            case "CWIE":
+            case "CWOV":
+            case "CEI":
+            case "RA":
+                return true;
+            default: return false;
+        }
     }
 }
