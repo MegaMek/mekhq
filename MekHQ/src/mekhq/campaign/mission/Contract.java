@@ -401,90 +401,89 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
         } else {
             profit -= c.getPayRoll() * getLength();
         }
-        if(null != c.getPlanet(planetName) && c.getCampaignOptions().payForTransport()) {
-            DateTime currentDate = Utilities.getDateTimeDay(c.getCalendar());
-            JumpPath jumpPath = c.calculateJumpPath(c.getCurrentPlanet(), getPlanet());
-            double days = Math.round(jumpPath.getTotalTime(currentDate, c.getLocation().getTransitTime())*100.0)/100.0;
-            int roundedMonths = (int) Math.ceil(days / 30.0);
+		if(null != c.getPlanet(planetName) && c.getCampaignOptions().payForTransport()) {
+			DateTime currentDate = Utilities.getDateTimeDay(c.getCalendar());
+			JumpPath jumpPath = c.calculateJumpPath(c.getCurrentPlanet(), getPlanet());
+			double days = Math.round(jumpPath.getTotalTime(currentDate, c.getLocation().getTransitTime())*100.0)/100.0;
+			int roundedMonths = (int) Math.ceil(days / 30.0);
 
-            // TODO: for Campaign Ops transport rules, use excludeOwnTransport = true.
-            transportAmount = (long)((transportComp/100.0) * 2 * c.calculateCostPerJump(false, false, jumpPath.getJumps(), roundedMonths) * jumpPath.getJumps());
-            profit -= 2 * c.calculateCostPerJump(false, false, jumpPath.getJumps(), roundedMonths) * jumpPath.getJumps();
-        }
-        return profit;
-    }
+			boolean campaignOps = c.getCampaignOptions().useEquipmentContractBase();
+			transportAmount = (long)((transportComp/100.0) * 2 * c.calculateCostPerJump(campaignOps, campaignOps, jumpPath.getJumps(), roundedMonths) * jumpPath.getJumps());
+			profit -= 2 * c.calculateCostPerJump(campaignOps, campaignOps, jumpPath.getJumps(), roundedMonths) * jumpPath.getJumps();
+		}
+		return profit;
+	}
 
-    public int getMonthsLeft(Date date) {
-        GregorianCalendar cal = new GregorianCalendar();
-        cal.setTime(date);
-        cal.add(Calendar.MONTH, 1);
-        date = cal.getTime();
-        int monthsLeft = 0;
-        while (date.before(endDate) || date.equals(endDate)) {
-            monthsLeft++;
-            cal.add(Calendar.MONTH, 1);
-            date = cal.getTime();
-        }
-        return monthsLeft;
-    }
+	public int getMonthsLeft(Date date) {
+		GregorianCalendar cal = new GregorianCalendar();
+		cal.setTime(date);
+		cal.add(Calendar.MONTH, 1);
+		date = cal.getTime();
+		int monthsLeft = 0;
+		while(date.before(endDate) || date.equals(endDate)) {
+			monthsLeft++;
+			cal.add(Calendar.MONTH, 1);
+			date = cal.getTime();
+		}
+		return monthsLeft;
+	}
 
-    /**
-     * Only do this at the time the contract is set up, otherwise amounts may change
-     * after the ink is signed, which is a no-no.
-     * 
-     * @param c
-     */
-    public void calculateContract(Campaign c) {
+	/**
+	 * Only do this at the time the contract is set up, otherwise amounts may change after
+	 * the ink is signed, which is a no-no.
+	 * @param c
+	 */
+	public void calculateContract(Campaign c) {
 
-        // calculate base amount
-        baseAmount = (long) (paymentMultiplier * getLength() * c.getContractBase());
+		//calculate base amount
+		baseAmount = (long)(paymentMultiplier * getLength() * c.getContractBase());
 
-        // calculate overhead
-        switch (overheadComp) {
-            case OH_HALF:
-                overheadAmount = (long) (0.5 * c.getOverheadExpenses() * getLength());
-                break;
-            case OH_FULL:
-                overheadAmount = (long) (1 * c.getOverheadExpenses() * getLength());
-                break;
-            default:
-                overheadAmount = 0;
-        }
+		//calculate overhead
+		switch(overheadComp) {
+		case OH_HALF:
+			overheadAmount = (long)(0.5 * c.getOverheadExpenses() * getLength());
+			break;
+		case OH_FULL:
+			overheadAmount = (long)(1 * c.getOverheadExpenses() * getLength());
+			break;
+		default:
+			overheadAmount = 0;
+		}
 
-        // calculate support amount
-        if (c.getCampaignOptions().usePeacetimeCost() && c.getCampaignOptions().getUnitRatingMethod()
-                .equals(mekhq.campaign.rating.UnitRatingMethod.CAMPAIGN_OPS)) {
-            supportAmount = (long) ((straightSupport / 100.0) * c.getPeacetimeCost() * getLength());
-        } else {
-            long maintCosts = 0;
-            for (Unit u : c.getUnits()) {
-                if (u.getEntity() instanceof Infantry && !(u.getEntity() instanceof BattleArmor)) {
-                    continue;
-                }
-                maintCosts += u.getWeeklyMaintenanceCost();
-            }
-            maintCosts *= 4;
-            supportAmount = (long) ((straightSupport / 100.0) * maintCosts * getLength());
-        }
+		//calculate support amount
+		if (c.getCampaignOptions().usePeacetimeCost()
+		        && c.getCampaignOptions().getUnitRatingMethod().equals(mekhq.campaign.rating.UnitRatingMethod.CAMPAIGN_OPS)) {
+		    supportAmount = (long)((straightSupport/100.0) * c.getPeacetimeCost() * getLength());
+		} else {
+		    long maintCosts = 0;
+	        for (Unit u : c.getUnits()) {
+	            if (u.getEntity() instanceof Infantry && !(u.getEntity() instanceof BattleArmor)) {
+	                continue;
+	            }
+	            maintCosts += u.getWeeklyMaintenanceCost();
+	        }
+	        maintCosts *= 4;
+	        supportAmount = (long)((straightSupport/100.0) * maintCosts * getLength());
+		}
 
-        // calculate transportation costs
-        if (null != Planets.getInstance().getPlanetById(planetName) && c.getCampaignOptions().payForTransport()) {
-            DateTime currentDate = Utilities.getDateTimeDay(c.getCalendar());
-            JumpPath jumpPath = c.calculateJumpPath(c.getCurrentPlanet(), getPlanet());
-            double days = Math.round(jumpPath.getTotalTime(currentDate, c.getLocation().getTransitTime())*100.0)/100.0;
-            int roundedMonths = (int) Math.ceil(days / 30.0);
+		//calculate transportation costs
+		if(null != Planets.getInstance().getPlanetById(planetName)) {
+			DateTime currentDate = Utilities.getDateTimeDay(c.getCalendar());
+			JumpPath jumpPath = c.calculateJumpPath(c.getCurrentPlanet(), getPlanet());
+			double days = Math.round(jumpPath.getTotalTime(currentDate, c.getLocation().getTransitTime())*100.0)/100.0;
+			int roundedMonths = (int) Math.ceil(days / 30.0);
 
-            // TODO: for Campaign Ops transport rules, use excludeOwnTransport = true.
-            transportAmount = (long)((transportComp/100.0) * c.calculateCostPerJump(false, false, jumpPath.getJumps(), roundedMonths) * jumpPath.getJumps());
-        }
+			// FM:Mercs transport payments take into account owned transports and do not use CampaignOps dropship costs.
+			// CampaignOps doesn't care about owned transports and does use its own dropship costs.
+			boolean campaignOps = c.getCampaignOptions().useEquipmentContractBase();
+			transportAmount = (long)((transportComp/100.0) * 2 * c.calculateCostPerJump(campaignOps, campaignOps, jumpPath.getJumps(), roundedMonths) * jumpPath.getJumps());
+		}
 
-        // calculate transit amount for CO
-        if (c.getCampaignOptions().usePeacetimeCost() && c.getCampaignOptions().getUnitRatingMethod()
-                .equals(mekhq.campaign.rating.UnitRatingMethod.CAMPAIGN_OPS)) {
-            // contract base * transport period * reputation * employer modifier
-            transitAmount = (long) (c.getContractBase()
-                    * (((c.calculateJumpPath(c.getCurrentPlanet(), getPlanet()).getJumps()) * 2) / 4)
-                    * (c.getUnitRatingMod() * .2 + .5) * 1.2);
+		//calculate transit amount for CO
+        if (c.getCampaignOptions().usePeacetimeCost()
+                && c.getCampaignOptions().getUnitRatingMethod().equals(mekhq.campaign.rating.UnitRatingMethod.CAMPAIGN_OPS)) {
+            //contract base * transport period * reputation * employer modifier
+            transitAmount = (long)(c.getContractBase() * (((c.calculateJumpPath(c.getCurrentPlanet(), getPlanet()).getJumps()) * 2) / 4) * (c.getUnitRatingMod() * .2 + .5) * 1.2);
         } else {
             transitAmount = 0;
         }

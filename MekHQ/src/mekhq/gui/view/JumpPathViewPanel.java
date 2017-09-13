@@ -270,7 +270,7 @@ public class JumpPathViewPanel extends javax.swing.JPanel {
             double days = Math.round(path.getTotalTime(currentDate, campaign.getLocation().getTransitTime())*100.0)/100.0;
             int roundedMonths = (int) Math.ceil(days / 30.0);
             txtCost.setName("lblCost2"); // NOI18N
-            txtCost.setText(formatter.format(path.getJumps() * campaign.calculateCostPerJump(true, false, path.getJumps(), roundedMonths)) + " C-bills");
+            txtCost.setText(formatter.format(path.getJumps() * campaign.calculateCostPerJump(true, campaign.getCampaignOptions().useEquipmentContractBase(), path.getJumps(), roundedMonths)) + " C-bills");
             txtCost.setEditable(false);
             txtCost.setLineWrap(true);
             txtCost.setWrapStyleWord(true);
