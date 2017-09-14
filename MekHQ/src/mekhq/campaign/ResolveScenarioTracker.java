@@ -45,6 +45,7 @@ import megamek.common.Crew;
 import megamek.common.CriticalSlot;
 import megamek.common.EjectedCrew;
 import megamek.common.Entity;
+import megamek.common.IAero;
 import megamek.common.IArmorState;
 import megamek.common.IEntityRemovalConditions;
 import megamek.common.Infantry;
@@ -1201,8 +1202,8 @@ public class ResolveScenarioTracker {
                 long currentValue = unit.getValueOfAllMissingParts();
                 campaign.clearGameData(en);
                 // FIXME: Need to implement a "fuel" part just like the "armor" part
-                if (en instanceof Aero) {
-                    ((Aero)en).setFuelTonnage(((Aero)ustatus.getBaseEntity()).getFuelTonnage());
+                if (en.isAero()) {
+                    ((IAero)en).setFuelTonnage(((IAero)ustatus.getBaseEntity()).getFuelTonnage());
                 }
                 unit.setEntity(en);
                 unit.runDiagnostic(true);

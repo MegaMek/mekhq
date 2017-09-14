@@ -63,6 +63,8 @@ import megamek.common.Infantry;
 import megamek.common.InfantryBay;
 import megamek.common.InsulatedCargoBay;
 import megamek.common.Jumpship;
+import megamek.common.LAMPilot;
+import megamek.common.LandAirMech;
 import megamek.common.LightVehicleBay;
 import megamek.common.LiquidCargoBay;
 import megamek.common.LivestockCargoBay;
@@ -2447,6 +2449,18 @@ public class Unit implements MekHqXmlSerializable {
                 }
             }
         }
+        if (getEntity() instanceof LandAirMech) {
+            if (null == avionics) {
+                avionics = new Avionics((int)entity.getWeight(), campaign);
+                addPart(avionics);
+                partsToAdd.add(avionics);
+            }
+            if (null == landingGear) {
+                landingGear = new LandingGear((int) entity.getWeight(), campaign);
+                addPart(landingGear);
+                partsToAdd.add(landingGear);
+            }
+        }
 
         if(addParts) {
             for(Part p : partsToAdd) {
@@ -2625,7 +2639,11 @@ public class Unit implements MekHqXmlSerializable {
                 }
             }
         } else {
-            calcCompositeCrew();
+            if ((entity.getEntityType() & Entity.ETYPE_LAND_AIR_MECH) == 0) {
+                calcCompositeCrew();
+            } else {
+                refreshLAMPilot();
+            }
             if (entity.getCrew().isMissing(0)) {
                 return;
             }
@@ -2684,8 +2702,6 @@ public class Unit implements MekHqXmlSerializable {
     /**
      * For vehicles, infantry, and naval vessels, compute the piloting and gunnery skills based
      * on the crew as a whole.
-     * 
-     * @return The size of the crew.
      */
     private void calcCompositeCrew() {
         if (drivers.isEmpty() && gunners.isEmpty()) {
@@ -2853,6 +2869,56 @@ public class Unit implements MekHqXmlSerializable {
         entity.getCrew().setGunnery(Math.min(Math.max(gunnery, 0), 7), 0);
         entity.getCrew().setArtillery(Math.min(Math.max(artillery, 7), 8), 0);
         entity.getCrew().setSize(nCrew);
+        entity.getCrew().setMissing(false, 0);
+    }
+    
+    /**
+     * LAMs require a pilot that is cross-trained for mechs and fighters
+     */
+    private void refreshLAMPilot() {
+        Person pilot = getCommander();
+        if (null == pilot) {
+            entity.getCrew().setMissing(true, 0);
+            entity.getCrew().setSize(0);
+            return;
+        }
+        
+        int pilotingMech = 13;
+        int gunneryMech = 13;
+        int pilotingAero = 13;
+        int gunneryAero = 13;
+        int artillery = 13;
+        
+        if (pilot.hasSkill(SkillType.S_PILOT_MECH)) {
+            pilotingMech = pilot.getSkill(SkillType.S_PILOT_MECH).getFinalSkillValue();
+        }
+        if (pilot.hasSkill(SkillType.S_GUN_MECH)) {
+            gunneryMech = pilot.getSkill(SkillType.S_GUN_MECH).getFinalSkillValue();
+        }
+        if (pilot.hasSkill(SkillType.S_PILOT_AERO)) {
+            pilotingAero = pilot.getSkill(SkillType.S_PILOT_AERO).getFinalSkillValue();
+        }
+        if (pilot.hasSkill(SkillType.S_GUN_AERO)) {
+            gunneryAero = pilot.getSkill(SkillType.S_GUN_AERO).getFinalSkillValue();
+        }
+        if (pilot.hasSkill(SkillType.S_ARTILLERY)) {
+            artillery = pilot.getSkill(SkillType.S_ARTILLERY).getFinalSkillValue();
+        }
+
+        if (campaign.getCampaignOptions().useAdvancedMedical()) {
+            pilotingMech += pilot.getPilotingInjuryMod();
+            gunneryMech += pilot.getGunneryInjuryMod();
+            pilotingAero += pilot.getPilotingInjuryMod();
+            gunneryAero += pilot.getGunneryInjuryMod();
+            artillery += pilot.getGunneryInjuryMod();
+        }
+        LAMPilot crew = (LAMPilot)entity.getCrew();
+        crew.setPiloting(Math.min(Math.max(pilotingMech, 0), 8));
+        crew.setGunnery(Math.min(Math.max(gunneryMech, 0), 7));
+        crew.setPilotingAero(Math.min(Math.max(pilotingAero, 0), 8));
+        crew.setGunneryAero(Math.min(Math.max(gunneryAero, 0), 7));
+        entity.getCrew().setArtillery(Math.min(Math.max(artillery, 7), 8), 0);
+        entity.getCrew().setSize(1);
         entity.getCrew().setMissing(false, 0);
     }
     
@@ -3804,5 +3870,246 @@ public class Unit implements MekHqXmlSerializable {
             entName = getEntity().getDisplayName();
         }
         return "Unit for Entity: " + entName;
+    }
+
+    public int getTechRating() {
+        int techRating = 0;
+        for(Part p : parts) {
+            int tempRating = p.getTechRating();
+            
+            if (tempRating > techRating) {
+                techRating = tempRating;
+            }
+        }
+        return techRating;
+    }
+
+    public String displayMonthlyCost() {
+        String unitMonthlyCost = "<b>Spare Parts</b>: " + getSparePartsCost() + " C-bills<br>"
+                               + "<b>Ammunition</b>: " + getAmmoCost() + " C-bills<br>"
+                               + "<b>Fuel</b>: " + getFuelCost() + " C-bills<br>";
+        return unitMonthlyCost;
+    }
+
+    public long getSparePartsCost() {
+        final String METHOD_NAME = "getSparePartsCost()"; //$NON-NLS-1$
+        long partsCost = 0;
+
+        entity = getEntity();
+        if (isMothballed()) {
+            return partsCost;
+        }
+        if ((entity instanceof Jumpship) || (entity instanceof SpaceStation)) {
+            partsCost += ((long)entity.getWeight()) * .0001 * 15000;
+        } else if (entity instanceof Aero) {
+            partsCost += ((long)entity.getWeight()) * .001 * 15000;
+        } else if (entity instanceof Tank) {
+            partsCost += ((long)entity.getWeight()) * .001 * 8000;
+        } else if ((entity instanceof Mech) || (entity instanceof BattleArmor)
+                || ((Infantry) entity).isMechanized()) {
+            partsCost += ((long)entity.getWeight()) * .001 * 10000;
+        } else if (entity instanceof Infantry) {
+            if (entity.getMovementMode() == EntityMovementMode.INF_LEG) {
+                partsCost += 3 * .002 * 10000;
+            } else if (entity.getMovementMode() == EntityMovementMode.INF_JUMP) {
+                partsCost += 4 * .002 * 10000;
+            } else if (entity.getMovementMode() == EntityMovementMode.INF_MOTORIZED) {
+                partsCost += 6 * .002 * 10000;
+            } else {
+                partsCost += ((long)entity.getWeight()) * .002 * 10000;
+                MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
+                        getName() + " is not a generic CI. Movement mode is "
+                        + entity.getMovementModeAsString());
+            }
+
+        } else {
+            // Only protomechs should fall here. Anything else needs to be logged
+            if (!(entity instanceof Protomech)) {
+                MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
+                        getName() + " has no Spare Parts value for unit type " 
+                        + Entity.getEntityTypeName(entity.getEntityType()));
+            }
+        }
+
+        // Handle cost for quirks if used
+        if (entity.hasQuirk("easy_maintain")) {
+            partsCost = (long)(partsCost * .8);
+        }
+        if (entity.hasQuirk("difficult_maintain")) {
+            partsCost = (long)(partsCost * 1.25);
+        }
+        if (entity.hasQuirk("non_standard")) {
+            partsCost = (long)(partsCost * 2.0);
+        }
+        if (entity.hasQuirk("ubiquitous_is")) {
+            partsCost = (long)(partsCost * .75);
+        }
+        // TODO Obsolete quirk
+
+        // Now for extended parts cost modifiers
+        if (campaign.getCampaignOptions().useExtendedPartsModifier()) {
+            Engine en = entity.getEngine();
+            int currentYear = campaign.getCalendar().get(Calendar.YEAR);
+            int rating = getTechRating();
+            if (((currentYear > 2859) && (currentYear < 3040))
+                    && (!campaign.isFactionClan() && !campaign.isFactionComstar())) {
+                if (rating > EquipmentType.RATING_D) {
+                    partsCost = (long)(partsCost * 5.0);
+                }
+            }
+            if (rating == EquipmentType.RATING_E) {
+                partsCost = (long)(partsCost * 1.1);
+            }
+            if (rating == EquipmentType.RATING_F) {
+                partsCost = (long)(partsCost * 1.25);
+            }
+            if ((entity instanceof Tank)
+                    && (en.getEngineType() == Engine.NORMAL_ENGINE)) {
+                partsCost = (long)(partsCost * 2.0);
+            }
+            if (!(entity instanceof Infantry)) {
+                if ((en.getEngineType() == Engine.XL_ENGINE)
+                        || (en.getEngineType() == Engine.XXL_ENGINE)) {
+                    partsCost = (long)(partsCost * 2.5);
+                }
+                if (en.getEngineType() == Engine.LIGHT_ENGINE) {
+                    partsCost = (long)(partsCost * 1.5);
+                }
+            }
+            if (entity.isClan()) {
+                if ((currentYear >3048) && (currentYear < 3071)) {
+                    partsCost = (long)(partsCost * 5.0);
+                } else if (currentYear > 3070) {
+                    partsCost = (long)(partsCost * 4.0);
+                }
+            }
+        }
+
+        return partsCost;
+    }
+
+    public long getAmmoCost() {
+        long ammoCost = 0;
+
+        for (Part p : getParts()) {
+            if (p instanceof EquipmentPart && ((EquipmentPart)p).getType() instanceof AmmoType) {
+                ammoCost += p.getStickerPrice();
+            }
+        }
+        ammoCost = (long)(ammoCost * .25);
+
+        return ammoCost;
+    }
+
+    public long getFuelCost() {
+        long fuelCost = 0;
+
+        if ((entity instanceof Warship) || (entity instanceof SmallCraft) ) {
+            fuelCost += ((long)getTonsBurnDay(entity));
+        } else if (entity instanceof Jumpship) {
+            fuelCost += ((long)getTonsBurnDay(entity));// * 3 * 15000;
+        } else if (entity instanceof ConvFighter) {
+            fuelCost += getFighterFuelCost(entity);
+        } else if (entity instanceof megamek.common.Aero) {
+            fuelCost += ((long)((Aero) entity).getFuelTonnage()) * 4 * 15000;
+        } else if ((entity instanceof Tank) || (entity instanceof Mech)) {
+            fuelCost += getVehicleFuelCost(entity);
+        } else if (entity instanceof Infantry) {
+            fuelCost += getInfantryFuelCost(entity);
+        }
+
+        return fuelCost;
+    }
+
+    public double getTonsBurnDay(Entity e) {
+        double tonsburnday = 0;
+        if (e instanceof Dropship) {
+            if (((SmallCraft) e).getDesignType() != Dropship.MILITARY) {
+                if (e.getWeight() < 1000) {
+                    tonsburnday = 1.84;
+                } else if (e.getWeight() < 4000) {
+                    tonsburnday = 2.82;
+                } else if (e.getWeight() < 9000) {
+                    tonsburnday = 3.37;
+                } else if (e.getWeight() < 20000) {
+                    tonsburnday = 4.22;
+                } else if (e.getWeight() < 30000) {
+                    tonsburnday = 6.52;
+                } else if (e.getWeight() < 40000) {
+                    tonsburnday = 7.71;
+                } else if (e.getWeight() < 50000) {
+                    tonsburnday = 7.74;
+                } else if (e.getWeight() < 70000) {
+                    tonsburnday = 8.37;
+                } else {
+                    tonsburnday = 8.83;
+                }
+            } else {
+                tonsburnday = 1.84;
+            }
+            return  (tonsburnday * 15 * 15000);
+        } else if ((e instanceof SmallCraft)) {
+            return (1.84 * 15 * 15000);
+        } else if (e instanceof megamek.common.Jumpship) {
+            if (e.getWeight() < 50000) {
+                tonsburnday = 2.82;
+            } else if (e.getWeight() < 100000) {
+                tonsburnday = 9.77;
+            } else if (e.getWeight() < 200000) {
+                tonsburnday = 19.75;
+            } else {
+                tonsburnday = 39.52;
+            }
+            if (e instanceof megamek.common.Warship) {
+                return (tonsburnday * 15 * 15000);
+            }
+            return (tonsburnday * 3 * 15000);
+        }        
+        return tonsburnday;
+    }
+
+    public double getFighterFuelCost(Entity e) {
+        Engine en = e.getEngine();
+        if (en.isFusion()) {
+            return ((Aero) e).getFuelTonnage() * 4 * 15000;
+        } else {
+            return ((Aero) e).getFuelTonnage() * 4 * 1000;
+        }
+    }
+
+    public double getVehicleFuelCost(Entity e) {
+        Engine en = e.getEngine();
+        if (e instanceof SupportTank) {
+            if (en.getEngineType() == Engine.FUEL_CELL) {
+                return (((SupportTank) e).getFuelTonnage() * 15000 * 4);
+            } else if (en.getEngineType() == Engine.COMBUSTION_ENGINE) {
+                return (((SupportTank) e).getFuelTonnage() * 1000 * 4);
+            } else {
+                return 0;
+            }
+        } else {
+            if (en.getEngineType() == Engine.FUEL_CELL) {
+                return (en.getWeightEngine(e) *.1 * 15000 * 4);
+            } else if (en.getEngineType() == Engine.COMBUSTION_ENGINE) {
+                return (en.getWeightEngine(e) *.1 * 1000 * 4);
+            } else {
+                return 0;
+            }
+        }
+    }
+
+    public double getInfantryFuelCost(Entity e) {
+        if (e instanceof BattleArmor) {
+            if (e.getJumpMP() > 0) {
+                return (e.getWeight() * .02 * 1000 * 4);
+            } else {
+                return 0;
+            }
+        }
+        if (e.getMovementMode() == EntityMovementMode.INF_LEG) {
+            return 0;
+        } else {
+            return (e.getWeight() *.02 * 1000 * 4);
+        }
     }
 }

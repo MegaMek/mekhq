@@ -73,6 +73,7 @@ import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.Infantry;
 import megamek.common.Jumpship;
+import megamek.common.LandAirMech;
 import megamek.common.Mech;
 import megamek.common.MechSummary;
 import megamek.common.MechSummaryCache;
@@ -619,32 +620,34 @@ public class Utilities {
 		// Generate solo crews
 		if (u.usesSoloPilot()) {
 			Person p = null;
-			if(u.getEntity() instanceof Mech) {
+			if (u.getEntity() instanceof LandAirMech) {
+                p = c.newPerson(Person.T_MECHWARRIOR);
+                p.addSkill(SkillType.S_PILOT_MECH, SkillType.getType(SkillType.S_PILOT_MECH).getTarget() - oldCrew.getPiloting(), 0);
+                p.addSkill(SkillType.S_GUN_MECH, SkillType.getType(SkillType.S_GUN_MECH).getTarget() - oldCrew.getGunnery(), 0);
+                p.addSkill(SkillType.S_PILOT_AERO, SkillType.getType(SkillType.S_PILOT_AERO).getTarget() - oldCrew.getPiloting(), 0);
+                p.addSkill(SkillType.S_GUN_AERO, SkillType.getType(SkillType.S_GUN_AERO).getTarget() - oldCrew.getGunnery(), 0);
+                p.setSecondaryRole(Person.T_AERO_PILOT);
+			} else if (u.getEntity() instanceof Mech) {
     			p = c.newPerson(Person.T_MECHWARRIOR);
     			p.addSkill(SkillType.S_PILOT_MECH, SkillType.getType(SkillType.S_PILOT_MECH).getTarget() - oldCrew.getPiloting(), 0);
     			p.addSkill(SkillType.S_GUN_MECH, SkillType.getType(SkillType.S_GUN_MECH).getTarget() - oldCrew.getGunnery(), 0);
-    		}
-    		else if(u.getEntity() instanceof Aero) {
+    		} else if (u.getEntity() instanceof Aero) {
     			p = c.newPerson(Person.T_AERO_PILOT);
     			p.addSkill(SkillType.S_PILOT_AERO, SkillType.getType(SkillType.S_PILOT_AERO).getTarget() - oldCrew.getPiloting(), 0);
     			p.addSkill(SkillType.S_GUN_AERO, SkillType.getType(SkillType.S_GUN_AERO).getTarget() - oldCrew.getGunnery(), 0);
-    		}
-    		else if(u.getEntity() instanceof ConvFighter) {
+    		} else if (u.getEntity() instanceof ConvFighter) {
     			p = c.newPerson(Person.T_CONV_PILOT);
     			p.addSkill(SkillType.S_PILOT_JET, SkillType.getType(SkillType.S_PILOT_JET).getTarget() - oldCrew.getPiloting(), 0);
     			p.addSkill(SkillType.S_GUN_JET, SkillType.getType(SkillType.S_GUN_JET).getTarget() - oldCrew.getPiloting(), 0);
-    		}
-    		else if(u.getEntity() instanceof Protomech) {
+    		} else if (u.getEntity() instanceof Protomech) {
     			p = c.newPerson(Person.T_PROTO_PILOT);
     			//p.addSkill(SkillType.S_PILOT_PROTO, SkillType.getType(SkillType.S_PILOT_PROTO).getTarget() - oldCrew.getPiloting(), 0);
     			p.addSkill(SkillType.S_GUN_PROTO, SkillType.getType(SkillType.S_GUN_PROTO).getTarget() - oldCrew.getGunnery(), 0);
-    		}
-    		else if(u.getEntity() instanceof VTOL) {
+    		} else if (u.getEntity() instanceof VTOL) {
     			p = c.newPerson(Person.T_VTOL_PILOT);
     			p.addSkill(SkillType.S_PILOT_VTOL, SkillType.getType(SkillType.S_PILOT_VTOL).getTarget() - oldCrew.getPiloting(), 0);
     			p.addSkill(SkillType.S_GUN_VEE, SkillType.getType(SkillType.S_GUN_VEE).getTarget() - oldCrew.getGunnery(), 0);
-    		}
-    		else {
+    		} else {
     			//assume tanker if we got here
     			p = c.newPerson(Person.T_GVEE_DRIVER);
     			p.addSkill(SkillType.S_PILOT_GVEE, SkillType.getType(SkillType.S_PILOT_GVEE).getTarget() - oldCrew.getPiloting(), 0);
@@ -702,10 +705,10 @@ public class Utilities {
 	    			p = c.newPerson(Person.T_VTOL_PILOT);
 	    			p.addSkill(SkillType.S_PILOT_VTOL, SkillType.getType(SkillType.S_PILOT_VTOL).getTarget() - oldCrew.getPiloting(), 0);
 	    			p.addSkill(SkillType.S_GUN_VEE, SkillType.getType(SkillType.S_GUN_VEE).getTarget() - oldCrew.getGunnery(), 0);
-	    		} else if (u.getEntity() instanceof Mech) {
-	                p = c.newPerson(Person.T_MECHWARRIOR);
-	                p.addSkill(SkillType.S_PILOT_MECH, SkillType.getType(SkillType.S_PILOT_MECH).getTarget() - oldCrew.getPiloting(), 0);
-	                p.addSkill(SkillType.S_GUN_MECH, SkillType.getType(SkillType.S_GUN_MECH).getTarget() - oldCrew.getGunnery(), 0);
+                } else if (u.getEntity() instanceof Mech) {
+                    p = c.newPerson(Person.T_MECHWARRIOR);
+                    p.addSkill(SkillType.S_PILOT_MECH, SkillType.getType(SkillType.S_PILOT_MECH).getTarget() - oldCrew.getPiloting(), 0);
+                    p.addSkill(SkillType.S_GUN_MECH, SkillType.getType(SkillType.S_GUN_MECH).getTarget() - oldCrew.getGunnery(), 0);
 	    		} else {
 	    			//assume tanker if we got here
 	    			p = c.newPerson(Person.T_GVEE_DRIVER);

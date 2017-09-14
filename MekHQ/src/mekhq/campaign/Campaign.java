@@ -80,6 +80,7 @@ import megamek.common.Game;
 import megamek.common.GunEmplacement;
 import megamek.common.Infantry;
 import megamek.common.Jumpship;
+import megamek.common.LandAirMech;
 import megamek.common.Mech;
 import megamek.common.MechFileParser;
 import megamek.common.MechSummary;
@@ -91,6 +92,7 @@ import megamek.common.Protomech;
 import megamek.common.SmallCraft;
 import megamek.common.Tank;
 import megamek.common.TargetRoll;
+import megamek.common.Warship;
 import megamek.common.loaders.BLKFile;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.logging.LogLevel;
@@ -655,7 +657,7 @@ public class Campaign implements Serializable {
                     "Unable to load unit: " + ms.getEntryName()); //$NON-NLS-1$
             MekHQ.getLogger().log(getClass(), METHOD_NAME, ex);
         }
-		Entity en = mechFileParser.getEntity();
+        Entity en = mechFileParser.getEntity();
 
 		int transitDays = getCampaignOptions().getInstantUnitMarketDelivery()?0:
     		calculatePartTransitTime(Compute.d6(2) - 2);
@@ -2537,14 +2539,59 @@ public class Campaign implements Serializable {
             	}
             }
             // Payday!
-            if (campaignOptions.payForSalaries()) {
-                if (finances.debit(getPayRoll(), Transaction.C_SALARY,
-                                   "Monthly salaries", calendar.getTime())) {
-                    addReport("Payday! Your account has been debited for "
-                              + formatter.format(getPayRoll())
-                              + " C-bills in personnel salaries");
+            if (campaignOptions.usePeacetimeCost()) {
+                if (!campaignOptions.showPeacetimeCost()) {
+                    if (finances.debit(getPeacetimeCost(), Transaction.C_MAINTAIN, "Monthly Peacetime Operating Costs", calendar.getTime())) {
+                        addReport("Your account has been debited "
+                                + formatter.format(getPeacetimeCost())
+                                + " C-bills for peacetime operating costs");
+                    } else {
+                        addReport("<font color='red'><b>You cannot afford to pay operating costs!</b></font> Lucky for you that this does not appear to have any effect.");
+                    }
                 } else {
-                    addReport("<font color='red'><b>You cannot afford to pay payroll costs!</b></font> Lucky for you that personnel morale is not yet implemented.");
+                    if (finances.debit(getMonthlySpareParts(), Transaction.C_MAINTAIN,
+                            "Monthly Spare Parts", calendar.getTime())) {
+                        addReport("Your account has been debited "
+                                + formatter.format(getMonthlySpareParts())
+                                + " C-bills for spare parts");
+                    } else {
+                        addReport("<font color='red'><b>You cannot afford to pay for spare parts!</b></font> Lucky for you that this does not appear to have any effect.");
+                    }
+                    if (finances.debit(getMonthlyAmmo(), Transaction.C_MAINTAIN,
+                            "Monthly Ammunition", calendar.getTime())) {
+                        addReport("Your account has been debited "
+                                + formatter.format(getMonthlyAmmo())
+                                + " C-bills for training munitions");
+                    } else {
+                        addReport("<font color='red'><b>You cannot afford to pay for training munitions!</b></font> Lucky for you that this does not appear to have any effect.");
+                    }
+                    if (finances.debit(getMonthlyFuel(), Transaction.C_MAINTAIN,
+                            "Monthly Fuel bill", calendar.getTime())) {
+                        addReport("Your account has been debited "
+                                + formatter.format(getMonthlyFuel())
+                                + " C-bills for fuel");
+                    } else {
+                        addReport("<font color='red'><b>You cannot afford to pay for fuel!</b></font> Lucky for you that this does not appear to have any effect.");
+                    }
+                    if (finances.debit(getPayRoll(), Transaction.C_SALARY,
+                            "Monthly salaries", calendar.getTime())) {
+                        addReport("Payday! Your account has been debited for "
+                                  + formatter.format(getPayRoll())
+                                  + " C-bills in personnel salaries");
+                    } else {
+                        addReport("<font color='red'><b>You cannot afford to pay payroll costs!</b></font> Lucky for you that personnel morale is not yet implemented.");
+                    }
+                }
+            } else {
+                if (campaignOptions.payForSalaries()) {
+                    if (finances.debit(getPayRoll(), Transaction.C_SALARY,
+                                       "Monthly salaries", calendar.getTime())) {
+                        addReport("Payday! Your account has been debited for "
+                                  + formatter.format(getPayRoll())
+                                  + " C-bills in personnel salaries");
+                    } else {
+                        addReport("<font color='red'><b>You cannot afford to pay payroll costs!</b></font> Lucky for you that personnel morale is not yet implemented.");
+                    }
                 }
             }
             if (campaignOptions.payForOverhead()) {
@@ -5137,30 +5184,43 @@ public class Campaign implements Serializable {
     public Planet getPlanet(String name) {
         return Planets.getInstance().getPlanetByName(name, Utilities.getDateTimeDay(calendar));
     }
+    
+    public Person newPerson(int type) {
+        if (type == Person.T_LAM_PILOT) {
+            return newPerson(Person.T_MECHWARRIOR, Person.T_AERO_PILOT);
+        }
+        return newPerson(type, Person.T_NONE);
+    }
 
     /**
      * Generate a new pilotPerson of the given type using whatever randomization options have been given in the
      * CampaignOptions
      *
-     * @param type
+     * @param type The primary role
+     * @param secondary A secondary role; used for LAM pilots to generate MW + Aero pilot
      * @return
      */
-    public Person newPerson(int type) {
+    public Person newPerson(int type, int secondary) {
         boolean isFemale = getRNG().isFemale();
         Person person = new Person(this);
         if (isFemale) {
             person.setGender(Person.G_FEMALE);
         }
         person.setName(getRNG().generate(isFemale));
-        int expLvl = Utilities.generateExpLevel(rskillPrefs
-                                                        .getOverallRecruitBonus() + rskillPrefs.getRecruitBonus(type));
+        int bonus = rskillPrefs.getOverallRecruitBonus() + rskillPrefs.getRecruitBonus(type);
+        // LAM pilots get +3 to random experience roll
+        if ((type == Person.T_MECHWARRIOR) && (secondary == Person.T_AERO_PILOT)) {
+            bonus += 3;
+        }
+        int expLvl = Utilities.generateExpLevel(bonus);
         person.setPrimaryRole(type);
+        person.setSecondaryRole(secondary);
         if (getCampaignOptions().useDylansRandomXp()) {
             person.setXp(Utilities.generateRandomExp());
         }
         person.setDaysToWaitForHealing(getCampaignOptions().getNaturalHealingWaitingPeriod());
         //check for clan phenotypes
-        int bonus = 0;
+        bonus = 0;
         if (person.isClanner()) {
             switch (type) {
                 case (Person.T_MECHWARRIOR):
@@ -5196,6 +5256,10 @@ public class Campaign implements Serializable {
                     break;
             }
         }
+        // LAM pilots get -2 to the random skill roll.
+        if ((type == Person.T_MECHWARRIOR) && (secondary == Person.T_AERO_PILOT)) {
+            bonus -= 2;
+        }
         GregorianCalendar birthdate = (GregorianCalendar) getCalendar().clone();
         birthdate.set(Calendar.YEAR, birthdate.get(Calendar.YEAR) - Utilities.getAgeByExpLevel(expLvl, person.isClanner() && person.getPhenotype() != Person.PHENOTYPE_NONE));
         // choose a random day and month
@@ -5207,6 +5271,81 @@ public class Campaign implements Serializable {
         birthdate.set(Calendar.DAY_OF_YEAR, randomDay);
         person.setBirthday(birthdate);
         // set default skills
+        generateDefaultSkills(type, person, expLvl, bonus);
+        if (secondary != Person.T_NONE) {
+            generateDefaultSkills(secondary, person, expLvl, bonus);
+        }
+        // roll small arms skill
+        if (!person.hasSkill(SkillType.S_SMALL_ARMS)) {
+            int sarmsLvl = -12;
+            if (person.isSupport()) {
+                sarmsLvl = Utilities.generateExpLevel(rskillPrefs
+                                                              .getSupportSmallArmsBonus());
+            } else {
+                sarmsLvl = Utilities.generateExpLevel(rskillPrefs
+                                                              .getCombatSmallArmsBonus());
+            }
+            if (sarmsLvl > SkillType.EXP_ULTRA_GREEN) {
+                person.addSkill(SkillType.S_SMALL_ARMS, sarmsLvl,
+                                rskillPrefs.randomizeSkill(), bonus);
+            }
+
+        }
+        // roll tactics skill
+        if (!person.isSupport()) {
+            int tacLvl = Utilities.generateExpLevel(rskillPrefs
+                                                            .getTacticsMod(expLvl));
+            if (tacLvl > SkillType.EXP_ULTRA_GREEN) {
+                person.addSkill(SkillType.S_TACTICS, tacLvl,
+                                rskillPrefs.randomizeSkill(), bonus);
+            }
+        }
+        // roll artillery skill
+        if (getCampaignOptions().useArtillery()
+            && (type == Person.T_MECHWARRIOR || type == Person.T_VEE_GUNNER || type == Person.T_INFANTRY)
+            && Utilities.rollProbability(rskillPrefs.getArtilleryProb())) {
+            int artyLvl = Utilities.generateExpLevel(rskillPrefs
+                                                             .getArtilleryBonus());
+            if (artyLvl > SkillType.EXP_ULTRA_GREEN) {
+                person.addSkill(SkillType.S_ARTILLERY, artyLvl,
+                                rskillPrefs.randomizeSkill(), bonus);
+            }
+        }
+        // roll random secondary skill
+        if (Utilities.rollProbability(rskillPrefs.getSecondSkillProb())) {
+            ArrayList<String> possibleSkills = new ArrayList<String>();
+            for (String stype : SkillType.skillList) {
+                if (!person.hasSkill(stype)) {
+                    possibleSkills.add(stype);
+                }
+            }
+            String selSkill = possibleSkills.get(Compute
+                                                         .randomInt(possibleSkills.size()));
+            int secondLvl = Utilities.generateExpLevel(rskillPrefs
+                                                               .getSecondSkillBonus());
+            person.addSkill(selSkill, secondLvl, rskillPrefs.randomizeSkill(),
+                            bonus);
+        }
+        // TODO: roll special abilities
+        if (getCampaignOptions().useAbilities()) {
+            int nabil = Utilities.rollSpecialAbilities(rskillPrefs
+                                                               .getSpecialAbilBonus(expLvl));
+            while (nabil > 0 && null != rollSPA(type, person)) {
+                nabil--;
+            }
+        }
+        if (getCampaignOptions().usePortraitForType(type)) {
+            assignRandomPortraitFor(person);
+        }
+        //check for Bloodname
+        if (person.isClanner()) {
+        	checkBloodnameAdd(person, type);
+        }
+
+        return person;
+    }
+
+    private void generateDefaultSkills(int type, Person person, int expLvl, int bonus) {
         switch (type) {
             case (Person.T_MECHWARRIOR):
                 person.addSkill(SkillType.S_PILOT_MECH, expLvl,
@@ -5318,74 +5457,6 @@ public class Campaign implements Serializable {
                                 rskillPrefs.randomizeSkill(), bonus);
                 break;
         }
-        // roll small arms skill
-        if (!person.hasSkill(SkillType.S_SMALL_ARMS)) {
-            int sarmsLvl = -12;
-            if (person.isSupport()) {
-                sarmsLvl = Utilities.generateExpLevel(rskillPrefs
-                                                              .getSupportSmallArmsBonus());
-            } else {
-                sarmsLvl = Utilities.generateExpLevel(rskillPrefs
-                                                              .getCombatSmallArmsBonus());
-            }
-            if (sarmsLvl > SkillType.EXP_ULTRA_GREEN) {
-                person.addSkill(SkillType.S_SMALL_ARMS, sarmsLvl,
-                                rskillPrefs.randomizeSkill(), bonus);
-            }
-
-        }
-        // roll tactics skill
-        if (!person.isSupport()) {
-            int tacLvl = Utilities.generateExpLevel(rskillPrefs
-                                                            .getTacticsMod(expLvl));
-            if (tacLvl > SkillType.EXP_ULTRA_GREEN) {
-                person.addSkill(SkillType.S_TACTICS, tacLvl,
-                                rskillPrefs.randomizeSkill(), bonus);
-            }
-        }
-        // roll artillery skill
-        if (getCampaignOptions().useArtillery()
-            && (type == Person.T_MECHWARRIOR || type == Person.T_VEE_GUNNER || type == Person.T_INFANTRY)
-            && Utilities.rollProbability(rskillPrefs.getArtilleryProb())) {
-            int artyLvl = Utilities.generateExpLevel(rskillPrefs
-                                                             .getArtilleryBonus());
-            if (artyLvl > SkillType.EXP_ULTRA_GREEN) {
-                person.addSkill(SkillType.S_ARTILLERY, artyLvl,
-                                rskillPrefs.randomizeSkill(), bonus);
-            }
-        }
-        // roll random secondary skill
-        if (Utilities.rollProbability(rskillPrefs.getSecondSkillProb())) {
-            ArrayList<String> possibleSkills = new ArrayList<String>();
-            for (String stype : SkillType.skillList) {
-                if (!person.hasSkill(stype)) {
-                    possibleSkills.add(stype);
-                }
-            }
-            String selSkill = possibleSkills.get(Compute
-                                                         .randomInt(possibleSkills.size()));
-            int secondLvl = Utilities.generateExpLevel(rskillPrefs
-                                                               .getSecondSkillBonus());
-            person.addSkill(selSkill, secondLvl, rskillPrefs.randomizeSkill(),
-                            bonus);
-        }
-        // TODO: roll special abilities
-        if (getCampaignOptions().useAbilities()) {
-            int nabil = Utilities.rollSpecialAbilities(rskillPrefs
-                                                               .getSpecialAbilBonus(expLvl));
-            while (nabil > 0 && null != rollSPA(type, person)) {
-                nabil--;
-            }
-        }
-        if (getCampaignOptions().usePortraitForType(type)) {
-            assignRandomPortraitFor(person);
-        }
-        //check for Bloodname
-        if (person.isClanner()) {
-        	checkBloodnameAdd(person, type);
-        }
-
-        return person;
     }
 
     public void checkBloodnameAdd(Person person, int type) {
@@ -6590,7 +6661,9 @@ public class Campaign implements Serializable {
         }
         while (unit.canTakeMoreDrivers()) {
             Person p = null;
-            if (unit.getEntity() instanceof Mech) {
+            if (unit.getEntity() instanceof LandAirMech) {
+                p = newPerson(Person.T_MECHWARRIOR, Person.T_AERO_PILOT);
+            } else if (unit.getEntity() instanceof Mech) {
                 p = newPerson(Person.T_MECHWARRIOR);
             } else if (unit.getEntity() instanceof SmallCraft
                        || unit.getEntity() instanceof Jumpship) {
@@ -6799,6 +6872,7 @@ public class Campaign implements Serializable {
         entity.setNeverDeployed(true);
         entity.setStuck(false);
         entity.resetCoolantFailureAmount();
+        entity.setConversionMode(0);
 
         if (!entity.getSensors().isEmpty()) {
             entity.setNextSensor(entity.getSensors().firstElement());
@@ -6814,8 +6888,9 @@ public class Campaign implements Serializable {
                 if (!(m.getType() instanceof BombType)) {
                     continue;
                 }
-                bombChoices[BombType.getBombTypeFromInternalName(m.getType().getInternalName())]
-                        += m.getBaseShotsLeft();
+                if(m.getBaseShotsLeft() == 0) {
+                    bombChoices[BombType.getBombTypeFromInternalName(m.getType().getInternalName())] -= 1;
+                }
             }
             a.setBombChoices(bombChoices);
             a.clearBombs();
@@ -7291,8 +7366,8 @@ public class Campaign implements Serializable {
     }
 
     /**
-     * Calculate the total value of units in the TO&E. This serves as the basis for contract payments in the StellarOps
-     * Beta.
+     * Calculate the total value of units in the TO&E. This serves as the basis for contract payments in Campaign
+     * Operations.
      *
      * @return
      */
@@ -7301,8 +7376,8 @@ public class Campaign implements Serializable {
     }
 
     /**
-     * Calculate the total value of units in the TO&E. This serves as the basis for contract payments in the StellarOps
-     * Beta.
+     * Calculate the total value of units in the TO&E. This serves as the basis for contract payments in Campaign
+     * Operations.
      *
      * @return
      */
@@ -7316,25 +7391,53 @@ public class Campaign implements Serializable {
             if (noInfantry && u.getEntity() instanceof Infantry && !(u.getEntity() instanceof BattleArmor)) {
             	continue;
             }
-            // lets exclude dropships and jumpships
-            if (u.getEntity() instanceof Dropship
-                || u.getEntity() instanceof Jumpship) {
-                continue;
-            }
-            // we will assume sale value for now, but make this customizable
-            if (getCampaignOptions().useEquipmentContractSaleValue()) {
-                value += u.getSellValue();
+            if (u.getEntity() instanceof Dropship) {
+                if (getCampaignOptions().getDropshipContractPercent() == 0) {
+                    continue;
+                }
+                if (getCampaignOptions().useEquipmentContractSaleValue()) {
+                    value += (getCampaignOptions().getDropshipContractPercent() / 100) * u.getSellValue();
+                } else {
+                    value += (getCampaignOptions().getDropshipContractPercent() / 100) * u.getBuyCost();
+                }
+            } else if (u.getEntity() instanceof Warship) {
+                if (getCampaignOptions().getWarshipContractPercent() == 0) {
+                    continue;
+                }
+                if (getCampaignOptions().useEquipmentContractSaleValue()) {
+                    value += (getCampaignOptions().getWarshipContractPercent() / 100) * u.getSellValue();
+                } else {
+                    value += (getCampaignOptions().getWarshipContractPercent() / 100) * u.getBuyCost();
+                }
+            } else if (u.getEntity() instanceof Jumpship) {
+                if (getCampaignOptions().getJumpshipContractPercent() == 0) {
+                    continue;
+                }
+                if (getCampaignOptions().useEquipmentContractSaleValue()) {
+                    value += (getCampaignOptions().getJumpshipContractPercent() / 100) * u.getSellValue();
+                } else {
+                    value += (getCampaignOptions().getJumpshipContractPercent() / 100) * u.getBuyCost();
+                }
             } else {
-                value += u.getBuyCost();
+                // we will assume sale value for now, but make this customizable
+                if (getCampaignOptions().useEquipmentContractSaleValue()) {
+                    value += (getCampaignOptions().getEquipmentContractPercent() / 100.0) * u.getSellValue();
+                } else {
+                    value += (getCampaignOptions().getEquipmentContractPercent() / 100.0) * u.getBuyCost();
+                }
             }
+
         }
         return value;
     }
 
     public long getContractBase() {
-        if (getCampaignOptions().useEquipmentContractBase()) {
-            return (long) ((getCampaignOptions().getEquipmentContractPercent() / 100.0)
-            		* getForceValue(getCampaignOptions().useInfantryDontCount()));
+        if (getCampaignOptions().usePeacetimeCost()) {
+            double peacetimecost = (getPeacetimeCost() * .75) +
+                    getForceValue(getCampaignOptions().useInfantryDontCount());
+            return (long) peacetimecost;
+        } else if (getCampaignOptions().useEquipmentContractBase()) {
+            return getForceValue(getCampaignOptions().useInfantryDontCount());
         } else {
             return getPayRoll(getCampaignOptions().useInfantryDontCount());
         }
@@ -7407,6 +7510,9 @@ public class Campaign implements Serializable {
 
         long monthlyIncome = 0;
         long monthlyExpenses = 0;
+        long coSpareParts = 0;
+        long coFuel = 0;
+        long coAmmo = 0;
         long maintenance = 0;
         long salaries = 0;
         long overhead = 0;
@@ -7420,11 +7526,16 @@ public class Campaign implements Serializable {
         if (campaignOptions.payForOverhead()) {
             overhead = getOverheadExpenses();
         }
+        if (campaignOptions.usePeacetimeCost()) {
+            coSpareParts = getMonthlySpareParts();
+            coAmmo = getMonthlyAmmo();
+            coFuel = getMonthlyFuel();
+        }
         for (Contract contract : getActiveContracts()) {
             contracts += contract.getMonthlyPayOut();
         }
         monthlyIncome += contracts;
-        monthlyExpenses = maintenance + salaries + overhead;
+        monthlyExpenses = maintenance + salaries + overhead + coSpareParts + coAmmo + coFuel;
 
         long assets = cash + mech + vee + ba + infantry + largeCraft
                       + smallCraft + proto + getFinances().getTotalAssetValue();
@@ -7530,6 +7641,17 @@ public class Campaign implements Serializable {
         sb.append("    Overhead............. ")
           .append(String.format(formatted, DecimalFormat.getInstance()
                                                         .format(overhead))).append("\n");
+        if (campaignOptions.usePeacetimeCost()) {
+            sb.append("    Spare Parts.......... ")
+              .append(String.format(formatted, DecimalFormat.getInstance()
+                                                          .format(coSpareParts))).append("\n");
+            sb.append("    Training Munitions... ")
+              .append(String.format(formatted, DecimalFormat.getInstance()
+                                                          .format(coAmmo))).append("\n");
+            sb.append("    Fuel................. ")
+              .append(String.format(formatted, DecimalFormat.getInstance()
+                                                          .format(coFuel))).append("\n");
+        }
 
         return new String(sb);
     }
@@ -8567,4 +8689,90 @@ public class Campaign implements Serializable {
 		
 		return unitRating;
 	}
+
+    public int getPeacetimeCost() {
+        int cost = 0;
+
+        cost += getPayRoll(getCampaignOptions().useInfantryDontCount());
+        cost += getMonthlySpareParts();
+        cost += getMonthlyFuel();
+        cost += getMonthlyAmmo();
+        return cost;
+    }
+
+    public long getMonthlySpareParts() {
+        long partsCost = 0;
+
+        for (Unit u : getUnits()) {
+            if (u.isMothballed()) {
+                continue;
+            }
+            partsCost += u.getSparePartsCost();
+        }
+        return partsCost;
+    }
+
+    public long getMonthlyFuel() {
+        long fuelCost = 0;
+
+        for (Unit u : getUnits()) {
+            if (u.isMothballed()) {
+                continue;
+            }
+            fuelCost += u.getFuelCost();
+        }
+        return fuelCost;
+    }
+
+    public long getMonthlyAmmo() {
+        long ammoCost= 0;
+
+        for (Unit u : getUnits()) {
+            if (u.isMothballed()) {
+                continue;
+            }
+            ammoCost += u.getAmmoCost();
+        }
+        return ammoCost;
+    }
+
+    public boolean isFactionComstar() {
+        if (getFactionCode().equals("CS")) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isFactionClan() {
+        switch (getFactionCode()) {
+            case "CBS":
+            case "CB":
+            case "CCC":
+            case "CCO":
+            case "SOC":
+            case "CDS":
+            case "CFM":
+            case "CGB":
+            case "CGS":
+            case "CHH":
+            case "CIH":
+            case "CJF":
+            case "CMG":
+            case "CNC":
+            case "CSJ":
+            case "CSR":
+            case "CSA":
+            case "CSV":
+            case "CSL":
+            case "CWI":
+            case "CW":
+            case "CWE":
+            case "CWIE":
+            case "CWOV":
+            case "CEI":
+            case "RA":
+                return true;
+            default: return false;
+        }
+    }
 }
