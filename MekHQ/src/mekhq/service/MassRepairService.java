@@ -147,6 +147,10 @@ public class MassRepairService {
 			msg += " No actions were performed because there are currently no valid parts.";
 			break;
 
+		case MassRepairUnitAction.STATUS.ALL_PARTS_IN_PROCESS:
+			msg += " No actions were performed because all parts are being worked on.";
+			break;
+
 		case MassRepairUnitAction.STATUS.NO_TECHS:
 			msg += " No actions were performed because there are currently no valid techs.";
 			break;
@@ -240,8 +244,12 @@ public class MassRepairService {
 			int totalCount = 0;
 			int actionsPerformed = 0;
 
-			for (List<MassRepairUnitAction> unitsByStatus : unitActionsByStatus.values()) {
-				totalCount += unitsByStatus.size();
+			for (Integer key : unitActionsByStatus.keySet()) {
+				if (key == MassRepairUnitAction.STATUS.ALL_PARTS_IN_PROCESS) {
+					continue;
+				}
+				
+				totalCount += unitActionsByStatus.get(key).size();
 			}
 
 			if (unitActionsByStatus.containsKey(MassRepairUnitAction.STATUS.ACTIONS_PERFORMED)) {
@@ -406,6 +414,14 @@ public class MassRepairService {
 
 		List<IPartWork> parts = campaignGUI.getCampaign().getPartsNeedingServiceFor(unit.getId(), true);
 
+		if (parts.isEmpty()) {
+			parts = campaignGUI.getCampaign().getPartsNeedingServiceFor(unit.getId(), false);
+			
+			if (!parts.isEmpty()) {
+				return new MassRepairUnitAction(unit, salvaging, MassRepairUnitAction.STATUS.ALL_PARTS_IN_PROCESS);
+			}
+		}
+		
 		/*
 		 * If we're performing an action on a unit and we allow auto-scrapping
 		 * of parts that can't be fixed by an elite tech, let's first get rid of
@@ -1326,6 +1342,7 @@ public class MassRepairService {
 			public static final int NO_TECHS = 2;
 			public static final int UNFIXABLE_LIMB = 3;
 			public static final int NO_PARTS = 4;
+			public static final int ALL_PARTS_IN_PROCESS = 5;
 		}
 
 		private Unit unit;
