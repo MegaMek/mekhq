@@ -1517,7 +1517,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.gridy = 21;
         panPersonnel.add(chkUseTransfers, gridBagConstraints);
 
-        chkUseTimeInService = new JCheckBox("Use Time In Service (Unofficial)"); // NOI18N
+        chkUseTimeInService = new JCheckBox("Track Time In Service"); // NOI18N
         chkUseTimeInService.setSelected(options.getUseTimeInService());
         gridBagConstraints.gridy = 22;
         panPersonnel.add(chkUseTimeInService, gridBagConstraints);

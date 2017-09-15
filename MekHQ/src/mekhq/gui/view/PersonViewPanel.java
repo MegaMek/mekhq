@@ -405,7 +405,7 @@ public class PersonViewPanel extends JPanel {
         pnlStats.add(lblStatus2, gridBagConstraints);
 
         if (campaign.getCampaignOptions().getUseTimeInService()) {
-            if (null != person.getRecruitmentAsString() && !person.isDependent() && !person.isPrisoner() && !person.isBondsman()) {
+            if ((null != person.getRecruitmentAsString()) && !person.isDependent() && !person.isPrisoner() && !person.isBondsman()) {
                 firsty++;
                 lblRecruited1.setName("lblRecruited1"); // NOI18N
                 lblRecruited1.setText(resourceMap.getString("lblRecruited1.text"));
