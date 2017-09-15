@@ -95,6 +95,7 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
 	private long advanceAmount;
 	private long signingAmount;
 	private long transportAmount;
+	private long transitAmount;
 	private long overheadAmount;
 	private long supportAmount;
 	private long baseAmount;
@@ -296,11 +297,11 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
 	}
 
 	public long getTotalAmountPlusFeesAndBonuses() {
-		return baseAmount + supportAmount + overheadAmount + transportAmount + signingAmount - feeAmount;
+		return baseAmount + supportAmount + overheadAmount + transportAmount + transitAmount + signingAmount - feeAmount;
 	}
 
 	public long getTotalAmount() {
-		return baseAmount + supportAmount + overheadAmount + transportAmount;
+		return baseAmount + supportAmount + overheadAmount + transportAmount + transitAmount;
 	}
 
 	public long getAdvanceAmount() {
@@ -342,7 +343,14 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
 	protected void setSupportAmount(long amount) {
 		supportAmount = amount;
 	}
+	
+	public long getTransitAmount() {
+        return transitAmount;
+    }
 
+    protected void setTransitAmount(long amount) {
+        transitAmount = amount;
+    }
 	public long getTransportAmount() {
 		return transportAmount;
 	}
@@ -386,7 +394,11 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
 		long profit = getTotalAmountPlusFeesAndBonuses();
 		profit -= c.getOverheadExpenses() * getLength();
 		profit -= c.getMaintenanceCosts() * getLength();
-		profit -= c.getPayRoll() * getLength();
+		if (c.getCampaignOptions().usePeacetimeCost()) {
+            profit -= c.getPeacetimeCost() * getLength();
+        } else {
+            profit -= c.getPayRoll() * getLength();
+        }
 		if(null != c.getPlanet(planetName) && c.getCampaignOptions().payForTransport()) {
 			profit -= 2 * c.calculateCostPerJump(true) * c.calculateJumpPath(c.getCurrentPlanet(), getPlanet()).getJumps();
 		}
@@ -430,27 +442,41 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
 		}
 
 		//calculate support amount
-		long maintCosts = 0;
-		for (Unit u : c.getUnits()) {
-            if (u.getEntity() instanceof Infantry && !(u.getEntity() instanceof BattleArmor)) {
-            	continue;
-            }
-            maintCosts += u.getWeeklyMaintenanceCost();
-        }
-		maintCosts *= 4;
-		supportAmount = (long)((straightSupport/100.0) * maintCosts * getLength());
+		if (c.getCampaignOptions().usePeacetimeCost()
+		        && c.getCampaignOptions().getUnitRatingMethod().equals(mekhq.campaign.rating.UnitRatingMethod.CAMPAIGN_OPS)) {
+		    supportAmount = (long)((straightSupport/100.0) * c.getPeacetimeCost() * getLength());
+		} else {
+		    long maintCosts = 0;
+	        for (Unit u : c.getUnits()) {
+	            if (u.getEntity() instanceof Infantry && !(u.getEntity() instanceof BattleArmor)) {
+	                continue;
+	            }
+	            maintCosts += u.getWeeklyMaintenanceCost();
+	        }
+	        maintCosts *= 4;
+	        supportAmount = (long)((straightSupport/100.0) * maintCosts * getLength());
+		}
 
 		//calculate transportation costs
 		if(null != Planets.getInstance().getPlanetById(planetName)) {
-			transportAmount = (long)((transportComp/100.0) * 2 * c.calculateCostPerJump(false) * c.calculateJumpPath(c.getCurrentPlanet(), getPlanet()).getJumps());
+	        transportAmount = (long)((transportComp/100.0) * 2 * c.calculateCostPerJump(false) * c.calculateJumpPath(c.getCurrentPlanet(), getPlanet()).getJumps());
 		}
 
-		signingAmount = (long)((signBonus/100.0) * (baseAmount + overheadAmount + transportAmount + supportAmount));
+		//calculate transit amount for CO
+        if (c.getCampaignOptions().usePeacetimeCost()
+                && c.getCampaignOptions().getUnitRatingMethod().equals(mekhq.campaign.rating.UnitRatingMethod.CAMPAIGN_OPS)) {
+            //contract base * transport period * reputation * employer modifier
+            transitAmount = (long)(c.getContractBase() * (((c.calculateJumpPath(c.getCurrentPlanet(), getPlanet()).getJumps()) * 2) / 4) * (c.getUnitRatingMod() * .2 + .5) * 1.2);
+        } else {
+            transitAmount = 0;
+        }
 
-		advanceAmount = (long)((advancePct/100.0) * (baseAmount + overheadAmount + transportAmount + supportAmount));
+		signingAmount = (long)((signBonus/100.0) * (baseAmount + overheadAmount + transportAmount + transitAmount + supportAmount));
+
+		advanceAmount = (long)((advancePct/100.0) * (baseAmount + overheadAmount + transportAmount + transitAmount + supportAmount));
 
 		if(mrbcFee) {
-			feeAmount =  (long)(0.05 * (baseAmount + overheadAmount + transportAmount + supportAmount));
+			feeAmount =  (long)(0.05 * (baseAmount + overheadAmount + transportAmount + transitAmount + supportAmount));
 		} else {
 			feeAmount = 0;
 		}

@@ -149,6 +149,7 @@ import mekhq.gui.dialog.RefitNameDialog;
 import mekhq.gui.dialog.ReportDialog;
 import mekhq.gui.dialog.RetirementDefectionDialog;
 import mekhq.gui.dialog.ShipSearchDialog;
+import mekhq.gui.dialog.UnitCostReportDialog;
 import mekhq.gui.dialog.UnitMarketDialog;
 import mekhq.gui.dialog.UnitSelectorDialog;
 import mekhq.gui.model.PartsTableModel;
@@ -1902,6 +1903,18 @@ public class CampaignGUI extends JPanel {
             return;
         }
         MaintenanceReportDialog mrd = new MaintenanceReportDialog(getFrame(), u);
+        mrd.setVisible(true);
+    }
+
+    public void showUnitCostReport(UUID id) {
+        if (null == id) {
+            return;
+        }
+        Unit u = getCampaign().getUnit(id);
+        if (null == u) {
+            return;
+        }
+        UnitCostReportDialog mrd = new UnitCostReportDialog(getFrame(), u);
         mrd.setVisible(true);
     }
 
