@@ -23,15 +23,15 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import org.w3c.dom.Node;
+
 import megamek.common.Compute;
 import megamek.common.CriticalSlot;
-import megamek.common.EquipmentType;
 import megamek.common.Protomech;
+import megamek.common.TechAdvancement;
 import megamek.common.TechConstants;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.SkillType;
-
-import org.w3c.dom.Node;
 
 /**
  *
@@ -78,20 +78,6 @@ public class ProtomekSensor extends Part {
     public void writeToXml(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
         writeToXmlEnd(pw1, indent);
-    }
-
-    @Override
-    public int getAvailability(int era) {
-        if(era == EquipmentType.ERA_CLAN) {
-            return EquipmentType.RATING_C;
-        } else {
-            return EquipmentType.RATING_X;
-        }
-    }
-
-    @Override
-    public int getTechRating() {
-        return EquipmentType.RATING_C;
     }
 
     @Override
@@ -266,20 +252,11 @@ public class ProtomekSensor extends Part {
 		return Protomech.LOC_HEAD;
 	}
 
-	@Override
-	public int getIntroDate() {
-		return 3055;
-	}
-
-	@Override
-	public int getExtinctDate() {
-		return EquipmentType.DATE_NONE;
-	}
-
-	@Override
-	public int getReIntroDate() {
-		return EquipmentType.DATE_NONE;
-	}
+    @Override
+    public TechAdvancement getTechAdvancement() {
+        // No separate listing for the sensors; using same TA as structural components
+        return ProtomekLocation.TECH_ADVANCEMENT;
+    }
     
     @Override
 	public int getMassRepairOptionType() {

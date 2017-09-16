@@ -23,14 +23,14 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import megamek.common.Aero;
-import megamek.common.Entity;
-import megamek.common.EquipmentType;
-import mekhq.MekHqXmlUtil;
-import mekhq.campaign.Campaign;
-
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import megamek.common.Aero;
+import megamek.common.Entity;
+import megamek.common.TechAdvancement;
+import mekhq.MekHqXmlUtil;
+import mekhq.campaign.Campaign;
 
 /**
  *
@@ -92,16 +92,6 @@ public class MissingAeroLifeSupport extends MissingPart {
 	}
 
 	@Override
-	public int getTechRating() {
-		return EquipmentType.RATING_C;
-	}
-
-	@Override
-	public int getAvailability(int era) {
-		return EquipmentType.RATING_C;
-	}
-	
-	@Override
 	public void writeToXml(PrintWriter pw1, int indent) {
 		writeToXmlBegin(pw1, indent);
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
@@ -152,21 +142,11 @@ public class MissingAeroLifeSupport extends MissingPart {
 	public int getLocation() {
 		return Entity.LOC_NONE;
 	}
-
-	@Override
-	public int getIntroDate() {
-		return EquipmentType.DATE_NONE;
-	}
-
-	@Override
-	public int getExtinctDate() {
-		return EquipmentType.DATE_NONE;
-	}
-
-	@Override
-	public int getReIntroDate() {
-		return EquipmentType.DATE_NONE;
-	}
+    
+    @Override
+    public TechAdvancement getTechAdvancement() {
+        return AeroLifeSupport.TECH_ADVANCEMENT;
+    }
 	
 	@Override
 	public int getMassRepairOptionType() {

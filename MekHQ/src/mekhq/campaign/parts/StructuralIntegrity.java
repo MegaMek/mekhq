@@ -23,18 +23,18 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.common.Aero;
 import megamek.common.ConvFighter;
 import megamek.common.Dropship;
 import megamek.common.Entity;
-import megamek.common.EquipmentType;
+import megamek.common.SimpleTechLevel;
 import megamek.common.SmallCraft;
-import megamek.common.TechConstants;
+import megamek.common.TechAdvancement;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  *
@@ -46,6 +46,22 @@ public class StructuralIntegrity extends Part {
 	 * 
 	 */
 	private static final long serialVersionUID = 7723466837496688673L;
+	
+	// Slight variations for ASFs, CFs, and SC/DS
+    static final TechAdvancement TA_ASF = new TechAdvancement(TECH_BASE_ALL)
+            .setAdvancement(2200, 2470, 2490).setApproximate(true, false, false)
+            .setPrototypeFactions(F_TA).setProductionFactions(F_TH)
+            .setTechRating(RATING_C).setAvailability(RATING_C, RATING_D, RATING_D, RATING_C)
+            .setStaticTechLevel(SimpleTechLevel.STANDARD);
+    static final TechAdvancement TA_CF = new TechAdvancement(TECH_BASE_ALL)
+            .setAdvancement(DATE_PS, 2470, 2490).setProductionFactions(F_TH)
+            .setTechRating(RATING_C).setAvailability(RATING_C, RATING_C, RATING_C, RATING_C)
+            .setStaticTechLevel(SimpleTechLevel.STANDARD);
+    static final TechAdvancement TA_DS = new TechAdvancement(TECH_BASE_ALL)
+            .setAdvancement(2200, 2470, 2490).setApproximate(true, false, false)
+            .setPrototypeFactions(F_TA).setProductionFactions(F_TH)
+            .setTechRating(RATING_C).setAvailability(RATING_D, RATING_D, RATING_D, RATING_D)
+            .setStaticTechLevel(SimpleTechLevel.STANDARD);
 
 	private int pointsNeeded;
 	
@@ -68,27 +84,6 @@ public class StructuralIntegrity extends Part {
 	
 	
 	@Override
-	public int getAvailability(int era) {
-		if(null != unit && unit.getEntity() instanceof Aero) {
-			if(unit.getEntity() instanceof Dropship || unit.getEntity() instanceof SmallCraft) {
-				return EquipmentType.RATING_D;
-			}
-			else if(unit.getEntity() instanceof ConvFighter) {
-				return EquipmentType.RATING_C;
-			} else {
-				if(era == EquipmentType.ERA_SL) {
-					return EquipmentType.RATING_C;
-				} else if(era == EquipmentType.ERA_SW) {
-					return EquipmentType.RATING_D;
-				} else {
-					return EquipmentType.RATING_D;
-				}
-			}
-		}
-		return EquipmentType.RATING_C;
-	}
-
-	@Override
 	public long getStickerPrice() {
 		if(null != unit && unit.getEntity() instanceof Aero) {
 			if(unit.getEntity() instanceof Dropship || unit.getEntity() instanceof SmallCraft) {
@@ -103,16 +98,6 @@ public class StructuralIntegrity extends Part {
 		return 0;
 	}
 	
-    @Override
-	public int getTechLevel() {
-		return TechConstants.T_ALLOWED_ALL;
-	}
-
-	@Override
-	public int getTechRating() {
-		return EquipmentType.RATING_C;
-	}
-
 	@Override
 	public double getTonnage() {
 		//not important I suppose
@@ -244,17 +229,15 @@ public class StructuralIntegrity extends Part {
 	}
 	
 	@Override
-	public int getIntroDate() {
-		return EquipmentType.DATE_NONE;
-	}
-
-	@Override
-	public int getExtinctDate() {
-		return EquipmentType.DATE_NONE;
-	}
-
-	@Override
-	public int getReIntroDate() {
-		return EquipmentType.DATE_NONE;
+	public TechAdvancement getTechAdvancement() {
+	    if (null == getUnit()) {
+	        return TA_GENERIC;
+	    } else if (getUnit().getEntity().hasETypeFlag(Entity.ETYPE_SMALL_CRAFT)) {
+	        return TA_DS;
+	    } else if (getUnit().getEntity().hasETypeFlag(Entity.ETYPE_CONV_FIGHTER)) {
+            return TA_CF;
+	    } else {
+            return TA_ASF;
+	    }
 	}
 }

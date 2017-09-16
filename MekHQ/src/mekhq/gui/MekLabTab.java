@@ -42,6 +42,7 @@ import megamek.common.AmmoType;
 import megamek.common.BattleArmor;
 import megamek.common.Engine;
 import megamek.common.Entity;
+import megamek.common.ITechManager;
 import megamek.common.Infantry;
 import megamek.common.Mech;
 import megamek.common.MechFileParser;
@@ -530,6 +531,30 @@ public class MekLabTab extends CampaignGuiTab {
         public void refreshPreview() {
             previewTab.refresh();
         }
+
+        @Override
+        public void refreshSummary() {
+            structureTab.refreshSummary();
+        }
+
+        @Override
+        public void refreshEquipmentTable() {
+            equipmentTab.refreshTable();
+        }
+
+        @Override
+        public void createNewUnit(long entitytype, boolean isPrimitive, boolean isIndustrial, Entity oldUnit) {
+            // TODO Auto-generated method stub
+            
+        }
+
+        @Override
+        public ITechManager getTechManager() {
+            if (null != structureTab) {
+                return structureTab.getTechManager();
+            }
+            return null;
+        }
     }
 
     private class MekPanel extends EntityPanel {
@@ -625,6 +650,30 @@ public class MekLabTab extends CampaignGuiTab {
         public void refreshPreview() {
             previewTab.refresh();
         }
+
+        @Override
+        public void refreshSummary() {
+            structureTab.refresh();
+        }
+
+        @Override
+        public void refreshEquipmentTable() {
+            equipmentTab.refreshTable();
+        }
+
+        @Override
+        public void createNewUnit(long entitytype, boolean isPrimitive, boolean isIndustrial, Entity oldUnit) {
+            // TODO Auto-generated method stub
+            
+        }
+
+        @Override
+        public ITechManager getTechManager() {
+            if (null != structureTab) {
+                return structureTab.getTechManager();
+            }
+            return null;
+        }
     }
 
     private class TankPanel extends EntityPanel {
@@ -712,6 +761,30 @@ public class MekLabTab extends CampaignGuiTab {
 
         @Override
         public void refreshPreview() {
+        }
+
+        @Override
+        public void refreshSummary() {
+            structureTab.refreshSummary();
+        }
+
+        @Override
+        public void refreshEquipmentTable() {
+            equipmentTab.refreshTable();
+        }
+
+        @Override
+        public void createNewUnit(long entitytype, boolean isPrimitive, boolean isIndustrial, Entity oldUnit) {
+            // TODO Auto-generated method stub
+            
+        }
+
+        @Override
+        public ITechManager getTechManager() {
+            if (null != structureTab) {
+                return structureTab.getTechManager();
+            }
+            return null;
         }
     }
 
@@ -803,6 +876,31 @@ public class MekLabTab extends CampaignGuiTab {
         public void refreshPreview() {
             structureTab.refresh();
         }
+
+        @Override
+        public void refreshSummary() {
+            // TODO Auto-generated method stub
+            
+        }
+
+        @Override
+        public void refreshEquipmentTable() {
+            equipmentTab.refreshTable();
+        }
+
+        @Override
+        public void createNewUnit(long entitytype, boolean isPrimitive, boolean isIndustrial, Entity oldUnit) {
+            // TODO Auto-generated method stub
+            
+        }
+
+        @Override
+        public ITechManager getTechManager() {
+            if (null != structureTab) {
+                return structureTab.getTechManager();
+            }
+            return null;
+        }
     }
 
     private class InfantryPanel extends EntityPanel {
@@ -884,6 +982,32 @@ public class MekLabTab extends CampaignGuiTab {
         @Override
         public void refreshPreview() {
             previewTab.refresh();
+        }
+
+        @Override
+        public void refreshSummary() {
+            // TODO Auto-generated method stub
+            
+        }
+
+        @Override
+        public void refreshEquipmentTable() {
+            // TODO Auto-generated method stub
+            
+        }
+
+        @Override
+        public void createNewUnit(long entitytype, boolean isPrimitive, boolean isIndustrial, Entity oldUnit) {
+            // TODO Auto-generated method stub
+            
+        }
+
+        @Override
+        public ITechManager getTechManager() {
+            if (null != structureTab) {
+                return structureTab.getTechManager();
+            }
+            return null;
         }
     }
 }

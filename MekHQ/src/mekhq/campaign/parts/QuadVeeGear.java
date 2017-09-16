@@ -9,9 +9,9 @@ import org.w3c.dom.Node;
 
 import megamek.common.CriticalSlot;
 import megamek.common.Entity;
-import megamek.common.EquipmentType;
 import megamek.common.QuadVee;
-import megamek.common.TechConstants;
+import megamek.common.SimpleTechLevel;
+import megamek.common.TechAdvancement;
 import mekhq.campaign.Campaign;
 
 /**
@@ -26,6 +26,15 @@ public class QuadVeeGear extends Part {
      * 
      */
     private static final long serialVersionUID = -382649905317675957L;
+    
+    static final TechAdvancement TECH_ADVANCEMENT = new TechAdvancement(TECH_BASE_CLAN)
+            .setTechRating(RATING_F)
+            .setAvailability(RATING_X, RATING_X, RATING_X, RATING_F)
+            .setClanAdvancement(3130, 3135, DATE_NONE, DATE_NONE, DATE_NONE)
+            .setClanApproximate(true).setPrototypeFactions(F_CHH)
+            .setProductionFactions(F_CHH)
+            .setStaticTechLevel(SimpleTechLevel.ADVANCED);
+
 
     public QuadVeeGear() {
         this(0, null);
@@ -170,38 +179,10 @@ public class QuadVeeGear extends Part {
     }
 
     @Override
-    public int getTechRating() {
-        return EquipmentType.RATING_F;
+    public TechAdvancement getTechAdvancement() {
+        return TECH_ADVANCEMENT;
     }
-
-    @Override
-    public int getAvailability(int era) {
-        if (era == EquipmentType.ERA_DA) {
-            return EquipmentType.RATING_F;
-        }
-        return EquipmentType.RATING_X;
-    }
-
-    @Override
-    public int getTechLevel() {
-        return TechConstants.T_CLAN_ADVANCED;
-    }
-
-    @Override
-    public int getIntroDate() {
-        return 3125; // Officially ~3130
-    }
-
-    @Override
-    public int getExtinctDate() {
-        return EquipmentType.DATE_NONE;
-    }
-
-    @Override
-    public int getReIntroDate() {
-        return EquipmentType.DATE_NONE;
-    }
-
+    
     @Override
     public boolean isSamePartType(Part part) {
         return part instanceof QuadVeeGear && part.unitTonnage == unitTonnage;

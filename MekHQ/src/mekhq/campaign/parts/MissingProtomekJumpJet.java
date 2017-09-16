@@ -23,14 +23,13 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import org.w3c.dom.Node;
+
 import megamek.common.CriticalSlot;
 import megamek.common.Entity;
-import megamek.common.EquipmentType;
 import megamek.common.Protomech;
-import megamek.common.TechConstants;
+import megamek.common.TechAdvancement;
 import mekhq.campaign.Campaign;
-
-import org.w3c.dom.Node;
 
 /**
  *
@@ -76,30 +75,6 @@ public class MissingProtomekJumpJet extends MissingPart {
     @Override
     protected void loadFieldsFromXmlNode(Node wn) {
         
-    }
-
-    @Override
-    public int getAvailability(int era) {
-        if(era == EquipmentType.ERA_CLAN) {
-            return EquipmentType.RATING_D;
-        } else {
-            return EquipmentType.RATING_X;
-        }
-    }
-
-    @Override
-    public int getTechRating() {
-        return EquipmentType.RATING_D;
-    }
-    
-    @Override
-    public int getTechBase() {
-        return T_CLAN;
-    }
-    
-    @Override
-    public int getTechLevel() {
-        return TechConstants.T_CLAN_TW;
     }
 
     @Override
@@ -184,19 +159,9 @@ public class MissingProtomekJumpJet extends MissingPart {
 		return Entity.LOC_NONE;
 	}
 	
-	@Override
-	public int getIntroDate() {
-		return 3055;
-	}
-
-	@Override
-	public int getExtinctDate() {
-		return EquipmentType.DATE_NONE;
-	}
-
-	@Override
-	public int getReIntroDate() {
-		return EquipmentType.DATE_NONE;
-	}
+    @Override
+    public TechAdvancement getTechAdvancement() {
+        return ProtomekJumpJet.TECH_ADVANCEMENT;
+    }
 
 }

@@ -24,23 +24,22 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 import java.util.GregorianCalendar;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.common.Aero;
 import megamek.common.CriticalSlot;
 import megamek.common.Engine;
 import megamek.common.Entity;
-import megamek.common.EquipmentType;
 import megamek.common.IArmorState;
 import megamek.common.Mech;
 import megamek.common.Protomech;
 import megamek.common.Tank;
-import megamek.common.TechConstants;
+import megamek.common.TechAdvancement;
 import megamek.common.verifier.TestEntity;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.SkillType;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  *
@@ -157,15 +156,6 @@ public class EnginePart extends Part {
 	}
 
 	@Override
-	public int getTechLevel() {
-		int techLevel = getEngine().getTechType(campaign.getCalendar().get(GregorianCalendar.YEAR));
-        if ((techLevel != TechConstants.T_ALLOWED_ALL && techLevel < 0) || techLevel >= TechConstants.T_ALL)
-            return TechConstants.T_TECH_UNKNOWN;
-        else
-            return techLevel;
-	}
-
-	@Override
 	public void writeToXml(PrintWriter pw1, int indent) {
 		writeToXmlBegin(pw1, indent);
 		// The engine is a MM object...
@@ -212,101 +202,6 @@ public class EnginePart extends Part {
 		}
 
 		engine = new Engine(engineRating, engineType, engineFlags);
-	}
-
-	@Override
-	public int getAvailability(int era) {
-		//TODO: this needs to be updated once we get DA era in
-	    int year = campaign.getCalendar().get(GregorianCalendar.YEAR);
-		switch(engine.getTechType(year)) {
-		case Engine.COMBUSTION_ENGINE:
-			if(era == EquipmentType.ERA_SL) {
-				return EquipmentType.RATING_A;
-			} else if(era == EquipmentType.ERA_SW) {
-				return EquipmentType.RATING_A;
-			} else {
-				return EquipmentType.RATING_A;
-			}
-		case Engine.FUEL_CELL:
-			if(era == EquipmentType.ERA_SL) {
-				return EquipmentType.RATING_C;
-			} else if(era == EquipmentType.ERA_SW) {
-				return EquipmentType.RATING_D;
-			} else {
-				return EquipmentType.RATING_D;
-			}
-		case Engine.FISSION:
-			if(era == EquipmentType.ERA_SL) {
-				return EquipmentType.RATING_E;
-			} else if(era == EquipmentType.ERA_SW) {
-				return EquipmentType.RATING_E;
-			} else {
-				return EquipmentType.RATING_D;
-			}
-		case Engine.XL_ENGINE:
-			if(era == EquipmentType.ERA_SL) {
-				return EquipmentType.RATING_D;
-			} else if(era == EquipmentType.ERA_SW) {
-				return EquipmentType.RATING_F;
-			} else {
-				return EquipmentType.RATING_E;
-			}
-		case Engine.LIGHT_ENGINE:
-		case Engine.COMPACT_ENGINE:
-			if(era == EquipmentType.ERA_SL) {
-				return EquipmentType.RATING_X;
-			} else if(era == EquipmentType.ERA_SW) {
-				return EquipmentType.RATING_X;
-			} else {
-				return EquipmentType.RATING_E;
-			}
-		case Engine.XXL_ENGINE:
-			if(era == EquipmentType.ERA_SL) {
-				return EquipmentType.RATING_X;
-			} else if(era == EquipmentType.ERA_SW) {
-				return EquipmentType.RATING_X;
-			} else {
-				return EquipmentType.RATING_F;
-			}
-		default:
-			if(era == EquipmentType.ERA_SL) {
-				return EquipmentType.RATING_C;
-			} else if(era == EquipmentType.ERA_SW) {
-				return EquipmentType.RATING_E;
-			} else {
-				return EquipmentType.RATING_D;
-			}
-		}
-	}
-
-	@Override
-	public int getTechRating() {
-		switch(engine.getEngineType()) {
-		case Engine.XL_ENGINE:
-			if(engine.hasFlag(Engine.CLAN_ENGINE)) {
-				return EquipmentType.RATING_F;
-			}
-		case Engine.LIGHT_ENGINE:
-		case Engine.COMPACT_ENGINE:
-			return EquipmentType.RATING_E;
-		case Engine.XXL_ENGINE:
-			return EquipmentType.RATING_F;
-		case Engine.FUEL_CELL:
-		case Engine.FISSION:
-			if(engine.hasFlag(Engine.SUPPORT_VEE_ENGINE)) {
-				return EquipmentType.RATING_C;
-			}
-		case Engine.NORMAL_ENGINE:
-			return EquipmentType.RATING_D;
-		case Engine.STEAM:
-			return EquipmentType.RATING_A;
-		case Engine.COMBUSTION_ENGINE:
-			if(engine.hasFlag(Engine.SUPPORT_VEE_ENGINE)) {
-				return EquipmentType.RATING_B;
-			}
-		default:
-			return EquipmentType.RATING_C;
-		}
 	}
 
 	@Override
@@ -555,98 +450,10 @@ public class EnginePart extends Part {
 	public int getLocation() {
 		return Entity.LOC_NONE;
 	}
-
+	
 	@Override
-	public int getIntroDate() {
-		switch(engine.getEngineType()) {
-		case Engine.XL_ENGINE:
-			if(engine.hasFlag(Engine.CLAN_ENGINE)) {
-				if(engine.hasFlag(Engine.LARGE_ENGINE)) {
-					return 2850;
-				} else {
-					return 2824;
-				}
-			} else {
-				if(engine.hasFlag(Engine.LARGE_ENGINE)) {
-					return 2635;
-				} else {
-					return 2556;
-				}
-			}
-		case Engine.XXL_ENGINE:
-			if(engine.hasFlag(Engine.CLAN_ENGINE)) {
-				if(engine.hasFlag(Engine.LARGE_ENGINE)) {
-					return 3055;
-				} else {
-					return 2954;
-				}
-			} else {
-				if(engine.hasFlag(Engine.LARGE_ENGINE)) {
-					return 3058;
-				} else {
-					return 3055;
-				}
-			}
-		case Engine.LIGHT_ENGINE:
-			if(engine.hasFlag(Engine.LARGE_ENGINE)) {
-				return 3064;
-			} else {
-				return 3055;
-			}
-		case Engine.COMPACT_ENGINE:
-			return 3065;
-		case Engine.FUEL_CELL:
-			if(!engine.hasFlag(Engine.SUPPORT_VEE_ENGINE)) {
-				return 2300;
-			}
-		case Engine.FISSION:
-			if(!engine.hasFlag(Engine.SUPPORT_VEE_ENGINE)) {
-				return 2470;
-			}
-		case Engine.MAGLEV:
-		case Engine.BATTERY:
-		case Engine.SOLAR:
-		case Engine.NORMAL_ENGINE:
-		case Engine.COMBUSTION_ENGINE:
-			if(engine.hasFlag(Engine.LARGE_ENGINE)) {
-				return 2630;
-			}
-		case Engine.STEAM:
-		default:
-			return EquipmentType.DATE_NONE;
-		}
-	}
-
-	@Override
-	public int getExtinctDate() {
-		switch(engine.getEngineType()) {
-		case Engine.XL_ENGINE:
-			if(!engine.hasFlag(Engine.CLAN_ENGINE)) {
-				if(engine.hasFlag(Engine.LARGE_ENGINE)) {
-					return 2822;
-				} else {
-					return 2865;
-				}
-			}
-		default:
-			return EquipmentType.DATE_NONE;
-		}
-	}
-
-	@Override
-	public int getReIntroDate() {
-		switch(engine.getEngineType()) {
-		case Engine.XL_ENGINE:
-			if(!engine.hasFlag(Engine.CLAN_ENGINE)) {
-				if(engine.hasFlag(Engine.LARGE_ENGINE)) {
-					return 3054;
-				} else {
-					return 3035;
-				}
-			}
-		default:
-			return EquipmentType.DATE_NONE;
-		}
+	public TechAdvancement getTechAdvancement() {
+	    return engine.getTechAdvancement();
 	}
 
 	@Override

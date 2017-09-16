@@ -22,19 +22,17 @@
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
-import java.util.GregorianCalendar;
-
-import megamek.common.Compute;
-import megamek.common.CriticalSlot;
-import megamek.common.EquipmentType;
-import megamek.common.Mech;
-import megamek.common.TechConstants;
-import mekhq.MekHqXmlUtil;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.personnel.SkillType;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import megamek.common.Compute;
+import megamek.common.CriticalSlot;
+import megamek.common.Mech;
+import megamek.common.TechAdvancement;
+import mekhq.MekHqXmlUtil;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.personnel.SkillType;
 
 /**
  *
@@ -157,42 +155,6 @@ public class MekGyro extends Part {
 			//need to calculate gyroTonnage for reverse compatability
 	        gyroTonnage = MekGyro.getGyroTonnage(walkMP, type, uTonnage);
 		}
-	}
-
-	@Override
-	public int getAvailability(int era) {
-		switch(type) {
-		case Mech.GYRO_COMPACT:
-		case Mech.GYRO_HEAVY_DUTY:
-		case Mech.GYRO_XL:
-			if(era == EquipmentType.ERA_SL) {
-				return EquipmentType.RATING_X;
-			} else if(era == EquipmentType.ERA_SW) {
-				return EquipmentType.RATING_X;
-			} else {
-				return EquipmentType.RATING_E;
-			}
-		default:
-			return EquipmentType.RATING_C;
-		}
-	}
-
-	@Override
-	public int getTechRating() {
-		switch(type) {
-		case Mech.GYRO_COMPACT:
-		case Mech.GYRO_HEAVY_DUTY:
-		case Mech.GYRO_XL:
-			return EquipmentType.RATING_E;
-		default:
-			return EquipmentType.RATING_D;
-		}
-	}
-
-	@Override
-	public int getTechLevel() {
-	    int year  = campaign.getCalendar().get(GregorianCalendar.YEAR);
-	    return TechConstants.getGyroTechLevel(type, isClan, year);
 	}
 
 	@Override
@@ -321,30 +283,12 @@ public class MekGyro extends Part {
 	public int getLocation() {
 		return Mech.LOC_CT;
 	}
-
-	@Override
-	public int getIntroDate() {
-		switch(type) {
-		case Mech.GYRO_COMPACT:
-			return 3068;
-		case Mech.GYRO_HEAVY_DUTY:
-		case Mech.GYRO_XL:
-			return 3067;
-		default:
-			return EquipmentType.DATE_NONE;
-		}
-	}
-
-	@Override
-	public int getExtinctDate() {
-		return EquipmentType.DATE_NONE;
-	}
-
-	@Override
-	public int getReIntroDate() {
-		return EquipmentType.DATE_NONE;
-	}
 	
+	@Override
+	public TechAdvancement getTechAdvancement() {
+	    return Mech.getGyroTechAdvancement(type);
+	}
+
 	@Override
 	public int getMassRepairOptionType() {
     	return Part.REPAIR_PART_TYPE.GYRO;

@@ -23,15 +23,15 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import megamek.common.BipedMech;
-import megamek.common.CriticalSlot;
-import megamek.common.EquipmentType;
-import megamek.common.Mech;
-import mekhq.MekHqXmlUtil;
-import mekhq.campaign.Campaign;
-
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import megamek.common.BipedMech;
+import megamek.common.CriticalSlot;
+import megamek.common.Mech;
+import megamek.common.TechAdvancement;
+import mekhq.MekHqXmlUtil;
+import mekhq.campaign.Campaign;
 
 /**
  *
@@ -112,16 +112,6 @@ public class MissingMekActuator extends MissingPart {
 		}
 	}
 
-	@Override
-	public int getAvailability(int era) {
-		return EquipmentType.RATING_C;
-	}
-
-	@Override
-	public int getTechRating() {
-		return EquipmentType.RATING_C;
-	}
-
 	@Override 
 	public void fix() {
 		Part replacement = findReplacement(false);
@@ -192,21 +182,11 @@ public class MissingMekActuator extends MissingPart {
 		return unit.getEntity().getLocationName(location);
 	}
 	
-	@Override
-	public int getIntroDate() {
-		return EquipmentType.DATE_NONE;
-	}
-
-	@Override
-	public int getExtinctDate() {
-		return EquipmentType.DATE_NONE;
-	}
-
-	@Override
-	public int getReIntroDate() {
-		return EquipmentType.DATE_NONE;
-	}
-	
+    @Override
+    public TechAdvancement getTechAdvancement() {
+        return (getUnitTonnage() <= 100)? MekActuator.TA_STANDARD : MekActuator.TA_SUPERHEAVY;
+    }
+    	
 	@Override
 	public int getMassRepairOptionType() {
     	return Part.REPAIR_PART_TYPE.ACTUATOR;

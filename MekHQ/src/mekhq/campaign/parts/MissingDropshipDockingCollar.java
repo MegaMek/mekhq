@@ -23,13 +23,14 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.common.Dropship;
 import megamek.common.Entity;
-import megamek.common.EquipmentType;
-import megamek.common.TechConstants;
+import megamek.common.TechAdvancement;
+import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
-
-import org.w3c.dom.Node;
 
 /**
  *
@@ -42,14 +43,16 @@ public class MissingDropshipDockingCollar extends MissingPart {
 	 */
 	private static final long serialVersionUID = -717866644605314883L;
 
+	private boolean hasKFBoom = true;
 	
 	public MissingDropshipDockingCollar() {
-    	this(0, null);
+    	this(0, null, true);
     }
     
-    public MissingDropshipDockingCollar(int tonnage, Campaign c) {
+    public MissingDropshipDockingCollar(int tonnage, Campaign c, boolean hasKFBoom) {
         super(tonnage, c);
         this.name = "Dropship Docking Collar";
+        this.hasKFBoom = hasKFBoom;
     }
     
     @Override 
@@ -72,7 +75,7 @@ public class MissingDropshipDockingCollar extends MissingPart {
 
 	@Override
 	public Part getNewPart() {
-		return new DropshipDockingCollar(getUnitTonnage(), campaign);
+		return new DropshipDockingCollar(getUnitTonnage(), campaign, hasKFBoom);
 	}
 
 	@Override
@@ -87,40 +90,22 @@ public class MissingDropshipDockingCollar extends MissingPart {
 	}
 
 	@Override
-	public int getTechRating() {
-		return EquipmentType.RATING_C;
-	}
-
-	@Override
-	public int getAvailability(int era) {
-		if(era == EquipmentType.ERA_SL) {
-			return EquipmentType.RATING_C;
-		} else if(era == EquipmentType.ERA_SW) {
-			return EquipmentType.RATING_D;
-		} else {
-			return EquipmentType.RATING_C;
-		}
-	}
-	
-	@Override
-	public int getTechLevel() {
-		return TechConstants.T_IS_TW_ALL;
-	}
-	
-	@Override 
-	public int getTechBase() {
-		return T_BOTH;	
-	}
-	
-	@Override
 	public void writeToXml(PrintWriter pw1, int indent) {
 		writeToXmlBegin(pw1, indent);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "hasKFBoom", hasKFBoom);
 		writeToXmlEnd(pw1, indent);
 	}
 
 	@Override
 	protected void loadFieldsFromXmlNode(Node wn) {
-		//nothing
+        NodeList nl = wn.getChildNodes();
+
+        for (int x=0; x<nl.getLength(); x++) {
+            Node wn2 = nl.item(x);
+            if (wn2.getNodeName().equalsIgnoreCase("hasKFBoom")) {
+                hasKFBoom = Boolean.parseBoolean(wn2.getTextContent());
+            }
+        }
 	}
 
 	@Override
@@ -140,19 +125,8 @@ public class MissingDropshipDockingCollar extends MissingPart {
 	}
 	
 	@Override
-	public int getIntroDate() {
-		return 2304;
+	public TechAdvancement getTechAdvancement() {
+	    return hasKFBoom? DropshipDockingCollar.TA_BOOM : DropshipDockingCollar.TA_NO_BOOM; 
 	}
-
-	@Override
-	public int getExtinctDate() {
-		return EquipmentType.DATE_NONE;
-	}
-
-	@Override
-	public int getReIntroDate() {
-		return EquipmentType.DATE_NONE;
-	}
-	
 	
 }

@@ -6,8 +6,8 @@ package mekhq.campaign.parts;
 import org.w3c.dom.Node;
 
 import megamek.common.CriticalSlot;
-import megamek.common.EquipmentType;
 import megamek.common.QuadVee;
+import megamek.common.TechAdvancement;
 import mekhq.campaign.Campaign;
 
 /**
@@ -79,31 +79,8 @@ public class MissingQuadVeeGear extends MissingPart {
     }
 
     @Override
-    public int getTechRating() {
-        return EquipmentType.RATING_F;
-    }
-
-    @Override
-    public int getAvailability(int era) {
-        if (era == EquipmentType.ERA_DA) {
-            return EquipmentType.RATING_F;
-        }
-        return EquipmentType.RATING_X;
-    }
-
-    @Override
-    public int getIntroDate() {
-        return 3125; // Officially ~3130
-    }
-
-    @Override
-    public int getExtinctDate() {
-        return EquipmentType.DATE_NONE;
-    }
-
-    @Override
-    public int getReIntroDate() {
-        return EquipmentType.DATE_NONE;
+    public TechAdvancement getTechAdvancement() {
+        return QuadVeeGear.TECH_ADVANCEMENT;
     }
 
     @Override
