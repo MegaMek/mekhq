@@ -8607,7 +8607,7 @@ public class Campaign implements Serializable, ITechManager {
         if (campaignOptions.limitByYear()) {
             return calendar.get(Calendar.YEAR);
         } else {
-            return 0;
+            return Integer.MAX_VALUE;
         }
     }
 
