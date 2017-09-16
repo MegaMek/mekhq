@@ -18,6 +18,7 @@ v0.43.4-git
 + Issue #437: ATB ambush mission generates the incorrect amount of enemy units
 + issue #410: Allied traitors scenario no longer working
 + Issue #436: BA in MekHQ's mechlab has incorrect tonnage
++ PR #425: Implementation of Issue #339 - Prisoner ransoming instead of bonus
 + PR #451: IO Tech
 	o Updates all tech intro dates to the Universal Technology Advancement Table in Interstellar Operations.
 	o New options to vary part and unit tech level according to campaign year and/or faction.

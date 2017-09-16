@@ -8602,6 +8602,56 @@ public class Campaign implements Serializable, ITechManager {
         return false;
     }
 
+    public int getPeacetimeCost() {
+        int cost = 0;
+
+        cost += getPayRoll(getCampaignOptions().useInfantryDontCount());
+        cost += getMonthlySpareParts();
+        cost += getMonthlyFuel();
+        cost += getMonthlyAmmo();
+        return cost;
+    }
+
+    public long getMonthlySpareParts() {
+        long partsCost = 0;
+
+        for (Unit u : getUnits()) {
+            if (u.isMothballed()) {
+                continue;
+            }
+            partsCost += u.getSparePartsCost();
+        }
+        return partsCost;
+    }
+
+    public long getMonthlyFuel() {
+        long fuelCost = 0;
+
+        for (Unit u : getUnits()) {
+            if (u.isMothballed()) {
+                continue;
+            }
+            fuelCost += u.getFuelCost();
+        }
+        return fuelCost;
+    }
+
+    public long getMonthlyAmmo() {
+        long ammoCost= 0;
+
+        for (Unit u : getUnits()) {
+            if (u.isMothballed()) {
+                continue;
+            }
+            ammoCost += u.getAmmoCost();
+        }
+        return ammoCost;
+    }
+
+    public boolean isFactionComstar() {
+        return getFactionCode().equals("CS");
+    }
+
     @Override
     public int getTechIntroYear() {
         if (campaignOptions.limitByYear()) {

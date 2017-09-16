@@ -138,6 +138,9 @@ public class CampaignOptions implements Serializable {
     private boolean sellUnits;
     private boolean sellParts;
     private boolean useLoanLimits;
+    private boolean usePeacetimeCost;
+    private boolean useExtendedPartsModifier;
+    private boolean showPeacetimeCost;
     private double[] usedPartsValue;
     private double damagedPartsValue;
     private double canceledOrderReimbursement;
@@ -148,6 +151,9 @@ public class CampaignOptions implements Serializable {
     //contract related
     private boolean equipmentContractBase;
     private double equipmentContractPercent;
+    private double dropshipContractPercent;
+    private double jumpshipContractPercent;
+    private double warshipContractPercent;
     private boolean equipmentContractSaleValue;
     private boolean blcSaleValue;
 
@@ -299,6 +305,9 @@ public class CampaignOptions implements Serializable {
         payForMaintain = false;
         payForTransport = false;
         useLoanLimits = false;
+        usePeacetimeCost = false;
+        useExtendedPartsModifier = false;
+        showPeacetimeCost = false;
         sellUnits = false;
         sellParts = false;
         limitByYear = true;
@@ -352,6 +361,9 @@ public class CampaignOptions implements Serializable {
         acquireMinimumTimeUnit = TRANSIT_UNIT_MONTH;
         equipmentContractBase = false;
         equipmentContractPercent = 5.0;
+        dropshipContractPercent = 1.0;
+        jumpshipContractPercent = 0.0;
+        warshipContractPercent = 0.0;
         equipmentContractSaleValue = false;
         blcSaleValue = false;
         clanAcquisitionPenalty = 0;
@@ -807,6 +819,30 @@ public class CampaignOptions implements Serializable {
         this.payForTransport = b;
     }
 
+    public boolean usePeacetimeCost() {
+        return usePeacetimeCost;
+    }
+
+    public void setUsePeacetimeCost(boolean b) {
+        this.usePeacetimeCost = b;
+    }
+
+    public boolean useExtendedPartsModifier() {
+        return useExtendedPartsModifier;
+    }
+
+    public void setUseExtendedPartsModifier(boolean b) {
+        this.useExtendedPartsModifier = b;
+    }
+
+    public boolean showPeacetimeCost() {
+        return showPeacetimeCost;
+    }
+
+    public void setShowPeacetimeCost(boolean b) {
+        this.showPeacetimeCost = b;
+    }
+
     public boolean canSellUnits() {
         return sellUnits;
     }
@@ -1181,6 +1217,30 @@ public class CampaignOptions implements Serializable {
 
     public void setEquipmentContractSaleValue(boolean b) {
         this.equipmentContractSaleValue = b;
+    }
+
+    public double getDropshipContractPercent() {
+        return dropshipContractPercent;
+    }
+
+    public void setDropshipContractPercent(double b) {
+        dropshipContractPercent = b;
+    }
+
+    public double getJumpshipContractPercent() {
+        return jumpshipContractPercent;
+    }
+
+    public void setJumpshipContractPercent(double b) {
+        jumpshipContractPercent = b;
+    }
+
+    public double getWarshipContractPercent() {
+        return warshipContractPercent;
+    }
+
+    public void setWarshipContractPercent(double b) {
+        warshipContractPercent = b;
     }
 
     public boolean useBLCSaleValue() {
@@ -1908,6 +1968,9 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "payForOverhead", payForOverhead);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "payForMaintain", payForMaintain);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "payForTransport", payForTransport);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "usePeacetimeCost", usePeacetimeCost);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useExtendedPartsModifier", useExtendedPartsModifier);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "showPeacetimeCost", showPeacetimeCost);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "usedPartsValueA", usedPartsValue[0]);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "usedPartsValueB", usedPartsValue[1]);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "usedPartsValueC", usedPartsValue[2]);
@@ -1952,6 +2015,9 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "acquireMinimumTime", acquireMinimumTime);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "acquireMinimumTimeUnit", acquireMinimumTimeUnit);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "equipmentContractPercent", equipmentContractPercent);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "dropshipContractPercent", dropshipContractPercent);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "jumpshipContractPercent", jumpshipContractPercent);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "warshipContractPercent", warshipContractPercent);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "equipmentContractBase", equipmentContractBase);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "equipmentContractSaleValue", equipmentContractSaleValue);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "blcSaleValue", blcSaleValue);
@@ -2177,6 +2243,12 @@ public class CampaignOptions implements Serializable {
                 retVal.payForMaintain = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("payForTransport")) {
                 retVal.payForTransport = Boolean.parseBoolean(wn2.getTextContent());
+            } else if (wn2.getNodeName().equalsIgnoreCase("usePeacetimeCost")) {
+                retVal.usePeacetimeCost = Boolean.parseBoolean(wn2.getTextContent());
+            } else if (wn2.getNodeName().equalsIgnoreCase("useExtendedPartsModifier")) {
+                retVal.useExtendedPartsModifier = Boolean.parseBoolean(wn2.getTextContent());
+            } else if (wn2.getNodeName().equalsIgnoreCase("showPeacetimeCost")) {
+                retVal.showPeacetimeCost = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("payForRecruitment")) {
                 retVal.payForRecruitment = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("useLoanLimits")) {
@@ -2255,6 +2327,12 @@ public class CampaignOptions implements Serializable {
                 retVal.isAcquisitionPenalty = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("equipmentContractPercent")) {
                 retVal.equipmentContractPercent = Double.parseDouble(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("dropshipContractPercent")) {
+                retVal.dropshipContractPercent = Double.parseDouble(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("jumpshipContractPercent")) {
+                retVal.jumpshipContractPercent = Double.parseDouble(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("warshipContractPercent")) {
+                retVal.warshipContractPercent = Double.parseDouble(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("equipmentContractBase")) {
                 retVal.equipmentContractBase = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("equipmentContractSaleValue")) {

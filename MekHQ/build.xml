@@ -12,7 +12,9 @@
     <property name="dir.test.src" location="unittests"/>
     <property name="dir.build.teststaging" location="${build}/teststaging"/>
     <property name="dir.build.testreport" location="${build}/testreport"/>
-    <property name="class.main" location="mekhq.MekHQ"/>
+    <property name="class.main" value="mekhq.MekHQ"/>
+    <property name="megamek" value="MegaMek.jar"/>
+    <property name="megameklab" value="MegaMekLab.jar"/>
 
     <path id="project.classpath">
         <pathelement path="${build}">
@@ -113,7 +115,7 @@
             <manifest>
                 <attribute name="Built-By" value="${user.name}"/>
                 <attribute name="Main-Class" value="${class.main}"/>
-                <attribute name="Class-Path" value="${classpath.manifest}"/>
+                <attribute name="Class-Path" value="${classpath.manifest} ${megamek} ${megameklab}"/>
             </manifest>
             <fileset dir="${src}" includes="**/*.properties"/>
         </jar>

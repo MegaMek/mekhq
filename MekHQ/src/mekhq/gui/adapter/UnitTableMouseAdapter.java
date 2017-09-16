@@ -117,6 +117,8 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                 gui.refreshOverview();
         }*/ else if (command.contains("MAINTENANCE_REPORT")) {
             gui.showMaintenanceReport(selectedUnit.getId());
+        } else if (command.contains("SUPPLY_COST")) {
+            gui.showUnitCostReport(selectedUnit.getId());
         } else if (command.contains("ASSIGN")) {
             String sel = command.split(":")[1];
             UUID id = UUID.fromString(sel);
@@ -715,6 +717,12 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
             if (oneSelected && unit.requiresMaintenance()) {
                 menuItem = new JMenuItem("Show Last Maintenance Report");
                 menuItem.setActionCommand("MAINTENANCE_REPORT");
+                menuItem.addActionListener(this);
+                popup.add(menuItem);
+            }
+            if (oneSelected && !unit.isMothballed() && gui.getCampaign().getCampaignOptions().usePeacetimeCost()) {
+                menuItem = new JMenuItem("Show Monthly Supply Cost Report");
+                menuItem.setActionCommand("SUPPLY_COST");
                 menuItem.addActionListener(this);
                 popup.add(menuItem);
             }
