@@ -378,13 +378,14 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	</faction>
 	<faction>
 		<shortname>SCon</shortname>
-		<fullname>Stewart Confederation</fullname>
+		<fullname>Stewart Commonality</fullname>
+		<altNames>Stewart Confederation,Stewart Confederacy</altNames>
 		<startingPlanet>Stewart,,,,,,,,</startingPlanet>
 		<nameGenerator>FWL</nameGenerator>
 		<colorRGB>76,0,153</colorRGB>
 		<tags>is</tags>
 		<start>2259</start>
-		<end>2271</end>
+		<end>2295</end>
 		<successor>FWL</successor>
 	</faction>
 	<faction>
