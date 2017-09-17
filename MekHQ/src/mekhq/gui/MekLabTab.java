@@ -116,7 +116,7 @@ public class MekLabTab extends CampaignGuiTab {
         UnitUtil.loadFonts();
         new CConfig();
         MekHQ.getLogger().log(getClass(), "initTab()", LogLevel.INFO, //$NON-NLS-1$
-                "Staring MegaMekLab version: " + MegaMekLab.VERSION); //$NON-NLS-1$
+                "Starting MegaMekLab version: " + MegaMekLab.VERSION); //$NON-NLS-1$
         btnRefit = new JButton("Begin Refit");
         btnRefit.addActionListener(evt -> {
             Entity entity = labPanel.getEntity();
@@ -168,6 +168,13 @@ public class MekLabTab extends CampaignGuiTab {
         UnitUtil.updateLoadedMech(entity);
         entity.setModel(entity.getModel() + " Mk II");
         removeAll();
+        // We need to override the values in the MML properties file with the campaign options settings.
+        CConfig.setParam(CConfig.TECH_EXTINCT, String.valueOf(campaignGUI.getCampaign().showExtinct()));
+        CConfig.setParam(CConfig.TECH_PROGRESSION, String.valueOf(campaignGUI.getCampaign().useVariableTechLevel()));
+        CConfig.setParam(CConfig.TECH_SHOW_FACTION, String.valueOf(campaignGUI.getCampaign().getTechFaction() >= 0));
+        CConfig.setParam(CConfig.TECH_UNOFFICAL_NO_YEAR, String.valueOf(campaignGUI.getCampaign().unofficialNoYear()));
+        CConfig.setParam(CConfig.TECH_USE_YEAR, String.valueOf(campaignGUI.getCampaign().getGameYear()));
+        CConfig.setParam(CConfig.TECH_YEAR, String.valueOf(campaignGUI.getCampaign().getGameYear()));
         labPanel = getCorrectLab(entity);
         refreshSummary();
         add(summaryPane, BorderLayout.LINE_START);
@@ -627,7 +634,7 @@ public class MekLabTab extends CampaignGuiTab {
 
         @Override
         public void refreshStatus() {
-            refreshSummary();
+            MekLabTab.this.refreshSummary();
         }
 
         @Override
