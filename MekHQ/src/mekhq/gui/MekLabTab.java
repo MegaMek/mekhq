@@ -176,6 +176,7 @@ public class MekLabTab extends CampaignGuiTab {
         CConfig.setParam(CConfig.TECH_USE_YEAR, String.valueOf(campaignGUI.getCampaign().getGameYear()));
         CConfig.setParam(CConfig.TECH_YEAR, String.valueOf(campaignGUI.getCampaign().getGameYear()));
         labPanel = getCorrectLab(entity);
+        labPanel.setTechFaction(campaignGUI.getCampaign().getTechFaction());
         refreshSummary();
         add(summaryPane, BorderLayout.LINE_START);
         add(labPanel, BorderLayout.CENTER);
@@ -443,6 +444,8 @@ public class MekLabTab extends CampaignGuiTab {
 
         @Override
         public abstract Entity getEntity();
+        
+        abstract void setTechFaction(int techFaction);
     }
 
     private class AeroPanel extends EntityPanel {
@@ -562,6 +565,12 @@ public class MekLabTab extends CampaignGuiTab {
             }
             return null;
         }
+        
+        @Override
+        void setTechFaction(int techFaction) {
+            structureTab.setTechFaction(techFaction);
+        }
+        
     }
 
     private class MekPanel extends EntityPanel {
@@ -681,6 +690,11 @@ public class MekLabTab extends CampaignGuiTab {
             }
             return null;
         }
+
+        @Override
+        void setTechFaction(int techFaction) {
+            structureTab.setTechFaction(techFaction);
+        }
     }
 
     private class TankPanel extends EntityPanel {
@@ -792,6 +806,11 @@ public class MekLabTab extends CampaignGuiTab {
                 return structureTab.getTechManager();
             }
             return null;
+        }
+
+        @Override
+        void setTechFaction(int techFaction) {
+            structureTab.setTechFaction(techFaction);
         }
     }
 
@@ -908,6 +927,11 @@ public class MekLabTab extends CampaignGuiTab {
             }
             return null;
         }
+
+        @Override
+        void setTechFaction(int techFaction) {
+            structureTab.setTechFaction(techFaction);
+        }
     }
 
     private class InfantryPanel extends EntityPanel {
@@ -1015,6 +1039,11 @@ public class MekLabTab extends CampaignGuiTab {
                 return structureTab.getTechManager();
             }
             return null;
+        }
+
+        @Override
+        void setTechFaction(int techFaction) {
+            structureTab.setTechFaction(techFaction);
         }
     }
 }
