@@ -4393,6 +4393,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         campaign.getGameOptions().getOption("canon_only").setValue(allowCanonOnlyBox.isSelected());
         campaign.getGameOptions().getOption(OptionsConstants.ALLOWED_ERA_BASED).setValue(variableTechLevelBox.isSelected());
         options.setfactionIntroDate(factionIntroDateBox.isSelected());
+        campaign.updateTechFactionCode();
         options.setAllowCanonRefitOnly(allowCanonRefitOnlyBox.isSelected());
         options.setUseAmmoByType(useAmmoByTypeBox.isSelected());
         options.setTechLevel(choiceTechLevel.getSelectedIndex());
