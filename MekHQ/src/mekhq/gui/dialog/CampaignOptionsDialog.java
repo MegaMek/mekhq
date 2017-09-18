@@ -502,7 +502,9 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         allowCanonOnlyBox.setSelected(options.allowCanonOnly());
         allowCanonRefitOnlyBox.setSelected(options.allowCanonRefitOnly());
         variableTechLevelBox.setSelected(campaign.getGameOptions()
-                .getOption(OptionsConstants.ALLOWED_ERA_BASED).booleanValue());
+                .getOption(OptionsConstants.ALLOWED_ERA_BASED).booleanValue()
+                && options.limitByYear());
+        variableTechLevelBox.setEnabled(options.limitByYear());
         factionIntroDateBox.setSelected(options.useFactionIntroDate());
         useAmmoByTypeBox.setSelected(options.useAmmoByType());
 
@@ -1213,6 +1215,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panTech.add(limitByYearBox, gridBagConstraints);
+        limitByYearBox.addActionListener(e -> variableTechLevelBox.setEnabled(limitByYearBox.isSelected()));
 
         disallowExtinctStuffBox.setText(resourceMap.getString("disallowExtinctStuffBox.text")); // NOI18N
         disallowExtinctStuffBox.setToolTipText(resourceMap.getString("disallowExtinctStuffBox.toolTipText")); // NOI18N
