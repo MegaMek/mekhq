@@ -2800,7 +2800,7 @@ public class CampaignGUI extends JPanel {
     		// put a try-catch here so that bugs in the meklab don't screw up
     		// other stuff
     		try {
-    			lab.refreshSummary();
+    			lab.refreshRefitSummary();
     		} catch (Exception err) {
     			err.printStackTrace();
     		}
