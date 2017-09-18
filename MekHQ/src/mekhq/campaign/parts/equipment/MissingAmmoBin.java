@@ -102,7 +102,7 @@ public class MissingAmmoBin extends MissingEquipmentPart {
 		        actualReplacement = replacement.clone();
 		    } else {
 		        actualReplacement = new AmmoBin(getUnitTonnage(), getType(), getEquipmentNum(), 
-		                getFullShots(), this.isOneShot(), this.isOmniPodded(), this.campaign);
+		                getFullShots(), isOneShot(), isOmniPodded(), campaign);
 		    }
 			
 			unit.addPart(actualReplacement);
