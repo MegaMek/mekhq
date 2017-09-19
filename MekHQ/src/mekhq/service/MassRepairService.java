@@ -1174,15 +1174,16 @@ public class MassRepairService {
 			 * Sort the valid techs by applicable skill. Let's start with the
 			 * least experienced and work our way up until we find someone who
 			 * can perform the work. If we have two techs with the same skill,
-			 * put the one with the lesser XP in the front.
+			 * put the one with the lesser XP in the front. If we have techs 
+			 * with the same XP, put the one with the more time ahead.
 			 */
 
 			Skill skill1 = tech1.getSkillForWorkingOn(partWork);
 			Skill skill2 = tech2.getSkillForWorkingOn(partWork);
 
 			if (skill1.getExperienceLevel() == skill2.getExperienceLevel()) {
-				if (tech1.getXp() == tech2.getXp()) {
-					return 0;
+				if ((tech1.getXp() == tech2.getXp()) || (skill1.getLevel() == SkillType.EXP_ELITE)) {
+					return tech1.getMinutesLeft() < tech2.getMinutesLeft() ? -1 : 1;
 				}
 
 				return tech1.getXp() < tech2.getXp() ? -1 : 1;
