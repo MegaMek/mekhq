@@ -23,14 +23,14 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import megamek.common.Aero;
-import megamek.common.Entity;
-import megamek.common.EquipmentType;
-import mekhq.MekHqXmlUtil;
-import mekhq.campaign.Campaign;
-
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import megamek.common.Aero;
+import megamek.common.Entity;
+import megamek.common.TechAdvancement;
+import mekhq.MekHqXmlUtil;
+import mekhq.campaign.Campaign;
 
 /**
  *
@@ -86,16 +86,6 @@ public class MissingFireControlSystem extends MissingPart {
 	}
 
 	@Override
-	public int getTechRating() {
-		return EquipmentType.RATING_C;
-	}
-
-	@Override
-	public int getAvailability(int era) {
-		return EquipmentType.RATING_C;
-	}
-
-	@Override
 	public void updateConditionFromPart() {
 		if(null != unit && unit.getEntity() instanceof Aero) {
 			((Aero)unit.getEntity()).setFCSHits(3);
@@ -136,18 +126,8 @@ public class MissingFireControlSystem extends MissingPart {
 	}
 	
 	@Override
-	public int getIntroDate() {
-		return EquipmentType.DATE_NONE;
-	}
-
-	@Override
-	public int getExtinctDate() {
-		return EquipmentType.DATE_NONE;
-	}
-
-	@Override
-	public int getReIntroDate() {
-		return EquipmentType.DATE_NONE;
+	public TechAdvancement getTechAdvancement() {
+	    return TA_GENERIC;
 	}
 	
 }

@@ -19,6 +19,10 @@ v0.43.4-git
 + Issue #410: Allied traitors scenario no longer working
 + Issue #436: BA in MekHQ's mechlab has incorrect tonnage
 + PR #425: Implementation of Issue #339 - Prisoner ransoming instead of bonus
++ PR #451: IO Tech
+	o Updates all tech intro dates to the Universal Technology Advancement Table in Interstellar Operations.
+	o New options to vary part and unit tech level according to campaign year and/or faction.
++ Update Era.java to match MUL and add Dark Age information.
 
 v0.43.3 (2017-07-18 18:30 UTC)
 + Feature: Refactor AtBScenario to break up the monolithic AtBScenario class and to have a separate class for each scenario

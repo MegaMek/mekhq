@@ -23,14 +23,15 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import megamek.common.Entity;
-import megamek.common.EntityMovementMode;
-import megamek.common.EquipmentType;
-import mekhq.MekHqXmlUtil;
-import mekhq.campaign.Campaign;
-
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import megamek.common.Entity;
+import megamek.common.EntityMovementMode;
+import megamek.common.Infantry;
+import megamek.common.TechAdvancement;
+import mekhq.MekHqXmlUtil;
+import mekhq.campaign.Campaign;
 
 /**
  *
@@ -165,23 +166,10 @@ public class InfantryMotiveType extends Part {
 	}
 
 	@Override
-	public int getTechRating() {
-		// TODO Auto-generated method stub
-		return 0;
+	public TechAdvancement getTechAdvancement() {
+	    return Infantry.getMotiveTechAdvancement(mode);
 	}
-
-	@Override
-	public int getAvailability(int era) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public int getTechLevel() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
+	
 	@Override
 	public boolean isSamePartType(Part part) {
 		return part instanceof InfantryMotiveType && mode.equals(((InfantryMotiveType)part).getMovementMode());
@@ -237,20 +225,5 @@ public class InfantryMotiveType extends Part {
 	@Override
 	public int getLocation() {
 		return Entity.LOC_NONE;
-	}
-	
-	@Override
-	public int getIntroDate() {
-		return EquipmentType.DATE_NONE;
-	}
-
-	@Override
-	public int getExtinctDate() {
-		return EquipmentType.DATE_NONE;
-	}
-
-	@Override
-	public int getReIntroDate() {
-		return EquipmentType.DATE_NONE;
 	}
 }

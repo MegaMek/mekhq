@@ -43,8 +43,8 @@ import megamek.common.Protomech;
 import megamek.common.TechConstants;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.verifier.TestEntity;
-import megamek.common.weapons.BayWeapon;
 import megamek.common.weapons.InfantryAttack;
+import megamek.common.weapons.bayweapons.BayWeapon;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.AeroHeatSink;
 import mekhq.campaign.parts.AeroSensor;
@@ -432,124 +432,69 @@ public class PartsStore implements Serializable {
 	}
 
 	private void stockArmor(Campaign c) {
+	    int amount;
+	    for (int at = 0; at < EquipmentType.armorNames.length; at++) {
+	        String name = EquipmentType.getArmorTypeName(at, false);
+	        EquipmentType is = EquipmentType.get(name);
+	        if (null != is) {
+	            if (is.hasFlag(MiscType.F_BA_EQUIPMENT)) {
+	                amount = (int)(5 * BaArmor.getPointsPerTon(at, false));
+	                parts.add(new BaArmor(0, amount, at, -1, false, c));
+	            } else {
+    	            amount = (int)(5.0 * 16.0 * EquipmentType.getArmorPointMultiplier(at, false));
+    	            parts.add(new Armor(0, at, amount, -1, false, false, c));
+	            }
+	        }
+	        name = EquipmentType.getArmorTypeName(at, true);
+	        EquipmentType clan = EquipmentType.get(name);
+	        if ((null != clan) && (is != clan)) {
+                if (clan.hasFlag(MiscType.F_BA_EQUIPMENT)) {
+                    amount = (int)(5 * BaArmor.getPointsPerTon(at, true));
+                    parts.add(new BaArmor(0, amount, at, -1, true, c));
+                } else {
+                    amount = (int)(5.0 * 16.0 * EquipmentType.getArmorPointMultiplier(at, true));
+                    parts.add(new Armor(0, at, amount, -1, false, true, c));
+                }
+	        }
+	    }
 		/*
-		 * Mech, Aero, and Vehicle armors
-		 */
-		//Standard armor
-		int amount = (int) (5.0 * 16.0 * EquipmentType.getArmorPointMultiplier(EquipmentType.T_ARMOR_STANDARD, false));
-		parts.add(new Armor(0, EquipmentType.T_ARMOR_STANDARD, amount, -1, false, false, c));
-		//Ferro-Fibrous
-		amount = (int) (5.0 * 16.0 * EquipmentType.getArmorPointMultiplier(EquipmentType.T_ARMOR_FERRO_FIBROUS, false));
-		parts.add(new Armor(0, EquipmentType.T_ARMOR_FERRO_FIBROUS, amount, -1, false, false, c));
-		amount = (int) (5.0 * 16.0 * EquipmentType.getArmorPointMultiplier(EquipmentType.T_ARMOR_FERRO_FIBROUS, true));
-		parts.add(new Armor(0, EquipmentType.T_ARMOR_FERRO_FIBROUS, amount, -1, false, true, c));
-		//Reactive
-		amount = (int) (5.0 * 16.0 * EquipmentType.getArmorPointMultiplier(EquipmentType.T_ARMOR_REACTIVE, false));
-		parts.add(new Armor(0, EquipmentType.T_ARMOR_REACTIVE, amount, -1, false, false, c));
-		amount = (int) (5.0 * 16.0 * EquipmentType.getArmorPointMultiplier(EquipmentType.T_ARMOR_REACTIVE, true));
-		parts.add(new Armor(0, EquipmentType.T_ARMOR_REACTIVE, amount, -1, false, true, c));
-		//Reflective
-		amount = (int) (5.0 * 16.0 * EquipmentType.getArmorPointMultiplier(EquipmentType.T_ARMOR_REFLECTIVE, false));
-		parts.add(new Armor(0, EquipmentType.T_ARMOR_REFLECTIVE, amount, -1, false, false, c));
-		amount = (int) (5.0 * 16.0 * EquipmentType.getArmorPointMultiplier(EquipmentType.T_ARMOR_REFLECTIVE, true));
-		parts.add(new Armor(0, EquipmentType.T_ARMOR_REFLECTIVE, amount, -1, false, true, c));
-		//Hardened
-		amount = (int) (5.0 * 16.0 * EquipmentType.getArmorPointMultiplier(EquipmentType.T_ARMOR_HARDENED, false));
-		parts.add(new Armor(0, EquipmentType.T_ARMOR_HARDENED, amount, -1, false, false, c));
-		amount = (int) (5.0 * 16.0 * EquipmentType.getArmorPointMultiplier(EquipmentType.T_ARMOR_HARDENED, true));
-		parts.add(new Armor(0, EquipmentType.T_ARMOR_HARDENED, amount, -1, false, true, c));
-		//Light/Heavy FF
-		amount = (int) (5.0 * 16.0 * EquipmentType.getArmorPointMultiplier(EquipmentType.T_ARMOR_LIGHT_FERRO, false));
-		parts.add(new Armor(0, EquipmentType.T_ARMOR_LIGHT_FERRO, amount, -1, false, false, c));
-		amount = (int) (5.0 * 16.0 * EquipmentType.getArmorPointMultiplier(EquipmentType.T_ARMOR_LIGHT_FERRO, true));
-		parts.add(new Armor(0, EquipmentType.T_ARMOR_LIGHT_FERRO, amount, -1, false, true, c));
-		amount = (int) (5.0 * 16.0 * EquipmentType.getArmorPointMultiplier(EquipmentType.T_ARMOR_HEAVY_FERRO, false));
-		parts.add(new Armor(0, EquipmentType.T_ARMOR_HEAVY_FERRO, amount, -1, false, false, c));
-		//Stealth
-		amount = (int) (5.0 * 16.0 * EquipmentType.getArmorPointMultiplier(EquipmentType.T_ARMOR_STEALTH, false));
-		parts.add(new Armor(0, EquipmentType.T_ARMOR_STEALTH, amount, -1, false, false, c));
-		//Commercial
-		amount = (int) (5.0 * 16.0 * EquipmentType.getArmorPointMultiplier(EquipmentType.T_ARMOR_COMMERCIAL, false));
-		parts.add(new Armor(0, EquipmentType.T_ARMOR_COMMERCIAL, amount, -1, false, false, c));
-		//Industrial
-		amount = (int) (5.0 * 16.0 * EquipmentType.getArmorPointMultiplier(EquipmentType.T_ARMOR_INDUSTRIAL, false));
-		parts.add(new Armor(0, EquipmentType.T_ARMOR_INDUSTRIAL, amount, -1, false, false, c));
-		//Heavy Industrial
-		amount = (int) (5.0 * 16.0 * EquipmentType.getArmorPointMultiplier(EquipmentType.T_ARMOR_HEAVY_INDUSTRIAL, false));
-		parts.add(new Armor(0, EquipmentType.T_ARMOR_HEAVY_INDUSTRIAL, amount, -1, false, false, c));
-		//Ferro-Lamellor
-		amount = (int) (5.0 * 16.0 * EquipmentType.getArmorPointMultiplier(EquipmentType.T_ARMOR_FERRO_LAMELLOR, false));
-		parts.add(new Armor(0, EquipmentType.T_ARMOR_FERRO_LAMELLOR, amount, -1, false, true, c));
-		//Ferro-Aluminum
-		amount = (int) (5.0 * 16.0 * EquipmentType.getArmorPointMultiplier(EquipmentType.T_ARMOR_ALUM, false));
-		parts.add(new Armor(0, EquipmentType.T_ARMOR_ALUM, amount, -1, false, false, c));
-		amount = (int) (5.0 * 16.0 * EquipmentType.getArmorPointMultiplier(EquipmentType.T_ARMOR_ALUM, true));
-		parts.add(new Armor(0, EquipmentType.T_ARMOR_ALUM, amount, -1, false, true, c));
-		//Light/Heavy Ferro-Aluminum
-		amount = (int) (5.0 * 16.0 * EquipmentType.getArmorPointMultiplier(EquipmentType.T_ARMOR_LIGHT_ALUM, false));
-		parts.add(new Armor(0, EquipmentType.T_ARMOR_LIGHT_ALUM, amount, -1, false, false, c));
-		amount = (int) (5.0 * 16.0 * EquipmentType.getArmorPointMultiplier(EquipmentType.T_ARMOR_HEAVY_ALUM, false));
-		parts.add(new Armor(0, EquipmentType.T_ARMOR_HEAVY_ALUM, amount, -1, false, false, c));
-		//Primitive
-		amount = (int) (5.0 * 16.0 * EquipmentType.getArmorPointMultiplier(EquipmentType.T_ARMOR_PRIMITIVE, false));
-		parts.add(new Armor(0, EquipmentType.T_ARMOR_PRIMITIVE, amount, -1, false, false, c));
-		/*
-		 * Warship armors
-		*/
-		//Ferro-Carbide
-		amount = (int) (5.0 * 16.0 * EquipmentType.getArmorPointMultiplier(EquipmentType.T_ARMOR_FERRO_CARBIDE, false));
-		parts.add(new Armor(0, EquipmentType.T_ARMOR_FERRO_CARBIDE, amount, -1, false, false, c));
-		//Lemellor Ferro Carbide
-		amount = (int) (5.0 * 16.0 * EquipmentType.getArmorPointMultiplier(EquipmentType.T_ARMOR_LAMELLOR_FERRO_CARBIDE, false));
-		parts.add(new Armor(0, EquipmentType.T_ARMOR_LAMELLOR_FERRO_CARBIDE, amount, -1, false, false, c));
-		//Improved Ferro-Aluminum
-		amount = (int) (5.0 * 16.0 * EquipmentType.getArmorPointMultiplier(EquipmentType.T_ARMOR_FERRO_IMP, false));
-		parts.add(new Armor(0, EquipmentType.T_ARMOR_FERRO_IMP, amount, -1, false, false, c));
 		/*
 		 * Protomek Armor
 		 */
 		parts.add(new ProtomekArmor(0, 100, -1, true, c));
-		/*
-		*BA ARMOR
-		*/
-		parts.add(new BaArmor(0, (int)Math.round(5 * BaArmor.getPointsPerTon(EquipmentType.T_ARMOR_BA_STANDARD, false)), EquipmentType.T_ARMOR_BA_STANDARD, -1, false, c));
-		parts.add(new BaArmor(0, (int)Math.round(5 * BaArmor.getPointsPerTon(EquipmentType.T_ARMOR_BA_STANDARD, true)), EquipmentType.T_ARMOR_BA_STANDARD, -1, true, c));
-		parts.add(new BaArmor(0, (int)Math.round(5 * BaArmor.getPointsPerTon(EquipmentType.T_ARMOR_BA_STANDARD_ADVANCED, true)), EquipmentType.T_ARMOR_BA_STANDARD_ADVANCED, -1, true, c));
-		parts.add(new BaArmor(0, (int)Math.round(5 * BaArmor.getPointsPerTon(EquipmentType.T_ARMOR_BA_STANDARD_PROTOTYPE, true)), EquipmentType.T_ARMOR_BA_STANDARD_PROTOTYPE, -1, true, c));
-		parts.add(new BaArmor(0, (int)Math.round(5 * BaArmor.getPointsPerTon(EquipmentType.T_ARMOR_BA_STEALTH_BASIC, false)), EquipmentType.T_ARMOR_BA_STEALTH_BASIC, -1, false, c));
-		parts.add(new BaArmor(0, (int)Math.round(5 * BaArmor.getPointsPerTon(EquipmentType.T_ARMOR_BA_STEALTH_BASIC, true)), EquipmentType.T_ARMOR_BA_STEALTH_BASIC, -1, true, c));
-		parts.add(new BaArmor(0, (int)Math.round(5 * BaArmor.getPointsPerTon(EquipmentType.T_ARMOR_BA_STEALTH_IMP, false)), EquipmentType.T_ARMOR_BA_STEALTH_IMP, -1, false, c));
-		parts.add(new BaArmor(0, (int)Math.round(5 * BaArmor.getPointsPerTon(EquipmentType.T_ARMOR_BA_STEALTH_IMP, true)), EquipmentType.T_ARMOR_BA_STEALTH_IMP, -1, true, c));
-		parts.add(new BaArmor(0, (int)Math.round(5 * BaArmor.getPointsPerTon(EquipmentType.T_ARMOR_BA_STEALTH_PROTOTYPE, true)), EquipmentType.T_ARMOR_BA_STEALTH_PROTOTYPE, -1, true, c));
-		parts.add(new BaArmor(0, (int)Math.round(5 * BaArmor.getPointsPerTon(EquipmentType.T_ARMOR_BA_STEALTH, false)), EquipmentType.T_ARMOR_BA_STEALTH, -1, false, c));
-		parts.add(new BaArmor(0, (int)Math.round(5 * BaArmor.getPointsPerTon(EquipmentType.T_ARMOR_BA_STEALTH, true)), EquipmentType.T_ARMOR_BA_STEALTH, -1, true, c));
-		parts.add(new BaArmor(0, (int)Math.round(5 * BaArmor.getPointsPerTon(EquipmentType.T_ARMOR_BA_FIRE_RESIST, true)), EquipmentType.T_ARMOR_BA_FIRE_RESIST, -1, true, c));
-		parts.add(new BaArmor(0, (int)Math.round(5 * BaArmor.getPointsPerTon(EquipmentType.T_ARMOR_BA_MIMETIC, false)), EquipmentType.T_ARMOR_BA_MIMETIC, -1, false, c));
 	}
 
 	private void stockMekLocations(Campaign c) {
 		for(int loc = Mech.LOC_HEAD; loc <= Mech.LOC_LLEG; loc++) {
 			for(int ton = 20; ton <= 100; ton=ton+5) {
 				for(int type = 0; type < EquipmentType.structureNames.length; type++) {
-					if(loc == Mech.LOC_HEAD) {
-					    //for(int ctype = Mech.COCKPIT_STANDARD; ctype < Mech.COCKPIT_STRING.length; ctype++) {
-					        parts.add(new MekLocation(loc, ton, type, false, false, true, true, c));
-	                        parts.add(new MekLocation(loc, ton, type, true, false, true, true, c));
-					        parts.add(new MekLocation(loc, ton, type, false, false, false, false, c));
-	                        parts.add(new MekLocation(loc, ton, type, true, false, false, false, c));
-				        //}
-					} else {
-    				    parts.add(new MekLocation(loc, ton, type, false, false, false, false, c));
-    					parts.add(new MekLocation(loc, ton, type, true, false, false, false, c));
-    					if(loc > Mech.LOC_LT) {
-    						parts.add(new MekLocation(loc, ton, type, false, true, false, false, c));
-    						parts.add(new MekLocation(loc, ton, type, true, true, false, false, c));
-    					}
+					addMekLocation(c, loc, ton, type, false);
+					// The only structure that differs between IS and Clan versions is Endo-Steel
+					if (EquipmentType.T_STRUCTURE_ENDO_STEEL == type) {
+	                    addMekLocation(c, loc, ton, type, true);
 					}
 				}
 			}
 		}
 	}
+
+    private void addMekLocation(Campaign c, int loc, int ton, int type, boolean clan) {
+        if(loc == Mech.LOC_HEAD) {
+            //for(int ctype = Mech.COCKPIT_STANDARD; ctype < Mech.COCKPIT_STRING.length; ctype++) {
+                parts.add(new MekLocation(loc, ton, type, clan, false, false, true, true, c));
+                parts.add(new MekLocation(loc, ton, type, clan, true, false, true, true, c));
+                parts.add(new MekLocation(loc, ton, type, clan, false, false, false, false, c));
+                parts.add(new MekLocation(loc, ton, type, clan, true, false, false, false, c));
+            //}
+        } else {
+            parts.add(new MekLocation(loc, ton, type, clan, false, false, false, false, c));
+        	parts.add(new MekLocation(loc, ton, type, clan, true, false, false, false, c));
+        	if(loc > Mech.LOC_LT) {
+        		parts.add(new MekLocation(loc, ton, type, clan, false, true, false, false, c));
+        		parts.add(new MekLocation(loc, ton, type, clan, true, true, false, false, c));
+        	}
+        }
+    }
 
 	private void stockProtomekLocations(Campaign c) {
 	    for(int loc = Protomech.LOC_HEAD; loc <= Protomech.LOC_MAINGUN; loc++) {

@@ -25,48 +25,58 @@ import megamek.common.EquipmentType;
 
 /**
  *
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * @author Jay Lawson <jaylawson39 at yahoo.com> 
+ * September 2017 - Update Eras to
+ * match MUL, and added reference to 4th era code
  */
 public class Era {
 
     public static final int E_AOW   = 0;
-    public static final int E_RW    = 1;
-    public static final int E_SL    = 2;
-    public static final int E_1SW   = 3;
-    public static final int E_2SW   = 4;
-    public static final int E_3SW   = 5;
-    public static final int E_4SW   = 6;
-    public static final int E_CLAN  = 7;
-    public static final int E_JIHAD = 8;
-    public static final int E_NUM   = 9;
+    public static final int E_SL    = 1;
+    public static final int E_ESW    = 2;
+    public static final int E_LSW_LOSTECH   = 3;
+    public static final int E_LSW_RENAISSANCE   = 4;
+    public static final int E_CLAN_INVASION   = 5;
+    public static final int E_CIVIL_WAR   = 6;
+    public static final int E_JIHAD  = 7;
+    public static final int E_EARLY_REPUBLIC = 8;
+    public static final int E_LATE_REPUBLIC = 9;
+    public static final int E_DARK_AGES = 10;
+    public static final int E_NUM   = 11;
     
     public static int getEra(int year) {
         if(year < 2570) {
             return E_AOW;
         } 
-        else if(year < 2598) {
-            return E_RW;
-        }
-        else if(year < 2785) {
+        else if(year < 2780) {
             return E_SL;
+        }
+        else if(year < 2900) {
+            return E_ESW;
         } 
-        else if(year < 2828) {
-            return E_1SW;
+        else if(year < 3019) {
+            return E_LSW_LOSTECH;
         }
-        else if(year < 2864) {
-            return E_2SW;
+        else if(year < 3049) {
+            return E_LSW_RENAISSANCE;
         }
-        else if(year < 3028) {
-            return E_3SW;
-        }
-        else if(year < 3050) {
-            return E_4SW;
+        else if(year < 3061) {
+            return E_CLAN_INVASION;
         }
         else if(year < 3067) {
-            return E_CLAN;
+            return E_CIVIL_WAR;
+        }
+        else if(year < 3085) {
+            return E_JIHAD;
+        }
+        else if(year <3100) {
+            return E_EARLY_REPUBLIC;
+        }
+        else if(year <3130) {
+            return E_LATE_REPUBLIC;
         }
         else {
-            return E_JIHAD;
+            return E_DARK_AGES;
         }
     }
     
@@ -74,22 +84,37 @@ public class Era {
         switch(era) {
             case E_AOW:
                 return "Age of War";
-            case E_RW:
-                return "Reunification War";
+            
             case E_SL:
                 return "Star League";
-            case E_1SW:
-                return "First Succession War";
-            case E_2SW:
-                return "Second Succession War";
-            case E_3SW:
-                return "Third Succession War";
-            case E_4SW:
-                return "Fourth Succession War";
-            case E_CLAN:
+            
+            case E_ESW:
+                return "Early Sucession War";
+            
+            case E_LSW_LOSTECH:
+                return "Late Succession War - LosTech";
+            
+            case E_LSW_RENAISSANCE:
+                return "Late Succession War - Renaissance";
+            
+            case E_CLAN_INVASION:
                 return "Clan Invasion";
+            
+            case E_CIVIL_WAR:
+                return "Civil War";
+            
             case E_JIHAD:
                 return "Jihad";
+            
+            case E_EARLY_REPUBLIC:
+                return "Early Republic";
+            
+            case E_LATE_REPUBLIC:
+                return "Late Republic";
+            
+            case E_DARK_AGES:
+                return "Dark Ages";
+            
             default:
                 return "Unknown";
         }
@@ -101,24 +126,29 @@ public class Era {
  
     /**
      * Convert the eras used in Strategic Ops to the availability-based eras
-     * used in the TechManual
+     * used in the TechManual. 
+     * Updated for 4th Era Code.
      * @param era
      * @return
      */
+    
     public static int convertEra(int era) {
     	switch(era) {
-    	case E_AOW:
-        case E_RW:
+        case E_AOW:
         case E_SL:
             return EquipmentType.ERA_SL;
-        case E_1SW:
-        case E_2SW:
-        case E_3SW:
-        case E_4SW:
-        	return EquipmentType.ERA_SW;
-        case E_CLAN:
+        case E_ESW:
+        case E_LSW_LOSTECH:
+        case E_LSW_RENAISSANCE:
+            return EquipmentType.ERA_SW;
+        case E_CLAN_INVASION:
+        case E_CIVIL_WAR:
         case E_JIHAD:
+        case E_EARLY_REPUBLIC:
+        case E_LATE_REPUBLIC:
             return EquipmentType.ERA_CLAN;
+        case E_DARK_AGES:
+            return EquipmentType.ERA_DA;
         default:
             return -1;
     	}

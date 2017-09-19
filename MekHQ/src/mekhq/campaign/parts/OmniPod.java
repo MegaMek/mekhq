@@ -25,8 +25,10 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import megamek.common.Aero;
+import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.MiscType;
+import megamek.common.TechAdvancement;
 import megamek.common.TechConstants;
 import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
@@ -126,36 +128,10 @@ public class OmniPod extends Part {
     public int getTechRating() {
         return EquipmentType.RATING_E;
     }
-
+    
     @Override
-    public int getAvailability(int era) {
-        if (era == EquipmentType.ERA_SL
-                || (era == EquipmentType.ERA_SW && partType.getTechBase() == T_IS)) {
-            return EquipmentType.RATING_X;
-        } else if (era == EquipmentType.ERA_DA) {
-            return Math.max(partType.getAvailability(era), EquipmentType.RATING_D);
-        } else {
-            return Math.max(partType.getAvailability(era), EquipmentType.RATING_E);
-        }
-    }
-
-    @Override
-    public int getIntroDate() {
-        if (partType.getTechBase() == T_IS) {
-            return Math.max(3052, partType.getIntroDate());
-        } else {
-            return Math.max(2850, partType.getIntroDate());
-        }
-    }
-
-    @Override
-    public int getExtinctDate() {
-        return partType.getExtinctDate();
-    }
-
-    @Override
-    public int getReIntroDate() {
-        return partType.getReIntroDate();
+    public TechAdvancement getTechAdvancement() {
+        return Entity.getOmniAdvancement();
     }
 
     @Override

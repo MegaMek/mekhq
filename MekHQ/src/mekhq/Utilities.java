@@ -97,6 +97,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.CrewType;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.unit.UnitTechProgression;
 
 /**
  *
@@ -375,7 +376,8 @@ public class Utilities {
         return files;
 	}
 
-	public static ArrayList<String> getAllVariants(Entity en, int year, CampaignOptions options) {
+	public static ArrayList<String> getAllVariants(Entity en, Campaign campaign) {
+	    CampaignOptions options = campaign.getCampaignOptions();
 		ArrayList<String> variants = new ArrayList<String>();
 		for(MechSummary summary : MechSummaryCache.getInstance().getAllMechs()) {
 			// If this isn't the same chassis, is our current unit, or is a different weight we continue
@@ -388,13 +390,9 @@ public class Utilities {
 			if(!summary.isCanon() && options.allowCanonRefitOnly()) {
 				continue;
 			}
-			// If we're limiting by year and aren't to this unit's year yet we continue
-			if(options.limitByYear() && summary.getYear() > year) {
-				continue;
-			}
-			// If the tech level doesn't meet the game's tech level we continue
-			if(options.getTechLevel() < Utilities.getSimpleTechLevel(summary.getType())) {
-				continue;
+            // If the unit doesn't meet the tech filter criteria we continue
+			if (!campaign.isLegal(UnitTechProgression.getProgression(summary, campaign.getTechFaction(), true))) {
+			    continue;
 			}
 			// Otherwise, we can offer it for selection
 			variants.add(summary.getModel());

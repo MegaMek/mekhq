@@ -24,20 +24,20 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import megamek.common.BattleArmor;
 import megamek.common.EntityMovementMode;
-import megamek.common.EntityWeightClass;
-import megamek.common.EquipmentType;
 import megamek.common.IArmorState;
 import megamek.common.TargetRoll;
+import megamek.common.TechAdvancement;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.equipment.BattleArmorEquipmentPart;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.MissingBattleArmorEquipmentPart;
 import mekhq.campaign.personnel.Person;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  *
@@ -147,32 +147,6 @@ public class MissingBattleArmorSuit extends MissingPart {
     public double getTonnage() {
         // TODO Auto-generated method stub
         return 0;
-    }
-
-    @Override
-    public int getAvailability(int era) {
-        int chassisAvail = EquipmentType.RATING_E;
-        if(weightClass > EntityWeightClass.WEIGHT_ULTRA_LIGHT) {
-            if(era == EquipmentType.ERA_SW) {
-                chassisAvail = EquipmentType.RATING_F;
-            }
-        }
-        else if(era < EquipmentType.ERA_CLAN) {
-            chassisAvail = EquipmentType.RATING_X;
-        }
-        if(jumpType == EntityMovementMode.INF_UMU || jumpType == EntityMovementMode.VTOL) {
-            chassisAvail = EquipmentType.RATING_F;
-        }
-        return chassisAvail;
-    }
-
-    @Override
-    public int getTechRating() {
-        int rating = EquipmentType.RATING_E;
-        if(weightClass < EntityWeightClass.WEIGHT_LIGHT) {
-            rating = EquipmentType.RATING_D;
-        }
-        return rating;
     }
 
     public int getTrooper() {
@@ -384,19 +358,13 @@ public class MissingBattleArmorSuit extends MissingPart {
 		return bestPart;
 	}
 
-	@Override
-	public int getIntroDate() {
-    	return ((BattleArmorSuit)getNewPart()).getIntroDate();
-	}
+    @Override
+    public int getIntroductionDate() {
+        return ((BattleArmorSuit)getNewPart()).getIntroductionDate();
+    }
 
-	@Override
-	public int getExtinctDate() {
-		return EquipmentType.DATE_NONE;
-	}
-
-	@Override
-	public int getReIntroDate() {
-		return EquipmentType.DATE_NONE;
-	}
-
+    @Override
+    public TechAdvancement getTechAdvancement() {
+        return BattleArmor.getConstructionTechAdvancement(weightClass);
+    }
 }
