@@ -77,7 +77,9 @@ public class MassRepairService {
 
 		campaign.addReport("Beginning mass warehouse repair.");
 
-		ArrayList<Person> techs = campaign.getTechs(true);
+		List<Person> techs = campaign.getTechs(true);
+
+		MassRepairPartSet partSet = new MassRepairPartSet();
 
 		if (techs.isEmpty()) {
 			campaign.addReport("No available techs to repairs parts.");
@@ -88,8 +90,6 @@ public class MassRepairService {
 				mroByTypeMap.put(mroList.get(i).getType(), mroList.get(i));
 			}
 
-			MassRepairPartSet partSet = new MassRepairPartSet();
-
 			/*
 			 * Filter our parts list to only those that aren't being worked on
 			 * or those that meet our criteria as defined in the campaign
@@ -97,36 +97,33 @@ public class MassRepairService {
 			 */
 			List<IPartWork> parts = filterParts(selectedParts, mroByTypeMap, techs, campaign);
 
-			if (parts.isEmpty()) {
-				return partSet;
-			}
+			if (!parts.isEmpty()) {
+				for (IPartWork partWork : parts) {
+					Part part = (Part) partWork;
+					part.resetModeToNormal();
 
-			for (IPartWork partWork : parts) {
-				Part part = (Part) partWork;
-				part.resetModeToNormal();
+					List<Person> validTechs = filterTechs(partWork, techs, mroByTypeMap, true, campaignGUI);
 
-				List<Person> validTechs = filterTechs(partWork, techs, mroByTypeMap, true, campaignGUI);
+					if (validTechs.isEmpty()) {
+						continue;
+					}
 
-				if (validTechs.isEmpty()) {
-					continue;
-				}
+					int originalQuantity = part.getQuantity();
 
-				int originalQuantity = part.getQuantity();
-
-				for (int i = 0; i < originalQuantity; i++) {
-					partSet.addPartAction(
-							repairPart(campaignGUI, part, null, validTechs, mroByTypeMap, configuredOptions, true));
+					for (int i = 0; i < originalQuantity; i++) {
+						partSet.addPartAction(
+								repairPart(campaignGUI, part, null, validTechs, mroByTypeMap, configuredOptions, true));
+					}
 				}
 			}
 		}
 
-		return null;
+		return partSet;
 	}
 
 	public static void performSingleUnitMassRepairOrSalvage(CampaignGUI campaignGUI, Unit unit) {
 		CampaignOptions options = campaignGUI.getCampaign().getCampaignOptions();
 		List<MassRepairOption> activeMROs = createActiveMROsFromConfiguration(campaignGUI);
-		String msg = "";
 
 		MassRepairConfiguredOptions configuredOptions = new MassRepairConfiguredOptions();
 		configuredOptions.setup(options);
@@ -135,53 +132,64 @@ public class MassRepairService {
 				activeMROs, configuredOptions);
 
 		String actionDescriptor = unit.isSalvage() ? "Salvage" : "Repair";
-		msg = String.format("<font color='green'>Mass %s complete on %s.</font>", actionDescriptor, unit.getName());
+		String msg = String.format("<font color='green'>Mass %s complete on %s.</font>", actionDescriptor,
+				unit.getName());
 
 		switch (unitAction.getStatus()) {
-		case MassRepairUnitAction.STATUS.ACTIONS_PERFORMED:
+		case ACTIONS_PERFORMED:
 			int count = unitAction.getPartSet().countRepairs();
 			msg += String.format(" There were %s action%s performed.", count, (count == 1 ? "" : "s"));
 			break;
 
-		case MassRepairUnitAction.STATUS.NO_PARTS:
+		case NO_PARTS:
 			msg += " No actions were performed because there are currently no valid parts.";
 			break;
 
-		case MassRepairUnitAction.STATUS.ALL_PARTS_IN_PROCESS:
+		case ALL_PARTS_IN_PROCESS:
 			msg += " No actions were performed because all parts are being worked on.";
 			break;
 
-		case MassRepairUnitAction.STATUS.NO_TECHS:
+		case NO_TECHS:
 			msg += " No actions were performed because there are currently no valid techs.";
 			break;
 
-		case MassRepairUnitAction.STATUS.UNFIXABLE_LIMB:
+		case UNFIXABLE_LIMB:
 			msg += " No actions were performed because there is at least one unfixable limb and configured settings do not allow location repairs.";
+			break;
+
+		case NO_ACTIONS:
+		default:
 			break;
 		}
 
 		campaignGUI.getCampaign().addReport(msg);
 
-		ArrayList<Person> techs = campaignGUI.getCampaign().getTechs(false);
+		List<Person> techs = campaignGUI.getCampaign().getTechs(false);
 
 		if (!techs.isEmpty()) {
 			List<IPartWork> parts = campaignGUI.getCampaign().getPartsNeedingServiceFor(unit.getId(), true);
 			parts = filterParts(parts, null, techs, campaignGUI.getCampaign());
-			
+
 			if (!parts.isEmpty()) {
 				if (parts.size() == 1) {
-					campaignGUI.getCampaign().addReport("<font color='red'>There in still 1 part that in not being worked on.</font>");
+					campaignGUI.getCampaign()
+							.addReport("<font color='red'>There in still 1 part that in not being worked on.</font>");
 				} else {
-					campaignGUI.getCampaign().addReport(String.format("<font color='red'>There are still %s parts that are not being worked on.</font>", parts.size()));	
-				}					
+					campaignGUI.getCampaign()
+							.addReport(String.format(
+									"<font color='red'>There are still %s parts that are not being worked on.</font>",
+									parts.size()));
+				}
 			}
 		}
 
-		JOptionPane.showMessageDialog(campaignGUI.getFrame(), String.format("Mass %s complete on %s.", actionDescriptor, unit.getName()), "Complete", JOptionPane.INFORMATION_MESSAGE);
+		JOptionPane.showMessageDialog(campaignGUI.getFrame(),
+				String.format("Mass %s complete on %s.", actionDescriptor, unit.getName()), "Complete",
+				JOptionPane.INFORMATION_MESSAGE);
 	}
 
 	public static void massRepairSalvageAllUnits(CampaignGUI campaignGUI) {
-		List<Unit> units = new ArrayList<>();
+		List<Unit> units = new ArrayList<Unit>();
 
 		for (int i = 0; i < campaignGUI.getCampaign().getServiceableUnits().size(); i++) {
 			Unit unit = campaignGUI.getCampaign().getServiceableUnits().get(i);
@@ -217,7 +225,7 @@ public class MassRepairService {
 		CampaignOptions options = campaignGUI.getCampaign().getCampaignOptions();
 		List<MassRepairOption> activeMROs = createActiveMROsFromConfiguration(campaignGUI);
 
-		Map<Integer, List<MassRepairUnitAction>> unitActionsByStatus = new HashMap<Integer, List<MassRepairUnitAction>>();
+		Map<MassRepairUnitAction.STATUS, List<MassRepairUnitAction>> unitActionsByStatus = new HashMap<MassRepairUnitAction.STATUS, List<MassRepairUnitAction>>();
 
 		MassRepairConfiguredOptions configuredOptions = new MassRepairConfiguredOptions();
 		configuredOptions.setup(options);
@@ -236,19 +244,17 @@ public class MassRepairService {
 			list.add(unitAction);
 		}
 
-		String msg = "";
-		
 		if (unitActionsByStatus.isEmpty()) {
-			msg = "Mass Repair/Salvage complete. There were no units worked on.";
+			campaignGUI.getCampaign().addReport("Mass Repair/Salvage complete. There were no units worked on.");
 		} else {
 			int totalCount = 0;
 			int actionsPerformed = 0;
 
-			for (Integer key : unitActionsByStatus.keySet()) {
+			for (MassRepairUnitAction.STATUS key : unitActionsByStatus.keySet()) {
 				if (key == MassRepairUnitAction.STATUS.ALL_PARTS_IN_PROCESS) {
 					continue;
 				}
-				
+
 				totalCount += unitActionsByStatus.get(key).size();
 			}
 
@@ -261,28 +267,28 @@ public class MassRepairService {
 				}
 			}
 
-			msg = String.format("<font color='green'>Mass Repair/Salvage complete for %s units.</font>", totalCount);
+			StringBuilder sb = new StringBuilder(
+					String.format("<font color='green'>Mass Repair/Salvage complete for %s units.</font>", totalCount));
 
 			if (actionsPerformed > 0) {
-				msg += String.format(" %s repair/salvage action%s performed.", actionsPerformed,
-						(actionsPerformed == 1 ? "" : "s"));
+				sb.append(String.format(" %s repair/salvage action%s performed.", actionsPerformed,
+						(actionsPerformed == 1 ? "" : "s")));
 			}
 
-			msg += generateUnitRepairSummary("\n- %s unit%s had repairs/parts salvaged.", unitActionsByStatus,
-					MassRepairUnitAction.STATUS.ACTIONS_PERFORMED);
-			msg += generateUnitRepairSummary(
-					"\n- %s unit%s had no actions performed because there were no valid parts.", unitActionsByStatus,
-					MassRepairUnitAction.STATUS.NO_PARTS);
-			msg += generateUnitRepairSummary(
-					"\n- %s unit%s had no actions performed because there were no valid techs.", unitActionsByStatus,
-					MassRepairUnitAction.STATUS.NO_TECHS);
-			msg += generateUnitRepairSummary(
-					"\n- %s unit%s had no actions performed because there were unfixable limbs and configured settings do not allow location repairs.",
-					unitActionsByStatus, MassRepairUnitAction.STATUS.UNFIXABLE_LIMB);
+			sb.append(generateUnitRepairSummary("<br/>- %s unit%s had repairs/parts salvaged.", unitActionsByStatus,
+					MassRepairUnitAction.STATUS.ACTIONS_PERFORMED));
+			sb.append(generateUnitRepairSummary(
+					"<br/>- %s unit%s had no actions performed because there were no valid parts.", unitActionsByStatus,
+					MassRepairUnitAction.STATUS.NO_PARTS));
+			sb.append(generateUnitRepairSummary(
+					"<br/>- %s unit%s had no actions performed because there were no valid techs.", unitActionsByStatus,
+					MassRepairUnitAction.STATUS.NO_TECHS));
+			sb.append(generateUnitRepairSummary(
+					"<br/>- %s unit%s had no actions performed because there were unfixable limbs and configured settings do not allow location repairs.",
+					unitActionsByStatus, MassRepairUnitAction.STATUS.UNFIXABLE_LIMB));
+
+			campaignGUI.getCampaign().addReport(sb.toString());
 		}
-
-
-		campaignGUI.getCampaign().addReport(msg.replaceAll("\n", "<br/>"));
 
 		generateCampaignLogForUnitStatus(unitActionsByStatus, MassRepairUnitAction.STATUS.NO_PARTS,
 				"Units with no valid parts:", campaignGUI);
@@ -292,39 +298,46 @@ public class MassRepairService {
 				"Units with unfixable limbs:", campaignGUI);
 
 		if (!unitActionsByStatus.isEmpty()) {
-			ArrayList<Person> techs = campaignGUI.getCampaign().getTechs(false);
-			
+			List<Person> techs = campaignGUI.getCampaign().getTechs(false);
+
 			if (!techs.isEmpty()) {
 				int count = 0;
 				int unitCount = 0;
-				
+
 				for (List<MassRepairUnitAction> list : unitActionsByStatus.values()) {
 					for (MassRepairUnitAction mrua : list) {
-						List<IPartWork> parts = campaignGUI.getCampaign().getPartsNeedingServiceFor(mrua.getUnit().getId(), true);
+						List<IPartWork> parts = campaignGUI.getCampaign()
+								.getPartsNeedingServiceFor(mrua.getUnit().getId(), true);
 						int tempCount = filterParts(parts, null, techs, campaignGUI.getCampaign()).size();
-						
+
 						if (tempCount > 0) {
 							unitCount++;
 							count += tempCount;
 						}
 					}
-				}				
-				
+				}
+
 				if (count > 0) {
 					if (count == 1) {
-						campaignGUI.getCampaign().addReport("<font color='red'>There in still 1 part that in not being worked on.</font>");
+						campaignGUI.getCampaign().addReport(
+								"<font color='red'>There in still 1 part that in not being worked on.</font>");
 					} else {
-						campaignGUI.getCampaign().addReport(String.format("<font color='red'>There are still %s parts that are not being worked on %s unit%s.</font>", count, unitCount, (unitCount == 1 ? "" : "s")));	
-					}					
+						campaignGUI.getCampaign()
+								.addReport(String.format(
+										"<font color='red'>There are still %s parts that are not being worked on %s unit%s.</font>",
+										count, unitCount, (unitCount == 1 ? "" : "s")));
+					}
 				}
 			}
 		}
-		
-		JOptionPane.showMessageDialog(campaignGUI.getFrame(), "Mass Repair/Salvage complete.", "Complete", JOptionPane.INFORMATION_MESSAGE);
+
+		JOptionPane.showMessageDialog(campaignGUI.getFrame(), "Mass Repair/Salvage complete.", "Complete",
+				JOptionPane.INFORMATION_MESSAGE);
 	}
 
 	private static String generateUnitRepairSummary(String baseDescription,
-			Map<Integer, List<MassRepairUnitAction>> unitActionsByStatus, int status) {
+			Map<MassRepairUnitAction.STATUS, List<MassRepairUnitAction>> unitActionsByStatus,
+			MassRepairUnitAction.STATUS status) {
 
 		if (!unitActionsByStatus.containsKey(status)) {
 			return "";
@@ -335,8 +348,9 @@ public class MassRepairService {
 		return String.format(baseDescription, count, count == 1 ? "" : "s");
 	}
 
-	private static void generateCampaignLogForUnitStatus(Map<Integer, List<MassRepairUnitAction>> unitActionsByStatus,
-			int status, String statusDesc, CampaignGUI campaignGUI) {
+	private static void generateCampaignLogForUnitStatus(
+			Map<MassRepairUnitAction.STATUS, List<MassRepairUnitAction>> unitActionsByStatus,
+			MassRepairUnitAction.STATUS status, String statusDesc, CampaignGUI campaignGUI) {
 		if (!unitActionsByStatus.containsKey(status) || unitActionsByStatus.get(status).isEmpty()) {
 			return;
 		}
@@ -357,7 +371,7 @@ public class MassRepairService {
 			boolean isSalvage, List<MassRepairOption> mroList, MassRepairConfiguredOptions configuredOptions) {
 		Campaign campaign = campaignGUI.getCampaign();
 
-		ArrayList<Person> techs = campaign.getTechs(true);
+		List<Person> techs = campaign.getTechs(true);
 
 		if (techs.isEmpty()) {
 			return new MassRepairUnitAction(unit, isSalvage, MassRepairUnitAction.STATUS.NO_TECHS);
@@ -416,12 +430,12 @@ public class MassRepairService {
 
 		if (parts.isEmpty()) {
 			parts = campaignGUI.getCampaign().getPartsNeedingServiceFor(unit.getId(), false);
-			
+
 			if (!parts.isEmpty()) {
 				return new MassRepairUnitAction(unit, salvaging, MassRepairUnitAction.STATUS.ALL_PARTS_IN_PROCESS);
 			}
 		}
-		
+
 		/*
 		 * If we're performing an action on a unit and we allow auto-scrapping
 		 * of parts that can't be fixed by an elite tech, let's first get rid of
@@ -1174,7 +1188,7 @@ public class MassRepairService {
 			 * Sort the valid techs by applicable skill. Let's start with the
 			 * least experienced and work our way up until we find someone who
 			 * can perform the work. If we have two techs with the same skill,
-			 * put the one with the lesser XP in the front. If we have techs 
+			 * put the one with the lesser XP in the front. If we have techs
 			 * with the same XP, put the one with the more time ahead.
 			 */
 
@@ -1194,15 +1208,12 @@ public class MassRepairService {
 	}
 
 	public static class MassRepairPartAction {
-		public interface STATUS {
-			public static final int REPAIRED = 0;
-			public static final int MAX_SKILL_REACHED = 1;
-			public static final int MRO_DISABLED = 2;
-			public static final int NO_TECHS = 3;
+		public enum STATUS {
+			REPAIRED, MAX_SKILL_REACHED, MRO_DISABLED, NO_TECHS
 		}
 
 		private IPartWork partWork;
-		private int status;
+		private STATUS status;
 		private int maxTechSkill;
 		private int configuredBTHMin;
 
@@ -1214,7 +1225,7 @@ public class MassRepairService {
 			this.partWork = partWork;
 		}
 
-		public MassRepairPartAction(IPartWork partWork, int status) {
+		public MassRepairPartAction(IPartWork partWork, STATUS status) {
 			this(partWork);
 
 			this.status = status;
@@ -1228,11 +1239,11 @@ public class MassRepairService {
 			this.partWork = partWork;
 		}
 
-		public int getStatus() {
+		public STATUS getStatus() {
 			return status;
 		}
 
-		public void setStatus(int status) {
+		public void setStatus(STATUS status) {
 			this.status = status;
 		}
 
@@ -1290,7 +1301,7 @@ public class MassRepairService {
 	}
 
 	public static class MassRepairPartSet {
-		private Map<Integer, List<MassRepairPartAction>> partActionsByStatus = new HashMap<Integer, List<MassRepairPartAction>>();
+		private Map<MassRepairPartAction.STATUS, List<MassRepairPartAction>> partActionsByStatus = new HashMap<MassRepairPartAction.STATUS, List<MassRepairPartAction>>();
 
 		public void addPartAction(MassRepairPartAction partAction) {
 			if (null == partAction) {
@@ -1307,7 +1318,7 @@ public class MassRepairService {
 			list.add(partAction);
 		}
 
-		public Map<Integer, List<MassRepairPartAction>> getPartActions() {
+		public Map<MassRepairPartAction.STATUS, List<MassRepairPartAction>> getPartActions() {
 			return partActionsByStatus;
 		}
 
@@ -1337,25 +1348,20 @@ public class MassRepairService {
 	}
 
 	public static class MassRepairUnitAction {
-		public interface STATUS {
-			public static final int NO_ACTIONS = 0;
-			public static final int ACTIONS_PERFORMED = 1;
-			public static final int NO_TECHS = 2;
-			public static final int UNFIXABLE_LIMB = 3;
-			public static final int NO_PARTS = 4;
-			public static final int ALL_PARTS_IN_PROCESS = 5;
+		public enum STATUS {
+			NO_ACTIONS, ACTIONS_PERFORMED, NO_TECHS, UNFIXABLE_LIMB, NO_PARTS, ALL_PARTS_IN_PROCESS
 		}
 
 		private Unit unit;
 		private MassRepairPartSet partSet = new MassRepairPartSet();
-		private int status;
+		private STATUS status;
 		private boolean salvaging;
 
 		public MassRepairUnitAction() {
 
 		}
 
-		public MassRepairUnitAction(Unit unit, boolean salvaging, int status) {
+		public MassRepairUnitAction(Unit unit, boolean salvaging, STATUS status) {
 			this.unit = unit;
 			this.salvaging = salvaging;
 			this.status = status;
@@ -1377,11 +1383,11 @@ public class MassRepairService {
 			this.partSet = partSet;
 		}
 
-		public int getStatus() {
+		public STATUS getStatus() {
 			return status;
 		}
 
-		public void setStatus(int status) {
+		public void setStatus(STATUS status) {
 			this.status = status;
 		}
 
