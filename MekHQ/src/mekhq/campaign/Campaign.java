@@ -8770,7 +8770,7 @@ public class Campaign implements Serializable, ITechManager {
 
     @Override
     public boolean useVariableTechLevel() {
-        return getGameOptions().getOption(OptionsConstants.ALLOWED_ERA_BASED).booleanValue();
+        return campaignOptions.useVariableTechLevel();
     }
 
     @Override

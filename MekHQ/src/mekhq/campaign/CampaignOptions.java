@@ -124,6 +124,7 @@ public class CampaignOptions implements Serializable {
     private boolean allowCanonOnly;
     private boolean allowCanonRefitOnly;
     private int techLevel;
+    private boolean variableTechLevel;
     private boolean factionIntroDate;
     private boolean useAmmoByType; // Unofficial
 
@@ -320,6 +321,7 @@ public class CampaignOptions implements Serializable {
         usePercentageMaint = false;
         infantryDontCount = false;
         techLevel = TECH_EXPERIMENTAL;
+        variableTechLevel = false;
         factionIntroDate = false;
         scenarioXP = 1;
         killsForXP = 0;
@@ -978,6 +980,14 @@ public class CampaignOptions implements Serializable {
 
     public void setAllowCanonRefitOnly(boolean b) {
         allowCanonRefitOnly = b;
+    }
+    
+    public boolean useVariableTechLevel() {
+        return variableTechLevel;
+    }
+    
+    public void setVariableTechLevel(boolean b) {
+        variableTechLevel = b;
     }
     
     public void setfactionIntroDate(boolean b) {
@@ -2000,6 +2010,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "allowISPurchases", allowISPurchases);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "allowCanonOnly", allowCanonOnly);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "allowCanonRefitOnly", allowCanonRefitOnly);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "variableTechLevel", variableTechLevel);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "factionIntroDate", factionIntroDate);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useAmmoByType", useAmmoByType);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "usePercentageMaint", usePercentageMaint);
@@ -2387,6 +2398,8 @@ public class CampaignOptions implements Serializable {
                 } else {
                     retVal.useAmmoByType = false;
                 }
+            } else if (wn2.getNodeName().equalsIgnoreCase("variableTechLevel")) {
+                retVal.variableTechLevel = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("factionIntroDate")) {
                 retVal.factionIntroDate = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("usePercentageMaint")) {
