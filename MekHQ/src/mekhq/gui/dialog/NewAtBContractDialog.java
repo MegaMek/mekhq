@@ -479,8 +479,8 @@ public class NewAtBContractDialog extends NewContractDialog {
 				getCurrentEnemyCode().equals("REB") ||
 				getCurrentEnemyCode().equals("PIR")) {
 			for (Planet p : RandomFactionGenerator.getInstance().
-					getMissionTargetList(getCurrentEmployerCode(), getCurrentEnemyCode(),
-							campaign.getDate())) {
+					getMissionTargetList(getCurrentEmployerCode(), getCurrentEnemyCode(), campaign.getDate(), null, 0
+                    )) {
 				planets.add(p.getName(Utilities.getDateTimeDay(campaign.getCalendar())));
 			}
 		}
@@ -488,8 +488,8 @@ public class NewAtBContractDialog extends NewContractDialog {
 				contract.getMissionType() == AtBContract.MT_RELIEFDUTY) &&
 				!contract.getEnemyCode().equals("REB")) {
 			for (Planet p : RandomFactionGenerator.getInstance().
-					getMissionTargetList(getCurrentEnemyCode(), getCurrentEmployerCode(),
-							campaign.getDate())) {
+					getMissionTargetList(getCurrentEnemyCode(), getCurrentEmployerCode(), campaign.getDate(), null, 0
+                    )) {
 				planets.add(p.getName(Utilities.getDateTimeDay(campaign.getCalendar())));
 			}
 		}

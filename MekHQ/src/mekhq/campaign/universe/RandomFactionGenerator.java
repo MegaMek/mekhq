@@ -686,15 +686,16 @@ public class RandomFactionGenerator implements Serializable {
 		return count;
 	}
 	
-	public String getMissionTarget(String attacker, String defender, Date date) {
-		ArrayList<Planet> planetList = getMissionTargetList(attacker, defender, date);
+	public String getMissionTarget(String attacker, String defender, Date date, Planet currentPlanet, int searchRadius) {
+		ArrayList<Planet> planetList = getMissionTargetList(attacker, defender, date, currentPlanet, searchRadius);
 		if (planetList.size() > 0) {
 			return Utilities.getRandomItem(planetList).getId();
 		}
 		return null;
 	}
 	
-	public ArrayList<Planet> getMissionTargetList(String attacker, String defender, Date date) {
+	public ArrayList<Planet> getMissionTargetList(String attacker, String defender, Date date, Planet currentPlanet, int searchRadius) {
+		boolean filterByDistance = (currentPlanet != null);
 		ArrayList<Planet> planetList = new ArrayList<Planet>();
 		int maxJumps = 3;
 		if (deepPeriphery.contains(attacker) || deepPeriphery.contains(defender)) {
@@ -734,7 +735,9 @@ public class RandomFactionGenerator implements Serializable {
 						if (f.getShortName().equals(defender) ||
 								defender.equals("PIR") ||
 								(f.getShortName().equals(attacker) && defender.equals("REB"))) {
-							planetList.add(planetKey);
+							if(filterByDistance && currentPlanet.getDistanceTo(planetKey) <= searchRadius) {
+								planetList.add(planetKey);
+							}
 						}
 					}
 				}
