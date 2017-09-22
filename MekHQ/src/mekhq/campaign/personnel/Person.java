@@ -319,7 +319,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         MECHWARRIOR_AERO_RANSOM_VALUES.put(SkillType.EXP_GREEN, 10000);
         MECHWARRIOR_AERO_RANSOM_VALUES.put(SkillType.EXP_REGULAR, 25000);
         MECHWARRIOR_AERO_RANSOM_VALUES.put(SkillType.EXP_VETERAN, 75000);
-        MECHWARRIOR_AERO_RANSOM_VALUES.put(SkillType.EXP_ELITE, 15000);
+        MECHWARRIOR_AERO_RANSOM_VALUES.put(SkillType.EXP_ELITE, 150000);
         
         OTHER_RANSOM_VALUES = new HashMap<>();
         OTHER_RANSOM_VALUES.put(SkillType.EXP_ULTRA_GREEN, 2500);
