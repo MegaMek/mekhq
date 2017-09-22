@@ -127,6 +127,7 @@ import mekhq.campaign.report.Report;
 import mekhq.campaign.report.TransportReport;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.NewsItem;
+import mekhq.campaign.universe.Planets;
 import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.gui.dialog.AdvanceDaysDialog;
 import mekhq.gui.dialog.BatchXPDialog;
@@ -674,6 +675,16 @@ public class CampaignGUI extends JPanel {
         });
         // miLoadForces.setEnabled(false);
         menuImport.add(miLoadForces);
+        
+        JMenuItem miLoadPlanets = new JMenuItem("Import planets from csv file...");
+        miLoadPlanets.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                //Planets.getInstance().loadPlanetsFromCSV("data/universe/Systems By Era.tsv");
+                Planets.getInstance().comparePlanetLists("data/universe/Systems By Era.tsv");
+            }
+        });
+        menuImport.add(miLoadPlanets);
 
         menuFile.add(menuImport);
         menuFile.add(menuExport);

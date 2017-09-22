@@ -18,7 +18,9 @@
  */
 package mekhq.campaign.universe;
 
+import java.io.BufferedReader;
 import java.io.FileInputStream;
+import java.io.FileReader;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,8 +31,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -57,6 +61,7 @@ import megamek.common.logging.LogLevel;
 import mekhq.FileParser;
 import mekhq.MekHQ;
 import mekhq.Utilities;
+import mekhq.campaign.universe.Planet.PlanetaryEvent;
 
 public class Planets {
     private final static Object LOADING_LOCK = new Object[0];
@@ -378,6 +383,132 @@ public class Planets {
     }
     
     private void generatePlanets() throws DOMException, ParseException {
+        generatePlanets("data/universe/planets", "data/universe/planets.xml");
+    }
+    
+    /**
+     * Worker function that loads a list of planets from the CSV file at the specified path.
+     * @param csvPath
+     * @return List of planets
+     */
+    public List<Planet> loadPlanetsFromCSV(String tsvPath) {
+        final String METHOD_NAME = "loadPlanetsFromCSV()"; //NON-NLS-1$
+        
+        MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO,
+                "Starting load of planetary data from CSV: " + tsvPath); //$NON-NLS-1$
+        
+        List<Planet> planets = new ArrayList<>();
+        
+        try {
+            FileReader fr = new FileReader(tsvPath);
+            BufferedReader br = new BufferedReader(fr);
+
+            // expected file format (no spaces, just tab-separated)
+            // "System" \t "X" \t "Y" \t Comma separated list of years
+            // "Name" \t X-coordinate \t Y-coordinate \t "Ownership info".
+            //      "Ownership info" breaks down to FactionCode, irrelevant stuff
+            
+            // parse the first line. Skip the first three items, then add all the rest to an array of DateTime objects
+            String firstLine = br.readLine();
+            String[] yearElements = firstLine.split("\t");
+            List<DateTime> years = new ArrayList<>();
+            for(int x = 3; x < yearElements.length; x++) { 
+                DateTime year = new DateTime(Integer.parseInt(yearElements[x]), 1, 1, 0, 0, 0, 0);
+                years.add(year);
+            }
+            
+            String currentLine = "";
+            while(currentLine != null) {
+                currentLine = br.readLine();
+                if(currentLine == null || currentLine.trim().length() == 0) {
+                    continue;
+                }
+                
+                Planet p = new Planet(currentLine, years); // "this place crawls, sir!"
+                planets.add(p);
+            }
+        } catch(Exception e) {
+            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR, e);
+        }
+        
+        return planets;
+    }
+
+    public Map<String, Map<Integer, Planet>> planetNameMap;
+    private void initializePlanetNameMap() {
+        for(Planet p : this.planetList.values()) {
+            
+        }
+    }
+    
+    public void comparePlanetLists(String tsvPath) {
+        List<Planet> planets = loadPlanetsFromCSV(tsvPath);
+        StringBuilder planetLog = new StringBuilder();
+        String METHOD_NAME = "comparePlanetLists";
+        
+        int coordinateUpdates = 0;
+        int notFoundPlanets = 0;
+        int parenPlanets = 0;
+                
+        try {
+            for(Planet p : planets) {
+                Planet existingPlanet = getPlanetById(p.getId());
+                planetLog.setLength(0);    
+                
+                // if we have not found the planet via name match, let's try to find it via coordinate match
+                if(existingPlanet == null) {
+                    // now we go to slow method
+                    // #1
+                    
+                }
+                
+                if(p.getId().contains("(")) {
+                    parenPlanets++;
+                }
+                
+                if(existingPlanet == null) {
+                    notFoundPlanets++;
+                    MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, "Import planet " + p.getId() + " not found in existing data.");
+                    continue;
+                }
+                
+                for(PlanetaryEvent pe : existingPlanet.getEvents()) {
+                    if(pe.name != null) {
+                        int alpha = 1;
+                    }
+                }
+                
+                // compare: names by period
+                // coordinates
+                // ownership changes by period
+                
+                if(!p.getX().equals(existingPlanet.getX()) || 
+                        !p.getY().equals(existingPlanet.getY())) {
+                    coordinateUpdates++;
+                }
+                
+                /*if(!p.getX().equals(existingPlanet.getX())) {
+                    planetLog.append("X: " + p.getX() + " EX: " + existingPlanet.getX());
+                }
+                
+                if(!p.getY().equals(existingPlanet.getY())) {
+                    planetLog.append(" Y: " + p.getY() + " EY: " + existingPlanet.getY());
+                }
+                
+                if(planetLog.length() > 0) {
+                    planetLog.insert(0, "Planet mismatch " + p.getId() + " and " + existingPlanet.getId() + " ");
+                    MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, planetLog.toString());
+                }*/
+            }
+        } catch(Exception e) {
+            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR, e);
+        }
+        
+        MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, parenPlanets + " planets with parens in the name" );
+        MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, coordinateUpdates + " coordinate updates, " + notFoundPlanets + " planets not found");
+    }
+    
+    private void generatePlanets(String planetsPath, String defaultFilePath) throws DOMException, ParseException {
         final String METHOD_NAME = "generatePlanets()"; //NON-NLS-1$
         
         MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO,
@@ -406,14 +537,14 @@ public class Planets {
             planetGrid.clear();
             
             // Step 2: Read the default file
-            try(FileInputStream fis = new FileInputStream("data/universe/planets.xml")) { //$NON-NLS-1$
+            try(FileInputStream fis = new FileInputStream(defaultFilePath)) { //$NON-NLS-1$
                 updatePlanets(fis);
             } catch (Exception ex) {
                 MekHQ.getLogger().log(getClass(), METHOD_NAME, ex);
             }
             
             // Step 3: Load all the xml files within the planets subdirectory, if it exists
-            Utilities.parseXMLFiles("data/universe/planets", //$NON-NLS-1$
+            Utilities.parseXMLFiles(planetsPath, //$NON-NLS-1$
                     new FileParser() {
                         @Override
                         public void parse(FileInputStream is) {

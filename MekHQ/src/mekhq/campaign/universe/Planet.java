@@ -239,6 +239,105 @@ public class Planet implements Serializable {
     public Planet(String id) {
         this.id = id;
     }
+    
+    /**
+     * Overloaded constructor that parses out a single line of csv data for a planet
+     * with the help of a list of event years
+     * @param csvData
+     * @param years
+     * @throws Exception 
+     */
+    public Planet(String csvData, List<DateTime> years) throws Exception {
+        eventList = new ArrayList<>();
+        events = new TreeMap<>();
+        
+        try {
+            // "Name" \t X-coordinate \t Y-coordinate \t "Ownership info".
+            //      "Ownership info" breaks down to "FactionCode, irrelevantstuff"
+            String[] infoElements = csvData.split("\t");
+            
+            // sometimes, names are formatted like this:
+            // Primary Name (Alternate Name)
+            // Primary Name (Alternate Name YEAR+)
+            
+            String nameString = infoElements[0].replace("\"", ""); // get rid of surrounding quotation marks
+            int plusIndex = nameString.indexOf('+');
+            int year = 2000;
+            
+            // this indicates that there's an (Alternate Name YEAR+) here
+            if(plusIndex > 0) {
+                String yearString = nameString.substring(plusIndex - 4, plusIndex);
+                year = Integer.parseInt(yearString);
+            }
+            
+            String altName;
+            String primaryName = nameString;
+            PlanetaryEvent nameChangeEvent = null;
+            int parenIndex = nameString.indexOf('(');
+            int closingParenIndex = nameString.indexOf(')');
+            // this indicates that there's an (Alternate Name) sequence of some kind
+            if(parenIndex > 0) {
+                // we chop off the year if there is one
+                if(plusIndex > 0) {
+                    altName = nameString.substring(parenIndex + 1, plusIndex - 5);
+                }
+                // otherwise, we just chop off the closing paren
+                else {
+                    altName = nameString.substring(parenIndex + 1, closingParenIndex);
+                }
+                
+                // there are a few situations where all this stuff with parens is for naught, which is
+                // PlanetName (FactionCode) or if the PlanetName (AltName) is already in our planets "database"
+                
+                if(null == Faction.getFaction(altName) && null == Planets.getInstance().getPlanetById(primaryName)) {
+                    primaryName = nameString.substring(0, parenIndex - 1);
+                    
+                    nameChangeEvent = new PlanetaryEvent();
+                    nameChangeEvent.name = altName;
+                }
+            }
+            
+            // now we have a primary name and possibly a name change planetary event
+            this.name = primaryName;
+            
+            if(null != nameChangeEvent) {
+                this.events.put(new DateTime(year, 1, 1, 0, 0, 0, 0), nameChangeEvent);
+            }
+            
+            this.id = this.name;
+            this.x = Double.parseDouble(infoElements[1]);
+            this.y = Double.parseDouble(infoElements[2]);
+            
+            for(int x = 3; x < infoElements.length; x++) {
+                String infoElement = infoElements[x].replace("\"", "");
+                if(infoElement.trim().length() == 0) {
+                    continue;
+                }
+                
+                String newFaction;
+                
+                int commaIndex = infoElement.indexOf(',');
+                if(commaIndex < 0) { // sometimes there are no commas
+                    newFaction = infoElement;
+                } else {
+                    // anything after the first comma is fluff
+                    // we also want to forego the opening quote
+                    newFaction = infoElement.substring(0, commaIndex);
+                }
+                
+                PlanetaryEvent pe = new PlanetaryEvent();
+                pe.faction = new ArrayList<String>();
+                pe.faction.add(newFaction);
+                this.eventList.add(pe);
+                
+                this.events.put(years.get(x - 3), pe);
+            }
+        } catch(Exception e) {
+            Exception ne = new Exception("Error running Planet constructor with following line:\n" + csvData);
+            ne.addSuppressed(e);
+            throw(ne);
+        }
+    }
 
     // Constant base data
     
@@ -462,6 +561,16 @@ public class Planet implements Serializable {
         return getEventData(when, shortName, new EventGetter<String>() {
             @Override public String get(PlanetaryEvent e) { return e.shortName; }
         });
+    }
+    
+    public List<String> getNames() {
+        List<String> names = new ArrayList<>();
+        
+        for(PlanetaryEvent p : events.values()) {
+            names.add(p.name);
+        }
+        
+        return names;
     }
 
     /** @return short name if set, else full name, else "unnamed" */
