@@ -601,6 +601,13 @@
 			<date>2571-07-09</date>
 			<faction>DC</faction>
 		</factionChange>
+		<factionChange> No Black Dragon Faction so used Rebels
+			<date>3077-12-19</date>
+			<faction>DC,REB</faction>
+		</factionChange>
+		<factionChange> Noncanon
+			<date>3080-01-01</date>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Addasar</name>
@@ -696,8 +703,6 @@
         <temperature>34</temperature>
 		<climate>5</climate>
         <percentWater>62</percentWater>
-        <nadirCharge>true</nadirCharge>
-        <hpg>B</hpg>
         <lifeForm>4</lifeForm>
         <satellite>Damocles</satellite>
         <satellite>Grant</satellite>
@@ -707,7 +712,6 @@
 		<landMass>Silesia</landMass>
 		<landMass>Loknar</landMass>
 		<landMass>Bureigo</landMass>
-        <socioIndustrial>B-B-C-B-C</socioIndustrial>
         <desc>Addicks is seemingly a world with two identities, thanks to two different and large groups of immigrants that initially colonized the world. Both claimed predominance over Addicks, each establishing capitals and lending their own names to the world's features. The Terran Alliance and later the Terran Hegemony, chose one to be the official naming conventions after officially taking charge of Addicks, but even today, some seven centuries later, the alternates can be found in use.&#xA;&#xA;Despite a high-pressure atmosphere that visitors have likened to "breathing soup," Addicks was once an ideal world with abundant natural resources. Its initial population of English and Greek colonists, as well as a later influx of French, grew exponentially as more and more of Terra's people took to the stars, with the manufacturing and tech industries likewise growing at the same prodigious rate. Agricultural output was far in excess of the world's needs, and the world's education system was among the best in the Hegemony. The Succession Wars, however, ruined much of Addick's bounty.&#xA;&#xA;Addicks remains an important world today, though it has lost much of its glory over the past three centuries. Early in the Succession Wars, the AFFS turned Addicks into a major military headquarters and forward logistics base, with most of the facilities constructed underground for additional protection. The world still has a strong manufacturing industry, but its once-bountiful farmlands have been poisoned by centuries of war; Addicks produces enough food to feed its population, though it no longer yields the excesses it once did. The world's capital of St. Randall on Tauken (also known as Landersia), Addicks' largest and most populous continent; together with Silesia (aka Auskel), the two continent's are home to the great majority of the world's people. Loknar (aka Sparro) is a smallish continent, one taken almost completely over by the AFFS. Bureigo (aka Frankalia), located deep in the southern hemisphere, is lightly populated, with the majority of its people clustered in ocean-side farming settlements.</desc>
 	</planet>
 	<planet>
@@ -791,6 +795,14 @@
 			<date>2571-07-09</date>
 			<faction>MOC</faction>
 		</factionChange>
+		<factionChange> date listed as last week in April so picked Easter to occupy :)
+			<date>2583-04-27</date>
+			<faction>SL</faction>
+		</factionChange>
+		<factionChange> date noncanon
+			<date>2897-01-01</date>
+			<factionChange>MOC</factionChange>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Adrian</name>
@@ -823,7 +835,7 @@
 			<date>3030-01-01</date>
 			<faction>TC</faction>
 		</factionChange>
-		<factionChange>
+		<factionChange> date question
 			<date>3075-01-01</date>
 			<faction>ABN</faction>
 		</factionChange>
@@ -10771,6 +10783,14 @@ Industrial, Command and logistical world, paperwork in this planet and its prefe
 			<date>3057-09-18</date>
 			<faction>LA</faction>
 		</factionChange>
+		<factionChange>
+			<date>3058-01-30</date>
+			<faction>LA,CJF</faction>
+		</factionChange>
+		<factionChange>
+			<date>3058-06-09</date>
+			<faction>LA</faction>
+		</factionChange>
 		<spectralClass>K</spectralClass>
 		<subtype>3</subtype>
 		<luminosity>V</luminosity>
@@ -10780,9 +10800,7 @@ Industrial, Command and logistical world, paperwork in this planet and its prefe
 		<climate>3</climate>
 		<temperature>32</temperature>
 		<percentWater>50</percentWater>
-		<hpg>B</hpg>
 		<lifeForm>7</lifeForm>
-		<socioIndustrial>D-D-C-D-A</socioIndustrial>
 		<desc>Bucklands is breadbasket world that supplies massive amounts of food to neighboring planets. The food supplies make the planet vital to the region, even if Bucklands is regarded as a backwater planet by most Lyrans. The planet is otherwise not noteworthy, with next to no industry beyond food processing and packaging and only modest deposits of common mineral resources.&#xA;&#xA;Nearly 80% of the planet’s population belong to ‘farming clans’, which often wrangle for the best farmlands and during harvests. In order to avoid damaging the crops and fields, the people of Bucklands solve these conflicts, when negotiations fail, with AgroMech duels’ conducted by the farming clans’’ security forces. Unlike many systems that would record and broadcast these sorts of fights, the duels on Bucklands garner little interest, due to the use of non-BattleMechs.&#xA;&#xA;The children of Bucklands tend to view their planet as boring and the majority seek to escape the ‘slow life’ by joining the Lyran Military once they come of age. However, many of the wayward sons and daughters of Bucklands end up returning after a few tours. Bucklands is home to a prominent retired veterans social club for those that became MechWarriors, which has chapters in almost every settlement on planet.</desc>
 	</planet>
 	<planet>
@@ -15810,8 +15828,8 @@ Industrial, Command and logistical world, paperwork in this planet and its prefe
 			<faction>LA</faction>
 		</factionChange>
 		<factionChange>
-			<date>3058-01-30</date>
-			<faction>CJF,LA</faction>
+			<date>3058-03-15</date>
+			<faction>LA,CJF</faction>
 		</factionChange>
 		<factionChange>
 			<date>3058-06-09</date>

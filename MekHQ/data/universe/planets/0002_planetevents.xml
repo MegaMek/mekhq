@@ -32,10 +32,6 @@
 			<date>2653-01-01</date>
 			<hpg>b</hpg>
 		</event>
-		<event>
-			<date>3132-08-07</date>
-			<hpg>X</hpg>
-		</event>
 	</planet>
 	<planet>
 		<id>Abagnar</id>
@@ -98,10 +94,6 @@
 			<date>2645-01-01</date>
 			<socioIndustrial>C-B-C-C-C</socioIndustrial>
 			<hpg>b</hpg>
-		</event>
-		<event>
-			<date>3132-08-07</date>
-			<hpg>X</hpg>
 		</event>
 	</planet>
 	<planet>
@@ -194,6 +186,139 @@
 		</event>
 	</planet>
 	<planet>
+		<id>Acubens</id>
+		<event>noncanon
+			<date>2652-01-01</date>
+			<hpg>b</hpg>
+		</event>
+		<event>
+			<date>3132-08-07</date>
+			<hpg>X</hpg>
+		</event>
+	</planet>
+	<planet>
+		<id>Ad Duwayd</id>
+		<event>noncanon
+			<date>2569-01-01</date>
+			<hpg>b</hpg>
+		</event>
+		<event>
+			<date>3132-08-07</date>
+			<hpg>X</hpg>
+		</event>
+	</planet>
+	<planet>
+		<id>Addasar</id>
+		<event>noncanon
+			<date>2714-01-01</date>
+			<hpg>b</hpg>
+		</event>
+		<event>
+			<date>3132-08-07</date>
+			<hpg>X</hpg>
+		</event>
+	</planet>
+	<planet>
+		<id>Addhara</id>
+		<event>noncanon
+			<date>2750-01-01</date>
+			<hpg>b</hpg>
+		</event>
+		<event>
+			<date>3132-08-07</date>
+			<hpg>X</hpg>
+		</event>
+	</planet>
+	<planet>
+		<id>Addicks</id>
+		<event>Date noncanon
+			<date>2315-01-01</date>
+			<nadirCharge>true</nadirCharge>
+			<socioIndustrial>B-B-C-B-C</socioIndustrial>
+		</event>
+		<event>date noncanon
+			<date>2636-01-01</date>
+			<hpg>b</hpg>
+		</event>
+	</planet>
+	<planet>
+		<id>Adelaide</id>
+		<event>noncanon
+			<date>2701-01-01</date>
+			<hpg>b</hpg>
+		</event>
+		<event>
+			<date>3132-08-07</date>
+			<hpg>X</hpg>
+		</event>
+	</planet>
+	<planet>
+		<id>Adelson</id>
+		<event>noncanon
+			<date>2725-01-01</date>
+			<hpg>b</hpg>
+		</event>
+		<event>
+			<date>3132-08-07</date>
+			<hpg>X</hpg>
+		</event>
+	</planet>
+	<planet>
+		<id>Adhafera</id>
+		<event>noncanon
+			<date>2737-01-01</date>
+			<hpg>b</hpg>
+		</event>
+		<event>
+			<date>3132-08-07</date>
+			<hpg>X</hpg>
+		</event>
+	</planet>
+	<planet>
+		<id>Adhara (Trip 3040+)</id>
+		<event>noncanon
+			<date>2721-01-01</date>
+			<hpg>b</hpg>
+		</event>
+		<event>
+			<date>3132-08-07</date>
+			<hpg>X</hpg>
+		</event>
+	</planet>
+	<planet>
+		<id>Adherlwin</id>
+		<event>noncanon
+			<date>2750-01-01</date>
+			<hpg>b</hpg>
+		</event>
+		<event>
+			<date>3132-08-07</date>
+			<hpg>X</hpg>
+		</event>
+	</planet>
+	<planet>
+		<id>Adrian</id>
+		<event>noncanon
+			<date>2734-01-01</date>
+			<hpg>b</hpg>
+		</event>
+		<event>
+			<date>3132-08-07</date>
+			<hpg>X</hpg>
+		</event>
+	</planet>
+	<planet>
+		<id>Aea</id>
+		<event>noncanon
+			<date>2708-01-01</date>
+			<hpg>b</hpg>
+		</event>
+		<event>
+			<date>3132-08-07</date>
+			<hpg>X</hpg>
+		</event>
+	</planet>
+	<planet>
 		<id>Apollo</id>
 		<event>
 			<date>2250-09-08</date>
@@ -202,6 +327,7 @@
 		<event>noncanon
 			<date>2645-01-01</date>
 			<hpg>A</hpg>
+			<pop>6</pop>
 		</event>
 		<event>
 			<date>3132-08-07</date>
@@ -232,6 +358,22 @@
 			<date>3079-01-01</date>
 			<pop>7</pop>
 			<hpg>b</hpg>
+		</event>
+	</planet>
+	<planet>
+		<id>Buckland</id>
+		<event>noncanon
+			<date>2652-01-01</date>
+			<hpg>b</hpg>
+		</event>
+		<event>
+			<date>3058-01-01</date>
+			<pop>7</pop>
+			<socioIndustrial>D-D-C-D-A</socioIndustrial>
+		</event>
+		<event>
+			<date>3132-08-07</date>
+			<hpg>X</hpg>
 		</event>
 	</planet>
 	<planet>
