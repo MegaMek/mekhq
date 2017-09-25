@@ -501,8 +501,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         allowISPurchasesBox.setSelected(options.allowISPurchases());
         allowCanonOnlyBox.setSelected(options.allowCanonOnly());
         allowCanonRefitOnlyBox.setSelected(options.allowCanonRefitOnly());
-        variableTechLevelBox.setSelected(campaign.getGameOptions()
-                .getOption(OptionsConstants.ALLOWED_ERA_BASED).booleanValue()
+        variableTechLevelBox.setSelected(options.useVariableTechLevel()
                 && options.limitByYear());
         variableTechLevelBox.setEnabled(options.limitByYear());
         factionIntroDateBox.setSelected(options.useFactionIntroDate());
@@ -4395,6 +4394,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setAllowCanonOnly(allowCanonOnlyBox.isSelected());
         campaign.getGameOptions().getOption("canon_only").setValue(allowCanonOnlyBox.isSelected());
         campaign.getGameOptions().getOption(OptionsConstants.ALLOWED_ERA_BASED).setValue(variableTechLevelBox.isSelected());
+        options.setVariableTechLevel(variableTechLevelBox.isSelected() && options.limitByYear());
         options.setfactionIntroDate(factionIntroDateBox.isSelected());
         campaign.updateTechFactionCode();
         options.setAllowCanonRefitOnly(allowCanonRefitOnlyBox.isSelected());
