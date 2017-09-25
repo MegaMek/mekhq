@@ -439,8 +439,10 @@ public class MassRepairService {
 		}
 		
 		for (IPartWork partWork : parts) {
-			Part part = (Part) partWork;
-			part.resetModeToNormal();
+			if (partWork instanceof Part) {
+				Part part = (Part) partWork;
+				part.resetModeToNormal();
+			}
 		}
 
 		/*
