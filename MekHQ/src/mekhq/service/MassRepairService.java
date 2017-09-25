@@ -416,7 +416,7 @@ public class MassRepairService {
 			}
 		}
 
-		debugLog("Finished fixing %s in %s ns", unit.getName(), System.nanoTime() - time);
+		debugLog("Finished fixing %s in %s ns", "performUnitMassRepairOrSalvage", unit.getName(), System.nanoTime() - time);
 
 		return unitAction;
 	}
@@ -712,7 +712,7 @@ public class MassRepairService {
 
 			Person tech = techs.get(i);
 
-			debugLog("Checking tech %s", tech.getName());
+			debugLog("Checking tech %s", "repairPart", tech.getName());
 
 			Skill skill = tech.getSkillForWorkingOn(partWork);
 
