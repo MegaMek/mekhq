@@ -10,6 +10,7 @@ import java.util.Map;
 import javax.swing.JOptionPane;
 
 import megamek.common.Aero;
+import megamek.common.BattleArmor;
 import megamek.common.Mech;
 import megamek.common.Tank;
 import megamek.common.TargetRoll;
@@ -25,6 +26,7 @@ import mekhq.campaign.parts.MissingMekLocation;
 import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PodSpace;
+import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
@@ -51,7 +53,7 @@ public class MassRepairService {
 		}
 
 		return (unit.getEntity() instanceof Tank) || (unit.getEntity() instanceof Aero)
-				|| (unit.getEntity() instanceof Mech);
+				|| (unit.getEntity() instanceof Mech) || (unit.getEntity() instanceof BattleArmor);
 	}
 
 	private static List<MassRepairOption> createActiveMROsFromConfiguration(CampaignGUI campaignGUI) {
@@ -434,6 +436,13 @@ public class MassRepairService {
 			if (!parts.isEmpty()) {
 				return new MassRepairUnitAction(unit, salvaging, MassRepairUnitAction.STATUS.ALL_PARTS_IN_PROCESS);
 			}
+			
+			return new MassRepairUnitAction(unit, salvaging, MassRepairUnitAction.STATUS.NO_PARTS);
+		}
+		
+		for (IPartWork partWork : parts) {
+			Part part = (Part) partWork;
+			part.resetModeToNormal();
 		}
 
 		/*
@@ -461,28 +470,27 @@ public class MassRepairService {
 				ps.setRepairInPlace(!configuredOptions.isReplacePodParts());
 			}
 
-			// This needs to be looked at by Neoancient since he put this in.
-			// I don't think this accomplishes the desire effect.
-
 			// If we're replacing damaged parts, we want to remove any that have
 			// an available replacement
 			// from the list since the pod space repair will cover it.
 
-			// List<IPartWork> temp = new ArrayList<>();
-			//
-			// for (IPartWork p : parts) {
-			// if ((p instanceof Part) && ((Part) p).isOmniPodded()) {
-			// MissingPart m = ((Part) p).getMissingPart();
-			//
-			// if (m != null && m.isReplacementAvailable()) {
-			// continue;
-			// }
-			// }
-			//
-			// temp.add(p);
-			// }
-			//
-			// parts = temp;
+			List<IPartWork> temp = new ArrayList<>();
+
+			for (IPartWork p : parts) {
+				if ((p instanceof Part) && ((Part) p).isOmniPodded()) {
+					if (!(p instanceof AmmoBin) || ((p instanceof AmmoBin) && salvaging)) {
+						MissingPart m = ((Part) p).getMissingPart();
+	
+						if (m != null && m.isReplacementAvailable()) {
+							continue;
+						}
+					}
+				}
+
+				temp.add(p);
+			}
+
+			parts = temp;
 		}
 
 		if (techs.isEmpty()) {
@@ -887,10 +895,6 @@ public class MassRepairService {
 			if (partWork.isBeingWorkedOn()) {
 				continue;
 			}
-
-			/*
-			 * if (partWork instanceof PodSpace) { continue; }
-			 */
 
 			if (partWork instanceof MissingPart && !((MissingPart) partWork).isReplacementAvailable()) {
 				continue;
