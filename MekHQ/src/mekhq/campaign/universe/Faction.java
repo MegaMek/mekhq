@@ -86,8 +86,10 @@ public class Faction {
         fullname = fname;
         nameGenerator = "General";
         color = Color.LIGHT_GRAY;
-        startingPlanet = new String[]{"Terra","Terra","Terra","Terra","Terra","Terra","Terra","Terra","Terra","Terra","Terra"};
-        altNamesByEra = new String[]{"","","","","","","","","","",""};
+        startingPlanet = new String[Era.E_NUM];
+        altNamesByEra = new String[Era.E_NUM];
+        Arrays.fill(startingPlanet, "Terra");
+        Arrays.fill(altNamesByEra, "");
         eraMods = new int[]{0,0,0,0,0,0,0,0,0};
         tags = EnumSet.noneOf(Faction.Tag.class);
         start = 0;
