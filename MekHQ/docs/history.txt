@@ -16,8 +16,15 @@ v0.43.4-git
 + Issue #431: When starting a scenario in MegaMek the camo for units seems to be the defaults.
 + Issue #426: Adding or removing bombs from ASF does not update Warehouse
 + Issue #437: ATB ambush mission generates the incorrect amount of enemy units
-+ issue #410: Allied traitors scenario no longer working
++ Issue #410: Allied traitors scenario no longer working
 + Issue #436: BA in MekHQ's mechlab has incorrect tonnage
++ PR #425: Implementation of Issue #339 - Prisoner ransoming instead of bonus
++ PR #451: IO Tech
+	o Updates all tech intro dates to the Universal Technology Advancement Table in Interstellar Operations.
+	o New options to vary part and unit tech level according to campaign year and/or faction.
++ Update Era.java to match MUL and add Dark Age information.
++ PR #453: Overhaul much of the logic in MRMS to be better and faster. 
+    o Fix multiple bugs around rush jobs and repeated fixes 
 
 v0.43.3 (2017-07-18 18:30 UTC)
 + Feature: Refactor AtBScenario to break up the monolithic AtBScenario class and to have a separate class for each scenario

@@ -23,21 +23,21 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.common.CriticalSlot;
-import megamek.common.EquipmentType;
 import megamek.common.IArmorState;
 import megamek.common.ILocationExposureStatus;
 import megamek.common.Mounted;
+import megamek.common.SimpleTechLevel;
 import megamek.common.Tank;
 import megamek.common.TargetRoll;
-import megamek.common.TechConstants;
+import megamek.common.TechAdvancement;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  *
@@ -45,6 +45,13 @@ import org.w3c.dom.NodeList;
  */
 public class TankLocation extends Part {
 	private static final long serialVersionUID = -122291037522319765L;
+	
+    static final TechAdvancement TECH_ADVANCEMENT = new TechAdvancement(TECH_BASE_ALL)
+            .setAdvancement(2460, 2470, 2510).setApproximate(true, false, false)
+            .setPrototypeFactions(F_TH).setProductionFactions(F_TH)
+            .setTechRating(RATING_D).setAvailability(RATING_A, RATING_A, RATING_A, RATING_A)
+            .setStaticTechLevel(SimpleTechLevel.STANDARD);
+
 	protected int loc;
 	protected int damage;
 	protected boolean breached;
@@ -145,21 +152,6 @@ public class TankLocation extends Part {
 					breached = false;
 			} 
 		}
-	}
-
-	@Override
-	public int getAvailability(int era) {
-		return EquipmentType.RATING_A;
-	}
-
-	@Override
-	public int getTechRating() {
-		return EquipmentType.RATING_B;
-	}
-
-    @Override
-	public int getTechLevel() {
-		return TechConstants.T_ALLOWED_ALL;
 	}
 
 	@Override
@@ -340,18 +332,8 @@ public class TankLocation extends Part {
 	}
 	
 	@Override
-	public int getIntroDate() {
-		return EquipmentType.DATE_NONE;
-	}
-
-	@Override
-	public int getExtinctDate() {
-		return EquipmentType.DATE_NONE;
-	}
-
-	@Override
-	public int getReIntroDate() {
-		return EquipmentType.DATE_NONE;
+	public TechAdvancement getTechAdvancement() {
+	    return TECH_ADVANCEMENT;
 	}
     
     @Override

@@ -39,12 +39,14 @@ import megamek.common.BattleArmor;
 import megamek.common.BipedMech;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
+import megamek.common.ITechnology;
 import megamek.common.Infantry;
 import megamek.common.Mech;
 import megamek.common.MechFileParser;
 import megamek.common.MechSummary;
 import megamek.common.MechSummaryCache;
 import megamek.common.TargetRoll;
+import megamek.common.TechAdvancement;
 import megamek.common.WeaponType;
 import megamek.common.loaders.BLKFile;
 import megamek.common.loaders.EntityLoadingException;
@@ -1749,13 +1751,13 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 	                techBaseMod = penalty;
 	            }
 	        }
-		    avail = Math.max(avail, part.getAvailability(campaign.getEra()));
+		    avail = Math.max(avail, part.getAvailability());
 		}
 		if(techBaseMod > 0) {
             roll.addModifier(techBaseMod, "tech limit");
 		}
 		int availabilityMod = Availability.getAvailabilityModifier(avail);
-        roll.addModifier(availabilityMod, "availability (" + EquipmentType.getRatingName(avail) + ")");
+        roll.addModifier(availabilityMod, "availability (" + ITechnology.getRatingName(avail) + ")");
 		return roll;
 	}
 
@@ -1953,12 +1955,6 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
     }
 
     @Override
-    public int getAvailability(int era) {
-        // TODO Auto-generated method stub
-        return 0;
-    }
-
-    @Override
     public boolean isSamePartType(Part part) {
         // TODO Auto-generated method stub
         return false;
@@ -1996,21 +1992,21 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 	}
 
 	@Override
-	public int getIntroDate() {
-		return EquipmentType.DATE_NONE;
-	}
-
-	@Override
-	public int getExtinctDate() {
-		return EquipmentType.DATE_NONE;
-	}
-
-	@Override
-	public int getReIntroDate() {
-		return EquipmentType.DATE_NONE;
+	public TechAdvancement getTechAdvancement() {
+	    return TA_GENERIC;
 	}
 
 	public boolean isBeingRefurbished() {
         return isRefurbishing;
+    }
+
+    @Override
+    public boolean isIntroducedBy(int year, boolean clan, int techFaction) {
+        return getIntroductionDate(clan, techFaction) <= year;
+    }
+
+    @Override
+    public boolean isExtinctIn(int year, boolean clan, int techFaction) {
+        return isExtinct(year, clan, techFaction);
     }
 }

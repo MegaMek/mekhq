@@ -984,6 +984,11 @@ public final class BriefingTab extends CampaignGuiTab {
     }
     
     @Subscribe
+    public void handle(ScenarioResolvedEvent ev) {
+        missionsScheduler.schedule();
+    }
+    
+    @Subscribe
     public void handle(OrganizationChangedEvent ev) {
         scenarioDataScheduler.schedule();
         if (getCampaignOptions().getUseAtB()) {

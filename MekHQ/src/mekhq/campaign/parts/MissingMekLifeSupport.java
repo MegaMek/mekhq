@@ -21,13 +21,13 @@
 
 package mekhq.campaign.parts;
 
+import org.w3c.dom.Node;
+
 import megamek.common.CriticalSlot;
 import megamek.common.Entity;
-import megamek.common.EquipmentType;
 import megamek.common.Mech;
+import megamek.common.TechAdvancement;
 import mekhq.campaign.Campaign;
-
-import org.w3c.dom.Node;
 
 /**
  *
@@ -64,16 +64,6 @@ public class MissingMekLifeSupport extends MissingPart {
 	@Override
 	protected void loadFieldsFromXmlNode(Node wn) {
 		// Do nothing - no fields to load.
-	}
-
-	@Override
-	public int getAvailability(int era) {
-		return EquipmentType.RATING_C;
-	}
-
-	@Override
-	public int getTechRating() {
-		return EquipmentType.RATING_C;
 	}
 
 	@Override
@@ -131,20 +121,10 @@ public class MissingMekLifeSupport extends MissingPart {
 		return Entity.LOC_NONE;
 	}
 	
-	@Override
-	public int getIntroDate() {
-		return EquipmentType.DATE_NONE;
-	}
-
-	@Override
-	public int getExtinctDate() {
-		return EquipmentType.DATE_NONE;
-	}
-
-	@Override
-	public int getReIntroDate() {
-		return EquipmentType.DATE_NONE;
-	}
+    @Override
+    public TechAdvancement getTechAdvancement() {
+        return TA_GENERIC;
+    }
 	
 	@Override
     public boolean isInLocation(String loc) {

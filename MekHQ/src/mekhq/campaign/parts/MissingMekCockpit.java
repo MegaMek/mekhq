@@ -23,14 +23,14 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import megamek.common.CriticalSlot;
-import megamek.common.EquipmentType;
-import megamek.common.Mech;
-import mekhq.MekHqXmlUtil;
-import mekhq.campaign.Campaign;
-
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import megamek.common.CriticalSlot;
+import megamek.common.Mech;
+import megamek.common.TechAdvancement;
+import mekhq.MekHqXmlUtil;
+import mekhq.campaign.Campaign;
 
 /**
  *
@@ -99,63 +99,6 @@ public class MissingMekCockpit extends MissingPart {
 	}
 
 	@Override
-	public int getAvailability(int era) {
-		switch (type) {
-        case Mech.COCKPIT_COMMAND_CONSOLE:
-        	if(era == EquipmentType.ERA_SL) {
-				return EquipmentType.RATING_C;
-			} else if(era == EquipmentType.ERA_SW) {
-				return EquipmentType.RATING_F;
-			} else {
-				return EquipmentType.RATING_E;
-			}
-        case Mech.COCKPIT_SMALL:
-        	if(era == EquipmentType.ERA_SL) {
-				return EquipmentType.RATING_X;
-			} else if(era == EquipmentType.ERA_SW) {
-				return EquipmentType.RATING_X;
-			} else {
-				return EquipmentType.RATING_E;
-			}
-        case Mech.COCKPIT_TORSO_MOUNTED:
-        	if(era == EquipmentType.ERA_SL) {
-				return EquipmentType.RATING_X;
-			} else if(era == EquipmentType.ERA_SW) {
-				return EquipmentType.RATING_X;
-			} else {
-				return EquipmentType.RATING_F;
-			}
-        case Mech.COCKPIT_INDUSTRIAL:
-        	if(era == EquipmentType.ERA_SL) {
-				return EquipmentType.RATING_B;
-			} else if(era == EquipmentType.ERA_SW) {
-				return EquipmentType.RATING_C;
-			} else {
-				return EquipmentType.RATING_C;
-			}
-        default:
-            return EquipmentType.RATING_C;
-		}
-	}
-
-	@Override
-	public int getTechRating() {
-		switch(type) {
-		case Mech.COCKPIT_SMALL:
-		case Mech.COCKPIT_INTERFACE:
-		case Mech.COCKPIT_SUPERHEAVY:
-		case Mech.COCKPIT_SUPERHEAVY_TRIPOD:
-		case Mech.COCKPIT_TRIPOD:
-            return EquipmentType.RATING_E;
-		case Mech.COCKPIT_INDUSTRIAL:
-		case Mech.COCKPIT_PRIMITIVE_INDUSTRIAL:
-            return EquipmentType.RATING_C;
-		default:
-			return EquipmentType.RATING_D;
-		}
-	}
-
-	@Override
 	public boolean isAcceptableReplacement(Part part, boolean refit) {
 		return part instanceof MekCockpit && ((MekCockpit)part).getType() == type;
 	}
@@ -212,62 +155,10 @@ public class MissingMekCockpit extends MissingPart {
 		}
 	}
 
-	@Override
-	public int getIntroDate() {
-    	//TODO: where are aerospace cockpits
-    	//TODO: differentiate clan for some designs
-		switch(type) {
-		case Mech.COCKPIT_STANDARD:
-			return 2468;
-		case Mech.COCKPIT_SMALL:
-			return 3060;
-		case Mech.COCKPIT_COMMAND_CONSOLE:
-			return 2625;
-		case Mech.COCKPIT_TORSO_MOUNTED:
-		case Mech.COCKPIT_DUAL:
-			return 3053;
-		case Mech.COCKPIT_INDUSTRIAL:
-			return 2469;
-		case Mech.COCKPIT_PRIMITIVE:
-			return 2430;
-		case Mech.COCKPIT_PRIMITIVE_INDUSTRIAL:
-			return 2300;
-		case Mech.COCKPIT_SUPERHEAVY:
-			return 3060;
-		case Mech.COCKPIT_SUPERHEAVY_TRIPOD:
-			return 3130;
-		case Mech.COCKPIT_TRIPOD:
-			return 2590;
-		case Mech.COCKPIT_INTERFACE:
-			return 3074;
-		default:
-			return EquipmentType.DATE_NONE;
-		}
-	}
-
-	@Override
-	public int getExtinctDate() {
-		switch(type) {
-		case Mech.COCKPIT_PRIMITIVE:
-			return 2520;
-		case Mech.COCKPIT_PRIMITIVE_INDUSTRIAL:
-			return 2520;
-		case Mech.COCKPIT_COMMAND_CONSOLE:
-			return 2850;
-		default:
-			return EquipmentType.DATE_NONE;
-		}
-	}
-
-	@Override
-	public int getReIntroDate() {
-		switch(type) {
-		case Mech.COCKPIT_COMMAND_CONSOLE:
-			return 3030;
-		default:
-			return EquipmentType.DATE_NONE;
-		}
-	}
+    @Override
+    public TechAdvancement getTechAdvancement() {
+        return Mech.getCockpitTechAdvancement(type);
+    }
 	
 	@Override
 	public int getMassRepairOptionType() {

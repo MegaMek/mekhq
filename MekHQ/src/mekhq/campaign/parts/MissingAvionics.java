@@ -21,14 +21,15 @@
 
 package mekhq.campaign.parts;
 
+import org.w3c.dom.Node;
+
 import megamek.common.Aero;
 import megamek.common.CriticalSlot;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.LandAirMech;
+import megamek.common.TechAdvancement;
 import mekhq.campaign.Campaign;
-
-import org.w3c.dom.Node;
 
 /**
  *
@@ -87,18 +88,6 @@ public class MissingAvionics extends MissingPart {
 	}
 
 	@Override
-	public int getAvailability(int era) {
-		//go with conventional fighter avionics
-		if(era == EquipmentType.ERA_SL) {
-			return EquipmentType.RATING_C;
-		} else if(era == EquipmentType.ERA_SW) {
-			return EquipmentType.RATING_D;
-		} else {
-			return EquipmentType.RATING_C;
-		}
-	}
-
-	@Override
 	public void updateConditionFromPart() {
 		if(null != unit && unit.getEntity() instanceof Aero) {
 			((Aero)unit.getEntity()).setAvionicsHits(3);
@@ -124,18 +113,8 @@ public class MissingAvionics extends MissingPart {
 	}
 	
 	@Override
-	public int getIntroDate() {
-		return EquipmentType.DATE_NONE;
-	}
-
-	@Override
-	public int getExtinctDate() {
-		return EquipmentType.DATE_NONE;
-	}
-
-	@Override
-	public int getReIntroDate() {
-		return EquipmentType.DATE_NONE;
+	public TechAdvancement getTechAdvancement() {
+	    return TA_GENERIC;
 	}
 	
 }

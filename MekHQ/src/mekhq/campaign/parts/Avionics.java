@@ -32,7 +32,7 @@ import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.IAero;
 import megamek.common.LandAirMech;
-import megamek.common.TechConstants;
+import megamek.common.TechAdvancement;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.SkillType;
 
@@ -178,23 +178,6 @@ public class Avionics extends Part {
 	}
 
 	@Override
-	public int getAvailability(int era) {
-		//go with conventional fighter avionics
-		if(era == EquipmentType.ERA_SL) {
-			return EquipmentType.RATING_C;
-		} else if(era == EquipmentType.ERA_SW) {
-			return EquipmentType.RATING_D;
-		} else {
-			return EquipmentType.RATING_C;
-		}
-	}
-	
-	@Override
-	public int getTechLevel() {
-		return TechConstants.T_ALLOWED_ALL;
-	}
-
-	@Override
 	public boolean isSamePartType(Part part) {
 		return part instanceof Avionics;
 	}
@@ -228,21 +211,10 @@ public class Avionics extends Part {
 	public int getLocation() {
 		return Entity.LOC_NONE;
 	}
-	
-	@Override
-	public int getIntroDate() {
-		return EquipmentType.DATE_NONE;
-	}
 
 	@Override
-	public int getExtinctDate() {
-		return EquipmentType.DATE_NONE;
+	public TechAdvancement getTechAdvancement() {
+	    return TA_GENERIC;
 	}
-
-	@Override
-	public int getReIntroDate() {
-		return EquipmentType.DATE_NONE;
-	}
-	
 	
 }
