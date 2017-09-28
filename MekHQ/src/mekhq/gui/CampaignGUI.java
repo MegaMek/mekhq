@@ -680,8 +680,8 @@ public class CampaignGUI extends JPanel {
         miLoadPlanets.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                //Planets.getInstance().loadPlanetsFromCSV("data/universe/Systems By Era.tsv");
-                Planets.getInstance().comparePlanetLists("data/universe/Systems By Era.tsv");
+                Planets.getInstance().importPlanetsFromTSV("data/universe/planets/Systems By Era.tsv");
+                Planets.getInstance().exportPlanets("data/universe/testPlanets.xml");
             }
         });
         menuImport.add(miLoadPlanets);

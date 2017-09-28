@@ -19,8 +19,11 @@
 package mekhq.campaign.universe;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -415,6 +418,10 @@ public class Planets {
             String[] yearElements = firstLine.split("\t");
             List<DateTime> years = new ArrayList<>();
             for(int x = 3; x < yearElements.length; x++) { 
+                // note that there are a couple of instances where years are listed multiple times
+                // "Operation Revival" and "Operation Bulldog"
+                // TODO: Create these as separate dates.
+
                 DateTime year = new DateTime(Integer.parseInt(yearElements[x]), 1, 1, 0, 0, 0, 0);
                 years.add(year);
             }
@@ -436,6 +443,13 @@ public class Planets {
         return planets;
     }
     
+    /**
+     * A "slow" method that tries to find the target planet among the given list of planets by checking
+     * if the target's name is a substring of one of the planets' names
+     * @param target The planet to search for
+     * @param planets The "list" of planets to search
+     * @return Found planet from within the "list"
+     */
     private Planet slowFind(Planet target, Map<String, Planet> planets) {
         for(String key : planets.keySet()) {
             if(key.contains(target.getId())) {
@@ -446,7 +460,48 @@ public class Planets {
         return null;
     }
     
-    public void comparePlanetLists(String tsvPath) {
+    /**
+     * Handles importation of planets from a specifically-formatted tab-separated file to our planet data structure
+     * @param tsvPath The path of the file
+     */
+    public void importPlanetsFromTSV(String tsvPath) {
+        MekHQ.getLogger().log(getClass(), "importPlanetsFromTSV", LogLevel.INFO, "Import Planets From TSV");
+        
+        List<Planet> matchedImportPlanets = new ArrayList<>();
+        List<Planet> matchedExistingPlanets = new ArrayList<>();
+        List<Planet> unmatchedImportPlanets = new ArrayList<>();
+        boolean dryRun = false;
+        
+        comparePlanetLists(tsvPath, matchedImportPlanets, matchedExistingPlanets, unmatchedImportPlanets);
+        
+        StringBuilder planetLog = new StringBuilder();
+        for(int x = 0; x < matchedImportPlanets.size(); x++) {
+            planetLog.append(matchedExistingPlanets.get(x).updateFromOtherPlanet(matchedImportPlanets.get(x), dryRun));
+        }
+        
+        for(Planet unmatched : unmatchedImportPlanets) {
+            planetLog.append("Adding planet " + unmatched.getId() + "\r\n");
+            
+            if(!dryRun) {
+                getInstance().addPlanet(unmatched);
+            }
+        }
+        
+        MekHQ.getLogger().log(getClass(), "importPlanetsFromTSV", LogLevel.INFO, "\r\n" + planetLog.toString());
+    }
+    
+    /**
+     * Performs a comparison
+     * @param tsvPath
+     * @param outMatchedImportPlanets
+     * @param outMatchedExistingPlanets
+     * @param outUnmatchedImportPlanets
+     */
+    public void comparePlanetLists(String tsvPath, 
+            List<Planet> outMatchedImportPlanets, 
+            List<Planet> outMatchedExistingPlanets, 
+            List<Planet> outUnmatchedImportPlanets) {
+        
         List<Planet> planets = loadPlanetsFromCSV(tsvPath);
         StringBuilder planetLog = new StringBuilder();
         String METHOD_NAME = "comparePlanetLists";
@@ -483,6 +538,8 @@ public class Planets {
                 }
                 
                 unmatchedXMLPlanets.remove(existingPlanet.getId());
+                outMatchedImportPlanets.add(p);
+                outMatchedExistingPlanets.add(existingPlanet);
                 
                 // make note of planets which will get coordinate updates
                 if(!p.getX().equals(existingPlanet.getX()) || 
@@ -507,12 +564,16 @@ public class Planets {
                 if(existingPlanet != null) {
                     unmatchedXMLPlanets.remove(existingPlanet.getId());
                     
+                    outMatchedImportPlanets.add(p);
+                    outMatchedExistingPlanets.add(existingPlanet);
+                    
                     if(!p.getX().equals(existingPlanet.getX()) || 
                             !p.getY().equals(existingPlanet.getY())) {
                         coordinateUpdates++;
                     }
                 }
                 else {
+                    outUnmatchedImportPlanets.add(p);
                     unmatchedPlanets++;
                     MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, planetLog.toString() + "Import planet " + p.getId() + " not found in existing data.");
                 }
@@ -524,6 +585,35 @@ public class Planets {
         }
         
         MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, coordinateUpdates + " coordinate updates, " + unmatchedPlanets + " planets not found, " + unmatchedXMLPlanets.size() + " xml planets not in csv");
+    }
+    
+    /**
+     * Adds a planet to the list of planets. Includes putting it into the planet grid.
+     * @param planet The planet to add.
+     */
+    private void addPlanet(Planet planet) { 
+        this.planetList.put(planet.getId(), planet);
+        
+        int x = (int)(planet.getX()/30.0);
+        int y = (int)(planet.getY()/30.0);
+        if (planetGrid.get(x) == null) {
+            planetGrid.put(x, new HashMap<Integer, Set<Planet>>());
+        }
+        if (planetGrid.get(x).get(y) == null) {
+            planetGrid.get(x).put(y, new HashSet<Planet>());
+        }
+        if( !planetGrid.get(x).get(y).contains(planet) ) {
+            planetGrid.get(x).get(y).add(planet);
+        }
+    }
+    
+    public void exportPlanets(String fileName) {
+        try {
+            FileOutputStream fos = new FileOutputStream(fileName);
+            this.writePlanets(fos, new ArrayList(this.planetList.values()));
+        } catch(IOException ioe) {
+            MekHQ.getLogger().log(getClass(), "exportPlanets", LogLevel.INFO, "Error exporting planets to XML");
+        }
     }
     
     private void generatePlanets(String planetsPath, String defaultFilePath) throws DOMException, ParseException {

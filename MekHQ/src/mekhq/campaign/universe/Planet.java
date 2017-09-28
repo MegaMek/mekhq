@@ -57,6 +57,7 @@ import mekhq.adapter.LifeFormAdapter;
 import mekhq.adapter.SocioIndustrialDataAdapter;
 import mekhq.adapter.SpectralClassAdapter;
 import mekhq.adapter.StringListAdapter;
+import mekhq.campaign.universe.Faction.Tag;
 
 
 /**
@@ -263,13 +264,17 @@ public class Planet implements Serializable {
             
             String nameString = infoElements[0].replace("\"", ""); // get rid of surrounding quotation marks
             int plusIndex = nameString.indexOf('+');
-            int year = 2000;
+            int nameChangeYear = 2000;
             
             // this indicates that there's an (Alternate Name YEAR+) here
             if(plusIndex > 0) {
                 String yearString = nameString.substring(plusIndex - 4, plusIndex);
-                year = Integer.parseInt(yearString);
+                nameChangeYear = Integer.parseInt(yearString);
             }
+            
+            // this is a dirty hack: in order to avoid colliding with faction changes, we
+            // set name changes to be a second into the new year
+            DateTime nameChangeYearDate = new DateTime(nameChangeYear, 1, 1, 0, 0, 1, 0);
             
             String altName;
             String primaryName = nameString;
@@ -294,6 +299,7 @@ public class Planet implements Serializable {
                     primaryName = nameString.substring(0, parenIndex - 1);
                     
                     nameChangeEvent = new PlanetaryEvent();
+                    nameChangeEvent.date = nameChangeYearDate;
                     nameChangeEvent.name = altName;
                 }
             }
@@ -302,7 +308,8 @@ public class Planet implements Serializable {
             this.name = primaryName;
             
             if(null != nameChangeEvent) {
-                this.events.put(new DateTime(year, 1, 1, 0, 0, 0, 0), nameChangeEvent);
+                this.events.put(nameChangeYearDate, nameChangeEvent);
+                this.eventList.add(nameChangeEvent);
             }
             
             this.id = this.name;
@@ -327,11 +334,13 @@ public class Planet implements Serializable {
                 }
                 
                 PlanetaryEvent pe = new PlanetaryEvent();
+                DateTime eventDate = years.get(x - 3);
                 pe.faction = new ArrayList<String>();
                 pe.faction.add(newFaction);
+                pe.date = eventDate;
                 this.eventList.add(pe);
                 
-                this.events.put(years.get(x - 3), pe);
+                this.events.put(eventDate, pe);
             }
         } catch(Exception e) {
             Exception ne = new Exception("Error running Planet constructor with following line:\n" + tsvData);
@@ -901,19 +910,49 @@ public class Planet implements Serializable {
         luminosity = scDef.luminosity;
     }
     
-    public String comparisonReport(Planet other, boolean dryRun) {
+    public String updateFromOtherPlanet(Planet other, boolean dryRun) {
         StringBuilder sb = new StringBuilder();
         
-        if(other.x != this.x || other.y != this.y) {
-            sb.append("Coordinate update from " + x + ", " + y + " to " + other.x + ", " + other.y);
+        if(!other.x.equals(this.x) || !other.y.equals(this.y)) {
+            sb.append("Coordinate update from " + x + ", " + y + " to " + other.x + ", " + other.y + "\r\n");
+            
+            if(!dryRun) {
+                this.x = other.x;
+                this.y = other.y;
+            }
         }
         
         for(PlanetaryEvent event : other.getEvents()) {
-            // check other planet's events
-            // if an ownership change occurred 
-            if(event.name != null) {
+            // check other planet events (currently only updating faction change events)
+            // if the other planet has an 'ownership change' event with a non-"U" faction
+            // check that this planet does not have an existing non-"U" faction already owning it at the event date
+            // Then we will add an the ownership change event
+            
+            if(event.faction != null && event.faction.size() > 0) { 
+                // the purpose of this code is to evaluate whether the current "other planet" event is 
+                // a faction change to an active, valid faction.
+                Faction eventFaction = Faction.getFaction(event.faction.get(0));
+                boolean eventHasActualFaction = eventFaction != null ? !eventFaction.is(Tag.INACTIVE) && !eventFaction.is(Tag.ABANDONED) : false;
                 
+                if(eventHasActualFaction) {
+                    List<String> currentFactions = this.getFactions(event.date);
+                     
+                    // if this planet has an "inactive and abandoned" current faction, then we will carry out a planet update.
+                    if(currentFactions.size() == 1 && 
+                            Faction.getFaction(currentFactions.get(0)).is(Tag.INACTIVE) &&
+                            Faction.getFaction(currentFactions.get(0)).is(Tag.ABANDONED)) {
+                        sb.append("Adding faction change in " + event.date.getYear() + " from " + currentFactions.get(0) + " to " + event.faction + "\r\n");
+                        
+                        if(!dryRun) {
+                            this.events.put(event.date, event);
+                        }
+                    }
+                }
             }
+        }
+        
+        if(sb.length() > 0) {
+            sb.insert(0, "Updating planet " + this.getId() + "\r\n");
         }
         
         return sb.toString();
