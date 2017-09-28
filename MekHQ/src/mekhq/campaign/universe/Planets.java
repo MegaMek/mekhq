@@ -24,8 +24,10 @@ import java.io.FileReader;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Writer;
+import java.text.Normalizer.Form;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -58,6 +60,7 @@ import org.w3c.dom.Node;
 
 import megamek.common.EquipmentType;
 import megamek.common.logging.LogLevel;
+import megameklab.com.util.StringUtils;
 import mekhq.FileParser;
 import mekhq.MekHQ;
 import mekhq.Utilities;
@@ -400,8 +403,7 @@ public class Planets {
         List<Planet> planets = new ArrayList<>();
         
         try {
-            FileReader fr = new FileReader(tsvPath);
-            BufferedReader br = new BufferedReader(fr);
+            BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(tsvPath), "UTF-8"));
 
             // expected file format (no spaces, just tab-separated)
             // "System" \t "X" \t "Y" \t Comma separated list of years
@@ -433,12 +435,15 @@ public class Planets {
         
         return planets;
     }
-
-    public Map<String, Map<Integer, Planet>> planetNameMap;
-    private void initializePlanetNameMap() {
-        for(Planet p : this.planetList.values()) {
-            
+    
+    private Planet slowFind(Planet target, Map<String, Planet> planets) {
+        for(String key : planets.keySet()) {
+            if(key.contains(target.getId())) {
+                return planets.get(key);
+            }
         }
+        
+        return null;
     }
     
     public void comparePlanetLists(String tsvPath) {
@@ -446,66 +451,79 @@ public class Planets {
         StringBuilder planetLog = new StringBuilder();
         String METHOD_NAME = "comparePlanetLists";
         
+        MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, planetLog.toString() + "Starting planet comparison.");
+        
         int coordinateUpdates = 0;
-        int notFoundPlanets = 0;
-        int parenPlanets = 0;
+        int unmatchedPlanets = 0;
+        
+        // this is pretty inefficient but it's not a frequent operation.
+        List<Planet> unmatchedCSVPlanets = new ArrayList<Planet>();
+        
+        Map<String, Planet> unmatchedXMLPlanets = new HashMap<String, Planet>();
+        for(String key : planetList.keySet()) {
+            if(!key.startsWith("NP") &&
+                    !key.startsWith("HL") &&
+                    !key.startsWith("DPR") &&
+                    !key.startsWith("TFS") &&
+                    !key.startsWith("ER") &&
+                    !key.startsWith("KC"))
+            unmatchedXMLPlanets.put(key, planetList.get(key));
+        }
                 
         try {
+            // in the first pass, we get planets directly by their full name
             for(Planet p : planets) {
                 Planet existingPlanet = getPlanetById(p.getId());
                 planetLog.setLength(0);    
                 
-                // if we have not found the planet via name match, let's try to find it via coordinate match
                 if(existingPlanet == null) {
-                    // now we go to slow method
-                    // #1
-                    
-                }
-                
-                if(p.getId().contains("(")) {
-                    parenPlanets++;
-                }
-                
-                if(existingPlanet == null) {
-                    notFoundPlanets++;
-                    MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, "Import planet " + p.getId() + " not found in existing data.");
+                    unmatchedCSVPlanets.add(p);
+                    //MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, planetLog.toString() + "Import planet " + p.getId() + " not found in existing data.");
                     continue;
                 }
                 
-                for(PlanetaryEvent pe : existingPlanet.getEvents()) {
-                    if(pe.name != null) {
-                        int alpha = 1;
-                    }
-                }
+                unmatchedXMLPlanets.remove(existingPlanet.getId());
                 
-                // compare: names by period
-                // coordinates
-                // ownership changes by period
-                
+                // make note of planets which will get coordinate updates
                 if(!p.getX().equals(existingPlanet.getX()) || 
                         !p.getY().equals(existingPlanet.getY())) {
                     coordinateUpdates++;
                 }
-                
-                /*if(!p.getX().equals(existingPlanet.getX())) {
-                    planetLog.append("X: " + p.getX() + " EX: " + existingPlanet.getX());
-                }
-                
-                if(!p.getY().equals(existingPlanet.getY())) {
-                    planetLog.append(" Y: " + p.getY() + " EY: " + existingPlanet.getY());
-                }
-                
-                if(planetLog.length() > 0) {
-                    planetLog.insert(0, "Planet mismatch " + p.getId() + " and " + existingPlanet.getId() + " ");
-                    MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, planetLog.toString());
-                }*/
             }
+
+            // in the second pass through the remaining planets, we get them by "full substring match"
+            for(Planet p : unmatchedCSVPlanets) {
+                Planet existingPlanet = slowFind(p, unmatchedXMLPlanets);
+                
+                if(existingPlanet == null) {
+                    for(PlanetaryEvent pe : p.getEvents()) {
+                        if(pe.name != null) {
+                            existingPlanet = getPlanetById(pe.name);
+                            break;
+                        }
+                    }
+                }
+                
+                if(existingPlanet != null) {
+                    unmatchedXMLPlanets.remove(existingPlanet.getId());
+                    
+                    if(!p.getX().equals(existingPlanet.getX()) || 
+                            !p.getY().equals(existingPlanet.getY())) {
+                        coordinateUpdates++;
+                    }
+                }
+                else {
+                    unmatchedPlanets++;
+                    MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, planetLog.toString() + "Import planet " + p.getId() + " not found in existing data.");
+                }
+            }
+            
+            
         } catch(Exception e) {
             MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR, e);
         }
         
-        MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, parenPlanets + " planets with parens in the name" );
-        MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, coordinateUpdates + " coordinate updates, " + notFoundPlanets + " planets not found");
+        MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, coordinateUpdates + " coordinate updates, " + unmatchedPlanets + " planets not found, " + unmatchedXMLPlanets.size() + " xml planets not in csv");
     }
     
     private void generatePlanets(String planetsPath, String defaultFilePath) throws DOMException, ParseException {

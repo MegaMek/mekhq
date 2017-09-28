@@ -241,20 +241,20 @@ public class Planet implements Serializable {
     }
     
     /**
-     * Overloaded constructor that parses out a single line of csv data for a planet
+     * Overloaded constructor that parses out a single line of tsv data for a planet
      * with the help of a list of event years
-     * @param csvData
+     * @param tsvData tab-separated data line
      * @param years
      * @throws Exception 
      */
-    public Planet(String csvData, List<DateTime> years) throws Exception {
+    public Planet(String tsvData, List<DateTime> years) throws Exception {
         eventList = new ArrayList<>();
         events = new TreeMap<>();
         
         try {
             // "Name" \t X-coordinate \t Y-coordinate \t "Ownership info".
             //      "Ownership info" breaks down to "FactionCode, irrelevantstuff"
-            String[] infoElements = csvData.split("\t");
+            String[] infoElements = tsvData.split("\t");
             
             // sometimes, names are formatted like this:
             // Primary Name (Alternate Name)
@@ -333,7 +333,7 @@ public class Planet implements Serializable {
                 this.events.put(years.get(x - 3), pe);
             }
         } catch(Exception e) {
-            Exception ne = new Exception("Error running Planet constructor with following line:\n" + csvData);
+            Exception ne = new Exception("Error running Planet constructor with following line:\n" + tsvData);
             ne.addSuppressed(e);
             throw(ne);
         }
@@ -898,6 +898,24 @@ public class Planet implements Serializable {
         spectralClass = scDef.spectralClass;
         subtype = scDef.subtype;
         luminosity = scDef.luminosity;
+    }
+    
+    public String comparisonReport(Planet other, boolean dryRun) {
+        StringBuilder sb = new StringBuilder();
+        
+        if(other.x != this.x || other.y != this.y) {
+            sb.append("Coordinate update from " + x + ", " + y + " to " + other.x + ", " + other.y);
+        }
+        
+        for(PlanetaryEvent event : other.getEvents()) {
+            // check other planet's events
+            // if an ownership change occurred 
+            if(event.name != null) {
+                
+            }
+        }
+        
+        return sb.toString();
     }
     
     /**
