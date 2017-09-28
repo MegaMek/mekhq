@@ -88,7 +88,7 @@ public class Faction {
         color = Color.LIGHT_GRAY;
         startingPlanet = new String[]{"Terra","Terra","Terra","Terra","Terra","Terra","Terra","Terra","Terra","Terra","Terra"};
         altNamesByEra = new String[]{"","","","","","","","","","",""};
-        eraMods = new int[]{0,0,0,0,0,0,0,0,0,0,0};
+        eraMods = new int[]{0,0,0,0,0,0,0,0,0};
         tags = EnumSet.noneOf(Faction.Tag.class);
         start = 0;
         end = 9999;
@@ -135,11 +135,43 @@ public class Faction {
         return "Terra";
     }
 
-    public int getEraMod(int era) {
-        if(eraMods.length > era) {
-            return eraMods[era];
+    public int getEraMod(int year) {
+        if(year < 2570) {
+            //Era: Age of War
+            return eraMods[0];
+        } 
+        else if(year < 2598) {
+            //Era: RW
+            return eraMods[1];
         }
-        return 0;
+        else if(year < 2785) {
+            //Era: Star League
+            return eraMods[2];
+        } 
+        else if(year < 2828) {
+            //Era: 1st SW
+            return eraMods[3];
+        }
+        else if(year < 2864) {
+            //Era: 2nd SW
+            return eraMods[4];
+        }
+        else if(year < 3028) {
+            //Era: 3rd SW
+            return eraMods[5];
+        }
+        else if(year < 3050) {
+            //Era: 4th SW
+            return eraMods[6];
+        }
+        else if(year < 3067) {
+            //Era: Clan Invasion
+            return eraMods[7];
+        }
+        else {
+            //Era: Jihad
+            return eraMods[8];
+        }
     }
 
     public int getTechMod(Part part, Campaign campaign) {
@@ -307,7 +339,7 @@ public class Faction {
             MekHQ.getLogger().log(Faction.class, METHOD_NAME, LogLevel.WARNING,
                     retVal.fullname + " faction did not have a long enough altNamesByEra vector"); //$NON-NLS-1$
         }
-        if(retVal.eraMods.length < Era.E_NUM) {
+        if(retVal.eraMods.length < 9) {
             MekHQ.getLogger().log(Faction.class, METHOD_NAME, LogLevel.WARNING,
                     retVal.fullname + " faction did not have a long enough eraMods vector"); //$NON-NLS-1$
         }

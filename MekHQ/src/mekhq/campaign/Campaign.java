@@ -6024,7 +6024,7 @@ public class Campaign implements Serializable, ITechManager {
         target.append(partWork.getAllMods(tech));
 
         if (getCampaignOptions().useEraMods()) {
-            target.addModifier(getFaction().getEraMod(getEra()), "era");
+            target.addModifier(getFaction().getEraMod(calendar.get(Calendar.YEAR)), "era");
         }
 
         boolean isOvertime = false;
@@ -6091,7 +6091,7 @@ public class Campaign implements Serializable, ITechManager {
         target.append(partWork.getAllModsForMaintenance());
 
         if (getCampaignOptions().useEraMods()) {
-            target.addModifier(getFaction().getEraMod(getEra()), "era");
+            target.addModifier(getFaction().getEraMod(calendar.get(Calendar.YEAR)), "era");
         }
 
         if (null != partWork.getUnit() && null != tech) {
