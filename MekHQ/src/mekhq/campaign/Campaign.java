@@ -7518,6 +7518,9 @@ public class Campaign implements Serializable, ITechManager {
 
         long monthlyIncome = 0;
         long monthlyExpenses = 0;
+        long coSpareParts = 0;
+        long coFuel = 0;
+        long coAmmo = 0;
         long maintenance = 0;
         long salaries = 0;
         long overhead = 0;
@@ -7531,11 +7534,16 @@ public class Campaign implements Serializable, ITechManager {
         if (campaignOptions.payForOverhead()) {
             overhead = getOverheadExpenses();
         }
+        if (campaignOptions.usePeacetimeCost()) {
+            coSpareParts = getMonthlySpareParts();
+            coAmmo = getMonthlyAmmo();
+            coFuel = getMonthlyFuel();
+        }
         for (Contract contract : getActiveContracts()) {
             contracts += contract.getMonthlyPayOut();
         }
         monthlyIncome += contracts;
-        monthlyExpenses = maintenance + salaries + overhead;
+        monthlyExpenses = maintenance + salaries + overhead + coSpareParts + coAmmo + coFuel;
 
         long assets = cash + mech + vee + ba + infantry + largeCraft
                       + smallCraft + proto + getFinances().getTotalAssetValue();
@@ -7641,6 +7649,17 @@ public class Campaign implements Serializable, ITechManager {
         sb.append("    Overhead............. ")
           .append(String.format(formatted, DecimalFormat.getInstance()
                                                         .format(overhead))).append("\n");
+        if (campaignOptions.usePeacetimeCost()) {
+            sb.append("    Spare Parts.......... ")
+              .append(String.format(formatted, DecimalFormat.getInstance()
+                                                          .format(coSpareParts))).append("\n");
+            sb.append("    Training Munitions... ")
+              .append(String.format(formatted, DecimalFormat.getInstance()
+                                                          .format(coAmmo))).append("\n");
+            sb.append("    Fuel................. ")
+              .append(String.format(formatted, DecimalFormat.getInstance()
+                                                          .format(coFuel))).append("\n");
+        }
 
         return new String(sb);
     }
