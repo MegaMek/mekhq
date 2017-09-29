@@ -24,6 +24,7 @@ package mekhq.campaign.unit;
 
 import java.io.PrintWriter;
 import java.math.BigInteger;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Enumeration;
@@ -3897,9 +3898,11 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     }
     
     public String displayMonthlyCost() {
-        String unitMonthlyCost = "<b>Spare Parts</b>: " + getSparePartsCost() + " C-bills<br>"
-                               + "<b>Ammunition</b>: " + getAmmoCost() + " C-bills<br>"
-                               + "<b>Fuel</b>: " + getFuelCost() + " C-bills<br>";
+        DecimalFormat numFormatter = new DecimalFormat();
+        
+        String unitMonthlyCost = "<b>Spare Parts</b>: " + numFormatter.format(getSparePartsCost()) + " C-bills<br>"
+                               + "<b>Ammunition</b>: " + numFormatter.format(getAmmoCost()) + " C-bills<br>"
+                               + "<b>Fuel</b>: " + numFormatter.format(getFuelCost()) + " C-bills<br>";
         return unitMonthlyCost;
     }
 

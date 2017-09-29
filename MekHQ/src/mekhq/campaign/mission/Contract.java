@@ -581,6 +581,10 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
 				+transportAmount
 				+"</transportAmount>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"<transitAmount>"
+                +transitAmount
+                +"</transitAmount>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<overheadAmount>"
 				+overheadAmount
 				+"</overheadAmount>");
@@ -665,6 +669,9 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
 			else if (wn2.getNodeName().equalsIgnoreCase("transportAmount")) {
 				transportAmount = Long.parseLong(wn2.getTextContent().trim());
 			}
+			else if (wn2.getNodeName().equalsIgnoreCase("transitAmount")) {
+			    transitAmount = Long.parseLong(wn2.getTextContent().trim());
+            }
 			else if (wn2.getNodeName().equalsIgnoreCase("overheadAmount")) {
 				overheadAmount = Long.parseLong(wn2.getTextContent().trim());
 			}
