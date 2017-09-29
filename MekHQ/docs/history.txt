@@ -39,6 +39,7 @@ v0.43.3 (2017-07-18 18:30 UTC)
 + Fix #395: SPAs do not appear in Pilot Info in MHQ
 + Commenting out PR#249 see commit notes.
 + PR#409 - Fix for incorrect treatment of tornadoes
++ PR  #468: Support - Peacetime Costs cleanup
 
 
 v0.43.2 (2017-05-1 22:00 UTC)
