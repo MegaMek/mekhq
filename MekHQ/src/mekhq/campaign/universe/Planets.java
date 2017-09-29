@@ -476,7 +476,7 @@ public class Planets {
         
         StringBuilder planetLog = new StringBuilder();
         for(int x = 0; x < matchedImportPlanets.size(); x++) {
-            planetLog.append(matchedExistingPlanets.get(x).updateFromOtherPlanet(matchedImportPlanets.get(x), dryRun));
+            planetLog.append(matchedExistingPlanets.get(x).updateFromTSVPlanet(matchedImportPlanets.get(x), dryRun));
         }
         
         for(Planet unmatched : unmatchedImportPlanets) {
@@ -610,7 +610,16 @@ public class Planets {
     public void exportPlanets(String fileName) {
         try {
             FileOutputStream fos = new FileOutputStream(fileName);
-            this.writePlanets(fos, new ArrayList(this.planetList.values()));
+            ArrayList<Planet> localPlanetList = new ArrayList<>(this.planetList.values());
+            localPlanetList.sort(new Comparator<Planet>() {
+                @Override
+                public int compare(Planet arg0, Planet arg1) {
+                    return arg0.getId().compareTo(arg1.getId());
+                }});
+            
+            this.writePlanets(fos, localPlanetList);
+            fos.flush();
+            fos.close();
         } catch(IOException ioe) {
             MekHQ.getLogger().log(getClass(), "exportPlanets", LogLevel.INFO, "Error exporting planets to XML");
         }

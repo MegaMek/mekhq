@@ -26,12 +26,15 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.UUID;
 
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
@@ -117,6 +120,7 @@ public class Planet implements Serializable {
     private Double y;
 
     // Base data
+    private UUID uniqueIdentifier;
     private String id;
     private String name;
     private String shortName;
@@ -246,12 +250,20 @@ public class Planet implements Serializable {
      * Overloaded constructor that parses out a single line of tsv data for a planet
      * with the help of a list of event years
      * @param tsvData tab-separated data line
-     * @param years
+     * @param years The list of years acquired from the tsv file
      * @throws Exception 
      */
     public Planet(String tsvData, List<DateTime> years) throws Exception {
         eventList = new ArrayList<>();
         events = new TreeMap<>();
+        
+        // map of faction names that are different in the SUCS data, but have a correspondence to our factions
+        Map<String, String> factionReplacements = new HashMap<>();
+        factionReplacements.put("LC", "LA");
+        factionReplacements.put("U", "UND");
+        factionReplacements.put("A", "ABN");
+        factionReplacements.put("I", "IND");
+        factionReplacements.put("", "UND"); // no data. defaulting to "undiscovered"
         
         try {
             // "Name" \t X-coordinate \t Y-coordinate \t "Ownership info".
@@ -318,11 +330,11 @@ public class Planet implements Serializable {
             
             for(int x = 3; x < infoElements.length; x++) {
                 String infoElement = infoElements[x].replace("\"", "");
-                if(infoElement.trim().length() == 0) {
-                    continue;
-                }
-                
                 String newFaction;
+                
+                if(infoElement.trim().length() == 0) {
+                    newFaction = "";
+                }
                 
                 int commaIndex = infoElement.indexOf(',');
                 if(commaIndex < 0) { // sometimes there are no commas
@@ -333,14 +345,26 @@ public class Planet implements Serializable {
                     newFaction = infoElement.substring(0, commaIndex);
                 }
                 
-                PlanetaryEvent pe = new PlanetaryEvent();
-                DateTime eventDate = years.get(x - 3);
-                pe.faction = new ArrayList<String>();
-                pe.faction.add(newFaction);
-                pe.date = eventDate;
-                this.eventList.add(pe);
+                //dirty hack, replace faction name with one we can use
+                if(factionReplacements.containsKey(newFaction)) {
+                    newFaction = factionReplacements.get(newFaction);
+                }
                 
-                this.events.put(eventDate, pe);
+                // for brevity, only add the new event if the faction hasn't changed since the previous event
+                // or if it's the first event
+                
+                // dirty hack here assumes that there's only one faction per event, which is true in the case
+                // of this spreadsheet
+                if(x == 3 || !eventList.get(eventList.size() - 1).faction.get(0).equals(newFaction)) {
+                    PlanetaryEvent pe = new PlanetaryEvent();
+                    DateTime eventDate = years.get(x - 3);
+                    pe.faction = new ArrayList<String>();
+                    pe.faction.add(newFaction);
+                    pe.date = eventDate;
+                    
+                    this.eventList.add(pe);                
+                    this.events.put(eventDate, pe);
+                }
             }
         } catch(Exception e) {
             Exception ne = new Exception("Error running Planet constructor with following line:\n" + tsvData);
@@ -910,22 +934,34 @@ public class Planet implements Serializable {
         luminosity = scDef.luminosity;
     }
     
-    public String updateFromOtherPlanet(Planet other, boolean dryRun) {
+    /**
+     * Updates the current planet's coordinates and faction ownership from the given other planet.
+     * Makes several assumptions about the way the other planet's ownership events are structured.
+     * @param tsvPlanet The planet from which to update.
+     * @param dryRun Whether to actually perform the updates.
+     * @return Human readable form of what was/would have been updated. 
+     */
+    public String updateFromTSVPlanet(Planet tsvPlanet, boolean dryRun) {
         StringBuilder sb = new StringBuilder();
         
-        if(!other.x.equals(this.x) || !other.y.equals(this.y)) {
-            sb.append("Coordinate update from " + x + ", " + y + " to " + other.x + ", " + other.y + "\r\n");
+        if(!tsvPlanet.x.equals(this.x) || !tsvPlanet.y.equals(this.y)) {
+            sb.append("Coordinate update from " + x + ", " + y + " to " + tsvPlanet.x + ", " + tsvPlanet.y + "\r\n");
             
             if(!dryRun) {
-                this.x = other.x;
-                this.y = other.y;
+                this.x = tsvPlanet.x;
+                this.y = tsvPlanet.y;
             }
         }
         
-        for(PlanetaryEvent event : other.getEvents()) {
+        // loop using index
+        // look ahead by one event (if possible) and check that getFaction(next event year) isn't already
+        // the same as the faction from the current event : sometimes, our data is more exact than the incoming data 
+        for(int eventIndex = 0; eventIndex < tsvPlanet.getEvents().size(); eventIndex++) {
+            PlanetaryEvent event = tsvPlanet.getEvents().get(eventIndex);
             // check other planet events (currently only updating faction change events)
             // if the other planet has an 'ownership change' event with a non-"U" faction
             // check that this planet does not have an existing non-"U" faction already owning it at the event date
+            // and does not acquire such a faction between this and the next event
             // Then we will add an the ownership change event
             
             if(event.faction != null && event.faction.size() > 0) { 
@@ -936,15 +972,37 @@ public class Planet implements Serializable {
                 
                 if(eventHasActualFaction) {
                     List<String> currentFactions = this.getFactions(event.date);
-                     
-                    // if this planet has an "inactive and abandoned" current faction, then we will carry out a planet update.
+                                         
+                    // if this planet has an "inactive and abandoned" current faction... 
+                    // we also want to catch the situation where the next faction change isn't to the same exact faction 
                     if(currentFactions.size() == 1 && 
                             Faction.getFaction(currentFactions.get(0)).is(Tag.INACTIVE) &&
                             Faction.getFaction(currentFactions.get(0)).is(Tag.ABANDONED)) {
-                        sb.append("Adding faction change in " + event.date.getYear() + " from " + currentFactions.get(0) + " to " + event.faction + "\r\n");
                         
-                        if(!dryRun) {
-                            this.events.put(event.date, event);
+                        // now we travel into the future, to the next "other" event, and if this planet has acquired a faction
+                        // before the next "other" event, then we
+                        int nextEventIndex = eventIndex + 1;                        
+                        PlanetaryEvent nextEvent = nextEventIndex < tsvPlanet.getEvents().size() ? tsvPlanet.getEvents().get(nextEventIndex) : null;
+                        DateTime nextEventDate; 
+                        
+                        // if we're at the last event, then just check that the planet doesn't have a faction in the year 3600
+                        if(nextEvent == null) {
+                            nextEventDate = new DateTime(3600, 1, 1, 0, 0, 1, 0);
+                        } else {
+                            nextEventDate = nextEvent.date;
+                        }
+                        
+                        List<String> nextFactions = this.getFactions(nextEventDate);
+                        boolean factionBeforeNextEvent = !(nextFactions.size() == 1 &&
+                                Faction.getFaction(nextFactions.get(0)).is(Tag.INACTIVE) &&
+                                Faction.getFaction(nextFactions.get(0)).is(Tag.ABANDONED));
+                        
+                        if(!factionBeforeNextEvent) {
+                            sb.append("Adding faction change in " + event.date.getYear() + " from " + currentFactions.get(0) + " to " + event.faction + "\r\n");
+                            
+                            if(!dryRun) {
+                                this.events.put(event.date, event);
+                            }
                         }
                     }
                 }
