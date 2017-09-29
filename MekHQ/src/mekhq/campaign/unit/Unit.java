@@ -557,15 +557,23 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         }
     }
 
+    private boolean isPartAvailableForRepairs(IPartWork partWork, boolean onlyNotBeingWorkedOn) {
+    	return (!onlyNotBeingWorkedOn || (onlyNotBeingWorkedOn && !partWork.isBeingWorkedOn()));
+    }
+    
     public ArrayList<IPartWork> getPartsNeedingFixing() {
+    	return getPartsNeedingFixing(false);
+    }
+    
+    public ArrayList<IPartWork> getPartsNeedingFixing(boolean onlyNotBeingWorkedOn) {
         ArrayList<IPartWork> brokenParts = new ArrayList<IPartWork>();
         for(Part part: parts) {
-            if(part.needsFixing()) {
+            if(part.needsFixing() && isPartAvailableForRepairs(part, onlyNotBeingWorkedOn)) {
                 brokenParts.add(part);
             }
         }
         for (PodSpace pod : podSpace) {
-            if (pod.needsFixing()) {
+            if (pod.needsFixing() && isPartAvailableForRepairs(pod, onlyNotBeingWorkedOn)) {
                 brokenParts.add(pod);
             }
         }
@@ -573,14 +581,18 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     }
 
     public ArrayList<IPartWork> getSalvageableParts() {
+    	return getSalvageableParts(false);
+    }
+    
+    public ArrayList<IPartWork> getSalvageableParts(boolean onlyNotBeingWorkedOn) {
         ArrayList<IPartWork> salvageParts = new ArrayList<IPartWork>();
         for(Part part: parts) {
-            if(part.isSalvaging()) {
+            if(part.isSalvaging() && isPartAvailableForRepairs(part, onlyNotBeingWorkedOn)) {
                 salvageParts.add(part);
             }
         }
         for (PodSpace pod : podSpace) {
-            if (pod.hasSalvageableParts()) {
+            if (pod.hasSalvageableParts() && isPartAvailableForRepairs(pod, onlyNotBeingWorkedOn)) {
                 salvageParts.add(pod);
             }
         }

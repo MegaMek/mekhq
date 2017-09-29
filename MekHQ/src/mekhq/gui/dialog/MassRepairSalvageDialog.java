@@ -54,6 +54,7 @@ import mekhq.gui.sorter.PartsDetailSorter;
 import mekhq.gui.sorter.UnitStatusSorter;
 import mekhq.gui.sorter.UnitTypeSorter;
 import mekhq.service.MassRepairService;
+import mekhq.service.MassRepairService.MassRepairPartSet;
 
 /**
  * @author Kipsta
@@ -217,7 +218,7 @@ public class MassRepairSalvageDialog extends JDialog {
 		for (int i = 0; i < MassRepairOption.VALID_REPAIR_TYPES.length; i++) {
 			int type = MassRepairOption.VALID_REPAIR_TYPES[i];
 
-			MassRepairOptionControl mroc = massRepairOptionControlMap.get(i);
+			MassRepairOptionControl mroc = massRepairOptionControlMap.get(type);
 
 			if ((null == mroc) || !mroc.activeBox.isSelected()) {
 				continue;
@@ -254,7 +255,10 @@ public class MassRepairSalvageDialog extends JDialog {
 		partsTableModel.setData(filteredPartsList);
 
 		int count = partsTable.getRowCount();
-		partsTable.addRowSelectionInterval(0, count - 1);
+		
+		if (count > 0) {
+			partsTable.addRowSelectionInterval(0, count - 1);
+		}
 	}
 
 	private void initComponents() {
@@ -1113,9 +1117,6 @@ public class MassRepairSalvageDialog extends JDialog {
 			return;
 		}
 
-		int repairsCompleted = 0;
-		String msg = "";
-
 		if (isModeUnits()) {
 			int[] selectedRows = unitTable.getSelectedRows();
 
@@ -1147,17 +1148,7 @@ public class MassRepairSalvageDialog extends JDialog {
 			MassRepairService.MassRepairConfiguredOptions configuredOptions = new MassRepairService.MassRepairConfiguredOptions();
 			configuredOptions.setup(this);
 
-			for (Unit unit : units) {
-				repairsCompleted += MassRepairService.performUnitMassRepairOrSalvage(campaignGUI, unit, unit.isSalvage(), activeMROs,
-						configuredOptions);
-			}
-
-			if (repairsCompleted == 1) {
-				msg = "Mass Repair/Salvage complete. There was 1 repair completed or scheduled.";
-			} else {
-				msg = String.format("Mass Repair/Salvage complete. There were %d repairs completed or scheduled.",
-						repairsCompleted);
-			}
+			MassRepairService.massRepairSalvageUnits(campaignGUI, units);
 
 			filterUnits();
 		} else if (isModeWarehouse()) {
@@ -1191,21 +1182,23 @@ public class MassRepairSalvageDialog extends JDialog {
 			configuredOptions.setup(this);
 			configuredOptions.setScrapImpossible(false);
 
-			repairsCompleted = MassRepairService.performWarehouseMassRepair(parts, activeMROs, configuredOptions, campaignGUI);
+			MassRepairPartSet partSet = MassRepairService.performWarehouseMassRepair(parts, activeMROs, configuredOptions, campaignGUI);
 
-			if (repairsCompleted == 1) {
-				msg = "Mass Repair complete. There was 1 repair completed or scheduled.";
+			String msg = String.format("Mass Repair complete");
+			
+			if (partSet.isHasRepairs()) {
+				int count = partSet.countRepairs();
+				msg += String.format(" - %s repair action%s performed", count, (count == 1 ? "" : "s"));
 			} else {
-				msg = String.format("Mass Repair complete. There were %d repairs completed or scheduled.",
-						repairsCompleted);
+				msg += ".";
 			}
 
 			filterCompletePartsList(true);
+
+			campaignGUI.getCampaign().addReport(msg);
+
+			JOptionPane.showMessageDialog(this, msg, "Complete", JOptionPane.INFORMATION_MESSAGE);
 		}
-
-		JOptionPane.showMessageDialog(this, msg, "Complete", JOptionPane.INFORMATION_MESSAGE);
-
-		campaignGUI.getCampaign().addReport(msg);
 	}
 
 	private void btnSaveAsDefaultActionPerformed(ActionEvent evt) {

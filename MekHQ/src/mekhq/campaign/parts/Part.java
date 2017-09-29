@@ -855,6 +855,14 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	    }
 	}
 	
+	/*
+	 * Reset our WorkTime back to normal so that we can adjust as
+	 * necessary
+	 */
+	public void resetModeToNormal() {
+		setMode(WorkTime.NORMAL);
+	}
+	
 	@Override
 	public boolean canChangeWorkMode() {
 	    return !(isOmniPodded() && isSalvaging());
@@ -863,10 +871,16 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	@Override
 	public TargetRoll getAllMods(Person tech) {
 	    int difficulty = getDifficulty();
+	    
 	    if (isOmniPodded() && (isSalvaging() || this instanceof MissingPart)
-	            && !(unit.getEntity() instanceof Tank)) {
+	            && (null != unit) && !(unit.getEntity() instanceof Tank)) {
 	        difficulty -= 2;
 	    }
+	    
+	    if (null == mode) {
+	    	mode = WorkTime.NORMAL;
+	    }
+	    
 		TargetRoll mods = new TargetRoll(difficulty, "difficulty");
 		int modeMod = mode.getMod(campaign.getCampaignOptions().isDestroyByMargin());
 		if (modeMod != 0) {
@@ -1061,8 +1075,16 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	}
 
 	public String scrap() {
+		String msg = "";
+		
+		if (null == getUnit()) {
+			msg = getName() + " scrapped.";
+		} else {
+			msg = getName() + " on " + unit.getName() + " scrapped.";
+		}
+		
 		remove(false);
-		return getName() + " scrapped.";
+		return msg;
 	}
 
 	@Override

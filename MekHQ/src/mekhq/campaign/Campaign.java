@@ -1956,6 +1956,7 @@ public class Campaign implements Serializable, ITechManager {
         TargetRoll target = getTargetFor(partWork, tech);
         String report = "";
         String action = " fix ";
+                
         // TODO: this should really be a method on the part
         if (partWork instanceof AmmoBin) {
             action = " reload ";
@@ -1996,6 +1997,11 @@ public class Campaign implements Serializable, ITechManager {
         }
         report += tech.getHyperlinkedFullTitle() + " attempts to" + action
                   + partWork.getPartName();
+        
+        if (null != partWork.getUnit()) {
+        	report += " on " + partWork.getUnit().getName();
+        }
+        
         int minutes = partWork.getTimeLeft();
         int minutesUsed = minutes;
         boolean usedOvertime = false;
@@ -5711,15 +5717,19 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public ArrayList<IPartWork> getPartsNeedingServiceFor(UUID uid) {
+    	return getPartsNeedingServiceFor(uid, false);
+    }
+    
+    public ArrayList<IPartWork> getPartsNeedingServiceFor(UUID uid, boolean onlyNotBeingWorkedOn) {
         if (null == uid) {
             return new ArrayList<IPartWork>();
         }
         Unit u = getUnit(uid);
         if (u != null) {
             if (u.isSalvage() || !u.isRepairable()) {
-                return u.getSalvageableParts();
+                return u.getSalvageableParts(onlyNotBeingWorkedOn);
             } else {
-                return u.getPartsNeedingFixing();
+                return u.getPartsNeedingFixing(onlyNotBeingWorkedOn);
             }
         }
         return new ArrayList<IPartWork>();
