@@ -262,6 +262,9 @@ class CampaignOpsReputation extends AbstractUnitRating {
             } else if ((u.getEntity().getEntityType() &
                         Entity.ETYPE_AERO) == Entity.ETYPE_AERO) {
                 totalAero++;
+            } else if ((u.getEntity().getEntityType() &
+                        Entity.ETYPE_DROPSHIP) == Entity.ETYPE_DROPSHIP) {
+                totalAero++;
             } else if (((u.getEntity().getEntityType() &
                          Entity.ETYPE_MECH) == Entity.ETYPE_MECH)
                        || ((u.getEntity().getEntityType() &
@@ -619,8 +622,7 @@ class CampaignOpsReputation extends AbstractUnitRating {
                 totalValue += 5;
             }
         }
-        if ((getDropshipCount() > 0) && (getDockingCollarCount() >=
-                                         getDropshipCount())) {
+        if ((getDropshipCount() > 0) && (getDockingCollarCount() >= getDropshipCount())) {
             totalValue += 5;
         }
 
