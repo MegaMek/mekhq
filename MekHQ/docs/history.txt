@@ -23,6 +23,7 @@ v0.43.4-git
 	o Updates all tech intro dates to the Universal Technology Advancement Table in Interstellar Operations.
 	o New options to vary part and unit tech level according to campaign year and/or faction.
 + Update Era.java to match MUL and add Dark Age information.
++ Issue #455: Repair bay uses the wrong ammo bin.
 
 v0.43.3 (2017-07-18 18:30 UTC)
 + Feature: Refactor AtBScenario to break up the monolithic AtBScenario class and to have a separate class for each scenario
