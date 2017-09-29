@@ -392,20 +392,34 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
         }
     }
 
+    private int getTravelDays(Campaign c) {
+        if(null != c.getPlanet(planetName)) {
+            DateTime currentDate = Utilities.getDateTimeDay(c.getCalendar());
+            JumpPath jumpPath = c.calculateJumpPath(c.getCurrentPlanet(), getPlanet());
+            double days = Math.round(jumpPath.getTotalTime(currentDate, c.getLocation().getTransitTime()) * 100.0) / 100.0;
+            return (int) Math.round(days);
+        }
+        return 0;
+    }
+
+
+    private int getLengthPlusTravel(Campaign c) {
+        int travelMonths = (int) Math.ceil(getTravelDays(c) / 30.0) * 2;
+        return getLength() + travelMonths;
+    }
+
     public long getEstimatedTotalProfit(Campaign c) {
         long profit = getTotalAmountPlusFeesAndBonuses();
-        profit -= c.getOverheadExpenses() * getLength();
-        profit -= c.getMaintenanceCosts() * getLength();
+        profit -= c.getOverheadExpenses() * getLengthPlusTravel(c);
+        profit -= c.getMaintenanceCosts() * getLengthPlusTravel(c);
         if (c.getCampaignOptions().usePeacetimeCost()) {
-            profit -= c.getPeacetimeCost() * getLength();
+            profit -= c.getPeacetimeCost() * getLengthPlusTravel(c);
         } else {
-            profit -= c.getPayRoll() * getLength();
+            profit -= c.getPayRoll() * getLengthPlusTravel(c);
         }
 		if(null != c.getPlanet(planetName) && c.getCampaignOptions().payForTransport()) {
-			DateTime currentDate = Utilities.getDateTimeDay(c.getCalendar());
 			JumpPath jumpPath = c.calculateJumpPath(c.getCurrentPlanet(), getPlanet());
-			double days = Math.round(jumpPath.getTotalTime(currentDate, c.getLocation().getTransitTime())*100.0)/100.0;
-			int roundedMonths = (int) Math.ceil(days / 30.0);
+            int roundedMonths = (int) Math.ceil(getTravelDays(c) / 30.0);
 
 			boolean campaignOps = c.getCampaignOptions().useEquipmentContractBase();
 			transportAmount = (long)((transportComp/100.0) * 2 * c.calculateCostPerJump(campaignOps, campaignOps, jumpPath.getJumps(), roundedMonths) * jumpPath.getJumps());
@@ -468,10 +482,8 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
 
 		//calculate transportation costs
 		if(null != Planets.getInstance().getPlanetById(planetName)) {
-			DateTime currentDate = Utilities.getDateTimeDay(c.getCalendar());
-			JumpPath jumpPath = c.calculateJumpPath(c.getCurrentPlanet(), getPlanet());
-			double days = Math.round(jumpPath.getTotalTime(currentDate, c.getLocation().getTransitTime())*100.0)/100.0;
-			int roundedMonths = (int) Math.ceil(days / 30.0);
+            JumpPath jumpPath = c.calculateJumpPath(c.getCurrentPlanet(), getPlanet());
+            int roundedMonths = (int) Math.ceil(getTravelDays(c) / 30.0);
 
 			// FM:Mercs transport payments take into account owned transports and do not use CampaignOps dropship costs.
 			// CampaignOps doesn't care about owned transports and does use its own dropship costs.
