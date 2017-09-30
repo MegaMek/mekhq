@@ -264,7 +264,7 @@ public class ContractSummaryPanel extends JPanel {
 			mainPanel.add(lblEnemy, gridBagConstraints);
 
 			txtEnemy.setName("txtEnemy"); // NOI18N
-			txtEnemy.setText(((AtBContract)contract).getEnemyName(campaign.getEra()));
+			txtEnemy.setText(((AtBContract)contract).getEnemyName(campaign.getYear()));
 			txtEnemy.setEditable(false);
 			txtEnemy.setLineWrap(true);
 			txtEnemy.setWrapStyleWord(true);

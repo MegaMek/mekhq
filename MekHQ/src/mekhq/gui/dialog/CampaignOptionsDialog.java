@@ -4082,7 +4082,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     }
 
     private void switchFaction() {
-        String factionCode = Faction.getFactionFromFullNameAndEra(String.valueOf(comboFaction.getSelectedItem()), Era.getEra(date.get(Calendar.YEAR)))
+        String factionCode = Faction.getFactionFromFullNameAndYear(String.valueOf(comboFaction.getSelectedItem()), date.get(Calendar.YEAR))
                                     .getNameGenerator();
         boolean found = false;
         for (Iterator<String> i = campaign.getRNG().getFactions(); i.hasNext(); ) {
@@ -4265,8 +4265,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         if (gameOpts.intOption("year") != campaignYear) {
             gameOpts.getOption("year").setValue(campaignYear);
         }
-        campaign.setFactionCode(Faction.getFactionFromFullNameAndEra
-        		(String.valueOf(comboFaction.getSelectedItem()), Era.getEra(date.get(Calendar.YEAR))).getShortName());
+        campaign.setFactionCode(Faction.getFactionFromFullNameAndYear
+        		(String.valueOf(comboFaction.getSelectedItem()), date.get(Calendar.YEAR)).getShortName());
         if (null != comboFactionNames.getSelectedItem()) {
             campaign.getRNG().setChosenFaction((String) comboFactionNames.getSelectedItem());
         }

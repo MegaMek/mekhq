@@ -156,10 +156,10 @@ public class CustomizeAtBContractDialog extends JDialog {
 		txtName = new JTextField();
         JLabel lblName = new JLabel();
         cbEmployer = new FactionComboBox();
-        cbEmployer.addFactionEntries(currentFactions, campaign.getEra());
+        cbEmployer.addFactionEntries(currentFactions, campaign.getYear());
         JLabel lblEmployer = new JLabel();
 		cbEnemy = new FactionComboBox();
-        cbEnemy.addFactionEntries(currentFactions, campaign.getEra());
+        cbEnemy.addFactionEntries(currentFactions, campaign.getYear());
         JLabel lblEnemy = new JLabel();
     	chkShowAllFactions = new JCheckBox();
     	cbMissionType = new JComboBox<String>(AtBContract.missionTypeNames);
@@ -579,7 +579,7 @@ public class CustomizeAtBContractDialog extends JDialog {
     
     private void btnOKActionPerformed(ActionEvent evt) {//GEN-FIRST:event_btnHireActionPerformed
     	contract.setName(txtName.getText());
-    	contract.setEmployerCode(cbEmployer.getSelectedItemKey(), campaign.getEra());
+    	contract.setEmployerCode(cbEmployer.getSelectedItemKey(), campaign.getYear());
     	contract.setEnemyCode(cbEnemy.getSelectedItemKey());
     	contract.setMissionType(cbMissionType.getSelectedIndex());
     	contract.setAllySkill(cbAllySkill.getSelectedIndex());
@@ -609,11 +609,11 @@ public class CustomizeAtBContractDialog extends JDialog {
     	cbEmployer.removeAllItems();
     	cbEnemy.removeAllItems();
     	if (allFactions) {
-    		cbEmployer.addFactionEntries(Faction.getFactionList(),	campaign.getEra());
-    		cbEnemy.addFactionEntries(Faction.getFactionList(),	campaign.getEra());
+    		cbEmployer.addFactionEntries(Faction.getFactionList(),	campaign.getYear());
+    		cbEnemy.addFactionEntries(Faction.getFactionList(),	campaign.getYear());
     	} else {
-    		cbEmployer.addFactionEntries(currentFactions, campaign.getEra());
-    		cbEnemy.addFactionEntries(currentFactions, campaign.getEra());
+    		cbEmployer.addFactionEntries(currentFactions, campaign.getYear());
+    		cbEnemy.addFactionEntries(currentFactions, campaign.getYear());
     	}
     }
     

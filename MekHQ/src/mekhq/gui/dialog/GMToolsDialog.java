@@ -110,11 +110,11 @@ public class GMToolsDialog extends JDialog implements ActionListener {
         
         Collection<String> factionIds = Faction.getFactionList();
         List<FactionChoice> factionChoices = new ArrayList<>(factionIds.size());
-        int era = gui.getCampaign().getEra();
+        int year = gui.getCampaign().getYear();
         StringBuilder sb = new StringBuilder();
         for(String factionId : factionIds) {
             sb.setLength(0);
-            sb.append(Faction.getFaction(factionId).getFullName(era)).append(" [").append(factionId).append("]");
+            sb.append(Faction.getFaction(factionId).getFullName(year)).append(" [").append(factionId).append("]");
             factionChoices.add(new FactionChoice(factionId, sb.toString()));
         }
         Collections.sort(factionChoices, new Comparator<FactionChoice>() {

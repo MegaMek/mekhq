@@ -3059,7 +3059,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public String getFactionName() {
-        return getFaction().getFullName(getEra());
+        return getFaction().getFullName(getYear());
     }
 
     public void setFactionCode(String i) {

@@ -17,8 +17,10 @@ Here is a description of what goes in each faction tag
 shortname - this is the abbreviation that is used to identify each faction in planets.xml and within
             MekHQ itself. This code must be unique.
 fullname  - the full display name for the faction.
-altNamesByEra - a comma-separated 9-item list that identifies alternate names for a given era. Use a single
+altNamesByYear - a comma-separated 9-item list that identifies alternate names for a given era. Use a single
 	       space between commas to indicate that the regular fullname should be used.
+altNames - A list of alternate names for a faction, also known as type of names,
+					not official designations
 startingPlanet - Identifies the starting planet if you begin a new campaign with this faction. 
 				 The name of the planet must be the name as it is recognized in MekHQ.
 				 If left out, then this defaults to Terra.
@@ -154,7 +156,8 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<eraMods>1,0,0,1,2,3,2,1,0</eraMods>
 		<nameGenerator>LA</nameGenerator>
 		<colorRGB>0,124,186</colorRGB>
-		<altNamesByEra>, , , , , , ,Lyran Alliance,Lyran Alliance</altNamesByEra>
+		<altNamesByYear year='3058'>Lyran Alliance</altNamesByYear>
+		<altNamesByYear year='3085'>Lyran Commonwealth</altNamesByYear>
 		<tags>is</tags>
 		<start>2340</start>
 		<end>3084</end>
@@ -480,7 +483,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<eraMods>1,1,1,1,2,3,2,1,0</eraMods>
 		<nameGenerator>General</nameGenerator>
 		<colorRGB>210,190,153</colorRGB>
-		<altNamesByEra>, , , , , , , ,Raven Alliance</altNamesByEra>
+		<altNamesByYear year='3083'>Raven Alliance</altNamesByYear>
 		<tags>periphery</tags>
 		<start>2413</start>
 		<end>3083</end>
@@ -619,8 +622,9 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	<faction>
 		<shortname>CDS</shortname>
 		<id>26</id>
-		<fullname>Clan Diamond Shark</fullname>
-		<altNamesByEra>, , ,Clan Sea Fox,Clan Sea Fox, , , , </altNamesByEra>
+		<fullname>Clan Sea Fox</fullname>
+		<altNamesByYear year='2984'>Clan Diamond Shark</altNamesByYear>
+		<altNamesByYear year='3100'>Clan Sea Fox</altNamesByYear>
 		<startingPlanet>Babylon</startingPlanet>
 		<changePlanet year='3065'>Twycross</changePlanet>
 		<eraMods>0,0,0,0,0,0,0,0,0</eraMods>
@@ -649,7 +653,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<eraMods>0,0,0,0,0,0,0,0,0</eraMods>
 		<nameGenerator>Clan</nameGenerator>
 		<colorRGB>188,222,235</colorRGB>
-		<altNamesByEra>, , , , , , ,Ghost Bear Dominion,Ghost Bear Dominion</altNamesByEra>
+		<altNamesByYear year='3060'>Ghost Bear Dominion</altNamesByYear>
 		<tags>clan</tags>
 		<start>2807</start>
 		<end>3103</end>
@@ -658,7 +662,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<shortname>CGS</shortname>
 		<fullname>Clan Goliath Scorpion</fullname>
 		<startingPlanet>Roche</startingPlanet>
-		<altNamesByEra>, , , , , , , ,Escorpión Imperio</altNamesByEra>
+		<altNamesByYear year='3080'>Escorpión Imperio</altNamesByYear>
 		<eraMods>0,0,0,0,0,0,0,0,0</eraMods>
 		<nameGenerator>Clan</nameGenerator>
 		<colorRGB>238,232,170</colorRGB>
@@ -745,7 +749,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<eraMods>0,0,0,0,0,0,0,0,0</eraMods>
 		<nameGenerator>Clan</nameGenerator>
 		<colorRGB>135,206,235</colorRGB>
-		<altNamesByEra>, , , , , , , ,Raven Alliance</altNamesByEra>
+		<altNamesByYear year='3083'>Raven Alliance</altNamesByYear>
 		<tags>clan</tags>
 		<start>2807</start>
 		<end>3083</end>
@@ -1704,7 +1708,11 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<fullname>Coreward Confederacy</fullname>
 		<startingPlanet>RWR Outpost #27</startingPlanet>
 		<eraMods>3,3,1,3,3,3,3,3,3</eraMods>
-		<altNamesByEra>Autocracy of New Virginia, Virginian Union, Rim Worlds Republic Outpost #27, , , , , ,</altNamesByEra>
+		<altNamesByYear year='2371'>Autocracy of New Virginia</altNamesByYear>
+		<altNamesByYear year='2400'>Virginian Union</altNamesByYear>
+		<altNamesByYear year='2700'>Rim Worlds Republic Outpost #27</altNamesByYear>
+		<altNamesByYear year='2798'>Virginian Union</altNamesByYear>
+		<altNamesByYear year='2816'>Coreward Confederacy</altNamesByYear>
 		<nameGenerator>General</nameGenerator>
 		<colorRGB>255,0,0</colorRGB>
 		<tags>periphery</tags>

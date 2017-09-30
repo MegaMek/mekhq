@@ -287,8 +287,8 @@ public class ContractMarketDialog extends JDialog {
 			c.calculateContract(campaign);
 			Vector<String> row = new Vector<String>();
 			if (c instanceof AtBContract) {
-				row.add(((AtBContract)c).getEmployerName(campaign.getEra()));
-				row.add(((AtBContract)c).getEnemyName(campaign.getEra()));
+				row.add(((AtBContract)c).getEmployerName(campaign.getYear()));
+				row.add(((AtBContract)c).getEnemyName(campaign.getYear()));
 				if (((AtBContract)c).isSubcontract()) {
 					row.add(((AtBContract)c).getMissionTypeName() + " (Subcontract)");
 				} else {
@@ -341,7 +341,7 @@ public class ContractMarketDialog extends JDialog {
         gbc.fill = GridBagConstraints.NONE;
         panelRetainer.add(lblCurrentRetainer, gbc);
         if (null != campaign.getRetainerEmployerCode()) {
-        	lblRetainerEmployer.setText(Faction.getFaction(campaign.getRetainerEmployerCode()).getFullName(campaign.getEra()));
+        	lblRetainerEmployer.setText(Faction.getFaction(campaign.getRetainerEmployerCode()).getFullName(campaign.getYear()));
         }
         gbc.gridx = 1;
         gbc.gridy = 0;
@@ -372,7 +372,7 @@ public class ContractMarketDialog extends JDialog {
         gbc.gridx = 0;
         gbc.gridy = 2;
         panelRetainer.add(lblRetainerAvailable, gbc);
-        cbRetainerEmployer.addFactionEntries(possibleRetainerContracts, campaign.getEra());
+        cbRetainerEmployer.addFactionEntries(possibleRetainerContracts, campaign.getYear());
         gbc.gridx = 1;
         gbc.gridy = 2;
         panelRetainer.add(cbRetainerEmployer, gbc);
@@ -390,7 +390,7 @@ public class ContractMarketDialog extends JDialog {
 		        lblCurrentRetainer.setVisible(true);
 		        lblRetainerEmployer.setVisible(true);
 		        btnEndRetainer.setVisible(true);
-	        	lblRetainerEmployer.setText(Faction.getFaction(campaign.getRetainerEmployerCode()).getFullName(campaign.getEra()));
+	        	lblRetainerEmployer.setText(Faction.getFaction(campaign.getRetainerEmployerCode()).getFullName(campaign.getYear()));
 		        //Remove the selected faction and add the previous one, if any
 		        countSuccessfulContracts();
 		        lblRetainerAvailable.setVisible(possibleRetainerContracts.size() > 0);
@@ -422,8 +422,8 @@ public class ContractMarketDialog extends JDialog {
 
         		c.calculateContract(campaign);
         		Vector<String> row = new Vector<String>();
-        		row.add(((AtBContract)c).getEmployerName(campaign.getEra()));
-        		row.add(((AtBContract)c).getEnemyName(campaign.getEra()));
+        		row.add(((AtBContract)c).getEmployerName(campaign.getYear()));
+        		row.add(((AtBContract)c).getEnemyName(campaign.getYear()));
         		row.add(((AtBContract)c).getMissionTypeName());
 
         		((DefaultTableModel)tblContracts.getModel()).addRow(row);
