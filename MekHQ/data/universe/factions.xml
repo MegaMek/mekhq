@@ -3,6 +3,10 @@
 factions.xml
 1/19/2012
 Jay Lawson
+
+Modified Sept 2017
+Joshua Bartz (Bonepart)
+
 This file defines the factions used by MekHQ. Keep in mind that the faction shortnames are used by
 the planets.xml file, so if you remove a faction here, you need to remove all references to it in
 that file. Not all of the factions listed here are available to play by default. To add a faction as
@@ -15,11 +19,12 @@ shortname - this is the abbreviation that is used to identify each faction in pl
 fullname  - the full display name for the faction.
 altNamesByEra - a comma-separated 9-item list that identifies alternate names for a given era. Use a single
 	       space between commas to indicate that the regular fullname should be used.
-startingPlanet - A comma-separated 9-item list that identifies the starting planet if you
-			     begin a new campaign with this faction. The name of the planet must be the name
-			     as it is recognized in MekHQ. Each item corresponds to a different era as follows:
-			     Age of War, Reunification Wars, Star League, 1SW, 2SW, 3SW, 4SW, Clan Invasion, Jihad
-				 If left out, then this defaults to Terra for all eras.
+startingPlanet - Identifies the starting planet if you begin a new campaign with this faction. 
+				 The name of the planet must be the name as it is recognized in MekHQ.
+				 If left out, then this defaults to Terra.
+changePlanet - Identifies the starting planet after the given year
+				 Format should be: <changePlanet year='XXXX'>Planet name</changePlanet>
+				 Years given in this first revision are best guesses
 eraMods - A comma-separated 9-item list of optional modifiers to repair/replacement rolls. as per
           Strat Ops. If left out, then this defaults to 0 for all eras.
 nameGenerator - The name of the faction name generator that should be used for this faction. If
@@ -616,7 +621,8 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<id>26</id>
 		<fullname>Clan Diamond Shark</fullname>
 		<altNamesByEra>, , ,Clan Sea Fox,Clan Sea Fox, , , , </altNamesByEra>
-		<startingPlanet>Babylon,Babylon,Babylon,Babylon,Babylon,Babylon,Babylon,Babylon,Twycross</startingPlanet>
+		<startingPlanet>Babylon</startingPlanet>
+		<changePlanet year='3065'>Twycross</changePlanet>
 		<eraMods>0,0,0,0,0,0,0,0,0</eraMods>
 		<nameGenerator>Clan</nameGenerator>
 		<colorRGB>0,255,255</colorRGB>
@@ -638,7 +644,8 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<shortname>CGB</shortname>
 		<id>23</id>
 		<fullname>Clan Ghost Bear</fullname>
-		<startingPlanet>Arcadia (Clan),Arcadia (Clan),Arcadia (Clan),Arcadia (Clan),Arcadia (Clan),Arcadia (Clan),Arcadia (Clan),Alshain,Alshain</startingPlanet>
+		<startingPlanet>Arcadia (Clan)</startingPlanet>
+		<changePlanet year='3060'>Alshain</changePlanet>
 		<eraMods>0,0,0,0,0,0,0,0,0</eraMods>
 		<nameGenerator>Clan</nameGenerator>
 		<colorRGB>188,222,235</colorRGB>
@@ -663,7 +670,9 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<shortname>CHH</shortname>
 		<id>28</id>
 		<fullname>Clan Hell's Horses</fullname>
-		<startingPlanet>Niles (Clan),Niles (Clan),Niles (Clan),Niles (Clan),Niles (Clan),Niles (Clan),Niles (Clan),Csesztreg,Niles (Clan)</startingPlanet>
+		<!--Original data shows CHH back on Niles during the Jihad, but I am unable to find data for that -->
+		<startingPlanet>Niles (Clan)</startingPlanet>
+		<changePlanet year='3074'>Csesztreg</changePlanet>
 		<eraMods>0,0,0,0,0,0,0,0,0</eraMods>
 		<nameGenerator>Clan</nameGenerator>
 		<colorRGB>241,168,110</colorRGB>
@@ -685,7 +694,8 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<shortname>CJF</shortname>
 		<id>22</id>
 		<fullname>Clan Jade Falcon</fullname>
-		<startingPlanet>Ironhold,Ironhold,Ironhold,Ironhold,Ironhold,Ironhold,Ironhold,Sudeten,Sudeten</startingPlanet>
+		<startingPlanet>Ironhold</startingPlanet>
+		<changePlanet year='3052'>Sudeten</changePlanet>
 		<eraMods>0,0,0,0,0,0,0,0,0</eraMods>
 		<nameGenerator>Clan</nameGenerator>
 		<colorRGB>172,208,115</colorRGB>
@@ -706,7 +716,8 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<shortname>CNC</shortname>
 		<id>25</id>
 		<fullname>Clan Nova Cat</fullname>
-		<startingPlanet>Barcella,Barcella,Barcella,Barcella,Barcella,Barcella,Barcella,Irece,Irece</startingPlanet>
+		<startingPlanet>Barcella</startingPlanet>
+		<changePlanet year='3057'>Irece</changePlanet>
 		<eraMods>0,0,0,0,0,0,0,0,0</eraMods>
 		<nameGenerator>Clan</nameGenerator>
 		<colorRGB>245,255,250</colorRGB>
@@ -718,7 +729,8 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<shortname>CSJ</shortname>
 		<id>24</id>
 		<fullname>Clan Smoke Jaguar</fullname>
-		<startingPlanet>Huntress,Huntress,Huntress,Huntress,Huntress,Huntress,Huntress,Luzerne, </startingPlanet>
+		<startingPlanet>Huntress</startingPlanet>
+		<changePlanet year='3052'>Luzerne</changePlanet>
 		<eraMods>0,0,0,0,0,0,0,0,0</eraMods>
 		<nameGenerator>Clan</nameGenerator>
 		<colorRGB>152,164,129</colorRGB>
@@ -784,7 +796,8 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<shortname>CW</shortname>
 		<id>21</id>
 		<fullname>Clan Wolf</fullname>
-		<startingPlanet>Tranquil,Tranquil,Tranquil,Tranquil,Tranquil,Tranquil,Tranquil,Tamar,Tamar</startingPlanet>
+		<startingPlanet>Tranquil</startingPlanet>
+		<changePlanet year='3052'>Tamar</changePlanet>
 		<eraMods>0,0,0,0,0,0,0,0,0</eraMods>
 		<nameGenerator>Clan</nameGenerator>
 		<colorRGB>207,114,58</colorRGB>
@@ -805,7 +818,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	<faction>
 		<shortname>CWIE</shortname>
 		<fullname>Clan Wolf-in-Exile</fullname>
-		<startingPlanet>Tranquil,Tranquil,Tranquil,Tranquil,Tranquil,Tranquil,Tranquil,Arc-Royal,Arc-Royal</startingPlanet>
+		<startingPlanet>Arc-Royal</startingPlanet>
 		<eraMods>0,0,0,0,0,0,0,0,0</eraMods>
 		<nameGenerator>Clan</nameGenerator>
 		<colorRGB>160,82,45</colorRGB>
@@ -826,7 +839,8 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<shortname>CS</shortname>
 		<id>8</id>
 		<fullname>ComStar</fullname>
-		<startingPlanet>Terra,Terra,Terra,Terra,Terra,Terra,Terra,Tukayyid,Tukayyid</startingPlanet>
+		<startingPlanet>Terra</startingPlanet>
+		<changePlanet year='3059'>Tukayyid</changePlanet>
 		<eraMods>0,0,0,0,0,0,0,0,0</eraMods>
 		<nameGenerator>General</nameGenerator>
 		<colorRGB>255,250,240</colorRGB>
@@ -952,7 +966,8 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<shortname>FRR</shortname>
 		<id>10</id>
 		<fullname>Free Rasalhague Republic</fullname>
-		<startingPlanet>Rasalhague,Rasalhague,Rasalhague,Rasalhague,Rasalhague,Rasalhague,Rasalhague,Orestes,Orestes</startingPlanet>
+		<startingPlanet>Rasalhague</startingPlanet>
+		<changePlanet year='3052'>Orestes</changePlanet>
 		<eraMods>0,0,0,0,0,0,2,1,0</eraMods>
 		<nameGenerator>FRR</nameGenerator>
 		<colorRGB>116,171,206</colorRGB>
@@ -1124,7 +1139,10 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<shortname>MERC</shortname>
 		<id>0</id>
 		<fullname>Mercenary</fullname>
-		<startingPlanet>Galatea,Solaris,Galatea,Galatea,Galatea,Galatea,Outreach,Outreach,Outreach</startingPlanet>
+		<startingPlanet>Solaris</startingPlanet>
+		<changePlanet year='2789'>Galatea</changePlanet>
+		<changePlanet year='3052'>Outreach</changePlanet>
+		<changePlanet year='3067'>Galatea</changePlanet>
 		<eraMods>1,1,1,1,2,3,2,1,0</eraMods>
 		<nameGenerator>General</nameGenerator>
 		<colorRGB>169,169,169</colorRGB>

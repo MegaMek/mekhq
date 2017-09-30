@@ -69,8 +69,8 @@ public class Faction {
     private String[] altNames;
     private Color color;
     private String nameGenerator;
-    private String[] startingPlanet;
-    private int[] startingPlanetAfterYear;
+    private String startingPlanet;
+    private List<factionPlanetChange> changePlanet;
     private int[] eraMods;
     private Integer id;
     private Set<Tag> tags;
@@ -88,6 +88,8 @@ public class Faction {
         nameGenerator = "General";
         color = Color.LIGHT_GRAY;
         altNamesByEra = new String[Era.E_NUM];
+        startingPlanet = "Terra";
+        changePlanet = null;
         Arrays.fill(altNamesByEra, "");
         eraMods = new int[]{0,0,0,0,0,0,0,0,0};
         tags = EnumSet.noneOf(Faction.Tag.class);
@@ -128,18 +130,18 @@ public class Faction {
     }
 
     public String getStartingPlanet(int year) {
-        if (startingPlanet.length == 1) {
-            return startingPlanet[0];
+        if (changePlanet == null) {
+            return startingPlanet;
         } else {
-            for (int i = startingPlanet.length - 1; i != -1; i--) {
-                if (year < startingPlanetAfterYear[i]) {
+            for (int i = changePlanet.size() - 1; i != -1; i--) {
+                if (year < changePlanet.get(i).year) {
                     continue;
                 } else {
-                    return startingPlanet[i];
+                    return changePlanet.get(i).planetName;
                 }
             }
         }
-        return "Terra";
+        return startingPlanet;
     }
 
     public int getEraMod(int year) {
@@ -290,9 +292,6 @@ public class Faction {
         
         Faction retVal = new Faction();
         NodeList nl = wn.getChildNodes();
-        
-        List<String> planetName = new ArrayList<String>();
-        List<Integer> planetYear = new ArrayList<Integer>();
 
         for (int x=0; x<nl.getLength(); x++) {
             Node wn2 = nl.item(x);
@@ -315,17 +314,14 @@ public class Faction {
                     retVal.tags.remove(Tag.PERIPHERY);
                 }
             } else if (wn2.getNodeName().equalsIgnoreCase("startingPlanet")) {
-                if (wn2.getAttributes().getNamedItem("year") == null) {
-                    if (!planetName.isEmpty()) {
-                        MekHQ.getLogger().log(Faction.class, METHOD_NAME, LogLevel.WARNING,
-                                retVal.fullname + " faction has more than one default starting planet");
-                    }
-                    planetName.add(wn2.getTextContent());
-                    planetYear.add(0);
-                } else {
-                    planetName.add(wn2.getTextContent());
-                    planetYear.add(Integer.parseInt(wn2.getAttributes().getNamedItem("year").getTextContent()));
+                retVal.startingPlanet = wn2.getTextContent();
+            } else if (wn2.getNodeName().equalsIgnoreCase("changePlanet")) {
+                if (retVal.changePlanet == null) {
+                    retVal.changePlanet = new ArrayList<factionPlanetChange>();
                 }
+                factionPlanetChange pChange = retVal.new factionPlanetChange(Integer.parseInt(wn2.getAttributes().getNamedItem("year").getTextContent()),
+                        wn2.getTextContent());
+                retVal.changePlanet.add(pChange);
             } else if (wn2.getNodeName().equalsIgnoreCase("altNamesByEra")) {
                 retVal.altNamesByEra = wn2.getTextContent().split(",", -2);
             } else if (wn2.getNodeName().equalsIgnoreCase("altNames")) {
@@ -363,9 +359,6 @@ public class Faction {
             MekHQ.getLogger().log(Faction.class, METHOD_NAME, LogLevel.WARNING,
                     retVal.fullname + " faction did not have a long enough eraMods vector"); //$NON-NLS-1$
         }
-        
-        retVal.startingPlanet = planetName.toArray(new String[planetName.size()]);
-        retVal.startingPlanetAfterYear = planetYear.stream().mapToInt(i -> i).toArray();
 
         return retVal;
     }
@@ -479,5 +472,15 @@ public class Faction {
         GENERATED,
         /** Faction is hidden from view */
         HIDDEN
+    }
+    
+    class factionPlanetChange {
+        int year;
+        String planetName;
+        
+        public factionPlanetChange(int year, String planetName) {
+            this.year = year;
+            this.planetName = planetName;
+        }
     }
 }
