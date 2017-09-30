@@ -112,7 +112,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<id>2</id>
 		<fullname>Draconis Combine</fullname>
 		<startingPlanet>New Samarkand</startingPlanet>
-		<startingPlanet year='2619'>Luthien</startingPlanet>>
+		<changePlanet year='2619'>Luthien</startingPlanet>>
 		<eraMods>0,0,0,1,2,2,1,0,0</eraMods>
 		<nameGenerator>DC</nameGenerator>
 		<colorRGB>234,45,46</colorRGB>
@@ -617,7 +617,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<fullname>Clan Diamond Shark</fullname>
 		<altNamesByEra>, , ,Clan Sea Fox,Clan Sea Fox, , , , </altNamesByEra>
 		<startingPlanet>Babylon,Babylon,Babylon,Babylon,Babylon,Babylon,Babylon,Babylon,Twycross</startingPlanet>
-				<eraMods>0,0,0,0,0,0,0,0,0</eraMods>
+		<eraMods>0,0,0,0,0,0,0,0,0</eraMods>
 		<nameGenerator>Clan</nameGenerator>
 		<colorRGB>0,255,255</colorRGB>
 		<tags>clan</tags>
@@ -729,7 +729,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	<faction>
 		<shortname>CSR</shortname>
 		<fullname>Clan Snow Raven</fullname>
-		<startingPlanet>Circe,Circe,Circe,Circe,Circe,Circe,Circe,Circe,Circe</startingPlanet>
+		<startingPlanet>Circe</startingPlanet>
 		<eraMods>0,0,0,0,0,0,0,0,0</eraMods>
 		<nameGenerator>Clan</nameGenerator>
 		<colorRGB>135,206,235</colorRGB>
@@ -741,7 +741,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	<faction>
 		<shortname>CSA</shortname>
 		<fullname>Clan Star Adder</fullname>
-		<startingPlanet>Sheridan (Clan),Sheridan (Clan),Sheridan (Clan),Sheridan (Clan),Sheridan (Clan),Sheridan (Clan),Sheridan (Clan),Sheridan (Clan),Sheridan (Clan)</startingPlanet>
+		<startingPlanet>Sheridan (Clan)</startingPlanet>
 		<eraMods>0,0,0,0,0,0,0,0,0</eraMods>
 		<nameGenerator>Clan</nameGenerator>
 		<colorRGB>218,165,32</colorRGB>
@@ -752,7 +752,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<shortname>CSV</shortname>
 		<id>27</id>
 		<fullname>Clan Steel Viper</fullname>
-		<startingPlanet>Homer,Homer,Homer,Homer,Homer,Homer,Homer,Homer,Homer</startingPlanet>
+		<startingPlanet>Homer</startingPlanet>
 		<eraMods>0,0,0,0,0,0,0,0,0</eraMods>
 		<nameGenerator>Clan</nameGenerator>
 		<colorRGB>127,255,0</colorRGB>
@@ -763,7 +763,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	<faction>
 		<shortname>CSL</shortname>
 		<fullname>Clan Stone Lion</fullname>
-		<startingPlanet>, , , , , , , ,Tokasha</startingPlanet>
+		<startingPlanet>Tokasha</startingPlanet>
 		<eraMods>0,0,0,0,0,0,0,0,0</eraMods>
 		<nameGenerator>Clan</nameGenerator>
 		<colorRGB>241,168,110</colorRGB>
@@ -795,7 +795,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	<faction>
 		<shortname>CWE</shortname>
 		<fullname>Wolf Empire</fullname>
-		<startingPlanet> , , , , , , , ,Gienah</startingPlanet>
+		<startingPlanet>Gienah</startingPlanet>
 		<eraMods>0,0,0,0,0,0,0,0,0</eraMods>
 		<nameGenerator>Clan</nameGenerator>
 		<colorRGB>207,114,58</colorRGB>
@@ -836,7 +836,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	<faction>
 		<shortname>DA</shortname>
 		<fullname>Duchy of Andurien</fullname>
-		<startingPlanet>Andurien,Andurien,Andurien,Andurien,Andurien,Andurien,Andurien,Andurien,Andurien,</startingPlanet>
+		<startingPlanet>Andurien</startingPlanet>
 		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
 		<nameGenerator>FWL</nameGenerator>
 		<colorRGB>148,148,255</colorRGB>
@@ -846,7 +846,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	<faction>
 		<shortname>DGM</shortname>
 		<fullname>Duchy of Graham-Marik</fullname>
-		<startingPlanet>Loyalty,Loyalty,Loyalty,Loyalty,Loyalty,Loyalty,Loyalty,Loyalty,Loyalty,</startingPlanet>
+		<startingPlanet>Loyalty</startingPlanet>
 		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
 		<nameGenerator>FWL</nameGenerator>
 		<colorRGB>143,190,192</colorRGB>
@@ -857,7 +857,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	<faction>
 		<shortname>DO</shortname>
 		<fullname>Duchy of Oriente</fullname>
-		<startingPlanet>Oriente,Oriente,Oriente,Oriente,Oriente,Oriente,Oriente,Oriente,Oriente,</startingPlanet>
+		<startingPlanet>Oriente</startingPlanet>
 		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
 		<nameGenerator>FWL</nameGenerator>
 		<colorRGB>163,112,120</colorRGB>
@@ -868,7 +868,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	<faction>
 		<shortname>DoO</shortname>
 		<fullname>Duchy of Orloff</fullname>
-		<startingPlanet>Vanra,Vanra,Vanra,Vanra,Vanra,Vanra,Vanra,Vanra,Vanra,</startingPlanet>
+		<startingPlanet>Vanra</startingPlanet>
 		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
 		<nameGenerator>FWL</nameGenerator>
 		<colorRGB>164,94,126</colorRGB>
@@ -879,7 +879,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	<faction>
 		<shortname>DS</shortname>
 		<fullname>Duchy of Small</fullname>
-		<startingPlanet>Small World,Small World,Small World,Small World,Small World,Small World,Small World,Small World,Small World,</startingPlanet>
+		<startingPlanet>Small World</startingPlanet>
 		<eraMods>1,0,0,1,2,3,2,1,0</eraMods>
 		<nameGenerator>CC</nameGenerator>
 		<colorRGB>107,142,35</colorRGB>
@@ -890,7 +890,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	<faction>
 		<shortname>DTA</shortname>
 		<fullname>Duchy of Tamarind-Abbey</fullname>
-		<startingPlanet>Tamarind,Tamarind,Tamarind,Tamarind,Tamarind,Tamarind,Tamarind,Tamarind,Tamarind,</startingPlanet>
+		<startingPlanet>Tamarind</startingPlanet>
 		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
 		<nameGenerator>FWL</nameGenerator>
 		<colorRGB>99,94,165</colorRGB>
@@ -901,7 +901,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<faction>
 		<shortname>DT</shortname>
 		<fullname>Duchy of Tamarind</fullname>
-		<startingPlanet>Tamarind,Tamarind,Tamarind,Tamarind,Tamarind,Tamarind,Tamarind,Tamarind,Tamarind,</startingPlanet>
+		<startingPlanet>Tamarind</startingPlanet>
 		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
 		<nameGenerator>FWL</nameGenerator>
 		<colorRGB>158,60,147</colorRGB>
@@ -912,7 +912,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	<faction>
 		<shortname>EF</shortname>
 		<fullname>Elysian Fields</fullname>
-		<startingPlanet>Nyserta,Nyserta,Nyserta,Nyserta,Nyserta,Nyserta,Nyserta,Nyserta,Nyserta,</startingPlanet>
+		<startingPlanet>Nyserta</startingPlanet>
 		<eraMods>1,1,1,1,2,3,2,2,1</eraMods>
 		<nameGenerator>General</nameGenerator>
 		<colorRGB>255,0,255</colorRGB>
@@ -921,7 +921,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	<faction>
 		<shortname>CEI</shortname>
 		<fullname>Escorpion Imperio</fullname>
-		<startingPlanet>Granda,Granda,Granda,Granda,Granda,Granda,Granda,Granda,Granda,</startingPlanet>
+		<startingPlanet>Granda</startingPlanet>
 		<eraMods>1,1,1,1,2,3,2,2,1</eraMods>
 		<nameGenerator>General</nameGenerator>
 		<colorRGB>238,232,170</colorRGB>
@@ -932,7 +932,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<shortname>FC</shortname>
 		<id>6</id>
 		<fullname>Federated Commonwealth</fullname>
-		<startingPlanet>New Avalon,New Avalon,New Avalon,New Avalon,New Avalon,New Avalon,New Avalon,New Avalon,New Avalon</startingPlanet>
+		<startingPlanet>New Avalon</startingPlanet>
 		<eraMods>0,0,0,1,2,2,1,0,0</eraMods>
 		<nameGenerator>General</nameGenerator>
 		<colorRGB>248,212,44</colorRGB>
@@ -941,7 +941,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	<faction>
 		<shortname>FVC</shortname>
 		<fullname>Filtvelt Coalition</fullname>
-		<startingPlanet>Filtvelt,Filtvelt,Filtvelt,Filtvelt,Filtvelt,Filtvelt,Filtvelt,Filtvelt,Filtvelt,</startingPlanet>
+		<startingPlanet>Filtvelt</startingPlanet>
 		<eraMods>0,0,0,1,2,2,1,0,0</eraMods>
 		<nameGenerator>FS</nameGenerator>
 		<colorRGB>255,228,181</colorRGB>
@@ -963,7 +963,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	<faction>
 		<shortname>FWLR</shortname>
 		<fullname>Free Worlds League Rebels</fullname>
-		<startingPlanet>New Delos,New Delos,New Delos,New Delos,New Delos,New Delos,New Delos,New Delos,New Delos</startingPlanet>
+		<startingPlanet>New Delos</startingPlanet>
 		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
 		<nameGenerator>FWL</nameGenerator>
 		<colorRGB>68,212,228</colorRGB>
@@ -972,7 +972,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	<faction>
 		<shortname>FR</shortname>
 		<fullname>Fronc Reaches</fullname>
-		<startingPlanet>Fronc,Fronc,Fronc,Fronc,Fronc,Fronc,Fronc,Fronc,Fronc,</startingPlanet>
+		<startingPlanet>Fronc</startingPlanet>
 		<eraMods>1,1,1,1,2,3,2,2,1</eraMods>
 		<nameGenerator>General</nameGenerator>
 		<colorRGB>128,169,127</colorRGB>
@@ -982,7 +982,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	<faction>
 		<shortname>GV</shortname>
 		<fullname>Greater Valkyrate</fullname>
-		<startingPlanet>Gotterdammerung,Gotterdammerung,Gotterdammerung,Gotterdammerung,Gotterdammerung,Gotterdammerung,Gotterdammerung,Gotterdammerung,Gotterdammerung,</startingPlanet>
+		<startingPlanet>Gotterdammerung</startingPlanet>
 		<eraMods>1,1,1,1,2,3,2,2,1</eraMods>
 		<nameGenerator>General</nameGenerator>
 		<colorRGB>255,105,180</colorRGB>
@@ -993,7 +993,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	<faction>
 		<shortname>HL</shortname>
 		<fullname>Hanseatic League</fullname>
-		<startingPlanet>,,,,Bremen,Bremen,Bremen,Bremen,Bremen</startingPlanet>
+		<startingPlanet>Bremen</startingPlanet>
 		<eraMods>1,1,1,1,2,3,2,2,1</eraMods>
 		<nameGenerator>General</nameGenerator>
 		<colorRGB>219,112,147</colorRGB>
@@ -1003,7 +1003,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	<faction>
 		<shortname>IP</shortname>
 		<fullname>Illyrian Palatinate</fullname>
-		<startingPlanet>Illyria,Illyria,Illyria,Illyria,Illyria,Illyria,Illyria,Illyria,Illyria</startingPlanet>
+		<startingPlanet>Illyria</startingPlanet>
 		<eraMods>1,1,1,1,2,3,2,2,1</eraMods>
 		<nameGenerator>General</nameGenerator>
 		<colorRGB>0,255,255</colorRGB>
@@ -1032,7 +1032,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	<faction>
 		<shortname>JF</shortname>
 		<fullname>Jarnfolk</fullname>
-		<startingPlanet>Trondheim,Trondheim,Trondheim,Trondheim,Trondheim,Trondheim,Trondheim,Trondheim,Trondheim</startingPlanet>
+		<startingPlanet>Trondheim</startingPlanet>
 		<eraMods>1,1,1,1,2,3,2,2,1</eraMods>
 		<nameGenerator>FRR</nameGenerator>
 		<colorRGB>153,50,204</colorRGB>
@@ -1069,7 +1069,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	<faction>
 		<shortname>LL</shortname>
 		<fullname>Lothian League</fullname>
-		<startingPlanet>,,Lothario,Lothario,Lothario,Lothario,Lothario,,</startingPlanet>
+		<startingPlanet>Lothario</startingPlanet>
 		<eraMods>1,1,1,1,2,3,2,2,1</eraMods>
 		<nameGenerator>General</nameGenerator>
 		<colorRGB>255,140,0</colorRGB>
@@ -1079,7 +1079,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	<faction>
 		<shortname>MC</shortname>
 		<fullname>Malagrotta Cooperative</fullname>
-		<startingPlanet>,,,,,,,Malagrotta,Malagrotta</startingPlanet>
+		<startingPlanet>Malagrotta</startingPlanet>
 		<eraMods>0,0,0,1,2,2,1,0,0</eraMods>
 		<nameGenerator>FS</nameGenerator>
 		<colorRGB>218,112,214</colorRGB>
@@ -1091,7 +1091,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<shortname>MH</shortname>
 		<id>15</id>
 		<fullname>Marian Hegemony</fullname>
-		<startingPlanet>Alphard (Periphery),Alphard (Periphery),Alphard (Periphery),Alphard (Periphery),Alphard (Periphery),Alphard (Periphery),Alphard (Periphery),Alphard (Periphery),Alphard (Periphery)</startingPlanet>
+		<startingPlanet>Alphard (Periphery)</startingPlanet>
 		<eraMods>1,1,1,1,2,3,2,2,1</eraMods>
 		<nameGenerator>General</nameGenerator>
 		<colorRGB>236,136,65</colorRGB>
@@ -1101,7 +1101,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	<faction>
 		<shortname>MCM</shortname>
 		<fullname>Marik Commonwealth</fullname>
-		<startingPlanet>,,,,,,,Marik,Marik</startingPlanet>
+		<startingPlanet>Marik</startingPlanet>
 		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
 		<nameGenerator>FWL</nameGenerator>
 		<colorRGB>165,94,160</colorRGB>
@@ -1112,7 +1112,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	<faction>
 		<shortname>MSC</shortname>
 		<fullname>Marik-Stewart Commonwealth</fullname>
-		<startingPlanet>,,,,,,,Marik,Marik</startingPlanet>
+		<startingPlanet>Marik</startingPlanet>
 		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
 		<nameGenerator>FWL</nameGenerator>
 		<colorRGB>117,65,113</colorRGB>
@@ -1133,7 +1133,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	<faction>
 		<shortname>MV</shortname>
 		<fullname>Morgraine's Valkyrate</fullname>
-		<startingPlanet>,,,,,Apollo,Apollo,,</startingPlanet>
+		<startingPlanet>Apollo</startingPlanet>
 		<eraMods>1,1,1,1,2,3,2,2,1</eraMods>
 		<nameGenerator>General</nameGenerator>
 		<colorRGB>255,105,180</colorRGB>
@@ -1144,7 +1144,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	<faction>
 		<shortname>BoS</shortname>
 		<fullname>Barony of Strang</fullname>
-		<startingPlanet>,,,,,Von Strang's World,Von Strang's World,Von Strang's World,Von Strang's World</startingPlanet>
+		<startingPlanet>Von Strang's World</startingPlanet>
 		<eraMods>1,1,1,1,2,3,2,2,1</eraMods>
 		<nameGenerator>General</nameGenerator>
 		<colorRGB>165,94,160</colorRGB>
@@ -1153,7 +1153,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	<faction>
 		<shortname>MA</shortname>
 		<fullname>Mosiro Archipelago</fullname>
-		<startingPlanet>,,,,,,,Mosiro,Mosiro</startingPlanet>
+		<startingPlanet>Mosiro</startingPlanet>
 		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
 		<nameGenerator>FWL</nameGenerator>
 		<colorRGB>165,94,160</colorRGB>
@@ -1164,7 +1164,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	<faction>
 		<shortname>NCR</shortname>
 		<fullname>New Colony Region</fullname>
-		<startingPlanet>,,,,,,Fronc,Fronc,Fronc</startingPlanet>
+		<startingPlanet>Fronc</startingPlanet>
 		<eraMods>1,1,1,1,2,3,2,1,0</eraMods>
 		<nameGenerator>General</nameGenerator>
 		<colorRGB>32,178,170</colorRGB>
@@ -1175,7 +1175,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	<faction>
 		<shortname>NC</shortname>
 		<fullname>Nueva Castile</fullname>
-		<startingPlanet>Asturias,Asturias,Asturias,Asturias,Asturias,Asturias,Asturias,Asturias,Asturias</startingPlanet>
+		<startingPlanet>Asturias</startingPlanet>
 		<eraMods>1,1,1,1,2,3,2,2,1</eraMods>
 		<nameGenerator>General</nameGenerator>
 		<colorRGB>0,255,0</colorRGB>
@@ -1186,7 +1186,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	<faction>
 		<shortname>OC</shortname>
 		<fullname>Oberon Confederation</fullname>
-		<startingPlanet>,,,,Oberon VI,Oberon VI,,,</startingPlanet>
+		<startingPlanet>Oberon VI</startingPlanet>
 		<eraMods>1,1,1,1,2,3,2,2,1</eraMods>
 		<nameGenerator>General</nameGenerator>
 		<colorRGB>50,205,50</colorRGB>
@@ -1197,7 +1197,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	<faction>
 		<shortname>NOC</shortname>
 		<fullname>New Oberon Confederation</fullname>
-		<startingPlanet>,,,,,,,,Oberon VI</startingPlanet>
+		<startingPlanet>Oberon VI</startingPlanet>
 		<nameGenerator>General</nameGenerator>
 		<colorRGB>231,178,50</colorRGB>
 		<tags>periphery</tags>
@@ -1206,7 +1206,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	<faction>
 		<shortname>OZP</shortname>
 		<fullname>Ohrenson-Zion Province</fullname>
-		<startingPlanet>,,,,,,,Ohrenson,Ohrenson</startingPlanet>
+		<startingPlanet>Ohrenson</startingPlanet>
 		<eraMods>1,0,0,1,2,3,2,1,0</eraMods>
 		<nameGenerator>CC</nameGenerator>
 		<colorRGB>160,165,94</colorRGB>
@@ -1217,7 +1217,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	<faction>
 		<shortname>OP</shortname>
 		<fullname>Oriente Protectorate</fullname>
-		<startingPlanet>,,,,,,,Oriente,Oriente</startingPlanet>
+		<startingPlanet>Oriente</startingPlanet>
 		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
 		<nameGenerator>FWL</nameGenerator>
 		<colorRGB>163,112,120</colorRGB>
@@ -1228,7 +1228,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	<faction>
 		<shortname>PG</shortname>
 		<fullname>Principality of Gibson</fullname>
-		<startingPlanet>,,,,,,,Gibson,Gibson</startingPlanet>
+		<startingPlanet>Gibson</startingPlanet>
 		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
 		<nameGenerator>FWL</nameGenerator>
 		<colorRGB>250,250,250</colorRGB>
@@ -1238,7 +1238,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	<faction>
 		<shortname>PR</shortname>
 		<fullname>Principality of Regulus</fullname>
-		<startingPlanet>,,,,,,,Regulas,Regulas</startingPlanet>
+		<startingPlanet>Regulas</startingPlanet>
 		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
 		<nameGenerator>FWL</nameGenerator>
 		<colorRGB>192,143,189</colorRGB>
@@ -1249,7 +1249,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	<faction>
 		<shortname>RD</shortname>
 		<fullname>Rasalhague Dominion</fullname>
-		<startingPlanet>,,,,,,,Rasalhague,Rasalhague</startingPlanet>
+		<startingPlanet>Rasalhague</startingPlanet>
 		<eraMods>0,0,0,0,0,0,2,1,0</eraMods>
 		<nameGenerator>FRR</nameGenerator>
 		<colorRGB>188,222,235</colorRGB>
@@ -1259,7 +1259,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	<faction>
 		<shortname>RA</shortname>
 		<fullname>Raven Alliance</fullname>
-		<startingPlanet>,,,,,,,Alpheratz,Alpheratz</startingPlanet>
+		<startingPlanet>Alpheratz</startingPlanet>
 		<eraMods>1,1,1,1,2,3,2,1,0</eraMods>
 		<nameGenerator>General</nameGenerator>
 		<colorRGB>25,120,110</colorRGB>
@@ -1269,7 +1269,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	<faction>
 		<shortname>RF</shortname>
 		<fullname>Regulan Fiefs</fullname>
-		<startingPlanet>,,,,,,,Regulas,Regulas</startingPlanet>
+		<startingPlanet>Regulas</startingPlanet>
 		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
 		<nameGenerator>FWL</nameGenerator>
 		<colorRGB>255,51,51</colorRGB>
@@ -1279,7 +1279,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	<faction>
 		<shortname>RFS</shortname>
 		<fullname>Regulan Free States</fullname>
-		<startingPlanet>,,,,,,,Regulas,Regulas</startingPlanet>
+		<startingPlanet>Regulas</startingPlanet>
 		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
 		<nameGenerator>FWL</nameGenerator>
 		<colorRGB>165,94,160</colorRGB>
@@ -1291,7 +1291,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<shortname>ROS</shortname>
 		<id>7</id>
 		<fullname>Republic of the Sphere</fullname>
-		<startingPlanet>,,,,,,,,Terra</startingPlanet>
+		<startingPlanet>Terra</startingPlanet>
 		<eraMods>0,0,0,0,0,0,0,0,0</eraMods>
 		<nameGenerator>General</nameGenerator>
 		<colorRGB>207,119,57</colorRGB>
@@ -1302,7 +1302,6 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<shortname>Stone</shortname>
 		<fullname>Stone's Coalition</fullname>
 		<altNames>Coalition Forces</altNames>
-		<startingPlanet>, , , , , , , , </startingPlanet>
 		<eraMods>0,0,0,0,0,0,0,0,0</eraMods>
 		<nameGenerator>General</nameGenerator>
 		<colorRGB>207,119,57</colorRGB>
@@ -1321,7 +1320,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	<faction>
 		<shortname>RIM</shortname>
 		<fullname>Rim Collection</fullname>
-		<startingPlanet>Gillfillan’s Gold,Gillfillan’s Gold,Gillfillan’s Gold,Gillfillan’s Gold,Gillfillan’s Gold,Gillfillan’s Gold,Gillfillan’s Gold,Gillfillan’s Gold,Gillfillan’s Gold</startingPlanet>
+		<startingPlanet>Gillfillan’s Gold</startingPlanet>
 		<eraMods>1,1,1,1,2,3,2,2,1</eraMods>
 		<nameGenerator>General</nameGenerator>
 		<colorRGB>95,158,160</colorRGB>
@@ -1331,7 +1330,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	<faction>
 		<shortname>RCM</shortname>
 		<fullname>Rim Commonality</fullname>
-		<startingPlanet>,,,,,,,Lesnovo,Lesnovo</startingPlanet>
+		<startingPlanet>Lesnovo</startingPlanet>
 		<eraMods>1,1,1,1,2,3,2,2,1</eraMods>
 		<nameGenerator>General</nameGenerator>
 		<colorRGB>95,158,160</colorRGB>
@@ -1342,7 +1341,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	<faction>
 		<shortname>RT</shortname>
 		<fullname>Rim Territories</fullname>
-		<startingPlanet>,,,,,,,Pain,Pain</startingPlanet>
+		<startingPlanet>Pain</startingPlanet>
 		<eraMods>1,1,1,1,2,3,2,2,1</eraMods>
 		<nameGenerator>General</nameGenerator>
 		<colorRGB>175,238,238</colorRGB>
@@ -1352,7 +1351,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	<faction>
 		<shortname>ST</shortname>
 		<fullname>Saiph Triumvirate</fullname>
-		<startingPlanet>,,,,,,Saiph,Saiph,Saiph</startingPlanet>
+		<startingPlanet>Saiph</startingPlanet>
 		<eraMods>0,0,0,0,0,0,0,0,0</eraMods>
 		<nameGenerator>CC</nameGenerator>
 		<colorRGB>128,128,0</colorRGB>
@@ -1363,7 +1362,6 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	<faction>
 		<shortname>SP</shortname>
 		<fullname>Sarna Protectorate</fullname>
-		<startingPlanet>,,,,,,,,</startingPlanet>
 		<eraMods>1,0,0,1,2,3,2,1,0</eraMods>
 		<nameGenerator>CC</nameGenerator>
 		<colorRGB>184,134,11</colorRGB>
@@ -1380,7 +1378,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	<faction>
 		<shortname>SHC</shortname>
 		<fullname>Silver Hawk Coalition</fullname>
-		<startingPlanet>,,,,,,Amity,,</startingPlanet>
+		<startingPlanet>Amity</startingPlanet>
 		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
 		<nameGenerator>FWL</nameGenerator>
 		<colorRGB>255,0,127</colorRGB>
@@ -1391,7 +1389,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<shortname>SIC</shortname>
 		<id>11</id>
 		<fullname>St. Ives Compact</fullname>
-		<startingPlanet>St. Ives,St. Ives,St. Ives,St. Ives,St. Ives,St. Ives,St. Ives,St. Ives,St. Ives</startingPlanet>
+		<startingPlanet>St. Ives</startingPlanet>
 		<eraMods>1,0,0,1,2,3,2,1,0</eraMods>
 		<nameGenerator>CC</nameGenerator>
 		<colorRGB>188,223,186</colorRGB>
@@ -1402,7 +1400,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	<faction>
 		<shortname>SL</shortname>
 		<fullname>Star League</fullname>
-		<startingPlanet>Terra,Terra,Terra, , , , , ,</startingPlanet>
+		<startingPlanet>Terra</startingPlanet>
 		<eraMods>-1,-1,-1,0,0,0,0,0,0</eraMods>
 		<nameGenerator>General</nameGenerator>
 		<colorRGB>176,196,222</colorRGB>
@@ -1411,7 +1409,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	<faction>
 		<shortname>SLIE</shortname>
 		<fullname>Star League-in-Exile</fullname>
-		<startingPlanet>,,Strana Mechty,Strana Mechty,,,,,</startingPlanet>
+		<startingPlanet>Strana Mechty</startingPlanet>
 		<eraMods>-1,-1,-1,0,0,0,0,0,0</eraMods>
 		<nameGenerator>General</nameGenerator>
 		<colorRGB>176,196,222</colorRGB>
@@ -1422,7 +1420,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	<faction>
 		<shortname>SC</shortname>
 		<fullname>Stewart Commonality</fullname>
-		<startingPlanet> , , , , , , ,Stewart,Stewart</startingPlanet>
+		<startingPlanet>Stewart</startingPlanet>
 		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
 		<nameGenerator>FWL</nameGenerator>
 		<colorRGB>76,0,153</colorRGB>
@@ -1431,7 +1429,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	<faction>
 		<shortname>SKC</shortname>
 		<fullname>Styk Commonality</fullname>
-		<startingPlanet>,,,,,,Styk,,</startingPlanet>
+		<startingPlanet>Styk</startingPlanet>
 		<eraMods>1,0,0,1,2,3,2,1,0</eraMods>
 		<nameGenerator>CC</nameGenerator>
 		<colorRGB>0,139,139</colorRGB>
@@ -1442,7 +1440,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	<faction>
 		<shortname>SKP</shortname>
 		<fullname>Styk Protectorate</fullname>
-		<startingPlanet>,,,,,,,Styk,Styk</startingPlanet>
+		<startingPlanet>Styk</startingPlanet>
 		<eraMods>1,0,0,1,2,3,2,1,0</eraMods>
 		<nameGenerator>CC</nameGenerator>
 		<colorRGB>0,139,139</colorRGB>
@@ -1451,7 +1449,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	<faction>
 		<shortname>TCC</shortname>
 		<fullname>Terracap Confederation</fullname>
-		<startingPlanet>,,,,,,Terra Firma,Terra Firma,Terra Firma</startingPlanet>
+		<startingPlanet>Terra Firma</startingPlanet>
 		<eraMods>1,0,0,1,2,3,2,1,0</eraMods>
 		<nameGenerator>CC</nameGenerator>
 		<colorRGB>233,150,122</colorRGB>
@@ -1462,7 +1460,6 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	<faction>
 		<shortname>TB</shortname>
 		<fullname>The Barrens</fullname>
-		<startingPlanet>,,,,,,,,</startingPlanet>
 		<eraMods>1,1,1,1,2,3,2,2,1</eraMods>
 		<nameGenerator>General</nameGenerator>
 		<colorRGB>255,255,224</colorRGB>
@@ -1472,7 +1469,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	<faction>
 		<shortname>TP</shortname>
 		<fullname>The Protectorate</fullname>
-		<startingPlanet>,,,,,,,New Delos,New Delos</startingPlanet>
+		<startingPlanet>New Delos</startingPlanet>
 		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
 		<nameGenerator>FWL</nameGenerator>
 		<colorRGB>255,51,51</colorRGB>
@@ -1482,7 +1479,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	<faction>
 		<shortname>TFR</shortname>
 		<fullname>Tikonov Free Republic</fullname>
-		<startingPlanet>Tikonov,Tikonov,Tikonov,Tikonov,Tikonov,Tikonov,Tikonov,Tikonov,Tikonov</startingPlanet>
+		<startingPlanet>Tikonov</startingPlanet>
 		<eraMods>1,1,1,1,2,3,2,2,1</eraMods>
 		<nameGenerator>CC</nameGenerator>
 		<colorRGB>255,160,122</colorRGB>
@@ -1493,7 +1490,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	<faction>
 		<shortname>TD</shortname>
 		<fullname>Tortuga Dominions</fullname>
-		<startingPlanet>,Tortuga Prime,Tortuga Prime,Tortuga Prime,Tortuga Prime,Tortuga Prime,Tortuga Prime,Tortuga Prime,Tortuga Prime</startingPlanet>
+		<startingPlanet>,Tortuga Prime</startingPlanet>
 		<eraMods>1,1,1,1,2,3,2,2,1</eraMods>
 		<nameGenerator>General</nameGenerator>
 		<colorRGB>34,139,34</colorRGB>
@@ -1511,7 +1508,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<shortname>WOB</shortname>
 		<id>9</id>
 		<fullname>Word of Blake</fullname>
-		<startingPlanet>, , , , , , ,Terra,Terra</startingPlanet>
+		<startingPlanet>Terra</startingPlanet>
 		<eraMods>0,0,0,0,0,0,0,1,1</eraMods>
 		<nameGenerator>General</nameGenerator>
 		<colorRGB>205,192,176</colorRGB>
@@ -1521,7 +1518,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	<faction>
 		<shortname>CLAN</shortname>
 		<fullname>All Clans</fullname>
-		<startingPlanet> , ,Strana Mechty,Strana Mechty,Strana Mechty,Strana Mechty,Strana Mechty,Strana Mechty,Strana Mechty</startingPlanet>
+		<startingPlanet>Strana Mechty</startingPlanet>
 		<nameGenerator>Clan</nameGenerator>
 		<colorRGB>139,69,19</colorRGB>
 		<tags>clan</tags>
@@ -1530,21 +1527,20 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	<faction>
 		<shortname>NIOPS</shortname>
 		<fullname>Niops Association</fullname>
-		<startingPlanet> ,Niops VII,Niops VII,Niops VII,Niops VII,Niops VII,Niops VII,Niops VII,Niops VII</startingPlanet>
+		<startingPlanet>Niops VII</startingPlanet>
 		<colorRGB>205,173,0</colorRGB>
 		<tags>periphery,minor</tags>
 	</faction>
 	<faction>
 		<shortname>NONE</shortname>
 		<fullname>Unexplored</fullname>
-		<startingPlanet> , , , , , , , , </startingPlanet>
 		<colorRGB>0,0,0</colorRGB>
 		<tags>periphery,abandoned,inactive,chaos</tags>
 	</faction>
 	<faction>
 		<shortname>FOR</shortname>
 		<fullname>Fiefdom Randis</fullname>
-		<startingPlanet> , , , , ,Randis IV,Randis IV,Randis IV,Randis IV</startingPlanet>
+		<startingPlanet>Randis IV</startingPlanet>
 		<nameGenerator>General</nameGenerator>
 		<colorRGB>30,144,255</colorRGB>
 		<tags>periphery</tags>
@@ -1552,7 +1548,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	<faction>
 		<shortname>MM</shortname>
 		<fullname>Mica Majority</fullname>
-		<startingPlanet>Mica II,Mica II,Mica II,Mica II,Mica II,Mica II,Mica II,Mica II,Mica II</startingPlanet>
+		<startingPlanet>Mica II</startingPlanet>
 		<nameGenerator>General</nameGenerator>
 		<colorRGB>240,230,140</colorRGB>
 		<tags>periphery</tags>
@@ -1561,7 +1557,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<shortname>SA</shortname>
 		<fullname>Senatorial Alliance</fullname>
 		<altNames>Senate Alliance</altNames>
-		<startingPlanet>, , , , , , , ,Augustine</startingPlanet>
+		<startingPlanet>Augustine</startingPlanet>
 		<eraMods>0,0,0,0,0,0,0,0,0</eraMods>
 		<nameGenerator>General</nameGenerator>
 		<colorRGB>255,102,153</colorRGB>
@@ -1572,7 +1568,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	<faction>
 		<shortname>AA</shortname>
 		<fullname>Augustine Alliance</fullname>
-		<startingPlanet>, , , , , , , ,Augustine</startingPlanet>
+		<startingPlanet>Augustine</startingPlanet>
 		<eraMods>0,0,0,0,0,0,0,0,0</eraMods>
 		<nameGenerator>General</nameGenerator>
 		<colorRGB>255,102,153</colorRGB>
@@ -1581,7 +1577,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	<faction>
 		<shortname>TTU</shortname>
 		<fullname>Tall Trees Union</fullname>
-		<startingPlanet>, , , , , , , ,Tall Trees</startingPlanet>
+		<startingPlanet>Tall Trees</startingPlanet>
 		<eraMods>1,0,0,1,2,3,2,1,0</eraMods>
 		<nameGenerator>CC</nameGenerator>
 		<colorRGB>153,153,51</colorRGB>
@@ -1590,7 +1586,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	<faction>
 		<shortname>ShA</shortname>
 		<fullname>Shiloh Alliance</fullname>
-		<startingPlanet>, , , , , , , ,Shiloh</startingPlanet>
+		<startingPlanet>Shiloh</startingPlanet>
 		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
 		<nameGenerator>FWL</nameGenerator>
 		<colorRGB>97,26,92</colorRGB>
@@ -1599,7 +1595,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	<faction>
 		<shortname>CvW</shortname>
 		<fullname>Covenant Worlds</fullname>
-		<startingPlanet>, , , , , , , ,Bordon</startingPlanet>
+		<startingPlanet>Bordon</startingPlanet>
 		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
 		<nameGenerator>FWL</nameGenerator>
 		<colorRGB>102,51,51</colorRGB>
@@ -1608,7 +1604,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	<faction>
 		<shortname>PC</shortname>
 		<fullname>Protectorate Coalition</fullname>
-		<startingPlanet>, , , , , , , ,Rochelle</startingPlanet>
+		<startingPlanet>Rochelle</startingPlanet>
 		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
 		<nameGenerator>FWL</nameGenerator>
 		<colorRGB>51,51,102</colorRGB>
@@ -1617,7 +1613,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	<faction>
 		<shortname>MiC</shortname>
 		<fullname>Milton Combine</fullname>
-		<startingPlanet>, , , , , , , ,Milton</startingPlanet>
+		<startingPlanet>Milton</startingPlanet>
 		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
 		<nameGenerator>FWL</nameGenerator>
 		<colorRGB>255,0,51</colorRGB>
@@ -1626,7 +1622,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	<faction>
 		<shortname>CP</shortname>
 		<fullname>Clan Protectorate</fullname>
-		<startingPlanet>, , , , , , , ,Marik</startingPlanet>
+		<startingPlanet>Marik</startingPlanet>
 		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
 		<nameGenerator>Clan</nameGenerator>
 		<colorRGB>153,255,51</colorRGB>
@@ -1635,7 +1631,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	<faction>
 		<shortname>RR</shortname>
 		<fullname>Republic Remnant</fullname>
-		<startingPlanet>, , , , , , , ,Callison</startingPlanet>
+		<startingPlanet>Callison</startingPlanet>
 		<eraMods>0,0,0,0,0,0,0,0,0</eraMods>
 		<nameGenerator>General</nameGenerator>
 		<colorRGB>128,40,0</colorRGB>
@@ -1653,7 +1649,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	<faction>
 		<shortname>UC</shortname>
 		<fullname>Umayyad Caliphate</fullname>
-		<startingPlanet>,Granada,Granada,Granada,Granada,Granada,Granada,Granada, </startingPlanet>
+		<startingPlanet>Granada</startingPlanet>
 		<eraMods>1,1,1,1,2,3,2,2,1</eraMods>
 		<nameGenerator>General</nameGenerator>
 		<colorRGB>0,255,0</colorRGB>
@@ -1669,7 +1665,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	<faction>
 		<shortname>RON</shortname>
 		<fullname>Ronin</fullname>
-		<startingPlanet>, , , , , ,Predlitz, , </startingPlanet>
+		<startingPlanet>Predlitz</startingPlanet>
 		<eraMods>0,0,0,1,2,2,1,0,0</eraMods>
 		<nameGenerator>DC</nameGenerator>
 		<colorRGB>234,45,46</colorRGB>
@@ -1678,7 +1674,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	<faction>
 		<shortname>AXP</shortname>
 		<fullname>Axumite Providence</fullname>
-		<startingPlanet>,Thala,Thala,Thala,Thala,Thala,Thala,Thala,Thala</startingPlanet>
+		<startingPlanet>Thala</startingPlanet>
 		<eraMods>1,1,1,1,2,3,2,2,1</eraMods>
 		<nameGenerator>General</nameGenerator>
 		<colorRGB>153,50,204</colorRGB>
@@ -1688,7 +1684,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	<faction>
 		<shortname>CCon</shortname>
 		<fullname>Coreward Confederacy</fullname>
-		<startingPlanet>, RWR Outpost #27,RWR Outpost #27,RWR Outpost #27,RWR Outpost #27,RWR Outpost #27,RWR Outpost #27,RWR Outpost #27,RWR Outpost #27</startingPlanet>
+		<startingPlanet>RWR Outpost #27</startingPlanet>
 		<eraMods>3,3,1,3,3,3,3,3,3</eraMods>
 		<altNamesByEra>Autocracy of New Virginia, Virginian Union, Rim Worlds Republic Outpost #27, , , , , ,</altNamesByEra>
 		<nameGenerator>General</nameGenerator>
@@ -1698,7 +1694,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	<faction>
 		<shortname>GDL</shortname>
 		<fullname>Galatean Defense League</fullname>
-		<startingPlanet>, , , , , , , ,Galatea</startingPlanet>
+		<startingPlanet>Galatea</startingPlanet>
 		<nameGenerator>General</nameGenerator>
 		<colorRGB>102,255,255</colorRGB>
 		<tags>is</tags>
@@ -1706,7 +1702,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	<faction>
       <shortname>GL</shortname>
       <fullname>Galatean League</fullname>
-      <startingPlanet>, , , , , , , ,Galatea</startingPlanet>
+      <startingPlanet>Galatea</startingPlanet>
       <nameGenerator>General</nameGenerator>
       <colorRGB>102,255,255</colorRGB>
 		<tags>is</tags>
@@ -1722,7 +1718,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
    <faction>
       <shortname>NDC</shortname>
       <fullname>New Delphi Compact</fullname>
-      <startingPlanet> , , , New Delphi,New Delphi,New Delphi,New Delphi,New Delphi,New Delphi</startingPlanet>
+      <startingPlanet>New Delphi</startingPlanet>
       <nameGenerator>General</nameGenerator>
       <colorRGB>127,151,139</colorRGB>
 		<tags>periphery</tags>
