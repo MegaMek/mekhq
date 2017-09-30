@@ -634,6 +634,16 @@ public class CampaignGUI extends JPanel {
             }
         });
         menuExport.add(miExportUnitCSV);
+        
+        JMenuItem miExportPlanetsXML = new JMenuItem(
+                resourceMap.getString("miExportPlanetsXML.text"));
+        miExportPlanetsXML.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                miExportPlanetsXMLActionPerformed(evt);
+            }
+        });
+        menuExport.add(miExportPlanetsXML);
 
         JMenuItem miImportOptions = new JMenuItem(
                 resourceMap.getString("miImportOptions.text")); // NOI18N
@@ -676,12 +686,12 @@ public class CampaignGUI extends JPanel {
         // miLoadForces.setEnabled(false);
         menuImport.add(miLoadForces);
         
-        JMenuItem miLoadPlanets = new JMenuItem("Import planets from csv file...");
+        JMenuItem miLoadPlanets = new JMenuItem(
+                resourceMap.getString("miImportPlanets.text"));
         miLoadPlanets.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                Planets.getInstance().importPlanetsFromTSV("data/universe/planets/Systems By Era.tsv");
-                Planets.getInstance().exportPlanets("data/universe/testPlanets.xml");
+                miLoadPlanetsActionPerformed(evt);
             }
         });
         menuImport.add(miLoadPlanets);
@@ -1730,6 +1740,14 @@ public class CampaignGUI extends JPanel {
         }
     }// GEN-LAST:event_miLoadForcesActionPerformed
 
+    private void miLoadPlanetsActionPerformed(java.awt.event.ActionEvent evt) {
+        try {
+            loadPlanetTSVFile();
+        } catch (Exception ex) {
+            MekHQ.getLogger().log(getClass(), "miLoadPlanetsActionPerformed", ex);
+        }
+    }
+    
     private void miImportPersonActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_miImportPersonActionPerformed
         try {
             loadPersonFile();
@@ -1754,6 +1772,14 @@ public class CampaignGUI extends JPanel {
         }
     }// GEN-LAST:event_miExportPersonActionPerformed
 
+    private void miExportPlanetsXMLActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_miExportPersonActionPerformed
+        try {
+            exportPlanets("xml");
+        } catch (Exception ex) {
+            MekHQ.getLogger().log(getClass(), "miImportOptionsActionPerformed(ActionEvent)", ex);
+        }
+    }
+    
     private void miImportOptionsActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_miExportPersonActionPerformed
         try {
             loadOptionsFile();
@@ -1972,6 +1998,91 @@ public class CampaignGUI extends JPanel {
         return getCampaign().getPartsStore().getByNameAndDetails(pnd);
     }
 
+    protected void loadPlanetTSVFile() {
+        JFileChooser loadList = new JFileChooser(".");
+        loadList.setDialogTitle("Load Planets from SUCS format TSV file");
+        
+        loadList.setFileFilter(new FileFilter() {
+            @Override
+            public boolean accept(File dir) {
+                if (dir.isDirectory()) {
+                    return true;
+                }
+                return dir.getName().endsWith(".tsv");
+            }
+
+            @Override
+            public String getDescription() {
+                return "TSV file";
+            }
+        });
+        
+        int returnVal = loadList.showOpenDialog(mainPanel);
+
+        if ((returnVal != JFileChooser.APPROVE_OPTION)
+                || (loadList.getSelectedFile() == null)) {
+            // I want a file, y'know!
+            return;
+        }
+
+        File tsvFile = loadList.getSelectedFile();
+        String report = Planets.getInstance().importPlanetsFromTSV(tsvFile.getAbsolutePath());
+        
+        JOptionPane.showMessageDialog(mainPanel, report);
+    }
+    
+    protected void exportPlanets(String format) {
+        JFileChooser exportPlanets = new JFileChooser(".");
+        exportPlanets.setDialogTitle("Export Current Planet List");
+        exportPlanets.setFileFilter(new FileFilter() {
+            @Override
+            public boolean accept(File dir) {
+                if (dir.isDirectory()) {
+                    return true;
+                }
+                return dir.getName().endsWith(format);
+            }
+
+            @Override
+            public String getDescription() {
+                if(format.equals("xml")) {
+                    return "XML File";
+                } else {
+                    return "File"; // eventually we plan to export to CSV/TSV
+                }
+            }
+        });
+        exportPlanets.setSelectedFile(new File("planets." + format)); //$NON-NLS-1$
+        int returnVal = exportPlanets.showSaveDialog(mainPanel);
+
+        if ((returnVal != JFileChooser.APPROVE_OPTION)
+                || (exportPlanets.getSelectedFile() == null)) {
+            // I want a file, y'know!
+            return;
+        }
+
+        File file = exportPlanets.getSelectedFile();
+        if (file == null) {
+            // I want a file, y'know!
+            return;
+        }
+        String path = file.getPath();
+        if (!path.endsWith(".xml")) {
+            path += ".xml";
+            file = new File(path);
+        }
+
+        // check for existing file and make a back-up if found
+        String path2 = path + "_backup";
+        File backupFile = new File(path2);
+        if (file.exists()) {
+            Utilities.copyfile(file, backupFile);
+        }
+        
+        String report = Planets.getInstance().exportPlanets(path);
+        JOptionPane.showMessageDialog(mainPanel, report);
+    }
+    
     protected void loadListFile(boolean allowNewPilots) throws IOException {
         final String METHOD_NAME = "loadListFile(boolean)";
         

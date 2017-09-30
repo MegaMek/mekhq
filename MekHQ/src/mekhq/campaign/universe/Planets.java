@@ -397,13 +397,33 @@ public class Planets {
      * @param csvPath
      * @return List of planets
      */
-    public List<Planet> loadPlanetsFromCSV(String tsvPath) {
-        final String METHOD_NAME = "loadPlanetsFromCSV()"; //NON-NLS-1$
+    public List<Planet> loadPlanetsFromTSV(String tsvPath) {
+        final String METHOD_NAME = "loadPlanetsFromTSV()"; //NON-NLS-1$
         
         MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO,
-                "Starting load of planetary data from CSV: " + tsvPath); //$NON-NLS-1$
+                "Starting load of planetary data from TSV: " + tsvPath); //$NON-NLS-1$
         
         List<Planet> planets = new ArrayList<>();
+        
+        // this is a dirty dirty hack to give specific dates to "waves" of
+        // Operation Revival and Operation Bulldog, which occurred in 3050 and 3059 respectively
+        // and resulted in a lot of rapid territorial changes
+        Map<Integer, List<DateTime>> yearMonths = new HashMap<>();
+        yearMonths.put(3050, new ArrayList<DateTime>());
+        yearMonths.get(3050).add(new DateTime(3050, 3, 7, 0, 0, 0, 0)); // wave 1
+        yearMonths.get(3050).add(new DateTime(3050, 5, 1, 0, 0, 0, 0)); // wave 2
+        yearMonths.get(3050).add(new DateTime(3050, 6, 1, 0, 0, 0, 0)); // wave 3
+        
+        yearMonths.put(3059, new ArrayList<DateTime>());
+        yearMonths.get(3059).add(new DateTime(3059, 5, 20, 0, 0, 0, 0)); // wave 1
+        yearMonths.get(3059).add(new DateTime(3059, 6, 26, 0, 0, 0, 0)); // wave 2
+        yearMonths.get(3059).add(new DateTime(3059, 8, 13, 0, 0, 0, 0)); // wave 3
+        yearMonths.get(3059).add(new DateTime(3059, 9, 18, 0, 0, 0, 0)); // wave 4
+        
+        // this contains the current indices of the 3050/3059 maps
+        Map<Integer, Integer> yearMonthIndex = new HashMap<>();
+        yearMonthIndex.put(3050, 0);
+        yearMonthIndex.put(3059, 0);
         
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(tsvPath), "UTF-8"));
@@ -420,9 +440,22 @@ public class Planets {
             for(int x = 3; x < yearElements.length; x++) { 
                 // note that there are a couple of instances where years are listed multiple times
                 // "Operation Revival" and "Operation Bulldog"
-                // TODO: Create these as separate dates.
+                // so we employ a dirty hack to get multiple dates within the same year,
+                // since the SUCS data does not contain the actual dates
+                DateTime year;
+                
+                int parsedYear = Integer.parseInt(yearElements[x]);
+                if((parsedYear == 3050) || (parsedYear == 3059)) {
+                    int yearIndex = yearMonthIndex.get(parsedYear);
+                    
+                    // get the datetime of the appropriate operation, then keep track of how many times we've done that
+                    year = yearMonths.get(parsedYear).get(yearMonthIndex.get(parsedYear));
 
-                DateTime year = new DateTime(Integer.parseInt(yearElements[x]), 1, 1, 0, 0, 0, 0);
+                    yearMonthIndex.put(parsedYear, ++yearIndex);
+                } else {
+                    year = new DateTime(Integer.parseInt(yearElements[x]), 1, 1, 0, 0, 0, 0);
+                }
+                
                 years.add(year);
             }
             
@@ -464,7 +497,7 @@ public class Planets {
      * Handles importation of planets from a specifically-formatted tab-separated file to our planet data structure
      * @param tsvPath The path of the file
      */
-    public void importPlanetsFromTSV(String tsvPath) {
+    public String importPlanetsFromTSV(String tsvPath) {
         MekHQ.getLogger().log(getClass(), "importPlanetsFromTSV", LogLevel.INFO, "Import Planets From TSV");
         
         List<Planet> matchedImportPlanets = new ArrayList<>();
@@ -488,6 +521,10 @@ public class Planets {
         }
         
         MekHQ.getLogger().log(getClass(), "importPlanetsFromTSV", LogLevel.INFO, "\r\n" + planetLog.toString());
+        String report = "Planet import: " + matchedImportPlanets.size() + " planets in TSV found in current planet list.\r\n" +
+                unmatchedImportPlanets.size() + " planets in TSV not found in and added to current planet list.\r\nSee log file for details.";
+        
+        return report;
     }
     
     /**
@@ -502,7 +539,7 @@ public class Planets {
             List<Planet> outMatchedExistingPlanets, 
             List<Planet> outUnmatchedImportPlanets) {
         
-        List<Planet> planets = loadPlanetsFromCSV(tsvPath);
+        List<Planet> planets = loadPlanetsFromTSV(tsvPath);
         StringBuilder planetLog = new StringBuilder();
         String METHOD_NAME = "comparePlanetLists";
         
@@ -607,7 +644,9 @@ public class Planets {
         }
     }
     
-    public void exportPlanets(String fileName) {
+    public String exportPlanets(String fileName) {
+        String report;
+        
         try {
             FileOutputStream fos = new FileOutputStream(fileName);
             ArrayList<Planet> localPlanetList = new ArrayList<>(this.planetList.values());
@@ -620,9 +659,14 @@ public class Planets {
             this.writePlanets(fos, localPlanetList);
             fos.flush();
             fos.close();
+            
+            report = localPlanetList.size() + " planets written to file.";
         } catch(IOException ioe) {
             MekHQ.getLogger().log(getClass(), "exportPlanets", LogLevel.INFO, "Error exporting planets to XML");
+            report = "Error exporting planets. See log for details.";
         }
+        
+        return report;
     }
     
     private void generatePlanets(String planetsPath, String defaultFilePath) throws DOMException, ParseException {
