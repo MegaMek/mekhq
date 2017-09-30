@@ -428,6 +428,10 @@ public class Campaign implements Serializable, ITechManager {
     public int getEra() {
         return Era.getEra(calendar.get(Calendar.YEAR));
     }
+    
+    public int getYear() {
+        return calendar.get(Calendar.YEAR);
+    }
 
     public String getTitle() {
         return getName() + " (" + getFactionName() + ")" + " - "
@@ -6818,7 +6822,7 @@ public class Campaign implements Serializable, ITechManager {
 
     public void setStartingPlanet() {
     	Map<String, Planet> planetList = Planets.getInstance().getPlanets();
-        Planet startingPlanet = planetList.get(getFaction().getStartingPlanet(getEra()));
+        Planet startingPlanet = planetList.get(getFaction().getStartingPlanet(getYear()));
 
         if (startingPlanet == null) {
         	startingPlanet = planetList.get(JOptionPane.showInputDialog("This faction does not have a starting planet for this era. Please choose a planet."));

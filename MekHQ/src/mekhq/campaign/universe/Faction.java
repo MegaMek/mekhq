@@ -70,6 +70,7 @@ public class Faction {
     private Color color;
     private String nameGenerator;
     private String[] startingPlanet;
+    private int[] startingPlanetAfterYear;
     private int[] eraMods;
     private Integer id;
     private Set<Tag> tags;
@@ -86,9 +87,7 @@ public class Faction {
         fullname = fname;
         nameGenerator = "General";
         color = Color.LIGHT_GRAY;
-        startingPlanet = new String[Era.E_NUM];
         altNamesByEra = new String[Era.E_NUM];
-        Arrays.fill(startingPlanet, "Terra");
         Arrays.fill(altNamesByEra, "");
         eraMods = new int[]{0,0,0,0,0,0,0,0,0};
         tags = EnumSet.noneOf(Faction.Tag.class);
@@ -128,11 +127,17 @@ public class Faction {
         return nameGenerator;
     }
 
-    public String getStartingPlanet(int era) {
-        if(startingPlanet.length > era) {
-            return startingPlanet[era];
-        } else if(startingPlanet.length > 0) {
-            return startingPlanet[startingPlanet.length-1];
+    public String getStartingPlanet(int year) {
+        if (startingPlanet.length == 1) {
+            return startingPlanet[0];
+        } else {
+            for (int i = startingPlanet.length - 1; i != -1; i--) {
+                if (year < startingPlanetAfterYear[i]) {
+                    continue;
+                } else {
+                    return startingPlanet[i];
+                }
+            }
         }
         return "Terra";
     }
@@ -285,6 +290,9 @@ public class Faction {
         
         Faction retVal = new Faction();
         NodeList nl = wn.getChildNodes();
+        
+        List<String> planetName = new ArrayList<String>();
+        List<Integer> planetYear = new ArrayList<Integer>();
 
         for (int x=0; x<nl.getLength(); x++) {
             Node wn2 = nl.item(x);
@@ -307,7 +315,17 @@ public class Faction {
                     retVal.tags.remove(Tag.PERIPHERY);
                 }
             } else if (wn2.getNodeName().equalsIgnoreCase("startingPlanet")) {
-                retVal.startingPlanet = wn2.getTextContent().split(",", -2);
+                if (wn2.getAttributes().getNamedItem("year") == null) {
+                    if (!planetName.isEmpty()) {
+                        MekHQ.getLogger().log(Faction.class, METHOD_NAME, LogLevel.WARNING,
+                                retVal.fullname + " faction has more than one default starting planet");
+                    }
+                    planetName.add(wn2.getTextContent());
+                    planetYear.add(0);
+                } else {
+                    planetName.add(wn2.getTextContent());
+                    planetYear.add(Integer.parseInt(wn2.getAttributes().getNamedItem("year").getTextContent()));
+                }
             } else if (wn2.getNodeName().equalsIgnoreCase("altNamesByEra")) {
                 retVal.altNamesByEra = wn2.getTextContent().split(",", -2);
             } else if (wn2.getNodeName().equalsIgnoreCase("altNames")) {
@@ -345,13 +363,9 @@ public class Faction {
             MekHQ.getLogger().log(Faction.class, METHOD_NAME, LogLevel.WARNING,
                     retVal.fullname + " faction did not have a long enough eraMods vector"); //$NON-NLS-1$
         }
-        if(!retVal.is(Tag.PIRATE) && !retVal.is(Tag.MERC) && !retVal.is(Tag.TRADER)) {
-            // Planet checks
-            if(retVal.startingPlanet.length < Era.E_NUM) {
-                MekHQ.getLogger().log(Faction.class, METHOD_NAME, LogLevel.WARNING,
-                        retVal.fullname + " faction did not have a long enough startingPlanet vector"); //$NON-NLS-1$
-            }
-        }
+        
+        retVal.startingPlanet = planetName.toArray(new String[planetName.size()]);
+        retVal.startingPlanetAfterYear = planetYear.stream().mapToInt(i -> i).toArray();
 
         return retVal;
     }

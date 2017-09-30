@@ -238,7 +238,7 @@ public class ContractMarket implements Serializable {
 			 */
 			for (Faction f : campaign.getCurrentPlanet().getFactionSet(currentDate)) {
 				try {
-					if (f.getStartingPlanet(campaign.getEra()).equals(campaign.getCurrentPlanet().getId())
+					if (f.getStartingPlanet(campaign.getYear()).equals(campaign.getCurrentPlanet().getId())
 							&& RandomFactionGenerator.getInstance().getEmployerSet().contains(f.getShortName())) {
 						AtBContract c = generateAtBContract(campaign, f.getShortName(), unitRatingMod);
 						if (c != null) {
