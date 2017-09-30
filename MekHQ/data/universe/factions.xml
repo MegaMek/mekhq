@@ -117,7 +117,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<id>2</id>
 		<fullname>Draconis Combine</fullname>
 		<startingPlanet>New Samarkand</startingPlanet>
-		<changePlanet year='2619'>Luthien</startingPlanet>>
+		<changePlanet year='2619'>Luthien</changePlanet>>
 		<eraMods>0,0,0,1,2,2,1,0,0</eraMods>
 		<nameGenerator>DC</nameGenerator>
 		<colorRGB>234,45,46</colorRGB>
@@ -1508,7 +1508,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	<faction>
 		<shortname>TD</shortname>
 		<fullname>Tortuga Dominions</fullname>
-		<startingPlanet>,Tortuga Prime</startingPlanet>
+		<startingPlanet>Tortuga Prime</startingPlanet>
 		<eraMods>1,1,1,1,2,3,2,2,1</eraMods>
 		<nameGenerator>General</nameGenerator>
 		<colorRGB>34,139,34</colorRGB>
