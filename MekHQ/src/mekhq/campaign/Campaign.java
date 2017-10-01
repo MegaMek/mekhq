@@ -8700,7 +8700,7 @@ public class Campaign implements Serializable {
         return cost;
     }
 
-    public long getMonthlySpareParts() {
+    private long getMonthlySpareParts() {
         long partsCost = 0;
 
         for (Unit u : getUnits()) {
@@ -8712,7 +8712,7 @@ public class Campaign implements Serializable {
         return partsCost;
     }
 
-    public long getMonthlyFuel() {
+    private long getMonthlyFuel() {
         long fuelCost = 0;
 
         for (Unit u : getUnits()) {
@@ -8724,7 +8724,7 @@ public class Campaign implements Serializable {
         return fuelCost;
     }
 
-    public long getMonthlyAmmo() {
+    private long getMonthlyAmmo() {
         long ammoCost= 0;
 
         for (Unit u : getUnits()) {
@@ -8734,45 +8734,5 @@ public class Campaign implements Serializable {
             ammoCost += u.getAmmoCost();
         }
         return ammoCost;
-    }
-
-    public boolean isFactionComstar() {
-        if (getFactionCode().equals("CS")) {
-            return true;
-        }
-        return false;
-    }
-
-    public boolean isFactionClan() {
-        switch (getFactionCode()) {
-            case "CBS":
-            case "CB":
-            case "CCC":
-            case "CCO":
-            case "SOC":
-            case "CDS":
-            case "CFM":
-            case "CGB":
-            case "CGS":
-            case "CHH":
-            case "CIH":
-            case "CJF":
-            case "CMG":
-            case "CNC":
-            case "CSJ":
-            case "CSR":
-            case "CSA":
-            case "CSV":
-            case "CSL":
-            case "CWI":
-            case "CW":
-            case "CWE":
-            case "CWIE":
-            case "CWOV":
-            case "CEI":
-            case "RA":
-                return true;
-            default: return false;
-        }
     }
 }

@@ -412,8 +412,6 @@ public abstract class AbstractUnitRating implements IUnitRating {
      * Calculates the unit's rating score.
      */
     protected abstract int calculateUnitRatingScore();
-
-    public abstract UnitRatingMethod getUnitRatingMethod();
     
     /**
      * Recalculates the dragoons rating.  If this has already been done, the 
