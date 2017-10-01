@@ -6862,7 +6862,7 @@ public class Campaign implements Serializable, ITechManager {
         }
         String searchCat_Role = Person.getRoleDesc(p.getPrimaryRole(), false) + "/";
         if (searchCat_Role.startsWith("Admin/")) {
-            searchCat_Role = searchCat_Role.substring(0, 5) + searchCat_Role.substring(6);
+            searchCat_Role = "Admin/";
         }
         
         while (categories.hasNext()) {
