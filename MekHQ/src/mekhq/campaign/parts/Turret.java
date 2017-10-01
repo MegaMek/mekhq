@@ -23,8 +23,10 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.common.CriticalSlot;
-import megamek.common.EquipmentType;
 import megamek.common.IArmorState;
 import megamek.common.Mounted;
 import megamek.common.Tank;
@@ -32,9 +34,6 @@ import megamek.common.WeaponType;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.unit.Unit;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  *
@@ -128,16 +127,6 @@ public class Turret extends TankLocation {
 				damage = Integer.parseInt(wn2.getTextContent());
 			}
 		}
-	}
-
-	@Override
-	public int getAvailability(int era) {
-		return EquipmentType.RATING_C;
-	}
-
-	@Override
-	public int getTechRating() {
-		return EquipmentType.RATING_B;
 	}
 
 	@Override

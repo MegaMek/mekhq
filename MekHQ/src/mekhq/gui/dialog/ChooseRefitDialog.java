@@ -28,7 +28,6 @@ import java.awt.GridBagLayout;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.GregorianCalendar;
 import java.util.ResourceBundle;
 
 import javax.swing.BorderFactory;
@@ -279,7 +278,7 @@ public class ChooseRefitDialog extends javax.swing.JDialog {
     
     private void populateRefits() {
     	ArrayList<Refit> refits = new ArrayList<Refit>();
-        for(String model : Utilities.getAllVariants(unit.getEntity(), campaign.getCalendar().get(GregorianCalendar.YEAR), campaign.getCampaignOptions())) {
+        for(String model : Utilities.getAllVariants(unit.getEntity(), campaign)) {
 			MechSummary summary = MechSummaryCache.getInstance().getMech(unit.getEntity().getChassis() + " " + model);
 			if(null == summary) {
 				continue;

@@ -1141,8 +1141,6 @@ public class ResolveScenarioTracker {
                         getCampaign().getCampaignOptions().getUseAtBCapture() &&
                         m instanceof AtBContract &&
                         status.isCaptured()) {
-                    getCampaign().getFinances().credit(50000, Transaction.C_MISC,
-                        "Bonus for prisoner capture", getCampaign().getDate()); //$NON-NLS-1$
                     if (Compute.d6(2) >= 10 + ((AtBContract)m).getEnemySkill() - getCampaign().getUnitRatingMod()) {
                         getCampaign().addReport(String.format(
                             "You have convinced %s to defect.", person.getHyperlinkedName())); //$NON-NLS-1$

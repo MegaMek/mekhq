@@ -30,14 +30,15 @@ import megamek.common.AmmoType;
 import megamek.common.BombType;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
+import megamek.common.ITechnology;
 import megamek.common.Mounted;
 import megamek.common.TargetRoll;
+import megamek.common.TechAdvancement;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.universe.Era;
 import mekhq.campaign.work.IAcquisitionWork;
 
 /**
@@ -180,22 +181,12 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
 		}
 		restore();
 	}
-
+	
 	@Override
-	public int getAvailability(int era) {		
-		return type.getAvailability(Era.convertEra(era));
-	}
-
-	@Override
-	public int getTechRating() {
-		return type.getTechRating();
+	public TechAdvancement getTechAdvancement() {
+	    return type.getTechAdvancement();
 	}
 	
-	//@Override
-	//public int getTechBase() {
-		//return T_BOTH;
-	//}
-
 	@Override
 	public void fix() {
 		//nothing to fix
@@ -360,9 +351,9 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
             target.addModifier(campaign.getCampaignOptions().getIsAcquisitionPenalty(), "Inner Sphere tech");
         }   
         //availability mod
-        int avail = getAvailability(campaign.getEra());
+        int avail = getAvailability();
         int availabilityMod = Availability.getAvailabilityModifier(avail);
-        target.addModifier(availabilityMod, "availability (" + EquipmentType.getRatingName(avail) + ")");
+        target.addModifier(availabilityMod, "availability (" + ITechnology.getRatingName(avail) + ")");
         return target;
     }
 
@@ -400,6 +391,16 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
     @Override
     public boolean isPriceAdustedForAmount() {
         return true;
+    }
+
+    @Override
+    public boolean isIntroducedBy(int year, boolean clan, int techFaction) {
+        return getIntroductionDate(clan, techFaction) <= year;
+    }
+
+    @Override
+    public boolean isExtinctIn(int year, boolean clan, int techFaction) {
+        return isExtinct(year, clan, techFaction);
     }
 }
 

@@ -42,6 +42,7 @@ import megamek.common.AmmoType;
 import megamek.common.BattleArmor;
 import megamek.common.Engine;
 import megamek.common.Entity;
+import megamek.common.ITechManager;
 import megamek.common.Infantry;
 import megamek.common.Mech;
 import megamek.common.MechFileParser;
@@ -80,9 +81,9 @@ public class MekLabTab extends CampaignGuiTab {
     EntityVerifier entityVerifier;
     Refit refit;
     EntityPanel labPanel;
-    JPanel summaryPane = new JPanel();
     JPanel emptyPanel;
 
+    private JPanel summaryPane;
     private JLabel lblName;
 
     private JPanel refitPanel;
@@ -115,7 +116,7 @@ public class MekLabTab extends CampaignGuiTab {
         UnitUtil.loadFonts();
         new CConfig();
         MekHQ.getLogger().log(getClass(), "initTab()", LogLevel.INFO, //$NON-NLS-1$
-                "Staring MegaMekLab version: " + MegaMekLab.VERSION); //$NON-NLS-1$
+                "Starting MegaMekLab version: " + MegaMekLab.VERSION); //$NON-NLS-1$
         btnRefit = new JButton("Begin Refit");
         btnRefit.addActionListener(evt -> {
             Entity entity = labPanel.getEntity();
@@ -137,7 +138,60 @@ public class MekLabTab extends CampaignGuiTab {
         emptyPanel = new JPanel(new BorderLayout());
         emptyPanel.add(new JLabel("No Unit Loaded"), BorderLayout.PAGE_START);
         add(emptyPanel, BorderLayout.CENTER);
-    }
+
+        summaryPane = new JPanel(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
+        refitPanel = new JPanel();
+        refitPanel.setLayout(new BoxLayout(refitPanel, BoxLayout.PAGE_AXIS));
+        refitPanel.setBorder(BorderFactory.createTitledBorder("Refit Statistics"));
+
+        lblRefit = new JLabel();
+        lblTime = new JLabel();
+        lblCost = new JLabel();
+        refitPanel.add(lblRefit);
+        refitPanel.add(lblTime);
+        refitPanel.add(lblCost);
+
+        statPanel = new JPanel();
+        statPanel.setLayout(new BoxLayout(statPanel, BoxLayout.PAGE_AXIS));
+        statPanel.setBorder(BorderFactory.createTitledBorder("Unit Statistics"));
+        lblMove = new JLabel();
+        lblBV = new JLabel();
+        lblTons = new JLabel();
+        lblHeat = new JLabel();
+        statPanel.add(lblMove);
+        statPanel.add(lblBV);
+        statPanel.add(lblTons);
+        statPanel.add(lblHeat);
+
+        shoppingPanel = new JPanel();
+        shoppingPanel.setLayout(new BoxLayout(shoppingPanel, BoxLayout.PAGE_AXIS));
+        shoppingPanel.setBorder(BorderFactory.createTitledBorder("Needed Parts"));
+
+        lblName = new JLabel();
+        c.gridx = 0;
+        c.gridy = 0;
+        c.anchor = GridBagConstraints.NORTHWEST;
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.insets = new Insets(10, 5, 2, 5);
+        summaryPane.add(lblName, c);
+        c.gridy++;
+        c.insets = new Insets(0, 5, 2, 5);
+        summaryPane.add(btnRefit, c);
+        c.gridy++;
+        summaryPane.add(btnClear, c);
+        c.gridy++;
+        summaryPane.add(btnRemove, c);
+        c.gridy++;
+        summaryPane.add(statPanel, c);
+        c.gridy++;
+        summaryPane.add(refitPanel, c);
+        c.gridy++;
+        c.weighty = 1.0;
+        summaryPane.add(shoppingPanel, c);
+
+        // TODO: compare units dialog that pops up mech views back-to-back
+}
 
     @Override
     public void refreshAll() {
@@ -167,8 +221,16 @@ public class MekLabTab extends CampaignGuiTab {
         UnitUtil.updateLoadedMech(entity);
         entity.setModel(entity.getModel() + " Mk II");
         removeAll();
+        // We need to override the values in the MML properties file with the campaign options settings.
+        CConfig.setParam(CConfig.TECH_EXTINCT, String.valueOf(campaignGUI.getCampaign().showExtinct()));
+        CConfig.setParam(CConfig.TECH_PROGRESSION, String.valueOf(campaignGUI.getCampaign().useVariableTechLevel()));
+        CConfig.setParam(CConfig.TECH_SHOW_FACTION, String.valueOf(campaignGUI.getCampaign().getTechFaction() >= 0));
+        CConfig.setParam(CConfig.TECH_UNOFFICAL_NO_YEAR, String.valueOf(campaignGUI.getCampaign().unofficialNoYear()));
+        CConfig.setParam(CConfig.TECH_USE_YEAR, String.valueOf(campaignGUI.getCampaign().getGameYear()));
+        CConfig.setParam(CConfig.TECH_YEAR, String.valueOf(campaignGUI.getCampaign().getGameYear()));
         labPanel = getCorrectLab(entity);
-        refreshSummary();
+        labPanel.setTechFaction(campaignGUI.getCampaign().getTechFaction());
+        refreshRefitSummary();
         add(summaryPane, BorderLayout.LINE_START);
         add(labPanel, BorderLayout.CENTER);
         labPanel.refreshAll();
@@ -193,13 +255,13 @@ public class MekLabTab extends CampaignGuiTab {
         UnitUtil.updateLoadedMech(entity);
         removeAll();
         labPanel = getCorrectLab(entity);
-        refreshSummary();
+        refreshRefitSummary();
         add(summaryPane, BorderLayout.LINE_START);
         add(labPanel, BorderLayout.CENTER);
         labPanel.refreshAll();
     }
-
-    public void refreshSummary() {
+    
+    public void refreshRefitSummary() {
         if (null == labPanel) {
             return;
         }
@@ -266,54 +328,33 @@ public class MekLabTab extends CampaignGuiTab {
             btnRefit.setToolTipText(null);
         }
 
-        summaryPane.removeAll();
-        summaryPane.setLayout(new GridBagLayout());
-        GridBagConstraints c = new GridBagConstraints();
-        lblName = new JLabel("<html><b>" + unit.getName() + "</b></html>");
-        lblRefit = new JLabel(refit.getRefitClassName());
-        lblTime = new JLabel(refit.getTime() + " minutes");
-        lblCost = new JLabel(Utilities.getCurrencyString(refit.getCost()));
-        lblMove = new JLabel("Movement: " + walk + "/" + run + "/" + jump);
+        lblName.setText("<html><b>" + unit.getName() + "</b></html>");
+        lblRefit.setText(refit.getRefitClassName());
+        lblTime.setText(refit.getTime() + " minutes");
+        lblCost.setText(Utilities.getCurrencyString(refit.getCost()));
+        lblMove.setText("Movement: " + walk + "/" + run + "/" + jump);
         if (bvDiff > 0) {
-            lblBV = new JLabel("<html>BV: " + entity.calculateBattleValue(true, true) + " (<font color='green'>+"
+            lblBV.setText("<html>BV: " + entity.calculateBattleValue(true, true) + " (<font color='green'>+"
                     + bvDiff + "</font>)</html>");
         } else if (bvDiff < 0) {
-            lblBV = new JLabel("<html>BV: " + entity.calculateBattleValue(true, true) + " (<font color='red'>" + bvDiff
+            lblBV.setText("<html>BV: " + entity.calculateBattleValue(true, true) + " (<font color='red'>" + bvDiff
                     + "</font>)</html>");
         } else {
-            lblBV = new JLabel("<html>BV: " + entity.calculateBattleValue(true, true) + " (+" + bvDiff + ")</html>");
+            lblBV.setText("<html>BV: " + entity.calculateBattleValue(true, true) + " (+" + bvDiff + ")</html>");
         }
 
         if (currentTonnage != tonnage) {
-            lblTons = new JLabel(
+            lblTons.setText(
                     "<html>Tonnage: <font color='red'>" + currentTonnage + "/" + tonnage + "</font></html>");
         } else {
-            lblTons = new JLabel("Tonnage: " + currentTonnage + "/" + tonnage);
+            lblTons.setText("Tonnage: " + currentTonnage + "/" + tonnage);
         }
         if (totalHeat > heat) {
-            lblHeat = new JLabel("<html>Heat: <font color='red'>" + totalHeat + "/" + heat + "</font></html>");
+            lblHeat.setText("<html>Heat: <font color='red'>" + totalHeat + "/" + heat + "</font></html>");
         } else {
-            lblHeat = new JLabel("<html>Heat: " + totalHeat + "/" + heat + "</html>");
+            lblHeat.setText("<html>Heat: " + totalHeat + "/" + heat + "</html>");
         }
-        refitPanel = new JPanel();
-        refitPanel.setLayout(new BoxLayout(refitPanel, BoxLayout.PAGE_AXIS));
-        refitPanel.setBorder(BorderFactory.createTitledBorder("Refit Statistics"));
-
-        refitPanel.add(lblRefit);
-        refitPanel.add(lblTime);
-        refitPanel.add(lblCost);
-
-        statPanel = new JPanel();
-        statPanel.setLayout(new BoxLayout(statPanel, BoxLayout.PAGE_AXIS));
-        statPanel.setBorder(BorderFactory.createTitledBorder("Unit Statistics"));
-        statPanel.add(lblMove);
-        statPanel.add(lblBV);
-        statPanel.add(lblTons);
-        statPanel.add(lblHeat);
-
-        shoppingPanel = new JPanel();
-        shoppingPanel.setLayout(new BoxLayout(shoppingPanel, BoxLayout.PAGE_AXIS));
-        shoppingPanel.setBorder(BorderFactory.createTitledBorder("Needed Parts"));
+        shoppingPanel.removeAll();
         JLabel lblItem;
         for (String name : refit.getShoppingListDescription()) {
             lblItem = new JLabel(name);
@@ -323,29 +364,6 @@ public class MekLabTab extends CampaignGuiTab {
             lblItem = new JLabel("None");
             shoppingPanel.add(lblItem);
         }
-
-        c.gridx = 0;
-        c.gridy = 0;
-        c.anchor = GridBagConstraints.NORTHWEST;
-        c.fill = GridBagConstraints.HORIZONTAL;
-        c.insets = new Insets(10, 5, 2, 5);
-        summaryPane.add(lblName, c);
-        c.gridy++;
-        c.insets = new Insets(0, 5, 2, 5);
-        summaryPane.add(btnRefit, c);
-        c.gridy++;
-        summaryPane.add(btnClear, c);
-        c.gridy++;
-        summaryPane.add(btnRemove, c);
-        c.gridy++;
-        summaryPane.add(statPanel, c);
-        c.gridy++;
-        summaryPane.add(refitPanel, c);
-        c.gridy++;
-        c.weighty = 1.0;
-        summaryPane.add(shoppingPanel, c);
-
-        // TODO: compare units dialog that pops up mech views back-to-back
     }
 
     public double calculateTotalHeat() {
@@ -435,6 +453,8 @@ public class MekLabTab extends CampaignGuiTab {
 
         @Override
         public abstract Entity getEntity();
+        
+        abstract void setTechFaction(int techFaction);
     }
 
     private class AeroPanel extends EntityPanel {
@@ -507,7 +527,7 @@ public class MekLabTab extends CampaignGuiTab {
 
         @Override
         public void refreshStatus() {
-            refreshSummary();
+            refreshRefitSummary();
         }
 
         @Override
@@ -530,6 +550,36 @@ public class MekLabTab extends CampaignGuiTab {
         public void refreshPreview() {
             previewTab.refresh();
         }
+
+        @Override
+        public void refreshSummary() {
+            structureTab.refreshSummary();
+        }
+
+        @Override
+        public void refreshEquipmentTable() {
+            equipmentTab.refreshTable();
+        }
+
+        @Override
+        public void createNewUnit(long entitytype, boolean isPrimitive, boolean isIndustrial, Entity oldUnit) {
+            // TODO Auto-generated method stub
+            
+        }
+
+        @Override
+        public ITechManager getTechManager() {
+            if (null != structureTab) {
+                return structureTab.getTechManager();
+            }
+            return null;
+        }
+        
+        @Override
+        void setTechFaction(int techFaction) {
+            structureTab.setTechFaction(techFaction);
+        }
+        
     }
 
     private class MekPanel extends EntityPanel {
@@ -602,7 +652,7 @@ public class MekLabTab extends CampaignGuiTab {
 
         @Override
         public void refreshStatus() {
-            refreshSummary();
+            refreshRefitSummary();
         }
 
         @Override
@@ -624,6 +674,35 @@ public class MekLabTab extends CampaignGuiTab {
         @Override
         public void refreshPreview() {
             previewTab.refresh();
+        }
+
+        @Override
+        public void refreshSummary() {
+            structureTab.refresh();
+        }
+
+        @Override
+        public void refreshEquipmentTable() {
+            equipmentTab.refreshTable();
+        }
+
+        @Override
+        public void createNewUnit(long entitytype, boolean isPrimitive, boolean isIndustrial, Entity oldUnit) {
+            // TODO Auto-generated method stub
+            
+        }
+
+        @Override
+        public ITechManager getTechManager() {
+            if (null != structureTab) {
+                return structureTab.getTechManager();
+            }
+            return null;
+        }
+
+        @Override
+        void setTechFaction(int techFaction) {
+            structureTab.setTechFaction(techFaction);
         }
     }
 
@@ -692,7 +771,7 @@ public class MekLabTab extends CampaignGuiTab {
 
         @Override
         public void refreshStatus() {
-            refreshSummary();
+            refreshRefitSummary();
         }
 
         @Override
@@ -712,6 +791,35 @@ public class MekLabTab extends CampaignGuiTab {
 
         @Override
         public void refreshPreview() {
+        }
+
+        @Override
+        public void refreshSummary() {
+            structureTab.refreshSummary();
+        }
+
+        @Override
+        public void refreshEquipmentTable() {
+            equipmentTab.refreshTable();
+        }
+
+        @Override
+        public void createNewUnit(long entitytype, boolean isPrimitive, boolean isIndustrial, Entity oldUnit) {
+            // TODO Auto-generated method stub
+            
+        }
+
+        @Override
+        public ITechManager getTechManager() {
+            if (null != structureTab) {
+                return structureTab.getTechManager();
+            }
+            return null;
+        }
+
+        @Override
+        void setTechFaction(int techFaction) {
+            structureTab.setTechFaction(techFaction);
         }
     }
 
@@ -781,7 +889,7 @@ public class MekLabTab extends CampaignGuiTab {
 
         @Override
         public void refreshStatus() {
-            refreshSummary();
+            refreshRefitSummary();
         }
 
         @Override
@@ -802,6 +910,36 @@ public class MekLabTab extends CampaignGuiTab {
         @Override
         public void refreshPreview() {
             structureTab.refresh();
+        }
+
+        @Override
+        public void refreshSummary() {
+            // TODO Auto-generated method stub
+            
+        }
+
+        @Override
+        public void refreshEquipmentTable() {
+            equipmentTab.refreshTable();
+        }
+
+        @Override
+        public void createNewUnit(long entitytype, boolean isPrimitive, boolean isIndustrial, Entity oldUnit) {
+            // TODO Auto-generated method stub
+            
+        }
+
+        @Override
+        public ITechManager getTechManager() {
+            if (null != structureTab) {
+                return structureTab.getTechManager();
+            }
+            return null;
+        }
+
+        @Override
+        void setTechFaction(int techFaction) {
+            structureTab.setTechFaction(techFaction);
         }
     }
 
@@ -863,7 +1001,7 @@ public class MekLabTab extends CampaignGuiTab {
 
         @Override
         public void refreshStatus() {
-            refreshSummary();
+            refreshRefitSummary();
         }
 
         @Override
@@ -884,6 +1022,37 @@ public class MekLabTab extends CampaignGuiTab {
         @Override
         public void refreshPreview() {
             previewTab.refresh();
+        }
+
+        @Override
+        public void refreshSummary() {
+            // TODO Auto-generated method stub
+            
+        }
+
+        @Override
+        public void refreshEquipmentTable() {
+            // TODO Auto-generated method stub
+            
+        }
+
+        @Override
+        public void createNewUnit(long entitytype, boolean isPrimitive, boolean isIndustrial, Entity oldUnit) {
+            // TODO Auto-generated method stub
+            
+        }
+
+        @Override
+        public ITechManager getTechManager() {
+            if (null != structureTab) {
+                return structureTab.getTechManager();
+            }
+            return null;
+        }
+
+        @Override
+        void setTechFaction(int techFaction) {
+            structureTab.setTechFaction(techFaction);
         }
     }
 }

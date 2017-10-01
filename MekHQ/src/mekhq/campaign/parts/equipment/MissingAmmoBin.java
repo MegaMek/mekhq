@@ -95,7 +95,16 @@ public class MissingAmmoBin extends MissingEquipmentPart {
 	public void fix() {
 		Part replacement = findReplacement(false);
 		if(null != replacement) {
-			Part actualReplacement = replacement.clone();
+		    Part actualReplacement;
+		    
+            //Check to see if munition types are different
+		    if (getType() == ((AmmoBin)replacement).getType()) {
+		        actualReplacement = replacement.clone();
+		    } else {
+		        actualReplacement = new AmmoBin(getUnitTonnage(), getType(), getEquipmentNum(), 
+		                getFullShots(), isOneShot(), isOmniPodded(), campaign);
+		    }
+			
 			unit.addPart(actualReplacement);
 			campaign.addPart(actualReplacement, 0);
 			replacement.decrementQuantity();

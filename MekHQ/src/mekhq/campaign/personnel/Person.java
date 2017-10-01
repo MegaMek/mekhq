@@ -33,6 +33,7 @@ import java.util.Date;
 import java.util.EnumMap;
 import java.util.Enumeration;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
@@ -165,6 +166,9 @@ public class Person implements Serializable, MekHqXmlSerializable {
     public static final int DESIG_NUM     = 14;
     
     public static final String LOGTYPE_MEDICAL = "med";
+    
+    private static final Map<Integer, Integer> MECHWARRIOR_AERO_RANSOM_VALUES; 
+    private static final Map<Integer, Integer> OTHER_RANSOM_VALUES;
 
     private static final IntSupplier PREGNANCY_DURATION = () -> {
         double gaussian = Math.sqrt(-2 * Math.log(Math.nextUp(Math.random())))
@@ -308,6 +312,23 @@ public class Person implements Serializable, MekHqXmlSerializable {
     //lets just go ahead and pass in the campaign - to hell with OOP
     private Campaign campaign;
 
+    // initializes the AtB ransom values
+    static {
+        MECHWARRIOR_AERO_RANSOM_VALUES = new HashMap<>();
+        MECHWARRIOR_AERO_RANSOM_VALUES.put(SkillType.EXP_ULTRA_GREEN, 5000);    // no official AtB rules for really inexperienced scrubs, but...
+        MECHWARRIOR_AERO_RANSOM_VALUES.put(SkillType.EXP_GREEN, 10000);
+        MECHWARRIOR_AERO_RANSOM_VALUES.put(SkillType.EXP_REGULAR, 25000);
+        MECHWARRIOR_AERO_RANSOM_VALUES.put(SkillType.EXP_VETERAN, 75000);
+        MECHWARRIOR_AERO_RANSOM_VALUES.put(SkillType.EXP_ELITE, 150000);
+        
+        OTHER_RANSOM_VALUES = new HashMap<>();
+        OTHER_RANSOM_VALUES.put(SkillType.EXP_ULTRA_GREEN, 2500);
+        OTHER_RANSOM_VALUES.put(SkillType.EXP_GREEN, 5000);
+        OTHER_RANSOM_VALUES.put(SkillType.EXP_REGULAR, 10000);
+        OTHER_RANSOM_VALUES.put(SkillType.EXP_VETERAN, 25000);
+        OTHER_RANSOM_VALUES.put(SkillType.EXP_ELITE, 50000);
+    }
+    
     //default constructor
     public Person(Campaign c) {
         this("Biff the Understudy", c);
@@ -3630,5 +3651,17 @@ public class Person implements Serializable, MekHqXmlSerializable {
         }
         
         return hasKids;
+    }
+    
+    /** Returns the ransom value of this individual
+    * Useful for prisoner who you want to ransom or hand off to your employer in an AtB context */
+    public int getRansomValue() {
+        // mechwarriors and aero pilots are worth more than the other types of scrubs
+        if(primaryRole == T_MECHWARRIOR || primaryRole == T_AERO_PILOT) {
+            return MECHWARRIOR_AERO_RANSOM_VALUES.get(getExperienceLevel(false));
+        }
+        else {
+            return OTHER_RANSOM_VALUES.get(getExperienceLevel(false));
+        }
     }
 }

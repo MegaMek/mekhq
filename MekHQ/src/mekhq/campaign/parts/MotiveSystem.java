@@ -23,15 +23,14 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import megamek.common.Entity;
-import megamek.common.EquipmentType;
-import megamek.common.Tank;
-import megamek.common.TechConstants;
-import mekhq.MekHqXmlUtil;
-import mekhq.campaign.Campaign;
-
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import megamek.common.Entity;
+import megamek.common.Tank;
+import megamek.common.TechAdvancement;
+import mekhq.MekHqXmlUtil;
+import mekhq.campaign.Campaign;
 
 /**
  *
@@ -75,9 +74,8 @@ public class MotiveSystem extends Part {
 	}
 	
 	@Override
-	public int getAvailability(int era) {
-		// TODO Auto-generated method stub
-		return 0;
+	public int getBaseAvailability(int era) {
+		return RATING_B;
 	}
 
 	@Override
@@ -86,16 +84,6 @@ public class MotiveSystem extends Part {
 		return 0;
 	}
 	
-    @Override
-	public int getTechLevel() {
-		return TechConstants.T_ALLOWED_ALL;
-	}
-
-	@Override
-	public int getTechRating() {
-		return EquipmentType.RATING_C;
-	}
-
 	@Override
 	public double getTonnage() {
 		// TODO Auto-generated method stub
@@ -220,19 +208,8 @@ public class MotiveSystem extends Part {
 	}
 	
 	@Override
-	public int getIntroDate() {
-		return EquipmentType.DATE_NONE;
+	public TechAdvancement getTechAdvancement() {
+	    return TankLocation.TECH_ADVANCEMENT;
 	}
-
-	@Override
-	public int getExtinctDate() {
-		return EquipmentType.DATE_NONE;
-	}
-
-	@Override
-	public int getReIntroDate() {
-		return EquipmentType.DATE_NONE;
-	}
-	
 	
 }

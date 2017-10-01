@@ -21,9 +21,6 @@
 package mekhq.campaign.parts.equipment;
 
 import java.io.PrintWriter;
-import java.util.GregorianCalendar;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -34,16 +31,15 @@ import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.MiscType;
 import megamek.common.Mounted;
-import megamek.common.TechConstants;
+import megamek.common.TechAdvancement;
 import megamek.common.WeaponType;
-import megamek.common.weapons.BayWeapon;
+import megamek.common.weapons.bayweapons.BayWeapon;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.unit.Unit;
-import mekhq.campaign.universe.Era;
 
 /**
  * This part covers most of the equipment types in WeaponType, AmmoType, and MiscType
@@ -167,21 +163,6 @@ public class EquipmentPart extends Part {
         		&& isOmniPodded() == part.isOmniPodded();
     }
 
-    @Override
-    public int getTechLevel() {
-        int techLevel = getType().getTechLevel(campaign.getCalendar().get(GregorianCalendar.YEAR));
-        if(techLevel == TechConstants.T_TECH_UNKNOWN && !getType().getTechLevels().isEmpty()) {
-        	//If this is tech unknown we are probably using a part before its date of introduction
-        	//in this case, try to give it the date of the earliest entry if it exists
-        	SortedSet<Integer> keys = new TreeSet<Integer>(getType().getTechLevels().keySet());
-        	techLevel = getType().getTechLevels().get(keys.first());
-        }
-        if ((techLevel != TechConstants.T_ALLOWED_ALL && techLevel < 0) || techLevel >= TechConstants.T_ALL)
-            return TechConstants.T_TECH_UNKNOWN;
-        else
-            return techLevel;
-    }
-
 	@Override
 	public void writeToXml(PrintWriter pw1, int indent) {
 		writeToXmlBegin(pw1, indent);
@@ -218,34 +199,11 @@ public class EquipmentPart extends Part {
 		}
 		restore();
 	}
-
+	
 	@Override
-	public int getAvailability(int era) {
-		return type.getAvailability(Era.convertEra(era));
+	public TechAdvancement getTechAdvancement() {
+	    return type.getTechAdvancement();
 	}
-
-	@Override
-    public int getIntroDate() {
-	    if (isOmniPodded()) {
-	        if (isClanTechBase()) {
-	            return Math.max(2850, getType().getIntroductionDate());
-	        } else {
-	            return Math.max(3052, getType().getIntroductionDate());
-	        }
-	    }
-    	return getType().getIntroductionDate();
-    }
-
-    @Override
-    public int getExtinctDate() {
-    	return getType().getExtinctionDate();
-    }
-
-    @Override
-    public int getReIntroDate() {
-    	return getType().getReintruductionDate();
-    }
-
 	@Override
 	public int getTechRating() {
 		return type.getTechRating();

@@ -21,12 +21,12 @@
 
 package mekhq.campaign.parts;
 
-import megamek.common.Entity;
-import megamek.common.EquipmentType;
-import megamek.common.Tank;
-import mekhq.campaign.Campaign;
-
 import org.w3c.dom.Node;
+
+import megamek.common.Entity;
+import megamek.common.Tank;
+import megamek.common.TechAdvancement;
+import mekhq.campaign.Campaign;
 
 /**
  *
@@ -79,16 +79,6 @@ public class MissingVeeSensor extends MissingPart {
 	}
 
 	@Override
-	public int getTechRating() {
-		return EquipmentType.RATING_C;
-	}
-
-	@Override
-	public int getAvailability(int era) {
-		return EquipmentType.RATING_C;
-	}
-
-	@Override
 	public void updateConditionFromPart() {
 		if(null != unit && unit.getEntity() instanceof Tank) {
 			((Tank)unit.getEntity()).setSensorHits(4);
@@ -111,20 +101,10 @@ public class MissingVeeSensor extends MissingPart {
 		return Entity.LOC_NONE;
 	}
 	
-	@Override
-	public int getIntroDate() {
-		return EquipmentType.DATE_NONE;
-	}
-
-	@Override
-	public int getExtinctDate() {
-		return EquipmentType.DATE_NONE;
-	}
-
-	@Override
-	public int getReIntroDate() {
-		return EquipmentType.DATE_NONE;
-	}
+    @Override
+    public TechAdvancement getTechAdvancement() {
+        return TankLocation.TECH_ADVANCEMENT;
+    }
     
     @Override
 	public int getMassRepairOptionType() {

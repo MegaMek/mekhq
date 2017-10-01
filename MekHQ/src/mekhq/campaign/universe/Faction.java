@@ -65,6 +65,7 @@ public class Faction {
 
     private String shortname;
     private String fullname;
+    private String[] altNamesByEra;
     private String[] altNames;
     private Color color;
     private String nameGenerator;
@@ -86,7 +87,7 @@ public class Faction {
         nameGenerator = "General";
         color = Color.LIGHT_GRAY;
         startingPlanet = new String[]{"Terra","Terra","Terra","Terra","Terra","Terra","Terra","Terra","Terra"};
-        altNames = new String[]{"","","","","","","","",""};
+        altNamesByEra = new String[]{"","","","","","","","",""};
         eraMods = new int[]{0,0,0,0,0,0,0,0,0};
         tags = EnumSet.noneOf(Faction.Tag.class);
         start = 0;
@@ -99,8 +100,8 @@ public class Faction {
 
     public String getFullName(int era) {
         String alt = "";
-        if(altNames.length > era) {
-            alt = altNames[era];
+        if(altNamesByEra.length > era) {
+            alt = altNamesByEra[era];
         }
         if(alt.trim().length() == 0) {
             return fullname;
@@ -197,6 +198,26 @@ public class Faction {
         return id;
     }
     
+    public boolean hasName(String name) {
+        if (name.equals(fullname)) {
+            return true;
+        } else {
+            for (String altName : altNamesByEra) {
+                if (name.equals(altName)) {
+                    return true;
+                }
+            }
+        }
+        if (altNames != null && altNames.length > 0) {
+            for (String altName : altNames) {
+                if (name.equals(altName)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    
     public static Collection<Faction> getFactions() {
         return factions.values();
     }
@@ -257,8 +278,10 @@ public class Faction {
                 }
             } else if (wn2.getNodeName().equalsIgnoreCase("startingPlanet")) {
                 retVal.startingPlanet = wn2.getTextContent().split(",", -2);
+            } else if (wn2.getNodeName().equalsIgnoreCase("altNamesByEra")) {
+                retVal.altNamesByEra = wn2.getTextContent().split(",", -2);
             } else if (wn2.getNodeName().equalsIgnoreCase("altNames")) {
-                retVal.altNames = wn2.getTextContent().split(",", -2);
+                retVal.altNames = wn2.getTextContent().split(",", 0);
             } else if (wn2.getNodeName().equalsIgnoreCase("eraMods")) {
                 String[] values = wn2.getTextContent().split(",", -2);
                 for(int i = 0; i < values.length; i++) {
@@ -284,9 +307,9 @@ public class Faction {
             }
         }
 
-        if(retVal.altNames.length < Era.E_NUM) {
+        if(retVal.altNamesByEra.length < Era.E_NUM) {
             MekHQ.getLogger().log(Faction.class, METHOD_NAME, LogLevel.WARNING,
-                    retVal.fullname + " faction did not have a long enough altNames vector"); //$NON-NLS-1$
+                    retVal.fullname + " faction did not have a long enough altNamesByEra vector"); //$NON-NLS-1$
         }
         if(retVal.eraMods.length < Era.E_NUM) {
             MekHQ.getLogger().log(Faction.class, METHOD_NAME, LogLevel.WARNING,

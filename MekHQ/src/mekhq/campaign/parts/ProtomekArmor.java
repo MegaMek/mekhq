@@ -21,8 +21,7 @@
 
 package mekhq.campaign.parts;
 
-import megamek.common.EquipmentType;
-import megamek.common.TechConstants;
+import megamek.common.TechAdvancement;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.work.IAcquisitionWork;
 
@@ -92,29 +91,10 @@ public class ProtomekArmor extends Armor implements IAcquisitionWork {
         return clan;
     }
     
-    @Override
-    public int getTechLevel() {
-        return TechConstants.T_CLAN_TW;
-    }
-
     public double getArmorWeight(int points) {
         return points * 50/1000.0;
     }
 
-    @Override
-    public int getAvailability(int era) {
-        if(era == EquipmentType.ERA_CLAN) {
-            return EquipmentType.RATING_D;
-        } else {
-            return EquipmentType.RATING_X;
-        }
-    }
-
-    @Override
-    public int getTechRating() {
-        return EquipmentType.RATING_D;
-    }
- 
     @Override
     public IAcquisitionWork getAcquisitionWork() {
         return new ProtomekArmor(0, (int)Math.round(5 * getArmorPointsPerTon()), -1, clan, campaign);
@@ -163,19 +143,17 @@ public class ProtomekArmor extends Armor implements IAcquisitionWork {
             campaign.addPart(new ProtomekArmor(getUnitTonnage(), amount, -1, isClanTechBase(), campaign), 0);
         }
     }
+    
+    @Override
+    public int getTechRating() {
+        return RATING_F;
+    }
+    
+    @Override
+    public TechAdvancement getTechAdvancement() {
+        // This is for standard armor, which does not currently have a separate entry in MM.
+        // TODO: EDP armor (which does have an entry in MM)
+        return ProtomekLocation.TECH_ADVANCEMENT;
+    }
 
-	@Override
-	public int getIntroDate() {
-		return 3055;
-	}
-
-	@Override
-	public int getExtinctDate() {
-		return EquipmentType.DATE_NONE;
-	}
-
-	@Override
-	public int getReIntroDate() {
-		return EquipmentType.DATE_NONE;
-	}
 }

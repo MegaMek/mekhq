@@ -78,6 +78,8 @@ import megamek.common.EquipmentType;
 import megamek.common.FighterSquadron;
 import megamek.common.Game;
 import megamek.common.GunEmplacement;
+import megamek.common.ITechManager;
+import megamek.common.ITechnology;
 import megamek.common.Infantry;
 import megamek.common.Jumpship;
 import megamek.common.LandAirMech;
@@ -89,10 +91,11 @@ import megamek.common.MiscType;
 import megamek.common.Mounted;
 import megamek.common.Player;
 import megamek.common.Protomech;
+import megamek.common.SimpleTechLevel;
 import megamek.common.SmallCraft;
 import megamek.common.Tank;
 import megamek.common.TargetRoll;
-import megamek.common.Warship;
+import megamek.common.TechConstants;
 import megamek.common.loaders.BLKFile;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.logging.LogLevel;
@@ -103,7 +106,7 @@ import megamek.common.options.IOptionGroup;
 import megamek.common.options.PilotOptions;
 import megamek.common.util.BuildingBlock;
 import megamek.common.util.DirectoryItems;
-import megamek.common.weapons.BayWeapon;
+import megamek.common.weapons.bayweapons.BayWeapon;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
@@ -165,6 +168,7 @@ import mekhq.campaign.parts.MekActuator;
 import mekhq.campaign.parts.MekLocation;
 import mekhq.campaign.parts.MissingEnginePart;
 import mekhq.campaign.parts.MissingMekActuator;
+import mekhq.campaign.parts.MissingMekLocation;
 import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.OmniPod;
 import mekhq.campaign.parts.Part;
@@ -195,6 +199,7 @@ import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.campaign.unit.CrewType;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.unit.UnitTechProgression;
 import mekhq.campaign.universe.Era;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.IUnitGenerator;
@@ -213,7 +218,7 @@ import mekhq.gui.utilities.PortraitFileFactory;
 /**
  * @author Taharqa The main campaign class, keeps track of teams and units
  */
-public class Campaign implements Serializable {
+public class Campaign implements Serializable, ITechManager {
     private static final String REPORT_LINEBREAK = "<br/><br/>"; //$NON-NLS-1$
 
 	private static final long serialVersionUID = -6312434701389973056L;
@@ -277,6 +282,7 @@ public class Campaign implements Serializable {
     private SimpleDateFormat shortDateFormat;
 
     private String factionCode;
+    private int techFactionCode;
     private String retainerEmployerCode; //AtB
     private Ranks ranks;
 
@@ -338,6 +344,7 @@ public class Campaign implements Serializable {
         overtime = false;
         gmMode = false;
         factionCode = "MERC";
+        techFactionCode = ITechnology.F_MERC;
         retainerEmployerCode = null;
         Ranks.initializeRankSystems();
         ranks = Ranks.getRanksFromSystem(Ranks.RS_SL);
@@ -1952,6 +1959,7 @@ public class Campaign implements Serializable {
         TargetRoll target = getTargetFor(partWork, tech);
         String report = "";
         String action = " fix ";
+                
         // TODO: this should really be a method on the part
         if (partWork instanceof AmmoBin) {
             action = " reload ";
@@ -1992,6 +2000,11 @@ public class Campaign implements Serializable {
         }
         report += tech.getHyperlinkedFullTitle() + " attempts to" + action
                   + partWork.getPartName();
+        
+        if (null != partWork.getUnit()) {
+        	report += " on " + partWork.getUnit().getName();
+        }
+        
         int minutes = partWork.getTimeLeft();
         int minutesUsed = minutes;
         boolean usedOvertime = false;
@@ -2576,31 +2589,29 @@ public class Campaign implements Serializable {
                     if (finances.debit(getPayRoll(), Transaction.C_SALARY,
                             "Monthly salaries", calendar.getTime())) {
                         addReport("Payday! Your account has been debited for "
-                                  + formatter.format(getPayRoll())
-                                  + " C-bills in personnel salaries");
+                                + formatter.format(getPayRoll())
+                                + " C-bills in personnel salaries");
                     } else {
                         addReport("<font color='red'><b>You cannot afford to pay payroll costs!</b></font> Lucky for you that personnel morale is not yet implemented.");
                     }
                 }
-            } else {
-                if (campaignOptions.payForSalaries()) {
-                    if (finances.debit(getPayRoll(), Transaction.C_SALARY,
-                                       "Monthly salaries", calendar.getTime())) {
-                        addReport("Payday! Your account has been debited for "
-                                  + formatter.format(getPayRoll())
-                                  + " C-bills in personnel salaries");
-                    } else {
-                        addReport("<font color='red'><b>You cannot afford to pay payroll costs!</b></font> Lucky for you that personnel morale is not yet implemented.");
-                    }
+            } else if (campaignOptions.payForSalaries()) {
+                if (finances.debit(getPayRoll(), Transaction.C_SALARY,
+                        "Monthly salaries", calendar.getTime())) {
+                    addReport("Payday! Your account has been debited for "
+                            + formatter.format(getPayRoll())
+                            + " C-bills in personnel salaries");
+                } else {
+                    addReport("<font color='red'><b>You cannot afford to pay payroll costs!</b></font> Lucky for you that personnel morale is not yet implemented.");
                 }
             }
             if (campaignOptions.payForOverhead()) {
                 if (finances.debit(getOverheadExpenses(),
-                                   Transaction.C_OVERHEAD, "Monthly overhead",
-                                   calendar.getTime())) {
+                        Transaction.C_OVERHEAD, "Monthly overhead",
+                        calendar.getTime())) {
                     addReport("Your account has been debited for "
-                              + formatter.format(getOverheadExpenses())
-                              + " C-bills in overhead expenses");
+                            + formatter.format(getOverheadExpenses())
+                            + " C-bills in overhead expenses");
                 } else {
                     addReport("<font color='red'><b>You cannot afford to pay overhead costs!</b></font> Lucky for you that this does not appear to have any effect.");
                 }
@@ -3052,6 +3063,7 @@ public class Campaign implements Serializable {
 
     public void setFactionCode(String i) {
         this.factionCode = i;
+        updateTechFactionCode();
     }
 
     public String getFactionCode() {
@@ -3993,6 +4005,24 @@ public class Campaign implements Serializable {
                 && prt.getName().contains("(Clan")
                 && prt.getTechBase() != Part.T_CLAN) {
                 ((MissingEnginePart) prt).fixClanFlag();
+            }
+            
+            if (version.getMajorVersion() == 0
+                    && version.getMinorVersion() < 44
+                    && version.getSnapshot() < 5) {
+                if ((prt instanceof MekLocation)
+                        && (((MekLocation)prt).getStructureType() == EquipmentType.T_STRUCTURE_ENDO_STEEL)) {
+                    if (null != u) {
+                        ((MekLocation)prt).setClan(TechConstants.isClan(u.getEntity().getStructureTechLevel()));
+                    } else {
+                        ((MekLocation)prt).setClan(retVal.getFaction().isClan());
+                    }
+                } else if ((prt instanceof MissingMekLocation)
+                        && (((MissingMekLocation)prt).getStructureType() == EquipmentType.T_STRUCTURE_ENDO_STEEL)) {
+                    if (null != u) {
+                        ((MissingMekLocation)prt).setClan(TechConstants.isClan(u.getEntity().getStructureTechLevel()));
+                    }
+                }
             }
 
         }
@@ -4953,7 +4983,7 @@ public class Campaign implements Serializable {
                 retVal.addPartWithoutId(p);
             }
         }
-
+        
         MekHQ.getLogger().log(Campaign.class, METHOD_NAME, LogLevel.INFO,
                 "Load Part Nodes Complete!"); //$NON-NLS-1$
     }
@@ -5057,6 +5087,7 @@ public class Campaign implements Serializable {
                     } else {
                         retVal.factionCode = wn.getTextContent();
                     }
+                    retVal.updateTechFactionCode();
                 } else if (xn.equalsIgnoreCase("retainerEmployerCode")) {
                 	retVal.retainerEmployerCode = wn.getTextContent();
                 } else if (xn.equalsIgnoreCase("officerCut")) {
@@ -5690,15 +5721,19 @@ public class Campaign implements Serializable {
     }
 
     public ArrayList<IPartWork> getPartsNeedingServiceFor(UUID uid) {
+    	return getPartsNeedingServiceFor(uid, false);
+    }
+    
+    public ArrayList<IPartWork> getPartsNeedingServiceFor(UUID uid, boolean onlyNotBeingWorkedOn) {
         if (null == uid) {
             return new ArrayList<IPartWork>();
         }
         Unit u = getUnit(uid);
         if (u != null) {
             if (u.isSalvage() || !u.isRepairable()) {
-                return u.getSalvageableParts();
+                return u.getSalvageableParts(onlyNotBeingWorkedOn);
             } else {
-                return u.getPartsNeedingFixing();
+                return u.getPartsNeedingFixing(onlyNotBeingWorkedOn);
             }
         }
         return new ArrayList<IPartWork>();
@@ -6144,19 +6179,21 @@ public class Campaign implements Serializable {
             return new TargetRoll(TargetRoll.IMPOSSIBLE,
                                   "You cannot acquire parts of this tech level");
         }
-        if(getCampaignOptions().limitByYear() && !acquisition.isIntroducedBy(getCalendar().get(Calendar.YEAR))) {
+        if(getCampaignOptions().limitByYear()
+                && !acquisition.isIntroducedBy(getGameYear(), useClanTechBase(), getTechFaction())) {
         	return new TargetRoll(TargetRoll.IMPOSSIBLE,
                     "It has not been invented yet!");
         }
         if(getCampaignOptions().disallowExtinctStuff() &&
-        		(acquisition.isExtinctIn(getCalendar().get(Calendar.YEAR)) || acquisition.getAvailability(getEra()) == EquipmentType.RATING_X)) {
+        		(acquisition.isExtinctIn(getGameYear(), useClanTechBase(), getTechFaction())
+        		        || acquisition.getAvailability() == EquipmentType.RATING_X)) {
         	return new TargetRoll(TargetRoll.IMPOSSIBLE,
                     "It is extinct!");
         }
         if (getCampaignOptions().getUseAtB() &&
         		getCampaignOptions().getRestrictPartsByMission() &&
         		acquisition instanceof Part) {
-        	int partAvailability = ((Part)acquisition).getAvailability(getEra());
+        	int partAvailability = ((Part)acquisition).getAvailability();
     		EquipmentType et = null;
     		if (acquisition instanceof EquipmentPart) {
     			et = ((EquipmentPart)acquisition).getType();
@@ -6179,16 +6216,16 @@ public class Campaign implements Serializable {
         		 * for non-flamer energy weapons, which was the reason this
         		 * rule was included in AtB to begin with.
         		 */
-        		if (et instanceof megamek.common.weapons.EnergyWeapon
-        				&& !(et instanceof megamek.common.weapons.FlamerWeapon)
+        		if (et instanceof megamek.common.weapons.lasers.EnergyWeapon
+        				&& !(et instanceof megamek.common.weapons.flamers.FlamerWeapon)
         				&& partAvailability < EquipmentType.RATING_C) {
         			partAvailability = EquipmentType.RATING_C;
         		}
-        		if (et instanceof megamek.common.weapons.ACWeapon) {
+        		if (et instanceof megamek.common.weapons.autocannons.ACWeapon) {
         			partAvailability -= 2;
         		}
-        		if (et instanceof megamek.common.weapons.GaussWeapon
-        				|| et instanceof megamek.common.weapons.FlamerWeapon) {
+        		if (et instanceof megamek.common.weapons.gaussrifles.GaussWeapon
+        				|| et instanceof megamek.common.weapons.flamers.FlamerWeapon) {
         			partAvailability--;
         		}
                 if (et instanceof megamek.common.AmmoType) {
@@ -7366,8 +7403,8 @@ public class Campaign implements Serializable {
     }
 
     /**
-     * Calculate the total value of units in the TO&E. This serves as the basis for contract payments in Campaign
-     * Operations.
+     * Calculate the total value of units in the TO&E. This serves as the basis for contract payments in the StellarOps
+     * Beta.
      *
      * @return
      */
@@ -7376,8 +7413,8 @@ public class Campaign implements Serializable {
     }
 
     /**
-     * Calculate the total value of units in the TO&E. This serves as the basis for contract payments in Campaign
-     * Operations.
+     * Calculate the total value of units in the TO&E. This serves as the basis for contract payments in the StellarOps
+     * Beta.
      *
      * @return
      */
@@ -7391,53 +7428,25 @@ public class Campaign implements Serializable {
             if (noInfantry && u.getEntity() instanceof Infantry && !(u.getEntity() instanceof BattleArmor)) {
             	continue;
             }
-            if (u.getEntity() instanceof Dropship) {
-                if (getCampaignOptions().getDropshipContractPercent() == 0) {
-                    continue;
-                }
-                if (getCampaignOptions().useEquipmentContractSaleValue()) {
-                    value += (getCampaignOptions().getDropshipContractPercent() / 100) * u.getSellValue();
-                } else {
-                    value += (getCampaignOptions().getDropshipContractPercent() / 100) * u.getBuyCost();
-                }
-            } else if (u.getEntity() instanceof Warship) {
-                if (getCampaignOptions().getWarshipContractPercent() == 0) {
-                    continue;
-                }
-                if (getCampaignOptions().useEquipmentContractSaleValue()) {
-                    value += (getCampaignOptions().getWarshipContractPercent() / 100) * u.getSellValue();
-                } else {
-                    value += (getCampaignOptions().getWarshipContractPercent() / 100) * u.getBuyCost();
-                }
-            } else if (u.getEntity() instanceof Jumpship) {
-                if (getCampaignOptions().getJumpshipContractPercent() == 0) {
-                    continue;
-                }
-                if (getCampaignOptions().useEquipmentContractSaleValue()) {
-                    value += (getCampaignOptions().getJumpshipContractPercent() / 100) * u.getSellValue();
-                } else {
-                    value += (getCampaignOptions().getJumpshipContractPercent() / 100) * u.getBuyCost();
-                }
-            } else {
-                // we will assume sale value for now, but make this customizable
-                if (getCampaignOptions().useEquipmentContractSaleValue()) {
-                    value += (getCampaignOptions().getEquipmentContractPercent() / 100.0) * u.getSellValue();
-                } else {
-                    value += (getCampaignOptions().getEquipmentContractPercent() / 100.0) * u.getBuyCost();
-                }
+            // lets exclude dropships and jumpships
+            if (u.getEntity() instanceof Dropship
+                || u.getEntity() instanceof Jumpship) {
+                continue;
             }
-
+            // we will assume sale value for now, but make this customizable
+            if (getCampaignOptions().useEquipmentContractSaleValue()) {
+                value += u.getSellValue();
+            } else {
+                value += u.getBuyCost();
+            }
         }
         return value;
     }
 
     public long getContractBase() {
-        if (getCampaignOptions().usePeacetimeCost()) {
-            double peacetimecost = (getPeacetimeCost() * .75) +
-                    getForceValue(getCampaignOptions().useInfantryDontCount());
-            return (long) peacetimecost;
-        } else if (getCampaignOptions().useEquipmentContractBase()) {
-            return getForceValue(getCampaignOptions().useInfantryDontCount());
+        if (getCampaignOptions().useEquipmentContractBase()) {
+            return (long) ((getCampaignOptions().getEquipmentContractPercent() / 100.0)
+            		* getForceValue(getCampaignOptions().useInfantryDontCount()));
         } else {
             return getPayRoll(getCampaignOptions().useInfantryDontCount());
         }
@@ -8734,5 +8743,88 @@ public class Campaign implements Serializable {
             ammoCost += u.getAmmoCost();
         }
         return ammoCost;
+    }
+    
+    @Override
+    public int getTechIntroYear() {
+        if (campaignOptions.limitByYear()) {
+            return calendar.get(Calendar.YEAR);
+        } else {
+            return Integer.MAX_VALUE;
+        }
+    }
+
+    @Override
+    public int getGameYear() {
+        return calendar.get(Calendar.YEAR);
+    }
+
+    @Override
+    public int getTechFaction() {
+        return techFactionCode;
+    }
+    
+    public void updateTechFactionCode() {
+        if (campaignOptions.useFactionIntroDate()) {
+            for (int i = 0; i < ITechnology.MM_FACTION_CODES.length; i++) {
+                if (ITechnology.MM_FACTION_CODES[i].equals(factionCode)) {
+                    techFactionCode = i;
+                    UnitTechProgression.loadFaction(techFactionCode);
+                    return;
+                }
+            }
+            // If the tech progression data does not include the current faction,
+            // use a generic.
+            if (getFaction().isClan()) {
+                techFactionCode = ITechnology.F_CLAN;
+            } else if (getFaction().isPeriphery()) {
+                techFactionCode = ITechnology.F_PER;
+            } else {
+                techFactionCode = ITechnology.F_IS;
+            }
+        } else {
+            techFactionCode = ITechnology.F_NONE;
+        }
+        // Unit tech level will be calculated if the code has changed.
+        UnitTechProgression.loadFaction(techFactionCode);
+    }
+
+    @Override
+    public boolean useClanTechBase() {
+        return getFaction().isClan();
+    }
+
+    @Override
+    public boolean useMixedTech() {
+        if (useClanTechBase()) {
+            return campaignOptions.allowISPurchases();
+        } else {
+            return campaignOptions.allowClanPurchases();
+        }
+    }
+
+    @Override
+    public SimpleTechLevel getTechLevel() {
+        for (SimpleTechLevel lvl : SimpleTechLevel.values()) {
+            if (campaignOptions.getTechLevel() == lvl.ordinal()) {
+                return lvl;
+            }
+        }
+        return SimpleTechLevel.UNOFFICIAL;
+    }
+
+    @Override
+    public boolean unofficialNoYear() {
+        return false;
+    }
+
+    @Override
+    public boolean useVariableTechLevel() {
+        return campaignOptions.useVariableTechLevel();
+    }
+
+    @Override
+    public boolean showExtinct() {
+        return !campaignOptions.disallowExtinctStuff();
     }
 }

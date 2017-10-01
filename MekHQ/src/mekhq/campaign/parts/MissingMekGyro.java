@@ -26,6 +26,7 @@ import java.io.PrintWriter;
 import megamek.common.CriticalSlot;
 import megamek.common.EquipmentType;
 import megamek.common.Mech;
+import megamek.common.TechAdvancement;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 
@@ -110,24 +111,6 @@ public class MissingMekGyro extends MissingPart {
 	}
 
 	@Override
-	public int getAvailability(int era) {
-		switch(type) {
-		case Mech.GYRO_COMPACT:
-		case Mech.GYRO_HEAVY_DUTY:
-		case Mech.GYRO_XL:
-			if(era == EquipmentType.ERA_SL) {
-				return EquipmentType.RATING_X;
-			} else if(era == EquipmentType.ERA_SW) {
-				return EquipmentType.RATING_X;
-			} else {
-				return EquipmentType.RATING_E;
-			}
-		default:
-			return EquipmentType.RATING_C;
-		}
-	}
-
-	@Override
 	public int getTechRating() {
 		switch(type) {
 		case Mech.GYRO_COMPACT:
@@ -182,28 +165,10 @@ public class MissingMekGyro extends MissingPart {
 		return Mech.LOC_CT;
 	}
 
-	@Override
-	public int getIntroDate() {
-		switch(type) {
-		case Mech.GYRO_COMPACT:
-			return 3068;
-		case Mech.GYRO_HEAVY_DUTY:
-		case Mech.GYRO_XL:
-			return 3067;
-		default:
-			return EquipmentType.DATE_NONE;
-		}
-	}
-
-	@Override
-	public int getExtinctDate() {
-		return EquipmentType.DATE_NONE;
-	}
-
-	@Override
-	public int getReIntroDate() {
-		return EquipmentType.DATE_NONE;
-	}
+    @Override
+    public TechAdvancement getTechAdvancement() {
+        return Mech.getGyroTechAdvancement(type);
+    }
 	
 	@Override
 	public int getMassRepairOptionType() {

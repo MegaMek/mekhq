@@ -115,7 +115,7 @@
             <manifest>
                 <attribute name="Built-By" value="${user.name}"/>
                 <attribute name="Main-Class" value="${class.main}"/>
-                <attribute name="Class-Path" value="${classpath.manifest} ${megamek} ${megameklab}"/>
+                <attribute name="Class-Path" value=". ${classpath.manifest} ${megamek} ${megameklab}"/>
             </manifest>
             <fileset dir="${src}" includes="**/*.properties"/>
         </jar>
@@ -144,7 +144,7 @@
             <formatter type="xml" usefile="true"/>
             <batchtest fork="true" todir="${dir.build.teststaging}">
                 <fileset dir="${dir.build.test}">
-                    <include name="**/*Test.java"/>
+                    <include name="**/*Test.class"/>
                 </fileset>
             </batchtest>
         </junit>
