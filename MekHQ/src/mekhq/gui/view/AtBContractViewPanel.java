@@ -212,7 +212,7 @@ public class AtBContractViewPanel extends JPanel {
         pnlStats.add(lblEmployer, gridBagConstraints);
         
         txtEmployer.setName("txtEmployer"); // NOI18N
-        txtEmployer.setText(contract.getEmployerName(campaign.getYear()));
+        txtEmployer.setText(contract.getEmployerName(campaign.getGameYear()));
         txtEmployer.setEditable(false);
         txtEmployer.setLineWrap(true);
         txtEmployer.setWrapStyleWord(true);
@@ -235,7 +235,7 @@ public class AtBContractViewPanel extends JPanel {
         pnlStats.add(lblEnemy, gridBagConstraints);
         
         txtEnemy.setName("txtEnemy"); // NOI18N
-        txtEnemy.setText(contract.getEnemyName(campaign.getYear()));
+        txtEnemy.setText(contract.getEnemyName(campaign.getGameYear()));
         txtEnemy.setEditable(false);
         txtEnemy.setLineWrap(true);
         txtEnemy.setWrapStyleWord(true);

@@ -218,8 +218,8 @@ public class AtBContract extends Contract implements Serializable {
         	setOverheadComp(OH_NONE);
         }
         
-        allyBotName = getEmployerName(campaign.getYear());
-        enemyBotName = getEnemyName(campaign.getYear());
+        allyBotName = getEmployerName(campaign.getGameYear());
+        enemyBotName = getEnemyName(campaign.getGameYear());
 	}
 	
 	public void calculateLength(boolean variable) {
@@ -1490,7 +1490,7 @@ public class AtBContract extends Contract implements Serializable {
 				missionType = MT_PLANETARYASSAULT;
 			}
 		}
-		Faction f = Faction.getFactionFromFullNameAndYear(c.getEmployer(), campaign.getYear());
+		Faction f = Faction.getFactionFromFullNameAndYear(c.getEmployer(), campaign.getGameYear());
 		if (null == f) {
 			employerCode = "IND";
 		} else {
@@ -1506,8 +1506,8 @@ public class AtBContract extends Contract implements Serializable {
 		
 		requiredLances = Math.max(getEffectiveNumUnits(campaign) / 6, 1);
 		calculatePartsAvailabilityLevel(campaign);
-        allyBotName = getEmployerName(campaign.getYear());
-        enemyBotName = getEnemyName(campaign.getYear());
+        allyBotName = getEmployerName(campaign.getGameYear());
+        enemyBotName = getEnemyName(campaign.getGameYear());
 	}
 
 	public static AtBContract getContractExtension(AtBContract c, int length, Campaign campaign) {
@@ -1536,7 +1536,7 @@ public class AtBContract extends Contract implements Serializable {
 		retVal.setMRBCFee(c.payMRBCFee());
 		
 		retVal.setMissionType(c.getMissionType());
-		retVal.setEmployerCode(c.getEmployerCode(), campaign.getYear());
+		retVal.setEmployerCode(c.getEmployerCode(), campaign.getGameYear());
 		retVal.setEnemyCode(c.getEnemyCode());
 		retVal.requiredLances = c.getRequiredLances();
 		retVal.calculatePartsAvailabilityLevel(campaign);
