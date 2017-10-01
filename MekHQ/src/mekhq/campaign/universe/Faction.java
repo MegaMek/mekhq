@@ -326,19 +326,20 @@ public class Faction {
                 if (retVal.changePlanet == null) {
                     retVal.changePlanet = new ArrayList<factionChange>();
                 }
-                factionChange pChange = retVal.new factionChange(Integer.parseInt(wn2.getAttributes().getNamedItem("year").getTextContent()),
+                factionChange pChange = retVal.getChangeObject(Integer.parseInt(wn2.getAttributes().getNamedItem("year").getTextContent()),
                         wn2.getTextContent());
                 retVal.changePlanet.add(pChange);
             } else if (wn2.getNodeName().equalsIgnoreCase("altNamesByYear")) {
                 if (retVal.changeName == null) {
                     retVal.changeName = new ArrayList<factionChange>();
                 }
-                factionChange nChange = retVal.new factionChange(Integer.parseInt(wn2.getAttributes().getNamedItem("year").getTextContent()),
+                factionChange nChange = retVal.getChangeObject(Integer.parseInt(wn2.getAttributes().getNamedItem("year").getTextContent()),
                         wn2.getTextContent());
                 retVal.changeName.add(nChange);
             } else if (wn2.getNodeName().equalsIgnoreCase("altNames")) {
                 retVal.altNames = wn2.getTextContent().split(",", 0);
             } else if (wn2.getNodeName().equalsIgnoreCase("eraMods")) {
+                retVal.eraMods = new int[] {0,0,0,0,0,0,0,0,0};
                 String[] values = wn2.getTextContent().split(",", -2);
                 for(int i = 0; i < values.length; i++) {
                     retVal.eraMods[i] = Integer.parseInt(values[i]);
@@ -363,7 +364,7 @@ public class Faction {
             }
         }
 
-        if(retVal.eraMods.length < 9) {
+        if(retVal.eraMods != null && retVal.eraMods.length < 9) {
             MekHQ.getLogger().log(Faction.class, METHOD_NAME, LogLevel.WARNING,
                     retVal.fullname + " faction did not have a long enough eraMods vector"); //$NON-NLS-1$
         }
@@ -445,16 +446,20 @@ public class Faction {
     }
 
     /** @return Sorted list of faction names as one string */
-    public static String getFactionNames(Collection<Faction> factions, int era) {
+    public static String getFactionNames(Collection<Faction> factions, int year) {
         if( null == factions ) {
             return "-"; //$NON-NLS-1$
         }
         List<String> factionNames = new ArrayList<>(factions.size());
         for(Faction f : factions) {
-            factionNames.add(f.getFullName(era));
+            factionNames.add(f.getFullName(year));
         }
         Collections.sort(factionNames);
         return Utilities.combineString(factionNames, "/"); //$NON-NLS-1$
+    }
+    
+    private factionChange getChangeObject(int year, String name) {
+        return new factionChange(year, name);
     }
 
     public static enum Tag {
@@ -486,7 +491,7 @@ public class Faction {
         int year;
         String name;
         
-        public factionChange(int year, String name) {
+        factionChange(int year, String name) {
             this.year = year;
             this.name = name;
         }

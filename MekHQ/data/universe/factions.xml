@@ -17,15 +17,15 @@ Here is a description of what goes in each faction tag
 shortname - this is the abbreviation that is used to identify each faction in planets.xml and within
             MekHQ itself. This code must be unique.
 fullname  - the full display name for the faction.
-altNamesByYear - a comma-separated 9-item list that identifies alternate names for a given era. Use a single
-	       space between commas to indicate that the regular fullname should be used.
-altNames - A list of alternate names for a faction, also known as type of names,
+altNamesByYear - Identifies alternate names for a given year.
+					Format: <altNamesByYear year='XXXX'>Faction name</altNamesByYear>
+altNames - A list of alternate names for a faction, 'also known as' type of names,
 					not official designations
 startingPlanet - Identifies the starting planet if you begin a new campaign with this faction. 
 				 The name of the planet must be the name as it is recognized in MekHQ.
 				 If left out, then this defaults to Terra.
 changePlanet - Identifies the starting planet after the given year
-				 Format should be: <changePlanet year='XXXX'>Planet name</changePlanet>
+				 Format: <changePlanet year='XXXX'>Planet name</changePlanet>
 				 Years given in this first revision are best guesses
 eraMods - A comma-separated 9-item list of optional modifiers to repair/replacement rolls. as per
           Strat Ops. If left out, then this defaults to 0 for all eras.
