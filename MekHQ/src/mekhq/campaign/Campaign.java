@@ -6855,11 +6855,14 @@ public class Campaign implements Serializable, ITechManager {
         Iterator<String> categories = portraits.getCategoryNames();
         
         String searchCat_Gender = "";
-        String searchCat_Role = Person.getRoleDesc(p.getPrimaryRole(), false) + "/";
         if (p.getGender() == Person.G_FEMALE) {
             searchCat_Gender += "Female/";
         } else {
             searchCat_Gender += "Male/";
+        }
+        String searchCat_Role = Person.getRoleDesc(p.getPrimaryRole(), false) + "/";
+        if (searchCat_Role.startsWith("Admin/")) {
+            searchCat_Role = searchCat_Role.substring(0, 5) + searchCat_Role.substring(6);
         }
         
         while (categories.hasNext()) {
