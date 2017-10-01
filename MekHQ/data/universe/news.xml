@@ -252,7 +252,7 @@ location - an optional tag for the location of the news report
 	</newsItem>
 	<newsItem>
 		<headline>Death Commandos to take new recruits</headline>
-		<date>3003-2</date>
+		<date>3003-02</date>
 		<desc><![CDATA[Filed 3003-01-16<br><br>The Chancellor announced today, that the cream of CCAF would be given the chance to advance further in the cause of the Confederation by joining the Death Commandos.]]></desc>
 		<service>CBS</service>
 		<location>Capalla</location>
