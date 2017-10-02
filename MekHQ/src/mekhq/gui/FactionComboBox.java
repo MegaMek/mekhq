@@ -75,11 +75,11 @@ public class FactionComboBox extends JComboBox<Map.Entry<String, String>> {
 		});
 	}
 	
-	public void addFactionEntries(Collection<String> list, int era) {
+	public void addFactionEntries(Collection<String> list, int year) {
 		HashMap<String, String> map = new HashMap<String, String>();
 		HashSet<String> collisions = new HashSet<String>();
 		for (String key : list) {
-			String fullName = Faction.getFaction(key).getFullName(era);
+			String fullName = Faction.getFaction(key).getFullName(year);
 			if (map.containsValue(fullName)) {
 				collisions.add(fullName);
 			}

@@ -102,7 +102,7 @@ public class NewAtBContractDialog extends NewContractDialog {
         updatePlanets();
 
         if (getCurrentEmployerCode() != null) {
-        	((AtBContract)contract).setEmployerCode(getCurrentEmployerCode(), campaign.getEra());
+        	((AtBContract)contract).setEmployerCode(getCurrentEmployerCode(), campaign.getGameYear());
         }
         if (getCurrentEnemyCode() != null) {
         	((AtBContract)contract).setEnemyCode(getCurrentEnemyCode());
@@ -124,7 +124,7 @@ public class NewAtBContractDialog extends NewContractDialog {
 		txtName = new javax.swing.JTextField();
         JLabel lblName = new JLabel();
         cbEmployer = new FactionComboBox();
-        cbEmployer.addFactionEntries(employerSet, campaign.getEra());
+        cbEmployer.addFactionEntries(employerSet, campaign.getGameYear());
         JLabel lblEmployer = new JLabel();
 		cbEnemy = new FactionComboBox();
         JLabel lblEnemy = new JLabel();
@@ -436,7 +436,7 @@ public class NewAtBContractDialog extends NewContractDialog {
 			return;
 		}
 		cbEnemy.addFactionEntries(RandomFactionGenerator.getInstance().
-				getEnemyList(getCurrentEmployerCode()), campaign.getEra());
+				getEnemyList(getCurrentEmployerCode()), campaign.getGameYear());
 		cbEnemy.setSelectedItemByKey(((AtBContract)contract).getEnemyCode());
 	}
 	
@@ -446,13 +446,13 @@ public class NewAtBContractDialog extends NewContractDialog {
 		if (show) {
 			cbEmployer.removeAllItems();
 			cbEnemy.removeAllItems();
-			cbEmployer.addFactionEntries(currentFactions, campaign.getEra());
-			cbEnemy.addFactionEntries(currentFactions, campaign.getEra());
+			cbEmployer.addFactionEntries(currentFactions, campaign.getGameYear());
+			cbEnemy.addFactionEntries(currentFactions, campaign.getGameYear());
 			cbEmployer.setSelectedItemByKey(((AtBContract)contract).getEmployerCode());
 			cbEnemy.setSelectedItemByKey(((AtBContract)contract).getEnemyCode());
 		} else {
 			cbEmployer.removeAllItems();
-			cbEmployer.addFactionEntries(employerSet, campaign.getEra());
+			cbEmployer.addFactionEntries(employerSet, campaign.getGameYear());
 			cbEmployer.setSelectedItemByKey(((AtBContract)contract).getEmployerCode());
 			updateEnemies();
 		}
@@ -521,7 +521,7 @@ public class NewAtBContractDialog extends NewContractDialog {
 		} else {
 			contract.setPlanetName((String)cbPlanets.getSelectedItem());
 		}
-    	contract.setEmployerCode(getCurrentEmployerCode(), campaign.getEra());
+    	contract.setEmployerCode(getCurrentEmployerCode(), campaign.getGameYear());
     	contract.setMissionType(cbMissionType.getSelectedIndex());
     	contract.setDesc(txtDesc.getText());
     	contract.setCommandRights(choiceCommand.getSelectedIndex());
@@ -531,8 +531,8 @@ public class NewAtBContractDialog extends NewContractDialog {
     	contract.setAllyQuality(cbAllyQuality.getSelectedIndex());
     	contract.setEnemySkill(cbEnemySkill.getSelectedIndex());
     	contract.setEnemyQuality(cbEnemyQuality.getSelectedIndex());
-    	contract.setAllyBotName(contract.getEmployerName(campaign.getEra()));
-    	contract.setEnemyBotName(contract.getEnemyName(campaign.getEra()));
+    	contract.setAllyBotName(contract.getEmployerName(campaign.getGameYear()));
+    	contract.setEnemyBotName(contract.getEnemyName(campaign.getGameYear()));
     	contract.setSharesPct((Integer)spnShares.getValue());
     	
     	contract.calculatePartsAvailabilityLevel(campaign);
@@ -553,7 +553,7 @@ public class NewAtBContractDialog extends NewContractDialog {
         } else if (source.equals(cbEmployer)) {
         	System.out.println("Setting employer code to " + getCurrentEmployerCode());
         	long time = System.currentTimeMillis();
-    		contract.setEmployerCode(getCurrentEmployerCode(), campaign.getEra());
+    		contract.setEmployerCode(getCurrentEmployerCode(), campaign.getGameYear());
     		System.out.println("to set employer code: " + (System.currentTimeMillis() - time));
         	time = System.currentTimeMillis();
     		updateEnemies();

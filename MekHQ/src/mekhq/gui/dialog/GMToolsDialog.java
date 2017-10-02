@@ -12,7 +12,6 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -110,11 +109,11 @@ public class GMToolsDialog extends JDialog implements ActionListener {
         
         Collection<String> factionIds = Faction.getFactionList();
         List<FactionChoice> factionChoices = new ArrayList<>(factionIds.size());
-        int era = gui.getCampaign().getEra();
+        int year = gui.getCampaign().getGameYear();
         StringBuilder sb = new StringBuilder();
         for(String factionId : factionIds) {
             sb.setLength(0);
-            sb.append(Faction.getFaction(factionId).getFullName(era)).append(" [").append(factionId).append("]");
+            sb.append(Faction.getFaction(factionId).getFullName(year)).append(" [").append(factionId).append("]");
             factionChoices.add(new FactionChoice(factionId, sb.toString()));
         }
         Collections.sort(factionChoices, new Comparator<FactionChoice>() {
@@ -134,9 +133,9 @@ public class GMToolsDialog extends JDialog implements ActionListener {
             
         });
         factionPicker = new JComboBox<FactionChoice>(factionChoices.toArray(new FactionChoice[factionChoices.size()]));
-        System.out.println(gui.getCampaign().getCalendar().get(Calendar.YEAR));
+        System.out.println(gui.getCampaign().getGameYear());
         yearPicker = new JTextField(5);
-        yearPicker.setText(String.valueOf(gui.getCampaign().getCalendar().get(Calendar.YEAR)));
+        yearPicker.setText(String.valueOf(gui.getCampaign().getGameYear()));
         qualityPicker = new JComboBox<String>(qualityNames);
         unitTypePicker = new JComboBox<String>();
         for (int ut = 0; ut < UnitType.SIZE; ut++) {

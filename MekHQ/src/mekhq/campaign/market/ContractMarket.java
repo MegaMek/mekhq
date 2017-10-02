@@ -238,7 +238,7 @@ public class ContractMarket implements Serializable {
 			 */
 			for (Faction f : campaign.getCurrentPlanet().getFactionSet(currentDate)) {
 				try {
-					if (f.getStartingPlanet(campaign.getEra()).equals(campaign.getCurrentPlanet().getId())
+					if (f.getStartingPlanet(campaign.getGameYear()).equals(campaign.getCurrentPlanet().getId())
 							&& RandomFactionGenerator.getInstance().getEmployerSet().contains(f.getShortName())) {
 						AtBContract c = generateAtBContract(campaign, f.getShortName(), unitRatingMod);
 						if (c != null) {
@@ -338,7 +338,7 @@ public class ContractMarket implements Serializable {
         		employer = RandomFactionGenerator.getInstance().getEmployer();
         	}
         }
-		contract.setEmployerCode(employer, campaign.getEra());
+		contract.setEmployerCode(employer, campaign.getGameYear());
 		contract.setMissionType(findAtBMissionType(unitRatingMod,
 				RandomFactionGenerator.getInstance().isISMajorPower(contract.getEmployerCode())));
 
@@ -431,7 +431,7 @@ public class ContractMarket implements Serializable {
 	protected AtBContract generateAtBSubcontract(Campaign campaign,
 			AtBContract parent, int unitRatingMod) {
 		AtBContract contract = new AtBContract("New Subcontract");
-		contract.setEmployerCode(parent.getEmployerCode(), campaign.getEra());
+		contract.setEmployerCode(parent.getEmployerCode(), campaign.getGameYear());
 		contract.setMissionType(findAtBMissionType(unitRatingMod,
 				RandomFactionGenerator.getInstance().isISMajorPower(contract.getEmployerCode())));
 
@@ -519,7 +519,7 @@ public class ContractMarket implements Serializable {
 			return;
 		}
 		AtBContract followup = new AtBContract("Followup Contract");
-		followup.setEmployerCode(contract.getEmployerCode(), campaign.getEra());
+		followup.setEmployerCode(contract.getEmployerCode(), campaign.getGameYear());
 		followup.setEnemyCode(contract.getEnemyCode());
 		followup.setPlanetName(contract.getPlanetName());
 		switch (contract.getMissionType()) {
