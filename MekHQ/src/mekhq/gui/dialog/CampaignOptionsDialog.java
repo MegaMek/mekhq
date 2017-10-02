@@ -678,7 +678,10 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
         factionModel = new SortedComboBoxModel<String>();
         for (String sname : Faction.choosableFactionCodes) {
-            factionModel.addElement(Faction.getFaction(sname).getFullName(date.get(Calendar.YEAR)));
+            Faction f = Faction.getFaction(sname);
+            if (f.validIn(date.get(Calendar.YEAR))) {
+                factionModel.addElement(f.getFullName(date.get(Calendar.YEAR)));
+            }
         }
         factionModel.setSelectedItem(campaign.getFaction().getFullName(date.get(Calendar.YEAR)));
         comboFaction.setModel(factionModel);
@@ -4595,7 +4598,10 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
             btnDate.setText(getDateAsString());
             factionModel = new SortedComboBoxModel<String>();
             for (String sname : Faction.choosableFactionCodes) {
-                factionModel.addElement(Faction.getFaction(sname).getFullName(date.get(Calendar.YEAR)));
+                Faction f = Faction.getFaction(sname);
+                if (f.validIn(date.get(Calendar.YEAR))) {
+                    factionModel.addElement(f.getFullName(date.get(Calendar.YEAR)));
+                }
             }
             factionModel.setSelectedItem(campaign.getFaction().getFullName(date.get(Calendar.YEAR)));
             comboFaction.setModel(factionModel);
