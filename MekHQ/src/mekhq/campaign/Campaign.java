@@ -5428,7 +5428,7 @@ public class Campaign implements Serializable {
 		    String special = Crew.SPECIAL_NONE;
 		    switch (Compute.randomInt(2)) {
 		        case 0:
-		            special = Crew.SPECIAL_LASER;
+		            special = Crew.SPECIAL_ENERGY;
 		            break;
 		        case 1:
 		            special = Crew.SPECIAL_BALLISTIC;

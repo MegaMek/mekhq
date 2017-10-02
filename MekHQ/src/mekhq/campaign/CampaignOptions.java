@@ -84,6 +84,7 @@ public class CampaignOptions implements Serializable {
     private boolean useArtillery;
     private boolean useAbilities;
     private boolean useEdge;
+    private boolean useRemfEdge;
     private boolean useImplants;
 	private boolean altQualityAveraging;
     private int healWaitingPeriod;
@@ -284,6 +285,7 @@ public class CampaignOptions implements Serializable {
         useArtillery = false;
         useAbilities = false;
         useEdge = false;
+        useRemfEdge = false;
         useImplants = false;
 		altQualityAveraging = false;
         useAdvancedMedical = false;
@@ -649,6 +651,14 @@ public class CampaignOptions implements Serializable {
 
     public void setEdge(boolean b) {
         this.useEdge = b;
+    }
+    
+    public boolean useRemfEdge() {
+        return useRemfEdge;
+    }
+
+    public void setRemfEdge(boolean b) {
+        this.useRemfEdge = b;
     }
 
     public boolean useImplants() {
@@ -1886,6 +1896,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useArtillery", useArtillery);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useAbilities", useAbilities);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useEdge", useEdge);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useRemfEdge", useRemfEdge);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useImplants", useImplants);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "altQualityAveraging", altQualityAveraging);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useAdvancedMedical", useAdvancedMedical);
@@ -2140,6 +2151,8 @@ public class CampaignOptions implements Serializable {
                 retVal.useAbilities = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("useEdge")) {
                 retVal.useEdge = Boolean.parseBoolean(wn2.getTextContent());
+            } else if (wn2.getNodeName().equalsIgnoreCase("useRemfEdge")) {
+                retVal.useRemfEdge = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("useImplants")) {
                 retVal.useImplants = Boolean.parseBoolean(wn2.getTextContent());
 			} else if (wn2.getNodeName().equalsIgnoreCase("altQualityAveraging")) {
