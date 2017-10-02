@@ -24,7 +24,6 @@ import javax.swing.JScrollPane;
 import org.joda.time.DateTime;
 
 import megamek.common.util.EncodeControl;
-import mekhq.campaign.universe.Era;
 import mekhq.campaign.universe.Faction;
 
 public class ChooseFactionsDialog extends JDialog {
@@ -76,7 +75,7 @@ public class ChooseFactionsDialog extends JDialog {
                     boolean cellHasFocus) {
                 DefaultListCellRenderer result = (DefaultListCellRenderer) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if(value instanceof Faction) {
-                    result.setText(((Faction)value).getFullName(Era.getEra(date.getYear())));
+                    result.setText(((Faction)value).getFullName(date.getYear()));
                 }
                 return result;
             }
@@ -132,9 +131,8 @@ public class ChooseFactionsDialog extends JDialog {
         private List<String> names;
         
         public FactionListModel(DateTime date) {
-            int era = Era.getEra(date.getYear());
             for(Faction faction : Faction.getFactions()) {
-                factionMap.put(faction.getFullName(era), faction);
+                factionMap.put(faction.getFullName(date.getYear()), faction);
             }
             names = new ArrayList<>(factionMap.navigableKeySet());
         }

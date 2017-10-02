@@ -360,11 +360,11 @@ public class Campaign implements Serializable, ITechManager {
         partsStore = new PartsStore(this);
         gameOptions = new GameOptions();
         gameOptions.initialize();
-        gameOptions.getOption("year").setValue(calendar.get(Calendar.YEAR));
+        gameOptions.getOption("year").setValue(getGameYear());
         game.setOptions(gameOptions);
         customs = new ArrayList<String>();
         shoppingList = new ShoppingList();
-        news = new News(calendar.get(Calendar.YEAR), id.getLeastSignificantBits());
+        news = new News(getGameYear(), id.getLeastSignificantBits());
         personnelMarket = new PersonnelMarket();
         contractMarket = new ContractMarket();
         unitMarket = new UnitMarket();
@@ -422,11 +422,11 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public String getEraName() {
-        return Era.getEraNameFromYear(calendar.get(Calendar.YEAR));
+        return Era.getEraNameFromYear(getGameYear());
     }
 
     public int getEra() {
-        return Era.getEra(calendar.get(Calendar.YEAR));
+        return Era.getEra(getGameYear());
     }
 
     public String getTitle() {
@@ -534,7 +534,7 @@ public class Campaign implements Serializable, ITechManager {
     		rm.setIgnoreRatEra(campaignOptions.canIgnoreRatEra());
     		unitGenerator = rm;    			
 		} else {
-			RATGeneratorConnector rgc = new RATGeneratorConnector(calendar.get(Calendar.YEAR));
+			RATGeneratorConnector rgc = new RATGeneratorConnector(getGameYear());
 			unitGenerator = rgc;
 		}    	
     }
@@ -2112,7 +2112,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public void reloadNews() {
-        news.loadNewsFor(calendar.get(Calendar.YEAR), id.getLeastSignificantBits());
+        news.loadNewsFor(getGameYear(), id.getLeastSignificantBits());
     }
 
     public int getDeploymentDeficit(AtBContract contract) {
@@ -2149,8 +2149,8 @@ public class Campaign implements Serializable, ITechManager {
         }
 
         // Ensure that the MegaMek year GameOption matches the campaign year
-        if (gameOptions.intOption("year") != calendar.get(Calendar.YEAR)) {
-            gameOptions.getOption("year").setValue(calendar.get(Calendar.YEAR));
+        if (gameOptions.intOption("year") != getGameYear()) {
+            gameOptions.getOption("year").setValue(getGameYear());
         }
 
         //read the news
@@ -3055,7 +3055,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public String getFactionName() {
-        return getFaction().getFullName(getEra());
+        return getFaction().getFullName(getGameYear());
     }
 
     public void setFactionCode(String i) {
@@ -5591,7 +5591,7 @@ public class Campaign implements Serializable, ITechManager {
     				break;
     			}
     			person.setBloodname(Bloodname.randomBloodname(factionCode, phenotype,
-    						calendar.get(Calendar.YEAR)).getName());
+    						getGameYear()).getName());
     		}
         }
         MekHQ.triggerEvent(new PersonChangedEvent(person));
@@ -6024,7 +6024,7 @@ public class Campaign implements Serializable, ITechManager {
         target.append(partWork.getAllMods(tech));
 
         if (getCampaignOptions().useEraMods()) {
-            target.addModifier(getFaction().getEraMod(getEra()), "era");
+            target.addModifier(getFaction().getEraMod(getGameYear()), "era");
         }
 
         boolean isOvertime = false;
@@ -6091,7 +6091,7 @@ public class Campaign implements Serializable, ITechManager {
         target.append(partWork.getAllModsForMaintenance());
 
         if (getCampaignOptions().useEraMods()) {
-            target.addModifier(getFaction().getEraMod(getEra()), "era");
+            target.addModifier(getFaction().getEraMod(getGameYear()), "era");
         }
 
         if (null != partWork.getUnit() && null != tech) {
@@ -6818,7 +6818,7 @@ public class Campaign implements Serializable, ITechManager {
 
     public void setStartingPlanet() {
     	Map<String, Planet> planetList = Planets.getInstance().getPlanets();
-        Planet startingPlanet = planetList.get(getFaction().getStartingPlanet(getEra()));
+        Planet startingPlanet = planetList.get(getFaction().getStartingPlanet(getGameYear()));
 
         if (startingPlanet == null) {
         	startingPlanet = planetList.get(JOptionPane.showInputDialog("This faction does not have a starting planet for this era. Please choose a planet."));
@@ -8726,7 +8726,7 @@ public class Campaign implements Serializable, ITechManager {
     @Override
     public int getTechIntroYear() {
         if (campaignOptions.limitByYear()) {
-            return calendar.get(Calendar.YEAR);
+            return getGameYear();
         } else {
             return Integer.MAX_VALUE;
         }

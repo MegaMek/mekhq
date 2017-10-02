@@ -628,8 +628,7 @@ public class Planet implements Serializable {
     }
 
     public String getFactionDesc(DateTime when) {
-        int era = Era.getEra(when.getYear());
-        return Faction.getFactionNames(getFactionSet(when), era);
+        return Faction.getFactionNames(getFactionSet(when), when.getYear());
     }
 
     // Stellar event data, to be moved

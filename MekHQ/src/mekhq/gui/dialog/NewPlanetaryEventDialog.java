@@ -47,7 +47,6 @@ import mekhq.Utilities;
 import mekhq.adapter.SocioIndustrialDataAdapter;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.universe.Climate;
-import mekhq.campaign.universe.Era;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.LifeForm;
 import mekhq.campaign.universe.Planet;
@@ -849,7 +848,7 @@ public class NewPlanetaryEventDialog extends JDialog {
                 factionSet.add(Faction.getFaction(f));
             }
         }
-        factionsButton.setText(Faction.getFactionNames(factionSet, Era.getEra(date.getYear())));
+        factionsButton.setText(Faction.getFactionNames(factionSet, date.getYear()));
         lifeFormField.setSelectedItem(new LifeFormChoice((null != event) ? event.lifeForm : null));
         climateField.setSelectedItem(new ClimateChoice((null != event) ? event.climate : null));
         if((null == event) || (null == event.percentWater)) {

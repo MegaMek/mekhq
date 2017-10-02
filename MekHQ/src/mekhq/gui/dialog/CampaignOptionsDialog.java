@@ -107,7 +107,6 @@ import mekhq.campaign.personnel.Ranks;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.rating.UnitRatingMethod;
-import mekhq.campaign.universe.Era;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.RATManager;
 import mekhq.gui.SpecialAbilityPanel;
@@ -679,9 +678,9 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
         factionModel = new SortedComboBoxModel<String>();
         for (String sname : Faction.choosableFactionCodes) {
-            factionModel.addElement(Faction.getFaction(sname).getFullName(Era.getEra(date.get(Calendar.YEAR))));
+            factionModel.addElement(Faction.getFaction(sname).getFullName(date.get(Calendar.YEAR)));
         }
-        factionModel.setSelectedItem(campaign.getFaction().getFullName(Era.getEra(date.get(Calendar.YEAR))));
+        factionModel.setSelectedItem(campaign.getFaction().getFullName(date.get(Calendar.YEAR)));
         comboFaction.setModel(factionModel);
         comboFaction.setMinimumSize(new java.awt.Dimension(400, 30));
         comboFaction.setName("comboFaction"); // NOI18N
@@ -4082,7 +4081,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     }
 
     private void switchFaction() {
-        String factionCode = Faction.getFactionFromFullNameAndEra(String.valueOf(comboFaction.getSelectedItem()), Era.getEra(date.get(Calendar.YEAR)))
+        String factionCode = Faction.getFactionFromFullNameAndYear(String.valueOf(comboFaction.getSelectedItem()), date.get(Calendar.YEAR))
                                     .getNameGenerator();
         boolean found = false;
         for (Iterator<String> i = campaign.getRNG().getFactions(); i.hasNext(); ) {
@@ -4265,8 +4264,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         if (gameOpts.intOption("year") != campaignYear) {
             gameOpts.getOption("year").setValue(campaignYear);
         }
-        campaign.setFactionCode(Faction.getFactionFromFullNameAndEra
-        		(String.valueOf(comboFaction.getSelectedItem()), Era.getEra(date.get(Calendar.YEAR))).getShortName());
+        campaign.setFactionCode(Faction.getFactionFromFullNameAndYear
+        		(String.valueOf(comboFaction.getSelectedItem()), date.get(Calendar.YEAR)).getShortName());
         if (null != comboFactionNames.getSelectedItem()) {
             campaign.getRNG().setChosenFaction((String) comboFactionNames.getSelectedItem());
         }
@@ -4596,9 +4595,9 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
             btnDate.setText(getDateAsString());
             factionModel = new SortedComboBoxModel<String>();
             for (String sname : Faction.choosableFactionCodes) {
-                factionModel.addElement(Faction.getFaction(sname).getFullName(Era.getEra(date.get(Calendar.YEAR))));
+                factionModel.addElement(Faction.getFaction(sname).getFullName(date.get(Calendar.YEAR)));
             }
-            factionModel.setSelectedItem(campaign.getFaction().getFullName(Era.getEra(date.get(Calendar.YEAR))));
+            factionModel.setSelectedItem(campaign.getFaction().getFullName(date.get(Calendar.YEAR)));
             comboFaction.setModel(factionModel);
         }
     }//GEN-LAST:event_btnDateActionPerformed
