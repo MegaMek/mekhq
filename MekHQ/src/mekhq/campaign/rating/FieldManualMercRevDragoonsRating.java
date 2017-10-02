@@ -1162,4 +1162,8 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
     private int getCountClan() {
         return countClan;
     }
+    
+    public UnitRatingMethod getUnitRatingMethod() {
+        return UnitRatingMethod.FLD_MAN_MERCS_REV;
+    }
 }

@@ -45,7 +45,7 @@ import mekhq.campaign.unit.Unit;
  * @version %Id%
  * @since 3/12/2012
  */
-class CampaignOpsReputation extends AbstractUnitRating {
+public class CampaignOpsReputation extends AbstractUnitRating {
 
     private int nonAdminPersonnelCount = 0;
 
@@ -65,10 +65,14 @@ class CampaignOpsReputation extends AbstractUnitRating {
     private final List<String> craftWithoutCrew = new ArrayList<>();
     private int technicians = 0;
 
-    CampaignOpsReputation(Campaign campaign) {
+    public CampaignOpsReputation(Campaign campaign) {
         super(campaign);
     }
 
+    public UnitRatingMethod getUnitRatingMethod() {
+        return UnitRatingMethod.CAMPAIGN_OPS;
+    }
+    
     int getNonAdminPersonnelCount() {
         return nonAdminPersonnelCount;
     }

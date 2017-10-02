@@ -116,6 +116,10 @@ public class Faction {
     public boolean isClan() {
         return is(Tag.CLAN);
     }
+    
+    public boolean isComstar() {
+        return "CS".equals(shortname);
+    }
 
     public boolean isPeriphery() {
         return is(Tag.PERIPHERY);

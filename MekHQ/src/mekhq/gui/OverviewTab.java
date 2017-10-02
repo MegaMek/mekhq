@@ -46,6 +46,7 @@ import megamek.common.event.Subscribe;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.event.DeploymentChangedEvent;
+import mekhq.campaign.event.LoanEvent;
 import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.event.PartEvent;
 import mekhq.campaign.event.PartWorkEvent;
@@ -54,8 +55,6 @@ import mekhq.campaign.event.ScenarioResolvedEvent;
 import mekhq.campaign.event.UnitEvent;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PartInUse;
-import mekhq.campaign.rating.IUnitRating;
-import mekhq.campaign.rating.UnitRatingFactory;
 import mekhq.campaign.report.CargoReport;
 import mekhq.campaign.report.HangarReport;
 import mekhq.campaign.report.PersonnelReport;
@@ -92,7 +91,6 @@ public final class OverviewTab extends CampaignGuiTab {
     private JSplitPane splitOverviewHangar;
     // Overview Rating
     private JScrollPane scrollOverviewUnitRating;
-    private IUnitRating rating;
     // Overview Cargo
     private JScrollPane scrollOverviewCargo;
 
@@ -199,8 +197,6 @@ public final class OverviewTab extends CampaignGuiTab {
         getTabOverview().addTab(resourceMap.getString("scrollOverviewParts.TabConstraints.tabTitle"),
                 scrollOverviewParts);
 
-        rating = UnitRatingFactory.getUnitRating(getCampaign());
-        rating.reInitialize();
         scrollOverviewUnitRating.setViewportView(new RatingReport(getCampaign()).getReport());
         getTabOverview().addTab(resourceMap.getString("scrollOverviewDragoonsRating.TabConstraints.tabTitle"),
                 scrollOverviewUnitRating);
@@ -447,5 +443,10 @@ public final class OverviewTab extends CampaignGuiTab {
     @Subscribe
     public void handle(PartWorkEvent ev) {
         overviewScheduler.schedule();
+    }
+    
+    @Subscribe
+    public void handle(LoanEvent ev) {
+    	overviewScheduler.schedule();
     }
 }
