@@ -35,7 +35,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.NavigableMap;
 import java.util.Set;
+import java.util.TreeMap;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -65,12 +67,12 @@ public class Faction {
 
     private String shortname;
     private String fullname;
-    private List<factionChange> changeName;
+    private NavigableMap<Integer,String> nameChanges = new TreeMap<>();
     private String[] altNames;
     private Color color;
     private String nameGenerator;
     private String startingPlanet;
-    private List<factionChange> changePlanet;
+    private NavigableMap<Integer,String> planetChanges = new TreeMap<>();
     private int[] eraMods;
     private Integer id;
     private Set<Tag> tags;
@@ -88,7 +90,6 @@ public class Faction {
         nameGenerator = "General";
         color = Color.LIGHT_GRAY;
         startingPlanet = "Terra";
-        changePlanet = null;
         eraMods = null;
         tags = EnumSet.noneOf(Faction.Tag.class);
         start = 0;
@@ -100,17 +101,11 @@ public class Faction {
     }
 
     public String getFullName(int year) {
-        if (changeName == null) {
+        Map.Entry<Integer,String> change = nameChanges.floorEntry(year);
+        if (null == change) {
             return fullname;
         } else {
-            for (int i = changeName.size() - 1; i != -1; i--) {
-                if (year < changeName.get(i).year) {
-                    continue;
-                } else {
-                    return changeName.get(i).name;
-                }
-            }
-            return fullname;
+            return change.getValue();
         }
     }
 
@@ -131,17 +126,11 @@ public class Faction {
     }
 
     public String getStartingPlanet(int year) {
-        if (changePlanet == null) {
+        Map.Entry<Integer,String> change = planetChanges.floorEntry(year);
+        if (null == change) {
             return startingPlanet;
         } else {
-            for (int i = changePlanet.size() - 1; i != -1; i--) {
-                if (year < changePlanet.get(i).year) {
-                    continue;
-                } else {
-                    return changePlanet.get(i).name;
-                }
-            }
-            return startingPlanet;
+            return change.getValue();
         }
     }
 
@@ -241,16 +230,9 @@ public class Faction {
     }
     
     public boolean hasName(String name) {
-        if (name.equals(fullname)) {
+        if (name.equals(fullname)
+                || nameChanges.values().stream().anyMatch(n -> n.equals(name))) {
             return true;
-        } else {
-            if (changeName != null) {
-                for (factionChange nChange : changeName) {
-                    if (nChange.name.equals(name)) {
-                        return true;
-                    }
-                }
-            }
         }
         if (altNames != null && altNames.length > 0) {
             for (String altName : altNames) {
@@ -323,19 +305,11 @@ public class Faction {
             } else if (wn2.getNodeName().equalsIgnoreCase("startingPlanet")) {
                 retVal.startingPlanet = wn2.getTextContent();
             } else if (wn2.getNodeName().equalsIgnoreCase("changePlanet")) {
-                if (retVal.changePlanet == null) {
-                    retVal.changePlanet = new ArrayList<factionChange>();
-                }
-                factionChange pChange = retVal.getChangeObject(Integer.parseInt(wn2.getAttributes().getNamedItem("year").getTextContent()),
-                        wn2.getTextContent());
-                retVal.changePlanet.add(pChange);
+                int year = Integer.parseInt(wn2.getAttributes().getNamedItem("year").getTextContent());
+                retVal.planetChanges.put(year, wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("altNamesByYear")) {
-                if (retVal.changeName == null) {
-                    retVal.changeName = new ArrayList<factionChange>();
-                }
-                factionChange nChange = retVal.getChangeObject(Integer.parseInt(wn2.getAttributes().getNamedItem("year").getTextContent()),
-                        wn2.getTextContent());
-                retVal.changeName.add(nChange);
+                int year = Integer.parseInt(wn2.getAttributes().getNamedItem("year").getTextContent());
+                retVal.nameChanges.put(year, wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("altNames")) {
                 retVal.altNames = wn2.getTextContent().split(",", 0);
             } else if (wn2.getNodeName().equalsIgnoreCase("eraMods")) {
@@ -458,10 +432,6 @@ public class Faction {
         return Utilities.combineString(factionNames, "/"); //$NON-NLS-1$
     }
     
-    private factionChange getChangeObject(int year, String name) {
-        return new factionChange(year, name);
-    }
-
     public static enum Tag {
         /** Inner sphere */
         IS, PERIPHERY, CLAN,
@@ -485,15 +455,5 @@ public class Faction {
         GENERATED,
         /** Faction is hidden from view */
         HIDDEN
-    }
-    
-    class factionChange {
-        int year;
-        String name;
-        
-        factionChange(int year, String name) {
-            this.year = year;
-            this.name = name;
-        }
     }
 }
