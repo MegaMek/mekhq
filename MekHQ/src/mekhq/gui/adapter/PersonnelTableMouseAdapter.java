@@ -30,6 +30,7 @@ import megamek.common.options.PilotOptions;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.Utilities;
+import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.Kill;
 import mekhq.campaign.LogEntry;
 import mekhq.campaign.event.PersonChangedEvent;
@@ -88,6 +89,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
     private static final String CMD_EDIT_PERSONNEL_LOG = "LOG"; //$NON-NLS-1$
     private static final String CMD_EDIT_KILL_LOG = "KILL_LOG"; //$NON-NLS-1$
     private static final String CMD_KILL = "KILL"; //$NON-NLS-1$
+    private static final String CMD_BUY_EDGE = "EDGE_BUY"; //$NON-NLS-1$
     private static final String CMD_SET_EDGE = "EDGE_SET"; //$NON-NLS-1$
     private static final String CMD_SET_XP = "XP_SET"; //$NON-NLS-1$
     private static final String CMD_ADD_XP = "XP_ADD"; //$NON-NLS-1$
@@ -820,6 +822,17 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 int i = pvcd.getValue();
                 for (Person person : people) {
                     person.setXp(i);
+                    MekHQ.triggerEvent(new PersonChangedEvent(person));
+                }
+                break;
+            }
+            case CMD_BUY_EDGE:
+            {
+                int cost = gui.getCampaign().getCampaignOptions().getEdgeCost();
+                for (Person person : people) {
+                    selectedPerson.setXp(selectedPerson.getXp() - cost);
+                    person.setEdge(person.getEdge() + 1);
+                    gui.getCampaign().personUpdated(person);
                     MekHQ.triggerEvent(new PersonChangedEvent(person));
                 }
                 break;
@@ -1806,6 +1819,20 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     }
                     menu.add(abMenu);
                 }
+                menu.add(currentMenu);
+                menu.add(newMenu);
+                if (gui.getCampaign().getCampaignOptions().useEdge()) {
+                    JMenu edgeMenu = new JMenu(resourceMap.getString("edge.text")); //$NON-NLS-1$
+                    int cost = gui.getCampaign().getCampaignOptions().getEdgeCost();
+                    boolean available = (cost >= 0) && (person.getXp() >= cost);
+                                        
+                    menuItem = new JMenuItem(String.format(resourceMap.getString("spendOnEdge.text"), cost)); //$NON-NLS-1$
+                    menuItem.setActionCommand(makeCommand(CMD_BUY_EDGE, String.valueOf(cost)));
+                    menuItem.addActionListener(this);
+                    menuItem.setEnabled(available);
+                    edgeMenu.add(menuItem);
+                    menu.add(edgeMenu); 
+                }        
                 popup.add(menu);
             }
             if (oneSelected && person.isActive()) {

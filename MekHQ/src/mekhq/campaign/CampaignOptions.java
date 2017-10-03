@@ -178,6 +178,7 @@ public class CampaignOptions implements Serializable {
     private int contractNegotiationXP;
     private int adminXP;
     private int adminXPPeriod;
+    private int edgeCost;
 
     //repair related
     private boolean destroyByMargin;
@@ -338,6 +339,7 @@ public class CampaignOptions implements Serializable {
         contractNegotiationXP = 0;
         adminXP = 0;
         adminXPPeriod = 1;
+        edgeCost = 1;
         unitRatingMethod = UnitRatingMethod.CAMPAIGN_OPS;
         waitingPeriod = 7;
         acquisitionSkill = S_TECH;
@@ -1076,6 +1078,14 @@ public class CampaignOptions implements Serializable {
 
     public void setAdminXPPeriod(int m) {
         adminXPPeriod = m;
+    }
+    
+    public int getEdgeCost() {
+        return edgeCost;
+    }
+
+    public void setEdgeCost(int b) {
+        edgeCost = b;
     }
 
     public int getWaitingPeriod() {
@@ -1931,6 +1941,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "contractNegotiationXP", contractNegotiationXP);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "adminWeeklyXP", adminXP);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "adminXPPeriod", adminXPPeriod);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "edgeCost", edgeCost);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "limitByYear", limitByYear);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "disallowExtinctStuff", disallowExtinctStuff);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "allowClanPurchases", allowClanPurchases);
@@ -2225,6 +2236,8 @@ public class CampaignOptions implements Serializable {
                 retVal.adminXP = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("adminXPPeriod")) {
                 retVal.adminXPPeriod = Integer.parseInt(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("edgeCost")) {
+                retVal.edgeCost = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("waitingPeriod")) {
                 retVal.waitingPeriod = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("healWaitingPeriod")) {

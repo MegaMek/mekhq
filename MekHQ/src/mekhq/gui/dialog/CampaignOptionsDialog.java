@@ -285,6 +285,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JSpinner spnContractNegotiationXP;
     private JSpinner spnAdminWeeklyXP;
     private JSpinner spnAdminWeeklyXPPeriod;
+    private JSpinner spnEdgeCost;
 
     private JCheckBox chkSupportStaffOnly;
     private JSpinner spnAcquireWaitingPeriod;
@@ -2179,6 +2180,23 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         panXP.add(new JLabel("week(s)"), gridBagConstraints);
+        
+        spnEdgeCost = new JSpinner(new SpinnerNumberModel(options.getEdgeCost(), 0, 10000, 1));
+        ((JSpinner.DefaultEditor) spnEdgeCost.getEditor()).getTextField().setEditable(false);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 8;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        panXP.add(spnEdgeCost, gridBagConstraints);
+
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 8;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        panXP.add(new JLabel("XP Cost for 1 Edge Point"), gridBagConstraints);
 
         txtInstructionsXP = new JTextArea();
         txtInstructionsXP.setText(resourceMap.getString("txtInstructionsXP.text"));
@@ -2194,7 +2212,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         txtInstructionsXP.setMinimumSize(new Dimension(550, 120));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 8;
+        gridBagConstraints.gridy = 9;
         gridBagConstraints.gridwidth = 6;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 0.0;
@@ -2217,7 +2235,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         scrXP.setCorner(JScrollPane.UPPER_LEFT_CORNER, rowTable.getTableHeader());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 9;
+        gridBagConstraints.gridy = 10;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.gridwidth = 5;
@@ -4257,6 +4275,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setContractNegotiationXP((Integer) spnContractNegotiationXP.getModel().getValue());
         options.setAdminXP((Integer) spnAdminWeeklyXP.getModel().getValue());
         options.setAdminXPPeriod((Integer) spnAdminWeeklyXPPeriod.getModel().getValue());
+        options.setEdgeCost((Integer) spnEdgeCost.getModel().getValue());
         options.setTargetIdleXP((Integer) spnTargetIdleXP.getModel().getValue());
 
         options.setLimitByYear(limitByYearBox.isSelected());
