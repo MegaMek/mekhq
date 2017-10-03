@@ -23,13 +23,13 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import megamek.common.EquipmentType;
-import megamek.common.Tank;
-import mekhq.MekHqXmlUtil;
-import mekhq.campaign.Campaign;
-
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import megamek.common.Tank;
+import megamek.common.TechAdvancement;
+import mekhq.MekHqXmlUtil;
+import mekhq.campaign.Campaign;
 
 /**
  *
@@ -84,16 +84,6 @@ public class MissingVeeStabiliser extends MissingPart {
 	}
 
 	@Override
-	public int getTechRating() {
-		return EquipmentType.RATING_C;
-	}
-
-	@Override
-	public int getAvailability(int era) {
-		return EquipmentType.RATING_C;
-	}
-	
-	@Override
 	public void writeToXml(PrintWriter pw1, int indent) {
 		writeToXmlBegin(pw1, indent);
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
@@ -147,20 +137,10 @@ public class MissingVeeStabiliser extends MissingPart {
 		return unit.getEntity().getLocationName(loc);
 	}
 	
-	@Override
-	public int getIntroDate() {
-		return EquipmentType.DATE_NONE;
-	}
-
-	@Override
-	public int getExtinctDate() {
-		return EquipmentType.DATE_NONE;
-	}
-
-	@Override
-	public int getReIntroDate() {
-		return EquipmentType.DATE_NONE;
-	}
+    @Override
+    public TechAdvancement getTechAdvancement() {
+        return TankLocation.TECH_ADVANCEMENT;
+    }
 	
 	
 }

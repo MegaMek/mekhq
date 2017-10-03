@@ -106,7 +106,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
     private int failCount = 0;
     private BigDecimal supportPercent = BigDecimal.ZERO;
     private BigDecimal transportPercent = BigDecimal.ZERO;
-
+    
     private static boolean initialized = false;
 
     /**
@@ -412,7 +412,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
      * Calculates the unit's rating score.
      */
     protected abstract int calculateUnitRatingScore();
-
+    
     /**
      * Recalculates the dragoons rating.  If this has already been done, the 
      * initialized flag should already be set true

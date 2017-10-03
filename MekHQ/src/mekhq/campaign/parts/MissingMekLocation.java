@@ -27,6 +27,7 @@ import megamek.common.CriticalSlot;
 import megamek.common.EquipmentType;
 import megamek.common.IArmorState;
 import megamek.common.Mech;
+import megamek.common.TechAdvancement;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 
@@ -41,12 +42,13 @@ public class MissingMekLocation extends MissingPart {
 	private static final long serialVersionUID = -122291037522319765L;
 	protected int loc;
     protected int structureType;
+    protected boolean clan; // Needed for Endo-steel
     protected boolean tsm;
     protected double percent;
     protected boolean forQuad;
 
     public MissingMekLocation() {
-    	this(0, 0, 0, false, false, null);
+    	this(0, 0, 0, false, false, false, null);
     }
 
     public boolean isTsm() {
@@ -57,10 +59,15 @@ public class MissingMekLocation extends MissingPart {
         return structureType;
     }
 
-    public MissingMekLocation(int loc, int tonnage, int structureType, boolean hasTSM, boolean quad, Campaign c) {
+    public void setClan(boolean clan) {
+        this.clan = clan;
+    }
+
+    public MissingMekLocation(int loc, int tonnage, int structureType, boolean clan, boolean hasTSM, boolean quad, Campaign c) {
         super(tonnage, c);
         this.loc = loc;
         this.structureType = structureType;
+        this.clan = clan;
         this.tsm = hasTSM;
         this.percent = 1.0;
         this.forQuad = quad;
@@ -139,6 +146,7 @@ public class MissingMekLocation extends MissingPart {
 				+"<structureType>"
 				+structureType
 				+"</structureType>");
+		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "clan", clan);
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<tsm>"
 				+tsm
@@ -163,8 +171,10 @@ public class MissingMekLocation extends MissingPart {
 
 			if (wn2.getNodeName().equalsIgnoreCase("loc")) {
 				loc = Integer.parseInt(wn2.getTextContent());
-			} else if (wn2.getNodeName().equalsIgnoreCase("structureType")) {
-				structureType = Integer.parseInt(wn2.getTextContent());
+            } else if (wn2.getNodeName().equalsIgnoreCase("structureType")) {
+                structureType = Integer.parseInt(wn2.getTextContent());
+            } else if (wn2.getNodeName().equalsIgnoreCase("clan")) {
+                clan = Boolean.parseBoolean(wn2.getTextContent());
 			} else if (wn2.getNodeName().equalsIgnoreCase("percent")) {
 				percent = Double.parseDouble(wn2.getTextContent());
 			} else if (wn2.getNodeName().equalsIgnoreCase("tsm")) {
@@ -179,63 +189,6 @@ public class MissingMekLocation extends MissingPart {
 					forQuad = false;
 			}
 		}
-	}
-
-	@Override
-	public int getAvailability(int era) {
-		switch(structureType) {
-		case EquipmentType.T_STRUCTURE_ENDO_STEEL:
-		case EquipmentType.T_STRUCTURE_ENDO_PROTOTYPE:
-			if(era == EquipmentType.ERA_SL) {
-				return EquipmentType.RATING_D;
-			} else if(era == EquipmentType.ERA_SW) {
-				return EquipmentType.RATING_F;
-			} else {
-				return EquipmentType.RATING_E;
-			}
-		case EquipmentType.T_STRUCTURE_ENDO_COMPOSITE:
-			if(era == EquipmentType.ERA_SL) {
-				return EquipmentType.RATING_X;
-			} else if(era == EquipmentType.ERA_SW) {
-				return EquipmentType.RATING_X;
-			} else {
-				return EquipmentType.RATING_F;
-			}
-		case EquipmentType.T_STRUCTURE_REINFORCED:
-		case EquipmentType.T_STRUCTURE_COMPOSITE:
-			if(era == EquipmentType.ERA_SL) {
-				return EquipmentType.RATING_X;
-			} else if(era == EquipmentType.ERA_SW) {
-				return EquipmentType.RATING_X;
-			} else {
-				return EquipmentType.RATING_E;
-			}
-		case EquipmentType.T_STRUCTURE_INDUSTRIAL:
-		default:
-			return EquipmentType.RATING_C;
-		}
-	}
-
-	@Override
-	public int getTechRating() {
-		switch(structureType) {
-		case EquipmentType.T_STRUCTURE_ENDO_STEEL:
-		case EquipmentType.T_STRUCTURE_ENDO_PROTOTYPE:
-			return EquipmentType.RATING_E;
-		case EquipmentType.T_STRUCTURE_ENDO_COMPOSITE:
-		case EquipmentType.T_STRUCTURE_REINFORCED:
-		case EquipmentType.T_STRUCTURE_COMPOSITE:
-			return EquipmentType.RATING_E;
-		case EquipmentType.T_STRUCTURE_INDUSTRIAL:
-			return EquipmentType.RATING_C;
-		default:
-			return EquipmentType.RATING_D;
-		}
-	}
-
-	@Override
-	public int getTechBase() {
-		return T_BOTH;
 	}
 
 	private boolean isArm() {
@@ -314,7 +267,8 @@ public class MissingMekLocation extends MissingPart {
 	    }*/
 	    boolean lifeSupport = (loc == Mech.LOC_HEAD);
 	    boolean sensors = (loc == Mech.LOC_HEAD);
-	    Part nPart = new MekLocation(loc, getUnitTonnage(), structureType, tsm, forQuad, sensors, lifeSupport, campaign);
+	    Part nPart = new MekLocation(loc, getUnitTonnage(), structureType, clan,
+	            tsm, forQuad, sensors, lifeSupport, campaign);
 		return nPart;
 	}
 
@@ -403,50 +357,11 @@ public class MissingMekLocation extends MissingPart {
 		return loc;
 	}
 
-	@Override
-	public int getIntroDate() {
-		//TODO: I need a clan tag in order to distinguish some of these
-		//I believe there is also a bug about differences between IS/Clan IS
-		int currentDate;
-		switch(structureType) {
-		case EquipmentType.T_STRUCTURE_ENDO_COMPOSITE:
-			currentDate = 3067;
-			break;
-		case EquipmentType.T_STRUCTURE_REINFORCED:
-			currentDate = 3057;
-			break;
-		case EquipmentType.T_STRUCTURE_COMPOSITE:
-			currentDate = 3061;
-			break;
-		case EquipmentType.T_STRUCTURE_INDUSTRIAL:
-			currentDate = 2350;
-			break;
-		case EquipmentType.T_STRUCTURE_STANDARD:
-			currentDate = 2439;
-			break;
-		case EquipmentType.T_STRUCTURE_ENDO_PROTOTYPE:
-		case EquipmentType.T_STRUCTURE_ENDO_STEEL:
-			currentDate = 2487;
-			break;
-		default:
-			currentDate = EquipmentType.DATE_NONE;
-		}
-		if(tsm && currentDate < 3050) {
-			currentDate = 3050;
-		}
-		return currentDate;
-	}
-
-	@Override
-	public int getExtinctDate() {
-		//TOD: endo steel should go extinct for IS, but I have no way to distinguish
-		return EquipmentType.DATE_NONE;
-	}
-
-	@Override
-	public int getReIntroDate() {
-		return EquipmentType.DATE_NONE;
-	}
+    @Override
+    public TechAdvancement getTechAdvancement() {
+        return EquipmentType.getStructureTechAdvancement(structureType, clan);
+    }
+    
 	
 	@Override
 	public int getMassRepairOptionType() {

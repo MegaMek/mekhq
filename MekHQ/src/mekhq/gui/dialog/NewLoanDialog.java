@@ -52,7 +52,6 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Loan;
 import mekhq.campaign.rating.IUnitRating;
-import mekhq.campaign.rating.UnitRatingFactory;
 
 /**
  * @author Taharqa
@@ -109,8 +108,7 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
         super(parent, modal);
         this.frame = parent;
         campaign = c;
-        IUnitRating unitRating = UnitRatingFactory.getUnitRating(campaign);
-        unitRating.reInitialize();
+        IUnitRating unitRating = c.getUnitRating();
         rating = unitRating.getModifier();
         loan = Loan.getBaseLoanFor(rating, campaign.getCalendar());
         maxCollateralValue = campaign.getFinances().getMaxCollateral(campaign);

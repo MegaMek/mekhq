@@ -197,16 +197,23 @@ public class PersonnelMarket {
 					for (int i = Person.T_NONE + 1; i < Person.T_NUM; i++) {
 						roll = Compute.d6(2);
 						// TODO: Modifiers for hiring hall, but first needs to track the hiring hall
-						if (c.getUnitRating().equalsIgnoreCase("A") || c.getUnitRating().equalsIgnoreCase("A*")) {
+						switch(c.getUnitRatingMod()) {
+						case IUnitRating.DRAGOON_A:
+						case IUnitRating.DRAGOON_ASTAR:
 							roll += 3;
-						} else if (c.getUnitRating().equalsIgnoreCase("B")) {
+							break;
+						case IUnitRating.DRAGOON_B:
 							roll += 2;
-						} else if (c.getUnitRating().equalsIgnoreCase("C")) {
+							break;
+						case IUnitRating.DRAGOON_C:
 							roll += 1;
-						} else if (c.getUnitRating().equalsIgnoreCase("E")) {
+							break;
+						case IUnitRating.DRAGOON_D:
 							roll -= 1;
-						} else if (c.getUnitRating().equalsIgnoreCase("F")) {
+							break;
+						case IUnitRating.DRAGOON_F:
 							roll -= 2;
+							break;
 						}
 						roll += mftMod;
 						roll = Math.max(roll, 0);

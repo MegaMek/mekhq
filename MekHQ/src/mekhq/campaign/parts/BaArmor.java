@@ -141,33 +141,6 @@ public class BaArmor extends Armor implements IAcquisitionWork {
     }
 
     @Override
-    public int getAvailability(int era) {
-        switch(type) {
-        case EquipmentType.T_ARMOR_BA_STEALTH:
-            if(era == EquipmentType.ERA_CLAN) {
-                return EquipmentType.RATING_E;
-            } else {
-                return EquipmentType.RATING_X;
-            } 
-        case EquipmentType.T_ARMOR_BA_STANDARD_PROTOTYPE:
-        case EquipmentType.T_ARMOR_BA_STANDARD:
-        case EquipmentType.T_ARMOR_BA_STEALTH_BASIC:
-            if(era == EquipmentType.ERA_CLAN) {
-                return EquipmentType.RATING_E;
-            } else {
-                return EquipmentType.RATING_F;
-            } 
-        default:
-            if(era == EquipmentType.ERA_CLAN) {
-                return EquipmentType.RATING_F;
-            } else {
-                return EquipmentType.RATING_X;
-            }           
-        }
-        
-    }
-    
-    @Override
     public IAcquisitionWork getAcquisitionWork() {
         return new BaArmor(0, (int)Math.round(5 * getPointsPerTon()), type, -1, clan, campaign);
     }

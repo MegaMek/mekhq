@@ -45,7 +45,7 @@ import mekhq.campaign.unit.Unit;
  * @version %Id%
  * @since 3/12/2012
  */
-class CampaignOpsReputation extends AbstractUnitRating {
+public class CampaignOpsReputation extends AbstractUnitRating {
 
     private int nonAdminPersonnelCount = 0;
 
@@ -65,10 +65,14 @@ class CampaignOpsReputation extends AbstractUnitRating {
     private final List<String> craftWithoutCrew = new ArrayList<>();
     private int technicians = 0;
 
-    CampaignOpsReputation(Campaign campaign) {
+    public CampaignOpsReputation(Campaign campaign) {
         super(campaign);
     }
 
+    public UnitRatingMethod getUnitRatingMethod() {
+        return UnitRatingMethod.CAMPAIGN_OPS;
+    }
+    
     int getNonAdminPersonnelCount() {
         return nonAdminPersonnelCount;
     }
@@ -261,6 +265,9 @@ class CampaignOpsReputation extends AbstractUnitRating {
                 continue;
             } else if ((u.getEntity().getEntityType() &
                         Entity.ETYPE_AERO) == Entity.ETYPE_AERO) {
+                totalAero++;
+            } else if ((u.getEntity().getEntityType() &
+                        Entity.ETYPE_DROPSHIP) == Entity.ETYPE_DROPSHIP) {
                 totalAero++;
             } else if (((u.getEntity().getEntityType() &
                          Entity.ETYPE_MECH) == Entity.ETYPE_MECH)
@@ -619,8 +626,7 @@ class CampaignOpsReputation extends AbstractUnitRating {
                 totalValue += 5;
             }
         }
-        if ((getDropshipCount() > 0) && (getDockingCollarCount() >=
-                                         getDropshipCount())) {
+        if ((getDropshipCount() > 0) && (getDockingCollarCount() >= getDropshipCount())) {
             totalValue += 5;
         }
 

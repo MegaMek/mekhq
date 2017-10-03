@@ -23,10 +23,9 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 import java.io.Serializable;
-import java.util.Calendar;
 import java.util.UUID;
 
-import megamek.common.EquipmentType;
+import megamek.common.ITechnology;
 import megamek.common.TargetRoll;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
@@ -254,12 +253,9 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
             }
         }
         //availability mod
-        int avail = getAvailability(campaign.getEra());
-        if(this.isExtinctIn(campaign.getCalendar().get(Calendar.YEAR))) {
-        	avail = EquipmentType.RATING_X;
-        }
+        int avail = getAvailability();
         int availabilityMod = Availability.getAvailabilityModifier(avail);
-        target.addModifier(availabilityMod, "availability (" + EquipmentType.getRatingName(avail) + ")");
+        target.addModifier(availabilityMod, "availability (" + ITechnology.getRatingName(avail) + ")");
         
         return target;
     }
@@ -427,6 +423,16 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 	@Override
 	public boolean needsMaintenance() {
         return false;
+    }
+
+    @Override
+    public boolean isIntroducedBy(int year, boolean clan, int techFaction) {
+        return getIntroductionDate(clan, techFaction) <= year;
+    }
+
+    @Override
+    public boolean isExtinctIn(int year, boolean clan, int techFaction) {
+        return isExtinct(year, clan, techFaction);
     }
 }
 

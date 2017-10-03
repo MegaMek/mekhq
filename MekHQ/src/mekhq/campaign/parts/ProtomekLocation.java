@@ -23,22 +23,22 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.common.CriticalSlot;
-import megamek.common.EquipmentType;
 import megamek.common.IArmorState;
 import megamek.common.ILocationExposureStatus;
 import megamek.common.Mounted;
 import megamek.common.Protomech;
+import megamek.common.SimpleTechLevel;
 import megamek.common.TargetRoll;
-import megamek.common.TechConstants;
+import megamek.common.TechAdvancement;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.work.WorkTime;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  *
@@ -46,6 +46,13 @@ import org.w3c.dom.NodeList;
  */
 public class ProtomekLocation extends Part {
     private static final long serialVersionUID = -122291037522319765L;
+
+    static final TechAdvancement TECH_ADVANCEMENT = new TechAdvancement(TECH_BASE_CLAN)
+            .setClanAdvancement(3055, 3060, 3060).setClanApproximate(true, false, false)
+            .setPrototypeFactions(F_CSJ).setProductionFactions(F_CSJ)
+            .setTechRating(RATING_D).setAvailability(RATING_X, RATING_X, RATING_D, RATING_D)
+            .setStaticTechLevel(SimpleTechLevel.STANDARD);
+    
     //some of these aren't used but may be later for advanced designs (i.e. WoR)
     protected int loc;
     protected int structureType;
@@ -236,30 +243,6 @@ public class ProtomekLocation extends Part {
                     breached = false;
             }
         }
-    }
-
-    @Override
-    public int getAvailability(int era) {
-        if(era == EquipmentType.ERA_CLAN) {
-            return EquipmentType.RATING_E;
-        } else {
-            return EquipmentType.RATING_X;
-        }
-    }
-
-    @Override
-    public int getTechRating() {
-       return EquipmentType.RATING_E;
-    }
-
-    @Override
-    public int getTechLevel() {
-        return TechConstants.T_CLAN_TW;
-    }
-
-    @Override
-    public int getTechBase() {
-        return T_CLAN;
     }
 
     @Override
@@ -664,18 +647,8 @@ public class ProtomekLocation extends Part {
 	}
 
 	@Override
-	public int getIntroDate() {
-		return 3055;
-	}
-
-	@Override
-	public int getExtinctDate() {
-		return EquipmentType.DATE_NONE;
-	}
-
-	@Override
-	public int getReIntroDate() {
-		return EquipmentType.DATE_NONE;
+	public TechAdvancement getTechAdvancement() {
+	    return TECH_ADVANCEMENT;
 	}
     
     @Override

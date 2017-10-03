@@ -119,6 +119,9 @@ import mekhq.campaign.parts.Refit;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.SpecialAbility;
+import mekhq.campaign.rating.CampaignOpsReputation;
+import mekhq.campaign.rating.FieldManualMercRevDragoonsRating;
+import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.campaign.report.CargoReport;
 import mekhq.campaign.report.HangarReport;
 import mekhq.campaign.report.PersonnelReport;
@@ -149,6 +152,7 @@ import mekhq.gui.dialog.RefitNameDialog;
 import mekhq.gui.dialog.ReportDialog;
 import mekhq.gui.dialog.RetirementDefectionDialog;
 import mekhq.gui.dialog.ShipSearchDialog;
+import mekhq.gui.dialog.UnitCostReportDialog;
 import mekhq.gui.dialog.UnitMarketDialog;
 import mekhq.gui.dialog.UnitSelectorDialog;
 import mekhq.gui.model.PartsTableModel;
@@ -795,7 +799,7 @@ public class CampaignGUI extends JPanel {
         JMenuItem miHire;
         for (int i = Person.T_MECHWARRIOR; i < Person.T_NUM; i++) {
             miHire = new JMenuItem(Person.getRoleDesc(i, getCampaign()
-                    .getFaction().isClan())); // NOI18N
+                    .getFaction().isClan()));
             miHire.setActionCommand(Integer.toString(i));
             miHire.addActionListener(new ActionListener() {
                 @Override
@@ -1644,6 +1648,7 @@ public class CampaignGUI extends JPanel {
     private void menuOptionsActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_menuOptionsActionPerformed
         boolean atb = getCampaign().getCampaignOptions().getUseAtB();
         boolean staticRATs = getCampaign().getCampaignOptions().useStaticRATs();
+        boolean factionIntroDate = getCampaign().getCampaignOptions().useFactionIntroDate();
         CampaignOptionsDialog cod = new CampaignOptionsDialog(getFrame(), true,
                 getCampaign(), getIconPackage().getCamos());
         cod.setVisible(true);
@@ -1689,6 +1694,9 @@ public class CampaignGUI extends JPanel {
         }
         if (staticRATs != getCampaign().getCampaignOptions().useStaticRATs()) {
         	getCampaign().initUnitGenerator();
+        }
+        if (factionIntroDate != getCampaign().getCampaignOptions().useFactionIntroDate()) {
+            getCampaign().updateTechFactionCode();
         }
         refreshCalendar();
         getCampaign().reloadNews();
@@ -1902,6 +1910,18 @@ public class CampaignGUI extends JPanel {
             return;
         }
         MaintenanceReportDialog mrd = new MaintenanceReportDialog(getFrame(), u);
+        mrd.setVisible(true);
+    }
+
+    public void showUnitCostReport(UUID id) {
+        if (null == id) {
+            return;
+        }
+        Unit u = getCampaign().getUnit(id);
+        if (null == u) {
+            return;
+        }
+        UnitCostReportDialog mrd = new UnitCostReportDialog(getFrame(), u);
         mrd.setVisible(true);
     }
 
@@ -2783,7 +2803,7 @@ public class CampaignGUI extends JPanel {
     		// put a try-catch here so that bugs in the meklab don't screw up
     		// other stuff
     		try {
-    			lab.refreshSummary();
+    			lab.refreshRefitSummary();
     		} catch (Exception err) {
     			err.printStackTrace();
     		}
@@ -2821,8 +2841,18 @@ public class CampaignGUI extends JPanel {
 
     private void refreshRating() {
         if (getCampaign().getCampaignOptions().useDragoonRating()) {
-            String text = "<html><b>Dragoons Rating:</b> "
-                    + getCampaign().getUnitRating() + "</html>";
+        	// this is the one situation where we do want to refresh the rating,
+        	// as it means something has happened to influence it
+        	getCampaign().getUnitRating().reInitialize();
+        	
+            String text;
+        	if (UnitRatingMethod.FLD_MAN_MERCS_REV.equals(getCampaign().getCampaignOptions().getUnitRatingMethod())) {
+                text = String.format(resourceMap.getString("bottomRating.DragoonsRating"), getCampaign().getUnitRatingText());
+            }
+            else {
+                text = String.format(resourceMap.getString("bottomRating.CampaignOpsRating"), getCampaign().getUnitRatingText());
+            }
+        	
             lblRating.setText(text);
         } else {
             lblRating.setText("");

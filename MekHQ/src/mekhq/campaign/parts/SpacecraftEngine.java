@@ -23,21 +23,22 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.common.Aero;
 import megamek.common.CriticalSlot;
 import megamek.common.Entity;
-import megamek.common.EquipmentType;
 import megamek.common.Jumpship;
 import megamek.common.Mech;
+import megamek.common.SimpleTechLevel;
 import megamek.common.SmallCraft;
+import megamek.common.TechAdvancement;
 import megamek.common.TechConstants;
 import megamek.common.Warship;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.SkillType;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  * 
@@ -45,6 +46,12 @@ import org.w3c.dom.NodeList;
  */
 public class SpacecraftEngine extends Part {
 	private static final long serialVersionUID = -6961398614705924172L;
+	
+	static final TechAdvancement TECH_ADVANCEMENT = new TechAdvancement(TECH_BASE_ALL)
+	        .setAdvancement(DATE_ES, DATE_ES, DATE_ES).setTechRating(RATING_D)
+	        .setAvailability(RATING_C, RATING_D, RATING_C, RATING_C)
+	        .setStaticTechLevel(SimpleTechLevel.STANDARD);
+	
 	double engineTonnage;  
 	boolean clan;
 	
@@ -146,22 +153,6 @@ public class SpacecraftEngine extends Part {
 				}
 			} 
 		}
-	}
-
-	@Override
-	public int getAvailability(int era) {
-		if(era == EquipmentType.ERA_SL) {
-			return EquipmentType.RATING_C;
-		} else if(era == EquipmentType.ERA_SW) {
-			return EquipmentType.RATING_E;
-		} else {
-			return EquipmentType.RATING_C;
-		}
-	}
-
-	@Override
-	public int getTechRating() {
-		return EquipmentType.RATING_D;
 	}
 
 	@Override
@@ -277,18 +268,8 @@ public class SpacecraftEngine extends Part {
 	}
 	
 	@Override
-	public int getIntroDate() {
-		return EquipmentType.DATE_NONE;
-	}
-
-	@Override
-	public int getExtinctDate() {
-		return EquipmentType.DATE_NONE;
-	}
-
-	@Override
-	public int getReIntroDate() {
-		return EquipmentType.DATE_NONE;
+	public TechAdvancement getTechAdvancement() {
+	    return TECH_ADVANCEMENT;
 	}
     
     @Override

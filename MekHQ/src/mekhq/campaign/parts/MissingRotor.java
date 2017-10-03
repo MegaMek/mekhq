@@ -21,13 +21,14 @@
 
 package mekhq.campaign.parts;
 
+import org.w3c.dom.Node;
+
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.IArmorState;
+import megamek.common.TechAdvancement;
 import megamek.common.VTOL;
 import mekhq.campaign.Campaign;
-
-import org.w3c.dom.Node;
 
 /**
  *
@@ -61,18 +62,9 @@ public class MissingRotor extends MissingPart {
 	}
 
 	@Override
-	public int getAvailability(int era) {
-		if(era == EquipmentType.ERA_SW) {
-			return EquipmentType.RATING_D;
-		}
-		return EquipmentType.RATING_C;
-	}
-
-	@Override
 	public int getTechRating() {
 		return EquipmentType.RATING_B;
 	}
-
 
 	@Override
 	public boolean isAcceptableReplacement(Part part, boolean refit) {
@@ -115,18 +107,8 @@ public class MissingRotor extends MissingPart {
 	}
 	
 	@Override
-	public int getIntroDate() {
-		return EquipmentType.DATE_NONE;
-	}
-
-	@Override
-	public int getExtinctDate() {
-		return EquipmentType.DATE_NONE;
-	}
-
-	@Override
-	public int getReIntroDate() {
-		return EquipmentType.DATE_NONE;
+	public TechAdvancement getTechAdvancement() {
+	    return Rotor.TECH_ADVANCEMENT;
 	}
 	
 }

@@ -36,7 +36,6 @@ import javax.swing.JTextArea;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.rating.IUnitRating;
-import mekhq.campaign.rating.UnitRatingFactory;
 
 /**
  * @author Deric Page (deric (dot) page (at) usa.net)
@@ -92,8 +91,7 @@ public class UnitRatingDialog extends JDialog implements ActionListener {
     }
 
     private void getDragoonsRating() {
-        rating = UnitRatingFactory.getUnitRating(campaign);
-        rating.reInitialize();
+        rating = campaign.getUnitRating();
     }
 
     private JPanel getButtonPanel() {

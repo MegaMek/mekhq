@@ -23,18 +23,19 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.common.BipedMech;
 import megamek.common.Compute;
 import megamek.common.CriticalSlot;
-import megamek.common.EquipmentType;
 import megamek.common.Mech;
+import megamek.common.SimpleTechLevel;
+import megamek.common.TechAdvancement;
 import megamek.common.TechConstants;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.SkillType;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  *
@@ -42,6 +43,16 @@ import org.w3c.dom.NodeList;
  */
 public class MekActuator extends Part {
 	private static final long serialVersionUID = 719878556021696393L;
+	
+    static final TechAdvancement TA_STANDARD = new TechAdvancement(TECH_BASE_ALL)
+            .setAdvancement(2300, 2350, 2505).setApproximate(true, false, false)
+            .setPrototypeFactions(F_TA).setProductionFactions(F_TH)
+            .setStaticTechLevel(SimpleTechLevel.INTRO);
+    static final TechAdvancement TA_SUPERHEAVY = new TechAdvancement(TECH_BASE_IS)
+            .setAdvancement(2905, 2940, 3076).setApproximate(true, false, false)
+            .setPrototypeFactions(F_FW).setProductionFactions(F_FW)
+            .setStaticTechLevel(SimpleTechLevel.ADVANCED);
+    
 	protected int type;
 	protected int location;
 
@@ -164,16 +175,6 @@ public class MekActuator extends Part {
 		}
 	}
 
-	@Override
-	public int getAvailability(int era) {
-		return EquipmentType.RATING_C;
-	}
-
-	@Override
-	public int getTechRating() {
-		return EquipmentType.RATING_C;
-	}
-	
 	@Override
 	public void fix() {
 		super.fix();
@@ -325,18 +326,8 @@ public class MekActuator extends Part {
 	}
 	
 	@Override
-	public int getIntroDate() {
-		return EquipmentType.DATE_NONE;
-	}
-
-	@Override
-	public int getExtinctDate() {
-		return EquipmentType.DATE_NONE;
-	}
-
-	@Override
-	public int getReIntroDate() {
-		return EquipmentType.DATE_NONE;
+	public TechAdvancement getTechAdvancement() {
+	    return (getUnitTonnage() <= 100)? TA_STANDARD : TA_SUPERHEAVY;
 	}
 	
 	@Override

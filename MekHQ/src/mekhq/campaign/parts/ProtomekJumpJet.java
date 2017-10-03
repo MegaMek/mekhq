@@ -23,21 +23,29 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import org.w3c.dom.Node;
+
 import megamek.common.CriticalSlot;
-import megamek.common.EquipmentType;
 import megamek.common.Protomech;
+import megamek.common.SimpleTechLevel;
+import megamek.common.TechAdvancement;
 import megamek.common.TechConstants;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.SkillType;
 
-import org.w3c.dom.Node;
-
 /**
+ * Legacy part that represents standard Protomech jump jets.
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class ProtomekJumpJet extends Part {
     private static final long serialVersionUID = 719878556021696393L;
+    
+    static final TechAdvancement TECH_ADVANCEMENT = new TechAdvancement(TECH_BASE_CLAN)
+            .setClanAdvancement(3055,3060,3060).setClanApproximate(true, false, false)
+            .setPrototypeFactions(F_CSJ).setProductionFactions(F_CSJ)
+            .setTechRating(RATING_D).setAvailability(RATING_X, RATING_X, RATING_C, RATING_C)
+            .setStaticTechLevel(SimpleTechLevel.STANDARD);
 
     public ProtomekJumpJet() {
         this(0, null);
@@ -81,20 +89,6 @@ public class ProtomekJumpJet extends Part {
     public void writeToXml(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
         writeToXmlEnd(pw1, indent);
-    }
-
-    @Override
-    public int getAvailability(int era) {
-        if(era == EquipmentType.ERA_CLAN) {
-            return EquipmentType.RATING_D;
-        } else {
-            return EquipmentType.RATING_X;
-        }
-    }
-
-    @Override
-    public int getTechRating() {
-        return EquipmentType.RATING_D;
     }
 
     @Override
@@ -297,20 +291,10 @@ public class ProtomekJumpJet extends Part {
 	public int getLocation() {
 		return Protomech.LOC_TORSO;
 	}
-
+	
 	@Override
-	public int getIntroDate() {
-		return 3055;
-	}
-
-	@Override
-	public int getExtinctDate() {
-		return EquipmentType.DATE_NONE;
-	}
-
-	@Override
-	public int getReIntroDate() {
-		return EquipmentType.DATE_NONE;
+	public TechAdvancement getTechAdvancement() {
+	    return TECH_ADVANCEMENT;
 	}
 
 }

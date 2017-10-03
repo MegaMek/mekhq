@@ -295,6 +295,16 @@ public class StaticChecks {
         }
         return true;
     }
+    
+    public static boolean areAllPrisoners(Person[] people) {
+        for(Person person : people) {
+            if(!person.isPrisoner()) {
+                return false;
+            }
+        }
+        
+        return true;
+    }
 
     public static boolean areAllWoB(Person[] people) {
         for (Person p : people) {

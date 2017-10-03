@@ -47,6 +47,7 @@ import megamek.client.ui.swing.MechViewPanel;
 import megamek.common.Configuration;
 import megamek.common.Entity;
 import megamek.common.EntityWeightClass;
+import megamek.common.ITechnology;
 import megamek.common.MechFileParser;
 import megamek.common.MechSearchFilter;
 import megamek.common.MechSummary;
@@ -58,9 +59,9 @@ import megamek.common.loaders.EntityLoadingException;
 import megamek.common.logging.LogLevel;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
-import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.unit.UnitOrder;
+import mekhq.campaign.unit.UnitTechProgression;
 
 /**
  *
@@ -473,6 +474,7 @@ public class UnitSelectorDialog extends JDialog {
                 public boolean include(Entry<? extends MechTableModel, ? extends Integer> entry) {
                     MechTableModel mechModel = entry.getModel();
                     MechSummary mech = mechModel.getMechSummary(entry.getIdentifier());
+                    ITechnology tech = UnitTechProgression.getProgression(mech, campaign.getTechFaction(), true);
                     if (
                             /*year limits*/
                             (!campaign.getCampaignOptions().limitByYear() || mech.getYear() <= year) &&
@@ -484,7 +486,7 @@ public class UnitSelectorDialog extends JDialog {
                             /* Weight */
                             (mech.getWeightClass() == nClass || nClass == EntityWeightClass.SIZE) &&
                             /* Technology Level */
-                            campaign.getCampaignOptions().getTechLevel() >= Utilities.getSimpleTechLevel(mech.getType()) &&
+                            (null != tech) && campaign.isLegal(tech) &&
                             /*Unit type*/
                             (nUnit == UnitType.SIZE || mech.getUnitType().equals(UnitType.getTypeName(nUnit))) &&
                             (searchFilter==null || MechSearchFilter.isMatch(mech, searchFilter))) {

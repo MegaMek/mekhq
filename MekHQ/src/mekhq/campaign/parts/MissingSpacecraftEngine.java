@@ -23,15 +23,15 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.common.Aero;
 import megamek.common.Entity;
-import megamek.common.EquipmentType;
+import megamek.common.TechAdvancement;
 import megamek.common.TechConstants;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  * 
@@ -121,24 +121,6 @@ public class MissingSpacecraftEngine extends MissingPart {
 	}
 
 	@Override
-	public int getAvailability(int era) {
-		if(era == EquipmentType.ERA_SL) {
-			return EquipmentType.RATING_C;
-		} else if(era == EquipmentType.ERA_SW) {
-			return EquipmentType.RATING_E;
-		} else {
-			return EquipmentType.RATING_C;
-		}
-	}
-
-	@Override
-	public int getTechRating() {
-		return EquipmentType.RATING_D;
-	}
-
-
-
-	@Override
 	public Part getNewPart() {
 		return new SpacecraftEngine(getUnitTonnage(), engineTonnage, campaign, clan);
 	}
@@ -169,18 +151,8 @@ public class MissingSpacecraftEngine extends MissingPart {
 	}
 	
 	@Override
-	public int getIntroDate() {
-		return EquipmentType.DATE_NONE;
-	}
-
-	@Override
-	public int getExtinctDate() {
-		return EquipmentType.DATE_NONE;
-	}
-
-	@Override
-	public int getReIntroDate() {
-		return EquipmentType.DATE_NONE;
+	public TechAdvancement getTechAdvancement() {
+	    return SpacecraftEngine.TECH_ADVANCEMENT;
 	}
     
     @Override
