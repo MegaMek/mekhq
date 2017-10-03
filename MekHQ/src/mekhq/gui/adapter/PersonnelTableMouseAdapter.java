@@ -1837,39 +1837,43 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             }
             if (oneSelected && person.isActive()) {
                 if (gui.getCampaign().getCampaignOptions().useEdge()) {
-                    menu = new JMenu(resourceMap.getString("setEdgeTriggers.text")); //$NON-NLS-1$
-                    cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("edgeTriggerHeadHits.text")); //$NON-NLS-1$
-                    cbMenuItem.setSelected(person.getOptions()
-                            .booleanOption(OPT_EDGE_HEADHIT));
-                    cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_HEADHIT));
-                    cbMenuItem.addActionListener(this);
-                    menu.add(cbMenuItem);
-                    cbMenuItem = new JCheckBoxMenuItem(
-                            resourceMap.getString("edgeTriggerTAC.text")); //$NON-NLS-1$
-                    cbMenuItem.setSelected(person.getOptions()
-                            .booleanOption(OPT_EDGE_TAC));
-                    cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_TAC));
-                    cbMenuItem.addActionListener(this);
-                    menu.add(cbMenuItem);
-                    cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("edgeTriggerKO.text")); //$NON-NLS-1$
-                    cbMenuItem.setSelected(person.getOptions()
-                            .booleanOption(OPT_EDGE_KO));
-                    cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_KO));
-                    cbMenuItem.addActionListener(this);
-                    menu.add(cbMenuItem);
-                    cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("edgeTriggerExplosion.text")); //$NON-NLS-1$
-                    cbMenuItem.setSelected(person.getOptions()
-                            .booleanOption(OPT_EDGE_EXPLOSION));
-                    cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_EXPLOSION));
-                    cbMenuItem.addActionListener(this);
-                    menu.add(cbMenuItem);
-                    cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("edgeTriggerMASCFailure.text")); //$NON-NLS-1$
-                    cbMenuItem.setSelected(person.getOptions()
-                            .booleanOption(OPT_EDGE_MASC_FAILURE));
-                    cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_MASC_FAILURE));
-                    cbMenuItem.addActionListener(this);
-                    menu.add(cbMenuItem);
-                    popup.add(menu);
+                    //Start of role-specific Edge reroll options
+                    //Mechwarriors
+                    if (person.getPrimaryRole() == 1) {
+                        menu = new JMenu(resourceMap.getString("setEdgeTriggers.text")); //$NON-NLS-1$
+                        cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("edgeTriggerHeadHits.text")); //$NON-NLS-1$
+                        cbMenuItem.setSelected(person.getOptions()
+                                .booleanOption(OPT_EDGE_HEADHIT));
+                        cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_HEADHIT));
+                        cbMenuItem.addActionListener(this);
+                        menu.add(cbMenuItem);
+                        cbMenuItem = new JCheckBoxMenuItem(
+                                resourceMap.getString("edgeTriggerTAC.text")); //$NON-NLS-1$
+                        cbMenuItem.setSelected(person.getOptions()
+                                .booleanOption(OPT_EDGE_TAC));
+                        cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_TAC));
+                        cbMenuItem.addActionListener(this);
+                        menu.add(cbMenuItem);
+                        cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("edgeTriggerKO.text")); //$NON-NLS-1$
+                        cbMenuItem.setSelected(person.getOptions()
+                                .booleanOption(OPT_EDGE_KO));
+                        cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_KO));
+                        cbMenuItem.addActionListener(this);
+                        menu.add(cbMenuItem);
+                        cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("edgeTriggerExplosion.text")); //$NON-NLS-1$
+                        cbMenuItem.setSelected(person.getOptions()
+                                .booleanOption(OPT_EDGE_EXPLOSION));
+                        cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_EXPLOSION));
+                        cbMenuItem.addActionListener(this);
+                        menu.add(cbMenuItem);
+                        cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("edgeTriggerMASCFailure.text")); //$NON-NLS-1$
+                        cbMenuItem.setSelected(person.getOptions()
+                                .booleanOption(OPT_EDGE_MASC_FAILURE));
+                        cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_MASC_FAILURE));
+                        cbMenuItem.addActionListener(this);
+                        menu.add(cbMenuItem);
+                        popup.add(menu);
+                    }
                 }
                 menu = new JMenu(resourceMap.getString("specialFlags.text")); //$NON-NLS-1$
                 cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("dependent.text")); //$NON-NLS-1$
