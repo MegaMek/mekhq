@@ -1445,40 +1445,12 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
      * @param num        The number of turrets to generate
      * @param skill 	The skill level of the turret operators
      * @param quality	The quality level of the turrets
-     * 
-     * @param campaign
+     * @param campaign  The campaign for which the turrets are being generated.
      */
     protected void addTurrets(ArrayList<Entity> list, int num, int skill, int quality, Campaign campaign) {
-    	// dirty hack:
-    	// there are three Turret rats: 2500, 2750, 3025
-    	// we map the current year to the nearest lowest one, although once we get to 3050 or so we can go back to 2750   	
     	int currentYear = campaign.getCalendar().get(Calendar.YEAR);
-    	int ratYear;
-    	// From 2500 to 2750, we use the 2500 table
-    	if(currentYear < 2750) {
-    		ratYear = 2500;
-    	}
-    	// From 2750 to 2866, we use the 2750 table
-    	else if(currentYear < 2866) {
-    		ratYear = 2750;
-    	}
-    	// From 2866 to ~3050, we use the 3025 table
-    	// 2866 is when the second succession war ended, at which point we had a drastic reduction in available technology
-    	else if(currentYear < 3055) {
-    		ratYear = 3025;
-    	}
-    	// Once we hit 3050, there's a pretty serious tech revival across the inner sphere, so we can go back to using the 2750 table
-    	else {
-    		ratYear = 2750;
-    	}
     	
-    	// now that we have the year, we need to determine which turret RAT we're going to use
-    	// hope nobody decides to change the turret RAT names around on us!
-    	String ratName = String.format("Turrets %d %s", ratYear, campaign.getUnitRating().getUnitRatingName(quality));
-    	
-        RandomUnitGenerator.getInstance().setChosenRAT(ratName);
-        ArrayList<MechSummary> msl = RandomUnitGenerator.getInstance().generate(num);
-                
+    	List<MechSummary> msl = campaign.getUnitGenerator().generateTurrets(num, skill, quality, currentYear);
         List<Entity> entities = msl.stream().map(ms -> createEntityWithCrew("IND",
         		skill, campaign, ms))
                 .collect(Collectors.<Entity>toList());

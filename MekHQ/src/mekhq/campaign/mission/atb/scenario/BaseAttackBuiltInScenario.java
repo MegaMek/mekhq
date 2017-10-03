@@ -1,13 +1,11 @@
 package mekhq.campaign.mission.atb.scenario;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 
 import megamek.common.Board;
 import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.EntityWeightClass;
-import megamek.common.UnitType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.atb.AtBScenarioEnabled;
@@ -100,8 +98,7 @@ public class BaseAttackBuiltInScenario extends AtBScenario {
 
 		if(isAttacker()) {
 			addTurrets(otherForce, 6, getContract(campaign).getEnemySkill(), getContract(campaign).getEnemyQuality(), campaign);
-		}
-		else {
+		} else {
 			addTurrets(otherForce, 6, getContract(campaign).getAllySkill(), getContract(campaign).getAllyQuality(), campaign);
 		}
 	}

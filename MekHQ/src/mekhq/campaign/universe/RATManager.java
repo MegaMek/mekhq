@@ -63,7 +63,7 @@ import mekhq.campaign.event.OptionsChangedEvent;
  * @author Neoancient
  *
  */
-public class RATManager implements IUnitGenerator {
+public class RATManager extends AbstractUnitGenerator implements IUnitGenerator {
 
     private static final String ALT_FACTION = "data/universe/altfactions.xml";
     private static final String RATINFO_DIR = "data/universe/ratdata";
