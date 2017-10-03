@@ -182,6 +182,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JCheckBox useAbilitiesBox;
     private JCheckBox useQuirksBox;
     private JCheckBox useEdgeBox;
+    private JCheckBox useRemfEdgeBox;
     private JCheckBox useImplantsBox;
 	private JCheckBox altQualityAveragingCheckBox;
     private JCheckBox useAdvancedMedicalBox;
@@ -457,6 +458,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         useArtilleryBox.setSelected(options.useArtillery());
         useAbilitiesBox.setSelected(options.useAbilities());
         useEdgeBox.setSelected(options.useEdge());
+        useRemfEdgeBox.setSelected(options.useRemfEdge());
         useImplantsBox.setSelected(options.useImplants());
         chkCapturePrisoners.setSelected(options.capturePrisoners());
 		altQualityAveragingCheckBox.setSelected(options.useAltQualityAveraging());
@@ -549,6 +551,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         useArtilleryBox = new JCheckBox();
         useAbilitiesBox = new JCheckBox();
         useEdgeBox = new JCheckBox();
+        useRemfEdgeBox = new JCheckBox();
         useImplantsBox = new JCheckBox();
         chkCapturePrisoners = new JCheckBox();
 		altQualityAveragingCheckBox = new JCheckBox();
@@ -1355,13 +1358,24 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panPersonnel.add(useEdgeBox, gridBagConstraints);
+        
+        useRemfEdgeBox.setText(resourceMap.getString("useRemfEdgeBox.text")); // NOI18N
+        useRemfEdgeBox.setToolTipText(resourceMap.getString("useRemfEdgeBox.toolTipText")); // NOI18N
+        useRemfEdgeBox.setName("useRemfEdgeBox"); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 6;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panPersonnel.add(useRemfEdgeBox, gridBagConstraints);
 
         useImplantsBox.setText(resourceMap.getString("useImplantsBox.text")); // NOI18N
         useImplantsBox.setToolTipText(resourceMap.getString("useImplantsBox.toolTipText")); // NOI18N
         useImplantsBox.setName("useImplantsBox"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 6;
+        gridBagConstraints.gridy = 7;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
@@ -1371,7 +1385,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         chkCapturePrisoners.setToolTipText(resourceMap.getString("chkCapturePrisoners.toolTipText")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 7;
+        gridBagConstraints.gridy = 8;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
@@ -1386,7 +1400,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         pnlPrisonerStatus.add(new JLabel("Default Prisoner Status:"));
         pnlPrisonerStatus.add(comboPrisonerStatus);
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 8;
+        gridBagConstraints.gridy = 9;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
@@ -1397,7 +1411,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         altQualityAveragingCheckBox.setName("altQualityAveragingCheckBox"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 9;
+        gridBagConstraints.gridy = 10;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
@@ -1408,7 +1422,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         useAdvancedMedicalBox.setName("useAdvancedMedicalBox"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 10;
+        gridBagConstraints.gridy = 11;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
@@ -1419,7 +1433,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         useDylansRandomXpBox.setName("useDylansRandomXpBox"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 11;
+        gridBagConstraints.gridy = 12;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
@@ -1432,7 +1446,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         pnlHealWaitingPeriod.add(new JLabel("Days to wait between healing checks by doctors"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 12;
+        gridBagConstraints.gridy = 13;
         gridBagConstraints.gridwidth = 2;
         //gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
@@ -1446,7 +1460,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         pnlNaturalHealWaitingPeriod.add(new JLabel("Days to wait for natural healing"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 13;
+        gridBagConstraints.gridy = 14;
         gridBagConstraints.gridwidth = 2;
         //gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
@@ -1459,7 +1473,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         panMinimumHitsForVees.add(new JLabel("Minimum number of hits for wounded crews and infantry"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 14;
+        gridBagConstraints.gridy = 15;
         gridBagConstraints.gridwidth = 2;
         //gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
@@ -1471,7 +1485,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         useRandomHitsForVees.setToolTipText(resourceMap.getString("useRandomHitsForVees.toolTipText")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 15;
+        gridBagConstraints.gridy = 16;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
@@ -1482,7 +1496,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         useTougherHealing.setToolTipText(resourceMap.getString("useTougherHealing.toolTipText")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 16;
+        gridBagConstraints.gridy = 17;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
@@ -1491,28 +1505,28 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         chkUseUnofficialProcreation = new JCheckBox("Use procreation (Unofficial)"); // NOI18N
         chkUseUnofficialProcreation.setSelected(options.useUnofficialProcreation());
         //chkUseUnofficialProcreation.setToolTipText(resourceMap.getString("chkUseUnofficialProcreation.toolTipText")); // NOI18N
-        gridBagConstraints.gridy = 17;
+        gridBagConstraints.gridy = 18;
         panPersonnel.add(chkUseUnofficialProcreation, gridBagConstraints);
 
         chkUseUnofficialProcreationNoRelationship = new JCheckBox("Use procreation without a relationship (Unofficial)"); // NOI18N
         chkUseUnofficialProcreationNoRelationship.setSelected(options.useUnofficialProcreationNoRelationship());
         //chkUseUnofficialProcreationNoRelationship.setToolTipText(resourceMap.getString("chkUseUnofficialProcreationNoRelationship.toolTipText")); // NOI18N
-        gridBagConstraints.gridy = 18;
+        gridBagConstraints.gridy = 19;
         panPersonnel.add(chkUseUnofficialProcreationNoRelationship, gridBagConstraints);
 
         chkUseParentage = new JCheckBox("Display children in the person panel");
         chkUseParentage.setSelected(options.useParentage());
-        gridBagConstraints.gridy = 19;
+        gridBagConstraints.gridy = 20;
         panPersonnel.add(chkUseParentage, gridBagConstraints);
 
         chkLogConception = new JCheckBox("Log Conception and Birth ");
         chkLogConception.setSelected(options.logConception());
-        gridBagConstraints.gridy = 20;
+        gridBagConstraints.gridy = 21;
         panPersonnel.add(chkLogConception, gridBagConstraints);
 
         chkUseTransfers = new JCheckBox("Log Saver - Use Reassign instead of Remove/Assign"); // NOI18N
         chkUseTransfers.setSelected(options.useTransfers());
-        gridBagConstraints.gridy = 21;
+        gridBagConstraints.gridy++;
         panPersonnel.add(chkUseTransfers, gridBagConstraints);
 
         JPanel panSalary = new JPanel(new GridBagLayout());
@@ -4185,6 +4199,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         campaign.getGameOptions().getOption("pilot_advantages").setValue(useAbilitiesBox.isSelected());
         options.setEdge(useEdgeBox.isSelected());
         campaign.getGameOptions().getOption("edge").setValue(useEdgeBox.isSelected());
+        options.setRemfEdge(useRemfEdgeBox.isSelected());
         options.setImplants(useImplantsBox.isSelected());
         options.setCapturePrisoners(chkCapturePrisoners.isSelected());
         campaign.getGameOptions().getOption("manei_domini").setValue(useImplantsBox.isSelected());
