@@ -2687,6 +2687,19 @@ public class Person implements Serializable, MekHqXmlSerializable {
         }
         MekHQ.triggerEvent(new PersonChangedEvent(this));
     }
+    
+    /*
+     * This will set a specific HQ-local edge trigger, regardless of the current status
+     */
+    public void setHqEdgeTrigger(String name, boolean status) {
+        for (Enumeration<IOption> i = getOptions(PilotOptions.EDGE_ADVANTAGES); i.hasMoreElements(); ) {
+            IOption ability = i.nextElement();
+            if (ability.getName().equals(name)) {
+                ability.setValue(status);
+            }
+        }
+        MekHQ.triggerEvent(new PersonChangedEvent(this));
+    }
 
     /**
      * This will flip the boolean status of the current edge trigger
