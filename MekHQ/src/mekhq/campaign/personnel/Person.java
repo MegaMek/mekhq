@@ -33,6 +33,7 @@ import java.util.Date;
 import java.util.EnumMap;
 import java.util.Enumeration;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
@@ -57,6 +58,7 @@ import megamek.common.Entity;
 import megamek.common.EntityMovementMode;
 import megamek.common.Infantry;
 import megamek.common.Jumpship;
+import megamek.common.LandAirMech;
 import megamek.common.Mech;
 import megamek.common.Protomech;
 import megamek.common.SmallCraft;
@@ -64,6 +66,7 @@ import megamek.common.Tank;
 import megamek.common.TargetRoll;
 import megamek.common.VTOL;
 import megamek.common.annotations.Nullable;
+import megamek.common.logging.LogLevel;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.PilotOptions;
@@ -117,7 +120,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
     public static final int T_ADMIN_LOG = 23;
     public static final int T_ADMIN_TRA = 24;
     public static final int T_ADMIN_HR = 25;
-    public static final int T_NUM = 26;
+    public static final int T_LAM_PILOT = 26; // Not a separate type, but an alias for MW + Aero pilot
+    public static final int T_NUM = 27;
 
     public static final int S_ACTIVE = 0;
     public static final int S_RETIRED = 1;
@@ -162,6 +166,9 @@ public class Person implements Serializable, MekHqXmlSerializable {
     public static final int DESIG_NUM     = 14;
     
     public static final String LOGTYPE_MEDICAL = "med";
+    
+    private static final Map<Integer, Integer> MECHWARRIOR_AERO_RANSOM_VALUES; 
+    private static final Map<Integer, Integer> OTHER_RANSOM_VALUES;
 
     private static final IntSupplier PREGNANCY_DURATION = () -> {
         double gaussian = Math.sqrt(-2 * Math.log(Math.nextUp(Math.random())))
@@ -305,6 +312,23 @@ public class Person implements Serializable, MekHqXmlSerializable {
     //lets just go ahead and pass in the campaign - to hell with OOP
     private Campaign campaign;
 
+    // initializes the AtB ransom values
+    static {
+        MECHWARRIOR_AERO_RANSOM_VALUES = new HashMap<>();
+        MECHWARRIOR_AERO_RANSOM_VALUES.put(SkillType.EXP_ULTRA_GREEN, 5000);    // no official AtB rules for really inexperienced scrubs, but...
+        MECHWARRIOR_AERO_RANSOM_VALUES.put(SkillType.EXP_GREEN, 10000);
+        MECHWARRIOR_AERO_RANSOM_VALUES.put(SkillType.EXP_REGULAR, 25000);
+        MECHWARRIOR_AERO_RANSOM_VALUES.put(SkillType.EXP_VETERAN, 75000);
+        MECHWARRIOR_AERO_RANSOM_VALUES.put(SkillType.EXP_ELITE, 150000);
+        
+        OTHER_RANSOM_VALUES = new HashMap<>();
+        OTHER_RANSOM_VALUES.put(SkillType.EXP_ULTRA_GREEN, 2500);
+        OTHER_RANSOM_VALUES.put(SkillType.EXP_GREEN, 5000);
+        OTHER_RANSOM_VALUES.put(SkillType.EXP_REGULAR, 10000);
+        OTHER_RANSOM_VALUES.put(SkillType.EXP_VETERAN, 25000);
+        OTHER_RANSOM_VALUES.put(SkillType.EXP_ELITE, 50000);
+    }
+    
     //default constructor
     public Person(Campaign c) {
         this("Biff the Understudy", c);
@@ -764,6 +788,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 return "Admin/Transport";
             case (T_ADMIN_HR):
                 return "Admin/HR";
+            case (T_LAM_PILOT):
+                return "LAM Pilot";
             default:
                 return "??";
         }
@@ -1412,6 +1438,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public static Person generateInstanceFromXML(Node wn, Campaign c, Version version) {
+        final String METHOD_NAME = "generateInstanceFromXML(Node,Campaign,Version)"; //$NON-NLS-1$
+        
         Person retVal = null;
 
         try {
@@ -1591,7 +1619,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
                         if (!wn3.getNodeName().equalsIgnoreCase("id")) {
                             // Error condition of sorts!
                             // Errr, what should we do here?
-                            MekHQ.logMessage("Unknown node type not loaded in techUnitIds nodes: " + wn3.getNodeName());
+                            MekHQ.getLogger().log(Person.class, METHOD_NAME, LogLevel.ERROR,
+                                    "Unknown node type not loaded in techUnitIds nodes: " + wn3.getNodeName()); //$NON-NLS-1$
                             continue;
                         }
                         retVal.techUnitIds.add(UUID.fromString(wn3.getTextContent()));
@@ -1609,7 +1638,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
                         if (!wn3.getNodeName().equalsIgnoreCase("logEntry")) {
                             // Error condition of sorts!
                             // Errr, what should we do here?
-                            MekHQ.logMessage("Unknown node type not loaded in personnel log nodes: " + wn3.getNodeName());
+                            MekHQ.getLogger().log(Person.class, METHOD_NAME, LogLevel.ERROR,
+                                    "Unknown node type not loaded in personnel log nodes: " + wn3.getNodeName()); //$NON-NLS-1$
                             continue;
                         }
                         retVal.addLogEntry(LogEntry.generateInstanceFromXML(wn3));
@@ -1626,7 +1656,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
                         if (!wn3.getNodeName().equalsIgnoreCase("injury")) {
                             // Error condition of sorts!
                             // Errr, what should we do here?
-                            MekHQ.logMessage("Unknown node type not loaded in injury nodes: " + wn3.getNodeName());
+                            MekHQ.getLogger().log(Person.class, METHOD_NAME, LogLevel.ERROR,
+                                    "Unknown node type not loaded in injury nodes: " + wn3.getNodeName()); //$NON-NLS-1$
                             continue;
                         }
                         retVal.injuries.add(Injury.generateInstanceFromXML(wn3));
@@ -1693,7 +1724,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     try {
                         retVal.getOptions().getOption(advName).setValue(value);
                     } catch (Exception e) {
-                        MekHQ.logMessage("Error restoring advantage: " + adv);
+                        MekHQ.getLogger().log(Person.class, METHOD_NAME, LogLevel.ERROR,
+                                "Error restoring advantage: " + adv); //$NON-NLS-1$
                     }
                 }
             }
@@ -1707,7 +1739,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     try {
                         retVal.getOptions().getOption(advName).setValue(value);
                     } catch (Exception e) {
-                        MekHQ.logMessage("Error restoring edge: " + adv);
+                        MekHQ.getLogger().log(Person.class, METHOD_NAME, LogLevel.ERROR,
+                                "Error restoring edge: " + adv); //$NON-NLS-1$
                     }
                 }
             }
@@ -1721,7 +1754,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     try {
                         retVal.getOptions().getOption(advName).setValue(value);
                     } catch (Exception e) {
-                        MekHQ.logMessage("Error restoring implants: " + adv);
+                        MekHQ.getLogger().log(Person.class, METHOD_NAME, LogLevel.ERROR,
+                                "Error restoring implants: " + adv); //$NON-NLS-1$
                     }
                 }
             }
@@ -1762,11 +1796,12 @@ public class Person implements Serializable, MekHqXmlSerializable {
             // Errrr, apparently either the class name was invalid...
             // Or the listed name doesn't exist.
             // Doh!
-            MekHQ.logError(ex);
+            MekHQ.getLogger().log(Person.class, METHOD_NAME, ex);
         }
 
         if (retVal.id == null) {
-            MekHQ.logMessage("ID not pre-defined; generating person's ID.", 5);
+            MekHQ.getLogger().log(Person.class, METHOD_NAME, LogLevel.ERROR,
+                    "ID not pre-defined; generating person's ID."); //$NON-NLS-1$
             retVal.id = UUID.randomUUID();
         }
 
@@ -2733,7 +2768,9 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public boolean canDrive(Entity ent) {
-        if (ent instanceof Mech) {
+        if (ent instanceof LandAirMech) {
+            return hasSkill(SkillType.S_PILOT_MECH) && hasSkill(SkillType.S_PILOT_AERO);
+        } else if (ent instanceof Mech) {
             return hasSkill(SkillType.S_PILOT_MECH);
         } else if (ent instanceof VTOL) {
             return hasSkill(SkillType.S_PILOT_VTOL);
@@ -2762,7 +2799,9 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public boolean canGun(Entity ent) {
-        if (ent instanceof Mech) {
+        if (ent instanceof LandAirMech) {
+            return hasSkill(SkillType.S_GUN_MECH) && hasSkill(SkillType.S_GUN_AERO);
+        } else if (ent instanceof Mech) {
             return hasSkill(SkillType.S_GUN_MECH);
         } else if (ent instanceof Tank) {
             return hasSkill(SkillType.S_GUN_VEE);
@@ -3612,5 +3651,17 @@ public class Person implements Serializable, MekHqXmlSerializable {
         }
         
         return hasKids;
+    }
+    
+    /** Returns the ransom value of this individual
+    * Useful for prisoner who you want to ransom or hand off to your employer in an AtB context */
+    public int getRansomValue() {
+        // mechwarriors and aero pilots are worth more than the other types of scrubs
+        if(primaryRole == T_MECHWARRIOR || primaryRole == T_AERO_PILOT) {
+            return MECHWARRIOR_AERO_RANSOM_VALUES.get(getExperienceLevel(false));
+        }
+        else {
+            return OTHER_RANSOM_VALUES.get(getExperienceLevel(false));
+        }
     }
 }

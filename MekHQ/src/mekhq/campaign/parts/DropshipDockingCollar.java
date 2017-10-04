@@ -23,15 +23,18 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.common.Compute;
 import megamek.common.Dropship;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
-import megamek.common.TechConstants;
+import megamek.common.SimpleTechLevel;
+import megamek.common.TechAdvancement;
+import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.SkillType;
-
-import org.w3c.dom.Node;
 
 /**
  *
@@ -43,19 +46,32 @@ public class DropshipDockingCollar extends Part {
 	 * 
 	 */
 	private static final long serialVersionUID = -717866644605314883L;
-
+	
+    static final TechAdvancement TA_BOOM = new TechAdvancement(TECH_BASE_ALL)
+            .setAdvancement(2458, 2470, 2500).setPrototypeFactions(F_TH)
+            .setProductionFactions(F_TH).setTechRating(RATING_C)
+            .setAvailability(RATING_C, RATING_C, RATING_C, RATING_C)
+            .setStaticTechLevel(SimpleTechLevel.STANDARD);
+    static final TechAdvancement TA_NO_BOOM = new TechAdvancement(TECH_BASE_ALL)
+            .setAdvancement(2304, 2350, 2364, 2520).setPrototypeFactions(F_TA)
+            .setProductionFactions(F_TH).setTechRating(RATING_B)
+            .setAvailability(RATING_C, RATING_X, RATING_X, RATING_X)
+            .setStaticTechLevel(SimpleTechLevel.ADVANCED);
+    
+    // We don't currently distinguish between primitve and standard docking collars in MM.
+    private boolean hasKFBoom = true;
 	
 	public DropshipDockingCollar() {
-    	this(0, null);
+    	this(0, null, true);
     }
     
-    public DropshipDockingCollar(int tonnage, Campaign c) {
+    public DropshipDockingCollar(int tonnage, Campaign c, boolean hasKFBoom) {
         super(tonnage, c);
         this.name = "Dropship Docking Collar";
     }
     
     public DropshipDockingCollar clone() {
-    	DropshipDockingCollar clone = new DropshipDockingCollar(getUnitTonnage(), campaign);
+    	DropshipDockingCollar clone = new DropshipDockingCollar(getUnitTonnage(), campaign, hasKFBoom);
         clone.copyBaseData(this);
     	return clone;
     }
@@ -136,7 +152,7 @@ public class DropshipDockingCollar extends Part {
 
 	@Override
 	public MissingPart getMissingPart() {
-		return new MissingDropshipDockingCollar(getUnitTonnage(), campaign);
+		return new MissingDropshipDockingCollar(getUnitTonnage(), campaign, hasKFBoom);
 	}
 
 	@Override
@@ -165,35 +181,28 @@ public class DropshipDockingCollar extends Part {
 	}
 
 	@Override
-	public int getAvailability(int era) {
-		if(era == EquipmentType.ERA_SL) {
-			return EquipmentType.RATING_C;
-		} else if(era == EquipmentType.ERA_SW) {
-			return EquipmentType.RATING_D;
-		} else {
-			return EquipmentType.RATING_C;
-		}
-	}
-	
-	@Override
-	public int getTechLevel() {
-		return TechConstants.T_ALLOWED_ALL;
-	}
-
-	@Override
 	public boolean isSamePartType(Part part) {
-		return part instanceof DropshipDockingCollar;
+		return (part instanceof DropshipDockingCollar)
+		        && (hasKFBoom == ((DropshipDockingCollar)part).hasKFBoom);
 	}
 	
 	@Override
 	public void writeToXml(PrintWriter pw1, int indent) {
 		writeToXmlBegin(pw1, indent);
+		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "hasKFBoom", hasKFBoom);
 		writeToXmlEnd(pw1, indent);
 	}
 
 	@Override
 	protected void loadFieldsFromXmlNode(Node wn) {
-		//nothing
+        NodeList nl = wn.getChildNodes();
+
+        for (int x=0; x<nl.getLength(); x++) {
+            Node wn2 = nl.item(x);
+            if (wn2.getNodeName().equalsIgnoreCase("hasKFBoom")) {
+                hasKFBoom = Boolean.parseBoolean(wn2.getTextContent());
+            }
+        }
 	}
 	
 	@Override
@@ -213,19 +222,8 @@ public class DropshipDockingCollar extends Part {
 	}
 	
 	@Override
-	public int getIntroDate() {
-		return 2304;
+	public TechAdvancement getTechAdvancement() {
+	    return hasKFBoom? TA_BOOM : TA_NO_BOOM;
 	}
-
-	@Override
-	public int getExtinctDate() {
-		return EquipmentType.DATE_NONE;
-	}
-
-	@Override
-	public int getReIntroDate() {
-		return EquipmentType.DATE_NONE;
-	}
-	
 	
 }

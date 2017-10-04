@@ -39,15 +39,18 @@ import megamek.common.BattleArmor;
 import megamek.common.BipedMech;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
+import megamek.common.ITechnology;
 import megamek.common.Infantry;
 import megamek.common.Mech;
 import megamek.common.MechFileParser;
 import megamek.common.MechSummary;
 import megamek.common.MechSummaryCache;
 import megamek.common.TargetRoll;
+import megamek.common.TechAdvancement;
 import megamek.common.WeaponType;
 import megamek.common.loaders.BLKFile;
 import megamek.common.loaders.EntityLoadingException;
+import megamek.common.logging.LogLevel;
 import megamek.common.weapons.InfantryAttack;
 import megameklab.com.util.UnitUtil;
 import mekhq.MekHQ;
@@ -226,6 +229,8 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 	}
 
 	public void calculate() {
+        final String METHOD_NAME = "calculate()"; //$NON-NLS-1$
+	    
 		Unit newUnit = new Unit(newEntity, oldUnit.campaign);
 		newUnit.initializeParts(false);
 		refitClass = NO_CHANGE;
@@ -339,7 +344,8 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 					if(null != mPart) {
 						newPartList.add(mPart);
 					} else {
-						MekHQ.logError("null missing part for " + part.getName() + " during refit calculations");
+					    MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
+					            "null missing part for " + part.getName() + " during refit calculations"); //$NON-NLS-1$
 					}
 				}
 			}
@@ -688,7 +694,8 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
                 time = 3360;
             } else {
                 time = 1111;
-                MekHQ.logMessage("Unit " + newEntity.getModel() + " did not set its time correctly.");
+                MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
+                        "Unit " + newEntity.getModel() + " did not set its time correctly."); //$NON-NLS-1$
             }
 
             // The cost is equal to 10 percent of the units base value (not modified for quality).
@@ -802,7 +809,8 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 			Part part = oldUnit.campaign.getPart(pid);
 			if (part == null) {
 				if(null == part) {
-					MekHQ.logMessage("part with id " + pid + " not found for refit of " + getDesc());
+			        MekHQ.getLogger().log(getClass(), "partsInTransit()", LogLevel.ERROR, //$NON-NLS-1$
+			                "part with id " + pid + " not found for refit of " + getDesc()); //$NON-NLS-1$
 					continue;
 				}
 			}
@@ -924,11 +932,14 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 	}
 
 	public void cancel() {
-		oldUnit.setRefit(null);
+        final String METHOD_NAME = "cancel()"; //$NON-NLS-1$
+
+        oldUnit.setRefit(null);
 		for(int pid : newUnitParts) {
 			Part part = oldUnit.campaign.getPart(pid);
 			if(null == part) {
-				MekHQ.logMessage("part with id " + pid + " not found for refit of " + getDesc());
+		        MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
+		                "part with id " + pid + " not found for refit of " + getDesc()); //$NON-NLS-1$
 				continue;
 			}
 			part.setRefitId(null);
@@ -956,7 +967,9 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 	}
 
 	private void complete() {
-		int atype = -1;
+        final String METHOD_NAME = "complete()"; //$NON-NLS-1$
+
+        int atype = -1;
 		boolean aclan = false;
 	    oldUnit.setRefit(null);
         Entity oldEntity = oldUnit.getEntity();
@@ -972,7 +985,8 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 		for(int pid : oldUnitParts) {
 			Part part = oldUnit.campaign.getPart(pid);
 			if(null == part) {
-				MekHQ.logMessage("old part with id " + pid + " not found for refit of " + getDesc());
+                MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
+                        "old part with id " + pid + " not found for refit of " + getDesc()); //$NON-NLS-1$
 				continue;
 			}
 			if(part instanceof MekLocation && ((MekLocation)part).getLoc() == Mech.LOC_CT) {
@@ -1030,7 +1044,8 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 		for(int pid : newUnitParts) {
 			Part part = oldUnit.campaign.getPart(pid);
 			if(null == part) {
-				MekHQ.logMessage("part with id " + pid + " not found for refit of " + getDesc());
+                MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
+                        "part with id " + pid + " not found for refit of " + getDesc()); //$NON-NLS-1$
 				continue;
 			}
 			part.setUnit(oldUnit);
@@ -1462,7 +1477,9 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 	}
 
 	public static Refit generateInstanceFromXML(Node wn, Unit u, Version version) {
-		Refit retVal = new Refit();
+        final String METHOD_NAME = "generateInstanceFromXML(Node,Unit,Version)"; //$NON-NLS-1$
+
+        Refit retVal = new Refit();
 		retVal.oldUnit = u;
 
 		NodeList nl = wn.getChildNodes();
@@ -1544,7 +1561,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 			}
 		} catch (Exception ex) {
 			// Doh!
-			MekHQ.logError(ex);
+            MekHQ.getLogger().log(Refit.class, METHOD_NAME, ex);
 		}
 
 		return retVal;
@@ -1565,8 +1582,8 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 			if (!wn2.getNodeName().equalsIgnoreCase("part")) {
 				// Error condition of sorts!
 				// Errr, what should we do here?
-				MekHQ.logMessage("Unknown node type not loaded in Part nodes: "+wn2.getNodeName());
-
+                MekHQ.getLogger().log(Refit.class, "processShoppingList(Refit,Node,Unit,Version)", LogLevel.ERROR, //$NON-NLS-1$
+                        "Unknown node type not loaded in Part nodes: " + wn2.getNodeName()); //$NON-NLS-1$
 				continue;
 			}
 			Part p = Part.generateInstanceFromXML(wn2, version);
@@ -1593,7 +1610,8 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 			if (!wn2.getNodeName().equalsIgnoreCase("part")) {
 				// Error condition of sorts!
 				// Errr, what should we do here?
-				MekHQ.logMessage("Unknown node type not loaded in Part nodes: "+wn2.getNodeName());
+                MekHQ.getLogger().log(Refit.class, "processArmorSupplies(Refit,Node,Version)", LogLevel.ERROR, //$NON-NLS-1$
+                        "Unknown node type not loaded in Part nodes: " + wn2.getNodeName()); //$NON-NLS-1$
 
 				continue;
 			}
@@ -1733,13 +1751,13 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 	                techBaseMod = penalty;
 	            }
 	        }
-		    avail = Math.max(avail, part.getAvailability(campaign.getEra()));
+		    avail = Math.max(avail, part.getAvailability());
 		}
 		if(techBaseMod > 0) {
             roll.addModifier(techBaseMod, "tech limit");
 		}
 		int availabilityMod = Availability.getAvailabilityModifier(avail);
-        roll.addModifier(availabilityMod, "availability (" + EquipmentType.getRatingName(avail) + ")");
+        roll.addModifier(availabilityMod, "availability (" + ITechnology.getRatingName(avail) + ")");
 		return roll;
 	}
 
@@ -1937,12 +1955,6 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
     }
 
     @Override
-    public int getAvailability(int era) {
-        // TODO Auto-generated method stub
-        return 0;
-    }
-
-    @Override
     public boolean isSamePartType(Part part) {
         // TODO Auto-generated method stub
         return false;
@@ -1980,21 +1992,21 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 	}
 
 	@Override
-	public int getIntroDate() {
-		return EquipmentType.DATE_NONE;
-	}
-
-	@Override
-	public int getExtinctDate() {
-		return EquipmentType.DATE_NONE;
-	}
-
-	@Override
-	public int getReIntroDate() {
-		return EquipmentType.DATE_NONE;
+	public TechAdvancement getTechAdvancement() {
+	    return TA_GENERIC;
 	}
 
 	public boolean isBeingRefurbished() {
         return isRefurbishing;
+    }
+
+    @Override
+    public boolean isIntroducedBy(int year, boolean clan, int techFaction) {
+        return getIntroductionDate(clan, techFaction) <= year;
+    }
+
+    @Override
+    public boolean isExtinctIn(int year, boolean clan, int techFaction) {
+        return isExtinct(year, clan, techFaction);
     }
 }

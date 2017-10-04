@@ -30,7 +30,6 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Comparator;
 import java.util.ResourceBundle;
 
@@ -51,13 +50,12 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
 import megamek.common.AmmoType;
-import megamek.common.EquipmentType;
 import megamek.common.MiscType;
 import megamek.common.TargetRoll;
 import megamek.common.WeaponType;
+import megamek.common.logging.LogLevel;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
-import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Mission;
@@ -343,20 +341,17 @@ public class PartsStoreDialog extends javax.swing.JDialog {
     			if(part.getTechBase() == Part.T_CLAN && !campaign.getCampaignOptions().allowClanPurchases()) {
     				return false;
     			}
-    			if(part.getTechBase() == Part.T_IS && !campaign.getCampaignOptions().allowISPurchases()) {
+    			if((part.getTechBase() == Part.T_IS)
+    			        && !campaign.getCampaignOptions().allowISPurchases()
+    			        // Hack to allow Clan access to SL tech but not post-Exodus tech
+    			        // until 3050.
+    			        && !(campaign.useClanTechBase() && (part.getIntroductionDate() > 2787)
+    			                && (part.getIntroductionDate() < 3050))) {
     				return false;
     			}
-    			if(campaign.getCampaignOptions().getTechLevel() < Utilities.getSimpleTechLevel(part.getTechLevel())) {
-    				return false;
+    			if (!campaign.isLegal(part)) {
+    			    return false;
     			}
-    			if(campaign.getCampaignOptions().limitByYear() && !part.isIntroducedBy(campaign.getCalendar().get(Calendar.YEAR))) {
-    				return false;
-    			}
-    			if(campaign.getCampaignOptions().disallowExtinctStuff() &&
-    	        		(part.isExtinctIn(campaign.getCalendar().get(Calendar.YEAR)) || part.getAvailability(campaign.getEra()) == EquipmentType.RATING_X)) {
-    	        	return false;
-    	        }
-    			//TODO: limit by year
         		if(nGroup == SG_ALL) {
         			return true;
         		} else if(nGroup == SG_ARMOR) {
@@ -406,6 +401,8 @@ public class PartsStoreDialog extends javax.swing.JDialog {
     }
 
     private void addPart(boolean purchase, boolean bulk, boolean bonus) {
+        final String METHOD_NAME = "addPart(boolean,boolean,boolean)"; //$NON-NLS-1$
+        
     	int row = partsTable.getSelectedRow();
 		if(row < 0) {
 			return;
@@ -430,7 +427,8 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 					}
 				}
 				if (null == contract) {
-					MekHQ.logError("AtB: used bonus part but no contract has bonus parts available.");
+			        MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
+			                "AtB: used bonus part but no contract has bonus parts available."); //$NON-NLS-1$
 				} else {
 					contract.useBonusPart();
 				}

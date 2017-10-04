@@ -35,6 +35,7 @@ import org.w3c.dom.NodeList;
 
 import megamek.client.RandomSkillsGenerator;
 import megamek.common.Compute;
+import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
@@ -237,7 +238,7 @@ public class ContractMarket implements Serializable {
 			 */
 			for (Faction f : campaign.getCurrentPlanet().getFactionSet(currentDate)) {
 				try {
-					if (f.getStartingPlanet(campaign.getEra()).equals(campaign.getCurrentPlanet().getId())
+					if (f.getStartingPlanet(campaign.getGameYear()).equals(campaign.getCurrentPlanet().getId())
 							&& RandomFactionGenerator.getInstance().getEmployerSet().contains(f.getShortName())) {
 						AtBContract c = generateAtBContract(campaign, f.getShortName(), unitRatingMod);
 						if (c != null) {
@@ -320,6 +321,8 @@ public class ContractMarket implements Serializable {
 
 	private AtBContract generateAtBContract(Campaign campaign,
 			String employer, int unitRatingMod, int retries) {
+	    final String METHOD_NAME = "generateAtBContract(Campaign,String,int,int)"; //$NON-NLS-1$
+	    
 		AtBContract contract = new AtBContract(employer
 				+"-"
 				+Contract.generateRandomContractName()
@@ -335,7 +338,7 @@ public class ContractMarket implements Serializable {
         		employer = RandomFactionGenerator.getInstance().getEmployer();
         	}
         }
-		contract.setEmployerCode(employer, campaign.getEra());
+		contract.setEmployerCode(employer, campaign.getGameYear());
 		contract.setMissionType(findAtBMissionType(unitRatingMod,
 				RandomFactionGenerator.getInstance().isISMajorPower(contract.getEmployerCode())));
 
@@ -375,8 +378,9 @@ public class ContractMarket implements Serializable {
 			contract.setPlanetName(RandomFactionGenerator.getInstance().getMissionTarget(contract.getEnemyCode(), contract.getEmployerCode(), campaign.getDate()));
 		}
 		if (contract.getPlanetName() == null) {
-			MekHQ.logError("Could not find contract location for " +
-					contract.getEmployerCode() + " vs. " + contract.getEnemyCode());
+		    MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.WARNING,
+		            "Could not find contract location for " //$NON-NLS-1$
+		                    + contract.getEmployerCode() + " vs. " + contract.getEnemyCode()); //$NON-NLS-1$
 			if (retries > 0) {
 				return generateAtBContract(campaign, employer, unitRatingMod, retries - 1);
 			} else {
@@ -427,7 +431,7 @@ public class ContractMarket implements Serializable {
 	protected AtBContract generateAtBSubcontract(Campaign campaign,
 			AtBContract parent, int unitRatingMod) {
 		AtBContract contract = new AtBContract("New Subcontract");
-		contract.setEmployerCode(parent.getEmployerCode(), campaign.getEra());
+		contract.setEmployerCode(parent.getEmployerCode(), campaign.getGameYear());
 		contract.setMissionType(findAtBMissionType(unitRatingMod,
 				RandomFactionGenerator.getInstance().isISMajorPower(contract.getEmployerCode())));
 
@@ -515,7 +519,7 @@ public class ContractMarket implements Serializable {
 			return;
 		}
 		AtBContract followup = new AtBContract("Followup Contract");
-		followup.setEmployerCode(contract.getEmployerCode(), campaign.getEra());
+		followup.setEmployerCode(contract.getEmployerCode(), campaign.getGameYear());
 		followup.setEnemyCode(contract.getEnemyCode());
 		followup.setPlanetName(contract.getPlanetName());
 		switch (contract.getMissionType()) {
@@ -828,6 +832,7 @@ public class ContractMarket implements Serializable {
     }
 
     public static ContractMarket generateInstanceFromXML(Node wn, Campaign c, Version version) {
+        final String METHOD_NAME = "generateInstanceFromXML(Node wn, Campaign c, Version version)"; //$NON-NLS-1$
         ContractMarket retVal = null;
 
         try {
@@ -880,7 +885,7 @@ public class ContractMarket implements Serializable {
             // Errrr, apparently either the class name was invalid...
             // Or the listed name doesn't exist.
             // Doh!
-            MekHQ.logError(ex);
+            MekHQ.getLogger().log(ContractMarket.class, METHOD_NAME, ex);
         }
 
         return retVal;

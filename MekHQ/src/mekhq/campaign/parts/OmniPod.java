@@ -25,9 +25,12 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import megamek.common.Aero;
+import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.MiscType;
+import megamek.common.TechAdvancement;
 import megamek.common.TechConstants;
+import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
@@ -125,49 +128,27 @@ public class OmniPod extends Part {
     public int getTechRating() {
         return EquipmentType.RATING_E;
     }
-
+    
     @Override
-    public int getAvailability(int era) {
-        if (era == EquipmentType.ERA_SL
-                || (era == EquipmentType.ERA_SW && partType.getTechBase() == T_IS)) {
-            return EquipmentType.RATING_X;
-        } else if (era == EquipmentType.ERA_DA) {
-            return Math.max(partType.getAvailability(era), EquipmentType.RATING_D);
-        } else {
-            return Math.max(partType.getAvailability(era), EquipmentType.RATING_E);
-        }
-    }
-
-    @Override
-    public int getIntroDate() {
-        if (partType.getTechBase() == T_IS) {
-            return Math.max(3052, partType.getIntroDate());
-        } else {
-            return Math.max(2850, partType.getIntroDate());
-        }
-    }
-
-    @Override
-    public int getExtinctDate() {
-        return partType.getExtinctDate();
-    }
-
-    @Override
-    public int getReIntroDate() {
-        return partType.getReIntroDate();
+    public TechAdvancement getTechAdvancement() {
+        return Entity.getOmniAdvancement();
     }
 
     @Override
     protected void loadFieldsFromXmlNode(Node wn) {
+        final String METHOD_NAME = "generateInstanceFromXML(Node)"; //$NON-NLS-1$
+
         NodeList nl = wn.getChildNodes();
 
         for (int x=0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
             if (wn2.getNodeName().equalsIgnoreCase("partType")) {
                 if (null == wn2.getAttributes().getNamedItem("type")) {
-                    MekHQ.logError("OmniPod lacks part type attribute.");
+                    MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
+                            "OmniPod lacks part type attribute."); //$NON-NLS-1$
                 } else if (null == wn2.getAttributes().getNamedItem("tonnage")) {
-                    MekHQ.logError("OmniPod lacks partType tonnage attribute.");
+                    MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
+                            "OmniPod lacks partType tonnage attribute."); //$NON-NLS-1$
                 } else {
                     String type = wn2.getAttributes().getNamedItem("type").getTextContent();
                     int tonnage = Integer.parseInt(wn2.getAttributes().getNamedItem("tonnage").getTextContent());
@@ -177,14 +158,16 @@ public class OmniPod extends Part {
                             hsType = Integer.parseInt(wn2.getAttributes().getNamedItem("hsType").getTextContent());
                         }
                         if (hsType != Aero.HEAT_SINGLE && hsType != Aero.HEAT_DOUBLE) {
-                            MekHQ.logError("Aero heatsink OmniPod does not have a legal value for heat sink type; using SINGLE");
+                            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
+                                    "Aero heatsink OmniPod does not have a legal value for heat sink type; using SINGLE"); //$NON-NLS-1$
                             hsType = Aero.HEAT_SINGLE;
                         }
                         partType = new AeroHeatSink(0, hsType, false, campaign);
                     } else {
                         EquipmentType et = EquipmentType.get(type);
                         if (null == et) {
-                            MekHQ.logError("Unknown part type " + type + " for OmniPod");
+                            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
+                                    "Unknown part type " + type + " for OmniPod"); //$NON-NLS-1$
                             //Throw a generic value in there to prevent NPE but still indicate a problem
                             et = EquipmentType.get(EquipmentType
                                     .getStructureTypeName(EquipmentType.T_STRUCTURE_STANDARD));
@@ -203,7 +186,8 @@ public class OmniPod extends Part {
                                 int rating = Integer.parseInt(wn2.getAttributes().getNamedItem("rating").getTextContent());
                                 partType = new MASC(tonnage, et, -1, campaign, rating, false);
                             } else {
-                                MekHQ.logError("OmniPod for MASC lacks engine rating");
+                                MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
+                                        "OmniPod for MASC lacks engine rating"); //$NON-NLS-1$
                             }
                         } else {
                             partType = new EquipmentPart(tonnage, et, -1, false, campaign);
@@ -309,6 +293,8 @@ public class OmniPod extends Part {
 
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
+        final String METHOD_NAME = "writeToXml(PrintWriter,int)"; //$NON-NLS-1$
+        
         writeToXmlBegin(pw1, indent);
         pw1.print(MekHqXmlUtil.indentStr(indent + 1) + "<partType tonnage='" + partType.getUnitTonnage()
             + "' type='");
@@ -320,7 +306,8 @@ public class OmniPod extends Part {
                 pw1.print("' rating='" + ((MASC)partType).getEngineRating());
             }
         } else {
-            MekHQ.logError("OmniPod partType is not EquipmentType");
+            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO,
+                    "OmniPod partType is not EquipmentType"); //$NON-NLS-1$
         }
         pw1.println("'/>");
         writeToXmlEnd(pw1, indent);

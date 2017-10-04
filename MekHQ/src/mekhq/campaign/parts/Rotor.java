@@ -21,8 +21,9 @@
 
 package mekhq.campaign.parts;
 
-import megamek.common.EquipmentType;
 import megamek.common.IArmorState;
+import megamek.common.SimpleTechLevel;
+import megamek.common.TechAdvancement;
 import megamek.common.VTOL;
 import mekhq.campaign.Campaign;
 
@@ -32,6 +33,12 @@ import mekhq.campaign.Campaign;
  */
 public class Rotor extends TankLocation {
 	private static final long serialVersionUID = -122291037522319765L;
+	
+	static final TechAdvancement TECH_ADVANCEMENT = new TechAdvancement(TECH_BASE_ALL)
+	        .setAdvancement(2460, 2470, 2510).setApproximate(true, false, false)
+	        .setPrototypeFactions(F_TH).setProductionFactions(F_TH)
+	        .setTechRating(RATING_D).setAvailability(RATING_C, RATING_D, RATING_C, RATING_C)
+	        .setStaticTechLevel(SimpleTechLevel.STANDARD);
 
     public Rotor() {
     	this(0, null);
@@ -60,23 +67,6 @@ public class Rotor extends TankLocation {
         		&& this.getDamage() == ((Rotor)part).getDamage()
         		&& part.getSkillMin() == this.getSkillMin();
     }
-
-	@Override
-	public int getAvailability(int era) {
-		//go with conventional fighter avionics
-		if(era == EquipmentType.ERA_SL) {
-			return EquipmentType.RATING_C;
-		} else if(era == EquipmentType.ERA_SW) {
-			return EquipmentType.RATING_D;
-		} else {
-			return EquipmentType.RATING_C;
-		}
-	}
-
-	@Override
-	public int getTechRating() {
-		return EquipmentType.RATING_B;
-	}
 
 	@Override
 	public void fix() {
@@ -179,5 +169,10 @@ public class Rotor extends TankLocation {
 	@Override
 	public long getStickerPrice() {
 		return (long)(40000 * getTonnage());
+	}
+	
+	@Override
+	public TechAdvancement getTechAdvancement() {
+	    return TECH_ADVANCEMENT;
 	}
 }

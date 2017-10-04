@@ -36,6 +36,7 @@ import megamek.common.Entity;
 import megamek.common.EntityMovementMode;
 import megamek.common.EntityWeightClass;
 import megamek.common.EquipmentType;
+import megamek.common.ITechnology;
 import megamek.common.Infantry;
 import megamek.common.Mech;
 import megamek.common.MechFileParser;
@@ -45,6 +46,7 @@ import megamek.common.Protomech;
 import megamek.common.Tank;
 import megamek.common.TargetRoll;
 import megamek.common.loaders.EntityLoadingException;
+import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
@@ -122,18 +124,22 @@ public class UnitOrder extends Unit implements IAcquisitionWork, MekHqXmlSeriali
 
     @Override
     public Object getNewEquipment() {
+        final String METHOD_NAME = "getNewEquipment()"; //$NON-NLS-1$
+
         String name = getEntity().getChassis() + " " + getEntity().getModel();
         name = name.trim();
         MechSummary summary = MechSummaryCache.getInstance().getMech(name);
         if(null == summary) {
             //throw(new EntityLoadingException());
-            MekHQ.logMessage("Could not find a mech summary for " + name);
+            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
+                    "Could not find a mech summary for " + name); //$NON-NLS-1$
             return null;
         }
         try {
             return new MechFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
         } catch (EntityLoadingException e) {
-            MekHQ.logMessage("Could not load " + summary.getEntryName());
+            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
+                    "Could not load " + summary.getEntryName()); //$NON-NLS-1$
             return null;
         }
     }
@@ -295,27 +301,21 @@ public class UnitOrder extends Unit implements IAcquisitionWork, MekHqXmlSeriali
             target.addModifier(+1, "Protomech");
         }
         //parts need to be initialized for this to work
-        int avail = getAvailability(campaign.getEra());
+        int avail = getAvailability();
         if(this.isExtinctIn(campaign.getCalendar().get(Calendar.YEAR))) {
         	avail = EquipmentType.RATING_X;
         }
         int availabilityMod = Availability.getAvailabilityModifier(avail);
-        target.addModifier(availabilityMod, "availability (" + EquipmentType.getRatingName(avail) + ")");      
+        target.addModifier(availabilityMod, "availability (" + ITechnology.getRatingName(avail) + ")");      
         return target;
     }
 
-    @Override
-    public int getTechBase() {
-        // TODO Auto-generated method stub
-        return 0;
-    }
 
     @Override
-    public int getTechLevel() {
-        // TODO Auto-generated method stub
-        return 0;
+    public int getAvailability() {
+        return calcYearAvailability(campaign.getGameYear(), campaign.useClanTechBase(), campaign.getTechFaction());
     }
-
+    
     @Override
     public int getQuantity() {
         return quantity;
@@ -355,6 +355,8 @@ public class UnitOrder extends Unit implements IAcquisitionWork, MekHqXmlSeriali
     }
     
     public static UnitOrder generateInstanceFromXML(Node wn, Campaign c, Version version) {
+        final String METHOD_NAME = "generateInstanceFromXML(Node,Campaign,Version)"; //$NON-NLS-1$
+
         UnitOrder retVal = new UnitOrder();
         retVal.campaign = c;
         
@@ -374,12 +376,28 @@ public class UnitOrder extends Unit implements IAcquisitionWork, MekHqXmlSeriali
             }
         } catch (Exception ex) {
             // Doh!
-            MekHQ.logError(ex);
+            MekHQ.getLogger().log(UnitOrder.class, METHOD_NAME, ex);
         }
         
         retVal.initializeParts(false);
 
         return retVal;
     }
-    
+
+    @Override
+    public boolean isIntroducedBy(int year, boolean clan, int techFaction) {
+        return getIntroductionDate(clan, techFaction) <= year;
+    }
+
+    @Override
+    public boolean isExtinctIn(int year, boolean clan, int techFaction) {
+        return isExtinct(year, clan, techFaction);
+    }
+
+    /**
+     * @return TechConstants tech level
+     */
+    public int getTechLevel() {
+        return getSimpleTechLevel().getCompoundTechLevel(campaign.getFaction().isClan());
+    }
 }

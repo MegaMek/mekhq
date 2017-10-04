@@ -28,12 +28,12 @@ import java.util.Date;
 import java.util.Hashtable;
 import java.util.UUID;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.Version;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 
 /**
@@ -99,6 +99,7 @@ public class Kill implements Serializable {
 	}
 	
 	public static Kill generateInstanceFromXML(Node wn, Version version) {
+	    final String METHOD_NAME = "generateInstanceFromXML(Node,Version)"; //$NON-NLS-1$
 	
 		Kill retVal = null;
 		try {
@@ -126,7 +127,7 @@ public class Kill implements Serializable {
 			// Errrr, apparently either the class name was invalid...
 			// Or the listed name doesn't exist.
 			// Doh!
-			MekHQ.logError(ex);
+		    MekHQ.getLogger().log(Kill.class, METHOD_NAME, ex);
 		}
 		return retVal;
 	}

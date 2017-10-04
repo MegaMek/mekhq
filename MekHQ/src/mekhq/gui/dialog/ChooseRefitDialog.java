@@ -28,10 +28,7 @@ import java.awt.GridBagLayout;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.GregorianCalendar;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -54,6 +51,7 @@ import megamek.common.MechSummaryCache;
 import megamek.common.MechView;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.Refit;
@@ -280,7 +278,7 @@ public class ChooseRefitDialog extends javax.swing.JDialog {
     
     private void populateRefits() {
     	ArrayList<Refit> refits = new ArrayList<Refit>();
-        for(String model : Utilities.getAllVariants(unit.getEntity(), campaign.getCalendar().get(GregorianCalendar.YEAR), campaign.getCampaignOptions())) {
+        for(String model : Utilities.getAllVariants(unit.getEntity(), campaign)) {
 			MechSummary summary = MechSummaryCache.getInstance().getMech(unit.getEntity().getChassis() + " " + model);
 			if(null == summary) {
 				continue;
@@ -294,8 +292,7 @@ public class ChooseRefitDialog extends javax.swing.JDialog {
 					}
 				}
 			} catch (EntityLoadingException ex) {
-				Logger.getLogger(CampaignGUI.class.getName())
-						.log(Level.SEVERE, null, ex);
+			    MekHQ.getLogger().log(getClass(), "populateRefits()", ex); //$NON-NLS-1$
 			}		
 		}
         refitModel = new RefitTableModel(refits);

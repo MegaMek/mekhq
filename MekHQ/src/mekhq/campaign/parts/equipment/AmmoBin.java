@@ -32,11 +32,13 @@ import megamek.common.Aero;
 import megamek.common.AmmoType;
 import megamek.common.CriticalSlot;
 import megamek.common.EquipmentType;
+import megamek.common.ITechnology;
 import megamek.common.Jumpship;
 import megamek.common.Mounted;
 import megamek.common.Protomech;
 import megamek.common.SmallCraft;
 import megamek.common.TargetRoll;
+import megamek.common.TechAdvancement;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
@@ -46,7 +48,6 @@ import mekhq.campaign.parts.Availability;
 import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.universe.Era;
 import mekhq.campaign.work.IAcquisitionWork;
 
 /**
@@ -287,23 +288,6 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 	public long getMunitionType() {
 		return munition;
 	}
-
-	@Override
-	public int getAvailability(int era) {
-		return type.getAvailability(Era.convertEra(era));
-	}
-
-	@Override
-	public int getTechRating() {
-		return type.getTechRating();
-	}
-
-	/*
-	@Override
-	public int getTechBase() {
-		return T_BOTH;
-	}
-	*/
 
 	@Override
 	public String getStatus() {
@@ -607,7 +591,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 			campaign.addPart(new AmmoStorage(1, curType, amount, campaign), 0);
 		} else if (a == null && amount < 0
 		        && campaign.getCampaignOptions().useAmmoByType()
-		        && AmmoBin.ALLOWED_BY_TYPE.contains(curType)) {
+		        && AmmoBin.ALLOWED_BY_TYPE.contains(curType.getAmmoType())) {
 			campaign.addPart(new AmmoStorage(1 , curType ,0, campaign), 0);
 			changeAmountAvailable(amount, curType);
 		}
@@ -765,9 +749,9 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
             target.addModifier(campaign.getCampaignOptions().getIsAcquisitionPenalty(), "Inner Sphere tech");
         }
         //availability mod
-        int avail = getAvailability(campaign.getEra());
+        int avail = getAvailability();
         int availabilityMod = Availability.getAvailabilityModifier(avail);
-        target.addModifier(availabilityMod, "availability (" + EquipmentType.getRatingName(avail) + ")");
+        target.addModifier(availabilityMod, "availability (" + ITechnology.getRatingName(avail) + ")");
         return target;
     }
 
@@ -817,4 +801,20 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     public boolean isOmniPodded() {
         return getUnit() != null && getUnit().getEntity().getEquipment(equipmentNum).isOmniPodMounted();
     }
+    
+    @Override
+    public TechAdvancement getTechAdvancement() {
+        return type.getTechAdvancement();
+    }
+
+    @Override
+    public boolean isIntroducedBy(int year, boolean clan, int techFaction) {
+        return getIntroductionDate(clan, techFaction) <= year;
+    }
+
+    @Override
+    public boolean isExtinctIn(int year, boolean clan, int techFaction) {
+        return isExtinct(year, clan, techFaction);
+    }
+
 }

@@ -31,6 +31,9 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.UUID;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.client.RandomSkillsGenerator;
 import megamek.client.RandomUnitGenerator;
 import megamek.common.Compute;
@@ -40,6 +43,7 @@ import megamek.common.MechSummary;
 import megamek.common.Player;
 import megamek.common.UnitType;
 import megamek.common.loaders.EntityLoadingException;
+import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
@@ -52,9 +56,6 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.gui.view.LanceAssignmentView;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  * Contract class for use with Against the Bot rules
@@ -217,8 +218,8 @@ public class AtBContract extends Contract implements Serializable {
         	setOverheadComp(OH_NONE);
         }
         
-        allyBotName = getEmployerName(campaign.getEra());
-        enemyBotName = getEnemyName(campaign.getEra());
+        allyBotName = getEmployerName(campaign.getGameYear());
+        enemyBotName = getEnemyName(campaign.getGameYear());
 	}
 	
 	public void calculateLength(boolean variable) {
@@ -601,6 +602,8 @@ public class AtBContract extends Contract implements Serializable {
 	}
 	
 	public void doBonusRoll(Campaign c) {
+	    final String METHOD_NAME = "doBonusRoll(Campaign)"; //$NON-NLS-1$
+	    
 		int number;
 		String rat = null;
 		int roll = Compute.d6();
@@ -645,8 +648,9 @@ public class AtBContract extends Contract implements Serializable {
 					en = new MechFileParser(msl.get(0).getSourceFile(), msl.get(0).getEntryName()).getEntity();
 				} catch (EntityLoadingException ex) {
 		            en = null;
-		            MekHQ.logError("Unable to load entity: " + msl.get(0).getSourceFile() + ": " + msl.get(0).getEntryName() + ": " + ex.getMessage());
-		            MekHQ.logError(ex);
+		            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
+		                    "Unable to load entity: " + msl.get(0).getSourceFile() + ": " + msl.get(0).getEntryName() + ": " + ex.getMessage()); //$NON-NLS-1$
+		            MekHQ.getLogger().log(getClass(), METHOD_NAME, ex);
 				}
 				
 			}
@@ -1229,25 +1233,25 @@ public class AtBContract extends Contract implements Serializable {
 		return employerCode;
 	}
 	
-	public void setEmployerCode(String code, int era) {
+	public void setEmployerCode(String code, int year) {
 		employerCode = code;
-		setEmployer(getEmployerName(era));
+		setEmployer(getEmployerName(year));
 	}
 	
-	public String getEmployerName(int era) {
+	public String getEmployerName(int year) {
 		if (mercSubcontract) {
 			return "Mercenary (" +
-					Faction.getFaction(employerCode).getFullName(era) + ")";
+					Faction.getFaction(employerCode).getFullName(year) + ")";
 		}
-		return Faction.getFaction(employerCode).getFullName(era);
+		return Faction.getFaction(employerCode).getFullName(year);
 	}
 	
 	public String getEnemyCode() {
 		return enemyCode;
 	}
 		
-	public String getEnemyName(int era) {
-		return Faction.getFaction(enemyCode).getFullName(era);
+	public String getEnemyName(int year) {
+		return Faction.getFaction(enemyCode).getFullName(year);
 	}
 
 	public void setEnemyCode(String enemyCode) {
@@ -1486,7 +1490,7 @@ public class AtBContract extends Contract implements Serializable {
 				missionType = MT_PLANETARYASSAULT;
 			}
 		}
-		Faction f = Faction.getFactionFromFullNameAndEra(c.getEmployer(), campaign.getEra());
+		Faction f = Faction.getFactionFromFullNameAndYear(c.getEmployer(), campaign.getGameYear());
 		if (null == f) {
 			employerCode = "IND";
 		} else {
@@ -1502,8 +1506,8 @@ public class AtBContract extends Contract implements Serializable {
 		
 		requiredLances = Math.max(getEffectiveNumUnits(campaign) / 6, 1);
 		calculatePartsAvailabilityLevel(campaign);
-        allyBotName = getEmployerName(campaign.getEra());
-        enemyBotName = getEnemyName(campaign.getEra());
+        allyBotName = getEmployerName(campaign.getGameYear());
+        enemyBotName = getEnemyName(campaign.getGameYear());
 	}
 
 	public static AtBContract getContractExtension(AtBContract c, int length, Campaign campaign) {
@@ -1532,7 +1536,7 @@ public class AtBContract extends Contract implements Serializable {
 		retVal.setMRBCFee(c.payMRBCFee());
 		
 		retVal.setMissionType(c.getMissionType());
-		retVal.setEmployerCode(c.getEmployerCode(), campaign.getEra());
+		retVal.setEmployerCode(c.getEmployerCode(), campaign.getGameYear());
 		retVal.setEnemyCode(c.getEnemyCode());
 		retVal.requiredLances = c.getRequiredLances();
 		retVal.calculatePartsAvailabilityLevel(campaign);

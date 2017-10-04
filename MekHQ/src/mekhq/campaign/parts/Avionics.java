@@ -23,15 +23,18 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import org.w3c.dom.Node;
+
 import megamek.common.Aero;
 import megamek.common.Compute;
+import megamek.common.CriticalSlot;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
-import megamek.common.TechConstants;
+import megamek.common.IAero;
+import megamek.common.LandAirMech;
+import megamek.common.TechAdvancement;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.SkillType;
-
-import org.w3c.dom.Node;
 
 /**
  *
@@ -62,8 +65,9 @@ public class Avionics extends Part {
 	@Override
 	public void updateConditionFromEntity(boolean checkForDestruction) {
 		int priorHits = hits;
-		if(null != unit && unit.getEntity() instanceof Aero) {
-			hits = ((Aero)unit.getEntity()).getAvionicsHits();
+		if(null != unit
+		        && (unit.getEntity().getEntityType() & (Entity.ETYPE_AERO | Entity.ETYPE_LAND_AIR_MECH)) != 0) {
+			hits = ((IAero)unit.getEntity()).getAvionicsHits();
 			if(checkForDestruction 
 					&& hits > priorHits 
 					&& Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
@@ -91,24 +95,40 @@ public class Avionics extends Part {
 
 	@Override
 	public void updateConditionFromPart() {
-		if(null != unit && unit.getEntity() instanceof Aero) {
+	    if (null == unit) {
+	        return;
+	    }
+	    if (unit.getEntity() instanceof Aero) {
 			((Aero)unit.getEntity()).setAvionicsHits(hits);
+		} else if (unit.getEntity() instanceof LandAirMech) {
+		    if(hits == 0) {
+		        unit.repairSystem(CriticalSlot.TYPE_SYSTEM, LandAirMech.LAM_AVIONICS);
+		    } else {
+		        unit.damageSystem(CriticalSlot.TYPE_SYSTEM, LandAirMech.LAM_AVIONICS, hits);
+	        }
 		}
-		
 	}
 
 	@Override
 	public void fix() {
 		super.fix();
-		if(null != unit && unit.getEntity() instanceof Aero) {
-			((Aero)unit.getEntity()).setAvionicsHits(0);
-		}
+		if(null != unit) {
+		    if (unit.getEntity() instanceof Aero) {
+		        ((Aero)unit.getEntity()).setAvionicsHits(0);
+		    } else if (unit.getEntity() instanceof LandAirMech) {
+                unit.repairSystem(CriticalSlot.TYPE_SYSTEM, LandAirMech.LAM_AVIONICS);
+		    }
+	    }
 	}
 
 	@Override
 	public void remove(boolean salvage) {
-		if(null != unit && unit.getEntity() instanceof Aero) {
-			((Aero)unit.getEntity()).setAvionicsHits(3);
+		if(null != unit) {
+		    if (unit.getEntity() instanceof Aero) {
+		        ((Aero)unit.getEntity()).setAvionicsHits(3);
+		    } else if (unit.getEntity() instanceof LandAirMech) {
+		        unit.damageSystem(CriticalSlot.TYPE_SYSTEM, LandAirMech.LAM_AVIONICS, 3);
+		    }
 			Part spare = campaign.checkForExistingSparePart(this);
 			if(!salvage) {
 				campaign.removePart(this);
@@ -158,23 +178,6 @@ public class Avionics extends Part {
 	}
 
 	@Override
-	public int getAvailability(int era) {
-		//go with conventional fighter avionics
-		if(era == EquipmentType.ERA_SL) {
-			return EquipmentType.RATING_C;
-		} else if(era == EquipmentType.ERA_SW) {
-			return EquipmentType.RATING_D;
-		} else {
-			return EquipmentType.RATING_C;
-		}
-	}
-	
-	@Override
-	public int getTechLevel() {
-		return TechConstants.T_ALLOWED_ALL;
-	}
-
-	@Override
 	public boolean isSamePartType(Part part) {
 		return part instanceof Avionics;
 	}
@@ -192,6 +195,9 @@ public class Avionics extends Part {
 	
 	@Override
 	public boolean isRightTechType(String skillType) {
+	    if (unit != null && unit.getEntity() instanceof LandAirMech) {
+	        return skillType.equals(SkillType.S_TECH_MECH);
+	    }
 		return skillType.equals(SkillType.S_TECH_AERO);
 	}
 
@@ -205,21 +211,10 @@ public class Avionics extends Part {
 	public int getLocation() {
 		return Entity.LOC_NONE;
 	}
-	
-	@Override
-	public int getIntroDate() {
-		return EquipmentType.DATE_NONE;
-	}
 
 	@Override
-	public int getExtinctDate() {
-		return EquipmentType.DATE_NONE;
+	public TechAdvancement getTechAdvancement() {
+	    return TA_GENERIC;
 	}
-
-	@Override
-	public int getReIntroDate() {
-		return EquipmentType.DATE_NONE;
-	}
-	
 	
 }

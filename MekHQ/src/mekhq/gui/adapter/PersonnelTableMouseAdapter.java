@@ -5,7 +5,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Enumeration;
 import java.util.ResourceBundle;
 import java.util.TreeSet;
 import java.util.UUID;
@@ -25,7 +24,7 @@ import megamek.common.Infantry;
 import megamek.common.Mech;
 import megamek.common.Mounted;
 import megamek.common.Tank;
-import megamek.common.options.IOption;
+import megamek.common.logging.LogLevel;
 import megamek.common.options.PilotOptions;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
@@ -35,6 +34,7 @@ import mekhq.campaign.Kill;
 import mekhq.campaign.LogEntry;
 import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.event.PersonLogEvent;
+import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Rank;
@@ -117,7 +117,8 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
     private static final String CMD_IMPRISON = "IMPRISON"; //$NON-NLS-1$
     private static final String CMD_FREE = "FREE"; //$NON-NLS-1$
     private static final String CMD_RECRUIT = "RECRUIT"; //$NON-NLS-1$
-
+    private static final String CMD_RANSOM = "RANSOM";
+    
     private static final String SEPARATOR = "@"; //$NON-NLS-1$
     private static final String SPACE = " "; //$NON-NLS-1$
     private static final String HYPHEN = "-"; //$NON-NLS-1$
@@ -162,6 +163,8 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
 
     @Override
     public void actionPerformed(ActionEvent action) {
+        final String METHOD_NAME = "actionPerformed(ActionEvent)"; //$NON-NLS-1$
+        
         int row = personnelTable.getSelectedRow();
         if (row < 0) {
             return;
@@ -523,7 +526,8 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                         break;
                     default:
                         spouse.setName(spouseGivenname + SPACE + "ImaError"); //$NON-NLS-1$
-                        MekHQ.logMessage(String.format("Unknown error in Surname chooser between \"%s\" and \"%s\"", //$NON-NLS-1$
+                        MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
+                                String.format("Unknown error in Surname chooser between \"%s\" and \"%s\"", //$NON-NLS-1$
                             selectedPerson.getFullName(), spouse.getFullName()));
                         break;
                 }
@@ -681,6 +685,26 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 break;
             case CMD_RECRUIT:
                 gui.getCampaign().changePrisonerStatus(selectedPerson, Person.PRISONER_NOT);
+                break;
+            case CMD_RANSOM:
+                // ask the user if they want to sell off their prisoners. If yes, then add a daily report entry, add the money and remove them all.
+                int total = 0;
+                for(Person person : people) {
+                    total += person.getRansomValue();
+                }
+                
+                if (0 == JOptionPane.showConfirmDialog(
+                        null,
+                        String.format(resourceMap.getString("ransomQ.format"), people.length, total), //$NON-NLS-1$
+                        resourceMap.getString("ransom.text"), //$NON-NLS-1$
+                        JOptionPane.YES_NO_OPTION)) {
+                    
+                    gui.getCampaign().addReport(String.format(resourceMap.getString("ransomReport.format"), people.length, total));
+                    gui.getCampaign().addFunds(total, resourceMap.getString("ransom.text"), Transaction.C_MISC);
+                    for (Person person : people) {
+                        gui.getCampaign().removePerson(person.getId(), false);
+                    }
+                }
                 break;
             case CMD_EDGE_TRIGGER:
             {
@@ -1233,6 +1257,12 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 popup.add(newMenuItem(resourceMap.getString("free.text"), CMD_FREE, !person.isFree())); //$NON-NLS-1$
                 popup.add(newMenuItem(resourceMap.getString("recruit.text"), CMD_RECRUIT, //$NON-NLS-1$
                         person.isBondsman() || person.isWillingToDefect()));
+            }
+            
+            if(gui.getCampaign().getCampaignOptions().getUseAtB() &&
+               gui.getCampaign().getCampaignOptions().getUseAtBCapture() &&
+               StaticChecks.areAllPrisoners(selected)) {
+                popup.add(newMenuItem(resourceMap.getString("ransom.text"), CMD_RANSOM));
             }
 
             menu = new JMenu(resourceMap.getString("changePrimaryRole.text")); //$NON-NLS-1$
@@ -2089,8 +2119,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             popup.show(e.getComponent(), e.getX(), e.getY());
         }
     }
-
-    @SuppressWarnings("unused")
+    
     private JMenuItem newMenuItem(String text, String command) {
         return newMenuItem(text, command, true);
     }

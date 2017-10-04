@@ -28,7 +28,11 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.common.TechConstants;
+import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
@@ -37,9 +41,6 @@ import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.rating.UnitRatingMethod;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  * @author natit
@@ -124,6 +125,8 @@ public class CampaignOptions implements Serializable {
     private boolean allowCanonOnly;
     private boolean allowCanonRefitOnly;
     private int techLevel;
+    private boolean variableTechLevel;
+    private boolean factionIntroDate;
     private boolean useAmmoByType; // Unofficial
 
     //finance related
@@ -137,6 +140,9 @@ public class CampaignOptions implements Serializable {
     private boolean sellUnits;
     private boolean sellParts;
     private boolean useLoanLimits;
+    private boolean usePeacetimeCost;
+    private boolean useExtendedPartsModifier;
+    private boolean showPeacetimeCost;
     private double[] usedPartsValue;
     private double damagedPartsValue;
     private double canceledOrderReimbursement;
@@ -147,6 +153,9 @@ public class CampaignOptions implements Serializable {
     //contract related
     private boolean equipmentContractBase;
     private double equipmentContractPercent;
+    private double dropshipContractPercent;
+    private double jumpshipContractPercent;
+    private double warshipContractPercent;
     private boolean equipmentContractSaleValue;
     private boolean blcSaleValue;
 
@@ -300,6 +309,9 @@ public class CampaignOptions implements Serializable {
         payForMaintain = false;
         payForTransport = false;
         useLoanLimits = false;
+        usePeacetimeCost = false;
+        useExtendedPartsModifier = false;
+        showPeacetimeCost = false;
         sellUnits = false;
         sellParts = false;
         limitByYear = true;
@@ -312,6 +324,8 @@ public class CampaignOptions implements Serializable {
         usePercentageMaint = false;
         infantryDontCount = false;
         techLevel = TECH_EXPERIMENTAL;
+        variableTechLevel = false;
+        factionIntroDate = false;
         scenarioXP = 1;
         killsForXP = 0;
         killXPAward = 0;
@@ -353,6 +367,9 @@ public class CampaignOptions implements Serializable {
         acquireMinimumTimeUnit = TRANSIT_UNIT_MONTH;
         equipmentContractBase = false;
         equipmentContractPercent = 5.0;
+        dropshipContractPercent = 1.0;
+        jumpshipContractPercent = 0.0;
+        warshipContractPercent = 0.0;
         equipmentContractSaleValue = false;
         blcSaleValue = false;
         clanAcquisitionPenalty = 0;
@@ -816,6 +833,30 @@ public class CampaignOptions implements Serializable {
         this.payForTransport = b;
     }
 
+    public boolean usePeacetimeCost() {
+        return usePeacetimeCost;
+    }
+
+    public void setUsePeacetimeCost(boolean b) {
+        this.usePeacetimeCost = b;
+    }
+
+    public boolean useExtendedPartsModifier() {
+        return useExtendedPartsModifier;
+    }
+
+    public void setUseExtendedPartsModifier(boolean b) {
+        this.useExtendedPartsModifier = b;
+    }
+
+    public boolean showPeacetimeCost() {
+        return showPeacetimeCost;
+    }
+
+    public void setShowPeacetimeCost(boolean b) {
+        this.showPeacetimeCost = b;
+    }
+
     public boolean canSellUnits() {
         return sellUnits;
     }
@@ -951,6 +992,22 @@ public class CampaignOptions implements Serializable {
 
     public void setAllowCanonRefitOnly(boolean b) {
         allowCanonRefitOnly = b;
+    }
+    
+    public boolean useVariableTechLevel() {
+        return variableTechLevel;
+    }
+    
+    public void setVariableTechLevel(boolean b) {
+        variableTechLevel = b;
+    }
+    
+    public void setfactionIntroDate(boolean b) {
+        factionIntroDate = b;
+    }
+    
+    public boolean useFactionIntroDate() {
+        return factionIntroDate;
     }
 
     public boolean useAmmoByType() {
@@ -1190,6 +1247,30 @@ public class CampaignOptions implements Serializable {
 
     public void setEquipmentContractSaleValue(boolean b) {
         this.equipmentContractSaleValue = b;
+    }
+
+    public double getDropshipContractPercent() {
+        return dropshipContractPercent;
+    }
+
+    public void setDropshipContractPercent(double b) {
+        dropshipContractPercent = b;
+    }
+
+    public double getJumpshipContractPercent() {
+        return jumpshipContractPercent;
+    }
+
+    public void setJumpshipContractPercent(double b) {
+        jumpshipContractPercent = b;
+    }
+
+    public double getWarshipContractPercent() {
+        return warshipContractPercent;
+    }
+
+    public void setWarshipContractPercent(double b) {
+        warshipContractPercent = b;
     }
 
     public boolean useBLCSaleValue() {
@@ -1918,6 +1999,9 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "payForOverhead", payForOverhead);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "payForMaintain", payForMaintain);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "payForTransport", payForTransport);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "usePeacetimeCost", usePeacetimeCost);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useExtendedPartsModifier", useExtendedPartsModifier);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "showPeacetimeCost", showPeacetimeCost);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "usedPartsValueA", usedPartsValue[0]);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "usedPartsValueB", usedPartsValue[1]);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "usedPartsValueC", usedPartsValue[2]);
@@ -1948,6 +2032,8 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "allowISPurchases", allowISPurchases);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "allowCanonOnly", allowCanonOnly);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "allowCanonRefitOnly", allowCanonRefitOnly);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "variableTechLevel", variableTechLevel);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "factionIntroDate", factionIntroDate);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useAmmoByType", useAmmoByType);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "usePercentageMaint", usePercentageMaint);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "waitingPeriod", waitingPeriod);
@@ -1962,6 +2048,9 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "acquireMinimumTime", acquireMinimumTime);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "acquireMinimumTimeUnit", acquireMinimumTimeUnit);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "equipmentContractPercent", equipmentContractPercent);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "dropshipContractPercent", dropshipContractPercent);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "jumpshipContractPercent", jumpshipContractPercent);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "warshipContractPercent", warshipContractPercent);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "equipmentContractBase", equipmentContractBase);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "equipmentContractSaleValue", equipmentContractSaleValue);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "blcSaleValue", blcSaleValue);
@@ -2115,7 +2204,10 @@ public class CampaignOptions implements Serializable {
     }
 
     public static CampaignOptions generateCampaignOptionsFromXml(Node wn) {
-        MekHQ.logMessage("Loading Campaign Options from XML...", 4);
+        final String METHOD_NAME = "generateCampaignOptionsFromXml(Node)"; //$NON-NLS-1$
+
+        MekHQ.getLogger().log(CampaignOptions.class, METHOD_NAME, LogLevel.INFO,
+                "Loading Campaign Options from XML..."); //$NON-NLS-1$
 
         wn.normalize();
         CampaignOptions retVal = new CampaignOptions();
@@ -2130,9 +2222,9 @@ public class CampaignOptions implements Serializable {
                 continue;
             }
 
-            MekHQ.logMessage("---", 5);
-            MekHQ.logMessage(wn2.getNodeName(), 5);
-            MekHQ.logMessage("\t" + wn2.getTextContent(), 5);
+            MekHQ.getLogger().log(CampaignOptions.class, METHOD_NAME, LogLevel.INFO,
+                    String.format("%s\n\t%s", //$NON-NLS-1$
+                            wn2.getNodeName(), wn2.getTextContent()));
 
             if (wn2.getNodeName().equalsIgnoreCase("clanPriceModifier")) {
                 retVal.clanPriceModifier = Double.parseDouble(wn2.getTextContent());
@@ -2186,6 +2278,12 @@ public class CampaignOptions implements Serializable {
                 retVal.payForMaintain = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("payForTransport")) {
                 retVal.payForTransport = Boolean.parseBoolean(wn2.getTextContent());
+            } else if (wn2.getNodeName().equalsIgnoreCase("usePeacetimeCost")) {
+                retVal.usePeacetimeCost = Boolean.parseBoolean(wn2.getTextContent());
+            } else if (wn2.getNodeName().equalsIgnoreCase("useExtendedPartsModifier")) {
+                retVal.useExtendedPartsModifier = Boolean.parseBoolean(wn2.getTextContent());
+            } else if (wn2.getNodeName().equalsIgnoreCase("showPeacetimeCost")) {
+                retVal.showPeacetimeCost = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("payForRecruitment")) {
                 retVal.payForRecruitment = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("useLoanLimits")) {
@@ -2266,6 +2364,12 @@ public class CampaignOptions implements Serializable {
                 retVal.isAcquisitionPenalty = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("equipmentContractPercent")) {
                 retVal.equipmentContractPercent = Double.parseDouble(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("dropshipContractPercent")) {
+                retVal.dropshipContractPercent = Double.parseDouble(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("jumpshipContractPercent")) {
+                retVal.jumpshipContractPercent = Double.parseDouble(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("warshipContractPercent")) {
+                retVal.warshipContractPercent = Double.parseDouble(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("equipmentContractBase")) {
                 retVal.equipmentContractBase = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("equipmentContractSaleValue")) {
@@ -2320,6 +2424,10 @@ public class CampaignOptions implements Serializable {
                 } else {
                     retVal.useAmmoByType = false;
                 }
+            } else if (wn2.getNodeName().equalsIgnoreCase("variableTechLevel")) {
+                retVal.variableTechLevel = Boolean.parseBoolean(wn2.getTextContent());
+            } else if (wn2.getNodeName().equalsIgnoreCase("factionIntroDate")) {
+                retVal.factionIntroDate = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("usePercentageMaint")) {
                 if (wn2.getTextContent().equalsIgnoreCase("true")) {
                     retVal.usePercentageMaint = true;
@@ -2555,10 +2663,9 @@ public class CampaignOptions implements Serializable {
                                     continue;
                                 }
                      
-                                MekHQ.logMessage("---", 5);
-                                MekHQ.logMessage("massRepairOption" + mroTypeIdx + "." + mroItemNode.getNodeName(), 5);
-                                MekHQ.logMessage("\t" + mroItemNode.getTextContent(), 5);
-                                
+                                MekHQ.getLogger().log(CampaignOptions.class, METHOD_NAME, LogLevel.INFO,
+                                        String.format("massRepairOption %d.%s\n\t%s", //$NON-NLS-1$
+                                                mroTypeIdx, mroItemNode.getNodeName(), mroItemNode.getTextContent()));
                                 
                                 if (mroItemNode.getNodeName().equalsIgnoreCase("type")) {
                                 	mro.setType(Integer.parseInt(mroItemNode.getTextContent().trim()));
@@ -2584,7 +2691,8 @@ public class CampaignOptions implements Serializable {
             }
         }
 
-        MekHQ.logMessage("Load Campaign Options Complete!", 4);
+        MekHQ.getLogger().log(CampaignOptions.class, METHOD_NAME, LogLevel.INFO,
+                "Load Campaign Options Complete!"); //$NON-NLS-1$
 
         return retVal;
     }

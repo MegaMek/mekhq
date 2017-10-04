@@ -23,17 +23,18 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.common.Aero;
 import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
+import megamek.common.TechAdvancement;
 import megamek.common.TechConstants;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.SkillType;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  *
@@ -43,6 +44,10 @@ public class AeroHeatSink extends Part {
     private static final long serialVersionUID = -717866644605314883L;
 
     private int type;
+    
+    static final TechAdvancement TA_SINGLE = EquipmentType.get("Heat Sink").getTechAdvancement();
+    static final TechAdvancement TA_IS_DOUBLE = EquipmentType.get("ISDoubleHeatSink").getTechAdvancement();
+    static final TechAdvancement TA_CLAN_DOUBLE = EquipmentType.get("CLDoubleHeatSink").getTechAdvancement();
     
     public AeroHeatSink() {
         this(0, Aero.HEAT_SINGLE, false, null);
@@ -117,7 +122,6 @@ public class AeroHeatSink extends Part {
                 a.setHeatSinks(Math.min(a.getHeatSinks()+1, a.getOHeatSinks()));
             }
         }
-        
     }
 
     @Override
@@ -189,21 +193,6 @@ public class AeroHeatSink extends Part {
     }
 
     @Override
-    public int getAvailability(int era) {
-        if(type == Aero.HEAT_DOUBLE) {
-        if(era == EquipmentType.ERA_SL) {
-            return EquipmentType.RATING_C;
-        } else if(era == EquipmentType.ERA_SW) {
-            return EquipmentType.RATING_E;
-        } else {
-            return EquipmentType.RATING_D;
-        }
-        } else {
-            return EquipmentType.RATING_B;
-        }
-    }
-    
-    @Override
     public int getTechLevel() {
         return TechConstants.T_ALLOWED_ALL;
     }
@@ -261,34 +250,18 @@ public class AeroHeatSink extends Part {
     public int getLocation() {
         return Entity.LOC_NONE;
     }
-
-    @Override
-    public int getIntroDate() {
-        if (isOmniPodded()) {
-            return isClanTechBase()? 2850 : 3052;
-        }
-        if(type == Aero.HEAT_DOUBLE) {
-            return 2567;
-        }
-        return EquipmentType.DATE_NONE;
-    }
-
-    @Override
-    public int getExtinctDate() {
-        //TODO: we should distinguish clan and IS here for extinction purposes
-        /*if(type == Aero.HEAT_DOUBLE) {
-         * if(!isClan()) {
-                return 2865;
-            }
-        }*/
-        return EquipmentType.DATE_NONE;
-    }
-
-    @Override
-    public int getReIntroDate() {
-        return 3040;
-    }
     
+    @Override
+    public TechAdvancement getTechAdvancement() {
+        if (type == Aero.HEAT_SINGLE) {
+            return TA_SINGLE;
+        } else if (campaign.getFaction().isClan()) {
+            return TA_CLAN_DOUBLE;
+        } else {
+            return TA_IS_DOUBLE;
+        }
+    }
+
     @Override
     public boolean isOmniPoddable() {
         return true;

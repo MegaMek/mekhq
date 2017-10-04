@@ -24,6 +24,7 @@ package mekhq.campaign.unit;
 
 import java.io.PrintWriter;
 import java.math.BigInteger;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Enumeration;
@@ -59,10 +60,13 @@ import megamek.common.HeavyVehicleBay;
 import megamek.common.IArmorState;
 import megamek.common.ILocationExposureStatus;
 import megamek.common.IPlayer;
+import megamek.common.ITechnology;
 import megamek.common.Infantry;
 import megamek.common.InfantryBay;
 import megamek.common.InsulatedCargoBay;
 import megamek.common.Jumpship;
+import megamek.common.LAMPilot;
+import megamek.common.LandAirMech;
 import megamek.common.LightVehicleBay;
 import megamek.common.LiquidCargoBay;
 import megamek.common.LivestockCargoBay;
@@ -77,6 +81,7 @@ import megamek.common.ProtomechBay;
 import megamek.common.QuadMech;
 import megamek.common.QuadVee;
 import megamek.common.RefrigeratedCargoBay;
+import megamek.common.SimpleTechLevel;
 import megamek.common.SmallCraft;
 import megamek.common.SmallCraftBay;
 import megamek.common.SpaceStation;
@@ -88,11 +93,12 @@ import megamek.common.TechConstants;
 import megamek.common.VTOL;
 import megamek.common.Warship;
 import megamek.common.WeaponType;
+import megamek.common.logging.LogLevel;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.PilotOptions;
-import megamek.common.weapons.BayWeapon;
 import megamek.common.weapons.InfantryAttack;
+import megamek.common.weapons.bayweapons.BayWeapon;
 import megamek.common.weapons.infantry.InfantryWeapon;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
@@ -194,7 +200,7 @@ import mekhq.campaign.work.IPartWork;
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class Unit implements MekHqXmlSerializable {
+public class Unit implements MekHqXmlSerializable, ITechnology {
     public static final int SITE_FIELD = 0;
     public static final int SITE_MOBILE_BASE = 1;
     public static final int SITE_BAY = 2;
@@ -552,15 +558,23 @@ public class Unit implements MekHqXmlSerializable {
         }
     }
 
+    private boolean isPartAvailableForRepairs(IPartWork partWork, boolean onlyNotBeingWorkedOn) {
+    	return (!onlyNotBeingWorkedOn || (onlyNotBeingWorkedOn && !partWork.isBeingWorkedOn()));
+    }
+    
     public ArrayList<IPartWork> getPartsNeedingFixing() {
+    	return getPartsNeedingFixing(false);
+    }
+    
+    public ArrayList<IPartWork> getPartsNeedingFixing(boolean onlyNotBeingWorkedOn) {
         ArrayList<IPartWork> brokenParts = new ArrayList<IPartWork>();
         for(Part part: parts) {
-            if(part.needsFixing()) {
+            if(part.needsFixing() && isPartAvailableForRepairs(part, onlyNotBeingWorkedOn)) {
                 brokenParts.add(part);
             }
         }
         for (PodSpace pod : podSpace) {
-            if (pod.needsFixing()) {
+            if (pod.needsFixing() && isPartAvailableForRepairs(pod, onlyNotBeingWorkedOn)) {
                 brokenParts.add(pod);
             }
         }
@@ -568,14 +582,18 @@ public class Unit implements MekHqXmlSerializable {
     }
 
     public ArrayList<IPartWork> getSalvageableParts() {
+    	return getSalvageableParts(false);
+    }
+    
+    public ArrayList<IPartWork> getSalvageableParts(boolean onlyNotBeingWorkedOn) {
         ArrayList<IPartWork> salvageParts = new ArrayList<IPartWork>();
         for(Part part: parts) {
-            if(part.isSalvaging()) {
+            if(part.isSalvaging() && isPartAvailableForRepairs(part, onlyNotBeingWorkedOn)) {
                 salvageParts.add(part);
             }
         }
         for (PodSpace pod : podSpace) {
-            if (pod.hasSalvageableParts()) {
+            if (pod.hasSalvageableParts() && isPartAvailableForRepairs(pod, onlyNotBeingWorkedOn)) {
                 salvageParts.add(pod);
             }
         }
@@ -1442,6 +1460,8 @@ public class Unit implements MekHqXmlSerializable {
     }
 
     public static Unit generateInstanceFromXML(Node wn, Version version) {
+        final String METHOD_NAME = "generateInstanceFromXML(Node,Version)"; //$NON-NLS-1$
+
         Unit retVal = new Unit();
         NamedNodeMap attrs = wn.getAttributes();
         Node idNode = attrs.getNamedItem("id");
@@ -1536,11 +1556,12 @@ public class Unit implements MekHqXmlSerializable {
             }
         } catch (Exception ex) {
             // Doh!
-            MekHQ.logError(ex);
+            MekHQ.getLogger().log(Unit.class, METHOD_NAME, ex);
         }
 
         if (retVal.id == null) {
-            MekHQ.logMessage("ID not pre-defined; generating unit's ID.", 5);
+            MekHQ.getLogger().log(Unit.class, METHOD_NAME, LogLevel.WARNING,
+                    "ID not pre-defined; generating unit's ID."); //$NON-NLS-1$
             retVal.id = UUID.randomUUID();
         }
 
@@ -1968,7 +1989,9 @@ public class Unit implements MekHqXmlSerializable {
             }
             if(null == locations[i]) {
                 if(entity instanceof Mech) {
-                    MekLocation mekLocation = new MekLocation(i, (int) getEntity().getWeight(), getEntity().getStructureType(), hasTSM(), entity instanceof QuadMech, false, false, campaign);
+                    MekLocation mekLocation = new MekLocation(i, (int) getEntity().getWeight(),
+                            getEntity().getStructureType(), TechConstants.isClan(entity.getStructureTechLevel()),
+                            hasTSM(), entity instanceof QuadMech, false, false, campaign);
                     addPart(mekLocation);
                     partsToAdd.add(mekLocation);
                 } else if(entity instanceof Protomech && i != Protomech.LOC_NMISS) {
@@ -2114,6 +2137,9 @@ public class Unit implements MekHqXmlSerializable {
                             m.isOmniPodMounted(), campaign);
                     addPart(epart);
                     partsToAdd.add(epart);
+                    if (entity.hasETypeFlag(Entity.ETYPE_PROTOMECH)) {
+                        protoJumpJets.add(epart);
+                    }
                 }
             } else {
                 int eqnum = entity.getEquipmentNum(m);
@@ -2321,7 +2347,7 @@ public class Unit implements MekHqXmlSerializable {
                 ((AeroLifeSupport)lifeSupport).calculateCost();
             }
             if(null == dropCollar && entity instanceof Dropship) {
-                dropCollar = new DropshipDockingCollar((int) entity.getWeight(), campaign);
+                dropCollar = new DropshipDockingCollar((int) entity.getWeight(), campaign, true);
                 addPart(dropCollar);
                 partsToAdd.add(dropCollar);
             }
@@ -2410,14 +2436,19 @@ public class Unit implements MekHqXmlSerializable {
                 }
             }
             if(null == infantryArmor) {
-                infantryArmor = new InfantryArmorPart(0, campaign, ((Infantry)entity).getDamageDivisor(), ((Infantry)entity).isArmorEncumbering(), ((Infantry)entity).hasDEST(), ((Infantry)entity).hasSneakCamo(), ((Infantry)entity).hasSneakECM(), ((Infantry)entity).hasSneakIR(), ((Infantry)entity).hasSpaceSuit());
-                if(infantryArmor.getStickerPrice() > 0) {
-                    int number = ((Infantry)entity).getOInternal(Infantry.LOC_INFANTRY);
-                    while(number > 0) {
-                        infantryArmor = new InfantryArmorPart(0, campaign, ((Infantry)entity).getDamageDivisor(), ((Infantry)entity).isArmorEncumbering(), ((Infantry)entity).hasDEST(), ((Infantry)entity).hasSneakCamo(), ((Infantry)entity).hasSneakECM(), ((Infantry)entity).hasSneakIR(), ((Infantry)entity).hasSpaceSuit());
-                        addPart(infantryArmor);
-                        partsToAdd.add(infantryArmor);
-                        number--;
+                EquipmentType eq = ((Infantry)entity).getArmorKit();
+                if (null != eq) {
+                    infantryArmor = new EquipmentPart(0, eq, 0, false, campaign);
+                } else {
+                    infantryArmor = new InfantryArmorPart(0, campaign, ((Infantry)entity).getDamageDivisor(), ((Infantry)entity).isArmorEncumbering(), ((Infantry)entity).hasDEST(), ((Infantry)entity).hasSneakCamo(), ((Infantry)entity).hasSneakECM(), ((Infantry)entity).hasSneakIR(), ((Infantry)entity).hasSpaceSuit());
+                    if(infantryArmor.getStickerPrice() > 0) {
+                        int number = ((Infantry)entity).getOInternal(Infantry.LOC_INFANTRY);
+                        while(number > 0) {
+                            infantryArmor = new InfantryArmorPart(0, campaign, ((Infantry)entity).getDamageDivisor(), ((Infantry)entity).isArmorEncumbering(), ((Infantry)entity).hasDEST(), ((Infantry)entity).hasSneakCamo(), ((Infantry)entity).hasSneakECM(), ((Infantry)entity).hasSneakIR(), ((Infantry)entity).hasSpaceSuit());
+                            addPart(infantryArmor);
+                            partsToAdd.add(infantryArmor);
+                            number--;
+                        }
                     }
                 }
             }
@@ -2441,6 +2472,18 @@ public class Unit implements MekHqXmlSerializable {
                     partsToAdd.add(secondaryW);
                     number--;
                 }
+            }
+        }
+        if (getEntity() instanceof LandAirMech) {
+            if (null == avionics) {
+                avionics = new Avionics((int)entity.getWeight(), campaign);
+                addPart(avionics);
+                partsToAdd.add(avionics);
+            }
+            if (null == landingGear) {
+                landingGear = new LandingGear((int) entity.getWeight(), campaign);
+                addPart(landingGear);
+                partsToAdd.add(landingGear);
             }
         }
 
@@ -2621,7 +2664,11 @@ public class Unit implements MekHqXmlSerializable {
                 }
             }
         } else {
-            calcCompositeCrew();
+            if ((entity.getEntityType() & Entity.ETYPE_LAND_AIR_MECH) == 0) {
+                calcCompositeCrew();
+            } else {
+                refreshLAMPilot();
+            }
             if (entity.getCrew().isMissing(0)) {
                 return;
             }
@@ -2680,8 +2727,6 @@ public class Unit implements MekHqXmlSerializable {
     /**
      * For vehicles, infantry, and naval vessels, compute the piloting and gunnery skills based
      * on the crew as a whole.
-     * 
-     * @return The size of the crew.
      */
     private void calcCompositeCrew() {
         if (drivers.isEmpty() && gunners.isEmpty()) {
@@ -2849,6 +2894,56 @@ public class Unit implements MekHqXmlSerializable {
         entity.getCrew().setGunnery(Math.min(Math.max(gunnery, 0), 7), 0);
         entity.getCrew().setArtillery(Math.min(Math.max(artillery, 7), 8), 0);
         entity.getCrew().setSize(nCrew);
+        entity.getCrew().setMissing(false, 0);
+    }
+    
+    /**
+     * LAMs require a pilot that is cross-trained for mechs and fighters
+     */
+    private void refreshLAMPilot() {
+        Person pilot = getCommander();
+        if (null == pilot) {
+            entity.getCrew().setMissing(true, 0);
+            entity.getCrew().setSize(0);
+            return;
+        }
+        
+        int pilotingMech = 13;
+        int gunneryMech = 13;
+        int pilotingAero = 13;
+        int gunneryAero = 13;
+        int artillery = 13;
+        
+        if (pilot.hasSkill(SkillType.S_PILOT_MECH)) {
+            pilotingMech = pilot.getSkill(SkillType.S_PILOT_MECH).getFinalSkillValue();
+        }
+        if (pilot.hasSkill(SkillType.S_GUN_MECH)) {
+            gunneryMech = pilot.getSkill(SkillType.S_GUN_MECH).getFinalSkillValue();
+        }
+        if (pilot.hasSkill(SkillType.S_PILOT_AERO)) {
+            pilotingAero = pilot.getSkill(SkillType.S_PILOT_AERO).getFinalSkillValue();
+        }
+        if (pilot.hasSkill(SkillType.S_GUN_AERO)) {
+            gunneryAero = pilot.getSkill(SkillType.S_GUN_AERO).getFinalSkillValue();
+        }
+        if (pilot.hasSkill(SkillType.S_ARTILLERY)) {
+            artillery = pilot.getSkill(SkillType.S_ARTILLERY).getFinalSkillValue();
+        }
+
+        if (campaign.getCampaignOptions().useAdvancedMedical()) {
+            pilotingMech += pilot.getPilotingInjuryMod();
+            gunneryMech += pilot.getGunneryInjuryMod();
+            pilotingAero += pilot.getPilotingInjuryMod();
+            gunneryAero += pilot.getGunneryInjuryMod();
+            artillery += pilot.getGunneryInjuryMod();
+        }
+        LAMPilot crew = (LAMPilot)entity.getCrew();
+        crew.setPiloting(Math.min(Math.max(pilotingMech, 0), 8));
+        crew.setGunnery(Math.min(Math.max(gunneryMech, 0), 7));
+        crew.setPilotingAero(Math.min(Math.max(pilotingAero, 0), 8));
+        crew.setGunneryAero(Math.min(Math.max(gunneryAero, 0), 7));
+        entity.getCrew().setArtillery(Math.min(Math.max(artillery, 7), 8), 0);
+        entity.getCrew().setSize(1);
         entity.getCrew().setMissing(false, 0);
     }
     
@@ -3534,13 +3629,13 @@ public class Unit implements MekHqXmlSerializable {
         //take the highest availability of all parts
         int availability = EquipmentType.RATING_A;
         for(Part p : parts) {
-            int newAvailability = p.getAvailability(era);
+            int newAvailability = p.getAvailability();
             //Taharqa: its not clear whether a unit should really be considered extinct
             //when its parts are extinct as many probably outlive the production of parts
             //it would be better to just use the unit extinction date itself, but given
             //that there are no canon extinction/reintro dates for units, we will use this
             //instead
-            if(p.isExtinctIn(campaign.getCalendar().get(Calendar.YEAR))) {
+            if(p.isExtinct(campaign.getCalendar().get(Calendar.YEAR), campaign.getFaction().isClan())) {
                 newAvailability = EquipmentType.RATING_X;
             }
             if(newAvailability > availability) {
@@ -3801,4 +3896,373 @@ public class Unit implements MekHqXmlSerializable {
         }
         return "Unit for Entity: " + entName;
     }
+    
+    public String displayMonthlyCost() {
+        DecimalFormat numFormatter = new DecimalFormat();
+        
+        String unitMonthlyCost = "<b>Spare Parts</b>: " + numFormatter.format(getSparePartsCost()) + " C-bills<br>"
+                               + "<b>Ammunition</b>: " + numFormatter.format(getAmmoCost()) + " C-bills<br>"
+                               + "<b>Fuel</b>: " + numFormatter.format(getFuelCost()) + " C-bills<br>";
+        return unitMonthlyCost;
+    }
+
+    public long getSparePartsCost() {
+        final String METHOD_NAME = "getSparePartsCost()"; //$NON-NLS-1$
+        long partsCost = 0;
+
+        entity = getEntity();
+        if (isMothballed()) {
+            return partsCost;
+        }
+        if ((entity instanceof Jumpship) || (entity instanceof SpaceStation)) {
+            partsCost += ((long)entity.getWeight()) * .0001 * 15000;
+        } else if (entity instanceof Aero) {
+            partsCost += ((long)entity.getWeight()) * .001 * 15000;
+        } else if (entity instanceof Tank) {
+            partsCost += ((long)entity.getWeight()) * .001 * 8000;
+        } else if ((entity instanceof Mech) || (entity instanceof BattleArmor)
+                || ((Infantry) entity).isMechanized()) {
+            partsCost += ((long)entity.getWeight()) * .001 * 10000;
+        } else if (entity instanceof Infantry) {
+            if (entity.getMovementMode() == EntityMovementMode.INF_LEG) {
+                partsCost += 3 * .002 * 10000;
+            } else if (entity.getMovementMode() == EntityMovementMode.INF_JUMP) {
+                partsCost += 4 * .002 * 10000;
+            } else if (entity.getMovementMode() == EntityMovementMode.INF_MOTORIZED) {
+                partsCost += 6 * .002 * 10000;
+            } else {
+                partsCost += ((long)entity.getWeight()) * .002 * 10000;
+                MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
+                        getName() + " is not a generic CI. Movement mode is "
+                        + entity.getMovementModeAsString());
+            }
+
+        } else {
+            // Only protomechs should fall here. Anything else needs to be logged
+            if (!(entity instanceof Protomech)) {
+                MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
+                        getName() + " has no Spare Parts value for unit type " 
+                        + Entity.getEntityTypeName(entity.getEntityType()));
+            }
+        }
+
+        // Handle cost for quirks if used
+        if (entity.hasQuirk("easy_maintain")) {
+            partsCost = (long)(partsCost * .8);
+        }
+        if (entity.hasQuirk("difficult_maintain")) {
+            partsCost = (long)(partsCost * 1.25);
+        }
+        if (entity.hasQuirk("non_standard")) {
+            partsCost = (long)(partsCost * 2.0);
+        }
+        if (entity.hasQuirk("ubiquitous_is")) {
+            partsCost = (long)(partsCost * .75);
+        }
+        // TODO Obsolete quirk
+
+        // Now for extended parts cost modifiers
+        if (campaign.getCampaignOptions().useExtendedPartsModifier()) {
+            Engine en = entity.getEngine();
+            int currentYear = campaign.getCalendar().get(Calendar.YEAR);
+            int rating = getTechRating();
+            if (((currentYear > 2859) && (currentYear < 3040))
+                    && (!campaign.getFaction().isClan() && !campaign.getFaction().isComstar())) {
+                if (rating > EquipmentType.RATING_D) {
+                    partsCost = (long)(partsCost * 5.0);
+                }
+            }
+            if (rating == EquipmentType.RATING_E) {
+                partsCost = (long)(partsCost * 1.1);
+            }
+            if (rating == EquipmentType.RATING_F) {
+                partsCost = (long)(partsCost * 1.25);
+            }
+            if ((entity instanceof Tank)
+                    && (en.getEngineType() == Engine.NORMAL_ENGINE)) {
+                partsCost = (long)(partsCost * 2.0);
+            }
+            if (!(entity instanceof Infantry)) {
+                if ((en.getEngineType() == Engine.XL_ENGINE)
+                        || (en.getEngineType() == Engine.XXL_ENGINE)) {
+                    partsCost = (long)(partsCost * 2.5);
+                }
+                if (en.getEngineType() == Engine.LIGHT_ENGINE) {
+                    partsCost = (long)(partsCost * 1.5);
+                }
+            }
+            if (entity.isClan()) {
+                if ((currentYear >3048) && (currentYear < 3071)) {
+                    partsCost = (long)(partsCost * 5.0);
+                } else if (currentYear > 3070) {
+                    partsCost = (long)(partsCost * 4.0);
+                }
+            }
+        }
+
+        return partsCost;
+    }
+
+    public long getAmmoCost() {
+        long ammoCost = 0;
+
+        for (Part p : getParts()) {
+            if (p instanceof EquipmentPart && ((EquipmentPart)p).getType() instanceof AmmoType) {
+                ammoCost += p.getStickerPrice();
+            }
+        }
+        ammoCost = (long)(ammoCost * .25);
+
+        return ammoCost;
+    }
+
+    public long getFuelCost() {
+        long fuelCost = 0;
+
+        if ((entity instanceof Warship) || (entity instanceof SmallCraft) ) {
+            fuelCost += ((long)getTonsBurnDay(entity));
+        } else if (entity instanceof Jumpship) {
+            fuelCost += ((long)getTonsBurnDay(entity));// * 3 * 15000;
+        } else if (entity instanceof ConvFighter) {
+            fuelCost += getFighterFuelCost(entity);
+        } else if (entity instanceof megamek.common.Aero) {
+            fuelCost += ((long)((Aero) entity).getFuelTonnage()) * 4 * 15000;
+        } else if ((entity instanceof Tank) || (entity instanceof Mech)) {
+            fuelCost += getVehicleFuelCost(entity);
+        } else if (entity instanceof Infantry) {
+            fuelCost += getInfantryFuelCost(entity);
+        }
+
+        return fuelCost;
+    }
+
+    public double getTonsBurnDay(Entity e) {
+        double tonsburnday = 0;
+        if (e instanceof Dropship) {
+            if (((SmallCraft) e).getDesignType() != Dropship.MILITARY) {
+                if (e.getWeight() < 1000) {
+                    tonsburnday = 1.84;
+                } else if (e.getWeight() < 4000) {
+                    tonsburnday = 2.82;
+                } else if (e.getWeight() < 9000) {
+                    tonsburnday = 3.37;
+                } else if (e.getWeight() < 20000) {
+                    tonsburnday = 4.22;
+                } else if (e.getWeight() < 30000) {
+                    tonsburnday = 6.52;
+                } else if (e.getWeight() < 40000) {
+                    tonsburnday = 7.71;
+                } else if (e.getWeight() < 50000) {
+                    tonsburnday = 7.74;
+                } else if (e.getWeight() < 70000) {
+                    tonsburnday = 8.37;
+                } else {
+                    tonsburnday = 8.83;
+                }
+            } else {
+                tonsburnday = 1.84;
+            }
+            return  (tonsburnday * 15 * 15000);
+        } else if ((e instanceof SmallCraft)) {
+            return (1.84 * 15 * 15000);
+        } else if (e instanceof megamek.common.Jumpship) {
+            if (e.getWeight() < 50000) {
+                tonsburnday = 2.82;
+            } else if (e.getWeight() < 100000) {
+                tonsburnday = 9.77;
+            } else if (e.getWeight() < 200000) {
+                tonsburnday = 19.75;
+            } else {
+                tonsburnday = 39.52;
+            }
+            if (e instanceof megamek.common.Warship) {
+                return (tonsburnday * 15 * 15000);
+            }
+            return (tonsburnday * 3 * 15000);
+        }        
+        return tonsburnday;
+    }
+
+    public double getFighterFuelCost(Entity e) {
+        Engine en = e.getEngine();
+        if (en.isFusion()) {
+            return ((Aero) e).getFuelTonnage() * 4 * 15000;
+        } else {
+            return ((Aero) e).getFuelTonnage() * 4 * 1000;
+        }
+    }
+
+    public double getVehicleFuelCost(Entity e) {
+        Engine en = e.getEngine();
+        if (e instanceof SupportTank) {
+            if (en.getEngineType() == Engine.FUEL_CELL) {
+                return (((SupportTank) e).getFuelTonnage() * 15000 * 4);
+            } else if (en.getEngineType() == Engine.COMBUSTION_ENGINE) {
+                return (((SupportTank) e).getFuelTonnage() * 1000 * 4);
+            } else {
+                return 0;
+            }
+        } else {
+            if (en.getEngineType() == Engine.FUEL_CELL) {
+                return (en.getWeightEngine(e) *.1 * 15000 * 4);
+            } else if (en.getEngineType() == Engine.COMBUSTION_ENGINE) {
+                return (en.getWeightEngine(e) *.1 * 1000 * 4);
+            } else {
+                return 0;
+            }
+        }
+    }
+
+    public double getInfantryFuelCost(Entity e) {
+        if (e instanceof BattleArmor) {
+            if (e.getJumpMP() > 0) {
+                return (e.getWeight() * .02 * 1000 * 4);
+            } else {
+                return 0;
+            }
+        }
+        if (e.getMovementMode() == EntityMovementMode.INF_LEG) {
+            return 0;
+        } else {
+            return (e.getWeight() *.02 * 1000 * 4);
+        }
+    }
+    
+    /**
+     * @return Tech progression data for this unit, using the campaign faction if the useFactionIntroDate
+     *         option is enabled.
+     */
+    private ITechnology getTechProgression() {
+        return getTechProgression(campaign.getTechFaction());
+    }
+    
+    private ITechnology getTechProgression(int techFaction) {
+        // If useFactionIntroDate is false, use the base data that was calculated for the Entity when is was loaded.
+        if (techFaction < 0) {
+            return getEntity();
+        }
+        // First check whether it has already been calculated for this faction, but don't wait if
+        // it hasn't.
+        ITechnology techProgression = UnitTechProgression.getProgression(this, techFaction, false);
+        if (null != techProgression) {
+            return techProgression;
+        } else {
+            return getEntity().factionTechLevel(techFaction);
+        }
+    }
+
+    @Override
+    public boolean isClan() {
+        return getTechProgression().isClan();
+    }
+
+    @Override
+    public boolean isMixedTech() {
+        return getTechProgression().isMixedTech();
+    }
+
+    @Override
+    public int getTechBase() {
+        return getTechProgression().getTechBase();
+    }
+
+    @Override
+    public int getIntroductionDate() {
+        return getTechProgression().getIntroductionDate();
+    }
+
+    @Override
+    public int getPrototypeDate() {
+        return getTechProgression().getPrototypeDate();
+    }
+
+    @Override
+    public int getProductionDate() {
+        return getTechProgression().getProductionDate();
+    }
+
+    @Override
+    public int getCommonDate() {
+        return getTechProgression().getCommonDate();
+    }
+
+    @Override
+    public int getExtinctionDate() {
+        return getTechProgression().getExtinctionDate();
+    }
+
+    @Override
+    public int getReintroductionDate() {
+        return getTechProgression().getReintroductionDate();
+    }
+
+    @Override
+    public int getTechRating() {
+        return getTechProgression().getTechRating();
+    }
+
+    @Override
+    public int getBaseAvailability(int era) {
+        return getTechProgression().getBaseAvailability(era);
+    }
+    
+    @Override
+    public int getIntroductionDate(boolean clan, int faction) {
+        return getTechProgression(faction).getIntroductionDate(clan, faction);
+    }
+
+    @Override
+    public int getPrototypeDate(boolean clan, int faction) {
+        return getTechProgression(faction).getPrototypeDate(clan, faction);
+    }
+
+    @Override
+    public int getProductionDate(boolean clan, int faction) {
+        return getTechProgression(faction).getProductionDate(clan, faction);
+    }
+
+    @Override
+    public int getExtinctionDate(boolean clan, int faction) {
+        return getTechProgression(faction).getExtinctionDate(clan, faction);
+    }
+
+    @Override
+    public int getReintroductionDate(boolean clan, int faction) {
+        return getTechProgression(faction).getReintroductionDate(clan, faction);
+    }
+
+    public SimpleTechLevel getSimpleTechLevel() {
+        if (campaign.useVariableTechLevel()) {
+            return getSimpleLevel(campaign.getCalendar().get(Calendar.YEAR));
+        } else {
+            return getStaticTechLevel();
+        }
+    }
+    
+    public SimpleTechLevel getSimpleTechLevel(int year) {
+        if (campaign.useVariableTechLevel()) {
+            return getSimpleLevel(year);
+        } else {
+            return getStaticTechLevel();
+        }
+    }
+    
+    public SimpleTechLevel getSimpleTechLevel(int year, boolean clan, int faction) {
+        if (campaign.useVariableTechLevel()) {
+            return getSimpleLevel(year, clan, faction);
+        } else {
+            return getStaticTechLevel();
+        }
+    }
+
+    @Override
+    public SimpleTechLevel getStaticTechLevel() {
+        return getEntity().getStaticTechLevel();
+    }
+
+    @Override
+    public int calcYearAvailability(int year, boolean clan, int faction) {
+        return getTechProgression(faction).calcYearAvailability(year, clan);
+    }
+    
 }

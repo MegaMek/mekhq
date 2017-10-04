@@ -12,7 +12,6 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -35,6 +34,7 @@ import megamek.common.MechFileParser;
 import megamek.common.MechSummary;
 import megamek.common.UnitType;
 import megamek.common.loaders.EntityLoadingException;
+import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
@@ -109,11 +109,11 @@ public class GMToolsDialog extends JDialog implements ActionListener {
         
         Collection<String> factionIds = Faction.getFactionList();
         List<FactionChoice> factionChoices = new ArrayList<>(factionIds.size());
-        int era = gui.getCampaign().getEra();
+        int year = gui.getCampaign().getGameYear();
         StringBuilder sb = new StringBuilder();
         for(String factionId : factionIds) {
             sb.setLength(0);
-            sb.append(Faction.getFaction(factionId).getFullName(era)).append(" [").append(factionId).append("]");
+            sb.append(Faction.getFaction(factionId).getFullName(year)).append(" [").append(factionId).append("]");
             factionChoices.add(new FactionChoice(factionId, sb.toString()));
         }
         Collections.sort(factionChoices, new Comparator<FactionChoice>() {
@@ -133,9 +133,9 @@ public class GMToolsDialog extends JDialog implements ActionListener {
             
         });
         factionPicker = new JComboBox<FactionChoice>(factionChoices.toArray(new FactionChoice[factionChoices.size()]));
-        System.out.println(gui.getCampaign().getCalendar().get(Calendar.YEAR));
+        System.out.println(gui.getCampaign().getGameYear());
         yearPicker = new JTextField(5);
-        yearPicker.setText(String.valueOf(gui.getCampaign().getCalendar().get(Calendar.YEAR)));
+        yearPicker.setText(String.valueOf(gui.getCampaign().getGameYear()));
         qualityPicker = new JComboBox<String>(qualityNames);
         unitTypePicker = new JComboBox<String>();
         for (int ut = 0; ut < UnitType.SIZE; ut++) {
@@ -197,6 +197,8 @@ public class GMToolsDialog extends JDialog implements ActionListener {
     
     @Override
     public void actionPerformed(ActionEvent event) {
+        final String METHOD_NAME = "actionPerformed(ActionEvent)"; //$NON-NLS-1$
+
         if(event.getActionCommand().equals(GM_TOOL_DICE)) {
             performDiceRoll();
         }
@@ -213,8 +215,10 @@ public class GMToolsDialog extends JDialog implements ActionListener {
                     e = new MechFileParser(ms.getSourceFile(),ms.getEntryName()).getEntity();
                     gui.getCampaign().addUnit(e, false, 0);
                 } catch (EntityLoadingException e1) {
-                    e1.printStackTrace();
-                    MekHQ.logError("Failed to load entity " + ms.getName() + " from " + ms.getSourceFile().toString());
+                    MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
+                            "Failed to load entity " + ms.getName() + " from " //$NON-NLS-1$
+                                    + ms.getSourceFile().toString()); //$NON-NLS-1$
+                    MekHQ.getLogger().log(getClass(), METHOD_NAME, e1);
                     unitPicked.setText("Failed to load entity " + ms.getName());
                 }
             }

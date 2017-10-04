@@ -85,9 +85,11 @@ import javax.swing.table.TableColumn;
 
 import megamek.client.ui.swing.util.PlayerColors;
 import megamek.common.Player;
+import megamek.common.logging.LogLevel;
 import megamek.common.options.GameOptions;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
+import megamek.common.options.OptionsConstants;
 import megamek.common.options.PilotOptions;
 import megamek.common.util.DirectoryItems;
 import megamek.common.util.EncodeControl;
@@ -105,7 +107,6 @@ import mekhq.campaign.personnel.Ranks;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.rating.UnitRatingMethod;
-import mekhq.campaign.universe.Era;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.RATManager;
 import mekhq.gui.SpecialAbilityPanel;
@@ -197,6 +198,9 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JCheckBox useLoanLimitsBox;
     private JCheckBox sellUnitsBox;
     private JCheckBox sellPartsBox;
+    private JCheckBox usePeacetimeCostBox;
+    private JCheckBox useExtendedPartsModifierBox;
+    private JCheckBox showPeacetimeCostBox;
 
     private JTextField[] txtSalaryBase;
     private JSpinner[] spnSalaryXp;
@@ -247,6 +251,9 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JRadioButton btnContractEquipment;
     private JRadioButton btnContractPersonnel;
     private JSpinner spnEquipPercent;
+    private JSpinner spnDropshipPercent;
+    private JSpinner spnJumpshipPercent;
+    private JSpinner spnWarshipPercent;
     private JCheckBox chkEquipContractSaleValue;
     private JCheckBox chkBLCSaleValue;
     private JSpinner spnOrderRefund;
@@ -315,6 +322,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JCheckBox allowISPurchasesBox;
     private JCheckBox allowCanonOnlyBox;
     private JCheckBox allowCanonRefitOnlyBox;
+    private JCheckBox variableTechLevelBox;
+    private JCheckBox factionIntroDateBox;
     private JCheckBox useAmmoByTypeBox;
     //private JCheckBox disallowSLUnitsBox;
     private JLabel lblTechLevel;
@@ -475,6 +484,9 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         useLoanLimitsBox.setSelected(options.useLoanLimits());
         usePercentageMaintBox.setSelected(options.usePercentageMaint());
         useInfantryDontCountBox.setSelected(options.useInfantryDontCount());
+        usePeacetimeCostBox.setSelected(options.usePeacetimeCost());
+        useExtendedPartsModifierBox.setSelected(options.useExtendedPartsModifier());
+        showPeacetimeCostBox.setSelected(options.showPeacetimeCost());
 
         useDamageMargin.setSelected(options.isDestroyByMargin());
         useQualityMaintenance.setSelected(options.useQualityMaintenance());
@@ -491,6 +503,10 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         allowISPurchasesBox.setSelected(options.allowISPurchases());
         allowCanonOnlyBox.setSelected(options.allowCanonOnly());
         allowCanonRefitOnlyBox.setSelected(options.allowCanonRefitOnly());
+        variableTechLevelBox.setSelected(options.useVariableTechLevel()
+                && options.limitByYear());
+        variableTechLevelBox.setEnabled(options.limitByYear());
+        factionIntroDateBox.setSelected(options.useFactionIntroDate());
         useAmmoByTypeBox.setSelected(options.useAmmoByType());
 
         useQuirksBox.setSelected(options.useQuirks());
@@ -566,6 +582,9 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         payForOverheadBox = new JCheckBox();
         payForMaintainBox = new JCheckBox();
         payForTransportBox = new JCheckBox();
+        usePeacetimeCostBox = new JCheckBox();
+        useExtendedPartsModifierBox = new JCheckBox();
+        showPeacetimeCostBox = new JCheckBox();
         sellUnitsBox = new JCheckBox();
         sellPartsBox = new JCheckBox();
         useQuirksBox = new JCheckBox();
@@ -575,6 +594,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         allowISPurchasesBox = new JCheckBox();
         allowCanonOnlyBox = new JCheckBox();
         allowCanonRefitOnlyBox = new JCheckBox();
+        variableTechLevelBox = new JCheckBox();
+        factionIntroDateBox = new JCheckBox();
         useAmmoByTypeBox = new JCheckBox();
         choiceTechLevel = new JComboBox<String>();
         btnOkay = new JButton();
@@ -661,9 +682,12 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
         factionModel = new SortedComboBoxModel<String>();
         for (String sname : Faction.choosableFactionCodes) {
-            factionModel.addElement(Faction.getFaction(sname).getFullName(Era.getEra(date.get(Calendar.YEAR))));
+            Faction f = Faction.getFaction(sname);
+            if (f.validIn(date.get(Calendar.YEAR))) {
+                factionModel.addElement(f.getFullName(date.get(Calendar.YEAR)));
+            }
         }
-        factionModel.setSelectedItem(campaign.getFaction().getFullName(Era.getEra(date.get(Calendar.YEAR))));
+        factionModel.setSelectedItem(campaign.getFaction().getFullName(date.get(Calendar.YEAR)));
         comboFaction.setModel(factionModel);
         comboFaction.setMinimumSize(new java.awt.Dimension(400, 30));
         comboFaction.setName("comboFaction"); // NOI18N
@@ -1196,6 +1220,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panTech.add(limitByYearBox, gridBagConstraints);
+        limitByYearBox.addActionListener(e -> variableTechLevelBox.setEnabled(limitByYearBox.isSelected()));
 
         disallowExtinctStuffBox.setText(resourceMap.getString("disallowExtinctStuffBox.text")); // NOI18N
         disallowExtinctStuffBox.setToolTipText(resourceMap.getString("disallowExtinctStuffBox.toolTipText")); // NOI18N
@@ -1278,12 +1303,34 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panTech.add(choiceTechLevel, gridBagConstraints);
 
+        variableTechLevelBox.setText(resourceMap.getString("variableTechLevelBox.text")); // NOI18N
+        variableTechLevelBox.setToolTipText(resourceMap.getString("variableTechLevelBox.toolTipText")); // NOI18N
+        variableTechLevelBox.setName("variableTechLevelBox"); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 7;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panTech.add(variableTechLevelBox, gridBagConstraints);
+
+        factionIntroDateBox.setText(resourceMap.getString("factionIntroDateBox.text")); // NOI18N
+        factionIntroDateBox.setToolTipText(resourceMap.getString("factionIntroDateBox.toolTipText")); // NOI18N
+        factionIntroDateBox.setName("factionIntroDateBox"); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 8;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panTech.add(factionIntroDateBox, gridBagConstraints);
+
         useAmmoByTypeBox.setText(resourceMap.getString("useAmmoByTypeBox.text")); // NOI18N
         useAmmoByTypeBox.setToolTipText(resourceMap.getString("useAmmoByTypeBox.toolTipText")); // NOI18N
         useAmmoByTypeBox.setName("useAmmoByTypeBox"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 7;
+        gridBagConstraints.gridy = 9;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
@@ -1775,6 +1822,40 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panFinances.add(useInfantryDontCountBox, gridBagConstraints);
 
+        // Campaign Operations Peacetime operating costs
+        usePeacetimeCostBox.setText(resourceMap.getString("usePeacetimeCostBox.text")); // NOI18N
+        usePeacetimeCostBox.setToolTipText(resourceMap.getString("usePeacetimeCostBox.toolTipText")); // NOI18N
+        usePeacetimeCostBox.setName("usePeacetimeCostBox"); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 12;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panFinances.add(usePeacetimeCostBox, gridBagConstraints);
+
+        useExtendedPartsModifierBox.setText(resourceMap.getString("useExtendedPartsModifierBox.text")); // NOI18N
+        //useExtendedPartsModifierBox.setToolTipText(resourceMap.getString("useExtendedPartsModifierBox.toolTipText")); // NOI18N
+        useExtendedPartsModifierBox.setName("useExtendedPartsModifierBox"); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 13;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panFinances.add(useExtendedPartsModifierBox, gridBagConstraints);
+
+        showPeacetimeCostBox.setText(resourceMap.getString("showPeacetimeCostBox.text")); // NOI18N
+        showPeacetimeCostBox.setToolTipText(resourceMap.getString("showPeacetimeCostBox.toolTipText")); // NOI18N
+        showPeacetimeCostBox.setName("showPeacetimeCostBox"); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 14;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panFinances.add(showPeacetimeCostBox, gridBagConstraints);
+
 
         clanPriceModifierLabel.setText(resourceMap.getString("clanPriceModifierLabel.text")); // NOI18N
         clanPriceModifierLabel.setName("clanPriceModifierLabel"); // NOI18N
@@ -1873,8 +1954,21 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
             btnContractPersonnel.setSelected(true);
         }
 
-        spnEquipPercent = new JSpinner(new SpinnerNumberModel(options.getEquipmentContractPercent(), 0.1, 20, 0.1));
+        spnEquipPercent = new JSpinner(new SpinnerNumberModel(options.getEquipmentContractPercent(), 0.1, 5.0, 0.1));
+        spnEquipPercent.setEditor(new JSpinner.NumberEditor(spnEquipPercent, "0.0"));
         ((JSpinner.DefaultEditor) spnEquipPercent.getEditor()).getTextField().setEditable(false);
+
+        spnDropshipPercent = new JSpinner(new SpinnerNumberModel(options.getDropshipContractPercent(), 0.0, 1.0, 0.1));
+        spnDropshipPercent.setEditor(new JSpinner.NumberEditor(spnDropshipPercent, "0.0"));
+        ((JSpinner.NumberEditor) spnDropshipPercent.getEditor()).getTextField().setEditable(false);
+
+        spnJumpshipPercent = new JSpinner(new SpinnerNumberModel(options.getJumpshipContractPercent(), 0.0, 1.0, 0.1));
+        spnJumpshipPercent.setEditor(new JSpinner.NumberEditor(spnJumpshipPercent, "0.0"));
+        ((JSpinner.DefaultEditor) spnJumpshipPercent.getEditor()).getTextField().setEditable(false);
+
+        spnWarshipPercent = new JSpinner(new SpinnerNumberModel(options.getWarshipContractPercent(), 0.0, 1.0, 0.1));
+        spnWarshipPercent.setEditor(new JSpinner.NumberEditor(spnWarshipPercent, "0.0"));
+        ((JSpinner.DefaultEditor) spnWarshipPercent.getEditor()).getTextField().setEditable(false);
 
         ButtonGroup groupContract = new ButtonGroup();
         groupContract.add(btnContractEquipment);
@@ -1898,7 +1992,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
         gridBagConstraints.insets = new Insets(5, 30, 5, 5);
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        panMercenary.add(new JLabel("Percent:"), gridBagConstraints);
+        panMercenary.add(new JLabel("Combat Percent:"), gridBagConstraints);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
@@ -1916,13 +2010,55 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.insets = new Insets(5, 30, 5, 5);
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panMercenary.add(new JLabel("Dropship Percent:"), gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        //gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panMercenary.add(spnDropshipPercent, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.insets = new Insets(5, 30, 5, 5);
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panMercenary.add(new JLabel("Jumpship Percent:"), gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        //gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panMercenary.add(spnJumpshipPercent, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.insets = new Insets(5, 30, 5, 5);
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panMercenary.add(new JLabel("Warship Percent:"), gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        //gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panMercenary.add(spnWarshipPercent, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 5;
         gridBagConstraints.gridwidth = 3;
         //gridBagConstraints.weighty = 1.0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panMercenary.add(btnContractPersonnel, gridBagConstraints);
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridy = 6;
         gridBagConstraints.gridwidth = 3;
         //gridBagConstraints.weighty = 1.0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
@@ -3980,7 +4116,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     }
 
     private void switchFaction() {
-        String factionCode = Faction.getFactionFromFullNameAndEra(String.valueOf(comboFaction.getSelectedItem()), Era.getEra(date.get(Calendar.YEAR)))
+        String factionCode = Faction.getFactionFromFullNameAndYear(String.valueOf(comboFaction.getSelectedItem()), date.get(Calendar.YEAR))
                                     .getNameGenerator();
         boolean found = false;
         for (Iterator<String> i = campaign.getRNG().getFactions(); i.hasNext(); ) {
@@ -4075,6 +4211,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     }
 
     private void btnSaveActionPerformed() {
+        final String METHOD_NAME = "btnSaveActionPerformed()"; //$NON-NLS-1$
     	if (txtName.getText().length() == 0) {
     		return;
     	}
@@ -4084,7 +4221,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         	return;
         }
 
-    	MekHQ.logMessage("Saving campaign options...");
+        MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO,
+                "Saving campaign options..."); //$NON-NLS-1$
         // Choose a file...
         JFileChooser saveOptions = new JFileChooser(MekHQ.PRESET_DIR);
         saveOptions.setDialogTitle("Save Campaign Options as Presets");
@@ -4134,9 +4272,10 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
             if (backupFile.exists()) {
                 backupFile.delete();
             }
-            MekHQ.logMessage("Campaign options saved to " + file);
+            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO,
+                    "Campaign options saved to " + file); //$NON-NLS-1$
         } catch (Exception ex) {
-            MekHQ.logError(ex);
+            MekHQ.getLogger().log(getClass(), METHOD_NAME, ex);
             JOptionPane
                     .showMessageDialog(
                             null,
@@ -4160,8 +4299,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         if (gameOpts.intOption("year") != campaignYear) {
             gameOpts.getOption("year").setValue(campaignYear);
         }
-        campaign.setFactionCode(Faction.getFactionFromFullNameAndEra
-        		(String.valueOf(comboFaction.getSelectedItem()), Era.getEra(date.get(Calendar.YEAR))).getShortName());
+        campaign.setFactionCode(Faction.getFactionFromFullNameAndYear
+        		(String.valueOf(comboFaction.getSelectedItem()), date.get(Calendar.YEAR)).getShortName());
         if (null != comboFactionNames.getSelectedItem()) {
             campaign.getRNG().setChosenFaction((String) comboFactionNames.getSelectedItem());
         }
@@ -4236,9 +4375,15 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setUseInfantryDontCount(useInfantryDontCountBox.isSelected());
         options.setSellUnits(sellUnitsBox.isSelected());
         options.setSellParts(sellPartsBox.isSelected());
+        options.setUsePeacetimeCost(usePeacetimeCostBox.isSelected());
+        options.setUseExtendedPartsModifier(useExtendedPartsModifierBox.isSelected());
+        options.setShowPeacetimeCost(showPeacetimeCostBox.isSelected());
 
         options.setEquipmentContractBase(btnContractEquipment.isSelected());
         options.setEquipmentContractPercent((Double) spnEquipPercent.getModel().getValue());
+        options.setDropshipContractPercent((Double) spnDropshipPercent.getModel().getValue());
+        options.setJumpshipContractPercent((Double) spnJumpshipPercent.getModel().getValue());
+        options.setWarshipContractPercent((Double) spnWarshipPercent.getModel().getValue());
         options.setEquipmentContractSaleValue(chkEquipContractSaleValue.isSelected());
         options.setBLCSaleValue(chkBLCSaleValue.isSelected());
 
@@ -4284,6 +4429,10 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setAllowISPurchases(allowISPurchasesBox.isSelected());
         options.setAllowCanonOnly(allowCanonOnlyBox.isSelected());
         campaign.getGameOptions().getOption("canon_only").setValue(allowCanonOnlyBox.isSelected());
+        campaign.getGameOptions().getOption(OptionsConstants.ALLOWED_ERA_BASED).setValue(variableTechLevelBox.isSelected());
+        options.setVariableTechLevel(variableTechLevelBox.isSelected() && options.limitByYear());
+        options.setfactionIntroDate(factionIntroDateBox.isSelected());
+        campaign.updateTechFactionCode();
         options.setAllowCanonRefitOnly(allowCanonRefitOnlyBox.isSelected());
         options.setUseAmmoByType(useAmmoByTypeBox.isSelected());
         options.setTechLevel(choiceTechLevel.getSelectedIndex());
@@ -4435,7 +4584,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
                     int cost = Integer.parseInt((String) tableXP.getValueAt(i, j));
                     SkillType.setCost(SkillType.skillList[i], cost, j);
                 } catch (NumberFormatException e) {
-                    MekHQ.logMessage("unreadable value in skill cost table for " + SkillType.skillList[i]);
+                    MekHQ.getLogger().log(getClass(), "updateXPCosts()", LogLevel.ERROR,
+                            "unreadable value in skill cost table for " + SkillType.skillList[i]); //$NON-NLS-1$
                 }
             }
         }
@@ -4482,9 +4632,12 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
             btnDate.setText(getDateAsString());
             factionModel = new SortedComboBoxModel<String>();
             for (String sname : Faction.choosableFactionCodes) {
-                factionModel.addElement(Faction.getFaction(sname).getFullName(Era.getEra(date.get(Calendar.YEAR))));
+                Faction f = Faction.getFaction(sname);
+                if (f.validIn(date.get(Calendar.YEAR))) {
+                    factionModel.addElement(f.getFullName(date.get(Calendar.YEAR)));
+                }
             }
-            factionModel.setSelectedItem(campaign.getFaction().getFullName(Era.getEra(date.get(Calendar.YEAR))));
+            factionModel.setSelectedItem(campaign.getFaction().getFullName(date.get(Calendar.YEAR)));
             comboFaction.setModel(factionModel);
         }
     }//GEN-LAST:event_btnDateActionPerformed

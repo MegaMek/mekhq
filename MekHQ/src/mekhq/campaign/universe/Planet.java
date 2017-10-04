@@ -46,6 +46,7 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeComparator;
 
 import megamek.common.EquipmentType;
+import megamek.common.ITechnology;
 import megamek.common.PlanetaryConditions;
 import mekhq.Utilities;
 import mekhq.adapter.BooleanValueAdapter;
@@ -627,8 +628,7 @@ public class Planet implements Serializable {
     }
 
     public String getFactionDesc(DateTime when) {
-        int era = Era.getEra(when.getYear());
-        return Faction.getFactionNames(getFactionSet(when), era);
+        return Faction.getFactionNames(getFactionSet(when), when.getYear());
     }
 
     // Stellar event data, to be moved
@@ -907,11 +907,11 @@ public class Planet implements Serializable {
         
         @Override
         public String toString() {
-             return EquipmentType.getRatingName(tech)
-                + "-" + EquipmentType.getRatingName(industry) //$NON-NLS-1$
-                + "-" + EquipmentType.getRatingName(rawMaterials) //$NON-NLS-1$
-                + "-" + EquipmentType.getRatingName(output) //$NON-NLS-1$
-                + "-" + EquipmentType.getRatingName(agriculture); //$NON-NLS-1$
+             return ITechnology.getRatingName(tech)
+                + "-" + ITechnology.getRatingName(industry) //$NON-NLS-1$
+                + "-" + ITechnology.getRatingName(rawMaterials) //$NON-NLS-1$
+                + "-" + ITechnology.getRatingName(output) //$NON-NLS-1$
+                + "-" + ITechnology.getRatingName(agriculture); //$NON-NLS-1$
          }
         
         /** @return the USILR rating as a HTML description */

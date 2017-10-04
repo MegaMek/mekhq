@@ -23,17 +23,17 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.common.Aero;
 import megamek.common.Compute;
 import megamek.common.Entity;
-import megamek.common.EquipmentType;
-import megamek.common.TechConstants;
+import megamek.common.SimpleTechLevel;
+import megamek.common.TechAdvancement;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.SkillType;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  *
@@ -49,6 +49,11 @@ public class AeroLifeSupport extends Part {
 	private long cost;
 	private boolean fighter;
 	
+	static final TechAdvancement TECH_ADVANCEMENT = new TechAdvancement(TECH_BASE_ALL)
+	        .setAdvancement(DATE_ES, DATE_ES, DATE_ES).setTechRating(RATING_C)
+	        .setAvailability(RATING_C, RATING_C, RATING_C, RATING_C)
+	        .setStaticTechLevel(SimpleTechLevel.STANDARD);
+		
 	public AeroLifeSupport() {
     	this(0, 0, false, null);
     }
@@ -177,21 +182,6 @@ public class AeroLifeSupport extends Part {
 		return 0;
 	}
 
-	@Override
-	public int getTechRating() {
-		return EquipmentType.RATING_C;
-	}
-
-	@Override
-	public int getAvailability(int era) {
-		return EquipmentType.RATING_C;
-	}
-	
-	@Override
-	public int getTechLevel() {
-		return TechConstants.T_ALLOWED_ALL;
-	}
-
 	public boolean isForFighter() {
 		return fighter;
 	}
@@ -252,22 +242,12 @@ public class AeroLifeSupport extends Part {
 	}
 
 	@Override
-	public int getIntroDate() {
-		return EquipmentType.DATE_NONE;
-	}
-
-	@Override
-	public int getExtinctDate() {
-		return EquipmentType.DATE_NONE;
-	}
-
-	@Override
-	public int getReIntroDate() {
-		return EquipmentType.DATE_NONE;
-	}
-	
-	@Override
 	public int getMassRepairOptionType() {
     	return Part.REPAIR_PART_TYPE.ELECTRONICS;
     }
+	
+	@Override
+	public TechAdvancement getTechAdvancement() {
+	    return TECH_ADVANCEMENT;
+	}
 }

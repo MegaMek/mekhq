@@ -3,6 +3,10 @@
 news.xml
 9/15/2013
 Jay Lawson
+Updated
+9/9/2017
+Adam Brant
+
 This file defines defines a set of news item that will display in the daily report frame of MekHQ. 
 
 Here is a description of what goes in each newsItem tag
@@ -19,10 +23,308 @@ location - an optional tag for the location of the news report
  -->
 <news>
 	<newsItem>
+		<headline>A new shuttle introduced, A Life Boat</headline>
+		<date>2478</date>
+		<desc><![CDATA[Introducing a new lifesaving vessel for dropships and jumpships who suffer accidents in space, we have the Life Boat. This vessel is not designed for reentry or thrust to escape the area. However, with a larger radar signature and solor sail the odds of rescue are increased over previous lifesaving vessels.]]></desc>
+	</newsItem>
+	<newsItem>
+		<headline>Regulan Hussars upgraded to Brigade size</headline>
+		<date>2478</date>
+		<desc><![CDATA[The Regulan Hussars, long a regiment size unit for the Principality of Regulus has been reinforced to Brigade size. This is to help it better handle possible invasions from its enemies the Terran Hegamony]]></desc>
+		<service>IMI</service>
+		<location>Regulus</location>
+	</newsItem>
+	<newsItem>
+		<headline>Stinger vs Wasp</headline>
+		<date>2479</date>
+		<desc><![CDATA[Earthwerks Inc, annouced today the Stinger, a Light Mech to rival the Wasp as the premier recon mech of the Terran Hegemony. ]]></desc>
+		<service>TNS</service>
+		<location>Terra</location>
+	</newsItem>
+	<newsItem>
+		<headline>Elizabeth Cameron takes Director-General position</headline>
+		<date>2479</date>
+		<desc><![CDATA[Following a serious health issue, Theodore Cameron has decided to step down from the rigors of the Director-General. His daughter Elizabeth Cameron will be taking over the throne of the Terran Hegemony. We wish the former Director-General a speedy recovery and look forward to the new reign of Elizabeth Cameron.]]></desc>
+		<service>TNS</service>
+		<location>Terra</location>
+	</newsItem>
+	<newsItem>
+		<headline>Commando to be upgraded</headline>
+		<date>2480</date>
+		<desc><![CDATA[Following recent advances in both mech design and electronics, Coventry Defense Conglomerate has release news of a new COM-1D variant of their Commando light mech. Sacrificing two tons of armor allows the Commando to carry a SRM-6.]]></desc>
+		<service>DBC</service>
+		<location>Coventry</location>
+	</newsItem>
+	<newsItem>
+		<headline>Kintetsu Stellar Systems annouces new Dropship</headline>
+		<date>2480</date>
+		<desc><![CDATA[Kintetsu Stellar Systems has started production of a new dropship, The Hoshiryokou. This class of dropship while small can handle 85 tons internally while carrying 10 Cargo containers of 10 tons each.]]></desc>
+		<location>Luthien</location>
+	</newsItem>
+	<newsItem>
+		<headline>Toro of Taurian Concordat</headline>
+		<date>2481</date>
+		<desc><![CDATA[Taurus WarWorks annouced today, the Toro TR-A-1. A 35 ton Light Mech armed with a PPC and two LRM-5, we see this as a long-range threat in the years to come.]]></desc>
+		<service></service>
+		<location>Taurus</location>
+	</newsItem>
+	<newsItem>
+		<headline>Crossbow to Close range</headline>
+		<date>2481</date>
+		<desc><![CDATA[In a interesting annoucement today, Arcturan Arms annouced the introduction of a new variant on their long-range Crossbow Mech. The CRS-6C will now be packing an Autocannon/10. However, this comes at the lost of its LRMs and one medium laser. Only time will tell if this new variant will survive the rigors of the battlefield.]]></desc>
+		<service>DBC</service>
+		<location>Arcturus</location>
+	</newsItem>
+	<newsItem>
+		<headline>Brion Marik</headline>
+		<date>2481</date>
+		<desc><![CDATA[For the second time, Brion Marik has been elected into the Captain-General post.]]></desc>
+		<service>IMI</service>
+		<location>Atreus</location>
+	</newsItem>
+	<newsItem>
+		<headline>New Chancellor of the Capellan Confederation</headline>
+		<date>2482</date>
+		<desc><![CDATA[Raxal Liao has come of age and the Regency has ended. The new Chancellor thanked the Duke of Sian for his service and then promptly stated that he did not wish to rule. The 13th Chancellor stepped down 12 minutes later. He was quoted as saying "I perferred to be a scholar and scientist rather than Chancellor." The 14th Chancellor, Hendrick Liao, has taken over the reins of state with aplomp.]]></desc>
+		<service>CBS</service>
+		<location>Capella</location>
+	</newsItem>
+	<newsItem>
+		<headline>Firebee of the Capellan Confederation's makeover</headline>
+		<date>2483</date>
+		<desc><![CDATA[A second generation version of the Capellan Confederation's mech has been released. This new mech designated FRB-2E, removes its LRM for 2 more SRMs and a Large laser. Giving it that added long range punch without the limits of ammo.]]></desc>
+		<service>CBS</service>
+		<location>Boardwalk</location>
+	</newsItem>
+	<newsItem>
+		<headline>New power in Marik</headline>
+		<date>2484</date>
+		<desc><![CDATA[Pounding its way onto the battlefield in Marik Guard colors is the newest Battlemech force outside of the Terran Hegemony's control.]]></desc>
+		<service>IMI</service>
+		<location>Marik</location>
+	</newsItem>
+	<newsItem>
+		<headline>First Regulan Hussars attack Lopez</headline>
+		<date>2485</date>
+		<desc><![CDATA[The First Regulan Hussars attacked a Capellan Confederation Heavy Tank Regiment marking their first time in combat. However, technical issues along with lack of training resulted in their first lost as well.]]></desc>
+		<service>IMI</service>
+		<location>Marik</location>
+	</newsItem>Fusiliers of Oriente
+	<newsItem>
+		<headline>Fusiliers of Oriente form new unit</headline>
+		<date>2485</date>
+		<desc><![CDATA[The Fusilers of Oriente formed the Ducal Guard today.]]></desc>
+		<service>IMI</service>
+		<location>Oriente</location>
+	</newsItem>
+	<newsItem>
+		<headline>Draconis Combine unveils new Dropship</headline>
+		<date>2485</date>
+		<desc><![CDATA[The Draconis Combine annouced the Gaajian System Patrol Boat to gathered members of the press today. This new dropship will be providing escort intra-system to Merchants as well as providing Custom and interdiction duties.]]></desc>
+		<service></service>
+		<location>Luthien</location>
+	</newsItem>
+	<newsItem>
+		<headline>The Apostle removed from service</headline>
+		<date>2485</date>
+		<desc><![CDATA[Apostle Self-Propelled Artillery has reached the end of its long and glorious career in the Terran Hegemony today when officals removed it from the TO&E of the military.]]></desc>
+		<service>TNS</service>
+		<location>Terra</location>
+	</newsItem>
+	<newsItem>
+		<headline>Commando Upgrade Again?</headline>
+		<date>2486</date>
+		<desc><![CDATA[Coventry Defense Conglomerate seeing the tactics of pilots of their light mech has come out with a new variant which increases armor in addition to adding an SRM-4 and replacing its Large Laser with a medium one.]]></desc>
+		<service>DBC</service>
+		<location>Coventry</location>
+	</newsItem>
+	<newsItem>
+		<headline>New Commander of the Otomo</headline>
+		<date>3000-02</date>
+		<desc><![CDATA[Filed 3000-01-01<br><br>Takashi Kurita has served with honor and distinction with the Swecond Sword of Light. For his service, the Coordinator has promoted Kurita Takashi-sama to the rank of Sho-sho and named his voice in High Command of the Arm of the Dragon. The Coordinator further showed his trust of Kurita Takashi-sama by naming him Commander of the Otomo here on Luthien. The Otomo are charged with the safety of the Imperial Palace.]]></desc>
+		<service>Voice of the Dragon</service>
+		<location>Luthien</location>
+	</newsItem>
+	<newsItem>
+		<headline>Kalidasa's 'Mech Factory attacked</headline>
+		<date>3000-02</date>
+		<desc><![CDATA[Filed 3000-01-23<br><br>In a daring raid, persons unknown attacked Kalidasa’s Mech Factory today. The attackers struck before dawn with unknown intent, however attempts to steal Battlemechs coming off the production failed when security forces overran the primary hostile force.]]></desc>
+		<service>CNB</service>
+		<location>Kalidasa</location>
+	</newsItem>
+	<newsItem>
+		<headline>Hesperus II under attack</headline>
+		<date>3000-05-05</date>
+		<desc><![CDATA[Filed 3000-03-28<br><br>Three days ago, House Kurita was able to push through the aerospace coverage of Hesperus II and land one battlemech regiment and its support elements. Since that time, they have made periodic raids of defenders here on the starport hoping to push the ELH out...<br><i>*muffled scream from off-camera* "INCOMING"</i><br>of the starport leaving the way for more Kurita reinforcements, we hear are inbound. This is Sylvia Denzel for <br><i>*explosions rips through the concourse where the reporter is*</i>]]></desc>
+		<service>TBC</service>
+		<location>Hesperus II</location>
+	</newsItem>
+	<newsItem>
+		<headline>Federated Suns raids Kalidasa</headline>
+		<date>3000-06</date>
+		<desc><![CDATA[Filed 3000-04-18<br><br>In a daring raid, the Federated Suns has raided Kalidasa earlier in the month. In a running battle between Planetary Militia forces and the raiders, supplies earmarked for the defense of the Front against House Steiner have disappeared. There are rumors that this open attack with easily identified forces is to accomplish what the FS was unable to accomplish by subterfuge earlier this year.]]></desc>
+		<service>CNB</service>
+		<location>Kalidasa</location>
+	</newsItem>
+	<newsItem>
+		<headline>Suzano lost to Capellan Confederation... Recovered</headline>
+		<date>3000-10-13</date>
+		<desc><![CDATA[Filed 3000-09-18<br><br>Suzano long a world held by the Free World League and frequently raided by the Capellan Confederation was "raided" in early June of this year. However, this time because House Marik had stripped our defenders away to the CCAF raiding forces that scouting our world were able to conquered it. It was thanks to the third and fifth Mechanized Infantry Companies that their reign was only three months long. However the damage they inflected on the League population will be years in the recovery.]]></desc>
+		<service>IMI</service>
+		<location>Suzano</location>
+	</newsItem>
+	<newsItem>
+		<headline>Eridani Light Horse speaks out</headline>
+		<date>3000-12</date>
+		<desc><![CDATA[Filed 3000-10-03<br><br>Eridani Light Horse in a public statement today, announced that they were leaving the Lyran Commonwealth for the Federated Suns. They stated that those "incompetent social generals" that they were assigned under had led the Light Horse to too many casualties to be tolerated in command of such elite soldiers. ]]></desc>
+		<service>CNB</service>
+		<location>Tharkad</location>
+	</newsItem>
+	<newsItem>
+		<headline>Astrokaszy stablizes under new Caliph</headline>
+		<date>3001-07</date>
+		<desc><![CDATA[Filed 3001-04-23<br><br>Comstar has announced that a new ruler of the Periphery world Astrokaszy. Caliph Omar Shervanis stands ready to join the galaxy community after uniting the various people of the world Astrokaszy. To cement this new addition, Comstar has announced the building of a Class B HPG on world. ]]></desc>
+		<service>CNB</service>
+		<location>Astrokaszy</location>
+	</newsItem>
+	<newsItem>
+		<headline>Warrior Houses defeat 7th Cruis Lancers</headline>
+		<date>3001-10</date>
+		<desc><![CDATA[Filed 3001-07-30<br><br>It is with great pride to announce today that the Blessed Orders of the Warrior Houses Imarra and LuSann have fought the 7th Cruis Lancers of that hated Federated Suns to a standstill then forced them off Lincoln.]]></desc>
+		<service>CBS</service>
+		<location>Lincoln</location>
+	</newsItem>
+	<newsItem>
+		<headline>Anton Marik titled Duke of Procyon</headline>
+		<date>3002-02</date>
+		<desc><![CDATA[Filed 3002-01-10<br><br>Anton Marik, General in the FWLM, was presented with the title of Duke of Procyon today. He is expected to take command of the Capellan Front soon.]]></desc>
+		<service>IMI</service>
+		<location>Procyon</location>
+	</newsItem>
+	<newsItem>
+		<headline>House Kurita honors lost son</headline>
+		<date>3002-03</date>
+		<desc><![CDATA[Voice of the Dragon has the duty of reporting the fall of Miyamoto Kurita in the battle for Cylene II. - (non canon ... battle location)]]></desc>
+		<service>Voice of the Dragon</service>
+		<location>Luthien</location>
+	</newsItem>
+	<newsItem>
+		<headline>Loric attacked</headline>
+		<date>3002-05</date>
+		<desc><![CDATA[Filed 3002-04-16<br><br>Free World League soldiers force their way onto our peaceful planet earlier this month. However, the addition of the 17th Donegal Guards which arrived earlier this year prove their worth by forcing House Marik to fight for every inch of soil on our paradise.]]></desc>
+		<service>TBC</service>
+		<location>Loric</location>
+	</newsItem>
+	<newsItem>
+		<headline>Davion forces trapped on Cammal</headline>
+		<date>3002-07</date>
+		<desc><![CDATA[Filed 3002-06-16<br><br>In a display of strategic maneuvering today, Warrior House Ijori of the Capellen Confederation was able to spring a trap on Davion forces. Will this spell the chance the CC needs to take over this world? Keep tuned to FSNN for the latest and most accurate news affecting you. ]]></desc>
+		<service>FSNN</service>
+		<location>Cammal</location>
+	</newsItem>
+	<newsItem>
+		<headline>Gordon's Highland Light Captured</headline>
+		<date>3002-08-20</date>
+		<desc><![CDATA[Filed 3002-07-30<br>In a fast tempo recon raid, the 2nd St Ives Lancers were able to outmaneuver and capture the Gordon's Highland Light mercenary company intact. Look forward to facing twelve Panthers next time you accidently are facing the St Ives Lancers in combat.]]></desc>
+		<service>MercNet</service>
+		<location>Pinard</location>
+	</newsItem>
+	<newsItem>
+		<headline>ISF Report: Akiro Kurita</headline>
+		<date>3002-09-30</date>
+		<desc><![CDATA[Filed 3002-09-30<br><br>Assistant Director Subhash Indrahar,<br>At your request we have probed deeper into the patrol that claimed Akiro Kurita's life on 09-04-3002. The investigation, which raised no outliners on the first look but on second pass, uncovered a long buried report regarding the Sholagar aerospace fighter, which Kurita Akiro-sama was piloting on that day. In 2989, during the Battle of Severn a lance of Sholagar fighters followed an aerospace unit into atmospheric conditions that interfered with the operational profile of the Sholagar. We have also found additional evidence in the technical reports we have acquired from the Capellan Confederation regarding their Thrush aerospace fighter, which has the same operational profile as our Sholagar.]]></desc>
+		<service>ISF</service>
+		<location>Luthien</location>
+	</newsItem>
+	<newsItem>
+		<headline>Solaris VII offers to FWL a place in the games</headline>
+		<date>3002-10-03</date>
+		<desc><![CDATA[Filed 3002-09-20<br><br>This is Ilias Albert for Solaris 7 News. Earlier this month, General Willis Crawford burned hard to land his forces on the Gaming World. The Defenders of Solaris, the LCAF, with advanced warning of his assault were able to gather the numerous volunteers who offered their services to the LCAF to oppose his landing to the Gaming World. The landing was a bloodbath for the FWL. After escaping circlement his forces were able to push back the forces opposing him and secure a stronghold. We at Solaris 7 News say, "Let the games continue!"]]></desc>
+		<service>S7NN</service>
+		<location>Solaris VII</location>
+	</newsItem>
+	<newsItem>
+		<headline>Solaris VII Games continue under Lyran control</headline>
+		<date>3002-12</date>
+		<desc><![CDATA[Filed 3002-11-20<br><br>This is Solaris 7 News and I am Kalina Križ. Today it has been confirmed that the invading Marik forces under General Willis Crawford have been defeated. The furious counter-attack by The Donegal Guards started with a strafing run by some of the few Seydlitz left in service leaving the FWL woefully short of aerospace fighters to counter LCAF air supremacy. Moreover, the operational tempo did not let up until half of the general's command was stretched over a salvage-covered wasteland. General Crawford retreated with what is left of his command off world. We at S7NN welcome the Donegal Guards and hope they enjoy the Games while on Solaris 7.]]></desc>
+		<service>S7NN</service>
+		<location>Solaris VII</location>
+	</newsItem>
+	<newsItem>
+		<headline>Death Commandos to take new recruits</headline>
+		<date>3003-02</date>
+		<desc><![CDATA[Filed 3003-01-16<br><br>The Chancellor announced today, that the cream of CCAF would be given the chance to advance further in the cause of the Confederation by joining the Death Commandos.]]></desc>
+		<service>CBS</service>
+		<location>Capalla</location>
+	</newsItem>
+	<newsItem>
+		<headline>Mercenaries captured on Tsumma</headline>
+		<date>3003-06</date>
+		<desc><![CDATA[Filed 3003-05-16<br><br>MercNet has received reports that the Dry River Devils, a Davion employed mercenary unit, was captured by the Warrior House Ijori of the Capellan Confederation. We at MercNet are curious about a CC unit being so far inside the Federated Suns. We will continue providing future updates on this issue.]]></desc>
+		<service>MercNet</service>
+		<location>Tsumma</location>
+	</newsItem>
+	<newsItem>
+		<headline>General Willis Crawford Court-Martialed and Executed</headline>
+		<date>3003-07</date>
+		<desc><![CDATA[Filed 3003-06-01<br><br>A FWLM representative has announced a new chapter in the series of events relating to the 3002 invasion of Solaris VII by the FWL today. General Willis Crawford, who was arrested in December of 3002, finally got his time in front of a military court regarding his handling of the invasion. The court announced today that General Willis Crawford was found guilty in a general court-martial of misbehavior before the enemy along with lesser-included offences. He was stripped of rank and executed by firing squad this afternoon. He is the first military officer in the FWL to be executed in over a century.]]></desc>
+		<service>IMI</service>
+		<location>Atrus</location>
+	</newsItem>
+	<newsItem>
+		<headline>Michael Hasek marries Marie Davion</headline>
+		<date>3003-09</date>
+		<desc><![CDATA[Filed 3003-08-02<br><br>Michael Hasek married Marie Davion in a beautiful ceremony in the beginning of August. Michael Hasek-Davion, formally combining his name with his wife's, the son of George Hasek Duke of New Syrtis and a former officer in the Syrtis Fusiliers brigade of the AFFS. Marie Davion is the daughter of First Prince Andrew Davion and Simon St. Clair.  ]]></desc>
+		<service>FSNN</service>
+		<location>New Syrtis</location>
+	</newsItem>
+	<newsItem>
+		<headline>Blantleff, a possible Kentares IV?</headline>
+		<date>3003-10</date>
+		<desc><![CDATA[Filed 3003-06-02<br><br>Lothian League informed Comstar News Bureau of an attempted massacre of Lothian settlers on the world of Blantleff. The Circinus Federation, which has lived peacefully with the Lothian settlers for more than a decade, decided stake their claim the small world. However, through the actions of an educated man the Lothian settlers were able to survive long enough for help to arrive. President H. R. "Little Bob" McIntyre leader of the Circinus Federation had no comment at time of posting.]]></desc>
+		<service>CNB</service>
+		<location>Blanetleff</location>
+	</newsItem>
+	<newsItem>
+		<headline>Hohiro Kurita Assassinated</headline>
+		<date>3004-02-04</date>
+		<desc><![CDATA[Filed 3004-02-03<br><br>In a stunning annnoucement today from the Imperial Palace on Luthien, Coordinator Hohiro Kurita was assassinated by a Otomo Kashira. Coordinator Takashi Kurita, who was Commander of the Otomo, has taken over as Head of House Kurita and title of Coordinator of the Draconis Combine.]]></desc>
+		<service>CNB</service>
+		<location>Luthien</location>
+	</newsItem>
+	<newsItem>
+		<headline>Summer raided by DCMS</headline>
+		<date>3005-04</date>
+		<desc><![CDATA[Filed 3005-03-20<br><br>House Kurita in response to raids of the LCAF raided Summer yesterday. Thanks to the lucky positioning of members of the 3rd Royal Guard, the raid on the palace of the Duke of Summer was repulsed. However, they were unable to prevent all casaulties, the Duke has died and his heir-appearant is currently in critical condition. ]]></desc>
+		<service>TBC</service>
+		<location>Summer</location>
+	</newsItem>
+	<newsItem>
+		<headline>Indicass raided by Federated Suns</headline>
+		<date>3005-06</date>
+		<desc><![CDATA[Filed 3005-04-27<br><br>The Ceti Hussars of the AFFS deployed to Indicass in a quick raid. However, they did not count on Cochraine's Goliaths and turned a raid into a retreat. Two companies of the enemy never left Indicass.]]></desc>
+		<service>CBS</service>
+		<location>Indicass</location>
+	</newsItem>
+	<newsItem>
+		<headline>New Mercenary Brigade arrives at Delo IV</headline>
+		<date>3005-05</date>
+		<desc><![CDATA[Filed 30005-04-11<br><br>A surprise that no world would welcome happened in the Delo IV system. Jumping in was not one or two jumpships but 7+ jumpships all loaded to bear with military dropships. To further add to the surprise was a message stating simply "I am Colonal Jamie Wolf, I come in peace."]]></desc>
+		<service>CNB</service>
+		<location>Delo IV</location>
+	</newsItem>
+	<newsItem>
+		<headline>Kittery absorbed into Federated Suns</headline>
+		<date>3005-10</date>
+		<desc><![CDATA[Filed 3005-09-25<br><br>While the Ceti Hussars were raiding Indicass, another battle was being fought on Kittery. A heavy assault force landed and secured the world for the Federated Suns. However, with the current unhappiness the military governor has a long road ahead of them for the hearts and minds of Kittery's populous.]]></desc>
+		<service>FSNN</service>
+		<location>Kittery</location>
+	</newsItem>
+	<newsItem>
 		<headline>Archon Married</headline>
 		<date>3009-03-18</date>
 		<desc><![CDATA[According to officials on Tharkad, Archon Katrina Steiner married long-time lover and Duke of Donegal, Arthur Luvon less than a week ago. The Lyran Commonwealth is celebration the wedding of their beloved Archon. Archon Steiner and Duke Luvon have been romantically linked since at least 3005 - hopefully the marriage of the two will produce an heir and quiet some of the current pretenders to the Lyran throne. That is all for our Commonwealth Update - back to local news.]]></desc>
-		<service>INN</service>
+		<service>TBC</service>
 		<location>Tharkad</location>
 	</newsItem>
 	<newsItem>
@@ -36,7 +338,7 @@ location - an optional tag for the location of the news report
 		<headline>Merlin's Debut</headline>
 		<date>3010-05-15</date>
 		<desc><![CDATA[The military community was shocked earlier this month to learn that the Mountain Wolf BattleMechs (MWBM) factory on Alpheratz was rebuilt in secret by the Outworld's Alliance and just recently produced its first new BattleMech. Even more surprising was the news that the 'Mech was of a brand new design, dubbed the Merlin by MWBM, it is a sturdy heavy 'Mech that uses parts common throughout the Inner Sphere and Periphery. The news of a new 'Mech has the military community quite excited as this is the first entirely new design in over 100 years. MWBM is reported to already have a line of customers interested in pruchasing the new 'Mechs just as quickly as they can make them.]]></desc>
-		<service>INN</service>
+		<service>OAB</service>
 		<location>Alpheratz</location>
 	</newsItem>
 	<newsItem>
@@ -57,7 +359,7 @@ location - an optional tag for the location of the news report
 		<headline>Hell's Black Aces Formed</headline>
 		<date>3011-05-23</date>
 		<desc><![CDATA[In mercenary news, a new aerospace unit has shown up on Galatea looking for work. So far unnamed, these Capellan ex-pats recently defected from the Capellan Confederation citing long term neglect by the CCAF and fear of Chancellor Maximilian's regular “purges” of the military. The new mercenaries made off with their entire Wing of fighters, support personnel, and even a rare Vengeance class dropship. They are currently looking for high risk contracts for either a major house or under another mercenary unit to provide aerospace fighter support.]]></desc>
-		<service>INN</service>
+		<service>MercNet</service>
 		<location>Galatea</location>
 	</newsItem>
 	<newsItem>
@@ -89,7 +391,6 @@ location - an optional tag for the location of the news report
 Oberon VI was once a jewel of the Rimworld Republic in the days of the Star League but never recovered from the ravages of the Amaris Coup. A century after the fall of the Star League the planet made for an easy target for the original Hendrik Grimm and a pirate's haven was founded and slavery became rampant.
 
 King Grimm III has promised social and political reform and a change to his ways, including using his men and 'Mechs to defend his new Confederation and to take on legitimate mercenary work for units that can be spared. What will actually become of the new nation remains to be seen. When asked for comment Lyran officials refused to make any public comments, though a few annonymously condemned Hendrik Grimm III and his "pirate nation".]]></desc>
-		<service>INN</service>
 		<location>Oberon VI</location>
 	</newsItem>
 	<newsItem>
@@ -103,14 +404,14 @@ King Grimm III has promised social and political reform and a change to his ways
 		<headline>Marauder II Unveiled</headline>
 		<date>3012-11-05</date>
 		<desc><![CDATA[Today, representatives of a joint General Motors and Blackwell Industries unveiled the Marauder II, a fiersome, 100-ton assault 'Mech. While the new 'Mech is 33% heavier than the original, the 'Mech has a lot in common with its lighter sire, pairing a PPC and laser in each arm, with a large laser in place of the traditional autoocannon. While the new Marauder II is slower, engineers have compensated by adding jumpjets that allow this 'Mech to jump up to 90 meters at a time. The initial line of Marauder IIs are slated for the Wolf's Dragoons, however Blackwell represntatives stated that they would begin taking orders on a first-come, first-serve basis starting in six-months.]]></desc>
-		<service>INN</service>
+		<service>TBC</service>
 		<location>Galatea</location>
 	</newsItem>
 	<newsItem>
 		<headline>Wolf's Dragoons on Carver V?</headline>
 		<date>3013-03-09</date>
 		<desc><![CDATA[INN has received reports from Carver V that the mysterious Wolf's Dragoons mercenary unit has been spotted on the Capellan Confederation planet. While Capellan officials refuse to comment, stating that they can "never discuss military deployments due to security concerns" rumors abound that the infamous mercenary unit has been deployed to garrison Carver V. If true, it would explain the lack of action from the Dragoons in recent months, though it does not take a military analyst to question why such a powerful unit would be withheld from combat.]]></desc>
-		<service>INN</service>
+		<service>TBC</service>
 		<location>Galatea</location>
 	</newsItem>
 	<newsItem>
@@ -173,7 +474,7 @@ In a ceremony honoring his brother, First-Prince Hanse Davion christened the 1st
 		<desc><![CDATA[INN has received an exclusive report that the Federated Suns' First-Prince Hanse Davion recently launched a massive invasion of the Draconis Combine planet Halstead Station. Our confidential source indicated that the invasion was authorized by the First-Prince himself after MIIO uncovered reports of a massive LosTech warehouse somewhere on the planet. Without a doubt, the First-Prince is hoping to capture the planet so that this technology can be claimed by the Suns.
 
 News from the planet seems to be cut off, however we have received initial reports from the planet which indicate the fighting is fierce between the Draconis Combine defenders and the Suns invaders.]]></desc>
-		<service>INN</service>
+		<service>FSNS</service>
 		<location>Halstead Station</location>
 	</newsItem>
 	<newsItem>
@@ -191,7 +492,7 @@ We will have more as this story develops. Next, our analysts will discuss what A
 		<headline>Wolf's Dragoons in the League</headline>
 		<date>3014-06-02</date>
 		<desc><![CDATA[In surprising news, the Wolf's Dragoons have been spotted fighting along-side Anton Marik's rebel forces in the Free Worlds League civil-war. Until the Dragoons joined the fighting, they were believed to still be contracted to the Capellan Confederation performing garrison duty on Carver V. We are unaware at this time if Chancelor Liao has loaned the Dragoons to Anton Marik or if they simply broke contract. One thing is sure, Wolf's Dragoons may be Anton Marik's strongest allies in his bid to dispose the Captain-General.]]></desc>
-		<service>INN</service>
+		<service>IMI</service>
 		<location>New Delos</location>
 	</newsItem>
 	<newsItem>
@@ -228,7 +529,7 @@ During the speech, Captain-General Janos Marik called for death to all traitors 
 		<headline>Marik Civil War Updates</headline>
 		<date>3014-12-03</date>
 		<desc><![CDATA[The Civil War between brothers continues to rage in the Free Worlds League. Insider reports indicate that forces loyal to Anton Marik, the rebelling brother to Captain-General Janos Marik, have secured some key victories in their fight to overthrow the leader of the League, including the capture of the 'Mech factories on Irian and Emris IV, as well as additional military manufacturing on Bernardo and Asuncion. However, Anton's forces have suffered several setbacks and reversals that could put an end to this war soon. However, so far the biggest setbacks have been political and not on the battlefield. While many regions of the Free Worlds League have declared their neutrality in the conflict and have reserved their forces for the defense of their holdings from Liao and Steiner, the Captain-General has secured support of both Sirian and Regulus, two of the most powerful regions of the League. With the new forces they can provide to the Captain-General, even the elite Wolf's Dragoons may not be enough to keep Anton's Rebellion alive.]]></desc>
-		<service>INN</service>
+		<service>IMI</service>
 		<location>New Home</location>
 	</newsItem>
 	<newsItem>
@@ -253,7 +554,7 @@ With their leader lost, the already flagging rebel forces are quickly falling to
 		<headline>Wolfs Dragoons New Employer</headline>
 		<date>3015-05-10</date>
 		<desc><![CDATA[In an odd twist of fate, after months of bitter fighting for his brother, Wolf's Dragoons have signed a contract with Captain-General Janos Marik's Free Worlds League. While we do not have word on where they will be deployed, it is likely safe to assume the Captain-General will be deploying them against the Lyran Commonwealth in retribution for attacks against the League while the nation was embroiled in a Civil War. Reports indicate that Captain-General Janos Marik personally reached out to the Dragoons to request their services.]]></desc>
-		<service>INN</service>
+		<service>IMI</service>
 		<location>Galatea</location>
 	</newsItem>
 	<newsItem>
@@ -269,7 +570,7 @@ With their leader lost, the already flagging rebel forces are quickly falling to
 		<desc><![CDATA[The so-called “New Delos Treason Trials” have finally ended, closing the curtain on a dark period in the long history of the Free Worlds League. The trials were ruthless for those that supported the rebel Anton Marik and fought against Captain-General Janos Marik. The majority of Anton's top supporters and senior officials were found guilty and executed, while lesser supporters were exiled to prison planets or sent to hard labor for their treason. Even the nobles of the League were not spared, even the Captain-General Janos Marik's second son, Gerald Marik, was executed for his part in Anton's Revolt.
 
 Beyond the bloody results of the treason trials, the Free Worlds League remains a nation divided. The rebels are gone but distrust remains between loyalists and those that remained neutral after invoking the Home Defense Act and the FWL Parliament remains splits politically, with many members at odds with each other or the Captain-General.]]></desc>
-		<service>INN</service>
+		<service>CBS</service>
 		<location>New Home</location>
 	</newsItem>
 	<newsItem>
@@ -277,14 +578,14 @@ Beyond the bloody results of the treason trials, the Free Worlds League remains 
 		<date>3020-09-20</date>
 		<desc><![CDATA[New Wessex is the latest casualty of the war between the Draconis Combine and the Lyran Commonwealth. During an orbital battle earlier this year the LCS St. Brendan entered the atmosphere and suffered a catastrophic engine containment failure. The resulting explosion rained tons of radioactive debris across Jaricosa. Reports are still coming in and medical professionals and scientists are preparing for an increase in cancer and other radiation exposure symptoms of incalcuable levels.]]></desc>
 		<date>3020-10-10</date>
-		<service>INN</service>
+		<service>DC</service>
 		<location>New Wessex</location>
 	</newsItem>
 	<newsItem>
 		<headline>Truth Massacre</headline>
 		<date>3020-09-22</date>
 		<desc><![CDATA[Capellan Confederation media reports that mercenaries have attacked Truth and butchered the population. Initial estimates indicate that as many as 50,000 people were killed, some dragged from their homes and executed, others fired upon by the mercenary battlemechs as they fled. So far there has been no official response from the Capellan government. ComStar has dennounced the mercenaries and branded them rogue.]]></desc>
-		<service>INN</service>
+		<service>FSNS</service>
 		<location>Truth</location>
 	</newsItem>
 	<newsItem>
@@ -306,7 +607,7 @@ Beyond the bloody results of the treason trials, the Free Worlds League remains 
 		<headline>A New Successor State is Born</headline>
 		<date>3034-04-01</date>
 		<desc><![CDATA[Gunji-no-Kanrei Theodore Kurita formally acknowledged the creation of the Free Rasalhague Republic earlier this year. The proclaimed Prince of the Free Rasalhague Republic, Haakon Magnusson has now created a realm for himself from both Draconis Combine as well as Federated Commonwealth worlds in the former Rasalhague Military District. Only time will tell how this new power will be treated in the large political world that is the Inner Sphere. Good luck Prince Magnusson, you are going to need it. ]]></desc>
-		<service>INN</service>
+		<service>DC</service>
 		<location>Rasalhague</location>
 	</newsItem>
 	<newsItem>
@@ -320,7 +621,7 @@ Beyond the bloody results of the treason trials, the Free Worlds League remains 
 		<headline>Fifth Succession War?</headline>
 		<date>3039-05-01</date>
 		<desc><![CDATA[Reports of attacks against the Combine worlds of Alrakis and Alnasi have been filtering through official and unoffical channels. This follows a declaration of liberation by First-Prince Hanse Davion last month. These events have stunned many who predicted that the Steiner-Davion marriage was going to usher in a new era of peace after the attempts to conquer the Capellan Confederation. Analysts are struggling to piece these new reorts together and anticipate the DCMS response.]]></desc>
-		<service>INN</service>
+		<service>Mercnet</service>
 		<location>Outreach</location>
 	</newsItem>
 	<newsItem>
@@ -355,7 +656,7 @@ Beyond the bloody results of the treason trials, the Free Worlds League remains 
 		<headline>AFFS Battalion Commander Flees Battle, Steals Jumpship</headline>
 		<date>3039-08-23</date>
 		<desc><![CDATA[The defenders of Halstead Station are a little shorthanded lately as reports of an AFFS officer leaving his post along with his entire battalion including dropships and a jumpship have been coming through unofficial channels. AFFS leaders have so far declined to comment on this report and have denied any morale issues within their officer corps. Several veteran units were stationed on the planet and it is not known at this time who the officer was or their unit affiliation.]]></desc>
-		<service>INN</service>
+		<service>FSNS</service>
 		<location>Halstead Station</location>
 	</newsItem>
 	<newsItem>
@@ -369,7 +670,7 @@ Beyond the bloody results of the treason trials, the Free Worlds League remains 
 		<headline>Galedon V in Flames</headline>
 		<date>3044-08-01</date>
 		<desc><![CDATA[The planets in the Galedon system are reporting uprisings against the Draconis garrison forces amid reports of war-crimes. Reports are spotty and local media outlets have been supressed by DC troops. Both sides are reportedly looking for mercenaries units.]]></desc>
-		<service>INN</service>
+		<service>MercNet</service>
 		<location>Outreach</location>
 	</newsItem>
 	<newsItem>
@@ -382,10 +683,10 @@ Beyond the bloody results of the treason trials, the Free Worlds League remains 
 	<newsItem>
 		<headline>Rim Collection Charter Signed</headline>
 		<date>3048-05-14</date>
-		<desc><![CDATA[INN has just received news from the Periphery that six former Rim Worlds Republic planets have signed the Rim Collection Charter. The Charter bands these six planets together into a mutual defensive pact and the six member states hope their alliance will allow them to better defend against pirate predation and pool their resources to improve the conditions on their planets.
+		<desc><![CDATA[CNB has just received news from the Periphery that six former Rim Worlds Republic planets have signed the Rim Collection Charter. The Charter bands these six planets together into a mutual defensive pact and the six member states hope their alliance will allow them to better defend against pirate predation and pool their resources to improve the conditions on their planets.
 
-Speaking on behalf of the new Periphery nation, Planetary Councilman Roberts explained the new nation’s goals to “Improve the living conditions for the residents of the Rim Collection planets, through improved security, pooling resources, and expanding trade with neighboring nations.” Here at INN we wish the new Rim Collection the best.]]></desc>
-		<service>INN</service>
+Speaking on behalf of the new Periphery nation, Planetary Councilman Roberts explained the new nation’s goals to “Improve the living conditions for the residents of the Rim Collection planets, through improved security, pooling resources, and expanding trade with neighboring nations.” Here at CNB we wish the new Rim Collection the best.]]></desc>
+		<service>CNB</service>
 		<location>Gillfillan's Gold</location>
 	</newsItem>
 	<newsItem>
@@ -657,7 +958,7 @@ In his infinite wisdom, the Chancellor called an emergency meeting with the Star
 	</newsItem>
 	<newsItem>
 		<headline>Clan Smoke Jaguar Defeated</headline>
-		<date>3061-05-15</date>
+		<date>3061-02-15</date>
 		<desc><![CDATA[Breaking news from Luthien. Star League Defense Force General, Victor Ian Steiner-Davion has made his first public appearance in well over a year and announced the end of the Clan threat. Reports are only now being made public that Operation Bulldog, the operation to remove the Smoke Jaguars from Inner Sphere space was only the first half of the plan and was completed in a few months in 3059. The rest of the mission, Task Force Serpent, was kept completely classified until now and was a second attack sent directly to the Clan Home-worlds to destroy the Smoke Jaguars in their den. This second prong of the attack was led by Duke Morgan Hasek-Davion and General Ariana Winston, commander of the famed SLDF Eridani Light Horse. Reports indicate that both commanders were killed while on the Jaguar home-world of Huntress, though their mission was ultimately a success when the forces from Operation Bulldog, following the Smoke Jaguar forces fleeing the Inner Sphere, arrived in Clan Space.
 
 After the Jaguars were completely destroyed, Victor Steiner-Davion led his coalition forces to the Clan's capital world, Strana Mechty, and waged a trial against the Clans to end their invasion for good. Forces from each realm squared off against Clan forces and were ultimately victorious, defeating the Clans by their own rules. The Inner Sphere can breath a collective sigh of relief to know that the Clans' invasion plans have been ended and we may be able to expect peace along that front for the immediate future.
@@ -693,6 +994,13 @@ Unfortunately for Victor Steiner-Davion, he returns home to find himself an Arch
 		<desc><![CDATA[Today the Free Worlds League Military officially commissioned the 8th Free Worlds Legionnaires, a new BattleMech regiment with air, armor and infantry support units. As with the other Legionnaires regiments, the 8th were recruited from all over the League and the new unit will bolster the defenses along the Federated Commonwealth border.]]></desc>
 		<service>GP</service>
 		<location>Atreus</location>
+	</newsItem>
+	<newsItem>
+		<headline>Acamar Freed from Pirates</headline>
+		<date>3061-08-05</date>
+		<desc><![CDATA[Today the representative of the Goverment of Acamar stood alongside the representative of the Federated Commonwealth company General Motors to annouced the completion of pacfications campaigns against the pirates and their leader Calvin Noru. We will see how the new government fares in future months.]]></desc>
+		<service>INN</service>
+		<location>Acamar</location>
 	</newsItem>
 	<newsItem>
 		<headline>Mercenary Treachery</headline>

@@ -28,6 +28,9 @@ import java.util.GregorianCalendar;
 import java.util.Hashtable;
 import java.util.UUID;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.EntityMovementMode;
@@ -38,6 +41,7 @@ import megamek.common.MechSummaryCache;
 import megamek.common.TargetRoll;
 import megamek.common.UnitType;
 import megamek.common.loaders.EntityLoadingException;
+import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
@@ -49,9 +53,6 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.RandomFactionGenerator;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 public class PersonnelMarket {
 	private ArrayList<Person> personnel = new ArrayList<Person>();
@@ -196,16 +197,23 @@ public class PersonnelMarket {
 					for (int i = Person.T_NONE + 1; i < Person.T_NUM; i++) {
 						roll = Compute.d6(2);
 						// TODO: Modifiers for hiring hall, but first needs to track the hiring hall
-						if (c.getUnitRating().equalsIgnoreCase("A") || c.getUnitRating().equalsIgnoreCase("A*")) {
+						switch(c.getUnitRatingMod()) {
+						case IUnitRating.DRAGOON_A:
+						case IUnitRating.DRAGOON_ASTAR:
 							roll += 3;
-						} else if (c.getUnitRating().equalsIgnoreCase("B")) {
+							break;
+						case IUnitRating.DRAGOON_B:
 							roll += 2;
-						} else if (c.getUnitRating().equalsIgnoreCase("C")) {
+							break;
+						case IUnitRating.DRAGOON_C:
 							roll += 1;
-						} else if (c.getUnitRating().equalsIgnoreCase("E")) {
+							break;
+						case IUnitRating.DRAGOON_D:
 							roll -= 1;
-						} else if (c.getUnitRating().equalsIgnoreCase("F")) {
+							break;
+						case IUnitRating.DRAGOON_F:
 							roll -= 2;
+							break;
 						}
 						roll += mftMod;
 						roll = Math.max(roll, 0);
@@ -636,6 +644,8 @@ public class PersonnelMarket {
     }
 
     public static PersonnelMarket generateInstanceFromXML(Node wn, Campaign c, Version version) {
+        final String METHOD_NAME = "generateInstanceFromXML(Node,Campaign,Version)"; //$NON-NLS-1$
+        
         PersonnelMarket retVal = null;
 
         try {
@@ -668,8 +678,10 @@ public class PersonnelMarket {
         				en = new MechFileParser(ms.getSourceFile(), ms.getEntryName()).getEntity();
         			} catch (EntityLoadingException ex) {
         	            en = null;
-        	            MekHQ.logError("Unable to load entity: " + ms.getSourceFile() + ": " + ms.getEntryName() + ": " + ex.getMessage());
-        	            MekHQ.logError(ex);
+                        MekHQ.getLogger().log(PersonnelMarket.class, METHOD_NAME, LogLevel.ERROR,
+                                "Unable to load entity: " + ms.getSourceFile() + ": " //$NON-NLS-1$
+                                        + ms.getEntryName() + ": " + ex.getMessage()); //$NON-NLS-1$
+                        MekHQ.getLogger().log(PersonnelMarket.class, METHOD_NAME, ex);
         			}
                     if (null != en) {
                     	retVal.attachedEntities.put(id, en);
@@ -681,7 +693,8 @@ public class PersonnelMarket {
           		} else  {
             		// Error condition of sorts!
             		// Errr, what should we do here?
-            		MekHQ.logMessage("Unknown node type not loaded in Personnel nodes: "
+                    MekHQ.getLogger().log(PersonnelMarket.class, METHOD_NAME, LogLevel.ERROR,
+                            "Unknown node type not loaded in Personnel nodes: " //$NON-NLS-1$
             				+ wn2.getNodeName());
 
             	}
@@ -691,7 +704,7 @@ public class PersonnelMarket {
         	// Errrr, apparently either the class name was invalid...
         	// Or the listed name doesn't exist.
         	// Doh!
-        	MekHQ.logError(ex);
+            MekHQ.getLogger().log(PersonnelMarket.class, METHOD_NAME, ex);
         }
 
         // All personnel need the rank reference fixed
@@ -910,6 +923,8 @@ public class PersonnelMarket {
     }
 
     private void addRecruitUnit(Person p, Campaign c) {
+        final String METHOD_NAME = "addRecruitUnit(Person,Campaign)"; //$NON-NLS-1$
+        
     	int unitType;
     	switch (p.getPrimaryRole()) {
     	case Person.T_MECHWARRIOR:
@@ -968,12 +983,15 @@ public class PersonnelMarket {
 				en = new MechFileParser(ms.getSourceFile(), ms.getEntryName()).getEntity();
 			} catch (EntityLoadingException ex) {
 	            en = null;
-	            MekHQ.logError("Unable to load entity: " + ms.getSourceFile() + ": " + ms.getEntryName() + ": " + ex.getMessage());
-	            MekHQ.logError(ex);
+                MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
+                        "Unable to load entity: " + ms.getSourceFile() + ": " //$NON-NLS-1$
+                                + ms.getEntryName() + ": " + ex.getMessage()); //$NON-NLS-1$
+                MekHQ.getLogger().log(getClass(), METHOD_NAME, ex);
 			}
 		} else {
-			MekHQ.logError("Personnel market could not find "
-					+ UnitType.getTypeName(unitType) + " for recruit from faction " + faction);
+            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
+                    "Personnel market could not find " //$NON-NLS-1$
+					+ UnitType.getTypeName(unitType) + " for recruit from faction " + faction); //$NON-NLS-1$
 			return;
 		}
 

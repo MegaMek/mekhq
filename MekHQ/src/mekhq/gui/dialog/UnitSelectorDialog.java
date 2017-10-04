@@ -47,6 +47,7 @@ import megamek.client.ui.swing.MechViewPanel;
 import megamek.common.Configuration;
 import megamek.common.Entity;
 import megamek.common.EntityWeightClass;
+import megamek.common.ITechnology;
 import megamek.common.MechFileParser;
 import megamek.common.MechSearchFilter;
 import megamek.common.MechSummary;
@@ -55,11 +56,12 @@ import megamek.common.MechView;
 import megamek.common.TechConstants;
 import megamek.common.UnitType;
 import megamek.common.loaders.EntityLoadingException;
+import megamek.common.logging.LogLevel;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
-import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.unit.UnitOrder;
+import mekhq.campaign.unit.UnitTechProgression;
 
 /**
  *
@@ -67,9 +69,9 @@ import mekhq.campaign.unit.UnitOrder;
  * (code borrowed heavily from MegaMekLab UnitSelectorDialog
  */
 public class UnitSelectorDialog extends JDialog {
-	private static final long serialVersionUID = 304389003995743004L;
+    private static final long serialVersionUID = 304389003995743004L;
 
-	private MechSummary[] mechs;
+    private MechSummary[] mechs;
 
     private MechTableModel unitModel;
 
@@ -150,7 +152,7 @@ public class UnitSelectorDialog extends JDialog {
         btnResetSearch = new JButton();
         panelSearchBtns = new JPanel();
 
-		ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.UnitSelectorDialog", new EncodeControl()); //$NON-NLS-1$
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.UnitSelectorDialog", new EncodeControl()); //$NON-NLS-1$
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle(resourceMap.getString("Form.title")); // NOI18N
         setName("Form"); // NOI18N
@@ -222,17 +224,17 @@ public class UnitSelectorDialog extends JDialog {
         txtFilter.setName("txtFilter"); // NOI18N
         txtFilter.setPreferredSize(new java.awt.Dimension(200, 28));
         txtFilter.getDocument().addDocumentListener(
-            new DocumentListener() {
-                public void changedUpdate(DocumentEvent e) {
-                    filterUnits();
-                }
-                public void insertUpdate(DocumentEvent e) {
-                    filterUnits();
-                }
-                public void removeUpdate(DocumentEvent e) {
-                    filterUnits();
-                }
-            });
+                new DocumentListener() {
+                    public void changedUpdate(DocumentEvent e) {
+                        filterUnits();
+                    }
+                    public void insertUpdate(DocumentEvent e) {
+                        filterUnits();
+                    }
+                    public void removeUpdate(DocumentEvent e) {
+                        filterUnits();
+                    }
+                });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 2;
@@ -266,7 +268,7 @@ public class UnitSelectorDialog extends JDialog {
         btnAdvSearch.setText(Messages.getString("MechSelectorDialog.AdvSearch")); //$NON-NLS-1$
         btnAdvSearch.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-            	searchFilter = asd.showDialog();
+                searchFilter = asd.showDialog();
                 btnResetSearch.setEnabled(searchFilter!=null);
                 filterUnits();
             }
@@ -281,7 +283,7 @@ public class UnitSelectorDialog extends JDialog {
         btnResetSearch.setText(Messages.getString("MechSelectorDialog.Reset")); //$NON-NLS-1$
         btnResetSearch.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-            	asd.clearValues();
+                asd.clearValues();
                 searchFilter=null;
                 btnResetSearch.setEnabled(false);
                 filterUnits();
@@ -319,7 +321,7 @@ public class UnitSelectorDialog extends JDialog {
         tableUnits.setRowSorter(sorter);
         tableUnits.getSelectionModel().addListSelectionListener(new javax.swing.event.ListSelectionListener() {
             public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
-                UnitChanged(evt);
+                unitChanged(evt);
             }
         });
         TableColumn column = null;
@@ -329,11 +331,11 @@ public class UnitSelectorDialog extends JDialog {
                 column.setPreferredWidth(125);
             }
             else if(i == MechTableModel.COL_MODEL
-                || i == MechTableModel.COL_COST) {
+                    || i == MechTableModel.COL_COST) {
                 column.setPreferredWidth(75);
             }
             else if(i == MechTableModel.COL_WEIGHT
-                || i == MechTableModel.COL_BV) {
+                    || i == MechTableModel.COL_BV) {
                 column.setPreferredWidth(50);
             }
             else {
@@ -360,9 +362,9 @@ public class UnitSelectorDialog extends JDialog {
             btnBuy.setText("Buy (TN: --)");
             btnBuy.setName("btnBuy"); // NOI18N
             btnBuy.addActionListener(new java.awt.event.ActionListener() {
-            	public void actionPerformed(java.awt.event.ActionEvent evt) {
-            		btnBuyActionPerformed(evt);
-            	}
+                public void actionPerformed(java.awt.event.ActionEvent evt) {
+                    btnBuyActionPerformed(evt);
+                }
             });
             panelOKBtns.add(btnBuy, new java.awt.GridBagConstraints());
 
@@ -379,9 +381,9 @@ public class UnitSelectorDialog extends JDialog {
             btnClose.setText(resourceMap.getString("btnClose.text")); // NOI18N
             btnClose.setName("btnClose"); // NOI18N
             btnClose.addActionListener(new java.awt.event.ActionListener() {
-            	public void actionPerformed(java.awt.event.ActionEvent evt) {
-            		btnCloseActionPerformed(evt);
-            	}
+                public void actionPerformed(java.awt.event.ActionEvent evt) {
+                    btnCloseActionPerformed(evt);
+                }
             });
             panelOKBtns.add(btnClose, new java.awt.GridBagConstraints());
 
@@ -413,52 +415,52 @@ public class UnitSelectorDialog extends JDialog {
         pack();
     }
 
-	private void comboUnitTypeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboUnitTypeActionPerformed
-	    filterUnits();
-	}
+    private void comboUnitTypeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboUnitTypeActionPerformed
+        filterUnits();
+    }
 
-	private void comboWeightActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboWeightActionPerformed
-	    filterUnits();
-	}
+    private void comboWeightActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboWeightActionPerformed
+        filterUnits();
+    }
 
-	public Entity getEntity() {
-	    if(null == selectedUnit) {
-	        return null;
-	    }
-	    return selectedUnit.getEntity();
-	}
+    public Entity getEntity() {
+        if(null == selectedUnit) {
+            return null;
+        }
+        return selectedUnit.getEntity();
+    }
 
-	private void btnBuyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuyActionPerformed
-	    if(null != selectedUnit && null != selectedUnit.getEntity()) {
-	        /*if(!campaign.buyUnit(en)) {
+    private void btnBuyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuyActionPerformed
+        if(null != selectedUnit && null != selectedUnit.getEntity()) {
+            /*if(!campaign.buyUnit(en)) {
 	            JOptionPane.showMessageDialog(null,
 	                    "You cannot afford to buy " + en.getDisplayName(),
 	                    "You Can't Afford It",
 	                    JOptionPane.ERROR_MESSAGE);
 	            return;
 	        }*/
-	        campaign.getShoppingList().addShoppingItem(selectedUnit, 1, campaign);
-	    }
-	    // Necessary if the user wants to buy the same unit twice without reselecting it
-	    UnitChanged(null);
-	}//GEN-LAST:event_btnBuyActionPerformed
+            campaign.getShoppingList().addShoppingItem(selectedUnit, 1, campaign);
+        }
+        // Necessary if the user wants to buy the same unit twice without reselecting it
+        unitChanged(null);
+    }//GEN-LAST:event_btnBuyActionPerformed
 
-	private void addUnitGM() {
-	    if(null != selectedUnit && null != selectedUnit.getEntity()) {
-	        campaign.addUnit(selectedUnit.getEntity(), false, 0);
-	    }
-	    // Necessary if the GM wants to add the same unit twice without reselecting it
-	    UnitChanged(null);
-	}
+    private void addUnitGM() {
+        if(null != selectedUnit && null != selectedUnit.getEntity()) {
+            campaign.addUnit(selectedUnit.getEntity(), false, 0);
+        }
+        // Necessary if the GM wants to add the same unit twice without reselecting it
+        unitChanged(null);
+    }
 
-	private void btnBuySelectActionPerformed(java.awt.event.ActionEvent evt) {
-	    setVisible(false);
-	}
+    private void btnBuySelectActionPerformed(java.awt.event.ActionEvent evt) {
+        setVisible(false);
+    }
 
-	private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
-	    selectedUnit = null;
-	    setVisible(false);
-	}//GEN-LAST:event_btnCloseActionPerformed
+    private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
+        selectedUnit = null;
+        setVisible(false);
+    }//GEN-LAST:event_btnCloseActionPerformed
 
     private void filterUnits() {
         RowFilter<MechTableModel, Integer> unitTypeFilter = null;
@@ -472,6 +474,7 @@ public class UnitSelectorDialog extends JDialog {
                 public boolean include(Entry<? extends MechTableModel, ? extends Integer> entry) {
                     MechTableModel mechModel = entry.getModel();
                     MechSummary mech = mechModel.getMechSummary(entry.getIdentifier());
+                    ITechnology tech = UnitTechProgression.getProgression(mech, campaign.getTechFaction(), true);
                     if (
                             /*year limits*/
                             (!campaign.getCampaignOptions().limitByYear() || mech.getYear() <= year) &&
@@ -483,7 +486,7 @@ public class UnitSelectorDialog extends JDialog {
                             /* Weight */
                             (mech.getWeightClass() == nClass || nClass == EntityWeightClass.SIZE) &&
                             /* Technology Level */
-                            campaign.getCampaignOptions().getTechLevel() >= Utilities.getSimpleTechLevel(mech.getType()) &&
+                            (null != tech) && campaign.isLegal(tech) &&
                             /*Unit type*/
                             (nUnit == UnitType.SIZE || mech.getUnitType().equals(UnitType.getTypeName(nUnit))) &&
                             (searchFilter==null || MechSearchFilter.isMatch(mech, searchFilter))) {
@@ -502,7 +505,9 @@ public class UnitSelectorDialog extends JDialog {
         sorter.setRowFilter(unitTypeFilter);
     }
 
-    private void UnitChanged(javax.swing.event.ListSelectionEvent evt) {
+    private void unitChanged(javax.swing.event.ListSelectionEvent evt) {
+        final String METHOD_NAME = "unitChanged(ListSelectionEvent)"; //$NON-NLS-1$
+
         int view = tableUnits.getSelectedRow();
         if(view < 0) {
             //selection got filtered away
@@ -514,27 +519,30 @@ public class UnitSelectorDialog extends JDialog {
         // else
         MechSummary ms = mechs[selected];
         try {
-             // For some unknown reason the base path gets screwed up after you
-             // print so this sets the source file to the full path.
-             Entity entity = new MechFileParser(ms.getSourceFile(), ms.getEntryName()).getEntity();
-             selectedUnit = new UnitOrder(entity, campaign);
-             btnBuy.setEnabled(true);
-             btnBuy.setText("Buy (TN: " + campaign.getTargetForAcquisition(selectedUnit, campaign.getLogisticsPerson(), false).getValueAsString() + "+)");
-             btnBuy.setToolTipText(campaign.getTargetForAcquisition(selectedUnit, campaign.getLogisticsPerson(), false).getDesc());
-             refreshUnitView();
+            // For some unknown reason the base path gets screwed up after you
+            // print so this sets the source file to the full path.
+            Entity entity = new MechFileParser(ms.getSourceFile(), ms.getEntryName()).getEntity();
+            selectedUnit = new UnitOrder(entity, campaign);
+            btnBuy.setEnabled(true);
+            btnBuy.setText("Buy (TN: " + campaign.getTargetForAcquisition(selectedUnit, campaign.getLogisticsPerson(), false).getValueAsString() + "+)");
+            btnBuy.setToolTipText(campaign.getTargetForAcquisition(selectedUnit, campaign.getLogisticsPerson(), false).getDesc());
+            refreshUnitView();
         } catch (EntityLoadingException ex) {
             selectedUnit = null;
             btnBuy.setEnabled(false);
             btnBuy.setText("Buy (TN: --)");
             btnBuy.setToolTipText(null);
-            MekHQ.logError("Unable to load mech: " + ms.getSourceFile() + ": " + ms.getEntryName() + ": " + ex.getMessage());
-            MekHQ.logError(ex);
+            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
+                    "Unable to load mech: " + ms.getSourceFile() + ": " //$NON-NLS-1$
+                    + ms.getEntryName() + ": " + ex.getMessage()); //$NON-NLS-1$
+            MekHQ.getLogger().log(getClass(), METHOD_NAME, ex);
             refreshUnitView();
             return;
-       }
+        }
     }
 
-     void refreshUnitView() {
+    void refreshUnitView() {
+        final String METHOD_NAME = "refreshUnitView()"; //$NON-NLS-1$
 
         boolean populateTextFields = true;
 
@@ -563,7 +571,7 @@ public class UnitSelectorDialog extends JDialog {
             try {
                 mt.loadFromFile("mechset.txt");
             } catch (IOException ex) {
-            	MekHQ.logError(ex);
+                MekHQ.getLogger().log(getClass(), METHOD_NAME, ex);
                 //TODO: do something here
                 return;
             }
@@ -573,23 +581,23 @@ public class UnitSelectorDialog extends JDialog {
             lblImage.setIcon(new ImageIcon(unitImage));
         }
     }
-/*
+    /*
      public Entity getSelectedEntity() {
         return selectedUnit;
 
     }
-*/
-     public void setMechs (MechSummary [] m) {
-         this.mechs = m;
+     */
+    public void setMechs (MechSummary [] m) {
+        this.mechs = m;
 
-         // break out if there are no units to filter
-         if (mechs == null) {
-             System.err.println("No units to filter!");
-         } else {
-             unitModel.setData(mechs);
-         }
-         filterUnits();
-     }
+        // break out if there are no units to filter
+        if (mechs == null) {
+            System.err.println("No units to filter!");
+        } else {
+            unitModel.setData(mechs);
+        }
+        filterUnits();
+    }
 
     public void changeBuyBtnToSelectBtn () {
         for (ActionListener actionListener : btnBuy.getActionListeners()) {
@@ -616,172 +624,172 @@ public class UnitSelectorDialog extends JDialog {
 
 
     /**
-	 * A table model for displaying work items
-	 */
-	public class MechTableModel extends AbstractTableModel {
-			private static final long serialVersionUID = 8472587304279640434L;
-			private final static int COL_MODEL = 0;
-	        private final static int COL_CHASSIS = 1;
-	        private final static int COL_WEIGHT = 2;
-	        private final static int COL_BV = 3;
-	        private final static int COL_YEAR = 4;
-	        private final static int COL_COST = 5;
-	        private final static int N_COL = 6;
+     * A table model for displaying work items
+     */
+    public class MechTableModel extends AbstractTableModel {
+        private static final long serialVersionUID = 8472587304279640434L;
+        private final static int COL_MODEL = 0;
+        private final static int COL_CHASSIS = 1;
+        private final static int COL_WEIGHT = 2;
+        private final static int COL_BV = 3;
+        private final static int COL_YEAR = 4;
+        private final static int COL_COST = 5;
+        private final static int N_COL = 6;
 
-	        private MechSummary[] data = new MechSummary[0];
+        private MechSummary[] data = new MechSummary[0];
 
-	        public MechTableModel() {
-	            //this.columnNames = new String[] {"Model", "Chassis"};
-	            //this.data = new MechSummary[0];
-	        }
+        public MechTableModel() {
+            //this.columnNames = new String[] {"Model", "Chassis"};
+            //this.data = new MechSummary[0];
+        }
 
-	        public int getRowCount() {
-	            return data.length;
-	        }
+        public int getRowCount() {
+            return data.length;
+        }
 
-	        public int getColumnCount() {
-	            return N_COL;
-	        }
+        public int getColumnCount() {
+            return N_COL;
+        }
 
-	        public int getAlignment(int col) {
-	            switch(col) {
-	            case COL_MODEL:
-	            case COL_CHASSIS:
-	            	return SwingConstants.LEFT;
-	            default:
-	            	return SwingConstants.RIGHT;
-	            }
-	        }
+        public int getAlignment(int col) {
+            switch(col) {
+            case COL_MODEL:
+            case COL_CHASSIS:
+                return SwingConstants.LEFT;
+            default:
+                return SwingConstants.RIGHT;
+            }
+        }
 
-	        @Override
-	        public String getColumnName(int column) {
-	            switch(column) {
-	                case COL_MODEL:
-	                    return "Model";
-	                case COL_CHASSIS:
-	                    return "Chassis";
-	                case COL_WEIGHT:
-	                    return "Weight";
-	                case COL_BV:
-	                    return "BV";
-	                case COL_YEAR:
-	                    return "Year";
-	                case COL_COST:
-	                    return "Price";
-	                default:
-	                    return "?";
-	            }
-	        }
+        @Override
+        public String getColumnName(int column) {
+            switch(column) {
+            case COL_MODEL:
+                return "Model";
+            case COL_CHASSIS:
+                return "Chassis";
+            case COL_WEIGHT:
+                return "Weight";
+            case COL_BV:
+                return "BV";
+            case COL_YEAR:
+                return "Year";
+            case COL_COST:
+                return "Price";
+            default:
+                return "?";
+            }
+        }
 
-	        @Override
-	        public Class<? extends Object> getColumnClass(int c) {
-	            return getValueAt(0, c).getClass();
-	        }
+        @Override
+        public Class<? extends Object> getColumnClass(int c) {
+            return getValueAt(0, c).getClass();
+        }
 
-	        @Override
-	        public boolean isCellEditable(int row, int col) {
-	            return false;
-	        }
+        @Override
+        public boolean isCellEditable(int row, int col) {
+            return false;
+        }
 
-	        public MechSummary getMechSummary(int i) {
-	            return data[i];
-	        }
+        public MechSummary getMechSummary(int i) {
+            return data[i];
+        }
 
-	        //fill table with values
-	        public void setData(MechSummary[] ms) {
-	            data = ms;
-	            fireTableDataChanged();
-	        }
+        //fill table with values
+        public void setData(MechSummary[] ms) {
+            data = ms;
+            fireTableDataChanged();
+        }
 
-	        public Object getValueAt(int row, int col) {
-	            MechSummary ms = data[row];
-	            if(col == COL_MODEL) {
-	                return ms.getModel();
-	            }
-	            if(col == COL_CHASSIS) {
-	                return ms.getChassis();
-	            }
-	            if(col == COL_WEIGHT) {
-	                return ms.getTons();
-	            }
-	            if(col == COL_BV) {
-	                return ms.getBV();
-	            }
-	            if(col == COL_YEAR) {
-	                return ms.getYear();
-	            }
-	            if(col == COL_COST) {
-	                return formatter.format(getPurchasePrice(ms));
-	            }
-	            return "?";
-	        }
+        public Object getValueAt(int row, int col) {
+            MechSummary ms = data[row];
+            if(col == COL_MODEL) {
+                return ms.getModel();
+            }
+            if(col == COL_CHASSIS) {
+                return ms.getChassis();
+            }
+            if(col == COL_WEIGHT) {
+                return ms.getTons();
+            }
+            if(col == COL_BV) {
+                return ms.getBV();
+            }
+            if(col == COL_YEAR) {
+                return ms.getYear();
+            }
+            if(col == COL_COST) {
+                return formatter.format(getPurchasePrice(ms));
+            }
+            return "?";
+        }
 
-	        private long getPurchasePrice(MechSummary ms) {
-	        	long cost = ms.getCost();
-	        	if(ms.getUnitType().equals(UnitType.getTypeName(UnitType.INFANTRY))
-	        	        || ms.getUnitType().equals(UnitType.getTypeName(UnitType.BATTLE_ARMOR))) {
-	        		cost = ms.getAlternateCost();
-	        	}
-	        	if(TechConstants.isClan(ms.getType())) {
-	        		cost *= campaign.getCampaignOptions().getClanPriceModifier();
-	        	}
-	        	return cost;
-	        }
+        private long getPurchasePrice(MechSummary ms) {
+            long cost = ms.getCost();
+            if(ms.getUnitType().equals(UnitType.getTypeName(UnitType.INFANTRY))
+                    || ms.getUnitType().equals(UnitType.getTypeName(UnitType.BATTLE_ARMOR))) {
+                cost = ms.getAlternateCost();
+            }
+            if(TechConstants.isClan(ms.getType())) {
+                cost *= campaign.getCampaignOptions().getClanPriceModifier();
+            }
+            return cost;
+        }
 
-	        public MechTableModel.Renderer getRenderer() {
-				return new MechTableModel.Renderer();
-			}
+        public MechTableModel.Renderer getRenderer() {
+            return new MechTableModel.Renderer();
+        }
 
-			public class Renderer extends DefaultTableCellRenderer {
+        public class Renderer extends DefaultTableCellRenderer {
 
-				private static final long serialVersionUID = 9054581142945717303L;
+            private static final long serialVersionUID = 9054581142945717303L;
 
-				public Component getTableCellRendererComponent(JTable table,
-						Object value, boolean isSelected, boolean hasFocus,
-						int row, int column) {
-					super.getTableCellRendererComponent(table, value, isSelected,
-							hasFocus, row, column);
-					setOpaque(true);
-					int actualCol = table.convertColumnIndexToModel(column);
-					setHorizontalAlignment(getAlignment(actualCol));
+            public Component getTableCellRendererComponent(JTable table,
+                    Object value, boolean isSelected, boolean hasFocus,
+                    int row, int column) {
+                super.getTableCellRendererComponent(table, value, isSelected,
+                        hasFocus, row, column);
+                setOpaque(true);
+                int actualCol = table.convertColumnIndexToModel(column);
+                setHorizontalAlignment(getAlignment(actualCol));
 
-					return this;
-				}
+                return this;
+            }
 
-			}
+        }
 
-	}
+    }
 
-	/**
-	 * A comparator for numbers that have been formatted with DecimalFormat
-	 * @author Jay Lawson
-	 *
-	 */
-	public class FormattedNumberSorter implements Comparator<String> {
+    /**
+     * A comparator for numbers that have been formatted with DecimalFormat
+     * @author Jay Lawson
+     *
+     */
+    public class FormattedNumberSorter implements Comparator<String> {
 
-		@Override
-		public int compare(String s0, String s1) {
-			//lets find the weight class integer for each name
-			DecimalFormat format = new DecimalFormat();
-			long l0 = 0;
-			try {
-				l0 = format.parse(s0.replace(",", "")).longValue();
-			} catch (java.text.ParseException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			long l1 = 0;
-			try {
-				l1 = format.parse(s1.replace(",", "")).longValue();
-			} catch (java.text.ParseException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			return ((Comparable<Long>)l0).compareTo(l1);
-		}
-	}
+        @Override
+        public int compare(String s0, String s1) {
+            //lets find the weight class integer for each name
+            DecimalFormat format = new DecimalFormat();
+            long l0 = 0;
+            try {
+                l0 = format.parse(s0.replace(",", "")).longValue();
+            } catch (java.text.ParseException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            long l1 = 0;
+            try {
+                l1 = format.parse(s1.replace(",", "")).longValue();
+            } catch (java.text.ParseException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            return ((Comparable<Long>)l0).compareTo(l1);
+        }
+    }
 
-	@Override
+    @Override
     public void setVisible(boolean visible) {
         asd.clearValues();
         searchFilter=null;

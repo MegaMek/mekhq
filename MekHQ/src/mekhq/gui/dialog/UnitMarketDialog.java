@@ -64,6 +64,7 @@ import megamek.common.MechFileParser;
 import megamek.common.MechSummary;
 import megamek.common.UnitType;
 import megamek.common.loaders.EntityLoadingException;
+import megamek.common.logging.LogLevel;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -408,6 +409,8 @@ public class UnitMarketDialog extends JDialog {
    	}
 
     private void offerChanged(ListSelectionEvent evt) {
+        final String METHOD_NAME = "offerChanged(ListSelectionEvent)"; //$NON-NLS-1$
+
         int view = tableUnits.getSelectedRow();
         if(view < 0) {
             //selection got filtered away
@@ -421,8 +424,10 @@ public class UnitMarketDialog extends JDialog {
 		} catch (EntityLoadingException e) {
             selectedEntity = null;
             btnPurchase.setEnabled(false);
-            MekHQ.logError("Unable to load mech: " + ms.getSourceFile() + ": " + ms.getEntryName() + ": " + e.getMessage());
-            MekHQ.logError(e);
+            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
+                    "Unable to load mech: " + ms.getSourceFile() + ": " //$NON-NLS-1$
+                    + ms.getEntryName() + ": " + e.getMessage()); //$NON-NLS-1$
+            MekHQ.getLogger().log(getClass(), METHOD_NAME, e);
             refreshOfferView();
             return;
 		}

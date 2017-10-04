@@ -23,19 +23,18 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.common.Aero;
 import megamek.common.Compute;
 import megamek.common.Entity;
-import megamek.common.EquipmentType;
 import megamek.common.Jumpship;
 import megamek.common.SmallCraft;
-import megamek.common.TechConstants;
+import megamek.common.TechAdvancement;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.SkillType;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  *
@@ -194,26 +193,6 @@ public class Thrusters extends Part {
 	}
 
 	@Override
-	public int getTechRating() {
-		return EquipmentType.RATING_C;
-	}
-
-	@Override
-	public int getAvailability(int era) {
-		return EquipmentType.RATING_C;
-	}
-	
-	@Override
-	public int getTechLevel() {
-		return TechConstants.T_ALLOWED_ALL;
-	}
-	
-	@Override 
-	public int getTechBase() {
-		return T_BOTH;	
-	}
-
-	@Override
 	public boolean isSamePartType(Part part) {
 		boolean match = false;
 		if (part instanceof Thrusters) {
@@ -273,21 +252,8 @@ public class Thrusters extends Part {
 	}
 	
 	@Override
-	public int getIntroDate() {
-		return EquipmentType.DATE_NONE;
+	public TechAdvancement getTechAdvancement() {
+		return TA_GENERIC;
 	}
-
-	@Override
-	public int getExtinctDate() {
-		return EquipmentType.DATE_NONE;
-	}
-
-	@Override
-	public int getReIntroDate() {
-		return EquipmentType.DATE_NONE;
-	}
-	
-	
-	
 	
 }

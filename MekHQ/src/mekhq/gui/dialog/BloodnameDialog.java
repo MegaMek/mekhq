@@ -18,7 +18,6 @@ import javax.swing.JLabel;
 import javax.swing.JTextArea;
 
 import mekhq.campaign.personnel.Bloodname;
-import mekhq.campaign.universe.Era;
 import mekhq.campaign.universe.Faction;
 
 /**
@@ -171,7 +170,7 @@ public class BloodnameDialog extends JDialog {
 								cbPhenotype.getSelectedIndex(),
 								(Integer)cbEra.getSelectedItem());
 				lblName.setText(n.getName() + " (" + n.getFounder() + ")");
-				lblOrigClan.setText(Faction.getFaction(n.getOrigClan()).getFullName(Era.getEra((Integer)cbEra.getSelectedItem())));
+				lblOrigClan.setText(Faction.getFaction(n.getOrigClan()).getFullName((Integer)cbEra.getSelectedItem()));
 				lblPhenotype.setText(Bloodname.phenotypeNames[n.getPhenotype()]);
 			}
 		});
