@@ -5866,19 +5866,14 @@ public class Campaign implements Serializable, ITechManager {
      * It can be used to calculate total travel costs in the style of FM:Mercs (excludeOwnTransports
      * and campaignOpsCosts set to false), to calculate leased/rented travel costs only in the style
      * of FM:Mercs (excludeOwnTransports true, campaignOpsCosts false), or to calculate travel costs
-     * for CampaignOps-style costs (excludeOwnTransports true, campaignOpsCosts true, jumps and months
-     * set as appropriate). When calculating CampaignOps costs, which have monthly DropShip charges, it
-     * requires the jumps and months parameters to be valid. It uses these to spread the monthly cost
-     * correctly per jump.
+     * for CampaignOps-style costs (excludeOwnTransports true, campaignOpsCosts true).
      *
-     * @param excludeOwnTransports If true, do not display maintenance costs in the calculated travel cost.
+     *  @param excludeOwnTransports If true, do not display maintenance costs in the calculated travel cost.
      * @param campaignOpsCosts If true, use the Campaign Ops method for calculating travel cost. (DropShip monthly fees
-     *                         of 0.5% of travel costs, 100,000 C-bills per collar.)
-     * @param jumps The number of jumps on this route. Only used for Campaign Ops costs.
-     * @param months The number of months this route will take. Only used for Campaign Ops costs.
+     *                         of 0.5% of purchase cost, 100,000 C-bills per collar.)
      */
     @SuppressWarnings("unused") // FIXME: Waiting for Dylan to finish re-writing
-	public long calculateCostPerJump(boolean excludeOwnTransports, boolean campaignOpsCosts, int jumps, int months) {
+	public long calculateCostPerJump(boolean excludeOwnTransports, boolean campaignOpsCosts) {
         int collarCost = (campaignOpsCosts ? 100000 : 50000);
 
         // first we need to get the total number of units by type
@@ -5935,48 +5930,46 @@ public class Campaign implements Serializable, ITechManager {
         // size exist for all of the prototypical variants chosen.
 
         // DropShip costs are for the duration of the trip for FM:Mercs rules,
-        // and per month for Campaign Ops. It's assumed that, if the player
-        // has no DropShips and a mission requires a combat drop, the DropShip
-        // is provided by the employer gratis.
-
-        // n.b. the pre-existing code seems to follow the common house rule that
-        // the FM:Mercs costs are per jump, which brings them a little closer
-        // to the CO rules. I've left that as-is for now.
+        // and per month for Campaign Ops. The prior implementation here assumed
+        // the FM:Mercs costs were per jump, which seems reasonable. To avoid having
+        // to add a bunch of code to remember the total length of the current
+        // jump path, CamOps costs are normalized to per-jump, using 175 hours charge
+        // time as a baseline.
 
         // Roughly an Overlord
         int largeDropshipMechCapacity = 36;
         int largeMechDropshipASFCapacity = 6;
         int largeMechDropshipCargoCapacity = 120;
-        long largeMechDropshipCost = (campaignOpsCosts ? 1750000 : 400000);
+        long largeMechDropshipCost = (campaignOpsCosts ? (long)(1750000 / 4.2) : 400000);
 
         // Roughly a Union
         int averageDropshipMechCapacity = 12;
         int mechDropshipASFCapacity = 2;
         int mechDropshipCargoCapacity = 75;
-        long mechDropshipCost = (campaignOpsCosts ? 1450000 : 150000);
+        long mechDropshipCost = (campaignOpsCosts ? (long)(1450000 / 4.2) : 150000);
 
         // Roughly a Leopard CV
         int averageDropshipASFCapacity = 6;
         int asfDropshipCargoCapacity = 90;
-        long asfDropshipCost = (campaignOpsCosts ? 900000 : 80000);
+        long asfDropshipCost = (campaignOpsCosts ? (long)(900000 / 4.2) : 80000);
 
         // Roughly a Triumph
         int largeDropshipVehicleCapacity = 50;
         int largeVehicleDropshipCargoCapacity = 750;
-        long largeVehicleDropshipCost = (campaignOpsCosts ? 1750000 : 430000);
+        long largeVehicleDropshipCost = (campaignOpsCosts ? (long)(1750000 / 4.2) : 430000);
 
         // Roughly a Gazelle
         int averageDropshipVehicleCapacity = 15;
         int vehicleDropshipCargoCapacity = 65;
-        long vehicleDropshipCost = (campaignOpsCosts ? 900000 : 40000);
+        long vehicleDropshipCost = (campaignOpsCosts ? (long)(900000 / 4.2): 40000);
 
         // Roughly a Mule
         int largeDropshipCargoCapacity = 8000;
-        long largeCargoDropshipCost = (campaignOpsCosts ? 750000 : 800000);
+        long largeCargoDropshipCost = (campaignOpsCosts ? (long)(750000 / 4.2) : 800000);
 
         // Roughly a Buccaneer
         int averageDropshipCargoCapacity = 2300;
-        long cargoDropshipCost = (campaignOpsCosts ? 550000 : 250000);
+        long cargoDropshipCost = (campaignOpsCosts ? (long)(550000 / 4.2) : 250000);
 
         int mechCollars = 0;
         double leasedLargeMechDropships = 0;
@@ -6136,12 +6129,6 @@ public class Campaign implements Serializable, ITechManager {
         dropshipCost += (long) (leasedAverageCargoDropships * cargoDropshipCost);
         dropshipCost += (long) (leasedLargeCargoDropships * largeCargoDropshipCost);
 
-        // In Campaign Ops, DropShip costs are per month, so we need to find the
-        // total cost for the transit and divide it among the number of jumps.
-        if(campaignOpsCosts) {
-            dropshipCost = dropshipCost * months / jumps;
-        }
-
         // Smaller/half-dropships are cheaper to rent, but still take one collar each
         int collarsNeeded = mechCollars + asfCollars + vehicleCollars + cargoCollars;
 
@@ -6153,7 +6140,7 @@ public class Campaign implements Serializable, ITechManager {
 
         long totalCost = dropshipCost + collarsNeeded * collarCost;
 
-        // FM:Mercs reimburses for transport
+        // FM:Mercs reimburses for owned transport (CamOps handles it in peacetime costs)
         if(!excludeOwnTransports) {
             long ownDropshipCost = 0;
             long ownJumpshipCost = 0;
@@ -6170,10 +6157,6 @@ public class Campaign implements Serializable, ITechManager {
                         ownJumpshipCost += e.getDockingCollars().size() * collarCost;
                     }
                 }
-            }
-
-            if(campaignOpsCosts) {
-                ownDropshipCost = ownDropshipCost * months / jumps;
             }
 
             totalCost = totalCost + ownDropshipCost + ownJumpshipCost;
