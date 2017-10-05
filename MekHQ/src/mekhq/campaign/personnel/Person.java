@@ -167,8 +167,28 @@ public class Person implements Serializable, MekHqXmlSerializable {
     
     public static final String LOGTYPE_MEDICAL = "med";
     
+    //noncombat Edge Advantages
+    private static final Map<String, Integer> NONCOMBAT_EDGE_ADVANTAGES;
+    
+    private static final String OPT_EDGE_MEDICAL = "edge_when_heal_crit_fail";
+    private static final String OPT_EDGE_REPAIR_FAIL = "edge_when_repair_crit_fail";
+    private static final String OPT_EDGE_REPAIR_BREAK_PART = "edge_when_repair_break_part";
+    private static final String OPT_EDGE_ADMIN_ACQUIRE_FAIL = "edge_when_admin_acquire_fail";
+    private static final String OPT_EDGE_RETENTION_FAILURE = "edge_when_retention_fail";
+    
+    static {
+    NONCOMBAT_EDGE_ADVANTAGES = new HashMap<>();
+    //NONCOMBAT_EDGE_ADVANTAGES.put(OPT_EDGE_MEDICAL, 100);
+    //NONCOMBAT_EDGE_ADVANTAGES.put(OPT_EDGE_REPAIR_FAIL, 200); 
+    //NONCOMBAT_EDGE_ADVANTAGES.put(OPT_EDGE_REPAIR_BREAK_PART, 201); 
+    //NONCOMBAT_EDGE_ADVANTAGES.put(OPT_EDGE_ADMIN_ACQUIRE_FAIL, 300); 
+    //NONCOMBAT_EDGE_ADVANTAGES.put(OPT_EDGE_RETENTION_FAILURE, 301); 
+
+    }
+    
     private static final Map<Integer, Integer> MECHWARRIOR_AERO_RANSOM_VALUES; 
     private static final Map<Integer, Integer> OTHER_RANSOM_VALUES;
+    
 
     private static final IntSupplier PREGNANCY_DURATION = () -> {
         double gaussian = Math.sqrt(-2 * Math.log(Math.nextUp(Math.random())))
@@ -223,6 +243,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     private Hashtable<String, Skill> skills;
     private PilotOptions options = new PilotOptions();
+    private boolean hqEdgeTriggerEnabled;
     private int toughness;
 
     private int status;
@@ -2461,7 +2482,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     public void addSkill(String skillName, int lvl, int bonus) {
         skills.put(skillName, new Skill(skillName, lvl, bonus));
     }
-
+    
     public void addSkill(String skillName, int xpLvl, boolean random, int bonus) {
         skills.put(skillName, new Skill(skillName, xpLvl, random, bonus));
     }
@@ -2477,7 +2498,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
      */
     public void removeAllSkills() {
         skills.clear();
-    }
+    }   
     
     /**
      * Limit skills to the maximum of the given level
@@ -2547,9 +2568,39 @@ public class Person implements Serializable, MekHqXmlSerializable {
         heal();
         return " <font color='green'><b>Successfully healed one hit.</b></font>";
     }
+    
+    public boolean hasHqTrigger(String edgeTrigger) {
+        return null != NONCOMBAT_EDGE_ADVANTAGES.get(edgeTrigger);
+    }
+    
+    @Nullable
+    public void getHqTrigger(String edgeTrigger) {
+        return NONCOMBAT_EDGE_ADVANTAGES.get(edgeTrigger);
+    }
+    
+    public void addHqTrigger(String edgeTrigger, boolean enabled) {
+        NONCOMBAT_EDGE_ADVANTAGES.put(edgeTrigger, 1);
+    }
+    
+    public void removeHqTrigger(String edgeTrigger) {
+        if (hasHqTrigger(edgeTrigger)) {
+            NONCOMBAT_EDGE_ADVANTAGES.remove(edgeTrigger);
+        }
+    } 
+    
+    /**
+     * Remove all hq-local edge triggers
+     */
+    public void removeAllHqTriggers() {
+        NONCOMBAT_EDGE_ADVANTAGES.clear();
+    }
 
     public PilotOptions getOptions() {
         return options;
+    }
+    
+    public String getHqOptions() {
+        return hqoptions;
     }
 
     /**
@@ -2692,10 +2743,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
      * This will set a specific HQ-local edge trigger, regardless of the current status
      */
     public void setHqEdgeTrigger(String name, boolean status) {
-        for (Enumeration<IOption> i = getOptions(PilotOptions.EDGE_ADVANTAGES); i.hasMoreElements(); ) {
-            IOption ability = i.nextElement();
-            if (ability.getName().equals(name)) {
-                ability.setValue(status);
+        for (Enumeration<NONCOMBAT_EDGE_ADVANTAGES> i = NONCOMBAT_EDGE_ADVANTAGES); i.hasMoreElements(); ) {
+            IOption trigger = i.nextElement();
+            if (trigger.getName().equals(name)) {
+                trigger.setValue(status);
             }
         }
         MekHQ.triggerEvent(new PersonChangedEvent(this));
