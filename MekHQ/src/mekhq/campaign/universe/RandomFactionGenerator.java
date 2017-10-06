@@ -734,10 +734,9 @@ public class RandomFactionGenerator implements Serializable {
 					for (Faction f : planetKey.getFactionSet(Utilities.getDateTimeDay(date))) {
 						if (f.getShortName().equals(defender) ||
 								defender.equals("PIR") ||
-								(f.getShortName().equals(attacker) && defender.equals("REB"))) {
-							if(filterByDistance && currentPlanet.getDistanceTo(planetKey) <= searchRadius) {
-								planetList.add(planetKey);
-							}
+								(f.getShortName().equals(attacker) && defender.equals("REB")) &&
+								(filterByDistance && currentPlanet.getDistanceTo(planetKey) <= searchRadius)) {
+							planetList.add(planetKey);
 						}
 					}
 				}

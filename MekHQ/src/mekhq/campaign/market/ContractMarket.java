@@ -369,7 +369,6 @@ public class ContractMarket implements Serializable {
 		}
 
 		int searchRadius = campaign.getCampaignOptions().getSearchRadius();
-		searchRadius += (int)(searchRadius * 0.10 * retries);
 
 		boolean isAttacker = (contract.getMissionType() == AtBContract.MT_PLANETARYASSAULT ||
 				contract.getMissionType() >= AtBContract.MT_PLANETARYASSAULT ||
