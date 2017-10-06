@@ -29,7 +29,6 @@ import megamek.common.options.PilotOptions;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.Utilities;
-import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.Kill;
 import mekhq.campaign.LogEntry;
 import mekhq.campaign.event.PersonChangedEvent;
@@ -37,6 +36,7 @@ import mekhq.campaign.event.PersonLogEvent;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.Rank;
 import mekhq.campaign.personnel.Ranks;
 import mekhq.campaign.personnel.SkillType;
@@ -100,7 +100,6 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
     private static final String CMD_SACK = "SACK"; //$NON-NLS-1$
     private static final String CMD_REMOVE = "REMOVE"; //$NON-NLS-1$
     private static final String CMD_EDGE_TRIGGER = "EDGE"; //$NON-NLS-1$
-    private static final String CMD_HQ_EDGE_TRIGGER = "REMFEDGE"; //$NON-NLS-1$
     private static final String CMD_CHANGE_PRISONER_STATUS = "PRISONER_STATUS"; //$NON-NLS-1$
     private static final String CMD_CHANGE_STATUS = "STATUS"; //$NON-NLS-1$
     private static final String CMD_ACQUIRE_SPECIALIST = "SPECIALIST"; //$NON-NLS-1$
@@ -152,11 +151,6 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
     private static final String OPT_EDGE_KO = "edge_when_ko"; //$NON-NLS-1$
     private static final String OPT_EDGE_TAC = "edge_when_tac"; //$NON-NLS-1$
     private static final String OPT_EDGE_HEADHIT = "edge_when_headhit"; //$NON-NLS-1$
-    private static final String OPT_EDGE_MEDICAL = "edge_when_heal_crit_fail"; //$NON-NLS-1$
-    private static final String OPT_EDGE_REPAIR_FAIL = "edge_when_repair_crit_fail"; //$NON-NLS-1$
-    private static final String OPT_EDGE_REPAIR_BREAK_PART = "edge_when_repair_break_part"; //$NON-NLS-1$
-    private static final String OPT_EDGE_ADMIN_ACQUIRE_FAIL = "edge_when_admin_aquire_fail"; //$NON-NLS-1$
-    private static final String OPT_EDGE_RETENTION_FAILURE = "edge_when_retention_fail"; //$NON-NLS-1$
     
     private static final String OPT_PRISONER_FREE = "free"; //$NON-NLS-1$
     private static final String OPT_PRISONER_IMPRISONED = "imprisoned"; //$NON-NLS-1$
@@ -727,21 +721,6 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 }
                 break;
             }
-            case CMD_HQ_EDGE_TRIGGER:
-            { // Edge triggers pull info over from MM. This is for support personnel.
-                String trigger = data[1];
-                if (people.length > 1) {
-                    boolean status = Boolean.parseBoolean(data[2]);
-                    for (Person person : people) {
-                        person.setHqEdgeTrigger(trigger, status);
-                        gui.getCampaign().personUpdated(person);
-                    }
-                } else {
-                    selectedPerson.changeHqEdgeTrigger(trigger);
-                    gui.getCampaign().personUpdated(selectedPerson);
-                }
-                break;
-            } 
             case CMD_REMOVE:
             {
                 String title = String.format(resourceMap.getString("numPersonnel.text"), people.length); //$NON-NLS-1$
@@ -1930,8 +1909,8 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                         cbMenuItem = new JCheckBoxMenuItem(
                                 resourceMap.getString("edgeTriggerHealCheck.text")); //$NON-NLS-1$
                         cbMenuItem.setSelected(person.getOptions()
-                                .booleanOption(OPT_EDGE_MEDICAL));
-                        cbMenuItem.setActionCommand(makeCommand(CMD_HQ_EDGE_TRIGGER, OPT_EDGE_MEDICAL));
+                                .booleanOption(PersonnelOptions.EDGE_MEDICAL));
+                        cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, PersonnelOptions.EDGE_MEDICAL));
                         cbMenuItem.addActionListener(this);
                         menu.add(cbMenuItem);
                         popup.add(menu);
@@ -1975,23 +1954,23 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     menuItem.addActionListener(this);
                     submenu.add(menuItem);
                     menuItem = new JMenuItem(resourceMap.getString("edgeTriggerHealCheck.text")); //$NON-NLS-1$
-                    menuItem.setActionCommand(makeCommand(CMD_HQ_EDGE_TRIGGER, OPT_EDGE_MEDICAL, TRUE));
+                    menuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, PersonnelOptions.EDGE_MEDICAL, TRUE));
                     menuItem.addActionListener(this);
                     submenu.add(menuItem);
                     menuItem = new JMenuItem(resourceMap.getString("edgeTriggerRepairCheck.text")); //$NON-NLS-1$
-                    menuItem.setActionCommand(makeCommand(CMD_HQ_EDGE_TRIGGER, OPT_EDGE_REPAIR_FAIL, TRUE));
+                    menuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, PersonnelOptions.EDGE_REPAIR_FAIL, TRUE));
                     menuItem.addActionListener(this);
                     submenu.add(menuItem);
                     menuItem = new JMenuItem(resourceMap.getString("edgeTriggerBreakPart.text")); //$NON-NLS-1$
-                    menuItem.setActionCommand(makeCommand(CMD_HQ_EDGE_TRIGGER, OPT_EDGE_REPAIR_BREAK_PART, TRUE));
+                    menuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, PersonnelOptions.EDGE_REPAIR_BREAK_PART, TRUE));
                     menuItem.addActionListener(this);
                     submenu.add(menuItem);
                     menuItem = new JMenuItem(resourceMap.getString("edgeTriggerAcquireCheck.text")); //$NON-NLS-1$
-                    menuItem.setActionCommand(makeCommand(CMD_HQ_EDGE_TRIGGER, OPT_EDGE_ADMIN_ACQUIRE_FAIL, TRUE));
+                    menuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, PersonnelOptions.EDGE_ADMIN_ACQUIRE_FAIL, TRUE));
                     menuItem.addActionListener(this);
                     submenu.add(menuItem);
                     menuItem = new JMenuItem(resourceMap.getString("edgeTriggerRetentionCheck.text")); //$NON-NLS-1$
-                    menuItem.setActionCommand(makeCommand(CMD_HQ_EDGE_TRIGGER, OPT_EDGE_RETENTION_FAILURE, TRUE));
+                    menuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, PersonnelOptions.EDGE_RETENTION_FAILURE, TRUE));
                     menuItem.addActionListener(this);
                     submenu.add(menuItem);
                     menu.add(submenu);
@@ -2018,23 +1997,23 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     submenu.add(menuItem);
                     menu.add(submenu);
                     menuItem = new JMenuItem(resourceMap.getString("edgeTriggerHealCheck.text")); //$NON-NLS-1$
-                    menuItem.setActionCommand(makeCommand(CMD_HQ_EDGE_TRIGGER, OPT_EDGE_MEDICAL, FALSE));
+                    menuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, PersonnelOptions.EDGE_MEDICAL, FALSE));
                     menuItem.addActionListener(this);
                     submenu.add(menuItem);
                     menuItem = new JMenuItem(resourceMap.getString("edgeTriggerRepairCheck.text")); //$NON-NLS-1$
-                    menuItem.setActionCommand(makeCommand(CMD_HQ_EDGE_TRIGGER, OPT_EDGE_REPAIR_FAIL, FALSE));
+                    menuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, PersonnelOptions.EDGE_REPAIR_FAIL, FALSE));
                     menuItem.addActionListener(this);
                     submenu.add(menuItem);
                     menuItem = new JMenuItem(resourceMap.getString("edgeTriggerBreakPart.text")); //$NON-NLS-1$
-                    menuItem.setActionCommand(makeCommand(CMD_HQ_EDGE_TRIGGER, OPT_EDGE_REPAIR_BREAK_PART, FALSE));
+                    menuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, PersonnelOptions.EDGE_REPAIR_BREAK_PART, FALSE));
                     menuItem.addActionListener(this);
                     submenu.add(menuItem);
                     menuItem = new JMenuItem(resourceMap.getString("edgeTriggerAcquireCheck.text")); //$NON-NLS-1$
-                    menuItem.setActionCommand(makeCommand(CMD_HQ_EDGE_TRIGGER, OPT_EDGE_ADMIN_ACQUIRE_FAIL, FALSE));
+                    menuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, PersonnelOptions.EDGE_ADMIN_ACQUIRE_FAIL, FALSE));
                     menuItem.addActionListener(this);
                     submenu.add(menuItem);
                     menuItem = new JMenuItem(resourceMap.getString("edgeTriggerRetentionCheck.text")); //$NON-NLS-1$
-                    menuItem.setActionCommand(makeCommand(CMD_HQ_EDGE_TRIGGER, OPT_EDGE_RETENTION_FAILURE, FALSE));
+                    menuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, PersonnelOptions.EDGE_RETENTION_FAILURE, FALSE));
                     menuItem.addActionListener(this);
                     submenu.add(menuItem);
                     popup.add(menu);
