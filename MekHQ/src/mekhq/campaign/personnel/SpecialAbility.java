@@ -403,7 +403,7 @@ public class SpecialAbility implements MekHqXmlSerializable {
         // Stupid weird parsing of XML.  At least this cleans it up.
         spaEle.normalize();
 
-        PilotOptions options = new PilotOptions();
+        PersonnelOptions options = new PersonnelOptions();
 
         // Okay, lets iterate through the children, eh?
         for (int x = 0; x < nl.getLength(); x++) {

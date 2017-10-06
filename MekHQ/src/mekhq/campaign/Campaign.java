@@ -185,6 +185,7 @@ import mekhq.campaign.parts.equipment.MissingMASC;
 import mekhq.campaign.personnel.Ancestors;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.Rank;
 import mekhq.campaign.personnel.RankTranslator;
 import mekhq.campaign.personnel.Ranks;
@@ -1676,8 +1677,8 @@ public class Campaign implements Serializable, ITechManager {
                  + " and rolls " + roll + ":";
         int xpGained = 0;
         //If we get a natural 2 that isn't an automatic success, reroll if Edge is available and in use.
-        if (getCampaignOptions().useEdge() && (doctor.getHqOptions()
-                .booleanOption(OPT_EDGE_MEDICAL))) {
+        if (getCampaignOptions().useEdge()
+                && (doctor.getOptions().booleanOption(PersonnelOptions.EDGE_MEDICAL))) {
             if (roll == 2  && doctor.getEdge() > 0 && target.getValue() != TargetRoll.AUTOMATIC_SUCCESS) {
                 doctor.setEdge(doctor.getEdge() - 1);
                 roll = Compute.d6(2);
