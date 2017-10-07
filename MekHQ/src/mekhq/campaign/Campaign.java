@@ -6920,18 +6920,21 @@ public class Campaign implements Serializable, ITechManager {
             m.setCoolingFlawActive(false);
         } else if (entity instanceof Aero) {
             Aero a = (Aero) entity;
-            //This should return an int[] filled with 0's
-            int[] bombChoices = a.getBombChoices();
-            for (Mounted m : a.getBombs()) {
-                if (!(m.getType() instanceof BombType)) {
-                    continue;
+            List<Mounted> mountedBombs = a.getBombs();
+            if (mountedBombs.size() > 0) {
+                //This should return an int[] filled with 0's
+                int[] bombChoices = a.getBombChoices();
+                for (Mounted m : mountedBombs) {
+                    if (!(m.getType() instanceof BombType)) {
+                        continue;
+                    }
+                    if(m.getBaseShotsLeft() == 1) {
+                        bombChoices[BombType.getBombTypeFromInternalName(m.getType().getInternalName())] += 1;
+                    }
                 }
-                if(m.getBaseShotsLeft() == 1) {
-                    bombChoices[BombType.getBombTypeFromInternalName(m.getType().getInternalName())] += 1;
-                }
+                a.setBombChoices(bombChoices);
+                a.clearBombs();
             }
-            a.setBombChoices(bombChoices);
-            a.clearBombs();
             if(a.isSpheroid()) {
                 entity.setMovementMode(EntityMovementMode.SPHEROID);
             } else {
