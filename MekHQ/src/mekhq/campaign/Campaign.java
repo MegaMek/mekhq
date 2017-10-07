@@ -6920,13 +6920,14 @@ public class Campaign implements Serializable, ITechManager {
             m.setCoolingFlawActive(false);
         } else if (entity instanceof Aero) {
             Aero a = (Aero) entity;
+            //This should return an int[] filled with 0's
             int[] bombChoices = a.getBombChoices();
             for (Mounted m : a.getBombs()) {
                 if (!(m.getType() instanceof BombType)) {
                     continue;
                 }
-                if(m.getBaseShotsLeft() == 0) {
-                    bombChoices[BombType.getBombTypeFromInternalName(m.getType().getInternalName())] -= 1;
+                if(m.getBaseShotsLeft() == 1) {
+                    bombChoices[BombType.getBombTypeFromInternalName(m.getType().getInternalName())] += 1;
                 }
             }
             a.setBombChoices(bombChoices);
