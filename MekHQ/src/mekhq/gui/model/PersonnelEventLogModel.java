@@ -158,7 +158,9 @@ public class PersonnelEventLogModel extends DataTableModel {
             lines = Math.max(lines, newLines);
 
             int height = fontHeight * lines + 4;
-            table.setRowHeight(row, height);
+            if(table.getRowHeight(row) < height) {
+                table.setRowHeight(row, height);
+            }
 
             setForeground(Color.BLACK);
             // tiger stripes

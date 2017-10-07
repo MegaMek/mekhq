@@ -155,7 +155,9 @@ public class PersonnelKillLogModel extends DataTableModel {
             }
 
             int height = fontHeight * lines + 4;
-            table.setRowHeight(row, height);
+            if(table.getRowHeight(row) < height) {
+                table.setRowHeight(row, height);
+            }
 
             setForeground(Color.BLACK);
             // tiger stripes
