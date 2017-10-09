@@ -421,7 +421,6 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
 			JumpPath jumpPath = c.calculateJumpPath(c.getCurrentPlanet(), getPlanet());
 
 			boolean campaignOps = c.getCampaignOptions().useEquipmentContractBase();
-			transportAmount = (long)((transportComp/100.0) * 2 * c.calculateCostPerJump(campaignOps, campaignOps) * jumpPath.getJumps());
 			profit -= 2 * c.calculateCostPerJump(campaignOps, campaignOps) * jumpPath.getJumps();
 		}
 		return profit;
