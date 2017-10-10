@@ -29,6 +29,7 @@ import megamek.common.options.PilotOptions;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.Utilities;
+import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.Kill;
 import mekhq.campaign.LogEntry;
 import mekhq.campaign.event.PersonChangedEvent;
@@ -1904,7 +1905,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                         menu.add(cbMenuItem);
                         popup.add(menu);
                     //Doctors    
-                    } else if (person.getPrimaryRole() == 20 && gui.getCampaign().getCampaignOptions().useRemfEdge()) {
+                    } else if (person.getPrimaryRole() == 20 && CampaignOptions.useRemfEdge()) {
                         menu = new JMenu(resourceMap.getString("setEdgeTriggers.text")); //$NON-NLS-1$
                         cbMenuItem = new JCheckBoxMenuItem(
                                 resourceMap.getString("edgeTriggerHealCheck.text")); //$NON-NLS-1$
@@ -1914,7 +1915,22 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                         cbMenuItem.addActionListener(this);
                         menu.add(cbMenuItem);
                         popup.add(menu);
-                    }
+                    //Techs
+                    } else if ((person.getPrimaryRole() == 15
+                                || person.getPrimaryRole() == 16
+                                || person.getPrimaryRole() == 17
+                                || person.getPrimaryRole() == 18)
+                                && CampaignOptions.useRemfEdge()) {
+                        menu = new JMenu(resourceMap.getString("setEdgeTriggers.text")); //$NON-NLS-1$
+                        cbMenuItem = new JCheckBoxMenuItem(
+                                resourceMap.getString("edgeTriggerBreakPart.text")); //$NON-NLS-1$
+                        cbMenuItem.setSelected(person.getOptions()
+                                .booleanOption(PersonnelOptions.EDGE_REPAIR_BREAK_PART));
+                        cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, PersonnelOptions.EDGE_REPAIR_BREAK_PART));
+                        cbMenuItem.addActionListener(this);
+                        menu.add(cbMenuItem);
+                        popup.add(menu);                        
+                    }                    
                     
                 }
                 menu = new JMenu(resourceMap.getString("specialFlags.text")); //$NON-NLS-1$
@@ -1957,8 +1973,8 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     menuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, PersonnelOptions.EDGE_MEDICAL, TRUE));
                     menuItem.addActionListener(this);
                     submenu.add(menuItem);
-                    menuItem = new JMenuItem(resourceMap.getString("edgeTriggerRepairCheck.text")); //$NON-NLS-1$
-                    menuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, PersonnelOptions.EDGE_REPAIR_FAIL, TRUE));
+                    menuItem = new JMenuItem(resourceMap.getString("edgeTriggerShipRepairCheck.text")); //$NON-NLS-1$
+                    menuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, PersonnelOptions.EDGE_SHIP_REPAIR_FAIL, TRUE));
                     menuItem.addActionListener(this);
                     submenu.add(menuItem);
                     menuItem = new JMenuItem(resourceMap.getString("edgeTriggerBreakPart.text")); //$NON-NLS-1$
@@ -2000,8 +2016,8 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     menuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, PersonnelOptions.EDGE_MEDICAL, FALSE));
                     menuItem.addActionListener(this);
                     submenu.add(menuItem);
-                    menuItem = new JMenuItem(resourceMap.getString("edgeTriggerRepairCheck.text")); //$NON-NLS-1$
-                    menuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, PersonnelOptions.EDGE_REPAIR_FAIL, FALSE));
+                    menuItem = new JMenuItem(resourceMap.getString("edgeTriggerShipRepairCheck.text")); //$NON-NLS-1$
+                    menuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, PersonnelOptions.EDGE_SHIP_REPAIR_FAIL, FALSE));
                     menuItem.addActionListener(this);
                     submenu.add(menuItem);
                     menuItem = new JMenuItem(resourceMap.getString("edgeTriggerBreakPart.text")); //$NON-NLS-1$

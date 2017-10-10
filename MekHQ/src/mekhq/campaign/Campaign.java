@@ -2102,7 +2102,10 @@ public class Campaign implements Serializable, ITechManager {
                     // not destroyed - set the effective level as low as
                     // possible
                     effectiveSkillLvl = SkillType.EXP_ULTRA_GREEN;
-                } else {
+                } /* else if (CampaignOptions.useRemfEdge()
+                        && (tech.getOptions().booleanOption(PersonnelOptions.EDGE_REPAIR_BREAK_PART))) {
+                    // If using edge, here's a chance to reroll. 
+                } */ else {
                     // destroyed - set the effective level to elite
                     effectiveSkillLvl = SkillType.EXP_ELITE;
                 }
