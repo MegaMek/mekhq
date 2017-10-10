@@ -67,6 +67,7 @@ import megamek.client.RandomUnitGenerator;
 import megamek.common.Aero;
 import megamek.common.BattleArmor;
 import megamek.common.BombType;
+import megamek.common.CommonConstants;
 import megamek.common.Compute;
 import megamek.common.ConvFighter;
 import megamek.common.Coords;
@@ -1682,8 +1683,8 @@ public class Campaign implements Serializable, ITechManager {
             if (roll == 2  && doctor.getEdge() > 0 && target.getValue() != TargetRoll.AUTOMATIC_SUCCESS) {
                 doctor.setEdge(doctor.getEdge() - 1);
                 roll = Compute.d6(2);
-                report += doctor.getHyperlinkedFullTitle() + " uses Edge to reroll. "
-                + " Rolls " + roll + ":";
+                report += medWork.fail(0) + "\n" + doctor.getHyperlinkedFullTitle() + " uses Edge to reroll:"
+                + " rolls " + roll + ":";
             }
         }
         if (roll >= target.getValue()) {
