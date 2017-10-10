@@ -323,6 +323,8 @@ public class CampaignOpsReputation extends AbstractUnitRating {
 
     private void updatePersonnelCounts() {
         setNonAdminPersonnelCount(0);
+        technicians = 0;
+
         List<Person> personnelList =
                 new ArrayList<>(getCampaign().getPersonnel());
         for (Person p : personnelList) {
@@ -908,7 +910,7 @@ public class CampaignOpsReputation extends AbstractUnitRating {
                                               getBaTechTeams()));
         out.append("\n").append(String.format(TEMPLATE_CAT, "Astechs:",
                                               technicians * 6,
-                                              getCampaign().getAstechPool()));
+                                              getCampaign().getNumberAstechs()));
         out.append("\n").append(String.format("    %-" + (CATEGORY_LENGTH + 4) +
                                               "s %4d needed / %4d available",
                                               "Admin Support:",

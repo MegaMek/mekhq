@@ -988,7 +988,7 @@ public class CampaignOpsReputationTest {
                 "        Mechanics:                    8 needed /    0 available\n" +
                 "            NOTE: Vehicles and Infantry use the same mechanics.\n" +
                 "        BA Techs:                     0 needed /    0 available\n" +
-                "        Astechs:                    168 needed /   84 available\n" +
+                "        Astechs:                     84 needed /   84 available\n" +
                 "    Admin Support:                   20 needed /   10 available\n" +
                 "    Large Craft Crew:\n" +
                 "        All fully crewed.\n" +
@@ -1043,7 +1043,7 @@ public class CampaignOpsReputationTest {
                 "        Mechanics:                    0 needed /    0 available\n" +
                 "            NOTE: Vehicles and Infantry use the same mechanics.\n" +
                 "        BA Techs:                     0 needed /    0 available\n" +
-                "        Astechs:                    168 needed /    0 available\n" +
+                "        Astechs:                      0 needed /    0 available\n" +
                 "    Admin Support:                    0 needed /    0 available\n" +
                 "    Large Craft Crew:\n" +
                 "        All fully crewed.\n" +
