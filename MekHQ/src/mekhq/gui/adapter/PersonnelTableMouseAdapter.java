@@ -1916,7 +1916,8 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                         menu.add(cbMenuItem);
                         popup.add(menu);
                     //Techs
-                    } else if ((person.getPrimaryRole() == 15
+                    } else if ((person.getPrimaryRole() == 12
+                                || person.getPrimaryRole() == 15
                                 || person.getPrimaryRole() == 16
                                 || person.getPrimaryRole() == 17
                                 || person.getPrimaryRole() == 18)
