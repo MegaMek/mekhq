@@ -523,12 +523,12 @@ public class RandomFactionGenerator implements Serializable {
 		final Date FORTRESS_REPUBLIC = new Date (new GregorianCalendar(3135,10,1).getTimeInMillis());
 
 		if (borders.get(fName) == null) {
-			borders.put(fName, new HashMap<String, HashSet<Planet>>());
-			borders.get(fName).put("REB", new HashSet<Planet>());
-			borders.get(fName).put("PIR", new HashSet<Planet>());
+			borders.put(fName, new HashMap<>());
 		}
+        borders.get(fName).putIfAbsent("REB", new HashSet<>());
+        borders.get(fName).putIfAbsent("PIR", new HashSet<>());
 		if (fName.equals(eName)) {
-			borders.get(fName).get("REB").add(p);
+		    borders.get(fName).get("REB").add(p);
 			if (hintApplies(wars, fName, fName, lastUpdate)) {
 				if (borders.get(fName).get(eName) == null) {
 					borders.get(fName).put(eName, new HashSet<Planet>());

@@ -42,7 +42,6 @@ import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.rating.FieldManualMercRevDragoonsRating;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.RandomFactionGenerator;

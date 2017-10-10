@@ -119,8 +119,6 @@ import mekhq.campaign.parts.Refit;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.SpecialAbility;
-import mekhq.campaign.rating.CampaignOpsReputation;
-import mekhq.campaign.rating.FieldManualMercRevDragoonsRating;
 import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.campaign.report.CargoReport;
 import mekhq.campaign.report.HangarReport;
