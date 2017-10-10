@@ -2080,6 +2080,24 @@ public class Campaign implements Serializable, ITechManager {
         report = report + ",  needs " + target.getValueAsString()
                  + " and rolls " + roll + ":";
         int xpGained = 0;
+        //if we fail and would break a part, here's a chance to use Edge for a reroll...
+        if (CampaignOptions.useRemfEdge() 
+                && tech.getOptions().booleanOption(PersonnelOptions.EDGE_REPAIR_BREAK_PART)
+                && tech.getEdge() > 0) {
+            if ((getCampaignOptions().isDestroyByMargin()
+                        && getCampaignOptions().getDestroyMargin() <= (target.getValue() - roll))
+                    || (tech.getExperienceLevel(false) == SkillType.EXP_ELITE //if an elite, primary tech
+                            || tech.getPrimaryRole() == 12) //For vessel crews
+                        && roll < target.getValue()) {
+                tech.setEdge(tech.getEdge() - 1);
+                if (tech.isRightTechTypeFor(partWork)) {
+                    roll = Compute.d6(2);
+                } else {
+                    roll = Utilities.roll3d6();
+                }
+                report += " <b>failed!</b> and would destroy the part, but uses Edge to reroll...getting a " + roll + ":";                
+            }
+        }
         if (roll >= target.getValue()) {
             report = report + partWork.succeed();
             if (roll == 12 && target.getValue() != TargetRoll.AUTOMATIC_SUCCESS) {
@@ -2097,15 +2115,11 @@ public class Campaign implements Serializable, ITechManager {
             int effectiveSkillLvl = tech.getSkillForWorkingOn(partWork)
                                         .getExperienceLevel() - modePenalty;
             if (getCampaignOptions().isDestroyByMargin()) {
-                if (getCampaignOptions().getDestroyMargin() > (target
-                                                                       .getValue() - roll)) {
+                if (getCampaignOptions().getDestroyMargin() > (target.getValue() - roll)) {
                     // not destroyed - set the effective level as low as
                     // possible
                     effectiveSkillLvl = SkillType.EXP_ULTRA_GREEN;
-                } /* else if (CampaignOptions.useRemfEdge()
-                        && (tech.getOptions().booleanOption(PersonnelOptions.EDGE_REPAIR_BREAK_PART))) {
-                    // If using edge, here's a chance to reroll. 
-                } */ else {
+                } else {
                     // destroyed - set the effective level to elite
                     effectiveSkillLvl = SkillType.EXP_ELITE;
                 }
