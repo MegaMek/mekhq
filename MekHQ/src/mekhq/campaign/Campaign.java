@@ -67,7 +67,6 @@ import megamek.client.RandomUnitGenerator;
 import megamek.common.Aero;
 import megamek.common.BattleArmor;
 import megamek.common.BombType;
-import megamek.common.CommonConstants;
 import megamek.common.Compute;
 import megamek.common.ConvFighter;
 import megamek.common.Coords;
@@ -1677,8 +1676,9 @@ public class Campaign implements Serializable, ITechManager {
         report = report + ",  needs " + target.getValueAsString()
                  + " and rolls " + roll + ":";
         int xpGained = 0;
+        getCampaignOptions();
         //If we get a natural 2 that isn't an automatic success, reroll if Edge is available and in use.
-        if (getCampaignOptions().useEdge()
+        if (CampaignOptions.useRemfEdge()
                 && (doctor.getOptions().booleanOption(PersonnelOptions.EDGE_MEDICAL))) {
             if (roll == 2  && doctor.getEdge() > 0 && target.getValue() != TargetRoll.AUTOMATIC_SUCCESS) {
                 doctor.setEdge(doctor.getEdge() - 1);

@@ -85,7 +85,7 @@ public class CampaignOptions implements Serializable {
     private boolean useArtillery;
     private boolean useAbilities;
     private boolean useEdge;
-    private boolean useRemfEdge;
+    private static boolean useRemfEdge;
     private boolean useImplants;
 	private boolean altQualityAveraging;
     private int healWaitingPeriod;
@@ -672,12 +672,12 @@ public class CampaignOptions implements Serializable {
         this.useEdge = b;
     }
     
-    public boolean useRemfEdge() {
+    public static boolean useRemfEdge() {
         return useRemfEdge;
     }
 
     public void setRemfEdge(boolean b) {
-        this.useRemfEdge = b;
+        CampaignOptions.useRemfEdge = b;
     }
 
     public boolean useImplants() {
@@ -2255,7 +2255,7 @@ public class CampaignOptions implements Serializable {
             } else if (wn2.getNodeName().equalsIgnoreCase("useEdge")) {
                 retVal.useEdge = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("useRemfEdge")) {
-                retVal.useRemfEdge = Boolean.parseBoolean(wn2.getTextContent());
+                CampaignOptions.useRemfEdge = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("useImplants")) {
                 retVal.useImplants = Boolean.parseBoolean(wn2.getTextContent());
 			} else if (wn2.getNodeName().equalsIgnoreCase("altQualityAveraging")) {

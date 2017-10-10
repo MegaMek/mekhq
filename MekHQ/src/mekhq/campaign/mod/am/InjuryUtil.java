@@ -34,12 +34,14 @@ import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.Mech;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.GameEffect;
 import mekhq.campaign.LogEntry;
 import mekhq.campaign.personnel.BodyLocation;
 import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.InjuryType;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
@@ -51,7 +53,7 @@ public final class InjuryUtil {
     // Fumble and critical success limits for doctor skills levels 0-10, on a d100
     private static final int FUMBLE_LIMITS[] = {50, 40, 30, 20, 12, 6, 5, 4, 3, 2, 1};
     private static final int CRIT_LIMITS[] = {98, 97, 94, 89, 84, 79, 74, 69, 64, 59, 49};
-    
+      
     /*
     private static AMEventHandler eventHandler = null;
     
@@ -281,7 +283,17 @@ public final class InjuryUtil {
                     xpGained += successXP;
                 }
                 final int critTimeReduction = i.getTime() - (int) Math.floor(i.getTime() * 0.9);
-                if(roll < fumbleLimit) {
+                //Reroll fumbled treatment check with Edge if applicable
+                if (roll < fumbleLimit && CampaignOptions.useRemfEdge()
+                        && (doc.getOptions().booleanOption(PersonnelOptions.EDGE_MEDICAL) && doc.getEdge() > 0)) {
+                    result.add(new GameEffect(
+                    String.format("%s made a mistake, but used Edge to reroll.",
+                            doc.getHyperlinkedFullTitle(), p.getHyperlinkedName(),
+                            p.getGenderPronoun(Person.PRONOUN_HISHER), i.getName())));
+                    doc.setEdge(doc.getEdge() - 1);
+                    roll = Compute.randomInt(100);
+                }
+                if(roll < fumbleLimit) {                    
                     result.add(new GameEffect(
                         String.format("%s made a mistake in the treatment of %s and caused %s %s to worsen.",
                             doc.getHyperlinkedFullTitle(), p.getHyperlinkedName(),
