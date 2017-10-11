@@ -2095,6 +2095,10 @@ public class Campaign implements Serializable, ITechManager {
                 } else {
                     roll = Utilities.roll3d6();
                 }
+                //This is needed to update the edge values of individual crewmen
+                if (tech.isEngineer()) {
+                    tech.setEdgeUsed(true);
+                }
                 report += " <b>failed!</b> and would destroy the part, but uses Edge to reroll...getting a " + roll + ":";                
             }
         }

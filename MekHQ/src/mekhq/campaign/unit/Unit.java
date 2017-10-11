@@ -2998,7 +2998,6 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             minutesLeft = engineer.getMinutesLeft();
             overtimeLeft = engineer.getOvertimeLeft();
             edgeLeft = engineer.getEdge();
-            breakpartreroll = engineer.getOptions().booleanOption(PersonnelOptions.EDGE_REPAIR_BREAK_PART);
         } else {
             //then get the number based on the least amount available to crew members
             //in the case of Edge, everyone must have the same triggers set for Edge to work
@@ -3041,6 +3040,12 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     if(null == p) {
                         continue;
                     }
+                    //If the engineer used an edge point, remove one from all vessel crewmembers
+                    if (engineer != null) {
+                        if (engineer.getEdgeUsed() == true) {
+                        p.setEdge(p.getEdge() - 1);
+                        }
+                    }
                     sumEdge += p.getEdge();
                     
                     if(p.hasSkill(SkillType.S_TECH_VESSEL)) {
@@ -3059,6 +3064,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 if(nCrew > 0) {
                     engineer = new Person(engineerName, campaign);
                     engineer.setEngineer(true);
+                    engineer.setEdgeUsed(false);
                     engineer.setEdgeTrigger(PersonnelOptions.EDGE_REPAIR_BREAK_PART, breakpartreroll);
                     engineer.setMinutesLeft(minutesLeft);
                     engineer.setOvertimeLeft(overtimeLeft);
