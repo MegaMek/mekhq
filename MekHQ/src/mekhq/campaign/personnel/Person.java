@@ -228,6 +228,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     private int status;
     protected int xp;
+    protected int engXp;
     protected int acquisitions;
     protected int salary;
     private int hits;
@@ -1116,6 +1117,14 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     public void awardXP(int xp) {
         this.xp += xp;
+    }
+    
+    public int getEngineerXp() {
+        return engXp;
+    }
+    
+    public void setEngineerXp(int xp) {
+        engXp = xp;
     }
 
     public int getAcquisitions() {

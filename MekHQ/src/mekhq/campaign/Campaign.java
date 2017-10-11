@@ -2137,6 +2137,9 @@ public class Campaign implements Serializable, ITechManager {
         if (xpGained > 0) {
             tech.setXp(tech.getXp() + xpGained);
             report += " (" + xpGained + "XP gained) ";
+            if (tech.isEngineer()) {
+                tech.setEngineerXp(xpGained);
+            }
         }
         report += wrongType;
         partWork.resetTimeSpent();

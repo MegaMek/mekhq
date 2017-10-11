@@ -106,6 +106,7 @@ import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
 import mekhq.Version;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.event.PersonCrewAssignmentEvent;
 import mekhq.campaign.event.PersonTechAssignmentEvent;
 import mekhq.campaign.event.UnitArrivedEvent;
@@ -3043,7 +3044,14 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     //If the engineer used an edge point, remove one from all vessel crewmembers
                     if (engineer != null) {
                         if (engineer.getEdgeUsed() == true) {
-                        p.setEdge(p.getEdge() - 1);
+                            p.setEdge(p.getEdge() - 1);
+                        }
+                        p.setXp(p.getXp() + engineer.getEngineerXp());
+                        
+                        p.setNTasks(p.getNTasks() + engineer.getNTasks());
+                        if (p.getNTasks() >= campaign.getCampaignOptions().getNTasksXP()) {
+                            p.setXp(p.getXp() + campaign.getCampaignOptions().getTaskXP());
+                            p.setNTasks(0);
                         }
                     }
                     sumEdge += p.getEdge();
@@ -3065,6 +3073,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     engineer = new Person(engineerName, campaign);
                     engineer.setEngineer(true);
                     engineer.setEdgeUsed(false);
+                    engineer.setEngineerXp(0);
                     engineer.setEdgeTrigger(PersonnelOptions.EDGE_REPAIR_BREAK_PART, breakpartreroll);
                     engineer.setMinutesLeft(minutesLeft);
                     engineer.setOvertimeLeft(overtimeLeft);
