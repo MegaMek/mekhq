@@ -190,6 +190,7 @@ import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.parts.equipment.MissingHeatSink;
 import mekhq.campaign.parts.equipment.MissingJumpJet;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
@@ -2991,17 +2992,25 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         }
         int minutesLeft = 480;
         int overtimeLeft = 240;
+        int edgeLeft = 0;
+        boolean breakpartreroll = true;
         if(null != engineer) {
             minutesLeft = engineer.getMinutesLeft();
             overtimeLeft = engineer.getOvertimeLeft();
+            edgeLeft = engineer.getEdge();
+            breakpartreroll = engineer.getOptions().booleanOption(PersonnelOptions.EDGE_REPAIR_BREAK_PART);
         } else {
-            //then get the number based on the least amount of time available to crew members
+            //then get the number based on the least amount available to crew members
+            //in the case of Edge, everyone must have the same triggers set for Edge to work
             for(Person p : getActiveCrew()) {
                 if(p.getMinutesLeft() < minutesLeft) {
                     minutesLeft = p.getMinutesLeft();
                 }
                 if(p.getOvertimeLeft() < overtimeLeft) {
                     overtimeLeft = p.getOvertimeLeft();
+                }
+                if(p.getEdge() < edgeLeft) {
+                    edgeLeft = p.getEdge();
                 }
             }
         }
@@ -3024,6 +3033,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 int nCrew = 0;
                 int sumSkill = 0;
                 int sumBonus = 0;
+                int sumEdge = 0;
                 String engineerName = "Nobody";
                 int bestRank = -1;
                 for(UUID pid : vesselCrew) {
@@ -3031,10 +3041,15 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     if(null == p) {
                         continue;
                     }
+                    sumEdge += p.getEdge();
+                    
                     if(p.hasSkill(SkillType.S_TECH_VESSEL)) {
                         sumSkill += p.getSkill(SkillType.S_TECH_VESSEL).getLevel();
                         sumBonus += p.getSkill(SkillType.S_TECH_VESSEL).getBonus();
                         nCrew++;
+                    }
+                    if (!(p.getOptions().booleanOption(PersonnelOptions.EDGE_REPAIR_BREAK_PART))) {
+                        breakpartreroll = false;
                     }
                     if(p.getRankNumeric() > bestRank) {
                         engineerName = p.getFullName();
@@ -3044,6 +3059,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 if(nCrew > 0) {
                     engineer = new Person(engineerName, campaign);
                     engineer.setEngineer(true);
+                    engineer.setEdgeTrigger(PersonnelOptions.EDGE_REPAIR_BREAK_PART, breakpartreroll);
                     engineer.setMinutesLeft(minutesLeft);
                     engineer.setOvertimeLeft(overtimeLeft);
                     engineer.setId(getCommander().getId());
@@ -3052,6 +3068,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                         engineer.setRankNumeric(bestRank);
                     }
                     engineer.addSkill(SkillType.S_TECH_VESSEL, sumSkill/nCrew, sumBonus/nCrew);
+                    engineer.setEdge(sumEdge/nCrew);
                     engineer.setUnitId(this.getId());
                 } else {
                     engineer = null;
