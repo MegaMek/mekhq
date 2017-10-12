@@ -1939,6 +1939,22 @@ public class Campaign implements Serializable, ITechManager {
                 }
                 report = report + ",  needs " + target.getValueAsString()
                          + " and rolls " + roll + ": ";
+                if (roll < target.getValue()
+                        && CampaignOptions.useRemfEdge() 
+                        && tech.getOptions().booleanOption(PersonnelOptions.EDGE_REPAIR_FAILED_REFIT)
+                        && tech.getEdge() > 0) {
+                    tech.setEdge(tech.getEdge() - 1);
+                    if (tech.isRightTechTypeFor(r)) {
+                        roll = Compute.d6(2);
+                    } else {
+                        roll = Utilities.roll3d6();
+                    }
+                    //This is needed to update the edge values of individual crewmen
+                    if (tech.isEngineer()) {
+                        tech.setEdgeUsed(true);
+                    }
+                    report += " <b>failed!</b> but uses Edge to reroll...getting a " + roll + ": ";
+                }
                 if (roll >= target.getValue()) {
                     report += r.succeed();
                 } else {

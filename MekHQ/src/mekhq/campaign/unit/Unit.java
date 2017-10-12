@@ -2994,6 +2994,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         int overtimeLeft = 240;
         int edgeLeft = 0;
         boolean breakpartreroll = true;
+        boolean failrefitreroll = true;
         if(null != engineer) {
             minutesLeft = engineer.getMinutesLeft();
             overtimeLeft = engineer.getOvertimeLeft();
@@ -3065,6 +3066,9 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     if (!(p.getOptions().booleanOption(PersonnelOptions.EDGE_REPAIR_BREAK_PART))) {
                         breakpartreroll = false;
                     }
+                    if (!(p.getOptions().booleanOption(PersonnelOptions.EDGE_REPAIR_FAILED_REFIT))) {
+                        failrefitreroll = false;
+                    }
                     if(p.getRankNumeric() > bestRank) {
                         engineerName = p.getFullName();
                         bestRank = p.getRankNumeric();
@@ -3076,6 +3080,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     engineer.setEdgeUsed(false);
                     engineer.setEngineerXp(0);
                     engineer.setEdgeTrigger(PersonnelOptions.EDGE_REPAIR_BREAK_PART, breakpartreroll);
+                    engineer.setEdgeTrigger(PersonnelOptions.EDGE_REPAIR_FAILED_REFIT, failrefitreroll);
                     engineer.setMinutesLeft(minutesLeft);
                     engineer.setOvertimeLeft(overtimeLeft);
                     engineer.setId(getCommander().getId());
