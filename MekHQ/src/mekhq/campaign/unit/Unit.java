@@ -106,7 +106,6 @@ import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
 import mekhq.Version;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.event.PersonCrewAssignmentEvent;
 import mekhq.campaign.event.PersonTechAssignmentEvent;
 import mekhq.campaign.event.UnitArrivedEvent;
