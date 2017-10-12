@@ -3044,9 +3044,12 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     //If the engineer used an edge point, remove one from all vessel crewmembers
                     if (engineer != null) {
                         if (engineer.getEdgeUsed() == true) {
-                            p.setEdge(p.getEdge() - 1);
+                            //Don't subtract an Edge if the individual has none left
+                            if (p.getEdge() > 0) {
+                                p.setEdge(p.getEdge() - 1);
+                            }
                         }
-                        //If the engineer gained XP, add one for each crewman
+                        //If the engineer gained XP, add it for each crewman
                         p.setXp(p.getXp() + engineer.getEngineerXp());
                         
                         //Update each crewman's successful task count too
