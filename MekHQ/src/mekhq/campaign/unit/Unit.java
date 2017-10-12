@@ -3045,8 +3045,10 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                         if (engineer.getEdgeUsed() == true) {
                             p.setEdge(p.getEdge() - 1);
                         }
+                        //If the engineer gained XP, add one for each crewman
                         p.setXp(p.getXp() + engineer.getEngineerXp());
                         
+                        //Update each crewman's successful task count too
                         p.setNTasks(p.getNTasks() + engineer.getNTasks());
                         if (p.getNTasks() >= campaign.getCampaignOptions().getNTasksXP()) {
                             p.setXp(p.getXp() + campaign.getCampaignOptions().getTaskXP());
