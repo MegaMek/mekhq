@@ -1817,6 +1817,15 @@ public class Campaign implements Serializable, ITechManager {
         int roll = Compute.d6(2);
         report += "  needs " + target.getValueAsString();
         report += " and rolls " + roll + ":";
+        //Edge reroll, if applicable
+        if (roll < target.getValue()
+                && CampaignOptions.useRemfEdge() 
+                && person.getOptions().booleanOption(PersonnelOptions.EDGE_ADMIN_ACQUIRE_FAIL)
+                && person.getEdge() > 0) {
+            person.setEdge(person.getEdge() - 1);
+            roll = Compute.d6(2);
+            report += " <b>failed!</b> but uses Edge to reroll...getting a " + roll + ": ";
+        }
         int mos = roll - target.getValue();
         if (target.getValue() == TargetRoll.AUTOMATIC_SUCCESS) {
             mos = roll - 2;
