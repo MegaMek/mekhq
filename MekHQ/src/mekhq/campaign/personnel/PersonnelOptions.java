@@ -41,7 +41,6 @@ public class PersonnelOptions extends PilotOptions {
     public static final String EDGE_REPAIR_FAILED_REFIT = "edge_when_fail_refit_check";
     public static final String EDGE_ADMIN_ACQUIRE_FAIL = "edge_when_admin_acquire_fail";
     public static final String EDGE_RETENTION_FAILURE = "edge_when_retention_fail";
-    public static final String EDGE_ADMIN_CONTRACT_FAIL = "edge_when_roll_bad_contract";
     
     @Override
     public void initialize() {
@@ -71,7 +70,6 @@ public class PersonnelOptions extends PilotOptions {
         addOption(edge, EDGE_REPAIR_FAILED_REFIT, false);
         addOption(edge, EDGE_ADMIN_ACQUIRE_FAIL, false);
         addOption(edge, EDGE_RETENTION_FAILURE, false);
-        addOption(edge, EDGE_ADMIN_CONTRACT_FAIL, false);
     }
 
     @Override
