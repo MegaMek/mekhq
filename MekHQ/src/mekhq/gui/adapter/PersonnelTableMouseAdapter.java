@@ -1868,10 +1868,21 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             }
             if (oneSelected && person.isActive()) {
                 if (gui.getCampaign().getCampaignOptions().useEdge()) {
+                    menu = new JMenu(resourceMap.getString("setEdgeTriggers.text")); //$NON-NLS-1$
                     //Start of role-specific Edge reroll options
+                    //Unit Commanders
+                    Unit u = gui.getCampaign().getUnit(person.getUnitId());
+                    if (u != null && u.isCommander(person)) {                        
+                        cbMenuItem = new JCheckBoxMenuItem(
+                                resourceMap.getString("edgeTriggerRetentionCheck.text")); //$NON-NLS-1$
+                        cbMenuItem.setSelected(person.getOptions()
+                                .booleanOption(PersonnelOptions.EDGE_RETENTION_FAILURE));
+                        cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, PersonnelOptions.EDGE_RETENTION_FAILURE));
+                        cbMenuItem.addActionListener(this);
+                        menu.add(cbMenuItem);
+                    } 
                     //Mechwarriors
                     if (person.getPrimaryRole() == 1) {
-                        menu = new JMenu(resourceMap.getString("setEdgeTriggers.text")); //$NON-NLS-1$
                         cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("edgeTriggerHeadHits.text")); //$NON-NLS-1$
                         cbMenuItem.setSelected(person.getOptions()
                                 .booleanOption(OPT_EDGE_HEADHIT));
@@ -1903,17 +1914,8 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                         cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_MASC_FAILURE));
                         cbMenuItem.addActionListener(this);
                         menu.add(cbMenuItem);
-                        cbMenuItem = new JCheckBoxMenuItem(
-                                resourceMap.getString("edgeTriggerRetentionCheck.text")); //$NON-NLS-1$
-                        cbMenuItem.setSelected(person.getOptions()
-                                .booleanOption(PersonnelOptions.EDGE_RETENTION_FAILURE));
-                        cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, PersonnelOptions.EDGE_RETENTION_FAILURE));
-                        cbMenuItem.addActionListener(this);
-                        menu.add(cbMenuItem);
-                        popup.add(menu);
                     //Doctors    
                     } else if (person.getPrimaryRole() == 20 && CampaignOptions.useRemfEdge()) {
-                        menu = new JMenu(resourceMap.getString("setEdgeTriggers.text")); //$NON-NLS-1$
                         cbMenuItem = new JCheckBoxMenuItem(
                                 resourceMap.getString("edgeTriggerHealCheck.text")); //$NON-NLS-1$
                         cbMenuItem.setSelected(person.getOptions()
@@ -1921,14 +1923,6 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                         cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, PersonnelOptions.EDGE_MEDICAL));
                         cbMenuItem.addActionListener(this);
                         menu.add(cbMenuItem);
-                        cbMenuItem = new JCheckBoxMenuItem(
-                                resourceMap.getString("edgeTriggerRetentionCheck.text")); //$NON-NLS-1$
-                        cbMenuItem.setSelected(person.getOptions()
-                                .booleanOption(PersonnelOptions.EDGE_RETENTION_FAILURE));
-                        cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, PersonnelOptions.EDGE_RETENTION_FAILURE));
-                        cbMenuItem.addActionListener(this);
-                        menu.add(cbMenuItem);
-                        popup.add(menu);
                     //Techs
                     } else if ((person.getPrimaryRole() == 12
                                 || person.getPrimaryRole() == 15
@@ -1936,7 +1930,6 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                                 || person.getPrimaryRole() == 17
                                 || person.getPrimaryRole() == 18)
                                 && CampaignOptions.useRemfEdge()) {
-                        menu = new JMenu(resourceMap.getString("setEdgeTriggers.text")); //$NON-NLS-1$
                         cbMenuItem = new JCheckBoxMenuItem(
                                 resourceMap.getString("edgeTriggerBreakPart.text")); //$NON-NLS-1$
                         cbMenuItem.setSelected(person.getOptions()
@@ -1951,38 +1944,22 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                         cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, PersonnelOptions.EDGE_REPAIR_FAILED_REFIT));
                         cbMenuItem.addActionListener(this);
                         menu.add(cbMenuItem);
-                        cbMenuItem = new JCheckBoxMenuItem(
-                                resourceMap.getString("edgeTriggerRetentionCheck.text")); //$NON-NLS-1$
-                        cbMenuItem.setSelected(person.getOptions()
-                                .booleanOption(PersonnelOptions.EDGE_RETENTION_FAILURE));
-                        cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, PersonnelOptions.EDGE_RETENTION_FAILURE));
-                        cbMenuItem.addActionListener(this);
-                        menu.add(cbMenuItem);
-                        popup.add(menu);
                     //Admins
                     } else if ((person.getPrimaryRole() == 22
                             || person.getPrimaryRole() == 23
                             || person.getPrimaryRole() == 24
                             || person.getPrimaryRole() == 25) 
                             && CampaignOptions.useRemfEdge()) {
-                        menu = new JMenu(resourceMap.getString("setEdgeTriggers.text")); //$NON-NLS-1$
                         cbMenuItem = new JCheckBoxMenuItem(
                                 resourceMap.getString("edgeTriggerAcquireCheck.text")); //$NON-NLS-1$
                         cbMenuItem.setSelected(person.getOptions()
                                 .booleanOption(PersonnelOptions.EDGE_ADMIN_ACQUIRE_FAIL));
                         cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, PersonnelOptions.EDGE_ADMIN_ACQUIRE_FAIL));
                         cbMenuItem.addActionListener(this);
-                        menu.add(cbMenuItem);
-                        cbMenuItem = new JCheckBoxMenuItem(
-                                resourceMap.getString("edgeTriggerRetentionCheck.text")); //$NON-NLS-1$
-                        cbMenuItem.setSelected(person.getOptions()
-                                .booleanOption(PersonnelOptions.EDGE_RETENTION_FAILURE));
-                        cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, PersonnelOptions.EDGE_RETENTION_FAILURE));
-                        cbMenuItem.addActionListener(this);
-                        menu.add(cbMenuItem);
-                        popup.add(menu);
-                    }
+                        menu.add(cbMenuItem);                        
+                    } 
                     
+                    popup.add(menu);
                 }
                 menu = new JMenu(resourceMap.getString("specialFlags.text")); //$NON-NLS-1$
                 cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("dependent.text")); //$NON-NLS-1$
