@@ -2730,7 +2730,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
      * on the crew as a whole.
      */
     private void calcCompositeCrew() {
-        if (drivers.isEmpty() && gunners.isEmpty()) {
+        //Fix for MHQ Bug # 3 here: Stations don't have pilots, and some don't have gunners
+        if (drivers.isEmpty() && gunners.isEmpty() && !(entity instanceof SpaceStation)) {
             entity.getCrew().setMissing(true, 0);
             entity.getCrew().setSize(0);
             return;
