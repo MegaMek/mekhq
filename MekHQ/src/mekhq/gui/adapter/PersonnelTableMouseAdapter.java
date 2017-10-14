@@ -1870,17 +1870,6 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 if (gui.getCampaign().getCampaignOptions().useEdge()) {
                     menu = new JMenu(resourceMap.getString("setEdgeTriggers.text")); //$NON-NLS-1$
                     //Start of role-specific Edge reroll options
-                    //Unit Commanders
-                    Unit u = gui.getCampaign().getUnit(person.getUnitId());
-                    if (u != null && u.isCommander(person)) {                        
-                        cbMenuItem = new JCheckBoxMenuItem(
-                                resourceMap.getString("edgeTriggerRetentionCheck.text")); //$NON-NLS-1$
-                        cbMenuItem.setSelected(person.getOptions()
-                                .booleanOption(PersonnelOptions.EDGE_RETENTION_FAILURE));
-                        cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, PersonnelOptions.EDGE_RETENTION_FAILURE));
-                        cbMenuItem.addActionListener(this);
-                        menu.add(cbMenuItem);
-                    } 
                     //Mechwarriors
                     if (person.getPrimaryRole() == 1) {
                         cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("edgeTriggerHeadHits.text")); //$NON-NLS-1$
@@ -2013,11 +2002,6 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     menuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, PersonnelOptions.EDGE_ADMIN_ACQUIRE_FAIL, TRUE));
                     menuItem.addActionListener(this);
                     submenu.add(menuItem);
-                    menuItem = new JMenuItem(resourceMap.getString("edgeTriggerRetentionCheck.text")); //$NON-NLS-1$
-                    menuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, PersonnelOptions.EDGE_RETENTION_FAILURE, TRUE));
-                    menuItem.addActionListener(this);
-                    submenu.add(menuItem);
-                    menu.add(submenu);
                     submenu = new JMenu(resourceMap.getString("off.text")); //$NON-NLS-1$
                     menuItem = new JMenuItem(resourceMap.getString("edgeTriggerHeadHits.text")); //$NON-NLS-1$
                     menuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_HEADHIT, FALSE));
@@ -2054,10 +2038,6 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     submenu.add(menuItem);
                     menuItem = new JMenuItem(resourceMap.getString("edgeTriggerAcquireCheck.text")); //$NON-NLS-1$
                     menuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, PersonnelOptions.EDGE_ADMIN_ACQUIRE_FAIL, FALSE));
-                    menuItem.addActionListener(this);
-                    submenu.add(menuItem);
-                    menuItem = new JMenuItem(resourceMap.getString("edgeTriggerRetentionCheck.text")); //$NON-NLS-1$
-                    menuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, PersonnelOptions.EDGE_RETENTION_FAILURE, FALSE));
                     menuItem.addActionListener(this);
                     submenu.add(menuItem);
                     popup.add(menu);
