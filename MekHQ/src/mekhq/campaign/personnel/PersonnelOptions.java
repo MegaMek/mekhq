@@ -14,17 +14,20 @@
 package mekhq.campaign.personnel;
 
 import java.util.Enumeration;
+import java.util.Hashtable;
 
 import megamek.common.logging.LogLevel;
 import megamek.common.options.AbstractOptionsInfo;
 import megamek.common.options.IBasicOptionGroup;
+import megamek.common.options.IOptionInfo;
 import megamek.common.options.OptionsConstants;
 import megamek.common.options.PilotOptions;
 import mekhq.MekHQ;
 
 /**
  * An extension of PilotOptions that adds MekHQ-specific SPAs and edge triggers for support and command
- * actions.
+ * actions. Display names and descriptions are taken from SpecialAbility when present, otherwise
+ * from the MM option.
  * 
  * @author Neoancient
  *
@@ -70,14 +73,35 @@ public class PersonnelOptions extends PilotOptions {
         addOption(edge, EDGE_ADMIN_ACQUIRE_FAIL, false);
     }
 
+    /* 
+     * When an option is added we need to create a custom IOptionInfo instance so we can
+     * provide a different source for display name and description.
+     */
+    @Override
+    protected void addOption(IBasicOptionGroup group, String name, int type,
+            Object defaultValue) {
+        super.addOption(group, name, type, defaultValue);
+        ((PersonnelOptionsInfo)getOptionsInfoImp()).setOptionInfo(name);
+    }
+
     @Override
     protected AbstractOptionsInfo getOptionsInfoImp() {
         return PersonnelOptionsInfo.getInstance();
     }
 
+    /**
+     * Custom IOptionsInfo class that allows adding additional options to the base MegaMek
+     * options before finalizing and also holds a hash of IOptionInfo objects for the abilities
+     * so we can provide names and descriptions for the MekHQ-specific options.
+     * 
+     * @author Neoancient
+     *
+     */
     private static class PersonnelOptionsInfo extends AbstractOptionsInfo {
         private static boolean initialized = false;
         private static AbstractOptionsInfo instance = new PersonnelOptionsInfo();
+
+        private Hashtable<String, IOptionInfo> optionsHash = new Hashtable<>();
 
         public static AbstractOptionsInfo getInstance() {
             if (!initialized) {
@@ -92,5 +116,75 @@ public class PersonnelOptions extends PilotOptions {
         protected PersonnelOptionsInfo() {
             super("PersonnelOptionsInfo"); //$NON-NLS-1$
         }
+        
+        public IOptionInfo getOptionInfo(String name) {
+            return optionsHash.get(name);
+        }
+
+        private void setOptionInfo(String name) {
+            optionsHash.put(name, new PersonnelOptionInfo(name));
+        }
+    }
+    
+    /**
+     * Access to ability names and descriptions from <code>SpecialAbility</code> if the ability
+     * has an entry, otherwise checks for the ability the MM PilotOptions class. If not found
+     * in either place, returns the lookup key instead.
+     * 
+     * @author Neoancient
+     *
+     */
+    private static class PersonnelOptionInfo implements IOptionInfo {
+        
+        private String name;
+        private static PilotOptions mmOptions = new PilotOptions();
+        
+        public PersonnelOptionInfo(String name) {
+            this.name = name;
+        }
+
+        @Override
+        public String getDisplayableName() {
+            if (null != SpecialAbility.getAbility(name)) {
+                return SpecialAbility.getAbility(name).getDisplayName();
+            } else if (null != mmOptions.getOption(name)){
+                return mmOptions.getOption(name).getDisplayableName();
+            } else {
+                return name;
+            }
+        }
+
+        @Override
+        public String getDisplayableNameWithValue() {
+            if (null != SpecialAbility.getAbility(name)) {
+                return SpecialAbility.getAbility(name).getDisplayName();
+            } else if (null != mmOptions.getOption(name)){
+                return mmOptions.getOption(name).getDisplayableName();
+            } else {
+                return name;
+            }
+        }
+
+        @Override
+        public String getDescription() {
+            if (null != SpecialAbility.getAbility(name)) {
+                return SpecialAbility.getAbility(name).getDescription();
+            } else if (null != mmOptions.getOption(name)){
+                return mmOptions.getOption(name).getDescription();
+            } else {
+                return name;
+            }
+        }
+
+        @Override
+        public int getTextFieldLength() {
+            return 3;
+        }
+
+        @Override
+        public boolean isLabelBeforeTextField() {
+            return false;
+        }
+        
     }
 }
