@@ -655,16 +655,16 @@ public class CampaignOpsReputation extends AbstractUnitRating {
                 break;
             }
 
-            if (tech.getSkill(SkillType.S_TECH_MECH) != null) {
+            if ((tech.getPrimaryRole() == Person.T_MECH_TECH || tech.getSecondaryRole() == Person.T_MECH_TECH) && tech.getSkill(SkillType.S_TECH_MECH) != null) {
                 setMechTechTeams(getMechTechTeams() + 1);
                 astechTeams--;
-            } else if (tech.getSkill(SkillType.S_TECH_AERO) != null) {
+            } else if ((tech.getPrimaryRole() == Person.T_AERO_TECH || tech.getSecondaryRole() == Person.T_AERO_TECH)  && tech.getSkill(SkillType.S_TECH_AERO) != null) {
                 setAeroTechTeams(getAeroTechTeams() + 1);
                 astechTeams--;
-            } else if (tech.getSkill(SkillType.S_TECH_MECHANIC) != null) {
+            } else if ((tech.getPrimaryRole() == Person.T_MECHANIC || tech.getSecondaryRole() == Person.T_MECHANIC)  && tech.getSkill(SkillType.S_TECH_MECHANIC) != null) {
                 setMechanicTeams(getMechanicTeams() + 1);
                 astechTeams--;
-            } else if (tech.getSkill(SkillType.S_TECH_BA) != null) {
+            } else if ((tech.getPrimaryRole() == Person.T_BA_TECH || tech.getSecondaryRole() == Person.T_BA_TECH)  && tech.getSkill(SkillType.S_TECH_BA) != null) {
                 setBaTechTeams(getBaTechTeams() + 1);
                 astechTeams--;
             } else {
