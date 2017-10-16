@@ -2729,9 +2729,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
      * For vehicles, infantry, and naval vessels, compute the piloting and gunnery skills based
      * on the crew as a whole.
      */
-    private void calcCompositeCrew() {
-        //Fix for MHQ Bug # 3 here: Stations don't have pilots, and some don't have gunners
-        if (drivers.isEmpty() && gunners.isEmpty() && !(entity instanceof SpaceStation)) {
+    private void calcCompositeCrew() {        
+        if (drivers.isEmpty() && gunners.isEmpty()) {
             entity.getCrew().setMissing(true, 0);
             entity.getCrew().setSize(0);
             return;
