@@ -307,6 +307,30 @@
     	</skillPrereq>
 	</ability>
 	
+	<edgeTrigger>
+		<lookupName>edge_when_heal_crit_fail</lookupName>
+		<displayName>Use Edge for doctor critical failure.</displayName>
+		<desc>Healing check critical failure will be rerolled with Edge.</desc>
+	</edgeTrigger>
+	
+	<edgeTrigger>
+		<lookupName>edge_when_repair_break_part</lookupName>
+		<displayName>Use Edge for tech breaking part.</displayName>
+		<desc>Failed repair check that breaks the part will be rerolled with Edge.</desc>
+	</edgeTrigger>
+	
+	<edgeTrigger>
+		<lookupName>edge_when_fail_refit_check</lookupName>
+		<displayName>Use Edge for refit failure.</displayName>
+		<desc>Failed refit check will be rerolled with Edge.</desc>
+	</edgeTrigger>
+	
+	<edgeTrigger>
+		<lookupName>edge_when_admin_acquire_fail</lookupName>
+		<displayName>Use Edge for acquisition failure.</displayName>
+		<desc>Failed acquisition check will be rerolled with edge.</desc>
+	</edgeTrigger>
+	
 </abilities>
 
 <!--  
