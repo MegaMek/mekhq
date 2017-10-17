@@ -1960,7 +1960,7 @@ public class Campaign implements Serializable, ITechManager {
                     }
                     //This is needed to update the edge values of individual crewmen
                     if (tech.isEngineer()) {
-                        tech.setEdgeUsed(true);
+                        tech.setEdgeUsed(tech.getEdgeUsed() - 1);
                     }
                     report += " <b>failed!</b> but uses Edge to reroll...getting a " + roll + ": ";
                 }
@@ -2122,7 +2122,7 @@ public class Campaign implements Serializable, ITechManager {
                 }
                 //This is needed to update the edge values of individual crewmen
                 if (tech.isEngineer()) {
-                    tech.setEdgeUsed(true);
+                    tech.setEdgeUsed(tech.getEdgeUsed() + 1);
                 }
                 report += " <b>failed!</b> and would destroy the part, but uses Edge to reroll...getting a " + roll + ":";                
             }

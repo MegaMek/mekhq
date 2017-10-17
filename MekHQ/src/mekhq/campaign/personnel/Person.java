@@ -239,7 +239,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     boolean dependent;
     boolean commander;
     boolean isClanTech;
-    boolean edgeUsedThisRound;
+    int edgeUsedThisRound;
 
     //phenotype and background
     private int phenotype;
@@ -2686,11 +2686,11 @@ public class Person implements Serializable, MekHqXmlSerializable {
         }
     }
     
-    public void setEdgeUsed(boolean b) {
-        edgeUsedThisRound = b;
+    public void setEdgeUsed(int e) {
+        edgeUsedThisRound = e;
     }
     
-    public boolean getEdgeUsed() {
+    public int getEdgeUsed() {
         return edgeUsedThisRound;
     }
 

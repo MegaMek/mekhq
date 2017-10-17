@@ -3034,6 +3034,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 int sumSkill = 0;
                 int sumBonus = 0;
                 int sumEdge = 0;
+                int sumEdgeUsed = 0;
                 String engineerName = "Nobody";
                 int bestRank = -1;
                 for(UUID pid : vesselCrew) {
@@ -3041,12 +3042,13 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     if(null == p) {
                         continue;
                     }
-                    //If the engineer used an edge point, remove one from all vessel crewmembers
+                    //If the engineer used edge points, remove some from vessel crewmembers until all is paid for
                     if (engineer != null) {
-                        if (engineer.getEdgeUsed() == true) {
+                        if (engineer.getEdgeUsed() > 0) {
                             //Don't subtract an Edge if the individual has none left
                             if (p.getEdge() > 0) {
                                 p.setEdge(p.getEdge() - 1);
+                                engineer.setEdgeUsed(engineer.getEdgeUsed() - 1);
                             }
                         }
                         //If the engineer gained XP, add it for each crewman
@@ -3058,8 +3060,9 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                             p.setXp(p.getXp() + campaign.getCampaignOptions().getTaskXP());
                             p.setNTasks(0);
                         }
+                        sumEdgeUsed = engineer.getEdgeUsed();
                     }
-                    sumEdge += p.getEdge();
+                    sumEdge += p.getEdge();                    
                     
                     if(p.hasSkill(SkillType.S_TECH_VESSEL)) {
                         sumSkill += p.getSkill(SkillType.S_TECH_VESSEL).getLevel();
@@ -3080,7 +3083,6 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 if(nCrew > 0) {
                     engineer = new Person(engineerName, campaign);
                     engineer.setEngineer(true);
-                    engineer.setEdgeUsed(false);
                     engineer.setEngineerXp(0);
                     engineer.setEdgeTrigger(PersonnelOptions.EDGE_REPAIR_BREAK_PART, breakpartreroll);
                     engineer.setEdgeTrigger(PersonnelOptions.EDGE_REPAIR_FAILED_REFIT, failrefitreroll);
@@ -3092,7 +3094,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                         engineer.setRankNumeric(bestRank);
                     }
                     engineer.addSkill(SkillType.S_TECH_VESSEL, sumSkill/nCrew, sumBonus/nCrew);
-                    engineer.setEdge(sumEdge/nCrew);
+                    engineer.setEdgeUsed(sumEdgeUsed);
+                    engineer.setEdge((sumEdge - sumEdgeUsed)/nCrew);
                     engineer.setUnitId(this.getId());
                 } else {
                     engineer = null;
