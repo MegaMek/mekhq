@@ -196,7 +196,7 @@ public class NewRecruitDialog extends javax.swing.JDialog {
     }
 
     private void regenerate() {
-        person = hqView.getCampaign().newPerson(person.getPrimaryRole());
+        person = hqView.getCampaign().newPerson(person.getPrimaryRole(), person.getSecondaryRole());
         refreshRanksCombo();
         refreshView();
     }
