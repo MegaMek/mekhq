@@ -1677,7 +1677,7 @@ public class Campaign implements Serializable, ITechManager {
                  + " and rolls " + roll + ":";
         int xpGained = 0;
         //If we get a natural 2 that isn't an automatic success, reroll if Edge is available and in use.
-        if (CampaignOptions.useSupportEdge()
+        if (getCampaignOptions().useSupportEdge()
                 && (doctor.getOptions().booleanOption(PersonnelOptions.EDGE_MEDICAL))) {
             if (roll == 2  && doctor.getEdge() > 0 && target.getValue() != TargetRoll.AUTOMATIC_SUCCESS) {
                 doctor.setEdge(doctor.getEdge() - 1);
@@ -1818,7 +1818,7 @@ public class Campaign implements Serializable, ITechManager {
         report += " and rolls " + roll + ":";
         //Edge reroll, if applicable
         if (roll < target.getValue()
-                && CampaignOptions.useSupportEdge() 
+                && getCampaignOptions().useSupportEdge() 
                 && person.getOptions().booleanOption(PersonnelOptions.EDGE_ADMIN_ACQUIRE_FAIL)
                 && person.getEdge() > 0) {
             person.setEdge(person.getEdge() - 1);
@@ -1948,7 +1948,7 @@ public class Campaign implements Serializable, ITechManager {
                 report = report + ",  needs " + target.getValueAsString()
                          + " and rolls " + roll + ": ";
                 if (roll < target.getValue()
-                        && CampaignOptions.useSupportEdge()
+                        && getCampaignOptions().useSupportEdge()
                         && tech.getOptions().booleanOption(PersonnelOptions.EDGE_REPAIR_FAILED_REFIT)
                         && tech.getEdge() > 0) {
                     tech.setEdge(tech.getEdge() - 1);
@@ -2105,7 +2105,7 @@ public class Campaign implements Serializable, ITechManager {
                  + " and rolls " + roll + ":";
         int xpGained = 0;
         //if we fail and would break a part, here's a chance to use Edge for a reroll...
-        if (CampaignOptions.useSupportEdge() 
+        if (getCampaignOptions().useSupportEdge() 
                 && tech.getOptions().booleanOption(PersonnelOptions.EDGE_REPAIR_BREAK_PART)
                 && tech.getEdge() > 0) {
             if ((getCampaignOptions().isDestroyByMargin()

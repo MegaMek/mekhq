@@ -1904,7 +1904,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                         cbMenuItem.addActionListener(this);
                         menu.add(cbMenuItem);
                     //Doctors    
-                    } else if (person.getPrimaryRole() == 20 && CampaignOptions.useSupportEdge()) {
+                    } else if (person.getPrimaryRole() == 20 && gui.getCampaign().getCampaignOptions().useSupportEdge()) {
                         cbMenuItem = new JCheckBoxMenuItem(
                                 resourceMap.getString("edgeTriggerHealCheck.text")); //$NON-NLS-1$
                         cbMenuItem.setSelected(person.getOptions()
@@ -1918,7 +1918,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                                 || person.getPrimaryRole() == 16
                                 || person.getPrimaryRole() == 17
                                 || person.getPrimaryRole() == 18)
-                                && CampaignOptions.useSupportEdge()) {
+                                && gui.getCampaign().getCampaignOptions().useSupportEdge()) {
                         cbMenuItem = new JCheckBoxMenuItem(
                                 resourceMap.getString("edgeTriggerBreakPart.text")); //$NON-NLS-1$
                         cbMenuItem.setSelected(person.getOptions()
@@ -1938,7 +1938,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                             || person.getPrimaryRole() == 23
                             || person.getPrimaryRole() == 24
                             || person.getPrimaryRole() == 25) 
-                            && CampaignOptions.useSupportEdge()) {
+                            && gui.getCampaign().getCampaignOptions().useSupportEdge()) {
                         cbMenuItem = new JCheckBoxMenuItem(
                                 resourceMap.getString("edgeTriggerAcquireCheck.text")); //$NON-NLS-1$
                         cbMenuItem.setSelected(person.getOptions()
