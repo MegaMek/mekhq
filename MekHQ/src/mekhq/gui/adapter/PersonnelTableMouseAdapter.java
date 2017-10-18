@@ -29,7 +29,6 @@ import megamek.common.options.PilotOptions;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.Utilities;
-import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.Kill;
 import mekhq.campaign.LogEntry;
 import mekhq.campaign.event.PersonChangedEvent;
