@@ -183,7 +183,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JCheckBox useAbilitiesBox;
     private JCheckBox useQuirksBox;
     private JCheckBox useEdgeBox;
-    private JCheckBox useRemfEdgeBox;
+    private JCheckBox useSupportEdgeBox;
     private JCheckBox useImplantsBox;
 	private JCheckBox altQualityAveragingCheckBox;
     private JCheckBox useAdvancedMedicalBox;
@@ -468,7 +468,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         useArtilleryBox.setSelected(options.useArtillery());
         useAbilitiesBox.setSelected(options.useAbilities());
         useEdgeBox.setSelected(options.useEdge());
-        useRemfEdgeBox.setSelected(options.useRemfEdge());
+        useSupportEdgeBox.setSelected(options.useSupportEdge());
         useImplantsBox.setSelected(options.useImplants());
         chkCapturePrisoners.setSelected(options.capturePrisoners());
 		altQualityAveragingCheckBox.setSelected(options.useAltQualityAveraging());
@@ -568,7 +568,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         useArtilleryBox = new JCheckBox();
         useAbilitiesBox = new JCheckBox();
         useEdgeBox = new JCheckBox();
-        useRemfEdgeBox = new JCheckBox();
+        useSupportEdgeBox = new JCheckBox();
         useImplantsBox = new JCheckBox();
         chkCapturePrisoners = new JCheckBox();
 		altQualityAveragingCheckBox = new JCheckBox();
@@ -1407,16 +1407,16 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panPersonnel.add(useEdgeBox, gridBagConstraints);
         
-        useRemfEdgeBox.setText(resourceMap.getString("useRemfEdgeBox.text")); // NOI18N
-        useRemfEdgeBox.setToolTipText(resourceMap.getString("useRemfEdgeBox.toolTipText")); // NOI18N
-        useRemfEdgeBox.setName("useRemfEdgeBox"); // NOI18N
+        useSupportEdgeBox.setText(resourceMap.getString("useSupportEdgeBox.text")); // NOI18N
+        useSupportEdgeBox.setToolTipText(resourceMap.getString("useSupportEdgeBox.toolTipText")); // NOI18N
+        useSupportEdgeBox.setName("useSupportEdgeBox"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 6;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        panPersonnel.add(useRemfEdgeBox, gridBagConstraints);
+        panPersonnel.add(useSupportEdgeBox, gridBagConstraints);
 
         useImplantsBox.setText(resourceMap.getString("useImplantsBox.text")); // NOI18N
         useImplantsBox.setToolTipText(resourceMap.getString("useImplantsBox.toolTipText")); // NOI18N
@@ -4356,7 +4356,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         campaign.getGameOptions().getOption("pilot_advantages").setValue(useAbilitiesBox.isSelected());
         options.setEdge(useEdgeBox.isSelected());
         campaign.getGameOptions().getOption("edge").setValue(useEdgeBox.isSelected());
-        options.setRemfEdge(useRemfEdgeBox.isSelected());
+        options.setSupportEdge(useSupportEdgeBox.isSelected());
         options.setImplants(useImplantsBox.isSelected());
         options.setCapturePrisoners(chkCapturePrisoners.isSelected());
         campaign.getGameOptions().getOption("manei_domini").setValue(useImplantsBox.isSelected());

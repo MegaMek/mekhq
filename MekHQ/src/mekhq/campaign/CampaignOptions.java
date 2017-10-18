@@ -85,7 +85,7 @@ public class CampaignOptions implements Serializable {
     private boolean useArtillery;
     private boolean useAbilities;
     private boolean useEdge;
-    private static boolean useRemfEdge;
+    private static boolean useSupportEdge;
     private boolean useImplants;
 	private boolean altQualityAveraging;
     private int healWaitingPeriod;
@@ -295,7 +295,7 @@ public class CampaignOptions implements Serializable {
         useArtillery = false;
         useAbilities = false;
         useEdge = false;
-        useRemfEdge = false;
+        useSupportEdge = false;
         useImplants = false;
 		altQualityAveraging = false;
         useAdvancedMedical = false;
@@ -672,12 +672,12 @@ public class CampaignOptions implements Serializable {
         this.useEdge = b;
     }
     
-    public static boolean useRemfEdge() {
-        return useRemfEdge;
+    public static boolean useSupportEdge() {
+        return useSupportEdge;
     }
 
-    public void setRemfEdge(boolean b) {
-        CampaignOptions.useRemfEdge = b;
+    public void setSupportEdge(boolean b) {
+        useSupportEdge = b;
     }
 
     public boolean useImplants() {
@@ -1987,7 +1987,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useArtillery", useArtillery);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useAbilities", useAbilities);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useEdge", useEdge);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useRemfEdge", useRemfEdge);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useSupportEdge", useSupportEdge);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useImplants", useImplants);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "altQualityAveraging", altQualityAveraging);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useAdvancedMedical", useAdvancedMedical);
@@ -2255,7 +2255,7 @@ public class CampaignOptions implements Serializable {
             } else if (wn2.getNodeName().equalsIgnoreCase("useEdge")) {
                 retVal.useEdge = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("useRemfEdge")) {
-                CampaignOptions.useRemfEdge = Boolean.parseBoolean(wn2.getTextContent());
+                CampaignOptions.useSupportEdge = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("useImplants")) {
                 retVal.useImplants = Boolean.parseBoolean(wn2.getTextContent());
 			} else if (wn2.getNodeName().equalsIgnoreCase("altQualityAveraging")) {
