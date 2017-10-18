@@ -2499,8 +2499,9 @@ public class Campaign implements Serializable, ITechManager {
 
         //need to loop through units twice, the first time to do all maintenance and the second
         //time to do whatever else. Otherwise, maintenance minutes might get sucked up by other
-        //stuff
+        //stuff. This is also a good place to ensure that a unit's engineer gets reset and updated.
         for (Unit u : getUnits()) {
+            u.resetEngineer();
             if (null != u.getEngineer()) {
                 u.getEngineer().resetMinutesLeft();
             }
