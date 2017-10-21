@@ -6,6 +6,7 @@ v0.43.5-git
 + Issue #488: Select bombs throws "index out of bounds" errors in particular campaign file
 + Feature #280: Role folders now supported for random portrait assignment
 + PR #440: Track & report time in service
++ PR #502: Edge use for non-combat personnel
 
 v0.43.4 (2017-10-01 11:00 UTC)
 + Updating the repo with 0.43.3 Data
