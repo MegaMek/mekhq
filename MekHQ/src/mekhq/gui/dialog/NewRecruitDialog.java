@@ -7,6 +7,7 @@
 package mekhq.gui.dialog;
 
 import java.awt.BorderLayout;
+import java.util.GregorianCalendar;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.util.ResourceBundle;
@@ -157,6 +158,10 @@ public class NewRecruitDialog extends javax.swing.JDialog {
 
     private void hire() {
         if (hqView.getCampaign().recruitPerson(person)) {
+            if (hqView.getCampaign().getCampaignOptions().getUseTimeInService()) {
+                GregorianCalendar rawrecruit = (GregorianCalendar) hqView.getCampaign().getCalendar().clone();
+                person.setRecruitment(rawrecruit);
+            }
             person = hqView.getCampaign().newPerson(person.getPrimaryRole());
             refreshRanksCombo();
             hqView.getCampaign().changeRank(person, hqView.getCampaign().getRanks().getRankNumericFromNameAndProfession(

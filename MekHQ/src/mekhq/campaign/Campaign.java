@@ -6478,6 +6478,9 @@ public class Campaign implements Serializable, ITechManager {
                     changeRank(p, 0, false);
                 }
                 p.addLogEntry(getDate(), "Freed");
+                if (getCampaignOptions().getUseTimeInService()) {
+                    p.setRecruitment((GregorianCalendar) getCalendar().clone());
+                }
                 break;
             case Person.PRISONER_YES:
                 if (p.getRankNumeric() > 0) {
@@ -6486,6 +6489,9 @@ public class Campaign implements Serializable, ITechManager {
                 }
                 p.setPrisoner();
                 p.addLogEntry(getDate(), "Made Prisoner");
+                if (getCampaignOptions().getUseTimeInService()) {
+                    p.setRecruitment(null);
+                }
                 break;
             case Person.PRISONER_BONDSMAN:
                 if (p.getRankNumeric() > 0) {
@@ -6494,6 +6500,9 @@ public class Campaign implements Serializable, ITechManager {
                 }
                 p.setBondsman();
                 p.addLogEntry(getDate(), "Made Bondsman");
+                if (getCampaignOptions().getUseTimeInService()) {
+                    p.setRecruitment(null);
+                }
                 break;
             default:
                 break;
@@ -8579,6 +8588,34 @@ public class Campaign implements Serializable, ITechManager {
 	                      + ". " + paidString + qualityString + ". " + damageString + " [<a href='MAINTENANCE|" + u.getId() + "'>Get details</a>]");
 	        }
             u.resetDaysSinceMaintenance();
+        }
+    }
+
+    public void initTimeInService() {
+        for (Person p : personnel) {
+            Date join = null;
+            for (LogEntry e : p.getPersonnelLog()) {
+                if (join == null){
+                    // If by some nightmare there is no Joined date just use the first entry.
+                    join = e.getDate();
+                }
+                if (e.getDesc().startsWith("Joined ") || e.getDesc().startsWith("Freed ")) {
+                    join = e.getDate();
+                    break;
+                }
+            }
+            if (!p.isDependent() && !p.isPrisoner() && !p.isBondsman()) {
+                GregorianCalendar cal = (GregorianCalendar) GregorianCalendar.getInstance();
+                // For that one in a billion chance the log is empty. Clone todays date and subtract a year
+                if (join == null) {
+                    cal = (GregorianCalendar)calendar.clone();
+                    cal.add(Calendar.YEAR, -1);
+                    p.setRecruitment(cal);
+                } else {
+                    cal.setTime(join);
+                    p.setRecruitment(cal);
+                }
+            }
         }
     }
 
