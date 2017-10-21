@@ -6854,10 +6854,21 @@ public class Campaign implements Serializable, ITechManager {
         }
         ArrayList<String> possiblePortraits = new ArrayList<String>();
         Iterator<String> categories = portraits.getCategoryNames();
+        
+        String searchCat_Gender = "";
+        if (p.getGender() == Person.G_FEMALE) {
+            searchCat_Gender += "Female/";
+        } else {
+            searchCat_Gender += "Male/";
+        }
+        String searchCat_Role = Person.getRoleDesc(p.getPrimaryRole(), false) + "/";
+        if (searchCat_Role.startsWith("Admin/")) {
+            searchCat_Role = "Admin/";
+        }
+        
         while (categories.hasNext()) {
             String category = categories.next();
-            if ((category.endsWith("Male/") && p.getGender() == Person.G_MALE)
-                || (category.endsWith("Female/") && p.getGender() == Person.G_FEMALE)) {
+            if (category.endsWith(searchCat_Gender + searchCat_Role)) {
                 Iterator<String> names = portraits.getItemNames(category);
                 while (names.hasNext()) {
                     String name = names.next();
@@ -6866,6 +6877,23 @@ public class Campaign implements Serializable, ITechManager {
                         continue;
                     }
                     possiblePortraits.add(location);
+                }
+            }
+        }
+        if (possiblePortraits.isEmpty()) {
+            categories = portraits.getCategoryNames();
+            while (categories.hasNext()) {
+                String category = categories.next();
+                if (category.endsWith(searchCat_Gender)) {
+                    Iterator<String> names = portraits.getItemNames(category);
+                    while (names.hasNext()) {
+                        String name = names.next();
+                        String location = category + ":" + name;
+                        if (existingPortraits.contains(location)) {
+                            continue;
+                        }
+                        possiblePortraits.add(location);
+                    }
                 }
             }
         }
