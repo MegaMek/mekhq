@@ -185,6 +185,7 @@ import mekhq.campaign.parts.equipment.MissingMASC;
 import mekhq.campaign.personnel.Ancestors;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.Rank;
 import mekhq.campaign.personnel.RankTranslator;
 import mekhq.campaign.personnel.Ranks;
@@ -1675,6 +1676,16 @@ public class Campaign implements Serializable, ITechManager {
         report = report + ",  needs " + target.getValueAsString()
                  + " and rolls " + roll + ":";
         int xpGained = 0;
+        //If we get a natural 2 that isn't an automatic success, reroll if Edge is available and in use.
+        if (getCampaignOptions().useSupportEdge()
+                && (doctor.getOptions().booleanOption(PersonnelOptions.EDGE_MEDICAL))) {
+            if (roll == 2  && doctor.getEdge() > 0 && target.getValue() != TargetRoll.AUTOMATIC_SUCCESS) {
+                doctor.setEdge(doctor.getEdge() - 1);
+                roll = Compute.d6(2);
+                report += medWork.fail(0) + "\n" + doctor.getHyperlinkedFullTitle() + " uses Edge to reroll:"
+                + " rolls " + roll + ":";
+            }
+        }
         if (roll >= target.getValue()) {
             report = report + medWork.succeed();
             Unit u = getUnit(medWork.getUnitId());
@@ -1805,6 +1816,15 @@ public class Campaign implements Serializable, ITechManager {
         int roll = Compute.d6(2);
         report += "  needs " + target.getValueAsString();
         report += " and rolls " + roll + ":";
+        //Edge reroll, if applicable
+        if (roll < target.getValue()
+                && getCampaignOptions().useSupportEdge() 
+                && person.getOptions().booleanOption(PersonnelOptions.EDGE_ADMIN_ACQUIRE_FAIL)
+                && person.getEdge() > 0) {
+            person.setEdge(person.getEdge() - 1);
+            roll = Compute.d6(2);
+            report += " <b>failed!</b> but uses Edge to reroll...getting a " + roll + ": ";
+        }
         int mos = roll - target.getValue();
         if (target.getValue() == TargetRoll.AUTOMATIC_SUCCESS) {
             mos = roll - 2;
@@ -1927,6 +1947,22 @@ public class Campaign implements Serializable, ITechManager {
                 }
                 report = report + ",  needs " + target.getValueAsString()
                          + " and rolls " + roll + ": ";
+                if (roll < target.getValue()
+                        && getCampaignOptions().useSupportEdge()
+                        && tech.getOptions().booleanOption(PersonnelOptions.EDGE_REPAIR_FAILED_REFIT)
+                        && tech.getEdge() > 0) {
+                    tech.setEdge(tech.getEdge() - 1);
+                    if (tech.isRightTechTypeFor(r)) {
+                        roll = Compute.d6(2);
+                    } else {
+                        roll = Utilities.roll3d6();
+                    }
+                    //This is needed to update the edge values of individual crewmen
+                    if (tech.isEngineer()) {
+                        tech.setEdgeUsed(tech.getEdgeUsed() - 1);
+                    }
+                    report += " <b>failed!</b> but uses Edge to reroll...getting a " + roll + ": ";
+                }
                 if (roll >= target.getValue()) {
                     report += r.succeed();
                 } else {
@@ -2068,6 +2104,28 @@ public class Campaign implements Serializable, ITechManager {
         report = report + ",  needs " + target.getValueAsString()
                  + " and rolls " + roll + ":";
         int xpGained = 0;
+        //if we fail and would break a part, here's a chance to use Edge for a reroll...
+        if (getCampaignOptions().useSupportEdge() 
+                && tech.getOptions().booleanOption(PersonnelOptions.EDGE_REPAIR_BREAK_PART)
+                && tech.getEdge() > 0) {
+            if ((getCampaignOptions().isDestroyByMargin()
+                        && getCampaignOptions().getDestroyMargin() <= (target.getValue() - roll))
+                    || (tech.getExperienceLevel(false) == SkillType.EXP_ELITE //if an elite, primary tech
+                            || tech.getPrimaryRole() == 12) //For vessel crews
+                        && roll < target.getValue()) {
+                tech.setEdge(tech.getEdge() - 1);
+                if (tech.isRightTechTypeFor(partWork)) {
+                    roll = Compute.d6(2);
+                } else {
+                    roll = Utilities.roll3d6();
+                }
+                //This is needed to update the edge values of individual crewmen
+                if (tech.isEngineer()) {
+                    tech.setEdgeUsed(tech.getEdgeUsed() + 1);
+                }
+                report += " <b>failed!</b> and would destroy the part, but uses Edge to reroll...getting a " + roll + ":";                
+            }
+        }
         if (roll >= target.getValue()) {
             report = report + partWork.succeed();
             if (roll == 12 && target.getValue() != TargetRoll.AUTOMATIC_SUCCESS) {
@@ -2085,8 +2143,7 @@ public class Campaign implements Serializable, ITechManager {
             int effectiveSkillLvl = tech.getSkillForWorkingOn(partWork)
                                         .getExperienceLevel() - modePenalty;
             if (getCampaignOptions().isDestroyByMargin()) {
-                if (getCampaignOptions().getDestroyMargin() > (target
-                                                                       .getValue() - roll)) {
+                if (getCampaignOptions().getDestroyMargin() > (target.getValue() - roll)) {
                     // not destroyed - set the effective level as low as
                     // possible
                     effectiveSkillLvl = SkillType.EXP_ULTRA_GREEN;
@@ -2104,6 +2161,9 @@ public class Campaign implements Serializable, ITechManager {
         if (xpGained > 0) {
             tech.setXp(tech.getXp() + xpGained);
             report += " (" + xpGained + "XP gained) ";
+            if (tech.isEngineer()) {
+                tech.setEngineerXp(xpGained);
+            }
         }
         report += wrongType;
         partWork.resetTimeSpent();
@@ -2439,8 +2499,9 @@ public class Campaign implements Serializable, ITechManager {
 
         //need to loop through units twice, the first time to do all maintenance and the second
         //time to do whatever else. Otherwise, maintenance minutes might get sucked up by other
-        //stuff
+        //stuff. This is also a good place to ensure that a unit's engineer gets reset and updated.
         for (Unit u : getUnits()) {
+            u.resetEngineer();
             if (null != u.getEngineer()) {
                 u.getEngineer().resetMinutesLeft();
             }

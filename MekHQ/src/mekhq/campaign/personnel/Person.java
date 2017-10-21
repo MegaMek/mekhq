@@ -169,6 +169,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     
     private static final Map<Integer, Integer> MECHWARRIOR_AERO_RANSOM_VALUES; 
     private static final Map<Integer, Integer> OTHER_RANSOM_VALUES;
+    
 
     private static final IntSupplier PREGNANCY_DURATION = () -> {
         double gaussian = Math.sqrt(-2 * Math.log(Math.nextUp(Math.random())))
@@ -223,11 +224,12 @@ public class Person implements Serializable, MekHqXmlSerializable {
     protected ArrayList<LogEntry> personnelLog;
 
     private Hashtable<String, Skill> skills;
-    private PilotOptions options = new PilotOptions();
+    private PersonnelOptions options = new PersonnelOptions();
     private int toughness;
 
     private int status;
     protected int xp;
+    protected int engXp;
     protected int acquisitions;
     protected int salary;
     private int hits;
@@ -238,6 +240,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     boolean dependent;
     boolean commander;
     boolean isClanTech;
+    int edgeUsedThisRound;
 
     //phenotype and background
     private int phenotype;
@@ -1156,6 +1159,14 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     public void awardXP(int xp) {
         this.xp += xp;
+    }
+    
+    public int getEngineerXp() {
+        return engXp;
+    }
+    
+    public void setEngineerXp(int xp) {
+        engXp = xp;
     }
 
     public int getAcquisitions() {
@@ -2513,7 +2524,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     public void addSkill(String skillName, int lvl, int bonus) {
         skills.put(skillName, new Skill(skillName, lvl, bonus));
     }
-
+    
     public void addSkill(String skillName, int xpLvl, boolean random, int bonus) {
         skills.put(skillName, new Skill(skillName, xpLvl, random, bonus));
     }
@@ -2529,7 +2540,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
      */
     public void removeAllSkills() {
         skills.clear();
-    }
+    }   
     
     /**
      * Limit skills to the maximum of the given level
@@ -2599,11 +2610,11 @@ public class Person implements Serializable, MekHqXmlSerializable {
         heal();
         return " <font color='green'><b>Successfully healed one hit.</b></font>";
     }
-
-    public PilotOptions getOptions() {
+    
+    public PersonnelOptions getOptions() {
         return options;
     }
-
+    
     /**
      * Returns the options of the given category that this pilot has
      */
@@ -2726,6 +2737,14 @@ public class Person implements Serializable, MekHqXmlSerializable {
             }
         }
     }
+    
+    public void setEdgeUsed(int e) {
+        edgeUsedThisRound = e;
+    }
+    
+    public int getEdgeUsed() {
+        return edgeUsedThisRound;
+    }
 
     /*
      * This will set a specific edge trigger, regardless of the current status
@@ -2739,7 +2758,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         }
         MekHQ.triggerEvent(new PersonChangedEvent(this));
     }
-
+    
     /**
      * This will flip the boolean status of the current edge trigger
      *

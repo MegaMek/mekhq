@@ -860,7 +860,8 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
 
     private void addGroup(IOptionGroup group, GridBagLayout gridbag,
             GridBagConstraints c) {
-        JLabel groupLabel = new JLabel(group.getDisplayableName());
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CustomizePersonDialog", new EncodeControl()); //$NON-NLS-1$
+        JLabel groupLabel = new JLabel(resourceMap.getString("optionGroup." + group.getKey())); //$NON-NLS-1$
 
         gridbag.setConstraints(groupLabel, c);
         panOptions.add(groupLabel);
