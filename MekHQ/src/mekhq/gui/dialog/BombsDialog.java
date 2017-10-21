@@ -35,6 +35,7 @@ import javax.swing.JScrollPane;
 
 import megamek.client.ui.swing.BombChoicePanel;
 import megamek.common.BombType;
+import megamek.common.EquipmentType;
 import megamek.common.IBomber;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.AmmoStorage;
@@ -133,11 +134,19 @@ public class BombsDialog extends JDialog implements ActionListener {
             }
             
             for (int type = 0; type < BombType.B_NUM; type++) {
-                if(newLoadout[type] != 0 && bombCatalog[type] > 0) {
-                    AmmoStorage storedBombs = (AmmoStorage) campaign.getPart(bombCatalog[type]);
-                    storedBombs.changeShots(newLoadout[type]);
-                    if(storedBombs.getShots() == 0) {
-                        campaign.removePart(storedBombs);
+                if (newLoadout[type] != 0) {
+                    //IF there are bombs of this TYPE in the warehouse
+                    if (bombCatalog[type] > 0) {
+                        AmmoStorage storedBombs = (AmmoStorage) campaign.getPart(bombCatalog[type]);
+                        storedBombs.changeShots(newLoadout[type]);
+                        if(storedBombs.getShots() == 0) {
+                            campaign.removePart(storedBombs);
+                        }
+                    //No bombs of this type in warehouse, add bombs
+                    //In this case newLoadout should always be greater than 0, but check to be sure
+                    } else if (bombCatalog[type] == 0 && newLoadout[type] > 0) {
+                        AmmoStorage excessBombs = new AmmoStorage(0, EquipmentType.get(BombType.getBombInternalName(type)), newLoadout[type], campaign);
+                        campaign.addPart(excessBombs, 0);
                     }
                 }
             }
