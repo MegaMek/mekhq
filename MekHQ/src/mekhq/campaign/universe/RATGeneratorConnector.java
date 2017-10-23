@@ -43,7 +43,7 @@ import mekhq.MekHQ;
  *
  */
 
-public class RATGeneratorConnector implements IUnitGenerator {
+public class RATGeneratorConnector extends AbstractUnitGenerator implements IUnitGenerator {
 	
 	/* Initialize RATGenerator and load the data for the current game year */
 	public RATGeneratorConnector(int year) {
