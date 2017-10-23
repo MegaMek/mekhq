@@ -185,6 +185,7 @@ import mekhq.campaign.parts.equipment.MissingMASC;
 import mekhq.campaign.personnel.Ancestors;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.Rank;
 import mekhq.campaign.personnel.RankTranslator;
 import mekhq.campaign.personnel.Ranks;
@@ -1675,6 +1676,16 @@ public class Campaign implements Serializable, ITechManager {
         report = report + ",  needs " + target.getValueAsString()
                  + " and rolls " + roll + ":";
         int xpGained = 0;
+        //If we get a natural 2 that isn't an automatic success, reroll if Edge is available and in use.
+        if (getCampaignOptions().useSupportEdge()
+                && (doctor.getOptions().booleanOption(PersonnelOptions.EDGE_MEDICAL))) {
+            if (roll == 2  && doctor.getEdge() > 0 && target.getValue() != TargetRoll.AUTOMATIC_SUCCESS) {
+                doctor.setEdge(doctor.getEdge() - 1);
+                roll = Compute.d6(2);
+                report += medWork.fail(0) + "\n" + doctor.getHyperlinkedFullTitle() + " uses Edge to reroll:"
+                + " rolls " + roll + ":";
+            }
+        }
         if (roll >= target.getValue()) {
             report = report + medWork.succeed();
             Unit u = getUnit(medWork.getUnitId());
@@ -1805,6 +1816,15 @@ public class Campaign implements Serializable, ITechManager {
         int roll = Compute.d6(2);
         report += "  needs " + target.getValueAsString();
         report += " and rolls " + roll + ":";
+        //Edge reroll, if applicable
+        if (roll < target.getValue()
+                && getCampaignOptions().useSupportEdge() 
+                && person.getOptions().booleanOption(PersonnelOptions.EDGE_ADMIN_ACQUIRE_FAIL)
+                && person.getEdge() > 0) {
+            person.setEdge(person.getEdge() - 1);
+            roll = Compute.d6(2);
+            report += " <b>failed!</b> but uses Edge to reroll...getting a " + roll + ": ";
+        }
         int mos = roll - target.getValue();
         if (target.getValue() == TargetRoll.AUTOMATIC_SUCCESS) {
             mos = roll - 2;
@@ -1927,6 +1947,22 @@ public class Campaign implements Serializable, ITechManager {
                 }
                 report = report + ",  needs " + target.getValueAsString()
                          + " and rolls " + roll + ": ";
+                if (roll < target.getValue()
+                        && getCampaignOptions().useSupportEdge()
+                        && tech.getOptions().booleanOption(PersonnelOptions.EDGE_REPAIR_FAILED_REFIT)
+                        && tech.getEdge() > 0) {
+                    tech.setEdge(tech.getEdge() - 1);
+                    if (tech.isRightTechTypeFor(r)) {
+                        roll = Compute.d6(2);
+                    } else {
+                        roll = Utilities.roll3d6();
+                    }
+                    //This is needed to update the edge values of individual crewmen
+                    if (tech.isEngineer()) {
+                        tech.setEdgeUsed(tech.getEdgeUsed() - 1);
+                    }
+                    report += " <b>failed!</b> but uses Edge to reroll...getting a " + roll + ": ";
+                }
                 if (roll >= target.getValue()) {
                     report += r.succeed();
                 } else {
@@ -2068,6 +2104,28 @@ public class Campaign implements Serializable, ITechManager {
         report = report + ",  needs " + target.getValueAsString()
                  + " and rolls " + roll + ":";
         int xpGained = 0;
+        //if we fail and would break a part, here's a chance to use Edge for a reroll...
+        if (getCampaignOptions().useSupportEdge() 
+                && tech.getOptions().booleanOption(PersonnelOptions.EDGE_REPAIR_BREAK_PART)
+                && tech.getEdge() > 0) {
+            if ((getCampaignOptions().isDestroyByMargin()
+                        && getCampaignOptions().getDestroyMargin() <= (target.getValue() - roll))
+                    || (tech.getExperienceLevel(false) == SkillType.EXP_ELITE //if an elite, primary tech
+                            || tech.getPrimaryRole() == 12) //For vessel crews
+                        && roll < target.getValue()) {
+                tech.setEdge(tech.getEdge() - 1);
+                if (tech.isRightTechTypeFor(partWork)) {
+                    roll = Compute.d6(2);
+                } else {
+                    roll = Utilities.roll3d6();
+                }
+                //This is needed to update the edge values of individual crewmen
+                if (tech.isEngineer()) {
+                    tech.setEdgeUsed(tech.getEdgeUsed() + 1);
+                }
+                report += " <b>failed!</b> and would destroy the part, but uses Edge to reroll...getting a " + roll + ":";                
+            }
+        }
         if (roll >= target.getValue()) {
             report = report + partWork.succeed();
             if (roll == 12 && target.getValue() != TargetRoll.AUTOMATIC_SUCCESS) {
@@ -2085,8 +2143,7 @@ public class Campaign implements Serializable, ITechManager {
             int effectiveSkillLvl = tech.getSkillForWorkingOn(partWork)
                                         .getExperienceLevel() - modePenalty;
             if (getCampaignOptions().isDestroyByMargin()) {
-                if (getCampaignOptions().getDestroyMargin() > (target
-                                                                       .getValue() - roll)) {
+                if (getCampaignOptions().getDestroyMargin() > (target.getValue() - roll)) {
                     // not destroyed - set the effective level as low as
                     // possible
                     effectiveSkillLvl = SkillType.EXP_ULTRA_GREEN;
@@ -2104,6 +2161,9 @@ public class Campaign implements Serializable, ITechManager {
         if (xpGained > 0) {
             tech.setXp(tech.getXp() + xpGained);
             report += " (" + xpGained + "XP gained) ";
+            if (tech.isEngineer()) {
+                tech.setEngineerXp(xpGained);
+            }
         }
         report += wrongType;
         partWork.resetTimeSpent();
@@ -2439,8 +2499,9 @@ public class Campaign implements Serializable, ITechManager {
 
         //need to loop through units twice, the first time to do all maintenance and the second
         //time to do whatever else. Otherwise, maintenance minutes might get sucked up by other
-        //stuff
+        //stuff. This is also a good place to ensure that a unit's engineer gets reset and updated.
         for (Unit u : getUnits()) {
+            u.resetEngineer();
             if (null != u.getEngineer()) {
                 u.getEngineer().resetMinutesLeft();
             }
@@ -6478,6 +6539,9 @@ public class Campaign implements Serializable, ITechManager {
                     changeRank(p, 0, false);
                 }
                 p.addLogEntry(getDate(), "Freed");
+                if (getCampaignOptions().getUseTimeInService()) {
+                    p.setRecruitment((GregorianCalendar) getCalendar().clone());
+                }
                 break;
             case Person.PRISONER_YES:
                 if (p.getRankNumeric() > 0) {
@@ -6486,6 +6550,9 @@ public class Campaign implements Serializable, ITechManager {
                 }
                 p.setPrisoner();
                 p.addLogEntry(getDate(), "Made Prisoner");
+                if (getCampaignOptions().getUseTimeInService()) {
+                    p.setRecruitment(null);
+                }
                 break;
             case Person.PRISONER_BONDSMAN:
                 if (p.getRankNumeric() > 0) {
@@ -6494,6 +6561,9 @@ public class Campaign implements Serializable, ITechManager {
                 }
                 p.setBondsman();
                 p.addLogEntry(getDate(), "Made Bondsman");
+                if (getCampaignOptions().getUseTimeInService()) {
+                    p.setRecruitment(null);
+                }
                 break;
             default:
                 break;
@@ -6854,10 +6924,21 @@ public class Campaign implements Serializable, ITechManager {
         }
         ArrayList<String> possiblePortraits = new ArrayList<String>();
         Iterator<String> categories = portraits.getCategoryNames();
+        
+        String searchCat_Gender = "";
+        if (p.getGender() == Person.G_FEMALE) {
+            searchCat_Gender += "Female/";
+        } else {
+            searchCat_Gender += "Male/";
+        }
+        String searchCat_Role = Person.getRoleDesc(p.getPrimaryRole(), false) + "/";
+        if (searchCat_Role.startsWith("Admin/")) {
+            searchCat_Role = "Admin/";
+        }
+        
         while (categories.hasNext()) {
             String category = categories.next();
-            if ((category.endsWith("Male/") && p.getGender() == Person.G_MALE)
-                || (category.endsWith("Female/") && p.getGender() == Person.G_FEMALE)) {
+            if (category.endsWith(searchCat_Gender + searchCat_Role)) {
                 Iterator<String> names = portraits.getItemNames(category);
                 while (names.hasNext()) {
                     String name = names.next();
@@ -6866,6 +6947,23 @@ public class Campaign implements Serializable, ITechManager {
                         continue;
                     }
                     possiblePortraits.add(location);
+                }
+            }
+        }
+        if (possiblePortraits.isEmpty()) {
+            categories = portraits.getCategoryNames();
+            while (categories.hasNext()) {
+                String category = categories.next();
+                if (category.endsWith(searchCat_Gender)) {
+                    Iterator<String> names = portraits.getItemNames(category);
+                    while (names.hasNext()) {
+                        String name = names.next();
+                        String location = category + ":" + name;
+                        if (existingPortraits.contains(location)) {
+                            continue;
+                        }
+                        possiblePortraits.add(location);
+                    }
                 }
             }
         }
@@ -6920,17 +7018,21 @@ public class Campaign implements Serializable, ITechManager {
             m.setCoolingFlawActive(false);
         } else if (entity instanceof Aero) {
             Aero a = (Aero) entity;
-            int[] bombChoices = a.getBombChoices();
-            for (Mounted m : a.getBombs()) {
-                if (!(m.getType() instanceof BombType)) {
-                    continue;
+            List<Mounted> mountedBombs = a.getBombs();
+            if (mountedBombs.size() > 0) {
+                //This should return an int[] filled with 0's
+                int[] bombChoices = a.getBombChoices();
+                for (Mounted m : mountedBombs) {
+                    if (!(m.getType() instanceof BombType)) {
+                        continue;
+                    }
+                    if(m.getBaseShotsLeft() == 1) {
+                        bombChoices[BombType.getBombTypeFromInternalName(m.getType().getInternalName())] += 1;
+                    }
                 }
-                if(m.getBaseShotsLeft() == 0) {
-                    bombChoices[BombType.getBombTypeFromInternalName(m.getType().getInternalName())] -= 1;
-                }
+                a.setBombChoices(bombChoices);
+                a.clearBombs();
             }
-            a.setBombChoices(bombChoices);
-            a.clearBombs();
             if(a.isSpheroid()) {
                 entity.setMovementMode(EntityMovementMode.SPHEROID);
             } else {
@@ -8547,6 +8649,34 @@ public class Campaign implements Serializable, ITechManager {
 	                      + ". " + paidString + qualityString + ". " + damageString + " [<a href='MAINTENANCE|" + u.getId() + "'>Get details</a>]");
 	        }
             u.resetDaysSinceMaintenance();
+        }
+    }
+
+    public void initTimeInService() {
+        for (Person p : personnel) {
+            Date join = null;
+            for (LogEntry e : p.getPersonnelLog()) {
+                if (join == null){
+                    // If by some nightmare there is no Joined date just use the first entry.
+                    join = e.getDate();
+                }
+                if (e.getDesc().startsWith("Joined ") || e.getDesc().startsWith("Freed ")) {
+                    join = e.getDate();
+                    break;
+                }
+            }
+            if (!p.isDependent() && !p.isPrisoner() && !p.isBondsman()) {
+                GregorianCalendar cal = (GregorianCalendar) GregorianCalendar.getInstance();
+                // For that one in a billion chance the log is empty. Clone todays date and subtract a year
+                if (join == null) {
+                    cal = (GregorianCalendar)calendar.clone();
+                    cal.add(Calendar.YEAR, -1);
+                    p.setRecruitment(cal);
+                } else {
+                    cal.setTime(join);
+                    p.setRecruitment(cal);
+                }
+            }
         }
     }
 

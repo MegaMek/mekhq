@@ -169,6 +169,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     
     private static final Map<Integer, Integer> MECHWARRIOR_AERO_RANSOM_VALUES; 
     private static final Map<Integer, Integer> OTHER_RANSOM_VALUES;
+    
 
     private static final IntSupplier PREGNANCY_DURATION = () -> {
         double gaussian = Math.sqrt(-2 * Math.log(Math.nextUp(Math.random())))
@@ -219,14 +220,16 @@ public class Person implements Serializable, MekHqXmlSerializable {
     protected String biography;
     protected GregorianCalendar birthday;
     protected GregorianCalendar deathday;
+    protected GregorianCalendar recruitment;
     protected ArrayList<LogEntry> personnelLog;
 
     private Hashtable<String, Skill> skills;
-    private PilotOptions options = new PilotOptions();
+    private PersonnelOptions options = new PersonnelOptions();
     private int toughness;
 
     private int status;
     protected int xp;
+    protected int engXp;
     protected int acquisitions;
     protected int salary;
     private int hits;
@@ -237,6 +240,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     boolean dependent;
     boolean commander;
     boolean isClanTech;
+    int edgeUsedThisRound;
 
     //phenotype and background
     private int phenotype;
@@ -422,6 +426,11 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     public void setDependent(boolean tf) {
         dependent = tf;
+        if (dependent) {
+            recruitment = null;
+        } else {
+            recruitment = (GregorianCalendar) campaign.getCalendar().clone();
+        }
     }
 
     public boolean isPrisoner() {
@@ -895,6 +904,23 @@ public class Person implements Serializable, MekHqXmlSerializable {
         this.deathday = date;
     }
 
+    public void setRecruitment(GregorianCalendar date) {
+        this.recruitment = date;
+    }
+
+    public GregorianCalendar getRecruitment() {
+        return recruitment;
+    }
+
+    public String getRecruitmentAsString() {
+        if (recruitment == null) {
+            return null;
+        }
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+        String recruitdate = df.format(recruitment.getTime());
+        return recruitdate;
+    }
+
     public int getAge(GregorianCalendar today) {
         // Get age based on year
         if (null != deathday) {
@@ -913,6 +939,25 @@ public class Person implements Serializable, MekHqXmlSerializable {
             age--;
         }
         return age;
+    }
+
+    public int getTimeInService(GregorianCalendar today) {
+        // Get time in service based on year
+        if (null == recruitment) {
+            //use zero if hasn't been recruited yet
+            return -1;
+        }
+         
+        int timeinservice = today.get(Calendar.YEAR) - recruitment.get(Calendar.YEAR);
+
+        // Add the tentative time in service to the date of recruitment to get this year's service history
+        GregorianCalendar tmpDate = (GregorianCalendar) recruitment.clone();
+        tmpDate.add(Calendar.YEAR, timeinservice);
+
+        if (today.before(tmpDate)) {
+            timeinservice--;
+        }
+        return timeinservice;
     }
 
     public void setId(UUID id) {
@@ -1114,6 +1159,14 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     public void awardXP(int xp) {
         this.xp += xp;
+    }
+    
+    public int getEngineerXp() {
+        return engXp;
+    }
+    
+    public void setEngineerXp(int xp) {
+        engXp = xp;
     }
 
     public int getAcquisitions() {
@@ -1363,6 +1416,12 @@ public class Person implements Serializable, MekHqXmlSerializable {
                         + df.format(deathday.getTime())
                         + "</deathday>");
         }
+        if (null != recruitment) {
+            pw1.println(MekHqXmlUtil.indentStr(indent + 1)
+                        + "<recruitment>"
+                        + df.format(recruitment.getTime())
+                        + "</recruitment>");
+        }
         for (String skName : skills.keySet()) {
             Skill skill = skills.get(skName);
             skill.writeToXml(pw1, indent + 1);
@@ -1580,6 +1639,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
                     retVal.deathday = (GregorianCalendar) GregorianCalendar.getInstance();
                     retVal.deathday.setTime(df.parse(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("recruitment")) {
+                    SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+                    retVal.recruitment = (GregorianCalendar) GregorianCalendar.getInstance();
+                    retVal.recruitment.setTime(df.parse(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("advantages")) {
                     advantages = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("edge")) {
@@ -2461,7 +2524,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     public void addSkill(String skillName, int lvl, int bonus) {
         skills.put(skillName, new Skill(skillName, lvl, bonus));
     }
-
+    
     public void addSkill(String skillName, int xpLvl, boolean random, int bonus) {
         skills.put(skillName, new Skill(skillName, xpLvl, random, bonus));
     }
@@ -2477,7 +2540,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
      */
     public void removeAllSkills() {
         skills.clear();
-    }
+    }   
     
     /**
      * Limit skills to the maximum of the given level
@@ -2547,11 +2610,11 @@ public class Person implements Serializable, MekHqXmlSerializable {
         heal();
         return " <font color='green'><b>Successfully healed one hit.</b></font>";
     }
-
-    public PilotOptions getOptions() {
+    
+    public PersonnelOptions getOptions() {
         return options;
     }
-
+    
     /**
      * Returns the options of the given category that this pilot has
      */
@@ -2674,6 +2737,14 @@ public class Person implements Serializable, MekHqXmlSerializable {
             }
         }
     }
+    
+    public void setEdgeUsed(int e) {
+        edgeUsedThisRound = e;
+    }
+    
+    public int getEdgeUsed() {
+        return edgeUsedThisRound;
+    }
 
     /*
      * This will set a specific edge trigger, regardless of the current status
@@ -2687,7 +2758,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         }
         MekHQ.triggerEvent(new PersonChangedEvent(this));
     }
-
+    
     /**
      * This will flip the boolean status of the current edge trigger
      *

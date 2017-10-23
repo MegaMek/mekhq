@@ -119,8 +119,6 @@ import mekhq.campaign.parts.Refit;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.SpecialAbility;
-import mekhq.campaign.rating.CampaignOpsReputation;
-import mekhq.campaign.rating.FieldManualMercRevDragoonsRating;
 import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.campaign.report.CargoReport;
 import mekhq.campaign.report.HangarReport;
@@ -1647,11 +1645,17 @@ public class CampaignGUI extends JPanel {
 
     private void menuOptionsActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_menuOptionsActionPerformed
         boolean atb = getCampaign().getCampaignOptions().getUseAtB();
+        boolean timein = getCampaign().getCampaignOptions().getUseTimeInService();
         boolean staticRATs = getCampaign().getCampaignOptions().useStaticRATs();
         boolean factionIntroDate = getCampaign().getCampaignOptions().useFactionIntroDate();
         CampaignOptionsDialog cod = new CampaignOptionsDialog(getFrame(), true,
                 getCampaign(), getIconPackage().getCamos());
         cod.setVisible(true);
+        if (timein != getCampaign().getCampaignOptions().getUseTimeInService()) {
+            if (getCampaign().getCampaignOptions().getUseTimeInService()) {
+                getCampaign().initTimeInService();
+            }
+        }
         if (atb != getCampaign().getCampaignOptions().getUseAtB()) {
             if (getCampaign().getCampaignOptions().getUseAtB()) {
                 getCampaign().initAtB();
