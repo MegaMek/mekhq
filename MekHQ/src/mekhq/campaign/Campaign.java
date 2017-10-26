@@ -180,6 +180,7 @@ import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.HeatSink;
 import mekhq.campaign.parts.equipment.MASC;
+import mekhq.campaign.parts.equipment.MissingAmmoBin;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.parts.equipment.MissingMASC;
 import mekhq.campaign.personnel.Ancestors;
@@ -4965,6 +4966,23 @@ public class Campaign implements Serializable, ITechManager {
             if((p instanceof EquipmentPart && null == ((EquipmentPart)p).getType())
             		|| (p instanceof MissingEquipmentPart && null == ((MissingEquipmentPart)p).getType())) {
             	p = null;
+            }
+            
+            if ((p.getUnitId() != null)
+                    && ((version.getMinorVersion() < 43)
+                            || ((version.getMinorVersion() == 43) && (version.getSnapshot() < 5)))
+                    && ((p instanceof AmmoBin) || (p instanceof MissingAmmoBin))) {
+                Unit u = retVal.getUnit(p.getUnitId());
+                if (null != u) {
+                    Mounted m = u.getEntity().getEquipment(((AmmoBin) p).getEquipmentNum());
+                    if (null != m) {
+                        if (p instanceof AmmoBin) {
+                            ((AmmoBin) p).setCapacity(m.getAmmoCapacity());
+                        } else {
+                            ((MissingAmmoBin) p).setCapacity(m.getAmmoCapacity());
+                        }
+                    }
+                }
             }
 
             if (p != null) {

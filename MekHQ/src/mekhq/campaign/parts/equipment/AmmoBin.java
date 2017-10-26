@@ -67,6 +67,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 	protected int shotsNeeded;
 	protected boolean checkedToday;
 	protected boolean oneShot;
+	protected double capacity;
 
     public AmmoBin() {
     	this(0, null, -1, 0, false, false, null);
@@ -78,6 +79,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
         this.shotsNeeded = shots;
         this.oneShot = singleShot;
         this.checkedToday = false;
+        this.capacity = 1.0;
         if(null != type && type instanceof AmmoType) {
         	this.munition = ((AmmoType)type).getMunitionType();
         }
@@ -128,15 +130,17 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     public double getTonnage() {
     	return (1.0 * getFullShots())/((AmmoType)type).getShots();
     }
+    
+    public double getCapacity() {
+        return capacity;
+    }
+    
+    public void setCapacity(double capacity) {
+        this.capacity = capacity;
+    }
 
     public int getFullShots() {
-    	int fullShots = ((AmmoType)type).getShots();
-    	if(unit != null) {
-			Mounted m = unit.getEntity().getEquipment(equipmentNum);
-            if(null != m && m.getOriginalShots() > 0) {
-                fullShots = m.getOriginalShots();
-            }
-		}
+        int fullShots = (int) Math.floor(capacity * ((AmmoType) type).getShots() / type.getTonnage(null));
     	if(null != unit && unit.getEntity() instanceof Protomech) {
 	        //if protomechs are using alternate munitions then cut in half
 	        if(((AmmoType)type).getMunitionType() != AmmoType.M_STANDARD) {
@@ -236,10 +240,14 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 				+"<checkedToday>"
 				+checkedToday
 				+"</checkedToday>");
-		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<oneShot>"
-				+oneShot
-				+"</oneShot>");
+        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"<oneShot>"
+                +oneShot
+                +"</oneShot>");
+        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"<capacity>"
+                +capacity
+                +"</capacity>");
 		writeToXmlEnd(pw1, indent);
 	}
 
@@ -265,12 +273,14 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 				} else {
 					checkedToday = false;
 				}
-			} else if (wn2.getNodeName().equalsIgnoreCase("oneShot")) {
-				if(wn2.getTextContent().equalsIgnoreCase("true")) {
-					oneShot = true;
-				} else {
-					oneShot = false;
-				}
+            } else if (wn2.getNodeName().equalsIgnoreCase("oneShot")) {
+                if(wn2.getTextContent().equalsIgnoreCase("true")) {
+                    oneShot = true;
+                } else {
+                    oneShot = false;
+                }
+            } else if (wn2.getNodeName().equalsIgnoreCase("capacity")) {
+                capacity = Double.parseDouble(wn2.getTextContent());
 			}
 		}
 		restore();
@@ -375,7 +385,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 
 	@Override
 	public MissingPart getMissingPart() {
-		return new MissingAmmoBin(getUnitTonnage(), type, equipmentNum, oneShot, omniPodded, campaign);
+		return new MissingAmmoBin(getUnitTonnage(), type, equipmentNum, oneShot, omniPodded, capacity, campaign);
 	}
 
 	public boolean isOneShot() {
@@ -395,16 +405,13 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 		if(null != unit) {
 			Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
 			if(null != mounted) {
+			    capacity = mounted.getAmmoCapacity();
 				if(mounted.isMissing() || mounted.isDestroyed()) {
 					mounted.setShotsLeft(0);
 					remove(false);
 					return;
 				}
-				long currentMuniType = 0;
-				if(mounted.getType() instanceof AmmoType) {
-					currentMuniType = ((AmmoType)mounted.getType()).getMunitionType();
-				}
-				if(currentMuniType == getMunitionType()) {
+				if (type == mounted.getType()) {
 					shotsNeeded = getFullShots() - mounted.getBaseShotsLeft();
 				} else {
 					//we have a change of munitions
@@ -461,6 +468,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 		        mounted.changeAmmoType((AmmoType) type);
 		        unit.repairSystem(CriticalSlot.TYPE_EQUIPMENT, equipmentNum);
 				mounted.setShotsLeft(getFullShots() - shotsNeeded);
+				mounted.setAmmoCapacity(capacity);
 			}
 		}
 	}

@@ -1071,7 +1071,8 @@ public class Utilities {
                     }
                     if(m.getType().getInternalName().equals(bin.getType().getInternalName())
                             && ((AmmoType)m.getType()).getMunitionType() == bin.getMunitionType()
-                            && !m.isDestroyed()) {
+                            && !m.isDestroyed()
+                            && m.getLocation() == bin.getLocation()) {
                         bin.setEquipmentNum(equipNum);
                         found = true;
                         break;
@@ -1092,7 +1093,8 @@ public class Utilities {
                         continue;
                     }
                     if(m.getType().getInternalName().equals(bin.getType().getInternalName())
-                            && m.isDestroyed()) {
+                            && !m.isDestroyed()
+                            && m.getLocation() == bin.getLocation()) {
                         bin.setEquipmentNum(equipNum);
                         found = true;
                         break;
@@ -1113,7 +1115,8 @@ public class Utilities {
                         continue;
                     }
                     if(m.getType().getInternalName().equals(epart.getType().getInternalName())
-                            && !m.isDestroyed()) {
+                            && !m.isDestroyed()
+                            && m.getLocation() == epart.getLocation()) {
                         epart.setEquipmentNum(equipNum);
                         found = true;
                         break;
@@ -1131,7 +1134,8 @@ public class Utilities {
                     i++;
                     m = unit.getEntity().getEquipment(equipNum);
                     if(m.getType().getInternalName().equals(epart.getType().getInternalName())
-                            && m.isDestroyed()) {
+                            && !m.isDestroyed()
+                            && m.getLocation() == epart.getLocation()) {
                         epart.setEquipmentNum(equipNum);
                         found = true;
                         break;

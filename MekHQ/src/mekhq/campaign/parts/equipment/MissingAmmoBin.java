@@ -43,18 +43,28 @@ public class MissingAmmoBin extends MissingEquipmentPart {
 	private static final long serialVersionUID = 2892728320891712304L;
 
 	protected boolean oneShot;
+	protected double capacity;
 	
     public MissingAmmoBin() {
-    	this(0, null, -1, false, false, null);
+    	this(0, null, -1, false, false, 1.0, null);
     }
     
     public MissingAmmoBin(int tonnage, EquipmentType et, int equipNum, boolean singleShot,
-            boolean omniPodded, Campaign c) {
+            boolean omniPodded, double capacity, Campaign c) {
         super(tonnage, et, equipNum, c, 1, omniPodded);
         this.oneShot = singleShot;
+        this.capacity = capacity;
         if(null != name) {
         	this.name += " Bin";
         }
+    }
+    
+    public double getCapacity() {
+        return capacity;
+    }
+    
+    public void setCapacity(double capacity) {
+        this.capacity = capacity;
     }
 	
     /* Per TM, ammo for fighters is stored in the fuselage. This makes a difference for omnifighter
@@ -96,6 +106,7 @@ public class MissingAmmoBin extends MissingEquipmentPart {
 		Part replacement = findReplacement(false);
 		if(null != replacement) {
 			Part actualReplacement = replacement.clone();
+			((AmmoBin) actualReplacement).setCapacity(capacity);
 			unit.addPart(actualReplacement);
 			campaign.addPart(actualReplacement, 0);
 			replacement.decrementQuantity();

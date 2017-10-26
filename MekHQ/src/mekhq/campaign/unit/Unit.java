@@ -29,6 +29,7 @@ import java.util.Calendar;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -2485,6 +2486,43 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 podSpace.add(new PodSpace(loc, this));
             }
             podSpace.forEach(ps -> ps.updateConditionFromEntity(false));
+        }
+    }
+    
+    /**
+     * Checks for additional ammo bins and adds the appropriate part.
+     * 
+     * Large craft can combine all the ammo of a single type into a single bin. Switching the munition type
+     * of one or more tons of ammo can require the addition of an ammo bin and can change the ammo bin
+     * capacity.
+     */
+    public void adjustLargeCraftAmmo() {
+        Map<Integer,Part> ammoParts = new HashMap<>();
+        List<Part> toAdd = new ArrayList<>();
+        for (Part p : parts) {
+            if (p instanceof AmmoBin) {
+                ammoParts.put(((AmmoBin) p).getEquipmentNum(), p);
+            } else if (p instanceof MissingAmmoBin) {
+                ammoParts.put(((MissingAmmoBin) p).getEquipmentNum(), p);
+            }
+        }
+        for (Mounted m : entity.getAmmo()) {
+            Integer eqNum = entity.getEquipmentNum(m);
+            Part part = ammoParts.get(eqNum);
+            if (null == part) {
+                part = new AmmoBin((int)entity.getWeight(), m.getType(), eqNum,
+                        m.getOriginalShots() - m.getBaseShotsLeft(), false, m.isOmniPodMounted(), campaign);
+                toAdd.add(part);
+            }
+            if (part instanceof AmmoBin) {
+                ((AmmoBin) part).setCapacity(m.getAmmoCapacity());
+            } else if (part instanceof MissingAmmoBin) {
+                ((MissingAmmoBin) part).setCapacity(m.getAmmoCapacity());
+            }
+        }
+        for (Part p : toAdd) {
+            addPart(p);
+            campaign.addPart(p, 0);
         }
     }
 
