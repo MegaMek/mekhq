@@ -26,6 +26,7 @@ import megamek.common.AmmoType;
 import megamek.common.BattleArmor;
 import megamek.common.CriticalSlot;
 import megamek.common.Entity;
+import megamek.common.EquipmentType;
 import megamek.common.IBomber;
 import megamek.common.Infantry;
 import megamek.common.Mech;
@@ -198,8 +199,8 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
             }
             AmmoBin ammo = (AmmoBin) part;
             sel = command.split(":")[2];
-            long munition = Long.parseLong(sel);
-            ammo.changeMunition(munition);
+            AmmoType atype = (AmmoType) EquipmentType.get(sel);
+            ammo.changeMunition(atype);
             MekHQ.triggerEvent(new UnitChangedEvent(part.getUnit()));
         } else if (command.contains("CHANGE_SITE")) {
             for (Unit unit : units) {
@@ -596,12 +597,12 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                             .getEntity(), curType, gui.getCampaign()
                             .getCampaignOptions().getTechLevel())) {
                         cbMenuItem = new JCheckBoxMenuItem(atype.getDesc());
-                        if (atype.equals(curType) && atype.getMunitionType() == curType.getMunitionType()) {
+                        if (atype == curType) {
                             cbMenuItem.setSelected(true);
                         } else {
                             cbMenuItem.setActionCommand("SWAP_AMMO:"
                                     + ammo.getId() + ":"
-                                    + atype.getMunitionType());
+                                    + atype.getInternalName());
                             cbMenuItem.addActionListener(this);
                         }
                         ammoMenu.add(cbMenuItem);

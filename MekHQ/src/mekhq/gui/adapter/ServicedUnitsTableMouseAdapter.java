@@ -13,10 +13,11 @@ import javax.swing.JTable;
 import javax.swing.event.MouseInputAdapter;
 
 import megamek.common.AmmoType;
+import megamek.common.EquipmentType;
 import mekhq.MekHQ;
 import mekhq.Utilities;
-import mekhq.campaign.event.UnitChangedEvent;
 import mekhq.campaign.event.RepairStatusChangedEvent;
+import mekhq.campaign.event.UnitChangedEvent;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.unit.Unit;
@@ -77,8 +78,8 @@ public class ServicedUnitsTableMouseAdapter extends MouseInputAdapter
             }
             AmmoBin ammo = (AmmoBin) part;
             sel = command.split(":")[2];
-            long munition = Long.parseLong(sel);
-            ammo.changeMunition(munition);
+            EquipmentType etype = EquipmentType.get(sel);
+            ammo.changeMunition(etype);
             MekHQ.triggerEvent(new UnitChangedEvent(part.getUnit()));
         } else if (command.contains("CHANGE_SITE")) {
             for (Unit unit : units) {
@@ -198,7 +199,7 @@ public class ServicedUnitsTableMouseAdapter extends MouseInputAdapter
                         } else {
                             cbMenuItem.setActionCommand("SWAP_AMMO:"
                                     + ammo.getId() + ":"
-                                    + atype.getMunitionType());
+                                    + atype.getInternalName());
                             cbMenuItem.addActionListener(this);
                         }
                         ammoMenu.add(cbMenuItem);

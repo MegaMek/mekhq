@@ -216,6 +216,16 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     	}
     	updateConditionFromEntity(false);
     }
+    
+    public void changeMunition(EquipmentType type) {
+        if (type instanceof AmmoType) {
+            munition = ((AmmoType) type).getMunitionType();
+            this.type = type;
+            this.name = type.getName();
+            this.typeName = type.getInternalName();
+            updateConditionFromEntity(false);
+        }
+    }
 
 	@Override
 	public void writeToXml(PrintWriter pw1, int indent) {

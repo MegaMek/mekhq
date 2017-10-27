@@ -85,6 +85,7 @@ import megamek.common.TechConstants;
 import megamek.common.VTOL;
 import megamek.common.logging.LogLevel;
 import megamek.common.options.IOption;
+import megamek.common.options.OptionsConstants;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.parts.Part;
@@ -273,10 +274,7 @@ public class Utilities {
             //TODO: clan/IS limitations?
 
             if ((entity instanceof Aero)
-                        && !((atype.getAmmoType() == AmmoType.T_MML)
-                                || (atype.getAmmoType() == AmmoType.T_ATM)
-                                || (atype.getAmmoType() == AmmoType.T_NARC)
-                                || (atype.getAmmoType() == AmmoType.T_AC_LBX))) {
+                    && !atype.canAeroUse()) {
                 continue;
             }
 
@@ -304,13 +302,19 @@ public class Utilities {
                             && !atype.hasFlag(AmmoType.F_PROTOMECH)) {
                 continue;
             }
+            
+            if (atype.hasFlag(AmmoType.F_NUCLEAR) && atype.hasFlag(AmmoType.F_CAP_MISSILE)
+                    && !entity.getGame().getOptions().booleanOption(OptionsConstants.ADVAERORULES_AT2_NUKES)) {
+                continue;
+            }
 
             // Battle Armor ammo can't be selected at all.
             // All other ammo types need to match on rack size and tech.
             if ((atype.getRackSize() == cur_atype.getRackSize())
             		&& (atype.hasFlag(AmmoType.F_BATTLEARMOR) == cur_atype.hasFlag(AmmoType.F_BATTLEARMOR))
             		&& (atype.hasFlag(AmmoType.F_ENCUMBERING) == cur_atype.hasFlag(AmmoType.F_ENCUMBERING))
-            		&& (atype.getTonnage(entity) == cur_atype.getTonnage(entity))) {
+            		&& ((atype.getTonnage(entity) == cur_atype.getTonnage(entity))
+            		        || atype.hasFlag(AmmoType.F_CAP_MISSILE))) {
                 atypes.add(atype);
             }
         }
