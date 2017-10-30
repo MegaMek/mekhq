@@ -20,6 +20,21 @@
  */
 package mekhq.campaign.mission;
 
+import megamek.common.BattleArmor;
+import megamek.common.Infantry;
+import mekhq.MekHqXmlSerializable;
+import mekhq.MekHqXmlUtil;
+import mekhq.Utilities;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.JumpPath;
+import mekhq.campaign.unit.Unit;
+import mekhq.campaign.universe.Planets;
+import org.apache.commons.text.CharacterPredicate;
+import org.apache.commons.text.RandomStringGenerator;
+import org.joda.time.DateTime;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.text.ParseException;
@@ -27,20 +42,6 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-
-import org.apache.commons.text.CharacterPredicate;
-import org.apache.commons.text.RandomStringGenerator;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import megamek.common.BattleArmor;
-import megamek.common.Infantry;
-import mekhq.MekHqXmlSerializable;
-import mekhq.MekHqXmlUtil;
-import mekhq.Utilities;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.unit.Unit;
-import mekhq.campaign.universe.Planets;
 
 /**
  * Contracts - we need to track static amounts here because changes in the
@@ -391,63 +392,96 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
         }
     }
 
-    public long getEstimatedTotalProfit(Campaign c) {
-        long profit = getTotalAmountPlusFeesAndBonuses();
-        profit -= c.getOverheadExpenses() * getLength();
-        profit -= c.getMaintenanceCosts() * getLength();
-        if (c.getCampaignOptions().usePeacetimeCost()) {
-            profit -= c.getPeacetimeCost() * getLength();
-        } else {
-            profit -= c.getPayRoll() * getLength();
+    private int getTravelDays(Campaign c) {
+        if(null != c.getPlanet(planetName)) {
+            DateTime currentDate = Utilities.getDateTimeDay(c.getCalendar());
+            JumpPath jumpPath = c.calculateJumpPath(c.getCurrentPlanet(), getPlanet());
+            double days = Math.round(jumpPath.getTotalTime(currentDate, c.getLocation().getTransitTime()) * 100.0) / 100.0;
+            return (int) Math.round(days);
         }
-        if (null != c.getPlanet(planetName) && c.getCampaignOptions().payForTransport()) {
-            profit -= 2 * c.calculateCostPerJump(true)
-                    * c.calculateJumpPath(c.getCurrentPlanet(), getPlanet()).getJumps();
-        }
-        return profit;
+        return 0;
     }
 
-    public int getMonthsLeft(Date date) {
-        GregorianCalendar cal = new GregorianCalendar();
-        cal.setTime(date);
-        cal.add(Calendar.MONTH, 1);
-        date = cal.getTime();
-        int monthsLeft = 0;
-        while (date.before(endDate) || date.equals(endDate)) {
-            monthsLeft++;
-            cal.add(Calendar.MONTH, 1);
-            date = cal.getTime();
-        }
-        return monthsLeft;
+
+    private int getLengthPlusTravel(Campaign c) {
+        int travelMonths = (int) Math.ceil(getTravelDays(c) / 30.0) * 2;
+        return getLength() + travelMonths;
     }
 
     /**
-     * Only do this at the time the contract is set up, otherwise amounts may change
-     * after the ink is signed, which is a no-no.
-     * 
-     * @param c
+     * Get the estimated total profit for this contract. The total profit is the total contract
+     * payment including fees and bonuses, minus overhead, maintenance, payroll, spare parts,
+     * and other monthly expenses. The duration used for monthly expenses is the contract duration
+     * plus the travel time from the unit's current world to the contract world and back.
+     *
+     * @param c The campaign with which this contract is associated.
+     * @return The estimated profit in C-bills.
      */
+    public long getEstimatedTotalProfit(Campaign c) {
+        long profit = getTotalAmountPlusFeesAndBonuses();
+        profit -= c.getOverheadExpenses() * getLengthPlusTravel(c);
+        profit -= c.getMaintenanceCosts() * getLengthPlusTravel(c);
+        if (c.getCampaignOptions().usePeacetimeCost()) {
+            profit -= c.getPeacetimeCost() * getLengthPlusTravel(c);
+        } else {
+            profit -= c.getPayRoll() * getLengthPlusTravel(c);
+        }
+		if(null != c.getPlanet(planetName) && c.getCampaignOptions().payForTransport()) {
+			JumpPath jumpPath = c.calculateJumpPath(c.getCurrentPlanet(), getPlanet());
+
+			boolean campaignOps = c.getCampaignOptions().useEquipmentContractBase();
+			profit -= 2 * c.calculateCostPerJump(campaignOps, campaignOps) * jumpPath.getJumps();
+		}
+		return profit;
+	}
+
+    /**
+     * Get the number of months left in this contract after the given date. Partial months are counted as
+     * full months.
+     *
+     * @param date
+     * @return
+     */
+	public int getMonthsLeft(Date date) {
+		GregorianCalendar cal = new GregorianCalendar();
+		cal.setTime(date);
+		cal.add(Calendar.MONTH, 1);
+		date = cal.getTime();
+		int monthsLeft = 0;
+		while(date.before(endDate) || date.equals(endDate)) {
+			monthsLeft++;
+			cal.add(Calendar.MONTH, 1);
+			date = cal.getTime();
+		}
+		return monthsLeft;
+	}
+
+	/**
+	 * Only do this at the time the contract is set up, otherwise amounts may change after
+	 * the ink is signed, which is a no-no.
+	 * @param c
+	 */
     public void calculateContract(Campaign c) {
 
-        // calculate base amount
-        baseAmount = (long) (paymentMultiplier * getLength() * c.getContractBase());
+        //calculate base amount
+        baseAmount = (long)(paymentMultiplier * getLength() * c.getContractBase());
 
-        // calculate overhead
-        switch (overheadComp) {
-            case OH_HALF:
-                overheadAmount = (long) (0.5 * c.getOverheadExpenses() * getLength());
-                break;
-            case OH_FULL:
-                overheadAmount = (long) (1 * c.getOverheadExpenses() * getLength());
-                break;
-            default:
-                overheadAmount = 0;
+        //calculate overhead
+        switch(overheadComp) {
+        case OH_HALF:
+            overheadAmount = (long)(0.5 * c.getOverheadExpenses() * getLength());
+            break;
+        case OH_FULL:
+            overheadAmount = (long)(1 * c.getOverheadExpenses() * getLength());
+            break;
+        default:
+            overheadAmount = 0;
         }
 
-        // calculate support amount
-        if (c.getCampaignOptions().usePeacetimeCost() && c.getCampaignOptions().getUnitRatingMethod()
-                .equals(mekhq.campaign.rating.UnitRatingMethod.CAMPAIGN_OPS)) {
-            supportAmount = (long) ((straightSupport / 100.0) * c.getPeacetimeCost() * getLength());
+        //calculate support amount
+        if (c.getCampaignOptions().usePeacetimeCost()
+                && c.getCampaignOptions().getUnitRatingMethod().equals(mekhq.campaign.rating.UnitRatingMethod.CAMPAIGN_OPS)) {
+            supportAmount = (long)((straightSupport/100.0) * c.getPeacetimeCost() * getLength());
         } else {
             long maintCosts = 0;
             for (Unit u : c.getUnits()) {
@@ -457,22 +491,24 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
                 maintCosts += u.getWeeklyMaintenanceCost();
             }
             maintCosts *= 4;
-            supportAmount = (long) ((straightSupport / 100.0) * maintCosts * getLength());
+            supportAmount = (long)((straightSupport/100.0) * maintCosts * getLength());
         }
 
-        // calculate transportation costs
-        if (null != Planets.getInstance().getPlanetById(planetName)) {
-            transportAmount = (long) ((transportComp / 100.0) * 2 * c.calculateCostPerJump(false)
-                    * c.calculateJumpPath(c.getCurrentPlanet(), getPlanet()).getJumps());
+        //calculate transportation costs
+        if(null != Planets.getInstance().getPlanetById(planetName)) {
+            JumpPath jumpPath = c.calculateJumpPath(c.getCurrentPlanet(), getPlanet());
+
+            // FM:Mercs transport payments take into account owned transports and do not use CampaignOps dropship costs.
+            // CampaignOps doesn't care about owned transports and does use its own dropship costs.
+            boolean campaignOps = c.getCampaignOptions().useEquipmentContractBase();
+            transportAmount = (long)((transportComp/100.0) * 2 * c.calculateCostPerJump(campaignOps, campaignOps) * jumpPath.getJumps());
         }
 
-        // calculate transit amount for CO
-        if (c.getCampaignOptions().usePeacetimeCost() && c.getCampaignOptions().getUnitRatingMethod()
-                .equals(mekhq.campaign.rating.UnitRatingMethod.CAMPAIGN_OPS)) {
-            // contract base * transport period * reputation * employer modifier
-            transitAmount = (long) (c.getContractBase()
-                    * (((c.calculateJumpPath(c.getCurrentPlanet(), getPlanet()).getJumps()) * 2) / 4)
-                    * (c.getUnitRatingMod() * .2 + .5) * 1.2);
+        //calculate transit amount for CO
+        if (c.getCampaignOptions().usePeacetimeCost()
+                && c.getCampaignOptions().getUnitRatingMethod().equals(mekhq.campaign.rating.UnitRatingMethod.CAMPAIGN_OPS)) {
+            //contract base * transport period * reputation * employer modifier
+            transitAmount = (long)(c.getContractBase() * (((c.calculateJumpPath(c.getCurrentPlanet(), getPlanet()).getJumps()) * 2) / 4) * (c.getUnitRatingMod() * .2 + .5) * 1.2);
         } else {
             transitAmount = 0;
         }

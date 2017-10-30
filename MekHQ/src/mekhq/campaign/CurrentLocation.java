@@ -165,8 +165,8 @@ public class CurrentLocation implements Serializable {
 			}
 			if(isAtJumpPoint() && rechargeTime >= neededRechargeTime) {
 				//jump
-				if(campaign.getCampaignOptions().payForTransport()) {				    
-					if(!campaign.getFinances().debit(campaign.calculateCostPerJump(true), Transaction.C_TRANSPORT, "jump from " + currentPlanet.getName(currentDate) + " to " + jumpPath.get(1).getName(currentDate), campaign.getCalendar().getTime())) {
+				if(campaign.getCampaignOptions().payForTransport()) {
+					if(!campaign.getFinances().debit(campaign.calculateCostPerJump(true, campaign.getCampaignOptions().useEquipmentContractBase()), Transaction.C_TRANSPORT, "jump from " + currentPlanet.getName(currentDate) + " to " + jumpPath.get(1).getName(currentDate), campaign.getCalendar().getTime())) {
 					    campaign.addReport("<font color='red'><b>You cannot afford to make the jump!</b></font>");
 					    return;
 					}
