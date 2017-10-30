@@ -218,7 +218,7 @@ public class MekLabTab extends CampaignGuiTab {
             MekHQ.getLogger().log(getClass(), "loadUnit(Unit)", ex); //$NON-NLS-1$
         }
         entity.setYear(unit.campaign.getCalendar().get(Calendar.YEAR));
-        UnitUtil.updateLoadedMech(entity);
+        UnitUtil.updateLoadedUnit(entity);
         entity.setModel(entity.getModel() + " Mk II");
         removeAll();
         // We need to override the values in the MML properties file with the campaign options settings.
@@ -252,7 +252,7 @@ public class MekLabTab extends CampaignGuiTab {
             MekHQ.getLogger().log(getClass(), "resetUnit()", ex); //$NON-NLS-1$
         }
         entity.setYear(unit.campaign.getCalendar().get(Calendar.YEAR));
-        UnitUtil.updateLoadedMech(entity);
+        UnitUtil.updateLoadedUnit(entity);
         removeAll();
         labPanel = getCorrectLab(entity);
         refreshRefitSummary();

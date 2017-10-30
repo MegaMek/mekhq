@@ -43,30 +43,20 @@ public class MissingAmmoBin extends MissingEquipmentPart {
 	private static final long serialVersionUID = 2892728320891712304L;
 
 	protected boolean oneShot;
-	protected double capacity;
 	
     public MissingAmmoBin() {
-    	this(0, null, -1, false, false, 1.0, null);
+    	this(0, null, -1, false, false, null);
     }
     
     public MissingAmmoBin(int tonnage, EquipmentType et, int equipNum, boolean singleShot,
-            boolean omniPodded, double capacity, Campaign c) {
+            boolean omniPodded, Campaign c) {
         super(tonnage, et, equipNum, c, 1, omniPodded);
         this.oneShot = singleShot;
-        this.capacity = capacity;
         if(null != name) {
         	this.name += " Bin";
         }
     }
     
-    public double getCapacity() {
-        return capacity;
-    }
-    
-    public void setCapacity(double capacity) {
-        this.capacity = capacity;
-    }
-	
     /* Per TM, ammo for fighters is stored in the fuselage. This makes a difference for omnifighter
      * pod space, so we're going to stick them in LOC_NONE where the heat sinks are */ 
     @Override
@@ -106,7 +96,6 @@ public class MissingAmmoBin extends MissingEquipmentPart {
 		Part replacement = findReplacement(false);
 		if(null != replacement) {
 			Part actualReplacement = replacement.clone();
-			((AmmoBin) actualReplacement).setCapacity(capacity);
 			unit.addPart(actualReplacement);
 			campaign.addPart(actualReplacement, 0);
 			replacement.decrementQuantity();
@@ -119,7 +108,8 @@ public class MissingAmmoBin extends MissingEquipmentPart {
 	
 	@Override
 	public boolean isAcceptableReplacement(Part part, boolean refit) {
-		if(part instanceof AmmoBin) {
+		if ((part instanceof AmmoBin)
+		        && !(part instanceof LargeCraftAmmoBin)) {
 			EquipmentPart eqpart = (EquipmentPart)part;
 			EquipmentType et = eqpart.getType();
 			return type.equals(et) && ((AmmoBin)part).getFullShots() == getFullShots();

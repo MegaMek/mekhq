@@ -179,9 +179,11 @@ import mekhq.campaign.parts.StructuralIntegrity;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.HeatSink;
+import mekhq.campaign.parts.equipment.LargeCraftAmmoBin;
 import mekhq.campaign.parts.equipment.MASC;
 import mekhq.campaign.parts.equipment.MissingAmmoBin;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
+import mekhq.campaign.parts.equipment.MissingLargeCraftAmmoBin;
 import mekhq.campaign.parts.equipment.MissingMASC;
 import mekhq.campaign.personnel.Ancestors;
 import mekhq.campaign.personnel.Bloodname;
@@ -4973,13 +4975,22 @@ public class Campaign implements Serializable, ITechManager {
                             || ((version.getMinorVersion() == 43) && (version.getSnapshot() < 5)))
                     && ((p instanceof AmmoBin) || (p instanceof MissingAmmoBin))) {
                 Unit u = retVal.getUnit(p.getUnitId());
-                if (null != u) {
-                    Mounted m = u.getEntity().getEquipment(((AmmoBin) p).getEquipmentNum());
-                    if (null != m) {
+                if ((null != u) && (u.getEntity().usesWeaponBays())) {
+                    Mounted ammo = u.getEntity().getEquipment(((AmmoBin) p).getEquipmentNum());
+                    if (null != ammo) {
                         if (p instanceof AmmoBin) {
-                            ((AmmoBin) p).setCapacity(m.getAmmoCapacity());
+                            p = new LargeCraftAmmoBin(p.getUnitTonnage(),
+                                    ((AmmoBin) p).getType(),
+                                    ((AmmoBin) p).getEquipmentNum(),
+                                    ((AmmoBin) p).getShotsNeeded(),
+                                    ammo.getAmmoCapacity(), retVal);
+                            ((LargeCraftAmmoBin) p).setBay(u.getEntity().getBayByAmmo(ammo));
                         } else {
-                            ((MissingAmmoBin) p).setCapacity(m.getAmmoCapacity());
+                            p = new MissingLargeCraftAmmoBin(p.getUnitTonnage(),
+                                    ((MissingAmmoBin) p).getType(),
+                                    ((MissingAmmoBin) p).getEquipmentNum(),
+                                    ammo.getAmmoCapacity(), retVal);
+                            ((MissingLargeCraftAmmoBin) p).setBay(u.getEntity().getBayByAmmo(ammo));
                         }
                     }
                 }

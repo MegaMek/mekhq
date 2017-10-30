@@ -67,7 +67,6 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 	protected int shotsNeeded;
 	protected boolean checkedToday;
 	protected boolean oneShot;
-	protected double capacity;
 
     public AmmoBin() {
     	this(0, null, -1, 0, false, false, null);
@@ -79,7 +78,6 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
         this.shotsNeeded = shots;
         this.oneShot = singleShot;
         this.checkedToday = false;
-        this.capacity = 1.0;
         if(null != type && type instanceof AmmoType) {
         	this.munition = ((AmmoType)type).getMunitionType();
         }
@@ -131,16 +129,14 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     	return (1.0 * getFullShots())/((AmmoType)type).getShots();
     }
     
-    public double getCapacity() {
-        return capacity;
-    }
-    
-    public void setCapacity(double capacity) {
-        this.capacity = capacity;
-    }
-
     public int getFullShots() {
-        int fullShots = (int) Math.floor(capacity * ((AmmoType) type).getShots() / type.getTonnage(null));
+        int fullShots = ((AmmoType)type).getShots();
+        if(unit != null) {
+            Mounted m = unit.getEntity().getEquipment(equipmentNum);
+            if(null != m && m.getOriginalShots() > 0) {
+                fullShots = m.getOriginalShots();
+            }
+        }
     	if(null != unit && unit.getEntity() instanceof Protomech) {
 	        //if protomechs are using alternate munitions then cut in half
 	        if(((AmmoType)type).getMunitionType() != AmmoType.M_STANDARD) {
@@ -154,16 +150,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     }
     
     protected int getCurrentShots() {
-    	int shots = getFullShots() - shotsNeeded;
-    	//replace with actual entity values if entity not null because the previous number will not
-    	//be correct for ammo swaps
-    	if(null != unit && null != unit.getEntity()) {
-    		Mounted m = unit.getEntity().getEquipment(equipmentNum);
-    		if(null != m) {
-    			shots = m.getBaseShotsLeft();
-    		}
-    	}
-    	return shots;
+    	return getFullShots() - shotsNeeded;
     }
 
     public long getValueNeeded() {
@@ -254,13 +241,9 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
                 +"<oneShot>"
                 +oneShot
                 +"</oneShot>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<capacity>"
-                +capacity
-                +"</capacity>");
 		writeToXmlEnd(pw1, indent);
 	}
-
+	
 	@Override
 	protected void loadFieldsFromXmlNode(Node wn) {
 		super.loadFieldsFromXmlNode(wn);
@@ -289,8 +272,6 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
                 } else {
                     oneShot = false;
                 }
-            } else if (wn2.getNodeName().equalsIgnoreCase("capacity")) {
-                capacity = Double.parseDouble(wn2.getTextContent());
 			}
 		}
 		restore();
@@ -395,7 +376,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 
 	@Override
 	public MissingPart getMissingPart() {
-		return new MissingAmmoBin(getUnitTonnage(), type, equipmentNum, oneShot, omniPodded, capacity, campaign);
+		return new MissingAmmoBin(getUnitTonnage(), type, equipmentNum, oneShot, omniPodded, campaign);
 	}
 
 	public boolean isOneShot() {
@@ -415,7 +396,6 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 		if(null != unit) {
 			Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
 			if(null != mounted) {
-			    capacity = mounted.getAmmoCapacity();
 				if(mounted.isMissing() || mounted.isDestroyed()) {
 					mounted.setShotsLeft(0);
 					remove(false);
@@ -478,16 +458,16 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 		        mounted.changeAmmoType((AmmoType) type);
 		        unit.repairSystem(CriticalSlot.TYPE_EQUIPMENT, equipmentNum);
 				mounted.setShotsLeft(getFullShots() - shotsNeeded);
-				mounted.setAmmoCapacity(capacity);
 			}
 		}
 	}
 
 	@Override
 	public boolean isSamePartType(Part part) {
-    	return  part instanceof AmmoBin
-                        && getType().equals( ((AmmoBin)part).getType() )
-                        && ((AmmoBin)part).getFullShots() == getFullShots();
+	    return  (part instanceof AmmoBin)
+	            && !(part instanceof LargeCraftAmmoBin)
+	            && getType().equals( ((AmmoBin)part).getType() )
+	            && ((AmmoBin)part).getFullShots() == getFullShots();
     }
 
 	@Override
