@@ -408,6 +408,15 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
         return getLength() + travelMonths;
     }
 
+    /**
+     * Get the estimated total profit for this contract. The total profit is the total contract
+     * payment including fees and bonuses, minus overhead, maintenance, payroll, spare parts,
+     * and other monthly expenses. The duration used for monthly expenses is the contract duration
+     * plus the travel time from the unit's current world to the contract world and back.
+     *
+     * @param c The campaign with which this contract is associated.
+     * @return The estimated profit in C-bills.
+     */
     public long getEstimatedTotalProfit(Campaign c) {
         long profit = getTotalAmountPlusFeesAndBonuses();
         profit -= c.getOverheadExpenses() * getLengthPlusTravel(c);
@@ -426,6 +435,13 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
 		return profit;
 	}
 
+    /**
+     * Get the number of months left in this contract after the given date. Partial months are counted as
+     * full months.
+     *
+     * @param date
+     * @return
+     */
 	public int getMonthsLeft(Date date) {
 		GregorianCalendar cal = new GregorianCalendar();
 		cal.setTime(date);
@@ -445,50 +461,50 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
 	 * the ink is signed, which is a no-no.
 	 * @param c
 	 */
-	public void calculateContract(Campaign c) {
+    public void calculateContract(Campaign c) {
 
-		//calculate base amount
-		baseAmount = (long)(paymentMultiplier * getLength() * c.getContractBase());
+        //calculate base amount
+        baseAmount = (long)(paymentMultiplier * getLength() * c.getContractBase());
 
-		//calculate overhead
-		switch(overheadComp) {
-		case OH_HALF:
-			overheadAmount = (long)(0.5 * c.getOverheadExpenses() * getLength());
-			break;
-		case OH_FULL:
-			overheadAmount = (long)(1 * c.getOverheadExpenses() * getLength());
-			break;
-		default:
-			overheadAmount = 0;
-		}
+        //calculate overhead
+        switch(overheadComp) {
+        case OH_HALF:
+            overheadAmount = (long)(0.5 * c.getOverheadExpenses() * getLength());
+            break;
+        case OH_FULL:
+            overheadAmount = (long)(1 * c.getOverheadExpenses() * getLength());
+            break;
+        default:
+            overheadAmount = 0;
+        }
 
-		//calculate support amount
-		if (c.getCampaignOptions().usePeacetimeCost()
-		        && c.getCampaignOptions().getUnitRatingMethod().equals(mekhq.campaign.rating.UnitRatingMethod.CAMPAIGN_OPS)) {
-		    supportAmount = (long)((straightSupport/100.0) * c.getPeacetimeCost() * getLength());
-		} else {
-		    long maintCosts = 0;
-	        for (Unit u : c.getUnits()) {
-	            if (u.getEntity() instanceof Infantry && !(u.getEntity() instanceof BattleArmor)) {
-	                continue;
-	            }
-	            maintCosts += u.getWeeklyMaintenanceCost();
-	        }
-	        maintCosts *= 4;
-	        supportAmount = (long)((straightSupport/100.0) * maintCosts * getLength());
-		}
+        //calculate support amount
+        if (c.getCampaignOptions().usePeacetimeCost()
+                && c.getCampaignOptions().getUnitRatingMethod().equals(mekhq.campaign.rating.UnitRatingMethod.CAMPAIGN_OPS)) {
+            supportAmount = (long)((straightSupport/100.0) * c.getPeacetimeCost() * getLength());
+        } else {
+            long maintCosts = 0;
+            for (Unit u : c.getUnits()) {
+                if (u.getEntity() instanceof Infantry && !(u.getEntity() instanceof BattleArmor)) {
+                    continue;
+                }
+                maintCosts += u.getWeeklyMaintenanceCost();
+            }
+            maintCosts *= 4;
+            supportAmount = (long)((straightSupport/100.0) * maintCosts * getLength());
+        }
 
-		//calculate transportation costs
-		if(null != Planets.getInstance().getPlanetById(planetName)) {
+        //calculate transportation costs
+        if(null != Planets.getInstance().getPlanetById(planetName)) {
             JumpPath jumpPath = c.calculateJumpPath(c.getCurrentPlanet(), getPlanet());
 
-			// FM:Mercs transport payments take into account owned transports and do not use CampaignOps dropship costs.
-			// CampaignOps doesn't care about owned transports and does use its own dropship costs.
-			boolean campaignOps = c.getCampaignOptions().useEquipmentContractBase();
-			transportAmount = (long)((transportComp/100.0) * 2 * c.calculateCostPerJump(campaignOps, campaignOps) * jumpPath.getJumps());
-		}
+            // FM:Mercs transport payments take into account owned transports and do not use CampaignOps dropship costs.
+            // CampaignOps doesn't care about owned transports and does use its own dropship costs.
+            boolean campaignOps = c.getCampaignOptions().useEquipmentContractBase();
+            transportAmount = (long)((transportComp/100.0) * 2 * c.calculateCostPerJump(campaignOps, campaignOps) * jumpPath.getJumps());
+        }
 
-		//calculate transit amount for CO
+        //calculate transit amount for CO
         if (c.getCampaignOptions().usePeacetimeCost()
                 && c.getCampaignOptions().getUnitRatingMethod().equals(mekhq.campaign.rating.UnitRatingMethod.CAMPAIGN_OPS)) {
             //contract base * transport period * reputation * employer modifier
