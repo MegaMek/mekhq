@@ -191,7 +191,6 @@ import mekhq.campaign.parts.equipment.MissingBattleArmorEquipmentPart;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.parts.equipment.MissingHeatSink;
 import mekhq.campaign.parts.equipment.MissingJumpJet;
-import mekhq.campaign.parts.equipment.MissingLargeCraftAmmoBin;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.work.IAcquisitionWork;
@@ -2507,10 +2506,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         Map<Integer,Part> ammoParts = new HashMap<>();
         List<Part> toAdd = new ArrayList<>();
         for (Part p : parts) {
-            if (p instanceof AmmoBin) {
-                ammoParts.put(((AmmoBin) p).getEquipmentNum(), p);
-            } else if (p instanceof MissingAmmoBin) {
-                ammoParts.put(((MissingAmmoBin) p).getEquipmentNum(), p);
+            if (p instanceof LargeCraftAmmoBin) {
+                ammoParts.put(((LargeCraftAmmoBin) p).getEquipmentNum(), p);
             }
         }
         for (Mounted m : entity.getAmmo()) {
@@ -2521,11 +2518,10 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                         m.getOriginalShots() - m.getBaseShotsLeft(), m.getAmmoCapacity(), campaign);
                 ((LargeCraftAmmoBin) part).setBay(entity.getBayByAmmo(m));
                 toAdd.add(part);
-            }
-            if (part instanceof LargeCraftAmmoBin) {
-                ((LargeCraftAmmoBin) part).setCapacity(m.getAmmoCapacity());
-            } else if (part instanceof MissingLargeCraftAmmoBin) {
-                ((MissingLargeCraftAmmoBin) part).setCapacity(m.getAmmoCapacity());
+            } else {
+                part.updateConditionFromEntity(false);
+                // Reset the name
+                ((LargeCraftAmmoBin) part).changeMunition(m.getType());
             }
         }
         for (Part p : toAdd) {

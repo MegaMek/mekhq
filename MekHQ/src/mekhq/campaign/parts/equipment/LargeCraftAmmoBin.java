@@ -57,8 +57,6 @@ public class LargeCraftAmmoBin extends AmmoBin {
     
     private double capacity;
     private int bayEqNum;
-    private String newAmmoType;
-    private int shotsToRemove;
     
     transient private Mounted bay;
     
@@ -77,7 +75,6 @@ public class LargeCraftAmmoBin extends AmmoBin {
         LargeCraftAmmoBin clone = new LargeCraftAmmoBin(getUnitTonnage(), getType(), getEquipmentNum(),
                 shotsNeeded, capacity, campaign);
         clone.copyBaseData(this);
-        clone.newAmmoType = this.newAmmoType;
         return clone;
     }
     
@@ -106,6 +103,11 @@ public class LargeCraftAmmoBin extends AmmoBin {
                 "Could not find weapon bay for " + typeName + " for " + unit.getName());
         return null;
     }
+    
+    
+    public int getBayEqNum() {
+        return bayEqNum;
+    }
 
     /**
      * Sets the bay for this ammo bin. Does not check whether the ammo bin is actually in the bay.
@@ -129,23 +131,9 @@ public class LargeCraftAmmoBin extends AmmoBin {
         }
     }
     
-    public @Nullable LargeCraftAmmoBin getDestinationBin() {
-        if ((null != newAmmoType) && (null != unit)) {
-            for (Part p : unit.getParts()) {
-                if ((p instanceof LargeCraftAmmoBin)
-                        && (((LargeCraftAmmoBin) p).getType().getInternalName().equals(newAmmoType))
-                        && (((LargeCraftAmmoBin) p).bayEqNum == this.bayEqNum)) {
-                    return (LargeCraftAmmoBin) p;
-                }
-            }
-            return unit.addBayAmmoBin(EquipmentType.get(newAmmoType), getBay());
-        }
-        return null;
-    }
-    
     @Override
     public double getTonnage() {
-        return capacity;
+        return getCurrentShots() * type.getTonnage(null) / ((AmmoType) type).getShots();
     }
     
     public double getCapacity() {
@@ -160,14 +148,6 @@ public class LargeCraftAmmoBin extends AmmoBin {
         return capacity - Math.ceil(getCurrentShots() * type.getTonnage(null) / ((AmmoType) type).getShots());
     }
     
-    public int getShotsToRemove() {
-        return shotsToRemove;
-    }
-    
-    public void setShotsToRemove(int shots) {
-        shotsToRemove = shots;
-    }
-
     @Override
     public int getFullShots() {
         return (int) Math.floor(capacity * ((AmmoType) type).getShots() / type.getTonnage(null));
@@ -192,46 +172,6 @@ public class LargeCraftAmmoBin extends AmmoBin {
     }
 
     @Override
-    public void changeMunition(EquipmentType type) {
-        changeMunition(type, getCurrentShots());
-    }
-    
-    /**
-     * Schedule removal of part of the capacity of this bay. Each tech action will remove 
-     * @param atype
-     * @param shots
-     */
-    public void changeMunition(EquipmentType atype, int shots) {
-        if ((atype instanceof AmmoType) && (atype != getType())) {
-            Mounted bay = getBay();
-            // If not in a bay (e.g. in the warehouse), just change the type.
-            if (null == bay) {
-                type = atype;
-            } else {
-                assert(null != unit);
-                newAmmoType = atype.getInternalName();
-                // If the bin is not full, use the empty space to fulfill the removal requirement first.
-                shotsToRemove = Math.max(0, shots - shotsNeeded);
-                shotsNeeded = Math.max(0, shotsNeeded - shots);
-                // Any space that is scheduled to be removed from this bin and is currently empty
-                // can be moved now. This includes any leftover space due to capacity not being a
-                // multiple of the ammo tonnage.
-                double availableUnused = capacity - (getFullShots() - shots + shotsToRemove)
-                        * type.getTonnage(unit.getEntity()) * ((AmmoType) type).getShots();
-                if (availableUnused > 0) {
-                    LargeCraftAmmoBin bin = getDestinationBin();
-                    if (null != bin) {
-                        bin.setCapacity(bin.getCapacity() + availableUnused);
-                        capacity -= availableUnused;
-                        bin.updateConditionFromPart();
-                        updateConditionFromPart();
-                    }
-                }
-            }
-        }
-    }
-
-    @Override
     public void writeToXml(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "equipmentNum", equipmentNum);
@@ -239,10 +179,6 @@ public class LargeCraftAmmoBin extends AmmoBin {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "shotsNeeded", shotsNeeded);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "capacity", capacity);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "bayEqNum", bayEqNum);
-        if (null != newAmmoType) {
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "newAmmoType", newAmmoType);
-        }
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "shotsToRemove", shotsToRemove);
         writeToXmlEnd(pw1, indent);
     }
 
@@ -257,13 +193,6 @@ public class LargeCraftAmmoBin extends AmmoBin {
                 capacity = Double.parseDouble(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("bayEqNum")) {
                 bayEqNum = Integer.parseInt(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("newAmmoType")) {
-                EquipmentType etype = EquipmentType.get(wn2.getTextContent());
-                if (null != etype) {
-                    newAmmoType = etype.getInternalName();
-                }
-            } else if (wn2.getNodeName().equalsIgnoreCase("shotsToRemove")) {
-                shotsToRemove = Integer.parseInt(wn2.getTextContent());
             }
         }
         restore();
@@ -271,7 +200,7 @@ public class LargeCraftAmmoBin extends AmmoBin {
 
     @Override
     public void fix() {
-        if (shotsToRemove > 0) {
+        if (shotsNeeded < 0) {
             unloadSingle();
         } else {
             loadBinSingle();
@@ -300,26 +229,8 @@ public class LargeCraftAmmoBin extends AmmoBin {
                 mounted.setShotsLeft(mounted.getBaseShotsLeft() - shots);
                 curType = (AmmoType)mounted.getType();
             }
-            if (null != newAmmoType) {
-                LargeCraftAmmoBin bin = getDestinationBin();
-                if (null != bin) {
-                    int current = bin.getCurrentShots();
-                    bin.setCapacity(bin.getCapacity() + type.getTonnage(unit.getEntity()));
-                    bin.setShotsNeeded(bin.getFullShots() - current);
-                    capacity -= type.getTonnage(unit.getEntity());
-                    bin.updateConditionFromPart();
-                    updateConditionFromPart();
-                    if (capacity == 0) {
-                        newAmmoType = null;
-                    }
-                }
-            } else {
-                shotsNeeded += shots;
-            }
-        } else {
-            shotsNeeded += shots;
         }
-        shotsToRemove -= shots;
+        shotsNeeded += shots;
         if(shots > 0) {
             changeAmountAvailable(shots, curType);
         }
@@ -327,7 +238,7 @@ public class LargeCraftAmmoBin extends AmmoBin {
     
     @Override
     public MissingPart getMissingPart() {
-        return new MissingLargeCraftAmmoBin(getUnitTonnage(), type, equipmentNum, capacity, campaign);
+        return null;
     }
 
     @Override
@@ -336,6 +247,7 @@ public class LargeCraftAmmoBin extends AmmoBin {
             Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
             if(null != mounted) {
                 capacity = mounted.getAmmoCapacity();
+                type = mounted.getType();
                 if(mounted.isMissing() || mounted.isDestroyed()) {
                     mounted.setShotsLeft(0);
                     remove(false);
@@ -379,12 +291,38 @@ public class LargeCraftAmmoBin extends AmmoBin {
 
     @Override
     public boolean needsFixing() {
-        return (shotsNeeded > 0) || (shotsToRemove > 0); 
+        return (shotsNeeded < 0)
+                || ((shotsNeeded > 0) && (type.getTonnage(null) <= bayAvailableCapacity())); 
+    }
+
+    /**
+     * Check all the bins in the same bay that feed the same weapon(s) to determine whether there is
+     * sufficient capacity to load more ammo into this bin. In the case of an ammo swap some ammo
+     * may need to be removed from another bin in this bay before more can be loaded.
+     *
+     * @return The amount of unused capacity that can be used to reload ammo.
+     */
+    private double bayAvailableCapacity() {
+        if (null != unit) {
+            double space = 0.0;
+            for (Part p : unit.getParts()) {
+                if (p instanceof LargeCraftAmmoBin) {
+                    final LargeCraftAmmoBin bin = (LargeCraftAmmoBin) p;
+                    if ((bin.getBayEqNum() == bayEqNum)
+                            && (((AmmoType) bin.getType()).getAmmoType() == ((AmmoType) type).getAmmoType())
+                            && (((AmmoType) bin.getType()).getRackSize() == ((AmmoType) type).getRackSize())) {
+                        space += bin.getCapacity() - bin.getTonnage();
+                    }
+                }
+            }
+            return space;
+        }
+        return 0.0;
     }
 
     @Override
     public String getDesc() {
-        if (shotsToRemove == 0) {
+        if (shotsNeeded >= 0) {
             return super.getDesc();
         }
         String toReturn = "<html><font size='2'";
@@ -406,8 +344,8 @@ public class LargeCraftAmmoBin extends AmmoBin {
         if (isSalvaging()) {
             return super.getDetails();
         }
-        if (shotsToRemove > 0) {
-            return ((AmmoType) type).getDesc() + ", " + shotsToRemove + " shots to remove";
+        if (shotsNeeded < 0) {
+            return ((AmmoType) type).getDesc() + ", " + (-shotsNeeded) + " shots to remove";
         }
         if (null != unit) {
             String availability = "";

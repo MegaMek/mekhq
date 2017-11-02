@@ -43,7 +43,6 @@ import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.parts.equipment.AmmoBin;
-import mekhq.campaign.parts.equipment.LargeCraftAmmoBin;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
@@ -53,6 +52,7 @@ import mekhq.gui.MekLabTab;
 import mekhq.gui.dialog.BombsDialog;
 import mekhq.gui.dialog.CamoChoiceDialog;
 import mekhq.gui.dialog.ChooseRefitDialog;
+import mekhq.gui.dialog.LargeCraftAmmoSwapDialog;
 import mekhq.gui.dialog.QuirksDialog;
 import mekhq.gui.dialog.TextAreaDialog;
 import mekhq.gui.model.UnitTableModel;
@@ -191,6 +191,12 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                     gui.getCampaign().removeUnit(unit.getId());
                 }
             }
+        } else if (command.contains("LC_SWAP_AMMO")) {
+            LargeCraftAmmoSwapDialog dialog = new LargeCraftAmmoSwapDialog(gui.getFrame(), selectedUnit);
+            dialog.setVisible(true);
+            if (!dialog.wasCanceled()) {
+                MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
+            }
         } else if (command.contains("SWAP_AMMO")) {
             String[] fields = command.split(":");
             int selAmmoId = Integer.parseInt(fields[1]);
@@ -200,11 +206,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
             }
             AmmoBin ammo = (AmmoBin) part;
             AmmoType atype = (AmmoType) EquipmentType.get(fields[2]);
-            if ((ammo instanceof LargeCraftAmmoBin) && (fields.length > 3)) {
-                ((LargeCraftAmmoBin) ammo).changeMunition(atype, Integer.parseInt(fields[3]));
-            } else {
-                ammo.changeMunition(atype);
-            }
+            ammo.changeMunition(atype);
             MekHQ.triggerEvent(new UnitChangedEvent(part.getUnit()));
         } else if (command.contains("CHANGE_SITE")) {
             for (Unit unit : units) {
@@ -592,61 +594,42 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
 
             // swap ammo
             if (oneSelected) {
-                menu = new JMenu("Swap ammo");
-                JMenu ammoMenu = null;
-                for (AmmoBin ammo : unit.getWorkingAmmoBins()) {
-                    ammoMenu = new JMenu(ammo.getType().getDesc());
-                    AmmoType curType = (AmmoType) ammo.getType();
-                    for (AmmoType atype : Utilities.getMunitionsFor(unit
-                            .getEntity(), curType, gui.getCampaign()
-                            .getCampaignOptions().getTechLevel())) {
-                        cbMenuItem = new JCheckBoxMenuItem(atype.getDesc());
-                        if (atype == curType) {
-                            cbMenuItem.setSelected(true);
-                        } else if (unit.getEntity().usesWeaponBays()
-                                && (ammo.getFullShots() > atype.getShots())) {
-                            JMenu atypeMenu = new JMenu(atype.getDesc());
-                            // If we're replacing a missile with a larger one, we need to
-                            // remove more than one.
-                            int min = ((AmmoType) ammo.getType()).getShots()
-                                    * (int) Math.ceil(atype.getTonnage(unit.getEntity())
-                                            / ammo.getType().getTonnage(unit.getEntity()));
-                            for (int s = min; s <= ammo.getFullShots(); s += atype.getShots()) {
-                                if (!atype.hasFlag(AmmoType.F_CAP_MISSILE)) {
-                                    cbMenuItem = new JCheckBoxMenuItem(s + " Shots");
-                                } else {
-                                    // AR10s have variable shot tonnage and we need to indicate that
-                                    // this is the number of missiles to replace rather than the number
-                                    // to load.
-                                    cbMenuItem = new JCheckBoxMenuItem("Replace " + s);
-                                }
+                if (unit.getEntity().usesWeaponBays()) {
+                    menuItem = new JMenuItem("Swap ammo...");
+                    menuItem.setActionCommand("LC_SWAP_AMMO");
+                    menuItem.addActionListener(this);
+                    popup.add(menuItem);
+                } else {
+                    menu = new JMenu("Swap ammo");
+                    JMenu ammoMenu = null;
+                    for (AmmoBin ammo : unit.getWorkingAmmoBins()) {
+                        ammoMenu = new JMenu(ammo.getType().getDesc());
+                        AmmoType curType = (AmmoType) ammo.getType();
+                        for (AmmoType atype : Utilities.getMunitionsFor(unit
+                                .getEntity(), curType, gui.getCampaign()
+                                .getCampaignOptions().getTechLevel())) {
+                            cbMenuItem = new JCheckBoxMenuItem(atype.getDesc());
+                            if (atype == curType) {
+                                cbMenuItem.setSelected(true);
+                            } else {
                                 cbMenuItem.setActionCommand("SWAP_AMMO:"
                                         + ammo.getId() + ":"
-                                        + atype.getInternalName() + ":"
-                                        + s);
+                                        + atype.getInternalName());
                                 cbMenuItem.addActionListener(this);
-                                atypeMenu.add(cbMenuItem);
                             }
-                            ammoMenu.add(atypeMenu);
-                            continue;
-                        } else {
-                            cbMenuItem.setActionCommand("SWAP_AMMO:"
-                                    + ammo.getId() + ":"
-                                    + atype.getInternalName());
-                            cbMenuItem.addActionListener(this);
+                            ammoMenu.add(cbMenuItem);
                         }
-                        ammoMenu.add(cbMenuItem);
+                        if (ammoMenu.getItemCount() > 20) {
+                            MenuScroller.setScrollerFor(ammoMenu, 20);
+                        }
+                        menu.add(ammoMenu);
                     }
-                    if (ammoMenu.getItemCount() > 20) {
-                        MenuScroller.setScrollerFor(ammoMenu, 20);
+                    menu.setEnabled(unit.isAvailable());
+                    if (menu.getItemCount() > 20) {
+                        MenuScroller.setScrollerFor(menu, 20);
                     }
-                    menu.add(ammoMenu);
+                    popup.add(menu);
                 }
-                menu.setEnabled(unit.isAvailable());
-                if (menu.getItemCount() > 20) {
-                    MenuScroller.setScrollerFor(menu, 20);
-                }
-                popup.add(menu);
             }
             // Select bombs.
             if (oneSelected && (unit.getEntity().isBomber())) {

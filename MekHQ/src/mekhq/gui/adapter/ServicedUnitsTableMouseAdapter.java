@@ -22,6 +22,7 @@ import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
+import mekhq.gui.dialog.LargeCraftAmmoSwapDialog;
 import mekhq.gui.model.UnitTableModel;
 import mekhq.gui.utilities.MenuScroller;
 import mekhq.gui.utilities.StaticChecks;
@@ -69,6 +70,12 @@ public class ServicedUnitsTableMouseAdapter extends MouseInputAdapter
              * gui.refreshTaskList(); gui.refreshAcquireList(); gui.refreshTechsList();
              * gui.refreshReport(); gui.refreshPartsList(); gui.refreshOverview();
              */
+        } else if (command.contains("LC_SWAP_AMMO")) {
+            LargeCraftAmmoSwapDialog dialog = new LargeCraftAmmoSwapDialog(gui.getFrame(), selectedUnit);
+            dialog.setVisible(true);
+            if (!dialog.wasCanceled()) {
+                MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
+            }
         } else if (command.contains("SWAP_AMMO")) {
             String sel = command.split(":")[1];
             int selAmmoId = Integer.parseInt(sel);
@@ -184,31 +191,38 @@ public class ServicedUnitsTableMouseAdapter extends MouseInputAdapter
              */
             // swap ammo
             if (oneSelected) {
-                menu = new JMenu("Swap ammo");
-                JMenu ammoMenu = null;
-                for (AmmoBin ammo : unit.getWorkingAmmoBins()) {
-                    ammoMenu = new JMenu(ammo.getType().getDesc());
-                    AmmoType curType = (AmmoType) ammo.getType();
-                    for (AmmoType atype : Utilities.getMunitionsFor(unit
-                            .getEntity(), curType, gui.getCampaign()
-                            .getCampaignOptions().getTechLevel())) {
-                        cbMenuItem = new JCheckBoxMenuItem(atype.getDesc());
-                        if (atype.equals(curType)
-                        		&& atype.getMunitionType() == curType.getMunitionType()) {
-                            cbMenuItem.setSelected(true);
-                        } else {
-                            cbMenuItem.setActionCommand("SWAP_AMMO:"
-                                    + ammo.getId() + ":"
-                                    + atype.getInternalName());
-                            cbMenuItem.addActionListener(this);
+                if (unit.getEntity().usesWeaponBays()) {
+                    menuItem = new JMenuItem("Swap ammo...");
+                    menuItem.setActionCommand("LC_SWAP_AMMO");
+                    menuItem.addActionListener(this);
+                    popup.add(menuItem);
+                } else {
+                    menu = new JMenu("Swap ammo");
+                    JMenu ammoMenu = null;
+                    for (AmmoBin ammo : unit.getWorkingAmmoBins()) {
+                        ammoMenu = new JMenu(ammo.getType().getDesc());
+                        AmmoType curType = (AmmoType) ammo.getType();
+                        for (AmmoType atype : Utilities.getMunitionsFor(unit
+                                .getEntity(), curType, gui.getCampaign()
+                                .getCampaignOptions().getTechLevel())) {
+                            cbMenuItem = new JCheckBoxMenuItem(atype.getDesc());
+                            if (atype.equals(curType)
+                            		&& atype.getMunitionType() == curType.getMunitionType()) {
+                                cbMenuItem.setSelected(true);
+                            } else {
+                                cbMenuItem.setActionCommand("SWAP_AMMO:"
+                                        + ammo.getId() + ":"
+                                        + atype.getInternalName());
+                                cbMenuItem.addActionListener(this);
+                            }
+                            ammoMenu.add(cbMenuItem);
+                            i++;
                         }
-                        ammoMenu.add(cbMenuItem);
-                        i++;
+                        if (menu.getItemCount() > 20) {
+                            MenuScroller.setScrollerFor(menu, 20);
+                        }
+                        menu.add(ammoMenu);
                     }
-                    if (menu.getItemCount() > 20) {
-                        MenuScroller.setScrollerFor(menu, 20);
-                    }
-                    menu.add(ammoMenu);
                 }
                 menu.setEnabled(unit.isAvailable());
                 popup.add(menu);
