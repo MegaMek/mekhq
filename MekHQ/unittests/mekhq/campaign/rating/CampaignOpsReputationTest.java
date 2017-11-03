@@ -28,13 +28,13 @@ import megamek.common.BipedMech;
 import megamek.common.Crew;
 import megamek.common.DockingCollar;
 import megamek.common.Dropship;
+import megamek.common.Entity;
 import megamek.common.Infantry;
 import megamek.common.InfantryBay;
 import megamek.common.Jumpship;
 import megamek.common.LightVehicleBay;
 import megamek.common.MechBay;
 import megamek.common.Tank;
-import megamek.common.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.mission.Mission;
@@ -238,6 +238,7 @@ public class CampaignOpsReputationTest {
         when(mockFighterTechSkillElite.getLevel()).thenReturn(5);
         when(mockVeeTechSkill.getLevel()).thenReturn(7);
 
+        when(mockThunderbolt1.getEntityType()).thenReturn(Entity.ETYPE_MECH);
         when(mockThunderboltUnit1.getEntity()).thenReturn(mockThunderbolt1);
         when(mockThunderbolt1Pilot.isAdmin()).thenReturn(false);
         when(mockThunderbolt1Pilot.getSkill(SkillType.S_GUN_MECH)).thenReturn(mockMechGunnery);
@@ -258,6 +259,7 @@ public class CampaignOpsReputationTest {
         personnelList.add(mockThunderbolt1Tech);
         astechs += 6;
 
+        when(mockThunderbolt2.getEntityType()).thenReturn(Entity.ETYPE_MECH);
         when(mockThunderboltUnit2.getEntity()).thenReturn(mockThunderbolt2);
         when(mockThunderbolt2Pilot.isAdmin()).thenReturn(false);
         when(mockThunderbolt2Pilot.getSkill(SkillType.S_GUN_MECH)).thenReturn(mockMechGunnery);
@@ -278,6 +280,7 @@ public class CampaignOpsReputationTest {
         personnelList.add(mockThunderbolt2Tech);
         astechs += 6;
 
+        when(mockGrasshopper1.getEntityType()).thenReturn(Entity.ETYPE_MECH);
         when(mockGrasshopperUnit1.getEntity()).thenReturn(mockGrasshopper1);
         when(mockGrasshopper1Pilot.isAdmin()).thenReturn(false);
         when(mockGrasshopper1Pilot.getSkill(SkillType.S_GUN_MECH)).thenReturn(mockMechGunnery);
@@ -298,6 +301,7 @@ public class CampaignOpsReputationTest {
         personnelList.add(mockGrasshopper1Tech);
         astechs += 6;
 
+        when(mockGrasshopper2.getEntityType()).thenReturn(Entity.ETYPE_MECH);
         when(mockGrasshopperUnit2.getEntity()).thenReturn(mockGrasshopper2);
         when(mockGrasshopper2Pilot.isAdmin()).thenReturn(false);
         when(mockGrasshopper2Pilot.getSkill(SkillType.S_GUN_MECH)).thenReturn(mockMechGunnery);
@@ -322,6 +326,7 @@ public class CampaignOpsReputationTest {
         personnelList.add(mockGrasshopper2Tech);
         astechs += 6;
 
+        when(mockBulldog1.getEntityType()).thenReturn(Entity.ETYPE_TANK);
         when(mockBulldogUnit1.getEntity()).thenReturn(mockBulldog1);
         when(mockBulldog1Driver.getSkill(SkillType.S_PILOT_GVEE)).thenReturn(mockTankPilot);
         when(mockBulldog1Driver.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
@@ -357,6 +362,7 @@ public class CampaignOpsReputationTest {
         when(mockBulldog1.getCrew()).thenReturn(mockBulldog1Crew);
         astechs += 6;
 
+        when(mockBulldog2.getEntityType()).thenReturn(Entity.ETYPE_TANK);
         when(mockBulldog2Driver.getSkill(SkillType.S_PILOT_GVEE)).thenReturn(mockTankPilot);
         when(mockBulldog2Driver.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
         when(mockBulldog2Gunner1.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
@@ -392,6 +398,7 @@ public class CampaignOpsReputationTest {
         when(mockBulldog2.getCrew()).thenReturn(mockBulldog2Crew);
         astechs += 6;
 
+        when(mockBulldog3.getEntityType()).thenReturn(Entity.ETYPE_TANK);
         when(mockBulldog3Driver.getSkill(SkillType.S_PILOT_GVEE)).thenReturn(mockTankPilot);
         when(mockBulldog3Driver.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
         when(mockBulldog3Gunner1.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
@@ -427,6 +434,7 @@ public class CampaignOpsReputationTest {
         when(mockBulldog3.getCrew()).thenReturn(mockBulldog3Crew);
         astechs += 6;
 
+        when(mockBulldog4.getEntityType()).thenReturn(Entity.ETYPE_TANK);
         when(mockBulldog4Driver.getSkill(SkillType.S_PILOT_GVEE)).thenReturn(mockTankPilot);
         when(mockBulldog4Driver.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
         when(mockBulldog4Gunner1.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
@@ -462,6 +470,7 @@ public class CampaignOpsReputationTest {
         when(mockBulldog4.getCrew()).thenReturn(mockBulldog4Crew);
         astechs += 6;
 
+        when(mockPackrat1.getEntityType()).thenReturn(Entity.ETYPE_TANK);
         when(mockPackrat1Driver.getSkill(SkillType.S_PILOT_GVEE)).thenReturn(mockTankPilot);
         when(mockPackrat1Driver.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
         when(mockPackrat1Gunner.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
@@ -487,6 +496,7 @@ public class CampaignOpsReputationTest {
         when(mockPackrat1.getCrew()).thenReturn(mockPackrat1Crew);
         astechs += 6;
 
+        when(mockPackrat2.getEntityType()).thenReturn(Entity.ETYPE_TANK);
         when(mockPackrat2Driver.getSkill(SkillType.S_PILOT_GVEE)).thenReturn(mockTankPilot);
         when(mockPackrat2Driver.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
         when(mockPackrat2Gunner.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
@@ -512,6 +522,7 @@ public class CampaignOpsReputationTest {
         when(mockPackrat2.getCrew()).thenReturn(mockPackrat2Crew);
         astechs += 6;
 
+        when(mockPackrat3.getEntityType()).thenReturn(Entity.ETYPE_TANK);
         when(mockPackrat3Driver.getSkill(SkillType.S_PILOT_GVEE)).thenReturn(mockTankPilot);
         when(mockPackrat3Driver.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
         when(mockPackrat3Gunner.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
@@ -537,6 +548,7 @@ public class CampaignOpsReputationTest {
         when(mockPackrat3.getCrew()).thenReturn(mockPackrat3Crew);
         astechs += 6;
 
+        when(mockPackrat4.getEntityType()).thenReturn(Entity.ETYPE_TANK);
         when(mockPackrat4Driver.getSkill(SkillType.S_PILOT_GVEE)).thenReturn(mockTankPilot);
         when(mockPackrat4Driver.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
         when(mockPackrat4Gunner.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
@@ -562,6 +574,7 @@ public class CampaignOpsReputationTest {
         when(mockPackrat4.getCrew()).thenReturn(mockPackrat4Crew);
         astechs += 6;
 
+        when(mockLaserPlatoon.getEntityType()).thenReturn(Entity.ETYPE_INFANTRY);
         when(mockLaserPlatoon.getSquadSize()).thenReturn(7);
         when(mockLaserPlatoon.getSquadN()).thenReturn(4);
         when(mockLaserPlatoonUnit.getEntity()).thenReturn(mockLaserPlatoon);
@@ -580,6 +593,7 @@ public class CampaignOpsReputationTest {
         when(mockLaserPlatoon.getCrew()).thenReturn(mockLaserPlatoonCrew);
         personnelList.addAll(infantryPersonnel);
 
+        when(mockCorsair1.getEntityType()).thenReturn(Entity.ETYPE_AERO);
         when(mockCorsairUnit1.getEntity()).thenReturn(mockCorsair1);
         when(mockCorsair1Pilot.isAdmin()).thenReturn(false);
         when(mockCorsair1Pilot.getSkill(SkillType.S_GUN_AERO)).thenReturn(mockAeroGunnery);
@@ -600,6 +614,7 @@ public class CampaignOpsReputationTest {
         when(mockCorsair1.getCrew()).thenReturn(mockCorsair1Crew);
         astechs += 6;
 
+        when(mockCorsair2.getEntityType()).thenReturn(Entity.ETYPE_AERO);
         when(mockCorsairUnit2.getEntity()).thenReturn(mockCorsair2);
         when(mockCorsair2Pilot.isAdmin()).thenReturn(false);
         when(mockCorsair2Pilot.getSkill(SkillType.S_GUN_AERO)).thenReturn(mockAeroGunnery);
@@ -620,6 +635,7 @@ public class CampaignOpsReputationTest {
         when(mockCorsair2.getCrew()).thenReturn(mockCorsair2Crew);
         astechs += 6;
 
+        when(mockSeeker.getEntityType()).thenReturn(Entity.ETYPE_DROPSHIP);
         when(mockSeekerUnit.getEntity()).thenReturn(mockSeeker);
         Bay transportBay;
         Vector<Bay> bayList = new Vector<>();
@@ -654,6 +670,7 @@ public class CampaignOpsReputationTest {
         doReturn(mockDropGunnery.getLevel()).when(mockSeekerCrew).getGunnery();
         when(mockSeeker.getCrew()).thenReturn(mockSeekerCrew);
 
+        when(mockInvader.getEntityType()).thenReturn(Entity.ETYPE_JUMPSHIP);
         when(mockInvaderUnit.getEntity()).thenReturn(mockInvader);
         DockingCollar collar;
         Vector<DockingCollar> collarList = new Vector<>(4);
@@ -701,6 +718,11 @@ public class CampaignOpsReputationTest {
         unitList.add(mockCorsairUnit2);
         unitList.add(mockSeekerUnit);
         unitList.add(mockInvaderUnit);
+
+        for (Unit u : unitList) {
+            when(u.isPresent()).thenReturn(true);
+            when(u.hasPilot()).thenReturn(true);
+        }
 
         for (int i = 0; i < 10; i++) {
             Person admin = mock(Person.class);
@@ -847,7 +869,7 @@ public class CampaignOpsReputationTest {
     @Test
     public void testGetTransportValue() {
         spyReputation.initValues();
-        assertEquals(20, spyReputation.getTransportValue());
+        assertEquals(15, spyReputation.getTransportValue());
 
         // Test not having any dropships (though we still have a jumpship).
         doReturn(0).when(spyReputation).getDropshipCount();
@@ -870,7 +892,7 @@ public class CampaignOpsReputationTest {
     @Test
     public void testGetSupportValue() {
         spyReputation.initValues();
-        assertEquals(-5, spyReputation.getSupportValue());
+        assertEquals(-10, spyReputation.getSupportValue());
 
         // Test a brand new campaign.
         buildFreshCampaign();
@@ -892,7 +914,7 @@ public class CampaignOpsReputationTest {
     @Test
     public void testCalculateUnitRatingScore() {
         spyReputation.initValues();
-        assertEquals(38, spyReputation.calculateUnitRatingScore());
+        assertEquals(28, spyReputation.calculateUnitRatingScore());
 
         // Test a brand new campaign.
         buildFreshCampaign();
@@ -903,7 +925,7 @@ public class CampaignOpsReputationTest {
     @Test
     public void testGetReputationModifier() {
         spyReputation.initValues();
-        assertEquals(3, spyReputation.getModifier());
+        assertEquals(2, spyReputation.getModifier());
 
         // Test a brand new campaign.
         buildFreshCampaign();
@@ -927,7 +949,7 @@ public class CampaignOpsReputationTest {
     @Test
     public void testGetDetails() {
         String expectedDetails =
-                "Unit Reputation:    38\n" +
+                "Unit Reputation:    28\n" +
                 "    Method: Campaign Operations\n" +
                 "\n" +
                 "Experience:          10\n" +
@@ -945,7 +967,7 @@ public class CampaignOpsReputationTest {
                 "    Failed Missions:          0\n" +
                 "    Contract Breaches:        0\n" +
                 "\n" +
-                "Transportation:      20\n" +
+                "Transportation:      15\n" +
                 "    Mech Bays:                   4 needed /   4 available\n" +
                 "    Fighter Bays:                2 needed /   2 available\n" +
                 "    Small Craft Bays:            0 needed /   0 available\n" +
@@ -958,7 +980,7 @@ public class CampaignOpsReputationTest {
                 "    Has Jumpships?             Yes\n" +
                 "    Has Warships?               No\n" +
                 "\n" +
-                "Support:             -5\n" +
+                "Support:            -10\n" +
                 "    Tech Support:\n" +
                 "        Mech Techs:                   4 needed /    0 available\n" +
                 "            NOTE: Protomechs and mechs use same techs.\n" +
@@ -966,7 +988,7 @@ public class CampaignOpsReputationTest {
                 "        Mechanics:                    8 needed /    0 available\n" +
                 "            NOTE: Vehicles and Infantry use the same mechanics.\n" +
                 "        BA Techs:                     0 needed /    0 available\n" +
-                "        Astechs:                    168 needed /   84 available\n" +
+                "        Astechs:                     84 needed /   84 available\n" +
                 "    Admin Support:                   20 needed /   10 available\n" +
                 "    Large Craft Crew:\n" +
                 "        All fully crewed.\n" +
@@ -1021,7 +1043,7 @@ public class CampaignOpsReputationTest {
                 "        Mechanics:                    0 needed /    0 available\n" +
                 "            NOTE: Vehicles and Infantry use the same mechanics.\n" +
                 "        BA Techs:                     0 needed /    0 available\n" +
-                "        Astechs:                    168 needed /    0 available\n" +
+                "        Astechs:                      0 needed /    0 available\n" +
                 "    Admin Support:                    0 needed /    0 available\n" +
                 "    Large Craft Crew:\n" +
                 "        All fully crewed.\n" +
@@ -1080,7 +1102,7 @@ public class CampaignOpsReputationTest {
 
     @Test
     public void testGetTransportationDetails() {
-        String expected = "Transportation:      20\n" +
+        String expected = "Transportation:      15\n" +
                           "    Mech Bays:                   4 needed /   4 available\n" +
                           "    Fighter Bays:                2 needed /   2 available\n" +
                           "    Small Craft Bays:            0 needed /   0 available\n" +
@@ -1112,7 +1134,7 @@ public class CampaignOpsReputationTest {
         assertEquals(expected, spyReputation.getTransportationDetails());
 
         // Add excess heavy vehicle bays.
-        expected = "Transportation:      20\n" +
+        expected = "Transportation:      15\n" +
                    "    Mech Bays:                   4 needed /   4 available\n" +
                    "    Fighter Bays:                2 needed /   2 available\n" +
                    "    Small Craft Bays:            0 needed /   0 available\n" +

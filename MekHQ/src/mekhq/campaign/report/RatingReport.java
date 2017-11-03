@@ -25,8 +25,6 @@ import java.awt.Font;
 import javax.swing.JTextPane;
 
 import mekhq.campaign.Campaign;
-import mekhq.campaign.rating.IUnitRating;
-import mekhq.campaign.rating.UnitRatingFactory;
 
 
 /**
@@ -36,11 +34,8 @@ import mekhq.campaign.rating.UnitRatingFactory;
  */
 public class RatingReport extends Report {
 
-    IUnitRating rating;
-
     public RatingReport(Campaign c) {
         super(c);
-        rating = UnitRatingFactory.getUnitRating(getCampaign());
     }
 
     public String getTitle() {
@@ -50,7 +45,7 @@ public class RatingReport extends Report {
     public JTextPane getReport() {
         JTextPane txtReport = new JTextPane();
         txtReport.setFont(new Font("Courier New", Font.PLAIN, 12));
-        txtReport.setText(rating.getDetails());
+        txtReport.setText(getCampaign().getUnitRating().getDetails());
         return txtReport;
     }
 

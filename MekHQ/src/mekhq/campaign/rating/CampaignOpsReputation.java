@@ -45,7 +45,7 @@ import mekhq.campaign.unit.Unit;
  * @version %Id%
  * @since 3/12/2012
  */
-class CampaignOpsReputation extends AbstractUnitRating {
+public class CampaignOpsReputation extends AbstractUnitRating {
 
     private int nonAdminPersonnelCount = 0;
 
@@ -65,10 +65,14 @@ class CampaignOpsReputation extends AbstractUnitRating {
     private final List<String> craftWithoutCrew = new ArrayList<>();
     private int technicians = 0;
 
-    CampaignOpsReputation(Campaign campaign) {
+    public CampaignOpsReputation(Campaign campaign) {
         super(campaign);
     }
 
+    public UnitRatingMethod getUnitRatingMethod() {
+        return UnitRatingMethod.CAMPAIGN_OPS;
+    }
+    
     int getNonAdminPersonnelCount() {
         return nonAdminPersonnelCount;
     }
@@ -262,6 +266,9 @@ class CampaignOpsReputation extends AbstractUnitRating {
             } else if ((u.getEntity().getEntityType() &
                         Entity.ETYPE_AERO) == Entity.ETYPE_AERO) {
                 totalAero++;
+            } else if ((u.getEntity().getEntityType() &
+                        Entity.ETYPE_DROPSHIP) == Entity.ETYPE_DROPSHIP) {
+                totalAero++;
             } else if (((u.getEntity().getEntityType() &
                          Entity.ETYPE_MECH) == Entity.ETYPE_MECH)
                        || ((u.getEntity().getEntityType() &
@@ -316,6 +323,8 @@ class CampaignOpsReputation extends AbstractUnitRating {
 
     private void updatePersonnelCounts() {
         setNonAdminPersonnelCount(0);
+        technicians = 0;
+
         List<Person> personnelList =
                 new ArrayList<>(getCampaign().getPersonnel());
         for (Person p : personnelList) {
@@ -619,8 +628,7 @@ class CampaignOpsReputation extends AbstractUnitRating {
                 totalValue += 5;
             }
         }
-        if ((getDropshipCount() > 0) && (getDockingCollarCount() >=
-                                         getDropshipCount())) {
+        if ((getDropshipCount() > 0) && (getDockingCollarCount() >= getDropshipCount())) {
             totalValue += 5;
         }
 
@@ -647,16 +655,16 @@ class CampaignOpsReputation extends AbstractUnitRating {
                 break;
             }
 
-            if (tech.getSkill(SkillType.S_TECH_MECH) != null) {
+            if ((tech.getPrimaryRole() == Person.T_MECH_TECH || tech.getSecondaryRole() == Person.T_MECH_TECH) && tech.getSkill(SkillType.S_TECH_MECH) != null) {
                 setMechTechTeams(getMechTechTeams() + 1);
                 astechTeams--;
-            } else if (tech.getSkill(SkillType.S_TECH_AERO) != null) {
+            } else if ((tech.getPrimaryRole() == Person.T_AERO_TECH || tech.getSecondaryRole() == Person.T_AERO_TECH)  && tech.getSkill(SkillType.S_TECH_AERO) != null) {
                 setAeroTechTeams(getAeroTechTeams() + 1);
                 astechTeams--;
-            } else if (tech.getSkill(SkillType.S_TECH_MECHANIC) != null) {
+            } else if ((tech.getPrimaryRole() == Person.T_MECHANIC || tech.getSecondaryRole() == Person.T_MECHANIC)  && tech.getSkill(SkillType.S_TECH_MECHANIC) != null) {
                 setMechanicTeams(getMechanicTeams() + 1);
                 astechTeams--;
-            } else if (tech.getSkill(SkillType.S_TECH_BA) != null) {
+            } else if ((tech.getPrimaryRole() == Person.T_BA_TECH || tech.getSecondaryRole() == Person.T_BA_TECH)  && tech.getSkill(SkillType.S_TECH_BA) != null) {
                 setBaTechTeams(getBaTechTeams() + 1);
                 astechTeams--;
             } else {
@@ -902,7 +910,7 @@ class CampaignOpsReputation extends AbstractUnitRating {
                                               getBaTechTeams()));
         out.append("\n").append(String.format(TEMPLATE_CAT, "Astechs:",
                                               technicians * 6,
-                                              getCampaign().getAstechPool()));
+                                              getCampaign().getNumberAstechs()));
         out.append("\n").append(String.format("    %-" + (CATEGORY_LENGTH + 4) +
                                               "s %4d needed / %4d available",
                                               "Admin Support:",

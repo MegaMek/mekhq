@@ -65,6 +65,7 @@ public class SpecialAbility implements MekHqXmlSerializable {
 
     private static Hashtable<String, SpecialAbility> specialAbilities;
     private static Hashtable<String, SpecialAbility> defaultSpecialAbilities;
+    private static Hashtable<String, SpecialAbility> edgeTriggers;
 
     private String displayName;
     private String lookupName;
@@ -85,8 +86,7 @@ public class SpecialAbility implements MekHqXmlSerializable {
     //these are abilities that should be removed if the person gets this ability
     //(typically this is a lower value ability on the same chain (e.g. Cluster Hitter removed when you get Cluster Master)
     private Vector<String> removeAbilities;
-
-
+    
     public SpecialAbility() {
         this("unknown");
     }
@@ -315,7 +315,11 @@ public class SpecialAbility implements MekHqXmlSerializable {
             }
         }
         
-        specialAbilities.put(retVal.lookupName, retVal);
+        if (wn.getNodeName().equalsIgnoreCase("edgetrigger")) {
+            edgeTriggers.put(retVal.lookupName, retVal);
+        } else {
+            specialAbilities.put(retVal.lookupName, retVal);
+        }
     }
 
     public static void generateSeparateInstanceFromXML(Node wn, Hashtable<String, SpecialAbility> spHash, PilotOptions options) {
@@ -379,7 +383,8 @@ public class SpecialAbility implements MekHqXmlSerializable {
 
     public static void initializeSPA() {
         final String METHOD_NAME = "initializeSPA()"; //$NON-NLS-1$
-        specialAbilities = new Hashtable<String, SpecialAbility>();
+        specialAbilities = new Hashtable<>();
+        edgeTriggers = new Hashtable<>();
 
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         Document xmlDoc = null;
@@ -403,7 +408,7 @@ public class SpecialAbility implements MekHqXmlSerializable {
         // Stupid weird parsing of XML.  At least this cleans it up.
         spaEle.normalize();
 
-        PilotOptions options = new PilotOptions();
+        PersonnelOptions options = new PersonnelOptions();
 
         // Okay, lets iterate through the children, eh?
         for (int x = 0; x < nl.getLength(); x++) {
@@ -421,7 +426,8 @@ public class SpecialAbility implements MekHqXmlSerializable {
                 // Okay, so what element is it?
                 String xn = wn.getNodeName();
 
-                if (xn.equalsIgnoreCase("ability")) {
+                if (xn.equalsIgnoreCase("ability")
+                        || xn.equalsIgnoreCase("edgeTrigger")) {
                     SpecialAbility.generateInstanceFromXML(wn, options, null);
                 }
             }
@@ -443,6 +449,14 @@ public class SpecialAbility implements MekHqXmlSerializable {
 
     public static Hashtable<String, SpecialAbility> getAllDefaultSpecialAbilities() {
         return defaultSpecialAbilities;
+    }
+    
+    public static SpecialAbility getEdgeTrigger(String name) {
+        return edgeTriggers.get(name);
+    }
+
+    public static Hashtable<String, SpecialAbility> getAllEdgeTriggers() {
+        return edgeTriggers;
     }
 
     public static void replaceSpecialAbilities(Hashtable<String, SpecialAbility> spas) {

@@ -24,6 +24,7 @@ package mekhq.campaign.unit;
 
 import java.io.PrintWriter;
 import java.math.BigInteger;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Enumeration;
@@ -192,6 +193,7 @@ import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.parts.equipment.MissingHeatSink;
 import mekhq.campaign.parts.equipment.MissingJumpJet;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
@@ -560,15 +562,23 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         }
     }
 
+    private boolean isPartAvailableForRepairs(IPartWork partWork, boolean onlyNotBeingWorkedOn) {
+    	return (!onlyNotBeingWorkedOn || (onlyNotBeingWorkedOn && !partWork.isBeingWorkedOn()));
+    }
+    
     public ArrayList<IPartWork> getPartsNeedingFixing() {
+    	return getPartsNeedingFixing(false);
+    }
+    
+    public ArrayList<IPartWork> getPartsNeedingFixing(boolean onlyNotBeingWorkedOn) {
         ArrayList<IPartWork> brokenParts = new ArrayList<IPartWork>();
         for(Part part: parts) {
-            if(part.needsFixing()) {
+            if(part.needsFixing() && isPartAvailableForRepairs(part, onlyNotBeingWorkedOn)) {
                 brokenParts.add(part);
             }
         }
         for (PodSpace pod : podSpace) {
-            if (pod.needsFixing()) {
+            if (pod.needsFixing() && isPartAvailableForRepairs(pod, onlyNotBeingWorkedOn)) {
                 brokenParts.add(pod);
             }
         }
@@ -576,14 +586,18 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     }
 
     public ArrayList<IPartWork> getSalvageableParts() {
+    	return getSalvageableParts(false);
+    }
+    
+    public ArrayList<IPartWork> getSalvageableParts(boolean onlyNotBeingWorkedOn) {
         ArrayList<IPartWork> salvageParts = new ArrayList<IPartWork>();
         for(Part part: parts) {
-            if(part.isSalvaging()) {
+            if(part.isSalvaging() && isPartAvailableForRepairs(part, onlyNotBeingWorkedOn)) {
                 salvageParts.add(part);
             }
         }
         for (PodSpace pod : podSpace) {
-            if (pod.hasSalvageableParts()) {
+            if (pod.hasSalvageableParts() && isPartAvailableForRepairs(pod, onlyNotBeingWorkedOn)) {
                 salvageParts.add(pod);
             }
         }
@@ -2795,7 +2809,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
      * For vehicles, infantry, and naval vessels, compute the piloting and gunnery skills based
      * on the crew as a whole.
      */
-    private void calcCompositeCrew() {
+    private void calcCompositeCrew() {        
         if (drivers.isEmpty() && gunners.isEmpty()) {
             entity.getCrew().setMissing(true, 0);
             entity.getCrew().setSize(0);
@@ -3058,17 +3072,25 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         }
         int minutesLeft = 480;
         int overtimeLeft = 240;
+        int edgeLeft = 0;
+        boolean breakpartreroll = true;
+        boolean failrefitreroll = true;
         if(null != engineer) {
             minutesLeft = engineer.getMinutesLeft();
             overtimeLeft = engineer.getOvertimeLeft();
+            edgeLeft = engineer.getEdge();
         } else {
-            //then get the number based on the least amount of time available to crew members
+            //then get the number based on the least amount available to crew members
+            //in the case of Edge, everyone must have the same triggers set for Edge to work
             for(Person p : getActiveCrew()) {
                 if(p.getMinutesLeft() < minutesLeft) {
                     minutesLeft = p.getMinutesLeft();
                 }
                 if(p.getOvertimeLeft() < overtimeLeft) {
                     overtimeLeft = p.getOvertimeLeft();
+                }
+                if(p.getEdge() < edgeLeft) {
+                    edgeLeft = p.getEdge();
                 }
             }
         }
@@ -3091,6 +3113,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 int nCrew = 0;
                 int sumSkill = 0;
                 int sumBonus = 0;
+                int sumEdge = 0;
+                int sumEdgeUsed = 0;
                 String engineerName = "Nobody";
                 int bestRank = -1;
                 for(UUID pid : vesselCrew) {
@@ -3098,10 +3122,38 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     if(null == p) {
                         continue;
                     }
+                    //If the engineer used edge points, remove some from vessel crewmembers until all is paid for
+                    if (engineer != null) {
+                        if (engineer.getEdgeUsed() > 0) {
+                            //Don't subtract an Edge if the individual has none left
+                            if (p.getEdge() > 0) {
+                                p.setEdge(p.getEdge() - 1);
+                                engineer.setEdgeUsed(engineer.getEdgeUsed() - 1);
+                            }
+                        }
+                        //If the engineer gained XP, add it for each crewman
+                        p.setXp(p.getXp() + engineer.getEngineerXp());
+                        
+                        //Update each crewman's successful task count too
+                        p.setNTasks(p.getNTasks() + engineer.getNTasks());
+                        if (p.getNTasks() >= campaign.getCampaignOptions().getNTasksXP()) {
+                            p.setXp(p.getXp() + campaign.getCampaignOptions().getTaskXP());
+                            p.setNTasks(0);
+                        }
+                        sumEdgeUsed = engineer.getEdgeUsed();
+                    }
+                    sumEdge += p.getEdge();                    
+                    
                     if(p.hasSkill(SkillType.S_TECH_VESSEL)) {
                         sumSkill += p.getSkill(SkillType.S_TECH_VESSEL).getLevel();
                         sumBonus += p.getSkill(SkillType.S_TECH_VESSEL).getBonus();
                         nCrew++;
+                    }
+                    if (!(p.getOptions().booleanOption(PersonnelOptions.EDGE_REPAIR_BREAK_PART))) {
+                        breakpartreroll = false;
+                    }
+                    if (!(p.getOptions().booleanOption(PersonnelOptions.EDGE_REPAIR_FAILED_REFIT))) {
+                        failrefitreroll = false;
                     }
                     if(p.getRankNumeric() > bestRank) {
                         engineerName = p.getFullName();
@@ -3111,6 +3163,9 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 if(nCrew > 0) {
                     engineer = new Person(engineerName, campaign);
                     engineer.setEngineer(true);
+                    engineer.setEngineerXp(0);
+                    engineer.setEdgeTrigger(PersonnelOptions.EDGE_REPAIR_BREAK_PART, breakpartreroll);
+                    engineer.setEdgeTrigger(PersonnelOptions.EDGE_REPAIR_FAILED_REFIT, failrefitreroll);
                     engineer.setMinutesLeft(minutesLeft);
                     engineer.setOvertimeLeft(overtimeLeft);
                     engineer.setId(getCommander().getId());
@@ -3119,6 +3174,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                         engineer.setRankNumeric(bestRank);
                     }
                     engineer.addSkill(SkillType.S_TECH_VESSEL, sumSkill/nCrew, sumBonus/nCrew);
+                    engineer.setEdgeUsed(sumEdgeUsed);
+                    engineer.setEdge((sumEdge - sumEdgeUsed)/nCrew);
                     engineer.setUnitId(this.getId());
                 } else {
                     engineer = null;
@@ -3965,9 +4022,11 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     }
     
     public String displayMonthlyCost() {
-        String unitMonthlyCost = "<b>Spare Parts</b>: " + getSparePartsCost() + " C-bills<br>"
-                               + "<b>Ammunition</b>: " + getAmmoCost() + " C-bills<br>"
-                               + "<b>Fuel</b>: " + getFuelCost() + " C-bills<br>";
+        DecimalFormat numFormatter = new DecimalFormat();
+        
+        String unitMonthlyCost = "<b>Spare Parts</b>: " + numFormatter.format(getSparePartsCost()) + " C-bills<br>"
+                               + "<b>Ammunition</b>: " + numFormatter.format(getAmmoCost()) + " C-bills<br>"
+                               + "<b>Fuel</b>: " + numFormatter.format(getFuelCost()) + " C-bills<br>";
         return unitMonthlyCost;
     }
 
@@ -4032,7 +4091,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             int currentYear = campaign.getCalendar().get(Calendar.YEAR);
             int rating = getTechRating();
             if (((currentYear > 2859) && (currentYear < 3040))
-                    && (!campaign.getFaction().isClan() && !campaign.isFactionComstar())) {
+                    && (!campaign.getFaction().isClan() && !campaign.getFaction().isComstar())) {
                 if (rating > EquipmentType.RATING_D) {
                     partsCost = (long)(partsCost * 5.0);
                 }

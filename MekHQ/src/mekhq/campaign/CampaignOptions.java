@@ -85,6 +85,7 @@ public class CampaignOptions implements Serializable {
     private boolean useArtillery;
     private boolean useAbilities;
     private boolean useEdge;
+    private boolean useSupportEdge;
     private boolean useImplants;
 	private boolean altQualityAveraging;
     private int healWaitingPeriod;
@@ -100,6 +101,7 @@ public class CampaignOptions implements Serializable {
     private boolean useParentage;
     private boolean logConception;
     private boolean useTransfers;
+    private boolean useTimeInService;
     private boolean capturePrisoners;
     private int defaultPrisonerStatus;
 
@@ -186,6 +188,7 @@ public class CampaignOptions implements Serializable {
     private int contractNegotiationXP;
     private int adminXP;
     private int adminXPPeriod;
+    private int edgeCost;
 
     //repair related
     private boolean destroyByMargin;
@@ -293,6 +296,7 @@ public class CampaignOptions implements Serializable {
         useArtillery = false;
         useAbilities = false;
         useEdge = false;
+        useSupportEdge = false;
         useImplants = false;
 		altQualityAveraging = false;
         useAdvancedMedical = false;
@@ -350,6 +354,7 @@ public class CampaignOptions implements Serializable {
         contractNegotiationXP = 0;
         adminXP = 0;
         adminXPPeriod = 1;
+        edgeCost = 1;
         unitRatingMethod = UnitRatingMethod.CAMPAIGN_OPS;
         waitingPeriod = 7;
         acquisitionSkill = S_TECH;
@@ -389,6 +394,7 @@ public class CampaignOptions implements Serializable {
         useParentage = false;
         logConception = false;
         useTransfers = true;
+        useTimeInService = false;
         capturePrisoners = true;
         defaultPrisonerStatus = PRISONER_RANK;
         personnelMarketReportRefresh = true;
@@ -666,6 +672,14 @@ public class CampaignOptions implements Serializable {
 
     public void setEdge(boolean b) {
         this.useEdge = b;
+    }
+    
+    public boolean useSupportEdge() {
+        return useSupportEdge;
+    }
+
+    public void setSupportEdge(boolean b) {
+        useSupportEdge = b;
     }
 
     public boolean useImplants() {
@@ -1124,6 +1138,14 @@ public class CampaignOptions implements Serializable {
     public void setAdminXPPeriod(int m) {
         adminXPPeriod = m;
     }
+    
+    public int getEdgeCost() {
+        return edgeCost;
+    }
+
+    public void setEdgeCost(int b) {
+        edgeCost = b;
+    }
 
     public int getWaitingPeriod() {
         return waitingPeriod;
@@ -1419,6 +1441,14 @@ public class CampaignOptions implements Serializable {
 
     public void setUseTransfers(boolean b) {
     	useTransfers = b;
+    }
+
+    public boolean getUseTimeInService() {
+        return useTimeInService;
+    }
+
+    public void setUseTimeInService(boolean b) {
+        useTimeInService = b;
     }
 
     public boolean capturePrisoners() {
@@ -1967,6 +1997,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useArtillery", useArtillery);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useAbilities", useAbilities);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useEdge", useEdge);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useSupportEdge", useSupportEdge);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useImplants", useImplants);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "altQualityAveraging", altQualityAveraging);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useAdvancedMedical", useAdvancedMedical);
@@ -2004,6 +2035,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "contractNegotiationXP", contractNegotiationXP);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "adminWeeklyXP", adminXP);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "adminXPPeriod", adminXPPeriod);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "edgeCost", edgeCost);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "limitByYear", limitByYear);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "disallowExtinctStuff", disallowExtinctStuff);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "allowClanPurchases", allowClanPurchases);
@@ -2055,6 +2087,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useParentage", useParentage);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "logConception", logConception);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useTransfers", useTransfers);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useTimeInService", useTimeInService);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "capturePrisoners", capturePrisoners);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "defaultPrisonerStatus", defaultPrisonerStatus);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "personnelMarketType", personnelMarketType);
@@ -2232,6 +2265,8 @@ public class CampaignOptions implements Serializable {
                 retVal.useAbilities = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("useEdge")) {
                 retVal.useEdge = Boolean.parseBoolean(wn2.getTextContent());
+            } else if (wn2.getNodeName().equalsIgnoreCase("useRemfEdge")) {
+                retVal.useSupportEdge = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("useImplants")) {
                 retVal.useImplants = Boolean.parseBoolean(wn2.getTextContent());
 			} else if (wn2.getNodeName().equalsIgnoreCase("altQualityAveraging")) {
@@ -2310,6 +2345,8 @@ public class CampaignOptions implements Serializable {
                 retVal.adminXP = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("adminXPPeriod")) {
                 retVal.adminXPPeriod = Integer.parseInt(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("edgeCost")) {
+                retVal.edgeCost = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("waitingPeriod")) {
                 retVal.waitingPeriod = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("healWaitingPeriod")) {
@@ -2462,6 +2499,8 @@ public class CampaignOptions implements Serializable {
                 retVal.logConception = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("useTransfers")) {
             	retVal.useTransfers = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("useTimeInService")) {
+                retVal.useTimeInService = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("capturePrisoners")) {
             	retVal.capturePrisoners = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("defaultPrisonerStatus")) {

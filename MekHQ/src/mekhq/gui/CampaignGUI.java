@@ -119,6 +119,7 @@ import mekhq.campaign.parts.Refit;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.SpecialAbility;
+import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.campaign.report.CargoReport;
 import mekhq.campaign.report.HangarReport;
 import mekhq.campaign.report.PersonnelReport;
@@ -1644,11 +1645,17 @@ public class CampaignGUI extends JPanel {
 
     private void menuOptionsActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_menuOptionsActionPerformed
         boolean atb = getCampaign().getCampaignOptions().getUseAtB();
+        boolean timein = getCampaign().getCampaignOptions().getUseTimeInService();
         boolean staticRATs = getCampaign().getCampaignOptions().useStaticRATs();
         boolean factionIntroDate = getCampaign().getCampaignOptions().useFactionIntroDate();
         CampaignOptionsDialog cod = new CampaignOptionsDialog(getFrame(), true,
                 getCampaign(), getIconPackage().getCamos());
         cod.setVisible(true);
+        if (timein != getCampaign().getCampaignOptions().getUseTimeInService()) {
+            if (getCampaign().getCampaignOptions().getUseTimeInService()) {
+                getCampaign().initTimeInService();
+            }
+        }
         if (atb != getCampaign().getCampaignOptions().getUseAtB()) {
             if (getCampaign().getCampaignOptions().getUseAtB()) {
                 getCampaign().initAtB();
@@ -2838,8 +2845,18 @@ public class CampaignGUI extends JPanel {
 
     private void refreshRating() {
         if (getCampaign().getCampaignOptions().useDragoonRating()) {
-            String text = "<html><b>Dragoons Rating:</b> "
-                    + getCampaign().getUnitRating() + "</html>";
+        	// this is the one situation where we do want to refresh the rating,
+        	// as it means something has happened to influence it
+        	getCampaign().getUnitRating().reInitialize();
+        	
+            String text;
+        	if (UnitRatingMethod.FLD_MAN_MERCS_REV.equals(getCampaign().getCampaignOptions().getUnitRatingMethod())) {
+                text = String.format(resourceMap.getString("bottomRating.DragoonsRating"), getCampaign().getUnitRatingText());
+            }
+            else {
+                text = String.format(resourceMap.getString("bottomRating.CampaignOpsRating"), getCampaign().getUnitRatingText());
+            }
+        	
             lblRating.setText(text);
         } else {
             lblRating.setText("");

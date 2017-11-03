@@ -174,4 +174,9 @@ public interface IUnitRating {
      */
     String getHelpText();
 
+    /**
+     * Returns the typs of unit rating method used.
+     * @return
+     */
+    UnitRatingMethod getUnitRatingMethod();
 }
