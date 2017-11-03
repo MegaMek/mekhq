@@ -2355,7 +2355,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 ((AeroLifeSupport)lifeSupport).calculateCost();
             }
             if(null == dropCollar && entity instanceof Dropship) {
-                dropCollar = new DropshipDockingCollar((int) entity.getWeight(), campaign, true);
+                dropCollar = new DropshipDockingCollar((int) entity.getWeight(), campaign,
+                        ((Dropship) entity).getCollarType());
                 addPart(dropCollar);
                 partsToAdd.add(dropCollar);
             }

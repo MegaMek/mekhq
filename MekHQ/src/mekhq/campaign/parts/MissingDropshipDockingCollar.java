@@ -43,16 +43,21 @@ public class MissingDropshipDockingCollar extends MissingPart {
 	 */
 	private static final long serialVersionUID = -717866644605314883L;
 
-	private boolean hasKFBoom = true;
+	private int collarType;
 	
 	public MissingDropshipDockingCollar() {
-    	this(0, null, true);
+    	this(0, null, Dropship.COLLAR_STANDARD);
     }
     
-    public MissingDropshipDockingCollar(int tonnage, Campaign c, boolean hasKFBoom) {
+    public MissingDropshipDockingCollar(int tonnage, Campaign c, int collarType) {
         super(tonnage, c);
+        this.collarType = collarType;
         this.name = "Dropship Docking Collar";
-        this.hasKFBoom = hasKFBoom;
+        if (collarType == Dropship.COLLAR_NO_BOOM) {
+            name += " (No Boom)";
+        } else if (collarType == Dropship.COLLAR_PROTOTYPE) {
+            name += " (Prototype)";
+        }
     }
     
     @Override 
@@ -68,14 +73,15 @@ public class MissingDropshipDockingCollar extends MissingPart {
 	@Override
 	public void updateConditionFromPart() {
 		if(null != unit && unit.getEntity() instanceof Dropship) {
-			((Dropship)unit.getEntity()).setDamageDockCollar(true);
+            ((Dropship)unit.getEntity()).setDamageDockCollar(true);
+            ((Dropship)unit.getEntity()).setDamageKFBoom(true);
 		}	
 		
 	}
 
 	@Override
 	public Part getNewPart() {
-		return new DropshipDockingCollar(getUnitTonnage(), campaign, hasKFBoom);
+		return new DropshipDockingCollar(getUnitTonnage(), campaign, collarType);
 	}
 
 	@Override
@@ -92,7 +98,7 @@ public class MissingDropshipDockingCollar extends MissingPart {
 	@Override
 	public void writeToXml(PrintWriter pw1, int indent) {
 		writeToXmlBegin(pw1, indent);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "hasKFBoom", hasKFBoom);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "collarType", collarType);
 		writeToXmlEnd(pw1, indent);
 	}
 
@@ -102,15 +108,16 @@ public class MissingDropshipDockingCollar extends MissingPart {
 
         for (int x=0; x<nl.getLength(); x++) {
             Node wn2 = nl.item(x);
-            if (wn2.getNodeName().equalsIgnoreCase("hasKFBoom")) {
-                hasKFBoom = Boolean.parseBoolean(wn2.getTextContent());
+            if (wn2.getNodeName().equalsIgnoreCase("collarType")) {
+                collarType = Integer.parseInt(wn2.getTextContent());
             }
         }
 	}
 
 	@Override
 	public boolean isAcceptableReplacement(Part part, boolean refit) {
-		return part instanceof DropshipDockingCollar;
+		return (part instanceof DropshipDockingCollar)
+		        && (refit || (((DropshipDockingCollar) part).getCollarType() == collarType));
 	}
 
 	@Override
@@ -126,7 +133,11 @@ public class MissingDropshipDockingCollar extends MissingPart {
 	
 	@Override
 	public TechAdvancement getTechAdvancement() {
-	    return hasKFBoom? DropshipDockingCollar.TA_BOOM : DropshipDockingCollar.TA_NO_BOOM; 
+        if (collarType != Dropship.COLLAR_NO_BOOM) {
+            return DropshipDockingCollar.TA_BOOM;
+        } else {
+            return DropshipDockingCollar.TA_NO_BOOM;
+        }
 	}
 	
 }
