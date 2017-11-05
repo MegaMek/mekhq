@@ -491,7 +491,6 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 				mounted.setHit(false);
 		        mounted.setDestroyed(false);
 		        mounted.setRepairable(true);
-		        //mounted.changeAmmoType((AmmoType) type);
 		        unit.repairSystem(CriticalSlot.TYPE_EQUIPMENT, equipmentNum);
 				mounted.setShotsLeft(getFullShots() - shotsNeeded);
 			}
