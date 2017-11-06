@@ -65,6 +65,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 
 	protected long munition;
 	protected int shotsNeeded;
+	private boolean ammoTypeChanged = false;
 	protected boolean checkedToday;
 	protected boolean oneShot;
 
@@ -199,7 +200,8 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     }
 
     public int getShotsNeeded() {
-    	return shotsNeeded;
+        int actualShots = (ammoTypeChanged ? getFullShots() : shotsNeeded);
+        return actualShots;
     }
 
     public void changeMunition(long m) {
@@ -228,6 +230,10 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 				+"<munition>"
 				+munition
 				+"</munition>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<ammoTypeChanged>"
+				+ammoTypeChanged
+				+"</ammoTypeChanged>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<shotsNeeded>"
 				+shotsNeeded
@@ -259,6 +265,12 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 				munition = Long.parseLong(wn2.getTextContent());
 			} else if (wn2.getNodeName().equalsIgnoreCase("shotsNeeded")) {
 				shotsNeeded = Integer.parseInt(wn2.getTextContent());
+			} else if (wn2.getNodeName().equalsIgnoreCase("ammoTypeChanged")) {
+				if(wn2.getTextContent().equalsIgnoreCase("true")) {
+					ammoTypeChanged = true;
+				} else {
+					ammoTypeChanged = false;
+				}
 			} else if (wn2.getNodeName().equalsIgnoreCase("checkedToday")) {
 				if(wn2.getTextContent().equalsIgnoreCase("true")) {
 					checkedToday = true;
@@ -309,7 +321,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 	}
 
 	public void loadBin() {
-		int shots = Math.min(getAmountAvailable(), shotsNeeded);
+		int shots = Math.min(getAmountAvailable(), getShotsNeeded());
 		if(null != unit) {
 			Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
 			if(null != mounted && mounted.getType() instanceof AmmoType) {
@@ -322,6 +334,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 					unload();
 					mounted.changeAmmoType((AmmoType)type);
 					mounted.setShotsLeft(shots);
+					ammoTypeChanged = false;
 				}
 			}
 		}
@@ -406,9 +419,13 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 				}
 				if(currentMuniType == getMunitionType()) {
 					shotsNeeded = getFullShots() - mounted.getBaseShotsLeft();
+					ammoTypeChanged = false;
 				} else {
+					ammoTypeChanged = true;
 					//we have a change of munitions
-					shotsNeeded = getFullShots();
+					//entity will be updated in loadBin when a tech does the task
+					//until then, change no state so that we can switch back for
+					//free
 				}
 			}
 		}
@@ -458,7 +475,6 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 				mounted.setHit(false);
 		        mounted.setDestroyed(false);
 		        mounted.setRepairable(true);
-		        mounted.changeAmmoType((AmmoType) type);
 		        unit.repairSystem(CriticalSlot.TYPE_EQUIPMENT, equipmentNum);
 				mounted.setShotsLeft(getFullShots() - shotsNeeded);
 			}
@@ -474,7 +490,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 
 	@Override
 	public boolean needsFixing() {
-		return shotsNeeded > 0;// && null != unit;
+		return ammoTypeChanged || shotsNeeded > 0;// && null != unit;
 	}
 
 	public String getDesc() {
@@ -504,12 +520,12 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     		String availability = "";
     		int shotsAvailable = getAmountAvailable();
             String[] inventories = campaign.getPartInventory(getNewPart());
-    		if(shotsAvailable == 0) {
+            if(shotsAvailable == 0) {
                 availability = "<br><font color='red'>No ammo ("+ inventories[1] + " in transit, " + inventories[2] + " on order)</font>";
-    		} else if(shotsAvailable < shotsNeeded) {
+            } else if(shotsAvailable < getShotsNeeded()) {
                 availability = "<br><font color='red'>Only " + shotsAvailable + " available ("+ inventories[1] + " in transit, " + inventories[2] + " on order)</font>";
-    		}
-			return ((AmmoType)type).getDesc() + ", " + shotsNeeded + " shots needed" + availability;
+            }
+            return ((AmmoType)type).getDesc() + ", " + getShotsNeeded() + " shots needed" + availability;
     	} else {
     		return "";
     	}
