@@ -24,6 +24,7 @@ import org.w3c.dom.Node;
 
 import megamek.common.Bay;
 import megamek.common.Entity;
+import megamek.common.SimpleTechLevel;
 import megamek.common.TechAdvancement;
 import mekhq.campaign.Campaign;
 
@@ -176,7 +177,8 @@ public class BayDoor extends Part {
     @Override
     public TechAdvancement getTechAdvancement() {
         return new TechAdvancement().setTechRating(RATING_A)
-                .setAvailability(RATING_A, RATING_A, RATING_A, RATING_A);
+                .setAvailability(RATING_A, RATING_A, RATING_A, RATING_A)
+                .setStaticTechLevel(SimpleTechLevel.STANDARD);
     }
 
 }

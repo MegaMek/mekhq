@@ -31,6 +31,7 @@ import java.util.regex.Pattern;
 
 import megamek.common.Aero;
 import megamek.common.AmmoType;
+import megamek.common.BayType;
 import megamek.common.Engine;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
@@ -53,6 +54,8 @@ import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Avionics;
 import mekhq.campaign.parts.BaArmor;
 import mekhq.campaign.parts.BattleArmorSuit;
+import mekhq.campaign.parts.BayDoor;
+import mekhq.campaign.parts.Cubicle;
 import mekhq.campaign.parts.EnginePart;
 import mekhq.campaign.parts.FireControlSystem;
 import mekhq.campaign.parts.LandingGear;
@@ -420,6 +423,12 @@ public class PartsStore implements Serializable {
 		parts.add(new Avionics(0, c));
 		parts.add(new FireControlSystem(0, 0, c));
 		parts.add(new LandingGear(0, c));
+		parts.add(new BayDoor(0, c));
+		for (BayType btype : BayType.values()) {
+		    if (btype.getCategory() == BayType.CATEGORY_NON_INFANTRY) {
+		        parts.add(new Cubicle(0, btype, c));
+		    }
+		}
 	}
 
 	private void stockVeeComponents(Campaign c) {
