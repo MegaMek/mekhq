@@ -53,7 +53,9 @@ public class Cubicle extends Part {
     public Cubicle(int tonnage, BayType bayType, Campaign c) {
         super(tonnage, false, c);
         this.bayType = bayType;
-        name = bayType.getDisplayName() + " Cubicle";
+        if (null != bayType) {
+            name = bayType.getDisplayName() + " Cubicle";
+        }
     }
     
     public BayType getBayType() {
