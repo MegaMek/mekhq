@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -40,6 +41,7 @@ import org.w3c.dom.NodeList;
 import megamek.common.AmmoType;
 import megamek.common.BattleArmor;
 import megamek.common.Bay;
+import megamek.common.BayType;
 import megamek.common.BipedMech;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
@@ -257,7 +259,8 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 		//Step 1: put all of the parts from the current unit into a new arraylist so they can
 		//be removed when we find a match.
 		for(Part p : oldUnit.getParts()) {
-		    if (!isOmniRefit || p.isOmniPodded()) {
+		    if ((!isOmniRefit || p.isOmniPodded())
+		            || (p instanceof TransportBayPart)) {
 		        oldUnitParts.add(p.getId());
 		    }
 		}
@@ -1052,6 +1055,9 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 		//add old parts to the warehouse
 		for(int pid : oldUnitParts) {
 			Part part = oldUnit.campaign.getPart(pid);
+			if (part instanceof TransportBayPart) {
+			    part.removeAllChildParts();
+			}
 			if(null == part) {
                 MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
                         "old part with id " + pid + " not found for refit of " + getDesc()); //$NON-NLS-1$
@@ -1066,6 +1072,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 			// We also don't want to generate new BA suits that have been replaced
 			// or allow legacy InfantryAttack BA parts to show up in the warehouse.
 			else if(part instanceof StructuralIntegrity || part instanceof BattleArmorSuit
+			        || (part instanceof TransportBayPart)
 			        || (part instanceof EquipmentPart && ((EquipmentPart)part).getType() instanceof InfantryAttack)) {
 				part.setUnit(null);
 				oldUnit.campaign.removePart(part);
@@ -1129,6 +1136,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 		oldUnit.setParts(newParts);
 		Utilities.unscrambleEquipmentNumbers(oldUnit);
 		assignArmActuators();
+		assignBayParts();
 		if(null != newArmorSupplies) {
 			oldUnit.campaign.removePart(newArmorSupplies);
 		}
@@ -2003,6 +2011,65 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
                 part.setLocation(Mech.LOC_LARM);
             }
         }
+	}
+	
+	/**
+	 * Assigns bay doors and cubicles as child parts of the bay part. We also need to make sure the
+	 * bay number of the parts match up to the Entity. The easiest way to do that is to remove all
+	 * the bay parts and create new ones from scratch. Then we assign doors and cubicles.
+	 */
+	private void assignBayParts() {
+	    final Entity entity = oldUnit.getEntity();
+
+	    List<Part> doors = new ArrayList<>();
+	    Map<BayType, List<Part>> cubicles = new HashMap<>();
+	    List<Part> oldBays = new ArrayList<>();
+	    for (Part p : oldUnit.getParts()) {
+	        if (p instanceof BayDoor) {
+	            doors.add(p);
+	        } else if (p instanceof Cubicle) {
+	            cubicles.putIfAbsent(((Cubicle) p).getBayType(), new ArrayList<>());
+	            cubicles.get(((Cubicle) p).getBayType()).add(p);
+	        } else if (p instanceof TransportBayPart) {
+	            oldBays.add(p);
+	        }
+	    }
+	    oldBays.forEach(p -> p.remove(false));
+	    for (Bay bay : entity.getTransportBays()) {
+	        if (bay.isQuarters()) {
+	            continue;
+	        }
+	        BayType btype = BayType.getTypeForBay(bay);
+	        Part bayPart = new TransportBayPart((int) oldUnit.getEntity().getWeight(),
+	                bay.getBayNumber(), bay.getCapacity(), campaign);
+	        oldUnit.addPart(bayPart);
+	        oldUnit.campaign.addPart(bayPart, 0);
+	        for (int i = 0; i < bay.getDoors(); i++) {
+	            Part door;
+	            if (doors.size() > 0) {
+	                door = doors.remove(0);
+	            } else {
+	                // This shouldn't ever happen
+	                door = new MissingBayDoor((int) entity.getWeight(), campaign);
+	                oldUnit.addPart(door);
+	                oldUnit.campaign.addPart(door, 0);
+	            }
+	            bayPart.addChildPart(door);
+	        }
+	        if (btype.getCategory() == BayType.CATEGORY_NON_INFANTRY) {
+	            for (int i = 0; i < bay.getCapacity(); i++) {
+	                Part cubicle;
+	                if (cubicles.containsKey(btype) && (cubicles.get(btype).size() > 0)) {
+	                    cubicle = cubicles.get(btype).remove(0);
+	                } else {
+	                    cubicle = new MissingCubicle((int) entity.getWeight(), btype, campaign);
+	                    oldUnit.addPart(cubicle);
+	                    oldUnit.campaign.addPart(cubicle, 0);
+	                }
+	                bayPart.addChildPart(cubicle);
+	            }
+	        }
+	    }
 	}
 
     @Override
