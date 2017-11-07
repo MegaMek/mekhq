@@ -65,6 +65,7 @@ import mekhq.campaign.event.PartChangedEvent;
 import mekhq.campaign.event.UnitRefitEvent;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.equipment.EquipmentPart;
+import mekhq.campaign.parts.equipment.LargeCraftAmmoBin;
 import mekhq.campaign.parts.equipment.MissingAmmoBin;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.personnel.Person;
@@ -398,8 +399,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 					cost += replacement.getActualValue();
 					shoppingList.add(nPart);
 				}
-			}
-			else if(nPart instanceof Armor) {
+			} else if(nPart instanceof Armor) {
 				int totalAmount = ((Armor)nPart).getTotalAmount();
 				time += totalAmount * ((Armor)nPart).getBaseTimeFor(newEntity);
 				armorNeeded += totalAmount;
@@ -408,26 +408,30 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 				//armor always gets added to the shopping list - it will be checked for differently
 				//NOT ANYMORE - I think this is overkill, lets just reuse existing armor parts
 				//shoppingList.add(nPart);
-			}
-			else if(nPart instanceof AmmoBin) {
+			} else if (nPart instanceof AmmoBin) {
 				AmmoType type = (AmmoType)((AmmoBin)nPart).getType();
-				ammoNeeded.merge(type, ((AmmoType)((AmmoBin)nPart).getType()).getShots(),
-				        (a, b) -> a + b);
-				time += 120;
-				//check for ammo bins in storage to avoid the proliferation of infinite ammo bins
-				MissingAmmoBin mab = (MissingAmmoBin)nPart.getMissingPart();
-				Part replacement = mab.findReplacement(true);
-				//check quantity
-				//TODO: the one weakness here is that we will not pick up damaged parts
-				if(null != replacement && null == partQuantity.get(replacement.getId())) {
-					partQuantity.put(replacement.getId(), replacement.getQuantity());
-				}
-				if(null != replacement && partQuantity.get(replacement.getId()) > 0) {
-					newUnitParts.add(replacement.getId());
-					//adjust quantity
-					partQuantity.put(replacement.getId(), partQuantity.get(replacement.getId())-1);
+				ammoNeeded.merge(type, type.getShots(), Integer::sum);
+				if (nPart instanceof LargeCraftAmmoBin) {
+				    time += nPart.getBaseTime() * ((AmmoBin) nPart).getFullShots()
+				            * type.getTonnage(newEntity) / type.getShots();
+				    shoppingList.add(nPart);
 				} else {
-					shoppingList.add(nPart);
+				    time += 120;
+    				//check for ammo bins in storage to avoid the proliferation of infinite ammo bins
+    				MissingAmmoBin mab = (MissingAmmoBin)nPart.getMissingPart();
+    				Part replacement = mab.findReplacement(true);
+    				//check quantity
+    				//TODO: the one weakness here is that we will not pick up damaged parts
+    				if(null != replacement && null == partQuantity.get(replacement.getId())) {
+    					partQuantity.put(replacement.getId(), replacement.getQuantity());
+    				}
+    				if(null != replacement && partQuantity.get(replacement.getId()) > 0) {
+    					newUnitParts.add(replacement.getId());
+    					//adjust quantity
+    					partQuantity.put(replacement.getId(), partQuantity.get(replacement.getId())-1);
+    				} else {
+    					shoppingList.add(nPart);
+    				}
 				}
 			}
 
@@ -570,8 +574,8 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 		int doorsAdded = 0;
 		if (oldUnitBays.size() + newUnitBays.size() > 0) {
     		for (Iterator<Bay> oldbays = oldUnitBays.iterator(); oldbays.hasNext(); ) {
+                final Bay oldbay = oldbays.next();
                 for (Iterator<Bay> newbays = newUnitBays.iterator(); newbays.hasNext(); ) {
-                    final Bay oldbay = oldbays.next();
                     final Bay newbay = newbays.next();
                     if ((oldbay.getCapacity() == newbay.getCapacity())
                             && (oldbay.getDoors() == newbay.getDoors())) {
@@ -582,8 +586,8 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
                 }
     		}
             for (Iterator<Bay> oldbays = oldUnitBays.iterator(); oldbays.hasNext(); ) {
+                final Bay oldbay = oldbays.next();
                 for (Iterator<Bay> newbays = newUnitBays.iterator(); newbays.hasNext(); ) {
-                    final Bay oldbay = oldbays.next();
                     final Bay newbay = newbays.next();
                     if (oldbay.getCapacity() == newbay.getCapacity()) {
                         if (oldbay.getDoors() > newbay.getDoors()) {
