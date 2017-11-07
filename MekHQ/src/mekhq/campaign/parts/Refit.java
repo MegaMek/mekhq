@@ -29,6 +29,8 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
 import java.util.UUID;
 
 import org.w3c.dom.Node;
@@ -36,6 +38,7 @@ import org.w3c.dom.NodeList;
 
 import megamek.common.AmmoType;
 import megamek.common.BattleArmor;
+import megamek.common.Bay;
 import megamek.common.BipedMech;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
@@ -550,6 +553,61 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 		    }
 		}
 		
+		/*
+		 * Cargo and transport bays are essentially just open space and while it may take time and materials
+		 * to change the cubicles or the number of doors, the bay itself does not require any refit work
+		 * unless the size changes. First we create a list of all bays on each unit, then we attempt to
+		 * match them by size and number of doors. Any remaining are matched on size, and difference in
+		 * number of doors is noted as moving doors has to be accounted for in the time calculation.
+		 */
+		List<Bay> oldUnitBays = oldUnit.getEntity().getTransportBays();
+		List<Bay> newUnitBays = newEntity.getTransportBays();
+		// If any bays keep the same size but have any doors added or removed, we need to note that separately
+		// since removing a door from one bay and adding it to another requires time even if the number
+		// of parts hasn't changed. We track them separately so that we don't charge time for changing the
+		// overall number of doors twice.
+		int doorsRemoved = 0;
+		int doorsAdded = 0;
+		if (oldUnitBays.size() + newUnitBays.size() > 0) {
+    		for (Iterator<Bay> oldbays = oldUnitBays.iterator(); oldbays.hasNext(); ) {
+                for (Iterator<Bay> newbays = newUnitBays.iterator(); newbays.hasNext(); ) {
+                    final Bay oldbay = oldbays.next();
+                    final Bay newbay = newbays.next();
+                    if ((oldbay.getCapacity() == newbay.getCapacity())
+                            && (oldbay.getDoors() == newbay.getDoors())) {
+                        oldbays.remove();
+                        newbays.remove();
+                        break;
+                    }
+                }
+    		}
+            for (Iterator<Bay> oldbays = oldUnitBays.iterator(); oldbays.hasNext(); ) {
+                for (Iterator<Bay> newbays = newUnitBays.iterator(); newbays.hasNext(); ) {
+                    final Bay oldbay = oldbays.next();
+                    final Bay newbay = newbays.next();
+                    if (oldbay.getCapacity() == newbay.getCapacity()) {
+                        if (oldbay.getDoors() > newbay.getDoors()) {
+                            doorsRemoved += oldbay.getDoors() - newbay.getDoors();
+                        } else {
+                            doorsAdded += newbay.getDoors() - oldbay.getDoors();
+                        }
+                        oldbays.remove();
+                        newbays.remove();
+                        break;
+                    }
+                }
+    		}
+            time += (oldUnitBays.size() + newUnitBays.size()) * 9600; // Assuming 1 month is 40 hours/week * 4 weeks
+            int deltaDoors = oldUnitBays.stream().mapToInt(Bay::getDoors).sum()
+                    - newUnitBays.stream().mapToInt(Bay::getDoors).sum();
+            if (deltaDoors < 0) {
+                doorsAdded = Math.max(0, doorsAdded - deltaDoors);
+            } else {
+                doorsRemoved = Math.max(0, doorsRemoved + deltaDoors);
+            }
+            time += (doorsAdded + doorsRemoved) * 600;
+		}
+		
 		//Step 4: loop through remaining equipment on oldunit parts and add time for removing.
 		for(int pid : oldUnitParts) {
 			Part oPart = oldUnit.campaign.getPart(pid);
@@ -584,7 +642,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 			time += oPart.getBaseTime();
 			oldUnit.setSalvage(isSalvaging);
 		}
-
+		
 		if(sameArmorType) {
 			//if this is the same armor type then we can recyle armor
 			armorNeeded -= recycledArmorPoints;
