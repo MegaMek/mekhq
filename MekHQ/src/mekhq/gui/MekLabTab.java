@@ -624,6 +624,7 @@ public class MekLabTab extends CampaignGuiTab {
             structureTab.addRefreshedListener(this);
             equipmentTab.addRefreshedListener(this);
             buildTab.addRefreshedListener(this);
+            transportTab.addRefreshedListener(this);
 
             addTab("Structure/Armor", new JScrollPane(structureTab));
             addTab("Equipment", new JScrollPane(equipmentTab));
