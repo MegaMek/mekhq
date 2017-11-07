@@ -293,8 +293,13 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 				//FIXME: There have been instances of null oParts here. Save/load will fix these, but
 				//I would like to figure out the source. From experimentation, I think it has to do with
 				//cancelling a prior refit.
-				if(((oPart instanceof MissingPart && ((MissingPart)oPart).isAcceptableReplacement(part, true))
-						|| oPart.isSamePartType(part))) {
+				if ((oPart instanceof MissingPart && ((MissingPart)oPart).isAcceptableReplacement(part, true))
+						|| oPart.isSamePartType(part)
+						// We're not going to require replacing the life support system just because the
+						// number of bay personnel changes.
+						|| ((oPart instanceof AeroLifeSupport)
+						        && (part instanceof AeroLifeSupport)
+						        && (!crewSizeChanged()))) {
 					//need a special check for location and armor amount for armor
 					if(oPart instanceof Armor
 							&& (((Armor)oPart).getLocation() != ((Armor)part).getLocation()
@@ -1433,6 +1438,23 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 	public void setShorthandedMod(int i) {
 		// TODO Auto-generated method stub
 
+	}
+	
+	/**
+	 * Requiring the life support system to be changed just because the number of bay personnel changes
+	 * is a bit much. Instead we'll limit it to changes in crew size, measured by quarters. 
+	 * @return true if the crew quarters capacity changed.
+	 */
+	private boolean crewSizeChanged() {
+        int oldCrew = oldUnit.getEntity().getTransportBays()
+                .stream().filter(b -> b.isQuarters())
+                .mapToInt(b -> (int) b.getCapacity())
+                .sum();
+        int newCrew = newEntity.getTransportBays()
+                .stream().filter(b -> b.isQuarters())
+                .mapToInt(b -> (int) b.getCapacity())
+                .sum();
+        return oldCrew != newCrew;
 	}
 
 	@Override
