@@ -7,6 +7,8 @@ v0.43.5-git
 + Feature #280: Role folders now supported for random portrait assignment
 + PR #440: Track & report time in service
 + PR #502: Edge use for non-combat personnel
++ Issue #416: Base Attack scenarios fail to generate turrets
++ PR #439: Calculate DropShip rental costs based on untransported units only (and also take into account mothballed units)
 
 v0.43.4 (2017-10-01 11:00 UTC)
 + Updating the repo with 0.43.3 Data

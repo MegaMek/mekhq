@@ -141,4 +141,14 @@ public interface IUnitGenerator {
 	List<MechSummary> generate(int count, String faction, int unitType, int weightClass,
 			int year, int quality, Collection<EntityMovementMode> movementModes,
 			Predicate<MechSummary> filter);
+	
+	/**
+	 * Generates a list of turrets given a skill level, quality and year
+	 * @param num How many turrets to generate
+	 * @param skill The skill level of the turret operator
+	 * @param quality The quality level of the turret
+	 * @param currentYear The current year
+	 * @return List of turrets
+	 */
+	List<MechSummary> generateTurrets(int num, int skill, int quality, int currentYear);
 }

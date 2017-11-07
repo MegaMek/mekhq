@@ -266,9 +266,9 @@ public class JumpPathViewPanel extends javax.swing.JPanel {
             gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
             gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
             pnlStats.add(lblCost, gridBagConstraints);
-            
+
             txtCost.setName("lblCost2"); // NOI18N
-            txtCost.setText(formatter.format(path.getJumps() * campaign.calculateCostPerJump(true)) + " C-bills");
+            txtCost.setText(formatter.format(path.getJumps() * campaign.calculateCostPerJump(true, campaign.getCampaignOptions().useEquipmentContractBase())) + " C-bills");
             txtCost.setEditable(false);
             txtCost.setLineWrap(true);
             txtCost.setWrapStyleWord(true);

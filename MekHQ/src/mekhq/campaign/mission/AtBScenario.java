@@ -1436,6 +1436,25 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 .collect(Collectors.<Entity>toList());
         list.addAll(entities);
     }
+    
+    /**
+     * Generates the indicated number of turret entities.
+     *
+     * @param list        Generated entities are added to this list
+     * @param num        The number of turrets to generate
+     * @param skill 	The skill level of the turret operators
+     * @param quality	The quality level of the turrets
+     * @param campaign  The campaign for which the turrets are being generated.
+     */
+    protected void addTurrets(ArrayList<Entity> list, int num, int skill, int quality, Campaign campaign) {
+    	int currentYear = campaign.getCalendar().get(Calendar.YEAR);
+    	
+    	List<MechSummary> msl = campaign.getUnitGenerator().generateTurrets(num, skill, quality, currentYear);
+        List<Entity> entities = msl.stream().map(ms -> createEntityWithCrew("IND",
+        		skill, campaign, ms))
+                .collect(Collectors.<Entity>toList());
+        list.addAll(entities);
+    }
 
     /* Convenience methods for frequently-used arguments */
     protected BotForce getAllyBotForce(AtBContract c, int start, int home, ArrayList<Entity> entities) {

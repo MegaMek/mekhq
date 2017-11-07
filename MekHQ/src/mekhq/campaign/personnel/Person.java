@@ -1129,7 +1129,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
 		return (
 				!this.equals(p)
 				&& (getAncestorsID() == null
-				|| campaign.getAncestors(getAncestorsID()).checkMutualAncestors(campaign.getAncestors(p.getAncestorsID())))
+				|| !campaign.getAncestors(getAncestorsID()).checkMutualAncestors(campaign.getAncestors(p.getAncestorsID())))
 				&& p.getSpouseID() == null
 				&& getGender() != p.getGender()
 				&& p.getAge(campaign.getCalendar()) > 13
