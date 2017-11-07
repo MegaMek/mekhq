@@ -170,6 +170,11 @@ public class TransportBayPart extends Part {
     public void remove(boolean salvage) {
         // Can't remove a bay
     }
+    
+    @Override
+    public boolean isSalvaging() {
+        return false;
+    }
 
     @Override
     public MissingPart getMissingPart() {
