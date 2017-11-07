@@ -32,6 +32,7 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -564,8 +565,10 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 		 * match them by size and number of doors. Any remaining are matched on size, and difference in
 		 * number of doors is noted as moving doors has to be accounted for in the time calculation.
 		 */
-		List<Bay> oldUnitBays = oldUnit.getEntity().getTransportBays();
-		List<Bay> newUnitBays = newEntity.getTransportBays();
+		List<Bay> oldUnitBays = oldUnit.getEntity().getTransportBays().stream()
+		        .filter(b -> !b.isQuarters()).collect(Collectors.toList());
+		List<Bay> newUnitBays = newEntity.getTransportBays().stream()
+                .filter(b -> !b.isQuarters()).collect(Collectors.toList());
 		// If any bays keep the same size but have any doors added or removed, we need to note that separately
 		// since removing a door from one bay and adding it to another requires time even if the number
 		// of parts hasn't changed. We track them separately so that we don't charge time for changing the
@@ -601,7 +604,9 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
                     }
                 }
     		}
-            time += (oldUnitBays.size() + newUnitBays.size()) * 9600; // Assuming 1 month is 40 hours/week * 4 weeks
+            // Use bay replacement time of 1 month (30 days) for each bay to be resized,
+            // plus another month for any bays to be added or removed.
+            time += Math.max(oldUnitBays.size(), newUnitBays.size()) * 14400;
             int deltaDoors = oldUnitBays.stream().mapToInt(Bay::getDoors).sum()
                     - newUnitBays.stream().mapToInt(Bay::getDoors).sum();
             if (deltaDoors < 0) {
@@ -617,9 +622,10 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 			Part oPart = oldUnit.campaign.getPart(pid);
 			//We're pretending we're changing the old suit rather than removing it.
 			//We also want to avoid accounting for legacy InfantryAttack parts.
-			if (oPart instanceof BattleArmorSuit
-			        || (oPart instanceof EquipmentPart
-			                && ((EquipmentPart)oPart).getType() instanceof InfantryAttack)) {
+			if ((oPart instanceof BattleArmorSuit)
+			        || (oPart instanceof TransportBayPart)
+			        || ((oPart instanceof EquipmentPart
+			                && ((EquipmentPart)oPart).getType() instanceof InfantryAttack))) {
 			    continue;
 			}
 			if (oPart.getLocation() >= 0) {
