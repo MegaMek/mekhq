@@ -471,7 +471,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
                 setBaBayCount(getBaBayCount() + (int)bay.getCapacity());
             } else if (bay instanceof InfantryBay) {
                 setInfantryBayCount(getInfantryBayCount() +
-                                    (int) bay.getCapacity());
+                                    (int) (bay.getCapacity() / ((InfantryBay) bay).getPlatoonType().getWeight()));
             } else if (bay instanceof LightVehicleBay) {
                 setLightVeeBayCount(getLightVeeBayCount() +
                                     (int) bay.getCapacity());
