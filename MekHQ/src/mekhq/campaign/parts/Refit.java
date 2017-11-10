@@ -29,14 +29,18 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import megamek.common.Aero;
 import megamek.common.AmmoType;
 import megamek.common.BattleArmor;
 import megamek.common.BipedMech;
+import megamek.common.ConvFighter;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.ITechnology;
@@ -45,12 +49,19 @@ import megamek.common.Mech;
 import megamek.common.MechFileParser;
 import megamek.common.MechSummary;
 import megamek.common.MechSummaryCache;
+import megamek.common.MiscType;
+import megamek.common.Mounted;
+import megamek.common.Tank;
 import megamek.common.TargetRoll;
 import megamek.common.TechAdvancement;
 import megamek.common.WeaponType;
 import megamek.common.loaders.BLKFile;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.logging.LogLevel;
+import megamek.common.verifier.EntityVerifier;
+import megamek.common.verifier.TestAero;
+import megamek.common.verifier.TestEntity;
+import megamek.common.verifier.TestTank;
 import megamek.common.weapons.InfantryAttack;
 import megameklab.com.util.UnitUtil;
 import mekhq.MekHQ;
@@ -62,6 +73,7 @@ import mekhq.campaign.event.PartChangedEvent;
 import mekhq.campaign.event.UnitRefitEvent;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.equipment.EquipmentPart;
+import mekhq.campaign.parts.equipment.HeatSink;
 import mekhq.campaign.parts.equipment.MissingAmmoBin;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.personnel.Person;
@@ -108,9 +120,11 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 	private boolean kitFound;
 	private String fixableString;
 
-	private ArrayList<Integer> oldUnitParts;
-	private ArrayList<Integer> newUnitParts;
-	private ArrayList<Part> shoppingList;
+	private List<Integer> oldUnitParts;
+	private List<Integer> newUnitParts;
+	private List<Part> shoppingList;
+	private List<Part> oldIntegratedHS;
+	private List<Part> newIntegratedHS;
 
 	private int armorNeeded;
 	private Armor newArmorSupplies;
@@ -121,22 +135,22 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 	private int oldTechId = -1;
 
 	public Refit() {
-		oldUnitParts = new ArrayList<Integer>();
-		newUnitParts = new ArrayList<Integer>();
-		shoppingList = new ArrayList<Part>();
+		oldUnitParts = new ArrayList<>();
+		newUnitParts = new ArrayList<>();
+		shoppingList = new ArrayList<>();
+		oldIntegratedHS = new ArrayList<>();
+		newIntegratedHS = new ArrayList<>();
 		fixableString = null;
 	}
 
 	public Refit(Unit oUnit, Entity newEn, boolean custom, boolean refurbish) {
+	    this();
 	    isRefurbishing = refurbish;
 		customJob = custom;
 		oldUnit = oUnit;
 		newEntity = newEn;
         newEntity.setOwner(oldUnit.getEntity().getOwner());
 		newEntity.setGame(oldUnit.getEntity().getGame());
-		oldUnitParts = new ArrayList<Integer>();
-		newUnitParts = new ArrayList<Integer>();
-		shoppingList = new ArrayList<Part>();
 		failedCheck = false;
 		timeSpent = 0;
 		fixableString = null;
@@ -184,7 +198,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 		return cost;
 	}
 
-	public ArrayList<Part> getShoppingList() {
+	public List<Part> getShoppingList() {
 		return shoppingList;
 	}
 
@@ -611,17 +625,43 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 			int shotsPerTon = type.getShots();
 			cost += type.getCost(newEntity, false, -1) * ((double)shotsNeeded/shotsPerTon);
 		}
-
-		//deal with integral heat sinks
-		//TODO: heat sinks on other units?
-		if(newEntity instanceof Mech
-				&& (((Mech)newEntity).hasDoubleHeatSinks() != ((Mech)oldUnit.getEntity()).hasDoubleHeatSinks()
-						|| ((Mech)newEntity).hasLaserHeatSinks() != ((Mech)oldUnit.getEntity()).hasLaserHeatSinks())) {
-			time += newEntity.getEngine().integralHeatSinkCapacity(((Mech)newEntity).hasCompactHeatSinks()) * 90;
-			time += oldUnit.getEntity().getEngine().integralHeatSinkCapacity(((Mech)newEntity).hasCompactHeatSinks()) * 90;
-			updateRefitClass(CLASS_D);
+		
+		/*
+		 * Figure out how many untracked heat sinks are needed to complete the refit or will
+		 * be removed. These are engine integrated heat sinks for Mechs or ASFs that change
+		 * the heat sink type or heat sinks required for energy weapons for vehicles and
+		 * conventional fighters.
+		 */
+		if ((newEntity instanceof Mech)
+		        || ((newEntity instanceof Aero) && !(newEntity instanceof ConvFighter))) {
+		    Part oldHS = heatSinkPart(oldUnit.getEntity());
+		    Part newHS = heatSinkPart(newEntity);
+		    if (!oldHS.isSamePartType(newHS)) {
+                for (int i = 0; i < untrackedHeatSinkCount(oldUnit.getEntity()); i++) {
+                    oldIntegratedHS.add(oldHS.clone());
+                }
+                for (int i = 0; i < untrackedHeatSinkCount(newEntity); i++) {
+                    newIntegratedHS.add(newHS.clone());
+                }
+		    }
+            updateRefitClass(CLASS_D);
+		} else if ((newEntity instanceof Tank)
+		        || (newEntity instanceof ConvFighter)) {
+		    int oldHS = untrackedHeatSinkCount(oldUnit.getEntity());
+		    int newHS = untrackedHeatSinkCount(newEntity);
+		    if (oldHS != newHS) {
+		        Part hsPart = heatSinkPart(newEntity); // only single HS allowed, so they have to be of the same type
+                for (int i = oldHS; i < newHS; i++) {
+                    newIntegratedHS.add(hsPart.clone());
+                }
+                for (int i = newHS; i < oldHS; i++) {
+                    oldIntegratedHS.add(hsPart.clone());
+                }
+		    }
 		}
-
+		time += (oldIntegratedHS.size() + newIntegratedHS.size()) * 90;
+		shoppingList.addAll(newIntegratedHS);
+		
 		//check for CASE
 		//TODO: we still dont have to order the part, we need to get the CASE issues sorted out
 		for(int loc = 0; loc < newEntity.locations(); loc++) {
@@ -981,52 +1021,56 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 				oldUnit.remove(soldier, true);
 			}
 		}
-		//add old parts to the warehouse
-		for(int pid : oldUnitParts) {
-			Part part = oldUnit.campaign.getPart(pid);
-			if(null == part) {
+        //add old parts to the warehouse
+        for(int pid : oldUnitParts) {
+            Part part = oldUnit.campaign.getPart(pid);
+            if(null == part) {
                 MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
                         "old part with id " + pid + " not found for refit of " + getDesc()); //$NON-NLS-1$
-				continue;
-			}
-			if(part instanceof MekLocation && ((MekLocation)part).getLoc() == Mech.LOC_CT) {
-				part.setUnit(null);
-				oldUnit.campaign.removePart(part);
-				continue;
-			}
-			// SI Should never be "kept" for the Warehouse
-			// We also don't want to generate new BA suits that have been replaced
-			// or allow legacy InfantryAttack BA parts to show up in the warehouse.
-			else if(part instanceof StructuralIntegrity || part instanceof BattleArmorSuit
-			        || (part instanceof EquipmentPart && ((EquipmentPart)part).getType() instanceof InfantryAttack)) {
-				part.setUnit(null);
-				oldUnit.campaign.removePart(part);
-				continue;
-			}
-			else if(part instanceof Armor) {
-				Armor a = (Armor)part;
-				//lets just re-use this armor part
-				if(!sameArmorType) {
-					//give the amount back to the warehouse since we are switching types
-					a.changeAmountAvailable(a.getAmount());
-					if(null != newArmorSupplies) {
-						a.changeType(newArmorSupplies.getType(), newArmorSupplies.isClanTechBase());
-					}
-				}
-				newUnitParts.add(pid);
-			}
-			else {
-				if(part instanceof AmmoBin) {
-					((AmmoBin) part).unload();
-				}
-				Part spare = oldUnit.campaign.checkForExistingSparePart(part);
-				if(null != spare) {
-					spare.incrementQuantity();
-					oldUnit.campaign.removePart(part);
-				}
-			}
-			part.setUnit(null);
-		}
+                continue;
+            }
+            if(part instanceof MekLocation && ((MekLocation)part).getLoc() == Mech.LOC_CT) {
+                part.setUnit(null);
+                oldUnit.campaign.removePart(part);
+                continue;
+            }
+            // SI Should never be "kept" for the Warehouse
+            // We also don't want to generate new BA suits that have been replaced
+            // or allow legacy InfantryAttack BA parts to show up in the warehouse.
+            else if(part instanceof StructuralIntegrity || part instanceof BattleArmorSuit
+                    || (part instanceof EquipmentPart && ((EquipmentPart)part).getType() instanceof InfantryAttack)) {
+                part.setUnit(null);
+                oldUnit.campaign.removePart(part);
+                continue;
+            }
+            else if(part instanceof Armor) {
+                Armor a = (Armor)part;
+                //lets just re-use this armor part
+                if(!sameArmorType) {
+                    //give the amount back to the warehouse since we are switching types
+                    a.changeAmountAvailable(a.getAmount());
+                    if(null != newArmorSupplies) {
+                        a.changeType(newArmorSupplies.getType(), newArmorSupplies.isClanTechBase());
+                    }
+                }
+                newUnitParts.add(pid);
+            }
+            else {
+                if(part instanceof AmmoBin) {
+                    ((AmmoBin) part).unload();
+                }
+                Part spare = oldUnit.campaign.checkForExistingSparePart(part);
+                if(null != spare) {
+                    spare.incrementQuantity();
+                    oldUnit.campaign.removePart(part);
+                }
+            }
+            part.setUnit(null);
+        }
+        // add leftover untracked heat sinks to the warehouse
+        for(Part part : oldIntegratedHS) {
+            campaign.addPart(part, 0);
+        }
 
 		//dont forget to switch entities!
 		oldUnit.setEntity(newEntity);
@@ -1935,6 +1979,58 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
                 part.setLocation(Mech.LOC_LARM);
             }
         }
+	}
+	
+	/**
+	 * Refits may require adding or removing heat sinks that are not tracked as parts. For Mechs and
+	 * ASFs this would be engine-integrated heat sinks if the heat sink type is changed. For vehicles and
+	 * conventional fighters this would be heat sinks required by energy weapons.
+	 * 
+	 * @param entity Either the starting or the ending unit of the refit.
+	 * @return       The number of heat sinks the unit mounts that are not tracked as parts.
+	 */
+	private int untrackedHeatSinkCount(Entity entity) {
+	    if (entity instanceof Mech) {
+	        return entity.getEngine().integralHeatSinkCapacity(((Mech) entity).hasCompactHeatSinks());
+	    } else if ((entity instanceof Aero)
+	            && (entity.getEntityType() & (Entity.ETYPE_CONV_FIGHTER | Entity.ETYPE_SMALL_CRAFT | Entity.ETYPE_JUMPSHIP)) == 0) {
+	        return entity.getEngine().integralHeatSinkCapacity(false);
+	    } else {
+	        EntityVerifier verifier = EntityVerifier.getInstance(new File(
+                    "data/mechfiles/UnitVerifierOptions.xml"));
+	        TestEntity te = null;
+	        if (entity instanceof Tank) {
+	            te = new TestTank((Tank) entity, verifier.tankOption, null);
+	            return te.getCountHeatSinks();
+	        } else if (entity instanceof ConvFighter) {
+	            te = new TestAero((Aero) entity, verifier.aeroOption, null);
+                return te.getCountHeatSinks();
+	        } else {
+	            return 0;
+	        }
+	    }
+	}
+	
+	/**
+	 * Creates an independent heat sink part appropriate to the unit that can be used to track
+	 * needed and leftover parts for heat sinks that are not actually tracked by the unit.
+	 * 
+	 * @param entity Either the original or the new unit.
+	 * @return       The part corresponding to the type of heat sink for the unit.
+	 */
+	private Part heatSinkPart(Entity entity) {
+	    if (entity instanceof Aero) {
+	        return new AeroHeatSink(0, ((Aero) entity).getHeatType(), false, campaign);
+	    } else if (entity instanceof Mech) {
+	        Optional<Mounted> mount = entity.getMisc().stream()
+	                .filter(m -> m.getType().hasFlag(MiscType.F_HEAT_SINK)
+	                        || m.getType().hasFlag(MiscType.F_DOUBLE_HEAT_SINK))
+	                .findAny();
+	        if (mount.isPresent()) {
+	            return new HeatSink(0, mount.get().getType(), -1, false, campaign);
+	        }
+	    }
+	    return new HeatSink(0, EquipmentType.get("Heat Sink"), -1, false, campaign);
 	}
 
     @Override
