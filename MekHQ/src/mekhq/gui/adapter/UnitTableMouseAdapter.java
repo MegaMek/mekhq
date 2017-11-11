@@ -779,12 +779,13 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
 	                menuItem.setActionCommand("CUSTOMIZE");
 	                menuItem.addActionListener(this);
 	                menuItem.setEnabled(unit.isAvailable()
-	                        && (unit.getEntity() instanceof megamek.common.Mech
-	                                || unit.getEntity() instanceof megamek.common.Tank
-	                                || unit.getEntity() instanceof megamek.common.SmallCraft
-	                                || (unit.getEntity() instanceof megamek.common.Aero && unit
-	                                        .getEntity().getClass() == Aero.class) || (unit
-	                                    .getEntity() instanceof Infantry)));
+	                        && ((unit.getEntity().getEntityType() &
+	                                (Entity.ETYPE_FIXED_WING_SUPPORT
+	                                        | Entity.ETYPE_JUMPSHIP
+	                                        | Entity.ETYPE_SUPPORT_TANK
+	                                        | Entity.ETYPE_SUPPORT_VTOL
+	                                        | Entity.ETYPE_PROTOMECH
+	                                        | Entity.ETYPE_GUN_EMPLACEMENT)) == 0));
 	                menu.add(menuItem);
                 }
                 if (unit.isRefitting()) {

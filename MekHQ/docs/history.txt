@@ -9,6 +9,10 @@ v0.43.5-git
 + PR #502: Edge use for non-combat personnel
 + Issue #416: Base Attack scenarios fail to generate turrets
 + PR #439: Calculate DropShip rental costs based on untransported units only (and also take into account mothballed units)
++ Issue #452: Actually limit contract search based on contract search radius
++ Issue #429: Switching ammo now updates the UI
++ Bug: vehicle and conventional fighter refits not accounting for possible change in heat sinks.
++ Issue #514: Feature Request: Building Conventional Fighters
 
 v0.43.4 (2017-10-01 11:00 UTC)
 + Updating the repo with 0.43.3 Data

@@ -368,14 +368,16 @@ public class ContractMarket implements Serializable {
 			}
 		}
 
+		int searchRadius = campaign.getCampaignOptions().getSearchRadius();
+
 		boolean isAttacker = (contract.getMissionType() == AtBContract.MT_PLANETARYASSAULT ||
 				contract.getMissionType() >= AtBContract.MT_PLANETARYASSAULT ||
 				(contract.getMissionType() == AtBContract.MT_RELIEFDUTY && Compute.d6() < 4) ||
 				contract.getEnemyCode().equals("REB"));
 		if (isAttacker) {
-			contract.setPlanetName(RandomFactionGenerator.getInstance().getMissionTarget(contract.getEmployerCode(), contract.getEnemyCode(), campaign.getDate()));
+			contract.setPlanetName(RandomFactionGenerator.getInstance().getMissionTarget(contract.getEmployerCode(), contract.getEnemyCode(), campaign.getDate(), campaign.getCurrentPlanet(), searchRadius));
 		} else {
-			contract.setPlanetName(RandomFactionGenerator.getInstance().getMissionTarget(contract.getEnemyCode(), contract.getEmployerCode(), campaign.getDate()));
+			contract.setPlanetName(RandomFactionGenerator.getInstance().getMissionTarget(contract.getEnemyCode(), contract.getEmployerCode(), campaign.getDate(), campaign.getCurrentPlanet(), searchRadius));
 		}
 		if (contract.getPlanetName() == null) {
 		    MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.WARNING,
