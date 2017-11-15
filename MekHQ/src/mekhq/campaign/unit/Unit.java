@@ -2893,7 +2893,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         //and set it to true when we start up through MHQ
         entity.getCrew().setPiloting(Math.min(Math.max(piloting, 0), 8), 0);
         entity.getCrew().setGunnery(Math.min(Math.max(gunnery, 0), 7), 0);
-        entity.getCrew().setArtillery(Math.min(Math.max(artillery, 7), 8), 0);
+        entity.getCrew().setArtillery(Math.min(Math.max(artillery, 0), 8), 0);
         entity.getCrew().setSize(nCrew);
         entity.getCrew().setMissing(false, 0);
     }
@@ -2943,7 +2943,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         crew.setGunnery(Math.min(Math.max(gunneryMech, 0), 7));
         crew.setPilotingAero(Math.min(Math.max(pilotingAero, 0), 8));
         crew.setGunneryAero(Math.min(Math.max(gunneryAero, 0), 7));
-        entity.getCrew().setArtillery(Math.min(Math.max(artillery, 7), 8), 0);
+        entity.getCrew().setArtillery(Math.min(Math.max(artillery, 0), 8), 0);
         entity.getCrew().setSize(1);
         entity.getCrew().setMissing(false, 0);
     }
