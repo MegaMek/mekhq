@@ -810,9 +810,11 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 break;
             case CMD_RANDOM_PORTRAIT:
                 for (Person person: people) {
-                    gui.getCampaign().assignRandomPortraitFor(person);
-                    gui.getCampaign().personUpdated(person);
-                    MekHQ.triggerEvent(new PersonChangedEvent(person));
+                    if (!person.getPortraitFileName().equals(Crew.PORTRAIT_NONE)) {
+                        gui.getCampaign().assignRandomPortraitFor(person);
+                        gui.getCampaign().personUpdated(person);
+                        MekHQ.triggerEvent(new PersonChangedEvent(person));
+                    }
                 }
                 break;
             case CMD_EDIT_PORTRAIT:
