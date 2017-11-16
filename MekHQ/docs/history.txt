@@ -15,6 +15,7 @@ v0.43.5-git
 + Issue #514: Feature Request: Building Conventional Fighters
 + Issue #496: Possible Packaging issue for releases with MekHQ
 + Issue #507: Artillery skill no longer limited to 7 when initiating battles from within MekHQ
++ Feature: Updated planetary location and ownership data, including two new systems. To revert to the old data, replace planets.xml with data\universe\planets_43_4.xml
 
 v0.43.4 (2017-10-01 11:00 UTC)
 + Updating the repo with 0.43.3 Data
