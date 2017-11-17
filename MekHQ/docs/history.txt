@@ -17,6 +17,7 @@ v0.43.5-git
 + Issue #507: Artillery skill no longer limited to 7 when initiating battles from within MekHQ
 + Feature: Updated planetary location and ownership data, including two new systems. To revert to the old data, replace planets.xml with data\universe\planets_43_4.xml
 + PR #528: Can add or remove arbitrary amount of XP using via right click on person -> GM Mode
++ Issue #321: New context menu option to randomize portraits for selected personnel.
 
 v0.43.4 (2017-10-01 11:00 UTC)
 + Updating the repo with 0.43.3 Data
