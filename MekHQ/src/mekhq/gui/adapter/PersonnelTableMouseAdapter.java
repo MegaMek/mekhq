@@ -95,6 +95,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
     private static final String CMD_ADD_1_XP = "XP_ADD_1"; //$NON-NLS-1$
     private static final String CMD_ADD_XP = "XP_ADD"; //$NON-NLS-1$
     private static final String CMD_EDIT_BIOGRAPHY = "BIOGRAPHY"; //$NON-NLS-1$
+    private static final String CMD_RANDOM_PORTRAIT = "RANDOMIZE_PORTRAIT"; //$NON-NLS-1$
     private static final String CMD_EDIT_PORTRAIT = "PORTRAIT"; //$NON-NLS-1$
     private static final String CMD_HEAL = "HEAL"; //$NON-NLS-1$
     private static final String CMD_EDIT = "EDIT"; //$NON-NLS-1$
@@ -807,6 +808,15 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 }
                 gui.getCampaign().personUpdated(selectedPerson);
                 MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
+                break;
+            case CMD_RANDOM_PORTRAIT:
+                for (Person person: people) {
+                    if (!person.getPortraitFileName().equals(Crew.PORTRAIT_NONE)) {
+                        gui.getCampaign().assignRandomPortraitFor(person);
+                        gui.getCampaign().personUpdated(person);
+                        MekHQ.triggerEvent(new PersonChangedEvent(person));
+                    }
+                }
                 break;
             case CMD_EDIT_PORTRAIT:
                 ImageChoiceDialog pcd = new ImageChoiceDialog(gui.getFrame(),
@@ -2070,6 +2080,12 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 menu.add(submenu);
                 popup.add(menu);
             }
+            // generate new appropriate random portrait
+            menuItem = new JMenuItem(resourceMap.getString("randomizePortrait.text")); //$NON-NLS-1$
+            menuItem.setActionCommand(CMD_RANDOM_PORTRAIT);
+            menuItem.addActionListener(this);
+            menuItem.setEnabled(true);
+            popup.add(menuItem);
             if (oneSelected) {
                 // change portrait
                 menuItem = new JMenuItem(resourceMap.getString("changePortrait.text")); //$NON-NLS-1$
