@@ -7157,6 +7157,9 @@ public class Campaign implements Serializable, ITechManager {
         if (searchCat_Role.startsWith("Admin/")) {
             searchCat_Role = "Admin/";
         }
+        if (searchCat_Role.endsWith("Tech")) {
+        	searchCat_Role = "Mechanic/";
+        }
         
         while (categories.hasNext()) {
             String category = categories.next();
