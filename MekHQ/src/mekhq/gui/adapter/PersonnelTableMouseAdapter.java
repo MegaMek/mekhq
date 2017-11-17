@@ -92,6 +92,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
     private static final String CMD_BUY_EDGE = "EDGE_BUY"; //$NON-NLS-1$
     private static final String CMD_SET_EDGE = "EDGE_SET"; //$NON-NLS-1$
     private static final String CMD_SET_XP = "XP_SET"; //$NON-NLS-1$
+    private static final String CMD_ADD_1_XP = "XP_ADD_1"; //$NON-NLS-1$
     private static final String CMD_ADD_XP = "XP_ADD"; //$NON-NLS-1$
     private static final String CMD_EDIT_BIOGRAPHY = "BIOGRAPHY"; //$NON-NLS-1$
     private static final String CMD_RANDOM_PORTRAIT = "RANDOMIZE_PORTRAIT"; //$NON-NLS-1$
@@ -839,9 +840,24 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
                 }
                 break;
-            case CMD_ADD_XP:
+            case CMD_ADD_1_XP:
                 for (Person person : people) {
                     person.setXp(person.getXp() + 1);
+                    MekHQ.triggerEvent(new PersonChangedEvent(person));
+                }
+                break;
+            case CMD_ADD_XP:
+                PopupValueChoiceDialog pvcda = new PopupValueChoiceDialog(
+                        gui.getFrame(), true, resourceMap.getString("xp.text"), 1, 0); //$NON-NLS-1$
+                pvcda.setVisible(true);
+
+                int ia = pvcda.getValue();
+                for (Person person : people) {
+                    int i2 = ia;
+                    if ((ia + person.getXp()) < 0) {
+                        i2 = -person.getXp();
+                    }
+                    person.setXp(person.getXp() + i2);
                     MekHQ.triggerEvent(new PersonChangedEvent(person));
                 }
                 break;
@@ -2159,6 +2175,11 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 menuItem.setEnabled(gui.getCampaign().isGM());
                 menu.add(menuItem);
             }
+            menuItem = new JMenuItem(resourceMap.getString("add1XP.text")); //$NON-NLS-1$
+            menuItem.setActionCommand(CMD_ADD_1_XP);
+            menuItem.addActionListener(this);
+            menuItem.setEnabled(gui.getCampaign().isGM());
+            menu.add(menuItem);
             menuItem = new JMenuItem(resourceMap.getString("addXP.text")); //$NON-NLS-1$
             menuItem.setActionCommand(CMD_ADD_XP);
             menuItem.addActionListener(this);
