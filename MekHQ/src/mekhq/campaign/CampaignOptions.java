@@ -72,6 +72,9 @@ public class CampaignOptions implements Serializable {
     public final static int REPAIR_SYSTEM_STRATOPS = 0;
     public final static int REPAIR_SYSTEM_WARCHEST_CUSTOM = 1;
     public final static int REPAIR_SYSTEM_GENERIC_PARTS = 2;
+    
+    public final static int MAXIMUM_D6_VALUE = 6;
+    
     //FIXME: This needs to be localized
     public final static String[] REPAIR_SYSTEM_NAMES = {"Strat Ops", "Warchest Custom", "Generic Spare Parts"};
 
@@ -271,6 +274,10 @@ public class CampaignOptions implements Serializable {
     private boolean contractMarketReportRefresh;
     private boolean unitMarketReportRefresh;
     private int startGameDelay;
+    private boolean allowOpforAeros;
+    private boolean allowOpforLocalUnits;
+    private int opforAeroChance;
+    private int opforLocalUnitChance;
 
     //Mass Repair/Salvage Options
     private boolean massRepairUseExtraTime;
@@ -488,6 +495,10 @@ public class CampaignOptions implements Serializable {
         contractMarketReportRefresh = true;
         unitMarketReportRefresh = true;
         startGameDelay = 500;
+        allowOpforAeros = false;
+        allowOpforLocalUnits = false;
+        opforAeroChance = 5;
+        opforLocalUnitChance = 5;
         
         //Mass Repair/Salvage Options
         massRepairUseExtraTime = true;
@@ -1979,6 +1990,38 @@ public class CampaignOptions implements Serializable {
 		});
 	}
 
+	public void setAllowOpforAeros(boolean allowOpforAeros) {
+	    this.allowOpforAeros = allowOpforAeros;
+	}
+	
+	public boolean getAllowOpforAeros() {
+	    return allowOpforAeros;
+	}
+	
+	public void setAllowOpforLocalUnits(boolean allowOpforLocalUnits) {
+        this.allowOpforLocalUnits = allowOpforLocalUnits;
+    }
+    
+    public boolean getAllowOpforLocalUnits() {
+        return allowOpforLocalUnits;
+    }
+    
+    public void setOpforAeroChance(int chance) {
+        this.opforAeroChance = chance;
+    }
+    
+    public int getOpforAeroChance() {
+        return opforAeroChance;
+    }
+    
+    public void setOpforLocalUnitChance(int chance) {
+        this.opforLocalUnitChance = chance;
+    }
+    
+    public int getOpforLocalUnitChance() {
+        return opforLocalUnitChance;
+    }
+	
 	public void writeToXml(PrintWriter pw1, int indent) {
         pw1.println(MekHqXmlUtil.indentStr(indent) + "<campaignOptions>");
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "clanPriceModifier", clanPriceModifier); //private double
@@ -2152,6 +2195,10 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "contractMarketReportRefresh", contractMarketReportRefresh);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "unitMarketReportRefresh", unitMarketReportRefresh);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "startGameDelay", startGameDelay);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "allowOpforAeros", allowOpforAeros);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "allowOpforLocalUnits", allowOpforLocalUnits);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "opforAeroChance", opforAeroChance);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "opforLocalUnitChance", opforLocalUnitChance);
 
         //Mass Repair/Salvage Options
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "massRepairUseExtraTime", massRepairUseExtraTime);
@@ -2631,6 +2678,14 @@ public class CampaignOptions implements Serializable {
                 retVal.unitMarketReportRefresh = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("startGameDelay")) {
                 retVal.startGameDelay = Integer.parseInt(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("allowOpforLocalUnits")) {
+                retVal.allowOpforLocalUnits = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("allowOpforAeros")) {
+                retVal.allowOpforAeros = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("opforAeroChance")) {
+                retVal.opforAeroChance = Integer.parseInt(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("opforLocalUnitChance")) {
+                retVal.opforLocalUnitChance = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("rats")) {
             	retVal.rats = MekHqXmlUtil.unEscape(wn2.getTextContent().trim()).split(",");
             } else if (wn2.getNodeName().equalsIgnoreCase("staticRATs")) {
