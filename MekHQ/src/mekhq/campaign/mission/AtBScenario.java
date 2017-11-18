@@ -1513,8 +1513,10 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             /* Must set per-entity start pos for units after start of scenarios. Reinforcements
              * arrive from the enemy home edge, which is not necessarily the start pos. */
             final int enemyDir = enemyHome;
+            final int deployRound = Compute.d6() + 2;   // deploy the new aircraft some time after the start of the game
             aircraft.stream().filter(Objects::nonNull).forEach(en -> {
                 en.setStartingPos(enemyDir);
+                en.setDeployRound(deployRound);
             });
             BotForce bf = getEnemyBotForce(getContract(campaign), enemyHome, enemyHome, aircraft);
             bf.setName(bf.getName() + " (Air Support)");
