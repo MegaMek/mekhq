@@ -225,6 +225,7 @@ public class CampaignOptions implements Serializable {
 
     //random portraits related
     private boolean[] usePortraitForType;
+    private boolean assignPortraitOnRoleChange;
 
     //Against the Bot related
     private boolean useAtB;
@@ -348,6 +349,7 @@ public class CampaignOptions implements Serializable {
             usePortraitForType[i] = false;
         }
         usePortraitForType[Person.T_MECHWARRIOR] = true;
+        assignPortraitOnRoleChange = false;
         idleXP = 0;
         targetIdleXP = 10;
         monthsIdleXP = 2;
@@ -1089,6 +1091,14 @@ public class CampaignOptions implements Serializable {
             return;
         }
         usePortraitForType[type] = b;
+    }
+
+    public boolean getAssignPortraitOnRoleChange() {
+        return assignPortraitOnRoleChange;
+    }
+
+    public void setAssignPortraitOnRoleChange(boolean b) {
+        assignPortraitOnRoleChange = b;
     }
 
     public int getIdleXP() {
@@ -2152,6 +2162,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "contractMarketReportRefresh", contractMarketReportRefresh);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "unitMarketReportRefresh", unitMarketReportRefresh);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "startGameDelay", startGameDelay);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "assignPortraitOnRoleChange", assignPortraitOnRoleChange);
 
         //Mass Repair/Salvage Options
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "massRepairUseExtraTime", massRepairUseExtraTime);
@@ -2467,6 +2478,8 @@ public class CampaignOptions implements Serializable {
                         retVal.usePortraitForType[i] = Boolean.parseBoolean(values[i].trim());
                     }
                 }
+            } else if (wn2.getNodeName().equalsIgnoreCase("assignPortraitOnRoleChange")) {
+                retVal.assignPortraitOnRoleChange = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("destroyByMargin")) {
                 retVal.destroyByMargin = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("destroyMargin")) {

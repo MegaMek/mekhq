@@ -231,6 +231,11 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 for (Person person : people) {
                     person.setPrimaryRole(role);
                     gui.getCampaign().personUpdated(person);
+                    if (gui.getCampaign().getCampaignOptions().usePortraitForType(role)
+                            && gui.getCampaign().getCampaignOptions().getAssignPortraitOnRoleChange()
+                            && person.getPortraitFileName().equals(Crew.PORTRAIT_NONE)) {
+                        gui.getCampaign().assignRandomPortraitFor(person);
+                    }
                 }
                 break;
             case CMD_SECONDARY_ROLE:

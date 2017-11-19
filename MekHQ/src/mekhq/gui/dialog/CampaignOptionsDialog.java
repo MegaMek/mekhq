@@ -201,6 +201,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JCheckBox usePeacetimeCostBox;
     private JCheckBox useExtendedPartsModifierBox;
     private JCheckBox showPeacetimeCostBox;
+    private JCheckBox chkAssignPortraitOnRoleChange;
 
     private JTextField[] txtSalaryBase;
     private JSpinner[] spnSalaryXp;
@@ -488,6 +489,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         usePeacetimeCostBox.setSelected(options.usePeacetimeCost());
         useExtendedPartsModifierBox.setSelected(options.useExtendedPartsModifier());
         showPeacetimeCostBox.setSelected(options.showPeacetimeCost());
+        chkAssignPortraitOnRoleChange.setSelected(options.getAssignPortraitOnRoleChange());
 
         useDamageMargin.setSelected(options.isDestroyByMargin());
         useQualityMaintenance.setSelected(options.useQualityMaintenance());
@@ -586,6 +588,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         usePeacetimeCostBox = new JCheckBox();
         useExtendedPartsModifierBox = new JCheckBox();
         showPeacetimeCostBox = new JCheckBox();
+        chkAssignPortraitOnRoleChange = new JCheckBox();
         sellUnitsBox = new JCheckBox();
         sellPartsBox = new JCheckBox();
         useQuirksBox = new JCheckBox();
@@ -3029,7 +3032,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
         panRandomPortrait.add(panUsePortrait, BorderLayout.CENTER);
         JTextArea txtPortraitInst = new JTextArea(resourceMap.getString("txtPortraitInst.text"));
-        txtPortraitInst.setPreferredSize(new Dimension(728, 50));
+        txtPortraitInst.setPreferredSize(new Dimension(728, 60));
         txtPortraitInst.setEditable(false);
         txtPortraitInst.setLineWrap(true);
         txtPortraitInst.setWrapStyleWord(true);
@@ -3048,6 +3051,16 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new Insets(10, 0, 0, 0);
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panNameGen.add(panRandomPortrait, gridBagConstraints);
+
+        chkAssignPortraitOnRoleChange.setText(resourceMap.getString("chkAssignPortraitOnRoleChange.text"));
+        chkAssignPortraitOnRoleChange.setToolTipText(resourceMap.getString("chkAssignPortraitOnRoleChange.toolTipText"));
+        chkAssignPortraitOnRoleChange.setName("chkAssignPortraitOnRoleChange");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        panNameGen.add(chkAssignPortraitOnRoleChange, gridBagConstraints);
+        // assignPortraitOnRoleChange
 
         tabOptions.addTab(resourceMap.getString("panNameGen.TabConstraints.tabTitle"), panNameGen); // NOI18N
 
@@ -4384,6 +4397,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setUsePeacetimeCost(usePeacetimeCostBox.isSelected());
         options.setUseExtendedPartsModifier(useExtendedPartsModifierBox.isSelected());
         options.setShowPeacetimeCost(showPeacetimeCostBox.isSelected());
+        options.setAssignPortraitOnRoleChange(chkAssignPortraitOnRoleChange.isSelected());
 
         options.setEquipmentContractBase(btnContractEquipment.isSelected());
         options.setEquipmentContractPercent((Double) spnEquipPercent.getModel().getValue());
