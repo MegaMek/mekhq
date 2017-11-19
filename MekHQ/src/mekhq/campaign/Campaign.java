@@ -7146,7 +7146,10 @@ public class Campaign implements Serializable, ITechManager {
         }
         ArrayList<String> possiblePortraits = new ArrayList<String>();
         Iterator<String> categories = portraits.getCategoryNames();
-        
+
+        // Will search for portraits in the /gender/primaryrole folder first,
+        // and if none are found then /gender/rolegroup, then /gender/combat or
+        // /gender/support, then in /gender.
         String searchCat_Gender = "";
         if (p.getGender() == Person.G_FEMALE) {
             searchCat_Gender += "Female/";
@@ -7154,13 +7157,27 @@ public class Campaign implements Serializable, ITechManager {
             searchCat_Gender += "Male/";
         }
         String searchCat_Role = Person.getRoleDesc(p.getPrimaryRole(), false) + "/";
+        String searchCat_RoleGroup = "";
+        String searchCat_CombatSupport = "";
         if (searchCat_Role.startsWith("Admin/")) {
-            searchCat_Role = "Admin/";
+            searchCat_RoleGroup = "Admin/";
         }
-        if (searchCat_Role.endsWith("Tech")) {
-        	searchCat_Role = "Mechanic/";
+        if (searchCat_Role.endsWith("Tech/") || searchCat_Role.equals("Mechanic/")) {
+            searchCat_RoleGroup = "Tech/";
         }
-        
+        if (searchCat_Role.equals("Medic/") || searchCat_Role.equals("Doctor/")) {
+            searchCat_RoleGroup = "Medical/";
+        }
+        if (searchCat_Role.startsWith("Vessel") || searchCat_Role.equals("Hyperspace Navigator/")) {
+            searchCat_RoleGroup = "Vessel Crew/";
+        }
+
+        if (p.isSupport()) {
+            searchCat_CombatSupport = "Support/";
+        } else {
+            searchCat_CombatSupport = "Combat/";
+        }
+
         while (categories.hasNext()) {
             String category = categories.next();
             if (category.endsWith(searchCat_Gender + searchCat_Role)) {
@@ -7172,6 +7189,41 @@ public class Campaign implements Serializable, ITechManager {
                         continue;
                     }
                     possiblePortraits.add(location);
+                }
+            }
+        }
+
+        if (possiblePortraits.isEmpty()) {
+            categories = portraits.getCategoryNames();
+            while (categories.hasNext()) {
+                String category = categories.next();
+                if (category.endsWith(searchCat_Gender + searchCat_RoleGroup)) {
+                    Iterator<String> names = portraits.getItemNames(category);
+                    while (names.hasNext()) {
+                        String name = names.next();
+                        String location = category + ":" + name;
+                        if (existingPortraits.contains(location)) {
+                            continue;
+                        }
+                        possiblePortraits.add(location);
+                    }
+                }
+            }
+        }
+        if (possiblePortraits.isEmpty()) {
+            categories = portraits.getCategoryNames();
+            while (categories.hasNext()) {
+                String category = categories.next();
+                if (category.endsWith(searchCat_Gender + searchCat_CombatSupport)) {
+                    Iterator<String> names = portraits.getItemNames(category);
+                    while (names.hasNext()) {
+                        String name = names.next();
+                        String location = category + ":" + name;
+                        if (existingPortraits.contains(location)) {
+                            continue;
+                        }
+                        possiblePortraits.add(location);
+                    }
                 }
             }
         }
