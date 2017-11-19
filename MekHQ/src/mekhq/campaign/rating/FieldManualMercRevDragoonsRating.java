@@ -22,6 +22,7 @@ package mekhq.campaign.rating;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
 import java.util.Map;
 
 import megamek.common.Aero;
@@ -314,7 +315,10 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
     //   3 + (4/5) = 3 + 0.8 = 3.8 = 4 hours.
     //   total = 16 hours.
     private void calcMedicalSupportHoursNeeded() {
-        int numSquads = new BigDecimal(getCampaign().getPersonnel().size())
+        ArrayList<Person> activePersonnel = new ArrayList<>();
+        // Only count active personnel. Dead or absent people don't need medical support. >.>
+        for (Person p : getCampaign().getPersonnel()) { if (p.isActive()) { activePersonnel.add(p); } }
+        int numSquads = new BigDecimal(activePersonnel.size())
                 .divide(new BigDecimal(7), 0,
                         RoundingMode.DOWN).intValue();
         int leftOver = getCampaign().getPersonnel().size() - (numSquads * 7);
