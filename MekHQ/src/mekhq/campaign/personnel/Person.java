@@ -3646,7 +3646,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public int getNumShares(boolean sharesForAll) {
-    	if (isPrisoner() || isBondsman()) {
+    	if (isPrisoner() || isBondsman() || !isActive()) {
     		return 0;
     	}
     	if (!sharesForAll && primaryRole != T_MECHWARRIOR &&
