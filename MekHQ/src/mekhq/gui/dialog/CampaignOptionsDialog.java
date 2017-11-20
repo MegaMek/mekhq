@@ -2947,6 +2947,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
         tabOptions.addTab(resourceMap.getString("panRank.TabConstraints.tabTitle"), panRank); // NOI18N
 
+        // Name and Portraits tab controls below
         panNameGen.setName("panNameGen"); // NOI18N
         panNameGen.setLayout(new java.awt.GridBagLayout());
 
@@ -2962,7 +2963,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
+        int gridy = 0;
+        gridBagConstraints.gridy = gridy;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
@@ -2973,7 +2975,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         lblFactionNames.setName("lblFactionNames"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = ++gridy;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panNameGen.add(lblFactionNames, gridBagConstraints);
 
@@ -2990,7 +2992,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         comboFactionNames.setEnabled(!useFactionForNamesBox.isSelected());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = gridy;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panNameGen.add(comboFactionNames, gridBagConstraints);
 
@@ -2998,7 +3000,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         lblGender.setName("lblGender"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridy = ++gridy;
         gridBagConstraints.insets = new Insets(10, 0, 0, 0);
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panNameGen.add(lblGender, gridBagConstraints);
@@ -3011,7 +3013,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         sldGender.setValue(campaign.getRNG().getPercentFemale());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridy = gridy;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new Insets(10, 0, 0, 0);
         panNameGen.add(sldGender, gridBagConstraints);
@@ -3045,7 +3047,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridy = ++gridy;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.insets = new Insets(10, 0, 0, 0);
@@ -3057,7 +3059,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         chkAssignPortraitOnRoleChange.setName("chkAssignPortraitOnRoleChange");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridy = ++gridy;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panNameGen.add(chkAssignPortraitOnRoleChange, gridBagConstraints);
         // assignPortraitOnRoleChange
