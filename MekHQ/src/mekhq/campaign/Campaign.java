@@ -1176,6 +1176,14 @@ public class Campaign implements Serializable, ITechManager {
         return personnel;
     }
 
+    public ArrayList<Person> getActivePersonnel() {
+        ArrayList<Person> activePersonnel = new ArrayList<Person>();
+        for (Person p : getPersonnel()) {
+            if (p.isActive()) {activePersonnel.add(p);}
+        }
+        return activePersonnel;
+    }
+
     public ArrayList<Ancestors> getAncestors() {
         return ancestors;
     }
