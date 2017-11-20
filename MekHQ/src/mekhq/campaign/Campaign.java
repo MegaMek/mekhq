@@ -7178,16 +7178,28 @@ public class Campaign implements Serializable, ITechManager {
         String searchCat_Role = Person.getRoleDesc(p.getPrimaryRole(), false) + "/";
         String searchCat_RoleGroup = "";
         String searchCat_CombatSupport = "";
-        if (searchCat_Role.startsWith("Admin/")) {
+//        if (searchCat_Role.startsWith("Admin/")) {
+        if (p.getPrimaryRole() == Person.T_ADMIN_COM
+                || p.getPrimaryRole() == Person.T_ADMIN_HR
+                || p.getPrimaryRole() == Person.T_ADMIN_LOG
+                || p.getPrimaryRole() == Person.T_ADMIN_TRA) {
             searchCat_RoleGroup = "Admin/";
         }
-        if (searchCat_Role.endsWith("Tech/") || searchCat_Role.equals("Mechanic/")) {
+        //if (searchCat_Role.endsWith("Tech/") || searchCat_Role.equals("Mechanic/")) {
+        if (p.getPrimaryRole() == Person.T_MECHANIC
+                || p.getPrimaryRole() == Person.T_AERO_TECH
+                || p.getPrimaryRole() == Person.T_MECH_TECH
+                || p.getPrimaryRole() == Person.T_BA_TECH) {
             searchCat_RoleGroup = "Tech/";
         }
-        if (searchCat_Role.equals("Medic/") || searchCat_Role.equals("Doctor/")) {
+        if (p.getPrimaryRole() == Person.T_MEDIC
+                || p.getPrimaryRole() == Person.T_DOCTOR) {
             searchCat_RoleGroup = "Medical/";
         }
-        if (searchCat_Role.startsWith("Vessel") || searchCat_Role.equals("Hyperspace Navigator/")) {
+        if (p.getPrimaryRole() == Person.T_SPACE_CREW
+                || p.getPrimaryRole() == Person.T_SPACE_GUNNER
+                || p.getPrimaryRole() == Person.T_SPACE_PILOT
+                || p.getPrimaryRole() == Person.T_NAVIGATOR) {
             searchCat_RoleGroup = "Vessel Crew/";
         }
 
