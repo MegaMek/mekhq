@@ -7126,6 +7126,25 @@ public class Campaign implements Serializable, ITechManager {
         p.addLogEntry(entry);
     }
 
+    public ArrayList<String> getPossibleRandomPortraits (DirectoryItems portraits, ArrayList<String> existingPortraits, String subDir ) {
+        ArrayList<String> possiblePortraits = new ArrayList<String>();
+        Iterator<String> categories = portraits.getCategoryNames();
+        while (categories.hasNext()) {
+            String category = categories.next();
+            if (category.endsWith(subDir)) {
+                Iterator<String> names = portraits.getItemNames(category);
+                while (names.hasNext()) {
+                    String name = names.next();
+                    String location = category + ":" + name;
+                    if (existingPortraits.contains(location)) {
+                        continue;
+                    }
+                    possiblePortraits.add(location);
+                }
+            }
+        }
+        return possiblePortraits;
+    }
     public void assignRandomPortraitFor(Person p) {
         // first create a list of existing portait strings, so we can check for
         // duplicates
@@ -7178,71 +7197,16 @@ public class Campaign implements Serializable, ITechManager {
             searchCat_CombatSupport = "Combat/";
         }
 
-        while (categories.hasNext()) {
-            String category = categories.next();
-            if (category.endsWith(searchCat_Gender + searchCat_Role)) {
-                Iterator<String> names = portraits.getItemNames(category);
-                while (names.hasNext()) {
-                    String name = names.next();
-                    String location = category + ":" + name;
-                    if (existingPortraits.contains(location)) {
-                        continue;
-                    }
-                    possiblePortraits.add(location);
-                }
-            }
-        }
+        possiblePortraits = getPossibleRandomPortraits(portraits, existingPortraits, searchCat_Gender + searchCat_Role);
 
         if (possiblePortraits.isEmpty()) {
-            categories = portraits.getCategoryNames();
-            while (categories.hasNext()) {
-                String category = categories.next();
-                if (category.endsWith(searchCat_Gender + searchCat_RoleGroup)) {
-                    Iterator<String> names = portraits.getItemNames(category);
-                    while (names.hasNext()) {
-                        String name = names.next();
-                        String location = category + ":" + name;
-                        if (existingPortraits.contains(location)) {
-                            continue;
-                        }
-                        possiblePortraits.add(location);
-                    }
-                }
-            }
+            possiblePortraits = getPossibleRandomPortraits(portraits, existingPortraits, searchCat_Gender + searchCat_RoleGroup);
         }
         if (possiblePortraits.isEmpty()) {
-            categories = portraits.getCategoryNames();
-            while (categories.hasNext()) {
-                String category = categories.next();
-                if (category.endsWith(searchCat_Gender + searchCat_CombatSupport)) {
-                    Iterator<String> names = portraits.getItemNames(category);
-                    while (names.hasNext()) {
-                        String name = names.next();
-                        String location = category + ":" + name;
-                        if (existingPortraits.contains(location)) {
-                            continue;
-                        }
-                        possiblePortraits.add(location);
-                    }
-                }
-            }
+            possiblePortraits = getPossibleRandomPortraits(portraits, existingPortraits, searchCat_Gender + searchCat_CombatSupport);
         }
         if (possiblePortraits.isEmpty()) {
-            categories = portraits.getCategoryNames();
-            while (categories.hasNext()) {
-                String category = categories.next();
-                if (category.endsWith(searchCat_Gender)) {
-                    Iterator<String> names = portraits.getItemNames(category);
-                    while (names.hasNext()) {
-                        String name = names.next();
-                        String location = category + ":" + name;
-                        if (existingPortraits.contains(location)) {
-                            continue;
-                        }
-                        possiblePortraits.add(location);
-                    }
-                }
-            }
+            possiblePortraits = getPossibleRandomPortraits(portraits, existingPortraits, searchCat_Gender);
         }
         if (!possiblePortraits.isEmpty()) {
             String chosenPortrait = possiblePortraits.get(Compute
