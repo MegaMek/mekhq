@@ -299,8 +299,8 @@ public class NewContractDialog extends javax.swing.JDialog {
 
         cboNegotiator.setName("cboNegotiator");
         // Add negotiators
-        for (Person p : campaign.getPersonnel()) {
-            if (p.hasSkill(SkillType.S_NEG) && p.isActive()) {
+        for (Person p : campaign.getActivePersonnel()) {
+            if (p.hasSkill(SkillType.S_NEG)) {
                 cboNegotiator.addItem(p);
             }
         }
