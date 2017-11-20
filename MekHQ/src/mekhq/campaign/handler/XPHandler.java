@@ -49,7 +49,7 @@ public class XPHandler {
             return;
         }
         for (Person person : campaign.getPersonnel()) {
-            if (person.isAdminPrimary()) {
+            if (person.isAdminPrimary() && person.isActive()) {
                 if(adminXPPeriod > 1) {
                     Integer weeksLeft = person.getExtraData().get(NEXT_ADMIN_XP_DELAY);
                     if(null == weeksLeft) {
