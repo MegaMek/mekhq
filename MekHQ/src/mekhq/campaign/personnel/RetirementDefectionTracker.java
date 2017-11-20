@@ -187,9 +187,10 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
 
     	for (Person p : campaign.getPersonnel()) {
     		if (!p.isActive() || p.isDependent()
-    				|| p.isPrisoner() || p.isBondsman()
-    				|| p.isDeployed() ||
-					p.isFounder() && campaign.getCampaignOptions().getFoundersNeverRetire()) {
+                    || p.isPrisoner()
+                    || p.isBondsman()
+                    || p.isDeployed()
+                    || (p.isFounder() && campaign.getCampaignOptions().getFoundersNeverRetire())) {
     			continue;
     		}
     		/* Infantry units retire or defect by platoon */
