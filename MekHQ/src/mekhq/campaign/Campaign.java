@@ -1634,7 +1634,8 @@ public class Campaign implements Serializable, ITechManager {
         int patients = 0;
         for (Person person : getPersonnel()) {
             if (null != person.getDoctorId()
-                && person.getDoctorId().equals(doctor.getId())) {
+                    && person.getDoctorId().equals(doctor.getId())
+                    && person.isActive()) {
                 patients++;
             }
         }
