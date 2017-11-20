@@ -321,7 +321,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
         int numSquads = new BigDecimal(activePersonnel.size())
                 .divide(new BigDecimal(7), 0,
                         RoundingMode.DOWN).intValue();
-        int leftOver = getCampaign().getPersonnel().size() - (numSquads * 7);
+        int leftOver = activePersonnel.size() - (numSquads * 7);
 
         medSupportNeeded = (numSquads * 4) +
                            (3 + (new BigDecimal(leftOver).divide(
@@ -346,7 +346,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
                 (p.getSecondaryRole() == Person.T_ADMIN_LOG)) {
                 continue;
             }
-            personnelCount++;
+            if (p.isActive()) { personnelCount++; }
         }
         int totalSupport = personnelCount + getTechSupportNeeded() +
                            dropJumpShipSupportNeeded;
