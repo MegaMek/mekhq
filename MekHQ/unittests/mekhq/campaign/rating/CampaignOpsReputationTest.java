@@ -761,14 +761,14 @@ public class CampaignOpsReputationTest {
         assertEquals(8, spyReputation.getVeeCount());
         assertEquals(0, spyReputation.getBattleArmorCount());
         assertEquals(28, spyReputation.getInfantryCount());
-        assertEquals(200, spyReputation.getNonAdminPersonnelCount());
+        assertEquals(98, spyReputation.getNonAdminPersonnelCount());
         assertEquals(1, spyReputation.getDropshipCount());
         BigDecimalAssert.assertEquals(expectedTotalSkill, spyReputation.getTotalSkillLevels(), 2);
         assertEquals(4, spyReputation.getMechTechTeamsNeeded());
         assertEquals(2, spyReputation.getAeroTechTeamsNeeded());
         assertEquals(8, spyReputation.getMechanicTeamsNeeded());
         assertEquals(0, spyReputation.getBattleArmorTechTeamsNeeded());
-        assertEquals(20, spyReputation.getAdminsNeeded());
+        assertEquals(10, spyReputation.getAdminsNeeded());
         assertEquals(expectedAverageSkill, spyReputation.calcAverageExperience());
         assertEquals(10, spyReputation.getExperienceValue());
 
@@ -782,14 +782,14 @@ public class CampaignOpsReputationTest {
         assertEquals(8, spyReputation.getVeeCount());
         assertEquals(0, spyReputation.getBattleArmorCount());
         assertEquals(28, spyReputation.getInfantryCount());
-        assertEquals(200, spyReputation.getNonAdminPersonnelCount());
+        assertEquals(98, spyReputation.getNonAdminPersonnelCount());
         assertEquals(1, spyReputation.getDropshipCount());
         BigDecimalAssert.assertEquals(expectedTotalSkill, spyReputation.getTotalSkillLevels(), 2);
         assertEquals(4, spyReputation.getMechTechTeamsNeeded());
         assertEquals(2, spyReputation.getAeroTechTeamsNeeded());
         assertEquals(8, spyReputation.getMechanicTeamsNeeded());
         assertEquals(0, spyReputation.getBattleArmorTechTeamsNeeded());
-        assertEquals(20, spyReputation.getAdminsNeeded());
+        assertEquals(10, spyReputation.getAdminsNeeded());
         assertEquals(expectedAverageSkill, spyReputation.calcAverageExperience());
         assertEquals(10, spyReputation.getExperienceValue());
 
@@ -892,7 +892,7 @@ public class CampaignOpsReputationTest {
     @Test
     public void testGetSupportValue() {
         spyReputation.initValues();
-        assertEquals(-10, spyReputation.getSupportValue());
+        assertEquals(-5, spyReputation.getSupportValue());
 
         // Test a brand new campaign.
         buildFreshCampaign();
@@ -914,7 +914,7 @@ public class CampaignOpsReputationTest {
     @Test
     public void testCalculateUnitRatingScore() {
         spyReputation.initValues();
-        assertEquals(28, spyReputation.calculateUnitRatingScore());
+        assertEquals(33, spyReputation.calculateUnitRatingScore());
 
         // Test a brand new campaign.
         buildFreshCampaign();
@@ -925,7 +925,7 @@ public class CampaignOpsReputationTest {
     @Test
     public void testGetReputationModifier() {
         spyReputation.initValues();
-        assertEquals(2, spyReputation.getModifier());
+        assertEquals(3, spyReputation.getModifier());
 
         // Test a brand new campaign.
         buildFreshCampaign();
@@ -949,7 +949,7 @@ public class CampaignOpsReputationTest {
     @Test
     public void testGetDetails() {
         String expectedDetails =
-                "Unit Reputation:    28\n" +
+                "Unit Reputation:    33\n" +
                 "    Method: Campaign Operations\n" +
                 "\n" +
                 "Experience:          10\n" +
@@ -980,7 +980,7 @@ public class CampaignOpsReputationTest {
                 "    Has Jumpships?             Yes\n" +
                 "    Has Warships?               No\n" +
                 "\n" +
-                "Support:            -10\n" +
+                "Support:             -5\n" +
                 "    Tech Support:\n" +
                 "        Mech Techs:                   4 needed /    0 available\n" +
                 "            NOTE: Protomechs and mechs use same techs.\n" +
@@ -989,7 +989,7 @@ public class CampaignOpsReputationTest {
                 "            NOTE: Vehicles and Infantry use the same mechanics.\n" +
                 "        BA Techs:                     0 needed /    0 available\n" +
                 "        Astechs:                     84 needed /   84 available\n" +
-                "    Admin Support:                   20 needed /   10 available\n" +
+                "    Admin Support:                   10 needed /   10 available\n" +
                 "    Large Craft Crew:\n" +
                 "        All fully crewed.\n" +
                 "\n" +
