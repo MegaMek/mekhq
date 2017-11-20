@@ -116,7 +116,7 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
 		}
 		int totalShares = 0;
 		for (Person p : campaign.getPersonnel()) {
-			totalShares += p.getNumShares(campaign.getCampaignOptions().getSharesForAll());
+			if (p.isActive()) { totalShares += p.getNumShares(campaign.getCampaignOptions().getSharesForAll()); }
 		}
 		return netWorth / totalShares;
 	}
