@@ -326,17 +326,15 @@ public class CampaignOpsReputation extends AbstractUnitRating {
         technicians = 0;
 
         List<Person> personnelList =
-                new ArrayList<>(getCampaign().getPersonnel());
+                new ArrayList<>(getCampaign().getActivePersonnel());
         for (Person p : personnelList) {
-            if (p.isActive()) {
-                if (p.isAdmin() || p.isDoctor()) {
-                    continue;
-                }
-                if (p.isTech()) {
-                    technicians++;
-                }
-                setNonAdminPersonnelCount(getNonAdminPersonnelCount() + 1);
+            if (p.isAdmin() || p.isDoctor()) {
+                continue;
             }
+            if (p.isTech()) {
+                technicians++;
+            }
+            setNonAdminPersonnelCount(getNonAdminPersonnelCount() + 1);
         }
         setNonAdminPersonnelCount(getNonAdminPersonnelCount() +
                                   getCampaign().getAstechPool());
