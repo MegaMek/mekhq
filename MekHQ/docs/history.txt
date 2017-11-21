@@ -18,6 +18,9 @@ v0.43.5-git
 + Feature: Updated planetary location and ownership data, including two new systems. To revert to the old data, replace planets.xml with data\universe\planets_43_4.xml
 + PR #528: Can add or remove arbitrary amount of XP using via right click on person -> GM Mode
 + Issue #321: New context menu option to randomize portraits for selected personnel.
++ PR #533: New AtB option to prevent unit founders from retiring.
++ PR #526: New option to auto-randomize portrait on job change if no portrait present.
++ PR #530: Greater op-for variety in AtB scenarios (may spawn additional hostile aircraft, infantry and turrets)
 
 v0.43.4 (2017-10-01 11:00 UTC)
 + Updating the repo with 0.43.3 Data
