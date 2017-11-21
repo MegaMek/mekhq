@@ -1176,6 +1176,10 @@ public class Campaign implements Serializable, ITechManager {
         return personnel;
     }
 
+    /**
+     * Provides a filtered list of personnel including only active Persons.
+     * @return ArrayList<Person>
+     */
     public ArrayList<Person> getActivePersonnel() {
         ArrayList<Person> activePersonnel = new ArrayList<Person>();
         for (Person p : getPersonnel()) {
