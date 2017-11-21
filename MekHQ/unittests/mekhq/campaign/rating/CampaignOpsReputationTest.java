@@ -70,6 +70,7 @@ public class CampaignOpsReputationTest {
     private Campaign mockCampaign = mock(Campaign.class);
     private ArrayList<Unit> unitList = new ArrayList<>();
     private ArrayList<Person> personnelList = new ArrayList<>();
+    private ArrayList<Person> activePersonnelList = new ArrayList<>();
     private ArrayList<Mission> missionList = new ArrayList<>();
 
     // Mothballed units.
@@ -204,6 +205,7 @@ public class CampaignOpsReputationTest {
         mockCampaign = mock(Campaign.class);
         unitList = new ArrayList<>();
         personnelList = new ArrayList<>();
+        activePersonnelList = new ArrayList<>();
         missionList = new ArrayList<>();
         infantryPersonnel = new HashSet<>(28);
         seekerCrew = new HashSet<>(20);
@@ -731,11 +733,15 @@ public class CampaignOpsReputationTest {
             regularAdmins.add(admin);
         }
         personnelList.addAll(regularAdmins);
+        for (Person p : personnelList) {
+            if (p.isActive()) { activePersonnelList.add(p); }
+        }
 
         when(mockFinances.isInDebt()).thenReturn(false);
 
         doReturn(unitList).when(mockCampaign).getCopyOfUnits();
         doReturn(personnelList).when(mockCampaign).getPersonnel();
+        doReturn(activePersonnelList).when(mockCampaign).getActivePersonnel();
         doReturn(astechs).when(mockCampaign).getAstechPool();
         doCallRealMethod().when(mockCampaign).getNumberAstechs();
         doCallRealMethod().when(mockCampaign).getNumberPrimaryAstechs();
@@ -817,6 +823,7 @@ public class CampaignOpsReputationTest {
     private void buildFreshCampaign() {
         doReturn(new ArrayList<Unit>(0)).when(mockCampaign).getCopyOfUnits();
         doReturn(new ArrayList<Person>(0)).when(mockCampaign).getPersonnel();
+        doReturn(new ArrayList<Person>(0)).when(mockCampaign).getActivePersonnel();
         doReturn(new ArrayList<Person>(0)).when(mockCampaign).getAdmins();
         doReturn(new ArrayList<Person>(0)).when(mockCampaign).getTechs();
         doReturn(new ArrayList<Person>(0)).when(mockCampaign).getDoctors();
