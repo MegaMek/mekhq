@@ -7211,7 +7211,7 @@ public class Campaign implements Serializable, ITechManager {
 
         possiblePortraits = getPossibleRandomPortraits(portraits, existingPortraits, searchCat_Gender + searchCat_Role);
 
-        if (possiblePortraits.isEmpty()) {
+        if (possiblePortraits.isEmpty() && !searchCat_RoleGroup.isEmpty()) {
             possiblePortraits = getPossibleRandomPortraits(portraits, existingPortraits, searchCat_Gender + searchCat_RoleGroup);
         }
         if (possiblePortraits.isEmpty()) {
