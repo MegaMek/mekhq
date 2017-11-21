@@ -247,6 +247,7 @@ public class CampaignOptions implements Serializable {
     private boolean retirementRolls;
     private boolean trackUnitFatigue;
     private boolean customRetirementMods;
+    private boolean foundersNeverRetire;
     private boolean trackOriginalUnit;
     private boolean mercSizeLimited;
     private String[] rats = {"Xotl", "Total Warfare"};
@@ -464,6 +465,7 @@ public class CampaignOptions implements Serializable {
         sharesForAll = false;
         retirementRolls = true;
         customRetirementMods = false;
+        foundersNeverRetire = false;
         trackUnitFatigue = false;
         trackOriginalUnit = false;
         mercSizeLimited = false;
@@ -1671,8 +1673,16 @@ public class CampaignOptions implements Serializable {
 		return customRetirementMods;
 	}
 
+	public boolean getFoundersNeverRetire() {
+		return foundersNeverRetire;
+	}
+
 	public void setCustomRetirementMods(boolean mods) {
 		customRetirementMods = mods;
+	}
+
+	public void setFoundersNeverRetire(boolean mods) {
+        foundersNeverRetire = mods;
 	}
 
 	public boolean getTrackOriginalUnit() {
@@ -2129,6 +2139,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "sharesForAll", sharesForAll);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "retirementRolls", retirementRolls);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "customRetirementMods", customRetirementMods);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "foundersNeverRetire", foundersNeverRetire);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "trackUnitFatigue", trackUnitFatigue);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "mercSizeLimited", mercSizeLimited);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "trackOriginalUnit", trackOriginalUnit);
@@ -2585,6 +2596,8 @@ public class CampaignOptions implements Serializable {
                 retVal.retirementRolls = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("customRetirementMods")) {
                 retVal.customRetirementMods = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("foundersNeverRetire")) {
+                retVal.foundersNeverRetire = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("trackUnitFatigue")) {
                 retVal.trackUnitFatigue = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("trackOriginalUnit")) {
