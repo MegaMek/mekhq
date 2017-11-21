@@ -228,6 +228,7 @@ public class CampaignOptions implements Serializable {
 
     //random portraits related
     private boolean[] usePortraitForType;
+    private boolean assignPortraitOnRoleChange;
 
     //Against the Bot related
     private boolean useAtB;
@@ -250,6 +251,7 @@ public class CampaignOptions implements Serializable {
     private boolean retirementRolls;
     private boolean trackUnitFatigue;
     private boolean customRetirementMods;
+    private boolean foundersNeverRetire;
     private boolean trackOriginalUnit;
     private boolean mercSizeLimited;
     private String[] rats = {"Xotl", "Total Warfare"};
@@ -355,6 +357,7 @@ public class CampaignOptions implements Serializable {
             usePortraitForType[i] = false;
         }
         usePortraitForType[Person.T_MECHWARRIOR] = true;
+        assignPortraitOnRoleChange = false;
         idleXP = 0;
         targetIdleXP = 10;
         monthsIdleXP = 2;
@@ -471,6 +474,7 @@ public class CampaignOptions implements Serializable {
         sharesForAll = false;
         retirementRolls = true;
         customRetirementMods = false;
+        foundersNeverRetire = false;
         trackUnitFatigue = false;
         trackOriginalUnit = false;
         mercSizeLimited = false;
@@ -1102,6 +1106,14 @@ public class CampaignOptions implements Serializable {
         usePortraitForType[type] = b;
     }
 
+    public boolean getAssignPortraitOnRoleChange() {
+        return assignPortraitOnRoleChange;
+    }
+
+    public void setAssignPortraitOnRoleChange(boolean b) {
+        assignPortraitOnRoleChange = b;
+    }
+
     public int getIdleXP() {
         return idleXP;
     }
@@ -1682,8 +1694,16 @@ public class CampaignOptions implements Serializable {
 		return customRetirementMods;
 	}
 
+	public boolean getFoundersNeverRetire() {
+		return foundersNeverRetire;
+	}
+
 	public void setCustomRetirementMods(boolean mods) {
 		customRetirementMods = mods;
+	}
+
+	public void setFoundersNeverRetire(boolean mods) {
+        foundersNeverRetire = mods;
 	}
 
 	public boolean getTrackOriginalUnit() {
@@ -2172,6 +2192,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "sharesForAll", sharesForAll);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "retirementRolls", retirementRolls);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "customRetirementMods", customRetirementMods);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "foundersNeverRetire", foundersNeverRetire);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "trackUnitFatigue", trackUnitFatigue);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "mercSizeLimited", mercSizeLimited);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "trackOriginalUnit", trackOriginalUnit);
@@ -2195,6 +2216,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "contractMarketReportRefresh", contractMarketReportRefresh);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "unitMarketReportRefresh", unitMarketReportRefresh);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "startGameDelay", startGameDelay);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "assignPortraitOnRoleChange", assignPortraitOnRoleChange);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "allowOpforAeros", allowOpforAeros);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "allowOpforLocalUnits", allowOpforLocalUnits);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "opforAeroChance", opforAeroChance);
@@ -2514,6 +2536,8 @@ public class CampaignOptions implements Serializable {
                         retVal.usePortraitForType[i] = Boolean.parseBoolean(values[i].trim());
                     }
                 }
+            } else if (wn2.getNodeName().equalsIgnoreCase("assignPortraitOnRoleChange")) {
+                retVal.assignPortraitOnRoleChange = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("destroyByMargin")) {
                 retVal.destroyByMargin = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("destroyMargin")) {
@@ -2632,6 +2656,8 @@ public class CampaignOptions implements Serializable {
                 retVal.retirementRolls = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("customRetirementMods")) {
                 retVal.customRetirementMods = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("foundersNeverRetire")) {
+                retVal.foundersNeverRetire = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("trackUnitFatigue")) {
                 retVal.trackUnitFatigue = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("trackOriginalUnit")) {

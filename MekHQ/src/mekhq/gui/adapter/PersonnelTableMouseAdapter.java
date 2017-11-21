@@ -231,6 +231,11 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 for (Person person : people) {
                     person.setPrimaryRole(role);
                     gui.getCampaign().personUpdated(person);
+                    if (gui.getCampaign().getCampaignOptions().usePortraitForType(role)
+                            && gui.getCampaign().getCampaignOptions().getAssignPortraitOnRoleChange()
+                            && person.getPortraitFileName().equals(Crew.PORTRAIT_NONE)) {
+                        gui.getCampaign().assignRandomPortraitFor(person);
+                    }
                 }
                 break;
             case CMD_SECONDARY_ROLE:
@@ -1858,6 +1863,11 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                             specialistMenu.add(menuItem);
                             menuItem = new JMenuItem(String.format(resourceMap.getString("abilityDesc.format"), resourceMap.getString("rangemaster_xtm.text"), costDesc)); //$NON-NLS-1$ //$NON-NLS-2$
                             menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_RANGEMASTER, Crew.RANGEMASTER_EXTREME, String.valueOf(cost)));
+                            menuItem.addActionListener(this);
+                            menuItem.setEnabled(available);
+                            specialistMenu.add(menuItem);
+                            menuItem = new JMenuItem(String.format(resourceMap.getString("abilityDesc.format"), resourceMap.getString("rangemaster_los.text"), costDesc)); //$NON-NLS-1$ //$NON-NLS-2$
+                            menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_RANGEMASTER, Crew.RANGEMASTER_LOS, String.valueOf(cost)));
                             menuItem.addActionListener(this);
                             menuItem.setEnabled(available);
                             specialistMenu.add(menuItem);
