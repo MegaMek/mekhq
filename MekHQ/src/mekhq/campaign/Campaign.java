@@ -7126,7 +7126,7 @@ public class Campaign implements Serializable, ITechManager {
         p.addLogEntry(entry);
     }
 
-    public ArrayList<String> getPossibleRandomPortraits (DirectoryItems portraits, ArrayList<String> existingPortraits, String subDir ) {
+    private ArrayList<String> getPossibleRandomPortraits (DirectoryItems portraits, ArrayList<String> existingPortraits, String subDir ) {
         ArrayList<String> possiblePortraits = new ArrayList<String>();
         Iterator<String> categories = portraits.getCategoryNames();
         while (categories.hasNext()) {
@@ -7221,8 +7221,7 @@ public class Campaign implements Serializable, ITechManager {
             possiblePortraits = getPossibleRandomPortraits(portraits, existingPortraits, searchCat_Gender);
         }
         if (!possiblePortraits.isEmpty()) {
-            String chosenPortrait = possiblePortraits.get(Compute
-                                                                  .randomInt(possiblePortraits.size()));
+            String chosenPortrait = possiblePortraits.get(Compute.randomInt(possiblePortraits.size()));
             String[] temp = chosenPortrait.split(":");
             if (temp.length != 2) {
                 return;
