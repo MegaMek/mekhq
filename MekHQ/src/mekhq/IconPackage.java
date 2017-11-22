@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.Vector;
 
 import megamek.client.ui.swing.MechTileset;
@@ -56,6 +57,22 @@ public class IconPackage {
         guiElements.put("infirmary_background", "data/images/misc/field_hospital.jpg");
         guiElements.put("default_male_paperdoll", "data/images/misc/paperdoll/default_male.xml");
         guiElements.put("default_female_paperdoll", "data/images/misc/paperdoll/default_female.xml");
+    }
+    
+    /** A map of resolution widths to file names for the startup screen */
+    private final TreeMap<Integer, String> startupScreenImages = new TreeMap<>();
+    {
+        startupScreenImages.put(0, "data/images/misc/MekHQ Start_spooky_hd.png");
+        startupScreenImages.put(1440, "data/images/misc/MekHQ Start_spooky_fhd.png");
+        startupScreenImages.put(1920, "data/images/misc/MekHQ Start_spooky_uhd.png");
+    }
+    
+    /** A map of resolution widths to file names for the loading screen */
+    private final TreeMap<Integer, String> loadingScreenImages = new TreeMap<>();
+    {
+        loadingScreenImages.put(0, "data/images/misc/MekHQ Load_spooky_hd.png");
+        loadingScreenImages.put(1440, "data/images/misc/MekHQ Load_spooky_fhd.png");
+        loadingScreenImages.put(1920, "data/images/misc/MekHQ Load_spooky_uhd.png");
     }
     
     public IconPackage() {
@@ -116,6 +133,24 @@ public class IconPackage {
     
     public String getGuiElement(String key) {
         return guiElements.get(key);
+    }
+    
+    /**
+     * Gets the name of the startup screen image appropriate for the given horizontal resolution.
+     * @param resolutionWidth Screen width
+     * @return Path to the appropriate startup screen image.
+     */
+    public String getStartupScreenImage(int resolutionWidth) {
+        return startupScreenImages.floorEntry(resolutionWidth).getValue();
+    }
+    
+    /**
+     * Gets the name of the loading screen image appropriate for the given horizontal resolution.
+     * @param resolutionWidth Screen width
+     * @return Path to the appropriate loading screen image.
+     */
+    public String getLoadingScreenImage(int resolutionWidth) {
+        return loadingScreenImages.floorEntry(resolutionWidth).getValue();
     }
     
     public static Image buildForceIcon(String category, String filename, DirectoryItems items, LinkedHashMap<String, Vector<String>> iconMap) {

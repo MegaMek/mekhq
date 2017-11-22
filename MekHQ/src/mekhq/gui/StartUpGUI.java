@@ -39,7 +39,7 @@ public class StartUpGUI extends javax.swing.JPanel {
 	JFrame frame;
 	File lastSave;
 	Image imgSplash;
-    
+	   
 	public StartUpGUI(MekHQ app) {
         this.app = app;
         lastSave = Utilities.lastFileModified(MekHQ.CAMPAIGN_DIRECTORY, new FilenameFilter() {
@@ -47,6 +47,7 @@ public class StartUpGUI extends javax.swing.JPanel {
                 return name.toLowerCase().endsWith(".cpnx") || name.toLowerCase().endsWith(".xml");
             }
         });
+        
         initComponents();
     }
 
@@ -100,7 +101,8 @@ public class StartUpGUI extends javax.swing.JPanel {
         });
         
         // initialize splash image
-        imgSplash = getToolkit().getImage("data/images/misc/mekhq-splash.png"); //$NON-NLS-1$
+        double maxWidth = app.calculateMaxScreenWidth();
+        imgSplash = getToolkit().getImage(app.getIconPackage().getStartupScreenImage((int) maxWidth));
 
         // wait for splash image to load completely
         MediaTracker tracker = new MediaTracker(frame);
@@ -110,6 +112,7 @@ public class StartUpGUI extends javax.swing.JPanel {
         } catch (InterruptedException e) {
             // really should never come here
         }
+        
         setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
         
         add(Box.createRigidArea(new Dimension(0,5)));
@@ -123,7 +126,7 @@ public class StartUpGUI extends javax.swing.JPanel {
                 
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 	    
-        frame.setSize(500, 350);
+        frame.setSize(imgSplash.getWidth(null), imgSplash.getHeight(null));
         frame.setResizable(false);
 	    // Determine the new location of the window
 	    int w = frame.getSize().width;

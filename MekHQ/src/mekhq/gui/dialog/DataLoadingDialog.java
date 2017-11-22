@@ -76,7 +76,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
         this.frame = frame;
         this.app = app;
         this.fileCampaign = f;
-
+        
         resourceMap = ResourceBundle.getBundle("mekhq.resources.DataLoadingDialog", new EncodeControl()); //$NON-NLS-1$
 
         setUndecorated(true);
@@ -87,10 +87,11 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
         progressBar.setVisible(true);
         progressBar.setString(resourceMap.getString("loadPlanet.text"));
 
-        // initialize splash image
-        Image imgSplash = getToolkit().getImage("data/images/misc/mekhq-load.png"); //$NON-NLS-1$
+        // initialize loading image
+        double maxWidth = app.calculateMaxScreenWidth();
+        Image imgSplash = getToolkit().getImage(app.getIconPackage().getLoadingScreenImage((int) maxWidth)); //$NON-NLS-1$
 
-        // wait for splash image to load completely
+        // wait for loading image to load completely
         MediaTracker tracker = new MediaTracker(frame);
         tracker.addImage(imgSplash, 0);
         try {
@@ -105,7 +106,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
         getContentPane().add(splash, BorderLayout.CENTER);
         getContentPane().add(progressBar, BorderLayout.PAGE_END);
 
-        setSize(500, 350);
+        setSize(imgSplash.getWidth(null), imgSplash.getHeight(null));
         this.setLocationRelativeTo(frame);
 
         task = new Task();
