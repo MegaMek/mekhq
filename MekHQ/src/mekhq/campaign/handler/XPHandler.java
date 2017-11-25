@@ -48,7 +48,7 @@ public class XPHandler {
         if((adminXP <= 0) || (campaign.getCalendar().get(Calendar.DAY_OF_WEEK) != Calendar.MONDAY)) {
             return;
         }
-        for (Person person : campaign.getPersonnel()) {
+        for (Person person : campaign.getAdmins()) {
             if (person.isAdminPrimary()) {
                 if(adminXPPeriod > 1) {
                     Integer weeksLeft = person.getExtraData().get(NEXT_ADMIN_XP_DELAY);

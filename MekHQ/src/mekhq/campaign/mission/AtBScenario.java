@@ -67,6 +67,7 @@ import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
 import mekhq.campaign.AtBConfiguration;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.force.Lance;
 import mekhq.campaign.market.UnitMarket;
@@ -168,6 +169,12 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
      */
     protected static final int [] startPos = {
         Board.START_N, Board.START_E, Board.START_S, Board.START_W
+    };
+    
+    private final int[] randomAeroWeights = {
+            EntityWeightClass.WEIGHT_LIGHT, EntityWeightClass.WEIGHT_LIGHT, EntityWeightClass.WEIGHT_LIGHT,
+            EntityWeightClass.WEIGHT_MEDIUM, EntityWeightClass.WEIGHT_MEDIUM,
+            EntityWeightClass.WEIGHT_HEAVY
     };
 
     private boolean attacker;
@@ -713,6 +720,8 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         ArrayList<Entity> enemyEntities = new ArrayList<Entity>();
         
         setExtraMissionForces(campaign, allyEntities, enemyEntities);
+        addAeroReinforcements(campaign);
+        addScrubReinforcements(campaign);
         
         /* Possible enemy reinforcements */
         int roll = Compute.d6();
@@ -1456,6 +1465,134 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         list.addAll(entities);
     }
 
+    /**
+     * Potentially generates and adds a force of enemy aircraft to the mix of opposing force.
+     * @param campaign  The campaign for which the aircraft are being generated.
+     */
+    protected void addAeroReinforcements(Campaign campaign) {
+        // if the campaign is configured to it and we're in a 'standard' scenario or 'big battle' (don't add extra units to special scenarios)
+        // if the opfor owns the planet, we have a user-defined chance of seeing 1-5 hostile conventional aircraft, 
+        //      one per "pip" of difficulty.
+        // if the opfor does not own the planet, we have a (slightly lower) user-defined chance of seeing 1-5 hostile aerotechs, 
+        //      one per "pip" of difficulty.
+        //      if generating aeros (crude approximation), we have a 1/2 chance of a light, 1/3 chance of medium and 1/6 chance of heavy
+        if(!(campaign.getCampaignOptions().getAllowOpforAeros() && (isStandardMission() || isBigBattle()))) {
+            return;
+        }
+        
+        AtBContract contract = getContract(campaign);
+        
+        boolean opForOwnsPlanet = contract.getPlanet().getFactions(Utilities.getDateTimeDay(campaign.getCalendar()))
+                                    .contains(contract.getEnemyCode());
+
+        boolean spawnConventional = opForOwnsPlanet && Compute.d6() >= 
+                CampaignOptions.MAXIMUM_D6_VALUE - campaign.getCampaignOptions().getOpforAeroChance();
+        
+        // aerotechs are rarer, so spawn them less often
+        boolean spawnAerotech = !opForOwnsPlanet && Compute.d6() > 
+                CampaignOptions.MAXIMUM_D6_VALUE - campaign.getCampaignOptions().getOpforAeroChance() / 2;   
+        
+        ArrayList<Entity> aircraft = new ArrayList<Entity>();
+        if (spawnConventional) {
+            // skill level is 0-4 where 0 is "ultra-green" and 4 is "elite badass"
+            for(int unitCount = 0; unitCount <= campaign.getCampaignOptions().getSkillLevel(); unitCount++) {
+                aircraft.add(getEntity(contract.getEnemyCode(), contract.getEnemySkill(), contract.getEnemyQuality(), 
+                    UnitType.CONV_FIGHTER, EntityWeightClass.WEIGHT_LIGHT, campaign));
+            }
+        } else if(spawnAerotech) {
+            for(int unitCount = 0; unitCount <= campaign.getCampaignOptions().getSkillLevel(); unitCount++) {
+                // compute weight class
+                int weightClass = randomAeroWeights[Compute.d6() - 1];                
+                
+                aircraft.add(getEntity(contract.getEnemyCode(), contract.getEnemySkill(), contract.getEnemyQuality(), 
+                    UnitType.AERO, weightClass, campaign));
+            }
+        }
+        
+        if(!aircraft.isEmpty()) {
+            /* Must set per-entity start pos for units after start of scenarios. Reinforcements
+             * arrive from the enemy home edge, which is not necessarily the start pos. */
+            final int enemyDir = enemyHome;
+            final int deployRound = Compute.d6() + 2;   // deploy the new aircraft some time after the start of the game
+            aircraft.stream().filter(Objects::nonNull).forEach(en -> {
+                en.setStartingPos(enemyDir);
+                en.setDeployRound(deployRound);
+            });
+            BotForce bf = getEnemyBotForce(getContract(campaign), enemyHome, enemyHome, aircraft);
+            bf.setName(bf.getName() + " (Air Support)");
+            addBotForce(bf);
+        }
+    }
+
+    /**
+     * Potentially generates some scrubs (turrets and/or infantry) to be randomly added to the opposing force.
+     * @param campaign The campaign for which the scrubs are being generated.
+     */
+    protected void addScrubReinforcements(Campaign campaign) {
+        // if the campaign is configured to it and we are in a standard scenario or big battle
+        // if the opfor owns the planet, and the opfor is defender we have a 1/3 chance of seeing 1-5 hostile turrets, one per "pip" of difficulty.
+        // if the opfor owns the planet, and the opfor is defender we have a 1/3 chance of seeing 1-5 hostile conventional infantry, one per "pip".
+        // if the opfor does not own the planet, we have a 1/6 chance of seeing 1-5 hostile battle armor, one per "pip" of difficulty.
+        if(!(campaign.getCampaignOptions().getAllowOpforLocalUnits() && isAttacker() && (isStandardMission() || isBigBattle()))) {
+            return;
+        }
+        
+        AtBContract contract = getContract(campaign);
+        
+        boolean opForOwnsPlanet = contract.getPlanet().getFactions(Utilities.getDateTimeDay(campaign.getCalendar()))
+                                    .contains(contract.getEnemyCode());
+        boolean spawnTurrets = opForOwnsPlanet && 
+                Compute.d6() >= CampaignOptions.MAXIMUM_D6_VALUE - campaign.getCampaignOptions().getOpforLocalUnitChance(); 
+        boolean spawnConventionalInfantry = opForOwnsPlanet && 
+                Compute.d6() >= CampaignOptions.MAXIMUM_D6_VALUE - campaign.getCampaignOptions().getOpforLocalUnitChance();   
+        
+        // battle armor is more rare
+        boolean spawnBattleArmor = !opForOwnsPlanet && 
+                Compute.d6() >= CampaignOptions.MAXIMUM_D6_VALUE - campaign.getCampaignOptions().getOpforLocalUnitChance() / 2;
+                
+        boolean isTurretAppropriateTerrain = (terrainType == TER_HEAVYURBAN) || (terrainType == TER_LIGHTURBAN);
+        boolean isInfantryAppropriateTerrain = isTurretAppropriateTerrain || terrainType == TER_WOODED;
+        
+        ArrayList<Entity> scrubs = new ArrayList<Entity>();
+        // don't bother spawning turrets if there won't be anything to put them on
+        if (spawnTurrets && isTurretAppropriateTerrain) {
+            // skill level is 0-4 where 0 is "ultra-green" and 4 is "elite badass" and drives the number of extra units
+            addTurrets(scrubs,  campaign.getCampaignOptions().getSkillLevel() + 1, contract.getEnemySkill(), contract.getEnemyQuality(), campaign);
+        } 
+        
+        if(spawnConventionalInfantry && isInfantryAppropriateTerrain) {
+            for(int unitCount = 0; unitCount <= campaign.getCampaignOptions().getSkillLevel(); unitCount++) {
+                scrubs.add(getEntity(contract.getEnemyCode(), contract.getEnemySkill(), contract.getEnemyQuality(), 
+                    UnitType.INFANTRY, EntityWeightClass.WEIGHT_LIGHT, campaign));
+            }
+        }
+        
+        if(spawnBattleArmor && isInfantryAppropriateTerrain) {
+            for(int unitCount = 0; unitCount <= campaign.getCampaignOptions().getSkillLevel(); unitCount++) {
+                // some factions don't have access to battle armor, so they get conventional infantry instead
+                Entity generatedUnit = getEntity(contract.getEnemyCode(), contract.getEnemySkill(), contract.getEnemyQuality(), 
+                        UnitType.BATTLE_ARMOR, EntityWeightClass.WEIGHT_LIGHT, campaign);              
+                
+                if(generatedUnit != null) {
+                    scrubs.add(generatedUnit);
+                } else {
+                    scrubs.add(getEntity(contract.getEnemyCode(), contract.getEnemySkill(), contract.getEnemyQuality(), 
+                            UnitType.INFANTRY, EntityWeightClass.WEIGHT_LIGHT, campaign));
+                }
+            }
+        }
+        
+        if(!scrubs.isEmpty()) {
+            /* Must set per-entity start pos for units after start of scenarios. Scrubs start in the center of the map. */
+            scrubs.stream().filter(Objects::nonNull).forEach(en -> {
+                en.setStartingPos(Board.START_CENTER);
+            });
+            BotForce bf = getEnemyBotForce(getContract(campaign), enemyHome, enemyHome, scrubs);
+            bf.setName(bf.getName() + " (Local Forces)");
+            addBotForce(bf);
+        }
+    }
+    
     /* Convenience methods for frequently-used arguments */
     protected BotForce getAllyBotForce(AtBContract c, int start, int home, ArrayList<Entity> entities) {
         return new BotForce(c.getAllyBotName(), 1, start, home, entities,

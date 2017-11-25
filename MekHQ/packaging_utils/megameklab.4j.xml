@@ -8,6 +8,7 @@
   	<cp>lib/MegaMekLab.jar</cp>
     <cp>lib/xstream-1.4.7.jar</cp>
     <cp>lib/svgSalamander.jar</cp>
+    <cp>lib/log4j.jar</cp>
   </classPath>
   <errTitle></errTitle>
   <cmdLine></cmdLine>

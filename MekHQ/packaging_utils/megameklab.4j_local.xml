@@ -6,6 +6,8 @@
   	<mainClass>megameklab.com.MegaMekLab</mainClass>
   	<cp>lib/MegaMek.jar</cp>
   	<cp>lib/MegaMekLab.jar</cp>
+  	<cp>lib/svgSalamander.jar</cp>
+  	<cp>lib/log4j.jar</cp>
   </classPath>
   <errTitle></errTitle>
   <cmdLine></cmdLine>

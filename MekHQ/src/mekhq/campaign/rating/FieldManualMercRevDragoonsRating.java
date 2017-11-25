@@ -22,6 +22,7 @@ package mekhq.campaign.rating;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
 import java.util.Map;
 
 import megamek.common.Aero;
@@ -145,15 +146,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
         final String METHOD_NAME = "updateAvailableSupport()";
 
         getLogger().methodCalled(getClass(), METHOD_NAME);
-        for (Person p : getCampaign().getPersonnel()) {
-            getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
-                            "Checking " + p.getName());
-            if (!p.isActive()) {
-                getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
-                                "Person, " + p.getName() +
-                                ", is not active.");
-                continue;
-            }
+        for (Person p : getCampaign().getActivePersonnel()) {
             if (p.isTech()) {
                 updateTechSupportHours(p);
             } else if (p.isDoctor()) {
@@ -314,10 +307,11 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
     //   3 + (4/5) = 3 + 0.8 = 3.8 = 4 hours.
     //   total = 16 hours.
     private void calcMedicalSupportHoursNeeded() {
-        int numSquads = new BigDecimal(getCampaign().getPersonnel().size())
+        int activePersonnelCount = getCampaign().getActivePersonnel().size();
+        int numSquads = new BigDecimal(activePersonnelCount)
                 .divide(new BigDecimal(7), 0,
                         RoundingMode.DOWN).intValue();
-        int leftOver = getCampaign().getPersonnel().size() - (numSquads * 7);
+        int leftOver = activePersonnelCount - (numSquads * 7);
 
         medSupportNeeded = (numSquads * 4) +
                            (3 + (new BigDecimal(leftOver).divide(
@@ -331,7 +325,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
 
     private void calcAdminSupportHoursNeeded() {
         int personnelCount = 0;
-        for (Person p : getCampaign().getPersonnel()) {
+        for (Person p : getCampaign().getActivePersonnel()) {
             if ((p.getPrimaryRole() == Person.T_ADMIN_TRA) ||
                 (p.getPrimaryRole() == Person.T_ADMIN_COM) ||
                 (p.getPrimaryRole() == Person.T_ADMIN_LOG) ||

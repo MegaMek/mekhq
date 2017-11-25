@@ -1179,6 +1179,18 @@ public class Campaign implements Serializable, ITechManager {
         return personnel;
     }
 
+    /**
+     * Provides a filtered list of personnel including only active Persons.
+     * @return ArrayList<Person>
+     */
+    public ArrayList<Person> getActivePersonnel() {
+        ArrayList<Person> activePersonnel = new ArrayList<Person>();
+        for (Person p : getPersonnel()) {
+            if (p.isActive()) {activePersonnel.add(p);}
+        }
+        return activePersonnel;
+    }
+
     public ArrayList<Ancestors> getAncestors() {
         return ancestors;
     }
@@ -1625,7 +1637,8 @@ public class Campaign implements Serializable, ITechManager {
         int patients = 0;
         for (Person person : getPersonnel()) {
             if (null != person.getDoctorId()
-                && person.getDoctorId().equals(doctor.getId())) {
+                    && person.getDoctorId().equals(doctor.getId())
+                    && person.isActive()) {
                 patients++;
             }
         }
@@ -5724,7 +5737,7 @@ public class Campaign implements Serializable, ITechManager {
 		                          special);
 		} else if (name.equals("range_master")) {
 		    String special = Crew.RANGEMASTER_NONE;
-            switch (Compute.randomInt(2)) {
+            switch (Compute.randomInt(3)) {
                 case 0:
                     special = Crew.RANGEMASTER_MEDIUM;
                     break;
@@ -5733,6 +5746,9 @@ public class Campaign implements Serializable, ITechManager {
                     break;
                 case 2:
                     special = Crew.RANGEMASTER_EXTREME;
+                    break;
+                case 3:
+                    special = Crew.RANGEMASTER_LOS;
                     break;
             }
             person.acquireAbility(PilotOptions.LVL3_ADVANTAGES, name,
@@ -7152,6 +7168,25 @@ public class Campaign implements Serializable, ITechManager {
         p.addLogEntry(entry);
     }
 
+    private ArrayList<String> getPossibleRandomPortraits (DirectoryItems portraits, ArrayList<String> existingPortraits, String subDir ) {
+        ArrayList<String> possiblePortraits = new ArrayList<String>();
+        Iterator<String> categories = portraits.getCategoryNames();
+        while (categories.hasNext()) {
+            String category = categories.next();
+            if (category.endsWith(subDir)) {
+                Iterator<String> names = portraits.getItemNames(category);
+                while (names.hasNext()) {
+                    String name = names.next();
+                    String location = category + ":" + name;
+                    if (existingPortraits.contains(location)) {
+                        continue;
+                    }
+                    possiblePortraits.add(location);
+                }
+            }
+        }
+        return possiblePortraits;
+    }
     public void assignRandomPortraitFor(Person p) {
         // first create a list of existing portait strings, so we can check for
         // duplicates
@@ -7172,7 +7207,10 @@ public class Campaign implements Serializable, ITechManager {
         }
         ArrayList<String> possiblePortraits = new ArrayList<String>();
         Iterator<String> categories = portraits.getCategoryNames();
-        
+
+        // Will search for portraits in the /gender/primaryrole folder first,
+        // and if none are found then /gender/rolegroup, then /gender/combat or
+        // /gender/support, then in /gender.
         String searchCat_Gender = "";
         if (p.getGender() == Person.G_FEMALE) {
             searchCat_Gender += "Female/";
@@ -7180,44 +7218,50 @@ public class Campaign implements Serializable, ITechManager {
             searchCat_Gender += "Male/";
         }
         String searchCat_Role = Person.getRoleDesc(p.getPrimaryRole(), false) + "/";
-        if (searchCat_Role.startsWith("Admin/")) {
-            searchCat_Role = "Admin/";
+        String searchCat_RoleGroup = "";
+        String searchCat_CombatSupport = "";
+        if (p.getPrimaryRole() == Person.T_ADMIN_COM
+                || p.getPrimaryRole() == Person.T_ADMIN_HR
+                || p.getPrimaryRole() == Person.T_ADMIN_LOG
+                || p.getPrimaryRole() == Person.T_ADMIN_TRA) {
+            searchCat_RoleGroup = "Admin/";
         }
-        
-        while (categories.hasNext()) {
-            String category = categories.next();
-            if (category.endsWith(searchCat_Gender + searchCat_Role)) {
-                Iterator<String> names = portraits.getItemNames(category);
-                while (names.hasNext()) {
-                    String name = names.next();
-                    String location = category + ":" + name;
-                    if (existingPortraits.contains(location)) {
-                        continue;
-                    }
-                    possiblePortraits.add(location);
-                }
-            }
+        if (p.getPrimaryRole() == Person.T_MECHANIC
+                || p.getPrimaryRole() == Person.T_AERO_TECH
+                || p.getPrimaryRole() == Person.T_MECH_TECH
+                || p.getPrimaryRole() == Person.T_BA_TECH) {
+            searchCat_RoleGroup = "Tech/";
+        }
+        if (p.getPrimaryRole() == Person.T_MEDIC
+                || p.getPrimaryRole() == Person.T_DOCTOR) {
+            searchCat_RoleGroup = "Medical/";
+        }
+        if (p.getPrimaryRole() == Person.T_SPACE_CREW
+                || p.getPrimaryRole() == Person.T_SPACE_GUNNER
+                || p.getPrimaryRole() == Person.T_SPACE_PILOT
+                || p.getPrimaryRole() == Person.T_NAVIGATOR) {
+            searchCat_RoleGroup = "Vessel Crew/";
+        }
+
+        if (p.isSupport()) {
+            searchCat_CombatSupport = "Support/";
+        } else {
+            searchCat_CombatSupport = "Combat/";
+        }
+
+        possiblePortraits = getPossibleRandomPortraits(portraits, existingPortraits, searchCat_Gender + searchCat_Role);
+
+        if (possiblePortraits.isEmpty() && !searchCat_RoleGroup.isEmpty()) {
+            possiblePortraits = getPossibleRandomPortraits(portraits, existingPortraits, searchCat_Gender + searchCat_RoleGroup);
         }
         if (possiblePortraits.isEmpty()) {
-            categories = portraits.getCategoryNames();
-            while (categories.hasNext()) {
-                String category = categories.next();
-                if (category.endsWith(searchCat_Gender)) {
-                    Iterator<String> names = portraits.getItemNames(category);
-                    while (names.hasNext()) {
-                        String name = names.next();
-                        String location = category + ":" + name;
-                        if (existingPortraits.contains(location)) {
-                            continue;
-                        }
-                        possiblePortraits.add(location);
-                    }
-                }
-            }
+            possiblePortraits = getPossibleRandomPortraits(portraits, existingPortraits, searchCat_Gender + searchCat_CombatSupport);
+        }
+        if (possiblePortraits.isEmpty()) {
+            possiblePortraits = getPossibleRandomPortraits(portraits, existingPortraits, searchCat_Gender);
         }
         if (!possiblePortraits.isEmpty()) {
-            String chosenPortrait = possiblePortraits.get(Compute
-                                                                  .randomInt(possiblePortraits.size()));
+            String chosenPortrait = possiblePortraits.get(Compute.randomInt(possiblePortraits.size()));
             String[] temp = chosenPortrait.split(":");
             if (temp.length != 2) {
                 return;

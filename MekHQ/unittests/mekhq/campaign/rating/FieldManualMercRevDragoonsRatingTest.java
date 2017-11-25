@@ -47,6 +47,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
+import java.util.stream.Collectors;
 
 import static org.mockito.Mockito.*;
 import static org.junit.Assert.*;
@@ -61,7 +62,8 @@ public class FieldManualMercRevDragoonsRatingTest {
 
     private Campaign mockCampaign = mock(Campaign.class);
 
-    private ArrayList<Person> mockPersonnnelList = new ArrayList<>();
+    private ArrayList<Person> mockPersonnelList = new ArrayList<>();
+    private ArrayList<Person> mockActivePersonnelList = new ArrayList<>();
 
     private Person mockDoctor = mock(Person.class);
     private Person mockTech = mock(Person.class);
@@ -100,10 +102,13 @@ public class FieldManualMercRevDragoonsRatingTest {
         when(mockMedicSkill.getExperienceLevel()).thenReturn(SkillType.EXP_REGULAR);
         when(mockAstechSkill.getExperienceLevel()).thenReturn(SkillType.EXP_REGULAR);
 
-        mockPersonnnelList.add(mockDoctor);
-        mockPersonnnelList.add(mockTech);
+        mockPersonnelList.add(mockDoctor);
+        mockPersonnelList.add(mockTech);
+        mockActivePersonnelList.add(mockDoctor);
+        mockActivePersonnelList.add(mockTech);
 
-        when(mockCampaign.getPersonnel()).thenReturn(mockPersonnnelList);
+        when(mockCampaign.getPersonnel()).thenReturn(mockPersonnelList);
+        when(mockCampaign.getActivePersonnel()).thenReturn(mockActivePersonnelList);
         when(mockCampaign.getNumberMedics()).thenCallRealMethod();
         when(mockCampaign.getNumberAstechs()).thenCallRealMethod();
         when(mockCampaign.getNumberPrimaryAstechs()).thenCallRealMethod();
@@ -125,7 +130,7 @@ public class FieldManualMercRevDragoonsRatingTest {
         doReturn(TechConstants.T_INTRO_BOXSET).when(mockWaspE).getTechLevel();
         doReturn(20.0).when(mockWaspE).getWeight();
         Person waspPilot = mock(Person.class);
-        mockPersonnnelList.add(waspPilot);
+        mockPersonnelList.add(waspPilot);
         doReturn(waspPilot).when(mockWasp).getCommander();
         Crew waspCrew = mock(Crew.class);
         doReturn(4).when(waspCrew).getGunnery();
@@ -139,7 +144,7 @@ public class FieldManualMercRevDragoonsRatingTest {
         doReturn(20.0).when(mockStingerE).getWeight();
         doReturn(mockStingerE).when(mockStinger).getEntity();
         Person stingerPilot = mock(Person.class);
-        mockPersonnnelList.add(stingerPilot);
+        mockPersonnelList.add(stingerPilot);
         doReturn(stingerPilot).when(mockStinger).getCommander();
         Crew stingerCrew = mock(Crew.class);
         doReturn(4).when(stingerCrew).getGunnery();
@@ -156,7 +161,7 @@ public class FieldManualMercRevDragoonsRatingTest {
         doReturn(65.0).when(mockThunderboltE).getWeight();
         doReturn(mockThunderboltE).when(mockThunderbolt).getEntity();
         Person thunderboltPilot = mock(Person.class);
-        mockPersonnnelList.add(thunderboltPilot);
+        mockPersonnelList.add(thunderboltPilot);
         doReturn(thunderboltPilot).when(mockThunderbolt).getCommander();
         Crew thunderboltCrew = mock(Crew.class);
         doReturn(thunderboltCrew).when(mockThunderboltE).getCrew();
@@ -170,7 +175,7 @@ public class FieldManualMercRevDragoonsRatingTest {
         doReturn(TechConstants.T_INTRO_BOXSET).when(mockShrekE).getTechLevel();
         doReturn(mockShrekE).when(mockShrek).getEntity();
         Person shrekCommander = mock(Person.class);
-        mockPersonnnelList.add(shrekCommander);
+        mockPersonnelList.add(shrekCommander);
         doReturn(shrekCommander).when(mockShrek).getCommander();
         Crew shrekCrew = mock(Crew.class);
         doReturn(shrekCrew).when(mockShrekE).getCrew();
@@ -184,7 +189,7 @@ public class FieldManualMercRevDragoonsRatingTest {
         doReturn(TechConstants.T_INTRO_BOXSET).when(mockShrek2E).getTechLevel();
         doReturn(mockShrek2E).when(mockShrek2).getEntity();
         Person shrek2Commander = mock(Person.class);
-        mockPersonnnelList.add(shrek2Commander);
+        mockPersonnelList.add(shrek2Commander);
         doReturn(shrek2Commander).when(mockShrek2).getCommander();
         Crew shrek2Crew = mock(Crew.class);
         doReturn(shrek2Crew).when(mockShrek2E).getCrew();
@@ -198,7 +203,7 @@ public class FieldManualMercRevDragoonsRatingTest {
         doReturn(TechConstants.T_IS_TW_NON_BOX).when(mockHarasserE).getTechLevel();
         doReturn(mockHarasserE).when(mockHarasser).getEntity();
         Person harasserCommander = mock(Person.class);
-        mockPersonnnelList.add(harasserCommander);
+        mockPersonnelList.add(harasserCommander);
         doReturn(harasserCommander).when(mockHarasser).getCommander();
         Crew harasserCrew = mock(Crew.class);
         doReturn(harasserCrew).when(mockHarasserE).getCrew();
@@ -212,7 +217,7 @@ public class FieldManualMercRevDragoonsRatingTest {
         doReturn(TechConstants.T_IS_TW_NON_BOX).when(mockHarasser2E).getTechLevel();
         doReturn(mockHarasser2E).when(mockHarasser2).getEntity();
         Person harasser2Commander = mock(Person.class);
-        mockPersonnnelList.add(harasser2Commander);
+        mockPersonnelList.add(harasser2Commander);
         doReturn(harasser2Commander).when(mockHarasser2).getCommander();
         Crew harasser2Crew = mock(Crew.class);
         doReturn(harasser2Crew).when(mockHarasser2E).getCrew();
@@ -226,7 +231,7 @@ public class FieldManualMercRevDragoonsRatingTest {
         doReturn(50.0).when(mockLightingE).getWeight();
         doReturn(mockLightingE).when(mockLightning).getEntity();
         Person lightningPilot = mock(Person.class);
-        mockPersonnnelList.add(lightningPilot);
+        mockPersonnelList.add(lightningPilot);
         doReturn(lightningPilot).when(mockLightning).getCommander();
         Crew lightningCrew = mock(Crew.class);
         doReturn(lightningCrew).when(mockLightingE).getCrew();
@@ -240,7 +245,7 @@ public class FieldManualMercRevDragoonsRatingTest {
         doReturn(50.0).when(mockLighting2E).getWeight();
         doReturn(mockLighting2E).when(mockLightning2).getEntity();
         Person lightning2Pilot = mock(Person.class);
-        mockPersonnnelList.add(lightning2Pilot);
+        mockPersonnelList.add(lightning2Pilot);
         doReturn(lightning2Pilot).when(mockLightning2).getCommander();
         Crew lightning2Crew = mock(Crew.class);
         doReturn(lightning2Crew).when(mockLighting2E).getCrew();
@@ -254,7 +259,7 @@ public class FieldManualMercRevDragoonsRatingTest {
         doReturn(3600.0).when(mockUnionE).getWeight();
         doReturn(mockUnionE).when(mockUnion).getEntity();
         Person unionCommander = mock(Person.class);
-        mockPersonnnelList.add(unionCommander);
+        mockPersonnelList.add(unionCommander);
         doReturn(unionCommander).when(mockUnion).getCommander();
         Crew unionCrew = mock(Crew.class);
         doReturn(unionCrew).when(mockUnionE).getCrew();
@@ -272,7 +277,7 @@ public class FieldManualMercRevDragoonsRatingTest {
         doReturn(152000.0).when(mockInvaderE).getWeight();
         doReturn(mockInvaderE).when(mockInvader).getEntity();
         Person invaderCommander = mock(Person.class);
-        mockPersonnnelList.add(invaderCommander);
+        mockPersonnelList.add(invaderCommander);
         doReturn(invaderCommander).when(mockInvader).getCommander();
         Crew invaderCrew = mock(Crew.class);
         doReturn(invaderCrew).when(mockInvaderE).getCrew();
@@ -323,7 +328,8 @@ public class FieldManualMercRevDragoonsRatingTest {
         when(mockMechwarrior.isDeployed()).thenReturn(false);
         when(mockMechwarrior.getSkill(eq(SkillType.S_DOCTOR))).thenReturn(mockDoctorSkillGreen);
         when(mockMechwarrior.hasSkill(eq(SkillType.S_DOCTOR))).thenReturn(true);
-        mockPersonnnelList.add(mockMechwarrior);
+        mockPersonnelList.add(mockMechwarrior);
+        mockActivePersonnelList.add(mockMechwarrior);
         expectedHours += 15;
         testFieldManuMercRevDragoonsRating.updateAvailableSupport();
         assertEquals(expectedHours, testFieldManuMercRevDragoonsRating.getMedicalSupportAvailable());
@@ -337,7 +343,8 @@ public class FieldManualMercRevDragoonsRatingTest {
         when(mockMedic.isDeployed()).thenReturn(false);
         when(mockMedic.getSkill(eq(SkillType.S_MEDTECH))).thenReturn(mockMedicSkill);
         when(mockMedic.hasSkill(eq(SkillType.S_MEDTECH))).thenReturn(true);
-        mockPersonnnelList.add(mockMedic);
+        mockPersonnelList.add(mockMedic);
+        mockActivePersonnelList.add(mockMedic);
         expectedHours += 20;
         testFieldManuMercRevDragoonsRating.updateAvailableSupport();
         assertEquals(expectedHours, testFieldManuMercRevDragoonsRating.getMedicalSupportAvailable());
@@ -369,7 +376,8 @@ public class FieldManualMercRevDragoonsRatingTest {
         when(mockMechwarrior.isDeployed()).thenReturn(false);
         when(mockMechwarrior.getSkill(eq(SkillType.S_TECH_MECH))).thenReturn(mockMechTechSkillRegular);
         when(mockMechwarrior.hasSkill(eq(SkillType.S_TECH_MECH))).thenReturn(true);
-        mockPersonnnelList.add(mockMechwarrior);
+        mockPersonnelList.add(mockMechwarrior);
+        mockActivePersonnelList.add(mockMechwarrior);
         expectedHours += 20;
         testFieldManuMercRevDragoonsRating.updateAvailableSupport();
         assertEquals(expectedHours, testFieldManuMercRevDragoonsRating.getTechSupportHours());
@@ -384,7 +392,8 @@ public class FieldManualMercRevDragoonsRatingTest {
         when(mockAstech.isDeployed()).thenReturn(false);
         when(mockAstech.getSkill(eq(SkillType.S_ASTECH))).thenReturn(mockAstechSkill);
         when(mockAstech.hasSkill(eq(SkillType.S_ASTECH))).thenReturn(true);
-        mockPersonnnelList.add(mockAstech);
+        mockPersonnelList.add(mockAstech);
+        mockActivePersonnelList.add(mockAstech);
         expectedHours += 20;
         testFieldManuMercRevDragoonsRating.updateAvailableSupport();
         assertEquals(expectedHours, testFieldManuMercRevDragoonsRating.getTechSupportHours());
@@ -419,6 +428,7 @@ public class FieldManualMercRevDragoonsRatingTest {
         when(mockCampaign.getFlaggedCommander()).thenReturn(null);
         doReturn(commandList).when(testRating).getCommanderList();
         when(expectedCommander.isActive()).thenReturn(false);
+        mockActivePersonnelList.remove(expectedCommander);
         when(leftennant.getExperienceLevel(anyBoolean())).thenReturn(SkillType.EXP_VETERAN);
         when(leftennant.isActive()).thenReturn(true);
         when(leftennant2.getExperienceLevel(anyBoolean())).thenReturn(SkillType.EXP_REGULAR);

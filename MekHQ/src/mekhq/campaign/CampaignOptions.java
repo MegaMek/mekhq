@@ -72,6 +72,9 @@ public class CampaignOptions implements Serializable {
     public final static int REPAIR_SYSTEM_STRATOPS = 0;
     public final static int REPAIR_SYSTEM_WARCHEST_CUSTOM = 1;
     public final static int REPAIR_SYSTEM_GENERIC_PARTS = 2;
+    
+    public final static int MAXIMUM_D6_VALUE = 6;
+    
     //FIXME: This needs to be localized
     public final static String[] REPAIR_SYSTEM_NAMES = {"Strat Ops", "Warchest Custom", "Generic Spare Parts"};
 
@@ -225,6 +228,7 @@ public class CampaignOptions implements Serializable {
 
     //random portraits related
     private boolean[] usePortraitForType;
+    private boolean assignPortraitOnRoleChange;
 
     //Against the Bot related
     private boolean useAtB;
@@ -247,6 +251,7 @@ public class CampaignOptions implements Serializable {
     private boolean retirementRolls;
     private boolean trackUnitFatigue;
     private boolean customRetirementMods;
+    private boolean foundersNeverRetire;
     private boolean trackOriginalUnit;
     private boolean mercSizeLimited;
     private String[] rats = {"Xotl", "Total Warfare"};
@@ -271,6 +276,10 @@ public class CampaignOptions implements Serializable {
     private boolean contractMarketReportRefresh;
     private boolean unitMarketReportRefresh;
     private int startGameDelay;
+    private boolean allowOpforAeros;
+    private boolean allowOpforLocalUnits;
+    private int opforAeroChance;
+    private int opforLocalUnitChance;
 
     //Mass Repair/Salvage Options
     private boolean massRepairUseExtraTime;
@@ -348,6 +357,7 @@ public class CampaignOptions implements Serializable {
             usePortraitForType[i] = false;
         }
         usePortraitForType[Person.T_MECHWARRIOR] = true;
+        assignPortraitOnRoleChange = false;
         idleXP = 0;
         targetIdleXP = 10;
         monthsIdleXP = 2;
@@ -464,6 +474,7 @@ public class CampaignOptions implements Serializable {
         sharesForAll = false;
         retirementRolls = true;
         customRetirementMods = false;
+        foundersNeverRetire = false;
         trackUnitFatigue = false;
         trackOriginalUnit = false;
         mercSizeLimited = false;
@@ -488,6 +499,10 @@ public class CampaignOptions implements Serializable {
         contractMarketReportRefresh = true;
         unitMarketReportRefresh = true;
         startGameDelay = 500;
+        allowOpforAeros = false;
+        allowOpforLocalUnits = false;
+        opforAeroChance = 5;
+        opforLocalUnitChance = 5;
         
         //Mass Repair/Salvage Options
         massRepairUseExtraTime = true;
@@ -1091,6 +1106,14 @@ public class CampaignOptions implements Serializable {
         usePortraitForType[type] = b;
     }
 
+    public boolean getAssignPortraitOnRoleChange() {
+        return assignPortraitOnRoleChange;
+    }
+
+    public void setAssignPortraitOnRoleChange(boolean b) {
+        assignPortraitOnRoleChange = b;
+    }
+
     public int getIdleXP() {
         return idleXP;
     }
@@ -1671,8 +1694,16 @@ public class CampaignOptions implements Serializable {
 		return customRetirementMods;
 	}
 
+	public boolean getFoundersNeverRetire() {
+		return foundersNeverRetire;
+	}
+
 	public void setCustomRetirementMods(boolean mods) {
 		customRetirementMods = mods;
+	}
+
+	public void setFoundersNeverRetire(boolean mods) {
+        foundersNeverRetire = mods;
 	}
 
 	public boolean getTrackOriginalUnit() {
@@ -1979,6 +2010,38 @@ public class CampaignOptions implements Serializable {
 		});
 	}
 
+	public void setAllowOpforAeros(boolean allowOpforAeros) {
+	    this.allowOpforAeros = allowOpforAeros;
+	}
+	
+	public boolean getAllowOpforAeros() {
+	    return allowOpforAeros;
+	}
+	
+	public void setAllowOpforLocalUnits(boolean allowOpforLocalUnits) {
+        this.allowOpforLocalUnits = allowOpforLocalUnits;
+    }
+    
+    public boolean getAllowOpforLocalUnits() {
+        return allowOpforLocalUnits;
+    }
+    
+    public void setOpforAeroChance(int chance) {
+        this.opforAeroChance = chance;
+    }
+    
+    public int getOpforAeroChance() {
+        return opforAeroChance;
+    }
+    
+    public void setOpforLocalUnitChance(int chance) {
+        this.opforLocalUnitChance = chance;
+    }
+    
+    public int getOpforLocalUnitChance() {
+        return opforLocalUnitChance;
+    }
+	
 	public void writeToXml(PrintWriter pw1, int indent) {
         pw1.println(MekHqXmlUtil.indentStr(indent) + "<campaignOptions>");
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "clanPriceModifier", clanPriceModifier); //private double
@@ -2129,6 +2192,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "sharesForAll", sharesForAll);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "retirementRolls", retirementRolls);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "customRetirementMods", customRetirementMods);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "foundersNeverRetire", foundersNeverRetire);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "trackUnitFatigue", trackUnitFatigue);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "mercSizeLimited", mercSizeLimited);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "trackOriginalUnit", trackOriginalUnit);
@@ -2152,6 +2216,11 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "contractMarketReportRefresh", contractMarketReportRefresh);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "unitMarketReportRefresh", unitMarketReportRefresh);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "startGameDelay", startGameDelay);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "assignPortraitOnRoleChange", assignPortraitOnRoleChange);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "allowOpforAeros", allowOpforAeros);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "allowOpforLocalUnits", allowOpforLocalUnits);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "opforAeroChance", opforAeroChance);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "opforLocalUnitChance", opforLocalUnitChance);
 
         //Mass Repair/Salvage Options
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "massRepairUseExtraTime", massRepairUseExtraTime);
@@ -2467,6 +2536,8 @@ public class CampaignOptions implements Serializable {
                         retVal.usePortraitForType[i] = Boolean.parseBoolean(values[i].trim());
                     }
                 }
+            } else if (wn2.getNodeName().equalsIgnoreCase("assignPortraitOnRoleChange")) {
+                retVal.assignPortraitOnRoleChange = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("destroyByMargin")) {
                 retVal.destroyByMargin = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("destroyMargin")) {
@@ -2585,6 +2656,8 @@ public class CampaignOptions implements Serializable {
                 retVal.retirementRolls = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("customRetirementMods")) {
                 retVal.customRetirementMods = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("foundersNeverRetire")) {
+                retVal.foundersNeverRetire = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("trackUnitFatigue")) {
                 retVal.trackUnitFatigue = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("trackOriginalUnit")) {
@@ -2631,6 +2704,14 @@ public class CampaignOptions implements Serializable {
                 retVal.unitMarketReportRefresh = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("startGameDelay")) {
                 retVal.startGameDelay = Integer.parseInt(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("allowOpforLocalUnits")) {
+                retVal.allowOpforLocalUnits = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("allowOpforAeros")) {
+                retVal.allowOpforAeros = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("opforAeroChance")) {
+                retVal.opforAeroChance = Integer.parseInt(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("opforLocalUnitChance")) {
+                retVal.opforLocalUnitChance = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("rats")) {
             	retVal.rats = MekHqXmlUtil.unEscape(wn2.getTextContent().trim()).split(",");
             } else if (wn2.getNodeName().equalsIgnoreCase("staticRATs")) {

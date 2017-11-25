@@ -115,7 +115,7 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
             MekHQ.getLogger().log(RetirementDefectionTracker.class, METHOD_NAME, e);
 		}
 		int totalShares = 0;
-		for (Person p : campaign.getPersonnel()) {
+		for (Person p : campaign.getActivePersonnel()) {
 			totalShares += p.getNumShares(campaign.getCampaignOptions().getSharesForAll());
 		}
 		return netWorth / totalShares;
@@ -187,8 +187,10 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
 
     	for (Person p : campaign.getPersonnel()) {
     		if (!p.isActive() || p.isDependent()
-    				|| p.isPrisoner() || p.isBondsman()
-    				|| p.isDeployed()) {
+                    || p.isPrisoner()
+                    || p.isBondsman()
+                    || p.isDeployed()
+                    || (p.isFounder() && campaign.getCampaignOptions().getFoundersNeverRetire())) {
     			continue;
     		}
     		/* Infantry units retire or defect by platoon */
