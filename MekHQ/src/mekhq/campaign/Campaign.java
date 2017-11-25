@@ -1176,6 +1176,18 @@ public class Campaign implements Serializable, ITechManager {
         return personnel;
     }
 
+    /**
+     * Provides a filtered list of personnel including only active Persons.
+     * @return ArrayList<Person>
+     */
+    public ArrayList<Person> getActivePersonnel() {
+        ArrayList<Person> activePersonnel = new ArrayList<Person>();
+        for (Person p : getPersonnel()) {
+            if (p.isActive()) {activePersonnel.add(p);}
+        }
+        return activePersonnel;
+    }
+
     public ArrayList<Ancestors> getAncestors() {
         return ancestors;
     }
@@ -1622,7 +1634,8 @@ public class Campaign implements Serializable, ITechManager {
         int patients = 0;
         for (Person person : getPersonnel()) {
             if (null != person.getDoctorId()
-                && person.getDoctorId().equals(doctor.getId())) {
+                    && person.getDoctorId().equals(doctor.getId())
+                    && person.isActive()) {
                 patients++;
             }
         }
