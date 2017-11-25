@@ -19,9 +19,9 @@ import java.io.FilenameFilter;
 import java.util.ResourceBundle;
 
 import javax.swing.Box;
-import javax.swing.BoxLayout;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
@@ -113,16 +113,19 @@ public class StartUpGUI extends javax.swing.JPanel {
             // really should never come here
         }
         
-        setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
+        setLayout(new BorderLayout(1, 1));
         
-        add(Box.createRigidArea(new Dimension(0,5)));
-        add(btnNewGame);
-        add(Box.createRigidArea(new Dimension(0,5)));
-        add(btnLoadGame);
-        add(Box.createRigidArea(new Dimension(0,5)));
-        add(btnLastSave);
-        add(Box.createRigidArea(new Dimension(0,5)));
-        add(btnQuit);
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setOpaque(false);
+        buttonPanel.add(Box.createRigidArea(new Dimension(0,5)));
+        buttonPanel.add(btnNewGame);
+        buttonPanel.add(Box.createRigidArea(new Dimension(0,5)));
+        buttonPanel.add(btnLoadGame);
+        buttonPanel.add(Box.createRigidArea(new Dimension(0,5)));
+        buttonPanel.add(btnLastSave);
+        buttonPanel.add(Box.createRigidArea(new Dimension(0,5)));
+        buttonPanel.add(btnQuit);
+        add(buttonPanel, BorderLayout.PAGE_END);
                 
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 	    
