@@ -326,7 +326,7 @@ public class CampaignOpsReputation extends AbstractUnitRating {
         technicians = 0;
 
         List<Person> personnelList =
-                new ArrayList<>(getCampaign().getPersonnel());
+                new ArrayList<>(getCampaign().getActivePersonnel());
         for (Person p : personnelList) {
             if (p.isAdmin() || p.isDoctor()) {
                 continue;
