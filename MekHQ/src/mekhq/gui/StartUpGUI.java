@@ -19,9 +19,9 @@ import java.io.FilenameFilter;
 import java.util.ResourceBundle;
 
 import javax.swing.Box;
-import javax.swing.BoxLayout;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
@@ -61,6 +61,8 @@ public class StartUpGUI extends javax.swing.JPanel {
         btnNewGame.setMinimumSize(new Dimension(200, 25));
         btnNewGame.setPreferredSize(new Dimension(200, 25));
         btnNewGame.setMaximumSize(new Dimension(200, 25));
+        //btnNewGame.setAlignmentX(Component.CENTER_ALIGNMENT);
+        //btnNewGame.setAlignmentY(Component.BOTTOM_ALIGNMENT);
         btnNewGame.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
             	newCampaign();
@@ -70,6 +72,8 @@ public class StartUpGUI extends javax.swing.JPanel {
         btnLoadGame.setMinimumSize(new Dimension(200, 25));
         btnLoadGame.setPreferredSize(new Dimension(200, 25));
         btnLoadGame.setMaximumSize(new Dimension(200, 25));
+        //btnLoadGame.setAlignmentX(Component.CENTER_ALIGNMENT);
+        //btnLoadGame.setAlignmentY(Component.BOTTOM_ALIGNMENT);
         btnLoadGame.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
             	File f = selectLoadCampaignFile();
@@ -82,6 +86,8 @@ public class StartUpGUI extends javax.swing.JPanel {
         btnLastSave.setMinimumSize(new Dimension(200, 25));
         btnLastSave.setPreferredSize(new Dimension(200, 25));
         btnLastSave.setMaximumSize(new Dimension(200, 25));
+        //btnLastSave.setAlignmentX(Component.CENTER_ALIGNMENT);
+        //btnLastSave.setAlignmentY(Component.BOTTOM_ALIGNMENT);
         if(null == lastSave) {
         	btnLastSave.setEnabled(false);
         }
@@ -94,6 +100,8 @@ public class StartUpGUI extends javax.swing.JPanel {
         btnQuit.setMinimumSize(new Dimension(200, 25));
         btnQuit.setPreferredSize(new Dimension(200, 25));
         btnQuit.setMaximumSize(new Dimension(200, 25));
+        //btnQuit.setAlignmentX(Component.RIGHT_ALIGNMENT);
+        //btnQuit.setAlignmentY(Component.BOTTOM_ALIGNMENT);
         btnQuit.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 System.exit(0);
@@ -113,16 +121,19 @@ public class StartUpGUI extends javax.swing.JPanel {
             // really should never come here
         }
         
-        setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
+        setLayout(new BorderLayout(1, 1));
         
-        add(Box.createRigidArea(new Dimension(0,5)));
-        add(btnNewGame);
-        add(Box.createRigidArea(new Dimension(0,5)));
-        add(btnLoadGame);
-        add(Box.createRigidArea(new Dimension(0,5)));
-        add(btnLastSave);
-        add(Box.createRigidArea(new Dimension(0,5)));
-        add(btnQuit);
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setOpaque(false);
+        buttonPanel.add(Box.createRigidArea(new Dimension(0,5)));
+        buttonPanel.add(btnNewGame);
+        buttonPanel.add(Box.createRigidArea(new Dimension(0,5)));
+        buttonPanel.add(btnLoadGame);
+        buttonPanel.add(Box.createRigidArea(new Dimension(0,5)));
+        buttonPanel.add(btnLastSave);
+        buttonPanel.add(Box.createRigidArea(new Dimension(0,5)));
+        buttonPanel.add(btnQuit);
+        add(buttonPanel, BorderLayout.PAGE_END);
                 
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 	    
