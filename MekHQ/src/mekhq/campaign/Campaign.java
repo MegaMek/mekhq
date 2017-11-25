@@ -7178,14 +7178,12 @@ public class Campaign implements Serializable, ITechManager {
         String searchCat_Role = Person.getRoleDesc(p.getPrimaryRole(), false) + "/";
         String searchCat_RoleGroup = "";
         String searchCat_CombatSupport = "";
-//        if (searchCat_Role.startsWith("Admin/")) {
         if (p.getPrimaryRole() == Person.T_ADMIN_COM
                 || p.getPrimaryRole() == Person.T_ADMIN_HR
                 || p.getPrimaryRole() == Person.T_ADMIN_LOG
                 || p.getPrimaryRole() == Person.T_ADMIN_TRA) {
             searchCat_RoleGroup = "Admin/";
         }
-        //if (searchCat_Role.endsWith("Tech/") || searchCat_Role.equals("Mechanic/")) {
         if (p.getPrimaryRole() == Person.T_MECHANIC
                 || p.getPrimaryRole() == Person.T_AERO_TECH
                 || p.getPrimaryRole() == Person.T_MECH_TECH
