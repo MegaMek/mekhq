@@ -2331,7 +2331,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         }
 
         public void setHomeEdge(int i) {
-            behaviorSettings.setHomeEdge(findHomeEdge(1));
+            behaviorSettings.setHomeEdge(findHomeEdge(i));
         }
 
         public void writeToXml(PrintWriter pw1, int indent) {
