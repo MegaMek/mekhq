@@ -647,7 +647,7 @@ public class CampaignOpsReputationTest {
         bayList.add(transportBay);
         transportBay = new LightVehicleBay(22, 0, 3);
         bayList.add(transportBay);
-        transportBay = new InfantryBay(4.0, 0, 4);
+        transportBay = new InfantryBay(4.0, 0, 4, InfantryBay.PlatoonType.FOOT);
         bayList.add(transportBay);
         when(mockSeeker.getTransportBays()).thenReturn(bayList);
         crew = new ArrayList<>(20);

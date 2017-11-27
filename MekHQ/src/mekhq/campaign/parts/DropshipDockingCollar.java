@@ -29,7 +29,6 @@ import org.w3c.dom.NodeList;
 import megamek.common.Compute;
 import megamek.common.Dropship;
 import megamek.common.Entity;
-import megamek.common.EquipmentType;
 import megamek.common.SimpleTechLevel;
 import megamek.common.TechAdvancement;
 import mekhq.MekHqXmlUtil;
@@ -58,35 +57,48 @@ public class DropshipDockingCollar extends Part {
             .setAvailability(RATING_C, RATING_X, RATING_X, RATING_X)
             .setStaticTechLevel(SimpleTechLevel.ADVANCED);
     
-    // We don't currently distinguish between primitve and standard docking collars in MM.
-    private boolean hasKFBoom = true;
+    private int collarType = Dropship.COLLAR_STANDARD;
+    private boolean boomDamaged = false;
 	
 	public DropshipDockingCollar() {
-    	this(0, null, true);
+    	this(0, null, Dropship.COLLAR_STANDARD);
     }
     
-    public DropshipDockingCollar(int tonnage, Campaign c, boolean hasKFBoom) {
+    public DropshipDockingCollar(int tonnage, Campaign c, int collarType) {
         super(tonnage, c);
         this.name = "Dropship Docking Collar";
+        if (collarType == Dropship.COLLAR_NO_BOOM) {
+            name += " (No Boom)";
+        } else if (collarType == Dropship.COLLAR_PROTOTYPE) {
+            name += " (Prototype)";
+        }
     }
     
     public DropshipDockingCollar clone() {
-    	DropshipDockingCollar clone = new DropshipDockingCollar(getUnitTonnage(), campaign, hasKFBoom);
+    	DropshipDockingCollar clone = new DropshipDockingCollar(getUnitTonnage(), campaign, collarType);
         clone.copyBaseData(this);
+        clone.boomDamaged = boomDamaged;
     	return clone;
+    }
+    
+    public int getCollarType() {
+        return collarType;
     }
         
 	@Override
 	public void updateConditionFromEntity(boolean checkForDestruction) {
 		int priorHits = hits;
+		boolean priorBoomDamage = boomDamaged;
 		if(null != unit && unit.getEntity() instanceof Dropship) {
 			 if(((Dropship)unit.getEntity()).isDockCollarDamaged()) {
 				 hits = 1;
 			 } else { 
 				 hits = 0;
 			 }
+			 boomDamaged = ((Dropship) unit.getEntity()).isKFBoomDamaged();
 			 if(checkForDestruction 
-					 && hits > priorHits 
+					 && ((hits > priorHits)
+					         || (boomDamaged && !priorBoomDamage))
 					 && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
 				 remove(false);
 				 return;
@@ -113,27 +125,26 @@ public class DropshipDockingCollar extends Part {
 	@Override
 	public void updateConditionFromPart() {
 		if(null != unit && unit.getEntity() instanceof Dropship) {
-			if(hits > 0) {
-				((Dropship)unit.getEntity()).setDamageDockCollar(true);
-			} else {
-				((Dropship)unit.getEntity()).setDamageDockCollar(false);
-			}
+            ((Dropship) unit.getEntity()).setDamageDockCollar(hits > 0);
+            ((Dropship) unit.getEntity()).setDamageKFBoom(boomDamaged);
 		}
-		
 	}
 
 	@Override
 	public void fix() {
 		super.fix();
+		boomDamaged = false;
 		if(null != unit && unit.getEntity() instanceof Dropship) {
 			((Dropship)unit.getEntity()).setDamageDockCollar(false);
+            ((Dropship)unit.getEntity()).setDamageKFBoom(false);
 		}
 	}
 
 	@Override
 	public void remove(boolean salvage) {
 		if(null != unit && unit.getEntity() instanceof Dropship) {
-			((Dropship)unit.getEntity()).setDamageDockCollar(true);
+            ((Dropship)unit.getEntity()).setDamageDockCollar(true);
+            ((Dropship)unit.getEntity()).setDamageKFBoom(true);
 			Part spare = campaign.checkForExistingSparePart(this);
 			if(!salvage) {
 				campaign.removePart(this);
@@ -152,7 +163,7 @@ public class DropshipDockingCollar extends Part {
 
 	@Override
 	public MissingPart getMissingPart() {
-		return new MissingDropshipDockingCollar(getUnitTonnage(), campaign, hasKFBoom);
+		return new MissingDropshipDockingCollar(getUnitTonnage(), campaign, collarType);
 	}
 
 	@Override
@@ -162,12 +173,18 @@ public class DropshipDockingCollar extends Part {
 
 	@Override
 	public boolean needsFixing() {
-		return hits > 0;
+		return (hits > 0) || boomDamaged;
 	}
 
 	@Override
 	public long getStickerPrice() {
-		return 10000;
+	    if (collarType == Dropship.COLLAR_STANDARD) {
+	        return 10000;
+	    } else if (collarType == Dropship.COLLAR_PROTOTYPE) {
+	        return 1010000;
+	    } else {
+	        return 0;
+	    }
 	}
 	
 	@Override
@@ -176,20 +193,16 @@ public class DropshipDockingCollar extends Part {
 	}
 
 	@Override
-	public int getTechRating() {
-		return EquipmentType.RATING_C;
-	}
-
-	@Override
 	public boolean isSamePartType(Part part) {
 		return (part instanceof DropshipDockingCollar)
-		        && (hasKFBoom == ((DropshipDockingCollar)part).hasKFBoom);
+		        && (collarType == ((DropshipDockingCollar)part).collarType);
 	}
 	
 	@Override
 	public void writeToXml(PrintWriter pw1, int indent) {
 		writeToXmlBegin(pw1, indent);
-		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "hasKFBoom", hasKFBoom);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "collarType", collarType);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "boomDamaged", boomDamaged);
 		writeToXmlEnd(pw1, indent);
 	}
 
@@ -199,8 +212,10 @@ public class DropshipDockingCollar extends Part {
 
         for (int x=0; x<nl.getLength(); x++) {
             Node wn2 = nl.item(x);
-            if (wn2.getNodeName().equalsIgnoreCase("hasKFBoom")) {
-                hasKFBoom = Boolean.parseBoolean(wn2.getTextContent());
+            if (wn2.getNodeName().equalsIgnoreCase("collarType")) {
+                collarType = Integer.parseInt(wn2.getTextContent());
+            } else if (wn2.getNodeName().equalsIgnoreCase("boomDamaged")) {
+                boomDamaged = Boolean.parseBoolean(wn2.getTextContent());
             }
         }
 	}
@@ -223,7 +238,11 @@ public class DropshipDockingCollar extends Part {
 	
 	@Override
 	public TechAdvancement getTechAdvancement() {
-	    return hasKFBoom? TA_BOOM : TA_NO_BOOM;
+	    if (collarType != Dropship.COLLAR_NO_BOOM) {
+	        return TA_BOOM;
+	    } else {
+	        return TA_NO_BOOM;
+	    }
 	}
 	
 }

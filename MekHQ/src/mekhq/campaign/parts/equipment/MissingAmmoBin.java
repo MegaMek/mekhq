@@ -56,7 +56,7 @@ public class MissingAmmoBin extends MissingEquipmentPart {
         	this.name += " Bin";
         }
     }
-	
+    
     /* Per TM, ammo for fighters is stored in the fuselage. This makes a difference for omnifighter
      * pod space, so we're going to stick them in LOC_NONE where the heat sinks are */ 
     @Override
@@ -117,7 +117,8 @@ public class MissingAmmoBin extends MissingEquipmentPart {
 	
 	@Override
 	public boolean isAcceptableReplacement(Part part, boolean refit) {
-		if(part instanceof AmmoBin) {
+		if ((part instanceof AmmoBin)
+		        && !(part instanceof LargeCraftAmmoBin)) {
 			EquipmentPart eqpart = (EquipmentPart)part;
 			EquipmentType et = eqpart.getType();
 			return type.equals(et) && ((AmmoBin)part).getFullShots() == getFullShots();

@@ -129,15 +129,15 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     public double getTonnage() {
     	return (1.0 * getFullShots())/((AmmoType)type).getShots();
     }
-
+    
     public int getFullShots() {
-    	int fullShots = ((AmmoType)type).getShots();
-    	if(unit != null) {
-			Mounted m = unit.getEntity().getEquipment(equipmentNum);
+        int fullShots = ((AmmoType)type).getShots();
+        if(unit != null) {
+            Mounted m = unit.getEntity().getEquipment(equipmentNum);
             if(null != m && m.getOriginalShots() > 0) {
                 fullShots = m.getOriginalShots();
             }
-		}
+        }
     	if(null != unit && unit.getEntity() instanceof Protomech) {
 	        //if protomechs are using alternate munitions then cut in half
 	        if(((AmmoType)type).getMunitionType() != AmmoType.M_STANDARD) {
@@ -151,16 +151,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     }
     
     protected int getCurrentShots() {
-    	int shots = getFullShots() - shotsNeeded;
-    	//replace with actual entity values if entity not null because the previous number will not
-    	//be correct for ammo swaps
-    	if(null != unit && null != unit.getEntity()) {
-    		Mounted m = unit.getEntity().getEquipment(equipmentNum);
-    		if(null != m) {
-    			shots = m.getBaseShotsLeft();
-    		}
-    	}
-    	return shots;
+    	return getFullShots() - shotsNeeded;
     }
 
     public long getValueNeeded() {
@@ -214,6 +205,16 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     	}
     	updateConditionFromEntity(false);
     }
+    
+    public void changeMunition(EquipmentType type) {
+        if (type instanceof AmmoType) {
+            munition = ((AmmoType) type).getMunitionType();
+            this.type = type;
+            this.name = type.getName();
+            this.typeName = type.getInternalName();
+            updateConditionFromEntity(false);
+        }
+    }
 
 	@Override
 	public void writeToXml(PrintWriter pw1, int indent) {
@@ -242,13 +243,13 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 				+"<checkedToday>"
 				+checkedToday
 				+"</checkedToday>");
-		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<oneShot>"
-				+oneShot
-				+"</oneShot>");
+        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"<oneShot>"
+                +oneShot
+                +"</oneShot>");
 		writeToXmlEnd(pw1, indent);
 	}
-
+	
 	@Override
 	protected void loadFieldsFromXmlNode(Node wn) {
 		super.loadFieldsFromXmlNode(wn);
@@ -277,12 +278,12 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 				} else {
 					checkedToday = false;
 				}
-			} else if (wn2.getNodeName().equalsIgnoreCase("oneShot")) {
-				if(wn2.getTextContent().equalsIgnoreCase("true")) {
-					oneShot = true;
-				} else {
-					oneShot = false;
-				}
+            } else if (wn2.getNodeName().equalsIgnoreCase("oneShot")) {
+                if(wn2.getTextContent().equalsIgnoreCase("true")) {
+                    oneShot = true;
+                } else {
+                    oneShot = false;
+                }
 			}
 		}
 		restore();
@@ -413,11 +414,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 					remove(false);
 					return;
 				}
-				long currentMuniType = 0;
-				if(mounted.getType() instanceof AmmoType) {
-					currentMuniType = ((AmmoType)mounted.getType()).getMunitionType();
-				}
-				if(currentMuniType == getMunitionType()) {
+				if (type == mounted.getType()) {
 					shotsNeeded = getFullShots() - mounted.getBaseShotsLeft();
 					ammoTypeChanged = false;
 				} else {
@@ -483,9 +480,10 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 
 	@Override
 	public boolean isSamePartType(Part part) {
-    	return  part instanceof AmmoBin
-                        && getType().equals( ((AmmoBin)part).getType() )
-                        && ((AmmoBin)part).getFullShots() == getFullShots();
+	    return  (part instanceof AmmoBin)
+	            && !(part instanceof LargeCraftAmmoBin)
+	            && getType().equals( ((AmmoBin)part).getType() )
+	            && ((AmmoBin)part).getFullShots() == getFullShots();
     }
 
 	@Override

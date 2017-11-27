@@ -1481,7 +1481,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
         return imgData;
 	}
 	
-	public abstract TechAdvancement getTechAdvancement();
+	public abstract ITechnology getTechAdvancement();
 
     @Override
     public boolean isClan() {

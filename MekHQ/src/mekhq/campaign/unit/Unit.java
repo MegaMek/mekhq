@@ -30,10 +30,12 @@ import java.util.Calendar;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -45,6 +47,7 @@ import megamek.common.AmmoType;
 import megamek.common.BattleArmor;
 import megamek.common.BattleArmorBay;
 import megamek.common.Bay;
+import megamek.common.BayType;
 import megamek.common.CargoBay;
 import megamek.common.Compute;
 import megamek.common.ConvFighter;
@@ -70,6 +73,7 @@ import megamek.common.LandAirMech;
 import megamek.common.LightVehicleBay;
 import megamek.common.LiquidCargoBay;
 import megamek.common.LivestockCargoBay;
+import megamek.common.LocationFullException;
 import megamek.common.Mech;
 import megamek.common.MechBay;
 import megamek.common.MiscType;
@@ -116,6 +120,8 @@ import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Avionics;
 import mekhq.campaign.parts.BaArmor;
 import mekhq.campaign.parts.BattleArmorSuit;
+import mekhq.campaign.parts.BayDoor;
+import mekhq.campaign.parts.Cubicle;
 import mekhq.campaign.parts.DropshipDockingCollar;
 import mekhq.campaign.parts.EnginePart;
 import mekhq.campaign.parts.FireControlSystem;
@@ -133,6 +139,8 @@ import mekhq.campaign.parts.MissingAeroLifeSupport;
 import mekhq.campaign.parts.MissingAeroSensor;
 import mekhq.campaign.parts.MissingAvionics;
 import mekhq.campaign.parts.MissingBattleArmorSuit;
+import mekhq.campaign.parts.MissingBayDoor;
+import mekhq.campaign.parts.MissingCubicle;
 import mekhq.campaign.parts.MissingDropshipDockingCollar;
 import mekhq.campaign.parts.MissingEnginePart;
 import mekhq.campaign.parts.MissingFireControlSystem;
@@ -172,6 +180,7 @@ import mekhq.campaign.parts.SpacecraftEngine;
 import mekhq.campaign.parts.StructuralIntegrity;
 import mekhq.campaign.parts.TankLocation;
 import mekhq.campaign.parts.Thrusters;
+import mekhq.campaign.parts.TransportBayPart;
 import mekhq.campaign.parts.Turret;
 import mekhq.campaign.parts.TurretLock;
 import mekhq.campaign.parts.VeeSensor;
@@ -183,6 +192,7 @@ import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.HeatSink;
 import mekhq.campaign.parts.equipment.InfantryWeaponPart;
 import mekhq.campaign.parts.equipment.JumpJet;
+import mekhq.campaign.parts.equipment.LargeCraftAmmoBin;
 import mekhq.campaign.parts.equipment.MASC;
 import mekhq.campaign.parts.equipment.MissingAmmoBin;
 import mekhq.campaign.parts.equipment.MissingBattleArmorEquipmentPart;
@@ -1770,6 +1780,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         ArrayList<Part> protoJumpJets = new ArrayList<Part>();
         Part aeroThrustersLeft = null;
         Part aeroThrustersRight = null;
+        Map<Integer, Part> bays = new HashMap<>();
+        Map<Integer, List<Part>> bayPartsToAdd = new HashMap<>();
 
         for(Part part : parts) {
             if(part instanceof MekGyro || part instanceof MissingMekGyro) {
@@ -1978,6 +1990,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 } else {
                     aeroThrustersRight = ((Thrusters) part);
                 }
+            } else if (part instanceof TransportBayPart) {
+                bays.put(((TransportBayPart) part).getBayNumber(), part);
             }
 
             part.updateConditionFromPart();
@@ -2109,6 +2123,10 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 if(null == apart) {
                     if(entity instanceof BattleArmor) {
                         apart = new BattleArmorAmmoBin((int)entity.getWeight(), m.getType(), eqnum, ((BattleArmor)entity).getSquadSize() * (fullShots - m.getBaseShotsLeft()), oneShot, campaign);
+                    } else if (entity.usesWeaponBays()) {
+                        apart = new LargeCraftAmmoBin((int) entity.getWeight(), m.getType(), eqnum,
+                                fullShots - m.getBaseShotsLeft(), m.getAmmoCapacity(), campaign);
+                        ((LargeCraftAmmoBin) apart).setBay(entity.getBayByAmmo(m));
                     } else {
                         apart = new AmmoBin((int)entity.getWeight(), m.getType(), eqnum,
                                 fullShots - m.getBaseShotsLeft(), oneShot, m.isOmniPodMounted(), campaign);
@@ -2182,7 +2200,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 }
             }
         }
-
+        
         if((null == engine) && !(entity instanceof Infantry) && !(entity instanceof FighterSquadron)) {
             if(entity instanceof SmallCraft || entity instanceof Jumpship) {
                 engine = new SpacecraftEngine((int) entity.getWeight(), 0, campaign, entity.isClan());
@@ -2195,6 +2213,60 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 partsToAdd.add(engine);
             }
         }
+        
+        for (Bay bay : entity.getTransportBays()) {
+            bayPartsToAdd.put(bay.getBayNumber(), new ArrayList<>());
+            BayType btype = BayType.getTypeForBay(bay);
+            Part bayPart = bays.get(bay.getBayNumber());
+            if (null == bayPart) {
+                bayPart = new TransportBayPart((int) entity.getWeight(),
+                        bay.getBayNumber(), bay.getCapacity(), campaign);
+                addPart(bayPart);
+                partsToAdd.add(bayPart);
+                for (int i = 0; i < bay.getDoors(); i++) {
+                    Part door = new BayDoor((int) entity.getWeight(), campaign);
+                    bayPartsToAdd.get(bay.getBayNumber()).add(door);
+                    addPart(door);
+                    partsToAdd.add(door);
+                }
+                if (btype.getCategory() == BayType.CATEGORY_NON_INFANTRY) {
+                    for (int i = 0; i < bay.getCapacity(); i++) {
+                        Part cubicle = new Cubicle((int) entity.getWeight(), btype, campaign);
+                        bayPartsToAdd.get(bay.getBayNumber()).add(cubicle);
+                        addPart(cubicle);
+                        partsToAdd.add(cubicle);
+                    }
+                }
+            } else {
+                List<Part> doors = bayPart.getChildPartIds().stream()
+                        .map(id -> campaign.getPart(id))
+                        .filter(p -> (null != p) && ((p instanceof BayDoor)
+                                || (p instanceof MissingBayDoor)))
+                        .collect(Collectors.toList());
+                while (bay.getDoors() > doors.size()) {
+                    Part door = new MissingBayDoor((int) entity.getWeight(), campaign);
+                    bayPartsToAdd.get(bay.getBayNumber()).add(door);
+                    addPart(door);
+                    partsToAdd.add(door);
+                    doors.add(door);
+                }
+                if (btype.getCategory() == BayType.CATEGORY_NON_INFANTRY) {
+                    List<Part> cubicles = bayPart.getChildPartIds().stream()
+                            .map(id -> campaign.getPart(id))
+                            .filter(p -> (null != p) && ((p instanceof Cubicle)
+                                    || (p instanceof MissingCubicle)))
+                            .collect(Collectors.toList());
+                    while (bay.getCapacity() > cubicles.size()) {
+                        Part cubicle = new MissingCubicle((int) entity.getWeight(), btype, campaign);
+                        bayPartsToAdd.get(bay.getBayNumber()).add(cubicle);
+                        addPart(cubicle);
+                        partsToAdd.add(cubicle);
+                    }
+                }
+            }
+        }
+
+
         if(entity instanceof Mech) {
             if(null == gyro) {
                 gyro =  new MekGyro((int) entity.getWeight(), entity.getGyroType(), entity.getOriginalWalkMP(), entity.isClan(), campaign);
@@ -2348,7 +2420,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 ((AeroLifeSupport)lifeSupport).calculateCost();
             }
             if(null == dropCollar && entity instanceof Dropship) {
-                dropCollar = new DropshipDockingCollar((int) entity.getWeight(), campaign, true);
+                dropCollar = new DropshipDockingCollar((int) entity.getWeight(), campaign,
+                        ((Dropship) entity).getCollarType());
                 addPart(dropCollar);
                 partsToAdd.add(dropCollar);
             }
@@ -2493,6 +2566,16 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 campaign.addPart(p, 0);
             }
         }
+        // We can't add the child parts to the transport bay part until they have been added to the
+        // campaign and have an id.
+        for (int bayNum : bayPartsToAdd.keySet()) {
+            Optional<Part> bayPart = getParts().stream()
+                    .filter(p -> (p instanceof TransportBayPart) && ((TransportBayPart) p).getBayNumber() == bayNum)
+                    .findAny();
+            if (bayPart.isPresent()) {
+                bayPartsToAdd.get(bayNum).forEach(p -> bayPart.get().addChildPart(p));
+            }
+        }
         if (getEntity().isOmni()) {
             podSpace.clear();
             for (int loc = 0; loc < getEntity().locations(); loc++) {
@@ -2501,7 +2584,80 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             podSpace.forEach(ps -> ps.updateConditionFromEntity(false));
         }
     }
-
+    
+    /**
+     * Checks for additional ammo bins and adds the appropriate part.
+     * 
+     * Large craft can combine all the ammo of a single type into a single bin. Switching the munition type
+     * of one or more tons of ammo can require the addition of an ammo bin and can change the ammo bin
+     * capacity.
+     */
+    public void adjustLargeCraftAmmo() {
+        Map<Integer,Part> ammoParts = new HashMap<>();
+        List<Part> toAdd = new ArrayList<>();
+        for (Part p : parts) {
+            if (p instanceof LargeCraftAmmoBin) {
+                ammoParts.put(((LargeCraftAmmoBin) p).getEquipmentNum(), p);
+            }
+        }
+        for (Mounted m : entity.getAmmo()) {
+            Integer eqNum = entity.getEquipmentNum(m);
+            Part part = ammoParts.get(eqNum);
+            if (null == part) {
+                part = new LargeCraftAmmoBin((int)entity.getWeight(), m.getType(), eqNum,
+                        m.getOriginalShots() - m.getBaseShotsLeft(), m.getAmmoCapacity(), campaign);
+                ((LargeCraftAmmoBin) part).setBay(entity.getBayByAmmo(m));
+                toAdd.add(part);
+            } else {
+                part.updateConditionFromEntity(false);
+                // Reset the name
+                ((LargeCraftAmmoBin) part).changeMunition(m.getType());
+            }
+        }
+        for (Part p : toAdd) {
+            addPart(p);
+            campaign.addPart(p, 0);
+        }
+    }
+    
+    /**
+     * Adds a new zero-capacity ammo bin to the bay as part of an ammo swap. If the bay has a zeroed-out
+     * bin, sets the ammo type on that one and returns it instead of creating a new one.
+     * 
+     * @param etype The type of ammo being changed to
+     * @param bay   The weapon bay where the ammo is located
+     * @return      The new ammo bin part
+     */
+    public LargeCraftAmmoBin addBayAmmoBin(EquipmentType etype, Mounted bay) {
+        for (Part p : getParts()) {
+            if (p instanceof LargeCraftAmmoBin) {
+                final LargeCraftAmmoBin bin = (LargeCraftAmmoBin) p;
+                if ((bin.getCapacity() == 0) && (bin.getBay() == bay)) {
+                    bin.changeMunition(etype);
+                    bin.updateConditionFromPart();
+                    return bin;
+                }
+            }
+        }
+        try {
+            Mounted m = entity.addEquipment(etype, bay.getLocation(), bay.isRearMounted(), 0);
+            int anum = entity.getEquipmentNum(m);
+            bay.addAmmoToBay(anum);
+            LargeCraftAmmoBin bin = new LargeCraftAmmoBin((int) entity.getWeight(), etype, anum,
+                    0, 0, campaign);
+            addPart(bin);
+            campaign.addPart(bin, 0);
+            return bin;
+        } catch (LocationFullException ex) {
+            MekHQ.getLogger().log(Unit.class, "addBayAmmoBin(EquipmentType, Mounted)",
+                    LogLevel.ERROR, "Location full exception attempting to add " + etype.getDesc()
+                    + " to unit " + getName());
+            MekHQ.getLogger().log(Unit.class, "addBayAmmoBin(EquipmentType, Mounted)", ex);
+            return null;
+        }
+        
+    }
+    
     public ArrayList<Part> getParts() {
         return parts;
     }

@@ -1204,6 +1204,9 @@ public class ResolveScenarioTracker {
                     ((IAero)en).setFuelTonnage(((IAero)ustatus.getBaseEntity()).getFuelTonnage());
                 }
                 unit.setEntity(en);
+                if (en.usesWeaponBays()) {
+                    unit.adjustLargeCraftAmmo();
+                }
                 unit.runDiagnostic(true);
                 unit.resetPilotAndEntity();
                 if(!unit.isRepairable()) {

@@ -21,10 +21,12 @@ import javax.swing.JTable;
 import javax.swing.event.MouseInputAdapter;
 
 import megamek.client.ui.swing.UnitEditorDialog;
+import megamek.common.Aero;
 import megamek.common.AmmoType;
 import megamek.common.BattleArmor;
 import megamek.common.CriticalSlot;
 import megamek.common.Entity;
+import megamek.common.EquipmentType;
 import megamek.common.IBomber;
 import megamek.common.Infantry;
 import megamek.common.Mech;
@@ -50,6 +52,7 @@ import mekhq.gui.MekLabTab;
 import mekhq.gui.dialog.BombsDialog;
 import mekhq.gui.dialog.CamoChoiceDialog;
 import mekhq.gui.dialog.ChooseRefitDialog;
+import mekhq.gui.dialog.LargeCraftAmmoSwapDialog;
 import mekhq.gui.dialog.QuirksDialog;
 import mekhq.gui.dialog.TextAreaDialog;
 import mekhq.gui.model.UnitTableModel;
@@ -188,17 +191,22 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                     gui.getCampaign().removeUnit(unit.getId());
                 }
             }
+        } else if (command.contains("LC_SWAP_AMMO")) {
+            LargeCraftAmmoSwapDialog dialog = new LargeCraftAmmoSwapDialog(gui.getFrame(), selectedUnit);
+            dialog.setVisible(true);
+            if (!dialog.wasCanceled()) {
+                MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
+            }
         } else if (command.contains("SWAP_AMMO")) {
-            String sel = command.split(":")[1];
-            int selAmmoId = Integer.parseInt(sel);
+            String[] fields = command.split(":");
+            int selAmmoId = Integer.parseInt(fields[1]);
             Part part = gui.getCampaign().getPart(selAmmoId);
             if (null == part || !(part instanceof AmmoBin)) {
                 return;
             }
             AmmoBin ammo = (AmmoBin) part;
-            sel = command.split(":")[2];
-            long munition = Long.parseLong(sel);
-            ammo.changeMunition(munition);
+            AmmoType atype = (AmmoType) EquipmentType.get(fields[2]);
+            ammo.changeMunition(atype);
             MekHQ.triggerEvent(new UnitChangedEvent(part.getUnit()));
         } else if (command.contains("CHANGE_SITE")) {
             for (Unit unit : units) {
@@ -586,35 +594,42 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
 
             // swap ammo
             if (oneSelected) {
-                menu = new JMenu("Swap ammo");
-                JMenu ammoMenu = null;
-                for (AmmoBin ammo : unit.getWorkingAmmoBins()) {
-                    ammoMenu = new JMenu(ammo.getType().getDesc());
-                    AmmoType curType = (AmmoType) ammo.getType();
-                    for (AmmoType atype : Utilities.getMunitionsFor(unit
-                            .getEntity(), curType, gui.getCampaign()
-                            .getCampaignOptions().getTechLevel())) {
-                        cbMenuItem = new JCheckBoxMenuItem(atype.getDesc());
-                        if (atype.equals(curType) && atype.getMunitionType() == curType.getMunitionType()) {
-                            cbMenuItem.setSelected(true);
-                        } else {
-                            cbMenuItem.setActionCommand("SWAP_AMMO:"
-                                    + ammo.getId() + ":"
-                                    + atype.getMunitionType());
-                            cbMenuItem.addActionListener(this);
+                if (unit.getEntity().usesWeaponBays()) {
+                    menuItem = new JMenuItem("Swap ammo...");
+                    menuItem.setActionCommand("LC_SWAP_AMMO");
+                    menuItem.addActionListener(this);
+                    popup.add(menuItem);
+                } else {
+                    menu = new JMenu("Swap ammo");
+                    JMenu ammoMenu = null;
+                    for (AmmoBin ammo : unit.getWorkingAmmoBins()) {
+                        ammoMenu = new JMenu(ammo.getType().getDesc());
+                        AmmoType curType = (AmmoType) ammo.getType();
+                        for (AmmoType atype : Utilities.getMunitionsFor(unit
+                                .getEntity(), curType, gui.getCampaign()
+                                .getCampaignOptions().getTechLevel())) {
+                            cbMenuItem = new JCheckBoxMenuItem(atype.getDesc());
+                            if (atype == curType) {
+                                cbMenuItem.setSelected(true);
+                            } else {
+                                cbMenuItem.setActionCommand("SWAP_AMMO:"
+                                        + ammo.getId() + ":"
+                                        + atype.getInternalName());
+                                cbMenuItem.addActionListener(this);
+                            }
+                            ammoMenu.add(cbMenuItem);
                         }
-                        ammoMenu.add(cbMenuItem);
+                        if (ammoMenu.getItemCount() > 20) {
+                            MenuScroller.setScrollerFor(ammoMenu, 20);
+                        }
+                        menu.add(ammoMenu);
                     }
-                    if (ammoMenu.getItemCount() > 20) {
-                        MenuScroller.setScrollerFor(ammoMenu, 20);
+                    menu.setEnabled(unit.isAvailable());
+                    if (menu.getItemCount() > 20) {
+                        MenuScroller.setScrollerFor(menu, 20);
                     }
-                    menu.add(ammoMenu);
+                    popup.add(menu);
                 }
-                menu.setEnabled(unit.isAvailable());
-                if (menu.getItemCount() > 20) {
-                    MenuScroller.setScrollerFor(menu, 20);
-                }
-                popup.add(menu);
             }
             // Select bombs.
             if (oneSelected && (unit.getEntity().isBomber())) {
@@ -766,7 +781,6 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
 	                menuItem.setEnabled(unit.isAvailable()
 	                        && ((unit.getEntity().getEntityType() &
 	                                (Entity.ETYPE_FIXED_WING_SUPPORT
-	                                        | Entity.ETYPE_SMALL_CRAFT
 	                                        | Entity.ETYPE_JUMPSHIP
 	                                        | Entity.ETYPE_SUPPORT_TANK
 	                                        | Entity.ETYPE_SUPPORT_VTOL
