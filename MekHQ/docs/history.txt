@@ -25,6 +25,8 @@ v0.43.5-git
 + Issue #510: Ratings calculations no longer count dead/retired/missing personnel for support requirements
 + Issue #519: Dragoons rating renamed unit rating
 + Data: New Loading Screens.
++ Customize Small Craft and Dropships in MekLab.
++ Track aerospace bays and doors as repairable parts.
 
 v0.43.4 (2017-10-01 11:00 UTC)
 + Updating the repo with 0.43.3 Data
