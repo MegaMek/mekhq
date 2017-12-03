@@ -1455,6 +1455,10 @@ public class ResolveScenarioTracker {
             return forceDead || (hits >= 6);
         }
         
+        public boolean isForceDead() {
+            return forceDead;
+        }
+
         public void setDead(boolean dead) {
             this.forceDead = dead;
         }

@@ -135,6 +135,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
      * Pilot status panel components
      */
     private ArrayList<JCheckBox> miaBtns = new ArrayList<JCheckBox>();
+    private ArrayList<JCheckBox> forceDeadBtns = new ArrayList<JCheckBox>();
     private ArrayList<JSlider> hitSliders = new ArrayList<JSlider>();
     private ArrayList<PersonStatus> pstatuses = new ArrayList<PersonStatus>();
 
@@ -388,8 +389,16 @@ public class ResolveScenarioWizardDialog extends JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new Insets(5, 5, 0, 0);
         pnlPilotStatus.add(new JLabel(resourceMap.getString("mia")), gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5, 5, 0, 0);
+        pnlPilotStatus.add(new JLabel(resourceMap.getString("forceDead")), gridBagConstraints);
         i = 2;
         JCheckBox miaCheck;
+        JCheckBox forceDeadCheck;
         JSlider hitSlider;
         Hashtable<Integer, JLabel> labelTable = new Hashtable<Integer, JLabel>();
         labelTable.put( new Integer( 0 ), new JLabel("0") );
@@ -406,6 +415,8 @@ public class ResolveScenarioWizardDialog extends JDialog {
             nameLbl = new JLabel("<html>" + status.getName() + "<br><i> " + status.getUnitName() + "</i></html>");
             miaCheck = new JCheckBox("");
             miaBtns.add(miaCheck);
+            forceDeadCheck = new JCheckBox("");
+            forceDeadBtns.add(forceDeadCheck);
             hitSlider = new JSlider(JSlider.HORIZONTAL, 0, 6, status.getHits());
             hitSlider.setMajorTickSpacing(1);
             hitSlider.setPaintTicks(true);
@@ -415,6 +426,9 @@ public class ResolveScenarioWizardDialog extends JDialog {
             hitSliders.add(hitSlider);
             if(status.isMissing()) {
                 miaCheck.setSelected(true);
+            }
+            if(status.isForceDead()) {
+                forceDeadCheck.setSelected(true);
             }
             gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 0;
@@ -430,8 +444,10 @@ public class ResolveScenarioWizardDialog extends JDialog {
             gridBagConstraints.gridx = 1;
             pnlPilotStatus.add(hitSlider, gridBagConstraints);
             gridBagConstraints.gridx = 2;
-            gridBagConstraints.weightx = 1.0;
             pnlPilotStatus.add(miaCheck, gridBagConstraints);
+            gridBagConstraints.gridx = 3;
+            gridBagConstraints.weightx = 1.0;
+            pnlPilotStatus.add(forceDeadCheck, gridBagConstraints);
             i++;
         }
         pnlMain.add(pnlPilotStatus, PILOTPANEL);
@@ -465,6 +481,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
             prstatuses.add(status);
             nameLbl = new JLabel("<html>" + status.getName() + "<br><i> " + status.getUnitName() + "</i></html>");
             miaCheck = new JCheckBox("");
+            forceDeadCheck = new JCheckBox("");
             hitSlider = new JSlider(JSlider.HORIZONTAL, 0, 6, status.getHits());
             hitSlider.setMajorTickSpacing(1);
             hitSlider.setPaintTicks(true);
@@ -474,6 +491,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
             hitSlider.setName(Integer.toString(j-1));
             pr_hitSliders.add(hitSlider);
             miaCheck.setSelected(status.isMissing());
+            forceDeadCheck.setSelected(status.isForceDead());
             gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = i;
@@ -1220,6 +1238,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         for(int i = 0; i < pstatuses.size(); i++) {
             PersonStatus status = pstatuses.get(i);
             status.setMissing(miaBtns.get(i).isSelected());
+            status.setDead(forceDeadBtns.get(i).isSelected());
             status.setHits(hitSliders.get(i).getValue());
         }
 
@@ -1364,7 +1383,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         String recoverNames = "";
         for(int i = 0; i < pstatuses.size(); i++) {
     		PersonStatus status = pstatuses.get(i);
-    		if(hitSliders.get(i).getValue() >= 6) {
+    		if(hitSliders.get(i).getValue() >= 6 || forceDeadBtns.get(i).isSelected()) {
     			kiaNames  += status.getName() + "\n";
     		} else if(miaBtns.get(i).isSelected()) {
     			missingNames += status.getName() + "\n";
