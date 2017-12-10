@@ -1197,7 +1197,7 @@ public class MassRepairService {
 
 			if (skill1.getExperienceLevel() == skill2.getExperienceLevel()) {
 				if ((tech1.getXp() == tech2.getXp()) || (skill1.getLevel() == SkillType.EXP_ELITE)) {
-					return tech1.getMinutesLeft() < tech2.getMinutesLeft() ? -1 : 1;
+					return tech1.getMinutesLeft() - tech2.getMinutesLeft();
 				}
 
 				return tech1.getXp() < tech2.getXp() ? -1 : 1;
