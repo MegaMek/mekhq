@@ -22,6 +22,7 @@ package mekhq.gui.dialog;
 import java.awt.BorderLayout;
 import java.awt.Image;
 import java.awt.MediaTracker;
+import java.awt.Rectangle;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -88,8 +89,9 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
         progressBar.setString(resourceMap.getString("loadPlanet.text"));
 
         // initialize loading image
-        double maxWidth = app.calculateMaxScreenWidth();
-        Image imgSplash = getToolkit().getImage(app.getIconPackage().getLoadingScreenImage((int) maxWidth)); //$NON-NLS-1$
+        Rectangle maxWidth_rect = app.calculateMaxScreenWidthRect();
+        Image imgSplash = getToolkit().getImage(app.getIconPackage().getLoadingScreenImage((int) maxWidth_rect.width)).getScaledInstance(maxWidth_rect.width, -1, Image.SCALE_DEFAULT);
+
 
         // wait for loading image to load completely
         MediaTracker tracker = new MediaTracker(frame);
@@ -106,7 +108,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
         getContentPane().add(splash, BorderLayout.CENTER);
         getContentPane().add(progressBar, BorderLayout.PAGE_END);
 
-        setSize(imgSplash.getWidth(null), imgSplash.getHeight(null));
+        setSize(maxWidth_rect.width, maxWidth_rect.height);
         this.setLocationRelativeTo(frame);
 
         task = new Task();
