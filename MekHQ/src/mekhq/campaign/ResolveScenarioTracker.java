@@ -1403,7 +1403,7 @@ public class ResolveScenarioTracker {
         private boolean pickedUp;
         private UUID personId;
         private boolean deployed;
-        private boolean forceDead;
+        private boolean dead;
 
         public PersonStatus(String n, String u, int h, UUID id) {
             name = n;
@@ -1416,7 +1416,7 @@ public class ResolveScenarioTracker {
             pickedUp = false;
             personId = id;
             deployed = true;
-            forceDead = false;
+            dead = false;
         }
 
         public UUID getId() {
@@ -1449,14 +1449,19 @@ public class ResolveScenarioTracker {
 
         public void setHits(int h) {
             hits = h;
+            if (hits >= 6) {
+                setDead(true);
+            } else {
+                setDead(false);
+            }
         }
 
         public boolean isDead() {
-            return forceDead || (hits >= 6);
+            return dead || (hits >= 6);
         }
-        
+
         public void setDead(boolean dead) {
-            this.forceDead = dead;
+            this.dead = dead;
         }
 
         public boolean isMissing() {
