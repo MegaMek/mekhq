@@ -407,7 +407,6 @@ public class ResolveScenarioWizardDialog extends JDialog {
         labelTable.put( new Integer( 3 ), new JLabel("3") );
         labelTable.put( new Integer( 4 ), new JLabel("4") );
         labelTable.put( new Integer( 5 ), new JLabel("5") );
-        // labelTable.put( new Integer( 6 ), new JLabel(resourceMap.getString("dead")) );
         j = 0;
         for(PersonStatus status : tracker.getSortedPeople()) {
         	j++;
