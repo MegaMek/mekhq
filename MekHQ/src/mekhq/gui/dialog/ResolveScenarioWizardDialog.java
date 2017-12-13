@@ -135,6 +135,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
      * Pilot status panel components
      */
     private ArrayList<JCheckBox> miaBtns = new ArrayList<JCheckBox>();
+    private ArrayList<JCheckBox> kiaBtns = new ArrayList<JCheckBox>();
     private ArrayList<JSlider> hitSliders = new ArrayList<JSlider>();
     private ArrayList<PersonStatus> pstatuses = new ArrayList<PersonStatus>();
 
@@ -388,8 +389,16 @@ public class ResolveScenarioWizardDialog extends JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new Insets(5, 5, 0, 0);
         pnlPilotStatus.add(new JLabel(resourceMap.getString("mia")), gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5, 5, 0, 0);
+        pnlPilotStatus.add(new JLabel(resourceMap.getString("kia")), gridBagConstraints);
         i = 2;
         JCheckBox miaCheck;
+        JCheckBox kiaCheck;
         JSlider hitSlider;
         Hashtable<Integer, JLabel> labelTable = new Hashtable<Integer, JLabel>();
         labelTable.put( new Integer( 0 ), new JLabel("0") );
@@ -398,7 +407,6 @@ public class ResolveScenarioWizardDialog extends JDialog {
         labelTable.put( new Integer( 3 ), new JLabel("3") );
         labelTable.put( new Integer( 4 ), new JLabel("4") );
         labelTable.put( new Integer( 5 ), new JLabel("5") );
-        labelTable.put( new Integer( 6 ), new JLabel(resourceMap.getString("dead")) );
         j = 0;
         for(PersonStatus status : tracker.getSortedPeople()) {
         	j++;
@@ -406,7 +414,10 @@ public class ResolveScenarioWizardDialog extends JDialog {
             nameLbl = new JLabel("<html>" + status.getName() + "<br><i> " + status.getUnitName() + "</i></html>");
             miaCheck = new JCheckBox("");
             miaBtns.add(miaCheck);
-            hitSlider = new JSlider(JSlider.HORIZONTAL, 0, 6, status.getHits());
+            kiaCheck = new JCheckBox("");
+            kiaCheck.addItemListener(new CheckBoxKIAListener());
+            kiaBtns.add(kiaCheck);
+            hitSlider = new JSlider(JSlider.HORIZONTAL, 0, 5, status.getHits());
             hitSlider.setMajorTickSpacing(1);
             hitSlider.setPaintTicks(true);
             hitSlider.setLabelTable(labelTable);
@@ -415,6 +426,9 @@ public class ResolveScenarioWizardDialog extends JDialog {
             hitSliders.add(hitSlider);
             if(status.isMissing()) {
                 miaCheck.setSelected(true);
+            }
+            if(status.isDead()) {
+                kiaCheck.setSelected(true);
             }
             gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 0;
@@ -430,8 +444,10 @@ public class ResolveScenarioWizardDialog extends JDialog {
             gridBagConstraints.gridx = 1;
             pnlPilotStatus.add(hitSlider, gridBagConstraints);
             gridBagConstraints.gridx = 2;
-            gridBagConstraints.weightx = 1.0;
             pnlPilotStatus.add(miaCheck, gridBagConstraints);
+            gridBagConstraints.gridx = 3;
+            gridBagConstraints.weightx = 1.0;
+            pnlPilotStatus.add(kiaCheck, gridBagConstraints);
             i++;
         }
         pnlMain.add(pnlPilotStatus, PILOTPANEL);
@@ -465,15 +481,20 @@ public class ResolveScenarioWizardDialog extends JDialog {
             prstatuses.add(status);
             nameLbl = new JLabel("<html>" + status.getName() + "<br><i> " + status.getUnitName() + "</i></html>");
             miaCheck = new JCheckBox("");
-            hitSlider = new JSlider(JSlider.HORIZONTAL, 0, 6, status.getHits());
+            kiaCheck = new JCheckBox("");
+            hitSlider = new JSlider(JSlider.HORIZONTAL, 0, 5, status.getHits());
             hitSlider.setMajorTickSpacing(1);
             hitSlider.setPaintTicks(true);
             hitSlider.setLabelTable(labelTable);
             hitSlider.setPaintLabels(true);
             hitSlider.setSnapToTicks(true);
             hitSlider.setName(Integer.toString(j-1));
+            if (status.getHits() > 5 || status.isDead()) {
+                hitSlider.setEnabled(false);
+            }
             pr_hitSliders.add(hitSlider);
             miaCheck.setSelected(status.isMissing());
+            kiaCheck.setSelected(status.getHits() > 5 || status.isDead());
             gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = i;
@@ -1220,6 +1241,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         for(int i = 0; i < pstatuses.size(); i++) {
             PersonStatus status = pstatuses.get(i);
             status.setMissing(miaBtns.get(i).isSelected());
+            status.setDead(kiaBtns.get(i).isSelected());
             status.setHits(hitSliders.get(i).getValue());
         }
 
@@ -1364,7 +1386,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         String recoverNames = "";
         for(int i = 0; i < pstatuses.size(); i++) {
     		PersonStatus status = pstatuses.get(i);
-    		if(hitSliders.get(i).getValue() >= 6) {
+    		if(hitSliders.get(i).getValue() >= 6 || kiaBtns.get(i).isSelected()) {
     			kiaNames  += status.getName() + "\n";
     		} else if(miaBtns.get(i).isSelected()) {
     			missingNames += status.getName() + "\n";
@@ -1515,6 +1537,24 @@ public class ResolveScenarioWizardDialog extends JDialog {
             	captured.setEnabled(true);
             }
 		}
+    }
+
+    private class CheckBoxKIAListener implements ItemListener {
+
+        @Override
+        public void itemStateChanged(ItemEvent e) {
+            JCheckBox kiaChk = (JCheckBox)e.getSource();
+            int idx = kiaBtns.indexOf(kiaChk);
+            JSlider hitSlider = hitSliders.get(idx);
+            JCheckBox miaChk = miaBtns.get(idx);
+            if (kiaChk.isSelected()) {
+                hitSlider.setEnabled(false);
+                miaChk.setEnabled(false);
+            } else {
+                hitSlider.setEnabled(true);
+                miaChk.setEnabled(true);
+            } 
+        }
     }
 
     private class ViewUnitListener implements ActionListener {
