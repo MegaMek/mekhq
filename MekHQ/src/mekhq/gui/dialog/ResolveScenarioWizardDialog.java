@@ -417,7 +417,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
             kiaCheck = new JCheckBox("");
             kiaCheck.addItemListener(new CheckBoxKIAListener());
             kiaBtns.add(kiaCheck);
-            hitSlider = new JSlider(JSlider.HORIZONTAL, 0, 5, status.getHits());
+            hitSlider = new JSlider(JSlider.HORIZONTAL, 0, 5, Math.min(status.getHits(),5));
             hitSlider.setMajorTickSpacing(1);
             hitSlider.setPaintTicks(true);
             hitSlider.setLabelTable(labelTable);
@@ -1242,14 +1242,17 @@ public class ResolveScenarioWizardDialog extends JDialog {
             PersonStatus status = pstatuses.get(i);
             status.setMissing(miaBtns.get(i).isSelected());
             status.setDead(kiaBtns.get(i).isSelected());
-            status.setHits(hitSliders.get(i).getValue());
+            if (pr_hitSliders.get(i).isEnabled()) {
+                status.setHits(pr_hitSliders.get(i).getValue());
+            }
         }
 
         //now prisoners
         for(int i = 0; i < prstatuses.size(); i++) {
             PrisonerStatus status = prstatuses.get(i);
-            //status.setMissing(pr_miaBtns.get(i).isSelected());
-            status.setHits(pr_hitSliders.get(i).getValue());
+            if (pr_hitSliders.get(i).isEnabled()) {
+                status.setHits(pr_hitSliders.get(i).getValue());
+            }
             status.setCaptured(prisonerBtns.get(i).isSelected());
         }
 
