@@ -1,6 +1,6 @@
 VERSION HISTORY:
 ----------------
-v0.43.5-git
+v0.43.5 (2017-12-17 11:00 UTC)
 + Issue #490: NPE with campaign.universe.RandomFactionGenerator.addBorderEnemy
 + Issue #494: Regenerate LAM Pilot selects from the Mechwarrior pool.
 + Issue #488: Select bombs throws "index out of bounds" errors in particular campaign file
