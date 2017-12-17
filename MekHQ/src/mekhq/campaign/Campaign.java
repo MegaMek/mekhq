@@ -5055,7 +5055,7 @@ public class Campaign implements Serializable, ITechManager {
             	p = null;
             }
             
-            if ((p.getUnitId() != null)
+            if ((null != p) && (p.getUnitId() != null)
                     && ((version.getMinorVersion() < 43)
                             || ((version.getMinorVersion() == 43) && (version.getSnapshot() < 5)))
                     && ((p instanceof AmmoBin) || (p instanceof MissingAmmoBin))) {
