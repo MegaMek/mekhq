@@ -482,7 +482,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
             nameLbl = new JLabel("<html>" + status.getName() + "<br><i> " + status.getUnitName() + "</i></html>");
             miaCheck = new JCheckBox("");
             kiaCheck = new JCheckBox("");
-            hitSlider = new JSlider(JSlider.HORIZONTAL, 0, 5, status.getHits());
+            hitSlider = new JSlider(JSlider.HORIZONTAL, 0, 5, Math.min(status.getHits(),5));
             hitSlider.setMajorTickSpacing(1);
             hitSlider.setPaintTicks(true);
             hitSlider.setLabelTable(labelTable);
