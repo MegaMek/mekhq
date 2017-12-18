@@ -1,6 +1,8 @@
 VERSION HISTORY:
 ----------------
-v0.43.5-git
+v0.43.6
+
+v0.43.5 (2017-12-17 11:00 UTC)
 + Issue #490: NPE with campaign.universe.RandomFactionGenerator.addBorderEnemy
 + Issue #494: Regenerate LAM Pilot selects from the Mechwarrior pool.
 + Issue #488: Select bombs throws "index out of bounds" errors in particular campaign file
@@ -28,7 +30,9 @@ v0.43.5-git
 + Customize Small Craft and Dropships in MekLab.
 + Track aerospace bays and doors as repairable parts.
 + Issue #554: Mass Repair/Salvage Button Broken during active campaign.
-+ Post-battle scenario resolution now features the ability to explicitly declare whether an individual was KIA, replacing the implicit determination from "number of hits". Personnel manually brought back from death will no longer stay dead as a result.
++ Post-battle scenario resolution now features the ability to explicitly declare whether an individual was KIA, 
+	replacing the implicit determination from "number of hits". Personnel manually brought back from death will 
+	no longer stay dead as a result.
 
 v0.43.4 (2017-10-01 11:00 UTC)
 + Updating the repo with 0.43.3 Data
