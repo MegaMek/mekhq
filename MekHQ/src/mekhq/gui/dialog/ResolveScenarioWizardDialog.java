@@ -1242,8 +1242,8 @@ public class ResolveScenarioWizardDialog extends JDialog {
             PersonStatus status = pstatuses.get(i);
             status.setMissing(miaBtns.get(i).isSelected());
             status.setDead(kiaBtns.get(i).isSelected());
-            if (pr_hitSliders.get(i).isEnabled()) {
-                status.setHits(pr_hitSliders.get(i).getValue());
+            if (hitSliders.get(i).isEnabled()) {
+                status.setHits(hitSliders.get(i).getValue());
             }
         }
 
