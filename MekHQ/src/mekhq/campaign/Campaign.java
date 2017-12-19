@@ -5010,9 +5010,16 @@ public class Campaign implements Serializable, ITechManager {
             }
 
             Part p = Part.generateInstanceFromXML(wn2, version);
-
+            
             // deal with the Weapon as Heat Sink problem from earlier versions
             if (p instanceof HeatSink && !p.getName().contains("Heat Sink")) {
+                continue;
+            }
+
+            if (((p instanceof EquipmentPart) && ((EquipmentPart) p).getType() == null)
+                    || ((p instanceof MissingEquipmentPart) && ((MissingEquipmentPart) p).getType() == null)) {
+                MekHQ.getLogger().log(Campaign.class, METHOD_NAME, LogLevel.WARNING,
+                        "Could not find matching EquipmentType for part " + p.getName());
                 continue;
             }
 
