@@ -5061,7 +5061,12 @@ public class Campaign implements Serializable, ITechManager {
                     && ((p instanceof AmmoBin) || (p instanceof MissingAmmoBin))) {
                 Unit u = retVal.getUnit(p.getUnitId());
                 if ((null != u) && (u.getEntity().usesWeaponBays())) {
-                    Mounted ammo = u.getEntity().getEquipment(((AmmoBin) p).getEquipmentNum());
+                    Mounted ammo;
+                    if (p instanceof EquipmentPart) {
+                        ammo = u.getEntity().getEquipment(((EquipmentPart) p).getEquipmentNum());
+                    } else {
+                        ammo = u.getEntity().getEquipment(((MissingEquipmentPart) p).getEquipmentNum());
+                    }
                     if (null != ammo) {
                         if (p instanceof AmmoBin) {
                             p = new LargeCraftAmmoBin(p.getUnitTonnage(),
