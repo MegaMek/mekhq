@@ -5010,9 +5010,16 @@ public class Campaign implements Serializable, ITechManager {
             }
 
             Part p = Part.generateInstanceFromXML(wn2, version);
-
+            
             // deal with the Weapon as Heat Sink problem from earlier versions
             if (p instanceof HeatSink && !p.getName().contains("Heat Sink")) {
+                continue;
+            }
+
+            if (((p instanceof EquipmentPart) && ((EquipmentPart) p).getType() == null)
+                    || ((p instanceof MissingEquipmentPart) && ((MissingEquipmentPart) p).getType() == null)) {
+                MekHQ.getLogger().log(Campaign.class, METHOD_NAME, LogLevel.WARNING,
+                        "Could not find matching EquipmentType for part " + p.getName());
                 continue;
             }
 
@@ -5061,7 +5068,12 @@ public class Campaign implements Serializable, ITechManager {
                     && ((p instanceof AmmoBin) || (p instanceof MissingAmmoBin))) {
                 Unit u = retVal.getUnit(p.getUnitId());
                 if ((null != u) && (u.getEntity().usesWeaponBays())) {
-                    Mounted ammo = u.getEntity().getEquipment(((AmmoBin) p).getEquipmentNum());
+                    Mounted ammo;
+                    if (p instanceof EquipmentPart) {
+                        ammo = u.getEntity().getEquipment(((EquipmentPart) p).getEquipmentNum());
+                    } else {
+                        ammo = u.getEntity().getEquipment(((MissingEquipmentPart) p).getEquipmentNum());
+                    }
                     if (null != ammo) {
                         if (p instanceof AmmoBin) {
                             p = new LargeCraftAmmoBin(p.getUnitTonnage(),

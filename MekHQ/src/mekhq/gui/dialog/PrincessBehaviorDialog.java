@@ -142,7 +142,11 @@ public class PrincessBehaviorDialog extends JDialog implements ActionListener {
     }
 
     private void setPrincessFields() {
-        verbosityCombo.setSelectedIndex(0);
+        if (princessBehavior.getVerbosity() != null) {
+            verbosityCombo.setSelectedItem(princessBehavior.getVerbosity().toString());
+        } else {
+            verbosityCombo.setSelectedIndex(0);
+        }
         forcedWithdrawalCheck.setSelected(princessBehavior.isForcedWithdrawal());
         goHomeCheck.setSelected(princessBehavior.shouldGoHome());
         autoFleeCheck.setSelected(princessBehavior.shouldAutoFlee());
@@ -162,6 +166,10 @@ public class PrincessBehaviorDialog extends JDialog implements ActionListener {
     }
 
     private void getPrincessFields() {
+        LogLevel logLevel = LogLevel.getLogLevel((String) verbosityCombo.getSelectedItem());
+        if (null != logLevel) {
+            princessBehavior.setVerbosity(logLevel);
+        }
     	princessBehavior.setForcedWithdrawal(forcedWithdrawalCheck.isSelected());
     	princessBehavior.setGoHome(goHomeCheck.isSelected());
     	princessBehavior.setAutoFlee(autoFleeCheck.isSelected());

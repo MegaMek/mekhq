@@ -250,7 +250,6 @@ public class LargeCraftAmmoBin extends AmmoBin {
                 type = mounted.getType();
                 if(mounted.isMissing() || mounted.isDestroyed()) {
                     mounted.setShotsLeft(0);
-                    remove(false);
                     return;
                 }
                 shotsNeeded = getFullShots() - mounted.getBaseShotsLeft();

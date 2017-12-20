@@ -469,6 +469,25 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
     }
 
     @Override
+    public void reInitialize() {
+        mechSupportNeeded = 0;
+        tankSupportNeeded = 0;
+        vtolSupportNeeded = 0;
+        baSupportNeeded = 0;
+        convFighterSupportNeeded = 0;
+        aeroFighterSupportNeeded = 0;
+        smallCraftSupportNeeded = 0;
+        medSupportNeeded = 0;
+        adminSupportNeeded = 0;
+        dropJumpShipSupportNeeded = 0;
+        techSupportHours = 0;
+        medSupportHours = 0;
+        adminSupportHours = 0;
+
+        super.reInitialize();
+    }
+
+    @Override
     protected int calculateUnitRatingScore() {
         initValues();
 

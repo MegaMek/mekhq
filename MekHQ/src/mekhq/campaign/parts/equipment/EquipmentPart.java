@@ -252,7 +252,9 @@ public class EquipmentPart extends Part {
 			}
 	        unit.removePart(this);
 	        Part missing = getMissingPart();
-			unit.addPart(missing);
+	        if (null != missing) {
+	            unit.addPart(missing);
+	        }
 			campaign.addPart(missing, 0);
 		}
 		checkWeaponBay();
