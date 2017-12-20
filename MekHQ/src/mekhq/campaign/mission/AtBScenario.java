@@ -2351,6 +2351,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             pw1.println(MekHqXmlUtil.indentStr(indent+1) + "</entities>");
 
             pw1.println(MekHqXmlUtil.indentStr(indent+1) + "<behaviorSettings>");
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+2, "verbosity", behaviorSettings.getVerbosity().toString());
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+2, "forcedWithdrawal", behaviorSettings.isForcedWithdrawal());
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+2, "goHome", behaviorSettings.shouldGoHome());
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+2, "autoFlee", behaviorSettings.shouldAutoFlee());
@@ -2408,7 +2409,9 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                     NodeList nl2 = wn2.getChildNodes();
                     for (int i = 0; i < nl2.getLength(); i++) {
                         Node wn3 = nl2.item(i);
-                        if (wn3.getNodeName().equalsIgnoreCase("forcedWithdrawal")) {
+                        if (wn3.getNodeName().equalsIgnoreCase("verbosity")) {
+                            behaviorSettings.setVerbosity(LogLevel.getLogLevel(wn3.getTextContent()));
+                        } else if (wn3.getNodeName().equalsIgnoreCase("forcedWithdrawal")) {
                             behaviorSettings.setForcedWithdrawal(Boolean.parseBoolean(wn3.getTextContent()));
                         } else if (wn3.getNodeName().equalsIgnoreCase("goHome")) {
                             behaviorSettings.setGoHome(Boolean.parseBoolean(wn3.getTextContent()));
