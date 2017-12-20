@@ -3,6 +3,8 @@ VERSION HISTORY:
 v0.43.6
 + Bug: ClassCastException when loading campaign from earlier versions with large craft with missing ammo bin.
 + Bug: NPE when restoring units with some equipment that has had name changes.
++ Issue #557: Dragoons rating needed support hours no longer grow daily
++ Issue #559, 560: Scenario resolution interface fixes
 + Retain Princess verbosity setting when configuring bot in AtB scenarios.
 
 v0.43.5 (2017-12-17 11:00 UTC)
