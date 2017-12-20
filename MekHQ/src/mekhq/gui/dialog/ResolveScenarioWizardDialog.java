@@ -482,7 +482,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
             nameLbl = new JLabel("<html>" + status.getName() + "<br><i> " + status.getUnitName() + "</i></html>");
             miaCheck = new JCheckBox("");
             kiaCheck = new JCheckBox("");
-            hitSlider = new JSlider(JSlider.HORIZONTAL, 0, 5, status.getHits());
+            hitSlider = new JSlider(JSlider.HORIZONTAL, 0, 5, Math.min(status.getHits(),5));
             hitSlider.setMajorTickSpacing(1);
             hitSlider.setPaintTicks(true);
             hitSlider.setLabelTable(labelTable);
@@ -1242,8 +1242,8 @@ public class ResolveScenarioWizardDialog extends JDialog {
             PersonStatus status = pstatuses.get(i);
             status.setMissing(miaBtns.get(i).isSelected());
             status.setDead(kiaBtns.get(i).isSelected());
-            if (pr_hitSliders.get(i).isEnabled()) {
-                status.setHits(pr_hitSliders.get(i).getValue());
+            if (hitSliders.get(i).isEnabled()) {
+                status.setHits(hitSliders.get(i).getValue());
             }
         }
 
