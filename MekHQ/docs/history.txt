@@ -1,6 +1,7 @@
 VERSION HISTORY:
 ----------------
 v0.43.7-git 
++ Issue #567: BA standard armor cannot be repaired
 
 v0.43.6 (2017-12-22 10:00 UTC)
 + Bug: ClassCastException when loading campaign from earlier versions with large craft with missing ammo bin.
