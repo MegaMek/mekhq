@@ -1984,11 +1984,17 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 protoLegsActuator = part;
             } else if(part instanceof ProtomekJumpJet || part instanceof MissingProtomekJumpJet) {
                 protoJumpJets.add(part);
-            } else if (part instanceof Thrusters || part instanceof MissingThrusters) {
+            } else if (part instanceof Thrusters) {
                 if (((Thrusters) part).isLeftThrusters()) {
-                    aeroThrustersLeft = ((Thrusters) part);
+                    aeroThrustersLeft = part;
                 } else {
-                    aeroThrustersRight = ((Thrusters) part);
+                    aeroThrustersRight = part;
+                }
+            } else if (part instanceof MissingThrusters) {
+                if (((MissingThrusters) part).isLeftThrusters()) {
+                    aeroThrustersLeft = part;
+                } else {
+                    aeroThrustersRight = part;
                 }
             } else if (part instanceof TransportBayPart) {
                 bays.put(((TransportBayPart) part).getBayNumber(), part);
