@@ -9,6 +9,9 @@ import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.time.Duration;
+import java.util.GregorianCalendar;
+import java.util.Calendar;
 import java.util.Collections;
 
 import javax.swing.JButton;
@@ -29,6 +32,7 @@ public class AdvanceDaysDialog extends JDialog implements ActionListener {
     private static final long serialVersionUID = 1L;
     private JSpinner spnDays;
     private JButton btnStart;
+    private JButton btnNextMonth;
     private JLabel lblDays = new JLabel("Days");
     private JPanel pnlNumDays;
     private DailyReportLogPanel logPanel;
@@ -58,7 +62,10 @@ public class AdvanceDaysDialog extends JDialog implements ActionListener {
         pnlNumDays.add(lblDays);
         btnStart = new JButton("Start Advancement");
         btnStart.addActionListener(this);
+        btnNextMonth = new JButton("Advance to Next Month");
+        btnNextMonth.addActionListener(this);
         pnlNumDays.add(btnStart);
+        pnlNumDays.add(btnNextMonth);
         getContentPane().add(pnlNumDays, BorderLayout.NORTH);
 
         logPanel = new DailyReportLogPanel(listener);
@@ -70,10 +77,19 @@ public class AdvanceDaysDialog extends JDialog implements ActionListener {
      */
     @Override
     public void actionPerformed(ActionEvent event) {
-        if (event.getSource().equals(btnStart)) {
+        if (event.getSource().equals(btnStart) || event.getSource().equals(btnNextMonth)) {
+            int days = (int)spnDays.getValue();
             boolean firstDay = true;
             MekHQ.registerHandler(this);
-            for (int numDays = (int)spnDays.getValue(); numDays > 0; numDays--) {
+            if (event.getSource().equals(btnNextMonth)) {
+                //Use java.time to get the number of days to next month.
+                //We already need Java 8 anyway, and this is much easier and more accurate.
+                GregorianCalendar cal = gui.getCampaign().getCalendar();
+                Duration duration = Duration.between(cal.getTime().toInstant(),
+                        new java.util.GregorianCalendar(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH)+1, 1).getTime().toInstant());
+                days = Math.abs((int)duration.toDays());
+            }
+            for (int numDays = days; numDays > 0; numDays--) {
                 spnDays.setValue(numDays);
                 if (gui.getCampaign().checkOverDueLoans()
                         || gui.nagShortMaintenance()
