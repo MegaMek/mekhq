@@ -65,7 +65,6 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 
 	protected long munition;
 	protected int shotsNeeded;
-	private boolean ammoTypeChanged = false;
 	protected boolean checkedToday;
 	protected boolean oneShot;
 
@@ -191,7 +190,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     }
 
     public int getShotsNeeded() {
-        int actualShots = (ammoTypeChanged ? getFullShots() : shotsNeeded);
+        int actualShots = (ammoTypeChanged()? getFullShots() : shotsNeeded);
         return actualShots;
     }
 
@@ -215,6 +214,15 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
             updateConditionFromEntity(false);
         }
     }
+    
+    private boolean ammoTypeChanged() {
+        if (null != unit) {
+            Mounted m = unit.getEntity().getEquipment(equipmentNum);
+            return (m == null)
+                    || (m.getType() != type);
+        }
+        return false;
+    }
 
 	@Override
 	public void writeToXml(PrintWriter pw1, int indent) {
@@ -231,10 +239,6 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 				+"<munition>"
 				+munition
 				+"</munition>");
-		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<ammoTypeChanged>"
-				+ammoTypeChanged
-				+"</ammoTypeChanged>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<shotsNeeded>"
 				+shotsNeeded
@@ -266,12 +270,6 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 				munition = Long.parseLong(wn2.getTextContent());
 			} else if (wn2.getNodeName().equalsIgnoreCase("shotsNeeded")) {
 				shotsNeeded = Integer.parseInt(wn2.getTextContent());
-			} else if (wn2.getNodeName().equalsIgnoreCase("ammoTypeChanged")) {
-				if(wn2.getTextContent().equalsIgnoreCase("true")) {
-					ammoTypeChanged = true;
-				} else {
-					ammoTypeChanged = false;
-				}
 			} else if (wn2.getNodeName().equalsIgnoreCase("checkedToday")) {
 				if(wn2.getTextContent().equalsIgnoreCase("true")) {
 					checkedToday = true;
@@ -326,8 +324,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 		if(null != unit) {
 			Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
 			if(null != mounted && mounted.getType() instanceof AmmoType) {
-				if(mounted.getType().equals(type)
-						&& ((AmmoType)mounted.getType()).getMunitionType() == getMunitionType()) {
+				if (!ammoTypeChanged()) {
 					//just a simple reload
 					mounted.setShotsLeft(mounted.getBaseShotsLeft() + shots);
 				} else {
@@ -335,7 +332,6 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 					unload();
 					mounted.changeAmmoType((AmmoType)type);
 					mounted.setShotsLeft(shots);
-					ammoTypeChanged = false;
 				}
 			}
 		}
@@ -416,13 +412,6 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 				}
 				if (type == mounted.getType()) {
 					shotsNeeded = getFullShots() - mounted.getBaseShotsLeft();
-					ammoTypeChanged = false;
-				} else {
-					ammoTypeChanged = true;
-					//we have a change of munitions
-					//entity will be updated in loadBin when a tech does the task
-					//until then, change no state so that we can switch back for
-					//free
 				}
 			}
 		}
@@ -488,7 +477,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 
 	@Override
 	public boolean needsFixing() {
-		return ammoTypeChanged || shotsNeeded > 0;// && null != unit;
+		return (shotsNeeded > 0) || ammoTypeChanged();
 	}
 
 	public String getDesc() {
