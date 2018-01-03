@@ -92,6 +92,7 @@ import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.equipment.BattleArmorEquipmentPart;
 import mekhq.campaign.parts.equipment.EquipmentPart;
+import mekhq.campaign.parts.equipment.LargeCraftAmmoBin;
 import mekhq.campaign.parts.equipment.MissingAmmoBin;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.personnel.Person;
@@ -1073,8 +1074,10 @@ public class Utilities {
                     if(!(m.getType() instanceof AmmoType)) {
                         continue;
                     }
+                    boolean sameMunition = (((AmmoType)m.getType()).getMunitionType() == bin.getMunitionType())
+                            || (part instanceof LargeCraftAmmoBin);
                     if(m.getType().getInternalName().equals(bin.getType().getInternalName())
-                            && ((AmmoType)m.getType()).getMunitionType() == bin.getMunitionType()
+                            && sameMunition
                             && !m.isDestroyed()
                             && m.getLocation() == bin.getLocation()) {
                         bin.setEquipmentNum(equipNum);
