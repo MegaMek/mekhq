@@ -1512,10 +1512,9 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         if(!aircraft.isEmpty()) {
             /* Must set per-entity start pos for units after start of scenarios. Reinforcements
              * arrive from the enemy home edge, which is not necessarily the start pos. */
-            final int enemyDir = enemyHome;
             final int deployRound = Compute.d6() + 2;   // deploy the new aircraft some time after the start of the game
             aircraft.stream().filter(Objects::nonNull).forEach(en -> {
-                en.setStartingPos(enemyDir);
+                en.setStartingPos(enemyHome);
                 en.setDeployRound(deployRound);
             });
             BotForce bf = getEnemyBotForce(getContract(campaign), enemyHome, enemyHome, aircraft);
@@ -1586,8 +1585,13 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             /* Must set per-entity start pos for units after start of scenarios. Scrubs start in the center of the map. */
             scrubs.stream().filter(Objects::nonNull).forEach(en -> {
                 en.setStartingPos(Board.START_CENTER);
+
+                // if it's a short range enemy unit, it has a chance to be hidden based on difficulty
+                if(en.getMaxWeaponRange() <= 4 && Compute.randomInt(4) <= campaign.getCampaignOptions().getSkillLevel()) {
+                    en.setHidden(true);
+                }
             });
-            BotForce bf = getEnemyBotForce(getContract(campaign), enemyHome, enemyHome, scrubs);
+            BotForce bf = getEnemyBotForce(getContract(campaign), Board.START_CENTER, enemyHome, scrubs);
             bf.setName(bf.getName() + " (Local Forces)");
             addBotForce(bf);
         }
