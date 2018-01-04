@@ -2267,6 +2267,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                         bayPartsToAdd.get(bay.getBayNumber()).add(cubicle);
                         addPart(cubicle);
                         partsToAdd.add(cubicle);
+                        cubicles.add(cubicle);
                     }
                 }
             }

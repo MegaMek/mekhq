@@ -4243,7 +4243,7 @@ public class Campaign implements Serializable, ITechManager {
         for (int x = 0; x < retVal.units.size(); x++) {
             Unit unit = retVal.units.get(x);
             // just in case parts are missing (i.e. because they weren't tracked
-            // in previous versions)
+            // in previous versions)            
             unit.initializeParts(true);
             unit.runDiagnostic(false);
             if (!unit.isRepairable()) {
