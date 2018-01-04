@@ -1585,12 +1585,12 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
         chkUseTransfers = new JCheckBox("Log Saver - Use Reassign instead of Remove/Assign"); // NOI18N
         chkUseTransfers.setSelected(options.useTransfers());
-        gridBagConstraints.gridy++;
+        gridBagConstraints.gridy = 22;
         panPersonnel.add(chkUseTransfers, gridBagConstraints);
 
         chkUseTimeInService = new JCheckBox("Track Time In Service"); // NOI18N
         chkUseTimeInService.setSelected(options.getUseTimeInService());
-        gridBagConstraints.gridy = 22;
+        gridBagConstraints.gridy = 23;
         panPersonnel.add(chkUseTimeInService, gridBagConstraints);
 
         JPanel panSalary = new JPanel(new GridBagLayout());
