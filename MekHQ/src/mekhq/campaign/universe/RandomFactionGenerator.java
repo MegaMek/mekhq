@@ -492,6 +492,12 @@ public class RandomFactionGenerator implements Serializable {
 		}
 		for (Planet planetKey : Planets.getInstance().getNearbyPlanets(p, distance)) {
 			for (Faction f2 : planetKey.getFactionSet(Utilities.getDateTimeDay(lastUpdate))) {
+			    if(f2 == null) {
+			        MekHQ.getLogger().log(this.getClass(), "RandomFactionGenerator.UpdateBorders", 
+			                LogLevel.ERROR, "Invalid faction code in planets.xml: " + f2);
+			        continue;
+			    }
+			    
 				String eName = f2.getShortName();
 				if (eName.equals("ABN") ||
 						eName.equals("UND") ||
