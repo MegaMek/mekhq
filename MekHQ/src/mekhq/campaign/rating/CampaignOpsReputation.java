@@ -1056,9 +1056,7 @@ public class CampaignOpsReputation extends AbstractUnitRating {
     }
 
     private List<String> getCraftWithoutCrew() {
-        List<String> copy = new ArrayList<>(craftWithoutCrew.size());
-        Collections.copy(copy, craftWithoutCrew);
-        return copy;
+        return new ArrayList<>(craftWithoutCrew);
     }
 
     private void addCraftWithoutCrew(Unit u) {
