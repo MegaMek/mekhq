@@ -6,6 +6,7 @@ v0.43.7-git
 + Feature: Advanced time by one month.
 + Issue #583: Ammunition Reload Issues
 + Greater OpFor variety: generated infantry may now be hidden. Odds depend on AtB difficulty setting.
++ Issue #575: Refits do not correctly handle equipment changing location
 
 v0.43.6 (2017-12-22 10:00 UTC)
 + Bug: ClassCastException when loading campaign from earlier versions with large craft with missing ammo bin.
