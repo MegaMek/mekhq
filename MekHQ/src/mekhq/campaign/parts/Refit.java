@@ -1185,14 +1185,17 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 			if(part instanceof Armor) {
 				//get amounts correct for armor
 				part.updateConditionFromEntity(false);
-			} else if (part instanceof AmmoBin) {
-			    ((AmmoBin)part).loadBin();
 			}
 		}
 		oldUnit.setParts(newParts);
 		Utilities.unscrambleEquipmentNumbers(oldUnit);
 		assignArmActuators();
 		assignBayParts();
+		for (Part p : newParts) {
+		    if (p instanceof AmmoBin) {
+		        ((AmmoBin) p).loadBin();
+		    }
+		}
 		if(null != newArmorSupplies) {
 			oldUnit.campaign.removePart(newArmorSupplies);
 		}
