@@ -263,8 +263,8 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 		sameArmorType = newEntity.getArmorType(0) == oldUnit.getEntity().getArmorType(0);
 		int recycledArmorPoints = 0;
 		boolean replacingLocations = false;
-		boolean[] locationHasNewStuff = new boolean[newEntity.locations()];
-		boolean[] locationLostOldStuff = new boolean[newEntity.locations()];
+		boolean[] locationHasNewStuff = new boolean[Math.max(newEntity.locations(), oldUnit.getEntity().locations())];
+		boolean[] locationLostOldStuff = new boolean[Math.max(newEntity.locations(), oldUnit.getEntity().locations())];
 		HashMap<AmmoType,Integer> ammoNeeded = new HashMap<AmmoType,Integer>();
 		HashMap<AmmoType,Integer> ammoRemoved = new HashMap<AmmoType,Integer>();
 		ArrayList<Part> newPartList = new ArrayList<Part>();
@@ -318,6 +318,10 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 							&& (((Armor)oPart).getLocation() != ((Armor)part).getLocation()
 									|| ((Armor)oPart).getTotalAmount() != ((Armor)part).getTotalAmount())) {
 						continue;
+					}
+					if ((oPart instanceof VeeStabiliser)
+					        && (oPart.getLocation() != part.getLocation())) {
+					    continue;
 					}
 					if(part instanceof EquipmentPart) {
 						//check the location to see if this moved. If so, then don't break, but
@@ -1140,7 +1144,13 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 						a.changeType(newArmorSupplies.getType(), newArmorSupplies.isClanTechBase());
 					}
 				}
-				newUnitParts.add(pid);
+				// Removing vehicle turrets or changing BA squad size can reduce the number of armor locations.
+				if (part.getLocation() < newEntity.locations()) {
+				    newUnitParts.add(pid);
+				} else {
+				    part.setUnit(null);
+				    oldUnit.campaign.removePart(part);
+				}
 			}
 			else {
 				if(part instanceof AmmoBin) {
