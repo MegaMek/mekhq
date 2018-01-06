@@ -715,15 +715,26 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 		        || ((newEntity instanceof Aero) && !(newEntity instanceof ConvFighter))) {
 		    Part oldHS = heatSinkPart(oldUnit.getEntity());
 		    Part newHS = heatSinkPart(newEntity);
-		    if (!oldHS.isSamePartType(newHS)) {
-                for (int i = 0; i < untrackedHeatSinkCount(oldUnit.getEntity()); i++) {
+		    int oldCount = untrackedHeatSinkCount(oldUnit.getEntity());
+		    int newCount = untrackedHeatSinkCount(newEntity);
+		    if (oldHS.isSamePartType(newHS)) {
+		        // If the number changes we need to add them to either the warehouse at the end of
+		        // refit or the shopping list at the beginning.
+                for (int i = 0; i < oldCount - newCount; i++) {
                     oldIntegratedHS.add(oldHS.clone());
                 }
-                for (int i = 0; i < untrackedHeatSinkCount(newEntity); i++) {
+                for (int i = 0; i < newCount - oldCount; i++) {
+                    newIntegratedHS.add(oldHS.clone());
+                }
+		    } else {
+                for (int i = 0; i < oldCount; i++) {
+                    oldIntegratedHS.add(oldHS.clone());
+                }
+                for (int i = 0; i < newCount; i++) {
                     newIntegratedHS.add(newHS.clone());
                 }
+                updateRefitClass(CLASS_D);
 		    }
-            updateRefitClass(CLASS_D);
 		} else if ((newEntity instanceof Tank)
 		        || (newEntity instanceof ConvFighter)) {
 		    int oldHS = untrackedHeatSinkCount(oldUnit.getEntity());
@@ -2168,7 +2179,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 	 */
 	private int untrackedHeatSinkCount(Entity entity) {
 	    if (entity instanceof Mech) {
-	        return entity.getEngine().integralHeatSinkCapacity(((Mech) entity).hasCompactHeatSinks());
+	        return Math.min(((Mech) entity).heatSinks(), entity.getEngine().integralHeatSinkCapacity(((Mech) entity).hasCompactHeatSinks()));
 	    } else if ((entity instanceof Aero)
 	            && (entity.getEntityType() & (Entity.ETYPE_CONV_FIGHTER | Entity.ETYPE_SMALL_CRAFT | Entity.ETYPE_JUMPSHIP)) == 0) {
 	        return entity.getEngine().integralHeatSinkCapacity(false);
