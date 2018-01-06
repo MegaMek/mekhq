@@ -82,6 +82,7 @@ import megamek.common.Protomech;
 import megamek.common.SmallCraft;
 import megamek.common.Tank;
 import megamek.common.TechConstants;
+import megamek.common.UnitType;
 import megamek.common.VTOL;
 import megamek.common.logging.LogLevel;
 import megamek.common.options.IOption;
@@ -387,7 +388,8 @@ public class Utilities {
 			// If this isn't the same chassis, is our current unit, or is a different weight we continue
 			if(!en.getChassis().equalsIgnoreCase(summary.getChassis())
 					|| en.getModel().equalsIgnoreCase(summary.getModel())
-					|| summary.getTons() != en.getWeight()) {
+					|| summary.getTons() != en.getWeight()
+			        || !summary.getUnitType().equals(UnitType.determineUnitType(en))) {
 				continue;
 			}
 			// If we only allow canon units and this isn't canon we continue
