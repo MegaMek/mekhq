@@ -2522,14 +2522,14 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     infantryArmor = new EquipmentPart(0, eq, 0, false, campaign);
                 } else {
                     infantryArmor = new InfantryArmorPart(0, campaign, ((Infantry)entity).getDamageDivisor(), ((Infantry)entity).isArmorEncumbering(), ((Infantry)entity).hasDEST(), ((Infantry)entity).hasSneakCamo(), ((Infantry)entity).hasSneakECM(), ((Infantry)entity).hasSneakIR(), ((Infantry)entity).hasSpaceSuit());
-                    if(infantryArmor.getStickerPrice() > 0) {
-                        int number = ((Infantry)entity).getOInternal(Infantry.LOC_INFANTRY);
-                        while(number > 0) {
-                            infantryArmor = new InfantryArmorPart(0, campaign, ((Infantry)entity).getDamageDivisor(), ((Infantry)entity).isArmorEncumbering(), ((Infantry)entity).hasDEST(), ((Infantry)entity).hasSneakCamo(), ((Infantry)entity).hasSneakECM(), ((Infantry)entity).hasSneakIR(), ((Infantry)entity).hasSpaceSuit());
-                            addPart(infantryArmor);
-                            partsToAdd.add(infantryArmor);
-                            number--;
-                        }
+                }
+                if(infantryArmor.getStickerPrice() > 0) {
+                    int number = ((Infantry)entity).getOInternal(Infantry.LOC_INFANTRY);
+                    while(number > 0) {
+                        infantryArmor = new InfantryArmorPart(0, campaign, ((Infantry)entity).getDamageDivisor(), ((Infantry)entity).isArmorEncumbering(), ((Infantry)entity).hasDEST(), ((Infantry)entity).hasSneakCamo(), ((Infantry)entity).hasSneakECM(), ((Infantry)entity).hasSneakIR(), ((Infantry)entity).hasSpaceSuit());
+                        addPart(infantryArmor);
+                        partsToAdd.add(infantryArmor);
+                        number--;
                     }
                 }
             }

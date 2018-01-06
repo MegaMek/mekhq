@@ -10,6 +10,7 @@ v0.43.7-git
 + Issue #46: Locations removed via refit seem to not remove the associated parts
 + Issue #71: Units that finish refitting are often missing ammo and components
 + Issue #114: ASF refit issues
++ Issue #508: Armor kits are free when customizing infantry
 
 v0.43.6 (2017-12-22 10:00 UTC)
 + Bug: ClassCastException when loading campaign from earlier versions with large craft with missing ammo bin.
