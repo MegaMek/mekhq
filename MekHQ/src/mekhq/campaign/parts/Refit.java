@@ -78,8 +78,8 @@ import mekhq.campaign.event.PartChangedEvent;
 import mekhq.campaign.event.UnitRefitEvent;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.equipment.EquipmentPart;
-import mekhq.campaign.parts.equipment.LargeCraftAmmoBin;
 import mekhq.campaign.parts.equipment.HeatSink;
+import mekhq.campaign.parts.equipment.LargeCraftAmmoBin;
 import mekhq.campaign.parts.equipment.MissingAmmoBin;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.personnel.Person;
@@ -847,6 +847,22 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
         }
 		oldUnit.setRefit(this);
 		newEntity.setOwner(oldUnit.getEntity().getOwner());
+		Map<AmmoType,Integer> shotsNeeded = new HashMap<>();
+		for (Iterator<Part> iter = shoppingList.iterator(); iter.hasNext(); ) {
+		    final Part part = iter.next();
+		    if (part instanceof AmmoBin) {
+                part.setRefitId(oldUnit.getId());
+                campaign.addPart(part, 0);
+		        newUnitParts.add(part.getId());
+		        AmmoBin bin = (AmmoBin) part;
+		        bin.setShotsNeeded(bin.getFullShots());
+		        bin.loadBin();
+		        if (bin.getShotsNeeded() > 0) {
+		            shotsNeeded.merge((AmmoType) bin.getType(), bin.getShotsNeeded(), Integer::sum);
+		        }
+		        iter.remove();
+		    }
+		}
 		reserveNewParts();
 		if(customJob) {
 		    //add the stuff on the shopping list to the master shopping list
@@ -904,6 +920,11 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 		    } else {
 		    	oldUnit.campaign.getShoppingList().addShoppingItem(this, 1, oldUnit.campaign);
 		    }
+		}
+		for (AmmoType atype : shotsNeeded.keySet()) {
+		    int tons = (int) Math.ceil((double) shotsNeeded.get(atype) / atype.getShots());
+		    AmmoStorage ammo = new AmmoStorage(0, atype, atype.getShots(), campaign);
+		    campaign.getShoppingList().addShoppingItem(ammo, tons, campaign);
 		}
 
 		if (isRefurbishing) {
