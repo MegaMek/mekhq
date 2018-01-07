@@ -12,6 +12,7 @@ v0.43.7-git
 + Issue #114: ASF refit issues
 + Issue #508: Armor kits are free when customizing infantry
 + Issue #461 Integrated heat sinks not added to refit shopping list
++ Bug: Armor removed in a refit is not the same as armor needed to refit back to original 
 
 v0.43.6 (2017-12-22 10:00 UTC)
 + Bug: ClassCastException when loading campaign from earlier versions with large craft with missing ammo bin.

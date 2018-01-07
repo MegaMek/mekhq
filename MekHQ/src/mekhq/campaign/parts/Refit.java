@@ -1107,7 +1107,6 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 	private void complete() {
         final String METHOD_NAME = "complete()"; //$NON-NLS-1$
 
-        int atype = -1;
 		boolean aclan = false;
 	    oldUnit.setRefit(null);
         Entity oldEntity = oldUnit.getEntity();
@@ -1222,8 +1221,11 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 		}
 		//in some cases we may have had more armor on the original unit and so we may add more
 		//back then we received
+		
+		//FIXME: This doesn't deal properly with patchwork armor.
 		if(sameArmorType && armorNeeded < 0) {
-			Armor a = new Armor(0, atype, -1 * armorNeeded, -1, false, aclan, oldUnit.campaign);
+			Armor a = new Armor(0, oldUnit.getEntity().getArmorType(1),
+			        -1 * armorNeeded, -1, false, aclan, oldUnit.campaign);
 			a.setUnit(oldUnit);
 			a.changeAmountAvailable(a.getAmount());
 		}
