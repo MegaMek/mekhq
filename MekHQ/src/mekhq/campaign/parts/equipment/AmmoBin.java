@@ -507,11 +507,17 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     		String availability = "";
     		int shotsAvailable = getAmountAvailable();
             String[] inventories = campaign.getPartInventory(getNewPart());
+            
+            String orderTransitString = getOrderTransitStringForDetails(inventories);
+            
             if(shotsAvailable == 0) {
-                availability = "<br><font color='red'>No ammo ("+ inventories[1] + " in transit, " + inventories[2] + " on order)</font>";
+                availability = "<br><font color='red'>No ammo " + orderTransitString + "</font>";
             } else if(shotsAvailable < getShotsNeeded()) {
-                availability = "<br><font color='red'>Only " + shotsAvailable + " available ("+ inventories[1] + " in transit, " + inventories[2] + " on order)</font>";
+                availability = "<br><font color='red'>Only " + shotsAvailable + " available" + orderTransitString + "</font>";
+            } else {
+                availability = "<br><font color='green'>" + shotsAvailable + " available " + orderTransitString + "</font>";
             }
+            
             return ((AmmoType)type).getDesc() + ", " + getShotsNeeded() + " shots needed" + availability;
     	} else {
     		return "";

@@ -155,14 +155,18 @@ public class Armor extends Part implements IAcquisitionWork {
 			if(!isSalvaging()) {
 				String availability = "";
 				int amountAvailable = getAmountAvailable();
-				if(!isSalvaging()) {
-				    String[] inventories = campaign.getPartInventory(getNewPart());
-					if(amountAvailable == 0) {
-						availability = "<br><font color='red'>No armor ("+ inventories[1] + " in transit, " + inventories[2] + " on order)</font>";
-					} else if(amountAvailable < amountNeeded) {
-						availability = "<br><font color='red'>Only " + amountAvailable + " available ("+ inventories[1] + " in transit, " + inventories[2] + " on order)</font>";
-					}
-				}
+				String[] inventories = campaign.getPartInventory(getNewPart());
+				
+	            String orderTransitString = getOrderTransitStringForDetails(inventories);
+				
+				if(amountAvailable == 0) {
+					availability = "<br><font color='red'>No armor " + orderTransitString + "</font>";
+				} else if(amountAvailable < amountNeeded) {
+					availability = "<br><font color='red'>Only " + amountAvailable + " available " + orderTransitString + "</font>";
+				} else {
+	                availability = "<br><font color='green'>" + amountAvailable + " available " + orderTransitString + "</font>";
+	            }
+				
 				return unit.getEntity().getLocationName(location) + rearMount + ", " + amountNeeded + " points" + availability;
 			}
 			return unit.getEntity().getLocationName(location) + rearMount + ", " + amount + " points";
