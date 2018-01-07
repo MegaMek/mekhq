@@ -4084,9 +4084,9 @@ public class Campaign implements Serializable, ITechManager {
                 ((MissingEnginePart) prt).fixClanFlag();
             }
             
-            if (version.getMajorVersion() == 0
-                    && version.getMinorVersion() < 44
-                    && version.getSnapshot() < 5) {
+            if ((version.getMajorVersion() == 0)
+                    && ((version.getMinorVersion() < 44)
+                            || ((version.getMinorVersion() == 43) && (version.getSnapshot() < 7)))) {
                 if ((prt instanceof MekLocation)
                         && (((MekLocation)prt).getStructureType() == EquipmentType.T_STRUCTURE_ENDO_STEEL)) {
                     if (null != u) {

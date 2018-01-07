@@ -220,6 +220,10 @@ public class MekLocation extends Part {
 				+"<structureType>"
 				+structureType
 				+"</structureType>");
+        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"<clan>"
+                +clan
+                +"</clan>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<tsm>"
 				+tsm
@@ -258,33 +262,22 @@ public class MekLocation extends Part {
 				loc = Integer.parseInt(wn2.getTextContent());
 			} else if (wn2.getNodeName().equalsIgnoreCase("structureType")) {
 				structureType = Integer.parseInt(wn2.getTextContent());
+            } else if (wn2.getNodeName().equalsIgnoreCase("clan")) {
+                clan = Boolean.parseBoolean(wn2.getTextContent());
 			} else if (wn2.getNodeName().equalsIgnoreCase("percent")) {
 				percent = Double.parseDouble(wn2.getTextContent());
-			} else if (wn2.getNodeName().equalsIgnoreCase("tsm")) {
-				if (wn2.getTextContent().equalsIgnoreCase("true"))
-					tsm = true;
-				else
-					tsm = false;
+            } else if (wn2.getNodeName().equalsIgnoreCase("clan")) {
+                clan = Boolean.parseBoolean(wn2.getTextContent());
+            } else if (wn2.getNodeName().equalsIgnoreCase("tsm")) {
+                tsm = Boolean.parseBoolean(wn2.getTextContent());
 			} else if (wn2.getNodeName().equalsIgnoreCase("forQuad")) {
-				if (wn2.getTextContent().equalsIgnoreCase("true"))
-					forQuad = true;
-				else
-					forQuad = false;
+			    forQuad = Boolean.parseBoolean(wn2.getTextContent());
 			} else if (wn2.getNodeName().equalsIgnoreCase("sensors")) {
-                if (wn2.getTextContent().equalsIgnoreCase("true"))
-                    sensors = true;
-                else
-                    sensors = false;
+			    sensors = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("lifeSupport")) {
-                if (wn2.getTextContent().equalsIgnoreCase("true"))
-                    lifeSupport = true;
-                else
-                    lifeSupport = false;
+                lifeSupport = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("breached")) {
-				if (wn2.getTextContent().equalsIgnoreCase("true"))
-					breached = true;
-				else
-					breached = false;
+                breached = Boolean.parseBoolean(wn2.getTextContent());
 			} 
 		}
 	}
