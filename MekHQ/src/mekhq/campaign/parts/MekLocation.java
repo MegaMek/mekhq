@@ -194,8 +194,10 @@ public class MekLocation extends Part {
                 && ((getStructureType() != EquipmentType.T_STRUCTURE_ENDO_STEEL)
                         || (isClan() == part.isClan()))
                 && (!isArm() || forQuad == ((MekLocation)part).forQuad)
-                && hasSensors() == ((MekLocation)part).hasSensors()
-                && hasLifeSupport() == ((MekLocation)part).hasLifeSupport();
+                // Sensors and life support only matter if we're comparing two parts in the warehouse.
+                && ((getUnit() != null) || (part.getUnit() != null)
+                        || (hasSensors() == ((MekLocation)part).hasSensors()
+                        && hasLifeSupport() == ((MekLocation)part).hasLifeSupport()));
     }
     
     @Override
