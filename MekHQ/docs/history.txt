@@ -13,6 +13,7 @@ v0.43.7-git
 + Issue #508: Armor kits are free when customizing infantry
 + Issue #461 Integrated heat sinks not added to refit shopping list
 + Bug: Armor removed in a refit is not the same as armor needed to refit back to original
++ Feature (Issue #275): Improved visibility for amount of available ammo/armor in repair tab
 + Do not require waiting for a refit kit if the only needed parts are ammo or ammo bins.
 + Not having enough ammo in the warehouse to fill all the bins will not delay the start of a refit. 
 
