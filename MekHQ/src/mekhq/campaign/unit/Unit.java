@@ -2729,49 +2729,44 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         //take first by rank
         //if rank is tied, take gunners over drivers
         //if two of the same type are tie rank, take the first one
-        int bestRank = -1;
         Person commander = null;
-        for(UUID id : vesselCrew) {
+        for (UUID id : vesselCrew) {
             if (id == null) {
                 continue;
             }
             Person p = campaign.getPerson(id);
-            if(null != p && p.getRankNumeric() > bestRank) {
+            if ((null != p) && p.outRanks(commander)){
                 commander = p;
-                bestRank = p.getRankNumeric();
             }
         }
-        for(UUID pid : gunners) {
+        for (UUID pid : gunners) {
             if (pid == null) {
                 continue;
             }
             Person p = campaign.getPerson(pid);
-            if(p != null && entity != null && (entity instanceof Tank || entity instanceof Infantry) && p.getHits() > 0) {
+            if (p != null && entity != null && (entity instanceof Tank || entity instanceof Infantry) && p.getHits() > 0) {
                 continue;
             }
-            if(p.getRankNumeric() > bestRank) {
+            if ((null != p) && p.outRanks(commander)) {
                 commander = p;
-                bestRank = p.getRankNumeric();
             }
         }
-        for(UUID pid : drivers) {
+        for (UUID pid : drivers) {
             if (pid == null) {
                 continue;
             }
             Person p = campaign.getPerson(pid);
-            if(p != null && entity != null && (entity instanceof Tank || entity instanceof Infantry) && p.getHits() > 0) {
+            if (p != null && entity != null && (entity instanceof Tank || entity instanceof Infantry) && p.getHits() > 0) {
                 continue;
             }
-            if(p.getRankNumeric() > bestRank) {
+            if ((null != p) && p.outRanks(commander)) {
                 commander = p;
-                bestRank = p.getRankNumeric();
             }
         }
-        if(navigator != null) {
+        if (navigator != null) {
             Person p = campaign.getPerson(navigator);
-            if(null != p && p.getRankNumeric() > bestRank) {
+            if(null != p && p.outRanks(commander)) {
                 commander = p;
-                bestRank = p.getRankNumeric();
             }
         }
         return commander;

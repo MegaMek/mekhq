@@ -2097,6 +2097,23 @@ public class Person implements Serializable, MekHqXmlSerializable {
 			default: return "";
 		}
 	}
+	
+	/**
+	 * Determines whether this person outranks another, taking into account the seniority rank for
+	 * ComStar and WoB ranks.
+	 * 
+	 * @param other The <code>Person</code> to compare ranks with
+	 * @return      true if <code>other</code> has a lower rank, or if <code>other</code> is null.
+	 */
+	public boolean outRanks(@Nullable Person other) {
+	    if (null == other) {
+	        return true;
+	    }
+	    if (getRankNumeric() == other.getRankNumeric()) {
+	        return getRankLevel() > other.getRankLevel();
+	    }
+	    return getRankNumeric() > other.getRankNumeric();
+	}
 
 	public String getSkillSummary() {
         return SkillType.getExperienceLevelName(getExperienceLevel(false));
