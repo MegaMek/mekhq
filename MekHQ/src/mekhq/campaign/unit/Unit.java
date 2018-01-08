@@ -1984,13 +1984,15 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 protoLegsActuator = part;
             } else if(part instanceof ProtomekJumpJet || part instanceof MissingProtomekJumpJet) {
                 protoJumpJets.add(part);
-            } else if (part instanceof Thrusters) {
+            } else if ((part instanceof Thrusters)
+                    && (entity.isLargeCraft() || entity.hasETypeFlag(Entity.ETYPE_SMALL_CRAFT))) {
                 if (((Thrusters) part).isLeftThrusters()) {
                     aeroThrustersLeft = part;
                 } else {
                     aeroThrustersRight = part;
                 }
-            } else if (part instanceof MissingThrusters) {
+            } else if ((part instanceof MissingThrusters)
+                    && (entity.isLargeCraft() || entity.hasETypeFlag(Entity.ETYPE_SMALL_CRAFT))) {
                 if (((MissingThrusters) part).isLeftThrusters()) {
                     aeroThrustersLeft = part;
                 } else {
@@ -2444,15 +2446,17 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     podhsinks--;
                 }
             }
-            if (aeroThrustersLeft == null) {
-                aeroThrustersLeft = new Thrusters(0, campaign, true);
-                addPart(aeroThrustersLeft);
-                partsToAdd.add(aeroThrustersLeft);
-            }
-            if (aeroThrustersRight == null) {
-                aeroThrustersRight = new Thrusters(0, campaign, false);
-                addPart(aeroThrustersRight);
-                partsToAdd.add(aeroThrustersRight);
+            if (entity.isLargeCraft() || entity.hasETypeFlag(Entity.ETYPE_SMALL_CRAFT)) {
+                if (aeroThrustersLeft == null) {
+                    aeroThrustersLeft = new Thrusters(0, campaign, true);
+                    addPart(aeroThrustersLeft);
+                    partsToAdd.add(aeroThrustersLeft);
+                }
+                if (aeroThrustersRight == null) {
+                    aeroThrustersRight = new Thrusters(0, campaign, false);
+                    addPart(aeroThrustersRight);
+                    partsToAdd.add(aeroThrustersRight);
+                }
             }
          }
         if(entity instanceof Tank) {
