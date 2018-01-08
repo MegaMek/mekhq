@@ -1102,25 +1102,41 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 				continue;
 			}
 			part.setRefitId(null);
-			if(part instanceof Armor) {
-				oldUnit.campaign.removePart(part);
-			}
-			else if(part instanceof AmmoBin) {
-				((AmmoBin) part).unload();
-				oldUnit.campaign.removePart(part);
-			} else {
-				Part spare = oldUnit.campaign.checkForExistingSparePart(part);
-				if(null != spare) {
-					spare.incrementQuantity();
-					oldUnit.campaign.removePart(part);
-				}
+			// If the part was not part of the old unit we need to consolidate it with others of its type
+			// in the warehouse. Ammo Bins just get unloaded and removed; no reason to keep them around.
+			if (part.getUnitId() == null) {
+    			if(part instanceof AmmoBin) {
+    				((AmmoBin) part).unload();
+    				oldUnit.campaign.removePart(part);
+    			} else {
+    				Part spare = oldUnit.campaign.checkForExistingSparePart(part);
+    				if(null != spare) {
+    					spare.incrementQuantity();
+    					oldUnit.campaign.removePart(part);
+    				}
+    			}
 			}
 		}
+		/*
 		if(null != newArmorSupplies) {
 			newArmorSupplies.setRefitId(null);
 			newArmorSupplies.setUnit(oldUnit);
 			oldUnit.campaign.removePart(newArmorSupplies);
 			newArmorSupplies.changeAmountAvailable(newArmorSupplies.getAmount());
+		}
+		*/
+		
+		// Remove refit parts from the procurement list. Those which have already been purchased and
+		// are in transit are left as is.
+		List<IAcquisitionWork> toRemove = new ArrayList<>();
+        toRemove.add(this);
+		for (IAcquisitionWork part : campaign.getShoppingList().getPartList()) {
+		    if ((part instanceof Part) && ((Part) part).getRefitId() == this.getRefitId()) {
+		        toRemove.add(part);
+		    }
+		}
+		for (IAcquisitionWork work : toRemove) {
+		    campaign.getShoppingList().removeItem(work);
 		}
 		MekHQ.triggerEvent(new UnitRefitEvent(oldUnit));
 	}

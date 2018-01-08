@@ -18,6 +18,7 @@ v0.43.7-git
 + Not having enough ammo in the warehouse to fill all the bins will not delay the start of a refit.
 + Issue #300: Comstar ranks do not take into account service years when determining the main "pilot" of a vehicle
 + Issue #378: Thruster Maintenance on Conventional/Aerospace Fighters 
++ Bug: NPE when attempting to refit unit that previously had a refit canceled.
 
 v0.43.6 (2017-12-22 10:00 UTC)
 + Bug: ClassCastException when loading campaign from earlier versions with large craft with missing ammo bin.
