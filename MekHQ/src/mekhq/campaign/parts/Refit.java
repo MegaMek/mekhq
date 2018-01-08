@@ -847,11 +847,13 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
         }
 		oldUnit.setRefit(this);
 		newEntity.setOwner(oldUnit.getEntity().getOwner());
+		// We don't want to require waiting for a refit kit if all that is missing is ammo or ammo bins.
 		Map<AmmoType,Integer> shotsNeeded = new HashMap<>();
 		for (Iterator<Part> iter = shoppingList.iterator(); iter.hasNext(); ) {
 		    final Part part = iter.next();
 		    if (part instanceof AmmoBin) {
                 part.setRefitId(oldUnit.getId());
+                part.setUnit(null);
                 campaign.addPart(part, 0);
 		        newUnitParts.add(part.getId());
 		        AmmoBin bin = (AmmoBin) part;
@@ -863,6 +865,11 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 		        iter.remove();
 		    }
 		}
+        for (AmmoType atype : shotsNeeded.keySet()) {
+            int tons = (int) Math.ceil((double) shotsNeeded.get(atype) / atype.getShots());
+            AmmoStorage ammo = new AmmoStorage(0, atype, atype.getShots() * tons, campaign);
+            shoppingList.add(ammo);
+        }
 		reserveNewParts();
 		if(customJob) {
 		    //add the stuff on the shopping list to the master shopping list
@@ -920,11 +927,6 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 		    } else {
 		    	oldUnit.campaign.getShoppingList().addShoppingItem(this, 1, oldUnit.campaign);
 		    }
-		}
-		for (AmmoType atype : shotsNeeded.keySet()) {
-		    int tons = (int) Math.ceil((double) shotsNeeded.get(atype) / atype.getShots());
-		    AmmoStorage ammo = new AmmoStorage(0, atype, atype.getShots(), campaign);
-		    campaign.getShoppingList().addShoppingItem(ammo, tons, campaign);
 		}
 
 		if (isRefurbishing) {
@@ -1887,17 +1889,8 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 	}
 
 	public void addRefitKitParts(int transitDays) {
-		for(Part part : shoppingList) {
-			if(part instanceof Armor) {
-				//Taharqa: WE shouldn't be here anymore, given that I am no longer adding
-				//armor by location to the shopping list but instead changing it all via
-				//the newArmorSupplies object, but commented out for completeness
-				//oldUnit.campaign.addPart(part, transitDays);
-				//part.setUnit(oldUnit);
-				//part.setRefitId(oldUnit.getId());
-				//newUnitParts.add(part.getId());
-			}
-			else if(part instanceof AmmoBin) {
+		for (Part part : shoppingList) {
+			if (part instanceof AmmoBin) {
                 part.setRefitId(oldUnit.getId());
 				oldUnit.campaign.addPart(part, 0);
 				newUnitParts.add(part.getId());
@@ -1908,12 +1901,15 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 	                oldUnit.campaign.addPart(bin.getNewPart(), transitDays);
 					bin.loadBin();
 				}
-			}
-			else if(part instanceof MissingPart) {
+			} else if (part instanceof MissingPart) {
 				Part newPart = (Part)((IAcquisitionWork)part).getNewEquipment();
 				newPart.setRefitId(oldUnit.getId());
 				oldUnit.campaign.addPart(newPart, transitDays);
 				newUnitParts.add(newPart.getId());
+			} else if (part instanceof AmmoStorage) {
+			    part.setUnit(null);
+                part.setRefitId(oldUnit.getId());
+                campaign.addPart(part, transitDays);
 			}
 		}
 		if(null != newArmorSupplies) {
