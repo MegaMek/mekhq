@@ -66,6 +66,9 @@ public class CampaignOptions implements Serializable {
     public final static String S_TECH = "Tech";
     public final static String S_AUTO = "Automatic Success";
 
+    public final static String S_HIGHESTFIRST = "Highest First";
+    public final static String S_LOWESTFIRST = "Lowest First";
+
     public final static int PRISONER_RANK = 0;
     public final static int BONDSMAN_RANK = 1;
 
@@ -166,6 +169,7 @@ public class CampaignOptions implements Serializable {
     //acquisition related
     private int waitingPeriod;
     private String acquisitionSkill;
+    private String acquisitionSortPriority;
     private boolean acquisitionSupportStaffOnly;
     private int nDiceTransitTime;
     private int constantTransitTime;
@@ -368,6 +372,7 @@ public class CampaignOptions implements Serializable {
         unitRatingMethod = UnitRatingMethod.CAMPAIGN_OPS;
         waitingPeriod = 7;
         acquisitionSkill = S_TECH;
+        acquisitionSortPriority = S_HIGHESTFIRST;
         acquisitionSupportStaffOnly = true;
         nDiceTransitTime = 1;
         constantTransitTime = 0;
@@ -1184,6 +1189,14 @@ public class CampaignOptions implements Serializable {
 
     public void setAcquisitionSkill(String skill) {
         acquisitionSkill = skill;
+    }
+
+    public String getAcquisitionSortPriority() {
+        return acquisitionSortPriority;
+    }
+
+    public void setAcquisitionSortPriority(String sortPriority) {
+        acquisitionSortPriority = sortPriority;
     }
 
     public void setAcquisitionSupportStaffOnly(boolean b) {
@@ -2111,6 +2124,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "usePercentageMaint", usePercentageMaint);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "waitingPeriod", waitingPeriod);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "acquisitionSkill", acquisitionSkill);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "acquisitionSortPriority", acquisitionSortPriority);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "acquisitionSupportStaffOnly", acquisitionSupportStaffOnly);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "techLevel", techLevel);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "nDiceTransitTime", nDiceTransitTime);
@@ -2424,6 +2438,8 @@ public class CampaignOptions implements Serializable {
                 retVal.naturalHealingWaitingPeriod = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("acquisitionSkill")) {
                 retVal.acquisitionSkill = wn2.getTextContent().trim();
+            } else if (wn2.getNodeName().equalsIgnoreCase("acquisitionSortPriority")) {
+                retVal.acquisitionSortPriority = wn2.getTextContent().trim();
             } else if (wn2.getNodeName().equalsIgnoreCase("nDiceTransitTime")) {
                 retVal.nDiceTransitTime = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("constantTransitTime")) {

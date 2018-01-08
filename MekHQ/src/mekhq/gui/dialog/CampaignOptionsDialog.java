@@ -298,6 +298,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JCheckBox chkSupportStaffOnly;
     private JSpinner spnAcquireWaitingPeriod;
     private JComboBox<String> choiceAcquireSkill;
+    private JComboBox<String> choiceAcquireSortPriority;
     private JSpinner spnAcquireClanPenalty;
     private JSpinner spnAcquireIsPenalty;
     private JCheckBox chkCapturePrisoners;
@@ -1071,6 +1072,26 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panSubAcquire.add(choiceAcquireSkill, gridBagConstraints);
+
+        DefaultComboBoxModel<String> acquisitionSortPriorityModel = new DefaultComboBoxModel<String>();
+        acquisitionSortPriorityModel.addElement(CampaignOptions.S_HIGHESTFIRST);
+        acquisitionSortPriorityModel.addElement(CampaignOptions.S_LOWESTFIRST);
+        acquisitionSortPriorityModel.setSelectedItem(options.getAcquisitionSortPriority());
+        choiceAcquireSortPriority = new JComboBox<String>(acquisitionSortPriorityModel);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        panSubAcquire.add(new JLabel("Buyer Skill Priority:"), gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        panSubAcquire.add(choiceAcquireSortPriority, gridBagConstraints);
 
         chkSupportStaffOnly.setText("Only support personnel can make acquisition checks"); // NOI18N
         //chkSupportStaffOnly.setToolTipText(resourceMap.getString("useQuirksBox.toolTipText")); // NOI18N
@@ -4463,6 +4484,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
         options.setWaitingPeriod((Integer) spnAcquireWaitingPeriod.getModel().getValue());
         options.setAcquisitionSkill((String) choiceAcquireSkill.getSelectedItem());
+        options.setAcquisitionSortPriority((String) choiceAcquireSortPriority.getSelectedItem());
         options.setAcquisitionSupportStaffOnly(chkSupportStaffOnly.isSelected());
         options.setClanAcquisitionPenalty((Integer) spnAcquireClanPenalty.getModel().getValue());
         options.setIsAcquisitionPenalty((Integer) spnAcquireIsPenalty.getModel().getValue());
