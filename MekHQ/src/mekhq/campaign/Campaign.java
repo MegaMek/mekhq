@@ -1839,7 +1839,7 @@ public class Campaign implements Serializable, ITechManager {
         int maxAcquisitions = getCampaignOptions().getMaxAcquisitions();
         Person admin = null;
         String skill = getCampaignOptions().getAcquisitionSkill();
-        if (getCampaignOptions().getAcquisitionSortPriority().equals(CampaignOptions.S_LOWESTFIRST)) {
+        if (getCampaignOptions().getAcquisitionSortPriority().equals(CampaignOptions.S_WORSTFIRST)) {
             bestSkill = 99;
         }
         if (skill.equals(CampaignOptions.S_AUTO)) {
@@ -1853,12 +1853,12 @@ public class Campaign implements Serializable, ITechManager {
                 if (maxAcquisitions > 0 && p.getAcquisitions() >= maxAcquisitions) {
                     continue;
                 }
-                if (getCampaignOptions().getAcquisitionSortPriority().equals(CampaignOptions.S_HIGHESTFIRST)
+                if (getCampaignOptions().getAcquisitionSortPriority().equals(CampaignOptions.S_BESTFIRST)
                         && p.isActive() && null != p.getBestTechSkill()
                         && p.getBestTechSkill().getLevel() > bestSkill) {
                     admin = p;
                     bestSkill = p.getBestTechSkill().getLevel();
-                } else if (getCampaignOptions().getAcquisitionSortPriority().equals(CampaignOptions.S_LOWESTFIRST)
+                } else if (getCampaignOptions().getAcquisitionSortPriority().equals(CampaignOptions.S_WORSTFIRST)
                         && p.isActive() && null != p.getBestTechSkill()
                         && p.getBestTechSkill().getLevel() < bestSkill) {
                     admin = p;
@@ -1874,12 +1874,12 @@ public class Campaign implements Serializable, ITechManager {
                 if (maxAcquisitions > 0 && p.getAcquisitions() >= maxAcquisitions) {
                     continue;
                 }
-                if (getCampaignOptions().getAcquisitionSortPriority().equals(CampaignOptions.S_HIGHESTFIRST)
+                if (getCampaignOptions().getAcquisitionSortPriority().equals(CampaignOptions.S_BESTFIRST)
                         && p.isActive() && p.hasSkill(skill)
                         && p.getSkill(skill).getLevel() > bestSkill) {
                     admin = p;
                     bestSkill = p.getSkill(skill).getLevel();
-                } else if (getCampaignOptions().getAcquisitionSortPriority().equals(CampaignOptions.S_LOWESTFIRST)
+                } else if (getCampaignOptions().getAcquisitionSortPriority().equals(CampaignOptions.S_WORSTFIRST)
                         && p.isActive() && p.hasSkill(skill)
                         && p.getSkill(skill).getLevel() < bestSkill) {
                     admin = p;

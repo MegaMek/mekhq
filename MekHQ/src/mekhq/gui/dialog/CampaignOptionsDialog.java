@@ -1074,21 +1074,21 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         panSubAcquire.add(choiceAcquireSkill, gridBagConstraints);
 
         DefaultComboBoxModel<String> acquisitionSortPriorityModel = new DefaultComboBoxModel<String>();
-        acquisitionSortPriorityModel.addElement(CampaignOptions.S_HIGHESTFIRST);
-        acquisitionSortPriorityModel.addElement(CampaignOptions.S_LOWESTFIRST);
+        acquisitionSortPriorityModel.addElement(CampaignOptions.S_BESTFIRST);
+        acquisitionSortPriorityModel.addElement(CampaignOptions.S_WORSTFIRST);
         acquisitionSortPriorityModel.setSelectedItem(options.getAcquisitionSortPriority());
         choiceAcquireSortPriority = new JComboBox<String>(acquisitionSortPriorityModel);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panSubAcquire.add(new JLabel("Buyer Skill Priority:"), gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 3;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panSubAcquire.add(choiceAcquireSortPriority, gridBagConstraints);
@@ -1097,7 +1097,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         //chkSupportStaffOnly.setToolTipText(resourceMap.getString("useQuirksBox.toolTipText")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridy = 4;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
         gridBagConstraints.weightx = 0.0;
@@ -1114,7 +1114,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridy = 5;
         gridBagConstraints.weightx = 0.0;
         gridBagConstraints.weighty = 0.0;
         gridBagConstraints.gridwidth = 2;
@@ -1131,7 +1131,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridy = 6;
         gridBagConstraints.weightx = 0.0;
         gridBagConstraints.weighty = 0.0;
         gridBagConstraints.gridwidth = 2;
@@ -1150,7 +1150,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 6;
+        gridBagConstraints.gridy = 7;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.gridwidth = 2;

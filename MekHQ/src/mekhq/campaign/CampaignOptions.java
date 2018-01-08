@@ -66,8 +66,8 @@ public class CampaignOptions implements Serializable {
     public final static String S_TECH = "Tech";
     public final static String S_AUTO = "Automatic Success";
 
-    public final static String S_HIGHESTFIRST = "Highest First";
-    public final static String S_LOWESTFIRST = "Lowest First";
+    public final static String S_BESTFIRST = "Best First";
+    public final static String S_WORSTFIRST = "Worst First";
 
     public final static int PRISONER_RANK = 0;
     public final static int BONDSMAN_RANK = 1;
@@ -372,7 +372,7 @@ public class CampaignOptions implements Serializable {
         unitRatingMethod = UnitRatingMethod.CAMPAIGN_OPS;
         waitingPeriod = 7;
         acquisitionSkill = S_TECH;
-        acquisitionSortPriority = S_HIGHESTFIRST;
+        acquisitionSortPriority = S_BESTFIRST;
         acquisitionSupportStaffOnly = true;
         nDiceTransitTime = 1;
         constantTransitTime = 0;
