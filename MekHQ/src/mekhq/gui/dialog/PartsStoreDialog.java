@@ -585,7 +585,7 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 		            shoppingItem = (IAcquisitionWork)part;
 		        }
 	            if(null != shoppingItem) {
-	                TargetRoll target = campaign.getTargetForAcquisition(shoppingItem, campaign.getLogisticsPerson());
+	                TargetRoll target = campaign.getTargetForAcquisition(shoppingItem, campaign.getNextAcquisitionPerson());
 	                String value = target.getValueAsString();
 	                if(target.getValue() != TargetRoll.IMPOSSIBLE && target.getValue() != TargetRoll.AUTOMATIC_SUCCESS && target.getValue() != TargetRoll.AUTOMATIC_FAIL) {
 	                    value += "+";
@@ -673,7 +673,7 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 	                    shoppingItem = (IAcquisitionWork)part;
 	                }
 	                if(null != shoppingItem) {
-	                    TargetRoll target = campaign.getTargetForAcquisition(shoppingItem, campaign.getLogisticsPerson());
+	                    TargetRoll target = campaign.getTargetForAcquisition(shoppingItem, campaign.getNextAcquisitionPerson());
 	                    return target.getDesc();
 	                } else {
 	                    return null;

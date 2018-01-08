@@ -128,7 +128,7 @@ public class PartsAcquisitionService {
 	public static void generateSummaryCounts(Campaign campaign) {
 		partCountInfoMap = new HashMap<String, PartCountInfo>();
 
-		Person admin = campaign.getLogisticsPerson();
+		Person admin = campaign.getNextAcquisitionPerson();
 
 		for (List<IAcquisitionWork> awList : acquisitionMap.values()) {
 			IAcquisitionWork awFirst = awList.get(0);

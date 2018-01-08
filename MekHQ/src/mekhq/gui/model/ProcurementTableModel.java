@@ -92,7 +92,7 @@ public class ProcurementTableModel extends DataTableModel {
             return DecimalFormat.getInstance().format(shoppingItem.getBuyCost());
         }
         if(col == COL_TARGET) {
-            TargetRoll target = getCampaign().getTargetForAcquisition(shoppingItem, getCampaign().getLogisticsPerson(), false);
+            TargetRoll target = getCampaign().getTargetForAcquisition(shoppingItem, getCampaign().getNextAcquisitionPerson(), false);
             String value = target.getValueAsString();
             if(target.getValue() != TargetRoll.IMPOSSIBLE && target.getValue() != TargetRoll.AUTOMATIC_SUCCESS && target.getValue() != TargetRoll.AUTOMATIC_FAIL) {
                 value += "+";
@@ -170,7 +170,7 @@ public class ProcurementTableModel extends DataTableModel {
         }
         switch(col) {
         case COL_TARGET:                    
-            TargetRoll target = getCampaign().getTargetForAcquisition(shoppingItem, getCampaign().getLogisticsPerson(), false);
+            TargetRoll target = getCampaign().getTargetForAcquisition(shoppingItem, getCampaign().getNextAcquisitionPerson(), false);
             return target.getDesc();
         default:                    
             return "<html>You can increase or decrease the quantity with the left/right arrows keys or the plus/minus keys.<br>Quantities reduced to zero will remain on the list until the next procurement cycle.</html>"; 

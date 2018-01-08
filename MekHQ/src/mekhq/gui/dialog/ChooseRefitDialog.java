@@ -378,7 +378,7 @@ public class ChooseRefitDialog extends javax.swing.JDialog {
 				return formatter.format(r.getCost());
 			}
 			if(col == COL_TARGET) {
-			    return campaign.getTargetForAcquisition(r, campaign.getLogisticsPerson(), false).getValueAsString();
+			    return campaign.getTargetForAcquisition(r, campaign.getNextAcquisitionPerson(), false).getValueAsString();
 			}
 			return "?";
 		}
@@ -429,7 +429,7 @@ public class ChooseRefitDialog extends javax.swing.JDialog {
 		     }
 			 switch(col) {
 			 case COL_TARGET:
-			     return campaign.getTargetForAcquisition(r, campaign.getLogisticsPerson(), false).getDesc();
+			     return campaign.getTargetForAcquisition(r, campaign.getNextAcquisitionPerson(), false).getDesc();
 			 default:
 				 return null;
 			 }

@@ -524,8 +524,8 @@ public class UnitSelectorDialog extends JDialog {
             Entity entity = new MechFileParser(ms.getSourceFile(), ms.getEntryName()).getEntity();
             selectedUnit = new UnitOrder(entity, campaign);
             btnBuy.setEnabled(true);
-            btnBuy.setText("Buy (TN: " + campaign.getTargetForAcquisition(selectedUnit, campaign.getLogisticsPerson(), false).getValueAsString() + "+)");
-            btnBuy.setToolTipText(campaign.getTargetForAcquisition(selectedUnit, campaign.getLogisticsPerson(), false).getDesc());
+            btnBuy.setText("Buy (TN: " + campaign.getTargetForAcquisition(selectedUnit, campaign.getNextAcquisitionPerson(), false).getValueAsString() + "+)");
+            btnBuy.setToolTipText(campaign.getTargetForAcquisition(selectedUnit, campaign.getNextAcquisitionPerson(), false).getDesc());
             refreshUnitView();
         } catch (EntityLoadingException ex) {
             selectedUnit = null;

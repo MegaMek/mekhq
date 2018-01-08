@@ -1834,13 +1834,13 @@ public class Campaign implements Serializable, ITechManager {
         return target;
     }
 
-    public Person getLogisticsPerson() {
+    public Person getNextAcquisitionPerson() {
         int bestSkill = -1;
         int maxAcquisitions = getCampaignOptions().getMaxAcquisitions();
         Person admin = null;
         String skill = getCampaignOptions().getAcquisitionSkill();
         if (skill.equals(CampaignOptions.S_AUTO)) {
-            return admin;
+            return null;
         } else if (skill.equals(CampaignOptions.S_TECH)) {
             for (Person p : personnel) {
                 if (getCampaignOptions().isAcquisitionSupportStaffOnly()
@@ -1879,7 +1879,7 @@ public class Campaign implements Serializable, ITechManager {
         boolean found = false;
         String report = "";
 
-        Person person = getLogisticsPerson();
+        Person person = getNextAcquisitionPerson();
         if(null == person && !getCampaignOptions().getAcquisitionSkill().equals(CampaignOptions.S_AUTO)) {
             addReport("Your force has no one capable of acquiring equipment.");
             return false;
