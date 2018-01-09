@@ -81,8 +81,8 @@ public class AtBContractViewPanel extends JPanel {
     private JTextArea txtSalvageValueMerc;
     private JLabel lblSalvageValueEmployer;
     private JTextArea txtSalvageValueEmployer;
-    private JLabel lblSalvagePct1;
-    private JLabel lblSalvagePct2;
+    private JLabel lblSalvagePct;
+    private JTextArea txtSalvagePct;
     private JLabel lblMorale;
     private JTextArea txtMorale;
     private JLabel lblScore;
@@ -480,22 +480,22 @@ public class AtBContractViewPanel extends JPanel {
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlStats.add(txtSalvageValueEmployer, gridBagConstraints);
         }
-        lblSalvagePct1 = new JLabel(resourceMap.getString("lblSalvage.text"));
-        lblSalvagePct2 = new JLabel();
+        lblSalvagePct = new JLabel(resourceMap.getString("lblSalvage.text"));
+        txtSalvagePct = new JTextArea();
+        txtSalvagePct.setName("txtSalvagePct"); // NOI18N
+        txtSalvagePct.setEditable(false);
+        txtSalvagePct.setLineWrap(true);
+        txtSalvagePct.setWrapStyleWord(true);
 
         if(contract.isSalvageExchange()) {
-            lblSalvagePct2.setText(resourceMap.getString("exchange") + " (" + contract.getSalvagePct() + "%)"); 
+            txtSalvagePct.setText(resourceMap.getString("exchange") + " (" + contract.getSalvagePct() + "%)"); 
         } else if(contract.getSalvagePct() == 0) {
-            lblSalvagePct2.setText(resourceMap.getString("none")); 
+            txtSalvagePct.setText(resourceMap.getString("none")); 
         } else {
-            lblSalvagePct1.setText(resourceMap.getString("lblSalvagePct.text"));   
+            lblSalvagePct.setText(resourceMap.getString("lblSalvagePct.text"));   
             int maxSalvagePct = contract.getSalvagePct();
             int currentSalvagePct = (int)(100*((double)contract.getSalvagedByUnit())/(contract.getSalvagedByUnit()+contract.getSalvagedByEmployer()));
-            String lead = "<html><font color='black'>";
-            if(currentSalvagePct > maxSalvagePct) {
-                lead = "<html><font color='red'>";
-            }
-            lblSalvagePct2.setText(lead + currentSalvagePct + "%</font> <font color='black'>(max " + maxSalvagePct + "%)</font></html>");       
+            txtSalvagePct.setText(currentSalvagePct + "% (max " + maxSalvagePct + "%)");       
         }
            
         gridBagConstraints = new GridBagConstraints();
@@ -503,7 +503,7 @@ public class AtBContractViewPanel extends JPanel {
         gridBagConstraints.gridy = y;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        pnlStats.add(lblSalvagePct1, gridBagConstraints); 
+        pnlStats.add(lblSalvagePct, gridBagConstraints); 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = y++;
@@ -511,7 +511,7 @@ public class AtBContractViewPanel extends JPanel {
         gridBagConstraints.insets = new Insets(0, 10, 0, 0);
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        pnlStats.add(lblSalvagePct2, gridBagConstraints);
+        pnlStats.add(txtSalvagePct, gridBagConstraints);
 
         lblMorale.setName("lblMorale"); // NOI18N
         lblMorale.setText(resourceMap.getString("lblMorale.text"));

@@ -20,6 +20,7 @@ v0.43.7-git
 + Issue #378: Thruster Maintenance on Conventional/Aerospace Fighters 
 + Bug: NPE when attempting to refit unit that previously had a refit canceled.
 + Issue #454: News won't fire at campaign creation
++ Issue #500: Contract view text alignment
 
 v0.43.6 (2017-12-22 10:00 UTC)
 + Bug: ClassCastException when loading campaign from earlier versions with large craft with missing ammo bin.
