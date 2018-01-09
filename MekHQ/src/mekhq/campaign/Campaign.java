@@ -5412,10 +5412,6 @@ public class Campaign implements Serializable, ITechManager {
                     break;
             }
         }
-        // LAM pilots get -2 to the random skill roll.
-        if ((type == Person.T_MECHWARRIOR) && (secondary == Person.T_AERO_PILOT)) {
-            bonus -= 2;
-        }
         GregorianCalendar birthdate = (GregorianCalendar) getCalendar().clone();
         birthdate.set(Calendar.YEAR, birthdate.get(Calendar.YEAR) - Utilities.getAgeByExpLevel(expLvl, person.isClanner() && person.getPhenotype() != Person.PHENOTYPE_NONE));
         // choose a random day and month
@@ -5427,10 +5423,16 @@ public class Campaign implements Serializable, ITechManager {
         birthdate.set(Calendar.DAY_OF_YEAR, randomDay);
         person.setBirthday(birthdate);
         // set default skills
-        generateDefaultSkills(type, person, expLvl, bonus);
-        if (secondary != Person.T_NONE) {
-            generateDefaultSkills(secondary, person, expLvl, bonus);
+        int mod = 0;
+        if ((type == Person.T_MECHWARRIOR) && (secondary == Person.T_AERO_PILOT)) {
+            mod = -2;
         }
+        generateDefaultSkills(type, person, expLvl, bonus, mod);
+        if (secondary != Person.T_NONE) {
+            generateDefaultSkills(secondary, person, expLvl, bonus, mod);
+        }
+        // apply phenotype bonus only to primary skills
+        bonus = 0;
         // roll small arms skill
         if (!person.hasSkill(SkillType.S_SMALL_ARMS)) {
             int sarmsLvl = -12;
@@ -5501,106 +5503,106 @@ public class Campaign implements Serializable, ITechManager {
         return person;
     }
 
-    private void generateDefaultSkills(int type, Person person, int expLvl, int bonus) {
+    private void generateDefaultSkills(int type, Person person, int expLvl, int bonus, int mod) {
         switch (type) {
             case (Person.T_MECHWARRIOR):
                 person.addSkill(SkillType.S_PILOT_MECH, expLvl,
-                                rskillPrefs.randomizeSkill(), bonus);
+                                rskillPrefs.randomizeSkill(), bonus, mod);
                 person.addSkill(SkillType.S_GUN_MECH, expLvl,
-                                rskillPrefs.randomizeSkill(), bonus);
+                                rskillPrefs.randomizeSkill(), bonus, mod);
                 break;
             case (Person.T_GVEE_DRIVER):
                 person.addSkill(SkillType.S_PILOT_GVEE, expLvl,
-                                rskillPrefs.randomizeSkill(), bonus);
+                                rskillPrefs.randomizeSkill(), bonus, mod);
                 person.addSkill(SkillType.S_GUN_VEE, expLvl,
-                                rskillPrefs.randomizeSkill(), bonus);
+                                rskillPrefs.randomizeSkill(), bonus, mod);
                 break;
             case (Person.T_NVEE_DRIVER):
                 person.addSkill(SkillType.S_PILOT_NVEE, expLvl,
-                                rskillPrefs.randomizeSkill(), bonus);
+                                rskillPrefs.randomizeSkill(), bonus, mod);
                 person.addSkill(SkillType.S_GUN_VEE, expLvl,
-                                rskillPrefs.randomizeSkill(), bonus);
+                                rskillPrefs.randomizeSkill(), bonus, mod);
                 break;
             case (Person.T_VTOL_PILOT):
                 person.addSkill(SkillType.S_PILOT_VTOL, expLvl,
-                                rskillPrefs.randomizeSkill(), bonus);
+                                rskillPrefs.randomizeSkill(), bonus, mod);
                 person.addSkill(SkillType.S_GUN_VEE, expLvl,
-                                rskillPrefs.randomizeSkill(), bonus);
+                                rskillPrefs.randomizeSkill(), bonus, mod);
                 break;
             case (Person.T_VEE_GUNNER):
                 person.addSkill(SkillType.S_GUN_VEE, expLvl,
-                                rskillPrefs.randomizeSkill(), bonus);
+                                rskillPrefs.randomizeSkill(), bonus, mod);
                 break;
             case (Person.T_CONV_PILOT):
                 person.addSkill(SkillType.S_PILOT_JET, expLvl,
-                                rskillPrefs.randomizeSkill(), bonus);
+                                rskillPrefs.randomizeSkill(), bonus, mod);
                 person.addSkill(SkillType.S_GUN_JET, expLvl,
-                                rskillPrefs.randomizeSkill(), bonus);
+                                rskillPrefs.randomizeSkill(), bonus, mod);
                 break;
             case (Person.T_AERO_PILOT):
                 person.addSkill(SkillType.S_PILOT_AERO, expLvl,
-                                rskillPrefs.randomizeSkill(), bonus);
+                                rskillPrefs.randomizeSkill(), bonus, mod);
                 person.addSkill(SkillType.S_GUN_AERO, expLvl,
-                                rskillPrefs.randomizeSkill(), bonus);
+                                rskillPrefs.randomizeSkill(), bonus, mod);
                 break;
             case (Person.T_PROTO_PILOT):
                 person.addSkill(SkillType.S_GUN_PROTO, expLvl,
-                                rskillPrefs.randomizeSkill(), bonus);
+                                rskillPrefs.randomizeSkill(), bonus, mod);
                 break;
             case (Person.T_BA):
                 person.addSkill(SkillType.S_GUN_BA, expLvl,
-                                rskillPrefs.randomizeSkill(), bonus);
+                                rskillPrefs.randomizeSkill(), bonus, mod);
                 person.addSkill(SkillType.S_ANTI_MECH, expLvl,
-                                rskillPrefs.randomizeSkill(), bonus);
+                                rskillPrefs.randomizeSkill(), bonus, mod);
                 person.addSkill(SkillType.S_SMALL_ARMS, expLvl,
-                                rskillPrefs.randomizeSkill(), bonus);
+                                rskillPrefs.randomizeSkill(), bonus, mod);
                 break;
             case (Person.T_INFANTRY):
                 if (Utilities.rollProbability(rskillPrefs.getAntiMekProb())) {
                     person.addSkill(SkillType.S_ANTI_MECH, expLvl,
-                                    rskillPrefs.randomizeSkill(), bonus);
+                                    rskillPrefs.randomizeSkill(), bonus, mod);
                 }
                 person.addSkill(SkillType.S_SMALL_ARMS, expLvl,
-                                rskillPrefs.randomizeSkill(), bonus);
+                                rskillPrefs.randomizeSkill(), bonus, mod);
                 break;
             case (Person.T_SPACE_PILOT):
                 person.addSkill(SkillType.S_PILOT_SPACE, expLvl,
-                                rskillPrefs.randomizeSkill(), bonus);
+                                rskillPrefs.randomizeSkill(), bonus, mod);
                 break;
             case (Person.T_SPACE_CREW):
                 person.addSkill(SkillType.S_TECH_VESSEL, expLvl,
-                                rskillPrefs.randomizeSkill(), bonus);
+                                rskillPrefs.randomizeSkill(), bonus, mod);
                 break;
             case (Person.T_SPACE_GUNNER):
                 person.addSkill(SkillType.S_GUN_SPACE, expLvl,
-                                rskillPrefs.randomizeSkill(), bonus);
+                                rskillPrefs.randomizeSkill(), bonus, mod);
                 break;
             case (Person.T_NAVIGATOR):
                 person.addSkill(SkillType.S_NAV, expLvl,
-                                rskillPrefs.randomizeSkill(), bonus);
+                                rskillPrefs.randomizeSkill(), bonus, mod);
                 break;
             case (Person.T_MECH_TECH):
                 person.addSkill(SkillType.S_TECH_MECH, expLvl,
-                                rskillPrefs.randomizeSkill(), bonus);
+                                rskillPrefs.randomizeSkill(), bonus, mod);
                 break;
             case (Person.T_MECHANIC):
                 person.addSkill(SkillType.S_TECH_MECHANIC, expLvl,
-                                rskillPrefs.randomizeSkill(), bonus);
+                                rskillPrefs.randomizeSkill(), bonus, mod);
                 break;
             case (Person.T_AERO_TECH):
                 person.addSkill(SkillType.S_TECH_AERO, expLvl,
-                                rskillPrefs.randomizeSkill(), bonus);
+                                rskillPrefs.randomizeSkill(), bonus, mod);
                 break;
             case (Person.T_BA_TECH):
                 person.addSkill(SkillType.S_TECH_BA, expLvl,
-                                rskillPrefs.randomizeSkill(), bonus);
+                                rskillPrefs.randomizeSkill(), bonus, mod);
                 break;
             case (Person.T_ASTECH):
                 person.addSkill(SkillType.S_ASTECH, 0, 0);
                 break;
             case (Person.T_DOCTOR):
                 person.addSkill(SkillType.S_DOCTOR, expLvl,
-                                rskillPrefs.randomizeSkill(), bonus);
+                                rskillPrefs.randomizeSkill(), bonus, mod);
                 break;
             case (Person.T_MEDIC):
                 person.addSkill(SkillType.S_MEDTECH, 0, 0);
@@ -5610,7 +5612,7 @@ public class Campaign implements Serializable, ITechManager {
             case (Person.T_ADMIN_TRA):
             case (Person.T_ADMIN_HR):
                 person.addSkill(SkillType.S_ADMIN, expLvl,
-                                rskillPrefs.randomizeSkill(), bonus);
+                                rskillPrefs.randomizeSkill(), bonus, mod);
                 break;
         }
     }

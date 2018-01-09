@@ -2543,7 +2543,11 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
     
     public void addSkill(String skillName, int xpLvl, boolean random, int bonus) {
-        skills.put(skillName, new Skill(skillName, xpLvl, random, bonus));
+        skills.put(skillName, new Skill(skillName, xpLvl, random, bonus, 0));
+    }
+    
+    public void addSkill(String skillName, int xpLvl, boolean random, int bonus, int rollMod) {
+        skills.put(skillName, new Skill(skillName, xpLvl, random, bonus, rollMod));
     }
 
     public void removeSkill(String skillName) {
