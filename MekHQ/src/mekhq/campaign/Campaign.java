@@ -2190,10 +2190,27 @@ public class Campaign implements Serializable, ITechManager {
         addReport(report);
     }
 
+    /**
+     * Parses news file and loads news items for the current year.
+     */
     public void reloadNews() {
         news.loadNewsFor(getGameYear(), id.getLeastSignificantBits());
     }
 
+    /**
+     * Checks for a news item for the current date. If found, adds it to the daily report.
+     */
+    public void readNews() {
+        //read the news
+        DateTime now = Utilities.getDateTimeDay(calendar);
+        for(NewsItem article : news.fetchNewsFor(now)) {
+            addReport(article.getHeadlineForReport());
+        }
+        for(NewsItem article : Planets.getInstance().getPlanetaryNews(now)) {
+            addReport(article.getHeadlineForReport());
+        }
+    }
+    
     public int getDeploymentDeficit(AtBContract contract) {
     	int total = -contract.getRequiredLances();
     	int role = -Math.max(1, contract.getRequiredLances() / 2);
@@ -2231,15 +2248,8 @@ public class Campaign implements Serializable, ITechManager {
         if (gameOptions.intOption("year") != getGameYear()) {
             gameOptions.getOption("year").setValue(getGameYear());
         }
-
-        //read the news
-        DateTime now = Utilities.getDateTimeDay(calendar);
-        for(NewsItem article : news.fetchNewsFor(now)) {
-            addReport(article.getHeadlineForReport());
-        }
-        for(NewsItem article : Planets.getInstance().getPlanetaryNews(now)) {
-            addReport(article.getHeadlineForReport());
-        }
+        
+        readNews();
 
         location.newDay(this);
 

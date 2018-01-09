@@ -19,6 +19,7 @@ v0.43.7-git
 + Issue #300: Comstar ranks do not take into account service years when determining the main "pilot" of a vehicle
 + Issue #378: Thruster Maintenance on Conventional/Aerospace Fighters 
 + Bug: NPE when attempting to refit unit that previously had a refit canceled.
++ Issue #454: News won't fire at campaign creation
 
 v0.43.6 (2017-12-22 10:00 UTC)
 + Bug: ClassCastException when loading campaign from earlier versions with large craft with missing ammo bin.
