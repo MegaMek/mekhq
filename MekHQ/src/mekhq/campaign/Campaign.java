@@ -3892,24 +3892,6 @@ public class Campaign implements Serializable, ITechManager {
             }
         }
 
-        // If we don't have a personnel market, create one.
-        if (!foundPersonnelMarket) {
-            retVal.personnelMarket = new PersonnelMarket(retVal);
-        }
-        if (!foundContractMarket) {
-            retVal.contractMarket = new ContractMarket();
-        }
-        if (!foundUnitMarket) {
-            retVal.unitMarket = new UnitMarket();
-        }
-        if (null == retVal.retirementDefectionTracker) {
-        	retVal.retirementDefectionTracker = new RetirementDefectionTracker();
-        }
-        if (retVal.getCampaignOptions().getUseAtB()) {
-        	retVal.atbConfig = AtBConfiguration.loadFromXml();
-        }
-
-
         // Okay, after we've gone through all the nodes and constructed the
         // Campaign object...
         // We need to do a post-process pass to restore a number of references.
@@ -4279,6 +4261,23 @@ public class Campaign implements Serializable, ITechManager {
                 String.format("[Campaign Load] News loaded in %dms", //$NON-NLS-1$
                         System.currentTimeMillis() - timestamp));
         timestamp = System.currentTimeMillis();
+
+        // If we don't have a personnel market, create one.
+        if (!foundPersonnelMarket) {
+            retVal.personnelMarket = new PersonnelMarket(retVal);
+        }
+        if (!foundContractMarket) {
+            retVal.contractMarket = new ContractMarket();
+        }
+        if (!foundUnitMarket) {
+            retVal.unitMarket = new UnitMarket();
+        }
+        if (null == retVal.retirementDefectionTracker) {
+            retVal.retirementDefectionTracker = new RetirementDefectionTracker();
+        }
+        if (retVal.getCampaignOptions().getUseAtB()) {
+            retVal.atbConfig = AtBConfiguration.loadFromXml();
+        }
 
         //**EVERYTHING HAS BEEN LOADED. NOW FOR SANITY CHECKS**//
 
