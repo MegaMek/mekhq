@@ -1906,7 +1906,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     menu = new JMenu(resourceMap.getString("setEdgeTriggers.text")); //$NON-NLS-1$
                     //Start of role-specific Edge reroll options
                     //Mechwarriors
-                    if (person.getPrimaryRole() == 1) {
+                    if (person.getPrimaryRole() == Person.T_MECHWARRIOR) {
                         cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("edgeTriggerHeadHits.text")); //$NON-NLS-1$
                         cbMenuItem.setSelected(person.getOptions()
                                 .booleanOption(OPT_EDGE_HEADHIT));
@@ -1939,7 +1939,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                         cbMenuItem.addActionListener(this);
                         menu.add(cbMenuItem);
                     //Doctors    
-                    } else if (person.getPrimaryRole() == 20 && gui.getCampaign().getCampaignOptions().useSupportEdge()) {
+                    } else if (person.getPrimaryRole() == Person.T_DOCTOR && gui.getCampaign().getCampaignOptions().useSupportEdge()) {
                         cbMenuItem = new JCheckBoxMenuItem(
                                 resourceMap.getString("edgeTriggerHealCheck.text")); //$NON-NLS-1$
                         cbMenuItem.setSelected(person.getOptions()
@@ -1948,11 +1948,11 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                         cbMenuItem.addActionListener(this);
                         menu.add(cbMenuItem);
                     //Techs
-                    } else if ((person.getPrimaryRole() == 12
-                                || person.getPrimaryRole() == 15
-                                || person.getPrimaryRole() == 16
-                                || person.getPrimaryRole() == 17
-                                || person.getPrimaryRole() == 18)
+                    } else if ((person.getPrimaryRole() == Person.T_SPACE_CREW
+                                || person.getPrimaryRole() == Person.T_MECH_TECH
+                                || person.getPrimaryRole() == Person.T_MECHANIC
+                                || person.getPrimaryRole() == Person.T_AERO_TECH
+                                || person.getPrimaryRole() == Person.T_BA_TECH)
                                 && gui.getCampaign().getCampaignOptions().useSupportEdge()) {
                         cbMenuItem = new JCheckBoxMenuItem(
                                 resourceMap.getString("edgeTriggerBreakPart.text")); //$NON-NLS-1$
@@ -1969,10 +1969,10 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                         cbMenuItem.addActionListener(this);
                         menu.add(cbMenuItem);
                     //Admins
-                    } else if ((person.getPrimaryRole() == 22
-                            || person.getPrimaryRole() == 23
-                            || person.getPrimaryRole() == 24
-                            || person.getPrimaryRole() == 25) 
+                    } else if ((person.getPrimaryRole() == Person.T_ADMIN_COM
+                            || person.getPrimaryRole() == Person.T_ADMIN_LOG
+                            || person.getPrimaryRole() == Person.T_ADMIN_TRA
+                            || person.getPrimaryRole() == Person.T_ADMIN_HR) 
                             && gui.getCampaign().getCampaignOptions().useSupportEdge()) {
                         cbMenuItem = new JCheckBoxMenuItem(
                                 resourceMap.getString("edgeTriggerAcquireCheck.text")); //$NON-NLS-1$
