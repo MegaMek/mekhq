@@ -2128,7 +2128,7 @@ public class Campaign implements Serializable, ITechManager {
             if ((getCampaignOptions().isDestroyByMargin()
                         && getCampaignOptions().getDestroyMargin() <= (target.getValue() - roll))
                     || (!getCampaignOptions().isDestroyByMargin() && (tech.getExperienceLevel(false) == SkillType.EXP_ELITE //if an elite, primary tech and destroy by margin is NOT on
-                            || tech.getPrimaryRole() == 12)) //For vessel crews
+                            || tech.getPrimaryRole() == Person.T_SPACE_CREW)) //For vessel crews
                         && roll < target.getValue()) {
                 tech.setEdge(tech.getEdge() - 1);
                 if (tech.isRightTechTypeFor(partWork)) {
