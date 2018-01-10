@@ -2123,11 +2123,12 @@ public class Campaign implements Serializable, ITechManager {
         //if we fail and would break a part, here's a chance to use Edge for a reroll...
         if (getCampaignOptions().useSupportEdge() 
                 && tech.getOptions().booleanOption(PersonnelOptions.EDGE_REPAIR_BREAK_PART)
-                && tech.getEdge() > 0) {
+                && tech.getEdge() > 0
+                && target.getValue() != TargetRoll.AUTOMATIC_SUCCESS) {
             if ((getCampaignOptions().isDestroyByMargin()
                         && getCampaignOptions().getDestroyMargin() <= (target.getValue() - roll))
-                    || (tech.getExperienceLevel(false) == SkillType.EXP_ELITE //if an elite, primary tech
-                            || tech.getPrimaryRole() == 12) //For vessel crews
+                    || (!getCampaignOptions().isDestroyByMargin() && (tech.getExperienceLevel(false) == SkillType.EXP_ELITE //if an elite, primary tech and destroy by margin is NOT on
+                            || tech.getPrimaryRole() == Person.T_SPACE_CREW)) //For vessel crews
                         && roll < target.getValue()) {
                 tech.setEdge(tech.getEdge() - 1);
                 if (tech.isRightTechTypeFor(partWork)) {
