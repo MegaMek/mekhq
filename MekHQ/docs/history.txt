@@ -23,6 +23,7 @@ v0.43.7-git
 + Issue #500: Contract view text alignment
 + Issue #504: Tactics can be negative
 + Bug: MML packaged with MekHQ cannot find needed libraries.
++ Issue #525: Available Time for Mothball Not Calculating Correctly
 
 v0.43.6 (2017-12-22 10:00 UTC)
 + Bug: ClassCastException when loading campaign from earlier versions with large craft with missing ammo bin.

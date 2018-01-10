@@ -85,6 +85,7 @@ import megamek.common.Entity;
 import megamek.common.Jumpship;
 import megamek.common.MULParser;
 import megamek.common.TechConstants;
+import megamek.common.annotations.Nullable;
 import megamek.common.event.Subscribe;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.logging.LogLevel;
@@ -1965,18 +1966,41 @@ public class CampaignGUI extends JPanel {
         UnitCostReportDialog mrd = new UnitCostReportDialog(getFrame(), u);
         mrd.setVisible(true);
     }
+    
+    /**
+     * Shows a dialog that lets the user select a tech for a task on a particular unit
+     * 
+     * @param u    The unit to be serviced, used to filter techs for skill on the unit.
+     * @param desc The description of the task
+     * @return     The ID of the selected tech, or null if none is selected.
+     */
+    public @Nullable UUID selectTech(Unit u, String desc) {
+        return selectTech(u, desc, false);
+    }
 
-    public UUID selectTech(Unit u, String desc) {
+    /**
+     * Shows a dialog that lets the user select a tech for a task on a particular unit
+     * 
+     * @param u                 The unit to be serviced, used to filter techs for skill on the unit.
+     * @param desc              The description of the task
+     * @param ignoreMaintenance If true, ignores the time required for maintenance tasks when displaying
+     *                          the tech's time available.
+     * @return                  The ID of the selected tech, or null if none is selected.
+     */
+    public @Nullable UUID selectTech(Unit u, String desc, boolean ignoreMaintenance) {
         String name;
         HashMap<String, Person> techHash = new HashMap<String, Person>();
         for (Person tech : getCampaign().getTechs()) {
             if (tech.canTech(u.getEntity()) && !tech.isMothballing()) {
+                int time = tech.getMinutesLeft();
+                if (!ignoreMaintenance) {
+                    time -= Math.max(0, tech.getMaintenanceTimeUsing());
+                }
                 name = tech.getFullName()
                         + ", "
                         + SkillType.getExperienceLevelName(tech
                                 .getSkillForWorkingOn(u).getExperienceLevel())
-                        + " (" + Math.max(0, (tech.getMinutesLeft() - tech.getMaintenanceTimeUsing()))
-                        + "min)";
+                        + " (" + time + "min)";
                 techHash.put(name, tech);
             }
         }
