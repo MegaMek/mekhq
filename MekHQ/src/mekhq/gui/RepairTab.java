@@ -95,6 +95,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
     private static final long serialVersionUID = 6757065427956450309L;
 
     private JPanel panDoTask;
+    private JPanel panDoTaskText;
     private JSplitPane splitServicedUnits;
     private JTable servicedUnitTable;
     private JTable taskTable;
@@ -291,9 +292,9 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         scrollTechTable.setPreferredSize(new java.awt.Dimension(300, 300));
 
         panDoTask = new JPanel(new GridBagLayout());
-        panDoTask.setMinimumSize(new java.awt.Dimension(300, 100));
+        panDoTask.setMinimumSize(new java.awt.Dimension(100, 100));
         panDoTask.setName("panelDoTask"); // NOI18N
-        panDoTask.setPreferredSize(new java.awt.Dimension(300, 100));
+        panDoTask.setPreferredSize(new java.awt.Dimension(100, 100));
 
         btnDoTask = new JButton(resourceMap.getString("btnDoTask.text")); // NOI18N
         btnDoTask.setToolTipText(resourceMap.getString("btnDoTask.toolTipText")); // NOI18N
@@ -319,6 +320,29 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTH;
         panDoTask.add(lblTargetNum, gridBagConstraints);
 
+        choiceLocation = new JComboBox<String>();
+        choiceLocation.removeAllItems();
+        choiceLocation.addItem("All");
+        choiceLocation.setEnabled(false);
+        choiceLocation.addActionListener(ev -> filterTasks());
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.gridheight = 1;
+        panDoTask.add(choiceLocation, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 1.0;
+        panTasks.add(panDoTask, gridBagConstraints);
+
+        panDoTaskText = new JPanel(new GridBagLayout());
+        panDoTaskText.setMinimumSize(new java.awt.Dimension(150, 100));
+        panDoTaskText.setName("panelDoTask"); // NOI18N
+        panDoTaskText.setPreferredSize(new java.awt.Dimension(150, 100));
+
         textTarget = new JTextArea();
         textTarget.setColumns(20);
         textTarget.setEditable(false);
@@ -339,25 +363,14 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        panDoTask.add(scrTextTarget, gridBagConstraints);
-
-        choiceLocation = new JComboBox<String>();
-        choiceLocation.removeAllItems();
-        choiceLocation.addItem("All");
-        choiceLocation.setEnabled(false);
-        choiceLocation.addActionListener(ev -> filterTasks());
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.gridheight = 1;
-        panDoTask.add(choiceLocation, gridBagConstraints);
+        panDoTaskText.add(scrTextTarget, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
-        panTasks.add(panDoTask, gridBagConstraints);
+        panTasks.add(panDoTaskText, gridBagConstraints);
 
         taskModel = new TaskTableModel(getCampaignGui(), this);
         taskTable = new JTable(taskModel);
@@ -382,6 +395,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.gridwidth = 2;
         panTasks.add(scrollTaskTable, gridBagConstraints);
 
         JPanel panTechs = new JPanel(new GridBagLayout());
