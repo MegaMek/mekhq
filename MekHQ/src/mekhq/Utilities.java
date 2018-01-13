@@ -1087,10 +1087,7 @@ public class Utilities {
 	                for (int equipNum : equipNums) {
 	                    i++;
 	                    m = unit.getEntity().getEquipment(equipNum);
-	                    if ((part instanceof LargeCraftAmmoBin)
-	                            && (m.getAmmoCapacity() != ((LargeCraftAmmoBin) part).getCapacity())) {
-	                        continue;
-	                    } else if (!allMunitions && (part instanceof AmmoBin)
+	                    if (!allMunitions && (part instanceof AmmoBin)
 	                            && (!(m.getType() instanceof AmmoType)
 	                                    || (((AmmoType) epart.getType()).getMunitionType()
 	                                            != ((AmmoType) m.getType()).getMunitionType()))) {
