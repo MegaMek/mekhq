@@ -434,6 +434,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
         setBattleArmorCount(0);
         setNumberBaSquads(0);
         setInfantryCount(0);
+        setDropshipCount(0);
         setJumpshipCount(0);
         setWarshipCount(0);
 
