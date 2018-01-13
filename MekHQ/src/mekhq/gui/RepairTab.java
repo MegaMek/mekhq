@@ -121,7 +121,8 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
     private int selectedRow = -1;
     private int selectedLocation = -1;
     private Unit selectedUnit = null;
-    private Person selectedTech = getSelectedTech();    
+    private Person selectedTech = getSelectedTech();
+    private boolean ignoreUnitTable = false; // Used to disable selection listener while data is updated.
 
     RepairTab(CampaignGUI gui, String name) {
         super(gui, name);
@@ -542,6 +543,9 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
     }
 
     private void servicedUnitTableValueChanged(javax.swing.event.ListSelectionEvent evt) {
+        if (ignoreUnitTable) {
+            return;
+        }
         refreshTaskList();
         refreshPartsAcquisition();
         int selected = servicedUnitTable.getSelectedRow();
@@ -553,6 +557,13 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
                 txtServicedUnitView.setText("<div style='font: 12pt monospaced'>" + mv.getMechReadoutBasic() + "<br>"
                         + mv.getMechReadoutLoadout() + "</div>");
             }
+            if (!unit.equals(selectedUnit)) {
+                choiceLocation.setSelectedIndex(0);
+            }
+            selectedUnit = unit;
+        } else {
+            selectedUnit = null;
+            choiceLocation.setSelectedItem(null);
         }
     }
 
@@ -652,6 +663,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
     }
 
     public void filterTasks() {
+        selectedLocation = choiceLocation.getSelectedIndex();
         RowFilter<TaskTableModel, Integer> taskLocationFilter = null;
         final String loc = (String) choiceLocation.getSelectedItem();
         taskLocationFilter = new RowFilter<TaskTableModel, Integer>() {
@@ -746,14 +758,18 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
 
     public void refreshServicedUnitList() {
         int selected = servicedUnitTable.getSelectedRow();
+        ignoreUnitTable = true;
         servicedUnitModel.setData(getCampaign().getServiceableUnits());
+        ignoreUnitTable = false;
         if (selected == servicedUnitTable.getRowCount()) {
             selected--;
         }
         if ((selected > -1) && (selected < servicedUnitTable.getRowCount())) {
             servicedUnitTable.setRowSelectionInterval(selected, selected);
+        } else {
+            refreshTaskList();
         }
-        
+
         refreshPartsAcquisition();
     }
 
@@ -765,6 +781,8 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         taskModel.setData(getCampaign().getPartsNeedingServiceFor(uuid));
 
         if (getSelectedServicedUnit() != null && getSelectedServicedUnit().getEntity() != null) {
+            // Retain the selected index while the contents is refreshed.
+            int selected = choiceLocation.getSelectedIndex();
             choiceLocation.removeAllItems();
             choiceLocation.addItem("All");
             for (String s : getSelectedServicedUnit().getEntity().getLocationAbbrs()) {
@@ -777,6 +795,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
             if (getSelectedServicedUnit().getEntity().isOmni()) {
                 choiceLocation.addItem("OmniPod");
             }
+            selectedLocation = selected;
             if (selectedLocation > -1 && choiceLocation.getModel().getSize() > selectedLocation) {
                 choiceLocation.setSelectedIndex(selectedLocation);
             } else {
@@ -797,11 +816,11 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
                     selectedRow);
         }
         if (selectedLocation != -1 && choiceLocation.getItemCount() > 0) {
-            if (selectedUnit == null || getSelectedServicedUnit() == null
-                    || !selectedUnit.equals(getSelectedServicedUnit())
-                    || selectedLocation >= choiceLocation.getItemCount()) {
-                selectedLocation = 0;
-            }
+//            if (selectedUnit == null || getSelectedServicedUnit() == null
+//                    || !selectedUnit.equals(getSelectedServicedUnit())
+//                    || selectedLocation >= choiceLocation.getItemCount()) {
+//                selectedLocation = 0;
+//            }
             choiceLocation.setSelectedIndex(selectedLocation);
         }
     }
