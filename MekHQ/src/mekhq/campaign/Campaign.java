@@ -7211,6 +7211,7 @@ public class Campaign implements Serializable, ITechManager {
         }
         return possiblePortraits;
     }
+    
     public void assignRandomPortraitFor(Person p) {
         // first create a list of existing portait strings, so we can check for
         // duplicates
@@ -7230,7 +7231,6 @@ public class Campaign implements Serializable, ITechManager {
             return;
         }
         ArrayList<String> possiblePortraits = new ArrayList<String>();
-        Iterator<String> categories = portraits.getCategoryNames();
 
         // Will search for portraits in the /gender/primaryrole folder first,
         // and if none are found then /gender/rolegroup, then /gender/combat or
