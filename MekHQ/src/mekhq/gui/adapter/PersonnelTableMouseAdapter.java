@@ -1,5 +1,6 @@
 package mekhq.gui.adapter;
 
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -1904,61 +1905,67 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             if (oneSelected && person.isActive()) {
                 if (gui.getCampaign().getCampaignOptions().useEdge()) {
                     menu = new JMenu(resourceMap.getString("setEdgeTriggers.text")); //$NON-NLS-1$
-                    //Start of role-specific Edge reroll options
-                    //Mechwarriors
-                    if (person.getPrimaryRole() == Person.T_MECHWARRIOR) {
-                        cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("edgeTriggerHeadHits.text")); //$NON-NLS-1$
-                        cbMenuItem.setSelected(person.getOptions()
-                                .booleanOption(OPT_EDGE_HEADHIT));
-                        cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_HEADHIT));
-                        cbMenuItem.addActionListener(this);
-                        menu.add(cbMenuItem);
-                        cbMenuItem = new JCheckBoxMenuItem(
-                                resourceMap.getString("edgeTriggerTAC.text")); //$NON-NLS-1$
-                        cbMenuItem.setSelected(person.getOptions()
-                                .booleanOption(OPT_EDGE_TAC));
-                        cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_TAC));
-                        cbMenuItem.addActionListener(this);
-                        menu.add(cbMenuItem);
-                        cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("edgeTriggerKO.text")); //$NON-NLS-1$
-                        cbMenuItem.setSelected(person.getOptions()
-                                .booleanOption(OPT_EDGE_KO));
-                        cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_KO));
-                        cbMenuItem.addActionListener(this);
-                        menu.add(cbMenuItem);
-                        cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("edgeTriggerExplosion.text")); //$NON-NLS-1$
-                        cbMenuItem.setSelected(person.getOptions()
-                                .booleanOption(OPT_EDGE_EXPLOSION));
-                        cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_EXPLOSION));
-                        cbMenuItem.addActionListener(this);
-                        menu.add(cbMenuItem);
-                        cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("edgeTriggerMASCFailure.text")); //$NON-NLS-1$
-                        cbMenuItem.setSelected(person.getOptions()
-                                .booleanOption(OPT_EDGE_MASC_FAILURE));
-                        cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_MASC_FAILURE));
-                        cbMenuItem.addActionListener(this);
-                        menu.add(cbMenuItem);
-                    //Doctors    
-                    } else if (person.getPrimaryRole() == Person.T_DOCTOR && gui.getCampaign().getCampaignOptions().useSupportEdge()) {
+                    //Start of Edge reroll options
+                    cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("edgeTriggerHeadHits.text")); //$NON-NLS-1$
+                    cbMenuItem.setSelected(person.getOptions()
+                            .booleanOption(OPT_EDGE_HEADHIT));
+                    cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_HEADHIT));
+                    if (person.getPrimaryRole() != Person.T_MECHWARRIOR) { cbMenuItem.setForeground(new Color(150, 150, 150)); }
+                    cbMenuItem.addActionListener(this);
+                    menu.add(cbMenuItem);
+                    cbMenuItem = new JCheckBoxMenuItem(
+                            resourceMap.getString("edgeTriggerTAC.text")); //$NON-NLS-1$
+                    cbMenuItem.setSelected(person.getOptions()
+                            .booleanOption(OPT_EDGE_TAC));
+                    cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_TAC));
+                    if (person.getPrimaryRole() != Person.T_MECHWARRIOR) { cbMenuItem.setForeground(new Color(150, 150, 150)); }
+                    cbMenuItem.addActionListener(this);
+                    menu.add(cbMenuItem);
+                    cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("edgeTriggerKO.text")); //$NON-NLS-1$
+                    cbMenuItem.setSelected(person.getOptions()
+                            .booleanOption(OPT_EDGE_KO));
+                    cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_KO));
+                    if (person.getPrimaryRole() != Person.T_MECHWARRIOR) { cbMenuItem.setForeground(new Color(150, 150, 150)); }
+                    cbMenuItem.addActionListener(this);
+                    menu.add(cbMenuItem);
+                    cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("edgeTriggerExplosion.text")); //$NON-NLS-1$
+                    cbMenuItem.setSelected(person.getOptions()
+                            .booleanOption(OPT_EDGE_EXPLOSION));
+                    cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_EXPLOSION));
+                    if (person.getPrimaryRole() != Person.T_MECHWARRIOR) { cbMenuItem.setForeground(new Color(150, 150, 150)); }
+                    cbMenuItem.addActionListener(this);
+                    menu.add(cbMenuItem);
+                    cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("edgeTriggerMASCFailure.text")); //$NON-NLS-1$
+                    cbMenuItem.setSelected(person.getOptions()
+                            .booleanOption(OPT_EDGE_MASC_FAILURE));
+                    cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_MASC_FAILURE));
+                    if (person.getPrimaryRole() != Person.T_MECHWARRIOR) { cbMenuItem.setForeground(new Color(150, 150, 150)); }
+                    cbMenuItem.addActionListener(this);
+                    menu.add(cbMenuItem);
+                    // Support Edge
+                    if (gui.getCampaign().getCampaignOptions().useSupportEdge()) {
+                        //Doctors
                         cbMenuItem = new JCheckBoxMenuItem(
                                 resourceMap.getString("edgeTriggerHealCheck.text")); //$NON-NLS-1$
                         cbMenuItem.setSelected(person.getOptions()
                                 .booleanOption(PersonnelOptions.EDGE_MEDICAL));
                         cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, PersonnelOptions.EDGE_MEDICAL));
+                        if (person.getPrimaryRole() != Person.T_DOCTOR) { cbMenuItem.setForeground(new Color(150, 150, 150)); }
                         cbMenuItem.addActionListener(this);
                         menu.add(cbMenuItem);
-                    //Techs
-                    } else if ((person.getPrimaryRole() == Person.T_SPACE_CREW
-                                || person.getPrimaryRole() == Person.T_MECH_TECH
-                                || person.getPrimaryRole() == Person.T_MECHANIC
-                                || person.getPrimaryRole() == Person.T_AERO_TECH
-                                || person.getPrimaryRole() == Person.T_BA_TECH)
-                                && gui.getCampaign().getCampaignOptions().useSupportEdge()) {
+                        //Techs
                         cbMenuItem = new JCheckBoxMenuItem(
                                 resourceMap.getString("edgeTriggerBreakPart.text")); //$NON-NLS-1$
                         cbMenuItem.setSelected(person.getOptions()
                                 .booleanOption(PersonnelOptions.EDGE_REPAIR_BREAK_PART));
                         cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, PersonnelOptions.EDGE_REPAIR_BREAK_PART));
+                        if (person.getPrimaryRole() != Person.T_SPACE_CREW
+                                && person.getPrimaryRole() != Person.T_MECH_TECH
+                                && person.getPrimaryRole() != Person.T_MECHANIC
+                                && person.getPrimaryRole() != Person.T_AERO_TECH
+                                && person.getPrimaryRole() != Person.T_BA_TECH) {
+                            cbMenuItem.setForeground(new Color(150, 150, 150));
+                        }
                         cbMenuItem.addActionListener(this);
                         menu.add(cbMenuItem);
                         cbMenuItem = new JCheckBoxMenuItem(
@@ -1966,19 +1973,27 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                         cbMenuItem.setSelected(person.getOptions()
                                 .booleanOption(PersonnelOptions.EDGE_REPAIR_FAILED_REFIT));
                         cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, PersonnelOptions.EDGE_REPAIR_FAILED_REFIT));
+                        if (person.getPrimaryRole() != Person.T_SPACE_CREW
+                                && person.getPrimaryRole() != Person.T_MECH_TECH
+                                && person.getPrimaryRole() != Person.T_MECHANIC
+                                && person.getPrimaryRole() != Person.T_AERO_TECH
+                                && person.getPrimaryRole() != Person.T_BA_TECH) {
+                            cbMenuItem.setForeground(new Color(150, 150, 150));
+                        }
                         cbMenuItem.addActionListener(this);
                         menu.add(cbMenuItem);
                     //Admins
-                    } else if ((person.getPrimaryRole() == Person.T_ADMIN_COM
-                            || person.getPrimaryRole() == Person.T_ADMIN_LOG
-                            || person.getPrimaryRole() == Person.T_ADMIN_TRA
-                            || person.getPrimaryRole() == Person.T_ADMIN_HR) 
-                            && gui.getCampaign().getCampaignOptions().useSupportEdge()) {
                         cbMenuItem = new JCheckBoxMenuItem(
                                 resourceMap.getString("edgeTriggerAcquireCheck.text")); //$NON-NLS-1$
                         cbMenuItem.setSelected(person.getOptions()
                                 .booleanOption(PersonnelOptions.EDGE_ADMIN_ACQUIRE_FAIL));
                         cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, PersonnelOptions.EDGE_ADMIN_ACQUIRE_FAIL));
+                        if (person.getPrimaryRole() != Person.T_ADMIN_COM
+                                && person.getPrimaryRole() != Person.T_ADMIN_LOG
+                                && person.getPrimaryRole() != Person.T_ADMIN_TRA
+                                && person.getPrimaryRole() != Person.T_ADMIN_HR) {
+                            cbMenuItem.setForeground(new Color(150, 150, 150));
+                        }
                         cbMenuItem.addActionListener(this);
                         menu.add(cbMenuItem);                        
                     } 
@@ -2021,22 +2036,25 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     menuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_MASC_FAILURE, TRUE));
                     menuItem.addActionListener(this);
                     submenu.add(menuItem);
-                    menuItem = new JMenuItem(resourceMap.getString("edgeTriggerHealCheck.text")); //$NON-NLS-1$
-                    menuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, PersonnelOptions.EDGE_MEDICAL, TRUE));
-                    menuItem.addActionListener(this);
-                    submenu.add(menuItem);
-                    menuItem = new JMenuItem(resourceMap.getString("edgeTriggerBreakPart.text")); //$NON-NLS-1$
-                    menuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, PersonnelOptions.EDGE_REPAIR_BREAK_PART, TRUE));
-                    menuItem.addActionListener(this);
-                    submenu.add(menuItem);
-                    menuItem = new JMenuItem(resourceMap.getString("edgeTriggerFailedRefit.text")); //$NON-NLS-1$
-                    menuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, PersonnelOptions.EDGE_REPAIR_FAILED_REFIT, TRUE));
-                    menuItem.addActionListener(this);
-                    submenu.add(menuItem);
-                    menuItem = new JMenuItem(resourceMap.getString("edgeTriggerAcquireCheck.text")); //$NON-NLS-1$
-                    menuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, PersonnelOptions.EDGE_ADMIN_ACQUIRE_FAIL, TRUE));
-                    menuItem.addActionListener(this);
-                    submenu.add(menuItem);
+                    if (gui.getCampaign().getCampaignOptions().useSupportEdge()) {
+                        menuItem = new JMenuItem(resourceMap.getString("edgeTriggerHealCheck.text")); //$NON-NLS-1$
+                        menuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, PersonnelOptions.EDGE_MEDICAL, TRUE));
+                        menuItem.addActionListener(this);
+                        submenu.add(menuItem);
+                        menuItem = new JMenuItem(resourceMap.getString("edgeTriggerBreakPart.text")); //$NON-NLS-1$
+                        menuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, PersonnelOptions.EDGE_REPAIR_BREAK_PART, TRUE));
+                        menuItem.addActionListener(this);
+                        submenu.add(menuItem);
+                        menuItem = new JMenuItem(resourceMap.getString("edgeTriggerFailedRefit.text")); //$NON-NLS-1$
+                        menuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, PersonnelOptions.EDGE_REPAIR_FAILED_REFIT, TRUE));
+                        menuItem.addActionListener(this);
+                        submenu.add(menuItem);
+                        menuItem = new JMenuItem(resourceMap.getString("edgeTriggerAcquireCheck.text")); //$NON-NLS-1$
+                        menuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, PersonnelOptions.EDGE_ADMIN_ACQUIRE_FAIL, TRUE));
+                        menuItem.addActionListener(this);
+                        submenu.add(menuItem);
+                    }
+                    menu.add(submenu);
                     submenu = new JMenu(resourceMap.getString("off.text")); //$NON-NLS-1$
                     menuItem = new JMenuItem(resourceMap.getString("edgeTriggerHeadHits.text")); //$NON-NLS-1$
                     menuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_HEADHIT, FALSE));
@@ -2058,23 +2076,25 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     menuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_MASC_FAILURE, FALSE));
                     menuItem.addActionListener(this);
                     submenu.add(menuItem);
+                    if (gui.getCampaign().getCampaignOptions().useSupportEdge()) {
+                        menuItem = new JMenuItem(resourceMap.getString("edgeTriggerHealCheck.text")); //$NON-NLS-1$
+                        menuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, PersonnelOptions.EDGE_MEDICAL, FALSE));
+                        menuItem.addActionListener(this);
+                        submenu.add(menuItem);
+                        menuItem = new JMenuItem(resourceMap.getString("edgeTriggerBreakPart.text")); //$NON-NLS-1$
+                        menuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, PersonnelOptions.EDGE_REPAIR_BREAK_PART, FALSE));
+                        menuItem.addActionListener(this);
+                        submenu.add(menuItem);
+                        menuItem = new JMenuItem(resourceMap.getString("edgeTriggerFailedRefit.text")); //$NON-NLS-1$
+                        menuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, PersonnelOptions.EDGE_REPAIR_FAILED_REFIT, FALSE));
+                        menuItem.addActionListener(this);
+                        submenu.add(menuItem);
+                        menuItem = new JMenuItem(resourceMap.getString("edgeTriggerAcquireCheck.text")); //$NON-NLS-1$
+                        menuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, PersonnelOptions.EDGE_ADMIN_ACQUIRE_FAIL, FALSE));
+                        menuItem.addActionListener(this);
+                        submenu.add(menuItem);
+                    }
                     menu.add(submenu);
-                    menuItem = new JMenuItem(resourceMap.getString("edgeTriggerHealCheck.text")); //$NON-NLS-1$
-                    menuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, PersonnelOptions.EDGE_MEDICAL, FALSE));
-                    menuItem.addActionListener(this);
-                    submenu.add(menuItem);
-                    menuItem = new JMenuItem(resourceMap.getString("edgeTriggerBreakPart.text")); //$NON-NLS-1$
-                    menuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, PersonnelOptions.EDGE_REPAIR_BREAK_PART, FALSE));
-                    menuItem.addActionListener(this);
-                    submenu.add(menuItem);
-                    menuItem = new JMenuItem(resourceMap.getString("edgeTriggerFailedRefit.text")); //$NON-NLS-1$
-                    menuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, PersonnelOptions.EDGE_REPAIR_FAILED_REFIT, FALSE));
-                    menuItem.addActionListener(this);
-                    submenu.add(menuItem);
-                    menuItem = new JMenuItem(resourceMap.getString("edgeTriggerAcquireCheck.text")); //$NON-NLS-1$
-                    menuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, PersonnelOptions.EDGE_ADMIN_ACQUIRE_FAIL, FALSE));
-                    menuItem.addActionListener(this);
-                    submenu.add(menuItem);
                     popup.add(menu);
                 }
                 menu = new JMenu(resourceMap.getString("specialFlags.text")); //$NON-NLS-1$
