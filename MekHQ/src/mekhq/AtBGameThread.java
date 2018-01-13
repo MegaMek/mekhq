@@ -180,8 +180,9 @@ public class AtBGameThread extends GameThread {
             		/* Set scenario type-specific delay */
                 	int deploymentRound = Math.max(entity.getDeployRound(), scenario.getDeploymentDelay() - speed);
                 	/* Lances deployed in scout roles always deploy units in 6-walking speed turns */
-                	if (scenario.getLanceRole() == Lance.ROLE_SCOUT
-                			&& scenario.getLance(campaign).getForceId() == scenario.getLanceForceId()
+                	if ((scenario.getLanceRole() == Lance.ROLE_SCOUT)
+                	        && (scenario.getLance(campaign) != null)
+                			&& (scenario.getLance(campaign).getForceId() == scenario.getLanceForceId())
                 			&& !useDropship) {
                 		deploymentRound = Math.max(deploymentRound, 6 - speed);
                 	}

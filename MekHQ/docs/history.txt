@@ -27,6 +27,7 @@ v0.43.7-git
 + Issue #520: GM Tools Window not placed correctly
 + Issue #537: Repair Bay tasks list location filter resets when changing mode of a task.
 + Issue #553: Fatigue check occurring too early
++ Issue #556: MM giving disconnected from server error when launched from MHQ
 
 v0.43.6 (2017-12-22 10:00 UTC)
 + Bug: ClassCastException when loading campaign from earlier versions with large craft with missing ammo bin.
