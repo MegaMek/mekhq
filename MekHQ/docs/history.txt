@@ -28,6 +28,7 @@ v0.43.7-git
 + Issue #537: Repair Bay tasks list location filter resets when changing mode of a task.
 + Issue #553: Fatigue check occurring too early
 + Issue #556: MM giving disconnected from server error when launched from MHQ
++ Issue #329: The "do task" button on the repair bay UI tends to jump left and right
 
 v0.43.6 (2017-12-22 10:00 UTC)
 + Bug: ClassCastException when loading campaign from earlier versions with large craft with missing ammo bin.
