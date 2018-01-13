@@ -31,6 +31,7 @@ v0.43.7-git
 + Issue #329: The "do task" button on the repair bay UI tends to jump left and right
 + Issue #570: Unit Rating unsustainable
 + Issue #574: Dropship capacity Inconsistancy
++ Issue #591: Special Abilities can be selected multiple times
 
 v0.43.6 (2017-12-22 10:00 UTC)
 + Bug: ClassCastException when loading campaign from earlier versions with large craft with missing ammo bin.
