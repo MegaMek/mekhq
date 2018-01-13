@@ -1258,7 +1258,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         int bays = 0;
         for (Bay b : getEntity().getTransportBays()) {
             if (b instanceof InfantryBay) {
-                bays += b.getCapacity();
+                bays += b.getCapacity() / ((InfantryBay) b).getPlatoonType().getWeight();
             }
         }
         return bays;
