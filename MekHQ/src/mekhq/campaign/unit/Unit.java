@@ -2852,6 +2852,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             }
             entity.getCrew().setMissing(false, 0);
         }
+        entity.getCrew().resetFatigue();
 
         // Clear any stale game data that may somehow have gotten set incorrectly
         campaign.clearGameData(entity);

@@ -26,6 +26,7 @@ v0.43.7-git
 + Issue #525: Available Time for Mothball Not Calculating Correctly
 + Issue #520: GM Tools Window not placed correctly
 + Issue #537: Repair Bay tasks list location filter resets when changing mode of a task.
++ Issue #553: Fatigue check occurring too early
 
 v0.43.6 (2017-12-22 10:00 UTC)
 + Bug: ClassCastException when loading campaign from earlier versions with large craft with missing ammo bin.
