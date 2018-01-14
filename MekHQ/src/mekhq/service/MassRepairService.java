@@ -717,6 +717,10 @@ public class MassRepairService {
 			debugLog("Checking tech %s", "repairPart", tech.getName());
 
 			Skill skill = tech.getSkillForWorkingOn(partWork);
+			
+			if (partWork instanceof Part) {
+			    ((Part) partWork).resetModeToNormal();
+			}
 
 			// We really only have to check one tech of each skill level
 			if (!techSkillToWorktimeMap.containsKey(skill.getType().getName() + "-" + skill.getLevel())) {
@@ -1087,7 +1091,7 @@ public class MassRepairService {
 					return new WorkTimeCalculation(previousNewWorkTime);
 				}
 
-				WorkTimeCalculation wtc = new WorkTimeCalculation();
+				WorkTimeCalculation wtc = new WorkTimeCalculation(null);
 
 				if (skill.getExperienceLevel() >= highestAvailableTechSkill) {
 					wtc.setReachedMaxSkill(true);
