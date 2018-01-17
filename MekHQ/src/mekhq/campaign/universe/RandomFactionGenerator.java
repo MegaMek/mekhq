@@ -436,6 +436,12 @@ public class RandomFactionGenerator implements Serializable {
 		currentFactions.clear();
 		for (Planet p : Planets.getInstance().getPlanets().values()) {
 			for (Faction f : p.getFactionSet(Utilities.getDateTimeDay(date))) {
+			    if(f == null) {
+                    MekHQ.getLogger().log(this.getClass(), "RandomFactionGenerator.updateTables", 
+                            LogLevel.ERROR, "Invalid faction code [" + f + "] in planets.xml for planet " + p.getId() + " in year " + date);
+                    continue;
+                }
+			    
 				String fName = f.getShortName();
 				if (fName.equals("ABN") ||
 						fName.equals("UND") ||
@@ -492,6 +498,12 @@ public class RandomFactionGenerator implements Serializable {
 		}
 		for (Planet planetKey : Planets.getInstance().getNearbyPlanets(p, distance)) {
 			for (Faction f2 : planetKey.getFactionSet(Utilities.getDateTimeDay(lastUpdate))) {
+			    if(f2 == null) {
+			        MekHQ.getLogger().log(this.getClass(), "RandomFactionGenerator.UpdateBorders", 
+			                LogLevel.ERROR, "Invalid faction code [" + f2 + "] in planets.xml for planet " + planetKey.getId() + " in year " + lastUpdate);
+			        continue;
+			    }
+			    
 				String eName = f2.getShortName();
 				if (eName.equals("ABN") ||
 						eName.equals("UND") ||

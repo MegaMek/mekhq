@@ -2334,7 +2334,7 @@ public class CampaignOptions implements Serializable {
                 retVal.useAbilities = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("useEdge")) {
                 retVal.useEdge = Boolean.parseBoolean(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("useRemfEdge")) {
+            } else if (wn2.getNodeName().equalsIgnoreCase("useSupportEdge")) {
                 retVal.useSupportEdge = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("useImplants")) {
                 retVal.useImplants = Boolean.parseBoolean(wn2.getTextContent());

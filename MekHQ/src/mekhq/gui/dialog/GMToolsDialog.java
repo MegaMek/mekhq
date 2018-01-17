@@ -73,8 +73,8 @@ public class GMToolsDialog extends JDialog implements ActionListener {
         //this.setPreferredSize(new Dimension(600,300));
         //this.setMinimumSize(new Dimension(600,300));
         initComponents();
-        setLocationRelativeTo(parent);
         pack();
+        setLocationRelativeTo(parent);
     }
 
     private JPanel getDiceRoller() {

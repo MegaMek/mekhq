@@ -95,6 +95,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
     private static final long serialVersionUID = 6757065427956450309L;
 
     private JPanel panDoTask;
+    private JPanel panDoTaskText;
     private JSplitPane splitServicedUnits;
     private JTable servicedUnitTable;
     private JTable taskTable;
@@ -121,7 +122,8 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
     private int selectedRow = -1;
     private int selectedLocation = -1;
     private Unit selectedUnit = null;
-    private Person selectedTech = getSelectedTech();    
+    private Person selectedTech = getSelectedTech();
+    private boolean ignoreUnitTable = false; // Used to disable selection listener while data is updated.
 
     RepairTab(CampaignGUI gui, String name) {
         super(gui, name);
@@ -290,9 +292,9 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         scrollTechTable.setPreferredSize(new java.awt.Dimension(300, 300));
 
         panDoTask = new JPanel(new GridBagLayout());
-        panDoTask.setMinimumSize(new java.awt.Dimension(300, 100));
+        panDoTask.setMinimumSize(new java.awt.Dimension(100, 100));
         panDoTask.setName("panelDoTask"); // NOI18N
-        panDoTask.setPreferredSize(new java.awt.Dimension(300, 100));
+        panDoTask.setPreferredSize(new java.awt.Dimension(100, 100));
 
         btnDoTask = new JButton(resourceMap.getString("btnDoTask.text")); // NOI18N
         btnDoTask.setToolTipText(resourceMap.getString("btnDoTask.toolTipText")); // NOI18N
@@ -318,6 +320,29 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTH;
         panDoTask.add(lblTargetNum, gridBagConstraints);
 
+        choiceLocation = new JComboBox<String>();
+        choiceLocation.removeAllItems();
+        choiceLocation.addItem("All");
+        choiceLocation.setEnabled(false);
+        choiceLocation.addActionListener(ev -> filterTasks());
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.gridheight = 1;
+        panDoTask.add(choiceLocation, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 1.0;
+        panTasks.add(panDoTask, gridBagConstraints);
+
+        panDoTaskText = new JPanel(new GridBagLayout());
+        panDoTaskText.setMinimumSize(new java.awt.Dimension(150, 100));
+        panDoTaskText.setName("panelDoTask"); // NOI18N
+        panDoTaskText.setPreferredSize(new java.awt.Dimension(150, 100));
+
         textTarget = new JTextArea();
         textTarget.setColumns(20);
         textTarget.setEditable(false);
@@ -338,25 +363,14 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        panDoTask.add(scrTextTarget, gridBagConstraints);
-
-        choiceLocation = new JComboBox<String>();
-        choiceLocation.removeAllItems();
-        choiceLocation.addItem("All");
-        choiceLocation.setEnabled(false);
-        choiceLocation.addActionListener(ev -> filterTasks());
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.gridheight = 1;
-        panDoTask.add(choiceLocation, gridBagConstraints);
+        panDoTaskText.add(scrTextTarget, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
-        panTasks.add(panDoTask, gridBagConstraints);
+        panTasks.add(panDoTaskText, gridBagConstraints);
 
         taskModel = new TaskTableModel(getCampaignGui(), this);
         taskTable = new JTable(taskModel);
@@ -381,6 +395,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.gridwidth = 2;
         panTasks.add(scrollTaskTable, gridBagConstraints);
 
         JPanel panTechs = new JPanel(new GridBagLayout());
@@ -542,6 +557,9 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
     }
 
     private void servicedUnitTableValueChanged(javax.swing.event.ListSelectionEvent evt) {
+        if (ignoreUnitTable) {
+            return;
+        }
         refreshTaskList();
         refreshPartsAcquisition();
         int selected = servicedUnitTable.getSelectedRow();
@@ -553,6 +571,13 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
                 txtServicedUnitView.setText("<div style='font: 12pt monospaced'>" + mv.getMechReadoutBasic() + "<br>"
                         + mv.getMechReadoutLoadout() + "</div>");
             }
+            if (!unit.equals(selectedUnit)) {
+                choiceLocation.setSelectedIndex(0);
+            }
+            selectedUnit = unit;
+        } else {
+            selectedUnit = null;
+            choiceLocation.setSelectedItem(null);
         }
     }
 
@@ -652,6 +677,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
     }
 
     public void filterTasks() {
+        selectedLocation = choiceLocation.getSelectedIndex();
         RowFilter<TaskTableModel, Integer> taskLocationFilter = null;
         final String loc = (String) choiceLocation.getSelectedItem();
         taskLocationFilter = new RowFilter<TaskTableModel, Integer>() {
@@ -746,14 +772,18 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
 
     public void refreshServicedUnitList() {
         int selected = servicedUnitTable.getSelectedRow();
+        ignoreUnitTable = true;
         servicedUnitModel.setData(getCampaign().getServiceableUnits());
+        ignoreUnitTable = false;
         if (selected == servicedUnitTable.getRowCount()) {
             selected--;
         }
         if ((selected > -1) && (selected < servicedUnitTable.getRowCount())) {
             servicedUnitTable.setRowSelectionInterval(selected, selected);
+        } else {
+            refreshTaskList();
         }
-        
+
         refreshPartsAcquisition();
     }
 
@@ -765,6 +795,8 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         taskModel.setData(getCampaign().getPartsNeedingServiceFor(uuid));
 
         if (getSelectedServicedUnit() != null && getSelectedServicedUnit().getEntity() != null) {
+            // Retain the selected index while the contents is refreshed.
+            int selected = choiceLocation.getSelectedIndex();
             choiceLocation.removeAllItems();
             choiceLocation.addItem("All");
             for (String s : getSelectedServicedUnit().getEntity().getLocationAbbrs()) {
@@ -777,6 +809,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
             if (getSelectedServicedUnit().getEntity().isOmni()) {
                 choiceLocation.addItem("OmniPod");
             }
+            selectedLocation = selected;
             if (selectedLocation > -1 && choiceLocation.getModel().getSize() > selectedLocation) {
                 choiceLocation.setSelectedIndex(selectedLocation);
             } else {
@@ -797,11 +830,11 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
                     selectedRow);
         }
         if (selectedLocation != -1 && choiceLocation.getItemCount() > 0) {
-            if (selectedUnit == null || getSelectedServicedUnit() == null
-                    || !selectedUnit.equals(getSelectedServicedUnit())
-                    || selectedLocation >= choiceLocation.getItemCount()) {
-                selectedLocation = 0;
-            }
+//            if (selectedUnit == null || getSelectedServicedUnit() == null
+//                    || !selectedUnit.equals(getSelectedServicedUnit())
+//                    || selectedLocation >= choiceLocation.getItemCount()) {
+//                selectedLocation = 0;
+//            }
             choiceLocation.setSelectedIndex(selectedLocation);
         }
     }

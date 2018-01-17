@@ -31,6 +31,7 @@ import megamek.common.Aero;
 import megamek.common.CriticalSlot;
 import megamek.common.Engine;
 import megamek.common.Entity;
+import megamek.common.EntityMovementMode;
 import megamek.common.IArmorState;
 import megamek.common.Mech;
 import megamek.common.Protomech;
@@ -40,6 +41,7 @@ import megamek.common.verifier.TestEntity;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.unit.Unit;
 
 /**
  *
@@ -118,6 +120,14 @@ public class EnginePart extends Part {
 	@Override
 	public long getStickerPrice() {
 		return (long)Math.round((getEngine().getBaseCost()/75.0) * getEngine().getRating() * getUnitTonnage());
+	}
+	
+	@Override
+	public void setUnit(Unit u) {
+	    super.setUnit(u);
+	    if ((null != u) && u.getEntity().hasETypeFlag(Entity.ETYPE_TANK)) {
+	        fixTankFlag(u.getEntity().getMovementMode() == EntityMovementMode.HOVER);
+	    }
 	}
 
 	public void fixTankFlag(boolean hover) {

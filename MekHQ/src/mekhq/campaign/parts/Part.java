@@ -1057,6 +1057,22 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
         sj.add(hits + " hit(s)");
         return sj.toString();
     }
+	
+	/**
+	 * Converts the array of strings normally returned by a call to campaign.getInventory() 
+	 * to a string that reads like "(x in transit, y on order)"
+	 * @param inventories The inventory array, see campaign.getInventory() for details.
+	 * @return Human readable string.
+	 */
+	public String getOrderTransitStringForDetails(String[] inventories) {
+        String inTransitString = inventories[1].startsWith("0 ") ? "" : inventories[1] + " in transit";
+        String onOrderString = inventories[2].startsWith("0 ") ? "" : inventories[2] + " on order";
+        String transitOrderSeparator = inTransitString.length() > 0 && onOrderString.length() > 0 ? ", " : "";
+        String orderTransitString = (inTransitString.length() > 0 || onOrderString.length() > 0) ? 
+                String.format("(%s%s%s)", inTransitString, transitOrderSeparator, onOrderString) : "";
+    
+        return orderTransitString;
+	}
 
 	@Override
 	public boolean isSalvaging() {

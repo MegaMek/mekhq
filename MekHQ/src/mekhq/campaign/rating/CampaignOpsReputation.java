@@ -24,7 +24,6 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -1056,9 +1055,7 @@ public class CampaignOpsReputation extends AbstractUnitRating {
     }
 
     private List<String> getCraftWithoutCrew() {
-        List<String> copy = new ArrayList<>(craftWithoutCrew.size());
-        Collections.copy(copy, craftWithoutCrew);
-        return copy;
+        return new ArrayList<>(craftWithoutCrew);
     }
 
     private void addCraftWithoutCrew(Unit u) {

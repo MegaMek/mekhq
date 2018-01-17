@@ -6,7 +6,12 @@
   	<mainClass>megameklab.com.MegaMekLab</mainClass>
   	<cp>lib/MegaMek.jar</cp>
   	<cp>lib/MegaMekLab.jar</cp>
+    <cp>lib/xstream-1.4.7.jar</cp>
   	<cp>lib/svgSalamander.jar</cp>
+  	<cp>lib/batik-all-1.9.jar</cp>
+  	<cp>lib/xml-apis-1.3.04.jar</cp>
+  	<cp>lib/xml-apis-ext-1.3.04.jar</cp>
+  	<cp>lib/xmlgraphics-commons-2.2.jar</cp>
   	<cp>lib/log4j.jar</cp>
   </classPath>
   <errTitle></errTitle>

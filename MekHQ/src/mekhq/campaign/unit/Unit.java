@@ -1258,7 +1258,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         int bays = 0;
         for (Bay b : getEntity().getTransportBays()) {
             if (b instanceof InfantryBay) {
-                bays += b.getCapacity();
+                bays += b.getCapacity() / ((InfantryBay) b).getPlatoonType().getWeight();
             }
         }
         return bays;
@@ -1984,11 +1984,19 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 protoLegsActuator = part;
             } else if(part instanceof ProtomekJumpJet || part instanceof MissingProtomekJumpJet) {
                 protoJumpJets.add(part);
-            } else if (part instanceof Thrusters || part instanceof MissingThrusters) {
+            } else if ((part instanceof Thrusters)
+                    && (entity.isLargeCraft() || entity.hasETypeFlag(Entity.ETYPE_SMALL_CRAFT))) {
                 if (((Thrusters) part).isLeftThrusters()) {
-                    aeroThrustersLeft = ((Thrusters) part);
+                    aeroThrustersLeft = part;
                 } else {
-                    aeroThrustersRight = ((Thrusters) part);
+                    aeroThrustersRight = part;
+                }
+            } else if ((part instanceof MissingThrusters)
+                    && (entity.isLargeCraft() || entity.hasETypeFlag(Entity.ETYPE_SMALL_CRAFT))) {
+                if (((MissingThrusters) part).isLeftThrusters()) {
+                    aeroThrustersLeft = part;
+                } else {
+                    aeroThrustersRight = part;
                 }
             } else if (part instanceof TransportBayPart) {
                 bays.put(((TransportBayPart) part).getBayNumber(), part);
@@ -2261,6 +2269,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                         bayPartsToAdd.get(bay.getBayNumber()).add(cubicle);
                         addPart(cubicle);
                         partsToAdd.add(cubicle);
+                        cubicles.add(cubicle);
                     }
                 }
             }
@@ -2437,15 +2446,17 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     podhsinks--;
                 }
             }
-            if (aeroThrustersLeft == null) {
-                aeroThrustersLeft = new Thrusters(0, campaign, true);
-                addPart(aeroThrustersLeft);
-                partsToAdd.add(aeroThrustersLeft);
-            }
-            if (aeroThrustersRight == null) {
-                aeroThrustersRight = new Thrusters(0, campaign, false);
-                addPart(aeroThrustersRight);
-                partsToAdd.add(aeroThrustersRight);
+            if (entity.isLargeCraft() || entity.hasETypeFlag(Entity.ETYPE_SMALL_CRAFT)) {
+                if (aeroThrustersLeft == null) {
+                    aeroThrustersLeft = new Thrusters(0, campaign, true);
+                    addPart(aeroThrustersLeft);
+                    partsToAdd.add(aeroThrustersLeft);
+                }
+                if (aeroThrustersRight == null) {
+                    aeroThrustersRight = new Thrusters(0, campaign, false);
+                    addPart(aeroThrustersRight);
+                    partsToAdd.add(aeroThrustersRight);
+                }
             }
          }
         if(entity instanceof Tank) {
@@ -2515,14 +2526,14 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     infantryArmor = new EquipmentPart(0, eq, 0, false, campaign);
                 } else {
                     infantryArmor = new InfantryArmorPart(0, campaign, ((Infantry)entity).getDamageDivisor(), ((Infantry)entity).isArmorEncumbering(), ((Infantry)entity).hasDEST(), ((Infantry)entity).hasSneakCamo(), ((Infantry)entity).hasSneakECM(), ((Infantry)entity).hasSneakIR(), ((Infantry)entity).hasSpaceSuit());
-                    if(infantryArmor.getStickerPrice() > 0) {
-                        int number = ((Infantry)entity).getOInternal(Infantry.LOC_INFANTRY);
-                        while(number > 0) {
-                            infantryArmor = new InfantryArmorPart(0, campaign, ((Infantry)entity).getDamageDivisor(), ((Infantry)entity).isArmorEncumbering(), ((Infantry)entity).hasDEST(), ((Infantry)entity).hasSneakCamo(), ((Infantry)entity).hasSneakECM(), ((Infantry)entity).hasSneakIR(), ((Infantry)entity).hasSpaceSuit());
-                            addPart(infantryArmor);
-                            partsToAdd.add(infantryArmor);
-                            number--;
-                        }
+                }
+                if(infantryArmor.getStickerPrice() > 0) {
+                    int number = ((Infantry)entity).getOInternal(Infantry.LOC_INFANTRY);
+                    while(number > 0) {
+                        infantryArmor = new InfantryArmorPart(0, campaign, ((Infantry)entity).getDamageDivisor(), ((Infantry)entity).isArmorEncumbering(), ((Infantry)entity).hasDEST(), ((Infantry)entity).hasSneakCamo(), ((Infantry)entity).hasSneakECM(), ((Infantry)entity).hasSneakIR(), ((Infantry)entity).hasSpaceSuit());
+                        addPart(infantryArmor);
+                        partsToAdd.add(infantryArmor);
+                        number--;
                     }
                 }
             }
@@ -2722,49 +2733,44 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         //take first by rank
         //if rank is tied, take gunners over drivers
         //if two of the same type are tie rank, take the first one
-        int bestRank = -1;
         Person commander = null;
-        for(UUID id : vesselCrew) {
+        for (UUID id : vesselCrew) {
             if (id == null) {
                 continue;
             }
             Person p = campaign.getPerson(id);
-            if(null != p && p.getRankNumeric() > bestRank) {
+            if ((null != p) && p.outRanks(commander)){
                 commander = p;
-                bestRank = p.getRankNumeric();
             }
         }
-        for(UUID pid : gunners) {
+        for (UUID pid : gunners) {
             if (pid == null) {
                 continue;
             }
             Person p = campaign.getPerson(pid);
-            if(p != null && entity != null && (entity instanceof Tank || entity instanceof Infantry) && p.getHits() > 0) {
+            if (p != null && entity != null && (entity instanceof Tank || entity instanceof Infantry) && p.getHits() > 0) {
                 continue;
             }
-            if(p.getRankNumeric() > bestRank) {
+            if ((null != p) && p.outRanks(commander)) {
                 commander = p;
-                bestRank = p.getRankNumeric();
             }
         }
-        for(UUID pid : drivers) {
+        for (UUID pid : drivers) {
             if (pid == null) {
                 continue;
             }
             Person p = campaign.getPerson(pid);
-            if(p != null && entity != null && (entity instanceof Tank || entity instanceof Infantry) && p.getHits() > 0) {
+            if (p != null && entity != null && (entity instanceof Tank || entity instanceof Infantry) && p.getHits() > 0) {
                 continue;
             }
-            if(p.getRankNumeric() > bestRank) {
+            if ((null != p) && p.outRanks(commander)) {
                 commander = p;
-                bestRank = p.getRankNumeric();
             }
         }
-        if(navigator != null) {
+        if (navigator != null) {
             Person p = campaign.getPerson(navigator);
-            if(null != p && p.getRankNumeric() > bestRank) {
+            if(null != p && p.outRanks(commander)) {
                 commander = p;
-                bestRank = p.getRankNumeric();
             }
         }
         return commander;
@@ -2846,6 +2852,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             }
             entity.getCrew().setMissing(false, 0);
         }
+        entity.getCrew().resetFatigue();
 
         // Clear any stale game data that may somehow have gotten set incorrectly
         campaign.clearGameData(entity);

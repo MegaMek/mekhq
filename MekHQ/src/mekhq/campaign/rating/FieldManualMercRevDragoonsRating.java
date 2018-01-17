@@ -22,7 +22,6 @@ package mekhq.campaign.rating;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
 import java.util.Map;
 
 import megamek.common.Aero;

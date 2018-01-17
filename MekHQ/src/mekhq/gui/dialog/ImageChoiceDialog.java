@@ -753,6 +753,7 @@ public class ImageChoiceDialog extends JDialog {
                     if(row < imageTableModel.getRowCount()) {
                         category = imageTableModel.getCategory();
                         filename = (String) imageTableModel.getValueAt(row, 0);
+                        changed = true;
                         setVisible(false);
                     }
                 }

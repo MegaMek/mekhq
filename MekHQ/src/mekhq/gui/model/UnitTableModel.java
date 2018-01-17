@@ -184,7 +184,7 @@ public class UnitTableModel extends DataTableModel {
 
     public Object getValueAt(int row, int col) {
         Unit u;
-        if(data.isEmpty()) {
+        if(data.isEmpty() || (row < 0) || row >= data.size()) {
             return "";
         } else {
             u = getUnit(row);

@@ -2123,11 +2123,12 @@ public class Campaign implements Serializable, ITechManager {
         //if we fail and would break a part, here's a chance to use Edge for a reroll...
         if (getCampaignOptions().useSupportEdge() 
                 && tech.getOptions().booleanOption(PersonnelOptions.EDGE_REPAIR_BREAK_PART)
-                && tech.getEdge() > 0) {
+                && tech.getEdge() > 0
+                && target.getValue() != TargetRoll.AUTOMATIC_SUCCESS) {
             if ((getCampaignOptions().isDestroyByMargin()
                         && getCampaignOptions().getDestroyMargin() <= (target.getValue() - roll))
-                    || (tech.getExperienceLevel(false) == SkillType.EXP_ELITE //if an elite, primary tech
-                            || tech.getPrimaryRole() == 12) //For vessel crews
+                    || (!getCampaignOptions().isDestroyByMargin() && (tech.getExperienceLevel(false) == SkillType.EXP_ELITE //if an elite, primary tech and destroy by margin is NOT on
+                            || tech.getPrimaryRole() == Person.T_SPACE_CREW)) //For vessel crews
                         && roll < target.getValue()) {
                 tech.setEdge(tech.getEdge() - 1);
                 if (tech.isRightTechTypeFor(partWork)) {
@@ -2190,10 +2191,27 @@ public class Campaign implements Serializable, ITechManager {
         addReport(report);
     }
 
+    /**
+     * Parses news file and loads news items for the current year.
+     */
     public void reloadNews() {
         news.loadNewsFor(getGameYear(), id.getLeastSignificantBits());
     }
 
+    /**
+     * Checks for a news item for the current date. If found, adds it to the daily report.
+     */
+    public void readNews() {
+        //read the news
+        DateTime now = Utilities.getDateTimeDay(calendar);
+        for(NewsItem article : news.fetchNewsFor(now)) {
+            addReport(article.getHeadlineForReport());
+        }
+        for(NewsItem article : Planets.getInstance().getPlanetaryNews(now)) {
+            addReport(article.getHeadlineForReport());
+        }
+    }
+    
     public int getDeploymentDeficit(AtBContract contract) {
     	int total = -contract.getRequiredLances();
     	int role = -Math.max(1, contract.getRequiredLances() / 2);
@@ -2231,15 +2249,8 @@ public class Campaign implements Serializable, ITechManager {
         if (gameOptions.intOption("year") != getGameYear()) {
             gameOptions.getOption("year").setValue(getGameYear());
         }
-
-        //read the news
-        DateTime now = Utilities.getDateTimeDay(calendar);
-        for(NewsItem article : news.fetchNewsFor(now)) {
-            addReport(article.getHeadlineForReport());
-        }
-        for(NewsItem article : Planets.getInstance().getPlanetaryNews(now)) {
-            addReport(article.getHeadlineForReport());
-        }
+        
+        readNews();
 
         location.newDay(this);
 
@@ -3881,24 +3892,6 @@ public class Campaign implements Serializable, ITechManager {
             }
         }
 
-        // If we don't have a personnel market, create one.
-        if (!foundPersonnelMarket) {
-            retVal.personnelMarket = new PersonnelMarket(retVal);
-        }
-        if (!foundContractMarket) {
-            retVal.contractMarket = new ContractMarket();
-        }
-        if (!foundUnitMarket) {
-            retVal.unitMarket = new UnitMarket();
-        }
-        if (null == retVal.retirementDefectionTracker) {
-        	retVal.retirementDefectionTracker = new RetirementDefectionTracker();
-        }
-        if (retVal.getCampaignOptions().getUseAtB()) {
-        	retVal.atbConfig = AtBConfiguration.loadFromXml();
-        }
-
-
         // Okay, after we've gone through all the nodes and constructed the
         // Campaign object...
         // We need to do a post-process pass to restore a number of references.
@@ -4084,9 +4077,9 @@ public class Campaign implements Serializable, ITechManager {
                 ((MissingEnginePart) prt).fixClanFlag();
             }
             
-            if (version.getMajorVersion() == 0
-                    && version.getMinorVersion() < 44
-                    && version.getSnapshot() < 5) {
+            if ((version.getMajorVersion() == 0)
+                    && ((version.getMinorVersion() < 44)
+                            || ((version.getMinorVersion() == 43) && (version.getSnapshot() < 7)))) {
                 if ((prt instanceof MekLocation)
                         && (((MekLocation)prt).getStructureType() == EquipmentType.T_STRUCTURE_ENDO_STEEL)) {
                     if (null != u) {
@@ -4243,7 +4236,7 @@ public class Campaign implements Serializable, ITechManager {
         for (int x = 0; x < retVal.units.size(); x++) {
             Unit unit = retVal.units.get(x);
             // just in case parts are missing (i.e. because they weren't tracked
-            // in previous versions)
+            // in previous versions)            
             unit.initializeParts(true);
             unit.runDiagnostic(false);
             if (!unit.isRepairable()) {
@@ -4268,6 +4261,23 @@ public class Campaign implements Serializable, ITechManager {
                 String.format("[Campaign Load] News loaded in %dms", //$NON-NLS-1$
                         System.currentTimeMillis() - timestamp));
         timestamp = System.currentTimeMillis();
+
+        // If we don't have a personnel market, create one.
+        if (!foundPersonnelMarket) {
+            retVal.personnelMarket = new PersonnelMarket(retVal);
+        }
+        if (!foundContractMarket) {
+            retVal.contractMarket = new ContractMarket();
+        }
+        if (!foundUnitMarket) {
+            retVal.unitMarket = new UnitMarket();
+        }
+        if (null == retVal.retirementDefectionTracker) {
+            retVal.retirementDefectionTracker = new RetirementDefectionTracker();
+        }
+        if (retVal.getCampaignOptions().getUseAtB()) {
+            retVal.atbConfig = AtBConfiguration.loadFromXml();
+        }
 
         //**EVERYTHING HAS BEEN LOADED. NOW FOR SANITY CHECKS**//
 
@@ -5402,10 +5412,6 @@ public class Campaign implements Serializable, ITechManager {
                     break;
             }
         }
-        // LAM pilots get -2 to the random skill roll.
-        if ((type == Person.T_MECHWARRIOR) && (secondary == Person.T_AERO_PILOT)) {
-            bonus -= 2;
-        }
         GregorianCalendar birthdate = (GregorianCalendar) getCalendar().clone();
         birthdate.set(Calendar.YEAR, birthdate.get(Calendar.YEAR) - Utilities.getAgeByExpLevel(expLvl, person.isClanner() && person.getPhenotype() != Person.PHENOTYPE_NONE));
         // choose a random day and month
@@ -5417,10 +5423,16 @@ public class Campaign implements Serializable, ITechManager {
         birthdate.set(Calendar.DAY_OF_YEAR, randomDay);
         person.setBirthday(birthdate);
         // set default skills
-        generateDefaultSkills(type, person, expLvl, bonus);
-        if (secondary != Person.T_NONE) {
-            generateDefaultSkills(secondary, person, expLvl, bonus);
+        int mod = 0;
+        if ((type == Person.T_MECHWARRIOR) && (secondary == Person.T_AERO_PILOT)) {
+            mod = -2;
         }
+        generateDefaultSkills(type, person, expLvl, bonus, mod);
+        if (secondary != Person.T_NONE) {
+            generateDefaultSkills(secondary, person, expLvl, bonus, mod);
+        }
+        // apply phenotype bonus only to primary skills
+        bonus = 0;
         // roll small arms skill
         if (!person.hasSkill(SkillType.S_SMALL_ARMS)) {
             int sarmsLvl = -12;
@@ -5491,106 +5503,106 @@ public class Campaign implements Serializable, ITechManager {
         return person;
     }
 
-    private void generateDefaultSkills(int type, Person person, int expLvl, int bonus) {
+    private void generateDefaultSkills(int type, Person person, int expLvl, int bonus, int mod) {
         switch (type) {
             case (Person.T_MECHWARRIOR):
                 person.addSkill(SkillType.S_PILOT_MECH, expLvl,
-                                rskillPrefs.randomizeSkill(), bonus);
+                                rskillPrefs.randomizeSkill(), bonus, mod);
                 person.addSkill(SkillType.S_GUN_MECH, expLvl,
-                                rskillPrefs.randomizeSkill(), bonus);
+                                rskillPrefs.randomizeSkill(), bonus, mod);
                 break;
             case (Person.T_GVEE_DRIVER):
                 person.addSkill(SkillType.S_PILOT_GVEE, expLvl,
-                                rskillPrefs.randomizeSkill(), bonus);
+                                rskillPrefs.randomizeSkill(), bonus, mod);
                 person.addSkill(SkillType.S_GUN_VEE, expLvl,
-                                rskillPrefs.randomizeSkill(), bonus);
+                                rskillPrefs.randomizeSkill(), bonus, mod);
                 break;
             case (Person.T_NVEE_DRIVER):
                 person.addSkill(SkillType.S_PILOT_NVEE, expLvl,
-                                rskillPrefs.randomizeSkill(), bonus);
+                                rskillPrefs.randomizeSkill(), bonus, mod);
                 person.addSkill(SkillType.S_GUN_VEE, expLvl,
-                                rskillPrefs.randomizeSkill(), bonus);
+                                rskillPrefs.randomizeSkill(), bonus, mod);
                 break;
             case (Person.T_VTOL_PILOT):
                 person.addSkill(SkillType.S_PILOT_VTOL, expLvl,
-                                rskillPrefs.randomizeSkill(), bonus);
+                                rskillPrefs.randomizeSkill(), bonus, mod);
                 person.addSkill(SkillType.S_GUN_VEE, expLvl,
-                                rskillPrefs.randomizeSkill(), bonus);
+                                rskillPrefs.randomizeSkill(), bonus, mod);
                 break;
             case (Person.T_VEE_GUNNER):
                 person.addSkill(SkillType.S_GUN_VEE, expLvl,
-                                rskillPrefs.randomizeSkill(), bonus);
+                                rskillPrefs.randomizeSkill(), bonus, mod);
                 break;
             case (Person.T_CONV_PILOT):
                 person.addSkill(SkillType.S_PILOT_JET, expLvl,
-                                rskillPrefs.randomizeSkill(), bonus);
+                                rskillPrefs.randomizeSkill(), bonus, mod);
                 person.addSkill(SkillType.S_GUN_JET, expLvl,
-                                rskillPrefs.randomizeSkill(), bonus);
+                                rskillPrefs.randomizeSkill(), bonus, mod);
                 break;
             case (Person.T_AERO_PILOT):
                 person.addSkill(SkillType.S_PILOT_AERO, expLvl,
-                                rskillPrefs.randomizeSkill(), bonus);
+                                rskillPrefs.randomizeSkill(), bonus, mod);
                 person.addSkill(SkillType.S_GUN_AERO, expLvl,
-                                rskillPrefs.randomizeSkill(), bonus);
+                                rskillPrefs.randomizeSkill(), bonus, mod);
                 break;
             case (Person.T_PROTO_PILOT):
                 person.addSkill(SkillType.S_GUN_PROTO, expLvl,
-                                rskillPrefs.randomizeSkill(), bonus);
+                                rskillPrefs.randomizeSkill(), bonus, mod);
                 break;
             case (Person.T_BA):
                 person.addSkill(SkillType.S_GUN_BA, expLvl,
-                                rskillPrefs.randomizeSkill(), bonus);
+                                rskillPrefs.randomizeSkill(), bonus, mod);
                 person.addSkill(SkillType.S_ANTI_MECH, expLvl,
-                                rskillPrefs.randomizeSkill(), bonus);
+                                rskillPrefs.randomizeSkill(), bonus, mod);
                 person.addSkill(SkillType.S_SMALL_ARMS, expLvl,
-                                rskillPrefs.randomizeSkill(), bonus);
+                                rskillPrefs.randomizeSkill(), bonus, mod);
                 break;
             case (Person.T_INFANTRY):
                 if (Utilities.rollProbability(rskillPrefs.getAntiMekProb())) {
                     person.addSkill(SkillType.S_ANTI_MECH, expLvl,
-                                    rskillPrefs.randomizeSkill(), bonus);
+                                    rskillPrefs.randomizeSkill(), bonus, mod);
                 }
                 person.addSkill(SkillType.S_SMALL_ARMS, expLvl,
-                                rskillPrefs.randomizeSkill(), bonus);
+                                rskillPrefs.randomizeSkill(), bonus, mod);
                 break;
             case (Person.T_SPACE_PILOT):
                 person.addSkill(SkillType.S_PILOT_SPACE, expLvl,
-                                rskillPrefs.randomizeSkill(), bonus);
+                                rskillPrefs.randomizeSkill(), bonus, mod);
                 break;
             case (Person.T_SPACE_CREW):
                 person.addSkill(SkillType.S_TECH_VESSEL, expLvl,
-                                rskillPrefs.randomizeSkill(), bonus);
+                                rskillPrefs.randomizeSkill(), bonus, mod);
                 break;
             case (Person.T_SPACE_GUNNER):
                 person.addSkill(SkillType.S_GUN_SPACE, expLvl,
-                                rskillPrefs.randomizeSkill(), bonus);
+                                rskillPrefs.randomizeSkill(), bonus, mod);
                 break;
             case (Person.T_NAVIGATOR):
                 person.addSkill(SkillType.S_NAV, expLvl,
-                                rskillPrefs.randomizeSkill(), bonus);
+                                rskillPrefs.randomizeSkill(), bonus, mod);
                 break;
             case (Person.T_MECH_TECH):
                 person.addSkill(SkillType.S_TECH_MECH, expLvl,
-                                rskillPrefs.randomizeSkill(), bonus);
+                                rskillPrefs.randomizeSkill(), bonus, mod);
                 break;
             case (Person.T_MECHANIC):
                 person.addSkill(SkillType.S_TECH_MECHANIC, expLvl,
-                                rskillPrefs.randomizeSkill(), bonus);
+                                rskillPrefs.randomizeSkill(), bonus, mod);
                 break;
             case (Person.T_AERO_TECH):
                 person.addSkill(SkillType.S_TECH_AERO, expLvl,
-                                rskillPrefs.randomizeSkill(), bonus);
+                                rskillPrefs.randomizeSkill(), bonus, mod);
                 break;
             case (Person.T_BA_TECH):
                 person.addSkill(SkillType.S_TECH_BA, expLvl,
-                                rskillPrefs.randomizeSkill(), bonus);
+                                rskillPrefs.randomizeSkill(), bonus, mod);
                 break;
             case (Person.T_ASTECH):
                 person.addSkill(SkillType.S_ASTECH, 0, 0);
                 break;
             case (Person.T_DOCTOR):
                 person.addSkill(SkillType.S_DOCTOR, expLvl,
-                                rskillPrefs.randomizeSkill(), bonus);
+                                rskillPrefs.randomizeSkill(), bonus, mod);
                 break;
             case (Person.T_MEDIC):
                 person.addSkill(SkillType.S_MEDTECH, 0, 0);
@@ -5600,7 +5612,7 @@ public class Campaign implements Serializable, ITechManager {
             case (Person.T_ADMIN_TRA):
             case (Person.T_ADMIN_HR):
                 person.addSkill(SkillType.S_ADMIN, expLvl,
-                                rskillPrefs.randomizeSkill(), bonus);
+                                rskillPrefs.randomizeSkill(), bonus, mod);
                 break;
         }
     }
@@ -7199,6 +7211,7 @@ public class Campaign implements Serializable, ITechManager {
         }
         return possiblePortraits;
     }
+    
     public void assignRandomPortraitFor(Person p) {
         // first create a list of existing portait strings, so we can check for
         // duplicates
@@ -7218,7 +7231,6 @@ public class Campaign implements Serializable, ITechManager {
             return;
         }
         ArrayList<String> possiblePortraits = new ArrayList<String>();
-        Iterator<String> categories = portraits.getCategoryNames();
 
         // Will search for portraits in the /gender/primaryrole folder first,
         // and if none are found then /gender/rolegroup, then /gender/combat or
@@ -8753,7 +8765,8 @@ public class Campaign implements Serializable, ITechManager {
         int minutesUsed = u.getMaintenanceTime();
         int astechsUsed = getAvailableAstechs(minutesUsed, false);
         boolean maintained = null != tech
-                             && tech.getMinutesLeft() > minutesUsed;
+                             && tech.getMinutesLeft() > minutesUsed
+                             && !tech.isMothballing();
         boolean paidMaintenance = true;
         if (maintained) {
             // use the time

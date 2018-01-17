@@ -1,6 +1,38 @@
 VERSION HISTORY:
 ----------------
 v0.43.7-git 
++ Issue #567: BA standard armor cannot be repaired
++ Issue #576: CCE on loading campaign with DS with missing thruster(s)
++ Feature: Advanced time by one month.
++ Issue #583: Ammunition Reload Issues
++ Greater OpFor variety: generated infantry may now be hidden. Odds depend on AtB difficulty setting.
++ Issue #575: Refits do not correctly handle equipment changing location
++ Issue #46: Locations removed via refit seem to not remove the associated parts
++ Issue #71: Units that finish refitting are often missing ammo and components
++ Issue #114: ASF refit issues
++ Issue #508: Armor kits are free when customizing infantry
++ Issue #461 Integrated heat sinks not added to refit shopping list
++ Bug: Armor removed in a refit is not the same as armor needed to refit back to original
++ Feature (Issue #275): Improved visibility for amount of available ammo/armor in repair tab
++ Do not require waiting for a refit kit if the only needed parts are ammo or ammo bins.
++ Not having enough ammo in the warehouse to fill all the bins will not delay the start of a refit.
++ Issue #300: Comstar ranks do not take into account service years when determining the main "pilot" of a vehicle
++ Issue #378: Thruster Maintenance on Conventional/Aerospace Fighters 
++ Bug: NPE when attempting to refit unit that previously had a refit canceled.
++ Issue #454: News won't fire at campaign creation
++ Issue #500: Contract view text alignment
++ Issue #504: Tactics can be negative
++ Bug: MML packaged with MekHQ cannot find needed libraries.
++ Issue #525: Available Time for Mothball Not Calculating Correctly
++ Issue #520: GM Tools Window not placed correctly
++ Issue #537: Repair Bay tasks list location filter resets when changing mode of a task.
++ Issue #553: Fatigue check occurring too early
++ Issue #556: MM giving disconnected from server error when launched from MHQ
++ Issue #329: The "do task" button on the repair bay UI tends to jump left and right
++ Issue #570: Unit Rating unsustainable
++ Issue #574: Dropship capacity Inconsistancy
++ Issue #591: Special Abilities can be selected multiple times
++ Issue #577: MRMS does not always use BTH settings
 
 v0.43.6 (2017-12-22 10:00 UTC)
 + Bug: ClassCastException when loading campaign from earlier versions with large craft with missing ammo bin.

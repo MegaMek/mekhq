@@ -5,6 +5,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.TreeSet;
 import java.util.UUID;
@@ -25,6 +27,7 @@ import megamek.common.Mech;
 import megamek.common.Mounted;
 import megamek.common.Tank;
 import megamek.common.logging.LogLevel;
+import megamek.common.options.OptionsConstants;
 import megamek.common.options.PilotOptions;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
@@ -1790,7 +1793,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                             costDesc = String.format(resourceMap.getString("costValue.format"), cost); //$NON-NLS-1$
                         }
                         boolean available = (cost >= 0) && (person.getXp() >= cost);
-                        if (spa.getName().equals("weapon_specialist")) { //$NON-NLS-1$
+                        if (spa.getName().equals(OptionsConstants.GUNNERY_WEAPON_SPECIALIST)) { //$NON-NLS-1$
                             Unit u = gui.getCampaign().getUnit(person.getUnitId());
                             if (null != u) {
                                 JMenu specialistMenu = new JMenu(resourceMap.getString("weaponSpecialist.text")); //$NON-NLS-1$
@@ -1799,39 +1802,65 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                                     Mounted m = u.getEntity().getWeaponList().get(j);
                                     uniqueWeapons.add(m.getName());
                                 }
+                                boolean isSpecialist = person.getOptions().booleanOption(spa.getName());
                                 for (String name : uniqueWeapons) {
-                                    menuItem = new JMenuItem(String.format(resourceMap.getString("abilityDesc.format"), name, costDesc)); //$NON-NLS-1$
-                                    menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_WEAPON_SPECIALIST, name, String.valueOf(cost)));
-                                    menuItem.addActionListener(this);
-                                    menuItem.setEnabled(available);
-                                    specialistMenu.add(menuItem);
+                                    if (!(isSpecialist
+                                            && person.getOptions().getOption(spa.getName()).stringValue().equals(name))) {
+                                        menuItem = new JMenuItem(String.format(resourceMap.getString("abilityDesc.format"), name, costDesc)); //$NON-NLS-1$
+                                        menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_WEAPON_SPECIALIST, name, String.valueOf(cost)));
+                                        menuItem.addActionListener(this);
+                                        menuItem.setEnabled(available);
+                                        specialistMenu.add(menuItem);
+                                    }
                                 }
+                                if (specialistMenu.getMenuComponentCount() > 0) {
+                                    abMenu.add(specialistMenu);
+                                }
+                            }
+                        } else if (spa.getName().equals(OptionsConstants.MISC_HUMAN_TRO)) { //$NON-NLS-1$
+                            JMenu specialistMenu = new JMenu(resourceMap.getString("humantro.text")); //$NON-NLS-1$
+                            List<Object> tros = new ArrayList<>();
+                            if (person.getOptions().getOption(OptionsConstants.MISC_HUMAN_TRO).booleanValue()) {
+                                Object val = person.getOptions().getOption(OptionsConstants.MISC_HUMAN_TRO).getValue();
+                                if (val instanceof Collection<?>) {
+                                    tros.addAll((Collection<?>) val);
+                                } else {
+                                    tros.add(val);
+                                }
+                            }
+                            menuItem = new JMenuItem(String.format(resourceMap.getString("abilityDesc.format"), resourceMap.getString("humantro_mek.text"), costDesc)); //$NON-NLS-1$ //$NON-NLS-2$
+                            if (!tros.contains(Crew.HUMANTRO_MECH)) {
+                                menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_HUMANTRO, Crew.HUMANTRO_MECH, String.valueOf(cost)));
+                                menuItem.addActionListener(this);
+                                menuItem.setEnabled(available);
+                                specialistMenu.add(menuItem);
+                            }
+                            if (!tros.contains(Crew.HUMANTRO_AERO)) {
+                                menuItem = new JMenuItem(String.format(resourceMap.getString("abilityDesc.format"), resourceMap.getString("humantro_aero.text"), costDesc)); //$NON-NLS-1$ //$NON-NLS-2$
+                                menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_HUMANTRO, Crew.HUMANTRO_AERO, String.valueOf(cost)));
+                                menuItem.addActionListener(this);
+                                menuItem.setEnabled(available);
+                                specialistMenu.add(menuItem);
+                            }
+                            if (!tros.contains(Crew.HUMANTRO_VEE)) {
+                                menuItem = new JMenuItem(String.format(resourceMap.getString("abilityDesc.format"), resourceMap.getString("humantro_vee.text"), costDesc)); //$NON-NLS-1$ //$NON-NLS-2$
+                                menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_HUMANTRO, Crew.HUMANTRO_VEE, String.valueOf(cost)));
+                                menuItem.addActionListener(this);
+                                menuItem.setEnabled(available);
+                                specialistMenu.add(menuItem);
+                            }
+                            if (!tros.contains(Crew.HUMANTRO_BA)) {
+                                menuItem = new JMenuItem(String.format(resourceMap.getString("abilityDesc.format"), resourceMap.getString("humantro_ba.text"), costDesc)); //$NON-NLS-1$ //$NON-NLS-2$
+                                menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_HUMANTRO, Crew.HUMANTRO_BA, String.valueOf(cost)));
+                                menuItem.addActionListener(this);
+                                menuItem.setEnabled(available);
+                                specialistMenu.add(menuItem);
+                            }
+                            if (specialistMenu.getMenuComponentCount() > 0) {
                                 abMenu.add(specialistMenu);
                             }
-                        } else if (spa.getName().equals("human_tro")) { //$NON-NLS-1$
-                            JMenu specialistMenu = new JMenu(resourceMap.getString("humantro.text")); //$NON-NLS-1$
-                            menuItem = new JMenuItem(String.format(resourceMap.getString("abilityDesc.format"), resourceMap.getString("humantro_mek.text"), costDesc)); //$NON-NLS-1$ //$NON-NLS-2$
-                            menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_HUMANTRO, Crew.HUMANTRO_MECH, String.valueOf(cost)));
-                            menuItem.addActionListener(this);
-                            menuItem.setEnabled(available);
-                            specialistMenu.add(menuItem);
-                            menuItem = new JMenuItem(String.format(resourceMap.getString("abilityDesc.format"), resourceMap.getString("humantro_aero.text"), costDesc)); //$NON-NLS-1$ //$NON-NLS-2$
-                            menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_HUMANTRO, Crew.HUMANTRO_AERO, String.valueOf(cost)));
-                            menuItem.addActionListener(this);
-                            menuItem.setEnabled(available);
-                            specialistMenu.add(menuItem);
-                            menuItem = new JMenuItem(String.format(resourceMap.getString("abilityDesc.format"), resourceMap.getString("humantro_vee.text"), costDesc)); //$NON-NLS-1$ //$NON-NLS-2$
-                            menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_HUMANTRO, Crew.HUMANTRO_VEE, String.valueOf(cost)));
-                            menuItem.addActionListener(this);
-                            menuItem.setEnabled(available);
-                            specialistMenu.add(menuItem);
-                            menuItem = new JMenuItem(String.format(resourceMap.getString("abilityDesc.format"), resourceMap.getString("humantro_ba.text"), costDesc)); //$NON-NLS-1$ //$NON-NLS-2$
-                            menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_HUMANTRO, Crew.HUMANTRO_BA, String.valueOf(cost)));
-                            menuItem.addActionListener(this);
-                            menuItem.setEnabled(available);
-                            specialistMenu.add(menuItem);
-                            abMenu.add(specialistMenu);
-                        } else if (spa.getName().equals("specialist")) { //$NON-NLS-1$
+                        } else if (spa.getName().equals("specialist")
+                                && !person.getOptions().booleanOption(OptionsConstants.GUNNERY_SPECIALIST)) { //$NON-NLS-1$
                             JMenu specialistMenu = new JMenu(resourceMap.getString("specialist.text")); //$NON-NLS-1$
                             menuItem = new JMenuItem(String.format(resourceMap.getString("abilityDesc.format"), resourceMap.getString("laserSpecialist.text"), costDesc)); //$NON-NLS-1$ //$NON-NLS-2$
                             menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_SPECIALIST, Crew.SPECIAL_ENERGY, String.valueOf(cost)));
@@ -1849,30 +1878,49 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                             menuItem.setEnabled(available);
                             specialistMenu.add(menuItem);
                             abMenu.add(specialistMenu);
-                        } else if (spa.getName().equals("range_master")) { //$NON-NLS-1$
+                        } else if (spa.getName().equals(OptionsConstants.GUNNERY_RANGE_MASTER)) { //$NON-NLS-1$
                             JMenu specialistMenu = new JMenu(resourceMap.getString("rangemaster.text")); //$NON-NLS-1$
-                            menuItem = new JMenuItem(String.format(resourceMap.getString("abilityDesc.format"), resourceMap.getString("rangemaster_med.text"), costDesc)); //$NON-NLS-1$ //$NON-NLS-2$
-                            menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_RANGEMASTER, Crew.RANGEMASTER_MEDIUM, String.valueOf(cost)));
-                            menuItem.addActionListener(this);
-                            menuItem.setEnabled(available);
-                            specialistMenu.add(menuItem);
-                            menuItem = new JMenuItem(String.format(resourceMap.getString("abilityDesc.format"), resourceMap.getString("rangemaster_lng.text"), costDesc)); //$NON-NLS-1$ //$NON-NLS-2$
-                            menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_RANGEMASTER, Crew.RANGEMASTER_LONG, String.valueOf(cost)));
-                            menuItem.addActionListener(this);
-                            menuItem.setEnabled(available);
-                            specialistMenu.add(menuItem);
-                            menuItem = new JMenuItem(String.format(resourceMap.getString("abilityDesc.format"), resourceMap.getString("rangemaster_xtm.text"), costDesc)); //$NON-NLS-1$ //$NON-NLS-2$
-                            menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_RANGEMASTER, Crew.RANGEMASTER_EXTREME, String.valueOf(cost)));
-                            menuItem.addActionListener(this);
-                            menuItem.setEnabled(available);
-                            specialistMenu.add(menuItem);
-                            menuItem = new JMenuItem(String.format(resourceMap.getString("abilityDesc.format"), resourceMap.getString("rangemaster_los.text"), costDesc)); //$NON-NLS-1$ //$NON-NLS-2$
-                            menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_RANGEMASTER, Crew.RANGEMASTER_LOS, String.valueOf(cost)));
-                            menuItem.addActionListener(this);
-                            menuItem.setEnabled(available);
-                            specialistMenu.add(menuItem);
-                            abMenu.add(specialistMenu);
-                        } else {
+                            List<Object> ranges = new ArrayList<>();
+                            if (person.getOptions().getOption(OptionsConstants.GUNNERY_RANGE_MASTER).booleanValue()) {
+                                Object val = person.getOptions().getOption(OptionsConstants.GUNNERY_RANGE_MASTER).getValue();
+                                if (val instanceof Collection<?>) {
+                                    ranges.addAll((Collection<?>) val);
+                                } else {
+                                    ranges.add(val);
+                                }
+                            }
+                            if (!ranges.contains(Crew.RANGEMASTER_MEDIUM)) {
+                                menuItem = new JMenuItem(String.format(resourceMap.getString("abilityDesc.format"), resourceMap.getString("rangemaster_med.text"), costDesc)); //$NON-NLS-1$ //$NON-NLS-2$
+                                menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_RANGEMASTER, Crew.RANGEMASTER_MEDIUM, String.valueOf(cost)));
+                                menuItem.addActionListener(this);
+                                menuItem.setEnabled(available);
+                                specialistMenu.add(menuItem);
+                            }
+                            if (!ranges.contains(Crew.RANGEMASTER_LONG)) {
+                                menuItem = new JMenuItem(String.format(resourceMap.getString("abilityDesc.format"), resourceMap.getString("rangemaster_lng.text"), costDesc)); //$NON-NLS-1$ //$NON-NLS-2$
+                                menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_RANGEMASTER, Crew.RANGEMASTER_LONG, String.valueOf(cost)));
+                                menuItem.addActionListener(this);
+                                menuItem.setEnabled(available);
+                                specialistMenu.add(menuItem);
+                            }
+                            if (!ranges.contains(Crew.RANGEMASTER_EXTREME)) {
+                                menuItem = new JMenuItem(String.format(resourceMap.getString("abilityDesc.format"), resourceMap.getString("rangemaster_xtm.text"), costDesc)); //$NON-NLS-1$ //$NON-NLS-2$
+                                menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_RANGEMASTER, Crew.RANGEMASTER_EXTREME, String.valueOf(cost)));
+                                menuItem.addActionListener(this);
+                                menuItem.setEnabled(available);
+                                specialistMenu.add(menuItem);
+                            }
+                            if (!ranges.contains(Crew.RANGEMASTER_LOS)) {
+                                menuItem = new JMenuItem(String.format(resourceMap.getString("abilityDesc.format"), resourceMap.getString("rangemaster_los.text"), costDesc)); //$NON-NLS-1$ //$NON-NLS-2$
+                                menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_RANGEMASTER, Crew.RANGEMASTER_LOS, String.valueOf(cost)));
+                                menuItem.addActionListener(this);
+                                menuItem.setEnabled(available);
+                                specialistMenu.add(menuItem);
+                            }
+                            if (specialistMenu.getMenuComponentCount() > 0) {
+                                abMenu.add(specialistMenu);
+                            }
+                        } else if (!person.getOptions().booleanOption(spa.getName())){
                             menuItem = new JMenuItem(String.format(resourceMap.getString("abilityDesc.format"), spa.getDisplayName(), costDesc)); //$NON-NLS-1$
                             menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_ABILITY, spa.getName(), String.valueOf(cost)));
                             menuItem.addActionListener(this);
@@ -1906,7 +1954,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     menu = new JMenu(resourceMap.getString("setEdgeTriggers.text")); //$NON-NLS-1$
                     //Start of role-specific Edge reroll options
                     //Mechwarriors
-                    if (person.getPrimaryRole() == 1) {
+                    if (person.getPrimaryRole() == Person.T_MECHWARRIOR) {
                         cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("edgeTriggerHeadHits.text")); //$NON-NLS-1$
                         cbMenuItem.setSelected(person.getOptions()
                                 .booleanOption(OPT_EDGE_HEADHIT));
@@ -1939,7 +1987,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                         cbMenuItem.addActionListener(this);
                         menu.add(cbMenuItem);
                     //Doctors    
-                    } else if (person.getPrimaryRole() == 20 && gui.getCampaign().getCampaignOptions().useSupportEdge()) {
+                    } else if (person.getPrimaryRole() == Person.T_DOCTOR && gui.getCampaign().getCampaignOptions().useSupportEdge()) {
                         cbMenuItem = new JCheckBoxMenuItem(
                                 resourceMap.getString("edgeTriggerHealCheck.text")); //$NON-NLS-1$
                         cbMenuItem.setSelected(person.getOptions()
@@ -1948,11 +1996,11 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                         cbMenuItem.addActionListener(this);
                         menu.add(cbMenuItem);
                     //Techs
-                    } else if ((person.getPrimaryRole() == 12
-                                || person.getPrimaryRole() == 15
-                                || person.getPrimaryRole() == 16
-                                || person.getPrimaryRole() == 17
-                                || person.getPrimaryRole() == 18)
+                    } else if ((person.getPrimaryRole() == Person.T_SPACE_CREW
+                                || person.getPrimaryRole() == Person.T_MECH_TECH
+                                || person.getPrimaryRole() == Person.T_MECHANIC
+                                || person.getPrimaryRole() == Person.T_AERO_TECH
+                                || person.getPrimaryRole() == Person.T_BA_TECH)
                                 && gui.getCampaign().getCampaignOptions().useSupportEdge()) {
                         cbMenuItem = new JCheckBoxMenuItem(
                                 resourceMap.getString("edgeTriggerBreakPart.text")); //$NON-NLS-1$
@@ -1969,10 +2017,10 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                         cbMenuItem.addActionListener(this);
                         menu.add(cbMenuItem);
                     //Admins
-                    } else if ((person.getPrimaryRole() == 22
-                            || person.getPrimaryRole() == 23
-                            || person.getPrimaryRole() == 24
-                            || person.getPrimaryRole() == 25) 
+                    } else if ((person.getPrimaryRole() == Person.T_ADMIN_COM
+                            || person.getPrimaryRole() == Person.T_ADMIN_LOG
+                            || person.getPrimaryRole() == Person.T_ADMIN_TRA
+                            || person.getPrimaryRole() == Person.T_ADMIN_HR) 
                             && gui.getCampaign().getCampaignOptions().useSupportEdge()) {
                         cbMenuItem = new JCheckBoxMenuItem(
                                 resourceMap.getString("edgeTriggerAcquireCheck.text")); //$NON-NLS-1$
