@@ -44,20 +44,30 @@ public class PersonnelOptions extends PilotOptions {
     public static final String EDGE_REPAIR_FAILED_REFIT = "edge_when_fail_refit_check";
     public static final String EDGE_ADMIN_ACQUIRE_FAIL = "edge_when_admin_acquire_fail";
     
+    public static final String TECH_CLAN_TECH_KNOWLEDGE = "clan_tech_knowledge";
+    
     @Override
     public void initialize() {
         final String METHOD_NAME = "initialize()"; //$NON-NLS-1$
         super.initialize();
 
+        IBasicOptionGroup l3a = null;
         IBasicOptionGroup edge = null;
         for (Enumeration<IBasicOptionGroup> e = getOptionsInfoImp().getGroups(); e.hasMoreElements(); ) {
             final IBasicOptionGroup group = e.nextElement();
-            if (group.getKey().equals(PilotOptions.EDGE_ADVANTAGES)) {
+            if ((null == l3a) && group.getKey().equals(PilotOptions.LVL3_ADVANTAGES)) {
+                l3a = group;
+            } else if ((null== edge) && group.getKey().equals(PilotOptions.EDGE_ADVANTAGES)) {
                 edge = group;
-                break;
             }
         }
         
+        if (null == l3a) {
+            // This really shouldn't happen.
+            MekHQ.getLogger().log(PersonnelOptions.class, METHOD_NAME,
+                    LogLevel.WARNING, "Could not find L3Advantage group"); //$NON-NLS-1$
+            edge = addGroup("adv", PilotOptions.LVL3_ADVANTAGES); // $NON-NLS-1$
+        }
         if (null == edge) {
             // This really shouldn't happen.
             MekHQ.getLogger().log(PersonnelOptions.class, METHOD_NAME,
@@ -67,6 +77,8 @@ public class PersonnelOptions extends PilotOptions {
         }
         
         // Add MekHQ-specific options
+        addOption(l3a, TECH_CLAN_TECH_KNOWLEDGE, false);
+
         addOption(edge, EDGE_MEDICAL, false);
         addOption(edge, EDGE_REPAIR_BREAK_PART, false);
         addOption(edge, EDGE_REPAIR_FAILED_REFIT, false);

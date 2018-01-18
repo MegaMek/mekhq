@@ -288,8 +288,9 @@
             <skill>Tech/Mechanic</skill>
             <skill>Tech/Aero</skill>
             <skill>Tech/BA</skill>
-            <skill>Tech/Vessel</skill>                             
+            <skill>Tech/Vessel</skill>
         </skillPrereq>
+        <miscPrereq>clanner:false</miscPrereq>
     </ability>
 	
 	<!-- OTHER SPA -->

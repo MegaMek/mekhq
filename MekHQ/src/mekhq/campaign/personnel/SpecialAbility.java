@@ -25,7 +25,9 @@ import java.io.FileInputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Map;
 import java.util.Vector;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -62,6 +64,9 @@ import mekhq.Version;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class SpecialAbility implements MekHqXmlSerializable {
+    
+    // Keys for miscellaneous prerequisites (i.e. not skill or ability)
+    private static final String PREREQ_MISC_CLANNER = "clanner";
 
     private static Hashtable<String, SpecialAbility> specialAbilities;
     private static Hashtable<String, SpecialAbility> defaultSpecialAbilities;
@@ -79,6 +84,7 @@ public class SpecialAbility implements MekHqXmlSerializable {
     //prerequisite skills and options
     private Vector<String> prereqAbilities;
     private Vector<SkillPrereq> prereqSkills;
+    private Map<String,String> prereqMisc;
 
     //these are abilities that will disqualify the person from getting the current ability
     private Vector<String> invalidAbilities;
@@ -103,6 +109,7 @@ public class SpecialAbility implements MekHqXmlSerializable {
         invalidAbilities = new Vector<String>();
         removeAbilities = new Vector<String>();
         prereqSkills = new Vector<SkillPrereq>();
+        prereqMisc = new HashMap<>();
         xpCost = 1;
         weight = 1;
     }
@@ -118,6 +125,7 @@ public class SpecialAbility implements MekHqXmlSerializable {
     	clone.invalidAbilities = (Vector<String>)this.invalidAbilities.clone();
     	clone.removeAbilities = (Vector<String>)this.removeAbilities.clone();
     	clone.prereqSkills = (Vector<SkillPrereq>)this.prereqSkills.clone();
+    	clone.prereqMisc = new HashMap<>(this.prereqMisc);
     	return clone;
     }
 
@@ -138,6 +146,10 @@ public class SpecialAbility implements MekHqXmlSerializable {
             if(p.getOptions().booleanOption(ability)) {
                 return false;
             }
+        }
+        if (prereqMisc.containsKey(PREREQ_MISC_CLANNER)
+                && (p.isClanner() != Boolean.parseBoolean(prereqMisc.get(PREREQ_MISC_CLANNER)))) {
+            return false;
         }
         return true;
     }
@@ -185,6 +197,14 @@ public class SpecialAbility implements MekHqXmlSerializable {
     public void setPrereqAbilities(Vector<String> prereq) {
     	prereqAbilities = prereq;
     }
+    
+    public Map<String,String> getPrereqMisc() {
+        return prereqMisc;
+    }
+    
+    public void setPrereqMisc(Map<String,String> prereq) {
+        prereqMisc = new HashMap<>(prereq);
+    }
 
     public Vector<String> getInvalidAbilities() {
         return invalidAbilities;
@@ -204,6 +224,10 @@ public class SpecialAbility implements MekHqXmlSerializable {
 
     public void clearPrereqSkills() {
         prereqSkills = new Vector<SkillPrereq>();
+    }
+    
+    public void clearPrereqMisc() {
+        prereqMisc = new HashMap<>();
     }
 
     @Override
@@ -243,6 +267,9 @@ public class SpecialAbility implements MekHqXmlSerializable {
                 +"</removeAbilities>");
         for(SkillPrereq skillpre : prereqSkills) {
             skillpre.writeToXml(pw1, indent+1);
+        }
+        for (String pre : prereqMisc.keySet()) {
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "miscPrereq", pre + ":" + prereqMisc.get(pre));
         }
         pw1.println(MekHqXmlUtil.indentStr(indent) + "</ability>");
 
@@ -284,6 +311,9 @@ public class SpecialAbility implements MekHqXmlSerializable {
                     if(!skill.isEmpty()) {
                         retVal.prereqSkills.add(skill);
                     }
+                } else if (wn2.getNodeName().equalsIgnoreCase("miscPrereq")) {
+                    String[] fields = wn2.getTextContent().split(":");
+                    retVal.prereqMisc.put(fields[0], fields[1]);
                 }
             }
         } catch (Exception ex) {
@@ -356,6 +386,9 @@ public class SpecialAbility implements MekHqXmlSerializable {
                     if(!skill.isEmpty()) {
                         retVal.prereqSkills.add(skill);
                     }
+                } else if (wn2.getNodeName().equalsIgnoreCase("miscPrereq")) {
+                    String[] fields = wn2.getTextContent().split(":");
+                    retVal.prereqMisc.put(fields[0], fields[1]);
                 }
             }
         } catch (Exception ex) {
@@ -533,6 +566,9 @@ public class SpecialAbility implements MekHqXmlSerializable {
         }
         for(SkillPrereq skPr : prereqSkills) {
             toReturn += skPr.toString() + "<br>";
+        }
+        for (String pr : prereqMisc.keySet()) {
+            toReturn += pr + ": " + prereqMisc.get(pr) + "<br/>";
         }
         if(toReturn.isEmpty()) {
         	toReturn = "None";
