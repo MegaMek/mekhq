@@ -477,7 +477,10 @@ public class SpecialAbility implements MekHqXmlSerializable {
     }
 
     public static SpecialAbility getDefaultAbility(String name) {
-        return defaultSpecialAbilities.get(name);
+        if (null != defaultSpecialAbilities) {
+            return defaultSpecialAbilities.get(name);
+        }
+        return null;
     }
 
     public static Hashtable<String, SpecialAbility> getAllDefaultSpecialAbilities() {
