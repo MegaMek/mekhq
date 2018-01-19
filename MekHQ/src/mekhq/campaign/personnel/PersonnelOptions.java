@@ -178,12 +178,9 @@ public class PersonnelOptions extends PilotOptions {
 
         @Override
         public String getDisplayableName() {
-            if (null != SpecialAbility.getAbility(name)) {
-                return SpecialAbility.getAbility(name).getDisplayName();
-            } else if (null != SpecialAbility.getDefaultAbility(name)) {
-                return SpecialAbility.getDefaultAbility(name).getDisplayName();
-            } else if (null != SpecialAbility.getEdgeTrigger(name)) {
-                return SpecialAbility.getEdgeTrigger(name).getDisplayName();
+            SpecialAbility spa = SpecialAbility.getOption(name);
+            if (null != spa) {
+                return spa.getDisplayName();
             } else if (null != mmOptions.getOption(name)){
                 return mmOptions.getOption(name).getDisplayableName();
             } else {
@@ -193,10 +190,9 @@ public class PersonnelOptions extends PilotOptions {
 
         @Override
         public String getDisplayableNameWithValue() {
-            if (null != SpecialAbility.getAbility(name)) {
-                return SpecialAbility.getAbility(name).getDisplayName();
-            } else if (null != SpecialAbility.getEdgeTrigger(name)) {
-                return SpecialAbility.getEdgeTrigger(name).getDisplayName();
+            SpecialAbility spa = SpecialAbility.getOption(name);
+            if (null != spa) {
+                return spa.getDisplayName();
             } else if (null != mmOptions.getOption(name)){
                 return mmOptions.getOption(name).getDisplayableName();
             } else {
@@ -206,12 +202,9 @@ public class PersonnelOptions extends PilotOptions {
 
         @Override
         public String getDescription() {
-            if (null != SpecialAbility.getAbility(name)) {
-                return SpecialAbility.getAbility(name).getDescription();
-            } else if (null != SpecialAbility.getDefaultAbility(name)) {
-                return SpecialAbility.getDefaultAbility(name).getDescription();
-            } else if (null != SpecialAbility.getEdgeTrigger(name)) {
-                return SpecialAbility.getEdgeTrigger(name).getDescription();
+            SpecialAbility spa = SpecialAbility.getOption(name);
+            if (null != spa) {
+                return spa.getDescription();
             } else if (null != mmOptions.getOption(name)){
                 return mmOptions.getOption(name).getDescription();
             } else {

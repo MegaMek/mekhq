@@ -308,17 +308,6 @@
     	</skillPrereq>
 	</ability>
 	
-	<ability>
-		<lookupName>envelope_pusher</lookupName>
-		<displayName>Envelope Pusher</displayName>
-		<xpCost>4</xpCost>
-		<weight>2</weight>
-        <skillPrereq>
-            <skill>Hyperspace Navigation</skill>
-        </skillPrereq>
-        <desc>Increase the maximum range of a hyperspace jump</desc>
-	</ability>
-	
 	<edgeTrigger>
 		<lookupName>edge_when_heal_crit_fail</lookupName>
 		<displayName>Use Edge for doctor critical failure.</displayName>
@@ -345,11 +334,36 @@
 
 <!-- customs -->
 	
+	<ability>
+		<lookupName>envelope_pusher</lookupName>
+		<displayName>Envelope Pusher</displayName>
+		<xpCost>4</xpCost>
+		<weight>2</weight>
+        <skillPrereq>
+            <skill>Hyperspace Navigation</skill>
+        </skillPrereq>
+        <desc>Increase the maximum range of a hyperspace jump</desc>
+	</ability>
+	
 	<edgeTrigger>
 	    <lookupName>edge_paper_cut</lookupName>
 	    <displayName>Use Edge to avoid paper cut.</displayName>
 	    <desc>A paper cut injury check will be rerolled with edge.</desc>
 	</edgeTrigger>
+	
+	<implant>
+	    <lookupName>md_prosthetic_blowtorch</lookupName>
+	    <displayName>Prosthetic Blowtorch</displayName>
+	    <desc>Reduce repair times by 10%</desc>
+        <skillPrereq>
+            <skill>Tech/Mech</skill>
+            <skill>Tech/Mechanic</skill>
+            <skill>Tech/Aero</skill>
+            <skill>Tech/BA</skill>
+            <skill>Tech/Vessel</skill>
+        </skillPrereq>
+	</implant>
+	
 </abilities>
 
 <!--  

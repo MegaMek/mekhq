@@ -71,6 +71,7 @@ public class SpecialAbility implements MekHqXmlSerializable {
     private static Hashtable<String, SpecialAbility> specialAbilities;
     private static Hashtable<String, SpecialAbility> defaultSpecialAbilities;
     private static Hashtable<String, SpecialAbility> edgeTriggers;
+    private static Hashtable<String, SpecialAbility> implants;
 
     private String displayName;
     private String lookupName;
@@ -347,6 +348,8 @@ public class SpecialAbility implements MekHqXmlSerializable {
         
         if (wn.getNodeName().equalsIgnoreCase("edgetrigger")) {
             edgeTriggers.put(retVal.lookupName, retVal);
+        } else if (wn.getNodeName().equalsIgnoreCase("implant")) {
+            implants.put(retVal.lookupName,  retVal);
         } else {
             specialAbilities.put(retVal.lookupName, retVal);
         }
@@ -418,6 +421,7 @@ public class SpecialAbility implements MekHqXmlSerializable {
         final String METHOD_NAME = "initializeSPA()"; //$NON-NLS-1$
         specialAbilities = new Hashtable<>();
         edgeTriggers = new Hashtable<>();
+        implants = new Hashtable<>();
 
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         Document xmlDoc = null;
@@ -460,7 +464,8 @@ public class SpecialAbility implements MekHqXmlSerializable {
                 String xn = wn.getNodeName();
 
                 if (xn.equalsIgnoreCase("ability")
-                        || xn.equalsIgnoreCase("edgeTrigger")) {
+                        || xn.equalsIgnoreCase("edgeTrigger")
+                        || xn.equalsIgnoreCase("implant")) {
                     SpecialAbility.generateInstanceFromXML(wn, options, null);
                 }
             }
@@ -494,9 +499,35 @@ public class SpecialAbility implements MekHqXmlSerializable {
     public static Hashtable<String, SpecialAbility> getAllEdgeTriggers() {
         return edgeTriggers;
     }
+    
+    public static SpecialAbility getImplant(String name) {
+        return implants.get(name);
+    }
+    
+    public static Hashtable<String, SpecialAbility> getAllImplants() {
+        return implants;
+    }
 
     public static void replaceSpecialAbilities(Hashtable<String, SpecialAbility> spas) {
     	specialAbilities = spas;
+    }
+    
+    public static SpecialAbility getOption(String name) {
+        SpecialAbility retVal = specialAbilities.get(name);
+        if (null != retVal) {
+            return retVal;
+        }
+        if (null != defaultSpecialAbilities) {
+            retVal = defaultSpecialAbilities.get(name);
+            if (null != retVal) {
+                return retVal;
+            }
+        }
+        retVal = edgeTriggers.get(name);
+        if (null != retVal) {
+            return retVal;
+        }
+        return implants.get(name);
     }
 
     public static String chooseWeaponSpecialization(int type, boolean isClan, int techLvl, int year) {
