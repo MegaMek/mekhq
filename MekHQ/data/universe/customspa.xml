@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE doc [
+    <!ENTITY    L3              "lvl3Advantages">
+    <!ENTITY    EDGE            "edgeAdvantages">
+    <!ENTITY    AUGMENTATION    "MDAdvantages">
+
+    <!ENTITY    BOOLEAN     "0">
+    <!ENTITY    STRING      "3">
+]>
+
+<options>
+    <option name="envelope_pusher">
+        <group>&L3;</group>
+        <type>&BOOLEAN;</type>
+        <default>false</default>
+    </option>
+    
+    <option name="edge_paper_cut">
+        <group>&EDGE;</group>
+        <type>&BOOLEAN;</type>
+        <default>false</default>
+    </option>
+    
+    <option name="md_prosthetic_blowtorch">
+        <group>&AUGMENTATION;</group>
+        <type>&BOOLEAN;</type>
+        <default>false</default>
+    </option>
+</options>

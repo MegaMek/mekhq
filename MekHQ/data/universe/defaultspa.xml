@@ -308,6 +308,17 @@
     	</skillPrereq>
 	</ability>
 	
+	<ability>
+		<lookupName>envelope_pusher</lookupName>
+		<displayName>Envelope Pusher</displayName>
+		<xpCost>4</xpCost>
+		<weight>2</weight>
+        <skillPrereq>
+            <skill>Hyperspace Navigation</skill>
+        </skillPrereq>
+        <desc>Increase the maximum range of a hyperspace jump</desc>
+	</ability>
+	
 	<edgeTrigger>
 		<lookupName>edge_when_heal_crit_fail</lookupName>
 		<displayName>Use Edge for doctor critical failure.</displayName>
@@ -331,7 +342,14 @@
 		<displayName>Use Edge for acquisition failure.</displayName>
 		<desc>Failed acquisition check will be rerolled with edge.</desc>
 	</edgeTrigger>
+
+<!-- customs -->
 	
+	<edgeTrigger>
+	    <lookupName>edge_paper_cut</lookupName>
+	    <displayName>Use Edge to avoid paper cut.</displayName>
+	    <desc>A paper cut injury check will be rerolled with edge.</desc>
+	</edgeTrigger>
 </abilities>
 
 <!--  
