@@ -15,6 +15,7 @@ package mekhq.campaign.personnel;
 
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.List;
 
 import megamek.common.logging.LogLevel;
 import megamek.common.options.AbstractOptionsInfo;
@@ -53,12 +54,15 @@ public class PersonnelOptions extends PilotOptions {
 
         IBasicOptionGroup l3a = null;
         IBasicOptionGroup edge = null;
+        IBasicOptionGroup md = null;
         for (Enumeration<IBasicOptionGroup> e = getOptionsInfoImp().getGroups(); e.hasMoreElements(); ) {
             final IBasicOptionGroup group = e.nextElement();
             if ((null == l3a) && group.getKey().equals(PilotOptions.LVL3_ADVANTAGES)) {
                 l3a = group;
             } else if ((null== edge) && group.getKey().equals(PilotOptions.EDGE_ADVANTAGES)) {
                 edge = group;
+            } else if ((null== md) && group.getKey().equals(PilotOptions.MD_ADVANTAGES)) {
+                md = group;
             }
         }
         
@@ -66,7 +70,7 @@ public class PersonnelOptions extends PilotOptions {
             // This really shouldn't happen.
             MekHQ.getLogger().log(PersonnelOptions.class, METHOD_NAME,
                     LogLevel.WARNING, "Could not find L3Advantage group"); //$NON-NLS-1$
-            edge = addGroup("adv", PilotOptions.LVL3_ADVANTAGES); // $NON-NLS-1$
+            l3a = addGroup("adv", PilotOptions.LVL3_ADVANTAGES); // $NON-NLS-1$
         }
         if (null == edge) {
             // This really shouldn't happen.
@@ -74,6 +78,12 @@ public class PersonnelOptions extends PilotOptions {
                     LogLevel.WARNING, "Could not find edge group"); //$NON-NLS-1$
             edge = addGroup("edge", PilotOptions.EDGE_ADVANTAGES); // $NON-NLS-1$
             addOption(edge, OptionsConstants.EDGE, 0);
+        }
+        if (null == md) {
+            // This really shouldn't happen.
+            MekHQ.getLogger().log(PersonnelOptions.class, METHOD_NAME,
+                    LogLevel.WARNING, "Could not find augmentation (MD) group"); //$NON-NLS-1$
+            md = addGroup("md", PilotOptions.MD_ADVANTAGES); // $NON-NLS-1$
         }
         
         // Add MekHQ-specific options
@@ -83,6 +93,17 @@ public class PersonnelOptions extends PilotOptions {
         addOption(edge, EDGE_REPAIR_BREAK_PART, false);
         addOption(edge, EDGE_REPAIR_FAILED_REFIT, false);
         addOption(edge, EDGE_ADMIN_ACQUIRE_FAIL, false);
+        
+        List<CustomOption> customs = CustomOption.getCustomAbilities();
+        for (CustomOption option : customs) {
+            if (option.getGroup().equals(PilotOptions.LVL3_ADVANTAGES)) {
+                addOption(l3a, option.getName(), option.getType(), option.getDefault());
+            } else if (option.getGroup().equals(PilotOptions.EDGE_ADVANTAGES)) {
+                addOption(edge, option.getName(), option.getType(), option.getDefault());
+            } else if (option.getGroup().equals(PilotOptions.MD_ADVANTAGES)) {
+                addOption(md, option.getName(), option.getType(), option.getDefault());
+            }
+        }
     }
 
     /* 
@@ -157,10 +178,9 @@ public class PersonnelOptions extends PilotOptions {
 
         @Override
         public String getDisplayableName() {
-            if (null != SpecialAbility.getAbility(name)) {
-                return SpecialAbility.getAbility(name).getDisplayName();
-            } else if (null != SpecialAbility.getEdgeTrigger(name)) {
-                return SpecialAbility.getEdgeTrigger(name).getDisplayName();
+            SpecialAbility spa = SpecialAbility.getOption(name);
+            if (null != spa) {
+                return spa.getDisplayName();
             } else if (null != mmOptions.getOption(name)){
                 return mmOptions.getOption(name).getDisplayableName();
             } else {
@@ -170,10 +190,9 @@ public class PersonnelOptions extends PilotOptions {
 
         @Override
         public String getDisplayableNameWithValue() {
-            if (null != SpecialAbility.getAbility(name)) {
-                return SpecialAbility.getAbility(name).getDisplayName();
-            } else if (null != SpecialAbility.getEdgeTrigger(name)) {
-                return SpecialAbility.getEdgeTrigger(name).getDisplayName();
+            SpecialAbility spa = SpecialAbility.getOption(name);
+            if (null != spa) {
+                return spa.getDisplayName();
             } else if (null != mmOptions.getOption(name)){
                 return mmOptions.getOption(name).getDisplayableName();
             } else {
@@ -183,10 +202,9 @@ public class PersonnelOptions extends PilotOptions {
 
         @Override
         public String getDescription() {
-            if (null != SpecialAbility.getAbility(name)) {
-                return SpecialAbility.getAbility(name).getDescription();
-            } else if (null != SpecialAbility.getEdgeTrigger(name)) {
-                return SpecialAbility.getEdgeTrigger(name).getDescription();
+            SpecialAbility spa = SpecialAbility.getOption(name);
+            if (null != spa) {
+                return spa.getDescription();
             } else if (null != mmOptions.getOption(name)){
                 return mmOptions.getOption(name).getDescription();
             } else {

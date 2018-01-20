@@ -27,6 +27,7 @@ import megamek.common.Mech;
 import megamek.common.Mounted;
 import megamek.common.Tank;
 import megamek.common.logging.LogLevel;
+import megamek.common.options.IOption;
 import megamek.common.options.OptionsConstants;
 import megamek.common.options.PilotOptions;
 import megamek.common.util.EncodeControl;
@@ -112,6 +113,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
     private static final String CMD_ACQUIRE_RANGEMASTER = "RANGEMASTER"; //$NON-NLS-1$
     private static final String CMD_ACQUIRE_HUMANTRO = "HUMANTRO"; //$NON-NLS-1$
     private static final String CMD_ACQUIRE_ABILITY = "ABILITY"; //$NON-NLS-1$
+    private static final String CMD_ACQUIRE_CUSTOM_CHOICE = "CUSTOM_CHOICE"; //$NON-NLS-1$
     private static final String CMD_IMPROVE = "IMPROVE"; //$NON-NLS-1$
     private static final String CMD_ADD_SPOUSE = "SPOUSE"; //$NON-NLS-1$
     private static final String CMD_REMOVE_SPOUSE = "REMOVE_SPOUSE"; //$NON-NLS-1$
@@ -638,6 +640,19 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 int cost = Integer.parseInt(data[2]);
                 selectedPerson.acquireAbility(PilotOptions.LVL3_ADVANTAGES,
                         "human_tro", selected); //$NON-NLS-1$
+                gui.getCampaign().personUpdated(selectedPerson);
+                selectedPerson.setXp(selectedPerson.getXp() - cost);
+                MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
+                // TODO: add campaign report
+                break;
+            }
+            case CMD_ACQUIRE_CUSTOM_CHOICE:
+            {
+                String selected = data[1];
+                int cost = Integer.parseInt(data[2]);
+                String ability = data[3];
+                selectedPerson.acquireAbility(PilotOptions.LVL3_ADVANTAGES,
+                        ability, selected); //$NON-NLS-1$
                 gui.getCampaign().personUpdated(selectedPerson);
                 selectedPerson.setXp(selectedPerson.getXp() - cost);
                 MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
@@ -1913,6 +1928,25 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                             if (!ranges.contains(Crew.RANGEMASTER_LOS)) {
                                 menuItem = new JMenuItem(String.format(resourceMap.getString("abilityDesc.format"), resourceMap.getString("rangemaster_los.text"), costDesc)); //$NON-NLS-1$ //$NON-NLS-2$
                                 menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_RANGEMASTER, Crew.RANGEMASTER_LOS, String.valueOf(cost)));
+                                menuItem.addActionListener(this);
+                                menuItem.setEnabled(available);
+                                specialistMenu.add(menuItem);
+                            }
+                            if (specialistMenu.getMenuComponentCount() > 0) {
+                                abMenu.add(specialistMenu);
+                            }
+                        } else if ((person.getOptions().getOption(spa.getName()).getType() == IOption.CHOICE)
+                                && !(person.getOptions().getOption(spa.getName()).booleanValue())) {
+                            JMenu specialistMenu = new JMenu(spa.getDisplayName());
+                            List<String> choices = spa.getChoiceValues();
+                            for (String s : choices) {
+                                if (s.equalsIgnoreCase("none")) {
+                                    continue;
+                                }
+                                menuItem = new JMenuItem(String.format(resourceMap.getString("abilityDesc.format"),
+                                        s, costDesc));
+                                menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_CUSTOM_CHOICE,
+                                        s, String.valueOf(cost), spa.getName()));
                                 menuItem.addActionListener(this);
                                 menuItem.setEnabled(available);
                                 specialistMenu.add(menuItem);
