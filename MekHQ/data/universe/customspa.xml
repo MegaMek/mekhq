@@ -12,11 +12,14 @@
     <!ENTITY    CHOICE      "4">
 ]>
 
+     
 <options>
+<!-- Examples customs of custom abilities. See docs/custom_spa.txt for
+     more information
+
     <option name="tetris_master">
         <group>&L3;</group>
         <type>&CHOICE;</type>
-        <default>false</default>
     </option>
     
     <option name="edge_paper_cut">
@@ -28,4 +31,6 @@
         <group>&AUGMENTATION;</group>
         <type>&BOOLEAN;</type>
     </option>
+-->
+
 </options>

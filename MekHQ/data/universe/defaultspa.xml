@@ -332,7 +332,8 @@
 		<desc>Failed acquisition check will be rerolled with edge.</desc>
 	</edgeTrigger>
 
-<!-- customs -->
+<!-- Example entries corresponding to the examples in customspa.xml
+     See docs/custom_spa.txt
 	
 	<ability>
 		<lookupName>tetris_master</lookupName>
@@ -364,6 +365,7 @@
             <skill>Tech/Vessel</skill>
         </skillPrereq>
 	</implant>
+-->
 	
 </abilities>
 
