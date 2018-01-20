@@ -124,7 +124,6 @@ public class CustomOption {
         
         try {
             retVal = new CustomOption(key);
-            String defaultText = null;
             NodeList nl = wn.getChildNodes();
 
             for (int x = 0; x < nl.getLength(); x++) {
@@ -133,40 +132,23 @@ public class CustomOption {
                     retVal.group = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("type")) {
                     retVal.type = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("default")) {
-                    defaultText = wn2.getTextContent();
                 }
             }
 
             switch (retVal.type) {
                 case IOption.BOOLEAN:
-                    if (null != defaultText) {
-                        retVal.defaultVal = Boolean.valueOf(defaultText);
-                    } else {
-                        retVal.defaultVal = Boolean.FALSE;
-                    }
+                    retVal.defaultVal = Boolean.FALSE;
                     break;
                 case IOption.INTEGER:
-                    if (null != defaultText) {
-                        retVal.defaultVal = Integer.valueOf(defaultText);
-                    } else {
-                        retVal.defaultVal = new Integer(0);
-                    }
+                    retVal.defaultVal = new Integer(0);
                     break;
                 case IOption.FLOAT:
-                    if (null != defaultText) {
-                        retVal.defaultVal = Float.valueOf(defaultText);
-                    } else {
-                        retVal.defaultVal = new Float(0.0f);
-                    }
+                    retVal.defaultVal = new Float(0.0f);
                     break;
                 case IOption.STRING:
+                case IOption.CHOICE:
                 default:
-                    if (null != defaultText) {
-                        retVal.defaultVal = defaultText;
-                    } else {
-                        retVal.defaultVal = "";
-                    }
+                    retVal.defaultVal = "";
                     break;
             }
         } catch (Exception ex) {

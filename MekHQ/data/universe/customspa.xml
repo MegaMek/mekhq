@@ -6,25 +6,26 @@
     <!ENTITY    AUGMENTATION    "MDAdvantages">
 
     <!ENTITY    BOOLEAN     "0">
+    <!ENTITY    INT         "1">
+    <!ENTITY    FLOAT       "2">
     <!ENTITY    STRING      "3">
+    <!ENTITY    CHOICE      "4">
 ]>
 
 <options>
-    <option name="envelope_pusher">
+    <option name="tetris_master">
         <group>&L3;</group>
-        <type>&BOOLEAN;</type>
+        <type>&CHOICE;</type>
         <default>false</default>
     </option>
     
     <option name="edge_paper_cut">
         <group>&EDGE;</group>
         <type>&BOOLEAN;</type>
-        <default>false</default>
     </option>
     
     <option name="md_prosthetic_blowtorch">
         <group>&AUGMENTATION;</group>
         <type>&BOOLEAN;</type>
-        <default>false</default>
     </option>
 </options>

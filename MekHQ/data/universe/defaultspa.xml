@@ -335,14 +335,15 @@
 <!-- customs -->
 	
 	<ability>
-		<lookupName>envelope_pusher</lookupName>
-		<displayName>Envelope Pusher</displayName>
+		<lookupName>tetris_master</lookupName>
+		<displayName>Tetris Master</displayName>
 		<xpCost>4</xpCost>
 		<weight>2</weight>
         <skillPrereq>
-            <skill>Hyperspace Navigation</skill>
+            <skill>Administration</skill>
         </skillPrereq>
-        <desc>Increase the maximum range of a hyperspace jump</desc>
+        <desc>Increase the capacity of a cargo or transport bay.</desc>
+        <choiceValues>None::Cargo::Mech::Vehicle::Fighter::Infantry</choiceValues>
 	</ability>
 	
 	<edgeTrigger>

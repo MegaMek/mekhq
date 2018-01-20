@@ -94,6 +94,9 @@ public class SpecialAbility implements MekHqXmlSerializable {
     //(typically this is a lower value ability on the same chain (e.g. Cluster Hitter removed when you get Cluster Master)
     private Vector<String> removeAbilities;
     
+    // For custom SPAs of type CHOICE the legal values need to be provided.
+    private Vector<String> choiceValues;
+    
     public SpecialAbility() {
         this("unknown");
     }
@@ -109,6 +112,7 @@ public class SpecialAbility implements MekHqXmlSerializable {
         prereqAbilities = new Vector<String>();
         invalidAbilities = new Vector<String>();
         removeAbilities = new Vector<String>();
+        choiceValues = new Vector<>();
         prereqSkills = new Vector<SkillPrereq>();
         prereqMisc = new HashMap<>();
         xpCost = 1;
@@ -125,6 +129,7 @@ public class SpecialAbility implements MekHqXmlSerializable {
     	clone.prereqAbilities = (Vector<String>)this.prereqAbilities.clone();
     	clone.invalidAbilities = (Vector<String>)this.invalidAbilities.clone();
     	clone.removeAbilities = (Vector<String>)this.removeAbilities.clone();
+    	clone.choiceValues = (Vector<String>)this.choiceValues.clone();
     	clone.prereqSkills = (Vector<SkillPrereq>)this.prereqSkills.clone();
     	clone.prereqMisc = new HashMap<>(this.prereqMisc);
     	return clone;
@@ -222,6 +227,14 @@ public class SpecialAbility implements MekHqXmlSerializable {
     public void setRemovedAbilities(Vector<String> remove) {
     	removeAbilities = remove;
     }
+    
+    public Vector<String> getChoiceValues() {
+        return choiceValues;
+    }
+    
+    public void setChoiceValues(Vector<String> values) {
+        choiceValues = values;
+    }
 
     public void clearPrereqSkills() {
         prereqSkills = new Vector<SkillPrereq>();
@@ -266,6 +279,10 @@ public class SpecialAbility implements MekHqXmlSerializable {
                 +"<removeAbilities>"
                 +Utilities.combineString(removeAbilities, "::")
                 +"</removeAbilities>");
+        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"<choiceValues>"
+                +Utilities.combineString(choiceValues, "::")
+                +"</choiceValues>");
         for(SkillPrereq skillpre : prereqSkills) {
             skillpre.writeToXml(pw1, indent+1);
         }
@@ -307,6 +324,8 @@ public class SpecialAbility implements MekHqXmlSerializable {
                     retVal.invalidAbilities = Utilities.splitString(wn2.getTextContent(), "::");
                 } else if (wn2.getNodeName().equalsIgnoreCase("removeAbilities")) {
                     retVal.removeAbilities = Utilities.splitString(wn2.getTextContent(), "::");
+                } else if (wn2.getNodeName().equalsIgnoreCase("choiceValues")) {
+                    retVal.choiceValues = Utilities.splitString(wn2.getTextContent(), "::");
                 } else if (wn2.getNodeName().equalsIgnoreCase("skillPrereq")) {
                     SkillPrereq skill = SkillPrereq.generateInstanceFromXML(wn2);
                     if(!skill.isEmpty()) {
@@ -384,6 +403,8 @@ public class SpecialAbility implements MekHqXmlSerializable {
                     retVal.invalidAbilities = Utilities.splitString(wn2.getTextContent(), "::");
                 } else if (wn2.getNodeName().equalsIgnoreCase("removeAbilities")) {
                     retVal.removeAbilities = Utilities.splitString(wn2.getTextContent(), "::");
+                } else if (wn2.getNodeName().equalsIgnoreCase("choiceValues")) {
+                    retVal.choiceValues = Utilities.splitString(wn2.getTextContent(), "::");
                 } else if (wn2.getNodeName().equalsIgnoreCase("skillPrereq")) {
                     SkillPrereq skill = SkillPrereq.generateInstanceFromXML(wn2);
                     if(!skill.isEmpty()) {
