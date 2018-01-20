@@ -1,20 +1,20 @@
 /*
  * MissingProtomekActuator.java
- * 
+ *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -43,43 +43,43 @@ public class MissingProtomekArmActuator extends MissingPart {
     public MissingProtomekArmActuator() {
         this(0, 0, null);
     }
-    
+
     public MissingProtomekArmActuator(int tonnage, Campaign c) {
         this(tonnage, -1, c);
     }
-    
+
     public MissingProtomekArmActuator(int tonnage, int loc, Campaign c) {
         super(tonnage, c);
         this.name = "Protomech Arm Actuator";
         this.location = loc;
     }
-    
-    @Override 
+
+    @Override
 	public int getBaseTime() {
 		return 120;
 	}
-	
+
 	@Override
 	public int getDifficulty() {
 		return 0;
 	}
-    
+
     public void setLocation(int loc) {
         this.location = loc;
     }
-    
-   
+
+
     @Override
     public double getTonnage() {
         //TODO: how much do actuators weight?
         //apparently nothing
         return 0;
     }
-    
+
     public int getLocation() {
         return location;
     }
-    
+
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
@@ -93,13 +93,13 @@ public class MissingProtomekArmActuator extends MissingPart {
     @Override
     protected void loadFieldsFromXmlNode(Node wn) {
         NodeList nl = wn.getChildNodes();
-        
+
         for (int x=0; x<nl.getLength(); x++) {
             Node wn2 = nl.item(x);
-            
+
             if (wn2.getNodeName().equalsIgnoreCase("location")) {
                 location = Integer.parseInt(wn2.getTextContent());
-            } 
+            }
         }
     }
 
@@ -124,7 +124,7 @@ public class MissingProtomekArmActuator extends MissingPart {
         return null;
     }
 
-    @Override 
+    @Override
     public void fix() {
         Part replacement = findReplacement(false);
         if(null != replacement) {
@@ -134,11 +134,11 @@ public class MissingProtomekArmActuator extends MissingPart {
             replacement.decrementQuantity();
             ((ProtomekArmActuator)actualReplacement).setLocation(location);
             remove(false);
-            //assign the replacement part to the unit           
+            //assign the replacement part to the unit
             actualReplacement.updateConditionFromPart();
         }
     }
-    
+
     @Override
     public boolean isAcceptableReplacement(Part part, boolean refit) {
         return part instanceof ProtomekArmActuator
@@ -154,12 +154,12 @@ public class MissingProtomekArmActuator extends MissingPart {
 	public String getLocationName() {
 		return unit.getEntity().getLocationName(location);
 	}
-	
+
 	@Override
 	public TechAdvancement getTechAdvancement() {
 	    return ProtomekLocation.TECH_ADVANCEMENT;
 	}
-	
+
 	@Override
 	public int getMassRepairOptionType() {
     	return Part.REPAIR_PART_TYPE.ACTUATOR;

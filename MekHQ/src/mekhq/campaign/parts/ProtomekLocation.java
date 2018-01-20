@@ -52,7 +52,7 @@ public class ProtomekLocation extends Part {
             .setPrototypeFactions(F_CSJ).setProductionFactions(F_CSJ)
             .setTechRating(RATING_D).setAvailability(RATING_X, RATING_X, RATING_D, RATING_D)
             .setStaticTechLevel(SimpleTechLevel.STANDARD);
-    
+
     //some of these aren't used but may be later for advanced designs (i.e. WoR)
     protected int loc;
     protected int structureType;
@@ -650,12 +650,12 @@ public class ProtomekLocation extends Part {
 	public TechAdvancement getTechAdvancement() {
 	    return TECH_ADVANCEMENT;
 	}
-    
+
     @Override
 	public int getMassRepairOptionType() {
     	return Part.REPAIR_PART_TYPE.GENERAL_LOCATION;
     }
-	
+
 	@Override
 	public int getRepairPartType() {
     	return Part.REPAIR_PART_TYPE.MEK_LOCATION;

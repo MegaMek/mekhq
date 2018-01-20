@@ -48,7 +48,7 @@ public class LaunchGameDialog extends JDialog implements ActionListener {
     	this.campaign = c;
         initComponents();
     }
-    
+
     public void initComponents() {
     	yourNameL = new JLabel(
                 Messages.getString("MegaMek.yourNameL"), SwingConstants.RIGHT); //$NON-NLS-1$

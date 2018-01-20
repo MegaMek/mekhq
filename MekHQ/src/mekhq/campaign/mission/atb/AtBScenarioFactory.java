@@ -76,7 +76,7 @@ public class AtBScenarioFactory {
 	public static List<Class<IAtBScenario>> getScenarios(int type) {
 		return scenarioMap.get(type);
 	}
-	
+
 	public static AtBScenario createScenario(Campaign c, Lance lance, int type, boolean attacker, Date date) {
 		List<Class<IAtBScenario>> classList = getScenarios(type);
 		Class<IAtBScenario> selectedClass = null;
@@ -107,21 +107,21 @@ public class AtBScenarioFactory {
 	@SuppressWarnings("unchecked")
 	public static boolean registerScenario(IAtBScenario scenario) {
 	    final String METHOD_NAME = "registerScenario(IAtBScenario)"; //$NON-NLS-1$
-	    
+
 		if (!IAtBScenario.class.isAssignableFrom(scenario.getClass())) {
 	        MekHQ.getLogger().log(AtBScenarioFactory.class, METHOD_NAME, LogLevel.ERROR,
 	                String.format("Unable to register an AtBScenario of class '%s' because is does not implement '%s'.", //$NON-NLS-1$
 	                        scenario.getClass().getName(), IAtBScenario.class.getName()));
 			return false;
 		}
-		
+
 		if (!scenario.getClass().isAnnotationPresent(AtBScenarioEnabled.class)) {
             MekHQ.getLogger().log(AtBScenarioFactory.class, METHOD_NAME, LogLevel.ERROR,
                     String.format("Unable to register an AtBScenario of class '%s' because is does not have the '%s' annotation.", //$NON-NLS-1$
                             scenario.getClass().getName(), AtBScenarioEnabled.class.getName()));
 			return false;
 		}
-		
+
 		int type = scenario.getScenarioType();
 		List<Class<IAtBScenario>> list = scenarioMap.get(type);
 
@@ -134,7 +134,7 @@ public class AtBScenarioFactory {
 
 		return true;
 	}
-	
+
 	/* Iterate through the list of lances and make a battle roll for each,
 	 * then sort them by date before adding them to the campaign.
 	 * Contracts with enemy morale level of invincible have a base attack
@@ -143,52 +143,52 @@ public class AtBScenarioFactory {
 	 */
 	public static void createScenariosForNewWeek(Campaign c, boolean allowLancesToBeDuplicated) {
 		Hashtable<Integer, Lance> lances = c.getLances();
-		
+
 		ArrayList<AtBScenario> sList = new ArrayList<AtBScenario>();
 		AtBScenario baseAttack = null;
 		Map<Integer, Integer> assignedLances = new HashMap<Integer, Integer>();
-		
+
 		if (!allowLancesToBeDuplicated) {
 			for (Mission m : c.getMissions()) {
 				if (!m.isActive()) {
 					continue;
 				}
-				
+
 				for (Scenario s : m.getScenarios()) {
 					if (!s.isCurrent() || !AtBScenario.class.isAssignableFrom(s.getClass())) {
 						continue;
 					}
-					
+
 					AtBScenario atbScen = (AtBScenario)s;
-					
+
 					if (atbScen.getLanceForceId() == -1) {
 						continue;
 					}
-					
+
 					assignedLances.put(atbScen.getLanceForceId(), atbScen.getLanceForceId());
 				}
 			}
 		}
-		
+
 		for (Lance l : lances.values()) {
 			if (assignedLances.containsKey(l.getForceId())) {
 				continue;
 			}
-			
+
 			if (null == l.getContract(c) || !l.getContract(c).isActive() ||
 					!l.isEligible(c) ||
 					c.getDate().before(l.getContract(c).getStartDate())) {
 				continue;
 			}
-			
+
 			if (l.getRole() == Lance.ROLE_TRAINING) {
 				c.awardTrainingXP(l);
 			}
-			
+
 			if (l.getContract(c).getMoraleLevel() <= AtBContract.MORALE_VERYLOW) {
 				continue;
 			}
-			
+
 			AtBScenario scenario = l.checkForBattle(c);
 			if (null != scenario) {
 				sList.add(scenario);
@@ -284,6 +284,6 @@ public class AtBScenarioFactory {
 		for (AtBScenario s : sList) {
 			c.addScenario(s, c.getMission(s.getMissionId()));
 			s.setForces(c);
-		}		
+		}
 	}
 }

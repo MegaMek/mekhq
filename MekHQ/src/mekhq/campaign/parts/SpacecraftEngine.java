@@ -1,20 +1,20 @@
 /*
  * SpacecraftEngine.java
- * 
+ *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -41,20 +41,20 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.SkillType;
 
 /**
- * 
+ *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class SpacecraftEngine extends Part {
 	private static final long serialVersionUID = -6961398614705924172L;
-	
+
 	static final TechAdvancement TECH_ADVANCEMENT = new TechAdvancement(TECH_BASE_ALL)
 	        .setAdvancement(DATE_ES, DATE_ES, DATE_ES).setTechRating(RATING_D)
 	        .setAvailability(RATING_C, RATING_D, RATING_C, RATING_C)
 	        .setStaticTechLevel(SimpleTechLevel.STANDARD);
-	
-	double engineTonnage;  
+
+	double engineTonnage;
 	boolean clan;
-	
+
 	public SpacecraftEngine() {
 		this(0, 0, null, false);
 	}
@@ -65,20 +65,20 @@ public class SpacecraftEngine extends Part {
 		this.clan = clan;
 		this.name = "Spacecraft Engine";
 	}
-	
+
 	public SpacecraftEngine clone() {
 		SpacecraftEngine clone = new SpacecraftEngine(getUnitTonnage(), engineTonnage, campaign, clan);
         clone.copyBaseData(this);
 		return clone;
 	}
-	
+
 	@Override
 	public double getTonnage() {
 		return engineTonnage;
 	}
-	
+
 	public void calculateTonnage() {
-		
+
 		if(null != unit) {
 			clan = unit.getEntity().isClan();
 			if(unit.getEntity() instanceof SmallCraft) {
@@ -97,12 +97,12 @@ public class SpacecraftEngine extends Part {
 			}
 		}
 	}
-	
-	@Override 
+
+	@Override
 	public long getStickerPrice() {
 		return (long)Math.round(engineTonnage * 1000);
 	}
-	
+
 	@Override
 	public boolean isSamePartType(Part part) {
 		return part instanceof SpacecraftEngine
@@ -139,10 +139,10 @@ public class SpacecraftEngine extends Part {
 	@Override
 	protected void loadFieldsFromXmlNode(Node wn) {
 		NodeList nl = wn.getChildNodes();
-		
+
 		for (int x=0; x<nl.getLength(); x++) {
 			Node wn2 = nl.item(x);
-			
+
 			if (wn2.getNodeName().equalsIgnoreCase("engineTonnage")) {
 				engineTonnage = Double.parseDouble(wn2.getTextContent());
 			} else if (wn2.getNodeName().equalsIgnoreCase("clan")) {
@@ -151,7 +151,7 @@ public class SpacecraftEngine extends Part {
 				} else {
 					clan = false;
 				}
-			} 
+			}
 		}
 	}
 
@@ -205,7 +205,7 @@ public class SpacecraftEngine extends Part {
 			if(engineHits >= engineCrits) {
 				remove(false);
 				return;
-			} 
+			}
 			else if(engineHits > 0) {
 				hits = engineHits;
 			} else {
@@ -213,15 +213,15 @@ public class SpacecraftEngine extends Part {
 			}
 		}
 	}
-	
-	@Override 
+
+	@Override
 	public int getBaseTime() {
 		if(isSalvaging()) {
 			return 43200;
 		}
 		return 300;
 	}
-	
+
 	@Override
 	public int getDifficulty() {
 		return 1;
@@ -240,20 +240,20 @@ public class SpacecraftEngine extends Part {
 			}
 		}
 	}
-	
+
 	@Override
 	 public String checkFixable() {
 		 return null;
 	 }
-	
+
 	@Override
 	public boolean isMountedOnDestroyedLocation() {
 		return false;
 	}
-	 
+
 	 @Override
 	 public boolean isRightTechType(String skillType) {
-		 return skillType.equals(SkillType.S_TECH_AERO);	
+		 return skillType.equals(SkillType.S_TECH_AERO);
 	 }
 
 	@Override
@@ -266,12 +266,12 @@ public class SpacecraftEngine extends Part {
 	public int getLocation() {
 		return Entity.LOC_NONE;
 	}
-	
+
 	@Override
 	public TechAdvancement getTechAdvancement() {
 	    return TECH_ADVANCEMENT;
 	}
-    
+
     @Override
 	public int getMassRepairOptionType() {
     	return Part.REPAIR_PART_TYPE.ENGINE;

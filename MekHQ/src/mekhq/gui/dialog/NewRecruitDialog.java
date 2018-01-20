@@ -32,7 +32,7 @@ public class NewRecruitDialog extends javax.swing.JDialog {
 
     /**
      * This dialog is used to both hire new pilots and to edit existing ones
-     * 
+     *
      */
     private static final long serialVersionUID = -6265589976779860566L;
     private Person person;

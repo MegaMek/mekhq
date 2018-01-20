@@ -1,20 +1,20 @@
 /*
  * MissingDropshipDockingCollar.java
- * 
+ *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -39,16 +39,16 @@ import mekhq.campaign.Campaign;
 public class MissingDropshipDockingCollar extends MissingPart {
 
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = -717866644605314883L;
 
 	private int collarType;
-	
+
 	public MissingDropshipDockingCollar() {
     	this(0, null, Dropship.COLLAR_STANDARD);
     }
-    
+
     public MissingDropshipDockingCollar(int tonnage, Campaign c, int collarType) {
         super(tonnage, c);
         this.collarType = collarType;
@@ -59,12 +59,12 @@ public class MissingDropshipDockingCollar extends MissingPart {
             name += " (Prototype)";
         }
     }
-    
-    @Override 
+
+    @Override
 	public int getBaseTime() {
 		return 2880;
 	}
-	
+
 	@Override
 	public int getDifficulty() {
 		return -2;
@@ -75,8 +75,8 @@ public class MissingDropshipDockingCollar extends MissingPart {
 		if(null != unit && unit.getEntity() instanceof Dropship) {
             ((Dropship)unit.getEntity()).setDamageDockCollar(true);
             ((Dropship)unit.getEntity()).setDamageKFBoom(true);
-		}	
-		
+		}
+
 	}
 
 	@Override
@@ -89,7 +89,7 @@ public class MissingDropshipDockingCollar extends MissingPart {
 		return null;
 	}
 
-	
+
 	@Override
 	public double getTonnage() {
 		return 0;
@@ -130,7 +130,7 @@ public class MissingDropshipDockingCollar extends MissingPart {
 	public int getLocation() {
 		return Entity.LOC_NONE;
 	}
-	
+
 	@Override
 	public TechAdvancement getTechAdvancement() {
         if (collarType != Dropship.COLLAR_NO_BOOM) {
@@ -139,5 +139,5 @@ public class MissingDropshipDockingCollar extends MissingPart {
             return DropshipDockingCollar.TA_NO_BOOM;
         }
 	}
-	
+
 }

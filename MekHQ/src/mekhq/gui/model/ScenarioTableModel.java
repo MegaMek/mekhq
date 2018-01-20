@@ -15,7 +15,7 @@ public class ScenarioTableModel extends DataTableModel {
     private static final long serialVersionUID = 534443424190075264L;
 
     Campaign campaign;
-    
+
     private final static int COL_NAME       = 0;
     private final static int COL_STATUS     = 1;
     private final static int COL_DATE       = 2;
@@ -26,7 +26,7 @@ public class ScenarioTableModel extends DataTableModel {
         data = new ArrayList<Scenario>();
         campaign = c;
     }
-    
+
     public int getRowCount() {
         return data.size();
     }
@@ -105,7 +105,7 @@ public class ScenarioTableModel extends DataTableModel {
     public Scenario getScenario(int row) {
         return (Scenario)data.get(row);
     }
-    
+
     private Campaign getCampaign() {
         return campaign;
     }

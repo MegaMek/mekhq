@@ -7,12 +7,12 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -47,17 +47,17 @@ public class SocioIndustrialDataAdapter extends XmlAdapter<String, Planet.SocioI
         equipmentTypeToStringMap.put(EquipmentType.RATING_X, "R"); //$NON-NLS-1$
     }
     private final String SEPARATOR = "-"; //$NON-NLS-1$
-    
+
     public static int convertRatingToCode(String rating) {
         Integer result = stringToEquipmentTypeMap.get(rating.toUpperCase(Locale.ROOT));
         return null != result ? result.intValue() : EquipmentType.RATING_C;
     }
-    
+
     public static String convertCodeToRating(int code) {
         String result = equipmentTypeToStringMap.get(code);
         return null != result ? result : "?"; //$NON-NLS-1$
     }
-    
+
     @Override
     public Planet.SocioIndustrialData unmarshal(String v) throws Exception {
         String[] socio = v.split(SEPARATOR);

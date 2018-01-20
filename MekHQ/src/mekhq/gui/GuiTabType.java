@@ -25,7 +25,7 @@ import megamek.common.util.EncodeControl;
 
 /**
  * Identifies the standard tabs and provides a factory method.
- * 
+ *
  * @author Neoancient
  *
  */

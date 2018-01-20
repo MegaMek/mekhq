@@ -7,12 +7,12 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -113,7 +113,7 @@ public class MedicalViewDialog extends JDialog {
     private transient Font handwritingFont;
     private transient Color labelColor;
     private transient ImageIcon healImageIcon;
-    
+
     private boolean gmMode;
 
     public MedicalViewDialog(Window parent, Campaign c, Person p, IconPackage ip) {
@@ -122,7 +122,7 @@ public class MedicalViewDialog extends JDialog {
         this.person = Objects.requireNonNull(p);
         //this.iconPackage = Objects.requireNonNull(ip);
         resourceMap = ResourceBundle.getBundle("mekhq.resources.MedicalViewDialog", new EncodeControl()); //$NON-NLS-1$
-        
+
         // Preload default paperdolls
         try(InputStream fis = new FileInputStream(ip.getGuiElement("default_male_paperdoll"))) { //$NON-NLS-1$
             defaultMaleDoll = new Paperdoll(fis);
@@ -134,11 +134,11 @@ public class MedicalViewDialog extends JDialog {
         } catch(IOException e) {
             MekHQ.getLogger().log(getClass(), "<init>(Window,Campaign,Person,IconPackage)", e); //$NON-NLS-1$
         }
-        
+
         setPreferredSize(new Dimension(1024, 840));
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(parent);
-        
+
         labelFont = UIManager.getDefaults().getFont("Menu.font").deriveFont(Font.PLAIN, 16); //$NON-NLS-1$
         try(InputStream fis = new FileInputStream("data/fonts/angelina.TTF")) { //$NON-NLS-1$
             handwritingFont = Font.createFont(Font.TRUETYPE_FONT, fis).deriveFont(Font.PLAIN, 22);
@@ -147,7 +147,7 @@ public class MedicalViewDialog extends JDialog {
         }
         labelColor = new Color(170, 170, 170);
         healImageIcon = new ImageIcon(new ImageIcon("data/images/misc/medical.png").getImage().getScaledInstance(16, 16, Image.SCALE_DEFAULT)); //$NON-NLS-1$
-        
+
         dollActionListener = ae -> {
             final BodyLocation loc = BodyLocation.of(ae.getActionCommand());
             final boolean locationPicked = !loc.readableName.isEmpty();
@@ -199,13 +199,13 @@ public class MedicalViewDialog extends JDialog {
             popup.show(doll, (int) (mousePos.getX() - popupSize.getWidth()) + 10, (int) mousePos.getY() - 10);
 
         };
-        
+
         setBackground(Color.WHITE);
         getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
         Container scrollPanel = new JPanel();
         getContentPane().add(new JScrollPane(scrollPanel, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER));
         initComponents(scrollPanel);
-        
+
         JButton okayButton = new JButton(resourceMap.getString("buttonDone.text")); //$NON-NLS-1$
         okayButton.addActionListener(ae -> {
             if(!notesArea.getText().isEmpty()) {
@@ -217,20 +217,20 @@ public class MedicalViewDialog extends JDialog {
         getContentPane().add(okayButton);
         pack();
     }
-    
+
     private void initComponents(Container cont) {
         cont.setBackground(Color.WHITE);
         cont.setLayout(new GridBagLayout());
-        
+
         GridBagConstraints gbc;
-        
+
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridheight = 6;
         gbc.weighty = 1.0;
         gbc.fill = GridBagConstraints.VERTICAL;
-        
+
         dollWrapper = new JPanel(null);
         dollWrapper.setLayout(new BoxLayout(dollWrapper, BoxLayout.Y_AXIS));
         dollWrapper.setMinimumSize(new Dimension(256, 768));
@@ -245,27 +245,27 @@ public class MedicalViewDialog extends JDialog {
         gbc.weighty = 0.0;
         gbc.insets = new Insets(10, 10, 10, 10);
         gbc.fill = GridBagConstraints.BOTH;
-        
+
         cont.add(genBaseData(campaign, person), gbc);
-        
+
         gbc.gridy = 1;
-        
+
         cont.add(genMedicalHistory(campaign, person), gbc);
-        
+
         gbc.gridy = 2;
-        
+
         cont.add(genAllergies(campaign, person), gbc);
 
         gbc.gridy = 3;
-        
+
         cont.add(genIllnesses(campaign, person), gbc);
 
         gbc.gridy = 4;
-        
+
         cont.add(injuryPanel = new JPanel(), gbc);
 
         gbc.gridy = 5;
-        
+
         cont.add(genNotes(campaign, person), gbc);
     }
 
@@ -279,10 +279,10 @@ public class MedicalViewDialog extends JDialog {
         injuryPanel.setVisible(true);
         super.validate();
     }
-    
+
     private JPanel fillDoll(JPanel panel, Campaign c, Person p) {
         panel.removeAll();
-        
+
         if(null != doll) {
             doll.removeActionListener(dollActionListener);
         }
@@ -317,7 +317,7 @@ public class MedicalViewDialog extends JDialog {
                         default:
                             col = Color.WHITE;
                             break;
-                        
+
                     }
                     doll.setLocColor(bl, col);
                 }
@@ -327,20 +327,20 @@ public class MedicalViewDialog extends JDialog {
         }
         panel.add(doll);
         panel.add(Box.createVerticalGlue());
-        
+
         return panel;
     }
-    
+
     private JPanel genBaseData(Campaign c, Person p) {
         JPanel panel = new JPanel();
         panel.setOpaque(false);
         panel.setLayout(new GridLayout(10, 2));
         panel.setBorder(BorderFactory.createMatteBorder(3, 3, 0, 3, Color.BLACK));
         panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
-        
+
         String name = p.getFullName();
         String[] nameParts = name.split(" ", -1); //$NON-NLS-1$
-        
+
         String familyName = "-"; //$NON-NLS-1$
         String givenNames = ""; //$NON-NLS-1$
         if(nameParts.length < 2) {
@@ -349,19 +349,19 @@ public class MedicalViewDialog extends JDialog {
             familyName = nameParts[nameParts.length - 1];
             givenNames = String.join(" ", Arrays.copyOf(nameParts, nameParts.length - 1)); //$NON-NLS-1$
         }
-        
+
         GregorianCalendar birthday = (GregorianCalendar) p.getBirthday().clone();
         DATE_FORMAT.setCalendar(birthday);
         String birthdayString = DATE_FORMAT.format(birthday.getTime());
         GregorianCalendar now = (GregorianCalendar) c.getCalendar().clone();
         int ageInMonths = (now.get(Calendar.YEAR) - birthday.get(Calendar.YEAR)) * 12
             + now.get(Calendar.MONTH) - birthday.get(Calendar.MONTH);
-        
+
         String phenotype = (p.getPhenotype() != Person.PHENOTYPE_NONE) ? p.getPhenotypeName() : resourceMap.getString("baselinePhenotype.text"); //$NON-NLS-1$
-        
+
         Force f = c.getForceFor(p);
         String force = (null != f) ? f.getFullName() : "-"; //$NON-NLS-1$
-        
+
         Person doc = c.getPerson(p.getDoctorId());
         String doctor = resourceMap.getString("none.text"); //$NON-NLS-1$
         if((null != doc) && doc.isActive()) {
@@ -389,7 +389,7 @@ public class MedicalViewDialog extends JDialog {
         panel.add(genWrittenPanel("")); //$NON-NLS-1$
         return panel;
     }
-    
+
     private JPanel genMedicalHistory(Campaign c, Person p) {
         JPanel panel = new JPanel();
         panel.setOpaque(false);
@@ -420,35 +420,35 @@ public class MedicalViewDialog extends JDialog {
             });
         return panel;
     }
-    
+
     private JPanel genAllergies(Campaign c, Person p) {
         JPanel panel = new JPanel();
         panel.setOpaque(false);
         panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
         panel.add(genLabel(resourceMap.getString("allergies.text"))); //$NON-NLS-1$
         panel.add(genWrittenText("")); //$NON-NLS-1$
-        
+
         return panel;
     }
-    
+
     private JPanel genIllnesses(Campaign c, Person p) {
         JPanel panel = new JPanel();
         panel.setOpaque(false);
         panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
         panel.add(genLabel(resourceMap.getString("illnesses.text"))); //$NON-NLS-1$
         panel.add(genWrittenText("")); //$NON-NLS-1$
-        
+
         return panel;
     }
-    
+
     /** Get the maximum injury level in the specified location */
     private InjuryLevel getMaxInjuryLevel(Person p, BodyLocation loc) {
         return p.getInjuries().stream().filter(inj -> !inj.isHidden() && (inj.getLocation() == loc))
             .sorted((inj1, inj2) -> Integer.compare(inj2.getLevel().ordinal(), inj1.getLevel().ordinal()))
             .findFirst().map(Injury::getLevel).orElse(InjuryLevel.NONE);
     }
-    
-    /** Compiles a list of body locations stream ordered by the maximum injury level in that location */ 
+
+    /** Compiles a list of body locations stream ordered by the maximum injury level in that location */
     private Stream<BodyLocation> maxInjurylevelLocationStream(Person p) {
         Map<BodyLocation, InjuryLevel> levelMap = new HashMap<>();
         Arrays.stream(BodyLocation.values())
@@ -460,13 +460,13 @@ public class MedicalViewDialog extends JDialog {
             Integer.compare(entry2.getValue().ordinal(), entry1.getValue().ordinal())
         ).map(Map.Entry::getKey);
     }
-    
+
     private JPanel fillInjuries(JPanel panel, Campaign c, Person p) {
         panel.removeAll();
         panel.setOpaque(false);
         panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
         panel.add(genLabel(resourceMap.getString("injuries.text"))); //$NON-NLS-1$
-        
+
         maxInjurylevelLocationStream(p).forEachOrdered(bl -> {
             JPanel blWrapper = new JPanel();
             blWrapper.setLayout(new BoxLayout(blWrapper, BoxLayout.X_AXIS));
@@ -475,7 +475,7 @@ public class MedicalViewDialog extends JDialog {
             blWrapper.add(Box.createHorizontalStrut(30));
             blWrapper.add(genWrittenText(Utilities.capitalize(bl.readableName)));
             panel.add(blWrapper);
-            
+
             p.getInjuriesByLocation(bl).stream()
                 .sorted((inj1, inj2) -> Integer.compare(inj2.getLevel().ordinal(), inj1.getLevel().ordinal()))
                 .forEachOrdered(inj -> {
@@ -493,27 +493,27 @@ public class MedicalViewDialog extends JDialog {
                     if(isGMMode()) {
                         injLabel.addMouseListener(new InjuryLabelMouseAdapter(injLabel, p, inj));
                     }
-                    
+
                     JPanel wrapper = new JPanel();
                     wrapper.setLayout(new BoxLayout(wrapper, BoxLayout.X_AXIS));
                     wrapper.setOpaque(false);
                     wrapper.setAlignmentX(Component.LEFT_ALIGNMENT);
                     wrapper.add(Box.createHorizontalStrut(60));
                     wrapper.add(injLabel);
-                    
+
                     panel.add(wrapper);
                 });
         });
-        
+
         return panel;
     }
-    
+
     private JPanel genNotes(Campaign c, Person p) {
         JPanel panel = new JPanel();
         panel.setOpaque(false);
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.add(genLabel(resourceMap.getString("doctorsNotes.text"))); //$NON-NLS-1$
-        
+
         String notes = p.getExtraData().get(DOCTOR_NOTES, ""); //$NON-NLS-1$
         notesArea = new JTextArea(notes);
         notesArea.setEditable(true);
@@ -528,9 +528,9 @@ public class MedicalViewDialog extends JDialog {
         notesPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
         notesPanel.add(Box.createHorizontalStrut(30));
         notesPanel.add(notesArea);
-        
+
         panel.add(notesPanel);
-        
+
         return panel;
     }
 
@@ -541,10 +541,10 @@ public class MedicalViewDialog extends JDialog {
         label.setForeground(labelColor);
         return label;
     }
-    
+
     private JPanel genWrittenPanel(String text) {
         JLabel label = genWrittenText(text);
-        
+
         JPanel wrapper = new JPanel();
         wrapper.setLayout(new BoxLayout(wrapper, BoxLayout.X_AXIS));
         wrapper.setOpaque(false);
@@ -552,16 +552,16 @@ public class MedicalViewDialog extends JDialog {
         wrapper.add(Box.createHorizontalStrut(30));
         wrapper.add(label);
         wrapper.setBorder(BorderFactory.createMatteBorder(0, 0, 3, 0, Color.BLACK));
-        
+
         return wrapper;
     }
-    
+
     private JLabel genWrittenText(String text) {
         JLabel label = new JLabel(text);
         label.setFont(handwritingFont);
         return label;
     }
-    
+
     private String genTimePeriod(int days) {
         if(days <= 1) {
             return resourceMap.getString("durationOneDay.text"); //$NON-NLS-1$
@@ -575,15 +575,15 @@ public class MedicalViewDialog extends JDialog {
             return String.format(resourceMap.getString("durationYears.format"), days * 1.0 / 365.0); //$NON-NLS-1$
         }
     }
-    
+
     public boolean isGMMode() {
         return gmMode;
     }
-    
+
     public void setGMMode(boolean gmMode) {
         this.gmMode = gmMode;
     }
-    
+
     private static class InjuryLabelMouseAdapter extends MouseAdapter {
         private final JLabel label;
         private final Person person;
@@ -598,7 +598,7 @@ public class MedicalViewDialog extends JDialog {
             this.healImageIcon = new ImageIcon(new ImageIcon("data/images/misc/medical.png").getImage().getScaledInstance(16, 16, Image.SCALE_DEFAULT)); //$NON-NLS-1$
             this.resourceMap = ResourceBundle.getBundle("mekhq.resources.MedicalViewDialog", new EncodeControl()); //$NON-NLS-1$
         }
-        
+
         @Override
         public void mouseEntered(MouseEvent e) {
             label.setBackground(Color.LIGHT_GRAY);

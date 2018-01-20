@@ -40,14 +40,14 @@ import mekhq.gui.model.SortedComboBoxModel;
  * Combo box for choosing a faction by full name that accounts for
  * the fact that full names are not always unique within the faction's
  * era.
- * 
+ *
  * @author Neoancient
  *
  */
 public class FactionComboBox extends JComboBox<Map.Entry<String, String>> {
-	
+
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1352706316707722054L;
 
@@ -60,7 +60,7 @@ public class FactionComboBox extends JComboBox<Map.Entry<String, String>> {
 					Entry<String, String> arg1) {
 				return arg0.getValue().compareTo(arg1.getValue());
 			}
-			
+
 		};
 		setModel(new SortedComboBoxModel<Map.Entry<String, String>>(comp));
 		setRenderer(new DefaultListCellRenderer() {
@@ -71,10 +71,10 @@ public class FactionComboBox extends JComboBox<Map.Entry<String, String>> {
 					setText((String)((Map.Entry<?, ?>)value).getValue());
 				}
 				return this;
-			}			
+			}
 		});
 	}
-	
+
 	public void addFactionEntries(Collection<String> list, int year) {
 		HashMap<String, String> map = new HashMap<String, String>();
 		HashSet<String> collisions = new HashSet<String>();
@@ -108,7 +108,7 @@ public class FactionComboBox extends JComboBox<Map.Entry<String, String>> {
 		}
 		return (String)((Map.Entry<?, ?>)getSelectedItem()).getValue();
 	}
-	
+
 	public void setSelectedItemByKey(String key) {
 		for (int i = 0; i < getModel().getSize(); i++) {
 			if (key.equals(((Map.Entry<String, String>)(getModel().getElementAt(i))).getKey())) {

@@ -371,20 +371,20 @@ public final class InfirmaryTab extends CampaignGuiTab {
     }
 
     private ActionScheduler doctorListScheduler = new ActionScheduler(this::refreshDoctorsList);
-    private ActionScheduler patientListScheduler = new ActionScheduler(this::refreshPatientList);    
-    
+    private ActionScheduler patientListScheduler = new ActionScheduler(this::refreshPatientList);
+
     @Subscribe
     public void handle(ScenarioResolvedEvent ev) {
         doctorListScheduler.schedule();
         patientListScheduler.schedule();
     }
-    
+
     @Subscribe
     public void handle(PersonEvent ev) {
         doctorListScheduler.schedule();
         patientListScheduler.schedule();
     }
-    
+
     @Subscribe
     public void handle(MedicPoolChangedEvent ev) {
         doctorListScheduler.schedule();

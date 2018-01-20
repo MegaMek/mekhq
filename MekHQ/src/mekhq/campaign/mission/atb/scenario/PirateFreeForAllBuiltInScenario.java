@@ -20,7 +20,7 @@ public class PirateFreeForAllBuiltInScenario extends AtBScenario {
 	public boolean isBigBattle() {
 		return true;
 	}
-	
+
 	@Override
 	public int getScenarioType() {
 		return PIRATEFREEFORALL;
@@ -55,14 +55,14 @@ public class PirateFreeForAllBuiltInScenario extends AtBScenario {
 	public void setExtraMissionForces(Campaign campaign, ArrayList<Entity> allyEntities,
 			ArrayList<Entity> enemyEntities) {
         setStart(Board.START_CENTER);
-        
+
         for (int i = 0; i < 4; i++) {
             getAlliesPlayer().add(getEntity(getContract(campaign).getEmployerCode(),
                     getContract(campaign).getAllySkill(), getContract(campaign).getAllyQuality(),
                     UnitType.MEK, UnitMarket.getRandomAeroWeight(), // max heavy
                     campaign));
         }
-        
+
         for (int i = 0; i < 12; i++) {
             enemyEntities.add(getEntity(getContract(campaign).getEnemyCode(),
                     getContract(campaign).getEnemySkill(), getContract(campaign).getEnemyQuality(),
@@ -71,11 +71,11 @@ public class PirateFreeForAllBuiltInScenario extends AtBScenario {
                             campaign.getCampaignOptions().getRegionalMechVariations()),
                     campaign));
         }
-        
+
         addBotForce(getEnemyBotForce(getContract(campaign), Board.START_N, enemyEntities));
 
         ArrayList<Entity>otherForce = new ArrayList<Entity>();
-        
+
         for (int i = 0; i < 12; i++) {
             otherForce.add(getEntity("PIR",
                             RandomSkillsGenerator.L_REG, IUnitRating.DRAGOON_C,
@@ -83,7 +83,7 @@ public class PirateFreeForAllBuiltInScenario extends AtBScenario {
                             UnitMarket.getRandomMechWeight(),
                             campaign));
         }
-        
+
         addBotForce(new BotForce("Pirates", 3, Board.START_S, otherForce));
 	}
 }

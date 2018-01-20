@@ -37,7 +37,7 @@ public class StaticChecks {
         }
         return true;
     }
-    
+
     public static boolean areAnyForcesDeployed(Vector<Force> forces) {
         for (Force force : forces) {
             if (force.isDeployed()) {
@@ -55,7 +55,7 @@ public class StaticChecks {
         }
         return true;
     }
-    
+
     public static boolean areAnyUnitsDeployed(Vector<Unit> units) {
         for (Unit unit : units) {
             if (unit.isDeployed()) {
@@ -295,14 +295,14 @@ public class StaticChecks {
         }
         return true;
     }
-    
+
     public static boolean areAllPrisoners(Person[] people) {
         for(Person person : people) {
             if(!person.isPrisoner()) {
                 return false;
             }
         }
-        
+
         return true;
     }
 

@@ -37,27 +37,27 @@ import mekhq.MekHQ;
  * to use faction-specific tech, but the data can be calculated for multiple factions and used, for example,
  * for a tracked OpFor. The calculation is performed on a separate thread and only blocks if the data is
  * needed before the task completes. There is also a non-blocking call.
- * 
+ *
  * @author Neoancient
  *
  */
 public class UnitTechProgression {
-    
+
     private final static UnitTechProgression instance = new UnitTechProgression();
-    
+
     private Map<Integer, FutureTask<Map<MechSummary,ITechnology>>> techMap = new HashMap<>();
-    
+
     /**
      * Initializes the data for a particular faction
      */
     public static void loadFaction(int techFaction) {
         instance.getTask(techFaction);
     }
-    
+
     /**
      * Find the FutureTask associated with a particular faction. If no data has been generated for the
      * faction, start a thread to do so.
-     * 
+     *
      * @param techFaction The faction for which to calculate progression data.
      * @return            The task responsible for calculating the data for the faction.
      */
@@ -70,11 +70,11 @@ public class UnitTechProgression {
         }
         return task;
     }
-    
+
     /**
      * Get a faction-specific ITechnology object that can be used to calculate tech levels for the given unit.
-     * If values have not been generated for the techFaction, a new task will be started. 
-     * 
+     * If values have not been generated for the techFaction, a new task will be started.
+     *
      * @param unit          The <code>Unit</code> for which to calculate the tech progression.
      * @param techFaction   The faction to use in calculating the progression.
      * @param block         If the task has not completed this method will wait until completion if block is true,
@@ -92,11 +92,11 @@ public class UnitTechProgression {
             return null;
         }
     }
-    
+
     /**
      * Get a faction-specific ITechnology object that can be used to calculate tech levels for the given unit.
-     * If values have not been generated for the techFaction, a new task will be started. 
-     * 
+     * If values have not been generated for the techFaction, a new task will be started.
+     *
      * @param MechSummary   The <code>MechSummary</code> for which to calculate the tech progression.
      * @param techFaction   The faction to use in calculating the progression.
      * @param block         If the task has not completed this method will wait until completion if block is true,
@@ -122,14 +122,14 @@ public class UnitTechProgression {
         }
         return null;
     }
-    
+
     /**
      * Goes through all the entries in MechSummaryCache, loads them, and calculates the composite
      * tech level of all the equipment and construction options for a specific faction.
      */
     private class BuildMapTask implements Callable<Map<MechSummary,ITechnology>> {
         private int techFaction;
-        
+
         BuildMapTask(int techFaction) {
             this.techFaction = techFaction;
         }

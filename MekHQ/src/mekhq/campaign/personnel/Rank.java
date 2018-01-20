@@ -166,7 +166,7 @@ public class Rank implements MekHqXmlSerializable {
 
     public static Rank generateInstanceFromXML(Node wn) {
         final String METHOD_NAME = "generateInstanceFromXML(Node)"; //$NON-NLS-1$
-        
+
         Rank retVal = null;
 
         try {

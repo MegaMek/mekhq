@@ -34,7 +34,7 @@ public class LoanTableModel extends DataTableModel {
     public LoanTableModel() {
         data = new ArrayList<Loan>();
     }
-    
+
     public int getRowCount() {
         return data.size();
     }
@@ -70,7 +70,7 @@ public class LoanTableModel extends DataTableModel {
     }
 
     public Object getValueAt(int row, int col) {
-        Loan loan = getLoan(row);           
+        Loan loan = getLoan(row);
         if(col == COL_DESC) {
             return loan.getDescription();
         }

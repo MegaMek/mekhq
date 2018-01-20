@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package mekhq.gui.model;
 
@@ -23,14 +23,14 @@ import mekhq.gui.BasicInfo;
 
 /**
  * Model for a list that displays a unit's crew with their role.
- * 
+ *
  * @author Neoancient
  *
  */
 public class CrewListModel extends AbstractListModel<Person> {
-    
+
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 3584521762881297199L;
 
@@ -43,23 +43,23 @@ public class CrewListModel extends AbstractListModel<Person> {
         GUNNER (5, "Gunner"),
         TECH_OFFICER (6, "Tech Officer"),
         CREW (7, "Crew");
-        
+
         private int sortOrder;
         private String displayName;
-        
+
         public int getSortOrder() {
             return sortOrder;
         }
-        
+
         public String getDisplayName() {
             return displayName;
         }
-        
+
         CrewRole(int sortOrder, String displayName) {
             this.sortOrder = sortOrder;
             this.displayName = displayName;
         }
-        
+
         public static CrewRole getCrewRole(Person p, Unit u) {
             if (u.usesSoloPilot()) {
                 return PILOT;
@@ -83,12 +83,12 @@ public class CrewListModel extends AbstractListModel<Person> {
                 return CREW;
             }
         }
-        
+
     }
-    
+
     Unit unit;
     List<Person> crew;
-    
+
     public void setData(final Unit u) {
         this.unit = u;
         this.crew = new ArrayList<>(u.getCrew());
@@ -97,7 +97,7 @@ public class CrewListModel extends AbstractListModel<Person> {
             - CrewRole.getCrewRole(p2, u).getSortOrder());
         fireContentsChanged(this, 0, crew.size());
     }
-    
+
     @Override
     public int getSize() {
         return crew.size();
@@ -109,15 +109,15 @@ public class CrewListModel extends AbstractListModel<Person> {
         }
         return crew.get(index);
     }
-    
+
     public ListCellRenderer<Person> getRenderer(IconPackage icons) {
         return new CrewRenderer(icons);
     }
-    
+
     public class CrewRenderer extends BasicInfo implements ListCellRenderer<Person> {
-        
+
         /**
-         * 
+         *
          */
         private static final long serialVersionUID = -1742201083598095886L;
 

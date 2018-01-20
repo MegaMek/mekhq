@@ -38,7 +38,7 @@ public class ExtractionBuiltInScenario extends AtBScenario {
 		int otherStart;
 		int otherHome;
 		int playerHome;
-		
+
 		if (isAttacker()) {
 			playerHome = startPos[Compute.randomInt(4)];
 			setStart(playerHome);
@@ -85,9 +85,9 @@ public class ExtractionBuiltInScenario extends AtBScenario {
 				BotForce bf = new BotForce("Civilians", 1, otherStart, playerHome, otherForce);
 				bf.setBehaviorSettings(BehaviorSettingsFactory.getInstance().ESCAPE_BEHAVIOR.getCopy());
 				bf.getBehaviorSettings().setHomeEdge(bf.findHomeEdge(otherHome));
-				
+
 				addBotForce(bf);
-				
+
 				for (Entity en : otherForce) {
 					getSurvivalBonusIds().add(UUID.fromString(en.getExternalIdAsString()));
 				}
@@ -95,7 +95,7 @@ public class ExtractionBuiltInScenario extends AtBScenario {
 				BotForce bf = new BotForce("Civilians", 2, otherStart, enemyStart, otherForce);
 				bf.setBehaviorSettings(BehaviorSettingsFactory.getInstance().ESCAPE_BEHAVIOR.getCopy());
 				bf.getBehaviorSettings().setHomeEdge(bf.findHomeEdge(otherHome));
-				
+
 				addBotForce(bf);
 			}
 		} catch (PrincessException e) {

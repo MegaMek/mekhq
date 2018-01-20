@@ -62,15 +62,15 @@ public class HangarReport extends Report {
     public HangarReport(Campaign c) {
         super(c);
     }
-    
+
     public String getTitle() {
         return "Hangar Breakdown";
     }
-    
+
     public JTree getHangarTree() {
     	DefaultMutableTreeNode top = new DefaultMutableTreeNode("Hangar");
         JTree overviewHangarTree = new JTree(top);
- 
+
         // BattleMechs
         // boolean expandMechs = false;
         int countMechs = 0;
@@ -88,7 +88,7 @@ public class HangarReport extends Report {
         int mediumOmniMech = 0;
         int lightOmniMech = 0;
         int ultralightOmniMech = 0;
-        
+
         // ASF
         //boolean expandASF = false;
         int countASF = 0;
@@ -100,7 +100,7 @@ public class HangarReport extends Report {
         int countOmniLightASF = 0;
         int countOmniMediumASF = 0;
         int countOmniHeavyASF = 0;
-        
+
         // Vehicles
         //boolean expandVees = false;
         int countVees = 0;
@@ -182,7 +182,7 @@ public class HangarReport extends Report {
         int countOmniHydrofoilHeavy = 0;
         int countOmniHydrofoilMedium = 0;
         int countOmniHydrofoilLight = 0;
-        
+
         // Battle Armor and Infantry
         //boolean expandInfantry = false;
         int countInfantry = 0;
@@ -196,7 +196,7 @@ public class HangarReport extends Report {
         int countBAMedium = 0;
         int countBAHeavy = 0;
         int countBAAssault = 0;
-        
+
         // Jumpships, Warships, Dropships, and SmallCraft
         //boolean expandSpace = false;
         int countSpace = 0;
@@ -209,10 +209,10 @@ public class HangarReport extends Report {
         int countMediumDS = 0;
         int countSmallDS = 0;
         int countSmallCraft = 0;
-        
+
         // Conventional Fighters
         int countConv = 0;
-        
+
         // Support Vees
         /*boolean expandSupportVees = false;
         int countSupportVees = 0;
@@ -294,10 +294,10 @@ public class HangarReport extends Report {
         int countSupportOmniHydrofoilHeavy = 0;
         int countSupportOmniHydrofoilMedium = 0;
         int countSupportOmniHydrofoilLight = 0;*/
-        
+
         // Turrets
         int countGE = 0;
-        
+
         // Protomechs
         //boolean expandProtos = false;
         int countProtos = 0;
@@ -305,8 +305,8 @@ public class HangarReport extends Report {
         int countMediumProtos = 0;
         int countHeavyProtos = 0;
         int countAssaultProtos = 0;
-        
-        
+
+
         // Gather data and load it into the tree
         for (Unit u : getCampaign().getUnits()) {
             Entity e = u.getEntity();
@@ -608,7 +608,7 @@ public class HangarReport extends Report {
                 }
             }
         }
-        
+
         // Mech Nodes
         final DefaultMutableTreeNode mechs = new DefaultMutableTreeNode("'Mechs: "+countMechs);
         DefaultMutableTreeNode battlemechs = new DefaultMutableTreeNode("BattleMechs: "+countBattleMechs);
@@ -640,7 +640,7 @@ public class HangarReport extends Report {
         DefaultMutableTreeNode ultralightomnis = new DefaultMutableTreeNode("Ultralight: "+ultralightOmniMech);
         omnis.add(ultralightomnis);
         top.add(mechs);
-        
+
         // ASF Nodes
         final DefaultMutableTreeNode ASF = new DefaultMutableTreeNode("'Aerospace Fighters: "+countASF);
         DefaultMutableTreeNode sASF = new DefaultMutableTreeNode("Standard Fighters: "+countStandardASF);
@@ -660,7 +660,7 @@ public class HangarReport extends Report {
         DefaultMutableTreeNode oLightASF = new DefaultMutableTreeNode("Light: "+countOmniLightASF);
         oASF.add(oLightASF);
         top.add(ASF);
-        
+
         // Vee Nodes
         final DefaultMutableTreeNode vees = new DefaultMutableTreeNode("Vehicles: "+countVees);
         DefaultMutableTreeNode sVees = new DefaultMutableTreeNode("Standard: "+countStandardVees);
@@ -820,11 +820,11 @@ public class HangarReport extends Report {
         DefaultMutableTreeNode oHydrofoilLight = new DefaultMutableTreeNode("Light: "+countOmniHydrofoilLight);
         oHydrofoil.add(oHydrofoilLight);
         top.add(vees);
-        
+
         // Conventional Fighters
         final DefaultMutableTreeNode conv = new DefaultMutableTreeNode("Conventional Fighters: "+countConv);
         top.add(conv);
-        
+
         // Infantry Nodes
         int allInfantry = (countInfantry+countBA);
         final DefaultMutableTreeNode inf = new DefaultMutableTreeNode("Infantry: "+allInfantry);
@@ -851,7 +851,7 @@ public class HangarReport extends Report {
         DefaultMutableTreeNode baAssault = new DefaultMutableTreeNode("Assault: "+countBAAssault);
         BAInf.add(baAssault);
         top.add(inf);
-        
+
         // Protomechs
         final DefaultMutableTreeNode protos = new DefaultMutableTreeNode("Protomechs: "+countProtos);
         DefaultMutableTreeNode plight = new DefaultMutableTreeNode("Light: "+countLightProtos);
@@ -863,11 +863,11 @@ public class HangarReport extends Report {
         DefaultMutableTreeNode passault = new DefaultMutableTreeNode("Assault: "+countAssaultProtos);
         protos.add(passault);
         top.add(protos);
-        
+
         // Turrets
         final DefaultMutableTreeNode ge = new DefaultMutableTreeNode("Gun Emplacements: "+countGE);
         top.add(ge);
-        
+
         // Space
         final DefaultMutableTreeNode space = new DefaultMutableTreeNode("Spacecraft: "+countSpace);
         DefaultMutableTreeNode ws = new DefaultMutableTreeNode("Warships: "+countWarships);
@@ -889,7 +889,7 @@ public class HangarReport extends Report {
         DefaultMutableTreeNode lgds = new DefaultMutableTreeNode("Large Dropships: "+countLargeDS);
         ds.add(lgds);
         top.add(space);
-        
+
         for (Unit u : getCampaign().getUnits()) {
             Entity e = u.getEntity();
             if (e instanceof Mech) {
@@ -1166,17 +1166,17 @@ public class HangarReport extends Report {
                 }
             }
         }
-        
+
         // Reset our UI
         /*
         final boolean expandMechsFinal = expandMechs;
         final boolean expandASFFinal = expandASF;
         final boolean expandVeesFinal = expandVees;
-        final boolean expandInfantryFinal = expandInfantry; 
+        final boolean expandInfantryFinal = expandInfantry;
         final boolean expandSpaceFinal = expandSpace;
         final boolean expandProtosFinal = expandProtos;
         */
-        
+
         overviewHangarTree.setSelectionPath(null);
         overviewHangarTree.expandPath(new TreePath(top.getPath()));
         /*
@@ -1198,10 +1198,10 @@ public class HangarReport extends Report {
         if (expandProtosFinal) {
             overviewHangarTree.expandPath(new TreePath(protos.getPath()));
         }*/
-        
+
         return overviewHangarTree;
     }
-    
+
     public String getHangarTotals() {
     	int countInTransit = 0;
         int countPresent = 0;
@@ -1220,7 +1220,7 @@ public class HangarReport extends Report {
                 countDeployed++;
             }
         }
-        
+
         return "Total Units: "+getCampaign().getUnits().size()+
                 "\n  Present: "+countPresent+
                 "\n  In Transit: "+countInTransit+
@@ -1232,13 +1232,13 @@ public class HangarReport extends Report {
         JTextPane txtReport = new JTextPane();
         txtReport.setMinimumSize(new Dimension(800, 500));
         txtReport.setFont(new Font("Courier New", Font.PLAIN, 12));
-        
+
         txtReport.setAlignmentY(1.0f);
 
         txtReport.setText(getHangarTotals() + "\n\n\n");
         txtReport.insertComponent(getHangarTree());
-      
+
         return txtReport;
     }
-   
+
 }

@@ -211,7 +211,7 @@ public class ResolveScenarioTracker {
         } else {
             nu.setId(UUID.fromString(e.getExternalIdAsString()));
         }
-        
+
         for (Part part : nu.getParts()) {
             part.setBrandNew(false);
         }
@@ -688,13 +688,13 @@ public class ResolveScenarioTracker {
                 //over to infantry checks for casualties
                 Entity ejected = null;
                 if (!en.getCrew().getExternalIdAsString().equals("-1")) {
-                	ejected = enemyEjections.get(UUID.fromString(en.getCrew().getExternalIdAsString()));                
+                	ejected = enemyEjections.get(UUID.fromString(en.getCrew().getExternalIdAsString()));
                 }
                 if(null != ejected) {
-                    en = ejected;          
+                    en = ejected;
                 }
                 //check if this ejection was picked up by a player's unit
-                boolean pickedUp = en instanceof MechWarrior 
+                boolean pickedUp = en instanceof MechWarrior
                         && !((MechWarrior)en).getPickedUpByExternalIdAsString().equals("-1")
                         && null != unitsStatus.get(UUID.fromString(((MechWarrior)en).getPickedUpByExternalIdAsString()));
                 //if the crew ejected from this unit, then skip it because we should find them elsewhere
@@ -735,7 +735,7 @@ public class ResolveScenarioTracker {
                 if (commander == null && crew.size() > 0) {
                     commander = crew.get(0);
                 }
-                
+
                 int casualties = 0;
                 int casualtiesAssigned = 0;
                 if(en instanceof Infantry) {
@@ -778,7 +778,7 @@ public class ResolveScenarioTracker {
                             continue;
                         }
                         int slot = 0;
-                        //For multicrew cockpits the person id has been set to match the crew slot 
+                        //For multicrew cockpits the person id has been set to match the crew slot
                         for (int pos = 0; pos < pilot.getSlotCount(); pos++) {
                             if (p.getId().toString().equals(pilot.getExternalIdAsString(pos))) {
                                 slot = pos;
@@ -859,8 +859,8 @@ public class ResolveScenarioTracker {
                             status.setHits(hits);
                         }
                     }
-                    status.setCaptured(Utilities.isLikelyCapture(en) || pickedUp);                
-                    status.setXP(campaign.getCampaignOptions().getScenarioXP());     
+                    status.setCaptured(Utilities.isLikelyCapture(en) || pickedUp);
+                    status.setXP(campaign.getCampaignOptions().getScenarioXP());
                     prisonerStatus.put(id, status);
                 }
             }
@@ -919,7 +919,7 @@ public class ResolveScenarioTracker {
                         if(e instanceof EjectedCrew) {
                             ejections.put(UUID.fromString(e.getCrew().getExternalIdAsString()), (EjectedCrew)e);
                         }
-                        
+
                     }
                 }
             }
@@ -1007,7 +1007,7 @@ public class ResolveScenarioTracker {
             }
         }
     }
-    
+
     /**
      * When resolving the battle manually without a resolution file (such as MekHQ + tabletop),
      * set initial status of units and crew as pre-battle.
@@ -1020,7 +1020,7 @@ public class ResolveScenarioTracker {
     		Crew crew = u.getEntity().getCrew();
             if(null != crew && !crew.getExternalIdAsString().equals("-1")) {
             	pilots.put(UUID.fromString(crew.getExternalIdAsString()), crew);
-            }    		
+            }
     	}
     }
 
@@ -1385,7 +1385,7 @@ public class ResolveScenarioTracker {
     public boolean usesSalvageExchange() {
         return (getMission() instanceof Contract) && ((Contract)getMission()).isSalvageExchange();
     }
-    
+
     /**
      * This object is used to track the status of a particular personnel. At the present,
      * we track the person's missing status, hits, and XP

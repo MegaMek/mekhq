@@ -33,19 +33,19 @@ import mekhq.campaign.market.UnitMarket;
 
 /**
  * Model for displaying offers on the UnitMarket
- * 
+ *
  * Code borrowed heavily from PersonnelTableModel
- * 
+ *
  * @author Neoancient
  *
  */
 public class UnitMarketTableModel extends DataTableModel {
-	
+
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = -6275443301484277495L;
-	
+
 	public static final int COL_MARKET = 0;
 	public static final int COL_UNITTYPE = 1;
 	public static final int COL_WEIGHTCLASS = 2;
@@ -53,15 +53,15 @@ public class UnitMarketTableModel extends DataTableModel {
 	public static final int COL_PRICE = 4;
 	public static final int COL_PERCENT = 5;
 	public static final int COL_NUM = 6;
-	
+
 	private static final String[] colNames = {
 		"Market", "Type", "Weight Class", "Unit", "Price", "Percent"
 	};
-	
+
 	public UnitMarketTableModel() {
 		data = new ArrayList<UnitMarket.MarketOffer>();
 	}
-	
+
     @Override
     public int getColumnCount() {
         return COL_NUM;
@@ -71,7 +71,7 @@ public class UnitMarketTableModel extends DataTableModel {
     public String getColumnName(int column) {
     	return colNames[column];
     }
-	
+
     public int getColumnWidth(int c) {
         switch(c) {
         case COL_MARKET:

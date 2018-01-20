@@ -1,20 +1,20 @@
 /*
  * Loot.java
- * 
+ *
  * Copyright (c) 2011 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -41,24 +41,24 @@ import org.w3c.dom.NodeList;
 
 
 /**
- * 
+ *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class Loot implements MekHqXmlSerializable {
-   
+
     private String name;
     private long cash;
     private ArrayList<Entity> units;
     private ArrayList<Part> parts;
     //Personnel?
-    
+
     public Loot() {
         name = "None";
         cash = 0;
         units = new ArrayList<Entity>();
         parts = new ArrayList<Part>();
     }
-    
+
     @Override
     public Object clone() {
         Loot newLoot = new Loot();
@@ -68,47 +68,47 @@ public class Loot implements MekHqXmlSerializable {
         newLoot.parts = parts;
         return newLoot;
     }
-    
+
     public String getName() {
         return name;
     }
-    
+
     public void setName(String s) {
         name = s;
     }
-    
+
     public void setCash(long c) {
         cash = c;
     }
-    
+
     public long getCash() {
         return cash;
     }
-    
+
     public void addUnit(Entity e) {
         units.add(e);
     }
-    
+
     public ArrayList<Entity> getUnits() {
         return units;
     }
-    
+
     public void clearUnits() {
         units = new ArrayList<Entity>();
     }
-    
+
     public ArrayList<Part> getParts() {
         return parts;
     }
-    
+
     public void addPart(Part p) {
         parts.add(p);
     }
-    
+
     public void clearParts() {
         parts = new ArrayList<Part>();
     }
-    
+
     public String getShortDescription() {
         String desc = getName() + " - ";
         if(cash > 0) {
@@ -136,7 +136,7 @@ public class Loot implements MekHqXmlSerializable {
         }
         return desc;
     }
-    
+
     public void get(Campaign campaign, Scenario s) {
         //TODO: put in some reports
         if(cash > 0) {
@@ -149,7 +149,7 @@ public class Loot implements MekHqXmlSerializable {
             campaign.addPart(p, 0);
         }
     }
-    
+
     public void writeToXml(PrintWriter pw1, int indent) {
         pw1.println(MekHqXmlUtil.indentStr(indent) + "<loot>");
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
@@ -171,27 +171,27 @@ public class Loot implements MekHqXmlSerializable {
         for(Part p : parts) {
             p.writeToXml(pw1, indent+1);
         }
-        
+
         pw1.println(MekHqXmlUtil.indentStr(indent) + "</loot>");
     }
-    
+
     public static Loot generateInstanceFromXML(Node wn, Campaign c, Version version) {
         Loot retVal = null;
-       
+
         try {
             retVal = new Loot();
-            
+
             // Okay, now load specific fields!
             NodeList nl = wn.getChildNodes();
-            
+
             for (int x=0; x<nl.getLength(); x++) {
                 Node wn2 = nl.item(x);
-                
+
                 if (wn2.getNodeName().equalsIgnoreCase("name")) {
                     retVal.name = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("cash")) {
                     retVal.cash = Long.parseLong(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("entityName")) {              
+                } else if (wn2.getNodeName().equalsIgnoreCase("entityName")) {
                     MechSummary summary = MechSummaryCache.getInstance().getMech(wn2.getTextContent());
                     if(null == summary) {
                         throw(new EntityLoadingException());
@@ -212,8 +212,8 @@ public class Loot implements MekHqXmlSerializable {
             // Or the listed name doesn't exist.
             // Doh!
         }
-        
+
         return retVal;
     }
-    
+
 }

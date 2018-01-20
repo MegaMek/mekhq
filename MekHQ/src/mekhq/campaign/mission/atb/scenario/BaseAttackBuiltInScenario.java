@@ -52,18 +52,18 @@ public class BaseAttackBuiltInScenario extends AtBScenario {
 		int attackerStart = startPos[attackerStartIndex];
 		int defenderStart = Board.START_CENTER;
 		int defenderHome = (attackerStart + 4) % 8; // the defender's "retreat" edge should always be the opposite of the attacker's edge
-		
+
 		int enemyStart;
-		
+
 		// the attacker starts on an edge, the defender starts in the center and flees to the opposite edge of the attacker
 		if (isAttacker()) {
 		    setStart(attackerStart);
-		    
+
 			setEnemyHome(defenderHome);
 			enemyStart = defenderStart;
 		} else {
 		    setStart(defenderStart);
-		    
+
 		    setEnemyHome(attackerStart);
 		    enemyStart = attackerStart;
 		}
@@ -80,15 +80,15 @@ public class BaseAttackBuiltInScenario extends AtBScenario {
 
 		// the "second" force will be deployed (orthogonally) between 90 degrees clockwise and counterclockwise from the "primary force".
 		int angleChange = Compute.randomInt(2) - 1;
-		int secondAttackerForceStart = startPos[(attackerStartIndex + angleChange) % 4]; 
-		
+		int secondAttackerForceStart = startPos[(attackerStartIndex + angleChange) % 4];
+
 		// the ally is the "second force" and will flee either in the same direction as the player (in case of the player being the defender)
 		// or where it came from (in case of the player being the attacker
-		addBotForce(getAllyBotForce(getContract(campaign), isAttacker() ? secondAttackerForceStart : getStart(), 
+		addBotForce(getAllyBotForce(getContract(campaign), isAttacker() ? secondAttackerForceStart : getStart(),
 		        isAttacker() ? secondAttackerForceStart : defenderHome, allyEntities));
 
 		// "base" force gets 8 civilian units and six turrets
-		// set the civilians to "cowardly" behavior by default so they don't run out and get killed. As much. 
+		// set the civilians to "cowardly" behavior by default so they don't run out and get killed. As much.
 		ArrayList<Entity> otherForce = new ArrayList<>();
 		addCivilianUnits(otherForce, 8, campaign);
 		BotForce civilianForce = new BotForce("Base Civilian Units", isAttacker() ? 2 : 1, defenderStart, defenderHome, otherForce);
@@ -103,16 +103,16 @@ public class BaseAttackBuiltInScenario extends AtBScenario {
 		} else {
 			addTurrets(turretForce, 6, getContract(campaign).getAllySkill(), getContract(campaign).getAllyQuality(), campaign);
 		}
-		
+
 		/* Roll 2x on bot lances roll */
         addEnemyForce(enemyEntities, getLance(campaign).getWeightClass(campaign), campaign);
         addBotForce(getEnemyBotForce(getContract(campaign), enemyStart, getEnemyHome(), enemyEntities));
-        
+
         // the "second" enemy force will either flee in the same direction as the first enemy force in case of the player being the attacker
         // or where it came from in case of player being defender
         ArrayList<Entity> secondBotEntities = new ArrayList<>();
         addEnemyForce(secondBotEntities, getLance(campaign).getWeightClass(campaign), campaign);
-        BotForce secondBotForce = getEnemyBotForce(getContract(campaign), isAttacker() ? enemyStart : secondAttackerForceStart, 
+        BotForce secondBotForce = getEnemyBotForce(getContract(campaign), isAttacker() ? enemyStart : secondAttackerForceStart,
                 isAttacker() ? getEnemyHome() : secondAttackerForceStart, secondBotEntities);
         secondBotForce.setName(secondBotForce.getName() + " Force #2");
         addBotForce(secondBotForce);

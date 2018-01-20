@@ -30,13 +30,13 @@ import mekhq.campaign.unit.Unit;
  */
 
 public class NetworkChangedEvent extends MMEvent {
-    
+
     private final List<Unit> units;
-    
+
     public NetworkChangedEvent(List<Unit> units) {
         this.units = units;
     }
-    
+
     public List<Unit> getUnits() {
         return units;
     }

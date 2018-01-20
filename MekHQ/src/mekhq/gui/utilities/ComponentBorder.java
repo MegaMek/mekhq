@@ -9,12 +9,12 @@
  *  component a Border is added to the parent componet such that the insets of
  *  the Border will reserve space for the child component to be painted without
  *  affecting the parent component.
- *  
+ *
  *  @author Robert Camick
- *  
+ *
  *  @see <a href="http://tips4java.wordpress.com/2009/09/27/component-border/">http://tips4java.wordpress.com/2009/09/27/component-border/</a>
  *  @see <a href="http://www.camick.com/java/source/ComponentBorder.java">http://www.camick.com/java/source/ComponentBorder.java</a>
- *  
+ *
  */
 
 package mekhq.gui.utilities;

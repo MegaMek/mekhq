@@ -13,14 +13,14 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.work.IAcquisitionWork;
 
 /**
- * A table model for displaying acquisitions. Unlike the other table models here, this one 
+ * A table model for displaying acquisitions. Unlike the other table models here, this one
  * can apply to multiple tables and so we have to be more careful in its design
  */
 public class ProcurementTableModel extends DataTableModel {
     private static final long serialVersionUID = 534443424190075264L;
 
     Campaign campaign;
-    
+
     public final static int COL_NAME    =    0;
     public final static int COL_COST     =   1;
     public final static int COL_TARGET    =  2;
@@ -138,7 +138,7 @@ public class ProcurementTableModel extends DataTableModel {
         case COL_COST:
         case COL_TARGET:
         case COL_NEXT:
-            return 40;        
+            return 40;
         default:
             return 15;
         }
@@ -169,18 +169,18 @@ public class ProcurementTableModel extends DataTableModel {
             return null;
         }
         switch(col) {
-        case COL_TARGET:                    
+        case COL_TARGET:
             TargetRoll target = getCampaign().getTargetForAcquisition(shoppingItem, getCampaign().getLogisticsPerson(), false);
             return target.getDesc();
-        default:                    
-            return "<html>You can increase or decrease the quantity with the left/right arrows keys or the plus/minus keys.<br>Quantities reduced to zero will remain on the list until the next procurement cycle.</html>"; 
+        default:
+            return "<html>You can increase or decrease the quantity with the left/right arrows keys or the plus/minus keys.<br>Quantities reduced to zero will remain on the list until the next procurement cycle.</html>";
         }
     }
-    
+
     private Campaign getCampaign() {
         return campaign;
     }
-    
+
     public ProcurementTableModel.Renderer getRenderer() {
         return new ProcurementTableModel.Renderer();
     }

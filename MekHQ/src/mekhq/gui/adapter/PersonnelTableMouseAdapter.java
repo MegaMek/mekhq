@@ -123,7 +123,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
     private static final String CMD_FREE = "FREE"; //$NON-NLS-1$
     private static final String CMD_RECRUIT = "RECRUIT"; //$NON-NLS-1$
     private static final String CMD_RANSOM = "RANSOM";
-    
+
     private static final String SEPARATOR = "@"; //$NON-NLS-1$
     private static final String SPACE = " "; //$NON-NLS-1$
     private static final String HYPHEN = "-"; //$NON-NLS-1$
@@ -156,7 +156,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
     private static final String OPT_EDGE_KO = "edge_when_ko"; //$NON-NLS-1$
     private static final String OPT_EDGE_TAC = "edge_when_tac"; //$NON-NLS-1$
     private static final String OPT_EDGE_HEADHIT = "edge_when_headhit"; //$NON-NLS-1$
-    
+
     private static final String OPT_PRISONER_FREE = "free"; //$NON-NLS-1$
     private static final String OPT_PRISONER_IMPRISONED = "imprisoned"; //$NON-NLS-1$
     private static final String OPT_PRISONER_IMPRISONED_DEFECTING = "imprisoned_defecting"; //$NON-NLS-1$
@@ -169,7 +169,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
     @Override
     public void actionPerformed(ActionEvent action) {
         final String METHOD_NAME = "actionPerformed(ActionEvent)"; //$NON-NLS-1$
-        
+
         int row = personnelTable.getSelectedRow();
         if (row < 0) {
             return;
@@ -276,7 +276,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                          * Incase there's still some assignments for this tech,
                          * clear them out. This can happen if the target unit
                          * above is null. The tech will still have the pointer
-                         * but to a null unit and it will never go away 
+                         * but to a null unit and it will never go away
                          * otherwise.
                          */
                         person.clearTechUnitIDs();
@@ -702,13 +702,13 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 for(Person person : people) {
                     total += person.getRansomValue();
                 }
-                
+
                 if (0 == JOptionPane.showConfirmDialog(
                         null,
                         String.format(resourceMap.getString("ransomQ.format"), people.length, total), //$NON-NLS-1$
                         resourceMap.getString("ransom.text"), //$NON-NLS-1$
                         JOptionPane.YES_NO_OPTION)) {
-                    
+
                     gui.getCampaign().addReport(String.format(resourceMap.getString("ransomReport.format"), people.length, total));
                     gui.getCampaign().addFunds(total, resourceMap.getString("ransom.text"), Transaction.C_MISC);
                     for (Person person : people) {
@@ -1292,7 +1292,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 popup.add(newMenuItem(resourceMap.getString("recruit.text"), CMD_RECRUIT, //$NON-NLS-1$
                         person.isBondsman() || person.isWillingToDefect()));
             }
-            
+
             if(gui.getCampaign().getCampaignOptions().getUseAtB() &&
                gui.getCampaign().getCampaignOptions().getUseAtBCapture() &&
                StaticChecks.areAllPrisoners(selected)) {
@@ -1939,14 +1939,14 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     JMenu edgeMenu = new JMenu(resourceMap.getString("edge.text")); //$NON-NLS-1$
                     int cost = gui.getCampaign().getCampaignOptions().getEdgeCost();
                     boolean available = (cost >= 0) && (person.getXp() >= cost);
-                                        
+
                     menuItem = new JMenuItem(String.format(resourceMap.getString("spendOnEdge.text"), cost)); //$NON-NLS-1$
                     menuItem.setActionCommand(makeCommand(CMD_BUY_EDGE, String.valueOf(cost)));
                     menuItem.addActionListener(this);
                     menuItem.setEnabled(available);
                     edgeMenu.add(menuItem);
-                    menu.add(edgeMenu); 
-                }        
+                    menu.add(edgeMenu);
+                }
                 popup.add(menu);
             }
             if (oneSelected && person.isActive()) {
@@ -1986,7 +1986,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                         cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_MASC_FAILURE));
                         cbMenuItem.addActionListener(this);
                         menu.add(cbMenuItem);
-                    //Doctors    
+                    //Doctors
                     } else if (person.getPrimaryRole() == Person.T_DOCTOR && gui.getCampaign().getCampaignOptions().useSupportEdge()) {
                         cbMenuItem = new JCheckBoxMenuItem(
                                 resourceMap.getString("edgeTriggerHealCheck.text")); //$NON-NLS-1$
@@ -2020,7 +2020,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     } else if ((person.getPrimaryRole() == Person.T_ADMIN_COM
                             || person.getPrimaryRole() == Person.T_ADMIN_LOG
                             || person.getPrimaryRole() == Person.T_ADMIN_TRA
-                            || person.getPrimaryRole() == Person.T_ADMIN_HR) 
+                            || person.getPrimaryRole() == Person.T_ADMIN_HR)
                             && gui.getCampaign().getCampaignOptions().useSupportEdge()) {
                         cbMenuItem = new JCheckBoxMenuItem(
                                 resourceMap.getString("edgeTriggerAcquireCheck.text")); //$NON-NLS-1$
@@ -2028,9 +2028,9 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                                 .booleanOption(PersonnelOptions.EDGE_ADMIN_ACQUIRE_FAIL));
                         cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, PersonnelOptions.EDGE_ADMIN_ACQUIRE_FAIL));
                         cbMenuItem.addActionListener(this);
-                        menu.add(cbMenuItem);                        
-                    } 
-                    
+                        menu.add(cbMenuItem);
+                    }
+
                     popup.add(menu);
                 }
                 menu = new JMenu(resourceMap.getString("specialFlags.text")); //$NON-NLS-1$
@@ -2289,7 +2289,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             popup.show(e.getComponent(), e.getX(), e.getY());
         }
     }
-    
+
     private JMenuItem newMenuItem(String text, String command) {
         return newMenuItem(text, command, true);
     }

@@ -25,18 +25,18 @@ import mekhq.campaign.finances.Transaction;
  *
  */
 public class TransactionChangedEvent extends TransactionEvent {
-    
+
     private final Transaction newTransaction;
 
     public TransactionChangedEvent(Transaction oldTransaction, Transaction newTransaction) {
         super(oldTransaction);
         this.newTransaction = newTransaction;
     }
-    
+
     public Transaction getOldTransaction() {
          return getTransaction();
     }
-    
+
     public Transaction getNewTransaction() {
         return newTransaction;
     }

@@ -25,34 +25,34 @@ import mekhq.campaign.mission.Mission;
  * @author  Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class MissionViewPanel extends JPanel {
-	
+
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 7004741688464105277L;
 
 	private Mission mission;
-	
+
 	private JPanel pnlStats;
 	private JTextArea txtDesc;
-	
+
 	private JLabel lblStatus;
 	private JLabel lblLocation;
 	private JTextArea txtLocation;
 	private JLabel lblType;
 	private JTextArea txtType;
-	
+
 	public MissionViewPanel(Mission m) {
 		this.mission = m;
 		initComponents();
 	}
-	
+
 	private void initComponents() {
 		GridBagConstraints gridBagConstraints;
 
 		pnlStats = new JPanel();
 		txtDesc = new JTextArea();
-		       
+
 		setLayout(new GridBagLayout());
 
 		setBackground(Color.WHITE);
@@ -69,15 +69,15 @@ public class MissionViewPanel extends JPanel {
 		gridBagConstraints.weighty = 1.0;
 		gridBagConstraints.insets = new Insets(5, 5, 5, 20);
 		gridBagConstraints.fill = GridBagConstraints.BOTH;
-		gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;	
+		gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
 		add(pnlStats, gridBagConstraints);
-		
+
 	}
 
     private void fillStats() {
-    	
+
     	ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ContractViewPanel", new EncodeControl()); //$NON-NLS-1$
-    	
+
     	lblStatus = new JLabel();
     	lblLocation = new JLabel();
     	txtLocation = new JTextArea();
@@ -86,7 +86,7 @@ public class MissionViewPanel extends JPanel {
 
     	GridBagConstraints gridBagConstraints;
 		pnlStats.setLayout(new GridBagLayout());
-		
+
 		lblStatus.setName("lblOwner"); // NOI18N
 		lblStatus.setText("<html><b>" + mission.getStatusName() + "</b></html>");
 		gridBagConstraints = new GridBagConstraints();
@@ -99,7 +99,7 @@ public class MissionViewPanel extends JPanel {
 		gridBagConstraints.fill = GridBagConstraints.NONE;
 		gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
 		pnlStats.add(lblStatus, gridBagConstraints);
-		
+
 		lblLocation.setName("lblLocation"); // NOI18N
 		lblLocation.setText(resourceMap.getString("lblLocation.text"));
 		gridBagConstraints = new GridBagConstraints();
@@ -108,7 +108,7 @@ public class MissionViewPanel extends JPanel {
 		gridBagConstraints.fill = GridBagConstraints.NONE;
 		gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
 		pnlStats.add(lblLocation, gridBagConstraints);
-		
+
 		txtLocation.setName("txtLocation"); // NOI18N
 		txtLocation.setText(mission.getPlanetName());
 		txtLocation.setEditable(false);
@@ -122,7 +122,7 @@ public class MissionViewPanel extends JPanel {
 		gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
 		gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
 		pnlStats.add(txtLocation, gridBagConstraints);
-		
+
 		lblType.setName("lblType"); // NOI18N
 		lblType.setText(resourceMap.getString("lblType.text"));
 		gridBagConstraints = new GridBagConstraints();
@@ -131,7 +131,7 @@ public class MissionViewPanel extends JPanel {
 		gridBagConstraints.fill = GridBagConstraints.NONE;
 		gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
 		pnlStats.add(lblType, gridBagConstraints);
-		
+
 		txtType.setName("txtType"); // NOI18N
 		txtType.setText(mission.getType());
 		txtType.setEditable(false);
@@ -145,7 +145,7 @@ public class MissionViewPanel extends JPanel {
 		gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
 		gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
 		pnlStats.add(txtType, gridBagConstraints);
-		
+
 		txtDesc.setName("txtDesc");
 		txtDesc.setText(mission.getDescription());
 		txtDesc.setEditable(false);
@@ -161,6 +161,6 @@ public class MissionViewPanel extends JPanel {
 		gridBagConstraints.fill = GridBagConstraints.BOTH;
 		gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
 		pnlStats.add(txtDesc, gridBagConstraints);
-		
+
     }
 }

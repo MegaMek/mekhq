@@ -39,7 +39,7 @@ import mekhq.gui.BasicInfo;
         private Campaign campaign;
         private PersonnelMarket personnelMarket;
         private boolean loadAssignmentFromMarket;
-        
+
         public final static int COL_RANK     =    0;
         public final static int COL_NAME     =    1;
         public final static int COL_CALL     =    2;
@@ -520,11 +520,11 @@ import mekhq.gui.BasicInfo;
             if(col == COL_ASSIGN) {
             	if (loadAssignmentFromMarket) {
             		Entity en = personnelMarket.getAttachedEntity(p);
-            		
+
             		if (null == en) {
             			return "-";
             		}
-            		
+
             		return en.getDisplayName();
             	} else {
 	                Unit u = getCampaign().getUnit(p.getUnitId());
@@ -674,11 +674,11 @@ import mekhq.gui.BasicInfo;
                 if(actualCol == COL_ASSIGN) {
                 	if (loadAssignmentFromMarket) {
                 		Entity en = personnelMarket.getAttachedEntity(p);
-                		
+
                 		if (null == en) {
                 			setText("-", color);
                 		}
-                		
+
                 		setText(en.getDisplayName(), color);
                 	} else {
 	                    Unit u = getCampaign().getUnit(p.getUnitId());

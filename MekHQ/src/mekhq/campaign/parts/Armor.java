@@ -156,9 +156,9 @@ public class Armor extends Part implements IAcquisitionWork {
 				String availability = "";
 				int amountAvailable = getAmountAvailable();
 				String[] inventories = campaign.getPartInventory(getNewPart());
-				
+
 	            String orderTransitString = getOrderTransitStringForDetails(inventories);
-				
+
 				if(amountAvailable == 0) {
 					availability = "<br><font color='red'>No armor " + orderTransitString + "</font>";
 				} else if(amountAvailable < amountNeeded) {
@@ -166,7 +166,7 @@ public class Armor extends Part implements IAcquisitionWork {
 				} else {
 	                availability = "<br><font color='green'>" + amountAvailable + " available " + orderTransitString + "</font>";
 	            }
-				
+
 				return unit.getEntity().getLocationName(location) + rearMount + ", " + amountNeeded + " points" + availability;
 			}
 			return unit.getEntity().getLocationName(location) + rearMount + ", " + amount + " points";
@@ -235,7 +235,7 @@ public class Armor extends Part implements IAcquisitionWork {
     public TechAdvancement getTechAdvancement() {
         return EquipmentType.getArmorTechAdvancement(type, clan);
     }
-    
+
     public double getArmorWeight(int points) {
         // from megamek.common.Entity.getArmorWeight()
 
@@ -392,15 +392,15 @@ public class Armor extends Part implements IAcquisitionWork {
 		}
 		amountNeeded = unit.getEntity().getOArmor(location, rear) - amount;
 	}
-	
-	@Override 
+
+	@Override
 	public int getBaseTime() {
 		if(isSalvaging()) {
 			return getBaseTimeFor(unit.getEntity()) * amount;
 		}
 		return getBaseTimeFor(unit.getEntity()) * Math.min(amountNeeded, getAmountAvailable());
 	}
-	
+
 	@Override
 	public int getDifficulty() {
 		return -2;
@@ -464,17 +464,17 @@ public class Armor extends Part implements IAcquisitionWork {
 		toReturn += "</font></html>";
 		return toReturn;
 	}
-	
+
     @Override
     public String getAcquisitionDisplayName() {
     	return getName();
-    }    
+    }
 
 	@Override
 	public String getAcquisitionExtraDesc() {
 		return ((int)Math.round(getArmorPointsPerTon())) * 5 + " points (5 tons)";
 	}
-	
+
 	@Override
 	public String getAcquisitionName() {
 		return getName();
@@ -486,7 +486,7 @@ public class Armor extends Part implements IAcquisitionWork {
 		if(getAllAcquisitionMods().getValue() > -1) {
 			bonus = "+" + bonus;
 		}
-		
+
 		return "(" + bonus + ")";
     }
 
@@ -644,7 +644,7 @@ public class Armor extends Part implements IAcquisitionWork {
         	this.name += " (" + EquipmentType.armorNames[type] + ")";
         }
 	}
-	
+
 	@Override
 	public int getMassRepairOptionType() {
     	return Part.REPAIR_PART_TYPE.ARMOR;

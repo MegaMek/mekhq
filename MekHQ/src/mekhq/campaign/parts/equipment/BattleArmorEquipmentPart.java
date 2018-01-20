@@ -165,15 +165,15 @@ public class BattleArmorEquipmentPart extends EquipmentPart {
 			}
 		}
     }
-    
-    @Override 
+
+    @Override
 	public int getBaseTime() {
 		if(isSalvaging()) {
 			return 30;
 		}
 		return super.getBaseTime();
 	}
-	
+
 	@Override
 	public int getDifficulty() {
 		if(isSalvaging()) {
@@ -272,7 +272,7 @@ public class BattleArmorEquipmentPart extends EquipmentPart {
     public boolean needsMaintenance() {
         return false;
     }
-    
+
     public boolean canNeverScrap() {
     	return isModular();
 	}

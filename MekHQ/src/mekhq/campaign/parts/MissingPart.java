@@ -1,20 +1,20 @@
 /*
  * MissingPart.java
- * 
+ *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -44,50 +44,50 @@ import mekhq.campaign.work.WorkTime;
 public abstract class MissingPart extends Part implements Serializable, MekHqXmlSerializable, IPartWork, IAcquisitionWork {
 
 	/**
-	 * 
+	 *
 	 */
-	private static final long serialVersionUID = 300672661487966982L;	
-	
+	private static final long serialVersionUID = 300672661487966982L;
+
 	public MissingPart(int tonnage, Campaign c) {
 	    super(tonnage, false, c);
 	}
-	
+
 	public MissingPart(int tonnage, boolean isOmniPodded, Campaign c) {
 		super(tonnage, isOmniPodded, c);
 	}
-	
+
 	public MissingPart clone() {
 		//should never be called
 		return null;
 	}
-	
+
 	@Override
 	public long getStickerPrice() {
 		//missing parts aren't worth a thing
 		return 0;
 	}
-	
+
 	@Override
 	public long getBuyCost() {
 	    return getNewPart().getStickerPrice();
 	}
-	
+
 	@Override
 	public boolean isSalvaging() {
 		return false;
 	}
-	
+
 	@Override
 	public String getStatus() {
 		return "Destroyed";
 	}
-	
-	@Override 
+
+	@Override
 	public boolean isSamePartType(Part part) {
 		//missing parts should always return false
 		return false;
 	}
-	
+
 	public String getDesc() {
 		String bonus = getAllMods(null).getValueAsString();
 		if (getAllMods(null).getValue() > -1) {
@@ -99,7 +99,7 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 		if (getTeamId() != null) {
 			scheduled = " (scheduled) ";
 		}
-	
+
 		//if (this instanceof ReplacementItem
 		//		&& !((ReplacementItem) this).hasPart()) {
 		//	toReturn += " color='white'";
@@ -122,14 +122,14 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 		toReturn += "</font></html>";
 		return toReturn;
 	}
-	
+
 	@Override
-	public String succeed() {	
+	public String succeed() {
 		fix();
 		return " <font color='green'><b> replaced.</b></font>";
 	}
-	
-	@Override 
+
+	@Override
 	public void fix() {
 		Part replacement = findReplacement(false);
 		if(null != replacement) {
@@ -138,24 +138,24 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 			campaign.addPart(actualReplacement, 0);
 			replacement.decrementQuantity();
 			remove(false);
-			//assign the replacement part to the unit			
+			//assign the replacement part to the unit
 			actualReplacement.updateConditionFromPart();
 		}
 	}
-	
+
 	@Override
 	public void remove(boolean salvage) {
 		campaign.removePart(this);
 		if(null != unit) {
 			unit.removePart(this);
-		}	
+		}
 		setUnit(null);
 	}
-	
+
 	public abstract boolean isAcceptableReplacement(Part part, boolean refit);
-	
+
 	public Part findReplacement(boolean refit) {
-		Part bestPart = null;	
+		Part bestPart = null;
 
 		//check to see if we already have a replacement assigned
 		if(replacementId > -1) {
@@ -169,7 +169,7 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 			if(part.isReservedForRefit() || part.isBeingWorkedOn() || part.isReservedForReplacement() || !part.isPresent() || part.hasParentPart()) {
 				continue;
 			}
-			
+
 			if(isAcceptableReplacement(part, refit)) {
 				if(null == bestPart) {
 					bestPart = part;
@@ -180,7 +180,7 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 		}
 		return bestPart;
 	}
-	
+
 	public boolean isReplacementAvailable() {
 		return null != findReplacement(false);
 	}
@@ -194,7 +194,7 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 			return "<font color='red'>No replacement (" + inventories[1] + " in transit, " + inventories[2] + " on order)</font>";
 		}
     }
-	
+
 	@Override
 	public boolean needsFixing() {
 		//missing parts always need fixing
@@ -203,18 +203,18 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 		}
 		return false;
 	}
-	
+
 	@Override
 	public MissingPart getMissingPart() {
 		//do nothing - this should never be accessed
 		return null;
 	}
-	
+
 	@Override
 	public void updateConditionFromEntity(boolean checkForDestruction) {
 		//do nothing
 	}
-	
+
 	@Override
 	public String fail(int rating) {
 		skillMin = ++rating;
@@ -231,15 +231,15 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 			return " <font color='red'><b> failed.</b></font>";
 		}
 	}
-	
+
 	@Override
 	public boolean canChangeWorkMode() {
 	    return !isOmniPodded();
 	}
-	
+
 	@Override
 	public TargetRoll getAllAcquisitionMods() {
-        TargetRoll target = new TargetRoll();   
+        TargetRoll target = new TargetRoll();
         if(getTechBase() == T_CLAN && campaign.getCampaignOptions().getClanAcquisitionPenalty() > 0) {
             target.addModifier(campaign.getCampaignOptions().getClanAcquisitionPenalty(), "clan-tech");
         }
@@ -256,14 +256,14 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
         int avail = getAvailability();
         int availabilityMod = Availability.getAvailabilityModifier(avail);
         target.addModifier(availabilityMod, "availability (" + ITechnology.getRatingName(avail) + ")");
-        
+
         return target;
     }
-	
+
 	@Override
 	public String getAcquisitionDesc() {
 		String toReturn = "<html><font size='2'";
-		
+
 		toReturn += ">";
 		toReturn += "<b>" + getAcquisitionDisplayName() + "</b> " + getAcquisitionBonus() + "<br/>";
 		String[] inventories = campaign.getPartInventory(getNewPart());
@@ -272,7 +272,7 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 		    Part newPart = getAcquisitionPart();
 		    newPart.setOmniPodded(true);
 		    inventories = campaign.getPartInventory(newPart);
-		    if (Integer.parseInt(inventories[0]) > 0) { 
+		    if (Integer.parseInt(inventories[0]) > 0) {
 		        toReturn += ", " + inventories[0] + " OmniPod";
 		    }
 		}
@@ -281,11 +281,11 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 		toReturn += "</font></html>";
 		return toReturn;
 	}
-	
+
     @Override
     public String getAcquisitionDisplayName() {
     	return getAcquisitionName();
-    }    
+    }
 
 	@Override
 	public String getAcquisitionExtraDesc() {
@@ -318,20 +318,20 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 		    return "<font color='red'><b> You cannot afford this part. Transaction cancelled</b>.</font>";
 		}
 	}
-	
+
 	@Override
 	public Object getNewEquipment() {
 	    return getNewPart();
 	}
-	
+
 	public abstract Part getNewPart();
-	
+
 	@Override
 	public String failToFind() {
 	    resetDaysToWait();
 		return "<font color='red'><b> part not found</b>.</font>";
 	}
-	
+
 	@Override
 	public void writeToXmlBegin(PrintWriter pw1, int indent) {
 		super.writeToXmlBegin(pw1, indent);
@@ -344,13 +344,13 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 				+replacementId
 				+"</replacementId>");
 	}
-	
+
 	@Override
 	public void writeToXml(PrintWriter pw1, int indent) {
 		writeToXmlBegin(pw1, indent);
 		writeToXmlEnd(pw1, indent);
 	}
-	
+
 	@Override
 	public String checkScrappable() {
 		if(!isReplacementAvailable()) {
@@ -358,7 +358,7 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 		}
 		return null;
 	}
-	
+
 	@Override
 	public String scrap() {
 		Part replace = findReplacement(false);
@@ -368,24 +368,24 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 		skillMin = SkillType.EXP_GREEN;
 		return replace.getName() + " scrapped.";
 	}
-	
+
 	@Override
 	public String getAcquisitionName() {
 	    String details = getNewPart().getDetails();
 	    details = details.replaceFirst("\\d+\\shit\\(s\\)", "");
 		return getPartName() + " " + details;
 	}
-	
+
 	@Override
 	public int getTechLevel() {
 		return getNewPart().getTechLevel();
 	}
-	
+
 	@Override
 	public void reservePart() {
 		//this is being set as an overnight repair, so
-		//we also need to reserve the replacement. If the 
-		//quantity of the replacement is more than one, we will 
+		//we also need to reserve the replacement. If the
+		//quantity of the replacement is more than one, we will
 		//also need to split off a separate one
 		//shouldn't be null, but it never hurts to check
 		Part replacement = findReplacement(false);
@@ -403,7 +403,7 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 			}
 		}
 	}
-	
+
 	@Override
 	public void cancelReservation() {
 		Part replacement = findReplacement(false);
@@ -419,7 +419,7 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 			}
 		}
 	}
-	
+
 	@Override
 	public boolean needsMaintenance() {
         return false;
@@ -435,4 +435,3 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
         return isExtinct(year, clan, techFaction);
     }
 }
-

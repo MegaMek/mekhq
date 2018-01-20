@@ -80,7 +80,7 @@ public class AddFundsDialog extends JDialog implements FocusListener {
     private JPanel buildFieldsPanel() {
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT, 2, 2));
 
-        
+
         jFormattedTextFieldFundsQuantity = new JFormattedTextField();
         jFormattedTextFieldFundsQuantity.addFocusListener(this);
         jFormattedTextFieldFundsQuantity.setFormatterFactory(new DefaultFormatterFactory(new NumberFormatter(NumberFormat.getIntegerInstance())));
@@ -166,7 +166,7 @@ public class AddFundsDialog extends JDialog implements FocusListener {
     public void focusLost(FocusEvent e) {
         //not used
     }
-    
+
     public int getClosedType() {
         return closedType;
     }

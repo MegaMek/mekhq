@@ -40,7 +40,7 @@ public class ProbeBuiltInScenario extends AtBScenario {
 			ArrayList<Entity> enemyEntities) {
 		int playerHome = startPos[Compute.randomInt(4)];
 		setStart(playerHome);
-		
+
 		int enemyStart = getStart() + 4;
 
 		if (enemyStart > 8) {

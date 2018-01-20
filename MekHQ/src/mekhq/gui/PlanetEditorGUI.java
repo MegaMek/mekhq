@@ -44,32 +44,32 @@ public class PlanetEditorGUI extends JPanel {
 	private JSpinner temperature;
 	private JLabel lblLandmasses = new JLabel("Land Masses: ");
 	private JSpinner landmasses;
-	
+
 	// Habitability
 	private JPanel pnlHabitability = new JPanel();
 	private ButtonGroup habGroup;
 	private JRadioButton habTrue;
 	private JRadioButton habFalse;
-	
+
 	// Hyper-pulse Generators
 	private JPanel pnlHPG = new JPanel();
 	private ButtonGroup hpgGroup;
 	private JRadioButton hpgClassA;
 	private JRadioButton hpgClassB;
 	private JRadioButton hpgClassC;
-	
+
 	// Zenith Recharge Station?
 	private JPanel pnlZenith = new JPanel();
 	private ButtonGroup zenithGroup;
 	private JRadioButton zenithTrue;
 	private JRadioButton zenithFalse;
-	
+
 	// Nadir Recharge Station?
 	private JPanel pnlNadir = new JPanel();
 	private ButtonGroup nadirGroup;
 	private JRadioButton nadirTrue;
 	private JRadioButton nadirFalse;
-	
+
 	// Socio-Industrial Ratings
 	private JPanel pnlSocioIndi = new JPanel();
 	private JSpinner socioIndustrial1;
@@ -77,15 +77,15 @@ public class PlanetEditorGUI extends JPanel {
 	private JSpinner socioIndustrial3;
 	private JSpinner socioIndustrial4;
 	private JSpinner socioIndustrial5;
-	
+
 	public PlanetEditorGUI(boolean fullEditor) {
 		setLayout(new GridBagLayout());
 		initializeComponents(fullEditor);
 	}
-	
+
 	public void initializeComponents(boolean fullEditor) {
 		GridBagConstraints gbc = new GridBagConstraints();
-		
+
 		// Start General Panel
 		gbc.gridx = 0;
 		gbc.gridy = 0;
@@ -158,7 +158,7 @@ public class PlanetEditorGUI extends JPanel {
 		pnlGeneral.add(lblLandmasses, gbc);
 		gbc.gridx++;
 		pnlGeneral.add(landmasses, gbc);
-		
+
 		gbc.gridx = 0;
 		gbc.gridy = 0;
 		pnlGeneral.setBorder(BorderFactory.createTitledBorder("General"));

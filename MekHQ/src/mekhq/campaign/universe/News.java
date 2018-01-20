@@ -24,7 +24,7 @@ import mekhq.MekHQ;
 
 /**
  * Instead of making this a static like Planets, we are just going to reload a years
- * worth of news items at the start of every year, to cut down on memory usage. If this 
+ * worth of news items at the start of every year, to cut down on memory usage. If this
  * slows things down too much on year turn over we can reconsider
  * @author Jay Lawson
  *
@@ -52,17 +52,17 @@ public class News {
     //we need two hashes - one to access by date and the other by an id
     private Map<DateTime, List<NewsItem>> archive;
     private Map<Integer, NewsItem> news;
-    
+
     public News(int year, long seed) {
         loadNewsFor(year, seed);
     }
-    
+
     public NewsItem getNewsItem(int id) {
         synchronized(LOADING_LOCK) {
             return news.get(id);
         }
     }
-    
+
     public List<NewsItem> fetchNewsFor(DateTime d) {
         synchronized(LOADING_LOCK) {
             if(archive.containsKey(d)) {
@@ -71,7 +71,7 @@ public class News {
             return new ArrayList<>();
         }
     }
-    
+
     public void loadNewsFor(int year, long seed) {
         final String METHOD_NAME = "loadNewsFor(int,long)"; //$NON-NLS-1$
         synchronized(LOADING_LOCK) {
@@ -83,41 +83,41 @@ public class News {
             // Initialize variables.
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             Document xmlDoc = null;
-        
-            
+
+
             try(FileInputStream fis = new FileInputStream("data/universe/news.xml")) {
                 // Using factory get an instance of document builder
                 DocumentBuilder db = dbf.newDocumentBuilder();
-        
+
                 // Parse using builder to get DOM representation of the XML file
                 xmlDoc = db.parse(fis);
             } catch (Exception ex) {
                 MekHQ.getLogger().log(getClass(), METHOD_NAME, ex);
             }
-        
+
             Element newsEle = xmlDoc.getDocumentElement();
             NodeList nl = newsEle.getChildNodes();
-        
+
             // Get rid of empty text nodes and adjacent text nodes...
             // Stupid weird parsing of XML.  At least this cleans it up.
-            newsEle.normalize(); 
-        
+            newsEle.normalize();
+
             // Okay, lets iterate through the children, eh?
             for (int x = 0; x < nl.getLength(); x++) {
                 Node wn = nl.item(x);
-        
+
                 if (wn.getParentNode() != newsEle)
                     continue;
-        
+
                 int xc = wn.getNodeType();
-        
+
                 if (xc == Node.ELEMENT_NODE) {
                     // This is what we really care about.
                     // All the meat of our document is in this node type, at this
                     // level.
                     // Okay, so what element is it?
                     String xn = wn.getNodeName();
-        
+
                     if (xn.equalsIgnoreCase("newsItem")) {
                         NewsItem newsItem = null;
                         try {
@@ -149,7 +149,7 @@ public class News {
                         ++ id;
                     }
                 }
-            }   
+            }
             MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO,
                     "loaded " + archive.size() + " days of news items for " + year); //$NON-NLS-1$
         }

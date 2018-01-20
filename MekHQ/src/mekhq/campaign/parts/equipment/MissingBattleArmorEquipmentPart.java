@@ -54,12 +54,12 @@ public class MissingBattleArmorEquipmentPart extends MissingEquipmentPart {
         super(tonnage, et, equipNum, c, etonnage);
         this.trooper = trooper;
     }
-    
-    @Override 
+
+    @Override
 	public int getBaseTime() {
 		return 30;
 	}
-	
+
 	@Override
 	public int getDifficulty() {
 		return -2;

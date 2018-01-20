@@ -38,7 +38,7 @@ import mekhq.campaign.mission.Loot;
 public class LootTableModel extends AbstractTableModel {
 
         /**
-         * 
+         *
          */
         private static final long serialVersionUID = -58915479895694545L;
         protected String[] columnNames;
@@ -49,11 +49,11 @@ public class LootTableModel extends AbstractTableModel {
         public final static int COL_MECHS   = 2;
         public final static int COL_PARTS   = 3;
         public final static int N_COL       = 4;
-        
+
         public LootTableModel(ArrayList<Loot> entries) {
             data = entries;
         }
-        
+
         public int getRowCount() {
             return data.size();
         }
@@ -86,10 +86,10 @@ public class LootTableModel extends AbstractTableModel {
             } else {
                 loot = getLootAt(row);
             }
-            if(col == COL_NAME) {                
+            if(col == COL_NAME) {
                 return loot.getName();
             }
-            if(col == COL_MONEY) {                
+            if(col == COL_MONEY) {
                 return formatter.format(loot.getCash());
             }
             if(col == COL_MECHS) {
@@ -100,12 +100,12 @@ public class LootTableModel extends AbstractTableModel {
             }
             return "?";
         }
-        
+
         @Override
         public boolean isCellEditable(int row, int col) {
             return false;
         }
-        
+
         @Override
         public Class<? extends Object> getColumnClass(int c) {
             return getValueAt(0, c).getClass();
@@ -114,26 +114,26 @@ public class LootTableModel extends AbstractTableModel {
         public Loot getLootAt(int row) {
             return (Loot) data.get(row);
         }
-        
+
         public void addLoot(Loot loot) {
             data.add(loot);
             fireTableDataChanged();
         }
-        
+
         public ArrayList<Loot> getAllLoot() {
             return data;
         }
-        
+
          public int getColumnWidth(int c) {
              switch(c) {
              case COL_MONEY:
              case COL_NAME:
-                 return 100;     
+                 return 100;
              default:
                  return 20;
              }
          }
-            
+
          public int getAlignment(int col) {
              return SwingConstants.LEFT;
          }
@@ -144,22 +144,22 @@ public class LootTableModel extends AbstractTableModel {
                  return null;
              }
          }
-            
+
          //fill table with values
          public void setData(ArrayList<Loot> loot) {
              data = loot;
              fireTableDataChanged();
          }
-            
+
          public LootTableModel.Renderer getRenderer() {
              return new LootTableModel.Renderer();
          }
 
          public class Renderer extends DefaultTableCellRenderer {
-             
+
 
              /**
-             * 
+             *
              */
             private static final long serialVersionUID = -2888173457152182907L;
 
@@ -173,7 +173,7 @@ public class LootTableModel extends AbstractTableModel {
                     int actualRow = table.convertRowIndexToModel(row);
                     setHorizontalAlignment(getAlignment(actualCol));
                     setToolTipText(getTooltip(actualRow, actualCol));
-                    
+
                     return this;
                 }
 

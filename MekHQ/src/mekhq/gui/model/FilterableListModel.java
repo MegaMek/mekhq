@@ -1,18 +1,18 @@
 /*
  * Copyright (c) 2016 MegaMek team
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -34,21 +34,21 @@ public class FilterableListModel<E> extends AbstractListModel<E> implements List
     private ListModel<E> peerModel;
     private List<Integer> indices;
     private Predicate<E> filter;
-    
+
     public FilterableListModel() {
         this(null, null);
     }
-    
+
     public FilterableListModel(ListModel<E> model) {
         this(model, null);
     }
-    
+
     public FilterableListModel(ListModel<E> model, Predicate<E> filter) {
         indices = new ArrayList<>();
         setModel(model);
         setFilter(filter);
     }
-    
+
     public void setModel(ListModel<E> parent) {
         if((null == peerModel) || !peerModel.equals(parent)) {
             if(null != peerModel) {
@@ -68,7 +68,7 @@ public class FilterableListModel<E> extends AbstractListModel<E> implements List
     public ListModel<E> getModel() {
         return peerModel;
     }
-    
+
     public void setFilter(Predicate<E> value) {
         if((null == filter) || !filter.equals(value)) {
             filter = value;
@@ -119,7 +119,7 @@ public class FilterableListModel<E> extends AbstractListModel<E> implements List
             });
         }
     }
-    
+
     @Override
     public int getSize() {
         return (null == filter) ? ((null == peerModel) ? 0 : peerModel.getSize()) : indices.size();

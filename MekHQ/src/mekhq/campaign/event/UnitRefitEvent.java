@@ -26,7 +26,7 @@ import mekhq.campaign.unit.Unit;
  *
  */
 public class UnitRefitEvent extends UnitChangedEvent {
-    
+
     public UnitRefitEvent(Unit unit) {
         super(unit);
     }

@@ -1,20 +1,20 @@
 /*
  * NewKillDialog.java
- * 
+ *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -42,7 +42,7 @@ public class KillDialog extends javax.swing.JDialog {
     private Kill kill;
     private String name;
     private boolean cancelled;
-    
+
     /** Creates new form NewTeamDialog */
     public KillDialog(java.awt.Frame parent, boolean modal, Kill k, String pilotName) {
         super(parent, modal);
@@ -65,13 +65,13 @@ public class KillDialog extends javax.swing.JDialog {
         btnOK = new javax.swing.JButton();
         btnClose = new javax.swing.JButton();
         btnDate = new javax.swing.JButton();
-    
+
         ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.KillDialog", new EncodeControl()); //$NON-NLS-1$
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
         setTitle(resourceMap.getString("Form.title") + " " + name);
         getContentPane().setLayout(new java.awt.GridBagLayout());
-        
+
         lblKill.setText(resourceMap.getString("lblKill.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -80,7 +80,7 @@ public class KillDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         getContentPane().add(lblKill, gridBagConstraints);
-        
+
         txtKill.setText(kill.getWhatKilled());
         txtKill.setMinimumSize(new java.awt.Dimension(150, 28));
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -92,7 +92,7 @@ public class KillDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         getContentPane().add(txtKill, gridBagConstraints);
-        
+
         lblKiller.setText(resourceMap.getString("lblKiller.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -101,7 +101,7 @@ public class KillDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         getContentPane().add(lblKiller, gridBagConstraints);
-        
+
         //Unit u = campaign.getUnit(person.getUnitId());
         //if(null != u) {
         //	txtKiller.setText(u.getName());
@@ -119,7 +119,7 @@ public class KillDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         getContentPane().add(txtKiller, gridBagConstraints);
- 
+
         btnDate.setText(getDateAsString());
         btnDate.setName("btnDate"); // NOI18N
         btnDate.addActionListener(new java.awt.event.ActionListener() {
@@ -134,7 +134,7 @@ public class KillDialog extends javax.swing.JDialog {
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         getContentPane().add(btnDate, gridBagConstraints);
-        
+
         btnOK.setText(resourceMap.getString("btnOK.text")); // NOI18N
         btnOK.setName("btnOK"); // NOI18N
         btnOK.addActionListener(new java.awt.event.ActionListener() {
@@ -168,8 +168,8 @@ public class KillDialog extends javax.swing.JDialog {
         pack();
     }
 
-    
-    
+
+
     private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHireActionPerformed
     	kill.setWhatKilled(txtKill.getText());
     	kill.setKilledByWhat(txtKiller.getText());
@@ -181,15 +181,15 @@ public class KillDialog extends javax.swing.JDialog {
     	cancelled = true;
     	this.setVisible(false);
     }
-    
+
     public Kill getKill() {
     	return kill;
     }
-    
+
     public boolean wasCancelled() {
     	return cancelled;
     }
-    
+
     private void changeDate() {
     	GregorianCalendar cal = new GregorianCalendar();
     	cal.setTime(date);
@@ -199,12 +199,12 @@ public class KillDialog extends javax.swing.JDialog {
             btnDate.setText(getDateAsString());
         }
     }
-    
+
     private String getDateAsString() {
     	SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d yyyy");
         return dateFormat.format(date);
     }
-    
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnClose;
     private javax.swing.JButton btnOK;

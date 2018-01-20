@@ -1,18 +1,18 @@
 /*
  * Copyright (C) 2017 MegaMek team
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -43,17 +43,17 @@ import mekhq.campaign.personnel.SkillType;
 /**
  * An empty omnipod, which can be purchased or created when equipment is removed from a pod.
  * When fixed, the omnipod is removed from the warehouse and one replacement part is podded.
- * 
+ *
  * @author Neoancient
  *
  */
 public class OmniPod extends Part {
 
     private static final long serialVersionUID = -8236359530423260992L;
-    
+
     // Pods are specific to the type of equipment they contain.
     private Part partType;
-    
+
     public OmniPod() {
         this(new EquipmentPart(), null);
     }
@@ -66,7 +66,7 @@ public class OmniPod extends Part {
         }
         name = "OmniPod";
     }
-    
+
     @Override
     public void setCampaign(Campaign c) {
         super.setCampaign(c);
@@ -77,7 +77,7 @@ public class OmniPod extends Part {
     public String getDetails() {
         return partType.getName();
     }
-    
+
     @Override
     public int getBaseTime() {
         return partType.getMissingPart().getBaseTime();
@@ -116,7 +116,7 @@ public class OmniPod extends Part {
             return "Part not available";
         }
     }
-    
+
     //Weight is negligible
     @Override
     public double getTonnage() {
@@ -128,7 +128,7 @@ public class OmniPod extends Part {
     public int getTechRating() {
         return EquipmentType.RATING_E;
     }
-    
+
     @Override
     public TechAdvancement getTechAdvancement() {
         return Entity.getOmniAdvancement();
@@ -222,7 +222,7 @@ public class OmniPod extends Part {
     public boolean needsFixing() {
         return true;
     }
-    
+
     @Override
     public void fix() {
         Part newPart = partType.clone();
@@ -233,8 +233,8 @@ public class OmniPod extends Part {
             oldPart.decrementQuantity();
         }
     }
-    
-    
+
+
     @Override
     public String fail(int rating) {
         skillMin = ++rating;
@@ -243,12 +243,12 @@ public class OmniPod extends Part {
         if(skillMin > SkillType.EXP_ELITE) {
             return " <font color='red'><b> failed and part destroyed.</b></font>";
         } else {
-            //OmniPod is only added back to warehouse if repair fails without destroying part. 
+            //OmniPod is only added back to warehouse if repair fails without destroying part.
             campaign.addPart(this, 0);
             return " <font color='red'><b> failed.</b></font>";
         }
     }
-    
+
     @Override
     public String getStatus() {
         String toReturn = "Empty";
@@ -294,7 +294,7 @@ public class OmniPod extends Part {
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
         final String METHOD_NAME = "writeToXml(PrintWriter,int)"; //$NON-NLS-1$
-        
+
         writeToXmlBegin(pw1, indent);
         pw1.print(MekHqXmlUtil.indentStr(indent + 1) + "<partType tonnage='" + partType.getUnitTonnage()
             + "' type='");

@@ -26,14 +26,14 @@ import mekhq.campaign.personnel.Person;
  *
  */
 public class PersonForceAssignmentEvent extends PersonChangedEvent {
-    
+
     private final Force force;
 
     public PersonForceAssignmentEvent(Person person, Force force) {
         super(person);
         this.force = force;
     }
-    
+
     public Force getForce() {
         return force;
     }

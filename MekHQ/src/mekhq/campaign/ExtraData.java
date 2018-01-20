@@ -7,12 +7,12 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -95,7 +95,7 @@ public class ExtraData {
         marshaller = m;
         unmarshaller = u;
     }
-    
+
     private static final Map<Class<?>, StringAdapter<?>> ADAPTERS = new HashMap<>();
     static {
         ADAPTERS.put(String.class, new StringAdapter<String>() {
@@ -119,7 +119,7 @@ public class ExtraData {
             public DateTime adapt(String str) { return new DateTime(str); }
         });
     }
-    
+
     @XmlElement(name="map")
     @XmlJavaTypeAdapter(JAXBValueAdapter.class)
     private Map<Class<?>, Map<String, Object>> values = new HashMap<>();
@@ -127,10 +127,10 @@ public class ExtraData {
     private Map<String, Object> getOrCreateClassMap(Class<?> cls) {
         return ExtraData.getOrCreateClassMap(values, cls);
     }
-    
+
     /**
      * Set the given value for the given key.
-     * 
+     *
      * @return The previous value if there was one.
      */
     public <T> T set(Key<T> key, T value) {
@@ -140,10 +140,10 @@ public class ExtraData {
         Map<String, Object> map = getOrCreateClassMap(key.type);
         return key.type.cast(map.put(key.name, value));
     }
-    
+
     /**
      * Set the given value parsed from the string for the given key, if possible.
-     * 
+     *
      * @return The previous value if there was one.
      */
     public <T> T setString(Key<T> key, String value) {
@@ -167,7 +167,7 @@ public class ExtraData {
         }
         return key.type.cast(values.get(key.type).get(key.name));
     }
-    
+
     /**
      * @return the value associated with the given key, or the default value if there isn't one
      */
@@ -175,7 +175,7 @@ public class ExtraData {
         T result = get(key);
         return (null != result) ? result : defaultValue;
     }
-    
+
     public void writeToXml(Writer writer) {
         try {
             marshaller.marshal(this, writer);
@@ -183,7 +183,7 @@ public class ExtraData {
             MekHQ.getLogger().log(getClass(), "writeToXml(Writer)", e);
         }
     }
-    
+
     public void writeToXml(OutputStream os) {
         try {
             marshaller.marshal(this, os);
@@ -191,7 +191,7 @@ public class ExtraData {
             MekHQ.getLogger().log(getClass(), "writeToXml(OutputStream)", e);
         }
     }
-    
+
     public static ExtraData createFromXml(Node wn) {
         try {
             return (ExtraData) unmarshaller.unmarshal(wn);
@@ -200,7 +200,7 @@ public class ExtraData {
             return null;
         }
     }
-    
+
     public static ExtraData createFromXml(InputStream is) {
         try {
             return (ExtraData) unmarshaller.unmarshal(is);
@@ -209,7 +209,7 @@ public class ExtraData {
             return null;
         }
     }
-    
+
     private static Map<String, Object> getOrCreateClassMap(Map<Class<?>, Map<String, Object>> baseMap, Class<?> cls) {
         Map<String, Object> map = baseMap.get(cls);
         if(null == map) {
@@ -218,9 +218,9 @@ public class ExtraData {
         }
         return map;
     }
-    
+
     // XML marshalling/unmarshalling support classes and methods
-    
+
     /**
      * Register an adapter translating from String to the given value.
      * Already existing adapters are not overwritten.
@@ -230,7 +230,7 @@ public class ExtraData {
             ADAPTERS.put(cls, adapter);
         }
     }
-    
+
     private static <T> T adapt(Class<T> cls, String val) {
         if(!ADAPTERS.containsKey(cls)) {
             return null;
@@ -241,7 +241,7 @@ public class ExtraData {
             return null;
         }
     }
-    
+
     private static <T> String toString(T val) {
         if(null == val) {
             return null;
@@ -253,14 +253,14 @@ public class ExtraData {
         StringAdapter<T> adapter = (StringAdapter<T>) ADAPTERS.get(val.getClass());
         return adapter.toString(val);
     }
-    
+
     public static abstract class StringAdapter<T> {
         public abstract T adapt(String str);
         public String toString(T val) {
             return (null != val) ? val.toString() : null;
         }
     }
-    
+
     private static class JAXBValueAdapter
         extends XmlAdapter<XmlValueListArray, Map<Class<?>, Map<String, Object>>> {
         @Override
@@ -323,57 +323,57 @@ public class ExtraData {
             return arrayResult;
         }
     }
-    
+
     private static class XmlValueListArray {
         public List<XmlValueList> list;
     }
-    
+
     private static class XmlValueList {
         @XmlAttribute
         public String type;
         @XmlElement(name="entry")
         public List<XmlValueEntry> entries;
     }
-    
+
     private static class XmlValueEntry {
         @XmlAttribute
         public String key;
         @XmlAttribute
         public String value;
     }
-    
+
     // Predefined key types
-    
+
     public static abstract class Key<T> {
         private final String name;
         private final Class<T> type;
-        
+
         protected Key(String name, Class<T> type) {
             this.name = name;
             this.type = type;
         }
-        
+
         public String getName() {
             return name;
         }
-        
+
         public Class<T> getType() {
             return type;
         }
-        
+
         public T fromString(String str) {
             return ExtraData.adapt(type, str);
         }
-        
+
         public String toString(T val) {
             return (null != val) ? val.toString() : null;
         }
-        
+
         @Override
         public int hashCode() {
             return Objects.hash(name, type);
         }
-        
+
         @Override
         public boolean equals(Object object) {
             if(this == object) {
@@ -387,35 +387,35 @@ public class ExtraData {
             return Objects.equals(name, other.name) && (type == other.type);
         }
     }
-    
+
     /** A key referencing a String value */
     public static class StringKey extends Key<String> {
         public StringKey(String name) {
             super(name, String.class);
         }
     }
-    
+
     /** A key referencing an Integer or int value */
     public static class IntKey extends Key<Integer> {
         public IntKey(String name) {
             super(name, Integer.class);
         }
     }
-    
+
     /** A key referencing a Double or double value */
     public static class DoubleKey extends Key<Double> {
         public DoubleKey(String name) {
             super(name, Double.class);
         }
     }
-    
+
     /** A key referencing a Boolean or boolean value */
     public static class BooleanKey extends Key<Boolean> {
         public BooleanKey(String name) {
             super(name, Boolean.class);
         }
     }
-    
+
     /** A key referencing a joda-time DateTime value */
     public static class DateKey extends Key<DateTime> {
         public DateKey(String name) {

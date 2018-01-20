@@ -48,14 +48,14 @@ import mekhq.campaign.universe.Planets;
 
 /**
  * Contract summary view for ContractMarketDialog
- * 
+ *
  * @author Neoancient
  *
  */
 public class ContractSummaryPanel extends JPanel {
 
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 8773615661962644614L;
 	private Campaign campaign;
@@ -87,7 +87,7 @@ public class ContractSummaryPanel extends JPanel {
 	private JTextArea txtStartDate;
 	private JLabel lblLength;
 	private JTextArea txtLength;
-	
+
 	private JLabel lblCommand;
 	private JTextArea txtCommand;
 	private JLabel lblTransport;
@@ -155,7 +155,7 @@ public class ContractSummaryPanel extends JPanel {
 		gbc.weighty = 1.0;
 		gbc.insets = new java.awt.Insets(5, 5, 5, 20);
 		gbc.fill = java.awt.GridBagConstraints.BOTH;
-		gbc.anchor = java.awt.GridBagConstraints.NORTHWEST;	
+		gbc.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		add(mainPanel, gbc);
 
 	}
@@ -185,7 +185,7 @@ public class ContractSummaryPanel extends JPanel {
 		txtAllyRating = new JTextArea();
 		lblEnemyRating = new JLabel();
 		txtEnemyRating = new JTextArea();
-		
+
 		lblOverhead = new JLabel();
 		txtOverhead = new JTextArea();
 		lblCommand = new JLabel();
@@ -499,7 +499,7 @@ public class ContractSummaryPanel extends JPanel {
 		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		mainPanel.add(txtCommand, gridBagConstraints);
-		
+
 		/* Only allow command clause rerolls for merc and pirates; house units are always integrated */
 		if (allowRerolls && (campaign.getFactionCode().equals("MERC") || campaign.getFactionCode().equals("PIR")) &&
 				campaign.getContractMarket().getRerollsUsed(contract, ContractMarket.CLAUSE_COMMAND) < cmdRerolls) {
@@ -694,7 +694,7 @@ public class ContractSummaryPanel extends JPanel {
 		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		mainPanel.add(txtBattleLossComp, gridBagConstraints);
-		
+
 		if(contract instanceof AtBContract) {
 			lblRequiredLances.setName("lblRequiredLances"); // NOI18N
 			lblRequiredLances.setText(resourceMap.getString("lblRequiredLances.text"));
@@ -704,7 +704,7 @@ public class ContractSummaryPanel extends JPanel {
 			gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
 			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 			mainPanel.add(lblRequiredLances, gridBagConstraints);
-			
+
 			txtRequiredLances.setName("txtRequiredLances"); // NOI18N
 			txtRequiredLances.setText(((AtBContract)contract).getRequiredLances() + " Lance(s)");
 			txtRequiredLances.setEditable(false);
@@ -914,7 +914,7 @@ public class ContractSummaryPanel extends JPanel {
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = y;
-		gridBagConstraints.gridwidth = 1;       
+		gridBagConstraints.gridwidth = 1;
 		gridBagConstraints.weightx = 1.0;
 		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
@@ -935,7 +935,7 @@ public class ContractSummaryPanel extends JPanel {
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = y;
-		gridBagConstraints.gridwidth = 1;       
+		gridBagConstraints.gridwidth = 1;
 		gridBagConstraints.weightx = 1.0;
 		gridBagConstraints.weighty = 1.0;
 		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;

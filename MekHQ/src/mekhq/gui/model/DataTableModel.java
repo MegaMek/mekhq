@@ -34,7 +34,7 @@ public abstract class DataTableModel extends AbstractTableModel {
     public boolean isCellEditable(int row, int col) {
         return false;
     }
-    
+
     public ArrayList<?> getData() {
         return data;
     }

@@ -30,11 +30,11 @@ import mekhq.campaign.unit.Unit;
 abstract public class UnitEvent extends MMEvent {
 
     private final Unit unit;
-    
+
     public UnitEvent(Unit unit) {
         this.unit = Objects.requireNonNull(unit);
     }
-    
+
     public Unit getUnit() {
         return unit;
     }

@@ -162,7 +162,7 @@ import mekhq.gui.model.PartsTableModel;
  */
 public class CampaignGUI extends JPanel {
     private static final long serialVersionUID = -687162569841072579L;
-    
+
     public static final int MAX_START_WIDTH = 1400;
     public static final int MAX_START_HEIGHT = 900;
 
@@ -187,7 +187,7 @@ public class CampaignGUI extends JPanel {
     private JMenuItem miShipSearch;
     private JMenuItem miRetirementDefectionDialog;
     private JCheckBoxMenuItem miShowOverview;
-    
+
     private EnumMap<GuiTabType,CampaignGuiTab> standardTabs;
 
     /* Components for the status panel */
@@ -268,13 +268,13 @@ public class CampaignGUI extends JPanel {
         miShowOverview.setSelected(show);
         showOverviewTab(show);
     }
-    
+
     public void showOverviewTab(boolean show) {
     	if (show) {
     		addStandardTab(GuiTabType.OVERVIEW);
     	} else {
     		removeStandardTab(GuiTabType.OVERVIEW);
-    	}    	
+    	}
     }
 
     public void showGMToolsDialog() {
@@ -301,7 +301,7 @@ public class CampaignGUI extends JPanel {
     public void spendBatchXP() {
         BatchXPDialog batchXPDialog = new BatchXPDialog(getFrame(), getCampaign());
         batchXPDialog.setVisible(true);
-        
+
         if(batchXPDialog.hasDataChanged()) {
             refreshReport();
         }
@@ -347,7 +347,7 @@ public class CampaignGUI extends JPanel {
         add(mainPanel, BorderLayout.CENTER);
         add(btnPanel, BorderLayout.PAGE_START);
         add(statusPanel, BorderLayout.PAGE_END);
-        
+
         standardTabs.values().forEach(t -> t.refreshAll());
 
         refreshCalendar();
@@ -392,18 +392,18 @@ public class CampaignGUI extends JPanel {
 
         mainPanel.setDividerLocation(0.75);
     }
-    
+
     public CampaignGuiTab getTab(GuiTabType tabType) {
     	return standardTabs.get(tabType);
     }
-    
+
     public boolean hasTab(GuiTabType tabType) {
     	return standardTabs.containsKey(tabType);
     }
-    
+
     /**
      * Adds one of the built-in tabs to the gui, if it is not already present.
-     * 
+     *
      * @param tab The type of tab to add
      */
     public void addStandardTab(GuiTabType tab) {
@@ -423,10 +423,10 @@ public class CampaignGUI extends JPanel {
     		tabMain.insertTab(t.getTabName(), null, t, null, index);
     	}
     }
-    
+
     /**
      * Adds a custom tab to the gui at the end
-     * 
+     *
      * @param tab The tab to add
      */
     public void addCustomTab(CampaignGuiTab tab) {
@@ -439,11 +439,11 @@ public class CampaignGUI extends JPanel {
     		addStandardTab(tab.tabType());
     	}
     }
-    
+
     /**
      * Adds a custom tab to the gui in the specified position. If <code>tab</code> is a built-in
      * type it will be placed in its normal position if it does not already exist.
-     * 
+     *
      * @param tab	The tab to add
      * @param index	The position to place the tab
      */
@@ -457,10 +457,10 @@ public class CampaignGUI extends JPanel {
     		addStandardTab(tab.tabType());
     	}
     }
-    
+
     /**
      * Adds a custom tab to the gui positioned after one of the built-in tabs
-     * 
+     *
      * @param tab		The tab to add
      * @param stdTab	The build-in tab after which to place the new one
      */
@@ -487,10 +487,10 @@ public class CampaignGUI extends JPanel {
     		addStandardTab(tab.tabType());
     	}
     }
-    
+
     /**
      * Adds a custom tab to the gui positioned before one of the built-in tabs
-     * 
+     *
      * @param tab		The tab to add
      * @param stdTab	The build-in tab before which to place the new one
      */
@@ -517,10 +517,10 @@ public class CampaignGUI extends JPanel {
     		addStandardTab(tab.tabType());
     	}
     }
-    
+
     /**
      * Removes one of the built-in tabs from the gui.
-     * 
+     *
      * @param tabType	The tab to remove
      */
     public void removeStandardTab(GuiTabType tabType) {
@@ -530,20 +530,20 @@ public class CampaignGUI extends JPanel {
         	removeTab(tab);
     	}
     }
-    
+
     /**
      * Removes a tab from the gui.
-     * 
+     *
      * @param tab	The tab to remove
      */
     public void removeTab(CampaignGuiTab tab) {
         tab.disposeTab();
     	removeTab(tab.getTabName());
     }
-    
+
     /**
      * Removes a tab from the gui.
-     * 
+     *
      * @param tabName	The name of the tab to remove
      */
     public void removeTab(String tabName) {
@@ -556,7 +556,7 @@ public class CampaignGUI extends JPanel {
     		tabMain.removeTabAt(index);
     	}
     }
-    
+
     private void initMenu() {
 
         menuBar = new JMenuBar();
@@ -636,7 +636,7 @@ public class CampaignGUI extends JPanel {
             }
         });
         menuExport.add(miExportUnitCSV);
-        
+
         JMenuItem miExportPlanetsXML = new JMenuItem(
                 resourceMap.getString("miExportPlanetsXML.text"));
         miExportPlanetsXML.addActionListener(new ActionListener() {
@@ -687,7 +687,7 @@ public class CampaignGUI extends JPanel {
         });
         // miLoadForces.setEnabled(false);
         menuImport.add(miLoadForces);
-        
+
         JMenuItem miLoadPlanets = new JMenuItem(
                 resourceMap.getString("miImportPlanets.text"));
         miLoadPlanets.addActionListener(new ActionListener() {
@@ -1311,7 +1311,7 @@ public class CampaignGUI extends JPanel {
     		((RepairTab)getTab(GuiTabType.REPAIR)).filterTasks();
     	}
     }
-        
+
     public void focusOnUnit(UUID id) {
     	HangarTab ht = (HangarTab)getTab(GuiTabType.HANGAR);
         if (null == id || null == ht) {
@@ -1406,12 +1406,12 @@ public class CampaignGUI extends JPanel {
         if(!getCampaign().newDay()) {
             return;
         }
-        
+
         refreshCalendar();
         refreshLocation();
         initReport();
         refreshFunds();
-        
+
         refreshAllTabs();
     }// GEN-LAST:event_btnAdvanceDayActionPerformed
 
@@ -1539,7 +1539,7 @@ public class CampaignGUI extends JPanel {
 
     private void menuSaveXmlActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_menuSaveActionPerformed
         final String METHOD_NAME = "menuSaveXmlActionPerformed(ActionEvent)";
-        
+
         MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, //$NON-NLS-1$
                 "Saving campaign..."); //$NON-NLS-1$
         // Choose a file...
@@ -1755,7 +1755,7 @@ public class CampaignGUI extends JPanel {
             MekHQ.getLogger().log(getClass(), "miLoadPlanetsActionPerformed", ex);
         }
     }
-    
+
     private void miImportPersonActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_miImportPersonActionPerformed
         try {
             loadPersonFile();
@@ -1787,7 +1787,7 @@ public class CampaignGUI extends JPanel {
             MekHQ.getLogger().log(getClass(), "miImportOptionsActionPerformed(ActionEvent)", ex);
         }
     }
-    
+
     private void miImportOptionsActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_miExportPersonActionPerformed
         try {
             loadOptionsFile();
@@ -1907,7 +1907,7 @@ public class CampaignGUI extends JPanel {
         String RefitRefurbish;
         if (r.isBeingRefurbished()) {
             RefitRefurbish = "Refurbishment is a " + r.getRefitClassName() + " refit and must be done at a factory and costs 10% of the purchase price"
-                             + ".\n Are you sure you want to refurbish "; 
+                             + ".\n Are you sure you want to refurbish ";
         } else {
             RefitRefurbish = "This is a " + r.getRefitClassName() + " refit. Are you sure you want to refit ";
         }
@@ -1966,10 +1966,10 @@ public class CampaignGUI extends JPanel {
         UnitCostReportDialog mrd = new UnitCostReportDialog(getFrame(), u);
         mrd.setVisible(true);
     }
-    
+
     /**
      * Shows a dialog that lets the user select a tech for a task on a particular unit
-     * 
+     *
      * @param u    The unit to be serviced, used to filter techs for skill on the unit.
      * @param desc The description of the task
      * @return     The ID of the selected tech, or null if none is selected.
@@ -1980,7 +1980,7 @@ public class CampaignGUI extends JPanel {
 
     /**
      * Shows a dialog that lets the user select a tech for a task on a particular unit
-     * 
+     *
      * @param u                 The unit to be serviced, used to filter techs for skill on the unit.
      * @param desc              The description of the task
      * @param ignoreMaintenance If true, ignores the time required for maintenance tasks when displaying
@@ -2032,7 +2032,7 @@ public class CampaignGUI extends JPanel {
     protected void loadPlanetTSVFile() {
         JFileChooser loadList = new JFileChooser(".");
         loadList.setDialogTitle("Load Planets from SUCS format TSV file");
-        
+
         loadList.setFileFilter(new FileFilter() {
             @Override
             public boolean accept(File dir) {
@@ -2047,7 +2047,7 @@ public class CampaignGUI extends JPanel {
                 return "TSV file";
             }
         });
-        
+
         int returnVal = loadList.showOpenDialog(mainPanel);
 
         if ((returnVal != JFileChooser.APPROVE_OPTION)
@@ -2058,10 +2058,10 @@ public class CampaignGUI extends JPanel {
 
         File tsvFile = loadList.getSelectedFile();
         String report = Planets.getInstance().importPlanetsFromTSV(tsvFile.getAbsolutePath());
-        
+
         JOptionPane.showMessageDialog(mainPanel, report);
     }
-    
+
     protected void exportPlanets(String format) {
         JFileChooser exportPlanets = new JFileChooser(".");
         exportPlanets.setDialogTitle("Export Current Planet List");
@@ -2109,14 +2109,14 @@ public class CampaignGUI extends JPanel {
         if (file.exists()) {
             Utilities.copyfile(file, backupFile);
         }
-        
+
         String report = Planets.getInstance().exportPlanets(path);
         JOptionPane.showMessageDialog(mainPanel, report);
     }
-    
+
     protected void loadListFile(boolean allowNewPilots) throws IOException {
         final String METHOD_NAME = "loadListFile(boolean)";
-        
+
         JFileChooser loadList = new JFileChooser(".");
         loadList.setDialogTitle("Load Units");
 
@@ -2187,7 +2187,7 @@ public class CampaignGUI extends JPanel {
 
     protected void loadPersonFile() throws IOException {
         final String METHOD_NAME = "loadPersonFile()";
-        
+
         JFileChooser loadList = new JFileChooser(".");
         loadList.setDialogTitle("Load Personnel");
 
@@ -2293,7 +2293,7 @@ public class CampaignGUI extends JPanel {
     //TODO: disable if not using personnel tab
     private void savePersonFile() throws IOException {
         final String METHOD_NAME = "savePersonFile()";
-        
+
         JFileChooser savePersonnel = new JFileChooser(".");
         savePersonnel.setDialogTitle("Save Personnel");
         savePersonnel.setFileFilter(new FileFilter() {
@@ -2412,7 +2412,7 @@ public class CampaignGUI extends JPanel {
 
     private void saveOptionsFile() throws IOException {
         final String METHOD_NAME = "saveOptionsFile()";
-        
+
         JFileChooser saveOptions = new JFileChooser(".");
         saveOptions.setDialogTitle("Save Campaign Options");
         saveOptions.setFileFilter(new FileFilter() {
@@ -2610,7 +2610,7 @@ public class CampaignGUI extends JPanel {
 
     protected void loadOptionsFile() throws IOException {
         final String METHOD_NAME = "loadOptionsFile()";
-        
+
         JFileChooser loadList = new JFileChooser(".");
         loadList.setDialogTitle("Load Campaign Options");
 
@@ -2765,7 +2765,7 @@ public class CampaignGUI extends JPanel {
 
     private void savePartsFile() throws IOException {
         String METHOD_NAME = "savePartsFile()";
-        
+
         JFileChooser saveParts = new JFileChooser(".");
         saveParts.setDialogTitle("Save Parts");
         saveParts.setFileFilter(new FileFilter() {
@@ -2835,16 +2835,16 @@ public class CampaignGUI extends JPanel {
 	            }
 	            fos = new FileOutputStream(file);
 	            pw = new PrintWriter(new OutputStreamWriter(fos, "UTF-8"));
-	
+
 	            // File header
 	            pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-	
+
 	            ResourceBundle resourceMap = ResourceBundle
 	                    .getBundle("mekhq.resources.MekHQ");
 	            // Start the XML root.
 	            pw.println("<parts version=\""
 	                    + resourceMap.getString("Application.version") + "\">");
-	
+
 	            if (rows.length > 1) {
 	                for (int i = 0; i < rows.length; i++) {
 	                    parts[i].writeToXml(pw, 1);
@@ -2930,7 +2930,7 @@ public class CampaignGUI extends JPanel {
 
         Utilities.exportTabletoCSV(table, file);
     }
-    
+
     public void refreshAllTabs() {
         for (int i = 0; i < tabMain.getTabCount(); i++) {
             ((CampaignGuiTab)tabMain.getComponentAt(i)).refreshAll();
@@ -2969,7 +2969,7 @@ public class CampaignGUI extends JPanel {
         panLog.appendLog(newLogEntries);
         logDialog.appendLog(newLogEntries);
     }
-    
+
     public void initReport() {
         String report = getCampaign().getCurrentReportHTML();
         panLog.refreshLog(report);
@@ -2994,7 +2994,7 @@ public class CampaignGUI extends JPanel {
         	// this is the one situation where we do want to refresh the rating,
         	// as it means something has happened to influence it
         	getCampaign().getUnitRating().reInitialize();
-        	
+
             String text;
         	if (UnitRatingMethod.FLD_MAN_MERCS_REV.equals(getCampaign().getCampaignOptions().getUnitRatingMethod())) {
                 text = String.format(resourceMap.getString("bottomRating.DragoonsRating"), getCampaign().getUnitRatingText());
@@ -3002,7 +3002,7 @@ public class CampaignGUI extends JPanel {
             else {
                 text = String.format(resourceMap.getString("bottomRating.CampaignOpsRating"), getCampaign().getUnitRatingText());
             }
-        	
+
             lblRating.setText(text);
         } else {
             lblRating.setText("");
@@ -3014,7 +3014,7 @@ public class CampaignGUI extends JPanel {
                 + getCampaign().getAstechPool() + "</html>";
         lblTempAstechs.setText(text);
     }
-    
+
     private void refreshTempMedics() {
         String text = "<html><b>Temp Medics:</b> "
                 + getCampaign().getMedicPool() + "</html>";
@@ -3023,56 +3023,56 @@ public class CampaignGUI extends JPanel {
 
     private ActionScheduler fundsScheduler = new ActionScheduler(this::refreshFunds);
     private ActionScheduler ratingScheduler = new ActionScheduler(this::refreshRating);
-    
+
     @Subscribe
     public void handle(ReportEvent ev) {
         refreshReport();
     }
-    
+
     @Subscribe
     public void handle(OptionsChangedEvent ev) {
         fundsScheduler.schedule();
         ratingScheduler.schedule();
     }
-    
+
     @Subscribe
     public void handle(TransactionEvent ev) {
         fundsScheduler.schedule();
         ratingScheduler.schedule();
     }
-    
+
     @Subscribe
     public void handle(LoanEvent ev) {
         fundsScheduler.schedule();
         ratingScheduler.schedule();
     }
-    
+
     @Subscribe
     public void handle(AssetEvent ev) {
         fundsScheduler.schedule();
         ratingScheduler.schedule();
     }
-    
+
     @Subscribe
     public void handle(MissionEvent ev) {
         ratingScheduler.schedule();
     }
-    
+
     @Subscribe
     public void handle(PersonEvent ev) {
         ratingScheduler.schedule();
     }
-    
+
     @Subscribe
     public void handle(UnitEvent ev) {
         ratingScheduler.schedule();
     }
-    
+
     @Subscribe
     public void handle(AstechPoolChangedEvent ev) {
         refreshTempAstechs();
     }
-    
+
     @Subscribe
     public void handle(MedicPoolChangedEvent ev) {
         refreshTempMedics();
@@ -3164,7 +3164,7 @@ public class CampaignGUI extends JPanel {
                 prevId = parent.getId();
             }
         }
-        
+
         if (null != scenario) {
         	MekHQ.triggerEvent(new DeploymentChangedEvent(f, scenario));
         }

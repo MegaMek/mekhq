@@ -671,7 +671,7 @@ public class PersonViewPanel extends JPanel {
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(lblAdvancedMedical2, gridBagConstraints);
-        
+
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = secondy;

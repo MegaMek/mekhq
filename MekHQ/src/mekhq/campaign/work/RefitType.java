@@ -1,20 +1,20 @@
 /*
  * RefitType.java
- * 
+ *
  * Copyright (C) 2016 MegaMek team
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -35,7 +35,7 @@ public enum RefitType {
     F(7, "Class F Refit (Factory)", 5.0, 4),
     X(8, "Class X Experimental Refit", 7.5, 6), // For custom rule sets
     IMPOSSIBLE(9, "impossible", Double.POSITIVE_INFINITY, Integer.MAX_VALUE); // To mark some changes as forbidden
-    
+
     // Initialize by-id array lookup table
     private static RefitType[] idMap;
     static {
@@ -56,7 +56,7 @@ public enum RefitType {
     public static RefitType of(int id) {
         return ((id > 0) && (id < idMap.length)) ? idMap[id] : NO_CHANGE;
     }
-    
+
     /** @return the refit type corresponding to the given string */
     public static RefitType of(String str) {
         try {
@@ -66,7 +66,7 @@ public enum RefitType {
         }
         return valueOf(str.toUpperCase(Locale.ROOT));
     }
-    
+
     public final int id;
     // User-displayable. TODO: Localize
     public final String name;

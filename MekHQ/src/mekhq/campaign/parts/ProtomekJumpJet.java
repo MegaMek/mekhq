@@ -40,7 +40,7 @@ import mekhq.campaign.personnel.SkillType;
  */
 public class ProtomekJumpJet extends Part {
     private static final long serialVersionUID = 719878556021696393L;
-    
+
     static final TechAdvancement TECH_ADVANCEMENT = new TechAdvancement(TECH_BASE_CLAN)
             .setClanAdvancement(3055,3060,3060).setClanApproximate(true, false, false)
             .setPrototypeFactions(F_CSJ).setProductionFactions(F_CSJ)
@@ -291,7 +291,7 @@ public class ProtomekJumpJet extends Part {
 	public int getLocation() {
 		return Protomech.LOC_TORSO;
 	}
-	
+
 	@Override
 	public TechAdvancement getTechAdvancement() {
 	    return TECH_ADVANCEMENT;

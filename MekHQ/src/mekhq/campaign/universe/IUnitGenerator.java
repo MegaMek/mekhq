@@ -31,29 +31,29 @@ import megamek.common.MechSummary;
 
 /**
  * Common interface to interact with various methods for generating units.
- * 
+ *
  * @author Neoancient
  *
  */
 public interface IUnitGenerator {
-    
+
     /*
      * For convenience in generating traditional ground + vtol units.
      */
     final static EnumSet<EntityMovementMode> MIXED_TANK_VTOL = EnumSet.of(EntityMovementMode.TRACKED,
             EntityMovementMode.WHEELED, EntityMovementMode.HOVER, EntityMovementMode.WIGE,
             EntityMovementMode.VTOL);
-    
+
 	/**
-	 * 
+	 *
 	 * @param unitType UnitType constant
 	 * @return true if the generator supports the unit type
 	 */
 	boolean isSupportedUnitType(int unitType);
-	
+
 	/**
 	 * Generate a single unit.
-	 * 
+	 *
 	 * @param faction Faction shortname
 	 * @param unitType UnitType constant
 	 * @param weightClass EntityWeightClass constant, or -1 for unspecified
@@ -62,10 +62,10 @@ public interface IUnitGenerator {
 	 * @return A unit that matches the criteria
 	 */
 	MechSummary generate(String faction, int unitType, int weightClass, int year, int quality);
-	
+
 	/**
 	 * Generate a single unit.
-	 * 
+	 *
 	 * @param faction Faction shortname
 	 * @param unitType UnitType constant
 	 * @param weightClass EntityWeightClass constant, or -1 for unspecified
@@ -76,11 +76,11 @@ public interface IUnitGenerator {
 	 */
 	MechSummary generate(String faction, int unitType, int weightClass, int year, int quality,
 			Predicate<MechSummary> filter);
-	
+
 	/**
-	 * 
+	 *
 	 * Generates a list of units.
-	 * 
+	 *
 	 * @param count The number of units to generate
 	 * @param faction Faction shortname
 	 * @param unitType UnitType constant
@@ -91,11 +91,11 @@ public interface IUnitGenerator {
 	 */
 	List<MechSummary> generate(int count, String faction, int unitType, int weightClass,
 			int year, int quality);
-	
+
 	/**
-	 * 
+	 *
 	 * Generates a list of units with an additional test function.
-	 * 
+	 *
 	 * @param count The number of units to generate
 	 * @param faction Faction shortname
 	 * @param unitType UnitType constant
@@ -108,10 +108,10 @@ public interface IUnitGenerator {
 
 	List<MechSummary> generate(int count, String faction, int unitType, int weightClass,
 			int year, int quality, Predicate<MechSummary> filter);
-	
+
 	/**
 	 * Generate a unit using additional parameters specific to the generation method.
-	 * 
+	 *
 	 * @param faction Faction shortname
 	 * @param unitType UnitType constant
 	 * @param weightClass EntityWeightClass constant, or -1 for unspecified
@@ -125,9 +125,9 @@ public interface IUnitGenerator {
 			Predicate<MechSummary> filter);
 
 	/**
-	 * 
+	 *
 	 * Generates a list of units using additional parameters specific to the generation method.
-	 * 
+	 *
 	 * @param count The number of units to generate
 	 * @param faction Faction shortname
 	 * @param unitType UnitType constant
@@ -141,7 +141,7 @@ public interface IUnitGenerator {
 	List<MechSummary> generate(int count, String faction, int unitType, int weightClass,
 			int year, int quality, Collection<EntityMovementMode> movementModes,
 			Predicate<MechSummary> filter);
-	
+
 	/**
 	 * Generates a list of turrets given a skill level, quality and year
 	 * @param num How many turrets to generate

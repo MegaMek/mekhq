@@ -26,14 +26,14 @@ import mekhq.campaign.unit.Unit;
  *
  */
 public class PersonCrewAssignmentEvent extends PersonChangedEvent {
-    
+
     private final Unit unit;
-    
+
     public PersonCrewAssignmentEvent(Person crew, Unit unit) {
         super(crew);
         this.unit = unit;
     }
-    
+
     public Unit getUnit() {
         return unit;
     }

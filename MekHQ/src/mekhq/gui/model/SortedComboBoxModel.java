@@ -2,7 +2,7 @@
  *  Custom model to make sure the items are stored in a sorted order.
  *  The default is to sort in the natural order of the item, but a
  *  Comparator can be used to customize the sort order.
- *  
+ *
  *  Created by Rob Camick http://tips4java.wordpress.com/
  */
 package mekhq.gui.model;
@@ -15,7 +15,7 @@ import javax.swing.DefaultComboBoxModel;
 public class SortedComboBoxModel<E> extends DefaultComboBoxModel<E> {
 
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 3728158859609424148L;
 	private Comparator<E> comparator;

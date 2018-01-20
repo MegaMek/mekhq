@@ -121,7 +121,7 @@ public class EnginePart extends Part {
 	public long getStickerPrice() {
 		return (long)Math.round((getEngine().getBaseCost()/75.0) * getEngine().getRating() * getUnitTonnage());
 	}
-	
+
 	@Override
 	public void setUnit(Unit u) {
 	    super.setUnit(u);
@@ -460,7 +460,7 @@ public class EnginePart extends Part {
 	public int getLocation() {
 		return Entity.LOC_NONE;
 	}
-	
+
 	@Override
 	public TechAdvancement getTechAdvancement() {
 	    return engine.getTechAdvancement();
@@ -489,7 +489,7 @@ public class EnginePart extends Part {
          }
          return false;
     }
-	
+
 	@Override
 	public int getMassRepairOptionType() {
     	return Part.REPAIR_PART_TYPE.ENGINE;

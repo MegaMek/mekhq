@@ -33,13 +33,13 @@ import mekhq.gui.dialog.DataLoadingDialog;
  */
 public class StartUpGUI extends javax.swing.JPanel {
 
-	
+
 	private static final long serialVersionUID = 8376874926997734492L;
 	MekHQ app;
 	JFrame frame;
 	File lastSave;
 	Image imgSplash;
-	   
+
 	public StartUpGUI(MekHQ app) {
         this.app = app;
         lastSave = Utilities.lastFileModified(MekHQ.CAMPAIGN_DIRECTORY, new FilenameFilter() {
@@ -47,16 +47,16 @@ public class StartUpGUI extends javax.swing.JPanel {
                 return name.toLowerCase().endsWith(".cpnx") || name.toLowerCase().endsWith(".xml");
             }
         });
-        
+
         initComponents();
     }
 
     private void initComponents() {
 
     	frame = new JFrame("MekHQ");
-        
+
         ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.StartUpDialog", new EncodeControl()); //$NON-NLS-1$
-        
+
         btnNewGame = new javax.swing.JButton(resourceMap.getString("btnNewGame.text"));
         btnNewGame.setMinimumSize(new Dimension(200, 25));
         btnNewGame.setPreferredSize(new Dimension(200, 25));
@@ -99,7 +99,7 @@ public class StartUpGUI extends javax.swing.JPanel {
                 System.exit(0);
             }
         });
-        
+
         // initialize splash image
         double maxWidth = app.calculateMaxScreenWidth();
         imgSplash = getToolkit().getImage(app.getIconPackage().getStartupScreenImage((int) maxWidth));
@@ -112,9 +112,9 @@ public class StartUpGUI extends javax.swing.JPanel {
         } catch (InterruptedException e) {
             // really should never come here
         }
-        
+
         setLayout(new BorderLayout(1, 1));
-        
+
         JPanel buttonPanel = new JPanel();
         buttonPanel.setOpaque(false);
         buttonPanel.add(Box.createRigidArea(new Dimension(0,5)));
@@ -126,9 +126,9 @@ public class StartUpGUI extends javax.swing.JPanel {
         buttonPanel.add(Box.createRigidArea(new Dimension(0,5)));
         buttonPanel.add(btnQuit);
         add(buttonPanel, BorderLayout.PAGE_END);
-                
+
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-	    
+
         frame.setSize(imgSplash.getWidth(null), imgSplash.getHeight(null));
         frame.setResizable(false);
 	    // Determine the new location of the window
@@ -136,14 +136,14 @@ public class StartUpGUI extends javax.swing.JPanel {
 	    int h = frame.getSize().height;
 	    int x = (dim.width-w)/2;
 	    int y = (dim.height-h)/2;
-	    
+
 	    // Move the window
 	    frame.setLocation(x, y);
-	    
+
         frame.getContentPane().setLayout(new BorderLayout());
         frame.getContentPane().add(this, BorderLayout.CENTER);
         frame.validate();
-        
+
         frame.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
@@ -153,7 +153,7 @@ public class StartUpGUI extends javax.swing.JPanel {
         });
         frame.setVisible(true);
     }
-    
+
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -163,12 +163,12 @@ public class StartUpGUI extends javax.swing.JPanel {
     private void newCampaign() {
     	loadCampaign(null);
     }
-    
+
     private void loadCampaign(File f) {
-    	DataLoadingDialog dataLoadingDialog = new DataLoadingDialog(app, frame, f);   	
+    	DataLoadingDialog dataLoadingDialog = new DataLoadingDialog(app, frame, f);
     	dataLoadingDialog.setVisible(true);
     }
-    
+
     private File selectLoadCampaignFile() {
 		JFileChooser loadCpgn = new JFileChooser(MekHQ.CAMPAIGN_DIRECTORY);
 		loadCpgn.setDialogTitle("Load Campaign");
@@ -180,12 +180,12 @@ public class StartUpGUI extends javax.swing.JPanel {
 			// I want a file, y'know!
 			return null;
 		}
-		
+
 		File file = loadCpgn.getSelectedFile();
 
 		return file;
 	}
-    
+
     private javax.swing.JButton btnNewGame;
     private javax.swing.JButton btnLoadGame;
     private javax.swing.JButton btnLastSave;

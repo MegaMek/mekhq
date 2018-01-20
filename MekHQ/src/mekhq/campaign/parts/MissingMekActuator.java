@@ -1,20 +1,20 @@
 /*
  * MissingMekActuator.java
- * 
+ *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -45,15 +45,15 @@ public class MissingMekActuator extends MissingPart {
 	public MissingMekActuator() {
 		this(0, 0, null);
 	}
-	
+
     public int getType() {
         return type;
     }
-    
+
     public MissingMekActuator(int tonnage, int type, Campaign c) {
         this(tonnage, type, -1, c);
     }
-    
+
     public MissingMekActuator(int tonnage, int type, int loc, Campaign c) {
     	super(tonnage, c);
         this.type = type;
@@ -61,12 +61,12 @@ public class MissingMekActuator extends MissingPart {
         this.name = m.getSystemName(type) + " Actuator" ;
         this.location = loc;
     }
-    
-    @Override 
+
+    @Override
 	public int getBaseTime() {
 		return isOmniPodded()? 30 : 90;
 	}
-	
+
 	@Override
 	public int getDifficulty() {
 		return -3;
@@ -78,11 +78,11 @@ public class MissingMekActuator extends MissingPart {
     	//apparently nothing
     	return 0;
     }
-    
+
     public int getLocation() {
     	return location;
     }
-    
+
 	@Override
 	public void writeToXml(PrintWriter pw1, int indent) {
 		writeToXmlBegin(pw1, indent);
@@ -100,19 +100,19 @@ public class MissingMekActuator extends MissingPart {
 	@Override
 	protected void loadFieldsFromXmlNode(Node wn) {
 		NodeList nl = wn.getChildNodes();
-		
+
 		for (int x=0; x<nl.getLength(); x++) {
 			Node wn2 = nl.item(x);
-			
+
 			if (wn2.getNodeName().equalsIgnoreCase("type")) {
 				type = Integer.parseInt(wn2.getTextContent());
 			} else if (wn2.getNodeName().equalsIgnoreCase("location")) {
 				location = Integer.parseInt(wn2.getTextContent());
-			} 
+			}
 		}
 	}
 
-	@Override 
+	@Override
 	public void fix() {
 		Part replacement = findReplacement(false);
 		if(null != replacement) {
@@ -122,11 +122,11 @@ public class MissingMekActuator extends MissingPart {
 			replacement.decrementQuantity();
 			((MekActuator)actualReplacement).setLocation(location);
 			remove(false);
-			//assign the replacement part to the unit			
+			//assign the replacement part to the unit
 			actualReplacement.updateConditionFromPart();
 		}
 	}
-	
+
 	@Override
 	public boolean isAcceptableReplacement(Part part, boolean refit) {
 		if(part instanceof MekActuator) {
@@ -135,7 +135,7 @@ public class MissingMekActuator extends MissingPart {
 		}
 		return false;
 	}
-	
+
 	@Override
 	public String checkFixable() {
 		if(null == unit) {
@@ -149,7 +149,7 @@ public class MissingMekActuator extends MissingPart {
 		}
 		return null;
 	}
-	
+
 	@Override
 	public boolean onBadHipOrShoulder() {
 		return null != unit && unit.hasBadHipOrShoulder(location);
@@ -166,12 +166,12 @@ public class MissingMekActuator extends MissingPart {
 			unit.destroySystem(CriticalSlot.TYPE_SYSTEM, type, location);
 		}
 	}
-	
+
 	@Override
 	public boolean isOmniPoddable() {
 		return type == Mech.ACTUATOR_LOWER_ARM || type == Mech.ACTUATOR_HAND;
 	}
-	
+
 	@Override
 	public boolean isOmniPodded() {
 	    return isOmniPoddable() && getUnit() != null && getUnit().getEntity().isOmni();
@@ -181,12 +181,12 @@ public class MissingMekActuator extends MissingPart {
 	public String getLocationName() {
 		return unit.getEntity().getLocationName(location);
 	}
-	
+
     @Override
     public TechAdvancement getTechAdvancement() {
         return (getUnitTonnage() <= 100)? MekActuator.TA_STANDARD : MekActuator.TA_SUPERHEAVY;
     }
-    	
+
 	@Override
 	public int getMassRepairOptionType() {
     	return Part.REPAIR_PART_TYPE.ACTUATOR;

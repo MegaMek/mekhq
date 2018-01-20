@@ -50,12 +50,12 @@ public class MissingAeroHeatSink extends MissingPart {
     	this.type = type;
     	this.name = "Aero Heat Sink";
     }
-    
-    @Override 
+
+    @Override
 	public int getBaseTime() {
 		return isOmniPodded()? 30 : 90;
 	}
-	
+
 	@Override
 	public int getDifficulty() {
 		return -2;
@@ -104,7 +104,7 @@ public class MissingAeroHeatSink extends MissingPart {
 	public int getLocation() {
 		return Entity.LOC_NONE;
 	}
-	
+
     @Override
     public TechAdvancement getTechAdvancement() {
         if (type == Aero.HEAT_SINGLE) {

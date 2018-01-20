@@ -1,20 +1,20 @@
 /*
  * NewsItem.java
- * 
+ *
  * Copyright (c) 2011 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -41,7 +41,7 @@ import mekhq.Utilities;
 
 /**
  * NewsItem
- * 
+ *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 @XmlRootElement(name="newsItem")
@@ -49,7 +49,7 @@ import mekhq.Utilities;
 public class NewsItem {
     private final static DateTimeFormatter FORMATTER =
         DateTimeFormat.forPattern("yyyy-MM-dd").withChronology(GJChronology.getInstanceUTC());
-    
+
     @XmlTransient
     private DateTime date;
     @XmlTransient
@@ -59,13 +59,13 @@ public class NewsItem {
     private String description;
     private String service;
     private String location;
-    
+
     @XmlElement(name="date")
     private String dateString;
-    
+
     //ids will only be assigned when news is read in for the year
     transient private int id;
-    
+
     public NewsItem() {
         this.headline = "None";
         this.location = null;
@@ -73,15 +73,15 @@ public class NewsItem {
         this.description = null;
         this.service = null;
     }
-    
+
     public String getHeadline() {
         return headline;
     }
-    
+
     public void setHeadline(String headline) {
         this.headline = Utilities.nonNull(headline, this.headline);
     }
-    
+
     public void setLocation(String location) {
         this.location = location;
     }
@@ -89,11 +89,11 @@ public class NewsItem {
     public String getDescription() {
         return description;
     }
-    
+
     public void setDescription(String description) {
         this.description = description;
     }
-    
+
     public String getService() {
         return service;
     }
@@ -105,23 +105,23 @@ public class NewsItem {
     public DateTime getDate() {
         return date;
     }
-    
+
     public void setDate(DateTime date) {
         this.date = date;
     }
-    
+
     public int getId() {
         return id;
     }
-    
+
     public void setId(int i) {
         id = i;
     }
-    
+
     public int getYear() {
         return date.getYear();
     }
-    
+
     /** Finalize this news item's date according to its precision, using the supplied seed */
     public void finalizeDate(long seed) {
         if((null == date) || (null == datePrecision) || (datePrecision == Precision.DAY)) {
@@ -145,7 +145,7 @@ public class NewsItem {
         date = date.plusDays(rnd.nextInt(maxRandomDays));
         datePrecision = Precision.DAY;
     }
-    
+
     // Precision-aware year checker
     public boolean isInYear(int year) {
         if(null == date) {
@@ -156,7 +156,7 @@ public class NewsItem {
         }
         return year == date.getYear();
     }
-    
+
     public String getPrefix() {
         String prefix = "";
         if(null != location) {
@@ -173,7 +173,7 @@ public class NewsItem {
         }
         return prefix;
     }
-    
+
     public String getHeadlineForReport() {
         String s = getPrefix() + "<b>" + getHeadline() + "</b>";
         if(null != description) {
@@ -181,12 +181,12 @@ public class NewsItem {
         }
         return s;
     }
-    
+
     public String getFullDescription() {
         String s = "<html><h1>" + getHeadline() + "</h1>(" + date.toString(FORMATTER) + ")<br><p>" + getPrefix() + description + "</p></html>";
         return s;
     }
-    
+
     // JAXB marshalling support
 
     @SuppressWarnings({ "unused" })
@@ -209,7 +209,7 @@ public class NewsItem {
             }
         }
     }
-    
+
     /** News precision enum */
     public static enum Precision { DAY, MONTH, YEAR, DECADE }
 }

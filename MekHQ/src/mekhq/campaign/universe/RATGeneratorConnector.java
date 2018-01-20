@@ -38,13 +38,13 @@ import mekhq.MekHQ;
 
 /**
  * Provides access to RATGenerator through IUnitGenerator interface.
- * 
+ *
  * @author Neoancient
  *
  */
 
 public class RATGeneratorConnector extends AbstractUnitGenerator implements IUnitGenerator {
-	
+
 	/* Initialize RATGenerator and load the data for the current game year */
 	public RATGeneratorConnector(int year) {
 		while (!RATGenerator.getInstance().isInitialized()) {
@@ -56,11 +56,11 @@ public class RATGeneratorConnector extends AbstractUnitGenerator implements IUni
 		}
 		RATGenerator.getInstance().loadYear(year);
 	}
-	
+
 	private UnitTable findTable(String faction, int unitType, int weightClass, int year,
 			int quality, Collection<EntityMovementMode> movementModes) {
 	    final String METHOD_NAME = "findTable(String,int,int,int,int,Collection<EntityMovementMode>)"; //$NON-NLS-1$
-	    
+
 		FactionRecord fRec = RATGenerator.getInstance().getFaction(faction);
 		if (fRec == null) {
 			Faction f = Faction.getFaction(faction);
@@ -68,7 +68,7 @@ public class RATGeneratorConnector extends AbstractUnitGenerator implements IUni
 				if (f.isPeriphery()) {
 					fRec = RATGenerator.getInstance().getFaction("Periphery");
 				} else if (f.isClan()) {
-					fRec = RATGenerator.getInstance().getFaction("CLAN");					
+					fRec = RATGenerator.getInstance().getFaction("CLAN");
 				} else {
 					fRec = RATGenerator.getInstance().getFaction("IS");
 				}
@@ -88,7 +88,7 @@ public class RATGeneratorConnector extends AbstractUnitGenerator implements IUni
 		if (weightClass >= 0) {
 			wcs.add(weightClass);
 		}
-		
+
 		return UnitTable.findTable(fRec, unitType, year, rating, wcs,
 					ModelRecord.NETWORK_NONE, movementModes, new ArrayList<>(), 2, fRec);
 	}

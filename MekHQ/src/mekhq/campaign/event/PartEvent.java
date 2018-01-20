@@ -29,13 +29,13 @@ import mekhq.campaign.parts.Part;
  *
  */
 abstract public class PartEvent extends MMEvent {
-    
+
     private final Part part;
-    
+
     public PartEvent(Part part) {
         this.part = Objects.requireNonNull(part);
     }
-    
+
     public Part getPart() {
         return part;
     }

@@ -7,12 +7,12 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -59,7 +59,7 @@ public final class InjuryTypes {
     public static final InjuryType SEVERED_SPINE = new InjuryTypes.SeveredSpine();
 
     private static boolean registered = false;
-    
+
     /** Register all injury types defined here. Don't use them until you called this once! */
     public static synchronized void registerAll() {
         if(!registered) {
@@ -82,7 +82,7 @@ public final class InjuryTypes {
             registered = true;
         }
     }
-    
+
     private static class AMInjuryType extends InjuryType {
         protected int modifyInjuryTime(Person p, int time) {
             // Randomize healing time
@@ -93,7 +93,7 @@ public final class InjuryTypes {
             }
             return  Math.round(time * mod * p.getAbilityTimeModifier() / 10000);
         }
-        
+
         @Override
         public Injury newInjury(Campaign c, Person p, BodyLocation loc, int severity) {
             Injury result = super.newInjury(c, p, loc, severity);
@@ -103,7 +103,7 @@ public final class InjuryTypes {
             return result;
         }
     }
-    
+
     public static final class SeveredSpine extends AMInjuryType {
         public SeveredSpine() {
             recoveryTime = 180;
@@ -113,12 +113,12 @@ public final class InjuryTypes {
             simpleName = "severed spine";
             level = InjuryLevel.CHRONIC;
         }
-    
+
         @Override
         public String getFluffText(BodyLocation loc, int severity, int gender) {
             return "A severed spine in " + ((loc == BodyLocation.CHEST) ? "upper" : "lower") + " body";
         }
-        
+
         @Override
         public Collection<Modifier> getModifiers(Injury inj) {
             return Arrays.asList(new Modifier(Modifier.Value.PILOTING, Integer.MAX_VALUE,
@@ -134,11 +134,11 @@ public final class InjuryTypes {
             simpleName = "broken back";
             level = InjuryLevel.MAJOR;
         }
-    
+
         @Override
         public List<GameEffect> genStressEffect(Campaign c, Person p, Injury i, int hits) {
             final String METHOD_NAME = "genStressEffect(Campaign,Person,Injury,int"; //$NON-NLS-1$
-            
+
             return Arrays.asList(new GameEffect(
                 "20% chance of severing the spine, permanently paralizing the character",
                 rnd -> {
@@ -153,7 +153,7 @@ public final class InjuryTypes {
                     }
                 }));
         }
-        
+
         @Override
         public Collection<Modifier> getModifiers(Injury inj) {
             return Arrays.asList(
@@ -171,7 +171,7 @@ public final class InjuryTypes {
             simpleName = "CTE";
             level = InjuryLevel.DEADLY;
         }
-    
+
         @Override
         public List<GameEffect> genStressEffect(Campaign c, Person p, Injury i, int hits) {
             final String METHOD_NAME = "genStressEffect(Campaign,Person,Injury,int)"; //$NON-NLS-1$
@@ -203,7 +203,7 @@ public final class InjuryTypes {
                     }));
             }
         }
-        
+
         @Override
         public Collection<Modifier> getModifiers(Injury inj) {
             return Arrays.asList(new Modifier(Modifier.Value.PILOTING, Integer.MAX_VALUE, null, InjuryType.MODTAG_INJURY));
@@ -218,7 +218,7 @@ public final class InjuryTypes {
             simpleName = "punctured lung";
             level = InjuryLevel.MAJOR;
         }
-    
+
         @Override
         public List<GameEffect> genStressEffect(Campaign c, Person p, Injury i, int hits) {
             return Arrays.asList(newResetRecoveryTimeAction(i));
@@ -233,7 +233,7 @@ public final class InjuryTypes {
             simpleName = "cerebral contusion";
             level = InjuryLevel.MAJOR;
         }
-    
+
         @Override
         public List<GameEffect> genStressEffect(Campaign c, Person p, Injury i, int hits) {
             final String METHOD_NAME = "genStressEffect(Campaign,Person,Injury,int)"; //$NON-NLS-1$
@@ -259,7 +259,7 @@ public final class InjuryTypes {
                     })
                 );
         }
-        
+
         @Override
         public Collection<Modifier> getModifiers(Injury inj) {
             return Arrays.asList(new Modifier(Modifier.Value.PILOTING, 2, null, InjuryType.MODTAG_INJURY));
@@ -273,17 +273,17 @@ public final class InjuryTypes {
             simpleName = "lost";
             level = InjuryLevel.CHRONIC;
         }
-    
+
         @Override
         public boolean isValidInLocation(BodyLocation loc) {
             return loc.isLimb;
         }
-        
+
         @Override
         public boolean impliesMissingLocation(BodyLocation loc) {
             return true;
         }
-        
+
         @Override
         public String getName(BodyLocation loc, int severity) {
             return "Missing " + Utilities.capitalize(loc.readableName);
@@ -294,7 +294,7 @@ public final class InjuryTypes {
             return "Lost " + Person.getGenderPronoun(gender, Person.PRONOUN_HISHER) + " "
                 + loc.readableName;
         }
-        
+
         @Override
         public Collection<Modifier> getModifiers(Injury inj) {
             BodyLocation loc = inj.getLocation();
@@ -316,22 +316,22 @@ public final class InjuryTypes {
             maxSeverity = 3;
             simpleName = "internal bleeding";
         }
-    
+
         @Override
         public int getRecoveryTime(int severity) {
             return 20 * severity;
         }
-    
+
         @Override
         public String getName(BodyLocation loc, int severity) {
             return Utilities.capitalize(getFluffText(loc, severity, 0));
         }
-        
+
         @Override
         public InjuryLevel getLevel(Injury i) {
             return (i.getHits() > 2) ? InjuryLevel.DEADLY : InjuryLevel.MAJOR;
         }
-        
+
         @Override
         public String getFluffText(BodyLocation loc, int severity, int gender) {
             switch(severity) {
@@ -406,7 +406,7 @@ public final class InjuryTypes {
             simpleName = "broken collar bone";
             level = InjuryLevel.MAJOR;
         }
-    
+
         @Override
         public List<GameEffect> genStressEffect(Campaign c, Person p, Injury i, int hits) {
             return Arrays.asList(newResetRecoveryTimeAction(i));
@@ -419,12 +419,12 @@ public final class InjuryTypes {
             simpleName = "broken";
             level = InjuryLevel.MAJOR;
         }
-    
+
         @Override
         public boolean isValidInLocation(BodyLocation loc) {
             return loc.isLimb;
         }
-        
+
         @Override
         public String getName(BodyLocation loc, int severity) {
             return "Broken " + Utilities.capitalize(loc.readableName);
@@ -434,12 +434,12 @@ public final class InjuryTypes {
         public String getFluffText(BodyLocation loc, int severity, int gender) {
             return "A broken " + loc.readableName;
         }
-    
+
         @Override
         public List<GameEffect> genStressEffect(Campaign c, Person p, Injury i, int hits) {
             return Arrays.asList(newResetRecoveryTimeAction(i));
         }
-        
+
         @Override
         public Collection<Modifier> getModifiers(Injury inj) {
             BodyLocation loc = inj.getLocation();
@@ -464,7 +464,7 @@ public final class InjuryTypes {
             simpleName = "bruised kidney";
             level = InjuryLevel.MINOR;
         }
-    
+
         @Override
         public List<GameEffect> genStressEffect(Campaign c, Person p, Injury i, int hits) {
             final String METHOD_NAME = "genStressEffect(Campaign,Person,Injury,int)"; //$NON-NLS-1$
@@ -493,7 +493,7 @@ public final class InjuryTypes {
             simpleName = "broken rib";
             level = InjuryLevel.MAJOR;
         }
-    
+
         @Override
         public List<GameEffect> genStressEffect(Campaign c, Person p, Injury i, int hits) {
             final String METHOD_NAME = "genStressEffect(Campaign,Person,Injury,int)"; //$NON-NLS-1$
@@ -529,22 +529,22 @@ public final class InjuryTypes {
             maxSeverity = 2;
             fluffText = "A concussion";
         }
-    
+
         @Override
         public int getRecoveryTime(int severity) {
             return severity >= 2 ? 42 : 14;
         }
-    
+
         @Override
         public InjuryLevel getLevel(Injury i) {
             return (i.getHits() > 1) ? InjuryLevel.MAJOR : InjuryLevel.MINOR;
         }
-        
+
         @Override
         public String getSimpleName(int severity) {
             return ((severity == 1) ? "concussion" : "concussion (severe)");
         }
-        
+
         @Override
         public List<GameEffect> genStressEffect(Campaign c, Person p, Injury i, int hits) {
             final String METHOD_NAME = "genStressEffect(Campaign,Person,Injury,int)"; //$NON-NLS-1$
@@ -578,7 +578,7 @@ public final class InjuryTypes {
                     })
                 );
         }
-        
+
         @Override
         public Collection<Modifier> getModifiers(Injury inj) {
             return Arrays.asList(new Modifier(Modifier.Value.PILOTING, 1, null, InjuryType.MODTAG_INJURY));
@@ -591,12 +591,12 @@ public final class InjuryTypes {
             simpleName = "sprained";
             level = InjuryLevel.MINOR;
         }
-    
+
         @Override
         public boolean isValidInLocation(BodyLocation loc) {
             return loc.isLimb;
         }
-        
+
         @Override
         public String getName(BodyLocation loc, int severity) {
             return "Sprained " + Utilities.capitalize(loc.readableName);
@@ -606,7 +606,7 @@ public final class InjuryTypes {
         public String getFluffText(BodyLocation loc, int severity, int gender) {
             return "A sprained " + loc.readableName;
         }
-        
+
         @Override
         public Collection<Modifier> getModifiers(Injury inj) {
             BodyLocation loc = inj.getLocation();
@@ -627,7 +627,7 @@ public final class InjuryTypes {
             simpleName = "laceration";
             level = InjuryLevel.MINOR;
         }
-    
+
         @Override
         public String getName(BodyLocation loc, int severity) {
             return "Lacerated " + Utilities.capitalize(loc.readableName);
@@ -637,7 +637,7 @@ public final class InjuryTypes {
         public String getFluffText(BodyLocation loc, int severity, int gender) {
             return "A laceration on " + Person.getGenderPronoun(gender, Person.PRONOUN_HISHER) + " head";
         }
-        
+
         @Override
         protected int modifyInjuryTime(Person p, int time) {
             return super.modifyInjuryTime(p, time + Compute.d6());
@@ -650,12 +650,12 @@ public final class InjuryTypes {
             simpleName = "bruised";
             level = InjuryLevel.MINOR;
         }
-    
+
         @Override
         public boolean isValidInLocation(BodyLocation loc) {
             return loc.isLimb || super.isValidInLocation(loc);
         }
-        
+
         @Override
         public String getName(BodyLocation loc, int severity) {
             return "Bruised " + Utilities.capitalize(loc.readableName);
@@ -666,7 +666,7 @@ public final class InjuryTypes {
             return "A bruise on " + Person.getGenderPronoun(gender, Person.PRONOUN_HISHER) + " "
                 + loc.readableName;
         }
-        
+
         @Override
         protected int modifyInjuryTime(Person p, int time) {
             return super.modifyInjuryTime(p, time + Compute.d6());
@@ -679,7 +679,7 @@ public final class InjuryTypes {
             simpleName = "cut";
             level = InjuryLevel.MINOR;
         }
-    
+
         @Override
         public boolean isValidInLocation(BodyLocation loc) {
             return loc.isLimb || super.isValidInLocation(loc);
@@ -689,13 +689,13 @@ public final class InjuryTypes {
         public String getName(BodyLocation loc, int severity) {
             return "Cut " + Utilities.capitalize(loc.readableName);
         }
-        
+
         @Override
         public String getFluffText(BodyLocation loc, int severity, int gender) {
             return "Some cuts on " + Person.getGenderPronoun(gender, Person.PRONOUN_HISHER) + " "
                 + loc.readableName;
         }
-        
+
         @Override
         protected int modifyInjuryTime(Person p, int time) {
             return super.modifyInjuryTime(p, time + Compute.d6());

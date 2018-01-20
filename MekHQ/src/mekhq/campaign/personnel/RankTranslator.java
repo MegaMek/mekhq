@@ -13,12 +13,12 @@ public class RankTranslator {
 	public static final int RT_CL =  6;
 	public static final int RT_CUSTOM = 7;
 	public static final int RT_NUM = 8;
-	
+
 	public static final String[] oldRankNames = {
 		"Star League", "Federated Sun", "Lyran Alliance", "Free Worlds League",
 		"Capellan Confederation", "Draconis Combine", "Clan", "Custom"
 	};
-	
+
 	public static final String[][] oldRankSystems = {
 		{"None","Recruit","Private","Corporal","Sergeant","Master Sergeant","Warrant Officer","Lieutenant JG","Captain","Major","Colonel","Lt. General","Major General","General","Commanding General"},
 		{"None","Recruit","Private","Private, FC","Corporal","Sergeant","Sergeant Major","Command Sergeant-Major","Cadet","Subaltern","Leftenant","Captain","Major","Leftenant Colonel","Colonel","Leftenant General","Major General","General","Marshal","Field Marshal","Marshal of the Armies"},
@@ -28,21 +28,21 @@ public class RankTranslator {
 		{"None","Hojuhei","Heishi","Gunjin","Go-cho","Gunsho","Shujin","Kashira","Sho-ko","Chu-i","Tai-i","Sho-sa","Chu-sa","Tai-sa","Sho-sho","Tai-sho","Tai-shu","Gunji-no-Kanrei"},
 		{"None","Point","Point Commander","Star Commander","Star Captain","Star Colonel","Galaxy Commander","Khan","ilKhan"}
 	};
-	
+
 	private Campaign campaign;
-	
+
 	public RankTranslator(Campaign c) {
 		campaign = c;
 	}
-	
+
 	public int getNewRank(int oldSystem, int oldRank) throws ArrayIndexOutOfBoundsException {
 		Ranks ranks = Ranks.getRanksFromSystem(RankTranslator.translateRankSystem(oldSystem, campaign.getFactionCode()));
 		String rankName;
-		
+
 		// Try and acquire the rank name...
 		try {
 			rankName = oldRankSystems[oldSystem][oldRank];
-			
+
 			for (int rankNum = Ranks.RE_MIN; rankNum < Ranks.RC_NUM; rankNum++) {
 				if (ranks.getRank(rankNum).getName(Ranks.RPROF_MW).equals(rankName)) {
 					return rankNum;
@@ -51,11 +51,11 @@ public class RankTranslator {
 		} catch (ArrayIndexOutOfBoundsException e) {
 			throw e;
 		}
-		
+
 		// If we didn't find anything to translate to, then we can kick them as Rank "None"
 		return 0;
 	}
-	
+
 	public static int translateRankSystem(int old, String faction) {
 		switch(old) {
 			case RT_SL: return Ranks.RS_SL;

@@ -30,11 +30,11 @@ import mekhq.campaign.work.IAcquisitionWork;
 public class AcquisitionEvent extends MMEvent {
 
     private final IAcquisitionWork acquisition;
-    
+
     public AcquisitionEvent(IAcquisitionWork acquisition) {
         this.acquisition = acquisition;
     }
-    
+
     public IAcquisitionWork getAcquisition() {
         return acquisition;
     }

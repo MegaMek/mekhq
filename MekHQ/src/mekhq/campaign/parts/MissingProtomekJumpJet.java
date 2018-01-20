@@ -1,20 +1,20 @@
 /*
  * MissingProtomekJumpJet.java
- * 
+ *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -41,22 +41,22 @@ public class MissingProtomekJumpJet extends MissingPart {
     public MissingProtomekJumpJet() {
         this(0, null);
     }
-    
+
     public MissingProtomekJumpJet(int tonnage, Campaign c) {
         super(tonnage, c);
         this.name = "Protomech Jump Jet";
     }
-    
-    @Override 
+
+    @Override
 	public int getBaseTime() {
 		return 60;
 	}
-	
+
 	@Override
 	public int getDifficulty() {
 		return 0;
 	}
-   
+
     @Override
     public double getTonnage() {
         if(getUnitTonnage() <=5) {
@@ -74,7 +74,7 @@ public class MissingProtomekJumpJet extends MissingPart {
 
     @Override
     protected void loadFieldsFromXmlNode(Node wn) {
-        
+
     }
 
     @Override
@@ -107,7 +107,7 @@ public class MissingProtomekJumpJet extends MissingPart {
         return null;
     }
 
-    @Override 
+    @Override
     public void fix() {
         Part replacement = findReplacement(false);
         if(null != replacement) {
@@ -116,11 +116,11 @@ public class MissingProtomekJumpJet extends MissingPart {
             campaign.addPart(actualReplacement, 0);
             replacement.decrementQuantity();
             remove(false);
-            //assign the replacement part to the unit           
+            //assign the replacement part to the unit
             actualReplacement.updateConditionFromPart();
         }
     }
-    
+
     @Override
     public boolean isAcceptableReplacement(Part part, boolean refit) {
         return part instanceof ProtomekJumpJet
@@ -131,7 +131,7 @@ public class MissingProtomekJumpJet extends MissingPart {
     public Part getNewPart() {
         return new ProtomekJumpJet(getUnitTonnage(), campaign);
     }
-    
+
     private int getOtherDamagedJumpJets() {
         int damagedJJ = 0;
         if(null != unit) {
@@ -139,7 +139,7 @@ public class MissingProtomekJumpJet extends MissingPart {
                 if(p.getId() == this.getId()) {
                     continue;
                 }
-                if(p instanceof MissingProtomekJumpJet 
+                if(p instanceof MissingProtomekJumpJet
                         || (p instanceof ProtomekJumpJet && ((ProtomekJumpJet)p).needsFixing())) {
                     damagedJJ++;
                 }
@@ -158,7 +158,7 @@ public class MissingProtomekJumpJet extends MissingPart {
 	public int getLocation() {
 		return Entity.LOC_NONE;
 	}
-	
+
     @Override
     public TechAdvancement getTechAdvancement() {
         return ProtomekJumpJet.TECH_ADVANCEMENT;

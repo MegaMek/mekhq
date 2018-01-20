@@ -25,20 +25,20 @@ import javax.swing.table.TableColumn;
 	 */
 	public class XTableColumnModel extends DefaultTableColumnModel {
 	    /**
-		 * 
+		 *
 		 */
 		private static final long serialVersionUID = 4776942586030985204L;
 		/** Array of TableColumn objects in this model.
 	     *  Holds all column objects, regardless of their visibility
 	     */
 	    protected Vector<TableColumn> allTableColumns = new Vector<TableColumn>();
-	    
+
 	    /**
 	     * Creates an extended table column model.
 	     */
 	    public XTableColumnModel() {
 	    }
-	    
+
 	    /**
 	     * Sets the visibility of the specified TableColumn.
 	     * The call is ignored if the TableColumn is not found in this column model
@@ -60,11 +60,11 @@ import javax.swing.table.TableColumn;
 	            int noVisibleColumns    = tableColumns.size();
 	            int noInvisibleColumns  = allTableColumns.size();
 	            int visibleIndex        = 0;
-	            
+
 	            for(int invisibleIndex = 0; invisibleIndex < noInvisibleColumns; ++invisibleIndex) {
 	                TableColumn visibleColumn   = (visibleIndex < noVisibleColumns ? (TableColumn)tableColumns.get(visibleIndex) : null);
 	                TableColumn testColumn      = (TableColumn)allTableColumns.get(invisibleIndex);
-	                
+
 	                if(testColumn == column) {
 	                    if(visibleColumn != column) {
 	                        super.addColumn(column);
@@ -78,24 +78,24 @@ import javax.swing.table.TableColumn;
 	            }
 	        }
 	    }
-	    
+
 	    /**
 	     * Makes all columns in this model visible
 	     */
 	    public void setAllColumnsVisible() {
 	        int noColumns       = allTableColumns.size();
-	        
+
 	        for(int columnIndex = 0; columnIndex < noColumns; ++columnIndex) {
 	            TableColumn visibleColumn = (columnIndex < tableColumns.size() ? (TableColumn)tableColumns.get(columnIndex) : null);
 	            TableColumn invisibleColumn = (TableColumn)allTableColumns.get(columnIndex);
-	            
+
 	            if(visibleColumn != invisibleColumn) {
 	                super.addColumn(invisibleColumn);
 	                super.moveColumn(tableColumns.size() - 1, columnIndex);
 	            }
 	        }
 	    }
-	    
+
 	   /**
 	    * Maps the index of the column in the table model at
 	    * <code>modelColumnIndex</code> to the TableColumn object.
@@ -113,32 +113,32 @@ import javax.swing.table.TableColumn;
 	        }
 	        return null;
 	    }
-	    
+
 	/** Checks wether the specified column is currently visible.
 	 * @param aColumn column to check
 	 * @return visibility of specified column (false if there is no such column at all. [It's not visible, right?])
-	 */    
+	 */
 	    public boolean isColumnVisible(TableColumn aColumn) {
 	        return (tableColumns.indexOf(aColumn) >= 0);
 	    }
-	    
+
 	/** Append <code>column</code> to the right of exisiting columns.
 	 * Posts <code>columnAdded</code> event.
 	 * @param column The column to be added
 	 * @see #removeColumn
 	 * @exception IllegalArgumentException if <code>column</code> is <code>null</code>
-	 */    
+	 */
 	    public void addColumn(TableColumn column) {
 	        allTableColumns.addElement(column);
 	        super.addColumn(column);
 	    }
-	    
+
 	/** Removes <code>column</code> from this column model.
 	 * Posts <code>columnRemoved</code> event.
 	 * Will do nothing if the column is not in this model.
 	 * @param column the column to be added
 	 * @see #addColumn
-	 */    
+	 */
 	    public void removeColumn(TableColumn column) {
 	        int allColumnsIndex = allTableColumns.indexOf(column);
 	        if(allColumnsIndex != -1) {
@@ -146,7 +146,7 @@ import javax.swing.table.TableColumn;
 	        }
 	        super.removeColumn(column);
 	    }
-	    
+
 	    /** Moves the column from <code>oldIndex</code> to <code>newIndex</code>.
 	     * Posts  <code>columnMoved</code> event.
 	     * Will not move any columns if <code>oldIndex</code> equals <code>newIndex</code>.
@@ -161,10 +161,10 @@ import javax.swing.table.TableColumn;
 		if ((oldIndex < 0) || (oldIndex >= getColumnCount()) ||
 		    (newIndex < 0) || (newIndex >= getColumnCount()))
 		    throw new IllegalArgumentException("moveColumn() - Index out of range");
-	        
+
 	        TableColumn fromColumn  = (TableColumn) tableColumns.get(oldIndex);
 	        TableColumn toColumn    = (TableColumn) tableColumns.get(newIndex);
-	        
+
 	        int allColumnsOldIndex  = allTableColumns.indexOf(fromColumn);
 	        int allColumnsNewIndex  = allTableColumns.indexOf(toColumn);
 
@@ -172,7 +172,7 @@ import javax.swing.table.TableColumn;
 	            allTableColumns.removeElementAt(allColumnsOldIndex);
 	            allTableColumns.insertElementAt(fromColumn, allColumnsNewIndex);
 	        }
-	        
+
 	        super.moveColumn(oldIndex, newIndex);
 	    }
 
@@ -196,7 +196,7 @@ import javax.swing.table.TableColumn;
 	     */
 	    public Enumeration<?> getColumns(boolean onlyVisible) {
 	        Vector<?> columns = (onlyVisible ? tableColumns : allTableColumns);
-	        
+
 		return columns.elements();
 	    }
 
@@ -225,14 +225,14 @@ import javax.swing.table.TableColumn;
 	        Vector<?>      columns     = (onlyVisible ? tableColumns : allTableColumns);
 	        int         noColumns   = columns.size();
 	        TableColumn column;
-	        
+
 	        for(int columnIndex = 0; columnIndex < noColumns; ++columnIndex) {
 		    column = (TableColumn)columns.get(columnIndex);
 
 	            if(identifier.equals(column.getIdentifier()))
 			return columnIndex;
 	        }
-	        
+
 		throw new IllegalArgumentException("Identifier not found");
 	    }
 

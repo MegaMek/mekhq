@@ -76,7 +76,7 @@ public class Planet implements Serializable {
     private static final long serialVersionUID = -8699502165157515100L;
 
     // Star classification data and methods
-    
+
     public static final int SPECTRAL_O = 0;
     public static final int SPECTRAL_B = 1;
     public static final int SPECTRAL_A = 2;
@@ -91,8 +91,8 @@ public class Planet implements Serializable {
     public static final int SPECTRAL_D = 99;
     // "Q" - not a proper star (neutron stars QN, pulsars QP, black holes QB, ...)
     public static final int SPECTRAL_Q = 100;
-    // TODO: Wolf-Rayet stars ("W"), carbon stars ("C"), S-type stars ("S"), 
-    
+    // TODO: Wolf-Rayet stars ("W"), carbon stars ("C"), S-type stars ("S"),
+
     public static final String LUM_0           = "0"; //$NON-NLS-1$
     public static final String LUM_IA          = "Ia"; //$NON-NLS-1$
     public static final String LUM_IAB         = "Iab"; //$NON-NLS-1$
@@ -113,7 +113,7 @@ public class Planet implements Serializable {
     public static final String LUM_VI_PLUS     = "VI+"; //$NON-NLS-1$
     // always used as class designation "D", never as a suffix
     public static final String LUM_VII         = "VII"; //$NON-NLS-1$
-    
+
     @XmlElement(name = "xcood")
     private Double x;
     @XmlElement(name = "ycood")
@@ -140,13 +140,13 @@ public class Planet implements Serializable {
     private Double orbitEccentricity;
     /** Degrees to the system's invariable plane */
     private Double orbitInclination;
-    
+
     // Stellar neighbourhood
     @XmlElement(name="satellites")
     private Integer numSatellites;
     @XmlElement(name="satellite")
     private List<String> satellites;
-    
+
     // Global physical characteristics
     /** Mass in Earth masses */
     private Double mass;
@@ -159,7 +159,7 @@ public class Planet implements Serializable {
     private Double tilt;
     @XmlElement(name = "class")
     private String className;
-    
+
     // Surface description
     private Integer percentWater;
     @XmlElement(name = "volcanism")
@@ -189,12 +189,12 @@ public class Planet implements Serializable {
     private Integer temperature;
     @XmlJavaTypeAdapter(ClimateAdapter.class)
     private Climate climate;
-    
+
     // Ecosphere
     @XmlJavaTypeAdapter(LifeFormAdapter.class)
     private LifeForm lifeForm;
     private Integer habitability;
-    
+
     // Human influence
     /** Order of magnitude of the population - 1 */
     @XmlElement(name = "pop")
@@ -208,7 +208,7 @@ public class Planet implements Serializable {
     @XmlElement(name = "faction")
     @XmlJavaTypeAdapter(StringListAdapter.class)
     private List<String> factions;
-    
+
     //private List<String> garrisonUnits;
 
     // Fluff
@@ -224,7 +224,7 @@ public class Planet implements Serializable {
      */
     @XmlTransient
     TreeMap<DateTime, PlanetaryEvent> events;
-    
+
     //a hash to keep track of dynamic garrison changes
     //TreeMap<DateTime, List<String>> garrisonHistory;
 
@@ -245,18 +245,18 @@ public class Planet implements Serializable {
     public Planet(String id) {
         this.id = id;
     }
-    
+
     /**
      * Overloaded constructor that parses out a single line of tsv data for a planet
      * with the help of a list of event years
      * @param tsvData tab-separated data line
      * @param years The list of years acquired from the tsv file
-     * @throws Exception 
+     * @throws Exception
      */
     public Planet(String tsvData, List<DateTime> years) throws Exception {
         eventList = new ArrayList<>();
         events = new TreeMap<>();
-        
+
         // map of faction names that are different in the SUCS data, but have a correspondence to our factions
         Map<String, String> factionReplacements = new HashMap<>();
         factionReplacements.put("LC", "LA");
@@ -264,30 +264,30 @@ public class Planet implements Serializable {
         factionReplacements.put("A", "ABN");
         factionReplacements.put("I", "IND");
         factionReplacements.put("", "UND"); // no data. defaulting to "undiscovered"
-        
+
         try {
             // "Name" \t X-coordinate \t Y-coordinate \t "Ownership info".
             //      "Ownership info" breaks down to "FactionCode, irrelevantstuff"
             String[] infoElements = tsvData.split("\t");
-            
+
             // sometimes, names are formatted like this:
             // Primary Name (Alternate Name)
             // Primary Name (Alternate Name YEAR+)
-            
+
             String nameString = infoElements[0].replace("\"", ""); // get rid of surrounding quotation marks
             int plusIndex = nameString.indexOf('+');
             int nameChangeYear = 2000;
-            
+
             // this indicates that there's an (Alternate Name YEAR+) here
             if(plusIndex > 0) {
                 String yearString = nameString.substring(plusIndex - 4, plusIndex);
                 nameChangeYear = Integer.parseInt(yearString);
             }
-            
+
             // this is a dirty hack: in order to avoid colliding with faction changes, we
             // set name changes to be a second into the new year
             DateTime nameChangeYearDate = new DateTime(nameChangeYear, 1, 1, 0, 0, 1, 0);
-            
+
             String altName;
             String primaryName = nameString;
             PlanetaryEvent nameChangeEvent = null;
@@ -303,39 +303,39 @@ public class Planet implements Serializable {
                 else {
                     altName = nameString.substring(parenIndex + 1, closingParenIndex);
                 }
-                
+
                 // there are a few situations where all this stuff with parens is for naught, which is
                 // PlanetName (FactionCode) or if the PlanetName (AltName) is already in our planets "database"
-                
+
                 if(null == Faction.getFaction(altName) && null == Planets.getInstance().getPlanetById(primaryName)) {
                     primaryName = nameString.substring(0, parenIndex - 1);
-                    
+
                     nameChangeEvent = new PlanetaryEvent();
                     nameChangeEvent.date = nameChangeYearDate;
                     nameChangeEvent.name = altName;
                 }
             }
-            
+
             // now we have a primary name and possibly a name change planetary event
             this.name = primaryName;
-            
+
             if(null != nameChangeEvent) {
                 this.events.put(nameChangeYearDate, nameChangeEvent);
                 this.eventList.add(nameChangeEvent);
             }
-            
+
             this.id = this.name;
             this.x = Double.parseDouble(infoElements[1]);
             this.y = Double.parseDouble(infoElements[2]);
-            
+
             for(int x = 3; x < infoElements.length; x++) {
                 String infoElement = infoElements[x].replace("\"", "");
                 String newFaction;
-                
+
                 if(infoElement.trim().length() == 0) {
                     newFaction = "";
                 }
-                
+
                 int commaIndex = infoElement.indexOf(',');
                 if(commaIndex < 0) { // sometimes there are no commas
                     newFaction = infoElement;
@@ -344,15 +344,15 @@ public class Planet implements Serializable {
                     // we also want to forego the opening quote
                     newFaction = infoElement.substring(0, commaIndex);
                 }
-                
+
                 //dirty hack, replace faction name with one we can use
                 if(factionReplacements.containsKey(newFaction)) {
                     newFaction = factionReplacements.get(newFaction);
                 }
-                
+
                 // for brevity, only add the new event if the faction hasn't changed since the previous event
                 // or if it's the first event
-                
+
                 // dirty hack here assumes that there's only one faction per event, which is true in the case
                 // of this spreadsheet
                 if(x == 3 || !eventList.get(eventList.size() - 1).faction.get(0).equals(newFaction)) {
@@ -361,8 +361,8 @@ public class Planet implements Serializable {
                     pe.faction = new ArrayList<String>();
                     pe.faction.add(newFaction);
                     pe.date = eventDate;
-                    
-                    this.eventList.add(pe);                
+
+                    this.eventList.add(pe);
                     this.events.put(eventDate, pe);
                 }
             }
@@ -374,7 +374,7 @@ public class Planet implements Serializable {
     }
 
     // Constant base data
-    
+
     public String getId() {
         return id;
     }
@@ -382,23 +382,23 @@ public class Planet implements Serializable {
     public String getClassName() {
         return className;
     }
-    
+
     public Double getGravity() {
         return gravity;
     }
-    
+
     public Double getMass() {
         return mass;
     }
-    
+
     public Double getDensity() {
         return density;
     }
-    
+
     public Double getRadius() {
         return radius;
     }
-    
+
     public String getGravityText() {
         return null != gravity ? gravity.toString() + "g" : "unknown"; //$NON-NLS-1$
     }
@@ -406,7 +406,7 @@ public class Planet implements Serializable {
     public Double getOrbitSemimajorAxis() {
         return orbitSemimajorAxis;
     }
-    
+
     /** @return orbital semimajor axis in km; in the middle of the star's life zone if not set */
     public double getOrbitSemimajorAxisKm() {
         return null != orbitSemimajorAxis ? orbitSemimajorAxis * StarUtil.AU : getStarAverageLifeZone();
@@ -430,7 +430,7 @@ public class Planet implements Serializable {
     public String getLandMassDescription() {
         return null != landMasses ? Utilities.combineString(landMasses, ", ") : ""; //$NON-NLS-1$ //$NON-NLS-2$
     }
-    
+
     public Integer getVolcanicActivity() {
         return volcanicActivity;
     }
@@ -442,11 +442,11 @@ public class Planet implements Serializable {
     public Double getDayLength() {
         return dayLength;
     }
-    
+
     public Integer getSystemPosition() {
         return sysPos;
     }
-    
+
     public String getSystemPositionText() {
         return null != sysPos ? sysPos.toString() : "?"; //$NON-NLS-1$
     }
@@ -462,17 +462,17 @@ public class Planet implements Serializable {
     public Double getTilt() {
         return tilt;
     }
-    
+
     public String getDescription() {
         return desc;
     }
-    
+
     public String getIcon() {
         return icon;
     }
-    
+
     // Constant stellar data (to be moved out later)
-    
+
     public Double getX() {
         return x;
     }
@@ -484,12 +484,12 @@ public class Planet implements Serializable {
     public String getSpectralType() {
         return spectralType;
     }
-    
+
     /** @return normalized spectral type, for display */
     public String getSpectralTypeNormalized() {
         return null != spectralType ? StarUtil.getSpectralType(spectralClass, subtype, luminosity) : "?"; //$NON-NLS-1$
     }
-    
+
     public String getSpectralTypeText() {
         if(null == spectralType || spectralType.isEmpty()) {
             return "unknown";
@@ -522,7 +522,7 @@ public class Planet implements Serializable {
     }
 
     // Date-dependant data
-    
+
     @SuppressWarnings("unchecked")
     public PlanetaryEvent getOrCreateEvent(DateTime when) {
         if(null == when) {
@@ -539,21 +539,21 @@ public class Planet implements Serializable {
         }
         return event;
     }
-    
+
     public PlanetaryEvent getEvent(DateTime when) {
         if((null == when) || (null == events)) {
             return null;
         }
         return events.get(when);
     }
-    
+
     public List<PlanetaryEvent> getEvents() {
         if( null == events ) {
             return null;
         }
         return new ArrayList<PlanetaryEvent>(events.values());
     }
-    
+
     protected <T> T getEventData(DateTime when, T defaultValue, EventGetter<T> getter) {
         if( null == when || null == events || null == getter ) {
             return defaultValue;
@@ -567,7 +567,7 @@ public class Planet implements Serializable {
         }
         return result;
     }
-    
+
     /** @return events for this year. Never returns <i>null</i>. */
     public List<PlanetaryEvent> getEvents(int year) {
         if( null == events ) {
@@ -584,7 +584,7 @@ public class Planet implements Serializable {
         }
         return result;
     }
-    
+
     public String getName(DateTime when) {
         return getEventData(when, name, new EventGetter<String>() {
             @Override public String get(PlanetaryEvent e) { return e.name; }
@@ -596,14 +596,14 @@ public class Planet implements Serializable {
             @Override public String get(PlanetaryEvent e) { return e.shortName; }
         });
     }
-    
+
     public List<String> getNames() {
         List<String> names = new ArrayList<>();
-        
+
         for(PlanetaryEvent p : events.values()) {
             names.add(p.name);
         }
-        
+
         return names;
     }
 
@@ -615,7 +615,7 @@ public class Planet implements Serializable {
         }
         return null != result ? result : "unnamed"; //$NON-NLS-1$
     }
-    
+
     public SocioIndustrialData getSocioIndustrial(DateTime when) {
         return getEventData(when, socioIndustrial, new EventGetter<SocioIndustrialData>() {
             @Override public SocioIndustrialData get(PlanetaryEvent e) { return e.socioIndustrial; }
@@ -642,12 +642,12 @@ public class Planet implements Serializable {
             @Override public Integer get(PlanetaryEvent e) { return e.populationRating; }
         });
     }
-    
+
     public String getPopulationRatingString(DateTime when) {
         Integer pops = getPopulationRating(when);
         return (null != pops) ? StarUtil.getPopulationRatingString(pops.intValue()) : "unknown";
     }
-    
+
     public String getGovernment(DateTime when) {
         return getEventData(when, government, new EventGetter<String>() {
             @Override public String get(PlanetaryEvent e) { return e.government; }
@@ -659,12 +659,12 @@ public class Planet implements Serializable {
             @Override public Integer get(PlanetaryEvent e) { return e.controlRating; }
         });
     }
-    
+
     public String getControlRatingString(DateTime when) {
         Integer cr = getControlRating(when);
         return (null != cr) ? StarUtil.getControlRatingString(cr.intValue()) : "actual situation unclear";
     }
-    
+
     public LifeForm getLifeForm(DateTime when) {
         return getEventData(when, null != lifeForm ? lifeForm : LifeForm.NONE, new EventGetter<LifeForm>() {
             @Override public LifeForm get(PlanetaryEvent e) { return e.lifeForm; }
@@ -697,13 +697,13 @@ public class Planet implements Serializable {
             @Override public Integer get(PlanetaryEvent e) { return e.temperature; }
         });
     }
-    
+
     public Integer getPressure(DateTime when) {
         return getEventData(when, pressure, new EventGetter<Integer>() {
             @Override public Integer get(PlanetaryEvent e) { return e.pressure; }
         });
     }
-    
+
     public String getPressureName(DateTime when) {
         Integer currentPressure = getPressure(when);
         return null != currentPressure ? PlanetaryConditions.getAtmosphereDisplayableName(currentPressure) : "unknown";
@@ -774,7 +774,7 @@ public class Planet implements Serializable {
     }
 
     // Stellar event data, to be moved
-    
+
     public Boolean isNadirCharge(DateTime when) {
         return getEventData(when, nadirCharge, new EventGetter<Boolean>() {
             @Override public Boolean get(PlanetaryEvent e) { return e.nadirCharge; }
@@ -800,7 +800,7 @@ public class Planet implements Serializable {
             return "None";
         }
     }
-    
+
     /** Recharge time in hours (assuming the usage of the fastest charing method available) */
     public double getRechargeTime(DateTime when) {
         if(isZenithCharge(when) || isNadirCharge(when)) {
@@ -809,7 +809,7 @@ public class Planet implements Serializable {
             return getSolarRechargeTime();
         }
     }
-    
+
     /** Recharge time in hours using solar radiation alone (at jump point and 100% efficiency) */
     public double getSolarRechargeTime() {
         if( null == spectralClass || null == subtype ) {
@@ -826,9 +826,9 @@ public class Planet implements Serializable {
             return String.format("%.0f hours", time); //$NON-NLS-1$
         }
     }
-    
+
     // Astronavigation
-    
+
     /** @return the average travel time from low orbit to the jump point at 1g, in Terran days */
     public double getTimeToJumpPoint(double acceleration) {
         //based on the formula in StratOps
@@ -846,7 +846,7 @@ public class Planet implements Serializable {
         }
         return StarUtil.getDistanceToJumpPoint(spectralClass, subtype);
     }
-    
+
     /** @return the rough middle of the habitable zone around this star, in km */
     private double getStarAverageLifeZone() {
         // TODO Calculate from luminosity and the like. For now, using the table in IO Beta.
@@ -855,7 +855,7 @@ public class Planet implements Serializable {
         }
         return (StarUtil.getMinLifeZone(spectralClass, subtype) + StarUtil.getMaxLifeZone(spectralClass, subtype)) / 2;
     }
-    
+
     /** @return the distance to another planet in light years (0 if both are in the same system) */
     public double getDistanceTo(Planet anotherPlanet) {
         return Math.sqrt(Math.pow(x - anotherPlanet.x, 2) + Math.pow(y - anotherPlanet.y, 2));
@@ -867,13 +867,13 @@ public class Planet implements Serializable {
     }
 
     // JAXB marshalling support
-    
+
     @SuppressWarnings({ "unused", "unchecked" })
     private void afterUnmarshal(Unmarshaller unmarshaller, Object parent) {
         if( null == id ) {
             id = name;
         }
-        
+
         // Spectral classification: use spectralType if available, else the separate values
         if( null != spectralType ) {
             setSpectralType(spectralType);
@@ -886,8 +886,8 @@ public class Planet implements Serializable {
         if( null == spectralType ) {
             setSpectralType(StarUtil.generateSpectralType(
                 new Random(id.hashCode() + 133773), true, (null != spectralClass) ? spectralClass.intValue() : -1));
-        }        
-        
+        }
+
         // Fill up events
         events = new TreeMap<DateTime, PlanetaryEvent>(DateTimeComparator.getDateOnlyInstance());
         if( null != eventList ) {
@@ -911,50 +911,50 @@ public class Planet implements Serializable {
         }
         factionChanges = null;
     }
-    
+
     @SuppressWarnings("unused")
     private boolean beforeMarshal(Marshaller marshaller) {
         // Fill up our event list from the internal data type
         eventList = new ArrayList<PlanetaryEvent>(events.values());
         return true;
     }
-    
+
     /** Includes a parser for spectral type strings */
     protected void setSpectralType(String type) {
         SpectralDefinition scDef = StarUtil.parseSpectralType(type);
-        
+
         if( null == scDef ) {
             return;
         }
-        
+
         spectralType = scDef.spectralType;
         spectralClass = scDef.spectralClass;
         subtype = scDef.subtype;
         luminosity = scDef.luminosity;
     }
-    
+
     /**
      * Updates the current planet's coordinates and faction ownership from the given other planet.
      * Makes several assumptions about the way the other planet's ownership events are structured.
      * @param tsvPlanet The planet from which to update.
      * @param dryRun Whether to actually perform the updates.
-     * @return Human readable form of what was/would have been updated. 
+     * @return Human readable form of what was/would have been updated.
      */
     public String updateFromTSVPlanet(Planet tsvPlanet, boolean dryRun) {
         StringBuilder sb = new StringBuilder();
-        
+
         if(!tsvPlanet.x.equals(this.x) || !tsvPlanet.y.equals(this.y)) {
             sb.append("Coordinate update from " + x + ", " + y + " to " + tsvPlanet.x + ", " + tsvPlanet.y + "\r\n");
-            
+
             if(!dryRun) {
                 this.x = tsvPlanet.x;
                 this.y = tsvPlanet.y;
             }
         }
-        
+
         // loop using index
         // look ahead by one event (if possible) and check that getFaction(next event year) isn't already
-        // the same as the faction from the current event : sometimes, our data is more exact than the incoming data 
+        // the same as the faction from the current event : sometimes, our data is more exact than the incoming data
         for(int eventIndex = 0; eventIndex < tsvPlanet.getEvents().size(); eventIndex++) {
             PlanetaryEvent event = tsvPlanet.getEvents().get(eventIndex);
             // check other planet events (currently only updating faction change events)
@@ -962,43 +962,43 @@ public class Planet implements Serializable {
             // check that this planet does not have an existing non-"U" faction already owning it at the event date
             // and does not acquire such a faction between this and the next event
             // Then we will add an the ownership change event
-            
-            if(event.faction != null && event.faction.size() > 0) { 
-                // the purpose of this code is to evaluate whether the current "other planet" event is 
+
+            if(event.faction != null && event.faction.size() > 0) {
+                // the purpose of this code is to evaluate whether the current "other planet" event is
                 // a faction change to an active, valid faction.
                 Faction eventFaction = Faction.getFaction(event.faction.get(0));
                 boolean eventHasActualFaction = eventFaction != null ? !eventFaction.is(Tag.INACTIVE) && !eventFaction.is(Tag.ABANDONED) : false;
-                
+
                 if(eventHasActualFaction) {
                     List<String> currentFactions = this.getFactions(event.date);
-                                         
-                    // if this planet has an "inactive and abandoned" current faction... 
-                    // we also want to catch the situation where the next faction change isn't to the same exact faction 
-                    if(currentFactions.size() == 1 && 
+
+                    // if this planet has an "inactive and abandoned" current faction...
+                    // we also want to catch the situation where the next faction change isn't to the same exact faction
+                    if(currentFactions.size() == 1 &&
                             Faction.getFaction(currentFactions.get(0)).is(Tag.INACTIVE) &&
                             Faction.getFaction(currentFactions.get(0)).is(Tag.ABANDONED)) {
-                        
+
                         // now we travel into the future, to the next "other" event, and if this planet has acquired a faction
                         // before the next "other" event, then we
-                        int nextEventIndex = eventIndex + 1;                        
+                        int nextEventIndex = eventIndex + 1;
                         PlanetaryEvent nextEvent = nextEventIndex < tsvPlanet.getEvents().size() ? tsvPlanet.getEvents().get(nextEventIndex) : null;
-                        DateTime nextEventDate; 
-                        
+                        DateTime nextEventDate;
+
                         // if we're at the last event, then just check that the planet doesn't have a faction in the year 3600
                         if(nextEvent == null) {
                             nextEventDate = new DateTime(3600, 1, 1, 0, 0, 1, 0);
                         } else {
                             nextEventDate = nextEvent.date;
                         }
-                        
+
                         List<String> nextFactions = this.getFactions(nextEventDate);
                         boolean factionBeforeNextEvent = !(nextFactions.size() == 1 &&
                                 Faction.getFaction(nextFactions.get(0)).is(Tag.INACTIVE) &&
                                 Faction.getFaction(nextFactions.get(0)).is(Tag.ABANDONED));
-                        
+
                         if(!factionBeforeNextEvent) {
                             sb.append("Adding faction change in " + event.date.getYear() + " from " + currentFactions.get(0) + " to " + event.faction + "\r\n");
-                            
+
                             if(!dryRun) {
                                 this.events.put(event.date, event);
                             }
@@ -1007,14 +1007,14 @@ public class Planet implements Serializable {
                 }
             }
         }
-        
+
         if(sb.length() > 0) {
             sb.insert(0, "Updating planet " + this.getId() + "\r\n");
         }
-        
+
         return sb.toString();
     }
-    
+
     /**
      * Copy all but id from the other planet. Update event list. Events with the
      * same date as others already in the list get overwritten, others added.
@@ -1078,7 +1078,7 @@ public class Planet implements Serializable {
     public int hashCode() {
         return Objects.hashCode(id);
     }
-    
+
     @Override
     public boolean equals(Object object) {
         if(this == object) {
@@ -1122,13 +1122,13 @@ public class Planet implements Serializable {
             NONE.output = EquipmentType.RATING_X;
             NONE.agriculture = EquipmentType.RATING_X;
         }
-        
+
         public int tech;
         public int industry;
         public int rawMaterials;
         public int output;
         public int agriculture;
-        
+
         @Override
         public String toString() {
              return ITechnology.getRatingName(tech)
@@ -1137,7 +1137,7 @@ public class Planet implements Serializable {
                 + "-" + ITechnology.getRatingName(output) //$NON-NLS-1$
                 + "-" + ITechnology.getRatingName(agriculture); //$NON-NLS-1$
          }
-        
+
         /** @return the USILR rating as a HTML description */
         public String getHTMLDescription() {
             // TODO: Internationalization
@@ -1307,7 +1307,7 @@ public class Planet implements Serializable {
         public Boolean zenithCharge;
         // Events marked as "custom" are saved to scenario files and loaded from there
         public transient boolean custom = false;
-        
+
         public void copyDataFrom(PlanetaryEvent other) {
             climate = Utilities.nonNull(other.climate, climate);
             faction = Utilities.nonNull(other.faction, faction);
@@ -1333,7 +1333,7 @@ public class Planet implements Serializable {
             zenithCharge = Utilities.nonNull(other.zenithCharge, zenithCharge);
             custom = (other.custom || custom);
         }
-        
+
         public void replaceDataFrom(PlanetaryEvent other) {
             climate = other.climate;
             faction = other.faction;
@@ -1359,7 +1359,7 @@ public class Planet implements Serializable {
             zenithCharge = other.zenithCharge;
             custom = (other.custom || custom);
         }
-        
+
         /** @return <code>true</code> if the event doesn't contain any change */
         public boolean isEmpty() {
             return (null == climate) && (null == faction) && (null == hpg) && (null == lifeForm)
@@ -1370,13 +1370,13 @@ public class Planet implements Serializable {
                 && (null == controlRating) && (null == nadirCharge) && (null == zenithCharge);
         }
     }
-    
+
     public static final class FactionChange {
         @XmlJavaTypeAdapter(DateAdapter.class)
         public DateTime date;
         @XmlJavaTypeAdapter(StringListAdapter.class)
         public List<String> faction;
-        
+
         @Override
         public String toString() {
             StringBuilder sb = new StringBuilder();
@@ -1391,19 +1391,19 @@ public class Planet implements Serializable {
     private static interface EventGetter<T> {
         T get(PlanetaryEvent e);
     }
-    
+
     /** BT planet types */
     public static enum PlanetaryType {
         SMALL_ASTEROID, MEDIUM_ASTEROID, DWARF_TERRESTRIAL, TERRESTRIAL, GIANT_TERRESTRIAL, GAS_GIANT, ICE_GIANT;
     }
-    
+
     /** Data class to hold parsed spectral definitions */
     public static final class SpectralDefinition {
         public String spectralType;
         public int spectralClass;
         public double subtype;
         public String luminosity;
-        
+
         public SpectralDefinition(String spectralType, int spectralClass, double subtype, String luminosity) {
             this.spectralType = Objects.requireNonNull(spectralType);
             this.spectralClass = spectralClass;

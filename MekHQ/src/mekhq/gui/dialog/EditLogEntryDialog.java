@@ -1,20 +1,20 @@
 /*
  * EditLogEntryDialog.java
- * 
+ *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -45,14 +45,14 @@ public class EditLogEntryDialog extends javax.swing.JDialog {
     private Frame frame;
     private LogEntry entry;
     private Date date;
-    
+
     private javax.swing.JButton btnClose;
     private javax.swing.JButton btnOK;
     private javax.swing.JTextArea txtDesc;
     private javax.swing.JButton btnDate;
     private javax.swing.JPanel panBtn;
     private javax.swing.JPanel panMain;
-    
+
     /** Creates new form NewTeamDialog */
     public EditLogEntryDialog(java.awt.Frame parent, boolean modal, LogEntry e) {
         super(parent, modal);
@@ -72,7 +72,7 @@ public class EditLogEntryDialog extends javax.swing.JDialog {
         btnDate = new javax.swing.JButton();
         panBtn = new javax.swing.JPanel();
         panMain = new javax.swing.JPanel();
-        
+
         ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditLogEntryDialog", new EncodeControl()); //$NON-NLS-1$
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
@@ -80,7 +80,7 @@ public class EditLogEntryDialog extends javax.swing.JDialog {
         getContentPane().setLayout(new BorderLayout());
         panBtn.setLayout(new GridLayout(0,2));
         panMain.setLayout(new GridBagLayout());
-        
+
         btnDate = new javax.swing.JButton();
         btnDate.setText(getDateAsString());
         btnDate.addActionListener(new java.awt.event.ActionListener() {
@@ -97,7 +97,7 @@ public class EditLogEntryDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         panMain.add(btnDate, gridBagConstraints);
-        
+
         txtDesc.setText(entry.getDesc());
         txtDesc.setName("txtDesc");
         txtDesc.setEditable(true);
@@ -117,7 +117,7 @@ public class EditLogEntryDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         panMain.add(txtDesc, gridBagConstraints);
-        
+
         btnOK.setText(resourceMap.getString("btnOkay.text")); // NOI18N
         btnOK.setName("btnOK"); // NOI18N
         btnOK.addActionListener(new java.awt.event.ActionListener() {
@@ -141,7 +141,7 @@ public class EditLogEntryDialog extends javax.swing.JDialog {
         pack();
     }
 
-    
+
     private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {
     	entry.setDate(date);
     	entry.setDesc(txtDesc.getText());
@@ -152,11 +152,11 @@ public class EditLogEntryDialog extends javax.swing.JDialog {
     	entry = null;
     	this.setVisible(false);
     }
-    
+
     public LogEntry getEntry() {
     	return entry;
     }
-    
+
     private void changeDate() {
     	GregorianCalendar cal = new GregorianCalendar();
     	cal.setTime(date);
@@ -166,7 +166,7 @@ public class EditLogEntryDialog extends javax.swing.JDialog {
             btnDate.setText(getDateAsString());
         }
     }
-    
+
     private String getDateAsString() {
     	SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d yyyy");
         return dateFormat.format(date);

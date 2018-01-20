@@ -43,19 +43,19 @@ import mekhq.campaign.unit.Unit;
 
 /**
  * @author Neoancient
- * 
+ *
  * Enhanced version of GameThread which imports settings and non-player
  * units into the MM game
  *
  */
 public class AtBGameThread extends GameThread {
-	
+
 	AtBScenario scenario;
 
      public AtBGameThread(String name, Client c, MekHQ app, ArrayList<Unit> units, AtBScenario scenario) {
     	 this(name, c, app, units, scenario, true);
      }
-     
+
      public AtBGameThread(String name, Client c, MekHQ app, ArrayList<Unit> units, AtBScenario scenario, boolean started) {
         super(name, c, app, units, started);
         this.scenario = scenario;
@@ -103,7 +103,7 @@ public class AtBGameThread extends GameThread {
             	client.getLocalPlayer().setCamoCategory(app.getCampaign().getCamoCategory());
                 client.getLocalPlayer().setCamoFileName(app.getCampaign().getCamoFileName());
                 client.getLocalPlayer().setColorIndex(app.getCampaign().getColorIndex());
-            	
+
                 if (started) {
                 	client.getGame().getOptions().loadOptions();
                 	client.sendGameOptions("", app.getCampaign().getGameOptionsVector());
@@ -125,8 +125,8 @@ public class AtBGameThread extends GameThread {
                 mapSettings.getBoardsSelectedVector().add(MapSettings.BOARD_GENERATED);
                 client.sendMapSettings(mapSettings);
 				Thread.sleep(campaign.getCampaignOptions().getStartGameDelay());
-                
-                PlanetaryConditions planetaryConditions = new PlanetaryConditions(); 
+
+                PlanetaryConditions planetaryConditions = new PlanetaryConditions();
                 planetaryConditions.setLight(scenario.getLight());
                 planetaryConditions.setWeather(scenario.getWeather());
                 planetaryConditions.setWindStrength(scenario.getWind());
@@ -135,10 +135,10 @@ public class AtBGameThread extends GameThread {
                 planetaryConditions.setGravity(scenario.getGravity());
                 client.sendPlanetaryConditions(planetaryConditions);
 				Thread.sleep(campaign.getCampaignOptions().getStartGameDelay());
-                
+
                 client.getLocalPlayer().setStartingPos(scenario.getStart());
                 client.getLocalPlayer().setTeam(1);
-                
+
                 /* If the player is making a combat drop (either required by scenario
                  * or player chose to deploy a DropShip), do not use deployment
                  * delay for slower scout units.
@@ -167,7 +167,7 @@ public class AtBGameThread extends GameThread {
                 	// Set the TempID for autoreporting
                 	entity.setExternalIdAsString(unit.getId().toString());
                 	// Set the owner
-                	entity.setOwner(client.getLocalPlayer()); 
+                	entity.setOwner(client.getLocalPlayer());
                 	// Calculate deployment round
             		int speed = entity.getWalkMP();
             		if (entity.getJumpMP() > 0) {
@@ -219,7 +219,7 @@ public class AtBGameThread extends GameThread {
                 }
 
                 client.sendPlayerInfo();
-                
+
                 /* Add bots */
                 for (int i = 0; i < scenario.getNumBots(); i++) {
                 	AtBScenario.BotForce bf = scenario.getBotForce(i);
@@ -241,12 +241,12 @@ public class AtBGameThread extends GameThread {
                         MekHQ.getLogger().log(getClass(), "run", e); //$NON-NLS-1$
                 	}
                 	swingGui.getBots().put(name, botClient);
-                	
+
                 	configureBot(botClient, bf);
                 }
 
             }
-            
+
             while(!stop) {
             	Thread.sleep(50);
             }
@@ -259,13 +259,13 @@ public class AtBGameThread extends GameThread {
 	        swingGui = null;
 	        controller = null;
         }
-        
+
     }
- 
+
     /**
      * wait for the server to add the bot client, then send starting position,
      * camo, and entities
-     * 
+     *
      * @param botClient
      * @param botForce
      */
@@ -306,6 +306,6 @@ public class AtBGameThread extends GameThread {
 			}
 		} catch (Exception e) {
             MekHQ.getLogger().log(getClass(), "configureBot", e); //$NON-NLS-1$
-		}    	
+		}
     }
 }

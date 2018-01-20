@@ -241,7 +241,7 @@ public final class FinancesTab extends CampaignGuiTab {
     }
 
     public void refreshFinancialTransactions() {
-        SwingUtilities.invokeLater(() -> { 
+        SwingUtilities.invokeLater(() -> {
             financeModel.setData(getCampaign().getFinances().getAllTransactions());
             loanModel.setData(getCampaign().getFinances().getAllLoans());
             refreshFinancialReport();
@@ -249,12 +249,12 @@ public final class FinancesTab extends CampaignGuiTab {
     }
 
     public void refreshFinancialReport() {
-        SwingUtilities.invokeLater(() -> { 
+        SwingUtilities.invokeLater(() -> {
             areaNetWorth.setText(getCampaign().getFinancialReport());
             areaNetWorth.setCaretPosition(0);
         });
     }
-    
+
     ActionScheduler financialTransactionsScheduler = new ActionScheduler(this::refreshFinancialTransactions);
     ActionScheduler financialReportScheduler = new ActionScheduler(this::refreshFinancialReport);
 
@@ -282,32 +282,32 @@ public final class FinancesTab extends CampaignGuiTab {
             financialReportScheduler.schedule();
         }
     }
-    
+
     @Subscribe
     public void handle(AcquisitionEvent ev) {
         financialTransactionsScheduler.schedule();
     }
-    
+
     @Subscribe
     public void handle(TransactionEvent ev) {
         financialTransactionsScheduler.schedule();
     }
-    
+
     @Subscribe
     public void handle(LoanEvent ev) {
         financialTransactionsScheduler.schedule();
     }
-    
+
     @Subscribe
     public void handle(UnitEvent ev) {
         financialReportScheduler.schedule();
     }
-    
+
     @Subscribe
     public void handle(PartEvent ev) {
         financialReportScheduler.schedule();
     }
-    
+
     @Subscribe
     public void handle(AssetEvent ev) {
         financialReportScheduler.schedule();

@@ -25,18 +25,18 @@ import mekhq.campaign.personnel.Person;
  *
  */
 public class PersonMedicalAssignmentEvent extends PersonChangedEvent {
-    
+
     private final Person patient;
 
     public PersonMedicalAssignmentEvent(Person doctor, Person patient) {
         super(doctor);
         this.patient = patient;
     }
-    
+
     public Person getDoctor() {
         return getPerson();
     }
-    
+
     public Person getPatient() {
         return patient;
     }

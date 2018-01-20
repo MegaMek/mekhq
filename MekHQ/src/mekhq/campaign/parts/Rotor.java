@@ -1,20 +1,20 @@
 /*
  * Rotor.java
- * 
+ *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -33,7 +33,7 @@ import mekhq.campaign.Campaign;
  */
 public class Rotor extends TankLocation {
 	private static final long serialVersionUID = -122291037522319765L;
-	
+
 	static final TechAdvancement TECH_ADVANCEMENT = new TechAdvancement(TECH_BASE_ALL)
 	        .setAdvancement(2460, 2470, 2510).setApproximate(true, false, false)
 	        .setPrototypeFactions(F_TH).setProductionFactions(F_TH)
@@ -43,13 +43,13 @@ public class Rotor extends TankLocation {
     public Rotor() {
     	this(0, null);
     }
-    
+
     public Rotor(int tonnage, Campaign c) {
         super(VTOL.LOC_ROTOR, tonnage, c);
         this.name = "Rotor";
         this.damage = 0;
     }
-    
+
     public Rotor clone() {
     	Rotor clone = new Rotor(getUnitTonnage(), campaign);
         clone.copyBaseData(this);
@@ -58,11 +58,11 @@ public class Rotor extends TankLocation {
     	clone.breached = this.breached;
     	return clone;
     }
- 
+
     @Override
     public boolean isSamePartType(Part part) {
-        return part instanceof Rotor 
-        		&& getLoc() == ((Rotor)part).getLoc() 
+        return part instanceof Rotor
+        		&& getLoc() == ((Rotor)part).getLoc()
         		&& getUnitTonnage() == ((Rotor)part).getUnitTonnage()
         		&& this.getDamage() == ((Rotor)part).getDamage()
         		&& part.getSkillMin() == this.getSkillMin();
@@ -73,8 +73,8 @@ public class Rotor extends TankLocation {
 		super.fix();
 		damage--;
 		if(null != unit && unit.getEntity() instanceof VTOL) {
-		    int currIsVal = unit.getEntity().getInternal(VTOL.LOC_ROTOR); 
-		    int maxIsVal = unit.getEntity().getOInternal(VTOL.LOC_ROTOR); 
+		    int currIsVal = unit.getEntity().getInternal(VTOL.LOC_ROTOR);
+		    int maxIsVal = unit.getEntity().getOInternal(VTOL.LOC_ROTOR);
 		    int repairedIsVal = Math.min(maxIsVal, currIsVal + 1);
 			unit.getEntity().setInternal(repairedIsVal, VTOL.LOC_ROTOR);
 		}
@@ -109,15 +109,15 @@ public class Rotor extends TankLocation {
 		}
 		setUnit(null);
 	}
-	
-	@Override 
+
+	@Override
 	public int getBaseTime() {
 		if(isSalvaging()) {
 			return 300;
 		}
 		return 120;
 	}
-	
+
 	@Override
 	public int getDifficulty() {
 		if(isSalvaging()) {
@@ -125,15 +125,15 @@ public class Rotor extends TankLocation {
 		}
 		return 2;
 	}
-	
+
 	@Override
 	public void updateConditionFromPart() {
 		if(null != unit && unit.getEntity() instanceof VTOL) {
 			unit.getEntity().setInternal(unit.getEntity().getOInternal(VTOL.LOC_ROTOR) - damage, VTOL.LOC_ROTOR);
 		}
 	}
-	
-	@Override 
+
+	@Override
 	public String checkFixable() {
 		if(null == unit) {
 			return null;
@@ -146,7 +146,7 @@ public class Rotor extends TankLocation {
 		}
 		return null;
 	}
-	
+
 	@Override
 	public String checkScrappable() {
 		//check for armor
@@ -155,12 +155,12 @@ public class Rotor extends TankLocation {
         }
 		return null;
 	}
-	
+
 	@Override
 	public boolean canNeverScrap() {
 		return false;
 	}
-	
+
 	@Override
 	public double getTonnage() {
 		return 0.1 * getUnitTonnage();
@@ -170,7 +170,7 @@ public class Rotor extends TankLocation {
 	public long getStickerPrice() {
 		return (long)(40000 * getTonnage());
 	}
-	
+
 	@Override
 	public TechAdvancement getTechAdvancement() {
 	    return TECH_ADVANCEMENT;

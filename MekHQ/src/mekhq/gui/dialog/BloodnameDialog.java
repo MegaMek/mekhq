@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package mekhq.gui.dialog;
 
@@ -22,17 +22,17 @@ import mekhq.campaign.universe.Faction;
 
 /**
  * @author Neoancient
- * 
+ *
  * Randomly selects an appropriate Bloodname based on Clan, phenotype, and year
  *
  */
 public class BloodnameDialog extends JDialog {
 
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 120186090844572718L;
-	
+
 	public static final int CBS = 0;
 	public static final int CB = 1;
 	public static final int CCC = 2;
@@ -56,7 +56,7 @@ public class BloodnameDialog extends JDialog {
 	public static final int CWIE = 20;
 	public static final int CWOV	 = 21;
 	public static final int C_NUM = 22;
-	
+
 	public static final Integer[][] terminus = {
 		{2807, 3084},
 		{2807, 3059},
@@ -81,13 +81,13 @@ public class BloodnameDialog extends JDialog {
 		{3057, null},
 		{2807, 2823}
 	};
-	
+
 	public static final String[] clans = {
 		"CBS", "CB", "CCC", "CCO", "CDS", "CFM", "CGB",
 		"CGS", "CHH", "CIH", "CJF", "CMG", "CNC", "CSJ",
-		"CSR", "CSA", "CSV", "CSL", "CWI", "CW", "CWIE", "CWOV"		
+		"CSR", "CSA", "CSV", "CSL", "CWI", "CW", "CWIE", "CWOV"
 	};
-	
+
 	public static final String[] fullNames = {
 		"Blood Spirit", "Burrock", "Cloud Cobra", "Coyote",
 		"Diamond Shark/Sea Fox", "Fire Mandrill", "Ghost Bear",
@@ -97,12 +97,12 @@ public class BloodnameDialog extends JDialog {
 		"Stone Lion", "Widowmaker", "Wolf", "Wolf-in-Exile",
 		"Wolverine"
 	};
-	
+
 	public static Integer[] eras = {
 		2807, 2825, 2850, 2900, 2950, 3000, 3050, 3060,
 		3075, 3085, 3100
 	};
-	
+
 	private JComboBox<String> cbClan;
 	private JComboBox<Integer> cbEra;
 	private JComboBox<String> cbPhenotype;
@@ -123,29 +123,29 @@ public class BloodnameDialog extends JDialog {
 
 		setLocationRelativeTo(parent);
 		pack();
-		
+
 	}
-	
-	private void initComponents() {		
+
+	private void initComponents() {
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.fill = GridBagConstraints.NONE;
 		gbc.insets = new Insets(5, 5, 5, 5);
 		gbc.anchor = GridBagConstraints.NORTHWEST;
-		
+
 		cbClan = new JComboBox<String>(fullNames);
 		gbc.gridx = 0;
 		gbc.gridy = 0;
 		gbc.gridwidth = 2;
 		add(cbClan, gbc);
 		cbClan.addActionListener(validateActionListener);
-		
+
 		cbEra = new JComboBox<Integer>(eras);
 		gbc.gridx = 0;
 		gbc.gridy = 1;
 		gbc.gridwidth = 2;
 		add(cbEra, gbc);
 		cbEra.addActionListener(validateActionListener);
-		
+
 		cbPhenotype = new JComboBox<String>();
 		cbPhenotype.addItem("None");
 		for (int i = 1; i < Bloodname.phenotypeNames.length; i++) {
@@ -156,7 +156,7 @@ public class BloodnameDialog extends JDialog {
 		gbc.gridwidth = 2;
 		add(cbPhenotype, gbc);
 		cbPhenotype.addActionListener(validateActionListener);
-		
+
 		btnGo = new JButton("Go");
 		gbc.gridx = 0;
 		gbc.gridy = 3;
@@ -174,7 +174,7 @@ public class BloodnameDialog extends JDialog {
 				lblPhenotype.setText(Bloodname.phenotypeNames[n.getPhenotype()]);
 			}
 		});
-		
+
 		JLabel label = new JLabel("Result:");
 		gbc.gridx = 0;
 		gbc.gridy = 4;
@@ -221,26 +221,26 @@ public class BloodnameDialog extends JDialog {
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		add(txtWarning, gbc);
 			}
-	
+
 	private ActionListener validateActionListener = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent ev) {
 			btnGo.setEnabled(validateInput());
 		}
 	};
-	
+
 	private boolean validateInput() {
 		int clan = cbClan.getSelectedIndex();
 		int year = (Integer)cbEra.getSelectedItem();
 		String phenotype = (String)cbPhenotype.getSelectedItem();
-		
+
 		if (clan < 0 || null == phenotype ||
 				year < 2807 || year > 3150) {
 			return false;
 		}
-		
+
 		String txt = "";
-		
+
 		if (year < terminus[clan][0]) {
 			for (int i = 0; i < eras.length; i++) {
 				if (eras[i] >= terminus[clan][0]) {
@@ -277,7 +277,7 @@ public class BloodnameDialog extends JDialog {
 			txt += "The TankWarrior phenotype began development in the 32nd century. Using 3100.\n";
 		}
 		txtWarning.setText(txt);
-		
+
 		return true;
 	};
 
@@ -289,7 +289,7 @@ public class BloodnameDialog extends JDialog {
 			}
 		}
 	}
-	
+
 	public void setYear(int year) {
 		for (int i = eras.length - 1; i >= 0; i--) {
 			if (eras[i] <= year) {

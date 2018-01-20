@@ -1,11 +1,11 @@
 /*
  * ClientThread - Copyright (C) 2011
- * 
- * Derived from MekWars (http://www.sourceforge.net/projects/mekwars) 
- * 
+ *
+ * Derived from MekWars (http://www.sourceforge.net/projects/mekwars)
+ *
  * This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software
  * Foundation; either version 2 of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
  * A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  */
@@ -44,12 +44,12 @@ class GameThread extends Thread implements CloseClientListener {
     protected ArrayList<Unit> units = new ArrayList<Unit>();
 
     protected volatile boolean stop = false;
-    
+
     // CONSTRUCTOR
     public GameThread(String name, Client c, MekHQ app, ArrayList<Unit> units) {
     	this(name, c, app, units, true);
     }
-    
+
     public GameThread(String name, Client c, MekHQ app, ArrayList<Unit> units, boolean started) {
         super(name);
         myname = name.trim();
@@ -104,20 +104,20 @@ class GameThread extends Thread implements CloseClientListener {
             	System.out.println("Thread in lounge" );
             	client.getLocalPlayer().setCamoCategory(app.getCampaign().getCamoCategory());
                 client.getLocalPlayer().setCamoFileName(app.getCampaign().getCamoFileName());
-            	
+
                 if (started) {
                 	client.getGame().getOptions().loadOptions();
                 	client.sendGameOptions("", app.getCampaign().getGameOptionsVector());
     				Thread.sleep(campaign.getCampaignOptions().getStartGameDelay());
                 }
-                
+
                 for (Unit unit : units) {
                     // Get the Entity
                     Entity entity = unit.getEntity();
                     // Set the TempID for autoreporting
                     entity.setExternalIdAsString(unit.getId().toString());
                     // Set the owner
-                    entity.setOwner(client.getLocalPlayer()); 
+                    entity.setOwner(client.getLocalPlayer());
                     // Add Mek to game
                     client.sendAddEntity(entity);
                     // Wait a few secs to not overuse bandwith
@@ -126,7 +126,7 @@ class GameThread extends Thread implements CloseClientListener {
 
                 client.sendPlayerInfo();
             }
-            
+
             while(!stop) {
             	Thread.sleep(50);
             }
@@ -149,7 +149,7 @@ class GameThread extends Thread implements CloseClientListener {
     	requestStop();
     	app.stopHost();
     }
-    
+
     public void requestStop() {
     	PreferenceManager.getInstance().save();
     	try {
@@ -158,35 +158,35 @@ class GameThread extends Thread implements CloseClientListener {
             System.out.println("Error saving custom weapon orders!");
             e.printStackTrace();
         }
-    	
+
     	try {
             QuirksHandler.saveCustomQuirksList();
         } catch (IOException e) {
             System.out.println("Error saving quirks override!");
             e.printStackTrace();
         }
-    	
+
     	stop = true;
     }
-    
+
     public boolean stopRequested() {
     	return stop;
     }
-    
+
     public void quit() {
     	client.die();
         client = null;// explicit null of the MM client. Wasn't/isn't being
         // GC'ed.
         System.gc();
     }
-    
+
     public void createController(){
     	controller = new MegaMekController();
-    	KeyboardFocusManager kbfm = 
+    	KeyboardFocusManager kbfm =
     			KeyboardFocusManager.getCurrentKeyboardFocusManager();
     	kbfm.addKeyEventDispatcher(controller);
-    	
+
     	KeyBindParser.parseKeyBindings(controller);
-    } 
+    }
 
 }

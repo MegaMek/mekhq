@@ -633,7 +633,7 @@ public class PersonnelMarket {
         	pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<paidRecruitment/>");
         }
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "paidRecruitType", paidRecruitType);
-        
+
         for (UUID id : attachedEntities.keySet()) {
             pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                     + "<entity id=\"" + id.toString() + "\">"
@@ -645,7 +645,7 @@ public class PersonnelMarket {
 
     public static PersonnelMarket generateInstanceFromXML(Node wn, Campaign c, Version version) {
         final String METHOD_NAME = "generateInstanceFromXML(Node,Campaign,Version)"; //$NON-NLS-1$
-        
+
         PersonnelMarket retVal = null;
 
         try {
@@ -904,7 +904,7 @@ public class PersonnelMarket {
             }
 		}
     }
-    
+
     public TargetRoll getShipSearchTarget(Campaign campaign, boolean jumpship) {
     	TargetRoll target = new TargetRoll(jumpship?12:10, "Base");
 		Person adminLog = campaign.findBestInRole(Person.T_ADMIN_LOG, SkillType.S_ADMIN);
@@ -924,7 +924,7 @@ public class PersonnelMarket {
 
     private void addRecruitUnit(Person p, Campaign c) {
         final String METHOD_NAME = "addRecruitUnit(Person,Campaign)"; //$NON-NLS-1$
-        
+
     	int unitType;
     	switch (p.getPrimaryRole()) {
     	case Person.T_MECHWARRIOR:

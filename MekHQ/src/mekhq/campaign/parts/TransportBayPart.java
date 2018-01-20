@@ -1,18 +1,18 @@
 /*
  * Copyright (c) 2017 - The MegaMek Team. All rights reserved.
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -37,37 +37,37 @@ import mekhq.campaign.Campaign;
  *
  */
 public class TransportBayPart extends Part {
-    
+
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 6555762303379877899L;
-    
+
     private int bayNumber;
     private double size;
-    
+
     public TransportBayPart() {
         this(0, 0, 0, null);
     }
-    
+
     public TransportBayPart(int tonnage, int bayNumber, double size, Campaign c) {
         super(tonnage, c);
         this.bayNumber = bayNumber;
         this.size = size;
         name = "Bay #" + bayNumber;
     }
-    
+
     public int getBayNumber() {
         return bayNumber;
     }
-    
+
     public Bay getBay() {
         if (null != unit) {
             return unit.getEntity().getBayById(bayNumber);
         }
         return null;
     }
-    
+
     @Override
     public String getName() {
         if (null != getBay()) {
@@ -151,12 +151,12 @@ public class TransportBayPart extends Part {
                 }
             }
             bay.setCurrentDoors(goodDoors);
-            // Even if the bay is repaired, it still has reduced capacity until the cubicles are replaced. 
+            // Even if the bay is repaired, it still has reduced capacity until the cubicles are replaced.
             bay.setBayDamage(Math.max(hits, badCubicles));
         }
-        
+
     }
-    
+
     @Override
     public void fix() {
         super.fix();
@@ -170,7 +170,7 @@ public class TransportBayPart extends Part {
     public void remove(boolean salvage) {
         // Can't remove a bay
     }
-    
+
     @Override
     public boolean isSalvaging() {
         return false;

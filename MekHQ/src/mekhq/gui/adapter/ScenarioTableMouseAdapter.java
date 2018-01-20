@@ -22,7 +22,7 @@ import mekhq.gui.model.ScenarioTableModel;
 
 public class ScenarioTableMouseAdapter extends MouseInputAdapter implements
         ActionListener {
-    
+
     private CampaignGUI gui;
     private JTable scenarioTable;
     private ScenarioTableModel scenarioModel;

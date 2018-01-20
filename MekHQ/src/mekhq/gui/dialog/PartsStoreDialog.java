@@ -402,7 +402,7 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 
     private void addPart(boolean purchase, boolean bulk, boolean bonus) {
         final String METHOD_NAME = "addPart(boolean,boolean,boolean)"; //$NON-NLS-1$
-        
+
     	int row = partsTable.getSelectedRow();
 		if(row < 0) {
 			return;

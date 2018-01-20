@@ -7,12 +7,12 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -62,11 +62,11 @@ public final class StarUtil {
     public static final double SOLAR_TEMP = 5778.0;
     /** Gravitational constant (in m^3 kg^-1 s^-2 */
     public static final double GRAV_CONSTANT = 6.673848e-11;
-    
+
     // Temperature, mass, luminosity and size are all linked together. When modifying those tables,
     // make VERY sure you don't accidentally break the inherent inequalities
     // (stars becoming smaller, dimmer, cooler and so on in one direction)
-    
+
     // Temperature ranges for generation only. "Real" stars can lie outside of those.
     private static final int[] TEMPERATURE_RANGES = {
         65000, // Above class O
@@ -93,7 +93,7 @@ public final class StarUtil {
         0.044, 0.036, 0.0296, 0.0248, 0.0216, 0.0176, 0.0152, 0.01275, 0.0126, 0.01183, // Class L
         0.01104, 0.010695, 0.01034, 0.01026, 0.010176, 0.010088, 0.009996, 0.0099, 0.009702, 0.009504 // Class T
     };
-    
+
     private static final double[] MAX_MASS = {
         5062.5, 2565, 1662.5, 1021.8, 689, 425.7, 268.8, 165.1, 98.28, 58.75, // Class O
         36.9, 24.4, 18.15, 12.12, 9.639, 7.906, 6.7509, 5.6862, 4.5588, 3.6772, // Class B
@@ -103,9 +103,9 @@ public final class StarUtil {
         0.888, 0.86025, 0.84, 0.812, 0.791, 0.7345, 0.684, 0.6555, 0.6325, 0.60375, // Class K
         0.58, 0.522, 0.468, 0.4095, 0.3245, 0.236, 0.1785, 0.119, 0.108, 0.09, // Class M
         0.066, 0.054, 0.0444, 0.0372, 0.0324, 0.0264, 0.0228, 0.01725, 0.0154, 0.01417, // Class L
-        0.01296, 0.012305, 0.01166, 0.01134, 0.011024, 0.010712, 0.010404, 0.0101, 0.009898, 0.009696 // Class T 
+        0.01296, 0.012305, 0.01166, 0.01134, 0.011024, 0.010712, 0.010404, 0.0101, 0.009898, 0.009696 // Class T
     };
-    
+
     // Average luminosity in terms of Solar luminosity. O-class stars are BRIGHT. Generated values are +/-10% of this.
     private static final double[] AVG_LUMINOSITY = {
         12000000, 6000000, 4000000, 2500000, 1700000, 1050000, 670000, 410000, 250000, 150000, // Class O
@@ -116,9 +116,9 @@ public final class StarUtil {
         0.543, 0.475, 0.41, 0.355, 0.31, 0.257, 0.211, 0.187, 0.155, 0.125, // Class K
         0.1, 0.0535, 0.0321, 0.0178, 0.0106, 0.0063, 0.0045, 0.0016, 0.0008, 0.0006, // Class M
         0.00025, 0.00017, 0.00012, 0.00008, 0.000055, 0.000035, 0.000025, 0.000015, 0.000009, 0.000006, // Class L
-        0.0000035, 0.000002, 0.0000012, 0.0000007, 0.00000035, 0.00000018, 0.00000011, 0.00000007, 0.00000004, 0.000000025 // Class T          
+        0.0000035, 0.000002, 0.0000012, 0.0000007, 0.00000035, 0.00000018, 0.00000011, 0.00000007, 0.00000004, 0.000000025 // Class T
     };
-    
+
     //taken from Dropships and Jumpships sourcebook, pg. 17. L- and T-classes estimated
     private static final double[] DISTANCE_TO_JUMP_POINT = {
         Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY,
@@ -140,7 +140,7 @@ public final class StarUtil {
         30036042.0, 29403633.0, 28757320.0, 28494691.0, 28229618.0, // Class T
         27962033.0, 27691862.0, 27419029.0, 27143454.0, 26865052.0
     };
-    
+
     // Slightly modified IO Beta table
     private static final int[] REALISTIC_SPECTRAL_TYPE = {
             Planet.SPECTRAL_F, Planet.SPECTRAL_M, Planet.SPECTRAL_G, Planet.SPECTRAL_K, Planet.SPECTRAL_M,
@@ -149,11 +149,11 @@ public final class StarUtil {
     private static final int[] HOT_SPECTRAL_TYPE = {
         Planet.SPECTRAL_B, Planet.SPECTRAL_B, Planet.SPECTRAL_A, Planet.SPECTRAL_A, Planet.SPECTRAL_A,
         Planet.SPECTRAL_F, Planet.SPECTRAL_F, Planet.SPECTRAL_F, Planet.SPECTRAL_F, Planet.SPECTRAL_F, Planet.SPECTRAL_F};
-    
+
     private static final int[] LIFEFRIENDLY_SPECTRAL_TYPE = new int[]{
         Planet.SPECTRAL_M, Planet.SPECTRAL_M, Planet.SPECTRAL_M, Planet.SPECTRAL_K, Planet.SPECTRAL_K,
         Planet.SPECTRAL_G, Planet.SPECTRAL_G, Planet.SPECTRAL_F, Planet.SPECTRAL_F, Planet.SPECTRAL_F, Planet.SPECTRAL_F};
-    
+
     private static final double[] MIN_LIFE_ZONE = {
         Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY,
         Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY,
@@ -172,9 +172,9 @@ public final class StarUtil {
          2055095.0, 1833752.0, 1627530.0, 1435990.0, 1258696.0, // Class L
          1095210.0,  945094.0,  807910.0,  683220.0,  570588.0,
          477499.0, 393937.0, 319539.0, 253943.0, 196788.0, // Class T
-         147711.0, 124816.0, 104182.0,  85718.0,  69334.0    
+         147711.0, 124816.0, 104182.0,  85718.0,  69334.0
     };
-    
+
     private static final double[] MAX_LIFE_ZONE = {
         Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY,
         Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY,
@@ -195,14 +195,14 @@ public final class StarUtil {
         1062395.0, 876476.0, 710946.0, 565001.0, 437836.0, // Class T
          328645.0, 277705.0, 231795.0, 190715.0, 154262.0
     };
-        
+
 
     private static final double[] RECHARGE_HOURS_CLASS_L = {
             512.0, 616.0, 717.0, 901.0, 1142.0, 1462.0, 1767.0, 2325.0, 3617.0, 5038.0, 7973.0};
 
     private static final double[] RECHARGE_HOURS_CLASS_T = {
             7973.0, 13371.0, 21315.0, 35876.0, 70424.0, 134352.0, 215620.0, 32188.0, 569703.0, 892922.0, 10000000.0};
-    
+
     private static final Set<String> VALID_WHITE_DWARF_SUBCLASSES = new TreeSet<String>();
     static {
         VALID_WHITE_DWARF_SUBCLASSES.addAll(Arrays.asList("", //$NON-NLS-1$
@@ -213,13 +213,13 @@ public final class StarUtil {
     private static final String ICON_DATA_FILE = "images/universe/planet_icons.txt";
     private static final Map<String, String> ICON_DATA = new HashMap<>();
     private static boolean iconDataLoaded = false;
-    
+
     // Generators
-    
+
     public static String generateSpectralType(Random rnd, boolean lifeFriendly) {
         return generateSpectralType(rnd, lifeFriendly, -1);
     }
-    
+
     public static String generateSpectralType(Random rnd, boolean lifeFriendly, int spectralTypeOverride) {
         int spectralType = spectralTypeOverride;
         if(spectralTypeOverride < 0) {
@@ -240,7 +240,7 @@ public final class StarUtil {
     public static double generateTemperature(Random rnd, int spectral, double subtype) {
         return Utilities.lerp(getMinTemperature(spectral, subtype), getMaxTemperature(spectral, subtype), rnd.nextDouble());
     }
-    
+
     public static double generateMass(Random rnd, int spectral, double subtype) {
         return Utilities.lerp(getMinMass(spectral, subtype), getMaxMass(spectral, subtype), rnd.nextDouble());
     }
@@ -250,7 +250,7 @@ public final class StarUtil {
     }
 
     // Temperature data
-    
+
     private static double getTemperatureRange(int spectralTypeNumber) {
         if((spectralTypeNumber >= 0) && (spectralTypeNumber < TEMPERATURE_RANGES.length)) {
             return TEMPERATURE_RANGES[spectralTypeNumber];
@@ -281,14 +281,14 @@ public final class StarUtil {
 
 
     // Mass data
-    
+
     public static double getMinMass(int spectralTypeNumber) {
         if((spectralTypeNumber >= 0) && (spectralTypeNumber < MIN_MASS.length)) {
             return MIN_MASS[spectralTypeNumber];
         }
         return 0.0;
     }
-    
+
     public static double getMinMass(int spectral, double subtype) {
         int spectralTypeNumber = spectral * 10 + (int)subtype;
         double remainder = subtype - (int)subtype;
@@ -301,22 +301,22 @@ public final class StarUtil {
         }
         return 0.0;
     }
-    
+
     public static double getMaxMass(int spectral, double subtype) {
         int spectralTypeNumber = spectral * 10 + (int)subtype;
         double remainder = subtype - (int)subtype;
         return Utilities.lerp(getMaxMass(spectralTypeNumber), getMaxMass(spectralTypeNumber), remainder);
     }
-    
+
     // Luminosity data
-    
+
     public static double getAvgLuminosity(int spectralTypeNumber) {
         if((spectralTypeNumber >= 0) && (spectralTypeNumber < AVG_LUMINOSITY.length)) {
             return AVG_LUMINOSITY[spectralTypeNumber];
         }
         return 0.0;
     }
-    
+
     public static double getAvgLuminosity(int spectral, double subtype) {
         int spectralTypeNumber = spectral * 10 + (int)subtype;
         double remainder = subtype - (int)subtype;
@@ -419,20 +419,20 @@ public final class StarUtil {
         if( null == spectralClass || null == subtype ) {
             return null;
         }
-        
+
         if(spectralClass == Planet.SPECTRAL_Q) {
             return (null != luminosity) ? "Q" + luminosity : "Q"; //$NON-NLS-1$ //$NON-NLS-2$
         }
-        
+
         // Formatting subtype value up to two decimal points, if needed
         int subtypeValue = (int)Math.round(subtype * 100);
         if( subtypeValue < 0 ) { subtypeValue = 0; }
         if( subtypeValue > 999 ) { subtypeValue = 999; }
-        
+
         String subtypeFormat = "%.2f"; //$NON-NLS-1$
         if( subtypeValue % 100 == 0 ) { subtypeFormat = "%.0f"; } //$NON-NLS-1$
         else if( subtypeValue % 10 == 0 ) { subtypeFormat = "%.1f"; } //$NON-NLS-1$
-        
+
         if( luminosity == Planet.LUM_VI ) {
             // subdwarfs
             return "sd" + getSpectralClassName(spectralClass) + String.format(subtypeFormat, subtypeValue / 100.0); //$NON-NLS-1$
@@ -455,18 +455,18 @@ public final class StarUtil {
         if((null == type) || type.isEmpty()) {
             return null;
         }
-        
+
         // We make sure to not rewrite the subtype, in case we need whatever special part is behind it
         String parsedSpectralType = type;
         Integer parsedSpectralClass = null;
         Double parsedSubtype = null;
         String parsedLuminosity = null;
-        
+
         // Non-stellar objects
         if(type.startsWith("Q")) {
             return new SpectralDefinition(type, Planet.SPECTRAL_Q, 0.0, type.substring(1));
         }
-        
+
         // Subdwarf prefix parsing
         if( type.length() > 2 && type.startsWith("sd") ) { //$NON-NLS-1$
             // subdwarf
@@ -478,13 +478,13 @@ public final class StarUtil {
             parsedLuminosity = Planet.LUM_VI_PLUS;
             type = type.substring(3);
         }
-        
+
         if( type.length() < 1 ) {
             // We can't parse an empty string
             return null;
         }
         String mainClass = type.substring(0, 1);
-        
+
         if( mainClass.equals("D") && type.length() > 1 && null == parsedLuminosity /* prevent "sdD..." */ ) { //$NON-NLS-1$
             // white dwarf
             parsedLuminosity = Planet.LUM_VII;
@@ -518,7 +518,7 @@ public final class StarUtil {
                 }
             }
         }
-        
+
         if( null != parsedSpectralClass && null != parsedSubtype && null != parsedLuminosity ) {
             return new SpectralDefinition(parsedSpectralType, parsedSpectralClass, parsedSubtype, parsedLuminosity);
         } else {
@@ -559,7 +559,7 @@ public final class StarUtil {
         if( lc.startsWith("V") ) { return Planet.LUM_V; } //$NON-NLS-1$
         return null;
     }
-    
+
     public static String getPopulationRatingString(int pops) {
         if(pops < 0) {
             return "None";
@@ -581,7 +581,7 @@ public final class StarUtil {
             default: return "Uncountable";
         }
     }
-    
+
     public static String getControlRatingString(int cr) {
         if(cr < 0) {
             return "in total anarchy";
@@ -597,7 +597,7 @@ public final class StarUtil {
             default: return "enslaved population";
         }
     }
-    
+
     public static String getHPGClass(Integer hpg) {
         if(null == hpg) {
             return null;
@@ -611,7 +611,7 @@ public final class StarUtil {
             default: return "unknown";
         }
     }
-    
+
     public static String getIconImage(Planet planet) {
         final String METHOD_NAME = "getIconImage(Planet)"; //$NON-NLS-1$
 
@@ -637,6 +637,6 @@ public final class StarUtil {
         }
         return ICON_DATA.get(Utilities.nonNull(planet.getIcon(), "default"));
     }
-    
+
     private StarUtil() {}
 }

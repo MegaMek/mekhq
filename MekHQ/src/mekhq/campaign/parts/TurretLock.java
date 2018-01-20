@@ -1,20 +1,20 @@
 /*
  * TurretLock.java
- * 
+ *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -37,7 +37,7 @@ import mekhq.campaign.Campaign;
 public class TurretLock extends Part {
 
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1L;
 
@@ -45,28 +45,28 @@ public class TurretLock extends Part {
 		super(0, c);
 		this.name = "Turret Lock";
 	}
-	
-	@Override 
+
+	@Override
 	public int getBaseTime() {
 		return 90;
 	}
-	
+
 	@Override
 	public int getDifficulty() {
 		return -1;
 	}
-	
+
 	public TurretLock clone() {
 		TurretLock clone = new TurretLock(campaign);
         clone.copyBaseData(this);
         return clone;
 	}
-	
+
 	@Override
 	public long getStickerPrice() {
 		return 0;
 	}
-	
+
 	@Override
 	public double getTonnage() {
 		return 0;
@@ -80,13 +80,13 @@ public class TurretLock extends Part {
 	@Override
 	protected void loadFieldsFromXmlNode(Node wn) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void writeToXml(PrintWriter pw1, int indent) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -132,17 +132,17 @@ public class TurretLock extends Part {
 		}
 		return false;
 	}
-	
+
 	@Override
 	public boolean isSalvaging() {
 		return false;
 	}
-	
+
 	@Override
 	public String checkScrappable() {
 		return "Turret Lock is not scrappable";
 	}
-	
+
 	@Override
 	public boolean canNeverScrap() {
 		return true;
@@ -158,7 +158,7 @@ public class TurretLock extends Part {
 	public int getLocation() {
 		return Entity.LOC_NONE;
 	}
-	
+
 	@Override
 	public TechAdvancement getTechAdvancement() {
 	    return TA_GENERIC;

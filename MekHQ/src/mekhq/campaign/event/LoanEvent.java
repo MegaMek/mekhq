@@ -28,13 +28,13 @@ import mekhq.campaign.finances.Loan;
  *
  */
 public abstract class LoanEvent extends MMEvent {
-    
+
     private final Loan loan;
-    
+
     public LoanEvent(Loan loan) {
         this.loan = Objects.requireNonNull(loan);
     }
-    
+
     public Loan getLoan() {
         return loan;
     }

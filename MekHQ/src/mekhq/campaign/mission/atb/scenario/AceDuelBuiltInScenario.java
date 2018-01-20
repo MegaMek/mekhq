@@ -35,7 +35,7 @@ public class AceDuelBuiltInScenario extends AtBScenario {
 	public String getResourceKey() {
 		return "aceDuel";
 	}
-	
+
 	@Override
 	public void setLightConditions() {
 		setLight(PlanetaryConditions.L_DAY);
@@ -85,7 +85,7 @@ public class AceDuelBuiltInScenario extends AtBScenario {
 		}
 
 		for (int weight = EntityWeightClass.WEIGHT_LIGHT; weight <= EntityWeightClass.WEIGHT_ASSAULT; weight++) {
-		    
+
 			Entity en = getEntity(getContract(campaign).getEnemyCode(), getContract(campaign).getEnemySkill(),
 					getContract(campaign).getEnemyQuality(), UnitType.MEK,
 					Math.min(weight + 1, EntityWeightClass.WEIGHT_ASSAULT), campaign);
@@ -94,7 +94,7 @@ public class AceDuelBuiltInScenario extends AtBScenario {
 				en.getCrew().setGunnery(en.getCrew().getGunnery() - 1);
 				en.getCrew().setPiloting(en.getCrew().getPiloting() - 1);
 			}
-			
+
 			enemyEntities = new ArrayList<Entity>();
 			enemyEntities.add(en);
 			getSpecMissionEnemies().add(enemyEntities);

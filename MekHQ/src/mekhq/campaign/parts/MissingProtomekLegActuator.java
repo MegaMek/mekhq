@@ -134,7 +134,7 @@ public class MissingProtomekLegActuator extends MissingPart {
     public TechAdvancement getTechAdvancement() {
         return ProtomekLocation.TECH_ADVANCEMENT;
     }
-	
+
 	@Override
 	public int getMassRepairOptionType() {
     	return Part.REPAIR_PART_TYPE.ACTUATOR;

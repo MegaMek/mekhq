@@ -434,10 +434,10 @@ public class MassRepairService {
 			if (!parts.isEmpty()) {
 				return new MassRepairUnitAction(unit, salvaging, MassRepairUnitAction.STATUS.ALL_PARTS_IN_PROCESS);
 			}
-			
+
 			return new MassRepairUnitAction(unit, salvaging, MassRepairUnitAction.STATUS.NO_PARTS);
 		}
-		
+
 		for (IPartWork partWork : parts) {
 			if (partWork instanceof Part) {
 				Part part = (Part) partWork;
@@ -480,7 +480,7 @@ public class MassRepairService {
 				if ((p instanceof Part) && ((Part) p).isOmniPodded()) {
 					if (!(p instanceof AmmoBin) || ((p instanceof AmmoBin) && salvaging)) {
 						MissingPart m = ((Part) p).getMissingPart();
-	
+
 						if (m != null && m.isReplacementAvailable()) {
 							continue;
 						}
@@ -717,7 +717,7 @@ public class MassRepairService {
 			debugLog("Checking tech %s", "repairPart", tech.getName());
 
 			Skill skill = tech.getSkillForWorkingOn(partWork);
-			
+
 			if (partWork instanceof Part) {
 			    ((Part) partWork).resetModeToNormal();
 			}

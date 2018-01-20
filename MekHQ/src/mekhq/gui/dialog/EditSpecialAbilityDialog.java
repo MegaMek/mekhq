@@ -71,7 +71,7 @@ public class EditSpecialAbilityDialog extends JDialog {
     private JLabel lblPrereqAbil;
     private JLabel lblInvalidAbil;
     private JLabel lblRemoveAbil;
-    
+
     private boolean cancelled;
     private int currentXP;
 
@@ -475,7 +475,7 @@ public class EditSpecialAbilityDialog extends JDialog {
         	refreshGUI();
         }
     }
-    
+
     public boolean wasCancelled() {
     	return cancelled;
     }

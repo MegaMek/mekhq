@@ -621,7 +621,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         checkMaintenance = new JCheckBox();
         logMaintenance = new JCheckBox();
         reverseQualityNames = new JCheckBox();
-                
+
         chkSupportStaffOnly = new JCheckBox();
 
         ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignOptionsDialog", new EncodeControl()); //$NON-NLS-1$
@@ -776,7 +776,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         panSubMaintenance.setBorder(BorderFactory.createTitledBorder("Maintenance"));
         panSubAcquire.setBorder(BorderFactory.createTitledBorder("Acquisition"));
         panSubDelivery.setBorder(BorderFactory.createTitledBorder("Delivery"));
-        
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -784,7 +784,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         panRepair.add(panSubRepair, gridBagConstraints);
-        
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
@@ -792,21 +792,21 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         panRepair.add(panSubAcquire, gridBagConstraints);
-        
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         panRepair.add(panSubMaintenance, gridBagConstraints);
-        
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         panRepair.add(panSubDelivery, gridBagConstraints);
-        
+
         //We want the new mass repair panel to span two cells
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -1417,7 +1417,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panPersonnel.add(useEdgeBox, gridBagConstraints);
-        
+
         useSupportEdgeBox.setText(resourceMap.getString("useSupportEdgeBox.text")); // NOI18N
         useSupportEdgeBox.setToolTipText(resourceMap.getString("useSupportEdgeBox.toolTipText")); // NOI18N
         useSupportEdgeBox.setName("useSupportEdgeBox"); // NOI18N
@@ -2332,7 +2332,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         panXP.add(new JLabel("week(s)"), gridBagConstraints);
-        
+
         spnEdgeCost = new JSpinner(new SpinnerNumberModel(options.getEdgeCost(), 0, 10000, 1));
         ((JSpinner.DefaultEditor) spnEdgeCost.getEditor()).getTextField().setEditable(false);
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -3424,7 +3424,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         panAtB.add(btnStaticRATs, gridBagConstraints);
         btnStaticRATs.addItemListener(ev -> enableAtBComponents(panSubAtBRat,
         		btnStaticRATs.isSelected()));
-        
+
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.gridwidth = 2;
@@ -3554,7 +3554,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy++;
         panSubAtBAdmin.add(chkUnitMarketReportRefresh, gridBagConstraints);
-        
+
         ButtonGroup group = new ButtonGroup();
         group.add(btnDynamicRATs);
         group.add(btnStaticRATs);
@@ -3572,7 +3572,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
                 	displayName.append(")");
             	}
     			chosenRatModel.addElement(displayName.toString());
-        	}        	
+        	}
         }
         chosenRats.setModel(chosenRatModel);
         chosenRats.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -3599,7 +3599,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
             	if (!chosenRatModel.contains(displayName.toString())) {
             		availableRatModel.addElement(displayName.toString());
             	}
-        	}        	
+        	}
         }
         availableRats.setModel(availableRatModel);
         availableRats.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -3702,14 +3702,14 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 4;
         panSubAtBRat.add(panRatButtons, gridBagConstraints);
-        
+
         chkIgnoreRatEra.setText(resourceMap.getString("chkIgnoreRatEra.text"));
         chkIgnoreRatEra.setToolTipText(resourceMap.getString("chkIgnoreRatEra.toolTipText"));
         chkIgnoreRatEra.setSelected(options.canIgnoreRatEra());
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 5;
         panSubAtBRat.add(chkIgnoreRatEra, gridBagConstraints);
-        
+
         JLabel lblSearchRadius = new JLabel(resourceMap.getString("lblSearchRadius.text"));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -3935,7 +3935,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         panSubAtBScenario.add(chkOpforUsesVTOLs, gridBagConstraints);
-        
+
         JPanel panOpforAero = new JPanel();
         chkOpforUsesAero.setText(resourceMap.getString("chkOpforUsesAero.text"));
         chkOpforUsesAero.setToolTipText(resourceMap.getString("chkOpforUsesAero.toolTipText"));
@@ -3945,7 +3945,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         spnOpforAeroChance.setModel(new SpinnerNumberModel(options.getOpforAeroChance(), 0, 6, 1));
         panOpforAero.add(chkOpforUsesAero);
         panOpforAero.add(spnOpforAeroChance);
-        panOpforAero.add(lblOpforAeroChance);        
+        panOpforAero.add(lblOpforAeroChance);
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = yTablePosition++;
         gridBagConstraints.gridwidth = 2;
@@ -3953,7 +3953,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         panSubAtBScenario.add(panOpforAero, gridBagConstraints);
-        
+
         JPanel panOpforLocal = new JPanel();
         chkOpforUsesLocalForces.setText(resourceMap.getString("chkOpforUsesLocalForces.text"));
         chkOpforUsesLocalForces.setToolTipText(resourceMap.getString("chkOpforUsesLocalForces.toolTipText"));
@@ -4095,11 +4095,11 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 				&& btnStaticRATs.isSelected());
 
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
-            public void run() { 
+            public void run() {
                 scrSPA.getVerticalScrollBar().setValue(0);
                 scrAtB.getVerticalScrollBar().setValue(0);
             }
-         });        
+         });
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -4748,13 +4748,13 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     			}
     		}
     	}
-    	
+
     	for (String key : SpecialAbility.getAllDefaultSpecialAbilities().keySet()) {
             if(null == tempSPA.get(key) && !unused.contains(key)) {
                 unused.add(key);
             }
         }
-    	
+
     	return unused;
     }
 

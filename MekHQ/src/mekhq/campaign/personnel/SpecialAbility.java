@@ -64,7 +64,7 @@ import mekhq.Version;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class SpecialAbility implements MekHqXmlSerializable {
-    
+
     // Keys for miscellaneous prerequisites (i.e. not skill or ability)
     private static final String PREREQ_MISC_CLANNER = "clanner";
 
@@ -92,7 +92,7 @@ public class SpecialAbility implements MekHqXmlSerializable {
     //these are abilities that should be removed if the person gets this ability
     //(typically this is a lower value ability on the same chain (e.g. Cluster Hitter removed when you get Cluster Master)
     private Vector<String> removeAbilities;
-    
+
     public SpecialAbility() {
         this("unknown");
     }
@@ -197,11 +197,11 @@ public class SpecialAbility implements MekHqXmlSerializable {
     public void setPrereqAbilities(Vector<String> prereq) {
     	prereqAbilities = prereq;
     }
-    
+
     public Map<String,String> getPrereqMisc() {
         return prereqMisc;
     }
-    
+
     public void setPrereqMisc(Map<String,String> prereq) {
         prereqMisc = new HashMap<>(prereq);
     }
@@ -225,7 +225,7 @@ public class SpecialAbility implements MekHqXmlSerializable {
     public void clearPrereqSkills() {
         prereqSkills = new Vector<SkillPrereq>();
     }
-    
+
     public void clearPrereqMisc() {
         prereqMisc = new HashMap<>();
     }
@@ -344,7 +344,7 @@ public class SpecialAbility implements MekHqXmlSerializable {
                 }
             }
         }
-        
+
         if (wn.getNodeName().equalsIgnoreCase("edgetrigger")) {
             edgeTriggers.put(retVal.lookupName, retVal);
         } else {
@@ -483,7 +483,7 @@ public class SpecialAbility implements MekHqXmlSerializable {
     public static Hashtable<String, SpecialAbility> getAllDefaultSpecialAbilities() {
         return defaultSpecialAbilities;
     }
-    
+
     public static SpecialAbility getEdgeTrigger(String name) {
         return edgeTriggers.get(name);
     }

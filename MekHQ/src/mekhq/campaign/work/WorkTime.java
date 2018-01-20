@@ -1,21 +1,21 @@
 /*
  * WorkTime.java
- * 
+ *
  * Copyright (C) 2016 MegaMek team
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -37,7 +37,7 @@ public enum WorkTime {
     EXTRA_8(-1, "Extra time (x8)", -5, false, 0, 8.0),
     RUSH_15(-1, "Rush Job (1/15)", 4, true, 4, 1.0/15.0),
     RUSH_30(-1, "Rush Job (1/30)", 5, true, 5, 1.0/30.0);
-    
+
     // Initialize by-id array lookup table
     private static WorkTime[] idMap;
     static {
@@ -53,7 +53,7 @@ public enum WorkTime {
             }
         }
     }
-    
+
     /** Default (Strategic Operations) work time modifiers */
     public static final WorkTime[] DEFAULT_TIMES = {
         NORMAL, EXTRA_2, EXTRA_3, EXTRA_4, RUSH_2, RUSH_4, RUSH_8
@@ -62,17 +62,17 @@ public enum WorkTime {
     public static final WorkTime[] ALL_TIMES = {
         NORMAL, EXTRA_2, EXTRA_3, EXTRA_4, EXTRA_6, EXTRA_8, RUSH_2, RUSH_4, RUSH_8, RUSH_15, RUSH_30
     };
-    
+
     /** StratOps times in increasing order **/
     public static final WorkTime[] STRAT_OPTS_INCREASING_TIMES = {
     	RUSH_8, RUSH_4, RUSH_2, NORMAL, EXTRA_2, EXTRA_3, EXTRA_4
     };
-    
+
     /** @return the work time order corresponding to the (old) ID */
     public static WorkTime of(int id) {
         return ((id > 0) && (id < idMap.length)) ? idMap[id] : NORMAL;
     }
-    
+
     /** @return the work time order corresponding to the given string */
     public static WorkTime of(String str) {
         try {
@@ -82,7 +82,7 @@ public enum WorkTime {
         }
         return valueOf(str.toUpperCase(Locale.ROOT));
     }
-    
+
     public final int id;
     // User-displayable. TODO: Localize
     public final String name;
@@ -102,37 +102,37 @@ public enum WorkTime {
         this.expReduction = expReduction;
         this.timeMultiplier = timeMultiplier;
     }
-    
+
     /** @return the target number modificator */
     public int getMod(boolean includeRush) {
         return (!isRushed || includeRush) ? mod : 0;
     }
-    
+
     public WorkTime moveTimeToNextLevel(boolean increase) {
     	int currentIdx = -1;
-    	
+
     	for (int i = 0; i < STRAT_OPTS_INCREASING_TIMES.length; i++) {
     		if (id == STRAT_OPTS_INCREASING_TIMES[i].id) {
     			currentIdx = i;
     			break;
     		}
     	}
-    	
+
     	if (currentIdx == -1) {
     		return null;
     	}
-    	
+
     	if (increase) {
     		if (currentIdx == STRAT_OPTS_INCREASING_TIMES.length - 1) {
     			return null;
     		}
-    		
+
     		return WorkTime.of(STRAT_OPTS_INCREASING_TIMES[currentIdx + 1].id);
     	} else {
     		if (currentIdx == 0) {
     			return null;
     		}
-    		
+
     		return WorkTime.of(STRAT_OPTS_INCREASING_TIMES[currentIdx - 1].id);
     	}
     }

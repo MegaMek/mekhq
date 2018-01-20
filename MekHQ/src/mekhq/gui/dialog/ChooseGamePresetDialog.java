@@ -1,20 +1,20 @@
 /*
  * ChooseGamePresetDialog.java
- * 
+ *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -44,17 +44,17 @@ import mekhq.campaign.GamePreset;
  */
 public class ChooseGamePresetDialog extends javax.swing.JDialog {
 	private static final long serialVersionUID = -8038099101234445018L;
-    
-    
+
+
 	private javax.swing.JPanel panButtons;
 	private javax.swing.JButton btnCancel;
     private javax.swing.JButton btnOk;
-    
+
     private ArrayList<GamePreset> presets;
     private ArrayList<JRadioButton> presetButtons;
     private GamePreset selectedPreset;
 	private boolean cancelled;
-    
+
     /** Creates new form NewTeamDialog */
     public ChooseGamePresetDialog(java.awt.Frame parent, boolean modal, ArrayList<GamePreset> p) {
         super(parent, modal);
@@ -72,16 +72,16 @@ public class ChooseGamePresetDialog extends javax.swing.JDialog {
     	 btnOk = new javax.swing.JButton();
     	 btnCancel = new javax.swing.JButton();
     	 presetButtons = new ArrayList<JRadioButton>();
-    	 
+
     	 JPanel mainPanel = new JPanel(new GridBagLayout());
     	 JScrollPane scrPane = new JScrollPane(mainPanel);
 
     	 ButtonGroup group = new ButtonGroup();
-    	 
+
     	 ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ChooseGamePresetDialog", new EncodeControl()); //$NON-NLS-1$
     	 setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
     	 setName("Form"); // NOI18N
-    	 
+
     	 getContentPane().setLayout(new BorderLayout());
     	 setTitle(resourceMap.getString("title"));
 
@@ -102,7 +102,7 @@ public class ChooseGamePresetDialog extends javax.swing.JDialog {
         	 presetPanel.add(label, BorderLayout.CENTER);
         	 presetPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
     		 presetPanel.setPreferredSize(new Dimension(450, 100));
-        	 
+
     		 gridBagConstraints = new java.awt.GridBagConstraints();
         	 gridBagConstraints.gridx = 0;
         	 gridBagConstraints.gridy = i;
@@ -110,13 +110,13 @@ public class ChooseGamePresetDialog extends javax.swing.JDialog {
         	 gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         	 gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         	 gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        	 mainPanel.add(presetPanel, gridBagConstraints);        	 
+        	 mainPanel.add(presetPanel, gridBagConstraints);
         	 i++;
     	 }
-	   
+
     	 panButtons.setName("panButtons");
     	 panButtons.setLayout(new GridBagLayout());
-	        
+
     	 btnOk.setText(resourceMap.getString("btnOk.text")); // NOI18N
     	 btnOk.setName("btnOk"); // NOI18N
     	 btnOk.addActionListener(new java.awt.event.ActionListener() {
@@ -132,7 +132,7 @@ public class ChooseGamePresetDialog extends javax.swing.JDialog {
     	 gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
     	 gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
     	 panButtons.add(btnOk, gridBagConstraints);
-	
+
     	 btnCancel.setText(resourceMap.getString("btnCancel.text")); // NOI18N
     	 btnCancel.setName("btnClose"); // NOI18N
     	 btnCancel.addActionListener(new java.awt.event.ActionListener() {
@@ -148,16 +148,16 @@ public class ChooseGamePresetDialog extends javax.swing.JDialog {
     	 gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
     	 gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
     	 panButtons.add(btnCancel, gridBagConstraints);
-	
+
     	 scrPane.setPreferredSize(new Dimension(500, 430));
-    	 
+
     	 getContentPane().add(scrPane, BorderLayout.CENTER);
     	 getContentPane().add(panButtons, BorderLayout.SOUTH);
-    	 
+
     	 pack();
     }
 
-    
+
     private void btnOkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHireActionPerformed
     	int sel = 0;
     	for(JRadioButton button : presetButtons) {
@@ -167,7 +167,7 @@ public class ChooseGamePresetDialog extends javax.swing.JDialog {
     		}
     		sel++;
     	}
-    	
+
     	this.setVisible(false);
     }
 
@@ -176,11 +176,11 @@ public class ChooseGamePresetDialog extends javax.swing.JDialog {
     	cancelled = true;
     	this.setVisible(false);
     }
-    
+
     public boolean wasCancelled() {
     	return cancelled;
     }
-    
+
     public GamePreset getSelectedPreset() {
     	return selectedPreset;
     }
