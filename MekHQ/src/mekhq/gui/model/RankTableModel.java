@@ -26,7 +26,7 @@ public class RankTableModel extends DefaultTableModel {
     public RankTableModel(Object[][] ranksArray, String[] rankColNames) {
         super(ranksArray, rankColNames);
     }
-    
+
     @Override
     public boolean isCellEditable(int row, int column) {
     	return !(column == COL_NAME_RATE || column == COL_OFFICER);
@@ -51,7 +51,7 @@ public class RankTableModel extends DefaultTableModel {
     			return getValueAt(0, c).getClass();
     	}
     }
-    
+
     public int getColumnWidth(int c) {
     	switch (c) {
     		case COL_NAME_RATE:

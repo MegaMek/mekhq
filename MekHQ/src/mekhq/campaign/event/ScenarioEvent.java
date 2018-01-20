@@ -29,13 +29,13 @@ import mekhq.campaign.mission.Scenario;
  *
  */
 public abstract class ScenarioEvent extends MMEvent {
-    
+
     private final Scenario scenario;
-    
+
     public ScenarioEvent(Scenario scenario) {
         this.scenario = Objects.requireNonNull(scenario);
     }
-    
+
     public Scenario getScenario() {
         return scenario;
     }

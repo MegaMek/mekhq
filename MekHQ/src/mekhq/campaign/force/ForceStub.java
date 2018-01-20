@@ -1,20 +1,20 @@
 /*
  * Force.java
- * 
+ *
  * Copyright (c) 2011 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -39,15 +39,15 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.unit.Unit;
 
 /**
- * this is a hierarchical object that represents forces from the TO&E using 
- * strings rather than unit objects. This makes it static and thus usable to 
+ * this is a hierarchical object that represents forces from the TO&E using
+ * strings rather than unit objects. This makes it static and thus usable to
  * keep track of forces involved in completed scenarios
- * 
+ *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class ForceStub implements Serializable {
     private static final long serialVersionUID = -7283462987261602481L;
-    
+
     // pathway to force icon
     public static final String ROOT_ICON = "-- General --";
     public static final String ICON_NONE = "None";
@@ -58,13 +58,13 @@ public class ForceStub implements Serializable {
     private String name;
     private Vector<ForceStub> subForces;
     private Vector<UnitStub> units;
-    
+
     public ForceStub() {
         name = "";
         subForces = new Vector<ForceStub>();
         units = new Vector<UnitStub>();
     }
-    
+
     public ForceStub(Force force, Campaign c) {
         name = force.getFullName();
         subForces = new Vector<ForceStub>();
@@ -84,35 +84,35 @@ public class ForceStub implements Serializable {
             }
         }
     }
-    
+
     public String toString() {
         return name;
     }
-    
+
     public Vector<Object> getAllChildren() {
         Vector<Object> children = new Vector<Object>();
         children.addAll(subForces);
         children.addAll(units);
-        
+
         return children;
     }
-    
+
     public String getIconCategory() {
         return iconCategory;
     }
-    
+
     public String getIconFileName() {
         return iconFileName;
     }
-    
+
     public LinkedHashMap<String, Vector<String>> getIconMap() {
         return iconMap;
     }
-    
+
     public void setIconMap(LinkedHashMap<String, Vector<String>> iconMap) {
         this.iconMap = iconMap;
     }
-    
+
     public void writeToXml(PrintWriter pw1, int indent) {
         pw1.println(MekHqXmlUtil.indentStr(indent) + "<forceStub>");
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
@@ -160,7 +160,7 @@ public class ForceStub implements Serializable {
         }
         if(subForces.size() > 0) {
             pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                    +"<subforces>");        
+                    +"<subforces>");
             for(ForceStub sub : subForces) {
                 sub.writeToXml(pw1, indent+2);
             }
@@ -169,16 +169,16 @@ public class ForceStub implements Serializable {
             }
         pw1.println(MekHqXmlUtil.indentStr(indent) + "</forceStub>");
     }
-    
+
     public static ForceStub generateInstanceFromXML(Node wn) {
         final String METHOD_NAME = "generateInstanceFromXML(Node)"; //$NON-NLS-1$
-        
+
         ForceStub retVal = null;
-        
-        try {        
+
+        try {
             retVal = new ForceStub();
             NodeList nl = wn.getChildNodes();
-            
+
             for (int x=0; x<nl.getLength(); x++) {
                 Node wn2 = nl.item(x);
                 if (wn2.getNodeName().equalsIgnoreCase("name")) {
@@ -196,7 +196,7 @@ public class ForceStub implements Serializable {
                         // If it's not an element node, we ignore it.
                         if (wn3.getNodeType() != Node.ELEMENT_NODE)
                             continue;
-                        
+
                         if (!wn3.getNodeName().equalsIgnoreCase("unitStub")) {
                             // Error condition of sorts!
                             // Errr, what should we do here?
@@ -204,7 +204,7 @@ public class ForceStub implements Serializable {
                                     "Unknown node type not loaded in ForceStub nodes: " + wn3.getNodeName()); //$NON-NLS-1$
                             continue;
                         }
-                        
+
                         retVal.units.add(UnitStub.generateInstanceFromXML(wn3));
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("subforces")) {
@@ -214,7 +214,7 @@ public class ForceStub implements Serializable {
                         // If it's not an element node, we ignore it.
                         if (wn3.getNodeType() != Node.ELEMENT_NODE)
                             continue;
-                        
+
                         if (!wn3.getNodeName().equalsIgnoreCase("forceStub")) {
                             // Error condition of sorts!
                             // Errr, what should we do here?
@@ -222,18 +222,18 @@ public class ForceStub implements Serializable {
                                     "Unknown node type not loaded in ForceStub nodes: " + wn3.getNodeName()); //$NON-NLS-1$
                             continue;
                         }
-                        
+
                         retVal.addSubForce(generateInstanceFromXML(wn3));
                     }
                 }
-            }    
+            }
         } catch (Exception ex) {
             // Errrr, apparently either the class name was invalid...
             // Or the listed name doesn't exist.
             // Doh!
             MekHQ.getLogger().log(ForceStub.class, METHOD_NAME, ex);
         }
-        
+
         return retVal;
     }
 
@@ -257,7 +257,7 @@ public class ForceStub implements Serializable {
             retVal.getIconMap().put(key, values);
         }
     }
-    
+
     private static Vector<String> processIconMapSubNodes(Node wn) {
         Vector<String> values = new Vector<String>();
         NodeList nl = wn.getChildNodes();
@@ -278,7 +278,7 @@ public class ForceStub implements Serializable {
         }
         return values;
     }
-    
+
     public void addSubForce(ForceStub sub) {
         subForces.add(sub);
     }

@@ -181,7 +181,7 @@ public class PartsAcquisitionService {
 		missingTotalPrice = 0;
 
 		//campaign.addReport("***START: generateSummaryCounts");
-		
+
 		for (PartCountInfo pci : partCountInfoMap.values()) {
 			inTransitCount += pci.getInTransitCount();
 			onOrderCount += pci.getOnOrderCount();
@@ -199,7 +199,7 @@ public class PartsAcquisitionService {
 
 			//campaign.addReport(pci.toString());
 		}
-		
+
 		//campaign.addReport("***END: generateSummaryCounts");
 	}
 
@@ -330,7 +330,7 @@ public class PartsAcquisitionService {
 			sb.append(",failedMessage='" + failedMessage + "'");
 			sb.append(",canBeAcquired=" + canBeAcquired);
 			sb.append("}");
-			
+
 			return sb.toString();
 		}
 	}

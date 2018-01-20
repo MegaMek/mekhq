@@ -495,7 +495,7 @@ public class Lance implements Serializable, MekHqXmlSerializable {
 
     public static Lance generateInstanceFromXML(Node wn) {
         final String METHOD_NAME = "generateInstanceFromXML(Node)"; //$NON-NLS-1$
-        
+
         Lance retVal = null;
         NamedNodeMap attrs = wn.getAttributes();
         Node classNameNode = attrs.getNamedItem("type");

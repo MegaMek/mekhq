@@ -143,18 +143,18 @@ public class Bloodname implements Serializable {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param warriorType A Person.PHENOTYPE_* constant
 	 * @param year The current year of the campaign setting
 	 * @return An adjustment to the frequency of this name for the phenotype.
-	 * 
+	 *
 	 * A warrior is three times as likely to have a Bloodname associated with the
 	 * same phenotype as a general name (which is split among the three types).
 	 * Elemental names are treated as general prior to 2870. The names that later
 	 * became associated with ProtoMech pilots (identified in WoR) are assumed
 	 * to have been poor performers and have a lower frequency even before the
 	 * invention of the PM, though have a higher frequency for PM pilots than other
-	 * aerospace names. 
+	 * aerospace names.
 	 */
 	public int phenotypeMultiplier(int warriorType, int year) {
 		switch (phenotype) {
@@ -258,12 +258,12 @@ public class Bloodname implements Serializable {
 
 	/**
 	 * Determines a likely Bloodname based on Clan, phenotype, and year.
-	 * 
+	 *
 	 * @param faction The faction code for the Clan; must exist in data/names/bloodnames/clans.xml
 	 * @param phenotype One of the Person.PHENOTYPE_* constants
 	 * @param year The current campaign year
 	 * @return An object representing the chosen Bloodname
-	 * 
+	 *
 	 * Though based as much as possible on official sources, the method employed here involves a
 	 * considerable amount of speculation.
 	 */
@@ -408,11 +408,11 @@ public class Bloodname implements Serializable {
 	/**
 	 * Represents the decreasing frequency of non-exclusive names within the original Clan
 	 * due to dispersal throughout the Clans and reavings.
-	 * 
+	 *
 	 * @param year The current year of the campaign
 	 * @return A fraction that decreases by 10%/year
 	 */
-	
+
 	private static Fraction eraFraction(int year) {
 		if (year < 2900) {
 			return new Fraction(1);
@@ -431,7 +431,7 @@ public class Bloodname implements Serializable {
 
 	public static void loadBloodnameData() {
 	    final String METHOD_NAME = "loadBloodnameData()"; //$NON-NLS-1$
-	    
+
 		Clan.loadClanData();
 		bloodnames = new ArrayList<Bloodname>();
 

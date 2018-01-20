@@ -19,7 +19,7 @@ import mekhq.campaign.universe.NewsItem;
  * @author Jay Lawson
  */
 public class NewsReportDialog extends javax.swing.JDialog {
-    
+
     private static final long serialVersionUID = 3624327778807359294L;
 
     private JTextPane txtNews;
@@ -27,14 +27,14 @@ public class NewsReportDialog extends javax.swing.JDialog {
     public NewsReportDialog(java.awt.Frame parent, NewsItem news) {
         super(parent, false);
         setTitle(news.getHeadline());
-        initComponents();     
+        initComponents();
         txtNews.setText(news.getFullDescription());
         txtNews.setCaretPosition(0);
         setMinimumSize(new Dimension(500, 300));
         setPreferredSize(new Dimension(500, 300));
         setLocationRelativeTo(parent);
     }
-    
+
     private void initComponents() {
 
         txtNews = new JTextPane();
@@ -44,10 +44,10 @@ public class NewsReportDialog extends javax.swing.JDialog {
         scrNews.setBorder( new EmptyBorder(2,10,2,2));
 
         setLayout(new java.awt.BorderLayout());
-        
+
         txtNews.setEditable(false);
-        
+
         getContentPane().add(scrNews, BorderLayout.CENTER);
     }
-    
+
 }

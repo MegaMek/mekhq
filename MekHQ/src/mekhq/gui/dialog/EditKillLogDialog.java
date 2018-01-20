@@ -1,20 +1,20 @@
 /*
  * EditKillLogDialog.java
- * 
+ *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -50,23 +50,23 @@ import mekhq.campaign.personnel.Person;
  */
 public class EditKillLogDialog extends javax.swing.JDialog {
     /**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 6995319032267472795L;
-	
+
 	private Frame frame;
     private Campaign campaign;
     private Person person;
     private ArrayList<Kill> kills;
     private KillTableModel killModel;
-    
+
     private javax.swing.JButton btnAdd;
     private javax.swing.JButton btnEdit;
     private javax.swing.JButton btnDelete;
     private javax.swing.JButton btnOK;
     private JTable killTable;
     private JScrollPane scrollKillTable;
-    
+
     public EditKillLogDialog(java.awt.Frame parent, boolean modal, Campaign c, Person p) {
         super(parent, modal);
         this.frame = parent;
@@ -90,7 +90,7 @@ public class EditKillLogDialog extends javax.swing.JDialog {
         setName("Form"); // NOI18N
         setTitle(resourceMap.getString("Form.title") + " " + person.getName());
         getContentPane().setLayout(new java.awt.BorderLayout());
-        
+
         JPanel panBtns = new JPanel(new GridLayout(1,0));
         btnAdd.setText(resourceMap.getString("btnAdd.text")); // NOI18N
         btnAdd.setName("btnAdd"); // NOI18N
@@ -119,7 +119,7 @@ public class EditKillLogDialog extends javax.swing.JDialog {
         });
         panBtns.add(btnDelete);
         getContentPane().add(panBtns, BorderLayout.PAGE_START);
-        
+
         killTable = new JTable(killModel);
         killTable.setName("killTable"); // NOI18N
 		TableColumn column = null;
@@ -143,7 +143,7 @@ public class EditKillLogDialog extends javax.swing.JDialog {
 		scrollKillTable.setViewportView(killTable);
         getContentPane().add(scrollKillTable, BorderLayout.CENTER);
 
-        
+
         btnOK.setText(resourceMap.getString("btnOK.text")); // NOI18N
         btnOK.setName("btnOK"); // NOI18N
         btnOK.addActionListener(new java.awt.event.ActionListener() {
@@ -156,17 +156,17 @@ public class EditKillLogDialog extends javax.swing.JDialog {
         pack();
     }
 
-    
+
     private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHireActionPerformed
     	this.setVisible(false);
     }
-    
+
     private void killTableValueChanged(javax.swing.event.ListSelectionEvent evt) {
 		int row = killTable.getSelectedRow();
 		btnDelete.setEnabled(row != -1);
 		btnEdit.setEnabled(row != -1);
 	}
-    
+
     private void addKill() {
     	KillDialog ekld = new KillDialog(frame, true, new Kill(person.getId(), "", "", campaign.getDate()), person.getName());
 		ekld.setVisible(true);
@@ -175,7 +175,7 @@ public class EditKillLogDialog extends javax.swing.JDialog {
 		}
 		refreshTable();
     }
-    
+
     private void editKill() {
     	Kill kill = killModel.getKillAt(killTable.getSelectedRow());
     	if(null != kill) {
@@ -184,13 +184,13 @@ public class EditKillLogDialog extends javax.swing.JDialog {
     		refreshTable();
     	}
     }
-    
+
     private void deleteKill() {
     	Kill kill = killModel.getKillAt(killTable.getSelectedRow());
     	campaign.removeKill(kill);
     	refreshTable();
     }
-    
+
     private void refreshTable() {
 		int selectedRow = killTable.getSelectedRow();
     	killModel.setData(campaign.getKillsFor(person.getId()));
@@ -204,14 +204,14 @@ public class EditKillLogDialog extends javax.swing.JDialog {
     		}
     	}
     }
-    
+
     /**
 	 * A table model for displaying parts - similar to the one in CampaignGUI, but not exactly
 	 */
 	public class KillTableModel extends AbstractTableModel {
 
 		/**
-		 * 
+		 *
 		 */
 		private static final long serialVersionUID = -58915479895694545L;
 		protected String[] columnNames;
@@ -221,11 +221,11 @@ public class EditKillLogDialog extends javax.swing.JDialog {
 		public final static int COL_KILLED  = 1;
 		public final static int COL_KILLER  = 2;
         public final static int N_COL       = 3;
-		
+
 		public KillTableModel(ArrayList<Kill> entries) {
 			data = entries;
 		}
-		
+
 		public int getRowCount() {
             return data.size();
         }
@@ -267,12 +267,12 @@ public class EditKillLogDialog extends javax.swing.JDialog {
 			}
 			return "?";
 		}
-		
+
 		@Override
 		public boolean isCellEditable(int row, int col) {
 			return false;
 		}
-		
+
 		@Override
 		public Class<? extends Object> getColumnClass(int c) {
 			return getValueAt(0, c).getClass();
@@ -281,16 +281,16 @@ public class EditKillLogDialog extends javax.swing.JDialog {
 		public Kill getKillAt(int row) {
 			return (Kill) data.get(row);
 		}
-		
+
 		 public int getColumnWidth(int c) {
 			 switch(c) {
 			 case COL_DATE:
-				 return 20;     
+				 return 20;
 			 default:
 				 return 100;
 			 }
 		 }
-	        
+
 		 public int getAlignment(int col) {
 			 return SwingConstants.LEFT;
 		 }
@@ -301,22 +301,22 @@ public class EditKillLogDialog extends javax.swing.JDialog {
 				 return null;
 			 }
 		 }
-	        
+
 		 //fill table with values
 		 public void setData(ArrayList<Kill> kills) {
 			 data = kills;
 			 fireTableDataChanged();
 		 }
-	        
+
 		 public KillTableModel.Renderer getRenderer() {
 			 return new KillTableModel.Renderer();
 		 }
 
 		 public class Renderer extends DefaultTableCellRenderer {
-			 
+
 
 			 /**
-			 * 
+			 *
 			 */
 			private static final long serialVersionUID = -2888173457152182907L;
 
@@ -330,7 +330,7 @@ public class EditKillLogDialog extends javax.swing.JDialog {
 					int actualRow = table.convertRowIndexToModel(row);
 					setHorizontalAlignment(getAlignment(actualCol));
 					setToolTipText(getTooltip(actualRow, actualCol));
-					
+
 					return this;
 				}
 

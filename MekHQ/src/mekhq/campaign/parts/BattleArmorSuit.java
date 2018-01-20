@@ -413,7 +413,7 @@ public class BattleArmorSuit extends Part {
             }
         }
     }
-    
+
     @Override
     public void fix() {
         super.fix();
@@ -467,9 +467,9 @@ public class BattleArmorSuit extends Part {
             //Taharqa: I am not sure why this runDiagnostic is here and I think its problematic
 			//I know for certain it causes problems when we are trying to figure out damage
 			//to salvage unit because it can sometimes update parts before it checks for destruction
-			//so that they then appear to be the same and aren't checked. In general it seems 
+			//so that they then appear to be the same and aren't checked. In general it seems
 			//bad form. Looking through the code, I couldnt see any obvious reason for its
-			//existence. I am going to remove it and see if it causes problems. 
+			//existence. I am going to remove it and see if it causes problems.
 			//unit.runDiagnostic(false);
         }
         for(Part p : trooperParts) {
@@ -510,12 +510,12 @@ public class BattleArmorSuit extends Part {
             }
         }
     }
-    
-    @Override 
+
+    @Override
 	public int getBaseTime() {
 		return 0;
 	}
-	
+
 	@Override
 	public int getDifficulty() {
 		return 0;

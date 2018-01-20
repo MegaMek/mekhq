@@ -30,9 +30,9 @@ import mekhq.campaign.mission.Mission;
  *
  */
 abstract public class MissionEvent extends MMEvent {
-    
+
     private final Mission mission;
-    
+
     public MissionEvent(Mission mission) {
         this.mission = Objects.requireNonNull(mission);
     }
@@ -40,7 +40,7 @@ abstract public class MissionEvent extends MMEvent {
     public Mission getMission() {
         return mission;
     }
-    
+
     public boolean isContract() {
         return mission instanceof Contract;
     }

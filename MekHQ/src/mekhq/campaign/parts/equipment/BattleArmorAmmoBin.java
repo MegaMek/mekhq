@@ -1,20 +1,20 @@
 /*
  * BattleArmorAmmoBin.java
- * 
+ *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -40,44 +40,44 @@ import mekhq.campaign.work.IAcquisitionWork;
 public class BattleArmorAmmoBin extends AmmoBin implements IAcquisitionWork {
 
     /**
-     * Battle Armor ammo bins need to look for shots for all the remaining troopers in the 
-     * squad. 
-     * TODO: Think about how to handle the case of understrength squads. Right now they 
+     * Battle Armor ammo bins need to look for shots for all the remaining troopers in the
+     * squad.
+     * TODO: Think about how to handle the case of understrength squads. Right now they
      * pay for more ammo than they need, but this is easier than trying to track ammo per suit
      * and adjust for different ammo types when suits are added and removed from squads.
      */
     private static final long serialVersionUID = 2421186617583650648L;
-    
+
     public BattleArmorAmmoBin() {
         this(0, null, -1, 0, false, null);
     }
-    
+
     public BattleArmorAmmoBin(int tonnage, EquipmentType et, int equipNum, int shots, boolean singleShot, Campaign c) {
         super(tonnage, et, equipNum, shots, singleShot, false, c);
     }
-    
+
     public int getNumTroopers() {
         if(null != unit && unit.getEntity() instanceof BattleArmor) {
             //we are going to base this on the full squad size, even though this makes understrength
             //squads overpay for their ammo - that way suits can be moved around without having to adjust
-            //ammo - Tech: "oh you finally got here. Check in the back corner, we stockpiled some ammo for 
+            //ammo - Tech: "oh you finally got here. Check in the back corner, we stockpiled some ammo for
             //you."
             return ((BattleArmor)unit.getEntity()).getSquadSize();
         }
         return 0;
     }
-    
+
     //no salvaging of BA parts
     @Override
     public boolean isSalvaging() {
         return false;
     }
-    
+
     /*@Override
     public int getFullShots() {
     	return super.getFullShots() * getNumTroopers();
     }*/
-    
+
     @Override
     protected int getCurrentShots() {
     	int shots = getFullShots() * getNumTroopers() - shotsNeeded;
@@ -91,13 +91,13 @@ public class BattleArmorAmmoBin extends AmmoBin implements IAcquisitionWork {
     	}
     	return shots;
     }
-    
+
     @Override
     public void updateConditionFromEntity(boolean checkForDestruction) {
         if(null != unit) {
             Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
             if(null != mounted) {
-            	long currentMuniType = 0;			
+            	long currentMuniType = 0;
 				if(mounted.getType() instanceof AmmoType) {
 					currentMuniType = ((AmmoType)mounted.getType()).getMunitionType();
 				}
@@ -110,8 +110,8 @@ public class BattleArmorAmmoBin extends AmmoBin implements IAcquisitionWork {
             }
         }
     }
-    
-    @Override 
+
+    @Override
 	public int getBaseTime() {
 		if(null != unit) {
 			Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
@@ -123,12 +123,12 @@ public class BattleArmorAmmoBin extends AmmoBin implements IAcquisitionWork {
 		}
 		return 15;
 	}
-	
+
 	@Override
 	public int getDifficulty() {
 		return 0;
 	}
-    
+
     @Override
     public void updateConditionFromPart() {
         if(null != unit) {
@@ -142,7 +142,7 @@ public class BattleArmorAmmoBin extends AmmoBin implements IAcquisitionWork {
             }
         }
     }
-    
+
     @Override
     public void loadBin() {
         int shots = Math.min(getAmountAvailable(), shotsNeeded);
@@ -151,12 +151,12 @@ public class BattleArmorAmmoBin extends AmmoBin implements IAcquisitionWork {
         if(null != unit) {
             Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
             if(null != mounted) {
-            	if(mounted.getType().equals(type) 						
+            	if(mounted.getType().equals(type)
 						&& ((AmmoType)mounted.getType()).getMunitionType() == getMunitionType()) {
                     //just a simple reload
                     mounted.setShotsLeft(mounted.getBaseShotsLeft() + shotsPerTrooper);
                 } else {
-                    //loading a new type of ammo                
+                    //loading a new type of ammo
                     unload();
                     mounted.changeAmmoType((AmmoType)type);
                     mounted.setShotsLeft(shotsPerTrooper);
@@ -166,13 +166,13 @@ public class BattleArmorAmmoBin extends AmmoBin implements IAcquisitionWork {
         changeAmountAvailable(-1 * shots, (AmmoType)type);
         shotsNeeded -= shots;
     }
-    
+
     @Override
     public void unload() {
         int shots = 0;
         AmmoType curType = (AmmoType)type;
         if(null != unit) {
-            Mounted mounted = unit.getEntity().getEquipment(equipmentNum);      
+            Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
             if(null != mounted) {
                 shots = mounted.getBaseShotsLeft() * getNumTroopers();
                 mounted.setShotsLeft(0);
@@ -182,9 +182,9 @@ public class BattleArmorAmmoBin extends AmmoBin implements IAcquisitionWork {
         shotsNeeded = getFullShots() * getNumTroopers();
         if(shots > 0) {
             changeAmountAvailable(shots, curType);
-        }   
+        }
     }
-    
+
     @Override
     public String checkFixable() {
     	int amountAvailable = getAmountAvailable();
@@ -192,7 +192,7 @@ public class BattleArmorAmmoBin extends AmmoBin implements IAcquisitionWork {
     		return "Cannot do a partial reload of Battle Armor ammo less than the number of troopers";
     	}
     	return super.checkFixable();
-    	
+
     }
 
     @Override
@@ -200,7 +200,7 @@ public class BattleArmorAmmoBin extends AmmoBin implements IAcquisitionWork {
         //shouldnt be here
         return;
     }
-    
+
     @Override
     public Part getNewPart() {
     	int shots = (int) Math.floor(1000/((AmmoType)type).getKgPerShot());
@@ -211,7 +211,7 @@ public class BattleArmorAmmoBin extends AmmoBin implements IAcquisitionWork {
 		}
         return new AmmoStorage(1,type,shots,campaign);
     }
-    
+
     @Override
     public IAcquisitionWork getAcquisitionWork() {
     	int shots = (int) Math.floor(1000/((AmmoType)type).getKgPerShot());
@@ -226,21 +226,21 @@ public class BattleArmorAmmoBin extends AmmoBin implements IAcquisitionWork {
     @Override
     public String getAcquisitionDesc() {
         String toReturn = "<html><font size='2'";
-        
+
         toReturn += ">";
         toReturn += "<b>" + getAcquisitionDisplayName() + "</b> " + getAcquisitionBonus() + "<br/>";
         toReturn += getAcquisitionExtraDesc() + "<br/>";
         String[] inventories = campaign.getPartInventory(getAcquisitionPart());
-        toReturn += inventories[1] + " in transit, " + inventories[2] + " on order<br>"; 
+        toReturn += inventories[1] + " in transit, " + inventories[2] + " on order<br>";
         toReturn += Utilities.getCurrencyString(getBuyCost()) + "<br/>";
         toReturn += "</font></html>";
         return toReturn;
     }
-	
+
     @Override
     public String getAcquisitionDisplayName() {
     	return type.getDesc();
-    }    
+    }
 
     private int calculateShots() {
         int shots = (int) Math.floor(1000/((AmmoType)type).getKgPerShot());
@@ -249,10 +249,10 @@ public class BattleArmorAmmoBin extends AmmoBin implements IAcquisitionWork {
 			//because presumably this is happening because KgperShot is -1 or 0
 			shots = 20;
 		}
-		
+
 		return shots;
     }
-    
+
 	@Override
 	public String getAcquisitionExtraDesc() {
 		return calculateShots() + " shots";
@@ -276,11 +276,11 @@ public class BattleArmorAmmoBin extends AmmoBin implements IAcquisitionWork {
     public boolean needsMaintenance() {
         return false;
     }
-    
+
     public boolean canNeverScrap() {
     	return true;
 	}
-    
+
     /**
      * Restores the equipment from the name
      */
@@ -290,12 +290,12 @@ public class BattleArmorAmmoBin extends AmmoBin implements IAcquisitionWork {
         } else {
             type = EquipmentType.get(typeName);
         }
-        
-        
+
+
         //fIXME, this is a crappy hack, but we want something along these lines
         //to make sure that BA ammo gets removed from all parts - It might be better to run
         //a check on the XML loading after restore - we also will need to to the same for proto
-        //ammo but we can only do this if we have all the correct ammo rack sizes for the 
+        //ammo but we can only do this if we have all the correct ammo rack sizes for the
         //generics (e.g. LRM1, LRM2, LRM3, etc)
         /*if(typeName.contains("BA-")) {
         	String newTypeName = "IS" + typeName.split("BA-")[1];
@@ -305,7 +305,7 @@ public class BattleArmorAmmoBin extends AmmoBin implements IAcquisitionWork {
         		type = newType;
         	}
         }*/
-        
+
 
         if (type == null) {
             System.err

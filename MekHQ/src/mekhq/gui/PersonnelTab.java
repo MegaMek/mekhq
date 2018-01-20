@@ -127,7 +127,7 @@ public final class PersonnelTab extends CampaignGuiTab {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see mekhq.gui.CampaignGuiTab#initTab()
      */
     @Override
@@ -224,7 +224,7 @@ public final class PersonnelTab extends CampaignGuiTab {
                     }
 
                 }
-            }            
+            }
         });
         TableColumn column = null;
         for (int i = 0; i < PersonnelTableModel.N_COL; i++) {
@@ -264,14 +264,14 @@ public final class PersonnelTab extends CampaignGuiTab {
     public JTable getPersonnelTable() {
         return personnelTable;
     }
-    
+
     public PersonnelTableModel getPersonModel() {
         return personModel;
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see mekhq.gui.CampaignGuiTab#refreshAll()
      */
     @Override
@@ -812,27 +812,27 @@ public final class PersonnelTab extends CampaignGuiTab {
         changePersonnelView();
         personnelListScheduler.schedule();
     }
-    
+
     @Subscribe
     public void handle(DeploymentChangedEvent ev) {
         filterPersonnelScheduler.schedule();
     }
-    
+
     @Subscribe
     public void handle(PersonChangedEvent ev) {
         personnelListScheduler.schedule();
     }
-    
+
     @Subscribe
     public void handle(PersonNewEvent ev) {
         personnelListScheduler.schedule();
     }
-    
+
     @Subscribe
     public void handle(PersonRemovedEvent ev) {
         personnelListScheduler.schedule();
     }
-    
+
     @Subscribe
     public void handle(PersonLogEvent ev) {
         refreshPersonnelView();
@@ -852,7 +852,7 @@ public final class PersonnelTab extends CampaignGuiTab {
     public void handle(PartWorkEvent ev) {
         filterPersonnelScheduler.schedule();
     }
-    
+
     @Subscribe
     public void handle(OvertimeModeEvent ev) {
         filterPersonnelScheduler.schedule();

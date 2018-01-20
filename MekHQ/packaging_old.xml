@@ -7,7 +7,7 @@
 	<!-- Global properties for this build -->
 
 	<property name="version" value="0.1.21"/>
-	
+
 	<property name="srcdir" value="src" />
 	<property name="logdir" value="logs" />
 	<property name="builddir" value="classes" />
@@ -17,10 +17,10 @@
 	<property name="docdir" value="docs" />
 	<property name="confdir" value="mmconf" />
 	<property name="svndir" value="svndev" />
-	
+
 	<!-- Version and packaging properties -->
 	<property name="project.name" value="mekhq" />
-		
+
 	<!-- same as builddir but under svn -->
 	<property name="svnbuilddir" value="${svndir}/${builddir}" />
 
@@ -69,7 +69,7 @@
 			<arg line="export ${svnroot} ${svndir}" />
 		</exec>
 	</target>
-		
+
 	<target name="svndev-build" depends="svndev-get" description="compile project from SVN and generate JAR file" >
 		<mkdir dir="${svnbuilddir}" />
 		<!-- compile -->
@@ -80,7 +80,7 @@
 				<fileset dir="${svndir}/${libdir}" includes="*.jar" />
 				<fileset dir="${svndir}" includes="MegaMek.jar" />
 				<fileset dir="${svndir}" includes="MegaMekLab.jar" />
-			</classpath>			
+			</classpath>
 		</javac>
 
 		<!-- jar -->
@@ -90,13 +90,13 @@
 
 		<!-- Ensure that the log directory exists. -->
 		<mkdir dir="${svndir}/${logdir}" />
-		<touch file="${svndir}/${timestampfile}" />	
+		<touch file="${svndir}/${timestampfile}" />
 	</target>
-		
+
 	<target name="svndev-clean" description="remove the SVN build directory">
 		<delete dir="${svnbuilddir}" />
 	</target>
-	
+
 	<target name="bundle" description="Bundle the project built from SVN into a distribution">
 		<mkdir dir="${dist}" />
 		<copy todir="${dist}">
@@ -117,17 +117,17 @@
 			</fileset>
 		</copy>
 	</target>
-	
+
 	<target name="zip" description="Create a zipfile of the distribution">
 		<zip zipfile="${basedir}/${dist}.zip" basedir="${dist}"  />
 	</target>
-	
+
 	<target name="clean">
 		<delete dir="${dist}" />
 	</target>
-		
+
 	<target name="package" depends="bundle, zip, clean" description="Package a  distribution of the project built from SVN"/>
-	
+
 	<target name="release" depends="svndev-build, package, svndev-clean" description="Build and package a release"/>
-	
+
 </project>

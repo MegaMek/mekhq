@@ -69,7 +69,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see mekhq.gui.CampaignGuiTab#initTab()
      */
     @Override
@@ -161,7 +161,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see mekhq.gui.CampaignGuiTab#refreshAll()
      */
     @Override

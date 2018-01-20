@@ -1,20 +1,20 @@
 /*
  * Turret.java
- * 
+ *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -46,17 +46,17 @@ public class Turret extends TankLocation {
     public Turret() {
     	this(0, 0, null);
     }
-    
+
     public int getLoc() {
         return loc;
     }
-    
+
     public Turret(int loc, int tonnage, Campaign c) {
     	super(loc, tonnage, c);
     	weight = 0;
     	this.name = "Turret";
     }
-    
+
     public Turret clone() {
     	Turret clone = new Turret(0, getUnitTonnage(), weight, campaign);
         clone.copyBaseData(this);
@@ -65,13 +65,13 @@ public class Turret extends TankLocation {
     	clone.breached = this.breached;
     	return clone;
     }
-    
+
     public Turret(int loc, int tonnage, double weight, Campaign c) {
         super(loc, tonnage, c);
         this.weight = weight;
     	this.name = "Turret";
     }
-    
+
     @Override
     public void setUnit(Unit u) {
     	super.setUnit(u);
@@ -89,8 +89,8 @@ public class Turret extends TankLocation {
 
     @Override
     public boolean isSamePartType(Part part) {
-        return part instanceof Turret 
-        		&& getLoc() == ((Turret)part).getLoc() 
+        return part instanceof Turret
+        		&& getLoc() == ((Turret)part).getLoc()
         		&& getTonnage() == ((Turret)part).getTonnage();
     }
 
@@ -115,10 +115,10 @@ public class Turret extends TankLocation {
 	@Override
 	protected void loadFieldsFromXmlNode(Node wn) {
 		NodeList nl = wn.getChildNodes();
-		
+
 		for (int x=0; x<nl.getLength(); x++) {
 			Node wn2 = nl.item(x);
-			
+
 			if (wn2.getNodeName().equalsIgnoreCase("weight")) {
 				weight = Double.parseDouble(wn2.getTextContent());
 			} else if (wn2.getNodeName().equalsIgnoreCase("loc")) {
@@ -153,15 +153,15 @@ public class Turret extends TankLocation {
 		}
 		setUnit(null);
 	}
-	
-	@Override 
+
+	@Override
 	public int getBaseTime() {
 		if(isSalvaging()) {
 			return 160;
 		}
 		return 60;
 	}
-	
+
 	@Override
 	public int getDifficulty() {
 		if(isSalvaging()) {
@@ -177,7 +177,7 @@ public class Turret extends TankLocation {
 		}
 	}
 
-	@Override 
+	@Override
 	public String checkFixable() {
 		if(null == unit) {
 			return null;
@@ -196,12 +196,12 @@ public class Turret extends TankLocation {
 	            }
 	            if (slot.isRepairable()) {
 	                return "Repairable parts in " + unit.getEntity().getLocationName(loc) + " must be salvaged or scrapped first.";
-	            } 
+	            }
 	        }
 		}
 		return null;
 	}
-	
+
 	@Override
 	public String checkScrappable() {
 		//check for armor
@@ -217,16 +217,16 @@ public class Turret extends TankLocation {
             }
             if (slot.isRepairable()) {
                 return "You must scrap all equipment in the turret first";
-            } 
+            }
         }
 		return null;
 	}
-	
+
 	@Override
 	public boolean canNeverScrap() {
 		return false;
 	}
-	
+
 	@Override
     public String getDetails() {
 		return weight + " tons, " + damage + " point(s) of damage";
@@ -236,7 +236,7 @@ public class Turret extends TankLocation {
 	public double getTonnage() {
 		return weight;
 	}
-	
+
 	@Override
 	public long getStickerPrice() {
 		return (long)(5000 * weight);

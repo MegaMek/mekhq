@@ -36,7 +36,7 @@ public class BasicInfo extends JPanel {
         private JLabel lblImage;
         private JLabel lblLoad;
         IconPackage icons;
-        
+
 
         public BasicInfo(IconPackage i) {
             this.icons = i;
@@ -78,7 +78,7 @@ public class BasicInfo extends JPanel {
             lblImage.setText("<html><font size='2' color='" + color + "'>" + s
                     + "</font></html>");
         }
-        
+
 
         public void highlightBorder() {
             lblImage.setBorder(new javax.swing.border.LineBorder(Color.BLACK, 5, true));
@@ -110,10 +110,10 @@ public class BasicInfo extends JPanel {
                 lblLoad.setText("");
             }
         }
-        
+
         protected Image getImageFor(Unit u) {
-            
-            if(null == icons.getMechTiles()) { 
+
+            if(null == icons.getMechTiles()) {
                 return null;
             }
             Image base = icons.getMechTiles().imageFor(u.getEntity(), this, -1);
@@ -124,7 +124,7 @@ public class BasicInfo extends JPanel {
             EntityImage entityImage = new EntityImage(base, tint, getCamo(u), this);
             return entityImage.loadPreviewImage();
         }
-        
+
         protected Image getCamo(Unit unit) {
             // Try to get the player's camo file.
             Image camo = null;
@@ -135,7 +135,7 @@ public class BasicInfo extends JPanel {
             }
             return camo;
         }
-        
+
         protected void setPortrait(Person p) {
 
             String category = p.getPortraitCategory();
@@ -176,7 +176,7 @@ public class BasicInfo extends JPanel {
                 err.printStackTrace();
             }
         }
-        
+
         protected Image getImageFor(Force force) {
             String category = force.getIconCategory();
             String filename = force.getIconFileName();

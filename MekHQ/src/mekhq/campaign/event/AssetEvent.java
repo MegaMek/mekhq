@@ -24,17 +24,17 @@ import megamek.common.event.MMEvent;
 import mekhq.campaign.finances.Asset;
 
 /**
- * Abstract base class for events related to assets. 
+ * Abstract base class for events related to assets.
  *
  */
 public abstract class AssetEvent extends MMEvent {
-    
+
     private final Asset asset;
-    
+
     public AssetEvent(Asset asset) {
         this.asset = Objects.requireNonNull(asset);
     }
-    
+
     public Asset getAsset() {
         return asset;
     }

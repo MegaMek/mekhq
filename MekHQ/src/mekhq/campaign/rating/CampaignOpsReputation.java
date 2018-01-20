@@ -71,7 +71,7 @@ public class CampaignOpsReputation extends AbstractUnitRating {
     public UnitRatingMethod getUnitRatingMethod() {
         return UnitRatingMethod.CAMPAIGN_OPS;
     }
-    
+
     int getNonAdminPersonnelCount() {
         return nonAdminPersonnelCount;
     }
@@ -152,7 +152,7 @@ public class CampaignOpsReputation extends AbstractUnitRating {
                     break;
             }
             // UnitType doesn't include FixedWingSupport.
-            if (entity instanceof FixedWingSupport) { 
+            if (entity instanceof FixedWingSupport) {
                 if (u.getFullCrewSize() < u.getActiveCrew().size()) {
                     addCraftWithoutCrew(u);
                 }
@@ -458,9 +458,9 @@ public class CampaignOpsReputation extends AbstractUnitRating {
         skillTotal += getCommanderSkill(SkillType.S_NEG);
 
         // ToDo AToW Traits.
-        // ToDo MHQ would need  to support: Combat Sense, Connections, 
-        // ToDo                             Reputation, Wealth, High CHA, 
-        // ToDo                             Combat Paralysis, 
+        // ToDo MHQ would need  to support: Combat Sense, Connections,
+        // ToDo                             Reputation, Wealth, High CHA,
+        // ToDo                             Combat Paralysis,
         // ToDo                             Unlucky & Low CHA.
 
         int commanderValue = skillTotal; // ToDo + positiveTraits - negativeTraits.
@@ -608,7 +608,7 @@ public class CampaignOpsReputation extends AbstractUnitRating {
         }
 
         // ToDo Calculate transport needs and capacity for support personnel.
-        // According to Campaign Ops, this will require tracking bay personnel 
+        // According to Campaign Ops, this will require tracking bay personnel
         // & passenger quarters.
 
         if (getJumpshipCount() > 0) {
@@ -648,7 +648,7 @@ public class CampaignOpsReputation extends AbstractUnitRating {
         astechTeams = getCampaign().getNumberAstechs() / 6;
 
         for (Person tech : getCampaign().getTechs()) {
-            // If we're out of astech teams, the rest of the techs are 
+            // If we're out of astech teams, the rest of the techs are
             // unsupported and don't count.
             if (astechTeams <= 0) {
                 break;

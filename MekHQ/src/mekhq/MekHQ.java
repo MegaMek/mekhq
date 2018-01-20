@@ -98,7 +98,7 @@ public class MekHQ implements GameListener {
 	private static final EventBus EVENT_BUS = new EventBus();
 
 	private static MMLogger logger = null;
-	
+
 	//stuff related to MM games
     private Server myServer = null;
     private GameThread gameThread = null;
@@ -164,7 +164,7 @@ public class MekHQ implements GameListener {
 	 * Default to log level 3.
 	 *
 	 * @param msg The message you want to log.
-	 * @deprecated Use {@link #getLogger()} instead.              
+	 * @deprecated Use {@link #getLogger()} instead.
 	 */
 	@Deprecated
 	public static void logMessage(String msg) {
@@ -176,7 +176,7 @@ public class MekHQ implements GameListener {
 	 *
 	 * @param msg The message you want to log.
 	 * @param logLevel The log level of the message.
-	 * @deprecated Use {@link #getLogger()} instead.              
+	 * @deprecated Use {@link #getLogger()} instead.
 	 */
 	@Deprecated
 	public static void logMessage(String msg, int logLevel) {
@@ -208,7 +208,7 @@ public class MekHQ implements GameListener {
 	protected static MekHQ getInstance() {
 		return new MekHQ();
 	}
-	
+
     /**
      * At startup create and show the main frame of the application.
      */
@@ -577,7 +577,7 @@ public class MekHQ implements GameListener {
 	public IconPackage getIconPackage() {
 	    return iconPackage;
 	}
-	
+
     /**
      * Helper function that calculates the maximum screen width available locally.
      * @return Maximum screen width.
@@ -592,25 +592,25 @@ public class MekHQ implements GameListener {
                 maxWidth = b.getWidth();
             }
         }
-        
+
         return maxWidth;
     }
-	
+
 	/*
 	 * Access methods for event bus.
 	 */
 	static public void registerHandler(Object handler) {
 	    EVENT_BUS.register(handler);
 	}
-	
+
 	static public boolean triggerEvent(MMEvent event) {
 	    return EVENT_BUS.trigger(event);
 	}
-	
+
 	static public void unregisterHandler(Object handler) {
 	    EVENT_BUS.unregister(handler);
 	}
-	
+
 	// TODO: This needs to be way more flexible, but it will do for now.
 	private void initEventHandlers() {
 	    EVENT_BUS.register(new XPHandler());

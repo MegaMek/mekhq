@@ -1,20 +1,20 @@
 /*
  * Era.java
- * 
+ *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -25,7 +25,7 @@ import megamek.common.EquipmentType;
 
 /**
  *
- * @author Jay Lawson <jaylawson39 at yahoo.com> 
+ * @author Jay Lawson <jaylawson39 at yahoo.com>
  * September 2017 - Update Eras to
  * match MUL, and added reference to 4th era code
  */
@@ -43,17 +43,17 @@ public class Era {
     public static final int E_LATE_REPUBLIC = 9;
     public static final int E_DARK_AGES = 10;
     public static final int E_NUM   = 11;
-    
+
     public static int getEra(int year) {
         if(year < 2570) {
             return E_AOW;
-        } 
+        }
         else if(year < 2780) {
             return E_SL;
         }
         else if(year < 2900) {
             return E_ESW;
-        } 
+        }
         else if(year < 3019) {
             return E_LSW_LOSTECH;
         }
@@ -79,59 +79,59 @@ public class Era {
             return E_DARK_AGES;
         }
     }
-    
+
     public static String getEraName(int era) {
         switch(era) {
             case E_AOW:
                 return "Age of War";
-            
+
             case E_SL:
                 return "Star League";
-            
+
             case E_ESW:
                 return "Early Sucession War";
-            
+
             case E_LSW_LOSTECH:
                 return "Late Succession War - LosTech";
-            
+
             case E_LSW_RENAISSANCE:
                 return "Late Succession War - Renaissance";
-            
+
             case E_CLAN_INVASION:
                 return "Clan Invasion";
-            
+
             case E_CIVIL_WAR:
                 return "Civil War";
-            
+
             case E_JIHAD:
                 return "Jihad";
-            
+
             case E_EARLY_REPUBLIC:
                 return "Early Republic";
-            
+
             case E_LATE_REPUBLIC:
                 return "Late Republic";
-            
+
             case E_DARK_AGES:
                 return "Dark Ages";
-            
+
             default:
                 return "Unknown";
         }
     }
-    
+
     public static String getEraNameFromYear(int year) {
         return getEraName(getEra(year));
     }
- 
+
     /**
      * Convert the eras used in Strategic Ops to the availability-based eras
-     * used in the TechManual. 
+     * used in the TechManual.
      * Updated for 4th Era Code.
      * @param era
      * @return
      */
-    
+
     public static int convertEra(int era) {
     	switch(era) {
         case E_AOW:
@@ -153,5 +153,5 @@ public class Era {
             return -1;
     	}
     }
-    
+
 }

@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package mekhq.campaign.parts;
 
@@ -16,17 +16,17 @@ import mekhq.campaign.Campaign;
 
 /**
  * Conversion gear for QuadVees
- * 
+ *
  * @author Neoancient
  *
  */
 public class QuadVeeGear extends Part {
-    
+
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = -382649905317675957L;
-    
+
     static final TechAdvancement TECH_ADVANCEMENT = new TechAdvancement(TECH_BASE_CLAN)
             .setTechRating(RATING_F)
             .setAvailability(RATING_X, RATING_X, RATING_X, RATING_F)
@@ -39,18 +39,18 @@ public class QuadVeeGear extends Part {
     public QuadVeeGear() {
         this(0, null);
     }
-    
+
     public QuadVeeGear(int tonnage, Campaign c) {
         super(tonnage, c);
         this.name = "Conversion Gear";
     }
-    
+
     public QuadVeeGear clone() {
         QuadVeeGear clone = new QuadVeeGear(0, campaign);
         clone.copyBaseData(this);
         return clone;
     }
-        
+
     @Override
     public void updateConditionFromEntity(boolean checkForDestruction) {
         if(null != unit) {
@@ -58,7 +58,7 @@ public class QuadVeeGear extends Part {
                         QuadVee.SYSTEM_CONVERSION_GEAR);
         }
     }
-    
+
     @Override
     public int getBaseTime() {
         // Using value for 'Mech "weapons and other equipment"
@@ -182,7 +182,7 @@ public class QuadVeeGear extends Part {
     public TechAdvancement getTechAdvancement() {
         return TECH_ADVANCEMENT;
     }
-    
+
     @Override
     public boolean isSamePartType(Part part) {
         return part instanceof QuadVeeGear && part.unitTonnage == unitTonnage;

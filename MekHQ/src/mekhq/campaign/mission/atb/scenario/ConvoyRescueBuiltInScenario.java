@@ -45,13 +45,13 @@ public class ConvoyRescueBuiltInScenario extends AtBScenario {
 	public int getMapY() {
 		return 45;
 	}
-	
+
 	@Override
     public void setMapFile() {
         setMap("Convoy");
         setTerrainType(TER_WOODED);
-	}	
-	
+	}
+
 	@Override
     public boolean canRerollMapSize() {
 		return false;
@@ -67,7 +67,7 @@ public class ConvoyRescueBuiltInScenario extends AtBScenario {
 			ArrayList<Entity> enemyEntities) {
         setStart(Board.START_N);
         setDeploymentDelay(7);
-        
+
         for (int i = 0; i < 4; i++) {
             getAlliesPlayer().add(getEntity(getContract(campaign).getEmployerCode(),
                     getContract(campaign).getAllySkill(), getContract(campaign).getAllyQuality(),
@@ -76,11 +76,11 @@ public class ConvoyRescueBuiltInScenario extends AtBScenario {
 
         ArrayList<Entity> otherForce = new ArrayList<Entity>();
         addCivilianUnits(otherForce, 12, campaign);
-        
+
         for (Entity e : otherForce) {
             getSurvivalBonusIds().add(UUID.fromString(e.getExternalIdAsString()));
         }
-        
+
         addBotForce(new BotForce("Convoy", 1, Board.START_CENTER, otherForce));
 
         for (int i = 0; i < 12; i++) {
@@ -91,7 +91,7 @@ public class ConvoyRescueBuiltInScenario extends AtBScenario {
                             campaign.getCampaignOptions().getRegionalMechVariations()),
                     campaign));
         }
-        
+
         addBotForce(getEnemyBotForce(getContract(campaign), Board.START_S, enemyEntities));
 	}
 }

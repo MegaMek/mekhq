@@ -30,6 +30,6 @@ import mekhq.campaign.work.IPartWork;
 public interface ITechWorkPanel {
 
     public IPartWork getSelectedTask();
-    
+
     public Person getSelectedTech();
 }

@@ -29,5 +29,5 @@ public class ScenarioChangedEvent extends ScenarioEvent {
 
     public ScenarioChangedEvent(Scenario scenario) {
         super(scenario);
-    }    
+    }
 }

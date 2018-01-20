@@ -54,7 +54,7 @@ public class BombsDialog extends JDialog implements ActionListener {
     private BombChoicePanel bombPanel;
     private IBomber bomber;
     private Campaign campaign;
-    
+
     private int[] bombChoices;
     private int[] bombCatalog = new int[BombType.B_NUM];
     private int[] availBombs = new int[BombType.B_NUM];
@@ -68,7 +68,7 @@ public class BombsDialog extends JDialog implements ActionListener {
         this.bomber = iBomber;
         this.campaign = campaign;
         bombChoices = bomber.getBombChoices();
-        
+
         initGUI();
         validate();
         pack();
@@ -86,11 +86,11 @@ public class BombsDialog extends JDialog implements ActionListener {
                 availBombs[bombType] = ((AmmoStorage)spare).getShots();
             }
         }
-        
+
         for (int type = 0; type < BombType.B_NUM; type++) {
             typeMax[type] = availBombs[type] + bombChoices[type];
         }
-        
+
         bombPanel = new BombChoicePanel(bomber, campaign.getGameOptions().booleanOption("at2_nukes"),
                 campaign.getGameOptions().booleanOption("allow_advanced_ammo"), typeMax);
 
@@ -123,7 +123,7 @@ public class BombsDialog extends JDialog implements ActionListener {
         if (okayButton.equals(e.getSource())) {
             bombPanel.applyChoice();
             int[] newLoadout = bombPanel.getChoice();
-            
+
             //Get difference between starting bomb load and new bomb load
             for (int type = 0; type < BombType.B_NUM; type++) {
                 if(bombChoices[type] != newLoadout[type]) {
@@ -132,7 +132,7 @@ public class BombsDialog extends JDialog implements ActionListener {
                     newLoadout[type] = 0;
                 }
             }
-            
+
             for (int type = 0; type < BombType.B_NUM; type++) {
                 if (newLoadout[type] != 0) {
                     //IF there are bombs of this TYPE in the warehouse
@@ -150,7 +150,7 @@ public class BombsDialog extends JDialog implements ActionListener {
                     }
                 }
             }
-            
+
             setVisible(false);
         } else if (cancelButton.equals(e.getSource())) {
             setVisible(false);

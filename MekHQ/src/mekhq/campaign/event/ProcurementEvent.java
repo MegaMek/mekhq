@@ -25,18 +25,18 @@ import mekhq.campaign.work.IAcquisitionWork;
 /**
  * Triggered when a unit or part is added to the procurement list following a failed acquisition role.
  * A successful acquisition role should trigger a AcquisitionEvent.
- * 
+ *
  * This event can also be triggered by removing an item from the procurement list.
  *
  */
 public class ProcurementEvent extends MMEvent {
 
     private final IAcquisitionWork acquisition;
-    
+
     public ProcurementEvent(IAcquisitionWork acquisition) {
         this.acquisition = acquisition;
     }
-    
+
     public IAcquisitionWork getAcquisition() {
         return acquisition;
     }

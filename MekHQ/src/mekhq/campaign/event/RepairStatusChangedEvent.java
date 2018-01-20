@@ -29,13 +29,13 @@ import mekhq.campaign.unit.Unit;
  *
  */
 public class RepairStatusChangedEvent extends MMEvent {
-    
+
     private final Unit unit;
-    
+
     public RepairStatusChangedEvent(Unit unit) {
         this.unit = unit;
     }
-    
+
     public Unit getUnit() {
         return unit;
     }

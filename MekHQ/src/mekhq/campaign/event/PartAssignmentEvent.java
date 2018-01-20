@@ -27,14 +27,14 @@ import mekhq.campaign.personnel.Person;
  *
  */
 public class PartAssignmentEvent extends PartChangedEvent {
-    
+
     private final Person tech;
-    
+
     public PartAssignmentEvent(Part part, Person tech) {
         super(part);
         this.tech = tech;
     }
-    
+
     public Person getTech() {
         return tech;
     }

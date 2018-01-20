@@ -106,7 +106,7 @@ public class MissingMekCockpit extends MissingPart {
 	public int getType() {
 		return type;
 	}
-	
+
 	public boolean isClan() {
 	    return isClan;
 	}
@@ -159,7 +159,7 @@ public class MissingMekCockpit extends MissingPart {
     public TechAdvancement getTechAdvancement() {
         return Mech.getCockpitTechAdvancement(type);
     }
-	
+
 	@Override
 	public int getMassRepairOptionType() {
     	return Part.REPAIR_PART_TYPE.ELECTRONICS;

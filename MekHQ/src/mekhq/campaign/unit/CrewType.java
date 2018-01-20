@@ -7,12 +7,12 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -30,9 +30,9 @@ public enum CrewType {
     PILOT((u, p) -> u.addPilotOrSoldier(p)),
     SOLDIER((u, p) -> u.addPilotOrSoldier(p)),
     TECH_OFFICER((u, p) -> u.setTechOfficer(p));
-    
+
     public final BiConsumer<Unit, Person> addMethod;
-    
+
     private CrewType(BiConsumer<Unit, Person> addMethod) {
         this.addMethod = addMethod;
     }

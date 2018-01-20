@@ -49,12 +49,12 @@ public class CivilianRiotBuiltInScenario extends AtBScenario {
 	public int getMapY() {
 		return 65;
 	}
-	
+
 	@Override
 	public boolean canRerollMapSize() {
 		return false;
 	}
-	
+
 	@Override
 	public boolean canDeploy(Unit unit, Campaign campaign) {
         for (Part p : unit.getParts()) {
@@ -66,7 +66,7 @@ public class CivilianRiotBuiltInScenario extends AtBScenario {
                 }
             }
         }
-        
+
         return false;
 	}
 
@@ -74,7 +74,7 @@ public class CivilianRiotBuiltInScenario extends AtBScenario {
 	public void setExtraMissionForces(Campaign campaign, ArrayList<Entity> allyEntities,
 			ArrayList<Entity> enemyEntities) {
         setStart(Board.START_S);
-        
+
         //TODO: only units with machine guns, flamers, or sm lasers
         for (int i = 0; i < 4; i++) {
             getAlliesPlayer().add(getEntity(getContract(campaign).getEmployerCode(),
@@ -86,11 +86,11 @@ public class CivilianRiotBuiltInScenario extends AtBScenario {
 
         ArrayList<Entity>otherForce = new ArrayList<Entity>();
         addCivilianUnits(otherForce, 8, campaign);
-        
+
         for (Entity e : otherForce) {
             getSurvivalBonusIds().add(UUID.fromString(e.getExternalIdAsString()));
         }
-        
+
         addBotForce(new BotForce("Loyalists", 1, Board.START_CENTER, otherForce));
 
         otherForce = new ArrayList<Entity>();
@@ -105,7 +105,7 @@ public class CivilianRiotBuiltInScenario extends AtBScenario {
                     Compute.d6() < 4?EntityWeightClass.WEIGHT_LIGHT:EntityWeightClass.WEIGHT_MEDIUM,
                     campaign));
         }
-        
+
         addBotForce(new BotForce("Rebels", 2, Board.START_N, enemyEntities));
 	}
 }

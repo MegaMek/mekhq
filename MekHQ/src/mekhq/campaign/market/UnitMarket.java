@@ -50,14 +50,14 @@ import mekhq.campaign.universe.RandomFactionGenerator;
 
 /**
  * Generates units available for sale.
- * 
+ *
  * @author Neoancient
  *
  */
 public class UnitMarket implements Serializable {
-	
+
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = -2085002038852079114L;
 
@@ -67,7 +67,7 @@ public class UnitMarket implements Serializable {
 		public int unitWeight;
 		public MechSummary unit;
 		public int pct;
-		
+
 		public MarketOffer(int m, int t, int w, MechSummary u, int p) {
 			market = m;
 			unitType = t;
@@ -79,10 +79,10 @@ public class UnitMarket implements Serializable {
 		public MarketOffer() {
 		}
 	}
-	
+
 	public static int TYPE_ATBMONTHLY = 0;
 	//TODO: Implement a method that rolls each day and adds or removes units
-	
+
 	public static int MARKET_OPEN = 0;
 	public static int MARKET_EMPLOYER = 1;
 	public static int MARKET_MERCENARY = 2;
@@ -93,28 +93,28 @@ public class UnitMarket implements Serializable {
 		"Open Market", "Employer Market", "Mercenary Auction",
 		"Factory Line", "Black Market"
 	};
-	
+
 	private int method = TYPE_ATBMONTHLY;
-	
+
 	//master list
 	private ArrayList<MarketOffer> offers;
 
 	public UnitMarket() {
 		offers = new ArrayList<MarketOffer>();
 	}
-	
+
 	public ArrayList<MarketOffer> getOffers() {
 		return offers;
 	}
-	
+
 	public void removeOffer(MarketOffer o) {
 		offers.remove(o);
 	}
-	
+
 	public void generateUnitOffers(Campaign campaign) {
 		if (method == TYPE_ATBMONTHLY && campaign.getCalendar().get(Calendar.DAY_OF_MONTH) == 1) {
 			offers.clear();
-			
+
 			AtBContract contract = null;
 			for (Mission m : campaign.getMissions()) {
 				if (m.isActive() && m instanceof AtBContract) {
@@ -205,7 +205,7 @@ public class UnitMarket implements Serializable {
 				campaign.addReport("<a href='UNIT_MARKET'>Unit market updated</a>");
 			}
 		}
-	}	
+	}
 
 	private void addOffers(Campaign campaign, int num, int market,
 			int unitType, String faction, int quality, int priceTarget) {
@@ -260,9 +260,9 @@ public class UnitMarket implements Serializable {
 					ms, pricePct));
 			return ms.getName();
 		}
-		
+
 	}
-	
+
 	public static int getRandomWeight(int unitType, String faction,
 			boolean regionalVariations) {
 		if (unitType == UnitType.AERO) {
@@ -273,7 +273,7 @@ public class UnitMarket implements Serializable {
 		}
 		return getRandomMechWeight();
 	}
-	
+
 	public static int getRandomMechWeight() {
 		int roll = Compute.randomInt(10);
 		if (roll <= 2) return EntityWeightClass.WEIGHT_LIGHT;
@@ -281,7 +281,7 @@ public class UnitMarket implements Serializable {
 		if (roll <= 8) return EntityWeightClass.WEIGHT_HEAVY;
 		return EntityWeightClass.WEIGHT_ASSAULT;
 	}
-	
+
 	public static int getRegionalMechWeight(String faction) {
 		int roll = Compute.randomInt(100);
 		if (faction.equals("DC")) {
@@ -305,7 +305,7 @@ public class UnitMarket implements Serializable {
 		if (roll < 90) return EntityWeightClass.WEIGHT_HEAVY;
 		return EntityWeightClass.WEIGHT_ASSAULT;
 	}
-	
+
 	public static int getRandomAeroWeight() {
 		int roll = Compute.randomInt(8);
 		if (roll <= 2) return EntityWeightClass.WEIGHT_LIGHT;
@@ -329,7 +329,7 @@ public class UnitMarket implements Serializable {
         			"<pct>" + o.pct + "</pct>");
         	pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "</offer>");
         }
-    	
+
         pw1.println(MekHqXmlUtil.indentStr(indent) + "</unitMarket>");
     }
 

@@ -283,7 +283,7 @@ public class MekGyro extends Part {
 	public int getLocation() {
 		return Mech.LOC_CT;
 	}
-	
+
 	@Override
 	public TechAdvancement getTechAdvancement() {
 	    return Mech.getGyroTechAdvancement(type);

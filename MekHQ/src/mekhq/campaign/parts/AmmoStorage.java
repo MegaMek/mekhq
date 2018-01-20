@@ -1,20 +1,20 @@
 /*
  * AmmoStorage.java
- * 
+ *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -43,7 +43,7 @@ import mekhq.campaign.work.IAcquisitionWork;
 
 /**
  * This will be a special type of part that will only exist as spares
- * It will determine the amount of ammo of a particular type that 
+ * It will determine the amount of ammo of a particular type that
  * is available
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
@@ -52,11 +52,11 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
 
 	protected long munition;
 	protected int shots;
-	
+
     public AmmoStorage() {
     	this(0, null, 0, null);
     }
-    
+
     public AmmoStorage(int tonnage, EquipmentType et, int shots, Campaign c) {
         super(tonnage, et, -1, c);
         this.shots = shots;
@@ -65,14 +65,14 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
         }
 
     }
-    
+
     public AmmoStorage clone() {
     	AmmoStorage storage = new AmmoStorage(0, getType(), shots, campaign);
         storage.copyBaseData(this);
     	storage.munition = this.munition;
     	return storage;
     }
-    
+
     @Override
     public double getTonnage() {
     	if(((AmmoType)type).getKgPerShot() > 0) {
@@ -80,7 +80,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
     	}
      	return ((double)shots / ((AmmoType)type).getShots());
     }
-    
+
     @Override
     public long getStickerPrice() {
     	//costs are a total nightmare
@@ -99,7 +99,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
             }
     	}
 
-        int itemCost = 0;      
+        int itemCost = 0;
         try {
         	itemCost = (int) type.getCost(en, isArmored, -1);
         } catch(NullPointerException ex) {
@@ -107,12 +107,12 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
         }
     	return itemCost;
     }
-    
+
     @Override
     public long getBuyCost() {
         return getStickerPrice();
     }
-    
+
     @Override
     public long getCurrentValue() {
     	return (long)(getStickerPrice() * ((double)shots / ((AmmoType)type).getShots()));
@@ -121,7 +121,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
     public int getShots() {
     	return shots;
     }
-    
+
     @Override
     public boolean isSamePartType(Part part) {
         if (part instanceof AmmoStorage) {
@@ -132,18 +132,18 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
                 return ((AmmoType)getType()).getMunitionType() == ((AmmoType)((AmmoStorage)part).getType()).getMunitionType()
                         && ((AmmoType)getType()).equals( (Object)((EquipmentPart)part).getType());
             }
-            
+
         }
         return false;
     }
-    
+
     public void changeShots(int s) {
     	shots = Math.max(0, shots + s);
     }
-    
+
 	@Override
 	public void writeToXml(PrintWriter pw1, int indent) {
-		writeToXmlBegin(pw1, indent);		
+		writeToXmlBegin(pw1, indent);
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<equipmentNum>"
 				+equipmentNum
@@ -166,7 +166,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
 	@Override
 	protected void loadFieldsFromXmlNode(Node wn) {
 		NodeList nl = wn.getChildNodes();
-		
+
 		for (int x=0; x<nl.getLength(); x++) {
 			Node wn2 = nl.item(x);
 			if (wn2.getNodeName().equalsIgnoreCase("equipmentNum")) {
@@ -181,12 +181,12 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
 		}
 		restore();
 	}
-	
+
 	@Override
 	public TechAdvancement getTechAdvancement() {
 	    return type.getTechAdvancement();
 	}
-	
+
 	@Override
 	public void fix() {
 		//nothing to fix
@@ -198,12 +198,12 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
 		//nothing to do here
 		return null;
 	}
-	
+
 	@Override
     public IAcquisitionWork getAcquisitionWork() {
         return new AmmoStorage(1,type,((AmmoType)type).getShots(),campaign);
     }
-	
+
 	@Override
 	public TargetRoll getAllMods(Person tech) {
 		//nothing to do here
@@ -215,7 +215,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
 		//nothing to do here
 		return;
 	}
-	
+
 	@Override
 	public void updateConditionFromPart() {
 		//nothing to do here
@@ -226,14 +226,14 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
 	public boolean needsFixing() {
 		return false;
 	}
-	
+
 	public String getDesc() {
 		String toReturn = "<html><font size='2'";
 		String scheduled = "";
 		if (getTeamId() != null) {
 			scheduled = " (scheduled) ";
 		}
-	
+
 		toReturn += ">";
 		toReturn += "<b>Reload " + getName() + "</b><br/>";
 		toReturn += getDetails() + "<br/>";
@@ -241,17 +241,17 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
 		toReturn += "</font></html>";
 		return toReturn;
 	}
-	
+
     @Override
     public String getDetails() {
     	return shots + " shots";
     }
-	
+
 	@Override
     public String checkFixable() {
         return null;
     }
-	
+
 	@Override
     public String find(int transitDays) {
 	    Part newPart = getNewPart();
@@ -262,18 +262,18 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
             return "<font color='red'><b> You cannot afford this part. Transaction cancelled</b>.</font>";
         }
     }
-    
+
 	@Override
     public Object getNewEquipment() {
         return getNewPart();
     }
-	
+
     @Override
     public String failToFind() {
         resetDaysToWait();
         return "<font color='red'><b> part not found</b>.</font>";
     }
-    
+
     public void changeAmountAvailable(int amount, AmmoType curType) {
         AmmoStorage a = null;
         long curMunition = curType.getMunitionType();
@@ -281,7 +281,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
             if(!part.isPresent()) {
                 continue;
             }
-            if(part instanceof AmmoStorage 
+            if(part instanceof AmmoStorage
                     && ((AmmoType)((AmmoStorage)part).getType()).equals((Object)curType)
                     && curMunition == ((AmmoType)((AmmoStorage)part).getType()).getMunitionType()) {
                 a = (AmmoStorage)part;
@@ -295,25 +295,25 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
             campaign.addPart(new AmmoStorage(1,curType,amount,campaign), 0);
         }
     }
-    
+
     @Override
     public String getAcquisitionDesc() {
         String toReturn = "<html><font size='2'";
-        
+
         toReturn += ">";
         toReturn += "<b>" + getAcquisitionDisplayName() + "</b> " + getAcquisitionBonus() + "<br/>";
         toReturn += getAcquisitionExtraDesc() + "<br/>";
         String[] inventories = campaign.getPartInventory(getAcquisitionPart());
-        toReturn += inventories[1] + " in transit, " + inventories[2] + " on order<br>"; 
+        toReturn += inventories[1] + " in transit, " + inventories[2] + " on order<br>";
         toReturn += Utilities.getCurrencyString(getStickerPrice()) + "<br/>";
         toReturn += "</font></html>";
         return toReturn;
     }
-	
+
     @Override
     public String getAcquisitionDisplayName() {
     	return type.getDesc();
-    }    
+    }
 
 	@Override
 	public String getAcquisitionExtraDesc() {
@@ -349,7 +349,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
         }
         else if(campaign.getCampaignOptions().getIsAcquisitionPenalty() > 0) {
             target.addModifier(campaign.getCampaignOptions().getIsAcquisitionPenalty(), "Inner Sphere tech");
-        }   
+        }
         //availability mod
         int avail = getAvailability();
         int availabilityMod = Availability.getAvailabilityModifier(avail);
@@ -360,7 +360,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
     public Part getNewPart() {
         return new AmmoStorage(1,type,shots,campaign);
     }
-    
+
     @Override
     public String getQuantityName(int quan) {
         int totalShots = quan * getShots();
@@ -370,7 +370,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
         }
         return report;
     }
-    
+
     @Override
     public String getArrivalReport() {
         double totalShots = quantity * getShots();
@@ -382,12 +382,12 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
         }
         return report;
     }
-    
+
     @Override
     public boolean needsMaintenance() {
         return true;
     }
-    
+
     @Override
     public boolean isPriceAdustedForAmount() {
         return true;
@@ -403,4 +403,3 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
         return isExtinct(year, clan, techFaction);
     }
 }
-

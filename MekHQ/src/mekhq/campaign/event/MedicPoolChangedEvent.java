@@ -25,14 +25,14 @@ import mekhq.campaign.Campaign;
  *
  */
 public class MedicPoolChangedEvent extends CampaignEvent {
-    
+
     private final int increase;
-    
+
     public MedicPoolChangedEvent(Campaign campaign, int increase) {
         super(campaign);
         this.increase = increase;
     }
-    
+
     public int getIncrease() {
         return increase;
     }

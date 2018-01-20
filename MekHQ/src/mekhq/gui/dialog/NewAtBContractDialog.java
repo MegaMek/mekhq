@@ -57,10 +57,10 @@ import mekhq.gui.utilities.JSuggestField;
 public class NewAtBContractDialog extends NewContractDialog {
 
     /**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 7965491540448120578L;
-	
+
 	protected FactionComboBox cbEmployer;
 	protected FactionComboBox cbEnemy;
 	protected JCheckBox chkShowAllFactions;
@@ -73,16 +73,16 @@ public class NewAtBContractDialog extends NewContractDialog {
 	protected JComboBox<String> cbEnemyQuality;
 	protected JSpinner spnShares;
 	protected JLabel lblRequiredLances;
-	
+
 	Set<String> currentFactions;
 	Set<String> employerSet;
-	
+
 	int dragoonRating;
 
 	public NewAtBContractDialog(java.awt.Frame parent, boolean modal, Campaign c) {
 		super(parent, modal, c);
 	}
-	 
+
 	@Override
 	protected void initComponents() {
 		RandomFactionGenerator.getInstance().updateTables(campaign.getDate(),
@@ -95,7 +95,7 @@ public class NewAtBContractDialog extends NewContractDialog {
     	IUnitRating rating = campaign.getUnitRating();
     	dragoonRating = rating.getUnitRatingAsInteger();
     	super.initComponents();
-        
+
         updateEnemies();
         updatePlanets();
 
@@ -110,14 +110,14 @@ public class NewAtBContractDialog extends NewContractDialog {
         updatePaymentMultiplier();
         contract.calculateContract(campaign);
         this.doUpdateContract(cbPlanets);
-        
+
         addAllListeners();
 	}
-	
+
 	@Override
 	protected void initDescPanel(ResourceBundle resourceMap, JPanel descPanel) {
 		AtBContract contract = (AtBContract)(this.contract);
-		
+
 		java.awt.GridBagConstraints gbc;
 		txtName = new javax.swing.JTextField();
         JLabel lblName = new JLabel();
@@ -148,9 +148,9 @@ public class NewAtBContractDialog extends NewContractDialog {
         JLabel lblShares = new JLabel();
         spnShares = new JSpinner(new SpinnerNumberModel(20, 20, 50, 10));
     	lblRequiredLances = new JLabel();
-   	
+
     	int y = 0;
-          
+
         lblName.setText(resourceMap.getString("lblName.text")); // NOI18N
         lblName.setName("lblName"); // NOI18N
         gbc = new GridBagConstraints();
@@ -160,10 +160,10 @@ public class NewAtBContractDialog extends NewContractDialog {
         gbc.anchor = java.awt.GridBagConstraints.WEST;
         gbc.insets = new java.awt.Insets(5, 5, 5, 5);
         descPanel.add(lblName, gbc);
-        
+
         txtName.setText(contract.getName());
         txtName.setName("txtName"); // NOI18N
-        
+
         gbc.gridx = 1;
         gbc.gridy = y++;
         gbc.gridwidth = 2;
@@ -171,7 +171,7 @@ public class NewAtBContractDialog extends NewContractDialog {
         gbc.anchor = java.awt.GridBagConstraints.WEST;
         gbc.insets = new java.awt.Insets(5, 5, 5, 5);
         descPanel.add(txtName, gbc);
-        
+
         if (campaign.getFactionCode().equals("MERC")) {
         	lblEmployer.setText(resourceMap.getString("lblEmployer.text")); // NOI18N
         	lblEmployer.setName("lblEmployer"); // NOI18N
@@ -194,7 +194,7 @@ public class NewAtBContractDialog extends NewContractDialog {
 
         lblEnemy.setText(resourceMap.getString("lblEnemy.text")); // NOI18N
         lblEnemy.setName("lblEnemy"); // NOI18N
-        
+
         gbc.gridx = 0;
         gbc.gridy = y;
         gbc.gridwidth = 1;
@@ -202,7 +202,7 @@ public class NewAtBContractDialog extends NewContractDialog {
         gbc.insets = new java.awt.Insets(5, 5, 5, 5);
         descPanel.add(lblEnemy, gbc);
 
-        
+
         gbc.gridx = 1;
         gbc.gridy = y++;
         gbc.gridwidth = 2;
@@ -210,11 +210,11 @@ public class NewAtBContractDialog extends NewContractDialog {
         gbc.anchor = java.awt.GridBagConstraints.WEST;
         gbc.insets = new java.awt.Insets(5, 5, 5, 5);
         descPanel.add(cbEnemy, gbc);
- 
+
         chkShowAllFactions.setText(resourceMap.getString("chkShowAllFactions.text"));
         chkShowAllFactions.setName("chkShowAllFactions");
         chkShowAllFactions.setSelected(false);
-        
+
         gbc.gridx = 1;
         gbc.gridy = y++;
         gbc.gridwidth = 2;
@@ -228,17 +228,17 @@ public class NewAtBContractDialog extends NewContractDialog {
 				showAllFactions(chkShowAllFactions.isSelected());
 			}
         });
- 
+
         lblPlanetName.setText(resourceMap.getString("lblPlanetName.text")); // NOI18N
-        lblPlanetName.setName("lblPlanetName"); // NOI18N        
+        lblPlanetName.setName("lblPlanetName"); // NOI18N
         gbc.gridx = 0;
         gbc.gridy = y;
         gbc.gridwidth = 1;
         gbc.anchor = java.awt.GridBagConstraints.WEST;
         gbc.insets = new java.awt.Insets(5, 5, 5, 5);
         descPanel.add(lblPlanetName, gbc);
-        
-        suggestPlanet = new JSuggestField(this, campaign.getPlanetNames());       
+
+        suggestPlanet = new JSuggestField(this, campaign.getPlanetNames());
         gbc.gridx = 1;
         gbc.gridy = y++;
         gbc.gridwidth = 2;
@@ -248,11 +248,11 @@ public class NewAtBContractDialog extends NewContractDialog {
         descPanel.add(suggestPlanet, gbc);
         descPanel.add(cbPlanets, gbc);
         suggestPlanet.setVisible(false);
-        
+
         chkShowAllPlanets.setText(resourceMap.getString("chkShowAllPlanets.text"));
         chkShowAllPlanets.setName("chkShowAllPlanets");
         chkShowAllPlanets.setSelected(false);
-        
+
         gbc.gridx = 1;
         gbc.gridy = y++;
         gbc.gridwidth = 2;
@@ -269,17 +269,17 @@ public class NewAtBContractDialog extends NewContractDialog {
 
         lblType.setText(resourceMap.getString("lblType.text")); // NOI18N
         lblType.setName("lblType"); // NOI18N
-        
+
         gbc.gridx = 0;
         gbc.gridy = y;
         gbc.gridwidth = 1;
         gbc.anchor = java.awt.GridBagConstraints.WEST;
         gbc.insets = new java.awt.Insets(5, 5, 5, 5);
         descPanel.add(lblType, gbc);
-        
+
         cbMissionType.setSelectedItem(contract.getMissionTypeName());
         cbMissionType.setName("cbMissionType"); // NOI18N
-        
+
         gbc.gridx = 1;
         gbc.gridy = y++;
         gbc.gridwidth = 2;
@@ -287,19 +287,19 @@ public class NewAtBContractDialog extends NewContractDialog {
         gbc.anchor = java.awt.GridBagConstraints.WEST;
         gbc.insets = new java.awt.Insets(5, 5, 5, 5);
         descPanel.add(cbMissionType, gbc);
-         
+
         lblAllyRating.setText(resourceMap.getString("lblAllyRating.text")); // NOI18N
         lblEnemy.setName("lblAllyRating"); // NOI18N
-        
+
         gbc.gridx = 0;
         gbc.gridy = y;
         gbc.gridwidth = 1;
         gbc.anchor = java.awt.GridBagConstraints.WEST;
         gbc.insets = new java.awt.Insets(5, 5, 5, 5);
         descPanel.add(lblAllyRating, gbc);
-        
+
 		cbAllySkill.setSelectedIndex(contract.getAllySkill());
-        
+
         gbc.gridx = 1;
         gbc.gridy = y;
         gbc.gridwidth = 1;
@@ -309,7 +309,7 @@ public class NewAtBContractDialog extends NewContractDialog {
         gbc.insets = new java.awt.Insets(5, 5, 5, 5);
         descPanel.add(cbAllySkill, gbc);
 
-		cbAllyQuality.setSelectedIndex(contract.getAllyQuality());        
+		cbAllyQuality.setSelectedIndex(contract.getAllyQuality());
         gbc.gridx = 2;
         gbc.gridy = y++;
         gbc.gridwidth = 1;
@@ -319,15 +319,15 @@ public class NewAtBContractDialog extends NewContractDialog {
         descPanel.add(cbAllyQuality, gbc);
 
         lblEnemyRating.setText(resourceMap.getString("lblEnemyRating.text")); // NOI18N
-        lblEnemyRating.setName("lblAllyRating"); // NOI18N        
+        lblEnemyRating.setName("lblAllyRating"); // NOI18N
         gbc.gridx = 0;
         gbc.gridy = y;
         gbc.gridwidth = 1;
         gbc.anchor = java.awt.GridBagConstraints.WEST;
         gbc.insets = new java.awt.Insets(5, 5, 5, 5);
         descPanel.add(lblEnemyRating, gbc);
-        
-		cbEnemySkill.setSelectedIndex(contract.getEnemySkill());        
+
+		cbEnemySkill.setSelectedIndex(contract.getEnemySkill());
         gbc.gridx = 1;
         gbc.gridy = y;
         gbc.gridwidth = 1;
@@ -337,7 +337,7 @@ public class NewAtBContractDialog extends NewContractDialog {
         gbc.insets = new java.awt.Insets(5, 5, 5, 5);
         descPanel.add(cbEnemySkill, gbc);
 
-		cbEnemyQuality.setSelectedIndex(contract.getEnemyQuality());        
+		cbEnemyQuality.setSelectedIndex(contract.getEnemyQuality());
         gbc.gridx = 2;
         gbc.gridy = y++;
         gbc.gridwidth = 1;
@@ -354,8 +354,8 @@ public class NewAtBContractDialog extends NewContractDialog {
         gbc.anchor = java.awt.GridBagConstraints.WEST;
         gbc.insets = new java.awt.Insets(5, 5, 5, 5);
         descPanel.add(lblShares, gbc);
-        
-        spnShares.setName("spnShares"); // NOI18N        
+
+        spnShares.setName("spnShares"); // NOI18N
         gbc.gridx = 1;
         gbc.gridy = y++;
         gbc.gridwidth = 1;
@@ -363,7 +363,7 @@ public class NewAtBContractDialog extends NewContractDialog {
         gbc.anchor = java.awt.GridBagConstraints.WEST;
         gbc.insets = new java.awt.Insets(5, 5, 5, 5);
         descPanel.add(spnShares, gbc);
-         
+
         txtDesc.setText(contract.getDescription());
         txtDesc.setName("txtDesc");
         txtDesc.setEditable(true);
@@ -375,7 +375,7 @@ public class NewAtBContractDialog extends NewContractDialog {
         scrDesc.setViewportView(txtDesc);
         scrDesc.setPreferredSize(new Dimension(400, 200));
         scrDesc.setMinimumSize(new Dimension(400, 200));
-        
+
         gbc.gridx = 0;
         gbc.gridy = y++;
         gbc.gridwidth = 3;
@@ -386,7 +386,7 @@ public class NewAtBContractDialog extends NewContractDialog {
         gbc.insets = new java.awt.Insets(5, 5, 0, 0);
         descPanel.add(scrDesc, gbc);
 	}
-	
+
 	private void addAllListeners() {
         cbPlanets.addActionListener(contractUpdateActionListener);
 		cbMissionType.addActionListener(contractUpdateActionListener);
@@ -399,7 +399,7 @@ public class NewAtBContractDialog extends NewContractDialog {
         suggestPlanet.addFocusListener(contractUpdateFocusListener);
         suggestPlanet.addActionListener(contractUpdateActionListener);
 	}
-	
+
 	private void removeAllListeners() {
         cbPlanets.removeActionListener(contractUpdateActionListener);
 		cbMissionType.removeActionListener(contractUpdateActionListener);
@@ -412,7 +412,7 @@ public class NewAtBContractDialog extends NewContractDialog {
         suggestPlanet.removeFocusListener(contractUpdateFocusListener);
         suggestPlanet.removeActionListener(contractUpdateActionListener);
 	}
-	
+
 	private String getCurrentEmployerCode() {
 		if (campaign.getFactionCode().equals("MERC")) {
 			return cbEmployer.getSelectedItemKey();
@@ -420,11 +420,11 @@ public class NewAtBContractDialog extends NewContractDialog {
 			return campaign.getFactionCode();
 		}
 	}
-	
+
 	private String getCurrentEnemyCode() {
 		return cbEnemy.getSelectedItemKey();
 	}
-	
+
 	private void updateEnemies() {
 		if (chkShowAllFactions.isSelected()) {
 			return;
@@ -437,10 +437,10 @@ public class NewAtBContractDialog extends NewContractDialog {
 				getEnemyList(getCurrentEmployerCode()), campaign.getGameYear());
 		cbEnemy.setSelectedItemByKey(((AtBContract)contract).getEnemyCode());
 	}
-	
+
 	private void showAllFactions(boolean show) {
 		removeAllListeners();
-		
+
 		if (show) {
 			cbEmployer.removeAllItems();
 			cbEnemy.removeAllItems();
@@ -456,15 +456,15 @@ public class NewAtBContractDialog extends NewContractDialog {
 		}
 		addAllListeners();
 	}
-	
+
 	private void showAllPlanets(boolean show) {
 		removeAllListeners();
 		updatePlanets();
 		suggestPlanet.setVisible(show);
-		cbPlanets.setVisible(!show);		
+		cbPlanets.setVisible(!show);
 		addAllListeners();
 	}
-	
+
 	private void updatePlanets() {
 		if (chkShowAllPlanets.isSelected() ||
 				getCurrentEmployerCode() == null ||
@@ -510,7 +510,7 @@ public class NewAtBContractDialog extends NewContractDialog {
         if (!btnOK.equals(evt.getSource())) {
             return;
         }
-        
+
         AtBContract contract = (AtBContract)this.contract;
 
     	contract.setName(txtName.getText());
@@ -523,7 +523,7 @@ public class NewAtBContractDialog extends NewContractDialog {
     	contract.setMissionType(cbMissionType.getSelectedIndex());
     	contract.setDesc(txtDesc.getText());
     	contract.setCommandRights(choiceCommand.getSelectedIndex());
-    	
+
     	contract.setEnemyCode(getCurrentEnemyCode());
     	contract.setAllySkill(cbAllySkill.getSelectedIndex());
     	contract.setAllyQuality(cbAllyQuality.getSelectedIndex());
@@ -532,17 +532,17 @@ public class NewAtBContractDialog extends NewContractDialog {
     	contract.setAllyBotName(contract.getEmployerName(campaign.getGameYear()));
     	contract.setEnemyBotName(contract.getEnemyName(campaign.getGameYear()));
     	contract.setSharesPct((Integer)spnShares.getValue());
-    	
+
     	contract.calculatePartsAvailabilityLevel(campaign);
-   	
+
     	campaign.getFinances().credit(contract.getTotalAdvanceMonies(), Transaction.C_CONTRACT, "Advance monies for " + contract.getName(), campaign.getCalendar().getTime());
     	campaign.addMission(contract);
     	this.setVisible(false);
     }
-    
+
     protected void doUpdateContract(Object source) {
 		removeAllListeners();
-		
+
     	AtBContract contract = (AtBContract)this.contract;
         if (cbPlanets.equals(source) && null != cbPlanets.getSelectedItem()) {
             contract.setPlanetName((String)cbPlanets.getSelectedItem());
@@ -576,10 +576,10 @@ public class NewAtBContractDialog extends NewContractDialog {
     	} else if (source.equals(cbEnemyQuality)) {
     		contract.setEnemyQuality(cbEnemyQuality.getSelectedIndex());
     	}
-    	
+
    		updatePaymentMultiplier();
    		super.doUpdateContract(source);
-    	
+
     	addAllListeners();
    }
 }

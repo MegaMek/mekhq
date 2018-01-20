@@ -75,7 +75,7 @@ public class EquipmentPart extends Part {
     public EquipmentPart() {
     	this(0, null, -1, false, null);
     }
-    
+
     public EquipmentPart(int tonnage, EquipmentType et, int equipNum, Campaign c) {
         this(0, et, equipNum, false, c);
     }
@@ -199,7 +199,7 @@ public class EquipmentPart extends Part {
 		}
 		restore();
 	}
-	
+
 	@Override
 	public TechAdvancement getTechAdvancement() {
 	    return type.getTechAdvancement();
@@ -272,7 +272,7 @@ public class EquipmentPart extends Part {
 				if(mounted.isMissing()) {
 					remove(false);
 					return;
-				}				
+				}
 				hits = unit.getEntity().getDamagedCriticals(CriticalSlot.TYPE_EQUIPMENT, equipmentNum, mounted.getLocation());
 				if(mounted.isSplit()) {
 				hits += unit.getEntity().getDamagedCriticals(CriticalSlot.TYPE_EQUIPMENT, equipmentNum, mounted.getSecondLocation());
@@ -688,7 +688,7 @@ public class EquipmentPart extends Part {
 		}
 		return false;
     }
-	
+
 	/**
 	 * This method will check for an existing weapon bay that this equipment belongs to
 	 * and if there is one it will check the status of that weapon bay based on the equipment.
@@ -698,8 +698,8 @@ public class EquipmentPart extends Part {
 	 * order to properly update weapon bay mounts on the entity
 	 */
 	private void checkWeaponBay() {
-		
-		if(type instanceof WeaponType && null != unit 
+
+		if(type instanceof WeaponType && null != unit
 				&& null != unit.getEntity()
 				&& unit.getEntity().usesWeaponBays()) {
 			Mounted weapon = unit.getEntity().getEquipment(equipmentNum);
@@ -747,7 +747,7 @@ public class EquipmentPart extends Part {
 			weaponBay.setHit(true);
 			weaponBay.setDestroyed(true);
 			weaponBay.setRepairable(true);
-	        unit.destroySystem(CriticalSlot.TYPE_EQUIPMENT, wBayIndex);		
+	        unit.destroySystem(CriticalSlot.TYPE_EQUIPMENT, wBayIndex);
 		}
 	}
 }

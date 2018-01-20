@@ -76,7 +76,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
         this.frame = frame;
         this.app = app;
         this.fileCampaign = f;
-        
+
         resourceMap = ResourceBundle.getBundle("mekhq.resources.DataLoadingDialog", new EncodeControl()); //$NON-NLS-1$
 
         setUndecorated(true);
@@ -123,7 +123,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
         @Override
         public Void doInBackground() {
             final String METHOD_NAME = "doInBackground()"; //$NON-NLS-1$
-            
+
             //Initialize progress property.
             setProgress(0);
             try {

@@ -25,7 +25,7 @@ import java.util.Comparator;
                 r0 = Integer.MIN_VALUE;
             } else {
                 r0 = Integer.parseInt(s0);
-            }   
+            }
             if(s1.equals("Impossible")) {
                 r1 = Integer.MAX_VALUE;
             }
@@ -36,7 +36,7 @@ import java.util.Comparator;
                 r1 = Integer.MIN_VALUE;
             } else {
                 r1 = Integer.parseInt(s1);
-            }   
+            }
             return ((Comparable<Integer>)r0).compareTo(r1);
 
         }

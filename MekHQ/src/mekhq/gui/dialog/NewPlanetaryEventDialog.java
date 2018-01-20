@@ -55,7 +55,7 @@ import mekhq.campaign.universe.StarUtil;
 
 public class NewPlanetaryEventDialog extends JDialog {
     private static final long serialVersionUID = 6025304629282204159L;
-    
+
     private static final String FIELD_MESSAGE = "message"; //$NON-NLS-1$
     private static final String FIELD_NAME = "name"; //$NON-NLS-1$
     private static final String FIELD_SHORTNAME = "shortName"; //$NON-NLS-1$
@@ -76,16 +76,16 @@ public class NewPlanetaryEventDialog extends JDialog {
     private static final String FIELD_POPULATION = "pop"; //$NON-NLS-1$
     private static final String FIELD_GOVERNMENT = "government"; //$NON-NLS-1$
     private static final String FIELD_CONTROL = "control"; //$NON-NLS-1$
-    
+
     private final static DateTimeFormatter DATE_FORMATTER = DateTimeFormat.forPattern("yyyy-MM-dd"); //$NON-NLS-1$
     private final static SocioIndustrialDataAdapter SOCIO_INDUSTRIAL_ADAPTER = new SocioIndustrialDataAdapter();
-    
+
     ResourceBundle resourceMap;
 
     private final Planet planet;
-    
+
     private DateTime date;
-    
+
     private List<Planet.PlanetaryEvent> changedEvents = null;
 
     private JButton dateButton;
@@ -129,7 +129,7 @@ public class NewPlanetaryEventDialog extends JDialog {
     private JCheckBox popKeep;
     private JCheckBox governmentKeep;
     private JCheckBox controlKeep;
-    
+
     private JLabel nameCombined;
     private JLabel shortNameCombined;
     private JLabel factionCombined;
@@ -153,7 +153,7 @@ public class NewPlanetaryEventDialog extends JDialog {
     public NewPlanetaryEventDialog(Frame parent, Campaign campaign, Planet planet) {
         this(parent, campaign, planet, true);
     }
-    
+
     public NewPlanetaryEventDialog(Frame parent, Campaign campaign, Planet planet, boolean modal) {
         super(parent, modal);
         this.planet = new Planet(Objects.requireNonNull(planet).getId());
@@ -162,33 +162,33 @@ public class NewPlanetaryEventDialog extends JDialog {
         initComponents();
         setLocationRelativeTo(parent);
     }
-    
+
     public List<Planet.PlanetaryEvent> getChangedEvents() {
         return changedEvents;
     }
-    
+
     protected void initComponents() {
         resourceMap = ResourceBundle.getBundle("mekhq.resources.NewPlanetaryEventDialog", new EncodeControl()); //$NON-NLS-1$
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("form"); //$NON-NLS-1$
         setTitle(resourceMap.getString("Form.title")); //$NON-NLS-1$
         setMinimumSize(new Dimension(600, 600));
-        
+
         final Container content = getContentPane();
         content.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
-        
+
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridwidth = 3;
         content.add(new JLabel(String.format(resourceMap.getString("planetId.format"), planet.getId())), gbc); //$NON-NLS-1$
-        
+
         gbc.gridy = 1;
         gbc.gridwidth = 1;
         gbc.anchor = GridBagConstraints.EAST;
         content.add(new JButton(new AbstractAction(resourceMap.getString("previousDay.label")){ //$NON-NLS-1$
             private static final long serialVersionUID = -4901868873472027052L;
-            
+
             {
                 putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, ActionEvent.CTRL_MASK));
                 putValue(SHORT_DESCRIPTION, resourceMap.getString("previousDay.tooltip")); //$NON-NLS-1$
@@ -206,7 +206,7 @@ public class NewPlanetaryEventDialog extends JDialog {
                 updateDate();
             }
         }), gbc);
-        
+
         gbc.gridx = 1;
         gbc.anchor = GridBagConstraints.CENTER;
         dateButton = new JButton(new AbstractAction() {
@@ -225,12 +225,12 @@ public class NewPlanetaryEventDialog extends JDialog {
             }
         });
         content.add(dateButton, gbc);
-        
+
         gbc.gridx = 2;
         gbc.anchor = GridBagConstraints.WEST;
         content.add(new JButton(new AbstractAction(resourceMap.getString("nextDay.label")){ //$NON-NLS-1$
             private static final long serialVersionUID = -4901868873472027053L;
-            
+
             {
                 putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, ActionEvent.CTRL_MASK));
                 putValue(ACTION_COMMAND_KEY, "nextDay"); //$NON-NLS-1$
@@ -263,9 +263,9 @@ public class NewPlanetaryEventDialog extends JDialog {
             BorderFactory.createTitledBorder(resourceMap.getString("eventData.text")), //$NON-NLS-1$
             BorderFactory.createEmptyBorder(1, 5, 1, 5)));
         content.add(data, gbc);
-        
+
         preparaDataPane(data);
-        
+
         gbc.gridy = 3;
         gbc.gridwidth = 1;
         gbc.anchor = GridBagConstraints.WEST;
@@ -300,10 +300,10 @@ public class NewPlanetaryEventDialog extends JDialog {
         updateDate();
         pack();
     }
-    
+
     private void preparaDataPane(JPanel pane) {
         GridBagConstraints gbc = new GridBagConstraints();
-        
+
         Action changeValueAction = new AbstractAction() {
             private static final long serialVersionUID = 7405843636038153841L;
 
@@ -313,7 +313,7 @@ public class NewPlanetaryEventDialog extends JDialog {
                 updateDate();
             }
         };
-        
+
         ChangeListener changeListener = new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
@@ -335,7 +335,7 @@ public class NewPlanetaryEventDialog extends JDialog {
                 }
             }
         };
-        
+
         FocusAdapter textFocusAdapter = new FocusAdapter() {
             @Override
             public void focusGained(FocusEvent e) {
@@ -350,11 +350,11 @@ public class NewPlanetaryEventDialog extends JDialog {
                 {
                     final JTextField source = (JTextField) e.getSource();
                     source.dispatchEvent(new KeyEvent(source, KeyEvent.KEY_PRESSED,
-                            System.currentTimeMillis(), 0, KeyEvent.VK_ENTER, '\n'));  
+                            System.currentTimeMillis(), 0, KeyEvent.VK_ENTER, '\n'));
                 }
             }
         };
-        
+
         gbc.gridx = 0;
         gbc.gridy = 0;
         pane.add(new JLabel(resourceMap.getString("changeOf.text")), gbc); //$NON-NLS-1$
@@ -364,12 +364,12 @@ public class NewPlanetaryEventDialog extends JDialog {
         gbc.gridx = 3;
         gbc.weightx = 0.0;
         pane.add(new JLabel(resourceMap.getString("combinedValue.text")), gbc); //$NON-NLS-1$
-        
+
         gbc.gridx = 0;
         gbc.gridy = 1;
         gbc.anchor = GridBagConstraints.WEST;
         pane.add(new JLabel(resourceMap.getString("message.text")), gbc); //$NON-NLS-1$
-        
+
         gbc.gridx = 1;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         messageField = new JTextField();
@@ -381,7 +381,7 @@ public class NewPlanetaryEventDialog extends JDialog {
         gbc.gridx = 0;
         gbc.gridy = 2;
         pane.add(new JLabel(resourceMap.getString("name.text")), gbc); //$NON-NLS-1$
-        
+
         gbc.gridx = 1;
         nameField = new JTextField();
         nameField.addActionListener(changeValueAction);
@@ -396,15 +396,15 @@ public class NewPlanetaryEventDialog extends JDialog {
         nameKeep.setName(FIELD_NAME);
         pane.add(nameKeep, gbc);
         gbc.ipadx = 0;
-        
+
         gbc.gridx = 3;
         nameCombined = new JLabel();
         pane.add(nameCombined, gbc);
-        
+
         gbc.gridx = 0;
         gbc.gridy = 3;
         pane.add(new JLabel(resourceMap.getString("shortName.text")), gbc); //$NON-NLS-1$
-        
+
         gbc.gridx = 1;
         shortNameField = new JTextField();
         shortNameField.addActionListener(changeValueAction);
@@ -417,15 +417,15 @@ public class NewPlanetaryEventDialog extends JDialog {
         shortNameKeep.setText(resourceMap.getString("noChange.text")); //$NON-NLS-1$
         shortNameKeep.setName(FIELD_SHORTNAME);
         pane.add(shortNameKeep, gbc);
-        
+
         gbc.gridx = 3;
         shortNameCombined = new JLabel();
         pane.add(shortNameCombined, gbc);
-        
+
         gbc.gridx = 0;
         gbc.gridy = 4;
         pane.add(new JLabel(resourceMap.getString("factionList.text")), gbc); //$NON-NLS-1$
-        
+
         gbc.gridx = 1;
         factionsButton = new JButton(new AbstractAction("") { //$NON-NLS-1$
             private static final long serialVersionUID = -168994356642401048L;
@@ -449,15 +449,15 @@ public class NewPlanetaryEventDialog extends JDialog {
         factionKeep.setText(resourceMap.getString("noChange.text")); //$NON-NLS-1$
         factionKeep.setName(FIELD_FACTION);
         pane.add(factionKeep, gbc);
-        
+
         gbc.gridx = 3;
         factionCombined = new JLabel();
         pane.add(factionCombined, gbc);
-        
+
         gbc.gridx = 0;
         gbc.gridy = 5;
         pane.add(new JLabel(resourceMap.getString("lifeform.text")), gbc); //$NON-NLS-1$
-        
+
         gbc.gridx = 1;
         lifeFormField = new JComboBox<LifeFormChoice>(new LifeFormChoice[]{
             new LifeFormChoice(null),
@@ -474,11 +474,11 @@ public class NewPlanetaryEventDialog extends JDialog {
         lifeFormKeep.setText(resourceMap.getString("noChange.text")); //$NON-NLS-1$
         lifeFormKeep.setName(FIELD_LIFE_FORM);
         pane.add(lifeFormKeep, gbc);
-        
+
         gbc.gridx = 3;
         lifeFormCombined = new JLabel();
         pane.add(lifeFormCombined, gbc);
-        
+
         gbc.gridx = 0;
         gbc.gridy = 6;
         pane.add(new JLabel(resourceMap.getString("climate.text")), gbc); //$NON-NLS-1$
@@ -499,11 +499,11 @@ public class NewPlanetaryEventDialog extends JDialog {
         climateKeep.setText(resourceMap.getString("noChange.text")); //$NON-NLS-1$
         climateKeep.setName(FIELD_CLIMATE);
         pane.add(climateKeep, gbc);
-        
+
         gbc.gridx = 3;
         climateCombined = new JLabel();
         pane.add(climateCombined, gbc);
-        
+
         gbc.gridx = 0;
         gbc.gridy = 7;
         pane.add(new JLabel(resourceMap.getString("water.text")), gbc); //$NON-NLS-1$
@@ -519,7 +519,7 @@ public class NewPlanetaryEventDialog extends JDialog {
         waterKeep.setText(resourceMap.getString("noChange.text")); //$NON-NLS-1$
         waterKeep.setName(FIELD_WATER);
         pane.add(waterKeep, gbc);
-        
+
         gbc.gridx = 3;
         waterCombined = new JLabel();
         pane.add(waterCombined, gbc);
@@ -527,7 +527,7 @@ public class NewPlanetaryEventDialog extends JDialog {
         gbc.gridx = 0;
         gbc.gridy = 8;
         pane.add(new JLabel(resourceMap.getString("temperature.text")), gbc); //$NON-NLS-1$
-        
+
         gbc.gridx = 1;
         temperatureField = new JSpinner(new SpinnerNumberModel(0, -273, 10000, 1));
         temperatureField.addChangeListener(changeListener);
@@ -539,7 +539,7 @@ public class NewPlanetaryEventDialog extends JDialog {
         temperatureKeep.setText(resourceMap.getString("noChange.text")); //$NON-NLS-1$
         temperatureKeep.setName(FIELD_TEMPERATURE);
         pane.add(temperatureKeep, gbc);
-        
+
         gbc.gridx = 3;
         temperatureCombined = new JLabel();
         pane.add(temperatureCombined, gbc);
@@ -572,7 +572,7 @@ public class NewPlanetaryEventDialog extends JDialog {
         socioindustrialKeep.setText(resourceMap.getString("noChange.text")); //$NON-NLS-1$
         socioindustrialKeep.setName(FIELD_SOCIO_INDUSTRIAL);
         pane.add(socioindustrialKeep, gbc);
-        
+
         gbc.gridx = 3;
         socioindustrialCombined = new JLabel();
         pane.add(socioindustrialCombined, gbc);
@@ -597,7 +597,7 @@ public class NewPlanetaryEventDialog extends JDialog {
         hpgKeep.setText(resourceMap.getString("noChange.text")); //$NON-NLS-1$
         hpgKeep.setName(FIELD_HPG);
         pane.add(hpgKeep, gbc);
-        
+
         gbc.gridx = 3;
         hpgCombined = new JLabel();
         pane.add(hpgCombined, gbc);
@@ -622,7 +622,7 @@ public class NewPlanetaryEventDialog extends JDialog {
         pressureKeep.setText(resourceMap.getString("noChange.text")); //$NON-NLS-1$
         pressureKeep.setName(FIELD_PRESSURE);
         pane.add(pressureKeep, gbc);
-        
+
         gbc.gridx = 3;
         pressureCombined = new JLabel();
         pane.add(pressureCombined, gbc);
@@ -643,7 +643,7 @@ public class NewPlanetaryEventDialog extends JDialog {
         pressureAtmKeep.setText(resourceMap.getString("noChange.text")); //$NON-NLS-1$
         pressureAtmKeep.setName(FIELD_PRESSURE_ATM);
         pane.add(pressureAtmKeep, gbc);
-        
+
         gbc.gridx = 3;
         pressureAtmCombined = new JLabel();
         pane.add(pressureAtmCombined, gbc);
@@ -664,7 +664,7 @@ public class NewPlanetaryEventDialog extends JDialog {
         atmMassKeep.setText(resourceMap.getString("noChange.text")); //$NON-NLS-1$
         atmMassKeep.setName(FIELD_ATM_MASS);
         pane.add(atmMassKeep, gbc);
-        
+
         gbc.gridx = 3;
         atmMassCombined = new JLabel();
         pane.add(atmMassCombined, gbc);
@@ -689,7 +689,7 @@ public class NewPlanetaryEventDialog extends JDialog {
         atmosphereKeep.setText(resourceMap.getString("noChange.text")); //$NON-NLS-1$
         atmosphereKeep.setName(FIELD_ATMOSPHERE);
         pane.add(atmosphereKeep, gbc);
-        
+
         gbc.gridx = 3;
         atmosphereCombined = new JLabel();
         pane.add(atmosphereCombined, gbc);
@@ -710,7 +710,7 @@ public class NewPlanetaryEventDialog extends JDialog {
         albedoKeep.setText(resourceMap.getString("noChange.text")); //$NON-NLS-1$
         albedoKeep.setName(FIELD_ALBEDO);
         pane.add(albedoKeep, gbc);
-        
+
         gbc.gridx = 3;
         albedoCombined = new JLabel();
         pane.add(albedoCombined, gbc);
@@ -731,7 +731,7 @@ public class NewPlanetaryEventDialog extends JDialog {
         greenhouseKeep.setText(resourceMap.getString("noChange.text")); //$NON-NLS-1$
         greenhouseKeep.setName(FIELD_GREENHOUSE);
         pane.add(greenhouseKeep, gbc);
-        
+
         gbc.gridx = 3;
         greenhouseCombined = new JLabel();
         pane.add(greenhouseCombined, gbc);
@@ -751,7 +751,7 @@ public class NewPlanetaryEventDialog extends JDialog {
         habitabilityKeep.setText(resourceMap.getString("noChange.text")); //$NON-NLS-1$
         habitabilityKeep.setName(FIELD_HABITABILITY);
         pane.add(habitabilityKeep, gbc);
-        
+
         gbc.gridx = 3;
         habitabilityCombined = new JLabel();
         pane.add(habitabilityCombined, gbc);
@@ -777,7 +777,7 @@ public class NewPlanetaryEventDialog extends JDialog {
         popKeep.setText(resourceMap.getString("noChange.text")); //$NON-NLS-1$
         popKeep.setName(FIELD_POPULATION);
         pane.add(popKeep, gbc);
-        
+
         gbc.gridx = 3;
         popCombined = new JLabel();
         pane.add(popCombined, gbc);
@@ -798,7 +798,7 @@ public class NewPlanetaryEventDialog extends JDialog {
         governmentKeep.setText(resourceMap.getString("noChange.text")); //$NON-NLS-1$
         governmentKeep.setName(FIELD_GOVERNMENT);
         pane.add(governmentKeep, gbc);
-        
+
         gbc.gridx = 3;
         governmentCombined = new JLabel();
         pane.add(governmentCombined, gbc);
@@ -806,7 +806,7 @@ public class NewPlanetaryEventDialog extends JDialog {
         gbc.gridx = 0;
         gbc.gridy = 20;
         pane.add(new JLabel(resourceMap.getString("control.text")), gbc); //$NON-NLS-1$
-        
+
         gbc.gridx = 1;
         controlField = new JComboBox<ControlChoice>(new ControlChoice[]{
                 new ControlChoice(null, resourceMap.getString("control.undefined.text")), //$NON-NLS-1$
@@ -823,17 +823,17 @@ public class NewPlanetaryEventDialog extends JDialog {
         controlKeep.setText(resourceMap.getString("noChange.text")); //$NON-NLS-1$
         controlKeep.setName(FIELD_CONTROL);
         pane.add(controlKeep, gbc);
-        
+
         gbc.gridx = 3;
         controlCombined = new JLabel();
         pane.add(controlCombined, gbc);
 
     }
-    
+
     private Planet.PlanetaryEvent getCurrentEvent() {
         return planet.getEvent(date);
     }
-    
+
     private void updateDate() {
         dateButton.setText(date.toString(DATE_FORMATTER));
         Planet.PlanetaryEvent event = getCurrentEvent();
@@ -945,7 +945,7 @@ public class NewPlanetaryEventDialog extends JDialog {
         popKeep.setSelected((null == event) || (null == event.populationRating));
         governmentKeep.setSelected((null == event) || (null == event.government));
         controlKeep.setSelected((null == event) || (null == event.controlRating));
-        
+
         nameCombined.setText(Utilities.nonNull(planet.getName(date), resourceMap.getString("undefined.text"))); //$NON-NLS-1$
         shortNameCombined.setText(Utilities.nonNull(planet.getShortName(date), resourceMap.getString("undefined.text"))); //$NON-NLS-1$
         factionCombined.setText(planet.getFactionDesc(date));
@@ -979,7 +979,7 @@ public class NewPlanetaryEventDialog extends JDialog {
         governmentCombined.setText(Utilities.nonNull(planet.getGovernment(date), resourceMap.getString("undefined.text"))); //$NON-NLS-1$
         controlCombined.setText(planet.getControlRatingString(date));
     }
-    
+
     private void cleanEventField(Planet.PlanetaryEvent event, String field) {
         if((null == event) || (null == field)) {
             return;
@@ -1008,12 +1008,12 @@ public class NewPlanetaryEventDialog extends JDialog {
         }
         event.custom = true;
     }
-    
+
     private String nullEmptyText(JTextField field) {
         final String text = field.getText();
         return ((null == text) || text.isEmpty()) ? null : text;
     }
-    
+
     private void updateEvent(Component source, Planet.PlanetaryEvent event) {
         switch(source.getName()) {
             case FIELD_MESSAGE: event.message = nullEmptyText(messageField); break;
@@ -1049,14 +1049,14 @@ public class NewPlanetaryEventDialog extends JDialog {
         }
         event.custom = true;
     }
-    
+
     private static class LifeFormChoice {
         public LifeForm lifeForm;
-        
+
         public LifeFormChoice(LifeForm lifeForm) {
             this.lifeForm = lifeForm;
         }
-        
+
         @Override
         public String toString() {
             return null != lifeForm ? lifeForm.name : ""; //$NON-NLS-1$
@@ -1079,14 +1079,14 @@ public class NewPlanetaryEventDialog extends JDialog {
             return (other.lifeForm == lifeForm);
         }
     }
-    
+
     private static class ClimateChoice {
         public Climate climate;
-        
+
         public ClimateChoice(Climate climate) {
             this.climate = climate;
         }
-        
+
         @Override
         public String toString() {
             return null != climate ? climate.climateName : ""; //$NON-NLS-1$
@@ -1109,21 +1109,21 @@ public class NewPlanetaryEventDialog extends JDialog {
             return (other.climate == climate);
         }
     }
-    
+
     private static class HPGChoice {
         public Integer hpg;
         public String text;
-        
+
         public HPGChoice(Integer hpg, String text) {
             this.hpg = hpg;
             this.text = text;
         }
-        
+
         @Override
         public String toString() {
             return text;
         }
-        
+
         @Override
         public int hashCode() {
             return Objects.hashCode(hpg);
@@ -1141,25 +1141,25 @@ public class NewPlanetaryEventDialog extends JDialog {
             return Objects.equals(hpg, other.hpg);
         }
     }
-    
+
     private static class PressureChoice {
         public Integer pressure;
         public String text;
-        
+
         public PressureChoice(int pressure) {
             this(pressure, PlanetaryConditions.getAtmosphereDisplayableName(pressure));
         }
-        
+
         public PressureChoice(int pressure, String text) {
             this.pressure = Integer.valueOf(pressure);
             this.text = text;
         }
-        
+
         @Override
         public String toString() {
             return text;
         }
-        
+
         @Override
         public int hashCode() {
             return Objects.hashCode(pressure);
@@ -1181,21 +1181,21 @@ public class NewPlanetaryEventDialog extends JDialog {
     private static class PopulationChoice {
         public Integer population;
         public String text;
-        
+
         public PopulationChoice(int population) {
             this(Integer.valueOf(population), StarUtil.getPopulationRatingString(population));
         }
-        
+
         public PopulationChoice(Integer population, String text) {
             this.population = population;
             this.text = text;
         }
-        
+
         @Override
         public String toString() {
             return text;
         }
-        
+
         @Override
         public int hashCode() {
             return Objects.hashCode(population);
@@ -1217,21 +1217,21 @@ public class NewPlanetaryEventDialog extends JDialog {
     private static class ControlChoice {
         public Integer control;
         public String text;
-        
+
         public ControlChoice(int control) {
             this(Integer.valueOf(control), StarUtil.getControlRatingString(control));
         }
-        
+
         public ControlChoice(Integer control, String text) {
             this.control = control;
             this.text = text;
         }
-        
+
         @Override
         public String toString() {
             return text;
         }
-        
+
         @Override
         public int hashCode() {
             return Objects.hashCode(control);

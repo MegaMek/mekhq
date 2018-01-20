@@ -1,20 +1,20 @@
 /*
  * MissingAmmoBin.java
- * 
+ *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -43,11 +43,11 @@ public class MissingAmmoBin extends MissingEquipmentPart {
 	private static final long serialVersionUID = 2892728320891712304L;
 
 	protected boolean oneShot;
-	
+
     public MissingAmmoBin() {
     	this(0, null, -1, false, false, null);
     }
-    
+
     public MissingAmmoBin(int tonnage, EquipmentType et, int equipNum, boolean singleShot,
             boolean omniPodded, Campaign c) {
         super(tonnage, et, equipNum, c, 1, omniPodded);
@@ -56,9 +56,9 @@ public class MissingAmmoBin extends MissingEquipmentPart {
         	this.name += " Bin";
         }
     }
-    
+
     /* Per TM, ammo for fighters is stored in the fuselage. This makes a difference for omnifighter
-     * pod space, so we're going to stick them in LOC_NONE where the heat sinks are */ 
+     * pod space, so we're going to stick them in LOC_NONE where the heat sinks are */
     @Override
     public String getLocationName() {
         if (unit.getEntity() instanceof Aero
@@ -67,7 +67,7 @@ public class MissingAmmoBin extends MissingEquipmentPart {
         }
         return super.getLocationName();
     }
-    
+
     @Override
     public int getLocation() {
         if (unit.getEntity() instanceof Aero
@@ -76,7 +76,7 @@ public class MissingAmmoBin extends MissingEquipmentPart {
         }
         return super.getLocation();
     }
-    
+
     @Override
     public boolean isInLocation(String loc) {
         if (unit.getEntity() instanceof Aero
@@ -91,20 +91,20 @@ public class MissingAmmoBin extends MissingEquipmentPart {
 		return -2;
 	}
 
-	@Override 
+	@Override
 	public void fix() {
 		Part replacement = findReplacement(false);
 		if(null != replacement) {
 		    Part actualReplacement;
-		    
+
             //Check to see if munition types are different
 		    if (getType() == ((AmmoBin)replacement).getType()) {
 		        actualReplacement = replacement.clone();
 		    } else {
-		        actualReplacement = new AmmoBin(getUnitTonnage(), getType(), getEquipmentNum(), 
+		        actualReplacement = new AmmoBin(getUnitTonnage(), getType(), getEquipmentNum(),
 		                getFullShots(), isOneShot(), isOmniPodded(), campaign);
 		    }
-			
+
 			unit.addPart(actualReplacement);
 			campaign.addPart(actualReplacement, 0);
 			replacement.decrementQuantity();
@@ -114,7 +114,7 @@ public class MissingAmmoBin extends MissingEquipmentPart {
 			actualReplacement.updateConditionFromPart();
 		}
 	}
-	
+
 	@Override
 	public boolean isAcceptableReplacement(Part part, boolean refit) {
 		if ((part instanceof AmmoBin)
@@ -125,7 +125,7 @@ public class MissingAmmoBin extends MissingEquipmentPart {
 		}
 		return false;
 	}
-	
+
 	public boolean isOneShot() {
 		return oneShot;
 	}
@@ -137,15 +137,15 @@ public class MissingAmmoBin extends MissingEquipmentPart {
 		}
 		return fullShots;
     }
-	
+
 	@Override
 	public Part getNewPart() {
 		return new AmmoBin(getUnitTonnage(), type, -1, getFullShots(), oneShot, omniPodded, campaign);
 	}
-	
+
 	@Override
 	public void writeToXml(PrintWriter pw1, int indent) {
-		writeToXmlBegin(pw1, indent);		
+		writeToXmlBegin(pw1, indent);
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<equipmentNum>"
 				+equipmentNum
@@ -164,12 +164,12 @@ public class MissingAmmoBin extends MissingEquipmentPart {
 				+"</oneShot>");
 		writeToXmlEnd(pw1, indent);
 	}
-	
+
 	@Override
 	protected void loadFieldsFromXmlNode(Node wn) {
 		super.loadFieldsFromXmlNode(wn);
 		NodeList nl = wn.getChildNodes();
-		
+
 		for (int x=0; x<nl.getLength(); x++) {
 			Node wn2 = nl.item(x);
 			if (wn2.getNodeName().equalsIgnoreCase("equipmentNum")) {
@@ -185,7 +185,7 @@ public class MissingAmmoBin extends MissingEquipmentPart {
 				} else {
 					oneShot = false;
 				}
-			} 
+			}
 		}
 		restore();
 	}

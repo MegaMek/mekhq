@@ -17,10 +17,10 @@ import java.util.Comparator;
 
             return ((Comparable<Integer>)l0).compareTo(l1);
         }
-        
+
         public static int getDamageStateIndex(String damageState) {
         	int idx = 0;
-        	
+
             if(damageState.contains("Mothballed")) {
                 idx = 1;
             }
@@ -60,7 +60,7 @@ import java.util.Comparator;
             if(damageState.contains("Undamaged")) {
                 idx = 13;
             }
-            
+
             return idx;
         }
     }

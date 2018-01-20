@@ -44,7 +44,7 @@ import mekhq.gui.CampaignGUI;
 import mekhq.gui.model.TaskTableModel;
 
 public class TaskTableMouseAdapter extends MouseInputAdapter implements ActionListener {
-    
+
     private CampaignGUI gui;
     private JTable taskTable;
     private TaskTableModel taskModel;
@@ -55,7 +55,7 @@ public class TaskTableMouseAdapter extends MouseInputAdapter implements ActionLi
         this.gui = gui;
         this.taskTable = taskTable;
         this.taskModel = taskModel;
-    }        
+    }
 
     @Override
     public void actionPerformed(ActionEvent action) {
@@ -64,13 +64,13 @@ public class TaskTableMouseAdapter extends MouseInputAdapter implements ActionLi
         if (null == partWork) {
             return;
         }
-        
+
         int[] rows = taskTable.getSelectedRows();
         IPartWork[] parts = new IPartWork[rows.length];
         for (int i = 0; i < rows.length; i++) {
             parts[i] = taskModel.getTaskAt(taskTable.convertRowIndexToModel(rows[i]));
         }
-        
+
         if (command.equalsIgnoreCase("SCRAP")) {
             for (IPartWork p : parts) {
             	if (!(p instanceof Part)) {
@@ -165,7 +165,7 @@ public class TaskTableMouseAdapter extends MouseInputAdapter implements ActionLi
             if (null == partWork) {
                 return;
             }
-            
+
             int[] rows = taskTable.getSelectedRows();
             IPartWork[] parts = new IPartWork[rows.length];
             for (int i = 0; i < rows.length; i++) {

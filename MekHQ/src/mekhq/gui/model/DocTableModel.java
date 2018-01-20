@@ -19,7 +19,7 @@ public class DocTableModel extends DataTableModel {
     private static final long serialVersionUID = -6934834363013004894L;
 
     private Campaign campaign;
-    
+
     public DocTableModel(Campaign c) {
         columnNames = new String[] { "Doctors" };
         data = new ArrayList<Person>();
@@ -33,7 +33,7 @@ public class DocTableModel extends DataTableModel {
     public Person getDoctorAt(int row) {
         return (Person) data.get(row);
     }
-    
+
     public Campaign getCampaign() {
         return campaign;
     }

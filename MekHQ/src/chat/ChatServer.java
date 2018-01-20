@@ -10,7 +10,7 @@ import java.net.Socket;
 import java.util.Vector;
 
 public class ChatServer {
-	
+
 	// Moved this out here and added a die method just to make the warning shut the funk up
 	static ServerSocket serverSocket;
 
@@ -36,7 +36,7 @@ public class ChatServer {
             connection.start();
         }
     }
-    
+
     public void die() {
     	// close socket
         try {

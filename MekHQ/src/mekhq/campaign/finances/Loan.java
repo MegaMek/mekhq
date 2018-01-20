@@ -1,20 +1,20 @@
 /*
  * Loan.java
- * 
+ *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -44,7 +44,7 @@ import org.w3c.dom.NodeList;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class Loan implements MekHqXmlSerializable {
-    
+
     // If you add more Canon institutions, please add them at the beginning and change the next line.
     // The first four of these are Canon, the rest are made up.
     private static final List<String> madeUpInstitutions = Arrays.asList("Southern Bank and Trust" /* Canon */, "The Alliance Reserve Bank" /* Canon */,
@@ -54,7 +54,7 @@ public class Loan implements MekHqXmlSerializable {
     	"Luthien Bank of the Dragon", "Golden Bank of Sian", "Rasalhauge National Bank", "Canopus Federal Reserve",
     	"Concordat Bank and Trust", "Outworlds Alliance National Bank", "Hegemony Bank and Trust",
     	"Andurien First National Bank");
-    
+
     private String institution;
     private String refNumber;
     private long principal;
@@ -68,15 +68,15 @@ public class Loan implements MekHqXmlSerializable {
     private long totalValue;
     private long collateralValue;
     private boolean overdue;
-    
+
     public Loan() {
         //dont do anything, this is for loading
     }
-    
+
     public Loan(long p, int r, int c, int y, int s, GregorianCalendar today) {
         this(p, r, c, y, s, today, Utilities.getRandomItem(madeUpInstitutions), randomRefNumber());
     }
-    
+
     public Loan(long p, int r, int c, int y, int s, GregorianCalendar today, String i, String ref) {
         this.principal = p;
         this.rate = r;
@@ -90,10 +90,10 @@ public class Loan implements MekHqXmlSerializable {
         refNumber = ref;
         overdue = false;
     }
-    
+
     public void setFirstPaymentDate() {
         boolean keepGoing = true;
-        //We are going to assume a standard grace period, so you have to go 
+        //We are going to assume a standard grace period, so you have to go
         //through the first full time length (not partial) before your first
         //payment
         int grace = 1;
@@ -147,18 +147,18 @@ public class Loan implements MekHqXmlSerializable {
                         keepGoing = false;
                     }
                 }
-                break;       
+                break;
             default:
                 //shouldn't get here but kill the loop just in case
                 keepGoing = false;
                 break;
-                
+
             }
         }
     }
-    
+
     public void calculateAmortization() {
-        
+
         //figure out actual rate from APR
         int denom = 1;
         switch(schedule) {
@@ -181,7 +181,7 @@ public class Loan implements MekHqXmlSerializable {
         totalValue = payAmount * nPayments;
         collateralValue = (long)(((double)collateral/100.0)*principal);
     }
-    
+
     public long getPrincipal() {
         return principal;
     }
@@ -189,31 +189,31 @@ public class Loan implements MekHqXmlSerializable {
 	public void setPrincipal(long principal) {
 		this.principal = principal;
 	}
-    
+
     public String getInstitution() {
         return institution;
     }
-    
+
     public void setInstitution(String s) {
         this.institution = s;
     }
-    
+
     public String getRefNumber() {
         return refNumber;
     }
-    
+
     public void setRefNumber(String s) {
         this.refNumber = s;
     }
-    
+
     public boolean isOverdue() {
         return overdue;
     }
-    
+
     public void setOverdue(boolean b) {
         overdue = b;
     }
-    
+
     public int getRate() {
 		return rate;
 	}
@@ -221,28 +221,28 @@ public class Loan implements MekHqXmlSerializable {
 	public void setRate(int rate) {
 		this.rate = rate;
 	}
-    
+
     public int getInterestRate() {
         return rate;
     }
-    
+
     public boolean checkLoanPayment(GregorianCalendar today) {
         return (today.equals(nextPayment) || today.after(nextPayment)) && nPayments > 0;
     }
-    
+
     public long getPaymentAmount() {
         return payAmount;
     }
-    
+
     public long getRemainingValue() {
         return payAmount * nPayments;
     }
-    
+
     public Date getNextPayDate() {
         return nextPayment.getTime();
     }
-    
-    public void paidLoan() {      
+
+    public void paidLoan() {
         switch(schedule) {
         case Finances.SCHEDULE_BIWEEKLY:
             nextPayment.add(GregorianCalendar.WEEK_OF_YEAR, 2);
@@ -260,11 +260,11 @@ public class Loan implements MekHqXmlSerializable {
         nPayments--;
         overdue = false;
     }
-    
+
     public int getRemainingPayments() {
         return nPayments;
     }
-    
+
     public String getDescription() {
         return institution + " " + refNumber;
     }
@@ -276,7 +276,7 @@ public class Loan implements MekHqXmlSerializable {
 	public void setNextPayment(GregorianCalendar nextPayment) {
 		this.nextPayment = nextPayment;
 	}
-    
+
     public int getPaymentSchedule() {
         return schedule;
     }
@@ -288,7 +288,7 @@ public class Loan implements MekHqXmlSerializable {
 	public void setSchedule(int schedule) {
 		this.schedule = schedule;
 	}
-    
+
     public int getCollateralPercent() {
         return collateral;
     }
@@ -316,7 +316,7 @@ public class Loan implements MekHqXmlSerializable {
 	public void setPayAmount(long payAmount) {
 		this.payAmount = payAmount;
 	}
-	
+
     public long getCollateralAmount() {
         return collateralValue;
     }
@@ -332,7 +332,7 @@ public class Loan implements MekHqXmlSerializable {
 	public static List<String> getMadeupinstitutions() {
 		return madeUpInstitutions;
 	}
-    
+
     public int getYears() {
         return years;
     }
@@ -340,7 +340,7 @@ public class Loan implements MekHqXmlSerializable {
 	public void setYears(int years) {
 		this.years = years;
 	}
-    
+
     public long getTotalValue() {
         return totalValue;
     }
@@ -348,7 +348,7 @@ public class Loan implements MekHqXmlSerializable {
 	public void setTotalValue(long totalValue) {
 		this.totalValue = totalValue;
 	}
-    
+
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
         pw1.println(MekHqXmlUtil.indentStr(indent) + "<loan>");
@@ -403,7 +403,7 @@ public class Loan implements MekHqXmlSerializable {
 
     public static Loan generateInstanceFromXML(Node wn) {
         Loan retVal = new Loan();
-        
+
         NodeList nl = wn.getChildNodes();
         for (int x=0; x<nl.getLength(); x++) {
             Node wn2 = nl.item(x);
@@ -446,11 +446,11 @@ public class Loan implements MekHqXmlSerializable {
                     retVal.overdue = true;
                 else
                     retVal.overdue = false;
-            } 
+            }
         }
         return retVal;
     }
-    
+
     public static Loan getBaseLoanFor(int rating, GregorianCalendar cal) {
         //we are going to treat the score from StellarOps the same as dragoons score
         //TODO: pirates and government forces
@@ -466,11 +466,11 @@ public class Loan implements MekHqXmlSerializable {
         } else {
             return new Loan(10000000, 7, 15, 5, Finances.SCHEDULE_MONTHLY, cal);
         }
-        
+
     }
-    
+
     /* These two bracket methods below return a 3=length integer array
-     * of (minimum, starting, maximum). They are based on the StellarOps beta, 
+     * of (minimum, starting, maximum). They are based on the StellarOps beta,
      * but since that document doesn't have minimum collateral amounts, we
      * just make up some numbers there (note that the minimum collateral also
      * determines the maximum interest)
@@ -488,7 +488,7 @@ public class Loan implements MekHqXmlSerializable {
             return new int[]{4,7,17};
         }
     }
-    
+
     public static int[] getCollateralBracket(int rating) {
         if(rating <= 0) {
             return new int[]{60,80,380};
@@ -502,7 +502,7 @@ public class Loan implements MekHqXmlSerializable {
             return new int[]{5,15,35};
         }
     }
-    
+
     public static int getMaxYears(int rating) {
         if(rating < 5) {
             return 1;
@@ -514,7 +514,7 @@ public class Loan implements MekHqXmlSerializable {
             return 5;
         }
     }
-    
+
     public static int getCollateralIncrement(boolean interestPositive, int rating) {
         if(rating < 5) {
             if(interestPositive) {
@@ -531,7 +531,7 @@ public class Loan implements MekHqXmlSerializable {
             }
         }
     }
-    
+
     public static int recalculateCollateralFromInterest(int interest, int rating) {
         int interestDiff = interest - getInterestBracket(rating)[1];
         if(interestDiff < 0) {
@@ -541,7 +541,7 @@ public class Loan implements MekHqXmlSerializable {
             return getCollateralBracket(rating)[1] - (interestDiff/getCollateralIncrement(true, rating));
         }
     }
-    
+
     public static int recalculateInterestFromCollateral(int collateral, int rating) {
         int collateralDiff = collateral - getCollateralBracket(rating)[1];
         if(collateralDiff < 0) {
@@ -549,9 +549,9 @@ public class Loan implements MekHqXmlSerializable {
         } else {
             return getInterestBracket(rating)[1] - (collateralDiff/getCollateralIncrement(false, rating));
         }
-        
+
     }
-    
+
     public static String randomRefNumber() {
         int length = Compute.randomInt(5)+6;
         StringBuffer buffer = new StringBuffer();
@@ -572,14 +572,14 @@ public class Loan implements MekHqXmlSerializable {
         }
         return buffer.toString();
     }
-    
+
     @Override
     public boolean equals(Object obj) {
         if(!(obj instanceof Loan)) {
             return false;
         }
         Loan loan = (Loan)obj;
-        return this.getDescription().equals(loan.getDescription()) 
+        return this.getDescription().equals(loan.getDescription())
                 && this.getInterestRate() == loan.getInterestRate()
                 && this.getCollateralAmount() == loan.getCollateralAmount()
                 && this.getCollateralPercent() == loan.getCollateralPercent()

@@ -26,13 +26,13 @@ import mekhq.campaign.finances.Transaction;
  *
  */
 abstract public class TransactionEvent extends MMEvent {
-    
+
     private final Transaction transaction;
-    
+
     public TransactionEvent(Transaction transaction) {
         this.transaction = transaction;
     }
-    
+
     public Transaction getTransaction() {
         return transaction;
     }

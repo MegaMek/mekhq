@@ -1,23 +1,23 @@
 /*
  * java
- * 
+ *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
- * 
+ *
  * @author: Dylan Myers <ralgith@gmail.com>
  */
 package mekhq.campaign.personnel;
@@ -52,7 +52,7 @@ import mekhq.campaign.mod.am.InjuryTypes;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Injury {
     public static final int VERSION = 1;
-    
+
     // Marshaller / unmarshaller instances
     private static Marshaller marshaller;
     private static Unmarshaller unmarshaller;
@@ -68,15 +68,15 @@ public class Injury {
         } catch(JAXBException e) {
             MekHQ.getLogger().log(Injury.class, "<init>", e);
         }
-    } 
-    
+    }
+
     /**
      *  Load from campaign file XML
      *  <p>
      *  Also used by the personnel exporter
      */
     public static Injury generateInstanceFromXML(Node wn) {
-        try {    
+        try {
             return unmarshaller.unmarshal(wn, Injury.class).getValue();
         } catch (Exception ex) {
             MekHQ.getLogger().log(Injury.class, "generateInstanceFromXML(Node)", ex); //$NON-NLS-1$
@@ -104,12 +104,12 @@ public class Injury {
     private ExtraData extraData = new ExtraData();
     @XmlAttribute(name="v")
     private int version;
-    
+
     // Base constructor, in reality should never be used
     public Injury() {
         this(0, "", BodyLocation.GENERIC, InjuryType.BAD_HEALTH, 1, false, false);
     }
-    
+
     // Normal constructor for a new injury that has not been treated by a doctor & does not have extended time
     public Injury(int time, String text, BodyLocation loc, InjuryType type, int num, boolean perm) {
         this(time, text, loc, type, num, perm, false);
@@ -119,7 +119,7 @@ public class Injury {
     public Injury(int time, String text, BodyLocation loc, InjuryType type, int num, boolean perm, boolean workedOn) {
         this(time, text, loc, type, num, perm, workedOn, false);
     }
-    
+
     // Constructor for when this injury has extended time, full options includng worked on by a doctor
     public Injury(int time, String text, BodyLocation loc, InjuryType type, int num, boolean perm, boolean workedOn, boolean extended) {
         setTime(time);
@@ -133,64 +133,64 @@ public class Injury {
         setExtended(extended);
         id = UUID.randomUUID();
     }
-    
+
     // UUID Control Methods
     public UUID getUUID() {
         return id;
     }
-    
+
     public void setUUID(UUID uuid) {
         id = uuid;
     }
     // End UUID Control Methods
-    
+
     // Time Control Methods
     public DateTime getStart() {
         return start;
     }
-    
+
     public void setStart(DateTime start) {
         this.start = Objects.requireNonNull(start);
     }
-    
+
     public int getTime() {
         return days;
     }
-    
+
     public void setTime(int time) {
         days = time;
     }
-    
+
     public int getOriginalTime() {
         return originalDays;
     }
-    
+
     public void setOriginalTime(int time) {
         originalDays = time;
     }
     // End Time Control Methods
-    
+
     // Details Methods (Fluff, Location on Body, how many hits did it take, etc...)
     public String getFluff() {
         return fluff;
     }
-    
+
     public void setFluff(String text) {
         fluff = text;
     }
-    
+
     public BodyLocation getLocation() {
         return location;
     }
-    
+
     public void setLocation(BodyLocation loc) {
         location = loc;
     }
-    
+
     public int getHits() {
         return hits;
     }
-    
+
     public void setHits(int num) {
         final int minSeverity = isPermanent() ? 1 : 0;
         final int maxSeverity = type.getMaxSeverity();
@@ -201,47 +201,47 @@ public class Injury {
         }
         hits = num;
     }
-    
+
     public boolean isPermanent() {
         return permanent || type.isPermanent();
     }
-    
+
     public void setPermanent(boolean perm) {
         permanent = perm;
     }
-    
+
     public boolean getExtended() {
         return extended;
     }
-    
+
     public void setExtended(boolean ext) {
         extended = ext;
     }
-    
+
     public boolean isWorkedOn() {
         return workedOn;
     }
-    
+
     public void setWorkedOn(boolean wo) {
         workedOn = wo;
     }
-    
+
     public InjuryType getType() {
         return type;
     }
-    
+
     public void setType(InjuryType type) {
         this.type = Objects.requireNonNull(type);
     }
-    
+
     public InjuryLevel getLevel() {
         return type.getLevel(this);
     }
-    
+
     public Collection<Modifier> getModifiers() {
         return type.getModifiers(this);
     }
-    
+
     public ExtraData getExtraData() {
         return extraData;
     }
@@ -249,35 +249,35 @@ public class Injury {
     public void setVersion(int version) {
         this.version = version;
     }
-    
+
     public boolean isHidden() {
         return (hidingState != Hiding.NO) && ((hidingState == Hiding.YES) || type.isHidden(this));
     }
-    
+
     public void setHidingState(Hiding hidingState) {
         this.hidingState = Objects.requireNonNull(hidingState);
     }
-    
+
     // End Details Methods
-    
+
     // Returns the full long name of this injury including location and type as applicable
     public String getName() {
         return type.getName(location, hits);
     }
-    
+
     // Return the location name for the injury by passing location to the static overload
     public String getLocationName() {
         return Utilities.capitalize(location.readableName);
     }
-    
+
     public String getTypeKey() {
         return type.getKey();
     }
-    
+
     public int getTypeId() {
         return type.getId();
     }
-    
+
     // Save to campaign file as XML
     // Also used by the personnel exporter
     public void writeToXml(PrintWriter pw1, int indent) {
@@ -287,7 +287,7 @@ public class Injury {
             MekHQ.getLogger().log(getClass(), "writeToXml(PrintWriter,int)", ex); //$NON-NLS-1$
         }
     }
-    
+
     @SuppressWarnings({ "unused" })
     private void afterUnmarshal(Unmarshaller unmarshaller, Object parent) {
         // Fix old-style "hits" into "severity".
@@ -300,7 +300,7 @@ public class Injury {
                 hits = 1;
             }
         }
-        
+
         // Fix hand/foot locations
         if(fluff.endsWith(" hand")) {
             switch(location) {
@@ -316,19 +316,19 @@ public class Injury {
                 default: // do nothing
             }
         }
-        
+
         if (null == id) { // We didn't have an ID, so let's generate one!
             id = UUID.randomUUID();
         }
-        
+
         if(null == extraData) {
             extraData = new ExtraData();
         }
-        
+
         hidingState = Utilities.nonNull(hidingState, Hiding.DEFAULT);
-        
+
         version = Injury.VERSION;
     }
-    
+
     public static enum Hiding { YES, NO, DEFAULT }
 }

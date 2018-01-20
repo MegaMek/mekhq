@@ -7,12 +7,12 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -89,7 +89,7 @@ import mekhq.gui.dialog.NewPlanetaryEventDialog;
  */
 public class InterstellarMapPanel extends JPanel {
     private static final long serialVersionUID = -1110105822399704646L;
-    
+
     private static final Vector2d[] BASE_HEXCOORDS = {
         new Vector2d(1.0, 0.0),
         new Vector2d(Math.cos(Math.PI / 3.0), Math.sin(Math.PI / 3.0)),
@@ -104,7 +104,7 @@ public class InterstellarMapPanel extends JPanel {
     private JViewport optionView;
     private JPanel optionPanel;
     private JButton optionButton;
-    
+
     // Map view options
     private JCheckBox optEmptySystems;
     private JCheckBox optHPGNetwork;
@@ -112,7 +112,7 @@ public class InterstellarMapPanel extends JPanel {
 
     private Timer optionPanelTimer;
     private boolean optionPanelHidden;
-    
+
     private ArrayList<Planet> planets;
     private JumpPath jumpPath;
     private Campaign campaign;
@@ -136,7 +136,7 @@ public class InterstellarMapPanel extends JPanel {
         optionPanelHidden = true;
         optionPanelTimer = new Timer(50, new ActionListener() {
             Point viewPoint = new Point();
-            
+
             @Override
             public void actionPerformed(ActionEvent e) {
                 int width = optionView.getWidth();
@@ -430,7 +430,7 @@ public class InterstellarMapPanel extends JPanel {
                  zoom(Math.pow(1.5,-1 * e.getWheelRotation()), e.getPoint());
              }
         });
-        
+
         pane = new JLayeredPane();
         mapPanel = new JPanel() {
             private static final long serialVersionUID = -6666762147393179909L;
@@ -443,7 +443,7 @@ public class InterstellarMapPanel extends JPanel {
                 g2.fillRect(0, 0, getWidth(), getHeight());
                 double size = 1 + 5 * Math.log(conf.scale);
                 size = Math.max(Math.min(size, conf.maxdotSize), conf.minDotSize);
-                
+
                 final Stroke thick = new BasicStroke(2.0f);
                 final Stroke thin = new BasicStroke(1.2f);
                 final Stroke dashed = new BasicStroke(1.5f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[]{3}, 0);
@@ -455,7 +455,7 @@ public class InterstellarMapPanel extends JPanel {
                 maxX = scr2mapX(getWidth() + size * 2.0);
                 maxY = scr2mapY(- size * 2.0);
                 now = Utilities.getDateTimeDay(campaign.getCalendar());
-                
+
                 Arc2D.Double arc = new Arc2D.Double();
                 //first get the jump diameter for selected planet
                 if(null != selectedPlanet && conf.scale > conf.showPlanetNamesThreshold) {
@@ -475,7 +475,7 @@ public class InterstellarMapPanel extends JPanel {
                         g2.draw(arc);
                     }
                 }
-                
+
                 if((conf.scale > 1.0) && optISWAreas.isSelected()) {
                     // IDEA: Allow for different hex sizes later on.
                     final double HEX_SIZE = 30.0;
@@ -500,7 +500,7 @@ public class InterstellarMapPanel extends JPanel {
                                     hexFactions.addAll(planet.getFactionSet(now));
                                 }
                             }
-                            
+
                             path.transform(transform);
 
                             if(hexFactions.size() == 1) {
@@ -529,7 +529,7 @@ public class InterstellarMapPanel extends JPanel {
                                     paintColors[i * 2 + 1] = factionColor;
                                 }
                                 paintFractions[0] = 0.0f;
-                                
+
                                 // Determine where to anchor the stripes
                                 Point2D firstPoint = new Point2D.Double(map2scrX(coordX), map2scrY(coordY));
                                 Point2D secondPoint = new Point2D.Double(
@@ -551,7 +551,7 @@ public class InterstellarMapPanel extends JPanel {
                         }
                     }
                 }
-                
+
                 //draw a jump path
                 g2.setStroke(new BasicStroke(1.0f));
                 for(int i = 0; i < jumpPath.size(); i++) {
@@ -582,7 +582,7 @@ public class InterstellarMapPanel extends JPanel {
                 if(optHPGNetwork.isSelected()) {
                     // Grab the network from the planet manager
                     Collection<Planets.HPGLink> hpgNetwork = Planets.getInstance().getHPGNetwork(now);
-                    
+
                     for(Planet planet : planets) {
                         if(isPlanetVisible(planet, true)) {
                             double x = map2scrX(planet.getX());
@@ -636,7 +636,7 @@ public class InterstellarMapPanel extends JPanel {
                     }
                     g2.setStroke(new BasicStroke(1.0f));
                 }
-                
+
                 //check to see if the unit is traveling on a jump path currently and if so
                 //draw this one too, in a different color
                 if(null != campaign.getLocation().getJumpPath()) {
@@ -741,15 +741,15 @@ public class InterstellarMapPanel extends JPanel {
             }
         };
         pane.add(mapPanel, Integer.valueOf(1));
-        
+
         optionPanel = new JPanel();
         optionPanel.setLayout(new BoxLayout(optionPanel, BoxLayout.Y_AXIS));
         optionPanel.setBackground(new Color(0, 100, 230, 200));
         optionPanel.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
-        
+
         Icon checkboxIcon = new ImageIcon("data/images/misc/checkbox_unselected.png");
         Icon checkboxSelectedIcon = new ImageIcon("data/images/misc/checkbox_selected.png");
-        
+
         optEmptySystems = createOptionCheckBox("Empty systems", checkboxIcon, checkboxSelectedIcon);
         optEmptySystems.setSelected(true);
         optionPanel.add(optEmptySystems);
@@ -776,11 +776,11 @@ public class InterstellarMapPanel extends JPanel {
 
         optionView = new JViewport();
         optionView.add(optionPanel);
-        
+
         pane.add(optionView, Integer.valueOf(10));
-        
+
         add(pane);
-        
+
         optionPanelTimer.start();
     }
 
@@ -805,7 +805,7 @@ public class InterstellarMapPanel extends JPanel {
 
         super.paintComponent(g);
     }
-    
+
     private JCheckBox createOptionCheckBox(String text, Icon checkboxIcon, Icon checkboxSelectedIcon) {
         JCheckBox checkBox = new JCheckBox(text);
         checkBox.setOpaque(false);
@@ -824,7 +824,7 @@ public class InterstellarMapPanel extends JPanel {
         });
         return checkBox;
     }
-    
+
     private void setupHexPath(GeneralPath path, double centerX, double centerY, double radius) {
         if(null == path) {
             return;
@@ -837,7 +837,7 @@ public class InterstellarMapPanel extends JPanel {
         }
         path.closePath();
     }
-    
+
     /**
      * Computes the map-coordinate from the screen coordinate system
      */
@@ -864,7 +864,7 @@ public class InterstellarMapPanel extends JPanel {
         transform.translate(conf.centerX, - conf.centerY);
         return transform;
     }
-    
+
     public void setSelectedPlanet(Planet p) {
         selectedPlanet = p;
         if(conf.scale < 4.0) {
@@ -906,7 +906,7 @@ public class InterstellarMapPanel extends JPanel {
         }
         return empty;
     }
-    
+
     private boolean isPlanetVisible(Planet planet, boolean hideEmpty) {
         if(null == planet) {
             return false;
@@ -927,7 +927,7 @@ public class InterstellarMapPanel extends JPanel {
         }
         return true;
     }
-    
+
     /**
      * Activate and Center
      */
@@ -974,7 +974,7 @@ public class InterstellarMapPanel extends JPanel {
             notifyListeners();
         }
     }
-    
+
     /**
      * All configuration behaviour of InterStellarMap are saved here.
      *
@@ -1012,20 +1012,20 @@ public class InterstellarMapPanel extends JPanel {
          */
         int planetID;
     }
-    
-    
+
+
     private transient List<ActionListener> listeners = new ArrayList<>();
-    
+
     public void addActionListener(ActionListener l) {
         if (!listeners.contains(l)) {
             listeners.add(l);
         }
     }
-    
+
     public void removeActionListener(ActionListener l) {
         listeners.remove(l);
     }
-    
+
     private void notifyListeners() {
         ActionEvent ev = new ActionEvent(this, ActionEvent.ACTION_FIRST, "refresh");
         listeners.forEach(l -> l.actionPerformed(ev));

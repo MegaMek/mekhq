@@ -65,16 +65,16 @@ import mekhq.MekHQ;
 /**
  * Code copied from megamek.client.ui.swing.BotConfigDialog and modified
  * to function as a BehaviorSettings editor rather than a BotClient generator.
- * 
+ *
  */
 
 public class PrincessBehaviorDialog extends JDialog implements ActionListener {
 
     /**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = -1697757949925940582L;
-	
+
 	private static final String UNIT_TARGET = Messages.getString("BotConfigDialog.targetUnit");
     private static final String BUILDING_TARGET = Messages.getString("BotConfigDialog.targetBuilding");
 
@@ -114,7 +114,7 @@ public class PrincessBehaviorDialog extends JDialog implements ActionListener {
 		} catch (PrincessException e) {
 			e.printStackTrace();
 		}
-		
+
         setLayout(new BorderLayout());
         JScrollPane princessScroll = new JScrollPane(princessPanel());
         add(princessScroll, BorderLayout.CENTER);
@@ -125,9 +125,9 @@ public class PrincessBehaviorDialog extends JDialog implements ActionListener {
         validate();
         pack();
         setSize(new Dimension(600, 600));
-        setLocationRelativeTo(parent);		
+        setLocationRelativeTo(parent);
 	}
-	
+
 	public BehaviorSettings getBehaviorSettings() {
 		return princessBehavior;
 	}

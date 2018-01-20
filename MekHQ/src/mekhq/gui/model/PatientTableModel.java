@@ -20,7 +20,7 @@ public class PatientTableModel extends AbstractListModel<Person> {
 
     ArrayList<Person> patients;
     Campaign campaign;
-    
+
     public PatientTableModel(Campaign c) {
         patients = new ArrayList<Person>();
         campaign = c;
@@ -45,11 +45,11 @@ public class PatientTableModel extends AbstractListModel<Person> {
     public int getSize() {
         return patients.size();
     }
-    
+
     private Campaign getCampaign() {
         return campaign;
     }
-    
+
     public PatientTableModel.Renderer getRenderer(IconPackage icons) {
         return new PatientTableModel.Renderer(icons);
     }

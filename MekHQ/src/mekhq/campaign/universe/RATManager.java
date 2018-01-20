@@ -74,7 +74,7 @@ public class RATManager extends AbstractUnitGenerator implements IUnitGenerator 
 
     private static Map<String,List<Integer>> allCollections = null;
     private static Map<String,String> fileNames = new HashMap<>();
-   
+
     private boolean canIgnoreEra = false;
 
     public RATManager() {
@@ -83,7 +83,7 @@ public class RATManager extends AbstractUnitGenerator implements IUnitGenerator 
         loadAltFactions();
         MekHQ.registerHandler(this);
     }
-    
+
     @Subscribe
     public void updateRATconfig(OptionsChangedEvent ev) {
         canIgnoreEra = ev.getOptions().canIgnoreRatEra();
@@ -129,14 +129,14 @@ public class RATManager extends AbstractUnitGenerator implements IUnitGenerator 
     public void removeRAT(String collection) {
         selectedCollections.remove(collection);
     }
-    
+
     public void setIgnoreRatEra(boolean ignore) {
         canIgnoreEra = ignore;
     }
 
     private boolean loadCollection(String name) {
         final String METHOD_NAME = "loadCollection(String)"; //$NON-NLS-1$
-        
+
         if (!fileNames.containsKey(name)) {
             MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
                     "RAT collection " + name + " not found in " + RATINFO_DIR); //$NON-NLS-1$
@@ -228,7 +228,7 @@ public class RATManager extends AbstractUnitGenerator implements IUnitGenerator 
      */
     private void loadAltFactions() {
         final String METHOD_NAME = "loadAltFactions()"; //$NON-NLS-1$
-        
+
         altFactions = new HashMap<>();
 
         File f = new File(ALT_FACTION);
@@ -283,7 +283,7 @@ public class RATManager extends AbstractUnitGenerator implements IUnitGenerator 
      */
     public static void populateCollectionNames() {
         final String METHOD_NAME = "populateCollectionNames()"; //$NON-NLS-1$
-        
+
         allCollections = new HashMap<>();
 
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();

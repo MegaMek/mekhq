@@ -153,7 +153,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
     private int selectedRow = -1;
     private int partId = -1;
     private Person selectedTech;
-    
+
     WarehouseTab(CampaignGUI gui, String name) {
         super(gui, name);
         MekHQ.registerHandler(this);
@@ -710,15 +710,15 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
             }
         }
     }
-    
+
     public void refreshProcurementList() {
-        acquirePartsModel.setData(getCampaign().getShoppingList().getPartList());        
+        acquirePartsModel.setData(getCampaign().getShoppingList().getPartList());
     }
 
     private void doTask() {
         selectedTech = getSelectedTech();
         selectedRow = partsTable.getSelectedRow();
-        
+
         Part part = getSelectedTask();
         if (null == part) {
             return;
@@ -758,7 +758,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
     public void refreshAstechPool(String astechString) {
         astechPoolLabel.setText(astechString);
     }
-    
+
     private ActionScheduler partsScheduler = new ActionScheduler(this::refreshPartsList);
     private ActionScheduler techsScheduler = new ActionScheduler(this::refreshTechsList);
     private ActionScheduler procurementScheduler = new ActionScheduler(this::refreshProcurementList);
@@ -767,49 +767,49 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
     public void handle(UnitRemovedEvent ev) {
         filterParts();
     }
-    
+
     @Subscribe
     public void handle(UnitChangedEvent ev) {
         filterParts();
     }
-    
+
     @Subscribe
     public void handle(UnitRefitEvent ev) {
         partsScheduler.schedule();
         procurementScheduler.schedule();
     }
-    
+
     @Subscribe
     public void handle(PersonEvent ev) {
         techsScheduler.schedule();
     }
-    
+
     @Subscribe
     public void handle(PartNewEvent ev) {
         partsScheduler.schedule();
     }
-    
+
     @Subscribe
     public void handle(PartRemovedEvent ev) {
         partsScheduler.schedule();
     }
-    
+
     @Subscribe
     public void handle(PartChangedEvent ev) {
         filterParts();
     }
-    
+
     @Subscribe
     public void handle(AcquisitionEvent ev) {
         partsScheduler.schedule();
         procurementScheduler.schedule();
     }
-    
+
     @Subscribe
     public void handle(ProcurementEvent ev) {
         procurementScheduler.schedule();
     }
-    
+
     @Subscribe
     public void handle(PartWorkEvent ev) {
         if (ev.getPartWork().getUnit() == null) {
@@ -817,17 +817,17 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         }
         techsScheduler.schedule();
     }
-    
+
     @Subscribe
     public void handle(OvertimeModeEvent ev) {
         filterTechs();
     }
-    
+
     @Subscribe
     public void handle(AstechPoolChangedEvent ev) {
         filterTechs();
     }
-    
+
     @Subscribe
     public void handle(PartModeChangedEvent ev) {
         updateTechTarget();

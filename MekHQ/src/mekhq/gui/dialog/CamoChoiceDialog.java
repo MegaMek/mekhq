@@ -144,7 +144,7 @@ public class CamoChoiceDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.weightx = 1.0;
         getContentPane().add(comboCategories, gridBagConstraints);
-        
+
         btnSelect.setText(resourceMap.getString("btnSelect.text")); // NOI18N
         btnSelect.setName("btnSelect"); // NOI18N
         btnSelect.addActionListener(new java.awt.event.ActionListener() {
@@ -208,7 +208,7 @@ public class CamoChoiceDialog extends javax.swing.JDialog {
     public int getColorIndex() {
         return colorIndex;
     }
-    
+
     public boolean clickedSelect() {
         return clickedSelect;
     }
@@ -312,7 +312,7 @@ public class CamoChoiceDialog extends javax.swing.JDialog {
 
 
         public class Renderer extends CamoPanel implements TableCellRenderer {
-			
+
         	public Renderer(DirectoryItems camos) {
 				super(camos);
 			}
@@ -356,11 +356,11 @@ public class CamoChoiceDialog extends javax.swing.JDialog {
             }
         }
     }
-    
+
     public class CamoPanel extends javax.swing.JPanel {
     	private static final long serialVersionUID = -4106360800407452822L;
     	private DirectoryItems camos;
-        
+
         /** Creates new form CamoPanel */
         public CamoPanel(DirectoryItems camos) {
             this.camos = camos;
@@ -389,17 +389,17 @@ public class CamoChoiceDialog extends javax.swing.JDialog {
         public void setText(String text) {
             lblImage.setText(text);
         }
-        
+
         //public void setImage(Image image) {
           //  lblImage.setIcon(new ImageIcon(image));
         //}
-        
+
         public void setImage(String category, String name, int colorInd) {
 
             if (null == category) {
                 return;
             }
-            
+
             if(Player.NO_CAMO.equals(category)) {
                 if (colorInd == -1) {
                     colorInd = 0;
@@ -439,6 +439,6 @@ public class CamoChoiceDialog extends javax.swing.JDialog {
     private javax.swing.JTable tableCamo;
     // End of variables declaration//GEN-END:variables
 
-    
-    
+
+
 }

@@ -1,20 +1,20 @@
 /*
  * EditPersonnelLogDialog.java
- * 
+ *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -55,14 +55,14 @@ public class EditPersonnelLogDialog extends javax.swing.JDialog {
     private Person person;
     private ArrayList<LogEntry> log;
     private LogTableModel logModel;
-    
+
     private javax.swing.JButton btnAdd;
     private javax.swing.JButton btnEdit;
     private javax.swing.JButton btnDelete;
     private javax.swing.JButton btnOK;
     private JTable logTable;
     private JScrollPane scrollLogTable;
-    
+
     /** Creates new form EditPersonnelLogDialog */
     public EditPersonnelLogDialog(java.awt.Frame parent, boolean modal, Campaign c, Person p) {
         super(parent, modal);
@@ -87,7 +87,7 @@ public class EditPersonnelLogDialog extends javax.swing.JDialog {
         setName("Form"); // NOI18N
         setTitle(resourceMap.getString("Form.title") + " " + person.getName());
         getContentPane().setLayout(new java.awt.BorderLayout());
-        
+
         JPanel panBtns = new JPanel(new GridLayout(1,0));
         btnAdd.setText(resourceMap.getString("btnAdd.text")); // NOI18N
         btnAdd.setName("btnAdd"); // NOI18N
@@ -116,7 +116,7 @@ public class EditPersonnelLogDialog extends javax.swing.JDialog {
         });
         panBtns.add(btnDelete);
         getContentPane().add(panBtns, BorderLayout.PAGE_START);
-        
+
         logTable = new JTable(logModel);
         logTable.setName("logTable"); // NOI18N
 		TableColumn column = null;
@@ -140,7 +140,7 @@ public class EditPersonnelLogDialog extends javax.swing.JDialog {
 		scrollLogTable.setViewportView(logTable);
         getContentPane().add(scrollLogTable, BorderLayout.CENTER);
 
-        
+
         btnOK.setText(resourceMap.getString("btnOK.text")); // NOI18N
         btnOK.setName("btnOK"); // NOI18N
         btnOK.addActionListener(new java.awt.event.ActionListener() {
@@ -153,17 +153,17 @@ public class EditPersonnelLogDialog extends javax.swing.JDialog {
         pack();
     }
 
-    
+
     private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHireActionPerformed
     	this.setVisible(false);
     }
-    
+
     private void logTableValueChanged(javax.swing.event.ListSelectionEvent evt) {
 		int row = logTable.getSelectedRow();
 		btnDelete.setEnabled(row != -1);
 		btnEdit.setEnabled(row != -1);
 	}
-    
+
     private void addEntry() {
     	EditLogEntryDialog eeld = new EditLogEntryDialog(frame, true, new LogEntry(campaign.getDate(), ""));
 		eeld.setVisible(true);
@@ -172,7 +172,7 @@ public class EditPersonnelLogDialog extends javax.swing.JDialog {
 		}
 		refreshTable();
     }
-    
+
     private void editEntry() {
     	LogEntry entry = logModel.getEntryAt(logTable.getSelectedRow());
     	if(null != entry) {
@@ -181,12 +181,12 @@ public class EditPersonnelLogDialog extends javax.swing.JDialog {
     		refreshTable();
     	}
     }
-    
+
     private void deleteEntry() {
     	person.getPersonnelLog().remove(logTable.getSelectedRow());
     	refreshTable();
     }
-    
+
     private void refreshTable() {
 		int selectedRow = logTable.getSelectedRow();
     	logModel.setData(person.getPersonnelLog());
@@ -200,7 +200,7 @@ public class EditPersonnelLogDialog extends javax.swing.JDialog {
     		}
     	}
     }
-    
+
     /**
 	 * A table model for displaying parts - similar to the one in CampaignGUI, but not exactly
 	 */
@@ -213,11 +213,11 @@ public class EditPersonnelLogDialog extends javax.swing.JDialog {
 		public final static int COL_DATE    =    0;
 		public final static int COL_DESC     =   1;
         public final static int N_COL          = 2;
-		
+
 		public LogTableModel(ArrayList<LogEntry> entries) {
 			data = entries;
 		}
-		
+
 		public int getRowCount() {
             return data.size();
         }
@@ -254,12 +254,12 @@ public class EditPersonnelLogDialog extends javax.swing.JDialog {
 			}
 			return "?";
 		}
-		
+
 		@Override
 		public boolean isCellEditable(int row, int col) {
 			return false;
 		}
-		
+
 		@Override
 		public Class<? extends Object> getColumnClass(int c) {
 			return getValueAt(0, c).getClass();
@@ -268,16 +268,16 @@ public class EditPersonnelLogDialog extends javax.swing.JDialog {
 		public LogEntry getEntryAt(int row) {
 			return (LogEntry) data.get(row);
 		}
-		
+
 		 public int getColumnWidth(int c) {
 	            switch(c) {
 	            case COL_DESC:
-	        		return 200;     
+	        		return 200;
 	            default:
 	                return 10;
 	            }
 	        }
-	        
+
 	        public int getAlignment(int col) {
 	        	return SwingConstants.LEFT;
 	        }
@@ -288,13 +288,13 @@ public class EditPersonnelLogDialog extends javax.swing.JDialog {
 	            	return null;
 	            }
 	        }
-	        
+
 	        //fill table with values
 	        public void setData(ArrayList<LogEntry> entries) {
 	            data = entries;
 	            fireTableDataChanged();
 	        }
-	        
+
 	        public LogTableModel.Renderer getRenderer() {
 				return new LogTableModel.Renderer();
 			}
@@ -313,7 +313,7 @@ public class EditPersonnelLogDialog extends javax.swing.JDialog {
 					int actualRow = table.convertRowIndexToModel(row);
 					setHorizontalAlignment(getAlignment(actualCol));
 					setToolTipText(getTooltip(actualRow, actualCol));
-					
+
 					return this;
 				}
 

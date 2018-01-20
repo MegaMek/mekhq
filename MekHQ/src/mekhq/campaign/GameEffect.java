@@ -7,12 +7,12 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -35,27 +35,27 @@ import megamek.common.Compute;
  */
 public class GameEffect {
     private static final IntUnaryOperator DEFAULT_RND = Compute::randomInt;
-    
+
     public final String desc;
     public final Consumer<IntUnaryOperator> action;
-    
+
     /** "No operation" effect (for reporting) */
     public GameEffect(String desc) {
         this(desc, rnd -> {});
     }
-    
+
     public GameEffect(String desc, Consumer<IntUnaryOperator> action) {
         this.desc = desc;
         this.action = Objects.requireNonNull(action);
     }
-    
+
     /**
      * Helper method, applying the action with the default randomization source
      */
     public void apply() {
         action.accept(DEFAULT_RND);
     }
-    
+
     @Override
     public String toString() {
         return desc;

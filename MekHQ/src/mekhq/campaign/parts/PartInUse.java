@@ -19,7 +19,7 @@ public class PartInUse {
     private int transferCount;
     private int plannedCount;
     private long cost;
-    
+
     private void appendDetails(StringBuilder sb, Part part) {
         String details = part.getDetails();
         details = cleanUp1.matcher(details).replaceFirst(""); //$NON-NLS-1$
@@ -28,7 +28,7 @@ public class PartInUse {
             sb.append(" (").append(details).append(")"); //$NON-NLS-1$ //$NON-NLS-2$
         }
     }
-    
+
     public PartInUse(Part part) {
         StringBuilder sb = new StringBuilder(part.getName());
         Unit u = part.getUnit();
@@ -64,81 +64,81 @@ public class PartInUse {
             this.cost = partToBuy.getBuyCost();
         }
     }
-    
+
     public PartInUse(String description, IAcquisitionWork partToBuy, long cost) {
         this.description = Objects.requireNonNull(description);
         this.partToBuy = Objects.requireNonNull(partToBuy);
         this.cost = cost;
     }
-    
+
     public PartInUse(String description, IAcquisitionWork partToBuy) {
         this(description, partToBuy, partToBuy.getBuyCost());
     }
-    
+
     public String getDescription() {
         return description;
     }
-    
+
     public IAcquisitionWork getPartToBuy() {
         return partToBuy;
     }
-    
+
     public int getUseCount() {
         return useCount;
     }
-    
+
     public void setUseCount(int useCount) {
         this.useCount = useCount;
     }
-    
+
     public void incUseCount() {
         ++ useCount;
     }
-    
+
     public int getStoreCount() {
         return storeCount;
     }
-    
+
     public double getStoreTonnage() {
         return storeCount * tonnagePerItem;
     }
-    
+
     public void setStoreCount(int storeCount) {
         this.storeCount = storeCount;
     }
-    
+
     public void incStoreCount() {
         ++ storeCount;
     }
-    
+
     public int getTransferCount() {
         return transferCount;
     }
-    
+
     public void incTransferCount() {
         ++ transferCount;
     }
-    
+
     public void setTransferCount(int transferCount) {
         this.transferCount = transferCount;
     }
-    
+
     public int getPlannedCount() {
         return plannedCount;
     }
-    
+
     public void setPlannedCount(int plannedCount) {
         this.plannedCount = plannedCount;
     }
-    
+
     public void incPlannedCount() {
         ++ plannedCount;
     }
-    
+
     public long getCost() {
         return cost;
     }
-    
+
     @Override
     public int hashCode() {
         return Objects.hashCode(description);

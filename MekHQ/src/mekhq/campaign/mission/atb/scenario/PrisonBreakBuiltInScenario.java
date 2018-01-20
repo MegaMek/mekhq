@@ -80,7 +80,7 @@ public class PrisonBreakBuiltInScenario extends AtBScenario {
 		for (Entity e : otherForce) {
 			getSurvivalBonusIds().add(UUID.fromString(e.getExternalIdAsString()));
 		}
-		
+
 		addBotForce(new BotForce("Prisoners", 1, getStart(), otherForce));
 	}
 }

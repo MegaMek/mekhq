@@ -1,20 +1,20 @@
 /*
  * CurrentLocation.java
- * 
+ *
  * Copyright (c) 2011 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -44,62 +44,62 @@ import mekhq.campaign.universe.Planet;
  * overkill to have a separate object here, but when we reach a point
  * where we want to let a force be in different locations, this will
  * make it easier to keep track of everything
- * 
+ *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class CurrentLocation implements Serializable {
-	
+
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = -4337642922571022697L;
-	
+
 	private Planet currentPlanet;
 	//keep track of jump path
 	private JumpPath jumpPath;
 	private double rechargeTime;
 	//I would like to keep track of distance, but I ain't too good with fyziks
 	private double transitTime;
-	
+
 	public CurrentLocation() {
 		this(null,0);
 	}
-	
+
 	public CurrentLocation(Planet planet, double time) {
 		this.currentPlanet = planet;
 		this.transitTime = time;
 		this.rechargeTime = 0.0;
 		this.transitTime = 0.0;
 	}
-	
+
 	public void setCurrentPlanet(Planet p) {
 		currentPlanet = p;
 	}
-	
+
 	public void setTransitTime(double time) {
 		transitTime = time;
 	}
-	
+
 	public boolean isOnPlanet() {
 		return transitTime <= 0;
 	}
-	
+
 	public boolean isAtJumpPoint() {
 		return transitTime >= currentPlanet.getTimeToJumpPoint(1.0);
 	}
-	
+
 	public boolean isInTransit() {
 		return !isOnPlanet() && !isAtJumpPoint();
 	}
-	
+
 	public Planet getCurrentPlanet() {
 		return currentPlanet;
 	}
-	
+
 	public double getTransitTime() {
 		return transitTime;
 	}
-	
+
 	public String getReport(Date date) {
 	    DateTime now = Utilities.getDateTimeDay(date);
 	    StringBuilder sb = new StringBuilder();
@@ -110,7 +110,7 @@ public class CurrentLocation implements Serializable {
 		}
 		if(isOnPlanet()) {
 			sb.append("<i>on planet</i>");
-		} 
+		}
 		else if(isAtJumpPoint()) {
 		    sb.append("<i>at jump point</i>");
 		} else {
@@ -121,17 +121,17 @@ public class CurrentLocation implements Serializable {
 		}
 		return sb.append("</html>").toString();
 	}
-	
+
 	public JumpPath getJumpPath() {
 		return jumpPath;
 	}
-	
+
 	public void setJumpPath(JumpPath path) {
 		jumpPath = path;
 	}
-	
+
 	/**
-	 * Check for a jump path and if found, do whatever needs to be done to move 
+	 * Check for a jump path and if found, do whatever needs to be done to move
 	 * forward
 	 */
 	public void newDay(Campaign campaign) {
@@ -202,7 +202,7 @@ public class CurrentLocation implements Serializable {
 			}
 		}
 	}
-	
+
 	public void writeToXml(PrintWriter pw1, int indent) {
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "<location>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
@@ -221,18 +221,18 @@ public class CurrentLocation implements Serializable {
 			jumpPath.writeToXml(pw1, indent+1);
 		}
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "</location>");
-		
+
 	}
-	
+
 	public static CurrentLocation generateInstanceFromXML(Node wn, Campaign c) {
 	    final String METHOD_NAME = "generateInstanceFromXML(Node,Campaign)"; //$NON-NLS-1$
-	    
+
 		CurrentLocation retVal = null;
-		
-		try {		
+
+		try {
 			retVal = new CurrentLocation();
 			NodeList nl = wn.getChildNodes();
-			
+
 			for (int x=0; x<nl.getLength(); x++) {
 				Node wn2 = nl.item(x);
 				if (wn2.getNodeName().equalsIgnoreCase("currentPlanetName")) {
@@ -254,7 +254,7 @@ public class CurrentLocation implements Serializable {
 					retVal.rechargeTime = Double.parseDouble(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("jumpPath")) {
 					retVal.jumpPath = JumpPath.generateInstanceFromXML(wn2, c);
-				} 
+				}
 			}
 		} catch (Exception ex) {
 			// Errrr, apparently either the class name was invalid...

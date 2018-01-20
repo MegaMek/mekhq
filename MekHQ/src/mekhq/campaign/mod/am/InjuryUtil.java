@@ -7,12 +7,12 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -52,10 +52,10 @@ public final class InjuryUtil {
     // Fumble and critical success limits for doctor skills levels 0-10, on a d100
     private static final int FUMBLE_LIMITS[] = {50, 40, 30, 20, 12, 6, 5, 4, 3, 2, 1};
     private static final int CRIT_LIMITS[] = {98, 97, 94, 89, 84, 79, 74, 69, 64, 59, 49};
-          
+
     /*
     private static AMEventHandler eventHandler = null;
-    
+
     public synchronized static void registerEventHandler(Campaign c) {
         if(null != eventHandler) {
             MekHQ.EVENT_BUS.unregister(eventHandler);
@@ -63,7 +63,7 @@ public final class InjuryUtil {
         MekHQ.EVENT_BUS.register(eventHandler = new AMEventHandler(c));
     }
     */
-    
+
     /** Run a daily healing check */
     public static void resolveDailyHealing(Campaign c, Person p) {
         Person doc = c.getPerson(p.getDoctorId());
@@ -87,11 +87,11 @@ public final class InjuryUtil {
         {
             effects.addAll(i.getType().genStressEffect(c, p, i, hits));
         });
-        
+
         // We could do some fancy display-to-the-user thing here, but for now just resolve all actions
         effects.stream().forEach(GameEffect::apply);
     }
-    
+
     /** Resolve effects of damage suffered during combat */
     public static void resolveCombatDamage(Campaign c, Person person, int hits) {
         Collection<Injury> newInjuries = genInjuries(c, person, hits);
@@ -103,7 +103,7 @@ public final class InjuryUtil {
             person.addLogEntry(entry);
         }
     }
-    
+
     private static void addHitToAccumulator(Map<BodyLocation, Integer> acc, BodyLocation loc) {
         if(!acc.containsKey(loc)) {
             acc.put(loc, Integer.valueOf(1));
@@ -111,9 +111,9 @@ public final class InjuryUtil {
             acc.put(loc, acc.get(loc) + 1);
         }
     }
-    
+
     // Generator methods. Those don't change the state of the person.
-    
+
     /** Generate combat injuries spread through the whole body */
     public static Collection<Injury> genInjuries(Campaign c, Person p, int hits) {
         final Unit u = c.getUnit(p.getUnitId());
@@ -123,7 +123,7 @@ public final class InjuryUtil {
         final BiFunction<IntUnaryOperator, Function<BodyLocation, Boolean>, BodyLocation> generator
             = mwasf ? HitLocationGen::mechAndAsf : HitLocationGen::generic;
         final Map<BodyLocation, Integer> hitAccumulator = new HashMap<>();
-        
+
         for (int i = 0; i < hits; i++) {
             BodyLocation location
                 = generator.apply(Compute::randomInt, (loc) -> !p.isLocationMissing(loc));
@@ -149,7 +149,7 @@ public final class InjuryUtil {
         final BiFunction<InjuryType, Integer, Injury> gen = (it, severity) -> {
             return it.newInjury(c, p, loc, severity);
         };
-        
+
         switch(loc) {
             case LEFT_ARM: case LEFT_HAND: case LEFT_LEG: case LEFT_FOOT:
             case RIGHT_ARM: case RIGHT_HAND: case RIGHT_LEG: case RIGHT_FOOT:
@@ -231,12 +231,12 @@ public final class InjuryUtil {
         }
         return newInjuries;
     }
-    
+
     /** Called when creating a new injury to generate a slightly randomized healing time */
     public static int genHealingTime(Campaign c, Person p, Injury i) {
         return genHealingTime(c, p, i.getType(), i.getHits());
     }
-    
+
     /** Called when creating a new injury to generate a slightly randomized healing time */
     public static int genHealingTime(Campaign c, Person p, InjuryType itype, int severity) {
         int mod = 100;
@@ -244,7 +244,7 @@ public final class InjuryUtil {
         if(rand < 5) {
             mod += (Compute.d6() < 4) ? rand : -rand;
         }
-        
+
         int time = itype.getRecoveryTime(severity);
         if(itype == InjuryTypes.LACERATION) {
             time += Compute.d6();
@@ -253,7 +253,7 @@ public final class InjuryUtil {
         time = Math.round(time * mod * p.getAbilityTimeModifier() / 10000);
         return time;
     }
-    
+
     /** Generate the effects of a doctor dealing with injuries (frequency depends on campaign settings) */
     public static List<GameEffect> genMedicalTreatment(Campaign c, Person p, Person doc) {
         Objects.requireNonNull(c);
@@ -267,7 +267,7 @@ public final class InjuryUtil {
         int successXP = 0;
         int numTreated = 0;
         int numResting = 0;
-        
+
         List<GameEffect> result = new ArrayList<>();
 
         for(Injury i : p.getInjuries()) {
@@ -292,7 +292,7 @@ public final class InjuryUtil {
                     doc.setEdge(doc.getEdge() - 1);
                     roll = Compute.randomInt(100);
                 }
-                if(roll < fumbleLimit) {                    
+                if(roll < fumbleLimit) {
                     result.add(new GameEffect(
                         String.format("%s made a mistake in the treatment of %s and caused %s %s to worsen.",
                             doc.getHyperlinkedFullTitle(), p.getHyperlinkedName(),
@@ -364,7 +364,7 @@ public final class InjuryUtil {
                     String.format("%s spent time resting to heal %s %s.",
                         p.getHyperlinkedName(), p.getGenderPronoun(Person.PRONOUN_HISHER), i.getName()),
                     rnd -> {
-                        
+
                     }));
                 numResting++;
             }
@@ -379,7 +379,7 @@ public final class InjuryUtil {
                     xp, mistakeXP, successXP, xp - mistakeXP - successXP)
                 : String.format("%s successfully treated %s for %d injuries.",
                     doc.getHyperlinkedFullTitle(), p.getHyperlinkedName(), numTreated);
-                    
+
             result.add(new GameEffect(treatmentSummary,
                 rnd -> {
                     if(xp > 0) {
@@ -404,12 +404,12 @@ public final class InjuryUtil {
         }
         return result;
     }
-    
+
     /** Generate the effects of "natural" healing (daily) */
     public static List<GameEffect> genNaturalHealing(Campaign c, Person p) {
         Objects.requireNonNull(c);
         Objects.requireNonNull(p);
-        
+
         List<GameEffect> result = new ArrayList<>();
 
         p.getInjuries().forEach((i) -> {
@@ -485,7 +485,7 @@ public final class InjuryUtil {
                         LogEntry entry = new LogEntry(c.getDate(), "Got dismissed from the infirmary", Person.LOGTYPE_MEDICAL);
                         p.addLogEntry(entry);
                     }
-                    
+
                     if(dismissed) {
                         p.setDoctorId(null, c.getCampaignOptions().getHealingWaitingPeriod());
                     }
@@ -498,9 +498,9 @@ public final class InjuryUtil {
     public static List<GameEffect> genUntreatedEffects(Campaign c, Person p) {
         Objects.requireNonNull(c);
         Objects.requireNonNull(p);
-        
+
         List<GameEffect> result = new ArrayList<>();
-        
+
         p.getInjuries().forEach((i) -> {
             if((i.getTime() > 0) && !i.isPermanent() && !i.isWorkedOn()) {
                 result.add(new GameEffect(
@@ -518,7 +518,7 @@ public final class InjuryUtil {
                     }));
             }
         });
-        
+
         return result;
     }
 }

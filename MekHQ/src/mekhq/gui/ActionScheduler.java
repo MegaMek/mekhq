@@ -27,31 +27,31 @@ import javax.swing.Timer;
  * part of the gui to refresh. As long as the events are received within the delay period, only the
  * final one will cause a refresh. This also causes the refresh to occur on the Swing event dispatching
  * thread regardless of which thread it is scheduled from.
- * 
+ *
  * @author Neoancient
  *
  */
 public class ActionScheduler {
-    
+
     @FunctionalInterface
     public interface Action {
         void act();
     }
-    
+
     public static final int DELAY = 50;
-    
+
     private final Timer timer;
-    
+
     public ActionScheduler(Action action) {
         timer = new Timer(DELAY, ev -> action.act());
         timer.setRepeats(false);
     }
-    
+
     public ActionScheduler(Action action, int delay) {
         timer = new Timer(delay, ev -> action.act());
         timer.setRepeats(false);
     }
-    
+
     public void schedule() {
         timer.restart();
     }

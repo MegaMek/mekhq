@@ -211,7 +211,7 @@ public class ContractMarket implements Serializable {
                     }
                 }
             }
-            
+
             if (inBackwater) {
 				numContracts--;
 			}
@@ -322,7 +322,7 @@ public class ContractMarket implements Serializable {
 	private AtBContract generateAtBContract(Campaign campaign,
 			String employer, int unitRatingMod, int retries) {
 	    final String METHOD_NAME = "generateAtBContract(Campaign,String,int,int)"; //$NON-NLS-1$
-	    
+
 		AtBContract contract = new AtBContract(employer
 				+"-"
 				+Contract.generateRandomContractName()
@@ -400,7 +400,7 @@ public class ContractMarket implements Serializable {
 				return generateAtBContract(campaign, employer, unitRatingMod, retries - 1);
 			} else {
 				return null;
-			}			
+			}
 		}
 
 		setAllyRating(contract, isAttacker, campaign.getCalendar().get(Calendar.YEAR));
@@ -422,11 +422,11 @@ public class ContractMarket implements Serializable {
         contract.calculateContract(campaign);
 
         //Ralgith had a version of this then the PR got added. Commenting this Out.
-/*        contract.setName(Faction.getFaction(employer).getShortName() + "-" + String.format("%1$tY%1$tm", contract.getStartDate()) 
-        				 + "-" + AtBContract.missionTypeNames[contract.getMissionType()] 
+/*        contract.setName(Faction.getFaction(employer).getShortName() + "-" + String.format("%1$tY%1$tm", contract.getStartDate())
+        				 + "-" + AtBContract.missionTypeNames[contract.getMissionType()]
         				 + "-" + Faction.getFaction(contract.getEnemyCode()).getShortName()
         				 + "-" + contract.getLength());*/
-        
+
 		return contract;
 	}
 
@@ -655,7 +655,7 @@ public class ContractMarket implements Serializable {
 		if (roll == 11) return IUnitRating.DRAGOON_B;
 		return IUnitRating.DRAGOON_A;
 	}
-	
+
 	protected void setAtBContractClauses(AtBContract contract, int unitRatingMod, Campaign campaign) {
 		ClauseMods mods = new ClauseMods();
 		clauseMods.put(contract.getId(), mods);

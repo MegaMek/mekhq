@@ -12,11 +12,11 @@ import mekhq.campaign.work.IPartWork;
      */
     public class TechSorter implements Comparator<Person> {
     	private IPartWork partWork;
-    	
+
     	public TechSorter() {
     		this(null);
     	}
-    	
+
     	public TechSorter(IPartWork p) {
     		partWork = p;
     	}
@@ -33,11 +33,11 @@ import mekhq.campaign.work.IPartWork;
         	}
             return ((Comparable<Integer>)p0.getBestTechLevel()).compareTo(p1.getBestTechLevel());
         }
-        
+
         public void setPart(IPartWork p) {
         	partWork = p;
         }
-        
+
         public void clearPart() {
         	partWork = null;
         }

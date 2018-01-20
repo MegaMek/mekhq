@@ -30,7 +30,7 @@ import mekhq.service.MassRepairService;
 
 public class ServicedUnitsTableMouseAdapter extends MouseInputAdapter
         implements ActionListener {
-    
+
     private CampaignGUI gui;
     private JTable servicedUnitTable;
     private UnitTableModel servicedUnitModel;
@@ -115,11 +115,11 @@ public class ServicedUnitsTableMouseAdapter extends MouseInputAdapter
             }
         } else if (command.contains("MASS_REPAIR_SALVAGE")) {
             Unit unit = null;
-            
+
             if ((null != units) && (units.length > 0)) {
             	unit = units[0];
             }
-            
+
             if (unit.isDeployed()) {
     			JOptionPane.showMessageDialog(gui.getFrame(),
     					"Unit is currently deployed and can not be repaired.",
@@ -241,20 +241,20 @@ public class ServicedUnitsTableMouseAdapter extends MouseInputAdapter
                     menuItem.setEnabled(unit.isAvailable());
                     popup.add(menuItem);
                 }
-                
+
                 if (!unit.isSelfCrewed() && unit.isAvailable() && !unit.isDeployed()) {
                 	String title = String.format("Mass %s", unit.isSalvage() ? "Salvage" : "Repair");
-                	
+
                     menuItem = new JMenuItem(title);
                     menuItem.setActionCommand("MASS_REPAIR_SALVAGE");
                     menuItem.addActionListener(this);
                     menuItem.setEnabled(unit.isAvailable());
                     popup.add(menuItem);
                 }
-                
+
                 popup.show(e.getComponent(), e.getX(), e.getY());
             }
         }
     }
-    
+
 }

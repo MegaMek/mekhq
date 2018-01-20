@@ -288,7 +288,7 @@ public class AcquisitionsDialog extends JDialog {
 			if (null == partCountInfo) {
 				return;
 			}
-			
+
 			if ((partCountInfo.getMissingCount() > 0) && partCountInfo.isCanBeAcquired()) {
 				campaignGUI.getCampaign().getShoppingList().addShoppingItem(targetWork, partCountInfo.getMissingCount(),
 						campaignGUI.getCampaign());
@@ -323,12 +323,12 @@ public class AcquisitionsDialog extends JDialog {
 					contract.useBonusPart();
 				}
 			}
-			
+
 			refresh();
 
 			calculateBonusParts();
 		}
-		
+
 		private void refresh() {
 			pnlSummary.firePropertyChange("counts", -1, 0);
 
@@ -349,19 +349,19 @@ public class AcquisitionsDialog extends JDialog {
 						btnOrderAll.setVisible(true);
 					}
 				}
-				
+
 				if (partCountInfo.getOmniPodCount() == 0) {
 					btnDepod.setVisible(false);
 				} else {
 					btnDepod.setVisible(true);
 				}
-				
+
 				if (numBonusParts == 0) {
 					btnUseBonus.setVisible(false);
 				} else {
 					btnUseBonus.setText(String.format("Use Bonus Part (%s)", numBonusParts));
 					btnUseBonus.setVisible(true);
-				}			
+				}
 			}
 		}
 
@@ -434,7 +434,7 @@ public class AcquisitionsDialog extends JDialog {
 			part = targetWork.getAcquisitionPart();
 
 			partCountInfo = PartsAcquisitionService.getPartCountInfoMap().get(targetWork.getAcquisitionDisplayName());
-			
+
 			// Generate text
 			GridBagConstraints gbcMain = new GridBagConstraints();
 			gbcMain.gridx = 0;
@@ -539,7 +539,7 @@ public class AcquisitionsDialog extends JDialog {
 			if (numBonusParts == 0) {
 				btnUseBonus.setVisible(false);
 			}
-			
+
 			actionButtons.add(btnUseBonus, gbcActions);
 			gbcActions.gridy++;
 
@@ -573,7 +573,7 @@ public class AcquisitionsDialog extends JDialog {
 				}
 			}
 
-			if (partCountInfo.getOmniPodCount() > 0) {				
+			if (partCountInfo.getOmniPodCount() > 0) {
 				btnDepod.setText("Remove One From Pod"); // NOI18N
 				btnDepod.setToolTipText("Remove replacement from pod");
 				btnDepod.setName("btnDepod"); // NOI18N
@@ -586,7 +586,7 @@ public class AcquisitionsDialog extends JDialog {
 						campaignGUI.getCampaign().depodPart(replacement, 1);
 						MekHQ.triggerEvent(new PartChangedEvent(replacement));
 					}
-					
+
 					refresh();
 				});
 

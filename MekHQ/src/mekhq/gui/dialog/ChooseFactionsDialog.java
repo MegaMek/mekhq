@@ -28,18 +28,18 @@ import mekhq.campaign.universe.Faction;
 
 public class ChooseFactionsDialog extends JDialog {
     private static final long serialVersionUID = 805616085217507489L;
-    
+
     private DateTime date;
-    
+
     ResourceBundle resourceMap;
     private JList<Faction> factionList;
     private List<String> result;
     private boolean changed;
-    
+
     public ChooseFactionsDialog(Frame parent, DateTime date, List<String> defaults) {
         this(parent, date, defaults, true);
     }
-    
+
     public ChooseFactionsDialog(Frame parent, DateTime date, List<String> defaults, boolean modal) {
         super(parent, modal);
         this.date = Objects.requireNonNull(date);
@@ -55,7 +55,7 @@ public class ChooseFactionsDialog extends JDialog {
         setName("form"); //$NON-NLS-1$
         setTitle(resourceMap.getString("Form.title")); //$NON-NLS-1$
         setMinimumSize(new Dimension(400, 500));
-        
+
         final Container content = getContentPane();
         content.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
@@ -79,11 +79,11 @@ public class ChooseFactionsDialog extends JDialog {
                 }
                 return result;
             }
-            
+
         });
         scrollPane.setViewportView(factionList);
         content.add(scrollPane, gbc);
-        
+
         gbc.gridy = 1;
         gbc.gridwidth = 1;
         gbc.weighty = 0.0;
@@ -115,28 +115,28 @@ public class ChooseFactionsDialog extends JDialog {
         }), gbc);
         pack();
     }
-    
+
     public List<String> getResult() {
         return result;
     }
-    
+
     public boolean isChanged() {
         return changed;
     }
 
     private static class FactionListModel extends AbstractListModel<Faction> {
         private static final long serialVersionUID = 2779479232585980171L;
-        
+
         private TreeMap<String, Faction> factionMap = new TreeMap<>();
         private List<String> names;
-        
+
         public FactionListModel(DateTime date) {
             for(Faction faction : Faction.getFactions()) {
                 factionMap.put(faction.getFullName(date.getYear()), faction);
             }
             names = new ArrayList<>(factionMap.navigableKeySet());
         }
-        
+
         @Override
         public int getSize() {
             return names.size();

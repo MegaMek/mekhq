@@ -249,7 +249,7 @@ public class MekSensor extends Part {
 	public int getLocation() {
 		return Entity.LOC_NONE;
 	}
-	
+
 	@Override
 	public TechAdvancement getTechAdvancement() {
 	    return TA_GENERIC;
@@ -270,7 +270,7 @@ public class MekSensor extends Part {
 		 }
 		 return false;
     }
-	
+
 	@Override
 	public int getMassRepairOptionType() {
     	return Part.REPAIR_PART_TYPE.ELECTRONICS;

@@ -1,20 +1,20 @@
 /*
  * MissingAvionics.java
- * 
+ *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -37,9 +37,9 @@ import mekhq.campaign.Campaign;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class MissingThrusters extends MissingPart {
-	
+
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = -7402791453470647853L;
 	private boolean isLeftThrusters = false;
@@ -47,27 +47,27 @@ public class MissingThrusters extends MissingPart {
 	public MissingThrusters() {
     	this(0, null);
     }
-    
+
     public MissingThrusters(int tonnage, Campaign c) {
     	this(tonnage, c, false);
     }
-    
+
     public MissingThrusters(int tonnage, Campaign c, boolean left) {
     	super(0, c);
     	this.name = "Thrusters";
     	isLeftThrusters = left;
     }
-    
-    @Override 
+
+    @Override
 	public int getBaseTime() {
 		return 4800;
 	}
-	
+
 	@Override
 	public int getDifficulty() {
 		return 1;
 	}
-    
+
 	@Override
 	public String checkFixable() {
 		return null;
@@ -83,7 +83,7 @@ public class MissingThrusters extends MissingPart {
 		return part instanceof Thrusters;
 	}
 
-	@Override 
+	@Override
 	public void fix() {
 		Part replacement = findReplacement(false);
 		if(null != replacement) {
@@ -93,7 +93,7 @@ public class MissingThrusters extends MissingPart {
 			replacement.decrementQuantity();
 			((Thrusters)actualReplacement).setLeftThrusters(isLeftThrusters);
 			remove(false);
-			//assign the replacement part to the unit			
+			//assign the replacement part to the unit
 			actualReplacement.updateConditionFromPart();
 		}
 	}
@@ -113,7 +113,7 @@ public class MissingThrusters extends MissingPart {
 			}
 		}
 	}
-    
+
 	@Override
 	public void writeToXml(PrintWriter pw1, int indent) {
 		writeToXmlBegin(pw1, indent);
@@ -123,24 +123,24 @@ public class MissingThrusters extends MissingPart {
 				+"</isLeftThrusters>");
 		writeToXmlEnd(pw1, indent);
 	}
-	
+
 	@Override
 	protected void loadFieldsFromXmlNode(Node wn) {
 		NodeList nl = wn.getChildNodes();
-		
+
 		for (int x=0; x<nl.getLength(); x++) {
 			Node wn2 = nl.item(x);
-			
+
 			if (wn2.getNodeName().equalsIgnoreCase("isLeftThrusters")) {
 				isLeftThrusters = Boolean.parseBoolean(wn2.getTextContent());
 			}
 		}
 	}
-	
+
 	public boolean isLeftThrusters() {
 		return isLeftThrusters;
 	}
-	
+
 	public void setLeftThrusters(boolean b) {
 		isLeftThrusters = b;
 	}
@@ -155,7 +155,7 @@ public class MissingThrusters extends MissingPart {
 	public int getLocation() {
 		return Entity.LOC_NONE;
 	}
-	
+
 	@Override
 	public TechAdvancement getTechAdvancement() {
 	    return TA_GENERIC;

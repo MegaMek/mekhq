@@ -1518,7 +1518,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
             btnsEditUnit.get(idx).setEnabled(!chksTotaled.get(idx).isSelected());
         }
     }
-    
+
     private class CheckDeadPrisonerListener implements ChangeListener {
 
 		@Override
@@ -1556,7 +1556,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
             } else {
                 hitSlider.setEnabled(true);
                 miaChk.setEnabled(true);
-            } 
+            }
         }
     }
 

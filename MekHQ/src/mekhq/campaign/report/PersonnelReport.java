@@ -36,16 +36,16 @@ import mekhq.campaign.Campaign;
  * @since 3/12/2012
  */
 public class PersonnelReport extends Report {
-  
-    
+
+
     public PersonnelReport(Campaign c) {
         super(c);
     }
-    
+
     public String getTitle() {
         return "Personnel Report";
     }
-    
+
     public JTextPane getCombatPersonnelReport() {
     	// Load combat personnel
         JTextPane txtCombat = new JTextPane();
@@ -53,7 +53,7 @@ public class PersonnelReport extends Report {
         txtCombat.setText(getCampaign().getCombatPersonnelDetails());
         return txtCombat;
     }
-    
+
     public JTextPane getSupportPersonnelReport() {
     	// Load support personnel
         JTextPane txtSupport = new JTextPane();
@@ -61,19 +61,19 @@ public class PersonnelReport extends Report {
         txtSupport.setText(getCampaign().getSupportPersonnelDetails());
         return txtSupport;
     }
-      
+
     public JTextPane getReport() {
         // SplitPane them
         JSplitPane splitOverviewPersonnel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, getCombatPersonnelReport(), getSupportPersonnelReport());
 		splitOverviewPersonnel.setName("splitOverviewPersonnel");
 		splitOverviewPersonnel.setOneTouchExpandable(true);
 		splitOverviewPersonnel.setResizeWeight(0.5);
-        
+
 		// Actual report pane
 		JTextPane txtReport = new JTextPane();
         txtReport.setMinimumSize(new Dimension(800, 500));
         txtReport.insertComponent(splitOverviewPersonnel);
         return txtReport;
     }
-   
+
 }

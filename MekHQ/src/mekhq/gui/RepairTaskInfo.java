@@ -16,7 +16,7 @@ import mekhq.IconPackage;
 /**
  * A specialized JPanel wrapper for repair tasks. This is different from
  * BasicInfo due to the need for an extra image on the right side.
- * 
+ *
  * @author Cord Awtry (kipstafoo)
  *
  */
@@ -28,7 +28,7 @@ public class RepairTaskInfo extends JPanel {
 
     public RepairTaskInfo(IconPackage i) {
         lblImage = new JLabel();
-        
+
         GridBagLayout gridbag = new GridBagLayout();
         GridBagConstraints c = new GridBagConstraints();
         setLayout(gridbag);
@@ -48,7 +48,7 @@ public class RepairTaskInfo extends JPanel {
 
         lblSecondaryImage = new JLabel();
         lblSecondaryImage.setText("");
-        
+
         c.fill = GridBagConstraints.BOTH;
         c.insets = new Insets(1, 1, 1, 5);
         c.gridx = 1;
@@ -68,7 +68,7 @@ public class RepairTaskInfo extends JPanel {
         lblImage.setText("<html><font size='2' color='" + color + "'>" + s
                 + "</font></html>");
     }
-    
+
 
     public void highlightBorder() {
     	this.setBorder(new javax.swing.border.LineBorder(Color.BLACK, 5, true));

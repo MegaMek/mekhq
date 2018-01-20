@@ -250,7 +250,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 
 	public void calculate() {
         final String METHOD_NAME = "calculate()"; //$NON-NLS-1$
-	    
+
 		Unit newUnit = new Unit(newEntity, oldUnit.campaign);
 		newUnit.initializeParts(false);
 		refitClass = NO_CHANGE;
@@ -398,7 +398,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 		for(Part nPart : newPartList) {
 			//TODO: I don't think we need this here anymore
 			nPart.setUnit(oldUnit);
-			
+
 			//We don't actually want to order new BA suits; we're just pretending that we're altering the
 			//existing suits.
 			if (nPart instanceof MissingBattleArmorSuit) {
@@ -572,7 +572,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 				}
 			}
 		}
-		
+
 		//if oldUnitParts is not empty we are removing some stuff and so this should
 		//be at least a Class A refit
 		if(!oldUnitParts.isEmpty()) {
@@ -582,7 +582,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 		        updateRefitClass(CLASS_A);
 		    }
 		}
-		
+
 		/*
 		 * Cargo and transport bays are essentially just open space and while it may take time and materials
 		 * to change the cubicles or the number of doors, the bay itself does not require any refit work
@@ -641,7 +641,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
             }
             time += (doorsAdded + doorsRemoved) * 600;
 		}
-		
+
 		//Step 4: loop through remaining equipment on oldunit parts and add time for removing.
 		for(int pid : oldUnitParts) {
 			Part oPart = oldUnit.campaign.getPart(pid);
@@ -704,7 +704,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 			int shotsPerTon = type.getShots();
 			cost += type.getCost(newEntity, false, -1) * ((double)shotsNeeded/shotsPerTon);
 		}
-		
+
 		/*
 		 * Figure out how many untracked heat sinks are needed to complete the refit or will
 		 * be removed. These are engine integrated heat sinks for Mechs or ASFs that change
@@ -759,7 +759,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 		}
 		time += (oldIntegratedHS.size() + newIntegratedHS.size()) * 90;
 		shoppingList.addAll(newIntegratedHS);
-		
+
 		//check for CASE
 		//TODO: we still dont have to order the part, we need to get the CASE issues sorted out
 		for(int loc = 0; loc < newEntity.locations(); loc++) {
@@ -1127,7 +1127,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 			newArmorSupplies.changeAmountAvailable(newArmorSupplies.getAmount());
 		}
 		*/
-		
+
 		// Remove refit parts from the procurement list. Those which have already been purchased and
 		// are in transit are left as is.
 		List<IAcquisitionWork> toRemove = new ArrayList<>();
@@ -1220,7 +1220,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 
 		//dont forget to switch entities!
 		oldUnit.setEntity(newEntity);
-	
+
 		//set up new parts
 		ArrayList<Part> newParts = new ArrayList<Part>();
 		//We've already made the old suits go *poof*; now we materialize new ones.
@@ -1260,7 +1260,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 		}
 		//in some cases we may have had more armor on the original unit and so we may add more
 		//back then we received
-		
+
 		//FIXME: This doesn't deal properly with patchwork armor.
 		if(sameArmorType && armorNeeded < 0) {
 			Armor a = new Armor(0, oldUnit.getEntity().getArmorType(1),
@@ -1555,10 +1555,10 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 		// TODO Auto-generated method stub
 
 	}
-	
+
 	/**
 	 * Requiring the life support system to be changed just because the number of bay personnel changes
-	 * is a bit much. Instead we'll limit it to changes in crew size, measured by quarters. 
+	 * is a bit much. Instead we'll limit it to changes in crew size, measured by quarters.
 	 * @return true if the crew quarters capacity changed.
 	 */
 	private boolean crewSizeChanged() {
@@ -1740,7 +1740,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 				} else if (wn2.getNodeName().equalsIgnoreCase("isRefurbishing")) {
                     if (wn2.getTextContent().equalsIgnoreCase("true"))
                         retVal.isRefurbishing = true;
-                    else 
+                    else
                         retVal.isRefurbishing = false;
 				} else if (wn2.getNodeName().equalsIgnoreCase("armorNeeded")) {
 					retVal.armorNeeded = Integer.parseInt(wn2.getTextContent());
@@ -1858,11 +1858,11 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 	public String getAcquisitionDesc() {
 		return "Fill this in";
 	}
-	
+
     @Override
     public String getAcquisitionDisplayName() {
     	return null;
-    }    
+    }
 
 	@Override
 	public String getAcquisitionExtraDesc() {
@@ -2144,7 +2144,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
             }
         }
 	}
-	
+
 	/**
 	 * Assigns bay doors and cubicles as child parts of the bay part. We also need to make sure the
 	 * bay number of the parts match up to the Entity. The easiest way to do that is to remove all
@@ -2203,12 +2203,12 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 	        }
 	    }
 	}
-	
+
 	/**
 	 * Refits may require adding or removing heat sinks that are not tracked as parts. For Mechs and
 	 * ASFs this would be engine-integrated heat sinks if the heat sink type is changed. For vehicles and
 	 * conventional fighters this would be heat sinks required by energy weapons.
-	 * 
+	 *
 	 * @param entity Either the starting or the ending unit of the refit.
 	 * @return       The number of heat sinks the unit mounts that are not tracked as parts.
 	 */
@@ -2233,11 +2233,11 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 	        }
 	    }
 	}
-	
+
 	/**
 	 * Creates an independent heat sink part appropriate to the unit that can be used to track
 	 * needed and leftover parts for heat sinks that are not actually tracked by the unit.
-	 * 
+	 *
 	 * @param entity Either the original or the new unit.
 	 * @return       The part corresponding to the type of heat sink for the unit.
 	 */
@@ -2255,7 +2255,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 	    }
 	    return new HeatSink(0, EquipmentType.get("Heat Sink"), -1, false, campaign);
 	}
-	
+
 
     @Override
     public String getShoppingListReport(int quantity) {

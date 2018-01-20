@@ -169,7 +169,7 @@ public class MissingMekGyro extends MissingPart {
     public TechAdvancement getTechAdvancement() {
         return Mech.getGyroTechAdvancement(type);
     }
-	
+
 	@Override
 	public int getMassRepairOptionType() {
     	return Part.REPAIR_PART_TYPE.GYRO;

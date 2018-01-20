@@ -255,7 +255,7 @@ public class MassRepairSalvageDialog extends JDialog {
 		partsTableModel.setData(filteredPartsList);
 
 		int count = partsTable.getRowCount();
-		
+
 		if (count > 0) {
 			partsTable.addRowSelectionInterval(0, count - 1);
 		}
@@ -827,14 +827,14 @@ public class MassRepairSalvageDialog extends JDialog {
 
 		String btnHideDoHideLabel = "Hide Unit List";
 		String btnHideDoHideTooltip = "Hide units to save room on small screens";
-		
+
 		String btnHideDoShowLabel = "Show Unit List";
 		String btnHideDoShowTooltip = "Show list of units";
 
 		JDialog dlg = this;
-		
+
 		JButton btnHideUnits = new JButton();
-		
+
 		if (pnlUnits.isVisible()) {
 			btnHideUnits.setText(btnHideDoHideLabel);
 			btnHideUnits.setToolTipText(btnHideDoHideTooltip);
@@ -842,23 +842,23 @@ public class MassRepairSalvageDialog extends JDialog {
 			btnHideUnits.setText(btnHideDoShowLabel);
 			btnHideUnits.setToolTipText(btnHideDoShowTooltip);
 		}
-		
+
 		btnHideUnits.setName("btnHideUnits");
 		btnHideUnits.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 				if (pnlUnits.isVisible()) {
 					pnlUnits.setVisible(false);
-					
+
 					btnHideUnits.setText(btnHideDoShowLabel);
 					btnHideUnits.setToolTipText(btnHideDoShowTooltip);
-					
+
 					dlg.pack();
 				} else {
 					pnlUnits.setVisible(true);
-					
+
 					btnHideUnits.setText(btnHideDoHideLabel);
 					btnHideUnits.setToolTipText(btnHideDoHideTooltip);
-					
+
 					dlg.pack();
 				}
 			}
@@ -960,14 +960,14 @@ public class MassRepairSalvageDialog extends JDialog {
 
 		String btnHideDoHideLabel = "Hide Parts List";
 		String btnHideDoHideTooltip = "Hide parts to save room on small screens";
-		
+
 		String btnHideDoShowLabel = "Show Parts List";
 		String btnHideDoShowTooltip = "Show list of parts";
 
 		JDialog dlg = this;
-		
+
 		JButton btnHideParts = new JButton();
-		
+
 		if (pnlParts.isVisible()) {
 			btnHideParts.setText(btnHideDoHideLabel);
 			btnHideParts.setToolTipText(btnHideDoHideTooltip);
@@ -975,23 +975,23 @@ public class MassRepairSalvageDialog extends JDialog {
 			btnHideParts.setText(btnHideDoShowLabel);
 			btnHideParts.setToolTipText(btnHideDoShowTooltip);
 		}
-		
+
 		btnHideParts.setName("btnHideParts");
 		btnHideParts.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 				if (pnlParts.isVisible()) {
 					pnlParts.setVisible(false);
-					
+
 					btnHideParts.setText(btnHideDoShowLabel);
 					btnHideParts.setToolTipText(btnHideDoShowTooltip);
-					
+
 					dlg.pack();
 				} else {
 					pnlParts.setVisible(true);
-					
+
 					btnHideParts.setText(btnHideDoHideLabel);
 					btnHideParts.setToolTipText(btnHideDoHideTooltip);
-					
+
 					dlg.pack();
 				}
 			}
@@ -1185,7 +1185,7 @@ public class MassRepairSalvageDialog extends JDialog {
 			MassRepairPartSet partSet = MassRepairService.performWarehouseMassRepair(parts, activeMROs, configuredOptions, campaignGUI);
 
 			String msg = String.format("Mass Repair complete");
-			
+
 			if (partSet.isHasRepairs()) {
 				int count = partSet.countRepairs();
 				msg += String.format(" - %s repair action%s performed", count, (count == 1 ? "" : "s"));

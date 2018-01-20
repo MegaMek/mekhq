@@ -24,7 +24,7 @@ public final class TwoNumbersSorter implements Comparator<String>{
         if(!hasSecondNumber1 && !hasSecondNumber2) {
             return NUM_SORTER.compare(s1, s2);
         }
-        
+
         String firstNum1 = s1;
         String firstNum2 = s2;
         if(hasSecondNumber1) {
@@ -33,12 +33,12 @@ public final class TwoNumbersSorter implements Comparator<String>{
         if(hasSecondNumber2) {
             firstNum2 = match2.group(1);
         }
-        
+
         int result = NUM_SORTER.compare(firstNum1, firstNum2);
         if(result != 0) {
             return result;
         }
-        
+
         // Sort numbers without a second number before those with
         if(hasSecondNumber1 && !hasSecondNumber2) {
             return -1;

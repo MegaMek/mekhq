@@ -471,17 +471,17 @@ public class PersonnelMarketDialog extends JDialog {
 
      void refreshPersonView() {
     	 lblUnitCost.setText("");
-    	 
+
     	 int row = tablePersonnel.getSelectedRow();
 
     	 if(row < 0) {
              scrollPersonnelView.setViewportView(null);
              return;
          }
-    	 
+
          Entity en = personnelMarket.getAttachedEntity(selectedPerson);
          String unitText = "";
-         
+
     	 if (unitCost > 0) {
     		 unitText = "Unit cost: " + new java.text.DecimalFormat().format(unitCost);
     	 }
@@ -492,12 +492,12 @@ public class PersonnelMarketDialog extends JDialog {
 			 } else {
 				 unitText += " - ";
 			 }
-			 
+
 			 unitText += en.getDisplayName();
 		 }
-    	 
+
     	 lblUnitCost.setText(unitText);
-    	 
+
          if (null != en) {
              JTabbedPane tabUnit = new JTabbedPane();
              String name = "Commander";

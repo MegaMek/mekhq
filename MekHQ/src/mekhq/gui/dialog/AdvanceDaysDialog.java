@@ -116,7 +116,7 @@ public class AdvanceDaysDialog extends JDialog implements ActionListener {
                 }
             }
             MekHQ.unregisterHandler(this);
-            
+
             gui.refreshCalendar();
             gui.refreshLocation();
             gui.initReport();
@@ -124,7 +124,7 @@ public class AdvanceDaysDialog extends JDialog implements ActionListener {
             gui.refreshAllTabs();
         }
     }
-    
+
     @Subscribe(priority = 1)
     public void reportOverride(ReportEvent ev) {
         ev.cancel();

@@ -38,15 +38,15 @@ public abstract class Report {
     public Report(Campaign c) {
         this.campaign = c;
     }
-    
+
     protected Campaign getCampaign() {
         return campaign;
     }
-    
-    //using JTextPane here allows for more flexibility in terms of 
+
+    //using JTextPane here allows for more flexibility in terms of
     //what these reports look like
     public abstract JTextPane getReport();
-        
+
     public abstract String getTitle();
-    
+
 }

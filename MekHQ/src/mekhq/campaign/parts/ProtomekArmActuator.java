@@ -1,20 +1,20 @@
 /*
  * ProtomekActuator.java
- * 
+ *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -41,41 +41,41 @@ import mekhq.campaign.personnel.SkillType;
  */
 public class ProtomekArmActuator extends Part {
     private static final long serialVersionUID = 719878556021696393L;
-    
+
     protected int location;
-    
+
     public ProtomekArmActuator() {
         this(0, 0, null);
     }
-    
+
     public ProtomekArmActuator clone() {
         ProtomekArmActuator clone = new ProtomekArmActuator(getUnitTonnage(), location, campaign);
         clone.copyBaseData(this);
         return clone;
     }
-    
+
     public ProtomekArmActuator(int tonnage, Campaign c) {
         this(tonnage, -1, c);
     }
-    
+
     public ProtomekArmActuator(int tonnage, int loc, Campaign c) {
         super(tonnage, c);
         this.name = "Protomech Arm Actuator";
         this.location = loc;
     }
-    
+
     public void setLocation(int loc) {
         this.location = loc;
     }
-    
-   
+
+
     @Override
     public double getTonnage() {
         //TODO: how much do actuators weight?
         //apparently nothing
         return 0;
     }
-    
+
     @Override
     public long getStickerPrice() {
         return getUnitTonnage() * 180;
@@ -86,11 +86,11 @@ public class ProtomekArmActuator extends Part {
         return part instanceof ProtomekArmActuator
                 && getUnitTonnage() == ((ProtomekArmActuator)part).getUnitTonnage();
     }
-    
+
     public int getLocation() {
         return location;
     }
-    
+
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent);
@@ -104,13 +104,13 @@ public class ProtomekArmActuator extends Part {
     @Override
     protected void loadFieldsFromXmlNode(Node wn) {
         NodeList nl = wn.getChildNodes();
-        
+
         for (int x=0; x<nl.getLength(); x++) {
             Node wn2 = nl.item(x);
-            
+
             if (wn2.getNodeName().equalsIgnoreCase("location")) {
                 location = Integer.parseInt(wn2.getTextContent());
-            } 
+            }
         }
     }
 
@@ -121,12 +121,12 @@ public class ProtomekArmActuator extends Part {
             unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Protomech.SYSTEM_ARMCRIT, location);
         }
     }
-    
+
     @Override
     public int getTechBase() {
         return T_CLAN;
     }
-    
+
     @Override
     public int getTechLevel() {
         return TechConstants.T_CLAN_TW;
@@ -153,7 +153,7 @@ public class ProtomekArmActuator extends Part {
             Part missing = getMissingPart();
             unit.addPart(missing);
             campaign.addPart(missing, 0);
-        }   
+        }
         setUnit(null);
         updateConditionFromEntity(false);
         location = -1;
@@ -161,26 +161,26 @@ public class ProtomekArmActuator extends Part {
 
     @Override
     public void updateConditionFromEntity(boolean checkForDestruction) {
-        if(null != unit) {      
+        if(null != unit) {
         	int priorHits = hits;
             hits = unit.getEntity().getDamagedCriticals(CriticalSlot.TYPE_SYSTEM, Protomech.SYSTEM_ARMCRIT, location);
-            if(checkForDestruction 
-					&& hits > priorHits 
+            if(checkForDestruction
+					&& hits > priorHits
 					&& Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
 				remove(false);
 				return;
 			}
         }
     }
-    
-    @Override 
+
+    @Override
 	public int getBaseTime() {
 		if(isSalvaging()) {
 			return 120;
 		}
         if(hits <= 1) {
             return 100;
-        } 
+        }
         else if(hits == 2) {
             return 150;
         }
@@ -188,7 +188,7 @@ public class ProtomekArmActuator extends Part {
         	return 200;
         }
 	}
-	
+
 	@Override
 	public int getDifficulty() {
 		if(isSalvaging()) {
@@ -196,7 +196,7 @@ public class ProtomekArmActuator extends Part {
 		}
 		if(hits <= 1) {
             return 0;
-        } 
+        }
         else if(hits == 2) {
             return 1;
         }
@@ -209,7 +209,7 @@ public class ProtomekArmActuator extends Part {
     public boolean needsFixing() {
         return hits > 0;
     }
-    
+
     @Override
     public String getDetails() {
         if(null != unit) {
@@ -226,9 +226,9 @@ public class ProtomekArmActuator extends Part {
             } else {
                 unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Protomech.SYSTEM_ARMCRIT, location);
             }
-        }   
+        }
     }
-    
+
     @Override
     public String checkFixable() {
     	if(null == unit) {
@@ -245,27 +245,27 @@ public class ProtomekArmActuator extends Part {
         }
         return null;
     }
-    
+
     @Override
     public boolean isMountedOnDestroyedLocation() {
         return null != unit && unit.isLocationDestroyed(location);
     }
-    
+
     @Override
     public boolean onBadHipOrShoulder() {
         return false;
     }
-    
+
     @Override
     public boolean isPartForEquipmentNum(int index, int loc) {
         return false;//index == type && loc == location;
     }
-    
+
     @Override
     public boolean isRightTechType(String skillType) {
         return skillType.equals(SkillType.S_TECH_MECH);
     }
-    
+
     @Override
     public boolean isOmniPoddable() {
         return false;
@@ -275,12 +275,12 @@ public class ProtomekArmActuator extends Part {
 	public String getLocationName() {
 		return unit.getEntity().getLocationName(location);
 	}
-	
+
     @Override
     public TechAdvancement getTechAdvancement() {
         return ProtomekLocation.TECH_ADVANCEMENT;
     }
-    
+
     @Override
 	public int getMassRepairOptionType() {
     	return Part.REPAIR_PART_TYPE.ACTUATOR;

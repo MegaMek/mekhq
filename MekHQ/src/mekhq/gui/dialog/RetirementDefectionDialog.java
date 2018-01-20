@@ -286,7 +286,7 @@ public class RetirementDefectionDialog extends JDialog {
         			}
         		}
         	});
- 
+
         	JScrollPane scroll = new JScrollPane();
         	scroll.setViewportView(personnelTable);
         	scroll.setPreferredSize(new Dimension(500, 500));

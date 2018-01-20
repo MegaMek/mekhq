@@ -26,7 +26,7 @@ import mekhq.campaign.unit.Unit;
  * from a campaign. More specific change events should extend this class.
  */
 public class UnitChangedEvent extends UnitEvent {
-    
+
     public UnitChangedEvent(Unit unit) {
         super(unit);
     }

@@ -1,20 +1,20 @@
 /*
  * Asset.java
- * 
+ *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -42,53 +42,53 @@ public class Asset implements MekHqXmlSerializable {
     //lets only allow monthly and yearly and pay at the first of each
     private int schedule;
     private long income;
-    
+
     public Asset() {
         name = "New Asset";
         value = 0;
         schedule = Finances.SCHEDULE_YEARLY;
         income = 0;
     }
-    
+
     public Asset(String n, long v, long inc, int s) {
         name = n;
         schedule = s;
         value = v;
         income = inc;
     }
-    
+
     public String getName() {
         return name;
     }
-    
+
     public void setName(String s) {
         name = s;
     }
-    
+
     public long getValue() {
         return value;
     }
-    
+
     public void setValue(Long l) {
         value = l;
     }
-    
+
     public int getSchedule() {
         return schedule;
     }
-    
+
     public void setSchedule(int s) {
         schedule = s;
     }
-    
+
     public long getIncome() {
         return income;
     }
-    
+
     public void setIncome(long l) {
         income = l;
     }
-    
+
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
         pw1.println(MekHqXmlUtil.indentStr(indent) + "<asset>");
@@ -113,7 +113,7 @@ public class Asset implements MekHqXmlSerializable {
 
     public static Asset generateInstanceFromXML(Node wn) {
         Asset retVal = new Asset();
-        
+
         NodeList nl = wn.getChildNodes();
         for (int x=0; x<nl.getLength(); x++) {
             Node wn2 = nl.item(x);
@@ -125,7 +125,7 @@ public class Asset implements MekHqXmlSerializable {
                 retVal.income = Long.parseLong(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("schedule")) {
                 retVal.schedule = Integer.parseInt(wn2.getTextContent().trim());
-            } 
+            }
         }
         return retVal;
     }

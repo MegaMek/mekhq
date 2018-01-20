@@ -7,12 +7,12 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -71,12 +71,12 @@ import mekhq.gui.utilities.MultiplyComposite;
  */
 public class Paperdoll extends Component {
     private static final long serialVersionUID = 2427542264332728643L;
-    
+
     public static final int DEFAULT_WIDTH = 256;
     public static final int DEFAULT_HEIGHT = 768;
-    
+
     private transient ActionListener listener;
-    
+
     private Image base;
     private Map<BodyLocation, Path2D> locShapes;
     private Map<BodyLocation, Color> locColors;
@@ -86,28 +86,28 @@ public class Paperdoll extends Component {
 
     private transient BodyLocation hoverLoc;
     private transient double scale;
-    
+
     // TODO: Make this work with any enum, not just BodyLocation
     public Paperdoll(InputStream is) {
         locShapes = new EnumMap<>(BodyLocation.class);
         locColors = new EnumMap<>(BodyLocation.class);
         locOverlays = new EnumMap<>(BodyLocation.class);
         locTags = new EnumMap<>(BodyLocation.class);
-        
+
         try {
             loadShapeData(is);
         } catch(Exception ex) {
             MekHQ.getLogger().log(getClass(), "<init>(InputStream)", ex);
         }
-        
+
         highlightColor = null;
-        
+
         enableEvents(AWTEvent.MOUSE_EVENT_MASK | AWTEvent.MOUSE_MOTION_EVENT_MASK);
     }
-    
+
     public void loadShapeData(InputStream is) throws JAXBException {
         final String METHOD_NAME = "loadShapeData(InputStream)"; //$NON-NLS-1$
-        
+
         JAXBContext context = JAXBContext.newInstance(OverlayLocDataList.class, OverlayLocData.class);
         Unmarshaller unmarshaller = context.createUnmarshaller();
         OverlayLocDataList dataList = (OverlayLocDataList) unmarshaller.unmarshal(is);
@@ -141,7 +141,7 @@ public class Paperdoll extends Component {
         }
         setSize(base.getWidth(null), base.getHeight(null));
     }
-    
+
     public void setLocShape(BodyLocation loc, Path2D path) {
         Objects.requireNonNull(loc);
         if(null != path) {
@@ -151,7 +151,7 @@ public class Paperdoll extends Component {
         }
         invalidate();
     }
-    
+
     public void setLocColor(BodyLocation loc, Color color) {
         Objects.requireNonNull(loc);
         Color oldColor = locColors.get(loc);
@@ -160,7 +160,7 @@ public class Paperdoll extends Component {
             invalidate();
         }
     }
-    
+
     public void setLocTag(BodyLocation loc, String tag) {
         Objects.requireNonNull(loc);
         String oldTag = locTags.get(loc);
@@ -173,26 +173,26 @@ public class Paperdoll extends Component {
             invalidate();
         }
     }
-    
+
     public void clearLocColors() {
         locColors.clear();
     }
-    
+
     public void clearLocTags() {
         locTags.clear();
     }
-    
+
     public Color getHighlightColor() {
         return highlightColor;
     }
-    
+
     public void setHighlightColor(Color highlightColor) {
         if(!Objects.equals(this.highlightColor, highlightColor)) {
             invalidate();
         }
         this.highlightColor = highlightColor;
     }
-    
+
     @Override
     public void paint(Graphics g) {
         final Graphics2D g2 = (Graphics2D) g;
@@ -226,14 +226,14 @@ public class Paperdoll extends Component {
                 g2.fill(overlay);
             });
         g2.setComposite(AlphaComposite.SrcOver);
-        
+
         if((null != highlightColor) && (null != hoverLoc) && locShapes.containsKey(hoverLoc)) {
             g2.setPaint(highlightColor);
             g2.setStroke(new BasicStroke(5f));
             g2.draw(locShapes.get(hoverLoc));
         }
     }
-    
+
     public BodyLocation locationUnderPoint(double x, double y) {
         final double scaledX = x / scale;
         final double scaledY = y / scale;
@@ -241,20 +241,20 @@ public class Paperdoll extends Component {
             .filter(entry -> entry.getValue().contains(scaledX, scaledY)).findAny()
             .map(entry -> entry.getKey()).orElse(BodyLocation.GENERIC);
     }
-    
+
     @Override
     public Dimension getPreferredSize() {
         return new Dimension(base.getWidth(null), base.getHeight(null));
     }
-    
+
     public void addActionListener(ActionListener al) {
         listener = AWTEventMulticaster.add(listener, al);
     }
-    
+
     public void removeActionListener(ActionListener al) {
         listener = AWTEventMulticaster.remove(listener, al);
     }
-    
+
     @Override
     public void processEvent(AWTEvent e) {
         if(e instanceof MouseEvent) {
@@ -280,7 +280,7 @@ public class Paperdoll extends Component {
             }
         }
     }
-    
+
     // XML serialization classes
     @XmlRootElement(name="overlays")
     @XmlAccessorType(XmlAccessType.FIELD)
@@ -289,7 +289,7 @@ public class Paperdoll extends Component {
         @XmlElement(name="loc")
         public List<OverlayLocData> locs;
     }
-    
+
     @XmlRootElement(name="loc")
     @XmlAccessorType(XmlAccessType.FIELD)
     public static class OverlayLocData {
@@ -301,7 +301,7 @@ public class Paperdoll extends Component {
         public List<Point2D> path;
         @XmlElement(name="image")
         public List<OverlayLocImage> overlayImages;
-        
+
         public Path2D genPath() {
             Path2D result = new Path2D.Float();
             if((null != path) && !path.isEmpty()) {
@@ -313,14 +313,14 @@ public class Paperdoll extends Component {
             return result;
         }
     }
-    
+
     public static class OverlayLocImage {
         @XmlAttribute
         public String tag;
         @XmlValue
         public String image;
     }
-    
+
     private static class XMLPoint2DAdapter extends XmlAdapter<String, Point2D> {
         @Override
         public Point2D unmarshal(String v) throws Exception {
@@ -343,6 +343,6 @@ public class Paperdoll extends Component {
         public String marshal(Point2D v) throws Exception {
             return (null != v) ? String.format(Locale.ROOT, "%.3f,%.3f", v.getX(), v.getY()) : null;
         }
-        
+
     }
 }

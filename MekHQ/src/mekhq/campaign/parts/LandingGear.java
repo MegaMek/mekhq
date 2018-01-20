@@ -1,20 +1,20 @@
 /*
  * LandingGear.java
- * 
+ *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -42,25 +42,25 @@ import mekhq.campaign.personnel.SkillType;
 public class LandingGear extends Part {
 
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = -717866644605314883L;
 
 	public LandingGear() {
     	this(0, null);
     }
-    
+
     public LandingGear(int tonnage, Campaign c) {
         super(tonnage, c);
         this.name = "Landing Gear";
     }
-        
+
     public LandingGear clone() {
     	LandingGear clone = new LandingGear(0, campaign);
         clone.copyBaseData(this);
     	return clone;
     }
-    
+
 	@Override
 	public void updateConditionFromEntity(boolean checkForDestruction) {
 		int priorHits = hits;
@@ -74,23 +74,23 @@ public class LandingGear extends Part {
 		    } else if (unit.getEntity() instanceof LandAirMech) {
 		        hits = unit.getHitCriticals(CriticalSlot.TYPE_SYSTEM, LandAirMech.LAM_LANDING_GEAR);
 		    }
-			if(checkForDestruction 
-					&& hits > priorHits 
+			if(checkForDestruction
+					&& hits > priorHits
 					&& Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
 				remove(false);
 				return;
 			}
 		}
 	}
-	
-	@Override 
+
+	@Override
 	public int getBaseTime() {
 		if(isSalvaging()) {
 			return 1200;
 		}
 		return 120;
 	}
-	
+
 	@Override
 	public int getDifficulty() {
 		if(isSalvaging()) {
@@ -192,7 +192,7 @@ public class LandingGear extends Part {
 	protected void loadFieldsFromXmlNode(Node wn) {
 		//nothing to load
 	}
-	
+
 	@Override
 	public boolean isRightTechType(String skillType) {
         if (unit != null && unit.getEntity() instanceof LandAirMech) {
@@ -211,10 +211,10 @@ public class LandingGear extends Part {
 	public int getLocation() {
 		return Entity.LOC_NONE;
 	}
-	
+
 	@Override
 	public TechAdvancement getTechAdvancement() {
 	    return TA_GENERIC;
 	}
-	
+
 }

@@ -54,7 +54,7 @@ import mekhq.campaign.rating.IUnitRating;
 
 /**
  * @author Neoancient
- * 
+ *
  * Class that handles configuration options for Against the Bot campaigns
  * more extensive than what is handled by CampaignOptions. Most of the options
  * fall into one of two categories: they allow users to customize the various
@@ -62,24 +62,24 @@ import mekhq.campaign.rating.IUnitRating;
  *
  */
 public class AtBConfiguration implements Serializable {
-	
+
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 515628415152924457L;
-	
+
 	/* Used to indicate size of lance or equivalent in opfor forces */
 	public static final String ORG_IS = "IS";
 	public static final String ORG_CLAN = "CLAN";
 	public static final String ORG_CS = "CS";
-	
+
 	/* Scenario generation */
 	private HashMap<String,ArrayList<WeightedTable<String>>> botForceTables = new HashMap<>();
 	private HashMap<String,ArrayList<WeightedTable<String>>> botLanceTables = new HashMap<>();
-	
+
 	/* Contract generation */
 	private ArrayList<DatedRecord<String>> hiringHalls;
-	
+
 	/* Personnel and unit markets */
 	private int shipSearchCost = 100000;
 	private int shipSearchLengthWeeks = 4;
@@ -88,20 +88,20 @@ public class AtBConfiguration implements Serializable {
 	private Integer warshipSearchTarget;
 	private WeightedTable<String> dsTable;
 	private WeightedTable<String> jsTable;
-	
+
 	private ResourceBundle defaultProperties;
-	
+
 	private AtBConfiguration() {
 		hiringHalls = new ArrayList<DatedRecord<String>>();
 		dsTable = new WeightedTable<>();
 		jsTable = new WeightedTable<>();
 		defaultProperties = ResourceBundle.getBundle("mekhq.resources.AtBConfigDefaults");
 	}
-	
+
 	/**
 	 * Provide default values in case the file is missing or contains errors.
 	 */
-	
+
 	private WeightedTable<String> getDefaultForceTable(String key, int index) {
 	    final String METHOD_NAME = "getDefaultForceTable(String,int)"; //$NON-NLS-1$
 	    if(index < 0) {
@@ -119,11 +119,11 @@ public class AtBConfiguration implements Serializable {
 		}
 		return parseDefaultWeightedTable(fields[index]);
 	}
-	
+
 	private WeightedTable<String> parseDefaultWeightedTable(String entry) {
 		return parseDefaultWeightedTable(entry, s -> s);
 	}
-	
+
 	private <T>WeightedTable<T> parseDefaultWeightedTable(String entry, Function<String,T> fromString) {
 		WeightedTable<T> retVal = new WeightedTable<>();
 		String[] entries = entry.split(",");
@@ -133,13 +133,13 @@ public class AtBConfiguration implements Serializable {
 		}
 		return retVal;
 	}
-	
+
 	/**
 	 * Used if the config file is missing.
 	 */
 	private void setAllValuesToDefaults() {
 	    final String METHOD_NAME = "setAllValuesToDefaults()"; //$NON-NLS-1$
-	    
+
 		for (Enumeration<String> e = defaultProperties.getKeys(); e.hasMoreElements(); ) {
 			String key = e.nextElement();
 			String property = defaultProperties.getString(key);
@@ -201,11 +201,11 @@ public class AtBConfiguration implements Serializable {
 			}
 		}
 	}
-	
+
 	public int weightClassIndex(int entityWeightClass) {
 		return entityWeightClass - 1;
 	}
-	
+
 	public int weightClassIndex(String wc) {
 		switch (wc) {
 		case "L":
@@ -222,11 +222,11 @@ public class AtBConfiguration implements Serializable {
 		}
 		throw new IllegalArgumentException("Could not parse weight class " + wc);
 	}
-	
+
 	public String selectBotLances(String org, int weightClass) {
 		return selectBotLances(org, weightClass, 0f);
 	}
-	
+
 	public String selectBotLances(String org, int weightClass, float rollMod) {
 	    final String METHOD_NAME = "selectBotLances(String,int,float)"; //$NON-NLS-1$
 		if (botForceTables.containsKey(org)) {
@@ -254,11 +254,11 @@ public class AtBConfiguration implements Serializable {
 		    return null;
 		}
 	}
-	
+
 	public String selectBotUnitWeights(String org, int weightClass) {
 		return selectBotUnitWeights(org, weightClass, 0f);
 	}
-	
+
 	public String selectBotUnitWeights(String org, int weightClass, float rollMod) {
 		if (botLanceTables.containsKey(org)) {
 			WeightedTable<String> table = botLanceTables.get(org).get(weightClassIndex(weightClass));
@@ -269,36 +269,36 @@ public class AtBConfiguration implements Serializable {
 		}
 		return null;
 	}
-	
+
 	public boolean isHiringHall(String planet, Date date) {
 		return hiringHalls.stream().anyMatch( rec -> rec.getValue().equals(planet)
 				&& rec.fitsDate(date));
 	}
-	
+
 	public int getShipSearchCost() {
 		return shipSearchCost;
 	}
-	
+
 	public int getShipSearchLengthWeeks() {
 		return shipSearchLengthWeeks;
 	}
-	
+
 	public int shipSearchCostPerWeek() {
 		return shipSearchCost / shipSearchLengthWeeks;
 	}
-	
+
 	public Integer getDropshipSearchTarget() {
 		return dropshipSearchTarget;
 	}
-	
+
 	public Integer getJumpshipSearchTarget() {
 		return jumpshipSearchTarget;
 	}
-	
+
 	public Integer getWarshipSearchTarget() {
 		return warshipSearchTarget;
 	}
-	
+
 	public Integer shipSearchTargetBase(int unitType) {
 		switch (unitType) {
 		case UnitType.DROPSHIP:
@@ -310,7 +310,7 @@ public class AtBConfiguration implements Serializable {
 		}
 		return null;
 	}
-	
+
     public TargetRoll shipSearchTargetRoll(int unitType, Campaign campaign) {
     	if (shipSearchTargetBase(unitType) == null) {
     		return new TargetRoll(TargetRoll.IMPOSSIBLE, "Base");
@@ -328,9 +328,9 @@ public class AtBConfiguration implements Serializable {
     	target.addModifier(SkillType.EXP_REGULAR - adminLogExp, "Admin/Logistics");
     	target.addModifier(IUnitRating.DRAGOON_C - campaign.getUnitRatingMod(),
     			"Unit Rating");
-    	return target;    	
+    	return target;
     }
-    
+
 	public MechSummary findShip(int unitType) {
 		WeightedTable<String> table = null;
 		if (unitType == UnitType.JUMPSHIP) {
@@ -344,21 +344,21 @@ public class AtBConfiguration implements Serializable {
 		}
 		return MechSummaryCache.getInstance().getMech(shipName);
 	}
-	
+
 	public static AtBConfiguration loadFromXml() {
 	    final String METHOD_NAME = "loadFromXml()"; //$NON-NLS-1$
 		AtBConfiguration retVal = new AtBConfiguration();
-		
+
         MekHQ.getLogger().log(AtBConfiguration.class, METHOD_NAME, LogLevel.INFO,
                 "Starting load of AtB configuration data from XML..."); //$NON-NLS-1$
 
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		Document xmlDoc = null;
-		
+
 		try {
 			FileInputStream fis = new FileInputStream("data/universe/atbconfig.xml");
 			DocumentBuilder db = dbf.newDocumentBuilder();
-	
+
 			xmlDoc = db.parse(fis);
 		} catch (FileNotFoundException ex) {
             MekHQ.getLogger().log(AtBConfiguration.class, METHOD_NAME, LogLevel.INFO,
@@ -369,11 +369,11 @@ public class AtBConfiguration implements Serializable {
             MekHQ.getLogger().log(AtBConfiguration.class, METHOD_NAME, ex);
 			return retVal;
 		}
-		
+
 		Element rootElement = xmlDoc.getDocumentElement();
 		NodeList nl = rootElement.getChildNodes();
 		rootElement.normalize();
-	
+
 		for (int x = 0; x < nl.getLength(); x++) {
 			Node wn = nl.item(x);
 			switch (wn.getNodeName()) {
@@ -388,10 +388,10 @@ public class AtBConfiguration implements Serializable {
 				break;
 			}
 		}
-		
+
 		return retVal;
 	}
-	
+
 	private void loadScenarioGenerationNodeFromXml(Node node) {
 		NodeList nl = node.getChildNodes();
 		for (int i = 0; i < nl.getLength(); i++) {
@@ -426,7 +426,7 @@ public class AtBConfiguration implements Serializable {
 			}
 		}
 	}
-	
+
 	private ArrayList<WeightedTable<String>> loadForceTableFromXml(Node node) {
 	    final String METHOD_NAME = "loadForceTableFromXml(Node)"; //$NON-NLS-1$
 		ArrayList<WeightedTable<String>> retVal = new ArrayList<>();
@@ -445,16 +445,16 @@ public class AtBConfiguration implements Serializable {
                     MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
                             "Could not parse weight class attribute for enemy forces table"); //$NON-NLS-1$
                     MekHQ.getLogger().log(getClass(), METHOD_NAME, ex);
-				}							
+				}
 			}
 		}
 		return retVal;
 	}
-	
+
 	private void loadContractGenerationNodeFromXml(Node node) {
 	    final String METHOD_NAME = "loadContractGenerationNodeFromXml(Node)"; //$NON-NLS-1$
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-		
+
 		NodeList nl = node.getChildNodes();
 		for (int i = 0; i < nl.getLength(); i++) {
 			Node wn = nl.item(i);
@@ -487,7 +487,7 @@ public class AtBConfiguration implements Serializable {
 			}
 		}
 	}
-	
+
 	private void loadShipSearchNodeFromXml(Node node) {
 		NodeList nl = node.getChildNodes();
 		for (int i = 0; i < nl.getLength(); i++) {
@@ -530,11 +530,11 @@ public class AtBConfiguration implements Serializable {
 			}
 		}
 	}
-	
+
 	private WeightedTable<String> loadWeightedTableFromXml(Node node) {
 		return loadWeightedTableFromXml(node, s -> s);
 	}
-	
+
 	private <T>WeightedTable<T> loadWeightedTableFromXml(Node node, Function<String,T> fromString) {
 		WeightedTable<T> retVal = new WeightedTable<>();
 		NodeList nl = node.getChildNodes();
@@ -550,7 +550,7 @@ public class AtBConfiguration implements Serializable {
 		}
 		return retVal;
 	}
-	
+
 	/*
 	 * Attaches a start and end date to any object.
 	 * Either the start or end date can be null, indicating that
@@ -561,13 +561,13 @@ public class AtBConfiguration implements Serializable {
 		private Date start;
 		private Date end;
 		private E value;
-		
+
 		public DatedRecord() {
 			start = null;
 			end = null;
 			value = null;
 		}
-		
+
 		public DatedRecord(Date s, Date e, E v) {
 			if (s != null) {
 				start = new Date(s.getTime());
@@ -577,7 +577,7 @@ public class AtBConfiguration implements Serializable {
 			}
 			value = v;
 		}
-		
+
 		public void setStart(Date s) {
 			if (start == null) {
 				start = new Date(s.getTime());
@@ -585,11 +585,11 @@ public class AtBConfiguration implements Serializable {
 				start.setTime(s.getTime());
 			}
 		}
-		
+
 		public Date getStart() {
 			return start;
 		}
-	
+
 		public void setEnd(Date e) {
 			if (end == null) {
 				end = new Date(e.getTime());
@@ -597,21 +597,21 @@ public class AtBConfiguration implements Serializable {
 				end.setTime(e.getTime());
 			}
 		}
-		
+
 		public Date getEnd() {
 			return end;
 		}
-		
+
 		public void setValue(E v) {
 			value = v;
 		}
-		
+
 		public E getValue() {
 			return value;
 		}
-		
+
 		/**
-		 * 
+		 *
 		 * @param d
 		 * @return true if d is between the start and end date, inclusive
 		 */
@@ -620,21 +620,21 @@ public class AtBConfiguration implements Serializable {
 					&& (end == null || !end.before(d));
 		}
 	}
-	
+
 	static class WeightedTable<T> implements Serializable {
 		/**
-		 * 
+		 *
 		 */
 		private static final long serialVersionUID = 1984759212668176620L;
-		
+
 		private ArrayList<Integer> weights = new ArrayList<>();
 		private ArrayList<T> values = new ArrayList<>();
-		
+
 		public void add(Integer weight, T value) {
 			weights.add(weight);
 			values.add(value);
 		}
-		
+
 		public T remove(T value) {
 			int index = values.indexOf(value);
 			if (index > 0) {
@@ -643,11 +643,11 @@ public class AtBConfiguration implements Serializable {
 			}
 			return null;
 		}
-		
+
 		public T select() {
 			return select(0f);
 		}
-		
+
 		/**
 		 * Select random entry proportionally to the weight values
 		 * @param rollMod - a modifier to the die roll, expressed as a fraction of the total weight

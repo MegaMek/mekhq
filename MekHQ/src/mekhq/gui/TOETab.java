@@ -142,7 +142,7 @@ public final class TOETab extends CampaignGuiTab {
         if (node instanceof Unit) {
             Unit u = ((Unit) node);
             JTabbedPane tabUnit = new JTabbedPane();
-            int crewSize = u.getCrew().size(); 
+            int crewSize = u.getCrew().size();
             if (crewSize > 0) {
                 JPanel crewPanel = new JPanel(new BorderLayout());
                 final JScrollPane scrollPerson = new JScrollPane();
@@ -194,24 +194,24 @@ public final class TOETab extends CampaignGuiTab {
             javax.swing.SwingUtilities.invokeLater(() -> scrollForceView.getVerticalScrollBar().setValue(0));
         }
     }
-    
+
     private ActionScheduler orgRefreshScheduler = new ActionScheduler(this::refreshOrganization);
-    
+
     @Subscribe
     public void deploymentChanged(DeploymentChangedEvent ev) {
         orgTree.repaint();
     }
-    
+
     @Subscribe
     public void organizationChanged(OrganizationChangedEvent ev) {
         orgRefreshScheduler.schedule();
     }
-    
+
     @Subscribe
     public void networkChanged(NetworkChangedEvent ev) {
         orgTree.repaint();
     }
-    
+
     @Subscribe
     public void scenarioResolved(ScenarioResolvedEvent ev) {
         orgRefreshScheduler.schedule();

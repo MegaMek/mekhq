@@ -32,7 +32,7 @@ public class UnitTableModel extends DataTableModel {
     private static final long serialVersionUID = -5207167419079014157L;
 
     private Campaign campaign;
-    
+
     public final static int COL_NAME    =    0;
     public final static int COL_TYPE    =    1;
     public final static int COL_WCLASS    =  2;
@@ -57,7 +57,7 @@ public class UnitTableModel extends DataTableModel {
         data = new ArrayList<Unit>();
         campaign = c;
     }
-    
+
     public int getRowCount() {
         return data.size();
     }
@@ -263,11 +263,11 @@ public class UnitTableModel extends DataTableModel {
         }
         return "?";
     }
-    
+
     public Campaign getCampaign() {
         return campaign;
     }
-    
+
     public void refreshData() {
         setData(getCampaign().getUnits());
     }
@@ -313,11 +313,11 @@ public class UnitTableModel extends DataTableModel {
                 else if ((null != u)
                         && (u.isMothballing())) {
                     setBackground(new Color(153,153,255));
-                } 
+                }
                 else if ((null != u)
                         && (u.isMothballed())) {
                     setBackground(new Color(204, 204, 255));
-                } 
+                }
                 else if (null != u && !u.isRepairable()) {
                     setBackground(new Color(190, 150, 55));
                 } else if ((null != u) && !u.isFunctional()) {

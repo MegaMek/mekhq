@@ -45,11 +45,11 @@ public class PlanetViewPanel extends JPanel {
 
     private Planet planet;
     private Campaign campaign;
-    
+
     private JPanel pnlNeighbors;
     private JPanel pnlStats;
     private JTextArea txtDesc;
-    
+
     private JLabel lblOwner;
     private JLabel lblStarType;
     private JTextArea txtStarType;
@@ -77,22 +77,22 @@ public class PlanetViewPanel extends JPanel {
     private JTextPane txtSocioIndustrial;
     private JLabel lblLandMass;
     private JTextArea txtLandMass;
-    
+
     private Image planetIcon = null;
-    
+
     public PlanetViewPanel(Planet p, Campaign c) {
         this.planet = p;
         this.campaign = c;
         initComponents();
     }
-    
+
     private void initComponents() {
         GridBagConstraints gridBagConstraints;
 
         pnlStats = new JPanel();
         pnlNeighbors = new JPanel();
         txtDesc = new JTextArea();
-               
+
         setLayout(new GridBagLayout());
 
         setBackground(Color.WHITE);
@@ -109,9 +109,9 @@ public class PlanetViewPanel extends JPanel {
         gridBagConstraints.weighty = 0.0;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;    
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         add(pnlStats, gridBagConstraints);
-        
+
         pnlNeighbors.setName("pnlNeighbors");
         pnlNeighbors.setBorder(BorderFactory.createTitledBorder("Planets within 30 light years"));
         pnlNeighbors.setBackground(Color.WHITE);
@@ -124,9 +124,9 @@ public class PlanetViewPanel extends JPanel {
         gridBagConstraints.weighty = 0.0;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;    
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         add(pnlNeighbors, gridBagConstraints);
-        
+
         txtDesc.setName("txtDesc");
         ((DefaultCaret) txtDesc.getCaret()).setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
         txtDesc.setText(planet.getDescription());
@@ -146,7 +146,7 @@ public class PlanetViewPanel extends JPanel {
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         add(txtDesc, gridBagConstraints);
-        
+
         planetIcon = ImageUtil.loadImageFromFile("data/" + StarUtil.getIconImage(planet));
     }
 
@@ -172,7 +172,7 @@ public class PlanetViewPanel extends JPanel {
             gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlNeighbors.add(lblNeighbor, gridBagConstraints);
-            
+
             lblDistance = new JLabel(String.format(Locale.ROOT, "%.2f ly", planet.getDistanceTo(neighbor)));
             lblDistance.setAlignmentX(Component.RIGHT_ALIGNMENT);
             gridBagConstraints = new GridBagConstraints();
@@ -184,13 +184,13 @@ public class PlanetViewPanel extends JPanel {
             pnlNeighbors.add(lblDistance, gridBagConstraints);
 
             ++ i;
-        }        
+        }
     }
-    
+
     @Override
     protected void paintChildren(Graphics g) {
         super.paintChildren(g);
-    
+
         if(null != planetIcon) {
             Graphics2D gfx = (Graphics2D) g;
             final int width = getWidth();
@@ -208,9 +208,9 @@ public class PlanetViewPanel extends JPanel {
     }
 
     private void fillStats() {
-        
+
         ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PlanetViewPanel", new EncodeControl()); //$NON-NLS-1$
-        
+
         lblOwner = new JLabel();
         lblStarType = new JLabel();
         txtStarType = new JTextArea();
@@ -238,7 +238,7 @@ public class PlanetViewPanel extends JPanel {
         txtSocioIndustrial = new JTextPane();
         lblLandMass = new JLabel();
         txtLandMass = new JTextArea();
-        
+
         GridBagConstraints gridBagConstraints;
         pnlStats.setLayout(new GridBagLayout());
         DateTime currentDate = Utilities.getDateTimeDay(campaign.getCalendar());
@@ -255,7 +255,7 @@ public class PlanetViewPanel extends JPanel {
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(lblOwner, gridBagConstraints);
-        
+
         lblStarType.setName("lblStarType"); // NOI18N
         lblStarType.setText(resourceMap.getString("lblStarType1.text"));
         gridBagConstraints = new GridBagConstraints();
@@ -264,7 +264,7 @@ public class PlanetViewPanel extends JPanel {
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(lblStarType, gridBagConstraints);
-        
+
         txtStarType.setName("lblStarType2"); // NOI18N
         txtStarType.setText(planet.getSpectralTypeText() + " (" + planet.getRechargeTimeText(currentDate) + ")");
         txtStarType.setEditable(false);
@@ -278,7 +278,7 @@ public class PlanetViewPanel extends JPanel {
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         pnlStats.add(txtStarType, gridBagConstraints);
-        
+
         int infoRow = 2;
         if((null != planet.getSystemPosition()) || (null != planet.getOrbitSemimajorAxis())) {
             lblPosition.setName("lblPosition"); // NOI18N
@@ -289,7 +289,7 @@ public class PlanetViewPanel extends JPanel {
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlStats.add(lblPosition, gridBagConstraints);
-            
+
             txtPosition.setName("txtPosition"); // NOI18N
             String text;
             if(null != planet.getOrbitSemimajorAxis()) {
@@ -310,10 +310,10 @@ public class PlanetViewPanel extends JPanel {
             gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
             gridBagConstraints.anchor = GridBagConstraints.WEST;
             pnlStats.add(txtPosition, gridBagConstraints);
-            
+
             ++ infoRow;
         }
-        
+
         lblJumpPoint.setName("lblJumpPoint"); // NOI18N
         lblJumpPoint.setText(resourceMap.getString("lblJumpPoint1.text"));
         gridBagConstraints = new GridBagConstraints();
@@ -322,7 +322,7 @@ public class PlanetViewPanel extends JPanel {
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(lblJumpPoint, gridBagConstraints);
-        
+
         txtJumpPoint.setName("lblJumpPoint2"); // NOI18N
         txtJumpPoint.setText(Double.toString(Math.round(100 * planet.getTimeToJumpPoint(1))/100.0) + " days");
         txtJumpPoint.setEditable(false);
@@ -336,9 +336,9 @@ public class PlanetViewPanel extends JPanel {
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(txtJumpPoint, gridBagConstraints);
-        
+
         ++ infoRow;
-        
+
         lblSatellite.setName("lblSatellite"); // NOI18N
         lblSatellite.setText(resourceMap.getString("lblSatellite1.text"));
         gridBagConstraints = new GridBagConstraints();
@@ -347,7 +347,7 @@ public class PlanetViewPanel extends JPanel {
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(lblSatellite, gridBagConstraints);
-        
+
         txtSatellite.setName("lblSatellite2"); // NOI18N
         txtSatellite.setText(planet.getSatelliteDescription());
         txtSatellite.setEditable(false);
@@ -361,9 +361,9 @@ public class PlanetViewPanel extends JPanel {
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(txtSatellite, gridBagConstraints);
-        
+
         ++ infoRow;
-        
+
         if(null != planet.getGravity()) {
             lblGravity.setName("lblGravity1"); // NOI18N
             lblGravity.setText(resourceMap.getString("lblGravity1.text"));
@@ -373,7 +373,7 @@ public class PlanetViewPanel extends JPanel {
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlStats.add(lblGravity, gridBagConstraints);
-            
+
             txtGravity.setName("lblGravity2"); // NOI18N
             txtGravity.setText(planet.getGravityText());
             txtGravity.setEditable(false);
@@ -387,10 +387,10 @@ public class PlanetViewPanel extends JPanel {
             gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlStats.add(txtGravity, gridBagConstraints);
-            
+
             ++ infoRow;
         }
-        
+
         if(null != planet.getPressure(currentDate)) {
             lblPressure.setName("lblPressure1"); // NOI18N
             lblPressure.setText(resourceMap.getString("lblPressure1.text"));
@@ -400,7 +400,7 @@ public class PlanetViewPanel extends JPanel {
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlStats.add(lblPressure, gridBagConstraints);
-            
+
             txtPressure.setName("lblPressure2"); // NOI18N
             txtPressure.setText(planet.getPressureName(currentDate));
             txtPressure.setEditable(false);
@@ -414,10 +414,10 @@ public class PlanetViewPanel extends JPanel {
             gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlStats.add(txtPressure, gridBagConstraints);
-            
+
             ++ infoRow;
         }
-        
+
         if((null != planet.getTemperature(currentDate)) || (null != planet.getClimate(currentDate))) {
             lblTemp.setName("lblTemp1"); // NOI18N
             lblTemp.setText(resourceMap.getString("lblTemp1.text"));
@@ -427,7 +427,7 @@ public class PlanetViewPanel extends JPanel {
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlStats.add(lblTemp, gridBagConstraints);
-            
+
             txtTemp.setName("lblTemp2"); // NOI18N
             String text;
             if( null == planet.getClimate(currentDate) ) {
@@ -449,10 +449,10 @@ public class PlanetViewPanel extends JPanel {
             gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlStats.add(txtTemp, gridBagConstraints);
-            
+
             ++ infoRow;
         }
-        
+
         if(null != planet.getPercentWater(currentDate)) {
             lblWater.setName("lblWater1"); // NOI18N
             lblWater.setText(resourceMap.getString("lblWater1.text"));
@@ -462,7 +462,7 @@ public class PlanetViewPanel extends JPanel {
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlStats.add(lblWater, gridBagConstraints);
-            
+
             txtWater.setName("lblWater2"); // NOI18N
             txtWater.setText(planet.getPercentWater(currentDate) + " percent");
             txtWater.setEditable(false);
@@ -476,10 +476,10 @@ public class PlanetViewPanel extends JPanel {
             gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlStats.add(txtWater, gridBagConstraints);
-            
+
             ++ infoRow;
         }
-        
+
         lblRecharge.setName("lblRecharge1"); // NOI18N
         lblRecharge.setText(resourceMap.getString("lblRecharge1.text"));
         gridBagConstraints = new GridBagConstraints();
@@ -488,7 +488,7 @@ public class PlanetViewPanel extends JPanel {
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(lblRecharge, gridBagConstraints);
-        
+
         txtRecharge.setName("lblRecharge2"); // NOI18N
         txtRecharge.setText(planet.getRechargeStationsText(currentDate));
         txtRecharge.setEditable(false);
@@ -502,7 +502,7 @@ public class PlanetViewPanel extends JPanel {
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(txtRecharge, gridBagConstraints);
-        
+
         ++ infoRow;
 
         if(null != planet.getLifeForm(currentDate)) {
@@ -514,7 +514,7 @@ public class PlanetViewPanel extends JPanel {
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlStats.add(lblAnimal, gridBagConstraints);
-            
+
             txtAnimal.setName("lblAnimal2"); // NOI18N
             txtAnimal.setText(planet.getLifeFormName(currentDate));
             txtAnimal.setEditable(false);
@@ -528,10 +528,10 @@ public class PlanetViewPanel extends JPanel {
             gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlStats.add(txtAnimal, gridBagConstraints);
-            
+
             ++ infoRow;
         }
-        
+
         if(null != planet.getLandMasses()) {
             lblLandMass.setName("lblLandMass1"); // NOI18N
             lblLandMass.setText(resourceMap.getString("lblLandMass1.text"));
@@ -541,7 +541,7 @@ public class PlanetViewPanel extends JPanel {
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlStats.add(lblLandMass, gridBagConstraints);
-            
+
             txtLandMass.setName("lblLandMass2"); // NOI18N
             txtLandMass.setText(planet.getLandMassDescription());
             txtLandMass.setEditable(false);
@@ -555,10 +555,10 @@ public class PlanetViewPanel extends JPanel {
             gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlStats.add(txtLandMass, gridBagConstraints);
-            
+
             ++ infoRow;
         }
-        
+
         // Social stuff
         if(null != planet.getPopulationRating(currentDate)) {
             JLabel label = new JLabel(resourceMap.getString("lblPopulation.text"));
@@ -568,7 +568,7 @@ public class PlanetViewPanel extends JPanel {
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlStats.add(label, gridBagConstraints);
-            
+
             JTextArea textArea = new JTextArea(planet.getPopulationRatingString(currentDate));
             textArea.setEditable(false);
             textArea.setLineWrap(true);
@@ -581,10 +581,10 @@ public class PlanetViewPanel extends JPanel {
             gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlStats.add(textArea, gridBagConstraints);
-            
+
             ++ infoRow;
         }
-        
+
         if(null != planet.getGovernment(currentDate)) {
             JLabel label = new JLabel(resourceMap.getString("lblGovernment.text"));
             gridBagConstraints = new GridBagConstraints();
@@ -593,7 +593,7 @@ public class PlanetViewPanel extends JPanel {
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlStats.add(label, gridBagConstraints);
-            
+
             JTextArea textArea = new JTextArea();
             textArea.setEditable(false);
             textArea.setLineWrap(true);
@@ -614,7 +614,7 @@ public class PlanetViewPanel extends JPanel {
             gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlStats.add(textArea, gridBagConstraints);
-            
+
             ++ infoRow;
         }
 
@@ -627,7 +627,7 @@ public class PlanetViewPanel extends JPanel {
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlStats.add(lblSocioIndustrial, gridBagConstraints);
-            
+
             txtSocioIndustrial.setName("lblSocioIndustrial2"); // NOI18N
             SocioIndustrialData sid = planet.getSocioIndustrial(currentDate);
             String sidText = (null == sid) ? "" : sid.getHTMLDescription();
@@ -642,10 +642,10 @@ public class PlanetViewPanel extends JPanel {
             gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlStats.add(txtSocioIndustrial, gridBagConstraints);
-            
+
             ++ infoRow;
         }
-        
+
         if(null != planet.getHPGClass(currentDate)) {
             lblHPG.setName("lblHPG1"); // NOI18N
             lblHPG.setText(resourceMap.getString("lblHPG1.text"));
@@ -655,7 +655,7 @@ public class PlanetViewPanel extends JPanel {
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlStats.add(lblHPG, gridBagConstraints);
-            
+
             txtHPG.setName("lblHPG2"); // NOI18N
             txtHPG.setText(planet.getHPGClass(currentDate));
             txtHPG.setEditable(false);
@@ -669,7 +669,7 @@ public class PlanetViewPanel extends JPanel {
             gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlStats.add(txtHPG, gridBagConstraints);
-            
+
             ++ infoRow;
         }
     }

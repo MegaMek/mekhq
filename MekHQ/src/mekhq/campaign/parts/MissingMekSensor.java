@@ -1,20 +1,20 @@
 /*
  * MissingMekSensor.java
- * 
+ *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -39,22 +39,22 @@ public class MissingMekSensor extends MissingPart {
 	public MissingMekSensor() {
 		this(0, null);
 	}
-	
+
 	public MissingMekSensor(int tonnage, Campaign c) {
         super(tonnage, c);
         this.name = "Mech Sensors";
     }
-	
-	@Override 
+
+	@Override
 	public int getBaseTime() {
 		return 260;
 	}
-	
+
 	@Override
 	public int getDifficulty() {
 		return 0;
 	}
-	
+
 	@Override
 	public double getTonnage() {
 		//TODO: what should this tonnage be?
@@ -70,7 +70,7 @@ public class MissingMekSensor extends MissingPart {
 	public boolean isAcceptableReplacement(Part part, boolean refit) {
 		return part instanceof MekSensor && getUnitTonnage() == part.getUnitTonnage();
 	}
-	
+
 	@Override
     public String checkFixable() {
 		if(null == unit) {
@@ -84,7 +84,7 @@ public class MissingMekSensor extends MissingPart {
             	if(unit.isLocationDestroyed(i)) {
             		return unit.getEntity().getLocationName(i) + " is destroyed.";
             	}
-            	
+
             }
         }
         return null;
@@ -120,12 +120,12 @@ public class MissingMekSensor extends MissingPart {
 		}
 		return Entity.LOC_NONE;
 	}
-	
+
     @Override
     public TechAdvancement getTechAdvancement() {
         return TA_GENERIC;
     }
-	
+
 	@Override
     public boolean isInLocation(String loc) {
 		 if(null == unit || null == unit.getEntity() || !(unit.getEntity() instanceof Mech)) {
@@ -139,9 +139,9 @@ public class MissingMekSensor extends MissingPart {
      			return true;
      		}
 		 }
-		 return false;	
+		 return false;
     }
-	
+
 	@Override
 	public int getMassRepairOptionType() {
     	return Part.REPAIR_PART_TYPE.ELECTRONICS;

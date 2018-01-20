@@ -35,16 +35,16 @@ import mekhq.campaign.Campaign;
  * @since 3/12/2012
  */
 public class CargoReport extends Report {
-  
-    
+
+
     public CargoReport(Campaign c) {
         super(c);
     }
-    
+
     public String getTitle() {
         return "Cargo Report";
     }
-      
+
     public JTextPane getReport() {
         JTextPane txtReport = new JTextPane();
         txtReport.setMinimumSize(new Dimension(800, 500));
@@ -52,5 +52,5 @@ public class CargoReport extends Report {
         txtReport.setText(getCampaign().getCargoDetails());
         return txtReport;
     }
-   
+
 }

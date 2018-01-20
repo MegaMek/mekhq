@@ -1,18 +1,18 @@
 /*
  * Copyright (c) 2017 - The MegaMek Team
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -41,29 +41,29 @@ import mekhq.campaign.work.IAcquisitionWork;
  * Ammo bin for a weapon bay that combines multiple tons of ammo into a single bin. Reload times
  * are calculated per ton, and a  reload tech action handles a single ton of ammo (or whatever the
  * smallest amount is for capital weapon ammo).
- * 
+ *
  * When the munition type is changed, fix actions diminish the capacity of this bay and add to
  * the capacity of the appropriate bin in the same bay.
- * 
+ *
  * @author Neoancient
  *
  */
 public class LargeCraftAmmoBin extends AmmoBin {
-    
+
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = -7931419849350769887L;
-    
+
     private double capacity;
     private int bayEqNum;
-    
+
     transient private Mounted bay;
-    
+
     public LargeCraftAmmoBin() {
         this(0, null, -1, 0, 0, null);
     }
-    
+
     public LargeCraftAmmoBin(int tonnage, EquipmentType et, int equipNum, int shotsNeeded, double capacity,
             Campaign c) {
         super(tonnage, et, equipNum, shotsNeeded, false, false, c);
@@ -77,7 +77,7 @@ public class LargeCraftAmmoBin extends AmmoBin {
         clone.copyBaseData(this);
         return clone;
     }
-    
+
     /**
      * @return The <code>Mounted</code> of the unit's <code>Entity</code> that contains this ammo bin,
      *         or null if there is no unit or the ammo bin is not in any bay.
@@ -103,8 +103,8 @@ public class LargeCraftAmmoBin extends AmmoBin {
                 "Could not find weapon bay for " + typeName + " for " + unit.getName());
         return null;
     }
-    
-    
+
+
     public int getBayEqNum() {
         return bayEqNum;
     }
@@ -119,7 +119,7 @@ public class LargeCraftAmmoBin extends AmmoBin {
             this.bay = bay;
         }
     }
-    
+
     /**
      * Sets the bay for this ammo bin. Does not check whether the ammo bin is actually in the bay.
      * @param bayEqNum
@@ -130,29 +130,29 @@ public class LargeCraftAmmoBin extends AmmoBin {
             bay = unit.getEntity().getEquipment(bayEqNum);
         }
     }
-    
+
     @Override
     public double getTonnage() {
         return getCurrentShots() * type.getTonnage(null) / ((AmmoType) type).getShots();
     }
-    
+
     public double getCapacity() {
         return capacity;
     }
-    
+
     public void setCapacity(double capacity) {
         this.capacity = capacity;
     }
-    
+
     public double getUnusedCapacity() {
         return capacity - Math.ceil(getCurrentShots() * type.getTonnage(null) / ((AmmoType) type).getShots());
     }
-    
+
     @Override
     public int getFullShots() {
         return (int) Math.floor(capacity * ((AmmoType) type).getShots() / type.getTonnage(null));
     }
-    
+
     @Override
     public long getValueNeeded() {
         return adjustCostsForCampaignOptions((long)(capacity * getPricePerTon()
@@ -165,7 +165,7 @@ public class LargeCraftAmmoBin extends AmmoBin {
         // of the bay and the unit should be the same.
         return (long) getType().getRawCost();
     }
-    
+
     @Override
     public long getStickerPrice() {
         return (long)(capacity * getPricePerTon() * (1.0 * getCurrentShots()/getShotsPerTon()));
@@ -206,7 +206,7 @@ public class LargeCraftAmmoBin extends AmmoBin {
             loadBinSingle();
         }
     }
-    
+
     public void loadBinSingle() {
         int shots = Math.min(getAmountAvailable(), Math.min(shotsNeeded, ((AmmoType) type).getShots()));
         if(null != unit) {
@@ -235,7 +235,7 @@ public class LargeCraftAmmoBin extends AmmoBin {
             changeAmountAvailable(shots, curType);
         }
     }
-    
+
     @Override
     public MissingPart getMissingPart() {
         return null;
@@ -291,7 +291,7 @@ public class LargeCraftAmmoBin extends AmmoBin {
     @Override
     public boolean needsFixing() {
         return (shotsNeeded < 0)
-                || ((shotsNeeded > 0) && (type.getTonnage(null) <= bayAvailableCapacity())); 
+                || ((shotsNeeded > 0) && (type.getTonnage(null) <= bayAvailableCapacity()));
     }
 
     /**
@@ -374,5 +374,5 @@ public class LargeCraftAmmoBin extends AmmoBin {
     public boolean isOmniPoddable() {
         return false;
     }
-    
+
 }

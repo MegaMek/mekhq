@@ -23,24 +23,24 @@ import mekhq.gui.ReportHyperlinkListener;
  * @author Jay Lawson
  */
 public class DailyReportLogDialog extends JDialog {
-    
+
     private static final long serialVersionUID = 3624327778807359294L;
 
     private DailyReportLogPanel panLog;
-    
+
     private CampaignGUI gui;
- 
+
     public DailyReportLogDialog(Frame parent, CampaignGUI gui, ReportHyperlinkListener listener) {
         super(parent, false);
         this.gui = gui;
         panLog = new DailyReportLogPanel(listener);
-        initComponents();   
+        initComponents();
         setMinimumSize(new Dimension(400, 500));
         setLocationRelativeTo(parent);
     }
-    
+
     private void initComponents() {
-        
+
         setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent we) {
@@ -51,11 +51,11 @@ public class DailyReportLogDialog extends JDialog {
         setLayout(new BorderLayout());
         add(panLog, BorderLayout.CENTER);
     }
-    
+
     public void refreshLog(String report) {
         panLog.refreshLog(report);
     }
-    
+
     public void appendLog(List<String> newReports) {
     	panLog.appendLog(newReports);
     }

@@ -18,7 +18,7 @@ import javax.swing.JTextField;
 public class ChatClient extends JPanel implements ActionListener {
 
     /**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = -7447573101863923187L;
 

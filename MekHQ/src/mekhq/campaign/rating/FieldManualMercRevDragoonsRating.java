@@ -296,10 +296,10 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
         dropJumpShipSupportNeeded += hours;
     }
 
-    // The wording on this in FM:Mr is rather confusing.  Near as I can parse 
-    // it out, you divide your total personnel into 7-man "squads".  These each 
-    // require 4 hours of medical support (3 + (7/5) = 3 + 1.4 = 4.4 rounds to 
-    // 4).   The left over personnel form a new "squad" which requires 3 hours 
+    // The wording on this in FM:Mr is rather confusing.  Near as I can parse
+    // it out, you divide your total personnel into 7-man "squads".  These each
+    // require 4 hours of medical support (3 + (7/5) = 3 + 1.4 = 4.4 rounds to
+    // 4).   The left over personnel form a new "squad" which requires 3 hours
     // + (# left over / 5).  So, if you have 25 personnel that would be:
     //   25 / 7 = 3 squads of 7 and 1 squad of 4.
     //   3 * (3 + 7/5) = 3 * (3 + 1.4) = 3 * 4 = 12 hours
@@ -543,7 +543,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
         }
 
         /*
-          todo consider adding rpg traits in MekHQ (they would have no impact 
+          todo consider adding rpg traits in MekHQ (they would have no impact
           todo on megamek).
           value += (total positive - total negative)
           See FM: Mercs (rev) pg 154 for a full list.
@@ -1036,7 +1036,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
             return 0;
         }
 
-        //Number of high-tech units is equal to the number of IS2 units plus 
+        //Number of high-tech units is equal to the number of IS2 units plus
         // twice the number of Clan units.
         BigDecimal highTechNumber = new BigDecimal(getCountIS2() +
                                                    (getCountClan() * 2));
@@ -1061,7 +1061,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
         BigDecimal scoredPercent = getHighTechPercent().subtract(
                 new BigDecimal(30));
 
-        //If we have a negative value (hi-tech percent was < 30%) return a 
+        //If we have a negative value (hi-tech percent was < 30%) return a
         // value of zero.
         if (scoredPercent.compareTo(BigDecimal.ZERO) <= 0) {
             return 0;
@@ -1087,11 +1087,11 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
     }
 
     /**
-     * Adds the tech level of the passed unit to the number of Clan or IS 
+     * Adds the tech level of the passed unit to the number of Clan or IS
      * Advanced units in the list (as appropriate).
      *
      * @param u     The {@code Unit} to be evaluated.
-     * @param value The unit's value.  Most have a value of '1' but infantry 
+     * @param value The unit's value.  Most have a value of '1' but infantry
      *              and battle armor are less.
      */
     private void updateAdvanceTechCount(Unit u, BigDecimal value) {
@@ -1174,7 +1174,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
     private int getCountClan() {
         return countClan;
     }
-    
+
     public UnitRatingMethod getUnitRatingMethod() {
         return UnitRatingMethod.FLD_MAN_MERCS_REV;
     }

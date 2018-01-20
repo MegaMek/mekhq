@@ -51,7 +51,7 @@ import mekhq.campaign.CampaignOptions;
 
 /**
  * @author Neoancient
- * 
+ *
  * Uses Factions and Planets to weighted lists of potential employers
  * and enemies for contract generation. Also finds a suitable planet
  * for the action.
@@ -65,10 +65,10 @@ import mekhq.campaign.CampaignOptions;
  */
 public class RandomFactionGenerator implements Serializable {
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = -7346225681238948390L;
-	
+
 	/* When checking for potential enemies, count the planets controlled
 	 * by potentially hostile factions within a certain number of jumps of
 	 * friendly worlds; the number is based on the region of space.
@@ -79,11 +79,11 @@ public class RandomFactionGenerator implements Serializable {
 	private static final int BORDER_RANGE_DEEP_PERIPHERY = 210; //a bit more than this distance between HL and NC
 
 	private static RandomFactionGenerator rfg = null;
-	
+
 	private TreeSet<String> currentFactions;
 	/* all factions that control at least one system at the current date
 	 */
-	
+
 	private ArrayList<String> employers;
 	/* list of potential employers weighted by number of systems controlled
 	 */
@@ -91,26 +91,26 @@ public class RandomFactionGenerator implements Serializable {
 	/*List of systems controlled by faction key1 that are within one
 	 * jump of faction key2
 	 */
-	
+
 	private HashSet<String> deepPeriphery;
 	private HashSet<String> neutralFactions;
 	private HashSet<String> majorPowers;
-	
+
 	private HashMap<String, HashMap<String, ArrayList<FactionHint>>> wars;
 	private HashMap<String, HashMap<String, ArrayList<FactionHint>>> alliances;
 	private HashMap<String, HashMap<String, ArrayList<FactionHint>>> rivals;
 	private HashMap<String, HashMap<String, ArrayList<FactionHint>>> neutralExceptions;
 	private HashMap<String, HashMap<String, ArrayList<AltLocation>>> containedFactions;
-	
+
 	private ArrayList<ActionListener> listeners;
 	private Thread loader;
 	private static boolean initialized = false;
 	private static boolean initializing = false;
-	
+
 	/* Track time and location; only update if one of them has changed */
 	private Date lastUpdate = null;
 	private Planet lastLocation = null;
-	
+
 	private RandomFactionGenerator() {
 		currentFactions = new TreeSet<String>();
 		employers = new ArrayList<String>();
@@ -124,16 +124,16 @@ public class RandomFactionGenerator implements Serializable {
 		neutralExceptions = new HashMap<String, HashMap<String, ArrayList<FactionHint>>>();
 		containedFactions = new HashMap<String, HashMap<String, ArrayList<AltLocation>>>();
 		listeners = new ArrayList<ActionListener>();
-		
+
 		lastUpdate = new Date(0); //initialize 1 Jan 1970
 		lastLocation = Planets.getInstance().getPlanets().get("Terra");
 	}
-	
+
 	public static RandomFactionGenerator getInstance() {
 		if (rfg == null) {
 			rfg = new RandomFactionGenerator();
 		}
-		
+
 		if (!initialized && !initializing) {
 			initializing = true;
 			rfg.loader = new Thread(new Runnable() {
@@ -153,11 +153,11 @@ public class RandomFactionGenerator implements Serializable {
 		}
 		return rfg;
 	}
-	
+
 	public boolean isInitialized() {
 		return initialized;
 	}
-	
+
 	private void initialize() {
 		try {
 			loadFactionHints();
@@ -173,7 +173,7 @@ public class RandomFactionGenerator implements Serializable {
 			l.actionPerformed(new ActionEvent(this, 0, "FactionGeography initialized"));
 		}
 	}
-	
+
 	public void dispose() {
 		if (initialized){
 			clear();
@@ -187,51 +187,51 @@ public class RandomFactionGenerator implements Serializable {
 		borders.clear();
 		deepPeriphery.clear();
 		neutralFactions.clear();
-		majorPowers.clear();		
+		majorPowers.clear();
 		wars.clear();
 		alliances.clear();
 		rivals.clear();
 		neutralExceptions.clear();
 		containedFactions.clear();
-		
+
 		initialized = false;
 		initializing = false;
-	}	
+	}
 
-	
+
 	private void loadFactionHints() throws DOMException, ParseException {
 	    final String METHOD_NAME = "loadFactionHints()"; //$NON-NLS-1$
-	    
+
 	    MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO,
 	            "Starting load of faction hint data from XML..."); //$NON-NLS-1$
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		Document xmlDoc = null;
-		
+
 		try {
 			FileInputStream fis = new FileInputStream("data/universe/factionhints.xml"); //$NON-NLS-1$
 			DocumentBuilder db = dbf.newDocumentBuilder();
-	
+
 			xmlDoc = db.parse(fis);
 		} catch (Exception ex) {
 	        MekHQ.getLogger().log(getClass(), METHOD_NAME, ex);
 		}
-		
+
 		Element rootElement = xmlDoc.getDocumentElement();
 		NodeList nl = rootElement.getChildNodes();
 		rootElement.normalize();
-		
+
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 		for (int i = 0; i < nl.getLength(); i++) {
 			final Date epoch_start = df.parse("0001-01-01");
 			final Date epoch_end = df.parse("9999-12-31");
 			Node wn = nl.item(i);
-			
+
 			if (wn.getParentNode() != rootElement)
 				continue;
-			
+
 			if (wn.getNodeType() == Node.ELEMENT_NODE) {
 				String nodeName = wn.getNodeName();
-				
+
 				if (nodeName.equalsIgnoreCase("neutral")) {
 					String f = wn.getAttributes().getNamedItem("faction").getTextContent().trim();
 					if (Faction.getFaction(f) != null) {
@@ -311,11 +311,11 @@ public class RandomFactionGenerator implements Serializable {
 			}
 		}
 	}
-	
+
 	private void setFactionHint(HashMap<String, HashMap<String, ArrayList<FactionHint>>> hint,
 			Node node) throws DOMException, ParseException {
 	    final String METHOD_NAME = "setFactionHint(HashMap<String,HashMap<String,ArrayList<FactionHint>>>,Node"; //$NON-NLS-1$
-	    
+
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 		final Date epoch_start = df.parse("0001-01-01");
 		final Date epoch_end = df.parse("9999-12-31");
@@ -343,9 +343,9 @@ public class RandomFactionGenerator implements Serializable {
 				if (wn.getAttributes().getNamedItem("end") != null) {
 					localEnd = df.parse(wn.getAttributes().getNamedItem("end").getTextContent().trim());
 				}
-				
+
 				String[] parties = wn.getTextContent().trim().split(",");
-				
+
 				for (int i = 0; i < parties.length - 1; i++) {
 					if (Faction.getFaction(parties[i]) == null) {
                         MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
@@ -368,12 +368,12 @@ public class RandomFactionGenerator implements Serializable {
 					}
 				}
 			}
-		}	
+		}
 	}
-	
+
 	private void addNeutralExceptions(String faction, Node node) throws DOMException, ParseException {
 	    final String METHOD_NAME = "addNeutralExceptions(String,Node)"; //$NON-NLS-1$
-	    
+
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 		final Date epoch_start = df.parse("0001-01-01");
 		final Date epoch_end = df.parse("9999-12-31");
@@ -394,9 +394,9 @@ public class RandomFactionGenerator implements Serializable {
 				if (wn.getAttributes().getNamedItem("end") != null) {
 					localEnd = df.parse(wn.getAttributes().getNamedItem("end").getTextContent().trim());
 				}
-				
+
 				String[] parties = wn.getTextContent().trim().split(",");
-				
+
 				for (int i = 0; i < parties.length; i++) {
 					if (Faction.getFaction(parties[i]) == null) {
                         MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
@@ -412,17 +412,17 @@ public class RandomFactionGenerator implements Serializable {
 					neutralExceptions.get(faction).get(parties[i]).add(new FactionHint(faction, localStart, localEnd));
 				}
 			}
-		}	
+		}
 	}
-	
+
 	public void registerListener(ActionListener l) {
 		listeners.add(l);
 	}
-	
+
 	public void removeListener(ActionListener l) {
 		listeners.remove(l);
 	}
-	
+
 	public void updateTables(Date date, Planet currentLocation,
 			CampaignOptions options) {
         final Date FORTRESS_REPUBLIC = new Date (new GregorianCalendar(3135,10,1).getTimeInMillis());
@@ -437,11 +437,11 @@ public class RandomFactionGenerator implements Serializable {
 		for (Planet p : Planets.getInstance().getPlanets().values()) {
 			for (Faction f : p.getFactionSet(Utilities.getDateTimeDay(date))) {
 			    if(f == null) {
-                    MekHQ.getLogger().log(this.getClass(), "RandomFactionGenerator.updateTables", 
+                    MekHQ.getLogger().log(this.getClass(), "RandomFactionGenerator.updateTables",
                             LogLevel.ERROR, "Invalid faction code [" + f + "] in planets.xml for planet " + p.getId() + " in year " + date);
                     continue;
                 }
-			    
+
 				String fName = f.getShortName();
 				if (fName.equals("ABN") ||
 						fName.equals("UND") ||
@@ -481,29 +481,29 @@ public class RandomFactionGenerator implements Serializable {
 				}
 			}
 		}
-		
+
 		//Add rebels and pirates
 		currentFactions.add("REB");
 		currentFactions.add("PIR");
 	}
-	
+
 	private void updateBorders(Faction f, Planet p) {
 		int distance = BORDER_RANGE_IS;
 		if (f.isClan()) {
 			distance = BORDER_RANGE_CLAN;
 		} else if (deepPeriphery.contains(f.getShortName())) {
-			distance = BORDER_RANGE_DEEP_PERIPHERY;			
+			distance = BORDER_RANGE_DEEP_PERIPHERY;
 		} else if (f.isPeriphery()) {
 			distance = BORDER_RANGE_NEAR_PERIPHERY;
 		}
 		for (Planet planetKey : Planets.getInstance().getNearbyPlanets(p, distance)) {
 			for (Faction f2 : planetKey.getFactionSet(Utilities.getDateTimeDay(lastUpdate))) {
 			    if(f2 == null) {
-			        MekHQ.getLogger().log(this.getClass(), "RandomFactionGenerator.UpdateBorders", 
+			        MekHQ.getLogger().log(this.getClass(), "RandomFactionGenerator.UpdateBorders",
 			                LogLevel.ERROR, "Invalid faction code [" + f2 + "] in planets.xml for planet " + planetKey.getId() + " in year " + lastUpdate);
 			        continue;
 			    }
-			    
+
 				String eName = f2.getShortName();
 				if (eName.equals("ABN") ||
 						eName.equals("UND") ||
@@ -557,7 +557,7 @@ public class RandomFactionGenerator implements Serializable {
 				borders.get("PIR").put(fName, new HashSet<Planet>());
 			}
 			borders.get("PIR").get(fName).add(p);
-			
+
 			/* Ignore allies (unless both are Clan) */
 			if (hintApplies(alliances, fName, eName, lastUpdate) &&
 					!(Faction.getFaction(fName).isClan() &&
@@ -584,18 +584,18 @@ public class RandomFactionGenerator implements Serializable {
 			borders.get(fName).get(eName).add(p);
 		}
 	}
-	
+
 	public TreeSet<String> getCurrentFactions() {
 		return currentFactions;
 	}
-	
+
 	public String getEmployer() {
 		return Utilities.getRandomItem(employers);
 	}
-	
+
 	public String getEnemy(String fName, boolean useRebels) {
 	    final String METHOD_NAME = "getEnemy(String,boolean)"; //$NON-NLS-1$
-	    
+
 		/* Rebels occur on a 1-4 (d20) on nearly every enemy chart */
 		if (useRebels && Compute.randomInt(5) == 0) {
 			return "REB";
@@ -647,15 +647,15 @@ public class RandomFactionGenerator implements Serializable {
 		        "Could not find enemy for " + fName); //$NON-NLS-1$
 		return "PIR";
 	}
-	
+
 	public HashSet<String> getEmployerSet() {
 		HashSet<String> retval = new HashSet<String>();
 		for (String fName : employers) {
 			retval.add(fName);
 		}
 		return retval;
-	}	
-	
+	}
+
 	public ArrayList<String> getEnemyList(String employer) {
 		ArrayList<String> list = new ArrayList<String>();
 		if (borders.get(employer) != null) {
@@ -670,7 +670,7 @@ public class RandomFactionGenerator implements Serializable {
 		}
 		return list;
 	}
-	
+
 	private double adjustBorderWeight(double count, String f,
 			String enemy, Date date) {
 		final Date tukayyid = new Date (new GregorianCalendar(3052,5,20).getTimeInMillis());
@@ -697,7 +697,7 @@ public class RandomFactionGenerator implements Serializable {
 		}
 		return count;
 	}
-	
+
 	public String getMissionTarget(String attacker, String defender, Date date, Planet currentPlanet, int searchRadius) {
 		ArrayList<Planet> planetList = getMissionTargetList(attacker, defender, date, currentPlanet, searchRadius);
 		if (planetList.size() > 0) {
@@ -705,7 +705,7 @@ public class RandomFactionGenerator implements Serializable {
 		}
 		return null;
 	}
-	
+
 	public ArrayList<Planet> getMissionTargetList(String attacker, String defender, Date date, Planet currentPlanet, int searchRadius) {
 		boolean filterByDistance = (currentPlanet != null);
 		ArrayList<Planet> planetList = new ArrayList<Planet>();
@@ -713,7 +713,7 @@ public class RandomFactionGenerator implements Serializable {
 		if (deepPeriphery.contains(attacker) || deepPeriphery.contains(defender)) {
 			maxJumps = 8;
 		}
-		HashSet<Planet> border = null;		
+		HashSet<Planet> border = null;
 		if (borders.get(attacker) != null && borders.get(attacker).get(defender) != null) {
 			border = borders.get(attacker).get(defender);
 		} else {
@@ -764,19 +764,19 @@ public class RandomFactionGenerator implements Serializable {
 		}
 		return planetList;
 	}
-	
+
 	public boolean isMajorPower(Faction f) {
 		return majorPowers.contains(f.getShortName());
 	}
-	
+
 	public boolean isISMajorPower(String fName) {
 		return majorPowers.contains(fName);
 	}
-	
+
 	public boolean isAtWarWith(String f1, String f2, Date date) {
 		return hintApplies(wars, f1, f2, date);
 	}
-	
+
 	public String getCurrentWar(String f1, String f2, Date date) {
 		if (wars.get(f1) != null && wars.get(f1).get(f2) != null) {
 			for (FactionHint fh : wars.get(f1).get(f2)) {
@@ -787,11 +787,11 @@ public class RandomFactionGenerator implements Serializable {
 		}
 		return null;
 	}
-	
+
 	public boolean isNeutral(String faction) {
 		return neutralFactions.contains(faction);
 	}
-	
+
 	private boolean hintApplies(HashMap<String, HashMap<String, ArrayList<FactionHint>>> hints,
 				String f1, String f2, Date date) {
 		if (hints.get(f1) != null && hints.get(f1).get(f2) != null) {
@@ -810,7 +810,7 @@ public class RandomFactionGenerator implements Serializable {
 		}
 		return false;
 	}
-	
+
 	private HashSet<String> getContainedFactions(String f, Date date) {
 		HashSet<String> retval = new HashSet<String>();
 		if (containedFactions.get(f) != null) {
@@ -824,7 +824,7 @@ public class RandomFactionGenerator implements Serializable {
 		}
 		return retval;
 	}
-	
+
 	private double getAltLocationFraction(String f1, String f2, Date date) {
 		if (containedFactions.get(f1) != null && containedFactions.get(f1).get(f2) != null) {
 			for (AltLocation l : containedFactions.get(f1).get(f2)) {
@@ -835,13 +835,13 @@ public class RandomFactionGenerator implements Serializable {
 		}
 		return 0.0;
 	}
-	
+
 	public boolean isContainedFactionOpponent(Faction f1, Faction f2,
 			Faction opponent, Date date) {
 		return isContainedFactionOpponent(f1.getShortName(),
 				f2.getShortName(), opponent.getShortName(), date);
 	}
-	
+
 	public boolean isContainedFactionOpponent(String outer, String inner,
 				String opponent, Date date) {
 		if (containedFactions.get(outer) != null && containedFactions.get(outer).get(inner) != null) {
@@ -861,7 +861,7 @@ public class RandomFactionGenerator implements Serializable {
 		}
 		return false;
 	}
-	
+
 	class FactionHint {
 		/**
 		 * Each participant in a war or an alliance has one instance
@@ -870,7 +870,7 @@ public class RandomFactionGenerator implements Serializable {
 		public String name;
 		public Date start;
 		public Date end;
-		
+
 		public FactionHint (String n, Date s, Date e) {
 			name = n;
 			start = (Date)s.clone();
@@ -881,11 +881,11 @@ public class RandomFactionGenerator implements Serializable {
 	class AltLocation extends FactionHint {
 		public double fraction;
 		public ArrayList<String> opponents;
-			
+
 		public AltLocation (Date s, Date e, double f, ArrayList<String> opponents) {
 			super(null, s, e);
 			fraction = f;
 			this.opponents = opponents;
-		}		
+		}
 	}
 }

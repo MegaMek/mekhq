@@ -147,7 +147,7 @@ public final class BriefingTab extends CampaignGuiTab {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see mekhq.gui.CampaignGuiTab#initTab()
      */
     @Override
@@ -477,10 +477,10 @@ public final class BriefingTab extends CampaignGuiTab {
                 JOptionPane.YES_NO_OPTION)) {
             return;
         }
-        
+
         AtBScenarioFactory.createScenariosForNewWeek(getCampaign(), false);
     }
-    
+
     private void addScenario() {
         Mission m = getCampaign().getMission(selectedMission);
         if (null != m) {
@@ -906,7 +906,7 @@ public final class BriefingTab extends CampaignGuiTab {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see mekhq.gui.CampaignGuiTab#refreshAll()
      */
     @Override
@@ -972,7 +972,7 @@ public final class BriefingTab extends CampaignGuiTab {
         splitScenario.getBottomComponent().setVisible(getCampaignOptions().getUseAtB());
         splitScenario.resetToPreferredSizes();
     }
-    
+
     @Subscribe
     public void handle(ScenarioChangedEvent ev) {
         if (ev.getScenario() != null && ev.getScenario().getMissionId() == selectedMission) {
@@ -982,12 +982,12 @@ public final class BriefingTab extends CampaignGuiTab {
             }
         }
     }
-    
+
     @Subscribe
     public void handle(ScenarioResolvedEvent ev) {
         missionsScheduler.schedule();
     }
-    
+
     @Subscribe
     public void handle(OrganizationChangedEvent ev) {
         scenarioDataScheduler.schedule();
@@ -995,32 +995,32 @@ public final class BriefingTab extends CampaignGuiTab {
             lanceAssignmentScheduler.schedule();
         }
     }
-    
+
     @Subscribe
     public void handle(ScenarioNewEvent ev) {
         scenarioDataScheduler.schedule();
     }
-    
+
     @Subscribe
     public void handle(ScenarioRemovedEvent ev) {
         scenarioDataScheduler.schedule();
     }
-    
+
     @Subscribe
     public void handle(MissionNewEvent ev) {
         missionsScheduler.schedule();
     }
-    
+
     @Subscribe
     public void handle(MissionRemovedEvent ev) {
         missionsScheduler.schedule();
     }
-    
+
     @Subscribe
     public void handle(MissionCompletedEvent ev) {
         missionsScheduler.schedule();
     }
-    
+
     @Subscribe
     public void handle(MissionChangedEvent ev) {
         if (ev.getMission().getId() == selectedMission) {

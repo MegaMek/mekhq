@@ -65,7 +65,7 @@ public class PopupValueChoiceDialog extends JDialog implements WindowListener, C
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         addWindowListener(this);
 	}
-	
+
     public PopupValueChoiceDialog(Frame parent, boolean modal, String title, int current, int min, int max) {
         super(parent, modal);
         this.max = max;

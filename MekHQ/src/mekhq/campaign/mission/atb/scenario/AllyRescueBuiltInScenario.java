@@ -66,7 +66,7 @@ public class AllyRescueBuiltInScenario extends AtBScenario {
 
 		setStart(Board.START_S);
 		setDeploymentDelay(12);
-		
+
 		for (int i = 0; i < 4; i++) {
 			getAlliesPlayer().add(getEntity(getContract(campaign).getEmployerCode(), getContract(campaign).getAllySkill(),
 					getContract(campaign).getAllyQuality(), UnitType.MEK,
@@ -76,14 +76,14 @@ public class AllyRescueBuiltInScenario extends AtBScenario {
 		}
 
 		ArrayList<Entity> otherForce = new ArrayList<Entity>();
-		
+
 		for (int i = 0; i < 8; i++) {
 			otherForce.add(getEntity(getContract(campaign).getEmployerCode(), getContract(campaign).getAllySkill(),
 					getContract(campaign).getAllyQuality(), UnitType.MEK, UnitMarket.getRandomAeroWeight(), // max
 																											// heavy
 					campaign));
 		}
-		
+
 		addBotForce(new BotForce(getContract(campaign).getAllyBotName(), 1, Board.START_CENTER, otherForce));
 
 		for (int i = 0; i < 12; i++) {
@@ -93,7 +93,7 @@ public class AllyRescueBuiltInScenario extends AtBScenario {
 																													// 'Mechs
 					campaign));
 		}
-		
+
 		addBotForce(getEnemyBotForce(getContract(campaign), Board.START_N, enemyEntities));
 	}
 }

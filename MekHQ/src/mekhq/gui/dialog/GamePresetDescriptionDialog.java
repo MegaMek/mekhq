@@ -17,7 +17,7 @@ import megamek.common.util.EncodeControl;
  * @author Jay Lason
  */
 public class GamePresetDescriptionDialog extends javax.swing.JDialog {
-	
+
 	private static final long serialVersionUID = 3624327778807359294L;
 
 	private javax.swing.JTextField txtTitle;
@@ -30,7 +30,7 @@ public class GamePresetDescriptionDialog extends javax.swing.JDialog {
 	public GamePresetDescriptionDialog(java.awt.Frame parent, boolean modal, String title, String desc) {
         super(parent, modal);
         setTitle("Enter description of preset");
-        initComponents();    
+        initComponents();
         txtTitle.setText(title);
         txtDesc.setText(desc);
         changed = false;
@@ -38,7 +38,7 @@ public class GamePresetDescriptionDialog extends javax.swing.JDialog {
         setPreferredSize(new Dimension(400, 250));
         setLocationRelativeTo(parent);
     }
-	
+
 	private void initComponents() {
 		java.awt.GridBagConstraints gridBagConstraints;
 
@@ -51,12 +51,12 @@ public class GamePresetDescriptionDialog extends javax.swing.JDialog {
 		ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.TextAreaDialog", new EncodeControl()); //$NON-NLS-1$
 
 		setLayout(new java.awt.GridBagLayout());
-		
+
 		txtDesc.setName("txtDesc");
 		txtDesc.setEditable(true);
 		txtDesc.setLineWrap(true);
 		txtDesc.setWrapStyleWord(true);
-		
+
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 0;
@@ -66,7 +66,7 @@ public class GamePresetDescriptionDialog extends javax.swing.JDialog {
 		gridBagConstraints.weighty = 0.0;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		add(new JLabel("Title:"), gridBagConstraints);
-		
+
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 1;
 		gridBagConstraints.gridy = 0;
@@ -76,9 +76,9 @@ public class GamePresetDescriptionDialog extends javax.swing.JDialog {
 		gridBagConstraints.weighty = 0.0;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		add(txtTitle, gridBagConstraints);
-		
+
 		scrText.setPreferredSize(new Dimension(450, 100));
-		scrText.setViewportView(txtDesc);	
+		scrText.setViewportView(txtDesc);
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 1;
@@ -88,7 +88,7 @@ public class GamePresetDescriptionDialog extends javax.swing.JDialog {
 		gridBagConstraints.weighty = 1.0;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		add(scrText, gridBagConstraints);
-		
+
 		btnOK.setText(resourceMap.getString("btnOK.text"));
 		btnOK.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -103,7 +103,7 @@ public class GamePresetDescriptionDialog extends javax.swing.JDialog {
 		gridBagConstraints.weighty = 0.0;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.CENTER;
 		add(btnOK, gridBagConstraints);
-		
+
 		btnCancel.setText(resourceMap.getString("btnCancel.text"));
 		btnCancel.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -117,24 +117,24 @@ public class GamePresetDescriptionDialog extends javax.swing.JDialog {
 		gridBagConstraints.weightx = 0.5;
 		gridBagConstraints.weighty = 0.0;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.CENTER;
-		add(btnCancel, gridBagConstraints);		
+		add(btnCancel, gridBagConstraints);
 	}
-	
+
 	public String getTitle() {
 		return txtTitle.getText();
 	}
-	
+
 	public String getDesc() {
 		return txtDesc.getText();
 	}
-	
+
 	private void btnOKActionPerformed() {
 		changed = true;
 		setVisible(false);
 	}
-	
+
 	public boolean wasChanged() {
 		return changed;
 	}
-	
+
 }

@@ -116,7 +116,7 @@ public class Faction {
     public boolean isClan() {
         return is(Tag.CLAN);
     }
-    
+
     public boolean isComstar() {
         return "CS".equals(shortname);
     }
@@ -145,7 +145,7 @@ public class Faction {
             if(year < 2570) {
                 //Era: Age of War
                 return eraMods[0];
-            } 
+            }
             else if(year < 2598) {
                 //Era: RW
                 return eraMods[1];
@@ -153,7 +153,7 @@ public class Faction {
             else if(year < 2785) {
                 //Era: Star League
                 return eraMods[2];
-            } 
+            }
             else if(year < 2828) {
                 //Era: 1st SW
                 return eraMods[3];
@@ -216,15 +216,15 @@ public class Faction {
 
         return factionMod;
     }
-    
+
     public boolean is(Faction.Tag tag) {
         return tags.contains(tag);
     }
-    
+
     public boolean validIn(int year) {
         return (year >= start) && (year <= end);
     }
-    
+
     public boolean validIn(DateTime time) {
         return validIn(time.getYear());
     }
@@ -232,7 +232,7 @@ public class Faction {
     public Integer getId() {
         return id;
     }
-    
+
     public boolean hasName(String name) {
         if (name.equals(fullname)
                 || nameChanges.values().stream().anyMatch(n -> n.equals(name))) {
@@ -247,11 +247,11 @@ public class Faction {
         }
         return false;
     }
-    
+
     public static Collection<Faction> getFactions() {
         return factions.values();
     }
-    
+
     public static Collection<String> getFactionList() {
         return new ArrayList<>(factions.keySet());
     }
@@ -282,7 +282,7 @@ public class Faction {
 
     public static Faction getFactionFromXML(Node wn) throws DOMException, ParseException {
         final String METHOD_NAME = "getFactionFromXML(Node)"; //$NON-NLS-1$
-        
+
         Faction retVal = new Faction();
         NodeList nl = wn.getChildNodes();
 
@@ -352,7 +352,7 @@ public class Faction {
 
     public static void generateFactions() throws DOMException, ParseException {
         final String METHOD_NAME = "generateFactions()";
-        
+
         MekHQ.getLogger().log(Faction.class, METHOD_NAME, LogLevel.INFO,
                 "Starting load of faction data from XML..."); //$NON-NLS-1$
         // Initialize variables.
@@ -435,7 +435,7 @@ public class Faction {
         Collections.sort(factionNames);
         return Utilities.combineString(factionNames, "/"); //$NON-NLS-1$
     }
-    
+
     public static enum Tag {
         /** Inner sphere */
         IS, PERIPHERY, CLAN,

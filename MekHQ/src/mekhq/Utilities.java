@@ -143,10 +143,10 @@ public class Utilities {
      * <pre>
      * collection.get(Compute.randomInt(collection.size());
      * </pre>
-     * 
+     *
      * @return <i>null</i> if the collection itself is null or empty;
      * can return <i>null</i> if the collection contains <i>null</i> items.
-     * 
+     *
      */
     public static <T> T getRandomItem(Collection<? extends T> collection) {
         if((null == collection) || collection.isEmpty()) {
@@ -168,10 +168,10 @@ public class Utilities {
      * <pre>
      * list.get(Compute.randomInt(list.size());
      * </pre>
-     * 
+     *
      * @return <i>null</i> if the list itself is null or empty;
      * can return <i>null</i> if the list contains <i>null</i> items.
-     * 
+     *
      */
     public static <T> T getRandomItem(List<? extends T> list) {
         if((null == list) || list.isEmpty() ) {
@@ -180,7 +180,7 @@ public class Utilities {
         int index = Compute.randomInt(list.size());
         return list.get(index);
     }
-    
+
     /**
      * @return linear interpolation value between min and max
      */
@@ -188,7 +188,7 @@ public class Utilities {
         // The order of operations is important here, to not lose precision
         return min * (1.0 - f) + max * f;
     }
-    
+
     /**
      * @return linear interpolation value between min and max, rounded to the nearest integer
      */
@@ -196,7 +196,7 @@ public class Utilities {
         // The order of operations is important here, to not lose precision
         return (int)Math.round(min * (1.0 - f) + max * f);
     }
-    
+
     /**
      * @return linear interpolation value between min and max, rounded to the nearest coordinate
      * <p>
@@ -238,16 +238,16 @@ public class Utilities {
      * it is needed or not. Since Java guarantees the order of evaluation for arguments to be
      * the same as the order in which they appear (JSR 15.7.4), this makes it more suitable
      * for re-playable procedural generation and similar method calls with side effects.
-     * 
+     *
      * @return the first argument if it's not <i>null</i>, else the second argument
      */
     public static <T> T nonNull(T first, T second) {
         return (null != first) ? first : second;
     }
-    
+
     /**
      * For details and caveats, see the two-argument method.
-     * 
+     *
      * @return the first non-<i>null</i> argument, else <i>null</i> if all are <i>null</i>
      */
     @SafeVarargs
@@ -302,7 +302,7 @@ public class Utilities {
                             && !atype.hasFlag(AmmoType.F_PROTOMECH)) {
                 continue;
             }
-            
+
             if (atype.hasFlag(AmmoType.F_NUCLEAR) && atype.hasFlag(AmmoType.F_CAP_MISSILE)
                     && !entity.getGame().getOptions().booleanOption(OptionsConstants.ADVAERORULES_AT2_NUKES)) {
                 continue;
@@ -404,7 +404,7 @@ public class Utilities {
 		}
 		return variants;
 	}
-	
+
 	public static boolean isOmniVariant(Entity entity1, Entity entity2) {
 	    if (!entity1.isOmni() || !entity2.isOmni()) {
 	        return false;
@@ -473,7 +473,7 @@ public class Utilities {
                             return false;
                         }
                     }
-                }                
+                }
             }
             if (!fixedEquipment.isEmpty()) {
                 return false;
@@ -816,12 +816,12 @@ public class Utilities {
     		Person p = c.newPerson(Person.T_NAVIGATOR);
     		navigator = p;
     	}
-    	
+
     	if (u.canTakeTechOfficer()) {
     	    Person p = c.newPerson(Person.T_VEE_GUNNER);
     	    consoleCmdr = p;
     	}
-    	
+
 		for(Person p : drivers) {
             if (!nameset) {
                 p.setName(commanderName);
@@ -849,14 +849,14 @@ public class Utilities {
                 nameset = true;
             }
 		}
-		
+
 		if (null != consoleCmdr) {
 		    if (!nameset) {
 		        consoleCmdr.setName(commanderName);
 		        nameset = true;
 		    }
 		}
-		
+
         // Gather the data
         Map<CrewType, Collection<Person>> result = new HashMap<>();
 		if (!drivers.isEmpty()) {
@@ -1136,18 +1136,18 @@ public class Utilities {
             notFound.clear();
 	    }
 	}
-	
+
 	public static void assignTroopersAndEquipmentNums(Unit unit) {
 	    if (!(unit.getEntity() instanceof BattleArmor)) {
 	        throw new IllegalArgumentException("Attempting to assign trooper values to parts for non-BA unit");
 	    }
-	    
+
 	    //Create a list that we can remove parts from as we match them
 	    List<EquipmentPart> tempParts = unit.getParts().stream()
 	            .filter(p -> p instanceof EquipmentPart)
 	            .map(p -> (EquipmentPart)p)
 	            .collect(Collectors.toList());
-	    
+
 	    for (Mounted m : unit.getEntity().getEquipment()) {
 	        final int eqNum = unit.getEntity().getEquipmentNum(m);
 	        //Look for parts of the same type with the equipment number already set correctly
@@ -1260,7 +1260,7 @@ public class Utilities {
     public static DateTime getDateTimeDay(Calendar cal) {
         return new LocalDateTime(cal).toDateTime(DateTimeZone.UTC);
     }
-    
+
     /** @return the current date as a DateTime time stamp for midnight in UTC time zone */
     public static DateTime getDateTimeDay(Date date) {
         return new LocalDateTime(date).toDateTime(DateTimeZone.UTC);
@@ -1354,7 +1354,7 @@ public class Utilities {
         }
         return new String(buffer);
     }
-    
+
     public static String getRomanNumeralsFromArabicNumber(int level, boolean checkZero) {
     	// If we're 0, then we just return an empty string
     	if (checkZero && level == 0) {
@@ -1494,12 +1494,12 @@ public class Utilities {
                     }
                 }
             }
-            
+
             if( !recurse ) {
                 // We're done
                 return;
             }
-            
+
             // Get subdirectories too
             File[] dirs = dir.listFiles();
             if( null != dirs && dirs.length > 0 ) {

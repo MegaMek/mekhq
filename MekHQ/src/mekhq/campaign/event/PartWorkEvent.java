@@ -29,7 +29,7 @@ import mekhq.campaign.work.IPartWork;
  *
  */
 public class PartWorkEvent extends MMEvent {
-    
+
     private final Person tech;
     private final IPartWork partWork;
 
@@ -37,11 +37,11 @@ public class PartWorkEvent extends MMEvent {
         this.tech = Objects.requireNonNull(tech);
         this.partWork = Objects.requireNonNull(partWork);
     }
-    
+
     public Person getTech() {
         return tech;
     }
-    
+
     public IPartWork getPartWork() {
         return partWork;
     }

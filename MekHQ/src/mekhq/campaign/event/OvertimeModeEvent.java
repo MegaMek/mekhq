@@ -25,13 +25,13 @@ import megamek.common.event.MMEvent;
  *
  */
 public class OvertimeModeEvent extends MMEvent {
-    
+
     private final boolean allowed;
-    
+
     public OvertimeModeEvent(boolean allowed) {
         this.allowed = allowed;
     }
-    
+
     public boolean isAllowed() {
         return allowed;
     }

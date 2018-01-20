@@ -273,12 +273,12 @@ public class MissingProtomekLocation extends MissingPart {
     public TechAdvancement getTechAdvancement() {
         return ProtomekLocation.TECH_ADVANCEMENT;
     }
-    
+
     @Override
 	public int getMassRepairOptionType() {
     	return Part.REPAIR_PART_TYPE.GENERAL_LOCATION;
     }
-	
+
 	@Override
 	public int getRepairPartType() {
     	return Part.REPAIR_PART_TYPE.MEK_LOCATION;

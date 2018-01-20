@@ -40,8 +40,8 @@ import megamek.common.logging.LogLevel;
  */
 public class RandomSkillPreferences implements Serializable {
 	private static final long serialVersionUID = 5698008431749303602L;
-	
-	
+
+
     private int overallRecruitBonus;
     private int[] recruitBonuses;
     private boolean randomizeSkill;
@@ -55,9 +55,9 @@ public class RandomSkillPreferences implements Serializable {
     private int artilleryBonus;
     private int secondSkillProb;
     private int secondSkillBonus;
-    
+
     //special abilities
-    
+
     public RandomSkillPreferences() {
     	overallRecruitBonus = 0;
     	recruitBonuses = new int[Person.T_NUM];
@@ -73,127 +73,127 @@ public class RandomSkillPreferences implements Serializable {
     	secondSkillProb = 0;
     	secondSkillBonus = -4;
     }
-    
-    
+
+
     public int getOverallRecruitBonus() {
     	return overallRecruitBonus;
     }
-    
+
     public void setOverallRecruitBonus(int b) {
     	overallRecruitBonus = b;
     }
-    
+
     public int getRecruitBonus(int type) {
     	if(type > recruitBonuses.length) {
     		return 0;
-    	} 
+    	}
     	return recruitBonuses[type];
     }
-    
+
     public void setRecruitBonus(int type, int bonus) {
     	if(type > recruitBonuses.length) {
     		return;
     	}
     	recruitBonuses[type] = bonus;
     }
-    
+
     public int getSpecialAbilBonus(int type) {
     	if(type > specialAbilBonus.length) {
     		return 0;
-    	} 
+    	}
     	return specialAbilBonus[type];
     }
-    
+
     public void setSpecialAbilBonus(int type, int bonus) {
     	if(type > specialAbilBonus.length) {
     		return;
     	}
     	specialAbilBonus[type] = bonus;
     }
-    
+
     public void setRandomizeSkill(boolean b) {
     	this.randomizeSkill = b;
     }
-    
+
     public boolean randomizeSkill() {
     	return randomizeSkill;
     }
-    
+
     public void setUseClanBonuses(boolean b) {
     	this.useClanBonuses = b;
     }
-    
+
     public boolean useClanBonuses() {
     	return useClanBonuses;
     }
-    
+
     public int getAntiMekProb() {
     	return antiMekProb;
     }
-    
+
     public void setAntiMekProb(int b) {
     	antiMekProb = b;
     }
-    
+
     public int getCombatSmallArmsBonus() {
     	return combatSmallArmsBonus;
     }
-    
+
     public void setCombatSmallArmsBonus(int b) {
     	combatSmallArmsBonus = b;
     }
-    
+
     public int getSupportSmallArmsBonus() {
     	return supportSmallArmsBonus;
     }
-    
+
     public void setSupportSmallArmsBonus(int b) {
     	supportSmallArmsBonus = b;
     }
-    
+
     public int getTacticsMod(int lvl) {
     	return tacticsMod[lvl];
     }
-    
+
     public void setTacticsMod(int lvl, int bonus) {
     	if(lvl > tacticsMod.length) {
     		return;
     	}
     	tacticsMod[lvl] = bonus;
     }
-    
+
     public void setArtilleryProb(int b) {
     	this.artilleryProb = b;
     }
-    
+
     public int getArtilleryProb() {
     	return artilleryProb;
     }
-    
+
     public void setArtilleryBonus(int b) {
     	this.artilleryBonus = b;
     }
-    
+
     public int getArtilleryBonus() {
     	return artilleryBonus;
     }
-    
+
     public void setSecondSkillProb(int b) {
     	this.secondSkillProb = b;
     }
-    
+
     public int getSecondSkillProb() {
     	return secondSkillProb;
     }
-    
+
     public void setSecondSkillBonus(int b) {
     	this.secondSkillBonus = b;
     }
-    
+
     public int getSecondSkillBonus() {
     	return secondSkillBonus;
     }
-    
+
     public void writeToXml(PrintWriter pw1, int indent) {
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "<randomSkillPreferences>");
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "overallRecruitBonus", overallRecruitBonus);
@@ -223,7 +223,7 @@ public class RandomSkillPreferences implements Serializable {
 
 	public static RandomSkillPreferences generateRandomSkillPreferencesFromXml(Node wn) {
 	    final String METHOD_NAME = "generateRandomSkillPreferencesFromXml(Node)"; //$NON-NLS-1$
-	    
+
 	    MekHQ.getLogger().log(RandomSkillPreferences.class, METHOD_NAME, LogLevel.INFO,
 	            "Loading Random Skill Preferences from XML..."); //$NON-NLS-1$
 
@@ -238,7 +238,7 @@ public class RandomSkillPreferences implements Serializable {
 			// If it's not an element node, we ignore it.
 			if (wn2.getNodeType() != Node.ELEMENT_NODE)
 				continue;
-			
+
 	        MekHQ.getLogger().log(RandomSkillPreferences.class, METHOD_NAME, LogLevel.INFO,
 	                "---"); //$NON-NLS-1$
 	        MekHQ.getLogger().log(RandomSkillPreferences.class, METHOD_NAME, LogLevel.INFO,
@@ -248,7 +248,7 @@ public class RandomSkillPreferences implements Serializable {
 
 			if (wn2.getNodeName().equalsIgnoreCase("overallRecruitBonus")) {
 				retVal.overallRecruitBonus = Integer.parseInt(wn2.getTextContent().trim());
-			} 
+			}
 			else if (wn2.getNodeName().equalsIgnoreCase("randomizeSkill")) {
 				if (wn2.getTextContent().equalsIgnoreCase("true"))
 					retVal.randomizeSkill = true;
@@ -266,7 +266,7 @@ public class RandomSkillPreferences implements Serializable {
 			}
 			else if (wn2.getNodeName().equalsIgnoreCase("combatSmallArmsBonus")) {
 				retVal.combatSmallArmsBonus = Integer.parseInt(wn2.getTextContent().trim());
-			} 
+			}
 			else if (wn2.getNodeName().equalsIgnoreCase("supportSmallArmsBonus")) {
 				retVal.supportSmallArmsBonus = Integer.parseInt(wn2.getTextContent().trim());
 			}
@@ -287,19 +287,19 @@ public class RandomSkillPreferences implements Serializable {
 				for(int i = 0; i < values.length; i++) {
 					retVal.recruitBonuses[i] = Integer.parseInt(values[i]);
 				}
-			} 
+			}
 			else if (wn2.getNodeName().equalsIgnoreCase("tacticsMod")) {
 				String[] values = wn2.getTextContent().split(",");
 				for(int i = 0; i < values.length; i++) {
 					retVal.tacticsMod[i] = Integer.parseInt(values[i]);
 				}
-			} 
+			}
 			else if (wn2.getNodeName().equalsIgnoreCase("specialAbilBonus")) {
 				String[] values = wn2.getTextContent().split(",");
 				for(int i = 0; i < values.length; i++) {
 					retVal.specialAbilBonus[i] = Integer.parseInt(values[i]);
 				}
-			} 
+			}
 		}
 
         MekHQ.getLogger().log(RandomSkillPreferences.class, METHOD_NAME, LogLevel.INFO,

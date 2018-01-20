@@ -15,7 +15,7 @@ import org.w3c.dom.NodeList;
 
 public class Ancestors implements Serializable, MekHqXmlSerializable {
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = -6350146649504329173L;
 	// UUID
@@ -25,30 +25,30 @@ public class Ancestors implements Serializable, MekHqXmlSerializable {
 	private Campaign campaign;
 	private UUID fathersAncestors;
 	private UUID mothersAncestors;
-	
+
 	public Ancestors(Campaign c) {
 		this(null, null, c);
 	}
-	
+
 	public Ancestors(UUID father, UUID mother, Campaign c) {
 		fatherID = father;
 		motherID = mother;
 		campaign = c;
-		
+
 		// Generate ID
 		id = UUID.randomUUID();
 		while (c.getAncestors(id) != null) {
 			id = UUID.randomUUID();
 		}
-		
+
 		// Find the parents and if they exist set the ancestors
 		Person f = c.getPerson(father);
 		Person m = c.getPerson(mother);
-		
+
 		if (f != null) {
 			fathersAncestors = f.getAncestorsID();
 		}
-		
+
 		if (m != null) {
 			mothersAncestors = m.getAncestorsID();
 		}
@@ -69,7 +69,7 @@ public class Ancestors implements Serializable, MekHqXmlSerializable {
 	public void setMotherID(UUID motherID) {
 		this.motherID = motherID;
 	}
-	
+
 	public UUID getId() {
 		return id;
 	}
@@ -98,7 +98,7 @@ public class Ancestors implements Serializable, MekHqXmlSerializable {
 	public boolean checkMutualAncestors(Ancestors anc) {
 		return checkMutualAncestors(anc, 0);
 	}
-	
+
 	public boolean checkMutualAncestors(Ancestors anc, int depth) {
 		// We only go 4 generations back looking for a connection
 		// TODO: Make this a setting
@@ -118,43 +118,43 @@ public class Ancestors implements Serializable, MekHqXmlSerializable {
 				|| (anc.getFatherID() == null && anc.getMotherID() == null)){
 			return false;
 		}
-		
+
 		if ((getFatherID() != null && getFatherID().equals(anc.getFatherID()))
 				|| (getMotherID() != null && getMotherID().equals(anc.getMotherID()))) {
 			return true;
 		}
-		
+
 		// Check father...
 		if (fathersAncestors != null) {
 			if (campaign.getAncestors(fathersAncestors).checkMutualAncestors(anc, depth)) {
 				return true;
 			}
 		}
-		
+
 		// Check mother...
 		if (mothersAncestors != null) {
 			if (campaign.getAncestors(mothersAncestors).checkMutualAncestors(anc, depth)) {
 				return true;
 			}
 		}
-		
+
 		// Check their father...
 		if (anc.getFathersAncestors() != null) {
 			if (anc.getFathersAncestors().checkMutualAncestors(this, depth)) {
 				return true;
 			}
 		}
-		
+
 		// Check their mother...
 		if (anc.getMothersAncestors() != null) {
 			if (anc.getMothersAncestors().checkMutualAncestors(this, depth)) {
 				return true;
 			}
 		}
-		
+
 		return false;
 	}
-	
+
 	public void writeToXml(PrintWriter pw1, int indent) {
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "<ancestor id=\""
                 + id.toString()
@@ -191,19 +191,19 @@ public class Ancestors implements Serializable, MekHqXmlSerializable {
 		indent--;
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "</ancestor>");
 	}
-	
+
 	public static Ancestors generateInstanceFromXML(Node wn, Campaign c, Version version) {
 		Ancestors retVal = null;
-		
+
 		try {
 			retVal = new Ancestors(c);
 
             // Okay, now load Ancestor-specific fields!
             NodeList nl = wn.getChildNodes();
-            
+
             for (int x = 0; x < nl.getLength(); x++) {
                 Node wn2 = nl.item(x);
-            
+
 	            if (wn2.getNodeName().equalsIgnoreCase("id")) {
 	                retVal.id = UUID.fromString(wn2.getTextContent());
 	            } else if (wn2.getNodeName().equalsIgnoreCase("fatherID")) {
@@ -222,7 +222,7 @@ public class Ancestors implements Serializable, MekHqXmlSerializable {
             // Doh!
 		    MekHQ.getLogger().log(Ancestors.class, "generateInstanceFromXML(Node,Campaign,Version)", e); //$NON-NLS-1$
 		}
-		
+
 		return retVal;
 	}
 }

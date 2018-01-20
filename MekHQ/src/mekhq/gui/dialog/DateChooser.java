@@ -41,26 +41,26 @@ import mekhq.MekHQ;
 /**
  * Hovanes Gambaryan Henry Demirchian CSUN, CS 585 Professor Mike Barnes
  * December 06, 2000
- * 
+ *
  * DateChooser class is a general GUI based date chooser. It allows the user to
  * select an instance of GregorianCalendar defined in java.util package.
- * 
+ *
  * Programming API is similar to JFC's JColorChooser or JFileChooser. This class
  * can be used in any application to enable the user to select a date from a
  * visually displayed calendar.
- * 
+ *
  * There is a lot of improvements that can be done over this class in areas of
  * functionality, usability, and appearance. But as is, the class can be easily
  * used from within any Java program.
- * 
+ *
  * Typical usage is like:
- * 
+ *
  * // initial date GregorianCalendar date = new GregorianCalendar()
- * 
+ *
  * // The owner is the JFrame of the application ("AppClass.this")
- * 
+ *
  * // show the date chooser DateChooser dc = new DateChooser(owner, date);
- * 
+ *
  * // user can eiter choose a date or cancel by closing if (dc.showDateChooser()
  * == DateChooser.OK_OPTION) { date = dc.getDate(); }
  */
@@ -99,10 +99,10 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
 
     // Stores the user-input date.
     private JFormattedTextField dateField = null;
-    
+
     /**
      * Constructor for DateChooser
-     * 
+     *
      * @param owner
      *            JFrame instance, owner of DateChooser dialog
      * @param d
@@ -218,7 +218,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
 
     /**
      * Action handler for this dialog, which handles all the button presses.
-     * 
+     *
      * @param evt
      *            ActionEvent
      */
@@ -398,7 +398,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
     /**
      * Return the month following the one passed in as an argument. If the
      * argument is the las month of the year, return the first month.
-     * 
+     *
      * @param month
      *            Current month expressed as an integer (0 to 11).
      */
@@ -412,7 +412,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
     /**
      * Return the month preceding the one passed in as an argument. If the
      * argument is the first month of the year, return the last month.
-     * 
+     *
      * @param month
      *            Current month expressed as an integer (0 to 11).
      */

@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package mekhq.campaign.parts;
 
@@ -12,14 +12,14 @@ import mekhq.campaign.Campaign;
 
 /**
  * Missing part for QuadVee conversion gear
- * 
+ *
  * @author Neoancient
  *
  */
 public class MissingQuadVeeGear extends MissingPart {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = -5968768537443435516L;
 

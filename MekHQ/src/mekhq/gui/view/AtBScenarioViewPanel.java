@@ -515,7 +515,7 @@ public class AtBScenarioViewPanel extends JPanel {
         txtDetails.setLineWrap(true);
         txtDetails.setWrapStyleWord(true);
         txtDetails.setEditable(false);
-        
+
         if (scenario.isSpecialMission()) {
             txtDetails.setText("Details:\n" +
                     scenario.getResourceBundle().getString("battleDetails." +

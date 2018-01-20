@@ -88,21 +88,21 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
             	if (unit.isDeployed()) {
             		continue;
             	}
-            	
+
                 for (Person p : unit.getCrew()) {
                     unit.remove(p, true);
                 }
-                
+
                 Person tech = unit.getTech();
-                
+
                 if (null != tech) {
                 	tech.removeTechUnitId(unit.getId());
                 }
-                
+
                 unit.removeTech();
-                
+
                 Person engineer = unit.getEngineer();
-                
+
                 if (null != engineer) {
                 	unit.remove(engineer, true);
                 }
@@ -793,7 +793,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                 menuItem.setEnabled(unit.isAvailable()
                         && (unit.getEntity() instanceof megamek.common.Mech
                                 || unit.getEntity() instanceof megamek.common.Tank
-                                || unit.getEntity() instanceof megamek.common.Aero 
+                                || unit.getEntity() instanceof megamek.common.Aero
                                 || unit.getEntity() instanceof BattleArmor
                                 || unit.getEntity() instanceof megamek.common.Protomech));
                 menu.add(menuItem);
@@ -875,7 +875,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                 menuItem.setEnabled(true);
                 popup.add(menuItem);
             }
-                
+
             // remove all personnel
             popup.addSeparator();
             menuItem = new JMenuItem("Remove all personnel");

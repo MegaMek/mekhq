@@ -1,20 +1,20 @@
 /*
  * InfantryWeapon.java
- * 
+ *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -39,16 +39,16 @@ public class InfantryWeaponPart extends EquipmentPart {
 	private static final long serialVersionUID = 2892728320891712304L;
 
 	private boolean primary;
-	
+
 	public InfantryWeaponPart() {
     	this(0, null, -1, null, false);
     }
-    
+
     public InfantryWeaponPart(int tonnage, EquipmentType et, int equipNum, Campaign c, boolean p) {
         super(tonnage, et, equipNum, c);
         primary = p;
     }
-    
+
     @Override
     public InfantryWeaponPart clone() {
     	InfantryWeaponPart clone = new InfantryWeaponPart(getUnitTonnage(), getType(), getEquipmentNum(), campaign, primary);
@@ -61,10 +61,10 @@ public class InfantryWeaponPart extends EquipmentPart {
 		//shouldn't get here, but ok
 		return new MissingEquipmentPart(getUnitTonnage(), type, equipmentNum, campaign, getTonnage());
 	}
-	
+
 	@Override
 	public void writeToXml(PrintWriter pw1, int indent) {
-		writeToXmlBegin(pw1, indent);		
+		writeToXmlBegin(pw1, indent);
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<equipmentNum>"
 				+equipmentNum
@@ -87,7 +87,7 @@ public class InfantryWeaponPart extends EquipmentPart {
 	@Override
 	protected void loadFieldsFromXmlNode(Node wn) {
 		NodeList nl = wn.getChildNodes();
-		
+
 		for (int x=0; x<nl.getLength(); x++) {
 			Node wn2 = nl.item(x);
 			if (wn2.getNodeName().equalsIgnoreCase("equipmentNum")) {
@@ -109,7 +109,7 @@ public class InfantryWeaponPart extends EquipmentPart {
 		}
 		restore();
 	}
-	
+
 	public boolean isPrimary() {
 		return primary;
 	}
