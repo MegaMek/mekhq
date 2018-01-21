@@ -1,6 +1,6 @@
 VERSION HISTORY:
 ----------------
-v0.43.7-git 
+v0.43.7 (2018-01-21 2200 UTC)
 + Issue #567: BA standard armor cannot be repaired
 + Issue #576: CCE on loading campaign with DS with missing thruster(s)
 + Feature: Advanced time by one month.
