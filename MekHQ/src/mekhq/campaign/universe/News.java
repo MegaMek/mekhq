@@ -134,7 +134,7 @@ public class News {
                             continue;
                         }
                         List<NewsItem> items;
-                        newsItem.finalizeDate(seed);
+                        newsItem.finalizeDate();
                         if(null == archive.get(newsItem.getDate())) {
                             items = new ArrayList<NewsItem>();
                             items.add(newsItem);
