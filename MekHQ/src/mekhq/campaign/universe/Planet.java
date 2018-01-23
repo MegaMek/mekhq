@@ -754,7 +754,7 @@ public class Planet implements Serializable {
     private static Set<Faction> getFactionsFrom(Collection<String> codes) {
         Set<Faction> factions = new HashSet<Faction>(codes.size());
         for(String code : codes) {
-            factions.add(Faction.getFaction(code.toUpperCase()));
+            factions.add(Faction.getFaction(code));
         }
         return factions;
     }

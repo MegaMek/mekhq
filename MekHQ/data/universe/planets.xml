@@ -1,4 +1,3 @@
-
 <planets>
     <planet>
         <xcood>-123.764</xcood>
@@ -605,7 +604,7 @@ GM and Taijian Petrochemicals have vested interest in Acamar because they have h
         </event>
         <event>
             <date>3058-02-01</date>
-            <faction>Merc,CM</faction>
+            <faction>MERC,CM</faction>
         </event>
         <event>
             <date>3058-08-01</date>
@@ -613,7 +612,7 @@ GM and Taijian Petrochemicals have vested interest in Acamar because they have h
         </event>
         <event>
             <date>3061-02-09</date>
-            <faction>Merc,PIR</faction>
+            <faction>MERC,PIR</faction>
         </event>
         <event>
             <date>3061-08-31</date>
@@ -26839,11 +26838,11 @@ During the First Succession War, the Draconis Combine used over a dozen 100-mega
         </event>
         <event>
             <date>3051-09-03</date>
-            <faction>Merc</faction>
+            <faction>MERC</faction>
         </event>
         <event>
             <date>3051-09-06</date>
-            <faction>Merc,CJF</faction>
+            <faction>MERC,CJF</faction>
         </event>
         <event>
             <date>3051-09-12</date>
