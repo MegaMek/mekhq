@@ -1359,15 +1359,16 @@ Addicks remains an important world today, though it has lost much of its glory o
             <faction>MOC</faction>
         </event>
         <event>
-            <date>2583-04-27</date>
-            <faction>SL</faction>
+            <date>2583-01-01</date>
+            <faction>MOC,SL</faction>
+        </event>
+        <event>
+            <date>2596-01-01</date>
+            <faction>MOC</faction>
         </event>
         <event>
             <date>2750-01-01</date>
             <hpg>B</hpg>
-        </event>
-        <event>
-            <date>2897-01-01</date>
         </event>
         <event>
             <date>3132-08-07</date>
@@ -103568,47 +103569,35 @@ Manufacturing centers:
 Amau Electronics
 New York Vehicle Y2 Facility [Created 3068]</desc>
         <event>
-            <date>2250-01-01</date>
+            <date>2300-01-01</date>
             <faction>PoR</faction>
         </event>
         <event>
-            <date>2347-01-01</date>
-            <faction>PoR,DC</faction>
+            <date>2337-01-01</date>
+            <faction>DC</faction>
         </event>
         <event>
-            <date>2348-01-01</date>
+            <date>2367-01-01</date>
             <faction>PoR</faction>
         </event>
         <event>
-            <date>3034-03-13</date>
+            <date>2510-01-01</date>
+            <faction>DC</faction>
+        </event>
+        <event>
+            <date>3040-01-01</date>
             <faction>FRR</faction>
         </event>
         <event>
             <date>3050-05-01</date>
-            <faction>CGB,FRR</faction>
-        </event>
-        <event>
-            <date>3050-05-06</date>
             <faction>CGB</faction>
         </event>
         <event>
-            <date>3067-04-01</date>
+            <date>3130-01-01</date>
             <faction>CDS</faction>
         </event>
         <event>
-            <date>3099-07-15</date>
-            <faction>CDS,CGB</faction>
-        </event>
-        <event>
-            <date>3100-03-18</date>
-            <faction>CDS,CGB,DC</faction>
-        </event>
-        <event>
-            <date>3100-04-06</date>
-            <faction>CDS</faction>
-        </event>
-        <event>
-            <date>3132-07-01</date>
+            <date>3135-01-01</date>
             <faction>RD</faction>
         </event>
     </planet>
