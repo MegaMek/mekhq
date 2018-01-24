@@ -160,7 +160,6 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<altNamesByYear year='3085'>Lyran Commonwealth</altNamesByYear>
 		<tags>is</tags>
 		<start>2340</start>
-		<end>3084</end>
 	</faction>
 	<!-- Star League Era factions -->
 	<faction>
