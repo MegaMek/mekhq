@@ -25,6 +25,7 @@ import megamek.common.CommonConstants;
 import megamek.common.Entity;
 import megamek.common.EntityListFile;
 import megamek.common.FighterSquadron;
+import megamek.common.IBomber;
 import megamek.common.IPlayer;
 import megamek.common.Jumpship;
 import megamek.common.MULParser;
@@ -190,22 +191,6 @@ public class MekHqXmlUtil {
 			retVal += MekHqXmlUtil.indentStr(indentLvl+1) + "<fuel left=\"" + String.valueOf(a.getFuel())
 					+ "\"/>\n";
 
-            int[] bombChoices = a.getBombChoices();
-            if (bombChoices.length > 0) {
-                retVal += MekHqXmlUtil.indentStr(indentLvl+1) + "<bombs>\n";
-                for (int type = 0; type < BombType.B_NUM; type++) {
-                    if (bombChoices[type] > 0) {
-                    	String typeName = BombType.getBombInternalName(type);
-                        retVal += MekHqXmlUtil.indentStr(indentLvl+2) + "<bomb type=\"";
-                        retVal += typeName;
-                        retVal += "\" load=\"";
-                        retVal += String.valueOf(bombChoices[type]);
-                        retVal += "\"/>\n";
-                    }
-                }
-                retVal += MekHqXmlUtil.indentStr(indentLvl+1) + "</bombs>\n";
-            }
-
 			// TODO: dropship docking collars, bays
 
 			// Large craft stuff
@@ -223,6 +208,11 @@ public class MekHqXmlUtil {
 
 			// Crits
 			retVal += getAeroCritString(a, indentLvl+1);
+		}
+		
+		// If the entity carries bombs, write those out
+		if(tgtEnt instanceof IBomber) {
+		    retVal += getBombChoiceString((IBomber) tgtEnt, indentLvl);
 		}
 
 		// Add the locations of this entity (if any are needed).
@@ -258,6 +248,28 @@ public class MekHqXmlUtil {
 		return retVal;
 	}
 
+	private static String getBombChoiceString(IBomber bomber, int indentLvl) {
+	    String retVal = "";
+	    
+	    int[] bombChoices = bomber.getBombChoices();
+        if (bombChoices.length > 0) {
+            retVal += MekHqXmlUtil.indentStr(indentLvl+1) + "<bombs>\n";
+            for (int type = 0; type < BombType.B_NUM; type++) {
+                if (bombChoices[type] > 0) {
+                    String typeName = BombType.getBombInternalName(type);
+                    retVal += MekHqXmlUtil.indentStr(indentLvl+2) + "<bomb type=\"";
+                    retVal += typeName;
+                    retVal += "\" load=\"";
+                    retVal += String.valueOf(bombChoices[type]);
+                    retVal += "\"/>\n";
+                }
+            }
+            retVal += MekHqXmlUtil.indentStr(indentLvl+1) + "</bombs>\n";
+        }
+        
+        return retVal;
+	}
+	
 	/**
 	 * Contents copied from megamek.common.EntityListFile.getAeroCritString(...)
 	 * Modified to support saving to/from XML for our purposes in MekHQ
