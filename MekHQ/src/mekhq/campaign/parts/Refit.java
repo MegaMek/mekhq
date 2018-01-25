@@ -438,8 +438,9 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 				AmmoType type = (AmmoType)((AmmoBin)nPart).getType();
 				ammoNeeded.merge(type, type.getShots(), Integer::sum);
 				if (nPart instanceof LargeCraftAmmoBin) {
-				    time += nPart.getBaseTime() * ((AmmoBin) nPart).getFullShots()
-				            * type.getTonnage(newEntity) / type.getShots();
+				    // Adding ammo requires base 15 minutes per ton of ammo. Putting in a new
+				    // capital missile bay can take weeks.
+				    time += 15 * Math.max(1, nPart.getTonnage());
 				    shoppingList.add(nPart);
 				} else {
 				    time += 120;

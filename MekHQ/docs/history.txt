@@ -6,8 +6,9 @@ VERSION HISTORY:
 + Data: Fix for multiple issues relating to incorrect capitalization and date omissions in planets.xml
 + VTOL and LAM bomb selections should now be saved when campaign is saved
 + Issue #620: Unused bombs are not recovered for VTOLs after battle (should recover properly for LAMs, as well)
++ Bug: large craft refits calculating ammo loading times incorrectly.
 
-v0.43.7-RC1 (2018-01-21 2200 UTC)
+v0.43.7-git 
 + Issue #567: BA standard armor cannot be repaired
 + Issue #576: CCE on loading campaign with DS with missing thruster(s)
 + Feature: Advanced time by one month.
