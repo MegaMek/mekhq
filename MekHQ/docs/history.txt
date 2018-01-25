@@ -5,6 +5,7 @@ VERSION HISTORY:
 + Issue #616: Text rendering issue in Campaign Options screen
 + Data: Fix for multiple issues relating to incorrect capitalization and date omissions in planets.xml
 + VTOL and LAM bomb selections should now be saved when campaign is saved
++ Issue #620: Unused bombs are not recovered for VTOLs after battle (should recover properly for LAMs, as well)
 
 v0.43.7-RC1 (2018-01-21 2200 UTC)
 + Issue #567: BA standard armor cannot be repaired
