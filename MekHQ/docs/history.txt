@@ -8,6 +8,7 @@ VERSION HISTORY:
 + Issue #620: Unused bombs are not recovered for VTOLs after battle (should recover properly for LAMs, as well)
 + Bug: large craft refits calculating ammo loading times incorrectly.
 + Issue #617: Extinct units available for purchase when they shouldn't be.
++ Issue #625: Repair Bay status window not cleared after last unit is repaired.
 
 v0.43.7-git 
 + Issue #567: BA standard armor cannot be repaired
