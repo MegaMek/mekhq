@@ -28,6 +28,7 @@ public class LaunchGameDialog extends JDialog implements ActionListener {
     public String playerName;
     public String serverAddr;
     public int port;
+    public boolean cancelled;
     private JLabel yourNameL;
     private JLabel serverAddrL;
     private JLabel portL;
@@ -137,6 +138,8 @@ public class LaunchGameDialog extends JDialog implements ActionListener {
             } catch (NumberFormatException ex) {
                 System.err.println(ex.getMessage());
             }
+        } else {
+            cancelled = true;
         }
         setVisible(false);
 	}
