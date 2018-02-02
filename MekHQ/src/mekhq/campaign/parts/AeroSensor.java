@@ -76,15 +76,44 @@ public class AeroSensor extends Part {
 			hits = ((Aero)unit.getEntity()).getSensorHits();
 			if(checkForDestruction 
 					&& hits > priorHits 
-					&& Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
+					&& (hits < 3 && !campaign.getCampaignOptions().useAeroSystemHits())
+                    && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
 				remove(false);
 				return;
-			}
+			} else if (hits >= 3) {
+                remove(false);
+                return;
+            }
 		}
 	}
 	
 	@Override 
 	public int getBaseTime() {
+        if (campaign.getCampaignOptions().useAeroSystemHits()) {
+            //Test of proposed errata for repair times
+            Entity e = unit.getEntity();
+            if (isSalvaging()) {
+                if (e.hasETypeFlag(Entity.ETYPE_DROPSHIP) || e.hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
+                    return 1200;
+                } else {
+                    return 600;
+                }
+            }
+            if (hits == 1) {
+                if (e.hasETypeFlag(Entity.ETYPE_DROPSHIP) || e.hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
+                    return 120;
+                } else {
+                    return 75;
+                }
+            } 
+            if (hits == 2) {
+                if (e.hasETypeFlag(Entity.ETYPE_DROPSHIP) || e.hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
+                    return 240;
+                } else {
+                    return 150;
+                }
+            }
+        }
 		if(isSalvaging()) {
 			return 1200;
 		}
