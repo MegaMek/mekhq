@@ -69,18 +69,47 @@ public class Avionics extends Part {
 		        && (unit.getEntity().getEntityType() & (Entity.ETYPE_AERO | Entity.ETYPE_LAND_AIR_MECH)) != 0) {
 			hits = ((IAero)unit.getEntity()).getAvionicsHits();
 			if(checkForDestruction 
-					&& hits > priorHits 
+					&& hits > priorHits
+					&& (hits < 3 && !campaign.getCampaignOptions().useAeroSystemHits())
 					&& Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
 				remove(false);
 				return;
+			} else if (hits >= 3) {
+			    remove(false);
+			    return;
 			}
 		}
 	}
 	
 	@Override 
 	public int getBaseTime() {
-		if(isSalvaging()) {
-			return 4800;
+		if (campaign.getCampaignOptions().useAeroSystemHits()) {
+		    //Test of proposed errata for repair times
+		    Entity e = unit.getEntity();
+		    if (isSalvaging()) {
+		        if (e.hasETypeFlag(Entity.ETYPE_DROPSHIP) || e.hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
+                    return 4800;
+                } else {
+                    return 600;
+                }
+		    }
+		    if (hits == 1) {
+		        if (e.hasETypeFlag(Entity.ETYPE_DROPSHIP) || e.hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
+		            return 240;
+		        } else {
+		            return 120;
+		        }
+		    } 
+		    if (hits == 2) {
+		        if (e.hasETypeFlag(Entity.ETYPE_DROPSHIP) || e.hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
+                    return 480;
+                } else {
+                    return 240;
+                }
+		    }
+		}
+		if (isSalvaging()) {
+		    return 4800;
 		}
 		return 480;
 	}
