@@ -94,6 +94,22 @@ public class AeroLifeSupport extends Part {
 	
 	@Override 
 	public int getBaseTime() {
+        if (campaign.getCampaignOptions().useAeroSystemHits()) {
+            //Test of proposed errata for repair times
+            Entity e = unit.getEntity();
+            if (isSalvaging()) {
+                if (e.hasETypeFlag(Entity.ETYPE_DROPSHIP) || e.hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
+                    return 6720;
+                } else {
+                    return 180;
+                }
+            }
+            if (e.hasETypeFlag(Entity.ETYPE_DROPSHIP) || e.hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
+                return 120;
+            } else {
+                return 60;
+            }
+        }
 		if(isSalvaging()) {
 			return 6720;
 		}
