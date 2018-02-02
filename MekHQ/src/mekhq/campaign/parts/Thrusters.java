@@ -79,15 +79,32 @@ public class Thrusters extends Part {
 			}
 			if(checkForDestruction 
 					&& hits > priorHits 
-					&& Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
+					&& (hits < 4 && !campaign.getCampaignOptions().useAeroSystemHits())
+                    && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
 				remove(false);
 				return;
-			}
+			} else if (hits >= 4) {
+                remove(false);
+                return;
+            }
 		}
 	}
 	
 	@Override 
 	public int getBaseTime() {
+        if (campaign.getCampaignOptions().useAeroSystemHits()) {
+            //Test of proposed errata for repair times
+            Entity e = unit.getEntity();
+            if (hits == 1) {
+                return 90;
+            } 
+            if (hits == 2) {
+                return 180;
+            }
+            if (hits == 3) {
+                return 270;
+            }
+        }
 		if(isSalvaging()) {
 			return 600;
 		}
