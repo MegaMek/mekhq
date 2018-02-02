@@ -182,6 +182,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JCheckBox useArtilleryBox;
     private JCheckBox useAbilitiesBox;
     private JCheckBox useQuirksBox;
+    private JCheckBox useAeroSystemHitsBox;
     private JCheckBox useEdgeBox;
     private JCheckBox useSupportEdgeBox;
     private JCheckBox useImplantsBox;
@@ -499,6 +500,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         chkAssignPortraitOnRoleChange.setSelected(options.getAssignPortraitOnRoleChange());
 
         useDamageMargin.setSelected(options.isDestroyByMargin());
+        useAeroSystemHitsBox.setSelected(options.useAeroSystemHits());
         useQualityMaintenance.setSelected(options.useQualityMaintenance());
         useUnofficalMaintenance.setSelected(options.useUnofficalMaintenance());
         checkMaintenance.setSelected(options.checkMaintenance());
@@ -616,6 +618,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         scrRanks = new JScrollPane();
 
         useDamageMargin = new JCheckBox();
+        useAeroSystemHitsBox = new JCheckBox();
         useQualityMaintenance = new JCheckBox();
         useUnofficalMaintenance = new JCheckBox();
         checkMaintenance = new JCheckBox();
@@ -884,6 +887,18 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
                 }
             }
         });
+        
+        useAeroSystemHitsBox.setText(resourceMap.getString("useAeroSystemHits.text")); // NOI18N
+        useAeroSystemHitsBox.setToolTipText(resourceMap.getString("useAeroSystemHits.toolTipText")); // NOI18N
+        useAeroSystemHitsBox.setName("useAeroSystemHits"); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.weightx = 0.0;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panSubRepair.add(useAeroSystemHitsBox, gridBagConstraints);
 
         spnDamageMargin = new JSpinner(new SpinnerNumberModel(options.getDestroyMargin(), 1, 20, 1));
         ((JSpinner.DefaultEditor) spnDamageMargin.getEditor()).getTextField().setEditable(false);
