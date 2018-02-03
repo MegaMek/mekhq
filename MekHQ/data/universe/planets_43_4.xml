@@ -799,8 +799,8 @@
 			<date>2583-04-27</date>
 			<faction>SL</faction>
 		</factionChange>
-		<factionChange> date noncanon
-			<date>2897-01-01</date>
+		<factionChange> Era Report 2750 - occupation 'ended' for all Periphery states
+			<date>2597-03-21</date>
 			<factionChange>MOC</factionChange>
 		</factionChange>
 	</planet>
