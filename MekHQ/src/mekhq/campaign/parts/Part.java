@@ -335,6 +335,11 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	}
 
 	protected long adjustCostsForCampaignOptions(long cost) {
+	    // if the part doesn't cost anything, no amount of multiplication will change it
+	    if(cost == 0) { 
+	        return cost;
+	    }
+	    
 		if(getTechBase() == T_CLAN) {
 			cost *= campaign.getCampaignOptions().getClanPriceModifier();
 		}
