@@ -62,9 +62,9 @@ public class MissingFireControlSystem extends MissingPart {
             Entity e = unit.getEntity();
             if (e.hasETypeFlag(Entity.ETYPE_DROPSHIP) || e.hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
                 if (e.hasNavalC3()) {
-                    return 4320;
+                    return 8640;
                 }
-                return 2160;
+                return 4320;
             } else {
                 return 1080;
             }
