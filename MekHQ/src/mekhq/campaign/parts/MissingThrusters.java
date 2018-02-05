@@ -54,13 +54,13 @@ public class MissingThrusters extends MissingPart {
     
     public MissingThrusters(int tonnage, Campaign c, boolean left) {
     	super(0, c);
-    	this.name = "Thrusters";
     	isLeftThrusters = left;
+    	this.name = "Thrusters";
     }
     
     @Override 
 	public int getBaseTime() {
-		return 4800;
+		return 600;
 	}
 	
 	@Override
