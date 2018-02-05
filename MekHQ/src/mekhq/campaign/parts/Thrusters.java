@@ -58,8 +58,8 @@ public class Thrusters extends Part {
     
     public Thrusters(int tonnage, Campaign c, boolean left) {
         super(tonnage, c);
-        this.name = "Thrusters";
         isLeftThrusters = left;
+        this.name = "Thrusters";
     }
     
     public Thrusters clone() {
@@ -94,7 +94,6 @@ public class Thrusters extends Part {
 	public int getBaseTime() {
         if (campaign.getCampaignOptions().useAeroSystemHits()) {
             //Test of proposed errata for repair times
-            Entity e = unit.getEntity();
             if (hits == 1) {
                 return 90;
             } 
