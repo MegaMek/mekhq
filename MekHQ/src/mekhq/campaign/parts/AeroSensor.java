@@ -96,7 +96,7 @@ public class AeroSensor extends Part {
                 if (e.hasETypeFlag(Entity.ETYPE_DROPSHIP) || e.hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
                     return 1200;
                 } else {
-                    return 600;
+                    return 260;
                 }
             }
             if (hits == 1) {
