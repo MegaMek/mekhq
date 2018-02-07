@@ -1358,11 +1358,11 @@ Addicks remains an important world today, though it has lost much of its glory o
             <faction>MOC</faction>
         </event>
         <event>
-            <date>2583-01-01</date>
-            <faction>MOC,SL</faction>
+            <date>2583-04-27</date>
+            <faction>SL</faction>
         </event>
-        <event>
-            <date>2596-01-01</date>
+		<event>
+            <date>2597-03-21</date>
             <faction>MOC</faction>
         </event>
         <event>
@@ -45797,7 +45797,15 @@ Holloway is home to a Duchy RTC facility, located on the Morristown continent, w
             <faction>PoR</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2333-01-01</date> Kuritra Housebook
+            <faction>PoR,DC</faction>
+        </event>
+        <event>
+            <date>2367-01-01</date> Kuritra Housebook
+            <faction>PoR</faction>
+        </event>
+		<event>
+            <date>2510-01-01</date> Kuritra Housebook
             <faction>DC</faction>
         </event>
         <event>
@@ -57717,10 +57725,6 @@ As a wealthy border world, Laiaka suffered from numerous raids during the Succes
         <event>
             <date>2341-01-01</date>
             <faction>ABN</faction>
-        </event>
-        <event>
-            <date>2367-01-01</date>
-            <faction>LA</faction>
         </event>
     </planet>
     <planet>
@@ -72233,27 +72237,23 @@ Federated News Services</desc>
             <faction>PoR</faction>
         </event>
         <event>
-            <date>2319-01-01</date>
-            <faction>PoR</faction>
-        </event>
-        <event>
-            <date>2333-09-01</date>
+            <date>2333-01-01</date> Kuritra Housebook
             <faction>DC</faction>
         </event>
         <event>
-            <date>2334-01-01</date>
+            <date>2334-01-01</date> Kuritra Housebook
             <faction>PoR</faction>
         </event>
         <event>
-            <date>2347-01-01</date>
+            <date>2347-01-01</date> Kuritra Housebook
             <faction>PoR,DC</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
-            <faction>DC</faction>
+            <date>2367-01-01</date> Kuritra Housebook
+            <faction>PoR</faction>
         </event>
         <event>
-            <date>2510-06-01</date>
+            <date>2510-01-01</date> Kuritra Housebook
             <faction>DC</faction>
         </event>
         <event>
@@ -73620,7 +73620,15 @@ Most industry on the planet is centered around catering to the rich individuals 
             <faction>PoR</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2333-01-01</date> Kuritra Housebook
+            <faction>PoR,DC</faction>
+        </event>
+        <event>
+            <date>2367-01-01</date> Kuritra Housebook
+            <faction>PoR</faction>
+        </event>
+		<event>
+            <date>2510-01-01</date> Kuritra Housebook
             <faction>DC</faction>
         </event>
         <event>
@@ -83632,20 +83640,8 @@ The location of Proserpina on the Federated Suns border requires the DCMS to kee
         <desc>Overall Radstadt is a typical cool-temperate terran-planet that has sufficient resources, a lot of land devoted to agriculture with a thriving fishing industry and basic heavy industry that is capable of locally supplying most non-military grade machinery. The biggest exports from Radstadt are fish and timber, with the Radstadt Pine being prized due to its ability when treated to shimmer as if flecked with gold.
 
 During its time in the Draconis Combine, Radstadt was infamous for being home to one of the largest prison complexes in the entire Combine. The Lotus Flower Correctional Institute could rival most small cities in size and was located right outside of Munich, the planetary capital. The ‘pinnacle’ of the prison complex was the Black Tower, a large windowless tower of black concrete that was used to house the worst offenders in the Combine.</desc>
-        <event>
-            <date>2250-01-01</date>
-            <faction>PoR</faction>
-        </event>
-        <event>
-            <date>2354-01-01</date>
-            <faction>PoR,DC</faction>
-        </event>
-        <event>
-            <date>2367-01-01</date>
-            <faction>DC</faction>
-        </event>
-        <event>
-            <date>2510-06-01</date>
+		<event> Removed PoR references - it does not appear on early PoR maps and only reference to it being PoR is on Sarna and seems like s stretch based on the reference provided
+            <date>2510-01-01</date> Kuritra Housebook
             <faction>DC</faction>
         </event>
         <event>
@@ -84287,11 +84283,15 @@ Unfortunately, independence did not last long for the people of Rasalhague when 
             <faction>PoR</faction>
         </event>
         <event>
-            <date>2357-01-01</date>
+            <date>2333-01-01</date> Kuritra Housebook
             <faction>PoR,DC</faction>
         </event>
-        <event>
-            <date>2358-01-01</date>
+		<event>
+            <date>2367-01-01</date> Kuritra Housebook
+            <faction>PoR</faction>
+        </event>
+		<event>
+            <date>2510-01-01</date> Kuritra Housebook
             <faction>DC</faction>
         </event>
         <event>
@@ -92936,7 +92936,15 @@ Saroyan Special Production</desc>
             <faction>PoR</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2333-01-01</date> Kuritra Housebook
+            <faction>PoR,DC</faction>
+        </event>
+        <event>
+            <date>2367-01-01</date> Kuritra Housebook
+            <faction>PoR</faction>
+        </event>
+		<event>
+            <date>2510-01-01</date> Kuritra Housebook
             <faction>DC</faction>
         </event>
         <event>
@@ -97204,7 +97212,15 @@ For most of the planet’s history it was a Lyran Commonwealth planet bordering 
             <faction>PoR</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2333-01-01</date> Kuritra Housebook
+            <faction>PoR,DC</faction>
+        </event>
+        <event>
+            <date>2367-01-01</date> Kuritra Housebook
+            <faction>PoR</faction>
+        </event>
+		<event>
+            <date>2510-01-01</date> Kuritra Housebook
             <faction>DC</faction>
         </event>
         <event>
@@ -101394,7 +101410,7 @@ Tharkad Aerospace Group</desc>
             <faction>PoR</faction>
         </event>
         <event>
-            <date>2333-09-01</date>
+            <date>2333-01-01</date>
             <faction>DC</faction>
         </event>
         <event>
@@ -101406,7 +101422,11 @@ Tharkad Aerospace Group</desc>
             <faction>PoR,DC</faction>
         </event>
         <event>
-            <date>2355-01-01</date>
+            <date>2367-01-01</date> Kuritra Housebook
+            <faction>PoR</faction>
+        </event>
+		<event>
+            <date>2510-01-01</date> Kuritra Housebook
             <faction>DC</faction>
         </event>
         <event>
@@ -103568,35 +103588,51 @@ Manufacturing centers:
 Amau Electronics
 New York Vehicle Y2 Facility [Created 3068]</desc>
         <event>
-            <date>2300-01-01</date>
+            <date>2250-01-01</date>
             <faction>PoR</faction>
         </event>
         <event>
-            <date>2337-01-01</date>
-            <faction>DC</faction>
+            <date>2333-01-01</date> Kuritra Housebook
+            <faction>PoR,DC</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2367-01-01</date> Kuritra Housebook
             <faction>PoR</faction>
         </event>
-        <event>
-            <date>2510-01-01</date>
+		<event>
+            <date>2510-01-01</date> Kuritra Housebook
             <faction>DC</faction>
         </event>
         <event>
-            <date>3040-01-01</date>
+            <date>3034-03-13</date>
             <faction>FRR</faction>
         </event>
         <event>
             <date>3050-05-01</date>
+            <faction>CGB,FRR</faction>
+        </event>
+        <event>
+            <date>3050-05-06</date>
             <faction>CGB</faction>
         </event>
         <event>
-            <date>3130-01-01</date>
+            <date>3067-04-01</date>
             <faction>CDS</faction>
         </event>
         <event>
-            <date>3135-01-01</date>
+            <date>3099-07-15</date>
+            <faction>CDS,CGB</faction>
+        </event>
+        <event>
+            <date>3100-03-18</date>
+            <faction>CDS,CGB,DC</faction>
+        </event>
+        <event>
+            <date>3100-04-06</date>
+            <faction>CDS</faction>
+        </event>
+        <event>
+            <date>3132-07-01</date>
             <faction>RD</faction>
         </event>
     </planet>
@@ -107444,7 +107480,15 @@ Tellis Electronics</desc>
             <faction>PoR</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2333-01-01</date> Kuritra Housebook
+            <faction>PoR,DC</faction>
+        </event>
+        <event>
+            <date>2367-01-01</date> Kuritra Housebook
+            <faction>PoR</faction>
+        </event>
+		<event>
+            <date>2510-01-01</date> Kuritra Housebook
             <faction>DC</faction>
         </event>
         <event>
