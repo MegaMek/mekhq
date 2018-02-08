@@ -3,7 +3,7 @@
 1
 </BlockVersion>
 
-#Write the version number just in case...
+##Write the version number just in case...
 <Version>
 MAM0
 </Version>
@@ -16,170 +16,41 @@ Dropship
 Outpost
 </Name>
 
-<model>
+<Model>
 (3063)
-</model>
+</Model>
 
-<Tonnage>
-7000
-</Tonnage>
+<year>
+3063
+</year>
+
+<originalBuildYear>
+3063
+</originalBuildYear>
+
+<type>
+Clan Level 2
+</type>
+
+<motion_type>
+Spheroid
+</motion_type>
+
+<transporters>
+mechbay:5.0:1
+heavyvehiclebay:10.0:2:3
+battlearmorbay:5.0:1:4
+2ndclassquarters:0.0:0
+steeragequarters:0.0:0
+asfbay:4.0:2:2
+crewquarters:112.0:0
+1stclassquarters:40.0:0
+cargobay:1340.0:1:5
+</transporters>
 
 <SafeThrust>
 5
 </SafeThrust>
-
-<Armor>
-360
-355
-355
-350
-</Armor>
-
-<Nose Equipment>
-CLERLargeLaser
-CLERLargeLaser
-CLMediumPulseLaser
-CLERLargeLaser
-CLERLargeLaser
-CLMediumPulseLaser
-CLERLargeLaser
-CLERLargeLaser
-CLMediumPulseLaser
-CLStreakSRM6
-CLStreakSRM6
-CLStreakSRM6
-CLStreakSRM6
-CLMediumPulseLaser
-CLMediumPulseLaser
-CLMediumPulseLaser
-CLAntiMissileSystem
-CLAntiMissileSystem
-CLAntiMissileSystem
-CLStreakSRM6 Ammo
-CLStreakSRM6 Ammo
-CLStreakSRM6 Ammo
-CLStreakSRM6 Ammo
-CLStreakSRM6 Ammo
-CLAMS Ammo
-CLAMS Ammo
-CLAMS Ammo
-CLAMS Ammo
-CLAMS Ammo
-CLAMS Ammo
-CLAMS Ammo
-CLAMS Ammo
-CLAMS Ammo
-CLAMS Ammo
-</Nose Equipment>
-
-<Left Side Equipment>
-CLERLargeLaser
-CLERLargeLaser
-CLERLargeLaser
-CLStreakSRM6
-CLStreakSRM6
-CLStreakSRM6 Ammo
-CLStreakSRM6 Ammo
-CLStreakSRM6 Ammo
-CLStreakSRM6 Ammo
-CLStreakSRM6 Ammo
-CLStreakSRM6 Ammo
-CLStreakSRM6 Ammo
-CLStreakSRM6 Ammo
-CLAntiMissileSystem
-CLAntiMissileSystem
-CLAMS Ammo
-CLAMS Ammo
-CLAMS Ammo
-CLMediumPulseLaser
-CLMediumPulseLaser
-CLMediumPulseLaser
-(R) CLERLargeLaser
-(R) CLERLargeLaser
-(R) CLStreakSRM6
-(R) CLStreakSRM6
-(R) CLStreakSRM6 Ammo
-(R) CLStreakSRM6 Ammo
-(R) CLStreakSRM6 Ammo
-(R) CLStreakSRM6 Ammo
-(R) CLStreakSRM6 Ammo
-(R) CLStreakSRM6 Ammo
-(R) CLAntiMissileSystem
-(R) CLAntiMissileSystem
-(R) CLAMS Ammo
-(R) CLAMS Ammo
-(R) CLAMS Ammo
-(R) CLMediumPulseLaser
-(R) CLMediumPulseLaser
-(R) CLMediumPulseLaser
-</Left Side Equipment>
-
-<Right Side Equipment> 
-CLERLargeLaser
-CLERLargeLaser
-CLERLargeLaser
-CLStreakSRM6
-CLStreakSRM6
-CLStreakSRM6 Ammo
-CLStreakSRM6 Ammo
-CLStreakSRM6 Ammo
-CLStreakSRM6 Ammo
-CLStreakSRM6 Ammo
-CLStreakSRM6 Ammo
-CLStreakSRM6 Ammo
-CLStreakSRM6 Ammo
-CLAntiMissileSystem
-CLAntiMissileSystem
-CLAMS Ammo
-CLAMS Ammo
-CLAMS Ammo
-CLMediumPulseLaser
-CLMediumPulseLaser
-CLMediumPulseLaser
-(R) CLERLargeLaser
-(R) CLERLargeLaser
-(R) CLStreakSRM6
-(R) CLStreakSRM6
-(R) CLStreakSRM6 Ammo
-(R) CLStreakSRM6 Ammo
-(R) CLStreakSRM6 Ammo
-(R) CLStreakSRM6 Ammo
-(R) CLStreakSRM6 Ammo
-(R) CLStreakSRM6 Ammo
-(R) CLAntiMissileSystem
-(R) CLAntiMissileSystem
-(R) CLAMS Ammo
-(R) CLAMS Ammo
-(R) CLAMS Ammo
-(R) CLMediumPulseLaser
-(R) CLMediumPulseLaser
-(R) CLMediumPulseLaser
-</Right Side Equipment>
-
-<Aft Equipment> 
-CLERLargeLaser
-CLERLargeLaser
-CLStreakSRM6
-CLStreakSRM6
-CLStreakSRM6 Ammo
-CLStreakSRM6 Ammo
-CLStreakSRM6 Ammo
-CLStreakSRM6 Ammo
-CLStreakSRM6 Ammo
-CLMediumPulseLaser
-CLMediumPulseLaser
-CLMediumPulseLaser
-CLMediumPulseLaser
-(R) CLAntiMissileSystem
-(R) CLAntiMissileSystem
-(R) CLAMS Ammo
-(R) CLAMS Ammo
-(R) CLAMS Ammo
-</Aft Equipment>
-
-<structural_integrity>
-20
-</structural_integrity>
 
 <heatsinks>
 195
@@ -190,61 +61,168 @@ CLMediumPulseLaser
 </sink_type>
 
 <fuel>
-450
+4500
 </fuel>
 
-<type>
-Clan Level 2
-</type>
+<engine_type>
+1
+</engine_type>
 
-<year>
-3063
-</year>
+<armor_type>
+41
+</armor_type>
+
+<armor_tech>
+2
+</armor_tech>
+
+<armor>
+360
+355
+355
+350
+</armor>
+
+<Nose Equipment>
+(B) CLERLargeLaser
+CLERLargeLaser
+CLERLargeLaser
+CLERLargeLaser
+(B) CLMediumPulseLaser
+CLMediumPulseLaser
+CLMediumPulseLaser
+CLMediumPulseLaser
+CLMediumPulseLaser
+CLMediumPulseLaser
+(B) CLAntiMissileSystem
+CLAntiMissileSystem
+CLAntiMissileSystem
+CLAMS Ammo:120
+(B) CLStreakSRM6
+CLStreakSRM6
+CLStreakSRM6
+CLStreakSRM6
+Clan Streak SRM 6 Ammo:75
+</Nose Equipment>
+
+<Left Side Equipment>
+(B) CLERLargeLaser
+CLERLargeLaser
+CLERLargeLaser
+(B) CLMediumPulseLaser
+CLMediumPulseLaser
+CLMediumPulseLaser
+CLMediumPulseLaser
+CLMediumPulseLaser
+(B) CLAntiMissileSystem
+CLAntiMissileSystem
+CLAMS Ammo:72
+(R) (B) CLERLargeLaser
+(R) CLERLargeLaser
+(R) (B) CLMediumPulseLaser
+(R) CLMediumPulseLaser
+(R) CLMediumPulseLaser
+(R) (B) CLAntiMissileSystem
+(R) CLAntiMissileSystem
+(R) CLAMS Ammo:72
+(B) CLStreakSRM6
+CLStreakSRM6
+CLStreakSRM6
+Clan Streak SRM 6 Ammo:120
+(R) (B) CLStreakSRM6
+(R) CLStreakSRM6
+(R) Clan Streak SRM 6 Ammo:90
+</Left Side Equipment>
+
+<Right Side Equipment>
+(B) CLERLargeLaser
+CLERLargeLaser
+CLERLargeLaser
+(B) CLMediumPulseLaser
+CLMediumPulseLaser
+CLMediumPulseLaser
+CLMediumPulseLaser
+CLMediumPulseLaser
+(B) CLAntiMissileSystem
+CLAntiMissileSystem
+CLAMS Ammo:72
+(R) (B) CLERLargeLaser
+(R) CLERLargeLaser
+(R) (B) CLMediumPulseLaser
+(R) CLMediumPulseLaser
+(R) CLMediumPulseLaser
+(R) (B) CLAntiMissileSystem
+(R) CLAntiMissileSystem
+(R) CLAMS Ammo:72
+(B) CLStreakSRM6
+CLStreakSRM6
+CLStreakSRM6
+Clan Streak SRM 6 Ammo:120
+(R) (B) CLStreakSRM6
+(R) CLStreakSRM6
+(R) Clan Streak SRM 6 Ammo:90
+</Right Side Equipment>
+
+<Aft Equipment>
+(B) CLERLargeLaser
+CLERLargeLaser
+(B) CLMediumPulseLaser
+CLMediumPulseLaser
+CLMediumPulseLaser
+CLMediumPulseLaser
+(B) CLAntiMissileSystem
+CLAntiMissileSystem
+CLAMS Ammo:72
+(B) CLStreakSRM6
+CLStreakSRM6
+Clan Streak SRM 6 Ammo:75
+</Aft Equipment>
+
+<structural_integrity>
+20
+</structural_integrity>
 
 <source>
 TRO 3067 - Civil War
 </source>
 
-<internal_type>
-0
-</internal_type>
+<tonnage>
+7000.0
+</tonnage>
 
-<designtype>
-1
-</designtype>
+<crew>
+144
+</crew>
 
-<armor_type>
-0
-</armor_type>
+<officers>
+4
+</officers>
 
-<engine_type>
-0
-</engine_type>
-
-<motion_type>
-spheroid
-</motion_type>
-
-<transporters>
-MechBay:5:1
-HeavyVehicleBay:10:2
-BattleArmorBay:5:1
-ASFBay:4:2
-CargoBay:316:1
-</transporters>
-
-<escape_pod>
+<gunners>
 10
-</escape_pod>
+</gunners>
+
+<passengers>
+0
+</passengers>
+
+<marines>
+0
+</marines>
+
+<battlearmor>
+0
+</battlearmor>
+
+<otherpassenger>
+0
+</otherpassenger>
 
 <life_boat>
 5
 </life_boat>
 
-<crew>
-111
-</crew>
+<escape_pod>
+10
+</escape_pod>
 
-<passengers>
-0
-</passengers>
