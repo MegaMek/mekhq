@@ -10,6 +10,7 @@ VERSION HISTORY:
 + Issue #617: Extinct units available for purchase when they shouldn't be.
 + Issue #625: Repair Bay status window not cleared after last unit is repaired.
 + Honor user's press of the cancel button in the briefing screen "load saved game" dialog
++ Dropships and other units with transport bays that have internal components (cubicles, doors) should no longer incorrectly show some of those components as damaged.
 
 v0.43.7-git 
 + Issue #567: BA standard armor cannot be repaired
