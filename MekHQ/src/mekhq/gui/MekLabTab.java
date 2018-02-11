@@ -461,8 +461,6 @@ public class MekLabTab extends CampaignGuiTab {
         public abstract Entity getEntity();
         
         abstract void setTechFaction(int techFaction);
-        
-        abstract void refreshTransport();
     }
 
     private class AeroPanel extends EntityPanel {
