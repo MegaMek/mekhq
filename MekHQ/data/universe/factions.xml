@@ -160,6 +160,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<altNamesByYear year='3085'>Lyran Commonwealth</altNamesByYear>
 		<tags>is</tags>
 		<start>2340</start>
+		<end>3084</end>
 	</faction>
 	<!-- Star League Era factions -->
 	<faction>
@@ -537,7 +538,8 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<nameGenerator>General</nameGenerator>
 		<colorRGB>0,128,128</colorRGB>
 		<tags>periphery</tags>
-		<start>3066</start>
+		<start>2253</start> 
+		<!-- Per Reunification War PDF, Protectorate existed prior to the Concordat, changing start from 3066 to 2253 per that source -->
 	</faction>
 	<faction>
 		<shortname>CI</shortname>
