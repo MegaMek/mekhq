@@ -80,8 +80,8 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<nameGenerator>General</nameGenerator>
 		<colorRGB>255,255,255</colorRGB>
 		<tags>is</tags>
-		<start>2316</start>
-		<end>2776</end>
+		<start>2315</start>
+		<end>2790</end>
 	</faction>
 		<faction>
 		<shortname>AE</shortname>
@@ -160,7 +160,6 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<altNamesByYear year='3085'>Lyran Commonwealth</altNamesByYear>
 		<tags>is</tags>
 		<start>2340</start>
-		<end>3084</end>
 	</faction>
 	<!-- Star League Era factions -->
 	<faction>
@@ -437,9 +436,10 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<eraMods>1,1,1,0,0,0,0,0,0</eraMods>
 		<nameGenerator>General</nameGenerator>
 		<colorRGB>232,202,173</colorRGB>
+		<altNamesByYear year='2767'>Amaris Empire</altNamesByYear>
 		<tags>periphery</tags>
 		<start>2250</start>
-		<end>2769</end>
+		<end>2779</end>
 	</faction>
 	<faction>
 		<shortname>THW</shortname>

@@ -11,6 +11,7 @@ VERSION HISTORY:
 + Issue #625: Repair Bay status window not cleared after last unit is repaired.
 + Honor user's press of the cancel button in the briefing screen "load saved game" dialog
 + Dropships and other units with transport bays that have internal components (cubicles, doors) should no longer incorrectly show some of those components as damaged.
++ Improved faction-change info for pre-CC factions and CC formation using Handbook Liao
 
 v0.43.7-git 
 + Issue #567: BA standard armor cannot be repaired
