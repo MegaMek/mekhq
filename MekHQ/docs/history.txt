@@ -14,6 +14,7 @@ v0.43.8-RC2 (2018-02-11 22:40 UTC)
 + Honor user's press of the cancel button in the briefing screen "load saved game" dialog
 + Dropships and other units with transport bays that have internal components (cubicles, doors) should no longer incorrectly show some of those components as damaged.
 + Improved faction-change info for pre-CC factions and CC formation using Handbook Liao
++ Updated faction-change info for FS using Handbook Davion
 
 v0.43.7-RC1 (2018-01-21 22:00 UTC)
 + Issue #567: BA standard armor cannot be repaired
