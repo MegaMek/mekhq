@@ -321,7 +321,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<fullname>Marlette Association</fullname>
 		<eraMods>0,0,0,1,2,2,1,0,0</eraMods>
 		<nameGenerator>FS</nameGenerator>
-		<colorRGB>254,214,0</colorRGB>
+		<colorRGB>27,98,229</colorRGB>
 		<tags>is</tags>
 		<start>2278</start>
 		<end>2324</end>
@@ -332,7 +332,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<fullname>Muskegon Coalition</fullname>
 		<startingPlanet>Muskegon</startingPlanet>
 		<nameGenerator>General</nameGenerator>
-		<colorRGB>254,214,0</colorRGB>
+		<colorRGB>27,229,195</colorRGB>
 		<tags>is</tags>
 		<start>2163</start>
 		<end>2317</end>
