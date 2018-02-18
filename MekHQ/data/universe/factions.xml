@@ -190,7 +190,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<fullname>Capellan Commonality</fullname>
 		<eraMods>1,0,0,1,2,3,2,1,0</eraMods>
 		<nameGenerator>CC</nameGenerator>
-		<colorRGB>2,166,79</colorRGB>
+		<colorRGB>242,145,197</colorRGB>
 		<tags>is</tags>
 		<start>2310</start>
 		<end>2366</end>
@@ -287,7 +287,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<fullname>Alliance of Galedon</fullname>
 		<eraMods>0,0,0,1,2,2,1,0,0</eraMods>
 		<nameGenerator>DC</nameGenerator>
-		<colorRGB>234,38,41</colorRGB>
+		<colorRGB>128,66,244</colorRGB>
 		<tags>is</tags>
 		<start>2302</start>
 		<end>2319</end>
@@ -298,7 +298,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<fullname>Azami Caliphate</fullname>
 		<startingPlanet>Algedi</startingPlanet>
 		<nameGenerator>DC</nameGenerator>
-		<colorRGB>255,80,93</colorRGB>
+		<colorRGB>66,244,66</colorRGB>
 		<tags>is</tags>
 		<start>2450</start>
 		<end>2516</end>
@@ -400,7 +400,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<fullname>Protectorate of Donegal</fullname>
 		<eraMods>1,0,0,1,2,3,2,1,0</eraMods>
 		<nameGenerator>LA</nameGenerator>
-		<colorRGB>22,126,194</colorRGB>
+		<colorRGB>66,244,143</colorRGB>
 		<tags>is</tags>
 		<start>2313</start>
 		<end>2341</end>
@@ -411,7 +411,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<fullname>Federation of Skye</fullname>
 		<eraMods>1,0,0,1,2,3,2,1,0</eraMods>
 		<nameGenerator>LA</nameGenerator>
-		<colorRGB>22,126,194</colorRGB>
+		<colorRGB>66,217,244</colorRGB>
 		<tags>is</tags>
 		<start>2299</start>
 		<end>2341</end>
@@ -422,7 +422,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<fullname>Tamar Pact</fullname>
 		<eraMods>1,0,0,1,2,3,2,1,0</eraMods>
 		<nameGenerator>LA</nameGenerator>
-		<colorRGB>22,126,194</colorRGB>
+		<colorRGB>244,161,66</colorRGB>
 		<tags>is</tags>
 		<start>2235</start>
 		<end>2341</end>
@@ -517,7 +517,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<startingPlanet>Algedi</startingPlanet>
 		<eraMods>0,0,0,1,2,2,1,0,0</eraMods>
 		<nameGenerator>DC</nameGenerator>
-		<colorRGB>255,80,93</colorRGB>
+		<colorRGB>238,66,244</colorRGB>
 		<tags>is</tags>
 		<start>3071</start>
 		<end>3081</end>
@@ -527,7 +527,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<fullname>Ozawa Mercantile Association</fullname>
 		<eraMods>0,0,0,1,2,2,1,0,0</eraMods>
 		<nameGenerator>DC</nameGenerator>
-		<colorRGB>255,80,93</colorRGB>
+		<colorRGB>206,244,66</colorRGB>
 		<tags>trader</tags>
 	</faction>
 	<faction>
@@ -1395,7 +1395,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<fullname>Sian Supremacy</fullname>
 		<eraMods>1,0,0,1,2,3,2,1,0</eraMods>
 		<nameGenerator>CC</nameGenerator>
-		<colorRGB>2,166,79</colorRGB>
+		<colorRGB>145,166,242</colorRGB>
 		<tags>is</tags>
 	</faction>
 	<faction>
