@@ -7325,6 +7325,7 @@ public class Campaign implements Serializable, ITechManager {
         entity.setStuck(false);
         entity.resetCoolantFailureAmount();
         entity.setConversionMode(0);
+        entity.setDoomed(false);
 
         if (!entity.getSensors().isEmpty()) {
             entity.setNextSensor(entity.getSensors().firstElement());
