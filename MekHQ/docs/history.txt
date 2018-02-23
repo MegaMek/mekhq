@@ -2,6 +2,7 @@ VERSION HISTORY:
 ----------------
 v0.43.9-git
 + Issue #647: Exception Causing UI Issues while Unit is Being Refit
++ Issue #655: Mechs (and probably other units) whose crews ejected will be able to deploy on subsequent missions
 
 v0.43.8-RC2 (2018-02-11 22:40 UTC)
 + Issue #626: News events with year but no specific date should now fire with better distribution
