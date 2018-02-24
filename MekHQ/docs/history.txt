@@ -3,6 +3,7 @@ VERSION HISTORY:
 v0.43.9-git
 + Issue #647: Exception Causing UI Issues while Unit is Being Refit
 + Issue #655: Mechs (and probably other units) whose crews ejected will be able to deploy on subsequent missions
++ Updated faction-change info for FWL using Handbook Marik
 
 v0.43.8-RC2 (2018-02-11 22:40 UTC)
 + Issue #626: News events with year but no specific date should now fire with better distribution
@@ -18,7 +19,6 @@ v0.43.8-RC2 (2018-02-11 22:40 UTC)
 + Improved faction-change info for pre-CC factions and CC formation using Handbook Liao
 + Updated faction-change info for FS using Handbook Davion
 + Updated faction-change info for DC using Handbook Kurita
-+ Updated faction-change info for FWL using Handbook Marik
 
 v0.43.7-RC1 (2018-01-21 22:00 UTC)
 + Issue #567: BA standard armor cannot be repaired
