@@ -105,16 +105,12 @@ Austen-Armstrong Industries</desc>
             <date>2168-01-01</date>
             <faction>TA</faction>
         </event>
-        <event>
-            <date>2242-01-01</date>
-            <faction>IND</faction>
-        </event>
-        <event>
-            <date>2246-01-01</date>
+		<event>
+            <date>2241-01-01</date>
             <faction>MCM</faction>
         </event>
         <event>
-            <date>2317-01-01</date>
+            <date>2271-06-01</date>
             <faction>FWL</faction>
             <pop>8</pop>
         </event>
@@ -905,7 +901,7 @@ The three continents of Achernar are Agnetenar, Eridanus, and Zaurak; the capita
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2355-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -987,7 +983,7 @@ The three continents of Achernar are Agnetenar, Eridanus, and Zaurak; the capita
             <faction>IND</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2280-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -1746,11 +1742,11 @@ Addicks remains an important world today, though it has lost much of its glory o
 
 Aitutaki’s early settlers made a unique distinction by creating two capital cities, Ladakh and Srinagar. Ladakh was created as the center of government and Srinagar as the center for financial, commercial and industrial concerns with the intent of minimizing interference between commerce and government.</desc>
         <event>
-            <date>2271-01-01</date>
+            <date>2247-01-01</date>
             <faction>PR</faction>
         </event>
         <event>
-            <date>2317-01-01</date>
+            <date>2271-06-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -3652,10 +3648,6 @@ Despite being aware of the impending, though slow coming, temperature change tha
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2315-01-01</date>
-            <faction>TH</faction>
-        </event>
-        <event>
             <date>2571-01-01</date>
             <faction>FWL</faction>
         </event>
@@ -3685,7 +3677,7 @@ Despite being aware of the impending, though slow coming, temperature change tha
             <faction>IND</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2280-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -4290,12 +4282,12 @@ The capital city, Gaines, located on the southern polar continent of Tanzaria, i
         <nadirCharge>false</nadirCharge>
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
-        <event>
-            <date>2271-01-01</date>
+		<event>
+            <date>2241-01-01</date>
             <faction>MCM</faction>
         </event>
         <event>
-            <date>2317-01-01</date>
+            <date>2271-06-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -4604,7 +4596,7 @@ Alula Australis has the distinction of being the first planet that House Marik d
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2340-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -4890,7 +4882,7 @@ The capital city and commercial center of Alya, LeSabrea, is located on Paroasis
             <faction>IND</faction>
         </event>
         <event>
-            <date>2271-01-01</date>
+            <date>2300-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -5523,12 +5515,12 @@ Andurien Aerotech</desc>
         <hpg>B</hpg>
         <faction>UND</faction>
         <desc>Due to contaminants in most of the water on Angell II the planet has always been reliant on Ice Ships and water purification to sustain its population. However, due to the vast mineral deposits found on Angell II, it has been one of the Free Worlds League’s most prosperous worlds since its founding. The world is stratified into the rich and the poor, the rich have access to purified water while the poor are forced to live off the water rationed to them by the rich or support themselves with unreliable ‘home purification’ systems. Tensions run high due to the disparity that has only widened as the Succession Wars took their toll on the purification systems on planet.</desc>
-        <event>
-            <date>2271-01-01</date>
+		<event>
+            <date>2241-01-01</date>
             <faction>MCM</faction>
         </event>
         <event>
-            <date>2317-01-01</date>
+            <date>2271-06-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -7170,12 +7162,12 @@ Salvatore Incorporated</desc>
         <nadirCharge>false</nadirCharge>
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
-        <event>
-            <date>2271-01-01</date>
+		<event>
+            <date>2241-01-01</date>
             <faction>MCM</faction>
         </event>
         <event>
-            <date>2317-01-01</date>
+            <date>2271-06-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -7639,7 +7631,7 @@ Though a major exporter of heavy metals and radioactive elements, as well as sma
             <faction>IND</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2280-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -7680,7 +7672,7 @@ Though a major exporter of heavy metals and radioactive elements, as well as sma
             <faction>IND</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2280-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -7799,7 +7791,7 @@ Though a major exporter of heavy metals and radioactive elements, as well as sma
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2340-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -8013,10 +8005,6 @@ Though a major exporter of heavy metals and radioactive elements, as well as sma
             <faction>TH</faction>
         </event>
         <event>
-            <date>2317-01-01</date>
-            <faction>TH</faction>
-        </event>
-        <event>
             <date>2767-01-01</date>
             <faction>RWR</faction>
         </event>
@@ -8031,6 +8019,10 @@ Though a major exporter of heavy metals and radioactive elements, as well as sma
         <event>
             <date>3030-01-01</date>
             <faction>LA</faction>
+        </event>
+		<event>
+            <date>3057-01-01</date>
+            <faction>DC</faction>
         </event>
         <event>
             <date>3068-06-19</date>
@@ -8148,7 +8140,7 @@ Sanctuary Station</desc>
             <faction>CCom</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2367-08-01</date>
             <faction>CC</faction>
         </event>
         <event>
@@ -8445,11 +8437,15 @@ Deller-Bingham-Fouts
 Illium Shipyards
 Imperator Automatic Weaponry</desc>
         <event>
-            <date>2271-01-01</date>
+            <date>2160-01-01</date>
+            <faction>IND</faction>
+        </event>
+		<event>
+            <date>2241-01-01</date>
             <faction>MCM</faction>
         </event>
         <event>
-            <date>2317-01-01</date>
+            <date>2271-06-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -8806,12 +8802,12 @@ The capital and primary spaceport city of Atria Prime, located on the southern p
 However, by the early 31st century this turned around and Augustine began to rebuild and repopulate as many people immigrated to the hospitable warm-temperate planet.
 
 The primary industries on Augustine involve extracting raw minerals from the planet and processing petrochemicals on the northern continent of Kabuko and agriculture on other two continents, Roma and Grecian.</desc>
-        <event>
-            <date>2271-01-01</date>
+		<event>
+            <date>2241-01-01</date>
             <faction>MCM</faction>
         </event>
         <event>
-            <date>2317-01-01</date>
+            <date>2271-06-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -9006,7 +9002,7 @@ Most of the wilds of Queensland, the planet’s largest continent, have remained
             <faction>IND</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2285-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -9063,12 +9059,12 @@ Most of the wilds of Queensland, the planet’s largest continent, have remained
         <nadirCharge>false</nadirCharge>
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
-        <event>
-            <date>2271-01-01</date>
+		<event>
+            <date>2241-01-01</date>
             <faction>MCM</faction>
         </event>
         <event>
-            <date>2317-01-01</date>
+            <date>2271-06-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -9146,11 +9142,11 @@ Most of the wilds of Queensland, the planet’s largest continent, have remained
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2271-01-01</date>
+            <date>2247-01-01</date>
             <faction>PR</faction>
         </event>
         <event>
-            <date>2317-01-01</date>
+            <date>2271-06-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -9391,7 +9387,7 @@ Most of the wilds of Queensland, the planet’s largest continent, have remained
             <faction>IND</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2335-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -9789,7 +9785,7 @@ Babylon is home to the Goliath Scorpion, which were a bane of early settlers.</d
             <faction>IND</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2280-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -10450,7 +10446,7 @@ Babylon is home to the Goliath Scorpion, which were a bane of early settlers.</d
             <faction>IND</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2280-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -11344,11 +11340,11 @@ The capital city and primary spaceport of Baxter, Cleopolis, is located on the n
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2271-01-01</date>
-            <faction>SC</faction>
+            <date>2259-01-01</date>
+            <faction>SCon</faction>
         </event>
         <event>
-            <date>2317-01-01</date>
+            <date>2293-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -12193,19 +12189,15 @@ During the Word of Blake Jihad, Benjamin was right on the edge of the Word of Bl
             <faction>IND</faction>
         </event>
         <event>
-            <date>2317-01-01</date>
+            <date>2367-10-01</date>
+            <faction>CC</faction>
+        </event>
+		<event>
+            <date>2369-12-01</date>
             <faction>FWL</faction>
         </event>
         <event>
-            <date>2341-01-01</date>
-            <faction>TH</faction>
-        </event>
-        <event>
-            <date>2367-01-01</date>
-            <faction>FWL</faction>
-        </event>
-        <event>
-            <date>2571-01-01</date>
+            <date>2500-01-01</date>
             <faction>TH</faction>
         </event>
         <event>
@@ -12224,7 +12216,15 @@ During the Word of Blake Jihad, Benjamin was right on the edge of the Word of Bl
             <date>2821-01-01</date>
             <faction>CC</faction>
         </event>
-        <event>
+        <event> From pg 36 of HB Marik
+            <date>2832-01-01</date>
+            <faction>FWL</faction>
+        </event>
+		<event>
+            <date>2860-01-01</date>
+            <faction>CC</faction>
+        </event>
+		<event>
             <date>2950-01-01</date>
             <faction>FWL</faction>
         </event>
@@ -14349,11 +14349,11 @@ Bermuda Combat Systems</desc>
             <faction>IND</faction>
         </event>
          <event>
-            <date>2367-01-01</date>
+            <date>2300-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2500-01-01</date>
             <faction>TH</faction>
         </event>
         <event>
@@ -17114,7 +17114,11 @@ Unlike many planets, Butte Hold was unaffected by the fall of the Star League an
         </event>
         <event>
             <date>2570-01-01</date>
-            <faction>FWL,TH</faction>
+            <faction>FWL</faction>
+        </event>
+		<event>
+            <date>2600-01-01</date>
+            <faction>TH</faction>
         </event>
         <event>
             <date>2767-01-01</date>
@@ -17460,11 +17464,11 @@ Earthwerks Incorporated</desc>
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2271-01-01</date>
+            <date>2247-01-01</date>
             <faction>PR</faction>
         </event>
         <event>
-            <date>2317-01-01</date>
+            <date>2271-06-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -18836,14 +18840,6 @@ During the Jihad, Carsphairn was raided several times by Word of Blake forces as
             <date>2350-01-01</date>
             <faction>FS</faction>
         </event>
-		<event>
-            <date>2411-01-01</date>
-            <faction>TH</faction>
-        </event>
-		<event>
-            <date>2472-01-01</date>
-            <faction>TH</faction>
-        </event>
         <event>
             <date>2787-06-01</date>
             <faction>DC</faction>
@@ -20013,7 +20009,7 @@ Like the other Trinity worlds, Cerillos' primary industry is farming. Both agric
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2355-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -20735,14 +20731,6 @@ During the Jihad, mercenaries employed by the Word of Blake savaged several mini
             <faction>TH</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
-            <faction>FWL</faction>
-        </event>
-        <event>
-            <date>2571-01-01</date>
-            <faction>TH</faction>
-        </event>
-        <event>
             <date>2767-01-01</date>
             <faction>RWR</faction>
         </event>
@@ -20968,8 +20956,8 @@ During the Jihad, mercenaries employed by the Word of Blake savaged several mini
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2271-01-01</date>
-            <faction>IND</faction>
+            <date>2280-01-01</date>
+            <faction>FWL</faction>
         </event>
         <event>
             <date>2367-01-01</date>
@@ -21853,7 +21841,7 @@ This led to a very hostile environment by the mid 3020s with many residents just
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2350-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -22142,7 +22130,7 @@ This led to a very hostile environment by the mid 3020s with many residents just
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2335-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -22426,15 +22414,7 @@ Honor is the 4th planet in the system and is best described as an arctic planet 
             <faction>TH</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
-            <faction>TH</faction>
-        </event>
-        <event>
             <date>2765-01-01</date>
-            <faction>ABN</faction>
-        </event>
-        <event>
-            <date>2790-01-01</date>
             <faction>ABN</faction>
         </event>
         <event>
@@ -22572,7 +22552,7 @@ Honor is the 4th planet in the system and is best described as an arctic planet 
             <faction>FWL</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2500-01-01</date>
             <faction>TH</faction>
         </event>
         <event>
@@ -23082,12 +23062,12 @@ Hollis Incorporated</desc>
         <nadirCharge>false</nadirCharge>
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
-        <event>
-            <date>2271-01-01</date>
+		<event>
+            <date>2241-01-01</date>
             <faction>MCM</faction>
         </event>
         <event>
-            <date>2317-01-01</date>
+            <date>2271-06-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -26379,10 +26359,6 @@ During the First Succession War, the Draconis Combine used over a dozen 100-mega
         <desc>Early scans of Dalton in 2310 revealed the planet was extremely habitable, with a comfortable climate, breathable air, edible lifeforms, and plentiful arable land, it unfortunately was also very seismically active and as a result the planet was passed up for colonization for more than 200 years. Oddly the seismic activity was no longer present and there had not been a single recorded earthquake as of the 31st Century. Dalton is home to Garret Satcomm., which creates targeting and communication systems for military units.</desc>
         <event>
             <date>2317-01-01</date>
-            <faction>IND</faction>
-        </event>
-        <event>
-            <date>2571-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -26510,11 +26486,11 @@ During the First Succession War, the Draconis Combine used over a dozen 100-mega
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2271-01-01</date>
+            <date>2241-01-01</date>
             <faction>DO</faction>
         </event>
         <event>
-            <date>2317-01-01</date>
+            <date>2271-06-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -27045,11 +27021,11 @@ During the First Succession War, the Draconis Combine used over a dozen 100-mega
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2271-01-01</date>
+            <date>2241-01-01</date>
             <faction>DO</faction>
         </event>
         <event>
-            <date>2317-01-01</date>
+            <date>2271-06-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -28054,10 +28030,6 @@ The influx of off-world immigrants with each change of ownership, mixed with the
             <faction>IND</faction>
         </event>
         <event>
-            <date>2271-01-01</date>
-            <faction>IND</faction>
-        </event>
-        <event>
             <date>2315-07-22</date>
             <faction>TH</faction>
         </event>
@@ -28075,10 +28047,6 @@ The influx of off-world immigrants with each change of ownership, mixed with the
         </event>
         <event>
             <date>2786-01-01</date>
-            <faction>FWL</faction>
-        </event>
-        <event>
-            <date>2790-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -28107,6 +28075,10 @@ The influx of off-world immigrants with each change of ownership, mixed with the
         </event>
         <event>
             <date>3068-09-01</date>
+            <faction>LA,FWL</faction>
+        </event>
+		<event>
+            <date>3068-09-20</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -28611,7 +28583,7 @@ Novis AT-H Incorporated</desc>
             <faction>IND</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2280-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -29031,7 +29003,7 @@ The Free Worlds League finally established full control of the planet in the mid
             <faction>IND</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2310-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -30166,7 +30138,7 @@ In the 32nd century, Dromini is home to people descended originally from Davion,
             <faction>IND</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2280-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -30262,8 +30234,8 @@ During the Star League era, Dubhe was a border world jointly administered by the
             <faction>FWL</faction>
         </event>
         <event>
-            <date>2570-01-01</date>
-            <faction>FWL,TH</faction>
+            <date>2600-01-01</date>
+            <faction>TH</faction>
         </event>
         <event>
             <date>2767-01-01</date>
@@ -32119,11 +32091,7 @@ For much of its early history El Dorado was known for its JumpShip yards. This e
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2315-01-01</date>
-            <faction>TH</faction>
-        </event>
-        <event>
-            <date>2367-01-01</date>
+            <date>2325-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -32335,7 +32303,7 @@ For much of its early history El Dorado was known for its JumpShip yards. This e
             <faction>IND</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2280-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -32914,7 +32882,7 @@ The capital city of Eltanin, Dry Springs, is the administrative and trading cent
             <faction>IND</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2280-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -33598,7 +33566,7 @@ The continent of Cotswold is home to large, rolling plains that great herds of w
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2355-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -34428,11 +34396,11 @@ Exedor is home to one of the many Duchy RTC training facilities throughout the C
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2271-01-01</date>
+            <date>2247-01-01</date>
             <faction>PR</faction>
         </event>
         <event>
-            <date>2317-01-01</date>
+            <date>2271-06-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -35802,19 +35770,11 @@ Manufacturing centers:
 Free Flight, Limited
 Fuisgon-Flame Tech</desc>
         <event>
-            <date>2271-01-01</date>
+            <date>2241-01-01</date>
             <faction>DO</faction>
         </event>
         <event>
-            <date>2315-01-01</date>
-            <faction>TH</faction>
-        </event>
-        <event>
-            <date>2317-01-01</date>
-            <faction>FWL</faction>
-        </event>
-        <event>
-            <date>2790-01-01</date>
+            <date>2271-06-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -36853,7 +36813,7 @@ Colonial Tractors</desc>
             <faction>IND</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2280-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -36915,19 +36875,11 @@ Colonial Tractors</desc>
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2271-01-01</date>
+            <date>2241-01-01</date>
             <faction>DO</faction>
         </event>
         <event>
-            <date>2315-01-01</date>
-            <faction>TH</faction>
-        </event>
-        <event>
-            <date>2317-01-01</date>
-            <faction>FWL</faction>
-        </event>
-        <event>
-            <date>2790-01-01</date>
+            <date>2271-06-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -37055,7 +37007,7 @@ Colonial Tractors</desc>
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2280-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -37613,7 +37565,7 @@ Unfortunately, during the Word of Blake Jihad, orbital strikes by Clan Snow Rave
             <faction>IND</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2285-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -38069,7 +38021,7 @@ When Gallery was originally settled there were no native lifeforms so the origin
             <faction>IND</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2345-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -38832,7 +38784,7 @@ Brigadier Corporation</desc>
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2350-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -41126,7 +41078,7 @@ In the 31st century Greeley gained some importance as the Federated Suns establi
             <faction>IND</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2330-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -42525,10 +42477,6 @@ In the late 3070s Clan Diamond Shark was granted an enclave on the planet of Hal
             <faction>TH</faction>
         </event>
         <event>
-            <date>2341-01-01</date>
-            <faction>TH</faction>
-        </event>
-        <event>
             <date>2767-01-01</date>
             <faction>RWR</faction>
         </event>
@@ -42937,7 +42885,7 @@ During their Holy War, the Blakists found ready converts among the technological
             <faction>IND</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2280-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -43307,11 +43255,11 @@ Entertainment on Hardcore ranges from ballet to bloodsports and is home to a ser
         <faction>UND</faction>
         <desc>Harmony is a hot planet with an oppressive atmosphere, modest natural resources and sufficient arable land to feed its population. Harmony has a well established industrial base, though for most of its history it did not include any military manufacturers. This changed during the Word of Blake Jihad, the Regulans were in need of replacement ‘Mechs and helped Selasys Inc. to upgrade the Harmony MetalWorks facilities, previously only capable of repair and refit, into a production site.</desc>
         <event>
-            <date>2271-01-01</date>
+            <date>2247-01-01</date>
             <faction>PR</faction>
         </event>
         <event>
-            <date>2317-01-01</date>
+            <date>2271-06-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -44576,11 +44524,11 @@ Helm once again became famous in the mid 3020s when the Grey Death League discov
 Manufacturing centers:
 Freeport Armorworks</desc>
         <event>
-            <date>2271-01-01</date>
-            <faction>SC</faction>
+            <date>2259-01-01</date>
+            <faction>SCon</faction>
         </event>
         <event>
-            <date>2317-01-01</date>
+            <date>2293-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -45345,7 +45293,7 @@ Highspire is home to one of the many Duchy RTC facilities throughout the Capella
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2300-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -45838,7 +45786,7 @@ Holloway is home to a Duchy RTC facility, located on the Morristown continent, w
             <faction>IND</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2290-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -45904,7 +45852,7 @@ Holloway is home to a Duchy RTC facility, located on the Morristown continent, w
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2345-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -46046,7 +45994,7 @@ Holloway is home to a Duchy RTC facility, located on the Morristown continent, w
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2340-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -47520,7 +47468,7 @@ Huntress was the capital of Clan Smoke Jaguar and their primary holding. They ha
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2280-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -47744,7 +47692,7 @@ Huntress was the capital of Clan Smoke Jaguar and their primary holding. They ha
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2380-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -47799,7 +47747,7 @@ Huntress was the capital of Clan Smoke Jaguar and their primary holding. They ha
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2365-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -49044,7 +48992,7 @@ Irian’s terrain is best described as bland. The planet’s terrain is dominate
             <faction>IND</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2280-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -50025,7 +49973,7 @@ Taurus Territorial Industries</desc>
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2300-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -50472,7 +50420,7 @@ Taurus Territorial Industries</desc>
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2360-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -50856,11 +50804,11 @@ Jonathan has a 20 hour day and takes 745 standard days to orbit its sun.</desc>
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2271-01-01</date>
+            <date>2241-01-01</date>
             <faction>DO</faction>
         </event>
         <event>
-            <date>2317-01-01</date>
+            <date>2271-06-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -51120,10 +51068,6 @@ Jonathan has a 20 hour day and takes 745 standard days to orbit its sun.</desc>
         <faction>UND</faction>
         <event>
             <date>2317-01-01</date>
-            <faction>IND</faction>
-        </event>
-        <event>
-            <date>2367-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -51683,7 +51627,7 @@ Jonathan has a 20 hour day and takes 745 standard days to orbit its sun.</desc>
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2355-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -51821,7 +51765,7 @@ Quikscell Company</desc>
             <faction>IND</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2335-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -51940,7 +51884,7 @@ Quikscell Company</desc>
             <faction>IND</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2335-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -53174,11 +53118,11 @@ The Blakist Holy War destroyed much of Kawich‘s industry, but The Republic of 
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2271-01-01</date>
+            <date>2247-01-01</date>
             <faction>PR</faction>
         </event>
         <event>
-            <date>2317-01-01</date>
+            <date>2271-06-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -53480,7 +53424,7 @@ Manufacturing centers:
 Brooks, Incorporated
 Kali Yama - Alphard Trading Corporation</desc>
         <event>
-            <date>2571-01-01</date>
+            <date>2400-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -54075,12 +54019,12 @@ Due to the low pressure (and tainted) atmosphere of Keystone, rebreathing device
 Manufacturing Centers:
 Earthwerks Incorporated
 Exeter Organization</desc>
-        <event>
-            <date>2271-01-01</date>
+		<event>
+            <date>2241-01-01</date>
             <faction>MCM</faction>
         </event>
         <event>
-            <date>2317-01-01</date>
+            <date>2271-06-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -54934,12 +54878,12 @@ The planet has moderate natural resources and enough arable land to sustain itse
         <nadirCharge>false</nadirCharge>
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
-        <event>
-            <date>2271-01-01</date>
+		<event>
+            <date>2241-01-01</date>
             <faction>MCM</faction>
         </event>
         <event>
-            <date>2317-01-01</date>
+            <date>2271-06-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -55229,7 +55173,7 @@ Gortex Multi-E</desc>
             <faction>IND</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2280-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -57124,7 +57068,7 @@ Defiance Industries Manufacturing Annex</desc>
             <faction>IND</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2280-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -57168,8 +57112,16 @@ Defiance Industries Manufacturing Annex</desc>
             <date>2367-08-01</date>
             <faction>CC</faction>
         </event>
-        <event>
-            <date>2900-01-01</date>
+        <event> From pg 36 of HB Marik
+            <date>2832-01-01</date>
+            <faction>FWL</faction>
+        </event>
+		<event>
+            <date>2860-01-01</date>
+            <faction>CC</faction>
+        </event>
+		<event>
+            <date>2950-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -57931,12 +57883,12 @@ Aside from the large island continent of Galapagos in the northern hemisphere of
         <nadirCharge>false</nadirCharge>
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
-        <event>
-            <date>2271-01-01</date>
+		<event>
+            <date>2241-01-01</date>
             <faction>MCM</faction>
         </event>
         <event>
-            <date>2317-01-01</date>
+            <date>2271-06-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -58459,12 +58411,12 @@ Aside from the large island continent of Galapagos in the northern hemisphere of
         <nadirCharge>false</nadirCharge>
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
-        <event>
-            <date>2271-01-01</date>
+		<event>
+            <date>2241-01-01</date>
             <faction>MCM</faction>
         </event>
         <event>
-            <date>2317-01-01</date>
+            <date>2271-06-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -59575,7 +59527,7 @@ Liao is home to the Liao Conservatory of Military Arts, which is located in the 
             <faction>CC</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2500-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -59967,11 +59919,11 @@ Ceres Metals Industries of Lockton</desc>
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2271-01-01</date>
+            <date>2241-01-01</date>
             <faction>DO</faction>
         </event>
         <event>
-            <date>2317-01-01</date>
+            <date>2271-06-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -60306,7 +60258,7 @@ While the air was still breathable, the planet is locked in ice and uninhabited 
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2355-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -60800,7 +60752,7 @@ Norse Storm</desc>
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2280-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -61184,7 +61136,7 @@ Norse Storm</desc>
             <faction>IND</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2280-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -61922,7 +61874,7 @@ Pinard Protectorates Unlimited</desc>
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2355-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -63048,12 +63000,12 @@ Mandate has a short 15 hour day and orbits its sun every 9 standard days.</desc>
         <nadirCharge>false</nadirCharge>
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
-        <event>
-            <date>2271-01-01</date>
+		<event>
+            <date>2241-01-01</date>
             <faction>MCM</faction>
         </event>
         <event>
-            <date>2317-01-01</date>
+            <date>2271-06-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -63841,11 +63793,15 @@ Manufacturing Centers:
 Imstar Aerosapce
 Waytani Incorporated</desc>
         <event>
-            <date>2271-01-01</date>
+            <date>2139-01-01</date>
+            <faction>TA</faction>
+        </event>
+		<event>
+            <date>2241-01-01</date>
             <faction>MCM</faction>
         </event>
         <event>
-            <date>2317-01-01</date>
+            <date>2271-06-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -64439,11 +64395,11 @@ In late September 3039 the 11th Ghost and 12th Ghost regiments arrived.  Close c
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2271-01-01</date>
+            <date>2241-01-01</date>
             <faction>DO</faction>
         </event>
         <event>
-            <date>2317-01-01</date>
+            <date>2271-06-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -64705,7 +64661,7 @@ Matsu has 30 hour days and orbits its sun every 1034 standard days. This results
             <faction>IND</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2330-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -64988,11 +64944,7 @@ Maxwell is home to the original Hero Training Institute - a large for-profit ins
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
-            <faction>FWL</faction>
-        </event>
-        <event>
-            <date>2900-01-01</date>
+            <date>2330-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -65641,7 +65593,7 @@ When the planet was rediscovered in the 31st century, the world was full of stra
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2335-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -66487,11 +66439,11 @@ Menkib has 25 hour days and orbits its sun every 37 standard days.</desc>
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2271-01-01</date>
-            <faction>SC</faction>
+            <date>2259-01-01</date>
+            <faction>SCon</faction>
         </event>
         <event>
-            <date>2317-01-01</date>
+            <date>2293-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -66896,12 +66848,12 @@ Menkib has 25 hour days and orbits its sun every 37 standard days.</desc>
         <nadirCharge>false</nadirCharge>
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
-        <event>
-            <date>2271-01-01</date>
+		<event>
+            <date>2241-01-01</date>
             <faction>MCM</faction>
         </event>
         <event>
-            <date>2317-01-01</date>
+            <date>2271-06-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -67101,12 +67053,12 @@ Menkib has 25 hour days and orbits its sun every 37 standard days.</desc>
         <nadirCharge>false</nadirCharge>
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
-        <event>
-            <date>2271-01-01</date>
+		<event>
+            <date>2241-01-01</date>
             <faction>MCM</faction>
         </event>
         <event>
-            <date>2317-01-01</date>
+            <date>2271-06-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -67283,10 +67235,6 @@ Menkib has 25 hour days and orbits its sun every 37 standard days.</desc>
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2315-01-01</date>
-            <faction>TH</faction>
-        </event>
-        <event>
             <date>2750-01-01</date>
             <faction>FWL</faction>
         </event>
@@ -67312,11 +67260,11 @@ Menkib has 25 hour days and orbits its sun every 37 standard days.</desc>
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2271-01-01</date>
+            <date>2241-01-01</date>
             <faction>DO</faction>
         </event>
         <event>
-            <date>2317-01-01</date>
+            <date>2271-06-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -68528,7 +68476,7 @@ Mizar has been a resort planet of some renown since before the time of the Star 
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2350-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -69388,11 +69336,7 @@ The major city of Al-Hassam is a commercial hub which is a major trade center in
 Manufacturing centers:
 Bagamoyo Aerospace Manufacturing</desc>
         <event>
-            <date>2315-01-01</date>
-            <faction>TH</faction>
-        </event>
-        <event>
-            <date>2367-01-01</date>
+            <date>2325-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -69619,7 +69563,7 @@ Bagamoyo Aerospace Manufacturing</desc>
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2320-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -69928,11 +69872,11 @@ spaceport of Laubenstein.</desc>
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2271-01-01</date>
+            <date>2247-01-01</date>
             <faction>PR</faction>
         </event>
         <event>
-            <date>2317-01-01</date>
+            <date>2271-06-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -71649,7 +71593,7 @@ Kallon Industries</desc>
             <faction>IND</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2280-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -72615,10 +72559,6 @@ However, the Devil's Brigade had one striking success: they found the ancient st
             <faction>TH</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
-            <faction>TH</faction>
-        </event>
-        <event>
             <date>2766-01-31</date>
             <faction>RWR</faction>
         </event>
@@ -72727,11 +72667,7 @@ However, the Devil's Brigade had one striking success: they found the ancient st
             <faction>IND</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
-            <faction>FWL</faction>
-        </event>
-        <event>
-            <date>2900-01-01</date>
+            <date>2280-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -73615,12 +73551,12 @@ New Macao has 22 hour days and orbits its sun every 364 standard days.</desc>
         <desc>An uneasy peace has covered New Olympia for centuries between the Olympica Province and the rest of the planet which is part of the Free Worlds League. Technically the island province is an independent realm in the middle of the Free Worlds League. This unique status as an independent region has drawn the wealthy of the Free Worlds League that are eager to live under the comforts provided at the heart of the League while avoiding the taxes imposed on most planets.
 
 Most industry on the planet is centered around catering to the rich individuals seeking to take advantage of the Olympica Provinces’ tax free status.</desc>
-        <event>
-            <date>2271-01-01</date>
+		<event>
+            <date>2241-01-01</date>
             <faction>MCM</faction>
         </event>
         <event>
-            <date>2317-01-01</date>
+            <date>2271-06-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -73743,10 +73679,6 @@ Most industry on the planet is centered around catering to the rich individuals 
         <faction>UND</faction>
         <event>
             <date>2317-01-01</date>
-            <faction>IND</faction>
-        </event>
-        <event>
-            <date>2367-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -74583,11 +74515,11 @@ New Wessex is sparsely inhabited, with most of the population living in towns an
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2271-01-01</date>
+            <date>2247-01-01</date>
             <faction>PR</faction>
         </event>
         <event>
-            <date>2317-01-01</date>
+            <date>2271-06-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -74712,7 +74644,7 @@ New Wessex is sparsely inhabited, with most of the population living in towns an
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2315-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -75251,7 +75183,7 @@ Niops V and VI were settled primarily to expand the available resources to the N
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2360-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -75496,7 +75428,7 @@ During the Fourth Succession War, the Federated Suns leaked false reports of ung
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2280-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -76163,7 +76095,7 @@ Federated Industries</desc>
             <faction>IND</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2280-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -76625,7 +76557,7 @@ Today, Nusakan is home to a thriving population and reborn computer and electron
             <faction>IND</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2280-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -77007,11 +76939,11 @@ Okefenokee is covered in jungles and swamps that are teeming with life. Unfortun
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2271-01-01</date>
+            <date>2247-01-01</date>
             <faction>PR</faction>
         </event>
         <event>
-            <date>2317-01-01</date>
+            <date>2271-06-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -77655,11 +77587,11 @@ Manufacturing centers:
 Oriente Weapons Works
 Etna Foundries</desc>
         <event>
-            <date>2271-01-01</date>
+            <date>2241-01-01</date>
             <faction>DO</faction>
         </event>
         <event>
-            <date>2317-01-01</date>
+            <date>2271-06-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -78996,7 +78928,7 @@ Challenge Systems</desc>
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2320-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -80735,7 +80667,7 @@ Wingman Enterprises</desc>
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2310-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -82209,15 +82141,7 @@ During the Fourth Succession War, Federated Suns forces captured Poznan and they
             <faction>IND</faction>
         </event>
         <event>
-            <date>2315-01-01</date>
-            <faction>TH</faction>
-        </event>
-        <event>
-            <date>2571-01-01</date>
-            <faction>FWL</faction>
-        </event>
-        <event>
-            <date>2790-01-01</date>
+            <date>2310-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -82562,7 +82486,7 @@ While the planet was once home to a sprawling Brigadier Corporation ‘Mech fact
 
 The marketing campaign forgot to mention that there were fewer areas with moderate temperature and good soil on the massive planet than on Earth. Or that much of the abundant water was highly salinated. The ads also failed to mention the extremely high gravity, almost double that on Earth. There were very narrow temperate zones, with massive desserts between. There was also the problem of native life that required vaccines, anti-allergy medication to fight the smaller-scale life forms, and for the larger and more aggressive and intelligent, possibly body armor and weapons training.</desc>
         <event>
-            <date>2271-01-01</date>
+            <date>2360-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -84205,7 +84129,7 @@ Hope Industrial Works</desc>
             <faction>IND</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2280-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -84612,11 +84536,11 @@ Trade is the primary industry on Regulus and the planet is a well known trade-po
 Manufacturing Centers:
 Magna Metals Incorporated</desc>
         <event>
-            <date>2271-01-01</date>
+            <date>2247-01-01</date>
             <faction>PR</faction>
         </event>
         <event>
-            <date>2317-01-01</date>
+            <date>2271-06-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -84837,7 +84761,7 @@ Magna Metals Incorporated</desc>
             <faction>IND</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2300-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -85102,7 +85026,7 @@ Magna Metals Incorporated</desc>
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2400-01-01</date>
             <faction>MOC</faction>
         </event>
         <event>
@@ -85177,7 +85101,7 @@ Magna Metals Incorporated</desc>
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2310-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -86306,7 +86230,7 @@ Interstellar Agriculture Concerns</desc>
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2335-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -87406,7 +87330,7 @@ Throughout the Succession Wars, Ryde‘s chemical industry, which produces every
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2360-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -88400,10 +88324,6 @@ As of the 32nd century, this world is little more than an outpost, with no agric
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2315-01-01</date>
-            <faction>TH</faction>
-        </event>
-        <event>
             <date>2750-01-01</date>
             <faction>FWL</faction>
         </event>
@@ -88471,11 +88391,11 @@ As of the 32nd century, this world is little more than an outpost, with no agric
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2271-01-01</date>
+            <date>2241-01-01</date>
             <faction>DO</faction>
         </event>
         <event>
-            <date>2317-01-01</date>
+            <date>2271-06-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -89376,15 +89296,7 @@ Tengo Aerospace</desc>
             <faction>IND</faction>
         </event>
         <event>
-            <date>2315-01-01</date>
-            <faction>TH</faction>
-        </event>
-        <event>
-            <date>2367-01-01</date>
-            <faction>FWL</faction>
-        </event>
-        <event>
-            <date>2790-01-01</date>
+            <date>2280-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -90354,7 +90266,7 @@ The capital city, Gambootas, is home not only to the planet‘s sole interstella
             <faction>IND</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2280-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -91009,7 +90921,7 @@ Sevon was famously the location of the Star League’s first defeat during Opera
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2280-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -91445,19 +91357,7 @@ By the time of the founding of The Republic of the Sphere, Sheratan‘s populati
             <faction>IND</faction>
         </event>
         <event>
-            <date>2315-01-01</date>
-            <faction>TH</faction>
-        </event>
-        <event>
-            <date>2316-01-01</date>
-            <faction>IND</faction>
-        </event>
-        <event>
-            <date>2367-01-01</date>
-            <faction>LA</faction>
-        </event>
-        <event>
-            <date>2571-01-01</date>
+            <date>2330-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -92465,10 +92365,6 @@ Saroyan Special Production</desc>
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2315-01-01</date>
-            <faction>TH</faction>
-        </event>
-        <event>
             <date>2571-01-01</date>
             <faction>FWL</faction>
         </event>
@@ -92777,7 +92673,7 @@ Saroyan Special Production</desc>
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2355-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -94265,7 +94161,7 @@ The local population have a pragmatic political approach that can almost be mist
             <faction>IND</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2280-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -94370,7 +94266,7 @@ The local population have a pragmatic political approach that can almost be mist
             <faction>IND</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2280-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -95633,7 +95529,7 @@ Tengo Aerospace</desc>
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2310-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -95832,15 +95728,11 @@ Manufacturing centers:
 Corean Enterprises (BattleMechs)
 Magna Metals (Fusion engines)</desc>
         <event>
-            <date>2271-01-01</date>
-            <faction>SC</faction>
+            <date>2259-01-01</date>
+            <faction>SCon</faction>
         </event>
         <event>
-            <date>2315-01-01</date>
-            <faction>TH</faction>
-        </event>
-        <event>
-            <date>2317-01-01</date>
+            <date>2293-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -98865,10 +98757,6 @@ Technicron Manufacturing
 Forerunner A.G.</desc>
         <event>
             <date>2341-01-01</date>
-            <faction>IND</faction>
-        </event>
-        <event>
-            <date>2571-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -99138,10 +99026,6 @@ Precision Weaponry [Precision Laser Systems prior to the 2nd Succession War]</de
         <faction>UND</faction>
         <event>
             <date>2341-01-01</date>
-            <faction>IND</faction>
-        </event>
-        <event>
-            <date>2367-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -99170,11 +99054,11 @@ Precision Weaponry [Precision Laser Systems prior to the 2nd Succession War]</de
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2271-01-01</date>
-            <faction>SC</faction>
+            <date>2259-01-01</date>
+            <faction>SCon</faction>
         </event>
         <event>
-            <date>2317-01-01</date>
+            <date>2293-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -100982,7 +100866,7 @@ Tharkad Aerospace Group</desc>
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2332-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -101593,7 +101477,7 @@ Earthwerks Incorporated</desc>
             <faction>IND</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2280-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -101767,14 +101651,6 @@ The planet is heavily industrialized and for a long time was the top producer of
         </event>
         <event>
             <date>2367-08-01</date>
-            <faction>CC</faction>
-        </event>
-        <event>
-            <date>2650-01-01</date>
-            <faction>TH,CC</faction>
-        </event>
-        <event>
-            <date>2786-01-01</date>
             <faction>CC</faction>
         </event>
         <event>
@@ -102012,10 +101888,6 @@ Timbuktu has been a staging ground used by the Lyran Commonwealth to coordinate 
         <faction>UND</faction>
         <event>
             <date>2317-01-01</date>
-            <faction>IND</faction>
-        </event>
-        <event>
-            <date>2367-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -102266,7 +102138,7 @@ Timbuktu has been a staging ground used by the Lyran Commonwealth to coordinate 
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2332-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -102551,12 +102423,12 @@ Timbuktu has been a staging ground used by the Lyran Commonwealth to coordinate 
         <nadirCharge>false</nadirCharge>
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
-        <event>
-            <date>2271-01-01</date>
+		<event>
+            <date>2241-01-01</date>
             <faction>MCM</faction>
         </event>
         <event>
-            <date>2317-01-01</date>
+            <date>2271-06-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -103216,7 +103088,7 @@ Gutierrez Aerospace</desc>
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2340-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -103405,7 +103277,7 @@ Gutierrez Aerospace</desc>
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2280-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -103487,10 +103359,6 @@ Gutierrez Aerospace</desc>
         <event>
             <date>2242-01-01</date>
             <faction>IND</faction>
-        </event>
-        <event>
-            <date>2597-01-01</date>
-            <faction>LA</faction>
         </event>
         <event>
             <date>2750-01-01</date>
@@ -104532,11 +104400,11 @@ After its fall, humans continued to live on Tyrfing at a basic hunter-gatherer l
             <faction>TA</faction>
         </event>
         <event>
-            <date>2314-01-01</date>
+            <date>2242-01-01</date>
             <faction>IND</faction>
         </event>
         <event>
-            <date>2330-01-01</date>
+            <date>2262-01-01</date>
             <faction>ABN</faction>
         </event>
         <event>
@@ -105987,11 +105855,11 @@ In the centuries of the Succession Wars, Unukalhai was largely overlooked by inv
             <faction>IND</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2300-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2500-01-01</date>
             <faction>TH</faction>
         </event>
         <event>
@@ -106163,10 +106031,14 @@ In the centuries of the Succession Wars, Unukalhai was largely overlooked by inv
         <socioIndustrial>A-B-C-B-C</socioIndustrial>
         <hpg>A</hpg>
         <faction>UND</faction>
-        <desc>Vanra has a grand military tradition and the planet itself is comfortable for inhabitation, if slightly colder than Terra. The planet is well developed in terms of industry and technology but it does not have an abundance of natural resources or agriculture, only enough to be self sufficient on both counts.</desc>
+        <desc>Vanra is comfortable for inhabitation, if slightly colder than Terra. The planet is well developed in terms of industry and technology but it does not have an abundance of natural resources or agriculture, only enough to be self sufficient on both counts. The people have Vanra have a grand military tradition.</desc>
         <event>
-            <date>2271-01-01</date>
+            <date>2241-01-01</date>
             <faction>DO</faction>
+        </event>
+        <event>
+            <date>2271-06-01</date>
+            <faction>FWL</faction>
         </event>
         <event>
             <date>2310-01-01</date>
@@ -108205,11 +108077,11 @@ Tellis Electronics</desc>
 
 Wealthy Walloons enjoy taking advantage of Vuzar, the 7th planet in the Wallis system, as a retreat from the heat and humidity on Wallis. Vuzar is an arctic planet with an equator just warm enough for tourists from Wallis to enjoy the snow. Despite the planet’s popularity with the residents of Wallis, Vuzar is overlooked and forgotten by nearly everyone else in the universe.</desc>
         <event>
-            <date>2271-01-01</date>
+            <date>2247-01-01</date>
             <faction>PR</faction>
         </event>
         <event>
-            <date>2317-01-01</date>
+            <date>2271-06-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -108513,19 +108385,11 @@ Ceres Metals</desc>
             <faction>IND</faction>
         </event>
         <event>
-            <date>2317-01-01</date>
+            <date>2300-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
             <date>2341-01-01</date>
-            <faction>TH</faction>
-        </event>
-        <event>
-            <date>2367-01-01</date>
-            <faction>FWL</faction>
-        </event>
-        <event>
-            <date>2571-01-01</date>
             <faction>TH</faction>
         </event>
         <event>
@@ -108633,12 +108497,12 @@ Ceres Metals</desc>
         <hpg>B</hpg>
         <faction>UND</faction>
         <desc>Washburn is a hot, arid planet with little to redeem itself, other than an abundance of natural resources. The planet is primarily covered in scorching deserts and badlands. Due to the lack of water and arable land, agriculture suffers on Washburn and the population is forced to rely on imported food. The planet is home to the Washburn Irian Technologies Refit Center, which is capable of conducting maintenance, repairs and upgrades to ‘Mechs and combat vehicles alike.</desc>
-        <event>
-            <date>2271-01-01</date>
+		<event>
+            <date>2241-01-01</date>
             <faction>MCM</faction>
         </event>
         <event>
-            <date>2317-01-01</date>
+            <date>2271-06-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -109717,7 +109581,7 @@ Presently, aside from the Games and the Hiring Hall, Westerhand does not feature
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2300-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -109982,7 +109846,11 @@ Presently, aside from the Games and the Hiring Hall, Westerhand does not feature
         </event>
         <event>
             <date>2570-01-01</date>
-            <faction>FWL,TH</faction>
+            <faction>FWL</faction>
+        </event>
+		<event>
+            <date>2600-01-01</date>
+            <faction>TH</faction>
         </event>
         <event>
             <date>2767-01-01</date>
@@ -110650,7 +110518,7 @@ Woodstock‘s third continent, Essex, is the only blemish on this otherwise beau
             <faction>FWL</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2500-01-01</date>
             <faction>TH</faction>
         </event>
         <event>
@@ -111559,10 +111427,6 @@ Laumer City is located on the continent of Saddleback and is home to Yegaus’ w
         <event>
             <date>3075-01-01</date>
             <faction>ABN</faction>
-        </event>
-        <event>
-            <date>3075-01-01</date>
-            <faction>CBS</faction>
         </event>
     </planet>
     <planet>
@@ -112834,15 +112698,23 @@ Today, a trace of Zebeneschamali‘s founding decades can still be seen in the s
             <faction>IND</faction>
         </event>
         <event>
-            <date>2315-01-01</date>
-            <faction>TH</faction>
-        </event>
-        <event>
             <date>2317-01-01</date>
             <faction>CCom</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2367-08-01</date>
+            <faction>CC</faction>
+        </event>
+		        <event>
+            <date>2369-10-01</date>
+            <faction>FWL</faction>
+        </event>
+		<event>
+            <date>2400-01-01</date>
+            <faction>FWL</faction>
+        </event>
+		<event>
+            <date>2550-01-01</date>
             <faction>CC</faction>
         </event>
         <event>
@@ -112857,8 +112729,16 @@ Today, a trace of Zebeneschamali‘s founding decades can still be seen in the s
             <date>2821-01-01</date>
             <faction>CC</faction>
         </event>
-        <event>
-            <date>2900-01-01</date>
+        <event> From pg 36 of HB Marik
+            <date>2832-01-01</date>
+            <faction>FWL</faction>
+        </event>
+		<event>
+            <date>2860-01-01</date>
+            <faction>CC</faction>
+        </event>
+		<event>
+            <date>2950-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -113137,7 +113017,7 @@ Today, a trace of Zebeneschamali‘s founding decades can still be seen in the s
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2310-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>

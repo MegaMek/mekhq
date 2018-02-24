@@ -385,8 +385,8 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	</faction>
 	<faction>
 		<shortname>SCon</shortname>
-		<fullname>Stewart Commonality</fullname>
-		<altNames>Stewart Confederation,Stewart Confederacy</altNames>
+		<fullname>Stewart Confederation</fullname>
+		<altNames>Stewart Confederation,Stewart Confederacy,Stewart Commonality</altNames>
 		<startingPlanet>Stewart</startingPlanet>
 		<nameGenerator>FWL</nameGenerator>
 		<colorRGB>76,0,153</colorRGB>
@@ -1126,7 +1126,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<nameGenerator>FWL</nameGenerator>
 		<colorRGB>165,94,160</colorRGB>
 		<tags>is</tags>
-		<start>3079</start>
+		<start>2241</start>
 		<end>3082</end>
 	</faction>
 	<faction>
@@ -1266,7 +1266,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<nameGenerator>FWL</nameGenerator>
 		<colorRGB>192,143,189</colorRGB>
 		<tags>is</tags>
-		<start>3079</start>
+		<start>2247</start>
 		<end>3086</end>
 	</faction>
 	<faction>
