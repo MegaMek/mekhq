@@ -17,7 +17,7 @@
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2362-01-01</date>
             <faction>LA</faction>
             <socioIndustrial>C-C-A-C-D</socioIndustrial>
             <pop>6</pop>
@@ -1843,11 +1843,7 @@ Aitutaki’s early settlers made a unique distinction by creating two capital ci
             <faction>TA</faction>
         </event>
         <event>
-            <date>2242-01-01</date>
-            <faction>IND</faction>
-        </event>
-        <event>
-            <date>2288-01-01</date>
+            <date>2235-01-01</date>
             <faction>TamP</faction>
         </event>
         <event>
@@ -2363,7 +2359,7 @@ Alcor was overlooked during the Jihad, the only known fighting that took place i
             <faction>FoS</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2341-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -2920,7 +2916,7 @@ Throughout the Succession Wars, Algorab was a difficult target for raids and onl
             <faction>FoS</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2341-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -3042,7 +3038,7 @@ Alhena was largely overlooked throughout the Age of War and the Star League era.
             <faction>IND</faction>
         </event>
         <event>
-            <date>2366-01-01</date>
+            <date>2350-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -3178,7 +3174,7 @@ During the Jihad, Word of Blake forces entered the system via pirate points and 
             <faction>FoS</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2341-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -3238,11 +3234,11 @@ Allabad, the planetary capital, was originally one such colony, nestled into the
             <faction>IND</faction>
         </event>
         <event>
-            <date>2319-01-01</date>
+            <date>2299-01-01</date>
             <faction>FoS</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2341-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -3291,11 +3287,11 @@ Allabad, the planetary capital, was originally one such colony, nestled into the
             <faction>IND</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2355-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2417-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -3448,11 +3444,11 @@ Allabad, the planetary capital, was originally one such colony, nestled into the
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2341-01-01</date>
+            <date>2314-01-01</date>
             <faction>PD</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2341-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -3603,7 +3599,7 @@ Despite being aware of the impending, though slow coming, temperature change tha
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2365-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -3777,7 +3773,7 @@ Alphecca‘s capital city, Galanette Rainbow, is located on the northernmost isl
             <faction>IND</faction>
         </event>
         <event>
-            <date>2319-01-01</date>
+            <date>2299-01-01</date>
             <faction>FoS</faction>
         </event>
         <event>
@@ -3787,6 +3783,14 @@ Alphecca‘s capital city, Galanette Rainbow, is located on the northernmost isl
         <event>
             <date>3030-01-01</date>
             <faction>DC</faction>
+        </event>
+		<event>
+            <date>3048-01-01</date>
+            <faction>FC</faction>
+        </event>
+		<event>
+            <date>3057-09-18</date>
+            <faction>LA</faction>
         </event>
         <event>
             <date>3081-01-01</date>
@@ -3869,11 +3873,11 @@ Alphecca‘s capital city, Galanette Rainbow, is located on the northernmost isl
             <faction>IND</faction>
         </event>
         <event>
-            <date>2319-01-01</date>
+            <date>2299-01-01</date>
             <faction>FoS</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2341-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -4180,7 +4184,7 @@ The capital city, Gaines, located on the southern polar continent of Tanzaria, i
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2365-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -4238,7 +4242,7 @@ The capital city, Gaines, located on the southern polar continent of Tanzaria, i
             <faction>TamP</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2341-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -4433,15 +4437,15 @@ The capital city, Gaines, located on the southern polar continent of Tanzaria, i
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2750-01-01</date>
+            <date>2700-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
-            <date>2821-01-01</date>
+            <date>2800-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
-            <date>2864-01-01</date>
+            <date>2822-01-01</date>
             <faction>ABN</faction>
         </event>
     </planet>
@@ -4596,7 +4600,7 @@ Alula Australis has the distinction of being the first planet that House Marik d
             <faction>IND</faction>
         </event>
         <event>
-            <date>2340-01-01</date>
+            <date>2360-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -4890,7 +4894,7 @@ The capital city and commercial center of Alya, LeSabrea, is located on Paroasis
             <faction>LA</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2418-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -5304,10 +5308,6 @@ An Ting fell to the 'Curse of Galedon' plague that devastated Galedon V and was 
         <event>
             <date>2779-01-01</date>
             <faction>LA</faction>
-        </event>
-        <event>
-            <date>2785-01-01</date>
-            <faction>CIR</faction>
         </event>
         <event>
             <date>2864-01-01</date>
@@ -6056,11 +6056,11 @@ A few Stone Age tribes exist in the planet's deep deserts and jungles, far from 
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2341-01-01</date>
+            <date>2300-01-01</date>
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2365-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -6427,7 +6427,7 @@ Bordello Military Goods, Inc.</desc>
             <faction>IND</faction>
         </event>
         <event>
-            <date>2341-07-01</date>
+            <date>2345-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -6743,11 +6743,11 @@ Wolf Clan Aerospace Annex
 Wolf Clan Auxiliary Factory Epsilon
 Wolf Clan Sites 1-4</desc>
         <event>
-            <date>2341-01-01</date>
+            <date>2300-01-01</date>
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2355-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -6870,14 +6870,6 @@ Wolf Clan Sites 1-4</desc>
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2271-01-01</date>
-            <faction>IND</faction>
-        </event>
-        <event>
-            <date>2341-01-01</date>
-            <faction>ABN</faction>
-        </event>
-        <event>
             <date>2596-09-22</date>
             <faction>LA</faction>
         </event>
@@ -6940,7 +6932,7 @@ Arcturan Arms Refit Facility</desc>
             <faction>TamP</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2341-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -7052,11 +7044,11 @@ Salvatore Incorporated</desc>
             <faction>IND</faction>
         </event>
         <event>
-            <date>2341-01-01</date>
+            <date>2299-01-01</date>
             <faction>FoS</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2341-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -7196,7 +7188,7 @@ Salvatore Incorporated</desc>
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2345-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -8021,7 +8013,11 @@ Though a major exporter of heavy metals and radioactive elements, as well as sma
             <faction>LA</faction>
         </event>
 		<event>
-            <date>3057-01-01</date>
+            <date>3040-01-19</date>
+            <faction>FC</faction>
+        </event>
+		<event>
+            <date>3048-01-01</date>
             <faction>DC</faction>
         </event>
         <event>
@@ -8329,11 +8325,11 @@ Sanctuary Station</desc>
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2341-01-01</date>
+            <date>2300-01-01</date>
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2360-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -8848,7 +8844,7 @@ The primary industries on Augustine involve extracting raw minerals from the pla
             <faction>FoS</faction>
         </event>
         <event>
-            <date>2657-01-01</date>
+            <date>2341-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -8877,11 +8873,11 @@ The primary industries on Augustine involve extracting raw minerals from the pla
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2341-01-01</date>
+            <date>2314-01-01</date>
             <faction>PD</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2341-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -11078,15 +11074,7 @@ The capital city and primary spaceport of Baxter, Cleopolis, is located on the n
             <faction>FoS</faction>
         </event>
         <event>
-            <date>2319-01-01</date>
-            <faction>FoS</faction>
-        </event>
-        <event>
             <date>2341-01-01</date>
-            <faction>LA</faction>
-        </event>
-        <event>
-            <date>2367-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -11693,11 +11681,11 @@ The capital city and primary spaceport of Baxter, Cleopolis, is located on the n
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2341-01-01</date>
+            <date>2300-01-01</date>
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2363-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -11957,7 +11945,7 @@ Belladonna's sky is dominated by six satellites, which due to the number of sate
             <faction>IND</faction>
         </event>
         <event>
-            <date>2373-01-01</date>
+            <date>2346-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -13026,11 +13014,15 @@ Betelgeuse has ample natural resources and a high level of industry, including B
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
+            <date>2600-01-01</date>
+            <faction>LA</faction>
+        </event>
+		<event>
             <date>2750-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
-            <date>2821-01-01</date>
+            <date>2793-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -13055,11 +13047,7 @@ Betelgeuse has ample natural resources and a high level of industry, including B
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2235-01-01</date>
-            <faction>TamP</faction>
-        </event>
-        <event>
-            <date>2580-01-01</date>
+            <date>2350-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -13245,11 +13233,11 @@ Bithinian Ballistics</desc>
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2341-01-01</date>
+            <date>2300-01-01</date>
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2360-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -13321,11 +13309,11 @@ Bithinian Ballistics</desc>
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2341-01-01</date>
+            <date>2300-01-01</date>
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2345-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -13685,11 +13673,11 @@ When the Lothian ship arrived with help, the settler's distress signal led it to
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2300-01-01</date>
+            <date>2235-01-01</date>
             <faction>TamP</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2341-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -14072,8 +14060,20 @@ Bolan was primarily colonized by settlers from India, Pakistan and Afghanistan.<
             <date>2271-01-01</date>
             <faction>IND</faction>
         </event>
-        <event>
-            <date>2571-01-01</date>
+		<event>
+            <date>2365-01-01</date>
+            <faction>LA</faction>
+        </event>
+		<event>
+            <date>2418-01-01</date>
+            <faction>FWL</faction>
+        </event>
+		<event>
+            <date>2427-01-01</date>
+            <faction>LA</faction>
+        </event>
+		<event>
+            <date>2441-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -14441,7 +14441,7 @@ Bermuda Combat Systems</desc>
             <faction>TamP</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2341-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -14652,11 +14652,11 @@ Bermuda Combat Systems</desc>
         <faction>UND</faction>
         <desc>Bountiful Harvest is one of the most productive agricultural worlds in the entire Inner Sphere. The planet is slightly larger than Terra and possesses large tracts of fertile land perfect for growing produce and raising livestock as well as large oceans teeming with a large variety of plants and animals. With ample water, fertile land and a comfortable temperate climate it is little surprise that Bountiful Harvest lives up to its name. Bountiful Harvest is a major exporter of all types of food to surrounding systems.</desc>
         <event>
-            <date>2341-01-01</date>
+            <date>2300-01-01</date>
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2360-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -15104,7 +15104,7 @@ Brasha is home to the unique and elite Qum’ran Guard, which are comprised of m
             <faction>IND</faction>
         </event>
         <event>
-            <date>2341-07-01</date>
+            <date>2345-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -16230,6 +16230,10 @@ The children of Bucklands tend to view their planet as boring and the majority s
             <date>2750-01-01</date>
             <faction>DC</faction>
         </event>
+		<event>
+            <date>3069-05-01</date>
+            <faction>CSR</faction>
+        </event>
         <event>
             <date>3075-01-01</date>
             <faction>OA</faction>
@@ -17019,11 +17023,11 @@ Unlike many planets, Butte Hold was unaffected by the fall of the Star League an
             <faction>IND</faction>
         </event>
         <event>
-            <date>2340-01-01</date>
+            <date>2299-01-01</date>
             <faction>FoS</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2341-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -17783,11 +17787,11 @@ Camlann itself is barely able to sustain itself, the primarily industry and expo
             <faction>IND</faction>
         </event>
         <event>
-            <date>2341-01-01</date>
+            <date>2299-01-01</date>
             <faction>FoS</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2341-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -18616,10 +18620,6 @@ Carnwath‘s capital city, Carnwath City, is located on the Wartholi continent, 
             <faction>FoS</faction>
         </event>
         <event>
-            <date>2319-01-01</date>
-            <faction>FoS</faction>
-        </event>
-        <event>
             <date>2341-01-01</date>
             <faction>LA</faction>
         </event>
@@ -18665,10 +18665,6 @@ The planets primary industries and exports are plastics and plastisteel using th
         <event>
             <date>2235-01-01</date>
             <faction>TamP</faction>
-        </event>
-        <event>
-            <date>2242-01-01</date>
-            <faction>IND</faction>
         </event>
         <event>
             <date>2341-01-01</date>
@@ -18732,7 +18728,7 @@ During the Jihad, Carsphairn was raided several times by Word of Blake forces as
             <faction>FoS</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2341-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -18777,15 +18773,7 @@ During the Jihad, Carsphairn was raided several times by Word of Blake forces as
             <faction>IND</faction>
         </event>
         <event>
-            <date>2341-01-01</date>
-            <faction>IND</faction>
-        </event>
-        <event>
-            <date>2341-07-01</date>
-            <faction>LA</faction>
-        </event>
-        <event>
-            <date>2571-01-01</date>
+            <date>2345-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -19484,7 +19472,7 @@ Cavanaugh II was settled by a mixture of English, Welsh and Scottish colonists.<
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2365-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -19976,11 +19964,11 @@ Like the other Trinity worlds, Cerillos' primary industry is farming. Both agric
             <faction>IND</faction>
         </event>
         <event>
-            <date>2341-01-01</date>
+            <date>2299-01-01</date>
             <faction>FoS</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2341-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -20465,19 +20453,7 @@ During the Succession Wars, the exports from Starpad to agriculturally poorer ne
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2341-01-01</date>
-            <faction>TamP</faction>
-        </event>
-        <event>
-            <date>2571-01-01</date>
-            <faction>ABN</faction>
-        </event>
-        <event>
             <date>2573-01-01</date>
-            <faction>LA</faction>
-        </event>
-        <event>
-            <date>2750-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -21790,11 +21766,11 @@ This led to a very hostile environment by the mid 3020s with many residents just
             <faction>IND</faction>
         </event>
         <event>
-            <date>2341-01-01</date>
+            <date>2299-01-01</date>
             <faction>FoS</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2341-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -22472,11 +22448,11 @@ Honor is the 4th planet in the system and is best described as an arctic planet 
             <faction>IND</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2355-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2418-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -22797,7 +22773,7 @@ Corriolas, Cor Caroli's capital and largest city, is located on the northwestern
             <faction>IND</faction>
         </event>
         <event>
-            <date>2319-01-01</date>
+            <date>2299-01-01</date>
             <faction>FoS</faction>
         </event>
         <event>
@@ -22805,8 +22781,8 @@ Corriolas, Cor Caroli's capital and largest city, is located on the northwestern
             <faction>LA</faction>
         </event>
         <event>
-            <date>2570-01-01</date>
-            <faction>LA,TH</faction>
+            <date>2500-01-01</date>
+            <faction>TH</faction>
         </event>
         <event>
             <date>2767-01-01</date>
@@ -23174,16 +23150,8 @@ Hollis Incorporated</desc>
 Eventually Gabriel Tal, a resident part-time chemical engineer, stumbled upon a means to purify over ninety-five percent of the toxic agents from small quantities of Corridani water in a safe and economical fashion using an innovative fusion filtration system. Tal‘s invention ultimately became the basis for Water Pure Industries, which would become the largest of the Lyran Commonwealth‘s five water purifier manufacturers. Though publicly traded, Water Pure remained mostly in Tal family hands throughout its history, expanding to add manufacturing sites on Freedom and Ryde, and distribution sites on over a dozen worlds in the Federation of Skye. In spite of the destruction of its main Corridan plant six times in its history—the last during an incidental Word of Blake raid during the Jihad—Water Pure has managed to come back bigger and better every time. The value of clean, drinkable water obviously made Corridan IV a prime target during the Succession Wars, and for centuries its cities and the landscape on all three of its primary continents—Alorran and Cederban in the northern hemisphere, Fayrun in the southern—bore the scars of repeated raids and planetary assaults. When this planet was ceded to The Republic of the Sphere, a planetwide beautification project ultimately erased the last of these scars, resulting in the idyllic, pastoral world visitors see today.
 
 Today, Corridan‘s greatest exports, after water purifiers, are agricultural and ranching produce, which range from native fruits and vegetables to the beef-like meat of the Corridani grazer, a dim-witted beast roughly half again the size of a Terran buffalo. For this reason, many travelers expect a world of mainly rural plains. In fact, close to half the planetary population lives in big cities, mostly concentrated on Feyrun and Cederban. The largest of these, Rio Grande, is home to Water Pure Industries, much of the Tal family fortune, and the largest planetary spaceport. The planetary capital, New Austin, is over seventy kilometers north of Rio Grande, and boasts the planet‘s largest shipping concern, Corridani Forward, which uses its own starport.</desc>
-        <event>
-            <date>2299-01-01</date>
-            <faction>FoS</faction>
-        </event>
 		<event>
-            <date>2640-01-01</date>
-            <faction>LA</faction>
-        </event>
-        <event>
-            <date>2750-01-01</date>
+            <date>2350-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -23819,19 +23787,7 @@ The continents of Chromatisch and Metallerz have been extensively surveyed and m
             <faction>TamP</faction>
         </event>
         <event>
-            <date>2242-01-01</date>
-            <faction>IND</faction>
-        </event>
-        <event>
-            <date>2319-01-01</date>
-            <faction>TamP</faction>
-        </event>
-        <event>
             <date>2341-01-01</date>
-            <faction>LA</faction>
-        </event>
-        <event>
-            <date>2367-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -24257,11 +24213,11 @@ After suffering at the hands of the Combine for decades, the people of Csesztreg
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2341-01-01</date>
+            <date>2314-01-01</date>
             <faction>PD</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2341-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -24357,10 +24313,6 @@ After suffering at the hands of the Combine for decades, the people of Csesztreg
         </event>
         <event>
             <date>2341-01-01</date>
-            <faction>LA</faction>
-        </event>
-        <event>
-            <date>2367-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -26279,10 +26231,6 @@ During the First Succession War, the Draconis Combine used over a dozen 100-mega
             <faction>TamP</faction>
         </event>
         <event>
-            <date>2242-01-01</date>
-            <faction>IND</faction>
-        </event>
-        <event>
             <date>2341-01-01</date>
             <faction>LA</faction>
         </event>
@@ -26453,11 +26401,11 @@ During the First Succession War, the Draconis Combine used over a dozen 100-mega
             <faction>IND</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2355-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2418-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -26659,11 +26607,15 @@ During the First Succession War, the Draconis Combine used over a dozen 100-mega
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
+            <date>2600-01-01</date>
+            <faction>LA</faction>
+        </event>
+		<event>
             <date>2750-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
-            <date>2821-01-01</date>
+            <date>2791-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -27277,19 +27229,11 @@ During the First Succession War, the Draconis Combine used over a dozen 100-mega
             <faction>TA</faction>
         </event>
         <event>
-            <date>2242-01-01</date>
-            <faction>IND</faction>
-        </event>
-        <event>
-            <date>2288-01-01</date>
+            <date>2235-01-01</date>
             <faction>TamP</faction>
         </event>
         <event>
             <date>2341-01-01</date>
-            <faction>LA</faction>
-        </event>
-        <event>
-            <date>2367-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -27642,7 +27586,7 @@ After the Clan Invasion, Deia found itself along the front of a new dangerous bo
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>275-01-01</date>
+            <date>2375-01-01</date>
             <faction>FS</faction>
         </event>
         <event>
@@ -29238,7 +29182,7 @@ Protectorate Arms Conglomerate</desc>
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2362-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -29554,11 +29498,11 @@ Donegal is a warm-temperate world, that boasts large deposits of valuable ores a
 
 Donegal is the home to many major trading companies, the Supreme Court of the Commonwealth, and the Donegal Stock Exchange.</desc>
         <event>
-            <date>2317-01-01</date>
+            <date>2314-01-01</date>
             <faction>PD</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2341-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -29769,10 +29713,6 @@ Donegal is the home to many major trading companies, the Supreme Court of the Co
         <faction>UND</faction>
         <event>
             <date>2367-01-01</date>
-            <faction>IND</faction>
-        </event>
-        <event>
-            <date>2571-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -30060,7 +30000,7 @@ In the 32nd century, Dromini is home to people descended originally from Davion,
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2365-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -30230,7 +30170,7 @@ During the Star League era, Dubhe was a border world jointly administered by the
             <faction>IND</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2350-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -30503,11 +30443,11 @@ Majesty Metals and Manufacturing</desc>
         <faction>UND</faction>
         <desc>Duran is an exceptionally average planet with modest agriculture, resources and industry. With almost no outstanding features, it is little surprise that the worst of the various wars over the centuries since Duran was settled have passed by without causing any serious damage to the sleepy planet. The comfortable climate and atmosphere of Duran is its most notable feature. The largest manufacturer on planet is Rastaban Agricultural Products plant on the continent of Foley. RAP creates all sorts of agricultural products from tractors to the Lumberjack IndustrialMech. During the Word of Blake Jihad, when ‘Mechs were scarce the plant was retooled to create primitive Gladiator BattleMechs.</desc>
         <event>
-            <date>2341-01-01</date>
+            <date>2314-01-01</date>
             <faction>PD</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2341-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -31495,10 +31435,6 @@ The capital city of Dyev, Novaya Mensk, is located in the northern hemisphere, o
             <faction>LA</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
-            <faction>LA</faction>
-        </event>
-        <event>
             <date>3040-01-19</date>
             <faction>FC</faction>
         </event>
@@ -31549,7 +31485,7 @@ The capital city of Dyev, Novaya Mensk, is located in the northern hemisphere, o
             <faction>IND</faction>
         </event>
         <event>
-            <date>2468-07-01</date>
+            <date>2345-07-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -31677,7 +31613,7 @@ Edasich Motors</desc>
             <faction>IND</faction>
         </event>
         <event>
-            <date>2468-07-01</date>
+            <date>2345-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -31973,7 +31909,7 @@ Edasich Motors</desc>
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2360-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -32707,7 +32643,7 @@ The capital city of Eltanin, Dry Springs, is the administrative and trading cent
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2350-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -33125,11 +33061,11 @@ The continent of Cotswold is home to large, rolling plains that great herds of w
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2341-01-01</date>
+            <date>2300-01-01</date>
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2345-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -33679,10 +33615,6 @@ The continent of Cotswold is home to large, rolling plains that great herds of w
         <faction>UND</faction>
         <event>
             <date>2367-01-01</date>
-            <faction>IND</faction>
-        </event>
-        <event>
-            <date>2571-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -34000,11 +33932,11 @@ The continent of Cotswold is home to large, rolling plains that great herds of w
 
 Eutin has two moons, Eutin Minor and Eutin Prime. Despite being only marginally habitable, Eutin prime is home to several small domed communities and during the Word of Blake Jihad Tharhes Industries built a battle armor manufacturing plant there. The new manufacturing center resulted in the moon’s population doubling to nearly 800,000 residents.</desc>
         <event>
-            <date>2341-01-01</date>
+            <date>2314-01-01</date>
             <faction>PD</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2341-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -34840,11 +34772,7 @@ Olympus Construction Vehicles</desc>
             <faction>TA</faction>
         </event>
         <event>
-            <date>2242-01-01</date>
-            <faction>IND</faction>
-        </event>
-        <event>
-            <date>2271-01-01</date>
+            <date>2235-01-01</date>
             <faction>TamP</faction>
         </event>
         <event>
@@ -35237,11 +35165,11 @@ Olympus Construction Vehicles</desc>
             <faction>IND</faction>
         </event>
         <event>
-            <date>2341-01-01</date>
+            <date>2299-01-01</date>
             <faction>FoS</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2341-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -36197,11 +36125,11 @@ During the Capellan-Republic war, Foot Fall was the center of some of the fierce
             <faction>IND</faction>
         </event>
         <event>
-            <date>2341-01-01</date>
+            <date>2299-01-01</date>
             <faction>FoS</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2341-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -36603,19 +36531,11 @@ During the Capellan-Republic war, Foot Fall was the center of some of the fierce
             <faction>IND</faction>
         </event>
         <event>
-            <date>2271-01-01</date>
-            <faction>IND</faction>
-        </event>
-        <event>
             <date>2299-01-01</date>
             <faction>FoS</faction>
         </event>
         <event>
             <date>2341-01-01</date>
-            <faction>LA</faction>
-        </event>
-        <event>
-            <date>2367-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -36941,7 +36861,7 @@ Colonial Tractors</desc>
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2345-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -37120,7 +37040,7 @@ At the dawn the thirty-second century, a surgical strike from the Lyran Commonwe
             <faction>IND</faction>
         </event>
         <event>
-            <date>2317-01-01</date>
+            <date>2299-01-01</date>
             <faction>FoS</faction>
         </event>
         <event>
@@ -37239,12 +37159,12 @@ At the dawn the thirty-second century, a surgical strike from the Lyran Commonwe
             <faction>IND</faction>
         </event>
         <event>
-            <date>2320-01-01</date>
-            <faction>TH</faction>
-        </event>
-        <event>
             <date>2367-01-01</date>
             <faction>LA</faction>
+        </event>
+		<event>
+            <date>2500-01-01</date>
+            <faction>TH</faction>
         </event>
         <event>
             <date>2767-01-01</date>
@@ -37611,11 +37531,11 @@ Unfortunately, during the Word of Blake Jihad, orbital strikes by Clan Snow Rave
 
 When Gallery was originally settled there were no native lifeforms so the original colonists had to import plants and animals that could adapt and survive in the nearly constant darkness. What Gallery lacks in comforts, it more than makes up for in natural resources. The stormy dark climate has resulted in the populace living underground and the primary industry on the planet is mining. Due to their comfort and familiarity with underground spaces, many natives of Gallery are easily able to find jobs on other planets as miners.</desc>
         <event>
-            <date>2341-01-01</date>
+            <date>2314-01-01</date>
             <faction>PD</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2341-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -38050,11 +37970,11 @@ When Gallery was originally settled there were no native lifeforms so the origin
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2319-01-01</date>
+            <date>2300-01-01</date>
             <faction>IND</faction>
         </event>
         <event>
-            <date>2456-01-01</date>
+            <date>2345-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -38125,11 +38045,11 @@ When Gallery was originally settled there were no native lifeforms so the origin
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2341-01-01</date>
+            <date>2314-01-01</date>
             <faction>PD</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2341-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -38660,7 +38580,7 @@ In 2315, Genoa became a member of the Liao Protectorate before it was taken by t
             <faction>IND</faction>
         </event>
         <event>
-            <date>2400-01-01</date>
+            <date>2360-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -38711,11 +38631,11 @@ In 2315, Genoa became a member of the Liao Protectorate before it was taken by t
         <faction>UND</faction>
         <desc>Gibbs is an important planet in the Lyran Commonwealth due to the presence of a major aerospace fighter manufacturer, but even more important than that, the Ioto Galactic Enterprises orbital facility, which is capable of creating rare K-F drives. Gibbs is a comfortable planet, despite its thin atmosphere, it has standard gravity and a warm climate which allows for abundant agriculture to feed the planet’s population. The planet also contains abundant natural resources to feed its large industrial base. The Lockheed/CBM Corp. facilities, which is one of the largest aerospace manufacturing facilities in the entire Commonwealth, are located in Rolfson the planetary capital. Rolfson is situated in the badlands of the Perrette continent.</desc>
         <event>
-            <date>2341-01-01</date>
+            <date>2314-01-01</date>
             <faction>PD</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2341-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -38830,11 +38750,11 @@ Brigadier Corporation</desc>
             <faction>IND</faction>
         </event>
         <event>
-            <date>2341-01-01</date>
+            <date>2299-01-01</date>
             <faction>FoS</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2341-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -39102,11 +39022,11 @@ The capital city, Hyacles, is located on the northern shores of Garamond, and is
             <faction>IND</faction>
         </event>
         <event>
-            <date>2341-01-01</date>
+            <date>2299-01-01</date>
             <faction>FoS</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2341-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -39195,10 +39115,6 @@ The capital city, Dunkeld, a sprawling metropolis as big as any capital on a maj
         </event>
         <event>
             <date>2341-01-01</date>
-            <faction>FoS</faction>
-        </event>
-        <event>
-            <date>2367-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -40042,7 +39958,7 @@ Glenmora’s location on the Federated Suns and Draconis Combine border has made
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2346-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -40171,7 +40087,7 @@ The gojo berries harvested on Gram earned a degree of fame and were noted not ju
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2365-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -40702,11 +40618,11 @@ In the 31st century Greeley gained some importance as the Federated Suns establi
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2341-01-01</date>
+            <date>2314-01-01</date>
             <faction>PD</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2341-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -40979,11 +40895,7 @@ In the 31st century Greeley gained some importance as the Federated Suns establi
             <faction>TA</faction>
         </event>
         <event>
-            <date>2242-01-01</date>
-            <faction>IND</faction>
-        </event>
-        <event>
-            <date>2288-01-01</date>
+            <date>2235-01-01</date>
             <faction>TamP</faction>
         </event>
         <event>
@@ -41024,11 +40936,11 @@ In the 31st century Greeley gained some importance as the Federated Suns establi
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2341-01-01</date>
+            <date>2314-01-01</date>
             <faction>PD</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2341-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -41486,7 +41398,7 @@ In the 31st century Greeley gained some importance as the Federated Suns establi
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2365-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -42672,11 +42584,11 @@ Corvatti Corporation</desc>
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2341-01-01</date>
+            <date>2300-01-01</date>
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2345-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -42922,11 +42834,11 @@ During their Holy War, the Blakists found ready converts among the technological
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2341-01-01</date>
+            <date>2300-01-01</date>
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2355-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -43373,7 +43285,7 @@ The planet is defended by an AFFS security force located on the moon Bane and is
             <faction>TA</faction>
         </event>
         <event>
-            <date>2300-01-01</date>
+            <date>2242-01-01</date>
             <faction>IND</faction>
         </event>
         <event>
@@ -44961,19 +44873,11 @@ Doering Electronics</desc>
             <faction>IND</faction>
         </event>
         <event>
-            <date>2271-01-01</date>
-            <faction>IND</faction>
-        </event>
-        <event>
-            <date>2340-01-01</date>
+            <date>2299-01-01</date>
             <faction>FoS</faction>
         </event>
         <event>
             <date>2341-01-01</date>
-            <faction>FoS</faction>
-        </event>
-        <event>
-            <date>2367-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -45231,11 +45135,11 @@ Highspire is home to one of the many Duchy RTC facilities throughout the Capella
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2341-01-01</date>
+            <date>2314-01-01</date>
             <faction>PD</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2341-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -46115,11 +46019,11 @@ Holloway is home to a Duchy RTC facility, located on the Morristown continent, w
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2341-01-01</date>
+            <date>2314-01-01</date>
             <faction>PD</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2341-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -47141,11 +47045,11 @@ Huntress was the capital of Clan Smoke Jaguar and their primary holding. They ha
             <faction>IND</faction>
         </event>
         <event>
-            <date>2341-01-01</date>
+            <date>2299-01-01</date>
             <faction>FoS</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2341-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -47746,8 +47650,20 @@ Huntress was the capital of Clan Smoke Jaguar and their primary holding. They ha
             <date>2271-01-01</date>
             <faction>IND</faction>
         </event>
-        <event>
+		<event>
             <date>2365-01-01</date>
+            <faction>LA</faction>
+        </event>
+		<event>
+            <date>2418-01-01</date>
+            <faction>FWL</faction>
+        </event>
+		<event>
+            <date>2427-01-01</date>
+            <faction>LA</faction>
+        </event>
+		<event>
+            <date>2441-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -48258,7 +48174,7 @@ Trunner, the largest city and planetary capital, is home to Imbross AeroTech Ind
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2355-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -49529,23 +49445,11 @@ Apart from the planetary capital of Promise Point, Izar boasts a second major sp
             <faction>IND</faction>
         </event>
         <event>
-            <date>2271-01-01</date>
-            <faction>IND</faction>
-        </event>
-        <event>
             <date>2299-01-01</date>
             <faction>FoS</faction>
         </event>
         <event>
-            <date>2319-01-01</date>
-            <faction>FoS</faction>
-        </event>
-        <event>
             <date>2341-01-01</date>
-            <faction>LA</faction>
-        </event>
-        <event>
-            <date>2367-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -49889,7 +49793,7 @@ Liberty Arms</desc>
         <faction>UND</faction>
         <event>
             <date>2779-01-01</date>
-            <faction>PIND</faction>
+            <faction>LA</faction>
         </event>
         <event>
             <date>2864-01-01</date>
@@ -50114,11 +50018,11 @@ Taurus Territorial Industries</desc>
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2341-01-01</date>
+            <date>2300-01-01</date>
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2345-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -51700,11 +51604,11 @@ Quikscell Company</desc>
             <faction>IND</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2355-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2417-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -51829,7 +51733,19 @@ Quikscell Company</desc>
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2571-01-01</date>
+            <date>2370-01-01</date>
+            <faction>LA</faction>
+        </event>
+		<event>
+            <date>2418-01-01</date>
+            <faction>FWL</faction>
+        </event>
+		<event>
+            <date>2427-01-01</date>
+            <faction>LA</faction>
+        </event>
+		<event>
+            <date>2441-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -51905,11 +51821,11 @@ Quikscell Company</desc>
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2341-01-01</date>
+            <date>2300-01-01</date>
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2355-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -51991,7 +51907,7 @@ Quikscell Company</desc>
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2350-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -52235,19 +52151,11 @@ By 3091, in an extreme example of a runaway greenhouse effect, the average surfa
             <faction>TA</faction>
         </event>
         <event>
-            <date>2242-01-01</date>
-            <faction>IND</faction>
-        </event>
-        <event>
-            <date>2288-01-01</date>
+            <date>2235-01-01</date>
             <faction>TamP</faction>
         </event>
         <event>
             <date>2341-01-01</date>
-            <faction>LA</faction>
-        </event>
-        <event>
-            <date>2367-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -53334,19 +53242,7 @@ The Blakist Holy War destroyed much of Kawich‘s industry, but The Republic of 
             <faction>TamP</faction>
         </event>
         <event>
-            <date>2242-01-01</date>
-            <faction>IND</faction>
-        </event>
-        <event>
-            <date>2319-01-01</date>
-            <faction>TamP</faction>
-        </event>
-        <event>
             <date>2341-01-01</date>
-            <faction>LA</faction>
-        </event>
-        <event>
-            <date>2367-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -53833,7 +53729,7 @@ Kessel‘s capital city is Sverdlovsk, located on the northwestern continent of 
             <faction>FoS</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2341-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -54505,15 +54401,11 @@ The Combine agreed to cede Kimball II to Devlin Stone‘s Republic of the Sphere
             <faction>IND</faction>
         </event>
         <event>
-            <date>2319-01-01</date>
+            <date>2299-01-01</date>
             <faction>FoS</faction>
         </event>
         <event>
             <date>2341-01-01</date>
-            <faction>LA</faction>
-        </event>
-        <event>
-            <date>2367-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -54528,8 +54420,12 @@ The Combine agreed to cede Kimball II to Devlin Stone‘s Republic of the Sphere
             <date>3030-01-01</date>
             <faction>LA</faction>
         </event>
+		<event>
+            <date>3040-01-19</date>
+            <faction>LA</faction>
+        </event>
         <event>
-            <date>3040-01-01</date>
+            <date>3048-01-01</date>
             <faction>DC</faction>
         </event>
         <event>
@@ -54842,15 +54738,7 @@ The planet has moderate natural resources and enough arable land to sustain itse
             <faction>IND</faction>
         </event>
         <event>
-            <date>2341-01-01</date>
-            <faction>IND</faction>
-        </event>
-        <event>
-            <date>2341-07-01</date>
-            <faction>LA</faction>
-        </event>
-        <event>
-            <date>2571-01-01</date>
+            <date>2345-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -55140,7 +55028,7 @@ Gortex Multi-E</desc>
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2360-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -55621,15 +55509,11 @@ The capital and primary spaceport of Kochab, Stenton, is located on Dakkato, jus
             <faction>IND</faction>
         </event>
         <event>
-            <date>2319-01-01</date>
+            <date>2299-01-01</date>
             <faction>FoS</faction>
         </event>
         <event>
             <date>2341-01-01</date>
-            <faction>LA</faction>
-        </event>
-        <event>
-            <date>2367-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -55666,11 +55550,11 @@ The capital and primary spaceport of Kochab, Stenton, is located on Dakkato, jus
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2341-01-01</date>
+            <date>2300-01-01</date>
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2345-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -55862,7 +55746,7 @@ The capital and primary spaceport of Kochab, Stenton, is located on Dakkato, jus
 
 Over the centuries after the fall of the Star League, Komephoros traded hands a few times between Houses Steiner and Kurita, with many of its mining and ore-processing facilities damaged during each shift in control. Bypassed during the Jihad, however, the planet‘s industrial infrastructure was in excellent shape when the world was ceded to Devlin Stone‘s newborn Republic. The capital city of Komephoros is located on Marksenia‘s east coast, and is also home to the planet‘s primary spaceport. Bristalle, largest city on the northern continent of Jasonri, boasts a secondary spaceport and the corporate headquarters of Kamlarr Enterprises, a subsidiary of Bannson Universal Unlimited, which runs several specialized mining rigs located throughout the north polar region.</desc>
         <event>
-            <date>2319-01-01</date>
+            <date>2299-01-01</date>
             <faction>FoS</faction>
         </event>
         <event>
@@ -55877,11 +55761,15 @@ Over the centuries after the fall of the Star League, Komephoros traded hands a 
             <date>3030-01-01</date>
             <faction>LA</faction>
         </event>
-        <event>
-            <date>3040-01-01</date>
-            <faction>DC</faction>
+		<event>
+            <date>3040-01-19</date>
+            <faction>LA</faction>
         </event>
         <event>
+            <date>3048-01-01</date>
+            <faction>DC</faction>
+        </event>
+         <event>
             <date>3081-01-01</date>
             <faction>ROS</faction>
         </event>
@@ -55911,7 +55799,7 @@ Over the centuries after the fall of the Star League, Komephoros traded hands a 
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2346-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -55978,11 +55866,11 @@ Unfortunately, despite the decreased presence of heavy industry in the middle an
 
 The capital city of Konstance, Ishtalia, is located on the southern polar continent of Perragea, and also doubles as the southern hemisphere‘s largest spaceport city. Its counterpart on the north polar continent of Epigaus, Lazarus Bay, also boasts the planet‘s largest submarine seaport, which ferries over half the harsh-environment workforce for local fuel producers like Axis PetroChem Unlimited.</desc>
         <event>
-            <date>2319-01-01</date>
+            <date>2299-01-01</date>
             <faction>FoS</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2341-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -56378,11 +56266,11 @@ The planet itself is resource poor and has little to offer for export. However, 
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2341-01-01</date>
+            <date>2300-01-01</date>
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2370-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -57256,7 +57144,7 @@ La Blon‘s capital, Amadeus, is located at the foot of the Carbondale Mountains
             <faction>FoS</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2341-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -57305,19 +57193,7 @@ La Blon‘s capital, Amadeus, is located at the foot of the Carbondale Mountains
             <faction>TamP</faction>
         </event>
         <event>
-            <date>2242-01-01</date>
-            <faction>IND</faction>
-        </event>
-        <event>
-            <date>2319-01-01</date>
-            <faction>TamP</faction>
-        </event>
-        <event>
             <date>2341-01-01</date>
-            <faction>LA</faction>
-        </event>
-        <event>
-            <date>2367-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -57634,15 +57510,11 @@ As a wealthy border world, Laiaka suffered from numerous raids during the Succes
             <faction>IND</faction>
         </event>
         <event>
-            <date>2317-01-01</date>
+            <date>2299-01-01</date>
             <faction>FoS</faction>
         </event>
         <event>
             <date>2341-01-01</date>
-            <faction>LA</faction>
-        </event>
-        <event>
-            <date>2367-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -57679,15 +57551,7 @@ As a wealthy border world, Laiaka suffered from numerous raids during the Succes
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2271-01-01</date>
-            <faction>IND</faction>
-        </event>
-        <event>
-            <date>2319-01-01</date>
-            <faction>TamP</faction>
-        </event>
-        <event>
-            <date>2341-01-01</date>
+            <date>2350-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -57821,15 +57685,7 @@ Aside from the large island continent of Galapagos in the northern hemisphere of
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2271-01-01</date>
-            <faction>IND</faction>
-        </event>
-        <event>
-            <date>2341-01-01</date>
-            <faction>FoS</faction>
-        </event>
-        <event>
-            <date>2367-01-01</date>
+            <date>2345-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -57913,11 +57769,11 @@ Aside from the large island continent of Galapagos in the northern hemisphere of
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2317-01-01</date>
+            <date>2300-01-01</date>
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2355-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -58379,11 +58235,11 @@ Aside from the large island continent of Galapagos in the northern hemisphere of
             <faction>IND</faction>
         </event>
         <event>
-            <date>2341-01-01</date>
+            <date>2299-01-01</date>
             <faction>FoS</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2341-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -58474,11 +58330,11 @@ Aside from the large island continent of Galapagos in the northern hemisphere of
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2341-01-01</date>
+            <date>2299-01-01</date>
             <faction>FoS</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2341-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -60402,7 +60258,15 @@ The continents of Sorania and Padawa are mostly temperate and are the sites of t
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2362-01-01</date>
+            <faction>LA</faction>
+        </event>
+		<event>
+            <date>2440-01-01</date>
+            <faction>FWL</faction>
+        </event>
+		<event>
+            <date>2459-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -60557,10 +60421,6 @@ The continents of Sorania and Padawa are mostly temperate and are the sites of t
         <nadirCharge>false</nadirCharge>
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
-        <event>
-            <date>2235-01-01</date>
-            <faction>TamP</faction>
-        </event>
         <event>
             <date>2750-01-01</date>
             <faction>LA</faction>
@@ -60902,7 +60762,7 @@ Norse Storm</desc>
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2345-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -62049,19 +61909,7 @@ Pinard Protectorates Unlimited</desc>
             <faction>TamP</faction>
         </event>
         <event>
-            <date>2242-01-01</date>
-            <faction>IND</faction>
-        </event>
-        <event>
-            <date>2319-01-01</date>
-            <faction>TamP</faction>
-        </event>
-        <event>
             <date>2341-01-01</date>
-            <faction>LA</faction>
-        </event>
-        <event>
-            <date>2367-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -63715,7 +63563,7 @@ Unfortunately, the loss of the Star League–era atmospheric purifiers during th
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2355-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -64136,8 +63984,12 @@ Peloran Motors</desc>
             <date>2271-01-01</date>
             <faction>IND</faction>
         </event>
+		<event>
+            <date>2370-01-01</date>
+            <faction>LA</faction>
+        </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2441-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -65274,23 +65126,11 @@ When the planet was rediscovered in the 31st century, the world was full of stra
             <faction>TA</faction>
         </event>
         <event>
-            <date>2242-01-01</date>
-            <faction>IND</faction>
-        </event>
-        <event>
-            <date>2288-01-01</date>
-            <faction>TamP</faction>
-        </event>
-        <event>
-            <date>2319-01-01</date>
+            <date>2235-01-01</date>
             <faction>TamP</faction>
         </event>
         <event>
             <date>2341-01-01</date>
-            <faction>LA</faction>
-        </event>
-        <event>
-            <date>2367-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -65460,7 +65300,7 @@ When the planet was rediscovered in the 31st century, the world was full of stra
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2365-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -66994,10 +66834,6 @@ Menkib has 25 hour days and orbits its sun every 37 standard days.</desc>
             <faction>FS</faction>
         </event>
         <event>
-            <date>2750-01-01</date>
-            <faction>TH</faction>
-        </event>
-        <event>
             <date>2790-01-01</date>
             <faction>FS</faction>
         </event>
@@ -67456,11 +67292,11 @@ Menkib has 25 hour days and orbits its sun every 37 standard days.</desc>
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2341-01-01</date>
+            <date>2314-01-01</date>
             <faction>PD</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2341-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -68116,12 +67952,12 @@ Mizar has been a resort planet of some renown since before the time of the Star 
             <faction>IND</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2355-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
-            <date>2570-01-01</date>
-            <faction>TH,LA</faction>
+            <date>2500-01-01</date>
+            <faction>TH</faction>
         </event>
         <event>
             <date>2767-01-01</date>
@@ -68896,10 +68732,6 @@ Duncan Enterprises</desc>
             <faction>DC</faction>
         </event>
         <event>
-            <date>3030-01-01</date>
-            <faction>LA</faction>
-        </event>
-        <event>
             <date>3040-01-19</date>
             <faction>FC</faction>
         </event>
@@ -69044,11 +68876,11 @@ Duncan Enterprises</desc>
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2341-01-01</date>
+            <date>2300-01-01</date>
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2365-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -69159,15 +68991,11 @@ Duncan Enterprises</desc>
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2271-01-01</date>
-            <faction>IND</faction>
-        </event>
-        <event>
-            <date>2300-01-01</date>
+            <date>2235-01-01</date>
             <faction>TamP</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2341-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -69221,7 +69049,7 @@ Duncan Enterprises</desc>
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2360-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -69931,10 +69759,6 @@ spaceport of Laubenstein.</desc>
         <faction>UND</faction>
         <event>
             <date>2367-01-01</date>
-            <faction>IND</faction>
-        </event>
-        <event>
-            <date>2571-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -71821,11 +71645,7 @@ Neerabup is divided into provinces that are each ruled by a Publican. The Public
             <faction>IND</faction>
         </event>
         <event>
-            <date>2341-01-01</date>
-            <faction>IND</faction>
-        </event>
-        <event>
-            <date>2571-01-01</date>
+            <date>2345-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -71904,11 +71724,11 @@ Neerabup is divided into provinces that are each ruled by a Publican. The Public
             <faction>IND</faction>
         </event>
         <event>
-            <date>2341-01-01</date>
+            <date>2299-01-01</date>
             <faction>FoS</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2341-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -72290,11 +72110,7 @@ Federated News Services</desc>
             <faction>IND</faction>
         </event>
         <event>
-            <date>2341-01-01</date>
-            <faction>LA</faction>
-        </event>
-        <event>
-            <date>2571-01-01</date>
+            <date>2375-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -72819,11 +72635,11 @@ However, the Devil's Brigade had one striking success: they found the ancient st
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2341-01-01</date>
+            <date>2300-01-01</date>
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2360-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -73159,11 +72975,11 @@ New Hessen was occupied several times during the Succession Wars. However, New H
             <faction>IND</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2355-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2417-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -73408,7 +73224,7 @@ Kyoto has an extensiveindustrial presence with many factories and other industri
             <faction>FoS</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2341-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -74312,7 +74128,7 @@ New Wessex is sparsely inhabited, with most of the population living in towns an
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2350-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -76254,15 +76070,11 @@ Today, Nusakan is home to a thriving population and reborn computer and electron
             <faction>IND</faction>
         </event>
         <event>
-            <date>2319-01-01</date>
+            <date>2299-01-01</date>
             <faction>FoS</faction>
         </event>
         <event>
             <date>2341-01-01</date>
-            <faction>LA,TH</faction>
-        </event>
-        <event>
-            <date>2367-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -76673,11 +76485,11 @@ Today, Nusakan is home to a thriving population and reborn computer and electron
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2341-01-01</date>
+            <date>2314-01-01</date>
             <faction>PD</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2341-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -77466,15 +77278,11 @@ Orestes has the distinction of being one of the few planets in the Free Rasalhag
             <faction>TA</faction>
         </event>
         <event>
-            <date>2242-01-01</date>
-            <faction>IND</faction>
-        </event>
-        <event>
-            <date>2288-01-01</date>
+            <date>2235-01-01</date>
             <faction>TamP</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2341-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -77624,19 +77432,7 @@ Etna Foundries</desc>
             <faction>TamP</faction>
         </event>
         <event>
-            <date>2242-01-01</date>
-            <faction>IND</faction>
-        </event>
-        <event>
-            <date>2319-01-01</date>
-            <faction>TamP</faction>
-        </event>
-        <event>
             <date>2341-01-01</date>
-            <faction>LA</faction>
-        </event>
-        <event>
-            <date>2367-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -78228,10 +78024,6 @@ On Ovan, local nobles have come to exercise complete control over the citizenry 
         <faction>UND</faction>
         <event>
             <date>2367-01-01</date>
-            <faction>IND</faction>
-        </event>
-        <event>
-            <date>2571-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -78708,15 +78500,7 @@ Quickscell Company</desc>
             <faction>IND</faction>
         </event>
         <event>
-            <date>2341-01-01</date>
-            <faction>IND</faction>
-        </event>
-        <event>
-            <date>2341-07-01</date>
-            <faction>LA</faction>
-        </event>
-        <event>
-            <date>2571-01-01</date>
+            <date>2345-07-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -80179,15 +79963,11 @@ Alphard Trading Corporation [destroyed 3075]</desc>
             <faction>IND</faction>
         </event>
         <event>
-            <date>2319-01-01</date>
+            <date>2299-01-01</date>
             <faction>FoS</faction>
         </event>
         <event>
             <date>2341-01-01</date>
-            <faction>FoS</faction>
-        </event>
-        <event>
-            <date>2367-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -80294,11 +80074,11 @@ Alphard Trading Corporation [destroyed 3075]</desc>
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2341-01-01</date>
+            <date>2314-01-01</date>
             <faction>PD</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2341-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -81152,11 +80932,11 @@ Pleione was part of the Tikonov Grand Union before joining the Capellan Confeder
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2341-01-01</date>
+            <date>2314-01-01</date>
             <faction>PD</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2341-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -81516,7 +81296,7 @@ Hadrian Mechanized Industries</desc>
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2345-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -81613,23 +81393,11 @@ Port Moseby itself is an ordinary planet, comfortable for human life with no ext
             <faction>TA</faction>
         </event>
         <event>
-            <date>2242-01-01</date>
-            <faction>IND</faction>
-        </event>
-        <event>
-            <date>2288-01-01</date>
-            <faction>TamP</faction>
-        </event>
-        <event>
-            <date>2319-01-01</date>
+            <date>2235-01-01</date>
             <faction>TamP</faction>
         </event>
         <event>
             <date>2341-01-01</date>
-            <faction>LA</faction>
-        </event>
-        <event>
-            <date>2367-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -82066,7 +81834,7 @@ During the Fourth Succession War, Federated Suns forces captured Poznan and they
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2360-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -82922,7 +82690,7 @@ The location of Proserpina on the Federated Suns border requires the DCMS to kee
             <faction>TamP</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2341-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -83554,7 +83322,7 @@ The location of Proserpina on the Federated Suns border requires the DCMS to kee
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2750-01-01</date>
+            <date>2600-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -83562,7 +83330,7 @@ The location of Proserpina on the Federated Suns border requires the DCMS to kee
             <faction>FWL</faction>
         </event>
         <event>
-            <date>2821-01-01</date>
+            <date>2793-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -83706,11 +83474,11 @@ Even with its extreme weather, Rahne does support native life. A prime example i
             <faction>IND</faction>
         </event>
         <event>
-            <date>2341-01-01</date>
+            <date>2299-01-01</date>
             <faction>FoS</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2341-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -84174,19 +83942,7 @@ Hope Industrial Works</desc>
             <faction>TamP</faction>
         </event>
         <event>
-            <date>2242-01-01</date>
-            <faction>IND</faction>
-        </event>
-        <event>
-            <date>2319-01-01</date>
-            <faction>TamP</faction>
-        </event>
-        <event>
             <date>2341-01-01</date>
-            <faction>LA</faction>
-        </event>
-        <event>
-            <date>2367-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -84450,11 +84206,11 @@ If it were not for the constant raids and invasions, Redfield would likely have 
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2341-01-01</date>
+            <date>2314-01-01</date>
             <faction>PD</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2341-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -84496,8 +84252,8 @@ If it were not for the constant raids and invasions, Redfield would likely have 
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>3030-01-01</date>
-            <faction>IND</faction>
+            <date>3040-01-01</date>
+            <faction>TC</faction>
         </event>
         <event>
             <date>3120-01-01</date>
@@ -85281,11 +85037,11 @@ Magna Metals Incorporated</desc>
 Manufacturing centers:
 Quikscell Company</desc>
         <event>
-            <date>2341-01-01</date>
+            <date>2314-01-01</date>
             <faction>PD</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2341-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -85806,10 +85562,6 @@ Valiant Systems</desc>
             <faction>FS</faction>
         </event>
         <event>
-            <date>2750-01-01</date>
-            <faction>TH</faction>
-        </event>
-        <event>
             <date>2790-01-01</date>
             <faction>FS</faction>
         </event>
@@ -85914,19 +85666,11 @@ Valiant Systems</desc>
             <faction>IND</faction>
         </event>
         <event>
-            <date>2290-01-01</date>
-            <faction>FoS</faction>
-        </event>
-        <event>
-            <date>2341-01-01</date>
-            <faction>FWL</faction>
-        </event>
-        <event>
-            <date>2367-01-01</date>
+            <date>2355-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2418-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -85987,15 +85731,19 @@ Valiant Systems</desc>
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2367-01-01</date>
+            <date>2300-01-01</date>
             <faction>IND</faction>
         </event>
+		<event>
+            <date>2365-01-01</date>
+            <faction>LA</faction>
+        </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2410-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
-            <date>2864-01-01</date>
+            <date>2822-01-01</date>
             <faction>ABN</faction>
         </event>
     </planet>
@@ -87211,23 +86959,11 @@ Throughout the Succession Wars, Ryde‘s chemical industry, which produces every
             <faction>IND</faction>
         </event>
         <event>
-            <date>2271-01-01</date>
-            <faction>IND</faction>
-        </event>
-        <event>
             <date>2299-01-01</date>
             <faction>FoS</faction>
         </event>
         <event>
-            <date>2319-01-01</date>
-            <faction>FoS</faction>
-        </event>
-        <event>
             <date>2341-01-01</date>
-            <faction>LA</faction>
-        </event>
-        <event>
-            <date>2367-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -87863,7 +87599,7 @@ As of the 32nd century, this world is little more than an outpost, with no agric
             <faction>TA</faction>
         </event>
         <event>
-            <date>2300-01-01</date>
+            <date>2242-01-01</date>
             <faction>IND</faction>
         </event>
         <event>
@@ -88064,23 +87800,11 @@ As of the 32nd century, this world is little more than an outpost, with no agric
             <faction>IND</faction>
         </event>
         <event>
-            <date>2271-01-01</date>
-            <faction>IND</faction>
-        </event>
-        <event>
             <date>2299-01-01</date>
             <faction>FoS</faction>
         </event>
         <event>
-            <date>2317-01-01</date>
-            <faction>FoS</faction>
-        </event>
-        <event>
             <date>2341-01-01</date>
-            <faction>LA</faction>
-        </event>
-        <event>
-            <date>2367-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -88614,11 +88338,11 @@ As of the 32nd century, this world is little more than an outpost, with no agric
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2341-01-01</date>
+            <date>2300-01-01</date>
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2360-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -88883,11 +88607,11 @@ As of the 32nd century, this world is little more than an outpost, with no agric
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2341-01-01</date>
+            <date>2300-01-01</date>
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2360-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -89054,14 +88778,6 @@ Tengo Aerospace</desc>
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2271-01-01</date>
-            <faction>IND</faction>
-        </event>
-        <event>
-            <date>2317-01-01</date>
-            <faction>ABN</faction>
-        </event>
-        <event>
             <date>2596-09-22</date>
             <faction>LA</faction>
         </event>
@@ -89152,7 +88868,7 @@ Tengo Aerospace</desc>
             <faction>TamP</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2341-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -90127,7 +89843,7 @@ The capital city, Gambootas, is home not only to the planet‘s sole interstella
             <faction>FoS</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2341-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -90172,11 +89888,7 @@ The capital city, Gambootas, is home not only to the planet‘s sole interstella
             <faction>IND</faction>
         </event>
         <event>
-            <date>2341-01-01</date>
-            <faction>LA</faction>
-        </event>
-        <event>
-            <date>2571-01-01</date>
+            <date>2370-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -90366,7 +90078,7 @@ The capital city, Gambootas, is home not only to the planet‘s sole interstella
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2360-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -90625,7 +90337,7 @@ Sevon was famously the location of the Star League’s first defeat during Opera
             <faction>IND</faction>
         </event>
         <event>
-            <date>2341-01-01</date>
+            <date>2344-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -90837,10 +90549,6 @@ Sevon was famously the location of the Star League’s first defeat during Opera
         <faction>UND</faction>
         <event>
             <date>2367-01-01</date>
-            <faction>IND</faction>
-        </event>
-        <event>
-            <date>2571-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -91654,7 +91362,7 @@ Shiba is home to a Duchy RTC facility, which is located in the flatlands of Abbo
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2365-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -92340,7 +92048,7 @@ Saroyan Special Production</desc>
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2365-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -92936,7 +92644,7 @@ Saroyan Special Production</desc>
             <faction>TamP</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2341-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -93180,7 +92888,7 @@ The capital of Skondia, Platinum City, is located on the southeastern continent 
             <faction>IND</faction>
         </event>
         <event>
-            <date>2319-01-01</date>
+            <date>2299-01-01</date>
             <faction>FoS</faction>
         </event>
         <event>
@@ -93307,23 +93015,11 @@ Skye Pleasure Craft</desc>
             <faction>IND</faction>
         </event>
         <event>
-            <date>2271-01-01</date>
-            <faction>IND</faction>
-        </event>
-        <event>
             <date>2299-01-01</date>
             <faction>FoS</faction>
         </event>
         <event>
-            <date>2317-01-01</date>
-            <faction>FoS</faction>
-        </event>
-        <event>
             <date>2341-01-01</date>
-            <faction>LA</faction>
-        </event>
-        <event>
-            <date>2367-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -93678,11 +93374,11 @@ During the Jihad, the Word of Blake forces invaded after they neutralized the de
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2341-01-01</date>
+            <date>2314-01-01</date>
             <faction>PD</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2341-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -93844,7 +93540,7 @@ During the Jihad, the Word of Blake forces invaded after they neutralized the de
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2355-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -93902,11 +93598,11 @@ Vining Engineering and Salvage Team</desc>
             <faction>IND</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2355-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2419-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -94542,8 +94238,8 @@ The local population have a pragmatic political approach that can almost be mist
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>3030-01-01</date>
-            <faction>IND</faction>
+            <date>3040-01-01</date>
+            <faction>TC</faction>
         </event>
         <event>
             <date>3120-01-01</date>
@@ -94782,11 +94478,11 @@ Tengo Aerospace</desc>
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2350-01-01</date>
+            <date>2367-01-01</date>
             <faction>LA</faction>
         </event>
-        <event>
-            <date>2367-01-01</date>
+		<event>
+            <date>2400-01-01</date>
             <faction>DC</faction>
         </event>
         <event>
@@ -96525,19 +96221,7 @@ For most of the planet’s history it was a Lyran Commonwealth planet bordering 
             <faction>TamP</faction>
         </event>
         <event>
-            <date>2242-01-01</date>
-            <faction>IND</faction>
-        </event>
-        <event>
-            <date>2271-01-01</date>
-            <faction>TamP</faction>
-        </event>
-        <event>
             <date>2341-01-01</date>
-            <faction>LA</faction>
-        </event>
-        <event>
-            <date>2367-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -96732,7 +96416,7 @@ For most of the planet’s history it was a Lyran Commonwealth planet bordering 
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2345-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -96861,7 +96545,7 @@ For most of the planet’s history it was a Lyran Commonwealth planet bordering 
             <faction>TamP</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2341-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -97166,11 +96850,11 @@ For most of the planet’s history it was a Lyran Commonwealth planet bordering 
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2341-01-01</date>
+            <date>2300-01-01</date>
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2345-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -97328,15 +97012,7 @@ For most of the planet’s history it was a Lyran Commonwealth planet bordering 
             <faction>FoS</faction>
         </event>
         <event>
-            <date>2319-01-01</date>
-            <faction>FoS</faction>
-        </event>
-        <event>
             <date>2341-01-01</date>
-            <faction>LA</faction>
-        </event>
-        <event>
-            <date>2367-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -97431,7 +97107,7 @@ For most of the planet’s history it was a Lyran Commonwealth planet bordering 
             <faction>IND</faction>
         </event>
         <event>
-            <date>2300-01-01</date>
+            <date>2299-01-01</date>
             <faction>FoS</faction>
         </event>
         <event>
@@ -97439,12 +97115,16 @@ For most of the planet’s history it was a Lyran Commonwealth planet bordering 
             <faction>LA</faction>
         </event>
         <event>
-            <date>2570-01-01</date>
-            <faction>LA,TH</faction>
+            <date>2700-01-01</date>
+            <faction>TH</faction>
         </event>
         <event>
             <date>2767-01-01</date>
             <faction>RWR</faction>
+        </event>
+		<event>
+            <date>3078-01-01</date>
+            <faction>TH</faction>
         </event>
         <event>
             <date>2780-01-01</date>
@@ -98407,10 +98087,6 @@ For most of the planet’s history it was a Lyran Commonwealth planet bordering 
         <faction>UND</faction>
         <event>
             <date>2367-01-01</date>
-            <faction>IND</faction>
-        </event>
-        <event>
-            <date>2571-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -98693,10 +98369,6 @@ For most of the planet’s history it was a Lyran Commonwealth planet bordering 
         </event>
         <event>
             <date>2341-01-01</date>
-            <faction>LA</faction>
-        </event>
-        <event>
-            <date>2367-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -100321,11 +99993,11 @@ Since the fall of the Star League, ten of the twenty huge atmosphere recondition
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2341-01-01</date>
+            <date>2314-01-01</date>
             <faction>PD</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2341-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -100637,11 +100309,11 @@ Lockheed/CBM Corp.
 Tharhes Industries
 Tharkad Aerospace Group</desc>
         <event>
-            <date>2317-01-01</date>
+            <date>2314-01-01</date>
             <faction>PD</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2341-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -101315,7 +100987,7 @@ Tharkad Aerospace Group</desc>
             <faction>TamP</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2341-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -102379,19 +102051,7 @@ Timbuktu has been a staging ground used by the Lyran Commonwealth to coordinate 
             <faction>TamP</faction>
         </event>
         <event>
-            <date>2242-01-01</date>
-            <faction>IND</faction>
-        </event>
-        <event>
-            <date>2319-01-01</date>
-            <faction>TamP</faction>
-        </event>
-        <event>
             <date>2341-01-01</date>
-            <faction>LA</faction>
-        </event>
-        <event>
-            <date>2367-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -103125,11 +102785,11 @@ Gutierrez Aerospace</desc>
             <faction>IND</faction>
         </event>
         <event>
-            <date>2341-01-01</date>
+            <date>2299-01-01</date>
             <faction>FoS</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2341-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -103352,14 +103012,6 @@ Gutierrez Aerospace</desc>
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <desc>Trolloc Prime was successfully conquered by the Draconis Combine in November of 2785 following a diversionary raid on the planet of Bone-Norman.</desc>
-        <event>
-            <date>2172-08-01</date>
-            <faction>TA</faction>
-        </event>
-        <event>
-            <date>2242-01-01</date>
-            <faction>IND</faction>
-        </event>
         <event>
             <date>2750-01-01</date>
             <faction>LA</faction>
@@ -103646,11 +103298,11 @@ New York Vehicle Y2 Facility [Created 3068]</desc>
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2341-01-01</date>
+            <date>2314-01-01</date>
             <faction>PD</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2341-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -103879,7 +103531,7 @@ Tsukude‘s capital, Ogawa City, is located on Ikadae, the largest of this world
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2365-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -104054,11 +103706,11 @@ Turin is home to a Duchy RTC, which focuses on training vehicle crews and unarmo
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2341-01-01</date>
+            <date>2314-01-01</date>
             <faction>PD</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2341-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -104470,7 +104122,7 @@ After its fall, humans continued to live on Tyrfing at a basic hunter-gatherer l
             <faction>TC</faction>
         </event>
         <event>
-            <date>3066-01-01</date>
+            <date>3066-04-01</date>
             <faction>PIND</faction>
         </event>
         <event>
@@ -104639,11 +104291,11 @@ After its fall, humans continued to live on Tyrfing at a basic hunter-gatherer l
             <faction>IND</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2355-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2419-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -105131,23 +104783,11 @@ In the centuries of the Succession Wars, Unukalhai was largely overlooked by inv
             <faction>IND</faction>
         </event>
         <event>
-            <date>2271-01-01</date>
-            <faction>IND</faction>
-        </event>
-        <event>
             <date>2299-01-01</date>
             <faction>FoS</faction>
         </event>
         <event>
-            <date>2319-01-01</date>
-            <faction>FoS</faction>
-        </event>
-        <event>
             <date>2341-01-01</date>
-            <faction>LA</faction>
-        </event>
-        <event>
-            <date>2367-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -105365,6 +105005,10 @@ In the centuries of the Succession Wars, Unukalhai was largely overlooked by inv
             <faction>TamP</faction>
         </event>
         <event>
+            <date>2341-01-01</date>
+            <faction>LA</faction>
+        </event>
+        <event>
             <date>2571-01-01</date>
             <faction>DC</faction>
         </event>
@@ -105410,7 +105054,7 @@ In the centuries of the Succession Wars, Unukalhai was largely overlooked by inv
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2360-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -105639,10 +105283,6 @@ In the centuries of the Succession Wars, Unukalhai was largely overlooked by inv
             <faction>DC</faction>
         </event>
         <event>
-            <date>2750-01-01</date>
-            <faction>TH</faction>
-        </event>
-        <event>
             <date>2790-01-01</date>
             <faction>DC</faction>
         </event>
@@ -105780,11 +105420,15 @@ In the centuries of the Succession Wars, Unukalhai was largely overlooked by inv
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2571-01-01</date>
+            <date>2370-01-01</date>
+            <faction>LA</faction>
+        </event>
+		<event>
+            <date>2441-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
-            <date>2821-01-01</date>
+            <date>2791-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -106227,11 +105871,11 @@ In the centuries of the Succession Wars, Unukalhai was largely overlooked by inv
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2341-01-01</date>
+            <date>2300-01-01</date>
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2345-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -106283,12 +105927,12 @@ Vega‘s biggest tourist attraction by far, even over the site of the Treaty of 
             <faction>IND</faction>
         </event>
         <event>
+            <date>2355-01-01</date>
+            <faction>LA</faction>
+        </event>
+		<event>
             <date>2407-01-01</date>
             <faction>DC</faction>
-        </event>
-        <event>
-            <date>2571-01-01</date>
-            <faction>LA</faction>
         </event>
         <event>
             <date>2821-01-01</date>
@@ -107493,7 +107137,7 @@ Tellis Electronics</desc>
             <faction>TamP</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2341-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -107610,7 +107254,7 @@ Tellis Electronics</desc>
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2365-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -107676,11 +107320,11 @@ Tellis Electronics</desc>
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2341-01-01</date>
+            <date>2314-01-01</date>
             <faction>PD</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2341-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -109340,11 +108984,11 @@ Presently, aside from the Games and the Hiring Hall, Westerhand does not feature
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2341-01-01</date>
+            <date>2314-01-01</date>
             <faction>PD</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2341-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -109841,11 +109485,7 @@ Presently, aside from the Games and the Hiring Hall, Westerhand does not feature
             <faction>IND</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
-            <faction>FWL</faction>
-        </event>
-        <event>
-            <date>2570-01-01</date>
+            <date>2350-01-01</date>
             <faction>FWL</faction>
         </event>
 		<event>
@@ -109873,7 +109513,7 @@ Presently, aside from the Games and the Hiring Hall, Westerhand does not feature
             <faction>LA</faction>
         </event>
         <event>
-            <date>2917-01-01</date>
+            <date>2860-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -110448,11 +110088,11 @@ Woodstock‘s third continent, Essex, is the only blemish on this otherwise beau
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2341-01-01</date>
+            <date>2300-01-01</date>
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2360-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -110514,7 +110154,7 @@ Woodstock‘s third continent, Essex, is the only blemish on this otherwise beau
             <faction>IND</faction>
         </event>
         <event>
-            <date>2367-01-01</date>
+            <date>2350-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -111086,19 +110726,11 @@ As a border world, Yed Posterior saw its fair share of raids and invasions durin
             <faction>IND</faction>
         </event>
         <event>
-            <date>2319-01-01</date>
-            <faction>FoS</faction>
-        </event>
-        <event>
-            <date>2320-01-01</date>
+            <date>2299-01-01</date>
             <faction>FoS</faction>
         </event>
         <event>
             <date>2341-01-01</date>
-            <faction>LA</faction>
-        </event>
-        <event>
-            <date>2367-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -111151,15 +110783,7 @@ As a border world, Yed Posterior saw its fair share of raids and invasions durin
             <faction>FoS</faction>
         </event>
         <event>
-            <date>2319-01-01</date>
-            <faction>FoS</faction>
-        </event>
-        <event>
             <date>2341-01-01</date>
-            <faction>LA</faction>
-        </event>
-        <event>
-            <date>2367-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -111446,7 +111070,7 @@ Laumer City is located on the continent of Saddleback and is home to Yegaus’ w
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2355-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -111822,12 +111446,8 @@ Laumer City is located on the continent of Saddleback and is home to Yegaus’ w
             <date>2271-01-01</date>
             <faction>IND</faction>
         </event>
-		<event>
-            <date>2299-01-01</date>
-            <faction>FoS</faction>
-        </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2355-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -112188,19 +111808,11 @@ Today, Gray Valley City remains the largest and most industrialized of Zebebelge
             <faction>IND</faction>
         </event>
         <event>
-            <date>2271-01-01</date>
-            <faction>IND</faction>
-        </event>
-        <event>
-            <date>2319-01-01</date>
+            <date>2299-01-01</date>
             <faction>FoS</faction>
         </event>
         <event>
             <date>2341-01-01</date>
-            <faction>FoS</faction>
-        </event>
-        <event>
-            <date>2367-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -112208,8 +111820,8 @@ Today, Gray Valley City remains the largest and most industrialized of Zebebelge
             <faction>RWR</faction>
         </event>
         <event>
-            <date>2767-01-01</date>
-            <faction>RWR</faction>
+            <date>2768-01-01</date>
+            <faction>TH</faction>
         </event>
         <event>
             <date>2779-09-30</date>
@@ -112290,10 +111902,6 @@ Today, a trace of Zebeneschamali‘s founding decades can still be seen in the s
         </event>
         <event>
             <date>2341-01-01</date>
-            <faction>FoS</faction>
-        </event>
-        <event>
-            <date>2367-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -113262,7 +112870,7 @@ Today, a trace of Zebeneschamali‘s founding decades can still be seen in the s
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2362-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
@@ -113295,7 +112903,7 @@ Today, a trace of Zebeneschamali‘s founding decades can still be seen in the s
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2360-01-01</date>
             <faction>LA</faction>
         </event>
         <event>
