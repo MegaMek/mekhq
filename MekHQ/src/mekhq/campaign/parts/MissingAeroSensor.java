@@ -57,16 +57,12 @@ public class MissingAeroSensor extends MissingPart {
     
     @Override 
 	public int getBaseTime() {
-        if (campaign.getCampaignOptions().useAeroSystemHits()) {
-            //Test of proposed errata for repair times
-            Entity e = unit.getEntity();
-            if (e.hasETypeFlag(Entity.ETYPE_DROPSHIP) || e.hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
-                return 1200;
-            } else {
-                return 260;
-            }
+        //Published errata for replacement times of small aero vs large craft
+        Entity e = unit.getEntity();
+        if (e.hasETypeFlag(Entity.ETYPE_DROPSHIP) || e.hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
+            return 1200;
         }
-		return 1200;
+        return 260;            
 	}
 	
 	@Override
