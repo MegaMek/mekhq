@@ -95,7 +95,11 @@ public class Thrusters extends Part {
 	    int time = 0;
         if (campaign.getCampaignOptions().useAeroSystemHits()) {
             //Test of proposed errata for repair times
-            time = 90;
+            if(isSalvaging()) {
+                time = 600;
+            } else {
+                time = 90;
+            }
             if (hits == 1) {
                 time *= 1;
             } 
@@ -105,6 +109,7 @@ public class Thrusters extends Part {
             if (hits == 3) {
                 time *= 3;
             }
+            return time;
         }
 		if(isSalvaging()) {
 			time = 600;
