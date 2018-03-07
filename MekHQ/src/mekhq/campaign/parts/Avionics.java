@@ -83,35 +83,39 @@ public class Avionics extends Part {
 	
 	@Override 
 	public int getBaseTime() {
+	    int time = 0;
 		if (campaign.getCampaignOptions().useAeroSystemHits()) {
 		    //Test of proposed errata for repair times
 		    Entity e = unit.getEntity();
 		    if (isSalvaging()) {
 		        if (e.hasETypeFlag(Entity.ETYPE_DROPSHIP) || e.hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
-                    return 4800;
+                    time = 4800;
                 } else {
-                    return 600;
+                    time = 600;
                 }
 		    }
 		    if (hits == 1) {
 		        if (e.hasETypeFlag(Entity.ETYPE_DROPSHIP) || e.hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
-		            return 240;
+		            time = 240;
 		        } else {
-		            return 120;
+		            time = 120;
 		        }
 		    } 
 		    if (hits == 2) {
 		        if (e.hasETypeFlag(Entity.ETYPE_DROPSHIP) || e.hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
-                    return 480;
+                    time = 480;
                 } else {
-                    return 240;
+                    time = 240;
                 }
 		    }
+		    return time;
 		}
 		if (isSalvaging()) {
-		    return 4800;
+		    time = 4800;
+		} else {
+		    time = 480;
 		}
-		return 480;
+		return time;
 	}
 	
 	@Override

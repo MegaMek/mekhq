@@ -85,10 +85,13 @@ public class LandingGear extends Part {
 	
 	@Override 
 	public int getBaseTime() {
+	    int time = 0;
 		if(isSalvaging()) {
-			return 1200;
+			time = 1200;
+		} else {
+		    time = 120;
 		}
-		return 120;
+		return time;
 	}
 	
 	@Override

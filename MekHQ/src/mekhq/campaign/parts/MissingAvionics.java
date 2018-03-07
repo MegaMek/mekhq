@@ -54,13 +54,15 @@ public class MissingAvionics extends MissingPart {
     @Override 
 	public int getBaseTime() {
         if (campaign.getCampaignOptions().useAeroSystemHits()) {
+            int time = 0;
             //Test of proposed errata for repair times
             Entity e = unit.getEntity();
             if (e.hasETypeFlag(Entity.ETYPE_DROPSHIP) || e.hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
-                return 4800;
+                time = 4800;
             } else {
-                return 600;
+                time = 600;
             }
+            return time;
         }
 		return 4800;
 	}

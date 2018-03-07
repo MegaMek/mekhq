@@ -92,22 +92,26 @@ public class Thrusters extends Part {
 	
 	@Override 
 	public int getBaseTime() {
+	    int time = 0;
         if (campaign.getCampaignOptions().useAeroSystemHits()) {
             //Test of proposed errata for repair times
+            time = 90;
             if (hits == 1) {
-                return 90;
+                time *= 1;
             } 
             if (hits == 2) {
-                return 180;
+                time *= 2;
             }
             if (hits == 3) {
-                return 270;
+                time *= 3;
             }
         }
 		if(isSalvaging()) {
-			return 600;
+			time = 600;
+		} else {
+		    time = 90;
 		}
-		return 90;
+		return time;
 	}
 	
 	@Override

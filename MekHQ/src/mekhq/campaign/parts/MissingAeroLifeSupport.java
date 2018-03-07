@@ -62,12 +62,15 @@ public class MissingAeroLifeSupport extends MissingPart {
 	 
 	 @Override 
 	 public int getBaseTime() {
+	     int time = 0;
 	     //Published errata for replacement times of small aero vs large craft
 	     Entity e = unit.getEntity();
 	     if (e.hasETypeFlag(Entity.ETYPE_DROPSHIP) || e.hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
-	         return 6720;
+	         time = 6720;
+	     } else {
+	         time = 180;
 	     }
-	     return 180;
+	     return time;
      } 
 
 		@Override

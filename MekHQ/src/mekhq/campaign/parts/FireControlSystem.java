@@ -85,44 +85,48 @@ public class FireControlSystem extends Part {
 	
 	@Override 
 	public int getBaseTime() {
+	    int time = 0;
         if (campaign.getCampaignOptions().useAeroSystemHits()) {
             //Test of proposed errata for repair times
             Entity e = unit.getEntity();
             if (isSalvaging()) {
                 if (e.hasETypeFlag(Entity.ETYPE_DROPSHIP) || e.hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
+                    time = 4320;
                     if (e.hasNavalC3()) {
-                        return 8640;
+                        time *= 2;
                     }
-                    return 4320;
                 } else {
-                    return 1080;
+                    time = 1080; 
                 }
             }
             if (hits == 1) {
                 if (e.hasETypeFlag(Entity.ETYPE_DROPSHIP) || e.hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
+                    time = 240;
                     if (e.hasNavalC3()) {
-                        return 480;
+                        time *= 2;
                     }
-                    return 240;
                 } else {
-                    return 120;
+                    time = 120; 
                 }
             } 
             if (hits == 2) {
                 if (e.hasETypeFlag(Entity.ETYPE_DROPSHIP) || e.hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
+                    time = 480;
                     if (e.hasNavalC3()) {
-                        return 960;
+                        time *= 2;
                     }
-                    return 480;
                 } else {
-                    return 240;
+                    time = 240; 
                 }
             }
+            return time;
         }
 		if(isSalvaging()) {
-			return 4320;
+			time = 4320;
+		} else {
+		    time = 120;
 		}
-		return 120;
+		return time;
 	}
 	
 	@Override
