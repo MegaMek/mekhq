@@ -78,6 +78,7 @@ import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.Faction.Tag;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.Planets;
 import mekhq.gui.dialog.NewPlanetaryEventDialog;
@@ -894,17 +895,16 @@ public class InterstellarMapPanel extends JPanel {
     private boolean isPlanetEmpty(Planet planet) {
         Set<Faction> factions = planet.getFactionSet(now);
         if((null == factions) || factions.isEmpty()) {
-            return false;
+            return true;
         }
-        boolean empty = true;
+
         for(Faction faction : factions) {
-            String id = faction.getShortName();
-            // TODO: Replace with proper methods instead of magic strings
-            if(!id.equals("UND") && !id.equals("ABN") && !id.equals("NONE")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                empty = false;
+            if(!faction.is(Tag.ABANDONED)) {
+                return false;
             }
         }
-        return empty;
+        
+        return true;
     }
     
     private boolean isPlanetVisible(Planet planet, boolean hideEmpty) {

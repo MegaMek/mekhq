@@ -782,6 +782,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
             servicedUnitTable.setRowSelectionInterval(selected, selected);
         } else {
             refreshTaskList();
+            txtServicedUnitView.setText("");
         }
 
         refreshPartsAcquisition();

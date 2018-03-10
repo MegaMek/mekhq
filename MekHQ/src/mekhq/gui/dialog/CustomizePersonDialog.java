@@ -42,12 +42,15 @@ import megamek.common.EquipmentType;
 import megamek.common.WeaponType;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
+import megamek.common.options.Option;
+import megamek.common.options.OptionsConstants;
 import megamek.common.options.PilotOptions;
 import megamek.common.util.EncodeControl;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.unit.Unit;
 
 /**
@@ -872,7 +875,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         DialogOptionComponent optionComp = new DialogOptionComponent(this,
                 option, editable);
 
-        if ("weapon_specialist".equals(option.getName())) { //$NON-NLS-1$
+        if (OptionsConstants.GUNNERY_WEAPON_SPECIALIST.equals(option.getName())) { //$NON-NLS-1$
             optionComp.addValue("None"); //$NON-NLS-1$
             //holy crap, do we really need to add every weapon?
             for (Enumeration<EquipmentType> i = EquipmentType.getAllTypes(); i.hasMoreElements();) {
@@ -882,32 +885,34 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
                 }
             }
             optionComp.setSelected(option.stringValue());
-        }
-        
-        if ("specialist".equals(option.getName())) { //$NON-NLS-1$
+        } else if (OptionsConstants.GUNNERY_SPECIALIST.equals(option.getName())) { //$NON-NLS-1$
             optionComp.addValue(Crew.SPECIAL_NONE);
             optionComp.addValue(Crew.SPECIAL_ENERGY);
             optionComp.addValue(Crew.SPECIAL_BALLISTIC);
             optionComp.addValue(Crew.SPECIAL_MISSILE);
             optionComp.setSelected(option.stringValue());
-        }
-
-        if ("range_master".equals(option.getName())) { //$NON-NLS-1$
+        } else if (OptionsConstants.GUNNERY_RANGE_MASTER.equals(option.getName())) { //$NON-NLS-1$
             optionComp.addValue(Crew.RANGEMASTER_NONE);
             optionComp.addValue(Crew.RANGEMASTER_MEDIUM);
             optionComp.addValue(Crew.RANGEMASTER_LONG);
             optionComp.addValue(Crew.RANGEMASTER_EXTREME);
             optionComp.addValue(Crew.RANGEMASTER_LOS);
             optionComp.setSelected(option.stringValue());
-        }
-
-        if ("human_tro".equals(option.getName())) { //$NON-NLS-1$
+        } else if (OptionsConstants.MISC_HUMAN_TRO.equals(option.getName())) { //$NON-NLS-1$
             optionComp.addValue(Crew.HUMANTRO_NONE);
             optionComp.addValue(Crew.HUMANTRO_MECH);
             optionComp.addValue(Crew.HUMANTRO_AERO);
             optionComp.addValue(Crew.HUMANTRO_VEE);
             optionComp.addValue(Crew.HUMANTRO_BA);
             optionComp.setSelected(option.stringValue());
+        } else if (option.getType() == Option.CHOICE) {
+            SpecialAbility spa = SpecialAbility.getOption(option.getName());
+            if (null != spa) {
+                for (String val : spa.getChoiceValues()) {
+                    optionComp.addValue(val);
+                }
+                optionComp.setSelected(option.stringValue());
+            }
         }
 
         gridbag.setConstraints(optionComp, c);

@@ -3887,7 +3887,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         chkDoubleVehicles.setSelected(options.getDoubleVehicles());
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = yTablePosition;
+        gridBagConstraints.gridy = yTablePosition++;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
@@ -4067,7 +4067,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
         JLabel lblStartGameDelay = new JLabel(resourceMap.getString("spnStartGameDelay.text"));
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = yTablePosition++;
+        gridBagConstraints.gridy = yTablePosition;
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
@@ -4078,7 +4078,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         spnStartGameDelay.setToolTipText(resourceMap.getString("spnStartGameDelay.toolTipText"));
         spnStartGameDelay.setValue(options.getStartGameDelay());
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 13;
+        gridBagConstraints.gridy = yTablePosition;
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);

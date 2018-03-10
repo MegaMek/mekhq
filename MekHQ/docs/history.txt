@@ -1,6 +1,27 @@
 VERSION HISTORY:
 ----------------
-v0.43.7-git 
+v0.43.9-git
++ Issue #647: Exception Causing UI Issues while Unit is Being Refit
++ Issue #655: Mechs (and probably other units) whose crews ejected will be able to deploy on subsequent missions
++ Updated faction-change info for FWL using Handbook Marik
++ Updated faction-change info for FC using Handbook Steiner
+
+v0.43.8-RC2 (2018-02-11 22:40 UTC)
++ Issue #626: News events with year but no specific date should now fire with better distribution
++ Issue #616: Text rendering issue in Campaign Options screen
++ Data: Fix for multiple issues relating to incorrect capitalization and date omissions in planets.xml
++ VTOL and LAM bomb selections should now be saved when campaign is saved
++ Issue #620: Unused bombs are not recovered for VTOLs after battle (should recover properly for LAMs, as well)
++ Bug: large craft refits calculating ammo loading times incorrectly.
++ Issue #617: Extinct units available for purchase when they shouldn't be.
++ Issue #625: Repair Bay status window not cleared after last unit is repaired.
++ Honor user's press of the cancel button in the briefing screen "load saved game" dialog
++ Dropships and other units with transport bays that have internal components (cubicles, doors) should no longer incorrectly show some of those components as damaged.
++ Improved faction-change info for pre-CC factions and CC formation using Handbook Liao
++ Updated faction-change info for FS using Handbook Davion
++ Updated faction-change info for DC using Handbook Kurita
+
+v0.43.7-RC1 (2018-01-21 22:00 UTC)
 + Issue #567: BA standard armor cannot be repaired
 + Issue #576: CCE on loading campaign with DS with missing thruster(s)
 + Feature: Advanced time by one month.
@@ -33,6 +54,8 @@ v0.43.7-git
 + Issue #574: Dropship capacity Inconsistancy
 + Issue #591: Special Abilities can be selected multiple times
 + Issue #577: MRMS does not always use BTH settings
++ Fixed unofficial Clan tech knowledge SPA.
++ Custom SPAs for tracking purposes (see docs/custom_spa.txt).
 
 v0.43.6 (2017-12-22 10:00 UTC)
 + Bug: ClassCastException when loading campaign from earlier versions with large craft with missing ammo bin.

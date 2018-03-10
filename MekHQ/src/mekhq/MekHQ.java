@@ -356,6 +356,10 @@ public class MekHQ implements GameListener {
     public void joinGame(Scenario scenario, ArrayList<Unit> meks) {
 		LaunchGameDialog lgd = new LaunchGameDialog(campaigngui.getFrame(), false, campaign);
 		lgd.setVisible(true);
+		
+		if(lgd.cancelled) {
+		    return;
+		}
 
     	try {
     		client = new Client(lgd.playerName, lgd.serverAddr, lgd.port);
@@ -377,6 +381,11 @@ public class MekHQ implements GameListener {
     	LaunchGameDialog lgd = new LaunchGameDialog(campaigngui.getFrame(), true, campaign);
 		lgd.setVisible(true);
 
+		if(lgd.cancelled) {
+		    stopHost();
+		    return;
+		}
+		
     	try {
             myServer = new Server("", lgd.port);
             if (loadSavegame) {
@@ -387,7 +396,7 @@ public class MekHQ implements GameListener {
                     myServer.loadGame(new File(f.getDirectory(), f.getFile()));
                 } else {
                     stopHost();
-                    throw new FileNotFoundException();
+                    return; // exceptions as flow control? no thanks.
                 }
             }
     	} catch (FileNotFoundException ex) {

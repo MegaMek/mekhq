@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE doc [
+    <!ENTITY    L3              "lvl3Advantages">
+    <!ENTITY    EDGE            "edgeAdvantages">
+    <!ENTITY    AUGMENTATION    "MDAdvantages">
+
+    <!ENTITY    BOOLEAN     "0">
+    <!ENTITY    INT         "1">
+    <!ENTITY    FLOAT       "2">
+    <!ENTITY    STRING      "3">
+    <!ENTITY    CHOICE      "4">
+]>
+
+     
+<options>
+<!-- Examples customs of custom abilities. See docs/custom_spa.txt for
+     more information
+
+    <option name="tetris_master">
+        <group>&L3;</group>
+        <type>&CHOICE;</type>
+    </option>
+    
+    <option name="edge_paper_cut">
+        <group>&EDGE;</group>
+        <type>&BOOLEAN;</type>
+    </option>
+    
+    <option name="md_prosthetic_blowtorch">
+        <group>&AUGMENTATION;</group>
+        <type>&BOOLEAN;</type>
+    </option>
+-->
+
+</options>

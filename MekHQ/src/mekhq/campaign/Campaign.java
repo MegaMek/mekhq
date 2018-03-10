@@ -78,6 +78,7 @@ import megamek.common.EquipmentType;
 import megamek.common.FighterSquadron;
 import megamek.common.Game;
 import megamek.common.GunEmplacement;
+import megamek.common.IBomber;
 import megamek.common.ITechManager;
 import megamek.common.ITechnology;
 import megamek.common.Infantry;
@@ -7324,20 +7325,18 @@ public class Campaign implements Serializable, ITechManager {
         entity.setStuck(false);
         entity.resetCoolantFailureAmount();
         entity.setConversionMode(0);
+        entity.setDoomed(false);
 
         if (!entity.getSensors().isEmpty()) {
             entity.setNextSensor(entity.getSensors().firstElement());
         }
 
-        if (entity instanceof Mech) {
-            Mech m = (Mech) entity;
-            m.setCoolingFlawActive(false);
-        } else if (entity instanceof Aero) {
-            Aero a = (Aero) entity;
-            List<Mounted> mountedBombs = a.getBombs();
+        if (entity instanceof IBomber) {
+            IBomber bomber = (IBomber) entity;
+            List<Mounted> mountedBombs = bomber.getBombs();
             if (mountedBombs.size() > 0) {
                 //This should return an int[] filled with 0's
-                int[] bombChoices = a.getBombChoices();
+                int[] bombChoices = bomber.getBombChoices();
                 for (Mounted m : mountedBombs) {
                     if (!(m.getType() instanceof BombType)) {
                         continue;
@@ -7346,9 +7345,17 @@ public class Campaign implements Serializable, ITechManager {
                         bombChoices[BombType.getBombTypeFromInternalName(m.getType().getInternalName())] += 1;
                     }
                 }
-                a.setBombChoices(bombChoices);
-                a.clearBombs();
+                bomber.setBombChoices(bombChoices);
+                bomber.clearBombs();
             }
+        }
+        
+        if (entity instanceof Mech) {
+            Mech m = (Mech) entity;
+            m.setCoolingFlawActive(false);
+        } else if (entity instanceof Aero) {
+            Aero a = (Aero) entity;
+            
             if(a.isSpheroid()) {
                 entity.setMovementMode(EntityMovementMode.SPHEROID);
             } else {

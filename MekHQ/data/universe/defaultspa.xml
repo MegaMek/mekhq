@@ -288,8 +288,9 @@
             <skill>Tech/Mechanic</skill>
             <skill>Tech/Aero</skill>
             <skill>Tech/BA</skill>
-            <skill>Tech/Vessel</skill>                             
+            <skill>Tech/Vessel</skill>
         </skillPrereq>
+        <miscPrereq>clanner:false</miscPrereq>
     </ability>
 	
 	<!-- OTHER SPA -->
@@ -330,6 +331,41 @@
 		<displayName>Use Edge for acquisition failure.</displayName>
 		<desc>Failed acquisition check will be rerolled with edge.</desc>
 	</edgeTrigger>
+
+<!-- Example entries corresponding to the examples in customspa.xml
+     See docs/custom_spa.txt
+	
+	<ability>
+		<lookupName>tetris_master</lookupName>
+		<displayName>Tetris Master</displayName>
+		<xpCost>4</xpCost>
+		<weight>2</weight>
+        <skillPrereq>
+            <skill>Administration</skill>
+        </skillPrereq>
+        <desc>Increase the capacity of a cargo or transport bay.</desc>
+        <choiceValues>None::Cargo::Mech::Vehicle::Fighter::Infantry</choiceValues>
+	</ability>
+	
+	<edgeTrigger>
+	    <lookupName>edge_paper_cut</lookupName>
+	    <displayName>Use Edge to avoid paper cut.</displayName>
+	    <desc>A paper cut injury check will be rerolled with edge.</desc>
+	</edgeTrigger>
+	
+	<implant>
+	    <lookupName>md_prosthetic_blowtorch</lookupName>
+	    <displayName>Prosthetic Blowtorch</displayName>
+	    <desc>Reduce repair times by 10%</desc>
+        <skillPrereq>
+            <skill>Tech/Mech</skill>
+            <skill>Tech/Mechanic</skill>
+            <skill>Tech/Aero</skill>
+            <skill>Tech/BA</skill>
+            <skill>Tech/Vessel</skill>
+        </skillPrereq>
+	</implant>
+-->
 	
 </abilities>
 

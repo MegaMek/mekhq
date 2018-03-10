@@ -49,6 +49,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IAcquisitionWork;
@@ -334,6 +335,11 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	}
 
 	protected long adjustCostsForCampaignOptions(long cost) {
+	    // if the part doesn't cost anything, no amount of multiplication will change it
+	    if(cost == 0) { 
+	        return cost;
+	    }
+	    
 		if(getTechBase() == T_CLAN) {
 			cost *= campaign.getCampaignOptions().getClanPriceModifier();
 		}
@@ -896,8 +902,9 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	        }
 		}
 		if(isClanTechBase() || (this instanceof MekLocation && this.getUnit() != null && this.getUnit().getEntity().isClan())) {
-			if (null != tech && !tech.isClanner()) {
-				mods.addModifier(2, "clan tech");
+			if (null != tech && !tech.isClanner()
+			        && !tech.getOptions().booleanOption(PersonnelOptions.TECH_CLAN_TECH_KNOWLEDGE)) {
+				mods.addModifier(2, "Clan tech");
 			}
 		}
 		String qualityName = getQualityName(quality, campaign.getCampaignOptions().reverseQualityNames());
@@ -942,9 +949,10 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	    }
 	    if(isClanTechBase() || (this instanceof MekLocation && this.getUnit() != null && this.getUnit().getEntity().isClan())) {
 	        if (campaign.getPerson(getTeamId()) == null) {
-	            mods.addModifier(2, "clan tech");
-	        } else if (!campaign.getPerson(getTeamId()).isClanner()) {
-	            mods.addModifier(2, "clan tech");
+	            mods.addModifier(2, "Clan tech");
+	        } else if (!campaign.getPerson(getTeamId()).isClanner()
+                    && !campaign.getPerson(getTeamId()).getOptions().booleanOption(PersonnelOptions.TECH_CLAN_TECH_KNOWLEDGE)) {
+	            mods.addModifier(2, "Clan tech");
 	        }
 	    }
 

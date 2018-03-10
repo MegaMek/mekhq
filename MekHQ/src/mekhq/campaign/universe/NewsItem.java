@@ -37,6 +37,8 @@ import org.joda.time.chrono.GJChronology;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
+import megamek.common.Compute;
+
 import mekhq.Utilities;
 
 /**
@@ -122,13 +124,15 @@ public class NewsItem {
         return date.getYear();
     }
     
-    /** Finalize this news item's date according to its precision, using the supplied seed */
-    public void finalizeDate(long seed) {
+    /**
+     * Finalize this news item's date according to its precision.
+     */
+    public void finalizeDate() {
         if((null == date) || (null == datePrecision) || (datePrecision == Precision.DAY)) {
             return;
         }
-        Random rnd = new Random(seed + date.getMillis());
-        int maxRandomDays = 0;
+        
+        int maxRandomDays;
         switch(datePrecision) {
             case MONTH:
                 maxRandomDays = Days.daysBetween(date, date.plusMonths(1)).getDays();
@@ -142,7 +146,7 @@ public class NewsItem {
             default:
                 return;
         }
-        date = date.plusDays(rnd.nextInt(maxRandomDays));
+        date = date.plusDays(Compute.randomInt(maxRandomDays));
         datePrecision = Precision.DAY;
     }
     
