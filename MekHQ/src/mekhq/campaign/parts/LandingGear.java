@@ -96,6 +96,7 @@ public class LandingGear extends Part {
             }
             if(isSalvaging()) {
                 time *= 10;
+            }
             return time;
         }
 		if(isSalvaging()) {
