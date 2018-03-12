@@ -65,7 +65,7 @@ public class MissingThrusters extends MissingPart {
 	
 	@Override
 	public int getDifficulty() {
-		return 1;
+		return -2;
 	}
     
 	@Override
