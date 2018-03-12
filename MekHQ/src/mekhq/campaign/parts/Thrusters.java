@@ -121,6 +121,21 @@ public class Thrusters extends Part {
 	
 	@Override
 	public int getDifficulty() {
+	    if (campaign.getCampaignOptions().useAeroSystemHits()) {
+            //Test of proposed errata for repair time and difficulty
+            if(isSalvaging()) {
+                return -2;
+            }
+            if (hits == 1) {
+                return -1;
+            } 
+            if (hits == 2) {
+                return 0;
+            }
+            if (hits == 3) {
+                return 1;
+            }
+        }
 		if(isSalvaging()) {
 			return -2;
 		}
