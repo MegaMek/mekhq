@@ -89,35 +89,22 @@ public class FireControlSystem extends Part {
         if (campaign.getCampaignOptions().useAeroSystemHits()) {
             //Test of proposed errata for repair times
             Entity e = unit.getEntity();
-            if (isSalvaging()) {
-                if (e.hasETypeFlag(Entity.ETYPE_DROPSHIP) || e.hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
-                    time = 4320;
-                    if (e.hasNavalC3()) {
-                        time *= 2;
-                    }
-                } else {
-                    time = 1080; 
+            if (e.hasETypeFlag(Entity.ETYPE_DROPSHIP) || e.hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
+                time = 120;
+                if (e.hasNavalC3()) {
+                    time *= 2;
                 }
+            } else {
+                time = 60; 
+            }
+            if (isSalvaging()) {
+                time *= 10;
             }
             if (hits == 1) {
-                if (e.hasETypeFlag(Entity.ETYPE_DROPSHIP) || e.hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
-                    time = 240;
-                    if (e.hasNavalC3()) {
-                        time *= 2;
-                    }
-                } else {
-                    time = 120; 
-                }
+                time *= 1;
             } 
             if (hits == 2) {
-                if (e.hasETypeFlag(Entity.ETYPE_DROPSHIP) || e.hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
-                    time = 480;
-                    if (e.hasNavalC3()) {
-                        time *= 2;
-                    }
-                } else {
-                    time = 240; 
-                }
+                time *= 2;
             }
             return time;
         }
@@ -131,6 +118,18 @@ public class FireControlSystem extends Part {
 	
 	@Override
 	public int getDifficulty() {
+	    if (campaign.getCampaignOptions().useAeroSystemHits()) {
+            //Test of proposed errata for repair time and difficulty
+            if(isSalvaging()) {
+                return 0;
+            }
+            if (hits == 1) {
+                return 1;
+            } 
+            if (hits == 2) {
+                return 2;
+            }
+        }
 		if(isSalvaging()) {
 			return 0;
 		}
