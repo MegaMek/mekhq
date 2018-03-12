@@ -87,26 +87,23 @@ public class Avionics extends Part {
 		if (campaign.getCampaignOptions().useAeroSystemHits()) {
 		    //Test of proposed errata for repair times
 		    Entity e = unit.getEntity();
+		    if (e.hasETypeFlag(Entity.ETYPE_DROPSHIP) || e.hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
+                time = 240;
+            } else {
+                time = 120;
+            }
 		    if (isSalvaging()) {
 		        if (e.hasETypeFlag(Entity.ETYPE_DROPSHIP) || e.hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
-                    time = 4800;
-                } else {
-                    time = 600;
-                }
+	                time *= 10;
+	            } else {
+	                time *= 5;
+	            }
 		    }
 		    if (hits == 1) {
-		        if (e.hasETypeFlag(Entity.ETYPE_DROPSHIP) || e.hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
-		            time = 240;
-		        } else {
-		            time = 120;
-		        }
+		        time *= 1;
 		    } 
 		    if (hits == 2) {
-		        if (e.hasETypeFlag(Entity.ETYPE_DROPSHIP) || e.hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
-                    time = 480;
-                } else {
-                    time = 240;
-                }
+		        time *= 2;
 		    }
 		    return time;
 		}
@@ -120,6 +117,18 @@ public class Avionics extends Part {
 	
 	@Override
 	public int getDifficulty() {
+	    if (campaign.getCampaignOptions().useAeroSystemHits()) {
+            //Test of proposed errata for repair time and difficulty
+            if(isSalvaging()) {
+                return 1;
+            }
+            if (hits == 1) {
+                return 0;
+            } 
+            if (hits == 2) {
+                return 1;
+            }
+        }
 		if(isSalvaging()) {
 			return 1;
 		}
