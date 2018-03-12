@@ -62,12 +62,12 @@ public class MissingFireControlSystem extends MissingPart {
             //Test of proposed errata for repair times
             Entity e = unit.getEntity();
             if (e.hasETypeFlag(Entity.ETYPE_DROPSHIP) || e.hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
-                time = 4320;
+                time = 1200;
                 if (e.hasNavalC3()) {
                     time *= 2;
                 }
             } else {
-                time = 1080; 
+                time = 600; 
             }
         }
 		return time;
