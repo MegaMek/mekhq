@@ -63,8 +63,18 @@ public class MissingAeroLifeSupport extends MissingPart {
 	 @Override 
 	 public int getBaseTime() {
 	     int time = 0;
-	     //Published errata for replacement times of small aero vs large craft
 	     Entity e = unit.getEntity();
+	     if (campaign.getCampaignOptions().useAeroSystemHits()) {
+	         //Test of proposed errata for repair times
+	         if (e.hasETypeFlag(Entity.ETYPE_DROPSHIP) || e.hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
+	             time = 1200;
+	         } else {
+	             time = 180;
+	         }
+	         return time;
+	     }
+	     
+	     //Published errata for replacement times of small aero vs large craft
 	     if (e.hasETypeFlag(Entity.ETYPE_DROPSHIP) || e.hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
 	         time = 6720;
 	     } else {
@@ -73,10 +83,16 @@ public class MissingAeroLifeSupport extends MissingPart {
 	     return time;
      } 
 
-		@Override
-		public int getDifficulty() {
-			return 0;
-		}
+	@Override
+	public int getDifficulty() {
+	    Entity e = unit.getEntity();
+	    //Published errata for replacement times of small aero vs large craft
+        if (e.hasETypeFlag(Entity.ETYPE_DROPSHIP) || e.hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
+            return 0;
+        } else {
+            return -1;
+        }
+	}
     
 	@Override
 	public String checkFixable() {
