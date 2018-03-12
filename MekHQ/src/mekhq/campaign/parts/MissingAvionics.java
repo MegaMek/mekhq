@@ -58,7 +58,7 @@ public class MissingAvionics extends MissingPart {
             //Test of proposed errata for repair times
             Entity e = unit.getEntity();
             if (e.hasETypeFlag(Entity.ETYPE_DROPSHIP) || e.hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
-                time = 4800;
+                time = 2400;
             } else {
                 time = 600;
             }
