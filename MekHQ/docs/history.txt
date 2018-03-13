@@ -1,5 +1,7 @@
 VERSION HISTORY:
 ----------------
+v0.43.10-git
+
 v0.43.9-RC3
 + Issue #647: Exception Causing UI Issues while Unit is Being Refit
 + Issue #655: Mechs (and probably other units) whose crews ejected will be able to deploy on subsequent missions
