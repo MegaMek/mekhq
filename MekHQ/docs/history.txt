@@ -1,10 +1,15 @@
 VERSION HISTORY:
 ----------------
-v0.43.9-git
+v0.43.9-RC3
 + Issue #647: Exception Causing UI Issues while Unit is Being Refit
 + Issue #655: Mechs (and probably other units) whose crews ejected will be able to deploy on subsequent missions
 + Updated faction-change info for FWL using Handbook Marik
 + Updated faction-change info for FC using Handbook Steiner
++ Refactor OrgTree classes to be TOE classes (For clarity of purpose)
++ PR #667: Deployed Twice
+	Fixes #666 Cloning units into scenarios by the simple expedient of clearing deployment of everything within the selected forces to be deployed.
++ Updated MegaMek.jar to v0.43.9-RC3
++ Updated MegaMekLab.jar to v0.43.9-RC3
 
 v0.43.8-RC2 (2018-02-11 22:40 UTC)
 + Issue #626: News events with year but no specific date should now fire with better distribution
