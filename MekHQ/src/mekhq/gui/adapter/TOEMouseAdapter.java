@@ -162,6 +162,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements
             int sid = Integer.parseInt(target);
             Scenario scenario = gui.getCampaign().getScenario(sid);
             for (Force force : forces) {
+            		gui.undeployForce(force);
                 force.clearScenarioIds(gui.getCampaign(), true);
                 if (null != force && null != scenario) {
                     scenario.addForces(force.getId());
