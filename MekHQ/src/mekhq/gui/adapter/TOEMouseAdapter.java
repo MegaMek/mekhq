@@ -34,11 +34,11 @@ import mekhq.gui.dialog.TextAreaDialog;
 import mekhq.gui.utilities.MenuScroller;
 import mekhq.gui.utilities.StaticChecks;
 
-public class OrgTreeMouseAdapter extends MouseInputAdapter implements
+public class TOEMouseAdapter extends MouseInputAdapter implements
         ActionListener {
     private CampaignGUI gui;
 
-    public OrgTreeMouseAdapter(CampaignGUI gui) {
+    public TOEMouseAdapter(CampaignGUI gui) {
         super();
         this.gui = gui;
     }

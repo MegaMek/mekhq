@@ -18,7 +18,7 @@ import mekhq.campaign.force.Force;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
 
-public class OrgTreeTransferHandler extends TransferHandler {
+public class TOETransferHandler extends TransferHandler {
 
     /**
      *
@@ -26,7 +26,7 @@ public class OrgTreeTransferHandler extends TransferHandler {
     private static final long serialVersionUID = -1276891849078287710L;
     private CampaignGUI gui;
 
-    public OrgTreeTransferHandler(CampaignGUI gui) {
+    public TOETransferHandler(CampaignGUI gui) {
         super();
         this.gui = gui;
     }
