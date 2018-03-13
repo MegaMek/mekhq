@@ -48,8 +48,8 @@ import mekhq.campaign.event.UnitRemovedEvent;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
-import mekhq.gui.adapter.OrgTreeMouseAdapter;
-import mekhq.gui.handler.OrgTreeTransferHandler;
+import mekhq.gui.adapter.TOEMouseAdapter;
+import mekhq.gui.handler.TOETransferHandler;
 import mekhq.gui.model.CrewListModel;
 import mekhq.gui.model.OrgTreeModel;
 import mekhq.gui.view.ForceViewPanel;
@@ -87,14 +87,14 @@ public final class TOETab extends CampaignGuiTab {
 
         orgModel = new OrgTreeModel(getCampaign());
         orgTree = new JTree(orgModel);
-        orgTree.addMouseListener(new OrgTreeMouseAdapter(getCampaignGui()));
+        orgTree.addMouseListener(new TOEMouseAdapter(getCampaignGui()));
         orgTree.setCellRenderer(new ForceRenderer(getIconPackage()));
         orgTree.setRowHeight(60);
         orgTree.getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
         orgTree.addTreeSelectionListener(ev -> refreshForceView());
         orgTree.setDragEnabled(true);
         orgTree.setDropMode(DropMode.ON);
-        orgTree.setTransferHandler(new OrgTreeTransferHandler(getCampaignGui()));
+        orgTree.setTransferHandler(new TOETransferHandler(getCampaignGui()));
 
         scrollForceView = new JScrollPane();
         scrollForceView.setMinimumSize(new java.awt.Dimension(550, 600));
