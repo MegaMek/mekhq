@@ -1,5 +1,5 @@
 /*
- * DefaultMrbcRating.java
+ * CampaignOpsRating.java
  *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  *
@@ -165,13 +165,16 @@ public class CampaignOpsReputation extends AbstractUnitRating {
         if (null == crew) {
             return;
         }
+        
         int gunnery = crew.getGunnery();
         int antiMek = infantry.getAntiMekSkill();
-        if (antiMek == 0) {
+        if (antiMek == 0 || antiMek == 8) {
             antiMek = gunnery + 1;
         }
+        
         BigDecimal skillLevel = BigDecimal.valueOf(gunnery)
-                                          .add(BigDecimal.valueOf(antiMek));
+                                    .add(BigDecimal.valueOf(antiMek));
+
         incrementSkillRatingCounts(getExperienceLevelName(skillLevel));
         setTotalSkillLevels(getTotalSkillLevels(false).add(skillLevel));
     }
@@ -229,8 +232,8 @@ public class CampaignOpsReputation extends AbstractUnitRating {
         totalCombatUnits += getFighterCount();
         totalCombatUnits += getProtoCount();
         totalCombatUnits += getVeeCount();
-        totalCombatUnits += (getBattleArmorCount() / 5);
-        totalCombatUnits += (getInfantryCount() / 28);
+        totalCombatUnits += getNumberBaSquads();
+        totalCombatUnits += getInfantryUnitCount();
         totalCombatUnits += getDropshipCount();
         totalCombatUnits += getSmallCraftCount();
         return totalCombatUnits;
@@ -569,14 +572,14 @@ public class CampaignOpsReputation extends AbstractUnitRating {
             fullCapacity = false;
             doubleExcessCapacity = false;
         }
-        if (getInfantryBayCount() < getInfantryCount() / 28) {
+        if (getInfantryBayCount() == calcInfantryPlatoons()) {
             excessCapacity = false;
             doubleExcessCapacity = false;
-        } else if (getInfantryBayCount() < getInfantryCount() / 28) {
+        } else if (getInfantryBayCount() < calcInfantryPlatoons()) {
             fullCapacity = false;
             excessCapacity = false;
             doubleExcessCapacity = false;
-        } else if (getInfantryBayCount() < getInfantryCount() / 14) {
+        } else if (getInfantryBayCount() < calcInfantryPlatoons() / 2) {
             fullCapacity = false;
             doubleExcessCapacity = false;
         }
@@ -868,7 +871,7 @@ public class CampaignOpsReputation extends AbstractUnitRating {
                                           getBattleArmorCount() / 5,
                                           getBaBayCount()) +
                      "\n" + String.format(TEMPLATE, "Infantry Bays:",
-                                          getInfantryCount() / 28,
+                                          calcInfantryPlatoons(),
                                           getInfantryBayCount()) +
                      "\n" + String.format(TEMPLATE, "Docking Collars:",
                                           getDropshipCount(),
