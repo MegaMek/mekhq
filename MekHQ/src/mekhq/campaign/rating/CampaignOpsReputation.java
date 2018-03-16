@@ -497,110 +497,32 @@ public class CampaignOpsReputation extends AbstractUnitRating {
 
         int totalValue = 0;
 
-        // todo Superheavys.
-        // Find out how short of transport bays we are.
-        boolean doubleExcessCapacity = true;
-        boolean fullCapacity = true;
-        boolean excessCapacity = true;
-        int heavyVeeBays = getHeavyVeeBayCount();
-
-        if (getMechBayCount() == getMechCount()) {
-            excessCapacity = false;
-            doubleExcessCapacity = false;
-        } else if (getMechBayCount() < getMechCount()) {
-            fullCapacity = false;
-            excessCapacity = false;
-            doubleExcessCapacity = false;
-        } else if (getMechBayCount() < getMechCount() * 2) {
-            fullCapacity = false;
-            doubleExcessCapacity = false;
+        TransportCapacityIndicators tci = new TransportCapacityIndicators();
+        tci.updateCapacityIndicators(getMechBayCount(), getMechCount());
+        tci.updateCapacityIndicators(getProtoBayCount(), getProtoCount());
+        tci.updateCapacityIndicators(getHeavyVeeBayCount(), getHeavyVeeCount());
+        
+        // vehicles are the only units that can share heavy/light bays so we have some special logic
+        // we've stuffed all possible heavy vehicles into heavy vehicle bays.
+        // if we have some heavy vehicle bays left over, add them to the light vehicle bay count
+        int heavyVeeBays = getHeavyVeeBayCount() - getHeavyVeeCount();
+        int lightVeeBays = getLightVeeBayCount();
+        if(heavyVeeBays > 0) {
+            lightVeeBays += heavyVeeBays;
         }
-        if (getProtoBayCount() == getProtoCount()) {
-            excessCapacity = false;
-            doubleExcessCapacity = false;
-        } else if (getProtoBayCount() < getProtoCount()) {
-            fullCapacity = false;
-            excessCapacity = false;
-            doubleExcessCapacity = false;
-        } else if (getProtoBayCount() < getProtoCount() * 2) {
-            fullCapacity = false;
-            doubleExcessCapacity = false;
-        }
-        if (getHeavyVeeBayCount() == getHeavyVeeCount()) {
-            excessCapacity = false;
-            doubleExcessCapacity = false;
-        } else if (getHeavyVeeBayCount() < getHeavyVeeCount()) {
-            fullCapacity = false;
-            excessCapacity = false;
-            doubleExcessCapacity = false;
-        } else if (getHeavyVeeBayCount() < getHeavyVeeCount() * 2) {
-            fullCapacity = false;
-            doubleExcessCapacity = false;
-        }
-        heavyVeeBays -= getHeavyVeeBayCount();
-        int lightVeeBays = getLightVeeBayCount() + heavyVeeBays;
-        if (lightVeeBays == getLightVeeCount()) {
-            excessCapacity = false;
-            doubleExcessCapacity = false;
-        } else if (lightVeeBays < getLightVeeCount()) {
-            fullCapacity = false;
-            excessCapacity = false;
-            doubleExcessCapacity = false;
-        } else if (lightVeeBays < getLightVeeCount() * 2) {
-            fullCapacity = false;
-            doubleExcessCapacity = false;
-        }
-        if (getFighterBayCount() == getFighterCount()) {
-            excessCapacity = false;
-            doubleExcessCapacity = false;
-        } else if (getFighterBayCount() < getFighterCount()) {
-            fullCapacity = false;
-            excessCapacity = false;
-            doubleExcessCapacity = false;
-        } else if (getFighterBayCount() < getFighterCount() * 2) {
-            fullCapacity = false;
-            doubleExcessCapacity = false;
-        }
-        if ((getBaBayCount()) == getBattleArmorCount() / 5) {
-            excessCapacity = false;
-            doubleExcessCapacity = false;
-        } else if ((getBaBayCount()) < getBattleArmorCount() / 5) {
-            fullCapacity = false;
-            excessCapacity = false;
-            doubleExcessCapacity = false;
-        } else if ((getBaBayCount() * 2) < 2 * getBattleArmorCount() / 5) {
-            fullCapacity = false;
-            doubleExcessCapacity = false;
-        }
-        if (getInfantryBayCount() == calcInfantryPlatoons()) {
-            excessCapacity = false;
-            doubleExcessCapacity = false;
-        } else if (getInfantryBayCount() < calcInfantryPlatoons()) {
-            fullCapacity = false;
-            excessCapacity = false;
-            doubleExcessCapacity = false;
-        } else if (getInfantryBayCount() < calcInfantryPlatoons() / 2) {
-            fullCapacity = false;
-            doubleExcessCapacity = false;
-        }
-        if (getSmallCraftBayCount() == getSmallCraftCount()) {
-            excessCapacity = false;
-            doubleExcessCapacity = false;
-        } else if (getSmallCraftBayCount() < getSmallCraftCount()) {
-            fullCapacity = false;
-            excessCapacity = false;
-            doubleExcessCapacity = false;
-        } else if (getSmallCraftBayCount() < (getSmallCraftCount() * 2)) {
-            fullCapacity = false;
-            doubleExcessCapacity = false;
-        }
+        
+        tci.updateCapacityIndicators(lightVeeBays, getLightVeeCount());
+        tci.updateCapacityIndicators(getFighterBayCount(), getFighterCount());
+        tci.updateCapacityIndicators(getBaBayCount(), getBattleArmorCount() / 5); // battle armor bays can hold 5 battle armor per bay
+        tci.updateCapacityIndicators(getInfantryBayCount(), calcInfantryPlatoons());
+        tci.updateCapacityIndicators(getSmallCraftBayCount(), getSmallCraftCount());
 
         //Find the percentage of units that are transported.
-        if (doubleExcessCapacity) {
+        if (tci.hasDoubleCapacity()) {
             totalValue += 10;
-        } else if (excessCapacity) {
+        } else if (tci.hasExcessCapacity()) {
             totalValue += 5;
-        } else if (fullCapacity) {
+        } else if (tci.hasSufficientCapacity()) {
             totalValue += 0;
         } else {
             totalValue -= 5;
@@ -636,7 +558,7 @@ public class CampaignOpsReputation extends AbstractUnitRating {
 
         return totalValue;
     }
-
+    
     int calcTechSupportValue() {
         int totalValue = 0;
         setTotalTechTeams(0);
@@ -1067,5 +989,48 @@ public class CampaignOpsReputation extends AbstractUnitRating {
 
     private void clearCraftWithoutCrew() {
         craftWithoutCrew.clear();
+    }
+    
+    /**
+     * Data structure that holds transport capacity indicators
+     * @author NickAragua
+     *
+     */
+    private class TransportCapacityIndicators {
+        private boolean sufficientCapacity = true;
+        private boolean excessCapacity = true;
+        private boolean doubleCapacity = true;
+        
+        public boolean hasSufficientCapacity() {
+            return sufficientCapacity;
+        }
+
+        public boolean hasExcessCapacity() {
+            return excessCapacity;
+        }
+        
+        public boolean hasDoubleCapacity() {
+            return doubleCapacity;
+        }
+        
+        /**
+         * Updates the transport capacity indicators
+         * @param bayCount The number of available bays
+         * @param unitCount The number of units using the given type of bay
+         */
+        public void updateCapacityIndicators(int bayCount, int unitCount) {
+            // per CamOps, if we don't have any of a given type of unit but have bays for it
+            // the force doesn't count as having excess capacity for that unit type
+            if(unitCount == 0) {
+                return;
+            }
+            
+            // if any unit type is under capacity, the whole thing falls through and we count as being under capacity
+            // because god forbid units share unused bay space
+                        
+            sufficientCapacity &= (bayCount >= unitCount); // we have enough capacity if there are as many or more bays than units
+            excessCapacity &= (bayCount > unitCount);   // we have excess capacity if there are more bays than units
+            doubleCapacity &= (bayCount > (unitCount * 2)); // we have double capacity if there are more than twice as many bays as units
+        }
     }
 }

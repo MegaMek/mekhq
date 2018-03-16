@@ -84,7 +84,6 @@ public abstract class AbstractUnitRating implements IUnitRating {
     private int battleArmorCount = 0;
     private int numberBaSquads = 0;
     private int infantryCount = 0;
-    private int mechanizedInfantryCount = 0;
     private int infantryUnitCount = 0;
     private int smallCraftCount = 0;
     private int dropshipCount = 0;
@@ -436,7 +435,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
         setBattleArmorCount(0);
         setNumberBaSquads(0);
         setInfantryCount(0);
-        setMechInfantryCount(0);
+        setInfantryUnitCount(0);
         setDropshipCount(0);
         setJumpshipCount(0);
         setWarshipCount(0);
@@ -574,6 +573,10 @@ public abstract class AbstractUnitRating implements IUnitRating {
         mechCount++;
     }
     
+    private void setInfantryUnitCount(int count) {
+        infantryUnitCount = count;
+    }
+    
     private void incrementInfantryUnitCount() {
         infantryUnitCount++;
     }
@@ -680,28 +683,12 @@ public abstract class AbstractUnitRating implements IUnitRating {
 
     /**
      * Calculate the number of infantry "platoons" present in the company, based on the numbers
-     * of various infantry. This is used for the purposes of stuffing people into infantry bays,
-     * where infantry of most kinds can be fit at 28 per bay, except mechanized infnatry, which 
-     * can only be fit at 7 per bay.
+     * of various infantry present. Per CamOps, the simplification is that an infantry cube can
+     * house 28 infantry.
      * @return Number of infantry "platoons" in the company.
      */
     int calcInfantryPlatoons() {
-        int infantryPlatoonCount = (int) Math.ceil((double) getInfantryCount() / 28);
-        int mechInfantryPlatoonCount = (int) Math.ceil((double) getMechInfantryCount() / 7);
-        
-        return infantryPlatoonCount + mechInfantryPlatoonCount;
-    }
-
-    int getMechInfantryCount() {
-        return mechanizedInfantryCount;
-    }
-    
-    void setMechInfantryCount(int count) {
-        mechanizedInfantryCount = count;
-    }
-    
-    private void incrementMechInfantryCount(int amount) {
-        mechanizedInfantryCount += amount;
+        return (int) Math.ceil((double) getInfantryCount() / 28);
     }
     
     int getDropshipCount() {
@@ -943,16 +930,8 @@ public abstract class AbstractUnitRating implements IUnitRating {
             case UnitType.INFANTRY:
                 Infantry i = (Infantry) e;
                 
-                // mechanized infantry takes up more space in infantry bays than
-                // standard infantry, so we have to count them up separately.
-                if(i.isMechanized()) {
-                    incrementMechInfantryCount(i.getSquadSize() * i.getSquadN());
-                } else {
-                    incrementInfantryCount(i.getSquadSize() * i.getSquadN());
-                }
-                
+                incrementInfantryCount(i.getSquadSize() * i.getSquadN());
                 incrementInfantryUnitCount();
-                
                 break;
         }
     }
