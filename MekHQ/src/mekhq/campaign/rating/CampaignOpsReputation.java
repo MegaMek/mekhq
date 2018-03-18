@@ -998,7 +998,7 @@ public class CampaignOpsReputation extends AbstractUnitRating {
      */
     private class TransportCapacityIndicators {
         private boolean sufficientCapacity = true;
-        private boolean excessCapacity = true;
+        private boolean excessCapacity = false;
         private boolean doubleCapacity = true;
         
         public boolean hasSufficientCapacity() {
@@ -1025,12 +1025,21 @@ public class CampaignOpsReputation extends AbstractUnitRating {
                 return;
             }
             
-            // if any unit type is under capacity, the whole thing falls through and we count as being under capacity
-            // because god forbid units share unused bay space
-                        
-            sufficientCapacity &= (bayCount >= unitCount); // we have enough capacity if there are as many or more bays than units
-            excessCapacity &= (bayCount > unitCount);   // we have excess capacity if there are more bays than units
-            doubleCapacity &= (bayCount > (unitCount * 2)); // we have double capacity if there are more than twice as many bays as units
+            // examples: 
+            //  1 infantry platoon, 1 bay = sufficient capacity
+            //  1 infantry platoon, 1 tank, 1 infantry bay, 1 tank bay = excess capacity
+            //  1 infantry platoon, 1 tank, 2 infantry bay, 1 tank bay = double capacity
+            //  1 infantry platoon, no infantry bays, 1 tank, 1 tank bay = insufficient capacity
+            
+            // we have enough capacity if there are as many or more bays than units
+            sufficientCapacity &= (bayCount >= unitCount); 
+            
+            // we have excess capacity if there are more bays than units for at least one unit type AND 
+            // we have sufficient capacity for everything else
+            excessCapacity |= (bayCount > unitCount) && sufficientCapacity;
+            
+            // we have double capacity if there are more than twice as many bays as units for every unit type
+            doubleCapacity &= (bayCount > (unitCount * 2)); 
         }
     }
 }
