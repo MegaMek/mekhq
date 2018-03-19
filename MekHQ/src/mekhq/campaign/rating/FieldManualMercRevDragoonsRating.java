@@ -1,5 +1,5 @@
 /*
- * FieldManualMercRevMrbcRating.java
+ * FieldManualMercRevDragoonsRating.java
  *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  *
