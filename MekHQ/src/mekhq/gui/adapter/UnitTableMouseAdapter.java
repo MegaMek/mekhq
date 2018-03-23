@@ -21,6 +21,7 @@ import javax.swing.JTable;
 import javax.swing.event.MouseInputAdapter;
 
 import megamek.client.ui.swing.UnitEditorDialog;
+import megamek.client.ui.swing.util.MenuScroller;
 import megamek.common.AmmoType;
 import megamek.common.BattleArmor;
 import megamek.common.CriticalSlot;
@@ -55,7 +56,6 @@ import mekhq.gui.dialog.LargeCraftAmmoSwapDialog;
 import mekhq.gui.dialog.QuirksDialog;
 import mekhq.gui.dialog.TextAreaDialog;
 import mekhq.gui.model.UnitTableModel;
-import mekhq.gui.utilities.MenuScroller;
 import mekhq.gui.utilities.StaticChecks;
 
 public class UnitTableMouseAdapter extends MouseInputAdapter implements

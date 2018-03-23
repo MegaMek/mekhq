@@ -1047,7 +1047,33 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public ArrayList<Unit> getUnits() {
-        return units;
+        return getUnits(false, false);
+    }
+
+    public ArrayList<Unit> getUnits(boolean weightSorted, boolean alphaSorted) {
+        ArrayList<Unit> sortedUnits = null;
+        if (alphaSorted || weightSorted) {
+            sortedUnits = getCopyOfUnits();
+            if (alphaSorted) {
+                Collections.sort(sortedUnits, new Comparator<Unit>() {
+                    @Override
+                    public int compare(Unit lhs, Unit rhs) {
+                        // -1 - less than, 1 - greater than, 0 - equal, all inversed for descending
+                        return lhs.getName().compareTo(rhs.getName());
+                    }
+                });
+            }
+            if (weightSorted) {
+                Collections.sort(sortedUnits, new Comparator<Unit>() {
+                    @Override
+                    public int compare(Unit lhs, Unit rhs) {
+                        // -1 - less than, 1 - greater than, 0 - equal, all inversed for descending
+                        return lhs.getEntity().getWeight() > rhs.getEntity().getWeight() ? -1 : (lhs.getEntity().getWeight() < rhs.getEntity().getWeight()) ? 1 : 0;
+                    }
+                });
+            }
+        }
+        return sortedUnits == null ? units : sortedUnits;
     }
 
     // Since getUnits doesn't return a defensive copy and I don't know what I might break if I made it do so...
@@ -1565,41 +1591,60 @@ public class Campaign implements Serializable, ITechManager {
      * @param noZeroMinute If TRUE, then techs with no time remaining will be excluded from the list.
      * @param firstTechId  The ID of the tech that should appear first in the list (assuming active and satisfies the
      *                     noZeroMinute argument)
+     * @param sorted	       If TRUE, then return the list sorted from worst to best
+     * @param eliteFirst   If TRUE and sorted also TRUE, then return the list sorted from best to worst
      * @return The list of active {@link Person}s who qualify as technicians ({@link Person#isTech()}).
      */
-    public ArrayList<Person> getTechs(boolean noZeroMinute, UUID firstTechId) {
-        ArrayList<Person> techs = new ArrayList<>();
+	public ArrayList<Person> getTechs(boolean noZeroMinute, UUID firstTechId, boolean sorted, boolean eliteFirst) {
+	    ArrayList<Person> techs = new ArrayList<>();
 
-        // Get the first tech.
-        Person firstTech = getPerson(firstTechId);
-        if ((firstTech != null) && firstTech.isTech() && firstTech.isActive() &&
-            (!noZeroMinute || firstTech.getMinutesLeft() > 0)) {
-            techs.add(firstTech);
-        }
+	    // Get the first tech.
+	    Person firstTech = getPerson(firstTechId);
+	    if ((firstTech != null) && firstTech.isTech() && firstTech.isActive() &&
+	            (!noZeroMinute || firstTech.getMinutesLeft() > 0)) {
+	        techs.add(firstTech);
+	    }
 
-        for (Person p : getPersonnel()) {
-            if (p.isTech() && p.isActive() && (!p.equals(firstTech)) && (!noZeroMinute || (p.getMinutesLeft() > 0))) {
-                techs.add(p);
-            }
-        }
-        //also need to loop through and collect engineers on self-crewed vessels
-        for(Unit u : getUnits()) {
-        	if(u.isSelfCrewed() && !(u.getEntity() instanceof Infantry) && null != u.getEngineer()) {
-        		techs.add(u.getEngineer());
-        	}
-        }
-        return techs;
-    }
+	    for (Person p : getPersonnel()) {
+	        if (p.isTech() && p.isActive() && (!p.equals(firstTech)) && (!noZeroMinute || (p.getMinutesLeft() > 0))) {
+	            techs.add(p);
+	        }
+	    }
+	    //also need to loop through and collect engineers on self-crewed vessels
+	    for(Unit u : getUnits()) {
+	        if(u.isSelfCrewed() && !(u.getEntity() instanceof Infantry) && null != u.getEngineer()) {
+	            techs.add(u.getEngineer());
+	        }
+	    }
+
+	    // Return the tech collection sorted worst to best
+	    // Reverse the sort if we've been asked for best to worst
+	    if (sorted) {
+	        Collections.sort(techs, new Comparator<Person>() {
+                @Override
+                public int compare(Person person1, Person person2) {
+                    int retVal = person1.getExperienceLevel(!person1.isTechPrimary() && person1.isTechSecondary())
+                            > person2.getExperienceLevel(!person2.isTechPrimary() && person2.isTechSecondary()) ? -1
+                                    : (person1.getExperienceLevel(!person1.isTechPrimary() && person1.isTechSecondary())
+                                       < person2.getExperienceLevel(!person2.isTechPrimary() && person2.isTechSecondary())) ? 1 : 0;
+                    return eliteFirst ? retVal *= -1 : retVal;
+                }
+	            
+	        });
+	    }
+
+	    return techs;
+	}
 
     public ArrayList<Person> getTechs(boolean noZeroMinute) {
-        return getTechs(noZeroMinute, null);
+        return getTechs(noZeroMinute, null, true, false);
     }
 
     /**
      * @return The list of all active {@link Person}s who qualify as technicians ({@link Person#isTech()}));
      */
     public ArrayList<Person> getTechs() {
-        return getTechs(false, null);
+        return getTechs(false, null, true, false);
     }
 
     public List<Person> getAdmins() {

@@ -3,6 +3,7 @@ package mekhq.gui.adapter;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
+import java.util.HashMap;
 import java.util.StringTokenizer;
 import java.util.UUID;
 import java.util.Vector;
@@ -15,7 +16,10 @@ import javax.swing.JTree;
 import javax.swing.event.MouseInputAdapter;
 import javax.swing.tree.TreePath;
 
+import megamek.client.ui.swing.util.MenuScroller;
+import megamek.common.EntityWeightClass;
 import megamek.common.GunEmplacement;
+import megamek.common.UnitType;
 import mekhq.MekHQ;
 import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.event.NetworkChangedEvent;
@@ -31,11 +35,10 @@ import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.dialog.ImageChoiceDialog;
 import mekhq.gui.dialog.TextAreaDialog;
-import mekhq.gui.utilities.MenuScroller;
 import mekhq.gui.utilities.StaticChecks;
 
 public class TOEMouseAdapter extends MouseInputAdapter implements
-        ActionListener {
+ActionListener {
     private CampaignGUI gui;
 
     public TOEMouseAdapter(CampaignGUI gui) {
@@ -109,42 +112,42 @@ public class TOEMouseAdapter extends MouseInputAdapter implements
             }
         }
         if (command.contains("ADD_LANCE_TECH")) {
-           	if (null != singleForce) {
-            	Person tech = gui.getCampaign().getPerson(UUID.fromString(target));
-            	if (null != tech) {
-            		if (singleForce.getTechID() != null) {
-            			Person oldTech = gui.getCampaign().getPerson(singleForce.getTechID());
-            			oldTech.clearTechUnitIDs();
-            			oldTech.addLogEntry(gui.getCampaign().getDate(), "Removed from " + singleForce.getName());
-            		}
-                	singleForce.setTechID(tech.getId());
-                	tech.addLogEntry(gui.getCampaign().getDate(), "Assigned to " + singleForce.getFullName());
-                	if (singleForce.getAllUnits() !=null) {
-                	    String cantTech = "";
-                		for (UUID uuid : singleForce.getAllUnits()) {
-                			Unit u = gui.getCampaign().getUnit(uuid);
-                			if (u != null) {
-                			    if (null != u.getTech()) {
-                			        Person oldTech = u.getTech();
-                			        oldTech.removeTechUnitId(u.getId());
-                			        u.removeTech();
-                			    }
-                			    if (tech.canTech(u.getEntity())) {
-                			        u.setTech(tech.getId());
+            if (null != singleForce) {
+                Person tech = gui.getCampaign().getPerson(UUID.fromString(target));
+                if (null != tech) {
+                    if (singleForce.getTechID() != null) {
+                        Person oldTech = gui.getCampaign().getPerson(singleForce.getTechID());
+                        oldTech.clearTechUnitIDs();
+                        oldTech.addLogEntry(gui.getCampaign().getDate(), "Removed from " + singleForce.getName());
+                    }
+                    singleForce.setTechID(tech.getId());
+                    tech.addLogEntry(gui.getCampaign().getDate(), "Assigned to " + singleForce.getFullName());
+                    if (singleForce.getAllUnits() !=null) {
+                        String cantTech = "";
+                        for (UUID uuid : singleForce.getAllUnits()) {
+                            Unit u = gui.getCampaign().getUnit(uuid);
+                            if (u != null) {
+                                if (null != u.getTech()) {
+                                    Person oldTech = u.getTech();
+                                    oldTech.removeTechUnitId(u.getId());
+                                    u.removeTech();
+                                }
+                                if (tech.canTech(u.getEntity())) {
+                                    u.setTech(tech.getId());
                                     tech.addTechUnitID(u.getId());
                                     MekHQ.triggerEvent(new PersonTechAssignmentEvent(tech, u));
-                			    } else {
-                			        cantTech += tech.getName() + " cannot maintain " + u.getName() + "\n";
-                			    }
-                			}
-                		}
-                		if (cantTech != "") {
-                		    cantTech += "You will need to assign a tech manually.";
-                		    JOptionPane.showMessageDialog(null, cantTech, "Warning", JOptionPane.WARNING_MESSAGE);
-                		}
-                	}
+                                } else {
+                                    cantTech += tech.getName() + " cannot maintain " + u.getName() + "\n";
+                                }
+                            }
+                        }
+                        if (cantTech != "") {
+                            cantTech += "You will need to assign a tech manually.";
+                            JOptionPane.showMessageDialog(null, cantTech, "Warning", JOptionPane.WARNING_MESSAGE);
+                        }
+                    }
                 }
-          	}
+            }
         }
         if (command.contains("ADD_UNIT")) {
             if (null != singleForce) {
@@ -162,7 +165,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements
             int sid = Integer.parseInt(target);
             Scenario scenario = gui.getCampaign().getScenario(sid);
             for (Force force : forces) {
-            		gui.undeployForce(force);
+                gui.undeployForce(force);
                 force.clearScenarioIds(gui.getCampaign(), true);
                 if (null != force && null != scenario) {
                     scenario.addForces(force.getId());
@@ -181,7 +184,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements
                 ImageChoiceDialog pcd = new ImageChoiceDialog(
                         gui.getFrame(), true, singleForce.getIconCategory(),
                         singleForce.getIconFileName(), gui.getIconPackage()
-                                .getForceIcons(), true);
+                        .getForceIcons(), true);
                 pcd.setVisible(true);
                 if (pcd.isChanged()) {
                     singleForce.setIconCategory(pcd.getCategory());
@@ -219,32 +222,32 @@ public class TOEMouseAdapter extends MouseInputAdapter implements
                             null,
                             "Are you sure you want to delete "
                                     + force.getFullName() + "?",
-                            "Delete Force?", JOptionPane.YES_NO_OPTION)) {
+                                    "Delete Force?", JOptionPane.YES_NO_OPTION)) {
                         return;
                     }
                     gui.getCampaign().removeForce(force);
                 }
             }
         } else if (command.contains("REMOVE_LANCE_TECH")) {
-           	if (singleForce.getTechID() != null) {
-    			Person oldTech = gui.getCampaign().getPerson(singleForce.getTechID());
-    			oldTech.clearTechUnitIDs();
-    			oldTech.addLogEntry(gui.getCampaign().getDate(), "Removed from " + singleForce.getName());
-    			if (singleForce.getAllUnits() !=null) {
-           			for (UUID uuid : singleForce.getAllUnits()) {
-           				Unit u = gui.getCampaign().getUnit(uuid);
+            if (singleForce.getTechID() != null) {
+                Person oldTech = gui.getCampaign().getPerson(singleForce.getTechID());
+                oldTech.clearTechUnitIDs();
+                oldTech.addLogEntry(gui.getCampaign().getDate(), "Removed from " + singleForce.getName());
+                if (singleForce.getAllUnits() !=null) {
+                    for (UUID uuid : singleForce.getAllUnits()) {
+                        Unit u = gui.getCampaign().getUnit(uuid);
                         if (null != u.getTech()) {
                             oldTech = u.getTech();
                             oldTech.removeTechUnitId(u.getId());
                             MekHQ.triggerEvent(new PersonTechAssignmentEvent(oldTech, u));
                         }
-           				if (u != null) {
-           					u.setTech((UUID)null);
-           				}
-           			}
-           		}
-    			singleForce.setTechID(null);
-    		}
+                        if (u != null) {
+                            u.setTech((UUID)null);
+                        }
+                    }
+                }
+                singleForce.setTechID(null);
+            }
         } else if (command.contains("REMOVE_UNIT")) {
             for (Unit unit : units) {
                 if (null != unit) {
@@ -252,8 +255,8 @@ public class TOEMouseAdapter extends MouseInputAdapter implements
                     if (null != parentForce) {
                         gui.getCampaign().removeUnitFromForce(unit);
                         if (null != parentForce.getTechID()) {
-                           	unit.removeTech();
-                           	Person forceTech = gui.getCampaign().getPerson(parentForce.getTechID());
+                            unit.removeTech();
+                            Person forceTech = gui.getCampaign().getPerson(parentForce.getTechID());
                             forceTech.removeTechUnitId(unit.getId());
                             MekHQ.triggerEvent(new PersonTechAssignmentEvent(forceTech, unit));
                         }
@@ -372,8 +375,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements
             // distinguish forces and units, but the user can
             // select multiple items of both types
             // we will allow multiple selection of either units or forces
-            // but
-            // not both - if both are selected then default to
+            // but not both - if both are selected then default to
             // unit and deselect all forces
             Vector<Force> forces = new Vector<Force>();
             Vector<Unit> unitsInForces = new Vector<Unit>();
@@ -390,12 +392,12 @@ public class TOEMouseAdapter extends MouseInputAdapter implements
                 }
             }
             for(Force force: forces) {
-            	for(UUID id : force.getAllUnits()) {
-            		Unit u = gui.getCampaign().getUnit(id);
-            		if(null != u) {
-            			unitsInForces.add(u);
-            		}
-            	}
+                for(UUID id : force.getAllUnits()) {
+                    Unit u = gui.getCampaign().getUnit(id);
+                    if(null != u) {
+                        unitsInForces.add(u);
+                    }
+                }
             }
             boolean forcesSelected = !forces.isEmpty();
             boolean unitsSelected = !units.isEmpty();
@@ -441,37 +443,353 @@ public class TOEMouseAdapter extends MouseInputAdapter implements
                     if (force.getTechID() == null) {
                         menu = new JMenu("Add Tech to Force");
                         menu.setEnabled(false);
+                        // Mech Techs
+                        JMenu mech_techs = new JMenu("Mech Techs");
+                        JMenu m_ug_menu = new JMenu(SkillType.ULTRA_GREEN_NM);
+                        JMenu m_g_menu = new JMenu(SkillType.GREEN_NM);
+                        JMenu m_r_menu = new JMenu(SkillType.REGULAR_NM);
+                        JMenu m_v_menu = new JMenu(SkillType.VETERAN_NM);
+                        JMenu m_e_menu = new JMenu(SkillType.ELITE_NM);
+
+                        // Aero Techs
+                        JMenu aero_techs = new JMenu("Aero Techs");
+                        JMenu a_ug_menu = new JMenu(SkillType.ULTRA_GREEN_NM);
+                        JMenu a_g_menu = new JMenu(SkillType.GREEN_NM);
+                        JMenu a_r_menu = new JMenu(SkillType.REGULAR_NM);
+                        JMenu a_v_menu = new JMenu(SkillType.VETERAN_NM);
+                        JMenu a_e_menu = new JMenu(SkillType.ELITE_NM);
+
+                        // Mechanics
+                        JMenu mechanics = new JMenu("Mechanics");
+                        JMenu v_ug_menu = new JMenu(SkillType.ULTRA_GREEN_NM);
+                        JMenu v_g_menu = new JMenu(SkillType.GREEN_NM);
+                        JMenu v_r_menu = new JMenu(SkillType.REGULAR_NM);
+                        JMenu v_v_menu = new JMenu(SkillType.VETERAN_NM);
+                        JMenu v_e_menu = new JMenu(SkillType.ELITE_NM);
+
+                        // BA Techs
+                        JMenu ba_techs = new JMenu("BA Techs");
+                        JMenu ba_ug_menu = new JMenu(SkillType.ULTRA_GREEN_NM);
+                        JMenu ba_g_menu = new JMenu(SkillType.GREEN_NM);
+                        JMenu ba_r_menu = new JMenu(SkillType.REGULAR_NM);
+                        JMenu ba_v_menu = new JMenu(SkillType.VETERAN_NM);
+                        JMenu ba_e_menu = new JMenu(SkillType.ELITE_NM);
+
                         for (Person tech : gui.getCampaign().getTechs()) {
-                        	if (tech.getMaintenanceTimeUsing() == 0 && !tech.isEngineer()) {
-                        		String skillLvl = "Unknown";
-                        		skillLvl = SkillType.getExperienceLevelName(tech.getExperienceLevel(false));
-                        		menuItem = new JMenuItem(tech.getFullTitle() + " (" + skillLvl + ", " + tech.getRoleDesc() + ")");
-                        		menuItem.setActionCommand("ADD_LANCE_TECH|FORCE|" + tech.getId() + "|" + forceIds);
-                        		menuItem.addActionListener(this);
-                        		menuItem.setEnabled(true);
-                        		menu.add(menuItem);
-                        		menu.setEnabled(true);
-                        	}
+                            if (tech.getMaintenanceTimeUsing() == 0 && !tech.isEngineer()) {
+                                String skillLvl = "Unknown";
+                                skillLvl = SkillType.getExperienceLevelName(tech.getExperienceLevel(tech.isTechPrimary() ? false : true));
+                                int role = tech.isTechPrimary() ? tech.getPrimaryRole() : tech.getSecondaryRole();
+
+                                // We're a MechTech!
+                                if (role == Person.T_MECH_TECH) {
+                                    if (skillLvl.equals(SkillType.ULTRA_GREEN_NM)) {
+                                        menuItem = new JMenuItem(tech.getFullTitle() + " (" + tech.getRoleDesc() + ")");
+                                        menuItem.setActionCommand("ADD_LANCE_TECH|FORCE|" + tech.getId() + "|" + forceIds);
+                                        menuItem.addActionListener(this);
+                                        menuItem.setEnabled(true);
+                                        m_ug_menu.add(menuItem);
+                                        m_ug_menu.setEnabled(true);
+                                    }
+                                    if (skillLvl.equals(SkillType.GREEN_NM)) {
+                                        menuItem = new JMenuItem(tech.getFullTitle() + " (" + tech.getRoleDesc() + ")");
+                                        menuItem.setActionCommand("ADD_LANCE_TECH|FORCE|" + tech.getId() + "|" + forceIds);
+                                        menuItem.addActionListener(this);
+                                        menuItem.setEnabled(true);
+                                        m_g_menu.add(menuItem);
+                                        m_g_menu.setEnabled(true);
+                                    }
+                                    if (skillLvl.equals(SkillType.REGULAR_NM)) {
+                                        menuItem = new JMenuItem(tech.getFullTitle() + " (" + tech.getRoleDesc() + ")");
+                                        menuItem.setActionCommand("ADD_LANCE_TECH|FORCE|" + tech.getId() + "|" + forceIds);
+                                        menuItem.addActionListener(this);
+                                        menuItem.setEnabled(true);
+                                        m_r_menu.add(menuItem);
+                                        m_r_menu.setEnabled(true);
+                                    }
+                                    if (skillLvl.equals(SkillType.VETERAN_NM)) {
+                                        menuItem = new JMenuItem(tech.getFullTitle() + " (" + tech.getRoleDesc() + ")");
+                                        menuItem.setActionCommand("ADD_LANCE_TECH|FORCE|" + tech.getId() + "|" + forceIds);
+                                        menuItem.addActionListener(this);
+                                        menuItem.setEnabled(true);
+                                        m_v_menu.add(menuItem);
+                                        m_v_menu.setEnabled(true);
+                                    }
+                                    if (skillLvl.equals(SkillType.ELITE_NM)) {
+                                        menuItem = new JMenuItem(tech.getFullTitle() + " (" + tech.getRoleDesc() + ")");
+                                        menuItem.setActionCommand("ADD_LANCE_TECH|FORCE|" + tech.getId() + "|" + forceIds);
+                                        menuItem.addActionListener(this);
+                                        menuItem.setEnabled(true);
+                                        m_e_menu.add(menuItem);
+                                        m_e_menu.setEnabled(true);
+                                    }
+                                }
+
+                                // We're a AerpTech!
+                                if (role == Person.T_AERO_TECH) {
+                                    if (skillLvl.equals(SkillType.ULTRA_GREEN_NM)) {
+                                        menuItem = new JMenuItem(tech.getFullTitle() + " (" + tech.getRoleDesc() + ")");
+                                        menuItem.setActionCommand("ADD_LANCE_TECH|FORCE|" + tech.getId() + "|" + forceIds);
+                                        menuItem.addActionListener(this);
+                                        menuItem.setEnabled(true);
+                                        a_ug_menu.add(menuItem);
+                                        a_ug_menu.setEnabled(true);
+                                    }
+                                    if (skillLvl.equals(SkillType.GREEN_NM)) {
+                                        menuItem = new JMenuItem(tech.getFullTitle() + " (" + tech.getRoleDesc() + ")");
+                                        menuItem.setActionCommand("ADD_LANCE_TECH|FORCE|" + tech.getId() + "|" + forceIds);
+                                        menuItem.addActionListener(this);
+                                        menuItem.setEnabled(true);
+                                        a_g_menu.add(menuItem);
+                                        a_g_menu.setEnabled(true);
+                                    }
+                                    if (skillLvl.equals(SkillType.REGULAR_NM)) {
+                                        menuItem = new JMenuItem(tech.getFullTitle() + " (" + tech.getRoleDesc() + ")");
+                                        menuItem.setActionCommand("ADD_LANCE_TECH|FORCE|" + tech.getId() + "|" + forceIds);
+                                        menuItem.addActionListener(this);
+                                        menuItem.setEnabled(true);
+                                        a_r_menu.add(menuItem);
+                                        a_r_menu.setEnabled(true);
+                                    }
+                                    if (skillLvl.equals(SkillType.VETERAN_NM)) {
+                                        menuItem = new JMenuItem(tech.getFullTitle() + " (" + tech.getRoleDesc() + ")");
+                                        menuItem.setActionCommand("ADD_LANCE_TECH|FORCE|" + tech.getId() + "|" + forceIds);
+                                        menuItem.addActionListener(this);
+                                        menuItem.setEnabled(true);
+                                        a_v_menu.add(menuItem);
+                                        a_v_menu.setEnabled(true);
+                                    }
+                                    if (skillLvl.equals(SkillType.ELITE_NM)) {
+                                        menuItem = new JMenuItem(tech.getFullTitle() + " (" + tech.getRoleDesc() + ")");
+                                        menuItem.setActionCommand("ADD_LANCE_TECH|FORCE|" + tech.getId() + "|" + forceIds);
+                                        menuItem.addActionListener(this);
+                                        menuItem.setEnabled(true);
+                                        a_e_menu.add(menuItem);
+                                        a_e_menu.setEnabled(true);
+                                    }
+                                }
+
+                                // We're a Mechanic!
+                                if (role == Person.T_MECHANIC) {
+                                    if (skillLvl.equals(SkillType.ULTRA_GREEN_NM)) {
+                                        menuItem = new JMenuItem(tech.getFullTitle() + " (" + tech.getRoleDesc() + ")");
+                                        menuItem.setActionCommand("ADD_LANCE_TECH|FORCE|" + tech.getId() + "|" + forceIds);
+                                        menuItem.addActionListener(this);
+                                        menuItem.setEnabled(true);
+                                        v_ug_menu.add(menuItem);
+                                        v_ug_menu.setEnabled(true);
+                                    }
+                                    if (skillLvl.equals(SkillType.GREEN_NM)) {
+                                        menuItem = new JMenuItem(tech.getFullTitle() + " (" + tech.getRoleDesc() + ")");
+                                        menuItem.setActionCommand("ADD_LANCE_TECH|FORCE|" + tech.getId() + "|" + forceIds);
+                                        menuItem.addActionListener(this);
+                                        menuItem.setEnabled(true);
+                                        v_g_menu.add(menuItem);
+                                        v_g_menu.setEnabled(true);
+                                    }
+                                    if (skillLvl.equals(SkillType.REGULAR_NM)) {
+                                        menuItem = new JMenuItem(tech.getFullTitle() + " (" + tech.getRoleDesc() + ")");
+                                        menuItem.setActionCommand("ADD_LANCE_TECH|FORCE|" + tech.getId() + "|" + forceIds);
+                                        menuItem.addActionListener(this);
+                                        menuItem.setEnabled(true);
+                                        v_r_menu.add(menuItem);
+                                        v_r_menu.setEnabled(true);
+                                    }
+                                    if (skillLvl.equals(SkillType.VETERAN_NM)) {
+                                        menuItem = new JMenuItem(tech.getFullTitle() + " (" + tech.getRoleDesc() + ")");
+                                        menuItem.setActionCommand("ADD_LANCE_TECH|FORCE|" + tech.getId() + "|" + forceIds);
+                                        menuItem.addActionListener(this);
+                                        menuItem.setEnabled(true);
+                                        v_v_menu.add(menuItem);
+                                        v_v_menu.setEnabled(true);
+                                    }
+                                    if (skillLvl.equals(SkillType.ELITE_NM)) {
+                                        menuItem = new JMenuItem(tech.getFullTitle() + " (" + tech.getRoleDesc() + ")");
+                                        menuItem.setActionCommand("ADD_LANCE_TECH|FORCE|" + tech.getId() + "|" + forceIds);
+                                        menuItem.addActionListener(this);
+                                        menuItem.setEnabled(true);
+                                        v_e_menu.add(menuItem);
+                                        v_e_menu.setEnabled(true);
+                                    }
+                                }
+
+                                // We're a BATech!
+                                if (role == Person.T_BA_TECH) {
+                                    if (skillLvl.equals(SkillType.ULTRA_GREEN_NM)) {
+                                        menuItem = new JMenuItem(tech.getFullTitle() + " (" + tech.getRoleDesc() + ")");
+                                        menuItem.setActionCommand("ADD_LANCE_TECH|FORCE|" + tech.getId() + "|" + forceIds);
+                                        menuItem.addActionListener(this);
+                                        menuItem.setEnabled(true);
+                                        ba_ug_menu.add(menuItem);
+                                        ba_ug_menu.setEnabled(true);
+                                    }
+                                    if (skillLvl.equals(SkillType.GREEN_NM)) {
+                                        menuItem = new JMenuItem(tech.getFullTitle() + " (" + tech.getRoleDesc() + ")");
+                                        menuItem.setActionCommand("ADD_LANCE_TECH|FORCE|" + tech.getId() + "|" + forceIds);
+                                        menuItem.addActionListener(this);
+                                        menuItem.setEnabled(true);
+                                        ba_g_menu.add(menuItem);
+                                        ba_g_menu.setEnabled(true);
+                                    }
+                                    if (skillLvl.equals(SkillType.REGULAR_NM)) {
+                                        menuItem = new JMenuItem(tech.getFullTitle() + " (" + tech.getRoleDesc() + ")");
+                                        menuItem.setActionCommand("ADD_LANCE_TECH|FORCE|" + tech.getId() + "|" + forceIds);
+                                        menuItem.addActionListener(this);
+                                        menuItem.setEnabled(true);
+                                        ba_r_menu.add(menuItem);
+                                        ba_r_menu.setEnabled(true);
+                                    }
+                                    if (skillLvl.equals(SkillType.VETERAN_NM)) {
+                                        menuItem = new JMenuItem(tech.getFullTitle() + " (" + tech.getRoleDesc() + ")");
+                                        menuItem.setActionCommand("ADD_LANCE_TECH|FORCE|" + tech.getId() + "|" + forceIds);
+                                        menuItem.addActionListener(this);
+                                        menuItem.setEnabled(true);
+                                        ba_v_menu.add(menuItem);
+                                        ba_v_menu.setEnabled(true);
+                                    }
+                                    if (skillLvl.equals(SkillType.ELITE_NM)) {
+                                        menuItem = new JMenuItem(tech.getFullTitle() + " (" + tech.getRoleDesc() + ")");
+                                        menuItem.setActionCommand("ADD_LANCE_TECH|FORCE|" + tech.getId() + "|" + forceIds);
+                                        menuItem.addActionListener(this);
+                                        menuItem.setEnabled(true);
+                                        ba_e_menu.add(menuItem);
+                                        ba_e_menu.setEnabled(true);
+                                    }
+                                }
+                            }
+
+                            // Set up 'Mech Menus
+                            if (m_ug_menu.getMenuComponentCount() > 0 || menu.getItemCount() > 0) {
+                                mech_techs.add(m_ug_menu);
+                            }
+                            if (m_g_menu.getMenuComponentCount() > 0 || menu.getItemCount() > 0) {
+                                mech_techs.add(m_g_menu);
+                            }
+                            if (m_r_menu.getMenuComponentCount() > 0 || menu.getItemCount() > 0) {
+                                mech_techs.add(m_r_menu);
+                            }
+                            if (m_v_menu.getMenuComponentCount() > 0 || menu.getItemCount() > 0) {
+                                mech_techs.add(m_v_menu);
+                            }
+                            if (m_e_menu.getMenuComponentCount() > 0 || menu.getItemCount() > 0) {
+                                mech_techs.add(m_e_menu);
+                            }
+                            if (mech_techs.getMenuComponentCount() > 0 || menu.getItemCount() > 0) {
+                                menu.add(mech_techs);
+                            }
+
+                            // Set up Aero Menus
+                            if (a_ug_menu.getMenuComponentCount() > 0 || menu.getItemCount() > 0) {
+                                aero_techs.add(a_ug_menu);
+                            }
+                            if (a_g_menu.getMenuComponentCount() > 0 || menu.getItemCount() > 0) {
+                                aero_techs.add(a_g_menu);
+                            }
+                            if (a_r_menu.getMenuComponentCount() > 0 || menu.getItemCount() > 0) {
+                                aero_techs.add(a_r_menu);
+                            }
+                            if (a_v_menu.getMenuComponentCount() > 0 || menu.getItemCount() > 0) {
+                                aero_techs.add(a_v_menu);
+                            }
+                            if (a_e_menu.getMenuComponentCount() > 0 || menu.getItemCount() > 0) {
+                                aero_techs.add(a_e_menu);
+                            }
+                            if (aero_techs.getMenuComponentCount() > 0 || menu.getItemCount() > 0) {
+                                menu.add(aero_techs);
+                            }
+
+                            // Set up Mechanic Menus
+                            if (v_ug_menu.getMenuComponentCount() > 0 || menu.getItemCount() > 0) {
+                                aero_techs.add(v_ug_menu);
+                            }
+                            if (v_g_menu.getMenuComponentCount() > 0 || menu.getItemCount() > 0) {
+                                aero_techs.add(v_g_menu);
+                            }
+                            if (v_r_menu.getMenuComponentCount() > 0 || menu.getItemCount() > 0) {
+                                aero_techs.add(v_r_menu);
+                            }
+                            if (v_v_menu.getMenuComponentCount() > 0 || menu.getItemCount() > 0) {
+                                aero_techs.add(v_v_menu);
+                            }
+                            if (v_e_menu.getMenuComponentCount() > 0 || menu.getItemCount() > 0) {
+                                aero_techs.add(v_e_menu);
+                            }
+                            if (aero_techs.getMenuComponentCount() > 0 || menu.getItemCount() > 0) {
+                                menu.add(mechanics);
+                            }
+
+                            // Set up BA Menus
+                            if (ba_ug_menu.getMenuComponentCount() > 0 || menu.getItemCount() > 0) {
+                                ba_techs.add(ba_ug_menu);
+                            }
+                            if (ba_g_menu.getMenuComponentCount() > 0 || menu.getItemCount() > 0) {
+                                ba_techs.add(ba_g_menu);
+                            }
+                            if (ba_r_menu.getMenuComponentCount() > 0 || menu.getItemCount() > 0) {
+                                ba_techs.add(ba_r_menu);
+                            }
+                            if (ba_v_menu.getMenuComponentCount() > 0 || menu.getItemCount() > 0) {
+                                ba_techs.add(ba_v_menu);
+                            }
+                            if (ba_e_menu.getMenuComponentCount() > 0 || menu.getItemCount() > 0) {
+                                ba_techs.add(ba_e_menu);
+                            }
+                            if (ba_techs.getMenuComponentCount() > 0 || menu.getItemCount() > 0) {
+                                menu.add(ba_techs);
+                            }
                         }
-                        if (menu.getItemCount() > 0) {
-                        	popup.add(menu);
-                        	if (menu.getItemCount() > 20) {
-                        		MenuScroller.setScrollerFor(menu, 20);
-                        	}
+
+                        if (menu.getMenuComponentCount() > 0 || menu.getItemCount() > 0) {
+                            menu.setEnabled(true);
+                            MenuScroller.createScrollBarsOnMenus(menu);
+                            popup.add(menu);
                         }
                     }
                     if (force.getTechID() != null) {
-                       	menuItem = new JMenuItem("Remove Tech from Force");
-                       	menuItem.setActionCommand("REMOVE_LANCE_TECH|FORCE|" + force.getTechID() + "|" + forceIds);
+                        menuItem = new JMenuItem("Remove Tech from Force");
+                        menuItem.setActionCommand("REMOVE_LANCE_TECH|FORCE|" + force.getTechID() + "|" + forceIds);
                         menuItem.addActionListener(this);
                         menuItem.setEnabled(true);
                         popup.add(menuItem);
                     }
                     menu = new JMenu("Add Unit");
                     menu.setEnabled(false);
-                    // only add units that have commanders
+                    HashMap<String, JMenu> unitTypeMenus = new HashMap<String, JMenu>();
+                    HashMap<String, JMenu> weightClassForUnitType = new HashMap<String, JMenu>();
+                    
+                    // TODO: Doesn't currently account for Support Vees of any type
+                    for (int i = 0; i < UnitType.SIZE; i++)
+                    {
+                        String unittype = UnitType.getTypeName(i);
+                        String displayname = UnitType.getTypeDisplayableName(i);
+                        unitTypeMenus.put(unittype, new JMenu(displayname));
+                        unitTypeMenus.get(unittype).setName(unittype);
+                        unitTypeMenus.get(unittype).setEnabled(false);
+                        for (int j = 0; j < EntityWeightClass.getWeightLimitByType(unittype).length; j++) {
+                            double tonnage = EntityWeightClass.getWeightLimitByType(unittype)[j];
+                            // Skip over the padding 0s
+                            if (tonnage == 0) {
+                                continue;
+                            }
+                            
+                            int weightClass = EntityWeightClass.getWeightClass(tonnage, unittype);
+                            String displayname2 = UnitType.getTypeDisplayableName(i) + "_"
+                                    + EntityWeightClass.getClassName(weightClass, unittype, false);
+                            String weightClassMenuName = unittype + "_"
+                                    + EntityWeightClass.getClassName(weightClass, unittype, false);
+                            weightClassForUnitType.put(weightClassMenuName, new JMenu(displayname2));
+                            weightClassForUnitType.get(weightClassMenuName).setName(weightClassMenuName);
+                            weightClassForUnitType.get(weightClassMenuName).setEnabled(false);
+                        }
+                    }
+                    
+                    // Only add units that have commanders
                     // Or Gun Emplacements!
-                    for (Unit u : gui.getCampaign().getUnits()) {
+                    // TODO: Or Robotic Systems!
+                    JMenu unsorted = new JMenu("Unsorted");
+                    for (Unit u : gui.getCampaign().getUnits(true, true)) {
+                        String type = UnitType.determineUnitType(u.getEntity());
+                        String className = u.getEntity().getWeightClassName();
                         if (null != u.getCommander()) {
                             Person p = u.getCommander();
                             if (p.isActive() && u.getForceId() < 1
@@ -482,8 +800,13 @@ public class TOEMouseAdapter extends MouseInputAdapter implements
                                         + u.getId() + "|" + forceIds);
                                 menuItem.addActionListener(this);
                                 menuItem.setEnabled(u.isAvailable());
-                                menu.add(menuItem);
-                                menu.setEnabled(true);
+                                if (null != weightClassForUnitType.get(type + "_" + className)) {
+                                    weightClassForUnitType.get(type + "_" + className).add(menuItem);
+                                    weightClassForUnitType.get(type + "_" + className).setEnabled(true);
+                                } else {
+                                    unsorted.add(menuItem);
+                                }
+                                unitTypeMenus.get(type).setEnabled(true);
                             }
                         }
                         if (u.getEntity() instanceof GunEmplacement) {
@@ -494,15 +817,51 @@ public class TOEMouseAdapter extends MouseInputAdapter implements
                                         + u.getId() + "|" + forceIds);
                                 menuItem.addActionListener(this);
                                 menuItem.setEnabled(u.isAvailable());
-                                menu.add(menuItem);
-                                menu.setEnabled(true);
+                                if (null != weightClassForUnitType.get(type + "_" + className)) {
+                                    weightClassForUnitType.get(type + "_" + className).add(menuItem);
+                                    weightClassForUnitType.get(type + "_" + className).setEnabled(true);
+                                } else {
+                                    unsorted.add(menuItem);
+                                }
+                                unitTypeMenus.get(type).setEnabled(true);
                             }
                         }
                     }
-                    if (menu.getItemCount() > 30) {
-                        MenuScroller.setScrollerFor(menu, 30);
+
+                    for (int i = 0; i < UnitType.SIZE; i++)
+                    {
+                        String unittype = UnitType.getTypeName(i);
+                        JMenu tmp = unitTypeMenus.get(UnitType.getTypeName(i));
+                        if (tmp.isEnabled()) {
+                            for (int j = 0; j < EntityWeightClass.getWeightLimitByType(unittype).length; j++) {
+                                double tonnage = EntityWeightClass.getWeightLimitByType(unittype)[j];
+                                // Skip over the padding 0s
+                                if (tonnage == 0) {
+                                    continue;
+                                }
+
+                                int weightClass = EntityWeightClass.getWeightClass(tonnage, unittype);
+                                JMenu tmp2 = weightClassForUnitType
+                                        .get(unittype + "_"
+                                                + EntityWeightClass.getClassName(weightClass, unittype, false));
+                                if (tmp2.isEnabled()) {
+                                    tmp.add(tmp2);
+                                }
+                            }
+                            menu.add(tmp);
+                            menu.setEnabled(true);
+                        }
                     }
-                    popup.add(menu);
+
+                    if (unsorted.getComponentCount() > 0 || unsorted.getItemCount() > 0) {
+                        menu.add(unsorted);
+                        menu.setEnabled(true);
+                    }
+
+                    if (menu.getMenuComponentCount() > 0 || menu.getItemCount() > 0) {
+                        MenuScroller.createScrollBarsOnMenus(menu);
+                        popup.add(menu);
+                    }
                     menuItem = new JMenuItem("Change Force Icon...");
                     menuItem.setActionCommand("CHANGE_ICON|FORCE|empty|"
                             + forceIds);
@@ -525,8 +884,8 @@ public class TOEMouseAdapter extends MouseInputAdapter implements
                                         .getUseAtB()
                                         && s instanceof AtBScenario
                                         && !((AtBScenario) s)
-                                                .canDeployForces(forces,
-                                                        gui.getCampaign())) {
+                                        .canDeployForces(forces,
+                                                gui.getCampaign())) {
                                     continue;
                                 }
                                 menuItem = new JMenuItem(s.getName());
@@ -540,7 +899,12 @@ public class TOEMouseAdapter extends MouseInputAdapter implements
                         }
                         menu.add(missionMenu);
                     }
-                    popup.add(menu);
+
+
+                    if (menu.getMenuComponentCount() > 0 || menu.getItemCount() > 0) {
+                        MenuScroller.createScrollBarsOnMenus(menu);
+                        popup.add(menu);
+                    }
                 }
                 if (StaticChecks.areAllForcesDeployed(forces)) {
                     menuItem = new JMenuItem("Undeploy Force");
@@ -579,7 +943,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements
                             availMenu.add(menuItem);
                         }
                     }
-                    if (availMenu.getItemCount() > 0) {
+                    if (availMenu.getMenuComponentCount() > 0 || availMenu.getItemCount() > 0) {
                         networkMenu.add(availMenu);
                     }
                 }
@@ -604,7 +968,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements
                             availMenu.add(menuItem);
                         }
                     }
-                    if (availMenu.getItemCount() > 0) {
+                    if (availMenu.getMenuComponentCount() > 0 || availMenu.getItemCount() > 0) {
                         networkMenu.add(availMenu);
                     }
                 }
@@ -651,7 +1015,7 @@ public class TOEMouseAdapter extends MouseInputAdapter implements
                                 availMenu.add(menuItem);
                             }
                         }
-                        if (availMenu.getItemCount() > 0) {
+                        if (availMenu.getMenuComponentCount() > 0 || availMenu.getItemCount() > 0) {
                             networkMenu.add(availMenu);
                         }
                     }
@@ -672,12 +1036,13 @@ public class TOEMouseAdapter extends MouseInputAdapter implements
                         }
                     }
                 }
-                if (networkMenu.getItemCount() > 0) {
+                if (networkMenu.getMenuComponentCount() > 0 || networkMenu.getItemCount() > 0) {
+                    MenuScroller.createScrollBarsOnMenus(networkMenu);
                     popup.add(networkMenu);
                 }
                 menuItem = new JMenuItem("Remove Unit from TO&E");
                 menuItem.setActionCommand("REMOVE_UNIT|UNIT|empty|"
-                		+ unitIds);
+                        + unitIds);
                 menuItem.addActionListener(this);
                 menuItem.setEnabled(!StaticChecks.areAnyUnitsDeployed(units));
                 popup.add(menuItem);
@@ -695,8 +1060,8 @@ public class TOEMouseAdapter extends MouseInputAdapter implements
                                         .getUseAtB()
                                         && s instanceof AtBScenario
                                         && !((AtBScenario) s)
-                                                .canDeployUnits(units,
-                                                        gui.getCampaign())) {
+                                        .canDeployUnits(units,
+                                                gui.getCampaign())) {
                                     continue;
                                 }
                                 menuItem = new JMenuItem(s.getName());
@@ -707,15 +1072,16 @@ public class TOEMouseAdapter extends MouseInputAdapter implements
                                 missionMenu.add(menuItem);
                             }
                         }
-                        if (missionMenu.getItemCount() > 30) {
+                        if (missionMenu.getMenuComponentCount() > 30) {
                             MenuScroller.setScrollerFor(missionMenu, 30);
                         }
                         menu.add(missionMenu);
                     }
-                    if (menu.getItemCount() > 30) {
-                        MenuScroller.setScrollerFor(menu, 30);
+
+                    if (menu.getMenuComponentCount() > 0 || menu.getItemCount() > 0) {
+                        MenuScroller.createScrollBarsOnMenus(menu);
+                        popup.add(menu);
                     }
-                    popup.add(menu);
                 }
                 if (StaticChecks.areAllUnitsDeployed(units)) {
                     menuItem = new JMenuItem("Undeploy Unit");

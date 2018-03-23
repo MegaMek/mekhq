@@ -653,7 +653,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
     }
 
     public void refreshTechsList() {
-        ArrayList<Person> techs = getCampaign().getTechs(true, null);
+        ArrayList<Person> techs = getCampaign().getTechs(true, null, false, false);
         techsModel.setData(techs);
         String astechString = "<html><b>Astech Pool Minutes:</> " + getCampaign().getAstechPoolMinutes();
         if (getCampaign().isOvertimeAllowed()) {
