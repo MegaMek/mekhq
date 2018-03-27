@@ -7851,10 +7851,11 @@ public class Campaign implements Serializable, ITechManager {
             if (null == u) {
                 continue;
             }
-            if (noInfantry && u.getEntity() instanceof Infantry && !(u.getEntity() instanceof BattleArmor)) {
+            if (noInfantry && ((u.getEntity().getEntityType() & Entity.ETYPE_INFANTRY) == Entity.ETYPE_INFANTRY)
+                    && !((u.getEntity().getEntityType() & Entity.ETYPE_BATTLEARMOR) == Entity.ETYPE_BATTLEARMOR)) {
             	continue;
             }
-            if (u.getEntity() instanceof Dropship) {
+            if ((u.getEntity().getEntityType() & Entity.ETYPE_DROPSHIP) == Entity.ETYPE_DROPSHIP) {
                 if (getCampaignOptions().getDropshipContractPercent() == 0) {
                     continue;
                 }
@@ -7863,7 +7864,7 @@ public class Campaign implements Serializable, ITechManager {
                 } else {
                     value += (getCampaignOptions().getDropshipContractPercent() / 100) * u.getBuyCost();
                 }
-            } else if (u.getEntity() instanceof Warship) {
+            } else if ((u.getEntity().getEntityType() & Entity.ETYPE_WARSHIP) == Entity.ETYPE_WARSHIP) {
                 if (getCampaignOptions().getWarshipContractPercent() == 0) {
                     continue;
                 }
@@ -7872,7 +7873,7 @@ public class Campaign implements Serializable, ITechManager {
                 } else {
                     value += (getCampaignOptions().getWarshipContractPercent() / 100) * u.getBuyCost();
                 }
-            } else if (u.getEntity() instanceof Jumpship) {
+            } else if ((u.getEntity().getEntityType() & Entity.ETYPE_JUMPSHIP) == Entity.ETYPE_JUMPSHIP) {
                 if (getCampaignOptions().getJumpshipContractPercent() == 0) {
                     continue;
                 }
