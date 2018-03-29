@@ -79,9 +79,9 @@ public class CampaignOptions implements Serializable {
     public final static String[] REPAIR_SYSTEM_NAMES = {"Strat Ops", "Warchest Custom", "Generic Spare Parts"};
 
     public final static double MAXIMUM_COMBAT_EQUIPMENT_PERCENT = 5.0;
-    public final static double MAXIMUM_DROPSHIP_EQUIPMENT_PERCENT = 5.0;
-    public final static double MAXIMUM_JUMPSHIP_EQUIPMENT_PERCENT = 5.0;
-    public final static double MAXIMUM_WARSHIP_EQUIPMENT_PERCENT = 5.0;
+    public final static double MAXIMUM_DROPSHIP_EQUIPMENT_PERCENT = 1.0;
+    public final static double MAXIMUM_JUMPSHIP_EQUIPMENT_PERCENT = 1.0;
+    public final static double MAXIMUM_WARSHIP_EQUIPMENT_PERCENT = 1.0;
     
     private boolean useFactionForNames;
     private boolean useUnitRating;
