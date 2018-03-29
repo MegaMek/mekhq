@@ -773,8 +773,9 @@ ActionListener {
                             }
                             
                             int weightClass = EntityWeightClass.getWeightClass(tonnage, unittype);
-                            String displayname2 = UnitType.getTypeDisplayableName(i) + "_"
-                                    + EntityWeightClass.getClassName(weightClass, unittype, false);
+                            String displayname2 = /*
+                                                   * UnitType.getTypeDisplayableName(i) + "_" +
+                                                   */EntityWeightClass.getClassName(weightClass, unittype, false);
                             String weightClassMenuName = unittype + "_"
                                     + EntityWeightClass.getClassName(weightClass, unittype, false);
                             weightClassForUnitType.put(weightClassMenuName, new JMenu(displayname2));
