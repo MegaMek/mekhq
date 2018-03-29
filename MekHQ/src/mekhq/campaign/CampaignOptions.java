@@ -78,6 +78,11 @@ public class CampaignOptions implements Serializable {
     //FIXME: This needs to be localized
     public final static String[] REPAIR_SYSTEM_NAMES = {"Strat Ops", "Warchest Custom", "Generic Spare Parts"};
 
+    public final static double MAXIMUM_COMBAT_EQUIPMENT_PERCENT = 5.0;
+    public final static double MAXIMUM_DROPSHIP_EQUIPMENT_PERCENT = 5.0;
+    public final static double MAXIMUM_JUMPSHIP_EQUIPMENT_PERCENT = 5.0;
+    public final static double MAXIMUM_WARSHIP_EQUIPMENT_PERCENT = 5.0;
+    
     private boolean useFactionForNames;
     private boolean useUnitRating;
 
@@ -1255,7 +1260,7 @@ public class CampaignOptions implements Serializable {
     }
 
     public void setEquipmentContractPercent(double b) {
-        equipmentContractPercent = b;
+        equipmentContractPercent = Math.min(b, MAXIMUM_COMBAT_EQUIPMENT_PERCENT);
     }
 
     public boolean useEquipmentContractBase() {
@@ -1279,7 +1284,7 @@ public class CampaignOptions implements Serializable {
     }
 
     public void setDropshipContractPercent(double b) {
-        dropshipContractPercent = b;
+        dropshipContractPercent = Math.min(b, MAXIMUM_DROPSHIP_EQUIPMENT_PERCENT);
     }
 
     public double getJumpshipContractPercent() {
@@ -1287,7 +1292,7 @@ public class CampaignOptions implements Serializable {
     }
 
     public void setJumpshipContractPercent(double b) {
-        jumpshipContractPercent = b;
+        jumpshipContractPercent = Math.min(b, MAXIMUM_JUMPSHIP_EQUIPMENT_PERCENT);
     }
 
     public double getWarshipContractPercent() {
@@ -1295,7 +1300,7 @@ public class CampaignOptions implements Serializable {
     }
 
     public void setWarshipContractPercent(double b) {
-        warshipContractPercent = b;
+        warshipContractPercent = Math.min(b, MAXIMUM_WARSHIP_EQUIPMENT_PERCENT);
     }
 
     public boolean useBLCSaleValue() {
@@ -2443,13 +2448,13 @@ public class CampaignOptions implements Serializable {
             } else if (wn2.getNodeName().equalsIgnoreCase("isAcquisitionPenalty")) {
                 retVal.isAcquisitionPenalty = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("equipmentContractPercent")) {
-                retVal.equipmentContractPercent = Double.parseDouble(wn2.getTextContent().trim());
+                retVal.setEquipmentContractPercent(Double.parseDouble(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("dropshipContractPercent")) {
-                retVal.dropshipContractPercent = Double.parseDouble(wn2.getTextContent().trim());
+                retVal.setDropshipContractPercent(Double.parseDouble(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("jumpshipContractPercent")) {
-                retVal.jumpshipContractPercent = Double.parseDouble(wn2.getTextContent().trim());
+                retVal.setJumpshipContractPercent(Double.parseDouble(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("warshipContractPercent")) {
-                retVal.warshipContractPercent = Double.parseDouble(wn2.getTextContent().trim());
+                retVal.setWarshipContractPercent(Double.parseDouble(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("equipmentContractBase")) {
                 retVal.equipmentContractBase = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("equipmentContractSaleValue")) {

@@ -1970,19 +1970,19 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
             btnContractPersonnel.setSelected(true);
         }
 
-        spnEquipPercent = new JSpinner(new SpinnerNumberModel(options.getEquipmentContractPercent(), 0.1, 5.0, 0.1));
+        spnEquipPercent = new JSpinner(new SpinnerNumberModel(options.getEquipmentContractPercent(), 0.1, CampaignOptions.MAXIMUM_COMBAT_EQUIPMENT_PERCENT, 0.1));
         spnEquipPercent.setEditor(new JSpinner.NumberEditor(spnEquipPercent, "0.0"));
         ((JSpinner.DefaultEditor) spnEquipPercent.getEditor()).getTextField().setEditable(false);
 
-        spnDropshipPercent = new JSpinner(new SpinnerNumberModel(options.getDropshipContractPercent(), 0.0, 1.0, 0.1));
+        spnDropshipPercent = new JSpinner(new SpinnerNumberModel(options.getDropshipContractPercent(), 0.0, CampaignOptions.MAXIMUM_DROPSHIP_EQUIPMENT_PERCENT, 0.1));
         spnDropshipPercent.setEditor(new JSpinner.NumberEditor(spnDropshipPercent, "0.0"));
         ((JSpinner.NumberEditor) spnDropshipPercent.getEditor()).getTextField().setEditable(false);
 
-        spnJumpshipPercent = new JSpinner(new SpinnerNumberModel(options.getJumpshipContractPercent(), 0.0, 1.0, 0.1));
+        spnJumpshipPercent = new JSpinner(new SpinnerNumberModel(options.getJumpshipContractPercent(), 0.0, CampaignOptions.MAXIMUM_JUMPSHIP_EQUIPMENT_PERCENT, 0.1));
         spnJumpshipPercent.setEditor(new JSpinner.NumberEditor(spnJumpshipPercent, "0.0"));
         ((JSpinner.DefaultEditor) spnJumpshipPercent.getEditor()).getTextField().setEditable(false);
 
-        spnWarshipPercent = new JSpinner(new SpinnerNumberModel(options.getWarshipContractPercent(), 0.0, 1.0, 0.1));
+        spnWarshipPercent = new JSpinner(new SpinnerNumberModel(options.getWarshipContractPercent(), 0.0, CampaignOptions.MAXIMUM_WARSHIP_EQUIPMENT_PERCENT, 0.1));
         spnWarshipPercent.setEditor(new JSpinner.NumberEditor(spnWarshipPercent, "0.0"));
         ((JSpinner.DefaultEditor) spnWarshipPercent.getEditor()).getTextField().setEditable(false);
 
