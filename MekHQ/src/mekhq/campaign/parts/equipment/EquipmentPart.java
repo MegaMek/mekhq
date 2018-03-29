@@ -143,11 +143,6 @@ public class EquipmentPart extends Part {
                     + typeName + "\"");
             return;
         }
-        try {
-        	equipTonnage = type.getTonnage(null);
-        } catch(NullPointerException ex) {
-        	//System.out.println("Found a null entity while calculating tonnage for " + name);
-        }
     }
 
     @Override
