@@ -599,18 +599,18 @@ public class AcquisitionsDialog extends JDialog {
 				btnGM.setText("[GM] Acquire Instantly"); // NOI18N
 				btnGM.setToolTipText("GM Override - Acquire all missing items instantly");
 				btnGM.setName("btnGM"); // NOI18N
-				btnGM.addActionListener(ev -> {
-				    IAcquisitionWork actualWork = targetWork;
+			    btnGM.addActionListener(ev -> {
+			        IAcquisitionWork actualWork = targetWork;
 				    
-				    // ammo bins have some internal logic for generating acquisition work?
-				    if(targetWork instanceof AmmoBin) {
-				        actualWork = ((AmmoBin) targetWork).getAcquisitionWork();
+			        // ammo bins have some internal logic for generating acquisition work?
+			        if(targetWork instanceof AmmoBin) {
+			            actualWork = ((AmmoBin) targetWork).getAcquisitionWork();
 			        }
 				    
-					campaignGUI.getCampaign().addReport(actualWork.find(0));
-					MekHQ.triggerEvent(new UnitChangedEvent(actualWork.getUnit()));
+			        campaignGUI.getCampaign().addReport(actualWork.find(0));
+			        MekHQ.triggerEvent(new UnitChangedEvent(actualWork.getUnit()));
 
-					refresh();
+			        refresh();
 				});
 
 				actionButtons.add(btnGM, gbcActions);
