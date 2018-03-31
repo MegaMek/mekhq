@@ -2,6 +2,7 @@ VERSION HISTORY:
 ----------------
 v0.43.10-git
 + Issue #639: Campaign Ops rating now properly reflects infantry skill and more accurately calculates combat unit transport capacity
++ Issue #688: Cannot slot Endo Steel crits
 
 v0.43.9-RC3
 + Issue #647: Exception Causing UI Issues while Unit is Being Refit
