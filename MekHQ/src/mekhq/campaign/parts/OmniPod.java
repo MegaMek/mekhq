@@ -75,7 +75,12 @@ public class OmniPod extends Part {
 
     @Override
     public String getDetails() {
-        return partType.getName();
+        String details = partType.getDetails().replaceAll("\\d+ hit\\(s\\)(,\\s)?", "");
+        if (details.length() > 0) {
+            return partType.getName() + " (" + details + ")";
+        } else {
+            return partType.getName();
+        }
     }
     
     @Override
