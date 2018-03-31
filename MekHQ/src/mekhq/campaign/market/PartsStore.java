@@ -197,12 +197,16 @@ public class PartsStore implements Serializable {
 					parts.add(new AmmoStorage(0, et, ((AmmoType)et).getShots(), c));
 				}
 			} else if(et instanceof MiscType && (((MiscType)et).hasFlag(MiscType.F_HEAT_SINK) || ((MiscType)et).hasFlag(MiscType.F_DOUBLE_HEAT_SINK))) {
-            	parts.add(new HeatSink(0, et, -1, false, c));
+            	Part p = new HeatSink(0, et, -1, false, c);
+            	parts.add(p);
+                parts.add(new OmniPod(p, c));
             	parts.add(new HeatSink(0, et, -1, true, c));
 			} else if(et instanceof MiscType && ((MiscType)et).hasFlag(MiscType.F_JUMP_JET)) {
 				//need to do it by rating and unit tonnage
 				for(int ton = 10; ton <= 100; ton += 5) {
-                    parts.add(new JumpJet(ton, et, -1, false, c));
+				    Part p = new JumpJet(ton, et, -1, false, c);
+                    parts.add(p);
+                    parts.add(new OmniPod(p, c));
                     parts.add(new JumpJet(ton, et, -1, true, c));
 				}
 			} else if ((et instanceof MiscType && ((MiscType)et).hasFlag(MiscType.F_TANK_EQUIPMENT) && ((MiscType)et).hasFlag(MiscType.F_CHASSIS_MODIFICATION))
@@ -227,6 +231,7 @@ public class PartsStore implements Serializable {
                             MASC sp = new MASC(0, et, -1 , c, rating, false);
                             sp.setEquipTonnage(eton);
                             parts.add(sp);
+                            parts.add(new OmniPod(sp, c));
                             sp = new MASC(0, et, -1 , c, rating, true);
                             sp.setEquipTonnage(eton);
 							parts.add(sp);
@@ -239,7 +244,9 @@ public class PartsStore implements Serializable {
 							if(rating < ton || (rating % ton) != 0) {
 								continue;
 							}
-                            parts.add(new MASC(ton, et, -1, c, rating, false));
+							Part p = new MASC(ton, et, -1, c, rating, false);
+                            parts.add(p);
+                            parts.add(new OmniPod(p, c));
                             parts.add(new MASC(ton, et, -1, c, rating, true));
 						}
 					}
@@ -255,6 +262,7 @@ public class PartsStore implements Serializable {
 						    epart = new EquipmentPart(0, et, -1, true, c);
 	                        epart.setEquipTonnage(ton);
 	                        parts.add(epart);
+	                        parts.add(new OmniPod(epart, c));
 						}
 						//TODO: still need to deal with talons (unit tonnage) and masc (engine rating)
 					}
