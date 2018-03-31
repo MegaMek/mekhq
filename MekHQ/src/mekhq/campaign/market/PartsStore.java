@@ -42,9 +42,11 @@ import megamek.common.MechSummaryCache;
 import megamek.common.MiscType;
 import megamek.common.Protomech;
 import megamek.common.TechConstants;
+import megamek.common.WeaponType;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.verifier.TestEntity;
 import megamek.common.weapons.InfantryAttack;
+import megamek.common.weapons.Weapon;
 import megamek.common.weapons.bayweapons.BayWeapon;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.AeroHeatSink;
@@ -206,8 +208,10 @@ public class PartsStore implements Serializable {
 				for(int ton = 10; ton <= 100; ton += 5) {
 				    Part p = new JumpJet(ton, et, -1, false, c);
                     parts.add(p);
-                    parts.add(new OmniPod(p, c));
-                    parts.add(new JumpJet(ton, et, -1, true, c));
+                    if (!et.hasFlag(MiscType.F_BA_EQUIPMENT)) {
+                        parts.add(new OmniPod(p, c));
+                        parts.add(new JumpJet(ton, et, -1, true, c));
+                    }
 				}
 			} else if ((et instanceof MiscType && ((MiscType)et).hasFlag(MiscType.F_TANK_EQUIPMENT) && ((MiscType)et).hasFlag(MiscType.F_CHASSIS_MODIFICATION))
 					|| et instanceof BayWeapon
@@ -252,13 +256,24 @@ public class PartsStore implements Serializable {
 					}
 				}
 			} else {
+			    boolean poddable = !et.isOmniFixedOnly();
+			    if (et instanceof MiscType) {
+			        poddable &= et.hasFlag(MiscType.F_MECH_EQUIPMENT)
+                            || et.hasFlag(MiscType.F_TANK_EQUIPMENT)
+                            || et.hasFlag(MiscType.F_FIGHTER_EQUIPMENT);
+			    } else if (et instanceof WeaponType) {
+			        poddable &= (et.hasFlag(WeaponType.F_MECH_WEAPON)
+			                || et.hasFlag(Weapon.F_TANK_WEAPON)
+			                || et.hasFlag(WeaponType.F_AERO_WEAPON))
+			                && !((WeaponType) et).isCapital(); 
+			    }
 				if(EquipmentPart.hasVariableTonnage(et)) {
 					EquipmentPart epart;
 					for(double ton = EquipmentPart.getStartingTonnage(et); ton <= EquipmentPart.getMaxTonnage(et); ton += EquipmentPart.getTonnageIncrement(et)) {
 						epart = new EquipmentPart(0, et, -1, false, c);
 						epart.setEquipTonnage(ton);
 						parts.add(epart);
-						if (!et.isOmniFixedOnly()) {
+						if (poddable) {
 						    epart = new EquipmentPart(0, et, -1, true, c);
 	                        epart.setEquipTonnage(ton);
 	                        parts.add(epart);
@@ -269,7 +284,7 @@ public class PartsStore implements Serializable {
 				} else {
 				    Part p = new EquipmentPart(0, et, -1, false, c);
 				    parts.add(p);
-                    if (p.isOmniPoddable()) {
+                    if (poddable) {
                         parts.add(new EquipmentPart(0, et, -1, true, c));
                         parts.add(new OmniPod(p, c));
                     }
