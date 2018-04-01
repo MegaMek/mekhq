@@ -39,6 +39,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -656,6 +657,9 @@ public class Utilities {
     			p.addSkill(SkillType.S_PILOT_GVEE, SkillType.getType(SkillType.S_PILOT_GVEE).getTarget() - oldCrew.getPiloting(), 0);
     			p.addSkill(SkillType.S_GUN_VEE, SkillType.getType(SkillType.S_GUN_VEE).getTarget() - oldCrew.getGunnery(), 0);
     		}
+			
+			populateOptionsFromCrew(p, oldCrew);
+			
 			drivers.add(p);
 		} else if (oldCrew.getSlotCount() > 1) {
 		    for (int slot = 0; slot < oldCrew.getSlotCount(); slot++) {
@@ -674,6 +678,8 @@ public class Utilities {
 	                if (!oldCrew.getExternalIdAsString().equals("-1")) {
 	                    p.setId(UUID.fromString(oldCrew.getExternalIdAsString(slot)));
 	                }
+	                
+	                populateOptionsFromCrew(p, oldCrew);
 	                drivers.add(p);
 	            }
 		    }
@@ -718,6 +724,11 @@ public class Utilities {
 	    			p.addSkill(SkillType.S_PILOT_GVEE, SkillType.getType(SkillType.S_PILOT_GVEE).getTarget() - oldCrew.getPiloting(), 0);
 	    			p.addSkill(SkillType.S_GUN_VEE, SkillType.getType(SkillType.S_GUN_VEE).getTarget() - oldCrew.getGunnery(), 0);
 	    		}
+	    		
+	    		// this will have the side effect of giving every driver on the crew
+	    		// the SPAs from the entity's crew.
+	    		// Not really any way around it 
+	    		populateOptionsFromCrew(p, oldCrew);
 	    		drivers.add(p);
 	    	}
 
@@ -773,6 +784,8 @@ public class Utilities {
 		    			p.addSkill(SkillType.S_GUN_VEE, randomSkillFromTarget(SkillType.getType(SkillType.S_GUN_VEE).getTarget() - oldCrew.getGunnery()), 0);
 		    			totalGunnery += p.getSkill(SkillType.S_GUN_VEE).getFinalSkillValue();
 		    		}
+		    		
+		    		populateOptionsFromCrew(p, oldCrew);
 		    		gunners.add(p);
 		    	}
 
@@ -881,6 +894,19 @@ public class Utilities {
             result.put(CrewType.TECH_OFFICER, Collections.singletonList(consoleCmdr));
         }
 		return result;
+	}
+	
+	/**
+	 * Worker function that takes the PilotOptions (SPAs, in other words) from the given "old crew" and sets them for a person.
+	 * @param p The person whose SPAs to populate
+	 * @param oldCrew The entity the SPAs of whose crew we're importing
+	 */
+	private static void populateOptionsFromCrew(Person p, Crew oldCrew) {
+        Enumeration<IOption> optionsEnum = oldCrew.getOptions().getOptions();
+        while(optionsEnum.hasMoreElements()) {
+            IOption currentOption = (IOption) optionsEnum.nextElement();
+            p.getOptions().getOption(currentOption.getName()).setValue(currentOption.getValue());
+        }
 	}
 
 	public static int generateRandomExp() {
