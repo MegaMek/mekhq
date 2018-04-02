@@ -1623,10 +1623,25 @@ public class Campaign implements Serializable, ITechManager {
 	        Collections.sort(techs, new Comparator<Person>() {
                 @Override
                 public int compare(Person person1, Person person2) {
-                    int retVal = person1.getExperienceLevel(!person1.isTechPrimary() && person1.isTechSecondary())
-                            > person2.getExperienceLevel(!person2.isTechPrimary() && person2.isTechSecondary()) ? -1
-                                    : (person1.getExperienceLevel(!person1.isTechPrimary() && person1.isTechSecondary())
-                                       < person2.getExperienceLevel(!person2.isTechPrimary() && person2.isTechSecondary())) ? 1 : 0;
+                    // default to 0, which means they're equal
+                    int retVal = 0;
+                    
+                    // Set up booleans to know if the tech is secondary only
+                    // this is to get the skill from getExperienceLevel(boolean) properly
+                    boolean p1Secondary = !person1.isTechPrimary() && person1.isTechSecondary();
+                    boolean p2Secondary = !person2.isTechPrimary() && person2.isTechSecondary();
+                    
+                    if (person1.getExperienceLevel(p1Secondary)
+                            > person2.getExperienceLevel(p2Secondary)) {
+                        // Person 1 is better than Person 2.
+                        retVal = -1;
+                    } else if (person1.getExperienceLevel(p1Secondary)
+                            < person2.getExperienceLevel(p2Secondary)) {
+                        // Person 2 is better than Person 1
+                        retVal = 1;
+                    }
+                    
+                    // Return, swapping the value if we're looking to have Elites ordered first
                     return eliteFirst ? retVal *= -1 : retVal;
                 }
 	            
