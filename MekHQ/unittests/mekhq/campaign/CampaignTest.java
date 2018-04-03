@@ -84,7 +84,7 @@ public class CampaignTest {
         Mockito.when(testCampaign.getPersonnel()).thenReturn(testPersonList);
         Mockito.when(testCampaign.getTechs()).thenCallRealMethod();
         Mockito.when(testCampaign.getTechs(Mockito.anyBoolean())).thenCallRealMethod();
-        Mockito.when(testCampaign.getTechs(Mockito.anyBoolean(), Mockito.any(UUID.class))).thenCallRealMethod();
+        Mockito.when(testCampaign.getTechs(Mockito.anyBoolean(), Mockito.any(UUID.class), Mockito.anyBoolean(), Mockito.anyBoolean())).thenCallRealMethod();
         Mockito.when(testCampaign.getPerson(Mockito.eq(testId))).thenReturn(mockTechActiveTwo);
 
         // Test just getting the list of active techs.
@@ -105,7 +105,7 @@ public class CampaignTest {
         expected.add(mockTechActiveTwo);
         expected.add(mockTechActive);
         expected.add(mockTechNoTime);
-        Assert.assertEquals(expected, testCampaign.getTechs(false, testId));
+        Assert.assertEquals(expected, testCampaign.getTechs(false, testId, false, false));
     }
 
 }

@@ -12,6 +12,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.event.MouseInputAdapter;
 
+import megamek.client.ui.swing.util.MenuScroller;
 import megamek.common.AmmoType;
 import megamek.common.EquipmentType;
 import mekhq.MekHQ;
@@ -24,7 +25,6 @@ import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.dialog.LargeCraftAmmoSwapDialog;
 import mekhq.gui.model.UnitTableModel;
-import mekhq.gui.utilities.MenuScroller;
 import mekhq.gui.utilities.StaticChecks;
 import mekhq.service.MassRepairService;
 

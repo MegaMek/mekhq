@@ -20,6 +20,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.event.MouseInputAdapter;
 
+import megamek.client.ui.swing.util.MenuScroller;
 import megamek.common.Aero;
 import megamek.common.BattleArmor;
 import megamek.common.Crew;
@@ -59,7 +60,6 @@ import mekhq.gui.dialog.PopupValueChoiceDialog;
 import mekhq.gui.dialog.RetirementDefectionDialog;
 import mekhq.gui.dialog.TextAreaDialog;
 import mekhq.gui.model.PersonnelTableModel;
-import mekhq.gui.utilities.MenuScroller;
 import mekhq.gui.utilities.StaticChecks;
 
 public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
