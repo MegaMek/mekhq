@@ -1350,14 +1350,18 @@ Addicks remains an important world today, though it has lost much of its glory o
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2571-01-01</date>
+            <date>2540-01-01</date>
             <faction>MOC</faction>
         </event>
-        <event>
+		<event>
+            <date>2583-04-20</date>
+            <faction>MOC,SL</faction>
+        </event>
+		<event>
             <date>2583-04-27</date>
             <faction>SL</faction>
         </event>
-		<event>
+        <event>
             <date>2597-03-21</date>
             <faction>MOC</faction>
         </event>
@@ -1517,7 +1521,19 @@ Addicks remains an important world today, though it has lost much of its glory o
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2571-01-01</date>
+            <date>2540-01-01</date>
+            <faction>MOC</faction>
+        </event>
+		<event>
+            <date>2583-04-03</date>
+            <faction>MOC,SL</faction>
+        </event>
+		<event>
+            <date>2584-04-06</date>
+            <faction>SL</faction>
+        </event>
+        <event>
+            <date>2597-03-21</date>
             <faction>MOC</faction>
         </event>
     </planet>
@@ -7943,15 +7959,19 @@ Though a major exporter of heavy metals and radioactive elements, as well as sma
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2540-01-01</date>
             <faction>MOC</faction>
         </event>
-        <event>
-            <date>2596-09-22</date>
-            <faction>FWL</faction>
+		<event>
+            <date>2580-09-10</date>
+            <faction>MOC,SL</faction>
+        </event>
+		<event>
+            <date>2580-09-22</date>
+            <faction>SL</faction>
         </event>
         <event>
-            <date>2750-01-01</date>
+            <date>2597-03-21</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -9384,6 +9404,14 @@ Most of the wilds of Queensland, the planet’s largest continent, have remained
         </event>
         <event>
             <date>2335-01-01</date>
+            <faction>FWL</faction>
+        </event>
+		<event>
+            <date>2578-01-09</date>
+            <faction>FWL,MOC</faction>
+        </event>
+		<event>
+            <date>2578-01-15</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -10834,7 +10862,19 @@ During the Golden Age of Peace, Basalt‘s mining companies recovered enough to 
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2571-01-01</date>
+            <date>2540-01-01</date>
+            <faction>MOC</faction>
+        </event>
+		<event>
+            <date>2585-06-09</date>
+            <faction>MOC,SL</faction>
+        </event>
+		<event>
+            <date>2585-06-10</date>
+            <faction>SL</faction>
+        </event>
+        <event>
+            <date>2597-03-21</date>
             <faction>MOC</faction>
         </event>
     </planet>
@@ -12666,7 +12706,19 @@ Betelgeuse has ample natural resources and a high level of industry, including B
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2571-01-01</date>
+            <date>2540-01-01</date>
+            <faction>MOC</faction>
+        </event>
+		<event>
+            <date>2579-12-03</date>
+            <faction>MOC,SL</faction>
+        </event>
+		<event>
+            <date>2580-01-09</date>
+            <faction>SL</faction>
+        </event>
+        <event>
+            <date>2597-03-21</date>
             <faction>MOC</faction>
         </event>
     </planet>
@@ -14416,7 +14468,19 @@ Bermuda Combat Systems</desc>
         <faction>UND</faction>
         <desc>Borgan’s Rift is another of many worlds in the Periphery free-falling back into the dark ages. Long neglected due to the collapse of the Star League and the start of the Succession Wars has brought about economic ruin and technological decay. Off world trade has long vanished. Borgan’s Rift is now a planet ravaged by pirates, pillaging the few remaining markets. Many pirates inhabit the old industrial city of Howe. In 3049 the title to the planet was purchased by Magliss Spirits (a large producer of fine wines and spirits in the periphery) with the Magestrix’s full approval. South of Howe is the city of Newport built up by Shanti Magliss, owner of Magliss Spirits. Newport contains numerous warehouses and distribution centers.</desc>
         <event>
-            <date>2571-01-01</date>
+            <date>2540-01-01</date>
+            <faction>MOC</faction>
+        </event>
+		<event>
+            <date>2581-09-20</date>
+            <faction>MOC,SL</faction>
+        </event>
+		<event>
+            <date>2581-10-05</date>
+            <faction>SL</faction>
+        </event>
+        <event>
+            <date>2597-03-21</date>
             <faction>MOC</faction>
         </event>
     </planet>
@@ -15383,7 +15447,19 @@ O-P Computer Electronics</desc>
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2571-01-01</date>
+            <date>2540-01-01</date>
+            <faction>MOC</faction>
+        </event>
+		<event>
+            <date>2584-01-36</date>
+            <faction>MOC,SL</faction>
+        </event>
+		<event>
+            <date>2584-02-10</date>
+            <faction>SL</faction>
+        </event>
+        <event>
+            <date>2597-03-21</date>
             <faction>MOC</faction>
         </event>
     </planet>
@@ -16526,15 +16602,19 @@ Unlike many planets, Butte Hold was unaffected by the fall of the Star League an
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2571-01-01</date>
+            <date>2540-01-01</date>
             <faction>MOC</faction>
         </event>
-        <event>
-            <date>2596-09-22</date>
-            <faction>FWL</faction>
+		<event>
+            <date>2553-10-29</date>
+            <faction>MOC,SL</faction>
+        </event>
+		<event>
+            <date>2577-10-31</date>
+            <faction>SL</faction>
         </event>
         <event>
-            <date>2750-01-01</date>
+            <date>2597-03-21</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -17766,7 +17846,19 @@ Camlann itself is barely able to sustain itself, the primarily industry and expo
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2571-01-01</date>
+            <date>2540-01-01</date>
+            <faction>MOC</faction>
+        </event>
+		<event>
+            <date>2585-03-03</date>
+            <faction>MOC,SL</faction>
+        </event>
+		<event>
+            <date>2585-03-04</date>
+            <faction>SL</faction>
+        </event>
+        <event>
+            <date>2597-03-21</date>
             <faction>MOC</faction>
         </event>
     </planet>
@@ -17840,6 +17932,18 @@ Canopus Industries Alpha
 Majestic Metals and Manufacturing</desc>
         <event>
             <date>2531-01-01</date>
+            <faction>MOC</faction>
+        </event>
+		<event>
+            <date>2584-03-06</date>
+            <faction>MOC,SL</faction>
+        </event>
+		<event>
+            <date>2584-05-03</date>
+            <faction>SL</faction>
+        </event>
+        <event>
+            <date>2597-03-21</date>
             <faction>MOC</faction>
         </event>
     </planet>
@@ -19388,7 +19492,19 @@ Royals Refit and Repair Station</desc>
         <faction>UND</faction>
         <desc>3025 - Cate's Hold is a border world between the Magistracy and Concordat and was settled as a pleasure world similar to Hardcore and Canopus. Cate's Hold found itself thrust into the role of a major supply and repair center during the Reunification War before returning to a resort world during the early Succession Wars. The discovery of rare radioactive materials in the southern hemisphere and several Star League caches, have made the planet strategically important to the Magistracy and have resulted in several clashes between Taurian and Canopian forces on Cate's Hold.</desc>
         <event>
-            <date>2571-01-01</date>
+            <date>2540-01-01</date>
+            <faction>MOC</faction>
+        </event>
+		<event>
+            <date>2587-04-02</date>
+            <faction>MOC,SL</faction>
+        </event>
+		<event>
+            <date>2587-04-17</date>
+            <faction>SL</faction>
+        </event>
+        <event>
+            <date>2597-03-21</date>
             <faction>MOC</faction>
         </event>
     </planet>
@@ -23542,8 +23658,16 @@ Coventry Metal Works, Refit Facility</desc>
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2571-01-01</date>
+            <date>2540-01-01</date>
             <faction>MOC</faction>
+        </event>
+		<event>
+            <date>2577-10-08</date>
+            <faction>MOC,SL</faction>
+        </event>
+		<event>
+            <date>2577-11-29</date>
+            <faction>SL</faction>
         </event>
         <event>
             <date>2596-09-22</date>
@@ -31460,7 +31584,19 @@ The capital city of Dyev, Novaya Mensk, is located in the northern hemisphere, o
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2571-01-01</date>
+            <date>2540-01-01</date>
+            <faction>MOC</faction>
+        </event>
+		<event>
+            <date>2583-10-29</date>
+            <faction>MOC,SL</faction>
+        </event>
+		<event>
+            <date>2583-11-02</date>
+            <faction>SL</faction>
+        </event>
+        <event>
+            <date>2597-03-21</date>
             <faction>MOC</faction>
         </event>
     </planet>
@@ -32274,15 +32410,19 @@ Overall the planet is comfortable for human habitation, with the unfortunate pro
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2540-01-01</date>
             <faction>MOC</faction>
         </event>
         <event>
-            <date>2596-01-01</date>
-            <faction>FWL</faction>
+            <date>2579-04-02</date>
+            <faction>MOC,SL</faction>
+        </event>
+		<event>
+            <date>2579-09-19</date>
+            <faction>SL</faction>
         </event>
         <event>
-            <date>2750-01-01</date>
+            <date>2597-03-04</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -34539,7 +34679,19 @@ Olympus Construction Vehicles</desc>
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2540-01-01</date>
+            <faction>MOC</faction>
+        </event>
+		<event>
+            <date>2581-03-10</date>
+            <faction>MOC,SL</faction>
+        </event>
+		<event>
+            <date>2581-03-22</date>
+            <faction>SL</faction>
+        </event>
+        <event>
+            <date>2597-03-21</date>
             <faction>MOC</faction>
         </event>
     </planet>
@@ -37564,7 +37716,19 @@ When Gallery was originally settled there were no native lifeforms so the origin
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2571-01-01</date>
+            <date>2540-01-01</date>
+            <faction>MOC</faction>
+        </event>
+		<event>
+            <date>2580-01-20</date>
+            <faction>MOC,SL</faction>
+        </event>
+		<event>
+            <date>2580-02-05</date>
+            <faction>SL</faction>
+        </event>
+        <event>
+            <date>2597-03-21</date>
             <faction>MOC</faction>
         </event>
     </planet>
@@ -39920,16 +40084,24 @@ Glenmora’s location on the Federated Suns and Draconis Combine border has made
             <date>2367-01-01</date>
             <faction>IND</faction>
         </event>
-        <event>
-            <date>2571-01-01</date>
-            <faction>MOC</faction>
-        </event>
-        <event>
-            <date>2596-09-22</date>
+		<event>
+            <date>2400-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
-            <date>2750-01-01</date>
+            <date>2553-01-01</date>
+            <faction>MOC</faction>
+        </event>
+		<event>
+            <date>2577-06-10</date>
+            <faction>MOC,SL</faction>
+        </event>
+		<event>
+            <date>2577-06-19</date>
+            <faction>SL</faction>
+        </event>
+        <event>
+            <date>2597-03-21</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -40228,7 +40400,15 @@ Earthwerks Limited</desc>
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2596-09-22</date>
+            <date>2500-01-01</date>
+            <faction>FWL</faction>
+        </event>
+		<event>
+            <date>2578-01-09</date>
+            <faction>FWL,MOC</faction>
+        </event>
+		<event>
+            <date>2578-01-15</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -43036,7 +43216,19 @@ During their Holy War, the Blakists found ready converts among the technological
 
 Entertainment on Hardcore ranges from ballet to bloodsports and is home to a series of 'Mech duels and contests each spring with live combat. The planet is also famous for its film industry which is well known for its production of hundreds of full-feature 'erotic epics' that are distributed all through the Magistracy and even deep into the Inner Sphere.</desc>
         <event>
-            <date>2571-01-01</date>
+            <date>2540-01-01</date>
+            <faction>MOC</faction>
+        </event>
+		<event>
+            <date>2586-10-30</date>
+            <faction>MOC,SL</faction>
+        </event>
+		<event>
+            <date>2586-11-01</date>
+            <faction>SL</faction>
+        </event>
+        <event>
+            <date>2597-03-21</date>
             <faction>MOC</faction>
         </event>
     </planet>
@@ -43139,7 +43331,19 @@ Entertainment on Hardcore ranges from ballet to bloodsports and is home to a ser
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2571-01-01</date>
+            <date>2540-01-01</date>
+            <faction>MOC</faction>
+        </event>
+		<event>
+            <date>2586-01-10</date>
+            <faction>MOC,SL</faction>
+        </event>
+		<event>
+            <date>2586-01-12</date>
+            <faction>SL</faction>
+        </event>
+        <event>
+            <date>2597-03-21</date>
             <faction>MOC</faction>
         </event>
     </planet>
@@ -43503,11 +43707,19 @@ The planet is defended by an AFFS security force located on the moon Bane and is
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2571-01-01</date>
+            <date>2540-01-01</date>
             <faction>MOC</faction>
         </event>
+		<event>
+            <date>2583-11-26</date>
+            <faction>MOC,SL</faction>
+        </event>
+		<event>
+            <date>2583-11-28</date>
+            <faction>SL</faction>
+        </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2597-03-21</date>
             <faction>MOC</faction>
         </event>
         <event>
@@ -50737,7 +50949,19 @@ Jonathan has a 20 hour day and takes 745 standard days to orbit its sun.</desc>
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2571-01-01</date>
+            <date>2540-01-01</date>
+            <faction>MOC</faction>
+        </event>
+		<event>
+            <date>2584-01-12</date>
+            <faction>MOC,SL</faction>
+        </event>
+		<event>
+            <date>2584-01-22</date>
+            <faction>SL</faction>
+        </event>
+        <event>
+            <date>2597-03-21</date>
             <faction>MOC</faction>
         </event>
     </planet>
@@ -56049,11 +56273,19 @@ The planet itself is resource poor and has little to offer for export. However, 
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2596-01-01</date>
+            <date>2583-06-01</date>
             <faction>MOC</faction>
         </event>
+		<event>
+            <date>2588-02-01</date>
+            <faction>MOC,SL</faction>
+        </event>
+		<event>
+            <date>2588-02-25</date>
+            <faction>SL</faction>
+        </event>
         <event>
-            <date>2596-09-22</date>
+            <date>2597-03-21</date>
             <faction>MOC</faction>
         </event>
         <event>
@@ -56363,7 +56595,19 @@ The planet itself is resource poor and has little to offer for export. However, 
 Manufacturing centers:
 Novis AT-H, Incorporated</desc>
         <event>
-            <date>2596-09-22</date>
+            <date>2540-01-01</date>
+            <faction>MOC</faction>
+        </event>
+		<event>
+            <date>2583-12-14</date>
+            <faction>MOC,SL</faction>
+        </event>
+		<event>
+            <date>2583-12-16</date>
+            <faction>SL</faction>
+        </event>
+        <event>
+            <date>2597-03-21</date>
             <faction>MOC</faction>
         </event>
     </planet>
@@ -59309,7 +59553,19 @@ Liao is home to the Liao Conservatory of Military Arts, which is located in the 
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2571-01-01</date>
+            <date>2540-01-01</date>
+            <faction>MOC</faction>
+        </event>
+		<event>
+            <date>2582-07-15</date>
+            <faction>MOC,SL</faction>
+        </event>
+		<event>
+            <date>2582-07-18</date>
+            <faction>SL</faction>
+        </event>
+        <event>
+            <date>2597-03-21</date>
             <faction>MOC</faction>
         </event>
     </planet>
@@ -59758,7 +60014,19 @@ The Jihad saw Word of Blake mercenaries raid the planet, smashing several indust
 Manufacturing centers:
 Ceres Metals Industries of Lockton</desc>
         <event>
-            <date>2571-01-01</date>
+            <date>2540-01-01</date>
+            <faction>MOC</faction>
+        </event>
+		<event>
+            <date>2583-11-08</date>
+            <faction>MOC,SL</faction>
+        </event>
+		<event>
+            <date>2583-11-12</date>
+            <faction>SL</faction>
+        </event>
+        <event>
+            <date>2597-03-21</date>
             <faction>MOC</faction>
         </event>
     </planet>
@@ -63233,7 +63501,19 @@ Manufacturing centers:
 
 Alliance Aerospace Group</desc>
         <event>
-            <date>2571-01-01</date>
+            <date>2540-01-01</date>
+            <faction>MOC</faction>
+        </event>
+		<event>
+            <date>2584-06-10</date>
+            <faction>MOC,SL</faction>
+        </event>
+		<event>
+            <date>2584-07-12</date>
+            <faction>SL</faction>
+        </event>
+        <event>
+            <date>2597-03-21</date>
             <faction>MOC</faction>
         </event>
     </planet>
@@ -65166,6 +65446,14 @@ When the planet was rediscovered in the 31st century, the world was full of stra
             <date>2367-01-01</date>
             <faction>FWL</faction>
         </event>
+		<event>
+            <date>2578-01-09</date>
+            <faction>FWL,MOC</faction>
+        </event>
+		<event>
+            <date>2578-01-15</date>
+            <faction>FWL</faction>
+        </event>
         <event>
             <date>3014-03-22</date>
             <faction>FWLR</faction>
@@ -65329,7 +65617,19 @@ When the planet was rediscovered in the 31st century, the world was full of stra
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2596-09-22</date>
+            <date>2540-01-01</date>
+            <faction>MOC</faction>
+        </event>
+		<event>
+            <date>2583-03-26</date>
+            <faction>MOC,SL</faction>
+        </event>
+		<event>
+            <date>2583-03-28</date>
+            <faction>SL</faction>
+        </event>
+        <event>
+            <date>2597-03-21</date>
             <faction>MOC</faction>
         </event>
     </planet>
@@ -66869,7 +67169,7 @@ Menkib has 25 hour days and orbits its sun every 37 standard days.</desc>
         <lifeForm>NONE</lifeForm>
         <faction>UND</faction>
         <event>
-            <date>2571-01-01</date>
+            <date>2600-01-01</date>
             <faction>MOC</faction>
         </event>
         <event>
@@ -71848,7 +72148,19 @@ Neerabup is divided into provinces that are each ruled by a Publican. The Public
         <faction>UND</faction>
         <desc>3025 - New Abilene was settled in 2581 and since that time the planet has seen numerous battles between the Canopians and Taurians, vying for control of this border world. The planet's economy is primarily focused on agriculture with large tracts of land devoted to cattle and sheep farming. The planet is divided into numerous large baronies controlled by wealthy landowners who tend to own the largest herds on planet. There are numerous disputes between the Barons over water rights and the best grazing areas. Escalation in these disputes led to the hiring of "Range Riders", MechWarriors hired to serve the local barons, which only led to further fighting along the edges of the baronies. Eventually forces from the Magistracy were sent to act as frontier marshalls and to keep the peace.</desc>
         <event>
-            <date>2571-01-01</date>
+            <date>2540-01-01</date>
+            <faction>MOC</faction>
+        </event>
+		<event>
+            <date>2586-10-02</date>
+            <faction>MOC,SL</faction>
+        </event>
+		<event>
+            <date>2586-10-03</date>
+            <faction>SL</faction>
+        </event>
+        <event>
+            <date>2597-03-21</date>
             <faction>MOC</faction>
         </event>
     </planet>
@@ -74974,7 +75286,19 @@ Niops V and VI were settled primarily to expand the available resources to the N
             <faction>PIND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2540-01-01</date>
+            <faction>MOC</faction>
+        </event>
+		<event>
+            <date>2583-04-22</date>
+            <faction>MOC,SL</faction>
+        </event>
+		<event>
+            <date>2583-04-25</date>
+            <faction>SL</faction>
+        </event>
+        <event>
+            <date>2597-03-21</date>
             <faction>MOC</faction>
         </event>
         <event>
@@ -76336,15 +76660,19 @@ Today, Nusakan is home to a thriving population and reborn computer and electron
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2571-01-01</date>
+            <date>2540-01-01</date>
             <faction>MOC</faction>
         </event>
         <event>
-            <date>2596-09-22</date>
-            <faction>FWL</faction>
+            <date>2579-03-19</date>
+            <faction>MOC,SL</faction>
+        </event>
+		<event>
+            <date>2579-03-25</date>
+            <faction>SL</faction>
         </event>
         <event>
-            <date>2750-01-01</date>
+            <date>2597-03-21</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -78328,7 +78656,19 @@ Wunderland Enterprises</desc>
 Manufacturing centers:
 Novis AT-H, Incorporated</desc>
         <event>
-            <date>2571-01-01</date>
+            <date>2540-01-01</date>
+            <faction>MOC</faction>
+        </event>
+		<event>
+            <date>2586-05-10</date>
+            <faction>MOC,SL</faction>
+        </event>
+		<event>
+            <date>2586-05-25</date>
+            <faction>SL</faction>
+        </event>
+        <event>
+            <date>2597-03-21</date>
             <faction>MOC</faction>
         </event>
     </planet>
@@ -79374,23 +79714,23 @@ Challenge Systems</desc>
         <faction>UND</faction>
         <desc>Payvand is a relatively unimpressive world. Despite a comfortable atmosphere and climate the planet only has enough arable land to feed its population and while there are deposits of natural resources, they are far from abundant. The planet also supports only modest industry and its biggest claim to fame is as home to the second oldest Hero Training Institute facility. The Hero Training Institute is a for-profit training academy that will training any aspiring MechWarrior or Aerospace Pilot with enough money to afford their program. The facility is located in Payvand’s planetary capital Pejman on the Gooya continent. The academy uses the hills surrounding the capital for their training grounds.</desc>
         <event>
-            <date>2550-01-01</date>
-            <faction>MOC</faction>
-        </event>
-        <event>
-            <date>2571-01-01</date>
-            <faction>MOC</faction>
-        </event>
-        <event>
-            <date>2578-01-01</date>
-            <faction>MOC,FWL</faction>
-        </event>
-        <event>
-            <date>2579-01-01</date>
+            <date>2400-01-01</date>
             <faction>FWL</faction>
         </event>
+		<event>
+            <date>2553-01-01</date>
+            <faction>MOC</faction>
+        </event>
         <event>
-            <date>2596-09-22</date>
+            <date>2578-07-06</date>
+            <faction>MOC,SL</faction>
+        </event>
+		<event>
+            <date>2578-11-20</date>
+            <faction>SL</faction>
+        </event>
+        <event>
+            <date>2579-04-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -84782,17 +85122,26 @@ Magna Metals Incorporated</desc>
             <faction>IND</faction>
         </event>
         <event>
-            <date>2400-01-01</date>
+            <date>2540-01-01</date>
             <faction>MOC</faction>
         </event>
+		<event>
+            <date>2577-10-12</date>
+            <faction>MOC,SL</faction>
+        </event>
+		<event>
+            <date>2577-10-22</date>
+            <faction>SL</faction>
+        </event>
         <event>
-            <date>2596-09-22</date>
+            <date>2597-03-21</date>
             <faction>FWL</faction>
         </event>
         <event>
             <date>2925-01-01</date>
             <faction>ABN</faction>
         </event>
+		<landMass>(Magdeburg)</landMass>
     </planet>
     <planet>
         <xcood>-400.913</xcood>
@@ -86571,7 +86920,19 @@ The twin continents of Oxo and Xox are nearly mirror images of each other, almos
 Manufacturing centers:
 Foxx Infantry Systems</desc>
         <event>
-            <date>2571-01-01</date>
+            <date>2540-01-01</date>
+            <faction>MOC</faction>
+        </event>
+		<event>
+            <date>2582-03-02</date>
+            <faction>MOC,SL</faction>
+        </event>
+		<event>
+            <date>2582-03-06</date>
+            <faction>SL</faction>
+        </event>
+        <event>
+            <date>2597-03-21</date>
             <faction>MOC</faction>
         </event>
     </planet>
@@ -86852,15 +87213,23 @@ Under The Republic, Michaelson converted its helicopter designs to civilian use 
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2571-01-01</date>
-            <faction>MOC</faction>
-        </event>
-        <event>
-            <date>2596-09-22</date>
+            <date>2400-01-01</date>
             <faction>FWL</faction>
         </event>
+		<event>
+            <date>2553-01-01</date>
+            <faction>MOC</faction>
+        </event>
+		<event>
+            <date>2578-07-02</date>
+            <faction>MOC,SL</faction>
+        </event>
+		<event>
+            <date>2578-07-15</date>
+            <faction>SL</faction>
+        </event>
         <event>
-            <date>2750-01-01</date>
+            <date>2579-04-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -88461,7 +88830,15 @@ As of the 32nd century, this world is little more than an outpost, with no agric
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2596-09-22</date>
+            <date>2550-01-01</date>
+            <faction>FWL</faction>
+        </event>
+		<event>
+            <date>2578-01-09</date>
+            <faction>FWL,MOC</faction>
+        </event>
+		<event>
+            <date>2578-01-15</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -89404,16 +89781,24 @@ Although the fall of the First Star League brought an end to terraforming on Sch
             <date>2271-01-01</date>
             <faction>IND</faction>
         </event>
-        <event>
-            <date>2571-01-01</date>
-            <faction>MOC</faction>
-        </event>
-        <event>
-            <date>2596-09-22</date>
+		<event>
+            <date>2400-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
-            <date>2750-01-01</date>
+            <date>2553-01-01</date>
+            <faction>MOC</faction>
+        </event>
+        <event>
+            <date>2578-07-12</date>
+            <faction>MOC,SL</faction>
+        </event>
+		<event>
+            <date>2578-07-20</date>
+            <faction>SL</faction>
+        </event>
+        <event>
+            <date>2579-04-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -99110,7 +99495,19 @@ Alexandra is the 3rd planet in the Tanis system and is relatively temperate, tho
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2571-01-01</date>
+            <date>2540-01-01</date>
+            <faction>MOC</faction>
+        </event>
+		<event>
+            <date>2586-01-03</date>
+            <faction>MOC,SL</faction>
+        </event>
+		<event>
+            <date>2586-01-04</date>
+            <faction>SL</faction>
+        </event>
+        <event>
+            <date>2597-03-21</date>
             <faction>MOC</faction>
         </event>
     </planet>
@@ -100047,7 +100444,19 @@ Since the fall of the Star League, ten of the twenty huge atmosphere recondition
             <faction>PIND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2540-01-01</date>
+            <faction>MOC</faction>
+        </event>
+		<event>
+            <date>2582-09-03</date>
+            <faction>MOC,SL</faction>
+        </event>
+		<event>
+            <date>2582-11-06</date>
+            <faction>SL</faction>
+        </event>
+        <event>
+            <date>2597-03-21</date>
             <faction>MOC</faction>
         </event>
         <event>
@@ -100058,6 +100467,7 @@ Since the fall of the Star League, ten of the twenty huge atmosphere recondition
             <date>2895-01-01</date>
             <faction>ABN</faction>
         </event>
+		<landMass>(Tokhai)</landMass>
     </planet>
     <planet>
         <xcood>110.627</xcood>
@@ -101028,15 +101438,19 @@ Tharkad Aerospace Group</desc>
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2571-01-01</date>
+            <date>2540-01-01</date>
             <faction>MOC</faction>
         </event>
-        <event>
-            <date>2596-09-22</date>
-            <faction>FWL</faction>
+		<event>
+            <date>2583-07-15</date>
+            <faction>MOC,SL</faction>
+        </event>
+		<event>
+            <date>2583-07-16</date>
+            <faction>SL</faction>
         </event>
         <event>
-            <date>2900-01-01</date>
+            <date>2597-03-21</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -104606,15 +105020,23 @@ After its fall, humans continued to live on Tyrfing at a basic hunter-gatherer l
         <faction>UND</faction>
         <desc>Umka is a very hot planet with abundant water and massive deposits of rare natural resources. The planet has sufficient arable land to feed its population. Kerr-McGinnis is one of the major manufacturers on Umka and creates ‘Mech and combat vehicle armor in their factory located in Shenville, the planetary capital. Shenville is located on the Barajevo continent, in the foothills leading to a large mountain chain on the continent. Due to the cities location, rain is extremely common.</desc>
         <event>
-            <date>2571-01-01</date>
-            <faction>MOC</faction>
-        </event>
-        <event>
-            <date>2580-01-01</date>
+            <date>2400-01-01</date>
             <faction>FWL</faction>
         </event>
+		<event>
+            <date>2553-01-01</date>
+            <faction>MOC</faction>
+        </event>
+		<event>
+            <date>2577-08-03</date>
+            <faction>MOC,SL</faction>
+        </event>
         <event>
-            <date>2596-09-22</date>
+            <date>2577-10-26</date>
+            <faction>SL</faction>
+        </event>
+        <event>
+            <date>2597-03-21</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -105145,15 +105567,23 @@ In the centuries of the Succession Wars, Unukalhai was largely overlooked by inv
         <zenithCharge>false</zenithCharge>
         <faction>UND</faction>
         <event>
-            <date>2571-01-01</date>
-            <faction>MOC</faction>
-        </event>
-        <event>
-            <date>2596-09-22</date>
+            <date>2400-01-01</date>
             <faction>FWL</faction>
         </event>
+		<event>
+            <date>2553-01-01</date>
+            <faction>MOC</faction>
+        </event>
+		<event>
+            <date>2577-10-26</date>
+            <faction>MOC,SL</faction>
+        </event>
+		<event>
+            <date>2577-11-14</date>
+            <faction>SL</faction>
+        </event>
         <event>
-            <date>2750-01-01</date>
+            <date>2597-03-21</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -109200,11 +109630,19 @@ Presently, aside from the Games and the Hiring Hall, Westerhand does not feature
         <faction>UND</faction>
         <desc>3025 - Wildwood is a major agricultural world best known throughout the Magistracy of Canopus and into the Free Worlds League for its vineyards and fine wines. Much of the planet has been left undeveloped and the majority of the terrain remains virgin wilderness. The planet is sparsely populated beyond the handful of farms and vineyards and a small tourist trade that offers tours through the wilderness. Wildwood is popular among bird watchers for its unique avian population.</desc>
         <event>
-            <date>2571-01-01</date>
+            <date>2540-01-01</date>
             <faction>MOC</faction>
         </event>
+		<event>
+            <date>2585-07-07</date>
+            <faction>MOC,SL</faction>
+        </event>
+		<event>
+            <date>2585-07-08</date>
+            <faction>SL</faction>
+        </event>
         <event>
-            <date>2900-01-01</date>
+            <date>2597-03-21</date>
             <faction>MOC</faction>
         </event>
     </planet>
@@ -111576,7 +112014,19 @@ Laumer City is located on the continent of Saddleback and is home to Yegaus’ w
             <faction>IND</faction>
         </event>
         <event>
-            <date>2571-01-01</date>
+            <date>2540-01-01</date>
+            <faction>MOC</faction>
+        </event>
+		<event>
+            <date>2583-12-02</date>
+            <faction>MOC,SL</faction>
+        </event>
+		<event>
+            <date>2583-12-12</date>
+            <faction>SL</faction>
+        </event>
+        <event>
+            <date>2597-03-21</date>
             <faction>MOC</faction>
         </event>
         <event>
