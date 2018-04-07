@@ -7855,43 +7855,48 @@ public class Campaign implements Serializable, ITechManager {
                     && !((u.getEntity().getEntityType() & Entity.ETYPE_BATTLEARMOR) == Entity.ETYPE_BATTLEARMOR)) {
             	continue;
             }
-            if ((u.getEntity().getEntityType() & Entity.ETYPE_DROPSHIP) == Entity.ETYPE_DROPSHIP) {
+            if (u.getEntity().hasETypeFlag(Entity.ETYPE_DROPSHIP)) {
                 if (getCampaignOptions().getDropshipContractPercent() == 0) {
                     continue;
                 }
-                if (getCampaignOptions().useEquipmentContractSaleValue()) {
-                    value += (getCampaignOptions().getDropshipContractPercent() / 100) * u.getSellValue();
-                } else {
-                    value += (getCampaignOptions().getDropshipContractPercent() / 100) * u.getBuyCost();
-                }
-            } else if ((u.getEntity().getEntityType() & Entity.ETYPE_WARSHIP) == Entity.ETYPE_WARSHIP) {
+                value += getEquipmentContractValue(u, getCampaignOptions().useEquipmentContractSaleValue());
+            } else if (u.getEntity().hasETypeFlag(Entity.ETYPE_WARSHIP)) {
                 if (getCampaignOptions().getWarshipContractPercent() == 0) {
                     continue;
                 }
-                if (getCampaignOptions().useEquipmentContractSaleValue()) {
-                    value += (getCampaignOptions().getWarshipContractPercent() / 100) * u.getSellValue();
-                } else {
-                    value += (getCampaignOptions().getWarshipContractPercent() / 100) * u.getBuyCost();
-                }
-            } else if ((u.getEntity().getEntityType() & Entity.ETYPE_JUMPSHIP) == Entity.ETYPE_JUMPSHIP) {
+                value += getEquipmentContractValue(u, getCampaignOptions().useEquipmentContractSaleValue());
+            } else if (u.getEntity().hasETypeFlag(Entity.ETYPE_JUMPSHIP) || u.getEntity().hasETypeFlag(Entity.ETYPE_SPACE_STATION)) {
                 if (getCampaignOptions().getJumpshipContractPercent() == 0) {
                     continue;
                 }
-                if (getCampaignOptions().useEquipmentContractSaleValue()) {
-                    value += (getCampaignOptions().getJumpshipContractPercent() / 100) * u.getSellValue();
-                } else {
-                    value += (getCampaignOptions().getJumpshipContractPercent() / 100) * u.getBuyCost();
-                }
+                value += getEquipmentContractValue(u, getCampaignOptions().useEquipmentContractSaleValue());
             } else {
-                // we will assume sale value for now, but make this customizable
-                if (getCampaignOptions().useEquipmentContractSaleValue()) {
-                    value += (getCampaignOptions().getEquipmentContractPercent() / 100.0) * u.getSellValue();
-                } else {
-                    value += (getCampaignOptions().getEquipmentContractPercent() / 100.0) * u.getBuyCost();
-                }
+                value += getEquipmentContractValue(u, getCampaignOptions().useEquipmentContractSaleValue());
             }
         }
         return value;
+    }
+
+    public long getEquipmentContractValue(Unit u, boolean useSaleValue) {
+        long value;
+        long percentValue = 0;
+        if (useSaleValue) {
+            value = u.getSellValue();
+        } else {
+            value = u.getBuyCost();
+        }
+
+        if (u.getEntity().hasETypeFlag(Entity.ETYPE_DROPSHIP)) {
+            percentValue = (long) ((getCampaignOptions().getDropshipContractPercent() / 100) * value);
+        } else if (u.getEntity().hasETypeFlag(Entity.ETYPE_WARSHIP)) {
+            percentValue = (long) ((getCampaignOptions().getWarshipContractPercent() / 100) * value);
+        } else if (u.getEntity().hasETypeFlag(Entity.ETYPE_JUMPSHIP) || u.getEntity().hasETypeFlag(Entity.ETYPE_SPACE_STATION)) {
+            percentValue = (long) ((getCampaignOptions().getJumpshipContractPercent() / 100) * value);
+        } else {
+            percentValue = (long) ((getCampaignOptions().getEquipmentContractPercent() / 100) * value);
+        }
+
+        return percentValue;
     }
 
     public long getContractBase() {
