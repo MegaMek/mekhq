@@ -97,6 +97,7 @@ import megamek.common.SmallCraft;
 import megamek.common.Tank;
 import megamek.common.TargetRoll;
 import megamek.common.TechConstants;
+import megamek.common.Warship;
 import megamek.common.loaders.BLKFile;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.logging.LogLevel;
@@ -7910,28 +7911,61 @@ public class Campaign implements Serializable, ITechManager {
             if (null == u) {
                 continue;
             }
-            if (noInfantry && u.getEntity() instanceof Infantry && !(u.getEntity() instanceof BattleArmor)) {
+            if (noInfantry && ((u.getEntity().getEntityType() & Entity.ETYPE_INFANTRY) == Entity.ETYPE_INFANTRY)
+                    && !((u.getEntity().getEntityType() & Entity.ETYPE_BATTLEARMOR) == Entity.ETYPE_BATTLEARMOR)) {
             	continue;
             }
-            // lets exclude dropships and jumpships
-            if (u.getEntity() instanceof Dropship
-                || u.getEntity() instanceof Jumpship) {
-                continue;
-            }
-            // we will assume sale value for now, but make this customizable
-            if (getCampaignOptions().useEquipmentContractSaleValue()) {
-                value += u.getSellValue();
+            if (u.getEntity().hasETypeFlag(Entity.ETYPE_DROPSHIP)) {
+                if (getCampaignOptions().getDropshipContractPercent() == 0) {
+                    continue;
+                }
+                value += getEquipmentContractValue(u, getCampaignOptions().useEquipmentContractSaleValue());
+            } else if (u.getEntity().hasETypeFlag(Entity.ETYPE_WARSHIP)) {
+                if (getCampaignOptions().getWarshipContractPercent() == 0) {
+                    continue;
+                }
+                value += getEquipmentContractValue(u, getCampaignOptions().useEquipmentContractSaleValue());
+            } else if (u.getEntity().hasETypeFlag(Entity.ETYPE_JUMPSHIP) || u.getEntity().hasETypeFlag(Entity.ETYPE_SPACE_STATION)) {
+                if (getCampaignOptions().getJumpshipContractPercent() == 0) {
+                    continue;
+                }
+                value += getEquipmentContractValue(u, getCampaignOptions().useEquipmentContractSaleValue());
             } else {
-                value += u.getBuyCost();
+                value += getEquipmentContractValue(u, getCampaignOptions().useEquipmentContractSaleValue());
             }
         }
         return value;
     }
 
+    public long getEquipmentContractValue(Unit u, boolean useSaleValue) {
+        long value;
+        long percentValue = 0;
+        if (useSaleValue) {
+            value = u.getSellValue();
+        } else {
+            value = u.getBuyCost();
+        }
+
+        if (u.getEntity().hasETypeFlag(Entity.ETYPE_DROPSHIP)) {
+            percentValue = (long) ((getCampaignOptions().getDropshipContractPercent() / 100) * value);
+        } else if (u.getEntity().hasETypeFlag(Entity.ETYPE_WARSHIP)) {
+            percentValue = (long) ((getCampaignOptions().getWarshipContractPercent() / 100) * value);
+        } else if (u.getEntity().hasETypeFlag(Entity.ETYPE_JUMPSHIP) || u.getEntity().hasETypeFlag(Entity.ETYPE_SPACE_STATION)) {
+            percentValue = (long) ((getCampaignOptions().getJumpshipContractPercent() / 100) * value);
+        } else {
+            percentValue = (long) ((getCampaignOptions().getEquipmentContractPercent() / 100) * value);
+        }
+
+        return percentValue;
+    }
+
     public long getContractBase() {
-        if (getCampaignOptions().useEquipmentContractBase()) {
-            return (long) ((getCampaignOptions().getEquipmentContractPercent() / 100.0)
-            		* getForceValue(getCampaignOptions().useInfantryDontCount()));
+        if (getCampaignOptions().usePeacetimeCost()) {
+            double peacetimecost = (getPeacetimeCost() * .75) +
+                    getForceValue(getCampaignOptions().useInfantryDontCount());
+            return (long) peacetimecost;
+        } else if (getCampaignOptions().useEquipmentContractBase()) {
+            return getForceValue(getCampaignOptions().useInfantryDontCount());
         } else {
             return getPayRoll(getCampaignOptions().useInfantryDontCount());
         }
