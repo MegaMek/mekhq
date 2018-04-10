@@ -2689,8 +2689,9 @@ public class Campaign implements Serializable, ITechManager {
 
         processNewDayUnits();
 
-        // check for anything else in finances
+        // check for anything in finances
         finances.newDay(this);
+
         MekHQ.triggerEvent(new NewDayEvent(this));
         return true;
     }
