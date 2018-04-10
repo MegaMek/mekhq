@@ -38,9 +38,12 @@ import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.event.LoanDefaultedEvent;
 import mekhq.campaign.event.TransactionCreditEvent;
 import mekhq.campaign.event.TransactionDebitEvent;
+import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.Contract;
 
 /**
  *
@@ -231,6 +234,122 @@ public class Finances implements Serializable {
 	}
 
 	public void newDay(Campaign campaign) {
+        DecimalFormat formatter = new DecimalFormat();
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        GregorianCalendar calendar = campaign.getCalendar();
+
+        // check for a new year
+        if (calendar.get(Calendar.MONTH) == 0 && calendar.get(Calendar.DAY_OF_MONTH) == 1) {
+            // clear the ledger
+            newFiscalYear(calendar.getTime());
+        }
+
+        // Handle contract payments
+        if (calendar.get(Calendar.DAY_OF_MONTH) == 1) {
+            for (Contract contract : campaign.getActiveContracts()) {
+                credit(contract.getMonthlyPayOut(), Transaction.C_CONTRACT,
+                        "Monthly payment for " + contract.getName(), calendar.getTime());
+                campaign.addReport("Your account has been credited for " + formatter.format(contract.getMonthlyPayOut())
+                        + " C-bills for the monthly payout from contract " + contract.getName());
+
+                if (campaignOptions.getUseAtB() && campaignOptions.getUseShareSystem()
+                        && contract instanceof AtBContract) {
+                    long shares = contract.getMonthlyPayOut() * ((AtBContract) contract).getSharesPct() / 100;
+                    if (debit(shares, Transaction.C_SALARY, "Shares payments for " + contract.getName(),
+                            calendar.getTime())) {
+                        campaign.addReport(formatter.format(shares) + " C-bills have been distributed as shares.");
+                    } else {
+                        /*
+                         * This should not happen, as the shares payment is less than the contract
+                         * payment that has just been made.
+                         */
+                        campaign.addReport(
+                                "<font color='red'><b>You cannot afford to pay shares!</b></font> Lucky for you that personnel morale is not yet implemented.");
+                    }
+                }
+            }
+        }
+
+        // Handle assets
+        for (Asset asset : assets) {
+            if (asset.getSchedule() == SCHEDULE_YEARLY && campaign.calendar.get(Calendar.DAY_OF_YEAR) == 1) {
+                credit(asset.getIncome(), Transaction.C_MISC, "income from " + asset.getName(),
+                        campaign.getCalendar().getTime());
+                campaign.addReport("Your account has been credited for "
+                        + DecimalFormat.getInstance().format(asset.getIncome()) + " C-bills from " + asset.getName());
+            } else if (asset.getSchedule() == SCHEDULE_MONTHLY && campaign.calendar.get(Calendar.DAY_OF_MONTH) == 1) {
+                credit(asset.getIncome(), Transaction.C_MISC, "income from " + asset.getName(),
+                        campaign.getCalendar().getTime());
+                campaign.addReport("Your account has been credited for "
+                        + DecimalFormat.getInstance().format(asset.getIncome()) + " C-bills from " + asset.getName());
+            }
+        }
+
+        // Handle peacetime operating expenses && payroll
+        if (calendar.get(Calendar.DAY_OF_MONTH) == 1 && campaignOptions.usePeacetimeCost()) {
+            if (!campaignOptions.showPeacetimeCost()) {
+                if (debit(campaign.getPeacetimeCost(), Transaction.C_MAINTAIN, "Monthly Peacetime Operating Costs",
+                        calendar.getTime())) {
+                    campaign.addReport("Your account has been debited " + formatter.format(campaign.getPeacetimeCost())
+                            + " C-bills for peacetime operating costs");
+                } else {
+                    campaign.addReport(
+                            "<font color='red'><b>You cannot afford to pay operating costs!</b></font> Lucky for you that this does not appear to have any effect.");
+                }
+            } else {
+                if (debit(campaign.getMonthlySpareParts(), Transaction.C_MAINTAIN, "Monthly Spare Parts",
+                        calendar.getTime())) {
+                    campaign.addReport("Your account has been debited "
+                            + formatter.format(campaign.getMonthlySpareParts()) + " C-bills for spare parts");
+                } else {
+                    campaign.addReport(
+                            "<font color='red'><b>You cannot afford to pay for spare parts!</b></font> Lucky for you that this does not appear to have any effect.");
+                }
+                if (debit(campaign.getMonthlyAmmo(), Transaction.C_MAINTAIN, "Monthly Ammunition",
+                        calendar.getTime())) {
+                    campaign.addReport("Your account has been debited " + formatter.format(campaign.getMonthlyAmmo())
+                            + " C-bills for training munitions");
+                } else {
+                    campaign.addReport(
+                            "<font color='red'><b>You cannot afford to pay for training munitions!</b></font> Lucky for you that this does not appear to have any effect.");
+                }
+                if (debit(campaign.getMonthlyFuel(), Transaction.C_MAINTAIN, "Monthly Fuel bill", calendar.getTime())) {
+                    campaign.addReport("Your account has been debited " + formatter.format(campaign.getMonthlyFuel())
+                            + " C-bills for fuel");
+                } else {
+                    campaign.addReport(
+                            "<font color='red'><b>You cannot afford to pay for fuel!</b></font> Lucky for you that this does not appear to have any effect.");
+                }
+                if (debit(campaign.getPayRoll(), Transaction.C_SALARY, "Monthly salaries", calendar.getTime())) {
+                    campaign.addReport(
+                            "Payday! Your account has been debited for " + formatter.format(campaign.getPayRoll())
+                            + " C-bills in personnel salaries");
+                } else {
+                    campaign.addReport(
+                            "<font color='red'><b>You cannot afford to pay payroll costs!</b></font> Lucky for you that personnel morale is not yet implemented.");
+                }
+            }
+        } else if (campaignOptions.payForSalaries()) {
+            if (debit(campaign.getPayRoll(), Transaction.C_SALARY, "Monthly salaries", calendar.getTime())) {
+                campaign.addReport("Payday! Your account has been debited for "
+                        + formatter.format(campaign.getPayRoll()) + " C-bills in personnel salaries");
+            } else {
+                campaign.addReport(
+                        "<font color='red'><b>You cannot afford to pay payroll costs!</b></font> Lucky for you that personnel morale is not yet implemented.");
+            }
+        }
+
+        // Handle overhead expenses
+        if (campaignOptions.payForOverhead()) {
+            if (debit(campaign.getOverheadExpenses(), Transaction.C_OVERHEAD, "Monthly overhead", calendar.getTime())) {
+                campaign.addReport("Your account has been debited for "
+                        + formatter.format(campaign.getOverheadExpenses()) + " C-bills in overhead expenses");
+            } else {
+                campaign.addReport(
+                        "<font color='red'><b>You cannot afford to pay overhead costs!</b></font> Lucky for you that this does not appear to have any effect.");
+            }
+        }
+
 	    ArrayList<Loan> newLoans = new ArrayList<Loan>();
 	    for(Loan loan : loans) {
 	        if(loan.checkLoanPayment(campaign.getCalendar())) {
@@ -252,15 +371,6 @@ public class Finances implements Serializable {
             wentIntoDebt = null;
         }
 	    loans = newLoans;
-	    for(Asset asset : assets) {
-	        if(asset.getSchedule() == SCHEDULE_YEARLY && campaign.calendar.get(Calendar.DAY_OF_YEAR) == 1) {
-	            credit(asset.getIncome(), Transaction.C_MISC, "income from " + asset.getName(), campaign.getCalendar().getTime());
-                campaign.addReport("Your account has been credited for " + DecimalFormat.getInstance().format(asset.getIncome()) + " C-bills from " + asset.getName());
-	        } else if(asset.getSchedule() == SCHEDULE_MONTHLY && campaign.calendar.get(Calendar.DAY_OF_MONTH) == 1) {
-	            credit(asset.getIncome(), Transaction.C_MISC, "income from " + asset.getName(), campaign.getCalendar().getTime());
-                campaign.addReport("Your account has been credited for " + DecimalFormat.getInstance().format(asset.getIncome()) + " C-bills from " + asset.getName());
-	        }
-	    }
 	}
 
 	public long checkOverdueLoanPayments(Campaign campaign) {

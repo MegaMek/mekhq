@@ -2280,233 +2280,213 @@ public class Campaign implements Serializable, ITechManager {
         }
         return Math.max(total, role);
     }
-
-    /** @return <code>true</code> if the new day arrived */
-    public boolean newDay() {
-        if(MekHQ.triggerEvent(new DayEndingEvent(this))) {
-            return false;
-        }
-        calendar.add(Calendar.DAY_OF_MONTH, 1);
-        currentReport.clear();
-        currentReportHTML = "";
-        newReports.clear();
-        addReport("<b>" + getDateAsString() + "</b>");
-
-        if (calendar.get(Calendar.DAY_OF_YEAR) == 1) {
-            reloadNews();
-        }
-
-        // Ensure that the MegaMek year GameOption matches the campaign year
-        if (gameOptions.intOption("year") != getGameYear()) {
-            gameOptions.getOption("year").setValue(getGameYear());
-        }
-
-        readNews();
-
-        location.newDay(this);
-
-        // Manage the personnel market
-        personnelMarket.generatePersonnelForDay(this);
-
-        if (campaignOptions.getUseAtB()) {
-            contractMarket.generateContractOffers(this);
-            unitMarket.generateUnitOffers(this);
-
-            if (shipSearchExpiration != null && !shipSearchExpiration.after(calendar)) {
-                shipSearchExpiration = null;
-                if (shipSearchResult != null) {
-                    addReport("Opportunity for purchase of " + shipSearchResult + " has expired.");
-                    shipSearchResult = null;
-                }
+    
+    private void processNewDayATBScenarios() {
+        for (Mission m : missions) {
+            if (!m.isActive() || !(m instanceof AtBContract) || getDate().before(((Contract) m).getStartDate())) {
+                continue;
             }
-
-            if (getCalendar().get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY) {
-                processShipSearch();
-            }
-
-            // Add or remove dependents
-            if (calendar.get(Calendar.DAY_OF_YEAR) == 1) {
-                int numPersonnel = 0;
-                ArrayList<Person> dependents = new ArrayList<Person>();
-                for (Person p : personnel) {
-                    if (p.isActive()) {
-                        numPersonnel++;
-                        if (p.isDependent()) {
-                            dependents.add(p);
-                        }
-                    }
-                }
-                int roll = Compute.d6(2) + getUnitRatingMod() - 2;
-                if (roll < 2)
-                    roll = 2;
-                if (roll > 12)
-                    roll = 12;
-                int change = numPersonnel * (roll - 5) / 100;
-                while (change < 0 && dependents.size() > 0) {
-                    removePerson(Utilities.getRandomItem(dependents).getId());
-                    change++;
-                }
-                for (int i = 0; i < change; i++) {
-                    Person p = newPerson(Person.T_ASTECH);
-                    p.setDependent(true);
-                    p.setId(UUID.randomUUID());
-                    addPersonWithoutId(p, true);
-                }
-            }
-
-            if (calendar.get(Calendar.DAY_OF_MONTH) == 1) {
+            /*
+             * Situations like a delayed start or running out of funds during transit can
+             * delay arrival until after the contract start. In that case, shift the
+             * starting and ending dates before making any battle rolls. We check that the
+             * unit is actually on route to the planet in case the user is using a custom
+             * system for transport or splitting the unit, etc.
+             */
+            if (!getLocation().isOnPlanet() && // null != getLocation().getJumpPath() &&
+                    getLocation().getJumpPath().getLastPlanet().getId().equals(m.getPlanetName())) {
                 /*
-                 * First of the month; update employer/enemy tables, roll morale, track unit
-                 * fatigue.
+                 * transitTime is measured in days; round up to the next whole day, then convert
+                 * to milliseconds
                  */
-
-                RandomFactionGenerator.getInstance().updateTables(calendar.getTime(), location.getCurrentPlanet(),
-                        campaignOptions);
-                IUnitRating rating = getUnitRating();
-                rating.reInitialize();
-
-                for (Mission m : missions) {
-                    if (m.isActive() && m instanceof AtBContract
-                            && !((AtBContract) m).getStartDate().after(getDate())) {
-                        ((AtBContract) m).checkMorale(calendar, getUnitRatingMod());
-                        addReport("Enemy morale is now " + ((AtBContract) m).getMoraleLevelName() + " on contract "
-                                + m.getName());
-                    }
-                }
-
-                // Account for fatigue
-                if (getCampaignOptions().getTrackUnitFatigue()) {
-                    boolean inContract = false;
-                    for (Mission m : missions) {
-                        if (!m.isActive() || !(m instanceof AtBContract)
-                                || getDate().before(((Contract) m).getStartDate())) {
-                            continue;
-                        }
-                        switch (((AtBContract) m).getMissionType()) {
-                            case AtBContract.MT_GARRISONDUTY:
-                            case AtBContract.MT_SECURITYDUTY:
-                            case AtBContract.MT_CADREDUTY:
-                                fatigueLevel -= 1;
-                                break;
-                            case AtBContract.MT_RIOTDUTY:
-                            case AtBContract.MT_GUERRILLAWARFARE:
-                            case AtBContract.MT_PIRATEHUNTING:
-                                fatigueLevel += 1;
-                                break;
-                            case AtBContract.MT_RELIEFDUTY:
-                            case AtBContract.MT_PLANETARYASSAULT:
-                                fatigueLevel += 2;
-                                break;
-                            case AtBContract.MT_DIVERSIONARYRAID:
-                            case AtBContract.MT_EXTRACTIONRAID:
-                            case AtBContract.MT_RECONRAID:
-                            case AtBContract.MT_OBJECTIVERAID:
-                                fatigueLevel += 3;
-                                break;
-                        }
-                        inContract = true;
-                    }
-                    if (!inContract && location.isOnPlanet()) {
-                        fatigueLevel -= 2;
-                    }
-                    fatigueLevel = Math.max(fatigueLevel, 0);
-                }
+                GregorianCalendar cal = (GregorianCalendar) calendar.clone();
+                cal.add(Calendar.DATE, (int) Math.ceil(getLocation().getTransitTime()));
+                ((AtBContract) m).getStartDate().setTime(cal.getTimeInMillis());
+                cal.add(Calendar.MONTH, ((AtBContract) m).getLength());
+                ((AtBContract) m).getEndingDate().setTime(cal.getTimeInMillis());
+                addReport(
+                        "The start and end dates of " + m.getName() + " have been shifted to reflect the current ETA.");
+                continue;
             }
-
-            for (Mission m : missions) {
-                if (!m.isActive() || !(m instanceof AtBContract) || getDate().before(((Contract) m).getStartDate())) {
-                    continue;
-                }
-                /*
-                 * Situations like a delayed start or running out of funds during transit can
-                 * delay arrival until after the contract start. In that case, shift the
-                 * starting and ending dates before making any battle rolls. We check that the
-                 * unit is actually on route to the planet in case the user is using a custom
-                 * system for transport or splitting the unit, etc.
-                 */
-                if (!getLocation().isOnPlanet() && // null != getLocation().getJumpPath() &&
-                        getLocation().getJumpPath().getLastPlanet().getId().equals(m.getPlanetName())) {
-                    /*
-                     * transitTime is measured in days; round up to the next whole day, then convert
-                     * to milliseconds
-                     */
-                    GregorianCalendar cal = (GregorianCalendar) calendar.clone();
-                    cal.add(Calendar.DATE, (int) Math.ceil(getLocation().getTransitTime()));
-                    ((AtBContract) m).getStartDate().setTime(cal.getTimeInMillis());
-                    cal.add(Calendar.MONTH, ((AtBContract) m).getLength());
-                    ((AtBContract) m).getEndingDate().setTime(cal.getTimeInMillis());
-                    addReport("The start and end dates of " + m.getName()
-                            + " have been shifted to reflect the current ETA.");
-                    continue;
-                }
-                if (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY) {
-                    int deficit = getDeploymentDeficit((AtBContract) m);
-                    if (deficit > 0) {
-                        ((AtBContract) m).addPlayerMinorBreaches(deficit);
-                        addReport("Failure to meet " + m.getName() + " requirements resulted in " + deficit
-                                + ((deficit == 1) ? " minor contract breach" : " minor contract breaches"));
-                    }
-                }
-
-                for (Scenario s : m.getScenarios()) {
-                    if (!s.isCurrent() || !(s instanceof AtBScenario)) {
-                        continue;
-                    }
-                    if (s.getDate().before(calendar.getTime())) {
-                        s.setStatus(Scenario.S_DEFEAT);
-                        s.clearAllForcesAndPersonnel(this);
-                        ((AtBContract) m).addPlayerMinorBreach();
-                        addReport("Failure to deploy for " + s.getName()
-                                + " resulted in defeat and a minor contract breach.");
-                        ((AtBScenario) s).generateStub(this);
-                    }
-                }
-            }
-
             if (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY) {
-                AtBScenarioFactory.createScenariosForNewWeek(this, true);
+                int deficit = getDeploymentDeficit((AtBContract) m);
+                if (deficit > 0) {
+                    ((AtBContract) m).addPlayerMinorBreaches(deficit);
+                    addReport("Failure to meet " + m.getName() + " requirements resulted in " + deficit
+                            + ((deficit == 1) ? " minor contract breach" : " minor contract breaches"));
+                }
             }
+
+            for (Scenario s : m.getScenarios()) {
+                if (!s.isCurrent() || !(s instanceof AtBScenario)) {
+                    continue;
+                }
+                if (s.getDate().before(calendar.getTime())) {
+                    s.setStatus(Scenario.S_DEFEAT);
+                    s.clearAllForcesAndPersonnel(this);
+                    ((AtBContract) m).addPlayerMinorBreach();
+                    addReport("Failure to deploy for " + s.getName()
+                            + " resulted in defeat and a minor contract breach.");
+                    ((AtBScenario) s).generateStub(this);
+                }
+            }
+        }
+
+        if (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY) {
+            AtBScenarioFactory.createScenariosForNewWeek(this, true);
+        }
+
+        for (Mission m : missions) {
+            if (m.isActive() && m instanceof AtBContract && !((AtBContract) m).getStartDate().after(getDate())) {
+                ((AtBContract) m).checkEvents(this);
+            }
+            /*
+             * If there is a standard battle set for today, deploy the lance.
+             */
+            for (Scenario s : m.getScenarios()) {
+                if (s.getDate() != null && s.getDate().equals(calendar.getTime())) {
+                    int forceId = ((AtBScenario) s).getLanceForceId();
+                    if (null != lances.get(forceId) && !forceIds.get(forceId).isDeployed()) {
+
+                        // If any unit in the force is under repair, don't deploy the force
+                        // Merely removing the unit from deployment would break with user expectation
+                        boolean forceUnderRepair = false;
+                        for (UUID uid : forceIds.get(forceId).getAllUnits()) {
+                            Unit u = getUnit(uid);
+                            if (null != u && u.isUnderRepair()) {
+                                forceUnderRepair = true;
+                                break;
+                            }
+                        }
+
+                        if (!forceUnderRepair) {
+                            forceIds.get(forceId).setScenarioId(s.getId());
+                            s.addForces(forceId);
+                            for (UUID uid : forceIds.get(forceId).getAllUnits()) {
+                                Unit u = getUnit(uid);
+                                if (null != u) {
+                                    u.setScenarioId(s.getId());
+                                }
+                            }
+                            MekHQ.triggerEvent(new DeploymentChangedEvent(forceIds.get(forceId), s));
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private void processNewDayATBFatigue() {
+        boolean inContract = false;
+        for (Mission m : missions) {
+            if (!m.isActive() || !(m instanceof AtBContract) || getDate().before(((Contract) m).getStartDate())) {
+                continue;
+            }
+            switch (((AtBContract) m).getMissionType()) {
+                case AtBContract.MT_GARRISONDUTY:
+                case AtBContract.MT_SECURITYDUTY:
+                case AtBContract.MT_CADREDUTY:
+                    fatigueLevel -= 1;
+                    break;
+                case AtBContract.MT_RIOTDUTY:
+                case AtBContract.MT_GUERRILLAWARFARE:
+                case AtBContract.MT_PIRATEHUNTING:
+                    fatigueLevel += 1;
+                    break;
+                case AtBContract.MT_RELIEFDUTY:
+                case AtBContract.MT_PLANETARYASSAULT:
+                    fatigueLevel += 2;
+                    break;
+                case AtBContract.MT_DIVERSIONARYRAID:
+                case AtBContract.MT_EXTRACTIONRAID:
+                case AtBContract.MT_RECONRAID:
+                case AtBContract.MT_OBJECTIVERAID:
+                    fatigueLevel += 3;
+                    break;
+            }
+            inContract = true;
+        }
+        if (!inContract && location.isOnPlanet()) {
+            fatigueLevel -= 2;
+        }
+        fatigueLevel = Math.max(fatigueLevel, 0);
+    }
+
+    private void processNewDayATB() {
+        contractMarket.generateContractOffers(this);
+        unitMarket.generateUnitOffers(this);
+
+        if (shipSearchExpiration != null && !shipSearchExpiration.after(calendar)) {
+            shipSearchExpiration = null;
+            if (shipSearchResult != null) {
+                addReport("Opportunity for purchase of " + shipSearchResult + " has expired.");
+                shipSearchResult = null;
+            }
+        }
+
+        if (getCalendar().get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY) {
+            processShipSearch();
+        }
+
+        // Add or remove dependents
+        if (calendar.get(Calendar.DAY_OF_YEAR) == 1) {
+            int numPersonnel = 0;
+            ArrayList<Person> dependents = new ArrayList<Person>();
+            for (Person p : personnel) {
+                if (p.isActive()) {
+                    numPersonnel++;
+                    if (p.isDependent()) {
+                        dependents.add(p);
+                    }
+                }
+            }
+            int roll = Compute.d6(2) + getUnitRatingMod() - 2;
+            if (roll < 2)
+                roll = 2;
+            if (roll > 12)
+                roll = 12;
+            int change = numPersonnel * (roll - 5) / 100;
+            while (change < 0 && dependents.size() > 0) {
+                removePerson(Utilities.getRandomItem(dependents).getId());
+                change++;
+            }
+            for (int i = 0; i < change; i++) {
+                Person p = newPerson(Person.T_ASTECH);
+                p.setDependent(true);
+                p.setId(UUID.randomUUID());
+                addPersonWithoutId(p, true);
+            }
+        }
+
+        if (calendar.get(Calendar.DAY_OF_MONTH) == 1) {
+            /*
+             * First of the month; update employer/enemy tables, roll morale, track unit
+             * fatigue.
+             */
+
+            RandomFactionGenerator.getInstance().updateTables(calendar.getTime(), location.getCurrentPlanet(),
+                    campaignOptions);
+            IUnitRating rating = getUnitRating();
+            rating.reInitialize();
 
             for (Mission m : missions) {
                 if (m.isActive() && m instanceof AtBContract && !((AtBContract) m).getStartDate().after(getDate())) {
-                    ((AtBContract) m).checkEvents(this);
+                    ((AtBContract) m).checkMorale(calendar, getUnitRatingMod());
+                    addReport("Enemy morale is now " + ((AtBContract) m).getMoraleLevelName() + " on contract "
+                            + m.getName());
                 }
-                /*
-                 * If there is a standard battle set for today, deploy the lance.
-                 */
-                for (Scenario s : m.getScenarios()) {
-                    if (s.getDate() != null && s.getDate().equals(calendar.getTime())) {
-                        int forceId = ((AtBScenario) s).getLanceForceId();
-                        if (null != lances.get(forceId) && !forceIds.get(forceId).isDeployed()) {
+            }
 
-                            // If any unit in the force is under repair, don't deploy the force
-                            // Merely removing the unit from deployment would break with user expectation
-                            boolean forceUnderRepair = false;
-                            for (UUID uid : forceIds.get(forceId).getAllUnits()) {
-                                Unit u = getUnit(uid);
-                                if (null != u && u.isUnderRepair()) {
-                                    forceUnderRepair = true;
-                                    break;
-                                }
-                            }
-
-                            if (!forceUnderRepair) {
-                                forceIds.get(forceId).setScenarioId(s.getId());
-                                s.addForces(forceId);
-                                for (UUID uid : forceIds.get(forceId).getAllUnits()) {
-                                    Unit u = getUnit(uid);
-                                    if (null != u) {
-                                        u.setScenarioId(s.getId());
-                                    }
-                                }
-                                MekHQ.triggerEvent(new DeploymentChangedEvent(forceIds.get(forceId), s));
-                            }
-                        }
-                    }
-                }
+            // Account for fatigue
+            if (getCampaignOptions().getTrackUnitFatigue()) {
+                processNewDayATBFatigue();
             }
         }
 
+        processNewDayATBScenarios();
+    }
+
+    public void processNewDayPersonnel() {
         ArrayList<Person> babies = new ArrayList<Person>();
         for (Person p : getPersonnel()) {
             if (!p.isActive()) {
@@ -2547,39 +2527,43 @@ public class Campaign implements Serializable, ITechManager {
                 }
             }
             // TODO Advanced Medical needs to go away from here later on
-            if(getCampaignOptions().useAdvancedMedical()) {
+            if (getCampaignOptions().useAdvancedMedical()) {
                 InjuryUtil.resolveDailyHealing(this, p);
                 Unit u = getUnit(p.getUnitId());
                 if (null != u) {
                     u.resetPilotAndEntity();
                 }
             }
-            if (getCampaignOptions().getIdleXP() > 0
-                    && calendar.get(Calendar.DAY_OF_MONTH) == 1 && p.isActive() && !p.isPrisoner()) { // Prisoners no
-                                                                                                      // XP, Bondsmen
-                                                                                                      // yes xp
+
+            if (getCampaignOptions().getIdleXP() > 0 && calendar.get(Calendar.DAY_OF_MONTH) == 1 && p.isActive()
+                    && !p.isPrisoner()) { // Prisoners no
+                                          // XP, Bondsmen
+                                          // yes xp
                 p.setIdleMonths(p.getIdleMonths() + 1);
                 if (p.getIdleMonths() >= getCampaignOptions().getMonthsIdleXP()) {
                     if (Compute.d6(2) >= getCampaignOptions().getTargetIdleXP()) {
                         p.setXp(p.getXp() + getCampaignOptions().getIdleXP());
-                        addReport(p.getHyperlinkedFullTitle() + " has gained "
-                                + getCampaignOptions().getIdleXP() + " XP");
+                        addReport(p.getHyperlinkedFullTitle() + " has gained " + getCampaignOptions().getIdleXP()
+                                + " XP");
                     }
                     p.setIdleMonths(0);
                 }
             }
 
         }
+
         for (Person baby : babies) {
             addPersonWithoutId(baby, false);
         }
-        resetAstechMinutes();
+    }
 
-        shoppingList.newDay(this);
-
-        //need to loop through units twice, the first time to do all maintenance and the second
-        //time to do whatever else. Otherwise, maintenance minutes might get sucked up by other
-        //stuff. This is also a good place to ensure that a unit's engineer gets reset and updated.
+    public void processNewDayUnits() {
+        // need to loop through units twice, the first time to do all maintenance and
+        // the second
+        // time to do whatever else. Otherwise, maintenance minutes might get sucked up
+        // by other
+        // stuff. This is also a good place to ensure that a unit's engineer gets reset
+        // and updated.
         for (Unit u : getUnits()) {
             u.resetEngineer();
             if (null != u.getEngineer()) {
@@ -2606,7 +2590,7 @@ public class Campaign implements Serializable, ITechManager {
             }
         }
 
-        //arrive parts before attempting refit or parts will not get reserved that day
+        // arrive parts before attempting refit or parts will not get reserved that day
         for (int pid : arrivedPartIds) {
             Part part = getPart(pid);
             if (null != part) {
@@ -2614,7 +2598,7 @@ public class Campaign implements Serializable, ITechManager {
             }
         }
 
-        //finish up any overnight assigned tasks
+        // finish up any overnight assigned tasks
         for (int pid : assignedPartIds) {
             Part part = getPart(pid);
             if (null != part) {
@@ -2625,15 +2609,19 @@ public class Campaign implements Serializable, ITechManager {
                     tech = getPerson(part.getTeamId());
                 }
                 if (null != tech) {
-                    if(null != tech.getSkillForWorkingOn(part)) {
+                    if (null != tech.getSkillForWorkingOn(part)) {
                         fixPart(part, tech);
                     } else {
-                        addReport(String.format("%s looks at %s, recalls his total lack of skill for working with such technology, then slowly puts the tools down before anybody gets hurt.",
+                        addReport(String.format(
+                                "%s looks at %s, recalls his total lack of skill for working with such technology, then slowly puts the tools down before anybody gets hurt.",
                                 tech.getHyperlinkedFullTitle(), part.getName()));
                         part.setTeamId(null);
                     }
                 } else {
-                    JOptionPane.showMessageDialog(null, "Could not find tech for part: "+part.getName()+" on unit: "+part.getUnit().getHyperlinkedName(), "Invalid Auto-continue", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null,
+                            "Could not find tech for part: " + part.getName() + " on unit: "
+                                    + part.getUnit().getHyperlinkedName(),
+                            "Invalid Auto-continue", JOptionPane.ERROR_MESSAGE);
                 }
                 // check to see if this part can now be combined with other
                 // spare parts
@@ -2647,7 +2635,7 @@ public class Campaign implements Serializable, ITechManager {
             }
         }
 
-        //ok now we can check for other stuff we might need to do to units
+        // ok now we can check for other stuff we might need to do to units
         for (Unit u : getUnits()) {
             if (u.isRefitting()) {
                 refit(u.getRefit());
@@ -2659,113 +2647,55 @@ public class Campaign implements Serializable, ITechManager {
                 u.checkArrival();
             }
         }
+    }
 
-        DecimalFormat formatter = new DecimalFormat();
-        // check for a new year
-        if (calendar.get(Calendar.MONTH) == 0
-                && calendar.get(Calendar.DAY_OF_MONTH) == 1) {
-            // clear the ledger
-            finances.newFiscalYear(calendar.getTime());
+    /** @return <code>true</code> if the new day arrived */
+    public boolean newDay() {
+        if(MekHQ.triggerEvent(new DayEndingEvent(this))) {
+            return false;
         }
 
-        if (calendar.get(Calendar.DAY_OF_MONTH) == 1) {
-            // check for contract payments
-            for (Contract contract : getActiveContracts()) {
-                finances.credit(contract.getMonthlyPayOut(),
-                        Transaction.C_CONTRACT, "Monthly payment for " + contract.getName(), calendar.getTime());
-                addReport("Your account has been credited for "
-                        + formatter.format(contract.getMonthlyPayOut())
-                        + " C-bills for the monthly payout from contract " + contract.getName());
+        calendar.add(Calendar.DAY_OF_MONTH, 1);
+        currentReport.clear();
+        currentReportHTML = "";
+        newReports.clear();
+        addReport("<b>" + getDateAsString() + "</b>");
 
-                if (campaignOptions.getUseAtB() && campaignOptions.getUseShareSystem()
-                        && contract instanceof AtBContract) {
-                    long shares = contract.getMonthlyPayOut() * ((AtBContract) contract).getSharesPct() / 100;
-                    if (finances.debit(shares, Transaction.C_SALARY, "Shares payments for " + contract.getName(),
-                            calendar.getTime())) {
-                        addReport(formatter.format(shares) + " C-bills have been distributed as shares.");
-                    } else {
-                        /*
-                         * This should not happen, as the shares payment is less than the contract
-                         * payment that has just been made.
-                         */
-                        addReport(
-                                "<font color='red'><b>You cannot afford to pay shares!</b></font> Lucky for you that personnel morale is not yet implemented.");
-                    }
-                }
-            }
-            // Payday!
-            if (campaignOptions.usePeacetimeCost()) {
-                if (!campaignOptions.showPeacetimeCost()) {
-                    if (finances.debit(getPeacetimeCost(), Transaction.C_MAINTAIN, "Monthly Peacetime Operating Costs", calendar.getTime())) {
-                        addReport("Your account has been debited "
-                                + formatter.format(getPeacetimeCost())
-                                + " C-bills for peacetime operating costs");
-                    } else {
-                        addReport("<font color='red'><b>You cannot afford to pay operating costs!</b></font> Lucky for you that this does not appear to have any effect.");
-                    }
-                } else {
-                    if (finances.debit(getMonthlySpareParts(), Transaction.C_MAINTAIN,
-                            "Monthly Spare Parts", calendar.getTime())) {
-                        addReport("Your account has been debited "
-                                + formatter.format(getMonthlySpareParts())
-                                + " C-bills for spare parts");
-                    } else {
-                        addReport("<font color='red'><b>You cannot afford to pay for spare parts!</b></font> Lucky for you that this does not appear to have any effect.");
-                    }
-                    if (finances.debit(getMonthlyAmmo(), Transaction.C_MAINTAIN,
-                            "Monthly Ammunition", calendar.getTime())) {
-                        addReport("Your account has been debited "
-                                + formatter.format(getMonthlyAmmo())
-                                + " C-bills for training munitions");
-                    } else {
-                        addReport("<font color='red'><b>You cannot afford to pay for training munitions!</b></font> Lucky for you that this does not appear to have any effect.");
-                    }
-                    if (finances.debit(getMonthlyFuel(), Transaction.C_MAINTAIN,
-                            "Monthly Fuel bill", calendar.getTime())) {
-                        addReport("Your account has been debited "
-                                + formatter.format(getMonthlyFuel())
-                                + " C-bills for fuel");
-                    } else {
-                        addReport("<font color='red'><b>You cannot afford to pay for fuel!</b></font> Lucky for you that this does not appear to have any effect.");
-                    }
-                    if (finances.debit(getPayRoll(), Transaction.C_SALARY,
-                            "Monthly salaries", calendar.getTime())) {
-                        addReport("Payday! Your account has been debited for "
-                                + formatter.format(getPayRoll())
-                                + " C-bills in personnel salaries");
-                    } else {
-                        addReport("<font color='red'><b>You cannot afford to pay payroll costs!</b></font> Lucky for you that personnel morale is not yet implemented.");
-                    }
-                }
-            } else if (campaignOptions.payForSalaries()) {
-                if (finances.debit(getPayRoll(), Transaction.C_SALARY,
-                        "Monthly salaries", calendar.getTime())) {
-                    addReport("Payday! Your account has been debited for "
-                            + formatter.format(getPayRoll())
-                            + " C-bills in personnel salaries");
-                } else {
-                    addReport("<font color='red'><b>You cannot afford to pay payroll costs!</b></font> Lucky for you that personnel morale is not yet implemented.");
-                }
-            }
-            if (campaignOptions.payForOverhead()) {
-                if (finances.debit(getOverheadExpenses(),
-                        Transaction.C_OVERHEAD, "Monthly overhead",
-                        calendar.getTime())) {
-                    addReport("Your account has been debited for "
-                            + formatter.format(getOverheadExpenses())
-                            + " C-bills in overhead expenses");
-                } else {
-                    addReport("<font color='red'><b>You cannot afford to pay overhead costs!</b></font> Lucky for you that this does not appear to have any effect.");
-                }
-            }
+        if (calendar.get(Calendar.DAY_OF_YEAR) == 1) {
+            reloadNews();
         }
+
+        // Ensure that the MegaMek year GameOption matches the campaign year
+        if (gameOptions.intOption("year") != getGameYear()) {
+            gameOptions.getOption("year").setValue(getGameYear());
+        }
+
+        readNews();
+
+        location.newDay(this);
+
+        // Manage the personnel market
+        personnelMarket.generatePersonnelForDay(this);
+
+        if (campaignOptions.getUseAtB()) {
+            processNewDayATB();
+        }
+
+        processNewDayPersonnel();
+
+        resetAstechMinutes();
+
+        shoppingList.newDay(this);
+
+        processNewDayUnits();
+
         // check for anything else in finances
         finances.newDay(this);
         MekHQ.triggerEvent(new NewDayEvent(this));
         return true;
     }
 
-    private ArrayList<Contract> getActiveContracts() {
+    public ArrayList<Contract> getActiveContracts() {
         ArrayList<Contract> active = new ArrayList<Contract>();
         for (Mission m : getMissions()) {
             if (!(m instanceof Contract)) {
@@ -9164,7 +9094,7 @@ public class Campaign implements Serializable, ITechManager {
         return cost;
     }
 
-    private long getMonthlySpareParts() {
+    public long getMonthlySpareParts() {
         long partsCost = 0;
 
         for (Unit u : getUnits()) {
@@ -9176,7 +9106,7 @@ public class Campaign implements Serializable, ITechManager {
         return partsCost;
     }
 
-    private long getMonthlyFuel() {
+    public long getMonthlyFuel() {
         long fuelCost = 0;
 
         for (Unit u : getUnits()) {
@@ -9188,7 +9118,7 @@ public class Campaign implements Serializable, ITechManager {
         return fuelCost;
     }
 
-    private long getMonthlyAmmo() {
+    public long getMonthlyAmmo() {
         long ammoCost= 0;
 
         for (Unit u : getUnits()) {
