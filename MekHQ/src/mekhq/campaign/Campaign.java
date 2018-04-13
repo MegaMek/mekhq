@@ -686,46 +686,48 @@ public class Campaign implements Serializable, ITechManager {
 
     public boolean applyRetirement(long totalPayout, HashMap<UUID, UUID> unitAssignments) {
 		if (null != getRetirementDefectionTracker().getRetirees()) {
-			if (getFinances().debit(totalPayout,
-					Transaction.C_SALARY, "Final Payout", getDate())) {
-				for (UUID pid : getRetirementDefectionTracker().getRetirees()) {
-					if (getPerson(pid).isActive()) {
-						changeStatus(getPerson(pid), Person.S_RETIRED);
-						addReport(getPerson(pid).getFullName() + " has retired.");
-					}
-					if (Person.T_NONE != getRetirementDefectionTracker().getPayout(pid).getRecruitType()) {
-						getPersonnelMarket().addPerson(newPerson(getRetirementDefectionTracker().getPayout(pid).getRecruitType()));
-					}
-					if (getRetirementDefectionTracker().getPayout(pid).hasHeir()) {
-						Person p = newPerson(getPerson(pid).getPrimaryRole());
-						p.setOriginalUnitWeight(getPerson(pid).getOriginalUnitWeight());
-						p.setOriginalUnitTech(getPerson(pid).getOriginalUnitTech());
-						p.setOriginalUnitId(getPerson(pid).getOriginalUnitId());
-						if (unitAssignments.containsKey(pid)) {
-							getPersonnelMarket().addPerson(p, getUnit(unitAssignments.get(pid)).getEntity());
-						} else {
-							getPersonnelMarket().addPerson(p);
-						}
-					}
-					int dependents = getRetirementDefectionTracker().getPayout(pid).getDependents();
-			    	while(dependents > 0 ) {
-			    		Person p = newPerson(Person.T_ASTECH);
-			    		p.setDependent(true);
-			    		if (recruitPerson(p)) {
-			    			dependents--;
-			    		} else {
-			    			dependents = 0;
-			    		}
-			    	}
-					if (unitAssignments.containsKey(pid)) {
-						removeUnit(unitAssignments.get(pid));
-					}
-				}
-				getRetirementDefectionTracker().resolveAllContracts();
-				return true;
-			} else {
-				addReport("<font color='red'>You cannot afford to make the final payments.</font>");
-			}
+            if (totalPayout > 0) {
+                if (getFinances().debit(totalPayout, Transaction.C_SALARY, "Final Payout", getDate())) {
+                    for (UUID pid : getRetirementDefectionTracker().getRetirees()) {
+                        if (getPerson(pid).isActive()) {
+                            changeStatus(getPerson(pid), Person.S_RETIRED);
+                            addReport(getPerson(pid).getFullName() + " has retired.");
+                        }
+                        if (Person.T_NONE != getRetirementDefectionTracker().getPayout(pid).getRecruitType()) {
+                            getPersonnelMarket().addPerson(
+                                    newPerson(getRetirementDefectionTracker().getPayout(pid).getRecruitType()));
+                        }
+                        if (getRetirementDefectionTracker().getPayout(pid).hasHeir()) {
+                            Person p = newPerson(getPerson(pid).getPrimaryRole());
+                            p.setOriginalUnitWeight(getPerson(pid).getOriginalUnitWeight());
+                            p.setOriginalUnitTech(getPerson(pid).getOriginalUnitTech());
+                            p.setOriginalUnitId(getPerson(pid).getOriginalUnitId());
+                            if (unitAssignments.containsKey(pid)) {
+                                getPersonnelMarket().addPerson(p, getUnit(unitAssignments.get(pid)).getEntity());
+                            } else {
+                                getPersonnelMarket().addPerson(p);
+                            }
+                        }
+                        int dependents = getRetirementDefectionTracker().getPayout(pid).getDependents();
+                        while (dependents > 0) {
+                            Person p = newPerson(Person.T_ASTECH);
+                            p.setDependent(true);
+                            if (recruitPerson(p)) {
+                                dependents--;
+                            } else {
+                                dependents = 0;
+                            }
+                        }
+                        if (unitAssignments.containsKey(pid)) {
+                            removeUnit(unitAssignments.get(pid));
+                        }
+                    }
+                    getRetirementDefectionTracker().resolveAllContracts();
+                    return true;
+                } else {
+                    addReport("<font color='red'>You cannot afford to make the final payments.</font>");
+                }
+            }
 		}
 		return false;
     }
@@ -7010,7 +7012,7 @@ public class Campaign implements Serializable, ITechManager {
             for (Enumeration<IOption> j = group.getOptions(); j
                     .hasMoreElements(); ) {
                 IOption option = j.nextElement();
-                options.add((IBasicOption) option);
+                options.add(option);
             }
         }
         return options;
