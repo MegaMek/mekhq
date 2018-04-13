@@ -165,7 +165,7 @@ public class Mission implements Serializable, MekHqXmlSerializable {
 	}
 	
 	public boolean isActive() {
-		return status ==S_ACTIVE;
+        return status == S_ACTIVE;
 	}
 	
 	public void removeScenario(int id) {
@@ -196,7 +196,8 @@ public class Mission implements Serializable, MekHqXmlSerializable {
 		return false;
 	}
 	
-	public void writeToXml(PrintWriter pw1, int indent) {
+	@Override
+    public void writeToXml(PrintWriter pw1, int indent) {
 		writeToXmlBegin(pw1, indent);
 		writeToXmlEnd(pw1, indent);
 	}

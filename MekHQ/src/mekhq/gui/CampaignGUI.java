@@ -1377,7 +1377,7 @@ public class CampaignGUI extends JPanel {
     }
 
     private void advanceDay() {
-        // first check for overdue loan payments - dont allow advancement until
+        // first check for overdue loan payments - don't allow advancement until
         // these are addressed
         if (getCampaign().checkOverDueLoans()) {
             refreshFunds();
