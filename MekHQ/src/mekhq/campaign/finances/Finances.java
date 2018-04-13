@@ -29,11 +29,13 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.ResourceBundle;
 
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
@@ -55,6 +57,8 @@ public class Finances implements Serializable {
 	 *
 	 */
 	private static final long serialVersionUID = 8533117455496219692L;
+
+    private ResourceBundle resourceMap;
 
 	private ArrayList<Transaction> transactions;
 	private ArrayList<Loan> loans;
@@ -91,6 +95,9 @@ public class Finances implements Serializable {
 	    loanDefaults = 0;
 	    failCollateral = 0;
 	    wentIntoDebt = null;
+
+        // Init the resource map
+        resourceMap = ResourceBundle.getBundle("mekhq.resources.Finances", new EncodeControl()); //$NON-NLS-1$
 	}
 
 	public long getBalance() {
@@ -158,7 +165,7 @@ public class Finances implements Serializable {
 	public void newFiscalYear(Date date) {
 		long carryover = getBalance();
 		transactions = new ArrayList<Transaction>();
-		credit(carryover, Transaction.C_START, "Carryover from previous year", date);
+        credit(carryover, Transaction.C_START, resourceMap.getString("Carryover.text"), date);
 	}
 
 	public ArrayList<Transaction> getAllTransactions() {
@@ -248,23 +255,26 @@ public class Finances implements Serializable {
         if (calendar.get(Calendar.DAY_OF_MONTH) == 1) {
             for (Contract contract : campaign.getActiveContracts()) {
                 credit(contract.getMonthlyPayOut(), Transaction.C_CONTRACT,
-                        "Monthly payment for " + contract.getName(), calendar.getTime());
-                campaign.addReport("Your account has been credited for " + formatter.format(contract.getMonthlyPayOut())
-                        + " C-bills for the monthly payout from contract " + contract.getName());
+                        String.format(resourceMap.getString("MonthlyContractPayment.text"), contract.getName()),
+                        calendar.getTime());
+                campaign.addReport(String.format(resourceMap.getString("ContractPaymentCredit.text"),
+                        formatter.format(contract.getMonthlyPayOut()), contract.getName()));
 
                 if (campaignOptions.getUseAtB() && campaignOptions.getUseShareSystem()
                         && contract instanceof AtBContract) {
                     long shares = contract.getMonthlyPayOut() * ((AtBContract) contract).getSharesPct() / 100;
-                    if (debit(shares, Transaction.C_SALARY, "Shares payments for " + contract.getName(),
+                    if (debit(shares, Transaction.C_SALARY,
+                            String.format(resourceMap.getString("ContractSharePayment.text"), contract.getName()),
                             calendar.getTime())) {
-                        campaign.addReport(formatter.format(shares) + " C-bills have been distributed as shares.");
+                        campaign.addReport(String.format(resourceMap.getString("DistributedShares.text"),
+                                formatter.format(shares)));
                     } else {
                         /*
                          * This should not happen, as the shares payment is less than the contract
                          * payment that has just been made.
                          */
                         campaign.addReport(
-                                "<font color='red'><b>You cannot afford to pay shares!</b></font> Lucky for you that personnel morale is not yet implemented.");
+                                String.format(resourceMap.getString("NotImplemented.text"), "shares"));
                     }
                 }
             }
@@ -275,96 +285,99 @@ public class Finances implements Serializable {
             if (asset.getSchedule() == SCHEDULE_YEARLY && campaign.calendar.get(Calendar.DAY_OF_YEAR) == 1) {
                 credit(asset.getIncome(), Transaction.C_MISC, "income from " + asset.getName(),
                         campaign.getCalendar().getTime());
-                campaign.addReport("Your account has been credited for "
-                        + DecimalFormat.getInstance().format(asset.getIncome()) + " C-bills from " + asset.getName());
+                campaign.addReport(String.format(resourceMap.getString("AssetPayment.text"),
+                        DecimalFormat.getInstance().format(asset.getIncome()), asset.getName()));
             } else if (asset.getSchedule() == SCHEDULE_MONTHLY && campaign.calendar.get(Calendar.DAY_OF_MONTH) == 1) {
                 credit(asset.getIncome(), Transaction.C_MISC, "income from " + asset.getName(),
                         campaign.getCalendar().getTime());
-                campaign.addReport("Your account has been credited for "
-                        + DecimalFormat.getInstance().format(asset.getIncome()) + " C-bills from " + asset.getName());
+                campaign.addReport(String.format(resourceMap.getString("AssetPayment.text"),
+                        DecimalFormat.getInstance().format(asset.getIncome()), asset.getName()));
             }
         }
 
         // Handle peacetime operating expenses && payroll
         if (calendar.get(Calendar.DAY_OF_MONTH) == 1 && campaignOptions.usePeacetimeCost()) {
             if (!campaignOptions.showPeacetimeCost()) {
-                if (debit(campaign.getPeacetimeCost(), Transaction.C_MAINTAIN, "Monthly Peacetime Operating Costs",
+                if (debit(campaign.getPeacetimeCost(), Transaction.C_MAINTAIN,
+                        resourceMap.getString("PeacetimeCosts.title"),
                         calendar.getTime())) {
-                    campaign.addReport("Your account has been debited " + formatter.format(campaign.getPeacetimeCost())
-                            + " C-bills for peacetime operating costs");
+                    campaign.addReport(String.format(resourceMap.getString("PeacetimeCosts.text"),
+                            formatter.format(campaign.getPeacetimeCost())));
                 } else {
                     campaign.addReport(
-                            "<font color='red'><b>You cannot afford to pay operating costs!</b></font> Lucky for you that this does not appear to have any effect.");
+                            String.format(resourceMap.getString("NotImplemented.text"), "for operating costs"));
                 }
             } else {
-                if (debit(campaign.getMonthlySpareParts(), Transaction.C_MAINTAIN, "Monthly Spare Parts",
+                if (debit(campaign.getMonthlySpareParts(), Transaction.C_MAINTAIN,
+                        resourceMap.getString("PeacetimeCostsParts.title"),
                         calendar.getTime())) {
-                    campaign.addReport("Your account has been debited "
-                            + formatter.format(campaign.getMonthlySpareParts()) + " C-bills for spare parts");
+                    campaign.addReport(String.format(resourceMap.getString("PeacetimeCostsParts.text"),
+                            formatter.format(campaign.getMonthlySpareParts())));
                 } else {
                     campaign.addReport(
-                            "<font color='red'><b>You cannot afford to pay for spare parts!</b></font> Lucky for you that this does not appear to have any effect.");
+                            String.format(resourceMap.getString("NotImplemented.text"), "for spare parts"));
                 }
-                if (debit(campaign.getMonthlyAmmo(), Transaction.C_MAINTAIN, "Monthly Ammunition",
+                if (debit(campaign.getMonthlyAmmo(), Transaction.C_MAINTAIN,
+                        resourceMap.getString("PeacetimeCostsAmmunition.title"),
                         calendar.getTime())) {
-                    campaign.addReport("Your account has been debited " + formatter.format(campaign.getMonthlyAmmo())
-                            + " C-bills for training munitions");
+                    campaign.addReport(String.format(resourceMap.getString("PeacetimeCostsAmmunition.text"),
+                            formatter.format(campaign.getMonthlySpareParts())));
                 } else {
                     campaign.addReport(
-                            "<font color='red'><b>You cannot afford to pay for training munitions!</b></font> Lucky for you that this does not appear to have any effect.");
+                            String.format(resourceMap.getString("NotImplemented.text"), "for training munitions"));
                 }
-                if (debit(campaign.getMonthlyFuel(), Transaction.C_MAINTAIN, "Monthly Fuel bill", calendar.getTime())) {
-                    campaign.addReport("Your account has been debited " + formatter.format(campaign.getMonthlyFuel())
-                            + " C-bills for fuel");
+                if (debit(campaign.getMonthlyFuel(), Transaction.C_MAINTAIN,
+                        resourceMap.getString("PeacetimeCostsFuel.title"), calendar.getTime())) {
+                    campaign.addReport(String.format(resourceMap.getString("PeacetimeCostsFuel.text"),
+                            formatter.format(campaign.getMonthlySpareParts())));
                 } else {
                     campaign.addReport(
-                            "<font color='red'><b>You cannot afford to pay for fuel!</b></font> Lucky for you that this does not appear to have any effect.");
-                }
-                if (debit(campaign.getPayRoll(), Transaction.C_SALARY, "Monthly salaries", calendar.getTime())) {
-                    campaign.addReport(
-                            "Payday! Your account has been debited for " + formatter.format(campaign.getPayRoll())
-                            + " C-bills in personnel salaries");
-                } else {
-                    campaign.addReport(
-                            "<font color='red'><b>You cannot afford to pay payroll costs!</b></font> Lucky for you that personnel morale is not yet implemented.");
+                            String.format(resourceMap.getString("NotImplemented.text"), "for fuel"));
                 }
             }
-        } else if (campaignOptions.payForSalaries()) {
-            if (debit(campaign.getPayRoll(), Transaction.C_SALARY, "Monthly salaries", calendar.getTime())) {
-                campaign.addReport("Payday! Your account has been debited for "
-                        + formatter.format(campaign.getPayRoll()) + " C-bills in personnel salaries");
+        }
+        if (campaignOptions.payForSalaries()) {
+            if (debit(campaign.getPayRoll(), Transaction.C_SALARY, resourceMap.getString("Salaries.title"),
+                    calendar.getTime())) {
+                campaign.addReport(
+                        String.format(resourceMap.getString("Salaries.text"), formatter.format(campaign.getPayRoll())));
             } else {
                 campaign.addReport(
-                        "<font color='red'><b>You cannot afford to pay payroll costs!</b></font> Lucky for you that personnel morale is not yet implemented.");
+                        String.format(resourceMap.getString("NotImplemented.text"), "payroll costs"));
             }
         }
 
         // Handle overhead expenses
         if (campaignOptions.payForOverhead()) {
-            if (debit(campaign.getOverheadExpenses(), Transaction.C_OVERHEAD, "Monthly overhead", calendar.getTime())) {
-                campaign.addReport("Your account has been debited for "
-                        + formatter.format(campaign.getOverheadExpenses()) + " C-bills in overhead expenses");
+            if (debit(campaign.getOverheadExpenses(), Transaction.C_OVERHEAD, resourceMap.getString("Overhead.title"),
+                    calendar.getTime())) {
+                campaign.addReport(String.format(resourceMap.getString("Overhead.text"),
+                        formatter.format(campaign.getOverheadExpenses())));
             } else {
                 campaign.addReport(
-                        "<font color='red'><b>You cannot afford to pay overhead costs!</b></font> Lucky for you that this does not appear to have any effect.");
+                        String.format(resourceMap.getString("NotImplemented.text"), "overhead costs"));
             }
         }
 
 	    ArrayList<Loan> newLoans = new ArrayList<Loan>();
 	    for(Loan loan : loans) {
 	        if(loan.checkLoanPayment(campaign.getCalendar())) {
-	           if(debit(loan.getPaymentAmount(), Transaction.C_LOAN_PAYMENT, "loan payment to " + loan.getDescription(), campaign.getCalendar().getTime())) {
-	               campaign.addReport("Your account has been debited for " + DecimalFormat.getInstance().format(loan.getPaymentAmount()) + " C-bills in loan payment to " + loan.getDescription());
+                if (debit(loan.getPaymentAmount(), Transaction.C_LOAN_PAYMENT,
+                        String.format(resourceMap.getString("Loan.title"), loan.getDescription()),
+                        campaign.getCalendar().getTime())) {
+                    campaign.addReport(String.format(resourceMap.getString("Loan.text"),
+                            DecimalFormat.getInstance().format(loan.getPaymentAmount()), loan.getDescription()));
 	               loan.paidLoan();
 	           } else {
-                   campaign.addReport("<font color='red'><b>You have insufficient funds to service the debt on loan " + loan.getDescription() + "!</b></font> Funds required: " + DecimalFormat.getInstance().format(loan.getPaymentAmount()));
+                    campaign.addReport(String.format(resourceMap.getString("Loan.insufficient"), loan.getDescription(),
+                            DecimalFormat.getInstance().format(loan.getPaymentAmount())));
                    loan.setOverdue(true);
 	           }
 	        }
 	        if(loan.getRemainingPayments() > 0) {
 	            newLoans.add(loan);
 	        } else {
-	            campaign.addReport("You have fully paid off loan " + loan.getDescription());
+                campaign.addReport(String.format(resourceMap.getString("Loan.paid"), loan.getDescription()));
 	        }
 	    }
 	    if(null != wentIntoDebt && !isInDebt()) {
@@ -378,8 +391,11 @@ public class Finances implements Serializable {
 	    long overdueAmount = 0;
 	    for(Loan loan : loans) {
             if(loan.isOverdue()) {
-               if(debit(loan.getPaymentAmount(), Transaction.C_LOAN_PAYMENT, "loan payment " + loan.getDescription(), campaign.getCalendar().getTime())) {
-                   campaign.addReport("Your account has been debited for " + DecimalFormat.getInstance().format(loan.getPaymentAmount()) + " C-bills in loan payment to " + loan.getDescription());
+                if (debit(loan.getPaymentAmount(), Transaction.C_LOAN_PAYMENT,
+                        String.format(resourceMap.getString("Loan.title"), loan.getDescription()),
+                        campaign.getCalendar().getTime())) {
+                    campaign.addReport(String.format(resourceMap.getString("Loan.text"),
+                            DecimalFormat.getInstance().format(loan.getPaymentAmount()), loan.getDescription()));
                    loan.paidLoan();
                } else {
                    overdueAmount += loan.getPaymentAmount();
@@ -388,7 +404,7 @@ public class Finances implements Serializable {
             if(loan.getRemainingPayments() > 0) {
                 newLoans.add(loan);
             } else {
-                campaign.addReport("You have fully paid off loan " + loan.getDescription());
+                campaign.addReport(String.format(resourceMap.getString("Loan.paid"), loan.getDescription()));
             }
 	    }
 	    loans = newLoans;
