@@ -1,6 +1,8 @@
 VERSION HISTORY:
 ----------------
 v0.43.10-git
++ Issue #698: Once again able to acquire ammo using GM mode "acquire immediately"
++ Issue #680: Fix calculation of contract payment based on large craft value
 + Issue #639: Campaign Ops rating now properly reflects infantry skill and more accurately calculates combat unit transport capacity
 + Issue #688: Cannot slot Endo Steel crits
 + Issue #668: Empty heat sink/double heat sink omnipods not available for Purchase Parts
