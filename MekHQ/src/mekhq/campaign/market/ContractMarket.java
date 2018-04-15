@@ -375,11 +375,11 @@ public class ContractMarket implements Serializable {
 				(contract.getMissionType() == AtBContract.MT_RELIEFDUTY && Compute.d6() < 4) ||
 				contract.getEnemyCode().equals("REB"));
 		if (isAttacker) {
-			contract.setPlanetName(RandomFactionGenerator.getInstance().getMissionTarget(contract.getEmployerCode(), contract.getEnemyCode(), campaign.getDate(), campaign.getCurrentPlanet(), searchRadius));
+			contract.setPlanetId(RandomFactionGenerator.getInstance().getMissionTarget(contract.getEmployerCode(), contract.getEnemyCode(), campaign.getDate(), campaign.getCurrentPlanet(), searchRadius));
 		} else {
-			contract.setPlanetName(RandomFactionGenerator.getInstance().getMissionTarget(contract.getEnemyCode(), contract.getEmployerCode(), campaign.getDate(), campaign.getCurrentPlanet(), searchRadius));
+			contract.setPlanetId(RandomFactionGenerator.getInstance().getMissionTarget(contract.getEnemyCode(), contract.getEmployerCode(), campaign.getDate(), campaign.getCurrentPlanet(), searchRadius));
 		}
-		if (contract.getPlanetName() == null) {
+        if (contract.getPlanet() == null) {
 		    MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.WARNING,
 		            "Could not find contract location for " //$NON-NLS-1$
 		                    + contract.getEmployerCode() + " vs. " + contract.getEnemyCode()); //$NON-NLS-1$
@@ -483,7 +483,7 @@ public class ContractMarket implements Serializable {
 				contract.getMissionType() >= AtBContract.MT_PLANETARYASSAULT ||
 				(contract.getMissionType() == AtBContract.MT_RELIEFDUTY && Compute.d6() < 4) ||
 				contract.getEnemyCode().equals("REB"));
-        contract.setPlanetName(parent.getPlanetName());
+        contract.setPlanetId(parent.getPlanetId(null));
 		setAllyRating(contract, isAttacker, campaign.getCalendar().get(Calendar.YEAR));
 		setEnemyRating(contract, isAttacker, campaign.getCalendar().get(Calendar.YEAR));
 
@@ -523,7 +523,7 @@ public class ContractMarket implements Serializable {
 		AtBContract followup = new AtBContract("Followup Contract");
 		followup.setEmployerCode(contract.getEmployerCode(), campaign.getGameYear());
 		followup.setEnemyCode(contract.getEnemyCode());
-		followup.setPlanetName(contract.getPlanetName());
+		followup.setPlanetId(contract.getPlanetId(null));
 		switch (contract.getMissionType()) {
 		case AtBContract.MT_DIVERSIONARYRAID:
 			followup.setMissionType(AtBContract.MT_OBJECTIVERAID);

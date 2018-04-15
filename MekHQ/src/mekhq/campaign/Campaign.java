@@ -2296,7 +2296,7 @@ public class Campaign implements Serializable, ITechManager {
              * system for transport or splitting the unit, etc.
              */
             if (!getLocation().isOnPlanet() && // null != getLocation().getJumpPath() &&
-                    getLocation().getJumpPath().getLastPlanet().getId().equals(m.getPlanetName())) {
+                    getLocation().getJumpPath().getLastPlanet().getId().equals(m.getPlanetId(null))) {
                 /*
                  * transitTime is measured in days; round up to the next whole day, then convert
                  * to milliseconds

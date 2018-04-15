@@ -27,8 +27,10 @@ import java.util.ResourceBundle;
 import javax.swing.BorderFactory;
 
 import megamek.common.util.EncodeControl;
+import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Mission;
+import mekhq.campaign.universe.Planets;
 import mekhq.gui.utilities.JSuggestField;
 
 /**
@@ -134,7 +136,7 @@ public class CustomizeMissionDialog extends javax.swing.JDialog {
 
         suggestPlanet = new JSuggestField(this, campaign.getPlanetNames());
         if(!newMission) {
-        	suggestPlanet.setText(mission.getPlanetName());
+            suggestPlanet.setText(mission.getPlanet().getName(null));
         }
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -170,6 +172,7 @@ public class CustomizeMissionDialog extends javax.swing.JDialog {
         btnOK.setText(resourceMap.getString("btnOkay.text")); // NOI18N
         btnOK.setName("btnOK"); // NOI18N
         btnOK.addActionListener(new java.awt.event.ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnOKActionPerformed(evt);
             }
@@ -185,6 +188,7 @@ public class CustomizeMissionDialog extends javax.swing.JDialog {
         btnClose.setText(resourceMap.getString("btnCancel.text")); // NOI18N
         btnClose.setName("btnClose"); // NOI18N
         btnClose.addActionListener(new java.awt.event.ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnCloseActionPerformed(evt);
             }
@@ -205,7 +209,8 @@ public class CustomizeMissionDialog extends javax.swing.JDialog {
 
     	mission.setName(txtName.getText());
     	mission.setType(txtType.getText());
-    	mission.setPlanetName(suggestPlanet.getText());
+        mission.setPlanetId((Planets.getInstance().getPlanetByName(suggestPlanet.getText(),
+                Utilities.getDateTimeDay(campaign.getCalendar()))).getId());
     	mission.setDesc(txtDesc.getText());
     	if(newMission) {
     		campaign.addMission(mission);

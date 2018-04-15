@@ -25,6 +25,7 @@ import java.io.Serializable;
 import java.text.ParseException;
 import java.util.ArrayList;
 
+import org.joda.time.DateTime;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -60,7 +61,7 @@ public class Mission implements Serializable, MekHqXmlSerializable {
 	public static final int S_NUM     = 4;
 	
 	private String name;
-	protected String planetName;
+	protected String planetId;
 	private int status;
 	private String desc;
 	private String type;
@@ -73,7 +74,7 @@ public class Mission implements Serializable, MekHqXmlSerializable {
 	
 	public Mission(String n) {
 		this.name = n;
-		this.planetName = "Unknown Planet";
+		this.planetId = "Unknown Planet";
 		this.desc = "";
 		this.type = "";
 		this.status = S_ACTIVE;
@@ -110,16 +111,16 @@ public class Mission implements Serializable, MekHqXmlSerializable {
 		this.type = t;
 	}
 	
-	public String getPlanetName() {
-		return planetName;
+	public String getPlanetId(DateTime when) {
+		return getPlanet().getName(when);
 	}
 	
-	public void setPlanetName(String n) {
-		this.planetName = n;
+	public void setPlanetId(String n) {
+		this.planetId = n;
 	}
 	
     public Planet getPlanet() {
-        return Planets.getInstance().getPlanetById(planetName);
+        return Planets.getInstance().getPlanetById(planetId);
     }
 
 	public String getDescription() {
@@ -217,9 +218,9 @@ public class Mission implements Serializable, MekHqXmlSerializable {
 				+MekHqXmlUtil.escape(type)
 				+"</type>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<planetName>"
-				+MekHqXmlUtil.escape(planetName)
-				+"</planetName>");
+                + "<planetId>"
+				+MekHqXmlUtil.escape(planetId)
+                + "</planetId>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<status>"
 				+status
@@ -268,9 +269,11 @@ public class Mission implements Serializable, MekHqXmlSerializable {
 				
 				if (wn2.getNodeName().equalsIgnoreCase("name")) {
 					retVal.name = wn2.getTextContent();
-				} else if (wn2.getNodeName().equalsIgnoreCase("planetName")) {
-					retVal.planetName = wn2.getTextContent();
-				} else if (wn2.getNodeName().equalsIgnoreCase("status")) {
+                } else if (wn2.getNodeName().equalsIgnoreCase("planetId")) {
+                    retVal.planetId = wn2.getTextContent();
+                } else if (wn2.getNodeName().equalsIgnoreCase("planetName")) {
+                    retVal.planetId = c.getPlanet(wn2.getTextContent()).getId();
+                } else if (wn2.getNodeName().equalsIgnoreCase("status")) {
 					retVal.status = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("id")) {
 					retVal.id = Integer.parseInt(wn2.getTextContent());
