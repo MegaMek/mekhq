@@ -290,95 +290,94 @@ public class Finances implements Serializable {
             }
         }
 
-        // Handle peacetime operating expenses && payroll
-        if (calendar.get(Calendar.DAY_OF_MONTH) == 1 && campaignOptions.usePeacetimeCost()) {
-            if (!campaignOptions.showPeacetimeCost()) {
-                if (debit(campaign.getPeacetimeCost(), Transaction.C_MAINTAIN,
-                        resourceMap.getString("PeacetimeCosts.title"),
-                        calendar.getTime())) {
-                    campaign.addReport(String.format(resourceMap.getString("PeacetimeCosts.text"),
-                            formatter.format(campaign.getPeacetimeCost())));
+        // Handle peacetime operating expenses, payroll, and loan payments
+        if (calendar.get(Calendar.DAY_OF_MONTH) == 1) {
+            if (campaignOptions.usePeacetimeCost()) {
+                if (!campaignOptions.showPeacetimeCost()) {
+                    if (debit(campaign.getPeacetimeCost(), Transaction.C_MAINTAIN,
+                            resourceMap.getString("PeacetimeCosts.title"), calendar.getTime())) {
+                        campaign.addReport(String.format(resourceMap.getString("PeacetimeCosts.text"),
+                                formatter.format(campaign.getPeacetimeCost())));
+                    } else {
+                        campaign.addReport(
+                                String.format(resourceMap.getString("NotImplemented.text"), "for operating costs"));
+                    }
                 } else {
-                    campaign.addReport(
-                            String.format(resourceMap.getString("NotImplemented.text"), "for operating costs"));
-                }
-            } else {
-                if (debit(campaign.getMonthlySpareParts(), Transaction.C_MAINTAIN,
-                        resourceMap.getString("PeacetimeCostsParts.title"),
-                        calendar.getTime())) {
-                    campaign.addReport(String.format(resourceMap.getString("PeacetimeCostsParts.text"),
-                            formatter.format(campaign.getMonthlySpareParts())));
-                } else {
-                    campaign.addReport(
-                            String.format(resourceMap.getString("NotImplemented.text"), "for spare parts"));
-                }
-                if (debit(campaign.getMonthlyAmmo(), Transaction.C_MAINTAIN,
-                        resourceMap.getString("PeacetimeCostsAmmunition.title"),
-                        calendar.getTime())) {
-                    campaign.addReport(String.format(resourceMap.getString("PeacetimeCostsAmmunition.text"),
-                            formatter.format(campaign.getMonthlySpareParts())));
-                } else {
-                    campaign.addReport(
-                            String.format(resourceMap.getString("NotImplemented.text"), "for training munitions"));
-                }
-                if (debit(campaign.getMonthlyFuel(), Transaction.C_MAINTAIN,
-                        resourceMap.getString("PeacetimeCostsFuel.title"), calendar.getTime())) {
-                    campaign.addReport(String.format(resourceMap.getString("PeacetimeCostsFuel.text"),
-                            formatter.format(campaign.getMonthlySpareParts())));
-                } else {
-                    campaign.addReport(
-                            String.format(resourceMap.getString("NotImplemented.text"), "for fuel"));
+                    if (debit(campaign.getMonthlySpareParts(), Transaction.C_MAINTAIN,
+                            resourceMap.getString("PeacetimeCostsParts.title"), calendar.getTime())) {
+                        campaign.addReport(String.format(resourceMap.getString("PeacetimeCostsParts.text"),
+                                formatter.format(campaign.getMonthlySpareParts())));
+                    } else {
+                        campaign.addReport(
+                                String.format(resourceMap.getString("NotImplemented.text"), "for spare parts"));
+                    }
+                    if (debit(campaign.getMonthlyAmmo(), Transaction.C_MAINTAIN,
+                            resourceMap.getString("PeacetimeCostsAmmunition.title"), calendar.getTime())) {
+                        campaign.addReport(String.format(resourceMap.getString("PeacetimeCostsAmmunition.text"),
+                                formatter.format(campaign.getMonthlySpareParts())));
+                    } else {
+                        campaign.addReport(
+                                String.format(resourceMap.getString("NotImplemented.text"), "for training munitions"));
+                    }
+                    if (debit(campaign.getMonthlyFuel(), Transaction.C_MAINTAIN,
+                            resourceMap.getString("PeacetimeCostsFuel.title"), calendar.getTime())) {
+                        campaign.addReport(String.format(resourceMap.getString("PeacetimeCostsFuel.text"),
+                                formatter.format(campaign.getMonthlySpareParts())));
+                    } else {
+                        campaign.addReport(String.format(resourceMap.getString("NotImplemented.text"), "for fuel"));
+                    }
                 }
             }
-        }
-        if (campaignOptions.payForSalaries()) {
-            if (debit(campaign.getPayRoll(), Transaction.C_SALARY, resourceMap.getString("Salaries.title"),
-                    calendar.getTime())) {
-                campaign.addReport(
-                        String.format(resourceMap.getString("Salaries.text"), formatter.format(campaign.getPayRoll())));
-            } else {
-                campaign.addReport(
-                        String.format(resourceMap.getString("NotImplemented.text"), "payroll costs"));
+            if (campaignOptions.payForSalaries()) {
+                if (debit(campaign.getPayRoll(), Transaction.C_SALARY, resourceMap.getString("Salaries.title"),
+                        calendar.getTime())) {
+                    campaign.addReport(String.format(resourceMap.getString("Salaries.text"),
+                            formatter.format(campaign.getPayRoll())));
+                } else {
+                    campaign.addReport(
+                            String.format(resourceMap.getString("NotImplemented.text"), "payroll costs"));
+                }
+            }
+
+            // Handle overhead expenses
+            if (campaignOptions.payForOverhead()) {
+                if (debit(campaign.getOverheadExpenses(), Transaction.C_OVERHEAD,
+                        resourceMap.getString("Overhead.title"),
+                        calendar.getTime())) {
+                    campaign.addReport(String.format(resourceMap.getString("Overhead.text"),
+                            formatter.format(campaign.getOverheadExpenses())));
+                } else {
+                    campaign.addReport(
+                            String.format(resourceMap.getString("NotImplemented.text"), "overhead costs"));
+                }
             }
         }
 
-        // Handle overhead expenses
-        if (campaignOptions.payForOverhead()) {
-            if (debit(campaign.getOverheadExpenses(), Transaction.C_OVERHEAD, resourceMap.getString("Overhead.title"),
-                    calendar.getTime())) {
-                campaign.addReport(String.format(resourceMap.getString("Overhead.text"),
-                        formatter.format(campaign.getOverheadExpenses())));
-            } else {
-                campaign.addReport(
-                        String.format(resourceMap.getString("NotImplemented.text"), "overhead costs"));
-            }
-        }
-
-        ArrayList<Loan> newLoans = new ArrayList<Loan>();
-        for (Loan loan : loans) {
-            if (loan.checkLoanPayment(campaign.getCalendar())) {
-                if (debit(loan.getPaymentAmount(), Transaction.C_LOAN_PAYMENT,
-                        String.format(resourceMap.getString("Loan.title"), loan.getDescription()),
-                        campaign.getCalendar().getTime())) {
-                    campaign.addReport(String.format(resourceMap.getString("Loan.text"),
-                            DecimalFormat.getInstance().format(loan.getPaymentAmount()), loan.getDescription()));
-                    loan.paidLoan();
+            ArrayList<Loan> newLoans = new ArrayList<Loan>();
+            for (Loan loan : loans) {
+                if (loan.checkLoanPayment(campaign.getCalendar())) {
+                    if (debit(loan.getPaymentAmount(), Transaction.C_LOAN_PAYMENT,
+                            String.format(resourceMap.getString("Loan.title"), loan.getDescription()),
+                            campaign.getCalendar().getTime())) {
+                        campaign.addReport(String.format(resourceMap.getString("Loan.text"),
+                                DecimalFormat.getInstance().format(loan.getPaymentAmount()), loan.getDescription()));
+                        loan.paidLoan();
+                    } else {
+                        campaign.addReport(String.format(resourceMap.getString("Loan.insufficient"),
+                                loan.getDescription(), DecimalFormat.getInstance().format(loan.getPaymentAmount())));
+                        loan.setOverdue(true);
+                    }
+                }
+                if (loan.getRemainingPayments() > 0) {
+                    newLoans.add(loan);
                 } else {
-                    campaign.addReport(String.format(resourceMap.getString("Loan.insufficient"), loan.getDescription(),
-                            DecimalFormat.getInstance().format(loan.getPaymentAmount())));
-                    loan.setOverdue(true);
+                    campaign.addReport(String.format(resourceMap.getString("Loan.paid"), loan.getDescription()));
                 }
             }
-            if (loan.getRemainingPayments() > 0) {
-                newLoans.add(loan);
-            } else {
-                campaign.addReport(String.format(resourceMap.getString("Loan.paid"), loan.getDescription()));
+            if (null != wentIntoDebt && !isInDebt()) {
+                wentIntoDebt = null;
             }
-        }
-        if (null != wentIntoDebt && !isInDebt()) {
-            wentIntoDebt = null;
-        }
-        loans = newLoans;
+            loans = newLoans;
     }
 
     public long checkOverdueLoanPayments(Campaign campaign) {
