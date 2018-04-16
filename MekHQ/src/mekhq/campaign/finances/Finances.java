@@ -351,6 +351,7 @@ public class Finances implements Serializable {
                             String.format(resourceMap.getString("NotImplemented.text"), "overhead costs"));
                 }
             }
+        }
 
             ArrayList<Loan> newLoans = new ArrayList<Loan>();
             for (Loan loan : loans) {
@@ -377,7 +378,6 @@ public class Finances implements Serializable {
                 wentIntoDebt = null;
             }
             loans = newLoans;
-        }
     }
 
     public long checkOverdueLoanPayments(Campaign campaign) {
