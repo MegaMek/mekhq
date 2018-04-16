@@ -700,19 +700,19 @@ ActionListener {
 
                             // Set up Mechanic Menus
                             if (v_ug_menu.getMenuComponentCount() > 0 || menu.getItemCount() > 0) {
-                                aero_techs.add(v_ug_menu);
+                                mechanics.add(v_ug_menu);
                             }
                             if (v_g_menu.getMenuComponentCount() > 0 || menu.getItemCount() > 0) {
-                                aero_techs.add(v_g_menu);
+                                mechanics.add(v_g_menu);
                             }
                             if (v_r_menu.getMenuComponentCount() > 0 || menu.getItemCount() > 0) {
-                                aero_techs.add(v_r_menu);
+                                mechanics.add(v_r_menu);
                             }
                             if (v_v_menu.getMenuComponentCount() > 0 || menu.getItemCount() > 0) {
-                                aero_techs.add(v_v_menu);
+                                mechanics.add(v_v_menu);
                             }
                             if (v_e_menu.getMenuComponentCount() > 0 || menu.getItemCount() > 0) {
-                                aero_techs.add(v_e_menu);
+                                mechanics.add(v_e_menu);
                             }
                             if (aero_techs.getMenuComponentCount() > 0 || menu.getItemCount() > 0) {
                                 menu.add(mechanics);
