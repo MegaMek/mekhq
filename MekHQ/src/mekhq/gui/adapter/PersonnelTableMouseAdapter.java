@@ -1305,14 +1305,14 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             if(oneSelected) {
                 popup.add(newMenuItem(resourceMap.getString("imprison.text"), CMD_IMPRISON, person.isFree())); //$NON-NLS-1$
                 popup.add(newMenuItem(resourceMap.getString("free.text"), CMD_FREE, !person.isFree())); //$NON-NLS-1$
-                popup.add(newMenuItem(resourceMap.getString("recruit.text"), CMD_RECRUIT, //$NON-NLS-1$
-                        person.isBondsman() || person.isWillingToDefect()));
             }
             
             if(gui.getCampaign().getCampaignOptions().getUseAtB() &&
-               gui.getCampaign().getCampaignOptions().getUseAtBCapture() &&
-               StaticChecks.areAllPrisoners(selected)) {
+                    gui.getCampaign().getCampaignOptions().getUseAtBCapture()
+                    && StaticChecks.areAllPrisoners(selected)) {
                 popup.add(newMenuItem(resourceMap.getString("ransom.text"), CMD_RANSOM));
+                popup.add(newMenuItem(resourceMap.getString("recruit.text"), CMD_RECRUIT, //$NON-NLS-1$
+                        StaticChecks.areAllWillingToDefect(selected)));
             }
 
             menu = new JMenu(resourceMap.getString("changePrimaryRole.text")); //$NON-NLS-1$
