@@ -1,12 +1,38 @@
 VERSION HISTORY:
 ----------------
-v0.43.10-git
-+ Issue #698: Once again able to acquire ammo using GM mode "acquire immediately"
-+ Issue #680: Fix calculation of contract payment based on large craft value
-+ Issue #639: Campaign Ops rating now properly reflects infantry skill and more accurately calculates combat unit transport capacity
-+ Issue #688: Cannot slot Endo Steel crits
-+ Issue #668: Empty heat sink/double heat sink omnipods not available for Purchase Parts
+v0.43.10-RC4
++ PR #670: Adjusted unit rating calculation and infantry counts
+	Fixes issue #639: CO calculates Infantry Skill Level Incorrectly
+	Campaign Ops rating now properly reflects infantry skill and more accurately calculates combat unit transport capacity
++ PR #689: Make Endo Steel crits work correctly again
+	Fixes issue #688: Cannot slot Endo Steel crits
++ PR #690: Add missing OmniPod for some parts
+	Fixes issue #668: Empty heat sink/double heat sink omnipods not available for Purchase Parts
 + Updated faction-change info from Reunification for Canopus
++ Bugfix: Can't mass recruit prisoners who are willing to defect
++ Fix weird behavior with person panel when the crew size is > 1 and other conditions are met
++ PR #697: Process exploded units for prisoner capture
+	Fixes issue #531: Destroyed Units not generating crews for Capture/Prisoner
++ PR #676: Fix variable weight
+	Fixes issue #675: Save/Load Game Does Not Properly Track Weight EquipmentParts
++ PR #692: Implement SPA import from MUL
+	Fixes issue #108: Import from MUL Option Does Not Seem to Load Saved Abilities
++ PR #678: Too long popup lists
+	Fixes issue where popup menus could get extremely long
+	This is only a partial fix, and adding the methods that can be used to fix it elsewhere
++ PR #699: New day cleanup
+	Fixes issue #698: Income/Expenses Processed in wrong order
++ PR #700: Handle large craft unit values again
+	Fixes issue #680: Contract payment based on Large Craft unit value does not appear to work
++ PR #673: Implement ability to acquire ammo in parts acquisition dialog via GM Mode
+	Fixes issue #698: Unable to GM Acquire clan ammo
++ PR #701: Update Mission.planetName to Mission.planetId for consistency
+	Fixes issue #328: If you accept a contract on Taussen, the game teleports you back to Terra once you arrive
++ PR #802: Fix the campaign level planet pt. 2
+	The rest of the fix for issue #328
++ PR #703: Make payroll monthly again, whups
+	Fixes bug where payroll was accidentally made daily
++ Fix ATB adds 0 value transactions to the finance logs
 
 v0.43.9-RC3
 + Issue #647: Exception Causing UI Issues while Unit is Being Refit
