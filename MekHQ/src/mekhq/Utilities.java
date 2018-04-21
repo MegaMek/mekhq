@@ -72,6 +72,7 @@ import megamek.common.Crew;
 import megamek.common.CriticalSlot;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
+import megamek.common.ITechnology;
 import megamek.common.Infantry;
 import megamek.common.Jumpship;
 import megamek.common.LandAirMech;
@@ -382,6 +383,7 @@ public class Utilities {
 	}
 
 	public static ArrayList<String> getAllVariants(Entity en, Campaign campaign) {
+	    final String METHOD_NAME = "getAllVariants(Entity, Campaign)"; // $NON-NLS-1$
 	    CampaignOptions options = campaign.getCampaignOptions();
 		ArrayList<String> variants = new ArrayList<String>();
 		for(MechSummary summary : MechSummaryCache.getInstance().getAllMechs()) {
@@ -397,7 +399,14 @@ public class Utilities {
 				continue;
 			}
             // If the unit doesn't meet the tech filter criteria we continue
-			if (!campaign.isLegal(UnitTechProgression.getProgression(summary, campaign.getTechFaction(), true))) {
+			ITechnology techProg = UnitTechProgression.getProgression(summary, campaign.getTechFaction(), true);
+			if (null == techProg) {
+			    // This should never happen unless there was an exception thrown when calculating the progression.
+			    // In such a case we will log it and take the least restrictive action, which is to let it through.
+			    MekHQ.getLogger().log(Utilities.class, METHOD_NAME, LogLevel.WARNING,
+			            "Could not determine tech progression for " + summary.getName() // $NON-NLS-1$
+			            + ", including among available refits."); // $NON-NLS-1$
+			} else if (!campaign.isLegal(techProg)) {
 			    continue;
 			}
 			// Otherwise, we can offer it for selection
