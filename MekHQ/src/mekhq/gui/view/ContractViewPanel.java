@@ -150,7 +150,7 @@ public class ContractViewPanel extends JPanel {
         pnlStats.add(lblLocation, gridBagConstraints);
         
         txtLocation.setName("txtLocation"); // NOI18N
-        txtLocation.setText(contract.getPlanetName());
+        txtLocation.setText(contract.getPlanet().getName(null));
         txtLocation.setEditable(false);
         txtLocation.setLineWrap(true);
         txtLocation.setWrapStyleWord(true);

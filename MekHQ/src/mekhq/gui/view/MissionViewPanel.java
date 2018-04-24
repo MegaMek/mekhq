@@ -110,7 +110,7 @@ public class MissionViewPanel extends JPanel {
 		pnlStats.add(lblLocation, gridBagConstraints);
 		
 		txtLocation.setName("txtLocation"); // NOI18N
-		txtLocation.setText(mission.getPlanetName());
+        txtLocation.setText(mission.getPlanet().getName(null));
 		txtLocation.setEditable(false);
 		txtLocation.setLineWrap(true);
 		txtLocation.setWrapStyleWord(true);

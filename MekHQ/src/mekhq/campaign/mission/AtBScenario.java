@@ -404,7 +404,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
     public void setPlanetaryConditions(Mission mission, Campaign campaign) {
         if (null != mission) {
-            Planet p = Planets.getInstance().getPlanets().get(mission.getPlanetName());
+            Planet p = Planets.getInstance().getPlanets().get(mission.getPlanetId(null));
             if (null != p) {
                 atmosphere = Utilities.nonNull(p.getPressure(Utilities.getDateTimeDay(campaign.getCalendar())), atmosphere);
                 gravity = Utilities.nonNull(p.getGravity(), gravity).floatValue();
