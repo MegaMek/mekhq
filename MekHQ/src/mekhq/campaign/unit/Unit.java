@@ -97,6 +97,7 @@ import megamek.common.TechConstants;
 import megamek.common.VTOL;
 import megamek.common.Warship;
 import megamek.common.WeaponType;
+import megamek.common.annotations.Nullable;
 import megamek.common.logging.LogLevel;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
@@ -2729,7 +2730,22 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         return fileName;
     }
 
-    public Person getCommander() {
+    /**
+     * Determines which crew member is considered the unit commander. For solo-piloted units there is
+     * only one option, but units with multiple crew (vehicles, aerospace vessels, infantry) use the following
+     * criteria:
+     * 1. The highest rank.
+     * 2. If there is more than one with the highest rank, select according to the following order, from
+     *    highest to lowest priority:
+     *    a. vessel crew
+     *    b. gunners
+     *    c. pilots/drivers
+     *    d. hyperspace navigator.
+     * 3. If there is still a tie, take the first one in the crew list. 
+     * 
+     * @return The unit commander, or null if the unit has no crew.
+     */
+    public @Nullable Person getCommander() {
         //take first by rank
         //if rank is tied, take gunners over drivers
         //if two of the same type are tie rank, take the first one
