@@ -3747,14 +3747,14 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
      * 
      * @param person A <code>Person</code> in the campaign. The person need not be assigned to the unit as
      *               crew, in which case the return value will be false.
-     * @return       Whether the person is considered the unit commander. A unit with no crew has no
-     *               commander and this method will return false.
+     * @return       Whether the person is considered the unit commander. If <code>person</code> is null or
+     *               the unit has no crew, this method will return false
      * 
      * @see {@link #getCommander()}
      */
     public boolean isCommander(Person person) {
         Person commander = getCommander();
-        return (null != commander) && person.getId().equals(commander.getId());
+        return (null != person) && (null != commander) && person.getId().equals(commander.getId());
     }
 
     public boolean isNavigator(Person person) {
