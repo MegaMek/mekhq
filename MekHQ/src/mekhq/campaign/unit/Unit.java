@@ -3753,7 +3753,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
      * @see {@link #getCommander()}
      */
     public boolean isCommander(Person person) {
-        return (null != getCommander()) && person.getId().equals(getCommander().getId());
+        Person commander = getCommander();
+        return (null != commander) && person.getId().equals(commander.getId());
     }
 
     public boolean isNavigator(Person person) {
