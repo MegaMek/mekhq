@@ -97,6 +97,7 @@ import megamek.common.TechConstants;
 import megamek.common.VTOL;
 import megamek.common.Warship;
 import megamek.common.WeaponType;
+import megamek.common.annotations.Nullable;
 import megamek.common.logging.LogLevel;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
@@ -2729,7 +2730,22 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         return fileName;
     }
 
-    public Person getCommander() {
+    /**
+     * Determines which crew member is considered the unit commander. For solo-piloted units there is
+     * only one option, but units with multiple crew (vehicles, aerospace vessels, infantry) use the following
+     * criteria:
+     * 1. The highest rank.
+     * 2. If there is more than one with the highest rank, select according to the following order, from
+     *    highest to lowest priority:
+     *    a. vessel crew
+     *    b. gunners
+     *    c. pilots/drivers
+     *    d. hyperspace navigator.
+     * 3. If there is still a tie, take the first one in the crew list. 
+     * 
+     * @return The unit commander, or null if the unit has no crew.
+     */
+    public @Nullable Person getCommander() {
         //take first by rank
         //if rank is tied, take gunners over drivers
         //if two of the same type are tie rank, take the first one
@@ -3726,8 +3742,19 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         return false;
     }
 
+    /**
+     * Checks whether a person is considered the commander of this unit.
+     * 
+     * @param person A <code>Person</code> in the campaign. The person need not be assigned to the unit as
+     *               crew, in which case the return value will be false.
+     * @return       Whether the person is considered the unit commander. If <code>person</code> is null or
+     *               the unit has no crew, this method will return false
+     * 
+     * @see {@link #getCommander()}
+     */
     public boolean isCommander(Person person) {
-        return person.getId().equals(getCommander().getId());
+        Person commander = getCommander();
+        return (null != person) && (null != commander) && person.getId().equals(commander.getId());
     }
 
     public boolean isNavigator(Person person) {
