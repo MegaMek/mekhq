@@ -49,7 +49,6 @@ public class BaseAttackBuiltInScenario extends AtBScenario {
 	public void setExtraMissionForces(Campaign campaign, ArrayList<Entity> allyEntities,
 			ArrayList<Entity> enemyEntities) {
 	    int attackerStartIndex = Compute.randomInt(4);
-	    attackerStartIndex = 0;
 		int attackerStart = startPos[attackerStartIndex];
 		int defenderStart = Board.START_CENTER;
 		int defenderHome = (attackerStart + 4) % 8; // the defender's "retreat" edge should always be the opposite of the attacker's edge
@@ -81,7 +80,6 @@ public class BaseAttackBuiltInScenario extends AtBScenario {
 
 		// the "second" force will be deployed (orthogonally) between 90 degrees clockwise and counterclockwise from the "primary force".
 		int angleChange = Compute.randomInt(3) - 1;
-		angleChange = -1;
 		int secondAttackerForceStart = startPos[(attackerStartIndex + angleChange + 4) % 4]; 
 		
 		// the ally is the "second force" and will flee either in the same direction as the player (in case of the player being the defender)
