@@ -221,11 +221,15 @@ public class Mission implements Serializable, MekHqXmlSerializable {
     }
 
     protected void writeToXmlBegin(PrintWriter pw1, int indent) {
-        pw1.println(MekHqXmlUtil.indentStr(indent) + "<mission id=\"" + id + "\" type=\"" + this.getClass().getName()
-                + "\">");
+        pw1.println(MekHqXmlUtil.indentStr(indent) + "<mission id=\"" + id + "\" type=\"" + this.getClass().getName() + "\">");
         pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<name>" + MekHqXmlUtil.escape(name) + "</name>");
         pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<type>" + MekHqXmlUtil.escape(type) + "</type>");
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<planetId>" + MekHqXmlUtil.escape(planetId) + "</planetId>");
+        
+        if(planetId != null) {         
+            pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<planetId>" + MekHqXmlUtil.escape(planetId) + "</planetId>");
+        } else {
+            pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<planetId>" + MekHqXmlUtil.escape(legacyPlanetName) + "</planetId>");
+        }
         pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<status>" + status + "</status>");
         pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<desc>" + MekHqXmlUtil.escape(desc) + "</desc>");
         pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<id>" + id + "</id>");
