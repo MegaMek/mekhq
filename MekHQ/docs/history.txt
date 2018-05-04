@@ -1,5 +1,11 @@
 VERSION HISTORY:
 ----------------
+v0.43.11-RC5
++ PR #707: Added MissingOmniPod class needed for acquisition.
++ PR #709: Fix for #704: NPE when bringing up the refit dialog
++ PR #715: Fix for #718: Unit.isCommander Error
+	Correctly handle check for unit commander if unit has no crew.
+
 v0.43.10-RC4
 + PR #670: Adjusted unit rating calculation and infantry counts
 	Fixes issue #639: CO calculates Infantry Skill Level Incorrectly

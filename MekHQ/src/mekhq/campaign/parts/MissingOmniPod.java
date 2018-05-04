@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 MegaMek team
+ * Copyright (C) 2018 MegaMek team
  * 
  * This file is part of MekHQ.
  * 
@@ -29,7 +29,6 @@ import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.MiscType;
 import megamek.common.TechAdvancement;
-import megamek.common.TechConstants;
 import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
@@ -38,107 +37,76 @@ import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.HeatSink;
 import mekhq.campaign.parts.equipment.JumpJet;
 import mekhq.campaign.parts.equipment.MASC;
-import mekhq.campaign.personnel.SkillType;
 
 /**
- * An empty omnipod, which can be purchased or created when equipment is removed from a pod.
- * When fixed, the omnipod is removed from the warehouse and one replacement part is podded.
+ * Like {@link OmniPod} this is never added to a <code>Unit</code>. <code>OmniPod</code> is used for empty
+ * pods in the warehouse, and <code>MissingOmniPod</code> is used for acquisition. 
  * 
- * @author Neoancient
+ * @author neoancient
  *
  */
-public class OmniPod extends Part {
+public class MissingOmniPod extends MissingPart {
 
-    private static final long serialVersionUID = -8236359530423260992L;
+    private static final long serialVersionUID = -1231514024730868438L;
     
     // Pods are specific to the type of equipment they contain.
     private Part partType;
     
-    public OmniPod() {
+    public MissingOmniPod() {
         this(new EquipmentPart(), null);
     }
-
-    public OmniPod(Part partType, Campaign c) {
+    
+    /**
+     * @param partType The type of part that can be installed in this pod
+     * @param c        The campaign
+     */
+    public MissingOmniPod(Part partType, Campaign c) {
         super(0, false, c);
         this.partType = partType;
-        if (null != partType) {
-            partType.setOmniPodded(false);
-        }
-        name = "OmniPod";
     }
-    
+
     @Override
     public void setCampaign(Campaign c) {
         super.setCampaign(c);
         partType.setCampaign(c);
     }
+    
+    /**
+     * @return The type of part that can be installed in this pod
+     */
+    public Part getPartType() {
+        return partType;
+    }
 
+    /**
+     * Exports class data to xml
+     */
     @Override
-    public String getDetails() {
-        String details = partType.getDetails().replaceAll("\\d+ hit\\(s\\)(,\\s)?", "");
-        if (details.length() > 0) {
-            return partType.getName() + " (" + details + ")";
+    public void writeToXml(PrintWriter pw1, int indent) {
+        final String METHOD_NAME = "writeToXml(PrintWriter,int)"; //$NON-NLS-1$
+        
+        writeToXmlBegin(pw1, indent);
+        pw1.print(MekHqXmlUtil.indentStr(indent + 1) + "<partType tonnage='" + partType.getUnitTonnage()
+            + "' type='");
+        if (partType instanceof AeroHeatSink) {
+            pw1.print("AeroHeatSink' hsType='" + ((AeroHeatSink)partType).getType());
+        } else if (partType instanceof EquipmentPart) {
+            pw1.print(((EquipmentPart)partType).getType().getInternalName());
+            if (partType instanceof MASC) {
+                pw1.print("' rating='" + ((MASC)partType).getEngineRating());
+            }
         } else {
-            return partType.getName();
+            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO,
+                    "MissingOmniPod partType is not EquipmentType"); //$NON-NLS-1$
         }
-    }
-    
-    @Override
-    public int getBaseTime() {
-        return partType.getMissingPart().getBaseTime();
+        pw1.println("'/>");
+        writeToXmlEnd(pw1, indent);
     }
 
-    @Override
-    public void updateConditionFromPart() {
-        // do nothing
-    }
 
-    //This can only be found in the warehouse
-    @Override
-    public int getLocation() {
-        return -1;
-    }
-
-    @Override
-    public String checkFixable() {
-        if (partType.getMissingPart().isReplacementAvailable()) {
-            return null;
-        }
-        return "No equipment available to install";
-    }
-
-    //Podding equipment is a Class D (Maintenance) refit, which carries a +2 modifier.
-    @Override
-    public int getDifficulty() {
-        return partType.getDifficulty() + 2;
-    }
-
-    @Override
-    public String getRepairDesc() {
-        if (partType.getMissingPart().isReplacementAvailable()) {
-            return super.getRepairDesc();
-        } else {
-            return "Part not available";
-        }
-    }
-    
-    //Weight is negligible
-    @Override
-    public double getTonnage() {
-        return 0;
-    }
-
-    //Using tech rating for Omni construction option from IOps.
-    @Override
-    public int getTechRating() {
-        return EquipmentType.RATING_E;
-    }
-    
-    @Override
-    public TechAdvancement getTechAdvancement() {
-        return Entity.getOmniAdvancement();
-    }
-
+    /**
+     * Loads class fields from XML
+     */
     @Override
     protected void loadFieldsFromXmlNode(Node wn) {
         final String METHOD_NAME = "generateInstanceFromXML(Node)"; //$NON-NLS-1$
@@ -204,126 +172,60 @@ public class OmniPod extends Part {
     }
 
     @Override
-    public String getLocationName() {
+    public Part getNewPart() {
+        return new OmniPod(getPartType(), campaign);
+    }
+
+    //Using tech rating for Omni construction option from IOps.
+    @Override
+    public int getTechRating() {
+        return EquipmentType.RATING_E;
+    }
+    
+    @Override
+    public TechAdvancement getTechAdvancement() {
+        return Entity.getOmniAdvancement();
+    }
+
+    @Override
+    public int getBaseTime() {
+        return 0;
+    }
+
+    @Override
+    public void updateConditionFromPart() {
+        // not relevant
+    }
+
+    @Override
+    public int getLocation() {
+        return Entity.LOC_NONE;
+    }
+
+    @Override
+    public String checkFixable() {
         return null;
     }
 
     @Override
-    public void updateConditionFromEntity(boolean checkForDestruction) {
-        //do nothing
+    public int getDifficulty() {
+        return 0;
     }
 
     @Override
-    public void remove(boolean salvage) {
-        //do nothing
+    public boolean isAcceptableReplacement(Part part, boolean refit) {
+        return (part instanceof OmniPod)
+                && ((OmniPod) part).isSamePartType(partType);
     }
 
     @Override
-    public MissingPart getMissingPart() {
-        // This is used only for acquisition.
-        return new MissingOmniPod(partType, campaign);
+    public double getTonnage() {
+        return 0;
     }
 
     @Override
-    public boolean needsFixing() {
-        return true;
-    }
-    
-    @Override
-    public void fix() {
-        Part newPart = partType.clone();
-        Part oldPart = campaign.checkForExistingSparePart(newPart.clone());
-        if(null != oldPart) {
-            newPart.setOmniPodded(true);
-            campaign.addPart(newPart, 0);
-            oldPart.decrementQuantity();
-        }
-    }
-    
-    
-    @Override
-    public String fail(int rating) {
-        skillMin = ++rating;
-        timeSpent = 0;
-        shorthandedMod = 0;
-        if(skillMin > SkillType.EXP_ELITE) {
-            return " <font color='red'><b> failed and part destroyed.</b></font>";
-        } else {
-            //OmniPod is only added back to warehouse if repair fails without destroying part. 
-            campaign.addPart(this, 0);
-            return " <font color='red'><b> failed.</b></font>";
-        }
-    }
-    
-    @Override
-    public String getStatus() {
-        String toReturn = "Empty";
-        if(isReservedForRefit()) {
-            toReturn = "Reserved for Refit";
-        }
-        if(isReservedForReplacement()) {
-            toReturn = "Reserved for Repair";
-        }
-        if(isBeingWorkedOn()) {
-            toReturn = "Being worked on";
-        }
-        if(!isPresent()) {
-            //toReturn = "" + getDaysToArrival() + " days to arrival";
-            String dayName = "day";
-            if(getDaysToArrival() > 1) {
-                dayName += "s";
-            }
-            toReturn = "In transit (" + getDaysToArrival() + " " + dayName + ")";
-        }
-        return toReturn;
-    }
-
-    @Override
-    public long getStickerPrice() {
-        return (long)Math.ceil(partType.getStickerPrice() / 5.0);
-    }
-
-    @Override
-    public int getTechLevel() {
-        if (partType.isClanTechBase()) {
-            return TechConstants.T_CLAN_TW;
-        }
-        return TechConstants.T_IS_TW_ALL;
-    }
-
-    @Override
-    public boolean isSamePartType(Part part) {
-        return part instanceof OmniPod
-                && (partType.isSamePartType(((OmniPod)part).partType));
-    }
-
-    @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
-        final String METHOD_NAME = "writeToXml(PrintWriter,int)"; //$NON-NLS-1$
-        
-        writeToXmlBegin(pw1, indent);
-        pw1.print(MekHqXmlUtil.indentStr(indent + 1) + "<partType tonnage='" + partType.getUnitTonnage()
-            + "' type='");
-        if (partType instanceof AeroHeatSink) {
-            pw1.print("AeroHeatSink' hsType='" + ((AeroHeatSink)partType).getType());
-        } else if (partType instanceof EquipmentPart) {
-            pw1.print(((EquipmentPart)partType).getType().getInternalName());
-            if (partType instanceof MASC) {
-                pw1.print("' rating='" + ((MASC)partType).getEngineRating());
-            }
-        } else {
-            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO,
-                    "OmniPod partType is not EquipmentType"); //$NON-NLS-1$
-        }
-        pw1.println("'/>");
-        writeToXmlEnd(pw1, indent);
-    }
-
-    @Override
-    public Part clone() {
-        Part p = new OmniPod(partType, campaign);
-        p.copyBaseData(this);
-        return p;
+    public String getLocationName() {
+        return null;
     }
 
 }
