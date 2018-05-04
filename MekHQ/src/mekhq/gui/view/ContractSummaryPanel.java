@@ -311,7 +311,7 @@ public class ContractSummaryPanel extends JPanel {
 		mainPanel.add(lblLocation, gridBagConstraints);
 
 		txtLocation.setName("txtLocation"); // NOI18N
-        txtLocation.setText(contract.getPlanet().getName(Utilities.getDateTimeDay(campaign.getCalendar())));
+        txtLocation.setText(contract.getPlanetName(Utilities.getDateTimeDay(campaign.getCalendar())));
 		txtLocation.setEditable(false);
 		txtLocation.setLineWrap(true);
 		txtLocation.setWrapStyleWord(true);
