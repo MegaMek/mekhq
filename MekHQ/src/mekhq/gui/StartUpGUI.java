@@ -11,7 +11,7 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.MediaTracker;
-import java.awt.Rectangle;
+import java.awt.Toolkit;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
@@ -101,8 +101,8 @@ public class StartUpGUI extends javax.swing.JPanel {
         });
         
         // initialize splash image
-        Rectangle maxWidth_rect = app.calculateMaxScreenWidthRect();
-        imgSplash = getToolkit().getImage(app.getIconPackage().getStartupScreenImage((int) maxWidth_rect.width)).getScaledInstance(maxWidth_rect.width, -1, Image.SCALE_DEFAULT);
+        double maxWidth = app.calculateMaxScreenWidth();
+        imgSplash = getToolkit().getImage(app.getIconPackage().getStartupScreenImage((int) maxWidth));
 
         // wait for splash image to load completely
         MediaTracker tracker = new MediaTracker(frame);
@@ -127,13 +127,16 @@ public class StartUpGUI extends javax.swing.JPanel {
         buttonPanel.add(btnQuit);
         add(buttonPanel, BorderLayout.PAGE_END);
                 
-        frame.setSize(maxWidth_rect.width, maxWidth_rect.height);
+        Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+	    
+        frame.setSize(imgSplash.getWidth(null), imgSplash.getHeight(null));
         frame.setResizable(false);
-
 	    // Determine the new location of the window
-        int x = maxWidth_rect.x;
-        int y = maxWidth_rect.y;
-
+	    int w = frame.getSize().width;
+	    int h = frame.getSize().height;
+	    int x = (dim.width-w)/2;
+	    int y = (dim.height-h)/2;
+	    
 	    // Move the window
 	    frame.setLocation(x, y);
 	    
