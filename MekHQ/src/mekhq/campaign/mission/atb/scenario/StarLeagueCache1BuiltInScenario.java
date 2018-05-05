@@ -1,7 +1,5 @@
 package mekhq.campaign.mission.atb.scenario;
 
-import java.util.ArrayList;
-
 import megamek.client.RandomSkillsGenerator;
 import megamek.client.RandomUnitGenerator;
 import megamek.common.Board;
@@ -16,6 +14,8 @@ import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.Loot;
 import mekhq.campaign.mission.atb.AtBScenarioEnabled;
 import mekhq.campaign.rating.IUnitRating;
+
+import java.util.ArrayList;
 
 @AtBScenarioEnabled
 public class StarLeagueCache1BuiltInScenario extends AtBScenario {
@@ -104,7 +104,7 @@ public class StarLeagueCache1BuiltInScenario extends AtBScenario {
 					(roll == 6) ? IUnitRating.DRAGOON_A : IUnitRating.DRAGOON_D);
 		}
 		Entity en = (ms == null) ? null
-				: createEntityWithCrew(campaign.getFactionCode(), RandomSkillsGenerator.L_REG, campaign, ms);
+				: createEntityWithCrew(campaign.getFactionCode(), RandomSkillsGenerator.L_GREEN, campaign, ms);
 		otherForce.add(en);
 
 		// TODO: During SW offer a choice between an employer exchange or a
