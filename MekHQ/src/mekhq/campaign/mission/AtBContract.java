@@ -1439,7 +1439,7 @@ public class AtBContract extends Contract implements Serializable {
 		this(c.getName());
 		
 		setType(c.getType());
-		setPlanetId(c.getPlanetId(null));
+		setPlanetId(c.getPlanetId());
 		setDesc(c.getDescription());
 		setStatus(c.getStatus());
 		for (Scenario s : c.getScenarios()) {
@@ -1513,7 +1513,7 @@ public class AtBContract extends Contract implements Serializable {
 	public static AtBContract getContractExtension(AtBContract c, int length, Campaign campaign) {
 		AtBContract retVal = new AtBContract(c.getName() + " (Ext)");
 		retVal.setType(c.getType());
-		retVal.setPlanetId(c.getPlanetId(null));
+		retVal.setPlanetId(c.getPlanetId());
 		retVal.setDesc(c.getDescription());
 		retVal.setStatus(Mission.S_ACTIVE);
 		retVal.setLength(length);

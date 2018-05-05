@@ -113,8 +113,8 @@ public class Mission implements Serializable, MekHqXmlSerializable {
         this.type = t;
     }
 
-    public String getPlanetId(DateTime when) {
-        return getPlanet().getName(when);
+    public String getPlanetId() {
+        return getPlanet().getId();
     }
 
     public void setPlanetId(String n) {
