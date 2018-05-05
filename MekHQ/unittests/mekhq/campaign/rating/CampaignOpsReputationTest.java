@@ -876,7 +876,7 @@ public class CampaignOpsReputationTest {
     @Test
     public void testGetTransportValue() {
         spyReputation.initValues();
-        assertEquals(15, spyReputation.getTransportValue());
+        assertEquals(20, spyReputation.getTransportValue());
 
         // Test not having any dropships (though we still have a jumpship).
         doReturn(0).when(spyReputation).getDropshipCount();
@@ -921,7 +921,7 @@ public class CampaignOpsReputationTest {
     @Test
     public void testCalculateUnitRatingScore() {
         spyReputation.initValues();
-        assertEquals(33, spyReputation.calculateUnitRatingScore());
+        assertEquals(38, spyReputation.calculateUnitRatingScore());
 
         // Test a brand new campaign.
         buildFreshCampaign();
@@ -956,7 +956,7 @@ public class CampaignOpsReputationTest {
     @Test
     public void testGetDetails() {
         String expectedDetails =
-                "Unit Reputation:    33\n" +
+                "Unit Reputation:    38\n" +
                 "    Method: Campaign Operations\n" +
                 "\n" +
                 "Experience:          10\n" +
@@ -974,7 +974,7 @@ public class CampaignOpsReputationTest {
                 "    Failed Missions:          0\n" +
                 "    Contract Breaches:        0\n" +
                 "\n" +
-                "Transportation:      15\n" +
+                "Transportation:      20\n" +
                 "    Mech Bays:                   4 needed /   4 available\n" +
                 "    Fighter Bays:                2 needed /   2 available\n" +
                 "    Small Craft Bays:            0 needed /   0 available\n" +
@@ -1109,7 +1109,7 @@ public class CampaignOpsReputationTest {
 
     @Test
     public void testGetTransportationDetails() {
-        String expected = "Transportation:      15\n" +
+        String expected = "Transportation:      20\n" +
                           "    Mech Bays:                   4 needed /   4 available\n" +
                           "    Fighter Bays:                2 needed /   2 available\n" +
                           "    Small Craft Bays:            0 needed /   0 available\n" +
@@ -1141,7 +1141,7 @@ public class CampaignOpsReputationTest {
         assertEquals(expected, spyReputation.getTransportationDetails());
 
         // Add excess heavy vehicle bays.
-        expected = "Transportation:      15\n" +
+        expected = "Transportation:      20\n" +
                    "    Mech Bays:                   4 needed /   4 available\n" +
                    "    Fighter Bays:                2 needed /   2 available\n" +
                    "    Small Craft Bays:            0 needed /   0 available\n" +

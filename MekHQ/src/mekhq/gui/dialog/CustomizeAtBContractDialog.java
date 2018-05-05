@@ -54,9 +54,11 @@ import megamek.client.ui.swing.util.PlayerColors;
 import megamek.common.Player;
 import megamek.common.util.DirectoryItems;
 import megamek.common.util.EncodeControl;
+import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.Planets;
 import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.gui.FactionComboBox;
 import mekhq.gui.utilities.JSuggestField;
@@ -272,7 +274,7 @@ public class CustomizeAtBContractDialog extends JDialog {
         leftPanel.add(lblPlanetName, gbc);
         
         suggestPlanet = new JSuggestField(this, campaign.getPlanetNames());       
-        suggestPlanet.setText(contract.getPlanetName());
+        suggestPlanet.setText(contract.getPlanetId(null));
         gbc.gridx = 1;
         gbc.gridy = y++;
         gbc.gridwidth = 2;
@@ -482,6 +484,7 @@ public class CustomizeAtBContractDialog extends JDialog {
         btnOK.setText(resourceMap.getString("btnOkay.text")); // NOI18N
         btnOK.setName("btnOK"); // NOI18N
         btnOK.addActionListener(new java.awt.event.ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnOKActionPerformed(evt);
             }
@@ -491,6 +494,7 @@ public class CustomizeAtBContractDialog extends JDialog {
         btnClose.setText(resourceMap.getString("btnCancel.text")); // NOI18N
         btnClose.setName("btnClose"); // NOI18N
         btnClose.addActionListener(new java.awt.event.ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnCloseActionPerformed(evt);
             }
@@ -596,7 +600,8 @@ public class CustomizeAtBContractDialog extends JDialog {
     	contract.setEnemyCamoCategory(enemyCamoCategory);
     	contract.setEnemyCamoFileName(enemyCamoFileName);
     	contract.setEnemyColorIndex(enemyColorIndex);
-    	contract.setPlanetName(suggestPlanet.getText());
+        contract.setPlanetId((Planets.getInstance().getPlanetByName(suggestPlanet.getText(),
+                Utilities.getDateTimeDay(campaign.getCalendar()))).getId());
     	contract.setDesc(txtDesc.getText());
     	this.setVisible(false);
     }

@@ -35,6 +35,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
 import megamek.common.util.EncodeControl;
+import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
@@ -189,7 +190,7 @@ public class AtBContractViewPanel extends JPanel {
         pnlStats.add(lblLocation, gridBagConstraints);
         
         txtLocation.setName("txtLocation"); // NOI18N
-        txtLocation.setText(contract.getPlanetName());
+        txtLocation.setText(contract.getPlanet().getName(Utilities.getDateTimeDay(campaign.getCalendar())));
         txtLocation.setEditable(false);
         txtLocation.setLineWrap(true);
         txtLocation.setWrapStyleWord(true);

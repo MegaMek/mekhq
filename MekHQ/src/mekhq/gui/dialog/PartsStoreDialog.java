@@ -335,7 +335,9 @@ public class PartsStoreDialog extends javax.swing.JDialog {
         	public boolean include(Entry<? extends PartsTableModel, ? extends Integer> entry) {
         		PartsTableModel partsModel = entry.getModel();
         		Part part = partsModel.getPartAt(entry.getIdentifier());
-        		if(txtFilter.getText().length() > 0 && !part.getName().toLowerCase().contains(txtFilter.getText().toLowerCase())) {
+        		if ((txtFilter.getText().length() > 0)
+        		        && !part.getName().toLowerCase().contains(txtFilter.getText().toLowerCase())
+        		        && !part.getDetails().toLowerCase().contains(txtFilter.getText().toLowerCase())) {
                     return false;
                 }
     			if(part.getTechBase() == Part.T_CLAN && !campaign.getCampaignOptions().allowClanPurchases()) {

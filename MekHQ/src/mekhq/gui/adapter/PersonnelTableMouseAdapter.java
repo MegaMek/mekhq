@@ -20,6 +20,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.event.MouseInputAdapter;
 
+import megamek.client.ui.swing.util.MenuScroller;
 import megamek.common.Aero;
 import megamek.common.BattleArmor;
 import megamek.common.Crew;
@@ -59,7 +60,6 @@ import mekhq.gui.dialog.PopupValueChoiceDialog;
 import mekhq.gui.dialog.RetirementDefectionDialog;
 import mekhq.gui.dialog.TextAreaDialog;
 import mekhq.gui.model.PersonnelTableModel;
-import mekhq.gui.utilities.MenuScroller;
 import mekhq.gui.utilities.StaticChecks;
 
 public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
@@ -1305,14 +1305,14 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             if(oneSelected) {
                 popup.add(newMenuItem(resourceMap.getString("imprison.text"), CMD_IMPRISON, person.isFree())); //$NON-NLS-1$
                 popup.add(newMenuItem(resourceMap.getString("free.text"), CMD_FREE, !person.isFree())); //$NON-NLS-1$
-                popup.add(newMenuItem(resourceMap.getString("recruit.text"), CMD_RECRUIT, //$NON-NLS-1$
-                        person.isBondsman() || person.isWillingToDefect()));
             }
             
             if(gui.getCampaign().getCampaignOptions().getUseAtB() &&
-               gui.getCampaign().getCampaignOptions().getUseAtBCapture() &&
-               StaticChecks.areAllPrisoners(selected)) {
+                    gui.getCampaign().getCampaignOptions().getUseAtBCapture()
+                    && StaticChecks.areAllPrisoners(selected)) {
                 popup.add(newMenuItem(resourceMap.getString("ransom.text"), CMD_RANSOM));
+                popup.add(newMenuItem(resourceMap.getString("recruit.text"), CMD_RECRUIT, //$NON-NLS-1$
+                        StaticChecks.areAllWillingToDefect(selected)));
             }
 
             menu = new JMenu(resourceMap.getString("changePrimaryRole.text")); //$NON-NLS-1$

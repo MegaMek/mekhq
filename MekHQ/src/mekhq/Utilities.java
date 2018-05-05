@@ -39,6 +39,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -71,6 +72,7 @@ import megamek.common.Crew;
 import megamek.common.CriticalSlot;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
+import megamek.common.ITechnology;
 import megamek.common.Infantry;
 import megamek.common.Jumpship;
 import megamek.common.LandAirMech;
@@ -381,6 +383,7 @@ public class Utilities {
 	}
 
 	public static ArrayList<String> getAllVariants(Entity en, Campaign campaign) {
+	    final String METHOD_NAME = "getAllVariants(Entity, Campaign)"; // $NON-NLS-1$
 	    CampaignOptions options = campaign.getCampaignOptions();
 		ArrayList<String> variants = new ArrayList<String>();
 		for(MechSummary summary : MechSummaryCache.getInstance().getAllMechs()) {
@@ -396,7 +399,14 @@ public class Utilities {
 				continue;
 			}
             // If the unit doesn't meet the tech filter criteria we continue
-			if (!campaign.isLegal(UnitTechProgression.getProgression(summary, campaign.getTechFaction(), true))) {
+			ITechnology techProg = UnitTechProgression.getProgression(summary, campaign.getTechFaction(), true);
+			if (null == techProg) {
+			    // This should never happen unless there was an exception thrown when calculating the progression.
+			    // In such a case we will log it and take the least restrictive action, which is to let it through.
+			    MekHQ.getLogger().log(Utilities.class, METHOD_NAME, LogLevel.WARNING,
+			            "Could not determine tech progression for " + summary.getName() // $NON-NLS-1$
+			            + ", including among available refits."); // $NON-NLS-1$
+			} else if (!campaign.isLegal(techProg)) {
 			    continue;
 			}
 			// Otherwise, we can offer it for selection
@@ -656,6 +666,9 @@ public class Utilities {
     			p.addSkill(SkillType.S_PILOT_GVEE, SkillType.getType(SkillType.S_PILOT_GVEE).getTarget() - oldCrew.getPiloting(), 0);
     			p.addSkill(SkillType.S_GUN_VEE, SkillType.getType(SkillType.S_GUN_VEE).getTarget() - oldCrew.getGunnery(), 0);
     		}
+			
+			populateOptionsFromCrew(p, oldCrew);
+			
 			drivers.add(p);
 		} else if (oldCrew.getSlotCount() > 1) {
 		    for (int slot = 0; slot < oldCrew.getSlotCount(); slot++) {
@@ -674,6 +687,8 @@ public class Utilities {
 	                if (!oldCrew.getExternalIdAsString().equals("-1")) {
 	                    p.setId(UUID.fromString(oldCrew.getExternalIdAsString(slot)));
 	                }
+	                
+	                populateOptionsFromCrew(p, oldCrew);
 	                drivers.add(p);
 	            }
 		    }
@@ -718,6 +733,11 @@ public class Utilities {
 	    			p.addSkill(SkillType.S_PILOT_GVEE, SkillType.getType(SkillType.S_PILOT_GVEE).getTarget() - oldCrew.getPiloting(), 0);
 	    			p.addSkill(SkillType.S_GUN_VEE, SkillType.getType(SkillType.S_GUN_VEE).getTarget() - oldCrew.getGunnery(), 0);
 	    		}
+	    		
+	    		// this will have the side effect of giving every driver on the crew
+	    		// the SPAs from the entity's crew.
+	    		// Not really any way around it 
+	    		populateOptionsFromCrew(p, oldCrew);
 	    		drivers.add(p);
 	    	}
 
@@ -773,6 +793,8 @@ public class Utilities {
 		    			p.addSkill(SkillType.S_GUN_VEE, randomSkillFromTarget(SkillType.getType(SkillType.S_GUN_VEE).getTarget() - oldCrew.getGunnery()), 0);
 		    			totalGunnery += p.getSkill(SkillType.S_GUN_VEE).getFinalSkillValue();
 		    		}
+		    		
+		    		populateOptionsFromCrew(p, oldCrew);
 		    		gunners.add(p);
 		    	}
 
@@ -881,6 +903,19 @@ public class Utilities {
             result.put(CrewType.TECH_OFFICER, Collections.singletonList(consoleCmdr));
         }
 		return result;
+	}
+	
+	/**
+	 * Worker function that takes the PilotOptions (SPAs, in other words) from the given "old crew" and sets them for a person.
+	 * @param p The person whose SPAs to populate
+	 * @param oldCrew The entity the SPAs of whose crew we're importing
+	 */
+	private static void populateOptionsFromCrew(Person p, Crew oldCrew) {
+        Enumeration<IOption> optionsEnum = oldCrew.getOptions().getOptions();
+        while(optionsEnum.hasMoreElements()) {
+            IOption currentOption = (IOption) optionsEnum.nextElement();
+            p.getOptions().getOption(currentOption.getName()).setValue(currentOption.getValue());
+        }
 	}
 
 	public static int generateRandomExp() {

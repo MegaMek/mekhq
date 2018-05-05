@@ -42,9 +42,11 @@ import megamek.common.MechSummaryCache;
 import megamek.common.MiscType;
 import megamek.common.Protomech;
 import megamek.common.TechConstants;
+import megamek.common.WeaponType;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.verifier.TestEntity;
 import megamek.common.weapons.InfantryAttack;
+import megamek.common.weapons.Weapon;
 import megamek.common.weapons.bayweapons.BayWeapon;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.AeroHeatSink;
@@ -197,13 +199,19 @@ public class PartsStore implements Serializable {
 					parts.add(new AmmoStorage(0, et, ((AmmoType)et).getShots(), c));
 				}
 			} else if(et instanceof MiscType && (((MiscType)et).hasFlag(MiscType.F_HEAT_SINK) || ((MiscType)et).hasFlag(MiscType.F_DOUBLE_HEAT_SINK))) {
-            	parts.add(new HeatSink(0, et, -1, false, c));
+            	Part p = new HeatSink(0, et, -1, false, c);
+            	parts.add(p);
+                parts.add(new OmniPod(p, c));
             	parts.add(new HeatSink(0, et, -1, true, c));
 			} else if(et instanceof MiscType && ((MiscType)et).hasFlag(MiscType.F_JUMP_JET)) {
 				//need to do it by rating and unit tonnage
 				for(int ton = 10; ton <= 100; ton += 5) {
-                    parts.add(new JumpJet(ton, et, -1, false, c));
-                    parts.add(new JumpJet(ton, et, -1, true, c));
+				    Part p = new JumpJet(ton, et, -1, false, c);
+                    parts.add(p);
+                    if (!et.hasFlag(MiscType.F_BA_EQUIPMENT)) {
+                        parts.add(new OmniPod(p, c));
+                        parts.add(new JumpJet(ton, et, -1, true, c));
+                    }
 				}
 			} else if ((et instanceof MiscType && ((MiscType)et).hasFlag(MiscType.F_TANK_EQUIPMENT) && ((MiscType)et).hasFlag(MiscType.F_CHASSIS_MODIFICATION))
 					|| et instanceof BayWeapon
@@ -227,6 +235,7 @@ public class PartsStore implements Serializable {
                             MASC sp = new MASC(0, et, -1 , c, rating, false);
                             sp.setEquipTonnage(eton);
                             parts.add(sp);
+                            parts.add(new OmniPod(sp, c));
                             sp = new MASC(0, et, -1 , c, rating, true);
                             sp.setEquipTonnage(eton);
 							parts.add(sp);
@@ -239,29 +248,43 @@ public class PartsStore implements Serializable {
 							if(rating < ton || (rating % ton) != 0) {
 								continue;
 							}
-                            parts.add(new MASC(ton, et, -1, c, rating, false));
+							Part p = new MASC(ton, et, -1, c, rating, false);
+                            parts.add(p);
+                            parts.add(new OmniPod(p, c));
                             parts.add(new MASC(ton, et, -1, c, rating, true));
 						}
 					}
 				}
 			} else {
+			    boolean poddable = !et.isOmniFixedOnly();
+			    if (et instanceof MiscType) {
+			        poddable &= et.hasFlag(MiscType.F_MECH_EQUIPMENT)
+                            || et.hasFlag(MiscType.F_TANK_EQUIPMENT)
+                            || et.hasFlag(MiscType.F_FIGHTER_EQUIPMENT);
+			    } else if (et instanceof WeaponType) {
+			        poddable &= (et.hasFlag(WeaponType.F_MECH_WEAPON)
+			                || et.hasFlag(Weapon.F_TANK_WEAPON)
+			                || et.hasFlag(WeaponType.F_AERO_WEAPON))
+			                && !((WeaponType) et).isCapital(); 
+			    }
 				if(EquipmentPart.hasVariableTonnage(et)) {
 					EquipmentPart epart;
 					for(double ton = EquipmentPart.getStartingTonnage(et); ton <= EquipmentPart.getMaxTonnage(et); ton += EquipmentPart.getTonnageIncrement(et)) {
 						epart = new EquipmentPart(0, et, -1, false, c);
 						epart.setEquipTonnage(ton);
 						parts.add(epart);
-						if (!et.isOmniFixedOnly()) {
+						if (poddable) {
 						    epart = new EquipmentPart(0, et, -1, true, c);
 	                        epart.setEquipTonnage(ton);
 	                        parts.add(epart);
+	                        parts.add(new OmniPod(epart, c));
 						}
 						//TODO: still need to deal with talons (unit tonnage) and masc (engine rating)
 					}
 				} else {
 				    Part p = new EquipmentPart(0, et, -1, false, c);
 				    parts.add(p);
-                    if (p.isOmniPoddable()) {
+                    if (poddable) {
                         parts.add(new EquipmentPart(0, et, -1, true, c));
                         parts.add(new OmniPod(p, c));
                     }

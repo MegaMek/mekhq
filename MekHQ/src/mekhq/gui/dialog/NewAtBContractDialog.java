@@ -44,6 +44,7 @@ import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.universe.Planet;
+import mekhq.campaign.universe.Planets;
 import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.gui.FactionComboBox;
 import mekhq.gui.model.SortedComboBoxModel;
@@ -105,7 +106,9 @@ public class NewAtBContractDialog extends NewContractDialog {
         if (getCurrentEnemyCode() != null) {
         	((AtBContract)contract).setEnemyCode(getCurrentEnemyCode());
         }
-        ((AtBContract)contract).setPlanetName((String)cbPlanets.getSelectedItem());
+        ((AtBContract) contract)
+                .setPlanetId((Planets.getInstance().getPlanetByName((String) cbPlanets.getSelectedItem(),
+                        Utilities.getDateTimeDay(campaign.getCalendar()))).getId());
         spnMultiplier.setModel(new SpinnerNumberModel(contract.getMultiplier(), 0.1, 10.0, 0.1));
         updatePaymentMultiplier();
         contract.calculateContract(campaign);
@@ -517,7 +520,8 @@ public class NewAtBContractDialog extends NewContractDialog {
 		if (chkShowAllPlanets.isSelected()) {
 	    	//contract.setPlanetName(suggestPlanet.getText());
 		} else {
-			contract.setPlanetName((String)cbPlanets.getSelectedItem());
+            contract.setPlanetId((Planets.getInstance().getPlanetByName((String) cbPlanets.getSelectedItem(),
+                    Utilities.getDateTimeDay(campaign.getCalendar()))).getId());
 		}
     	contract.setEmployerCode(getCurrentEmployerCode(), campaign.getGameYear());
     	contract.setMissionType(cbMissionType.getSelectedIndex());
@@ -540,12 +544,14 @@ public class NewAtBContractDialog extends NewContractDialog {
     	this.setVisible(false);
     }
     
+    @Override
     protected void doUpdateContract(Object source) {
 		removeAllListeners();
 		
     	AtBContract contract = (AtBContract)this.contract;
         if (cbPlanets.equals(source) && null != cbPlanets.getSelectedItem()) {
-            contract.setPlanetName((String)cbPlanets.getSelectedItem());
+            contract.setPlanetId((Planets.getInstance().getPlanetByName((String) cbPlanets.getSelectedItem(),
+                    Utilities.getDateTimeDay(campaign.getCalendar()))).getId());
             //reset the start date as null so we recalculate travel time
             contract.setStartDate(null);
         } else if (source.equals(cbEmployer)) {
