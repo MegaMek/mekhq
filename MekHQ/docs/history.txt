@@ -6,6 +6,7 @@ v0.43.11-RC5
 + PR #715: Fix for #718: Unit.isCommander Error
 	Correctly handle check for unit commander if unit has no crew.
 + PR #720: Fix for issue #353 [ATB] Special mission - SL mech piloted by Tech Mech is VETERAN and not GREEN
++ PR #721: Fix for issue #631 [0.43.7-RC1] Battlefield control observation missing from special missions
 
 v0.43.10-RC4
 + PR #670: Adjusted unit rating calculation and infantry counts
