@@ -7,6 +7,11 @@ v0.43.11-RC5
 	Correctly handle check for unit commander if unit has no crew.
 + PR #720: Fix for issue #353 [ATB] Special mission - SL mech piloted by Tech Mech is VETERAN and not GREEN
 + PR #721: Fix for issue #631 [0.43.7-RC1] Battlefield control observation missing from special missions
++ PR #712: Fix for issue #708 [0.43.10-RC4 : Bug] Old Contacts Appearing in Deployment Requirements
+	Fix for issue #706 ArrayIndexOutOfBoundsException in BaseAttackBuiltInScenario
+	Fix for most cases of issue #695 Base Attack (Defense) mission generate with no Allies or OpFor in AtB and
+	#674 AtB fails to generate opfor 
+	The only exception being if the opfor has no RAT for the current contract date, which will be addressed in a separate PR.
 
 v0.43.10-RC4
 + PR #670: Adjusted unit rating calculation and infantry counts
