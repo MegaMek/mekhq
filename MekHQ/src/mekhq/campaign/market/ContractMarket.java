@@ -483,7 +483,7 @@ public class ContractMarket implements Serializable {
 				contract.getMissionType() >= AtBContract.MT_PLANETARYASSAULT ||
 				(contract.getMissionType() == AtBContract.MT_RELIEFDUTY && Compute.d6() < 4) ||
 				contract.getEnemyCode().equals("REB"));
-        contract.setPlanetId(parent.getPlanetId(null));
+        contract.setPlanetId(parent.getPlanetId());
 		setAllyRating(contract, isAttacker, campaign.getCalendar().get(Calendar.YEAR));
 		setEnemyRating(contract, isAttacker, campaign.getCalendar().get(Calendar.YEAR));
 
@@ -523,7 +523,7 @@ public class ContractMarket implements Serializable {
 		AtBContract followup = new AtBContract("Followup Contract");
 		followup.setEmployerCode(contract.getEmployerCode(), campaign.getGameYear());
 		followup.setEnemyCode(contract.getEnemyCode());
-		followup.setPlanetId(contract.getPlanetId(null));
+		followup.setPlanetId(contract.getPlanetId());
 		switch (contract.getMissionType()) {
 		case AtBContract.MT_DIVERSIONARYRAID:
 			followup.setMissionType(AtBContract.MT_OBJECTIVERAID);
