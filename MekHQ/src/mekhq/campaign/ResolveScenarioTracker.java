@@ -78,6 +78,7 @@ import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.universe.Faction;
 
 /**
  * This object will be the main workhorse for the scenario
@@ -680,6 +681,15 @@ public class ResolveScenarioTracker {
      *                  in order to be processed, a unit must be in the salvageStatus hashtable.
      */
     private void processPrisonerCapture(List<TestUnit> unitsToProcess) {
+
+        Mission currentMission = campaign.getMission(scenario.getMissionId());
+        String enemyCode;
+        if (currentMission instanceof AtBContract) {
+            enemyCode = ((AtBContract) currentMission).getEnemyCode();
+        } else {
+            enemyCode = "IND";
+        }
+
         for(Unit u : unitsToProcess) {
             if (null == u) {
                 continue; // Shouldn't happen... but well... ya know
@@ -713,7 +723,7 @@ public class ResolveScenarioTracker {
                 continue;
             }
             //shuffling the crew ensures that casualties are randomly assigned in multi-crew units
-            List<Person> crew = Utilities.genRandomCrewWithCombinedSkill(campaign, u).values().stream().flatMap(c -> c.stream()).collect(Collectors.toList());
+            List<Person> crew = Utilities.genRandomCrewWithCombinedSkill(campaign, u, enemyCode).values().stream().flatMap(c -> c.stream()).collect(Collectors.toList());
             crew = shuffleCrew(crew);
 
             //For vees we may need to know the commander or driver, which aren't assigned for TestUnit.

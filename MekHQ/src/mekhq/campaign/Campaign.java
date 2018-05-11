@@ -1029,7 +1029,7 @@ public class Campaign implements Serializable, ITechManager {
         unit.setDaysToArrival(days);
 
         if (allowNewPilots) {
-            Map<CrewType, Collection<Person>> newCrew = Utilities.genRandomCrewWithCombinedSkill(this, unit);
+            Map<CrewType, Collection<Person>> newCrew = Utilities.genRandomCrewWithCombinedSkill(this, unit, getFactionCode());
             newCrew.forEach((type, personnel) -> personnel.forEach(p -> type.addMethod.accept(unit, p)));
         }
         unit.resetPilotAndEntity();
@@ -5312,10 +5312,18 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public Person newPerson(int type) {
+        return newPerson(type, Person.T_NONE, getFactionCode());
+    }
+
+    public Person newPerson(int type, int secondary) {
+        return newPerson(type, secondary, getFactionCode());
+    }
+    
+    public Person newPerson(int type, String factionCode) {
         if (type == Person.T_LAM_PILOT) {
-            return newPerson(Person.T_MECHWARRIOR, Person.T_AERO_PILOT);
+            return newPerson(Person.T_MECHWARRIOR, Person.T_AERO_PILOT, factionCode);
         }
-        return newPerson(type, Person.T_NONE);
+        return newPerson(type, Person.T_NONE, factionCode);
     }
 
     /**
@@ -5326,9 +5334,9 @@ public class Campaign implements Serializable, ITechManager {
      * @param secondary A secondary role; used for LAM pilots to generate MW + Aero pilot
      * @return
      */
-    public Person newPerson(int type, int secondary) {
+    public Person newPerson(int type, int secondary, String factionCode) {
         boolean isFemale = getRNG().isFemale();
-        Person person = new Person(this);
+        Person person = new Person(this, factionCode);
         if (isFemale) {
             person.setGender(Person.G_FEMALE);
         }
