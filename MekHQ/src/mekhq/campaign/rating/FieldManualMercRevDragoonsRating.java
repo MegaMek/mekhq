@@ -106,7 +106,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
                                 " is mothballed.  Skipping.");
                 continue;
             }
-
+            
             updateUnitCounts(u);
             BigDecimal value = getUnitValue(u);
             getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
@@ -428,7 +428,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
         final String METHOD_NAME = "updateSkillLevel(Unit, BigDecimal)";
 
         //Make sure this is a combat unit.
-        if ((null == u.getEntity()) || (null == u.getEntity().getCrew())) {
+        if ((null == u.getEntity()) || (u.getCrew().size() == 0)) {
             return;
         }
 
