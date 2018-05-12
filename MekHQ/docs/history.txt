@@ -12,6 +12,10 @@ v0.43.11-RC5
 	Fix for most cases of issue #695 Base Attack (Defense) mission generate with no Allies or OpFor in AtB and
 	#674 AtB fails to generate opfor 
 	The only exception being if the opfor has no RAT for the current contract date, which will be addressed in a separate PR.
++ PR #725: Fix for issue #714 0.43.2 Migration to 0.43.9 causes Phantom Personel in Unit Breakdown
++ PR #726: Fix issue #600 and #621 where inner sphere prisoners were being converted to trueborn warriors and clanners were being
+	turned into freebirths
++ PR #723: If GM-generate contract fails to generate contracts, an message is output to the daily log instead of failing silently
 
 v0.43.10-RC4
 + PR #670: Adjusted unit rating calculation and infantry counts
