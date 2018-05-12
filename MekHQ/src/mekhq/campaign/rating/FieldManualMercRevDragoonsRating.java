@@ -106,7 +106,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
                                 " is mothballed.  Skipping.");
                 continue;
             }
-            
+
             updateUnitCounts(u);
             BigDecimal value = getUnitValue(u);
             getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
