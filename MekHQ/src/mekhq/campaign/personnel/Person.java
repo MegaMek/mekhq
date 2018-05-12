@@ -84,6 +84,7 @@ import mekhq.campaign.mod.am.InjuryUtil;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
+import mekhq.campaign.universe.Faction;
 
 /**
  * @author Jay Lawson <jaylawson39 at yahoo.com>
@@ -338,7 +339,15 @@ public class Person implements Serializable, MekHqXmlSerializable {
         this("Biff the Understudy", c);
     }
 
+    public Person(Campaign c, String factionCode) {
+        this("Biff the Understudy", c, factionCode);
+    }
+    
     public Person(String name, Campaign c) {
+        this(name, c, c.getFactionCode());
+    }
+    
+    public Person(String name, Campaign c, String factionCode) {
         this.name = name;
         callsign = "";
         portraitCategory = Crew.ROOT_PORTRAIT;
@@ -374,7 +383,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         techUnitIds = new ArrayList<UUID>();
         salary = -1;
         phenotype = PHENOTYPE_NONE;
-        clan = campaign.getFaction() != null && campaign.getFaction().isClan();
+        clan = Faction.getFaction(factionCode).isClan();
         bloodname = "";
         primaryDesignator = DESIG_NONE;
         secondaryDesignator = DESIG_NONE;
