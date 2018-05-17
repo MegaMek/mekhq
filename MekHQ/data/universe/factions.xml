@@ -37,7 +37,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 	"pirate", "merc", "trader", "minor", "rebel", "inactive", "hidden", "abandoned", "chaos"
  -->
 <factions>
-	<choosableFactionCodes>MERC,CC,DC,FS,FWL,LA,FC,ROS,CS,WOB,FRR,SIC,MOC,MH,OA,TC,CDS,CGB,CHH,CJF,CNC,CSJ,CSV,CSR,CW,CBS,CCC,CCO,CFM,CGS,CIH,CSA,TH,RWR,CIR,JF,PIR,NIOPS,CDP,HL,NC</choosableFactionCodes>
+	<choosableFactionCodes>MERC,CC,DC,FS,FWL,LA,FC,ROS,CS,WOB,FRR,SIC,MOC,MH,OA,TC,CDS,CGB,CHH,CJF,CNC,CSJ,CSV,CSR,CW,CBS,CCC,CCO,CFM,CGS,CIH,CSA,TH,RWR,CIR,JF,PIR,NIOPS,CDP,HL,NC,RD</choosableFactionCodes>
 	<!-- Early spaceflight factions -->
 	<faction>
 		<shortname>WA</shortname>
@@ -1276,7 +1276,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<eraMods>0,0,0,0,0,0,2,1,0</eraMods>
 		<nameGenerator>FRR</nameGenerator>
 		<colorRGB>188,222,235</colorRGB>
-		<tags>is</tags>
+		<tags>clan,is</tags>
 		<start>3103</start>
 	</faction>
 	<faction>
