@@ -30,6 +30,7 @@ import megamek.common.util.EncodeControl;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Mission;
+import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.Planets;
 import mekhq.gui.utilities.JSuggestField;
 
@@ -136,7 +137,7 @@ public class CustomizeMissionDialog extends javax.swing.JDialog {
 
         suggestPlanet = new JSuggestField(this, campaign.getPlanetNames());
         if(!newMission) {
-            suggestPlanet.setText(mission.getPlanetName(null));
+            suggestPlanet.setText(mission.getPlanetName(Utilities.getDateTimeDay(campaign.getCalendar())));
         }
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -209,8 +210,17 @@ public class CustomizeMissionDialog extends javax.swing.JDialog {
 
     	mission.setName(txtName.getText());
     	mission.setType(txtType.getText());
-        mission.setPlanetId((Planets.getInstance().getPlanetByName(suggestPlanet.getText(),
-                Utilities.getDateTimeDay(campaign.getCalendar()))).getId());
+    	
+    	Planet canonPlanet = Planets.getInstance().getPlanetByName(suggestPlanet.getText(),
+                Utilities.getDateTimeDay(campaign.getCalendar()));
+    	
+    	if(canonPlanet != null) {
+    	    mission.setPlanetId(canonPlanet.getId());
+    	} else {
+    	    mission.setPlanetId(null);
+    	    mission.setLegacyPlanetName(suggestPlanet.getText());
+    	}
+    	
     	mission.setDesc(txtDesc.getText());
     	if(newMission) {
     		campaign.addMission(mission);
