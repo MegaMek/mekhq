@@ -138,6 +138,10 @@ public class Mission implements Serializable, MekHqXmlSerializable {
         
         return getPlanet().getName(when);
     }
+    
+    public void setLegacyPlanetName(String name) {
+        legacyPlanetName = name;
+    }
 
     public String getDescription() {
         return desc;
@@ -228,7 +232,7 @@ public class Mission implements Serializable, MekHqXmlSerializable {
         if(planetId != null) {         
             pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<planetId>" + MekHqXmlUtil.escape(planetId) + "</planetId>");
         } else {
-            pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<planetId>" + MekHqXmlUtil.escape(legacyPlanetName) + "</planetId>");
+            pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<planetName>" + MekHqXmlUtil.escape(legacyPlanetName) + "</planetName>");
         }
         pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<status>" + status + "</status>");
         pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<desc>" + MekHqXmlUtil.escape(desc) + "</desc>");
