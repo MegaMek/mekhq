@@ -433,7 +433,13 @@ public final class BriefingTab extends CampaignGuiTab {
                             }
                         }
                     }
+                    
+                    if(mission.getStatus() != Mission.S_ACTIVE) {
+                        MekHQ.triggerEvent(new MissionCompletedEvent(mission));
+                    }
                 }
+                
+                
                 if (!mission.isActive()) {
                     if (getCampaign().getCampaignOptions().getUseAtB() && mission instanceof AtBContract) {
                         ((AtBContract) mission).checkForFollowup(getCampaign());
