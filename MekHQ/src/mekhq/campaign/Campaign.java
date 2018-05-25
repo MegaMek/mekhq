@@ -680,6 +680,12 @@ public class Campaign implements Serializable, ITechManager {
         shipSearchExpiration = null;
     }
 
+    /**
+     * Process retirements for retired personnel, if any.
+     * @param totalPayout The total retirement payout.
+     * @param unitAssignments List of unit assignments.
+     * @return False if there were payments AND they were unable to be processed, true otherwise.
+     */
     public boolean applyRetirement(long totalPayout, HashMap<UUID, UUID> unitAssignments) {
         if (totalPayout > 0) {
             if (null != getRetirementDefectionTracker().getRetirees()) {
@@ -722,10 +728,12 @@ public class Campaign implements Serializable, ITechManager {
                     return true;
                 } else {
                     addReport("<font color='red'>You cannot afford to make the final payments.</font>");
+                    return false;
                 }
             }
         }
-        return false;
+        
+        return true;
     }
 
     public News getNews() {
@@ -7630,7 +7638,6 @@ public class Campaign implements Serializable, ITechManager {
                         + contract.getName());
             }
         }
-        MekHQ.triggerEvent(new MissionCompletedEvent(mission));
     }
 
     public int calculatePartTransitTime(int mos) {
