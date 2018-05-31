@@ -1926,13 +1926,6 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                                 menuItem.setEnabled(available);
                                 specialistMenu.add(menuItem);
                             }
-                            if (!ranges.contains(Crew.RANGEMASTER_LOS)) {
-                                menuItem = new JMenuItem(String.format(resourceMap.getString("abilityDesc.format"), resourceMap.getString("rangemaster_los.text"), costDesc)); //$NON-NLS-1$ //$NON-NLS-2$
-                                menuItem.setActionCommand(makeCommand(CMD_ACQUIRE_RANGEMASTER, Crew.RANGEMASTER_LOS, String.valueOf(cost)));
-                                menuItem.addActionListener(this);
-                                menuItem.setEnabled(available);
-                                specialistMenu.add(menuItem);
-                            }
                             if (specialistMenu.getMenuComponentCount() > 0) {
                                 abMenu.add(specialistMenu);
                             }

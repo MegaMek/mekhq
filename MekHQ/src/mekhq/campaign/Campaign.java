@@ -5749,7 +5749,7 @@ public class Campaign implements Serializable, ITechManager {
             person.acquireAbility(PilotOptions.LVL3_ADVANTAGES, name, special);
         } else if (name.equals("range_master")) {
             String special = Crew.RANGEMASTER_NONE;
-            switch (Compute.randomInt(3)) {
+            switch (Compute.randomInt(2)) {
                 case 0:
                     special = Crew.RANGEMASTER_MEDIUM;
                     break;
@@ -5758,9 +5758,6 @@ public class Campaign implements Serializable, ITechManager {
                     break;
                 case 2:
                     special = Crew.RANGEMASTER_EXTREME;
-                    break;
-                case 3:
-                    special = Crew.RANGEMASTER_LOS;
                     break;
             }
             person.acquireAbility(PilotOptions.LVL3_ADVANTAGES, name,
