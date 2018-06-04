@@ -136,7 +136,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
      */
     private ArrayList<JCheckBox> miaBtns = new ArrayList<JCheckBox>();
     private ArrayList<JCheckBox> kiaBtns = new ArrayList<JCheckBox>();
-    private ArrayList<JCheckBox> pr_kiaBtns = new ArrayList<JCheckBox>();
+    private ArrayList<JCheckBox> prisonerKiaBtns = new ArrayList<JCheckBox>();
     private ArrayList<JSlider> hitSliders = new ArrayList<JSlider>();
     private ArrayList<PersonStatus> pstatuses = new ArrayList<PersonStatus>();
 
@@ -519,7 +519,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
             pnlPrisonerStatus.add(prisonerCheck, gridBagConstraints);
             kiaCheck = new JCheckBox("");
             kiaCheck.addItemListener(new CheckBoxKIAListener());
-            pr_kiaBtns.add(kiaCheck);
+            prisonerKiaBtns.add(kiaCheck);
             kiaCheck.setSelected(status.getHits() > 5 || status.isDead());
             gridBagConstraints.gridx = 3;
             gridBagConstraints.weightx = 1.0;
@@ -1260,7 +1260,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         //now prisoners
         for(int i = 0; i < prstatuses.size(); i++) {
             PrisonerStatus status = prstatuses.get(i);
-            status.setDead(pr_kiaBtns.get(i).isSelected());
+            status.setDead(prisonerKiaBtns.get(i).isSelected());
             if (pr_hitSliders.get(i).isEnabled()) {
                 status.setHits(pr_hitSliders.get(i).getValue());
             }
@@ -1561,7 +1561,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
             int idx = kiaBtns.indexOf(kiaChk);
             boolean enable = !kiaChk.isSelected();
             if (idx == -1) {    // not found in pilot kiaBtns
-                idx = pr_kiaBtns.indexOf(kiaChk);   // find it in prisoners' instead
+                idx = prisonerKiaBtns.indexOf(kiaChk);   // find it in prisoners' instead
                 JSlider hitSlider = pr_hitSliders.get(idx);
                 JCheckBox capturedCheck = prisonerBtns.get(idx);
                 hitSlider.setEnabled(enable);
