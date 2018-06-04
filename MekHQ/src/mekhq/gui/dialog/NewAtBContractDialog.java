@@ -588,7 +588,9 @@ public class NewAtBContractDialog extends NewContractDialog {
     		contract.setEnemyQuality(cbEnemyQuality.getSelectedIndex());
     	}
     	
-    	if (needUpdatePayment) { updatePaymentMultiplier(); }
+    	if (needUpdatePayment) {
+            updatePaymentMultiplier();
+        }
     	super.doUpdateContract(source);
     	
     	addAllListeners();
