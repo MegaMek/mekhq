@@ -1,6 +1,6 @@
 VERSION HISTORY:
 ----------------
-v0.43.11-RC5
+v0.43.11-RC5 (2018-06-04 0100 UTC)
 + PR #707: Added MissingOmniPod class needed for acquisition.
 + PR #709: Fix for #704: NPE when bringing up the refit dialog
 + PR #715: Fix for #718: Unit.isCommander Error
@@ -21,7 +21,7 @@ v0.43.11-RC5
 + Data: Updating Mechfiles, RATs, and Images in MekHQ repo to match Megamek ones.
 + PR #738: Fix for issue #731 [43.10 AtB] contracts become uncompleted
 
-v0.43.10-RC4
+v0.43.10-RC4 (2018-04-18 18:00 UTC)
 + PR #670: Adjusted unit rating calculation and infantry counts
 	Fixes issue #639: CO calculates Infantry Skill Level Incorrectly
 	Campaign Ops rating now properly reflects infantry skill and more accurately calculates combat unit transport capacity
@@ -55,7 +55,7 @@ v0.43.10-RC4
 	Fixes bug where payroll was accidentally made daily
 + Fix ATB adds 0 value transactions to the finance logs
 
-v0.43.9-RC3
+v0.43.9-RC3 (2018-03-13 18:00 UTC)
 + Issue #647: Exception Causing UI Issues while Unit is Being Refit
 + Issue #655: Mechs (and probably other units) whose crews ejected will be able to deploy on subsequent missions
 + Updated faction-change info for FWL using Handbook Marik
