@@ -32,6 +32,7 @@ import java.util.UUID;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import classes.mekhq.campaign.event.OptionsChangedEvent;
 import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.EntityMovementMode;
@@ -41,6 +42,7 @@ import megamek.common.MechSummary;
 import megamek.common.MechSummaryCache;
 import megamek.common.TargetRoll;
 import megamek.common.UnitType;
+import megamek.common.event.Subscribe;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
@@ -77,18 +79,32 @@ public class PersonnelMarket {
 
 	public PersonnelMarket() {
 	    method = new PersonnelMarketRandom();
+        MekHQ.registerHandler(this);
 	}
 
 	public PersonnelMarket(Campaign c) {
 		daysSinceRolled = c.getCampaignOptions().getMaintenanceCycleDays();
 		generatePersonnelForDay(c);
-		switch (c.getCampaignOptions().getPersonnelMarketType()) {
-		    case TYPE_RANDOM:
-		        method = new PersonnelMarketRandom();
-		        break;
-		    default:
-		        method = null;
-		}
+		setType(c.getCampaignOptions().getPersonnelMarketType());
+		MekHQ.registerHandler(this);
+	}
+	
+	public void setType(int type) {
+        switch (type) {
+            case TYPE_RANDOM:
+                method = new PersonnelMarketRandom();
+                break;
+            case TYPE_FMMR:
+                method = new PersonnelMarketFMMr();
+                break;
+            default:
+                method = null;
+        }
+	}
+	
+	@Subscribe
+	public void handleCampaignOptionsEvent(OptionsChangedEvent ev) {
+	    setType(ev.getOptions().getPersonnelMarketType());
 	}
 
 	/*
@@ -115,15 +131,17 @@ public class PersonnelMarket {
 			}
 		} else if (null != method) {
 		    List<Person> newPersonnel = method.generatePersonnelForDay(c);
-		    for (Person recruit : newPersonnel) {
-                personnel.add(recruit);
-                personnelIds.put(recruit.getId(), recruit);
-                updated = true;
-                if (c.getCampaignOptions().getUseAtB()) {
-                    addRecruitUnit(recruit, c);
-                }
+		    if (null != newPersonnel) {
+    		    for (Person recruit : newPersonnel) {
+                    personnel.add(recruit);
+                    personnelIds.put(recruit.getId(), recruit);
+                    updated = true;
+                    if (c.getCampaignOptions().getUseAtB()) {
+                        addRecruitUnit(recruit, c);
+                    }
+    		    }
+    		    updated = !newPersonnel.isEmpty();
 		    }
-		    updated = !newPersonnel.isEmpty();
 		} else {
 
 			switch (c.getCampaignOptions().getPersonnelMarketType()) {
@@ -207,68 +225,6 @@ public class PersonnelMarket {
 					}
 				}
 				updated = true;
-				break;
-			case TYPE_FMMR:
-				long mft = getUnitMainForceType(c);
-				int mftMod = 0;
-				if (mft == Entity.ETYPE_MECH || mft == Entity.ETYPE_TANK || mft == Entity.ETYPE_INFANTRY || mft == Entity.ETYPE_BATTLEARMOR) {
-					mftMod = 1;
-				}
-				if (c.getCalendar().get(Calendar.DAY_OF_MONTH) == 1) {
-					for (int i = Person.T_NONE + 1; i < Person.T_NUM; i++) {
-						roll = Compute.d6(2);
-						// TODO: Modifiers for hiring hall, but first needs to track the hiring hall
-						switch(c.getUnitRatingMod()) {
-						case IUnitRating.DRAGOON_A:
-						case IUnitRating.DRAGOON_ASTAR:
-							roll += 3;
-							break;
-						case IUnitRating.DRAGOON_B:
-							roll += 2;
-							break;
-						case IUnitRating.DRAGOON_C:
-							roll += 1;
-							break;
-						case IUnitRating.DRAGOON_D:
-							roll -= 1;
-							break;
-						case IUnitRating.DRAGOON_F:
-							roll -= 2;
-							break;
-						}
-						roll += mftMod;
-						roll = Math.max(roll, 0);
-						if (roll < 4) {
-							q = 0;
-						} else if (roll < 6) {
-							q = 1;
-						} else if (roll < 9) {
-							q = 2;
-						} else if (roll < 11) {
-							q = 3;
-						} else if (roll < 14) {
-							q = 4;
-						} else if (roll < 16) {
-							q = 5;
-						} else {
-							q = 6;
-						}
-						for (int j = 0; j < q; j++) {
-							p = c.newPerson(i);
-							UUID id = UUID.randomUUID();
-							while (null != personnelIds.get(id)) {
-								id = UUID.randomUUID();
-							}
-							p.setId(id);
-							personnel.add(p);
-							personnelIds.put(id, p);
-							if (c.getCampaignOptions().getUseAtB()) {
-								addRecruitUnit(p, c);
-							}
-						}
-					}
-					updated = true;
-				}
 				break;
 			case TYPE_STRAT_OPS:
 				if (daysSinceRolled == c.getCampaignOptions().getMaintenanceCycleDays()) {
@@ -496,7 +452,6 @@ public class PersonnelMarket {
 				}
 
 				break;
-			case TYPE_RANDOM:
 			default: // default is random
 				q = generateRandomQuantity();
 
@@ -538,12 +493,6 @@ public class PersonnelMarket {
             int roll;
     
             switch (c.getCampaignOptions().getPersonnelMarketType()) {
-                case TYPE_FMMR:
-                    if (c.getCalendar().get(Calendar.DAY_OF_MONTH) == 1) {
-                        personnel.clear();
-                        attachedEntities.clear();
-                    }
-                    break;
                 case TYPE_STRAT_OPS:
                     if (daysSinceRolled == c.getCampaignOptions().getMaintenanceCycleDays()) {
                         personnel.clear();
@@ -557,7 +506,6 @@ public class PersonnelMarket {
                 	}
                 	break;
                 case TYPE_DYLANS:
-                case TYPE_RANDOM:
                 default: // default is random
                     for (Person p : personnel) {
                         roll = Compute.d6(2);
@@ -580,12 +528,14 @@ public class PersonnelMarket {
                     }
             }
         }
-        for (Person p : toRemove) {
-        	if (attachedEntities.contains(p.getId())) {
-        		attachedEntities.remove(p.getId());
-        	}
+        if (null != toRemove) {
+            for (Person p : toRemove) {
+            	if (attachedEntities.contains(p.getId())) {
+            		attachedEntities.remove(p.getId());
+            	}
+            }
+            personnel.removeAll(toRemove);
         }
-        personnel.removeAll(toRemove);
     }
 
     public void setPersonnel(ArrayList<Person> p) {
@@ -760,7 +710,7 @@ public class PersonnelMarket {
         }
     }
 
-    public long getUnitMainForceType(Campaign c) {
+    public static long getUnitMainForceType(Campaign c) {
         long mostTypes = getUnitMainForceTypes(c);
         if ((mostTypes & Entity.ETYPE_MECH) != 0) {
             return Entity.ETYPE_MECH;
@@ -785,7 +735,7 @@ public class PersonnelMarket {
         }
     }
 
-    public long getUnitMainForceTypes(Campaign c) {
+    public static long getUnitMainForceTypes(Campaign c) {
         int mechs = c.getNumberOfUnitsByType(Entity.ETYPE_MECH);
         int ds = c.getNumberOfUnitsByType(Entity.ETYPE_DROPSHIP);
         int sc = c.getNumberOfUnitsByType(Entity.ETYPE_SMALL_CRAFT);
