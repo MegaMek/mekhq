@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.UUID;
 
 import org.w3c.dom.Node;
@@ -58,6 +59,7 @@ public class PersonnelMarket {
 	private ArrayList<Person> personnel = new ArrayList<Person>();
 	private Hashtable<UUID, Person> personnelIds = new Hashtable<UUID, Person>();
 	private int daysSinceRolled;
+	private PersonnelMarketMethod method;
 
 	public static final int TYPE_RANDOM = 0;
 	public static final int TYPE_DYLANS = 1;
@@ -74,11 +76,19 @@ public class PersonnelMarket {
 	private int paidRecruitType;
 
 	public PersonnelMarket() {
+	    method = new PersonnelMarketRandom();
 	}
 
 	public PersonnelMarket(Campaign c) {
 		daysSinceRolled = c.getCampaignOptions().getMaintenanceCycleDays();
 		generatePersonnelForDay(c);
+		switch (c.getCampaignOptions().getPersonnelMarketType()) {
+		    case TYPE_RANDOM:
+		        method = new PersonnelMarketRandom();
+		        break;
+		    default:
+		        method = null;
+		}
 	}
 
 	/*
@@ -103,6 +113,17 @@ public class PersonnelMarket {
 			} else {
 				c.addReport("<html><font color=\"red\">Insufficient funds for paid recruitment.</font></html>");
 			}
+		} else if (null != method) {
+		    List<Person> newPersonnel = method.generatePersonnelForDay(c);
+		    for (Person recruit : newPersonnel) {
+                personnel.add(recruit);
+                personnelIds.put(recruit.getId(), recruit);
+                updated = true;
+                if (c.getCampaignOptions().getUseAtB()) {
+                    addRecruitUnit(recruit, c);
+                }
+		    }
+		    updated = !newPersonnel.isEmpty();
 		} else {
 
 			switch (c.getCampaignOptions().getPersonnelMarketType()) {
@@ -510,50 +531,54 @@ public class PersonnelMarket {
      * The better they are, the faster they disappear
      */
     public void removePersonnelForDay(Campaign c) {
-        ArrayList<Person> toRemove = new ArrayList<Person>();
-        int roll;
-
-        switch (c.getCampaignOptions().getPersonnelMarketType()) {
-            case TYPE_FMMR:
-                if (c.getCalendar().get(Calendar.DAY_OF_MONTH) == 1) {
-                    personnel.clear();
-                    attachedEntities.clear();
-                }
-                break;
-            case TYPE_STRAT_OPS:
-                if (daysSinceRolled == c.getCampaignOptions().getMaintenanceCycleDays()) {
-                    personnel.clear();
-                    attachedEntities.clear();
-                }
-                break;
-            case TYPE_ATB:
-            	if (c.getCalendar().get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY) {
-            		personnel.clear();
-                    attachedEntities.clear();
-            	}
-            	break;
-            case TYPE_DYLANS:
-            case TYPE_RANDOM:
-            default: // default is random
-                for (Person p : personnel) {
-                    roll = Compute.d6(2);
-                    if (p.getExperienceLevel(false) == SkillType.EXP_ELITE
-                        && roll < c.getCampaignOptions().getPersonnelMarketRandomEliteRemoval()) {
-                        toRemove.add(p);
-                    } else if (p.getExperienceLevel(false) == SkillType.EXP_VETERAN
-                               && roll < c.getCampaignOptions().getPersonnelMarketRandomVeteranRemoval()) {
-                        toRemove.add(p);
-                    } else if (p.getExperienceLevel(false) == SkillType.EXP_REGULAR
-                               && roll < c.getCampaignOptions().getPersonnelMarketRandomRegularRemoval()) {
-                        toRemove.add(p);
-                    } else if (p.getExperienceLevel(false) == SkillType.EXP_GREEN
-                               && roll < c.getCampaignOptions().getPersonnelMarketRandomGreenRemoval()) {
-                        toRemove.add(p);
-                    } else if (p.getExperienceLevel(false) == SkillType.EXP_ULTRA_GREEN
-                               && roll < c.getCampaignOptions().getPersonnelMarketRandomUltraGreenRemoval()) {
-                        toRemove.add(p);
+        List<Person> toRemove = new ArrayList<Person>();
+        if (null != method) {
+            toRemove = method.removePersonnelForDay(c, personnel);
+        } else {
+            int roll;
+    
+            switch (c.getCampaignOptions().getPersonnelMarketType()) {
+                case TYPE_FMMR:
+                    if (c.getCalendar().get(Calendar.DAY_OF_MONTH) == 1) {
+                        personnel.clear();
+                        attachedEntities.clear();
                     }
-                }
+                    break;
+                case TYPE_STRAT_OPS:
+                    if (daysSinceRolled == c.getCampaignOptions().getMaintenanceCycleDays()) {
+                        personnel.clear();
+                        attachedEntities.clear();
+                    }
+                    break;
+                case TYPE_ATB:
+                	if (c.getCalendar().get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY) {
+                		personnel.clear();
+                        attachedEntities.clear();
+                	}
+                	break;
+                case TYPE_DYLANS:
+                case TYPE_RANDOM:
+                default: // default is random
+                    for (Person p : personnel) {
+                        roll = Compute.d6(2);
+                        if (p.getExperienceLevel(false) == SkillType.EXP_ELITE
+                            && roll < c.getCampaignOptions().getPersonnelMarketRandomEliteRemoval()) {
+                            toRemove.add(p);
+                        } else if (p.getExperienceLevel(false) == SkillType.EXP_VETERAN
+                                   && roll < c.getCampaignOptions().getPersonnelMarketRandomVeteranRemoval()) {
+                            toRemove.add(p);
+                        } else if (p.getExperienceLevel(false) == SkillType.EXP_REGULAR
+                                   && roll < c.getCampaignOptions().getPersonnelMarketRandomRegularRemoval()) {
+                            toRemove.add(p);
+                        } else if (p.getExperienceLevel(false) == SkillType.EXP_GREEN
+                                   && roll < c.getCampaignOptions().getPersonnelMarketRandomGreenRemoval()) {
+                            toRemove.add(p);
+                        } else if (p.getExperienceLevel(false) == SkillType.EXP_ULTRA_GREEN
+                                   && roll < c.getCampaignOptions().getPersonnelMarketRandomUltraGreenRemoval()) {
+                            toRemove.add(p);
+                        }
+                    }
+            }
         }
         for (Person p : toRemove) {
         	if (attachedEntities.contains(p.getId())) {
