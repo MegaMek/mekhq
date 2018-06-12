@@ -24,7 +24,6 @@ package mekhq.campaign.market;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.UUID;
@@ -60,8 +59,8 @@ import mekhq.campaign.universe.RandomFactionGenerator;
 public class PersonnelMarket {
 	private ArrayList<Person> personnel = new ArrayList<Person>();
 	private Hashtable<UUID, Person> personnelIds = new Hashtable<UUID, Person>();
-	private int daysSinceRolled;
 	private PersonnelMarketMethod method;
+	private int methodIndex = TYPE_RANDOM;
 
 	public static final int TYPE_RANDOM = 0;
 	public static final int TYPE_DYLANS = 1;
@@ -83,26 +82,37 @@ public class PersonnelMarket {
 	}
 
 	public PersonnelMarket(Campaign c) {
-		daysSinceRolled = c.getCampaignOptions().getMaintenanceCycleDays();
 		generatePersonnelForDay(c);
 		setType(c.getCampaignOptions().getPersonnelMarketType());
 		MekHQ.registerHandler(this);
 	}
 	
+	/**
+	 * Sets the method for generating potential recruits for the personnel market.
+	 * @param type  The index of the market type to use.
+	 */
 	public void setType(int type) {
-        switch (type) {
-            case TYPE_DYLANS:
-                method = new PersonnelMarketDylan();
-                break;
-            case TYPE_RANDOM:
-                method = new PersonnelMarketRandom();
-                break;
-            case TYPE_FMMR:
-                method = new PersonnelMarketFMMr();
-                break;
-            default:
-                method = null;
-        }
+	    // We don't want to initialize the method if it doesn't actually change, since methods
+	    // can lose state.
+	    if ((type != methodIndex) || (null == method)) {
+            switch (type) {
+                case TYPE_RANDOM:
+                    method = new PersonnelMarketRandom();
+                    break;
+                case TYPE_DYLANS:
+                    method = new PersonnelMarketDylan();
+                    break;
+                case TYPE_FMMR:
+                    method = new PersonnelMarketFMMr();
+                    break;
+                case TYPE_STRAT_OPS:
+                    method = new PersonnelMarketStratOps();
+                    break;
+                default:
+                    method = null;
+            }
+            methodIndex = type;
+	    }
 	}
 	
 	@Subscribe
@@ -147,61 +157,6 @@ public class PersonnelMarket {
 		} else {
 
 			switch (c.getCampaignOptions().getPersonnelMarketType()) {
-			case TYPE_STRAT_OPS:
-				if (daysSinceRolled == c.getCampaignOptions().getMaintenanceCycleDays()) {
-					roll = Compute.d6(2);
-					if (roll == 2) { // Medical
-						p = c.newPerson(Person.T_DOCTOR);
-					} else if (roll == 3) { // ASF or Proto Pilot
-						if (c.getFaction().isClan() && c.getCalendar().after(new GregorianCalendar(3059, 1, 1)) && Compute.d6(2) < 6) {
-							p = c.newPerson(Person.T_PROTO_PILOT);
-						} else {
-							p = c.newPerson(Person.T_AERO_PILOT);
-						}
-					} else if (roll == 4 || roll == 10) { // MW
-						p = c.newPerson(Person.T_MECHWARRIOR);
-					} else if (roll == 5 || roll == 9) { // Vehicle Crews
-						if (Compute.d6() < 3) {
-							p = c.newPerson(Person.T_GVEE_DRIVER);
-						} else {
-							p = c.newPerson(Person.T_VEE_GUNNER);
-						}
-					} else if (roll == 6 || roll == 8) { // Infantry
-						if (c.getFaction().isClan() && Compute.d6(2) > 3) {
-							p = c.newPerson(Person.T_BA);
-						} else {
-							p = c.newPerson(Person.T_INFANTRY);
-						}
-					} else if (roll == 11) { // Tech
-						int tr = Compute.randomInt(Person.T_ASTECH);
-						while (tr < Person.T_MECH_TECH) {
-							tr = Compute.randomInt(Person.T_ASTECH);
-						}
-						p = c.newPerson(tr);
-					} else if (roll == 12) { // Vessel Crew
-						int tr = Compute.randomInt(Person.T_SPACE_GUNNER);
-						while (tr < Person.T_SPACE_PILOT) {
-							tr = Compute.randomInt(Person.T_SPACE_GUNNER);
-						}
-						p = c.newPerson(tr);
-					} else {
-						p = c.newPerson(Person.T_NONE);
-					}
-					UUID id = UUID.randomUUID();
-					while (null != personnelIds.get(id)) {
-						id = UUID.randomUUID();
-					}
-					p.setId(id);
-					personnel.add(p);
-					personnelIds.put(id, p);
-					if (c.getCampaignOptions().getUseAtB()) {
-						addRecruitUnit(p, c);
-					}
-					updated = true;
-				} else {
-					incrementDaysSinceRolled();
-				}
-				break;
 			case TYPE_ATB:
 				p = null;
 
@@ -390,42 +345,13 @@ public class PersonnelMarket {
         if (null != method) {
             toRemove = method.removePersonnelForDay(c, personnel);
         } else {
-            int roll;
-    
             switch (c.getCampaignOptions().getPersonnelMarketType()) {
-                case TYPE_STRAT_OPS:
-                    if (daysSinceRolled == c.getCampaignOptions().getMaintenanceCycleDays()) {
-                        personnel.clear();
-                        attachedEntities.clear();
-                    }
-                    break;
                 case TYPE_ATB:
                 	if (c.getCalendar().get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY) {
                 		personnel.clear();
                         attachedEntities.clear();
                 	}
                 	break;
-                case TYPE_DYLANS:
-                default: // default is random
-                    for (Person p : personnel) {
-                        roll = Compute.d6(2);
-                        if (p.getExperienceLevel(false) == SkillType.EXP_ELITE
-                            && roll < c.getCampaignOptions().getPersonnelMarketRandomEliteRemoval()) {
-                            toRemove.add(p);
-                        } else if (p.getExperienceLevel(false) == SkillType.EXP_VETERAN
-                                   && roll < c.getCampaignOptions().getPersonnelMarketRandomVeteranRemoval()) {
-                            toRemove.add(p);
-                        } else if (p.getExperienceLevel(false) == SkillType.EXP_REGULAR
-                                   && roll < c.getCampaignOptions().getPersonnelMarketRandomRegularRemoval()) {
-                            toRemove.add(p);
-                        } else if (p.getExperienceLevel(false) == SkillType.EXP_GREEN
-                                   && roll < c.getCampaignOptions().getPersonnelMarketRandomGreenRemoval()) {
-                            toRemove.add(p);
-                        } else if (p.getExperienceLevel(false) == SkillType.EXP_ULTRA_GREEN
-                                   && roll < c.getCampaignOptions().getPersonnelMarketRandomUltraGreenRemoval()) {
-                            toRemove.add(p);
-                        }
-                    }
             }
         }
         if (null != toRemove) {
@@ -495,14 +421,13 @@ public class PersonnelMarket {
     	paidRecruitType = pr;
     }
 
-    public void incrementDaysSinceRolled() {
-        daysSinceRolled++;
-    }
-
     public void writeToXml(PrintWriter pw1, int indent) {
         pw1.println(MekHqXmlUtil.indentStr(indent) + "<personnelMarket>");
         for (Person p : personnel) {
             p.writeToXml(pw1, indent + 1);
+        }
+        if (null != method) {
+            method.writeToXml(pw1, indent);
         }
         if (paidRecruitment) {
         	pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<paidRecruitment/>");
@@ -514,7 +439,7 @@ public class PersonnelMarket {
                     + "<entity id=\"" + id.toString() + "\">"
                     + attachedEntities.get(id).getShortNameRaw()
                     + "</entity>");
-         }
+        }
         pw1.println(MekHqXmlUtil.indentStr(indent) + "</personnelMarket>");
     }
 
@@ -526,6 +451,7 @@ public class PersonnelMarket {
         try {
             // Instantiate the correct child class, and call its parsing function.
             retVal = new PersonnelMarket();
+            retVal.setType(c.getCampaignOptions().getPersonnelMarketType());
 
             // Okay, now load Part-specific fields!
             NodeList nl = wn.getChildNodes();
@@ -538,7 +464,7 @@ public class PersonnelMarket {
             	if (wn2.getNodeType() != Node.ELEMENT_NODE) {
             		continue;
             	}
-
+            	
             	if (wn2.getNodeName().equalsIgnoreCase("person")) {
             		Person p = Person.generateInstanceFromXML(wn2, c, version);
 
@@ -565,6 +491,8 @@ public class PersonnelMarket {
             		retVal.paidRecruitment = true;
             	} else if (wn2.getNodeName().equalsIgnoreCase("paidRecruitType")) {
             		retVal.paidRecruitType = Integer.parseInt(wn2.getTextContent());
+            	} else if (null != retVal.method) {
+            	    retVal.method.loadFieldsFromXml(wn2);
           		} else  {
             		// Error condition of sorts!
             		// Errr, what should we do here?

@@ -18,7 +18,10 @@
  */
 package mekhq.campaign.market;
 
+import java.io.PrintWriter;
 import java.util.List;
+
+import org.w3c.dom.Node;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
@@ -34,5 +37,8 @@ public interface PersonnelMarketMethod {
     String getMethodName();
     List<Person> generatePersonnelForDay(Campaign c);
     List<Person> removePersonnelForDay(Campaign c, List<Person> current);
+    
+    default void loadFieldsFromXml(Node node) {}
+    default void writeToXml(PrintWriter pw1, int indent) {}
 
 }
