@@ -23,7 +23,6 @@ package mekhq.campaign.market;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.UUID;
@@ -32,29 +31,22 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import classes.mekhq.campaign.event.OptionsChangedEvent;
-import megamek.common.Compute;
 import megamek.common.Entity;
-import megamek.common.EntityMovementMode;
-import megamek.common.EntityWeightClass;
 import megamek.common.MechFileParser;
 import megamek.common.MechSummary;
 import megamek.common.MechSummaryCache;
 import megamek.common.TargetRoll;
-import megamek.common.UnitType;
 import megamek.common.event.Subscribe;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
-import mekhq.Utilities;
 import mekhq.Version;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.finances.Transaction;
+import mekhq.campaign.event.MarketNewPersonnelEvent;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.rating.IUnitRating;
-import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.plugin.atb.PersonnelMarketAtB;
 
 public class PersonnelMarket {
@@ -135,26 +127,15 @@ public class PersonnelMarket {
 			removePersonnelForDay(c);
 		}
 
-		if (paidRecruitment && c.getCalendar().get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY) {
-			if (c.getFinances().debit(100000, Transaction.C_MISC,
-					"Paid recruitment roll", c.getDate())) {
-				doPaidRecruitment(c);
-				updated = true;
-			} else {
-				c.addReport("<html><font color=\"red\">Insufficient funds for paid recruitment.</font></html>");
-			}
-		} else if (null != method) {
+		if (null != method) {
 		    List<Person> newPersonnel = method.generatePersonnelForDay(c);
-		    if (null != newPersonnel) {
+		    if ((null != newPersonnel) && !newPersonnel.isEmpty()) {
     		    for (Person recruit : newPersonnel) {
                     personnel.add(recruit);
                     personnelIds.put(recruit.getId(), recruit);
-                    updated = true;
-                    if (c.getCampaignOptions().getUseAtB()) {
-                        addRecruitUnit(recruit, c);
-                    }
     		    }
-    		    updated = !newPersonnel.isEmpty();
+    		    updated = true;
+                MekHQ.triggerEvent(new MarketNewPersonnelEvent(newPersonnel));
 		    }
 		}
 
@@ -209,17 +190,40 @@ public class PersonnelMarket {
         	attachedEntities.remove(p.getId());
         }
     }
+    
+    /**
+     * Assign an <code>Entity</code> to a recruit
+     * @param pid  The recruit's id
+     * @param en   The Entity to assign
+     */
+    public void addAttachedEntity(UUID pid, Entity en) {
+        attachedEntities.put(pid, en);
+    }
 
+    /**
+     * Get the Entity associated with a recruit, if any
+     * @param p  The recruit
+     * @return   The Entity associated with the recruit, or null if there is none
+     */
     public Entity getAttachedEntity(Person p) {
     	return attachedEntities.get(p.getId());
     }
 
+    /**
+     * Get the Entity associated with a recruit, if any
+     * @param pid The id of the recruit
+     * @return    The Entity associated with the recruit, or null if there is none
+     */
     public Entity getAttachedEntity(UUID pid) {
     	return attachedEntities.get(pid);
     }
 
-    public void removeAttachedEntity(UUID id) {
-    	attachedEntities.remove(id);
+    /**
+     * Clears the <code>Entity</code> associated with a recruit
+     * @param pid  The recruit's id
+     */
+    public void removeAttachedEntity(UUID pid) {
+    	attachedEntities.remove(pid);
     }
 
     public boolean getPaidRecruitment() {
@@ -446,64 +450,6 @@ public class PersonnelMarket {
         }
         return retval;
     }
-
-    private void doPaidRecruitment(Campaign c) {
-    	int mod;
-    	switch (paidRecruitType) {
-    	case Person.T_MECHWARRIOR:
-    		mod = -2;
-    		break;
-    	case Person.T_INFANTRY:
-    		mod = 2;
-    		break;
-    	case Person.T_MECH_TECH:
-    	case Person.T_AERO_TECH:
-    	case Person.T_MECHANIC:
-    	case Person.T_BA_TECH:
-    	case Person.T_DOCTOR:
-    		mod = 1;
-    		break;
-    	default:
-    		mod = 0;
-    	}
-
-    	mod += c.getUnitRatingMod() - IUnitRating.DRAGOON_C;
-		if (c.getFinances().isInDebt()) {
-			mod -= 3;
-		}
-
-		Person adminHR = c.findBestInRole(Person.T_ADMIN_HR, SkillType.S_ADMIN);
-		int adminHRExp = (adminHR == null)?SkillType.EXP_ULTRA_GREEN:adminHR.getSkill(SkillType.S_ADMIN).getExperienceLevel();
-		mod += adminHRExp - 2;
-		int q = 0;
-		int r = Compute.d6(2) + mod;
-		if (r > 15) {
-			q = 6;
-		} else if (r > 12) {
-			q = 5;
-		} else if (r > 10) {
-			q = 4;
-		} else if (r > 8) {
-			q = 3;
-		} else if (r > 5) {
-			q = 2;
-		} else if (r > 3) {
-			q = 1;
-		}
-		for (int i = 0; i < q; i++) {
-            Person p = c.newPerson(paidRecruitType);
-            UUID id = UUID.randomUUID();
-            while (null != personnelIds.get(id)) {
-                id = UUID.randomUUID();
-            }
-            p.setId(id);
-            personnel.add(p);
-            personnelIds.put(id, p);
-            if (c.getCampaignOptions().getUseAtB()) {
-            	addRecruitUnit(p, c);
-            }
-		}
-    }
     
     public TargetRoll getShipSearchTarget(Campaign campaign, boolean jumpship) {
     	TargetRoll target = new TargetRoll(jumpship?12:10, "Base");
@@ -522,154 +468,4 @@ public class PersonnelMarket {
     	return target;
     }
 
-    private void addRecruitUnit(Person p, Campaign c) {
-        final String METHOD_NAME = "addRecruitUnit(Person,Campaign)"; //$NON-NLS-1$
-        
-    	int unitType;
-    	switch (p.getPrimaryRole()) {
-    	case Person.T_MECHWARRIOR:
-    		unitType = UnitType.MEK;
-    		break;
-    	case Person.T_GVEE_DRIVER:
-    	case Person.T_VEE_GUNNER:
-    	case Person.T_VTOL_PILOT:
-    		return;
-     	case Person.T_AERO_PILOT:
-    		if (!c.getCampaignOptions().getAeroRecruitsHaveUnits()) {
-    			return;
-    		}
-    		unitType = UnitType.AERO;
-    		break;
-    	case Person.T_INFANTRY:
-    		unitType = UnitType.INFANTRY;
-    		break;
-    	case Person.T_BA:
-    		unitType = UnitType.BATTLE_ARMOR;
-    		break;
-    	case Person.T_PROTO_PILOT:
-    		unitType = UnitType.PROTOMEK;
-    		break;
-    	default:
-    		return;
-    	}
-
-    	int weight = -1;
-    	if (unitType == UnitType.MEK
-    			|| unitType == UnitType.TANK
-    			|| unitType == UnitType.AERO) {
-			int roll = Compute.d6(2);
-	    	if (roll < 8) {
-	    		return;
-	    	}
-	    	if (roll < 10) {
-	    		weight = EntityWeightClass.WEIGHT_LIGHT;
-	    	} else if (roll < 12) {
-	    		weight = EntityWeightClass.WEIGHT_MEDIUM;
-	    	} else {
-	    		weight = EntityWeightClass.WEIGHT_HEAVY;
-	    	}
-    	}
-    	Entity en = null;
-
-    	String faction = getRecruitFaction(c);
-		MechSummary ms = c.getUnitGenerator().generate(faction, unitType, weight, c.getCalendar().get(Calendar.YEAR), IUnitRating.DRAGOON_F);
-    	if (null != ms) {
-    		if (Faction.getFaction(faction).isClan() && ms.getName().matches(".*Platoon.*")) {
-				String name = "Clan " + ms.getName().replaceAll("Platoon", "Point");
-				ms = MechSummaryCache.getInstance().getMech(name);
-				System.out.println("looking for Clan infantry " + name);
-			}
-			try {
-				en = new MechFileParser(ms.getSourceFile(), ms.getEntryName()).getEntity();
-			} catch (EntityLoadingException ex) {
-	            en = null;
-                MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
-                        "Unable to load entity: " + ms.getSourceFile() + ": " //$NON-NLS-1$
-                                + ms.getEntryName() + ": " + ex.getMessage()); //$NON-NLS-1$
-                MekHQ.getLogger().log(getClass(), METHOD_NAME, ex);
-			}
-		} else {
-            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
-                    "Personnel market could not find " //$NON-NLS-1$
-					+ UnitType.getTypeName(unitType) + " for recruit from faction " + faction); //$NON-NLS-1$
-			return;
-		}
-
-		if (null != en) {
-			attachedEntities.put(p.getId(), en);
-			/* adjust vehicle pilot roles according to the type of vehicle rolled */
-			if ((en.getEntityType() & Entity.ETYPE_TANK) != 0) {
-				if (en.getMovementMode() == EntityMovementMode.TRACKED ||
-						en.getMovementMode() == EntityMovementMode.WHEELED ||
-						en.getMovementMode() == EntityMovementMode.HOVER ||
-						en.getMovementMode() == EntityMovementMode.WIGE) {
-					if (p.getPrimaryRole() == Person.T_VTOL_PILOT) {
-						swapSkills(p, SkillType.S_PILOT_VTOL, SkillType.S_PILOT_GVEE);
-						p.setPrimaryRole(Person.T_GVEE_DRIVER);
-					}
-					if (p.getPrimaryRole() == Person.T_NVEE_DRIVER) {
-						swapSkills(p, SkillType.S_PILOT_NVEE, SkillType.S_PILOT_GVEE);
-						p.setPrimaryRole(Person.T_GVEE_DRIVER);
-					}
-				} else if (en.getMovementMode() == EntityMovementMode.VTOL) {
-					if (p.getPrimaryRole() == Person.T_GVEE_DRIVER) {
-						swapSkills(p, SkillType.S_PILOT_GVEE, SkillType.S_PILOT_VTOL);
-						p.setPrimaryRole(Person.T_VTOL_PILOT);
-					}
-					if (p.getPrimaryRole() == Person.T_NVEE_DRIVER) {
-						swapSkills(p, SkillType.S_PILOT_NVEE, SkillType.S_PILOT_VTOL);
-						p.setPrimaryRole(Person.T_VTOL_PILOT);
-					}
-				} else if (en.getMovementMode() == EntityMovementMode.NAVAL ||
-						en.getMovementMode() == EntityMovementMode.HYDROFOIL ||
-						en.getMovementMode() == EntityMovementMode.SUBMARINE) {
-					if (p.getPrimaryRole() == Person.T_GVEE_DRIVER) {
-						swapSkills(p, SkillType.S_PILOT_GVEE, SkillType.S_PILOT_NVEE);
-						p.setPrimaryRole(Person.T_NVEE_DRIVER);
-					}
-					if (p.getPrimaryRole() == Person.T_VTOL_PILOT) {
-						swapSkills(p, SkillType.S_PILOT_VTOL, SkillType.S_PILOT_NVEE);
-						p.setPrimaryRole(Person.T_NVEE_DRIVER);
-					}
-				}
-			}
-		}
-    }
-
-    private void swapSkills(Person p, String skill1, String skill2) {
-    	int s1 = p.hasSkill(skill1)?p.getSkill(skill1).getLevel():0;
-    	int b1 = p.hasSkill(skill1)?p.getSkill(skill1).getBonus():0;
-    	int s2 = p.hasSkill(skill2)?p.getSkill(skill2).getLevel():0;
-    	int b2 = p.hasSkill(skill2)?p.getSkill(skill2).getBonus():0;
-    	p.addSkill(skill1, s2, b2);
-    	p.addSkill(skill2, s1, b1);
-    	if (p.getSkill(skill1).getLevel() == 0) {
-    		p.removeSkill(skill1);
-    	}
-    	if (p.getSkill(skill2).getLevel() == 0) {
-    		p.removeSkill(skill2);
-    	}
-    }
-    public static String getRecruitFaction(Campaign c) {
-        if (c.getFactionCode().equals("MERC")) {
-        	if (c.getCalendar().get(Calendar.YEAR) > 3055 && Compute.randomInt(20) == 0) {
-        		ArrayList<String> clans = new ArrayList<String>();
-        		for (String f : RandomFactionGenerator.getInstance().getCurrentFactions()) {
-        			if (Faction.getFaction(f).isClan()) {
-        				clans.add(f);
-        			}
-        		}
-        		String clan = Utilities.getRandomItem(clans);
-        		if (clan != null) {
-        		    return clan;
-        		}
-        	} else {
-        	    String faction = RandomFactionGenerator.getInstance().getEmployer();
-        	    if (faction != null) {
-        	        return faction;
-        	    }
-        	}
-        }
-        return c.getFactionCode();
-    }
 }

@@ -219,6 +219,7 @@ import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
 import mekhq.gui.GuiTabType;
 import mekhq.gui.utilities.PortraitFileFactory;
+import mekhq.plugin.atb.AtBEventProcessor;
 
 /**
  * @author Taharqa The main campaign class, keeps track of teams and units
@@ -325,6 +326,7 @@ public class Campaign implements Serializable, ITechManager {
     private RetirementDefectionTracker retirementDefectionTracker; // AtB
     private int fatigueLevel; //AtB
     private AtBConfiguration atbConfig; //AtB
+    private AtBEventProcessor atbEventProcessor; //AtB
     private Calendar shipSearchStart; //AtB
     private int shipSearchType;
     private String shipSearchResult; //AtB
@@ -4254,6 +4256,7 @@ public class Campaign implements Serializable, ITechManager {
         }
         if (retVal.getCampaignOptions().getUseAtB()) {
             retVal.atbConfig = AtBConfiguration.loadFromXml();
+            retVal.atbEventProcessor = new AtBEventProcessor(retVal);
         }
 
         //**EVERYTHING HAS BEEN LOADED. NOW FOR SANITY CHECKS**//
@@ -9053,6 +9056,17 @@ public class Campaign implements Serializable, ITechManager {
         atbConfig = AtBConfiguration.loadFromXml();
         RandomFactionGenerator.getInstance().updateTables(calendar.getTime(), location.getCurrentPlanet(),
                 campaignOptions);
+        atbEventProcessor = new AtBEventProcessor(this);
+    }
+    
+    /**
+     * Stop processing AtB events and release memory.
+     */
+    public void shutdownAtB() {
+        RandomFactionGenerator.getInstance().dispose();
+        RandomUnitGenerator.getInstance().dispose();
+        RandomNameGenerator.getInstance().dispose();
+        atbEventProcessor.shutdown();
     }
 
     public boolean checkOverDueLoans() {
