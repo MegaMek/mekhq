@@ -84,7 +84,7 @@ public class PersonnelMarketRandom implements PersonnelMarketMethod {
         return toRemove;
     }
 
-    private int generateRandomQuantity() {
+    int generateRandomQuantity() {
         int roll = Compute.d6(2);
         int retval = 0;
         if (roll == 12) {

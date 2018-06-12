@@ -91,6 +91,9 @@ public class PersonnelMarket {
 	
 	public void setType(int type) {
         switch (type) {
+            case TYPE_DYLANS:
+                method = new PersonnelMarketDylan();
+                break;
             case TYPE_RANDOM:
                 method = new PersonnelMarketRandom();
                 break;
@@ -113,7 +116,6 @@ public class PersonnelMarket {
 	 */
 	public void generatePersonnelForDay(Campaign c) {
 		int roll;
-		int q = 0;
 		Person p;
 		boolean updated = false;
 
@@ -145,87 +147,6 @@ public class PersonnelMarket {
 		} else {
 
 			switch (c.getCampaignOptions().getPersonnelMarketType()) {
-			case TYPE_DYLANS: // TODO: Add in extra infantry and vehicle crews
-				q = generateRandomQuantity();
-
-				ArrayList<Long> mtf = new ArrayList<Long>();
-				long mostTypes = getUnitMainForceTypes(c);
-				if ((mostTypes & Entity.ETYPE_MECH) != 0) {
-					mtf.add(Entity.ETYPE_MECH);
-				} else if ((mostTypes & Entity.ETYPE_TANK) != 0) {
-					mtf.add(Entity.ETYPE_TANK);
-				} else if ((mostTypes & Entity.ETYPE_AERO) != 0) {
-					mtf.add(Entity.ETYPE_AERO);
-				} else if ((mostTypes & Entity.ETYPE_BATTLEARMOR) != 0) {
-					mtf.add(Entity.ETYPE_BATTLEARMOR);
-				} else if ((mostTypes & Entity.ETYPE_INFANTRY) != 0) {
-					mtf.add(Entity.ETYPE_INFANTRY);
-				} else if ((mostTypes & Entity.ETYPE_PROTOMECH) != 0) {
-					mtf.add(Entity.ETYPE_PROTOMECH);
-				} else if ((mostTypes & Entity.ETYPE_CONV_FIGHTER) != 0) {
-					mtf.add(Entity.ETYPE_CONV_FIGHTER);
-				} else if ((mostTypes & Entity.ETYPE_SMALL_CRAFT) != 0) {
-					mtf.add(Entity.ETYPE_SMALL_CRAFT);
-				} else if ((mostTypes & Entity.ETYPE_DROPSHIP) != 0) {
-					mtf.add(Entity.ETYPE_DROPSHIP);
-				} else {
-					mtf.add(Entity.ETYPE_MECH);
-				}
-
-
-				int weight = (int) (c.getCampaignOptions().getPersonnelMarketDylansWeight() * 100);
-				for (int i = 0; i < q; i++) {
-					long choice = mtf.get(Compute.randomInt(Math.max(mtf.size() - 1, 1)));
-					if (Compute.randomInt(99) < weight) {
-						if (choice == Entity.ETYPE_MECH) {
-							p = c.newPerson(Person.T_MECHWARRIOR);
-						} else if (choice == Entity.ETYPE_TANK) {
-							if (Compute.d6() < 3) {
-								p = c.newPerson(Person.T_GVEE_DRIVER);
-							} else {
-								p = c.newPerson(Person.T_VEE_GUNNER);
-							}
-						} else if (choice == Entity.ETYPE_AERO) {
-							p = c.newPerson(Person.T_AERO_PILOT);
-						} else if (choice == Entity.ETYPE_BATTLEARMOR) {
-							p = c.newPerson(Person.T_BA);
-						} else if (choice == Entity.ETYPE_INFANTRY) {
-							p = c.newPerson(Person.T_INFANTRY);
-						} else if (choice == Entity.ETYPE_PROTOMECH) {
-							p = c.newPerson(Person.T_PROTO_PILOT);
-						} else if (choice == Entity.ETYPE_CONV_FIGHTER) {
-							p = c.newPerson(Person.T_CONV_PILOT);
-						} else if (choice == Entity.ETYPE_SMALL_CRAFT) {
-							p = c.newPerson(Person.T_SPACE_PILOT);
-						} else if (choice == Entity.ETYPE_DROPSHIP) {
-							int space = Compute.randomInt(Person.T_SPACE_GUNNER);
-							while (space < Person.T_SPACE_PILOT) {
-								space = Compute.randomInt(Person.T_SPACE_GUNNER);
-							}
-							p = c.newPerson(space);
-						} else {
-							p = c.newPerson(Person.T_NONE);
-						}
-					} else {
-						roll = Compute.randomInt(Person.T_NUM - 1);
-						while (roll == Person.T_NONE) {
-							roll = Compute.randomInt(Person.T_NUM - 1);
-						}
-						p = c.newPerson(roll);
-					}
-					UUID id = UUID.randomUUID();
-					while (null != personnelIds.get(id)) {
-						id = UUID.randomUUID();
-					}
-					p.setId(id);
-					personnel.add(p);
-					personnelIds.put(id, p);
-					if (c.getCampaignOptions().getUseAtB()) {
-						addRecruitUnit(p, c);
-					}
-				}
-				updated = true;
-				break;
 			case TYPE_STRAT_OPS:
 				if (daysSinceRolled == c.getCampaignOptions().getMaintenanceCycleDays()) {
 					roll = Compute.d6(2);
@@ -452,27 +373,6 @@ public class PersonnelMarket {
 				}
 
 				break;
-			default: // default is random
-				q = generateRandomQuantity();
-
-				for (int i = 0; i < q; i++) {
-					roll = Compute.randomInt(Person.T_NUM - 1);
-					while (roll == Person.T_NONE) {
-						roll = Compute.randomInt(Person.T_NUM - 1);
-					}
-					p = c.newPerson(roll);
-					UUID id = UUID.randomUUID();
-					while (null != personnelIds.get(id)) {
-						id = UUID.randomUUID();
-					}
-					p.setId(id);
-					personnel.add(p);
-					personnelIds.put(id, p);
-					updated = true;
-					if (c.getCampaignOptions().getUseAtB()) {
-						addRecruitUnit(p, c);
-					}
-				}
 			}
 		}
 
@@ -709,6 +609,7 @@ public class PersonnelMarket {
                 return "ERROR: Default case reached in PersonnelMarket.getTypeName()";
         }
     }
+    
 
     public static long getUnitMainForceType(Campaign c) {
         long mostTypes = getUnitMainForceTypes(c);
@@ -797,27 +698,6 @@ public class PersonnelMarket {
         }
         if (most == proto) {
             retval = retval | Entity.ETYPE_PROTOMECH;
-        }
-        return retval;
-    }
-
-    public int generateRandomQuantity() {
-        int roll = Compute.d6(2);
-        int retval = 0;
-        if (roll == 12) {
-            retval = 6;
-        } else if (roll < 12) {
-            retval = 5;
-        } else if (roll < 10) {
-            retval = 4;
-        } else if (roll < 8) {
-            retval = 3;
-        } else if (roll < 5) {
-            retval = 2;
-        } else if (roll < 3) {
-            retval = 1;
-        } else if (roll == 1) {
-            retval = 0;
         }
         return retval;
     }
