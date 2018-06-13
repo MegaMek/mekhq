@@ -781,6 +781,15 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 		}
         return new AmmoStorage(1,type,shots,campaign);
     }
+	
+	/**
+	 * Get an "IAcquisitionWork" with a specific number of shots.
+	 * @param shots The number of shots to get.
+	 * @return IAcquisitionWork object.
+	 */
+	public IAcquisitionWork getAcquisitionWork(int shots) {
+	    return new AmmoStorage(1, type, shots, campaign);
+	}
 
 	@Override
 	public boolean needsMaintenance() {
