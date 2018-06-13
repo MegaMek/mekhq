@@ -38,6 +38,7 @@ import mekhq.Utilities;
 import mekhq.campaign.event.RepairStatusChangedEvent;
 import mekhq.campaign.event.UnitChangedEvent;
 import mekhq.campaign.finances.Transaction;
+import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.Part;
@@ -507,10 +508,13 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                             armor.setAmount(armor.getTotalAmount());
                         } else if(part instanceof AmmoBin) {
                             final AmmoBin ammoBin = (AmmoBin) part;
-                            ammoBin.setShotsNeeded(0);
+                            // we magically find the ammo we need, then load the bin
+                            ammoBin.getAcquisitionWork().find(0);
+                            ammoBin.loadBin();
                         }
+                        
                         if(part instanceof MissingPart) {
-                            // MissingPart has no easy way to just tell it "replace me with a working one" either ...
+                            // We magically acquire a replacement part, then fix the missing one.
                             part.getCampaign().addPart(((MissingPart) part).getNewPart(), 0);
                             part.fix();
                             part.resetTimeSpent();
