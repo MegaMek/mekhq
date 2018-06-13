@@ -496,11 +496,12 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
         } else if(command.equalsIgnoreCase("RESTORE_UNIT")) {
             for (Unit unit : units) {
                 unit.setSalvage(false);
-                Collection<Part> partsToFix = new HashSet<>(unit.getParts());
+                
                 boolean needsCheck = true;
                 while(unit.isAvailable() && needsCheck) {
                     needsCheck = false;
-                    for(Part part : partsToFix) {
+                    for(int x = 0; x < unit.getParts().size(); x++) {
+                        Part part = unit.getParts().get(x);
                         if(part instanceof Armor) {
                             final Armor armor = (Armor) part;
                             armor.setAmount(armor.getTotalAmount());
@@ -509,13 +510,14 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                             ammoBin.setShotsNeeded(0);
                         }
                         if(part instanceof MissingPart) {
-                            // MissingPart has no easy way to just tell it "replace me with a workig one" either ...
+                            // MissingPart has no easy way to just tell it "replace me with a working one" either ...
+                            part.getCampaign().addPart(((MissingPart) part).getNewPart(), 0);
+                            part.fix();
                             part.resetTimeSpent();
                             part.resetOvertime();
                             part.setTeamId(null);
                             part.cancelReservation();
                             part.remove(false);
-                            needsCheck = true;
                         } else {
                             if(part.needsFixing()) {
                                 needsCheck = true;
@@ -542,10 +544,6 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                             }
                         }
                     }
-                    // Check for more parts to fix (because the list above is not
-                    // sorted usefully)
-                    unit.initializeParts(true);
-                    partsToFix = new HashSet<>(unit.getParts());
                 }
                 MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
             }
