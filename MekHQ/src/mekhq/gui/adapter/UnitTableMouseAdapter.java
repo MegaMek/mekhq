@@ -500,21 +500,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                     needsCheck = false;
                     for(int x = 0; x < unit.getParts().size(); x++) {
                         Part part = unit.getParts().get(x);
-                        if(part instanceof Armor) {
-                            final Armor armor = (Armor) part;
-                            armor.setAmount(armor.getTotalAmount());
-                        } else if(part instanceof AmmoBin) {
-                            final AmmoBin ammoBin = (AmmoBin) part;
-                            
-                            // we magically find the ammo we need, then load the bin
-                            // we only want to get the amount of ammo the bin actually needs                            
-                            if(ammoBin.getShotsNeeded() > 0) {
-                                ammoBin.getAcquisitionWork(ammoBin.getShotsNeeded()).find(0);
-                            }                            
-                            
-                            ammoBin.loadBin();
-                        }
-                        
+                                                
                         if(part instanceof MissingPart) {
                             // We magically acquire a replacement part, then fix the missing one.
                             part.getCampaign().addPart(((MissingPart) part).getNewPart(), 0);
@@ -534,7 +520,25 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                             part.setTeamId(null);
                             part.cancelReservation();
                         }
+                        
+                        // replace damaged armor and reload ammo bins after fixing their respective locations
+                        if(part instanceof Armor) {
+                            final Armor armor = (Armor) part;
+                            armor.setAmount(armor.getTotalAmount());
+                        } else if(part instanceof AmmoBin) {
+                            final AmmoBin ammoBin = (AmmoBin) part;
+                            
+                            // we magically find the ammo we need, then load the bin
+                            // we only want to get the amount of ammo the bin actually needs                            
+                            if(ammoBin.getShotsNeeded() > 0) {
+                                ammoBin.getAcquisitionWork(ammoBin.getShotsNeeded()).find(0);
+                            }                            
+                            
+                            ammoBin.loadBin();
+                        }
+                        
                     }
+                    
                     // TODO: Make this less painful. We just want to fix hips and shoulders.
                     Entity entity = unit.getEntity();
                     if(entity instanceof Mech) {
