@@ -28,6 +28,7 @@ import java.util.ServiceLoader;
 import java.util.stream.Collectors;
 
 import megamek.common.annotations.Nullable;
+import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
 import mekhq.module.api.MekHQModule;
 
@@ -43,16 +44,19 @@ abstract public class AbstractServiceManager<T extends MekHQModule> {
     private final Map<String, T> services;
     
     protected AbstractServiceManager(Class<T> clazz) {
-        loader = ServiceLoader.load(clazz);
+        loader = ServiceLoader.load(clazz, PluginManager.getInstance().getClassLoader());
         services = new HashMap<>();
-        loadServoces();
+        loadServices();
     }
     
-    private void loadServoces() {
+    private void loadServices() {
         try {
             for (Iterator<T> iter = loader.iterator(); iter.hasNext(); ) {
-                final T method = iter.next();
-                services.put(method.getModuleName(), method);
+                final T service = iter.next();
+                MekHQ.getLogger().log(getClass(), "loadServices()",
+                        LogLevel.DEBUG, "Found service " + service.getModuleName());
+
+                services.put(service.getModuleName(), service);
             }
         } catch (ServiceConfigurationError err) {
             MekHQ.getLogger().log(getClass(), "loadServices()", err); //$NON-NLS-1$
