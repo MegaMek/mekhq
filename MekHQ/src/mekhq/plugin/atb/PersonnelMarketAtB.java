@@ -25,9 +25,9 @@ import java.util.UUID;
 
 import megamek.common.Compute;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.market.PersonnelMarketMethod;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.plugin.api.PersonnelMarketMethod;
 
 /**
  * Method for generating market personnel according to AtB rules.
@@ -38,7 +38,7 @@ import mekhq.campaign.personnel.SkillType;
 public class PersonnelMarketAtB implements PersonnelMarketMethod {
 
     @Override
-    public String getMethodName() {
+    public String getModuleName() {
         return "Against the Bot";
     }
 

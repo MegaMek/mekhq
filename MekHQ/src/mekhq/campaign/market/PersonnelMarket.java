@@ -47,6 +47,7 @@ import mekhq.campaign.event.MarketNewPersonnelEvent;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.rating.IUnitRating;
+import mekhq.plugin.api.PersonnelMarketMethod;
 import mekhq.plugin.atb.PersonnelMarketAtB;
 
 public class PersonnelMarket {

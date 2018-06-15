@@ -28,6 +28,7 @@ import megamek.common.Entity;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.rating.IUnitRating;
+import mekhq.plugin.api.PersonnelMarketMethod;
 
 /**
  * Generation method for personnel market based on Field Manual: Mercenaries (Revised)
@@ -38,7 +39,7 @@ import mekhq.campaign.rating.IUnitRating;
 public class PersonnelMarketFMMr implements PersonnelMarketMethod {
 
     @Override
-    public String getMethodName() {
+    public String getModuleName() {
         return "FM: Mercenaries Revised";
     }
 

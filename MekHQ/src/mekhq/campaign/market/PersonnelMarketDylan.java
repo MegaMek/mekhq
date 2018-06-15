@@ -19,7 +19,7 @@ import mekhq.campaign.personnel.Person;
 public class PersonnelMarketDylan extends PersonnelMarketRandom {
     
     @Override
-    public String getMethodName() {
+    public String getModuleName() {
         return "Dylan's Method";
     }
 

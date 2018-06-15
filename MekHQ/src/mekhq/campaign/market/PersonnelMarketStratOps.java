@@ -31,6 +31,7 @@ import megamek.common.Compute;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
+import mekhq.plugin.api.PersonnelMarketMethod;
 
 /**
  * Method for personnel market generation given in the repair and maintenance section of Strategic Operations
@@ -41,7 +42,7 @@ public class PersonnelMarketStratOps implements PersonnelMarketMethod {
     private int daysSinceRolled = 0;
 
     @Override
-    public String getMethodName() {
+    public String getModuleName() {
         return "Strat Ops";
     }
 
