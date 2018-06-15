@@ -510,6 +510,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                             part.setTeamId(null);
                             part.cancelReservation();
                             part.remove(false);
+                            needsCheck = true;
                         } else {
                             if(part.needsFixing()) {
                                 needsCheck = true;
@@ -531,10 +532,9 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                             // we magically find the ammo we need, then load the bin
                             // we only want to get the amount of ammo the bin actually needs                            
                             if(ammoBin.getShotsNeeded() > 0) {
-                                ammoBin.getAcquisitionWork(ammoBin.getShotsNeeded()).find(0);
-                            }                            
-                            
-                            ammoBin.loadBin();
+                                ammoBin.setShotsNeeded(0);
+                                ammoBin.updateConditionFromPart();
+                            }
                         }
                         
                     }
