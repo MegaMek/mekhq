@@ -7,8 +7,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.text.NumberFormat;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.UUID;
 import java.util.Vector;
 
@@ -496,20 +494,17 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
         } else if(command.equalsIgnoreCase("RESTORE_UNIT")) {
             for (Unit unit : units) {
                 unit.setSalvage(false);
-                Collection<Part> partsToFix = new HashSet<>(unit.getParts());
+                
                 boolean needsCheck = true;
                 while(unit.isAvailable() && needsCheck) {
                     needsCheck = false;
-                    for(Part part : partsToFix) {
-                        if(part instanceof Armor) {
-                            final Armor armor = (Armor) part;
-                            armor.setAmount(armor.getTotalAmount());
-                        } else if(part instanceof AmmoBin) {
-                            final AmmoBin ammoBin = (AmmoBin) part;
-                            ammoBin.setShotsNeeded(0);
-                        }
+                    for(int x = 0; x < unit.getParts().size(); x++) {
+                        Part part = unit.getParts().get(x);
+                                                
                         if(part instanceof MissingPart) {
-                            // MissingPart has no easy way to just tell it "replace me with a workig one" either ...
+                            // We magically acquire a replacement part, then fix the missing one.
+                            part.getCampaign().addPart(((MissingPart) part).getNewPart(), 0);
+                            part.fix();
                             part.resetTimeSpent();
                             part.resetOvertime();
                             part.setTeamId(null);
@@ -526,7 +521,24 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                             part.setTeamId(null);
                             part.cancelReservation();
                         }
+                        
+                        // replace damaged armor and reload ammo bins after fixing their respective locations
+                        if(part instanceof Armor) {
+                            final Armor armor = (Armor) part;
+                            armor.setAmount(armor.getTotalAmount());
+                        } else if(part instanceof AmmoBin) {
+                            final AmmoBin ammoBin = (AmmoBin) part;
+                            
+                            // we magically find the ammo we need, then load the bin
+                            // we only want to get the amount of ammo the bin actually needs                            
+                            if(ammoBin.getShotsNeeded() > 0) {
+                                ammoBin.setShotsNeeded(0);
+                                ammoBin.updateConditionFromPart();
+                            }
+                        }
+                        
                     }
+                    
                     // TODO: Make this less painful. We just want to fix hips and shoulders.
                     Entity entity = unit.getEntity();
                     if(entity instanceof Mech) {
@@ -542,10 +554,6 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                             }
                         }
                     }
-                    // Check for more parts to fix (because the list above is not
-                    // sorted usefully)
-                    unit.initializeParts(true);
-                    partsToFix = new HashSet<>(unit.getParts());
                 }
                 MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
             }
