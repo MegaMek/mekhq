@@ -27,7 +27,10 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 
 /**
- * Interface to be implemented by methods for generating and removing personnel market entries
+ * Interface to be implemented by methods for generating and removing personnel market entries.
+ * 
+ * Implementations of this interface need to be registered by adding the fully qualified class name
+ * to src/META-INF/services/mekhq.module.api.PersonnelMarketMethod.
  * 
  * @author Neoancient
  *
