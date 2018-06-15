@@ -47,14 +47,13 @@ import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.rating.IUnitRating;
+import mekhq.module.PersonnelMarketServiceManager;
 import mekhq.module.api.PersonnelMarketMethod;
-import mekhq.module.atb.PersonnelMarketAtB;
 
 public class PersonnelMarket {
 	private ArrayList<Person> personnel = new ArrayList<Person>();
 	private Hashtable<UUID, Person> personnelIds = new Hashtable<UUID, Person>();
 	private PersonnelMarketMethod method;
-	private int methodIndex = TYPE_RANDOM;
 
 	public static final int TYPE_RANDOM = 0;
 	public static final int TYPE_DYLANS = 1;
@@ -83,32 +82,12 @@ public class PersonnelMarket {
 	
 	/**
 	 * Sets the method for generating potential recruits for the personnel market.
-	 * @param type  The index of the market type to use.
+	 * @param type  The lookup name of the market type to use.
 	 */
-	public void setType(int type) {
-	    // We don't want to initialize the method if it doesn't actually change, since methods
-	    // can lose state.
-	    if ((type != methodIndex) || (null == method)) {
-            switch (type) {
-                case TYPE_RANDOM:
-                    method = new PersonnelMarketRandom();
-                    break;
-                case TYPE_DYLANS:
-                    method = new PersonnelMarketDylan();
-                    break;
-                case TYPE_FMMR:
-                    method = new PersonnelMarketFMMr();
-                    break;
-                case TYPE_STRAT_OPS:
-                    method = new PersonnelMarketStratOps();
-                    break;
-                case TYPE_ATB:
-                    method = new PersonnelMarketAtB();
-                    break;
-                default:
-                    method = null;
-            }
-            methodIndex = type;
+	public void setType(String key) {
+	    method = PersonnelMarketServiceManager.getInstance().getService(key);
+	    if (null == method) {
+	        method = new PersonnelMarketRandom();
 	    }
 	}
 	

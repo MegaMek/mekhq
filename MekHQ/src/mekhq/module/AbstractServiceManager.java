@@ -25,6 +25,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.ServiceConfigurationError;
 import java.util.ServiceLoader;
+import java.util.stream.Collectors;
 
 import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
@@ -39,24 +40,22 @@ import mekhq.module.api.MekHQModule;
 abstract public class AbstractServiceManager<T extends MekHQModule> {
 
     private final ServiceLoader<T> loader;
-    private final Map<String, T> methods;
+    private final Map<String, T> services;
     
     protected AbstractServiceManager(Class<T> clazz) {
         loader = ServiceLoader.load(clazz);
-        methods = new HashMap<>();
-        loadMethods();
+        services = new HashMap<>();
+        loadServoces();
     }
     
-    abstract protected Class<?> getServiceClass();
-    
-    private void loadMethods() {
+    private void loadServoces() {
         try {
             for (Iterator<T> iter = loader.iterator(); iter.hasNext(); ) {
                 final T method = iter.next();
-                methods.put(method.getModuleName(), method);
+                services.put(method.getModuleName(), method);
             }
         } catch (ServiceConfigurationError err) {
-            MekHQ.getLogger().log(getClass(), "loadMethods()", err); //$NON-NLS-1$
+            MekHQ.getLogger().log(getClass(), "loadServices()", err); //$NON-NLS-1$
         }
     }
     
@@ -65,14 +64,29 @@ abstract public class AbstractServiceManager<T extends MekHQModule> {
      * @param key The name of the method, returned by the service's getMethodName method.
      * @return    The service associated with the key, or null if there is no such service.
      */
-    public @Nullable T getMethod(String key) {
-        return methods.get(key);
+    public @Nullable T getService(String key) {
+        return services.get(key);
     }
     
     /**
-     * @return An unmodifiable 
+     * @return An unmodifiable collection of the services
      */
-    public Collection<T> getAllMethods() {
-        return Collections.unmodifiableCollection(methods.values());
+    public Collection<T> getAllServices() {
+        return getAllServices(false);
+    }
+    
+    /**
+     * Retrieve a collection of all available services
+     * 
+     * @param sort Whether to sort the collection by the service name. 
+     * @return An unmodifiable collection of the services
+     */
+    public Collection<T> getAllServices(boolean sort) {
+        if (sort) {
+            return Collections.unmodifiableCollection(services.values().stream()
+                    .sorted((s1, s2) -> (s1.getModuleName().compareTo(s2.getModuleName())))
+                            .collect(Collectors.toList()));
+        }
+        return Collections.unmodifiableCollection(services.values());
     }
 }

@@ -41,10 +41,4 @@ public class PersonnelMarketServiceManager extends AbstractServiceManager<Person
         }
         return instance;
     }
-
-    @Override
-    protected Class<?> getServiceClass() {
-        return PersonnelMarketMethod.class;
-    }
-
 }

@@ -16,35 +16,35 @@ public class PersonnelMarketServiceManagerTest {
     @Test
     public void providesRandomMarket() {
         assertTrue(PersonnelMarketServiceManager.getInstance()
-                .getMethod(PersonnelMarket.getTypeName(PersonnelMarket.TYPE_RANDOM))
+                .getService(PersonnelMarket.getTypeName(PersonnelMarket.TYPE_RANDOM))
                 instanceof PersonnelMarketRandom);
     }
 
     @Test
     public void providesFMMrMarket() {
         assertTrue(PersonnelMarketServiceManager.getInstance()
-                .getMethod(PersonnelMarket.getTypeName(PersonnelMarket.TYPE_FMMR))
+                .getService(PersonnelMarket.getTypeName(PersonnelMarket.TYPE_FMMR))
                 instanceof PersonnelMarketFMMr);
     }
 
     @Test
     public void providesStratOpsMarket() {
         assertTrue(PersonnelMarketServiceManager.getInstance()
-                .getMethod(PersonnelMarket.getTypeName(PersonnelMarket.TYPE_STRAT_OPS))
+                .getService(PersonnelMarket.getTypeName(PersonnelMarket.TYPE_STRAT_OPS))
                 instanceof PersonnelMarketStratOps);
     }
 
     @Test
     public void providesDylansMarket() {
         assertTrue(PersonnelMarketServiceManager.getInstance()
-                .getMethod(PersonnelMarket.getTypeName(PersonnelMarket.TYPE_DYLANS))
+                .getService(PersonnelMarket.getTypeName(PersonnelMarket.TYPE_DYLANS))
                 instanceof PersonnelMarketDylan);
     }
 
     @Test
     public void providesAtBMarket() {
         assertTrue(PersonnelMarketServiceManager.getInstance()
-                .getMethod(PersonnelMarket.getTypeName(PersonnelMarket.TYPE_ATB))
+                .getService(PersonnelMarket.getTypeName(PersonnelMarket.TYPE_ATB))
                 instanceof PersonnelMarketAtB);
     }
 
