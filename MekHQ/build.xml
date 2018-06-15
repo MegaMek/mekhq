@@ -118,6 +118,7 @@
                 <attribute name="Class-Path" value=". ${classpath.manifest} ${megamek} ${megameklab}"/>
             </manifest>
             <fileset dir="${src}" includes="**/*.properties"/>
+			<metainf dir="${src}/META-INF" includes="**/services/*"/>
         </jar>
         <echo message="Built-By: ${user.name}"/>
         <echo message="Main-Class: ${class.main}"/>
@@ -132,7 +133,7 @@
         </javac>
     </target>
 
-    <target depends="compileTests" name="unit.test">
+    <target depends="compileTests" name="unit.test" unless="${skip.tests}">
         <delete dir="${dir.build.teststaging}"/>
         <delete dir="${dir.build.testreport}"/>
         <mkdir dir="${dir.build.teststaging}"/>

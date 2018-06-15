@@ -32,6 +32,7 @@
 	<property name="builddir" value="classes" />
 	<property name="libdir" value="lib" />
 	<property name="datadir" value="data" />
+	<property name="plugindir" value="plugins" />
 	<property name="apidocsdir" value="apidocs" />
 	<property name="docdir" value="docs" />
     <property name="docmmdir" value="docs-mm" />
@@ -234,6 +235,7 @@
 				<attribute name="Class-Path" value="${dataclasspath} ${classpath.manifest} ${megamek} ${megameklab}"/>
 			</manifest>
 				<fileset dir="${localdir}/${srcdir}" includes="**/*.properties"/>
+				<metainf dir="${localdir}/$srcdir}" includes="META-INF/services/*"/>
 			</jar>
 
 			<!-- Ensure that the log directory exists. -->
@@ -254,6 +256,7 @@
 				<include name="${datadir}/" />
 				<include name="${docdir}/" />
 				<include name="${confdir}/" />
+				<include name="${plugindir}/" />
 				<include name="campaigns/" />
 				<include name="campaigns/FoxsTeeth.cpnx" />
 				<include name="*README.html" />
