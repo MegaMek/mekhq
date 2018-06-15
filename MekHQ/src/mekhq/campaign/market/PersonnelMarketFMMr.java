@@ -28,7 +28,7 @@ import megamek.common.Entity;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.rating.IUnitRating;
-import mekhq.plugin.api.PersonnelMarketMethod;
+import mekhq.module.api.PersonnelMarketMethod;
 
 /**
  * Generation method for personnel market based on Field Manual: Mercenaries (Revised)

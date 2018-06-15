@@ -26,7 +26,7 @@ import megamek.common.Compute;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
-import mekhq.plugin.api.PersonnelMarketMethod;
+import mekhq.module.api.PersonnelMarketMethod;
 
 /**
  * Generation method for personnel market that adds a random number of recruits of a random type

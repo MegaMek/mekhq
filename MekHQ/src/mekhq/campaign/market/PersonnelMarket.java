@@ -30,7 +30,6 @@ import java.util.UUID;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import classes.mekhq.campaign.event.OptionsChangedEvent;
 import megamek.common.Entity;
 import megamek.common.MechFileParser;
 import megamek.common.MechSummary;
@@ -44,11 +43,12 @@ import mekhq.MekHqXmlUtil;
 import mekhq.Version;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.event.MarketNewPersonnelEvent;
+import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.rating.IUnitRating;
-import mekhq.plugin.api.PersonnelMarketMethod;
-import mekhq.plugin.atb.PersonnelMarketAtB;
+import mekhq.module.api.PersonnelMarketMethod;
+import mekhq.module.atb.PersonnelMarketAtB;
 
 public class PersonnelMarket {
 	private ArrayList<Person> personnel = new ArrayList<Person>();

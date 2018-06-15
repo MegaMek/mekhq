@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.plugin.atb;
+package mekhq.module.atb;
 
 import java.util.ArrayList;
 import java.util.Calendar;

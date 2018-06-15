@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.plugin.atb;
+package mekhq.module.atb;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -27,7 +27,7 @@ import megamek.common.Compute;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
-import mekhq.plugin.api.PersonnelMarketMethod;
+import mekhq.module.api.PersonnelMarketMethod;
 
 /**
  * Method for generating market personnel according to AtB rules.

@@ -219,7 +219,7 @@ import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
 import mekhq.gui.GuiTabType;
 import mekhq.gui.utilities.PortraitFileFactory;
-import mekhq.plugin.atb.AtBEventProcessor;
+import mekhq.module.atb.AtBEventProcessor;
 
 /**
  * @author Taharqa The main campaign class, keeps track of teams and units

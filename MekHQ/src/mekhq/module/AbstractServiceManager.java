@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.plugin;
+package mekhq.module;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -28,7 +28,7 @@ import java.util.ServiceLoader;
 
 import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
-import mekhq.plugin.api.MekHQModule;
+import mekhq.module.api.MekHQModule;
 
 /**
  * Common functionality for MekHQ module service managers.

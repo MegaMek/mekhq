@@ -16,35 +16,27 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.plugin;
+package mekhq.module.api;
 
-import mekhq.plugin.api.PersonnelMarketMethod;
+import java.io.PrintWriter;
+
+import org.w3c.dom.Node;
+
+import mekhq.campaign.Campaign;
 
 /**
- * Manager for services that provide methods for generating and removing potential recruits to and
- * from the personnel market
+ * Interface that needs to be implemented by all MekHQ plugins. Contains methods that MekHQ uses to identify
+ * the plugin, perform initialization, and save state in a campaign file.
  * 
  * @author Neoancient
  *
  */
-public class PersonnelMarketServiceManager extends AbstractServiceManager<PersonnelMarketMethod> {
-    
-    private static PersonnelMarketServiceManager instance;
-    
-    private PersonnelMarketServiceManager() {
-        super(PersonnelMarketMethod.class);
-    }
-    
-    public static PersonnelMarketServiceManager getInstance() {
-        if (null == instance) {
-            instance = new PersonnelMarketServiceManager();
-        }
-        return instance;
-    }
+public interface MekHQModule {
 
-    @Override
-    protected Class<?> getServiceClass() {
-        return PersonnelMarketMethod.class;
-    }
-
+    String getModuleName();
+    
+    void initPlugin(Campaign c);
+    
+    void loadFieldsFromXml(Node node);
+    void writeToXml(PrintWriter pw, int indent);
 }

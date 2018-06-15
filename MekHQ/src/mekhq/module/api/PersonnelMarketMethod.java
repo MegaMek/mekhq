@@ -16,27 +16,32 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.plugin.api;
+package mekhq.module.api;
 
 import java.io.PrintWriter;
+import java.util.List;
 
 import org.w3c.dom.Node;
 
 import mekhq.campaign.Campaign;
+import mekhq.campaign.personnel.Person;
 
 /**
- * Interface that needs to be implemented by all MekHQ plugins. Contains methods that MekHQ uses to identify
- * the plugin, perform initialization, and save state in a campaign file.
+ * Interface to be implemented by methods for generating and removing personnel market entries
  * 
  * @author Neoancient
  *
  */
-public interface MekHQModule {
+public interface PersonnelMarketMethod extends MekHQModule {
+    
+    List<Person> generatePersonnelForDay(Campaign c);
+    List<Person> removePersonnelForDay(Campaign c, List<Person> current);
 
-    String getModuleName();
-    
-    void initPlugin(Campaign c);
-    
-    void loadFieldsFromXml(Node node);
-    void writeToXml(PrintWriter pw, int indent);
+    @Override
+    default void initPlugin(Campaign c) {};
+    @Override
+    default void loadFieldsFromXml(Node node) {}
+    @Override
+    default void writeToXml(PrintWriter pw1, int indent) {}
+
 }

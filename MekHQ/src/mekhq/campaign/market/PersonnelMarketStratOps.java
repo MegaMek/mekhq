@@ -31,7 +31,7 @@ import megamek.common.Compute;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
-import mekhq.plugin.api.PersonnelMarketMethod;
+import mekhq.module.api.PersonnelMarketMethod;
 
 /**
  * Method for personnel market generation given in the repair and maintenance section of Strategic Operations
