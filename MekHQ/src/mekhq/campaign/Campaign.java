@@ -2151,7 +2151,7 @@ public class Campaign implements Serializable, ITechManager {
                 }
                 partWork.setTeamId(tech.getId());
                 partWork.reservePart();
-                report += " - <b>Not enough time, the remainder of the task will be finished tomorrow.</b>";
+                report += " - <b>Not enough time, the remainder of the task on " + partWork.getUnit().getName() + " will be finished tomorrow.</b>";
                 MekHQ.triggerEvent(new PartWorkEvent(tech, partWork));
                 addReport(report);
                 return;
