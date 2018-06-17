@@ -2086,7 +2086,7 @@
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- E1 -->
 		<rank>
-			<rankNames>Hojuhei,-,-,-,-,-</rankNames>
+			<rankNames>-,-,-,-,-,-</rankNames>
 			<officer>false</officer>
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- E2 -->
@@ -2096,7 +2096,7 @@
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- E3 -->
 		<rank>
-			<rankNames>Heishi,-,-,-,-,-</rankNames>
+			<rankNames>Heishi,-,-,Heishi,-,-</rankNames>
 			<officer>false</officer>
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- E4 -->
@@ -2106,7 +2106,7 @@
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- E5 -->
 		<rank>
-			<rankNames>Gunjin,-,-,-,-,-</rankNames>
+			<rankNames>Gunjin,-,-,Gunjin,-,-</rankNames>
 			<officer>false</officer>
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- E6 -->
@@ -2116,7 +2116,7 @@
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- E7 -->
 		<rank>
-			<rankNames>Go-cho,-,-,-,-,-</rankNames>
+			<rankNames>Go-cho,-,-,Go-cho,-,-</rankNames>
 			<officer>false</officer>
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- E8 -->
@@ -2136,7 +2136,7 @@
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- E11 -->
 		<rank>
-			<rankNames>Gunsho,-,-,-,-,-</rankNames>
+			<rankNames>Gunsho,-,-,Gunsho,-,-</rankNames>
 			<officer>false</officer>
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- E12 -->
@@ -2146,7 +2146,7 @@
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- E13 -->
 		<rank>
-			<rankNames>Shujin,-,-,-,-,-</rankNames>
+			<rankNames>Shujin,-,-,Shujin,-,-</rankNames>
 			<officer>false</officer>
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- E14 -->
@@ -2156,7 +2156,7 @@
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- E15 -->
 		<rank>
-			<rankNames>Kashira,-,-,-,-,-</rankNames>
+			<rankNames>Kashira,-,-,Kashira,-,-</rankNames>
 			<officer>false</officer>
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- E16 -->
@@ -2176,7 +2176,7 @@
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- E19 -->
 		<rank>
-			<rankNames>Sho-ko,-,-,-,-,-</rankNames>
+			<rankNames>Sho-ko,-,-,Sho-ko,-,-</rankNames>
 			<officer>false</officer>
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- E20 -->
@@ -2291,7 +2291,7 @@
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- O12 -->
 		<rank>
-			<rankNames>Tai-shu,-,-,--MW,-,-</rankNames>
+			<rankNames>Tai-shu,-,-,Tai-shu,-,-</rankNames>
 			<officer>true</officer>
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- O13 -->
@@ -2321,7 +2321,7 @@
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- O18 -->
 		<rank>
-			<rankNames>Coordinator,-,-,--MW,-,-</rankNames>
+			<rankNames>Coordinator,-,-,-,-,-</rankNames>
 			<officer>true</officer>
 			<payMultiplier>1.0</payMultiplier>
 		</rank> <!-- O19 -->
