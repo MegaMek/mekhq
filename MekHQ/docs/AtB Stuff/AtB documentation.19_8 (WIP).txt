@@ -10,7 +10,7 @@ Table of contents
 
 1. What is AtB?
 
-AtB stands for Against the Bot which is a set of rules designed to allow players to experience a BattleTech campaign while playing against the computer (Bot) without the input from other players. Most of these rules are implemented in MekHQ. The focus of the system is to play as a mercenary company but as the player is also the GM a wide variety of campaigns is possible. For more information  about MegaMek, MekHQ and MegaMekLab please visit megamek.info or the MegaMek games subforum on bg.battletech.com.
+AtB stands for Against the Bot which is a set of rules designed to allow players to experience a BattleTech campaign while playing against the computer (Bot) without the input from other players. Most of these rules are implemented in MekHQ. The focus of the system is to play as a mercenary company but as the player is also the GM a wide variety of campaigns is possible. For more information  about MegaMek, MekHQ and MegaMekLab please visit megamek.org or the MegaMek games subforum on bg.battletech.com.
 
 2. Getting started
 
