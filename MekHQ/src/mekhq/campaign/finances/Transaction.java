@@ -231,4 +231,8 @@ public class Transaction implements Serializable {
     public String toText() {
         return new SimpleDateFormat("MM/dd/yyyy").format(getDate()) + ", " + getCategoryName() + ", " + getDescription() + ", " + getAmount();
     }
+
+    public String toQuotedText() {
+        return "\"" + new SimpleDateFormat("MM/dd/yyyy").format(getDate()) + "\",\"" + getCategoryName() + "\",\"" + getDescription() + "\",\"" + getAmount() + "\"";
+    }
 }
