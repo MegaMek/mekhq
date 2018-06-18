@@ -20,6 +20,8 @@
 
 package mekhq.campaign.finances;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.text.DecimalFormat;
@@ -35,6 +37,7 @@ import org.w3c.dom.DOMException;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import megamek.common.logging.LogLevel;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
@@ -454,5 +457,31 @@ public class Finances implements Serializable {
 
     public long getMaxCollateral(Campaign c) {
         return c.getTotalEquipmentValue() + getTotalAssetValue() - getTotalLoanCollateral();
+    }
+
+    public String exportFinances(String fileName) {
+        String report;
+        String lineSeparator = System.getProperty("line.separator");
+        String encoding = "UTF-8";
+
+        try {
+            FileOutputStream fos = new FileOutputStream(fileName);
+            fos.write("\"Date\",\"Category\",\"Description\",\"Amount\"".getBytes(encoding));
+            fos.write(lineSeparator.getBytes(encoding));
+            for (int i = 0; i < transactions.size(); i++) {
+                fos.write(transactions.get(i).toQuotedText().getBytes(encoding));
+                fos.write(lineSeparator.getBytes(encoding));
+            }
+
+            fos.flush();
+            fos.close();
+
+            report = transactions.size() + " finance transactions written to file.";
+        } catch(IOException ioe) {
+            MekHQ.getLogger().log(getClass(), "exportFinances", LogLevel.INFO, "Error exporting finances to CSV");
+            report = "Error exporting finances. See log for details.";
+        }
+
+        return report;
     }
 }

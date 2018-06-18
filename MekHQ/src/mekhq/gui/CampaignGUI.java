@@ -647,6 +647,16 @@ public class CampaignGUI extends JPanel {
         });
         menuExport.add(miExportPlanetsXML);
 
+        JMenuItem miExportFinancesCSV = new JMenuItem(
+                resourceMap.getString("miExportFinancesCSV.text")); // NOI18N
+        miExportFinancesCSV.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                miExportFinancesCSVActionPerformed(evt);
+            }
+        });
+        menuExport.add(miExportFinancesCSV);
+
         JMenuItem miImportOptions = new JMenuItem(
                 resourceMap.getString("miImportOptions.text")); // NOI18N
         miImportOptions.addActionListener(new ActionListener() {
@@ -1788,6 +1798,14 @@ public class CampaignGUI extends JPanel {
         }
     }
     
+    private void miExportFinancesCSVActionPerformed(java.awt.event.ActionEvent evt) {
+        try {
+            exportFinances("csv");
+        } catch (Exception ex) {
+            MekHQ.getLogger().log(getClass(), "miExportOptionsActionPerformed(ActionEvent)", ex);
+        }
+    }
+
     private void miImportOptionsActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_miExportPersonActionPerformed
         try {
             loadOptionsFile();
@@ -2114,6 +2132,58 @@ public class CampaignGUI extends JPanel {
         JOptionPane.showMessageDialog(mainPanel, report);
     }
     
+    protected void exportFinances(String format) {
+        JFileChooser exportFinances = new JFileChooser(".");
+        exportFinances.setDialogTitle("Export Finances to File");
+        exportFinances.setFileFilter(new FileFilter() {
+            @Override
+            public boolean accept(File dir) {
+                if (dir.isDirectory()) {
+                    return true;
+                }
+                return dir.getName().endsWith(format);
+            }
+
+            @Override
+            public String getDescription() {
+                if(format.equals("csv")) {
+                    return "CSV File";
+                } else {
+                    return "File"; // eventually we plan to export to TD or other formats
+                }
+            }
+        });
+        exportFinances.setSelectedFile(new File("finances." + format)); //$NON-NLS-1$
+        int returnVal = exportFinances.showSaveDialog(mainPanel);
+
+        if ((returnVal != JFileChooser.APPROVE_OPTION)
+                || (exportFinances.getSelectedFile() == null)) {
+            // I want a file, y'know!
+            return;
+        }
+
+        File file = exportFinances.getSelectedFile();
+        if (file == null) {
+            // I want a file, y'know!
+            return;
+        }
+        String path = file.getPath();
+        if (!path.endsWith(".csv")) {
+            path += ".csv";
+            file = new File(path);
+        }
+
+        // check for existing file and make a back-up if found
+        String path2 = path + "_backup";
+        File backupFile = new File(path2);
+        if (file.exists()) {
+            Utilities.copyfile(file, backupFile);
+        }
+
+        String report = getCampaign().getFinances().exportFinances(path);
+        JOptionPane.showMessageDialog(mainPanel, report);
+    }
+
     protected void loadListFile(boolean allowNewPilots) throws IOException {
         final String METHOD_NAME = "loadListFile(boolean)";
         
