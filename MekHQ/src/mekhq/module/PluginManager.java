@@ -8,6 +8,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import megamek.common.logging.LogLevel;
@@ -24,7 +25,8 @@ public class PluginManager {
     private static PluginManager instance;
     private static final String PLUGIN_DIR = "./plugins";
     
-    private ClassLoader classLoader;
+    private final ClassLoader classLoader;
+    private final List<File> scriptFiles;
     
     public synchronized static PluginManager getInstance() {
         if (null == instance) {
@@ -37,6 +39,7 @@ public class PluginManager {
         MekHQ.getLogger().log(getClass(), "<init>(File)",
                 LogLevel.DEBUG, "Initializing plugin manager.");
 
+        scriptFiles = new ArrayList<>();
         File dir = new File(PLUGIN_DIR);
         URL[] urls = new URL[0];
         if (dir.exists() && dir.isDirectory()) {
@@ -67,7 +70,7 @@ public class PluginManager {
             if (f.isDirectory()) {
                 retVal.addAll(getPluginsFromDir(f));
             }
-            if (f.isFile() && f.getName().endsWith(".jar")) {
+            if (f.getName().toLowerCase().endsWith(".jar")) {
                 MekHQ.getLogger().log(getClass(), "getPluginsFromDir(File)",
                         LogLevel.DEBUG, "Now adding plugin " + f.getName() + " to class loader.");
                 try {
@@ -75,9 +78,15 @@ public class PluginManager {
                 } catch (MalformedURLException e) {
                     // Should not happen
                 }
+            } else {
+                scriptFiles.add(f);
             }
         }
         return retVal;
+    }
+    
+    public List<File> getScripts() {
+        return Collections.unmodifiableList(scriptFiles);
     }
     
     public ClassLoader getClassLoader() {

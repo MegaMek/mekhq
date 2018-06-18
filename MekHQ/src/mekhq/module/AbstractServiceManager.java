@@ -47,6 +47,7 @@ abstract public class AbstractServiceManager<T extends MekHQModule> {
         loader = ServiceLoader.load(clazz, PluginManager.getInstance().getClassLoader());
         services = new HashMap<>();
         loadServices();
+        loadScripts(clazz);
     }
     
     private void loadServices() {
@@ -60,6 +61,15 @@ abstract public class AbstractServiceManager<T extends MekHQModule> {
             }
         } catch (ServiceConfigurationError err) {
             MekHQ.getLogger().log(getClass(), "loadServices()", err); //$NON-NLS-1$
+        }
+    }
+    
+    @SuppressWarnings("unchecked")
+    private void loadScripts(Class<T> clazz) {
+        for (MekHQModule module : ScriptPluginManager.getInstance().getModules()) {
+            if (clazz.isInstance(module)) {
+                services.put(module.getModuleName(), (T) module);
+            }
         }
     }
     
