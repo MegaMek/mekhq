@@ -237,6 +237,11 @@ public class LargeCraftAmmoBin extends AmmoBin {
     }
     
     @Override
+    public boolean isSalvaging() {
+        return super.isSalvaging() && (getCurrentShots() > 0);
+    }
+    
+    @Override
     public void remove(boolean salvage) {
         // The bin represents capacity rather than an actual part, and cannot be
         // removed or damaged.
