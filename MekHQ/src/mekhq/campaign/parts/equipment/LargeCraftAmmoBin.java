@@ -237,6 +237,13 @@ public class LargeCraftAmmoBin extends AmmoBin {
     }
     
     @Override
+    public void remove(boolean salvage) {
+        // The bin represents capacity rather than an actual part, and cannot be
+        // removed or damaged.
+        unload();
+    }
+
+    @Override
     public MissingPart getMissingPart() {
         return null;
     }
