@@ -1,5 +1,7 @@
 VERSION HISTORY:
 ----------------
+v0.45.0-git
+
 v0.44.0 (2018-06-24 1900 UTC)
 + Issue #733: Clan techs still have clan penalties to maintenance
 + Issue #745: NPE at AbstractUnitGenerator.generateTurrets
