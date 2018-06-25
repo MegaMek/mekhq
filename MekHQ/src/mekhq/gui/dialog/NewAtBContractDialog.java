@@ -548,12 +548,14 @@ public class NewAtBContractDialog extends NewContractDialog {
     protected void doUpdateContract(Object source) {
 		removeAllListeners();
 		
+		boolean needUpdatePayment = false;
     	AtBContract contract = (AtBContract)this.contract;
         if (cbPlanets.equals(source) && null != cbPlanets.getSelectedItem()) {
             contract.setPlanetId((Planets.getInstance().getPlanetByName((String) cbPlanets.getSelectedItem(),
                     Utilities.getDateTimeDay(campaign.getCalendar()))).getId());
             //reset the start date as null so we recalculate travel time
             contract.setStartDate(null);
+            needUpdatePayment = true;
         } else if (source.equals(cbEmployer)) {
         	System.out.println("Setting employer code to " + getCurrentEmployerCode());
         	long time = System.currentTimeMillis();
@@ -565,14 +567,17 @@ public class NewAtBContractDialog extends NewContractDialog {
         	time = System.currentTimeMillis();
     		updatePlanets();
     		System.out.println("to update planets: " + (System.currentTimeMillis() - time));
+    		needUpdatePayment = true;
      	} else if (source.equals(cbEnemy)) {
     		contract.setEnemyCode(getCurrentEnemyCode());
     		updatePlanets();
+    		needUpdatePayment = true;
     	} else if (source.equals(cbMissionType)) {
     		contract.setMissionType(cbMissionType.getSelectedIndex());
     		contract.calculateLength(campaign.getCampaignOptions().getVariableContractLength());
     		spnLength.setValue(contract.getLength());
     		updatePlanets();
+    		needUpdatePayment = true;
     	} else if (source.equals(cbAllySkill)) {
     		contract.setAllySkill(cbAllySkill.getSelectedIndex());
     	} else if (source.equals(cbAllyQuality)) {
@@ -583,8 +588,10 @@ public class NewAtBContractDialog extends NewContractDialog {
     		contract.setEnemyQuality(cbEnemyQuality.getSelectedIndex());
     	}
     	
-   		updatePaymentMultiplier();
-   		super.doUpdateContract(source);
+    	if (needUpdatePayment) {
+            updatePaymentMultiplier();
+        }
+    	super.doUpdateContract(source);
     	
     	addAllListeners();
    }
