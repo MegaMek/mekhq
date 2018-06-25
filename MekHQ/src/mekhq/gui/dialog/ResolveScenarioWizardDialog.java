@@ -136,6 +136,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
      */
     private ArrayList<JCheckBox> miaBtns = new ArrayList<JCheckBox>();
     private ArrayList<JCheckBox> kiaBtns = new ArrayList<JCheckBox>();
+    private ArrayList<JCheckBox> prisonerKiaBtns = new ArrayList<JCheckBox>();
     private ArrayList<JSlider> hitSliders = new ArrayList<JSlider>();
     private ArrayList<PersonStatus> pstatuses = new ArrayList<PersonStatus>();
 
@@ -470,9 +471,14 @@ public class ResolveScenarioWizardDialog extends JDialog {
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new Insets(5, 5, 0, 0);
-        /*pnlPrisonerStatus.add(new JLabel(resourceMap.getString("mia")), gridBagConstraints);*/
-        //gridBagConstraints.gridx = 2;
         pnlPrisonerStatus.add(new JLabel(resourceMap.getString("prisoner")), gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5, 5, 0, 0);
+        pnlPrisonerStatus.add(new JLabel(resourceMap.getString("kia")), gridBagConstraints);
         i = 2;
         JCheckBox prisonerCheck;
         j = 0;
@@ -481,7 +487,6 @@ public class ResolveScenarioWizardDialog extends JDialog {
             prstatuses.add(status);
             nameLbl = new JLabel("<html>" + status.getName() + "<br><i> " + status.getUnitName() + "</i></html>");
             miaCheck = new JCheckBox("");
-            kiaCheck = new JCheckBox("");
             hitSlider = new JSlider(JSlider.HORIZONTAL, 0, 5, Math.min(status.getHits(),5));
             hitSlider.setMajorTickSpacing(1);
             hitSlider.setPaintTicks(true);
@@ -494,7 +499,6 @@ public class ResolveScenarioWizardDialog extends JDialog {
             }
             pr_hitSliders.add(hitSlider);
             miaCheck.setSelected(status.isMissing());
-            kiaCheck.setSelected(status.getHits() > 5 || status.isDead());
             gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = i;
@@ -512,8 +516,14 @@ public class ResolveScenarioWizardDialog extends JDialog {
             prisonerCheck = new JCheckBox("");
             prisonerBtns.add(prisonerCheck);
             prisonerCheck.setSelected(status.isCaptured());
-            gridBagConstraints.weightx = 1.0;
             pnlPrisonerStatus.add(prisonerCheck, gridBagConstraints);
+            kiaCheck = new JCheckBox("");
+            kiaCheck.addItemListener(new CheckBoxKIAListener());
+            prisonerKiaBtns.add(kiaCheck);
+            kiaCheck.setSelected(status.getHits() > 5 || status.isDead());
+            gridBagConstraints.gridx = 3;
+            gridBagConstraints.weightx = 1.0;
+            pnlPrisonerStatus.add(kiaCheck, gridBagConstraints);
             i++;
             if (status.isCaptured() &&
                     tracker.getCampaign().getCampaignOptions().getUseAtB() &&
@@ -1250,6 +1260,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         //now prisoners
         for(int i = 0; i < prstatuses.size(); i++) {
             PrisonerStatus status = prstatuses.get(i);
+            status.setDead(prisonerKiaBtns.get(i).isSelected());
             if (pr_hitSliders.get(i).isEnabled()) {
                 status.setHits(pr_hitSliders.get(i).getValue());
             }
@@ -1548,15 +1559,19 @@ public class ResolveScenarioWizardDialog extends JDialog {
         public void itemStateChanged(ItemEvent e) {
             JCheckBox kiaChk = (JCheckBox)e.getSource();
             int idx = kiaBtns.indexOf(kiaChk);
-            JSlider hitSlider = hitSliders.get(idx);
-            JCheckBox miaChk = miaBtns.get(idx);
-            if (kiaChk.isSelected()) {
-                hitSlider.setEnabled(false);
-                miaChk.setEnabled(false);
+            boolean enable = !kiaChk.isSelected();
+            if (idx == -1) {    // not found in pilot kiaBtns
+                idx = prisonerKiaBtns.indexOf(kiaChk);   // find it in prisoners' instead
+                JSlider hitSlider = pr_hitSliders.get(idx);
+                JCheckBox capturedCheck = prisonerBtns.get(idx);
+                hitSlider.setEnabled(enable);
+                capturedCheck.setEnabled(enable);
             } else {
-                hitSlider.setEnabled(true);
-                miaChk.setEnabled(true);
-            } 
+                JSlider hitSlider = hitSliders.get(idx);
+                JCheckBox miaChk = miaBtns.get(idx);
+                hitSlider.setEnabled(enable);
+                miaChk.setEnabled(enable);
+            }
         }
     }
 
