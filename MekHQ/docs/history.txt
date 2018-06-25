@@ -1,6 +1,7 @@
 VERSION HISTORY:
 ----------------
 v0.45.0-git
++ PR #602: Add KIA checkbox and functionality to prisoners during scenario resolution
 
 v0.44.0 (2018-06-24 1900 UTC)
 + Issue #733: Clan techs still have clan penalties to maintenance
