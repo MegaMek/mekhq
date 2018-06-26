@@ -1,7 +1,8 @@
 VERSION HISTORY:
 ----------------
 v0.45.0-git
-+ PR #602: Add KIA checkbox and functionality to prisoners during scenario resolution
++ PR #602: Add KIA checkbox and functionality to prisoners during scenario resolution.
++ Issue #308: Can now change contract payment multiplier when manually creating a new contract.
 
 v0.44.0 (2018-06-24 1900 UTC)
 + Issue #733: Clan techs still have clan penalties to maintenance
