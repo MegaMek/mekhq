@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gamePreset>
-	<title>TW Standard Default</title>
-	<description>This is the default settings used by MHQ. It is intended to follow the Total Warfare line of rulebooks whenever possible, and for rules outside of this scope it uses Field Manual: Mercenaries, revised rules. </description>
+	<title>Campaign Operations</title>
+	<description>Options to run a unit using the Campaign Operations rules. This preset uses the basic rules and rating system. Optional rules are off by default as well as SPAs, Implants, and Quirks. For games using the older Field Manual Mercenaries system use the Total Warefare (TW) preset instead.</description>
 	<campaignOptions>
 		<clanPriceModifier>1.0</clanPriceModifier>
 		<useFactionForNames>true</useFactionForNames>
 		<repairSystem>0</repairSystem>
 		<useUnitRating>true</useUnitRating>
-		<unitRatingMethod>FM: Mercenaries (rev)</unitRatingMethod>
+		<unitRatingMethod>Campaign Ops</unitRatingMethod>
 		<useEraMods>false</useEraMods>
 		<assignedTechFirst>false</assignedTechFirst>
 		<resetToFirstTech>false</resetToFirstTech>
@@ -17,17 +17,21 @@
 		<useArtillery>false</useArtillery>
 		<useAbilities>false</useAbilities>
 		<useEdge>false</useEdge>
+		<useSupportEdge>false</useSupportEdge>
 		<useImplants>false</useImplants>
 		<altQualityAveraging>false</altQualityAveraging>
 		<useAdvancedMedical>false</useAdvancedMedical>
 		<useDylansRandomXp>false</useDylansRandomXp>
 		<useQuirks>false</useQuirks>
-		<payForParts>false</payForParts>
-		<payForUnits>false</payForUnits>
-		<payForSalaries>false</payForSalaries>
+		<payForParts>true</payForParts>
+		<payForUnits>true</payForUnits>
+		<payForSalaries>true</payForSalaries>
 		<payForOverhead>false</payForOverhead>
-		<payForMaintain>false</payForMaintain>
+		<payForMaintain>true</payForMaintain>
 		<payForTransport>false</payForTransport>
+		<usePeacetimeCost>true</usePeacetimeCost>
+		<useExtendedPartsModifier>false</useExtendedPartsModifier>
+		<showPeacetimeCost>false</showPeacetimeCost>
 		<usedPartsValueA>0.1</usedPartsValueA>
 		<usedPartsValueB>0.2</usedPartsValueB>
 		<usedPartsValueC>0.3</usedPartsValueC>
@@ -36,8 +40,8 @@
 		<usedPartsValueF>0.9</usedPartsValueF>
 		<damagedPartsValue>0.33</damagedPartsValue>
 		<canceledOrderReimbursement>0.5</canceledOrderReimbursement>
-		<sellUnits>false</sellUnits>
-		<sellParts>false</sellParts>
+		<sellUnits>true</sellUnits>
+		<sellParts>true</sellParts>
 		<scenarioXP>1</scenarioXP>
 		<killsForXP>0</killsForXP>
 		<killXPAward>0</killXPAward>
@@ -50,11 +54,16 @@
 		<monthsIdleXP>2</monthsIdleXP>
 		<contractNegotiationXP>0</contractNegotiationXP>
 		<adminWeeklyXP>0</adminWeeklyXP>
+		<adminXPPeriod>1</adminXPPeriod>
+		<edgeCost>1</edgeCost>
 		<limitByYear>true</limitByYear>
 		<disallowExtinctStuff>false</disallowExtinctStuff>
 		<allowClanPurchases>true</allowClanPurchases>
 		<allowISPurchases>true</allowISPurchases>
 		<allowCanonOnly>false</allowCanonOnly>
+		<allowCanonRefitOnly>false</allowCanonRefitOnly>
+		<variableTechLevel>false</variableTechLevel>
+		<factionIntroDate>false</factionIntroDate>
 		<useAmmoByType>false</useAmmoByType>
 		<usePercentageMaint>false</usePercentageMaint>
 		<waitingPeriod>7</waitingPeriod>
@@ -69,7 +78,10 @@
 		<acquireMinimumTime>1</acquireMinimumTime>
 		<acquireMinimumTimeUnit>2</acquireMinimumTimeUnit>
 		<equipmentContractPercent>5.0</equipmentContractPercent>
-		<equipmentContractBase>false</equipmentContractBase>
+		<dropshipContractPercent>0.0</dropshipContractPercent>
+		<jumpshipContractPercent>0.0</jumpshipContractPercent>
+		<warshipContractPercent>0.0</warshipContractPercent>
+		<equipmentContractBase>true</equipmentContractBase>
 		<equipmentContractSaleValue>false</equipmentContractSaleValue>
 		<blcSaleValue>false</blcSaleValue>
 		<clanAcquisitionPenalty>0</clanAcquisitionPenalty>
@@ -80,9 +92,11 @@
 		<naturalHealingWaitingPeriod>15</naturalHealingWaitingPeriod>
 		<destroyByMargin>false</destroyByMargin>
 		<destroyMargin>4</destroyMargin>
+		<destroyPartTarget>10</destroyPartTarget>
 		<maintenanceCycleDays>7</maintenanceCycleDays>
 		<maintenanceBonus>-1</maintenanceBonus>
 		<useQualityMaintenance>true</useQualityMaintenance>
+		<reverseQualityNames>false</reverseQualityNames>
 		<useUnofficalMaintenance>false</useUnofficalMaintenance>
 		<checkMaintenance>true</checkMaintenance>
 		<useRandomHitsForVees>false</useRandomHitsForVees>
@@ -90,8 +104,13 @@
 		<maxAcquisitions>0</maxAcquisitions>
 		<useUnofficialProcreation>false</useUnofficialProcreation>
 		<useUnofficialProcreationNoRelationship>false</useUnofficialProcreationNoRelationship>
+		<useParentage>false</useParentage>
+		<logConception>false</logConception>
 		<useTransfers>true</useTransfers>
-		<personnelMarketType>2</personnelMarketType>
+		<useTimeInService>false</useTimeInService>
+		<capturePrisoners>true</capturePrisoners>
+		<defaultPrisonerStatus>0</defaultPrisonerStatus>
+		<personnelMarketType>3</personnelMarketType>
 		<personnelMarketRandomEliteRemoval>10</personnelMarketRandomEliteRemoval>
 		<personnelMarketRandomVeteranRemoval>8</personnelMarketRandomVeteranRemoval>
 		<personnelMarketRandomRegularRemoval>6</personnelMarketRandomRegularRemoval>
@@ -125,6 +144,7 @@
 		<sharesForAll>false</sharesForAll>
 		<retirementRolls>true</retirementRolls>
 		<customRetirementMods>false</customRetirementMods>
+		<foundersNeverRetire>false</foundersNeverRetire>
 		<trackUnitFatigue>false</trackUnitFatigue>
 		<mercSizeLimited>false</mercSizeLimited>
 		<trackOriginalUnit>false</trackOriginalUnit>
@@ -136,7 +156,6 @@
 		<useWeatherConditions>true</useWeatherConditions>
 		<useLightConditions>true</useLightConditions>
 		<usePlanetaryConditions>false</usePlanetaryConditions>
-		<useAltMapgen>false</useAltMapgen>
 		<useLeadership>true</useLeadership>
 		<useStrategy>true</useStrategy>
 		<baseStrategyDeployment>3</baseStrategyDeployment>
@@ -149,11 +168,104 @@
 		<contractMarketReportRefresh>true</contractMarketReportRefresh>
 		<unitMarketReportRefresh>true</unitMarketReportRefresh>
 		<startGameDelay>500</startGameDelay>
-		<salaryTypeBase>0,1500,1500,900,900,900,900,960,750,960,900,1000,1000,1000,1000,800,800,800,800,400,1500,400,500,500,500,500</salaryTypeBase>
+		<assignPortraitOnRoleChange>false</assignPortraitOnRoleChange>
+		<allowOpforAeros>false</allowOpforAeros>
+		<allowOpforLocalUnits>false</allowOpforLocalUnits>
+		<opforAeroChance>5</opforAeroChance>
+		<opforLocalUnitChance>5</opforLocalUnitChance>
+		<massRepairUseExtraTime>true</massRepairUseExtraTime>
+		<massRepairUseRushJob>true</massRepairUseRushJob>
+		<massRepairAllowCarryover>true</massRepairAllowCarryover>
+		<massRepairOptimizeToCompleteToday>false</massRepairOptimizeToCompleteToday>
+		<massRepairScrapImpossible>false</massRepairScrapImpossible>
+		<massRepairUseAssignedTechsFirst>false</massRepairUseAssignedTechsFirst>
+		<massRepairReplacePod>true</massRepairReplacePod>
+		<massRepairOptions>
+			<massRepairOption0>
+				<type>0</type>
+				<active>0</active>
+				<skillMin>0</skillMin>
+				<skillMax>4</skillMax>
+				<btnMin>4</btnMin>
+				<btnMax>4</btnMax>
+			</massRepairOption0>
+			<massRepairOption1>
+				<type>1</type>
+				<active>0</active>
+				<skillMin>0</skillMin>
+				<skillMax>4</skillMax>
+				<btnMin>4</btnMin>
+				<btnMax>4</btnMax>
+			</massRepairOption1>
+			<massRepairOption2>
+				<type>2</type>
+				<active>0</active>
+				<skillMin>0</skillMin>
+				<skillMax>4</skillMax>
+				<btnMin>4</btnMin>
+				<btnMax>4</btnMax>
+			</massRepairOption2>
+			<massRepairOption3>
+				<type>3</type>
+				<active>0</active>
+				<skillMin>0</skillMin>
+				<skillMax>4</skillMax>
+				<btnMin>4</btnMin>
+				<btnMax>4</btnMax>
+			</massRepairOption3>
+			<massRepairOption4>
+				<type>4</type>
+				<active>0</active>
+				<skillMin>0</skillMin>
+				<skillMax>4</skillMax>
+				<btnMin>4</btnMin>
+				<btnMax>4</btnMax>
+			</massRepairOption4>
+			<massRepairOption5>
+				<type>5</type>
+				<active>0</active>
+				<skillMin>0</skillMin>
+				<skillMax>4</skillMax>
+				<btnMin>4</btnMin>
+				<btnMax>4</btnMax>
+			</massRepairOption5>
+			<massRepairOption6>
+				<type>6</type>
+				<active>0</active>
+				<skillMin>0</skillMin>
+				<skillMax>4</skillMax>
+				<btnMin>4</btnMin>
+				<btnMax>4</btnMax>
+			</massRepairOption6>
+			<massRepairOption7>
+				<type>7</type>
+				<active>0</active>
+				<skillMin>0</skillMin>
+				<skillMax>4</skillMax>
+				<btnMin>4</btnMin>
+				<btnMax>4</btnMax>
+			</massRepairOption7>
+			<massRepairOption8>
+				<type>12</type>
+				<active>0</active>
+				<skillMin>0</skillMin>
+				<skillMax>4</skillMax>
+				<btnMin>4</btnMin>
+				<btnMax>4</btnMax>
+			</massRepairOption8>
+			<massRepairOption9>
+				<type>8</type>
+				<active>0</active>
+				<skillMin>0</skillMin>
+				<skillMax>4</skillMax>
+				<btnMin>4</btnMin>
+				<btnMax>4</btnMax>
+			</massRepairOption9>
+		</massRepairOptions>
+		<salaryTypeBase>0,1500,1500,900,900,900,900,960,750,960,900,1000,1000,1000,1000,800,800,800,800,400,1500,400,500,500,500,500,0</salaryTypeBase>
 		<salaryXpMultiplier>0.6,0.6,1.0,1.6,3.2</salaryXpMultiplier>
-		<usePortraitForType>false,true,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false</usePortraitForType>
+		<usePortraitForType>false,true,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false</usePortraitForType>
 		<rats>Xotl,Total Warfare</rats>
-		<ratsNoEra>Xotl,Total Warfare</ratsNoEra>
 	</campaignOptions>
 	<skillTypes>
 		<skillType>
@@ -512,8 +624,8 @@
 			<removeAbilities>hopping_jack</removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Protomech::Regular</skill>
 				<skill>Piloting/Mech::Regular</skill>
+				<skill>Gunnery/Protomech::Regular</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -527,12 +639,12 @@
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Battlesuit::Regular</skill>
 				<skill>Gunnery/Aircraft::Regular</skill>
-				<skill>Gunnery/Spacecraft::Regular</skill>
+				<skill>Gunnery/Battlesuit::Regular</skill>
 				<skill>Gunnery/Aerospace::Regular</skill>
-				<skill>Gunnery/Vehicle::Regular</skill>
+				<skill>Gunnery/Spacecraft::Regular</skill>
 				<skill>Gunnery/Mech::Regular</skill>
+				<skill>Gunnery/Vehicle::Regular</skill>
 				<skill>Gunnery/Protomech::Regular</skill>
 			</skillPrereq>
 		</ability>
@@ -548,12 +660,12 @@ at short, medium, or long/extended range, respectively, but only with a speciali
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Battlesuit::Regular</skill>
 				<skill>Gunnery/Aircraft::Regular</skill>
-				<skill>Gunnery/Spacecraft::Regular</skill>
+				<skill>Gunnery/Battlesuit::Regular</skill>
 				<skill>Gunnery/Aerospace::Regular</skill>
-				<skill>Gunnery/Vehicle::Regular</skill>
+				<skill>Gunnery/Spacecraft::Regular</skill>
 				<skill>Gunnery/Mech::Regular</skill>
+				<skill>Gunnery/Vehicle::Regular</skill>
 				<skill>Gunnery/Protomech::Regular</skill>
 			</skillPrereq>
 		</ability>
@@ -569,8 +681,8 @@ at short, medium, or long/extended range, respectively, but only with a speciali
 			<choiceValues></choiceValues>
 			<skillPrereq>
 				<skill>Tech/Vessel</skill>
-				<skill>Tech/BA</skill>
 				<skill>Tech/Aero</skill>
+				<skill>Tech/BA</skill>
 				<skill>Tech/Mechanic</skill>
 				<skill>Tech/Mech</skill>
 			</skillPrereq>
@@ -606,8 +718,8 @@ Additionally, you gain -1 to PSR checks in Jungle terrain.</desc>
 			<choiceValues></choiceValues>
 			<skillPrereq>
 				<skill>Piloting/Ground Vehicle::Veteran</skill>
-				<skill>Gunnery/Protomech::Veteran</skill>
 				<skill>Piloting/Mech::Veteran</skill>
+				<skill>Gunnery/Protomech::Veteran</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -624,8 +736,8 @@ Note: This ability is only used for BattleMechs.</desc>
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Protomech::Regular</skill>
 				<skill>Piloting/Mech::Regular</skill>
+				<skill>Gunnery/Protomech::Regular</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -654,12 +766,12 @@ Note: This ability is only used for BattleMechs.</desc>
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Battlesuit::Veteran</skill>
 				<skill>Gunnery/Aircraft::Veteran</skill>
-				<skill>Gunnery/Spacecraft::Veteran</skill>
+				<skill>Gunnery/Battlesuit::Veteran</skill>
 				<skill>Gunnery/Aerospace::Veteran</skill>
-				<skill>Gunnery/Vehicle::Veteran</skill>
+				<skill>Gunnery/Spacecraft::Veteran</skill>
 				<skill>Gunnery/Mech::Veteran</skill>
+				<skill>Gunnery/Vehicle::Veteran</skill>
 				<skill>Gunnery/Protomech::Veteran</skill>
 			</skillPrereq>
 		</ability>
@@ -676,8 +788,8 @@ The mountaineer also recieves a -1 to PSR checks for the given terrain.</desc>
 			<choiceValues></choiceValues>
 			<skillPrereq>
 				<skill>Piloting/Ground Vehicle::Veteran</skill>
-				<skill>Gunnery/Protomech::Veteran</skill>
 				<skill>Piloting/Mech::Veteran</skill>
+				<skill>Gunnery/Protomech::Veteran</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -687,37 +799,17 @@ The mountaineer also recieves a -1 to PSR checks for the given terrain.</desc>
 			<xpCost>15</xpCost>
 			<weight>2</weight>
 			<prereqAbilities></prereqAbilities>
-			<invalidAbilities>specialist</invalidAbilities>
-			<removeAbilities></removeAbilities>
-			<choiceValues></choiceValues>
-			<skillPrereq>
-				<skill>Gunnery/Battlesuit::Veteran</skill>
-				<skill>Gunnery/Aircraft::Veteran</skill>
-				<skill>Gunnery/Spacecraft::Veteran</skill>
-				<skill>Gunnery/Aerospace::Veteran</skill>
-				<skill>Gunnery/Vehicle::Veteran</skill>
-				<skill>Gunnery/Mech::Veteran</skill>
-				<skill>Gunnery/Protomech::Veteran</skill>
-			</skillPrereq>
-		</ability>
-		<ability>
-			<displayName>Natural Aptitude, Gunnery (aToW)</displayName>
-			<lookupName>aptitude_gunnery</lookupName>
-			<desc>Roll 3d6 and take the best two for gunnery checks</desc>
-			<xpCost>40</xpCost>
-			<weight>0</weight>
-			<prereqAbilities></prereqAbilities>
 			<invalidAbilities></invalidAbilities>
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Battlesuit</skill>
-				<skill>Gunnery/Aircraft</skill>
-				<skill>Gunnery/Spacecraft</skill>
-				<skill>Gunnery/Aerospace</skill>
-				<skill>Gunnery/Vehicle</skill>
-				<skill>Gunnery/Mech</skill>
-				<skill>Gunnery/Protomech</skill>
+				<skill>Gunnery/Aircraft::Veteran</skill>
+				<skill>Gunnery/Battlesuit::Veteran</skill>
+				<skill>Gunnery/Aerospace::Veteran</skill>
+				<skill>Gunnery/Spacecraft::Veteran</skill>
+				<skill>Gunnery/Mech::Veteran</skill>
+				<skill>Gunnery/Vehicle::Veteran</skill>
+				<skill>Gunnery/Protomech::Veteran</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -770,12 +862,12 @@ The mountaineer also recieves a -1 to PSR checks for the given terrain.</desc>
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Battlesuit::Regular</skill>
 				<skill>Gunnery/Aircraft::Regular</skill>
-				<skill>Gunnery/Spacecraft::Regular</skill>
+				<skill>Gunnery/Battlesuit::Regular</skill>
 				<skill>Gunnery/Aerospace::Regular</skill>
-				<skill>Gunnery/Vehicle::Regular</skill>
+				<skill>Gunnery/Spacecraft::Regular</skill>
 				<skill>Gunnery/Mech::Regular</skill>
+				<skill>Gunnery/Vehicle::Regular</skill>
 				<skill>Gunnery/Protomech::Regular</skill>
 			</skillPrereq>
 		</ability>
@@ -804,12 +896,12 @@ The mountaineer also recieves a -1 to PSR checks for the given terrain.</desc>
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Battlesuit::Regular</skill>
 				<skill>Gunnery/Aircraft::Regular</skill>
-				<skill>Gunnery/Spacecraft::Regular</skill>
+				<skill>Gunnery/Battlesuit::Regular</skill>
 				<skill>Gunnery/Aerospace::Regular</skill>
-				<skill>Gunnery/Vehicle::Regular</skill>
+				<skill>Gunnery/Spacecraft::Regular</skill>
 				<skill>Gunnery/Mech::Regular</skill>
+				<skill>Gunnery/Vehicle::Regular</skill>
 				<skill>Gunnery/Protomech::Regular</skill>
 			</skillPrereq>
 		</ability>
@@ -825,8 +917,8 @@ Also grants -1 to all PSR checks (including physicals) as well as -2 to Crush De
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Protomech::Veteran</skill>
 				<skill>Piloting/Mech::Veteran</skill>
+				<skill>Gunnery/Protomech::Veteran</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -840,7 +932,6 @@ Also grants -1 to all PSR checks (including physicals) as well as -2 to Crush De
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Aircraft::Regular</skill>
 				<skill>Gunnery/Aerospace::Regular</skill>
 				<skill>Gunnery/Mech::Regular</skill>
 			</skillPrereq>
@@ -863,8 +954,8 @@ Also grants -1 to all PSR checks (including physicals) as well as -2 to Crush De
 				<skill>Gunnery/Battlesuit::Green</skill>
 				<skill>Piloting/VTOL::Green</skill>
 				<skill>Piloting/Aircraft::Green</skill>
-				<skill>Gunnery/Protomech::Green</skill>
 				<skill>Piloting/Mech::Green</skill>
+				<skill>Gunnery/Protomech::Green</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -895,11 +986,11 @@ Finally, urban guerrillas can call on local support once per scenario.</desc>
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Battlesuit::Regular</skill>
 				<skill>Gunnery/Aircraft::Regular</skill>
+				<skill>Gunnery/Battlesuit::Regular</skill>
 				<skill>Gunnery/Aerospace::Regular</skill>
-				<skill>Gunnery/Vehicle::Regular</skill>
 				<skill>Gunnery/Mech::Regular</skill>
+				<skill>Gunnery/Vehicle::Regular</skill>
 				<skill>Gunnery/Protomech::Regular</skill>
 			</skillPrereq>
 		</ability>
@@ -922,8 +1013,8 @@ Units also receive a -1 BTH to rolls against skidding, sideslipping, and going o
 				<skill>Piloting/Ground Vehicle::Regular</skill>
 				<skill>Piloting/VTOL::Regular</skill>
 				<skill>Piloting/Aircraft::Regular</skill>
-				<skill>Gunnery/Protomech::Regular</skill>
 				<skill>Piloting/Mech::Regular</skill>
+				<skill>Gunnery/Protomech::Regular</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -937,11 +1028,11 @@ Units also receive a -1 BTH to rolls against skidding, sideslipping, and going o
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Battlesuit::Regular</skill>
 				<skill>Gunnery/Aircraft::Regular</skill>
+				<skill>Gunnery/Battlesuit::Regular</skill>
 				<skill>Gunnery/Aerospace::Regular</skill>
-				<skill>Gunnery/Vehicle::Regular</skill>
 				<skill>Gunnery/Mech::Regular</skill>
+				<skill>Gunnery/Vehicle::Regular</skill>
 				<skill>Gunnery/Protomech::Regular</skill>
 			</skillPrereq>
 		</ability>
@@ -956,8 +1047,8 @@ Units also receive a -1 BTH to rolls against skidding, sideslipping, and going o
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Protomech::Regular</skill>
 				<skill>Piloting/Mech::Regular</skill>
+				<skill>Gunnery/Protomech::Regular</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -971,12 +1062,12 @@ Units also receive a -1 BTH to rolls against skidding, sideslipping, and going o
 			<removeAbilities>cluster_hitter</removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Battlesuit::Veteran</skill>
 				<skill>Gunnery/Aircraft::Veteran</skill>
-				<skill>Gunnery/Spacecraft::Veteran</skill>
+				<skill>Gunnery/Battlesuit::Veteran</skill>
 				<skill>Gunnery/Aerospace::Veteran</skill>
-				<skill>Gunnery/Vehicle::Veteran</skill>
+				<skill>Gunnery/Spacecraft::Veteran</skill>
 				<skill>Gunnery/Mech::Veteran</skill>
+				<skill>Gunnery/Vehicle::Veteran</skill>
 				<skill>Gunnery/Protomech::Veteran</skill>
 			</skillPrereq>
 		</ability>
@@ -994,15 +1085,15 @@ NOTE: The quirk should be used only on bipedal units that have an animal like ap
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Protomech::Regular</skill>
 				<skill>Piloting/Mech::Regular</skill>
+				<skill>Gunnery/Protomech::Regular</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
 			<displayName>Melee Specialist (CamOps)</displayName>
 			<lookupName>melee_specialist</lookupName>
 			<desc>Enables the unit to do 1 additional point of damage with physical attacks and applies a -1 to-hit modifier to physical attacks.
-Note: This ability is only used for BattleMechs and Protomechs.</desc>
+Note: This ability is only used for BattleMechs.</desc>
 			<xpCost>10</xpCost>
 			<weight>3</weight>
 			<prereqAbilities></prereqAbilities>
@@ -1010,28 +1101,7 @@ Note: This ability is only used for BattleMechs and Protomechs.</desc>
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Protomech::Regular</skill>
 				<skill>Piloting/Mech::Regular</skill>
-			</skillPrereq>
-		</ability>
-		<ability>
-			<displayName>Gunnery Specialization (aToW)</displayName>
-			<lookupName>specialist</lookupName>
-			<desc>A pilot who specializes in a type of weapon receives a -1 to-hit modifier when using weapons of that type and a
- +1 to-hit modifier when using other types of weapons.</desc>
-			<xpCost>6</xpCost>
-			<weight>4</weight>
-			<prereqAbilities></prereqAbilities>
-			<invalidAbilities>weapon_specialist</invalidAbilities>
-			<removeAbilities></removeAbilities>
-			<choiceValues></choiceValues>
-			<skillPrereq>
-				<skill>Gunnery/Battlesuit::Regular</skill>
-				<skill>Gunnery/Aircraft::Regular</skill>
-				<skill>Gunnery/Spacecraft::Regular</skill>
-				<skill>Gunnery/Aerospace::Regular</skill>
-				<skill>Gunnery/Vehicle::Regular</skill>
-				<skill>Gunnery/Mech::Regular</skill>
 				<skill>Gunnery/Protomech::Regular</skill>
 			</skillPrereq>
 		</ability>
@@ -1089,8 +1159,8 @@ Note: This ability is only used for BattleMechs.</desc>
 				<skill>Piloting/Ground Vehicle::Regular</skill>
 				<skill>Piloting/VTOL::Regular</skill>
 				<skill>Piloting/Aircraft::Regular</skill>
-				<skill>Gunnery/Protomech::Regular</skill>
 				<skill>Piloting/Mech::Regular</skill>
+				<skill>Gunnery/Protomech::Regular</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -1121,8 +1191,8 @@ Using run/flank MP while in mud/swamp gives +1 BTH when being attacked</desc>
 			<choiceValues></choiceValues>
 			<skillPrereq>
 				<skill>Piloting/Ground Vehicle::Veteran</skill>
-				<skill>Gunnery/Protomech::Veteran</skill>
 				<skill>Piloting/Mech::Veteran</skill>
+				<skill>Gunnery/Protomech::Veteran</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -1136,8 +1206,8 @@ Using run/flank MP while in mud/swamp gives +1 BTH when being attacked</desc>
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Protomech::Regular</skill>
 				<skill>Piloting/Mech::Regular</skill>
+				<skill>Gunnery/Protomech::Regular</skill>
 			</skillPrereq>
 		</ability>
 		<ability>
@@ -1151,12 +1221,12 @@ Using run/flank MP while in mud/swamp gives +1 BTH when being attacked</desc>
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Battlesuit::Regular</skill>
 				<skill>Gunnery/Aircraft::Regular</skill>
-				<skill>Gunnery/Spacecraft::Regular</skill>
+				<skill>Gunnery/Battlesuit::Regular</skill>
 				<skill>Gunnery/Aerospace::Regular</skill>
-				<skill>Gunnery/Vehicle::Regular</skill>
+				<skill>Gunnery/Spacecraft::Regular</skill>
 				<skill>Gunnery/Mech::Regular</skill>
+				<skill>Gunnery/Vehicle::Regular</skill>
 				<skill>Gunnery/Protomech::Regular</skill>
 			</skillPrereq>
 		</ability>
@@ -1171,18 +1241,18 @@ Using run/flank MP while in mud/swamp gives +1 BTH when being attacked</desc>
 			<removeAbilities></removeAbilities>
 			<choiceValues></choiceValues>
 			<skillPrereq>
-				<skill>Gunnery/Battlesuit::Regular</skill>
 				<skill>Gunnery/Aircraft::Regular</skill>
+				<skill>Gunnery/Battlesuit::Regular</skill>
 				<skill>Gunnery/Aerospace::Regular</skill>
-				<skill>Gunnery/Vehicle::Regular</skill>
 				<skill>Gunnery/Mech::Regular</skill>
+				<skill>Gunnery/Vehicle::Regular</skill>
 				<skill>Gunnery/Protomech::Regular</skill>
 			</skillPrereq>
 		</ability>
 	</specialAbilities>
 	<randomSkillPreferences>
 		<overallRecruitBonus>0</overallRecruitBonus>
-		<recruitBonuses>0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0</recruitBonuses>
+		<recruitBonuses>0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0</recruitBonuses>
 		<specialAbilBonus>-10,-10,-2,0,1</specialAbilBonus>
 		<tacticsMod>-10,-10,-7,-4,-1</tacticsMod>
 		<randomizeSkill>true</randomizeSkill>
