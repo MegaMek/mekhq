@@ -5,6 +5,7 @@ v0.45.0-git
 + Issue #308: Can now change contract payment multiplier when manually creating a new contract.
 + PR #741: Updated configuration presets for new campaigns to include new special pilot abilities.
 + Issue #445: Lengthy repairs now show the unit's name if the repair runs over more than one day.
++ PR #742: Errata - Range Master SPA no longer applicable to LOS range
 
 v0.44.0 (2018-06-24 1900 UTC)
 + Issue #733: Clan techs still have clan penalties to maintenance
