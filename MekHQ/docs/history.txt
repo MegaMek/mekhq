@@ -6,6 +6,8 @@ v0.45.0-git
 + PR #741: Updated configuration presets for new campaigns to include new special pilot abilities.
 + Issue #445: Lengthy repairs now show the unit's name if the repair runs over more than one day.
 + PR #742: Errata - Range Master SPA no longer applicable to LOS range
++ Issue #384: Cannot negotiate contract terms because the game selects the highest skilled admin
+        and not the one with the negotiating skill
 
 v0.44.0 (2018-06-24 1900 UTC)
 + Issue #733: Clan techs still have clan penalties to maintenance
