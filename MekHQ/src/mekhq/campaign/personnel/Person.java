@@ -278,7 +278,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     private int rankSystem = -1;
     private Ranks ranks;
 
-    // Awards
+    // AwardNames
     protected AwardsFactory awardsFactory;
     protected ArrayList<Award> awards;
 
@@ -3380,6 +3380,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     public ArrayList<Award> getAwards(){
     	return awards;
+    }
+    
+    public boolean hasAwards() {
+    	return awards.size() > 0;
     }
 
     public void addAward(Date date, String awardName) {

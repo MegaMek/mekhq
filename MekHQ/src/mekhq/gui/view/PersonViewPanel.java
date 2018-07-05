@@ -33,6 +33,7 @@ import megamek.common.util.DirectoryItems;
 import megamek.common.util.EncodeControl;
 import mekhq.IconPackage;
 import mekhq.MekHQ;
+import mekhq.campaign.Award;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Kill;
 import mekhq.campaign.LogEntry;
@@ -43,6 +44,7 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.gui.dialog.MedicalViewDialog;
 import mekhq.gui.model.PersonnelEventLogModel;
 import mekhq.gui.model.PersonnelKillLogModel;
+import java.awt.GridLayout;
 
 /**
  * A custom panel that gets filled in with goodies from a Person record
@@ -96,6 +98,7 @@ public class PersonViewPanel extends JPanel {
     private JLabel lblChildren2;
 
     ResourceBundle resourceMap = null;
+    private JPanel pnlMedals;
 
     public PersonViewPanel(Person p, Campaign c, IconPackage ip) {
         this.person = p;
@@ -146,6 +149,23 @@ public class PersonViewPanel extends JPanel {
         add(pnlStats, gridBagConstraints);
 
         int gridy = 1;
+        
+        if(person.hasAwards()) {
+            pnlMedals = new JPanel();
+            pnlMedals.setName("pnlMedals");
+            pnlMedals.setBackground(Color.WHITE);
+            setMedals();
+            GridBagConstraints gbc_pnlMedals = new GridBagConstraints();
+            gbc_pnlMedals.fill = GridBagConstraints.HORIZONTAL;
+            gbc_pnlMedals.gridwidth = 2;
+            gbc_pnlMedals.insets = new Insets(5, 5, 5, 20);
+            gbc_pnlMedals.gridx = 0;
+            gbc_pnlMedals.gridy = gridy;
+            add(pnlMedals, gbc_pnlMedals);
+            pnlMedals.setLayout(new GridLayout(0, 10, 2, 5));
+            gridy++;
+        }
+
         if(campaign.getCampaignOptions().useAdvancedMedical() && person.hasInjuries(false)) {
             pnlInjuries.setName("pnlInjuries"); //$NON-NLS-1$
             pnlInjuries.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("pnlInjuries.title"))); //$NON-NLS-1$
@@ -232,6 +252,26 @@ public class PersonViewPanel extends JPanel {
 
     }
 
+    public void setMedals(){
+
+        for(Award award : person.getAwards()){
+            JLabel medalLabel = new JLabel();
+
+            Image medal = null;
+            try{
+                if(award.getMedalFileName() == null) continue;
+                medal = (Image) awardIcons.getItem("medals/", award.getMedalFileName());
+                medal = medal.getScaledInstance(28,61, Image.SCALE_DEFAULT);
+                medalLabel.setIcon(new ImageIcon(medal));
+                medalLabel.setToolTipText("(" + award.getFormatedDate() + ") " + award.getLongName() + ": " + award.getDescription());
+                pnlMedals.add(medalLabel);
+            }
+            catch (Exception err) {
+                err.printStackTrace();
+            }
+        }
+    }
+		    
     /**
      * set the portrait for the given person.
      *

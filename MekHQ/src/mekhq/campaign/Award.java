@@ -1,15 +1,16 @@
 package mekhq.campaign;
 
 import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import mekhq.MekHqXmlSerializable;
-import mekhq.campaign.personnel.Awards;
+import mekhq.campaign.personnel.AwardNames;
 import mekhq.campaign.personnel.Person;
 
 public class Award implements MekHqXmlSerializable, Cloneable {
 
-	private Awards award;
+	private AwardNames award;
 	private Date date;
 
 	private String longName;
@@ -22,11 +23,13 @@ public class Award implements MekHqXmlSerializable, Cloneable {
 	// Can be awarded multiple times to the same person.
 	private boolean stackable = false;
 
-	public Award(Awards award, String longName, String description, int xpReward){
+	public Award(AwardNames award, String longName, String description, int xpReward, String medalFile, String ribbonFile){
 	    this.award = award;
 	    this.longName = longName;
 	    this.description = description;
 	    this.xpReward = xpReward;
+	    this.medalFile = medalFile;
+	    this.ribbonFile = ribbonFile;
 	}
 
 	@Override
@@ -37,6 +40,11 @@ public class Award implements MekHqXmlSerializable, Cloneable {
 	public void setDate(Date date){
 	    this.date = date;
     }
+
+    public String getFormatedDate(){
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+		return df.format(date.getTime());
+	}
 
     public String getLongName() {
         return longName;
@@ -50,12 +58,20 @@ public class Award implements MekHqXmlSerializable, Cloneable {
         return description;
     }
 
+    public String getRibbonFileName(){
+	    return ribbonFile;
+    }
+
+    public String getMedalFileName(){
+	    return medalFile;
+    }
+
     public int getXPreward(){
 	    return xpReward;
     }
 
     public Award createCopy(Date date){
-	    Award awardCopy = new Award(this.award, this.longName, this.description, this.xpReward);
+	    Award awardCopy = new Award(this.award, this.longName, this.description, this.xpReward, this.medalFile, this.ribbonFile);
         awardCopy.setDate(date);
         return awardCopy;
     }

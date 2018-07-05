@@ -1,6 +1,6 @@
 package mekhq.campaign.personnel;
 
-public enum Awards {
+public enum AwardNames {
     armedForces,
     bronzeStar,
     clanInvasionCampaign,
