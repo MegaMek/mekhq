@@ -55,6 +55,7 @@ public class PersonViewPanel extends JPanel {
     private Campaign campaign;
 
     private DirectoryItems portraits;
+    private DirectoryItems awardIcons;
     private IconPackage ip;
 
     private JLabel lblPortrait;
@@ -99,8 +100,9 @@ public class PersonViewPanel extends JPanel {
     public PersonViewPanel(Person p, Campaign c, IconPackage ip) {
         this.person = p;
         this.campaign = c;
-        this.portraits = ip.getPortraits();
         this.ip = ip;
+        this.portraits = ip.getPortraits();
+        this.awardIcons = ip.getAwardIcons();
         resourceMap = ResourceBundle.getBundle("mekhq.resources.PersonViewPanel", new EncodeControl()); //$NON-NLS-1$
         initComponents();
     }
