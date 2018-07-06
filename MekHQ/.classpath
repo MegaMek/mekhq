@@ -29,5 +29,6 @@
 	<classpathentry kind="lib" path="lib/vecmath.jar"/>
 	<classpathentry kind="lib" path="MegaMek.jar"/>
 	<classpathentry kind="lib" path="MegaMekLab.jar"/>
+	<classpathentry kind="lib" path="lib/jfreechart-1.5.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
