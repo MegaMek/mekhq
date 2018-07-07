@@ -412,7 +412,7 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 		Part selectedPart = partsModel.getPartAt(partsTable.convertRowIndexToModel(row));
 		int quantity = 1;
 		if(bulk) {
-			PopupValueChoiceDialog pcd = new PopupValueChoiceDialog(campaignGUI.getFrame(), true, "How Many " + selectedPart.getName(), quantity, 1, 100);
+			PopupValueChoiceDialog pcd = new PopupValueChoiceDialog(campaignGUI.getFrame(), true, "How Many " + selectedPart.getName(), quantity, 1, CampaignGUI.MAX_QUANTITY_SPINNER);
 			pcd.setVisible(true);
 			quantity = pcd.getValue();
 		}
