@@ -7941,7 +7941,7 @@ public class Campaign implements Serializable, ITechManager {
             }
         }
         for (Part p : getSpareParts()) {
-            spareParts += p.getActualValue();
+            spareParts += (p.getActualValue() * p.getQuantity());
         }
 
         long monthlyIncome = 0;

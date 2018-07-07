@@ -97,7 +97,7 @@ import mekhq.gui.sorter.TargetSorter;
 import mekhq.gui.sorter.TechSorter;
 
 /**
- * Displays all spare parts in stock and on order and permits repair of damaged
+ * Displays all spare parts in stock, parts on order, and permits repair of damaged
  * parts.
  */
 

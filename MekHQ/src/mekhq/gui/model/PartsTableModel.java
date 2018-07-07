@@ -24,8 +24,9 @@ public class PartsTableModel extends DataTableModel {
     public final static int COL_STATUS   =   5;
     public final static int COL_REPAIR   =   6;
     public final static int COL_COST     =   7;
-    public final static int COL_TON       =  8;
-    public final static int N_COL          = 9;
+    public final static int COL_TOTAL_COST = 8;
+    public final static int COL_TON       =  9;
+    public final static int N_COL          = 10;
 
     public PartsTableModel() {
         data = new ArrayList<Part>();
@@ -46,7 +47,9 @@ public class PartsTableModel extends DataTableModel {
         case COL_NAME:
             return "Name";
         case COL_COST:
-            return "Value";
+            return "Value per Unit";
+        case COL_TOTAL_COST:
+        	return "Total Value";
         case COL_QUANTITY:
             return "#";
         case COL_QUALITY:
@@ -83,6 +86,9 @@ public class PartsTableModel extends DataTableModel {
         if(col == COL_COST) {
             return format.format(part.getActualValue());
         }
+        if(col == COL_TOTAL_COST) {
+            return format.format(part.getActualValue() * part.getQuantity());
+        }
         if(col == COL_QUANTITY) {
             return part.getQuantity();
         }
@@ -115,13 +121,15 @@ public class PartsTableModel extends DataTableModel {
         case COL_DETAIL:
             return 120;
         case COL_REPAIR:
-            return 150;
+            return 140;
         case COL_STATUS:
             return 40;
         case COL_TECH_BASE:
             return 20;
         case COL_COST:
-            return 10;
+            return 20;
+        case COL_TOTAL_COST:
+        	return 20;
         default:
             return 3;
         }
@@ -132,6 +140,7 @@ public class PartsTableModel extends DataTableModel {
         case COL_QUALITY:
         	return SwingConstants.CENTER;
         case COL_COST:
+        case COL_TOTAL_COST:
         case COL_TON:
             return SwingConstants.RIGHT;
         default:
