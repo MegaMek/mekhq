@@ -19,7 +19,6 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 
-import megamek.common.CompositeTechLevel;
 import megamek.common.Entity;
 import megamek.common.ITechnology;
 import megamek.common.MechFileParser;

@@ -22,7 +22,6 @@
 package mekhq.campaign.universe;
 
 import java.util.Locale;
-import java.util.Random;
 
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;

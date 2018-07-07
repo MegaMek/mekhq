@@ -122,7 +122,6 @@ import mekhq.campaign.event.GMModeEvent;
 import mekhq.campaign.event.LoanNewEvent;
 import mekhq.campaign.event.LoanPaidEvent;
 import mekhq.campaign.event.MedicPoolChangedEvent;
-import mekhq.campaign.event.MissionCompletedEvent;
 import mekhq.campaign.event.MissionNewEvent;
 import mekhq.campaign.event.NetworkChangedEvent;
 import mekhq.campaign.event.NewDayEvent;
