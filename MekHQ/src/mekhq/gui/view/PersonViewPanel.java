@@ -60,6 +60,7 @@ public class PersonViewPanel extends JPanel {
     private DirectoryItems awardIcons;
     private IconPackage ip;
 
+    private JPanel pnlPortrait;
     private JLabel lblPortrait;
     private JPanel pnlStats;
     private JTextArea txtDesc;
@@ -115,26 +116,50 @@ public class PersonViewPanel extends JPanel {
 
         lblPortrait = new JLabel();
         pnlStats = new JPanel();
+        pnlPortrait = new JPanel();
         txtDesc = new JTextArea();
         pnlKills = new JPanel();
         pnlLog = new JPanel();
         pnlInjuries = new JPanel();
-
         setLayout(new GridBagLayout());
-
         setBackground(Color.WHITE);
+
+        
+        
+        
+        
+        // Panel portrait will include the person picture and the ribbons
+        pnlPortrait.setName("pnlPortrait");
+        pnlPortrait.setBackground(Color.WHITE);
+        GridBagConstraints gbc_pnlPortrait = new GridBagConstraints();
+        gbc_pnlPortrait = new GridBagConstraints();
+        gbc_pnlPortrait.gridx = 0;
+        gbc_pnlPortrait.gridy = 0;
+        gbc_pnlPortrait.fill = GridBagConstraints.NONE;
+        gbc_pnlPortrait.anchor = GridBagConstraints.NORTHWEST;
+        gbc_pnlPortrait.insets = new Insets(10,10,0,0);
+        add(pnlPortrait, gbc_pnlPortrait);
 
         lblPortrait.setName("lblPortait"); // NOI18N
         lblPortrait.setBackground(Color.WHITE);
         setPortrait();
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new Insets(10,10,0,0);
-        add(lblPortrait, gridBagConstraints);
+        GridBagConstraints gbc_lblPortrait = new GridBagConstraints();
+        gbc_lblPortrait.gridx = 0;
+        gbc_lblPortrait.gridy = 0;
+        gbc_lblPortrait.fill = GridBagConstraints.NONE;
+        gbc_lblPortrait.anchor = GridBagConstraints.NORTHWEST;
+        gbc_lblPortrait.insets = new Insets(0,0,0,0);
+        gbc_lblPortrait.insets = new Insets(0,0,0,0);
+        add(lblPortrait, gbc_lblPortrait);
+        
+        pnlPortrait.add(lblPortrait);
 
+        
+        
+        
+        
+        
+        
         pnlStats.setName("pnlStats");
         pnlStats.setBorder(BorderFactory.createTitledBorder(person.getFullTitle()));
         pnlStats.setBackground(Color.WHITE);
