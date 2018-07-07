@@ -701,8 +701,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     public void setPrimaryRole(int t) {
         this.primaryRole = t;
-        //you cant be primary tech and a secondary astech
-        //you cant be a primary astech and a secondary tech
+        //you can't be primary tech and a secondary astech
+        //you can't be a primary astech and a secondary tech
         if ((isTechPrimary() && secondaryRole == T_ASTECH)
             || (isTechSecondary() && primaryRole == T_ASTECH)) {
             secondaryRole = T_NONE;
