@@ -78,7 +78,6 @@ import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
-import mekhq.campaign.universe.Faction;
 
 /**
  * This object will be the main workhorse for the scenario
