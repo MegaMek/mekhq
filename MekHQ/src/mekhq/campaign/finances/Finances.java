@@ -20,8 +20,12 @@
 
 package mekhq.campaign.finances;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Serializable;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -35,6 +39,10 @@ import org.w3c.dom.DOMException;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
+
+import megamek.common.logging.LogLevel;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
@@ -454,5 +462,37 @@ public class Finances implements Serializable {
 
     public long getMaxCollateral(Campaign c) {
         return c.getTotalEquipmentValue() + getTotalAssetValue() - getTotalLoanCollateral();
+    }
+    
+    public String exportFinances(String path, String format) {
+        String report;
+
+		try {
+			BufferedWriter writer = Files.newBufferedWriter(Paths.get(path));
+			CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT.withHeader("Date", "Category", "Description", "Amount", "RunningTotal"));
+			SimpleDateFormat df = new SimpleDateFormat("MM/dd/yyyy");
+			
+			int running_total = 0;
+			for (int i = 0; i < transactions.size(); i++) {
+				running_total += transactions.get(i).getAmount();
+				csvPrinter.printRecord(
+					df.format(transactions.get(i).getDate()),
+					transactions.get(i).getCategoryName(),
+					transactions.get(i).getDescription(),
+					transactions.get(i).getAmount(),
+					running_total
+				);
+			}
+
+			csvPrinter.flush();
+			csvPrinter.close();
+	
+			report = transactions.size() + " " + resourceMap.getString("FinanceExport.text");
+		} catch(IOException ioe) {
+            MekHQ.getLogger().log(getClass(), "exportFinances", LogLevel.INFO, "Error exporting finances to " + format);
+            report = "Error exporting finances. See log for details.";
+		}
+
+        return report;
     }
 }

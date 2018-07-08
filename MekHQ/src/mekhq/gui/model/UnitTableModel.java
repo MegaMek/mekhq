@@ -89,7 +89,7 @@ public class UnitTableModel extends DataTableModel {
         case COL_PILOT:
             return "Assigned to";
         case COL_TECH_CRW:
-            return "Tech";
+            return "Tech Crew";
         case COL_CREW:
             return "Crew";
         case COL_BV:
