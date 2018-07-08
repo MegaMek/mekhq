@@ -8,8 +8,13 @@ v0.45.0-git
 + PR #742: Errata - Range Master SPA no longer applicable to LOS range
 + Issue #384: Cannot negotiate contract terms because the game selects the highest skilled admin
         and not the one with the negotiating skill
-+ PR #766: Added balance-over-time and revenue/expenditure charts to finances tab
-+ PR #769: Added tooltips to tonnage labels on force view when AtB is enabled.
++ PR #766: [Feature] Added balance-over-time and revenue/expenditure charts to finances tab
++ PR #769: [Feature] Added tooltips to tonnage labels on force view when AtB is enabled.
++ PR #760: [Feature] Allow the user to introduce a modifier to the contract score of an AtB contract
++ PR #762: [Feature] Addresses RFE #515, by allowing 'export finances' as a CSV. Various minor fixes to other export mechanisms.
++ PR #762: Help -> About popup now contains link to MegaMek github home page.
++ PR #777: Addresses issue #776, by allowing the user to order up to a 1000 of some part or personnel class at a time, up from 100 previously.
++ PR #787: Adds total value for parts and fixes issue with net worth calculation for parts
 
 v0.44.0 (2018-06-24 1900 UTC)
 + Issue #733: Clan techs still have clan penalties to maintenance
