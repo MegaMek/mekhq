@@ -3379,6 +3379,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public ArrayList<Award> getAwards(){
+    	Collections.sort(awards);
     	return awards;
     }
     

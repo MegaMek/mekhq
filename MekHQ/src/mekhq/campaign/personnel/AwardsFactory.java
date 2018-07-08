@@ -10,7 +10,7 @@ public class AwardsFactory {
     private static AwardsFactory instance = null;
     private static ResourceBundle resourceMap = null;
 
-    public static Map<AwardNames, Award> awardsMap;
+    private static Map<AwardNames, Award> awardsMap;
 
     private AwardsFactory(){}
 
@@ -40,6 +40,10 @@ public class AwardsFactory {
         }
 
         return instance;
+    }
+
+    public Collection<Award> getAllAwards(){
+        return awardsMap.values();
     }
 
     public static Award GenerateNew(String awardName, Date date){

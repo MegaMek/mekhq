@@ -6,18 +6,15 @@
 
 package mekhq.gui.view;
 
-import java.awt.Color;
+import java.awt.*;
 import java.awt.Dialog.ModalityType;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Image;
-import java.awt.Insets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.ResourceBundle;
 
 import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -44,7 +41,6 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.gui.dialog.MedicalViewDialog;
 import mekhq.gui.model.PersonnelEventLogModel;
 import mekhq.gui.model.PersonnelKillLogModel;
-import java.awt.GridLayout;
 
 /**
  * A custom panel that gets filled in with goodies from a Person record
@@ -97,9 +93,11 @@ public class PersonViewPanel extends JPanel {
     private JLabel lblSpouse2;
     private JLabel lblChildren1;
     private JLabel lblChildren2;
+    private JPanel pnlMedals;
+    private Box boxRibbons;
 
     ResourceBundle resourceMap = null;
-    private JPanel pnlMedals;
+
 
     public PersonViewPanel(Person p, Campaign c, IconPackage ip) {
         this.person = p;
@@ -124,13 +122,11 @@ public class PersonViewPanel extends JPanel {
         setLayout(new GridBagLayout());
         setBackground(Color.WHITE);
 
-        
-        
-        
-        
         // Panel portrait will include the person picture and the ribbons
         pnlPortrait.setName("pnlPortrait");
         pnlPortrait.setBackground(Color.WHITE);
+        pnlPortrait.setLayout(new GridBagLayout());
+
         GridBagConstraints gbc_pnlPortrait = new GridBagConstraints();
         gbc_pnlPortrait = new GridBagConstraints();
         gbc_pnlPortrait.gridx = 0;
@@ -143,22 +139,31 @@ public class PersonViewPanel extends JPanel {
         lblPortrait.setName("lblPortait"); // NOI18N
         lblPortrait.setBackground(Color.WHITE);
         setPortrait();
+        
         GridBagConstraints gbc_lblPortrait = new GridBagConstraints();
         gbc_lblPortrait.gridx = 0;
         gbc_lblPortrait.gridy = 0;
         gbc_lblPortrait.fill = GridBagConstraints.NONE;
         gbc_lblPortrait.anchor = GridBagConstraints.NORTHWEST;
         gbc_lblPortrait.insets = new Insets(0,0,0,0);
-        gbc_lblPortrait.insets = new Insets(0,0,0,0);
-        add(lblPortrait, gbc_lblPortrait);
+        pnlPortrait.add(lblPortrait, gbc_lblPortrait);
         
-        pnlPortrait.add(lblPortrait);
+       if(person.hasAwards()) {
+            boxRibbons = Box.createVerticalBox();
+            boxRibbons.add(Box.createRigidArea(new Dimension(100,0)));
 
-        
-        
-        
-        
-        
+            setRibbons();
+
+            GridBagConstraints gbc_pnlAllRibbons = new GridBagConstraints();
+            gbc_pnlAllRibbons.gridx = 0;
+            gbc_pnlAllRibbons.gridy = 1;
+            gbc_pnlAllRibbons.fill = GridBagConstraints.NONE;
+            gbc_pnlAllRibbons.anchor = GridBagConstraints.NORTHWEST;
+            gbc_pnlAllRibbons.insets = new Insets(0,0,0,0);
+            pnlPortrait.add(boxRibbons, gbc_pnlAllRibbons);
+
+
+       }
         
         pnlStats.setName("pnlStats");
         pnlStats.setBorder(BorderFactory.createTitledBorder(person.getFullTitle()));
@@ -274,11 +279,56 @@ public class PersonViewPanel extends JPanel {
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         add(txtFiller, gridBagConstraints);
-
     }
 
-    public void setMedals(){
+    private void setRibbons() {
+    	int maxRibbonsPerRow = 4;
 
+    	ArrayList<Award> awards = person.getAwards();
+        Collections.reverse(awards);
+
+    	int i = 0;
+        Box rowRibbonsBox = null;
+        ArrayList<Box> rowRibbonsBoxes = new ArrayList<>();
+
+        //TODO: GET ONLY THE AWARDS THAT HAVE RIBBONS
+        for(Award award : awards){
+            JLabel ribbonLabel = new JLabel();
+    	    Image ribbon;
+
+    	    if(i%maxRibbonsPerRow == 0){
+                rowRibbonsBox = Box.createHorizontalBox();
+                rowRibbonsBox.setBackground(Color.RED);
+            }
+            //TODO: SKIP THE RIBBON IF IMAGE IS NOT FOUND
+    	    try{
+                ribbon = (Image) awardIcons.getItem("ribbons/", award.getRibbonFileName());
+                ribbon = ribbon.getScaledInstance(25,8, Image.SCALE_DEFAULT);
+                ribbonLabel.setIcon(new ImageIcon(ribbon));
+                ribbonLabel.setToolTipText("(" + award.getFormatedDate() + ") " + award.getLongName() + ": " + award.getDescription());
+                rowRibbonsBox.add(ribbonLabel);
+            }
+            catch (Exception err) {
+                err.printStackTrace();
+            }
+
+            i++;
+            if(i%maxRibbonsPerRow == 0){
+                rowRibbonsBoxes.add(rowRibbonsBox);
+            }
+        }
+        if(i%maxRibbonsPerRow!=0){
+            rowRibbonsBoxes.add(rowRibbonsBox);
+        }
+
+        Collections.reverse(rowRibbonsBoxes);
+        for(Box box : rowRibbonsBoxes){
+            boxRibbons.add(box);
+        }
+    }
+
+    //TODO: GET ONLY THE AWARDS THAT HAVE MEDALS
+    private void setMedals(){
         for(Award award : person.getAwards()){
             JLabel medalLabel = new JLabel();
 

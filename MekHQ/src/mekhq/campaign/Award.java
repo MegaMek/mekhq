@@ -8,7 +8,7 @@ import mekhq.MekHqXmlSerializable;
 import mekhq.campaign.personnel.AwardNames;
 import mekhq.campaign.personnel.Person;
 
-public class Award implements MekHqXmlSerializable, Cloneable {
+public class Award implements MekHqXmlSerializable, Cloneable, Comparable<Award> {
 
 	private AwardNames award;
 	private Date date;
@@ -59,11 +59,13 @@ public class Award implements MekHqXmlSerializable, Cloneable {
     }
 
     public String getRibbonFileName(){
-	    return ribbonFile;
+	    //return "ClanInvasion.png";
+		return ribbonFile;
     }
 
     public String getMedalFileName(){
-	    return medalFile;
+	    //return "ClanInvasionM.png";
+		return medalFile;
     }
 
     public int getXPreward(){
@@ -84,4 +86,9 @@ public class Award implements MekHqXmlSerializable, Cloneable {
 
         return true;
     }
+
+	@Override
+	public int compareTo(Award other) {
+		return Integer.compare(this.xpReward, other.xpReward);
+	}
 }

@@ -1772,7 +1772,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 }
                 
                 JMenu awardMenu = new JMenu(resourceMap.getString("award.text"));
-                for (Award award : AwardsFactory.awardsMap.values()) {
+                for (Award award : AwardsFactory.getInstance().getAllAwards()) {
 
                     if(!award.canBeAwarded(person)) continue;
 
