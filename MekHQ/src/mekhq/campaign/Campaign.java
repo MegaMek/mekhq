@@ -7973,7 +7973,7 @@ public class Campaign implements Serializable, ITechManager {
         monthlyExpenses = maintenance + salaries + overhead + coSpareParts + coAmmo + coFuel;
 
         long assets = cash + mech + vee + ba + infantry + largeCraft
-                + smallCraft + proto + getFinances().getTotalAssetValue();
+                + smallCraft + proto + spareParts + getFinances().getTotalAssetValue();
         long liabilities = loans;
         long netWorth = assets - liabilities;
         int longest = Math.max(DecimalFormat.getInstance().format(liabilities)
