@@ -99,6 +99,7 @@ public class CustomizeAtBContractDialog extends JDialog {
 	protected JComboBox<String> cbEnemyQuality;
 	protected JSpinner spnRequiredLances;
 	protected JComboBox<String> cbEnemyMorale;
+	protected JSpinner spnContractScoreArbitraryModifier;
 	protected JTextField txtAllyBotName;
 	protected JTextField txtEnemyBotName;
 	protected JButton btnAllyCamo;
@@ -192,6 +193,10 @@ public class CustomizeAtBContractDialog extends JDialog {
     	spnRequiredLances = new JSpinner(new SpinnerNumberModel(contract.getRequiredLances(), 1,
     			null, 1));
     	JLabel lblEnemyMorale = new JLabel();
+        spnContractScoreArbitraryModifier = new JSpinner(
+                new SpinnerNumberModel(contract.getContractScoreArbitraryModifier(),
+                        null,null,1));
+        JLabel lblContractScoreArbitraryModifier = new JLabel();
     	cbEnemyMorale = new JComboBox<String>(AtBContract.moraleLevelNames);
    	
     	int y = 0;
@@ -373,7 +378,7 @@ public class CustomizeAtBContractDialog extends JDialog {
         gbc.gridwidth = 1;
         gbc.insets = new java.awt.Insets(5, 5, 5, 5);
         leftPanel.add(lblEnemyMorale, gbc);
-        
+
         cbEnemyMorale.setSelectedIndex(contract.getMoraleLevel());
         gbc.gridx = 1;
         gbc.gridy = y++;
@@ -382,6 +387,22 @@ public class CustomizeAtBContractDialog extends JDialog {
         gbc.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gbc.insets = new java.awt.Insets(5, 5, 5, 5);
         leftPanel.add(cbEnemyMorale, gbc);
+
+        lblContractScoreArbitraryModifier.setText(resourceMap.getString("lblContractScoreArbitraryModifier.text")); // NOI18N
+        lblContractScoreArbitraryModifier.setName("lblContractScoreArbitraryModifier"); // NOI18N
+        gbc.gridx = 0;
+        gbc.gridy = y;
+        gbc.gridwidth = 1;
+        gbc.insets = new java.awt.Insets(5, 5, 5, 5);
+        leftPanel.add(lblContractScoreArbitraryModifier, gbc);
+
+        gbc.gridx = 1;
+        gbc.gridy = y++;
+        gbc.gridwidth = 1;
+        gbc.weightx = 1.0;
+        gbc.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gbc.insets = new java.awt.Insets(5, 5, 5, 5);
+        leftPanel.add(spnContractScoreArbitraryModifier, gbc);
 
         txtDesc.setText(contract.getDescription());
         txtDesc.setName("txtDesc");
@@ -593,6 +614,7 @@ public class CustomizeAtBContractDialog extends JDialog {
     	contract.setEnemyQuality(cbEnemyQuality.getSelectedIndex());
     	contract.setRequiredLances((Integer)spnRequiredLances.getValue());
     	contract.setMoraleLevel(cbEnemyMorale.getSelectedIndex());
+    	contract.setContractScoreArbitraryModifier((Integer)spnContractScoreArbitraryModifier.getValue());
     	contract.setAllyBotName(txtAllyBotName.getText());
     	contract.setEnemyBotName(txtEnemyBotName.getText());
     	contract.setAllyCamoCategory(allyCamoCategory);
