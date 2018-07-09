@@ -48,6 +48,10 @@ public class MekHQAboutBox extends javax.swing.JDialog {
 		java.awt.GridBagConstraints gridBagConstraints;
 
         javax.swing.JLabel appTitleLabel = new javax.swing.JLabel();
+        javax.swing.JLabel javaVendorLabel = new javax.swing.JLabel();
+        javax.swing.JLabel javaVendor = new javax.swing.JLabel();
+        javax.swing.JLabel javaVersionLabel = new javax.swing.JLabel();
+        javax.swing.JLabel javaVersion = new javax.swing.JLabel();
         javax.swing.JLabel versionLabel = new javax.swing.JLabel();
         javax.swing.JLabel appVersionLabel = new javax.swing.JLabel();
         javax.swing.JLabel versionLabelMegaMek = new javax.swing.JLabel();
@@ -80,9 +84,33 @@ public class MekHQAboutBox extends javax.swing.JDialog {
 		gridBagConstraints.weighty = 0.0;
         getContentPane().add(appTitleLabel, gridBagConstraints);
         
+        javaVendorLabel.setText(resourceMap.getString("javaVendorLabel.text")); // NOI18N
+        javaVendorLabel.setName("javaVendorLabel"); // NOI18N
+        gridBagConstraints.gridy = 1;
+		gridBagConstraints.gridwidth = 1;
+		getContentPane().add(javaVendorLabel, gridBagConstraints);
+		
+		javaVendor.setText(System.getProperty("java.vendor")); // NOI18N
+		javaVendor.setName("javaVendor"); // NOI18N
+        gridBagConstraints.gridx = 1;
+        getContentPane().add(javaVendor, gridBagConstraints);
+        
+        javaVersionLabel.setText(resourceMap.getString("javaVersionLabel.text")); // NOI18N
+        javaVersionLabel.setName("javaVersionLabel"); // NOI18N
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridx = 0;
+		gridBagConstraints.gridwidth = 1;
+		getContentPane().add(javaVersionLabel, gridBagConstraints);
+		
+		javaVersion.setText(System.getProperty("java.version")); // NOI18N
+		javaVersion.setName("javaVersion"); // NOI18N
+        gridBagConstraints.gridx = 1;
+        getContentPane().add(javaVersion, gridBagConstraints);
+        
         versionLabel.setText(resourceMap.getString("versionLabel.text")); // NOI18N
         versionLabel.setName("versionLabel"); // NOI18N
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridwidth = 1;
         getContentPane().add(versionLabel, gridBagConstraints);
         
@@ -93,7 +121,7 @@ public class MekHQAboutBox extends javax.swing.JDialog {
         
         versionLabelMegaMek.setText(resourceMap.getString("versionLabelMegaMek.text")); // NOI18N
         versionLabelMegaMek.setName("versionLabelMegaMek"); // NOI18N
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridy = 4;
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridwidth = 1;
         getContentPane().add(versionLabelMegaMek, gridBagConstraints);
@@ -105,7 +133,7 @@ public class MekHQAboutBox extends javax.swing.JDialog {
         
         versionLabelMegaMekLab.setText(resourceMap.getString("versionLabelMegaMekLab.text")); // NOI18N
         versionLabelMegaMekLab.setName("versionLabelMegaMekLab"); // NOI18N
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridy = 5;
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridwidth = 1;
         getContentPane().add(versionLabelMegaMekLab, gridBagConstraints);
@@ -118,10 +146,9 @@ public class MekHQAboutBox extends javax.swing.JDialog {
         homepageLabel.setText(resourceMap.getString("homepageLabel.text")); // NOI18N
         homepageLabel.setName("homepageLabel"); // NOI18N
         gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 4;
+		gridBagConstraints.gridy = 6;
         getContentPane().add(homepageLabel, gridBagConstraints);
         
-        // use a JButton but make it look more like a regular link
         appHomepage.setText("<html><font color='#0000EE'>" + mekhqProperties.getString("Application.homepage") + "</font></html>"); // NOI18N
         appHomepage.setName("appHomepageLabel"); // NOI18N
         appHomepage.setOpaque(false);
@@ -147,7 +174,7 @@ public class MekHQAboutBox extends javax.swing.JDialog {
         
         appDescLabel.setText(mekhqProperties.getString("Application.description")); // NOI18N
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 6;
+        gridBagConstraints.gridy = 8;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
