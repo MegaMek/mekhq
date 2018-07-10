@@ -12,6 +12,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -192,7 +193,7 @@ public class PersonViewPanel extends JPanel {
             gbc_pnlMedals.gridx = 0;
             gbc_pnlMedals.gridy = gridy;
             add(pnlMedals, gbc_pnlMedals);
-            pnlMedals.setLayout(new GridLayout(0, 10, 2, 5));
+            pnlMedals.setLayout(new GridLayout(0, 12, 2, 2));
             gridy++;
         }
 
@@ -284,14 +285,14 @@ public class PersonViewPanel extends JPanel {
     private void setRibbons() {
     	int maxRibbonsPerRow = 4;
 
-    	ArrayList<Award> awards = person.getAwards();
+    	ArrayList<Award> awards = person.getAwards().stream().filter(a -> a.getRibbonFileName() != null)
+                .collect(Collectors.toCollection(ArrayList::new));
         Collections.reverse(awards);
 
     	int i = 0;
         Box rowRibbonsBox = null;
         ArrayList<Box> rowRibbonsBoxes = new ArrayList<>();
 
-        //TODO: GET ONLY THE AWARDS THAT HAVE RIBBONS
         for(Award award : awards){
             JLabel ribbonLabel = new JLabel();
     	    Image ribbon;
@@ -300,12 +301,13 @@ public class PersonViewPanel extends JPanel {
                 rowRibbonsBox = Box.createHorizontalBox();
                 rowRibbonsBox.setBackground(Color.RED);
             }
-            //TODO: SKIP THE RIBBON IF IMAGE IS NOT FOUND
     	    try{
                 ribbon = (Image) awardIcons.getItem("ribbons/", award.getRibbonFileName());
+                if(ribbon == null) continue;
                 ribbon = ribbon.getScaledInstance(25,8, Image.SCALE_DEFAULT);
                 ribbonLabel.setIcon(new ImageIcon(ribbon));
-                ribbonLabel.setToolTipText("(" + award.getFormatedDate() + ") " + award.getLongName() + ": " + award.getDescription());
+                ribbonLabel.setToolTipText("(" + award.getFormatedDate() + ") " + award.getLongName()
+                        + ": " + award.getDescription());
                 rowRibbonsBox.add(ribbonLabel);
             }
             catch (Exception err) {
@@ -327,15 +329,19 @@ public class PersonViewPanel extends JPanel {
         }
     }
 
-    //TODO: GET ONLY THE AWARDS THAT HAVE MEDALS
     private void setMedals(){
-        for(Award award : person.getAwards()){
+
+        ArrayList<Award> awards = person.getAwards().stream().filter(a -> a.getMedalFileName() != null)
+                .collect(Collectors.toCollection(ArrayList::new));
+        Collections.sort(awards);
+
+        for(Award award : awards){
             JLabel medalLabel = new JLabel();
 
             Image medal = null;
             try{
-                if(award.getMedalFileName() == null) continue;
                 medal = (Image) awardIcons.getItem("medals/", award.getMedalFileName());
+                if(medal == null) continue;
                 medal = medal.getScaledInstance(28,61, Image.SCALE_DEFAULT);
                 medalLabel.setIcon(new ImageIcon(medal));
                 medalLabel.setToolTipText("(" + award.getFormatedDate() + ") " + award.getLongName() + ": " + award.getDescription());

@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import mekhq.MekHqXmlSerializable;
+import mekhq.MekHqXmlUtil;
 import mekhq.campaign.personnel.AwardNames;
 import mekhq.campaign.personnel.Person;
 
@@ -20,6 +21,8 @@ public class Award implements MekHqXmlSerializable, Cloneable, Comparable<Award>
 	private String medalFile;
 	private String ribbonFile;
 
+	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+
 	// Can be awarded multiple times to the same person.
 	private boolean stackable = false;
 
@@ -34,12 +37,23 @@ public class Award implements MekHqXmlSerializable, Cloneable, Comparable<Award>
 
 	@Override
 	public void writeToXml(PrintWriter pw1, int indent) {
-		// TODO Auto-generated method stub
+		StringBuilder sb = new StringBuilder();
+		sb.append(MekHqXmlUtil.indentStr(indent)).append("<award>");
+		if(null != date) {
+			sb.append("<date>").append(DATE_FORMAT.format(date)).append("</date>");
+		}
+		sb.append("<name>").append(MekHqXmlUtil.escape(award.toString())).append("</name>");
+		sb.append("</award>");
+		pw1.println(sb.toString());
 	}
 
 	public void setDate(Date date){
 	    this.date = date;
     }
+
+    public Date getDate(){
+		return date;
+	}
 
     public String getFormatedDate(){
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");

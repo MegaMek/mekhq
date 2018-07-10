@@ -1732,7 +1732,25 @@ public class Person implements Serializable, MekHqXmlSerializable {
                         }
                         retVal.addLogEntry(LogEntry.generateInstanceFromXML(wn3));
                     }
-                // TODO: load awards over here
+                } else if (wn2.getNodeName().equalsIgnoreCase("awards")){
+                    NodeList nl2 = wn2.getChildNodes();
+                    for (int y = 0; y < nl2.getLength(); y++) {
+
+                        Node wn3 = nl2.item(y);
+
+                        if (wn3.getNodeType() != Node.ELEMENT_NODE) {
+                            continue;
+                        }
+
+                        if (!wn3.getNodeName().equalsIgnoreCase("award")) {
+                            MekHQ.getLogger().log(Person.class, METHOD_NAME, LogLevel.ERROR,
+                                    "Unknown node type not loaded in personnel log nodes: " + wn3.getNodeName()); //$NON-NLS-1$
+                            continue;
+                        }
+
+                        retVal.addAward(AwardsFactory.generateNewFromXML(wn3));
+                    }
+
                 } else if (wn2.getNodeName().equalsIgnoreCase("injuries")) {
                     NodeList nl2 = wn2.getChildNodes();
                     for (int y = 0; y < nl2.getLength(); y++) {
@@ -3387,12 +3405,21 @@ public class Person implements Serializable, MekHqXmlSerializable {
     	return awards.size() > 0;
     }
 
-    public void addAward(Date date, String awardName) {
+    public void addAndLogAward(Date date, String awardName) {
         Award award = AwardsFactory.GenerateNew(awardName, date);
+        addAward(award);
+        logAward(award);
+    }
+
+    private void addAward(Award award){
         awards.add(award);
-    	addLogEntry(date, "Awarded " + award.getLongName() + " medal: " + award.getDescription());
         setXp(getXp() + award.getXPreward());
-    	MekHQ.triggerEvent(new PersonChangedEvent(this));
+        MekHQ.triggerEvent(new PersonChangedEvent(this));
+    }
+
+    public void logAward(Award award){
+        addLogEntry(award.getDate(), "Awarded " + award.getLongName() + " medal: " + award.getDescription());
+        MekHQ.triggerEvent(new PersonChangedEvent(this));
     }
 
     public boolean hasAward(Award award){
@@ -3401,8 +3428,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
         }
         return false;
     }
-    
-    //TODO: get awards list!
     
     public void addLogEntry(Date d, String desc, String type) {
         personnelLog.add(new LogEntry(d, desc, type));

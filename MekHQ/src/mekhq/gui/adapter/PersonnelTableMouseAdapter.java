@@ -551,7 +551,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             }
             case CMD_ADD_AWARD:
             {
-            	selectedPerson.addAward(gui.getCampaign().getDate(), data[1]);
+            	selectedPerson.addAndLogAward(gui.getCampaign().getDate(), data[1]);
             }
             case CMD_IMPROVE:
             {
