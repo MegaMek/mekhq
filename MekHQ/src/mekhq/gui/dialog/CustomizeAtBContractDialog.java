@@ -54,9 +54,12 @@ import megamek.client.ui.swing.util.PlayerColors;
 import megamek.common.Player;
 import megamek.common.util.DirectoryItems;
 import megamek.common.util.EncodeControl;
+import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.Planet;
+import mekhq.campaign.universe.Planets;
 import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.gui.FactionComboBox;
 import mekhq.gui.utilities.JSuggestField;
@@ -96,6 +99,7 @@ public class CustomizeAtBContractDialog extends JDialog {
 	protected JComboBox<String> cbEnemyQuality;
 	protected JSpinner spnRequiredLances;
 	protected JComboBox<String> cbEnemyMorale;
+	protected JSpinner spnContractScoreArbitraryModifier;
 	protected JTextField txtAllyBotName;
 	protected JTextField txtEnemyBotName;
 	protected JButton btnAllyCamo;
@@ -189,6 +193,10 @@ public class CustomizeAtBContractDialog extends JDialog {
     	spnRequiredLances = new JSpinner(new SpinnerNumberModel(contract.getRequiredLances(), 1,
     			null, 1));
     	JLabel lblEnemyMorale = new JLabel();
+        spnContractScoreArbitraryModifier = new JSpinner(
+                new SpinnerNumberModel(contract.getContractScoreArbitraryModifier(),
+                        null,null,1));
+        JLabel lblContractScoreArbitraryModifier = new JLabel();
     	cbEnemyMorale = new JComboBox<String>(AtBContract.moraleLevelNames);
    	
     	int y = 0;
@@ -272,7 +280,7 @@ public class CustomizeAtBContractDialog extends JDialog {
         leftPanel.add(lblPlanetName, gbc);
         
         suggestPlanet = new JSuggestField(this, campaign.getPlanetNames());       
-        suggestPlanet.setText(contract.getPlanetName());
+        suggestPlanet.setText(contract.getPlanetName(Utilities.getDateTimeDay(campaign.getCalendar())));
         gbc.gridx = 1;
         gbc.gridy = y++;
         gbc.gridwidth = 2;
@@ -370,7 +378,7 @@ public class CustomizeAtBContractDialog extends JDialog {
         gbc.gridwidth = 1;
         gbc.insets = new java.awt.Insets(5, 5, 5, 5);
         leftPanel.add(lblEnemyMorale, gbc);
-        
+
         cbEnemyMorale.setSelectedIndex(contract.getMoraleLevel());
         gbc.gridx = 1;
         gbc.gridy = y++;
@@ -379,6 +387,22 @@ public class CustomizeAtBContractDialog extends JDialog {
         gbc.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gbc.insets = new java.awt.Insets(5, 5, 5, 5);
         leftPanel.add(cbEnemyMorale, gbc);
+
+        lblContractScoreArbitraryModifier.setText(resourceMap.getString("lblContractScoreArbitraryModifier.text")); // NOI18N
+        lblContractScoreArbitraryModifier.setName("lblContractScoreArbitraryModifier"); // NOI18N
+        gbc.gridx = 0;
+        gbc.gridy = y;
+        gbc.gridwidth = 1;
+        gbc.insets = new java.awt.Insets(5, 5, 5, 5);
+        leftPanel.add(lblContractScoreArbitraryModifier, gbc);
+
+        gbc.gridx = 1;
+        gbc.gridy = y++;
+        gbc.gridwidth = 1;
+        gbc.weightx = 1.0;
+        gbc.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gbc.insets = new java.awt.Insets(5, 5, 5, 5);
+        leftPanel.add(spnContractScoreArbitraryModifier, gbc);
 
         txtDesc.setText(contract.getDescription());
         txtDesc.setName("txtDesc");
@@ -482,6 +506,7 @@ public class CustomizeAtBContractDialog extends JDialog {
         btnOK.setText(resourceMap.getString("btnOkay.text")); // NOI18N
         btnOK.setName("btnOK"); // NOI18N
         btnOK.addActionListener(new java.awt.event.ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnOKActionPerformed(evt);
             }
@@ -491,6 +516,7 @@ public class CustomizeAtBContractDialog extends JDialog {
         btnClose.setText(resourceMap.getString("btnCancel.text")); // NOI18N
         btnClose.setName("btnClose"); // NOI18N
         btnClose.addActionListener(new java.awt.event.ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnCloseActionPerformed(evt);
             }
@@ -588,6 +614,7 @@ public class CustomizeAtBContractDialog extends JDialog {
     	contract.setEnemyQuality(cbEnemyQuality.getSelectedIndex());
     	contract.setRequiredLances((Integer)spnRequiredLances.getValue());
     	contract.setMoraleLevel(cbEnemyMorale.getSelectedIndex());
+    	contract.setContractScoreArbitraryModifier((Integer)spnContractScoreArbitraryModifier.getValue());
     	contract.setAllyBotName(txtAllyBotName.getText());
     	contract.setEnemyBotName(txtEnemyBotName.getText());
     	contract.setAllyCamoCategory(allyCamoCategory);
@@ -596,7 +623,17 @@ public class CustomizeAtBContractDialog extends JDialog {
     	contract.setEnemyCamoCategory(enemyCamoCategory);
     	contract.setEnemyCamoFileName(enemyCamoFileName);
     	contract.setEnemyColorIndex(enemyColorIndex);
-    	contract.setPlanetName(suggestPlanet.getText());
+        
+    	Planet canonPlanet = Planets.getInstance().getPlanetByName(suggestPlanet.getText(),
+                Utilities.getDateTimeDay(campaign.getCalendar()));
+        
+        if(canonPlanet != null) {
+            contract.setPlanetId(canonPlanet.getId());
+        } else {
+            contract.setPlanetId(null);
+            contract.setLegacyPlanetName(suggestPlanet.getText());
+        }
+    	
     	contract.setDesc(txtDesc.getText());
     	this.setVisible(false);
     }

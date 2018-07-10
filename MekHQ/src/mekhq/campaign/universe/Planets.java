@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -57,6 +58,7 @@ import org.w3c.dom.Node;
 
 import megamek.common.EquipmentType;
 import megamek.common.logging.LogLevel;
+import megamek.common.util.EncodeControl;
 import mekhq.FileParser;
 import mekhq.MekHQ;
 import mekhq.Utilities;
@@ -65,6 +67,8 @@ import mekhq.campaign.universe.Planet.PlanetaryEvent;
 public class Planets {
     private final static Object LOADING_LOCK = new Object[0];
     private static Planets planets;
+    
+    private static ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.Planets", new EncodeControl()); //$NON-NLS-1$
 
     // Marshaller / unmarshaller instances
     private static Marshaller marshaller;
@@ -638,11 +642,11 @@ public class Planets {
         }
     }
     
-    public String exportPlanets(String fileName) {
+    public String exportPlanets(String path, String format) {
         String report;
         
         try {
-            FileOutputStream fos = new FileOutputStream(fileName);
+            FileOutputStream fos = new FileOutputStream(path);
             ArrayList<Planet> localPlanetList = new ArrayList<>(this.planetList.values());
             localPlanetList.sort(new Comparator<Planet>() {
                 @Override
@@ -654,9 +658,9 @@ public class Planets {
             fos.flush();
             fos.close();
             
-            report = localPlanetList.size() + " planets written to file.";
+            report = localPlanetList.size() + " " + resourceMap.getString("PlanetsWrittenFile.text");
         } catch(IOException ioe) {
-            MekHQ.getLogger().log(getClass(), "exportPlanets", LogLevel.INFO, "Error exporting planets to XML");
+            MekHQ.getLogger().log(getClass(), "exportPlanets", LogLevel.INFO, "Error exporting planets to " + format);
             report = "Error exporting planets. See log for details.";
         }
         

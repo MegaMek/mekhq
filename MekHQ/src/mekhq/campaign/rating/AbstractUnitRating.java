@@ -1,5 +1,5 @@
 /*
- * AbstractMrbcRating.java
+ * AbstractUnitRating.java
  *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  *
@@ -84,6 +84,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
     private int battleArmorCount = 0;
     private int numberBaSquads = 0;
     private int infantryCount = 0;
+    private int infantryUnitCount = 0;
     private int smallCraftCount = 0;
     private int dropshipCount = 0;
     private int warshipCount = 0;
@@ -434,6 +435,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
         setBattleArmorCount(0);
         setNumberBaSquads(0);
         setInfantryCount(0);
+        setInfantryUnitCount(0);
         setDropshipCount(0);
         setJumpshipCount(0);
         setWarshipCount(0);
@@ -570,6 +572,18 @@ public abstract class AbstractUnitRating implements IUnitRating {
     private void incrementMechCount() {
         mechCount++;
     }
+    
+    private void setInfantryUnitCount(int count) {
+        infantryUnitCount = count;
+    }
+    
+    private void incrementInfantryUnitCount() {
+        infantryUnitCount++;
+    }
+    
+    public int getInfantryUnitCount() {
+        return infantryUnitCount;
+    }
 
     int getProtoCount() {
         return protoCount;
@@ -667,10 +681,16 @@ public abstract class AbstractUnitRating implements IUnitRating {
         infantryCount += amount;
     }
 
+    /**
+     * Calculate the number of infantry "platoons" present in the company, based on the numbers
+     * of various infantry present. Per CamOps, the simplification is that an infantry cube can
+     * house 28 infantry.
+     * @return Number of infantry "platoons" in the company.
+     */
     int calcInfantryPlatoons() {
-        return (int) Math.ceil(getInfantryCount() / 28);
+        return (int) Math.ceil((double) getInfantryCount() / 28);
     }
-
+    
     int getDropshipCount() {
         return dropshipCount;
     }
@@ -909,7 +929,9 @@ public abstract class AbstractUnitRating implements IUnitRating {
                 break;
             case UnitType.INFANTRY:
                 Infantry i = (Infantry) e;
+                
                 incrementInfantryCount(i.getSquadSize() * i.getSquadN());
+                incrementInfantryUnitCount();
                 break;
         }
     }

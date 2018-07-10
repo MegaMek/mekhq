@@ -44,6 +44,7 @@ import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.universe.Planet;
+import mekhq.campaign.universe.Planets;
 import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.gui.FactionComboBox;
 import mekhq.gui.model.SortedComboBoxModel;
@@ -105,7 +106,9 @@ public class NewAtBContractDialog extends NewContractDialog {
         if (getCurrentEnemyCode() != null) {
         	((AtBContract)contract).setEnemyCode(getCurrentEnemyCode());
         }
-        ((AtBContract)contract).setPlanetName((String)cbPlanets.getSelectedItem());
+        ((AtBContract) contract)
+                .setPlanetId((Planets.getInstance().getPlanetByName((String) cbPlanets.getSelectedItem(),
+                        Utilities.getDateTimeDay(campaign.getCalendar()))).getId());
         spnMultiplier.setModel(new SpinnerNumberModel(contract.getMultiplier(), 0.1, 10.0, 0.1));
         updatePaymentMultiplier();
         contract.calculateContract(campaign);
@@ -517,7 +520,8 @@ public class NewAtBContractDialog extends NewContractDialog {
 		if (chkShowAllPlanets.isSelected()) {
 	    	//contract.setPlanetName(suggestPlanet.getText());
 		} else {
-			contract.setPlanetName((String)cbPlanets.getSelectedItem());
+            contract.setPlanetId((Planets.getInstance().getPlanetByName((String) cbPlanets.getSelectedItem(),
+                    Utilities.getDateTimeDay(campaign.getCalendar()))).getId());
 		}
     	contract.setEmployerCode(getCurrentEmployerCode(), campaign.getGameYear());
     	contract.setMissionType(cbMissionType.getSelectedIndex());
@@ -540,14 +544,18 @@ public class NewAtBContractDialog extends NewContractDialog {
     	this.setVisible(false);
     }
     
+    @Override
     protected void doUpdateContract(Object source) {
 		removeAllListeners();
 		
+		boolean needUpdatePayment = false;
     	AtBContract contract = (AtBContract)this.contract;
         if (cbPlanets.equals(source) && null != cbPlanets.getSelectedItem()) {
-            contract.setPlanetName((String)cbPlanets.getSelectedItem());
+            contract.setPlanetId((Planets.getInstance().getPlanetByName((String) cbPlanets.getSelectedItem(),
+                    Utilities.getDateTimeDay(campaign.getCalendar()))).getId());
             //reset the start date as null so we recalculate travel time
             contract.setStartDate(null);
+            needUpdatePayment = true;
         } else if (source.equals(cbEmployer)) {
         	System.out.println("Setting employer code to " + getCurrentEmployerCode());
         	long time = System.currentTimeMillis();
@@ -559,14 +567,17 @@ public class NewAtBContractDialog extends NewContractDialog {
         	time = System.currentTimeMillis();
     		updatePlanets();
     		System.out.println("to update planets: " + (System.currentTimeMillis() - time));
+    		needUpdatePayment = true;
      	} else if (source.equals(cbEnemy)) {
     		contract.setEnemyCode(getCurrentEnemyCode());
     		updatePlanets();
+    		needUpdatePayment = true;
     	} else if (source.equals(cbMissionType)) {
     		contract.setMissionType(cbMissionType.getSelectedIndex());
     		contract.calculateLength(campaign.getCampaignOptions().getVariableContractLength());
     		spnLength.setValue(contract.getLength());
     		updatePlanets();
+    		needUpdatePayment = true;
     	} else if (source.equals(cbAllySkill)) {
     		contract.setAllySkill(cbAllySkill.getSelectedIndex());
     	} else if (source.equals(cbAllyQuality)) {
@@ -577,8 +588,10 @@ public class NewAtBContractDialog extends NewContractDialog {
     		contract.setEnemyQuality(cbEnemyQuality.getSelectedIndex());
     	}
     	
-   		updatePaymentMultiplier();
-   		super.doUpdateContract(source);
+    	if (needUpdatePayment) {
+            updatePaymentMultiplier();
+        }
+    	super.doUpdateContract(source);
     	
     	addAllListeners();
    }

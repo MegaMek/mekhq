@@ -36,6 +36,7 @@ import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.universe.Planet;
+import mekhq.campaign.universe.Planets;
 
 
 /**
@@ -206,9 +207,9 @@ public class CurrentLocation implements Serializable {
 	public void writeToXml(PrintWriter pw1, int indent) {
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "<location>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<currentPlanetName>"
+                + "<currentPlanetId>"
 				+MekHqXmlUtil.escape(currentPlanet.getId())
-				+"</currentPlanetName>");
+                + "</currentPlanetId>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<transitTime>"
 				+transitTime
@@ -235,8 +236,9 @@ public class CurrentLocation implements Serializable {
 			
 			for (int x=0; x<nl.getLength(); x++) {
 				Node wn2 = nl.item(x);
-				if (wn2.getNodeName().equalsIgnoreCase("currentPlanetName")) {
-					Planet p = c.getPlanet(wn2.getTextContent());
+                if (wn2.getNodeName().equalsIgnoreCase("currentPlanetId")
+                        || wn2.getNodeName().equalsIgnoreCase("currentPlanetName")) {
+                    Planet p = Planets.getInstance().getPlanetById(wn2.getTextContent());
 					if(null == p) {
 						//whoops we cant find your planet man, back to Earth
 					    MekHQ.getLogger().log(CurrentLocation.class, METHOD_NAME, LogLevel.ERROR,

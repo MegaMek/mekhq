@@ -19,24 +19,48 @@
 package mekhq.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.ResourceBundle;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
+import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.table.TableColumn;
 
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.DateAxis;
+import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.XYItemRenderer;
+import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
+import org.jfree.chart.ui.RectangleEdge;
+import org.jfree.chart.ui.RectangleInsets;
+import org.jfree.data.category.CategoryDataset;
+import org.jfree.data.category.DefaultCategoryDataset;
+import org.jfree.data.time.Day;
+import org.jfree.data.time.TimeSeries;
+import org.jfree.data.time.TimeSeriesCollection;
+import org.jfree.data.xy.XYDataset;
+
 import megamek.common.event.Subscribe;
+import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.event.AcquisitionEvent;
 import mekhq.campaign.event.AssetEvent;
@@ -48,6 +72,7 @@ import mekhq.campaign.event.PartEvent;
 import mekhq.campaign.event.ScenarioResolvedEvent;
 import mekhq.campaign.event.TransactionEvent;
 import mekhq.campaign.event.UnitEvent;
+import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.mission.Contract;
 import mekhq.gui.adapter.FinanceTableMouseAdapter;
 import mekhq.gui.adapter.LoanTableMouseAdapter;
@@ -63,6 +88,8 @@ import mekhq.gui.model.LoanTableModel;
 public final class FinancesTab extends CampaignGuiTab {
 
     private static final long serialVersionUID = -3203920871646865885L;
+    
+    private ResourceBundle resourceMap;
 
     private JTable financeTable;
     private JTable loanTable;
@@ -77,6 +104,10 @@ public final class FinancesTab extends CampaignGuiTab {
         super(gui, name);
         MekHQ.registerHandler(this);
     }
+    
+    private enum GraphType {
+    	BALANCE_AMOUNT, MONTHLY_FINANCES;
+    }
 
     /*
      * (non-Javadoc)
@@ -85,9 +116,13 @@ public final class FinancesTab extends CampaignGuiTab {
      */
     @Override
     public void initTab() {
+    	resourceMap = ResourceBundle.getBundle("mekhq.resources.FinancesTab", new EncodeControl()); //$NON-NLS-1$
+    	
         GridBagConstraints gridBagConstraints;
 
         setLayout(new GridBagLayout());
+        ChartPanel financeAmountPanel = (ChartPanel) createGraphPanel(GraphType.BALANCE_AMOUNT);
+        ChartPanel financeMonthlyPanel = (ChartPanel) createGraphPanel(GraphType.MONTHLY_FINANCES);
 
         financeModel = new FinanceTableModel();
         financeTable = new JTable(financeModel);
@@ -129,34 +164,33 @@ public final class FinancesTab extends CampaignGuiTab {
         gridBagConstraints.weighty = 1.0;
         JPanel panBalance = new JPanel(new GridBagLayout());
         panBalance.add(new JScrollPane(financeTable), gridBagConstraints);
+        panBalance.setMinimumSize(new java.awt.Dimension(350, 100));
         panBalance.setBorder(BorderFactory.createTitledBorder("Balance Sheet"));
         JPanel panLoan = new JPanel(new GridBagLayout());
         panLoan.add(scrollLoanTable, gridBagConstraints);
-        scrollLoanTable.setMinimumSize(new java.awt.Dimension(450, 150));
-        scrollLoanTable.setPreferredSize(new java.awt.Dimension(450, 150));
-        panLoan.setBorder(BorderFactory.createTitledBorder("Active Loans"));
-        // JSplitPane splitFinances = new
-        // JSplitPane(JSplitPane.VERTICAL_SPLIT,panBalance, panLoan);
-        // splitFinances.setOneTouchExpandable(true);
-        // splitFinances.setResizeWeight(1.0);
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        add(panBalance, gridBagConstraints);
-
+        JTabbedPane financeTab = new JTabbedPane();
+        financeTab.setMinimumSize(new java.awt.Dimension(450, 300));
+        financeTab.setPreferredSize(new java.awt.Dimension(450, 300));
+        
+        JSplitPane splitFinances = new JSplitPane(JSplitPane.VERTICAL_SPLIT, panBalance, financeTab);
+		splitFinances.setOneTouchExpandable(true);
+		splitFinances.setContinuousLayout(true);
+		splitFinances.setResizeWeight(1.0);
+		splitFinances.setName("splitFinances");
+        
+        financeTab.addTab(resourceMap.getString("activeLoans.text"), panLoan);
+        financeTab.addTab(resourceMap.getString("cbillsBalanceTime.text"), financeAmountPanel);
+        financeTab.addTab(resourceMap.getString("monthlyRevenueExpenditures.text"), financeMonthlyPanel);
+        
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.SOUTHWEST;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 0.0;
-        add(panLoan, gridBagConstraints);
+        gridBagConstraints.weighty = 1.0;
+        add(splitFinances, gridBagConstraints);
 
         JPanel panelFinanceRight = new JPanel(new BorderLayout());
 
@@ -197,6 +231,134 @@ public final class FinancesTab extends CampaignGuiTab {
         gridBagConstraints.weightx = 0.0;
         gridBagConstraints.weighty = 1.0;
         add(panelFinanceRight, gridBagConstraints);
+    }
+    
+    private XYDataset setupFinanceDataset() {
+    	TimeSeries s1 = new TimeSeries("C-Bills"); // NOI18N
+    	ArrayList<Transaction> transactions = getCampaign().getFinances().getAllTransactions();
+    	Calendar cal = Calendar.getInstance();
+    	
+    	long balance = 0;
+    	for (int i = 0; i < transactions.size(); i++) {
+    		balance += transactions.get(i).getAmount();
+    		cal.setTime(transactions.get(i).getDate());
+    		// since there may be more than one entry per day and the dataset for the graph can only have one entry per day
+    		// we use addOrUpdate() which assumes transactions are in sequential order by date so we always have the most
+    		// up-to-date entry for each day
+    		s1.addOrUpdate(new Day(cal.get(Calendar.DAY_OF_MONTH),
+    				cal.get(Calendar.MONTH)+1, // Gregorian and Julian calendars start at 0: https://docs.oracle.com/javase/7/docs/api/java/util/Calendar.html#MONTH
+    				cal.get(Calendar.YEAR)), 
+    				balance);
+    	}
+                
+        TimeSeriesCollection dataset = new TimeSeriesCollection();
+        dataset.addSeries(s1);
+        
+        return dataset;
+    }
+    
+    private CategoryDataset setupMonthlyDataset() {
+    	SimpleDateFormat df = new SimpleDateFormat("MMM-yyyy");
+    	DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+    	ArrayList<Transaction> transactions = getCampaign().getFinances().getAllTransactions();
+    	Calendar cal = Calendar.getInstance();
+    	
+    	String pastMonthYear = "";
+    	long monthlyRevenue = 0;
+    	long monthlyExpenditures = 0;
+    	for (int i = 0; i < transactions.size(); i++) {
+    		cal.setTime(transactions.get(i).getDate());
+    		
+    		if (pastMonthYear.equals(df.format(cal.getTime()))) {
+    			if (transactions.get(i).getAmount() > 0) {
+    				monthlyRevenue += transactions.get(i).getAmount();
+    			} else {
+    				monthlyExpenditures += Math.abs(transactions.get(i).getAmount());
+    			}
+    		} else {
+    			// as long as we're not at the first transaction, add the previous month and reset
+    			if (i != 0) {
+    				dataset.addValue(monthlyRevenue, resourceMap.getString("graphMonthlyRevenue.text"), pastMonthYear);
+    				dataset.addValue(monthlyExpenditures, resourceMap.getString("graphMonthlyExpenditures.text"), pastMonthYear);
+    				monthlyRevenue = 0;
+    				monthlyExpenditures = 0;
+    			}
+    			pastMonthYear = df.format(cal.getTime());
+    			if (transactions.get(i).getAmount() > 0) {
+    				monthlyRevenue = transactions.get(i).getAmount();
+    			} else {
+    				monthlyExpenditures = Math.abs(transactions.get(i).getAmount());
+    			}
+    		}
+    		
+    		// if we're at the last transaction, save it off
+			if (i == transactions.size()-1) {
+				dataset.addValue(monthlyRevenue, resourceMap.getString("graphMonthlyRevenue.text"), pastMonthYear);
+				dataset.addValue(monthlyExpenditures, resourceMap.getString("graphMonthlyExpenditures.text"), pastMonthYear);
+			}
+    	}
+        
+        return dataset;
+    }
+    
+    private JPanel createGraphPanel(GraphType gt) {
+        JFreeChart chart = null;
+    	if (gt.equals(GraphType.BALANCE_AMOUNT)) {
+    		chart = createAmountChart(setupFinanceDataset());
+    	} else if (gt.equals(GraphType.MONTHLY_FINANCES)) {
+    		chart = createMonthlyChart(setupMonthlyDataset());
+    	}
+        ChartPanel panel = new ChartPanel(chart, false);
+        panel.setFillZoomRectangle(true);
+        panel.setMouseWheelEnabled(true);
+        return panel;
+    }
+    
+    private JFreeChart createAmountChart(XYDataset dataset) {
+        JFreeChart chart = ChartFactory.createTimeSeriesChart(
+            "", // title
+            resourceMap.getString("graphDate.text"), // x-axis label
+            resourceMap.getString("graphCBills.text"), // y-axis label
+            dataset);
+
+        chart.setBackgroundPaint(Color.WHITE);
+
+        XYPlot plot = (XYPlot) chart.getPlot();
+        plot.setBackgroundPaint(Color.LIGHT_GRAY);
+        plot.setDomainGridlinePaint(Color.WHITE);
+        plot.setRangeGridlinePaint(Color.WHITE);
+        plot.setAxisOffset(new RectangleInsets(5.0, 5.0, 5.0, 5.0));
+        plot.setDomainCrosshairVisible(true);
+        plot.setRangeCrosshairVisible(true);
+
+        XYItemRenderer r = plot.getRenderer();
+        if (r instanceof XYLineAndShapeRenderer) {
+            XYLineAndShapeRenderer renderer = (XYLineAndShapeRenderer) r;
+            renderer.setDefaultShapesVisible(true);
+            renderer.setDefaultShapesFilled(true);
+            renderer.setDrawSeriesLineAsPath(true);
+        }
+
+        DateAxis axis = (DateAxis) plot.getDomainAxis();
+        axis.setDateFormatOverride(new SimpleDateFormat("MMM-yyyy"));
+        
+        chart.removeLegend();
+
+        return chart;
+    }
+    
+    private JFreeChart createMonthlyChart(CategoryDataset dataset) {
+        JFreeChart chart = ChartFactory.createBarChart(
+            "", // title
+            resourceMap.getString("graphDate.text"), // x-axis label
+            resourceMap.getString("graphCBills.text"), // y-axis label
+            dataset);
+
+        chart.setBackgroundPaint(Color.WHITE);
+        
+        chart.getLegend().setPosition(RectangleEdge.TOP);
+
+        return chart;
     }
 
     /*

@@ -335,6 +335,11 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	}
 
 	protected long adjustCostsForCampaignOptions(long cost) {
+	    // if the part doesn't cost anything, no amount of multiplication will change it
+	    if(cost == 0) { 
+	        return cost;
+	    }
+	    
 		if(getTechBase() == T_CLAN) {
 			cost *= campaign.getCampaignOptions().getClanPriceModifier();
 		}
@@ -943,10 +948,10 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	        }
 	    }
 	    if(isClanTechBase() || (this instanceof MekLocation && this.getUnit() != null && this.getUnit().getEntity().isClan())) {
-	        if (campaign.getPerson(getTeamId()) == null) {
+	        if (unit.getTech() == null) {
 	            mods.addModifier(2, "Clan tech");
-	        } else if (!campaign.getPerson(getTeamId()).isClanner()
-                    && !campaign.getPerson(getTeamId()).getOptions().booleanOption(PersonnelOptions.TECH_CLAN_TECH_KNOWLEDGE)) {
+	        } else if (!unit.getTech().isClanner()
+                    && !unit.getTech().getOptions().booleanOption(PersonnelOptions.TECH_CLAN_TECH_KNOWLEDGE)) {
 	            mods.addModifier(2, "Clan tech");
 	        }
 	    }

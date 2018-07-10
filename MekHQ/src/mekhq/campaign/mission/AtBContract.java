@@ -148,6 +148,7 @@ public class AtBContract extends Contract implements Serializable {
 	
 	protected int playerMinorBreaches;
 	protected int employerMinorBreaches;
+	protected int contractScoreArbitraryModifier;
 	
 	protected int moraleMod = 0;
 	protected int numBonusParts;
@@ -598,7 +599,12 @@ public class AtBContract extends Contract implements Serializable {
 		if (earlySuccess) {
 			score += 4;
 		}
+		score += contractScoreArbitraryModifier;
 		return score;
+	}
+
+	public int getContractScoreArbitraryModifier() {
+		return contractScoreArbitraryModifier;
 	}
 	
 	public void doBonusRoll(Campaign c) {
@@ -1418,6 +1424,10 @@ public class AtBContract extends Contract implements Serializable {
 	public void addEmployerMinorBreaches(int num) {
 		employerMinorBreaches += num;
 	}
+
+	public void setContractScoreArbitraryModifier(int newModifier) {
+		contractScoreArbitraryModifier = newModifier;
+	}
 	
 	public int getNumBonusParts() {
 		return numBonusParts;
@@ -1439,7 +1449,7 @@ public class AtBContract extends Contract implements Serializable {
 		this(c.getName());
 		
 		setType(c.getType());
-		setPlanetName(c.getPlanetName());
+		setPlanetId(c.getPlanetId());
 		setDesc(c.getDescription());
 		setStatus(c.getStatus());
 		for (Scenario s : c.getScenarios()) {
@@ -1513,7 +1523,7 @@ public class AtBContract extends Contract implements Serializable {
 	public static AtBContract getContractExtension(AtBContract c, int length, Campaign campaign) {
 		AtBContract retVal = new AtBContract(c.getName() + " (Ext)");
 		retVal.setType(c.getType());
-		retVal.setPlanetName(c.getPlanetName());
+		retVal.setPlanetId(c.getPlanetId());
 		retVal.setDesc(c.getDescription());
 		retVal.setStatus(Mission.S_ACTIVE);
 		retVal.setLength(length);

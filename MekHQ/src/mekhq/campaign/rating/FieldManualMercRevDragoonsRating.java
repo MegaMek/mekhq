@@ -1,5 +1,5 @@
 /*
- * FieldManualMercRevMrbcRating.java
+ * FieldManualMercRevDragoonsRating.java
  *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  *
@@ -428,7 +428,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
         final String METHOD_NAME = "updateSkillLevel(Unit, BigDecimal)";
 
         //Make sure this is a combat unit.
-        if ((null == u.getEntity()) || (null == u.getEntity().getCrew())) {
+        if ((null == u.getEntity()) || (u.getCrew().size() == 0)) {
             return;
         }
 

@@ -995,7 +995,10 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 		for(Part part : shoppingList) {
 			if(part instanceof IAcquisitionWork) {
 			    //check to see if we found a replacement
-			    Part replacement = ((MissingPart)part).findReplacement(true);
+			    Part replacement = part;
+			    if (part instanceof MissingPart) {
+			        replacement = ((MissingPart)part).findReplacement(true);
+			    }
 			    if(null != replacement) {
 			        if(replacement.getQuantity() > 1) {
 			            Part actualReplacement = replacement.clone();

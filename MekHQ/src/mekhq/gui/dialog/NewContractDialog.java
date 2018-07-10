@@ -48,12 +48,14 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import megamek.common.util.EncodeControl;
+import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.universe.Planets;
 import mekhq.gui.utilities.JSuggestField;
 
 /**
@@ -146,6 +148,7 @@ public class NewContractDialog extends javax.swing.JDialog {
         btnOK.setText(resourceMap.getString("btnOkay.text")); // NOI18N
         btnOK.setName("btnOK"); // NOI18N
         btnOK.addActionListener(new java.awt.event.ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnOKActionPerformed(evt);
             }
@@ -161,6 +164,7 @@ public class NewContractDialog extends javax.swing.JDialog {
         btnClose.setText(resourceMap.getString("btnCancel.text")); // NOI18N
         btnClose.setName("btnClose"); // NOI18N
         btnClose.addActionListener(new java.awt.event.ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnCloseActionPerformed(evt);
             }
@@ -620,6 +624,7 @@ public class NewContractDialog extends javax.swing.JDialog {
         btnDate.setName("btnDate"); // NOI18N
         //btnDate.setPreferredSize(new java.awt.Dimension(400, 30));
         btnDate.addActionListener(new java.awt.event.ActionListener() {
+            @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 changeStartDate();
             }
@@ -1061,7 +1066,8 @@ public class NewContractDialog extends javax.swing.JDialog {
 
     protected void doUpdateContract(Object source) {
         if (suggestPlanet.equals(source)) {
-            contract.setPlanetName(suggestPlanet.getText());
+            contract.setPlanetId((Planets.getInstance().getPlanetByName(suggestPlanet.getText(),
+                    Utilities.getDateTimeDay(campaign.getCalendar()))).getId());
             //reset the start date as null so we recalculate travel time
             contract.setStartDate(null);
         } else if (choiceOverhead.equals(source)) {

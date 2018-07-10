@@ -121,13 +121,13 @@ public class ContractSummaryPanel extends JPanel {
 		this.campaign = campaign;
 		this.allowRerolls = allowRerolls;
 		if (allowRerolls) {
-			Person admin = campaign.findBestInRole(Person.T_ADMIN_COM, SkillType.S_ADMIN, SkillType.S_NEG);
+			Person admin = campaign.findBestInRole(Person.T_ADMIN_COM, SkillType.S_NEG, SkillType.S_ADMIN);
 			cmdRerolls = (admin == null || admin.getSkill(SkillType.S_NEG) == null)?
 					0 : admin.getSkill(SkillType.S_NEG).getLevel();
-			admin = campaign.findBestInRole(Person.T_ADMIN_LOG, SkillType.S_ADMIN, SkillType.S_NEG);
+			admin = campaign.findBestInRole(Person.T_ADMIN_LOG, SkillType.S_NEG, SkillType.S_ADMIN);
 			logRerolls = (admin == null || admin.getSkill(SkillType.S_NEG) == null)?
 					0 : admin.getSkill(SkillType.S_NEG).getLevel();
-			admin = campaign.findBestInRole(Person.T_ADMIN_TRA, SkillType.S_ADMIN, SkillType.S_NEG);
+			admin = campaign.findBestInRole(Person.T_ADMIN_TRA, SkillType.S_NEG, SkillType.S_ADMIN);
 			tranRerolls = (admin == null || admin.getSkill(SkillType.S_NEG) == null)?
 					0 : admin.getSkill(SkillType.S_NEG).getLevel();
 		}
@@ -311,8 +311,7 @@ public class ContractSummaryPanel extends JPanel {
 		mainPanel.add(lblLocation, gridBagConstraints);
 
 		txtLocation.setName("txtLocation"); // NOI18N
-		txtLocation.setText(Planets.getInstance()
-				.getPlanetById(contract.getPlanetName()).getName(Utilities.getDateTimeDay(campaign.getCalendar())));
+        txtLocation.setText(contract.getPlanetName(Utilities.getDateTimeDay(campaign.getCalendar())));
 		txtLocation.setEditable(false);
 		txtLocation.setLineWrap(true);
 		txtLocation.setWrapStyleWord(true);
@@ -325,7 +324,7 @@ public class ContractSummaryPanel extends JPanel {
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		mainPanel.add(txtLocation, gridBagConstraints);
 
-		if(Planets.getInstance().getPlanets().get(contract.getPlanetName()) != null) {
+		if(Planets.getInstance().getPlanets().get(contract.getPlanetId()) != null) {
 			lblDistance.setName("lblDistance"); // NOI18N
 			lblDistance.setText(resourceMap.getString("lblDistance.text"));
 			gridBagConstraints = new java.awt.GridBagConstraints();
@@ -339,8 +338,8 @@ public class ContractSummaryPanel extends JPanel {
 			JumpPath path = campaign.calculateJumpPath(campaign.getCurrentPlanet(), contract.getPlanet());
 			int days = (int)Math.ceil((path).getTotalTime(Utilities.getDateTimeDay(contract.getStartDate()), campaign.getLocation().getTransitTime()));
 			int jumps = path.getJumps();
-			if (campaign.getCurrentPlanetName().equals(contract.getPlanetName())
-					&&campaign.getLocation().isOnPlanet()) {
+            if (campaign.getCurrentPlanet().getId().equals(contract.getPlanetId())
+                    && campaign.getLocation().isOnPlanet()) {
 				days = 0;
 				jumps = 0;
 			}

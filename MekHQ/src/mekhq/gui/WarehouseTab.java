@@ -97,7 +97,7 @@ import mekhq.gui.sorter.TargetSorter;
 import mekhq.gui.sorter.TechSorter;
 
 /**
- * Displays all spare parts in stock and on order and permits repair of damaged
+ * Displays all spare parts in stock, parts on order, and permits repair of damaged
  * parts.
  */
 
@@ -653,7 +653,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
     }
 
     public void refreshTechsList() {
-        ArrayList<Person> techs = getCampaign().getTechs(true, null);
+        ArrayList<Person> techs = getCampaign().getTechs(true, null, false, false);
         techsModel.setData(techs);
         String astechString = "<html><b>Astech Pool Minutes:</> " + getCampaign().getAstechPoolMinutes();
         if (getCampaign().isOvertimeAllowed()) {

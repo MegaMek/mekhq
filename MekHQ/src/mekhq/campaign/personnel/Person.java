@@ -84,6 +84,7 @@ import mekhq.campaign.mod.am.InjuryUtil;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
+import mekhq.campaign.universe.Faction;
 
 /**
  * @author Jay Lawson <jaylawson39 at yahoo.com>
@@ -338,7 +339,15 @@ public class Person implements Serializable, MekHqXmlSerializable {
         this("Biff the Understudy", c);
     }
 
+    public Person(Campaign c, String factionCode) {
+        this("Biff the Understudy", c, factionCode);
+    }
+    
     public Person(String name, Campaign c) {
+        this(name, c, c.getFactionCode());
+    }
+    
+    public Person(String name, Campaign c, String factionCode) {
         this.name = name;
         callsign = "";
         portraitCategory = Crew.ROOT_PORTRAIT;
@@ -374,7 +383,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         techUnitIds = new ArrayList<UUID>();
         salary = -1;
         phenotype = PHENOTYPE_NONE;
-        clan = campaign.getFaction() != null && campaign.getFaction().isClan();
+        clan = Faction.getFaction(factionCode).isClan();
         bloodname = "";
         primaryDesignator = DESIG_NONE;
         secondaryDesignator = DESIG_NONE;
@@ -692,8 +701,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     public void setPrimaryRole(int t) {
         this.primaryRole = t;
-        //you cant be primary tech and a secondary astech
-        //you cant be a primary astech and a secondary tech
+        //you can't be primary tech and a secondary astech
+        //you can't be a primary astech and a secondary tech
         if ((isTechPrimary() && secondaryRole == T_ASTECH)
             || (isTechSecondary() && primaryRole == T_ASTECH)) {
             secondaryRole = T_NONE;
@@ -3066,6 +3075,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
         boolean isAeroTech = hasSkill(SkillType.S_TECH_AERO) && getSkill(SkillType.S_TECH_AERO).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN;
         boolean isMechanic = hasSkill(SkillType.S_TECH_MECHANIC) && getSkill(SkillType.S_TECH_MECHANIC).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN;
         boolean isBATech = hasSkill(SkillType.S_TECH_BA) && getSkill(SkillType.S_TECH_BA).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN;
+        // At some point we may want to re-write things to include this
+        /*boolean isEngineer = hasSkill(SkillType.S_TECH_VESSEL) && getSkill(SkillType.S_TECH_VESSEL).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN
+                && campaign.getUnit(getUnitId()).getEngineer() != null
+                && campaign.getUnit(getUnitId()).getEngineer().equals(this);*/
         return (isTechPrimary() || isTechSecondary()) && (isMechTech || isAeroTech || isMechanic || isBATech);
     }
 

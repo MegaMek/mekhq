@@ -335,7 +335,9 @@ public class PartsStoreDialog extends javax.swing.JDialog {
         	public boolean include(Entry<? extends PartsTableModel, ? extends Integer> entry) {
         		PartsTableModel partsModel = entry.getModel();
         		Part part = partsModel.getPartAt(entry.getIdentifier());
-        		if(txtFilter.getText().length() > 0 && !part.getName().toLowerCase().contains(txtFilter.getText().toLowerCase())) {
+        		if ((txtFilter.getText().length() > 0)
+        		        && !part.getName().toLowerCase().contains(txtFilter.getText().toLowerCase())
+        		        && !part.getDetails().toLowerCase().contains(txtFilter.getText().toLowerCase())) {
                     return false;
                 }
     			if(part.getTechBase() == Part.T_CLAN && !campaign.getCampaignOptions().allowClanPurchases()) {
@@ -410,7 +412,7 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 		Part selectedPart = partsModel.getPartAt(partsTable.convertRowIndexToModel(row));
 		int quantity = 1;
 		if(bulk) {
-			PopupValueChoiceDialog pcd = new PopupValueChoiceDialog(campaignGUI.getFrame(), true, "How Many " + selectedPart.getName(), quantity, 1, 100);
+			PopupValueChoiceDialog pcd = new PopupValueChoiceDialog(campaignGUI.getFrame(), true, "How Many " + selectedPart.getName(), quantity, 1, CampaignGUI.MAX_QUANTITY_SPINNER);
 			pcd.setVisible(true);
 			quantity = pcd.getValue();
 		}

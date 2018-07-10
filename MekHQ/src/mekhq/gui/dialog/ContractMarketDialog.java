@@ -411,6 +411,12 @@ public class ContractMarketDialog extends JDialog {
         btnGenerate.addActionListener(new java.awt.event.ActionListener() {
         	public void actionPerformed(java.awt.event.ActionEvent evt) {
         		AtBContract c = contractMarket.addAtBContract(campaign);
+        		
+        		if(c == null) {
+        		    campaign.addReport(resourceMap.getString("report.UnabletoGMContract"));
+        		    return;
+        		}
+        		
         		c.initContractDetails(campaign);
         		c.calculatePartsAvailabilityLevel(campaign);
         		c.setSharesPct(campaign.getCampaignOptions().getUseShareSystem()?
