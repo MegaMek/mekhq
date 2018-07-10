@@ -302,13 +302,13 @@ public class PersonViewPanel extends JPanel {
                 rowRibbonsBox.setBackground(Color.RED);
             }
     	    try{
-                ribbon = (Image) awardIcons.getItem("ribbons/", award.getRibbonFileName());
+                ribbon = (Image) awardIcons.getItem(award.getSet() + "/ribbons/", award.getRibbonFileName());
                 if(ribbon == null) continue;
                 ribbon = ribbon.getScaledInstance(25,8, Image.SCALE_DEFAULT);
                 ribbonLabel.setIcon(new ImageIcon(ribbon));
-                ribbonLabel.setToolTipText("(" + award.getFormatedDate() + ") " + award.getLongName()
+                ribbonLabel.setToolTipText("(" + award.getFormatedDate() + ") " + award.getDescription()
                         + ": " + award.getDescription());
-                rowRibbonsBox.add(ribbonLabel);
+                rowRibbonsBox.add(ribbonLabel, 0);
             }
             catch (Exception err) {
                 err.printStackTrace();
@@ -340,11 +340,11 @@ public class PersonViewPanel extends JPanel {
 
             Image medal = null;
             try{
-                medal = (Image) awardIcons.getItem("medals/", award.getMedalFileName());
+                medal = (Image) awardIcons.getItem( award.getSet() + "/medals/", award.getMedalFileName());
                 if(medal == null) continue;
                 medal = medal.getScaledInstance(28,61, Image.SCALE_DEFAULT);
                 medalLabel.setIcon(new ImageIcon(medal));
-                medalLabel.setToolTipText("(" + award.getFormatedDate() + ") " + award.getLongName() + ": " + award.getDescription());
+                medalLabel.setToolTipText("(" + award.getFormatedDate() + ") " + award.getDescription() + ": " + award.getDescription());
                 pnlMedals.add(medalLabel);
             }
             catch (Exception err) {

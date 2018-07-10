@@ -3405,8 +3405,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
     	return awards.size() > 0;
     }
 
-    public void addAndLogAward(Date date, String awardName) {
-        Award award = AwardsFactory.GenerateNew(awardName, date);
+    public void addAndLogAward(String setName, String awardName, Date date) {
+        Award award = AwardsFactory.GenerateNew(setName, awardName, date);
         addAward(award);
         logAward(award);
     }
@@ -3418,13 +3418,14 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public void logAward(Award award){
-        addLogEntry(award.getDate(), "Awarded " + award.getLongName() + " medal: " + award.getDescription());
+        addLogEntry(award.getDate(), "Awarded " + award.getName() + " medal: " + award.getDescription());
         MekHQ.triggerEvent(new PersonChangedEvent(this));
     }
 
     public boolean hasAward(Award award){
         for(Award myAward : awards){
-            if(award.getShortName().equals(myAward.getShortName())) return true;
+            if(award.getName().equals(myAward.getName()) &&
+                    award.getSet().equals(myAward.getSet())) return true;
         }
         return false;
     }

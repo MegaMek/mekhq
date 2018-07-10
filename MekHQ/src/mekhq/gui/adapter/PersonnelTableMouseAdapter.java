@@ -4,13 +4,7 @@ import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.ResourceBundle;
-import java.util.TreeSet;
-import java.util.UUID;
+import java.util.*;
 
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
@@ -551,7 +545,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             }
             case CMD_ADD_AWARD:
             {
-            	selectedPerson.addAndLogAward(gui.getCampaign().getDate(), data[1]);
+            	selectedPerson.addAndLogAward(data[1], data[2], gui.getCampaign().getDate());
             }
             case CMD_IMPROVE:
             {
@@ -1772,23 +1766,30 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 }
                 
                 JMenu awardMenu = new JMenu(resourceMap.getString("award.text"));
-                for (Award award : AwardsFactory.getInstance().getAllAwards()) {
+                for(String setName : AwardsFactory.getAllSetNames()){
+                    JMenu setAwardMenu = new JMenu(setName);
 
-                    if(!award.canBeAwarded(person)) continue;
+                    Collection<Award> awardsOfSet = AwardsFactory.getAllAwardsForSet(setName);
 
-                    String awardMenuItem = String.format("%s (+%s XP)",
-                            award.getLongName(),
-                            Integer.toString(award.getXPreward()));
-                    menuItem = new JMenuItem(awardMenuItem);
-                    menuItem.setToolTipText(award.getDescription());
+                    for (Award award : awardsOfSet) {
 
-                    if(!award.canBeAwarded(person) && !gui.getCampaign().isGM())
-                        menuItem.setEnabled(false);
+                        if(!award.canBeAwarded(person)) continue;
 
-                	menuItem.setActionCommand(makeCommand(CMD_ADD_AWARD, award.getShortName()));
-                	menuItem.addActionListener(this);
+                        String awardMenuItem = String.format("%s (+%s XP)",
+                                award.getName(),
+                                Integer.toString(award.getXPreward()));
+                        menuItem = new JMenuItem(awardMenuItem);
+                        menuItem.setToolTipText(award.getDescription());
 
-                	awardMenu.add(menuItem);
+                        if(!award.canBeAwarded(person) && !gui.getCampaign().isGM())
+                            menuItem.setEnabled(false);
+
+                        menuItem.setActionCommand(makeCommand(CMD_ADD_AWARD, award.getSet(), award.getName()));
+                        menuItem.addActionListener(this);
+
+                        setAwardMenu.add(menuItem);
+                    }
+                    awardMenu.add(setAwardMenu);
                 }
                 popup.add(awardMenu);
                 
