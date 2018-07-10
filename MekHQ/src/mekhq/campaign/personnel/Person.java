@@ -23,6 +23,7 @@ package mekhq.campaign.personnel;
 
 import java.io.PrintWriter;
 import java.io.Serializable;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -3411,6 +3412,27 @@ public class Person implements Serializable, MekHqXmlSerializable {
         logAward(award);
     }
 
+    public void removeAward(String setName, String awardName, String stringDate){
+
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+
+        Date date = null;
+        try {
+            date = df.parse(stringDate);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        for(Award award : awards){
+            if(award.equals(setName, awardName, date)){
+                awards.remove(award);
+                MekHQ.triggerEvent(new PersonChangedEvent(this));
+                addLogEntry(campaign.getDate(), "Removed award " + award.getName());
+                return;
+            }
+        }
+    }
+
     private void addAward(Award award){
         awards.add(award);
         setXp(getXp() + award.getXPreward());
@@ -3418,7 +3440,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public void logAward(Award award){
-        addLogEntry(award.getDate(), "Awarded " + award.getName() + " medal: " + award.getDescription());
+        addLogEntry(award.getDate(), "Awarded " + award.getName() + ": " + award.getDescription());
         MekHQ.triggerEvent(new PersonChangedEvent(this));
     }
 

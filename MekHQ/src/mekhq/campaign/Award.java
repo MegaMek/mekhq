@@ -128,6 +128,14 @@ public class Award implements MekHqXmlSerializable, Cloneable, Comparable<Award>
         return true;
     }
 
+    public boolean equals(String setName, String name, Date date){
+	    if(this.set.equals(setName) &&
+           this.name.equals(name) &&
+           this.date.equals(date)) return true;
+
+	    return false;
+    }
+
 	@Override
 	public int compareTo(Award other) {
 	    int result = Integer.compare(this.xp, other.xp);
