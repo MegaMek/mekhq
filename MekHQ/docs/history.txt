@@ -16,6 +16,7 @@ v0.45.0-git
 + PR #777: Addresses issue #776, by allowing the user to order up to a 1000 of some part or personnel class at a time, up from 100 previously.
 + PR #787: Adds total value for parts and fixes issue with net worth calculation for parts
 + Show java version and system info in log file.
++ PR #640: [Feature] Experimental aerospace equipment damage and repair times errata (aerospace equipment is damaged based on how many hits it has taken and repairs don't take an order of magnitude longer than mech equipment repairs)
 
 v0.44.0 (2018-06-24 1900 UTC)
 + Issue #733: Clan techs still have clan penalties to maintenance
