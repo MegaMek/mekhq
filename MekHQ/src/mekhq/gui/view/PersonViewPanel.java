@@ -42,6 +42,8 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.gui.dialog.MedicalViewDialog;
 import mekhq.gui.model.PersonnelEventLogModel;
 import mekhq.gui.model.PersonnelKillLogModel;
+import mekhq.gui.utilities.ImageHelpers;
+import mekhq.gui.utilities.WrapLayout;
 
 /**
  * A custom panel that gets filled in with goodies from a Person record
@@ -95,6 +97,7 @@ public class PersonViewPanel extends JPanel {
     private JLabel lblChildren1;
     private JLabel lblChildren2;
     private JPanel pnlMedals;
+    private JPanel pnlMiscAwards;
     private Box boxRibbons;
 
     ResourceBundle resourceMap = null;
@@ -162,8 +165,6 @@ public class PersonViewPanel extends JPanel {
             gbc_pnlAllRibbons.anchor = GridBagConstraints.NORTHWEST;
             gbc_pnlAllRibbons.insets = new Insets(0,0,0,0);
             pnlPortrait.add(boxRibbons, gbc_pnlAllRibbons);
-
-
        }
         
         pnlStats.setName("pnlStats");
@@ -187,13 +188,29 @@ public class PersonViewPanel extends JPanel {
             pnlMedals.setBackground(Color.WHITE);
             setMedals();
             GridBagConstraints gbc_pnlMedals = new GridBagConstraints();
-            gbc_pnlMedals.fill = GridBagConstraints.HORIZONTAL;
+            gbc_pnlMedals.fill = GridBagConstraints.BOTH;
             gbc_pnlMedals.gridwidth = 2;
             gbc_pnlMedals.insets = new Insets(5, 5, 5, 20);
             gbc_pnlMedals.gridx = 0;
             gbc_pnlMedals.gridy = gridy;
+            gbc_pnlMedals.anchor = GridBagConstraints.NORTHWEST;
             add(pnlMedals, gbc_pnlMedals);
-            pnlMedals.setLayout(new GridLayout(0, 12, 2, 2));
+            pnlMedals.setLayout(new WrapLayout(FlowLayout.LEFT));
+            gridy++;
+
+            pnlMiscAwards = new JPanel();
+            pnlMiscAwards.setName("pnlMiscAwards");
+            pnlMiscAwards.setBackground(Color.WHITE);
+            setMiscAwards();
+            GridBagConstraints gbc_pnlMiscAwards = new GridBagConstraints();
+            gbc_pnlMiscAwards.fill = GridBagConstraints.BOTH;
+            gbc_pnlMiscAwards.gridwidth = 2;
+            gbc_pnlMiscAwards.insets = new Insets(5, 5, 5, 20);
+            gbc_pnlMiscAwards.gridx = 0;
+            gbc_pnlMiscAwards.gridy = gridy;
+            gbc_pnlMedals.anchor = GridBagConstraints.NORTHWEST;
+            add(pnlMiscAwards, gbc_pnlMiscAwards);
+            pnlMiscAwards.setLayout(new WrapLayout(FlowLayout.LEFT));
             gridy++;
         }
 
@@ -306,7 +323,7 @@ public class PersonViewPanel extends JPanel {
                 if(ribbon == null) continue;
                 ribbon = ribbon.getScaledInstance(25,8, Image.SCALE_DEFAULT);
                 ribbonLabel.setIcon(new ImageIcon(ribbon));
-                ribbonLabel.setToolTipText("(" + award.getFormatedDate() + ") " + award.getDescription()
+                ribbonLabel.setToolTipText("(" + award.getFormatedDate() + ") " + award.getName()
                         + ": " + award.getDescription());
                 rowRibbonsBox.add(ribbonLabel, 0);
             }
@@ -342,12 +359,33 @@ public class PersonViewPanel extends JPanel {
             try{
                 medal = (Image) awardIcons.getItem( award.getSet() + "/medals/", award.getMedalFileName());
                 if(medal == null) continue;
-                medal = medal.getScaledInstance(28,61, Image.SCALE_DEFAULT);
+                medal = ImageHelpers.getScaledForBoundaries(medal, new Dimension(30,60), Image.SCALE_DEFAULT);
                 medalLabel.setIcon(new ImageIcon(medal));
-                medalLabel.setToolTipText("(" + award.getFormatedDate() + ") " + award.getDescription() + ": " + award.getDescription());
+                medalLabel.setToolTipText("(" + award.getFormatedDate() + ") " + award.getName() + ": " + award.getDescription());
                 pnlMedals.add(medalLabel);
             }
             catch (Exception err) {
+                err.printStackTrace();
+            }
+        }
+    }
+
+    private void setMiscAwards() {
+        ArrayList<Award> awards = person.getAwards().stream().filter(a -> a.getMiscFileName() != null)
+                .collect(Collectors.toCollection(ArrayList::new));
+
+        for (Award award : awards) {
+            JLabel miscLabel = new JLabel();
+
+            Image miscAward = null;
+            try {
+                Image miscAwardBufferedImage = (Image) awardIcons.getItem(award.getSet() + "/misc/", award.getMiscFileName());
+                if (miscAwardBufferedImage == null) continue;
+                miscAward = ImageHelpers.getScaledForBoundaries(miscAwardBufferedImage, new Dimension(100,100), Image.SCALE_DEFAULT);
+                miscLabel.setIcon(new ImageIcon(miscAward));
+                miscLabel.setToolTipText("(" + award.getFormatedDate() + ") " + award.getName() + ": " + award.getDescription());
+                pnlMiscAwards.add(miscLabel);
+            } catch (Exception err) {
                 err.printStackTrace();
             }
         }

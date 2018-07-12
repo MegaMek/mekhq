@@ -30,8 +30,14 @@ public class Award implements MekHqXmlSerializable, Cloneable, Comparable<Award>
 	@XmlElement(name = "ribbon")
 	private String ribbon;
 
+	@XmlElement(name = "misc")
+	private String misc;
+
 	@XmlElement(name = "xp")
-	private int xp;
+	private int xp = 0;
+
+	@XmlElement(name = "edge")
+	private int edge = 0;
 
 	@XmlElement(name = "stackable")
 	private boolean stackable = false;
@@ -44,13 +50,15 @@ public class Award implements MekHqXmlSerializable, Cloneable, Comparable<Award>
 
 	public Award(){}
 
-	public Award(String name, String set,  String description, String medal, String ribbon, int xp, boolean stackable) {
+	public Award(String name, String set,  String description, String medal, String ribbon, String misc, int xp, int edge, boolean stackable) {
 		this.name = name;
 		this.set = set;
 		this.description = description;
 		this.medal = medal;
 		this.ribbon = ribbon;
+		this.misc = misc;
 		this.xp = xp;
+		this.edge = edge;
 		this.stackable = stackable;
 	}
 
@@ -109,12 +117,17 @@ public class Award implements MekHqXmlSerializable, Cloneable, Comparable<Award>
 		return medal;
     }
 
-    public int getXPreward(){
+    public String getMiscFileName(){
+		return misc;
+	}
+
+    public int getXPReward(){
 	    return xp;
     }
+    public int getEdgeReward(){ return edge; }
 
     public Award createCopy(Date date){
-		Award awardCopy = new Award(this.name, this.set, this.description, this.medal, this.ribbon, this.xp, this.stackable);
+		Award awardCopy = new Award(this.name, this.set, this.description, this.medal, this.ribbon, this.misc, this.xp, this.edge, this.stackable);
 		awardCopy.setDate(date);
         return awardCopy;
     }

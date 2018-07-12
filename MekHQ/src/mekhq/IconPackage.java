@@ -116,7 +116,7 @@ public class IconPackage {
         }
         if(null == awardIcons){
             try{
-                awardIcons = new DirectoryItems(new File("data/images/awards"), "", ImageFileFactory.getInstance());
+                awardIcons = new DirectoryItems(new File("data/images/awards"), "", PortraitFileFactory.getInstance());
             }
             catch (Exception e){
                 awardIcons = null;

@@ -3408,6 +3408,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     public void addAndLogAward(String setName, String awardName, Date date) {
         Award award = AwardsFactory.GenerateNew(setName, awardName, date);
+        setXp(getXp() + award.getXPReward());
+        setEdge(getEdge() + award.getEdgeReward());
         addAward(award);
         logAward(award);
     }
@@ -3435,7 +3437,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     private void addAward(Award award){
         awards.add(award);
-        setXp(getXp() + award.getXPreward());
         MekHQ.triggerEvent(new PersonChangedEvent(this));
     }
 

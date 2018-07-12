@@ -1781,9 +1781,24 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
 
                         if(!award.canBeAwarded(person)) continue;
 
-                        String awardMenuItem = String.format("%s (+%s XP)",
-                                award.getName(),
-                                Integer.toString(award.getXPreward()));
+                        String awardMenuItem = String.format("%s", award.getName());
+
+                        if(award.getXPReward() != 0 || award.getEdgeReward() != 0){
+                            awardMenuItem += " (";
+
+                            if(award.getXPReward() != 0){
+                                awardMenuItem += Integer.toString(award.getXPReward()) + " XP";
+                                if(award.getEdgeReward() != 0)
+                                    awardMenuItem += " & ";
+                            }
+
+                            if(award.getEdgeReward() != 0){
+                                awardMenuItem += Integer.toString(award.getEdgeReward()) + " Edge";
+                            }
+
+                            awardMenuItem += ")";
+                        }
+
                         menuItem = new JMenuItem(awardMenuItem);
                         menuItem.setToolTipText(award.getDescription());
 
