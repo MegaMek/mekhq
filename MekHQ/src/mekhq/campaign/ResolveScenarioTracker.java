@@ -74,6 +74,7 @@ import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Loot;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.TestUnit;
@@ -1242,7 +1243,7 @@ public class ResolveScenarioTracker {
                 }
                 if (campaign.getCampaignOptions().payForRepairs()) {
                     for(Part p : unit.getParts()) {
-                        if (p.needsFixing()) {
+                        if (p.needsFixing() && !(p instanceof Armor)) {
                             repairBLC += p.getStickerPrice() * .2;
                         }
                     }
