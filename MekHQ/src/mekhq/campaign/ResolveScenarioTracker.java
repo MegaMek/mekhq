@@ -1232,6 +1232,7 @@ public class ResolveScenarioTracker {
                 //check for BLC
                 long newValue = unit.getValueOfAllMissingParts();
                 long blcValue = newValue - currentValue;
+                long repairBLC = 0;
                 String blcString = "attle loss compensation (parts) for " + unit.getName();
                 if(!unit.isRepairable()) {
                     //if the unit is not repairable, you should get BLC for it but we should subtract
@@ -1239,6 +1240,14 @@ public class ResolveScenarioTracker {
                     blcValue = unitValue - unit.getSellValue();
                     blcString = "attle loss compensation for " + unit.getName();
                 }
+                if (campaign.getCampaignOptions().payForRepairs()) {
+                    for(Part p : unit.getParts()) {
+                        if (p.needsFixing()) {
+                            repairBLC += p.getStickerPrice() * .2;
+                        }
+                    }
+                }
+                blcValue += repairBLC;
                 if(blc > 0 && blcValue > 0) {
                     long finalValue = (long)(blc * blcValue);
                     campaign.getFinances().credit(finalValue, Transaction.C_BLC, "B" + blcString, campaign.getCalendar().getTime());

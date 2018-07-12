@@ -23,6 +23,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 import java.io.Serializable;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Hashtable;
@@ -1063,6 +1064,11 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	        sj.add("OmniPod");
 	    }
         sj.add(hits + " hit(s)");
+        if (campaign.getCampaignOptions().payForRepairs() && (hits > 0)) {
+            int repairCost = (int) (getStickerPrice() * .2);
+            DecimalFormat numFormatter = new DecimalFormat();
+            sj.add(numFormatter.format(repairCost) + " C-bills to repair");
+        }
         return sj.toString();
     }
 	
