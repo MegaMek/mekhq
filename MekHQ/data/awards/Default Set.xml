@@ -1,0 +1,217 @@
+<?xml version="1.0"?>
+<awards>
+	<award>
+		<name>Armed Forces</name>
+		<description>12 pilot kills in a scenario.</description>
+		<ribbon>ArmedForces.png</ribbon>
+		<xp>3</xp>
+	</award>
+	<award>
+		<name>Bronze Star</name>
+		<description>4 pilot kills in a scenario.</description>
+		<ribbon>BronzeStar.png</ribbon>
+		<xp>3</xp>
+	</award>
+	<award>
+		<name>Clan Invasion Campaign</name>
+		<description>Partook in combat actions in support of clan invasion.</description>
+		<medal>ClanInvasionM.png</medal>
+		<ribbon>ClanInvasion.png</ribbon>
+		<xp>1</xp>
+	</award>
+	<award>
+		<name>Combat Achievement</name>
+		<description>6 pilot kills in a mission.</description>
+		<ribbon>CombatAchievement.png</ribbon>
+		<xp>2</xp>
+	</award>
+	<award>
+		<name>Combat Action</name>
+		<description>Involved in combat.</description>
+		<ribbon>CombatAction.png</ribbon>
+		<edge>1</edge>
+	</award>
+	<award>
+		<name>Combat Commendation</name>
+		<description>72 company kills in a mission.</description>
+		<medal>CombatCommendationM.png</medal>
+		<ribbon>CombatCommendation.png</ribbon>
+		<xp>2</xp>
+	</award>
+	<award>
+		<name>Combat Cross</name>
+		<description>12 pilot kills in a scenario.</description>
+		<ribbon>CombatCross.png</ribbon>
+		<xp>5</xp>
+	</award>	
+	<award>
+		<name>Combat Unit Commendation</name>
+		<description>36 lance kills in a mission.</description>
+		<ribbon>CombatUnitCommendation.png</ribbon>
+		<xp>2</xp>
+	</award>		
+	<award>
+		<name>Distinguished Service</name>
+		<description>324 batallion kills in a mission.</description>
+		<medal>DistinguishedServiceM.png</medal>
+		<ribbon>DistinguishedService.png</ribbon>
+		<xp>5</xp>
+	</award>
+	<award>
+		<name>Expeditionary</name>
+		<description>Partook in combat on a house world not covered by a war.</description>
+		<medal>ExpeditionaryM.png</medal>
+		<ribbon>Expeditionary.png</ribbon>
+		<xp>1</xp>
+	</award>
+	<award>
+		<name>Fedcom Civil War Campaign</name>
+		<description>Partook combat actions in support of fedcom civil war.</description>
+		<medal>FedComCivilWarM.png</medal>
+		<ribbon>FedComCivilWar.png</ribbon>
+		<xp>1</xp>
+	</award>			
+	<award>
+		<name>Fourth Succession War Campaign</name>
+		<description>Partook in combat actions in support of the 4th succession war.</description>
+		<medal>FourthSuccessionWarM.png</medal>
+		<ribbon>FourthSuccessionWar.png</ribbon>
+		<xp>1</xp>
+	</award>
+	<award>
+		<name>Galactic Service</name>
+		<description>Served a total of 12 months in foreign theatres.</description>
+		<ribbon>GalacticService.png</ribbon>
+		<xp>1</xp>
+	</award>	
+	<award>
+		<name>Galactic Service Deployment</name>
+		<description>Served over 3 consecutive months in a foreign theatre.</description>
+		<ribbon>GalacticServiceDeployment.png</ribbon>
+		<xp>1</xp>
+	</award>	
+	<award>
+		<name>Galactic War on Pirating</name>
+		<description>Partook in combat operations against pirates.</description>
+		<ribbon>GalacticWarOnPirating.png</ribbon>
+		<medal>GalacticWarOnPiratingM.png</medal>
+		<xp>1</xp>
+	</award>	
+	<award>
+		<name>Good Conduct</name>
+		<description>Served 6 years of with no disciplinary action.</description>
+		<ribbon>GoodConduct.png</ribbon>
+		<xp>1</xp>
+		<edge>1</edge>
+		<stackable>true</stackable>
+	</award>
+	<award>
+		<name>House Defense</name>
+		<description>Enlisted during a TOW and Defense of a house world.</description>
+		<ribbon>HouseDefense.png</ribbon>
+		<medal>HouseDefenseM.png</medal>
+		<xp>1</xp>
+	</award>	
+	<award>
+		<name>House Distinguished Service</name>
+		<description>432 batallion kills in a mission.</description>
+		<medal>HouseDistinguishedServiceM.png</medal>
+		<ribbon>HouseDistinguishedService.png</ribbon>
+		<xp>5</xp>
+	</award>	
+	<award>
+		<name>House Meritorious Service</name>
+		<description>144 company kills in a mission.</description>
+		<medal>HouseMeritoriousServiceM.png</medal>
+		<ribbon>HouseMeritoriousService.png</ribbon>
+		<xp>3</xp>
+	</award>
+	<award>
+		<name>House Superior Service</name>
+		<description>216 batallion kills in a mission.</description>
+		<medal>HouseSuperiorServiceM.png</medal>
+		<ribbon>HouseSuperiorService.png</ribbon>
+		<xp>4</xp>
+	</award>
+	<award>
+		<name>House Unit Citation</name>
+		<description>216 batallion kills in a mission.</description>
+		<ribbon>HouseUnitCitation.png</ribbon>
+		<xp>2</xp>
+	</award>		
+	<award>
+		<name>Humanitarian Service</name>
+		<description>Defense of civilian person or structures.</description>
+		<medal>HumanitarianServiceM.png</medal>
+		<ribbon>HumanitarianService.png</ribbon>
+		<edge>2</edge>
+		<stackable>true</stackable>
+	</award>	
+	<award>
+		<name>Legion of Merit</name>
+		<description>144 company kills in a mission.</description>
+		<medal>LegionOfMeritM.png</medal>
+		<ribbon>LegionOfMerit.png</ribbon>
+		<xp>4</xp>
+	</award>	
+	<award>
+		<name>Meritourious Service</name>
+		<description>9 pilot kills in a misson.</description>
+		<ribbon>MeritoriousService.png</ribbon>
+		<xp>3</xp>
+	</award>
+	<award>
+		<name>Meritourious Unit Commendation</name>
+		<description>24 lance kills in a misson.</description>
+		<ribbon>MeritoriousUnitCommendation.png</ribbon>
+		<xp>1</xp>
+	</award>			
+	<award>
+		<name>Periphery Expeditionary</name>
+		<description>Partook in combat operations on a periphery world.</description>
+		<medal>PeripheryExpeditionaryM.png</medal>
+		<ribbon>PeripheryExpeditionary.png</ribbon>
+		<xp>1</xp>
+	</award>		
+	<award>
+		<name>Prisoner of War</name>
+		<description>Taken prisoner during combat.</description>
+		<ribbon>PrisonerOfWar.png</ribbon>
+		<xp>1</xp>
+		<edge>1</edge>
+		<stackable>true</stackable>
+	</award>			
+	<award>
+		<name>Purple Heart</name>
+		<description>Wounded in combat due to enemy fire.</description>
+		<ribbon>PurpleHeart.png</ribbon>
+		<stackable>true</stackable>
+	</award>
+	<award>
+		<name>Silver Star</name>
+		<description>8 pilot kills in a scenario.</description>
+		<ribbon>SilverStar.png</ribbon>
+		<xp>4</xp>
+	</award>
+	<award>
+		<name>Task Force Serpent Campaign</name>
+		<description>Partook combat actions in support of Task Force Serpent.</description>
+		<medal>TaskForceSerpentM.png</medal>
+		<ribbon>TaskForceSerpent.png</ribbon>
+		<xp>1</xp>
+	</award>		
+	<award>
+		<name>Third Succession War Campaign</name>
+		<description>Partook in  combat actions in support of the 3rd Succession War.</description>
+		<medal>ThirdSuccessionWarM.png</medal>
+		<ribbon>ThirdSuccessionWar.png</ribbon>
+		<xp>1</xp>
+	</award>	
+	<award>
+		<name>War of 3039 Campaign</name>
+		<description>Partook in combat actions in support of the war of 3039.</description>
+		<medal>WarOf3039M.png</medal>
+		<ribbon>WarOf3039.png</ribbon>
+		<xp>1</xp>
+	</award>		
+</awards>

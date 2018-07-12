@@ -37,12 +37,12 @@ public class AwardsFactory {
         return instance;
     }
 
-    public static Collection<String> getAllSetNames(){
-        return awardsMap.keySet();
+    public static List<String> getAllSetNames(){
+        return new ArrayList<>(awardsMap.keySet());
     }
 
-    public static Collection<Award> getAllAwardsForSet(String setName){
-        return awardsMap.get(setName).values();
+    public static List<Award> getAllAwardsForSet(String setName){
+        return new ArrayList<>(awardsMap.get(setName).values());
     }
 
     public static Award GenerateNew(String setName, String awardName, Date date){

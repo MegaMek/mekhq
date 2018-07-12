@@ -304,7 +304,7 @@ public class PersonViewPanel extends JPanel {
 
     	ArrayList<Award> awards = person.getAwards().stream().filter(a -> a.getRibbonFileName() != null)
                 .collect(Collectors.toCollection(ArrayList::new));
-        Collections.reverse(awards);
+        Collections.sort(awards);
 
     	int i = 0;
         Box rowRibbonsBox = null;

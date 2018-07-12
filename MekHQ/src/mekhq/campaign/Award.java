@@ -153,7 +153,10 @@ public class Award implements MekHqXmlSerializable, Cloneable, Comparable<Award>
 	public int compareTo(Award other) {
 	    int result = Integer.compare(this.xp, other.xp);
 
-	    if(result == 0)
+		if(result == 0)
+			result = Integer.compare(this.edge, other.edge);
+
+		if(result == 0)
 	        result = this.getName().compareTo(other.getName());
 
 		return result;
