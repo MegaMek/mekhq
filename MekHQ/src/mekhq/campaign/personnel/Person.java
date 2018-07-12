@@ -23,6 +23,7 @@ package mekhq.campaign.personnel;
 
 import java.io.PrintWriter;
 import java.io.Serializable;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -75,6 +76,7 @@ import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
 import mekhq.Version;
+import mekhq.campaign.Award;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.ExtraData;
@@ -277,6 +279,11 @@ public class Person implements Serializable, MekHqXmlSerializable {
     private int rankSystem = -1;
     private Ranks ranks;
 
+    // AwardNames
+    protected AwardsFactory awardsFactory;
+    protected ArrayList<Award> awards;
+
+
     // Manei Domini "Classes"
     public static final int MD_NONE			= 0;
     public static final int MD_GHOST		= 1;
@@ -373,6 +380,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         biography = "";
         nTasks = 0;
         personnelLog = new ArrayList<LogEntry>();
+        awards = new ArrayList<Award>();
         idleMonths = -1;
         daysToWaitForHealing = 15;
         resetMinutesLeft();
@@ -387,6 +395,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
         bloodname = "";
         primaryDesignator = DESIG_NONE;
         secondaryDesignator = DESIG_NONE;
+        awardsFactory = AwardsFactory.getInstance();
+
     }
 
     public int getPhenotype() {
@@ -1470,6 +1480,13 @@ public class Person implements Serializable, MekHqXmlSerializable {
             }
             pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "</personnelLog>");
         }
+        if (!awards.isEmpty()) {
+            pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<awards>");
+            for (Award award : awards) {
+            	award.writeToXml(pw1, indent + 2);
+            }
+            pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "</awards>");
+        }
         if (injuries.size() > 0) {
             pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<injuries>");
             for (Injury injury : injuries) {
@@ -1716,6 +1733,25 @@ public class Person implements Serializable, MekHqXmlSerializable {
                         }
                         retVal.addLogEntry(LogEntry.generateInstanceFromXML(wn3));
                     }
+                } else if (wn2.getNodeName().equalsIgnoreCase("awards")){
+                    NodeList nl2 = wn2.getChildNodes();
+                    for (int y = 0; y < nl2.getLength(); y++) {
+
+                        Node wn3 = nl2.item(y);
+
+                        if (wn3.getNodeType() != Node.ELEMENT_NODE) {
+                            continue;
+                        }
+
+                        if (!wn3.getNodeName().equalsIgnoreCase("award")) {
+                            MekHQ.getLogger().log(Person.class, METHOD_NAME, LogLevel.ERROR,
+                                    "Unknown node type not loaded in personnel log nodes: " + wn3.getNodeName()); //$NON-NLS-1$
+                            continue;
+                        }
+
+                        retVal.addAward(AwardsFactory.generateNewFromXML(wn3));
+                    }
+
                 } else if (wn2.getNodeName().equalsIgnoreCase("injuries")) {
                     NodeList nl2 = wn2.getChildNodes();
                     for (int y = 0; y < nl2.getLength(); y++) {
@@ -3361,6 +3397,62 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return personnelLog;
     }
 
+    public ArrayList<Award> getAwards(){
+    	Collections.sort(awards);
+    	return awards;
+    }
+    
+    public boolean hasAwards() {
+    	return awards.size() > 0;
+    }
+
+    public void addAndLogAward(String setName, String awardName, Date date) {
+        Award award = AwardsFactory.GenerateNew(setName, awardName, date);
+        setXp(getXp() + award.getXPReward());
+        setEdge(getEdge() + award.getEdgeReward());
+        addAward(award);
+        logAward(award);
+    }
+
+    public void removeAward(String setName, String awardName, String stringDate){
+
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+
+        Date date = null;
+        try {
+            date = df.parse(stringDate);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        for(Award award : awards){
+            if(award.equals(setName, awardName, date)){
+                awards.remove(award);
+                MekHQ.triggerEvent(new PersonChangedEvent(this));
+                addLogEntry(campaign.getDate(), "Removed award " + award.getName());
+                return;
+            }
+        }
+    }
+
+    private void addAward(Award award){
+        awards.add(award);
+        MekHQ.triggerEvent(new PersonChangedEvent(this));
+    }
+
+    public void logAward(Award award){
+        addLogEntry(award.getDate(), "Awarded " + award.getName() + ": " + award.getDescription());
+        MekHQ.triggerEvent(new PersonChangedEvent(this));
+    }
+
+    public boolean hasAward(Award award){
+        for(Award myAward : awards){
+            if(award.getName().equals(myAward.getName()) &&
+                    award.getSet().equals(myAward.getSet())) return true;
+        }
+        return false;
+    }
+    
     public void addLogEntry(Date d, String desc, String type) {
         personnelLog.add(new LogEntry(d, desc, type));
     }
@@ -3372,6 +3464,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
     public void addLogEntry(LogEntry entry) {
         personnelLog.add(entry);
     }
+    
+    
 
     /**
      * All methods below are for the Advanced Medical option **

@@ -42,7 +42,7 @@ public abstract class CampaignGuiTab extends JPanel {
 
     protected String tabName;
 
-    CampaignGuiTab(CampaignGUI gui, String tabName) {
+    public CampaignGuiTab(CampaignGUI gui, String tabName) {
         this.gui = gui;
         this.tabName = tabName;
         initTab();

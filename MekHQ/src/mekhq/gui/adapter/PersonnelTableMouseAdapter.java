@@ -4,13 +4,8 @@ import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.ResourceBundle;
-import java.util.TreeSet;
-import java.util.UUID;
+import java.text.DateFormat;
+import java.util.*;
 
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
@@ -35,18 +30,13 @@ import megamek.common.options.PilotOptions;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.Utilities;
+import mekhq.campaign.Award;
 import mekhq.campaign.Kill;
 import mekhq.campaign.LogEntry;
 import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.event.PersonLogEvent;
 import mekhq.campaign.finances.Transaction;
-import mekhq.campaign.personnel.Injury;
-import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.PersonnelOptions;
-import mekhq.campaign.personnel.Rank;
-import mekhq.campaign.personnel.Ranks;
-import mekhq.campaign.personnel.SkillType;
-import mekhq.campaign.personnel.SpecialAbility;
+import mekhq.campaign.personnel.*;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.dialog.CustomizePersonDialog;
@@ -81,6 +71,8 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
     private static final String CMD_ADD_CREW = "ADD_CREW"; //$NON-NLS-1$
     private static final String CMD_ADD_NAVIGATOR = "ADD_NAV"; //$NON-NLS-1$
     private static final String CMD_ADD_TECH_OFFICER = "ADD_TECH_OFFICER"; //$NON-NLS-1$
+    private static final String CMD_ADD_AWARD = "ADD_AWARD";
+    private static final String CMD_RMV_AWARD = "RMV_AWARD";
 
     private static final String CMD_EDIT_SALARY = "SALARY"; //$NON-NLS-1$
     private static final String CMD_BLOODNAME = "BLOODNAME"; //$NON-NLS-1$
@@ -121,7 +113,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
     private static final String CMD_ADD_PREGNANCY = "ADD_PREGNANCY"; //$NON-NLS-1$
     private static final String CMD_REMOVE_PREGNANCY = "PREGNANCY_SPOUSE"; //$NON-NLS-1$
     private static final String CMD_ADD_TECH = "ADD_TECH"; //$NON-NLS-1$
-
+    
     private static final String CMD_IMPRISON = "IMPRISON"; //$NON-NLS-1$
     private static final String CMD_FREE = "FREE"; //$NON-NLS-1$
     private static final String CMD_RECRUIT = "RECRUIT"; //$NON-NLS-1$
@@ -552,6 +544,14 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
                 MekHQ.triggerEvent(new PersonChangedEvent(spouse));
                 break;
+            }
+            case CMD_ADD_AWARD:
+            {
+            	selectedPerson.addAndLogAward(data[1], data[2], gui.getCampaign().getDate());
+            }
+            case CMD_RMV_AWARD:
+            {
+                selectedPerson.removeAward(data[1], data[2], data[3]);
             }
             case CMD_IMPROVE:
             {
@@ -1770,6 +1770,72 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     menuItem.addActionListener(this);
                     popup.add(menuItem);
                 }
+                
+                JMenu awardMenu = new JMenu(resourceMap.getString("award.text"));
+                List<String> setNames = AwardsFactory.getAllSetNames();
+                Collections.sort(setNames);
+                for(String setName : setNames){
+                    JMenu setAwardMenu = new JMenu(setName);
+
+                    List<Award> awardsOfSet = AwardsFactory.getAllAwardsForSet(setName);
+                    Collections.sort(awardsOfSet);
+
+                    for (Award award : awardsOfSet) {
+
+                        if(!award.canBeAwarded(person)) continue;
+
+                        String awardMenuItem = String.format("%s", award.getName());
+
+                        if(award.getXPReward() != 0 || award.getEdgeReward() != 0){
+                            awardMenuItem += " (";
+
+                            if(award.getXPReward() != 0){
+                                awardMenuItem += Integer.toString(award.getXPReward()) + " XP";
+                                if(award.getEdgeReward() != 0)
+                                    awardMenuItem += " & ";
+                            }
+
+                            if(award.getEdgeReward() != 0){
+                                awardMenuItem += Integer.toString(award.getEdgeReward()) + " Edge";
+                            }
+
+                            awardMenuItem += ")";
+                        }
+
+                        menuItem = new JMenuItem(awardMenuItem);
+                        menuItem.setToolTipText(award.getDescription());
+
+                        if(!award.canBeAwarded(person) && !gui.getCampaign().isGM())
+                            menuItem.setEnabled(false);
+
+                        menuItem.setActionCommand(makeCommand(CMD_ADD_AWARD, award.getSet(), award.getName()));
+                        menuItem.addActionListener(this);
+
+                        setAwardMenu.add(menuItem);
+                    }
+                    awardMenu.add(setAwardMenu);
+                }
+                awardMenu.addSeparator();
+                JMenu removeAwardMenu = new JMenu(resourceMap.getString("removeAward.text"));
+
+                if(!person.hasAwards() && !gui.getCampaign().isGM())
+                    removeAwardMenu.setEnabled(false);
+
+                for(Award award : person.getAwards()){
+                    String awardMenuItem = String.format("(%s) %s",
+                            award.getFormatedDate(),
+                            award.getName());
+                    menuItem = new JMenuItem(awardMenuItem);
+                    menuItem.setToolTipText(award.getDescription());
+
+                    menuItem.setActionCommand(makeCommand(CMD_RMV_AWARD, award.getSet(), award.getName(), award.getFormatedDate()));
+                    menuItem.addActionListener(this);
+
+                    removeAwardMenu.add(menuItem);
+                }
+                awardMenu.add(removeAwardMenu);
+                popup.add(awardMenu);
+                
                 menu = new JMenu(resourceMap.getString("spendXP.text")); //$NON-NLS-1$
                 JMenu currentMenu = new JMenu(resourceMap.getString("spendOnCurrentSkills.text")); //$NON-NLS-1$
                 JMenu newMenu = new JMenu(resourceMap.getString("spendOnNewSkills.text")); //$NON-NLS-1$
