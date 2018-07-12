@@ -396,7 +396,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
         primaryDesignator = DESIG_NONE;
         secondaryDesignator = DESIG_NONE;
         awardsFactory = AwardsFactory.getInstance();
-
     }
 
     public int getPhenotype() {
@@ -3464,8 +3463,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
     public void addLogEntry(LogEntry entry) {
         personnelLog.add(entry);
     }
-    
-    
 
     /**
      * All methods below are for the Advanced Medical option **

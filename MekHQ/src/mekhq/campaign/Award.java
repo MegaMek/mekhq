@@ -16,7 +16,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name="award")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class Award implements MekHqXmlSerializable, Cloneable, Comparable<Award>, Serializable {
+public class Award implements MekHqXmlSerializable, Comparable<Award>, Serializable {
 
 	@XmlElement(name = "name")
 	private String name;

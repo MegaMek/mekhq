@@ -1,6 +1,5 @@
 package mekhq.campaign.personnel;
 
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Award;
 import mekhq.campaign.AwardSet;
@@ -19,7 +18,6 @@ import java.util.*;
 public class AwardsFactory {
 
     private static AwardsFactory instance = null;
-    private static ResourceBundle resourceMap = null;
 
     private static Map<String, Map<String,Award>> awardsMap;
 
@@ -79,7 +77,6 @@ public class AwardsFactory {
         }
 
         return GenerateNew(set, name, date);
-
     }
 
     private static void loadAwards(){
