@@ -58,8 +58,8 @@ public class Thrusters extends Part {
     
     public Thrusters(int tonnage, Campaign c, boolean left) {
         super(tonnage, c);
-        this.name = "Thrusters";
         isLeftThrusters = left;
+        this.name = "Thrusters";
     }
     
     public Thrusters clone() {
@@ -79,23 +79,63 @@ public class Thrusters extends Part {
 			}
 			if(checkForDestruction 
 					&& hits > priorHits 
-					&& Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
+					&& (hits < 4 && !campaign.getCampaignOptions().useAeroSystemHits())
+                    && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
 				remove(false);
 				return;
-			}
+			} else if (hits >= 4) {
+                remove(false);
+                return;
+            }
 		}
 	}
 	
 	@Override 
 	public int getBaseTime() {
+	    int time = 0;
+        if (campaign.getCampaignOptions().useAeroSystemHits()) {
+            //Test of proposed errata for repair times
+            if(isSalvaging()) {
+                time = 600;
+            } else {
+                time = 90;
+            }
+            if (hits == 1) {
+                time *= 1;
+            } 
+            if (hits == 2) {
+                time *= 2;
+            }
+            if (hits == 3) {
+                time *= 3;
+            }
+            return time;
+        }
 		if(isSalvaging()) {
-			return 600;
+			time = 600;
+		} else {
+		    time = 90;
 		}
-		return 90;
+		return time;
 	}
 	
 	@Override
 	public int getDifficulty() {
+	    if (campaign.getCampaignOptions().useAeroSystemHits()) {
+            //Test of proposed errata for repair time and difficulty
+            if(isSalvaging()) {
+                return -2;
+            }
+            if (hits == 1) {
+                return -1;
+            } 
+            if (hits == 2) {
+                return 0;
+            }
+            if (hits == 3) {
+                return 1;
+            }
+        }
 		if(isSalvaging()) {
 			return -2;
 		}

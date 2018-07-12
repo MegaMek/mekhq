@@ -186,7 +186,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 
 	//all parts need a reference to campaign
 	protected Campaign campaign;
-	
+		
 	/*
 	 * This will be unusual but in some circumstances certain parts will be linked to other parts.
 	 * These linked parts will be considered integral and subsidary to those other parts and will

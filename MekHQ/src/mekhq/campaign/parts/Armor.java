@@ -371,7 +371,8 @@ public class Armor extends Part implements IAcquisitionWork {
 		if(entity instanceof Tank) {
 			return 3;
 		}
-		else if(entity instanceof Aero) {
+		//December 2017 errata, only large craft should return 15m/point.
+		else if(entity.hasETypeFlag(entity.ETYPE_DROPSHIP) || entity.hasETypeFlag(entity.ETYPE_JUMPSHIP)) {
 			return 15;
 		}
 		return 5;

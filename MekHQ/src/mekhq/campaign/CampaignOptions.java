@@ -201,6 +201,7 @@ public class CampaignOptions implements Serializable {
 	private boolean assignedTechFirst;
 	private boolean resetToFirstTech;
 	private int destroyPartTarget;
+	private boolean useAeroSystemHits;
 
     //maintenance related
     private boolean checkMaintenance;
@@ -390,6 +391,7 @@ public class CampaignOptions implements Serializable {
         destroyByMargin = false;
         destroyMargin = 4;
         destroyPartTarget = 10;
+        useAeroSystemHits = false;
         maintenanceCycleDays = 7;
         maintenanceBonus = -1;
         useQualityMaintenance = true;
@@ -1409,6 +1411,14 @@ public class CampaignOptions implements Serializable {
     public void setDestroyPartTarget(int d) {
         destroyPartTarget = d;
     }
+    
+    public boolean useAeroSystemHits() {
+        return useAeroSystemHits;
+    }
+
+    public void setUseAeroSystemHits(boolean b) {
+        useAeroSystemHits = b;
+    }
 
     public boolean useRandomHitsForVees() {
         return useRandomHitsForVees;
@@ -2136,6 +2146,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "destroyByMargin", destroyByMargin);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "destroyMargin", destroyMargin);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "destroyPartTarget", destroyPartTarget);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useAeroSystemHits", useAeroSystemHits);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "maintenanceCycleDays", maintenanceCycleDays);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "maintenanceBonus", maintenanceBonus);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useQualityMaintenance", useQualityMaintenance);
@@ -2544,7 +2555,9 @@ public class CampaignOptions implements Serializable {
                 retVal.destroyMargin = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("destroyPartTarget")) {
                 retVal.destroyPartTarget = Integer.parseInt(wn2.getTextContent().trim());
-            }else if (wn2.getNodeName().equalsIgnoreCase("maintenanceCycleDays")) {
+            } else if (wn2.getNodeName().equalsIgnoreCase("useAeroSystemHits")) {
+                retVal.useAeroSystemHits = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("maintenanceCycleDays")) {
                 retVal.maintenanceCycleDays = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("maintenanceBonus")) {
                 retVal.maintenanceBonus = Integer.parseInt(wn2.getTextContent().trim());

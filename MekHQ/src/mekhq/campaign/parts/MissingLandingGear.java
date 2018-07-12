@@ -53,8 +53,19 @@ public class MissingLandingGear extends MissingPart {
     
     @Override 
 	public int getBaseTime() {
-		return 1200;
-	}
+        if (campaign.getCampaignOptions().useAeroSystemHits()) {
+            int time = 0;
+            //Test of proposed errata for repair times
+            Entity e = unit.getEntity();
+            if (e.hasETypeFlag(Entity.ETYPE_DROPSHIP) || e.hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
+                time = 1200;
+            } else {
+                time = 600;
+            }
+            return time;
+        }
+        return 1200;
+    }
 	
 	@Override
 	public int getDifficulty() {

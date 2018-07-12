@@ -94,18 +94,47 @@ public class AeroLifeSupport extends Part {
 	
 	@Override 
 	public int getBaseTime() {
-		if(isSalvaging()) {
-			return 6720;
-		}
-		return 120;
+	    int time = 0;
+	    Entity e = unit.getEntity();
+        if (campaign.getCampaignOptions().useAeroSystemHits()) {
+            //Test of proposed errata for repair times
+            if (isSalvaging()) {
+                if (e.hasETypeFlag(Entity.ETYPE_DROPSHIP) || e.hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
+                    time = 1200;
+                } else {
+                    time = 180;
+                }
+            }
+            if (e.hasETypeFlag(Entity.ETYPE_DROPSHIP) || e.hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
+                time = 120;
+            } else {
+                time = 60;
+            }
+            return time;
+        }
+        if (isSalvaging()) {
+            if (e.hasETypeFlag(Entity.ETYPE_DROPSHIP) || e.hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
+                time = 6720;
+            } else {
+                time = 180;
+            }
+        } else {
+            time = 120;
+        }
+		return time;
 	}
 	
 	@Override
 	public int getDifficulty() {
 		if(isSalvaging()) {
-			return 0;
+		    Entity e = unit.getEntity();
+		    if (e.hasETypeFlag(Entity.ETYPE_DROPSHIP) || e.hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
+	            return 0;
+	        } else {
+	            return -1;
+	        }
 		}
-		return -1;
+		return 1;
 	}
 
 	@Override

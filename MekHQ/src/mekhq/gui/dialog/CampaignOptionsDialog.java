@@ -182,6 +182,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JCheckBox useArtilleryBox;
     private JCheckBox useAbilitiesBox;
     private JCheckBox useQuirksBox;
+    private JCheckBox useAeroSystemHitsBox;
     private JCheckBox useEdgeBox;
     private JCheckBox useSupportEdgeBox;
     private JCheckBox useImplantsBox;
@@ -499,6 +500,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         chkAssignPortraitOnRoleChange.setSelected(options.getAssignPortraitOnRoleChange());
 
         useDamageMargin.setSelected(options.isDestroyByMargin());
+        useAeroSystemHitsBox.setSelected(options.useAeroSystemHits());
         useQualityMaintenance.setSelected(options.useQualityMaintenance());
         useUnofficalMaintenance.setSelected(options.useUnofficalMaintenance());
         checkMaintenance.setSelected(options.checkMaintenance());
@@ -616,6 +618,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         scrRanks = new JScrollPane();
 
         useDamageMargin = new JCheckBox();
+        useAeroSystemHitsBox = new JCheckBox();
         useQualityMaintenance = new JCheckBox();
         useUnofficalMaintenance = new JCheckBox();
         checkMaintenance = new JCheckBox();
@@ -862,12 +865,24 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.weighty = 0.0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panSubRepair.add(useQuirksBox, gridBagConstraints);
+        
+        useAeroSystemHitsBox.setText(resourceMap.getString("useAeroSystemHits.text")); // NOI18N
+        useAeroSystemHitsBox.setToolTipText(resourceMap.getString("useAeroSystemHits.toolTipText")); // NOI18N
+        useAeroSystemHitsBox.setName("useAeroSystemHits"); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.weightx = 0.0;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panSubRepair.add(useAeroSystemHitsBox, gridBagConstraints);
 
         useDamageMargin.setText(resourceMap.getString("useDamageMargin.text")); // NOI18N
         useDamageMargin.setToolTipText(resourceMap.getString("useDamageMargin.toolTipText")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridy = 5;
         gridBagConstraints.weightx = 0.0;
         gridBagConstraints.weighty = 0.0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
@@ -895,7 +910,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridy = 6;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 0.0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
@@ -913,7 +928,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 6;
+        gridBagConstraints.gridy = 7;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
@@ -4410,6 +4425,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setDestroyByMargin(useDamageMargin.isSelected());
         options.setDestroyMargin((Integer) spnDamageMargin.getModel().getValue());
         options.setDestroyPartTarget((Integer) spnDestroyPartTarget.getModel().getValue());
+        options.setUseAeroSystemHits(useAeroSystemHitsBox.isSelected());
         options.setCheckMaintenance(checkMaintenance.isSelected());
         options.setUseQualityMaintenance(useQualityMaintenance.isSelected());
         options.setReverseQualityNames(reverseQualityNames.isSelected());
