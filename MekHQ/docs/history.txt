@@ -17,6 +17,9 @@ v0.45.0-git
 + PR #787: Adds total value for parts and fixes issue with net worth calculation for parts
 + Show java version and system info in log file.
 + PR #640: [Feature] Experimental aerospace equipment damage and repair times errata (aerospace equipment is damaged based on how many hits it has taken and repairs don't take an order of magnitude longer than mech equipment repairs)
++ PR #758: Start of MekHQ plugin system
+		Currently includes support for external plugin for alternate personnel market methods.
+		See documentation in docs/plugins.txt.
 
 v0.44.0 (2018-06-24 1900 UTC)
 + Issue #733: Clan techs still have clan penalties to maintenance
