@@ -31,7 +31,7 @@ import megamek.common.util.DirectoryItems;
 import megamek.common.util.EncodeControl;
 import mekhq.IconPackage;
 import mekhq.MekHQ;
-import mekhq.campaign.Award;
+import mekhq.campaign.personnel.Award;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Kill;
 import mekhq.campaign.LogEntry;
@@ -51,6 +51,8 @@ import mekhq.gui.utilities.WrapLayout;
  */
 public class PersonViewPanel extends JPanel {
     private static final long serialVersionUID = 7004741688464105277L;
+
+    private static final int MAX_NUMBER_OF_RIBBON_AWARDS_PER_ROW = 4;
 
     private Person person;
     private Campaign campaign;
@@ -152,21 +154,6 @@ public class PersonViewPanel extends JPanel {
         gbc_lblPortrait.insets = new Insets(0,0,0,0);
         pnlPortrait.add(lblPortrait, gbc_lblPortrait);
         
-       if(person.hasAwards()) {
-            boxRibbons = Box.createVerticalBox();
-            boxRibbons.add(Box.createRigidArea(new Dimension(100,0)));
-
-            setRibbons();
-
-            GridBagConstraints gbc_pnlAllRibbons = new GridBagConstraints();
-            gbc_pnlAllRibbons.gridx = 0;
-            gbc_pnlAllRibbons.gridy = 1;
-            gbc_pnlAllRibbons.fill = GridBagConstraints.NONE;
-            gbc_pnlAllRibbons.anchor = GridBagConstraints.NORTHWEST;
-            gbc_pnlAllRibbons.insets = new Insets(0,0,0,0);
-            pnlPortrait.add(boxRibbons, gbc_pnlAllRibbons);
-       }
-        
         pnlStats.setName("pnlStats");
         pnlStats.setBorder(BorderFactory.createTitledBorder(person.getFullTitle()));
         pnlStats.setBackground(Color.WHITE);
@@ -183,35 +170,55 @@ public class PersonViewPanel extends JPanel {
         int gridy = 1;
         
         if(person.hasAwards()) {
-            pnlMedals = new JPanel();
-            pnlMedals.setName("pnlMedals");
-            pnlMedals.setBackground(Color.WHITE);
-            setMedals();
-            GridBagConstraints gbc_pnlMedals = new GridBagConstraints();
-            gbc_pnlMedals.fill = GridBagConstraints.BOTH;
-            gbc_pnlMedals.gridwidth = 2;
-            gbc_pnlMedals.insets = new Insets(5, 5, 5, 20);
-            gbc_pnlMedals.gridx = 0;
-            gbc_pnlMedals.gridy = gridy;
-            gbc_pnlMedals.anchor = GridBagConstraints.NORTHWEST;
-            add(pnlMedals, gbc_pnlMedals);
-            pnlMedals.setLayout(new WrapLayout(FlowLayout.LEFT));
-            gridy++;
+            if(person.hasAwardsWithRibbons()){
+                boxRibbons = Box.createVerticalBox();
+                boxRibbons.add(Box.createRigidArea(new Dimension(100,0)));
+                drawRibbons();
 
-            pnlMiscAwards = new JPanel();
-            pnlMiscAwards.setName("pnlMiscAwards");
-            pnlMiscAwards.setBackground(Color.WHITE);
-            setMiscAwards();
-            GridBagConstraints gbc_pnlMiscAwards = new GridBagConstraints();
-            gbc_pnlMiscAwards.fill = GridBagConstraints.BOTH;
-            gbc_pnlMiscAwards.gridwidth = 2;
-            gbc_pnlMiscAwards.insets = new Insets(5, 5, 5, 20);
-            gbc_pnlMiscAwards.gridx = 0;
-            gbc_pnlMiscAwards.gridy = gridy;
-            gbc_pnlMedals.anchor = GridBagConstraints.NORTHWEST;
-            add(pnlMiscAwards, gbc_pnlMiscAwards);
-            pnlMiscAwards.setLayout(new WrapLayout(FlowLayout.LEFT));
-            gridy++;
+                GridBagConstraints gbc_pnlAllRibbons = new GridBagConstraints();
+                gbc_pnlAllRibbons.gridx = 0;
+                gbc_pnlAllRibbons.gridy = 1;
+                gbc_pnlAllRibbons.fill = GridBagConstraints.NONE;
+                gbc_pnlAllRibbons.anchor = GridBagConstraints.NORTHWEST;
+                gbc_pnlAllRibbons.insets = new Insets(0,0,0,0);
+                pnlPortrait.add(boxRibbons, gbc_pnlAllRibbons);
+            }
+
+            if(person.hasAwardsWithMedals()){
+                pnlMedals = new JPanel();
+                pnlMedals.setName("pnlMedals");
+                pnlMedals.setBackground(Color.WHITE);
+                drawMedals();
+
+                GridBagConstraints gbc_pnlMedals = new GridBagConstraints();
+                gbc_pnlMedals.fill = GridBagConstraints.BOTH;
+                gbc_pnlMedals.gridwidth = 2;
+                gbc_pnlMedals.insets = new Insets(5, 5, 5, 20);
+                gbc_pnlMedals.gridx = 0;
+                gbc_pnlMedals.gridy = gridy;
+                gbc_pnlMedals.anchor = GridBagConstraints.NORTHWEST;
+                add(pnlMedals, gbc_pnlMedals);
+                pnlMedals.setLayout(new WrapLayout(FlowLayout.LEFT));
+                gridy++;
+            }
+
+            if(person.hasAwardsWithMiscs()){
+                pnlMiscAwards = new JPanel();
+                pnlMiscAwards.setName("pnlMiscAwards");
+                pnlMiscAwards.setBackground(Color.WHITE);
+                drawMiscAwards();
+
+                GridBagConstraints gbc_pnlMiscAwards = new GridBagConstraints();
+                gbc_pnlMiscAwards.fill = GridBagConstraints.BOTH;
+                gbc_pnlMiscAwards.gridwidth = 2;
+                gbc_pnlMiscAwards.insets = new Insets(5, 5, 5, 20);
+                gbc_pnlMiscAwards.gridx = 0;
+                gbc_pnlMiscAwards.gridy = gridy;
+                gbc_pnlMiscAwards.anchor = GridBagConstraints.NORTHWEST;
+                add(pnlMiscAwards, gbc_pnlMiscAwards);
+                pnlMiscAwards.setLayout(new WrapLayout(FlowLayout.LEFT));
+                gridy++;
+            }
         }
 
         if(campaign.getCampaignOptions().useAdvancedMedical() && person.hasInjuries(false)) {
@@ -299,26 +306,26 @@ public class PersonViewPanel extends JPanel {
         add(txtFiller, gridBagConstraints);
     }
 
-    private void setRibbons() {
-    	int maxRibbonsPerRow = 4;
-
-    	ArrayList<Award> awards = person.getAwards().stream().filter(a -> a.getRibbonFileName() != null)
+    /**
+     * Draws the ribbons below the person portrait.
+     */
+    private void drawRibbons() {
+        ArrayList<Award> awards = person.getAwards().stream().filter(a -> a.getRibbonFileName() != null).sorted()
                 .collect(Collectors.toCollection(ArrayList::new));
-        Collections.sort(awards);
 
-    	int i = 0;
+        int i = 0;
         Box rowRibbonsBox = null;
         ArrayList<Box> rowRibbonsBoxes = new ArrayList<>();
 
         for(Award award : awards){
             JLabel ribbonLabel = new JLabel();
-    	    Image ribbon;
+            Image ribbon;
 
-    	    if(i%maxRibbonsPerRow == 0){
+            if(i%MAX_NUMBER_OF_RIBBON_AWARDS_PER_ROW == 0){
                 rowRibbonsBox = Box.createHorizontalBox();
                 rowRibbonsBox.setBackground(Color.RED);
             }
-    	    try{
+            try{
                 ribbon = (Image) awardIcons.getItem(award.getSet() + "/ribbons/", award.getRibbonFileName());
                 if(ribbon == null) continue;
                 ribbon = ribbon.getScaledInstance(25,8, Image.SCALE_DEFAULT);
@@ -332,11 +339,11 @@ public class PersonViewPanel extends JPanel {
             }
 
             i++;
-            if(i%maxRibbonsPerRow == 0){
+            if(i%MAX_NUMBER_OF_RIBBON_AWARDS_PER_ROW == 0){
                 rowRibbonsBoxes.add(rowRibbonsBox);
             }
         }
-        if(i%maxRibbonsPerRow!=0){
+        if(i%MAX_NUMBER_OF_RIBBON_AWARDS_PER_ROW!=0){
             rowRibbonsBoxes.add(rowRibbonsBox);
         }
 
@@ -346,11 +353,12 @@ public class PersonViewPanel extends JPanel {
         }
     }
 
-    private void setMedals(){
-
-        ArrayList<Award> awards = person.getAwards().stream().filter(a -> a.getMedalFileName() != null)
+    /**
+     * Draws the medals above the personal log.
+     */
+    private void drawMedals(){
+        ArrayList<Award> awards = person.getAwards().stream().filter(a -> a.getMedalFileName() != null).sorted()
                 .collect(Collectors.toCollection(ArrayList::new));
-        Collections.sort(awards);
 
         for(Award award : awards){
             JLabel medalLabel = new JLabel();
@@ -370,7 +378,10 @@ public class PersonViewPanel extends JPanel {
         }
     }
 
-    private void setMiscAwards() {
+    /**
+     * Draws the misc awards below the medals.
+     */
+    private void drawMiscAwards() {
         ArrayList<Award> awards = person.getAwards().stream().filter(a -> a.getMiscFileName() != null)
                 .collect(Collectors.toCollection(ArrayList::new));
 
@@ -390,7 +401,7 @@ public class PersonViewPanel extends JPanel {
             }
         }
     }
-		    
+
     /**
      * set the portrait for the given person.
      *

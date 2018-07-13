@@ -1,7 +1,6 @@
 package mekhq.campaign.personnel;
 
 import mekhq.MekHQ;
-import mekhq.campaign.Award;
 import mekhq.campaign.AwardSet;
 import mekhq.campaign.LogEntry;
 import org.w3c.dom.Node;
@@ -15,41 +14,74 @@ import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+/**
+ * This class is responsible to control the awards. It loads one instance of each awards, then it creates a copy of it
+ * once it needs to be awarded to someone.
+ * @author Miguel Azevedo
+ *
+ */
 public class AwardsFactory {
+    private static final String AWARDS_XML_ROOT_PATH = "data/universe/awards/";
 
     private static AwardsFactory instance = null;
 
-    private static Map<String, Map<String,Award>> awardsMap;
+    /**
+     * Here is where the blueprints are stored, mapped by set and name.
+     */
+    private Map<String, Map<String,Award>> awardsMap;
 
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 
-    private AwardsFactory(){}
+    private AwardsFactory(){
+        awardsMap = new HashMap<>();
+
+        loadAwards();
+    }
 
     public static AwardsFactory getInstance(){
         if(instance == null){
             instance = new AwardsFactory();
-            awardsMap = new HashMap<>();
-            loadAwards();
         }
 
         return instance;
     }
 
-    public static List<String> getAllSetNames(){
+    /**
+     * @return the names of the all the award sets loaded.
+     */
+    public List<String> getAllSetNames(){
         return new ArrayList<>(awardsMap.keySet());
     }
 
-    public static List<Award> getAllAwardsForSet(String setName){
+    /**
+     * Gets a list of all awards that belong to a given Set
+     * @param setName is the name of the set
+     * @return list with the awards belonging to that set
+     */
+    public List<Award> getAllAwardsForSet(String setName){
         return new ArrayList<>(awardsMap.get(setName).values());
     }
 
-    public static Award GenerateNew(String setName, String awardName, Date date){
+    /**
+     * By searching the "blueprints" (i.e. awards instances that serve as data model), it generates a copy of that
+     * award in order for it to be given to someone.
+     * @param setName the name of the set
+     * @param awardName the name of the award
+     * @param date the date it was awarded
+     * @return list with the awards belonging to that set
+     */
+    public Award generateNew(String setName, String awardName, Date date){
         Map<String, Award> awardSet = awardsMap.get(setName);
         Award blueprintAward = awardSet.get(awardName);
         return blueprintAward.createCopy(date);
     }
 
-    public static Award generateNewFromXML(Node node){
+    /**
+     * Generates a new award from an XML entry (when loading game, for example)
+     * @param node xml node
+     * @return an award
+     */
+    public Award generateNewFromXML(Node node){
         final String METHOD_NAME = "generateNewFromXML(Node)"; //$NON-NLS-1$
 
         String name = null;
@@ -57,7 +89,6 @@ public class AwardsFactory {
         Date date = null;
 
         try {
-            // Okay, now load fields!
             NodeList nl = node.getChildNodes();
 
             for (int x=0; x<nl.getLength(); x++) {
@@ -76,11 +107,14 @@ public class AwardsFactory {
             MekHQ.getLogger().log(LogEntry.class, METHOD_NAME, ex);
         }
 
-        return GenerateNew(set, name, date);
+        return generateNew(set, name, date);
     }
 
-    private static void loadAwards(){
-        File dir = new File("data/awards/");
+    /**
+     * Generates the "blueprint" awards by reading the data from XML sources.
+     */
+    private void loadAwards(){
+        File dir = new File(AWARDS_XML_ROOT_PATH);
         File[] files =  dir.listFiles((dir1, filename) -> filename.endsWith(".xml"));
 
         for(File file : files){

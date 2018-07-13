@@ -1,4 +1,9 @@
 package mekhq.gui.utilities;
+/**
+ * This class has been downloaded from a third-party source:
+ * Author: Rob Cormak
+ * Website: https://tips4java.wordpress.com/2008/11/06/wrap-layout/
+ */
 
 import java.awt.*;
 import javax.swing.JScrollPane;

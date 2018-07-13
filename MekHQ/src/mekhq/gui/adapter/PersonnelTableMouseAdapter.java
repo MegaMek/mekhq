@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
-import java.text.DateFormat;
 import java.util.*;
 
 import javax.swing.JCheckBoxMenuItem;
@@ -30,7 +29,7 @@ import megamek.common.options.PilotOptions;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.Utilities;
-import mekhq.campaign.Award;
+import mekhq.campaign.personnel.Award;
 import mekhq.campaign.Kill;
 import mekhq.campaign.LogEntry;
 import mekhq.campaign.event.PersonChangedEvent;
@@ -547,7 +546,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             }
             case CMD_ADD_AWARD:
             {
-            	selectedPerson.addAndLogAward(data[1], data[2], gui.getCampaign().getDate());
+                selectedPerson.addAndLogAward(data[1], data[2], gui.getCampaign().getDate());
             }
             case CMD_RMV_AWARD:
             {
@@ -564,7 +563,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
                 gui.getCampaign().addReport(String.format(resourceMap.getString("improved.format"), selectedPerson.getHyperlinkedName(), type)); //$NON-NLS-1$
                 if (gui.getCampaign().getCampaignOptions().getUseAtB()
-                		&& gui.getCampaign().getCampaignOptions().useAbilities()) {
+                        && gui.getCampaign().getCampaignOptions().useAbilities()) {
                     if (selectedPerson.getPrimaryRole() > Person.T_NONE
                             && selectedPerson.getPrimaryRole() <= Person.T_CONV_PILOT
                             && selectedPerson.getExperienceLevel(false) > oldExpLevel
@@ -1772,12 +1771,12 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 }
                 
                 JMenu awardMenu = new JMenu(resourceMap.getString("award.text"));
-                List<String> setNames = AwardsFactory.getAllSetNames();
+                List<String> setNames = AwardsFactory.getInstance().getAllSetNames();
                 Collections.sort(setNames);
                 for(String setName : setNames){
                     JMenu setAwardMenu = new JMenu(setName);
 
-                    List<Award> awardsOfSet = AwardsFactory.getAllAwardsForSet(setName);
+                    List<Award> awardsOfSet = AwardsFactory.getInstance().getAllAwardsForSet(setName);
                     Collections.sort(awardsOfSet);
 
                     for (Award award : awardsOfSet) {
