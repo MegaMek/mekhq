@@ -110,7 +110,7 @@ public class CampaignOptions implements Serializable {
 
     //personnel market related
     private boolean personnelMarketReportRefresh;
-    private int personnelMarketType;
+    private String personnelMarketName;
     private int personnelMarketRandomEliteRemoval;
     private int personnelMarketRandomVeteranRemoval;
     private int personnelMarketRandomRegularRemoval;
@@ -410,7 +410,7 @@ public class CampaignOptions implements Serializable {
         capturePrisoners = true;
         defaultPrisonerStatus = PRISONER_RANK;
         personnelMarketReportRefresh = true;
-        personnelMarketType = PersonnelMarket.TYPE_STRAT_OPS;
+        personnelMarketName = PersonnelMarket.getTypeName(PersonnelMarket.TYPE_STRAT_OPS);
         personnelMarketRandomEliteRemoval = 10;
         personnelMarketRandomVeteranRemoval = 8;
         personnelMarketRandomRegularRemoval = 6;
@@ -740,12 +740,12 @@ public class CampaignOptions implements Serializable {
         personnelMarketReportRefresh = b;
     }
 
-    public int getPersonnelMarketType() {
-        return personnelMarketType;
+    public String getPersonnelMarketType() {
+        return personnelMarketName;
     }
 
-    public void setPersonnelMarketType(int t) {
-        personnelMarketType = t;
+    public void setPersonnelMarketType(String t) {
+        personnelMarketName = t;
     }
 
     public int getPersonnelMarketRandomEliteRemoval() {
@@ -2164,7 +2164,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useTimeInService", useTimeInService);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "capturePrisoners", capturePrisoners);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "defaultPrisonerStatus", defaultPrisonerStatus);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "personnelMarketType", personnelMarketType);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "personnelMarketName", personnelMarketName);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "personnelMarketRandomEliteRemoval",
                                        personnelMarketRandomEliteRemoval);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "personnelMarketRandomVeteranRemoval",
@@ -2592,7 +2592,10 @@ public class CampaignOptions implements Serializable {
             } else if (wn2.getNodeName().equalsIgnoreCase("useRandomHitsForVees")) {
                 retVal.useRandomHitsForVees = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketType")) {
-                retVal.personnelMarketType = Integer.parseInt(wn2.getTextContent().trim());
+                // Legacy
+                retVal.personnelMarketName = PersonnelMarket.getTypeName(Integer.parseInt(wn2.getTextContent().trim()));
+            } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketName")) {
+                retVal.personnelMarketName = wn2.getTextContent().trim();
             } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketRandomEliteRemoval")) {
                 retVal.personnelMarketRandomEliteRemoval = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketRandomVeteranRemoval")) {

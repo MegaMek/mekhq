@@ -113,6 +113,8 @@ import mekhq.gui.SpecialAbilityPanel;
 import mekhq.gui.model.RankTableModel;
 import mekhq.gui.model.SortedComboBoxModel;
 import mekhq.gui.utilities.TableCellListener;
+import mekhq.module.PersonnelMarketServiceManager;
+import mekhq.module.api.PersonnelMarketMethod;
 
 /**
  * @author Jay Lawson <jaylawson39 at yahoo.com>
@@ -3108,10 +3110,10 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         personnelMarketDylansWeightLabel = new JLabel("<html>Weight for Dylan's Method to choose most"
                                                       + "<br />common unit type based on your forces</html>");
         personnelMarketReportRefresh.setSelected(options.getPersonnelMarketReportRefresh());
-        for (int i = PersonnelMarket.TYPE_RANDOM; i < PersonnelMarket.TYPE_NUM; i++) {
-            personnelMarketType.addItem(PersonnelMarket.getTypeName(i));
+        for (PersonnelMarketMethod method : PersonnelMarketServiceManager.getInstance().getAllServices(true)) {
+            personnelMarketType.addItem(method.getModuleName());
         }
-        personnelMarketType.setSelectedIndex(options.getPersonnelMarketType());
+        personnelMarketType.setSelectedItem((String) options.getPersonnelMarketType());
         personnelMarketRandomEliteRemoval.setText(Integer.toString(options.getPersonnelMarketRandomEliteRemoval()));
         personnelMarketRandomVeteranRemoval.setText(Integer.toString(options.getPersonnelMarketRandomVeteranRemoval()));
         personnelMarketRandomRegularRemoval.setText(Integer.toString(options.getPersonnelMarketRandomRegularRemoval()));
@@ -3151,7 +3153,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panPersonnelMarket.add(personnelMarketTypeLabel, gridBagConstraints);
 
-        personnelMarketType.setSelectedIndex(options.getPersonnelMarketType());
+        personnelMarketType.setSelectedItem((String) options.getPersonnelMarketType());
         personnelMarketType.addActionListener(new java.awt.event.ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -4597,7 +4599,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setPersonnelMarketRandomUltraGreenRemoval(Integer.parseInt(personnelMarketRandomUltraGreenRemoval
                                                                                    .getText()));
         options.setPersonnelMarketReportRefresh(personnelMarketReportRefresh.isSelected());
-        options.setPersonnelMarketType(personnelMarketType.getSelectedIndex());
+        options.setPersonnelMarketType((String) personnelMarketType.getSelectedItem());
         // End Personnel Market
 
         // Start Against the Bot

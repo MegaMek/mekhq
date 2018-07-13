@@ -1727,9 +1727,7 @@ public class CampaignGUI extends JPanel {
                 RandomFactionGenerator.getInstance().updateTables(getCampaign().getDate(),
                         getCampaign().getCurrentPlanet(), getCampaign().getCampaignOptions());
             } else {
-                RandomFactionGenerator.getInstance().dispose();
-                RandomUnitGenerator.getInstance().dispose();
-                RandomNameGenerator.getInstance().dispose();
+                getCampaign().shutdownAtB();
             }
         }
         if (staticRATs != getCampaign().getCampaignOptions().useStaticRATs()) {
