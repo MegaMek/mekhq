@@ -125,6 +125,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     public static final int T_ADMIN_TRA = 24;
     public static final int T_ADMIN_HR = 25; // End of support roles
     public static final int T_LAM_PILOT = 26; // Not a separate type, but an alias for MW + Aero pilot
+                                              // Does not count as either combat or support role
     public static final int T_NUM = 27;
 
     public static final int S_ACTIVE = 0;
@@ -2884,11 +2885,14 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
     
     /**
+     * Determines whether a role is considered a combat role. Note that T_LAM_PILOT is a special
+     * placeholder which is not used for either primary or secondary role and will return false.
+     * 
      * @param role A value that can be used for a person's primary or secondary role.
      * @return     Whether the role is considered a combat role
      */
     public static boolean isCombatRole(int role) {
-        return role <= T_NAVIGATOR;
+        return (role > T_NONE) && (role <= T_NAVIGATOR);
     }
     
     /**
