@@ -852,7 +852,7 @@ public class RandomFactionGenerator implements Serializable {
 								hintApplies(wars, inner, inner, date);
 					}
 					for (String f : l.opponents) {
-						if (f == opponent) {
+						if (f.equals(opponent)) {
 							return true;
 						}
 					}
