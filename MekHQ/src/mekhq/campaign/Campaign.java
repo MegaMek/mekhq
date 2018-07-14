@@ -8607,7 +8607,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public String getCombatPersonnelDetails() {
-        int[] countPersonByType = new int[Person.T_SPACE_GUNNER + 1];
+        int[] countPersonByType = new int[Person.T_NUM];
         int countTotal = 0;
         int countInjured = 0;
         int countMIA = 0;
