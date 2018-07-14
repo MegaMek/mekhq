@@ -123,6 +123,14 @@ public class Transaction implements Serializable {
 		date = dt;
 	}
 	
+	public Transaction(Transaction t) {
+	    //copy constructor
+	    this.amount = t.amount;
+	    this.category = t.category;
+	    this.description = t.description;
+	    this.date = t.date;
+	}
+	
     public static int getCategoryIndex(String name) {
         for (int i = 0; i < getCategoryList().size(); i++) {
             if (getCategoryName(i).equalsIgnoreCase(name)) {
@@ -132,7 +140,44 @@ public class Transaction implements Serializable {
         return -1;
     }
 
-	public Long getAmount() {
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + (int) (amount ^ (amount >>> 32));
+        result = prime * result + category;
+        result = prime * result + ((date == null) ? 0 : date.hashCode());
+        result = prime * result + ((description == null) ? 0 : description.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Transaction other = (Transaction) obj;
+        if (amount != other.amount)
+            return false;
+        if (category != other.category)
+            return false;
+        if (date == null) {
+            if (other.date != null)
+                return false;
+        } else if (!date.equals(other.date))
+            return false;
+        if (description == null) {
+            if (other.description != null)
+                return false;
+        } else if (!description.equals(other.description))
+            return false;
+        return true;
+    }
+
+    public Long getAmount() {
 		return amount;
 	}
 	

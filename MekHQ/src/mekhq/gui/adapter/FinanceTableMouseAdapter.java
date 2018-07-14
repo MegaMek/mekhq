@@ -49,12 +49,13 @@ public class FinanceTableMouseAdapter extends MouseInputAdapter implements
             EditTransactionDialog dialog = new EditTransactionDialog(
                     transaction, gui.getFrame(), true);
             dialog.setVisible(true);
-            transaction = dialog.getNewTransaction();
-            financeModel.setTransaction(row, transaction);
-            MekHQ.triggerEvent(new TransactionChangedEvent(dialog.getOldTransaction(), transaction));
-            gui.getCampaign().addReport(
-                    transaction.updateTransaction(dialog
-                            .getOldTransaction()));
+            if (!transaction.equals(dialog.getOldTransaction())) {
+	            financeModel.setTransaction(row, transaction);
+	            MekHQ.triggerEvent(new TransactionChangedEvent(dialog.getOldTransaction(), transaction));
+	            gui.getCampaign().addReport(
+	                    transaction.updateTransaction(dialog
+	                            .getOldTransaction()));
+            }
         }
     }
 

@@ -58,7 +58,8 @@ public class EditTransactionDialog extends JDialog implements ActionListener, Fo
 
     public EditTransactionDialog(Transaction transaction, JFrame parent, boolean modal) {
         super(parent, modal);
-        oldTransaction = transaction;
+        //we need to make a copy of the object since objects are referenced by passing it to the dialog
+        oldTransaction = new Transaction(transaction);
         newTransaction = transaction;
         this.parent = parent;
 
@@ -189,7 +190,6 @@ public class EditTransactionDialog extends JDialog implements ActionListener, Fo
             }
             setVisible(false);
         } else if (cancelButton.equals(e.getSource())) {
-            newTransaction = oldTransaction;
             setVisible(false);
         } else if (dateButton.equals(e.getSource())) {
             GregorianCalendar calendar = new GregorianCalendar();
