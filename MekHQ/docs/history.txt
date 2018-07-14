@@ -21,6 +21,7 @@ v0.45.0-git
 		Currently includes support for external plugin for alternate personnel market methods.
 		See documentation in docs/plugins.txt.
 + PR #800: Correctly calculate admin costs for government forces per Campaign Ops rules.
++ PR #804: Two fixes to GM mode finances -> edit transaction
 
 
 v0.44.0 (2018-06-24 1900 UTC)
