@@ -11,6 +11,7 @@ import java.awt.Dialog.ModalityType;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
@@ -310,8 +311,8 @@ public class PersonViewPanel extends JPanel {
      * Draws the ribbons below the person portrait.
      */
     private void drawRibbons() {
-        ArrayList<Award> awards = person.getAwards().stream().filter(a -> a.getRibbonFileName() != null).sorted()
-                .collect(Collectors.toCollection(ArrayList::new));
+        List<Award> awards = person.getAwards().stream().filter(a -> a.getRibbonFileName() != null).sorted()
+                .collect(Collectors.toList());
 
         int i = 0;
         Box rowRibbonsBox = null;
@@ -357,8 +358,8 @@ public class PersonViewPanel extends JPanel {
      * Draws the medals above the personal log.
      */
     private void drawMedals(){
-        ArrayList<Award> awards = person.getAwards().stream().filter(a -> a.getMedalFileName() != null).sorted()
-                .collect(Collectors.toCollection(ArrayList::new));
+        List<Award> awards = person.getAwards().stream().filter(a -> a.getMedalFileName() != null).sorted()
+                .collect(Collectors.toList());
 
         for(Award award : awards){
             JLabel medalLabel = new JLabel();
