@@ -20,6 +20,8 @@ v0.45.0-git
 + PR #758: Start of MekHQ plugin system
 		Currently includes support for external plugin for alternate personnel market methods.
 		See documentation in docs/plugins.txt.
++ PR #800: Correctly calculate admin costs for government forces per Campaign Ops rules.
+
 
 v0.44.0 (2018-06-24 1900 UTC)
 + Issue #733: Clan techs still have clan penalties to maintenance
