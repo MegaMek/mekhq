@@ -47,6 +47,7 @@ import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Availability;
 import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.PartInventory;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.work.IAcquisitionWork;
 
@@ -506,7 +507,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     	if(null != unit) {
     		String availability = "";
     		int shotsAvailable = getAmountAvailable();
-            String[] inventories = campaign.getPartInventory(getNewPart());
+            PartInventory inventories = campaign.getPartInventory(getNewPart());
             
             String orderTransitString = getOrderTransitStringForDetails(inventories);
             
@@ -710,8 +711,8 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 		toReturn += ">";
 		toReturn += "<b>" + getAcquisitionDisplayName() + "</b> " + getAcquisitionBonus() + "<br/>";
 		toReturn += getAcquisitionExtraDesc() + "<br/>";
-		String[] inventories = campaign.getPartInventory(getAcquisitionPart());
-        toReturn += inventories[1] + " in transit, " + inventories[2] + " on order<br>";
+		PartInventory inventories = campaign.getPartInventory(getAcquisitionPart());
+        toReturn += inventories.getTransitOrderedDetails() + "<br/>";
 		toReturn += Utilities.getCurrencyString(getBuyCost()) + "<br/>";
 		toReturn += "</font></html>";
 		return toReturn;

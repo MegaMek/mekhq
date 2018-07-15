@@ -8,6 +8,7 @@ import java.util.Map;
 import megamek.common.TargetRoll;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.PartInventory;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IAcquisitionWork;
@@ -136,18 +137,20 @@ public class PartsAcquisitionService {
 			TargetRoll target = campaign.getTargetForAcquisition(awFirst, admin);
 			PartCountInfo pci = new PartCountInfo();
 
-			int[] inventories = getInventories(part, campaign, pci);
+			PartInventory inventories = campaign.getPartInventory(part);
+			pci.setCountModifier(inventories.getCountModifier());
 
-			int inTransit = inventories[1];
-			int onOrder = inventories[2];
+			int inTransit = inventories.getTransit();
+			int onOrder = inventories.getOrdered();
 			int omniPod = 0;
 
 			if (!part.isOmniPodded()) {
 				part.setOmniPodded(true);
-				inventories = getInventories(part, campaign, pci);
+				inventories = campaign.getPartInventory(part);
+				pci.setCountModifier(inventories.getCountModifier());
 
-				if (inventories[0] > 0) {
-					omniPod = inventories[0];
+				if (inventories.getSupply() > 0) {
+					omniPod = inventories.getSupply();
 				}
 
 				part.setOmniPodded(false);
@@ -201,26 +204,6 @@ public class PartsAcquisitionService {
 		}
 		
 		//campaign.addReport("***END: generateSummaryCounts");
-	}
-
-	private static int[] getInventories(Part part, Campaign campaign, PartCountInfo pci) {
-		String[] inventories = campaign.getPartInventory(part);
-		int[] parsedInventories = new int[inventories.length];
-
-		int idx = 0;
-
-		for (String s : inventories) {
-			if (s.indexOf(" ") > -1) {
-				parsedInventories[idx] = Integer.parseInt(s.substring(0, s.indexOf(" ")));
-				pci.setCountModifier(s.substring(s.indexOf(" ") + 1));
-			} else {
-				parsedInventories[idx] = Integer.parseInt(s);
-			}
-
-			idx++;
-		}
-
-		return parsedInventories;
 	}
 
 	public static class PartCountInfo {

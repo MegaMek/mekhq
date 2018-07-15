@@ -423,13 +423,11 @@ public class PodSpace implements Serializable, IPartWork {
                         replacements++;
                     } else {
                         //FIXME: This won't work if there are multiple items of the same type that need replacing and the number on order or in transit is less than the required number
-                        String[] inventories = campaign.getPartInventory(missing.getNewPart());
-                        if (inventories[1].indexOf(" ") >= 0
-                                && Integer.parseInt(inventories[1].substring(0, inventories[1].indexOf(" "))) > 0) {
+                        PartInventory inventories = campaign.getPartInventory(missing.getNewPart());
+                        if (inventories.getTransit() > 0) {
                             inTransit++;
                         }
-                        if (inventories[2].indexOf(" ") >= 0
-                                && Integer.parseInt(inventories[2].substring(0, inventories[2].indexOf(" "))) > 0) {
+                        if (inventories.getOrdered() > 0) {
                             onOrder++;
                         }
                     }
