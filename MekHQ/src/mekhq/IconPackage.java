@@ -33,6 +33,7 @@ public class IconPackage {
     private DirectoryItems portraits;
     private DirectoryItems camos;
     private DirectoryItems forceIcons;
+    private DirectoryItems awardIcons;
     protected static MechTileset mt;
     
     // Static defines for layered force icons
@@ -113,6 +114,14 @@ public class IconPackage {
                 //TODO: do something here
             }
         }
+        if(null == awardIcons){
+            try{
+                awardIcons = new DirectoryItems(new File("data/images/awards"), "", PortraitFileFactory.getInstance());
+            }
+            catch (Exception e){
+                awardIcons = null;
+            }
+        }
     }
     
     public DirectoryItems getPortraits() {
@@ -126,7 +135,9 @@ public class IconPackage {
     public DirectoryItems getForceIcons() {
         return forceIcons;
     }
-    
+
+    public DirectoryItems getAwardIcons() { return awardIcons; }
+
     public MechTileset getMechTiles() {
         return mt;
     }

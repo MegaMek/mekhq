@@ -1,0 +1,12 @@
+diff a/MekHQ/src/mekhq/gui/view/PersonViewPanel.java b/MekHQ/src/mekhq/gui/view/PersonViewPanel.java	(rejected hunks)
+@@ -134,8 +134,9 @@
+         gridBagConstraints.gridy = 0;
+         gridBagConstraints.fill = GridBagConstraints.NONE;
+         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+-        gridBagConstraints.insets = new Insets(10,10,0,0);
++        gridBagConstraints.insets = new Insets(10, 10, 5, 5);
+         add(lblPortrait, gridBagConstraints);
++        setRibbons();
+ 
+         pnlStats.setName("pnlStats");
+         pnlStats.setBorder(BorderFactory.createTitledBorder(person.getFullTitle()));
