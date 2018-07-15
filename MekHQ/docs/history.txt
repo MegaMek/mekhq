@@ -22,7 +22,7 @@ v0.45.0-git
 		See documentation in docs/plugins.txt.
 + PR #800: Correctly calculate admin costs for government forces per Campaign Ops rules.
 + PR #804: Two fixes to GM mode finances -> edit transaction
-
++ PR #801: [Feature] Personnel awards
 
 v0.44.0 (2018-06-24 1900 UTC)
 + Issue #733: Clan techs still have clan penalties to maintenance
