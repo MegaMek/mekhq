@@ -71,6 +71,56 @@ public class RegionBorder {
     }
     
     /**
+     * Tests whether a given point is inside the border region using a ray casting algorithm.
+     * 
+     * @param p The Point to test
+     * @return  Whether the point is contained within the convex polygon describing the border.
+     */
+    public boolean isInsideRegion(Point p) {
+        // Track how many sides are intersected by a ray along the X axis originating at the point
+        // being tested.
+        int intersections = 0;
+        for (int i = 0; i < border.size(); i++) {
+            Point p1 = border.get(i);
+            Point p2 = border.get((i + 1) % border.size());
+            // If both X coordinates are to the left of the point there will be no intersection.
+            if ((p.getX() > p1.getX()) && (p.getX() > p2.getX())) {
+                continue;
+            }
+            // Simplify calculations by always having p1 have the lower Y value.
+            if (p1.getY() > p2.getY()) {
+                p1 = p2;
+                p2 = border.get(i);
+            }
+            // Special case; if the point has the same Y coordinate as one of the vertices we fudge it a
+            // bit to keep from counting it twice.
+            double y = p.getY();
+            if ((y == p1.getY()) || (y == p2.getY())) {
+                y += 0.001;
+            }
+            // The ray can only intersect the segment if the Y coordinate lies between the two end points.
+            if ((y < p1.getY()) || (y > p2.getY())) {
+                continue;
+            }
+            // If the point being tested is to the left of both end points of the edge, the ray will intersect.
+            // If it is to the left of one of them it lies to the left if the slope of p1->p is greater
+            // than the slope of p1->p2.
+            if ((p.getX() < p1.getX()) && (p.getX() < p2.getX())) {
+                intersections++;
+            } else if ((y - p1.getY()) / (p.getX() - p1.getX())
+                    > (p2.getY() - p1.getY()) / (p2.getX() - p1.getX())) {
+                intersections++;
+            }
+            // Since we are only dealing with convex polygons, two intersections means that the point
+            // lies outside the polygon to the left and we can short-circuit.
+            if (intersections == 2) {
+                return false;
+            }
+        }
+        return intersections == 1;
+    }
+    
+    /**
      * Method to compute the convex hull of a list of points. Starts by determining the point
      * with the lowest y coordinate, selecting the lowest x coordinate if there is more than one that
      * shares the lowest y. The remaining points are sorted according to the angle made by the X axis

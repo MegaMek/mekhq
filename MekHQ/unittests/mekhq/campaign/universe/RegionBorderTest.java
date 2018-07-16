@@ -1,6 +1,7 @@
 package mekhq.campaign.universe;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -21,7 +22,7 @@ public class RegionBorderTest {
         when(mockPlanet.getId()).thenReturn(x + "," + y);
         return mockPlanet;
     }
-
+    
     @Test
     public void testRimwardSorter() {
         List<RegionBorder.Point> list = new ArrayList<>();
@@ -102,5 +103,25 @@ public class RegionBorderTest {
         for (RegionBorder.Point p : border.getVertices()) {
             assertTrue((Math.abs(p.getX()) == 1) || (Math.abs(p.getY()) == 1));
         }
+    }
+    
+    @Test
+    public void testIsInsideRegion() {
+        List<Planet> hexagon = new ArrayList<>();
+        hexagon.add(createMockPlanet(-1, -1));
+        hexagon.add(createMockPlanet(1, -1));
+        hexagon.add(createMockPlanet(2, 0));
+        hexagon.add(createMockPlanet(1, 1));
+        hexagon.add(createMockPlanet(-1, 1));
+        hexagon.add(createMockPlanet(-2, 0));
+        RegionBorder border = new RegionBorder(hexagon);
+
+        assertTrue(border.isInsideRegion(new RegionBorder.Point(0, 0.5)));
+        assertTrue(border.isInsideRegion(new RegionBorder.Point(0, -0.5)));
+        assertTrue(border.isInsideRegion(new RegionBorder.Point(0, 0)));
+        assertFalse(border.isInsideRegion(new RegionBorder.Point(0, 2)));
+        assertFalse(border.isInsideRegion(new RegionBorder.Point(0, -2)));
+        assertFalse(border.isInsideRegion(new RegionBorder.Point(-3, 0)));
+        assertFalse(border.isInsideRegion(new RegionBorder.Point(3, 0)));
     }
 }
