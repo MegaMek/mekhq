@@ -12,8 +12,6 @@ import java.util.List;
 
 import org.junit.Test;
 
-import mekhq.campaign.universe.RegionBorder.GrahamScanPlanetSorter;
-
 public class RegionBorderTest {
     
     private Planet createMockPlanet(final double x, final double y) {
@@ -26,12 +24,12 @@ public class RegionBorderTest {
 
     @Test
     public void testRimwardSorter() {
-        List<Planet> list = new ArrayList<>();
-        list.add(createMockPlanet(-1, 3));
-        list.add(createMockPlanet(2, -1));
-        list.add(createMockPlanet(-1, -1));
+        List<RegionBorder.Point> list = new ArrayList<>();
+        list.add(new RegionBorder.Point(-1, 3));
+        list.add(new RegionBorder.Point(2, -1));
+        list.add(new RegionBorder.Point(-1, -1));
         
-        Collections.sort(list, RegionBorder.rimwardSorter);
+        Collections.sort(list, RegionBorder.leastYSorter);
         
         assertEquals(list.get(0).getY(), -1, 0.05);
         assertEquals(list.get(0).getX(), -1, 0.05);
@@ -40,9 +38,9 @@ public class RegionBorderTest {
     
     @Test
     public void testVectorCrossProductSameQuadrant() {
-        Planet origin = createMockPlanet(0, 0);
-        Planet p1 = createMockPlanet(1, 1);
-        Planet p2 = createMockPlanet(1, 2);
+        RegionBorder.Point origin = new RegionBorder.Point(0, 0);
+        RegionBorder.Point p1 = new RegionBorder.Point(1, 1);
+        RegionBorder.Point p2 = new RegionBorder.Point(1, 2);
         
         assertTrue(RegionBorder.vectorCrossProduct(origin, p1, p2) > 0);
         assertTrue(RegionBorder.vectorCrossProduct(origin, p2, p1) < 0);
@@ -50,9 +48,9 @@ public class RegionBorderTest {
 
     @Test
     public void testVectorCrossProductDifferentQuadrant() {
-        Planet origin = createMockPlanet(0, 0);
-        Planet p1 = createMockPlanet(1, 1);
-        Planet p2 = createMockPlanet(-1, 2);
+        RegionBorder.Point origin = new RegionBorder.Point(0, 0);
+        RegionBorder.Point p1 = new RegionBorder.Point(1, 1);
+        RegionBorder.Point p2 = new RegionBorder.Point(-1, 2);
         
         assertTrue(RegionBorder.vectorCrossProduct(origin, p1, p2) > 0);
         assertTrue(RegionBorder.vectorCrossProduct(origin, p2, p1) < 0);
@@ -60,33 +58,33 @@ public class RegionBorderTest {
 
     @Test
     public void testVectorCrossProductCollinear() {
-        Planet origin = createMockPlanet(0, 0);
-        Planet p1 = createMockPlanet(1, 1);
-        Planet p2 = createMockPlanet(2, 2);
+        RegionBorder.Point origin = new RegionBorder.Point(0, 0);
+        RegionBorder.Point p1 = new RegionBorder.Point(1, 1);
+        RegionBorder.Point p2 = new RegionBorder.Point(2, 2);
         
         assertEquals(RegionBorder.vectorCrossProduct(origin, p1, p2), 0, 0.05);
     }
 
     @Test
-    public void testGrahamScanPlanetSorter() {
-        Comparator<Planet> sorter = new GrahamScanPlanetSorter(createMockPlanet(0, 0));
-        List<Planet> list = new ArrayList<>();
-        Planet[] mocks = new Planet[] {
-            createMockPlanet(1, 0),
-            createMockPlanet(1, 1),
-            createMockPlanet(0, 1),
-            createMockPlanet(-1, 1)
+    public void testGrahamScanPointSorter() {
+        Comparator<RegionBorder.Point> sorter = new RegionBorder.GrahamScanPointSorter(new RegionBorder.Point(0, 0));
+        List<RegionBorder.Point> list = new ArrayList<>();
+        RegionBorder.Point[] points = new RegionBorder.Point[] {
+            new RegionBorder.Point(1, 0),
+            new RegionBorder.Point(1, 1),
+            new RegionBorder.Point(0, 1),
+            new RegionBorder.Point(-1, 1)
         };
-        list.add(mocks[1]);
-        list.add(mocks[3]);
-        list.add(mocks[0]);
-        list.add(mocks[2]);
+        list.add(points[1]);
+        list.add(points[3]);
+        list.add(points[0]);
+        list.add(points[2]);
         
         Collections.sort(list, sorter);
         
         for (int i = 0; i < list.size(); i++) {
-            assertEquals(list.get(i).getX(), mocks[i].getX(), 0.05);
-            assertEquals(list.get(i).getY(), mocks[i].getY(), 0.05);
+            assertEquals(list.get(i).getX(), points[i].getX(), 0.05);
+            assertEquals(list.get(i).getY(), points[i].getY(), 0.05);
         }
     }
     
@@ -101,7 +99,7 @@ public class RegionBorderTest {
         
         RegionBorder border = new RegionBorder(list);
         
-        for (Planet p : border.getVertices()) {
+        for (RegionBorder.Point p : border.getVertices()) {
             assertTrue((Math.abs(p.getX()) == 1) || (Math.abs(p.getY()) == 1));
         }
     }

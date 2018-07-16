@@ -19,6 +19,7 @@
 
 package mekhq.campaign.universe;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
@@ -35,7 +36,8 @@ import java.util.stream.Collectors;
  */
 public class RegionBorder {
     
-    private final List<Planet> border;
+    private List<Point> border;
+    private double boundsX1, boundsX2, boundsY1, boundsY2;
     
     /**
      * Calculates the border polygon for the list of Planets provided.
@@ -43,53 +45,68 @@ public class RegionBorder {
      * @param planets A list of planets that define the region.
      */
     public RegionBorder(List<Planet> planets) {
-        border = performGrahamScan(planets);
+        if (!planets.isEmpty()) {
+            boundsX1 = boundsX2 = planets.get(0).getX();
+            boundsY1 = boundsY2 = planets.get(0).getY();
+            List<Point> points = new ArrayList<>();
+            for (Planet planet : planets) {
+                Point p = new Point(planet.getX(), planet.getY());
+                boundsX1 = Math.min(boundsX1, p.getX());
+                boundsX2 = Math.max(boundsX2, p.getX());
+                boundsY1 = Math.min(boundsY1, p.getY());
+                boundsY2 = Math.max(boundsY2, p.getY());
+                points.add(p);
+            }
+            border = performGrahamScan(points);
+        } else {
+            border = new ArrayList<>();
+        }
     }
     
     /**
-     * @return A list of planets that mark the vertices of a convex polygon that contains the entire region
+     * @return A list of points that mark the vertices of a convex polygon that contains the entire region
      */
-    public List<Planet> getVertices() {
+    public List<Point> getVertices() {
         return Collections.unmodifiableList(border);
     }
     
     /**
-     * Method to compute the convex hull of a list of planets. Starts by determining the planet
+     * Method to compute the convex hull of a list of points. Starts by determining the point
      * with the lowest y coordinate, selecting the lowest x coordinate if there is more than one that
-     * shares the lowest y. The remaining planets are sorted according to the angle made by the X axis
-     * and a line from the reference point. Planets are then added to a stack in the sorted order. If
-     * adding a planet would make a concavity in the polygon, previous planets are popped off the
-     * stack until adding the current planet makes a convex angle.
+     * shares the lowest y. The remaining points are sorted according to the angle made by the X axis
+     * and a line from the reference point. Points are then added to a stack in the sorted order. If
+     * adding a point would make a concavity in the polygon, previous points are popped off the
+     * stack until adding the current point makes a convex angle.
      * 
-     * @param planets The list of planets in the region
-     * @return        A list of planets whose coordinates define a convex polygon surrounding
-     *                all the planets in the list.
+     * @param points  A list of points in the region
+     * @return        A list of points whose coordinates define a convex polygon surrounding
+     *                all the points in the list.
      */
-    List<Planet> performGrahamScan(List<Planet> planets) {
-        Optional<Planet> start = planets.stream().min(rimwardSorter);
+    List<Point> performGrahamScan(List<Point> points) {
+        Optional<Point> start = points.stream().min(leastYSorter);
         if (!start.isPresent()) {
             return Collections.emptyList();
         }
-        final Planet origin = start.get();
-        Comparator<Planet> planetSorter = new GrahamScanPlanetSorter(origin);
-        List<Planet> sortedPlanets = planets.stream()
-                .filter(p -> !p.getId().equals(origin.getId()))
-                .sorted(planetSorter)
+        final Point origin = start.get();
+        Comparator<Point> pointSorter = new GrahamScanPointSorter(origin);
+        List<Point> sortedPoints = points.stream()
+                .filter(p -> !p.equals(origin))
+                .sorted(pointSorter)
                 .collect(Collectors.toList());
-        LinkedList<Planet> stack = new LinkedList<Planet>();
+        LinkedList<Point> stack = new LinkedList<>();
         stack.add(origin);
-        if (sortedPlanets.size() > 0) {
-            stack.add(sortedPlanets.get(0));
+        if (sortedPoints.size() > 0) {
+            stack.add(sortedPoints.get(0));
         }
-        if (sortedPlanets.size() > 1) {
-            stack.add(sortedPlanets.get(1));
+        if (sortedPoints.size() > 1) {
+            stack.add(sortedPoints.get(1));
         }
-        for (int i = 2; i < sortedPlanets.size(); i++) {
+        for (int i = 2; i < sortedPoints.size(); i++) {
             while (vectorCrossProduct(stack.get(stack.size() - 2),
-                    stack.getLast(), sortedPlanets.get(i)) <= 0) {
+                    stack.getLast(), sortedPoints.get(i)) <= 0) {
                 stack.removeLast();
             }
-            stack.add(sortedPlanets.get(i));
+            stack.add(sortedPoints.get(i));
         }
         return stack;
     }
@@ -99,21 +116,21 @@ public class RegionBorder {
      * be used to determine if a path from the origin to p1 to p2 is clockwise ( < 0 ), anticlockwise
      * ( > 0 ) or a straight line ( 0 ).
      * 
-     * @param p1 First planet in sequence
-     * @param p2 Second planet in sequence
-     * @param p3 Third planet in sequence
+     * @param p1 First point in sequence
+     * @param p2 Second point in sequence
+     * @param p3 Third point in sequence
      * @return   The cross product of the vectors p1->p2 and p1->p3
      */
-    static double vectorCrossProduct(Planet p1, Planet p2, Planet p3) {
+    static double vectorCrossProduct(Point p1, Point p2, Point p3) {
         return (p2.getX() - p1.getX()) * (p3.getY() - p1.getY())
                 - (p2.getY() - p1.getY()) * (p3.getX() - p1.getX());
     }
 
     /**
-     * Sorts planets from lowest Y coordinate to highest. If Y coordinates are equal, sorts
+     * Sorts points from lowest Y coordinate to highest. If Y coordinates are equal, sorts
      * from lowest to highest X.
      */
-    final static Comparator<Planet> rimwardSorter = (p1, p2) -> {
+    final static Comparator<Point> leastYSorter = (p1, p2) -> {
         int retVal = Double.compare(p1.getY(), p2.getY());
         if (retVal == 0) {
             return Double.compare(p1.getX(), p2.getX());
@@ -124,15 +141,15 @@ public class RegionBorder {
     /**
      * Used to sort planets according to their angle from a third planet
      */
-    static class GrahamScanPlanetSorter implements Comparator<Planet> {
-        private final Planet origin;
+    static class GrahamScanPointSorter implements Comparator<Point> {
+        private final Point origin;
         
-        GrahamScanPlanetSorter(Planet origin) {
+        GrahamScanPointSorter(Point origin) {
             this.origin = origin;
         }
 
         @Override
-        public int compare(Planet p1, Planet p2) {
+        public int compare(Point p1, Point p2) {
             double cp = vectorCrossProduct(origin, p1, p2);
             if (cp > 0) {
                 return -1;
@@ -141,6 +158,52 @@ public class RegionBorder {
             } else {
                 return 0;
             }
+        }
+    }
+    
+    public static class Point {
+        private final double x;
+        private final double y;
+        
+        public Point(double x, double y) {
+            this.x = x;
+            this.y = y;
+        }
+        
+        public double getX() {
+            return x;
+        }
+        
+        public double getY() {
+            return y;
+        }
+
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            long temp;
+            temp = Double.doubleToLongBits(x);
+            result = prime * result + (int) (temp ^ (temp >>> 32));
+            temp = Double.doubleToLongBits(y);
+            result = prime * result + (int) (temp ^ (temp >>> 32));
+            return result;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj)
+                return true;
+            if (obj == null)
+                return false;
+            if (getClass() != obj.getClass())
+                return false;
+            Point other = (Point) obj;
+            if (Double.doubleToLongBits(x) != Double.doubleToLongBits(other.x))
+                return false;
+            if (Double.doubleToLongBits(y) != Double.doubleToLongBits(other.y))
+                return false;
+            return true;
         }
     }
     
