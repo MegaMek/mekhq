@@ -36,8 +36,12 @@ import java.util.stream.Collectors;
  */
 public class RegionBorder {
     
+    // Margin for coordinates to be considered equal
+    private static final double EPSILON = 0.001;
+    
     private List<Point> border;
     private double boundsX1, boundsX2, boundsY1, boundsY2;
+    private Point center;
     
     /**
      * Calculates the border polygon for the list of Planets provided.
@@ -58,8 +62,12 @@ public class RegionBorder {
                 points.add(p);
             }
             border = performGrahamScan(points);
+            center = new Point(
+                    boundsX1 + (boundsX2 - boundsX1) / 2.0,
+                    boundsY1 + (boundsY2 - boundsY1) / 2.0);
         } else {
             border = new ArrayList<>();
+            center = new Point(0, 0);
         }
     }
     
@@ -96,7 +104,7 @@ public class RegionBorder {
             // bit to keep from counting it twice.
             double y = p.getY();
             if ((y == p1.getY()) || (y == p2.getY())) {
-                y += 0.001;
+                y += EPSILON;
             }
             // The ray can only intersect the segment if the Y coordinate lies between the two end points.
             if ((y < p1.getY()) || (y > p2.getY())) {
@@ -120,6 +128,124 @@ public class RegionBorder {
         return intersections == 1;
     }
     
+    /**
+     * Calculate the amount to scale each vertex along the X axis to expand the border a given distance.
+     * @param padding The linear distance to increase the border size.
+     * @return        The scale factor on the X axis
+     */
+    private double getScaleX(double padding) {
+        return (boundsX2 - boundsX1 + padding * 2.0) / (boundsX2 - boundsX1);
+    }
+    
+    /**
+     * Calculate the amount to scale each vertex along the Y axis to expand the border a given distance.
+     * @param padding The linear distance to increase the border size.
+     * @return        The scale factor on the Y axis
+     */
+    private double getScaleY(double padding) {
+        return (boundsY2 - boundsY1 + padding * 2.0) / (boundsY2 - boundsY1);
+    }
+    
+    /**
+     * Recalculates point when region is rescaled.
+     * 
+     * @param p       The point to recalculate
+     * @param scaleX  The scale factor on the X axis
+     * @param scaleY  The scale factor on the Y axis
+     * @return        The location of the point in the rescaled region
+     */
+    private Point rescale(Point p, double scaleX, double scaleY) {
+        return new Point(
+                center.getX() + (p.getX() - center.getX()) * scaleX,
+                center.getY() + (p.getY() - center.getY()) * scaleY);
+    }
+    
+    public List<Point> intersection(RegionBorder other, double padding) {
+        if (padding > 0) {
+            double scaleX = getScaleX(padding);
+            double scaleY = getScaleY(padding);
+            List<Point> region1 = border.stream()
+                    .map(p -> rescale(p, scaleX, scaleY)).collect(Collectors.toList());
+            double scaleX2 = other.getScaleX(padding);
+            double scaleY2 = other.getScaleY(padding);
+            List<Point> region2 = other.border.stream()
+                    .map(p -> other.rescale(p, scaleX2, scaleY2)).collect(Collectors.toList());
+            return intersection(region1, region2);
+        } else {
+            return intersection(border, other.border);
+        }
+        
+    }
+
+    /**
+     * Finds the intersection of two polygons using Sutherland-Hodgman polygon clipping.
+     * 
+     * @param subject A collection of points defining the first polygon.
+     * @param clipper A collection of points defining the second polygon. This one must be convex.
+     * @return The set of vertices defining the intersection between the two polygons.
+     */
+    public static List<Point> intersection(List<Point> subject, List<Point> clipper) {
+        /* Each edge of the clipping polygon is extended into a line, and each vertex on the subject polygon
+         * that lies on the side of the line that is inside the clipping polygon is added to the output list.
+         * For each edge of the subject that has one edge inside and one outside the point where the two
+         * edges intersect is added to the output list. Each iteration around the edges of the clipping polygon
+         * starts with the results of the previous iteration as the new subject. */
+        int clipperSize = clipper.size();
+        List<Point> output = new ArrayList<>(subject);
+        for (int i = 0; i < clipperSize; i++) {
+            int outputSize = output.size();
+            
+            List<Point> input = output;
+            output = new ArrayList<>(outputSize);
+            
+            Point a = clipper.get((i + clipperSize - 1) % clipperSize);
+            Point b = clipper.get(i);
+            
+            for (int j = 0; j < outputSize; j++) {
+                 Point p = input.get((j + outputSize - 1) % outputSize);
+                 Point q = input.get(j);
+                 
+                 if (vectorCrossProduct(a, b, q) > 0) {
+                     if (vectorCrossProduct(a, b, p) <= 0) {
+                         output.add(lineIntersection(a, b, p, q));
+                     }
+                     output.add(q);
+                 } else if (vectorCrossProduct(a, b, p) > 0) {
+                     output.add(lineIntersection(a, b, p, q));
+                 }
+            }
+            
+        }
+        
+        return output;
+    }
+
+    /**
+     * Find the point where two lines intersect in a plane. Does not test for parallel or for distinct
+     * points defining a line.
+     * 
+     * @param a A point on the first line
+     * @param b Another point on the first line
+     * @param p A point on the second line
+     * @param q Another point on the second line
+     * @return  The intersection
+     */
+    private static Point lineIntersection(Point a, Point b, Point p, Point q) {
+        double a1 = b.getY() - a.getY();
+        double b1 = a.getX() - b.getX();
+        double c1 = a1 * a.getX() + b1 * a.getY();
+ 
+        double a2 = q.getY() - p.getY();
+        double b2 = p.getX() - q.getX();
+        double c2 = a2 * p.getX() + b2 * p.getY();
+ 
+        double determinate = a1 * b2 - a2 * b1;
+        double x = (b2 * c1 - b1 * c2) / determinate;
+        double y = (a1 * c2 - a2 * c1) / determinate;
+ 
+        return new Point(x, y);
+    }
+
     /**
      * Method to compute the convex hull of a list of points. Starts by determining the point
      * with the lowest y coordinate, selecting the lowest x coordinate if there is more than one that
@@ -227,6 +353,11 @@ public class RegionBorder {
         public double getY() {
             return y;
         }
+        
+        @Override
+        public String toString() {
+            return String.format("%3.2f, %3.2f", x, y);
+        }
 
         @Override
         public int hashCode() {
@@ -249,11 +380,7 @@ public class RegionBorder {
             if (getClass() != obj.getClass())
                 return false;
             Point other = (Point) obj;
-            if (Double.doubleToLongBits(x) != Double.doubleToLongBits(other.x))
-                return false;
-            if (Double.doubleToLongBits(y) != Double.doubleToLongBits(other.y))
-                return false;
-            return true;
+            return (Math.abs(x - other.x) < EPSILON) && (Math.abs(y - other.y) < EPSILON); 
         }
     }
     

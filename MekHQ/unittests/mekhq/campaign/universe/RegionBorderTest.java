@@ -124,4 +124,65 @@ public class RegionBorderTest {
         assertFalse(border.isInsideRegion(new RegionBorder.Point(-3, 0)));
         assertFalse(border.isInsideRegion(new RegionBorder.Point(3, 0)));
     }
+    
+    @Test
+    public void testIntersectionTriangleClippedByRectangle() {
+        List<RegionBorder.Point> triangle = new ArrayList<>();
+        triangle.add(new RegionBorder.Point(0,  2));
+        triangle.add(new RegionBorder.Point(-2,  -2));
+        triangle.add(new RegionBorder.Point(2,  -2));
+        List<RegionBorder.Point> rectangle = new ArrayList<>();
+        rectangle.add(new RegionBorder.Point(-3, 0));
+        rectangle.add(new RegionBorder.Point(3, 0));
+        rectangle.add(new RegionBorder.Point(3, 4));
+        rectangle.add(new RegionBorder.Point(-3, 4));
+        
+        List<RegionBorder.Point> intersection = RegionBorder.intersection(triangle, rectangle);
+        
+        assertTrue(intersection.contains(triangle.get(0)));
+        assertFalse(intersection.contains(triangle.get(1)));
+        assertFalse(intersection.contains(triangle.get(2)));
+        assertTrue(intersection.contains(new RegionBorder.Point(-1, 0)));
+        assertTrue(intersection.contains(new RegionBorder.Point(1, 0)));
+    }
+    
+    @Test
+    public void testIntersectionNonOverlappingRegions() {
+        List<RegionBorder.Point> region1 = new ArrayList<>();
+        region1.add(new RegionBorder.Point(3,  2));
+        region1.add(new RegionBorder.Point(1,  -2));
+        region1.add(new RegionBorder.Point(5,  -2));
+        List<RegionBorder.Point> region2 = new ArrayList<>();
+        region2.add(new RegionBorder.Point(-3, 2));
+        region2.add(new RegionBorder.Point(-1, -2));
+        region2.add(new RegionBorder.Point(-5, -2));
+        
+        List<RegionBorder.Point> intersection = RegionBorder.intersection(region1, region2);
+        
+        assertTrue(intersection.isEmpty());
+    }
+    
+    @Test
+    public void testScaledIntersection() {
+        List<Planet> list = new ArrayList<>();
+        list.add(createMockPlanet(-2, -2));
+        list.add(createMockPlanet(0, -2));
+        list.add(createMockPlanet(0, 2));
+        list.add(createMockPlanet(-2, 2));
+        RegionBorder r1 = new RegionBorder(list);
+        list = new ArrayList<>();
+        list.add(createMockPlanet(2, -2));
+        list.add(createMockPlanet(0, -2));
+        list.add(createMockPlanet(0, 2));
+        list.add(createMockPlanet(2, 2));
+        RegionBorder r2 = new RegionBorder(list);
+        
+        List<RegionBorder.Point> intersection = r1.intersection(r2, 1.0);
+        
+        assertEquals(intersection.size(), 4);
+        assertTrue(intersection.contains(new RegionBorder.Point(-1, -3)));
+        assertTrue(intersection.contains(new RegionBorder.Point(1, -3)));
+        assertTrue(intersection.contains(new RegionBorder.Point(1, 3)));
+        assertTrue(intersection.contains(new RegionBorder.Point(-1, 3)));
+    }
 }
