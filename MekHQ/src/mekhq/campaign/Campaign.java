@@ -5314,7 +5314,7 @@ public class Campaign implements Serializable, ITechManager {
         return plntNames;
     }
 
-    public Planet getPlanet(String name) {
+    public Planet getPlanetByName(String name) {
         return Planets.getInstance().getPlanetByName(name, Utilities.getDateTimeDay(calendar));
     }
 

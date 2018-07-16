@@ -175,7 +175,7 @@ public class JumpPath implements Serializable {
 			for (int x=0; x<nl.getLength(); x++) {
 				Node wn2 = nl.item(x);
 				if (wn2.getNodeName().equalsIgnoreCase("planetName")) {
-					Planet p = c.getPlanet(wn2.getTextContent());
+					Planet p = c.getPlanetByName(wn2.getTextContent());
 					if(null != p) {
 						retVal.addPlanet(p);
 					} else {

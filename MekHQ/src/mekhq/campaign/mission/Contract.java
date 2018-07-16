@@ -68,6 +68,8 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
     public final static int   COM_INDEP          = 3;
     public final static int   COM_NUM            = 4;
 
+    public final static int   MRBC_FEE_PERCENTAGE = 5;
+
     private Date startDate;
     private Date endDate;
     private int nMonths;
@@ -292,6 +294,8 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
         return mrbcFee;
     }
 
+    public int getMrbcFeePercentage() {return MRBC_FEE_PERCENTAGE;}
+
     public void setMRBCFee(boolean b) {
         mrbcFee = b;
     }
@@ -307,6 +311,10 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
 
     public long getAdvanceAmount() {
         return advanceAmount;
+    }
+
+    public long getTotalAdvanceAmount() {
+        return advanceAmount + signingAmount;
     }
 
     protected void setAdvanceAmount(long amount) {
@@ -370,11 +378,15 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
     }
 
     public long getMonthlyPayOut() {
-        return (getTotalAmountPlusFeesAndBonuses() - getTotalAdvanceMonies()) / getLength();
+        return (getTotalAmountPlusFeesAndBonuses() - getTotalAdvanceAmount()) / getLength();
     }
 
-    public long getTotalAdvanceMonies() {
-        return getAdvanceAmount() + getSigningBonusAmount();
+    public long getTotalMonthlyPayOut(Campaign c){
+        return (getMonthlyPayOut()*getLength())
+                + getTotalEstimatedOverheadExpenses(c)
+                + getTotalEstimatedMaintenanceExpenses(c)
+                + getTotalEstimatedPayrollExpenses(c)
+                - getFeeAmount();
     }
 
     public static String generateRandomContractName() {
@@ -402,10 +414,40 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
         return 0;
     }
 
-
-    private int getLengthPlusTravel(Campaign c) {
-        int travelMonths = (int) Math.ceil(getTravelDays(c) / 30.0) * 2;
+    public int getLengthPlusTravel(Campaign c) {
+        int travelMonths = (int) Math.ceil(2 * getTravelDays(c) / 30.0);
         return getLength() + travelMonths;
+    }
+
+    public long getTotalEstimatedOverheadExpenses(Campaign c){
+        return c.getOverheadExpenses() * getLengthPlusTravel(c);
+    }
+
+    public long getTotalEstimatedMaintenanceExpenses(Campaign c){
+        return c.getMaintenanceCosts() * getLengthPlusTravel(c);
+    }
+
+    public long getEstimatedPayrollExpenses(Campaign c){
+        if (c.getCampaignOptions().usePeacetimeCost()) {
+            return c.getPeacetimeCost();
+        } else {
+            return c.getPayRoll();
+        }
+    }
+
+    public long getTotalEstimatedPayrollExpenses(Campaign c){
+         return getEstimatedPayrollExpenses(c) * getLengthPlusTravel(c);
+    }
+
+    public long getTotalTransportationFees(Campaign c){
+        if(null != getPlanet() && c.getCampaignOptions().payForTransport()) {
+            JumpPath jumpPath = c.calculateJumpPath(c.getCurrentPlanet(), getPlanet());
+
+            boolean campaignOps = c.getCampaignOptions().useEquipmentContractBase();
+
+            return 2 * c.calculateCostPerJump(campaignOps, campaignOps) * jumpPath.getJumps();
+        }
+        return 0;
     }
 
     /**
@@ -418,21 +460,7 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
      * @return The estimated profit in C-bills.
      */
     public long getEstimatedTotalProfit(Campaign c) {
-        long profit = getTotalAmountPlusFeesAndBonuses();
-        profit -= c.getOverheadExpenses() * getLengthPlusTravel(c);
-        profit -= c.getMaintenanceCosts() * getLengthPlusTravel(c);
-        if (c.getCampaignOptions().usePeacetimeCost()) {
-            profit -= c.getPeacetimeCost() * getLengthPlusTravel(c);
-        } else {
-            profit -= c.getPayRoll() * getLengthPlusTravel(c);
-        }
-		if(null != c.getPlanet(planetId) && c.getCampaignOptions().payForTransport()) {
-			JumpPath jumpPath = c.calculateJumpPath(c.getCurrentPlanet(), getPlanet());
-
-			boolean campaignOps = c.getCampaignOptions().useEquipmentContractBase();
-			profit -= 2 * c.calculateCostPerJump(campaignOps, campaignOps) * jumpPath.getJumps();
-		}
-		return profit;
+        return getTotalAdvanceAmount() + getTotalMonthlyPayOut(c) - getTotalTransportationFees(c);
 	}
 
     /**
@@ -520,7 +548,7 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
                 * (baseAmount + overheadAmount + transportAmount + transitAmount + supportAmount));
 
         if (mrbcFee) {
-            feeAmount = (long) (0.05 * (baseAmount + overheadAmount + transportAmount + transitAmount + supportAmount));
+            feeAmount = (long) ((MRBC_FEE_PERCENTAGE / 100.0) * (baseAmount + overheadAmount + transportAmount + transitAmount + supportAmount));
         } else {
             feeAmount = 0;
         }
@@ -533,7 +561,7 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
         }
         GregorianCalendar cal = new GregorianCalendar();
         cal.setTime(startDate);
-        if (adjustStartDate && null != c.getPlanet(planetId)) {
+        if (adjustStartDate && null != c.getPlanetByName(planetId)) {
             int days = (int) Math.ceil(c.calculateJumpPath(c.getCurrentPlanet(), getPlanet())
                     .getTotalTime(Utilities.getDateTimeDay(cal), c.getLocation().getTransitTime()));
             while (days > 0) {

@@ -91,7 +91,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
 
         suggestPlanet = new JSuggestField(getFrame(), getCampaign().getPlanetNames());
         suggestPlanet.addActionListener(ev -> {
-            Planet p = getCampaign().getPlanet(suggestPlanet.getText());
+            Planet p = getCampaign().getPlanetByName(suggestPlanet.getText());
             if (null != p) {
                 panMap.setSelectedPlanet(p);
                 refreshPlanetView();

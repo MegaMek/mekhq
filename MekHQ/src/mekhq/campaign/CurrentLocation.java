@@ -243,7 +243,7 @@ public class CurrentLocation implements Serializable {
 						//whoops we cant find your planet man, back to Earth
 					    MekHQ.getLogger().log(CurrentLocation.class, METHOD_NAME, LogLevel.ERROR,
 					            "Couldn't find planet named " + wn2.getTextContent()); //$NON-NLS-1$
-						p = c.getPlanet("Terra");
+						p = c.getPlanetByName("Terra");
 						if(null == p) {
 							//if that doesnt work then give the first planet we have
 							p = c.getPlanets().get(0);

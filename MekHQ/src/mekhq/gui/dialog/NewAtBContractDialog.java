@@ -539,7 +539,7 @@ public class NewAtBContractDialog extends NewContractDialog {
     	
     	contract.calculatePartsAvailabilityLevel(campaign);
    	
-    	campaign.getFinances().credit(contract.getTotalAdvanceMonies(), Transaction.C_CONTRACT, "Advance monies for " + contract.getName(), campaign.getCalendar().getTime());
+    	campaign.getFinances().credit(contract.getTotalAdvanceAmount(), Transaction.C_CONTRACT, "Advance monies for " + contract.getName(), campaign.getCalendar().getTime());
     	campaign.addMission(contract);
     	this.setVisible(false);
     }
