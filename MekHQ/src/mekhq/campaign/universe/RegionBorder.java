@@ -20,6 +20,7 @@
 package mekhq.campaign.universe;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
@@ -40,19 +41,20 @@ public class RegionBorder {
     private static final double EPSILON = 0.001;
     
     private List<Point> border;
-    private double boundsX1, boundsX2, boundsY1, boundsY2;
-    private Point center;
+    private double boundsX1, boundsY1, boundsX2, boundsY2;
     
     /**
      * Calculates the border polygon for the list of Planets provided.
      * 
      * @param planets A list of planets that define the region.
      */
-    public RegionBorder(List<Planet> planets) {
+    public RegionBorder(Collection<Planet> planets) {
         if (!planets.isEmpty()) {
-            boundsX1 = boundsX2 = planets.get(0).getX();
-            boundsY1 = boundsY2 = planets.get(0).getY();
             List<Point> points = new ArrayList<>();
+            boundsX1 = Double.MAX_VALUE;
+            boundsY1 = Double.MAX_VALUE;
+            boundsX2 = Double.MIN_VALUE;
+            boundsY2 = Double.MIN_VALUE;
             for (Planet planet : planets) {
                 Point p = new Point(planet.getX(), planet.getY());
                 boundsX1 = Math.min(boundsX1, p.getX());
@@ -62,12 +64,8 @@ public class RegionBorder {
                 points.add(p);
             }
             border = performGrahamScan(points);
-            center = new Point(
-                    boundsX1 + (boundsX2 - boundsX1) / 2.0,
-                    boundsY1 + (boundsY2 - boundsY1) / 2.0);
         } else {
             border = new ArrayList<>();
-            center = new Point(0, 0);
         }
     }
     
@@ -85,24 +83,35 @@ public class RegionBorder {
      * @return  Whether the point is contained within the convex polygon describing the border.
      */
     public boolean isInsideRegion(Point p) {
+        return isInsideRegion(p.getX(), p.getY(), border);
+    }
+    
+    /**
+     * Tests whether a given point is inside a convex polygon using a ray casting algorithm.
+     * 
+     * @param x      The x coordinate of the point to test
+     * @param y      The y coordinate of the point to test
+     * @param region An ordered list of vertices of a convex polygon
+     * @return       Whether the point is contained within the polygon.
+     */
+    public static boolean isInsideRegion(double x, double y, List<Point> region) {
         // Track how many sides are intersected by a ray along the X axis originating at the point
         // being tested.
         int intersections = 0;
-        for (int i = 0; i < border.size(); i++) {
-            Point p1 = border.get(i);
-            Point p2 = border.get((i + 1) % border.size());
+        for (int i = 0; i < region.size(); i++) {
+            Point p1 = region.get(i);
+            Point p2 = region.get((i + 1) % region.size());
             // If both X coordinates are to the left of the point there will be no intersection.
-            if ((p.getX() > p1.getX()) && (p.getX() > p2.getX())) {
+            if ((x > p1.getX()) && (x > p2.getX())) {
                 continue;
             }
             // Simplify calculations by always having p1 have the lower Y value.
             if (p1.getY() > p2.getY()) {
                 p1 = p2;
-                p2 = border.get(i);
+                p2 = region.get(i);
             }
             // Special case; if the point has the same Y coordinate as one of the vertices we fudge it a
             // bit to keep from counting it twice.
-            double y = p.getY();
             if ((y == p1.getY()) || (y == p2.getY())) {
                 y += EPSILON;
             }
@@ -113,9 +122,9 @@ public class RegionBorder {
             // If the point being tested is to the left of both end points of the edge, the ray will intersect.
             // If it is to the left of one of them it lies to the left if the slope of p1->p is greater
             // than the slope of p1->p2.
-            if ((p.getX() < p1.getX()) && (p.getX() < p2.getX())) {
+            if ((x < p1.getX()) && (x < p2.getX())) {
                 intersections++;
-            } else if ((y - p1.getY()) / (p.getX() - p1.getX())
+            } else if ((y - p1.getY()) / (x - p1.getX())
                     > (p2.getY() - p1.getY()) / (p2.getX() - p1.getX())) {
                 intersections++;
             }
@@ -129,52 +138,68 @@ public class RegionBorder {
     }
     
     /**
-     * Calculate the amount to scale each vertex along the X axis to expand the border a given distance.
-     * @param padding The linear distance to increase the border size.
-     * @return        The scale factor on the X axis
+     * Test whether the coordinates are in the region's bounding rectangle. Used for filtering likely values.
+     * @param x
+     * @param y
+     * @return  True if the point is contained within the bounding rectangle.
      */
-    private double getScaleX(double padding) {
-        return (boundsX2 - boundsX1 + padding * 2.0) / (boundsX2 - boundsX1);
+    public boolean isInsideBoundingBox(double x, double y) {
+        return (x > boundsX1) && (x < boundsX2)
+                && (y > boundsY1) && (y < boundsY2);
     }
     
     /**
-     * Calculate the amount to scale each vertex along the Y axis to expand the border a given distance.
-     * @param padding The linear distance to increase the border size.
-     * @return        The scale factor on the Y axis
+     * Test whether the point in the region's bounding rectangle. Used for filtering likely values.
+     * @param p
+     * @return  True if the point is contained within the bounding rectangle.
      */
-    private double getScaleY(double padding) {
-        return (boundsY2 - boundsY1 + padding * 2.0) / (boundsY2 - boundsY1);
+    public boolean isInsideBoundingBox(Point p) {
+        return isInsideBoundingBox(p.getX(), p.getY());
     }
     
     /**
-     * Recalculates point when region is rescaled.
+     * Test whether the planet in the region's bounding rectangle. Used for filtering likely values.
+     * @param p
+     * @return  True if the point is contained within the bounding rectangle.
+     */
+    public boolean isInsideBoundingBox(Planet p) {
+        return isInsideBoundingBox(p.getX(), p.getY());
+    }
+    
+    /**
+     * Calculates a convex polygon that surrounds a set of points with a minimum border width.
      * 
-     * @param p       The point to recalculate
-     * @param scaleX  The scale factor on the X axis
-     * @param scaleY  The scale factor on the Y axis
-     * @return        The location of the point in the rescaled region
+     * @param region  The region to surround
+     * @param padding The size of the border to add around the inner region
+     * @return        A list of vertices of a convex polygon
      */
-    private Point rescale(Point p, double scaleX, double scaleY) {
-        return new Point(
-                center.getX() + (p.getX() - center.getX()) * scaleX,
-                center.getY() + (p.getY() - center.getY()) * scaleY);
+    public static List<Point> getPaddedRegion(List<Point> region, double padding) {
+        if (padding > 0) {
+            List<Point> retVal = new ArrayList<>();
+            for (Point p : region) {
+                retVal.add(new Point(p.getX() - padding, p.getY() - padding));
+                retVal.add(new Point(p.getX() + padding, p.getY() - padding));
+                retVal.add(new Point(p.getX() - padding, p.getY() + padding));
+                retVal.add(new Point(p.getX() + padding, p.getY() + padding));
+            }
+            return performGrahamScan(retVal);
+        } else {
+            return region;
+        }
     }
     
+    /**
+     * Calculates the intersection between this region and another with the possibility of setting the
+     * width of a border around each.
+     * 
+     * @param other    The other intersecting region
+     * @param padding  If > 0, adds extra space of the given width around each region before
+     *                 calculating the intersection.
+     * @return         A list of the vertices of the polygon around the intersection.
+     */
     public List<Point> intersection(RegionBorder other, double padding) {
-        if (padding > 0) {
-            double scaleX = getScaleX(padding);
-            double scaleY = getScaleY(padding);
-            List<Point> region1 = border.stream()
-                    .map(p -> rescale(p, scaleX, scaleY)).collect(Collectors.toList());
-            double scaleX2 = other.getScaleX(padding);
-            double scaleY2 = other.getScaleY(padding);
-            List<Point> region2 = other.border.stream()
-                    .map(p -> other.rescale(p, scaleX2, scaleY2)).collect(Collectors.toList());
-            return intersection(region1, region2);
-        } else {
-            return intersection(border, other.border);
-        }
-        
+        return intersection(getPaddedRegion(border, padding),
+                getPaddedRegion(other.border, padding));
     }
 
     /**
@@ -258,7 +283,7 @@ public class RegionBorder {
      * @return        A list of points whose coordinates define a convex polygon surrounding
      *                all the points in the list.
      */
-    List<Point> performGrahamScan(List<Point> points) {
+    static List<Point> performGrahamScan(List<Point> points) {
         Optional<Point> start = points.stream().min(leastYSorter);
         if (!start.isPresent()) {
             return Collections.emptyList();
@@ -269,6 +294,17 @@ public class RegionBorder {
                 .filter(p -> !p.equals(origin))
                 .sorted(pointSorter)
                 .collect(Collectors.toList());
+        // Check for a special case: if there are more than two points that have the same least Y,
+        // remove all but the right-most to prevent popping too many values off the stack in the next
+        // step.
+        while ((sortedPoints.size() > 1) && (sortedPoints.get(0).getY() == sortedPoints.get(1).getY())) {
+            if (sortedPoints.get(0).getX() > sortedPoints.get(1).getX()) {
+                sortedPoints.remove(1);
+            } else {
+                sortedPoints.remove(0);
+            }
+        }
+        
         LinkedList<Point> stack = new LinkedList<>();
         stack.add(origin);
         if (sortedPoints.size() > 0) {
@@ -337,6 +373,10 @@ public class RegionBorder {
         }
     }
     
+    /**
+     * Utility class to track x and y values of a planar coordinate.
+     *
+     */
     public static class Point {
         private final double x;
         private final double y;
@@ -356,7 +396,7 @@ public class RegionBorder {
         
         @Override
         public String toString() {
-            return String.format("%3.2f, %3.2f", x, y);
+            return String.format("(%3.2f,%3.2f)", x, y);
         }
 
         @Override
