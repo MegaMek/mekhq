@@ -249,8 +249,8 @@ public class Campaign implements Serializable, ITechManager {
     private Hashtable<Integer, Part> partIds = new Hashtable<Integer, Part>();
     private Hashtable<Integer, Force> forceIds = new Hashtable<Integer, Force>();
     private Map<Integer, Mission> missions = new LinkedHashMap<>();
-    private Hashtable<Integer, Scenario> scenarioIds = new Hashtable<Integer, Scenario>();
-    private ArrayList<Kill> kills = new ArrayList<Kill>();
+    private Map<Integer, Scenario> scenarios = new LinkedHashMap<>();
+    private List<Kill> kills = new ArrayList<>();
 
     private Hashtable<String, Integer> duplicateNameHash = new Hashtable<String, Integer>();
 
@@ -792,7 +792,7 @@ public class Campaign implements Serializable, ITechManager {
      * @param scenario
      */
     public void addScenarioToHash(Scenario scenario) {
-        scenarioIds.put(scenario.getId(), scenario);
+        scenarios.put(scenario.getId(), scenario);
     }
 
     /**
@@ -902,7 +902,7 @@ public class Campaign implements Serializable, ITechManager {
         int id = lastScenarioId + 1;
         s.setId(id);
         m.addScenario(s);
-        scenarioIds.put(new Integer(id), s);
+        scenarios.put(Integer.valueOf(id), s);
         lastScenarioId = id;
         MekHQ.triggerEvent(new ScenarioNewEvent(s));
     }
@@ -931,7 +931,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public Scenario getScenario(int id) {
-        return scenarioIds.get(new Integer(id));
+        return scenarios.get(Integer.valueOf(id));
     }
 
     public CurrentLocation getLocation() {
@@ -2909,7 +2909,7 @@ public class Campaign implements Serializable, ITechManager {
         if (null != mission) {
             mission.removeScenario(scenario.getId());
         }
-        scenarioIds.remove(new Integer(id));
+        scenarios.remove(Integer.valueOf(id));
         MekHQ.triggerEvent(new ScenarioChangedEvent(scenario));
     }
 
@@ -2920,7 +2920,7 @@ public class Campaign implements Serializable, ITechManager {
         if (null != mission) {
             for (Scenario scenario : mission.getScenarios()) {
                 scenario.clearAllForcesAndPersonnel(this);
-                scenarioIds.remove(scenario.getId());
+                scenarios.remove(scenario.getId());
             }
             mission.clearScenarios();
         }
