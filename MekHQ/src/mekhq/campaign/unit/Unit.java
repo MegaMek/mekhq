@@ -3813,7 +3813,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         return oldId;
     }
 
-    public void fixIdReferences(Hashtable<Integer, UUID> uHash, Hashtable<Integer, UUID> peopleHash) {
+    public void fixIdReferences(Map<Integer, UUID> uHash, Map<Integer, UUID> peopleHash) {
         for(int oid : oldDrivers) {
             UUID nid = peopleHash.get(oid);
             if(null != nid) {

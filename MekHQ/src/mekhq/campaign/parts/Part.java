@@ -26,7 +26,7 @@ import java.io.Serializable;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Hashtable;
+import java.util.Map;
 import java.util.StringJoiner;
 import java.util.UUID;
 
@@ -1187,7 +1187,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 		return teamId != null;
 	}
 
-	public void fixIdReferences(Hashtable<Integer, UUID> uHash, Hashtable<Integer, UUID> pHash) {
+	public void fixIdReferences(Map<Integer, UUID> uHash, Map<Integer, UUID> pHash) {
     	unitId = uHash.get(oldUnitId);
     	refitId = uHash.get(oldRefitId);
     	teamId = pHash.get(oldTeamId);

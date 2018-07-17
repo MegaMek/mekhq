@@ -4395,8 +4395,8 @@ public class Campaign implements Serializable, ITechManager {
 
     private static void fixIdReferences(Campaign retVal) {
         // set up translation hashes
-        Hashtable<Integer, UUID> uHash = new Hashtable<Integer, UUID>();
-        Hashtable<Integer, UUID> pHash = new Hashtable<Integer, UUID>();
+        Map<Integer, UUID> uHash = new HashMap<>();
+        Map<Integer, UUID> pHash = new HashMap<>();
         for (Unit u : retVal.units) {
             uHash.put(u.getOldId(), u.getId());
         }

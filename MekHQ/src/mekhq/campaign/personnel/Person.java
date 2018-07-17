@@ -3370,7 +3370,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return oldId;
     }
 
-    public void fixIdReferences(Hashtable<Integer, UUID> uHash, Hashtable<Integer, UUID> pHash) {
+    public void fixIdReferences(Map<Integer, UUID> uHash, Map<Integer, UUID> pHash) {
         unitId = uHash.get(oldUnitId);
         doctorId = pHash.get(oldDoctorId);
     }
