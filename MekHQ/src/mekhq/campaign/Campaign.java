@@ -246,7 +246,7 @@ public class Campaign implements Serializable, ITechManager {
     private Map<UUID, Ancestors> ancestors = new LinkedHashMap<>();
     private ArrayList<Part> parts = new ArrayList<Part>();
     private Hashtable<Integer, Part> partIds = new Hashtable<Integer, Part>();
-    private Hashtable<Integer, Force> forceIds = new Hashtable<Integer, Force>();
+    private Map<Integer, Force> forceIds = new LinkedHashMap<>();
     private Map<Integer, Mission> missions = new LinkedHashMap<>();
     private Map<Integer, Scenario> scenarios = new LinkedHashMap<>();
     private List<Kill> kills = new ArrayList<>();
@@ -354,7 +354,7 @@ public class Campaign implements Serializable, ITechManager {
         Ranks.initializeRankSystems();
         ranks = Ranks.getRanksFromSystem(Ranks.RS_SL);
         forces = new Force(name);
-        forceIds.put(new Integer(lastForceId), forces);
+        forceIds.put(Integer.valueOf(lastForceId), forces);
         lastForceId++;
         lances = new Hashtable<Integer, Lance>();
         finances = new Finances();
@@ -750,11 +750,11 @@ public class Campaign implements Serializable, ITechManager {
         force.setId(id);
         superForce.addSubForce(force, true);
         force.setScenarioId(superForce.getScenarioId());
-        forceIds.put(new Integer(id), force);
+        forceIds.put(Integer.valueOf(id), force);
         lastForceId = id;
 
         if (campaignOptions.getUseAtB() && force.getUnits().size() > 0) {
-            if (null == lances.get(id)) {
+            if (null == lances.get(Integer.valueOf(id))) {
                 lances.put(id, new Lance(force.getId(), this));
             }
         }
@@ -1528,7 +1528,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public Force getForce(int id) {
-        return forceIds.get(new Integer(id));
+        return forceIds.get(Integer.valueOf(id));
     }
 
     public ArrayList<String> getCurrentReport() {
@@ -2948,7 +2948,7 @@ public class Campaign implements Serializable, ITechManager {
 
     public void removeForce(Force force) {
         int fid = force.getId();
-        forceIds.remove(new Integer(fid));
+        forceIds.remove(Integer.valueOf(fid));
         // clear forceIds of all personnel with this force
         for (UUID uid : force.getUnits()) {
             Unit u = getUnit(uid);
@@ -3930,8 +3930,9 @@ public class Campaign implements Serializable, ITechManager {
         long timestamp = System.currentTimeMillis();
 
         // loop through forces to set force id
-        for (int fid : retVal.forceIds.keySet()) {
-            Force f = retVal.forceIds.get(fid);
+        for (Map.Entry<Integer, Force> mf : retVal.forceIds.entrySet()) {
+            int fid = mf.getKey();
+            Force f = mf.getValue();
             Scenario s = retVal.getScenario(f.getScenarioId());
             if (null != s
                     && (null == f.getParentForce() || !f.getParentForce().isDeployed())) {
@@ -5827,10 +5828,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public ArrayList<Force> getAllForces() {
-        ArrayList<Force> allForces = new ArrayList<Force>();
-        for (int x : forceIds.keySet()) {
-            allForces.add(forceIds.get(x));
-        }
+        ArrayList<Force> allForces = new ArrayList<Force>(forceIds.values());
         return allForces;
     }
 
