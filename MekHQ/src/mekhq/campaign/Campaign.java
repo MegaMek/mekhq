@@ -248,8 +248,7 @@ public class Campaign implements Serializable, ITechManager {
     private ArrayList<Part> parts = new ArrayList<Part>();
     private Hashtable<Integer, Part> partIds = new Hashtable<Integer, Part>();
     private Hashtable<Integer, Force> forceIds = new Hashtable<Integer, Force>();
-    private ArrayList<Mission> missions = new ArrayList<Mission>();
-    private Hashtable<Integer, Mission> missionIds = new Hashtable<Integer, Mission>();
+    private Map<Integer, Mission> missions = new LinkedHashMap<>();
     private Hashtable<Integer, Scenario> scenarioIds = new Hashtable<Integer, Scenario>();
     private ArrayList<Kill> kills = new ArrayList<Kill>();
 
@@ -870,16 +869,14 @@ public class Campaign implements Serializable, ITechManager {
     public int addMission(Mission m) {
         int id = lastMissionId + 1;
         m.setId(id);
-        missions.add(m);
-        missionIds.put(new Integer(id), m);
+        missions.put(Integer.valueOf(id), m);
         lastMissionId = id;
         MekHQ.triggerEvent(new MissionNewEvent(m));
         return id;
     }
 
     private void addMissionWithoutId(Mission m) {
-        missions.add(m);
-        missionIds.put(new Integer(m.getId()), m);
+        missions.put(Integer.valueOf(m.getId()), m);
 
         if (m.getId() > lastMissionId) {
             lastMissionId = m.getId();
@@ -888,10 +885,10 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     /**
-     * @return an <code>ArrayList</code> of missions in the campaign
+     * @return an <code>Collection</code> of missions in the campaign
      */
-    public ArrayList<Mission> getMissions() {
-        return missions;
+    public Collection<Mission> getMissions() {
+        return missions.values();
     }
 
     /**
@@ -914,17 +911,14 @@ public class Campaign implements Serializable, ITechManager {
      * @return missions arraylist sorted with complete missions at the bottom
      */
     public ArrayList<Mission> getSortedMissions() {
-        ArrayList<Mission> msns = new ArrayList<Mission>();
-        for (Mission m : getMissions()) {
-            msns.add(m);
-        }
+        ArrayList<Mission> msns = new ArrayList<>(missions.values());
         Collections.sort(msns, new Comparator<Mission>() {
             @Override
             public int compare(final Mission m1, final Mission m2) {
-                return ((Comparable<Boolean>) m2.isActive()).compareTo(m1
-                        .isActive());
+                return Boolean.compare(m2.isActive(), m1.isActive());
             }
         });
+
         return msns;
     }
 
@@ -933,7 +927,7 @@ public class Campaign implements Serializable, ITechManager {
      * @return a <code>SupportTeam</code> object
      */
     public Mission getMission(int id) {
-        return missionIds.get(new Integer(id));
+        return missions.get(Integer.valueOf(id));
     }
 
     public Scenario getScenario(int id) {
@@ -2299,7 +2293,7 @@ public class Campaign implements Serializable, ITechManager {
     }
     
     private void processNewDayATBScenarios() {
-        for (Mission m : missions) {
+        for (Mission m : getMissions()) {
             if (!m.isActive() || !(m instanceof AtBContract) || getDate().before(((Contract) m).getStartDate())) {
                 continue;
             }
@@ -2353,7 +2347,7 @@ public class Campaign implements Serializable, ITechManager {
             AtBScenarioFactory.createScenariosForNewWeek(this, true);
         }
 
-        for (Mission m : missions) {
+        for (Mission m : getMissions()) {
             if (m.isActive() && m instanceof AtBContract && !((AtBContract) m).getStartDate().after(getDate())) {
                 ((AtBContract) m).checkEvents(this);
             }
@@ -2395,7 +2389,7 @@ public class Campaign implements Serializable, ITechManager {
 
     private void processNewDayATBFatigue() {
         boolean inContract = false;
-        for (Mission m : missions) {
+        for (Mission m : getMissions()) {
             if (!m.isActive() || !(m instanceof AtBContract) || getDate().before(((Contract) m).getStartDate())) {
                 continue;
             }
@@ -2486,7 +2480,7 @@ public class Campaign implements Serializable, ITechManager {
             IUnitRating rating = getUnitRating();
             rating.reInitialize();
 
-            for (Mission m : missions) {
+            for (Mission m : getMissions()) {
                 if (m.isActive() && m instanceof AtBContract && !((AtBContract) m).getStartDate().after(getDate())) {
                     ((AtBContract) m).checkMorale(calendar, getUnitRatingMod());
                     addReport("Enemy morale is now " + ((AtBContract) m).getMoraleLevelName() + " on contract "
@@ -2921,7 +2915,7 @@ public class Campaign implements Serializable, ITechManager {
 
     public void removeMission(int id) {
         Mission mission = getMission(id);
-        int idx = 0;
+
         // Loop through scenarios here! We need to remove them as well.
         if (null != mission) {
             for (Scenario scenario : mission.getScenarios()) {
@@ -2930,19 +2924,8 @@ public class Campaign implements Serializable, ITechManager {
             }
             mission.clearScenarios();
         }
-        idx = 0;
-        boolean mfound = false;
-        for (Mission m : getMissions()) {
-            if (m.getId() == id) {
-                mfound = true;
-                break;
-            }
-            idx++;
-        }
-        if (mfound) {
-            missions.remove(idx);
-        }
-        missionIds.remove(new Integer(id));
+
+        missions.remove(Integer.valueOf(id));
     }
 
     public void removePart(Part part) {
@@ -3491,7 +3474,7 @@ public class Campaign implements Serializable, ITechManager {
         writeArrayAndHashToXmlforUUID(pw1, 1, "personnel", personnel,
                 personnelIds); // Personnel
         writeMapToXml(pw1, 1, "ancestors", ancestors); // Ancestry trees
-        writeArrayAndHashToXml(pw1, 1, "missions", missions, missionIds); // Missions
+        writeMapToXml(pw1, 1, "missions", missions); // Missions
         // the forces structure is hierarchical, but that should be handled
         // internally
         // from with writeToXML function for Force
@@ -6634,7 +6617,7 @@ public class Campaign implements Serializable, ITechManager {
      */
     public int totalBonusParts() {
         int retVal = 0;
-        for (Mission m : missions) {
+        for (Mission m : getMissions()) {
             if (m.isActive() && m instanceof AtBContract) {
                 retVal += ((AtBContract) m).getNumBonusParts();
             }
@@ -6648,7 +6631,7 @@ public class Campaign implements Serializable, ITechManager {
          * If the unit is not assigned to a contract, use the least restrictive active
          * contract
          */
-        for (Mission m : missions) {
+        for (Mission m : getMissions()) {
             if (m.isActive() && m instanceof AtBContract) {
                 if (null == contract
                         || ((AtBContract) m).getPartsAvailabilityLevel() > contract.getPartsAvailabilityLevel()) {
@@ -9006,12 +8989,17 @@ public class Campaign implements Serializable, ITechManager {
 
     public void initAtB() {
         retirementDefectionTracker.setLastRetirementRoll(calendar);
-        for (int i = 0; i < missions.size(); i++) {
-            if (missions.get(i) instanceof Contract && !(missions.get(i) instanceof AtBContract)) {
-                missions.set(i, new AtBContract((Contract) missions.get(i), this));
-                missionIds.put(missions.get(i).getId(), missions.get(i));
+
+        /*
+         * Switch all contracts to AtBContract's
+         */
+        for (Map.Entry<Integer, Mission> me : missions.entrySet()) {
+            Mission m = me.getValue();
+            if (m instanceof Contract && !(m instanceof AtBContract)) {
+                me.setValue(new AtBContract((Contract)m, this));
             }
         }
+
         /*
          * Go through all the personnel records and assume the earliest date is the date
          * the unit was founded.
