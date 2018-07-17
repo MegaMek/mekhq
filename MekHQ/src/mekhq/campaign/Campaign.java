@@ -42,6 +42,7 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -243,8 +244,7 @@ public class Campaign implements Serializable, ITechManager {
     private Hashtable<UUID, Unit> unitIds = new Hashtable<UUID, Unit>();
     private ArrayList<Person> personnel = new ArrayList<Person>();
     private Hashtable<UUID, Person> personnelIds = new Hashtable<UUID, Person>();
-    private ArrayList<Ancestors> ancestors = new ArrayList<Ancestors>();
-    private Hashtable<UUID, Ancestors> ancestorsIds = new Hashtable<UUID, Ancestors>();
+    private Map<UUID, Ancestors> ancestors = new LinkedHashMap<>();
     private ArrayList<Part> parts = new ArrayList<Part>();
     private Hashtable<Integer, Part> partIds = new Hashtable<Integer, Part>();
     private Hashtable<Integer, Force> forceIds = new Hashtable<Integer, Force>();
@@ -1179,8 +1179,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     private void addAncestorsWithoutId(Ancestors a) {
-        ancestors.add(a);
-        ancestorsIds.put(a.getId(), a);
+        ancestors.put(a.getId(), a);
     }
 
     public void addPersonWithoutId(Person p, boolean log) {
@@ -1226,13 +1225,14 @@ public class Campaign implements Serializable, ITechManager {
         return activePersonnel;
     }
 
-    public ArrayList<Ancestors> getAncestors() {
-        return ancestors;
+    public Iterable<Ancestors> getAncestors() {
+        return ancestors.values();
     }
 
     /** @return a matching ancestors entry for the arguments, or null if there isn't any */
     public Ancestors getAncestors(UUID fatherID, UUID motherID) {
-        for(Ancestors a : ancestors) {
+        for(Map.Entry<UUID, Ancestors> m : ancestors.entrySet()) {
+            Ancestors a = m.getValue();
             if(Objects.equals(fatherID, a.getFatherID()) && Objects.equals(motherID, a.getMotherID())) {
                 return a;
             }
@@ -1281,13 +1281,12 @@ public class Campaign implements Serializable, ITechManager {
         if (id == null) {
             return null;
         }
-        return ancestorsIds.get(id);
+        return ancestors.get(id);
     }
 
     public Ancestors createAncestors(UUID father, UUID mother) {
         Ancestors na = new Ancestors(father, mother, this);
-        ancestorsIds.put(na.getId(), na);
-        ancestors.add(na);
+        ancestors.put(na.getId(), na);
         return na;
     }
 
@@ -3491,7 +3490,7 @@ public class Campaign implements Serializable, ITechManager {
         writeArrayAndHashToXmlforUUID(pw1, 1, "units", units, unitIds); // Units
         writeArrayAndHashToXmlforUUID(pw1, 1, "personnel", personnel,
                 personnelIds); // Personnel
-        writeArrayAndHashToXmlforUUID(pw1, 1, "ancestors", ancestors, ancestorsIds); // Ancestry trees
+        writeMapToXml(pw1, 1, "ancestors", ancestors); // Ancestry trees
         writeArrayAndHashToXml(pw1, 1, "missions", missions, missionIds); // Missions
         // the forces structure is hierarchical, but that should be handled
         // internally
@@ -3645,6 +3644,27 @@ public class Campaign implements Serializable, ITechManager {
         for (UUID x : hashtab.keySet()) {
             ((MekHqXmlSerializable) (hashtab.get(x))).writeToXml(pw1,
                     indent + 1);
+        }
+
+        pw1.println(MekHqXmlUtil.indentStr(indent) + "</" + tag + ">");
+    }
+    
+    /**
+     * A helper function to encapsulate writing the map entries out to XML.
+     *
+     * @param <keyType> The key type of the map.
+     * @param <arrType> The object type of the map. Must implement MekHqXmlSerializable.
+     * @param pw1       The PrintWriter to output XML to.
+     * @param indent    The indentation level to use for writing XML (purely for neatness).
+     * @param tag       The name of the tag to use to encapsulate it.
+     * @param map       The map of objects to write out.
+     */
+    private <keyType, valueType extends MekHqXmlSerializable> void writeMapToXml(PrintWriter pw1,
+            int indent, String tag, Map<keyType, valueType> map) {
+        pw1.println(MekHqXmlUtil.indentStr(indent) + "<" + tag + ">");
+
+        for (Map.Entry<keyType, valueType> x : map.entrySet()) {
+            x.getValue().writeToXml(pw1, indent + 1);
         }
 
         pw1.println(MekHqXmlUtil.indentStr(indent) + "</" + tag + ">");
