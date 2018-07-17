@@ -2735,6 +2735,12 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public long getPayRoll(boolean noInfantry) {
+        if(!campaignOptions.payForSalaries()) return 0;
+
+        return getTheoreticalPayroll(noInfantry);
+    }
+
+    private long getTheoreticalPayroll(boolean noInfantry){
         long salaries = 0;
         for (Person p : personnel) {
             // Optionized infantry (Unofficial)
@@ -2757,9 +2763,11 @@ public class Campaign implements Serializable, ITechManager {
 
     public long getMaintenanceCosts() {
         long costs = 0;
-        for (Unit u : units) {
-            if (u.requiresMaintenance() && null != u.getTech()) {
-                costs += u.getMaintenanceCost();
+        if(campaignOptions.payForMaintain()) {
+            for (Unit u : units) {
+                if (u.requiresMaintenance() && null != u.getTech()) {
+                    costs += u.getMaintenanceCost();
+                }
             }
         }
         return costs;
@@ -2774,7 +2782,9 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public long getOverheadExpenses() {
-        return (long) (getPayRoll() * 0.05);
+        if(!campaignOptions.payForOverhead()) return 0;
+
+        return (long) (getTheoreticalPayroll(false) * 0.05);
     }
 
     public void clearAllUnits() {
@@ -7880,7 +7890,7 @@ public class Campaign implements Serializable, ITechManager {
         } else if (getCampaignOptions().useEquipmentContractBase()) {
             return getForceValue(getCampaignOptions().useInfantryDontCount());
         } else {
-            return getPayRoll(getCampaignOptions().useInfantryDontCount());
+            return getTheoreticalPayroll(getCampaignOptions().useInfantryDontCount());
         }
     }
 
