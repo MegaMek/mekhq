@@ -242,8 +242,7 @@ public class Campaign implements Serializable, ITechManager {
     // to create an arraylist on demand
     private ArrayList<Unit> units = new ArrayList<Unit>();
     private Hashtable<UUID, Unit> unitIds = new Hashtable<UUID, Unit>();
-    private ArrayList<Person> personnel = new ArrayList<Person>();
-    private Hashtable<UUID, Person> personnelIds = new Hashtable<UUID, Person>();
+    private Map<UUID, Person> personnel = new LinkedHashMap<>();
     private Map<UUID, Ancestors> ancestors = new LinkedHashMap<>();
     private ArrayList<Part> parts = new ArrayList<Part>();
     private Hashtable<Integer, Part> partIds = new Hashtable<Integer, Part>();
@@ -1120,12 +1119,12 @@ public class Campaign implements Serializable, ITechManager {
             }
         }
         UUID id = UUID.randomUUID();
-        while (null != personnelIds.get(id)) {
+        while (null != personnel.get(id)) {
             id = UUID.randomUUID();
         }
         p.setId(id);
-        personnel.add(p);
-        personnelIds.put(id, p);
+        personnel.put(id, p);
+
         //TODO: implement a boolean check based on campaign options
         boolean bondsman = false;
         String add = prisoner == true ? " as a prisoner" : bondsman == true ? " as a bondsman" : "";
@@ -1167,8 +1166,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     private void addPersonWithoutId(Person p) {
-        personnel.add(p);
-        personnelIds.put(p.getId(), p);
+        personnel.put(p.getId(), p);
         MekHQ.triggerEvent(new PersonNewEvent(p));
     }
 
@@ -1177,7 +1175,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public void addPersonWithoutId(Person p, boolean log) {
-        while((null == p.getId()) || (null != personnelIds.get(p.getId()))) {
+        while((null == p.getId()) || (null != personnel.get(p.getId()))) {
             p.setId(UUID.randomUUID());
         }
         addPersonWithoutId(p);
@@ -1203,8 +1201,8 @@ public class Campaign implements Serializable, ITechManager {
         return calendar.getTime();
     }
 
-    public ArrayList<Person> getPersonnel() {
-        return personnel;
+    public Collection<Person> getPersonnel() {
+        return personnel.values();
     }
 
     /**
@@ -1268,7 +1266,7 @@ public class Campaign implements Serializable, ITechManager {
         if (id == null) {
             return null;
         }
-        return personnelIds.get(id);
+        return personnel.get(id);
     }
 
     public Ancestors getAncestors(UUID id) {
@@ -1836,7 +1834,7 @@ public class Campaign implements Serializable, ITechManager {
         if (skill.equals(CampaignOptions.S_AUTO)) {
             return admin;
         } else if (skill.equals(CampaignOptions.S_TECH)) {
-            for (Person p : personnel) {
+            for (Person p : getPersonnel()) {
                 if (getCampaignOptions().isAcquisitionSupportStaffOnly()
                         && !p.isSupport()) {
                     continue;
@@ -1851,7 +1849,7 @@ public class Campaign implements Serializable, ITechManager {
                 }
             }
         } else {
-            for (Person p : personnel) {
+            for (Person p : getPersonnel()) {
                 if (getCampaignOptions().isAcquisitionSupportStaffOnly()
                         && !p.isSupport()) {
                     continue;
@@ -2443,7 +2441,7 @@ public class Campaign implements Serializable, ITechManager {
         if (calendar.get(Calendar.DAY_OF_YEAR) == 1) {
             int numPersonnel = 0;
             ArrayList<Person> dependents = new ArrayList<Person>();
-            for (Person p : personnel) {
+            for (Person p : getPersonnel()) {
                 if (p.isActive()) {
                     numPersonnel++;
                     if (p.isDependent()) {
@@ -2738,7 +2736,7 @@ public class Campaign implements Serializable, ITechManager {
 
     public long getPayRoll(boolean noInfantry) {
         long salaries = 0;
-        for (Person p : personnel) {
+        for (Person p : getPersonnel()) {
             // Optionized infantry (Unofficial)
             if (noInfantry && p.getPrimaryRole() == Person.T_INFANTRY) {
                 continue;
@@ -2838,8 +2836,7 @@ public class Campaign implements Serializable, ITechManager {
                     + " has been removed from the personnel roster.");
         }
 
-        personnel.remove(person);
-        personnelIds.remove(id);
+        personnel.remove(id);
         if (person.getPrimaryRole() == Person.T_ASTECH) {
             astechPoolMinutes = Math.max(0, astechPoolMinutes - 480);
             astechPoolOvertime = Math.max(0, astechPoolOvertime - 240);
@@ -2869,7 +2866,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public void removeAllPatientsFor(Person doctor) {
-        for (Person p : personnel) {
+        for (Person p : getPersonnel()) {
             if (null != p.getDoctorId()
                     && p.getDoctorId().equals(doctor.getId())) {
                 p.setDoctorId(null, getCampaignOptions()
@@ -3471,8 +3468,7 @@ public class Campaign implements Serializable, ITechManager {
 
         // Lists of objects:
         writeArrayAndHashToXmlforUUID(pw1, 1, "units", units, unitIds); // Units
-        writeArrayAndHashToXmlforUUID(pw1, 1, "personnel", personnel,
-                personnelIds); // Personnel
+        writeMapToXml(pw1, 1, "personnel", personnel); // Personnel
         writeMapToXml(pw1, 1, "ancestors", ancestors); // Ancestry trees
         writeMapToXml(pw1, 1, "missions", missions); // Missions
         // the forces structure is hierarchical, but that should be handled
@@ -4104,9 +4100,7 @@ public class Campaign implements Serializable, ITechManager {
         timestamp = System.currentTimeMillis();
 
         // All personnel need the rank reference fixed
-        for (int x = 0; x < retVal.personnel.size(); x++) {
-            Person psn = retVal.personnel.get(x);
-
+        for (Person psn : retVal.getPersonnel()) {
             // skill types might need resetting
             psn.resetSkillTypes();
 
@@ -4406,14 +4400,14 @@ public class Campaign implements Serializable, ITechManager {
         for (Unit u : retVal.units) {
             uHash.put(u.getOldId(), u.getId());
         }
-        for (Person p : retVal.personnel) {
+        for (Person p : retVal.getPersonnel()) {
             pHash.put(p.getOldId(), p.getId());
         }
         // ok now go through and fix
         for (Unit u : retVal.units) {
             u.fixIdReferences(uHash, pHash);
         }
-        for (Person p : retVal.personnel) {
+        for (Person p : retVal.getPersonnel()) {
             p.fixIdReferences(uHash, pHash);
         }
         retVal.forces.fixIdReferences(uHash);
@@ -8960,7 +8954,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public void initTimeInService() {
-        for (Person p : personnel) {
+        for (Person p : getPersonnel()) {
             Date join = null;
             for (LogEntry e : p.getPersonnelLog()) {
                 if (join == null){
@@ -9005,7 +8999,7 @@ public class Campaign implements Serializable, ITechManager {
          * the unit was founded.
          */
         Date founding = null;
-        for (Person p : personnel) {
+        for (Person p : getPersonnel()) {
             for (LogEntry e : p.getPersonnelLog()) {
                 if (null == founding || e.getDate().before(founding)) {
                     founding = e.getDate();
@@ -9018,7 +9012,7 @@ public class Campaign implements Serializable, ITechManager {
          * that MWs assigned to a non-Assault 'Mech on the date they joined came with
          * that 'Mech (which is a less certain assumption)
          */
-        for (Person p : personnel) {
+        for (Person p : getPersonnel()) {
             Date join = null;
             for (LogEntry e : p.getPersonnelLog()) {
                 if (e.getDesc().startsWith("Joined ")) {
