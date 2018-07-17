@@ -313,6 +313,10 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
         return advanceAmount;
     }
 
+
+    /**
+     * @return total amount that will be paid on contract acception.
+     */
     public long getTotalAdvanceAmount() {
         return advanceAmount + signingAmount;
     }
@@ -381,6 +385,10 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
         return (getTotalAmountPlusFeesAndBonuses() - getTotalAdvanceAmount()) / getLength();
     }
 
+    /**
+     * @param c campaign loaded
+     * @return the cumulative sum the estimated monthly incomes - expenses
+     */
     public long getTotalMonthlyPayOut(Campaign c){
         return (getMonthlyPayOut()*getLength())
                 + getTotalEstimatedOverheadExpenses(c)
@@ -414,19 +422,35 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
         return 0;
     }
 
+    /**
+     * @param c campaign loaded
+     * @return the approximate number of months for a 2-way trip + deployment, rounded up
+     */
     public int getLengthPlusTravel(Campaign c) {
         int travelMonths = (int) Math.ceil(2 * getTravelDays(c) / 30.0);
         return getLength() + travelMonths;
     }
 
+    /**
+     * @param c campaign loaded
+     * @return the cumulative sum of estimated overhead expenses for the duration of travel + deployment
+     */
     public long getTotalEstimatedOverheadExpenses(Campaign c){
         return c.getOverheadExpenses() * getLengthPlusTravel(c);
     }
 
+    /**
+     * @param c campaign loaded
+     * @return the cumulative sum of estimated maintenance expenses for the duration of travel + deployment
+     */
     public long getTotalEstimatedMaintenanceExpenses(Campaign c){
         return c.getMaintenanceCosts() * getLengthPlusTravel(c);
     }
 
+    /**
+     * @param c campaign loaded
+     * @return the estimated payroll expenses for one month
+     */
     public long getEstimatedPayrollExpenses(Campaign c){
         if (c.getCampaignOptions().usePeacetimeCost()) {
             return c.getPeacetimeCost();
@@ -435,10 +459,18 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
         }
     }
 
+    /**
+     * @param c campaign loaded
+     * @return the cumulative sum of estimated payroll expenses for the duration of travel + deployment
+     */
     public long getTotalEstimatedPayrollExpenses(Campaign c){
          return getEstimatedPayrollExpenses(c) * getLengthPlusTravel(c);
     }
 
+    /**
+     * @param c campaign loaded
+     * @return the total (2-way) estimated transportation fee from the player's current location to this contract's planet
+     */
     public long getTotalTransportationFees(Campaign c){
         if(null != getPlanet() && c.getCampaignOptions().payForTransport()) {
             JumpPath jumpPath = c.calculateJumpPath(c.getCurrentPlanet(), getPlanet());

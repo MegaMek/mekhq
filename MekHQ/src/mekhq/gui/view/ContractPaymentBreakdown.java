@@ -10,6 +10,12 @@ import java.awt.event.FocusListener;
 import java.text.DecimalFormat;
 import java.util.ResourceBundle;
 
+/**
+ * Contract payment breakdown, showing all incomes and expenses, finishing with the estimated profit.
+ *
+ * @author Miguel Azevedo
+ *
+ */
 public class ContractPaymentBreakdown {
     private JPanel mainPanel;
     private Campaign campaign;
@@ -40,6 +46,12 @@ public class ContractPaymentBreakdown {
     private JLabel lblTransportationExpenses2;
     private JLabel lblEstimatedProfit2;
 
+
+    /**
+     * @param mainPanel panel where the elements will be appended
+     * @param contract that it is displaying
+     * @param campaign loaded
+     */
     public ContractPaymentBreakdown(JPanel mainPanel, Contract contract, Campaign campaign) {
         this.mainPanel = mainPanel;
         this.campaign = campaign;
@@ -47,8 +59,11 @@ public class ContractPaymentBreakdown {
         resourceMap = ResourceBundle.getBundle("mekhq.resources.ContractPaymentBreakdown", new EncodeControl()); //$NON-NLS-1$
     }
 
+    /**
+     * Draws and fill all the elements for the contract payment breakdown
+     * @param y gbc.gridy, in case it is appending to an existing grid
+     */
     public void display(int y){
-
     Font f;
     GridBagConstraints gridBagConstraints;
 
@@ -85,7 +100,7 @@ public class ContractPaymentBreakdown {
     gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
     gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-		mainPanel.add(lblBaseAmount1, gridBagConstraints);
+        mainPanel.add(lblBaseAmount1, gridBagConstraints);
     lblBaseAmount2 = new JLabel();
     setLblBaseAmount2();
     gridBagConstraints = new java.awt.GridBagConstraints();
@@ -96,7 +111,7 @@ public class ContractPaymentBreakdown {
     gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
     gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-		mainPanel.add(lblBaseAmount2, gridBagConstraints);
+        mainPanel.add(lblBaseAmount2, gridBagConstraints);
 
     JLabel lblOverheadAmount1 = new JLabel(identation + resourceMap.getString("lblOverheadAmount1.text"));
     gridBagConstraints = new java.awt.GridBagConstraints();
@@ -107,7 +122,7 @@ public class ContractPaymentBreakdown {
     gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
     gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-		mainPanel.add(lblOverheadAmount1, gridBagConstraints);
+        mainPanel.add(lblOverheadAmount1, gridBagConstraints);
     lblOverheadAmount2 = new JLabel();
     setLblOverheadAmount2();
     gridBagConstraints = new java.awt.GridBagConstraints();
@@ -117,7 +132,7 @@ public class ContractPaymentBreakdown {
     gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
     gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-		mainPanel.add(lblOverheadAmount2, gridBagConstraints);
+        mainPanel.add(lblOverheadAmount2, gridBagConstraints);
 
     JLabel lblSupportAmount1 = new JLabel(identation + resourceMap.getString("lblSupportAmount1.text"));
     gridBagConstraints = new java.awt.GridBagConstraints();
@@ -128,7 +143,7 @@ public class ContractPaymentBreakdown {
     gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
     gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-		mainPanel.add(lblSupportAmount1, gridBagConstraints);
+        mainPanel.add(lblSupportAmount1, gridBagConstraints);
     lblSupportAmount2 = new JLabel();
     setLblSupportAmount2();
     gridBagConstraints = new java.awt.GridBagConstraints();
@@ -139,7 +154,7 @@ public class ContractPaymentBreakdown {
     gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
     gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-		mainPanel.add(lblSupportAmount2, gridBagConstraints);
+        mainPanel.add(lblSupportAmount2, gridBagConstraints);
 
     JLabel lblTransportAmount1 = new JLabel(identation + resourceMap.getString("lblTransportAmount1.text"));
     gridBagConstraints = new java.awt.GridBagConstraints();
@@ -150,7 +165,7 @@ public class ContractPaymentBreakdown {
     gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
     gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-		mainPanel.add(lblTransportAmount1, gridBagConstraints);
+        mainPanel.add(lblTransportAmount1, gridBagConstraints);
     lblTransportAmount2 = new JLabel();
     setLblTransportAmount2();
     gridBagConstraints = new java.awt.GridBagConstraints();
@@ -161,7 +176,7 @@ public class ContractPaymentBreakdown {
     gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
     gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-		mainPanel.add(lblTransportAmount2, gridBagConstraints);
+        mainPanel.add(lblTransportAmount2, gridBagConstraints);
 
     JLabel lblTransitAmount1 = new JLabel(identation + resourceMap.getString("lblTransitAmount1.text"));
     gridBagConstraints = new java.awt.GridBagConstraints();
@@ -262,7 +277,7 @@ public class ContractPaymentBreakdown {
     gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
     gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-		mainPanel.add(lblSignBonusAmount1, gridBagConstraints);
+        mainPanel.add(lblSignBonusAmount1, gridBagConstraints);
     lblSignBonusAmount2 = new JLabel();
     setLblSignBonusAmount2();
     gridBagConstraints = new java.awt.GridBagConstraints();
@@ -273,7 +288,7 @@ public class ContractPaymentBreakdown {
     gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
     gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-		mainPanel.add(lblSignBonusAmount2, gridBagConstraints);
+        mainPanel.add(lblSignBonusAmount2, gridBagConstraints);
 
     JLabel lblMonthlyCashflow1 = new JLabel(resourceMap.getString("lblMonthlyCashflow.text"));
     f = lblMonthlyCashflow1.getFont();
@@ -418,7 +433,7 @@ public class ContractPaymentBreakdown {
 
     JLabel lblTransportationExpenses1 = new JLabel(resourceMap.getString("lblTransportationExpenses.text"));
     f = lblTransportationExpenses1.getFont();
-		lblTransportationExpenses1.setFont(f.deriveFont(f.getStyle() ^ Font.BOLD));
+        lblTransportationExpenses1.setFont(f.deriveFont(f.getStyle() ^ Font.BOLD));
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = y;
@@ -427,7 +442,7 @@ public class ContractPaymentBreakdown {
     gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
     gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-		mainPanel.add(lblTransportationExpenses1, gridBagConstraints);
+        mainPanel.add(lblTransportationExpenses1, gridBagConstraints);
     lblTransportationExpenses2 = new JLabel();
     setLblTransportationExpenses2();
     gridBagConstraints = new java.awt.GridBagConstraints();
@@ -438,11 +453,11 @@ public class ContractPaymentBreakdown {
     gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
     gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-		mainPanel.add(lblTransportationExpenses2, gridBagConstraints);
+        mainPanel.add(lblTransportationExpenses2, gridBagConstraints);
 
     JLabel lblEstimatedProfit1 = new JLabel(resourceMap.getString("lblEstimatedProfit.text"));
     f = lblEstimatedProfit1.getFont();
-		lblEstimatedProfit1.setFont(f.deriveFont(f.getStyle() ^ Font.BOLD));
+        lblEstimatedProfit1.setFont(f.deriveFont(f.getStyle() ^ Font.BOLD));
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = y;
@@ -451,7 +466,7 @@ public class ContractPaymentBreakdown {
     gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
     gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-		mainPanel.add(lblEstimatedProfit1, gridBagConstraints);
+        mainPanel.add(lblEstimatedProfit1, gridBagConstraints);
     lblEstimatedProfit2 = new JLabel();
     setLblEstimatedProfit2();
     gridBagConstraints = new java.awt.GridBagConstraints();
@@ -462,9 +477,12 @@ public class ContractPaymentBreakdown {
     gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
     gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-		mainPanel.add(lblEstimatedProfit2, gridBagConstraints);
+        mainPanel.add(lblEstimatedProfit2, gridBagConstraints);
     }
 
+    /**
+     * Rrefreshes all of the values
+     */
     public void refresh() {
         setLblBaseAmount2();
         setLblOverheadAmount2();
@@ -489,15 +507,6 @@ public class ContractPaymentBreakdown {
         setLblTransportationExpenses2();
 
         setLblEstimatedProfit2();
-    }
-
-    public void addFocusListenerToContractValueLabels(FocusListener focusListener){
-        lblBaseAmount2.addFocusListener(focusListener);
-        lblOverheadAmount2.addFocusListener(focusListener);
-        lblSupportAmount2.addFocusListener(focusListener);
-        lblTransportAmount2.addFocusListener(focusListener);
-        lblTransitAmount2.addFocusListener(focusListener);
-        lblTransportationExpenses2.addFocusListener(focusListener);
     }
 
     private void setLblBaseAmount2() {
@@ -525,7 +534,8 @@ public class ContractPaymentBreakdown {
     }
 
     private void setLblAdvanceNetIncome1(){
-        lblAdvanceNetIncome1.setText(identation + contract.getAdvancePct() + "% " + resourceMap.getString("lblOfNetIncome.text") + ":");
+        lblAdvanceNetIncome1.setText(identation + contract.getAdvancePct() + "% "
+                + resourceMap.getString("lblOfNetIncome.text") + ":");
     }
 
     private void setLblAdvanceNetIncome2(){
@@ -537,27 +547,33 @@ public class ContractPaymentBreakdown {
     }
 
     private void setLblMonthlyNetIncome1() {
-        lblMonthlyNetIncome1.setText(identation + (100 - contract.getAdvancePct()) + "% " + resourceMap.getString("lblOfNetIncome.text") + ":");
+        lblMonthlyNetIncome1.setText(identation + (100 - contract.getAdvancePct()) + "% "
+                + resourceMap.getString("lblOfNetIncome.text") + ":");
     }
 
     private void setLblMonthlyNetIncome2(){
-        lblMonthlyNetIncome2.setText(contract.getLength() + "x " + formatter.format(contract.getMonthlyPayOut()));
+        lblMonthlyNetIncome2.setText(contract.getLength() + "x "
+                + formatter.format(contract.getMonthlyPayOut()));
     }
 
     private void setLblFeeAmount2(){
-        lblFeeAmount2.setText(contract.getLength() + "x " + "-" + formatter.format(contract.getFeeAmount()/ (long)contract.getLength()));
+        lblFeeAmount2.setText(contract.getLength() + "x " + "-"
+                + formatter.format(contract.getFeeAmount()/ (long)contract.getLength()));
     }
 
     private void setLblOverheadExp2(){
-        lblOverheadExp2.setText(contract.getLengthPlusTravel(campaign) + "x " + "-" + formatter.format(campaign.getOverheadExpenses()));
+        lblOverheadExp2.setText(contract.getLengthPlusTravel(campaign) + "x "
+                + "-" + formatter.format(campaign.getOverheadExpenses()));
     }
 
     private void setLblMaintenanceExp2(){
-        lblMaintenanceExp2.setText(contract.getLengthPlusTravel(campaign) + "x " + "-" + formatter.format(campaign.getMaintenanceCosts()));
+        lblMaintenanceExp2.setText(contract.getLengthPlusTravel(campaign) + "x "
+                + "-" + formatter.format(campaign.getMaintenanceCosts()));
     }
 
     private void setLblPayrollExp2(){
-        lblPayrollExp2.setText(contract.getLengthPlusTravel(campaign) + "x " + "-" +formatter.format(contract.getEstimatedPayrollExpenses(campaign)));
+        lblPayrollExp2.setText(contract.getLengthPlusTravel(campaign) + "x "
+                + "-" +formatter.format(contract.getEstimatedPayrollExpenses(campaign)));
     }
 
     private void setLblTotalAdvanceMoney2(){

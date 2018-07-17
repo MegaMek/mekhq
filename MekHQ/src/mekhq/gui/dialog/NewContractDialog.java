@@ -345,7 +345,6 @@ public class NewContractDialog extends javax.swing.JDialog {
 	protected void initPaymentBreakdownPanel(JPanel totalsPanel) {
         contractPaymentBreakdown = new ContractPaymentBreakdown(totalsPanel, contract, campaign);
         contractPaymentBreakdown.display(0);
-        contractPaymentBreakdown.addFocusListenerToContractValueLabels(contractUpdateFocusListener);
 	}
 
 	protected void initContractPanel(ResourceBundle resourceMap,
@@ -764,19 +763,6 @@ public class NewContractDialog extends javax.swing.JDialog {
     protected JSpinner spnSignBonus;
     protected JSpinner spnAdvance;
     protected JCheckBox checkMRBC;
-
-    protected javax.swing.JLabel lblBaseAmount2;
-    protected javax.swing.JLabel lblOverheadAmount2;
-    protected javax.swing.JLabel lblSupportAmount2;
-    protected javax.swing.JLabel lblTransitAmount2;
-    protected javax.swing.JLabel lblTransportAmount2;
-    protected javax.swing.JLabel lblTotalAmount2;
-    protected javax.swing.JLabel lblSignBonusAmount2;
-    protected javax.swing.JLabel lblFeeAmount2;
-    protected javax.swing.JLabel lblTotalAmountPlus2;
-    protected javax.swing.JLabel lblAdvanceMoney2;
-    protected javax.swing.JLabel lblMonthlyAmount2;
-    protected javax.swing.JLabel lblProfit2;
 
     protected FocusListener contractUpdateFocusListener = new FocusListener() {
         @Override
