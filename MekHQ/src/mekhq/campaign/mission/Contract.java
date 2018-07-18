@@ -557,7 +557,7 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
         }
 
         //calculate transportation costs
-        if (null != getPlanet()) {
+        if (null != getPlanet() && c.getCampaignOptions().payForTransport()) {
             JumpPath jumpPath = c.calculateJumpPath(c.getCurrentPlanet(), getPlanet());
 
             // FM:Mercs transport payments take into account owned transports and do not use CampaignOps dropship costs.
