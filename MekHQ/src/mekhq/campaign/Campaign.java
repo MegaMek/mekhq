@@ -244,8 +244,7 @@ public class Campaign implements Serializable, ITechManager {
     private Hashtable<UUID, Unit> unitIds = new Hashtable<UUID, Unit>();
     private Map<UUID, Person> personnel = new LinkedHashMap<>();
     private Map<UUID, Ancestors> ancestors = new LinkedHashMap<>();
-    private ArrayList<Part> parts = new ArrayList<Part>();
-    private Hashtable<Integer, Part> partIds = new Hashtable<Integer, Part>();
+    private Map<Integer, Part> parts = new LinkedHashMap<>();
     private Map<Integer, Force> forceIds = new LinkedHashMap<>();
     private Map<Integer, Mission> missions = new LinkedHashMap<>();
     private Map<Integer, Scenario> scenarios = new LinkedHashMap<>();
@@ -1327,8 +1326,7 @@ public class Campaign implements Serializable, ITechManager {
                 return;
             }
         }
-        parts.add(p);
-        partIds.put(new Integer(id), p);
+        parts.put(Integer.valueOf(id), p);
         MekHQ.triggerEvent(new PartNewEvent(p));
     }
 
@@ -1408,8 +1406,7 @@ public class Campaign implements Serializable, ITechManager {
                 }
             }
         }
-        parts.add(p);
-        partIds.put(p.getId(), p);
+        parts.put(p.getId(), p);
 
         if (p.getId() > lastPartId) {
             lastPartId = p.getId();
@@ -1420,8 +1417,8 @@ public class Campaign implements Serializable, ITechManager {
     /**
      * @return an <code>ArrayList</code> of SupportTeams in the campaign
      */
-    public ArrayList<Part> getParts() {
-        return parts;
+    public Collection<Part> getParts() {
+        return parts.values();
     }
 
     private int getQuantity(Part p) {
@@ -1471,7 +1468,7 @@ public class Campaign implements Serializable, ITechManager {
         piu.setStoreCount(0);
         piu.setTransferCount(0);
         piu.setPlannedCount(0);
-        for(Part p : parts) {
+        for(Part p : getParts()) {
             PartInUse newPiu = getPartInUse(p);
             if(piu.equals(newPiu)) {
                 updatePartInUseData(piu, p);
@@ -1490,7 +1487,7 @@ public class Campaign implements Serializable, ITechManager {
     public Set<PartInUse> getPartsInUse() {
         // java.util.Set doesn't supply a get(Object) method, so we have to use a java.util.Map
         Map<PartInUse, PartInUse> inUse = new HashMap<PartInUse, PartInUse>();
-        for(Part p : parts) {
+        for(Part p : getParts()) {
             PartInUse piu = getPartInUse(p);
             if(null == piu) {
                 continue;
@@ -1524,7 +1521,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public Part getPart(int id) {
-        return partIds.get(new Integer(id));
+        return parts.get(Integer.valueOf(id));
     }
 
     public Force getForce(int id) {
@@ -2887,7 +2884,7 @@ public class Campaign implements Serializable, ITechManager {
                 u.getRefit().setTeamId(null);
             }
         }
-        for (Part p : parts) {
+        for (Part p : getParts()) {
             if (tech.getId().equals(p.getTeamId())) {
                 p.setTeamId(null);
             }
@@ -2930,8 +2927,7 @@ public class Campaign implements Serializable, ITechManager {
             // if this is a test unit, then we won't remove the part because its not there
             return;
         }
-        parts.remove(part);
-        partIds.remove(new Integer(part.getId()));
+        parts.remove(Integer.valueOf(part.getId()));
         //remove child parts as well
         for(int childId : part.getChildPartIds()) {
             Part childPart = getPart(childId);
@@ -3500,7 +3496,7 @@ public class Campaign implements Serializable, ITechManager {
         pw1.println("\t</specialAbilities>");
         rskillPrefs.writeToXml(pw1, 1);
         // parts is the biggest so it goes last
-        writeArrayAndHashToXml(pw1, 1, "parts", parts, partIds); // Parts
+        writeMapToXml(pw1, 1, "parts", parts); // Parts
 
         writeGameOptions(pw1);
 
@@ -3958,8 +3954,7 @@ public class Campaign implements Serializable, ITechManager {
         // Process parts...
         ArrayList<Part> spareParts = new ArrayList<Part>();
         ArrayList<Part> removeParts = new ArrayList<Part>();
-        for (int x = 0; x < retVal.parts.size(); x++) {
-            Part prt = retVal.parts.get(x);
+        for (Part prt : retVal.getParts()) {
             Unit u = retVal.getUnit(prt.getUnitId());
             prt.setUnit(u);
             if (null != u) {
@@ -4412,7 +4407,7 @@ public class Campaign implements Serializable, ITechManager {
             p.fixIdReferences(uHash, pHash);
         }
         retVal.forces.fixIdReferences(uHash);
-        for (Part p : retVal.parts) {
+        for (Part p : retVal.getParts()) {
             p.fixIdReferences(uHash, pHash);
         }
         ArrayList<Kill> ghostKills = new ArrayList<Kill>();

@@ -73,7 +73,7 @@ public class PayCollateralDialog extends JDialog {
     
     private ArrayList<JCheckBox> unitBoxes;
     private ArrayList<JCheckBox> assetBoxes;
-    private ArrayList<JSlider> partSliders;
+    private Map<JSlider, Integer> partSliders;
     private JProgressBar barAmount;
     private JButton btnPay;
     private JButton btnDontPay;
@@ -150,12 +150,13 @@ public class PayCollateralDialog extends JDialog {
         scrUnits.setMinimumSize(new java.awt.Dimension(400, 300));
         scrUnits.setPreferredSize(new java.awt.Dimension(400, 300));
                 
-        partSliders = new ArrayList<JSlider>();
+        partSliders = new LinkedHashMap<>();
         JPanel pnlParts = new JPanel(new GridBagLayout());
         i = 0;
         j = 0;
         JSlider partSlider;
-        for(Part p : campaign.getSpareParts()) {
+        ArrayList<Part> spareParts = campaign.getSpareParts();
+        for(Part p : spareParts) {
             j++;
             int quantity = p.getQuantity();
             if(p instanceof AmmoStorage) {
@@ -176,7 +177,7 @@ public class PayCollateralDialog extends JDialog {
                 }
             });
             partSlider.setEnabled(p.isPresent() && !p.isReservedForRefit() && !p.isReservedForReplacement());
-            partSliders.add(partSlider);
+            partSliders.put(partSlider, p.getId());
             gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = i;
@@ -185,7 +186,7 @@ public class PayCollateralDialog extends JDialog {
             gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
             gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
             gridBagConstraints.weightx = 0.0;
-            if(j == campaign.getSpareParts().size()) {
+            if(j == spareParts.size()) {
                 gridBagConstraints.weighty = 1.0;
             }
             pnlParts.add(partSlider, gridBagConstraints);
@@ -300,10 +301,11 @@ public class PayCollateralDialog extends JDialog {
                 amount += campaign.getUnits().get(i).getSellValue();
             }
         }
-        for(int i = 0; i < partSliders.size(); i++) {
-            int quantity = partSliders.get(i).getValue();
+
+        for (Map.Entry<JSlider, Integer> m : partSliders.entrySet()) {
+            int quantity = m.getKey().getValue();
             if(quantity > 0) {
-                amount += campaign.getSpareParts().get(i).getCurrentValue() * quantity;
+                amount += campaign.getPart(m.getValue()).getCurrentValue() * quantity;
             }
             
         }
@@ -336,10 +338,10 @@ public class PayCollateralDialog extends JDialog {
     
     public ArrayList<int[]> getParts() {
         ArrayList<int[]> parts = new ArrayList<int[]>();
-        for(int i = 0; i < partSliders.size(); i++) {
-            int quantity = partSliders.get(i).getValue();
+        for (Map.Entry<JSlider, Integer> m : partSliders.entrySet()) {
+            int quantity = m.getKey().getValue();
             if(quantity > 0) {
-                int[] array = {campaign.getSpareParts().get(i).getId(), quantity};
+                int[] array = {m.getValue(), quantity};
                 parts.add(array);
             }
         }
