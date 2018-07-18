@@ -141,6 +141,7 @@ import mekhq.gui.dialog.DataLoadingDialog;
 import mekhq.gui.dialog.GMToolsDialog;
 import mekhq.gui.dialog.HireBulkPersonnelDialog;
 import mekhq.gui.dialog.MaintenanceReportDialog;
+import mekhq.gui.dialog.MassMothballDialog;
 import mekhq.gui.dialog.MekHQAboutBox;
 import mekhq.gui.dialog.MercRosterDialog;
 import mekhq.gui.dialog.NewRecruitDialog;
@@ -282,6 +283,11 @@ public class CampaignGUI extends JPanel {
     public void showGMToolsDialog() {
         GMToolsDialog gmTools = new GMToolsDialog(getFrame(), this);
         gmTools.setVisible(true);
+    }
+    
+    public void showMassMothballDialog(Unit[] units, boolean activate) {
+        MassMothballDialog mothballDialog = new MassMothballDialog(getFrame(), units, getCampaign(), activate);
+        mothballDialog.setVisible(true);
     }
 
     public void showAdvanceDaysDialog() {

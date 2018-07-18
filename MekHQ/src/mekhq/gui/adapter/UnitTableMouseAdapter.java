@@ -62,6 +62,9 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
     private CampaignGUI gui;
     private JTable unitTable;
     private UnitTableModel unitModel;
+    
+    public final static String COMMAND_MOTHBALL = "MOTHBALL";
+    public final static String COMMAND_ACTIVATE = "ACTIVATE";
 
     public UnitTableMouseAdapter(CampaignGUI gui, JTable unitTable,
             UnitTableModel unitModel) {
@@ -404,7 +407,12 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
             if (null != selectedUnit) {
                 selectedUnit.setDaysToArrival(0);
             }
-        } else if (command.equalsIgnoreCase("MOTHBALL")) {
+        } else if (command.equalsIgnoreCase(COMMAND_MOTHBALL)) {
+            if(units.length > 1) {
+                gui.showMassMothballDialog(units, false);
+                return;
+            }
+            
             UUID id = null;
             if (!selectedUnit.isSelfCrewed()) {
                 id = gui.selectTech(selectedUnit, "mothball", true);
@@ -428,7 +436,12 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                 selectedUnit.startMothballing(id);
                 MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
             }
-        } else if (command.equalsIgnoreCase("ACTIVATE")) {
+        } else if (command.equalsIgnoreCase(COMMAND_ACTIVATE)) {
+            if(units.length > 1) {
+                gui.showMassMothballDialog(units, true);
+                return;
+            }
+            
             UUID id = null;
             if (!selectedUnit.isSelfCrewed()) {
                 id = gui.selectTech(selectedUnit, "activation", true);
@@ -706,14 +719,14 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                     popup.add(menuItem);
                 } else if (unit.isMothballed()) {
                     menuItem = new JMenuItem("Activate Unit");
-                    menuItem.setActionCommand("ACTIVATE");
+                    menuItem.setActionCommand(COMMAND_ACTIVATE);
                     menuItem.addActionListener(this);
                     menuItem.setEnabled(!unit.isSelfCrewed()
                             || null != unit.getEngineer());
                     popup.add(menuItem);
                 } else {
                     menuItem = new JMenuItem("Mothball Unit");
-                    menuItem.setActionCommand("MOTHBALL");
+                    menuItem.setActionCommand(COMMAND_MOTHBALL);
                     menuItem.addActionListener(this);
                     menuItem.setEnabled(unit.isAvailable()
                             && (!unit.isSelfCrewed() || null != unit
@@ -721,6 +734,41 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                     popup.add(menuItem);
                 }
             }
+            
+            if(unitTable.getSelectedRowCount() > 1) {
+                boolean allMothballed = true;
+                boolean allAvailable = true;
+                
+                for(int x = 0; x < units.length; x++) {
+                    // infantry, jumpships and warships cannot be mothballed
+                    if(units[x].isSelfCrewed()) {
+                        allMothballed = false;
+                        allAvailable = false;
+                        break;
+                    }
+                    
+                    if(!units[x].isMothballed()) {
+                        allMothballed = false;
+                    }
+                    
+                    if(!units[x].isAvailable()) {
+                        allAvailable = false;
+                    }
+                }
+                
+                if(allAvailable) {
+                    menuItem = new JMenuItem("Mass Mothball");
+                    menuItem.setActionCommand(COMMAND_MOTHBALL);
+                    menuItem.addActionListener(this);
+                    popup.add(menuItem);
+                } else if(allMothballed) {
+                    menuItem = new JMenuItem("Mass Activate");
+                    menuItem.setActionCommand(COMMAND_ACTIVATE);
+                    menuItem.addActionListener(this);
+                    popup.add(menuItem);
+                }
+            }
+            
             if (oneSelected && unit.requiresMaintenance()
                     && !unit.isSelfCrewed() && unit.isAvailable()) {
                 menu = new JMenu("Assign Tech");
