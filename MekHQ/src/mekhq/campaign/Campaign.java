@@ -250,7 +250,7 @@ public class Campaign implements Serializable, ITechManager {
     private Map<Integer, Scenario> scenarios = new LinkedHashMap<>();
     private List<Kill> kills = new ArrayList<>();
 
-    private Hashtable<String, Integer> duplicateNameHash = new Hashtable<String, Integer>();
+    private Map<String, Integer> duplicateNameHash = new HashMap<String, Integer>();
 
     private int astechPool;
     private int astechPoolMinutes;
@@ -6990,15 +6990,14 @@ public class Campaign implements Serializable, ITechManager {
      */
     private void checkDuplicateNamesDuringAdd(Entity entity) {
         if (duplicateNameHash.get(entity.getShortName()) == null) {
-            duplicateNameHash.put(entity.getShortName(), new Integer(1));
+            duplicateNameHash.put(entity.getShortName(), Integer.valueOf(1));
         } else {
-            int count = duplicateNameHash.get(entity.getShortName()).intValue();
+            int count = duplicateNameHash.get(entity.getShortName());
             count++;
-            duplicateNameHash.put(entity.getShortName(), new Integer(count));
+            duplicateNameHash.put(entity.getShortName(), Integer.valueOf(count));
             entity.duplicateMarker = count;
             entity.generateShortName();
             entity.generateDisplayName();
-
         }
     }
 
@@ -7021,8 +7020,8 @@ public class Campaign implements Serializable, ITechManager {
                         e.generateDisplayName();
                     }
                 }
-                duplicateNameHash.put(entity.getShortNameRaw(), new Integer(
-                        count - 1));
+                duplicateNameHash.put(entity.getShortNameRaw(), 
+                    Integer.valueOf(count - 1));
             } else {
                 duplicateNameHash.remove(entity.getShortNameRaw());
             }
