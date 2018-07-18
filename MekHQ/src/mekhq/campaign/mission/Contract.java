@@ -301,8 +301,11 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
     }
 
     public long getTotalAmountPlusFeesAndBonuses() {
-        return baseAmount + supportAmount + overheadAmount + transportAmount + transitAmount + signingAmount
-                - feeAmount;
+        return getTotalAmountPlusFees() + signingAmount;
+    }
+
+    public long getTotalAmountPlusFees(){
+        return getTotalAmount() - feeAmount;
     }
 
     public long getTotalAmount() {
@@ -391,10 +394,9 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
      */
     public long getTotalMonthlyPayOut(Campaign c){
         return (getMonthlyPayOut()*getLength())
-                + getTotalEstimatedOverheadExpenses(c)
-                + getTotalEstimatedMaintenanceExpenses(c)
-                + getTotalEstimatedPayrollExpenses(c)
-                - getFeeAmount();
+                - getTotalEstimatedOverheadExpenses(c)
+                - getTotalEstimatedMaintenanceExpenses(c)
+                - getTotalEstimatedPayrollExpenses(c);
     }
 
     public static String generateRandomContractName() {
@@ -576,14 +578,13 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
         signingAmount = (long) ((signBonus / 100.0)
                 * (baseAmount + overheadAmount + transportAmount + transitAmount + supportAmount));
 
-        advanceAmount = (long) ((advancePct / 100.0)
-                * (baseAmount + overheadAmount + transportAmount + transitAmount + supportAmount));
-
         if (mrbcFee) {
             feeAmount = (long) ((MRBC_FEE_PERCENTAGE / 100.0) * (baseAmount + overheadAmount + transportAmount + transitAmount + supportAmount));
         } else {
             feeAmount = 0;
         }
+
+        advanceAmount = (long) ((advancePct / 100.0) * getTotalAmountPlusFees());
 
         // only adjust the start date for travel if the start date is currently null
         boolean adjustStartDate = false;
