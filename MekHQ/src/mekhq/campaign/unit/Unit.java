@@ -520,6 +520,20 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     }
 
     /**
+     * Determines if this unit can be serviced.
+     * 
+     * @return <code>true</code> if the unit has parts that are salvageable or in
+     *         need of repair.
+     */
+    public boolean isServiceable() {
+        if (isSalvage() || !isRepairable()) {
+            return hasSalvageableParts();
+        } else {
+            return hasPartsNeedingFixing();
+        }
+    }
+
+    /**
      * Is the given location on the entity destroyed?
      *
      * @param loc
@@ -577,6 +591,26 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     public ArrayList<IPartWork> getPartsNeedingFixing() {
     	return getPartsNeedingFixing(false);
     }
+
+    /**
+     * Determines if this unit has parts in need of repair.
+     * 
+     * @return <code>true</code> if the unit has parts that are in need of repair.
+     */
+    public boolean hasPartsNeedingFixing() {
+        boolean onlyNotBeingWorkedOn = false;
+        for (Part part : parts) {
+            if (part.needsFixing() && isPartAvailableForRepairs(part, onlyNotBeingWorkedOn)) {
+                return true;
+            }
+        }
+        for (PodSpace pod : podSpace) {
+            if (pod.needsFixing() && isPartAvailableForRepairs(pod, onlyNotBeingWorkedOn)) {
+                return true;
+            }
+        }
+        return false;
+    }
     
     public ArrayList<IPartWork> getPartsNeedingFixing(boolean onlyNotBeingWorkedOn) {
         ArrayList<IPartWork> brokenParts = new ArrayList<IPartWork>();
@@ -595,6 +629,26 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
 
     public ArrayList<IPartWork> getSalvageableParts() {
     	return getSalvageableParts(false);
+    }
+
+    /**
+     * Determines if this unit has parts that are salvageable.
+     * 
+     * @return <code>true</code> if the unit has parts that are salvageable.
+     */
+    public boolean hasSalvageableParts() {
+        boolean onlyNotBeingWorkedOn = false;
+        for (Part part : parts) {
+            if (part.isSalvaging() && isPartAvailableForRepairs(part, onlyNotBeingWorkedOn)) {
+                return true;
+            }
+        }
+        for (PodSpace pod : podSpace) {
+            if (pod.hasSalvageableParts() && isPartAvailableForRepairs(pod, onlyNotBeingWorkedOn)) {
+                return true;
+            }
+        }
+        return false;
     }
     
     public ArrayList<IPartWork> getSalvageableParts(boolean onlyNotBeingWorkedOn) {

@@ -102,9 +102,8 @@ public class PartsAcquisitionService {
 
 	public static void buildPartsList(Campaign campaign) {
 		acquisitionMap = new HashMap<String, List<IAcquisitionWork>>();
-		List<Unit> unitList = campaign.getServiceableUnits();
 
-		for (Unit unit : unitList) {
+		for (Unit unit : campaign.getServiceableUnits()) {
 			ArrayList<IAcquisitionWork> unitPartsList = campaign.getAcquisitionsForUnit(unit.getId());
 
 			for (IAcquisitionWork aw : unitPartsList) {

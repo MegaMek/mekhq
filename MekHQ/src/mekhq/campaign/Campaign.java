@@ -1239,14 +1239,8 @@ public class Campaign implements Serializable, ITechManager {
             if (!u.isAvailable()) {
                 continue;
             }
-            if (u.isSalvage() || !u.isRepairable()) {
-                if (u.getSalvageableParts().size() > 0) {
-                    service.add(u);
-                }
-            } else {
-                if (u.getPartsNeedingFixing().size() > 0) {
-                    service.add(u);
-                }
+            if (u.isServiceable()) {
+                service.add(u);
             }
         }
         return service;
@@ -4211,7 +4205,7 @@ public class Campaign implements Serializable, ITechManager {
             unit.initializeParts(true);
             unit.runDiagnostic(false);
             if (!unit.isRepairable()) {
-                if (unit.getSalvageableParts().isEmpty()) {
+                if (!unit.hasSalvageableParts()) {
                     // we shouldnt get here but some units seem to stick around
                     // for some reason
                     retVal.removeUnit(unit.getId());

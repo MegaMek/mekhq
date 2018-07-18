@@ -323,7 +323,7 @@ public class UnitTableModel extends DataTableModel {
                 } else if ((null != u) && !u.isFunctional()) {
                     setBackground(new Color(205, 92, 92));
                 } else if ((null != u)
-                        && (u.getPartsNeedingFixing().size() > 0)) {
+                        && u.hasPartsNeedingFixing()) {
                     setBackground(new Color(238, 238, 0));
                 } else if (u.getEntity() instanceof Infantry
                         && u.getActiveCrew().size() < u.getFullCrewSize()) {
