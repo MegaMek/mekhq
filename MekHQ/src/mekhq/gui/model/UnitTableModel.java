@@ -269,7 +269,7 @@ public class UnitTableModel extends DataTableModel {
     }
     
     public void refreshData() {
-        setData(getCampaign().getUnits());
+        setData(getCampaign().getCopyOfUnits());
     }
 
     public TableCellRenderer getRenderer(boolean graphic, IconPackage icons) {

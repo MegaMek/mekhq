@@ -236,12 +236,7 @@ public class Campaign implements Serializable, ITechManager {
     // we will use the same basic system (borrowed from MegaMek) for tracking
     // all three
     // OK now we have more, parts, personnel, forces, missions, and scenarios.
-    // TODO: do we really need to track this in an array and hashtable?
-    // It seems like we could track in a hashtable and then iterate through the
-    // keys of the hash
-    // to create an arraylist on demand
-    private ArrayList<Unit> units = new ArrayList<Unit>();
-    private Hashtable<UUID, Unit> unitIds = new Hashtable<UUID, Unit>();
+    private Map<UUID, Unit> units = new LinkedHashMap<UUID, Unit>();
     private Map<UUID, Person> personnel = new LinkedHashMap<>();
     private Map<UUID, Ancestors> ancestors = new LinkedHashMap<>();
     private Map<Integer, Part> parts = new LinkedHashMap<>();
@@ -939,8 +934,7 @@ public class Campaign implements Serializable, ITechManager {
     private void addUnit(Unit u) {
         MekHQ.getLogger().log(getClass(), "addUnit()", LogLevel.INFO, //$NON-NLS-1$
                 "Adding unit: (" + u.getId() + "):" + u); //$NON-NLS-1$
-        units.add(u);
-        unitIds.put(u.getId(), u);
+        units.put(u.getId(), u);
         checkDuplicateNamesDuringAdd(u.getEntity());
 
         // Assign an entity ID to our new unit
@@ -968,13 +962,12 @@ public class Campaign implements Serializable, ITechManager {
 
         UUID id = UUID.randomUUID();
         // check for the very rare chance of getting same id
-        while (null != unitIds.get(id)) {
+        while (null != units.get(id)) {
             id = UUID.randomUUID();
         }
         unit.getEntity().setExternalIdAsString(id.toString());
         unit.setId(id);
-        units.add(unit);
-        unitIds.put(id, unit);
+        units.put(id, unit);
 
         // now lets grab the parts from the test unit and set them up with this unit
         for(Part p : tu.getParts()) {
@@ -1011,14 +1004,13 @@ public class Campaign implements Serializable, ITechManager {
 
         UUID id = UUID.randomUUID();
         // check for the very rare chance of getting same id
-        while (null != unitIds.get(id)) {
+        while (null != units.get(id)) {
             id = UUID.randomUUID();
         }
         en.setExternalIdAsString(id.toString());
         Unit unit = new Unit(en, this);
         unit.setId(id);
-        units.add(unit);
-        unitIds.put(id, unit);
+        units.put(id, unit);
         removeUnitFromForce(unit); // Added to avoid the 'default force bug'
         // when calculating cargo
 
@@ -1046,14 +1038,13 @@ public class Campaign implements Serializable, ITechManager {
         MekHQ.triggerEvent(new UnitNewEvent(unit));
     }
 
-    public ArrayList<Unit> getUnits() {
-        return getUnits(false, false);
+    public Collection<Unit> getUnits() {
+        return units.values();
     }
 
     public ArrayList<Unit> getUnits(boolean weightSorted, boolean alphaSorted) {
-        ArrayList<Unit> sortedUnits = null;
+        ArrayList<Unit> sortedUnits = getCopyOfUnits();
         if (alphaSorted || weightSorted) {
-            sortedUnits = getCopyOfUnits();
             if (alphaSorted) {
                 Collections.sort(sortedUnits, new Comparator<Unit>() {
                     @Override
@@ -1073,12 +1064,12 @@ public class Campaign implements Serializable, ITechManager {
                 });
             }
         }
-        return sortedUnits == null ? units : sortedUnits;
+        return sortedUnits;
     }
 
     // Since getUnits doesn't return a defensive copy and I don't know what I might break if I made it do so...
     public ArrayList<Unit> getCopyOfUnits() {
-        return new ArrayList<>(units);
+        return new ArrayList<>(units.values());
     }
 
     public ArrayList<Entity> getEntities() {
@@ -1093,7 +1084,7 @@ public class Campaign implements Serializable, ITechManager {
         if (null == id) {
             return null;
         }
-        return unitIds.get(id);
+        return units.get(id);
     }
 
     public boolean recruitPerson(Person p) {
@@ -1682,7 +1673,8 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public boolean isWorkingOnRefit(Person p) {
-        for (Unit u : units) {
+        for (Map.Entry<UUID, Unit> mu : units.entrySet()) {
+            Unit u = mu.getValue();
             if (u.isRefitting()) {
                 if (null != u.getRefit().getTeamId()
                         && u.getRefit().getTeamId().equals(p.getId())) {
@@ -2754,7 +2746,8 @@ public class Campaign implements Serializable, ITechManager {
 
     public long getMaintenanceCosts() {
         long costs = 0;
-        for (Unit u : units) {
+        for (Map.Entry<UUID, Unit> mu : units.entrySet()) {
+            Unit u = mu.getValue();
             if (u.requiresMaintenance() && null != u.getTech()) {
                 costs += u.getMaintenanceCost();
             }
@@ -2764,21 +2757,14 @@ public class Campaign implements Serializable, ITechManager {
 
     public long getWeeklyMaintenanceCosts() {
         long costs = 0;
-        for (Unit u : units) {
-            costs += u.getWeeklyMaintenanceCost();
+        for (Map.Entry<UUID, Unit> u : units.entrySet()) {
+            costs += u.getValue().getWeeklyMaintenanceCost();
         }
         return costs;
     }
 
     public long getOverheadExpenses() {
         return (long) (getPayRoll() * 0.05);
-    }
-
-    public void clearAllUnits() {
-        this.units = new ArrayList<Unit>();
-        this.unitIds = new Hashtable<UUID, Unit>();
-        // TODO: clear parts associated with unit
-
     }
 
     public void removeUnit(UUID id) {
@@ -2803,8 +2789,7 @@ public class Campaign implements Serializable, ITechManager {
         removeUnitFromForce(unit);
 
         // finally remove the unit
-        units.remove(unit);
-        unitIds.remove(unit.getId());
+        units.remove(unit.getId());
         checkDuplicateNamesDuringDelete(unit.getEntity());
         addReport(unit.getName() + " has been removed from the unit roster.");
         MekHQ.triggerEvent(new UnitRemovedEvent(unit));
@@ -2876,7 +2861,8 @@ public class Campaign implements Serializable, ITechManager {
         if (tech == null || tech.getId() == null) {
             return;
         }
-        for (Unit u : units) {
+        for (Map.Entry<UUID, Unit> mu : units.entrySet()) {
+            Unit u = mu.getValue();
             if (tech.getId().equals(u.getTechId())) {
                 u.removeTech();
             }
@@ -3463,7 +3449,7 @@ public class Campaign implements Serializable, ITechManager {
         }
 
         // Lists of objects:
-        writeArrayAndHashToXmlforUUID(pw1, 1, "units", units, unitIds); // Units
+        writeMapToXml(pw1, 1, "units", units); // Units
         writeMapToXml(pw1, 1, "personnel", personnel); // Personnel
         writeMapToXml(pw1, 1, "ancestors", ancestors); // Ancestry trees
         writeMapToXml(pw1, 1, "missions", missions); // Missions
@@ -4133,7 +4119,7 @@ public class Campaign implements Serializable, ITechManager {
         timestamp = System.currentTimeMillis();
 
         // Okay, Units, need their pilot references fixed.
-        for(Unit unit : retVal.units) {
+        for(Unit unit : retVal.getUnits()) {
             // Also, the unit should have its campaign set.
             unit.campaign = retVal;
 
@@ -4201,7 +4187,7 @@ public class Campaign implements Serializable, ITechManager {
                         System.currentTimeMillis() - timestamp));
         timestamp = System.currentTimeMillis();
 
-        for(Unit unit : retVal.units) {
+        for(Unit unit : retVal.getUnits()) {
             // Some units have been incorrectly assigned a null C3UUID as a string. This should correct that by setting a new C3UUID
             if ((unit.getEntity().hasC3() || unit.getEntity().hasC3i())
                     && (unit.getEntity().getC3UUIDAsString() == null || unit.getEntity().getC3UUIDAsString().equals("null"))) {
@@ -4219,8 +4205,7 @@ public class Campaign implements Serializable, ITechManager {
         // ok, once we are sure that campaign has been set for all units, we can
         // now go
         // through and initializeParts and run diagnostics
-        for (int x = 0; x < retVal.units.size(); x++) {
-            Unit unit = retVal.units.get(x);
+        for (Unit unit : retVal.getUnits()) {
             // just in case parts are missing (i.e. because they weren't tracked
             // in previous versions)            
             unit.initializeParts(true);
@@ -4393,14 +4378,14 @@ public class Campaign implements Serializable, ITechManager {
         // set up translation hashes
         Map<Integer, UUID> uHash = new HashMap<>();
         Map<Integer, UUID> pHash = new HashMap<>();
-        for (Unit u : retVal.units) {
+        for (Unit u : retVal.getUnits()) {
             uHash.put(u.getOldId(), u.getId());
         }
         for (Person p : retVal.getPersonnel()) {
             pHash.put(p.getOldId(), p.getId());
         }
         // ok now go through and fix
-        for (Unit u : retVal.units) {
+        for (Unit u : retVal.getUnits()) {
             u.fixIdReferences(uHash, pHash);
         }
         for (Person p : retVal.getPersonnel()) {
@@ -4426,9 +4411,9 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     private static void fixIdReferencesB(Campaign retVal) {
-        for (Unit u : retVal.units) {
-            Entity en = u.getEntity();
-            UUID id = u.getId();
+        for (Map.Entry<UUID, Unit> u : retVal.units.entrySet()) {
+            Entity en = u.getValue().getEntity();
+            UUID id = u.getKey();
             en.setExternalIdAsString(id.toString());
 
             // If they have C3 or C3i we need to set their ID
@@ -7602,8 +7587,8 @@ public class Campaign implements Serializable, ITechManager {
      */
     public void reloadGameEntities() {
         game.reset();
-        for (Unit u : units) {
-            Entity en = u.getEntity();
+        for (Map.Entry<UUID, Unit> u : units.entrySet()) {
+            Entity en = u.getValue().getEntity();
             if (null != en) {
                 game.addEntity(en.getId(), en);
             }
@@ -7907,7 +7892,8 @@ public class Campaign implements Serializable, ITechManager {
         long largeCraft = 0;
         long proto = 0;
         long spareParts = 0;
-        for (Unit u : units) {
+        for (Map.Entry<UUID, Unit> mu : units.entrySet()) {
+            Unit u = mu.getValue();
             long value = u.getSellValue();
             if (u.getEntity() instanceof Mech) {
                 mech += value;
@@ -9034,8 +9020,8 @@ public class Campaign implements Serializable, ITechManager {
                                  */
                                 p.setOriginalUnitTech(1);
                             }
-                            if (null != p.getUnitId() && null != unitIds.get(p.getUnitId())
-                                    && ms.getName().equals(unitIds.get(p.getUnitId()).getEntity().getShortNameRaw())) {
+                            if (null != p.getUnitId() && null != units.get(p.getUnitId())
+                                    && ms.getName().equals(units.get(p.getUnitId()).getEntity().getShortNameRaw())) {
                                 p.setOriginalUnitId(p.getUnitId());
                             }
                         }

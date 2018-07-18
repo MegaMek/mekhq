@@ -30,6 +30,9 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.UUID;
 
@@ -71,7 +74,7 @@ public class PayCollateralDialog extends JDialog {
     private boolean paid;
     private Loan loan;
     
-    private ArrayList<JCheckBox> unitBoxes;
+    private Map<JCheckBox, UUID> unitBoxes;
     private ArrayList<JCheckBox> assetBoxes;
     private Map<JSlider, Integer> partSliders;
     private JProgressBar barAmount;
@@ -115,12 +118,13 @@ public class PayCollateralDialog extends JDialog {
         gridBagConstraints.weighty = 0.0;
         panInfo.add(barAmount, gridBagConstraints);
         
-        unitBoxes = new ArrayList<JCheckBox>();
+        unitBoxes = new LinkedHashMap<>();
         JCheckBox box;
         int i = 0;
         int j = 0;
         JPanel pnlUnits = new JPanel(new GridBagLayout());
-        for(Unit u : campaign.getUnits()) {
+        Collection<Unit> units = campaign.getUnits();
+        for(Unit u : units) {
             j++;
             box = new JCheckBox(u.getName() + " (" + DecimalFormat.getInstance().format(u.getSellValue()) + "C-bills)");
             box.setSelected(false);
@@ -131,14 +135,14 @@ public class PayCollateralDialog extends JDialog {
                     updateAmount();
                 }
             });
-            unitBoxes.add(box);
+            unitBoxes.put(box, u.getId());
             gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = i;
             gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
             gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
             gridBagConstraints.weightx = 1.0;
-            if(j == (campaign.getUnits().size())) {
+            if(j == (units.size())) {
                 gridBagConstraints.weighty = 1.0;
             }
             gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
@@ -295,10 +299,9 @@ public class PayCollateralDialog extends JDialog {
     
     private void updateAmount() {
         long amount = 0;
-        for(int i = 0; i < unitBoxes.size(); i++) {
-            JCheckBox box = unitBoxes.get(i);
-            if(box.isSelected()) {
-                amount += campaign.getUnits().get(i).getSellValue();
+        for (Map.Entry<JCheckBox, UUID> m : unitBoxes.entrySet()) {
+            if (m.getKey().isSelected()) {
+                amount += campaign.getUnit(m.getValue()).getSellValue();
             }
         }
 
@@ -307,8 +310,8 @@ public class PayCollateralDialog extends JDialog {
             if(quantity > 0) {
                 amount += campaign.getPart(m.getValue()).getCurrentValue() * quantity;
             }
-            
         }
+
         for(int i = 0; i < assetBoxes.size(); i++) {
             JCheckBox box = assetBoxes.get(i);
             if(box.isSelected()) {
@@ -326,11 +329,10 @@ public class PayCollateralDialog extends JDialog {
     }
     
     public ArrayList<UUID> getUnits() {
-        ArrayList<UUID> uid = new ArrayList<UUID>();
-        for(int i = 0; i < unitBoxes.size(); i++) {
-            JCheckBox box = unitBoxes.get(i);
-            if(box.isSelected()) {
-                uid.add(campaign.getUnits().get(i).getId());
+        ArrayList<UUID> uid = new ArrayList<>();
+        for (Map.Entry<JCheckBox, UUID> u : unitBoxes.entrySet()) {
+            if (u.getKey().isSelected()) {
+                uid.add(u.getValue());
             }
         }
         return uid;
