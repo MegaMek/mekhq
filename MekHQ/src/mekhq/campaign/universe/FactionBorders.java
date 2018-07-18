@@ -23,7 +23,7 @@ public class FactionBorders {
     
     private final Faction faction;
     private Set<Planet> planets;
-    private RegionBorder border;
+    private RegionPerimeter border;
     
     public FactionBorders(Faction faction, Campaign c) {
         this.faction = faction;
@@ -52,7 +52,7 @@ public class FactionBorders {
         planets = planets.stream()
                 .filter(p -> p.getFactionSet(when).contains(faction))
                 .collect(Collectors.toSet());
-        border = new RegionBorder(planets);
+        border = new RegionPerimeter(planets);
     }
     
     /**
@@ -72,7 +72,7 @@ public class FactionBorders {
     /**
      * @return A polygon that surrounds the region controlled by this faction.
      */
-    public RegionBorder getBorder() {
+    public RegionPerimeter getBorder() {
         return border;
     }
     
@@ -85,16 +85,16 @@ public class FactionBorders {
      *                    of one of this faction's planets.
      */
     List<Planet> getBorderPlanets(FactionBorders other, double borderSize) {
-        List<RegionBorder.Point> intersection = border.intersection(other.getBorder(), borderSize);
+        List<RegionPerimeter.Point> intersection = border.intersection(other.getBorder(), borderSize);
         if (intersection.isEmpty()) {
             return Collections.emptyList();
         }
         List<Planet> theirPlanets = other.getPlanets().stream()
-                .filter(p -> RegionBorder.isInsideRegion(p.getX(), p.getY(), intersection))
+                .filter(p -> RegionPerimeter.isInsideRegion(p.getX(), p.getY(), intersection))
                 .sorted((p1, p2) -> Double.compare(p1.getX(), p2.getX()))
                 .collect(Collectors.toList());
         List<Planet> ourPlanets = getPlanets().stream()
-                .filter(p -> RegionBorder.isInsideRegion(p.getX(), p.getY(), intersection))
+                .filter(p -> RegionPerimeter.isInsideRegion(p.getX(), p.getY(), intersection))
                 .sorted((p1, p2) -> Double.compare(p1.getX(), p2.getX()))
                 .collect(Collectors.toList());
         

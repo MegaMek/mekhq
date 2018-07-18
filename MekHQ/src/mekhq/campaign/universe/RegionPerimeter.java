@@ -35,10 +35,10 @@ import java.util.stream.Collectors;
  * @author Neoancient
  *
  */
-public class RegionBorder {
+public class RegionPerimeter {
     
     // Margin for coordinates to be considered equal
-    private static final double EPSILON = 0.001;
+    static final double EPSILON = 0.001;
     
     private List<Point> border;
     private double boundsX1, boundsY1, boundsX2, boundsY2;
@@ -48,7 +48,7 @@ public class RegionBorder {
      * 
      * @param planets A list of planets that define the region.
      */
-    public RegionBorder(Collection<Planet> planets) {
+    public RegionPerimeter(Collection<Planet> planets) {
         if (!planets.isEmpty()) {
             List<Point> points = new ArrayList<>();
             boundsX1 = Double.MAX_VALUE;
@@ -197,7 +197,7 @@ public class RegionBorder {
      *                 calculating the intersection.
      * @return         A list of the vertices of the polygon around the intersection.
      */
-    public List<Point> intersection(RegionBorder other, double padding) {
+    public List<Point> intersection(RegionPerimeter other, double padding) {
         return intersection(getPaddedRegion(border, padding),
                 getPaddedRegion(other.border, padding));
     }
