@@ -27,10 +27,10 @@ import java.util.stream.Collectors;
 
 import org.joda.time.DateTime;
 
-import mekhq.Utilities;
-import mekhq.campaign.Campaign;
-
 /**
+ * Finds all planets controlled by a given faction at a particular date and can find all planets
+ * controlled by another faction within a set distance.
+ * 
  * @author Neoancient
  *
  */
@@ -40,9 +40,27 @@ public class FactionBorders {
     private Set<Planet> planets;
     private RegionPerimeter border;
     
-    public FactionBorders(Faction faction, Campaign c) {
+    /**
+     * Creates a FactionBorders object for a faction using all the known planets.
+     * 
+     * @param faction The faction to calculate the border for
+     * @param when    The date to use to determine planet control.
+     */
+    public FactionBorders(Faction faction, DateTime when) {
         this.faction = faction;
-        calculateRegion(Utilities.getDateTimeDay(c.getCalendar()));
+        calculateRegion(when);
+    }
+    
+    /**
+     * Creates a FactionBorders object for a faction using a particular set of planets
+     * 
+     * @param faction The faction to calculate the border for
+     * @param when    The date to use to determine planet control.
+     * @param region  A collection of planets within a region of space.
+     */
+    public FactionBorders(Faction faction, DateTime when, Collection<Planet> region) {
+        this.faction = faction;
+        calculateRegion(when, region);
     }
     
     /**
@@ -64,7 +82,7 @@ public class FactionBorders {
      * @param planets The set of planets to include in the region.
      */
     public void calculateRegion(DateTime when, Collection<Planet> planets) {
-        planets = planets.stream()
+        this.planets = planets.stream()
                 .filter(p -> p.getFactionSet(when).contains(faction))
                 .collect(Collectors.toSet());
         border = new RegionPerimeter(planets);
