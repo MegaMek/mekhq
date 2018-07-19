@@ -58,7 +58,8 @@ public class Transaction implements Serializable {
 	public final static int C_SALVAGE        = 12;
 	public final static int C_LOAN_PRINCIPAL = 13;
 	public final static int C_LOAN_PAYMENT   = 14;
-	public final static int C_NUM            = 15;
+    public final static int C_REPAIRS        = 15;
+    public final static int C_NUM            = 16;
 
     public static Vector<String> getCategoryList() {
         Vector<String> out = new Vector<String>();
@@ -102,6 +103,8 @@ public class Transaction implements Serializable {
 		    return "Loan Principal";
 		case C_LOAN_PAYMENT:
 		    return "Loan Payment";
+		case C_REPAIRS:
+            return "Repairs";
 		default:
 			return "Unknown category";
 		}

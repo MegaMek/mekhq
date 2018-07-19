@@ -2206,6 +2206,13 @@ public class Campaign implements Serializable, ITechManager {
         }
         if (roll >= target.getValue()) {
             report = report + partWork.succeed();
+            if (getCampaignOptions().payForRepairs()
+                    && action == " fix "
+                    && !(partWork instanceof Armor)) {
+                int cost = (int) (((Part) partWork).getStickerPrice() * .2);
+                report += "<br>Repairs cost " + cost + " C-bills worth of parts.";
+                finances.debit(cost, Transaction.C_REPAIRS, "Repair of " + partWork.getPartName(), calendar.getTime());
+            }
             if (roll == 12 && target.getValue() != TargetRoll.AUTOMATIC_SUCCESS) {
                 xpGained += getCampaignOptions().getSuccessXP();
             }
