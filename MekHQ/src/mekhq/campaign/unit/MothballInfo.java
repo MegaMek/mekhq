@@ -70,7 +70,7 @@ public class MothballInfo implements MekHqXmlSerializable {
         for(UUID driverID : driverIDs) {
             Person driver = campaign.getPerson(driverID);
             
-            if(driver != null) {
+            if(driver != null && driver.isActive() && driver.getUnitId() == null) {
                 unit.addDriver(driver);
             }
         }
@@ -78,7 +78,7 @@ public class MothballInfo implements MekHqXmlSerializable {
         for(UUID gunnerID : gunnerIDs) {
             Person gunner = campaign.getPerson(gunnerID);
             
-            if(gunner != null) {
+            if(gunner != null && gunner.isActive() && gunner.getUnitId() == null) {
                 unit.addGunner(gunner);
             }
         }
@@ -86,18 +86,18 @@ public class MothballInfo implements MekHqXmlSerializable {
         for(UUID vesselCrewID : vesselCrewIDs) {
             Person vesselCrew = campaign.getPerson(vesselCrewID);
             
-            if(vesselCrew != null) {
+            if(vesselCrew != null && vesselCrew.isActive() && vesselCrew.getUnitId() == null) {
                 unit.addVesselCrew(vesselCrew);
             }
         }
         
         Person techOfficer = campaign.getPerson(techOfficerID);
-        if(techOfficer != null) {
+        if(techOfficer != null && techOfficer.isActive() && techOfficer.getUnitId() == null) {
             unit.setTechOfficer(techOfficer);
         }
         
         Person navigator = campaign.getPerson(navigatorID);
-        if(navigator != null) {
+        if(navigator != null && navigator.isActive() && navigator.getUnitId() == null) {
             unit.setNavigator(navigator);
         }
         
