@@ -1472,6 +1472,11 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     +lastMaintenanceReport
                     +"]]></lastMaintenanceReport>");
         }
+        
+        if(null != mothballInfo) {
+            mothballInfo.writeToXml(pw1, indentLvl);
+        }
+        
         pw1.println(MekHqXmlUtil.indentStr(indentLvl) + "</unit>");
     }
 
@@ -1568,6 +1573,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     retVal.fluffName = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("lastMaintenanceReport")) {
                     retVal.lastMaintenanceReport = wn2.getTextContent();
+                } else if (wn2.getNodeName().equalsIgnoreCase("mothballInfo")) {
+                    retVal.mothballInfo = MothballInfo.generateInstanceFromXML(wn2, version);
                 }
             }
         } catch (Exception ex) {

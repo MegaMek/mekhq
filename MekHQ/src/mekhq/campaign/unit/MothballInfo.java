@@ -1,14 +1,19 @@
 package mekhq.campaign.unit;
 
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import megamek.common.Dropship;
-import megamek.common.Infantry;
-import megamek.common.Jumpship;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import mekhq.MekHQ;
+import mekhq.MekHqXmlSerializable;
+import mekhq.MekHqXmlUtil;
+import mekhq.Version;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.Refit;
 import mekhq.campaign.personnel.Person;
 
 /**
@@ -18,7 +23,7 @@ import mekhq.campaign.personnel.Person;
  * @author NickAragua
  *
  */
-public class MothballInfo {
+public class MothballInfo implements MekHqXmlSerializable {
     private UUID techID;
     private int forceID;
     private List<UUID> driverIDs;
@@ -26,6 +31,15 @@ public class MothballInfo {
     private List<UUID> vesselCrewIDs;
     private UUID techOfficerID;
     private UUID navigatorID;
+
+    /**
+     * Parameterless constructor, used for deserialization.
+     */
+    private MothballInfo() {
+        driverIDs = new ArrayList<>();
+        gunnerIDs = new ArrayList<>();
+        vesselCrewIDs = new ArrayList<>();
+    }
     
     /**
      * Creates a set of mothball info for a given unit
@@ -90,5 +104,88 @@ public class MothballInfo {
         if(campaign.getForce(forceID) != null) {
             campaign.addUnitToForce(unit, forceID);
         }
+    }
+
+    /**
+     * Serializer method implemented in MekHQ pattern
+     */
+    @Override
+    public void writeToXml(PrintWriter pw1, int indent) {
+        pw1.println(MekHqXmlUtil.indentStr(indent) + "<mothballInfo>");
+        
+        if(techID != null) {
+            pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<techID>" + techID.toString() + "</techID>");
+        }
+        
+        if(forceID > 0) {
+            pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<forceID>" + forceID + "</forceID>");
+        }
+        
+        if(driverIDs.size() > 0) {
+            for(UUID driverID : driverIDs) {
+                pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<driverID>" + driverID.toString() + "</driverID>");
+            }
+        }
+        
+        if(gunnerIDs.size() > 0) {
+            for(UUID gunnerID : gunnerIDs) {
+                pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<gunnerID>" + gunnerID.toString() + "</gunnerID>");
+            }
+        }
+        
+        if(vesselCrewIDs.size() > 0) {
+            for(UUID vesselCrewID : vesselCrewIDs) {
+                pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<vesselCrewID>" + vesselCrewID.toString() + "</vesselCrewID>");
+            }
+        }
+        
+        if(techOfficerID != null) {
+            pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<techOfficerID>" + techOfficerID.toString() + "</techOfficerID>");
+        }
+        
+        if(navigatorID != null) {
+            pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<navigatorID>" + navigatorID.toString() + "</navigatorID>");
+        }
+        
+        pw1.println(MekHqXmlUtil.indentStr(indent) + "</mothballInfo>");
+    }
+    
+    /**
+     * Deserializer method implemented in standard MekHQ pattern.
+     * @return Instance of MothballInfo
+     */
+    public static MothballInfo generateInstanceFromXML(Node wn, Version version) {
+        final String METHOD_NAME = "generateInstanceFromXML(Node,Version)";
+        
+        MothballInfo retVal = new MothballInfo();
+        
+        NodeList nl = wn.getChildNodes();
+
+        try {
+            for (int x=0; x<nl.getLength(); x++) {
+                Node wn2 = nl.item(x);
+
+                if (wn2.getNodeName().equalsIgnoreCase("techID")) {
+                    retVal.techID = UUID.fromString(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("forceID")) {
+                    retVal.forceID = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("driverID")) {
+                    retVal.driverIDs.add(UUID.fromString(wn2.getTextContent()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("gunnerID")) {
+                    retVal.gunnerIDs.add(UUID.fromString(wn2.getTextContent()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("vesselCrewID")) {
+                    retVal.vesselCrewIDs.add(UUID.fromString(wn2.getTextContent()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("techOfficerID")) {
+                    retVal.techOfficerID = UUID.fromString(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("navigatorID")) {
+                    retVal.navigatorID = UUID.fromString(wn2.getTextContent());
+                }
+            }
+        } catch (Exception ex) {
+            // Doh!
+            MekHQ.getLogger().log(Unit.class, METHOD_NAME, ex);
+        }
+        
+        return retVal;
     }
 }
