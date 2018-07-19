@@ -173,6 +173,7 @@ import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.OmniPod;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PartInUse;
+import mekhq.campaign.parts.PartInventory;
 import mekhq.campaign.parts.ProtomekArmor;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.parts.StructuralIntegrity;
@@ -7705,27 +7706,17 @@ public class Campaign implements Serializable, ITechManager {
 
     }
 
-    /*
-     * TODO: 
-     * 
-     * I think this should be rewritten to return a concrete class instead of 
-     * an array of strings.
-     * 
-     * This should have 3 ints for the values and an optional string modifier 
-     * for the points (armor) and shots (ammo).
-     * 
-     * Cord Awtry (kipstafoo) - 30-Oct-2016
-     */
     /**
-     * This returns a String array of length three, with the following values 0 - the number of parts of this type, or
-     * armor points, or ammo shots currently in stock 1 - the number of parts of this type, or armor points, or ammo shots
-     * currently in transit 2 - the number of parts of this type, or armor points, or ammo shots currently on order
+     * This returns a PartInventory object detailing the current count
+     * for a part on hand, in transit, and ordered.
      *
-     * @param part
-     * @return
+     * @param part A part to lookup its current inventory.
+     * @return A PartInventory object detailing the current counts of
+     * the part on hand, in transit, and ordered.
+     * @see mekhq.campaign.parts.PartInventory
      */
-    public String[] getPartInventory(Part part) {
-        String[] inventories = new String[3];
+    public PartInventory getPartInventory(Part part) {
+        PartInventory inventory = new PartInventory();
 
         int nSupply = 0;
         int nTransit = 0;
@@ -7762,6 +7753,9 @@ public class Campaign implements Serializable, ITechManager {
             }
         }
 
+        inventory.setSupply(nSupply);
+        inventory.setSupply(nTransit);
+
         int nOrdered = 0;
         IAcquisitionWork onOrder = getShoppingList().getShoppingItem(part);
         if (null != onOrder) {
@@ -7778,25 +7772,19 @@ public class Campaign implements Serializable, ITechManager {
             }
         }
 
-        String strSupply = Integer.toString(nSupply);
-        String strTransit = Integer.toString(nTransit);
-        String strOrdered = Integer.toString(nOrdered);
+        inventory.setOrdered(nOrdered);
 
+        String countModifier = "";
         if (part instanceof Armor || part instanceof ProtomekArmor
                 || part instanceof BaArmor) {
-            strSupply += " points";
-            strTransit += " points";
-            strOrdered += " points";
+            countModifier = "points";
         }
         if (part instanceof AmmoStorage) {
-            strSupply += " shots";
-            strTransit += " shots";
-            strOrdered += " shots";
+            countModifier = "shots";
         }
-        inventories[0] = strSupply;
-        inventories[1] = strTransit;
-        inventories[2] = strOrdered;
-        return inventories;
+        
+        inventory.setCountModifier(countModifier);
+        return inventory;
     }
 
     public long getTotalEquipmentValue() {

@@ -15,6 +15,7 @@ import megamek.common.TargetRoll;
 import mekhq.IconPackage;
 import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.PartInventory;
 import mekhq.campaign.parts.PodSpace;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Skill;
@@ -101,13 +102,9 @@ public class TaskTableModel extends DataTableModel {
             } else {            	
             	if (part instanceof MissingPart) {
             		if (!((MissingPart)part).isReplacementAvailable()) {
-	            		String[] inventories = gui.getCampaign().getPartInventory(((MissingPart) part).getNewPart());
+	            		PartInventory inventories = gui.getCampaign().getPartInventory(((MissingPart) part).getNewPart());
 	            		
-	            		//int inStock = processInventoryString(inventories[0]);
-	            		int inTransit = processInventoryString(inventories[1]);
-	            		int onOrder = processInventoryString(inventories[2]);
-	            		
-	            		if ((inTransit > 0) || (onOrder > 0)) {
+	            		if ((inventories.getTransit() > 0) || (inventories.getOrdered() > 0)) {
 	            			availableLevel = REPAIR_STATE.IN_TRANSIT;
 	            		} else {
 	            			availableLevel = REPAIR_STATE.NOT_AVAILABLE;
@@ -214,14 +211,5 @@ public class TaskTableModel extends DataTableModel {
             
             return c;
         }
-
-        //This is a hack to compensate for the sub-optimal return values
-		private int processInventoryString(String str) {
-			if (str.indexOf(" ") > -1) {
-				return Integer.parseInt(str.substring(0, str.indexOf(" ")));
-			}
-
-			return Integer.parseInt(str);
-		}
     }
 }

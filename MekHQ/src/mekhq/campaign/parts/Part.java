@@ -1078,9 +1078,9 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	 * @param inventories The inventory array, see campaign.getInventory() for details.
 	 * @return Human readable string.
 	 */
-	public String getOrderTransitStringForDetails(String[] inventories) {
-        String inTransitString = inventories[1].startsWith("0 ") ? "" : inventories[1] + " in transit";
-        String onOrderString = inventories[2].startsWith("0 ") ? "" : inventories[2] + " on order";
+	public String getOrderTransitStringForDetails(PartInventory inventories) {
+        String inTransitString = inventories.getTransit() == 0 ? "" : inventories.transitAsString() + " in transit";
+        String onOrderString = inventories.getOrdered() == 0 ? "" : inventories.orderedAsString() + " on order";
         String transitOrderSeparator = inTransitString.length() > 0 && onOrderString.length() > 0 ? ", " : "";
         String orderTransitString = (inTransitString.length() > 0 || onOrderString.length() > 0) ? 
                 String.format("(%s%s%s)", inTransitString, transitOrderSeparator, onOrderString) : "";
