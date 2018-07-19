@@ -23,6 +23,7 @@ v0.45.0-git
 + PR #800: Correctly calculate admin costs for government forces per Campaign Ops rules.
 + PR #804: Two fixes to GM mode finances -> edit transaction
 + PR #801: [Feature] Personnel awards
++ PR #799: [Feature] Optional "Pay for Repairs" per Campaign Ops, page 140
 
 v0.44.0 (2018-06-24 1900 UTC)
 + Issue #733: Clan techs still have clan penalties to maintenance
