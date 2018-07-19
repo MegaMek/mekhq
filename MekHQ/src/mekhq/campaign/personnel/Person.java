@@ -2366,14 +2366,12 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     /**
-     * returns a full description in html format that will be used for the graphical display in the personnel table
-     *
-     * @return
+     * returns a full description in HTML format that will be used for the graphical display in the personnel table among other places
+     * @param htmlRank if the rank will be wrapped in an HTML DIV and id
+     * @return String
      */
-    public String getFullDesc() {
-        String toReturn = "<b>" + getFullTitle(true) + "</b><br/>";
-        toReturn += getSkillSummary() + " " + getRoleDesc();
-        return toReturn;
+    public String getFullDesc(boolean htmlRank) {
+        return "<b>" + getFullTitle(htmlRank) + "</b><br/>" + getSkillSummary() + " " + getRoleDesc();
     }
 
     public String getFullTitle() {
