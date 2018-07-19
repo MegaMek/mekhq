@@ -205,12 +205,6 @@ public class AtBContract extends Contract implements Serializable {
 	}	
 	
 	public void initContractDetails(Campaign campaign) {
-		if (parentContract != null) {
-			requiredLances = 1;
-		} else {
-			requiredLances = Math.max(getEffectiveNumUnits(campaign) / 6, 1);
-		}
-		
         if (getEffectiveNumUnits(campaign) <= 12) {
         	setOverheadComp(OH_FULL);
         } else if (getEffectiveNumUnits(campaign) <= 48) {
@@ -430,14 +424,18 @@ public class AtBContract extends Contract implements Serializable {
 			campaign.getCampaignOptions().getBaseStrategyDeployment() +
 			campaign.getCampaignOptions().getAdditionalStrategyDeployment() *
 			cmdrStrategy;
-		
-		int required = Math.max(getEffectiveNumUnits(campaign) / 6, 1);
-		if (campaign.getCampaignOptions().getAdjustPaymentForStrategy() &&
-				required > maxDeployedLances) {
-			multiplier *= (double)maxDeployedLances / (double)required;
-			requiredLances = maxDeployedLances;
-		}
-		
+
+        if (isSubcontract()) {
+            requiredLances = 1;
+        } else {
+            int required = Math.max(getEffectiveNumUnits(campaign) / 6, 1);
+            if (campaign.getCampaignOptions().getAdjustPaymentForStrategy() &&
+                    required > maxDeployedLances) {
+                multiplier *= (double)maxDeployedLances / (double)required;
+                requiredLances = maxDeployedLances;
+            }
+        }
+
 		setMultiplier(multiplier);
 	}
 	
@@ -1444,7 +1442,7 @@ public class AtBContract extends Contract implements Serializable {
 	public int getBattleTypeMod() {
 		return battleTypeMod + nextWeekBattleTypeMod;
 	}
-	
+
 	public AtBContract(Contract c, Campaign campaign) {
 		this(c.getName());
 		
