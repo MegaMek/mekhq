@@ -748,12 +748,19 @@ public class Planet implements Serializable {
     }
 
     public List<String> getFactions(DateTime when) {
-        return getEventData(when, factions, new EventGetter<List<String>>() {
+        List<String> retVal = getEventData(when, factions, new EventGetter<List<String>>() {
             @Override public List<String> get(PlanetaryEvent e) { return e.faction; }
         });
+        if (retVal != null) {
+            return retVal;
+        }
+        return Collections.emptyList();
     }
 
     private static Set<Faction> getFactionsFrom(Collection<String> codes) {
+        if (null == codes) {
+            return Collections.emptySet();
+        }
         Set<Faction> factions = new HashSet<Faction>(codes.size());
         for(String code : codes) {
             factions.add(Faction.getFaction(code));
@@ -764,7 +771,7 @@ public class Planet implements Serializable {
     /** @return set of factions at a given date */
     public Set<Faction> getFactionSet(DateTime when) {
         List<String> currentFactions = getFactions(when);
-        return null != currentFactions ? getFactionsFrom(currentFactions) : null;
+        return getFactionsFrom(currentFactions);
     }
 
     public String getShortDesc(DateTime when) {
