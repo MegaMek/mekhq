@@ -34,6 +34,7 @@ import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
+import mekhq.campaign.event.LocationChangedEvent;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.Planets;
@@ -75,6 +76,7 @@ public class CurrentLocation implements Serializable {
 	
 	public void setCurrentPlanet(Planet p) {
 		currentPlanet = p;
+		MekHQ.triggerEvent(new LocationChangedEvent(this, false));
 	}
 	
 	public void setTransitTime(double time) {
@@ -175,6 +177,7 @@ public class CurrentLocation implements Serializable {
                 campaign.addReport("Jumping to " + jumpPath.get(1).getPrintableName(currentDate));
 				currentPlanet = jumpPath.get(1);
 				jumpPath.removeFirstPlanet();
+		        MekHQ.triggerEvent(new LocationChangedEvent(this, true));
 				//reduce remaining hours by usedRechargeTime or usedTransitTime, whichever is greater
 				hours -= Math.max(usedRechargeTime, usedTransitTime);
 				transitTime = currentPlanet.getTimeToJumpPoint(1.0);
