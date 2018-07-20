@@ -135,6 +135,42 @@ public class FactionBorderTracker {
     }
     
     /**
+     * Sets the current date and recalculates the faction borders if it has changed.
+     * 
+     * @param when The campaign date
+     */
+    public synchronized void setDate(DateTime when) {
+        invalid |= now.plusDays(dayThreshold).isAfter(when)
+                || now.minusDays(dayThreshold).isBefore(when);
+        now = when;
+        recalculate();
+    }
+    
+    /**
+     * Retrieves a {@code Set} of all factions that control at least one planet in the region.
+     * 
+     * If the borders are being recalculated, this method may block until the calculation is complete.
+     * If the change that caused the borders to be recalculated are under the time or distance thresholds,
+     * the return value will be current if it has already been calculated, otherwise it will be the value
+     * determined by the last completed recalculation.
+     * 
+     * @return  A {@code Set} of the factions present in the region
+     * @throws InterruptedException If the thread was interrupted while waiting for the results of
+     *                              a borders recalculation.
+     *                              
+     * @see #setDayThreshold(int)
+     * @see #setDistanceThreshold(double)
+     */
+            
+    public synchronized Set<Faction> getFactionsInRegion()
+            throws InterruptedException {
+        while (invalid) {
+            wait();
+        }
+        return Collections.unmodifiableSet(borders.keySet());
+    }
+
+    /**
      * Retrieves a FactionBorders object for the given faction.
      * 
      * If the borders are being recalculated, this method may block until the calculation is complete.
