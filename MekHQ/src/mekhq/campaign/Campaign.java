@@ -3092,14 +3092,7 @@ public class Campaign implements Serializable, ITechManager {
         shoppingList.restore();
 
         if (getCampaignOptions().getUseAtB()) {
-            while (!RandomFactionGenerator.getInstance().isInitialized()) {
-                //Sleep for up to one second.
-                try {
-                    Thread.sleep(50);
-                } catch (InterruptedException ignore) {
-
-                }
-            }
+            RandomFactionGenerator.getInstance().startup(this);
             while (!RandomUnitGenerator.getInstance().isInitialized()) {
                 //Sleep for up to one second.
                 try {

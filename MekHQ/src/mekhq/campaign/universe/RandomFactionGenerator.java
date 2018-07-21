@@ -21,8 +21,6 @@
 
 package mekhq.campaign.universe;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.FileInputStream;
 import java.io.Serializable;
 import java.text.ParseException;
@@ -35,7 +33,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.NavigableMap;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -79,6 +76,7 @@ public class RandomFactionGenerator implements Serializable {
 	 */
 	private static final long serialVersionUID = -7346225681238948390L;
 	
+	private static final String FACTION_HINTS_FILE = "data/universe/factionhints.xml"; //$NON-NLS-1$
 	/* When checking for potential enemies, count the planets controlled
 	 * by potentially hostile factions within a certain number of jumps of
 	 * friendly worlds; the number is based on the region of space.
@@ -92,12 +90,6 @@ public class RandomFactionGenerator implements Serializable {
     
 	private static RandomFactionGenerator rfg = null;
 	
-    /* all factions that control at least one system at the current date */
-	private TreeSet<String> currentFactions;
-	
-    /* list of potential employers weighted by number of systems controlled */
-	private NavigableMap<Integer, Faction> employers;
-	
 	private Set<String> deepPeriphery;
 	private Set<String> neutralFactions;
 	private Set<String> majorPowers;
@@ -108,16 +100,11 @@ public class RandomFactionGenerator implements Serializable {
 	private Map<String, Map<String, List<FactionHint>>> neutralExceptions;
 	private Map<String, Map<String, List<AltLocation>>> containedFactions;
 	
-	private List<ActionListener> listeners;
-	private Thread loader;
-	private static boolean initialized = false;
-	private static boolean initializing = false;
-	
 	private FactionBorderTracker borderTracker;
 	
+	private boolean initialized = false;
+	
 	private RandomFactionGenerator() {
-		currentFactions = new TreeSet<>();
-		employers = new TreeMap<>();
 		deepPeriphery = new HashSet<>();
 		neutralFactions = new HashSet<>();
 		majorPowers = new HashSet<>();
@@ -126,57 +113,30 @@ public class RandomFactionGenerator implements Serializable {
 		rivals = new HashMap<>();
 		neutralExceptions = new HashMap<>();
 		containedFactions = new HashMap<>();
-		listeners = new ArrayList<>();
 		
 		borderTracker = new FactionBorderTracker();
 		borderTracker.setDayThreshold(30);
 		borderTracker.setDistanceThreshold(100);
 		borderTracker.setDefaultBorderSize(BORDER_RANGE_IS, BORDER_RANGE_NEAR_PERIPHERY, BORDER_RANGE_CLAN);
+		
+		if (!initialized) {
+	        try {
+	            loadFactionHints();
+	        } catch (DOMException e) {
+	            MekHQ.getLogger().log(getClass(), "initialize()", e); //$NON-NLS-1$
+	        } catch (ParseException e) {
+	            MekHQ.getLogger().log(getClass(), "initialize()", e); //$NON-NLS-1$
+	        }
+
+	        initialized = true;
+		}
 	}
 	
 	public static RandomFactionGenerator getInstance() {
 		if (rfg == null) {
 			rfg = new RandomFactionGenerator();
 		}
-		
-		if (!initialized && !initializing) {
-			initializing = true;
-			rfg.loader = new Thread(new Runnable() {
-				public void run() {
-					Planets p = Planets.getInstance();
-					while (!p.isInitialized()) {
-						try {
-							Thread.sleep(50);
-						} catch (InterruptedException ignore) {
-						}
-					}
-					rfg.initialize();
-				}
-			}, "FactionGeography loader");
-            rfg.loader.setPriority(Thread.NORM_PRIORITY - 1);
-            rfg.loader.start();
-		}
 		return rfg;
-	}
-	
-	public boolean isInitialized() {
-		return initialized;
-	}
-	
-	private void initialize() {
-		try {
-			loadFactionHints();
-		} catch (DOMException e) {
-		    MekHQ.getLogger().log(getClass(), "initialize()", e); //$NON-NLS-1$
-		} catch (ParseException e) {
-            MekHQ.getLogger().log(getClass(), "initialize()", e); //$NON-NLS-1$
-		}
-
-		initialized = true;
-		initializing = false;
-		for (ActionListener l : listeners) {
-			l.actionPerformed(new ActionEvent(this, 0, "FactionGeography initialized"));
-		}
 	}
 	
 	public void startup(Campaign c) {
@@ -203,8 +163,6 @@ public class RandomFactionGenerator implements Serializable {
 
 	public void clear() {
 		rfg = null;
-		currentFactions.clear();
-		employers.clear();
 		deepPeriphery.clear();
 		neutralFactions.clear();
 		majorPowers.clear();		
@@ -215,7 +173,6 @@ public class RandomFactionGenerator implements Serializable {
 		containedFactions.clear();
 		
 		initialized = false;
-		initializing = false;
 	}	
 
 	
@@ -228,7 +185,7 @@ public class RandomFactionGenerator implements Serializable {
 		Document xmlDoc = null;
 		
 		try {
-			FileInputStream fis = new FileInputStream("data/universe/factionhints.xml"); //$NON-NLS-1$
+			FileInputStream fis = new FileInputStream(FACTION_HINTS_FILE); //$NON-NLS-1$
 			DocumentBuilder db = dbf.newDocumentBuilder();
 	
 			xmlDoc = db.parse(fis);
@@ -436,14 +393,6 @@ public class RandomFactionGenerator implements Serializable {
 		}	
 	}
 	
-	public void registerListener(ActionListener l) {
-		listeners.add(l);
-	}
-	
-	public void removeListener(ActionListener l) {
-		listeners.remove(l);
-	}
-	
 	private Date currentDate() {
 	    return borderTracker.getLastUpdated().toDate();
 	}
@@ -501,7 +450,6 @@ public class RandomFactionGenerator implements Serializable {
 	        for (String cf : getContainedFactions(f.getShortName(), currentDate())) {
 	            Faction cfaction = Faction.getFaction(cf);
 	            if (null != cfaction) {
-	                currentFactions.add(cf);
 	                if (!cfaction.isClan()) {
 	                    weight = (int) Math.floor(borderTracker.getBorders(f).getPlanets().size()
 	                            * getAltLocationFraction(f.getShortName(), cf, currentDate()) + 0.5);
@@ -608,7 +556,8 @@ public class RandomFactionGenerator implements Serializable {
 	 * @return A set of keys for all current factions in the space that are potential employers.
 	 */
 	public Set<String> getEmployerSet() {
-	    return employers.values().stream()
+	    return borderTracker.getFactionsInRegion().stream()
+	            .filter(f -> !f.isClan())
 	            .map(Faction::getShortName)
 	            .collect(Collectors.toSet());
 	}	
