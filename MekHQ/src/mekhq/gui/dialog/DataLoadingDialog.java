@@ -269,9 +269,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
         			campaign.readNews();
         			campaign.addReport("<b>" + campaign.getDateAsString() + "</b>");
         			if (campaign.getCampaignOptions().getUseAtB()) {
-        				RandomFactionGenerator.getInstance().updateTables(campaign.getDate(),
-        						campaign.getLocation().getCurrentPlanet(),
-        						campaign.getCampaignOptions());
+        				RandomFactionGenerator.getInstance().startup(campaign);
         				campaign.getContractMarket().generateContractOffers(campaign, true);
         				campaign.getUnitMarket().generateUnitOffers(campaign);
         				campaign.getRetirementDefectionTracker().setLastRetirementRoll(campaign.getCalendar());

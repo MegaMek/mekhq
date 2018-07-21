@@ -175,7 +175,7 @@ public class ContractMarket implements Serializable {
 					campaign.getCurrentPlanet().getFactionSet(currentDate);
 			boolean inMinorFaction = true;
 			for (Faction f : currentFactions) {
-				if (RandomFactionGenerator.getInstance().isMajorPower(f) ||
+				if (RandomFactionGenerator.getInstance().isISMajorPower(f) ||
 						f.isClan()) {
 					inMinorFaction = false;
 					break;
@@ -368,16 +368,14 @@ public class ContractMarket implements Serializable {
 			}
 		}
 
-		int searchRadius = campaign.getCampaignOptions().getSearchRadius();
-
 		boolean isAttacker = (contract.getMissionType() == AtBContract.MT_PLANETARYASSAULT ||
 				contract.getMissionType() >= AtBContract.MT_PLANETARYASSAULT ||
 				(contract.getMissionType() == AtBContract.MT_RELIEFDUTY && Compute.d6() < 4) ||
 				contract.getEnemyCode().equals("REB"));
 		if (isAttacker) {
-			contract.setPlanetId(RandomFactionGenerator.getInstance().getMissionTarget(contract.getEmployerCode(), contract.getEnemyCode(), campaign.getDate(), campaign.getCurrentPlanet(), searchRadius));
+			contract.setPlanetId(RandomFactionGenerator.getInstance().getMissionTarget(contract.getEmployerCode(), contract.getEnemyCode()));
 		} else {
-			contract.setPlanetId(RandomFactionGenerator.getInstance().getMissionTarget(contract.getEnemyCode(), contract.getEmployerCode(), campaign.getDate(), campaign.getCurrentPlanet(), searchRadius));
+			contract.setPlanetId(RandomFactionGenerator.getInstance().getMissionTarget(contract.getEnemyCode(), contract.getEmployerCode()));
 		}
         if (contract.getPlanet() == null) {
 		    MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.WARNING,

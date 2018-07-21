@@ -1724,8 +1724,7 @@ public class CampaignGUI extends JPanel {
                     }
                 }
                 RandomNameGenerator.getInstance();
-                RandomFactionGenerator.getInstance().updateTables(getCampaign().getDate(),
-                        getCampaign().getCurrentPlanet(), getCampaign().getCampaignOptions());
+                RandomFactionGenerator.getInstance().startup(getCampaign());
             } else {
                 getCampaign().shutdownAtB();
             }

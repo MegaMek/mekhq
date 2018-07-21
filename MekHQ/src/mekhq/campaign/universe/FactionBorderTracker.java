@@ -34,6 +34,8 @@ import org.joda.time.DateTime;
 
 import megamek.common.annotations.Nullable;
 import megamek.common.event.Subscribe;
+import megamek.common.logging.LogLevel;
+import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.event.LocationChangedEvent;
 import mekhq.campaign.event.NewDayEvent;
@@ -101,6 +103,27 @@ public class FactionBorderTracker {
     }
     
     /**
+     * @return The X coordinate of the bounding hex
+     */
+    public double getCenterX() {
+        return regionHex.center[0];
+    }
+
+    /**
+     * @return The Y coordinate of the bounding hex
+     */
+    public double getCenterY() {
+        return regionHex.center[1];
+    }
+    
+    /**
+     * @return The radius coordinate of the bounding hex (distance from the center to each vertex)
+     */
+    public double getRadius() {
+        return regionHex.radius;
+    }
+
+    /**
      * Sets the center of the region's bounding hex and recalculates the faction borders
      * if it has moved.
      * 
@@ -147,6 +170,13 @@ public class FactionBorderTracker {
     }
     
     /**
+     * @return The campaign date of the last completed border calculation
+     */
+    public synchronized DateTime getLastUpdated() {
+        return lastUpdate;
+    }
+    
+    /**
      * Retrieves a {@code Set} of all factions that control at least one planet in the region.
      * 
      * If the borders are being recalculated, this method may block until the calculation is complete.
@@ -155,17 +185,18 @@ public class FactionBorderTracker {
      * determined by the last completed recalculation.
      * 
      * @return  A {@code Set} of the factions present in the region
-     * @throws InterruptedException If the thread was interrupted while waiting for the results of
-     *                              a borders recalculation.
      *                              
      * @see #setDayThreshold(int)
      * @see #setDistanceThreshold(double)
      */
             
-    public synchronized Set<Faction> getFactionsInRegion()
-            throws InterruptedException {
+    public synchronized Set<Faction> getFactionsInRegion() {
         while (invalid) {
-            wait();
+            try {
+                wait();
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+            }
         }
         return Collections.unmodifiableSet(borders.keySet());
     }
@@ -182,17 +213,18 @@ public class FactionBorderTracker {
      * @param f A faction
      * @return  A {@link FactionBorders} instance for the faction, or null if the faction does not control
      *          any systems in the region's bounding hex
-     * @throws InterruptedException If the thread was interrupted while waiting for the results of
-     *                              a borders recalculation.
      *                              
      * @see #setDayThreshold(int)
      * @see #setDistanceThreshold(double)
      */
             
-    @Nullable public synchronized FactionBorders getBorders(Faction f)
-            throws InterruptedException {
+    @Nullable public synchronized FactionBorders getBorders(Faction f) {
         while (invalid) {
-            wait();
+            try {
+                wait();
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+            }
         }
         return borders.get(f);
     }
@@ -209,8 +241,6 @@ public class FactionBorderTracker {
      * @param f A faction key
      * @return  A {@link FactionBorders} instance for the faction, or null if the faction does not control
      *          any systems in the region's bounding hex or the key is invalid
-     * @throws InterruptedException If the thread was interrupted while waiting for the results of
-     *                              a borders recalculation.
      *                              
      * @see #setDayThreshold(int)
      * @see #setDistanceThreshold(double)
@@ -218,7 +248,11 @@ public class FactionBorderTracker {
     @Nullable public synchronized FactionBorders getBorders(String fKey)
             throws InterruptedException {
         while (invalid) {
-            wait();
+            try {
+                wait();
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+            }
         }
         Faction f = Faction.getFaction(fKey);
         if (null != f) {
@@ -242,16 +276,17 @@ public class FactionBorderTracker {
      *              distance. 
      * @return  A List of all planets in the region that are controlled by {@code other} that are considered
      *          to be within the border region.
-     * @throws InterruptedException If the thread was interrupted while waiting for the results of
-     *                              a borders recalculation.
      *                              
      * @see #setDayThreshold(int)
      * @see #setDistanceThreshold(double)
      */
-    public synchronized List<Planet> getBorderPlanets(Faction self, Faction other)
-            throws InterruptedException {
+    public synchronized List<Planet> getBorderPlanets(Faction self, Faction other) {
         while (invalid) {
-            wait();
+            try {
+                wait();
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+            }
         }
         if (borderPlanets.containsKey(self)
                 && borderPlanets.get(self).containsKey(other)) {
@@ -396,53 +431,61 @@ public class FactionBorderTracker {
      */
     private void rebuildBorderData() {
         cancelTask = false;
-        List<Planet> planetList = new ArrayList<>();
-        Set<Faction> factionSet = new HashSet<>();
-        Set<Faction> oldFactions = new HashSet<>(borders.keySet());
-        synchronized (this) {
-            for (Planet planet : getPlanetList()) {
-                if ((distanceThreshold < 0)
-                        || regionHex.contains(planet.getX(), planet.getY())) {
-                    planetList.add(planet);
-                    factionSet.addAll(planet.getFactionSet(now));
+        try {
+            List<Planet> planetList = new ArrayList<>();
+            Set<Faction> factionSet = new HashSet<>();
+            Set<Faction> oldFactions = new HashSet<>(borders.keySet());
+            synchronized (this) {
+                for (Planet planet : getPlanetList()) {
+                    if ((distanceThreshold < 0)
+                            || regionHex.contains(planet.getX(), planet.getY())) {
+                        planetList.add(planet);
+                        factionSet.addAll(planet.getFactionSet(now));
+                    }
+                    if (cancelTask) {
+                        return;
+                    }
                 }
+            }
+            for (Faction f : factionSet) {
+                borders.put(f, new FactionBorders(f, now, planetList));
+                oldFactions.remove(f);
+            }
+            for (Faction f : oldFactions) {
+                borders.remove(f);
+                borderPlanets.remove(f);
+            }
+            if (cancelTask) {
+                return;
+            }
+            for (Faction us : factionSet) {
+                Map<Faction, List<Planet>> borderMap = new HashMap<>();
+                for (Faction them : factionSet) {
+                    if (!us.equals(them)) {
+                        double borderSize = Math.max(getBorderSize(us), getBorderSize(them));
+                        List<Planet> planets = borders.get(us).getBorderPlanets(borders.get(them), borderSize);
+                        borderMap.put(them, planets);
+                    }
+                }
+                borderPlanets.put(us, borderMap);
                 if (cancelTask) {
                     return;
                 }
             }
-        }
-        for (Faction f : factionSet) {
-            borders.put(f, new FactionBorders(f, now, planetList));
-            oldFactions.remove(f);
-        }
-        for (Faction f : oldFactions) {
-            borders.remove(f);
-            borderPlanets.remove(f);
-        }
-        if (cancelTask) {
-            return;
-        }
-        for (Faction us : factionSet) {
-            Map<Faction, List<Planet>> borderMap = new HashMap<>();
-            for (Faction them : factionSet) {
-                if (!us.equals(them)) {
-                    double borderSize = Math.max(getBorderSize(us), getBorderSize(them));
-                    List<Planet> planets = borders.get(us).getBorderPlanets(borders.get(them), borderSize);
-                    borderMap.put(them, planets);
+            synchronized (this) {
+                if (cancelTask) {
+                    return;
                 }
+                lastUpdate = now;
             }
-            borderPlanets.put(us, borderMap);
-            if (cancelTask) {
-                return;
+        } catch (Exception ex) {
+            MekHQ.getLogger().log(getClass(), "recalculate()", LogLevel.ERROR,
+                    ex.getMessage());
+        } finally {
+            synchronized (this) {
+                invalid = false;
+                notify();
             }
-        }
-        synchronized (this) {
-            if (cancelTask) {
-                return;
-            }
-            lastUpdate = now;
-            invalid = false;
-            notify();
         }
     }
     

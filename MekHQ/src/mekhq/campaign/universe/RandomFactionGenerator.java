@@ -28,11 +28,18 @@ import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.NavigableMap;
+import java.util.Set;
+import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -44,10 +51,13 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import megamek.common.Compute;
+import megamek.common.annotations.Nullable;
+import megamek.common.event.Subscribe;
 import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
 import mekhq.Utilities;
-import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.event.OptionsChangedEvent;
 
 /**
  * @author Neoancient
@@ -77,56 +87,51 @@ public class RandomFactionGenerator implements Serializable {
 	private static final int BORDER_RANGE_CLAN = 90;
 	private static final int BORDER_RANGE_NEAR_PERIPHERY = 90;
 	private static final int BORDER_RANGE_DEEP_PERIPHERY = 210; //a bit more than this distance between HL and NC
-
+	
+    private static final Date FORTRESS_REPUBLIC = new Date (new GregorianCalendar(3135,10,1).getTimeInMillis());
+    
 	private static RandomFactionGenerator rfg = null;
 	
+    /* all factions that control at least one system at the current date */
 	private TreeSet<String> currentFactions;
-	/* all factions that control at least one system at the current date
-	 */
 	
-	private ArrayList<String> employers;
-	/* list of potential employers weighted by number of systems controlled
-	 */
-	private HashMap<String, HashMap<String, HashSet<Planet>>> borders;
-	/*List of systems controlled by faction key1 that are within one
-	 * jump of faction key2
-	 */
+    /* list of potential employers weighted by number of systems controlled */
+	private NavigableMap<Integer, Faction> employers;
 	
-	private HashSet<String> deepPeriphery;
-	private HashSet<String> neutralFactions;
-	private HashSet<String> majorPowers;
+	private Set<String> deepPeriphery;
+	private Set<String> neutralFactions;
+	private Set<String> majorPowers;
 	
-	private HashMap<String, HashMap<String, ArrayList<FactionHint>>> wars;
-	private HashMap<String, HashMap<String, ArrayList<FactionHint>>> alliances;
-	private HashMap<String, HashMap<String, ArrayList<FactionHint>>> rivals;
-	private HashMap<String, HashMap<String, ArrayList<FactionHint>>> neutralExceptions;
-	private HashMap<String, HashMap<String, ArrayList<AltLocation>>> containedFactions;
+	private Map<String, Map<String, List<FactionHint>>> wars;
+	private Map<String, Map<String, List<FactionHint>>> alliances;
+	private Map<String, Map<String, List<FactionHint>>> rivals;
+	private Map<String, Map<String, List<FactionHint>>> neutralExceptions;
+	private Map<String, Map<String, List<AltLocation>>> containedFactions;
 	
-	private ArrayList<ActionListener> listeners;
+	private List<ActionListener> listeners;
 	private Thread loader;
 	private static boolean initialized = false;
 	private static boolean initializing = false;
 	
-	/* Track time and location; only update if one of them has changed */
-	private Date lastUpdate = null;
-	private Planet lastLocation = null;
+	private FactionBorderTracker borderTracker;
 	
 	private RandomFactionGenerator() {
-		currentFactions = new TreeSet<String>();
-		employers = new ArrayList<String>();
-		deepPeriphery = new HashSet<String>();
-		neutralFactions = new HashSet<String>();
-		majorPowers = new HashSet<String>();
-		borders = new HashMap<String,HashMap<String,HashSet<Planet>>>();
-		wars = new HashMap<String, HashMap<String, ArrayList<FactionHint>>>();
-		alliances = new HashMap<String, HashMap<String, ArrayList<FactionHint>>>();
-		rivals = new HashMap<String, HashMap<String, ArrayList<FactionHint>>>();
-		neutralExceptions = new HashMap<String, HashMap<String, ArrayList<FactionHint>>>();
-		containedFactions = new HashMap<String, HashMap<String, ArrayList<AltLocation>>>();
-		listeners = new ArrayList<ActionListener>();
+		currentFactions = new TreeSet<>();
+		employers = new TreeMap<>();
+		deepPeriphery = new HashSet<>();
+		neutralFactions = new HashSet<>();
+		majorPowers = new HashSet<>();
+		wars = new HashMap<>();
+		alliances = new HashMap<>();
+		rivals = new HashMap<>();
+		neutralExceptions = new HashMap<>();
+		containedFactions = new HashMap<>();
+		listeners = new ArrayList<>();
 		
-		lastUpdate = new Date(0); //initialize 1 Jan 1970
-		lastLocation = Planets.getInstance().getPlanets().get("Terra");
+		borderTracker = new FactionBorderTracker();
+		borderTracker.setDayThreshold(30);
+		borderTracker.setDistanceThreshold(100);
+		borderTracker.setDefaultBorderSize(BORDER_RANGE_IS, BORDER_RANGE_NEAR_PERIPHERY, BORDER_RANGE_CLAN);
 	}
 	
 	public static RandomFactionGenerator getInstance() {
@@ -174,17 +179,32 @@ public class RandomFactionGenerator implements Serializable {
 		}
 	}
 	
+	public void startup(Campaign c) {
+	    borderTracker.setDate(Utilities.getDateTimeDay(c.getCalendar()));
+	    final Planet location = c.getLocation().getCurrentPlanet();
+	    borderTracker.setRegionCenter(location.getX(), location.getY());
+	    borderTracker.setRegionRadius(c.getCampaignOptions().getSearchRadius());
+	    MekHQ.registerHandler(borderTracker);
+	    MekHQ.registerHandler(this);
+	}
+	
+	@Subscribe
+	public void handleCampaignOptionsChanged(OptionsChangedEvent event) {
+	    borderTracker.setRegionRadius(event.getOptions().getSearchRadius());
+	}
+	
 	public void dispose() {
 		if (initialized){
 			clear();
 		}
+		MekHQ.unregisterHandler(borderTracker);
+		MekHQ.unregisterHandler(this);
 	}
 
 	public void clear() {
 		rfg = null;
 		currentFactions.clear();
 		employers.clear();
-		borders.clear();
 		deepPeriphery.clear();
 		neutralFactions.clear();
 		majorPowers.clear();		
@@ -245,6 +265,7 @@ public class RandomFactionGenerator implements Serializable {
 					for (String f : wn.getTextContent().trim().split(",")) {
 						if (Faction.getFaction(f) != null) {
 							deepPeriphery.add(f);
+							borderTracker.setBorderSize(Faction.getFaction(f), BORDER_RANGE_DEEP_PERIPHERY);
 						} else {
 	                        MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
 	                                "Invalid faction code in factionhints.xml: " + f); //$NON-NLS-1$
@@ -297,7 +318,7 @@ public class RandomFactionGenerator implements Serializable {
 					}
 					if (Faction.getFaction(outer) != null && Faction.getFaction(inner) != null) {
 						if (containedFactions.get(outer) == null) {
-							containedFactions.put(outer, new HashMap<String, ArrayList<AltLocation>>());
+							containedFactions.put(outer, new HashMap<>());
 						}
 						if (containedFactions.get(outer).get(inner) == null) {
 							containedFactions.get(outer).put(inner, new ArrayList<AltLocation>());
@@ -312,9 +333,9 @@ public class RandomFactionGenerator implements Serializable {
 		}
 	}
 	
-	private void setFactionHint(HashMap<String, HashMap<String, ArrayList<FactionHint>>> hint,
+	private void setFactionHint(Map<String, Map<String, List<FactionHint>>> hint,
 			Node node) throws DOMException, ParseException {
-	    final String METHOD_NAME = "setFactionHint(HashMap<String,HashMap<String,ArrayList<FactionHint>>>,Node"; //$NON-NLS-1$
+	    final String METHOD_NAME = "setFactionHint(Map<String,Map<String,List<FactionHint>>>,Node"; //$NON-NLS-1$
 	    
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 		final Date epoch_start = df.parse("0001-01-01");
@@ -359,7 +380,7 @@ public class RandomFactionGenerator implements Serializable {
 							continue;
 						}
 						if (hint.get(parties[i]) == null) {
-							hint.put(parties[i], new HashMap<String, ArrayList<FactionHint>>());
+							hint.put(parties[i], new HashMap<>());
 						}
 						if (hint.get(parties[i]).get(parties[j]) == null) {
 							hint.get(parties[i]).put(parties[j], new ArrayList<FactionHint>());
@@ -404,10 +425,10 @@ public class RandomFactionGenerator implements Serializable {
 						continue;
 					}
 					if (neutralExceptions.get(faction) == null) {
-						neutralExceptions.put(faction, new HashMap<String, ArrayList<FactionHint>>());
+						neutralExceptions.put(faction, new HashMap<>());
 					}
 					if (neutralExceptions.get(faction).get(parties[i]) == null) {
-						neutralExceptions.get(faction).put(parties[i], new ArrayList<FactionHint>());
+						neutralExceptions.get(faction).put(parties[i], new ArrayList<>());
 					}
 					neutralExceptions.get(faction).get(parties[i]).add(new FactionHint(faction, localStart, localEnd));
 				}
@@ -423,262 +444,235 @@ public class RandomFactionGenerator implements Serializable {
 		listeners.remove(l);
 	}
 	
-	public void updateTables(Date date, Planet currentLocation,
-			CampaignOptions options) {
-        final Date FORTRESS_REPUBLIC = new Date (new GregorianCalendar(3135,10,1).getTimeInMillis());
-        if (!date.after(lastUpdate) && currentLocation == lastLocation) {
-			return;
-		}
-		lastUpdate.setTime(date.getTime());
-		lastLocation = currentLocation;
-		employers.clear();
-		borders.clear();
-		currentFactions.clear();
-		for (Planet p : Planets.getInstance().getPlanets().values()) {
-			for (Faction f : p.getFactionSet(Utilities.getDateTimeDay(date))) {
-			    if(f == null) {
-                    MekHQ.getLogger().log(this.getClass(), "RandomFactionGenerator.updateTables", 
-                            LogLevel.ERROR, "Invalid faction code [" + f + "] in planets.xml for planet " + p.getId() + " in year " + date);
-                    continue;
+	private Date currentDate() {
+	    return borderTracker.getLastUpdated().toDate();
+	}
+	
+	/**
+	 * @return A set of faction keys for all factions that have a presence within the search area.
+	 */
+	public Set<String> getCurrentFactions() {
+        Set<String> retVal = new TreeSet<>();
+        for (Faction f : borderTracker.getFactionsInRegion()) {
+
+            if (isEmptyFaction(f)
+                    || f.getShortName().equals("CLAN")) {
+                continue;
+            }
+            if (f.getShortName().equals("ROS") && currentDate().after(FORTRESS_REPUBLIC)) {
+                 continue;
+            }
+
+            retVal.add(f.getShortName());
+            /* Add factions which do not control any planets to the employer list */
+            for (String cf : getContainedFactions(f.getShortName(), currentDate())) {
+                Faction cfaction = Faction.getFaction(cf);
+                if (null != cfaction) {
+                    retVal.add(cf);
                 }
-			    
-				String fName = f.getShortName();
-				if (fName.equals("ABN") ||
-						fName.equals("UND") ||
-						fName.equals("CLAN") ||
-						fName.equals("NONE")) {
-					continue;
-				}
-				if (fName.equals("ROS") && date.after(FORTRESS_REPUBLIC)) {
-					 continue;
-				}
-				currentFactions.add(fName);
-				if (p.getDistanceTo(currentLocation) <= options.getSearchRadius()) {
-					if (!f.isClan()) {
-						employers.add(fName);
-					}
-					updateBorders(f, p);
-				}
-			}
-		}
-		/* Add factions which do not control any planets to the employer list */
-		for (String emp : getEmployerSet()) {
-			int count = 0;
-			for(String cf : getContainedFactions(emp, date)) {
-				currentFactions.add(cf);
-				if (Faction.getFaction(cf).isClan()) {
-					continue;
-				}
-				if (count == 0) {
-					for (String s : employers) {
-						if (s.equals(emp)) {
-							count++;
-						}
-					}
-				}
-				for (int i = 0; i < count * getAltLocationFraction(emp, cf, date) + 0.5; i++) {
-					employers.add(cf);
-				}
-			}
-		}
-		
-		//Add rebels and pirates
-		currentFactions.add("REB");
-		currentFactions.add("PIR");
+            }
+        }
+        //Add rebels and pirates
+        retVal.add("REB");
+        retVal.add("PIR");
+		return retVal;
 	}
 	
-	private void updateBorders(Faction f, Planet p) {
-		int distance = BORDER_RANGE_IS;
-		if (f.isClan()) {
-			distance = BORDER_RANGE_CLAN;
-		} else if (deepPeriphery.contains(f.getShortName())) {
-			distance = BORDER_RANGE_DEEP_PERIPHERY;			
-		} else if (f.isPeriphery()) {
-			distance = BORDER_RANGE_NEAR_PERIPHERY;
-		}
-		for (Planet planetKey : Planets.getInstance().getNearbyPlanets(p, distance)) {
-			for (Faction f2 : planetKey.getFactionSet(Utilities.getDateTimeDay(lastUpdate))) {
-			    if(f2 == null) {
-			        MekHQ.getLogger().log(this.getClass(), "RandomFactionGenerator.UpdateBorders", 
-			                LogLevel.ERROR, "Invalid faction code [" + f2 + "] in planets.xml for planet " + planetKey.getId() + " in year " + lastUpdate);
-			        continue;
-			    }
-			    
-				String eName = f2.getShortName();
-				if (eName.equals("ABN") ||
-						eName.equals("UND") ||
-						eName.equals("CLAN") ||
-						eName.equals("NONE")) {
-					continue;
-				}
-				addBorderEnemy(f.getShortName(), p, eName);
-				/* Go through all factions contained within f and add this
-				 * planet to their border with this enemy as well */
-				for(String cf : getContainedFactions(f.getShortName(), lastUpdate)) {
-					if (isContainedFactionOpponent(f.getShortName(), cf, eName, lastUpdate)) {
-						addBorderEnemy(cf, p, eName);
-					}
-				}
-			}
-		}
-		/* If a faction is located within a faction with which it may be at war,
-		 * add this planet to both borders. */
-		for (String cf : getContainedFactions(f.getShortName(), lastUpdate)) {
-			if (isContainedFactionOpponent(f.getShortName(), cf, f.getShortName(), lastUpdate)) {
-				addBorderEnemy(cf, p, f.getShortName());
-				addBorderEnemy(f.getShortName(), p, cf);
-			}
-		}
-	}
+	/**
+	 * Builds map of potential employers weighted by number of systems controled within the search area
+	 * 
+	 * @return Map used to select employer
+	 */
+	protected WeightedMap<Faction> buildEmployerMap() {
+	    WeightedMap<Faction> retVal = new WeightedMap<>();
+	    for (Faction f : borderTracker.getFactionsInRegion()) {
 
-	private void addBorderEnemy(String fName, Planet p, String eName) {
-		final Date FORTRESS_REPUBLIC = new Date (new GregorianCalendar(3135,10,1).getTimeInMillis());
+	        if (f.isClan() || isEmptyFaction(f)) {
+	            continue;
+	        }
+	        if (f.getShortName().equals("ROS") && currentDate().after(FORTRESS_REPUBLIC)) {
+	            continue;
+	        }
 
-		if (borders.get(fName) == null) {
-			borders.put(fName, new HashMap<>());
-		}
-        borders.get(fName).putIfAbsent("REB", new HashSet<>());
-        borders.get(fName).putIfAbsent("PIR", new HashSet<>());
-		if (fName.equals(eName)) {
-		    borders.get(fName).get("REB").add(p);
-			if (hintApplies(wars, fName, fName, lastUpdate)) {
-				if (borders.get(fName).get(eName) == null) {
-					borders.get(fName).put(eName, new HashSet<Planet>());
-				}
-				borders.get(fName).get(eName).add(p);
-			}
-		} else {
-			/* Locate pirate activity primarily along borders */
-			borders.get(fName).get("PIR").add(p);
-			if (borders.get("PIR") == null) {
-				borders.put("PIR", new HashMap<String, HashSet<Planet>>());
-			}
-			if (borders.get("PIR").get(fName) == null) {
-				borders.get("PIR").put(fName, new HashSet<Planet>());
-			}
-			borders.get("PIR").get(fName).add(p);
-			
-			/* Ignore allies (unless both are Clan) */
-			if (hintApplies(alliances, fName, eName, lastUpdate) &&
-					!(Faction.getFaction(fName).isClan() &&
-							Faction.getFaction(eName).isClan())) {
-				return;
-			}
-			if (neutralFactions.contains(fName) &&
-					!hintApplies(neutralExceptions, fName, eName, lastUpdate)) {
-				return;
-			}
-			if (neutralFactions.contains(eName) &&
-					!hintApplies(neutralExceptions, eName, fName, lastUpdate)) {
-				return;
-			}
-			if ((fName.equals("ROS") || eName.equals("ROS")) &&
-					lastUpdate.after(FORTRESS_REPUBLIC)) {
-				return;
-			}
+	        int weight = borderTracker.getBorders(f).getPlanets().size();
+	        retVal.add(weight, f);
 
-			/* Otherwise add planet to the border */
-			if (borders.get(fName).get(eName) == null) {
-				borders.get(fName).put(eName, new HashSet<Planet>());
-			}
-			borders.get(fName).get(eName).add(p);
-		}
+	        /* Add factions which do not control any planets to the employer list */
+	        for (String cf : getContainedFactions(f.getShortName(), currentDate())) {
+	            Faction cfaction = Faction.getFaction(cf);
+	            if (null != cfaction) {
+	                currentFactions.add(cf);
+	                if (!cfaction.isClan()) {
+	                    weight = (int) Math.floor(borderTracker.getBorders(f).getPlanets().size()
+	                            * getAltLocationFraction(f.getShortName(), cf, currentDate()) + 0.5);
+	                    retVal.add(weight, f);
+	                }
+	            }
+	        }
+	    }
+	    return retVal;
 	}
 	
-	public TreeSet<String> getCurrentFactions() {
-		return currentFactions;
-	}
-	
+	/**
+	 * Selects a faction from those with a presence in the region weighted by number of systems controlled.
+	 * Excludes Clan factions and non-faction place holders (unknown, abandoned, none).
+	 * 
+	 * @return A faction to use as the employer for a contract.
+	 */
 	public String getEmployer() {
-		return Utilities.getRandomItem(employers);
+	    WeightedMap<Faction> employers = buildEmployerMap();
+	    Faction f = employers.randomItem();
+	    if (null != f) {
+	        return f.getShortName();
+	    }
+	    return null;
 	}
 	
-	public String getEnemy(String fName, boolean useRebels) {
+	/**
+	 * Selects an enemy faction for the given employer, weighted by length of shared border and
+	 * diplomatic relations. Factions at war are twice or designated as rivals as likely (cumulative)
+	 * to be chosen as opponents. Allied factions are ignored except for Clans, which cuts halves
+	 * the weight for that option. 
+	 * 
+	 * @param employer  The faction offering the contract
+	 * @param useRebels Whether to include rebels as a possible opponent
+	 * @return          The faction to use as the opfor.
+	 */
+	public String getEnemy(String employer, boolean useRebels) {
 	    final String METHOD_NAME = "getEnemy(String,boolean)"; //$NON-NLS-1$
 	    
 		/* Rebels occur on a 1-4 (d20) on nearly every enemy chart */
 		if (useRebels && Compute.randomInt(5) == 0) {
 			return "REB";
 		}
-		if (borders.get(fName) != null) {
-			ArrayList<String> enemiesList = new ArrayList<String>();
-			for (String eName : borders.get(fName).keySet()) {
-				if (eName.equals("PIR") ||
-						eName.equals("REB")) {
-					continue;
-					/*Pirate and rebel opponent frequency is not
-					 * based on borders.
-					 */
-				}
-				double totalCount = borders.get(fName).get(eName).size();
-				double count = totalCount;
-				/* Divide border between the main faction and any factions
-				 * that might be contained within it. */
-				for (String cf : getContainedFactions(eName, lastUpdate)) {
-					if (!isContainedFactionOpponent(eName, cf, fName, lastUpdate)) {
-						continue;
-					}
-					if ((neutralFactions.contains(cf) &&
-							!hintApplies(neutralExceptions, cf, eName, lastUpdate)) ||
-							neutralFactions.contains(eName) &&
-							!hintApplies(neutralExceptions, eName, cf, lastUpdate)) {
-						continue;
-					}
-					double cfCount = totalCount;
-					if (getAltLocationFraction(eName, cf, lastUpdate) > 0.0) {
-						cfCount = totalCount * getAltLocationFraction(eName, cf, lastUpdate);
-						count -= cfCount;
-					}
-					cfCount = adjustBorderWeight(cfCount, fName, eName, lastUpdate);
-					for (int i = 0; i < (cfCount + 0.5); i++) {
-						enemiesList.add(cf);
-					}
-				}
-				count = adjustBorderWeight(count, fName, eName, lastUpdate);
-				for (int i = 0; i < (count + 0.5); i++) {
-					enemiesList.add(eName);
-				}
-			}
-			if (enemiesList.size() > 0) {
-				return Utilities.getRandomItem(enemiesList);
-			}
+		
+		Faction enemy = null;
+		Faction employerFaction = Faction.getFaction(employer);
+		if (null != employerFaction) {
+		    WeightedMap<Faction> enemyMap = buildEnemyMap(employerFaction);
+		    enemy = enemyMap.randomItem();
 		}
-		MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
-		        "Could not find enemy for " + fName); //$NON-NLS-1$
-		return "PIR";
+		if (null != enemy) {
+		    return enemy.getShortName();
+		}
+		// Fallback; there are always pirates.
+        MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
+                "Could not find enemy for " + employer); //$NON-NLS-1$
+        return "PIR";
 	}
 	
-	public HashSet<String> getEmployerSet() {
-		HashSet<String> retval = new HashSet<String>();
-		for (String fName : employers) {
-			retval.add(fName);
-		}
-		return retval;
+	/**
+	 * Builds a map of potential enemies keyed to cumulative weight
+	 * 
+	 * @param employer
+	 * @return
+	 */
+	protected WeightedMap<Faction> buildEnemyMap(Faction employer) {
+	    WeightedMap<Faction> enemyMap = new WeightedMap<>();
+	    for (Faction enemy : borderTracker.getFactionsInRegion()) {
+	        if (isEmptyFaction(enemy)
+	                || enemy.getShortName().equals("CLAN")) {
+	            continue;
+	        }
+	        final String eName = enemy.getShortName();
+	        int totalCount = borderTracker.getBorderPlanets(employer, enemy).size();
+	        double count = totalCount;
+	        // Split the border between main controlling faction and any contained factions.
+            for (String cfName : getContainedFactions(employer.getShortName(), currentDate())) {
+                final Faction cFaction = Faction.getFaction(cfName);
+                if ((null == cFaction)
+                        || !isContainedFactionOpponent(eName, cfName, employer.getShortName(), currentDate())) {
+                    continue;
+                }
+                if ((neutralFactions.contains(cfName) &&
+                        !hintApplies(neutralExceptions, cfName, eName, currentDate())) ||
+                        neutralFactions.contains(eName) &&
+                        !hintApplies(neutralExceptions, eName, cfName, currentDate())) {
+                    continue;
+                }
+                double cfCount = totalCount;
+                if (getAltLocationFraction(eName, cfName, currentDate()) > 0.0) {
+                    cfCount = totalCount * getAltLocationFraction(eName, cfName, currentDate());
+                    count -= cfCount;
+                }
+                cfCount = adjustBorderWeight(cfCount, employer, enemy, currentDate());
+                enemyMap.add((int) Math.floor(cfCount + 0.5), Faction.getFaction(cfName));
+            }
+            count = adjustBorderWeight(count, employer, enemy, currentDate());
+            enemyMap.add((int) Math.floor(count + 0.5), enemy);
+	    }
+	    return enemyMap;
+	}
+	
+	/**
+	 * @return A set of keys for all current factions in the space that are potential employers.
+	 */
+	public Set<String> getEmployerSet() {
+	    return employers.values().stream()
+	            .map(Faction::getShortName)
+	            .collect(Collectors.toSet());
 	}	
 	
-	public ArrayList<String> getEnemyList(String employer) {
-		ArrayList<String> list = new ArrayList<String>();
-		if (borders.get(employer) != null) {
-			for (String enemy : borders.get(employer).keySet()) {
-				list.add(enemy);
-				for (String cf : getContainedFactions(enemy, lastUpdate)) {
-					if (isContainedFactionOpponent(enemy, cf, employer, lastUpdate)) {
-						list.add(cf);
-					}
-				}
-			}
+	/**
+	 * Constructs a list of a faction's potential enemies based on common borders.
+	 * @param employerName The shortName of the employer faction
+	 * @return             A list of faction that share a border
+	 */
+	public List<String> getEnemyList(String employerName) {
+	    Faction employer = Faction.getFaction(employerName);
+	    if (null == employer) {
+	        MekHQ.getLogger().log(getClass(), "getEnemyList(String)", LogLevel.WARNING, //$NON-NLS-1$
+	                "Unknown faction key: " + employerName); //$NON-NLS-1$
+	        return Collections.emptyList();
+	    }
+		Set<Faction> list = new HashSet<>();
+		for (Faction enemy : borderTracker.getFactionsInRegion()) {
+		    if (isEmptyFaction(enemy)) {
+		        continue;
+		    }
+            if (enemy.equals(employer) && !isAtWarWith(enemy.getShortName(),
+                    enemy.getShortName(), currentDate())) {
+                continue;
+            }
+            if (!borderTracker.getBorderPlanets(employer, enemy).isEmpty()) {
+                list.add(enemy);
+                for (String cf : getContainedFactions(enemy.getShortName(), currentDate())) {
+                    final Faction cFaction = Faction.getFaction(cf);
+                    if ((null != cFaction)
+                            && isContainedFactionOpponent(enemy.getShortName(), cf, employerName, currentDate())) {
+                        list.add(cFaction);
+                    }
+                }
+            }
 		}
-		return list;
+		return list.stream().map(Faction::getShortName).collect(Collectors.toList());
 	}
 	
-	private double adjustBorderWeight(double count, String f,
-			String enemy, Date date) {
-		final Date tukayyid = new Date (new GregorianCalendar(3052,5,20).getTimeInMillis());
-		if (Faction.getFaction(f).isClan() && Faction.getFaction(enemy).isClan() &&
+	/**
+	 * Applies modifiers to the border size (measured by number of planets within a certain proximity
+	 * to one or more of the attacker's planets) based on diplomatic stance (e.g. war, rivalry, alliance).
+	 * 
+	 * @param count  The number of planets
+	 * @param f      The attacking faction
+	 * @param enemy  The defending faction
+	 * @param date   The current campaign date
+	 * @return       An adjusted weight
+	 */
+	private double adjustBorderWeight(double count, Faction f,
+			Faction enemy, Date date) {
+		final Date TUKKAYID = new Date (new GregorianCalendar(3052,5,20).getTimeInMillis());
+		
+		if ((neutralFactions.contains(f.getShortName())
+		        || neutralFactions.contains(enemy.getShortName()))
+		        && !isAtWarWith(f, enemy, date)) {
+		    return 0;
+		}
+        if (!f.isClan() && hintApplies(alliances, f, enemy, date)) {
+            return 0;
+        }
+		if (f.isClan() && enemy.isClan() &&
 				(hintApplies(alliances, f, enemy, date) ||
-						(date.before(tukayyid) &&
-								borders.get(f).get(enemy) != null &&
-								borders.get(f).get(enemy).iterator().next().getY() < 600))) {
+						(date.before(TUKKAYID) && (borderTracker.getCenterY() < 600)))) {
 			/* Treat invading Clans as allies in the Inner Sphere */
 			count /= 4.0;
 		}
@@ -692,92 +686,169 @@ public class RandomFactionGenerator implements Serializable {
 		 * and tends to fight the Clans too much between Tukayyid and
 		 * the Jihad.
 		 */
-		if (f.equals("CS") && Faction.getFaction(enemy).isClan()) {
+		if (f.getShortName().equals("CS") && enemy.isClan()) {
 			count /= 12.0;
 		}
 		return count;
 	}
 	
-	public String getMissionTarget(String attacker, String defender, Date date, Planet currentPlanet, int searchRadius) {
-		ArrayList<Planet> planetList = getMissionTargetList(attacker, defender, date, currentPlanet, searchRadius);
+	/**
+	 * Selects a random planet from a list of potential targets based on the attacking and defending factions.
+	 * 
+	 * @param attacker
+	 * @param defender
+	 * @return          The planetId of the chosen planet, or null if there are no target candidates
+	 */
+	@Nullable public String getMissionTarget(String attacker, String defender) {
+	    final String METHOD_NAME = "getMissionTarget(String, String)"; // $NON-NLS-1$
+	    Faction f1 = Faction.getFaction(attacker);
+	    Faction f2 = Faction.getFaction(defender);
+        if (null == f1) {
+            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
+                    "Non-existent faction key: " + attacker); // $NON-NLS-1$
+            return null;
+        }
+        if (null == f2) {
+            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
+                    "Non-existent faction key: " + attacker); // $NON-NLS-1$
+            return null;
+        }
+		List<Planet> planetList = getMissionTargetList(f1, f2);
 		if (planetList.size() > 0) {
 			return Utilities.getRandomItem(planetList).getId();
 		}
 		return null;
 	}
 	
-	public ArrayList<Planet> getMissionTargetList(String attacker, String defender, Date date, Planet currentPlanet, int searchRadius) {
-		boolean filterByDistance = (currentPlanet != null);
-		ArrayList<Planet> planetList = new ArrayList<Planet>();
-		int maxJumps = 3;
-		if (deepPeriphery.contains(attacker) || deepPeriphery.contains(defender)) {
-			maxJumps = 8;
-		}
-		HashSet<Planet> border = null;		
-		if (borders.get(attacker) != null && borders.get(attacker).get(defender) != null) {
-			border = borders.get(attacker).get(defender);
-		} else {
-			/* No border with defender found among systems controlled by
-			 * attacker; check for presence of attacker and defender
-			 * in systems controlled by other factions.
-			 */
-			for (String fName : Faction.getFactionList()) {
-				for (String cf : getContainedFactions(fName, date)) {
-					if (cf.equals(attacker) && isContainedFactionOpponent(fName, cf, defender, date)) {
-						if (borders.get(fName) != null && borders.get(fName).get(defender) != null) {
-							border = borders.get(fName).get(defender);
-							attacker = fName;
-							break;
-						}
-					}
-					if (cf.equals(defender) && isContainedFactionOpponent(fName, cf, attacker, date)) {
-						if (borders.get(attacker) != null && borders.get(attacker).get(fName) != null) {
-							border = borders.get(attacker).get(fName);
-							defender = fName;
-							break;
-						}
-					}
-				}
-			}
-		}
-		if (border != null) {
-			for (Planet startingPlanet : border) {
-				for (Planet planetKey : Planets.getInstance().getNearbyPlanets(startingPlanet, maxJumps * 30)) {
-					for (Faction f : planetKey.getFactionSet(Utilities.getDateTimeDay(date))) {
-						if (f.getShortName().equals(defender) ||
-								defender.equals("PIR") ||
-								(f.getShortName().equals(attacker) && defender.equals("REB")) &&
-								(filterByDistance && currentPlanet.getDistanceTo(planetKey) <= searchRadius)) {
-							planetList.add(planetKey);
-						}
-					}
-				}
-			}
-		}
-		if (planetList.size() == 0 && borders.get(defender) != null &&
-				borders.get(defender).get(attacker) != null) {
-			/* Most likely a deep periphery defender against a non-deep
-			 * attacker; use one of the border planets */
-			for (Planet p : borders.get(defender).get(attacker)) {
-				planetList.add(p);
-			}
-		}
-		return planetList;
+	/**
+	 * Builds a list of planets controlled by the defender that are near one or more of the attacker's
+	 * planets.
+	 * 
+	 * @param attackerKey   The attacking faction's shortName
+	 * @param defenderKey   The defending faction's shortName
+	 * @return              A list of potential mission targets
+	 */
+	public List<Planet> getMissionTargetList(String attackerKey, String defenderKey) {
+	    final String METHOD_NAME = "getMissionTargetList(String, String)"; //$NON-NLS-1$
+	    Faction attacker = Faction.getFaction(attackerKey);
+	    Faction defender = Faction.getFaction(defenderKey);
+        if (null == attacker) {
+            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
+                    "Non-existent faction key: " + attackerKey); //$NON-NLS-1$
+        }
+        if (null == defender) {
+            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
+                    "Non-existent faction key: " + defenderKey); //$NON-NLS-1$
+        }
+        if ((null != attacker) && (null != defender)) {
+            return getMissionTargetList(attacker, defender);
+        } else {
+            return Collections.emptyList();
+        }
 	}
 	
-	public boolean isMajorPower(Faction f) {
+    /**
+     * Builds a list of planets controlled by the defender that are near one or more of the attacker's
+     * planets.
+     * 
+     * @param attackerKey   The attacking faction
+     * @param defenderKey   The defending faction
+     * @return              A list of potential mission targets
+     */
+	public List<Planet> getMissionTargetList(Faction attacker, Faction defender) {
+	    // Locate rebels on any of the attacker's planet
+        if (defender.getShortName().equals("REB")) {
+            return new ArrayList<>(borderTracker.getBorders(attacker).getPlanets());
+        }
+
+        Set<Planet> planetSet = new HashSet<>(borderTracker.getBorderPlanets(attacker, defender));
+        // Locate missions by or against pirates on border worlds
+	    if (attacker.getShortName().equals("PIR") || defender.getShortName().equals("PIR")) {
+	        for (Faction f : borderTracker.getFactionsInRegion()) {
+                planetSet.addAll(borderTracker.getBorderPlanets(f, attacker));
+                planetSet.addAll(borderTracker.getBorderPlanets(attacker, f));
+	        }
+	    }
+        /* No border with defender found among systems controlled by
+         * attacker; check for presence of attacker and defender
+         * in systems controlled by other factions.
+         */
+	    if (planetSet.isEmpty()) {
+            for (Faction f : borderTracker.getFactionsInRegion()) {
+                for (String cf : getContainedFactions(f.getShortName(), currentDate())) {
+                    if (cf.equals(attacker.getShortName())
+                            && isContainedFactionOpponent(f.getShortName(),
+                                    cf, defender.getShortName(), currentDate())) {
+                        planetSet.addAll(borderTracker.getBorderPlanets(f, defender));
+                    }
+                    if (cf.equals(defender.getShortName())
+                            && isContainedFactionOpponent(f.getShortName(),
+                                    cf, attacker.getShortName(), currentDate())) {
+                        planetSet.addAll(borderTracker.getBorderPlanets(attacker, f));
+                    }
+                }
+            }
+		}
+		return new ArrayList<>(planetSet);
+	}
+	
+	/**
+	 * Accounts for non-existent factions that are used to indicate special status of the planet
+	 * (undiscovered, abandoned).
+	 * 
+	 * @param f
+	 * @return  Whether the faction is not a true faction
+	 */
+	public boolean isEmptyFaction(Faction f) {
+        return (f.getShortName().equals("ABN")
+                || f.getShortName().equals("UND")
+                || f.getShortName().equals("NONE"));
+	}
+	
+	/**
+	 * @param f 
+	 * @return  Whether the faction is considered a major Inner Sphere
+	 *          power for purposes of contract generation
+	 */
+	public boolean isISMajorPower(Faction f) {
 		return majorPowers.contains(f.getShortName());
 	}
 	
+    /**
+     * @param f 
+     * @return  Whether the faction is considered a major Inner Sphere
+     *          power for purposes of contract generation
+     */
 	public boolean isISMajorPower(String fName) {
 		return majorPowers.contains(fName);
 	}
 	
+	public boolean isAtWarWith(Faction f1, Faction f2, Date date) {
+	    return isAtWarWith(f1.getShortName(), f2.getShortName(), date);
+	}
+	
+	/**
+	 * 
+	 * @param f1    A faction
+	 * @param f2    Another faction
+	 * @param date  The campaign date
+	 * @return      true if the factions are at war at the indicated date. If the two factions are
+	 *              the same, indicates civil war or some other infighting (such as Clan Fire Mandrill
+	 *              factionalism)
+	 */
 	public boolean isAtWarWith(String f1, String f2, Date date) {
 		return hintApplies(wars, f1, f2, date);
 	}
 	
-	public String getCurrentWar(String f1, String f2, Date date) {
+	/**
+	 * 
+	 * @param f1    A faction
+	 * @param f2    Another faction
+	 * @param date  The current campaign date
+	 * @return      The name of the current war the two factions are involved in, or {@code null} if they
+	 *              are not currently at war.
+	 */
+	@Nullable public String getCurrentWar(String f1, String f2, Date date) {
 		if (wars.get(f1) != null && wars.get(f1).get(f2) != null) {
 			for (FactionHint fh : wars.get(f1).get(f2)) {
 				if (date.after(fh.start) && date.before(fh.end)) {
@@ -788,11 +859,23 @@ public class RandomFactionGenerator implements Serializable {
 		return null;
 	}
 	
+	/**
+	 * Indicates a faction is neutral (e.g. Comstar) or non-combatant and should not be chosen as an
+	 * employer or enemy unless at war at the time.
+	 * 
+	 * @param faction  Any faction
+	 * @return         Whether the faction is considered neutral
+	 */
 	public boolean isNeutral(String faction) {
 		return neutralFactions.contains(faction);
 	}
 	
-	private boolean hintApplies(HashMap<String, HashMap<String, ArrayList<FactionHint>>> hints,
+	private boolean hintApplies(Map<String, Map<String, List<FactionHint>>> hints,
+	        Faction f1, Faction f2, Date date) {
+	    return hintApplies(hints, f1.getShortName(), f2.getShortName(), date);
+	}
+	
+	private boolean hintApplies(Map<String, Map<String, List<FactionHint>>> hints,
 				String f1, String f2, Date date) {
 		if (hints.get(f1) != null && hints.get(f1).get(f2) != null) {
 			for (FactionHint fh : hints.get(f1).get(f2)) {
@@ -842,6 +925,21 @@ public class RandomFactionGenerator implements Serializable {
 				f2.getShortName(), opponent.getShortName(), date);
 	}
 	
+	/**
+	 * Determines whether a faction that is contained within another can consider a third faction to
+	 * be an opponent. A contained faction is one that does not have any planets assigned to it but
+	 * occupies space in another faction's space, such as the exiled Clan Wolf or the abjured Clan
+	 * Nova Cat. Normally these are treated the same way as the containing faction, but in some cases
+	 * the inner faction may have a reduced set of opponents, such as the Second Star League force
+	 * in the Draconis Combine during Operation Bulldog, which should only be considered opponents of
+	 * Clan Smoke Jaguar and not the DC neighbors.
+	 * 
+	 * @param outer     The faction that controls the planets in the region.
+	 * @param inner     The faction that occupies planets within the outer faction's space.
+	 * @param opponent  A potential opponent of the inner faction
+	 * @param date      The campaign date
+	 * @return          Whether {@code opponent} can be treated as an enemy of {@code inner}.
+	 */
 	public boolean isContainedFactionOpponent(String outer, String inner,
 				String opponent, Date date) {
 		if (containedFactions.get(outer) != null && containedFactions.get(outer).get(inner) != null) {
@@ -887,5 +985,34 @@ public class RandomFactionGenerator implements Serializable {
 			fraction = f;
 			this.opponents = opponents;
 		}		
+	}
+
+	/**
+	 * Constructs a table of values each with a weight that makes them more or less likely to be
+	 * selected at random
+	 * 
+	 * @param <T> The values in the table
+	 */
+	static class WeightedMap<T> extends TreeMap<Integer, T> {
+	    
+        private static final long serialVersionUID = -568712793616821291L;
+
+        void add(int weight, T item) {
+	        if (weight > 0) {
+	            if (!isEmpty()) {
+	                put(lastKey() + weight, item);
+	            } else {
+	                put(weight, item);
+	            }
+	        }
+	    }
+	    
+	    T randomItem() {
+	        if (isEmpty()) {
+	            return null;
+	        }
+	        int random = Compute.randomInt(lastKey()) + 1;
+	        return ceilingEntry(random).getValue();
+	    }
 	}
 }
