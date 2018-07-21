@@ -5321,7 +5321,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public Person newPerson(int type) {
-        return newPerson(type, Person.T_NONE, getFactionCode());
+        return newPerson(type, getFactionCode());
     }
 
     public Person newPerson(int type, int secondary) {
@@ -5329,9 +5329,6 @@ public class Campaign implements Serializable, ITechManager {
     }
     
     public Person newPerson(int type, String factionCode) {
-        if (type == Person.T_LAM_PILOT) {
-            return newPerson(Person.T_MECHWARRIOR, Person.T_AERO_PILOT, factionCode);
-        }
         return newPerson(type, Person.T_NONE, factionCode);
     }
 
@@ -5344,6 +5341,10 @@ public class Campaign implements Serializable, ITechManager {
      * @return
      */
     public Person newPerson(int type, int secondary, String factionCode) {
+        if (type == Person.T_LAM_PILOT) {
+            type = Person.T_MECHWARRIOR;
+            secondary = Person.T_AERO_PILOT;
+        }
         boolean isFemale = getRNG().isFemale();
         Person person = new Person(this, factionCode);
         if (isFemale) {
