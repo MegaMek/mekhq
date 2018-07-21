@@ -30,6 +30,9 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.UUID;
 
@@ -71,9 +74,9 @@ public class PayCollateralDialog extends JDialog {
     private boolean paid;
     private Loan loan;
     
-    private ArrayList<JCheckBox> unitBoxes;
+    private Map<JCheckBox, UUID> unitBoxes;
     private ArrayList<JCheckBox> assetBoxes;
-    private ArrayList<JSlider> partSliders;
+    private Map<JSlider, Integer> partSliders;
     private JProgressBar barAmount;
     private JButton btnPay;
     private JButton btnDontPay;
@@ -115,12 +118,13 @@ public class PayCollateralDialog extends JDialog {
         gridBagConstraints.weighty = 0.0;
         panInfo.add(barAmount, gridBagConstraints);
         
-        unitBoxes = new ArrayList<JCheckBox>();
+        unitBoxes = new LinkedHashMap<>();
         JCheckBox box;
         int i = 0;
         int j = 0;
         JPanel pnlUnits = new JPanel(new GridBagLayout());
-        for(Unit u : campaign.getUnits()) {
+        Collection<Unit> units = campaign.getUnits();
+        for(Unit u : units) {
             j++;
             box = new JCheckBox(u.getName() + " (" + DecimalFormat.getInstance().format(u.getSellValue()) + "C-bills)");
             box.setSelected(false);
@@ -131,14 +135,14 @@ public class PayCollateralDialog extends JDialog {
                     updateAmount();
                 }
             });
-            unitBoxes.add(box);
+            unitBoxes.put(box, u.getId());
             gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = i;
             gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
             gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
             gridBagConstraints.weightx = 1.0;
-            if(j == (campaign.getUnits().size())) {
+            if(j == (units.size())) {
                 gridBagConstraints.weighty = 1.0;
             }
             gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
@@ -150,12 +154,13 @@ public class PayCollateralDialog extends JDialog {
         scrUnits.setMinimumSize(new java.awt.Dimension(400, 300));
         scrUnits.setPreferredSize(new java.awt.Dimension(400, 300));
                 
-        partSliders = new ArrayList<JSlider>();
+        partSliders = new LinkedHashMap<>();
         JPanel pnlParts = new JPanel(new GridBagLayout());
         i = 0;
         j = 0;
         JSlider partSlider;
-        for(Part p : campaign.getSpareParts()) {
+        ArrayList<Part> spareParts = campaign.getSpareParts();
+        for(Part p : spareParts) {
             j++;
             int quantity = p.getQuantity();
             if(p instanceof AmmoStorage) {
@@ -176,7 +181,7 @@ public class PayCollateralDialog extends JDialog {
                 }
             });
             partSlider.setEnabled(p.isPresent() && !p.isReservedForRefit() && !p.isReservedForReplacement());
-            partSliders.add(partSlider);
+            partSliders.put(partSlider, p.getId());
             gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = i;
@@ -185,7 +190,7 @@ public class PayCollateralDialog extends JDialog {
             gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
             gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
             gridBagConstraints.weightx = 0.0;
-            if(j == campaign.getSpareParts().size()) {
+            if(j == spareParts.size()) {
                 gridBagConstraints.weighty = 1.0;
             }
             pnlParts.add(partSlider, gridBagConstraints);
@@ -294,19 +299,19 @@ public class PayCollateralDialog extends JDialog {
     
     private void updateAmount() {
         long amount = 0;
-        for(int i = 0; i < unitBoxes.size(); i++) {
-            JCheckBox box = unitBoxes.get(i);
-            if(box.isSelected()) {
-                amount += campaign.getUnits().get(i).getSellValue();
+        for (Map.Entry<JCheckBox, UUID> m : unitBoxes.entrySet()) {
+            if (m.getKey().isSelected()) {
+                amount += campaign.getUnit(m.getValue()).getSellValue();
             }
         }
-        for(int i = 0; i < partSliders.size(); i++) {
-            int quantity = partSliders.get(i).getValue();
+
+        for (Map.Entry<JSlider, Integer> m : partSliders.entrySet()) {
+            int quantity = m.getKey().getValue();
             if(quantity > 0) {
-                amount += campaign.getSpareParts().get(i).getCurrentValue() * quantity;
+                amount += campaign.getPart(m.getValue()).getCurrentValue() * quantity;
             }
-            
         }
+
         for(int i = 0; i < assetBoxes.size(); i++) {
             JCheckBox box = assetBoxes.get(i);
             if(box.isSelected()) {
@@ -324,11 +329,10 @@ public class PayCollateralDialog extends JDialog {
     }
     
     public ArrayList<UUID> getUnits() {
-        ArrayList<UUID> uid = new ArrayList<UUID>();
-        for(int i = 0; i < unitBoxes.size(); i++) {
-            JCheckBox box = unitBoxes.get(i);
-            if(box.isSelected()) {
-                uid.add(campaign.getUnits().get(i).getId());
+        ArrayList<UUID> uid = new ArrayList<>();
+        for (Map.Entry<JCheckBox, UUID> u : unitBoxes.entrySet()) {
+            if (u.getKey().isSelected()) {
+                uid.add(u.getValue());
             }
         }
         return uid;
@@ -336,10 +340,10 @@ public class PayCollateralDialog extends JDialog {
     
     public ArrayList<int[]> getParts() {
         ArrayList<int[]> parts = new ArrayList<int[]>();
-        for(int i = 0; i < partSliders.size(); i++) {
-            int quantity = partSliders.get(i).getValue();
+        for (Map.Entry<JSlider, Integer> m : partSliders.entrySet()) {
+            int quantity = m.getKey().getValue();
             if(quantity > 0) {
-                int[] array = {campaign.getSpareParts().get(i).getId(), quantity};
+                int[] array = {m.getValue(), quantity};
                 parts.add(array);
             }
         }

@@ -83,7 +83,7 @@ public class TaskTableMouseAdapter extends MouseInputAdapter implements ActionLi
                 }
                 Unit u = p.getUnit();
                 gui.getCampaign().addReport(((Part)p).scrap());
-                if (null != u && !u.isRepairable() && u.getSalvageableParts().size() == 0) {
+                if (null != u && !u.isRepairable() && !u.hasSalvageableParts()) {
                     gui.getCampaign().removeUnit(u.getId());
                 }
                 MekHQ.triggerEvent(new UnitChangedEvent(u));

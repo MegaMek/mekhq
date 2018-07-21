@@ -578,7 +578,7 @@ public class Force implements Serializable {
     	return o instanceof Force && ((Force)o).getId() == id && ((Force)o).getFullName().equals(getFullName());
     }
 
-	public void fixIdReferences(Hashtable<Integer, UUID> uHash) {
+	public void fixIdReferences(Map<Integer, UUID> uHash) {
 		for(int oid : oldUnits) {
 			UUID nid = uHash.get(oid);
 			if(null != nid) {

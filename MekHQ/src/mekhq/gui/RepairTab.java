@@ -631,11 +631,11 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         }
         getCampaign().fixPart(part, selectedTech);
         if (null != u) {
-            if (!u.isRepairable() && u.getSalvageableParts().size() == 0) {
+            if (!u.isRepairable() && !u.hasSalvageableParts()) {
                 selectedRow = -1;
                 getCampaign().removeUnit(u.getId());
             }
-            if (!getCampaign().getServiceableUnits().contains(u)) {
+            if (!u.isServiceable()) {
                 selectedRow = -1;
             }
             u.refreshPodSpace();

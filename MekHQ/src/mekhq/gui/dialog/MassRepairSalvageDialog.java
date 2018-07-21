@@ -177,9 +177,8 @@ public class MassRepairSalvageDialog extends JDialog {
 
 		unitList = new ArrayList<Unit>();
 
-		for (int i = 0; i < campaignGUI.getCampaign().getServiceableUnits().size(); i++) {
-			Unit unit = campaignGUI.getCampaign().getServiceableUnits().get(i);
-
+		for (Unit unit : campaignGUI.getCampaign().getServiceableUnits()) {
+			
 			if (!MassRepairService.isValidMRMSUnit(unit)) {
 				continue;
 			}

@@ -1207,7 +1207,9 @@ public class HangarReport extends Report {
         int countPresent = 0;
         int countDamaged = 0;
         int countDeployed = 0;
+        int total = 0;
         for (Unit u : getCampaign().getUnits()) {
+            total++;
             if (u.isPresent()) {
                 countPresent++;
             } else {
@@ -1221,7 +1223,7 @@ public class HangarReport extends Report {
             }
         }
         
-        return "Total Units: "+getCampaign().getUnits().size()+
+        return "Total Units: "+total+
                 "\n  Present: "+countPresent+
                 "\n  In Transit: "+countInTransit+
                 "\n  Damaged: "+countDamaged+

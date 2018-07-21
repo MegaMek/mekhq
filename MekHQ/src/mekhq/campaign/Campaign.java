@@ -42,6 +42,7 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -235,25 +236,16 @@ public class Campaign implements Serializable, ITechManager {
     // we will use the same basic system (borrowed from MegaMek) for tracking
     // all three
     // OK now we have more, parts, personnel, forces, missions, and scenarios.
-    // TODO: do we really need to track this in an array and hashtable?
-    // It seems like we could track in a hashtable and then iterate through the
-    // keys of the hash
-    // to create an arraylist on demand
-    private ArrayList<Unit> units = new ArrayList<Unit>();
-    private Hashtable<UUID, Unit> unitIds = new Hashtable<UUID, Unit>();
-    private ArrayList<Person> personnel = new ArrayList<Person>();
-    private Hashtable<UUID, Person> personnelIds = new Hashtable<UUID, Person>();
-    private ArrayList<Ancestors> ancestors = new ArrayList<Ancestors>();
-    private Hashtable<UUID, Ancestors> ancestorsIds = new Hashtable<UUID, Ancestors>();
-    private ArrayList<Part> parts = new ArrayList<Part>();
-    private Hashtable<Integer, Part> partIds = new Hashtable<Integer, Part>();
-    private Hashtable<Integer, Force> forceIds = new Hashtable<Integer, Force>();
-    private ArrayList<Mission> missions = new ArrayList<Mission>();
-    private Hashtable<Integer, Mission> missionIds = new Hashtable<Integer, Mission>();
-    private Hashtable<Integer, Scenario> scenarioIds = new Hashtable<Integer, Scenario>();
-    private ArrayList<Kill> kills = new ArrayList<Kill>();
+    private Map<UUID, Unit> units = new LinkedHashMap<UUID, Unit>();
+    private Map<UUID, Person> personnel = new LinkedHashMap<>();
+    private Map<UUID, Ancestors> ancestors = new LinkedHashMap<>();
+    private Map<Integer, Part> parts = new LinkedHashMap<>();
+    private Map<Integer, Force> forceIds = new LinkedHashMap<>();
+    private Map<Integer, Mission> missions = new LinkedHashMap<>();
+    private Map<Integer, Scenario> scenarios = new LinkedHashMap<>();
+    private List<Kill> kills = new ArrayList<>();
 
-    private Hashtable<String, Integer> duplicateNameHash = new Hashtable<String, Integer>();
+    private Map<String, Integer> duplicateNameHash = new HashMap<String, Integer>();
 
     private int astechPool;
     private int astechPoolMinutes;
@@ -356,7 +348,7 @@ public class Campaign implements Serializable, ITechManager {
         Ranks.initializeRankSystems();
         ranks = Ranks.getRanksFromSystem(Ranks.RS_SL);
         forces = new Force(name);
-        forceIds.put(new Integer(lastForceId), forces);
+        forceIds.put(Integer.valueOf(lastForceId), forces);
         lastForceId++;
         lances = new Hashtable<Integer, Lance>();
         finances = new Finances();
@@ -752,11 +744,11 @@ public class Campaign implements Serializable, ITechManager {
         force.setId(id);
         superForce.addSubForce(force, true);
         force.setScenarioId(superForce.getScenarioId());
-        forceIds.put(new Integer(id), force);
+        forceIds.put(Integer.valueOf(id), force);
         lastForceId = id;
 
         if (campaignOptions.getUseAtB() && force.getUnits().size() > 0) {
-            if (null == lances.get(id)) {
+            if (null == lances.get(Integer.valueOf(id))) {
                 lances.put(id, new Lance(force.getId(), this));
             }
         }
@@ -793,7 +785,7 @@ public class Campaign implements Serializable, ITechManager {
      * @param scenario
      */
     public void addScenarioToHash(Scenario scenario) {
-        scenarioIds.put(scenario.getId(), scenario);
+        scenarios.put(scenario.getId(), scenario);
     }
 
     /**
@@ -870,16 +862,14 @@ public class Campaign implements Serializable, ITechManager {
     public int addMission(Mission m) {
         int id = lastMissionId + 1;
         m.setId(id);
-        missions.add(m);
-        missionIds.put(new Integer(id), m);
+        missions.put(Integer.valueOf(id), m);
         lastMissionId = id;
         MekHQ.triggerEvent(new MissionNewEvent(m));
         return id;
     }
 
     private void addMissionWithoutId(Mission m) {
-        missions.add(m);
-        missionIds.put(new Integer(m.getId()), m);
+        missions.put(Integer.valueOf(m.getId()), m);
 
         if (m.getId() > lastMissionId) {
             lastMissionId = m.getId();
@@ -888,10 +878,10 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     /**
-     * @return an <code>ArrayList</code> of missions in the campaign
+     * @return an <code>Collection</code> of missions in the campaign
      */
-    public ArrayList<Mission> getMissions() {
-        return missions;
+    public Collection<Mission> getMissions() {
+        return missions.values();
     }
 
     /**
@@ -905,7 +895,7 @@ public class Campaign implements Serializable, ITechManager {
         int id = lastScenarioId + 1;
         s.setId(id);
         m.addScenario(s);
-        scenarioIds.put(new Integer(id), s);
+        scenarios.put(Integer.valueOf(id), s);
         lastScenarioId = id;
         MekHQ.triggerEvent(new ScenarioNewEvent(s));
     }
@@ -914,17 +904,14 @@ public class Campaign implements Serializable, ITechManager {
      * @return missions arraylist sorted with complete missions at the bottom
      */
     public ArrayList<Mission> getSortedMissions() {
-        ArrayList<Mission> msns = new ArrayList<Mission>();
-        for (Mission m : getMissions()) {
-            msns.add(m);
-        }
+        ArrayList<Mission> msns = new ArrayList<>(missions.values());
         Collections.sort(msns, new Comparator<Mission>() {
             @Override
             public int compare(final Mission m1, final Mission m2) {
-                return ((Comparable<Boolean>) m2.isActive()).compareTo(m1
-                        .isActive());
+                return Boolean.compare(m2.isActive(), m1.isActive());
             }
         });
+
         return msns;
     }
 
@@ -933,11 +920,11 @@ public class Campaign implements Serializable, ITechManager {
      * @return a <code>SupportTeam</code> object
      */
     public Mission getMission(int id) {
-        return missionIds.get(new Integer(id));
+        return missions.get(Integer.valueOf(id));
     }
 
     public Scenario getScenario(int id) {
-        return scenarioIds.get(new Integer(id));
+        return scenarios.get(Integer.valueOf(id));
     }
 
     public CurrentLocation getLocation() {
@@ -947,8 +934,7 @@ public class Campaign implements Serializable, ITechManager {
     private void addUnit(Unit u) {
         MekHQ.getLogger().log(getClass(), "addUnit()", LogLevel.INFO, //$NON-NLS-1$
                 "Adding unit: (" + u.getId() + "):" + u); //$NON-NLS-1$
-        units.add(u);
-        unitIds.put(u.getId(), u);
+        units.put(u.getId(), u);
         checkDuplicateNamesDuringAdd(u.getEntity());
 
         // Assign an entity ID to our new unit
@@ -976,13 +962,12 @@ public class Campaign implements Serializable, ITechManager {
 
         UUID id = UUID.randomUUID();
         // check for the very rare chance of getting same id
-        while (null != unitIds.get(id)) {
+        while (null != units.get(id)) {
             id = UUID.randomUUID();
         }
         unit.getEntity().setExternalIdAsString(id.toString());
         unit.setId(id);
-        units.add(unit);
-        unitIds.put(id, unit);
+        units.put(id, unit);
 
         // now lets grab the parts from the test unit and set them up with this unit
         for(Part p : tu.getParts()) {
@@ -1019,14 +1004,13 @@ public class Campaign implements Serializable, ITechManager {
 
         UUID id = UUID.randomUUID();
         // check for the very rare chance of getting same id
-        while (null != unitIds.get(id)) {
+        while (null != units.get(id)) {
             id = UUID.randomUUID();
         }
         en.setExternalIdAsString(id.toString());
         Unit unit = new Unit(en, this);
         unit.setId(id);
-        units.add(unit);
-        unitIds.put(id, unit);
+        units.put(id, unit);
         removeUnitFromForce(unit); // Added to avoid the 'default force bug'
         // when calculating cargo
 
@@ -1054,14 +1038,13 @@ public class Campaign implements Serializable, ITechManager {
         MekHQ.triggerEvent(new UnitNewEvent(unit));
     }
 
-    public ArrayList<Unit> getUnits() {
-        return getUnits(false, false);
+    public Collection<Unit> getUnits() {
+        return units.values();
     }
 
     public ArrayList<Unit> getUnits(boolean weightSorted, boolean alphaSorted) {
-        ArrayList<Unit> sortedUnits = null;
+        ArrayList<Unit> sortedUnits = getCopyOfUnits();
         if (alphaSorted || weightSorted) {
-            sortedUnits = getCopyOfUnits();
             if (alphaSorted) {
                 Collections.sort(sortedUnits, new Comparator<Unit>() {
                     @Override
@@ -1081,12 +1064,12 @@ public class Campaign implements Serializable, ITechManager {
                 });
             }
         }
-        return sortedUnits == null ? units : sortedUnits;
+        return sortedUnits;
     }
 
     // Since getUnits doesn't return a defensive copy and I don't know what I might break if I made it do so...
     public ArrayList<Unit> getCopyOfUnits() {
-        return new ArrayList<>(units);
+        return new ArrayList<>(units.values());
     }
 
     public ArrayList<Entity> getEntities() {
@@ -1101,7 +1084,7 @@ public class Campaign implements Serializable, ITechManager {
         if (null == id) {
             return null;
         }
-        return unitIds.get(id);
+        return units.get(id);
     }
 
     public boolean recruitPerson(Person p) {
@@ -1126,12 +1109,12 @@ public class Campaign implements Serializable, ITechManager {
             }
         }
         UUID id = UUID.randomUUID();
-        while (null != personnelIds.get(id)) {
+        while (null != personnel.get(id)) {
             id = UUID.randomUUID();
         }
         p.setId(id);
-        personnel.add(p);
-        personnelIds.put(id, p);
+        personnel.put(id, p);
+
         //TODO: implement a boolean check based on campaign options
         boolean bondsman = false;
         String add = prisoner == true ? " as a prisoner" : bondsman == true ? " as a bondsman" : "";
@@ -1173,18 +1156,16 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     private void addPersonWithoutId(Person p) {
-        personnel.add(p);
-        personnelIds.put(p.getId(), p);
+        personnel.put(p.getId(), p);
         MekHQ.triggerEvent(new PersonNewEvent(p));
     }
 
     private void addAncestorsWithoutId(Ancestors a) {
-        ancestors.add(a);
-        ancestorsIds.put(a.getId(), a);
+        ancestors.put(a.getId(), a);
     }
 
     public void addPersonWithoutId(Person p, boolean log) {
-        while((null == p.getId()) || (null != personnelIds.get(p.getId()))) {
+        while((null == p.getId()) || (null != personnel.get(p.getId()))) {
             p.setId(UUID.randomUUID());
         }
         addPersonWithoutId(p);
@@ -1210,8 +1191,8 @@ public class Campaign implements Serializable, ITechManager {
         return calendar.getTime();
     }
 
-    public ArrayList<Person> getPersonnel() {
-        return personnel;
+    public Collection<Person> getPersonnel() {
+        return personnel.values();
     }
 
     /**
@@ -1226,13 +1207,14 @@ public class Campaign implements Serializable, ITechManager {
         return activePersonnel;
     }
 
-    public ArrayList<Ancestors> getAncestors() {
-        return ancestors;
+    public Iterable<Ancestors> getAncestors() {
+        return ancestors.values();
     }
 
     /** @return a matching ancestors entry for the arguments, or null if there isn't any */
     public Ancestors getAncestors(UUID fatherID, UUID motherID) {
-        for(Ancestors a : ancestors) {
+        for(Map.Entry<UUID, Ancestors> m : ancestors.entrySet()) {
+            Ancestors a = m.getValue();
             if(Objects.equals(fatherID, a.getFatherID()) && Objects.equals(motherID, a.getMotherID())) {
                 return a;
             }
@@ -1257,14 +1239,8 @@ public class Campaign implements Serializable, ITechManager {
             if (!u.isAvailable()) {
                 continue;
             }
-            if (u.isSalvage() || !u.isRepairable()) {
-                if (u.getSalvageableParts().size() > 0) {
-                    service.add(u);
-                }
-            } else {
-                if (u.getPartsNeedingFixing().size() > 0) {
-                    service.add(u);
-                }
+            if (u.isServiceable()) {
+                service.add(u);
             }
         }
         return service;
@@ -1274,20 +1250,19 @@ public class Campaign implements Serializable, ITechManager {
         if (id == null) {
             return null;
         }
-        return personnelIds.get(id);
+        return personnel.get(id);
     }
 
     public Ancestors getAncestors(UUID id) {
         if (id == null) {
             return null;
         }
-        return ancestorsIds.get(id);
+        return ancestors.get(id);
     }
 
     public Ancestors createAncestors(UUID father, UUID mother) {
         Ancestors na = new Ancestors(father, mother, this);
-        ancestorsIds.put(na.getId(), na);
-        ancestors.add(na);
+        ancestors.put(na.getId(), na);
         return na;
     }
 
@@ -1336,8 +1311,7 @@ public class Campaign implements Serializable, ITechManager {
                 return;
             }
         }
-        parts.add(p);
-        partIds.put(new Integer(id), p);
+        parts.put(Integer.valueOf(id), p);
         MekHQ.triggerEvent(new PartNewEvent(p));
     }
 
@@ -1417,8 +1391,7 @@ public class Campaign implements Serializable, ITechManager {
                 }
             }
         }
-        parts.add(p);
-        partIds.put(p.getId(), p);
+        parts.put(p.getId(), p);
 
         if (p.getId() > lastPartId) {
             lastPartId = p.getId();
@@ -1429,8 +1402,8 @@ public class Campaign implements Serializable, ITechManager {
     /**
      * @return an <code>ArrayList</code> of SupportTeams in the campaign
      */
-    public ArrayList<Part> getParts() {
-        return parts;
+    public Collection<Part> getParts() {
+        return parts.values();
     }
 
     private int getQuantity(Part p) {
@@ -1480,7 +1453,7 @@ public class Campaign implements Serializable, ITechManager {
         piu.setStoreCount(0);
         piu.setTransferCount(0);
         piu.setPlannedCount(0);
-        for(Part p : parts) {
+        for(Part p : getParts()) {
             PartInUse newPiu = getPartInUse(p);
             if(piu.equals(newPiu)) {
                 updatePartInUseData(piu, p);
@@ -1499,7 +1472,7 @@ public class Campaign implements Serializable, ITechManager {
     public Set<PartInUse> getPartsInUse() {
         // java.util.Set doesn't supply a get(Object) method, so we have to use a java.util.Map
         Map<PartInUse, PartInUse> inUse = new HashMap<PartInUse, PartInUse>();
-        for(Part p : parts) {
+        for(Part p : getParts()) {
             PartInUse piu = getPartInUse(p);
             if(null == piu) {
                 continue;
@@ -1533,11 +1506,11 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public Part getPart(int id) {
-        return partIds.get(new Integer(id));
+        return parts.get(Integer.valueOf(id));
     }
 
     public Force getForce(int id) {
-        return forceIds.get(new Integer(id));
+        return forceIds.get(Integer.valueOf(id));
     }
 
     public ArrayList<String> getCurrentReport() {
@@ -1694,7 +1667,8 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public boolean isWorkingOnRefit(Person p) {
-        for (Unit u : units) {
+        for (Map.Entry<UUID, Unit> mu : units.entrySet()) {
+            Unit u = mu.getValue();
             if (u.isRefitting()) {
                 if (null != u.getRefit().getTeamId()
                         && u.getRefit().getTeamId().equals(p.getId())) {
@@ -1843,7 +1817,7 @@ public class Campaign implements Serializable, ITechManager {
         if (skill.equals(CampaignOptions.S_AUTO)) {
             return admin;
         } else if (skill.equals(CampaignOptions.S_TECH)) {
-            for (Person p : personnel) {
+            for (Person p : getPersonnel()) {
                 if (getCampaignOptions().isAcquisitionSupportStaffOnly()
                         && !p.isSupport()) {
                     continue;
@@ -1858,7 +1832,7 @@ public class Campaign implements Serializable, ITechManager {
                 }
             }
         } else {
-            for (Person p : personnel) {
+            for (Person p : getPersonnel()) {
                 if (getCampaignOptions().isAcquisitionSupportStaffOnly()
                         && !p.isSupport()) {
                     continue;
@@ -2300,7 +2274,7 @@ public class Campaign implements Serializable, ITechManager {
     }
     
     private void processNewDayATBScenarios() {
-        for (Mission m : missions) {
+        for (Mission m : getMissions()) {
             if (!m.isActive() || !(m instanceof AtBContract) || getDate().before(((Contract) m).getStartDate())) {
                 continue;
             }
@@ -2354,7 +2328,7 @@ public class Campaign implements Serializable, ITechManager {
             AtBScenarioFactory.createScenariosForNewWeek(this, true);
         }
 
-        for (Mission m : missions) {
+        for (Mission m : getMissions()) {
             if (m.isActive() && m instanceof AtBContract && !((AtBContract) m).getStartDate().after(getDate())) {
                 ((AtBContract) m).checkEvents(this);
             }
@@ -2396,7 +2370,7 @@ public class Campaign implements Serializable, ITechManager {
 
     private void processNewDayATBFatigue() {
         boolean inContract = false;
-        for (Mission m : missions) {
+        for (Mission m : getMissions()) {
             if (!m.isActive() || !(m instanceof AtBContract) || getDate().before(((Contract) m).getStartDate())) {
                 continue;
             }
@@ -2450,7 +2424,7 @@ public class Campaign implements Serializable, ITechManager {
         if (calendar.get(Calendar.DAY_OF_YEAR) == 1) {
             int numPersonnel = 0;
             ArrayList<Person> dependents = new ArrayList<Person>();
-            for (Person p : personnel) {
+            for (Person p : getPersonnel()) {
                 if (p.isActive()) {
                     numPersonnel++;
                     if (p.isDependent()) {
@@ -2487,7 +2461,7 @@ public class Campaign implements Serializable, ITechManager {
             IUnitRating rating = getUnitRating();
             rating.reInitialize();
 
-            for (Mission m : missions) {
+            for (Mission m : getMissions()) {
                 if (m.isActive() && m instanceof AtBContract && !((AtBContract) m).getStartDate().after(getDate())) {
                     ((AtBContract) m).checkMorale(calendar, getUnitRatingMod());
                     addReport("Enemy morale is now " + ((AtBContract) m).getMoraleLevelName() + " on contract "
@@ -2745,7 +2719,7 @@ public class Campaign implements Serializable, ITechManager {
 
     public long getPayRoll(boolean noInfantry) {
         long salaries = 0;
-        for (Person p : personnel) {
+        for (Person p : getPersonnel()) {
             // Optionized infantry (Unofficial)
             if (noInfantry && p.getPrimaryRole() == Person.T_INFANTRY) {
                 continue;
@@ -2766,7 +2740,8 @@ public class Campaign implements Serializable, ITechManager {
 
     public long getMaintenanceCosts() {
         long costs = 0;
-        for (Unit u : units) {
+        for (Map.Entry<UUID, Unit> mu : units.entrySet()) {
+            Unit u = mu.getValue();
             if (u.requiresMaintenance() && null != u.getTech()) {
                 costs += u.getMaintenanceCost();
             }
@@ -2776,21 +2751,14 @@ public class Campaign implements Serializable, ITechManager {
 
     public long getWeeklyMaintenanceCosts() {
         long costs = 0;
-        for (Unit u : units) {
-            costs += u.getWeeklyMaintenanceCost();
+        for (Map.Entry<UUID, Unit> u : units.entrySet()) {
+            costs += u.getValue().getWeeklyMaintenanceCost();
         }
         return costs;
     }
 
     public long getOverheadExpenses() {
         return (long) (getPayRoll() * 0.05);
-    }
-
-    public void clearAllUnits() {
-        this.units = new ArrayList<Unit>();
-        this.unitIds = new Hashtable<UUID, Unit>();
-        // TODO: clear parts associated with unit
-
     }
 
     public void removeUnit(UUID id) {
@@ -2815,8 +2783,7 @@ public class Campaign implements Serializable, ITechManager {
         removeUnitFromForce(unit);
 
         // finally remove the unit
-        units.remove(unit);
-        unitIds.remove(unit.getId());
+        units.remove(unit.getId());
         checkDuplicateNamesDuringDelete(unit.getEntity());
         addReport(unit.getName() + " has been removed from the unit roster.");
         MekHQ.triggerEvent(new UnitRemovedEvent(unit));
@@ -2845,8 +2812,7 @@ public class Campaign implements Serializable, ITechManager {
                     + " has been removed from the personnel roster.");
         }
 
-        personnel.remove(person);
-        personnelIds.remove(id);
+        personnel.remove(id);
         if (person.getPrimaryRole() == Person.T_ASTECH) {
             astechPoolMinutes = Math.max(0, astechPoolMinutes - 480);
             astechPoolOvertime = Math.max(0, astechPoolOvertime - 240);
@@ -2876,7 +2842,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public void removeAllPatientsFor(Person doctor) {
-        for (Person p : personnel) {
+        for (Person p : getPersonnel()) {
             if (null != p.getDoctorId()
                     && p.getDoctorId().equals(doctor.getId())) {
                 p.setDoctorId(null, getCampaignOptions()
@@ -2889,7 +2855,8 @@ public class Campaign implements Serializable, ITechManager {
         if (tech == null || tech.getId() == null) {
             return;
         }
-        for (Unit u : units) {
+        for (Map.Entry<UUID, Unit> mu : units.entrySet()) {
+            Unit u = mu.getValue();
             if (tech.getId().equals(u.getTechId())) {
                 u.removeTech();
             }
@@ -2897,7 +2864,7 @@ public class Campaign implements Serializable, ITechManager {
                 u.getRefit().setTeamId(null);
             }
         }
-        for (Part p : parts) {
+        for (Part p : getParts()) {
             if (tech.getId().equals(p.getTeamId())) {
                 p.setTeamId(null);
             }
@@ -2916,34 +2883,23 @@ public class Campaign implements Serializable, ITechManager {
         if (null != mission) {
             mission.removeScenario(scenario.getId());
         }
-        scenarioIds.remove(new Integer(id));
+        scenarios.remove(Integer.valueOf(id));
         MekHQ.triggerEvent(new ScenarioChangedEvent(scenario));
     }
 
     public void removeMission(int id) {
         Mission mission = getMission(id);
-        int idx = 0;
+
         // Loop through scenarios here! We need to remove them as well.
         if (null != mission) {
             for (Scenario scenario : mission.getScenarios()) {
                 scenario.clearAllForcesAndPersonnel(this);
-                scenarioIds.remove(scenario.getId());
+                scenarios.remove(scenario.getId());
             }
             mission.clearScenarios();
         }
-        idx = 0;
-        boolean mfound = false;
-        for (Mission m : getMissions()) {
-            if (m.getId() == id) {
-                mfound = true;
-                break;
-            }
-            idx++;
-        }
-        if (mfound) {
-            missions.remove(idx);
-        }
-        missionIds.remove(new Integer(id));
+
+        missions.remove(Integer.valueOf(id));
     }
 
     public void removePart(Part part) {
@@ -2951,8 +2907,7 @@ public class Campaign implements Serializable, ITechManager {
             // if this is a test unit, then we won't remove the part because its not there
             return;
         }
-        parts.remove(part);
-        partIds.remove(new Integer(part.getId()));
+        parts.remove(Integer.valueOf(part.getId()));
         //remove child parts as well
         for(int childId : part.getChildPartIds()) {
             Part childPart = getPart(childId);
@@ -2969,7 +2924,7 @@ public class Campaign implements Serializable, ITechManager {
 
     public void removeForce(Force force) {
         int fid = force.getId();
-        forceIds.remove(new Integer(fid));
+        forceIds.remove(Integer.valueOf(fid));
         // clear forceIds of all personnel with this force
         for (UUID uid : force.getUnits()) {
             Unit u = getUnit(uid);
@@ -3488,11 +3443,10 @@ public class Campaign implements Serializable, ITechManager {
         }
 
         // Lists of objects:
-        writeArrayAndHashToXmlforUUID(pw1, 1, "units", units, unitIds); // Units
-        writeArrayAndHashToXmlforUUID(pw1, 1, "personnel", personnel,
-                personnelIds); // Personnel
-        writeArrayAndHashToXmlforUUID(pw1, 1, "ancestors", ancestors, ancestorsIds); // Ancestry trees
-        writeArrayAndHashToXml(pw1, 1, "missions", missions, missionIds); // Missions
+        writeMapToXml(pw1, 1, "units", units); // Units
+        writeMapToXml(pw1, 1, "personnel", personnel); // Personnel
+        writeMapToXml(pw1, 1, "ancestors", ancestors); // Ancestry trees
+        writeMapToXml(pw1, 1, "missions", missions); // Missions
         // the forces structure is hierarchical, but that should be handled
         // internally
         // from with writeToXML function for Force
@@ -3522,7 +3476,7 @@ public class Campaign implements Serializable, ITechManager {
         pw1.println("\t</specialAbilities>");
         rskillPrefs.writeToXml(pw1, 1);
         // parts is the biggest so it goes last
-        writeArrayAndHashToXml(pw1, 1, "parts", parts, partIds); // Parts
+        writeMapToXml(pw1, 1, "parts", parts); // Parts
 
         writeGameOptions(pw1);
 
@@ -3645,6 +3599,27 @@ public class Campaign implements Serializable, ITechManager {
         for (UUID x : hashtab.keySet()) {
             ((MekHqXmlSerializable) (hashtab.get(x))).writeToXml(pw1,
                     indent + 1);
+        }
+
+        pw1.println(MekHqXmlUtil.indentStr(indent) + "</" + tag + ">");
+    }
+    
+    /**
+     * A helper function to encapsulate writing the map entries out to XML.
+     *
+     * @param <keyType> The key type of the map.
+     * @param <arrType> The object type of the map. Must implement MekHqXmlSerializable.
+     * @param pw1       The PrintWriter to output XML to.
+     * @param indent    The indentation level to use for writing XML (purely for neatness).
+     * @param tag       The name of the tag to use to encapsulate it.
+     * @param map       The map of objects to write out.
+     */
+    private <keyType, valueType extends MekHqXmlSerializable> void writeMapToXml(PrintWriter pw1,
+            int indent, String tag, Map<keyType, valueType> map) {
+        pw1.println(MekHqXmlUtil.indentStr(indent) + "<" + tag + ">");
+
+        for (Map.Entry<keyType, valueType> x : map.entrySet()) {
+            x.getValue().writeToXml(pw1, indent + 1);
         }
 
         pw1.println(MekHqXmlUtil.indentStr(indent) + "</" + tag + ">");
@@ -3931,8 +3906,9 @@ public class Campaign implements Serializable, ITechManager {
         long timestamp = System.currentTimeMillis();
 
         // loop through forces to set force id
-        for (int fid : retVal.forceIds.keySet()) {
-            Force f = retVal.forceIds.get(fid);
+        for (Map.Entry<Integer, Force> mf : retVal.forceIds.entrySet()) {
+            int fid = mf.getKey();
+            Force f = mf.getValue();
             Scenario s = retVal.getScenario(f.getScenarioId());
             if (null != s
                     && (null == f.getParentForce() || !f.getParentForce().isDeployed())) {
@@ -3958,8 +3934,7 @@ public class Campaign implements Serializable, ITechManager {
         // Process parts...
         ArrayList<Part> spareParts = new ArrayList<Part>();
         ArrayList<Part> removeParts = new ArrayList<Part>();
-        for (int x = 0; x < retVal.parts.size(); x++) {
-            Part prt = retVal.parts.get(x);
+        for (Part prt : retVal.getParts()) {
             Unit u = retVal.getUnit(prt.getUnitId());
             prt.setUnit(u);
             if (null != u) {
@@ -4101,9 +4076,7 @@ public class Campaign implements Serializable, ITechManager {
         timestamp = System.currentTimeMillis();
 
         // All personnel need the rank reference fixed
-        for (int x = 0; x < retVal.personnel.size(); x++) {
-            Person psn = retVal.personnel.get(x);
-
+        for (Person psn : retVal.getPersonnel()) {
             // skill types might need resetting
             psn.resetSkillTypes();
 
@@ -4140,7 +4113,7 @@ public class Campaign implements Serializable, ITechManager {
         timestamp = System.currentTimeMillis();
 
         // Okay, Units, need their pilot references fixed.
-        for(Unit unit : retVal.units) {
+        for(Unit unit : retVal.getUnits()) {
             // Also, the unit should have its campaign set.
             unit.campaign = retVal;
 
@@ -4208,7 +4181,7 @@ public class Campaign implements Serializable, ITechManager {
                         System.currentTimeMillis() - timestamp));
         timestamp = System.currentTimeMillis();
 
-        for(Unit unit : retVal.units) {
+        for(Unit unit : retVal.getUnits()) {
             // Some units have been incorrectly assigned a null C3UUID as a string. This should correct that by setting a new C3UUID
             if ((unit.getEntity().hasC3() || unit.getEntity().hasC3i())
                     && (unit.getEntity().getC3UUIDAsString() == null || unit.getEntity().getC3UUIDAsString().equals("null"))) {
@@ -4226,14 +4199,13 @@ public class Campaign implements Serializable, ITechManager {
         // ok, once we are sure that campaign has been set for all units, we can
         // now go
         // through and initializeParts and run diagnostics
-        for (int x = 0; x < retVal.units.size(); x++) {
-            Unit unit = retVal.units.get(x);
+        for (Unit unit : retVal.getUnits()) {
             // just in case parts are missing (i.e. because they weren't tracked
             // in previous versions)            
             unit.initializeParts(true);
             unit.runDiagnostic(false);
             if (!unit.isRepairable()) {
-                if (unit.getSalvageableParts().isEmpty()) {
+                if (!unit.hasSalvageableParts()) {
                     // we shouldnt get here but some units seem to stick around
                     // for some reason
                     retVal.removeUnit(unit.getId());
@@ -4398,23 +4370,23 @@ public class Campaign implements Serializable, ITechManager {
 
     private static void fixIdReferences(Campaign retVal) {
         // set up translation hashes
-        Hashtable<Integer, UUID> uHash = new Hashtable<Integer, UUID>();
-        Hashtable<Integer, UUID> pHash = new Hashtable<Integer, UUID>();
-        for (Unit u : retVal.units) {
+        Map<Integer, UUID> uHash = new HashMap<>();
+        Map<Integer, UUID> pHash = new HashMap<>();
+        for (Unit u : retVal.getUnits()) {
             uHash.put(u.getOldId(), u.getId());
         }
-        for (Person p : retVal.personnel) {
+        for (Person p : retVal.getPersonnel()) {
             pHash.put(p.getOldId(), p.getId());
         }
         // ok now go through and fix
-        for (Unit u : retVal.units) {
+        for (Unit u : retVal.getUnits()) {
             u.fixIdReferences(uHash, pHash);
         }
-        for (Person p : retVal.personnel) {
+        for (Person p : retVal.getPersonnel()) {
             p.fixIdReferences(uHash, pHash);
         }
         retVal.forces.fixIdReferences(uHash);
-        for (Part p : retVal.parts) {
+        for (Part p : retVal.getParts()) {
             p.fixIdReferences(uHash, pHash);
         }
         ArrayList<Kill> ghostKills = new ArrayList<Kill>();
@@ -4433,9 +4405,9 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     private static void fixIdReferencesB(Campaign retVal) {
-        for (Unit u : retVal.units) {
-            Entity en = u.getEntity();
-            UUID id = u.getId();
+        for (Map.Entry<UUID, Unit> u : retVal.units.entrySet()) {
+            Entity en = u.getValue().getEntity();
+            UUID id = u.getKey();
             en.setExternalIdAsString(id.toString());
 
             // If they have C3 or C3i we need to set their ID
@@ -5830,10 +5802,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public ArrayList<Force> getAllForces() {
-        ArrayList<Force> allForces = new ArrayList<Force>();
-        for (int x : forceIds.keySet()) {
-            allForces.add(forceIds.get(x));
-        }
+        ArrayList<Force> allForces = new ArrayList<Force>(forceIds.values());
         return allForces;
     }
 
@@ -6614,7 +6583,7 @@ public class Campaign implements Serializable, ITechManager {
      */
     public int totalBonusParts() {
         int retVal = 0;
-        for (Mission m : missions) {
+        for (Mission m : getMissions()) {
             if (m.isActive() && m instanceof AtBContract) {
                 retVal += ((AtBContract) m).getNumBonusParts();
             }
@@ -6628,7 +6597,7 @@ public class Campaign implements Serializable, ITechManager {
          * If the unit is not assigned to a contract, use the least restrictive active
          * contract
          */
-        for (Mission m : missions) {
+        for (Mission m : getMissions()) {
             if (m.isActive() && m instanceof AtBContract) {
                 if (null == contract
                         || ((AtBContract) m).getPartsAvailabilityLevel() > contract.getPartsAvailabilityLevel()) {
@@ -7000,15 +6969,14 @@ public class Campaign implements Serializable, ITechManager {
      */
     private void checkDuplicateNamesDuringAdd(Entity entity) {
         if (duplicateNameHash.get(entity.getShortName()) == null) {
-            duplicateNameHash.put(entity.getShortName(), new Integer(1));
+            duplicateNameHash.put(entity.getShortName(), Integer.valueOf(1));
         } else {
-            int count = duplicateNameHash.get(entity.getShortName()).intValue();
+            int count = duplicateNameHash.get(entity.getShortName());
             count++;
-            duplicateNameHash.put(entity.getShortName(), new Integer(count));
+            duplicateNameHash.put(entity.getShortName(), Integer.valueOf(count));
             entity.duplicateMarker = count;
             entity.generateShortName();
             entity.generateDisplayName();
-
         }
     }
 
@@ -7031,8 +6999,8 @@ public class Campaign implements Serializable, ITechManager {
                         e.generateDisplayName();
                     }
                 }
-                duplicateNameHash.put(entity.getShortNameRaw(), new Integer(
-                        count - 1));
+                duplicateNameHash.put(entity.getShortNameRaw(), 
+                    Integer.valueOf(count - 1));
             } else {
                 duplicateNameHash.remove(entity.getShortNameRaw());
             }
@@ -7613,8 +7581,8 @@ public class Campaign implements Serializable, ITechManager {
      */
     public void reloadGameEntities() {
         game.reset();
-        for (Unit u : units) {
-            Entity en = u.getEntity();
+        for (Map.Entry<UUID, Unit> u : units.entrySet()) {
+            Entity en = u.getValue().getEntity();
             if (null != en) {
                 game.addEntity(en.getId(), en);
             }
@@ -7918,7 +7886,8 @@ public class Campaign implements Serializable, ITechManager {
         long largeCraft = 0;
         long proto = 0;
         long spareParts = 0;
-        for (Unit u : units) {
+        for (Map.Entry<UUID, Unit> mu : units.entrySet()) {
+            Unit u = mu.getValue();
             long value = u.getSellValue();
             if (u.getEntity() instanceof Mech) {
                 mech += value;
@@ -8957,7 +8926,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public void initTimeInService() {
-        for (Person p : personnel) {
+        for (Person p : getPersonnel()) {
             Date join = null;
             for (LogEntry e : p.getPersonnelLog()) {
                 if (join == null){
@@ -8986,18 +8955,23 @@ public class Campaign implements Serializable, ITechManager {
 
     public void initAtB() {
         retirementDefectionTracker.setLastRetirementRoll(calendar);
-        for (int i = 0; i < missions.size(); i++) {
-            if (missions.get(i) instanceof Contract && !(missions.get(i) instanceof AtBContract)) {
-                missions.set(i, new AtBContract((Contract) missions.get(i), this));
-                missionIds.put(missions.get(i).getId(), missions.get(i));
+
+        /*
+         * Switch all contracts to AtBContract's
+         */
+        for (Map.Entry<Integer, Mission> me : missions.entrySet()) {
+            Mission m = me.getValue();
+            if (m instanceof Contract && !(m instanceof AtBContract)) {
+                me.setValue(new AtBContract((Contract)m, this));
             }
         }
+
         /*
          * Go through all the personnel records and assume the earliest date is the date
          * the unit was founded.
          */
         Date founding = null;
-        for (Person p : personnel) {
+        for (Person p : getPersonnel()) {
             for (LogEntry e : p.getPersonnelLog()) {
                 if (null == founding || e.getDate().before(founding)) {
                     founding = e.getDate();
@@ -9010,7 +8984,7 @@ public class Campaign implements Serializable, ITechManager {
          * that MWs assigned to a non-Assault 'Mech on the date they joined came with
          * that 'Mech (which is a less certain assumption)
          */
-        for (Person p : personnel) {
+        for (Person p : getPersonnel()) {
             Date join = null;
             for (LogEntry e : p.getPersonnelLog()) {
                 if (e.getDesc().startsWith("Joined ")) {
@@ -9040,8 +9014,8 @@ public class Campaign implements Serializable, ITechManager {
                                  */
                                 p.setOriginalUnitTech(1);
                             }
-                            if (null != p.getUnitId() && null != unitIds.get(p.getUnitId())
-                                    && ms.getName().equals(unitIds.get(p.getUnitId()).getEntity().getShortNameRaw())) {
+                            if (null != p.getUnitId() && null != units.get(p.getUnitId())
+                                    && ms.getName().equals(units.get(p.getUnitId()).getEntity().getShortNameRaw())) {
                                 p.setOriginalUnitId(p.getUnitId());
                             }
                         }

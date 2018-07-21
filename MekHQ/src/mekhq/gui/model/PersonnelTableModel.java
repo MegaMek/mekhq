@@ -599,7 +599,7 @@ import mekhq.gui.BasicInfo;
         }
 
         public void refreshData() {
-            setData(getCampaign().getPersonnel());
+            setData(new ArrayList<>(getCampaign().getPersonnel()));
         }
 
         public TableCellRenderer getRenderer(boolean graphic, IconPackage icons) {
