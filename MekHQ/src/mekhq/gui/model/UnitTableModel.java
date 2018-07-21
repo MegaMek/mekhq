@@ -362,7 +362,7 @@ public class UnitTableModel extends DataTableModel {
                 Person p = u.getCommander();
                 if(null != p) {
                     setPortrait(p);
-                    setText(p.getFullDesc(), color);
+                    setText(p.getFullDesc(false), color);
                 } else {
                     clearImage();
                 }
@@ -371,7 +371,7 @@ public class UnitTableModel extends DataTableModel {
                 Person p = u.getTech();
                 if(null != p) {
                     setPortrait(p);
-                    setText(p.getFullDesc(), color);
+                    setText(p.getFullDesc(false), color);
                 } else {
                     clearImage();
                 }

@@ -669,7 +669,7 @@ import mekhq.gui.BasicInfo;
                 setText(getValueAt(actualRow, actualCol).toString(), color);
                 if (actualCol == COL_RANK) {
                     setPortrait(p);
-                    setText(p.getFullDesc(), color);
+                    setText(p.getFullDesc(false), color);
                 }
                 if(actualCol == COL_ASSIGN) {
                 	if (loadAssignmentFromMarket) {
