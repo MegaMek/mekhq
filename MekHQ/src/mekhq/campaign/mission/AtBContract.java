@@ -350,8 +350,13 @@ public class AtBContract extends Contract implements Serializable {
 	}
 
 	public static boolean isMinorPower(String fName) {
-		return !RandomFactionGenerator.getInstance().isISMajorPower(fName) &&
-				!Faction.getFaction(fName).isClan();
+	    Faction faction = Faction.getFaction(fName);
+	    if (null != faction) {
+    		return !RandomFactionGenerator.getInstance().getFactionHints().isISMajorPower(faction) &&
+    				!faction.isClan();
+	    } else {
+	        return false;
+	    }
 	}
 	
 	public void calculatePaymentMultiplier(Campaign campaign) {
@@ -406,7 +411,8 @@ public class AtBContract extends Contract implements Serializable {
 			break;
 		}
 		
-		if (RandomFactionGenerator.getInstance().isISMajorPower(employerCode)
+		if (RandomFactionGenerator.getInstance().getFactionHints()
+		            .isISMajorPower(Faction.getFaction(employerCode))
 				|| Faction.getFaction(employerCode).isClan()) {
 			multiplier *= 1.2;
 		} else if (enemyCode.equals("IND") ||
@@ -987,8 +993,9 @@ public class AtBContract extends Contract implements Serializable {
 	public boolean contractExtended (Campaign campaign) {
 		if (getMissionType() != MT_PIRATEHUNTING &&
 				getMissionType() != MT_RIOTDUTY) {
-			String warName = RandomFactionGenerator.getInstance().getCurrentWar(getEmployerCode(),
-					getEnemyCode(), campaign.getDate());
+			String warName = RandomFactionGenerator.getInstance().getFactionHints()
+			            .getCurrentWar(Faction.getFaction(getEmployerCode()),
+					Faction.getFaction(getEnemyCode()), campaign.getDate());
 			if (null != warName) {
 				int extension = 0;
 				int roll = Compute.d6();

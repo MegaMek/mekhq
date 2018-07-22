@@ -175,7 +175,7 @@ public class ContractMarket implements Serializable {
 					campaign.getCurrentPlanet().getFactionSet(currentDate);
 			boolean inMinorFaction = true;
 			for (Faction f : currentFactions) {
-				if (RandomFactionGenerator.getInstance().isISMajorPower(f) ||
+				if (RandomFactionGenerator.getInstance().getFactionHints().isISMajorPower(f) ||
 						f.isClan()) {
 					inMinorFaction = false;
 					break;
@@ -340,7 +340,8 @@ public class ContractMarket implements Serializable {
         }
 		contract.setEmployerCode(employer, campaign.getGameYear());
 		contract.setMissionType(findAtBMissionType(unitRatingMod,
-				RandomFactionGenerator.getInstance().isISMajorPower(contract.getEmployerCode())));
+		        RandomFactionGenerator.getInstance().getFactionHints()
+		            .isISMajorPower(Faction.getFaction(contract.getEmployerCode()))));
 
 		if (contract.getMissionType() == AtBContract.MT_PIRATEHUNTING)
 			contract.setEnemyCode("PIR");
@@ -358,9 +359,9 @@ public class ContractMarket implements Serializable {
 		 * (ComStar, Mercs not under contract) are more likely to have garrison-type
 		 * contracts and less likely to have battle-type contracts unless at war.
 		 */
-		if (RandomFactionGenerator.getInstance().isNeutral(employer) &&
-				!RandomFactionGenerator.getInstance().isAtWarWith(employer,
-						contract.getEnemyCode(), campaign.getDate())) {
+		if (RandomFactionGenerator.getInstance().getFactionHints().isNeutral(Faction.getFaction(employer)) &&
+				!RandomFactionGenerator.getInstance().getFactionHints().isAtWarWith(Faction.getFaction(employer),
+						Faction.getFaction(contract.getEnemyCode()), campaign.getDate())) {
 			if (contract.getMissionType() == AtBContract.MT_PLANETARYASSAULT) {
 				contract.setMissionType(AtBContract.MT_GARRISONDUTY);
 			} else if (contract.getMissionType() == AtBContract.MT_RELIEFDUTY) {
@@ -433,7 +434,8 @@ public class ContractMarket implements Serializable {
 		AtBContract contract = new AtBContract("New Subcontract");
 		contract.setEmployerCode(parent.getEmployerCode(), campaign.getGameYear());
 		contract.setMissionType(findAtBMissionType(unitRatingMod,
-				RandomFactionGenerator.getInstance().isISMajorPower(contract.getEmployerCode())));
+		        RandomFactionGenerator.getInstance().getFactionHints()
+		            .isISMajorPower(Faction.getFaction(contract.getEmployerCode()))));
 
 		if (contract.getMissionType() == AtBContract.MT_PIRATEHUNTING)
 			contract.setEnemyCode("PIR");
@@ -728,7 +730,8 @@ public class ContractMarket implements Serializable {
 			mods.mods[i] += missionMods[contract.getMissionType()][i];
 		}
 
-		if (RandomFactionGenerator.getInstance().isISMajorPower(contract.getEmployerCode())) {
+		if (RandomFactionGenerator.getInstance().getFactionHints()
+		        .isISMajorPower(Faction.getFaction(contract.getEmployerCode()))) {
 			mods.mods[CLAUSE_SALVAGE] += -1;
 			mods.mods[CLAUSE_TRANSPORT] += 1;
 		}
