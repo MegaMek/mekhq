@@ -1306,8 +1306,9 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 popup.add(newMenuItem(resourceMap.getString("free.text"), CMD_FREE, !person.isFree())); //$NON-NLS-1$
             }
             
-            if(gui.getCampaign().getCampaignOptions().getUseAtB() &&
-                    gui.getCampaign().getCampaignOptions().getUseAtBCapture()
+            if(gui.getCampaign().getCampaignOptions().getUseAtB()
+                    && (gui.getCampaign().getCampaignOptions().getUseAtBCapture()
+                        || gui.getCampaign().getCampaignOptions().capturePrisoners())
                     && StaticChecks.areAllPrisoners(selected)) {
                 popup.add(newMenuItem(resourceMap.getString("ransom.text"), CMD_RANSOM));
                 popup.add(newMenuItem(resourceMap.getString("recruit.text"), CMD_RECRUIT, //$NON-NLS-1$
