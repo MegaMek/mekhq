@@ -148,8 +148,12 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 		campaign.removePart(this);
 		if(null != unit) {
 			unit.removePart(this);
-		}	
+		}
 		setUnit(null);
+		Part parentPart = campaign.getPart(parentPartId);
+		if (null != parentPart) {
+		    parentPart.removeChildPart(this.getId());
+		}
 	}
 	
 	public abstract boolean isAcceptableReplacement(Part part, boolean refit);
