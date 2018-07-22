@@ -41,6 +41,7 @@ import java.util.stream.Collectors;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.joda.time.DateTime;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -104,7 +105,7 @@ public class RandomFactionGenerator implements Serializable {
 	
 	private boolean initialized = false;
 	
-	private RandomFactionGenerator() {
+	public RandomFactionGenerator() {
 		deepPeriphery = new HashSet<>();
 		neutralFactions = new HashSet<>();
 		majorPowers = new HashSet<>();
@@ -146,6 +147,26 @@ public class RandomFactionGenerator implements Serializable {
 	    borderTracker.setRegionRadius(c.getCampaignOptions().getSearchRadius());
 	    MekHQ.registerHandler(borderTracker);
 	    MekHQ.registerHandler(this);
+	}
+	
+	public void setDate(GregorianCalendar calendar) {
+	    borderTracker.setDate(Utilities.getDateTimeDay(calendar));
+	}
+	
+	public void setDate(DateTime when) {
+	    borderTracker.setDate(when);
+	}
+	
+	public void setSearchCenter(double x, double y) {
+	    borderTracker.setRegionCenter(x, y);
+	}
+	
+	public void setSearchCenter(Planet p) {
+	    borderTracker.setRegionCenter(p.getX(), p.getY());
+	}
+	
+	public void setSearchRadius(double radius) {
+	    borderTracker.setRegionRadius(radius);
 	}
 	
 	@Subscribe
@@ -557,7 +578,7 @@ public class RandomFactionGenerator implements Serializable {
 	 */
 	public Set<String> getEmployerSet() {
 	    return borderTracker.getFactionsInRegion().stream()
-	            .filter(f -> !f.isClan())
+	            .filter(f -> !f.isClan() && !isEmptyFaction(f))
 	            .map(Faction::getShortName)
 	            .collect(Collectors.toSet());
 	}	

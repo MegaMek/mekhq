@@ -143,6 +143,7 @@ public class FactionBorderTracker {
     
     /**
      * Sets the size of the region's bounding hex and recalculates the faction borders if it has changed.
+     * Any value less than zero will include the entire map.
      * 
      * @param radius The distance from the center of the hex to each vertex.
      */
@@ -437,7 +438,7 @@ public class FactionBorderTracker {
             Set<Faction> oldFactions = new HashSet<>(borders.keySet());
             synchronized (this) {
                 for (Planet planet : getPlanetList()) {
-                    if ((distanceThreshold < 0)
+                    if ((regionHex.radius < 0)
                             || regionHex.contains(planet.getX(), planet.getY())) {
                         planetList.add(planet);
                         factionSet.addAll(planet.getFactionSet(now));
