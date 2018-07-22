@@ -25,6 +25,7 @@ v0.45.0-git
 + PR #801: [Feature] Personnel awards
 + PR #799: [Feature] Optional "Pay for Repairs" per Campaign Ops, page 140
 + Issue #773: Fix text color for person text in Personnel and Hangar "Graphic" views
++ Issue #819: Dropshop Baydoor unrepairable
 
 v0.44.0 (2018-06-24 1900 UTC)
 + Issue #733: Clan techs still have clan penalties to maintenance
