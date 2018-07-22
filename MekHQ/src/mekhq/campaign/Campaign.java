@@ -5301,7 +5301,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public Person newPerson(int type) {
-        return newPerson(type, Person.T_NONE, getFactionCode());
+        return newPerson(type, getFactionCode());
     }
 
     public Person newPerson(int type, int secondary) {
@@ -5309,9 +5309,6 @@ public class Campaign implements Serializable, ITechManager {
     }
     
     public Person newPerson(int type, String factionCode) {
-        if (type == Person.T_LAM_PILOT) {
-            return newPerson(Person.T_MECHWARRIOR, Person.T_AERO_PILOT, factionCode);
-        }
         return newPerson(type, Person.T_NONE, factionCode);
     }
 
@@ -5324,6 +5321,10 @@ public class Campaign implements Serializable, ITechManager {
      * @return
      */
     public Person newPerson(int type, int secondary, String factionCode) {
+        if (type == Person.T_LAM_PILOT) {
+            type = Person.T_MECHWARRIOR;
+            secondary = Person.T_AERO_PILOT;
+        }
         boolean isFemale = getRNG().isFemale();
         Person person = new Person(this, factionCode);
         if (isFemale) {
@@ -8571,7 +8572,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public String getCombatPersonnelDetails() {
-        int[] countPersonByType = new int[Person.T_SPACE_GUNNER + 1];
+        int[] countPersonByType = new int[Person.T_NUM];
         int countTotal = 0;
         int countInjured = 0;
         int countMIA = 0;
@@ -8581,7 +8582,7 @@ public class Campaign implements Serializable, ITechManager {
 
         for (Person p : getPersonnel()) {
             // Add them to the total count
-            if (p.getPrimaryRole() <= Person.T_SPACE_GUNNER && !p.isPrisoner()
+            if (Person.isCombatRole(p.getPrimaryRole()) && !p.isPrisoner()
                     && !p.isBondsman() && p.isActive()) {
                 countPersonByType[p.getPrimaryRole()]++;
                 countTotal++;
@@ -8592,13 +8593,13 @@ public class Campaign implements Serializable, ITechManager {
                     countInjured++;
                 }
                 salary += p.getSalary();
-            } else if (p.getPrimaryRole() <= Person.T_SPACE_GUNNER
+            } else if (Person.isCombatRole(p.getPrimaryRole())
                     && p.getStatus() == Person.S_RETIRED) {
                 countRetired++;
-            } else if (p.getPrimaryRole() <= Person.T_SPACE_GUNNER
+            } else if (Person.isCombatRole(p.getPrimaryRole())
                     && p.getStatus() == Person.S_MIA) {
                 countMIA++;
-            } else if (p.getPrimaryRole() <= Person.T_SPACE_GUNNER
+            } else if (Person.isCombatRole(p.getPrimaryRole())
                     && p.getStatus() == Person.S_KIA) {
                 countKIA++;
             }
@@ -8612,10 +8613,12 @@ public class Campaign implements Serializable, ITechManager {
                 countTotal);
         sb.append(buffer);
 
-        for (int i = Person.T_NONE + 1; i <= Person.T_SPACE_GUNNER; i++) {
-            buffer = String.format("    %-30s    %4s\n", Person.getRoleDesc(i, getFaction().isClan()),
-                    countPersonByType[i]);
-            sb.append(buffer);
+        for (int i = 0; i <= Person.T_NUM; i++) {
+            if (Person.isCombatRole(i)) {
+                buffer = String.format("    %-30s    %4s\n", Person.getRoleDesc(i, getFaction().isClan()),
+                        countPersonByType[i]);
+                sb.append(buffer);
+            }
         }
 
         buffer = String.format("%-30s        %4s\n",
@@ -8649,7 +8652,7 @@ public class Campaign implements Serializable, ITechManager {
 
         for (Person p : getPersonnel()) {
             // Add them to the total count
-            if (p.getPrimaryRole() > Person.T_SPACE_GUNNER && !p.isPrisoner()
+            if (Person.isSupportRole(p.getPrimaryRole()) && !p.isPrisoner()
                     && !p.isBondsman() && p.isActive()) {
                 countPersonByType[p.getPrimaryRole()]++;
                 countTotal++;
@@ -8667,13 +8670,13 @@ public class Campaign implements Serializable, ITechManager {
                 if (p.getInjuries().size() > 0 || p.getHits() > 0) {
                     countInjured++;
                 }
-            } else if (p.getPrimaryRole() > Person.T_SPACE_GUNNER
+            } else if (Person.isSupportRole(p.getPrimaryRole())
                     && p.getStatus() == Person.S_RETIRED) {
                 countRetired++;
-            } else if (p.getPrimaryRole() > Person.T_SPACE_GUNNER
+            } else if (Person.isSupportRole(p.getPrimaryRole())
                     && p.getStatus() == Person.S_MIA) {
                 countMIA++;
-            } else if (p.getPrimaryRole() > Person.T_SPACE_GUNNER
+            } else if (Person.isSupportRole(p.getPrimaryRole())
                     && p.getStatus() == Person.S_KIA) {
                 countKIA++;
             }
@@ -8687,10 +8690,12 @@ public class Campaign implements Serializable, ITechManager {
                 countTotal);
         sb.append(buffer);
 
-        for (int i = Person.T_NAVIGATOR; i < Person.T_NUM; i++) {
-            buffer = String.format("    %-30s    %4s\n", Person.getRoleDesc(i, getFaction().isClan()),
-                    countPersonByType[i]);
-            sb.append(buffer);
+        for (int i = 0; i < Person.T_NUM; i++) {
+            if (Person.isSupportRole(i)) {
+                buffer = String.format("    %-30s    %4s\n", Person.getRoleDesc(i, getFaction().isClan()),
+                        countPersonByType[i]);
+                sb.append(buffer);
+            }
         }
 
         buffer = String.format("%-30s        %4s\n",

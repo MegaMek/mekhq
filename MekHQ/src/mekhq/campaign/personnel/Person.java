@@ -96,6 +96,9 @@ public class Person implements Serializable, MekHqXmlSerializable {
     public static final int G_MALE = 0;
     public static final int G_FEMALE = 1;
 
+    /* If any new roles are added they should go at the end. They should also be accounted for
+     * in isCombatRole(int) or isSupportRole(int)
+     */
     public static final int T_NONE = 0;
     public static final int T_MECHWARRIOR = 1;
     public static final int T_AERO_PILOT = 2;
@@ -110,7 +113,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     public static final int T_SPACE_PILOT = 11;
     public static final int T_SPACE_CREW = 12;
     public static final int T_SPACE_GUNNER = 13;
-    public static final int T_NAVIGATOR = 14;
+    public static final int T_NAVIGATOR = 14; // End of combat roles
     public static final int T_MECH_TECH = 15;
     public static final int T_MECHANIC = 16;
     public static final int T_AERO_TECH = 17;
@@ -121,8 +124,9 @@ public class Person implements Serializable, MekHqXmlSerializable {
     public static final int T_ADMIN_COM = 22;
     public static final int T_ADMIN_LOG = 23;
     public static final int T_ADMIN_TRA = 24;
-    public static final int T_ADMIN_HR = 25;
+    public static final int T_ADMIN_HR = 25; // End of support roles
     public static final int T_LAM_PILOT = 26; // Not a separate type, but an alias for MW + Aero pilot
+                                              // Does not count as either combat or support role
     public static final int T_NUM = 27;
 
     public static final int S_ACTIVE = 0;
@@ -2893,9 +2897,40 @@ public class Person implements Serializable, MekHqXmlSerializable {
             }
         }
     }
+    
+    /**
+     * @return true if this person has either a primary or a secondary role that is considered a combat
+     *         role
+     */
+    public boolean isCombat() {
+        return isCombatRole(primaryRole) || isCombatRole(primaryRole);
+    }
 
+    /**
+     * @return true if this person has either a primary or a secondary role that is considered a support
+     *         role
+     */
     public boolean isSupport() {
-        return primaryRole >= T_MECH_TECH || secondaryRole >= T_MECH_TECH;
+        return isSupportRole(primaryRole) || isSupportRole(secondaryRole);
+    }
+    
+    /**
+     * Determines whether a role is considered a combat role. Note that T_LAM_PILOT is a special
+     * placeholder which is not used for either primary or secondary role and will return false.
+     * 
+     * @param role A value that can be used for a person's primary or secondary role.
+     * @return     Whether the role is considered a combat role
+     */
+    public static boolean isCombatRole(int role) {
+        return (role > T_NONE) && (role <= T_NAVIGATOR);
+    }
+    
+    /**
+     * @param role A value that can be used for a person's primary or secondary role.
+     * @return     Whether the role is considered a support role
+     */
+    public static boolean isSupportRole(int role) {
+        return (role >= T_MECH_TECH) && (role < T_LAM_PILOT);
     }
 
     public boolean canDrive(Entity ent) {
