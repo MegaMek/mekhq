@@ -514,8 +514,10 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                         } else {
                             if(part.needsFixing()) {
                                 needsCheck = true;
+                                part.fix();
+                            } else {
+                                part.resetRepairSettings();
                             }
-                            part.fix();
                             part.resetTimeSpent();
                             part.resetOvertime();
                             part.setTeamId(null);
