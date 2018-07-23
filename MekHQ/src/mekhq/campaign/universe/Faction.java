@@ -436,6 +436,20 @@ public class Faction {
         return Utilities.combineString(factionNames, "/"); //$NON-NLS-1$
     }
     
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((shortname == null) ? 0 : shortname.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return (obj instanceof Faction)
+                && getShortName().equals(((Faction) obj).getShortName());
+    }
+
     public static enum Tag {
         /** Inner sphere */
         IS, PERIPHERY, CLAN,
