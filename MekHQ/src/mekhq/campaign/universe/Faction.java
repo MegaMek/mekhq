@@ -446,8 +446,11 @@ public class Faction {
 
     @Override
     public boolean equals(Object obj) {
-        return (obj instanceof Faction)
-                && getShortName().equals(((Faction) obj).getShortName());
+        if (obj instanceof Faction) {
+            final Faction other = (Faction) obj;
+            return (null != shortname) && (shortname.equals(other.shortname));
+        }
+        return false;
     }
 
     public static enum Tag {
