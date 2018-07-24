@@ -240,7 +240,7 @@
                 <attribute name="Class-Path" value="${dataclasspath} ${classpath.manifest} ${megamek} ${megameklab}"/>
             </manifest>
                 <fileset dir="${pkgdir}/${srcdir}" includes="**/*.properties"/>
-				<metainf dir="${pkgdir}/$srcdir}" includes="META-INF/services/*"/>
+				<metainf dir="${pkgdir}/${srcdir}" includes="META-INF/services/*"/>
             </jar>
 
             <!-- Ensure that the log directory exists. -->
