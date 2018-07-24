@@ -22,7 +22,13 @@ v0.45.0-git
 		See documentation in docs/plugins.txt.
 + PR #800: Correctly calculate admin costs for government forces per Campaign Ops rules.
 + PR #804: Two fixes to GM mode finances -> edit transaction
-
++ PR #801: [Feature] Personnel awards
++ PR #799: [Feature] Optional "Pay for Repairs" per Campaign Ops, page 140
++ Issue #773: Fix text color for person text in Personnel and Hangar "Graphic" views
++ Issue #549: Allow AtB-style prisoner ransom for prisoners even if the AtB option isn't enabled
++ Issue #819: Dropshop Baydoor unrepairable
++ Issue #796: LAM Pilot shows as Support in Personnel Breakdown
++ PR #821: Fix occasional issue where mechwarrior names with apostrophes and other "funny" characters would show up weird for completed scenarios.
 
 v0.44.0 (2018-06-24 1900 UTC)
 + Issue #733: Clan techs still have clan penalties to maintenance

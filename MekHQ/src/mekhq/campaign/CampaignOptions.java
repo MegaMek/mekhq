@@ -135,6 +135,7 @@ public class CampaignOptions implements Serializable {
 
     //finance related
     private boolean payForParts;
+    private boolean payForRepairs;
     private boolean payForUnits;
     private boolean payForSalaries;
     private boolean payForRecruitment;
@@ -313,6 +314,7 @@ public class CampaignOptions implements Serializable {
         useDylansRandomXp = false;
         useQuirks = false;
         payForParts = false;
+        payForRepairs = false;
         payForUnits = false;
         payForSalaries = false;
         payForRecruitment = false;
@@ -802,6 +804,14 @@ public class CampaignOptions implements Serializable {
 
     public void setPayForParts(boolean b) {
         this.payForParts = b;
+    }
+
+    public boolean payForRepairs() {
+        return payForRepairs;
+    }
+
+    public void setPayForRepairs(boolean b) {
+        this.payForRepairs = b;
     }
 
     public boolean payForUnits() {
@@ -2077,6 +2087,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useDylansRandomXp", useDylansRandomXp);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useQuirks", useQuirks);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "payForParts", payForParts);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "payForRepairs", payForRepairs);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "payForUnits", payForUnits);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "payForSalaries", payForSalaries);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "payForOverhead", payForOverhead);
@@ -2359,6 +2370,8 @@ public class CampaignOptions implements Serializable {
                 retVal.useQuirks = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("payForParts")) {
                 retVal.payForParts = Boolean.parseBoolean(wn2.getTextContent());
+            } else if (wn2.getNodeName().equalsIgnoreCase("payForRepairs")) {
+                retVal.payForRepairs = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("payForUnits")) {
                 retVal.payForUnits = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("payForSalaries")) {

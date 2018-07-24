@@ -22,6 +22,8 @@
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
+import java.text.DecimalFormat;
+import java.util.StringJoiner;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -257,7 +259,16 @@ public class MekActuator extends Part {
 	@Override
 	public String getDetails() {
 		if(null != unit) {
-			return unit.getEntity().getLocationName(location);
+		    StringJoiner sj = new StringJoiner(", ");
+            if (getLocationName() != null) {
+                sj.add(getLocationName());
+            }
+            if (campaign.getCampaignOptions().payForRepairs()) {
+                int repairCost = (int) (getStickerPrice() * .2);
+                DecimalFormat numFormatter = new DecimalFormat();
+                sj.add(numFormatter.format(repairCost) + " C-bills to repair");
+            }
+            return sj.toString();
 		}
 		return getUnitTonnage() + " tons";
 	}

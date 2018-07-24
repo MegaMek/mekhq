@@ -155,7 +155,7 @@ public class Armor extends Part implements IAcquisitionWork {
 			if(!isSalvaging()) {
 				String availability = "";
 				int amountAvailable = getAmountAvailable();
-				String[] inventories = campaign.getPartInventory(getNewPart());
+				PartInventory inventories = campaign.getPartInventory(getNewPart());
 				
 	            String orderTransitString = getOrderTransitStringForDetails(inventories);
 				
@@ -459,8 +459,8 @@ public class Armor extends Part implements IAcquisitionWork {
 		toReturn += ">";
 		toReturn += "<b>" + getAcquisitionDisplayName() + "</b> " + getAcquisitionBonus() + "<br/>";
 		toReturn += getAcquisitionExtraDesc() + "<br/>";
-		String[] inventories = campaign.getPartInventory(getAcquisitionPart());
-        toReturn += inventories[1] + " in transit, " + inventories[2] + " on order<br>";
+		PartInventory inventories = campaign.getPartInventory(getAcquisitionPart());
+        toReturn += inventories.getTransitOrderedDetails() + "<br/>";
 		toReturn += Utilities.getCurrencyString(adjustCostsForCampaignOptions(getStickerPrice())) + "<br/>";
 		toReturn += "</font></html>";
 		return toReturn;
