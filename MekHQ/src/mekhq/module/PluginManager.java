@@ -41,6 +41,10 @@ public class PluginManager {
 
         scriptFiles = new ArrayList<>();
         File dir = new File(PLUGIN_DIR);
+        if (!dir.exists()) {
+            MekHQ.getLogger().log(getClass(), "<init>()", LogLevel.WARNING, //$NON-NLS-1$
+                    "Could not find plugin directory"); //$NON-NLS-1$
+        }
         URL[] urls = new URL[0];
         if (dir.exists() && dir.isDirectory()) {
             List<URL> plugins = getPluginsFromDir(dir);
