@@ -5465,7 +5465,7 @@ public class Campaign implements Serializable, ITechManager {
         }
         //check for Bloodname
         if (person.isClanner()) {
-            checkBloodnameAdd(person, type);
+            checkBloodnameAdd(person, type, factionCode);
         }
 
         return person;
@@ -5576,11 +5576,59 @@ public class Campaign implements Serializable, ITechManager {
         }
     }
 
+    /**
+     * If the person does not already have a bloodname, assigns a chance of having one based on
+     * skill and rank. If the roll indicates there should be a bloodname, one is assigned as
+     * appropriate to the person's phenotype and the player's faction.
+     * 
+     * @param person       The Bloodname candidate
+     * @param type         The phenotype index
+     */
     public void checkBloodnameAdd(Person person, int type) {
-        checkBloodnameAdd(person, type, false);
+        checkBloodnameAdd(person, type, false, this.factionCode);
+    }
+    
+    /**
+     * If the person does not already have a bloodname, assigns a chance of having one based on
+     * skill and rank. If the roll indicates there should be a bloodname, one is assigned as
+     * appropriate to Clan and phenotype.
+     * 
+     * @param person       The Bloodname candidate
+     * @param type         The phenotype index
+     * @param factionCode  The shortName of the faction the person belongs to. Note that there
+     *                     is a chance of having a Bloodname that is unique to a different Clan
+     *                     as this person could have been captured.
+     */
+    public void checkBloodnameAdd(Person person, int type, String factionCode) {
+        checkBloodnameAdd(person, type, false, factionCode);
+    }
+    
+    /**
+     * If the person does not already have a bloodname, assigns a chance of having one based on
+     * skill and rank. If the roll indicates there should be a bloodname, one is assigned as
+     * appropriate to the person's phenotype and the player's faction.
+     * 
+     * @param person       The Bloodname candidate
+     * @param type         The phenotype index
+     * @param ignoreDice   If true, skips the random roll and assigns a Bloodname automatically
+     */
+    public void checkBloodnameAdd(Person person, int type, boolean ignoreDice) {
+        checkBloodnameAdd(person, type, ignoreDice, this.factionCode);
     }
 
-    public void checkBloodnameAdd(Person person, int type, boolean ignoreDice) {
+    /**
+     * If the person does not already have a bloodname, assigns a chance of having one based on
+     * skill and rank. If the roll indicates there should be a bloodname, one is assigned as
+     * appropriate to Clan and phenotype.
+     * 
+     * @param person       The Bloodname candidate
+     * @param type         The phenotype index
+     * @param ignoreDice   If true, skips the random roll and assigns a Bloodname automatically
+     * @param factionCode  The shortName of the faction the person belongs to. Note that there
+     *                     is a chance of having a Bloodname that is unique to a different Clan
+     *                     as this person could have been captured.
+     */
+    public void checkBloodnameAdd(Person person, int type, boolean ignoreDice, String factionCode) {
         // Person already has a bloodname?
         if (person.getBloodname().length() > 0) {
             int result = JOptionPane.showConfirmDialog(null,
@@ -5693,7 +5741,10 @@ public class Campaign implements Serializable, ITechManager {
                         phenotype = Bloodname.P_PROTOMECH;
                         break;
                 }
-                person.setBloodname(Bloodname.randomBloodname(factionCode, phenotype, getGameYear()).getName());
+                Bloodname bloodname = Bloodname.randomBloodname(factionCode, phenotype, getGameYear());
+                if (null != bloodname) {
+                    person.setBloodname(bloodname.getName());
+                }
             }
         }
         MekHQ.triggerEvent(new PersonChangedEvent(person));
