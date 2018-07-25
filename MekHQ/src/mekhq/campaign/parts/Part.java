@@ -1030,10 +1030,17 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	@Override
 	public void fix() {
 		hits = 0;
-		skillMin = SkillType.EXP_GREEN;
+		resetRepairSettings();
+	}
+
+    /**
+     * Sets minimum skill, shorthanded mod, and rush job/extra time setting to defaults.
+     */
+    public void resetRepairSettings() {
+        skillMin = SkillType.EXP_GREEN;
 		shorthandedMod = 0;
 		mode = WorkTime.NORMAL;
-	}
+    }
 
 	@Override
 	public String fail(int rating) {
