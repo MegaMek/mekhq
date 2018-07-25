@@ -373,6 +373,13 @@ public class ForceViewPanel extends javax.swing.JPanel {
 		pnlStats.add(lblTonnage2, gridBagConstraints);
 		nexty++;
 		
+		// if AtB is enabled, set tooltip to show lance weight breakdowns
+		if (campaign.getCampaignOptions().getUseAtB()) {
+			// see Lance.java for lance weight breakdowns
+			lblTonnage1.setToolTipText(resourceMap.getString("tonnageToolTip.text"));
+			lblTonnage2.setToolTipText(resourceMap.getString("tonnageToolTip.text"));
+		}
+
 		lblCost1.setName("lblCost1"); // NOI18N
 		lblCost1.setText(resourceMap.getString("lblCost1.text"));
 		gridBagConstraints = new java.awt.GridBagConstraints();

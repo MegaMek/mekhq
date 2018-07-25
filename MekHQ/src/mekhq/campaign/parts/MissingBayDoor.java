@@ -65,6 +65,23 @@ public class MissingBayDoor extends MissingPart {
     }
 
     @Override
+    public void fix() {
+        Part replacement = findReplacement(false);
+        if(null != replacement) {
+            Part actualReplacement = replacement.clone();
+            unit.addPart(actualReplacement);
+            campaign.addPart(actualReplacement, 0);
+            replacement.decrementQuantity();
+            remove(false);
+            Part bayPart = campaign.getPart(parentPartId);
+            if (null != bayPart) {
+                bayPart.addChildPart(actualReplacement);
+                bayPart.updateConditionFromPart();
+            }
+        }
+    }
+
+    @Override
     public int getLocation() {
         return Entity.LOC_NONE;
     }

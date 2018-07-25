@@ -11,6 +11,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.time.Duration;
 import java.util.GregorianCalendar;
+import java.util.ResourceBundle;
 import java.util.Calendar;
 import java.util.Collections;
 
@@ -22,6 +23,7 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
 import megamek.common.event.Subscribe;
+import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.event.ReportEvent;
 import mekhq.gui.CampaignGUI;
@@ -30,10 +32,13 @@ import mekhq.gui.ReportHyperlinkListener;
 
 public class AdvanceDaysDialog extends JDialog implements ActionListener {
     private static final long serialVersionUID = 1L;
+    
+    private ResourceBundle resourceMap;
+    
     private JSpinner spnDays;
     private JButton btnStart;
     private JButton btnNextMonth;
-    private JLabel lblDays = new JLabel("Days");
+    private JLabel lblDays;
     private JPanel pnlNumDays;
     private DailyReportLogPanel logPanel;
     private CampaignGUI gui;
@@ -44,7 +49,6 @@ public class AdvanceDaysDialog extends JDialog implements ActionListener {
         this.gui = gui;
         this.listener = listener;
         setName("formADD"); // NOI18N
-        setTitle("Advanced Days Dialog");
         getContentPane().setLayout(new java.awt.GridBagLayout());
         this.setPreferredSize(new Dimension(500,500));
         this.setMinimumSize(new Dimension(500,500));
@@ -54,15 +58,19 @@ public class AdvanceDaysDialog extends JDialog implements ActionListener {
 
     public void initComponents() {
         setLayout(new BorderLayout());
+        
+        resourceMap = ResourceBundle.getBundle("mekhq.resources.AdvanceDaysDialog", new EncodeControl()); //$NON-NLS-1$
 
+        this.setTitle(resourceMap.getString("dlgTitle.text"));
+        lblDays = new JLabel(resourceMap.getString("dlgDays.text"));
         pnlNumDays = new JPanel();
         spnDays = new JSpinner(new SpinnerNumberModel(7, 1, 365, 1));
         ((JSpinner.DefaultEditor)spnDays.getEditor()).getTextField().setEditable(true);
         pnlNumDays.add(spnDays);
         pnlNumDays.add(lblDays);
-        btnStart = new JButton("Start Advancement");
+        btnStart = new JButton(resourceMap.getString("dlgStartAdvancement.text"));
         btnStart.addActionListener(this);
-        btnNextMonth = new JButton("Advance to Next Month");
+        btnNextMonth = new JButton(resourceMap.getString("dlgAdvanceNextMonth.text"));
         btnNextMonth.addActionListener(this);
         pnlNumDays.add(btnStart);
         pnlNumDays.add(btnNextMonth);

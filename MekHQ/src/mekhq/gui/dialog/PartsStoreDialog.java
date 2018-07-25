@@ -76,6 +76,7 @@ import mekhq.campaign.parts.MekSensor;
 import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.OmniPod;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.PartInventory;
 import mekhq.campaign.parts.ProtomekArmActuator;
 import mekhq.campaign.parts.ProtomekArmor;
 import mekhq.campaign.parts.ProtomekJumpJet;
@@ -412,7 +413,7 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 		Part selectedPart = partsModel.getPartAt(partsTable.convertRowIndexToModel(row));
 		int quantity = 1;
 		if(bulk) {
-			PopupValueChoiceDialog pcd = new PopupValueChoiceDialog(campaignGUI.getFrame(), true, "How Many " + selectedPart.getName(), quantity, 1, 100);
+			PopupValueChoiceDialog pcd = new PopupValueChoiceDialog(campaignGUI.getFrame(), true, "How Many " + selectedPart.getName(), quantity, 1, CampaignGUI.MAX_QUANTITY_SPINNER);
 			pcd.setVisible(true);
 			quantity = pcd.getValue();
 		}
@@ -557,7 +558,7 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 	        } else {
 	        	part = (Part)data.get(row);
 	        }
-	        String[] inventories = campaign.getPartInventory(part);
+	        PartInventory inventories = campaign.getPartInventory(part);
 			if(col == COL_NAME) {
 				return part.getName();
 			}
@@ -596,13 +597,13 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 	            }
 			}
 			if(col == COL_SUPPLY) {
-                return inventories[0];
+                return inventories.supplyAsString();
             }
 			if(col == COL_TRANSIT) {
-                return inventories[1];
+                return inventories.transitAsString();
             }
 			if(col == COL_QUEUE) {
-			    return inventories[2];
+			    return inventories.orderedAsString();
 			}
 			return "?";
 		}

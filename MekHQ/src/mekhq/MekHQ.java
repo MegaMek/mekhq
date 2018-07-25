@@ -32,7 +32,9 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Properties;
 import java.util.ResourceBundle;
 
@@ -67,6 +69,7 @@ import megamek.common.event.MMEvent;
 import megamek.common.logging.DefaultMmLogger;
 import megamek.common.logging.LogLevel;
 import megamek.common.logging.MMLogger;
+import megamek.common.preference.PreferenceManager;
 import megamek.common.util.EncodeControl;
 import megamek.server.Server;
 import mekhq.campaign.Campaign;
@@ -213,8 +216,7 @@ public class MekHQ implements GameListener {
      * At startup create and show the main frame of the application.
      */
     protected void startup() {
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MekHQ", new EncodeControl()); //$NON-NLS-1$
-        MekHQ.logMessage(resourceMap.getString("Application.name") + " " + resourceMap.getString("Application.version"));
+        showInfo();
         //read in preferences
     	readPreferences();
     	setLookAndFeel();
@@ -283,6 +285,37 @@ public class MekHQ implements GameListener {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+    }
+    
+    private void showInfo() {
+        final String METHOD_NAME = "showInfo";
+        final long TIMESTAMP = new File(PreferenceManager
+                .getClientPreferences().getLogDirectory()
+                + File.separator
+                + "timestamp").lastModified();
+        // echo some useful stuff
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MekHQ", new EncodeControl()); //$NON-NLS-1$
+
+        StringBuilder msg = new StringBuilder();
+        msg.append("\t").append(resourceMap.getString("Application.name")) //$NON-NLS-1$ //$NON-NLS-2$
+                .append(" ").append(resourceMap.getString("Application.version")); //$NON-NLS-1$ //$NON-NLS-2$
+        if (TIMESTAMP > 0) {
+            msg.append("\n\tCompiled on ").append(new Date(TIMESTAMP)); //$NON-NLS-1$
+        }
+        msg.append("\n\tToday is ").append(new Date()); //$NON-NLS-1$
+        msg.append("\n\tJava vendor ").append(System.getProperty("java.vendor")); //$NON-NLS-1$ //$NON-NLS-2$
+        msg.append("\n\tJava version ").append(System.getProperty("java.version")); //$NON-NLS-1$ //$NON-NLS-2$
+        msg.append("\n\tPlatform ") //$NON-NLS-1$
+               .append(System.getProperty("os.name")) //$NON-NLS-1$
+               .append(" ") //$NON-NLS-1$
+               .append(System.getProperty("os.version")) //$NON-NLS-1$
+               .append(" (") //$NON-NLS-1$
+               .append(System.getProperty("os.arch")) //$NON-NLS-1$
+               .append(")"); //$NON-NLS-1$
+        long maxMemory = Runtime.getRuntime().maxMemory() / 1024;
+        msg.append("\n\tTotal memory available to MegaMek: ")
+            .append(NumberFormat.getInstance().format(maxMemory)).append(" kB"); //$NON-NLS-1$ //$NON-NLS-2$
+        getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, msg.toString());
     }
 
     protected void setLookAndFeel() {

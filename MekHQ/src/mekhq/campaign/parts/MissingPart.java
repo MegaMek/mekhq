@@ -148,8 +148,12 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 		campaign.removePart(this);
 		if(null != unit) {
 			unit.removePart(this);
-		}	
+		}
 		setUnit(null);
+		Part parentPart = campaign.getPart(parentPartId);
+		if (null != parentPart) {
+		    parentPart.removeChildPart(this.getId());
+		}
 	}
 	
 	public abstract boolean isAcceptableReplacement(Part part, boolean refit);
@@ -187,11 +191,11 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 
 	@Override
     public String getDetails() {
-	    String[] inventories = campaign.getPartInventory(getNewPart());
 		if(isReplacementAvailable()) {
 			return "Replacement part available";
 		} else {
-			return "<font color='red'>No replacement (" + inventories[1] + " in transit, " + inventories[2] + " on order)</font>";
+			PartInventory inventories = campaign.getPartInventory(getNewPart());
+			return "<font color='red'>No replacement (" + inventories.getTransitOrderedDetails() + ")</font>";
 		}
     }
 	
@@ -266,14 +270,14 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 		
 		toReturn += ">";
 		toReturn += "<b>" + getAcquisitionDisplayName() + "</b> " + getAcquisitionBonus() + "<br/>";
-		String[] inventories = campaign.getPartInventory(getNewPart());
-		toReturn += inventories[1] + " in transit, " + inventories[2] + " on order";
+		PartInventory inventories = campaign.getPartInventory(getNewPart());
+		toReturn += inventories.getTransitOrderedDetails();
 		if (!isOmniPodded()) {
 		    Part newPart = getAcquisitionPart();
 		    newPart.setOmniPodded(true);
 		    inventories = campaign.getPartInventory(newPart);
-		    if (Integer.parseInt(inventories[0]) > 0) { 
-		        toReturn += ", " + inventories[0] + " OmniPod";
+		    if (inventories.getSupply() > 0) { 
+		        toReturn += ", " + inventories.supplyAsString() + " OmniPod";
 		    }
 		}
 		toReturn += "<br/>";

@@ -42,6 +42,8 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.universe.Faction;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -203,6 +205,10 @@ public class CampaignOpsReputationTest {
     public void setUp() {
         int astechs = 0;
         mockCampaign = mock(Campaign.class);
+        Faction mockFaction = mock(Faction.class);
+        when(mockFaction.is(any())).thenReturn(true);
+        when(mockCampaign.getFaction()).thenReturn(mockFaction);
+        
         unitList = new ArrayList<>();
         personnelList = new ArrayList<>();
         activePersonnelList = new ArrayList<>();

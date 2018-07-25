@@ -38,6 +38,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.universe.Faction.Tag;
 
 /**
  * @author Deric Page (deric (dot) page (at) usa.net)
@@ -327,9 +328,7 @@ public class CampaignOpsReputation extends AbstractUnitRating {
         setNonAdminPersonnelCount(0);
         technicians = 0;
 
-        List<Person> personnelList =
-                new ArrayList<>(getCampaign().getActivePersonnel());
-        for (Person p : personnelList) {
+        for (Person p : getCampaign().getActivePersonnel()) {
             if (p.isAdmin() || p.isDoctor()) {
                 continue;
             }
@@ -343,14 +342,19 @@ public class CampaignOpsReputation extends AbstractUnitRating {
     }
 
     private void calcNeededAdmins() {
-        setAdminsNeeded(BigDecimal.valueOf(getNonAdminPersonnelCount())
-                                  .divide(BigDecimal.TEN, 0,
-                                          RoundingMode.UP).intValue());
+        int calculatedAdmin = BigDecimal.valueOf(getNonAdminPersonnelCount())
+                .divide(BigDecimal.TEN, 0,
+                RoundingMode.UP).intValue();
+
+        if (getCampaign().getFaction().is(Tag.MERC) || getCampaign().getFaction().is(Tag.PIRATE)) {
+            setAdminsNeeded(calculatedAdmin);
+        } else {
+            setAdminsNeeded((int) Math.ceil((double)calculatedAdmin / 2));
+        }
     }
 
     // todo Combat Personnel (up to 1/4 total) may be assigned double-duty and count as 1/3 of a tech.
     // todo Combat Personnel (up to 1/4 total) may be assigned double-duty and count as 1/3 of an admin.
-    // todo Distinguish between Merc and Government personnel (1/2 admin needs for gov).
 
     @Override
     protected void initValues() {
@@ -532,7 +536,7 @@ public class CampaignOpsReputation extends AbstractUnitRating {
             totalValue -= 5;
         }
 
-        // ToDo Calculate transport needs and capacity for support personnel.
+        // TODO: Calculate transport needs and capacity for support personnel.
         // According to Campaign Ops, this will require tracking bay personnel 
         // & passenger quarters.
 

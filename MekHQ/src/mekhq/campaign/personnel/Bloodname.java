@@ -39,6 +39,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import megamek.common.Compute;
+import megamek.common.annotations.Nullable;
 import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
 
@@ -252,14 +253,25 @@ public class Bloodname implements Serializable {
 		return retVal;
 	}
 
-	public static Bloodname randomBloodname(String factionCode, int phenotype, int year) {
+    /**
+     * Determines a likely Bloodname based on Clan, phenotype, and year.
+     * 
+     * @param faction The faction code for the Clan; must exist in data/names/bloodnames/clans.xml
+     * @param phenotype One of the Person.PHENOTYPE_* constants
+     * @param year The current campaign year
+     * @return An object representing the chosen Bloodname
+     * 
+     * Though based as much as possible on official sources, the method employed here involves a
+     * considerable amount of speculation.
+     */
+	public static @Nullable Bloodname randomBloodname(String factionCode, int phenotype, int year) {
 		return randomBloodname(Clan.getClan(factionCode), phenotype, year);
 	}
 
 	/**
 	 * Determines a likely Bloodname based on Clan, phenotype, and year.
 	 * 
-	 * @param faction The faction code for the Clan; must exist in data/names/bloodnames/clans.xml
+	 * @param faction The Clan faction; must exist in data/names/bloodnames/clans.xml
 	 * @param phenotype One of the Person.PHENOTYPE_* constants
 	 * @param year The current campaign year
 	 * @return An object representing the chosen Bloodname
@@ -267,7 +279,7 @@ public class Bloodname implements Serializable {
 	 * Though based as much as possible on official sources, the method employed here involves a
 	 * considerable amount of speculation.
 	 */
-	public static Bloodname randomBloodname(Clan faction, int phenotype, int year) {
+	public static @Nullable Bloodname randomBloodname(Clan faction, int phenotype, int year) {
 	    if (null == faction) {
 	        MekHQ.getLogger().log(Bloodname.class, "randomBloodname(Clan,int,int)", LogLevel.ERROR, //$NON-NLS-1$
 	                "Random Bloodname attempted for a clan that does not exist." //$NON-NLS-1$

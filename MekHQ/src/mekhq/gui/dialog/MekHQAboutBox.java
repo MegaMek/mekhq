@@ -21,7 +21,13 @@
 
 package mekhq.gui.dialog;
 
+import java.awt.Cursor;
+import java.awt.Desktop;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.net.URI;
 import java.util.ResourceBundle;
 
 import javax.swing.JFrame;
@@ -49,7 +55,7 @@ public class MekHQAboutBox extends javax.swing.JDialog {
         javax.swing.JLabel versionLabelMegaMekLab = new javax.swing.JLabel();
         javax.swing.JLabel appVersionLabelMegaMekLab = new javax.swing.JLabel();
         javax.swing.JLabel homepageLabel = new javax.swing.JLabel();
-        javax.swing.JLabel appHomepageLabel = new javax.swing.JLabel();
+        javax.swing.JLabel appHomepage = new javax.swing.JLabel();
         javax.swing.JLabel appDescLabel = new javax.swing.JLabel();
 
         ResourceBundle mekhqProperties = ResourceBundle.getBundle("mekhq.resources.MekHQ", new EncodeControl()); //$NON-NLS-1$
@@ -115,10 +121,28 @@ public class MekHQAboutBox extends javax.swing.JDialog {
 		gridBagConstraints.gridy = 4;
         getContentPane().add(homepageLabel, gridBagConstraints);
         
-        appHomepageLabel.setText(mekhqProperties.getString("Application.homepage")); // NOI18N
-        appHomepageLabel.setName("appHomepageLabel"); // NOI18N
+        // use a JButton but make it look more like a regular link
+        appHomepage.setText("<html><font color='#0000EE'>" + mekhqProperties.getString("Application.homepage") + "</font></html>"); // NOI18N
+        appHomepage.setName("appHomepageLabel"); // NOI18N
+        appHomepage.setOpaque(false);
+        appHomepage.setToolTipText(mekhqProperties.getString("Application.homepage"));
+        appHomepage.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        appHomepage.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent evt) {
+            	if (Desktop.isDesktopSupported()) {
+            		try {
+            			URI uri = new URI(mekhqProperties.getString("Application.homepage"));
+            			Desktop.getDesktop().browse(uri);
+            		} catch (Exception e) {
+            			return;
+            		}
+            	}
+            }
+        });
+        
         gridBagConstraints.gridx = 1;
-        getContentPane().add(appHomepageLabel, gridBagConstraints);
+        getContentPane().add(appHomepage, gridBagConstraints);
 
         
         appDescLabel.setText(mekhqProperties.getString("Application.description")); // NOI18N
@@ -127,6 +151,9 @@ public class MekHQAboutBox extends javax.swing.JDialog {
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
+        
+        // add some space at the bottom so the description text is easier to read
+        gridBagConstraints.insets = new Insets(15,15,15,15);
 
         appDescLabel.setName("appDescLabel"); // NOI18N
 

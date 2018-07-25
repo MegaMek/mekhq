@@ -438,7 +438,7 @@ public class RetirementTableModel extends AbstractTableModel {
             setText(getValueAt(actualRow, actualCol).toString(), color);
             if (actualCol == COL_PERSON) {
                 setPortrait(p);
-                setText(p.getFullDesc(), color);
+                setText(p.getFullDesc(false), color);
             }
             if(actualCol == COL_ASSIGN) {
                 Unit u = campaign.getUnit(p.getUnitId());

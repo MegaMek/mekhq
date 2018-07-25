@@ -12,6 +12,8 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.util.GregorianCalendar;
 import java.util.Objects;
 import java.util.ResourceBundle;
@@ -41,6 +43,7 @@ import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Ranks;
+import mekhq.gui.CampaignGUI;
 
 
 /**
@@ -59,6 +62,7 @@ public class HireBulkPersonnelDialog extends JDialog {
     private JComboBox<String> choiceRanks;
     private DefaultComboBoxModel<String> rankModel;
     private JSpinner spnNumber;
+    private JTextField jtf;
     
     private JButton btnHire;
     private JButton btnClose;
@@ -143,7 +147,41 @@ public class HireBulkPersonnelDialog extends JDialog {
         gridBagConstraints.weightx = 1.0;
         getContentPane().add(choiceRanks, gridBagConstraints);
         
-        spnNumber = new JSpinner(new SpinnerNumberModel(1, 1, 100, 1));
+        int sn_min = 1;
+        SpinnerNumberModel sn = new SpinnerNumberModel(1, sn_min, CampaignGUI.MAX_QUANTITY_SPINNER, 1);
+        spnNumber = new JSpinner(sn);
+        spnNumber.setEditor(new JSpinner.NumberEditor(spnNumber,"#")); //prevent digit grouping, e.g. 1,000
+        jtf = ((JSpinner.DefaultEditor) spnNumber.getEditor()).getTextField();
+        jtf.addKeyListener(new KeyListener() {
+        	@Override
+        	public void keyReleased(KeyEvent e) {
+                try {
+                    Integer newValue = Integer.valueOf(jtf.getText());
+                    if (newValue > CampaignGUI.MAX_QUANTITY_SPINNER) {
+                    	spnNumber.setValue(CampaignGUI.MAX_QUANTITY_SPINNER);
+                    	jtf.setText(String.valueOf(CampaignGUI.MAX_QUANTITY_SPINNER));
+                    } else if (newValue < sn_min) {
+                    	spnNumber.setValue(sn_min);
+                    	jtf.setText(String.valueOf(sn_min));
+                    } else {
+                    	spnNumber.setValue(newValue);
+                    	jtf.setText(String.valueOf(newValue));
+                    }
+                } catch(NumberFormatException ex) {
+                    //Not a number in text field
+                	spnNumber.setValue(sn_min);
+                	jtf.setText(String.valueOf(sn_min));
+                }
+        	}
+
+			@Override
+			public void keyTyped(KeyEvent e) {
+			}
+
+			@Override
+			public void keyPressed(KeyEvent e) {	
+			}
+        });
 
         getContentPane().add(new JLabel(resourceMap.getString("lblNumber.text")), newConstraints(0, 2)); //$NON-NLS-1$
         

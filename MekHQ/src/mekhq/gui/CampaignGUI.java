@@ -165,6 +165,8 @@ public class CampaignGUI extends JPanel {
     
     public static final int MAX_START_WIDTH = 1400;
     public static final int MAX_START_HEIGHT = 900;
+    // the max quantity when mass purchasing parts, hiring, etc. using the JSpinner
+    public static final int MAX_QUANTITY_SPINNER = 1000;
 
     private JFrame frame;
 
@@ -602,6 +604,12 @@ public class CampaignGUI extends JPanel {
          * miExportPartsActionPerformed(evt); } });
          * menuExport.add(miExportParts);
          */
+        
+        JMenu miExportCSVFile = new JMenu(resourceMap.getString("menuExportCSV.text")); // NOI18N
+        JMenu miExportXMLFile = new JMenu(resourceMap.getString("menuExportXML.text")); // NOI18N
+        
+        menuExport.add(miExportCSVFile);
+        menuExport.add(miExportXMLFile);
 
         JMenuItem miExportOptions = new JMenuItem(
                 resourceMap.getString("miExportOptions.text")); // NOI18N
@@ -611,41 +619,47 @@ public class CampaignGUI extends JPanel {
                 miExportOptionsActionPerformed(evt);
             }
         });
-        menuExport.add(miExportOptions);
+        miExportXMLFile.add(miExportOptions);
 
         JMenuItem miExportPersonCSV = new JMenuItem(
-                resourceMap.getString("miExportPersonCSV.text")); // NOI18N
-        miExportPersonCSV.addActionListener(ev -> {
-        		if (getTab(GuiTabType.PERSONNEL) != null) {
-        			exportTable(((PersonnelTab)getTab(GuiTabType.PERSONNEL)).getPersonnelTable(),
-        					getCampaign().getName()
-                        + getCampaign().getShortDateAsString()
-                        + "_ExportedPersonnel" + ".csv");
+                resourceMap.getString("miExportPersonnel.text")); // NOI18N
+        miExportPersonCSV.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                miExportPersonnelCSVActionPerformed(evt);
             }
         });
-        menuExport.add(miExportPersonCSV);
+        miExportCSVFile.add(miExportPersonCSV);
 
         JMenuItem miExportUnitCSV = new JMenuItem(
-                resourceMap.getString("miExportUnitCSV.text")); // NOI18N
-        miExportUnitCSV.addActionListener(ev -> {
-        	if (getTab(GuiTabType.HANGAR) != null) {
-                exportTable(((HangarTab)getTab(GuiTabType.HANGAR)).getUnitTable(),
-                		getCampaign().getName()
-                        + getCampaign().getShortDateAsString()
-                        + "_ExportedUnit" + ".csv");
+                resourceMap.getString("miExportUnit.text")); // NOI18N
+        miExportUnitCSV.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                miExportUnitCSVActionPerformed(evt);
             }
         });
-        menuExport.add(miExportUnitCSV);
+        miExportCSVFile.add(miExportUnitCSV);
         
         JMenuItem miExportPlanetsXML = new JMenuItem(
-                resourceMap.getString("miExportPlanetsXML.text"));
+                resourceMap.getString("miExportPlanets.text"));
         miExportPlanetsXML.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 miExportPlanetsXMLActionPerformed(evt);
             }
         });
-        menuExport.add(miExportPlanetsXML);
+        miExportXMLFile.add(miExportPlanetsXML);
+        
+        JMenuItem miExportFinancesCSV = new JMenuItem(
+                resourceMap.getString("miExportFinances.text")); // NOI18N
+        miExportFinancesCSV.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                miExportFinancesCSVActionPerformed(evt);
+            }
+        });
+        miExportCSVFile.add(miExportFinancesCSV);
 
         JMenuItem miImportOptions = new JMenuItem(
                 resourceMap.getString("miImportOptions.text")); // NOI18N
@@ -838,7 +852,7 @@ public class CampaignGUI extends JPanel {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(
-                        getFrame(), true, "Hire How Many Astechs?", 1, 0, 100);
+                        getFrame(), true, "Hire How Many Astechs?", 1, 0, CampaignGUI.MAX_QUANTITY_SPINNER);
                 pvcd.setVisible(true);
                 if (pvcd.getValue() < 0) {
                     return;
@@ -895,7 +909,7 @@ public class CampaignGUI extends JPanel {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(
-                        getFrame(), true, "Hire How Many Medics?", 1, 0, 100);
+                        getFrame(), true, "Hire How Many Medics?", 1, 0, CampaignGUI.MAX_QUANTITY_SPINNER);
                 pvcd.setVisible(true);
                 if (pvcd.getValue() < 0) {
                     return;
@@ -1713,9 +1727,7 @@ public class CampaignGUI extends JPanel {
                 RandomFactionGenerator.getInstance().updateTables(getCampaign().getDate(),
                         getCampaign().getCurrentPlanet(), getCampaign().getCampaignOptions());
             } else {
-                RandomFactionGenerator.getInstance().dispose();
-                RandomUnitGenerator.getInstance().dispose();
-                RandomNameGenerator.getInstance().dispose();
+                getCampaign().shutdownAtB();
             }
         }
         if (staticRATs != getCampaign().getCampaignOptions().useStaticRATs()) {
@@ -1774,7 +1786,7 @@ public class CampaignGUI extends JPanel {
 
     private void miExportOptionsActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_miExportPersonActionPerformed
         try {
-            saveOptionsFile();
+            saveOptionsFile("xml", resourceMap.getString("dlgSaveCampaignXML.text"), getCampaign().getName() + getCampaign().getShortDateAsString() + "_ExportedCampaignSettings");
         } catch (IOException ex) {
             MekHQ.getLogger().log(getClass(), "miExportOptionsActionPerformed(ActionEvent)", ex);
         }
@@ -1782,9 +1794,33 @@ public class CampaignGUI extends JPanel {
 
     private void miExportPlanetsXMLActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_miExportPersonActionPerformed
         try {
-            exportPlanets("xml");
+            exportPlanets("xml", resourceMap.getString("dlgSavePlanetsXML.text"), getCampaign().getName() + getCampaign().getShortDateAsString() + "_ExportedPlanets");
         } catch (Exception ex) {
-            MekHQ.getLogger().log(getClass(), "miImportOptionsActionPerformed(ActionEvent)", ex);
+            MekHQ.getLogger().log(getClass(), "miExportOptionsActionPerformed(ActionEvent)", ex);
+        }
+    }
+    
+    private void miExportFinancesCSVActionPerformed(java.awt.event.ActionEvent evt) {
+        try {
+            exportFinances("csv", resourceMap.getString("dlgSaveFinancesCSV.text"), getCampaign().getName() + getCampaign().getShortDateAsString() + "_ExportedFinances");
+        } catch (Exception ex) {
+            MekHQ.getLogger().log(getClass(), "miExportOptionsActionPerformed(ActionEvent)", ex);
+        }
+    }
+    
+    private void miExportPersonnelCSVActionPerformed(java.awt.event.ActionEvent evt) {
+        try {
+            exportPersonnel("csv", resourceMap.getString("dlgSavePersonnelCSV.text"), getCampaign().getName() + getCampaign().getShortDateAsString() + "_ExportedPersonnel");
+        } catch (Exception ex) {
+            MekHQ.getLogger().log(getClass(), "miExportOptionsActionPerformed(ActionEvent)", ex);
+        }
+    }
+    
+    private void miExportUnitCSVActionPerformed(java.awt.event.ActionEvent evt) {
+        try {
+            exportUnits("csv", resourceMap.getString("dlgSaveUnitsCSV.text"), getCampaign().getName() + getCampaign().getShortDateAsString() + "_ExportedUnits");
+        } catch (Exception ex) {
+            MekHQ.getLogger().log(getClass(), "miExportOptionsActionPerformed(ActionEvent)", ex);
         }
     }
     
@@ -2062,10 +2098,92 @@ public class CampaignGUI extends JPanel {
         JOptionPane.showMessageDialog(mainPanel, report);
     }
     
-    protected void exportPlanets(String format) {
-        JFileChooser exportPlanets = new JFileChooser(".");
-        exportPlanets.setDialogTitle("Export Current Planet List");
-        exportPlanets.setFileFilter(new FileFilter() {
+	/**
+	 * Exports Planets to a file (CSV, XML, etc.)
+	 * @param format
+	 * @param dialogTitle
+	 * @param filename
+	 */
+    protected void exportPlanets(String format, String dialogTitle, String filename) {
+        JFileChooser fc = getExportFile(format, dialogTitle, filename);
+
+        File file = fc.getSelectedFile();
+        if (file == null) {
+            return; // something went wrong
+        }
+
+        file = checkFileEnding(file, format);
+        checkToBackupFile(file, file.getPath());
+        
+        String report = Planets.getInstance().exportPlanets(file.getPath(), format);
+        JOptionPane.showMessageDialog(mainPanel, report);
+    }
+    
+	/**
+	 * Exports Personnel to a file (CSV, XML, etc.)
+	 * @param format
+	 * @param dialogTitle
+	 * @param filename
+	 */
+    protected void exportPersonnel(String format, String dialogTitle, String filename) {
+    	if (((PersonnelTab)getTab(GuiTabType.PERSONNEL)).getPersonnelTable().getRowCount() != 0) {
+    		exportTable(((PersonnelTab)getTab(GuiTabType.PERSONNEL)).getPersonnelTable(), filename, format, dialogTitle);
+    	} else {
+    		JOptionPane.showMessageDialog(mainPanel, resourceMap.getString("dlgNoPersonnel.text"));
+    	} 
+    }
+    
+	/**
+	 * Exports Units to a file (CSV, XML, etc.)
+	 * @param format
+	 * @param dialogTitle
+	 * @param filename
+	 */
+    protected void exportUnits(String format, String dialogTitle, String filename) {
+    	if (((HangarTab)getTab(GuiTabType.HANGAR)).getUnitTable().getRowCount() != 0) {
+    		exportTable(((HangarTab)getTab(GuiTabType.HANGAR)).getUnitTable(), filename, format, dialogTitle);
+    	} else {
+    		JOptionPane.showMessageDialog(mainPanel, resourceMap.getString("dlgNoUnits"));
+    	} 
+    }
+    
+	/**
+	 * Exports Finances to a file (CSV, XML, etc.)
+	 * @param format
+	 * @param dialogTitle
+	 * @param filename
+	 */
+    protected void exportFinances(String format, String dialogTitle, String filename) {
+    	if (getCampaign().getFinances().getAllTransactions().size() != 0) {
+	        JFileChooser fc = getExportFile(format, dialogTitle, filename);
+	
+	        File file = fc.getSelectedFile();
+	        if (file == null) {
+	            return; // something went wrong
+	        }
+	
+	        file = checkFileEnding(file, format);
+	        checkToBackupFile(file, file.getPath());
+	
+	        String report = getCampaign().getFinances().exportFinances(file.getPath(), format);
+	        JOptionPane.showMessageDialog(mainPanel, report);
+    	} else {
+    		JOptionPane.showMessageDialog(mainPanel, resourceMap.getString("dlgNoFinances.text"));
+    		return;
+    	}
+    }
+    
+	/**
+	 * Gets a filename from the user using the JFileChooser
+	 * @param format
+	 * @param dialogTitle
+	 * @param filename
+	 * @return JFileChooser
+	 */
+    private JFileChooser getExportFile(String format, String dialogTitle, String filename) {
+    	JFileChooser filePicker = new JFileChooser(".");
+    	filePicker.setDialogTitle(dialogTitle);
+    	filePicker.setFileFilter(new FileFilter() {
             @Override
             public boolean accept(File dir) {
                 if (dir.isDirectory()) {
@@ -2076,42 +2194,56 @@ public class CampaignGUI extends JPanel {
 
             @Override
             public String getDescription() {
-                if(format.equals("xml")) {
-                    return "XML File";
+            	// TODO: future support TD or other formats?
+                if(format.equals("csv")) {
+                    return "CSV File";
+                } else if (format.equals("xml")) {
+                	return "XML File";
+                } else if (format.equals("json")) {
+                	return "JSON File";
                 } else {
-                    return "File"; // eventually we plan to export to CSV/TSV
+                    return "File";
                 }
             }
         });
-        exportPlanets.setSelectedFile(new File("planets." + format)); //$NON-NLS-1$
-        int returnVal = exportPlanets.showSaveDialog(mainPanel);
+    	filePicker.setSelectedFile(new File(filename + "." + format));
+        int returnVal = filePicker.showSaveDialog(mainPanel);
 
         if ((returnVal != JFileChooser.APPROVE_OPTION)
-                || (exportPlanets.getSelectedFile() == null)) {
+                || (filePicker.getSelectedFile() == null)) {
             // I want a file, y'know!
-            return;
+            return null;
         }
-
-        File file = exportPlanets.getSelectedFile();
-        if (file == null) {
-            // I want a file, y'know!
-            return;
-        }
-        String path = file.getPath();
-        if (!path.endsWith(".xml")) {
-            path += ".xml";
-            file = new File(path);
-        }
-
+        return filePicker;
+    }
+    
+	/**
+	 * Checks if a file already exists, if so it makes a backup copy.
+	 * @param file
+	 * @param path
+	 */
+    private void checkToBackupFile(File file, String path) {
         // check for existing file and make a back-up if found
         String path2 = path + "_backup";
         File backupFile = new File(path2);
         if (file.exists()) {
             Utilities.copyfile(file, backupFile);
         }
-        
-        String report = Planets.getInstance().exportPlanets(path);
-        JOptionPane.showMessageDialog(mainPanel, report);
+    }
+    
+	/**
+	 * Checks to make sure the file has the appropriate ending / extension.
+	 * @param file
+	 * @param format
+	 * @return File
+	 */
+    private File checkFileEnding(File file, String format) {
+        String path = file.getPath();
+        if (!path.endsWith("." + format)) {
+            path += "." + format;
+            file = new File(path);
+        }
+        return file;
     }
     
     protected void loadListFile(boolean allowNewPilots) throws IOException {
@@ -2410,51 +2542,18 @@ public class CampaignGUI extends JPanel {
         }
     }
 
-    private void saveOptionsFile() throws IOException {
+    private void saveOptionsFile(String format, String dialogTitle, String filename) throws IOException {
         final String METHOD_NAME = "saveOptionsFile()";
         
-        JFileChooser saveOptions = new JFileChooser(".");
-        saveOptions.setDialogTitle("Save Campaign Options");
-        saveOptions.setFileFilter(new FileFilter() {
-            @Override
-            public boolean accept(File dir) {
-                if (dir.isDirectory()) {
-                    return true;
-                }
-                return dir.getName().endsWith(".xml");
-            }
+        JFileChooser fc = getExportFile(format, dialogTitle, filename);
 
-            @Override
-            public String getDescription() {
-                return "Campaign options file";
-            }
-        });
-        saveOptions.setSelectedFile(new File("campaignOptions.xml")); //$NON-NLS-1$
-        int returnVal = saveOptions.showSaveDialog(mainPanel);
-
-        if ((returnVal != JFileChooser.APPROVE_OPTION)
-                || (saveOptions.getSelectedFile() == null)) {
-            // I want a file, y'know!
-            return;
-        }
-
-        File file = saveOptions.getSelectedFile();
+        File file = fc.getSelectedFile();
         if (file == null) {
-            // I want a file, y'know!
-            return;
-        }
-        String path = file.getPath();
-        if (!path.endsWith(".xml")) {
-            path += ".xml";
-            file = new File(path);
+            return; // something went wrong
         }
 
-        // check for existing file and make a back-up if found
-        String path2 = path + "_backup";
-        File backupFile = new File(path2);
-        if (file.exists()) {
-            Utilities.copyfile(file, backupFile);
-        }
+        file = checkFileEnding(file, format);
+        checkToBackupFile(file, file.getPath());
 
         // Then save it out to that file.
         FileOutputStream fos = null;
@@ -2492,10 +2591,9 @@ public class CampaignGUI extends JPanel {
             pw.flush();
             pw.close();
             fos.close();
-            // delete the backup file because we didn't need it
-            if (backupFile.exists()) {
-                backupFile.delete();
-            }
+
+            JOptionPane.showMessageDialog(mainPanel, getResourceMap().getString("dlgCampaignSettingsSaved.text"));
+            
             MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, //$NON-NLS-1$
                     "Campaign Options saved saved to " + file); //$NON-NLS-1$
         } catch (Exception ex) {
@@ -2509,12 +2607,6 @@ public class CampaignGUI extends JPanel {
                                     + "the future.",
                             "Could not export campaign options",
                             JOptionPane.ERROR_MESSAGE);
-            // restore the backup file
-            file.delete();
-            if (backupFile.exists()) {
-                Utilities.copyfile(backupFile, file);
-                backupFile.delete();
-            }
         }
     }
 
@@ -2884,51 +2976,26 @@ public class CampaignGUI extends JPanel {
         }
     }
 
-    private void exportTable(JTable table, String suggestedName) {
-        JFileChooser fileChooser = new JFileChooser(".");
-        fileChooser.setDialogTitle("Save Table");
-        fileChooser.setFileFilter(new FileFilter() {
-            @Override
-            public boolean accept(File dir) {
-                if (dir.isDirectory()) {
-                    return true;
-                }
-                return dir.getName().endsWith(".csv");
-            }
+    private void exportTable(JTable table, String filename, String format, String dialogTitle) {
+        JFileChooser fc = getExportFile(format, dialogTitle, filename);
+        String report = "";
 
-            @Override
-            public String getDescription() {
-                return "comma-separated text file";
-            }
-        });
-        fileChooser.setSelectedFile(new File(suggestedName)); //$NON-NLS-1$
-        int returnVal = fileChooser.showSaveDialog(mainPanel);
-
-        if ((returnVal != JFileChooser.APPROVE_OPTION)
-                || (fileChooser.getSelectedFile() == null)) {
-            // I want a file, y'know!
-            return;
-        }
-
-        File file = fileChooser.getSelectedFile();
+        File file = fc.getSelectedFile();
         if (file == null) {
-            // I want a file, y'know!
-            return;
-        }
-        String path = file.getPath();
-        if (!path.endsWith(".csv")) {
-            path += ".csv";
-            file = new File(path);
+            return; // something went wrong
         }
 
-        // check for existing file and make a back-up if found
-        String path2 = path + "_backup";
-        File backupFile = new File(path2);
-        if (file.exists()) {
-            Utilities.copyfile(file, backupFile);
-        }
+        file = checkFileEnding(file, format);
+        checkToBackupFile(file, file.getPath());
 
-        Utilities.exportTabletoCSV(table, file);
+        if (format.equals("csv")) {
+        	report = Utilities.exportTabletoCSV(table, file);
+        } else if (format.equals("xml")) {
+        	// TODO
+        } else if (format.equals("json")) {
+        	// TODO
+        }
+        JOptionPane.showMessageDialog(mainPanel, report);
     }
     
     public void refreshAllTabs() {

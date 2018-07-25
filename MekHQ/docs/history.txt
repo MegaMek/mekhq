@@ -6,6 +6,31 @@ v0.45.0-git
 + PR #741: Updated configuration presets for new campaigns to include new special pilot abilities.
 + Issue #445: Lengthy repairs now show the unit's name if the repair runs over more than one day.
 + PR #742: Errata - Range Master SPA no longer applicable to LOS range
++ Issue #384: Cannot negotiate contract terms because the game selects the highest skilled admin
+        and not the one with the negotiating skill
++ PR #766: [Feature] Added balance-over-time and revenue/expenditure charts to finances tab
++ PR #769: [Feature] Added tooltips to tonnage labels on force view when AtB is enabled.
++ PR #760: [Feature] Allow the user to introduce a modifier to the contract score of an AtB contract
++ PR #762: [Feature] Addresses RFE #515, by allowing 'export finances' as a CSV. Various minor fixes to other export mechanisms.
++ PR #762: Help -> About popup now contains link to MegaMek github home page.
++ PR #777: Addresses issue #776, by allowing the user to order up to a 1000 of some part or personnel class at a time, up from 100 previously.
++ PR #787: Adds total value for parts and fixes issue with net worth calculation for parts
++ Show java version and system info in log file.
++ PR #640: [Feature] Experimental aerospace equipment damage and repair times errata (aerospace equipment is damaged based on how many hits it has taken and repairs don't take an order of magnitude longer than mech equipment repairs)
++ PR #758: Start of MekHQ plugin system
+		Currently includes support for external plugin for alternate personnel market methods.
+		See documentation in docs/plugins.txt.
++ PR #800: Correctly calculate admin costs for government forces per Campaign Ops rules.
++ PR #804: Two fixes to GM mode finances -> edit transaction
++ PR #801: [Feature] Personnel awards
++ PR #799: [Feature] Optional "Pay for Repairs" per Campaign Ops, page 140
++ Issue #773: Fix text color for person text in Personnel and Hangar "Graphic" views
++ Issue #549: Allow AtB-style prisoner ransom for prisoners even if the AtB option isn't enabled
++ Issue #819: Dropshop Baydoor unrepairable
++ Issue #796: LAM Pilot shows as Support in Personnel Breakdown
++ PR #821: Fix occasional issue where mechwarrior names with apostrophes and other "funny" characters would show up weird for completed scenarios.
++ PR #823: Fix for adding phantom heat sinks when restoring aerospace unit
++ Issue #824: Post game salvage/prisoners didn't show up.
 
 v0.44.0 (2018-06-24 1900 UTC)
 + Issue #733: Clan techs still have clan penalties to maintenance
