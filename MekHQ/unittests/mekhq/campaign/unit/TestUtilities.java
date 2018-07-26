@@ -158,12 +158,12 @@ public final class TestUtilities {
     }
 
     public static Entity ParseBase64MtfFile(String base64) {
-		try {
+        try {
             InputStream in = new ByteArrayInputStream(Decode(base64));
             MtfFile parser = new MtfFile(in);
             
             return parser.getEntity();
-		} catch (EntityLoadingException e) {
+        } catch (EntityLoadingException e) {
             Assert.fail(e.toString());
         }
 
