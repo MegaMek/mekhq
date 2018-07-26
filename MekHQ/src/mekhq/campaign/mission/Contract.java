@@ -28,6 +28,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
+import mekhq.campaign.universe.Planet;
 import org.apache.commons.text.CharacterPredicate;
 import org.apache.commons.text.RandomStringGenerator;
 import org.joda.time.DateTime;
@@ -579,7 +580,7 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
                 * (baseAmount + overheadAmount + transportAmount + transitAmount + supportAmount));
 
         if (mrbcFee) {
-            feeAmount = (long) ((MRBC_FEE_PERCENTAGE / 100.0) * (baseAmount + overheadAmount + transportAmount + transitAmount + supportAmount));
+            feeAmount = (long) ((getMrbcFeePercentage() / 100.0) * (baseAmount + overheadAmount + transportAmount + transitAmount + supportAmount));
         } else {
             feeAmount = 0;
         }
