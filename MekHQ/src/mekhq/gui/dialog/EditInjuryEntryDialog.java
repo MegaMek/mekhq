@@ -54,9 +54,9 @@ import mekhq.gui.model.FilterableComboBoxModel;
  * @author  Ralgith
  */
 public class EditInjuryEntryDialog extends JDialog {
-	private static final long serialVersionUID = -8038099101234445018L;
+    private static final long serialVersionUID = -8038099101234445018L;
     @SuppressWarnings("unused")
-	private Frame frame; // FIXME: Unusued => Unneeded?
+    private Frame frame; // FIXME: Unusued => Unneeded?
     private Injury injury;
     
     private JButton btnClose;
@@ -86,7 +86,7 @@ public class EditInjuryEntryDialog extends JDialog {
     }
 
     private void initComponents() {
-    	GridBagConstraints gridBagConstraints;
+        GridBagConstraints gridBagConstraints;
 
         locations = new BodyLocationChoice[BodyLocation.values().length];
         int i = 0;
@@ -97,15 +97,15 @@ public class EditInjuryEntryDialog extends JDialog {
         types = InjuryType.getAllTypes().stream()
             .map((type) -> new InjuryTypeChoice(type))
             .collect(Collectors.toList()).toArray(new InjuryTypeChoice[0]);
-    	String[] tf = { "True", "False" };
-    	txtDays = new JTextArea();
+        String[] tf = { "True", "False" };
+        txtDays = new JTextArea();
         ddLocation = new JComboBox<>(locations);
-    	ddType = new JComboBox<>(types);
-    	ddTypeModel = new FilterableComboBoxModel<InjuryTypeChoice>(ddType.getModel());
-    	ddType.setModel(ddTypeModel);
-    	ddTypeModel.setFilter(it -> {
-    	    BodyLocation loc = ((BodyLocationChoice) ddLocation.getSelectedItem()).loc;
-    	    return it.type.isValidInLocation(loc);
+        ddType = new JComboBox<>(types);
+        ddTypeModel = new FilterableComboBoxModel<InjuryTypeChoice>(ddType.getModel());
+        ddType.setModel(ddTypeModel);
+        ddTypeModel.setFilter(it -> {
+            BodyLocation loc = ((BodyLocationChoice) ddLocation.getSelectedItem()).loc;
+            return it.type.isValidInLocation(loc);
         });
 
         for (BodyLocationChoice choice : locations) {
@@ -121,12 +121,12 @@ public class EditInjuryEntryDialog extends JDialog {
                 break;
             }
         }
-    	
-    	txtFluff = new JTextArea();
-    	txtHits = new JTextArea();
-    	ddPermanent = new JComboBox<String>(tf);
-    	ddWorkedOn = new JComboBox<String>(tf);
-    	ddExtended = new JComboBox<String>(tf);
+        
+        txtFluff = new JTextArea();
+        txtHits = new JTextArea();
+        ddPermanent = new JComboBox<String>(tf);
+        ddWorkedOn = new JComboBox<String>(tf);
+        ddExtended = new JComboBox<String>(tf);
         btnOK = new JButton();
         btnClose = new JButton();
         panBtn = new JPanel();
@@ -146,8 +146,8 @@ public class EditInjuryEntryDialog extends JDialog {
         txtDays.setLineWrap(true);
         txtDays.setWrapStyleWord(true);
         txtDays.setBorder(BorderFactory.createCompoundBorder(
-	   			 BorderFactory.createTitledBorder("Days Remaining"),
-	   			 BorderFactory.createEmptyBorder(5,5,5,5)));
+                    BorderFactory.createTitledBorder("Days Remaining"),
+                    BorderFactory.createEmptyBorder(5,5,5,5)));
         txtDays.setPreferredSize(new Dimension(250,75));
         txtDays.setMinimumSize(new Dimension(250,75));
         gridBagConstraints = new GridBagConstraints();
@@ -163,8 +163,8 @@ public class EditInjuryEntryDialog extends JDialog {
         ddLocation.setName("ddLocation");
         ddLocation.setEditable(false);
         ddLocation.setBorder(BorderFactory.createCompoundBorder(
-	   			 BorderFactory.createTitledBorder("Location on Body"),
-	   			 BorderFactory.createEmptyBorder(5,5,5,5)));
+                    BorderFactory.createTitledBorder("Location on Body"),
+                    BorderFactory.createEmptyBorder(5,5,5,5)));
         ddLocation.setPreferredSize(new Dimension(250,75));
         ddLocation.setMinimumSize(new Dimension(250,75));
         ddLocation.addActionListener(new ActionListener() {
@@ -193,8 +193,8 @@ public class EditInjuryEntryDialog extends JDialog {
         ddType.setName("ddType");
         ddType.setEditable(false);
         ddType.setBorder(BorderFactory.createCompoundBorder(
-	   			 BorderFactory.createTitledBorder("Type of Injury"),
-	   			 BorderFactory.createEmptyBorder(5,5,5,5)));
+                    BorderFactory.createTitledBorder("Type of Injury"),
+                    BorderFactory.createEmptyBorder(5,5,5,5)));
         ddType.setPreferredSize(new Dimension(250,75));
         ddType.setMinimumSize(new Dimension(250,75));
         gridBagConstraints = new GridBagConstraints();
@@ -213,8 +213,8 @@ public class EditInjuryEntryDialog extends JDialog {
         txtFluff.setLineWrap(true);
         txtFluff.setWrapStyleWord(true);
         txtFluff.setBorder(BorderFactory.createCompoundBorder(
-	   			 BorderFactory.createTitledBorder("Fluff Message"),
-	   			 BorderFactory.createEmptyBorder(5,5,5,5)));
+                    BorderFactory.createTitledBorder("Fluff Message"),
+                    BorderFactory.createEmptyBorder(5,5,5,5)));
         txtFluff.setPreferredSize(new Dimension(250,75));
         txtFluff.setMinimumSize(new Dimension(250,75));
         gridBagConstraints = new GridBagConstraints();
@@ -233,8 +233,8 @@ public class EditInjuryEntryDialog extends JDialog {
         txtHits.setLineWrap(true);
         txtHits.setWrapStyleWord(true);
         txtHits.setBorder(BorderFactory.createCompoundBorder(
-	   			 BorderFactory.createTitledBorder("Number of Hits"),
-	   			 BorderFactory.createEmptyBorder(5,5,5,5)));
+                    BorderFactory.createTitledBorder("Number of Hits"),
+                    BorderFactory.createEmptyBorder(5,5,5,5)));
         txtHits.setPreferredSize(new Dimension(250,75));
         txtHits.setMinimumSize(new Dimension(250,75));
         gridBagConstraints = new GridBagConstraints();
@@ -251,8 +251,8 @@ public class EditInjuryEntryDialog extends JDialog {
         ddPermanent.setName("ddPermanent");
         ddPermanent.setEditable(false);
         ddPermanent.setBorder(BorderFactory.createCompoundBorder(
-	   			 BorderFactory.createTitledBorder("Is Permanent"),
-	   			 BorderFactory.createEmptyBorder(5,5,5,5)));
+                    BorderFactory.createTitledBorder("Is Permanent"),
+                    BorderFactory.createEmptyBorder(5,5,5,5)));
         ddPermanent.setPreferredSize(new Dimension(250,75));
         ddPermanent.setMinimumSize(new Dimension(250,75));
         gridBagConstraints = new GridBagConstraints();
@@ -269,8 +269,8 @@ public class EditInjuryEntryDialog extends JDialog {
         ddWorkedOn.setName("ddWorkedOn");
         ddWorkedOn.setEditable(false);
         ddWorkedOn.setBorder(BorderFactory.createCompoundBorder(
-	   			 BorderFactory.createTitledBorder("Doctor Has Worked On"),
-	   			 BorderFactory.createEmptyBorder(5,5,5,5)));
+                    BorderFactory.createTitledBorder("Doctor Has Worked On"),
+                    BorderFactory.createEmptyBorder(5,5,5,5)));
         ddWorkedOn.setPreferredSize(new Dimension(250,75));
         ddWorkedOn.setMinimumSize(new Dimension(250,75));
         gridBagConstraints = new GridBagConstraints();
@@ -287,8 +287,8 @@ public class EditInjuryEntryDialog extends JDialog {
         ddExtended.setName("ddExtended");
         ddExtended.setEditable(true);
         ddExtended.setBorder(BorderFactory.createCompoundBorder(
-	   			 BorderFactory.createTitledBorder("Was Extended Time"),
-	   			 BorderFactory.createEmptyBorder(5,5,5,5)));
+                    BorderFactory.createTitledBorder("Was Extended Time"),
+                    BorderFactory.createEmptyBorder(5,5,5,5)));
         ddExtended.setPreferredSize(new Dimension(250,75));
         ddExtended.setMinimumSize(new Dimension(250,75));
         gridBagConstraints = new GridBagConstraints();
@@ -327,37 +327,37 @@ public class EditInjuryEntryDialog extends JDialog {
     }
     
     private void btnOKActionPerformed(ActionEvent evt) {
-    	injury.setTime(Integer.parseInt(txtDays.getText()));
-    	injury.setHits(Integer.parseInt(txtHits.getText()));
-    	injury.setFluff(txtFluff.getText());
+        injury.setTime(Integer.parseInt(txtDays.getText()));
+        injury.setHits(Integer.parseInt(txtHits.getText()));
+        injury.setFluff(txtFluff.getText());
         injury.setLocation(((BodyLocationChoice) ddLocation.getSelectedItem()).loc);
         injury.setType(((InjuryTypeChoice)ddType.getSelectedItem()).type);
-    	if (ddPermanent.getSelectedIndex() == 0) {
-    		injury.setPermanent(true);
-    	} else {
-    		injury.setPermanent(false);
-    	}
-    	if (ddWorkedOn.getSelectedIndex() == 0) {
-    		injury.setWorkedOn(true);
-    	} else {
-    		injury.setWorkedOn(false);
-    	}
-    	if (ddExtended.getSelectedIndex() == 0) {
-    		injury.setExtended(true);
-    	} else {
-    		injury.setExtended(false);
-    	}
-    	injury.setUUID(UUID.randomUUID());
-    	this.setVisible(false);
+        if (ddPermanent.getSelectedIndex() == 0) {
+            injury.setPermanent(true);
+        } else {
+            injury.setPermanent(false);
+        }
+        if (ddWorkedOn.getSelectedIndex() == 0) {
+            injury.setWorkedOn(true);
+        } else {
+            injury.setWorkedOn(false);
+        }
+        if (ddExtended.getSelectedIndex() == 0) {
+            injury.setExtended(true);
+        } else {
+            injury.setExtended(false);
+        }
+        injury.setUUID(UUID.randomUUID());
+        this.setVisible(false);
     }
 
     private void btnCloseActionPerformed(ActionEvent evt) {
-    	injury = null;
-    	this.setVisible(false);
+        injury = null;
+        this.setVisible(false);
     }
     
     public Injury getEntry() {
-    	return injury;
+        return injury;
     }
     
     private static class BodyLocationChoice {
