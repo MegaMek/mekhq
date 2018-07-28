@@ -1,6 +1,7 @@
 /*
  * EditInjuryEntryDialog.java
  * 
+ * Copyright (C) 2018 MegaMek team
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  * 
  * This file is part of MekHQ.
@@ -98,15 +99,29 @@ public class EditInjuryEntryDialog extends JDialog {
             .collect(Collectors.toList()).toArray(new InjuryTypeChoice[0]);
     	String[] tf = { "True", "False" };
     	txtDays = new JTextArea();
-    	ddLocation = new JComboBox<>(locations);
+        ddLocation = new JComboBox<>(locations);
     	ddType = new JComboBox<>(types);
     	ddTypeModel = new FilterableComboBoxModel<InjuryTypeChoice>(ddType.getModel());
     	ddType.setModel(ddTypeModel);
     	ddTypeModel.setFilter(it -> {
     	    BodyLocation loc = ((BodyLocationChoice) ddLocation.getSelectedItem()).loc;
     	    return it.type.isValidInLocation(loc);
-    	});
-    	ddTypeModel.updateFilter();
+        });
+
+        for (BodyLocationChoice choice : locations) {
+            if (injury.getLocation() == choice.loc) {
+                ddLocation.setSelectedItem(choice);
+                break;
+            }
+        }
+
+        for (InjuryTypeChoice choice : types) {
+            if (injury.getType() == choice.type) {
+                ddType.setSelectedItem(choice);
+                break;
+            }
+        }
+    	
     	txtFluff = new JTextArea();
     	txtHits = new JTextArea();
     	ddPermanent = new JComboBox<String>(tf);
@@ -145,12 +160,6 @@ public class EditInjuryEntryDialog extends JDialog {
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         panMain.add(txtDays, gridBagConstraints);
         
-        for(BodyLocationChoice choice : locations) {
-            if(injury.getLocation() == choice.loc) {
-                ddLocation.setSelectedItem(choice);
-                break;
-            }
-        }
         ddLocation.setName("ddLocation");
         ddLocation.setEditable(false);
         ddLocation.setBorder(BorderFactory.createCompoundBorder(
@@ -158,6 +167,19 @@ public class EditInjuryEntryDialog extends JDialog {
 	   			 BorderFactory.createEmptyBorder(5,5,5,5)));
         ddLocation.setPreferredSize(new Dimension(250,75));
         ddLocation.setMinimumSize(new Dimension(250,75));
+        ddLocation.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                ddTypeModel.updateFilter();
+
+                BodyLocation loc = ((BodyLocationChoice) ddLocation.getSelectedItem()).loc;
+                InjuryType type = ((InjuryTypeChoice) ddType.getSelectedItem()).type;
+                if (!type.isValidInLocation(loc)) {
+                    ddType.setSelectedItem(ddTypeModel.getElementAt(0));
+                }
+            }
+        });
+
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
@@ -167,13 +189,7 @@ public class EditInjuryEntryDialog extends JDialog {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         panMain.add(ddLocation, gridBagConstraints);
-        
-        for(InjuryTypeChoice choice : types) {
-            if(injury.getType() == choice.type) {
-                ddType.setSelectedItem(choice);
-                break;
-            }
-        } 
+
         ddType.setName("ddType");
         ddType.setEditable(false);
         ddType.setBorder(BorderFactory.createCompoundBorder(
@@ -309,7 +325,6 @@ public class EditInjuryEntryDialog extends JDialog {
         getContentPane().add(panBtn, BorderLayout.PAGE_END);
         pack();
     }
-
     
     private void btnOKActionPerformed(ActionEvent evt) {
     	injury.setTime(Integer.parseInt(txtDays.getText()));
