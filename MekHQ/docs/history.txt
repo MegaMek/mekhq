@@ -34,6 +34,7 @@ v0.45.0-git
 + Issue #729: Fix for 'adjust contract pay' calculating number of required lances at the wrong time.
 + PR #831: Fix two bugs in Edit Injuries dialog
 		Advanced medical: remove injury and change injury types choices when location changes.
++ PR #823: Feature: Damage pilots from GM mode (non-advanced medical) 
 
 v0.44.0 (2018-06-24 1900 UTC)
 + Issue #733: Clan techs still have clan penalties to maintenance
