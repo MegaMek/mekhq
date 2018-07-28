@@ -31,6 +31,7 @@ v0.45.0-git
 + PR #821: Fix occasional issue where mechwarrior names with apostrophes and other "funny" characters would show up weird for completed scenarios.
 + PR #823: Fix for adding phantom heat sinks when restoring aerospace unit
 + Issue #824: Post game salvage/prisoners didn't show up.
++ Issue #729: Fix for 'adjust contract pay' calculating number of required lances at the wrong time.
 + PR #831: Fix two bugs in Edit Injuries dialog
 		Advanced medical: remove injury and change injury types choices when location changes.
 
