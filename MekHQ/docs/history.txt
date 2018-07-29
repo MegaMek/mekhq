@@ -35,6 +35,7 @@ v0.45.0-git
 + PR #831: Fix two bugs in Edit Injuries dialog
 		Advanced medical: remove injury and change injury types choices when location changes.
 + PR #823: Feature: Damage pilots from GM mode (non-advanced medical) 
++ PR #811: [Feature] Mass mothball/reactivate. Reactivating now does its best to restore the unit's force/crew/tech assignments.
 
 v0.44.0 (2018-06-24 1900 UTC)
 + Issue #733: Clan techs still have clan penalties to maintenance
