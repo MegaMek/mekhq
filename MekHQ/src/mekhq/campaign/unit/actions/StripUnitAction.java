@@ -28,7 +28,7 @@ import mekhq.campaign.work.IPartWork;
 /**
  * Strips a unit of its parts and adds them to the campaign.
  */
-public class StripUnitAction implements UnitAction {
+public class StripUnitAction implements IUnitAction {
 
     /**
      * Strips a unit of its parts and adds them to the campaign.

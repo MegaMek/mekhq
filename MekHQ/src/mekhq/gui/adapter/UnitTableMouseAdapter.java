@@ -45,7 +45,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.actions.StripUnitAction;
-import mekhq.campaign.unit.actions.UnitAction;
+import mekhq.campaign.unit.actions.IUnitAction;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.GuiTabType;
 import mekhq.gui.MekLabTab;
@@ -563,7 +563,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
             }
         }
         else if (command.equalsIgnoreCase("STRIP_UNIT")) {
-            UnitAction stripUnitAction = new StripUnitAction();
+            IUnitAction stripUnitAction = new StripUnitAction();
             for (Unit unit : units) {
                 stripUnitAction.Execute(gui.getCampaign(), unit);
             }

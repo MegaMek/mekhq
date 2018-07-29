@@ -27,7 +27,7 @@ import mekhq.campaign.unit.Unit;
 /**
  * Represents an action to take against a unit in a campaign.
  */
-public interface UnitAction {
+public interface IUnitAction {
     /**
      * Executes an action against a unit in a campaign. The action
      * may have side effects.
