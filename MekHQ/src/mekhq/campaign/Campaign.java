@@ -1655,6 +1655,25 @@ public class Campaign implements Serializable, ITechManager {
     public ArrayList<Person> getTechs() {
         return getTechs(false, null, true, false);
     }
+    
+    /**
+     * Gets a list of all techs of a specific role type
+     * @param roleType The filter role type
+     * @return Collection of all techs that match the given tech role
+     */
+    public List<Person> getTechsByRole(int roleType) {
+        List<Person> techs = getTechs(false, null, false, false);
+        List<Person> retval = new ArrayList<>();
+        
+        for(Person tech : techs) {
+            if((tech.getPrimaryRole() == roleType) ||
+                    (tech.getSecondaryRole() == roleType)) {
+                retval.add(tech);
+            }       
+        }
+        
+        return techs;
+    }
 
     public List<Person> getAdmins() {
         List<Person> admins = new ArrayList<Person>();

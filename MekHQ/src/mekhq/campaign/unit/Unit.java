@@ -223,6 +223,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     // To be used for transport and cargo reports
     public static final int ETYPE_MOTHBALLED = -9876;
 
+    public static final int TECH_WORK_DAY = 480;
+    
     protected Entity entity;
     private int site;
     private boolean salvaged;
@@ -276,6 +278,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
 
     //for delivery
     protected int daysToArrival;
+    
+    private MothballInfo mothballInfo;
 
     public Unit() {
         this(null, null);
@@ -1522,6 +1526,11 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     +lastMaintenanceReport
                     +"]]></lastMaintenanceReport>");
         }
+        
+        if(null != mothballInfo) {
+            mothballInfo.writeToXml(pw1, indentLvl);
+        }
+        
         pw1.println(MekHqXmlUtil.indentStr(indentLvl) + "</unit>");
     }
 
@@ -1618,6 +1627,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     retVal.fluffName = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("lastMaintenanceReport")) {
                     retVal.lastMaintenanceReport = wn2.getTextContent();
+                } else if (wn2.getNodeName().equalsIgnoreCase("mothballInfo")) {
+                    retVal.mothballInfo = MothballInfo.generateInstanceFromXML(wn2, version);
                 }
             }
         } catch (Exception ex) {
@@ -3224,8 +3235,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         if(!isSelfCrewed()) {
             return;
         }
-        int minutesLeft = 480;
-        int overtimeLeft = 240;
+        int minutesLeft = TECH_WORK_DAY;
+        int overtimeLeft = TECH_WORK_DAY / 2;
         int edgeLeft = 0;
         boolean breakpartreroll = true;
         boolean failrefitreroll = true;
@@ -3661,6 +3672,26 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         return crew;
     }
 
+    public ArrayList<UUID> getDriverIDs() {
+        return drivers;
+    }
+    
+    public ArrayList<UUID> getGunnerIDs() {
+        return gunners;
+    }
+    
+    public ArrayList<UUID> getVesselCrewIDs() {
+        return vesselCrew;
+    }
+    
+    public UUID getTechOfficerID() {
+        return techOfficer;
+    }
+
+    public UUID getNavigatorID() {
+        return navigator;
+    }
+    
     public Person getTech() {
         if(null != engineer) {
             return engineer;
@@ -3702,10 +3733,20 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         } else {
             //start maintenance cycle over again
             resetDaysSinceMaintenance();
+            
+            // if we previously mothballed this unit, attempt to restore its pre-mothball state
+            if(mothballInfo != null) {
+                mothballInfo.restorePreMothballInfo(this, campaign);
+                mothballInfo = null;
+            }
         }
     }
 
     public void startMothballing(UUID id) {
+        if(!isMothballed()) {
+            mothballInfo = new MothballInfo(this);
+        }
+        
         //set this person as tech
         if(!isSelfCrewed() && null != tech && !tech.equals(id)) {
             if(null != getTech()) {
@@ -3721,15 +3762,15 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         }
         //set mothballing time
         if(getEntity() instanceof Infantry) {
-            mothballTime = 480;
+            mothballTime = TECH_WORK_DAY;
         }
         else if(getEntity() instanceof Dropship || getEntity() instanceof Jumpship) {
-            mothballTime = 480 * (int)Math.ceil(getEntity().getWeight()/500.0);
+            mothballTime = TECH_WORK_DAY * (int)Math.ceil(getEntity().getWeight()/500.0);
         } else {
             if(isMothballed()) {
-                mothballTime = 480;
+                mothballTime = TECH_WORK_DAY;
             } else {
-                mothballTime = 960;
+                mothballTime = TECH_WORK_DAY * 2;
             }
         }
         campaign.mothball(this);
