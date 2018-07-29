@@ -44,6 +44,8 @@ import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.unit.actions.StripUnitAction;
+import mekhq.campaign.unit.actions.IUnitAction;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.GuiTabType;
 import mekhq.gui.MekLabTab;
@@ -573,6 +575,12 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                 MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
             }
         }
+        else if (command.equalsIgnoreCase("STRIP_UNIT")) {
+            IUnitAction stripUnitAction = new StripUnitAction();
+            for (Unit unit : units) {
+                stripUnitAction.Execute(gui.getCampaign(), unit);
+            }
+        }
     }
 
     @Override
@@ -963,6 +971,11 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
             menu = new JMenu("GM Mode");
             menuItem = new JMenuItem("Remove Unit");
             menuItem.setActionCommand("REMOVE");
+            menuItem.addActionListener(this);
+            menuItem.setEnabled(gui.getCampaign().isGM());
+            menu.add(menuItem);
+            menuItem = new JMenuItem("Strip Unit");
+            menuItem.setActionCommand("STRIP_UNIT");
             menuItem.addActionListener(this);
             menuItem.setEnabled(gui.getCampaign().isGM());
             menu.add(menuItem);
