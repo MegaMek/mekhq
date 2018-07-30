@@ -140,6 +140,7 @@ import mekhq.gui.dialog.DailyReportLogDialog;
 import mekhq.gui.dialog.DataLoadingDialog;
 import mekhq.gui.dialog.GMToolsDialog;
 import mekhq.gui.dialog.HireBulkPersonnelDialog;
+import mekhq.gui.dialog.HistoricalDailyReportDialog;
 import mekhq.gui.dialog.MaintenanceReportDialog;
 import mekhq.gui.dialog.MassMothballDialog;
 import mekhq.gui.dialog.MekHQAboutBox;
@@ -183,6 +184,7 @@ public class CampaignGUI extends JPanel {
     /* For the menu bar */
     private JMenuBar menuBar;
     private JMenu menuThemes;
+    private JMenuItem miHistoricalDailyReportDialog;
     private JMenuItem miDetachLog;
     private JMenuItem miAttachLog;
     private JMenuItem miContractMarket;
@@ -211,6 +213,7 @@ public class CampaignGUI extends JPanel {
 
     ReportHyperlinkListener reportHLL;
 
+    private HistoricalDailyReportDialog histDailyReportDialog;
     private DailyReportLogDialog logDialog;
     private AdvanceDaysDialog advanceDaysDialog;
     private BloodnameDialog bloodnameDialog;
@@ -227,6 +230,12 @@ public class CampaignGUI extends JPanel {
         MekHQAboutBox aboutBox = new MekHQAboutBox(getFrame());
         aboutBox.setLocationRelativeTo(getFrame());
         aboutBox.setVisible(true);
+    }
+
+    private void showHistoricalDailyReportDialog() {
+        histDailyReportDialog = new HistoricalDailyReportDialog(getFrame(), this);
+        histDailyReportDialog.setVisible(true);
+        histDailyReportDialog.dispose();
     }
 
     private void showDailyReportDialog() {
@@ -1034,6 +1043,17 @@ public class CampaignGUI extends JPanel {
         // menuBar.add(menuCommunity);
 
         JMenu menuView = new JMenu("View"); // NOI18N
+
+        miHistoricalDailyReportDialog = new JMenuItem(resourceMap.getString("miShowHistoricalReportLog.text")); // NOI18N
+        miHistoricalDailyReportDialog.setEnabled(true);
+        miHistoricalDailyReportDialog.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent evt) {
+                showHistoricalDailyReportDialog();
+            }
+        });
+        menuView.add(miHistoricalDailyReportDialog);
+
         miDetachLog = new JMenuItem("Detach Daily Report Log"); // NOI18N
         miDetachLog.addActionListener(new ActionListener() {
             @Override

@@ -292,6 +292,9 @@ public class CampaignOptions implements Serializable {
     private boolean massRepairUseAssignedTechsFirst;
     private boolean massRepairReplacePod;
     private List<MassRepairOption> massRepairOptions;
+    
+    //Miscellaneous
+    private boolean historicalDailyLog;
 
     public CampaignOptions() {
         clanPriceModifier = 1.0;
@@ -521,6 +524,8 @@ public class CampaignOptions implements Serializable {
         for (int i = 0; i < MassRepairOption.VALID_REPAIR_TYPES.length; i++) {
         	massRepairOptions.add(new MassRepairOption(MassRepairOption.VALID_REPAIR_TYPES[i]));
         }
+        
+        historicalDailyLog = false;
    }
 
     public UnitRatingMethod getUnitRatingMethod() {
@@ -1172,6 +1177,14 @@ public class CampaignOptions implements Serializable {
 
     public void setAdminXPPeriod(int m) {
         adminXPPeriod = m;
+    }
+    
+    public boolean historicalDailyLog() {
+        return historicalDailyLog;
+    }
+    
+    public void setHistoricalDailyLog(boolean b) {
+        this.historicalDailyLog = b;
     }
     
     public int getEdgeCost() {
@@ -2243,6 +2256,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "allowOpforLocalUnits", allowOpforLocalUnits);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "opforAeroChance", opforAeroChance);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "opforLocalUnitChance", opforLocalUnitChance);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "historicalDailyLog", historicalDailyLog);
 
         //Mass Repair/Salvage Options
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "massRepairUseExtraTime", massRepairUseExtraTime);
@@ -2741,6 +2755,8 @@ public class CampaignOptions implements Serializable {
                 retVal.opforAeroChance = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("opforLocalUnitChance")) {
                 retVal.opforLocalUnitChance = Integer.parseInt(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("historicalDailyLog")) {
+                retVal.historicalDailyLog = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("rats")) {
             	retVal.rats = MekHqXmlUtil.unEscape(wn2.getTextContent().trim()).split(",");
             } else if (wn2.getNodeName().equalsIgnoreCase("staticRATs")) {
