@@ -12,4 +12,6 @@ public class ScenarioForceTemplate {
     
     public static final String[] FORCE_ALIGNMENTS = { "Player", "Allied", "Opposing", "Third" };
     public static final String[] FORCE_GENERATION_METHODS = { "BV Scaled", "Unit Count Scaled", "Fixed Unit Count" };
+    public static final String[] DEPLOYMENT_ZONES = { "North", "Northeast", "East", "Southeast", "South", "Southwest", "West", "Northwest", "Edge", "Center", "Any" };
+    public static final String[] UNIT_TYPES = { "Mek", "Vee", "Aero", "Conv. Fighter", "Gun Emplacement", "Infantry", "Battle Armor", "Naval" };
 }

@@ -5,9 +5,12 @@ import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 
+import javax.swing.DefaultListModel;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JSpinner;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
@@ -108,10 +111,10 @@ public class ScenarioTemplateEditorDialog extends JDialog {
         gbc.gridx = 0;
         gbc.gridy++;
         
-        JComboBox cboAlignment = new JComboBox(ScenarioForceTemplate.FORCE_ALIGNMENTS);
+        JComboBox<String> cboAlignment = new JComboBox<String>(ScenarioForceTemplate.FORCE_ALIGNMENTS);
         getContentPane().add(cboAlignment, gbc);
         
-        JComboBox cboGenerationMethod = new JComboBox(ScenarioForceTemplate.FORCE_GENERATION_METHODS);
+        JComboBox<String> cboGenerationMethod = new JComboBox<String>(ScenarioForceTemplate.FORCE_GENERATION_METHODS);
         gbc.gridx++;
         getContentPane().add(cboGenerationMethod, gbc);
         
@@ -119,5 +122,39 @@ public class ScenarioTemplateEditorDialog extends JDialog {
         spnMultiplier.setPreferredSize(spinnerSize);
         gbc.gridx++;
         getContentPane().add(spnMultiplier, gbc);
+        
+        DefaultListModel<String> zoneModel = new DefaultListModel<String>();
+        for(String s : ScenarioForceTemplate.DEPLOYMENT_ZONES) {
+            zoneModel.addElement(s); 
+        }
+        
+        JList<String> lstDeployZones = new JList<String>();
+        lstDeployZones.setModel(zoneModel);
+        gbc.gridx++;
+        getContentPane().add(lstDeployZones, gbc);
+        
+        JList<String> lstReinforceZones = new JList<String>();
+        lstReinforceZones.setModel(zoneModel);
+        gbc.gridx++;
+        getContentPane().add(lstReinforceZones, gbc);
+        
+        JSpinner spnRetreatThreshold = new JSpinner(new SpinnerNumberModel(50, 0, 100, 5));
+        spnRetreatThreshold.setPreferredSize(spinnerSize);
+        gbc.gridx++;
+        getContentPane().add(spnRetreatThreshold, gbc);
+        
+        DefaultListModel<String> unitTypeModel = new DefaultListModel<String>();
+        for(String s : ScenarioForceTemplate.UNIT_TYPES) {
+            unitTypeModel.addElement(s); 
+        }
+        
+        JList<String> lstUnitTypes = new JList<String>();
+        lstUnitTypes.setModel(unitTypeModel);
+        gbc.gridx++;
+        getContentPane().add(lstUnitTypes, gbc);
+        
+        JButton btnAdd = new JButton("Add");
+        gbc.gridx++;
+        getContentPane().add(btnAdd, gbc);
     }
 }
