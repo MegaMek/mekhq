@@ -43,6 +43,7 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -219,6 +220,7 @@ import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
 import mekhq.gui.GuiTabType;
+import mekhq.gui.dialog.HistoricalDailyReportDialog;
 import mekhq.gui.utilities.PortraitFileFactory;
 import mekhq.module.atb.AtBEventProcessor;
 
@@ -287,6 +289,10 @@ public class Campaign implements Serializable, ITechManager {
     private ArrayList<String> currentReport;
     private transient String currentReportHTML;
     private transient List<String> newReports;
+
+    //this is updated and used per gaming session, it is enabled/disabled via the Campaign options
+    //we're re-using the LogEntry class that is used to store Personnel entries
+    public LinkedList<LogEntry> inMemoryLogHistory = new LinkedList<LogEntry>();
 
     private boolean overtime;
     private boolean gmMode;
@@ -2670,7 +2676,7 @@ public class Campaign implements Serializable, ITechManager {
         currentReport.clear();
         currentReportHTML = "";
         newReports.clear();
-        addReport("<b>" + getDateAsString() + "</b>");
+        beginReport("<b>" + getDateAsString() + "</b>");
 
         if (calendar.get(Calendar.DAY_OF_YEAR) == 1) {
             reloadNews();
@@ -3142,7 +3148,45 @@ public class Campaign implements Serializable, ITechManager {
         retainerEmployerCode = code;
     }
 
+    private void addInMemoryLogHistory(LogEntry le) {
+        if (inMemoryLogHistory.size() != 0) {
+            long diff = le.getDate().getTime() - inMemoryLogHistory.get(0).getDate().getTime();
+            while ((diff / (1000 * 60 * 60 * 24)) > HistoricalDailyReportDialog.MAX_DAYS_HISTORY) {
+                //we've hit the max size for the in-memory based on the UI display limit
+                //prune the oldest entry
+                inMemoryLogHistory.remove(0);
+                diff = le.getDate().getTime() - inMemoryLogHistory.get(0).getDate().getTime();
+            }
+        }
+        inMemoryLogHistory.add(le);
+    }
+
+    /**
+     * Starts a new day for the daily log
+     * @param r - the report String
+     */
+    public void beginReport(String r) {
+        if (this.getCampaignOptions().historicalDailyLog()) {
+            //add the new items to our in-memory cache
+            addInMemoryLogHistory(new LogEntry(getDate(), ""));
+        }
+        addReportInternal(r);
+    }
+
+    /**
+     * Adds a report to the daily log
+     * @param r - the report String
+     */
     public void addReport(String r) {
+        if (this.getCampaignOptions().historicalDailyLog()) {
+            String htmlStripped = r.replaceAll("\\<[^>]*>",""); //remote HTML tags
+            //add the new items to our in-memory cache
+            addInMemoryLogHistory(new LogEntry(getDate(), htmlStripped));
+        }
+        addReportInternal(r);
+    }
+
+    private void addReportInternal(String r) {
         currentReport.add(r);
         if( currentReportHTML.length() > 0 ) {
             currentReportHTML = currentReportHTML + REPORT_LINEBREAK + r;
