@@ -153,6 +153,7 @@ import mekhq.gui.dialog.PopupValueChoiceDialog;
 import mekhq.gui.dialog.RefitNameDialog;
 import mekhq.gui.dialog.ReportDialog;
 import mekhq.gui.dialog.RetirementDefectionDialog;
+import mekhq.gui.dialog.ScenarioTemplateEditorDialog;
 import mekhq.gui.dialog.ShipSearchDialog;
 import mekhq.gui.dialog.UnitCostReportDialog;
 import mekhq.gui.dialog.UnitMarketDialog;
@@ -1146,6 +1147,17 @@ public class CampaignGUI extends JPanel {
             }
         });
         menuManage.add(miBatchXP);
+        
+        JMenuItem miScenarioEditor = new JMenuItem("Scenario Template Editor");
+        miScenarioEditor.setEnabled(true);
+        miScenarioEditor.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent evt) {
+                ScenarioTemplateEditorDialog sted = new ScenarioTemplateEditorDialog(getFrame());
+                sted.setVisible(true);
+            }
+        });
+        menuManage.add(miScenarioEditor);
 
         menuBar.add(menuManage);
 
