@@ -1,5 +1,7 @@
 package mekhq.campaign.mission;
 
+import java.util.List;
+
 public class ScenarioForceTemplate {
     // A scenario force template is a way to describe a particular force that gets generated when creating a DymanicScenario
     // It contains the following characteristics
@@ -13,5 +15,53 @@ public class ScenarioForceTemplate {
     public static final String[] FORCE_ALIGNMENTS = { "Player", "Allied", "Opposing", "Third" };
     public static final String[] FORCE_GENERATION_METHODS = { "BV Scaled", "Unit Count Scaled", "Fixed Unit Count" };
     public static final String[] DEPLOYMENT_ZONES = { "North", "Northeast", "East", "Southeast", "South", "Southwest", "West", "Northwest", "Edge", "Center", "Any" };
+    public static final String[] BOT_DESTINATION_ZONES = { "None", "Short Edge", "North", "East", "South", "West" };
     public static final String[] UNIT_TYPES = { "Mek", "Vee", "Aero", "Conv. Fighter", "Gun Emplacement", "Infantry", "Battle Armor", "Naval" };
+    
+    private int forceAlignment;
+    private int generationMethod;
+    private double forceMultiplier;
+    private List<Integer> deploymentZones;
+    private int destinationZone;
+    private double retreatThreshold;
+    private List<Integer> allowedUnitTypes;
+    
+    public ScenarioForceTemplate(int forceAlignment, int generationMethod, double forceMultiplier, List<Integer> deploymentZones,
+            int destinationZone, double retreatThreshold, List<Integer> allowedUnitTypes) {
+        this.forceAlignment = forceAlignment;
+        this.generationMethod = generationMethod;
+        this.forceMultiplier = forceMultiplier;
+        this.deploymentZones = deploymentZones;
+        this.destinationZone = destinationZone;
+        this.retreatThreshold = retreatThreshold;
+        this.allowedUnitTypes = allowedUnitTypes;
+    }
+    
+    public int getForceAlignment() {
+        return forceAlignment;
+    }
+    
+    public int getGenerationMethod() {
+        return generationMethod;
+    }
+    
+    public double getForceMultiplier() {
+        return forceMultiplier;
+    }
+    
+    public List<Integer> getDeploymentZones() {
+        return deploymentZones;
+    }
+    
+    public int getDestinationZone() {
+        return destinationZone;
+    }
+    
+    public double getRetreatThreshold() {
+        return retreatThreshold;
+    }
+    
+    public List<Integer> allowedUnitTypes() {
+        return allowedUnitTypes;
+    }
 }

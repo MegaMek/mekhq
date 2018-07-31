@@ -1,9 +1,15 @@
 package mekhq.gui.dialog;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -11,17 +17,36 @@ import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
 import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.border.LineBorder;
 
 import mekhq.campaign.mission.ScenarioForceTemplate;
+import mekhq.campaign.mission.ScenarioTemplate;
 
-public class ScenarioTemplateEditorDialog extends JDialog {
+public class ScenarioTemplateEditorDialog extends JDialog implements ActionListener {
     
     private final Dimension spinnerSize = new Dimension(55, 25);
+    
+    private final static String ADD_FORCE_COMMAND = "ADDFORCE"; 
+    
+    // controls which need to be accessible across the lifetime of this dialog
+    JComboBox<String> cboAlignment;
+    JComboBox<String> cboGenerationMethod;
+    JSpinner spnMultiplier;
+    JList<String> lstDeployZones;
+    JComboBox<String> cboDestinationZone;
+    JSpinner spnRetreatThreshold;
+    JList<String> lstUnitTypes;
+    JPanel panForceList;
+    
+    // the scenario template we're working on
+    ScenarioTemplate scenarioTemplate = new ScenarioTemplate(); 
     
     public ScenarioTemplateEditorDialog(Frame parent) {
         super(parent, true);
@@ -39,6 +64,7 @@ public class ScenarioTemplateEditorDialog extends JDialog {
         setupTopFluff(gbc);
         setupForceEditorHeaders(gbc);
         setupForceEditor(gbc);
+        initializeForceList(gbc);
     }
     
     /**
@@ -94,9 +120,9 @@ public class ScenarioTemplateEditorDialog extends JDialog {
         gbc.gridx++;
         getContentPane().add(lblDeploymentZones, gbc);
         
-        JLabel lblReinforcementZones = new JLabel("Possible Reinforcement Zones");
+        JLabel lblDestinationZones = new JLabel("Possible Destination Zone");
         gbc.gridx++;
-        getContentPane().add(lblReinforcementZones, gbc);
+        getContentPane().add(lblDestinationZones, gbc);
         
         JLabel lblRetreatThreshold = new JLabel("Retreat Threshold");
         gbc.gridx++;
@@ -111,14 +137,14 @@ public class ScenarioTemplateEditorDialog extends JDialog {
         gbc.gridx = 0;
         gbc.gridy++;
         
-        JComboBox<String> cboAlignment = new JComboBox<String>(ScenarioForceTemplate.FORCE_ALIGNMENTS);
+        cboAlignment = new JComboBox<String>(ScenarioForceTemplate.FORCE_ALIGNMENTS);
         getContentPane().add(cboAlignment, gbc);
         
-        JComboBox<String> cboGenerationMethod = new JComboBox<String>(ScenarioForceTemplate.FORCE_GENERATION_METHODS);
+        cboGenerationMethod = new JComboBox<String>(ScenarioForceTemplate.FORCE_GENERATION_METHODS);
         gbc.gridx++;
         getContentPane().add(cboGenerationMethod, gbc);
         
-        JSpinner spnMultiplier = new JSpinner(new SpinnerNumberModel(1.0, 0.0, 2.0, .05));
+        spnMultiplier = new JSpinner(new SpinnerNumberModel(1.0, 0.0, 2.0, .05));
         spnMultiplier.setPreferredSize(spinnerSize);
         gbc.gridx++;
         getContentPane().add(spnMultiplier, gbc);
@@ -128,17 +154,16 @@ public class ScenarioTemplateEditorDialog extends JDialog {
             zoneModel.addElement(s); 
         }
         
-        JList<String> lstDeployZones = new JList<String>();
+        lstDeployZones = new JList<String>();
         lstDeployZones.setModel(zoneModel);
         gbc.gridx++;
         getContentPane().add(lstDeployZones, gbc);
         
-        JList<String> lstReinforceZones = new JList<String>();
-        lstReinforceZones.setModel(zoneModel);
+        cboDestinationZone = new JComboBox<String>(ScenarioForceTemplate.BOT_DESTINATION_ZONES);
         gbc.gridx++;
-        getContentPane().add(lstReinforceZones, gbc);
+        getContentPane().add(cboDestinationZone, gbc);
         
-        JSpinner spnRetreatThreshold = new JSpinner(new SpinnerNumberModel(50, 0, 100, 5));
+        spnRetreatThreshold = new JSpinner(new SpinnerNumberModel(50, 0, 100, 5));
         spnRetreatThreshold.setPreferredSize(spinnerSize);
         gbc.gridx++;
         getContentPane().add(spnRetreatThreshold, gbc);
@@ -148,13 +173,110 @@ public class ScenarioTemplateEditorDialog extends JDialog {
             unitTypeModel.addElement(s); 
         }
         
-        JList<String> lstUnitTypes = new JList<String>();
+        lstUnitTypes = new JList<String>();
         lstUnitTypes.setModel(unitTypeModel);
         gbc.gridx++;
         getContentPane().add(lstUnitTypes, gbc);
         
         JButton btnAdd = new JButton("Add");
+        btnAdd.setActionCommand(ADD_FORCE_COMMAND);
+        btnAdd.addActionListener(this);
         gbc.gridx++;
         getContentPane().add(btnAdd, gbc);
+    }
+        
+    private void initializeForceList(GridBagConstraints gbc) {
+        gbc.gridx = 0;
+        gbc.gridy++;
+        gbc.gridwidth = GridBagConstraints.REMAINDER;
+        gbc.gridheight = GridBagConstraints.RELATIVE;
+        panForceList = new JPanel(new GridBagLayout());
+        panForceList.setBorder(new LineBorder(Color.GREEN));
+
+        renderForceList();
+        
+        getContentPane().add(panForceList, gbc);
+    }
+    
+    private void renderForceList() {
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 1;
+        gbc.gridheight = 1;
+        gbc.ipadx = 5;
+        gbc.ipady = 5;
+        
+        panForceList.removeAll();
+        
+        for(ScenarioForceTemplate sft : scenarioTemplate.scenarioForces) {
+            JLabel lblForceAlignment = new JLabel(ScenarioForceTemplate.FORCE_ALIGNMENTS[sft.getForceAlignment()]);
+            panForceList.add(lblForceAlignment, gbc);
+            
+            JLabel lblGenerationMethod = new JLabel(ScenarioForceTemplate.FORCE_GENERATION_METHODS[sft.getGenerationMethod()]);
+            gbc.gridx++;
+            panForceList.add(lblGenerationMethod, gbc);
+            
+            JLabel lblMultiplier = new JLabel(((Double) sft.getForceMultiplier()).toString());
+            gbc.gridx++;
+            panForceList.add(lblMultiplier, gbc);
+            
+            JLabel lblDeploymentZones = new JLabel("PDZ");
+            gbc.gridx++;
+            panForceList.add(lblDeploymentZones, gbc);
+            
+            JLabel lblDestinationZones = new JLabel(ScenarioForceTemplate.BOT_DESTINATION_ZONES[sft.getDestinationZone()]);
+            gbc.gridx++;
+            panForceList.add(lblDestinationZones, gbc);
+            
+            JLabel lblRetreatThreshold = new JLabel(((Double) sft.getRetreatThreshold()).toString());
+            gbc.gridx++;
+            panForceList.add(lblRetreatThreshold, gbc);
+            
+            JLabel lblAllowedUnitTypes = new JLabel("AUT");
+            gbc.gridx++;
+            panForceList.add(lblAllowedUnitTypes, gbc);
+            
+            gbc.gridy++;
+            gbc.gridx = 0;
+        }
+        
+        panForceList.setPreferredSize(panForceList.getSize());
+    }
+    
+    
+    private void addButtonHandler() {
+        int forceAlignment = cboAlignment.getSelectedIndex();
+        int generationMethod = cboGenerationMethod.getSelectedIndex();
+        double forceMultiplier = (double) spnMultiplier.getValue();
+        
+        List<Integer> deploymentZones = new ArrayList<>();
+        for(int x : lstDeployZones.getSelectedIndices()) {
+            deploymentZones.add(x);
+        }
+        
+        int destinationZone = cboDestinationZone.getSelectedIndex();
+        double retreatThreshold = (int) spnRetreatThreshold.getValue() / 100.0;
+        
+        List<Integer> allowedUnitTypes = new ArrayList<>();
+        for(int x : lstUnitTypes.getSelectedIndices()) {
+            allowedUnitTypes.add(x);
+        }
+        
+        ScenarioForceTemplate sft = new ScenarioForceTemplate(forceAlignment, generationMethod, forceMultiplier,
+                deploymentZones, destinationZone, retreatThreshold, allowedUnitTypes);
+        scenarioTemplate.scenarioForces.add(sft);
+        
+        renderForceList();
+        this.pack();
+        this.repaint();
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if(e.getActionCommand() == ADD_FORCE_COMMAND) {
+            addButtonHandler();
+        }
+        
     }
 }
