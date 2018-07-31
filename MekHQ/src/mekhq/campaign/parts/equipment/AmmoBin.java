@@ -334,10 +334,11 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 					mounted.changeAmmoType((AmmoType)type);
 					mounted.setShotsLeft(shots);
 				}
+
+				changeAmountAvailable(-1 * shots, (AmmoType)type);
+				shotsNeeded -= shots;
 			}
 		}
-		changeAmountAvailable(-1 * shots, (AmmoType)type);
-		shotsNeeded -= shots;
 	}
 
 	public void setShotsNeeded(int shots) {
