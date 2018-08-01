@@ -23,6 +23,7 @@ package mekhq.gui.dialog;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -42,6 +43,8 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.border.LineBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -71,6 +74,9 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
     Campaign campaign;
     boolean activating;
     
+    JScrollPane scrollPane = new JScrollPane();
+    JPanel contentPanel = new JPanel();
+    
     /**
      * Constructor
      * @param parent MekHQ frame
@@ -84,8 +90,8 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
         
         sortUnitsByType(units);
         this.campaign = campaign;
-        
-        getContentPane().setLayout(new GridBagLayout());
+
+        contentPanel.setLayout(new GridBagLayout());
         
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridwidth = 3;
@@ -95,10 +101,13 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
         gbc.ipady = 4;
         gbc.insets = new Insets(2, 2, 2, 2);
         
+        gbc.weightx = 3;
         JLabel instructionLabel = new JLabel();
+        instructionLabel.setBorder(new LineBorder(Color.BLUE));
         instructionLabel.setText("<html>Choose the techs to carry out mothball/reactivation operations on the displayed units. <br/>A * indicates that the tech is currently maintaining units.</html>");
-        getContentPane().add(instructionLabel, gbc);
+        contentPanel.add(instructionLabel, gbc);
         
+        gbc.weightx = 1;
         gbc.gridy++;
         addTableHeaders(gbc);
         
@@ -110,7 +119,13 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
         gbc.gridy++;
         addExecuteButton(activate, gbc);
         
-        this.setResizable(false);
+        scrollPane.setViewportView(contentPanel);
+        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setMaximumSize(new Dimension(600, 600));
+        scrollPane.setPreferredSize(new Dimension(600, 600));
+        getContentPane().add(scrollPane);
+        
+        this.setResizable(true);
         this.pack();
         this.validate();
     }
@@ -128,17 +143,17 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
         gbc.gridx = 0;
         JLabel labelUnitNames = new JLabel();
         labelUnitNames.setText("Units to Process");
-        getContentPane().add(labelUnitNames, gbc);
+        contentPanel.add(labelUnitNames, gbc);
         
         gbc.gridx = 1;
         JLabel labelTechs = new JLabel();
         labelTechs.setText("Available Techs");
-        getContentPane().add(labelTechs, gbc);
+        contentPanel.add(labelTechs, gbc);
         
         gbc.gridx = 2;
         JLabel labelPlaceHolder = new JLabel();
         labelPlaceHolder.setText(" ");
-        getContentPane().add(labelPlaceHolder, gbc);
+        contentPanel.add(labelPlaceHolder, gbc);
     }
     
     /**
@@ -161,8 +176,9 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
             unitLabel.setText(unit.getName());
             unitPanel.add(unitLabel);
         }
-        unitPanel.setBorder(new LineBorder(Color.GRAY, 1));        
-        getContentPane().add(unitPanel, gbc);
+        
+        unitPanel.setBorder(new LineBorder(Color.GRAY, 1));   
+        contentPanel.add(unitPanel, gbc);
         
         gbc.gridx = 1;
 
@@ -179,16 +195,23 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
         techList.addListSelectionListener(this);
         techList.setBorder(new LineBorder(Color.GRAY, 1));
         techList.setCellRenderer(new TechListCellRenderer());
-        getContentPane().add(techList, gbc);
+        
+        JScrollPane techListPane = new JScrollPane();
+        techListPane.setViewportView(techList);
+        techListPane.setMaximumSize(new Dimension(200, 100));
+        techListPane.setPreferredSize(new Dimension(200, 50));
+        
+        contentPanel.add(techListPane, gbc);
         techListsByUnitType.put(unitType, techList);
         
         gbc.gridx = 2;
         gbc.weightx = 1;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         JLabel labelTotalTime = new JLabel();
+        labelTotalTime.setBorder(new LineBorder(Color.BLUE));
         labelTotalTime.setText(getCompletionTimeText(0));
         timeLabelsByUnitType.put(unitType, labelTotalTime);
-        getContentPane().add(labelTotalTime, gbc);
+        contentPanel.add(labelTotalTime, gbc);
     }
     
     /**
@@ -205,7 +228,7 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
         buttonExecute.setText(activate ? "Activate" : "Mothball");
         buttonExecute.setActionCommand(activate ? UnitTableMouseAdapter.COMMAND_ACTIVATE : UnitTableMouseAdapter.COMMAND_MOTHBALL);
         buttonExecute.addActionListener(this);
-        getContentPane().add(buttonExecute, gbc);
+        contentPanel.add(buttonExecute, gbc);
     }
     
     /**
@@ -280,6 +303,7 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
         int numTechs = Math.min(techList.getSelectedValuesList().size(), unitsByType.get(unitType).size());
         
         timeLabelsByUnitType.get(unitType).setText(getCompletionTimeText(workTime / numTechs));
+        pack();
     }
     
     /**

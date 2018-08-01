@@ -136,7 +136,11 @@ public class AwardsFactory {
         File dir = new File(AWARDS_XML_ROOT_PATH);
         File[] files =  dir.listFiles((dir1, filename) -> filename.endsWith(".xml"));
 
-        for(File file : files){
+        if(files == null) {
+            return;
+        }
+        
+        for(File file : files) {
 
             AwardSet awardSet = null;
 

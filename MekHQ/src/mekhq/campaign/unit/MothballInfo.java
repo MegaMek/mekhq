@@ -78,7 +78,10 @@ public class MothballInfo implements MekHqXmlSerializable {
         for(UUID gunnerID : gunnerIDs) {
             Person gunner = campaign.getPerson(gunnerID);
             
-            if(gunner != null && gunner.isActive() && gunner.getUnitId() == null) {
+            // add the gunner if they exist, aren't dead/retired/etc and aren't already assigned to some
+            // other unit. Caveat: single-person units have the same driver and gunner.
+            if(gunner != null && gunner.isActive() && 
+                    ((gunner.getUnitId() == null) || (gunner.getUnitId() == unit.getId()))) {
                 unit.addGunner(gunner);
             }
         }
