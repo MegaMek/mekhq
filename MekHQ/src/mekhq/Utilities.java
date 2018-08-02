@@ -1128,12 +1128,12 @@ public class Utilities {
 	                boolean found = false;
 	                for (int equipNum : equipNums) {
 	                    i++;
-	                    m = unit.getEntity().getEquipment(equipNum);
+						m = unit.getEntity().getEquipment(equipNum);
 	                    if (!allMunitions && (part instanceof AmmoBin)
 	                            && (!(m.getType() instanceof AmmoType)
 	                                    || (((AmmoType) epart.getType()).getMunitionType()
 	                                            != ((AmmoType) m.getType()).getMunitionType()))) {
-	                        continue;
+								continue;
 	                    }
 	                    if (m.getType().equals(epart.getType())
 	                            && !m.isDestroyed()) {
@@ -1175,9 +1175,31 @@ public class Utilities {
 	            }
 	        }
 	        allMunitions = true;
-            remaining = notFound;
+            remaining = new ArrayList<>(notFound);
             notFound.clear();
-	    }
+		}
+		
+		if (remaining.size() > 0) {
+			StringBuilder builder = new StringBuilder();
+			builder.append(String.format("Could not unscramble equipment for %s (%s)\r\n\r\n", unit.getName(), unit.getId()));
+			for (Part part : remaining) {
+				builder.append(" - " + part.getPartName() + " equipmentNum: ");
+				if (part instanceof EquipmentPart) {
+					builder.append(((EquipmentPart)part).getEquipmentNum() + "\r\n");
+				}
+				else if (part instanceof MissingEquipmentPart) {
+					builder.append(((MissingEquipmentPart)part).getEquipmentNum() + "\r\n");
+				}
+			}
+
+			builder.append("\r\nAvailable (remaining) equipment:\r\n");
+			for (int equipNum : equipNums) {
+				m = unit.getEntity().getEquipment(equipNum);
+				EquipmentType mType = m.getType();
+				builder.append(String.format(" %d: %s %s\r\n", equipNum, m.getName(), mType.getName()));
+			}
+			MekHQ.getLogger().log(Utilities.class, "unscrambleEquipmentNumbers", LogLevel.WARNING, builder.toString());
+		}
 	}
 	
 	public static void assignTroopersAndEquipmentNums(Unit unit) {

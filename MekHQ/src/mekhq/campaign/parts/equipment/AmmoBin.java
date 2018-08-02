@@ -34,11 +34,14 @@ import megamek.common.CriticalSlot;
 import megamek.common.EquipmentType;
 import megamek.common.ITechnology;
 import megamek.common.Jumpship;
+import megamek.common.MiscType;
 import megamek.common.Mounted;
 import megamek.common.Protomech;
 import megamek.common.SmallCraft;
 import megamek.common.TargetRoll;
 import megamek.common.TechAdvancement;
+import megamek.common.logging.LogLevel;
+import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
@@ -322,21 +325,27 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 
 	public void loadBin() {
 		int shots = Math.min(getAmountAvailable(), getShotsNeeded());
-		if(null != unit) {
+		if (null != unit) {
 			Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
-			if(null != mounted && mounted.getType() instanceof AmmoType) {
-				if (!ammoTypeChanged()) {
-					//just a simple reload
-					mounted.setShotsLeft(mounted.getBaseShotsLeft() + shots);
-				} else {
-					//loading a new type of ammo
-					unload();
-					mounted.changeAmmoType((AmmoType)type);
-					mounted.setShotsLeft(shots);
-				}
+			if (null != mounted) {
+				EquipmentType mType = mounted.getType();
+				if (mType instanceof AmmoType) {
+					if (!ammoTypeChanged()) {
+						//just a simple reload
+						mounted.setShotsLeft(mounted.getBaseShotsLeft() + shots);
+					} else {
+						//loading a new type of ammo
+						unload();
+						mounted.changeAmmoType((AmmoType)type);
+						mounted.setShotsLeft(shots);
+					}
 
-				changeAmountAvailable(-1 * shots, (AmmoType)type);
-				shotsNeeded -= shots;
+					changeAmountAvailable(-1 * shots, (AmmoType)type);
+					shotsNeeded -= shots;
+				}
+				else {
+					MekHQ.getLogger().log(AmmoBin.class, "loadBin", LogLevel.WARNING, mType.getName() + " is not valid equipment for " + getName() + " to restock ammo on unit " + unit.getName());
+				}
 			}
 		}
 	}
