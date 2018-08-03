@@ -38,6 +38,7 @@ v0.45.0-git
 + PR #811: [Feature]: Mass mothball/reactivate. Reactivating now does its best to restore the unit's force/crew/tech assignments.
 + Issue #830: [Feature]: GM Mode "Strip Unit". Takes all parts off the given unit(s) and place them in the warehouse.
 + Issue #775: [Feature]: Daily Log History. Retains 'daily log' entries for up to 120 days when turned on. Entry history is cleared when the user exits the program.
++ Issue #834: Partial fix - mechs with "messed up" ammo bins will no longer eat the player's ammo. As a workaround, when you encounter such a case gm-remove the unit and add a fresh one.
 
 v0.44.0 (2018-06-24 1900 UTC)
 + Issue #733: Clan techs still have clan penalties to maintenance
