@@ -1,6 +1,6 @@
 VERSION HISTORY:
 ----------------
-v0.45.0-git
+v0.45.0 (2018-08-02 0200 UTC)
 + PR #602: Add KIA checkbox and functionality to prisoners during scenario resolution.
 + Issue #308: Can now change contract payment multiplier when manually creating a new contract.
 + PR #741: Updated configuration presets for new campaigns to include new special pilot abilities.
