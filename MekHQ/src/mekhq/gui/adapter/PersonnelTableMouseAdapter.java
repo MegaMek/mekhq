@@ -1872,7 +1872,11 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 if (gui.getCampaign().getCampaignOptions().useAbilities()) {
                     JMenu abMenu = new JMenu(resourceMap.getString("spendOnSpecialAbilities.text")); //$NON-NLS-1$
                     int cost = -1;
-                    for (SpecialAbility spa : SpecialAbility.getAllSpecialAbilities().values()) {
+
+                    List<SpecialAbility> specialAbilities = new ArrayList(SpecialAbility.getAllSpecialAbilities().values());
+                    Collections.sort(specialAbilities, Comparator.comparing((SpecialAbility sa) -> sa.getName()));
+
+                    for (SpecialAbility spa : specialAbilities) {
                         if (null == spa) {
                             continue;
                         }
