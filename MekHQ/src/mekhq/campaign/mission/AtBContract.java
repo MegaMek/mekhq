@@ -467,34 +467,83 @@ public class AtBContract extends Contract implements Serializable {
 				defeats++;
 			}
 		}
+
+		//
+		// From: Official AtB Rules 2.31
+		//
+
+		// Enemy skill rating: Green -1, Veteran +1, Elite +2
 		int mod = Math.max(enemySkill - 2, -1);
-		mod += dragoonRating - IUnitRating.DRAGOON_C;
+
+		// Player Dragoon/MRBC rating: F +2, D +1, B -1, A -2
+		mod -= dragoonRating - IUnitRating.DRAGOON_C;
+
+		// For every 5 player victories in last month: -1
 		mod -= victories / 5;
+
+		// For every 2 player defeats in last month: +1
 		mod += defeats / 2;
+
+		// "Several weekly events affect the morale roll, so, beyond the
+		// modifiers presented here, notice that some events add
+		// bonuses/minuses to this roll."
 		mod += moraleMod;
-		if (enemyCode.equals("PIR"))
+
+		// Enemy type: Pirates: -2
+		// Rebels/Mercs/Minor factions: -1
+		// Clans: +2
+		if (enemyCode.equals("PIR")) {
 			mod -= 2;
+		}
 		else if (enemyCode.equals("REB") ||
 				isMinorPower(enemyCode) ||
-				enemyCode.equals("MERC"))
+				enemyCode.equals("MERC")) {
 			mod -= 1;
-		else if (Faction.getFaction(enemyCode).isClan())
+		}
+		else if (Faction.getFaction(enemyCode).isClan()) {
 			mod += 2;
+		}
+
+ 		// If no player victories in last month: +1
 		if (victories == 0) {
 			mod++;
 		}
+
+		// If no player defeats in last month: -1
 		if (defeats == 0) {
 			mod--;
 		}
 		
+		// After finding the applicable modifiers, roll according to the
+		// following table to find the new morale level:
 		int roll = Compute.d6(2) + mod;
-		if (roll < 2) moraleLevel -= 2;
-		else if (roll < 6) moraleLevel -= 1;
-		else if (roll > 12) moraleLevel += 2;
-		else if (roll > 8) moraleLevel += 1;
+
+		// 1 or less: Morale level decreases 2 levels
+		if (roll <= 1) {
+			moraleLevel -= 2;
+		}
+		// 2 – 5: Morale level decreases 1 level
+		else if (roll >= 2 && roll <= 5) {
+			moraleLevel -= 1;
+		}
+		// 6 – 8: Morale level remains the same
+		// 9 - 12: Morale level increases 1 level
+		else if (roll >= 9 && roll <= 12) {
+			moraleLevel += 1;
+		}
+		// 13 or more: Morale increases 2 levels
+		else if (roll >= 13) {
+			moraleLevel += 2;
+		}
+		
+		// Clamp morale to 0 - 5
 		if (moraleLevel < 0) moraleLevel = 0;
 		if (moraleLevel > 5) moraleLevel = 5;
 		
+		// Enemy defeated, retreats or do not offer opposition to the player 
+		// forces, equal to a early victory for contracts that are not
+		// Garrision-type, and a 1d6-3 (minimum 1) months without enemy 
+		// activity for Garrision-type contracts.
 		if (moraleLevel == 0 && missionType <= MT_RIOTDUTY) {
 			GregorianCalendar nextBattleRoll = (GregorianCalendar)calendar.clone();
 			nextBattleRoll.add(Calendar.MONTH, Math.max(1, Compute.d6() - 3));
