@@ -3260,19 +3260,28 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public String getDocDesc() {
-        String toReturn = "<html><font size='2'><b>" + getFullName() + "</b> (" + getXp() + " XP)<br/>";
+        StringBuilder toReturn = new StringBuilder(128);
+        toReturn.append("<html><font size='2'><b>");
+        toReturn.append(getFullName());
+        toReturn.append(String.format("</b> (%d XP)<br/>", getXp()));
+
         Skill skill = getSkill(SkillType.S_DOCTOR);
         if (null != skill) {
-            toReturn += SkillType.getExperienceLevelName(skill.getExperienceLevel()) + " " + SkillType.S_DOCTOR;
+            toReturn.append(SkillType.getExperienceLevelName(skill.getExperienceLevel()));
+            toReturn.append(" " + SkillType.S_DOCTOR);
         }
+
         if (campaign.getMedicsPerDoctor() < 4) {
-            toReturn += "</font><font size='2' color='red'>" + ", " + campaign.getMedicsPerDoctor() + " medics</font><font size='2'><br>";
+            toReturn.append("</font><font size='2' color='red'>, ");
+            toReturn.append(campaign.getMedicsPerDoctor());
+            toReturn.append(" medics</font><font size='2'><br/>");
         } else {
-            toReturn += ", " + campaign.getMedicsPerDoctor() + " medics<br>";
+            toReturn.append(String.format(", %d medics<br />", campaign.getMedicsPerDoctor()));
         }
-        toReturn += campaign.getPatientsFor(this) + " patient(s)";
-        toReturn += "</font></html>";
-        return toReturn;
+        
+        toReturn.append(String.format("%d patient(s)</font></html>", campaign.getPatientsFor(this)));
+
+        return toReturn.toString();
     }
 
     public int getBestTechLevel() {
