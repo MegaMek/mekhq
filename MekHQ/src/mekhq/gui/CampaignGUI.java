@@ -154,6 +154,7 @@ import mekhq.gui.dialog.RefitNameDialog;
 import mekhq.gui.dialog.ReportDialog;
 import mekhq.gui.dialog.RetirementDefectionDialog;
 import mekhq.gui.dialog.ShipSearchDialog;
+import mekhq.gui.dialog.TipsDialog;
 import mekhq.gui.dialog.UnitCostReportDialog;
 import mekhq.gui.dialog.UnitMarketDialog;
 import mekhq.gui.dialog.UnitSelectorDialog;
@@ -230,6 +231,12 @@ public class CampaignGUI extends JPanel {
         MekHQAboutBox aboutBox = new MekHQAboutBox(getFrame());
         aboutBox.setLocationRelativeTo(getFrame());
         aboutBox.setVisible(true);
+    }
+
+    public void showTipsDialog() {
+        TipsDialog tipsDialog = new TipsDialog(getFrame());
+        tipsDialog.setLocationRelativeTo(getFrame());
+        tipsDialog.setVisible(true);
     }
 
     private void showHistoricalDailyReportDialog() {
@@ -1160,6 +1167,17 @@ public class CampaignGUI extends JPanel {
             }
         });
         menuHelp.add(menuAboutItem);
+
+        JMenuItem menuTipsItem = new JMenuItem("tipsMenuItem"); // NOI18N
+        menuTipsItem.setText(resourceMap.getString("tipsMenu.text"));
+        menuTipsItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                showTipsDialog();
+            }
+        });
+        menuHelp.add(menuTipsItem);
+
         menuBar.add(menuHelp);
     }
 

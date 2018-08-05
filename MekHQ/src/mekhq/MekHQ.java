@@ -85,6 +85,7 @@ import mekhq.gui.StartUpGUI;
 import mekhq.gui.dialog.LaunchGameDialog;
 import mekhq.gui.dialog.ResolveScenarioWizardDialog;
 import mekhq.gui.dialog.RetirementDefectionDialog;
+import mekhq.gui.dialog.TipsDialog;
 
 /**
  * The main class of the application.
@@ -252,21 +253,26 @@ public class MekHQ implements GameListener {
     public static void main(String[] args) {
     	System.setProperty("apple.laf.useScreenMenuBar", "true");
         System.setProperty("com.apple.mrj.application.apple.menu.about.name","MekHQ");
+        System.setProperty("showLoadingTips", "true");
         //redirect output to log file
         redirectOutput();
         MekHQ.getInstance().startup();
     }
 
     protected static Properties setDefaultPreferences() {
-    	Properties defaults = new Properties();
-    	defaults.setProperty("laf", UIManager.getSystemLookAndFeelClassName());
-    	return defaults;
+        Properties defaults = new Properties();
+        defaults.setProperty("laf", UIManager.getSystemLookAndFeelClassName());
+        defaults.setProperty("showLoadingTips", "true");
+        return defaults;
     }
 
     protected void readPreferences() {
-    	preferences = new Properties(setDefaultPreferences());
+        preferences = new Properties(setDefaultPreferences());
         try {
             preferences.load(new FileInputStream(PROPERTIES_FILE));
+            if (preferences.getProperty("showLoadingTips").equalsIgnoreCase("true") || preferences.getProperty("showLoadingTips").equalsIgnoreCase("false")) {
+                TipsDialog.showTips = Boolean.valueOf(preferences.getProperty("showLoadingTips"));
+            }
             MekHQ.logMessage("loading mekhq properties from " + PROPERTIES_FILE);
         } catch (FileNotFoundException e) {
             MekHQ.logMessage("No mekhq properties file found. Reverting to defaults.");
@@ -276,15 +282,15 @@ public class MekHQ implements GameListener {
     }
 
     protected void savePreferences() {
-    	preferences.setProperty("laf", UIManager.getLookAndFeel().getClass().getName());
-    	try {
-			preferences.store(new FileOutputStream(PROPERTIES_FILE), "MekHQ Preferences");
-		} catch (FileNotFoundException e) {
-			MekHQ.logMessage("could not save preferences to " + PROPERTIES_FILE);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+        preferences.setProperty("laf", UIManager.getLookAndFeel().getClass().getName());
+        preferences.setProperty("showLoadingTips", Boolean.toString(TipsDialog.showTips).toLowerCase());
+        try {
+            preferences.store(new FileOutputStream(PROPERTIES_FILE), "MekHQ Preferences");
+        } catch (FileNotFoundException e) {
+            MekHQ.logMessage("could not save preferences to " + PROPERTIES_FILE);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
     
     private void showInfo() {

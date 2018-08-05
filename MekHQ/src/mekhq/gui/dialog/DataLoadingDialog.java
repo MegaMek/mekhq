@@ -20,6 +20,8 @@
 package mekhq.gui.dialog;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Font;
 import java.awt.Image;
 import java.awt.MediaTracker;
 import java.beans.PropertyChangeEvent;
@@ -37,7 +39,9 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
+import javax.swing.SwingConstants;
 import javax.swing.SwingWorker;
+import javax.swing.border.EmptyBorder;
 
 import megamek.client.RandomNameGenerator;
 import megamek.common.MechSummaryCache;
@@ -76,7 +80,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
         this.frame = frame;
         this.app = app;
         this.fileCampaign = f;
-        
+
         resourceMap = ResourceBundle.getBundle("mekhq.resources.DataLoadingDialog", new EncodeControl()); //$NON-NLS-1$
 
         setUndecorated(true);
@@ -102,6 +106,20 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
         // make splash image panel
         ImageIcon icon = new ImageIcon(imgSplash);
         JLabel splash = new JLabel(icon);
+        splash.setLayout(new BorderLayout());
+        
+        if (TipsDialog.showTips) {
+            JLabel tipLabel = new JLabel(TipsDialog.getRandomTip(), SwingConstants.RIGHT);
+            tipLabel.setFont(new Font("Arial", Font.BOLD, 24));
+            tipLabel.setForeground(Color.WHITE);
+            tipLabel.setVerticalAlignment(JLabel.BOTTOM);
+            tipLabel.setOpaque(true);
+            tipLabel.setBackground(new Color(0, 0, 0, 120)); // last value is the transparency, 0-255
+            tipLabel.setBorder(new EmptyBorder(12,12,12,12)); // add spacing
+
+            splash.add(tipLabel, BorderLayout.SOUTH);
+        }
+        
         getContentPane().setLayout(new BorderLayout());
         getContentPane().add(splash, BorderLayout.CENTER);
         getContentPane().add(progressBar, BorderLayout.PAGE_END);
