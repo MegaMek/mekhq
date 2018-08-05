@@ -3260,7 +3260,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public String getDocDesc() {
-        String toReturn = "<html><font size='2'><b>" + getFullName() + "</b><br/>";
+        String toReturn = "<html><font size='2'><b>" + getFullName() + "</b> (" + getXp() + " XP)<br/>";
         Skill skill = getSkill(SkillType.S_DOCTOR);
         if (null != skill) {
             toReturn += SkillType.getExperienceLevelName(skill.getExperienceLevel()) + " " + SkillType.S_DOCTOR;
