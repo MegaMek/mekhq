@@ -1822,7 +1822,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                         setAwardMenu.add(menuItem);
 
                         if (setAwardMenu.getItemCount() > 30) {
-                            MenuScroller.setScrollerFor(setAwardMenu, 30);
+                            MenuScroller.setScrollerFor(setAwardMenu, 20);
                         }
                     }
                     awardMenu.add(setAwardMenu);
