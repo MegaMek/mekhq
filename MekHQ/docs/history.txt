@@ -1,5 +1,8 @@
 VERSION HISTORY:
 ----------------
+v0.46.0
++ Issue #814: Fixed AtB morale calculation to match AtB rules
+
 v0.45.0 (2018-08-02 0200 UTC)
 + PR #602: Add KIA checkbox and functionality to prisoners during scenario resolution.
 + Issue #308: Can now change contract payment multiplier when manually creating a new contract.
