@@ -1,6 +1,6 @@
 VERSION HISTORY:
 ----------------
-v0.46.0
+v0.45.1-git
 + Issue #814: Fixed AtB morale calculation to match AtB rules
 
 v0.45.0 (2018-08-02 0200 UTC)
