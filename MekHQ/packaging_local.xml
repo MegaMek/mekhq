@@ -164,6 +164,7 @@
                 <include name="fonts/" />
                 <include name="mapgen/" />
                 <include name="names/bloodnames/" />
+                <include name="images/awards/" />
                 <include name="images/force/" />
                 <include name="images/portraits/" />
                 <include name="images/fluff/mech/*.png" />
@@ -234,9 +235,9 @@
 				<attribute name="Main-Class" value="${jarmainclass}"/>
 				<attribute name="Class-Path" value="${dataclasspath} ${classpath.manifest} ${megamek} ${megameklab}"/>
 			</manifest>
-				<fileset dir="${localdir}/${srcdir}" includes="**/*.properties"/>
-				<metainf dir="${localdir}/$srcdir}" includes="META-INF/services/*"/>
-			</jar>
+			<fileset dir="${localdir}/${srcdir}" includes="**/*.properties"/>
+			<metainf dir="${srcdir}/META-INF" includes="services/**"/>
+		</jar>
 
 			<!-- Ensure that the log directory exists. -->
 			<mkdir dir="${localdir}/${logdir}" />
@@ -464,6 +465,7 @@
 
 	<property name="dir.build.teststaging" location="${builddir}/teststaging"/>
 	<property name="dir.build.testreport" location="${builddir}/testreport"/>
+	<property name="dir.build.resources" location="${builddir}/resources"/>
 	<property name="class.main" value="mekhq.MekHQ"/>
 	<property name="megamek" value="MegaMek.jar"/>
 	<property name="megameklab" value="MegaMekLab.jar"/>
@@ -491,6 +493,7 @@
 	<path id="classpath.run-unittest">
 		<path refid="classpath.compile-unittest"/>
 		<pathelement location="${dir.build.test}"/>
+		<pathelement location="${dir.build.resources}"/>
 	</path>
 
 	<target name="tests-compile" unless="${skip.tests}">
@@ -505,8 +508,14 @@
 	<target depends="tests-compile" name="tests-run" unless="${skip.tests}">
 		<delete dir="${dir.build.teststaging}"/>
 		<delete dir="${dir.build.testreport}"/>
+		<delete dir="${dir.build.resources}"/>
 		<mkdir dir="${dir.build.teststaging}"/>
 		<mkdir dir="${dir.build.testreport}"/>
+        <copy todir="${dir.build.resources}" encoding="UTF-8">
+            <fileset dir="${srcdir}" >
+                <include name="**/*.properties" />
+            </fileset>
+        </copy>
 
 		<junit fork="true" maxmemory="256m" showoutput="true" printsummary="yes" forkmode="once" haltonfailure="true"
 			   haltonerror="true" failureproperty="tests.failed">

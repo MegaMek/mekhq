@@ -183,6 +183,7 @@
                 <include name="fonts/" />
                 <include name="mapgen/" />
      			<include name="names/bloodnames/" />
+                <include name="images/awards/" />
                 <include name="images/force/" />
                 <include name="images/portraits/" />
                 <include name="images/fluff/mech/*.png" />
@@ -240,7 +241,7 @@
                 <attribute name="Class-Path" value="${dataclasspath} ${classpath.manifest} ${megamek} ${megameklab}"/>
             </manifest>
                 <fileset dir="${pkgdir}/${srcdir}" includes="**/*.properties"/>
-				<metainf dir="${pkgdir}/${srcdir}" includes="META-INF/services/*"/>
+				<metainf dir="${pkgdir}/${srcdir}/META-INF" includes="services/**"/>
             </jar>
 
             <!-- Ensure that the log directory exists. -->
@@ -512,6 +513,7 @@
     <property name="megameklab" value="MegaMekLab.jar"/>
     <property name="dir.build.test" location="${builddir}/test"/>
     <property name="dir.test.src" location="unittests"/>
+    <property name="dir.build.resources" location="${builddir}/resources"/>
     <property name="libdir.test" value="lib-test"/>
 
     <path id="classpath">
@@ -534,11 +536,14 @@
     <path id="classpath.run-unittest">
         <path refid="classpath.compile-unittest"/>
         <pathelement location="${dir.build.test}"/>
+        <pathelement location="${pkgbuilddir}"/>
+        <pathelement location="${dir.build.resources}"/>
     </path>
 
     <target name="tests-compile" unless="${skip.tests}">
         <delete dir="${dir.build.test}"/>
         <mkdir dir="${dir.build.test}"/>
+        
         <javac srcdir="${dir.test.src}" destdir="${dir.build.test}" encoding="UTF-8" includeantruntime="false"
                debug="true">
             <classpath refid="classpath.compile-unittest"/>
@@ -548,8 +553,14 @@
     <target depends="tests-compile" name="tests-run" unless="${skip.tests}">
         <delete dir="${dir.build.teststaging}"/>
         <delete dir="${dir.build.testreport}"/>
+        <delete dir="${dir.build.resources}"/>
         <mkdir dir="${dir.build.teststaging}"/>
         <mkdir dir="${dir.build.testreport}"/>
+        <copy todir="${dir.build.resources}" encoding="UTF-8">
+            <fileset dir="${pkgdir}/${srcdir}" >
+                <include name="**/*.properties" />
+            </fileset>
+        </copy>
 
         <junit fork="true" maxmemory="256m" showoutput="true" printsummary="yes" forkmode="once" haltonfailure="true"
                haltonerror="true" failureproperty="tests.failed">
