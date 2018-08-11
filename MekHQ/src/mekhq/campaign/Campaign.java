@@ -4260,8 +4260,8 @@ public class Campaign implements Serializable, ITechManager {
         timestamp = System.currentTimeMillis();
 
         // ok, once we are sure that campaign has been set for all units, we can
-        // now go
-        // through and initializeParts and run diagnostics
+        // now go through and initializeParts and run diagnostics
+        List<Unit> removeUnits = new ArrayList<>();
         for (Unit unit : retVal.getUnits()) {
             // just in case parts are missing (i.e. because they weren't tracked
             // in previous versions)            
@@ -4271,11 +4271,14 @@ public class Campaign implements Serializable, ITechManager {
                 if (!unit.hasSalvageableParts()) {
                     // we shouldnt get here but some units seem to stick around
                     // for some reason
-                    retVal.removeUnit(unit.getId());
+                    removeUnits.add(unit);
                 } else {
                     unit.setSalvage(true);
                 }
             }
+        }
+        for (Unit unit : removeUnits) {
+            retVal.removeUnit(unit.getId());
         }
 
         MekHQ.getLogger().log(Campaign.class, METHOD_NAME, LogLevel.INFO,
