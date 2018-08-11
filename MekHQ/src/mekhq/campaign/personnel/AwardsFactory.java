@@ -25,14 +25,12 @@ import mekhq.campaign.AwardSet;
 import mekhq.campaign.LogEntry;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.stream.StreamSource;
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -127,7 +125,7 @@ public class AwardsFactory {
             }
         } catch (Exception ex) {
             // Doh!
-            MekHQ.getLogger().log(LogEntry.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(LogEntry.class, METHOD_NAME, ex);
         }
 
         return generateNew(set, name, date);
@@ -150,11 +148,10 @@ public class AwardsFactory {
 
             try {
                 InputStream inputStream = new FileInputStream(file);
-                InputSource inputSource = new InputSource(inputStream);
                 JAXBContext jaxbContext = JAXBContext.newInstance(AwardSet.class, Award.class);
                 Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
 
-                awardSet = unmarshaller.unmarshal(MekHqXmlUtil.createSafeXmlSource(inputSource), AwardSet.class).getValue();
+                awardSet = unmarshaller.unmarshal(MekHqXmlUtil.createSafeXmlSource(inputStream), AwardSet.class).getValue();
 
                 Map<String, Award> tempAwardMap = new HashMap<>();
                 String currentSetName = file.getName().replaceFirst("[.][^.]+$", "");
@@ -163,8 +160,6 @@ public class AwardsFactory {
                     tempAwardMap.put(award.getName(), award);
                 }
                 awardsMap.put(currentSetName, tempAwardMap);
-
-                inputStream.close();
             } catch (SAXException | ParserConfigurationException e) {
                 MekHQ.getLogger().error(AwardsFactory.class, "loadAwards", e);
             } catch (FileNotFoundException e) {

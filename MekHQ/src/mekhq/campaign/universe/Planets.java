@@ -51,12 +51,10 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.stream.StreamSource;
 
 import org.joda.time.DateTime;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Node;
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import megamek.common.EquipmentType;
@@ -87,7 +85,7 @@ public class Planets {
             // For debugging only!
             // unmarshaller.setEventHandler(new javax.xml.bind.helpers.DefaultValidationEventHandler());
         } catch(JAXBException e) {
-            MekHQ.getLogger().log(Planets.class, "<init>", e); //$NON-NLS-1$
+            MekHQ.getLogger().error(Planets.class, "<init>", e); //$NON-NLS-1$
         }
     }
     
@@ -362,7 +360,7 @@ public class Planets {
             source.getChannel().position(0);
 
             LocalPlanetList planets = unmarshaller.unmarshal(
-                    MekHqXmlUtil.createSafeXmlSource(new InputSource(is)), LocalPlanetList.class).getValue();
+                    MekHqXmlUtil.createSafeXmlSource(is), LocalPlanetList.class).getValue();
 
             // Run through the list again, this time creating and updating planets as we go
             for( Planet planet : planets.list ) {

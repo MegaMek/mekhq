@@ -1,6 +1,7 @@
 package mekhq;
 
 import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
@@ -106,7 +107,12 @@ public class MekHqXmlUtil {
 		return dbf.newDocumentBuilder();
 	}
 
-	public static Source createSafeXmlSource(InputSource inputSource) throws SAXException, ParserConfigurationException {
+    /**
+     * Creates a JAXB compatible Source safe from XML external entities
+     * attacks, and XML entity expansion attacks.
+     * @return A Source safe to use to read untrusted XML from a JAXB unmarshaller.
+     */
+	public static Source createSafeXmlSource(InputStream inputStream) throws SAXException, ParserConfigurationException {
 		SAXParserFactory spf = SAX_PARSER_FACTORY;
 		if (null == spf) {
 			// At worst we may do this twice if multiple threads
@@ -121,7 +127,7 @@ public class MekHqXmlUtil {
 			SAX_PARSER_FACTORY = spf;
 		}
 
-		return new SAXSource(spf.newSAXParser().getXMLReader(), inputSource);
+		return new SAXSource(spf.newSAXParser().getXMLReader(), new InputSource(inputStream));
 	}
 
 	public static void writeSimpleXmlTag(PrintWriter pw1, int indent, String name, String val) {

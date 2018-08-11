@@ -63,7 +63,6 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Source;
 
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import mekhq.MekHQ;
@@ -103,7 +102,7 @@ public class Paperdoll extends Component {
         try {
             loadShapeData(is);
         } catch(Exception ex) {
-            MekHQ.getLogger().log(getClass(), "<init>(InputStream)", ex);
+            MekHQ.getLogger().error(getClass(), "<init>(InputStream)", ex);
         }
         
         highlightColor = null;
@@ -116,7 +115,7 @@ public class Paperdoll extends Component {
         
         JAXBContext context = JAXBContext.newInstance(OverlayLocDataList.class, OverlayLocData.class);
         Unmarshaller unmarshaller = context.createUnmarshaller();
-        Source inputSource = MekHqXmlUtil.createSafeXmlSource(new InputSource(is));
+        Source inputSource = MekHqXmlUtil.createSafeXmlSource(is);
         OverlayLocDataList dataList = (OverlayLocDataList) unmarshaller.unmarshal(inputSource);
         if(null != dataList.locs) {
             dataList.locs.forEach(data -> {
@@ -141,7 +140,7 @@ public class Paperdoll extends Component {
             try {
                 mt.waitForAll();
             } catch(InterruptedException iex) {
-                MekHQ.getLogger().log(getClass(), METHOD_NAME, iex);
+                MekHQ.getLogger().error(getClass(), METHOD_NAME, iex);
             }
         } else {
             base = new BufferedImage(DEFAULT_WIDTH, DEFAULT_HEIGHT, BufferedImage.TYPE_INT_ARGB);
