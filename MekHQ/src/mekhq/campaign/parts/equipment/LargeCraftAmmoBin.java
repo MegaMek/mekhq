@@ -35,6 +35,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.PartInventory;
 import mekhq.campaign.work.IAcquisitionWork;
 
 /**
@@ -237,6 +238,18 @@ public class LargeCraftAmmoBin extends AmmoBin {
     }
     
     @Override
+    public boolean isSalvaging() {
+        return super.isSalvaging() && (getCurrentShots() > 0);
+    }
+    
+    @Override
+    public void remove(boolean salvage) {
+        // The bin represents capacity rather than an actual part, and cannot be
+        // removed or damaged.
+        unload();
+    }
+
+    @Override
     public MissingPart getMissingPart() {
         return null;
     }
@@ -349,11 +362,11 @@ public class LargeCraftAmmoBin extends AmmoBin {
         if (null != unit) {
             String availability = "";
             int shotsAvailable = getAmountAvailable();
-            String[] inventories = campaign.getPartInventory(getNewPart());
+            PartInventory inventories = campaign.getPartInventory(getNewPart());
             if(shotsAvailable == 0) {
-                availability = "<br><font color='red'>No ammo ("+ inventories[1] + " in transit, " + inventories[2] + " on order)</font>";
+                availability = "<br><font color='red'>No ammo ("+ inventories.getTransitOrderedDetails() + ")</font>";
             } else if(shotsAvailable < shotsNeeded) {
-                availability = "<br><font color='red'>Only " + shotsAvailable + " available ("+ inventories[1] + " in transit, " + inventories[2] + " on order)</font>";
+                availability = "<br><font color='red'>Only " + shotsAvailable + " available ("+ inventories.getTransitOrderedDetails() + ")</font>";
             }
             return ((AmmoType)type).getDesc() + ", " + shotsNeeded + " shots needed" + availability;
         } else {

@@ -1,0 +1,305 @@
+MekHQ plugin guide
+
+*** This feature is in the early stage of development and subject to rapid changes. While users are
+*** encouraged to experiment with the system, they should generally hold off on distributing plugins
+*** because API changes could easily render them incompatible with future versions.
+
+I. Introduction
+
+The MekHQ plugin system exposes certain parts of the MekHQ program to allow external programs to modify
+its behavior by overriding some behaviors and adding others without changing any code in MekHQ itself.
+By this we hope to encourage a healthy community of modders and allow for a much richer set of features
+and a higher level of customization than the limited time of the development team would otherwise permit.
+
+Modules can be written in Java and packaged in a jar file. Other languages are also supported using
+the Java scripting API. The basic requirements are that the language has a JSR 223-compliant scripting
+engine and that it can create an instance of an object that implements a Java interface. The JRE
+has built-in support for JavaScript through the Nashorn engine. Support for other languages requires
+downloading the appropriate script engine and adding it to the plugin directory. Besides Java and
+JavaScript, the plugin system has also been tested with Python and Ruby.
+
+II. How to write a plugin
+
+All plugins must define at least one class that implements the MekHQModule interface. In practice most
+plugins will implement an interface that extends MekHQModule. Plugin interfaces are found in the package
+mekhq.module.api. PersonnelMarketMethod is provided as an example of an interface for implementing a specific
+behavior. It is used to provide a method for adding and removing potential recruits to and from the personnel
+market.
+
+The plugin manager creates an instance of each installed plugin and stores it in memory. Therefore the module
+class (the one that implements MekHQModule) should be lightweight. Any plugin that stores more than a
+very small amount of data or requires more than the most basic initialization should handle all that in
+a separate object which is instantiated within initModule(Campaign). This is only called for modules that
+the user has enabled for the current campaign, either when the campaign is loaded or when the user enables
+them in the campaign options [the user interface has not yet been implemented, so all installed plugins are
+currently enabled].
+
+Plugins written in Java use the ServiceLoader framework to find module classes. In addition to any class files,
+the META-INF directory in the jar needs to contain a directory named "services" which contains one file for
+each module interface for which it provides an implementation. The name of the file is the fully qualified
+class name of the interface (e.g. mekhq.module.api.PersonnelMarketManager). The contents of the file is a
+list of the fully qualified class name of all classes implementing that interface (e.g.
+my.custom.plugins.ReallyCoolPersonnelMarket).
+
+Plugins using the Java scripting API must define a top-level function named getPlugins which returns a list
+of module objects. The container object must implement Java's Iterable interface. Some scripting engines do
+this with native array or list structure, but others require creating an instance of a Java container class.
+The script manager uses the filename extension to locate the correct script engine for the plugin, so
+plugin files should use a standard extension.
+ 
+III. Installing plugins
+
+A plugin is installed by putting it in the plugins directory of the MekHQ installation. The plugins directory
+is searched recursively, so plugins can be organized in subdirectories if the user wishes it. If a plugin
+requires an additional script engine and interpreter, the jar file is also placed in the plugins directory.
+
+IV. Examples
+
+These examples all implement PersonnelMarketMethod using the same algorithm for purposes of comparison. Each
+generates 2d6-2 recruits with a random primary role and removes a random number of existing recruits between
+zero and one less than all. Each day MekHQ will call removePersonnelForDay first, then generatePersonnelForDay.
+If a method should only generate or remove personnel on certain days, such as once a week or on the 1st and
+15th of the month, the method should check the date using the campaign parameter. It should be possible
+to create plugins in any language that meets the basic critera outlined above (see I. Introduction). The
+following languages have been tested. For more detail about interfacing other languages with Java, see
+the documentation for the particular script engine.
+
+A. Java
+
+Though this section is written with Java in mind, any language that can be compiled to Java bytecode could
+hypothetically use the same method.
+
+The source needs to be compiled into bytecode and packaged in a JAR file. The contents of the JAR file need
+to be as follows:
+
++ META-INF/
+|---+ services/
+    |--- mekhq.module.api.PersonnelMarketMethod
++ my/
+|---+ domain/
+    |---+ mekhqplugins
+        |--- MarketTest.class
+        
+The mekhq.module.api.PersonnelMarketMethod file should contain a single line: my.domain.mekhqplugins.MarketTest
+
+/** MarketTest.java listing **/
+
+package my.domain.mekhqplugins;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+import megamek.common.Compute;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.personnel.Person;
+import mekhq.module.api.PersonnelMarketMethod;
+
+public class MarketTest implements PersonnelMarketMethod {
+
+	@Override
+	public String getModuleName() {
+		return "Market Test - Java";
+	}
+
+	@Override
+	public List<Person> generatePersonnelForDay(Campaign c) {
+		List<Person> retVal = new ArrayList<>();
+		int num = Compute.d6(2) - 2;
+		for (int i = 0; i < num; i++) {
+			int type = Compute.randomInt(Person.T_NUM);
+            Person p = c.newPerson(type);
+            UUID id = UUID.randomUUID();
+            p.setId(id);
+            retVal.add(p);
+		}
+		return retVal;
+	}
+
+	@Override
+	public List<Person> removePersonnelForDay(Campaign c, List<Person> current) {
+		if (current.isEmpty()) {
+			return current;
+		}
+		List<Person> toRemove = new ArrayList<>();
+		List<Person> remaining = new ArrayList<>(current);
+		int count = Compute.randomInt(remaining.size());
+		for (int i = 0; i < count; i++) {
+			int index = Compute.randomInt(remaining.size());
+			Person p = remaining.get(index);
+			toRemove.add(p);
+			remaining.remove(index);
+		}
+		return toRemove;
+	}
+}
+
+B. JavaScript
+
+Beginning with Java 8, the JRE has the Nashorn JavaScript engine built in.
+Project website: http://openjdk.java.net/projects/nashorn/
+JavaScript code is compiled to Java bytecode then executed by the JRE. You can use Java classes by using
+the fully qualified class name. Other classes can be imported using the Java.type method and assigned
+to a variable for use as a class type name. To implement the chosen interface, create an instance of
+the interface and assign a function definition to each method as a property. The Nashorn engine does not
+implement native arrays as Iterable, so the getPlugins() function creates an instance of a Java ArrayList.
+
+/** personnel_test.js listing **/
+
+var Person = Java.type('mekhq.campaign.personnel.Person');
+var PersonnelMarketMethod = Java.type('mekhq.module.api.PersonnelMarketMethod');
+var Compute = Java.type('megamek.common.Compute');
+
+var testMarket = new PersonnelMarketMethod() {
+	getModuleName: function() {
+		return "Market Test - JavaScript";
+	},
+	
+    generatePersonnelForDay: function(c) {
+        var retVal = new java.util.ArrayList();
+        var num = Compute.d6(2) - 2
+        for (i = 0; i < num; i++) {
+            var type = Compute.randomInt(Person.T_NUM);
+            var p = c.newPerson(type);
+            p.setId(java.util.UUID.randomUUID());
+            retVal.add(p)
+		}
+        return retVal;
+    },
+    
+    removePersonnelForDay: function(c, current) {
+        if (current.isEmpty()) {
+            return current;
+        }
+        var toRemove = new java.util.ArrayList();
+        var remaining = new java.util.ArrayList(current);
+        var count = Compute.randomInt(remaining.size());
+        for (i = 0; i < count; i++) {
+            var index = Compute.randomInt(remaining.size());
+            var p = remaining.get(index);
+            toRemove.add(p);
+            remaining.remove(index);
+        }
+        return toRemove;
+    }
+	
+}
+    
+function getPlugins() {
+    var list = new java.util.ArrayList();
+    list.add(testMarket);
+	return list;
+}
+
+C. Python
+
+Python scripting support is provided by jython, which is a Python implementation written in Java.
+Project site: http://www.jython.org
+Users should use the jython standalone jar, which does not have external dependencies. Java classes can
+be used within the Python script using the from...import statement (other forms of import statements also work).
+There is no difference between importing Java language classes or MegaMek classes. The module interface
+can be implemented by subclassing it. Jython implements native Python arrays as Iterable, so the getPlugins()
+method can return an array of module instances.
+
+/** personnel_test.py listing **/
+
+from java.util import ArrayList
+from java.util import UUID
+from megamek.common import Compute
+from mekhq.module.api import PersonnelMarketMethod
+from mekhq.campaign import Campaign
+from mekhq.campaign.personnel import Person
+
+def getPlugins():
+    return [ TestMarket() ]
+
+class TestMarket (PersonnelMarketMethod):
+    def getModuleName(self):
+        return "Market Test - Python"
+        
+    def generatePersonnelForDay(self, c):
+        retVal = ArrayList()
+        num = Compute.d6(2)
+        for x in range(num):
+            type = Compute.randomInt(Person.T_NUM)
+            p = c.newPerson(type)
+            p.setId(UUID.randomUUID())
+            retVal.add(p)
+        return retVal
+        
+    def removePersonnelForDay(self, c, current):
+        if current.isEmpty():
+            return current
+        toRemove = ArrayList()
+        remaining = ArrayList(current)
+        count = Compute.randomInt(remaining.size())
+        for i in range(count):
+            index = Compute.randomInt(remaining.size())
+            p = remaining.get(index)
+            toRemove.add(p)
+            remaining.remove(p)
+        return toRemove
+
+D. Ruby
+
+Ruby scripting support is provided by jruby, which is a Ruby implementation written in Java.
+Project site: http://jruby.org
+Users should use the jruby complete jar, which does not have external dependencies. Interacting with Java
+requires the java module. Java classes can be imported using the java_import statement. Packages that
+do not have java, javax, org, or com as the top level need to be defined as being within the Java module.
+The module interface can be implemented by extending it with an include in the class definition. JRuby
+implements native Ruby arrays as Iterable, so the getPlugins() method can return an array of module instances.
+
+/** personnel_test.rb listing **/
+
+require 'java'
+java_import java.util.ArrayList
+java_import java.util.UUID
+
+def megamek
+    Java::Megamek
+end
+
+def mekhq
+    Java::Mekhq
+end
+
+def getPlugins()
+    return [ TestMarket.new() ]
+end
+
+class TestMarket
+    include mekhq.module.api.PersonnelMarketMethod
+    
+    def getModuleName()
+        return "Market Test - Ruby"
+    end
+    
+    def generatePersonnelForDay(c)
+        retVal = ArrayList.new()
+        num = megamek.common.Compute.d6(2) - 2
+        for i in 0..num do
+            type = megamek.common.Compute.randomInt(mekhq.campaign.personnel.Person::T_NUM)
+            p = c.newPerson(type)
+            p.setId(UUID.randomUUID())
+            retVal.add(p)
+        end
+        return retVal
+    end
+    
+    def removePersonnelForDay(c, current)
+        if current.isEmpty()
+            return current
+        end
+        toRemove = ArrayList.new()
+        remaining = ArrayList.new(current)
+        count = megamek.common.Compute.randomInt(remaining.size())
+        for i in 0...count
+            index = megamek.common.Compute.randomInt(remaining.size())
+            p = remaining.get(index)
+            toRemove.add(p)
+            remaining.remove(index)
+        end
+        return toRemove
+    end
+end

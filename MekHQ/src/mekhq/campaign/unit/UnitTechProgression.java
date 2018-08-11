@@ -19,7 +19,6 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 
-import megamek.common.CompositeTechLevel;
 import megamek.common.Entity;
 import megamek.common.ITechnology;
 import megamek.common.MechFileParser;
@@ -113,6 +112,9 @@ public class UnitTechProgression {
         }
         try {
             Map<MechSummary,ITechnology> map = task.get();
+            if (!map.containsKey(ms)) {
+                map.put(ms, calcTechProgression(ms, techFaction));
+            }
             return map.get(ms);
         } catch (InterruptedException e) {
             task.cancel(true);
@@ -121,6 +123,23 @@ public class UnitTechProgression {
                     "getProgression(MechSummary,int,boolean)", e);
         }
         return null;
+    }
+    
+    private static ITechnology calcTechProgression(MechSummary ms, int techFaction) {
+        final String METHOD_NAME = "calcTechProgression(MechSummary, int)"; // $NON-NLS-1$
+        try {
+            Entity en = new MechFileParser(ms.getSourceFile(), ms.getEntryName()).getEntity();
+            if (null == en) {
+                MekHQ.getLogger().log(BuildMapTask.class, METHOD_NAME, LogLevel.ERROR,
+                        "Entity was null: " + ms.getName());
+            }
+            return en.factionTechLevel(techFaction);
+        } catch (EntityLoadingException ex) {
+            MekHQ.getLogger().log(BuildMapTask.class, METHOD_NAME, LogLevel.ERROR,
+                    "Exception loading entity " + ms.getName());
+            MekHQ.getLogger().log(BuildMapTask.class, METHOD_NAME, ex);
+            return null;
+        }
     }
     
     /**
@@ -137,22 +156,9 @@ public class UnitTechProgression {
         // Load all the Entities in the MechSummaryCache and calculate the tech level for the given faction.
         @Override
         public Map<MechSummary, ITechnology> call() throws Exception {
-            final String METHOD_NAME = "call()"; // $NON-NLS-1$
             Map<MechSummary,ITechnology> map = new HashMap<MechSummary,ITechnology>();
             for (MechSummary ms : MechSummaryCache.getInstance().getAllMechs()) {
-                try {
-                    Entity en = new MechFileParser(ms.getSourceFile(), ms.getEntryName()).getEntity();
-                    if (null == en) {
-                        MekHQ.getLogger().log(BuildMapTask.class, METHOD_NAME, LogLevel.ERROR,
-                                "Entity was null: " + ms.getName());
-                    }
-                    CompositeTechLevel tech = en.factionTechLevel(techFaction);
-                    map.put(ms,  tech);
-                } catch (EntityLoadingException ex) {
-                    MekHQ.getLogger().log(BuildMapTask.class, METHOD_NAME, LogLevel.ERROR,
-                            "Exception loading entity " + ms.getName());
-                    MekHQ.getLogger().log(BuildMapTask.class, METHOD_NAME, ex);
-                }
+                map.put(ms, calcTechProgression(ms, techFaction));
             }
             return map;
         }

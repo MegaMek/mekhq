@@ -305,7 +305,7 @@ public final class OverviewTab extends CampaignGuiTab {
                 PartInUse piu = overviewPartsModel.getPartInUse(row);
                 int quantity = 1;
                 PopupValueChoiceDialog pcd = new PopupValueChoiceDialog(getFrame(), true,
-                        "How Many " + piu.getPartToBuy().getAcquisitionName(), quantity, 1, 100);
+                        "How Many " + piu.getPartToBuy().getAcquisitionName(), quantity, 1, CampaignGUI.MAX_QUANTITY_SPINNER);
                 pcd.setVisible(true);
                 quantity = pcd.getValue();
                 IAcquisitionWork partToBuy = piu.getPartToBuy();
@@ -332,7 +332,7 @@ public final class OverviewTab extends CampaignGuiTab {
                 PartInUse piu = overviewPartsModel.getPartInUse(row);
                 int quantity = 1;
                 PopupValueChoiceDialog pcd = new PopupValueChoiceDialog(getFrame(), true,
-                        "How Many " + piu.getPartToBuy().getAcquisitionName(), quantity, 1, 100);
+                        "How Many " + piu.getPartToBuy().getAcquisitionName(), quantity, 1, CampaignGUI.MAX_QUANTITY_SPINNER);
                 pcd.setVisible(true);
                 quantity = pcd.getValue();
                 IAcquisitionWork partToBuy = piu.getPartToBuy();

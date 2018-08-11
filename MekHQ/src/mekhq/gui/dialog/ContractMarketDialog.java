@@ -275,6 +275,7 @@ public class ContractMarketDialog extends JDialog {
 			 */
 			if (c instanceof AtBContract) {
 				((AtBContract)c).initContractDetails(campaign);
+				((AtBContract)c).calculatePaymentMultiplier(campaign);
 				((AtBContract)c).calculatePartsAvailabilityLevel(campaign);
 				((AtBContract)c).setSharesPct(campaign.getCampaignOptions().getUseShareSystem()?
 						(Integer)spnSharePct.getValue():0);
@@ -411,6 +412,12 @@ public class ContractMarketDialog extends JDialog {
         btnGenerate.addActionListener(new java.awt.event.ActionListener() {
         	public void actionPerformed(java.awt.event.ActionEvent evt) {
         		AtBContract c = contractMarket.addAtBContract(campaign);
+        		
+        		if(c == null) {
+        		    campaign.addReport(resourceMap.getString("report.UnabletoGMContract"));
+        		    return;
+        		}
+        		
         		c.initContractDetails(campaign);
         		c.calculatePartsAvailabilityLevel(campaign);
         		c.setSharesPct(campaign.getCampaignOptions().getUseShareSystem()?

@@ -7,8 +7,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.text.NumberFormat;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.UUID;
 import java.util.Vector;
 
@@ -21,6 +19,7 @@ import javax.swing.JTable;
 import javax.swing.event.MouseInputAdapter;
 
 import megamek.client.ui.swing.UnitEditorDialog;
+import megamek.client.ui.swing.util.MenuScroller;
 import megamek.common.AmmoType;
 import megamek.common.BattleArmor;
 import megamek.common.CriticalSlot;
@@ -45,6 +44,8 @@ import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.unit.actions.StripUnitAction;
+import mekhq.campaign.unit.actions.IUnitAction;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.GuiTabType;
 import mekhq.gui.MekLabTab;
@@ -55,7 +56,6 @@ import mekhq.gui.dialog.LargeCraftAmmoSwapDialog;
 import mekhq.gui.dialog.QuirksDialog;
 import mekhq.gui.dialog.TextAreaDialog;
 import mekhq.gui.model.UnitTableModel;
-import mekhq.gui.utilities.MenuScroller;
 import mekhq.gui.utilities.StaticChecks;
 
 public class UnitTableMouseAdapter extends MouseInputAdapter implements
@@ -64,6 +64,9 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
     private CampaignGUI gui;
     private JTable unitTable;
     private UnitTableModel unitModel;
+    
+    public final static String COMMAND_MOTHBALL = "MOTHBALL";
+    public final static String COMMAND_ACTIVATE = "ACTIVATE";
 
     public UnitTableMouseAdapter(CampaignGUI gui, JTable unitTable,
             UnitTableModel unitModel) {
@@ -406,7 +409,12 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
             if (null != selectedUnit) {
                 selectedUnit.setDaysToArrival(0);
             }
-        } else if (command.equalsIgnoreCase("MOTHBALL")) {
+        } else if (command.equalsIgnoreCase(COMMAND_MOTHBALL)) {
+            if(units.length > 1) {
+                gui.showMassMothballDialog(units, false);
+                return;
+            }
+            
             UUID id = null;
             if (!selectedUnit.isSelfCrewed()) {
                 id = gui.selectTech(selectedUnit, "mothball", true);
@@ -430,7 +438,12 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                 selectedUnit.startMothballing(id);
                 MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
             }
-        } else if (command.equalsIgnoreCase("ACTIVATE")) {
+        } else if (command.equalsIgnoreCase(COMMAND_ACTIVATE)) {
+            if(units.length > 1) {
+                gui.showMassMothballDialog(units, true);
+                return;
+            }
+            
             UUID id = null;
             if (!selectedUnit.isSelfCrewed()) {
                 id = gui.selectTech(selectedUnit, "activation", true);
@@ -496,20 +509,17 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
         } else if(command.equalsIgnoreCase("RESTORE_UNIT")) {
             for (Unit unit : units) {
                 unit.setSalvage(false);
-                Collection<Part> partsToFix = new HashSet<>(unit.getParts());
+                
                 boolean needsCheck = true;
                 while(unit.isAvailable() && needsCheck) {
                     needsCheck = false;
-                    for(Part part : partsToFix) {
-                        if(part instanceof Armor) {
-                            final Armor armor = (Armor) part;
-                            armor.setAmount(armor.getTotalAmount());
-                        } else if(part instanceof AmmoBin) {
-                            final AmmoBin ammoBin = (AmmoBin) part;
-                            ammoBin.setShotsNeeded(0);
-                        }
+                    for(int x = 0; x < unit.getParts().size(); x++) {
+                        Part part = unit.getParts().get(x);
+                                                
                         if(part instanceof MissingPart) {
-                            // MissingPart has no easy way to just tell it "replace me with a workig one" either ...
+                            // We magically acquire a replacement part, then fix the missing one.
+                            part.getCampaign().addPart(((MissingPart) part).getNewPart(), 0);
+                            part.fix();
                             part.resetTimeSpent();
                             part.resetOvertime();
                             part.setTeamId(null);
@@ -519,14 +529,33 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                         } else {
                             if(part.needsFixing()) {
                                 needsCheck = true;
+                                part.fix();
+                            } else {
+                                part.resetRepairSettings();
                             }
-                            part.fix();
                             part.resetTimeSpent();
                             part.resetOvertime();
                             part.setTeamId(null);
                             part.cancelReservation();
                         }
+                        
+                        // replace damaged armor and reload ammo bins after fixing their respective locations
+                        if(part instanceof Armor) {
+                            final Armor armor = (Armor) part;
+                            armor.setAmount(armor.getTotalAmount());
+                        } else if(part instanceof AmmoBin) {
+                            final AmmoBin ammoBin = (AmmoBin) part;
+                            
+                            // we magically find the ammo we need, then load the bin
+                            // we only want to get the amount of ammo the bin actually needs                            
+                            if(ammoBin.getShotsNeeded() > 0) {
+                                ammoBin.setShotsNeeded(0);
+                                ammoBin.updateConditionFromPart();
+                            }
+                        }
+                        
                     }
+                    
                     // TODO: Make this less painful. We just want to fix hips and shoulders.
                     Entity entity = unit.getEntity();
                     if(entity instanceof Mech) {
@@ -542,12 +571,14 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                             }
                         }
                     }
-                    // Check for more parts to fix (because the list above is not
-                    // sorted usefully)
-                    unit.initializeParts(true);
-                    partsToFix = new HashSet<>(unit.getParts());
                 }
                 MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
+            }
+        }
+        else if (command.equalsIgnoreCase("STRIP_UNIT")) {
+            IUnitAction stripUnitAction = new StripUnitAction();
+            for (Unit unit : units) {
+                stripUnitAction.Execute(gui.getCampaign(), unit);
             }
         }
     }
@@ -698,14 +729,14 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                     popup.add(menuItem);
                 } else if (unit.isMothballed()) {
                     menuItem = new JMenuItem("Activate Unit");
-                    menuItem.setActionCommand("ACTIVATE");
+                    menuItem.setActionCommand(COMMAND_ACTIVATE);
                     menuItem.addActionListener(this);
                     menuItem.setEnabled(!unit.isSelfCrewed()
                             || null != unit.getEngineer());
                     popup.add(menuItem);
                 } else {
                     menuItem = new JMenuItem("Mothball Unit");
-                    menuItem.setActionCommand("MOTHBALL");
+                    menuItem.setActionCommand(COMMAND_MOTHBALL);
                     menuItem.addActionListener(this);
                     menuItem.setEnabled(unit.isAvailable()
                             && (!unit.isSelfCrewed() || null != unit
@@ -713,6 +744,41 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                     popup.add(menuItem);
                 }
             }
+            
+            if(unitTable.getSelectedRowCount() > 1) {
+                boolean allMothballed = true;
+                boolean allAvailable = true;
+                
+                for(int x = 0; x < units.length; x++) {
+                    // infantry, jumpships and warships cannot be mothballed
+                    if(units[x].isSelfCrewed()) {
+                        allMothballed = false;
+                        allAvailable = false;
+                        break;
+                    }
+                    
+                    if(!units[x].isMothballed()) {
+                        allMothballed = false;
+                    }
+                    
+                    if(!units[x].isAvailable()) {
+                        allAvailable = false;
+                    }
+                }
+                
+                if(allAvailable) {
+                    menuItem = new JMenuItem("Mass Mothball");
+                    menuItem.setActionCommand(COMMAND_MOTHBALL);
+                    menuItem.addActionListener(this);
+                    popup.add(menuItem);
+                } else if(allMothballed) {
+                    menuItem = new JMenuItem("Mass Activate");
+                    menuItem.setActionCommand(COMMAND_ACTIVATE);
+                    menuItem.addActionListener(this);
+                    popup.add(menuItem);
+                }
+            }
+            
             if (oneSelected && unit.requiresMaintenance()
                     && !unit.isSelfCrewed() && unit.isAvailable()) {
                 menu = new JMenu("Assign Tech");
@@ -905,6 +971,11 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
             menu = new JMenu("GM Mode");
             menuItem = new JMenuItem("Remove Unit");
             menuItem.setActionCommand("REMOVE");
+            menuItem.addActionListener(this);
+            menuItem.setEnabled(gui.getCampaign().isGM());
+            menu.add(menuItem);
+            menuItem = new JMenuItem("Strip Unit");
+            menuItem.setActionCommand("STRIP_UNIT");
             menuItem.addActionListener(this);
             menuItem.setEnabled(gui.getCampaign().isGM());
             menu.add(menuItem);

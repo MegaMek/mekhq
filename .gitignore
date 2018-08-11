@@ -5,3 +5,11 @@
 /.settings/
 /logs/
 .DS_Store
+MekHQ/MekHQ.iml
+
+# Build directories
+MekHQ/pkgdir
+
+# IDE directories
+MekHQ/.idea/
+/.vscode

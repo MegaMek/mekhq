@@ -20,6 +20,20 @@
  */
 package mekhq.campaign.mission;
 
+import java.io.PrintWriter;
+import java.io.Serializable;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+
+import org.apache.commons.text.CharacterPredicate;
+import org.apache.commons.text.RandomStringGenerator;
+import org.joda.time.DateTime;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.common.BattleArmor;
 import megamek.common.Infantry;
 import mekhq.MekHqXmlSerializable;
@@ -28,20 +42,6 @@ import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.unit.Unit;
-import mekhq.campaign.universe.Planets;
-import org.apache.commons.text.CharacterPredicate;
-import org.apache.commons.text.RandomStringGenerator;
-import org.joda.time.DateTime;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import java.io.PrintWriter;
-import java.io.Serializable;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
 
 /**
  * Contracts - we need to track static amounts here because changes in the
@@ -393,7 +393,7 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
     }
 
     private int getTravelDays(Campaign c) {
-        if(null != c.getPlanet(planetName)) {
+        if (null != this.getPlanet()) {
             DateTime currentDate = Utilities.getDateTimeDay(c.getCalendar());
             JumpPath jumpPath = c.calculateJumpPath(c.getCurrentPlanet(), getPlanet());
             double days = Math.round(jumpPath.getTotalTime(currentDate, c.getLocation().getTransitTime()) * 100.0) / 100.0;
@@ -426,7 +426,7 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
         } else {
             profit -= c.getPayRoll() * getLengthPlusTravel(c);
         }
-		if(null != c.getPlanet(planetName) && c.getCampaignOptions().payForTransport()) {
+		if(null != c.getPlanet(planetId) && c.getCampaignOptions().payForTransport()) {
 			JumpPath jumpPath = c.calculateJumpPath(c.getCurrentPlanet(), getPlanet());
 
 			boolean campaignOps = c.getCampaignOptions().useEquipmentContractBase();
@@ -472,7 +472,7 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
             overheadAmount = (long)(0.5 * c.getOverheadExpenses() * getLength());
             break;
         case OH_FULL:
-            overheadAmount = (long)(1 * c.getOverheadExpenses() * getLength());
+            overheadAmount = 1 * c.getOverheadExpenses() * getLength();
             break;
         default:
             overheadAmount = 0;
@@ -495,7 +495,7 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
         }
 
         //calculate transportation costs
-        if(null != Planets.getInstance().getPlanetById(planetName)) {
+        if (null != getPlanet()) {
             JumpPath jumpPath = c.calculateJumpPath(c.getCurrentPlanet(), getPlanet());
 
             // FM:Mercs transport payments take into account owned transports and do not use CampaignOps dropship costs.
@@ -533,7 +533,7 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
         }
         GregorianCalendar cal = new GregorianCalendar();
         cal.setTime(startDate);
-        if (adjustStartDate && null != c.getPlanet(planetName)) {
+        if (adjustStartDate && null != c.getPlanet(planetId)) {
             int days = (int) Math.ceil(c.calculateJumpPath(c.getCurrentPlanet(), getPlanet())
                     .getTotalTime(Utilities.getDateTimeDay(cal), c.getLocation().getTransitTime()));
             while (days > 0) {
@@ -550,6 +550,7 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
         endDate = cal.getTime();
     }
 
+    @Override
     protected void writeToXmlBegin(PrintWriter pw1, int indent) {
         super.writeToXmlBegin(pw1, indent);
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
@@ -582,6 +583,7 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
                 + "</salvagedByEmployer>");
     }
 
+    @Override
     public void loadFieldsFromXmlNode(Node wn) throws ParseException {
         // Okay, now load mission-specific fields!
         NodeList nl = wn.getChildNodes();

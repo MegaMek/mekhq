@@ -180,6 +180,7 @@ public final class TOETab extends CampaignGuiTab {
                 if (u.usesSoloPilot()) {
                     name = "Pilot";
                 }
+                scrollPerson.setPreferredSize(crewList.getPreferredScrollableViewportSize());
                 tabUnit.add(name, crewPanel);
             }
             tabUnit.add("Unit",

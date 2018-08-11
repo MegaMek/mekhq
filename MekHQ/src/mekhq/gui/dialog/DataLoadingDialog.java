@@ -212,7 +212,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
         			cancel(true);
         		} catch(OutOfMemoryError e) {
         		    JOptionPane.showMessageDialog(null,
-                            "MekHQ ran out of memory attempting to load the campaign file. \nTry increasing the memory allocated to MekHQ and reloading.\nSee the FAQ at http://megamek.info for details.",
+                            "MekHQ ran out of memory attempting to load the campaign file. \nTry increasing the memory allocated to MekHQ and reloading.\nSee the FAQ at http://megamek.org for details.",
                             "Not Enough Memory",
                             JOptionPane.ERROR_MESSAGE);
                     //setVisible(false);
@@ -267,7 +267,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
         			campaign.generateNewPersonnelMarket();
         			campaign.reloadNews();
         			campaign.readNews();
-        			campaign.addReport("<b>" + campaign.getDateAsString() + "</b>");
+        			campaign.beginReport("<b>" + campaign.getDateAsString() + "</b>");
         			if (campaign.getCampaignOptions().getUseAtB()) {
         				RandomFactionGenerator.getInstance().updateTables(campaign.getDate(),
         						campaign.getLocation().getCurrentPlanet(),

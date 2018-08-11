@@ -89,7 +89,7 @@ public class UnitTableModel extends DataTableModel {
         case COL_PILOT:
             return "Assigned to";
         case COL_TECH_CRW:
-            return "Tech";
+            return "Tech Crew";
         case COL_CREW:
             return "Crew";
         case COL_BV:
@@ -269,7 +269,7 @@ public class UnitTableModel extends DataTableModel {
     }
     
     public void refreshData() {
-        setData(getCampaign().getUnits());
+        setData(getCampaign().getCopyOfUnits());
     }
 
     public TableCellRenderer getRenderer(boolean graphic, IconPackage icons) {
@@ -323,7 +323,7 @@ public class UnitTableModel extends DataTableModel {
                 } else if ((null != u) && !u.isFunctional()) {
                     setBackground(new Color(205, 92, 92));
                 } else if ((null != u)
-                        && (u.getPartsNeedingFixing().size() > 0)) {
+                        && u.hasPartsNeedingFixing()) {
                     setBackground(new Color(238, 238, 0));
                 } else if (u.getEntity() instanceof Infantry
                         && u.getActiveCrew().size() < u.getFullCrewSize()) {
@@ -362,7 +362,7 @@ public class UnitTableModel extends DataTableModel {
                 Person p = u.getCommander();
                 if(null != p) {
                     setPortrait(p);
-                    setText(p.getFullDesc(), color);
+                    setText(p.getFullDesc(false), color);
                 } else {
                     clearImage();
                 }
@@ -371,7 +371,7 @@ public class UnitTableModel extends DataTableModel {
                 Person p = u.getTech();
                 if(null != p) {
                     setPortrait(p);
-                    setText(p.getFullDesc(), color);
+                    setText(p.getFullDesc(false), color);
                 } else {
                     clearImage();
                 }

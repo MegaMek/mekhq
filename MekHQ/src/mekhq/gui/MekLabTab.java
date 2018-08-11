@@ -828,7 +828,7 @@ public class MekLabTab extends CampaignGuiTab {
 
         @Override
         public void refreshSummary() {
-            structureTab.refresh();
+            structureTab.refreshSummary();
         }
 
         @Override

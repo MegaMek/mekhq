@@ -23,10 +23,11 @@ public class ProcurementTableModel extends DataTableModel {
     
     public final static int COL_NAME    =    0;
     public final static int COL_COST     =   1;
-    public final static int COL_TARGET    =  2;
-    public final static int COL_NEXT      =  3;
-    public final static int COL_QUEUE     =  4;
-    public final static int N_COL          = 5;
+    public final static int COL_TOTAL_COST = 2;
+    public final static int COL_TARGET    =  3;
+    public final static int COL_NEXT      =  4;
+    public final static int COL_QUEUE     =  5;
+    public final static int N_COL          = 6;
 
     public ProcurementTableModel(Campaign c) {
         data = new ArrayList<IAcquisitionWork>();
@@ -47,7 +48,9 @@ public class ProcurementTableModel extends DataTableModel {
         case COL_NAME:
             return "Name";
         case COL_COST:
-            return "Cost";
+            return "Cost per Unit";
+        case COL_TOTAL_COST:
+            return "Total Cost";
         case COL_TARGET:
             return "Target";
         case COL_QUEUE:
@@ -90,6 +93,9 @@ public class ProcurementTableModel extends DataTableModel {
         }
         if(col == COL_COST) {
             return DecimalFormat.getInstance().format(shoppingItem.getBuyCost());
+        }
+        if(col == COL_TOTAL_COST) {
+            return DecimalFormat.getInstance().format(shoppingItem.getBuyCost() * shoppingItem.getQuantity());
         }
         if(col == COL_TARGET) {
             TargetRoll target = getCampaign().getTargetForAcquisition(shoppingItem, getCampaign().getLogisticsPerson(), false);
@@ -136,9 +142,10 @@ public class ProcurementTableModel extends DataTableModel {
         case COL_NAME:
             return 200;
         case COL_COST:
+        case COL_TOTAL_COST:
         case COL_TARGET:
         case COL_NEXT:
-            return 40;        
+            return 40;
         default:
             return 15;
         }
@@ -147,6 +154,7 @@ public class ProcurementTableModel extends DataTableModel {
     public int getAlignment(int col) {
         switch(col) {
         case COL_COST:
+        case COL_TOTAL_COST:
             return SwingConstants.RIGHT;
         case COL_TARGET:
         case COL_NEXT:

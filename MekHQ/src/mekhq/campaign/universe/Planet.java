@@ -120,6 +120,7 @@ public class Planet implements Serializable {
     private Double y;
 
     // Base data
+    @SuppressWarnings("unused")
     private UUID uniqueIdentifier;
     private String id;
     private String name;
@@ -229,6 +230,7 @@ public class Planet implements Serializable {
     //TreeMap<DateTime, List<String>> garrisonHistory;
 
     /** @deprecated Use "event", which can have any number of changes to the planetary data */
+    @Deprecated
     @XmlElement(name = "factionChange")
     private List<FactionChange> factionChanges;
     // For export and import only (lists are easier than maps) */

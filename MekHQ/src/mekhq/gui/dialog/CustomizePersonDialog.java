@@ -896,7 +896,6 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
             optionComp.addValue(Crew.RANGEMASTER_MEDIUM);
             optionComp.addValue(Crew.RANGEMASTER_LONG);
             optionComp.addValue(Crew.RANGEMASTER_EXTREME);
-            optionComp.addValue(Crew.RANGEMASTER_LOS);
             optionComp.setSelected(option.stringValue());
         } else if (OptionsConstants.MISC_HUMAN_TRO.equals(option.getName())) { //$NON-NLS-1$
             optionComp.addValue(Crew.HUMANTRO_NONE);

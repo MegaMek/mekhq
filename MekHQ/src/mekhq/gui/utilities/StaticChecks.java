@@ -306,6 +306,16 @@ public class StaticChecks {
         return true;
     }
 
+    public static boolean areAllWillingToDefect(Person[] people) {
+        for (Person person : people) {
+            if (!(person.isBondsman() || person.isWillingToDefect())) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     public static boolean areAllWoB(Person[] people) {
         for (Person p : people) {
             if (p.getRankSystem() != Ranks.RS_WOB)

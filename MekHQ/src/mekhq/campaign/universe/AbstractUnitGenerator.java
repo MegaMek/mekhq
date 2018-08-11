@@ -1,6 +1,7 @@
 package mekhq.campaign.universe;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -9,6 +10,8 @@ import java.util.TreeSet;
 
 import megamek.client.RandomUnitGenerator;
 import megamek.common.MechSummary;
+import megamek.common.logging.LogLevel;
+import mekhq.MekHQ;
 import mekhq.campaign.rating.IUnitRating;
 
 /**
@@ -47,6 +50,7 @@ public abstract class AbstractUnitGenerator {
      * @return List of turrets
      */
     public List<MechSummary> generateTurrets(int num, int skill, int quality, int currentYear) {
+        final String METHOD_NAME = "generateTurrets(int, int, int, int)"; //$NON-NLS-1$
         int ratYear = 2500;
         
         // less dirty hack
@@ -74,8 +78,18 @@ public abstract class AbstractUnitGenerator {
             }
         }
         
-        // we don't have rats for *every* year, so we find the nearest previous one.
-        ratYear = turretRatYears.floor(currentYear);
+        // We don't have rats for *every* year, so we find the nearest previous one. If there is no
+        // RAT for the current or previous year, use the earliest available.
+        // If there are no turret RATs, return an empty list
+        if (turretRatYears.isEmpty()) {
+            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.WARNING, "No turrent RATs found."); //$NON-NLS-1$
+            return Collections.emptyList();
+        } else if (currentYear < turretRatYears.first()) {
+            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.WARNING, "Earliest turret RAT is later than campaign year."); //$NON-NLS-1$
+            ratYear = turretRatYears.first();
+        } else {
+            ratYear = turretRatYears.floor(currentYear);
+        }
         
         // now that we have the year, we need to determine which turret RAT we're going to use
         String ratName = turretRatNames.get(ratYear).get(ratRatingMappings.get(quality));

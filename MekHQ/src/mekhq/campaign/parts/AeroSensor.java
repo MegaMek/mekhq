@@ -76,23 +76,62 @@ public class AeroSensor extends Part {
 			hits = ((Aero)unit.getEntity()).getSensorHits();
 			if(checkForDestruction 
 					&& hits > priorHits 
-					&& Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
+					&& (hits < 3 && !campaign.getCampaignOptions().useAeroSystemHits())
+                    && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
 				remove(false);
 				return;
-			}
+			} else if (hits >= 3) {
+                remove(false);
+                return;
+            }
 		}
 	}
 	
 	@Override 
 	public int getBaseTime() {
-		if(isSalvaging()) {
-			return 1200;
-		}
-		return 120;
+	    int time = 0;
+	    Entity e = unit.getEntity();
+        if (campaign.getCampaignOptions().useAeroSystemHits()) {
+            //Test of proposed errata for repair times
+            if (e.hasETypeFlag(Entity.ETYPE_DROPSHIP) || e.hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
+                time = 120;
+            } else {
+                time = 75;
+            }
+            if (hits == 1) {
+                time *= 1;
+            } 
+            if (hits == 2) {
+                time *= 2;
+            }
+            return time;
+        }
+        if (isSalvaging()) {
+            if (e.hasETypeFlag(Entity.ETYPE_DROPSHIP) || e.hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
+                time = 1200;
+            } else {
+                time = 260;
+            }
+        } else {
+            time = 120;
+        }
+		return time;
 	}
 	
 	@Override
 	public int getDifficulty() {
+	    if (campaign.getCampaignOptions().useAeroSystemHits()) {
+            //Test of proposed errata for repair time and difficulty
+            if(isSalvaging()) {
+                return -2;
+            }
+            if (hits == 1) {
+                return -1;
+            } 
+            if (hits == 2) {
+                return 0;
+            }
+        }
 		if(isSalvaging()) {
 			return -2;
 		}

@@ -237,13 +237,15 @@ public class RetirementDefectionDialog extends JDialog {
         	personnelSorter.setSortKeys(sortKeys);
 
         	cbGroupOverview.addActionListener(new ActionListener() {
-        		public void actionPerformed(ActionEvent evt) {
+        		@Override
+                public void actionPerformed(ActionEvent evt) {
         			filterPersonnel(personnelSorter, cbGroupOverview.getSelectedIndex(), false);
         		}
         	});
 
         	personnelTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-        		public void valueChanged(ListSelectionEvent ev) {
+        		@Override
+                public void valueChanged(ListSelectionEvent ev) {
         			if (personnelTable.getSelectedRow() <= 0) {
         				return;
         			}
@@ -325,6 +327,7 @@ public class RetirementDefectionDialog extends JDialog {
         }
         cbUnitCategory.setSelectedIndex(0);
         cbUnitCategory.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent evt) {
                 filterUnits();
             }
@@ -332,6 +335,7 @@ public class RetirementDefectionDialog extends JDialog {
         panTop.add(cbUnitCategory);
         chkShowAllUnits = new JCheckBox("Show All Units");
         chkShowAllUnits.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent evt) {
             	if (chkShowAllUnits.isSelected()) {
             		cbUnitCategory.setSelectedIndex(0);
@@ -355,13 +359,15 @@ public class RetirementDefectionDialog extends JDialog {
     	sortKeys.add(new RowSorter.SortKey(PersonnelTableModel.COL_RANK, SortOrder.DESCENDING));
         retireeSorter.setSortKeys(sortKeys);
         cbGroupResults.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent evt) {
                 filterPersonnel(retireeSorter, cbGroupResults.getSelectedIndex(), true);
             }
         });
 
         retireeTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-			public void valueChanged(ListSelectionEvent ev) {
+			@Override
+            public void valueChanged(ListSelectionEvent ev) {
 				enableAddRemoveButtons();
 				setUnitGroup();
 			}
@@ -407,7 +413,8 @@ public class RetirementDefectionDialog extends JDialog {
         unitAssignmentTable.setIntercellSpacing(new Dimension(0, 0));
         unitAssignmentTable.setShowGrid(false);
         unitAssignmentTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-			public void valueChanged(ListSelectionEvent ev) {
+			@Override
+            public void valueChanged(ListSelectionEvent ev) {
 				enableAddRemoveButtons();
 			}
         });
@@ -505,8 +512,10 @@ public class RetirementDefectionDialog extends JDialog {
 				} else {
 					txtInstructions.setText(resourceMap.getString("txtInstructions.Results.text"));
 				}
-				hqView.getCampaign().getFinances().debit(getTotalBonus(),
-				        Transaction.C_SALARY, "Bonus Payments", hqView.getCampaign().getDate());
+                if (getTotalBonus() > 0) {
+                    hqView.getCampaign().getFinances().debit(getTotalBonus(), Transaction.C_SALARY, "Bonus Payments",
+                            hqView.getCampaign().getDate());
+                }
 			} else if (ev.getSource().equals(btnDone)) {
 				for (UUID pid : ((RetirementTableModel)retireeTable.getModel()).getAltPayout().keySet()) {
 					rdTracker.getPayout(pid).setCbills(((RetirementTableModel)retireeTable.getModel()).getAltPayout().get(pid));

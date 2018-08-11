@@ -97,6 +97,7 @@ import megamek.common.TechConstants;
 import megamek.common.VTOL;
 import megamek.common.Warship;
 import megamek.common.WeaponType;
+import megamek.common.annotations.Nullable;
 import megamek.common.logging.LogLevel;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
@@ -222,6 +223,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     // To be used for transport and cargo reports
     public static final int ETYPE_MOTHBALLED = -9876;
 
+    public static final int TECH_WORK_DAY = 480;
+    
     protected Entity entity;
     private int site;
     private boolean salvaged;
@@ -275,6 +278,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
 
     //for delivery
     protected int daysToArrival;
+    
+    private MothballInfo mothballInfo;
 
     public Unit() {
         this(null, null);
@@ -519,6 +524,20 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     }
 
     /**
+     * Determines if this unit can be serviced.
+     * 
+     * @return <code>true</code> if the unit has parts that are salvageable or in
+     *         need of repair.
+     */
+    public boolean isServiceable() {
+        if (isSalvage() || !isRepairable()) {
+            return hasSalvageableParts();
+        } else {
+            return hasPartsNeedingFixing();
+        }
+    }
+
+    /**
      * Is the given location on the entity destroyed?
      *
      * @param loc
@@ -576,6 +595,26 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     public ArrayList<IPartWork> getPartsNeedingFixing() {
     	return getPartsNeedingFixing(false);
     }
+
+    /**
+     * Determines if this unit has parts in need of repair.
+     * 
+     * @return <code>true</code> if the unit has parts that are in need of repair.
+     */
+    public boolean hasPartsNeedingFixing() {
+        boolean onlyNotBeingWorkedOn = false;
+        for (Part part : parts) {
+            if (part.needsFixing() && isPartAvailableForRepairs(part, onlyNotBeingWorkedOn)) {
+                return true;
+            }
+        }
+        for (PodSpace pod : podSpace) {
+            if (pod.needsFixing() && isPartAvailableForRepairs(pod, onlyNotBeingWorkedOn)) {
+                return true;
+            }
+        }
+        return false;
+    }
     
     public ArrayList<IPartWork> getPartsNeedingFixing(boolean onlyNotBeingWorkedOn) {
         ArrayList<IPartWork> brokenParts = new ArrayList<IPartWork>();
@@ -594,6 +633,26 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
 
     public ArrayList<IPartWork> getSalvageableParts() {
     	return getSalvageableParts(false);
+    }
+
+    /**
+     * Determines if this unit has parts that are salvageable.
+     * 
+     * @return <code>true</code> if the unit has parts that are salvageable.
+     */
+    public boolean hasSalvageableParts() {
+        boolean onlyNotBeingWorkedOn = false;
+        for (Part part : parts) {
+            if (part.isSalvaging() && isPartAvailableForRepairs(part, onlyNotBeingWorkedOn)) {
+                return true;
+            }
+        }
+        for (PodSpace pod : podSpace) {
+            if (pod.hasSalvageableParts() && isPartAvailableForRepairs(pod, onlyNotBeingWorkedOn)) {
+                return true;
+            }
+        }
+        return false;
     }
     
     public ArrayList<IPartWork> getSalvageableParts(boolean onlyNotBeingWorkedOn) {
@@ -1467,6 +1526,11 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     +lastMaintenanceReport
                     +"]]></lastMaintenanceReport>");
         }
+        
+        if(null != mothballInfo) {
+            mothballInfo.writeToXml(pw1, indentLvl);
+        }
+        
         pw1.println(MekHqXmlUtil.indentStr(indentLvl) + "</unit>");
     }
 
@@ -1563,6 +1627,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     retVal.fluffName = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("lastMaintenanceReport")) {
                     retVal.lastMaintenanceReport = wn2.getTextContent();
+                } else if (wn2.getNodeName().equalsIgnoreCase("mothballInfo")) {
+                    retVal.mothballInfo = MothballInfo.generateInstanceFromXML(wn2, version);
                 }
             }
         } catch (Exception ex) {
@@ -2729,7 +2795,22 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         return fileName;
     }
 
-    public Person getCommander() {
+    /**
+     * Determines which crew member is considered the unit commander. For solo-piloted units there is
+     * only one option, but units with multiple crew (vehicles, aerospace vessels, infantry) use the following
+     * criteria:
+     * 1. The highest rank.
+     * 2. If there is more than one with the highest rank, select according to the following order, from
+     *    highest to lowest priority:
+     *    a. vessel crew
+     *    b. gunners
+     *    c. pilots/drivers
+     *    d. hyperspace navigator.
+     * 3. If there is still a tie, take the first one in the crew list. 
+     * 
+     * @return The unit commander, or null if the unit has no crew.
+     */
+    public @Nullable Person getCommander() {
         //take first by rank
         //if rank is tied, take gunners over drivers
         //if two of the same type are tie rank, take the first one
@@ -3154,8 +3235,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         if(!isSelfCrewed()) {
             return;
         }
-        int minutesLeft = 480;
-        int overtimeLeft = 240;
+        int minutesLeft = TECH_WORK_DAY;
+        int overtimeLeft = TECH_WORK_DAY / 2;
         int edgeLeft = 0;
         boolean breakpartreroll = true;
         boolean failrefitreroll = true;
@@ -3591,6 +3672,26 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         return crew;
     }
 
+    public ArrayList<UUID> getDriverIDs() {
+        return drivers;
+    }
+    
+    public ArrayList<UUID> getGunnerIDs() {
+        return gunners;
+    }
+    
+    public ArrayList<UUID> getVesselCrewIDs() {
+        return vesselCrew;
+    }
+    
+    public UUID getTechOfficerID() {
+        return techOfficer;
+    }
+
+    public UUID getNavigatorID() {
+        return navigator;
+    }
+    
     public Person getTech() {
         if(null != engineer) {
             return engineer;
@@ -3632,10 +3733,20 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         } else {
             //start maintenance cycle over again
             resetDaysSinceMaintenance();
+            
+            // if we previously mothballed this unit, attempt to restore its pre-mothball state
+            if(mothballInfo != null) {
+                mothballInfo.restorePreMothballInfo(this, campaign);
+                mothballInfo = null;
+            }
         }
     }
 
     public void startMothballing(UUID id) {
+        if(!isMothballed()) {
+            mothballInfo = new MothballInfo(this);
+        }
+        
         //set this person as tech
         if(!isSelfCrewed() && null != tech && !tech.equals(id)) {
             if(null != getTech()) {
@@ -3651,15 +3762,15 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         }
         //set mothballing time
         if(getEntity() instanceof Infantry) {
-            mothballTime = 480;
+            mothballTime = TECH_WORK_DAY;
         }
         else if(getEntity() instanceof Dropship || getEntity() instanceof Jumpship) {
-            mothballTime = 480 * (int)Math.ceil(getEntity().getWeight()/500.0);
+            mothballTime = TECH_WORK_DAY * (int)Math.ceil(getEntity().getWeight()/500.0);
         } else {
             if(isMothballed()) {
-                mothballTime = 480;
+                mothballTime = TECH_WORK_DAY;
             } else {
-                mothballTime = 960;
+                mothballTime = TECH_WORK_DAY * 2;
             }
         }
         campaign.mothball(this);
@@ -3726,8 +3837,19 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         return false;
     }
 
+    /**
+     * Checks whether a person is considered the commander of this unit.
+     * 
+     * @param person A <code>Person</code> in the campaign. The person need not be assigned to the unit as
+     *               crew, in which case the return value will be false.
+     * @return       Whether the person is considered the unit commander. If <code>person</code> is null or
+     *               the unit has no crew, this method will return false
+     * 
+     * @see {@link #getCommander()}
+     */
     public boolean isCommander(Person person) {
-        return person.getId().equals(getCommander().getId());
+        Person commander = getCommander();
+        return (null != person) && (null != commander) && person.getId().equals(commander.getId());
     }
 
     public boolean isNavigator(Person person) {
@@ -3786,7 +3908,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         return oldId;
     }
 
-    public void fixIdReferences(Hashtable<Integer, UUID> uHash, Hashtable<Integer, UUID> peopleHash) {
+    public void fixIdReferences(Map<Integer, UUID> uHash, Map<Integer, UUID> peopleHash) {
         for(int oid : oldDrivers) {
             UUID nid = peopleHash.get(oid);
             if(null != nid) {

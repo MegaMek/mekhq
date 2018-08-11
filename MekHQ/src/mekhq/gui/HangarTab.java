@@ -527,7 +527,7 @@ public final class HangarTab extends CampaignGuiTab {
                 selectedUUID = u.getId();
             }
         }
-        unitModel.setData(getCampaign().getUnits());
+        unitModel.setData(getCampaign().getCopyOfUnits());
         // try to put the focus back on same person if they are still available
         for (int row = 0; row < unitTable.getRowCount(); row++) {
             Unit u = unitModel.getUnit(unitTable.convertRowIndexToModel(row));

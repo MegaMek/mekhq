@@ -1,9 +1,117 @@
 VERSION HISTORY:
 ----------------
-v0.43.10-git
-+ Issue #639: Campaign Ops rating now properly reflects infantry skill and more accurately calculates combat unit transport capacity
+v0.45.1-git
++ Issue #814: Fixed AtB morale calculation to match AtB rules
++ Fixed JAR packaging error that made personnel market methods inaccessible.
 
-v0.43.9-RC3
+v0.45.0 (2018-08-02 0200 UTC)
++ PR #602: Add KIA checkbox and functionality to prisoners during scenario resolution.
++ Issue #308: Can now change contract payment multiplier when manually creating a new contract.
++ PR #741: Updated configuration presets for new campaigns to include new special pilot abilities.
++ Issue #445: Lengthy repairs now show the unit's name if the repair runs over more than one day.
++ PR #742: Errata - Range Master SPA no longer applicable to LOS range
++ Issue #384: Cannot negotiate contract terms because the game selects the highest skilled admin
+        and not the one with the negotiating skill
++ PR #766: [Feature] Added balance-over-time and revenue/expenditure charts to finances tab
++ PR #769: [Feature] Added tooltips to tonnage labels on force view when AtB is enabled.
++ PR #760: [Feature] Allow the user to introduce a modifier to the contract score of an AtB contract
++ PR #762: [Feature] Addresses RFE #515, by allowing 'export finances' as a CSV. Various minor fixes to other export mechanisms.
++ PR #762: Help -> About popup now contains link to MegaMek github home page.
++ PR #777: Addresses issue #776, by allowing the user to order up to a 1000 of some part or personnel class at a time, up from 100 previously.
++ PR #787: Adds total value for parts and fixes issue with net worth calculation for parts
++ Show java version and system info in log file.
++ PR #640: [Feature] Experimental aerospace equipment damage and repair times errata (aerospace equipment is damaged based on how many hits it has taken and repairs don't take an order of magnitude longer than mech equipment repairs)
++ PR #758: Start of MekHQ plugin system
+		Currently includes support for external plugin for alternate personnel market methods.
+		See documentation in docs/plugins.txt.
++ PR #800: Correctly calculate admin costs for government forces per Campaign Ops rules.
++ PR #804: Two fixes to GM mode finances -> edit transaction
++ PR #801: [Feature] Personnel awards
++ PR #799: [Feature] Optional "Pay for Repairs" per Campaign Ops, page 140
++ Issue #773: Fix text color for person text in Personnel and Hangar "Graphic" views
++ Issue #549: Allow AtB-style prisoner ransom for prisoners even if the AtB option isn't enabled
++ Issue #819: Dropshop Baydoor unrepairable
++ Issue #796: LAM Pilot shows as Support in Personnel Breakdown
++ PR #821: Fix occasional issue where mechwarrior names with apostrophes and other "funny" characters would show up weird for completed scenarios.
++ PR #823: Fix for adding phantom heat sinks when restoring aerospace unit
++ Issue #824: Post game salvage/prisoners didn't show up.
++ Issue #729: Fix for 'adjust contract pay' calculating number of required lances at the wrong time.
++ PR #831: Fix two bugs in Edit Injuries dialog
+		Advanced medical: remove injury and change injury types choices when location changes.
++ PR #823: Feature: Damage pilots from GM mode (non-advanced medical) 
++ PR #811: [Feature]: Mass mothball/reactivate. Reactivating now does its best to restore the unit's force/crew/tech assignments.
++ Issue #830: [Feature]: GM Mode "Strip Unit". Takes all parts off the given unit(s) and place them in the warehouse.
++ Issue #775: [Feature]: Daily Log History. Retains 'daily log' entries for up to 120 days when turned on. Entry history is cleared when the user exits the program.
++ Issue #834: Partial fix - mechs with "messed up" ammo bins will no longer eat the player's ammo. As a workaround, when you encounter such a case gm-remove the unit and add a fresh one.
+
+v0.44.0 (2018-06-24 1900 UTC)
++ Issue #733: Clan techs still have clan penalties to maintenance
++ Issue #745: NPE at AbstractUnitGenerator.generateTurrets
++ PR #752: AtB contracts will once again nag the user about insufficient force deployment, and subtract contract score.
+		Also, retirement "payouts" of 0 no longer persist endlessly.
++ Issue #748: GM -> Restore Unit on units with missing components no longer hangs MekHQ in an endless loop.
++ Issue #694: Added missing Draconis Combine ranks.
++ Issue #724: Changed references to megamek.info to point to megamek.org
++ PR #761: Fix for salvaging dropship ammo
++ Updated MegaMek.jar to v0.44.0
++ Updated MegaMekLab.jar to v0.44.0
+
+v0.43.11-RC5 (2018-06-04 0100 UTC)
++ PR #707: Added MissingOmniPod class needed for acquisition.
++ PR #709: Fix for #704: NPE when bringing up the refit dialog
++ PR #715: Fix for #718: Unit.isCommander Error
+	Correctly handle check for unit commander if unit has no crew.
++ PR #720: Fix for issue #353 [ATB] Special mission - SL mech piloted by Tech Mech is VETERAN and not GREEN
++ PR #721: Fix for issue #631 [0.43.7-RC1] Battlefield control observation missing from special missions
++ PR #712: Fix for issue #708 [0.43.10-RC4 : Bug] Old Contacts Appearing in Deployment Requirements
+	Fix for issue #706 ArrayIndexOutOfBoundsException in BaseAttackBuiltInScenario
+	Fix for most cases of issue #695 Base Attack (Defense) mission generate with no Allies or OpFor in AtB and
+	#674 AtB fails to generate opfor 
+	The only exception being if the opfor has no RAT for the current contract date, which will be addressed in a separate PR.
++ PR #725: Fix for issue #714 0.43.2 Migration to 0.43.9 causes Phantom Personel in Unit Breakdown
++ PR #726: Fix issue #600 and #621 where inner sphere prisoners were being converted to trueborn warriors and clanners were being
+	turned into freebirths
++ PR #723: If GM-generate contract fails to generate contracts, an message is output to the daily log instead of failing silently
++ Added Rasalhague Dominion to playable factions list
++ PR #737: Allow the user to enter non-canon names into the location textbox when editing a mission/contract
++ Data: Updating Mechfiles, RATs, and Images in MekHQ repo to match Megamek ones.
++ PR #738: Fix for issue #731 [43.10 AtB] contracts become uncompleted
+
+v0.43.10-RC4 (2018-04-18 18:00 UTC)
++ PR #670: Adjusted unit rating calculation and infantry counts
+	Fixes issue #639: CO calculates Infantry Skill Level Incorrectly
+	Campaign Ops rating now properly reflects infantry skill and more accurately calculates combat unit transport capacity
++ PR #689: Make Endo Steel crits work correctly again
+	Fixes issue #688: Cannot slot Endo Steel crits
++ PR #690: Add missing OmniPod for some parts
+	Fixes issue #668: Empty heat sink/double heat sink omnipods not available for Purchase Parts
++ Updated faction-change info from Reunification for Canopus
++ Bugfix: Can't mass recruit prisoners who are willing to defect
++ Fix weird behavior with person panel when the crew size is > 1 and other conditions are met
++ PR #697: Process exploded units for prisoner capture
+	Fixes issue #531: Destroyed Units not generating crews for Capture/Prisoner
++ PR #676: Fix variable weight
+	Fixes issue #675: Save/Load Game Does Not Properly Track Weight EquipmentParts
++ PR #692: Implement SPA import from MUL
+	Fixes issue #108: Import from MUL Option Does Not Seem to Load Saved Abilities
++ PR #678: Too long popup lists
+	Fixes issue where popup menus could get extremely long
+	This is only a partial fix, and adding the methods that can be used to fix it elsewhere
++ PR #699: New day cleanup
+	Fixes issue #698: Income/Expenses Processed in wrong order
++ PR #700: Handle large craft unit values again
+	Fixes issue #680: Contract payment based on Large Craft unit value does not appear to work
++ PR #673: Implement ability to acquire ammo in parts acquisition dialog via GM Mode
+	Fixes issue #698: Unable to GM Acquire clan ammo
++ PR #701: Update Mission.planetName to Mission.planetId for consistency
+	Fixes issue #328: If you accept a contract on Taussen, the game teleports you back to Terra once you arrive
++ PR #802: Fix the campaign level planet pt. 2
+	The rest of the fix for issue #328
++ PR #703: Make payroll monthly again, whups
+	Fixes bug where payroll was accidentally made daily
++ Fix ATB adds 0 value transactions to the finance logs
+
+v0.43.9-RC3 (2018-03-13 18:00 UTC)
 + Issue #647: Exception Causing UI Issues while Unit is Being Refit
 + Issue #655: Mechs (and probably other units) whose crews ejected will be able to deploy on subsequent missions
 + Updated faction-change info for FWL using Handbook Marik

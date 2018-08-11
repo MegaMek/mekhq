@@ -31,6 +31,7 @@ import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.PartInventory;
 import mekhq.campaign.work.IAcquisitionWork;
 
 /**
@@ -230,8 +231,8 @@ public class BattleArmorAmmoBin extends AmmoBin implements IAcquisitionWork {
         toReturn += ">";
         toReturn += "<b>" + getAcquisitionDisplayName() + "</b> " + getAcquisitionBonus() + "<br/>";
         toReturn += getAcquisitionExtraDesc() + "<br/>";
-        String[] inventories = campaign.getPartInventory(getAcquisitionPart());
-        toReturn += inventories[1] + " in transit, " + inventories[2] + " on order<br>"; 
+        PartInventory inventories = campaign.getPartInventory(getAcquisitionPart());
+        toReturn += inventories.getTransitOrderedDetails() + "<br/>"; 
         toReturn += Utilities.getCurrencyString(getBuyCost()) + "<br/>";
         toReturn += "</font></html>";
         return toReturn;

@@ -115,7 +115,7 @@ public class CampaignOptions implements Serializable {
 
     //personnel market related
     private boolean personnelMarketReportRefresh;
-    private int personnelMarketType;
+    private String personnelMarketName;
     private int personnelMarketRandomEliteRemoval;
     private int personnelMarketRandomVeteranRemoval;
     private int personnelMarketRandomRegularRemoval;
@@ -140,6 +140,7 @@ public class CampaignOptions implements Serializable {
 
     //finance related
     private boolean payForParts;
+    private boolean payForRepairs;
     private boolean payForUnits;
     private boolean payForSalaries;
     private boolean payForRecruitment;
@@ -206,6 +207,7 @@ public class CampaignOptions implements Serializable {
 	private boolean assignedTechFirst;
 	private boolean resetToFirstTech;
 	private int destroyPartTarget;
+	private boolean useAeroSystemHits;
 
     //maintenance related
     private boolean checkMaintenance;
@@ -295,6 +297,9 @@ public class CampaignOptions implements Serializable {
     private boolean massRepairUseAssignedTechsFirst;
     private boolean massRepairReplacePod;
     private List<MassRepairOption> massRepairOptions;
+    
+    //Miscellaneous
+    private boolean historicalDailyLog;
 
     public CampaignOptions() {
         clanPriceModifier = 1.0;
@@ -317,6 +322,7 @@ public class CampaignOptions implements Serializable {
         useDylansRandomXp = false;
         useQuirks = false;
         payForParts = false;
+        payForRepairs = false;
         payForUnits = false;
         payForSalaries = false;
         payForRecruitment = false;
@@ -395,6 +401,7 @@ public class CampaignOptions implements Serializable {
         destroyByMargin = false;
         destroyMargin = 4;
         destroyPartTarget = 10;
+        useAeroSystemHits = false;
         maintenanceCycleDays = 7;
         maintenanceBonus = -1;
         useQualityMaintenance = true;
@@ -413,7 +420,7 @@ public class CampaignOptions implements Serializable {
         capturePrisoners = true;
         defaultPrisonerStatus = PRISONER_RANK;
         personnelMarketReportRefresh = true;
-        personnelMarketType = PersonnelMarket.TYPE_STRAT_OPS;
+        personnelMarketName = PersonnelMarket.getTypeName(PersonnelMarket.TYPE_STRAT_OPS);
         personnelMarketRandomEliteRemoval = 10;
         personnelMarketRandomVeteranRemoval = 8;
         personnelMarketRandomRegularRemoval = 6;
@@ -522,6 +529,8 @@ public class CampaignOptions implements Serializable {
         for (int i = 0; i < MassRepairOption.VALID_REPAIR_TYPES.length; i++) {
         	massRepairOptions.add(new MassRepairOption(MassRepairOption.VALID_REPAIR_TYPES[i]));
         }
+        
+        historicalDailyLog = false;
    }
 
     public UnitRatingMethod getUnitRatingMethod() {
@@ -743,12 +752,12 @@ public class CampaignOptions implements Serializable {
         personnelMarketReportRefresh = b;
     }
 
-    public int getPersonnelMarketType() {
-        return personnelMarketType;
+    public String getPersonnelMarketType() {
+        return personnelMarketName;
     }
 
-    public void setPersonnelMarketType(int t) {
-        personnelMarketType = t;
+    public void setPersonnelMarketType(String t) {
+        personnelMarketName = t;
     }
 
     public int getPersonnelMarketRandomEliteRemoval() {
@@ -805,6 +814,14 @@ public class CampaignOptions implements Serializable {
 
     public void setPayForParts(boolean b) {
         this.payForParts = b;
+    }
+
+    public boolean payForRepairs() {
+        return payForRepairs;
+    }
+
+    public void setPayForRepairs(boolean b) {
+        this.payForRepairs = b;
     }
 
     public boolean payForUnits() {
@@ -1167,6 +1184,14 @@ public class CampaignOptions implements Serializable {
         adminXPPeriod = m;
     }
     
+    public boolean historicalDailyLog() {
+        return historicalDailyLog;
+    }
+    
+    public void setHistoricalDailyLog(boolean b) {
+        this.historicalDailyLog = b;
+    }
+    
     public int getEdgeCost() {
         return edgeCost;
     }
@@ -1413,6 +1438,14 @@ public class CampaignOptions implements Serializable {
 
     public void setDestroyPartTarget(int d) {
         destroyPartTarget = d;
+    }
+    
+    public boolean useAeroSystemHits() {
+        return useAeroSystemHits;
+    }
+
+    public void setUseAeroSystemHits(boolean b) {
+        useAeroSystemHits = b;
     }
 
     public boolean useRandomHitsForVees() {
@@ -2072,6 +2105,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useDylansRandomXp", useDylansRandomXp);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useQuirks", useQuirks);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "payForParts", payForParts);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "payForRepairs", payForRepairs);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "payForUnits", payForUnits);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "payForSalaries", payForSalaries);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "payForOverhead", payForOverhead);
@@ -2141,6 +2175,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "destroyByMargin", destroyByMargin);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "destroyMargin", destroyMargin);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "destroyPartTarget", destroyPartTarget);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useAeroSystemHits", useAeroSystemHits);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "maintenanceCycleDays", maintenanceCycleDays);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "maintenanceBonus", maintenanceBonus);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useQualityMaintenance", useQualityMaintenance);
@@ -2158,7 +2193,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useTimeInService", useTimeInService);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "capturePrisoners", capturePrisoners);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "defaultPrisonerStatus", defaultPrisonerStatus);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "personnelMarketType", personnelMarketType);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "personnelMarketName", personnelMarketName);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "personnelMarketRandomEliteRemoval",
                                        personnelMarketRandomEliteRemoval);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "personnelMarketRandomVeteranRemoval",
@@ -2226,6 +2261,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "allowOpforLocalUnits", allowOpforLocalUnits);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "opforAeroChance", opforAeroChance);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "opforLocalUnitChance", opforLocalUnitChance);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "historicalDailyLog", historicalDailyLog);
 
         //Mass Repair/Salvage Options
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "massRepairUseExtraTime", massRepairUseExtraTime);
@@ -2353,6 +2389,8 @@ public class CampaignOptions implements Serializable {
                 retVal.useQuirks = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("payForParts")) {
                 retVal.payForParts = Boolean.parseBoolean(wn2.getTextContent());
+            } else if (wn2.getNodeName().equalsIgnoreCase("payForRepairs")) {
+                retVal.payForRepairs = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("payForUnits")) {
                 retVal.payForUnits = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("payForSalaries")) {
@@ -2549,7 +2587,9 @@ public class CampaignOptions implements Serializable {
                 retVal.destroyMargin = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("destroyPartTarget")) {
                 retVal.destroyPartTarget = Integer.parseInt(wn2.getTextContent().trim());
-            }else if (wn2.getNodeName().equalsIgnoreCase("maintenanceCycleDays")) {
+            } else if (wn2.getNodeName().equalsIgnoreCase("useAeroSystemHits")) {
+                retVal.useAeroSystemHits = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("maintenanceCycleDays")) {
                 retVal.maintenanceCycleDays = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("maintenanceBonus")) {
                 retVal.maintenanceBonus = Integer.parseInt(wn2.getTextContent().trim());
@@ -2584,7 +2624,10 @@ public class CampaignOptions implements Serializable {
             } else if (wn2.getNodeName().equalsIgnoreCase("useRandomHitsForVees")) {
                 retVal.useRandomHitsForVees = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketType")) {
-                retVal.personnelMarketType = Integer.parseInt(wn2.getTextContent().trim());
+                // Legacy
+                retVal.personnelMarketName = PersonnelMarket.getTypeName(Integer.parseInt(wn2.getTextContent().trim()));
+            } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketName")) {
+                retVal.personnelMarketName = wn2.getTextContent().trim();
             } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketRandomEliteRemoval")) {
                 retVal.personnelMarketRandomEliteRemoval = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketRandomVeteranRemoval")) {
@@ -2717,6 +2760,8 @@ public class CampaignOptions implements Serializable {
                 retVal.opforAeroChance = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("opforLocalUnitChance")) {
                 retVal.opforLocalUnitChance = Integer.parseInt(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("historicalDailyLog")) {
+                retVal.historicalDailyLog = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("rats")) {
             	retVal.rats = MekHqXmlUtil.unEscape(wn2.getTextContent().trim()).split(",");
             } else if (wn2.getNodeName().equalsIgnoreCase("staticRATs")) {

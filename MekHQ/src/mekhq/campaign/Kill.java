@@ -25,7 +25,7 @@ import java.io.PrintWriter;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Hashtable;
+import java.util.Map;
 import java.util.UUID;
 
 import org.w3c.dom.Node;
@@ -155,7 +155,7 @@ public class Kill implements Serializable {
 		
 	}
 	
-	public void fixIdReferences(Hashtable<Integer, UUID> pHash) {
+	public void fixIdReferences(Map<Integer, UUID> pHash) {
     	pilotId = pHash.get(oldPilotId);
     }
 	

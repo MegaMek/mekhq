@@ -23,9 +23,10 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 import java.io.Serializable;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Hashtable;
+import java.util.Map;
 import java.util.StringJoiner;
 import java.util.UUID;
 
@@ -186,7 +187,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 
 	//all parts need a reference to campaign
 	protected Campaign campaign;
-	
+		
 	/*
 	 * This will be unusual but in some circumstances certain parts will be linked to other parts.
 	 * These linked parts will be considered integral and subsidary to those other parts and will
@@ -948,10 +949,10 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	        }
 	    }
 	    if(isClanTechBase() || (this instanceof MekLocation && this.getUnit() != null && this.getUnit().getEntity().isClan())) {
-	        if (campaign.getPerson(getTeamId()) == null) {
+	        if (unit.getTech() == null) {
 	            mods.addModifier(2, "Clan tech");
-	        } else if (!campaign.getPerson(getTeamId()).isClanner()
-                    && !campaign.getPerson(getTeamId()).getOptions().booleanOption(PersonnelOptions.TECH_CLAN_TECH_KNOWLEDGE)) {
+	        } else if (!unit.getTech().isClanner()
+                    && !unit.getTech().getOptions().booleanOption(PersonnelOptions.TECH_CLAN_TECH_KNOWLEDGE)) {
 	            mods.addModifier(2, "Clan tech");
 	        }
 	    }
@@ -1029,10 +1030,17 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	@Override
 	public void fix() {
 		hits = 0;
-		skillMin = SkillType.EXP_GREEN;
+		resetRepairSettings();
+	}
+
+    /**
+     * Sets minimum skill, shorthanded mod, and rush job/extra time setting to defaults.
+     */
+    public void resetRepairSettings() {
+        skillMin = SkillType.EXP_GREEN;
 		shorthandedMod = 0;
 		mode = WorkTime.NORMAL;
-	}
+    }
 
 	@Override
 	public String fail(int rating) {
@@ -1063,6 +1071,11 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	        sj.add("OmniPod");
 	    }
         sj.add(hits + " hit(s)");
+        if (campaign.getCampaignOptions().payForRepairs() && (hits > 0)) {
+            int repairCost = (int) (getStickerPrice() * .2);
+            DecimalFormat numFormatter = new DecimalFormat();
+            sj.add(numFormatter.format(repairCost) + " C-bills to repair");
+        }
         return sj.toString();
     }
 	
@@ -1072,9 +1085,9 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	 * @param inventories The inventory array, see campaign.getInventory() for details.
 	 * @return Human readable string.
 	 */
-	public String getOrderTransitStringForDetails(String[] inventories) {
-        String inTransitString = inventories[1].startsWith("0 ") ? "" : inventories[1] + " in transit";
-        String onOrderString = inventories[2].startsWith("0 ") ? "" : inventories[2] + " on order";
+	public String getOrderTransitStringForDetails(PartInventory inventories) {
+        String inTransitString = inventories.getTransit() == 0 ? "" : inventories.transitAsString() + " in transit";
+        String onOrderString = inventories.getOrdered() == 0 ? "" : inventories.orderedAsString() + " on order";
         String transitOrderSeparator = inTransitString.length() > 0 && onOrderString.length() > 0 ? ", " : "";
         String orderTransitString = (inTransitString.length() > 0 || onOrderString.length() > 0) ? 
                 String.format("(%s%s%s)", inTransitString, transitOrderSeparator, onOrderString) : "";
@@ -1181,7 +1194,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 		return teamId != null;
 	}
 
-	public void fixIdReferences(Hashtable<Integer, UUID> uHash, Hashtable<Integer, UUID> pHash) {
+	public void fixIdReferences(Map<Integer, UUID> uHash, Map<Integer, UUID> pHash) {
     	unitId = uHash.get(oldUnitId);
     	refitId = uHash.get(oldRefitId);
     	teamId = pHash.get(oldTeamId);
