@@ -2244,6 +2244,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 MekHQ.getLogger().log(getClass(), METHOD_NAME, ex);
             }
             behaviorSettings.setRetreatEdge(CardinalEdge.NEAREST_OR_NONE);
+            behaviorSettings.setDestinationEdge(CardinalEdge.NEAREST_OR_NONE);
         }
 
         /* Convert from MM's Board to Princess's HomeEdge */

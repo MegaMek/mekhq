@@ -42,7 +42,11 @@ public class PrincessBehaviorDialog extends BotConfigDialog implements ActionLis
 	public PrincessBehaviorDialog(JFrame parent, BehaviorSettings princessBehavior, String name) {
 	    super(parent, null);
 	    
-	    this.princessBehavior = princessBehavior;
+	    try {
+	        this.princessBehavior = princessBehavior.getCopy();
+	    } catch(Exception e) {
+	        handleError("PrincessBehaviorDialog", e);
+	    }
 	    this.setName(name);
 	    
 	    this.nameField.setText(name);
@@ -52,7 +56,7 @@ public class PrincessBehaviorDialog extends BotConfigDialog implements ActionLis
 	public BehaviorSettings getBehaviorSettings() {
 		return princessBehavior;
 	}
-
+	
     private void getPrincessFields() {
         LogLevel logLevel = LogLevel.getLogLevel((String) verbosityCombo.getSelectedItem());
         if (null != logLevel) {
