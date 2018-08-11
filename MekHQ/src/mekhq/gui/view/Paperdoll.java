@@ -60,8 +60,14 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlValue;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Source;
+
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 import mekhq.MekHQ;
+import mekhq.MekHqXmlUtil;
 import mekhq.campaign.personnel.BodyLocation;
 import mekhq.gui.utilities.MultiplyComposite;
 
@@ -105,12 +111,13 @@ public class Paperdoll extends Component {
         enableEvents(AWTEvent.MOUSE_EVENT_MASK | AWTEvent.MOUSE_MOTION_EVENT_MASK);
     }
     
-    public void loadShapeData(InputStream is) throws JAXBException {
+    public void loadShapeData(InputStream is) throws JAXBException, SAXException, ParserConfigurationException {
         final String METHOD_NAME = "loadShapeData(InputStream)"; //$NON-NLS-1$
         
         JAXBContext context = JAXBContext.newInstance(OverlayLocDataList.class, OverlayLocData.class);
         Unmarshaller unmarshaller = context.createUnmarshaller();
-        OverlayLocDataList dataList = (OverlayLocDataList) unmarshaller.unmarshal(is);
+        Source inputSource = MekHqXmlUtil.createSafeXmlSource(new InputSource(is));
+        OverlayLocDataList dataList = (OverlayLocDataList) unmarshaller.unmarshal(inputSource);
         if(null != dataList.locs) {
             dataList.locs.forEach(data -> {
                 locShapes.put(data.loc, data.genPath());
