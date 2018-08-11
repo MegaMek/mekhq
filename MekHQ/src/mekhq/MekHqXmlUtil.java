@@ -41,6 +41,7 @@ import megamek.common.util.StringUtil;
 
 public class MekHqXmlUtil {
 	private static DocumentBuilderFactory DOCUMENT_BUILDER_FACTORY;
+	private static DocumentBuilderFactory UNSAFE_DOCUMENT_BUILDER_FACTORY;
 
 	/**
 	 * Creates a DocumentBuilder safe from XML external entities
@@ -62,6 +63,40 @@ public class MekHqXmlUtil {
 			dbf.setFeature(FEATURE, true);
 
 			DOCUMENT_BUILDER_FACTORY = dbf;
+		}
+
+		return dbf.newDocumentBuilder();
+	}
+
+	/**
+	 * USE WITH CARE. Creates a DocumentBuilder safe from XML external entities
+	 * attacks, but unsafe from XML entity expansion attacks.
+	 * @return A DocumentBuilder less safe to use to read untrusted XML.
+	 */
+	public static DocumentBuilder newUnsafeDocumentBuilder() throws ParserConfigurationException {
+		DocumentBuilderFactory dbf = UNSAFE_DOCUMENT_BUILDER_FACTORY;
+		if (null == dbf) {
+			// At worst we may do this twice if multiple threads
+			// hit this method. It is Ok to have more than one
+			// instance of the builder factory, as long as it is
+			// XXE safe.
+			dbf = DocumentBuilderFactory.newInstance();
+			dbf.setXIncludeAware(false);
+			dbf.setExpandEntityReferences(false);
+
+			// Disable external entities
+			String FEATURE = "http://xml.org/sax/features/external-general-entities";
+			dbf.setFeature(FEATURE, false);
+
+			// Disable external parameters
+			FEATURE = "http://xml.org/sax/features/external-parameter-entities";
+       		dbf.setFeature(FEATURE, false);
+ 
+       		// Disable external DTDs as well
+       		FEATURE = "http://apache.org/xml/features/nonvalidating/load-external-dtd";
+       		dbf.setFeature(FEATURE, false);
+
+			UNSAFE_DOCUMENT_BUILDER_FACTORY = dbf;
 		}
 
 		return dbf.newDocumentBuilder();
