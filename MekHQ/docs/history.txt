@@ -4,6 +4,7 @@ v0.45.1-git
 + Issue #814: Fixed AtB morale calculation to match AtB rules
 + Fixed JAR packaging error that made personnel market methods inaccessible.
 + Issue #860: Fixed concurrent modification exception during campaign load if units unsalvageable and should be removed.
++ Feature: display a tech's XP on the repair tab and doctor's XP on the infirmary tab.
 
 v0.45.0 (2018-08-02 0200 UTC)
 + PR #602: Add KIA checkbox and functionality to prisoners during scenario resolution.
