@@ -31,7 +31,6 @@ import java.util.Map;
 import java.util.Vector;
 
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -444,14 +443,12 @@ public class SpecialAbility implements MekHqXmlSerializable {
         edgeTriggers = new Hashtable<>();
         implants = new Hashtable<>();
 
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         Document xmlDoc = null;
-
 
         try {
             FileInputStream fis = new FileInputStream("data/universe/defaultspa.xml");
             // Using factory get an instance of document builder
-            DocumentBuilder db = dbf.newDocumentBuilder();
+            DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
 
             // Parse using builder to get DOM representation of the XML file
             xmlDoc = db.parse(fis);

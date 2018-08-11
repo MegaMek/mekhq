@@ -35,7 +35,6 @@ import java.util.HashSet;
 import java.util.TreeSet;
 
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
@@ -46,6 +45,7 @@ import org.w3c.dom.NodeList;
 import megamek.common.Compute;
 import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
+import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
 import mekhq.campaign.CampaignOptions;
 
@@ -204,12 +204,12 @@ public class RandomFactionGenerator implements Serializable {
 	    
 	    MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO,
 	            "Starting load of faction hint data from XML..."); //$NON-NLS-1$
-		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+
 		Document xmlDoc = null;
 		
 		try {
 			FileInputStream fis = new FileInputStream("data/universe/factionhints.xml"); //$NON-NLS-1$
-			DocumentBuilder db = dbf.newDocumentBuilder();
+			DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
 	
 			xmlDoc = db.parse(fis);
 		} catch (Exception ex) {

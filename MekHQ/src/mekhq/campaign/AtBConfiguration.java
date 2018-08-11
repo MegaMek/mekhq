@@ -34,7 +34,6 @@ import java.util.ResourceBundle;
 import java.util.function.Function;
 
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -48,6 +47,7 @@ import megamek.common.TargetRoll;
 import megamek.common.UnitType;
 import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
+import mekhq.MekHqXmlUtil;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.rating.IUnitRating;
@@ -352,12 +352,10 @@ public class AtBConfiguration implements Serializable {
         MekHQ.getLogger().log(AtBConfiguration.class, METHOD_NAME, LogLevel.INFO,
                 "Starting load of AtB configuration data from XML..."); //$NON-NLS-1$
 
-		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		Document xmlDoc = null;
-		
 		try {
 			FileInputStream fis = new FileInputStream("data/universe/atbconfig.xml");
-			DocumentBuilder db = dbf.newDocumentBuilder();
+			DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
 	
 			xmlDoc = db.parse(fis);
 		} catch (FileNotFoundException ex) {

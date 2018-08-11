@@ -40,7 +40,6 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.joda.time.DateTime;
 import org.w3c.dom.DOMException;
@@ -52,6 +51,7 @@ import org.w3c.dom.NodeList;
 import megamek.common.EquipmentType;
 import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
+import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.Part;
@@ -358,13 +358,12 @@ public class Faction {
         // Initialize variables.
         factions = new HashMap<>();
         factionIdMap = new HashMap<>();
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        Document xmlDoc = null;
 
+        Document xmlDoc = null;
 
         try(FileInputStream fis = new FileInputStream("data/universe/factions.xml")) {
             // Using factory get an instance of document builder
-            DocumentBuilder db = dbf.newDocumentBuilder();
+            DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
 
             // Parse using builder to get DOM representation of the XML file
             xmlDoc = db.parse(fis);

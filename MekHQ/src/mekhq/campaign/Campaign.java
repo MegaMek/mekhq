@@ -55,7 +55,6 @@ import java.util.concurrent.TimeUnit;
 
 import javax.swing.JOptionPane;
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.joda.time.DateTime;
 import org.w3c.dom.DOMException;
@@ -3746,12 +3745,12 @@ public class Campaign implements Serializable, ITechManager {
         // Initialize variables.
         Campaign retVal = new Campaign();
         retVal.app = app;
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+
         Document xmlDoc = null;
 
         try {
             // Using factory get an instance of document builder
-            DocumentBuilder db = dbf.newDocumentBuilder();
+            DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
 
             // Parse using builder to get DOM representation of the XML file
             xmlDoc = db.parse(fis);

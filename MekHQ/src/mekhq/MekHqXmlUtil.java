@@ -8,6 +8,10 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Vector;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
@@ -36,6 +40,33 @@ import megamek.common.logging.LogLevel;
 import megamek.common.util.StringUtil;
 
 public class MekHqXmlUtil {
+	private static DocumentBuilderFactory DOCUMENT_BUILDER_FACTORY;
+
+	/**
+	 * Creates a DocumentBuilder safe from XML external entities
+	 * attacks, and XML entity expansion attacks.
+	 * @return A DocumentBuilder safe to use to read untrusted XML.
+	 */
+	public static DocumentBuilder newSafeDocumentBuilder() throws ParserConfigurationException {
+		DocumentBuilderFactory dbf = DOCUMENT_BUILDER_FACTORY;
+		if (null == dbf) {
+			// At worst we may do this twice if multiple threads
+			// hit this method. It is Ok to have more than one
+			// instance of the builder factory, as long as it is
+			// XXE safe.
+			dbf = DocumentBuilderFactory.newInstance();
+			dbf.setXIncludeAware(false);
+			dbf.setExpandEntityReferences(false);
+
+			String FEATURE = "http://apache.org/xml/features/disallow-doctype-decl";
+			dbf.setFeature(FEATURE, true);
+
+			DOCUMENT_BUILDER_FACTORY = dbf;
+		}
+
+		return dbf.newDocumentBuilder();
+	}
+
 	public static void writeSimpleXmlTag(PrintWriter pw1, int indent, String name, String val) {
 		for (int x=0; x<indent; x++)
 			pw1.print("\t");
