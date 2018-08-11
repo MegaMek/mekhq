@@ -20,14 +20,18 @@
 package mekhq.campaign.personnel;
 
 import mekhq.MekHQ;
+import mekhq.MekHqXmlUtil;
 import mekhq.campaign.AwardSet;
 import mekhq.campaign.LogEntry;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.stream.StreamSource;
 import java.io.*;
 import java.text.SimpleDateFormat;
@@ -146,10 +150,11 @@ public class AwardsFactory {
 
             try {
                 InputStream inputStream = new FileInputStream(file);
+                InputSource inputSource = new InputSource(inputStream);
                 JAXBContext jaxbContext = JAXBContext.newInstance(AwardSet.class, Award.class);
                 Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
 
-                awardSet = unmarshaller.unmarshal(new StreamSource(inputStream), AwardSet.class).getValue();
+                awardSet = unmarshaller.unmarshal(MekHqXmlUtil.createSafeXmlSource(inputSource), AwardSet.class).getValue();
 
                 Map<String, Award> tempAwardMap = new HashMap<>();
                 String currentSetName = file.getName().replaceFirst("[.][^.]+$", "");
@@ -159,11 +164,13 @@ public class AwardsFactory {
                 }
                 awardsMap.put(currentSetName, tempAwardMap);
 
-            } catch (JAXBException var4) {
-                System.err.println("Error loading XML for awards: " + var4.getMessage());
-                var4.printStackTrace();
+                inputStream.close();
+            } catch (SAXException | ParserConfigurationException e) {
+                MekHQ.getLogger().error(AwardsFactory.class, "loadAwards", e);
             } catch (FileNotFoundException e) {
-                e.printStackTrace();
+                MekHQ.getLogger().error(AwardsFactory.class, "loadAwards", "Cannot find XML awards file: " + file.getName(), e);
+            } catch (JAXBException | IOException e) {
+                MekHQ.getLogger().error(AwardsFactory.class, "loadAwards", "Error loading XML for awards", e);
             }
         }
     }

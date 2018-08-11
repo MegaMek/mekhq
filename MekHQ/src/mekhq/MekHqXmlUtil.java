@@ -11,19 +11,22 @@ import java.util.Vector;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-
+import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.apache.commons.text.StringEscapeUtils;
 
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 import megamek.common.Aero;
 import megamek.common.BombType;
@@ -42,6 +45,7 @@ import megamek.common.util.StringUtil;
 public class MekHqXmlUtil {
 	private static DocumentBuilderFactory DOCUMENT_BUILDER_FACTORY;
 	private static DocumentBuilderFactory UNSAFE_DOCUMENT_BUILDER_FACTORY;
+	private static SAXParserFactory SAX_PARSER_FACTORY;
 
 	/**
 	 * Creates a DocumentBuilder safe from XML external entities
@@ -100,6 +104,24 @@ public class MekHqXmlUtil {
 		}
 
 		return dbf.newDocumentBuilder();
+	}
+
+	public static Source createSafeXmlSource(InputSource inputSource) throws SAXException, ParserConfigurationException {
+		SAXParserFactory spf = SAX_PARSER_FACTORY;
+		if (null == spf) {
+			// At worst we may do this twice if multiple threads
+			// hit this method. It is Ok to have more than one
+			// instance of the parser factory, as long as it is
+			// XXE safe.
+			spf = SAXParserFactory.newInstance();
+			spf.setFeature("http://xml.org/sax/features/external-general-entities", false);
+			spf.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+			spf.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+
+			SAX_PARSER_FACTORY = spf;
+		}
+
+		return new SAXSource(spf.newSAXParser().getXMLReader(), inputSource);
 	}
 
 	public static void writeSimpleXmlTag(PrintWriter pw1, int indent, String name, String val) {
