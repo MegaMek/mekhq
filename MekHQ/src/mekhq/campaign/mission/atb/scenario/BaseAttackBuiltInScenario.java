@@ -93,7 +93,6 @@ public class BaseAttackBuiltInScenario extends AtBScenario {
 		addCivilianUnits(otherForce, 8, campaign);
 		BotForce civilianForce = new BotForce("Base Civilian Units", isAttacker() ? 2 : 1, defenderStart, defenderHome, otherForce);
 		civilianForce.setBehaviorSettings(BehaviorSettingsFactory.getInstance().COWARDLY_BEHAVIOR);
-		civilianForce.setHomeEdge(defenderHome); // setting behavior settings rewrites home edge, so we set it again
 		addBotForce(civilianForce);
 
 		ArrayList<Entity> turretForce = new ArrayList<>();
