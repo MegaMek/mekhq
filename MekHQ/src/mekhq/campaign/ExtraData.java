@@ -18,7 +18,6 @@
  */
 package mekhq.campaign;
 
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Writer;
 import java.util.ArrayList;
@@ -197,15 +196,6 @@ public class ExtraData {
             return (ExtraData) unmarshaller.unmarshal(wn);
         } catch(JAXBException e) {
             MekHQ.getLogger().log(ExtraData.class, "createFromXml(Node)", e);
-            return null;
-        }
-    }
-    
-    public static ExtraData createFromXml(InputStream is) {
-        try {
-            return (ExtraData) unmarshaller.unmarshal(is);
-        } catch(JAXBException e) {
-            MekHQ.getLogger().log(ExtraData.class, "createFromXml(InputStream)", e);
             return null;
         }
     }

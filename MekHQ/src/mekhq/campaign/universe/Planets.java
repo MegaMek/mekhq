@@ -50,17 +50,19 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
-import javax.xml.transform.stream.StreamSource;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.joda.time.DateTime;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Node;
+import org.xml.sax.SAXException;
 
 import megamek.common.EquipmentType;
 import megamek.common.logging.LogLevel;
 import megamek.common.util.EncodeControl;
 import mekhq.FileParser;
 import mekhq.MekHQ;
+import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
 import mekhq.campaign.universe.Planet.PlanetaryEvent;
 
@@ -83,7 +85,7 @@ public class Planets {
             // For debugging only!
             // unmarshaller.setEventHandler(new javax.xml.bind.helpers.DefaultValidationEventHandler());
         } catch(JAXBException e) {
-            MekHQ.getLogger().log(Planets.class, "<init>", e); //$NON-NLS-1$
+            MekHQ.getLogger().error(Planets.class, "<init>", e); //$NON-NLS-1$
         }
     }
     
@@ -358,7 +360,7 @@ public class Planets {
             source.getChannel().position(0);
 
             LocalPlanetList planets = unmarshaller.unmarshal(
-                    new StreamSource(is), LocalPlanetList.class).getValue();
+                    MekHqXmlUtil.createSafeXmlSource(is), LocalPlanetList.class).getValue();
 
             // Run through the list again, this time creating and updating planets as we go
             for( Planet planet : planets.list ) {
@@ -378,10 +380,12 @@ public class Planets {
                     planetList.remove(planetId);
                 }
             }
+        } catch (SAXException | ParserConfigurationException e) {
+            MekHQ.getLogger().error(getClass(), METHOD_NAME, e);
         } catch (JAXBException e) {
-            MekHQ.getLogger().log(getClass(), METHOD_NAME, e);
+            MekHQ.getLogger().error(getClass(), METHOD_NAME, e);
         } catch(IOException e) {
-            MekHQ.getLogger().log(getClass(), METHOD_NAME, e);
+            MekHQ.getLogger().error(getClass(), METHOD_NAME, e);
         }
     }
     

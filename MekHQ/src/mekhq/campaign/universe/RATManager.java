@@ -37,7 +37,6 @@ import java.util.Set;
 import java.util.function.Predicate;
 
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -53,6 +52,7 @@ import megamek.common.UnitType;
 import megamek.common.event.Subscribe;
 import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
+import mekhq.MekHqXmlUtil;
 import mekhq.campaign.event.OptionsChangedEvent;
 
 /**
@@ -153,13 +153,12 @@ public class RATManager extends AbstractUnitGenerator implements IUnitGenerator 
         File f = new File(RATINFO_DIR, fileNames.get(name));
         FileInputStream fis = null;
 
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         Document xmlDoc = null;
         DocumentBuilder db;
 
         try {
             fis = new FileInputStream(f);
-            db = dbf.newDocumentBuilder();
+            db = MekHqXmlUtil.newSafeDocumentBuilder();
             xmlDoc = db.parse(fis);
             fis.close();
         } catch (Exception ex) {
@@ -234,13 +233,12 @@ public class RATManager extends AbstractUnitGenerator implements IUnitGenerator 
         File f = new File(ALT_FACTION);
         FileInputStream fis = null;
 
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         Document xmlDoc = null;
         DocumentBuilder db;
 
         try {
             fis = new FileInputStream(f);
-            db = dbf.newDocumentBuilder();
+            db = MekHqXmlUtil.newSafeDocumentBuilder();
             xmlDoc = db.parse(fis);
             fis.close();
         } catch (Exception ex) {
@@ -286,7 +284,6 @@ public class RATManager extends AbstractUnitGenerator implements IUnitGenerator 
         
         allCollections = new HashMap<>();
 
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         Document xmlDoc = null;
         DocumentBuilder db;
 
@@ -302,7 +299,7 @@ public class RATManager extends AbstractUnitGenerator implements IUnitGenerator 
             if (f.getName().endsWith(".xml")) {
                 try {
                     fis = new FileInputStream(f);
-                    db = dbf.newDocumentBuilder();
+                    db = MekHqXmlUtil.newSafeDocumentBuilder();
                     xmlDoc = db.parse(fis);
                     fis.close();
                 } catch (Exception ex) {

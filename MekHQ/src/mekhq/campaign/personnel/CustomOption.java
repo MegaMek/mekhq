@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -19,6 +18,7 @@ import megamek.common.logging.LogLevel;
 import megamek.common.options.IOption;
 import megamek.common.options.PilotOptions;
 import mekhq.MekHQ;
+import mekhq.MekHqXmlUtil;
 
 /**
  * Parses custom SPA file and passes data to the PersonnelOption constructor so the custom
@@ -61,14 +61,13 @@ public class CustomOption {
         final String METHOD_NAME = "getCustomAbilities()"; //$NON-NLS-1$
         List<CustomOption> retVal = new ArrayList<>();
 
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         Document xmlDoc = null;
 
 
         try {
             FileInputStream fis = new FileInputStream("data/universe/customspa.xml");
             // Using factory get an instance of document builder
-            DocumentBuilder db = dbf.newDocumentBuilder();
+            DocumentBuilder db = MekHqXmlUtil.newUnsafeDocumentBuilder();
 
             // Parse using builder to get DOM representation of the XML file
             xmlDoc = db.parse(fis);
