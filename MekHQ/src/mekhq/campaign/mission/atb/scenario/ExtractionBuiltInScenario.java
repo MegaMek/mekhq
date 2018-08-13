@@ -84,7 +84,7 @@ public class ExtractionBuiltInScenario extends AtBScenario {
 			if (isAttacker()) {
 				BotForce bf = new BotForce("Civilians", 1, otherStart, playerHome, otherForce);
 				bf.setBehaviorSettings(BehaviorSettingsFactory.getInstance().ESCAPE_BEHAVIOR.getCopy());
-				bf.getBehaviorSettings().setHomeEdge(bf.findHomeEdge(otherHome));
+				bf.setDestinationEdge(otherHome);
 				
 				addBotForce(bf);
 				
@@ -94,7 +94,7 @@ public class ExtractionBuiltInScenario extends AtBScenario {
 			} else {
 				BotForce bf = new BotForce("Civilians", 2, otherStart, enemyStart, otherForce);
 				bf.setBehaviorSettings(BehaviorSettingsFactory.getInstance().ESCAPE_BEHAVIOR.getCopy());
-				bf.getBehaviorSettings().setHomeEdge(bf.findHomeEdge(otherHome));
+				bf.setDestinationEdge(otherHome);
 				
 				addBotForce(bf);
 			}
