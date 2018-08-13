@@ -877,12 +877,14 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 pvcda.setVisible(true);
 
                 int ia = pvcda.getValue();
+                if (ia <= 0) {
+                    // <0 indicates Cancellation
+                    // =0 is a No-Op
+                    return;
+                }
+
                 for (Person person : people) {
-                    int i2 = ia;
-                    if ((ia + person.getXp()) < 0) {
-                        i2 = -person.getXp();
-                    }
-                    person.setXp(person.getXp() + i2);
+                    person.setXp(person.getXp() + ia);
                     MekHQ.triggerEvent(new PersonChangedEvent(person));
                 }
                 break;
