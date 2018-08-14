@@ -8,6 +8,8 @@ v0.45.1-git
 + PR #844: Feature - display a tech's XP on the repair tab and doctor's XP on the infirmary tab.
 + PR #863: Feature - allow bots to have separate retreat and destination edges, see megamek notes.
 	Also upgrades AtB Chase scenarios to randomly have the player start on the north or the south edge instead of always south.
++ Issue #866: Fixed cancelling GM Add XP subtracts one (1) XP.
++ Issue #859: Fixed JSpinner text box overriding user-typed values.
 
 v0.45.0 (2018-08-02 0200 UTC)
 + PR #602: Add KIA checkbox and functionality to prisoners during scenario resolution.
