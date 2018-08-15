@@ -73,21 +73,24 @@ import mekhq.campaign.work.WorkTime;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public abstract class Part implements Serializable, MekHqXmlSerializable, IPartWork, ITechnology {
+	
 	private static final long serialVersionUID = 6185232893259168810L;
-	public static final int PART_TYPE_ARMOR = 0;
-	public static final int PART_TYPE_WEAPON = 1;
-	public static final int PART_TYPE_AMMO = 2;
-	public static final int PART_TYPE_EQUIPMENT_PART = 3;
-	public static final int PART_TYPE_MEK_ACTUATOR = 4;
-	public static final int PART_TYPE_MEK_ENGINE = 5;
-	public static final int PART_TYPE_MEK_GYRO = 6;
-	public static final int PART_TYPE_MEK_LIFE_SUPPORT = 7;
-	public static final int PART_TYPE_MEK_BODY_PART = 8;
-	public static final int PART_TYPE_MEK_SENSOR = 9;
-	public static final int PART_TYPE_GENERIC_SPARE_PART = 10;
-	public static final int PART_TYPE_OTHER = 11;
-	public static final int PART_TYPE_MEK_COCKPIT = 12;
-	public static final int PART_TYPE_OMNI_SPACE = 13;
+	
+	// FIXME none of these is actually used - can we get rid of them?
+	// public static final int PART_TYPE_ARMOR = 0;
+	// public static final int PART_TYPE_WEAPON = 1;
+	// public static final int PART_TYPE_AMMO = 2;
+	// public static final int PART_TYPE_EQUIPMENT_PART = 3;
+	// public static final int PART_TYPE_MEK_ACTUATOR = 4;
+	// public static final int PART_TYPE_MEK_ENGINE = 5;
+	// public static final int PART_TYPE_MEK_GYRO = 6;
+	// public static final int PART_TYPE_MEK_LIFE_SUPPORT = 7;
+	// public static final int PART_TYPE_MEK_BODY_PART = 8;
+	// public static final int PART_TYPE_MEK_SENSOR = 9;
+	// public static final int PART_TYPE_GENERIC_SPARE_PART = 10;
+	// public static final int PART_TYPE_OTHER = 11;
+	// public static final int PART_TYPE_MEK_COCKPIT = 12;
+	// public static final int PART_TYPE_OMNI_SPACE = 13;
 
 	public static final int T_UNKNOWN = -1;
 	public static final int T_BOTH = 0;
