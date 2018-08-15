@@ -42,6 +42,7 @@ import org.w3c.dom.NodeList;
 import megamek.common.annotations.Nullable;
 import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
+import mekhq.MekHqXmlUtil;
 
 /**
  * @author Neoancient
@@ -458,12 +459,11 @@ public class FactionHints {
         
         MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO,
                 "Starting load of faction hint data from XML..."); //$NON-NLS-1$
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         Document xmlDoc = null;
         
         try {
             FileInputStream fis = new FileInputStream(FACTION_HINTS_FILE); //$NON-NLS-1$
-            DocumentBuilder db = dbf.newDocumentBuilder();
+            DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
     
             xmlDoc = db.parse(fis);
         } catch (Exception ex) {
