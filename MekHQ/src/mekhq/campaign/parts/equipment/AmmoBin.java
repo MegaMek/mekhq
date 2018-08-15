@@ -34,7 +34,6 @@ import megamek.common.CriticalSlot;
 import megamek.common.EquipmentType;
 import megamek.common.ITechnology;
 import megamek.common.Jumpship;
-import megamek.common.MiscType;
 import megamek.common.Mounted;
 import megamek.common.Protomech;
 import megamek.common.SmallCraft;

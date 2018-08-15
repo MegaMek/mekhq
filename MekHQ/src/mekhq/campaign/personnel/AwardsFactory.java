@@ -164,7 +164,7 @@ public class AwardsFactory {
                 MekHQ.getLogger().error(AwardsFactory.class, "loadAwards", e);
             } catch (FileNotFoundException e) {
                 MekHQ.getLogger().error(AwardsFactory.class, "loadAwards", "Cannot find XML awards file: " + file.getName(), e);
-            } catch (JAXBException | IOException e) {
+            } catch (JAXBException e) {
                 MekHQ.getLogger().error(AwardsFactory.class, "loadAwards", "Error loading XML for awards", e);
             }
         }

@@ -40,8 +40,8 @@ public class PopupValueChoiceDialog extends JDialog implements WindowListener {
     private JSpinner value;
     private SpinnerNumberModel model;
     private JFormattedTextField jtf;
-    private int max;
-    private int min;
+    private int max; // FIXME this value is set but never used
+    private int min; // FIXME this value is set but never used
     // End of variables declaration//GEN-END:variables
 
     /**
