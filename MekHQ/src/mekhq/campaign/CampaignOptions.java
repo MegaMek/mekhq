@@ -78,6 +78,11 @@ public class CampaignOptions implements Serializable {
     //FIXME: This needs to be localized
     public final static String[] REPAIR_SYSTEM_NAMES = {"Strat Ops", "Warchest Custom", "Generic Spare Parts"};
 
+    public final static double MAXIMUM_COMBAT_EQUIPMENT_PERCENT = 5.0;
+    public final static double MAXIMUM_DROPSHIP_EQUIPMENT_PERCENT = 1.0;
+    public final static double MAXIMUM_JUMPSHIP_EQUIPMENT_PERCENT = 1.0;
+    public final static double MAXIMUM_WARSHIP_EQUIPMENT_PERCENT = 1.0;
+    
     private boolean useFactionForNames;
     private boolean useUnitRating;
 
@@ -292,6 +297,9 @@ public class CampaignOptions implements Serializable {
     private boolean massRepairUseAssignedTechsFirst;
     private boolean massRepairReplacePod;
     private List<MassRepairOption> massRepairOptions;
+    
+    //Miscellaneous
+    private boolean historicalDailyLog;
 
     public CampaignOptions() {
         clanPriceModifier = 1.0;
@@ -521,6 +529,8 @@ public class CampaignOptions implements Serializable {
         for (int i = 0; i < MassRepairOption.VALID_REPAIR_TYPES.length; i++) {
         	massRepairOptions.add(new MassRepairOption(MassRepairOption.VALID_REPAIR_TYPES[i]));
         }
+        
+        historicalDailyLog = false;
    }
 
     public UnitRatingMethod getUnitRatingMethod() {
@@ -1174,6 +1184,14 @@ public class CampaignOptions implements Serializable {
         adminXPPeriod = m;
     }
     
+    public boolean historicalDailyLog() {
+        return historicalDailyLog;
+    }
+    
+    public void setHistoricalDailyLog(boolean b) {
+        this.historicalDailyLog = b;
+    }
+    
     public int getEdgeCost() {
         return edgeCost;
     }
@@ -1267,7 +1285,7 @@ public class CampaignOptions implements Serializable {
     }
 
     public void setEquipmentContractPercent(double b) {
-        equipmentContractPercent = b;
+        equipmentContractPercent = Math.min(b, MAXIMUM_COMBAT_EQUIPMENT_PERCENT);
     }
 
     public boolean useEquipmentContractBase() {
@@ -1291,7 +1309,7 @@ public class CampaignOptions implements Serializable {
     }
 
     public void setDropshipContractPercent(double b) {
-        dropshipContractPercent = b;
+        dropshipContractPercent = Math.min(b, MAXIMUM_DROPSHIP_EQUIPMENT_PERCENT);
     }
 
     public double getJumpshipContractPercent() {
@@ -1299,7 +1317,7 @@ public class CampaignOptions implements Serializable {
     }
 
     public void setJumpshipContractPercent(double b) {
-        jumpshipContractPercent = b;
+        jumpshipContractPercent = Math.min(b, MAXIMUM_JUMPSHIP_EQUIPMENT_PERCENT);
     }
 
     public double getWarshipContractPercent() {
@@ -1307,7 +1325,7 @@ public class CampaignOptions implements Serializable {
     }
 
     public void setWarshipContractPercent(double b) {
-        warshipContractPercent = b;
+        warshipContractPercent = Math.min(b, MAXIMUM_WARSHIP_EQUIPMENT_PERCENT);
     }
 
     public boolean useBLCSaleValue() {
@@ -2243,6 +2261,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "allowOpforLocalUnits", allowOpforLocalUnits);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "opforAeroChance", opforAeroChance);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "opforLocalUnitChance", opforLocalUnitChance);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "historicalDailyLog", historicalDailyLog);
 
         //Mass Repair/Salvage Options
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "massRepairUseExtraTime", massRepairUseExtraTime);
@@ -2467,13 +2486,13 @@ public class CampaignOptions implements Serializable {
             } else if (wn2.getNodeName().equalsIgnoreCase("isAcquisitionPenalty")) {
                 retVal.isAcquisitionPenalty = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("equipmentContractPercent")) {
-                retVal.equipmentContractPercent = Double.parseDouble(wn2.getTextContent().trim());
+                retVal.setEquipmentContractPercent(Double.parseDouble(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("dropshipContractPercent")) {
-                retVal.dropshipContractPercent = Double.parseDouble(wn2.getTextContent().trim());
+                retVal.setDropshipContractPercent(Double.parseDouble(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("jumpshipContractPercent")) {
-                retVal.jumpshipContractPercent = Double.parseDouble(wn2.getTextContent().trim());
+                retVal.setJumpshipContractPercent(Double.parseDouble(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("warshipContractPercent")) {
-                retVal.warshipContractPercent = Double.parseDouble(wn2.getTextContent().trim());
+                retVal.setWarshipContractPercent(Double.parseDouble(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("equipmentContractBase")) {
                 retVal.equipmentContractBase = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("equipmentContractSaleValue")) {
@@ -2741,6 +2760,8 @@ public class CampaignOptions implements Serializable {
                 retVal.opforAeroChance = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("opforLocalUnitChance")) {
                 retVal.opforLocalUnitChance = Integer.parseInt(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("historicalDailyLog")) {
+                retVal.historicalDailyLog = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("rats")) {
             	retVal.rats = MekHqXmlUtil.unEscape(wn2.getTextContent().trim()).split(",");
             } else if (wn2.getNodeName().equalsIgnoreCase("staticRATs")) {

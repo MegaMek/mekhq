@@ -65,7 +65,11 @@ public class LogEntry implements MekHqXmlSerializable {
     public Date getDate() {
         return date;
     }
-    
+
+    public String getDateString() {
+        return date.toString();
+    }
+
     public void setDesc(String d) {
         this.desc = Objects.requireNonNull(d);
     }
