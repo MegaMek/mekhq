@@ -34,7 +34,6 @@ import org.joda.time.DateTime;
 
 import megamek.common.annotations.Nullable;
 import megamek.common.event.Subscribe;
-import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.event.LocationChangedEvent;
@@ -480,8 +479,7 @@ public class FactionBorderTracker {
                 lastUpdate = now;
             }
         } catch (Exception ex) {
-            MekHQ.getLogger().log(getClass(), "recalculate()", LogLevel.ERROR,
-                    ex.getMessage());
+            MekHQ.getLogger().error(getClass(), "recalculate()", ex.getMessage());
         } finally {
             synchronized (this) {
                 invalid = false;

@@ -37,7 +37,6 @@ import org.joda.time.DateTime;
 import megamek.common.Compute;
 import megamek.common.annotations.Nullable;
 import megamek.common.event.Subscribe;
-import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
@@ -243,7 +242,7 @@ public class RandomFactionGenerator {
 
         Faction employerFaction = Faction.getFaction(employer);
         if (null == employerFaction) {
-            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
+            MekHQ.getLogger().error(getClass(), METHOD_NAME,
                     "Could not find enemy for " + employer); //$NON-NLS-1$
             return "PIR";
         } else {
@@ -281,7 +280,7 @@ public class RandomFactionGenerator {
 		    return enemy.getShortName();
 		}
 		// Fallback; there are always pirates.
-        MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
+        MekHQ.getLogger().error(getClass(), METHOD_NAME,
                 "Could not find enemy for " + employer.getShortName()); //$NON-NLS-1$
         return "PIR";
 	}
@@ -356,7 +355,7 @@ public class RandomFactionGenerator {
     public List<String> getEnemyList(String employerName) {
         Faction employer = Faction.getFaction(employerName);
         if (null == employer) {
-            MekHQ.getLogger().log(getClass(), "getEnemyList(String)", LogLevel.WARNING, //$NON-NLS-1$
+            MekHQ.getLogger().warning(getClass(), "getEnemyList(String)", //$NON-NLS-1$
                     "Unknown faction key: " + employerName); //$NON-NLS-1$
             return Collections.emptyList();
         }
@@ -463,12 +462,12 @@ public class RandomFactionGenerator {
 	    Faction f1 = Faction.getFaction(attacker);
 	    Faction f2 = Faction.getFaction(defender);
         if (null == f1) {
-            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
+            MekHQ.getLogger().error(getClass(), METHOD_NAME,
                     "Non-existent faction key: " + attacker); // $NON-NLS-1$
             return null;
         }
         if (null == f2) {
-            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
+            MekHQ.getLogger().error(getClass(), METHOD_NAME,
                     "Non-existent faction key: " + attacker); // $NON-NLS-1$
             return null;
         }
@@ -492,11 +491,11 @@ public class RandomFactionGenerator {
 	    Faction attacker = Faction.getFaction(attackerKey);
 	    Faction defender = Faction.getFaction(defenderKey);
         if (null == attacker) {
-            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
+            MekHQ.getLogger().error(getClass(), METHOD_NAME,
                     "Non-existent faction key: " + attackerKey); //$NON-NLS-1$
         }
         if (null == defender) {
-            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
+            MekHQ.getLogger().error(getClass(), METHOD_NAME,
                     "Non-existent faction key: " + defenderKey); //$NON-NLS-1$
         }
         if ((null != attacker) && (null != defender)) {

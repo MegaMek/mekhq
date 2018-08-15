@@ -31,7 +31,6 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
@@ -40,7 +39,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import megamek.common.annotations.Nullable;
-import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 
@@ -90,9 +88,9 @@ public class FactionHints {
         try {
             loadFactionHints();
         } catch (DOMException e) {
-            MekHQ.getLogger().log(getClass(), "loadData()", e); //$NON-NLS-1$
+            MekHQ.getLogger().error(getClass(), "loadData()", e); //$NON-NLS-1$
         } catch (ParseException e) {
-            MekHQ.getLogger().log(getClass(), "loadData()", e); //$NON-NLS-1$
+            MekHQ.getLogger().error(getClass(), "loadData()", e); //$NON-NLS-1$
         }
     }
     
@@ -457,7 +455,7 @@ public class FactionHints {
     private void loadFactionHints() throws DOMException, ParseException {
         final String METHOD_NAME = "loadFactionHints()"; //$NON-NLS-1$
         
-        MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO,
+        MekHQ.getLogger().info(getClass(), METHOD_NAME,
                 "Starting load of faction hint data from XML..."); //$NON-NLS-1$
         Document xmlDoc = null;
         
@@ -467,7 +465,7 @@ public class FactionHints {
     
             xmlDoc = db.parse(fis);
         } catch (Exception ex) {
-            MekHQ.getLogger().log(getClass(), METHOD_NAME, ex);
+            MekHQ.getLogger().error(getClass(), METHOD_NAME, ex);
         }
         
         Element rootElement = xmlDoc.getDocumentElement();
@@ -491,7 +489,7 @@ public class FactionHints {
                         neutralFactions.add(f);
                         addNeutralExceptions(f, wn);
                     } else {
-                        MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
+                        MekHQ.getLogger().error(getClass(), METHOD_NAME,
                                 "Invalid faction code in factionhints.xml: " + f); //$NON-NLS-1$
                     }
                 } else if (nodeName.equalsIgnoreCase("deepPeriphery")) {
@@ -500,7 +498,7 @@ public class FactionHints {
                         if (null != fKey) {
                             deepPeriphery.add(f);
                         } else {
-                            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
+                            MekHQ.getLogger().error(getClass(), METHOD_NAME,
                                     "Invalid faction code in factionhints.xml: " + f); //$NON-NLS-1$
                         }
                     }
@@ -510,7 +508,7 @@ public class FactionHints {
                         if (null != f) {
                             majorPowers.add(f);
                         } else {
-                            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
+                            MekHQ.getLogger().error(getClass(), METHOD_NAME,
                                     "Invalid faction code in factionhints.xml: " + f); //$NON-NLS-1$
                         }
                     }
@@ -554,7 +552,7 @@ public class FactionHints {
                     if ((null != outer) && (null != inner)) {
                         addContainedFaction(outer, inner, start, end, fraction, opponents);
                     } else {
-                        MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
+                        MekHQ.getLogger().error(getClass(), METHOD_NAME,
                                 "Invalid faction code in factionhints.xml: " + outer + "/" + inner); //$NON-NLS-1$
                     }
                 }
@@ -597,7 +595,7 @@ public class FactionHints {
                 for (int i = 0; i < factionKeys.length; i++) {
                     parties[i] = Faction.getFaction(factionKeys[i]);
                     if (null == parties[i]) {
-                        MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
+                        MekHQ.getLogger().error(getClass(), METHOD_NAME,
                                 "Invalid faction code in factionhints.xml: " + parties[i]); //$NON-NLS-1$
                     }
                 }
@@ -633,7 +631,7 @@ public class FactionHints {
                 for (int i = 0; i < parties.length; i++) {
                     final Faction f = Faction.getFaction(parties[i]);
                     if (null == f) {
-                        MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
+                        MekHQ.getLogger().error(getClass(), METHOD_NAME,
                                 "Invalid faction code in factionhints.xml: " + parties[i]); //$NON-NLS-1$
                         continue;
                     }
