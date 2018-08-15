@@ -1769,8 +1769,8 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                             menu.add(spouseMenu);
                         }
                     }
-                    if (menu.getItemCount() > 30) {
-                        MenuScroller.setScrollerFor(menu, 20);
+                    if (menu.getItemCount() > MAX_POPUP_ITEMS) {
+                        MenuScroller.setScrollerFor(menu, MAX_POPUP_ITEMS);
                     }
                     popup.add(menu);
                 }
@@ -1823,8 +1823,8 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
 
                         setAwardMenu.add(menuItem);
 
-                        if (setAwardMenu.getItemCount() > 30) {
-                            MenuScroller.setScrollerFor(setAwardMenu, 20);
+                        if (setAwardMenu.getItemCount() > MAX_POPUP_ITEMS) {
+                            MenuScroller.setScrollerFor(setAwardMenu, MAX_POPUP_ITEMS);
                         }
                     }
                     awardMenu.add(setAwardMenu);
