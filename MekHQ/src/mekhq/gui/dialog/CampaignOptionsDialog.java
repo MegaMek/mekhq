@@ -440,6 +440,10 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JCheckBox chkUnitMarketReportRefresh;
 
     private JSpinner spnStartGameDelay;
+    
+    // Miscellaneous tab
+    private JPanel panMisc;
+    private JCheckBox chkHistoricalDailyLog;
 
     /**
      * Creates new form CampaignOptionsDialog
@@ -631,6 +635,9 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         reverseQualityNames = new JCheckBox();
                 
         chkSupportStaffOnly = new JCheckBox();
+        
+        panMisc = new JPanel();
+        chkHistoricalDailyLog = new JCheckBox();
 
         ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignOptionsDialog", new EncodeControl()); //$NON-NLS-1$
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
@@ -2002,19 +2009,19 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
             btnContractPersonnel.setSelected(true);
         }
 
-        spnEquipPercent = new JSpinner(new SpinnerNumberModel(options.getEquipmentContractPercent(), 0.1, 5.0, 0.1));
+        spnEquipPercent = new JSpinner(new SpinnerNumberModel(options.getEquipmentContractPercent(), 0.1, CampaignOptions.MAXIMUM_COMBAT_EQUIPMENT_PERCENT, 0.1));
         spnEquipPercent.setEditor(new JSpinner.NumberEditor(spnEquipPercent, "0.0"));
         ((JSpinner.DefaultEditor) spnEquipPercent.getEditor()).getTextField().setEditable(false);
 
-        spnDropshipPercent = new JSpinner(new SpinnerNumberModel(options.getDropshipContractPercent(), 0.0, 1.0, 0.1));
+        spnDropshipPercent = new JSpinner(new SpinnerNumberModel(options.getDropshipContractPercent(), 0.0, CampaignOptions.MAXIMUM_DROPSHIP_EQUIPMENT_PERCENT, 0.1));
         spnDropshipPercent.setEditor(new JSpinner.NumberEditor(spnDropshipPercent, "0.0"));
         ((JSpinner.NumberEditor) spnDropshipPercent.getEditor()).getTextField().setEditable(false);
 
-        spnJumpshipPercent = new JSpinner(new SpinnerNumberModel(options.getJumpshipContractPercent(), 0.0, 1.0, 0.1));
+        spnJumpshipPercent = new JSpinner(new SpinnerNumberModel(options.getJumpshipContractPercent(), 0.0, CampaignOptions.MAXIMUM_JUMPSHIP_EQUIPMENT_PERCENT, 0.1));
         spnJumpshipPercent.setEditor(new JSpinner.NumberEditor(spnJumpshipPercent, "0.0"));
         ((JSpinner.DefaultEditor) spnJumpshipPercent.getEditor()).getTextField().setEditable(false);
 
-        spnWarshipPercent = new JSpinner(new SpinnerNumberModel(options.getWarshipContractPercent(), 0.0, 1.0, 0.1));
+        spnWarshipPercent = new JSpinner(new SpinnerNumberModel(options.getWarshipContractPercent(), 0.0, CampaignOptions.MAXIMUM_WARSHIP_EQUIPMENT_PERCENT, 0.1));
         spnWarshipPercent.setEditor(new JSpinner.NumberEditor(spnWarshipPercent, "0.0"));
         ((JSpinner.DefaultEditor) spnWarshipPercent.getEditor()).getTextField().setEditable(false);
 
@@ -4131,7 +4138,22 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
                 scrSPA.getVerticalScrollBar().setValue(0);
                 scrAtB.getVerticalScrollBar().setValue(0);
             }
-         });        
+         });
+        
+        JScrollPane scrMisc = new JScrollPane(panMisc);
+        scrMisc.setPreferredSize(new java.awt.Dimension(500, 400));
+
+        chkHistoricalDailyLog.setText(resourceMap.getString("chkShowHistoricalDailyReport.text")); // NOI18N
+        chkHistoricalDailyLog.setToolTipText(resourceMap.getString("chkShowHistoricalDailyReport.toolTipText")); // NOI18N
+        chkHistoricalDailyLog.setName("chkHistoricalDailyLog"); // NOI18N
+        chkHistoricalDailyLog.setSelected(options.historicalDailyLog());
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panMisc.add(chkHistoricalDailyLog, gridBagConstraints);
+
+        tabOptions.addTab(resourceMap.getString("misc.TabConstraints.tabTitle"), scrMisc);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -4502,6 +4524,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setIsAcquisitionPenalty((Integer) spnAcquireIsPenalty.getModel().getValue());
         options.setMaxAcquisitions(Integer.parseInt(txtMaxAcquisitions.getText()));
 
+        options.setHistoricalDailyLog(chkHistoricalDailyLog.isSelected());
 
         options.setNDiceTransitTime((Integer) spnNDiceTransitTime.getModel().getValue());
         options.setConstantTransitTime((Integer) spnConstantTransitTime.getModel().getValue());

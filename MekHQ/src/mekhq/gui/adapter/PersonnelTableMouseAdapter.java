@@ -41,6 +41,7 @@ import mekhq.gui.CampaignGUI;
 import mekhq.gui.dialog.CustomizePersonDialog;
 import mekhq.gui.dialog.EditKillLogDialog;
 import mekhq.gui.dialog.EditLogEntryDialog;
+import mekhq.gui.dialog.EditPersonnelHitsDialog;
 import mekhq.gui.dialog.EditPersonnelInjuriesDialog;
 import mekhq.gui.dialog.EditPersonnelLogDialog;
 import mekhq.gui.dialog.ImageChoiceDialog;
@@ -93,7 +94,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
     private static final String CMD_EDIT_BIOGRAPHY = "BIOGRAPHY"; //$NON-NLS-1$
     private static final String CMD_RANDOM_PORTRAIT = "RANDOMIZE_PORTRAIT"; //$NON-NLS-1$
     private static final String CMD_EDIT_PORTRAIT = "PORTRAIT"; //$NON-NLS-1$
-    private static final String CMD_HEAL = "HEAL"; //$NON-NLS-1$
+    private static final String CMD_EDIT_HITS = "EDIT_HITS"; //$NON-NLS-1$
     private static final String CMD_EDIT = "EDIT"; //$NON-NLS-1$
     private static final String CMD_SACK = "SACK"; //$NON-NLS-1$
     private static final String CMD_REMOVE = "REMOVE"; //$NON-NLS-1$
@@ -823,10 +824,11 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 gui.getCampaign().personUpdated(selectedPerson);
                 MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
                 break;
-            case CMD_HEAL:
-                for (Person person : people) {
-                    person.setHits(0);
-                    person.setDoctorId(null, gui.getCampaign().getCampaignOptions()
+            case CMD_EDIT_HITS:
+                EditPersonnelHitsDialog ephd = new EditPersonnelHitsDialog(gui.getFrame(), true, selectedPerson);
+                ephd.setVisible(true);
+                if (0 == selectedPerson.getHits()) {
+                    selectedPerson.setDoctorId(null, gui.getCampaign().getCampaignOptions()
                             .getNaturalHealingWaitingPeriod());
                 }
                 gui.getCampaign().personUpdated(selectedPerson);
@@ -875,12 +877,14 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 pvcda.setVisible(true);
 
                 int ia = pvcda.getValue();
+                if (ia <= 0) {
+                    // <0 indicates Cancellation
+                    // =0 is a No-Op
+                    return;
+                }
+
                 for (Person person : people) {
-                    int i2 = ia;
-                    if ((ia + person.getXp()) < 0) {
-                        i2 = -person.getXp();
-                    }
-                    person.setXp(person.getXp() + i2);
+                    person.setXp(person.getXp() + ia);
                     MekHQ.triggerEvent(new PersonChangedEvent(person));
                 }
                 break;
@@ -2340,8 +2344,8 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             menuItem.setEnabled(gui.getCampaign().isGM());
             menu.add(menuItem);
             if (!gui.getCampaign().getCampaignOptions().useAdvancedMedical()) {
-                menuItem = new JMenuItem(resourceMap.getString("healPerson.text")); //$NON-NLS-1$
-                menuItem.setActionCommand(CMD_HEAL);
+                menuItem = new JMenuItem(resourceMap.getString("editHits.text")); //$NON-NLS-1$
+                menuItem.setActionCommand(CMD_EDIT_HITS);
                 menuItem.addActionListener(this);
                 menuItem.setEnabled(gui.getCampaign().isGM());
                 menu.add(menuItem);

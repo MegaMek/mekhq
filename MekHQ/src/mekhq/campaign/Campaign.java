@@ -43,6 +43,7 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -54,7 +55,6 @@ import java.util.concurrent.TimeUnit;
 
 import javax.swing.JOptionPane;
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.joda.time.DateTime;
 import org.w3c.dom.DOMException;
@@ -219,6 +219,7 @@ import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
 import mekhq.gui.GuiTabType;
+import mekhq.gui.dialog.HistoricalDailyReportDialog;
 import mekhq.gui.utilities.PortraitFileFactory;
 import mekhq.module.atb.AtBEventProcessor;
 
@@ -287,6 +288,10 @@ public class Campaign implements Serializable, ITechManager {
     private ArrayList<String> currentReport;
     private transient String currentReportHTML;
     private transient List<String> newReports;
+
+    //this is updated and used per gaming session, it is enabled/disabled via the Campaign options
+    //we're re-using the LogEntry class that is used to store Personnel entries
+    public LinkedList<LogEntry> inMemoryLogHistory = new LinkedList<LogEntry>();
 
     private boolean overtime;
     private boolean gmMode;
@@ -1655,6 +1660,25 @@ public class Campaign implements Serializable, ITechManager {
     public ArrayList<Person> getTechs() {
         return getTechs(false, null, true, false);
     }
+    
+    /**
+     * Gets a list of all techs of a specific role type
+     * @param roleType The filter role type
+     * @return Collection of all techs that match the given tech role
+     */
+    public List<Person> getTechsByRole(int roleType) {
+        List<Person> techs = getTechs(false, null, false, false);
+        List<Person> retval = new ArrayList<>();
+        
+        for(Person tech : techs) {
+            if((tech.getPrimaryRole() == roleType) ||
+                    (tech.getSecondaryRole() == roleType)) {
+                retval.add(tech);
+            }       
+        }
+        
+        return techs;
+    }
 
     public List<Person> getAdmins() {
         List<Person> admins = new ArrayList<Person>();
@@ -2651,7 +2675,7 @@ public class Campaign implements Serializable, ITechManager {
         currentReport.clear();
         currentReportHTML = "";
         newReports.clear();
-        addReport("<b>" + getDateAsString() + "</b>");
+        beginReport("<b>" + getDateAsString() + "</b>");
 
         if (calendar.get(Calendar.DAY_OF_YEAR) == 1) {
             reloadNews();
@@ -3133,7 +3157,45 @@ public class Campaign implements Serializable, ITechManager {
         retainerEmployerCode = code;
     }
 
+    private void addInMemoryLogHistory(LogEntry le) {
+        if (inMemoryLogHistory.size() != 0) {
+            long diff = le.getDate().getTime() - inMemoryLogHistory.get(0).getDate().getTime();
+            while ((diff / (1000 * 60 * 60 * 24)) > HistoricalDailyReportDialog.MAX_DAYS_HISTORY) {
+                //we've hit the max size for the in-memory based on the UI display limit
+                //prune the oldest entry
+                inMemoryLogHistory.remove(0);
+                diff = le.getDate().getTime() - inMemoryLogHistory.get(0).getDate().getTime();
+            }
+        }
+        inMemoryLogHistory.add(le);
+    }
+
+    /**
+     * Starts a new day for the daily log
+     * @param r - the report String
+     */
+    public void beginReport(String r) {
+        if (this.getCampaignOptions().historicalDailyLog()) {
+            //add the new items to our in-memory cache
+            addInMemoryLogHistory(new LogEntry(getDate(), ""));
+        }
+        addReportInternal(r);
+    }
+
+    /**
+     * Adds a report to the daily log
+     * @param r - the report String
+     */
     public void addReport(String r) {
+        if (this.getCampaignOptions().historicalDailyLog()) {
+            String htmlStripped = r.replaceAll("\\<[^>]*>",""); //remote HTML tags
+            //add the new items to our in-memory cache
+            addInMemoryLogHistory(new LogEntry(getDate(), htmlStripped));
+        }
+        addReportInternal(r);
+    }
+
+    private void addReportInternal(String r) {
         currentReport.add(r);
         if( currentReportHTML.length() > 0 ) {
             currentReportHTML = currentReportHTML + REPORT_LINEBREAK + r;
@@ -3693,12 +3755,12 @@ public class Campaign implements Serializable, ITechManager {
         // Initialize variables.
         Campaign retVal = new Campaign();
         retVal.app = app;
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+
         Document xmlDoc = null;
 
         try {
             // Using factory get an instance of document builder
-            DocumentBuilder db = dbf.newDocumentBuilder();
+            DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
 
             // Parse using builder to get DOM representation of the XML file
             xmlDoc = db.parse(fis);
@@ -4134,9 +4196,12 @@ public class Campaign implements Serializable, ITechManager {
                 unit.getRefit().reCalc();
                 if (null == unit.getRefit().getNewArmorSupplies()
                         && unit.getRefit().getNewArmorSuppliesId() > 0) {
-                    unit.getRefit().setNewArmorSupplies(
-                            (Armor) retVal.getPart(unit.getRefit()
-                                    .getNewArmorSuppliesId()));
+                    Armor armorSupplies = (Armor) retVal.getPart(
+                            unit.getRefit().getNewArmorSuppliesId());
+                    unit.getRefit().setNewArmorSupplies(armorSupplies);
+                    if (null == armorSupplies.getUnit()) {
+                        armorSupplies.setUnit(unit);
+                    }
                 }
                 if (!unit.getRefit().isCustomJob()
                         && !unit.getRefit().kitFound()) {
@@ -4207,8 +4272,8 @@ public class Campaign implements Serializable, ITechManager {
         timestamp = System.currentTimeMillis();
 
         // ok, once we are sure that campaign has been set for all units, we can
-        // now go
-        // through and initializeParts and run diagnostics
+        // now go through and initializeParts and run diagnostics
+        List<Unit> removeUnits = new ArrayList<>();
         for (Unit unit : retVal.getUnits()) {
             // just in case parts are missing (i.e. because they weren't tracked
             // in previous versions)            
@@ -4218,11 +4283,14 @@ public class Campaign implements Serializable, ITechManager {
                 if (!unit.hasSalvageableParts()) {
                     // we shouldnt get here but some units seem to stick around
                     // for some reason
-                    retVal.removeUnit(unit.getId());
+                    removeUnits.add(unit);
                 } else {
                     unit.setSalvage(true);
                 }
             }
+        }
+        for (Unit unit : removeUnits) {
+            retVal.removeUnit(unit.getId());
         }
 
         MekHQ.getLogger().log(Campaign.class, METHOD_NAME, LogLevel.INFO,

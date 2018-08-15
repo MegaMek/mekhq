@@ -50,10 +50,8 @@ import mekhq.Utilities;
  */
 public class DailyReportLogPanel extends JPanel {
 
-    /**
-     *
-     */
     private static final long serialVersionUID = -6512675362473724385L;
+
     JTextPane txtLog;
     String logText = new String();
 
@@ -82,6 +80,11 @@ public class DailyReportLogPanel extends JPanel {
         JScrollPane scrLog = new JScrollPane(txtLog);
         scrLog.setBorder(new EmptyBorder(2,10,2,2));
         add(scrLog, BorderLayout.CENTER);
+    }
+
+    public void clearLogPanel() {
+        logText = "";
+        txtLog.setText("");
     }
 
     public void refreshLog(String s) {

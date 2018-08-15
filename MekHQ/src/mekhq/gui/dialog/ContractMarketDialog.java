@@ -275,6 +275,7 @@ public class ContractMarketDialog extends JDialog {
 			 */
 			if (c instanceof AtBContract) {
 				((AtBContract)c).initContractDetails(campaign);
+				((AtBContract)c).calculatePaymentMultiplier(campaign);
 				((AtBContract)c).calculatePartsAvailabilityLevel(campaign);
 				((AtBContract)c).setSharesPct(campaign.getCampaignOptions().getUseShareSystem()?
 						(Integer)spnSharePct.getValue():0);

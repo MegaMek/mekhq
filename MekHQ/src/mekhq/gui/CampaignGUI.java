@@ -68,7 +68,6 @@ import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.filechooser.FileFilter;
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -93,6 +92,7 @@ import megamek.common.options.PilotOptions;
 import megamek.common.util.EncodeControl;
 import mekhq.IconPackage;
 import mekhq.MekHQ;
+import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
 import mekhq.Version;
 import mekhq.campaign.Campaign;
@@ -140,7 +140,9 @@ import mekhq.gui.dialog.DailyReportLogDialog;
 import mekhq.gui.dialog.DataLoadingDialog;
 import mekhq.gui.dialog.GMToolsDialog;
 import mekhq.gui.dialog.HireBulkPersonnelDialog;
+import mekhq.gui.dialog.HistoricalDailyReportDialog;
 import mekhq.gui.dialog.MaintenanceReportDialog;
+import mekhq.gui.dialog.MassMothballDialog;
 import mekhq.gui.dialog.MekHQAboutBox;
 import mekhq.gui.dialog.MercRosterDialog;
 import mekhq.gui.dialog.NewRecruitDialog;
@@ -182,6 +184,7 @@ public class CampaignGUI extends JPanel {
     /* For the menu bar */
     private JMenuBar menuBar;
     private JMenu menuThemes;
+    private JMenuItem miHistoricalDailyReportDialog;
     private JMenuItem miDetachLog;
     private JMenuItem miAttachLog;
     private JMenuItem miContractMarket;
@@ -210,6 +213,7 @@ public class CampaignGUI extends JPanel {
 
     ReportHyperlinkListener reportHLL;
 
+    private HistoricalDailyReportDialog histDailyReportDialog;
     private DailyReportLogDialog logDialog;
     private AdvanceDaysDialog advanceDaysDialog;
     private BloodnameDialog bloodnameDialog;
@@ -226,6 +230,12 @@ public class CampaignGUI extends JPanel {
         MekHQAboutBox aboutBox = new MekHQAboutBox(getFrame());
         aboutBox.setLocationRelativeTo(getFrame());
         aboutBox.setVisible(true);
+    }
+
+    private void showHistoricalDailyReportDialog() {
+        histDailyReportDialog = new HistoricalDailyReportDialog(getFrame(), this);
+        histDailyReportDialog.setVisible(true);
+        histDailyReportDialog.dispose();
     }
 
     private void showDailyReportDialog() {
@@ -282,6 +292,11 @@ public class CampaignGUI extends JPanel {
     public void showGMToolsDialog() {
         GMToolsDialog gmTools = new GMToolsDialog(getFrame(), this);
         gmTools.setVisible(true);
+    }
+    
+    public void showMassMothballDialog(Unit[] units, boolean activate) {
+        MassMothballDialog mothballDialog = new MassMothballDialog(getFrame(), units, getCampaign(), activate);
+        mothballDialog.setVisible(true);
     }
 
     public void showAdvanceDaysDialog() {
@@ -1028,6 +1043,17 @@ public class CampaignGUI extends JPanel {
         // menuBar.add(menuCommunity);
 
         JMenu menuView = new JMenu("View"); // NOI18N
+
+        miHistoricalDailyReportDialog = new JMenuItem(resourceMap.getString("miShowHistoricalReportLog.text")); // NOI18N
+        miHistoricalDailyReportDialog.setEnabled(true);
+        miHistoricalDailyReportDialog.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent evt) {
+                showHistoricalDailyReportDialog();
+            }
+        });
+        menuView.add(miHistoricalDailyReportDialog);
+
         miDetachLog = new JMenuItem("Detach Daily Report Log"); // NOI18N
         miDetachLog.addActionListener(new ActionListener() {
             @Override
@@ -2355,12 +2381,11 @@ public class CampaignGUI extends JPanel {
             MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, //$NON-NLS-1$
                     "Starting load of personnel file from XML..."); //$NON-NLS-1$
             // Initialize variables.
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             Document xmlDoc = null;
 
             try {
                 // Using factory get an instance of document builder
-                DocumentBuilder db = dbf.newDocumentBuilder();
+                DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
 
                 // Parse using builder to get DOM representation of the XML file
                 xmlDoc = db.parse(fis);
@@ -2647,12 +2672,11 @@ public class CampaignGUI extends JPanel {
             MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, //$NON-NLS-1$
                     "Starting load of parts file from XML..."); //$NON-NLS-1$
             // Initialize variables.
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             Document xmlDoc = null;
 
             try {
                 // Using factory get an instance of document builder
-                DocumentBuilder db = dbf.newDocumentBuilder();
+                DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
 
                 // Parse using builder to get DOM representation of the XML file
                 xmlDoc = db.parse(fis);
@@ -2738,12 +2762,11 @@ public class CampaignGUI extends JPanel {
             MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, //$NON-NLS-1$
                     "Starting load of options file from XML..."); //$NON-NLS-1$
             // Initialize variables.
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             Document xmlDoc = null;
 
             try {
                 // Using factory get an instance of document builder
-                DocumentBuilder db = dbf.newDocumentBuilder();
+                DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
 
                 // Parse using builder to get DOM representation of the XML file
                 xmlDoc = db.parse(fis);

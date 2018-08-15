@@ -30,7 +30,6 @@ import java.util.Vector;
 
 import javax.swing.JOptionPane;
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -127,14 +126,13 @@ public class Ranks {
         MekHQ.getLogger().log(Ranks.class, METHOD_NAME, LogLevel.INFO,
                 "Starting load of Rank Systems from XML..."); //$NON-NLS-1$
         // Initialize variables.
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         Document xmlDoc = null;
     
         
         try {
             FileInputStream fis = new FileInputStream("data/universe/ranks.xml");
             // Using factory get an instance of document builder
-            DocumentBuilder db = dbf.newDocumentBuilder();
+            DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
     
             // Parse using builder to get DOM representation of the XML file
             xmlDoc = db.parse(fis);
