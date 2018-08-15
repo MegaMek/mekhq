@@ -10,6 +10,7 @@ v0.45.1-git
 	Also upgrades AtB Chase scenarios to randomly have the player start on the north or the south edge instead of always south.
 + Issue #866: Fixed cancelling GM Add XP subtracts one (1) XP.
 + Issue #859: Fixed JSpinner text box overriding user-typed values.
++ Issue #857: Fixed bug where refit armor may not be attached to a unit on load.
 
 v0.45.0 (2018-08-02 0200 UTC)
 + PR #602: Add KIA checkbox and functionality to prisoners during scenario resolution.
