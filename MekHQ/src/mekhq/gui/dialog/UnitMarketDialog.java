@@ -427,7 +427,7 @@ public class UnitMarketDialog extends JDialog {
             MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
                     "Unable to load mech: " + ms.getSourceFile() + ": " //$NON-NLS-1$
                     + ms.getEntryName() + ": " + e.getMessage()); //$NON-NLS-1$
-            MekHQ.getLogger().log(getClass(), METHOD_NAME, e);
+            MekHQ.getLogger().error(getClass(), METHOD_NAME, e);
             refreshOfferView();
             return;
 		}

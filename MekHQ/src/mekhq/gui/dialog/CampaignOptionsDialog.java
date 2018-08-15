@@ -4399,7 +4399,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
             MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO,
                     "Campaign options saved to " + file); //$NON-NLS-1$
         } catch (Exception ex) {
-            MekHQ.getLogger().log(getClass(), METHOD_NAME, ex);
+            MekHQ.getLogger().error(getClass(), METHOD_NAME, ex);
             JOptionPane
                     .showMessageDialog(
                             null,

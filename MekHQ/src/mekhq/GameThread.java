@@ -84,7 +84,7 @@ class GameThread extends Thread implements CloseClientListener {
         } catch (Exception ex) {
             MekHQ.getLogger().log(getClass(), "run()", LogLevel.ERROR,
                     "MegaMek client failed to connect to server"); //$NON-NLS-1$
-            MekHQ.getLogger().log(getClass(), "run()", ex);
+            MekHQ.getLogger().error(getClass(), "run()", ex);
             return;
         }
 
@@ -131,7 +131,7 @@ class GameThread extends Thread implements CloseClientListener {
             	Thread.sleep(50);
             }
         } catch (Exception e) {
-            MekHQ.getLogger().log(getClass(), "run()", e);
+            MekHQ.getLogger().error(getClass(), "run()", e);
         }
         finally {
 	        client.die();

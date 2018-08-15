@@ -231,7 +231,7 @@ public class ForceStub implements Serializable {
             // Errrr, apparently either the class name was invalid...
             // Or the listed name doesn't exist.
             // Doh!
-            MekHQ.getLogger().log(ForceStub.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(ForceStub.class, METHOD_NAME, ex);
         }
         
         return retVal;

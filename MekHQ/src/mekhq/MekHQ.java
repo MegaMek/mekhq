@@ -202,10 +202,8 @@ public class MekHQ implements GameListener {
 	 */
 	@Deprecated
 	public static void logError(Exception ex) {
-		getLogger().log(MekHQ.class,
-						"unknown," +
-						LogLevel.ERROR,
-						ex);
+		getLogger().error(MekHQ.class, "unknown," +
+		LogLevel.ERROR, ex);
 	}
 
 	protected static MekHQ getInstance() {

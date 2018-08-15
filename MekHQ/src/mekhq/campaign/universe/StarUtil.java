@@ -630,9 +630,9 @@ public final class StarUtil {
                 }
                 iconDataLoaded = true;
             } catch (FileNotFoundException e) {
-                MekHQ.getLogger().log(StarUtil.class, METHOD_NAME, e);
+                MekHQ.getLogger().error(StarUtil.class, METHOD_NAME, e);
             } catch (IOException e) {
-                MekHQ.getLogger().log(StarUtil.class, METHOD_NAME, e);
+                MekHQ.getLogger().error(StarUtil.class, METHOD_NAME, e);
             }
         }
         return ICON_DATA.get(Utilities.nonNull(planet.getIcon(), "default"));

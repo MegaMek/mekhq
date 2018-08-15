@@ -887,7 +887,7 @@ public class ContractMarket implements Serializable {
             // Errrr, apparently either the class name was invalid...
             // Or the listed name doesn't exist.
             // Doh!
-            MekHQ.getLogger().log(ContractMarket.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(ContractMarket.class, METHOD_NAME, ex);
         }
 
         return retVal;

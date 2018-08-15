@@ -127,7 +127,7 @@ public class LogEntry implements MekHqXmlSerializable {
             }
         } catch (Exception ex) {
             // Doh!
-            MekHQ.getLogger().log(LogEntry.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(LogEntry.class, METHOD_NAME, ex);
         }
         
         return retVal;

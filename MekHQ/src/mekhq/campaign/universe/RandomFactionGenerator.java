@@ -162,9 +162,9 @@ public class RandomFactionGenerator implements Serializable {
 		try {
 			loadFactionHints();
 		} catch (DOMException e) {
-		    MekHQ.getLogger().log(getClass(), "initialize()", e); //$NON-NLS-1$
+		    MekHQ.getLogger().error(getClass(), "initialize()", e); //$NON-NLS-1$
 		} catch (ParseException e) {
-            MekHQ.getLogger().log(getClass(), "initialize()", e); //$NON-NLS-1$
+            MekHQ.getLogger().error(getClass(), "initialize()", e); //$NON-NLS-1$
 		}
 
 		initialized = true;
@@ -213,7 +213,7 @@ public class RandomFactionGenerator implements Serializable {
 	
 			xmlDoc = db.parse(fis);
 		} catch (Exception ex) {
-	        MekHQ.getLogger().log(getClass(), METHOD_NAME, ex);
+	        MekHQ.getLogger().error(getClass(), METHOD_NAME, ex);
 		}
 		
 		Element rootElement = xmlDoc.getDocumentElement();

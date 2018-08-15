@@ -410,7 +410,7 @@ public class EquipmentPart extends Part {
 		try {
 			return unit != null && unit.getEntity() != null && unit.getEntity().getEquipment(equipmentNum) != null && unit.isLocationDestroyed(unit.getEntity().getEquipment(equipmentNum).getLocation());
 		} catch (Exception e) {
-		    MekHQ.getLogger().log(getClass(), "isMountedOnDestroyedLocation()", e);
+		    MekHQ.getLogger().error(getClass(), "isMountedOnDestroyedLocation()", e);
 		}
 		return false;
 		/*if(null == unit) {

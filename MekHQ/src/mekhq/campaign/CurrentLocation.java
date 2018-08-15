@@ -262,7 +262,7 @@ public class CurrentLocation implements Serializable {
 			// Errrr, apparently either the class name was invalid...
 			// Or the listed name doesn't exist.
 			// Doh!
-            MekHQ.getLogger().log(CurrentLocation.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(CurrentLocation.class, METHOD_NAME, ex);
 		}
 
 		return retVal;
