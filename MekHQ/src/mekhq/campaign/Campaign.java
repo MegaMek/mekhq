@@ -425,7 +425,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public void setName(String s) {
-        this.name = s;
+        name = s;
     }
 
     public String getEraName() {
@@ -450,7 +450,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public void setRNG(RandomNameGenerator g) {
-        this.rng = g;
+        rng = g;
     }
 
     public String getCurrentPlanetName() {
@@ -3109,7 +3109,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public void setOvertime(boolean b) {
-        this.overtime = b;
+        overtime = b;
         MekHQ.triggerEvent(new OvertimeModeEvent(b));
     }
 
@@ -3118,7 +3118,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public void setGMMode(boolean b) {
-        this.gmMode = b;
+        gmMode = b;
         MekHQ.triggerEvent(new GMModeEvent(b));
     }
 
@@ -3131,7 +3131,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public void setFactionCode(String i) {
-        this.factionCode = i;
+        factionCode = i;
         updateTechFactionCode();
     }
 
@@ -3165,7 +3165,7 @@ public class Campaign implements Serializable, ITechManager {
      * @param r - the report String
      */
     public void beginReport(String r) {
-        if (this.getCampaignOptions().historicalDailyLog()) {
+        if (getCampaignOptions().historicalDailyLog()) {
             //add the new items to our in-memory cache
             addInMemoryLogHistory(new LogEntry(getDate(), ""));
         }
@@ -3178,7 +3178,7 @@ public class Campaign implements Serializable, ITechManager {
 	 * @param r - the report String
 	 */
 	public void addReport(String r) {
-		if (this.getCampaignOptions().historicalDailyLog()) {
+		if (getCampaignOptions().historicalDailyLog()) {
 			// #858: I'm not sure what the comment about the cache actually mean (it makes no sense to me),
 			//       but LogEntry now handles XML properly so I guess there's no need for this workaround anymore
 			// String htmlStripped = r.replaceAll("\\<[^>]*>",""); //remote HTML tags add the new items to our in-memory cache
@@ -3253,7 +3253,7 @@ public class Campaign implements Serializable, ITechManager {
             category = Transaction.C_MISC;
         }
         finances.credit(quantity, category, description, calendar.getTime());
-        NumberFormat numberFormat = DecimalFormat.getIntegerInstance();
+        NumberFormat numberFormat = NumberFormat.getIntegerInstance();
         String quantityString = numberFormat.format(quantity);
         addReport("Funds added : " + quantityString + " (" + description + ")");
     }
@@ -5175,7 +5175,7 @@ public class Campaign implements Serializable, ITechManager {
                 if (xn.equalsIgnoreCase("calendar")) {
                     SimpleDateFormat df = new SimpleDateFormat(
                             "yyyy-MM-dd hh:mm:ss");
-                    retVal.calendar = (GregorianCalendar) GregorianCalendar
+                    retVal.calendar = (GregorianCalendar) Calendar
                             .getInstance();
                     retVal.calendar.setTime(df
                             .parse(wn.getTextContent().trim()));
@@ -5655,7 +5655,7 @@ public class Campaign implements Serializable, ITechManager {
      * @param type         The phenotype index
      */
     public void checkBloodnameAdd(Person person, int type) {
-        checkBloodnameAdd(person, type, false, this.factionCode);
+        checkBloodnameAdd(person, type, false, factionCode);
     }
     
     /**
@@ -5683,7 +5683,7 @@ public class Campaign implements Serializable, ITechManager {
      * @param ignoreDice   If true, skips the random roll and assigns a Bloodname automatically
      */
     public void checkBloodnameAdd(Person person, int type, boolean ignoreDice) {
-        checkBloodnameAdd(person, type, ignoreDice, this.factionCode);
+        checkBloodnameAdd(person, type, ignoreDice, factionCode);
     }
 
     /**
@@ -5886,7 +5886,7 @@ public class Campaign implements Serializable, ITechManager {
         } else if (name.equals("weapon_specialist")) {
             person.acquireAbility(PilotOptions.LVL3_ADVANTAGES, name,
                     SpecialAbility.chooseWeaponSpecialization(type, getFaction().isClan(),
-                            getCampaignOptions().getTechLevel(), getCalendar().get(GregorianCalendar.YEAR)));
+                            getCampaignOptions().getTechLevel(), getCalendar().get(Calendar.YEAR)));
         } else {
             person.acquireAbility(PilotOptions.LVL3_ADVANTAGES, name, true);
         }
@@ -6615,7 +6615,7 @@ public class Campaign implements Serializable, ITechManager {
         }
         if(getCampaignOptions().disallowExtinctStuff() &&
                 (acquisition.isExtinctIn(getGameYear(), useClanTechBase(), getTechFaction())
-                        || acquisition.getAvailability() == EquipmentType.RATING_X)) {
+                        || acquisition.getAvailability() == ITechnology.RATING_X)) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE,
                     "It is extinct!");
         }
@@ -6634,7 +6634,7 @@ public class Campaign implements Serializable, ITechManager {
              * non-Clan units
              */
             if (acquisition.getTechBase() == Part.T_CLAN && !getFaction().isClan()) {
-                partAvailability = Math.max(partAvailability, EquipmentType.RATING_F);
+                partAvailability = Math.max(partAvailability, ITechnology.RATING_F);
             } else if (et != null) {
                 /*
                  * AtB rules do not simply affect difficulty of obtaining parts, but whether
@@ -6646,8 +6646,8 @@ public class Campaign implements Serializable, ITechManager {
                  */
                 if (et instanceof megamek.common.weapons.lasers.EnergyWeapon
                         && !(et instanceof megamek.common.weapons.flamers.FlamerWeapon)
-                        && partAvailability < EquipmentType.RATING_C) {
-                    partAvailability = EquipmentType.RATING_C;
+                        && partAvailability < ITechnology.RATING_C) {
+                    partAvailability = ITechnology.RATING_C;
                 }
                 if (et instanceof megamek.common.weapons.autocannons.ACWeapon) {
                     partAvailability -= 2;
@@ -7298,7 +7298,7 @@ public class Campaign implements Serializable, ITechManager {
         // first create a list of existing portait strings, so we can check for
         // duplicates
         ArrayList<String> existingPortraits = new ArrayList<>();
-        for (Person existingPerson : this.getPersonnel()) {
+        for (Person existingPerson : getPersonnel()) {
             existingPortraits.add(existingPerson.getPortraitCategory() + ":"
                     + existingPerson.getPortraitFileName());
         }
@@ -7973,7 +7973,7 @@ public class Campaign implements Serializable, ITechManager {
 
     public void addLoan(Loan loan) {
         addReport("You have taken out loan " + loan.getDescription()
-                + ". Your account has been credited " + DecimalFormat.getInstance().format(loan.getPrincipal())
+                + ". Your account has been credited " + NumberFormat.getInstance().format(loan.getPrincipal())
                 + " for the principal amount.");
         finances.addLoan(loan);
         MekHQ.triggerEvent(new LoanNewEvent(loan));
@@ -7986,7 +7986,7 @@ public class Campaign implements Serializable, ITechManager {
         if (finances.debit(loan.getRemainingValue(),
                 Transaction.C_LOAN_PAYMENT, "loan payoff for " + loan.getDescription(), calendar.getTime())) {
             addReport("You have paid off the remaining loan balance of "
-                    + DecimalFormat.getInstance().format(loan.getRemainingValue()) + "on " + loan.getDescription());
+                    + NumberFormat.getInstance().format(loan.getRemainingValue()) + "on " + loan.getDescription());
             finances.removeLoan(loan);
             MekHQ.triggerEvent(new LoanPaidEvent(loan));
         } else {
@@ -8065,47 +8065,47 @@ public class Campaign implements Serializable, ITechManager {
                 + smallCraft + proto + spareParts + getFinances().getTotalAssetValue();
         long liabilities = loans;
         long netWorth = assets - liabilities;
-        int longest = Math.max(DecimalFormat.getInstance().format(liabilities)
-                .length(), DecimalFormat.getInstance().format(assets).length());
-        longest = Math.max(DecimalFormat.getInstance().format(netWorth)
+        int longest = Math.max(NumberFormat.getInstance().format(liabilities)
+                .length(), NumberFormat.getInstance().format(assets).length());
+        longest = Math.max(NumberFormat.getInstance().format(netWorth)
                 .length(), longest);
         String formatted = "%1$" + longest + "s";
         sb.append("Net Worth................ ")
-                .append(String.format(formatted, DecimalFormat.getInstance().format(netWorth))).append("\n\n");
+                .append(String.format(formatted, NumberFormat.getInstance().format(netWorth))).append("\n\n");
         sb.append("    Assets............... ")
-                .append(String.format(formatted, DecimalFormat.getInstance().format(assets))).append("\n");
+                .append(String.format(formatted, NumberFormat.getInstance().format(assets))).append("\n");
         sb.append("       Cash.............. ")
-                .append(String.format(formatted, DecimalFormat.getInstance().format(cash))).append("\n");
+                .append(String.format(formatted, NumberFormat.getInstance().format(cash))).append("\n");
         if (mech > 0) {
             sb.append("       Mechs............. ")
-                    .append(String.format(formatted, DecimalFormat.getInstance().format(mech))).append("\n");
+                    .append(String.format(formatted, NumberFormat.getInstance().format(mech))).append("\n");
         }
         if (vee > 0) {
             sb.append("       Vehicles.......... ")
-                    .append(String.format(formatted, DecimalFormat.getInstance().format(vee))).append("\n");
+                    .append(String.format(formatted, NumberFormat.getInstance().format(vee))).append("\n");
         }
         if (ba > 0) {
             sb.append("       BattleArmor....... ")
-                    .append(String.format(formatted, DecimalFormat.getInstance().format(ba))).append("\n");
+                    .append(String.format(formatted, NumberFormat.getInstance().format(ba))).append("\n");
         }
         if (infantry > 0) {
             sb.append("       Infantry.......... ")
-                    .append(String.format(formatted, DecimalFormat.getInstance().format(infantry))).append("\n");
+                    .append(String.format(formatted, NumberFormat.getInstance().format(infantry))).append("\n");
         }
         if (proto > 0) {
             sb.append("       Protomechs........ ")
-                    .append(String.format(formatted, DecimalFormat.getInstance().format(proto))).append("\n");
+                    .append(String.format(formatted, NumberFormat.getInstance().format(proto))).append("\n");
         }
         if (smallCraft > 0) {
             sb.append("       Small Craft....... ")
-                    .append(String.format(formatted, DecimalFormat.getInstance().format(smallCraft))).append("\n");
+                    .append(String.format(formatted, NumberFormat.getInstance().format(smallCraft))).append("\n");
         }
         if (largeCraft > 0) {
             sb.append("       Large Craft....... ")
-                    .append(String.format(formatted, DecimalFormat.getInstance().format(largeCraft))).append("\n");
+                    .append(String.format(formatted, NumberFormat.getInstance().format(largeCraft))).append("\n");
         }
         sb.append("       Spare Parts....... ")
-                .append(String.format(formatted, DecimalFormat.getInstance().format(spareParts))).append("\n");
+                .append(String.format(formatted, NumberFormat.getInstance().format(spareParts))).append("\n");
 
         if (getFinances().getAllAssets().size() > 0) {
             for (Asset asset : getFinances().getAllAssets()) {
@@ -8120,38 +8120,38 @@ public class Campaign implements Serializable, ITechManager {
                 }
                 assetName += " ";
                 sb.append("       ").append(assetName)
-                        .append(String.format(formatted, DecimalFormat.getInstance().format(asset.getValue())))
+                        .append(String.format(formatted, NumberFormat.getInstance().format(asset.getValue())))
                         .append("\n");
             }
         }
         sb.append("\n");
         sb.append("    Liabilities.......... ")
-                .append(String.format(formatted, DecimalFormat.getInstance().format(liabilities))).append("\n");
+                .append(String.format(formatted, NumberFormat.getInstance().format(liabilities))).append("\n");
         sb.append("       Loans............. ")
-                .append(String.format(formatted, DecimalFormat.getInstance().format(loans))).append("\n\n\n");
+                .append(String.format(formatted, NumberFormat.getInstance().format(loans))).append("\n\n\n");
 
         sb.append("Monthly Profit........... ")
-                .append(String.format(formatted, DecimalFormat.getInstance().format(monthlyIncome - monthlyExpenses)))
+                .append(String.format(formatted, NumberFormat.getInstance().format(monthlyIncome - monthlyExpenses)))
                 .append("\n\n");
         sb.append("Monthly Income........... ")
-                .append(String.format(formatted, DecimalFormat.getInstance().format(monthlyIncome))).append("\n");
+                .append(String.format(formatted, NumberFormat.getInstance().format(monthlyIncome))).append("\n");
         sb.append("    Contract Payments.... ")
-                .append(String.format(formatted, DecimalFormat.getInstance().format(contracts))).append("\n\n");
+                .append(String.format(formatted, NumberFormat.getInstance().format(contracts))).append("\n\n");
         sb.append("Monthly Expenses......... ")
-                .append(String.format(formatted, DecimalFormat.getInstance().format(monthlyExpenses))).append("\n");
+                .append(String.format(formatted, NumberFormat.getInstance().format(monthlyExpenses))).append("\n");
         sb.append("    Salaries............. ")
-                .append(String.format(formatted, DecimalFormat.getInstance().format(salaries))).append("\n");
+                .append(String.format(formatted, NumberFormat.getInstance().format(salaries))).append("\n");
         sb.append("    Maintenance.......... ")
-                .append(String.format(formatted, DecimalFormat.getInstance().format(maintenance))).append("\n");
+                .append(String.format(formatted, NumberFormat.getInstance().format(maintenance))).append("\n");
         sb.append("    Overhead............. ")
-                .append(String.format(formatted, DecimalFormat.getInstance().format(overhead))).append("\n");
+                .append(String.format(formatted, NumberFormat.getInstance().format(overhead))).append("\n");
         if (campaignOptions.usePeacetimeCost()) {
             sb.append("    Spare Parts.......... ")
-                    .append(String.format(formatted, DecimalFormat.getInstance().format(coSpareParts))).append("\n");
+                    .append(String.format(formatted, NumberFormat.getInstance().format(coSpareParts))).append("\n");
             sb.append("    Training Munitions... ")
-                    .append(String.format(formatted, DecimalFormat.getInstance().format(coAmmo))).append("\n");
+                    .append(String.format(formatted, NumberFormat.getInstance().format(coAmmo))).append("\n");
             sb.append("    Fuel................. ")
-                    .append(String.format(formatted, DecimalFormat.getInstance().format(coFuel))).append("\n");
+                    .append(String.format(formatted, NumberFormat.getInstance().format(coFuel))).append("\n");
         }
 
         return new String(sb);
@@ -8424,12 +8424,12 @@ public class Campaign implements Serializable, ITechManager {
 
     public String getCargoDetails() {
         StringBuffer sb = new StringBuffer("Cargo\n\n");
-        double ccc = this.getTotalCombinedCargoCapacity();
-        double gcc = this.getTotalCargoCapacity();
-        double icc = this.getTotalInsulatedCargoCapacity();
-        double lcc = this.getTotalLiquidCargoCapacity();
-        double scc = this.getTotalLivestockCargoCapacity();
-        double rcc = this.getTotalRefrigeratedCargoCapacity();
+        double ccc = getTotalCombinedCargoCapacity();
+        double gcc = getTotalCargoCapacity();
+        double icc = getTotalInsulatedCargoCapacity();
+        double lcc = getTotalLiquidCargoCapacity();
+        double scc = getTotalLivestockCargoCapacity();
+        double rcc = getTotalRefrigeratedCargoCapacity();
         double tonnage = this.getCargoTonnage(false);
         double mothballedTonnage = this.getCargoTonnage(false, true);
         double mothballedUnits = Math.max(getNumberOfUnitsByType(Unit.ETYPE_MOTHBALLED), 0);
@@ -9065,7 +9065,7 @@ public class Campaign implements Serializable, ITechManager {
                 }
             }
             if (!p.isDependent() && !p.isPrisoner() && !p.isBondsman()) {
-                GregorianCalendar cal = (GregorianCalendar) GregorianCalendar.getInstance();
+                GregorianCalendar cal = (GregorianCalendar) Calendar.getInstance();
                 // For that one in a billion chance the log is empty. Clone todays date and subtract a year
                 if (join == null) {
                     cal = (GregorianCalendar)calendar.clone();
@@ -9149,7 +9149,7 @@ public class Campaign implements Serializable, ITechManager {
                 }
             }
         }
-        addAllLances(this.forces);
+        addAllLances(forces);
         atbConfig = AtBConfiguration.loadFromXml();
         RandomFactionGenerator.getInstance().updateTables(calendar.getTime(), location.getCurrentPlanet(),
                 campaignOptions);
@@ -9171,7 +9171,7 @@ public class Campaign implements Serializable, ITechManager {
         if (overdueAmount > 0) {
             JOptionPane.showMessageDialog(
                     null,
-                    "You have overdue loan payments totaling " + DecimalFormat.getInstance().format(overdueAmount)
+                    "You have overdue loan payments totaling " + NumberFormat.getInstance().format(overdueAmount)
                             + " C-bills.\nYou must deal with these payments before advancing the day.\nHere are some options:\n  - Sell off equipment to generate funds.\n  - Pay off the collateral on the loan.\n  - Default on the loan.\n  - Just cheat and remove the loan via GM mode.",
                             "Overdue Loan Payments",
                             JOptionPane.WARNING_MESSAGE);

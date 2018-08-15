@@ -42,7 +42,7 @@ public class UnitAssignmentTableModel extends AbstractTableModel {
     ArrayList<UUID> data;
 
     public UnitAssignmentTableModel(Campaign c) {
-        this.campaign = c;
+        campaign = c;
         data = new ArrayList<>();
     }
 
@@ -141,7 +141,8 @@ public class UnitAssignmentTableModel extends AbstractTableModel {
          */
         private static final long serialVersionUID = -3368335772600192895L;
 
-        public Component getTableCellRendererComponent(JTable table,
+        @Override
+		public Component getTableCellRendererComponent(JTable table,
                 Object value, boolean isSelected, boolean hasFocus,
                 int row, int column) {
             super.getTableCellRendererComponent(table, value, isSelected,
@@ -174,7 +175,8 @@ public class UnitAssignmentTableModel extends AbstractTableModel {
             super(icons);
         }
 
-        public Component getTableCellRendererComponent(JTable table,
+        @Override
+		public Component getTableCellRendererComponent(JTable table,
                 Object value, boolean isSelected, boolean hasFocus,
                 int row, int column) {
             Component c = this;

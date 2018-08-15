@@ -25,32 +25,33 @@ import java.util.Map;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 import megamek.common.EquipmentType;
+import megamek.common.ITechnology;
 import mekhq.campaign.universe.Planet;
 
 public class SocioIndustrialDataAdapter extends XmlAdapter<String, Planet.SocioIndustrialData> {
     private final static Map<String, Integer> stringToEquipmentTypeMap = new HashMap<>(6);
     private final static Map<Integer, String> equipmentTypeToStringMap = new HashMap<>(6);
     static {
-        stringToEquipmentTypeMap.put("A", EquipmentType.RATING_A); //$NON-NLS-1$
-        stringToEquipmentTypeMap.put("B", EquipmentType.RATING_B); //$NON-NLS-1$
-        stringToEquipmentTypeMap.put("C", EquipmentType.RATING_C); //$NON-NLS-1$
-        stringToEquipmentTypeMap.put("D", EquipmentType.RATING_D); //$NON-NLS-1$
-        stringToEquipmentTypeMap.put("E", EquipmentType.RATING_E); //$NON-NLS-1$
-        stringToEquipmentTypeMap.put("F", EquipmentType.RATING_F); //$NON-NLS-1$
+        stringToEquipmentTypeMap.put("A", ITechnology.RATING_A); //$NON-NLS-1$
+        stringToEquipmentTypeMap.put("B", ITechnology.RATING_B); //$NON-NLS-1$
+        stringToEquipmentTypeMap.put("C", ITechnology.RATING_C); //$NON-NLS-1$
+        stringToEquipmentTypeMap.put("D", ITechnology.RATING_D); //$NON-NLS-1$
+        stringToEquipmentTypeMap.put("E", ITechnology.RATING_E); //$NON-NLS-1$
+        stringToEquipmentTypeMap.put("F", ITechnology.RATING_F); //$NON-NLS-1$
         equipmentTypeToStringMap.put(-1, "ADV"); //$NON-NLS-1$
-        equipmentTypeToStringMap.put(EquipmentType.RATING_A, "A"); //$NON-NLS-1$
-        equipmentTypeToStringMap.put(EquipmentType.RATING_B, "B"); //$NON-NLS-1$
-        equipmentTypeToStringMap.put(EquipmentType.RATING_C, "C"); //$NON-NLS-1$
-        equipmentTypeToStringMap.put(EquipmentType.RATING_D, "D"); //$NON-NLS-1$
-        equipmentTypeToStringMap.put(EquipmentType.RATING_E, "E"); //$NON-NLS-1$
-        equipmentTypeToStringMap.put(EquipmentType.RATING_F, "F"); //$NON-NLS-1$
-        equipmentTypeToStringMap.put(EquipmentType.RATING_X, "R"); //$NON-NLS-1$
+        equipmentTypeToStringMap.put(ITechnology.RATING_A, "A"); //$NON-NLS-1$
+        equipmentTypeToStringMap.put(ITechnology.RATING_B, "B"); //$NON-NLS-1$
+        equipmentTypeToStringMap.put(ITechnology.RATING_C, "C"); //$NON-NLS-1$
+        equipmentTypeToStringMap.put(ITechnology.RATING_D, "D"); //$NON-NLS-1$
+        equipmentTypeToStringMap.put(ITechnology.RATING_E, "E"); //$NON-NLS-1$
+        equipmentTypeToStringMap.put(ITechnology.RATING_F, "F"); //$NON-NLS-1$
+        equipmentTypeToStringMap.put(ITechnology.RATING_X, "R"); //$NON-NLS-1$
     }
     private final String SEPARATOR = "-"; //$NON-NLS-1$
     
     public static int convertRatingToCode(String rating) {
         Integer result = stringToEquipmentTypeMap.get(rating.toUpperCase(Locale.ROOT));
-        return null != result ? result.intValue() : EquipmentType.RATING_C;
+        return null != result ? result.intValue() : ITechnology.RATING_C;
     }
     
     public static String convertCodeToRating(int code) {
@@ -64,13 +65,13 @@ public class SocioIndustrialDataAdapter extends XmlAdapter<String, Planet.SocioI
         Planet.SocioIndustrialData result = new Planet.SocioIndustrialData();
         if(socio.length >= 5) {
             result.tech = convertRatingToCode(socio[0]);
-            if(result.tech == EquipmentType.RATING_C) {
+            if(result.tech == ITechnology.RATING_C) {
                 // Could be ADV or R too
                 String techRating = socio[0].toUpperCase(Locale.ROOT);
                 if(techRating.equals("ADV")) {
                     result.tech = -1;
                 } else if(techRating.equals("R")) {
-                    result.tech = EquipmentType.RATING_X;
+                    result.tech = ITechnology.RATING_X;
                 }
             }
             result.industry = convertRatingToCode(socio[1]);

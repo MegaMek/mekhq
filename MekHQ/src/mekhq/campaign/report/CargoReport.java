@@ -41,11 +41,13 @@ public class CargoReport extends Report {
         super(c);
     }
     
-    public String getTitle() {
+    @Override
+	public String getTitle() {
         return "Cargo Report";
     }
       
-    public JTextPane getReport() {
+    @Override
+	public JTextPane getReport() {
         JTextPane txtReport = new JTextPane();
         txtReport.setMinimumSize(new Dimension(800, 500));
         txtReport.setFont(new Font("Courier New", Font.PLAIN, 12));

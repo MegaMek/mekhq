@@ -95,7 +95,8 @@ public class PopupValueChoiceDialog extends JDialog implements WindowListener {
         btnDone.setText(resourceMap.getString("btnDone.text")); // NOI18N
         btnDone.setName("btnDone"); // NOI18N
         btnDone.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent evt) {
+            @Override
+			public void actionPerformed(ActionEvent evt) {
                 btnDoneActionPerformed(evt);
             }
         });
@@ -103,7 +104,8 @@ public class PopupValueChoiceDialog extends JDialog implements WindowListener {
         btnCancel.setText(resourceMap.getString("btnCancel.text")); // NOI18N
         btnCancel.setName("btnCancel"); // NOI18N
         btnCancel.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent evt) {
+            @Override
+			public void actionPerformed(ActionEvent evt) {
                 btnCancelActionPerformed(evt);
             }
         });
@@ -122,12 +124,12 @@ public class PopupValueChoiceDialog extends JDialog implements WindowListener {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnDoneActionPerformed(ActionEvent evt) {//GEN-FIRST:event_btnDoneActionPerformed
-        this.setVisible(false);
+        setVisible(false);
     }//GEN-LAST:event_btnDoneActionPerformed
 
     private void btnCancelActionPerformed(ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
         value.getModel().setValue(-1);
-    	this.setVisible(false);
+    	setVisible(false);
     }//GEN-LAST:event_btnCancelActionPerformed
 
     /**
@@ -135,10 +137,12 @@ public class PopupValueChoiceDialog extends JDialog implements WindowListener {
     */
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
+            @Override
+			public void run() {
                 PopupValueChoiceDialog dialog = new PopupValueChoiceDialog(new JFrame(), true, "Label", 0, 0, 1);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
-                    public void windowClosing(java.awt.event.WindowEvent e) {
+                    @Override
+					public void windowClosing(java.awt.event.WindowEvent e) {
                         System.exit(0);
                     }
                 });
@@ -161,9 +165,9 @@ public class PopupValueChoiceDialog extends JDialog implements WindowListener {
 
     @Override
     public void windowClosing(WindowEvent arg0) {
-        if (arg0.getComponent() != this.btnDone) {
+        if (arg0.getComponent() != btnDone) {
             value.getModel().setValue(-1);
-            this.setVisible(false);
+            setVisible(false);
         }
     }
 

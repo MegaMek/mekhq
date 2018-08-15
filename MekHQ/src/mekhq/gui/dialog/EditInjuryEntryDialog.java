@@ -79,7 +79,7 @@ public class EditInjuryEntryDialog extends JDialog {
     /** Creates new form EditInjuryEntryDialog */
     public EditInjuryEntryDialog(Frame parent, boolean modal, Injury e) {
         super(parent, modal);
-        this.frame = parent;
+        frame = parent;
         injury = e;
         initComponents();
         setLocationRelativeTo(parent);
@@ -348,12 +348,12 @@ public class EditInjuryEntryDialog extends JDialog {
             injury.setExtended(false);
         }
         injury.setUUID(UUID.randomUUID());
-        this.setVisible(false);
+        setVisible(false);
     }
 
     private void btnCloseActionPerformed(ActionEvent evt) {
         injury = null;
-        this.setVisible(false);
+        setVisible(false);
     }
     
     public Injury getEntry() {

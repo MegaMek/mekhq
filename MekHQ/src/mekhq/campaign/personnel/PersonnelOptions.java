@@ -150,7 +150,8 @@ public class PersonnelOptions extends PilotOptions {
             super("PersonnelOptionsInfo"); //$NON-NLS-1$
         }
         
-        public IOptionInfo getOptionInfo(String name) {
+        @Override
+		public IOptionInfo getOptionInfo(String name) {
             return optionsHash.get(name);
         }
 

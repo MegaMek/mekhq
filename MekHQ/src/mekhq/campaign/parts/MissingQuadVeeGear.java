@@ -6,6 +6,7 @@ package mekhq.campaign.parts;
 import org.w3c.dom.Node;
 
 import megamek.common.CriticalSlot;
+import megamek.common.Entity;
 import megamek.common.QuadVee;
 import megamek.common.TechAdvancement;
 import mekhq.campaign.Campaign;
@@ -41,7 +42,7 @@ public class MissingQuadVeeGear extends MissingPart {
 
     @Override
     public int getLocation() {
-        return QuadVee.LOC_NONE;
+        return Entity.LOC_NONE;
     }
 
     @Override

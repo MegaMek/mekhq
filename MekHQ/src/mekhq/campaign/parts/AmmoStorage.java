@@ -61,15 +61,16 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
         super(tonnage, et, -1, c);
         this.shots = shots;
         if(null != type && type instanceof AmmoType) {
-        	this.munition = ((AmmoType)type).getMunitionType();
+        	munition = ((AmmoType)type).getMunitionType();
         }
 
     }
     
-    public AmmoStorage clone() {
+    @Override
+	public AmmoStorage clone() {
     	AmmoStorage storage = new AmmoStorage(0, getType(), shots, campaign);
         storage.copyBaseData(this);
-    	storage.munition = this.munition;
+    	storage.munition = munition;
     	return storage;
     }
     
@@ -130,7 +131,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
                         && ((BombType)getType()).getBombType() == ((BombType)((EquipmentPart)part).getType()).getBombType();
             } else {
                 return ((AmmoType)getType()).getMunitionType() == ((AmmoType)((AmmoStorage)part).getType()).getMunitionType()
-                        && ((AmmoType)getType()).equals( (Object)((EquipmentPart)part).getType());
+                        && ((AmmoType)getType()).equals( ((EquipmentPart)part).getType());
             }
             
         }
@@ -227,6 +228,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
 		return false;
 	}
 	
+	@Override
 	public String getDesc() {
 		String toReturn = "<html><font size='2'";
 		String scheduled = "";
@@ -282,7 +284,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
                 continue;
             }
             if(part instanceof AmmoStorage 
-                    && ((AmmoType)((AmmoStorage)part).getType()).equals((Object)curType)
+                    && ((AmmoType)((AmmoStorage)part).getType()).equals(curType)
                     && curMunition == ((AmmoType)((AmmoStorage)part).getType()).getMunitionType()) {
                 a = (AmmoStorage)part;
                 a.changeShots(amount);

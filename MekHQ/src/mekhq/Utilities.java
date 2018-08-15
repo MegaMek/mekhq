@@ -345,7 +345,7 @@ public class Utilities {
 
 
     public static String getCurrencyString(long value) {
-        NumberFormat numberFormat = DecimalFormat.getIntegerInstance();
+        NumberFormat numberFormat = NumberFormat.getIntegerInstance();
         String text = numberFormat.format(value) + " C-Bills";
         return text;
     }
@@ -921,7 +921,7 @@ public class Utilities {
     private static void populateOptionsFromCrew(Person p, Crew oldCrew) {
         Enumeration<IOption> optionsEnum = oldCrew.getOptions().getOptions();
         while(optionsEnum.hasMoreElements()) {
-            IOption currentOption = (IOption) optionsEnum.nextElement();
+            IOption currentOption = optionsEnum.nextElement();
             p.getOptions().getOption(currentOption.getName()).setValue(currentOption.getValue());
         }
     }
@@ -1282,7 +1282,7 @@ public class Utilities {
         }
 
         //reset all hours mins and secs to zero on start date
-        Calendar startCal = GregorianCalendar.getInstance();
+        Calendar startCal = Calendar.getInstance();
         startCal.setTime(start);
         startCal.set(Calendar.HOUR_OF_DAY, 0);
         startCal.set(Calendar.MINUTE, 0);
@@ -1290,7 +1290,7 @@ public class Utilities {
         long startTime = startCal.getTimeInMillis();
 
         //reset all hours mins and secs to zero on end date
-        Calendar endCal = GregorianCalendar.getInstance();
+        Calendar endCal = Calendar.getInstance();
         endCal.setTime(end);
         endCal.set(Calendar.HOUR_OF_DAY, 0);
         endCal.set(Calendar.MINUTE, 0);
@@ -1303,9 +1303,9 @@ public class Utilities {
     public static int getDiffFullYears(Date date, GregorianCalendar b) {
         GregorianCalendar a = new GregorianCalendar();
         a.setTime(date);
-        int diff = b.get(GregorianCalendar.YEAR) - a.get(GregorianCalendar.YEAR);
-        if (a.get(GregorianCalendar.MONTH) > b.get(GregorianCalendar.MONTH) ||
-            (a.get(GregorianCalendar.MONTH) == b.get(GregorianCalendar.MONTH) && a.get(GregorianCalendar.DATE) > b.get(GregorianCalendar.DATE))) {
+        int diff = b.get(Calendar.YEAR) - a.get(Calendar.YEAR);
+        if (a.get(Calendar.MONTH) > b.get(Calendar.MONTH) ||
+            (a.get(Calendar.MONTH) == b.get(Calendar.MONTH) && a.get(Calendar.DATE) > b.get(Calendar.DATE))) {
             diff--;
         }
         return diff;
@@ -1314,7 +1314,7 @@ public class Utilities {
     public static int getDiffPartialYears(Date date, GregorianCalendar b) {
         GregorianCalendar a = new GregorianCalendar();
         a.setTime(date);
-        int diff = b.get(GregorianCalendar.YEAR) - a.get(GregorianCalendar.YEAR);
+        int diff = b.get(Calendar.YEAR) - a.get(Calendar.YEAR);
         if (diff == 0 && countDaysBetween(a.getTime(), b.getTime()) > 0) {
             return 1;
         }

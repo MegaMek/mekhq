@@ -36,7 +36,7 @@ public abstract class Report {
     private Campaign campaign;
 
     public Report(Campaign c) {
-        this.campaign = c;
+        campaign = c;
     }
     
     protected Campaign getCampaign() {

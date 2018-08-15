@@ -50,8 +50,8 @@ public class MissingProtomekArmActuator extends MissingPart {
     
     public MissingProtomekArmActuator(int tonnage, int loc, Campaign c) {
         super(tonnage, c);
-        this.name = "Protomech Arm Actuator";
-        this.location = loc;
+        name = "Protomech Arm Actuator";
+        location = loc;
     }
     
     @Override 
@@ -65,7 +65,7 @@ public class MissingProtomekArmActuator extends MissingPart {
 	}
     
     public void setLocation(int loc) {
-        this.location = loc;
+        location = loc;
     }
     
    
@@ -76,7 +76,8 @@ public class MissingProtomekArmActuator extends MissingPart {
         return 0;
     }
     
-    public int getLocation() {
+    @Override
+	public int getLocation() {
         return location;
     }
     

@@ -47,29 +47,31 @@ public class Turret extends TankLocation {
     	this(0, 0, null);
     }
     
-    public int getLoc() {
+    @Override
+	public int getLoc() {
         return loc;
     }
     
     public Turret(int loc, int tonnage, Campaign c) {
     	super(loc, tonnage, c);
     	weight = 0;
-    	this.name = "Turret";
+    	name = "Turret";
     }
     
-    public Turret clone() {
+    @Override
+	public Turret clone() {
     	Turret clone = new Turret(0, getUnitTonnage(), weight, campaign);
         clone.copyBaseData(this);
-    	clone.loc = this.loc;
-    	clone.damage = this.damage;
-    	clone.breached = this.breached;
+    	clone.loc = loc;
+    	clone.damage = damage;
+    	clone.breached = breached;
     	return clone;
     }
     
     public Turret(int loc, int tonnage, double weight, Campaign c) {
         super(loc, tonnage, c);
         this.weight = weight;
-    	this.name = "Turret";
+    	name = "Turret";
     }
     
     @Override
@@ -79,7 +81,7 @@ public class Turret extends TankLocation {
     		weight = 0;
             for (Mounted m : unit.getEntity().getWeaponList()) {
                 WeaponType wt = (WeaponType) m.getType();
-                if (m.getLocation() == this.loc) {
+                if (m.getLocation() == loc) {
                     weight += wt.getTonnage(unit.getEntity()) / 10.0;
                 }
             }

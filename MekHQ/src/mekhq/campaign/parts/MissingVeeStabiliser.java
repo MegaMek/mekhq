@@ -49,7 +49,7 @@ public class MissingVeeStabiliser extends MissingPart {
     
     public MissingVeeStabiliser(int tonnage, int loc, Campaign c) {
     	super(0, c);
-    	this.name = "Vehicle Stabiliser";
+    	name = "Vehicle Stabiliser";
     	this.loc = loc;
     }
     
@@ -121,6 +121,7 @@ public class MissingVeeStabiliser extends MissingPart {
 		}
 	}
 	
+	@Override
 	public int getLocation() {
 		return loc;
 	}

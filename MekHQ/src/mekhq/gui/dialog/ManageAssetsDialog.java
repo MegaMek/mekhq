@@ -69,7 +69,7 @@ public class ManageAssetsDialog extends JDialog {
     /** Creates new form EditPersonnelLogDialog */
     public ManageAssetsDialog(Frame parent, Campaign c) {
         super(parent, true);
-        this.frame = parent;
+        frame = parent;
         campaign = c;
         assetModel = new AssetTableModel(campaign.getFinances().getAllAssets());
         initComponents();
@@ -91,7 +91,8 @@ public class ManageAssetsDialog extends JDialog {
         JPanel panBtns = new JPanel(new GridLayout(1,0));
         btnAdd.setText("Add Asset"); // NOI18N
         btnAdd.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 addAsset();
             }
         });
@@ -99,7 +100,8 @@ public class ManageAssetsDialog extends JDialog {
         btnEdit.setText("Edit Asset"); // NOI18N
         btnEdit.setEnabled(false);
         btnEdit.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 editAsset();
             }
         });
@@ -107,7 +109,8 @@ public class ManageAssetsDialog extends JDialog {
         btnDelete.setText("Remove Asset"); // NOI18N
         btnDelete.setEnabled(false);
         btnDelete.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 deleteAsset();
             }
         });
@@ -126,7 +129,8 @@ public class ManageAssetsDialog extends JDialog {
         assetTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         assetTable.getSelectionModel().addListSelectionListener(
                 new javax.swing.event.ListSelectionListener() {
-                    public void valueChanged(
+                    @Override
+					public void valueChanged(
                             javax.swing.event.ListSelectionEvent evt) {
                         assetTableValueChanged(evt);
                     }
@@ -138,7 +142,8 @@ public class ManageAssetsDialog extends JDialog {
         btnOK.setText(resourceMap.getString("btnOK.text")); // NOI18N
         btnOK.setName("btnOK"); // NOI18N
         btnOK.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnOKActionPerformed(evt);
             }
         });
@@ -149,7 +154,7 @@ public class ManageAssetsDialog extends JDialog {
 
     
     private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {
-        this.setVisible(false);
+        setVisible(false);
     }
     
     private void assetTableValueChanged(javax.swing.event.ListSelectionEvent evt) {
@@ -215,7 +220,8 @@ public class ManageAssetsDialog extends JDialog {
             data = assets;
         }
         
-        public int getRowCount() {
+        @Override
+		public int getRowCount() {
             return data.size();
         }
 
@@ -240,7 +246,8 @@ public class ManageAssetsDialog extends JDialog {
             }
         }
 
-        public Object getValueAt(int row, int col) {
+        @Override
+		public Object getValueAt(int row, int col) {
             Asset asset;
             if(data.isEmpty()) {
                 return "";
@@ -302,7 +309,8 @@ public class ManageAssetsDialog extends JDialog {
 
                 private static final long serialVersionUID = 9054581142945717303L;
 
-                public Component getTableCellRendererComponent(JTable table,
+                @Override
+				public Component getTableCellRendererComponent(JTable table,
                         Object value, boolean isSelected, boolean hasFocus,
                         int row, int column) {
                     super.getTableCellRendererComponent(table, value, isSelected,

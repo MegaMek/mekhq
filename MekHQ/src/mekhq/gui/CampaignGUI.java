@@ -66,6 +66,7 @@ import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
+import javax.swing.WindowConstants;
 import javax.swing.filechooser.FileFilter;
 import javax.xml.parsers.DocumentBuilder;
 
@@ -245,7 +246,7 @@ public class CampaignGUI extends JPanel {
         mainPanel.setOneTouchExpandable(false);
         logDialog.setVisible(true);
         refreshReport();
-        this.revalidate();
+        revalidate();
         this.repaint();
     }
 
@@ -255,7 +256,7 @@ public class CampaignGUI extends JPanel {
         mainPanel.setOneTouchExpandable(true);
         miDetachLog.setEnabled(true);
         miAttachLog.setEnabled(false);
-        this.revalidate();
+        revalidate();
         this.repaint();
     }
 
@@ -336,7 +337,7 @@ public class CampaignGUI extends JPanel {
         resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI", new EncodeControl()); //$NON-NLS-1$
 
         frame = new JFrame("MekHQ"); //$NON-NLS-1$
-        frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 
         tabMain = new JTabbedPane();
         tabMain.setToolTipText(resourceMap.getString("tabMain.toolTipText")); // NOI18N
@@ -2863,10 +2864,10 @@ public class CampaignGUI extends JPanel {
             }
 
             if (null != options) {
-                this.getCampaign().setCampaignOptions(options);
+                getCampaign().setCampaignOptions(options);
             }
             if (null != rsp) {
-                this.getCampaign().setRandomSkillPreferences(rsp);
+                getCampaign().setRandomSkillPreferences(rsp);
             }
 
             MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, //$NON-NLS-1$

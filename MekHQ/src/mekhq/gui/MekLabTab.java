@@ -107,7 +107,7 @@ public class MekLabTab extends CampaignGuiTab {
 
     MekLabTab(CampaignGUI gui, String name) {
         super(gui, name);
-        this.campaignGUI = gui;
+        campaignGUI = gui;
 
         this.repaint();
     }
@@ -239,7 +239,7 @@ public class MekLabTab extends CampaignGuiTab {
     }
 
     public void clearUnit() {
-        this.unit = null;
+        unit = null;
         removeAll();
         add(emptyPanel, BorderLayout.CENTER);
         this.repaint();

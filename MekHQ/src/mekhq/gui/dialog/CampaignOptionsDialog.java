@@ -32,6 +32,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -71,6 +72,7 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JViewport;
 import javax.swing.ListSelectionModel;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
@@ -84,6 +86,7 @@ import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumn;
 
 import megamek.client.ui.swing.util.PlayerColors;
+import megamek.common.IPlayer;
 import megamek.common.Player;
 import megamek.common.logging.LogLevel;
 import megamek.common.options.GameOptions;
@@ -450,16 +453,16 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
      */
     public CampaignOptionsDialog(java.awt.Frame parent, boolean modal, Campaign c, DirectoryItems camos) {
         super(parent, modal);
-        this.campaign = c;
-        this.options = c.getCampaignOptions();
-        this.rskillPrefs = c.getRandomSkillPreferences();
+        campaign = c;
+        options = c.getCampaignOptions();
+        rskillPrefs = c.getRandomSkillPreferences();
         //this is a hack but I have no idea what is going on here
-        this.frame = parent;
-        this.date = campaign.calendar;
+        frame = parent;
+        date = campaign.calendar;
         dateFormat = new SimpleDateFormat("EEEE, MMMM d yyyy");
-        this.camoCategory = campaign.getCamoCategory();
-        this.camoFileName = campaign.getCamoFileName();
-        this.colorIndex = campaign.getColorIndex();
+        camoCategory = campaign.getCamoCategory();
+        camoFileName = campaign.getCamoFileName();
+        colorIndex = campaign.getColorIndex();
         this.camos = camos;
         hashSkillTargets = new Hashtable<>();
         hashGreenSkill = new Hashtable<>();
@@ -575,7 +578,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         javax.swing.JLabel clanPriceModifierLabel = new JLabel();
         javax.swing.JLabel usedPartsValueLabel = new JLabel();
         javax.swing.JLabel damagedPartsValueLabel = new JLabel();
-        DecimalFormat numberFormat = (DecimalFormat) DecimalFormat.getInstance();
+        DecimalFormat numberFormat = (DecimalFormat) NumberFormat.getInstance();
         numberFormat.setMaximumFractionDigits(2);
         DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols();
         decimalFormatSymbols.setGroupingSeparator(' ');
@@ -1147,7 +1150,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
         txtMaxAcquisitions = new JTextField(4);
         txtMaxAcquisitions.setText(Integer.toString(options.getMaxAcquisitions()));
-        txtMaxAcquisitions.setHorizontalAlignment(JTextField.RIGHT);
+        txtMaxAcquisitions.setHorizontalAlignment(SwingConstants.RIGHT);
         txtMaxAcquisitions.setName("txtName"); // NOI18N
 
         JPanel pnlMaxAcquisitions = new JPanel();
@@ -2423,7 +2426,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         scrXP.setPreferredSize(new Dimension(550, 140));
         JTable rowTable = new RowNamesTable(tableXP);
         scrXP.setRowHeaderView(rowTable);
-        scrXP.setCorner(JScrollPane.UPPER_LEFT_CORNER, rowTable.getTableHeader());
+        scrXP.setCorner(ScrollPaneConstants.UPPER_LEFT_CORNER, rowTable.getTableHeader());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 10;
@@ -2961,8 +2964,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        scrRanks.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        scrRanks.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrRanks.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        scrRanks.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
         panRank.add(scrRanks, gridBagConstraints);
 
         //scrRanks.setMinimumSize(new Dimension(500, 500));
@@ -3027,7 +3030,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
         DefaultComboBoxModel<String> factionNamesModel = new DefaultComboBoxModel<>();
         for (Iterator<String> i = campaign.getRNG().getFactions(); i.hasNext(); ) {
-            String faction = (String) i.next();
+            String faction = i.next();
             factionNamesModel.addElement(faction);
         }
         factionNamesModel.setSelectedItem(campaign.getRNG().getChosenFaction());
@@ -3135,7 +3138,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         for (PersonnelMarketMethod method : PersonnelMarketServiceManager.getInstance().getAllServices(true)) {
             personnelMarketType.addItem(method.getModuleName());
         }
-        personnelMarketType.setSelectedItem((String) options.getPersonnelMarketType());
+        personnelMarketType.setSelectedItem(options.getPersonnelMarketType());
         personnelMarketRandomEliteRemoval.setText(Integer.toString(options.getPersonnelMarketRandomEliteRemoval()));
         personnelMarketRandomVeteranRemoval.setText(Integer.toString(options.getPersonnelMarketRandomVeteranRemoval()));
         personnelMarketRandomRegularRemoval.setText(Integer.toString(options.getPersonnelMarketRandomRegularRemoval()));
@@ -3175,7 +3178,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panPersonnelMarket.add(personnelMarketTypeLabel, gridBagConstraints);
 
-        personnelMarketType.setSelectedItem((String) options.getPersonnelMarketType());
+        personnelMarketType.setSelectedItem(options.getPersonnelMarketType());
         personnelMarketType.addActionListener(new java.awt.event.ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -4134,7 +4137,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 				&& btnStaticRATs.isSelected());
 
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
-            public void run() { 
+            @Override
+			public void run() { 
                 scrSPA.getVerticalScrollBar().setValue(0);
                 scrAtB.getVerticalScrollBar().setValue(0);
             }
@@ -4244,7 +4248,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
                                     .getNameGenerator();
         boolean found = false;
         for (Iterator<String> i = campaign.getRNG().getFactions(); i.hasNext(); ) {
-            String nextFaction = (String) i.next();
+            String nextFaction = i.next();
             if (nextFaction.equals(factionCode)) {
                 found = true;
                 break;
@@ -4329,7 +4333,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 				//rather than closing it, but that is currently not possible given how
 				//this dialog is set up
 				MekHQ.triggerEvent(new OptionsChangedEvent(campaign));
-				this.setVisible(false);
+				setVisible(false);
 			}
 		}
     }
@@ -4411,7 +4415,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
                 backupFile.delete();
             }
         }
-    	this.setVisible(false);
+    	setVisible(false);
     }
 
     private void updateOptions() {
@@ -4707,7 +4711,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private void btnOkayActionPerformed() {
         if (txtName.getText().length() > 0) {
         	updateOptions();
-            this.setVisible(false);
+            setVisible(false);
         }
     }
 
@@ -4750,7 +4754,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
     private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
         cancelled = true;
-        this.setVisible(false);
+        setVisible(false);
     }//GEN-LAST:event_btnCancelActionPerformed
 
     public boolean wasCancelled() {
@@ -4821,7 +4825,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
     private void btnAddSPA() {
 
-    	SelectUnusedAbilityDialog suad = new SelectUnusedAbilityDialog(this.frame, getUnusedSPA(), getCurrentSPA());
+    	SelectUnusedAbilityDialog suad = new SelectUnusedAbilityDialog(frame, getUnusedSPA(), getCurrentSPA());
     	suad.setVisible(true);
 
     	panSpecialAbilities.removeAll();
@@ -4909,7 +4913,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
             return;
         }
 
-        if (Player.NO_CAMO.equals(camoCategory)) {
+        if (IPlayer.NO_CAMO.equals(camoCategory)) {
             int colorInd = colorIndex;
             if (colorInd == -1) {
                 colorInd = 0;
@@ -4926,7 +4930,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         // Try to get the camo file.
         try {
             // Translate the root camo directory name.
-            if (Player.ROOT_CAMO.equals(camoCategory)) {
+            if (IPlayer.ROOT_CAMO.equals(camoCategory)) {
                 camoCategory = ""; //$NON-NLS-1$
             }
             Image camo = (Image) camos.getItem(camoCategory, camoFileName);
@@ -4942,7 +4946,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         			+ "data/images/camo folder.",
         			"Missing Camo File",
         			JOptionPane.WARNING_MESSAGE);
-        	camoCategory = Player.NO_CAMO;
+        	camoCategory = IPlayer.NO_CAMO;
         	colorIndex = 0;
         	setCamoIcon();
         }
@@ -5089,7 +5093,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
             private static final long serialVersionUID = -5430873664301394767L;
 
             public RowNumberRenderer() {
-                setHorizontalAlignment(JLabel.LEFT);
+                setHorizontalAlignment(SwingConstants.LEFT);
             }
 
             @Override

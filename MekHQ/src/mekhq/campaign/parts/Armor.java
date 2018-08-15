@@ -23,6 +23,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 import java.text.DecimalFormat;
+import java.text.NumberFormat;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -61,18 +62,19 @@ public class Armor extends Part implements IAcquisitionWork {
     public Armor(int tonnage, int t, int points, int loc, boolean r, boolean clan, Campaign c) {
         // Amount is used for armor quantity, not tonnage
         super(tonnage, c);
-        this.type = t;
-        this.amount = points;
-        this.location = loc;
-        this.rear = r;
+        type = t;
+        amount = points;
+        location = loc;
+        rear = r;
         this.clan = clan;
-        this.name = "Armor";
+        name = "Armor";
         if(type > -1) {
-        	this.name += " (" + EquipmentType.armorNames[type] + ")";
+        	name += " (" + EquipmentType.armorNames[type] + ")";
         }
     }
 
-    public Armor clone() {
+    @Override
+	public Armor clone() {
     	Armor clone = new Armor(0, type, amount, -1, false, clan, campaign);
         clone.copyBaseData(this);
         return clone;
@@ -111,7 +113,8 @@ public class Armor extends Part implements IAcquisitionWork {
         return getStickerPrice();
     }
 
-    public String getDesc() {
+    @Override
+	public String getDesc() {
     	if(isSalvaging()) {
     		return super.getDesc();
     	}
@@ -189,11 +192,13 @@ public class Armor extends Part implements IAcquisitionWork {
     	return amount + amountNeeded;
     }
 
-    public int getLocation() {
+    @Override
+	public int getLocation() {
     	return location;
     }
 
-    public String getLocationName() {
+    @Override
+	public String getLocationName() {
     	return unit.getEntity().getLocationName(location);
     }
 
@@ -206,7 +211,7 @@ public class Armor extends Part implements IAcquisitionWork {
     }
 
     public void setAmountNeeded(int needed) {
-    	this.amountNeeded = needed;
+    	amountNeeded = needed;
     }
 
     public boolean isSameType(Armor armor) {
@@ -227,7 +232,7 @@ public class Armor extends Part implements IAcquisitionWork {
 
     @Override
     public boolean isSameStatus(Part part) {
-    	return this.getDaysToArrival() == part.getDaysToArrival();
+    	return getDaysToArrival() == part.getDaysToArrival();
     }
 
     @Override
@@ -601,9 +606,9 @@ public class Armor extends Part implements IAcquisitionWork {
     @Override
     public String getQuantityName(int quan) {
         double totalTon = quan * getTonnage();
-        String report = "" + DecimalFormat.getInstance().format(totalTon) + " tons of " + getName();
+        String report = "" + NumberFormat.getInstance().format(totalTon) + " tons of " + getName();
         if(totalTon == 1.0) {
-            report = "" + DecimalFormat.getInstance().format(totalTon) + " ton of " + getName();
+            report = "" + NumberFormat.getInstance().format(totalTon) + " ton of " + getName();
         }
         return report;
     }
@@ -620,7 +625,8 @@ public class Armor extends Part implements IAcquisitionWork {
         return report;
     }
 
-    public void doMaintenanceDamage(int d) {
+    @Override
+	public void doMaintenanceDamage(int d) {
         int current = unit.getEntity().getArmor(location, rear);
         if(d >= current) {
             unit.getEntity().setArmor(IArmorState.ARMOR_DESTROYED, location, rear);
@@ -637,11 +643,11 @@ public class Armor extends Part implements IAcquisitionWork {
     }
 
 	public void changeType(int ty, boolean cl) {
-		this.type = ty;
-		this.clan = cl;
-		this.name = "Armor";
+		type = ty;
+		clan = cl;
+		name = "Armor";
         if(type > -1) {
-        	this.name += " (" + EquipmentType.armorNames[type] + ")";
+        	name += " (" + EquipmentType.armorNames[type] + ")";
         }
 	}
 	

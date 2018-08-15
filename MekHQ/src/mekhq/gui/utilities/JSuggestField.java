@@ -26,6 +26,7 @@ import javax.swing.JDialog;
 import javax.swing.JList;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 
 /**
@@ -181,7 +182,7 @@ public class JSuggestField extends JTextField {
 			public void mouseReleased(MouseEvent e) {
 				if (selected == list.getSelectedIndex()) {
 					// provide double-click for selecting a suggestion
-					setText((String) list.getSelectedValue());
+					setText(list.getSelectedValue());
 					lastChosenExistingVariable = list.getSelectedValue().toString();
 					fireActionEvent();
 					d.setVisible(false);
@@ -201,8 +202,8 @@ public class JSuggestField extends JTextField {
 			public void mouseClicked(MouseEvent e) {
 			}
 		});
-		d.add(new JScrollPane(list, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-				JScrollPane.HORIZONTAL_SCROLLBAR_NEVER));
+		d.add(new JScrollPane(list, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER));
 		d.pack();
 		addKeyListener(new KeyListener() {
 			@Override
@@ -233,7 +234,7 @@ public class JSuggestField extends JTextField {
 					return;
 				} else if (e.getKeyCode() == KeyEvent.VK_ENTER
 						& list.getSelectedIndex() != -1 & suggestions.size() > 0) {
-					setText((String) list.getSelectedValue());
+					setText(list.getSelectedValue());
 					lastChosenExistingVariable = list.getSelectedValue().toString();
 					fireActionEvent();
 					d.setVisible(false);

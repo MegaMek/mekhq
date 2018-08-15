@@ -22,6 +22,7 @@
 package mekhq.campaign.parts.equipment;
 
 import java.io.PrintWriter;
+import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 import megamek.common.EquipmentType;
@@ -51,17 +52,19 @@ public class MASC extends EquipmentPart {
     
     public MASC(int tonnage, EquipmentType et, int equipNum, Campaign c, int rating, boolean omniPodded) {
         super(tonnage, et, equipNum, omniPodded, c);
-        this.engineRating = rating;
+        engineRating = rating;
         equipTonnage = calculateTonnage();
     }
     
-    public MASC clone() {
+    @Override
+	public MASC clone() {
     	MASC clone = new MASC(getUnitTonnage(), getType(), getEquipmentNum(), campaign, engineRating, omniPodded);
         clone.copyBaseData(this);
     	return clone;
     }
  
-    public void setUnit(Unit u) {
+    @Override
+	public void setUnit(Unit u) {
     	super.setUnit(u);
     	if(null != unit && null != unit.getEntity().getEngine()) {
     		engineRating = unit.getEntity().getEngine().getRating();
@@ -73,7 +76,7 @@ public class MASC extends EquipmentPart {
     		return 0;
     	}
     	//supercharger tonnage will need to be set by hand in parts store
-        if (TechConstants.isClan(type.getTechLevel(campaign.getCalendar().get(GregorianCalendar.YEAR)))) {
+        if (TechConstants.isClan(type.getTechLevel(campaign.getCalendar().get(Calendar.YEAR)))) {
             return Math.round(getUnitTonnage() / 25.0f);
         }
         return Math.round(getUnitTonnage() / 20.0f);

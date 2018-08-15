@@ -25,6 +25,7 @@ import java.io.PrintWriter;
 
 import megamek.common.Aero;
 import megamek.common.AmmoType;
+import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.Jumpship;
 import megamek.common.SmallCraft;
@@ -51,9 +52,9 @@ public class MissingAmmoBin extends MissingEquipmentPart {
     public MissingAmmoBin(int tonnage, EquipmentType et, int equipNum, boolean singleShot,
             boolean omniPodded, Campaign c) {
         super(tonnage, et, equipNum, c, 1, omniPodded);
-        this.oneShot = singleShot;
+        oneShot = singleShot;
         if(null != name) {
-        	this.name += " Bin";
+        	name += " Bin";
         }
     }
     
@@ -72,7 +73,7 @@ public class MissingAmmoBin extends MissingEquipmentPart {
     public int getLocation() {
         if (unit.getEntity() instanceof Aero
                 && !((unit.getEntity() instanceof SmallCraft) || (unit.getEntity() instanceof Jumpship))){
-            return Aero.LOC_NONE;
+            return Entity.LOC_NONE;
         }
         return super.getLocation();
     }

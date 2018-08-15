@@ -61,7 +61,7 @@ public class Kill implements Serializable {
 	
 	public Kill(UUID id, String kill, String killer, Date d) {
 		pilotId = id;
-		this.killed = kill;
+		killed = kill;
 		this.killer = killer;
 		date = d;
 	}

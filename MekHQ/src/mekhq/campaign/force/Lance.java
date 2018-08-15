@@ -312,7 +312,8 @@ public class Lance implements Serializable, MekHqXmlSerializable {
         }
         //sort person vector by rank
         Collections.sort(people, new Comparator<Person>(){
-            public int compare(final Person p1, final Person p2) {
+            @Override
+			public int compare(final Person p1, final Person p2) {
                 return ((Comparable<Integer>)p2.getRankNumeric()).compareTo(p1.getRankNumeric());
             }
         });

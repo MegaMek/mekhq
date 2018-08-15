@@ -28,7 +28,7 @@ public class MekViewDialog extends javax.swing.JDialog {
     /** Creates new form MekViewDialog */
     public MekViewDialog(java.awt.Frame parent, boolean modal, MechView mv) {
         super(parent, modal);
-        this.mview = mv;
+        mview = mv;
         initComponents();
     }
 
@@ -54,7 +54,8 @@ public class MekViewDialog extends javax.swing.JDialog {
         btnOkay.setText(resourceMap.getString("btnOkay.text")); // NOI18N
         btnOkay.setName("btnOkay"); // NOI18N
         btnOkay.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnOkayActionPerformed(evt);
             }
         });
@@ -66,7 +67,7 @@ public class MekViewDialog extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
 	private void btnOkayActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOkayActionPerformed
-	    this.setVisible(false);
+	    setVisible(false);
 	}//GEN-LAST:event_btnOkayActionPerformed
 
 

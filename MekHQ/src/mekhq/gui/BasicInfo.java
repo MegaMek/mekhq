@@ -39,7 +39,7 @@ public class BasicInfo extends JPanel {
         
 
         public BasicInfo(IconPackage i) {
-            this.icons = i;
+            icons = i;
             lblImage = new JLabel();
             lblLoad = new JLabel();
 

@@ -120,7 +120,8 @@ public class ChooseGamePresetDialog extends javax.swing.JDialog {
     	 btnOk.setText(resourceMap.getString("btnOk.text")); // NOI18N
     	 btnOk.setName("btnOk"); // NOI18N
     	 btnOk.addActionListener(new java.awt.event.ActionListener() {
-    		 public void actionPerformed(java.awt.event.ActionEvent evt) {
+    		 @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
     			 btnOkActionPerformed(evt);
     		 }
     	 });
@@ -136,7 +137,8 @@ public class ChooseGamePresetDialog extends javax.swing.JDialog {
     	 btnCancel.setText(resourceMap.getString("btnCancel.text")); // NOI18N
     	 btnCancel.setName("btnClose"); // NOI18N
     	 btnCancel.addActionListener(new java.awt.event.ActionListener() {
-    		 public void actionPerformed(java.awt.event.ActionEvent evt) {
+    		 @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
     			 btnCancelActionPerformed(evt);
     		 }
     	 });
@@ -168,13 +170,13 @@ public class ChooseGamePresetDialog extends javax.swing.JDialog {
     		sel++;
     	}
     	
-    	this.setVisible(false);
+    	setVisible(false);
     }
 
 
     private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
     	cancelled = true;
-    	this.setVisible(false);
+    	setVisible(false);
     }
     
     public boolean wasCancelled() {

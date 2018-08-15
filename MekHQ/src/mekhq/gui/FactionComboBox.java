@@ -111,7 +111,7 @@ public class FactionComboBox extends JComboBox<Map.Entry<String, String>> {
 	
 	public void setSelectedItemByKey(String key) {
 		for (int i = 0; i < getModel().getSize(); i++) {
-			if (key.equals(((Map.Entry<String, String>)(getModel().getElementAt(i))).getKey())) {
+			if (key.equals((getModel().getElementAt(i)).getKey())) {
 				setSelectedIndex(i);
 				return;
 			}

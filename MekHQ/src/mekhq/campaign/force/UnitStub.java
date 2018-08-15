@@ -58,7 +58,8 @@ public class UnitStub implements Serializable {
         }
     }
     
-    public String toString() {
+    @Override
+	public String toString() {
         return desc;
     }
     

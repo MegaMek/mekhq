@@ -48,7 +48,8 @@ public class JumpJet extends EquipmentPart {
         super(tonnage, et, equipNum, omniPodded, c);
     }
     
-    public JumpJet clone() {
+    @Override
+	public JumpJet clone() {
     	JumpJet clone = new JumpJet(getUnitTonnage(), getType(), getEquipmentNum(), omniPodded, campaign);
         clone.copyBaseData(this);
     	return clone;

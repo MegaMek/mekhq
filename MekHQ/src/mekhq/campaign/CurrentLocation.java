@@ -67,10 +67,10 @@ public class CurrentLocation implements Serializable {
 	}
 	
 	public CurrentLocation(Planet planet, double time) {
-		this.currentPlanet = planet;
-		this.transitTime = time;
-		this.rechargeTime = 0.0;
-		this.transitTime = 0.0;
+		currentPlanet = planet;
+		transitTime = time;
+		rechargeTime = 0.0;
+		transitTime = 0.0;
 	}
 	
 	public void setCurrentPlanet(Planet p) {

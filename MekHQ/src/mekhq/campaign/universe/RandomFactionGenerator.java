@@ -137,6 +137,7 @@ public class RandomFactionGenerator implements Serializable {
 		if (!initialized && !initializing) {
 			initializing = true;
 			rfg.loader = new Thread(new Runnable() {
+				@Override
 				public void run() {
 					Planets p = Planets.getInstance();
 					while (!p.isInitialized()) {

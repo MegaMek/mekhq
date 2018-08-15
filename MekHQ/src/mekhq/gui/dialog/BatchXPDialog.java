@@ -80,13 +80,13 @@ public final class BatchXPDialog extends JDialog {
     public BatchXPDialog(JFrame parent, Campaign campaign) {
         super(parent, "", true); //$NON-NLS-1$
         
-        this.resourceMap = ResourceBundle.getBundle("mekhq.resources.BatchXPDialog", new EncodeControl()); //$NON-NLS-1$
+        resourceMap = ResourceBundle.getBundle("mekhq.resources.BatchXPDialog", new EncodeControl()); //$NON-NLS-1$
         
         setTitle(resourceMap.getString("dialogue.title")); //$NON-NLS-1$
         choiceNoSkill = resourceMap.getString("skill.choice.text"); //$NON-NLS-1$
         
         this.campaign = Objects.requireNonNull(campaign);
-        this.personnelModel = new PersonnelTableModel(campaign);
+        personnelModel = new PersonnelTableModel(campaign);
         personnelModel.refreshData();
         personnelSorter = new TableRowSorter<>(personnelModel);
         personnelSorter.setSortsOnUpdates(true);
@@ -220,7 +220,7 @@ public final class BatchXPDialog extends JDialog {
             updatePersonnelTable();
         });
         JPanel allowPrisonersPanel = new JPanel(new GridLayout(1, 1));
-        allowPrisonersPanel.setAlignmentY(JComponent.LEFT_ALIGNMENT);
+        allowPrisonersPanel.setAlignmentY(Component.LEFT_ALIGNMENT);
         allowPrisonersPanel.add(allowPrisoners);
         allowPrisonersPanel.setMaximumSize(new Dimension(Short.MAX_VALUE, (int) allowPrisonersPanel.getPreferredSize().getHeight()));
         panel.add(allowPrisonersPanel);

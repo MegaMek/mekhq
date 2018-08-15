@@ -26,6 +26,7 @@ import megamek.common.CriticalSlot;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.IBomber;
+import megamek.common.IPlayer;
 import megamek.common.Infantry;
 import megamek.common.Mech;
 import megamek.common.MechSummaryCache;
@@ -76,7 +77,8 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
         this.unitModel = unitModel;
     }
 
-    public void actionPerformed(ActionEvent action) {
+    @Override
+	public void actionPerformed(ActionEvent action) {
         String command = action.getActionCommand();
         Unit selectedUnit = unitModel.getUnit(unitTable
                 .convertRowIndexToModel(unitTable.getSelectedRow()));
@@ -380,7 +382,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
         } else if (command.contains("INDI_CAMO")) {
             String category = selectedUnit.getCamoCategory();
             if ("".equals(category)) {
-                category = Player.ROOT_CAMO;
+                category = IPlayer.ROOT_CAMO;
             }
             CamoChoiceDialog ccd = new CamoChoiceDialog(gui.getFrame(), true,
                     category, selectedUnit.getCamoFileName(), gui.getCampaign()

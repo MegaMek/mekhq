@@ -38,8 +38,8 @@ public class XPHandler {
     
     @Subscribe
     public void campaignOptionsHandler(OptionsChangedEvent event) {
-        this.adminXP = event.getOptions().getAdminXP();
-        this.adminXPPeriod = event.getOptions().getAdminXPPeriod();
+        adminXP = event.getOptions().getAdminXP();
+        adminXPPeriod = event.getOptions().getAdminXPPeriod();
     }
     
     @Subscribe

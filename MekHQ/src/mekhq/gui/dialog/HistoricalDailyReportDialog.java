@@ -74,8 +74,8 @@ public class HistoricalDailyReportDialog extends JDialog {
     public HistoricalDailyReportDialog (Frame owner, CampaignGUI gui) {
         super(owner, true);
         this.gui = gui;
-        this.setPreferredSize(new Dimension(650,500));
-        this.setMinimumSize(new Dimension(650,500));
+        setPreferredSize(new Dimension(650,500));
+        setMinimumSize(new Dimension(650,500));
         initComponents();
 
         setLocationRelativeTo(owner);

@@ -149,7 +149,8 @@ public class PersonnelMarketDialog extends JDialog {
         comboPersonType.setName("comboUnitType"); // NOI18N
         comboPersonType.setPreferredSize(new java.awt.Dimension(200, 27));
         comboPersonType.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 filterPersonnel();
             }
         });
@@ -228,7 +229,8 @@ public class PersonnelMarketDialog extends JDialog {
         sorter.setSortKeys(sortKeys);
         tablePersonnel.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
         tablePersonnel.getSelectionModel().addListSelectionListener(new javax.swing.event.ListSelectionListener() {
-            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
+            @Override
+			public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
                 personChanged(evt);
             }
         });
@@ -269,7 +271,8 @@ public class PersonnelMarketDialog extends JDialog {
         btnHire.setText("Hire");
         btnHire.setName("btnHire"); // NOI18N
         btnHire.addActionListener(new java.awt.event.ActionListener() {
-        	public void actionPerformed(java.awt.event.ActionEvent evt) {
+        	@Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
         		hirePerson(evt);
         	}
         });
@@ -277,7 +280,8 @@ public class PersonnelMarketDialog extends JDialog {
 
         btnAdd = new JButton("Add (GM)");
         btnAdd.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 addPerson();
             }
         });
@@ -288,7 +292,8 @@ public class PersonnelMarketDialog extends JDialog {
         btnClose.setText(resourceMap.getString("btnClose.text")); // NOI18N
         btnClose.setName("btnClose"); // NOI18N
         btnClose.addActionListener(new java.awt.event.ActionListener() {
-        	public void actionPerformed(java.awt.event.ActionEvent evt) {
+        	@Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
         		btnCloseActionPerformed(evt);
         	}
         });
@@ -515,7 +520,8 @@ public class PersonnelMarketDialog extends JDialog {
  		//This odd code is to make sure that the scrollbar stays at the top
  		//I cant just call it here, because it ends up getting reset somewhere later
  		javax.swing.SwingUtilities.invokeLater(new Runnable() {
- 			public void run() {
+ 			@Override
+			public void run() {
  				scrollPersonnelView.getVerticalScrollBar().setValue(0);
  			}
  		});

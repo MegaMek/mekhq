@@ -25,6 +25,7 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellRenderer;
 
 import megamek.client.ui.swing.util.PlayerColors;
+import megamek.common.IPlayer;
 import megamek.common.Player;
 import megamek.common.util.DirectoryItems;
 import megamek.common.util.EncodeControl;
@@ -60,7 +61,7 @@ public class CamoChoiceDialog extends javax.swing.JDialog {
         fillTable((String) comboCategories.getSelectedItem());
         int rowIndex = 0;
         for(int i = 0; i < camoModel.getRowCount(); i++) {
-            if(((String) camoModel.getValueAt(i, 0)).equals(filename)) {
+            if(camoModel.getValueAt(i, 0).equals(filename)) {
                 rowIndex = i;
                 break;
             }
@@ -105,13 +106,13 @@ public class CamoChoiceDialog extends javax.swing.JDialog {
         getContentPane().add(scrCamo, gridBagConstraints);
 
         DefaultComboBoxModel<String> categoryModel = new DefaultComboBoxModel<>();
-        categoryModel.addElement(Player.NO_CAMO);
+        categoryModel.addElement(IPlayer.NO_CAMO);
         String match = null;
         if (camos != null) {
             if (camos.getItemNames("").hasNext()) { //$NON-NLS-1$
-                categoryModel.addElement(Player.ROOT_CAMO);
-                if(category.equals(Player.ROOT_CAMO)) {
-                    match = Player.ROOT_CAMO;
+                categoryModel.addElement(IPlayer.ROOT_CAMO);
+                if(category.equals(IPlayer.ROOT_CAMO)) {
+                    match = IPlayer.ROOT_CAMO;
                 }
             }
             Iterator<String> names = camos.getCategoryNames();
@@ -128,12 +129,13 @@ public class CamoChoiceDialog extends javax.swing.JDialog {
         if(null != match) {
             categoryModel.setSelectedItem(match);
         } else {
-            categoryModel.setSelectedItem(Player.NO_CAMO);
+            categoryModel.setSelectedItem(IPlayer.NO_CAMO);
         }
         comboCategories.setModel(categoryModel);
         comboCategories.setName("comboCategories"); // NOI18N
         comboCategories.addItemListener(new java.awt.event.ItemListener() {
-            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+            @Override
+			public void itemStateChanged(java.awt.event.ItemEvent evt) {
                 comboCategoriesItemStateChanged(evt);
             }
         });
@@ -148,7 +150,8 @@ public class CamoChoiceDialog extends javax.swing.JDialog {
         btnSelect.setText(resourceMap.getString("btnSelect.text")); // NOI18N
         btnSelect.setName("btnSelect"); // NOI18N
         btnSelect.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnSelectActionPerformed(evt);
             }
         });
@@ -161,7 +164,8 @@ public class CamoChoiceDialog extends javax.swing.JDialog {
         btnCancel.setText(resourceMap.getString("btnCancel.text")); // NOI18N
         btnCancel.setName("btnCancel"); // NOI18N
         btnCancel.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnCancelActionPerformed(evt);
             }
         });
@@ -180,12 +184,12 @@ public class CamoChoiceDialog extends javax.swing.JDialog {
 
 	private void btnSelectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSelectActionPerformed
 	    category = camoModel.getCategory();
-	    if(category.equals(Player.NO_CAMO)) {
+	    if(category.equals(IPlayer.NO_CAMO)) {
 	        colorIndex = tableCamo.getSelectedRow();
 	        filename = null;
 	    }
 	    else if(tableCamo.getSelectedRow() != -1) {
-	        filename = (String) camoModel.getValueAt(tableCamo.getSelectedRow(), 0);
+	        filename = camoModel.getValueAt(tableCamo.getSelectedRow(), 0);
 	    }
 	    clickedSelect = true;
 	    setVisible(false);
@@ -216,14 +220,14 @@ public class CamoChoiceDialog extends javax.swing.JDialog {
      private void fillTable(String category) {
         camoModel.reset();
         camoModel.setCategory(category);
-        if(Player.NO_CAMO.equals(category)) {
-            for (String color : Player.colorNames) {
+        if(IPlayer.NO_CAMO.equals(category)) {
+            for (String color : IPlayer.colorNames) {
                 camoModel.addCamo(color);
             }
         } else {
             // Translate the "root camo" category name.
             Iterator<String> camoNames;
-            if (Player.ROOT_CAMO.equals(category)) {
+            if (IPlayer.ROOT_CAMO.equals(category)) {
                 camoNames = camos.getItemNames(""); //$NON-NLS-1$
             } else {
                 camoNames = camos.getItemNames(category);
@@ -251,21 +255,23 @@ public class CamoChoiceDialog extends javax.swing.JDialog {
 
         public CamoTableModel() {
             columnNames = new String[] {"Camos"};
-            category = Player.NO_CAMO;
+            category = IPlayer.NO_CAMO;
             names = new ArrayList<>();
             images = new ArrayList<>();
         }
 
-        public int getRowCount() {
+        @Override
+		public int getRowCount() {
             return names.size();
         }
 
-        public int getColumnCount() {
+        @Override
+		public int getColumnCount() {
             return 1;
         }
 
         public void reset() {
-            category = Player.NO_CAMO;
+            category = IPlayer.NO_CAMO;
             names = new ArrayList<>();
             images = new ArrayList<>();
         }
@@ -275,7 +281,8 @@ public class CamoChoiceDialog extends javax.swing.JDialog {
             return columnNames[column];
         }
 
-        public String getValueAt(int row, int col) {
+        @Override
+		public String getValueAt(int row, int col) {
             return names.get(row);
         }
 
@@ -319,6 +326,7 @@ public class CamoChoiceDialog extends javax.swing.JDialog {
 
 			private static final long serialVersionUID = -7106605749246434963L;
 
+			@Override
 			public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 Component c = this;
                 setOpaque(true);
@@ -344,12 +352,12 @@ public class CamoChoiceDialog extends javax.swing.JDialog {
             if (e.getClickCount() == 2) {
                 int row = tableCamo.rowAtPoint(e.getPoint());
                 category = camoModel.getCategory();
-                if(category.equals(Player.NO_CAMO)) {
+                if(category.equals(IPlayer.NO_CAMO)) {
                     colorIndex = tableCamo.getSelectedRow();
                     filename = null;
                 }
                 else {
-                    filename = (String) camoModel.getValueAt(row, 0);
+                    filename = camoModel.getValueAt(row, 0);
                 }
                 clickedSelect = true;
                 setVisible(false);
@@ -400,7 +408,7 @@ public class CamoChoiceDialog extends javax.swing.JDialog {
                 return;
             }
             
-            if(Player.NO_CAMO.equals(category)) {
+            if(IPlayer.NO_CAMO.equals(category)) {
                 if (colorInd == -1) {
                     colorInd = 0;
                 }
@@ -417,7 +425,7 @@ public class CamoChoiceDialog extends javax.swing.JDialog {
             try {
 
                 // Translate the root camo directory name.
-                if (Player.ROOT_CAMO.equals(category))
+                if (IPlayer.ROOT_CAMO.equals(category))
                     category = ""; //$NON-NLS-1$
                 Image camo = (Image) camos.getItem(category, name);
                 lblImage.setIcon(new ImageIcon(camo));

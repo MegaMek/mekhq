@@ -39,7 +39,7 @@ public class ProtomekArmor extends Armor implements IAcquisitionWork {
     public ProtomekArmor(int tonnage, int points, int loc, boolean clan, Campaign c) {
         // Amount is used for armor quantity, not tonnage
         super(tonnage, -1, points, loc, false, clan, c);
-        this.name = "Protomech Armor";
+        name = "Protomech Armor";
     }
     
     @Override
@@ -59,19 +59,21 @@ public class ProtomekArmor extends Armor implements IAcquisitionWork {
         return amount * 625;
     }
     
-    public double getTonnageNeeded() {
+    @Override
+	public double getTonnageNeeded() {
         double armorPerTon = 20;
         return amountNeeded / armorPerTon;
     }
     
-    public long getValueNeeded() {
-        return adjustCostsForCampaignOptions((long)(amountNeeded * 625));
+    @Override
+	public long getValueNeeded() {
+        return adjustCostsForCampaignOptions(amountNeeded * 625);
     }
     
     @Override
     public long getStickerPrice() {
         //always in 5-ton increments
-        return (long)(5 * 20 * 625);
+        return 5 * 20 * 625;
     }
     
     @Override
@@ -91,7 +93,8 @@ public class ProtomekArmor extends Armor implements IAcquisitionWork {
         return clan;
     }
     
-    public double getArmorWeight(int points) {
+    @Override
+	public double getArmorWeight(int points) {
         return points * 50/1000.0;
     }
 
@@ -105,15 +108,18 @@ public class ProtomekArmor extends Armor implements IAcquisitionWork {
 		return -2;
 	}
 
-    public double getArmorPointsPerTon() {
+    @Override
+	public double getArmorPointsPerTon() {
         return 20;
     }
     
-    public Part getNewPart() {
+    @Override
+	public Part getNewPart() {
         return new ProtomekArmor(0, (int)Math.round(5 * getArmorPointsPerTon()), -1, clan, campaign);
     }
     
-    public int getAmountAvailable() {
+    @Override
+	public int getAmountAvailable() {
         for(Part part : campaign.getSpareParts()) {
             if(part instanceof ProtomekArmor) {
                 ProtomekArmor a = (ProtomekArmor)part;
@@ -125,7 +131,8 @@ public class ProtomekArmor extends Armor implements IAcquisitionWork {
         return 0;
     }
     
-    public void changeAmountAvailable(int amount) {
+    @Override
+	public void changeAmountAvailable(int amount) {
         ProtomekArmor a = null;
         for(Part part : campaign.getSpareParts()) {
             if(part instanceof ProtomekArmor 

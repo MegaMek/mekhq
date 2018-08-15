@@ -32,6 +32,7 @@ import megamek.client.bot.princess.Princess;
 import megamek.client.ui.swing.ClientGUI;
 import megamek.common.Entity;
 import megamek.common.IGame;
+import megamek.common.IPlayer;
 import megamek.common.MapSettings;
 import megamek.common.PlanetaryConditions;
 import megamek.common.Player;
@@ -293,7 +294,7 @@ public class AtBGameThread extends GameThread {
 				botClient.getLocalPlayer().setTeam(botForce.getTeam());
 				botClient.getLocalPlayer().setStartingPos(botForce.getStart());
 
-				if (botForce.getCamoCategory() == Player.NO_CAMO) {
+				if (botForce.getCamoCategory() == IPlayer.NO_CAMO) {
 					if (botForce.getColorIndex() >= 0) {
 						botClient.getLocalPlayer().setColorIndex(botForce.getColorIndex());
 					}

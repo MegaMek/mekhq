@@ -43,7 +43,7 @@ public class MissingProtomekLegActuator extends MissingPart {
 
     public MissingProtomekLegActuator(int tonnage, Campaign c) {
         super(tonnage, c);
-        this.name = "Protomech Leg Actuator";
+        name = "Protomech Leg Actuator";
     }
 
     @Override

@@ -128,7 +128,7 @@ public class MissingBattleArmorEquipmentPart extends MissingEquipmentPart {
     	for (Mounted m : unit.getEntity().getEquipment()){
     		if (m.getType() instanceof MiscType && m.getType().hasFlag(MiscType.F_BA_MEA) &&
     				type instanceof MiscType && type.hasFlag(MiscType.F_BA_MANIPULATOR)
-    				&& this.getBaMountLocation()== m.getBaMountLoc()){
+    				&& getBaMountLocation()== m.getBaMountLoc()){
     			return true;
     		}
     		//this is not quite right, they must be linked somehow

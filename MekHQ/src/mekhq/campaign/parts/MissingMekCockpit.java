@@ -48,9 +48,9 @@ public class MissingMekCockpit extends MissingPart {
 
 	public MissingMekCockpit(int tonnage, int t, boolean isClan,Campaign c) {
         super(tonnage, c);
-        this.type = t;
+        type = t;
         this.isClan = isClan;
-        this.name = Mech.getCockpitDisplayString(type);
+        name = Mech.getCockpitDisplayString(type);
     }
 
 	@Override
@@ -107,6 +107,7 @@ public class MissingMekCockpit extends MissingPart {
 		return type;
 	}
 	
+	@Override
 	public boolean isClan() {
 	    return isClan;
 	}

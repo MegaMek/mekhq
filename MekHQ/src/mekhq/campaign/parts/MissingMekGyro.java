@@ -25,6 +25,7 @@ import java.io.PrintWriter;
 
 import megamek.common.CriticalSlot;
 import megamek.common.EquipmentType;
+import megamek.common.ITechnology;
 import megamek.common.Mech;
 import megamek.common.TechAdvancement;
 import mekhq.MekHqXmlUtil;
@@ -50,7 +51,7 @@ public class MissingMekGyro extends MissingPart {
     public MissingMekGyro(int tonnage, int type, double gyroTonnage, boolean isClan, Campaign c) {
         super(tonnage, c);
         this.type = type;
-        this.name = Mech.getGyroTypeString(type);
+        name = Mech.getGyroTypeString(type);
         this.gyroTonnage = gyroTonnage;
         this.isClan = isClan;
     }
@@ -116,9 +117,9 @@ public class MissingMekGyro extends MissingPart {
 		case Mech.GYRO_COMPACT:
 		case Mech.GYRO_HEAVY_DUTY:
 		case Mech.GYRO_XL:
-			return EquipmentType.RATING_E;
+			return ITechnology.RATING_E;
 		default:
-			return EquipmentType.RATING_D;
+			return ITechnology.RATING_D;
 		}
 	}
 

@@ -58,6 +58,7 @@ import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
 import megamek.common.EquipmentType;
+import megamek.common.ITechnology;
 import megamek.common.logging.LogLevel;
 import megamek.common.util.EncodeControl;
 import mekhq.FileParser;
@@ -232,7 +233,7 @@ public class Planets {
         Set<HPGLink> result = new HashSet<>();
         for(Planet planet : planetList.values()) {
             Integer hpg = planet.getHPG(when);
-            if((null != hpg) && (hpg.intValue() == EquipmentType.RATING_A)) {
+            if((null != hpg) && (hpg.intValue() == ITechnology.RATING_A)) {
                 Collection<Planet> neighbors = getNearbyPlanets(planet, 50);
                 for(Planet neighbor : neighbors) {
                     hpg = neighbor.getHPG(when);
@@ -631,7 +632,7 @@ public class Planets {
      * @param planet The planet to add.
      */
     private void addPlanet(Planet planet) { 
-        this.planetList.put(planet.getId(), planet);
+        planetList.put(planet.getId(), planet);
         
         int x = (int)(planet.getX()/30.0);
         int y = (int)(planet.getY()/30.0);
@@ -651,14 +652,14 @@ public class Planets {
         
         try {
             FileOutputStream fos = new FileOutputStream(path);
-            ArrayList<Planet> localPlanetList = new ArrayList<>(this.planetList.values());
+            ArrayList<Planet> localPlanetList = new ArrayList<>(planetList.values());
             localPlanetList.sort(new Comparator<Planet>() {
                 @Override
                 public int compare(Planet arg0, Planet arg1) {
                     return arg0.getId().compareTo(arg1.getId());
                 }});
             
-            this.writePlanets(fos, localPlanetList);
+            writePlanets(fos, localPlanetList);
             fos.flush();
             fos.close();
             

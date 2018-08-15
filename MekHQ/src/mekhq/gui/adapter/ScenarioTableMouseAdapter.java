@@ -35,7 +35,8 @@ public class ScenarioTableMouseAdapter extends MouseInputAdapter implements
         this.scenarioModel = scenarioModel;
     }
 
-    public void actionPerformed(ActionEvent action) {
+    @Override
+	public void actionPerformed(ActionEvent action) {
         String command = action.getActionCommand();
         Scenario scenario = scenarioModel.getScenario(scenarioTable.getSelectedRow());
         Mission mission = gui.getCampaign().getMission(scenario.getMissionId());

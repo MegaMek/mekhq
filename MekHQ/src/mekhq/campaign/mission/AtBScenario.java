@@ -51,6 +51,7 @@ import megamek.common.Compute;
 import megamek.common.Crew;
 import megamek.common.Entity;
 import megamek.common.EntityWeightClass;
+import megamek.common.IPlayer;
 import megamek.common.IStartingPositions;
 import megamek.common.Mech;
 import megamek.common.MechFileParser;
@@ -268,7 +269,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             lanceForceId = -1;
             lanceRole = Lance.ROLE_UNASSIGNED;
         } else {
-            this.lanceForceId = lance.getForceId();
+            lanceForceId = lance.getForceId();
             lanceRole = lance.getRole();
             setMissionId(lance.getMissionId());
 
@@ -826,7 +827,8 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         addBotForce(getEnemyBotForce(getContract(campaign), enemyHome, enemyHome, enemyEntities));
 	}
     
-    public boolean canAddDropShips() {
+    @Override
+	public boolean canAddDropShips() {
     	return false;
     }
     
@@ -2149,7 +2151,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     }
 
     public void setDeploymentDelay(int delay) {
-        this.deploymentDelay = delay;
+        deploymentDelay = delay;
     }
 
     public int getMapSizeX() {
@@ -2208,7 +2210,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         private BehaviorSettings behaviorSettings;
 
         public BotForce() {
-            this.entityList = new ArrayList<>();
+            entityList = new ArrayList<>();
             try {
                 behaviorSettings = BehaviorSettingsFactory.getInstance().DEFAULT_BEHAVIOR.getCopy();
             } catch (PrincessException ex) {
@@ -2219,11 +2221,11 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         };
 
         public BotForce(String name, int team, int start, ArrayList<Entity> entityList) {
-            this(name, team, start, start, entityList, Player.NO_CAMO, null, -1);
+            this(name, team, start, start, entityList, IPlayer.NO_CAMO, null, -1);
         }
 
         public BotForce(String name, int team, int start, int home, ArrayList<Entity> entityList) {
-            this(name, team, start, home, entityList, Player.NO_CAMO, null, -1);
+            this(name, team, start, home, entityList, IPlayer.NO_CAMO, null, -1);
         }
 
         public BotForce(String name, int team, int start, int home, ArrayList<Entity> entityList,
@@ -2343,7 +2345,8 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             behaviorSettings.setRetreatEdge(findCardinalEdge(i));
         }
 
-        public void writeToXml(PrintWriter pw1, int indent) {
+        @Override
+		public void writeToXml(PrintWriter pw1, int indent) {
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "name", MekHqXmlUtil.escape(name));
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "team", team);
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "start", start);

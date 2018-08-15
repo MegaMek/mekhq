@@ -31,6 +31,7 @@ import org.w3c.dom.NodeList;
 import megamek.common.Aero;
 import megamek.common.AmmoType;
 import megamek.common.CriticalSlot;
+import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.ITechnology;
 import megamek.common.Jumpship;
@@ -78,23 +79,24 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     public AmmoBin(int tonnage, EquipmentType et, int equipNum, int shots, boolean singleShot,
             boolean omniPodded, Campaign c) {
         super(tonnage, et, equipNum, omniPodded, c);
-        this.shotsNeeded = shots;
-        this.oneShot = singleShot;
-        this.checkedToday = false;
+        shotsNeeded = shots;
+        oneShot = singleShot;
+        checkedToday = false;
         if(null != type && type instanceof AmmoType) {
-            this.munition = ((AmmoType)type).getMunitionType();
+            munition = ((AmmoType)type).getMunitionType();
         }
         if(null != name) {
-            this.name += " Bin";
+            name += " Bin";
         }
     }
 
-    public AmmoBin clone() {
+    @Override
+	public AmmoBin clone() {
         AmmoBin clone = new AmmoBin(getUnitTonnage(), getType(), getEquipmentNum(), shotsNeeded, oneShot,
                 omniPodded, campaign);
         clone.copyBaseData(this);
-        clone.shotsNeeded = this.shotsNeeded;
-        clone.munition = this.munition;
+        clone.shotsNeeded = shotsNeeded;
+        clone.munition = munition;
         return clone;
     }
     
@@ -113,7 +115,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     public int getLocation() {
         if (unit.getEntity() instanceof Aero
                 && !((unit.getEntity() instanceof SmallCraft) || (unit.getEntity() instanceof Jumpship))){
-            return Aero.LOC_NONE;
+            return Entity.LOC_NONE;
         }
         return super.getLocation();
     }
@@ -198,7 +200,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     }
 
     public void changeMunition(long m) {
-        this.munition = m;
+        munition = m;
         for (AmmoType atype : Utilities.getMunitionsFor(unit.getEntity(),(AmmoType)type, CampaignOptions.TECH_EXPERIMENTAL)) {
             if (atype.getMunitionType() == munition) {
                 type = atype;
@@ -212,8 +214,8 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
         if (type instanceof AmmoType) {
             munition = ((AmmoType) type).getMunitionType();
             this.type = type;
-            this.name = type.getName();
-            this.typeName = type.getInternalName();
+            name = type.getName();
+            typeName = type.getInternalName();
             updateConditionFromEntity(false);
         }
     }
@@ -350,7 +352,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     }
 
     public void setShotsNeeded(int shots) {
-        this.shotsNeeded = shots;
+        shotsNeeded = shots;
     }
 
     @Override
@@ -490,7 +492,8 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
         return (shotsNeeded > 0) || ammoTypeChanged();
     }
 
-    public String getDesc() {
+    @Override
+	public String getDesc() {
         if(isSalvaging()) {
             return super.getDesc();
         }
@@ -548,7 +551,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     public void swapAmmoFromCompatible(int needed, AmmoStorage as) {
         AmmoStorage a = null;
         AmmoType aType = null;
-        AmmoType curType = ((AmmoType)((AmmoStorage)as).getType());
+        AmmoType curType = ((AmmoType)as.getType());
         int converted = 0;
         for(Part part : campaign.getSpareParts()) {
             if(!part.isPresent()) {
@@ -694,9 +697,9 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
             }
             if(part instanceof AmmoStorage) {
                 a = (AmmoStorage)part;
-                aType = ((AmmoType)((AmmoStorage)a).getType());
+                aType = ((AmmoType)a.getType());
                 thisType = ((AmmoType)getType());
-                if(aType.equals((Object)getType()) && thisType.getMunitionType() == aType.getMunitionType()) {
+                if(aType.equals(getType()) && thisType.getMunitionType() == aType.getMunitionType()) {
                     amount += a.getShots();
                     if (!(campaign.getCampaignOptions().useAmmoByType())) {
                         break;

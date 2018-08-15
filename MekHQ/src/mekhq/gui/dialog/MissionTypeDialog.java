@@ -26,7 +26,7 @@ public class MissionTypeDialog extends javax.swing.JDialog {
     public MissionTypeDialog(Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
-        this.setLocationRelativeTo(parent);
+        setLocationRelativeTo(parent);
     }
 
     private void initComponents() {

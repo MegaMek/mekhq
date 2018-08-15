@@ -1137,7 +1137,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 		List<IAcquisitionWork> toRemove = new ArrayList<>();
         toRemove.add(this);
 		for (IAcquisitionWork part : campaign.getShoppingList().getPartList()) {
-		    if ((part instanceof Part) && ((Part) part).getRefitId() == this.getRefitId()) {
+		    if ((part instanceof Part) && ((Part) part).getRefitId() == getRefitId()) {
 		        toRemove.add(part);
 		    }
 		}
@@ -1883,6 +1883,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 		return null;
 	}
 
+	@Override
 	public long getStickerPrice() {
 		return cost;
 	}
@@ -1948,7 +1949,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 	@Override
 	public TargetRoll getAllAcquisitionMods() {
         TargetRoll roll = new TargetRoll();
-		int avail = EquipmentType.RATING_A;
+		int avail = ITechnology.RATING_A;
 		int techBaseMod = 0;
 		for(Part part : shoppingList) {
 		    if(getTechBase() == T_CLAN && campaign.getCampaignOptions().getClanAcquisitionPenalty() > techBaseMod) {
@@ -2002,6 +2003,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 	    return Part.T_BOTH;
 	}
 
+	@Override
 	public void fixIdReferences(Map<Integer, UUID> uHash, Map<Integer, UUID> pHash) {
 		assignedTechId = pHash.get(oldTechId);
 		if(null != newArmorSupplies) {

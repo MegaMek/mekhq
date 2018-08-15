@@ -52,6 +52,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
+import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -204,8 +205,8 @@ public class ResolveScenarioWizardDialog extends JDialog {
 
     public ResolveScenarioWizardDialog(JFrame parent, boolean modal, ResolveScenarioTracker t) {
         super(parent, modal);
-        this.frame = parent;
-        this.tracker = t;
+        frame = parent;
+        tracker = t;
         loots = tracker.getPotentialLoot();
         salvageables = new ArrayList<>();
         if(tracker.getMission() instanceof Contract) {
@@ -418,7 +419,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
             kiaCheck = new JCheckBox("");
             kiaCheck.addItemListener(new CheckBoxKIAListener());
             kiaBtns.add(kiaCheck);
-            hitSlider = new JSlider(JSlider.HORIZONTAL, 0, 5, Math.min(status.getHits(),5));
+            hitSlider = new JSlider(SwingConstants.HORIZONTAL, 0, 5, Math.min(status.getHits(),5));
             hitSlider.setMajorTickSpacing(1);
             hitSlider.setPaintTicks(true);
             hitSlider.setLabelTable(labelTable);
@@ -487,7 +488,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
             prstatuses.add(status);
             nameLbl = new JLabel("<html>" + status.getName() + "<br><i> " + status.getUnitName() + "</i></html>");
             miaCheck = new JCheckBox("");
-            hitSlider = new JSlider(JSlider.HORIZONTAL, 0, 5, Math.min(status.getHits(),5));
+            hitSlider = new JSlider(SwingConstants.HORIZONTAL, 0, 5, Math.min(status.getHits(),5));
             hitSlider.setMajorTickSpacing(1);
             hitSlider.setPaintTicks(true);
             hitSlider.setLabelTable(labelTable);
@@ -1020,7 +1021,8 @@ public class ResolveScenarioWizardDialog extends JDialog {
         btnCancel = new JButton(resourceMap.getString("btnCancel.text")); // NOI18N
         btnCancel.setName("btnClose"); // NOI18N
         btnCancel.addActionListener(new java.awt.event.ActionListener() {
-        	public void actionPerformed(java.awt.event.ActionEvent evt) {
+        	@Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
         		cancel();
         	}
         });
@@ -1037,7 +1039,8 @@ public class ResolveScenarioWizardDialog extends JDialog {
         btnBack = new JButton(resourceMap.getString("btnBack.text")); // NOI18N
         btnBack.setName("btnBack"); // NOI18N
         btnBack.addActionListener(new java.awt.event.ActionListener() {
-        	public void actionPerformed(java.awt.event.ActionEvent evt) {
+        	@Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
         		back();
         	}
         });
@@ -1053,7 +1056,8 @@ public class ResolveScenarioWizardDialog extends JDialog {
         btnNext = new JButton(resourceMap.getString("btnNext.text")); // NOI18N
         btnNext.setName("btnNext"); // NOI18N
         btnNext.addActionListener(new java.awt.event.ActionListener() {
-        	public void actionPerformed(java.awt.event.ActionEvent evt) {
+        	@Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
         		next();
         	}
         });
@@ -1069,7 +1073,8 @@ public class ResolveScenarioWizardDialog extends JDialog {
         btnFinish = new JButton(resourceMap.getString("btnFinish.text")); // NOI18N
         btnFinish.setName("btnFinish"); // NOI18N
         btnFinish.addActionListener(new java.awt.event.ActionListener() {
-        	public void actionPerformed(java.awt.event.ActionEvent evt) {
+        	@Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
         		finish();
         	}
         });
@@ -1107,6 +1112,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
     	cardLayout.show(pnlMain, currentPanel);
     	switchInstructions();
     	javax.swing.SwingUtilities.invokeLater(new Runnable() {
+			@Override
 			public void run() {
 				scrMain.getVerticalScrollBar().setValue(0);
 			}
@@ -1300,7 +1306,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
 
     	//now process
     	tracker.resolveScenario(choiceStatus.getSelectedIndex()+1,txtReport.getText());
-    	this.setVisible(false);
+    	setVisible(false);
     }
 
     private void cancel() {
@@ -1472,7 +1478,8 @@ public class ResolveScenarioWizardDialog extends JDialog {
         mvp.setMech(entity, true);
         JButton btn = new JButton(Messages.getString("Okay")); //$NON-NLS-1$
         btn.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
+            @Override
+			public void actionPerformed(ActionEvent e) {
                 dialog.setVisible(false);
             }
         });

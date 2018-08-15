@@ -53,11 +53,11 @@ class GameThread extends Thread implements CloseClientListener {
     public GameThread(String name, Client c, MekHQ app, ArrayList<Unit> units, boolean started) {
         super(name);
         myname = name.trim();
-        this.client = c;
+        client = c;
         this.app = app;
         this.units = units;
         this.started = started;
-        this.campaign = app.getCampaign();
+        campaign = app.getCampaign();
     }
 
     public Client getClient() {
@@ -145,7 +145,8 @@ class GameThread extends Thread implements CloseClientListener {
      * from megamek.client.CloseClientListener clientClosed() Thanks to MM for
      * adding the listener. And to MMNet for the poorly documented code change.
      */
-    public void clientClosed() {
+    @Override
+	public void clientClosed() {
     	requestStop();
     	app.stopHost();
     }

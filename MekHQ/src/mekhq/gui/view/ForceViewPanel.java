@@ -72,8 +72,8 @@ public class ForceViewPanel extends javax.swing.JPanel {
 	
 	
 	public ForceViewPanel(Force f, Campaign c, IconPackage icons) {
-		this.force = f;
-		this.campaign = c;
+		force = f;
+		campaign = c;
 		this.icons = icons;
 		initComponents();
 	}
@@ -227,7 +227,8 @@ public class ForceViewPanel extends javax.swing.JPanel {
     	}
  		//sort person vector by rank
  		Collections.sort(people, new Comparator<Person>(){		 
-            public int compare(final Person p1, final Person p2) {
+            @Override
+			public int compare(final Person p1, final Person p2) {
                return ((Comparable<Integer>)p2.getRankNumeric()).compareTo(p1.getRankNumeric());
             }
         });
@@ -450,7 +451,8 @@ public class ForceViewPanel extends javax.swing.JPanel {
  		}
  		//sort person vector by rank
  		Collections.sort(units, new Comparator<Unit>(){		 
-            public int compare(final Unit u1, final Unit u2) {
+            @Override
+			public int compare(final Unit u1, final Unit u2) {
                return ((Comparable<Integer>)u2.getCommander().getRankNumeric()).compareTo(u1.getCommander().getRankNumeric());
             }
         });
@@ -614,7 +616,8 @@ public class ForceViewPanel extends javax.swing.JPanel {
     	}
  		//sort person vector by rank
  		Collections.sort(people, new Comparator<Person>(){		 
-            public int compare(final Person p1, final Person p2) {
+            @Override
+			public int compare(final Person p1, final Person p2) {
                return ((Comparable<Integer>)p2.getRankNumeric()).compareTo(p1.getRankNumeric());
             }
         });

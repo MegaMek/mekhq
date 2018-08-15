@@ -54,8 +54,8 @@ public class EditAssetDialog extends JDialog {
     
     public EditAssetDialog(Frame parent, Asset a) {
         super(parent, true);
-        this.frame = parent;
-        this.asset = a;
+        frame = parent;
+        asset = a;
         cancelled = false;
         initComponents();
         setLocationRelativeTo(parent);
@@ -163,7 +163,8 @@ public class EditAssetDialog extends JDialog {
         btnOK.setText("OK"); // NOI18N
         btnOK.setName("btnOK"); // NOI18N
         btnOK.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnOKActionPerformed(evt);
             }
         });
@@ -178,7 +179,8 @@ public class EditAssetDialog extends JDialog {
         btnClose.setText("Cancel"); // NOI18N
         btnClose.setName("btnClose"); // NOI18N
         btnClose.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnCloseActionPerformed(evt);
             }
         });
@@ -212,12 +214,12 @@ public class EditAssetDialog extends JDialog {
         } else {
             asset.setSchedule(Finances.SCHEDULE_MONTHLY);
         }
-        this.setVisible(false);
+        setVisible(false);
     }
 
     private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {
         cancelled = true;
-        this.setVisible(false);
+        setVisible(false);
     }
  
     public boolean wasCancelled() {

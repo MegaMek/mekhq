@@ -14,7 +14,7 @@ public class PartInventory {
      * @return part count on hand.
      */
     public int getSupply() {
-        return this.supply;
+        return supply;
     }
 
     /**
@@ -22,7 +22,7 @@ public class PartInventory {
      * @param count count of a part on hand.
      */
     public void setSupply(int count) {
-        this.supply = count;
+        supply = count;
     }
 
     /**
@@ -30,7 +30,7 @@ public class PartInventory {
      * @return the count of a part's supply on hand as a String.
      */
     public String supplyAsString() {
-        return this.supply + this.countModifier;
+        return supply + countModifier;
     }
 
     /**
@@ -38,7 +38,7 @@ public class PartInventory {
      * @return the count of a part in transit.
      */
     public int getTransit() {
-        return this.transit;
+        return transit;
     }
 
     /**
@@ -46,7 +46,7 @@ public class PartInventory {
      * @param count count in transit of a part.
      */
     public void setTransit(int count) {
-        this.transit = count;
+        transit = count;
     }
 
     /**
@@ -54,7 +54,7 @@ public class PartInventory {
      * @return the count in transit of a part as a String.
      */
     public String transitAsString() {
-        return this.transit + this.countModifier;
+        return transit + countModifier;
     }
 
     /**
@@ -62,7 +62,7 @@ public class PartInventory {
      * @return count ordered of a part.
      */
     public int getOrdered() {
-        return this.ordered;
+        return ordered;
     }
 
     /**
@@ -70,7 +70,7 @@ public class PartInventory {
      * @param count count ordered of a part.
      */
     public void setOrdered(int count) {
-        this.ordered = count;
+        ordered = count;
     }
 
     /**
@@ -78,7 +78,7 @@ public class PartInventory {
      * @return count ordered of a part as a String.
      */
     public String orderedAsString() {
-        return this.ordered + this.countModifier;
+        return ordered + countModifier;
     }
 
     /**
@@ -86,7 +86,7 @@ public class PartInventory {
      * @return modifier displayed next to a count when formatted as a String.
      */
     public String getCountModifier() {
-        return this.countModifier;
+        return countModifier;
     }
 
     /** 

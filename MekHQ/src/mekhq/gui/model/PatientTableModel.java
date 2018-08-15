@@ -29,7 +29,7 @@ public class PatientTableModel extends AbstractListModel<Person> {
     //fill table with values
     public void setData(ArrayList<Person> data) {
         patients = data;
-        this.fireContentsChanged(this, 0, patients.size());
+        fireContentsChanged(this, 0, patients.size());
         //fireTableDataChanged();
     }
 
@@ -61,7 +61,8 @@ public class PatientTableModel extends AbstractListModel<Person> {
 
         private static final long serialVersionUID = -406535109900807837L;
 
-        public Component getListCellRendererComponent(
+        @Override
+		public Component getListCellRendererComponent(
                 JList<?> list,
                 Object value,
                 int index,
@@ -69,7 +70,7 @@ public class PatientTableModel extends AbstractListModel<Person> {
                 boolean cellHasFocus) {
             Component c = this;
             setOpaque(true);
-            Person p = (Person)getElementAt(index);
+            Person p = getElementAt(index);
             if (getCampaign().getCampaignOptions().useAdvancedMedical()) {
                 setText(p.getInjuriesDesc(), "black");
             } else {

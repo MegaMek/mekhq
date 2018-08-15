@@ -136,20 +136,20 @@ public class AtBScenarioViewPanel extends JPanel {
 
     public AtBScenarioViewPanel(AtBScenario s, Campaign c, IconPackage ip, JFrame frame) {
         this.frame = frame;
-        this.scenario = s;
-        this.campaign = c;
-        this.icons = ip;
+        scenario = s;
+        campaign = c;
+        icons = ip;
         botStubs = new ArrayList<>();
 
         if(s.isCurrent()) {
             s.refresh(c);
-            this.playerForces = new ForceStub(s.getForces(campaign), campaign);
+            playerForces = new ForceStub(s.getForces(campaign), campaign);
             attachedAllyStub = s.generateEntityStub(s.getAlliesPlayer());
             for (int i = 0; i < s.getNumBots(); i++) {
                 botStubs.add(s.generateBotStub(s.getBotForce(i)));
             }
         } else {
-            this.playerForces = s.getForceStub();
+            playerForces = s.getForceStub();
             attachedAllyStub = s.getAlliesPlayerStub();
             botStubs = s.getBotForceStubs();
         }

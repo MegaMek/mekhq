@@ -56,10 +56,11 @@ public class FireControlSystem extends Part {
     public FireControlSystem(int tonnage, long cost, Campaign c) {
         super(tonnage, c);
         this.cost = cost;
-        this.name = "Fire Control System";
+        name = "Fire Control System";
     }
         
-    public FireControlSystem clone() {
+    @Override
+	public FireControlSystem clone() {
     	FireControlSystem clone = new FireControlSystem(0, cost, campaign);
         clone.copyBaseData(this);
     	return clone;

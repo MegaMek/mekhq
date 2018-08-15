@@ -263,7 +263,7 @@ public class AtBConfiguration implements Serializable {
 		if (botLanceTables.containsKey(org)) {
 			WeightedTable<String> table = botLanceTables.get(org).get(weightClassIndex(weightClass));
 			if (table == null) {
-				table = this.getDefaultForceTable("botLance." + org, weightClassIndex(weightClass));
+				table = getDefaultForceTable("botLance." + org, weightClassIndex(weightClass));
 			}
 			return table.select(rollMod);
 		}

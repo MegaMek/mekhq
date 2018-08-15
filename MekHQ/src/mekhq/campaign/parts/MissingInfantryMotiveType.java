@@ -51,7 +51,7 @@ public class MissingInfantryMotiveType extends MissingPart {
 	
 	public MissingInfantryMotiveType(int tonnage, Campaign c, EntityMovementMode m) {
 		super(tonnage, c);
-		this.mode = m;
+		mode = m;
 		if(null != mode) {
 			assignName();
 		}

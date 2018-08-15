@@ -22,6 +22,7 @@
 package mekhq.campaign.universe;
 
 import megamek.common.EquipmentType;
+import megamek.common.ITechnology;
 
 /**
  *
@@ -136,19 +137,19 @@ public class Era {
     	switch(era) {
         case E_AOW:
         case E_SL:
-            return EquipmentType.ERA_SL;
+            return ITechnology.ERA_SL;
         case E_ESW:
         case E_LSW_LOSTECH:
         case E_LSW_RENAISSANCE:
-            return EquipmentType.ERA_SW;
+            return ITechnology.ERA_SW;
         case E_CLAN_INVASION:
         case E_CIVIL_WAR:
         case E_JIHAD:
         case E_EARLY_REPUBLIC:
         case E_LATE_REPUBLIC:
-            return EquipmentType.ERA_CLAN;
+            return ITechnology.ERA_CLAN;
         case E_DARK_AGES:
-            return EquipmentType.ERA_DA;
+            return ITechnology.ERA_DA;
         default:
             return -1;
     	}

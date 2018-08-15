@@ -133,7 +133,7 @@ public class ImageChoiceDialog extends JDialog {
         this.category = category;
         filename = file;
         imagesMouseAdapter = new ImageTableMouseAdapter();
-        this.imageItems = items;
+        imageItems = items;
         this.force = force;
         // If we're doing forces, initialize the hashmap for use
         if (force) {

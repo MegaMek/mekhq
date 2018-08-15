@@ -47,9 +47,10 @@ public class MekSensor extends Part {
 
 	public MekSensor(int tonnage, Campaign c) {
         super(tonnage, c);
-        this.name = "Mech Sensors";
+        name = "Mech Sensors";
     }
 
+	@Override
 	public MekSensor clone() {
 		MekSensor clone = new MekSensor(getUnitTonnage(), campaign);
         clone.copyBaseData(this);

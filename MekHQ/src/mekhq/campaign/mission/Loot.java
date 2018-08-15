@@ -22,6 +22,7 @@ package mekhq.campaign.mission;
 
 import java.io.PrintWriter;
 import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 
 import megamek.common.Entity;
@@ -112,7 +113,7 @@ public class Loot implements MekHqXmlSerializable {
     public String getShortDescription() {
         String desc = getName() + " - ";
         if(cash > 0) {
-            desc += DecimalFormat.getIntegerInstance().format(cash) + " C-bills";
+            desc += NumberFormat.getIntegerInstance().format(cash) + " C-bills";
         }
         if(units.size() > 0) {
             String s = units.size() + " unit";
@@ -150,7 +151,8 @@ public class Loot implements MekHqXmlSerializable {
         }
     }
     
-    public void writeToXml(PrintWriter pw1, int indent) {
+    @Override
+	public void writeToXml(PrintWriter pw1, int indent) {
         pw1.println(MekHqXmlUtil.indentStr(indent) + "<loot>");
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<name>"

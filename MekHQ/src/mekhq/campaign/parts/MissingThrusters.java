@@ -55,7 +55,7 @@ public class MissingThrusters extends MissingPart {
     public MissingThrusters(int tonnage, Campaign c, boolean left) {
     	super(0, c);
     	isLeftThrusters = left;
-    	this.name = "Thrusters";
+    	name = "Thrusters";
     }
     
     @Override 

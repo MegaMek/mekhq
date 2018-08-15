@@ -297,6 +297,7 @@ public class PartsAcquisitionService {
 			this.canBeAcquired = canBeAcquired;
 		}
 
+		@Override
 		public String toString() {
 			StringBuilder sb = new StringBuilder();
 

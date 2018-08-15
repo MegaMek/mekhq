@@ -352,7 +352,7 @@ public class PartsInUseTableModel extends DataTableModel {
             }
             editButton.setEnabled(enabled && buyable);
             
-            this.editorValue = value;
+            editorValue = value;
             return editButton;
         }
 

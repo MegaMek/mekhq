@@ -345,14 +345,14 @@ public final class BriefingTab extends CampaignGuiTab {
                     ? new NewAtBContractDialog(getFrame(), true, getCampaign())
                     : new NewContractDialog(getFrame(), true, getCampaign());
             ncd.setVisible(true);
-            this.setVisible(false);
+            setVisible(false);
             if (ncd.getContractId() != -1) {
                 selectedMission = ncd.getContractId();
             }
         } else {
             CustomizeMissionDialog cmd = new CustomizeMissionDialog(getFrame(), true, null, getCampaign());
             cmd.setVisible(true);
-            this.setVisible(false);
+            setVisible(false);
             if (cmd.getMissionId() != -1) {
                 selectedMission = cmd.getMissionId();
             }

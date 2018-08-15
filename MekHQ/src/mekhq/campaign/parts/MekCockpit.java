@@ -51,11 +51,12 @@ public class MekCockpit extends Part {
 	
 	public MekCockpit(int tonnage, int t, boolean isClan, Campaign c) {
         super(tonnage, c);
-        this.type = t;
-        this.name = Mech.getCockpitDisplayString(type);
+        type = t;
+        name = Mech.getCockpitDisplayString(type);
         this.isClan = isClan;
     }
 	
+	@Override
 	public MekCockpit clone() {
 		MekCockpit clone = new MekCockpit(getUnitTonnage(), type, isClan, campaign);
         clone.copyBaseData(this);

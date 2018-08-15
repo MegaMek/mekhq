@@ -116,7 +116,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
      * @param campaign The MekHQ {@code Campaign}
      */
     public AbstractUnitRating(Campaign campaign) {
-        this.setCampaign(campaign);
+        setCampaign(campaign);
         setInitialized(false);
     }
 
@@ -128,16 +128,19 @@ public abstract class AbstractUnitRating implements IUnitRating {
         AbstractUnitRating.initialized = initialized;
     }
 
-    public void reInitialize() {
+    @Override
+	public void reInitialize() {
         setInitialized(false);
         initValues();
     }
 
-    public String getAverageExperience() {
+    @Override
+	public String getAverageExperience() {
         return getExperienceLevelName(calcAverageExperience());
     }
 
-    public int getCombatRecordValue() {
+    @Override
+	public int getCombatRecordValue() {
         setSuccessCount(0);
         setFailCount(0);
         setBreachCount(0);
@@ -187,7 +190,8 @@ public abstract class AbstractUnitRating implements IUnitRating {
     /**
      * Returns the commander (highest ranking person) for this force.
      */
-    public Person getCommander() {
+    @Override
+	public Person getCommander() {
         if ((commander == null)) {
 
             // First, check to see if a commander as been flagged.
@@ -258,7 +262,8 @@ public abstract class AbstractUnitRating implements IUnitRating {
         return failCount;
     }
 
-    public int getTechValue() {
+    @Override
+	public int getTechValue() {
         return 0;
     }
 
@@ -272,11 +277,13 @@ public abstract class AbstractUnitRating implements IUnitRating {
     /**
      * Returns the overall percentage of fully supported units.
      */
-    public BigDecimal getSupportPercent() {
+    @Override
+	public BigDecimal getSupportPercent() {
         return supportPercent;
     }
 
-    public int getTransportValue() {
+    @Override
+	public int getTransportValue() {
         int value = 0;
 
         //Find the percentage of units that are transported.
@@ -309,7 +316,8 @@ public abstract class AbstractUnitRating implements IUnitRating {
         return value;
     }
 
-    public int getUnitRating(int score) {
+    @Override
+	public int getUnitRating(int score) {
         if (score < 0) {
             return DRAGOON_F;
         } else if (score < 46) {
@@ -325,7 +333,8 @@ public abstract class AbstractUnitRating implements IUnitRating {
         }
     }
 
-    public String getUnitRatingName(int rating) {
+    @Override
+	public String getUnitRatingName(int rating) {
         switch (rating) {
             case DRAGOON_F:
                 return "F";
@@ -344,20 +353,24 @@ public abstract class AbstractUnitRating implements IUnitRating {
         }
     }
 
-    public String getUnitRating() {
+    @Override
+	public String getUnitRating() {
         int score = calculateUnitRatingScore();
         return getUnitRatingName(getUnitRating(score)) + " (" + score + ")";
     }
 
-    public int getUnitRatingAsInteger() {
+    @Override
+	public int getUnitRatingAsInteger() {
         return getUnitRating(calculateUnitRatingScore());
     }
 
-    public int getScore() {
+    @Override
+	public int getScore() {
         return calculateUnitRatingScore();
     }
 
-    public int getModifier() {
+    @Override
+	public int getModifier() {
         return (calculateUnitRatingScore() / 10);
     }
 

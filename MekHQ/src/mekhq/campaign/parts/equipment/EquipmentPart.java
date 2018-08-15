@@ -69,7 +69,7 @@ public class EquipmentPart extends Part {
     }
 
     public void setEquipmentNum(int n) {
-    	this.equipmentNum = n;
+    	equipmentNum = n;
     }
 
     public EquipmentPart() {
@@ -82,13 +82,13 @@ public class EquipmentPart extends Part {
 
     public EquipmentPart(int tonnage, EquipmentType et, int equipNum, boolean omniPodded, Campaign c) {
         super(tonnage, omniPodded, c);
-        this.type =et;
+        type =et;
         if(null != type) {
-        	this.name = type.getName();
-        	this.typeName = type.getInternalName();
+        	name = type.getName();
+        	typeName = type.getInternalName();
         }
         if (equipNum != -1) {
-            this.equipmentNum = equipNum;
+            equipmentNum = equipNum;
         } else {
             equipmentNum = -1;
         }
@@ -113,7 +113,8 @@ public class EquipmentPart extends Part {
     	equipTonnage = ton;
     }
 
-    public EquipmentPart clone() {
+    @Override
+	public EquipmentPart clone() {
     	EquipmentPart clone = new EquipmentPart(getUnitTonnage(), type, equipmentNum, omniPodded, campaign);
         clone.copyBaseData(this);
         if(hasVariableTonnage(type)) {
@@ -330,7 +331,8 @@ public class EquipmentPart extends Part {
 		return hits > 0;
 	}
 
-    public int getLocation() {
+    @Override
+	public int getLocation() {
     	if(null != unit) {
     		Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
 			if(null != mounted) {

@@ -96,8 +96,8 @@ public class Award implements MekHqXmlSerializable, Comparable<Award>, Serializa
         pw1.append(MekHqXmlUtil.indentStr(indent)).append("<award>");
 
         pw1.append("<date>").append(DATE_FORMAT.format(date)).append("</date>");
-        pw1.append("<set>").append(MekHqXmlUtil.escape(this.set)).append("</set>");
-        pw1.append("<name>").append(MekHqXmlUtil.escape(this.name)).append("</name>");
+        pw1.append("<set>").append(MekHqXmlUtil.escape(set)).append("</set>");
+        pw1.append("<name>").append(MekHqXmlUtil.escape(name)).append("</name>");
 
         pw1.append("</award>").println();
     }
@@ -159,7 +159,7 @@ public class Award implements MekHqXmlSerializable, Comparable<Award>, Serializa
      * @return award with new date
      */
     public Award createCopy(Date date){
-        Award awardCopy = new Award(this.name, this.set, this.description, this.medal, this.ribbon, this.misc, this.xp, this.edge, this.stackable);
+        Award awardCopy = new Award(name, set, description, medal, ribbon, misc, xp, edge, stackable);
         awardCopy.setDate(date);
         return awardCopy;
     }
@@ -185,7 +185,7 @@ public class Award implements MekHqXmlSerializable, Comparable<Award>, Serializa
      * @return true if it is equal
      */
     public boolean equals(String setName, String name, Date date){
-        return (this.set.equals(setName) && this.name.equals(name) && this.date.equals(date));
+        return (set.equals(setName) && this.name.equals(name) && this.date.equals(date));
     }
 
     /**
@@ -195,14 +195,14 @@ public class Award implements MekHqXmlSerializable, Comparable<Award>, Serializa
      */
     @Override
     public int compareTo(Award other) {
-        int result = Integer.compare(this.xp, other.xp);
+        int result = Integer.compare(xp, other.xp);
 
         if(result == 0) {
-            result = Integer.compare(this.edge, other.edge);
+            result = Integer.compare(edge, other.edge);
         }
 
         if(result == 0) {
-            result = this.getName().compareTo(other.getName());
+            result = getName().compareTo(other.getName());
         }
 
         return result;

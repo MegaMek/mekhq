@@ -530,7 +530,7 @@ class Clan {
 			return code.equals(((Clan)o).code);
 		}
 		if (o instanceof String) {
-			return code.equals((String)o);
+			return code.equals(o);
 		}
 		return false;
 	}

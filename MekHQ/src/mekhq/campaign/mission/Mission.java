@@ -73,11 +73,11 @@ public class Mission implements Serializable, MekHqXmlSerializable {
     }
 
     public Mission(String n) {
-        this.name = n;
-        this.planetId = "Unknown Planet";
-        this.desc = "";
-        this.type = "";
-        this.status = S_ACTIVE;
+        name = n;
+        planetId = "Unknown Planet";
+        desc = "";
+        type = "";
+        status = S_ACTIVE;
         scenarios = new ArrayList<>();
     }
 
@@ -102,7 +102,7 @@ public class Mission implements Serializable, MekHqXmlSerializable {
     }
 
     public void setName(String n) {
-        this.name = n;
+        name = n;
     }
 
     public String getType() {
@@ -110,7 +110,7 @@ public class Mission implements Serializable, MekHqXmlSerializable {
     }
 
     public void setType(String t) {
-        this.type = t;
+        type = t;
     }
 
     public String getPlanetId() {
@@ -118,7 +118,7 @@ public class Mission implements Serializable, MekHqXmlSerializable {
     }
 
     public void setPlanetId(String n) {
-        this.planetId = n;
+        planetId = n;
     }
 
     public Planet getPlanet() {
@@ -148,7 +148,7 @@ public class Mission implements Serializable, MekHqXmlSerializable {
     }
 
     public void setDesc(String d) {
-        this.desc = d;
+        desc = d;
     }
 
     public int getStatus() {
@@ -156,7 +156,7 @@ public class Mission implements Serializable, MekHqXmlSerializable {
     }
 
     public void setStatus(int s) {
-        this.status = s;
+        status = s;
     }
 
     public String getStatusName() {
@@ -183,7 +183,7 @@ public class Mission implements Serializable, MekHqXmlSerializable {
     }
 
     public void setId(int i) {
-        this.id = i;
+        id = i;
     }
 
     public boolean isActive() {

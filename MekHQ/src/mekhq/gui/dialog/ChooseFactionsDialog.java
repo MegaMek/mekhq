@@ -43,8 +43,8 @@ public class ChooseFactionsDialog extends JDialog {
     public ChooseFactionsDialog(Frame parent, DateTime date, List<String> defaults, boolean modal) {
         super(parent, modal);
         this.date = Objects.requireNonNull(date);
-        this.result = defaults;
-        this.changed = false;
+        result = defaults;
+        changed = false;
         initComponents();
         setLocationRelativeTo(parent);
     }

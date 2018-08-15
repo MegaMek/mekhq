@@ -109,14 +109,16 @@ public class EditSkillPrereqDialog extends JDialog {
         JPanel panButtons = new JPanel(new GridLayout(0,2));
         btnOK.setText("Done"); // NOI18N
         btnOK.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 done();
             }
         });
         
         btnClose.setText("Cancel"); // NOI18N
         btnClose.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 cancel();
             }
         });
@@ -131,7 +133,7 @@ public class EditSkillPrereqDialog extends JDialog {
         getContentPane().add(new JScrollPane(panMain), BorderLayout.CENTER);
         getContentPane().add(panButtons, BorderLayout.SOUTH);
         
-        this.setPreferredSize(new Dimension(400,700));
+        setPreferredSize(new Dimension(400,700));
 
         pack();
     }
@@ -143,7 +145,7 @@ public class EditSkillPrereqDialog extends JDialog {
     			prereq.addPrereq(type, skillLevels.get(type).getSelectedIndex());
     		}
     	}
-    	this.setVisible(false);
+    	setVisible(false);
     }
     
     public SkillPrereq getPrereq() {
@@ -151,7 +153,7 @@ public class EditSkillPrereqDialog extends JDialog {
     }
     
     private void cancel() {
-    	this.setVisible(false);
+    	setVisible(false);
     	cancelled = true;
     }
     

@@ -75,7 +75,7 @@ public class NewContractDialog extends javax.swing.JDialog {
     /** Creates new form NewTeamDialog */
     public NewContractDialog(java.awt.Frame parent, boolean modal, Campaign c) {
         super(parent, modal);
-        this.frame = parent;  
+        frame = parent;  
         campaign = c;
         contract = new Contract("New Contract", "New Employer");
         contract.calculateContract(campaign);
@@ -947,7 +947,7 @@ public class NewContractDialog extends javax.swing.JDialog {
     	    negotiator.awardXP(campaign.getCampaignOptions().getContractNegotiationXP());
     	}
     	
-    	this.setVisible(false);
+    	setVisible(false);
     }
     
     private void changeStartDate() {

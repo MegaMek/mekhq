@@ -112,7 +112,7 @@ public class NewAtBContractDialog extends NewContractDialog {
         spnMultiplier.setModel(new SpinnerNumberModel(contract.getMultiplier(), 0.1, 10.0, 0.1));
         updatePaymentMultiplier();
         contract.calculateContract(campaign);
-        this.doUpdateContract(cbPlanets);
+        doUpdateContract(cbPlanets);
         
         addAllListeners();
 	}
@@ -541,7 +541,7 @@ public class NewAtBContractDialog extends NewContractDialog {
    	
     	campaign.getFinances().credit(contract.getTotalAdvanceMonies(), Transaction.C_CONTRACT, "Advance monies for " + contract.getName(), campaign.getCalendar().getTime());
     	campaign.addMission(contract);
-    	this.setVisible(false);
+    	setVisible(false);
     }
     
     @Override

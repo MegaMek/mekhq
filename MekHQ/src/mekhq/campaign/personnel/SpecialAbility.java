@@ -118,19 +118,20 @@ public class SpecialAbility implements MekHqXmlSerializable {
         weight = 1;
     }
 
-    @SuppressWarnings("unchecked") // FIXME: Broken Java with it's Object clones
+    @Override
+	@SuppressWarnings("unchecked") // FIXME: Broken Java with it's Object clones
 	public SpecialAbility clone() {
     	SpecialAbility clone = new SpecialAbility(lookupName);
-    	clone.displayName = this.displayName;
-    	clone.desc = this.desc;
-    	clone.xpCost = this.xpCost;
-    	clone.weight = this.weight;
-    	clone.prereqAbilities = (Vector<String>)this.prereqAbilities.clone();
-    	clone.invalidAbilities = (Vector<String>)this.invalidAbilities.clone();
-    	clone.removeAbilities = (Vector<String>)this.removeAbilities.clone();
-    	clone.choiceValues = (Vector<String>)this.choiceValues.clone();
-    	clone.prereqSkills = (Vector<SkillPrereq>)this.prereqSkills.clone();
-    	clone.prereqMisc = new HashMap<>(this.prereqMisc);
+    	clone.displayName = displayName;
+    	clone.desc = desc;
+    	clone.xpCost = xpCost;
+    	clone.weight = weight;
+    	clone.prereqAbilities = (Vector<String>)prereqAbilities.clone();
+    	clone.invalidAbilities = (Vector<String>)invalidAbilities.clone();
+    	clone.removeAbilities = (Vector<String>)removeAbilities.clone();
+    	clone.choiceValues = (Vector<String>)choiceValues.clone();
+    	clone.prereqSkills = (Vector<SkillPrereq>)prereqSkills.clone();
+    	clone.prereqMisc = new HashMap<>(prereqMisc);
     	return clone;
     }
 

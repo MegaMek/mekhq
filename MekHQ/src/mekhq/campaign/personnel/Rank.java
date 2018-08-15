@@ -147,7 +147,8 @@ public class Rank implements MekHqXmlSerializable {
     	return names;
     }
 
-    public void writeToXml(PrintWriter pw1, int indent) {
+    @Override
+	public void writeToXml(PrintWriter pw1, int indent) {
         pw1.println(MekHqXmlUtil.indentStr(indent) + "<rank>");
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<rankNames>"

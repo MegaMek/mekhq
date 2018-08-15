@@ -27,6 +27,7 @@ import megamek.common.Aero;
 import megamek.common.CriticalSlot;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
+import megamek.common.ITechnology;
 import megamek.common.LandAirMech;
 import megamek.common.TechAdvancement;
 import mekhq.campaign.Campaign;
@@ -48,7 +49,7 @@ public class MissingAvionics extends MissingPart {
     
     public MissingAvionics(int tonnage, Campaign c) {
     	super(0, c);
-    	this.name = "Avionics";
+    	name = "Avionics";
     }
     
     @Override 
@@ -95,7 +96,7 @@ public class MissingAvionics extends MissingPart {
 	@Override
 	public int getTechRating() {
 		//go with conventional fighter avionics
-		return EquipmentType.RATING_B;
+		return ITechnology.RATING_B;
 	}
 
 	@Override

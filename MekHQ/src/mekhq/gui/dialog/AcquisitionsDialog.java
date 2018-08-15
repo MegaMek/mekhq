@@ -61,7 +61,7 @@ public class AcquisitionsDialog extends JDialog {
 
     public AcquisitionsDialog(Frame _parent, boolean _modal, CampaignGUI _campaignGUI) {
         super(_parent, _modal);
-        this.campaignGUI = _campaignGUI;
+        campaignGUI = _campaignGUI;
 
         calculateBonusParts();
 
@@ -335,7 +335,7 @@ public class AcquisitionsDialog extends JDialog {
             partCountInfo = PartsAcquisitionService.getPartCountInfoMap().get(targetWork.getAcquisitionDisplayName());
 
             if (null == partCountInfo) {
-                ((AcquisitionPanel) this).setVisible(false);
+                this.setVisible(false);
             } else {
                 lblText.setText(generateText());
 
@@ -513,7 +513,7 @@ public class AcquisitionsDialog extends JDialog {
             gbcMain.insets = insetsOriginal;
 
             if (idx != PartsAcquisitionService.getAcquisitionMap().size()) {
-                this.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.BLACK));
+                setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.BLACK));
             }
         }
 

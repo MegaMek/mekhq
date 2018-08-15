@@ -35,11 +35,11 @@ public class OrganizationChangedEvent extends MMEvent {
     
     public OrganizationChangedEvent(Force force) {
         this.force = force;
-        this.unit = null;
+        unit = null;
     }
     
     public OrganizationChangedEvent(Unit unit) {
-        this.force = null;
+        force = null;
         this.unit = unit;
     }
     

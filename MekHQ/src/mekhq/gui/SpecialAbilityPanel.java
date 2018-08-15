@@ -35,20 +35,22 @@ public class SpecialAbilityPanel extends JPanel {
         
 
         public SpecialAbilityPanel(SpecialAbility a, CampaignOptionsDialog cod) {
-            this.abil = a;
+            abil = a;
             this.cod = cod;
             
             btnEdit = new JButton("Edit");
             btnRemove = new JButton("Remove");
            
             btnEdit.addActionListener(new java.awt.event.ActionListener() {
-                public void actionPerformed(java.awt.event.ActionEvent evt) {
+                @Override
+				public void actionPerformed(java.awt.event.ActionEvent evt) {
                     editSPA();
                 }
             });
             
             btnRemove.addActionListener(new java.awt.event.ActionListener() {
-                public void actionPerformed(java.awt.event.ActionEvent evt) {
+                @Override
+				public void actionPerformed(java.awt.event.ActionEvent evt) {
                     remove();
                 }
             });
@@ -67,7 +69,7 @@ public class SpecialAbilityPanel extends JPanel {
           
             JTextArea txtDesc = new JTextArea(abil.getDescription());
             txtDesc.setEditable(false);
-            txtDesc.setBackground(this.getBackground());
+            txtDesc.setBackground(getBackground());
             
             JPanel pnlButton = new JPanel(new GridLayout(0,2));
             pnlButton.add(btnEdit);
@@ -136,7 +138,7 @@ public class SpecialAbilityPanel extends JPanel {
             c.weighty = 1.0;
             add(new JLabel("<html>" + abil.getRemovedDesc() + "</html>"), c);     
             
-            this.setBorder(BorderFactory.createTitledBorder(abil.getDisplayName()));
+            setBorder(BorderFactory.createTitledBorder(abil.getDisplayName()));
             
         }
         
@@ -147,9 +149,9 @@ public class SpecialAbilityPanel extends JPanel {
         private void editSPA() {
         	EditSpecialAbilityDialog esad = new EditSpecialAbilityDialog(null, abil, cod.getCurrentSPA());
             esad.setVisible(true);
-            this.removeAll();
+            removeAll();
             initComponents();
-            this.revalidate();
+            revalidate();
             this.repaint();
         }
     }

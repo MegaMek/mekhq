@@ -41,6 +41,7 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
 import megamek.common.EquipmentType;
+import megamek.common.ITechnology;
 import megamek.common.PlanetaryConditions;
 import megamek.common.util.EncodeControl;
 import mekhq.Utilities;
@@ -158,7 +159,7 @@ public class NewPlanetaryEventDialog extends JDialog {
         super(parent, modal);
         this.planet = new Planet(Objects.requireNonNull(planet).getId());
         this.planet.copyDataFrom(planet);
-        this.date = Utilities.getDateTimeDay(campaign.getCalendar());
+        date = Utilities.getDateTimeDay(campaign.getCalendar());
         initComponents();
         setLocationRelativeTo(parent);
     }
@@ -584,9 +585,9 @@ public class NewPlanetaryEventDialog extends JDialog {
         gbc.gridx = 1;
         hpgField = new JComboBox<>(new HPGChoice[]{
                 new HPGChoice(null, resourceMap.getString("hpg.undefined.text")), //$NON-NLS-1$
-                new HPGChoice(EquipmentType.RATING_A, resourceMap.getString("hpg.a.text")), new HPGChoice(EquipmentType.RATING_B, resourceMap.getString("hpg.b.text")), //$NON-NLS-1$ //$NON-NLS-2$
-                new HPGChoice(EquipmentType.RATING_C, resourceMap.getString("hpg.c.text")), new HPGChoice(EquipmentType.RATING_D, resourceMap.getString("hpg.d.text")), //$NON-NLS-1$ //$NON-NLS-2$
-                new HPGChoice(EquipmentType.RATING_X, resourceMap.getString("hpg.none.text")) //$NON-NLS-1$
+                new HPGChoice(ITechnology.RATING_A, resourceMap.getString("hpg.a.text")), new HPGChoice(ITechnology.RATING_B, resourceMap.getString("hpg.b.text")), //$NON-NLS-1$ //$NON-NLS-2$
+                new HPGChoice(ITechnology.RATING_C, resourceMap.getString("hpg.c.text")), new HPGChoice(ITechnology.RATING_D, resourceMap.getString("hpg.d.text")), //$NON-NLS-1$ //$NON-NLS-2$
+                new HPGChoice(ITechnology.RATING_X, resourceMap.getString("hpg.none.text")) //$NON-NLS-1$
         });
         hpgField.addActionListener(changeValueAction);
         hpgField.setName(FIELD_HPG);

@@ -26,7 +26,8 @@ public class DocTableModel extends DataTableModel {
         campaign = c;
     }
 
-    public Object getValueAt(int row, int col) {
+    @Override
+	public Object getValueAt(int row, int col) {
         return ((Person) data.get(row)).getDocDesc();
     }
 
@@ -49,7 +50,8 @@ public class DocTableModel extends DataTableModel {
 
         private static final long serialVersionUID = -818080358678474607L;
 
-        public Component getTableCellRendererComponent(JTable table,
+        @Override
+		public Component getTableCellRendererComponent(JTable table,
                 Object value, boolean isSelected, boolean hasFocus,
                 int row, int column) {
             Component c = this;

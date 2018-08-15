@@ -240,6 +240,7 @@ public class UnitMarketDialog extends JDialog {
         sorter = new TableRowSorter<>(marketModel);
         sorter.setComparator(UnitMarketTableModel.COL_WEIGHTCLASS, new WeightClassSorter());
         Comparator<String> numComparator = new Comparator<String>() {
+			@Override
 			public int compare(String arg0, String arg1) {
 				if (arg0.length() != arg1.length()) {
 					return arg0.length() - arg1.length();
@@ -252,7 +253,8 @@ public class UnitMarketDialog extends JDialog {
         tableUnits.setRowSorter(sorter);
         tableUnits.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
         tableUnits.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
+            @Override
+			public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
                 offerChanged(evt);
             }
         });
@@ -261,7 +263,8 @@ public class UnitMarketDialog extends JDialog {
             column = ((XTableColumnModel)tableUnits.getColumnModel()).getColumnByModelIndex(i);
             column.setPreferredWidth(marketModel.getColumnWidth(i));
             column.setCellRenderer(new DefaultTableCellRenderer() {
-                public Component getTableCellRendererComponent(JTable table,
+                @Override
+				public Component getTableCellRendererComponent(JTable table,
                         Object value, boolean isSelected, boolean hasFocus,
                         int row, int column) {
                     super.getTableCellRendererComponent(table, value, isSelected,
@@ -302,7 +305,8 @@ public class UnitMarketDialog extends JDialog {
         btnPurchase.setText(resourceMap.getString("btnPurchase.text"));
         btnPurchase.setName("btnPurchase"); // NOI18N
         btnPurchase.addActionListener(new java.awt.event.ActionListener() {
-        	public void actionPerformed(java.awt.event.ActionEvent evt) {
+        	@Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
         		purchaseUnit(evt);
         	}
         });
@@ -311,7 +315,8 @@ public class UnitMarketDialog extends JDialog {
 
         btnAdd = new JButton(resourceMap.getString("btnAdd.text"));
         btnAdd.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 addUnit();
             }
         });
@@ -322,7 +327,8 @@ public class UnitMarketDialog extends JDialog {
         btnClose.setText(resourceMap.getString("btnClose.text")); // NOI18N
         btnClose.setName("btnClose"); // NOI18N
         btnClose.addActionListener(new java.awt.event.ActionListener() {
-        	public void actionPerformed(java.awt.event.ActionEvent evt) {
+        	@Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
         		btnCloseActionPerformed(evt);
         	}
         });
@@ -443,7 +449,8 @@ public class UnitMarketDialog extends JDialog {
 	 		//This odd code is to make sure that the scrollbar stays at the top
 	 		//I cant just call it here, because it ends up getting reset somewhere later
 	 		javax.swing.SwingUtilities.invokeLater(new Runnable() {
-	 			public void run() {
+	 			@Override
+				public void run() {
 	 				scrollUnitView.getVerticalScrollBar().setValue(0);
 	 			}
 	 		});

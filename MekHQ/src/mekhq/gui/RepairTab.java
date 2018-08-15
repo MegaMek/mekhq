@@ -592,7 +592,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         selectedLocation = choiceLocation.getSelectedIndex();
         selectedUnit = getSelectedServicedUnit();
         selectedTech = getSelectedTech();
-        IPartWork part = (IPartWork)getSelectedTask();
+        IPartWork part = getSelectedTask();
         if (null == part) {
             return;
         }
@@ -684,7 +684,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
             @Override
             public boolean include(Entry<? extends TaskTableModel, ? extends Integer> entry) {
                 TaskTableModel taskModel = entry.getModel();
-                IPartWork part = (IPartWork)taskModel.getTaskAt(entry.getIdentifier());
+                IPartWork part = taskModel.getTaskAt(entry.getIdentifier());
                 if (part == null) {
                     return false;
                 }

@@ -54,38 +54,38 @@ public class MissingProtomekLocation extends MissingPart {
         super(tonnage, c);
         this.loc = loc;
         this.structureType = structureType;
-        this.booster = hasBooster;
-        this.percent = 1.0;
-        this.forQuad = quad;
+        booster = hasBooster;
+        percent = 1.0;
+        forQuad = quad;
         //TODO: need to account for internal structure and myomer types
         //crap, no static report for location names?
-        this.name = "Mech Location";
-        this.name = "Protomech Location";
+        name = "Mech Location";
+        name = "Protomech Location";
         switch(loc) {
         case(Protomech.LOC_HEAD):
-            this.name = "Protomech Head";
+            name = "Protomech Head";
             break;
         case(Protomech.LOC_TORSO):
-            this.name = "Protomech Torso";
+            name = "Protomech Torso";
             break;
         case(Protomech.LOC_LARM):
-            this.name = "Protomech Left Arm";
+            name = "Protomech Left Arm";
             break;
         case(Protomech.LOC_RARM):
-            this.name = "Protomech Right Arm";
+            name = "Protomech Right Arm";
             break;
         case(Protomech.LOC_LEG):
-            this.name = "Protomech Legs";
+            name = "Protomech Legs";
             if(forQuad) {
-                this.name = "Protomech Legs (Quad)";
+                name = "Protomech Legs (Quad)";
             }
             break;
         case(Protomech.LOC_MAINGUN):
-            this.name = "Protomech Main Gun";
+            name = "Protomech Main Gun";
             break;
         }
         if(booster) {
-            this.name += " (Myomer Booster)";
+            name += " (Myomer Booster)";
         }
     }
 
@@ -112,7 +112,8 @@ public class MissingProtomekLocation extends MissingPart {
     }
 
 
-    public double getTonnage() {
+    @Override
+	public double getTonnage() {
         //TODO: how much should this weigh?
         return 0;
     }

@@ -503,7 +503,8 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
         return score;
     }
 
-    public int getExperienceValue() {
+    @Override
+	public int getExperienceValue() {
         BigDecimal averageExperience = calcAverageExperience();
         if (averageExperience.compareTo(greenThreshold) >= 0) {
             return 5;
@@ -515,7 +516,8 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
         return 40;
     }
 
-    public int getCommanderValue() {
+    @Override
+	public int getCommanderValue() {
         if (getCommander() == null) {
             return 0;
         }
@@ -663,7 +665,8 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
         return percent.setScale(0, RoundingMode.DOWN).intValue() * 5;
     }
 
-    public int getSupportValue() {
+    @Override
+	public int getSupportValue() {
         return getTechSupportValue() + getMedicalSupportValue() + getAdminValue();
     }
 
@@ -719,7 +722,8 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
     }
     */
 
-    public int getFinancialValue() {
+    @Override
+	public int getFinancialValue() {
         int score = getYearsInDebt() * -10;
         score -= 25 * getCampaign().getFinances().getLoanDefaults();
         score -= 10 * getCampaign().getFinances().getFailedCollateral();
@@ -932,7 +936,8 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
                                                  .getFailedCollateral());
     }
 
-    public String getDetails() {
+    @Override
+	public String getDetails() {
         return String.format("%-" + HEADER_LENGTH + "s %s", "Dragoons Rating:",
                              getUnitRating()) + "\n" +
                "    Method: FM: Mercenaries (rev)\n\n" +
@@ -945,7 +950,8 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
                getFinancialDetails();
     }
 
-    public String getHelpText() {
+    @Override
+	public String getHelpText() {
         return "Method: FM: Mercenaries (rev)\n" +
                "An attempt to match the FM: Mercenaries (rev) method for " +
                "calculating the Dragoon's rating as closely as possible.\n" +
@@ -962,7 +968,8 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
                "tech support.";
     }
 
-    public BigDecimal getTransportPercent() {
+    @Override
+	public BigDecimal getTransportPercent() {
         // todo Superheavys.
         //Find out how short of transport bays we are.
         int heavyVeeBays = getHeavyVeeBayCount();
@@ -1175,7 +1182,8 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
         return countClan;
     }
     
-    public UnitRatingMethod getUnitRatingMethod() {
+    @Override
+	public UnitRatingMethod getUnitRatingMethod() {
         return UnitRatingMethod.FLD_MAN_MERCS_REV;
     }
 }

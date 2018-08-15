@@ -119,6 +119,7 @@ public class GamePreset implements MekHqXmlSerializable {
     	return true;
     }
 
+	@Override
 	public void writeToXml(PrintWriter pw, int indent) {
 		pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
         pw.println("<gamePreset>");
@@ -255,7 +256,8 @@ public class GamePreset implements MekHqXmlSerializable {
 		ArrayList<GamePreset> presets = new ArrayList<>();
 
 		File[] files = Utilities.getAllFiles(MekHQ.PRESET_DIR, new FilenameFilter() {
-            public boolean accept(File dir, String name) {
+            @Override
+			public boolean accept(File dir, String name) {
                 return name.toLowerCase().endsWith(".xml");
             }
         });

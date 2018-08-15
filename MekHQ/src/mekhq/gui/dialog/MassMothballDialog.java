@@ -125,9 +125,9 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
         scrollPane.setPreferredSize(new Dimension(600, 600));
         getContentPane().add(scrollPane);
         
-        this.setResizable(true);
-        this.pack();
-        this.validate();
+        setResizable(true);
+        pack();
+        validate();
     }
     
     /**
@@ -276,7 +276,7 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
             }
         }
         
-        this.setVisible(false);
+        setVisible(false);
     }
 
     /**

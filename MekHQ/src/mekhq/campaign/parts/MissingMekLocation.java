@@ -68,55 +68,55 @@ public class MissingMekLocation extends MissingPart {
         this.loc = loc;
         this.structureType = structureType;
         this.clan = clan;
-        this.tsm = hasTSM;
-        this.percent = 1.0;
-        this.forQuad = quad;
+        tsm = hasTSM;
+        percent = 1.0;
+        forQuad = quad;
         //TODO: need to account for internal structure and myomer types
         //crap, no static report for location names?
-        this.name = "Mech Location";
+        name = "Mech Location";
         switch(loc) {
             case(Mech.LOC_HEAD):
-                this.name = "Mech Head";
+                name = "Mech Head";
                 break;
             case(Mech.LOC_CT):
-                this.name = "Mech Center Torso";
+                name = "Mech Center Torso";
                 break;
             case(Mech.LOC_LT):
-                this.name = "Mech Left Torso";
+                name = "Mech Left Torso";
                 break;
             case(Mech.LOC_RT):
-                this.name = "Mech Right Torso";
+                name = "Mech Right Torso";
                 break;
             case(Mech.LOC_LARM):
-                this.name = "Mech Left Arm";
+                name = "Mech Left Arm";
             	if(forQuad) {
-            		this.name = "Mech Front Left Leg";
+            		name = "Mech Front Left Leg";
             	}
                 break;
             case(Mech.LOC_RARM):
-                this.name = "Mech Right Arm";
+                name = "Mech Right Arm";
             	if(forQuad) {
-            		this.name = "Mech Front Left Leg";
+            		name = "Mech Front Left Leg";
         		}
                 break;
             case(Mech.LOC_LLEG):
-                this.name = "Mech Left Leg";
+                name = "Mech Left Leg";
             	if(forQuad) {
-            		this.name = "Mech Rear Left Leg";
+            		name = "Mech Rear Left Leg";
             	}
                 break;
             case(Mech.LOC_RLEG):
-                this.name = "Mech Right Leg";
+                name = "Mech Right Leg";
             	if(forQuad) {
-            		this.name = "Mech Rear Right Leg";
+            		name = "Mech Rear Right Leg";
             	}
                 break;
         }
         if(structureType != EquipmentType.T_STRUCTURE_STANDARD) {
-            this.name += " (" + EquipmentType.getStructureTypeName(structureType) + ")";
+            name += " (" + EquipmentType.getStructureTypeName(structureType) + ")";
         }
         if(tsm) {
-            this.name += " (TSM)";
+            name += " (TSM)";
         }
     }
 
@@ -130,7 +130,8 @@ public class MissingMekLocation extends MissingPart {
 		return 3;
 	}
 
-    public double getTonnage() {
+    @Override
+	public double getTonnage() {
     	//TODO: how much should this weigh?
     	return 0;
     }

@@ -43,7 +43,8 @@ public class ServicedUnitsTableMouseAdapter extends MouseInputAdapter
         this.servicedUnitModel = servicedUnitModel;
     }
 
-    public void actionPerformed(ActionEvent action) {
+    @Override
+	public void actionPerformed(ActionEvent action) {
         String command = action.getActionCommand();
         @SuppressWarnings("unused")
         Unit selectedUnit = servicedUnitModel

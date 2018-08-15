@@ -28,6 +28,7 @@ import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.GregorianCalendar;
@@ -106,7 +107,7 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
      */
     public NewLoanDialog(java.awt.Frame parent, boolean modal, Campaign c) {
         super(parent, modal);
-        this.frame = parent;
+        frame = parent;
         campaign = c;
         IUnitRating unitRating = c.getUnitRating();
         rating = unitRating.getModifier();
@@ -145,15 +146,18 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
 
         txtName = new javax.swing.JTextField(loan.getInstitution());
         txtName.getDocument().addDocumentListener(new DocumentListener() {
-            public void changedUpdate(DocumentEvent e) {
+            @Override
+			public void changedUpdate(DocumentEvent e) {
                 changeInstitution();
             }
 
-            public void removeUpdate(DocumentEvent e) {
+            @Override
+			public void removeUpdate(DocumentEvent e) {
                 changeInstitution();
             }
 
-            public void insertUpdate(DocumentEvent e) {
+            @Override
+			public void insertUpdate(DocumentEvent e) {
                 changeInstitution();
             }
 
@@ -163,15 +167,18 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
         });
         txtNumber = new javax.swing.JTextField(loan.getRefNumber());
         txtNumber.getDocument().addDocumentListener(new DocumentListener() {
-            public void changedUpdate(DocumentEvent e) {
+            @Override
+			public void changedUpdate(DocumentEvent e) {
                 changeRefNumber();
             }
 
-            public void removeUpdate(DocumentEvent e) {
+            @Override
+			public void removeUpdate(DocumentEvent e) {
                 changeRefNumber();
             }
 
-            public void insertUpdate(DocumentEvent e) {
+            @Override
+			public void insertUpdate(DocumentEvent e) {
                 changeRefNumber();
             }
 
@@ -226,42 +233,50 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
         btnMinusTenK = new JButton("-10K");
         checkMinusButtons();
         btnPlusTenMillion.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 adjustPrincipal(10000000);
             }
         });
         btnMinusTenMillion.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 adjustPrincipal(-10000000);
             }
         });
         btnPlusMillion.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 adjustPrincipal(1000000);
             }
         });
         btnMinusMillion.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 adjustPrincipal(-1000000);
             }
         });
         btnPlusHundredK.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 adjustPrincipal(100000);
             }
         });
         btnMinusHundredK.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 adjustPrincipal(-100000);
             }
         });
         btnPlusTenK.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 adjustPrincipal(10000);
             }
         });
         btnMinusTenK.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 adjustPrincipal(-10000);
             }
         });
@@ -397,7 +412,8 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
         btnAdd = new JButton(resourceMap.getString("btnOkay.text")); // NOI18N
         btnAdd.setName("btnOK"); // NOI18N
         btnAdd.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 addLoan();
             }
         });
@@ -406,7 +422,8 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
         btnCancel = new JButton(resourceMap.getString("btnCancel.text")); // NOI18N
         btnCancel.setName("btnClose"); // NOI18N
         btnCancel.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 cancel();
             }
         });
@@ -551,9 +568,9 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
     private void refreshLoan(long principal) {
     	// Modify loan settings
     	loan.setPrincipal(principal);
-    	loan.setRate((int) sldInterest.getValue());
-    	loan.setCollateral((int) sldCollateral.getValue());
-    	loan.setYears((int) sldLength.getValue());
+    	loan.setRate(sldInterest.getValue());
+    	loan.setCollateral(sldCollateral.getValue());
+    	loan.setYears(sldLength.getValue());
     	loan.setSchedule(choiceSchedule.getSelectedIndex());
     	loan.setInstitution(txtName.getText());
     	loan.setRefNumber(txtNumber.getText());
@@ -574,7 +591,7 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
         lblYears.setText(loan.getYears() + " years");
         lblSchedule.setText(Finances.getScheduleName(loan.getPaymentSchedule()));
         lblPrincipal.setText(formatter.format(loan.getPrincipal()));
-        lblFirstPayment.setText(SimpleDateFormat.getDateInstance().format(loan.getNextPayDate()));
+        lblFirstPayment.setText(DateFormat.getDateInstance().format(loan.getNextPayDate()));
         lblPayAmount.setText(formatter.format(loan.getPaymentAmount()));
         lblNPayment.setText(formatter.format(loan.getRemainingPayments()));
         lblTotalPayment.setText(formatter.format(loan.getRemainingValue()));
@@ -591,11 +608,11 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
             return;
         }
         campaign.addLoan(loan);
-        this.setVisible(false);
+        setVisible(false);
     }
 
     private void cancel() {
-        this.setVisible(false);
+        setVisible(false);
     }
 
 

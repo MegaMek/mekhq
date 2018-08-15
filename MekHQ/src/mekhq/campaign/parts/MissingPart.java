@@ -56,6 +56,7 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 		super(tonnage, isOmniPodded, c);
 	}
 	
+	@Override
 	public MissingPart clone() {
 		//should never be called
 		return null;
@@ -88,6 +89,7 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 		return false;
 	}
 	
+	@Override
 	public String getDesc() {
 		String bonus = getAllMods(null).getValueAsString();
 		if (getAllMods(null).getValue() > -1) {
@@ -152,7 +154,7 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 		setUnit(null);
 		Part parentPart = campaign.getPart(parentPartId);
 		if (null != parentPart) {
-		    parentPart.removeChildPart(this.getId());
+		    parentPart.removeChildPart(getId());
 		}
 	}
 	

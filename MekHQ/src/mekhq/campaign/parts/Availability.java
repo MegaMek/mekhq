@@ -71,22 +71,22 @@ public class Availability {
         int modifier = 999;
 
         switch (tech) {
-            case (EquipmentType.RATING_A) :
+            case (ITechnology.RATING_A) :
                 modifier = -4;
                 break;
-            case (EquipmentType.RATING_B) :
+            case (ITechnology.RATING_B) :
                 modifier = -2;
                 break;
-            case (EquipmentType.RATING_C) :
+            case (ITechnology.RATING_C) :
                 modifier = 0;
                 break;
-            case (EquipmentType.RATING_D) :
+            case (ITechnology.RATING_D) :
                 modifier = 1;
                 break;
-            case (EquipmentType.RATING_E) :
+            case (ITechnology.RATING_E) :
                 modifier = 2;
                 break;
-            case (EquipmentType.RATING_F) :
+            case (ITechnology.RATING_F) :
                 modifier = 3;
                 break;
         }

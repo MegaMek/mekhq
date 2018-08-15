@@ -48,7 +48,7 @@ public class MissingAeroHeatSink extends MissingPart {
     public MissingAeroHeatSink(int tonnage, int type, boolean omniPodded, Campaign c) {
     	super(tonnage, omniPodded, c);
     	this.type = type;
-    	this.name = "Aero Heat Sink";
+    	name = "Aero Heat Sink";
     }
     
     @Override 

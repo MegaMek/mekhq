@@ -118,9 +118,9 @@ public class ResolveScenarioTracker {
     private GameVictoryEvent victoryEvent;
 
     public ResolveScenarioTracker(Scenario s, Campaign c, boolean ctrl) {
-        this.scenario = s;
-        this.campaign = c;
-        this.control = ctrl;
+        scenario = s;
+        campaign = c;
+        control = ctrl;
         unitsStatus = new Hashtable<>();
         salvageStatus = new Hashtable<>();
         potentialSalvage = new ArrayList<>();
@@ -524,7 +524,7 @@ public class ResolveScenarioTracker {
             if(infantry != null) {
                 infantry.applyDamage();
                 // If reading from a MUL, the shooting strength is set to Integer.MAX_VALUE if there is no damage.
-                int strength = Math.min(((Infantry)infantry).getShootingStrength(), crew.size());
+                int strength = Math.min(infantry.getShootingStrength(), crew.size());
                 casualties = crew.size() - strength;
                 if (ustatus.isTotalLoss()) {
                     casualties = crew.size();
@@ -1593,7 +1593,7 @@ public class ResolveScenarioTracker {
 
         public UnitStatus(Unit unit) {
             this.unit = unit;
-            this.name = unit.getName();
+            name = unit.getName();
             chassis = unit.getEntity().getChassis();
             model = unit.getEntity().getModel();
             //assume its a total loss until we find something that says otherwise
@@ -1613,7 +1613,8 @@ public class ResolveScenarioTracker {
             }
         }
 
-        public String toString() {
+        @Override
+		public String toString() {
             return "Unit status for: " + getName() + ", loss: " + isTotalLoss();
         }
 

@@ -1182,7 +1182,7 @@ public class MassRepairService {
 		private IPartWork partWork = null;
 
 		public TechSorter(IPartWork _part) {
-			this.partWork = _part;
+			partWork = _part;
 		}
 
 		@Override

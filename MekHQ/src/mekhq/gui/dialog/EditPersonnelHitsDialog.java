@@ -95,6 +95,6 @@ public class EditPersonnelHitsDialog extends JDialog {
     private void btnOKActionPerformed(ActionEvent evt) {//GEN-FIRST:event_btnHireActionPerformed
         person.setHits((Integer)spinnerHits.getModel().getValue());
         
-        this.setVisible(false);
+        setVisible(false);
     }
 }

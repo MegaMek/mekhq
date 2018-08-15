@@ -48,9 +48,9 @@ public class MissingSpacecraftEngine extends MissingPart {
 
 	public MissingSpacecraftEngine(int tonnage, double etonnage, Campaign c, boolean clan) {
 		super(tonnage, c);
-		this.engineTonnage = etonnage;
+		engineTonnage = etonnage;
 		this.clan = clan;
-		this.name = "Spacecraft Engine";
+		name = "Spacecraft Engine";
 	}
 	
 	@Override 

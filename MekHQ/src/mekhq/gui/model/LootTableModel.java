@@ -54,11 +54,13 @@ public class LootTableModel extends AbstractTableModel {
             data = entries;
         }
         
-        public int getRowCount() {
+        @Override
+		public int getRowCount() {
             return data.size();
         }
 
-        public int getColumnCount() {
+        @Override
+		public int getColumnCount() {
             return N_COL;
         }
 
@@ -78,7 +80,8 @@ public class LootTableModel extends AbstractTableModel {
             }
         }
 
-        public Object getValueAt(int row, int col) {
+        @Override
+		public Object getValueAt(int row, int col) {
             Loot loot;
             DecimalFormat formatter = new DecimalFormat();
             if(data.isEmpty()) {
@@ -112,7 +115,7 @@ public class LootTableModel extends AbstractTableModel {
         }
 
         public Loot getLootAt(int row) {
-            return (Loot) data.get(row);
+            return data.get(row);
         }
         
         public void addLoot(Loot loot) {
@@ -163,7 +166,8 @@ public class LootTableModel extends AbstractTableModel {
              */
             private static final long serialVersionUID = -2888173457152182907L;
 
-            public Component getTableCellRendererComponent(JTable table,
+            @Override
+			public Component getTableCellRendererComponent(JTable table,
                      Object value, boolean isSelected, boolean hasFocus,
                         int row, int column) {
                     super.getTableCellRendererComponent(table, value, isSelected,

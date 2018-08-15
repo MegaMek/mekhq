@@ -45,7 +45,7 @@ public class MissingVeeSensor extends MissingPart {
     
     public MissingVeeSensor(int tonnage, Campaign c) {
     	super(0, c);
-    	this.name = "Vehicle Sensors";
+    	name = "Vehicle Sensors";
     }
     
     @Override 

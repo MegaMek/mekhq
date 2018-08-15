@@ -25,26 +25,27 @@ import java.util.Map;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 import megamek.common.EquipmentType;
+import megamek.common.ITechnology;
 
 public class HPGRatingAdapter extends XmlAdapter<String, Integer> {
     private final static Map<String, Integer> stringToEquipmentTypeMap = new HashMap<>(6);
     private final static Map<Integer, String> equipmentTypeToStringMap = new HashMap<>(6);
     static {
-        stringToEquipmentTypeMap.put("A", EquipmentType.RATING_A); //$NON-NLS-1$
-        stringToEquipmentTypeMap.put("B", EquipmentType.RATING_B); //$NON-NLS-1$
-        stringToEquipmentTypeMap.put("C", EquipmentType.RATING_C); //$NON-NLS-1$
-        stringToEquipmentTypeMap.put("D", EquipmentType.RATING_D); //$NON-NLS-1$
-        stringToEquipmentTypeMap.put("X", EquipmentType.RATING_X); //$NON-NLS-1$
-        equipmentTypeToStringMap.put(EquipmentType.RATING_A, "A"); //$NON-NLS-1$
-        equipmentTypeToStringMap.put(EquipmentType.RATING_B, "B"); //$NON-NLS-1$
-        equipmentTypeToStringMap.put(EquipmentType.RATING_C, "C"); //$NON-NLS-1$
-        equipmentTypeToStringMap.put(EquipmentType.RATING_D, "D"); //$NON-NLS-1$
-        equipmentTypeToStringMap.put(EquipmentType.RATING_X, "X"); //$NON-NLS-1$
+        stringToEquipmentTypeMap.put("A", ITechnology.RATING_A); //$NON-NLS-1$
+        stringToEquipmentTypeMap.put("B", ITechnology.RATING_B); //$NON-NLS-1$
+        stringToEquipmentTypeMap.put("C", ITechnology.RATING_C); //$NON-NLS-1$
+        stringToEquipmentTypeMap.put("D", ITechnology.RATING_D); //$NON-NLS-1$
+        stringToEquipmentTypeMap.put("X", ITechnology.RATING_X); //$NON-NLS-1$
+        equipmentTypeToStringMap.put(ITechnology.RATING_A, "A"); //$NON-NLS-1$
+        equipmentTypeToStringMap.put(ITechnology.RATING_B, "B"); //$NON-NLS-1$
+        equipmentTypeToStringMap.put(ITechnology.RATING_C, "C"); //$NON-NLS-1$
+        equipmentTypeToStringMap.put(ITechnology.RATING_D, "D"); //$NON-NLS-1$
+        equipmentTypeToStringMap.put(ITechnology.RATING_X, "X"); //$NON-NLS-1$
     }
     
     public static int convertRatingToCode(String rating) {
         Integer result = stringToEquipmentTypeMap.get(rating.toUpperCase(Locale.ROOT));
-        return null != result ? result.intValue() : EquipmentType.RATING_X;
+        return null != result ? result.intValue() : ITechnology.RATING_X;
     }
     
     public static String convertCodeToRating(int code) {

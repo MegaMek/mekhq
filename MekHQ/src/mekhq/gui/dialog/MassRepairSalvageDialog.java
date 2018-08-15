@@ -106,8 +106,8 @@ public class MassRepairSalvageDialog extends JDialog {
 	public MassRepairSalvageDialog(Frame _parent, boolean _modal, CampaignGUI _campaignGUI, Unit _selectedUnit,
 			int mode) {
 		super(_parent, _modal);
-		this.campaignGUI = _campaignGUI;
-		this.selectedUnit = _selectedUnit;
+		campaignGUI = _campaignGUI;
+		selectedUnit = _selectedUnit;
 
 		campaignOptions = campaignGUI.getCampaign().getCampaignOptions();
 
@@ -666,6 +666,7 @@ public class MassRepairSalvageDialog extends JDialog {
 				columnIdx++);
 
 		mroc.activeBox.addActionListener(new java.awt.event.ActionListener() {
+			@Override
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 				if (mroc.activeBox.isSelected()) {
 					mroc.minSkillCBox.setEnabled(true);
@@ -779,6 +780,7 @@ public class MassRepairSalvageDialog extends JDialog {
 		btnSelectNone.setToolTipText("Unselect all units");
 		btnSelectNone.setName("btnSelectNone"); // NOI18N
 		btnSelectNone.addActionListener(new java.awt.event.ActionListener() {
+			@Override
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 				btnUnitsSelectNoneActionPerformed(evt);
 			}
@@ -798,6 +800,7 @@ public class MassRepairSalvageDialog extends JDialog {
 		btnSelectAssigned.setToolTipText("Select units with assigned pilots/crews");
 		btnSelectAssigned.setName("btnSelectAssigned"); // NOI18N
 		btnSelectAssigned.addActionListener(new java.awt.event.ActionListener() {
+			@Override
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 				btnUnitsSelectAssignedActionPerformed(evt);
 			}
@@ -817,6 +820,7 @@ public class MassRepairSalvageDialog extends JDialog {
 		btnSelectUnassigned.setToolTipText("Select units without assigned pilots/crews");
 		btnSelectUnassigned.setName("btnSelectUnassigned"); // NOI18N
 		btnSelectUnassigned.addActionListener(new java.awt.event.ActionListener() {
+			@Override
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 				btnUnitsSelectUnassignedActionPerformed(evt);
 			}
@@ -844,6 +848,7 @@ public class MassRepairSalvageDialog extends JDialog {
 		
 		btnHideUnits.setName("btnHideUnits");
 		btnHideUnits.addActionListener(new java.awt.event.ActionListener() {
+			@Override
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 				if (pnlUnits.isVisible()) {
 					pnlUnits.setVisible(false);
@@ -931,6 +936,7 @@ public class MassRepairSalvageDialog extends JDialog {
 		btnUnselectParts.setToolTipText("Unselect all parts");
 		btnUnselectParts.setName("btnUnselectParts"); // NOI18N
 		btnUnselectParts.addActionListener(new java.awt.event.ActionListener() {
+			@Override
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 				btnUnselectPartsActionPerformed(evt);
 			}
@@ -950,6 +956,7 @@ public class MassRepairSalvageDialog extends JDialog {
 		btnSelectAllParts.setToolTipText("Select all parts");
 		btnSelectAllParts.setName("btnSelectAllParts"); // NOI18N
 		btnSelectAllParts.addActionListener(new java.awt.event.ActionListener() {
+			@Override
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 				btnSelectAllPartsActionPerformed(evt);
 			}
@@ -977,6 +984,7 @@ public class MassRepairSalvageDialog extends JDialog {
 		
 		btnHideParts.setName("btnHideParts");
 		btnHideParts.addActionListener(new java.awt.event.ActionListener() {
+			@Override
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 				if (pnlParts.isVisible()) {
 					pnlParts.setVisible(false);
@@ -1040,6 +1048,7 @@ public class MassRepairSalvageDialog extends JDialog {
 
 		btnStart.setName("btnStart"); // NOI18N
 		btnStart.addActionListener(new java.awt.event.ActionListener() {
+			@Override
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 				btnStartMassRepairActionPerformed(evt);
 			}
@@ -1058,6 +1067,7 @@ public class MassRepairSalvageDialog extends JDialog {
 		btnSaveAsDefault.setText("Save Options as Default"); // NOI18N
 		btnSaveAsDefault.setName("btnSaveAsDefault"); // NOI18N
 		btnSaveAsDefault.addActionListener(new java.awt.event.ActionListener() {
+			@Override
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 				btnSaveAsDefaultActionPerformed(evt);
 			}
@@ -1076,6 +1086,7 @@ public class MassRepairSalvageDialog extends JDialog {
 		btnCancel.setText("Done"); // NOI18N
 		btnCancel.setName("btnClose"); // NOI18N
 		btnCancel.addActionListener(new java.awt.event.ActionListener() {
+			@Override
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 				btnCancelActionPerformed(evt);
 			}
@@ -1205,7 +1216,7 @@ public class MassRepairSalvageDialog extends JDialog {
 	}
 
 	private void btnCancelActionPerformed(ActionEvent evt) {
-		this.setVisible(false);
+		setVisible(false);
 	}
 
 	private void updateOptions() {

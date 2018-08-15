@@ -79,8 +79,8 @@ public class EditSpecialAbilityDialog extends JDialog {
     @SuppressWarnings("unchecked")
 	public EditSpecialAbilityDialog(Frame parent, SpecialAbility spa, Hashtable<String, SpecialAbility> hash) {
         super(parent, true);
-        this.ability = spa;
-        this.allSPA = hash;
+        ability = spa;
+        allSPA = hash;
         // FIXME: Java is broken, so we had to supress unchecked warnings for these 4 lines
         // Basically, Vector<E>.clone() returns an Object instead of a new Vector<E> - DOH!
         prereqAbilities = (Vector<String>)ability.getPrereqAbilities().clone();
@@ -129,7 +129,8 @@ public class EditSpecialAbilityDialog extends JDialog {
         panAbil.add(new JLabel("<html><b>Prerequisite Abilities</b></html>"), gridBagConstraints);
         btnEditPrereqAbil = new javax.swing.JButton("Edit Prereq Abilities");
         btnEditPrereqAbil.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
             	SelectAbilitiesDialog sad = new SelectAbilitiesDialog(null, prereqAbilities, allSPA);
                 sad.setVisible(true);
                 if(!sad.wasCancelled()) {
@@ -163,7 +164,8 @@ public class EditSpecialAbilityDialog extends JDialog {
         panAbil.add(new JLabel("<html><b>Invalid Abilities</b></html>"), gridBagConstraints);
         btnEditInvalid = new javax.swing.JButton("Edit Invalid Abilities");
         btnEditInvalid.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 SelectAbilitiesDialog sad = new SelectAbilitiesDialog(null, invalidAbilities, allSPA);
                 sad.setVisible(true);
                 if(!sad.wasCancelled()) {
@@ -197,7 +199,8 @@ public class EditSpecialAbilityDialog extends JDialog {
         panAbil.add(new JLabel("<html><b>Removed Abilities</b></html>"), gridBagConstraints);
         btnEditRemove = new javax.swing.JButton("Edit Removed Abilities");
         btnEditRemove.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 SelectAbilitiesDialog sad = new SelectAbilitiesDialog(null, removeAbilities, allSPA);
                 sad.setVisible(true);
                 if(!sad.wasCancelled()) {
@@ -264,7 +267,8 @@ public class EditSpecialAbilityDialog extends JDialog {
         btnOK.setText("OK"); // NOI18N
         btnOK.setName("btnOK"); // NOI18N
         btnOK.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 edit();
             }
         });
@@ -279,7 +283,8 @@ public class EditSpecialAbilityDialog extends JDialog {
         btnClose.setText("Cancel"); // NOI18N
         btnClose.setName("btnClose"); // NOI18N
         btnClose.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 cancel();
             }
         });
@@ -310,7 +315,8 @@ public class EditSpecialAbilityDialog extends JDialog {
 
         btnAddSkillPrereq = new javax.swing.JButton("Add Skill Prereq");
         btnAddSkillPrereq.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
             	EditSkillPrereqDialog nspd = new EditSkillPrereqDialog(null, new SkillPrereq());
             	nspd.setVisible(true);
             	if(!nspd.wasCancelled() & !nspd.getPrereq().isEmpty()) {
@@ -330,7 +336,8 @@ public class EditSpecialAbilityDialog extends JDialog {
 
         btnClearPrereqSkills = new javax.swing.JButton("Clear Skill Prereqs");
         btnClearPrereqSkills.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 prereqSkills = new Vector<>();
                 refreshGUI();
             }
@@ -414,12 +421,12 @@ public class EditSpecialAbilityDialog extends JDialog {
     	ability.setInvalidAbilities(invalidAbilities);
     	ability.setRemovedAbilities(removeAbilities);
     	ability.setPrereqSkills(prereqSkills);
-        this.setVisible(false);
+        setVisible(false);
     }
 
     private void cancel() {
     	cancelled = true;
-        this.setVisible(false);
+        setVisible(false);
     }
 
     private String getPrereqAbilDesc() {

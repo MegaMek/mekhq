@@ -38,6 +38,7 @@ import megamek.client.RandomSkillsGenerator;
 import megamek.client.RandomUnitGenerator;
 import megamek.common.Compute;
 import megamek.common.Entity;
+import megamek.common.IPlayer;
 import megamek.common.MechFileParser;
 import megamek.common.MechSummary;
 import megamek.common.Player;
@@ -185,10 +186,10 @@ public class AtBContract extends Contract implements Serializable {
         enemyQuality = IUnitRating.DRAGOON_C;
         allyBotName = "Ally";
         enemyBotName = "Enemy";
-        allyCamoCategory = Player.NO_CAMO;
+        allyCamoCategory = IPlayer.NO_CAMO;
         allyCamoFileName = null;
         allyColorIndex = 1;
-        enemyCamoCategory = Player.NO_CAMO;
+        enemyCamoCategory = IPlayer.NO_CAMO;
         enemyCamoFileName = null;
         enemyColorIndex = 2;
         
@@ -1087,7 +1088,8 @@ public class AtBContract extends Contract implements Serializable {
         }
     }
 
-    protected void writeToXmlBegin(PrintWriter pw1, int indent) {
+    @Override
+	protected void writeToXmlBegin(PrintWriter pw1, int indent) {
         super.writeToXmlBegin(pw1, indent);
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<employerCode>"
@@ -1213,7 +1215,8 @@ public class AtBContract extends Contract implements Serializable {
         }
     }
 
-    public void loadFieldsFromXmlNode(Node wn) throws ParseException {
+    @Override
+	public void loadFieldsFromXmlNode(Node wn) throws ParseException {
         super.loadFieldsFromXmlNode(wn);
         NodeList nl = wn.getChildNodes();
 

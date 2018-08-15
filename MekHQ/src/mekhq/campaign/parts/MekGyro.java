@@ -57,12 +57,13 @@ public class MekGyro extends Part {
             Campaign c) {
     	super(tonnage, c);
         this.type = type;
-        this.name = Mech.getGyroTypeString(type);
+        name = Mech.getGyroTypeString(type);
         this.gyroTonnage = gyroTonnage;
         this.isClan = isClan;
     }
 
-    public MekGyro clone() {
+    @Override
+	public MekGyro clone() {
     	MekGyro clone = new MekGyro(getUnitTonnage(), type, gyroTonnage, isClan, campaign);
         clone.copyBaseData(this);
     	return clone;
@@ -108,7 +109,7 @@ public class MekGyro extends Part {
             c = 300000 * getTonnage();
         }
 
-        return (long) Math.round(c);
+        return Math.round(c);
     }
 
     @Override

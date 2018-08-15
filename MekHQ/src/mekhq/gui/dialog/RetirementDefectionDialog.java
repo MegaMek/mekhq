@@ -972,7 +972,7 @@ class RetirementTable extends JTable {
 	public RetirementTable(RetirementTableModel model, CampaignGUI hqView) {
 		super(model);
         setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-        this.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         XTableColumnModel columnModel = new XTableColumnModel();
         setColumnModel(columnModel);
         createDefaultColumnsFromModel();

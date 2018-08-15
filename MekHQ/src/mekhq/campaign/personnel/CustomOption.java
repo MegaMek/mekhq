@@ -35,7 +35,7 @@ public class CustomOption {
     private Object defaultVal;
     
     private CustomOption(String key) {
-        this.name = key;
+        name = key;
         group = PilotOptions.LVL3_ADVANTAGES;
         type = IOption.BOOLEAN;
         defaultVal = Boolean.FALSE;

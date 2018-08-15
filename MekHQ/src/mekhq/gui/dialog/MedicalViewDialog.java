@@ -63,6 +63,7 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.UIManager;
 
 import org.joda.time.chrono.GJChronology;
@@ -118,8 +119,8 @@ public class MedicalViewDialog extends JDialog {
 
     public MedicalViewDialog(Window parent, Campaign c, Person p, IconPackage ip) {
         super();
-        this.campaign = Objects.requireNonNull(c);
-        this.person = Objects.requireNonNull(p);
+        campaign = Objects.requireNonNull(c);
+        person = Objects.requireNonNull(p);
         //this.iconPackage = Objects.requireNonNull(ip);
         resourceMap = ResourceBundle.getBundle("mekhq.resources.MedicalViewDialog", new EncodeControl()); //$NON-NLS-1$
         
@@ -203,7 +204,7 @@ public class MedicalViewDialog extends JDialog {
         setBackground(Color.WHITE);
         getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
         Container scrollPanel = new JPanel();
-        getContentPane().add(new JScrollPane(scrollPanel, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER));
+        getContentPane().add(new JScrollPane(scrollPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER));
         initComponents(scrollPanel);
         
         JButton okayButton = new JButton(resourceMap.getString("buttonDone.text")); //$NON-NLS-1$
@@ -595,8 +596,8 @@ public class MedicalViewDialog extends JDialog {
             this.label = label;
             this.person = person;
             this.injury = injury;
-            this.healImageIcon = new ImageIcon(new ImageIcon("data/images/misc/medical.png").getImage().getScaledInstance(16, 16, Image.SCALE_DEFAULT)); //$NON-NLS-1$
-            this.resourceMap = ResourceBundle.getBundle("mekhq.resources.MedicalViewDialog", new EncodeControl()); //$NON-NLS-1$
+            healImageIcon = new ImageIcon(new ImageIcon("data/images/misc/medical.png").getImage().getScaledInstance(16, 16, Image.SCALE_DEFAULT)); //$NON-NLS-1$
+            resourceMap = ResourceBundle.getBundle("mekhq.resources.MedicalViewDialog", new EncodeControl()); //$NON-NLS-1$
         }
         
         @Override

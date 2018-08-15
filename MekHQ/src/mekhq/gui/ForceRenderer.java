@@ -28,7 +28,8 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
         icons = i;
     }
 
-    public Component getTreeCellRendererComponent(
+    @Override
+	public Component getTreeCellRendererComponent(
             JTree tree,
             Object value,
             boolean sel,

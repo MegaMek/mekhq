@@ -128,10 +128,10 @@ public class Transaction implements Serializable {
 	
 	public Transaction(Transaction t) {
 	    //copy constructor
-	    this.amount = t.amount;
-	    this.category = t.category;
-	    this.description = t.description;
-	    this.date = t.date;
+	    amount = t.amount;
+	    category = t.category;
+	    description = t.description;
+	    date = t.date;
 	}
 	
     public static int getCategoryIndex(String name) {
@@ -185,7 +185,7 @@ public class Transaction implements Serializable {
 	}
 	
 	public void setAmount(long a) {
-		this.amount = a;
+		amount = a;
 	}
 	
 	public String getDescription() {
@@ -193,7 +193,7 @@ public class Transaction implements Serializable {
 	}
 	
 	public void setDescription(String s) {
-		this.description = s;
+		description = s;
 	}
 	
 	public int getCategory() {
@@ -201,7 +201,7 @@ public class Transaction implements Serializable {
 	}
 	
 	public void setCategory(int c) {
-		this.category = c;
+		category = c;
 	}
 	
 	public String getCategoryName() {

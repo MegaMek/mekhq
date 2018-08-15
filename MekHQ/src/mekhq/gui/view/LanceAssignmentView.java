@@ -119,6 +119,7 @@ public class LanceAssignmentView extends JPanel {
             column = ((XTableColumnModel)tblRequiredLances.getColumnModel()).getColumnByModelIndex(i);
             column.setPreferredWidth(rlModel.getColumnWidth(i));
             column.setCellRenderer(new DefaultTableCellRenderer() {
+				@Override
 				public Component getTableCellRendererComponent(JTable table,
                         Object value, boolean isSelected, boolean hasFocus,
                         int row, int column) {
@@ -153,6 +154,7 @@ public class LanceAssignmentView extends JPanel {
             column = ((XTableColumnModel)tblAssignments.getColumnModel()).getColumnByModelIndex(i);
             column.setPreferredWidth(rlModel.getColumnWidth(i));
             column.setCellRenderer(new DefaultTableCellRenderer() {
+				@Override
 				public Component getTableCellRendererComponent(JTable table,
                         Object value, boolean isSelected, boolean hasFocus,
                         int row, int column) {
@@ -255,6 +257,7 @@ public class LanceAssignmentView extends JPanel {
 	}
 	
 	TableModelListener assignmentTableListener = new TableModelListener() {
+		@Override
 		public void tableChanged(TableModelEvent ev) {
 			((RequiredLancesTableModel)tblRequiredLances.getModel()).fireTableDataChanged();
 		}
@@ -485,7 +488,7 @@ class LanceAssignmentTableModel extends DataTableModel {
 		case COL_WEIGHT_CLASS:
 			return WEIGHT_CODES[((Lance)data.get(row)).getWeightClass(campaign)];
 		case COL_CONTRACT:
-			return (AtBContract)campaign.getMission(((Lance)data.get(row)).getMissionId());
+			return campaign.getMission(((Lance)data.get(row)).getMissionId());
 		case COL_ROLE:
 			return Lance.roleNames[((Lance)data.get(row)).getRole()];
 		default:
@@ -493,6 +496,7 @@ class LanceAssignmentTableModel extends DataTableModel {
 		}
 	}
 
+	@Override
 	public void setValueAt(Object value, int row, int col) {
 		if (col == COL_CONTRACT) {
 			((Lance)data.get(row)).setContract((AtBContract)value);

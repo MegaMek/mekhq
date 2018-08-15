@@ -120,19 +120,19 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
     public CustomizePersonDialog(java.awt.Frame parent, boolean modal, Person person, Campaign campaign) {
         super(parent, modal);
         this.campaign = campaign;
-        this.frame = parent;
-        this.dateFormat = new SimpleDateFormat("MMMM d yyyy");
+        frame = parent;
+        dateFormat = new SimpleDateFormat("MMMM d yyyy");
         this.person = person;
         initializePilotAndOptions();
         setLocationRelativeTo(parent);
     }
 
     private void initializePilotAndOptions () {
-        this.birthdate = (GregorianCalendar)person.getBirthday().clone();
+        birthdate = (GregorianCalendar)person.getBirthday().clone();
     	if(campaign.getCampaignOptions().getUseTimeInService() && person.getRecruitment() != null) {
-            this.recruitment = (GregorianCalendar)person.getRecruitment().clone();
+            recruitment = (GregorianCalendar)person.getRecruitment().clone();
         }
-    	this.options = person.getOptions();	
+    	options = person.getOptions();	
     	initComponents();
     }
 
@@ -204,7 +204,8 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         btnRandomName.setText(resourceMap.getString("btnRandomName.text")); // NOI18N
         btnRandomName.setName("btnRandomName"); // NOI18N
         btnRandomName.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
             	randomName();
             }
         });
@@ -241,7 +242,8 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
             btnRandomBloodname.setText(resourceMap.getString("btnRandomBloodname.text")); // NOI18N
             btnRandomBloodname.setName("btnRandomBloodname"); // NOI18N
             btnRandomBloodname.addActionListener(new java.awt.event.ActionListener() {
-                public void actionPerformed(java.awt.event.ActionEvent evt) {
+                @Override
+				public void actionPerformed(java.awt.event.ActionEvent evt) {
                 	randomBloodname();
                  }
             });
@@ -289,7 +291,8 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         choiceGender.setName("choiceGender"); // NOI18N
         choiceGender.setSelectedIndex(person.getGender());
         choiceGender.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
             	randomName();
             }
         });
@@ -316,7 +319,8 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         choicePheno = new JComboBox<>(phenoModel);
         choicePheno.setSelectedIndex(person.getPhenotype());
         choicePheno.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 backgroundChanged();
             }
         });
@@ -359,7 +363,8 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         btnDate.setText(getDateAsString());
         btnDate.setName("btnDate"); // NOI18N
         btnDate.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
             	btnDateActionPerformed(evt);
             }
         });
@@ -392,7 +397,8 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
                 btnServiceDate.setText(getDateAsString2());
                 btnServiceDate.setName("btnServiceDate"); // NOI18N
                 btnServiceDate.addActionListener(new java.awt.event.ActionListener() {
-                    public void actionPerformed(java.awt.event.ActionEvent evt) {
+                    @Override
+					public void actionPerformed(java.awt.event.ActionEvent evt) {
                         btnServiceDateActionPerformed(evt);
                     }
                 });
@@ -597,7 +603,8 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         btnOk.setText(resourceMap.getString("btnOk.text")); // NOI18N
         btnOk.setName("btnOk"); // NOI18N
         btnOk.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnOkActionPerformed(evt);
             }
         });
@@ -612,7 +619,8 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         btnClose.setText(resourceMap.getString("btnClose.text")); // NOI18N
         btnClose.setName("btnClose"); // NOI18N
         btnClose.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnCloseActionPerformed(evt);
             }
         });
@@ -904,7 +912,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
             optionComp.addValue(Crew.HUMANTRO_VEE);
             optionComp.addValue(Crew.HUMANTRO_BA);
             optionComp.setSelected(option.stringValue());
-        } else if (option.getType() == Option.CHOICE) {
+        } else if (option.getType() == IOption.CHOICE) {
             SpecialAbility spa = SpecialAbility.getOption(option.getName());
             if (null != spa) {
                 for (String val : spa.getChoiceValues()) {
@@ -1055,7 +1063,8 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
     // Variables declaration - do not modify//GEN-BEGIN:variables
     
 
-    public void optionClicked(DialogOptionComponent arg0, IOption arg1, boolean arg2) {
+    @Override
+	public void optionClicked(DialogOptionComponent arg0, IOption arg1, boolean arg2) {
         //IMplement me!!
     }
 

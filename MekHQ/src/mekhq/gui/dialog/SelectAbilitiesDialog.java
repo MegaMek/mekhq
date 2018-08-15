@@ -89,14 +89,16 @@ public class SelectAbilitiesDialog extends JDialog {
         JPanel panButtons = new JPanel(new GridLayout(0,2));
         btnOK.setText("Done"); // NOI18N
         btnOK.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 done();
             }
         });
         
         btnClose.setText("Cancel"); // NOI18N
         btnClose.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 cancel();
             }
         });
@@ -121,7 +123,7 @@ public class SelectAbilitiesDialog extends JDialog {
     			selected.add(spaNames.get(i));
     		}
     	}
-    	this.setVisible(false);
+    	setVisible(false);
     }
     
     public Vector<String> getSelected() {
@@ -129,7 +131,7 @@ public class SelectAbilitiesDialog extends JDialog {
     }
     
     private void cancel() {
-    	this.setVisible(false);
+    	setVisible(false);
     	cancelled = true;
     }
     

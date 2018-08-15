@@ -43,7 +43,7 @@ public class TurretLock extends Part {
 
 	public TurretLock(Campaign c) {
 		super(0, c);
-		this.name = "Turret Lock";
+		name = "Turret Lock";
 	}
 	
 	@Override 
@@ -56,6 +56,7 @@ public class TurretLock extends Part {
 		return -1;
 	}
 	
+	@Override
 	public TurretLock clone() {
 		TurretLock clone = new TurretLock(campaign);
         clone.copyBaseData(this);

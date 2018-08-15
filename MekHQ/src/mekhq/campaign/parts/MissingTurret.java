@@ -49,7 +49,7 @@ public class MissingTurret extends MissingPart {
 	public MissingTurret(int tonnage, double weight, Campaign c) {
         super(tonnage, c);
         this.weight = weight;
-        this.name = "Turret";
+        name = "Turret";
     }
 	
 	@Override 

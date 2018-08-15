@@ -773,6 +773,6 @@ import mekhq.gui.BasicInfo;
 
 		public void loadAssignmentFromMarket(PersonnelMarket personnelMarket) {
 			this.personnelMarket = personnelMarket;
-			this.loadAssignmentFromMarket = (null != personnelMarket);
+			loadAssignmentFromMarket = (null != personnelMarket);
 		}
     }

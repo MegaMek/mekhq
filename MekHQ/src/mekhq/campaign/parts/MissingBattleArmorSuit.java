@@ -66,17 +66,17 @@ public class MissingBattleArmorSuit extends MissingPart {
 
     public MissingBattleArmorSuit(String ch, String m, int ton, int t, int w, int gmp, int jmp, boolean q, boolean clan, EntityMovementMode mode, Campaign c) {
         super(ton, c);
-        this.chassis = ch;
-        this.model = m;
-        this.trooper = t;
-        this.quad = q;
-        this.weightClass= w;
-        this.groundMP = gmp;
-        this.jumpMP = jmp;
-        this.jumpType = mode;
+        chassis = ch;
+        model = m;
+        trooper = t;
+        quad = q;
+        weightClass= w;
+        groundMP = gmp;
+        jumpMP = jmp;
+        jumpType = mode;
         this.clan = clan;
 
-        this.name = chassis + " " + model + " Suit";
+        name = chassis + " " + model + " Suit";
     }
 
     @Override

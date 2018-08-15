@@ -49,7 +49,8 @@ public class TaskTableModel extends DataTableModel {
         this.panel = panel;
     }
     
-    public Object getValueAt(int row, int col) {
+    @Override
+	public Object getValueAt(int row, int col) {
         return ((IPartWork) data.get(row)).getDesc();
     }
 
@@ -78,7 +79,8 @@ public class TaskTableModel extends DataTableModel {
 
         private static final long serialVersionUID = -3052618135259621130L;
 
-        public Component getTableCellRendererComponent(JTable table,
+        @Override
+		public Component getTableCellRendererComponent(JTable table,
                 Object value, boolean isSelected, boolean hasFocus,
                 int row, int column) {
             Component c = this;
@@ -201,12 +203,12 @@ public class TaskTableModel extends DataTableModel {
             
             Image imgTool = getToolkit().getImage(imgPath); //$NON-NLS-1$
             
-            this.setImage(imgTool);
+            setImage(imgTool);
             
             if (setSecondary) {
-            	this.setSecondaryImage(getToolkit().getImage("data/images/misc/repair/working.png"));	
+            	setSecondaryImage(getToolkit().getImage("data/images/misc/repair/working.png"));	
             } else {
-            	this.setSecondaryImage(null);
+            	setSecondaryImage(null);
             }
             
             return c;

@@ -32,6 +32,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import megamek.common.EquipmentType;
+import megamek.common.ITechnology;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.universe.Planet.SpectralDefinition;
@@ -603,11 +604,11 @@ public final class StarUtil {
             return null;
         }
         switch(hpg.intValue()) {
-            case EquipmentType.RATING_A: return "A-rated HPG";
-            case EquipmentType.RATING_B: return "B-rated HPG";
-            case EquipmentType.RATING_C: return "C-rated Service";
-            case EquipmentType.RATING_D: return "D-rated Service";
-            case EquipmentType.RATING_X: return "none";
+            case ITechnology.RATING_A: return "A-rated HPG";
+            case ITechnology.RATING_B: return "B-rated HPG";
+            case ITechnology.RATING_C: return "C-rated Service";
+            case ITechnology.RATING_D: return "D-rated Service";
+            case ITechnology.RATING_X: return "none";
             default: return "unknown";
         }
     }

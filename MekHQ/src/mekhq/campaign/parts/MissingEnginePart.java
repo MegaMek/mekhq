@@ -22,6 +22,7 @@
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
+import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 import org.w3c.dom.Node;
@@ -55,12 +56,12 @@ public class MissingEnginePart extends MissingPart {
 
 	public MissingEnginePart(int tonnage, Engine e, Campaign c, boolean hover) {
 		super(tonnage, c);
-		this.engine = e;
-		this.forHover = hover;
+		engine = e;
+		forHover = hover;
 		if(null != engine) {
-			this.name = engine.getEngineName() + " Engine";
+			name = engine.getEngineName() + " Engine";
 		}
-		this.engine = e;
+		engine = e;
 	}
 	
 	@Override 
@@ -160,12 +161,12 @@ public class MissingEnginePart extends MissingPart {
 		}
 		
 		engine = new Engine(engineRating, engineType, engineFlags);
-		this.name = engine.getEngineName() + " Engine";
+		name = engine.getEngineName() + " Engine";
 	}
 
 	@Override
 	public boolean isAcceptableReplacement(Part part, boolean refit) {
-	    int year = campaign.getCalendar().get(GregorianCalendar.YEAR);
+	    int year = campaign.getCalendar().get(Calendar.YEAR);
 		if(part instanceof EnginePart) {
 			Engine eng = ((EnginePart)part).getEngine();
 			if (null != eng) {
@@ -185,8 +186,8 @@ public class MissingEnginePart extends MissingPart {
 			flags |= Engine.TANK_ENGINE;
 		}
 		engine = new Engine(engine.getRating(), engine.getEngineType(), flags);
-		this.name = engine.getEngineName() + " Engine";
-		this.forHover = hover;
+		name = engine.getEngineName() + " Engine";
+		forHover = hover;
 	}
 	
 	public void fixClanFlag() {
@@ -195,7 +196,7 @@ public class MissingEnginePart extends MissingPart {
 			flags |= Engine.CLAN_ENGINE;
 		}
 		engine = new Engine(engine.getRating(), engine.getEngineType(), flags);
-		this.name = engine.getEngineName() + " Engine";
+		name = engine.getEngineName() + " Engine";
 	}
 	
 	 @Override

@@ -27,7 +27,8 @@ public class ScenarioTableModel extends DataTableModel {
         campaign = c;
     }
     
-    public int getRowCount() {
+    @Override
+	public int getRowCount() {
         return data.size();
     }
 
@@ -52,7 +53,8 @@ public class ScenarioTableModel extends DataTableModel {
         }
     }
 
-    public Object getValueAt(int row, int col) {
+    @Override
+	public Object getValueAt(int row, int col) {
         Scenario scenario = getScenario(row);
         if(col == COL_NAME) {
             return scenario.getName();

@@ -164,11 +164,13 @@ public class ComponentBorder implements Border
 //  Implement the Border interface
 //
 
+	@Override
 	public Insets getBorderInsets(Component c)
 	{
 		return borderInsets;
 	}
 
+	@Override
 	public boolean isBorderOpaque()
 	{
 		return false;
@@ -178,6 +180,7 @@ public class ComponentBorder implements Border
 	 *  In this case a real component is to be painted. Setting the location
 	 *  of the component will cause it to be painted at that location.
 	 */
+	@Override
 	public void paintBorder(Component c, Graphics g, int x, int y, int width, int height)
 	{
 		float x2 = (width  - component.getWidth())  * component.getAlignmentX() + x;

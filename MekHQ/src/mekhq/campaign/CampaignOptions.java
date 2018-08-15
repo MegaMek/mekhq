@@ -538,7 +538,7 @@ public class CampaignOptions implements Serializable {
     }
 
     public void setUnitRatingMethod(UnitRatingMethod method) {
-        this.unitRatingMethod = method;
+        unitRatingMethod = method;
     }
 
     public static String getRepairSystemName(int repairSystem) {
@@ -580,7 +580,7 @@ public class CampaignOptions implements Serializable {
     }
 
     public void setEraMods(boolean b) {
-        this.useEraMods = b;
+        useEraMods = b;
     }
 
     public boolean useAssignedTechFirst() {
@@ -604,7 +604,7 @@ public class CampaignOptions implements Serializable {
     }
 
     public void setDragoonRating(boolean b) {
-        this.useUnitRating = b;
+        useUnitRating = b;
     }
 
     public double getClanPriceModifier() {
@@ -612,7 +612,7 @@ public class CampaignOptions implements Serializable {
     }
 
     public void setClanPriceModifier(double d) {
-        this.clanPriceModifier = d;
+        clanPriceModifier = d;
     }
 
     public double getUsedPartsValue(int quality) {
@@ -620,7 +620,7 @@ public class CampaignOptions implements Serializable {
     }
 
     public void setUsedPartsValue(double d, int quality) {
-        this.usedPartsValue[quality] = d;
+        usedPartsValue[quality] = d;
     }
 
     public double getDamagedPartsValue() {
@@ -628,7 +628,7 @@ public class CampaignOptions implements Serializable {
     }
 
     public void setDamagedPartsValue(double d) {
-        this.damagedPartsValue = d;
+        damagedPartsValue = d;
     }
 
     public double GetCanceledOrderReimbursement() {
@@ -636,7 +636,7 @@ public class CampaignOptions implements Serializable {
     }
 
     public void setCanceledOrderReimbursement(double d) {
-        this.canceledOrderReimbursement = d;
+        canceledOrderReimbursement = d;
     }
 
     public int getRepairSystem() {
@@ -644,7 +644,7 @@ public class CampaignOptions implements Serializable {
     }
 
     public void setRepairSystem(int i) {
-        this.repairSystem = i;
+        repairSystem = i;
     }
 
     public boolean useFactionForNames() {
@@ -652,7 +652,7 @@ public class CampaignOptions implements Serializable {
     }
 
     public void setFactionForNames(boolean b) {
-        this.useFactionForNames = b;
+        useFactionForNames = b;
     }
 
     public boolean useTactics() {
@@ -660,7 +660,7 @@ public class CampaignOptions implements Serializable {
     }
 
     public void setUseTactics(boolean b) {
-        this.useTactics = b;
+        useTactics = b;
     }
 
     public boolean useInitBonus() {
@@ -668,7 +668,7 @@ public class CampaignOptions implements Serializable {
     }
 
     public void setInitBonus(boolean b) {
-        this.useInitBonus = b;
+        useInitBonus = b;
     }
 
     public boolean useToughness() {
@@ -676,7 +676,7 @@ public class CampaignOptions implements Serializable {
     }
 
     public void setToughness(boolean b) {
-        this.useToughness = b;
+        useToughness = b;
     }
 
     public boolean useArtillery() {
@@ -684,7 +684,7 @@ public class CampaignOptions implements Serializable {
     }
 
     public void setArtillery(boolean b) {
-        this.useArtillery = b;
+        useArtillery = b;
     }
 
     public boolean useAbilities() {
@@ -692,7 +692,7 @@ public class CampaignOptions implements Serializable {
     }
 
     public void setAbilities(boolean b) {
-        this.useAbilities = b;
+        useAbilities = b;
     }
 
     public boolean useEdge() {
@@ -700,7 +700,7 @@ public class CampaignOptions implements Serializable {
     }
 
     public void setEdge(boolean b) {
-        this.useEdge = b;
+        useEdge = b;
     }
     
     public boolean useSupportEdge() {
@@ -716,7 +716,7 @@ public class CampaignOptions implements Serializable {
     }
 
     public void setImplants(boolean b) {
-        this.useImplants = b;
+        useImplants = b;
     }
 
 	public boolean useAltQualityAveraging() {
@@ -732,7 +732,7 @@ public class CampaignOptions implements Serializable {
     }
 
     public void setAdvancedMedical(boolean b) {
-        this.useAdvancedMedical = b;
+        useAdvancedMedical = b;
     }
 
     public boolean useDylansRandomXp() {
@@ -740,7 +740,7 @@ public class CampaignOptions implements Serializable {
     }
 
     public void setDylansRandomXp(boolean b) {
-        this.useDylansRandomXp = b;
+        useDylansRandomXp = b;
     }
 
     // Personnel Market
@@ -813,7 +813,7 @@ public class CampaignOptions implements Serializable {
     }
 
     public void setPayForParts(boolean b) {
-        this.payForParts = b;
+        payForParts = b;
     }
 
     public boolean payForRepairs() {
@@ -821,7 +821,7 @@ public class CampaignOptions implements Serializable {
     }
 
     public void setPayForRepairs(boolean b) {
-        this.payForRepairs = b;
+        payForRepairs = b;
     }
 
     public boolean payForUnits() {
@@ -829,7 +829,7 @@ public class CampaignOptions implements Serializable {
     }
 
     public void setPayForUnits(boolean b) {
-        this.payForUnits = b;
+        payForUnits = b;
     }
 
     public boolean payForSalaries() {
@@ -837,7 +837,7 @@ public class CampaignOptions implements Serializable {
     }
 
     public void setPayForSalaries(boolean b) {
-        this.payForSalaries = b;
+        payForSalaries = b;
     }
 
     public boolean payForRecruitment() {
@@ -845,7 +845,7 @@ public class CampaignOptions implements Serializable {
     }
 
     public void setPayForRecruitment(boolean b) {
-        this.payForRecruitment = b;
+        payForRecruitment = b;
     }
 
     public boolean payForOverhead() {
@@ -853,7 +853,7 @@ public class CampaignOptions implements Serializable {
     }
 
     public void setPayForOverhead(boolean b) {
-        this.payForOverhead = b;
+        payForOverhead = b;
     }
 
     public boolean payForMaintain() {
@@ -861,7 +861,7 @@ public class CampaignOptions implements Serializable {
     }
 
     public void setPayForMaintain(boolean b) {
-        this.payForMaintain = b;
+        payForMaintain = b;
     }
 
     public boolean payForTransport() {
@@ -869,7 +869,7 @@ public class CampaignOptions implements Serializable {
     }
 
     public void setPayForTransport(boolean b) {
-        this.payForTransport = b;
+        payForTransport = b;
     }
 
     public boolean usePeacetimeCost() {
@@ -877,7 +877,7 @@ public class CampaignOptions implements Serializable {
     }
 
     public void setUsePeacetimeCost(boolean b) {
-        this.usePeacetimeCost = b;
+        usePeacetimeCost = b;
     }
 
     public boolean useExtendedPartsModifier() {
@@ -885,7 +885,7 @@ public class CampaignOptions implements Serializable {
     }
 
     public void setUseExtendedPartsModifier(boolean b) {
-        this.useExtendedPartsModifier = b;
+        useExtendedPartsModifier = b;
     }
 
     public boolean showPeacetimeCost() {
@@ -893,7 +893,7 @@ public class CampaignOptions implements Serializable {
     }
 
     public void setShowPeacetimeCost(boolean b) {
-        this.showPeacetimeCost = b;
+        showPeacetimeCost = b;
     }
 
     public boolean canSellUnits() {
@@ -901,7 +901,7 @@ public class CampaignOptions implements Serializable {
     }
 
     public void setSellUnits(boolean b) {
-        this.sellUnits = b;
+        sellUnits = b;
     }
 
     public boolean canSellParts() {
@@ -909,7 +909,7 @@ public class CampaignOptions implements Serializable {
     }
 
     public void setSellParts(boolean b) {
-        this.sellParts = b;
+        sellParts = b;
     }
 
     public boolean useLoanLimits() {
@@ -917,7 +917,7 @@ public class CampaignOptions implements Serializable {
     }
 
     public void setLoanLimits(boolean b) {
-        this.useLoanLimits = b;
+        useLoanLimits = b;
     }
 
     public boolean useQuirks() {
@@ -925,7 +925,7 @@ public class CampaignOptions implements Serializable {
     }
 
     public void setQuirks(boolean b) {
-        this.useQuirks = b;
+        useQuirks = b;
     }
 
     public int getScenarioXP() {
@@ -1189,7 +1189,7 @@ public class CampaignOptions implements Serializable {
     }
     
     public void setHistoricalDailyLog(boolean b) {
-        this.historicalDailyLog = b;
+        historicalDailyLog = b;
     }
     
     public int getEdgeCost() {
@@ -1217,7 +1217,7 @@ public class CampaignOptions implements Serializable {
     }
 
     public void setAcquisitionSupportStaffOnly(boolean b) {
-        this.acquisitionSupportStaffOnly = b;
+        acquisitionSupportStaffOnly = b;
     }
 
     public boolean isAcquisitionSupportStaffOnly() {
@@ -1293,7 +1293,7 @@ public class CampaignOptions implements Serializable {
     }
 
     public void setEquipmentContractBase(boolean b) {
-        this.equipmentContractBase = b;
+        equipmentContractBase = b;
     }
 
     public boolean useEquipmentContractSaleValue() {
@@ -1301,7 +1301,7 @@ public class CampaignOptions implements Serializable {
     }
 
     public void setEquipmentContractSaleValue(boolean b) {
-        this.equipmentContractSaleValue = b;
+        equipmentContractSaleValue = b;
     }
 
     public double getDropshipContractPercent() {
@@ -1333,7 +1333,7 @@ public class CampaignOptions implements Serializable {
     }
 
     public void setBLCSaleValue(boolean b) {
-        this.blcSaleValue = b;
+        blcSaleValue = b;
     }
 
     public int getClanAcquisitionPenalty() {
@@ -1547,7 +1547,7 @@ public class CampaignOptions implements Serializable {
         if (type < 0 || type >= salaryTypeBase.length) {
             return;
         }
-        this.salaryTypeBase[type] = base;
+        salaryTypeBase[type] = base;
     }
 
     public double getSalaryXpMultiplier(int xp) {
@@ -1561,7 +1561,7 @@ public class CampaignOptions implements Serializable {
         if (xp < 0 || xp >= salaryXpMultiplier.length) {
             return;
         }
-        this.salaryXpMultiplier[xp] = d;
+        salaryXpMultiplier[xp] = d;
     }
 
     public double getSalaryEnlistedMultiplier() {
@@ -1960,7 +1960,7 @@ public class CampaignOptions implements Serializable {
 	}
 
 	public void setMassRepairUseExtraTime(boolean b) {
-		this.massRepairUseExtraTime = b;
+		massRepairUseExtraTime = b;
 	}
 
 	public boolean massRepairUseRushJob() {
@@ -1968,7 +1968,7 @@ public class CampaignOptions implements Serializable {
 	}
 
 	public void setMassRepairUseRushJob(boolean b) {
-		this.massRepairUseRushJob = b;
+		massRepairUseRushJob = b;
 	}
 
 	public boolean massRepairAllowCarryover() {
@@ -1976,7 +1976,7 @@ public class CampaignOptions implements Serializable {
 	}
 
 	public void setMassRepairAllowCarryover(boolean b) {
-		this.massRepairAllowCarryover = b;
+		massRepairAllowCarryover = b;
 	}
 
 	public boolean massRepairOptimizeToCompleteToday() {
@@ -1992,7 +1992,7 @@ public class CampaignOptions implements Serializable {
 	}
 	
 	public void setMassRepairScrapImpossible(boolean b) {
-		this.massRepairScrapImpossible = b;
+		massRepairScrapImpossible = b;
 	}
 	
 	public boolean massRepairUseAssignedTechsFirst() {
@@ -2004,7 +2004,7 @@ public class CampaignOptions implements Serializable {
 	}
 
     public void setMassRepairReplacePod(boolean setMassRepairReplacePod) {
-        this.massRepairReplacePod = setMassRepairReplacePod;
+        massRepairReplacePod = setMassRepairReplacePod;
     }
 
     public boolean massRepairReplacePod() {
@@ -2065,7 +2065,7 @@ public class CampaignOptions implements Serializable {
     }
     
     public void setOpforAeroChance(int chance) {
-        this.opforAeroChance = chance;
+        opforAeroChance = chance;
     }
     
     public int getOpforAeroChance() {
@@ -2073,7 +2073,7 @@ public class CampaignOptions implements Serializable {
     }
     
     public void setOpforLocalUnitChance(int chance) {
-        this.opforLocalUnitChance = chance;
+        opforLocalUnitChance = chance;
     }
     
     public int getOpforLocalUnitChance() {

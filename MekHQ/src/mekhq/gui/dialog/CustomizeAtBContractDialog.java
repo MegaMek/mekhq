@@ -51,6 +51,7 @@ import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 
 import megamek.client.ui.swing.util.PlayerColors;
+import megamek.common.IPlayer;
 import megamek.common.Player;
 import megamek.common.util.DirectoryItems;
 import megamek.common.util.EncodeControl;
@@ -112,7 +113,7 @@ public class CustomizeAtBContractDialog extends JDialog {
 	
 	public CustomizeAtBContractDialog(Frame parent, boolean modal, AtBContract contract, Campaign c, DirectoryItems camos) {
 		super(parent, modal);
-		this.frame = parent;
+		frame = parent;
 		this.contract = contract;
 		this.camos = camos;
 		campaign = c;
@@ -564,7 +565,7 @@ public class CustomizeAtBContractDialog extends JDialog {
             return;
         }
 
-        if (Player.NO_CAMO.equals(camoCategory)) {
+        if (IPlayer.NO_CAMO.equals(camoCategory)) {
             int colorInd = colorIndex;
             if (colorInd == -1) {
                 colorInd = 0;
@@ -581,7 +582,7 @@ public class CustomizeAtBContractDialog extends JDialog {
         // Try to get the camo file.
         try {
             // Translate the root camo directory name.
-            if (Player.ROOT_CAMO.equals(camoCategory)) {
+            if (IPlayer.ROOT_CAMO.equals(camoCategory)) {
                 camoCategory = ""; //$NON-NLS-1$
             }
             Image camo = (Image) camos.getItem(camoCategory, camoFileName);
@@ -597,7 +598,7 @@ public class CustomizeAtBContractDialog extends JDialog {
         			+ "data/images/camo folder.",
         			"Missing Camo File",
         			JOptionPane.WARNING_MESSAGE);
-        	camoCategory = Player.NO_CAMO;
+        	camoCategory = IPlayer.NO_CAMO;
         	colorIndex = 0;
         	setCamoIcon(btnCamo, camoCategory, camoFileName, colorIndex);
         }   	
@@ -635,11 +636,11 @@ public class CustomizeAtBContractDialog extends JDialog {
         }
     	
     	contract.setDesc(txtDesc.getText());
-    	this.setVisible(false);
+    	setVisible(false);
     }
     
     private void btnCloseActionPerformed(ActionEvent evt) {
-    	this.setVisible(false);
+    	setVisible(false);
     }
 
     private void showAllFactions(boolean allFactions) {

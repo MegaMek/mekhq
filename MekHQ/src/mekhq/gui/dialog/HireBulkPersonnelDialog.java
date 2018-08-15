@@ -29,6 +29,7 @@ import javax.swing.JSeparator;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -79,7 +80,7 @@ public class HireBulkPersonnelDialog extends JDialog {
 
     public HireBulkPersonnelDialog(Frame parent, boolean modal, Campaign c) {
         super(parent, modal);
-        this.campaign = c;
+        campaign = c;
         initComponents();
         setLocationRelativeTo(getParent());
     }
@@ -221,7 +222,7 @@ public class HireBulkPersonnelDialog extends JDialog {
             getContentPane().add(ageRangePanel, gridBagConstraints);
             
             minAge = new JSpinner(new SpinnerNumberModel(19, 0, 99, 1));
-            ((JSpinner.DefaultEditor)minAge.getEditor()).getTextField().setHorizontalAlignment(JTextField.CENTER);
+            ((JSpinner.DefaultEditor)minAge.getEditor()).getTextField().setHorizontalAlignment(SwingConstants.CENTER);
             ((JSpinner.DefaultEditor)minAge.getEditor()).getTextField().setColumns(3);
             minAge.setEnabled(false);
             minAge.addChangeListener(new ChangeListener() {
@@ -238,7 +239,7 @@ public class HireBulkPersonnelDialog extends JDialog {
             ageRangePanel.add(new JLabel(resourceMap.getString("lblAgeRangeSeparator.text")), newConstraints(1, 0)); //$NON-NLS-1$
             
             maxAge = new JSpinner(new SpinnerNumberModel(99, 0, 99, 1));
-            ((JSpinner.DefaultEditor)maxAge.getEditor()).getTextField().setHorizontalAlignment(JTextField.CENTER);
+            ((JSpinner.DefaultEditor)maxAge.getEditor()).getTextField().setHorizontalAlignment(SwingConstants.CENTER);
             ((JSpinner.DefaultEditor)maxAge.getEditor()).getTextField().setColumns(3);
             maxAge.setEnabled(false);
             maxAge.addChangeListener(new ChangeListener() {
