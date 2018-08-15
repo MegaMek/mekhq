@@ -68,12 +68,12 @@ public class RetirementTableModel extends AbstractTableModel {
 
     public RetirementTableModel(Campaign c) {
         this.campaign = c;
-        data = new ArrayList<UUID>();
-        payBonus = new HashMap<UUID, Boolean>();
-        miscMods = new HashMap<UUID, Integer>();
+        data = new ArrayList<>();
+        payBonus = new HashMap<>();
+        miscMods = new HashMap<>();
         generalMod = 0;
-        unitAssignments = new HashMap<UUID, UUID>();
-        altPayout = new HashMap<UUID, Integer>();
+        unitAssignments = new HashMap<>();
+        altPayout = new HashMap<>();
         editPayout = false;
         formatter = new DecimalFormat();
     }

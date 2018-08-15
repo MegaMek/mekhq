@@ -524,7 +524,7 @@ public class CampaignOptions implements Serializable {
         massRepairScrapImpossible = false;
         massRepairUseAssignedTechsFirst = false;
         massRepairReplacePod = true;
-        massRepairOptions = new ArrayList<MassRepairOption>();
+        massRepairOptions = new ArrayList<>();
         
         for (int i = 0; i < MassRepairOption.VALID_REPAIR_TYPES.length; i++) {
         	massRepairOptions.add(new MassRepairOption(MassRepairOption.VALID_REPAIR_TYPES[i]));

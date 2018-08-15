@@ -234,13 +234,13 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         super();
         lanceForceId = -1;
         lanceRole = Lance.ROLE_UNASSIGNED;
-        alliesPlayer = new ArrayList<Entity>();
-        botForces = new ArrayList<BotForce>();
-        alliesPlayerStub = new ArrayList<String>();
-        botForceStubs = new ArrayList<BotForceStub>();
-        attachedUnitIds = new ArrayList<UUID>();
-        survivalBonus = new ArrayList<UUID>();
-        entityIds = new HashMap<UUID, Entity>();
+        alliesPlayer = new ArrayList<>();
+        botForces = new ArrayList<>();
+        alliesPlayerStub = new ArrayList<>();
+        botForceStubs = new ArrayList<>();
+        attachedUnitIds = new ArrayList<>();
+        survivalBonus = new ArrayList<>();
+        entityIds = new HashMap<>();
 
         light = PlanetaryConditions.L_DAY;
         weather = PlanetaryConditions.WE_NONE;
@@ -256,13 +256,13 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     public void initialize(Campaign c, Lance lance, boolean attacker, Date date) {
         this.attacker = attacker;
 
-        alliesPlayer = new ArrayList<Entity>();
-        botForces = new ArrayList<BotForce>();
-        alliesPlayerStub = new ArrayList<String>();
-        botForceStubs = new ArrayList<BotForceStub>();
-        attachedUnitIds = new ArrayList<UUID>();
-        survivalBonus = new ArrayList<UUID>();
-        entityIds = new HashMap<UUID, Entity>();
+        alliesPlayer = new ArrayList<>();
+        botForces = new ArrayList<>();
+        alliesPlayerStub = new ArrayList<>();
+        botForceStubs = new ArrayList<>();
+        attachedUnitIds = new ArrayList<>();
+        survivalBonus = new ArrayList<>();
+        entityIds = new HashMap<>();
 
         if (null == lance) {
             lanceForceId = -1;
@@ -704,7 +704,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         }
 
         /* The allyBot list will be passed to the BotForce constructor */
-        ArrayList<Entity> allyEntities = new ArrayList<Entity>();
+        ArrayList<Entity> allyEntities = new ArrayList<>();
         for (int i = 0; i < numAttachedBot; i++) {
             Entity en = getEntity(getContract(campaign).getEmployerCode(),
                     getContract(campaign).getAllySkill(), getContract(campaign).getAllyQuality(),
@@ -717,7 +717,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             }
         }
 
-        ArrayList<Entity> enemyEntities = new ArrayList<Entity>();
+        ArrayList<Entity> enemyEntities = new ArrayList<>();
         
         setExtraMissionForces(campaign, allyEntities, enemyEntities);
         addAeroReinforcements(campaign);
@@ -726,7 +726,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         /* Possible enemy reinforcements */
         int roll = Compute.d6();
         if (roll > 3) {
-            ArrayList<Entity> reinforcements = new ArrayList<Entity>();
+            ArrayList<Entity> reinforcements = new ArrayList<>();
             if (roll == 6) {
                 addLance(reinforcements, getContract(campaign).getEnemyCode(),
                     getContract(campaign).getEnemySkill(), getContract(campaign).getEnemyQuality(),
@@ -838,10 +838,10 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
      */
     private void setSpecialMissionForces(Campaign campaign) {
         //enemy must always be the first on the botforce list so we can find it on refresh()
-        specMissionEnemies = new ArrayList<ArrayList<Entity>>();
+        specMissionEnemies = new ArrayList<>();
         
-        ArrayList<Entity> enemyEntities = new ArrayList<Entity>();
-        ArrayList<Entity> allyEntities = new ArrayList<Entity>();
+        ArrayList<Entity> enemyEntities = new ArrayList<>();
+        ArrayList<Entity> allyEntities = new ArrayList<>();
         
         setExtraMissionForces(campaign, allyEntities, enemyEntities);
     }
@@ -857,12 +857,12 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
      * @param campaign
      */
     private void setBigBattleForces(Campaign campaign) {
-        ArrayList<Entity> enemyEntities = new ArrayList<Entity>();
-        ArrayList<Entity> allyEntities = new ArrayList<Entity>();
+        ArrayList<Entity> enemyEntities = new ArrayList<>();
+        ArrayList<Entity> allyEntities = new ArrayList<>();
         
         setExtraMissionForces(campaign, allyEntities, enemyEntities);
         
-        bigBattleAllies = new ArrayList<Entity>();
+        bigBattleAllies = new ArrayList<>();
         
         for (Entity en : alliesPlayer) {
             bigBattleAllies.add(en);
@@ -1492,7 +1492,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         boolean spawnAerotech = !opForOwnsPlanet && Compute.d6() > 
                 CampaignOptions.MAXIMUM_D6_VALUE - campaign.getCampaignOptions().getOpforAeroChance() / 2;   
         
-        ArrayList<Entity> aircraft = new ArrayList<Entity>();
+        ArrayList<Entity> aircraft = new ArrayList<>();
         if (spawnConventional) {
             // skill level is 0-4 where 0 is "ultra-green" and 4 is "elite badass"
             for(int unitCount = 0; unitCount <= campaign.getCampaignOptions().getSkillLevel(); unitCount++) {
@@ -1552,7 +1552,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         boolean isTurretAppropriateTerrain = (terrainType == TER_HEAVYURBAN) || (terrainType == TER_LIGHTURBAN);
         boolean isInfantryAppropriateTerrain = isTurretAppropriateTerrain || terrainType == TER_WOODED;
         
-        ArrayList<Entity> scrubs = new ArrayList<Entity>();
+        ArrayList<Entity> scrubs = new ArrayList<>();
         // don't bother spawning turrets if there won't be anything to put them on
         if (spawnTurrets && isTurretAppropriateTerrain) {
             // skill level is 0-4 where 0 is "ultra-green" and 4 is "elite badass" and drives the number of extra units
@@ -1617,7 +1617,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     }
 	
 	public ArrayList<String> generateEntityStub(ArrayList<Entity> entities) {
-        ArrayList<String> stub = new ArrayList<String>();
+        ArrayList<String> stub = new ArrayList<>();
         for (Entity en : entities) {
             if (null == en) {
                 stub.add("<html><font color='red'>No random assignment table found for faction</font></html>");
@@ -1888,7 +1888,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                     }
                 }
             } else if (wn2.getNodeName().equalsIgnoreCase("bigBattleAllies")) {
-                bigBattleAllies = new ArrayList<Entity>();
+                bigBattleAllies = new ArrayList<>();
                 NodeList nl2 = wn2.getChildNodes();
                 for (int i = 0; i < nl2.getLength(); i++) {
                     Node wn3 = nl2.item(i);
@@ -1912,7 +1912,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                     }
                 }
             } else if (wn2.getNodeName().equalsIgnoreCase("specMissionEnemies")) {
-                specMissionEnemies = new ArrayList<ArrayList<Entity>>();
+                specMissionEnemies = new ArrayList<>();
                 for (int i = 0; i < 4; i++) {
                     specMissionEnemies.add(new ArrayList<Entity>());
                 }
@@ -1980,7 +1980,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
          * remove the entry from the list of entities that give survival bonuses
          * to avoid an critical error that prevents battle resolution.
          */
-        ArrayList<UUID> toRemove = new ArrayList<UUID>();
+        ArrayList<UUID> toRemove = new ArrayList<>();
         for (UUID uid : survivalBonus) {
             if (!entityIds.containsKey(uid)) {
                 toRemove.add(uid);
@@ -1990,7 +1990,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     }
 
     private ArrayList<String> getEntityStub(Node wn) {
-        ArrayList<String> stub = new ArrayList<String>();
+        ArrayList<String> stub = new ArrayList<>();
         NodeList nl = wn.getChildNodes();
         for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
@@ -2208,7 +2208,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         private BehaviorSettings behaviorSettings;
 
         public BotForce() {
-            this.entityList = new ArrayList<Entity>();
+            this.entityList = new ArrayList<>();
             try {
                 behaviorSettings = BehaviorSettingsFactory.getInstance().DEFAULT_BEHAVIOR.getCopy();
             } catch (PrincessException ex) {

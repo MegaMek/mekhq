@@ -94,10 +94,10 @@ public class ContractMarket implements Serializable {
 	private HashMap<Integer, Integer> followupContracts;
 
 	public ContractMarket() {
-		contracts = new ArrayList<Contract>();
-		contractIds = new HashMap<Integer, Contract>();
-		clauseMods = new HashMap<Integer, ClauseMods>();
-		followupContracts = new HashMap<Integer, Integer>();
+		contracts = new ArrayList<>();
+		contractIds = new HashMap<>();
+		clauseMods = new HashMap<>();
+		followupContracts = new HashMap<>();
 	}
 
 	public ArrayList<Contract> getContracts() {

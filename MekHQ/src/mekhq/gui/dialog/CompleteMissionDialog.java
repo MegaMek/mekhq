@@ -37,7 +37,7 @@ public class CompleteMissionDialog extends javax.swing.JDialog {
     	
         btnDone = new javax.swing.JButton();
         btnCancel = new javax.swing.JButton();
-        choiceOutcome = new javax.swing.JComboBox<String>();
+        choiceOutcome = new javax.swing.JComboBox<>();
         lblOutcome = new javax.swing.JLabel();
         
         ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CompleteMissionDialog", new EncodeControl()); //$NON-NLS-1$
@@ -57,7 +57,7 @@ public class CompleteMissionDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         getContentPane().add(lblOutcome, gridBagConstraints);
         
-        DefaultComboBoxModel<String> outcomeModel = new DefaultComboBoxModel<String>();
+        DefaultComboBoxModel<String> outcomeModel = new DefaultComboBoxModel<>();
 		for (int i = 1; i < Mission.S_NUM; i++) {
 			outcomeModel.addElement(Mission.getStatusName(i));
 		}

@@ -22,7 +22,7 @@ public class PatientTableModel extends AbstractListModel<Person> {
     Campaign campaign;
     
     public PatientTableModel(Campaign c) {
-        patients = new ArrayList<Person>();
+        patients = new ArrayList<>();
         campaign = c;
     }
 

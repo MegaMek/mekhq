@@ -101,8 +101,8 @@ public class HireBulkPersonnelDialog extends JDialog {
     private void initComponents() {
         GridBagConstraints gridBagConstraints;
         
-        choiceType = new JComboBox<PersonTypeItem>();
-        choiceRanks = new JComboBox<String>();
+        choiceType = new JComboBox<>();
+        choiceRanks = new JComboBox<>();
 
         btnHire = new JButton(resourceMap.getString("btnHire.text")); //$NON-NLS-1$
         btnClose = new JButton(resourceMap.getString("btnClose.text")); //$NON-NLS-1$
@@ -116,7 +116,7 @@ public class HireBulkPersonnelDialog extends JDialog {
         
         getContentPane().add(new JLabel(resourceMap.getString("lblType.text")), newConstraints(0, 0)); //$NON-NLS-1$
         
-        DefaultComboBoxModel<PersonTypeItem> personTypeModel = new DefaultComboBoxModel<PersonTypeItem>();
+        DefaultComboBoxModel<PersonTypeItem> personTypeModel = new DefaultComboBoxModel<>();
         for(int i = 1; i < Person.T_NUM; i++) {
             personTypeModel.addElement(new PersonTypeItem(Person.getRoleDesc(i,campaign.getFaction().isClan()), i));
         }
@@ -138,7 +138,7 @@ public class HireBulkPersonnelDialog extends JDialog {
         
         getContentPane().add(new JLabel(resourceMap.getString("lblRank.text")), newConstraints(0, 1)); //$NON-NLS-1$
         
-        rankModel = new DefaultComboBoxModel<String>();
+        rankModel = new DefaultComboBoxModel<>();
         choiceRanks.setModel(rankModel);
         choiceRanks.setName("choiceRanks"); // NOI18N
         refreshRanksCombo();

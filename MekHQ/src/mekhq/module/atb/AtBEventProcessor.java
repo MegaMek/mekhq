@@ -273,7 +273,7 @@ public class AtBEventProcessor {
     public static String getRecruitFaction(Campaign c) {
         if (c.getFactionCode().equals("MERC")) {
             if (c.getCalendar().get(Calendar.YEAR) > 3055 && Compute.randomInt(20) == 0) {
-                ArrayList<String> clans = new ArrayList<String>();
+                ArrayList<String> clans = new ArrayList<>();
                 for (String f : RandomFactionGenerator.getInstance().getCurrentFactions()) {
                     if (Faction.getFaction(f).isClan()) {
                         clans.add(f);

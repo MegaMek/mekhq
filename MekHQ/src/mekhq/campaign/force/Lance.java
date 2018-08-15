@@ -300,7 +300,7 @@ public class Lance implements Serializable, MekHqXmlSerializable {
     /* Code to find unit commander from ForceViewPanel */
 
     public static UUID findCommander(int forceId, Campaign c) {
-        ArrayList<Person> people = new ArrayList<Person>();
+        ArrayList<Person> people = new ArrayList<>();
         for(UUID uid : c.getForce(forceId).getAllUnits()) {
             Unit u = c.getUnit(uid);
             if(null != u) {

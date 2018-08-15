@@ -65,11 +65,11 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
 	 */
 	private static final long serialVersionUID = -6265589976779860566L;
 	private Person person;
-    private ArrayList<DialogOptionComponent> optionComps = new ArrayList<DialogOptionComponent>();
-    private Hashtable<String, JSpinner> skillLvls = new Hashtable<String, JSpinner>();
-    private Hashtable<String, JSpinner> skillBonus = new Hashtable<String, JSpinner>();
-    private Hashtable<String, JLabel> skillValues = new Hashtable<String, JLabel>();
-    private Hashtable<String, JCheckBox> skillChks = new Hashtable<String, JCheckBox>();
+    private ArrayList<DialogOptionComponent> optionComps = new ArrayList<>();
+    private Hashtable<String, JSpinner> skillLvls = new Hashtable<>();
+    private Hashtable<String, JSpinner> skillBonus = new Hashtable<>();
+    private Hashtable<String, JLabel> skillValues = new Hashtable<>();
+    private Hashtable<String, JCheckBox> skillChks = new Hashtable<>();
     private PilotOptions options;
     private GregorianCalendar birthdate;
     private GregorianCalendar recruitment;
@@ -154,7 +154,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         textBloodname = new javax.swing.JTextField();
         textToughness = new javax.swing.JTextField();
         lblToughness = new javax.swing.JLabel();
-        choiceGender = new javax.swing.JComboBox<String>();
+        choiceGender = new javax.swing.JComboBox<>();
         scrOptions = new javax.swing.JScrollPane();
         panOptions = new javax.swing.JPanel();
         scrSkills = new javax.swing.JScrollPane();
@@ -282,7 +282,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
         panDemog.add(lblGender, gridBagConstraints);
 
-        DefaultComboBoxModel<String> genderModel = new DefaultComboBoxModel<String>();
+        DefaultComboBoxModel<String> genderModel = new DefaultComboBoxModel<>();
         genderModel.addElement(Person.getGenderName(Person.G_MALE));
         genderModel.addElement(Person.getGenderName(Person.G_FEMALE));
         choiceGender.setModel(genderModel);
@@ -309,11 +309,11 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
         panDemog.add(new JLabel("Phenotype:"), gridBagConstraints);
 
-        DefaultComboBoxModel<String> phenoModel = new DefaultComboBoxModel<String>();
+        DefaultComboBoxModel<String> phenoModel = new DefaultComboBoxModel<>();
         for(int i = 0; i < Person.PHENOTYPE_NUM; i++) {
             phenoModel.addElement(Person.getPhenotypeName(i));
         }
-        choicePheno = new JComboBox<String>(phenoModel);
+        choicePheno = new JComboBox<>(phenoModel);
         choicePheno.setSelectedIndex(person.getPhenotype());
         choicePheno.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -430,7 +430,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         lblUnit.setText("Original unit:"); // NOI18N
         lblUnit.setName("lblUnit"); // NOI18N
         
-        choiceUnitWeight = new JComboBox<String>();
+        choiceUnitWeight = new JComboBox<>();
         choiceUnitWeight.addItem("None");
         choiceUnitWeight.addItem("Light");
         choiceUnitWeight.addItem("Medium");
@@ -438,7 +438,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         choiceUnitWeight.addItem("Assault");
         choiceUnitWeight.setSelectedIndex(person.getOriginalUnitWeight());
 
-        choiceUnitTech = new JComboBox<String>();
+        choiceUnitTech = new JComboBox<>();
         choiceUnitTech.addItem("IS1");
         choiceUnitTech.addItem("IS2");
         choiceUnitTech.addItem("Clan");
@@ -450,7 +450,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         chkFounder = new JCheckBox("Founding member");
         chkFounder.setSelected(person.isFounder());
         
-        choiceOriginalUnit = new JComboBox<Unit>();
+        choiceOriginalUnit = new JComboBox<>();
         choiceOriginalUnit.setRenderer(new DefaultListCellRenderer() {
 			@Override
         	public Component getListCellRendererComponent(JList<?> list,
@@ -819,7 +819,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
     
     public void refreshOptions() {
         panOptions.removeAll();
-        optionComps = new ArrayList<DialogOptionComponent>();
+        optionComps = new ArrayList<>();
 
         GridBagLayout gridbag = new GridBagLayout();
         GridBagConstraints c = new GridBagConstraints();

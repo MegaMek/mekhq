@@ -331,7 +331,7 @@ public class EditSpecialAbilityDialog extends JDialog {
         btnClearPrereqSkills = new javax.swing.JButton("Clear Skill Prereqs");
         btnClearPrereqSkills.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                prereqSkills = new Vector<SkillPrereq>();
+                prereqSkills = new Vector<>();
                 refreshGUI();
             }
         });

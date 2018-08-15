@@ -487,7 +487,7 @@ public class RATManager extends AbstractUnitGenerator implements IUnitGenerator 
             }
             return RandomUnitGenerator.getInstance().generate(count, rat.ratName, filter);
         }
-        return new ArrayList<MechSummary>();
+        return new ArrayList<>();
     }
 
     @Override
@@ -507,7 +507,7 @@ public class RATManager extends AbstractUnitGenerator implements IUnitGenerator 
             }
             return RandomUnitGenerator.getInstance().generate(count, rat.ratName, filter);
         }
-        return new ArrayList<MechSummary>();
+        return new ArrayList<>();
     }
 
     private static class RAT {

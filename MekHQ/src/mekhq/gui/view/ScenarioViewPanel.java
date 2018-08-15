@@ -205,7 +205,7 @@ public class ScenarioViewPanel extends javax.swing.JPanel {
     protected class StubTreeModel implements TreeModel {
 
         private ForceStub rootForce;
-        private Vector<TreeModelListener> listeners = new Vector<TreeModelListener>();
+        private Vector<TreeModelListener> listeners = new Vector<>();
         
         public StubTreeModel(ForceStub root) {
             rootForce = root;

@@ -121,23 +121,23 @@ public class ResolveScenarioTracker {
         this.scenario = s;
         this.campaign = c;
         this.control = ctrl;
-        unitsStatus = new Hashtable<UUID, UnitStatus>();
-        salvageStatus = new Hashtable<UUID, UnitStatus>();
-        potentialSalvage = new ArrayList<TestUnit>();
-        alliedUnits = new ArrayList<TestUnit>(); // TODO: Make some use of this?
-        actualSalvage = new ArrayList<TestUnit>();
-        leftoverSalvage = new ArrayList<TestUnit>();
-        devastatedEnemyUnits = new ArrayList<TestUnit>();
-        pilots = new Hashtable<UUID, Crew>();
-        mia = new Hashtable<UUID, Crew>();
-        units = new ArrayList<Unit>();
+        unitsStatus = new Hashtable<>();
+        salvageStatus = new Hashtable<>();
+        potentialSalvage = new ArrayList<>();
+        alliedUnits = new ArrayList<>(); // TODO: Make some use of this?
+        actualSalvage = new ArrayList<>();
+        leftoverSalvage = new ArrayList<>();
+        devastatedEnemyUnits = new ArrayList<>();
+        pilots = new Hashtable<>();
+        mia = new Hashtable<>();
+        units = new ArrayList<>();
         potentialLoot = scenario.getLoot();
-        actualLoot = new ArrayList<Loot>();
-        peopleStatus = new Hashtable<UUID, PersonStatus>();
-        prisonerStatus = new Hashtable<UUID, PrisonerStatus>();
-        killCredits = new Hashtable<String, String>();
-        ejections = new Hashtable<UUID, EjectedCrew>();
-        enemyEjections = new Hashtable<UUID, EjectedCrew>();
+        actualLoot = new ArrayList<>();
+        peopleStatus = new Hashtable<>();
+        prisonerStatus = new Hashtable<>();
+        killCredits = new Hashtable<>();
+        ejections = new Hashtable<>();
+        enemyEjections = new Hashtable<>();
         for(UUID uid : scenario.getForces(campaign).getAllUnits()) {
             Unit u = campaign.getUnit(uid);
             if(null != u && null == u.checkDeployment()) {
@@ -456,7 +456,7 @@ public class ResolveScenarioTracker {
     }
 
     private List<Person> shuffleCrew(List<Person> source) {
-        List<Person> sortedList = new ArrayList<Person>();
+        List<Person> sortedList = new ArrayList<>();
         Random generator = new Random();
 
         while (source.size() > 0)
@@ -1315,7 +1315,7 @@ public class ResolveScenarioTracker {
     }
 
     public ArrayList<Person> getMissingPersonnel() {
-        ArrayList<Person> mia = new ArrayList<Person>();
+        ArrayList<Person> mia = new ArrayList<>();
         for(UUID pid : peopleStatus.keySet()) {
             PersonStatus status = peopleStatus.get(pid);
             if(status.isMissing()) {
@@ -1329,7 +1329,7 @@ public class ResolveScenarioTracker {
     }
 
     public ArrayList<Person> getDeadPersonnel() {
-        ArrayList<Person> kia = new ArrayList<Person>();
+        ArrayList<Person> kia = new ArrayList<>();
         for(UUID pid : peopleStatus.keySet()) {
             PersonStatus status = peopleStatus.get(pid);
             if(status.isDead()) {
@@ -1343,7 +1343,7 @@ public class ResolveScenarioTracker {
     }
 
     public ArrayList<Person> getRecoveredPersonnel() {
-        ArrayList<Person> recovered = new ArrayList<Person>();
+        ArrayList<Person> recovered = new ArrayList<>();
         for(UUID pid : peopleStatus.keySet()) {
             PersonStatus status = peopleStatus.get(pid);
             if(!status.isDead() && !status.isMissing()) {
@@ -1382,7 +1382,7 @@ public class ResolveScenarioTracker {
 
     public ArrayList<PersonStatus> getSortedPeople() {
         //put all the PersonStatuses in an ArrayList and sort by the unit name
-        ArrayList<PersonStatus> toReturn = new ArrayList<PersonStatus>();
+        ArrayList<PersonStatus> toReturn = new ArrayList<>();
         for(UUID id : getPeopleStatus().keySet()) {
             PersonStatus status = peopleStatus.get(id);
             if(null != status) {
@@ -1396,7 +1396,7 @@ public class ResolveScenarioTracker {
 
     public ArrayList<PrisonerStatus> getSortedPrisoners() {
         //put all the PersonStatuses in an ArrayList and sort by the unit name
-        ArrayList<PrisonerStatus> toReturn = new ArrayList<PrisonerStatus>();
+        ArrayList<PrisonerStatus> toReturn = new ArrayList<>();
         for(UUID id : getPrisonerStatus().keySet()) {
             PrisonerStatus status = prisonerStatus.get(id);
             if(null != status) {
@@ -1437,7 +1437,7 @@ public class ResolveScenarioTracker {
             hits = h;
             missing = false;
             xp = 0;
-            kills = new ArrayList<Kill>();
+            kills = new ArrayList<>();
             remove = false;
             pickedUp = false;
             personId = id;

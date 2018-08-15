@@ -90,7 +90,7 @@ public class AddFundsDialog extends JDialog implements FocusListener {
         jFormattedTextFieldFundsQuantity.setColumns(10);
         panel.add(jFormattedTextFieldFundsQuantity);
 
-        categoryCombo = new JComboBox<String>(Transaction.getCategoryList());
+        categoryCombo = new JComboBox<>(Transaction.getCategoryList());
         categoryCombo.setSelectedItem(Transaction.getCategoryName(Transaction.C_MISC));
         categoryCombo.setToolTipText("The category the transaction falls into.");
         categoryCombo.setName("categoryCombo");

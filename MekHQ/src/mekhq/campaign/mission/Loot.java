@@ -55,8 +55,8 @@ public class Loot implements MekHqXmlSerializable {
     public Loot() {
         name = "None";
         cash = 0;
-        units = new ArrayList<Entity>();
-        parts = new ArrayList<Part>();
+        units = new ArrayList<>();
+        parts = new ArrayList<>();
     }
     
     @Override
@@ -94,7 +94,7 @@ public class Loot implements MekHqXmlSerializable {
     }
     
     public void clearUnits() {
-        units = new ArrayList<Entity>();
+        units = new ArrayList<>();
     }
     
     public ArrayList<Part> getParts() {
@@ -106,7 +106,7 @@ public class Loot implements MekHqXmlSerializable {
     }
     
     public void clearParts() {
-        parts = new ArrayList<Part>();
+        parts = new ArrayList<>();
     }
     
     public String getShortDescription() {

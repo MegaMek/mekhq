@@ -78,7 +78,7 @@ public class Mission implements Serializable, MekHqXmlSerializable {
         this.desc = "";
         this.type = "";
         this.status = S_ACTIVE;
-        scenarios = new ArrayList<Scenario>();
+        scenarios = new ArrayList<>();
     }
 
     public static String getStatusName(int s) {

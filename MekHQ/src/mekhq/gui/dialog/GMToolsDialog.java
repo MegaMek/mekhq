@@ -132,18 +132,18 @@ public class GMToolsDialog extends JDialog implements ActionListener {
             }
             
         });
-        factionPicker = new JComboBox<FactionChoice>(factionChoices.toArray(new FactionChoice[factionChoices.size()]));
+        factionPicker = new JComboBox<>(factionChoices.toArray(new FactionChoice[factionChoices.size()]));
         System.out.println(gui.getCampaign().getGameYear());
         yearPicker = new JTextField(5);
         yearPicker.setText(String.valueOf(gui.getCampaign().getGameYear()));
-        qualityPicker = new JComboBox<String>(qualityNames);
-        unitTypePicker = new JComboBox<String>();
+        qualityPicker = new JComboBox<>(qualityNames);
+        unitTypePicker = new JComboBox<>();
         for (int ut = 0; ut < UnitType.SIZE; ut++) {
             if (gui.getCampaign().getUnitGenerator().isSupportedUnitType(ut)) {
                 unitTypePicker.addItem(UnitType.getTypeName(ut));
             }
         }
-        unitWeightPicker = new JComboBox<String>(weightNames);
+        unitWeightPicker = new JComboBox<>(weightNames);
         unitPicked = new JLabel("-");
         unitTypePicker.addItemListener(ev ->
             unitWeightPicker.setEnabled(unitTypePicker.getSelectedItem().equals("Mek")

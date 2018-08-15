@@ -122,7 +122,7 @@ public class Ranks {
     public static void initializeRankSystems() {
         final String METHOD_NAME = "initializeRankSystems()"; //$NON-NLS-1$
 
-        rankSystems = new Hashtable<Integer, Ranks>();
+        rankSystems = new Hashtable<>();
         MekHQ.getLogger().log(Ranks.class, METHOD_NAME, LogLevel.INFO,
                 "Starting load of Rank Systems from XML..."); //$NON-NLS-1$
         // Initialize variables.
@@ -319,7 +319,7 @@ public class Ranks {
 		// If we've got an invalid rank system, default to Star League
 		if(system >= rankSystems.size()) {
 			if (rankSystems.isEmpty()) {
-				ranks = new ArrayList<Rank>();
+				ranks = new ArrayList<>();
 			} else {
 				ranks = rankSystems.get(RS_SL).getAllRanks();
 			}
@@ -331,7 +331,7 @@ public class Ranks {
 	}
 	
 	public void setCustomRanks(ArrayList<ArrayList<String>> customRanks, int offCut) {
-	    ranks = new ArrayList<Rank>();
+	    ranks = new ArrayList<>();
         for (int i = 0; i < customRanks.size(); i++) {
             ranks.add(new Rank(customRanks.get(i), offCut <= i,  1.0));
         }
@@ -400,10 +400,10 @@ public class Ranks {
 	
 	//Keep this for reverse compatability in loading campaigns
 	public void setRanksFromList(String names, int officerCut) {
-		ArrayList<ArrayList<String>> rankNames = new ArrayList<ArrayList<String>>();
+		ArrayList<ArrayList<String>> rankNames = new ArrayList<>();
 		String[] rnames = names.split(",");
 		for(String rname : rnames) {
-			ArrayList<String> temp = new ArrayList<String>();
+			ArrayList<String> temp = new ArrayList<>();
 			for (int i = 0; i < RPROF_NUM; i++) {
 				temp.add(rname);
 			}
@@ -455,7 +455,7 @@ public class Ranks {
 		boolean showMessage = false;
         
         // Dump the ranks ArrayList so we can re-use it.
-        retVal.ranks = new ArrayList<Rank>();
+        retVal.ranks = new ArrayList<>();
 
         try {
             NodeList nl = wn.getChildNodes();
@@ -546,7 +546,7 @@ public class Ranks {
     }
 	
 	public void setRanksFromModel(RankTableModel model) {
-        ranks = new ArrayList<Rank>();
+        ranks = new ArrayList<>();
 	    @SuppressWarnings("unchecked") // Broken java doesn't have typed vectors in the DefaultTableModel
 		Vector<Vector<Object>> vectors = model.getDataVector();
 	    for(Vector<Object> row : vectors) {

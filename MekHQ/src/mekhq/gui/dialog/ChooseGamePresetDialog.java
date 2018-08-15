@@ -71,7 +71,7 @@ public class ChooseGamePresetDialog extends javax.swing.JDialog {
     	 panButtons = new javax.swing.JPanel();
     	 btnOk = new javax.swing.JButton();
     	 btnCancel = new javax.swing.JButton();
-    	 presetButtons = new ArrayList<JRadioButton>();
+    	 presetButtons = new ArrayList<>();
     	 
     	 JPanel mainPanel = new JPanel(new GridBagLayout());
     	 JScrollPane scrPane = new JScrollPane(mainPanel);

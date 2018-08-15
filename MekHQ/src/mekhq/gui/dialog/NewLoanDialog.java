@@ -281,11 +281,11 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
         sldCollateral.addChangeListener(this);
         sldLength.addChangeListener(this);
 
-        DefaultComboBoxModel<String> scheduleModel = new DefaultComboBoxModel<String>();
+        DefaultComboBoxModel<String> scheduleModel = new DefaultComboBoxModel<>();
         for (int i = 0; i < Finances.SCHEDULE_NUM; i++) {
             scheduleModel.addElement(Finances.getScheduleName(i));
         }
-        choiceSchedule = new JComboBox<String>(scheduleModel);
+        choiceSchedule = new JComboBox<>(scheduleModel);
         choiceSchedule.setSelectedIndex(loan.getPaymentSchedule());
 
         choiceSchedule.addActionListener(this);

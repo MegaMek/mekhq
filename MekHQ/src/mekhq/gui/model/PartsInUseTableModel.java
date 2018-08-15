@@ -139,7 +139,7 @@ public class PartsInUseTableModel extends DataTableModel {
     }
     
     public void setData(Set<PartInUse> data) {
-        setData(new ArrayList<PartInUse>(data));
+        setData(new ArrayList<>(data));
     }
     
     @SuppressWarnings("unchecked")

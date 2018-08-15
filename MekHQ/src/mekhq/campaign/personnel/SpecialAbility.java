@@ -108,11 +108,11 @@ public class SpecialAbility implements MekHqXmlSerializable {
         lookupName = name;
         displayName = display;
         desc = description;
-        prereqAbilities = new Vector<String>();
-        invalidAbilities = new Vector<String>();
-        removeAbilities = new Vector<String>();
+        prereqAbilities = new Vector<>();
+        invalidAbilities = new Vector<>();
+        removeAbilities = new Vector<>();
         choiceValues = new Vector<>();
-        prereqSkills = new Vector<SkillPrereq>();
+        prereqSkills = new Vector<>();
         prereqMisc = new HashMap<>();
         xpCost = 1;
         weight = 1;
@@ -236,7 +236,7 @@ public class SpecialAbility implements MekHqXmlSerializable {
     }
 
     public void clearPrereqSkills() {
-        prereqSkills = new Vector<SkillPrereq>();
+        prereqSkills = new Vector<>();
     }
     
     public void clearPrereqMisc() {
@@ -549,7 +549,7 @@ public class SpecialAbility implements MekHqXmlSerializable {
     }
 
     public static String chooseWeaponSpecialization(int type, boolean isClan, int techLvl, int year) {
-        ArrayList<String> candidates = new ArrayList<String>();
+        ArrayList<String> candidates = new ArrayList<>();
         for (Enumeration<EquipmentType> e = EquipmentType.getAllTypes(); e.hasMoreElements();) {
             EquipmentType et = e.nextElement();
             if(!(et instanceof WeaponType)) {

@@ -69,14 +69,14 @@ public class Rank implements MekHqXmlSerializable {
     }
 
     public Rank(String[] name, boolean b, double mult) {
-        this(new ArrayList<String>(Arrays.asList(name)), b, mult);
+        this(new ArrayList<>(Arrays.asList(name)), b, mult);
     }
 
     public Rank(ArrayList<String> names, boolean b, double mult) {
     	rankNames = names;
         officer = b;
         payMultiplier = mult;
-        rankLevels = new ArrayList<Integer>();
+        rankLevels = new ArrayList<>();
         for (int i = 0; i < rankNames.size(); i++) {
         	rankLevels.add(0);
         	if (rankNames.get(i).contains(":")) {
@@ -180,9 +180,9 @@ public class Rank implements MekHqXmlSerializable {
 
                 if (wn2.getNodeName().equalsIgnoreCase("rankName")) {
                 	String[] rNames = { wn2.getTextContent(), "--MW", "--MW", "--MW", "--MW", "--MW" };
-                    retVal.rankNames = new ArrayList<String>(Arrays.asList(rNames));
+                    retVal.rankNames = new ArrayList<>(Arrays.asList(rNames));
                 } else if (wn2.getNodeName().equalsIgnoreCase("rankNames")) {
-                    retVal.rankNames = new ArrayList<String>(Arrays.asList(wn2.getTextContent().split(",")));
+                    retVal.rankNames = new ArrayList<>(Arrays.asList(wn2.getTextContent().split(",")));
                     for (int i = 0; i < retVal.rankNames.size(); i++) {
                     	retVal.rankLevels.add(0);
                     	if (retVal.rankNames.get(i).contains(":")) {

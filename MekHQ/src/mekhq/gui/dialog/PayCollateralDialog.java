@@ -234,7 +234,7 @@ public class PayCollateralDialog extends JDialog {
         });
         panBtn.add(btnCancel);
 
-        assetBoxes = new ArrayList<JCheckBox>();
+        assetBoxes = new ArrayList<>();
         i = 0;
         j = 0;
         JPanel pnlAssets = new JPanel(new GridBagLayout());
@@ -339,7 +339,7 @@ public class PayCollateralDialog extends JDialog {
     }
     
     public ArrayList<int[]> getParts() {
-        ArrayList<int[]> parts = new ArrayList<int[]>();
+        ArrayList<int[]> parts = new ArrayList<>();
         for (Map.Entry<JSlider, Integer> m : partSliders.entrySet()) {
             int quantity = m.getKey().getValue();
             if(quantity > 0) {
@@ -351,7 +351,7 @@ public class PayCollateralDialog extends JDialog {
     }
     
     public ArrayList<Asset> getRemainingAssets() {
-        ArrayList<Asset> newAssets = new ArrayList<Asset>();
+        ArrayList<Asset> newAssets = new ArrayList<>();
         for(int i = 0; i < assetBoxes.size(); i++) {
             JCheckBox box = assetBoxes.get(i);
             if(!box.isSelected()) {

@@ -157,7 +157,7 @@ public class MassRepairSalvageDialog extends JDialog {
 	private void filterUnits() {
 		// Store selections so after the table is refreshed we can re-select
 		// them
-		Map<String, Unit> selectedUnitMap = new HashMap<String, Unit>();
+		Map<String, Unit> selectedUnitMap = new HashMap<>();
 
 		int[] selectedRows = unitTable.getSelectedRows();
 
@@ -175,7 +175,7 @@ public class MassRepairSalvageDialog extends JDialog {
 		int activeCount = 0;
 		int inactiveCount = 0;
 
-		unitList = new ArrayList<Unit>();
+		unitList = new ArrayList<>();
 
 		for (Unit unit : campaignGUI.getCampaign().getServiceableUnits()) {
 			
@@ -212,7 +212,7 @@ public class MassRepairSalvageDialog extends JDialog {
 	}
 
 	private void filterCompletePartsList(boolean refreshCompleteList) {
-		Map<Integer, Integer> activeMROMap = new HashMap<Integer, Integer>();
+		Map<Integer, Integer> activeMROMap = new HashMap<>();
 
 		for (int i = 0; i < MassRepairOption.VALID_REPAIR_TYPES.length; i++) {
 			int type = MassRepairOption.VALID_REPAIR_TYPES[i];
@@ -227,7 +227,7 @@ public class MassRepairSalvageDialog extends JDialog {
 		}
 
 		if (refreshCompleteList) {
-			completePartsList = new ArrayList<Part>();
+			completePartsList = new ArrayList<>();
 
 			for (Part part : campaignGUI.getCampaign().getSpareParts()) {
 				if (!part.isBeingWorkedOn() && part.needsFixing() && !(part instanceof AmmoBin)
@@ -237,7 +237,7 @@ public class MassRepairSalvageDialog extends JDialog {
 			}
 		}
 
-		filteredPartsList = new ArrayList<Part>();
+		filteredPartsList = new ArrayList<>();
 		int quantity = 0;
 
 		for (Part part : completePartsList) {
@@ -313,7 +313,7 @@ public class MassRepairSalvageDialog extends JDialog {
 
 		unitTableModel = new UnitTableModel(campaignGUI.getCampaign());
 
-		unitSorter = new TableRowSorter<UnitTableModel>(unitTableModel);
+		unitSorter = new TableRowSorter<>(unitTableModel);
 		unitSorter.setComparator(UnitTableModel.COL_STATUS, new UnitStatusSorter());
 		unitSorter.setComparator(UnitTableModel.COL_TYPE, new UnitTypeSorter());
 		unitSorter.setComparator(UnitTableModel.COL_RSTATUS, new Comparator<String>() {
@@ -323,7 +323,7 @@ public class MassRepairSalvageDialog extends JDialog {
 			}
 		});
 
-		ArrayList<RowSorter.SortKey> sortKeys = new ArrayList<RowSorter.SortKey>();
+		ArrayList<RowSorter.SortKey> sortKeys = new ArrayList<>();
 		sortKeys.add(new RowSorter.SortKey(UnitTableModel.COL_STATUS, SortOrder.DESCENDING));
 		unitSorter.setSortKeys(sortKeys);
 
@@ -378,7 +378,7 @@ public class MassRepairSalvageDialog extends JDialog {
 		partsTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 		partsTable.setColumnModel(new XTableColumnModel());
 		partsTable.createDefaultColumnsFromModel();
-		TableRowSorter<PartsTableModel> partsSorter = new TableRowSorter<PartsTableModel>(partsTableModel);
+		TableRowSorter<PartsTableModel> partsSorter = new TableRowSorter<>(partsTableModel);
 		partsSorter.setComparator(PartsTableModel.COL_DETAIL, new PartsDetailSorter());
 		partsTable.setRowSorter(partsSorter);
 
@@ -588,7 +588,7 @@ public class MassRepairSalvageDialog extends JDialog {
 
 		int rowIdx = 1;
 
-		massRepairOptionControlMap = new HashMap<Integer, MassRepairOptionControl>();
+		massRepairOptionControlMap = new HashMap<>();
 
 		if (!isModeWarehouse()) {
 			massRepairOptionControlMap.put(Part.REPAIR_PART_TYPE.ARMOR,
@@ -704,14 +704,14 @@ public class MassRepairSalvageDialog extends JDialog {
 
 	private JComboBox<String> createMassRepairSkillCBox(int selectedValue, boolean enabled, JPanel pnlItems, int rowIdx,
 			int columnIdx) {
-		DefaultComboBoxModel<String> skillModel = new DefaultComboBoxModel<String>();
+		DefaultComboBoxModel<String> skillModel = new DefaultComboBoxModel<>();
 		skillModel.addElement(SkillType.getExperienceLevelName(SkillType.EXP_ULTRA_GREEN));
 		skillModel.addElement(SkillType.getExperienceLevelName(SkillType.EXP_GREEN));
 		skillModel.addElement(SkillType.getExperienceLevelName(SkillType.EXP_REGULAR));
 		skillModel.addElement(SkillType.getExperienceLevelName(SkillType.EXP_VETERAN));
 		skillModel.addElement(SkillType.getExperienceLevelName(SkillType.EXP_ELITE));
 		skillModel.setSelectedItem(SkillType.getExperienceLevelName(selectedValue));
-		JComboBox<String> skillCBox = new JComboBox<String>(skillModel);
+		JComboBox<String> skillCBox = new JComboBox<>(skillModel);
 		skillCBox.setEnabled(enabled);
 
 		GridBagConstraints gridBagConstraints = new GridBagConstraints();
@@ -1087,7 +1087,7 @@ public class MassRepairSalvageDialog extends JDialog {
 	}
 
 	private void btnStartMassRepairActionPerformed(ActionEvent evt) {
-		List<MassRepairOption> activeMROs = new ArrayList<MassRepairOption>();
+		List<MassRepairOption> activeMROs = new ArrayList<>();
 
 		for (int i = 0; i < MassRepairOption.VALID_REPAIR_TYPES.length; i++) {
 			int type = MassRepairOption.VALID_REPAIR_TYPES[i];
@@ -1126,7 +1126,7 @@ public class MassRepairSalvageDialog extends JDialog {
 				return;
 			}
 
-			List<Unit> units = new ArrayList<Unit>();
+			List<Unit> units = new ArrayList<>();
 
 			for (int i = 0; i < selectedRows.length; i++) {
 				int rowIdx = unitTable.convertRowIndexToModel(selectedRows[i]);
@@ -1159,7 +1159,7 @@ public class MassRepairSalvageDialog extends JDialog {
 				return;
 			}
 
-			List<IPartWork> parts = new ArrayList<IPartWork>();
+			List<IPartWork> parts = new ArrayList<>();
 
 			for (int i = 0; i < selectedRows.length; i++) {
 				int rowIdx = partsTable.convertRowIndexToModel(selectedRows[i]);

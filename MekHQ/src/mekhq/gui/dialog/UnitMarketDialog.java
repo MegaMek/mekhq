@@ -237,7 +237,7 @@ public class UnitMarketDialog extends JDialog {
         tableUnits.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tableUnits.setColumnModel(new XTableColumnModel());
         tableUnits.createDefaultColumnsFromModel();
-        sorter = new TableRowSorter<UnitMarketTableModel>(marketModel);
+        sorter = new TableRowSorter<>(marketModel);
         sorter.setComparator(UnitMarketTableModel.COL_WEIGHTCLASS, new WeightClassSorter());
         Comparator<String> numComparator = new Comparator<String>() {
 			public int compare(String arg0, String arg1) {

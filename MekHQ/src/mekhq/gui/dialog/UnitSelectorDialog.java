@@ -139,9 +139,9 @@ public class UnitSelectorDialog extends JDialog {
         panelFilterBtns = new JPanel();
         panelLeft = new JPanel();
         lblWeight = new JLabel();
-        comboWeight = new JComboBox<String>();
+        comboWeight = new JComboBox<>();
         lblUnitType = new JLabel();
-        comboUnitType = new JComboBox<String>();
+        comboUnitType = new JComboBox<>();
         txtFilter = new JTextField();
         lblFilter = new JLabel();
         lblImage = new JLabel();
@@ -170,7 +170,7 @@ public class UnitSelectorDialog extends JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panelFilterBtns.add(lblUnitType, gridBagConstraints);
 
-        DefaultComboBoxModel<String> unitTypeModel = new DefaultComboBoxModel<String>();
+        DefaultComboBoxModel<String> unitTypeModel = new DefaultComboBoxModel<>();
         for (int i = 0; i < UnitType.SIZE; i++) {
             unitTypeModel.addElement(UnitType.getTypeDisplayableName(i));
         }
@@ -198,7 +198,7 @@ public class UnitSelectorDialog extends JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panelFilterBtns.add(lblWeight, gridBagConstraints);
 
-        DefaultComboBoxModel<String> weightModel = new DefaultComboBoxModel<String>();
+        DefaultComboBoxModel<String> weightModel = new DefaultComboBoxModel<>();
         for (int i = 0; i < EntityWeightClass.SIZE; i++) {
             weightModel.addElement(EntityWeightClass.getClassName(i));
         }
@@ -316,7 +316,7 @@ public class UnitSelectorDialog extends JDialog {
         tableUnits.setModel(unitModel);
         tableUnits.setName("tableUnits"); // NOI18N
         tableUnits.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
-        sorter = new TableRowSorter<MechTableModel>(unitModel);
+        sorter = new TableRowSorter<>(unitModel);
         sorter.setComparator(MechTableModel.COL_COST, new FormattedNumberSorter());
         tableUnits.setRowSorter(sorter);
         tableUnits.getSelectionModel().addListSelectionListener(new javax.swing.event.ListSelectionListener() {

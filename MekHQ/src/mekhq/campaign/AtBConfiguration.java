@@ -92,7 +92,7 @@ public class AtBConfiguration implements Serializable {
 	private ResourceBundle defaultProperties;
 	
 	private AtBConfiguration() {
-		hiringHalls = new ArrayList<DatedRecord<String>>();
+		hiringHalls = new ArrayList<>();
 		dsTable = new WeightedTable<>();
 		jsTable = new WeightedTable<>();
 		defaultProperties = ResourceBundle.getBundle("mekhq.resources.AtBConfigDefaults");
@@ -477,7 +477,7 @@ public class AtBConfiguration implements Serializable {
 		                            "Error parsing date for hiring hall on " + wn2.getTextContent()); //$NON-NLS-1$
 		                    MekHQ.getLogger().error(getClass(), METHOD_NAME, ex);
 						}
-						hiringHalls.add(new DatedRecord<String>(start, end, wn2.getTextContent()));
+						hiringHalls.add(new DatedRecord<>(start, end, wn2.getTextContent()));
 						break;
 					}
 				}

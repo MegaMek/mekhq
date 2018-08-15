@@ -53,7 +53,7 @@ public class ForceStub implements Serializable {
     public static final String ICON_NONE = "None";
     private String iconCategory = ROOT_ICON;
     private String iconFileName = ICON_NONE;
-    private LinkedHashMap<String, Vector<String>> iconMap = new LinkedHashMap<String, Vector<String>>();
+    private LinkedHashMap<String, Vector<String>> iconMap = new LinkedHashMap<>();
 
     private String name;
     private Vector<ForceStub> subForces;
@@ -61,14 +61,14 @@ public class ForceStub implements Serializable {
     
     public ForceStub() {
         name = "";
-        subForces = new Vector<ForceStub>();
-        units = new Vector<UnitStub>();
+        subForces = new Vector<>();
+        units = new Vector<>();
     }
     
     public ForceStub(Force force, Campaign c) {
         name = force.getFullName();
-        subForces = new Vector<ForceStub>();
-        units = new Vector<UnitStub>();
+        subForces = new Vector<>();
+        units = new Vector<>();
         iconCategory = force.getIconCategory();
         iconFileName = force.getIconFileName();
         iconMap = force.getIconMap();
@@ -90,7 +90,7 @@ public class ForceStub implements Serializable {
     }
     
     public Vector<Object> getAllChildren() {
-        Vector<Object> children = new Vector<Object>();
+        Vector<Object> children = new Vector<>();
         children.addAll(subForces);
         children.addAll(units);
         
@@ -259,7 +259,7 @@ public class ForceStub implements Serializable {
     }
     
     private static Vector<String> processIconMapSubNodes(Node wn) {
-        Vector<String> values = new Vector<String>();
+        Vector<String> values = new Vector<>();
         NodeList nl = wn.getChildNodes();
         for (int x=0; x<nl.getLength(); x++) {
             Node wn2 = nl.item(x);

@@ -62,7 +62,7 @@ public class Transaction implements Serializable {
     public final static int C_NUM            = 16;
 
     public static Vector<String> getCategoryList() {
-        Vector<String> out = new Vector<String>();
+        Vector<String> out = new Vector<>();
 
         for (int i = 0; i < C_NUM; i++) {
             out.add(Transaction.getCategoryName(i));

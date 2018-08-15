@@ -139,7 +139,7 @@ public class AtBScenarioViewPanel extends JPanel {
         this.scenario = s;
         this.campaign = c;
         this.icons = ip;
-        botStubs = new ArrayList<BotForceStub>();
+        botStubs = new ArrayList<>();
 
         if(s.isCurrent()) {
             s.refresh(c);
@@ -671,7 +671,7 @@ public class AtBScenarioViewPanel extends JPanel {
     protected class StubTreeModel implements TreeModel {
 
         private ForceStub rootForce;
-        private Vector<TreeModelListener> listeners = new Vector<TreeModelListener>();
+        private Vector<TreeModelListener> listeners = new Vector<>();
 
         public StubTreeModel(ForceStub root) {
             rootForce = root;
@@ -838,7 +838,7 @@ public class AtBScenarioViewPanel extends JPanel {
     protected class EntityListModel implements TreeModel {
 
         private ArrayList<String> root;
-        private Vector<TreeModelListener> listeners = new Vector<TreeModelListener>();
+        private Vector<TreeModelListener> listeners = new Vector<>();
         private String name;
 
         public EntityListModel(ArrayList<String> root, String name) {

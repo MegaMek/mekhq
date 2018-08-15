@@ -43,7 +43,7 @@ import mekhq.campaign.mission.atb.scenario.StarLeagueCache1BuiltInScenario;
 import mekhq.campaign.mission.atb.scenario.StarLeagueCache2BuiltInScenario;
 
 public class AtBScenarioFactory {
-	private static Map<Integer, List<Class<IAtBScenario>>> scenarioMap = new HashMap<Integer, List<Class<IAtBScenario>>>();
+	private static Map<Integer, List<Class<IAtBScenario>>> scenarioMap = new HashMap<>();
 
 	static {
 		registerScenario(new AceDuelBuiltInScenario());
@@ -126,7 +126,7 @@ public class AtBScenarioFactory {
 		List<Class<IAtBScenario>> list = scenarioMap.get(type);
 
 		if (null == list) {
-			list = new ArrayList<Class<IAtBScenario>>();
+			list = new ArrayList<>();
 			scenarioMap.put(type, list);
 		}
 
@@ -144,9 +144,9 @@ public class AtBScenarioFactory {
 	public static void createScenariosForNewWeek(Campaign c, boolean allowLancesToBeDuplicated) {
 		Hashtable<Integer, Lance> lances = c.getLances();
 		
-		ArrayList<AtBScenario> sList = new ArrayList<AtBScenario>();
+		ArrayList<AtBScenario> sList = new ArrayList<>();
 		AtBScenario baseAttack = null;
-		Map<Integer, Integer> assignedLances = new HashMap<Integer, Integer>();
+		Map<Integer, Integer> assignedLances = new HashMap<>();
 		
 		if (!allowLancesToBeDuplicated) {
 			for (Mission m : c.getMissions()) {
@@ -203,7 +203,7 @@ public class AtBScenarioFactory {
 		 * that contract are cleared.
 		 */
 		if (null != baseAttack) {
-			ArrayList<Scenario> sameContract = new ArrayList<Scenario>();
+			ArrayList<Scenario> sameContract = new ArrayList<>();
 			for (AtBScenario s : sList) {
 				if (s != baseAttack && s.getMissionId() == baseAttack.getMissionId()) {
 					sameContract.add(s);
@@ -230,7 +230,7 @@ public class AtBScenarioFactory {
 					 * first to those assigned to the same contract,
 					 * then to those assigned to defense roles
 					 */
-					ArrayList<Lance> lList = new ArrayList<Lance>();
+					ArrayList<Lance> lList = new ArrayList<>();
     				for (Lance l : lances.values()) {
     					if (l.getMissionId() == m.getId()
     							&& l.getRole() == Lance.ROLE_DEFEND

@@ -28,8 +28,8 @@ import megamek.common.EquipmentType;
 import mekhq.campaign.universe.Planet;
 
 public class SocioIndustrialDataAdapter extends XmlAdapter<String, Planet.SocioIndustrialData> {
-    private final static Map<String, Integer> stringToEquipmentTypeMap = new HashMap<String, Integer>(6);
-    private final static Map<Integer, String> equipmentTypeToStringMap = new HashMap<Integer, String>(6);
+    private final static Map<String, Integer> stringToEquipmentTypeMap = new HashMap<>(6);
+    private final static Map<Integer, String> equipmentTypeToStringMap = new HashMap<>(6);
     static {
         stringToEquipmentTypeMap.put("A", EquipmentType.RATING_A); //$NON-NLS-1$
         stringToEquipmentTypeMap.put("B", EquipmentType.RATING_B); //$NON-NLS-1$

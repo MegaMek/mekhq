@@ -70,8 +70,8 @@ public class GamePreset implements MekHqXmlSerializable {
     	description = "Description missing";
     	options = null;
     	rskillPrefs = null;
-    	skillHash = new Hashtable<String, SkillType>();
-    	specialAbilities = new Hashtable<String, SpecialAbility>();
+    	skillHash = new Hashtable<>();
+    	specialAbilities = new Hashtable<>();
     }
 
     public GamePreset(String t, String d, CampaignOptions o, RandomSkillPreferences r, Hashtable<String, SkillType> sk, Hashtable<String, SpecialAbility> sp) {
@@ -252,7 +252,7 @@ public class GamePreset implements MekHqXmlSerializable {
 	 */
 	public static ArrayList<GamePreset> getGamePresetsIn(String directory) {
 
-		ArrayList<GamePreset> presets = new ArrayList<GamePreset>();
+		ArrayList<GamePreset> presets = new ArrayList<>();
 
 		File[] files = Utilities.getAllFiles(MekHQ.PRESET_DIR, new FilenameFilter() {
             public boolean accept(File dir, String name) {

@@ -180,11 +180,11 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 0);
         panSupplies.add(new JLabel(resourceMap.getString("lblPartsChoice.text")), gridBagConstraints);
 
-        DefaultComboBoxModel<String> partsGroupModel = new DefaultComboBoxModel<String>();
+        DefaultComboBoxModel<String> partsGroupModel = new DefaultComboBoxModel<>();
         for (int i = 0; i < SG_NUM; i++) {
             partsGroupModel.addElement(getPartsGroupName(i));
         }
-        choiceParts = new JComboBox<String>(partsGroupModel);
+        choiceParts = new JComboBox<>(partsGroupModel);
         choiceParts.setSelectedIndex(0);
         choiceParts.addActionListener(ev -> filterParts());
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -205,11 +205,11 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 0);
         panSupplies.add(new JLabel(resourceMap.getString("lblPartsChoiceView.text")), gridBagConstraints);
 
-        DefaultComboBoxModel<String> partsGroupViewModel = new DefaultComboBoxModel<String>();
+        DefaultComboBoxModel<String> partsGroupViewModel = new DefaultComboBoxModel<>();
         for (int i = 0; i < SV_NUM; i++) {
             partsGroupViewModel.addElement(getPartsGroupViewName(i));
         }
-        choicePartsView = new JComboBox<String>(partsGroupViewModel);
+        choicePartsView = new JComboBox<>(partsGroupViewModel);
         choicePartsView.setSelectedIndex(0);
         choicePartsView.addActionListener(ev -> filterParts());
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -224,7 +224,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
 
         partsModel = new PartsTableModel();
         partsTable = new JTable(partsModel);
-        partsSorter = new TableRowSorter<PartsTableModel>(partsModel);
+        partsSorter = new TableRowSorter<>(partsModel);
         partsSorter.setComparator(PartsTableModel.COL_COST, new FormattedNumberSorter());
         partsSorter.setComparator(PartsTableModel.COL_DETAIL, new PartsDetailSorter());
         partsTable.setRowSorter(partsSorter);
@@ -256,7 +256,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
 
         acquirePartsModel = new ProcurementTableModel(getCampaign());
         acquirePartsTable = new JTable(acquirePartsModel);
-        acquirePartsSorter = new TableRowSorter<ProcurementTableModel>(acquirePartsModel);
+        acquirePartsSorter = new TableRowSorter<>(acquirePartsModel);
         acquirePartsSorter.setComparator(ProcurementTableModel.COL_COST, new FormattedNumberSorter());
         acquirePartsSorter.setComparator(ProcurementTableModel.COL_TARGET, new TargetSorter());
         acquirePartsTable.setRowSorter(acquirePartsSorter);
@@ -397,10 +397,10 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         techTable.setRowHeight(60);
         techTable.getColumnModel().getColumn(0).setCellRenderer(techsModel.getRenderer(getIconPackage()));
         techTable.getSelectionModel().addListSelectionListener(ev -> updateTechTarget());
-        techSorter = new TableRowSorter<TechTableModel>(techsModel);
+        techSorter = new TableRowSorter<>(techsModel);
         techSorter.setComparator(0, new TechSorter());
         techTable.setRowSorter(techSorter);
-        ArrayList<RowSorter.SortKey> sortKeys = new ArrayList<RowSorter.SortKey>();
+        ArrayList<RowSorter.SortKey> sortKeys = new ArrayList<>();
         sortKeys.add(new RowSorter.SortKey(0, SortOrder.ASCENDING));
         techSorter.setSortKeys(sortKeys);
         JScrollPane scrollTechTable = new JScrollPane(techTable);

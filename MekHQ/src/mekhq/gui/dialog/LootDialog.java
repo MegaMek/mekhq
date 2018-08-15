@@ -72,8 +72,8 @@ public class LootDialog extends javax.swing.JDialog {
         this.loot = l;
         this.campaign = c;
         cancelled = true;
-        units = new ArrayList<Entity>();
-        parts = new ArrayList<Part>();
+        units = new ArrayList<>();
+        parts = new ArrayList<>();
         for(Entity e : l.getUnits()) {
             units.add(e);
         }
@@ -94,8 +94,8 @@ public class LootDialog extends javax.swing.JDialog {
         btnRemoveUnit = new JButton("Remove");
         btnAddPart = new JButton("Add");
         btnRemovePart = new JButton("Remove");
-        listUnits = new JList<String>(new DefaultListModel<String>());
-        listParts = new JList<String>(new DefaultListModel<String>());
+        listUnits = new JList<>(new DefaultListModel<String>());
+        listParts = new JList<>(new DefaultListModel<String>());
 
         //ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.KillDialog", new EncodeControl());
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);

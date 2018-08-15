@@ -130,10 +130,10 @@ public class NewAtBContractDialog extends NewContractDialog {
 		cbEnemy = new FactionComboBox();
         JLabel lblEnemy = new JLabel();
     	chkShowAllFactions = new JCheckBox();
-    	cbPlanets = new JComboBox<String>();
+    	cbPlanets = new JComboBox<>();
     	cbPlanets.setModel(new SortedComboBoxModel<String>());
     	chkShowAllPlanets = new JCheckBox();
-    	cbMissionType = new JComboBox<String>(AtBContract.missionTypeNames);
+    	cbMissionType = new JComboBox<>(AtBContract.missionTypeNames);
         JLabel lblType = new JLabel();
         btnOK = new javax.swing.JButton();
         btnClose = new javax.swing.JButton();
@@ -142,11 +142,11 @@ public class NewAtBContractDialog extends NewContractDialog {
         JLabel lblPlanetName = new JLabel();
         String[] skillNames = {"Green", "Regular", "Veteran", "Elite"};
         String[] ratingNames = {"F", "D", "C", "B", "A"};
-    	cbAllySkill = new JComboBox<String>(skillNames);
-    	cbAllyQuality = new JComboBox<String>(ratingNames);
+    	cbAllySkill = new JComboBox<>(skillNames);
+    	cbAllyQuality = new JComboBox<>(ratingNames);
         JLabel lblAllyRating = new JLabel();
-    	cbEnemySkill = new JComboBox<String>(skillNames);
-    	cbEnemyQuality = new JComboBox<String>(ratingNames);;
+    	cbEnemySkill = new JComboBox<>(skillNames);
+    	cbEnemyQuality = new JComboBox<>(ratingNames);;
         JLabel lblEnemyRating = new JLabel();
         JLabel lblShares = new JLabel();
         spnShares = new JSpinner(new SpinnerNumberModel(20, 20, 50, 10));
@@ -475,7 +475,7 @@ public class NewAtBContractDialog extends NewContractDialog {
 			return;
 		}
 		AtBContract contract = (AtBContract)this.contract;
-		HashSet<String> planets = new HashSet<String>();
+		HashSet<String> planets = new HashSet<>();
 		if (contract.getMissionType() >= AtBContract.MT_PLANETARYASSAULT ||
 				getCurrentEnemyCode().equals("REB") ||
 				getCurrentEnemyCode().equals("PIR")) {

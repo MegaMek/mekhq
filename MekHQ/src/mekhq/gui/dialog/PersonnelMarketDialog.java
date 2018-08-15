@@ -109,10 +109,10 @@ public class PersonnelMarketDialog extends JDialog {
         tablePersonnel = new javax.swing.JTable();
         panelMain = new javax.swing.JPanel();
         panelFilterBtns = new javax.swing.JPanel();
-        comboPersonType = new javax.swing.JComboBox<String>();
+        comboPersonType = new javax.swing.JComboBox<>();
         radioNormalRoll = new javax.swing.JRadioButton();
         radioPaidRecruitment = new javax.swing.JRadioButton();
-        comboRecruitType = new javax.swing.JComboBox<String>();
+        comboRecruitType = new javax.swing.JComboBox<>();
         lblUnitCost = new javax.swing.JLabel();
         panelOKBtns = new javax.swing.JPanel();
         btnHire = new javax.swing.JButton();
@@ -139,7 +139,7 @@ public class PersonnelMarketDialog extends JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         panelFilterBtns.add(lblPersonChoice, gridBagConstraints);
 
-        DefaultComboBoxModel<String> personTypeModel = new DefaultComboBoxModel<String>();
+        DefaultComboBoxModel<String> personTypeModel = new DefaultComboBoxModel<>();
         for (int i = 0; i < PersonnelTab.PG_RETIRE; i++) {
         	personTypeModel.addElement(getPersonnelGroupName(i));
         }
@@ -219,11 +219,11 @@ public class PersonnelMarketDialog extends JDialog {
         tablePersonnel.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         tablePersonnel.setColumnModel(new XTableColumnModel());
         tablePersonnel.createDefaultColumnsFromModel();
-        sorter = new TableRowSorter<PersonnelTableModel>(personnelModel);
+        sorter = new TableRowSorter<>(personnelModel);
         sorter.setComparator(PersonnelTableModel.COL_SKILL, new LevelSorter());
         sorter.setComparator(PersonnelTableModel.COL_SALARY, new FormattedNumberSorter());
         tablePersonnel.setRowSorter(sorter);
-        sortKeys = new ArrayList<RowSorter.SortKey>();
+        sortKeys = new ArrayList<>();
         sortKeys.add(new RowSorter.SortKey(PersonnelTableModel.COL_SKILL, SortOrder.DESCENDING));
         sorter.setSortKeys(sortKeys);
         tablePersonnel.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);

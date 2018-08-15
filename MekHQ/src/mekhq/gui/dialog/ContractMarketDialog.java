@@ -121,7 +121,7 @@ public class ContractMarketDialog extends JDialog {
 		super(frame, true);
 		campaign = c;
 		contractMarket = c.getContractMarket();
-		possibleRetainerContracts = new ArrayList<String>();
+		possibleRetainerContracts = new ArrayList<>();
 		if (c.getFactionCode().equals("MERC")) {
 			countSuccessfulContracts();
 		}
@@ -134,7 +134,7 @@ public class ContractMarketDialog extends JDialog {
 	 * employer results in the offer of a retainer contract.
 	 */
 	private void countSuccessfulContracts() {
-		HashMap<String, Integer> successfulContracts = new HashMap<String, Integer>();
+		HashMap<String, Integer> successfulContracts = new HashMap<>();
 		for (Mission m : campaign.getMissions()) {
 			if (m.isActive() || !(m instanceof AtBContract) ||
 					((AtBContract)m).getEmployerCode().equals(campaign.getRetainerEmployerCode())) {
@@ -267,8 +267,8 @@ public class ContractMarketDialog extends JDialog {
 			panelFees.add(spnSharePct);
 		}
 
-		Vector<Vector<String>> data = new Vector<Vector<String>>();
-		Vector<String> colNames = new Vector<String>();
+		Vector<Vector<String>> data = new Vector<>();
+		Vector<String> colNames = new Vector<>();
 		for (Contract c : contractMarket.getContracts()) {
 			/* Changes in rating or force size since creation can alter some
 			 * details
@@ -286,7 +286,7 @@ public class ContractMarketDialog extends JDialog {
 			c.setSigningBonusPct(signingBonus);
 			
 			c.calculateContract(campaign);
-			Vector<String> row = new Vector<String>();
+			Vector<String> row = new Vector<>();
 			if (c instanceof AtBContract) {
 				row.add(((AtBContract)c).getEmployerName(campaign.getGameYear()));
 				row.add(((AtBContract)c).getEnemyName(campaign.getGameYear()));
@@ -428,7 +428,7 @@ public class ContractMarketDialog extends JDialog {
         		c.setSigningBonusPct(signingBonus);
 
         		c.calculateContract(campaign);
-        		Vector<String> row = new Vector<String>();
+        		Vector<String> row = new Vector<>();
         		row.add(((AtBContract)c).getEmployerName(campaign.getGameYear()));
         		row.add(((AtBContract)c).getEnemyName(campaign.getGameYear()));
         		row.add(((AtBContract)c).getMissionTypeName());

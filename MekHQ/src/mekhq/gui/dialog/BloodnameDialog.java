@@ -132,21 +132,21 @@ public class BloodnameDialog extends JDialog {
 		gbc.insets = new Insets(5, 5, 5, 5);
 		gbc.anchor = GridBagConstraints.NORTHWEST;
 		
-		cbClan = new JComboBox<String>(fullNames);
+		cbClan = new JComboBox<>(fullNames);
 		gbc.gridx = 0;
 		gbc.gridy = 0;
 		gbc.gridwidth = 2;
 		add(cbClan, gbc);
 		cbClan.addActionListener(validateActionListener);
 		
-		cbEra = new JComboBox<Integer>(eras);
+		cbEra = new JComboBox<>(eras);
 		gbc.gridx = 0;
 		gbc.gridy = 1;
 		gbc.gridwidth = 2;
 		add(cbEra, gbc);
 		cbEra.addActionListener(validateActionListener);
 		
-		cbPhenotype = new JComboBox<String>();
+		cbPhenotype = new JComboBox<>();
 		cbPhenotype.addItem("None");
 		for (int i = 1; i < Bloodname.phenotypeNames.length; i++) {
 			cbPhenotype.addItem(Bloodname.phenotypeNames[i]);

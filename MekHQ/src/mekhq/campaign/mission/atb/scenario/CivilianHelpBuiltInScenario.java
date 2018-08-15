@@ -52,7 +52,7 @@ public class CivilianHelpBuiltInScenario extends AtBScenario {
 		}
 
 		for (int weight = EntityWeightClass.WEIGHT_LIGHT; weight <= EntityWeightClass.WEIGHT_ASSAULT; weight++) {
-			enemyEntities = new ArrayList<Entity>();
+			enemyEntities = new ArrayList<>();
 			for (int i = 0; i < 3; i++)
 				enemyEntities.add(getEntity(getContract(campaign).getEnemyCode(), getContract(campaign).getEnemySkill(),
 						getContract(campaign).getEnemyQuality(), UnitType.MEK, weight, campaign));
@@ -61,7 +61,7 @@ public class CivilianHelpBuiltInScenario extends AtBScenario {
 
 		addBotForce(getEnemyBotForce(getContract(campaign), enemyStart, getSpecMissionEnemies().get(0)));
 
-		ArrayList<Entity> otherForce = new ArrayList<Entity>();
+		ArrayList<Entity> otherForce = new ArrayList<>();
 		addCivilianUnits(otherForce, 4, campaign);
 
 		for (Entity e : otherForce) {

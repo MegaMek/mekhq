@@ -106,7 +106,7 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
         	date = campaign.getCalendar().getTime();
         }
         dateFormatter = new SimpleDateFormat("MM/dd/yyyy");
-        loots = new ArrayList<Loot>();
+        loots = new ArrayList<>();
         for(Loot loot : scenario.getLoot()) {
             loots.add((Loot)loot.clone());
         }
@@ -126,7 +126,7 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
         btnClose = new javax.swing.JButton();
         scrDesc = new javax.swing.JScrollPane();
         scrReport = new javax.swing.JScrollPane();
-        choiceStatus = new javax.swing.JComboBox<String>();
+        choiceStatus = new javax.swing.JComboBox<>();
         lblStatus = new javax.swing.JLabel();  
         panMain = new javax.swing.JPanel();
         panBtn = new javax.swing.JPanel();
@@ -169,7 +169,7 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
 	        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
 	        panMain.add(lblStatus, gridBagConstraints);
 	        
-	        DefaultComboBoxModel<String> statusModel = new DefaultComboBoxModel<String>();
+	        DefaultComboBoxModel<String> statusModel = new DefaultComboBoxModel<>();
 			for (int i = 1; i < Scenario.S_NUM; i++) {
 				statusModel.addElement(Scenario.getStatusName(i));
 			}

@@ -84,7 +84,7 @@ public class CivilianRiotBuiltInScenario extends AtBScenario {
                     campaign));
         }
 
-        ArrayList<Entity>otherForce = new ArrayList<Entity>();
+        ArrayList<Entity>otherForce = new ArrayList<>();
         addCivilianUnits(otherForce, 8, campaign);
         
         for (Entity e : otherForce) {
@@ -93,7 +93,7 @@ public class CivilianRiotBuiltInScenario extends AtBScenario {
         
         addBotForce(new BotForce("Loyalists", 1, Board.START_CENTER, otherForce));
 
-        otherForce = new ArrayList<Entity>();
+        otherForce = new ArrayList<>();
         addCivilianUnits(otherForce, 12, campaign);
         addBotForce(new BotForce("Rioters", 2, Board.START_CENTER, otherForce));
 

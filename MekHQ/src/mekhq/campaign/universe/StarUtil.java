@@ -203,7 +203,7 @@ public final class StarUtil {
     private static final double[] RECHARGE_HOURS_CLASS_T = {
             7973.0, 13371.0, 21315.0, 35876.0, 70424.0, 134352.0, 215620.0, 32188.0, 569703.0, 892922.0, 10000000.0};
     
-    private static final Set<String> VALID_WHITE_DWARF_SUBCLASSES = new TreeSet<String>();
+    private static final Set<String> VALID_WHITE_DWARF_SUBCLASSES = new TreeSet<>();
     static {
         VALID_WHITE_DWARF_SUBCLASSES.addAll(Arrays.asList("", //$NON-NLS-1$
             "A,B,O,Q,Z,AB,AO,AQ,AZ,BO,BQ,BZ,QZ,ABO,ABQ,ABZ,AOQ,AOZ,AQZ,BOQ," //$NON-NLS-1$

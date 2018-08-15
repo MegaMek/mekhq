@@ -269,7 +269,7 @@ public class SkillType implements Serializable {
     }
     
     public static void initializeTypes() {
-        lookupHash = new Hashtable<String, SkillType>();
+        lookupHash = new Hashtable<>();
         lookupHash.put(S_PILOT_MECH, createPilotingMech());
         lookupHash.put(S_GUN_MECH, createGunneryMech());
         lookupHash.put(S_PILOT_AERO, createPilotingAero());

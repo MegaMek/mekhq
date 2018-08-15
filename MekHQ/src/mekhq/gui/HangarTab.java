@@ -140,12 +140,12 @@ public final class HangarTab extends CampaignGuiTab {
         add(new JLabel(resourceMap.getString("lblUnitChoice.text")), //$NON-NLS-1$ ;
                 gridBagConstraints);
 
-        DefaultComboBoxModel<String> unitGroupModel = new DefaultComboBoxModel<String>();
+        DefaultComboBoxModel<String> unitGroupModel = new DefaultComboBoxModel<>();
         unitGroupModel.addElement("All Units");
         for (int i = 0; i < UnitType.SIZE; i++) {
             unitGroupModel.addElement(UnitType.getTypeDisplayableName(i));
         }
-        choiceUnit = new JComboBox<String>(unitGroupModel);
+        choiceUnit = new JComboBox<>(unitGroupModel);
         choiceUnit.setSelectedIndex(0);
         choiceUnit.addActionListener(ev -> filterUnits());
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -165,11 +165,11 @@ public final class HangarTab extends CampaignGuiTab {
         add(new JLabel(resourceMap.getString("lblUnitView.text")), //$NON-NLS-1$ ;
                 gridBagConstraints);
 
-        DefaultComboBoxModel<String> unitViewModel = new DefaultComboBoxModel<String>();
+        DefaultComboBoxModel<String> unitViewModel = new DefaultComboBoxModel<>();
         for (int i = 0; i < UV_NUM; i++) {
             unitViewModel.addElement(getUnitViewName(i));
         }
-        choiceUnitView = new JComboBox<String>(unitViewModel);
+        choiceUnitView = new JComboBox<>(unitViewModel);
         choiceUnitView.setSelectedIndex(UV_GENERAL);
         choiceUnitView.addActionListener(ev -> changeUnitView());
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -187,13 +187,13 @@ public final class HangarTab extends CampaignGuiTab {
         XTableColumnModel unitColumnModel = new XTableColumnModel();
         unitTable.setColumnModel(unitColumnModel);
         unitTable.createDefaultColumnsFromModel();
-        unitSorter = new TableRowSorter<UnitTableModel>(unitModel);
+        unitSorter = new TableRowSorter<>(unitModel);
         unitSorter.setComparator(UnitTableModel.COL_STATUS, new UnitStatusSorter());
         unitSorter.setComparator(UnitTableModel.COL_TYPE, new UnitTypeSorter());
         unitSorter.setComparator(UnitTableModel.COL_WCLASS, new WeightClassSorter());
         unitSorter.setComparator(UnitTableModel.COL_COST, new FormattedNumberSorter());
         unitTable.setRowSorter(unitSorter);
-        ArrayList<RowSorter.SortKey> sortKeys = new ArrayList<RowSorter.SortKey>();
+        ArrayList<RowSorter.SortKey> sortKeys = new ArrayList<>();
         sortKeys.add(new RowSorter.SortKey(UnitTableModel.COL_TYPE, SortOrder.DESCENDING));
         sortKeys.add(new RowSorter.SortKey(UnitTableModel.COL_WCLASS, SortOrder.DESCENDING));
         unitSorter.setSortKeys(sortKeys);
@@ -229,7 +229,7 @@ public final class HangarTab extends CampaignGuiTab {
 
         acquireUnitsModel = new ProcurementTableModel(getCampaign());
         acquireUnitsTable = new JTable(acquireUnitsModel);
-        TableRowSorter<ProcurementTableModel> acquireUnitsSorter = new TableRowSorter<ProcurementTableModel>(
+        TableRowSorter<ProcurementTableModel> acquireUnitsSorter = new TableRowSorter<>(
                 acquireUnitsModel);
         acquireUnitsSorter.setComparator(ProcurementTableModel.COL_COST, new FormattedNumberSorter());
         acquireUnitsSorter.setComparator(ProcurementTableModel.COL_TARGET, new TargetSorter());

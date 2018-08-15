@@ -186,7 +186,7 @@ public class NewContractDialog extends javax.swing.JDialog {
         JLabel lblName = new JLabel();
         txtEmployer = new javax.swing.JTextField();
         JLabel lblEmployer = new JLabel();
-        cboNegotiator = new JComboBox<Person>();
+        cboNegotiator = new JComboBox<>();
         txtType = new javax.swing.JTextField();
         JLabel lblType = new JLabel();
         btnOK = new javax.swing.JButton();
@@ -645,20 +645,20 @@ public class NewContractDialog extends javax.swing.JDialog {
         spnMultiplier = new JSpinner(new SpinnerNumberModel(contract.getMultiplier(), 0.5, 10.0, 0.1));
         spnMultiplier.addChangeListener(contractUpdateChangeListener);
         
-        DefaultComboBoxModel<String> overheadModel = new DefaultComboBoxModel<String>();
+        DefaultComboBoxModel<String> overheadModel = new DefaultComboBoxModel<>();
 		for (int i = 0; i < Contract.OH_NUM; i++) {
 			overheadModel.addElement(Contract.getOverheadCompName(i));
 		}
-		choiceOverhead = new JComboBox<String>(overheadModel);
+		choiceOverhead = new JComboBox<>(overheadModel);
 		choiceOverhead.setSelectedIndex(contract.getOverheadComp());
         choiceOverhead.addActionListener(contractUpdateActionListener);
         choiceOverhead.addFocusListener(contractUpdateFocusListener);
         
-        DefaultComboBoxModel<String> commandModel = new DefaultComboBoxModel<String>();
+        DefaultComboBoxModel<String> commandModel = new DefaultComboBoxModel<>();
 		for (int i = 0; i < Contract.COM_NUM; i++) {
 			commandModel.addElement(Contract.getCommandRightsName(i));
 		}
-		choiceCommand = new JComboBox<String>(commandModel);
+		choiceCommand = new JComboBox<>(commandModel);
 		choiceCommand.setSelectedIndex(contract.getCommandRights());
 		choiceCommand.addActionListener(contractUpdateActionListener);
 		

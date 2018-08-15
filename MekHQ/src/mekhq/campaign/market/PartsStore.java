@@ -109,8 +109,8 @@ public class PartsStore implements Serializable {
 	private Map<String, Part> nameAndDetailMap;
 
 	public PartsStore(Campaign c) {
-		parts = new ArrayList<Part>(EXPECTED_SIZE);
-		nameAndDetailMap = new HashMap<String, Part>(EXPECTED_SIZE);
+		parts = new ArrayList<>(EXPECTED_SIZE);
+		nameAndDetailMap = new HashMap<>(EXPECTED_SIZE);
 		stock(c);
 	}
 

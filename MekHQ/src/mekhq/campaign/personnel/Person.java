@@ -317,7 +317,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     /**
      * * Start Advanced Medical ***
      */
-    private ArrayList<Injury> injuries = new ArrayList<Injury>();
+    private ArrayList<Injury> injuries = new ArrayList<>();
     private Map<BodyLocation, Integer> hitsPerLocation = new EnumMap<>(BodyLocation.class);
     /**
      * * End Advanced Medical ***
@@ -380,7 +380,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         rankLevel = 0;
         status = S_ACTIVE;
         hits = 0;
-        skills = new Hashtable<String, Skill>();
+        skills = new Hashtable<>();
         salary = -1;
         campaign = c;
         doctorId = null;
@@ -390,8 +390,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
         toughness = 0;
         biography = "";
         nTasks = 0;
-        personnelLog = new ArrayList<LogEntry>();
-        awards = new ArrayList<Award>();
+        personnelLog = new ArrayList<>();
+        awards = new ArrayList<>();
         idleMonths = -1;
         daysToWaitForHealing = 15;
         resetMinutesLeft();
@@ -399,7 +399,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         dependent = false;
         commander = false;
         isClanTech = false;
-        techUnitIds = new ArrayList<UUID>();
+        techUnitIds = new ArrayList<>();
         salary = -1;
         phenotype = PHENOTYPE_NONE;
         clan = Faction.getFaction(factionCode).isClan();
@@ -2705,7 +2705,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public ArrayList<SpecialAbility> getEligibleSPAs(boolean generation) {
-        ArrayList<SpecialAbility> eligible = new ArrayList<SpecialAbility>();
+        ArrayList<SpecialAbility> eligible = new ArrayList<>();
         for (Enumeration<IOption> i = getOptions(PilotOptions.LVL3_ADVANTAGES); i.hasMoreElements(); ) {
             IOption ability = i.nextElement();
             if (!ability.booleanValue()) {
@@ -2889,7 +2889,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     public void acquireAbility(String type, String name, Object value) {
         //we might also need to remove some prior abilities
         SpecialAbility spa = SpecialAbility.getAbility(name);
-        Vector<String> toRemove = new Vector<String>();
+        Vector<String> toRemove = new Vector<>();
         if(null != spa) {
             toRemove = spa.getRemovedAbilities();
         }

@@ -182,8 +182,8 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
         
         gbc.gridx = 1;
 
-        JList<Person> techList = new JList<Person>();
-        DefaultListModel<Person> listModel = new DefaultListModel<Person>();
+        JList<Person> techList = new JList<>();
+        DefaultListModel<Person> listModel = new DefaultListModel<>();
         
         for(Person tech : campaign.getTechs()) {
             if(tech.canTech(unitsByType.get(unitType).get(0).getEntity())) {

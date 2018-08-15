@@ -53,7 +53,7 @@ public class QuirksDialog extends JDialog implements DialogOptionListener, Actio
      */
     private static final long serialVersionUID = -5030866602278329622L;
     private QuirksPanel qpanel;
-    private HashMap<Integer, WeaponQuirks> h_wpnQuirks = new HashMap<Integer, WeaponQuirks>();
+    private HashMap<Integer, WeaponQuirks> h_wpnQuirks = new HashMap<>();
     private Entity entity;
 
     private JButton okayButton;

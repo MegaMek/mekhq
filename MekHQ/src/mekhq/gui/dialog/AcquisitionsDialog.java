@@ -51,7 +51,7 @@ public class AcquisitionsDialog extends JDialog {
     private static final long serialVersionUID = -1942823778220741544L;
 
     private CampaignGUI campaignGUI;
-    private Map<String, AcquisitionPanel> partPanelMap = new HashMap<String, AcquisitionPanel>();
+    private Map<String, AcquisitionPanel> partPanelMap = new HashMap<>();
 
     private JPanel pnlSummary;
     private JLabel lblSummary;
@@ -472,7 +472,7 @@ public class AcquisitionsDialog extends JDialog {
             gbcMain.gridwidth = 3;
             gbcMain.insets = insetsOriginal;
 
-            Map<Unit, Integer> unitMap = new HashMap<Unit, Integer>();
+            Map<Unit, Integer> unitMap = new HashMap<>();
 
             for (IAcquisitionWork awUnit : awList) {
                 if (!unitMap.containsKey(awUnit.getUnit())) {

@@ -73,7 +73,7 @@ public class CamoChoiceDialog extends javax.swing.JDialog {
 
         scrCamo = new javax.swing.JScrollPane();
         tableCamo = new javax.swing.JTable();
-        comboCategories = new javax.swing.JComboBox<String>();
+        comboCategories = new javax.swing.JComboBox<>();
         btnSelect = new javax.swing.JButton();
         btnCancel = new javax.swing.JButton();
 
@@ -104,7 +104,7 @@ public class CamoChoiceDialog extends javax.swing.JDialog {
         gridBagConstraints.weighty = 1.0;
         getContentPane().add(scrCamo, gridBagConstraints);
 
-        DefaultComboBoxModel<String> categoryModel = new DefaultComboBoxModel<String>();
+        DefaultComboBoxModel<String> categoryModel = new DefaultComboBoxModel<>();
         categoryModel.addElement(Player.NO_CAMO);
         String match = null;
         if (camos != null) {
@@ -252,8 +252,8 @@ public class CamoChoiceDialog extends javax.swing.JDialog {
         public CamoTableModel() {
             columnNames = new String[] {"Camos"};
             category = Player.NO_CAMO;
-            names = new ArrayList<String>();
-            images = new ArrayList<Image>();
+            names = new ArrayList<>();
+            images = new ArrayList<>();
         }
 
         public int getRowCount() {
@@ -266,8 +266,8 @@ public class CamoChoiceDialog extends javax.swing.JDialog {
 
         public void reset() {
             category = Player.NO_CAMO;
-            names = new ArrayList<String>();
-            images = new ArrayList<Image>();
+            names = new ArrayList<>();
+            images = new ArrayList<>();
         }
 
         @Override

@@ -551,9 +551,9 @@ public class Planets {
         int unmatchedPlanets = 0;
         
         // this is pretty inefficient but it's not a frequent operation.
-        List<Planet> unmatchedCSVPlanets = new ArrayList<Planet>();
+        List<Planet> unmatchedCSVPlanets = new ArrayList<>();
         
-        Map<String, Planet> unmatchedXMLPlanets = new HashMap<String, Planet>();
+        Map<String, Planet> unmatchedXMLPlanets = new HashMap<>();
         for(String key : planetList.keySet()) {
             if(!key.startsWith("NP") &&
                     !key.startsWith("HL") &&
@@ -770,12 +770,12 @@ public class Planets {
         
         @SuppressWarnings("unused")
         private void afterUnmarshal(Unmarshaller unmarshaller, Object parent) {
-            toDelete = new ArrayList<String>();
+            toDelete = new ArrayList<>();
             if( null == list ) {
-                list = new ArrayList<Planet>();
+                list = new ArrayList<>();
             } else {
                 // Fill in the "toDelete" list
-                List<Planet> filteredList = new ArrayList<Planet>(list.size());
+                List<Planet> filteredList = new ArrayList<>(list.size());
                 for( Planet planet : list ) {
                     if( null != planet.delete && planet.delete && null != planet.getId() ) {
                         toDelete.add(planet.getId());

@@ -66,8 +66,8 @@ public class SelectAbilitiesDialog extends JDialog {
         btnOK = new javax.swing.JButton();
         btnClose = new javax.swing.JButton();
     
-        chkAbil = new ArrayList<JCheckBox>();
-        spaNames = new ArrayList<String>();
+        chkAbil = new ArrayList<>();
+        spaNames = new ArrayList<>();
         
         for(String name: allSPA.keySet()) {
         	spaNames.add(name);
@@ -115,7 +115,7 @@ public class SelectAbilitiesDialog extends JDialog {
     }
     
     private void done() {
-    	selected = new Vector<String>();
+    	selected = new Vector<>();
     	for(int i = 0; i < spaNames.size(); i++) {
     		if(chkAbil.get(i).isSelected()) {
     			selected.add(spaNames.get(i));

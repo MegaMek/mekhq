@@ -75,7 +75,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
 
     private static final ArrayList<String> monthNames;
     static {
-        monthNames = new ArrayList<String>(12);
+        monthNames = new ArrayList<>(12);
         monthNames.add("January");
         monthNames.add("February");
         monthNames.add("March");

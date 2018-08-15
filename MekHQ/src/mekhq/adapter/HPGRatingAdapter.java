@@ -27,8 +27,8 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
 import megamek.common.EquipmentType;
 
 public class HPGRatingAdapter extends XmlAdapter<String, Integer> {
-    private final static Map<String, Integer> stringToEquipmentTypeMap = new HashMap<String, Integer>(6);
-    private final static Map<Integer, String> equipmentTypeToStringMap = new HashMap<Integer, String>(6);
+    private final static Map<String, Integer> stringToEquipmentTypeMap = new HashMap<>(6);
+    private final static Map<Integer, String> equipmentTypeToStringMap = new HashMap<>(6);
     static {
         stringToEquipmentTypeMap.put("A", EquipmentType.RATING_A); //$NON-NLS-1$
         stringToEquipmentTypeMap.put("B", EquipmentType.RATING_B); //$NON-NLS-1$

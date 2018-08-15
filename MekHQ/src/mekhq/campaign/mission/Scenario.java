@@ -86,9 +86,9 @@ public class Scenario implements Serializable {
         this.report = "";
         this.status = S_CURRENT;
         this.date = null;
-        this.subForceIds = new ArrayList<Integer>();
-        this.unitIds = new ArrayList<UUID>();
-        this.loots = new ArrayList<Loot>();
+        this.subForceIds = new ArrayList<>();
+        this.unitIds = new ArrayList<>();
+        this.loots = new ArrayList<>();
     }
     
     public static String getStatusName(int s) {
@@ -206,7 +206,7 @@ public class Scenario implements Serializable {
     
     public void removeForce(int fid) {
         //int idx = -1;
-        ArrayList<Integer> toRemove = new ArrayList<Integer>();
+        ArrayList<Integer> toRemove = new ArrayList<>();
         for(int i = 0; i < subForceIds.size(); i++) {
             if(fid == subForceIds.get(i)) {
                 //idx = i;
@@ -239,8 +239,8 @@ public class Scenario implements Serializable {
                 MekHQ.triggerEvent(new DeploymentChangedEvent(u, this));
             }
         }
-        subForceIds = new ArrayList<Integer>();
-        unitIds = new ArrayList<UUID>();
+        subForceIds = new ArrayList<>();
+        unitIds = new ArrayList<>();
     }
     
     public void generateStub(Campaign c) {
@@ -425,7 +425,7 @@ public class Scenario implements Serializable {
     }
     
     public void resetLoot() {
-        loots = new ArrayList<Loot>();
+        loots = new ArrayList<>();
     }
     
 }

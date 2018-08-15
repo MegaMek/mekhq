@@ -155,7 +155,7 @@ public class UnitTechProgression {
         // Load all the Entities in the MechSummaryCache and calculate the tech level for the given faction.
         @Override
         public Map<MechSummary, ITechnology> call() throws Exception {
-            Map<MechSummary,ITechnology> map = new HashMap<MechSummary,ITechnology>();
+            Map<MechSummary,ITechnology> map = new HashMap<>();
             for (MechSummary ms : MechSummaryCache.getInstance().getAllMechs()) {
                 map.put(ms, calcTechProgression(ms, techFaction));
             }

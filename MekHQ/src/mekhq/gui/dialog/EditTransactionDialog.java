@@ -134,7 +134,7 @@ public class EditTransactionDialog extends JDialog implements ActionListener, Fo
         panel.add(dateButton);
 
         c.gridx++;
-        categoryCombo = new JComboBox<String>(Transaction.getCategoryList());
+        categoryCombo = new JComboBox<>(Transaction.getCategoryList());
         categoryCombo.setSelectedItem(Transaction.getCategoryName(newTransaction.getCategory()));
         categoryCombo.setToolTipText("Category of the transaction");
         categoryCombo.setName("categoryCombo");

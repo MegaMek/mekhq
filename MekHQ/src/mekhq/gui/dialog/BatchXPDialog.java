@@ -88,7 +88,7 @@ public final class BatchXPDialog extends JDialog {
         this.campaign = Objects.requireNonNull(campaign);
         this.personnelModel = new PersonnelTableModel(campaign);
         personnelModel.refreshData();
-        personnelSorter = new TableRowSorter<PersonnelTableModel>(personnelModel);
+        personnelSorter = new TableRowSorter<>(personnelModel);
         personnelSorter.setSortsOnUpdates(true);
         personnelSorter.setComparator(PersonnelTableModel.COL_RANK, new RankSorter(campaign));
         personnelSorter.setComparator(PersonnelTableModel.COL_AGE, new FormattedNumberSorter());
@@ -138,7 +138,7 @@ public final class BatchXPDialog extends JDialog {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
-        choiceType = new JComboBox<PersonTypeItem>();
+        choiceType = new JComboBox<>();
         choiceType.setMaximumSize(new Dimension(Short.MAX_VALUE, (int) choiceType.getPreferredSize().getHeight()));
         DefaultComboBoxModel<PersonTypeItem> personTypeModel = new DefaultComboBoxModel<>();
         personTypeModel.addElement(new PersonTypeItem(resourceMap.getString("primaryRole.choice.text"), null)); //$NON-NLS-1$
@@ -155,7 +155,7 @@ public final class BatchXPDialog extends JDialog {
         });
         panel.add(choiceType);
         
-        choiceExp = new JComboBox<PersonTypeItem>();
+        choiceExp = new JComboBox<>();
         choiceExp.setMaximumSize(new Dimension(Short.MAX_VALUE, (int) choiceType.getPreferredSize().getHeight()));
         DefaultComboBoxModel<PersonTypeItem> personExpModel = new DefaultComboBoxModel<>();
         personExpModel.addElement(new PersonTypeItem(resourceMap.getString("experience.choice.text"), null)); //$NON-NLS-1$
@@ -170,7 +170,7 @@ public final class BatchXPDialog extends JDialog {
         });
         panel.add(choiceExp);
         
-        choiceSkill = new JComboBox<String>();
+        choiceSkill = new JComboBox<>();
         choiceSkill.setMaximumSize(new Dimension(Short.MAX_VALUE, (int) choiceSkill.getPreferredSize().getHeight()));
         DefaultComboBoxModel<String> personSkillModel = new DefaultComboBoxModel<>();
         personSkillModel.addElement(choiceNoSkill);

@@ -122,7 +122,7 @@ public class Utilities {
     private static String[] romanNumerals = "M,CM,D,CD,C,XC,L,XL,X,IX,V,IV,I".split(","); //$NON-NLS-1$ //$NON-NLS-2$
 
     public static int roll3d6() {
-        Vector<Integer> rolls = new Vector<Integer>();
+        Vector<Integer> rolls = new Vector<>();
         rolls.add(Compute.d6());
         rolls.add(Compute.d6());
         rolls.add(Compute.d6());
@@ -278,7 +278,7 @@ public class Utilities {
     }
 
     public static ArrayList<AmmoType> getMunitionsFor(Entity entity, AmmoType cur_atype, int techLvl) {
-        ArrayList<AmmoType> atypes = new ArrayList<AmmoType>();
+        ArrayList<AmmoType> atypes = new ArrayList<>();
         for(AmmoType atype : AmmoType.getMunitionsFor(cur_atype.getAmmoType())) {
             //this is an abbreviated version of setupMunitions in the CustomMechDialog
             //TODO: clan/IS limitations?
@@ -393,7 +393,7 @@ public class Utilities {
     public static ArrayList<String> getAllVariants(Entity en, Campaign campaign) {
         final String METHOD_NAME = "getAllVariants(Entity, Campaign)"; // $NON-NLS-1$
         CampaignOptions options = campaign.getCampaignOptions();
-        ArrayList<String> variants = new ArrayList<String>();
+        ArrayList<String> variants = new ArrayList<>();
         for(MechSummary summary : MechSummaryCache.getInstance().getAllMechs()) {
             // If this isn't the same chassis, is our current unit, or is a different weight we continue
             if(!en.getChassis().equalsIgnoreCase(summary.getChassis())
@@ -618,9 +618,9 @@ public class Utilities {
         String commanderName = oldCrew.getName();
         int averageGunnery = 0;
         int averagePiloting = 0;
-        List<Person> drivers = new ArrayList<Person>();
-        List<Person> gunners = new ArrayList<Person>();
-        List<Person> vesselCrew = new ArrayList<Person>();
+        List<Person> drivers = new ArrayList<>();
+        List<Person> gunners = new ArrayList<>();
+        List<Person> vesselCrew = new ArrayList<>();
         Person navigator = null;
         Person consoleCmdr = null;
         int totalGunnery = 0;
@@ -1091,7 +1091,7 @@ public class Utilities {
             assignTroopersAndEquipmentNums(unit);
             return;
         }
-        List<Integer> equipNums = new ArrayList<Integer>();
+        List<Integer> equipNums = new ArrayList<>();
         for(Mounted m : unit.getEntity().getEquipment()) {
             equipNums.add(unit.getEntity().getEquipmentNum(m));
         }
@@ -1370,7 +1370,7 @@ public class Utilities {
 
     public static Vector<String> splitString(String str, String sep) {
         StringTokenizer st = new StringTokenizer(str, sep);
-        Vector<String> output = new Vector<String>();
+        Vector<String> output = new Vector<>();
         while(st.hasMoreTokens()) {
             output.add(st.nextToken());
         }
@@ -1465,7 +1465,7 @@ public class Utilities {
 
         // Convert Map to List
         List<Map.Entry<String, Integer>> list =
-            new LinkedList<Map.Entry<String, Integer>>(unsortMap.entrySet());
+            new LinkedList<>(unsortMap.entrySet());
 
         // Sort list with comparator, to compare the Map values
         Collections.sort(list, new Comparator<Map.Entry<String, Integer>>() {
@@ -1477,7 +1477,7 @@ public class Utilities {
         });
 
         // Convert sorted map back to a Map
-        Map<String, Integer> sortedMap = new LinkedHashMap<String, Integer>();
+        Map<String, Integer> sortedMap = new LinkedHashMap<>();
         if(highFirst) {
             ListIterator<Map.Entry<String, Integer>> li = list.listIterator(list.size());
             while(li.hasPrevious()) {

@@ -64,7 +64,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
         AmmoType.T_LRM_TORPEDO_COMBO, AmmoType.T_SRM, AmmoType.T_SRM_ADVANCED, AmmoType.T_SRM_PRIMITIVE, AmmoType.T_SRM_STREAK, AmmoType.T_SRM_TORPEDO,
         AmmoType.T_MRM, AmmoType.T_MRM_STREAK, AmmoType.T_ROCKET_LAUNCHER, AmmoType.T_EXLRM, AmmoType.T_PXLRM, AmmoType.T_HSRM, AmmoType.T_MML,
         AmmoType.T_NLRM };
-    public static final HashSet<Integer> ALLOWED_BY_TYPE = new HashSet<Integer>(Arrays.asList(ALLOWED_BY_TYPE_ARRAY));
+    public static final HashSet<Integer> ALLOWED_BY_TYPE = new HashSet<>(Arrays.asList(ALLOWED_BY_TYPE_ARRAY));
 
     protected long munition;
     protected int shotsNeeded;

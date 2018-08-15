@@ -120,7 +120,7 @@ public class ChooseRefitDialog extends javax.swing.JDialog {
 						refitTableValueChanged();
 					}
 				});       
-        TableRowSorter<RefitTableModel> refitSorter = new TableRowSorter<RefitTableModel>(refitModel);
+        TableRowSorter<RefitTableModel> refitSorter = new TableRowSorter<>(refitModel);
         refitSorter.setComparator(RefitTableModel.COL_CLASS, new ClassSorter());
         refitSorter.setComparator(RefitTableModel.COL_COST, new FormattedNumberSorter());
         refitTable.setRowSorter(refitSorter);
@@ -264,7 +264,7 @@ public class ChooseRefitDialog extends javax.swing.JDialog {
     		return;
     	}
     	btnOK.setEnabled(true);
-    	lstShopping = new JList<String>(r.getShoppingListDescription());
+    	lstShopping = new JList<>(r.getShoppingListDescription());
     	scrShoppingList.setViewportView(lstShopping);
         MechView mv = new MechView(r.getNewEntity(), false, true);
 		txtNewUnit.setText("<div style='font: 12pt monospaced'>" + mv.getMechReadout() + "</div>");
@@ -277,7 +277,7 @@ public class ChooseRefitDialog extends javax.swing.JDialog {
     
     
     private void populateRefits() {
-    	ArrayList<Refit> refits = new ArrayList<Refit>();
+    	ArrayList<Refit> refits = new ArrayList<>();
         for(String model : Utilities.getAllVariants(unit.getEntity(), campaign)) {
 			MechSummary summary = MechSummaryCache.getInstance().getMech(unit.getEntity().getChassis() + " " + model);
 			if(null == summary) {

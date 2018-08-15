@@ -77,9 +77,9 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
 	private GregorianCalendar lastRetirementRoll;
 	
 	public RetirementDefectionTracker() {
-		rollRequired = new HashSet<Integer>();
-		unresolvedPersonnel = new HashMap<Integer, HashSet<UUID>>();
-		payouts = new HashMap<UUID, Payout>();
+		rollRequired = new HashSet<>();
+		unresolvedPersonnel = new HashMap<>();
+		payouts = new HashMap<>();
 		lastRetirementRoll = new GregorianCalendar();
 	}
 
@@ -134,7 +134,7 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
 	 */
     public HashMap<UUID, TargetRoll> calculateTargetNumbers(AtBContract contract,
     		Campaign campaign) {
-    	HashMap <UUID, TargetRoll> targets = new HashMap<UUID, TargetRoll>();
+    	HashMap <UUID, TargetRoll> targets = new HashMap<>();
     	int combatLeadershipMod = 0;
     	int supportLeadershipMod = 0;
     	
@@ -673,7 +673,7 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
                 		}
                 		if (wn3.getNodeName().equalsIgnoreCase("contract")) {
                 			int id = Integer.parseInt(wn3.getAttributes().getNamedItem("id").getTextContent());
-                			HashSet<UUID> pids = new HashSet<UUID>();
+                			HashSet<UUID> pids = new HashSet<>();
                 			String [] ids = wn3.getTextContent().split(",");
                 			for (String s : ids) {
                 				pids.add(UUID.fromString(s));

@@ -101,7 +101,7 @@ public class EditInjuryEntryDialog extends JDialog {
         txtDays = new JTextArea();
         ddLocation = new JComboBox<>(locations);
         ddType = new JComboBox<>(types);
-        ddTypeModel = new FilterableComboBoxModel<InjuryTypeChoice>(ddType.getModel());
+        ddTypeModel = new FilterableComboBoxModel<>(ddType.getModel());
         ddType.setModel(ddTypeModel);
         ddTypeModel.setFilter(it -> {
             BodyLocation loc = ((BodyLocationChoice) ddLocation.getSelectedItem()).loc;
@@ -124,9 +124,9 @@ public class EditInjuryEntryDialog extends JDialog {
         
         txtFluff = new JTextArea();
         txtHits = new JTextArea();
-        ddPermanent = new JComboBox<String>(tf);
-        ddWorkedOn = new JComboBox<String>(tf);
-        ddExtended = new JComboBox<String>(tf);
+        ddPermanent = new JComboBox<>(tf);
+        ddWorkedOn = new JComboBox<>(tf);
+        ddExtended = new JComboBox<>(tf);
         btnOK = new JButton();
         btnClose = new JButton();
         panBtn = new JPanel();

@@ -13,7 +13,7 @@ import mekhq.campaign.unit.Unit;
 public class OrgTreeModel implements TreeModel {
 
     private Force rootForce;
-    private Vector<TreeModelListener> listeners = new Vector<TreeModelListener>();
+    private Vector<TreeModelListener> listeners = new Vector<>();
     private Campaign campaign;
     
     public OrgTreeModel(Campaign c) {

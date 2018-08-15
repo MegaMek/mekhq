@@ -242,7 +242,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 		this.replacementId = -1;
 		this.quality = QUALITY_D;
 		this.parentPartId = -1;
-		this.childPartIds = new ArrayList<Integer>();
+		this.childPartIds = new ArrayList<>();
 		this.isTeamSalvaging = false;
 	}
 
@@ -1356,7 +1356,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
     }
 
     public void removeChildPart(int childId) {
-    	ArrayList<Integer> tempArray = new ArrayList<Integer>();
+    	ArrayList<Integer> tempArray = new ArrayList<>();
     	for(int cid : childPartIds) {
     		if(cid == childId) {
     			Part part = campaign.getPart(childId);
@@ -1377,7 +1377,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
     			part.setParentPartId(-1);
     		}
     	}
-    	childPartIds = new ArrayList<Integer>();
+    	childPartIds = new ArrayList<>();
     }
     
     /**

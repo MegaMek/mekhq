@@ -429,7 +429,7 @@ public class BattleArmorSuit extends Part {
 
     @Override
     public void remove(boolean salvage) {
-        ArrayList<Part> trooperParts = new ArrayList<Part>();
+        ArrayList<Part> trooperParts = new ArrayList<>();
         if(null != unit) {
             Person trooperToRemove = null;
             if(unit.getEntity().getInternal(trooper) > 0) {

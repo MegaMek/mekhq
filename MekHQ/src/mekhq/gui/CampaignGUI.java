@@ -1459,7 +1459,7 @@ public class CampaignGUI extends JPanel {
         if (!getCampaign().getCampaignOptions().checkMaintenance()) {
             return false;
         }
-        Vector<Unit> notMaintained = new Vector<Unit>();
+        Vector<Unit> notMaintained = new Vector<>();
         int totalAstechMinutesNeeded = 0;
         for (Unit u : getCampaign().getUnits()) {
             if (u.requiresMaintenance() && null == u.getTech()) {
@@ -1907,7 +1907,7 @@ public class CampaignGUI extends JPanel {
             r.setTeamId(engineer.getId());
         } else if (getCampaign().getTechs().size() > 0) {
             String name;
-            HashMap<String, Person> techHash = new HashMap<String, Person>();
+            HashMap<String, Person> techHash = new HashMap<>();
             String skillLvl = "Unknown";
             int TimePerDay = 0;
             for (Person tech : getCampaign().getTechs()) {
@@ -2051,7 +2051,7 @@ public class CampaignGUI extends JPanel {
      */
     public @Nullable UUID selectTech(Unit u, String desc, boolean ignoreMaintenance) {
         String name;
-        HashMap<String, Person> techHash = new HashMap<String, Person>();
+        HashMap<String, Person> techHash = new HashMap<>();
         for (Person tech : getCampaign().getTechs()) {
             if (tech.canTech(u.getEntity()) && !tech.isMothballing()) {
                 int time = tech.getMinutesLeft();

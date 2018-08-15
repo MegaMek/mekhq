@@ -52,7 +52,7 @@ public class JumpPath implements Serializable {
 	private ArrayList<Planet> path;
 	
 	public JumpPath() {
-		path = new ArrayList<Planet>();
+		path = new ArrayList<>();
 	}
 	
 	public JumpPath(ArrayList<Planet> p) {

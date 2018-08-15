@@ -238,7 +238,7 @@ public class MissingBattleArmorSuit extends MissingPart {
             newSuit.setTrooper(trooper);
             newSuit.updateConditionFromPart();
             //cycle through MissingBattleArmorEquipmentPart for trooper and replace
-            ArrayList<MissingBattleArmorEquipmentPart> missingStuff = new ArrayList<MissingBattleArmorEquipmentPart>();
+            ArrayList<MissingBattleArmorEquipmentPart> missingStuff = new ArrayList<>();
             BaArmor origArmor = null;
             for(Part p : unit.getParts()) {
             	if(p instanceof BaArmor && ((BaArmor)p).getLocation()== trooper) {

@@ -43,7 +43,7 @@ public class UnitAssignmentTableModel extends AbstractTableModel {
 
     public UnitAssignmentTableModel(Campaign c) {
         this.campaign = c;
-        data = new ArrayList<UUID>();
+        data = new ArrayList<>();
     }
 
     public void setData(ArrayList<UUID> data) {

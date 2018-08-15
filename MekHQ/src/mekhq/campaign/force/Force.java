@@ -64,7 +64,7 @@ public class Force implements Serializable {
     public static final int FORCE_NONE = -1;
     private String iconCategory = ROOT_ICON;
     private String iconFileName = ICON_NONE;
-    private LinkedHashMap<String, Vector<String>> iconMap = new LinkedHashMap<String, Vector<String>>();
+    private LinkedHashMap<String, Vector<String>> iconMap = new LinkedHashMap<>();
     
     private String name;
     private String desc;
@@ -83,9 +83,9 @@ public class Force implements Serializable {
         this.name = n;
         this.desc = "";
         this.parentForce = null;
-        this.subForces = new Vector<Force>();
-        this.units = new Vector<UUID>();
-        this.oldUnits = new Vector<Integer>();
+        this.subForces = new Vector<>();
+        this.units = new Vector<>();
+        this.oldUnits = new Vector<>();
         this.scenarioId = -1;
     }
     
@@ -198,7 +198,7 @@ public class Force implements Serializable {
      * @return
      */
     public Vector<UUID> getAllUnits() {
-        Vector<UUID> allUnits = new Vector<UUID>();
+        Vector<UUID> allUnits = new Vector<>();
         for(UUID uid : units) {
             allUnits.add(uid);
         }
@@ -523,7 +523,7 @@ public class Force implements Serializable {
     }
     
     private static Vector<String> processIconMapSubNodes(Node wn, Version version) {
-        Vector<String> values = new Vector<String>();
+        Vector<String> values = new Vector<>();
         NodeList nl = wn.getChildNodes();
         for (int x=0; x<nl.getLength(); x++) {
             Node wn2 = nl.item(x);
@@ -544,13 +544,13 @@ public class Force implements Serializable {
     }
     
     public Vector<Object> getAllChildren(Campaign campaign) {
-        Vector<Object> children = new Vector<Object>();
+        Vector<Object> children = new Vector<>();
         children.addAll(subForces);
         //add any units
         Enumeration<UUID> uids = getUnits().elements();
         //put them into a temporary array so I can sort it by rank
-        ArrayList<Unit> units = new ArrayList<Unit>();
-        ArrayList<Unit> unmannedUnits = new ArrayList<Unit>();
+        ArrayList<Unit> units = new ArrayList<>();
+        ArrayList<Unit> unmannedUnits = new ArrayList<>();
         while(uids.hasMoreElements()) {
             Unit u = campaign.getUnit(uids.nextElement());
             if(null != u) {

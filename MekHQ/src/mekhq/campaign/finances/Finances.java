@@ -97,9 +97,9 @@ public class Finances implements Serializable {
     }
 
     public Finances() {
-        transactions = new ArrayList<Transaction>();
-        loans = new ArrayList<Loan>();
-        assets = new ArrayList<Asset>();
+        transactions = new ArrayList<>();
+        loans = new ArrayList<>();
+        assets = new ArrayList<>();
         loanDefaults = 0;
         failCollateral = 0;
         wentIntoDebt = null;
@@ -171,7 +171,7 @@ public class Finances implements Serializable {
      */
     public void newFiscalYear(Date date) {
         long carryover = getBalance();
-        transactions = new ArrayList<Transaction>();
+        transactions = new ArrayList<>();
         credit(carryover, Transaction.C_START, resourceMap.getString("Carryover.text"), date);
     }
 
@@ -361,7 +361,7 @@ public class Finances implements Serializable {
             }
         }
 
-            ArrayList<Loan> newLoans = new ArrayList<Loan>();
+            ArrayList<Loan> newLoans = new ArrayList<>();
             for (Loan loan : loans) {
                 if (loan.checkLoanPayment(campaign.getCalendar())) {
                     if (debit(loan.getPaymentAmount(), Transaction.C_LOAN_PAYMENT,
@@ -389,7 +389,7 @@ public class Finances implements Serializable {
     }
 
     public long checkOverdueLoanPayments(Campaign campaign) {
-        ArrayList<Loan> newLoans = new ArrayList<Loan>();
+        ArrayList<Loan> newLoans = new ArrayList<>();
         long overdueAmount = 0;
         for (Loan loan : loans) {
             if(loan.isOverdue()) {

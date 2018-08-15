@@ -137,7 +137,7 @@ public class ImageChoiceDialog extends JDialog {
         this.force = force;
         // If we're doing forces, initialize the hashmap for use
         if (force) {
-            iconMap = new LinkedHashMap<String, Vector<String>>();
+            iconMap = new LinkedHashMap<>();
         }
         initComponents();
         fillTable((String) comboCategories.getSelectedItem());
@@ -157,7 +157,7 @@ public class ImageChoiceDialog extends JDialog {
 
         scrImages = new JScrollPane();
         tableImages = new JTable();
-        comboCategories = new JComboBox<String>();
+        comboCategories = new JComboBox<>();
         btnSelect = new JButton();
         btnCancel = new JButton();
         JPanel imagesPanel = new JPanel();
@@ -203,7 +203,7 @@ public class ImageChoiceDialog extends JDialog {
         gbc.weighty = 1.0;
         imagesPanel.add(scrImages, gbc);
 
-        DefaultComboBoxModel<String> categoryModel = new DefaultComboBoxModel<String>();
+        DefaultComboBoxModel<String> categoryModel = new DefaultComboBoxModel<>();
         String match = null;
         categoryModel.addElement(Crew.ROOT_PORTRAIT);
         if (imageItems != null) {
@@ -537,7 +537,7 @@ public class ImageChoiceDialog extends JDialog {
     private void refreshLayeredPreview() {
         // Add the image frame
         iconMap.clear();
-        Vector<String> frameVector = new Vector<String>();
+        Vector<String> frameVector = new Vector<>();
         frameVector.add("Frame.png");
         iconMap.put(IconPackage.FORCE_FRAME, frameVector);
         // Check each table for what is, or is not, selected
@@ -545,7 +545,7 @@ public class ImageChoiceDialog extends JDialog {
         if (tableTypes.getSelectedRow() == -1) {
             iconMap.remove(IconPackage.FORCE_TYPE, iconMap.get(IconPackage.FORCE_TYPE));
         } else {
-            tmp = new Vector<String>();
+            tmp = new Vector<>();
             for (int index : tableTypes.getSelectedRows()) {
                 tmp.add((String) tableTypes.getValueAt(index, 0));
                 iconMap.put(IconPackage.FORCE_TYPE, tmp);
@@ -554,7 +554,7 @@ public class ImageChoiceDialog extends JDialog {
         if (tableFormations.getSelectedRow() == -1) {
             iconMap.remove(IconPackage.FORCE_FORMATIONS, iconMap.get(IconPackage.FORCE_FORMATIONS));
         } else {
-            tmp = new Vector<String>();
+            tmp = new Vector<>();
             for (int index : tableFormations.getSelectedRows()) {
                 tmp.add((String) tableFormations.getValueAt(index, 0));
                 iconMap.put(IconPackage.FORCE_FORMATIONS, tmp);
@@ -563,7 +563,7 @@ public class ImageChoiceDialog extends JDialog {
         if (tableAdjustments.getSelectedRow() == -1) {
             iconMap.remove(IconPackage.FORCE_ADJUSTMENTS, iconMap.get(IconPackage.FORCE_ADJUSTMENTS));
         } else {
-            tmp = new Vector<String>();
+            tmp = new Vector<>();
             for (int index : tableAdjustments.getSelectedRows()) {
                 tmp.add((String) tableAdjustments.getValueAt(index, 0));
                 iconMap.put(IconPackage.FORCE_ADJUSTMENTS, tmp);
@@ -572,7 +572,7 @@ public class ImageChoiceDialog extends JDialog {
         if (tableAlphanumerics.getSelectedRow() == -1) {
             iconMap.remove(IconPackage.FORCE_ALPHANUMERICS, iconMap.get(IconPackage.FORCE_ALPHANUMERICS));
         } else {
-            tmp = new Vector<String>();
+            tmp = new Vector<>();
             for (int index : tableAlphanumerics.getSelectedRows()) {
                 tmp.add((String) tableAlphanumerics.getValueAt(index, 0));
                 iconMap.put(IconPackage.FORCE_ALPHANUMERICS, tmp);
@@ -581,7 +581,7 @@ public class ImageChoiceDialog extends JDialog {
         if (tableSpecialModifiers.getSelectedRow() == -1) {
             iconMap.remove(IconPackage.FORCE_SPECIAL_MODIFIERS, iconMap.get(IconPackage.FORCE_SPECIAL_MODIFIERS));
         } else {
-            tmp = new Vector<String>();
+            tmp = new Vector<>();
             for (int index : tableSpecialModifiers.getSelectedRows()) {
                 tmp.add((String) tableSpecialModifiers.getValueAt(index, 0));
                 iconMap.put(IconPackage.FORCE_SPECIAL_MODIFIERS, tmp);
@@ -590,7 +590,7 @@ public class ImageChoiceDialog extends JDialog {
         if (tableBackgrounds.getSelectedRow() == -1) {
             iconMap.remove(IconPackage.FORCE_BACKGROUNDS, iconMap.get(IconPackage.FORCE_BACKGROUNDS));
         } else {
-            tmp = new Vector<String>();
+            tmp = new Vector<>();
             for (int index : tableBackgrounds.getSelectedRows()) {
                 tmp.add((String) tableBackgrounds.getValueAt(index, 0));
                 iconMap.put(IconPackage.FORCE_BACKGROUNDS, tmp);
@@ -599,7 +599,7 @@ public class ImageChoiceDialog extends JDialog {
         if (tableLogos.getSelectedRow() == -1) {
             iconMap.remove(IconPackage.FORCE_LOGOS, iconMap.get(IconPackage.FORCE_LOGOS));
         } else {
-            tmp = new Vector<String>();
+            tmp = new Vector<>();
             for (int index : tableLogos.getSelectedRows()) {
                 tmp.add((String) tableLogos.getValueAt(index, 0));
                 iconMap.put(IconPackage.FORCE_LOGOS, tmp);
@@ -655,8 +655,8 @@ public class ImageChoiceDialog extends JDialog {
         public ImageTableModel() {
             columnNames = new String[] {"Images"};
             category = Crew.ROOT_PORTRAIT;
-            names = new ArrayList<String>();
-            images = new ArrayList<Image>();
+            names = new ArrayList<>();
+            images = new ArrayList<>();
         }
 
         @Override
@@ -671,8 +671,8 @@ public class ImageChoiceDialog extends JDialog {
 
         public void reset() {
             category = Crew.ROOT_PORTRAIT;
-            names = new ArrayList<String>();
-            images = new ArrayList<Image>();
+            names = new ArrayList<>();
+            images = new ArrayList<>();
         }
 
         @Override

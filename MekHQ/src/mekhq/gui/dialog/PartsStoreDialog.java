@@ -170,7 +170,7 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 
         partsTable = new JTable(partsModel);
 		partsTable.setName("partsTable"); // NOI18N
-		partsSorter = new TableRowSorter<PartsTableModel>(partsModel);
+		partsSorter = new TableRowSorter<>(partsModel);
 		partsSorter.setComparator(PartsTableModel.COL_TARGET, new TargetSorter());
         partsSorter.setComparator(PartsTableModel.COL_COST, new FormattedNumberSorter());
         partsSorter.setComparator(PartsTableModel.COL_DETAIL, new PartsDetailSorter());
@@ -191,11 +191,11 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 		GridBagConstraints c = new GridBagConstraints();
 		panFilter = new JPanel();
 		lblPartsChoice = new JLabel(resourceMap.getString("lblPartsChoice.text")); // NOI18N
-		DefaultComboBoxModel<String> partsGroupModel = new DefaultComboBoxModel<String>();
+		DefaultComboBoxModel<String> partsGroupModel = new DefaultComboBoxModel<>();
 		for (int i = 0; i < SG_NUM; i++) {
 			partsGroupModel.addElement(getPartsGroupName(i));
 		}
-		choiceParts = new JComboBox<String>(partsGroupModel);
+		choiceParts = new JComboBox<>(partsGroupModel);
 		choiceParts.setName("choiceParts"); // NOI18N
 		choiceParts.setSelectedIndex(0);
 		choiceParts.addActionListener(new java.awt.event.ActionListener() {

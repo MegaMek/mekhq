@@ -267,7 +267,7 @@ public final class OverviewTab extends CampaignGuiTab {
         }
         overviewPartsInUseTable.setIntercellSpacing(new Dimension(0, 0));
         overviewPartsInUseTable.setShowGrid(false);
-        partsInUseSorter = new TableRowSorter<PartsInUseTableModel>(overviewPartsModel);
+        partsInUseSorter = new TableRowSorter<>(overviewPartsModel);
         partsInUseSorter.setSortsOnUpdates(true);
         // Don't sort the buttons
         partsInUseSorter.setSortable(PartsInUseTableModel.COL_BUTTON_BUY, false);

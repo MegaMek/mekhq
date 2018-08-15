@@ -206,7 +206,7 @@ public class ForceViewPanel extends javax.swing.JPanel {
     	String LanceTech = "";
     	String assigned = "";
     	String type = null;
-    	ArrayList<Person> people = new ArrayList<Person>();
+    	ArrayList<Person> people = new ArrayList<>();
     	for(UUID uid : force.getAllUnits()) {
     		Unit u = campaign.getUnit(uid);
     		if(null != u) {
@@ -435,8 +435,8 @@ public class ForceViewPanel extends javax.swing.JPanel {
 		}
 		JLabel lblPerson;
 		JLabel lblUnit;		
-		ArrayList<Unit> units = new ArrayList<Unit>();
-		ArrayList<Unit> unmannedUnits = new ArrayList<Unit>();
+		ArrayList<Unit> units = new ArrayList<>();
+		ArrayList<Unit> unmannedUnits = new ArrayList<>();
  		for(UUID uid : force.getUnits()) {
 			Unit u = campaign.getUnit(uid);
 			if(null == u) {
@@ -594,7 +594,7 @@ public class ForceViewPanel extends javax.swing.JPanel {
     	double ton = 0;
     	int number = 0;
     	String commander = "No personnel found";
-    	ArrayList<Person> people = new ArrayList<Person>();
+    	ArrayList<Person> people = new ArrayList<>();
     	for(UUID uid : f.getAllUnits()) {
     		Unit u = campaign.getUnit(uid);
     		if(null != u) {

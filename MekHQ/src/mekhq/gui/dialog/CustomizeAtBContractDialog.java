@@ -166,7 +166,7 @@ public class CustomizeAtBContractDialog extends JDialog {
         cbEnemy.addFactionEntries(currentFactions, campaign.getGameYear());
         JLabel lblEnemy = new JLabel();
     	chkShowAllFactions = new JCheckBox();
-    	cbMissionType = new JComboBox<String>(AtBContract.missionTypeNames);
+    	cbMissionType = new JComboBox<>(AtBContract.missionTypeNames);
         JLabel lblType = new JLabel();
         btnOK = new JButton();
         btnClose = new JButton();
@@ -175,11 +175,11 @@ public class CustomizeAtBContractDialog extends JDialog {
         JLabel lblPlanetName = new JLabel();
         String[] skillNames = {"Green", "Regular", "Veteran", "Elite"};
         String[] ratingNames = {"F", "D", "C", "B", "A"};
-    	cbAllySkill = new JComboBox<String>(skillNames);
-    	cbAllyQuality = new JComboBox<String>(ratingNames);
+    	cbAllySkill = new JComboBox<>(skillNames);
+    	cbAllyQuality = new JComboBox<>(ratingNames);
         JLabel lblAllyRating = new JLabel();
-    	cbEnemySkill = new JComboBox<String>(skillNames);
-    	cbEnemyQuality = new JComboBox<String>(ratingNames);;
+    	cbEnemySkill = new JComboBox<>(skillNames);
+    	cbEnemyQuality = new JComboBox<>(ratingNames);;
     	JLabel lblAllyBotName = new JLabel();
     	txtAllyBotName = new JTextField();
     	JLabel lblEnemyBotName = new JLabel();
@@ -197,7 +197,7 @@ public class CustomizeAtBContractDialog extends JDialog {
                 new SpinnerNumberModel(contract.getContractScoreArbitraryModifier(),
                         null,null,1));
         JLabel lblContractScoreArbitraryModifier = new JLabel();
-    	cbEnemyMorale = new JComboBox<String>(AtBContract.moraleLevelNames);
+    	cbEnemyMorale = new JComboBox<>(AtBContract.moraleLevelNames);
    	
     	int y = 0;
           

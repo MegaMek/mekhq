@@ -74,7 +74,7 @@ public class PirateFreeForAllBuiltInScenario extends AtBScenario {
         
         addBotForce(getEnemyBotForce(getContract(campaign), Board.START_N, enemyEntities));
 
-        ArrayList<Entity>otherForce = new ArrayList<Entity>();
+        ArrayList<Entity>otherForce = new ArrayList<>();
         
         for (int i = 0; i < 12; i++) {
             otherForce.add(getEntity("PIR",

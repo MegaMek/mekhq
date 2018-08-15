@@ -142,10 +142,10 @@ public class EditAssetDialog extends JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         getContentPane().add(new JLabel("Income Schedule:"), gridBagConstraints);
         
-        DefaultComboBoxModel<String> scheduleModel = new DefaultComboBoxModel<String>();
+        DefaultComboBoxModel<String> scheduleModel = new DefaultComboBoxModel<>();
         scheduleModel.addElement(Finances.getScheduleName(Finances.SCHEDULE_MONTHLY));
         scheduleModel.addElement(Finances.getScheduleName(Finances.SCHEDULE_YEARLY));
-        choiceSchedule = new JComboBox<String>(scheduleModel);
+        choiceSchedule = new JComboBox<>(scheduleModel);
         choiceSchedule.setSelectedIndex(0);
         if(asset.getSchedule() == Finances.SCHEDULE_YEARLY) {
             choiceSchedule.setSelectedIndex(1);

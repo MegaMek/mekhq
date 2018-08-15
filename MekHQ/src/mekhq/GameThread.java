@@ -41,7 +41,7 @@ class GameThread extends Thread implements CloseClientListener {
     protected Campaign campaign;
     protected boolean started;
 
-    protected ArrayList<Unit> units = new ArrayList<Unit>();
+    protected ArrayList<Unit> units = new ArrayList<>();
 
     protected volatile boolean stop = false;
     

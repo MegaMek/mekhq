@@ -360,7 +360,7 @@ public class Planet implements Serializable {
                 if(x == 3 || !eventList.get(eventList.size() - 1).faction.get(0).equals(newFaction)) {
                     PlanetaryEvent pe = new PlanetaryEvent();
                     DateTime eventDate = years.get(x - 3);
-                    pe.faction = new ArrayList<String>();
+                    pe.faction = new ArrayList<>();
                     pe.faction.add(newFaction);
                     pe.date = eventDate;
                     
@@ -415,7 +415,7 @@ public class Planet implements Serializable {
     }
 
     public List<String> getSatellites() {
-        return null != satellites ? new ArrayList<String>(satellites) : null;
+        return null != satellites ? new ArrayList<>(satellites) : null;
     }
 
     public String getSatelliteDescription() {
@@ -426,7 +426,7 @@ public class Planet implements Serializable {
     }
 
     public List<String> getLandMasses() {
-        return null != landMasses ? new ArrayList<String>(landMasses) : null;
+        return null != landMasses ? new ArrayList<>(landMasses) : null;
     }
 
     public String getLandMassDescription() {
@@ -553,7 +553,7 @@ public class Planet implements Serializable {
         if( null == events ) {
             return null;
         }
-        return new ArrayList<PlanetaryEvent>(events.values());
+        return new ArrayList<>(events.values());
     }
     
     protected <T> T getEventData(DateTime when, T defaultValue, EventGetter<T> getter) {
@@ -575,7 +575,7 @@ public class Planet implements Serializable {
         if( null == events ) {
             return Collections.<PlanetaryEvent>emptyList();
         }
-        List<PlanetaryEvent> result = new ArrayList<PlanetaryEvent>();
+        List<PlanetaryEvent> result = new ArrayList<>();
         for( DateTime date : events.navigableKeySet() ) {
             if( date.getYear() > year ) {
                 break;
@@ -754,7 +754,7 @@ public class Planet implements Serializable {
     }
 
     private static Set<Faction> getFactionsFrom(Collection<String> codes) {
-        Set<Faction> factions = new HashSet<Faction>(codes.size());
+        Set<Faction> factions = new HashSet<>(codes.size());
         for(String code : codes) {
             factions.add(Faction.getFaction(code));
         }
@@ -917,7 +917,7 @@ public class Planet implements Serializable {
     @SuppressWarnings("unused")
     private boolean beforeMarshal(Marshaller marshaller) {
         // Fill up our event list from the internal data type
-        eventList = new ArrayList<PlanetaryEvent>(events.values());
+        eventList = new ArrayList<>(events.values());
         return true;
     }
     

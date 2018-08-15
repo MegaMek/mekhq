@@ -15,7 +15,7 @@ public class ChatServer {
 	static ServerSocket serverSocket;
 
     public static void main(String[] args) throws Exception {
-        Vector<Connection> connections        = new Vector<Connection>();
+        Vector<Connection> connections        = new Vector<>();
         serverSocket             = new ServerSocket(4444);
         ConnectionListener connectionListener = new ConnectionListener(connections);
 
