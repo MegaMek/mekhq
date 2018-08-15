@@ -4186,9 +4186,12 @@ public class Campaign implements Serializable, ITechManager {
                 unit.getRefit().reCalc();
                 if (null == unit.getRefit().getNewArmorSupplies()
                         && unit.getRefit().getNewArmorSuppliesId() > 0) {
-                    unit.getRefit().setNewArmorSupplies(
-                            (Armor) retVal.getPart(unit.getRefit()
-                                    .getNewArmorSuppliesId()));
+                    Armor armorSupplies = (Armor) retVal.getPart(
+                            unit.getRefit().getNewArmorSuppliesId());
+                    unit.getRefit().setNewArmorSupplies(armorSupplies);
+                    if (null == armorSupplies.getUnit()) {
+                        armorSupplies.setUnit(unit);
+                    }
                 }
                 if (!unit.getRefit().isCustomJob()
                         && !unit.getRefit().kitFound()) {
