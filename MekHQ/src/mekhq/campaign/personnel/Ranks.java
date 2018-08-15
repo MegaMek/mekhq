@@ -547,9 +547,9 @@ public class Ranks {
 	
 	public void setRanksFromModel(RankTableModel model) {
         ranks = new ArrayList<Rank>();
-	    @SuppressWarnings("unchecked") // Broken java doesn't have typed vectors in the DefaultTableModel
-		Vector<Vector<Object>> vectors = model.getDataVector();
-	    for(Vector<Object> row : vectors) {
+	    @SuppressWarnings("rawtypes") // Broken java doesn't have typed vectors in the DefaultTableModel
+		Vector<Vector> vectors = model.getDataVector();
+	    for(@SuppressWarnings("rawtypes") Vector row : vectors) {
 	        String[] names = { (String)row.get(RankTableModel.COL_NAME_MW), (String)row.get(RankTableModel.COL_NAME_ASF),
 	        		(String)row.get(RankTableModel.COL_NAME_VEE), (String)row.get(RankTableModel.COL_NAME_NAVAL),
 	        		(String)row.get(RankTableModel.COL_NAME_INF), (String)row.get(RankTableModel.COL_NAME_TECH) };

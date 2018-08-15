@@ -1,0 +1,339 @@
+plugins {
+	id 'application'
+	id 'maven-publish'
+	id 'edu.sc.seis.launch4j' version '2.4.4'
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src']
+        }
+        resources {
+            srcDirs = ['resources']
+        }
+    }
+    test {
+        java {
+            srcDirs = ['unittests']
+        }
+        resources {
+            srcDirs = ['testresources']
+        }
+    }
+}
+
+dependencies {
+	implementation "org.megamek:megamek${mmBranchTag}:0.45.1-SNAPSHOT"
+	implementation "org.megamek:megameklab${mmBranchTag}:0.45.1-SNAPSHOT"
+	
+	implementation 'org.jfree:jfreechart:1.5.0'
+	implementation 'joda-time:joda-time:2.10'
+	implementation 'org.apache.commons:commons-text:1.4'
+	implementation 'org.apache.commons:commons-csv:1.4'
+	implementation 'javax.vecmath:vecmath:1.5.2'
+
+	implementation 'log4j:log4j:1.2.17'
+	implementation 'javax.xml.bind:jaxb-api:2.3.0'
+	runtimeOnly 'org.glassfish.jaxb:jaxb-runtime:2.3.0'
+	runtimeOnly 'org.glassfish.jaxb:jaxb-core:2.3.0'
+	runtimeOnly 'com.sun.activation:javax.activation:1.2.0'
+
+    testImplementation 'junit:junit:4.12' 
+	testImplementation 'org.mockito:mockito-core:2.20.1'
+}
+
+mainClassName = 'mekhq.MekHQ'
+
+ext {
+	jvmOptions = ['-Xmx1024m']
+	dataDir = "data"
+	confDir = "mmconf"
+	logDir = "logs"
+	docDir = "docs"
+	libDir = "lib"
+	unitFilesDir = "data/mechfiles"
+	distributionDir = "${buildDir}/distributions"
+	fileStagingDir = "${buildDir}/files"
+	repoDir = "${buildDir}/repo/mekhq"
+	mmRepoDir = "${buildDir}/repo/megamek"
+	mmlRepoDir = "${buildDir}/repo/megameklab"
+	scriptTemplate = "startScriptTemplate.txt"
+}
+
+jar {
+	archiveName = "${rootProject.name}.${extension}"
+	manifest {
+	    attributes "Main-Class": mainClassName
+	    attributes 'Class-Path' : project.sourceSets.main.runtimeClasspath.files
+	    	.findAll { it.name.endsWith(".jar") }.collect { "${libDir}/${it.name}" }.join(' ')
+	}
+}
+
+task stageFiles(type: Copy) {
+	description = 'Stages files that are to be copied into the distribution.'
+	
+	from projectDir
+	include "${confDir}/**"
+	include "${docDir}/**"
+	include "${dataDir}/universe/"
+	include "${dataDir}/mapgen/"
+	include "${dataDir}/names/bloodnames/"
+	include "${dataDir}/images/awards/"
+	include "${dataDir}/images/force/"
+	include "${dataDir}/images/portraits/"
+	include "${dataDir}/images/fluff/mech/*.png"
+	include "${dataDir}/images/misc/"
+	include "${dataDir}/images/universe/"
+
+	into fileStagingDir
+}
+
+task createLogDir (dependsOn: stageFiles) {
+	description 'Creates the log directory and the timestamp file.'
+	doLast {
+		mkdir "${fileStagingDir}/${logDir}"
+		ant.touch(file: "${fileStagingDir}/${logDir}/timestamp")
+	}
+}
+
+task unixStartScript (type: CreateStartScripts) {
+	description = 'Create shell script for *nix distribution.'
+	applicationName = 'hq'
+	mainClassName = project.mainClassName
+	outputDir = startScripts.outputDir
+	classpath = jar.outputs.files + files(project.sourceSets.main.runtimeClasspath.files)
+	    	.filter { it.name.endsWith(".jar") }
+	defaultJvmOpts = project.ext.jvmOptions
+	// The default template assumes the start script is in a subdirectory and always
+	// sets APP_HOME to the parent directory of the one containing the script.
+	// So we provide a modified template.
+	unixStartScriptGenerator.template = resources.text.fromFile(scriptTemplate)
+	doLast {
+		// The start script assumes all the files on the classpath will be in the lib directory.
+		unixScript.text = unixScript.text.replace("lib/${rootProject.name}", rootProject.name)
+	}
+}
+
+distributions {
+	// Creates tasks which package distribution with MM jar and startup script in root directory
+	unix {
+		baseName = rootProject.name.toLowerCase()
+		contents {
+			from ("${mmDir}/megamek/build/libs/MegaMek.jar")
+			from ("${mmDir}/megamek/build/files")
+			from ("${mmDir}/megamek/build/scripts/startup")
+			from ("${mmlDir}/build/libs/MegaMekLab.jar")
+			from ("${mmlDir}/build/files/data/fonts") {
+				into "data/fonts"
+			}
+			from ("${mmlDir}/build/files/data/images") {
+				into "data/images"
+			}
+			from ("${mmlDir}/build/scripts/lab")
+			from fileStagingDir
+			from(unixStartScript.unixScript)
+			from(jar)
+			from (project.sourceSets.main.runtimeClasspath.files
+    				.findAll { it.name.endsWith(".jar") && !it.name.toLowerCase().startsWith("megamek") }) {
+    			into "${libDir}"
+			}
+			
+			duplicatesStrategy = 'include'
+		}
+	}
+	// Creates tasks which package distribution with MM jar wrapped in Windows executable
+	windows {
+		contents {
+			from ("${mmDir}/megamek/build/launch4j")
+			from ("${mmDir}/megamek/build/files")
+			from ("${mmlDir}/build/launch4j")
+			from ("${mmlDir}/build/files/data/fonts") {
+				into "data/fonts"
+			}
+			from ("${mmlDir}/build/files/data/images") {
+				into "data/images"
+			}
+			from fileStagingDir
+			from "${buildDir}/launch4j/*.exe"
+			from (project.sourceSets.main.runtimeClasspath.files
+    				.findAll { it.name.endsWith(".jar") && !it.name.toLowerCase().startsWith("megamek") }) {
+    			into "${libDir}"
+			}
+			duplicatesStrategy = 'include'
+		}
+	}
+}
+
+createExe {
+	description = 'Create Windows executable that wraps MekHQ jar'
+	mainClassName = project.mainClassName
+	icon = "${projectDir}/data/images/misc/mekhq.ico"
+	jvmOptions = project.ext.jvmOptions
+}
+
+task buildMM (type: GradleBuild) {
+	description = 'Builds the MegaMek project'
+	group = 'distribution'
+	
+	buildFile = "${mmDir}/build.gradle"
+	dir = "${mmDir}"
+	tasks = [ 'jar', 'stageFiles', 'createExe', 'unixStartScript' ]
+}
+
+task buildMML (type: GradleBuild) {
+	description = 'Builds the MegaMekLab project'
+	group = 'distribution'
+	
+	buildFile = "${mmlDir}/build.gradle"
+	dir = "${mmlDir}"
+	tasks = [ 'jar', 'stageFiles', 'createExe', 'unixStartScript' ]
+}
+
+windowsDistZip {
+	description = 'Creates Windows distribution packaged as a zip archive'
+	dependsOn stageFiles
+	dependsOn buildMM
+	dependsOn buildMML
+	dependsOn createExe
+}
+
+unixDistTar {
+	description = 'Creates *nix distribution packaged as a tar ball'
+	dependsOn stageFiles
+	dependsOn buildMM
+	dependsOn buildMML
+	dependsOn unixStartScript
+	compression = Compression.GZIP
+}
+
+// The repository can only be cloned into an empty directory so we need to delete anything left over
+// from a previous build
+task deleteRepoDir (type: Delete) {
+	delete = "${repoDir}"
+}
+
+task deleteMMRepoDir (type: Delete) {
+	delete = "${mmRepoDir}"
+}
+
+task deleteMMLRepoDir (type: Delete) {
+	delete = "${mmlRepoDir}"
+}
+
+task cloneRepo (type: Exec, dependsOn: deleteRepoDir) {
+	description = 'Clones the repository to ensure we are working with a clean directory tree'
+	group = 'distribution'
+	commandLine "git"
+	args "clone", "--branch", mmlBranch, "--single-branch", gitRoot, "${repoDir}"
+}
+
+task cloneMMRepo (type: Exec, dependsOn: deleteMMRepoDir) {
+	description = 'Clones the MegaMek repository to ensure we are working with a clean directory tree'
+	group = 'distribution'
+	commandLine "git"
+	args "clone", "--branch", mmBranch, "--single-branch", mmGitRoot, "${mmRepoDir}"
+}
+
+task cloneMMLRepo (type: Exec, dependsOn: deleteMMRepoDir) {
+	description = 'Clones the MegaMekLab repository to ensure we are working with a clean directory tree'
+	group = 'distribution'
+	commandLine "git"
+	args "clone", "--branch", mmlBranch, "--single-branch", mmlGitRoot, "${mmlRepoDir}"
+}
+
+task sourceZip (type: Zip) {
+	description 'Creates a zip archive of the source'
+	group = 'distribution'
+	from (rootDir) {
+		exclude "**/build/**"
+		exclude "**/.*"
+	}
+	archiveName "${rootProject.name.toLowerCase()}-${version}-source.zip"
+	destinationDir file(distributionDir)
+}
+
+task sourceTar (type: Tar) {
+	description 'Creates a compressed tar archive of the source'
+	from (rootDir) {
+		exclude "**/build/**"
+		exclude "**/.*"
+	}
+	archiveName "${rootProject.name.toLowerCase()}-${version}-source.tar.gz"
+	compression = Compression.GZIP
+	destinationDir file(distributionDir)
+}
+
+// Replace the assembleDist task created by the distributions plugin to create the packages we want to
+task assembleDist(overwrite: true) {
+	description = 'Build unix, Windows, and source packages'
+	group = 'distribution'
+	dependsOn buildMM
+	dependsOn buildMML
+	dependsOn unixDistTar
+	dependsOn windowsDistZip
+	dependsOn sourceZip
+	dependsOn sourceTar
+}
+
+task buildFromRepo (type: GradleBuild) {
+	description = 'Assembles the distribution packages in the clean repository copy'
+	group = 'distribution'
+	dependsOn cloneRepo
+	dependsOn cloneMMRepo
+	dependsOn cloneMMLRepo
+	
+	buildFile = "${repoDir}/build.gradle"
+	dir = "${repoDir}"
+	tasks = [ 'assembleDist' ]
+}
+
+task release (type: Copy) {
+	description = 'Builds the release packages from the repository and copies them into the project build directory'
+	group = 'distribution'
+	dependsOn buildFromRepo
+	
+	from "${repoDir}/build/distributions"
+//	from "${mmDir}/build/distributions"
+//	from "${mmlDir}/build/distributions"
+	into "${distributionDir}"
+}
+
+task sourcesJar(type: Jar) {
+	description = 'Creates a source archive for publication to a maven repository'
+    from sourceSets.main.allJava
+    classifier = 'sources'
+}
+
+task javadocJar(type: Jar) {
+	description = 'Creates a documentation archive for publication to a maven repository'
+    from javadoc
+    classifier = 'javadoc'
+}
+
+publishing {
+    publications {
+        publishMMLibrary(MavenPublication) {
+            artifactId = "mekhq${mmBranchTag}"
+            from components.java
+            artifact sourcesJar
+// Javadoc is full of errors
+//            artifact javadocJar
+
+            pom {
+                name = "MekHQ"
+                description = "MekHQ"
+                url = "http://megamek.org"
+                licenses {
+                    license {
+                        name = "GNU General Public License, version 2"
+                        url = "https://www.gnu.org/licenses/gpl-2.0.html"
+                    }
+                }
+            }
+        }
+	}
+	repositories {
+		mavenLocal()
+	}
+}

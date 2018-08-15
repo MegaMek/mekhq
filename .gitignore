@@ -13,3 +13,5 @@ MekHQ/pkgdir
 # IDE directories
 MekHQ/.idea/
 /.vscode
+/.gradle/
+/settings_local.gradle
