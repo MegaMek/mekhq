@@ -18,7 +18,6 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.Calendar;
 import java.util.Comparator;
-import java.util.GregorianCalendar;
 import java.util.ResourceBundle;
 
 import javax.swing.DefaultComboBoxModel;

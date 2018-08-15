@@ -40,7 +40,6 @@ import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
-import megamek.common.EquipmentType;
 import megamek.common.ITechnology;
 import megamek.common.PlanetaryConditions;
 import megamek.common.util.EncodeControl;

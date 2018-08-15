@@ -26,7 +26,6 @@ import javax.swing.table.TableCellRenderer;
 
 import megamek.client.ui.swing.util.PlayerColors;
 import megamek.common.IPlayer;
-import megamek.common.Player;
 import megamek.common.util.DirectoryItems;
 import megamek.common.util.EncodeControl;
 

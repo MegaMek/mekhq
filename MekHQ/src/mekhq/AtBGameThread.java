@@ -35,7 +35,6 @@ import megamek.common.IGame;
 import megamek.common.IPlayer;
 import megamek.common.MapSettings;
 import megamek.common.PlanetaryConditions;
-import megamek.common.Player;
 import megamek.common.UnitType;
 import megamek.common.logging.LogLevel;
 import mekhq.campaign.force.Lance;

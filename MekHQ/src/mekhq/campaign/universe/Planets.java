@@ -57,7 +57,6 @@ import org.w3c.dom.DOMException;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
-import megamek.common.EquipmentType;
 import megamek.common.ITechnology;
 import megamek.common.logging.LogLevel;
 import megamek.common.util.EncodeControl;

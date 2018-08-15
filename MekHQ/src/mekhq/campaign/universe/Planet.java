@@ -48,7 +48,6 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeComparator;
 
-import megamek.common.EquipmentType;
 import megamek.common.ITechnology;
 import megamek.common.PlanetaryConditions;
 import mekhq.Utilities;

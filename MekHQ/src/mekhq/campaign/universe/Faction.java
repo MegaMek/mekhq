@@ -48,7 +48,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import megamek.common.EquipmentType;
 import megamek.common.ITechnology;
 import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;

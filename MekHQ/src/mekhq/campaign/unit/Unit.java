@@ -79,7 +79,6 @@ import megamek.common.MechBay;
 import megamek.common.MiscType;
 import megamek.common.Mounted;
 import megamek.common.PillionSeatCargoBay;
-import megamek.common.Player;
 import megamek.common.Protomech;
 import megamek.common.ProtomechBay;
 import megamek.common.QuadMech;

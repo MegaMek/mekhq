@@ -30,7 +30,6 @@ import megamek.common.IPlayer;
 import megamek.common.Infantry;
 import megamek.common.Mech;
 import megamek.common.MechSummaryCache;
-import megamek.common.Player;
 import megamek.common.loaders.BLKFile;
 import mekhq.MekHQ;
 import mekhq.Utilities;

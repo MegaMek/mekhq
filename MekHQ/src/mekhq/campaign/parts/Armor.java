@@ -22,7 +22,6 @@
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
-import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
 import org.w3c.dom.Node;

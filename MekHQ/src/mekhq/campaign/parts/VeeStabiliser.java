@@ -27,7 +27,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import megamek.common.Compute;
-import megamek.common.EquipmentType;
 import megamek.common.ITechnology;
 import megamek.common.Tank;
 import megamek.common.TechAdvancement;

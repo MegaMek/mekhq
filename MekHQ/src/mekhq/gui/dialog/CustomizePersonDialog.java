@@ -42,7 +42,6 @@ import megamek.common.EquipmentType;
 import megamek.common.WeaponType;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
-import megamek.common.options.Option;
 import megamek.common.options.OptionsConstants;
 import megamek.common.options.PilotOptions;
 import megamek.common.util.EncodeControl;

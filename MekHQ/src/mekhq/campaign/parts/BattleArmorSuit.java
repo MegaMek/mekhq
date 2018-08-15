@@ -32,7 +32,6 @@ import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.EntityMovementMode;
 import megamek.common.EntityWeightClass;
-import megamek.common.EquipmentType;
 import megamek.common.IArmorState;
 import megamek.common.ITechnology;
 import megamek.common.MechFileParser;

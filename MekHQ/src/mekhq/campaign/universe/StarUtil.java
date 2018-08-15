@@ -31,7 +31,6 @@ import java.util.Random;
 import java.util.Set;
 import java.util.TreeSet;
 
-import megamek.common.EquipmentType;
 import megamek.common.ITechnology;
 import mekhq.MekHQ;
 import mekhq.Utilities;

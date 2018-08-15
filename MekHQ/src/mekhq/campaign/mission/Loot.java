@@ -21,7 +21,6 @@
 package mekhq.campaign.mission;
 
 import java.io.PrintWriter;
-import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 

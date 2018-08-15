@@ -24,7 +24,6 @@ package mekhq.campaign.parts;
 import megamek.common.Aero;
 import megamek.common.CriticalSlot;
 import megamek.common.Entity;
-import megamek.common.EquipmentType;
 import megamek.common.ITechnology;
 import megamek.common.LandAirMech;
 import megamek.common.TechAdvancement;

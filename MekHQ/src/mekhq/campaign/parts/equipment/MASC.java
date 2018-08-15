@@ -23,8 +23,6 @@ package mekhq.campaign.parts.equipment;
 
 import java.io.PrintWriter;
 import java.util.Calendar;
-import java.util.GregorianCalendar;
-
 import megamek.common.EquipmentType;
 import megamek.common.MiscType;
 import megamek.common.TechConstants;

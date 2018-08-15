@@ -41,7 +41,6 @@ import megamek.common.Entity;
 import megamek.common.IPlayer;
 import megamek.common.MechFileParser;
 import megamek.common.MechSummary;
-import megamek.common.Player;
 import megamek.common.UnitType;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.logging.LogLevel;

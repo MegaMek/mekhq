@@ -24,7 +24,6 @@ package mekhq.campaign.parts;
 import org.w3c.dom.Node;
 
 import megamek.common.Entity;
-import megamek.common.EquipmentType;
 import megamek.common.IArmorState;
 import megamek.common.ITechnology;
 import megamek.common.TechAdvancement;

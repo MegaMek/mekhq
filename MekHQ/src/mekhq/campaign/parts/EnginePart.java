@@ -23,8 +23,6 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 import java.util.Calendar;
-import java.util.GregorianCalendar;
-
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 

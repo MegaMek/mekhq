@@ -58,7 +58,6 @@ import megamek.common.MechFileParser;
 import megamek.common.MechSummary;
 import megamek.common.MechSummaryCache;
 import megamek.common.PlanetaryConditions;
-import megamek.common.Player;
 import megamek.common.UnitType;
 import megamek.common.logging.LogLevel;
 import megamek.common.util.EncodeControl;

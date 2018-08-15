@@ -87,7 +87,6 @@ import javax.swing.table.TableColumn;
 
 import megamek.client.ui.swing.util.PlayerColors;
 import megamek.common.IPlayer;
-import megamek.common.Player;
 import megamek.common.logging.LogLevel;
 import megamek.common.options.GameOptions;
 import megamek.common.options.IOption;

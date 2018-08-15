@@ -24,7 +24,6 @@ import java.util.Map;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
-import megamek.common.EquipmentType;
 import megamek.common.ITechnology;
 
 public class HPGRatingAdapter extends XmlAdapter<String, Integer> {

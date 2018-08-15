@@ -21,7 +21,6 @@
 
 package mekhq.campaign.universe;
 
-import megamek.common.EquipmentType;
 import megamek.common.ITechnology;
 
 /**

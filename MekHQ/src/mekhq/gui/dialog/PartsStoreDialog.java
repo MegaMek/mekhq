@@ -73,7 +73,6 @@ import mekhq.campaign.parts.MekGyro;
 import mekhq.campaign.parts.MekLifeSupport;
 import mekhq.campaign.parts.MekLocation;
 import mekhq.campaign.parts.MekSensor;
-import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.OmniPod;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PartInventory;
