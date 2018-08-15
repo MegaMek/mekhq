@@ -3172,18 +3172,21 @@ public class Campaign implements Serializable, ITechManager {
         addReportInternal(r);
     }
 
-    /**
-     * Adds a report to the daily log
-     * @param r - the report String
-     */
-    public void addReport(String r) {
-        if (this.getCampaignOptions().historicalDailyLog()) {
-            String htmlStripped = r.replaceAll("\\<[^>]*>",""); //remote HTML tags
-            //add the new items to our in-memory cache
-            addInMemoryLogHistory(new LogEntry(getDate(), htmlStripped));
-        }
-        addReportInternal(r);
-    }
+	/**
+	 * Adds a report to the daily log
+	 * 
+	 * @param r - the report String
+	 */
+	public void addReport(String r) {
+		if (this.getCampaignOptions().historicalDailyLog()) {
+			// #858: I'm not sure what the comment about the cache actually mean (it makes no sense to me),
+			//       but LogEntry now handles XML properly so I guess there's no need for this workaround anymore
+			// String htmlStripped = r.replaceAll("\\<[^>]*>",""); //remote HTML tags add the new items to our in-memory cache
+			// addInMemoryLogHistory(new LogEntry(getDate(), htmlStripped));
+			addInMemoryLogHistory(new LogEntry(getDate(), r));
+		}
+		addReportInternal(r);
+	}
 
     private void addReportInternal(String r) {
         currentReport.add(r);
@@ -3610,7 +3613,7 @@ public class Campaign implements Serializable, ITechManager {
         pw1.println("\t</gameOptions>");
     }
 
-    /**
+    /* Commenting unused method * LATER remove this
      * A helper function to encapsulate writing the array/hash pairs out to XML. Each of the types requires a different XML
      * structure, but is in an identical holding structure. Thus, genericized function and interface to cleanly wrap it up.
      * God, I love 3rd-generation programming languages.
@@ -3621,7 +3624,6 @@ public class Campaign implements Serializable, ITechManager {
      * @param tag       The name of the tag to use to encapsulate it.
      * @param array     The list of objects to write out.
      * @param hashtab   The lookup hashtable for the associated array.
-     */
     private <arrType> void writeArrayAndHashToXml(PrintWriter pw1, int indent,
             String tag, ArrayList<arrType> array, Hashtable<Integer, arrType> hashtab) {
         // Hooray for implicitly-type-detected genericized functions!
@@ -3636,9 +3638,9 @@ public class Campaign implements Serializable, ITechManager {
         }
 
         pw1.println(MekHqXmlUtil.indentStr(indent) + "</" + tag + ">");
-    }
+    }*/
 
-    /**
+    /* Commenting unused method * LATER remove this
      * A helper function to encapsulate writing the array/hash pairs out to XML. Each of the types requires a different XML
      * structure, but is in an identical holding structure. Thus, genericized function and interface to cleanly wrap it up.
      * God, I love 3rd-generation programming languages.
@@ -3649,7 +3651,6 @@ public class Campaign implements Serializable, ITechManager {
      * @param tag       The name of the tag to use to encapsulate it.
      * @param array     The list of objects to write out.
      * @param hashtab   The lookup hashtable for the associated array.
-     */
     private <arrType> void writeArrayAndHashToXmlforUUID(PrintWriter pw1,
             int indent, String tag, ArrayList<arrType> array, Hashtable<UUID, arrType> hashtab) {
         // Hooray for implicitly-type-detected genericized functions!
@@ -3665,6 +3666,7 @@ public class Campaign implements Serializable, ITechManager {
 
         pw1.println(MekHqXmlUtil.indentStr(indent) + "</" + tag + ">");
     }
+     */
     
     /**
      * A helper function to encapsulate writing the map entries out to XML.
