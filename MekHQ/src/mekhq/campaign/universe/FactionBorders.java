@@ -110,7 +110,7 @@ public class FactionBorders {
     }
     
     /**
-     * Finds planets of another faction that on a border with this faction.
+     * Finds planets of another faction that are on a border with this faction.
      * 
      * @param other       The other faction's region.
      * @param borderSize  The size of the border.

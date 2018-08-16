@@ -264,9 +264,9 @@ public class RegionPerimeter {
         double b2 = p.getX() - q.getX();
         double c2 = a2 * p.getX() + b2 * p.getY();
  
-        double determinate = a1 * b2 - a2 * b1;
-        double x = (b2 * c1 - b1 * c2) / determinate;
-        double y = (a1 * c2 - a2 * c1) / determinate;
+        double determinant = a1 * b2 - a2 * b1;
+        double x = (b2 * c1 - b1 * c2) / determinant;
+        double y = (a1 * c2 - a2 * c1) / determinant;
  
         return new Point(x, y);
     }

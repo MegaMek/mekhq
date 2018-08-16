@@ -229,8 +229,8 @@ public class RandomFactionGenerator {
 
     /**
      * Selects an enemy faction for the given employer, weighted by length of shared border and
-     * diplomatic relations. Factions at war are twice or designated as rivals as likely (cumulative)
-     * to be chosen as opponents. Allied factions are ignored except for Clans, which cuts halves
+     * diplomatic relations. Factions at war or designated as rivals are twice as likely (cumulative)
+     * to be chosen as opponents. Allied factions are ignored except for Clans, which halves
      * the weight for that option.
      *
      * @param employer  The shortName of the faction offering the contract
@@ -252,8 +252,8 @@ public class RandomFactionGenerator {
 
     /**
      * Selects an enemy faction for the given employer, weighted by length of shared border and
-     * diplomatic relations. Factions at war are twice or designated as rivals as likely (cumulative)
-     * to be chosen as opponents. Allied factions are ignored except for Clans, which cuts halves
+     * diplomatic relations. Factions at war or designated as rivals are twice as likely (cumulative)
+     * to be chosen as opponents. Allied factions are ignored except for Clans, which halves
      * the weight for that option.
      *
      * @param employer  The faction offering the contract
