@@ -482,7 +482,7 @@ public class FactionHints {
             if (wn.getNodeType() == Node.ELEMENT_NODE) {
                 String nodeName = wn.getNodeName();
                 
-                if (nodeName.equalsIgnoreCase("neutral")) {
+                if (nodeName.equals("neutral")) {
                     String fKey = wn.getAttributes().getNamedItem("faction").getTextContent().trim();
                     Faction f = Faction.getFaction(fKey);
                     if (null != f) {
@@ -492,7 +492,7 @@ public class FactionHints {
                         MekHQ.getLogger().error(getClass(), METHOD_NAME,
                                 "Invalid faction code in factionhints.xml: " + f); //$NON-NLS-1$
                     }
-                } else if (nodeName.equalsIgnoreCase("deepPeriphery")) {
+                } else if (nodeName.equals("deepPeriphery")) {
                     for (String fKey : wn.getTextContent().trim().split(",")) {
                         Faction f = Faction.getFaction(fKey);
                         if (null != fKey) {
@@ -502,7 +502,7 @@ public class FactionHints {
                                     "Invalid faction code in factionhints.xml: " + f); //$NON-NLS-1$
                         }
                     }
-                } else if (nodeName.equalsIgnoreCase("majorPowers")) {
+                } else if (nodeName.equals("majorPowers")) {
                     for (String fKey : wn.getTextContent().trim().split(",")) {
                         Faction f = Faction.getFaction(fKey);
                         if (null != f) {
@@ -512,13 +512,13 @@ public class FactionHints {
                                     "Invalid faction code in factionhints.xml: " + f); //$NON-NLS-1$
                         }
                     }
-                } else if (nodeName.equalsIgnoreCase("rivals")) {
+                } else if (nodeName.equals("rivals")) {
                     setFactionHint(rivals, wn);
-                } else if (nodeName.equalsIgnoreCase("war")) {
+                } else if (nodeName.equals("war")) {
                     setFactionHint(wars, wn);
-                } else if (nodeName.equalsIgnoreCase("alliance")) {
+                } else if (nodeName.equals("alliance")) {
                     setFactionHint(alliances, wn);
-                } else if (nodeName.equalsIgnoreCase("location")) {
+                } else if (nodeName.equals("location")) {
                     Date start = null;
                     Date end = null;
                     double fraction = 0.0;
@@ -533,13 +533,13 @@ public class FactionHints {
                     }
                     for (int j = 0; j < wn.getChildNodes().getLength(); j++) {
                         Node wn2 = wn.getChildNodes().item(j);
-                        if (wn2.getNodeName().equalsIgnoreCase("outer")) {
+                        if (wn2.getNodeName().equals("outer")) {
                             outer = Faction.getFaction(wn2.getTextContent().trim());
-                        } else if (wn2.getNodeName().equalsIgnoreCase("inner")) {
+                        } else if (wn2.getNodeName().equals("inner")) {
                             inner = Faction.getFaction(wn2.getTextContent().trim());
-                        } else if (wn2.getNodeName().equalsIgnoreCase("fraction")) {
+                        } else if (wn2.getNodeName().equals("fraction")) {
                             fraction = Double.parseDouble(wn2.getTextContent().trim());
-                        } else if (wn2.getNodeName().equalsIgnoreCase("opponents")) {
+                        } else if (wn2.getNodeName().equals("opponents")) {
                             opponents = new ArrayList<>();
                             for (String fKey : wn2.getTextContent().trim().split(",")) {
                                 Faction f = Faction.getFaction(fKey);
@@ -580,7 +580,7 @@ public class FactionHints {
         }
         for (int n = 0; n < node.getChildNodes().getLength(); n++) {
             Node wn = node.getChildNodes().item(n);
-            if (wn.getNodeName().equalsIgnoreCase("parties")) {
+            if (wn.getNodeName().equals("parties")) {
                 Date localStart = start;
                 Date localEnd = end;
                 if (wn.getAttributes().getNamedItem("start") != null) {
@@ -616,7 +616,7 @@ public class FactionHints {
         }
         for (int n = 0; n < node.getChildNodes().getLength(); n++) {
             Node wn = node.getChildNodes().item(n);
-            if (wn.getNodeName().equalsIgnoreCase("exceptions")) {
+            if (wn.getNodeName().equals("exceptions")) {
                 Date localStart = start;
                 Date localEnd = end;
                 if (wn.getAttributes().getNamedItem("start") != null) {
