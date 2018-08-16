@@ -279,7 +279,7 @@ public class BloodnameDialog extends JDialog {
 		txtWarning.setText(txt);
 		
 		return true;
-	};
+	}
 
 	public void setFaction(String factionCode) {
 		for (int i = 0; i < C_NUM; i++) {

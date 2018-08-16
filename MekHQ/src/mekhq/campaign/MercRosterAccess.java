@@ -79,7 +79,7 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
             statement = connect.createStatement();
         } catch (SQLException e2) {
             e2.printStackTrace();
-        };
+        }
         
         writeBasicData();
         writeForceData();

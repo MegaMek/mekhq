@@ -966,6 +966,6 @@ public class AtBScenarioViewPanel extends JPanel {
                 popup.show(e.getComponent(), e.getX(), e.getY());
             }
         }
-    };
+    }
 
 }

@@ -3870,7 +3870,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
             while (rankOrder <= rank && rankOrder < Ranks.RC_NUM) {
                 Rank rank = ranks.getAllRanks().get(rankOrder);
                 if (!rank.getName(getProfession()).equals("-")) {
-                    shares++;;
+                    shares++;
                 }
                 rankOrder++;
             }

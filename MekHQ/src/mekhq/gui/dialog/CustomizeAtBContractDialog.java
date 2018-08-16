@@ -179,7 +179,7 @@ public class CustomizeAtBContractDialog extends JDialog {
     	cbAllyQuality = new JComboBox<>(ratingNames);
         JLabel lblAllyRating = new JLabel();
     	cbEnemySkill = new JComboBox<>(skillNames);
-    	cbEnemyQuality = new JComboBox<>(ratingNames);;
+    	cbEnemyQuality = new JComboBox<>(ratingNames);
     	JLabel lblAllyBotName = new JLabel();
     	txtAllyBotName = new JTextField();
     	JLabel lblEnemyBotName = new JLabel();

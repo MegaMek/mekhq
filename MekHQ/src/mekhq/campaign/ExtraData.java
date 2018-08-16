@@ -80,7 +80,7 @@ public class ExtraData {
     private static final Marshaller marshaller;
     private static final Unmarshaller unmarshaller;
     static {
-        Marshaller m = null;;
+        Marshaller m = null;
         Unmarshaller u = null;
         try {
             JAXBContext context = JAXBContext.newInstance(ExtraData.class);

@@ -88,7 +88,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
         monthNames.add("October ");
         monthNames.add("November");
         monthNames.add("December");
-    };
+    }
 
     private GregorianCalendar date;
     private GregorianCalendar workingDate;

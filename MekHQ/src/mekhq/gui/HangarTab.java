@@ -550,12 +550,12 @@ public final class HangarTab extends CampaignGuiTab {
 
     @Subscribe
     public void handle(DeploymentChangedEvent ev) {
-        filterUnitScheduler.schedule();;
+        filterUnitScheduler.schedule();
     }
     
     @Subscribe
     public void handle(PersonChangedEvent ev) {
-        filterUnitScheduler.schedule();;
+        filterUnitScheduler.schedule();
     }
     
     @Subscribe
@@ -565,7 +565,7 @@ public final class HangarTab extends CampaignGuiTab {
 
     @Subscribe
     public void handle(UnitChangedEvent ev) {
-        filterUnitScheduler.schedule();;
+        filterUnitScheduler.schedule();
     }
     
     @Subscribe

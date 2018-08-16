@@ -215,7 +215,7 @@ public class ShoppingList implements MekHqXmlSerializable {
     }
 
     public void restore() {
-    	ArrayList<IAcquisitionWork> newShoppingList = new ArrayList<>();;
+    	ArrayList<IAcquisitionWork> newShoppingList = new ArrayList<>();
     	
 
         for(IAcquisitionWork shoppingItem : shoppingList) {

@@ -41,7 +41,7 @@ public interface PersonnelMarketMethod extends MekHQModule {
     List<Person> removePersonnelForDay(Campaign c, List<Person> current);
 
     @Override
-    default void initPlugin(Campaign c) {};
+    default void initPlugin(Campaign c) {}
     @Override
     default void loadFieldsFromXml(Node node) {}
     @Override

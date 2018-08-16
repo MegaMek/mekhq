@@ -146,7 +146,7 @@ public class NewAtBContractDialog extends NewContractDialog {
     	cbAllyQuality = new JComboBox<>(ratingNames);
         JLabel lblAllyRating = new JLabel();
     	cbEnemySkill = new JComboBox<>(skillNames);
-    	cbEnemyQuality = new JComboBox<>(ratingNames);;
+    	cbEnemyQuality = new JComboBox<>(ratingNames);
         JLabel lblEnemyRating = new JLabel();
         JLabel lblShares = new JLabel();
         spnShares = new JSpinner(new SpinnerNumberModel(20, 20, 50, 10));

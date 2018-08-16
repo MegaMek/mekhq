@@ -2955,7 +2955,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             }
             if(usesSoloPilot()) {
                 if(!commander.isActive()) {
-                    entity.getCrew().setMissing(true, 0);;
+                    entity.getCrew().setMissing(true, 0);
                     return;
                 }
                 entity.getCrew().setHits(commander.getHits(), 0);
