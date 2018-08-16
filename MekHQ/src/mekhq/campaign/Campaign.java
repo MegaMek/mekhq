@@ -3178,9 +3178,7 @@ public class Campaign implements Serializable, ITechManager {
      */
     public void addReport(String r) {
         if (this.getCampaignOptions().historicalDailyLog()) {
-            String htmlStripped = r.replaceAll("\\<[^>]*>",""); //remote HTML tags
-            //add the new items to our in-memory cache
-            addInMemoryLogHistory(new LogEntry(getDate(), htmlStripped));
+            addInMemoryLogHistory(new LogEntry(getDate(), r));
         }
         addReportInternal(r);
     }
