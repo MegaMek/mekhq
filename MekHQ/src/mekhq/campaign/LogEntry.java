@@ -104,11 +104,11 @@ public class LogEntry implements Cloneable, MekHqXmlSerializable {
             for (int x = 0; x < nl.getLength(); x++) {
                 Node   node = nl.item(x);
                 String nname = node.getNodeName();
-                if (nname.equalsIgnoreCase("desc")) { //$NON-NLS-1$
+                if (nname.equals("desc")) { //$NON-NLS-1$
                     desc = MekHqXmlUtil.unEscape(node.getTextContent());
-                } else if (nname.equalsIgnoreCase("type")) { //$NON-NLS-1$
+                } else if (nname.equals("type")) { //$NON-NLS-1$
                     type = MekHqXmlUtil.unEscape(node.getTextContent());
-                } else if (nname.equalsIgnoreCase("date")) { //$NON-NLS-1$
+                } else if (nname.equals("date")) { //$NON-NLS-1$
                     date = DATE_FORMAT.parse(node.getTextContent().trim());
                 }
             }
