@@ -44,7 +44,8 @@ public class ProtomekLegActuator extends Part {
         this(0, null);
     }
 
-    public ProtomekLegActuator clone() {
+    @Override
+	public ProtomekLegActuator clone() {
         ProtomekLegActuator clone = new ProtomekLegActuator(getUnitTonnage(), campaign);
         clone.copyBaseData(this);
         return clone;
@@ -53,7 +54,7 @@ public class ProtomekLegActuator extends Part {
 
     public ProtomekLegActuator(int tonnage, Campaign c) {
         super(tonnage, c);
-        this.name = "Protomech Leg Actuator";
+        name = "Protomech Leg Actuator";
     }
 
     @Override

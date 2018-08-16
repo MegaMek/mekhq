@@ -20,7 +20,8 @@ public class Connection extends Thread {
 
     public void println(String s) { out.println(s); }
 
-    public void run() {
+    @Override
+	public void run() {
         String s;
         while ((s = in.readLine()) != null) {
             setMessage(s);

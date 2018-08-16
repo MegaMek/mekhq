@@ -27,7 +27,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import megamek.common.Compute;
-import megamek.common.EquipmentType;
+import megamek.common.ITechnology;
 import megamek.common.Tank;
 import megamek.common.TechAdvancement;
 import mekhq.MekHqXmlUtil;
@@ -50,9 +50,10 @@ public class VeeStabiliser extends Part {
 	public VeeStabiliser(int tonnage, int loc, Campaign c) {
         super(tonnage, c);
         this.loc = loc;
-        this.name = "Vehicle Stabiliser";
+        name = "Vehicle Stabiliser";
     }
 	
+	@Override
 	public VeeStabiliser clone() {
 		VeeStabiliser clone = new VeeStabiliser(getUnitTonnage(), 0, campaign);
         clone.copyBaseData(this);
@@ -89,7 +90,7 @@ public class VeeStabiliser extends Part {
 
 	@Override
 	public int getBaseAvailability(int era) {
-		return EquipmentType.RATING_B;
+		return ITechnology.RATING_B;
 	}
 
 	@Override
@@ -201,12 +202,13 @@ public class VeeStabiliser extends Part {
 		return "";
     }
 	
+	@Override
 	public int getLocation() {
 		return loc;
 	}
 	
 	public void setLocation(int l) {
-		this.loc = l;
+		loc = l;
 	}
 	
 	@Override

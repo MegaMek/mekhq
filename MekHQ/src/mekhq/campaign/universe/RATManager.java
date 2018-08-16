@@ -165,7 +165,7 @@ public class RATManager extends AbstractUnitGenerator implements IUnitGenerator 
             ex.printStackTrace();
             MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
                     "While loading RAT info from " + f.getName() + ": "); //$NON-NLS-1$
-            MekHQ.getLogger().log(getClass(), METHOD_NAME, ex);
+            MekHQ.getLogger().error(getClass(), METHOD_NAME, ex);
             return false;
         }
 
@@ -244,7 +244,7 @@ public class RATManager extends AbstractUnitGenerator implements IUnitGenerator 
         } catch (Exception ex) {
             MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO,
                     "While loading altFactions: "); //$NON-NLS-1$
-            MekHQ.getLogger().log(getClass(), METHOD_NAME, ex);
+            MekHQ.getLogger().error(getClass(), METHOD_NAME, ex);
         }
 
         Element elem = xmlDoc.getDocumentElement();
@@ -305,7 +305,7 @@ public class RATManager extends AbstractUnitGenerator implements IUnitGenerator 
                 } catch (Exception ex) {
                     MekHQ.getLogger().log(RATManager.class, METHOD_NAME, LogLevel.ERROR,
                             "While loading RAT info from " + f.getName() + ": "); //$NON-NLS-1$
-                    MekHQ.getLogger().log(RATManager.class, METHOD_NAME, ex);
+                    MekHQ.getLogger().error(RATManager.class, METHOD_NAME, ex);
                 }
                 Element elem = xmlDoc.getDocumentElement();
                 NodeList nl = elem.getChildNodes();
@@ -487,7 +487,7 @@ public class RATManager extends AbstractUnitGenerator implements IUnitGenerator 
             }
             return RandomUnitGenerator.getInstance().generate(count, rat.ratName, filter);
         }
-        return new ArrayList<MechSummary>();
+        return new ArrayList<>();
     }
 
     @Override
@@ -507,7 +507,7 @@ public class RATManager extends AbstractUnitGenerator implements IUnitGenerator 
             }
             return RandomUnitGenerator.getInstance().generate(count, rat.ratName, filter);
         }
-        return new ArrayList<MechSummary>();
+        return new ArrayList<>();
     }
 
     private static class RAT {

@@ -300,7 +300,7 @@ public class Lance implements Serializable, MekHqXmlSerializable {
     /* Code to find unit commander from ForceViewPanel */
 
     public static UUID findCommander(int forceId, Campaign c) {
-        ArrayList<Person> people = new ArrayList<Person>();
+        ArrayList<Person> people = new ArrayList<>();
         for(UUID uid : c.getForce(forceId).getAllUnits()) {
             Unit u = c.getUnit(uid);
             if(null != u) {
@@ -312,7 +312,8 @@ public class Lance implements Serializable, MekHqXmlSerializable {
         }
         //sort person vector by rank
         Collections.sort(people, new Comparator<Person>(){
-            public int compare(final Person p1, final Person p2) {
+            @Override
+			public int compare(final Person p1, final Person p2) {
                 return ((Comparable<Integer>)p2.getRankNumeric()).compareTo(p1.getRankNumeric());
             }
         });
@@ -518,7 +519,7 @@ public class Lance implements Serializable, MekHqXmlSerializable {
                 }
             }
         } catch (Exception ex) {
-            MekHQ.getLogger().log(Lance.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(Lance.class, METHOD_NAME, ex);
         }
         return retVal;
     }

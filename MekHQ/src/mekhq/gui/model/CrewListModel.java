@@ -90,8 +90,8 @@ public class CrewListModel extends AbstractListModel<Person> {
     List<Person> crew;
     
     public void setData(final Unit u) {
-        this.unit = u;
-        this.crew = new ArrayList<>(u.getCrew());
+        unit = u;
+        crew = new ArrayList<>(u.getCrew());
         Collections.sort(crew, (p1, p2) ->
             CrewRole.getCrewRole(p1, u).getSortOrder()
             - CrewRole.getCrewRole(p2, u).getSortOrder());
@@ -130,7 +130,7 @@ public class CrewListModel extends AbstractListModel<Person> {
                 boolean isSelected, boolean cellHasFocus) {
             Component c = this;
             setOpaque(true);
-            Person p = (Person)getElementAt(index);
+            Person p = getElementAt(index);
             StringBuilder sb = new StringBuilder("<html><font size='2'><b>")
                     .append(p.getFullTitle())
                     .append("</b><br/>")

@@ -32,9 +32,9 @@ import megamek.client.bot.princess.Princess;
 import megamek.client.ui.swing.ClientGUI;
 import megamek.common.Entity;
 import megamek.common.IGame;
+import megamek.common.IPlayer;
 import megamek.common.MapSettings;
 import megamek.common.PlanetaryConditions;
-import megamek.common.Player;
 import megamek.common.UnitType;
 import megamek.common.logging.LogLevel;
 import mekhq.campaign.force.Lance;
@@ -81,7 +81,7 @@ public class AtBGameThread extends GameThread {
         } catch (Exception ex) {
             MekHQ.getLogger().log(getClass(), "run", LogLevel.ERROR, //$NON-NLS-1$
                     "MegaMek client failed to connect to server"); //$NON-NLS-1$
-            MekHQ.getLogger().log(getClass(), "run", ex); //$NON-NLS-1$
+            MekHQ.getLogger().error(getClass(), "run", ex); //$NON-NLS-1$
             return;
         }
 
@@ -117,7 +117,7 @@ public class AtBGameThread extends GameThread {
                 } catch (FileNotFoundException ex) {
                     MekHQ.getLogger().log(getClass(), "run", LogLevel.ERROR, //$NON-NLS-1$
                             "Could not load map file data/mapgen/" + scenario.getMap() + ".xml"); //$NON-NLS-1$
-                    MekHQ.getLogger().log(getClass(), "run", ex); //$NON-NLS-1$
+                    MekHQ.getLogger().error(getClass(), "run", ex); //$NON-NLS-1$
                 }
                 mapSettings.setBoardSize(scenario.getMapX(), scenario.getMapY());
                 mapSettings.setMapSize(1,  1);
@@ -238,7 +238,7 @@ public class AtBGameThread extends GameThread {
                 	} catch (Exception e) {
                         MekHQ.getLogger().log(getClass(), "run", LogLevel.ERROR, //$NON-NLS-1$
                                 "Could not connect with Bot name " + bf.getName()); //$NON-NLS-1$
-                        MekHQ.getLogger().log(getClass(), "run", e); //$NON-NLS-1$
+                        MekHQ.getLogger().error(getClass(), "run", e); //$NON-NLS-1$
                 	}
                 	swingGui.getBots().put(name, botClient);
                 	
@@ -251,7 +251,7 @@ public class AtBGameThread extends GameThread {
             	Thread.sleep(50);
             }
         } catch (Exception e) {
-            MekHQ.getLogger().log(getClass(), "run", e); //$NON-NLS-1$
+            MekHQ.getLogger().error(getClass(), "run", e); //$NON-NLS-1$
         }
         finally {
 	        client.die();
@@ -293,7 +293,7 @@ public class AtBGameThread extends GameThread {
 				botClient.getLocalPlayer().setTeam(botForce.getTeam());
 				botClient.getLocalPlayer().setStartingPos(botForce.getStart());
 
-				if (botForce.getCamoCategory() == Player.NO_CAMO) {
+				if (botForce.getCamoCategory() == IPlayer.NO_CAMO) {
 					if (botForce.getColorIndex() >= 0) {
 						botClient.getLocalPlayer().setColorIndex(botForce.getColorIndex());
 					}
@@ -305,7 +305,7 @@ public class AtBGameThread extends GameThread {
 				botClient.sendPlayerInfo();
 			}
 		} catch (Exception e) {
-            MekHQ.getLogger().log(getClass(), "configureBot", e); //$NON-NLS-1$
+            MekHQ.getLogger().error(getClass(), "configureBot", e); //$NON-NLS-1$
 		}    	
     }
 }

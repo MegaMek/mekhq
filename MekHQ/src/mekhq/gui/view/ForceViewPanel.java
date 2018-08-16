@@ -72,8 +72,8 @@ public class ForceViewPanel extends javax.swing.JPanel {
 	
 	
 	public ForceViewPanel(Force f, Campaign c, IconPackage icons) {
-		this.force = f;
-		this.campaign = c;
+		force = f;
+		campaign = c;
 		this.icons = icons;
 		initComponents();
 	}
@@ -206,7 +206,7 @@ public class ForceViewPanel extends javax.swing.JPanel {
     	String LanceTech = "";
     	String assigned = "";
     	String type = null;
-    	ArrayList<Person> people = new ArrayList<Person>();
+    	ArrayList<Person> people = new ArrayList<>();
     	for(UUID uid : force.getAllUnits()) {
     		Unit u = campaign.getUnit(uid);
     		if(null != u) {
@@ -227,7 +227,8 @@ public class ForceViewPanel extends javax.swing.JPanel {
     	}
  		//sort person vector by rank
  		Collections.sort(people, new Comparator<Person>(){		 
-            public int compare(final Person p1, final Person p2) {
+            @Override
+			public int compare(final Person p1, final Person p2) {
                return ((Comparable<Integer>)p2.getRankNumeric()).compareTo(p1.getRankNumeric());
             }
         });
@@ -435,8 +436,8 @@ public class ForceViewPanel extends javax.swing.JPanel {
 		}
 		JLabel lblPerson;
 		JLabel lblUnit;		
-		ArrayList<Unit> units = new ArrayList<Unit>();
-		ArrayList<Unit> unmannedUnits = new ArrayList<Unit>();
+		ArrayList<Unit> units = new ArrayList<>();
+		ArrayList<Unit> unmannedUnits = new ArrayList<>();
  		for(UUID uid : force.getUnits()) {
 			Unit u = campaign.getUnit(uid);
 			if(null == u) {
@@ -450,7 +451,8 @@ public class ForceViewPanel extends javax.swing.JPanel {
  		}
  		//sort person vector by rank
  		Collections.sort(units, new Comparator<Unit>(){		 
-            public int compare(final Unit u1, final Unit u2) {
+            @Override
+			public int compare(final Unit u1, final Unit u2) {
                return ((Comparable<Integer>)u2.getCommander().getRankNumeric()).compareTo(u1.getCommander().getRankNumeric());
             }
         });
@@ -594,7 +596,7 @@ public class ForceViewPanel extends javax.swing.JPanel {
     	double ton = 0;
     	int number = 0;
     	String commander = "No personnel found";
-    	ArrayList<Person> people = new ArrayList<Person>();
+    	ArrayList<Person> people = new ArrayList<>();
     	for(UUID uid : f.getAllUnits()) {
     		Unit u = campaign.getUnit(uid);
     		if(null != u) {
@@ -614,7 +616,8 @@ public class ForceViewPanel extends javax.swing.JPanel {
     	}
  		//sort person vector by rank
  		Collections.sort(people, new Comparator<Person>(){		 
-            public int compare(final Person p1, final Person p2) {
+            @Override
+			public int compare(final Person p1, final Person p2) {
                return ((Comparable<Integer>)p2.getRankNumeric()).compareTo(p1.getRankNumeric());
             }
         });

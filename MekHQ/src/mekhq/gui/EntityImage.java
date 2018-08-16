@@ -30,7 +30,7 @@ import java.awt.image.PixelGrabber;
             this.base = base;
             this.tint = tint;
             this.camo = camo;
-            this.parent = comp;
+            parent = comp;
             this.wreck = wreck;
         }
 

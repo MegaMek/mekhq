@@ -72,7 +72,7 @@ public class ConvoyAttackBuiltInScenario extends AtBScenario {
 					EntityWeightClass.WEIGHT_LIGHT, campaign));
 		}
 
-		ArrayList<Entity> otherForce = new ArrayList<Entity>();
+		ArrayList<Entity> otherForce = new ArrayList<>();
 		addCivilianUnits(otherForce, 12, campaign);
 		addBotForce(new BotForce("Convoy", 2, Board.START_CENTER, otherForce));
 

@@ -39,7 +39,8 @@ public class PartsTableMouseAdapter extends MouseInputAdapter implements ActionL
         this.partsModel = partsModel;
     }
 
-    public void actionPerformed(ActionEvent action) {
+    @Override
+	public void actionPerformed(ActionEvent action) {
         String command = action.getActionCommand();
         int row = partsTable.getSelectedRow();
         if (row < 0) {

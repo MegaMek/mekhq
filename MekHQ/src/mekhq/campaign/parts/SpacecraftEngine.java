@@ -61,11 +61,12 @@ public class SpacecraftEngine extends Part {
 
 	public SpacecraftEngine(int tonnage, double etonnage, Campaign c, boolean clan) {
 		super(tonnage, c);
-		this.engineTonnage = etonnage;
+		engineTonnage = etonnage;
 		this.clan = clan;
-		this.name = "Spacecraft Engine";
+		name = "Spacecraft Engine";
 	}
 	
+	@Override
 	public SpacecraftEngine clone() {
 		SpacecraftEngine clone = new SpacecraftEngine(getUnitTonnage(), engineTonnage, campaign, clan);
         clone.copyBaseData(this);
@@ -100,7 +101,7 @@ public class SpacecraftEngine extends Part {
 	
 	@Override 
 	public long getStickerPrice() {
-		return (long)Math.round(engineTonnage * 1000);
+		return Math.round(engineTonnage * 1000);
 	}
 	
 	@Override

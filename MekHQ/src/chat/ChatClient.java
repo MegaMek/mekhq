@@ -77,7 +77,8 @@ public class ChatClient extends JPanel implements ActionListener {
     }
 
     // process TextField after user hits Enter
-    public void actionPerformed(ActionEvent e) {
+    @Override
+	public void actionPerformed(ActionEvent e) {
         out.println("[" + screenName + "]: " + typedText.getText());
         typedText.setText("");
         typedText.requestFocusInWindow();

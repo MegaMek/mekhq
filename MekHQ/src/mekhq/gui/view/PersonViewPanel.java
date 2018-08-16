@@ -107,11 +107,11 @@ public class PersonViewPanel extends JPanel {
 
 
     public PersonViewPanel(Person p, Campaign c, IconPackage ip) {
-        this.person = p;
-        this.campaign = c;
+        person = p;
+        campaign = c;
         this.ip = ip;
-        this.portraits = ip.getPortraits();
-        this.awardIcons = ip.getAwardIcons();
+        portraits = ip.getPortraits();
+        awardIcons = ip.getAwardIcons();
         resourceMap = ResourceBundle.getBundle("mekhq.resources.PersonViewPanel", new EncodeControl()); //$NON-NLS-1$
         initComponents();
     }

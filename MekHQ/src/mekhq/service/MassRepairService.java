@@ -55,7 +55,7 @@ public class MassRepairService {
 	}
 
 	private static List<MassRepairOption> createActiveMROsFromConfiguration(CampaignGUI campaignGUI) {
-		List<MassRepairOption> activeMROs = new ArrayList<MassRepairOption>();
+		List<MassRepairOption> activeMROs = new ArrayList<>();
 		List<MassRepairOption> mroList = campaignGUI.getCampaign().getCampaignOptions().getMassRepairOptions();
 
 		if (null != mroList) {
@@ -84,7 +84,7 @@ public class MassRepairService {
 		if (techs.isEmpty()) {
 			campaign.addReport("No available techs to repairs parts.");
 		} else {
-			Map<Integer, MassRepairOption> mroByTypeMap = new HashMap<Integer, MassRepairOption>();
+			Map<Integer, MassRepairOption> mroByTypeMap = new HashMap<>();
 
 			for (int i = 0; i < mroList.size(); i++) {
 				mroByTypeMap.put(mroList.get(i).getType(), mroList.get(i));
@@ -189,7 +189,7 @@ public class MassRepairService {
 	}
 
 	public static void massRepairSalvageAllUnits(CampaignGUI campaignGUI) {
-		List<Unit> units = new ArrayList<Unit>();
+		List<Unit> units = new ArrayList<>();
 
 		for (Unit unit : campaignGUI.getCampaign().getServiceableUnits()) {
 
@@ -224,7 +224,7 @@ public class MassRepairService {
 		CampaignOptions options = campaignGUI.getCampaign().getCampaignOptions();
 		List<MassRepairOption> activeMROs = createActiveMROsFromConfiguration(campaignGUI);
 
-		Map<MassRepairUnitAction.STATUS, List<MassRepairUnitAction>> unitActionsByStatus = new HashMap<MassRepairUnitAction.STATUS, List<MassRepairUnitAction>>();
+		Map<MassRepairUnitAction.STATUS, List<MassRepairUnitAction>> unitActionsByStatus = new HashMap<>();
 
 		MassRepairConfiguredOptions configuredOptions = new MassRepairConfiguredOptions();
 		configuredOptions.setup(options);
@@ -236,7 +236,7 @@ public class MassRepairService {
 			List<MassRepairUnitAction> list = unitActionsByStatus.get(unitAction.getStatus());
 
 			if (null == list) {
-				list = new ArrayList<MassRepairUnitAction>();
+				list = new ArrayList<>();
 				unitActionsByStatus.put(unitAction.getStatus(), list);
 			}
 
@@ -388,7 +388,7 @@ public class MassRepairService {
 			}
 		}
 
-		Map<Integer, MassRepairOption> mroByTypeMap = new HashMap<Integer, MassRepairOption>();
+		Map<Integer, MassRepairOption> mroByTypeMap = new HashMap<>();
 
 		for (int i = 0; i < mroList.size(); i++) {
 			mroByTypeMap.put(mroList.get(i).getType(), mroList.get(i));
@@ -513,7 +513,7 @@ public class MassRepairService {
 		 */
 
 		if ((unit.getEntity() instanceof Mech)) {
-			Map<Integer, Part> locationMap = new HashMap<Integer, Part>();
+			Map<Integer, Part> locationMap = new HashMap<>();
 
 			for (IPartWork partWork : parts) {
 				if ((partWork instanceof MekLocation) && ((MekLocation) partWork).onBadHipOrShoulder()) {
@@ -542,8 +542,8 @@ public class MassRepairService {
 				}
 
 				List<IPartWork> partsTemp = campaignGUI.getCampaign().getPartsNeedingServiceFor(unit.getId(), true);
-				List<IPartWork> partsToBeRemoved = new ArrayList<IPartWork>();
-				Map<Integer, Integer> countOfPartsPerLocation = new HashMap<Integer, Integer>();
+				List<IPartWork> partsToBeRemoved = new ArrayList<>();
+				Map<Integer, Integer> countOfPartsPerLocation = new HashMap<>();
 
 				for (IPartWork partWork : partsTemp) {
 					if (!(partWork instanceof MekLocation) && !(partWork instanceof MissingMekLocation)
@@ -685,11 +685,11 @@ public class MassRepairService {
 
 		Campaign campaign = campaignGUI.getCampaign();
 		TechSorter sorter = new TechSorter(partWork);
-		Map<String, WorkTime> techSkillToWorktimeMap = new HashMap<String, WorkTime>();
-		List<Person> sameDayTechs = new ArrayList<Person>();
-		List<Person> overflowDayTechs = new ArrayList<Person>();
-		List<Person> sameDayAssignedTechs = new ArrayList<Person>();
-		List<Person> overflowDayAssignedTechs = new ArrayList<Person>();
+		Map<String, WorkTime> techSkillToWorktimeMap = new HashMap<>();
+		List<Person> sameDayTechs = new ArrayList<>();
+		List<Person> overflowDayTechs = new ArrayList<>();
+		List<Person> sameDayAssignedTechs = new ArrayList<>();
+		List<Person> overflowDayAssignedTechs = new ArrayList<>();
 		int highestAvailableTechSkill = -1;
 
 		for (Person tech : techs) {
@@ -823,7 +823,7 @@ public class MassRepairService {
 			debugLog("... time to check tech: %s ns", "repairPart", (System.nanoTime() - time));
 		}
 
-		List<Person> validTechs = new ArrayList<Person>();
+		List<Person> validTechs = new ArrayList<>();
 
 		if (!sameDayAssignedTechs.isEmpty()) {
 			Collections.sort(sameDayAssignedTechs, sorter);
@@ -886,13 +886,13 @@ public class MassRepairService {
 
 	private static List<IPartWork> filterParts(List<IPartWork> parts, Map<Integer, MassRepairOption> mroByTypeMap,
 			List<Person> techs, Campaign campaign) {
-		List<IPartWork> newParts = new ArrayList<IPartWork>();
+		List<IPartWork> newParts = new ArrayList<>();
 
 		if (techs.isEmpty() || parts.isEmpty()) {
 			return newParts;
 		}
 
-		Map<String, Person> techCache = new HashMap<String, Person>();
+		Map<String, Person> techCache = new HashMap<>();
 
 		for (IPartWork partWork : parts) {
 			if (partWork.isBeingWorkedOn()) {
@@ -965,7 +965,7 @@ public class MassRepairService {
 
 	private static List<Person> filterTechs(IPartWork partWork, List<Person> techs,
 			Map<Integer, MassRepairOption> mroByTypeMap, boolean warehouseMode, CampaignGUI campaignGUI) {
-		List<Person> validTechs = new ArrayList<Person>();
+		List<Person> validTechs = new ArrayList<>();
 
 		if (techs.isEmpty()) {
 			return validTechs;
@@ -1182,7 +1182,7 @@ public class MassRepairService {
 		private IPartWork partWork = null;
 
 		public TechSorter(IPartWork _part) {
-			this.partWork = _part;
+			partWork = _part;
 		}
 
 		@Override
@@ -1304,7 +1304,7 @@ public class MassRepairService {
 	}
 
 	public static class MassRepairPartSet {
-		private Map<MassRepairPartAction.STATUS, List<MassRepairPartAction>> partActionsByStatus = new HashMap<MassRepairPartAction.STATUS, List<MassRepairPartAction>>();
+		private Map<MassRepairPartAction.STATUS, List<MassRepairPartAction>> partActionsByStatus = new HashMap<>();
 
 		public void addPartAction(MassRepairPartAction partAction) {
 			if (null == partAction) {
@@ -1314,7 +1314,7 @@ public class MassRepairService {
 			List<MassRepairPartAction> list = partActionsByStatus.get(partAction.getStatus());
 
 			if (null == list) {
-				list = new ArrayList<MassRepairPartAction>();
+				list = new ArrayList<>();
 				partActionsByStatus.put(partAction.getStatus(), list);
 			}
 

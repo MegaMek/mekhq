@@ -51,7 +51,8 @@ public class ProtomekJumpJet extends Part {
         this(0, null);
     }
 
-    public ProtomekJumpJet clone() {
+    @Override
+	public ProtomekJumpJet clone() {
         ProtomekJumpJet clone = new ProtomekJumpJet(getUnitTonnage(), campaign);
         clone.copyBaseData(this);
         return clone;
@@ -60,7 +61,7 @@ public class ProtomekJumpJet extends Part {
 
     public ProtomekJumpJet(int tonnage, Campaign c) {
         super(tonnage, c);
-        this.name = "Protomech Jump Jet";
+        name = "Protomech Jump Jet";
     }
 
     @Override
@@ -270,7 +271,7 @@ public class ProtomekJumpJet extends Part {
         int damagedJJ = 0;
         if(null != unit) {
             for(Part p : unit.getParts()) {
-                if(p.getId() == this.getId()) {
+                if(p.getId() == getId()) {
                     continue;
                 }
                 if(p instanceof MissingProtomekJumpJet

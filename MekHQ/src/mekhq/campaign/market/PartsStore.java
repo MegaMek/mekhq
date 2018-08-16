@@ -23,8 +23,8 @@ package mekhq.campaign.market;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Enumeration;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -46,7 +46,6 @@ import megamek.common.WeaponType;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.verifier.TestEntity;
 import megamek.common.weapons.InfantryAttack;
-import megamek.common.weapons.Weapon;
 import megamek.common.weapons.bayweapons.BayWeapon;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.AeroHeatSink;
@@ -109,8 +108,8 @@ public class PartsStore implements Serializable {
 	private Map<String, Part> nameAndDetailMap;
 
 	public PartsStore(Campaign c) {
-		parts = new ArrayList<Part>(EXPECTED_SIZE);
-		nameAndDetailMap = new HashMap<String, Part>(EXPECTED_SIZE);
+		parts = new ArrayList<>(EXPECTED_SIZE);
+		nameAndDetailMap = new HashMap<>(EXPECTED_SIZE);
 		stock(c);
 	}
 
@@ -263,7 +262,7 @@ public class PartsStore implements Serializable {
                             || et.hasFlag(MiscType.F_FIGHTER_EQUIPMENT);
 			    } else if (et instanceof WeaponType) {
 			        poddable &= (et.hasFlag(WeaponType.F_MECH_WEAPON)
-			                || et.hasFlag(Weapon.F_TANK_WEAPON)
+			                || et.hasFlag(WeaponType.F_TANK_WEAPON)
 			                || et.hasFlag(WeaponType.F_AERO_WEAPON))
 			                && !((WeaponType) et).isCapital(); 
 			    }
@@ -356,7 +355,7 @@ public class PartsStore implements Serializable {
 
 	private void stockEngines(Campaign c) {
 		Engine engine;
-		int year = c.getCalendar().get(GregorianCalendar.YEAR);
+		int year = c.getCalendar().get(Calendar.YEAR);
 		for(int rating = 10; rating <= 400; rating += 5) {
 			for(int ton = 5; ton <= 100; ton += 5) {
 				for(int i = 0; i <= Engine.FISSION; i++) {

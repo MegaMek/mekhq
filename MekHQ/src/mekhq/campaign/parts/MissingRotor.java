@@ -24,8 +24,8 @@ package mekhq.campaign.parts;
 import org.w3c.dom.Node;
 
 import megamek.common.Entity;
-import megamek.common.EquipmentType;
 import megamek.common.IArmorState;
+import megamek.common.ITechnology;
 import megamek.common.TechAdvancement;
 import megamek.common.VTOL;
 import mekhq.campaign.Campaign;
@@ -43,7 +43,7 @@ public class MissingRotor extends MissingPart {
 	
 	public MissingRotor(int tonnage, Campaign c) {
         super(tonnage, c);
-        this.name = "Rotor";
+        name = "Rotor";
     }
 	
 	@Override 
@@ -63,7 +63,7 @@ public class MissingRotor extends MissingPart {
 
 	@Override
 	public int getTechRating() {
-		return EquipmentType.RATING_B;
+		return ITechnology.RATING_B;
 	}
 
 	@Override

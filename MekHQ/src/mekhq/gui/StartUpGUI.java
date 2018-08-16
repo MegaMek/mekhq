@@ -43,7 +43,8 @@ public class StartUpGUI extends javax.swing.JPanel {
 	public StartUpGUI(MekHQ app) {
         this.app = app;
         lastSave = Utilities.lastFileModified(MekHQ.CAMPAIGN_DIRECTORY, new FilenameFilter() {
-            public boolean accept(File dir, String name) {
+            @Override
+			public boolean accept(File dir, String name) {
                 return name.toLowerCase().endsWith(".cpnx") || name.toLowerCase().endsWith(".xml");
             }
         });
@@ -62,7 +63,8 @@ public class StartUpGUI extends javax.swing.JPanel {
         btnNewGame.setPreferredSize(new Dimension(200, 25));
         btnNewGame.setMaximumSize(new Dimension(200, 25));
         btnNewGame.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
             	newCampaign();
             }
         });
@@ -71,7 +73,8 @@ public class StartUpGUI extends javax.swing.JPanel {
         btnLoadGame.setPreferredSize(new Dimension(200, 25));
         btnLoadGame.setMaximumSize(new Dimension(200, 25));
         btnLoadGame.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
             	File f = selectLoadCampaignFile();
             	if(null != f) {
                 	loadCampaign(f);
@@ -86,7 +89,8 @@ public class StartUpGUI extends javax.swing.JPanel {
         	btnLastSave.setEnabled(false);
         }
         btnLastSave.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
             	loadCampaign(lastSave);
             }
         });
@@ -95,7 +99,8 @@ public class StartUpGUI extends javax.swing.JPanel {
         btnQuit.setPreferredSize(new Dimension(200, 25));
         btnQuit.setMaximumSize(new Dimension(200, 25));
         btnQuit.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 System.exit(0);
             }
         });

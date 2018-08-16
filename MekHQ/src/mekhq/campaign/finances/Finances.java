@@ -27,6 +27,7 @@ import java.io.Serializable;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -97,9 +98,9 @@ public class Finances implements Serializable {
     }
 
     public Finances() {
-        transactions = new ArrayList<Transaction>();
-        loans = new ArrayList<Loan>();
-        assets = new ArrayList<Asset>();
+        transactions = new ArrayList<>();
+        loans = new ArrayList<>();
+        assets = new ArrayList<>();
         loanDefaults = 0;
         failCollateral = 0;
         wentIntoDebt = null;
@@ -171,7 +172,7 @@ public class Finances implements Serializable {
      */
     public void newFiscalYear(Date date) {
         long carryover = getBalance();
-        transactions = new ArrayList<Transaction>();
+        transactions = new ArrayList<>();
         credit(carryover, Transaction.C_START, resourceMap.getString("Carryover.text"), date);
     }
 
@@ -289,12 +290,12 @@ public class Finances implements Serializable {
                 credit(asset.getIncome(), Transaction.C_MISC, "income from " + asset.getName(),
                         campaign.getCalendar().getTime());
                 campaign.addReport(String.format(resourceMap.getString("AssetPayment.text"),
-                        DecimalFormat.getInstance().format(asset.getIncome()), asset.getName()));
+                        NumberFormat.getInstance().format(asset.getIncome()), asset.getName()));
             } else if (asset.getSchedule() == SCHEDULE_MONTHLY && campaign.calendar.get(Calendar.DAY_OF_MONTH) == 1) {
                 credit(asset.getIncome(), Transaction.C_MISC, "income from " + asset.getName(),
                         campaign.getCalendar().getTime());
                 campaign.addReport(String.format(resourceMap.getString("AssetPayment.text"),
-                        DecimalFormat.getInstance().format(asset.getIncome()), asset.getName()));
+                        NumberFormat.getInstance().format(asset.getIncome()), asset.getName()));
             }
         }
 
@@ -361,18 +362,18 @@ public class Finances implements Serializable {
             }
         }
 
-            ArrayList<Loan> newLoans = new ArrayList<Loan>();
+            ArrayList<Loan> newLoans = new ArrayList<>();
             for (Loan loan : loans) {
                 if (loan.checkLoanPayment(campaign.getCalendar())) {
                     if (debit(loan.getPaymentAmount(), Transaction.C_LOAN_PAYMENT,
                             String.format(resourceMap.getString("Loan.title"), loan.getDescription()),
                             campaign.getCalendar().getTime())) {
                         campaign.addReport(String.format(resourceMap.getString("Loan.text"),
-                                DecimalFormat.getInstance().format(loan.getPaymentAmount()), loan.getDescription()));
+                                NumberFormat.getInstance().format(loan.getPaymentAmount()), loan.getDescription()));
                         loan.paidLoan();
                     } else {
                         campaign.addReport(String.format(resourceMap.getString("Loan.insufficient"),
-                                loan.getDescription(), DecimalFormat.getInstance().format(loan.getPaymentAmount())));
+                                loan.getDescription(), NumberFormat.getInstance().format(loan.getPaymentAmount())));
                         loan.setOverdue(true);
                     }
                 }
@@ -389,7 +390,7 @@ public class Finances implements Serializable {
     }
 
     public long checkOverdueLoanPayments(Campaign campaign) {
-        ArrayList<Loan> newLoans = new ArrayList<Loan>();
+        ArrayList<Loan> newLoans = new ArrayList<>();
         long overdueAmount = 0;
         for (Loan loan : loans) {
             if(loan.isOverdue()) {
@@ -397,7 +398,7 @@ public class Finances implements Serializable {
                         String.format(resourceMap.getString("Loan.title"), loan.getDescription()),
                         campaign.getCalendar().getTime())) {
                     campaign.addReport(String.format(resourceMap.getString("Loan.text"),
-                            DecimalFormat.getInstance().format(loan.getPaymentAmount()), loan.getDescription()));
+                            NumberFormat.getInstance().format(loan.getPaymentAmount()), loan.getDescription()));
                     loan.paidLoan();
                 } else {
                     overdueAmount += loan.getPaymentAmount();

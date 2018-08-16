@@ -53,8 +53,8 @@ ActionListener {
         String command = st.nextToken();
         String type = st.nextToken();
         String target = st.nextToken();
-        Vector<Force> forces = new Vector<Force>();
-        Vector<Unit> units = new Vector<Unit>();
+        Vector<Force> forces = new Vector<>();
+        Vector<Unit> units = new Vector<>();
         while (st.hasMoreTokens()) {
             String id = st.nextToken();
             if (type.equals("FORCE")) {
@@ -71,7 +71,7 @@ ActionListener {
             }
         }
         if (type.equals("FORCE")) {
-            Vector<Force> newForces = new Vector<Force>();
+            Vector<Force> newForces = new Vector<>();
             for (Force force : forces) {
                 boolean duplicate = false;
                 for (Force otherForce : forces) {
@@ -291,7 +291,7 @@ ActionListener {
             // don't set them directly, set the C3i UUIDs and then
             // run gui.refreshNetworks on the campaign
             // TODO: is that too costly?
-            Vector<String> uuids = new Vector<String>();
+            Vector<String> uuids = new Vector<>();
             for (Unit unit : units) {
                 if (null == unit.getEntity()) {
                     continue;
@@ -377,10 +377,10 @@ ActionListener {
             // we will allow multiple selection of either units or forces
             // but not both - if both are selected then default to
             // unit and deselect all forces
-            Vector<Force> forces = new Vector<Force>();
-            Vector<Unit> unitsInForces = new Vector<Unit>();
-            Vector<Unit> units = new Vector<Unit>();
-            Vector<TreePath> uPath = new Vector<TreePath>();
+            Vector<Force> forces = new Vector<>();
+            Vector<Unit> unitsInForces = new Vector<>();
+            Vector<Unit> units = new Vector<>();
+            Vector<TreePath> uPath = new Vector<>();
             for (TreePath path : tree.getSelectionPaths()) {
                 Object node = path.getLastPathComponent();
                 if (node instanceof Force) {
@@ -754,8 +754,8 @@ ActionListener {
                     }
                     menu = new JMenu("Add Unit");
                     menu.setEnabled(false);
-                    HashMap<String, JMenu> unitTypeMenus = new HashMap<String, JMenu>();
-                    HashMap<String, JMenu> weightClassForUnitType = new HashMap<String, JMenu>();
+                    HashMap<String, JMenu> unitTypeMenus = new HashMap<>();
+                    HashMap<String, JMenu> weightClassForUnitType = new HashMap<>();
                     
                     // TODO: Doesn't currently account for Support Vees of any type
                     for (int i = 0; i < UnitType.SIZE; i++)

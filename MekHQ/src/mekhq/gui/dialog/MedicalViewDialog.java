@@ -63,6 +63,7 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.UIManager;
 
 import org.joda.time.chrono.GJChronology;
@@ -118,8 +119,8 @@ public class MedicalViewDialog extends JDialog {
 
     public MedicalViewDialog(Window parent, Campaign c, Person p, IconPackage ip) {
         super();
-        this.campaign = Objects.requireNonNull(c);
-        this.person = Objects.requireNonNull(p);
+        campaign = Objects.requireNonNull(c);
+        person = Objects.requireNonNull(p);
         //this.iconPackage = Objects.requireNonNull(ip);
         resourceMap = ResourceBundle.getBundle("mekhq.resources.MedicalViewDialog", new EncodeControl()); //$NON-NLS-1$
         
@@ -127,12 +128,12 @@ public class MedicalViewDialog extends JDialog {
         try(InputStream fis = new FileInputStream(ip.getGuiElement("default_male_paperdoll"))) { //$NON-NLS-1$
             defaultMaleDoll = new Paperdoll(fis);
         } catch(IOException e) {
-            MekHQ.getLogger().log(getClass(), "<init>(Window,Campaign,Person,IconPackage)", e); //$NON-NLS-1$
+            MekHQ.getLogger().error(getClass(), "<init>(Window,Campaign,Person,IconPackage)", e); //$NON-NLS-1$
         }
         try(InputStream fis = new FileInputStream(ip.getGuiElement("default_female_paperdoll"))) { //$NON-NLS-1$
             defaultFemaleDoll = new Paperdoll(fis);
         } catch(IOException e) {
-            MekHQ.getLogger().log(getClass(), "<init>(Window,Campaign,Person,IconPackage)", e); //$NON-NLS-1$
+            MekHQ.getLogger().error(getClass(), "<init>(Window,Campaign,Person,IconPackage)", e); //$NON-NLS-1$
         }
         
         setPreferredSize(new Dimension(1024, 840));
@@ -203,7 +204,7 @@ public class MedicalViewDialog extends JDialog {
         setBackground(Color.WHITE);
         getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
         Container scrollPanel = new JPanel();
-        getContentPane().add(new JScrollPane(scrollPanel, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER));
+        getContentPane().add(new JScrollPane(scrollPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER));
         initComponents(scrollPanel);
         
         JButton okayButton = new JButton(resourceMap.getString("buttonDone.text")); //$NON-NLS-1$
@@ -396,7 +397,7 @@ public class MedicalViewDialog extends JDialog {
         panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
         panel.add(genLabel(resourceMap.getString("medicalHistory.text"))); //$NON-NLS-1$
         Map<String, List<LogEntry>> groupedEntries = p.getPersonnelLog().stream()
-            .filter(entry -> entry.isType(Person.LOGTYPE_MEDICAL))
+            .filter(entry -> Person.LOGTYPE_MEDICAL.equals(entry.getType()))
             .sorted((entry1, entry2) -> entry1.getDate().compareTo(entry2.getDate()))
             .collect(Collectors.groupingBy(entry -> DATE_FORMAT.format(entry.getDate())));
         groupedEntries.entrySet().stream()
@@ -595,8 +596,8 @@ public class MedicalViewDialog extends JDialog {
             this.label = label;
             this.person = person;
             this.injury = injury;
-            this.healImageIcon = new ImageIcon(new ImageIcon("data/images/misc/medical.png").getImage().getScaledInstance(16, 16, Image.SCALE_DEFAULT)); //$NON-NLS-1$
-            this.resourceMap = ResourceBundle.getBundle("mekhq.resources.MedicalViewDialog", new EncodeControl()); //$NON-NLS-1$
+            healImageIcon = new ImageIcon(new ImageIcon("data/images/misc/medical.png").getImage().getScaledInstance(16, 16, Image.SCALE_DEFAULT)); //$NON-NLS-1$
+            resourceMap = ResourceBundle.getBundle("mekhq.resources.MedicalViewDialog", new EncodeControl()); //$NON-NLS-1$
         }
         
         @Override

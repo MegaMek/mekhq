@@ -66,13 +66,13 @@ public class ScenarioViewPanel extends javax.swing.JPanel {
     private StubTreeModel forceModel;
     
     public ScenarioViewPanel(Scenario s, Campaign c, IconPackage i) {
-        this.scenario = s;
-        this.campaign = c;
-        this.icons = i;
+        scenario = s;
+        campaign = c;
+        icons = i;
         if(s.isCurrent()) {
-            this.forces = new ForceStub(s.getForces(campaign), campaign);
+            forces = new ForceStub(s.getForces(campaign), campaign);
         } else {
-            this.forces = s.getForceStub();
+            forces = s.getForceStub();
         }
         forceModel = new StubTreeModel(forces);
         initComponents();
@@ -205,7 +205,7 @@ public class ScenarioViewPanel extends javax.swing.JPanel {
     protected class StubTreeModel implements TreeModel {
 
         private ForceStub rootForce;
-        private Vector<TreeModelListener> listeners = new Vector<TreeModelListener>();
+        private Vector<TreeModelListener> listeners = new Vector<>();
         
         public StubTreeModel(ForceStub root) {
             rootForce = root;

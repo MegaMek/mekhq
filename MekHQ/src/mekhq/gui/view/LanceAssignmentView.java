@@ -95,7 +95,7 @@ public class LanceAssignmentView extends JPanel {
 	
 	@SuppressWarnings("serial")
 	private void initComponents() {
-		cbContract = new JComboBox<AtBContract>();
+		cbContract = new JComboBox<>();
 		cbContract.setRenderer(new DefaultListCellRenderer() {
 			@Override
 			public Component getListCellRendererComponent(JList<?> list,
@@ -105,7 +105,7 @@ public class LanceAssignmentView extends JPanel {
 			}
 		});
 		
-		cbRole = new JComboBox<String>(Lance.roleNames);
+		cbRole = new JComboBox<>(Lance.roleNames);
 		
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		
@@ -119,6 +119,7 @@ public class LanceAssignmentView extends JPanel {
             column = ((XTableColumnModel)tblRequiredLances.getColumnModel()).getColumnByModelIndex(i);
             column.setPreferredWidth(rlModel.getColumnWidth(i));
             column.setCellRenderer(new DefaultTableCellRenderer() {
+				@Override
 				public Component getTableCellRendererComponent(JTable table,
                         Object value, boolean isSelected, boolean hasFocus,
                         int row, int column) {
@@ -137,7 +138,7 @@ public class LanceAssignmentView extends JPanel {
                 }
             });
         }
-        TableRowSorter<RequiredLancesTableModel>sorter = new TableRowSorter<RequiredLancesTableModel>(rlModel);
+        TableRowSorter<RequiredLancesTableModel>sorter = new TableRowSorter<>(rlModel);
         tblRequiredLances.setRowSorter(sorter);
         
         tblRequiredLances.setIntercellSpacing(new Dimension(0, 0));
@@ -153,6 +154,7 @@ public class LanceAssignmentView extends JPanel {
             column = ((XTableColumnModel)tblAssignments.getColumnModel()).getColumnByModelIndex(i);
             column.setPreferredWidth(rlModel.getColumnWidth(i));
             column.setCellRenderer(new DefaultTableCellRenderer() {
+				@Override
 				public Component getTableCellRendererComponent(JTable table,
                         Object value, boolean isSelected, boolean hasFocus,
                         int row, int column) {
@@ -189,10 +191,10 @@ public class LanceAssignmentView extends JPanel {
     			return l.isEligible(campaign);
     		}
     	};
-        TableRowSorter<LanceAssignmentTableModel>laSorter = new TableRowSorter<LanceAssignmentTableModel>(laModel);
+        TableRowSorter<LanceAssignmentTableModel>laSorter = new TableRowSorter<>(laModel);
         laSorter.setRowFilter(laFilter);
         laSorter.setComparator(LanceAssignmentTableModel.COL_FORCE, forceComparator);
-        ArrayList<RowSorter.SortKey>sortKeys = new ArrayList<RowSorter.SortKey>();
+        ArrayList<RowSorter.SortKey>sortKeys = new ArrayList<>();
         sortKeys.add(new RowSorter.SortKey(LanceAssignmentTableModel.COL_FORCE, SortOrder.ASCENDING));
         sorter.setSortKeys(sortKeys);
         tblAssignments.setRowSorter(laSorter);
@@ -232,7 +234,7 @@ public class LanceAssignmentView extends JPanel {
 	
 	public void refresh() {
 		cbContract.removeAllItems();
-		ArrayList<AtBContract> activeContracts = new ArrayList<AtBContract>();
+		ArrayList<AtBContract> activeContracts = new ArrayList<>();
 		for (Mission m : campaign.getMissions()) {
 			if (m instanceof AtBContract && m.isActive() &&
 					!((AtBContract)m).getStartDate().after(campaign.getDate())) {
@@ -255,6 +257,7 @@ public class LanceAssignmentView extends JPanel {
 	}
 	
 	TableModelListener assignmentTableListener = new TableModelListener() {
+		@Override
 		public void tableChanged(TableModelEvent ev) {
 			((RequiredLancesTableModel)tblRequiredLances.getModel()).fireTableDataChanged();
 		}
@@ -485,7 +488,7 @@ class LanceAssignmentTableModel extends DataTableModel {
 		case COL_WEIGHT_CLASS:
 			return WEIGHT_CODES[((Lance)data.get(row)).getWeightClass(campaign)];
 		case COL_CONTRACT:
-			return (AtBContract)campaign.getMission(((Lance)data.get(row)).getMissionId());
+			return campaign.getMission(((Lance)data.get(row)).getMissionId());
 		case COL_ROLE:
 			return Lance.roleNames[((Lance)data.get(row)).getRole()];
 		default:
@@ -493,6 +496,7 @@ class LanceAssignmentTableModel extends DataTableModel {
 		}
 	}
 
+	@Override
 	public void setValueAt(Object value, int row, int col) {
 		if (col == COL_CONTRACT) {
 			((Lance)data.get(row)).setContract((AtBContract)value);

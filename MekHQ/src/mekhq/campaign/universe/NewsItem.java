@@ -68,11 +68,11 @@ public class NewsItem {
     transient private int id;
     
     public NewsItem() {
-        this.headline = "None";
-        this.location = null;
-        this.date = null;
-        this.description = null;
-        this.service = null;
+        headline = "None";
+        location = null;
+        date = null;
+        description = null;
+        service = null;
     }
     
     public String getHeadline() {

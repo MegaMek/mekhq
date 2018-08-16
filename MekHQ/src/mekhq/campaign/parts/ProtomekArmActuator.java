@@ -48,7 +48,8 @@ public class ProtomekArmActuator extends Part {
         this(0, 0, null);
     }
     
-    public ProtomekArmActuator clone() {
+    @Override
+	public ProtomekArmActuator clone() {
         ProtomekArmActuator clone = new ProtomekArmActuator(getUnitTonnage(), location, campaign);
         clone.copyBaseData(this);
         return clone;
@@ -60,12 +61,12 @@ public class ProtomekArmActuator extends Part {
     
     public ProtomekArmActuator(int tonnage, int loc, Campaign c) {
         super(tonnage, c);
-        this.name = "Protomech Arm Actuator";
-        this.location = loc;
+        name = "Protomech Arm Actuator";
+        location = loc;
     }
     
     public void setLocation(int loc) {
-        this.location = loc;
+        location = loc;
     }
     
    
@@ -87,7 +88,8 @@ public class ProtomekArmActuator extends Part {
                 && getUnitTonnage() == ((ProtomekArmActuator)part).getUnitTonnage();
     }
     
-    public int getLocation() {
+    @Override
+	public int getLocation() {
         return location;
     }
     

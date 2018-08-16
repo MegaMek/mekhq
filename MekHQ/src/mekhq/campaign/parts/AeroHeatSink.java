@@ -30,6 +30,7 @@ import megamek.common.Aero;
 import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
+import megamek.common.ITechnology;
 import megamek.common.TechAdvancement;
 import megamek.common.TechConstants;
 import mekhq.MekHqXmlUtil;
@@ -55,10 +56,10 @@ public class AeroHeatSink extends Part {
     
     public AeroHeatSink(int tonnage, int type, boolean omniPodded, Campaign c) {
         super(tonnage, omniPodded, c);
-        this.name = "Aero Heat Sink";
+        name = "Aero Heat Sink";
         this.type = type;
         if(type == Aero.HEAT_DOUBLE) {
-            this.name = "Aero Double Heat Sink";
+            name = "Aero Double Heat Sink";
         }
     }
     
@@ -188,9 +189,9 @@ public class AeroHeatSink extends Part {
     @Override
     public int getTechRating() {
         if(type == Aero.HEAT_DOUBLE) {
-            return EquipmentType.RATING_E;
+            return ITechnology.RATING_E;
         } else {
-            return EquipmentType.RATING_C;
+            return ITechnology.RATING_C;
         }
     }
 
@@ -229,7 +230,7 @@ public class AeroHeatSink extends Part {
             if (wn2.getNodeName().equalsIgnoreCase("type")) {
                 type = Integer.parseInt(wn2.getTextContent());
                 if(type == Aero.HEAT_DOUBLE) {
-                    this.name = "Aero Double Heat Sink";
+                    name = "Aero Double Heat Sink";
                 } 
             } 
         }

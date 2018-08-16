@@ -29,7 +29,7 @@ public class StringListAdapter extends XmlAdapter<String, List<String>> {
     @Override
     public List<String> unmarshal(String v) throws Exception {
         String[] values = v.split(SEPARATOR);
-        List<String> result = new ArrayList<String>(values.length);
+        List<String> result = new ArrayList<>(values.length);
         for(String val : values) {
             result.add(val.trim());
         }

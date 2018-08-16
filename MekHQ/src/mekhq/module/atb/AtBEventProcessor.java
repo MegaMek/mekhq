@@ -205,7 +205,7 @@ public class AtBEventProcessor {
                 MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
                         "Unable to load entity: " + ms.getSourceFile() + ": " //$NON-NLS-1$
                         + ms.getEntryName() + ": " + ex.getMessage()); //$NON-NLS-1$
-                MekHQ.getLogger().log(getClass(), METHOD_NAME, ex);
+                MekHQ.getLogger().error(getClass(), METHOD_NAME, ex);
             }
         } else {
             MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
@@ -273,7 +273,7 @@ public class AtBEventProcessor {
     public static String getRecruitFaction(Campaign c) {
         if (c.getFactionCode().equals("MERC")) {
             if (c.getCalendar().get(Calendar.YEAR) > 3055 && Compute.randomInt(20) == 0) {
-                ArrayList<String> clans = new ArrayList<String>();
+                ArrayList<String> clans = new ArrayList<>();
                 for (String f : RandomFactionGenerator.getInstance().getCurrentFactions()) {
                     if (Faction.getFaction(f).isClan()) {
                         clans.add(f);

@@ -93,8 +93,8 @@ public class Bloodname implements Serializable {
 		reactivated = 0;
 		startDate = 2807;
 		phenotype = P_GENERAL;
-		postReavingClans = new ArrayList<Clan>();
-		acquiringClans = new ArrayList<NameAcquired>();
+		postReavingClans = new ArrayList<>();
+		acquiringClans = new ArrayList<>();
 		absorbed = null;
 	}
 
@@ -301,9 +301,9 @@ public class Bloodname implements Serializable {
 		}
 
 		/* The relative probability of the various Bloodnames that are original to this Clan */
-		HashMap<Bloodname, Fraction> weights = new HashMap<Bloodname, Fraction>();
+		HashMap<Bloodname, Fraction> weights = new HashMap<>();
 		/* A list of non-exclusive Bloodnames from other Clans */
-		ArrayList<Bloodname> nonExclusives = new ArrayList<Bloodname>();
+		ArrayList<Bloodname> nonExclusives = new ArrayList<>();
 		/* The relative probability that a warrior in this Clan will have a non-exclusive
 		 * Bloodname that originally belonged to another Clan; the smaller the number
 		 * of exclusive Bloodnames of this Clan, the larger this chance.
@@ -400,7 +400,7 @@ public class Bloodname implements Serializable {
 		for (Fraction f : weights.values()) {
 			f.mul(lcd);
 		}
-		ArrayList<Bloodname> nameList = new ArrayList<Bloodname>();
+		ArrayList<Bloodname> nameList = new ArrayList<>();
 		for (Bloodname b : weights.keySet()) {
 			for (int i = 0; i < weights.get(b).value(); i++) {
 				nameList.add(b);
@@ -445,7 +445,7 @@ public class Bloodname implements Serializable {
 	    final String METHOD_NAME = "loadBloodnameData()"; //$NON-NLS-1$
 	    
 		Clan.loadClanData();
-		bloodnames = new ArrayList<Bloodname>();
+		bloodnames = new ArrayList<>();
 
 		File f = new File("data/names/bloodnames/bloodnames.xml");
 		FileInputStream fis = null;
@@ -520,8 +520,8 @@ class Clan {
 
 	public Clan() {
 		startDate = endDate = abjurationDate = 0;
-		rivals = new ArrayList<DatedRecord>();
-		nameChanges = new ArrayList<DatedRecord>();
+		rivals = new ArrayList<>();
+		nameChanges = new ArrayList<>();
 	}
 
 	@Override
@@ -530,7 +530,7 @@ class Clan {
 			return code.equals(((Clan)o).code);
 		}
 		if (o instanceof String) {
-			return code.equals((String)o);
+			return code.equals(o);
 		}
 		return false;
 	}
@@ -563,7 +563,7 @@ class Clan {
 	}
 
 	public ArrayList<Clan> getRivals(int year) {
-		ArrayList<Clan> retVal = new ArrayList<Clan>();
+		ArrayList<Clan> retVal = new ArrayList<>();
 		for (DatedRecord r : rivals) {
 			if (r.startDate < year && (endDate == 0) || endDate > year) {
 				Clan c = allClans.get(r.descr);
@@ -589,7 +589,7 @@ class Clan {
 	}
 
 	public static Clan randomClan(int year, boolean homeClan) {
-		ArrayList<Clan> list = new ArrayList<Clan>();
+		ArrayList<Clan> list = new ArrayList<>();
 		for (Clan c : allClans.values()) {
 			if (year > 3075 && homeClan != c.homeClan) {
 				continue;
@@ -602,7 +602,7 @@ class Clan {
 	}
 
 	public static void loadClanData() {
-		allClans = new HashMap<String, Clan>();
+		allClans = new HashMap<>();
 		File f = new File("data/names/bloodnames/clans.xml");
 		FileInputStream fis = null;
 		try {
@@ -799,7 +799,7 @@ class Fraction {
 	}
 
 	public static int lcd(Collection<Fraction> list) {
-		HashSet<Integer> denominators = new HashSet<Integer>();
+		HashSet<Integer> denominators = new HashSet<>();
 		for (Fraction f : list) {
 			denominators.add(f.denominator);
 		}

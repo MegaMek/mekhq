@@ -69,7 +69,7 @@ public class EditKillLogDialog extends javax.swing.JDialog {
     
     public EditKillLogDialog(java.awt.Frame parent, boolean modal, Campaign c, Person p) {
         super(parent, modal);
-        this.frame = parent;
+        frame = parent;
         campaign = c;
         person = p;
         kills = c.getKillsFor(p.getId());
@@ -95,7 +95,8 @@ public class EditKillLogDialog extends javax.swing.JDialog {
         btnAdd.setText(resourceMap.getString("btnAdd.text")); // NOI18N
         btnAdd.setName("btnAdd"); // NOI18N
         btnAdd.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 addKill();
             }
         });
@@ -104,7 +105,8 @@ public class EditKillLogDialog extends javax.swing.JDialog {
         btnEdit.setName("btnEdit"); // NOI18N
         btnEdit.setEnabled(false);
         btnEdit.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 editKill();
             }
         });
@@ -113,7 +115,8 @@ public class EditKillLogDialog extends javax.swing.JDialog {
         btnDelete.setName("btnDelete"); // NOI18N
         btnDelete.setEnabled(false);
         btnDelete.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 deleteKill();
             }
         });
@@ -133,6 +136,7 @@ public class EditKillLogDialog extends javax.swing.JDialog {
 		killTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		killTable.getSelectionModel().addListSelectionListener(
 				new javax.swing.event.ListSelectionListener() {
+					@Override
 					public void valueChanged(
 							javax.swing.event.ListSelectionEvent evt) {
 						killTableValueChanged(evt);
@@ -147,7 +151,8 @@ public class EditKillLogDialog extends javax.swing.JDialog {
         btnOK.setText(resourceMap.getString("btnOK.text")); // NOI18N
         btnOK.setName("btnOK"); // NOI18N
         btnOK.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnOKActionPerformed(evt);
             }
         });
@@ -158,7 +163,7 @@ public class EditKillLogDialog extends javax.swing.JDialog {
 
     
     private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHireActionPerformed
-    	this.setVisible(false);
+    	setVisible(false);
     }
     
     private void killTableValueChanged(javax.swing.event.ListSelectionEvent evt) {
@@ -226,11 +231,13 @@ public class EditKillLogDialog extends javax.swing.JDialog {
 			data = entries;
 		}
 		
+		@Override
 		public int getRowCount() {
             return data.size();
         }
 
-        public int getColumnCount() {
+        @Override
+		public int getColumnCount() {
             return N_COL;
         }
 
@@ -248,12 +255,13 @@ public class EditKillLogDialog extends javax.swing.JDialog {
             }
         }
 
+		@Override
 		public Object getValueAt(int row, int col) {
 	        Kill kill;
 	        if(data.isEmpty()) {
 	        	return "";
 	        } else {
-	        	kill = (Kill)data.get(row);
+	        	kill = data.get(row);
 	        }
 			if(col == COL_DATE) {
 				SimpleDateFormat shortDateFormat = new SimpleDateFormat("MM/dd/yyyy");
@@ -279,7 +287,7 @@ public class EditKillLogDialog extends javax.swing.JDialog {
 		}
 
 		public Kill getKillAt(int row) {
-			return (Kill) data.get(row);
+			return data.get(row);
 		}
 		
 		 public int getColumnWidth(int c) {
@@ -320,6 +328,7 @@ public class EditKillLogDialog extends javax.swing.JDialog {
 			 */
 			private static final long serialVersionUID = -2888173457152182907L;
 
+			@Override
 			public Component getTableCellRendererComponent(JTable table,
 					 Object value, boolean isSelected, boolean hasFocus,
 						int row, int column) {

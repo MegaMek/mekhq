@@ -58,7 +58,8 @@ public class UnitTableModel extends DataTableModel {
         campaign = c;
     }
     
-    public int getRowCount() {
+    @Override
+	public int getRowCount() {
         return data.size();
     }
 
@@ -182,7 +183,8 @@ public class UnitTableModel extends DataTableModel {
         return (Unit)data.get(i);
     }
 
-    public Object getValueAt(int row, int col) {
+    @Override
+	public Object getValueAt(int row, int col) {
         Unit u;
         if(data.isEmpty() || (row < 0) || row >= data.size()) {
             return "";
@@ -283,7 +285,8 @@ public class UnitTableModel extends DataTableModel {
 
         private static final long serialVersionUID = 9054581142945717303L;
 
-        public Component getTableCellRendererComponent(JTable table,
+        @Override
+		public Component getTableCellRendererComponent(JTable table,
                 Object value, boolean isSelected, boolean hasFocus,
                 int row, int column) {
             super.getTableCellRendererComponent(table, value, isSelected,
@@ -346,7 +349,8 @@ public class UnitTableModel extends DataTableModel {
             super(icons);
         }
 
-        public Component getTableCellRendererComponent(JTable table,
+        @Override
+		public Component getTableCellRendererComponent(JTable table,
                 Object value, boolean isSelected, boolean hasFocus,
                 int row, int column) {
             Component c = this;

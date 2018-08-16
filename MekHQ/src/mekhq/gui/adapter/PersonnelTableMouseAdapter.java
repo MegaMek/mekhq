@@ -255,7 +255,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     if (!person.getTechUnitIDs().isEmpty()) {
                         // I need to create a new array list to avoid concurrent
                         // problems
-                        ArrayList<UUID> temp = new ArrayList<UUID>();
+                        ArrayList<UUID> temp = new ArrayList<>();
                         for (UUID i : person.getTechUnitIDs()) {
                             temp.add(i);
                         }
@@ -767,7 +767,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             case CMD_SACK:
             {
                 boolean showDialog = false;
-                ArrayList<UUID> toRemove = new ArrayList<UUID>();
+                ArrayList<UUID> toRemove = new ArrayList<>();
                 for (Person person : people) {
                     if (gui.getCampaign().getRetirementDefectionTracker()
                             .removeFromCampaign(
@@ -1883,7 +1883,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                             Unit u = gui.getCampaign().getUnit(person.getUnitId());
                             if (null != u) {
                                 JMenu specialistMenu = new JMenu(resourceMap.getString("weaponSpecialist.text")); //$NON-NLS-1$
-                                TreeSet<String> uniqueWeapons = new TreeSet<String>();
+                                TreeSet<String> uniqueWeapons = new TreeSet<>();
                                 for (int j = 0; j < u.getEntity().getWeaponList().size(); j++) {
                                     Mounted m = u.getEntity().getWeaponList().get(j);
                                     uniqueWeapons.add(m.getName());

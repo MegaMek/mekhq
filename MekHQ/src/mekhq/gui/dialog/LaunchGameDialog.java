@@ -46,7 +46,7 @@ public class LaunchGameDialog extends JDialog implements ActionListener {
     	super(parent, Messages.getString("MegaMek.ConnectDialog.title"), true); //$NON-NLS-1$
     	this.parent = parent;
     	this.server = server;
-    	this.campaign = c;
+    	campaign = c;
         initComponents();
     }
     

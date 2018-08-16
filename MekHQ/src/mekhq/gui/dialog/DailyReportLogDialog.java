@@ -13,6 +13,7 @@ import java.awt.event.WindowEvent;
 import java.util.List;
 
 import javax.swing.JDialog;
+import javax.swing.WindowConstants;
 
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.DailyReportLogPanel;
@@ -41,9 +42,10 @@ public class DailyReportLogDialog extends JDialog {
     
     private void initComponents() {
         
-        setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent we) {
+            @Override
+			public void windowClosing(WindowEvent we) {
                 gui.hideDailyReportDialog();
             }
         });

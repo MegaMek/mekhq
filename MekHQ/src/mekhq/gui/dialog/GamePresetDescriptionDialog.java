@@ -91,7 +91,8 @@ public class GamePresetDescriptionDialog extends javax.swing.JDialog {
 		
 		btnOK.setText(resourceMap.getString("btnOK.text"));
 		btnOK.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnOKActionPerformed();
             }
         });
@@ -106,7 +107,8 @@ public class GamePresetDescriptionDialog extends javax.swing.JDialog {
 		
 		btnCancel.setText(resourceMap.getString("btnCancel.text"));
 		btnCancel.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 setVisible(false);
             }
         });
@@ -120,6 +122,7 @@ public class GamePresetDescriptionDialog extends javax.swing.JDialog {
 		add(btnCancel, gridBagConstraints);		
 	}
 	
+	@Override
 	public String getTitle() {
 		return txtTitle.getText();
 	}

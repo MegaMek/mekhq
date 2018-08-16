@@ -77,9 +77,9 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
 	private GregorianCalendar lastRetirementRoll;
 	
 	public RetirementDefectionTracker() {
-		rollRequired = new HashSet<Integer>();
-		unresolvedPersonnel = new HashMap<Integer, HashSet<UUID>>();
-		payouts = new HashMap<UUID, Payout>();
+		rollRequired = new HashSet<>();
+		unresolvedPersonnel = new HashMap<>();
+		payouts = new HashMap<>();
 		lastRetirementRoll = new GregorianCalendar();
 	}
 
@@ -112,7 +112,7 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
 		} catch (Exception e) {
             MekHQ.getLogger().log(RetirementDefectionTracker.class, METHOD_NAME, LogLevel.ERROR,
                     "Error parsing net worth in financial report"); //$NON-NLS-1$
-            MekHQ.getLogger().log(RetirementDefectionTracker.class, METHOD_NAME, e);
+            MekHQ.getLogger().error(RetirementDefectionTracker.class, METHOD_NAME, e);
 		}
 		int totalShares = 0;
 		for (Person p : campaign.getActivePersonnel()) {
@@ -134,7 +134,7 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
 	 */
     public HashMap<UUID, TargetRoll> calculateTargetNumbers(AtBContract contract,
     		Campaign campaign) {
-    	HashMap <UUID, TargetRoll> targets = new HashMap<UUID, TargetRoll>();
+    	HashMap <UUID, TargetRoll> targets = new HashMap<>();
     	int combatLeadershipMod = 0;
     	int supportLeadershipMod = 0;
     	
@@ -673,7 +673,7 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
                 		}
                 		if (wn3.getNodeName().equalsIgnoreCase("contract")) {
                 			int id = Integer.parseInt(wn3.getAttributes().getNamedItem("id").getTextContent());
-                			HashSet<UUID> pids = new HashSet<UUID>();
+                			HashSet<UUID> pids = new HashSet<>();
                 			String [] ids = wn3.getTextContent().split(",");
                 			for (String s : ids) {
                 				pids.add(UUID.fromString(s));
@@ -725,7 +725,7 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
             // Errrr, apparently either the class name was invalid...
             // Or the listed name doesn't exist.
             // Doh!
-            MekHQ.getLogger().log(RetirementDefectionTracker.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(RetirementDefectionTracker.class, METHOD_NAME, ex);
         }
 
         return retVal;

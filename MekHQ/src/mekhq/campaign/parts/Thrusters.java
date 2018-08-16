@@ -59,10 +59,11 @@ public class Thrusters extends Part {
     public Thrusters(int tonnage, Campaign c, boolean left) {
         super(tonnage, c);
         isLeftThrusters = left;
-        this.name = "Thrusters";
+        name = "Thrusters";
     }
     
-    public Thrusters clone() {
+    @Override
+	public Thrusters clone() {
     	Thrusters clone = new Thrusters(0, campaign, isLeftThrusters);
         clone.copyBaseData(this);
     	return clone;

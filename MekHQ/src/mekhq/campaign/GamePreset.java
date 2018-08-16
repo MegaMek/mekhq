@@ -70,8 +70,8 @@ public class GamePreset implements MekHqXmlSerializable {
     	description = "Description missing";
     	options = null;
     	rskillPrefs = null;
-    	skillHash = new Hashtable<String, SkillType>();
-    	specialAbilities = new Hashtable<String, SpecialAbility>();
+    	skillHash = new Hashtable<>();
+    	specialAbilities = new Hashtable<>();
     }
 
     public GamePreset(String t, String d, CampaignOptions o, RandomSkillPreferences r, Hashtable<String, SkillType> sk, Hashtable<String, SpecialAbility> sp) {
@@ -119,6 +119,7 @@ public class GamePreset implements MekHqXmlSerializable {
     	return true;
     }
 
+	@Override
 	public void writeToXml(PrintWriter pw, int indent) {
 		pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
         pw.println("<gamePreset>");
@@ -165,7 +166,7 @@ public class GamePreset implements MekHqXmlSerializable {
             // Parse using builder to get DOM representation of the XML file
             xmlDoc = db.parse(fis);
         } catch (Exception ex) {
-            MekHQ.getLogger().log(GamePreset.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(GamePreset.class, METHOD_NAME, ex);
             return preset;
         }
 
@@ -252,10 +253,11 @@ public class GamePreset implements MekHqXmlSerializable {
 	 */
 	public static ArrayList<GamePreset> getGamePresetsIn(String directory) {
 
-		ArrayList<GamePreset> presets = new ArrayList<GamePreset>();
+		ArrayList<GamePreset> presets = new ArrayList<>();
 
 		File[] files = Utilities.getAllFiles(MekHQ.PRESET_DIR, new FilenameFilter() {
-            public boolean accept(File dir, String name) {
+            @Override
+			public boolean accept(File dir, String name) {
                 return name.toLowerCase().endsWith(".xml");
             }
         });

@@ -38,7 +38,7 @@ public class StarLeagueCache2BuiltInScenario extends StarLeagueCache1BuiltInScen
 		int enemyStart = Board.START_S;
 
 		for (int weight = EntityWeightClass.WEIGHT_LIGHT; weight <= EntityWeightClass.WEIGHT_ASSAULT; weight++) {
-			enemyEntities = new ArrayList<Entity>();
+			enemyEntities = new ArrayList<>();
 			MechSummary ms = campaign.getUnitGenerator().generate("SL", UnitType.MEK, weight, 2750,
 					(Compute.d6() == 6) ? IUnitRating.DRAGOON_A : IUnitRating.DRAGOON_D);
 

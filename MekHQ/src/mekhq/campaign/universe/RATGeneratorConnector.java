@@ -84,7 +84,7 @@ public class RATGeneratorConnector extends AbstractUnitGenerator implements IUni
 			List<String> ratings = fRec.getRatingLevelSystem();
 			rating = ratings.get(Math.min(quality, ratings.size() - 1));
 		}
-		ArrayList<Integer> wcs = new ArrayList<Integer>();
+		ArrayList<Integer> wcs = new ArrayList<>();
 		if (weightClass >= 0) {
 			wcs.add(weightClass);
 		}
@@ -140,7 +140,7 @@ public class RATGeneratorConnector extends AbstractUnitGenerator implements IUni
 			int weightClass, int year, int quality) {
 		UnitTable ut = findTable(faction, unitType, weightClass, year, quality,
                 EnumSet.noneOf(EntityMovementMode.class));
-		return ut == null? new ArrayList<MechSummary>() : ut.generateUnits(count);
+		return ut == null? new ArrayList<>() : ut.generateUnits(count);
 	}
 
 	/* (non-Javadoc)
@@ -152,7 +152,7 @@ public class RATGeneratorConnector extends AbstractUnitGenerator implements IUni
 			Predicate<MechSummary> filter) {
 		UnitTable ut = findTable(faction, unitType, weightClass, year, quality,
                 EnumSet.noneOf(EntityMovementMode.class));
-		return ut == null? new ArrayList<MechSummary>() : ut.generateUnits(count,
+		return ut == null? new ArrayList<>() : ut.generateUnits(count,
 		        filter == null? null : ms -> filter.test(ms));
 	}
 
@@ -161,7 +161,7 @@ public class RATGeneratorConnector extends AbstractUnitGenerator implements IUni
             int weightClass, int year, int quality, Collection<EntityMovementMode> movementModes,
             Predicate<MechSummary> filter) {
         UnitTable ut = findTable(faction, unitType, weightClass, year, quality, movementModes);
-        return ut == null? new ArrayList<MechSummary>() : ut.generateUnits(count,
+        return ut == null? new ArrayList<>() : ut.generateUnits(count,
                 filter == null? null : ms -> filter.test(ms));
     }
 }

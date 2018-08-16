@@ -44,7 +44,7 @@ public class MissingProtomekJumpJet extends MissingPart {
     
     public MissingProtomekJumpJet(int tonnage, Campaign c) {
         super(tonnage, c);
-        this.name = "Protomech Jump Jet";
+        name = "Protomech Jump Jet";
     }
     
     @Override 
@@ -136,7 +136,7 @@ public class MissingProtomekJumpJet extends MissingPart {
         int damagedJJ = 0;
         if(null != unit) {
             for(Part p : unit.getParts()) {
-                if(p.getId() == this.getId()) {
+                if(p.getId() == getId()) {
                     continue;
                 }
                 if(p instanceof MissingProtomekJumpJet 

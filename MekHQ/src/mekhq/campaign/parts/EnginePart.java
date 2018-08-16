@@ -22,8 +22,7 @@
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
-import java.util.GregorianCalendar;
-
+import java.util.Calendar;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -58,11 +57,12 @@ public class EnginePart extends Part {
 
 	public EnginePart(int tonnage, Engine e, Campaign c, boolean hover) {
 		super(tonnage, c);
-		this.engine = e;
-		this.forHover = hover;
-		this.name = engine.getEngineName() + " Engine";
+		engine = e;
+		forHover = hover;
+		name = engine.getEngineName() + " Engine";
 	}
 
+	@Override
 	public EnginePart clone() {
 		EnginePart clone = new EnginePart(getUnitTonnage(), new Engine(engine.getRating(), engine.getEngineType(), engine.getFlags()), campaign, forHover);
         clone.copyBaseData(this);
@@ -119,7 +119,7 @@ public class EnginePart extends Part {
 
 	@Override
 	public long getStickerPrice() {
-		return (long)Math.round((getEngine().getBaseCost()/75.0) * getEngine().getRating() * getUnitTonnage());
+		return Math.round((getEngine().getBaseCost()/75.0) * getEngine().getRating() * getUnitTonnage());
 	}
 	
 	@Override
@@ -136,8 +136,8 @@ public class EnginePart extends Part {
 			flags |= Engine.TANK_ENGINE;
 		}
 		engine = new Engine(engine.getRating(), engine.getEngineType(), flags);
-		this.name = engine.getEngineName() + " Engine";
-		this.forHover = hover;
+		name = engine.getEngineName() + " Engine";
+		forHover = hover;
 	}
 
 	public void fixClanFlag() {
@@ -146,12 +146,12 @@ public class EnginePart extends Part {
 			flags |= Engine.CLAN_ENGINE;
 		}
 		engine = new Engine(engine.getRating(), engine.getEngineType(), flags);
-		this.name = engine.getEngineName() + " Engine";
+		name = engine.getEngineName() + " Engine";
 	}
 
 	@Override
 	public boolean isSamePartType(Part part) {
-	    int year = campaign.getCalendar().get(GregorianCalendar.YEAR);
+	    int year = campaign.getCalendar().get(Calendar.YEAR);
 		return part instanceof EnginePart
 				&& getName().equals(part.getName())
 				&& getEngine().getEngineType() == ((EnginePart) part)

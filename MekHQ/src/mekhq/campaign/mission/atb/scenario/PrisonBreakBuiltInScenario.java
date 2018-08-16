@@ -64,7 +64,7 @@ public class PrisonBreakBuiltInScenario extends AtBScenario {
 		int enemyStart = startPos[Compute.randomInt(4)];
 
 		for (int weight = EntityWeightClass.WEIGHT_LIGHT; weight <= EntityWeightClass.WEIGHT_ASSAULT; weight++) {
-			enemyEntities = new ArrayList<Entity>();
+			enemyEntities = new ArrayList<>();
 			for (int i = 0; i < 3; i++)
 				enemyEntities.add(getEntity(getContract(campaign).getEnemyCode(), getContract(campaign).getEnemySkill(),
 						getContract(campaign).getEnemyQuality(), UnitType.MEK, weight, campaign));
@@ -73,7 +73,7 @@ public class PrisonBreakBuiltInScenario extends AtBScenario {
 
 		addBotForce(new BotForce("Guards", 2, enemyStart, getSpecMissionEnemies().get(0)));
 
-		ArrayList<Entity> otherForce = new ArrayList<Entity>();
+		ArrayList<Entity> otherForce = new ArrayList<>();
 
 		addCivilianUnits(otherForce, 4, campaign);
 

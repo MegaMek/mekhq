@@ -35,13 +35,13 @@ public class DeploymentChangedEvent extends ScenarioChangedEvent {
     public DeploymentChangedEvent(Unit unit, Scenario scenario) {
         super(scenario);
         this.unit = unit;
-        this.force = null;
+        force = null;
     }
     
     public DeploymentChangedEvent(Force force, Scenario scenario) {
         super(scenario);
         this.force = force;
-        this.unit = null;
+        unit = null;
     }
     
     public Unit getUnit() {

@@ -59,11 +59,12 @@ public class AeroSensor extends Part {
     
     public AeroSensor(int tonnage, boolean lc, Campaign c) {
         super(tonnage, c);
-        this.name = "Aerospace Sensors";
-        this.largeCraft = lc;
+        name = "Aerospace Sensors";
+        largeCraft = lc;
     }
     
-    public AeroSensor clone() {
+    @Override
+	public AeroSensor clone() {
     	AeroSensor clone = new AeroSensor(getUnitTonnage(), largeCraft, campaign);
         clone.copyBaseData(this);
     	return clone;

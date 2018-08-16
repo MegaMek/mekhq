@@ -125,9 +125,9 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
         scrollPane.setPreferredSize(new Dimension(600, 600));
         getContentPane().add(scrollPane);
         
-        this.setResizable(true);
-        this.pack();
-        this.validate();
+        setResizable(true);
+        pack();
+        validate();
     }
     
     /**
@@ -182,8 +182,8 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
         
         gbc.gridx = 1;
 
-        JList<Person> techList = new JList<Person>();
-        DefaultListModel<Person> listModel = new DefaultListModel<Person>();
+        JList<Person> techList = new JList<>();
+        DefaultListModel<Person> listModel = new DefaultListModel<>();
         
         for(Person tech : campaign.getTechs()) {
             if(tech.canTech(unitsByType.get(unitType).get(0).getEntity())) {
@@ -276,7 +276,7 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
             }
         }
         
-        this.setVisible(false);
+        setVisible(false);
     }
 
     /**

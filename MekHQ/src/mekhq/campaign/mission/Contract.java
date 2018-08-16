@@ -109,18 +109,18 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
         super(name);
         this.employer = employer;
 
-        this.nMonths = 12;
-        this.paymentMultiplier = 2.0;
-        this.commandRights = COM_HOUSE;
-        this.overheadComp = OH_NONE;
-        this.straightSupport = 50;
-        this.battleLossComp = 50;
-        this.salvagePct = 50;
-        this.salvageExchange = false;
-        this.transportComp = 50;
-        this.mrbcFee = true;
-        this.advancePct = 25;
-        this.signBonus = 0;
+        nMonths = 12;
+        paymentMultiplier = 2.0;
+        commandRights = COM_HOUSE;
+        overheadComp = OH_NONE;
+        straightSupport = 50;
+        battleLossComp = 50;
+        salvagePct = 50;
+        salvageExchange = false;
+        transportComp = 50;
+        mrbcFee = true;
+        advancePct = 25;
+        signBonus = 0;
 
     }
 
@@ -157,7 +157,7 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
     }
 
     public void setEmployer(String s) {
-        this.employer = s;
+        employer = s;
     }
 
     public int getLength() {
@@ -253,7 +253,7 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
     }
 
     public void setSalvagedByUnit(long l) {
-        this.salvagedByUnit = l;
+        salvagedByUnit = l;
     }
 
     public void addSalvageByUnit(long l) {
@@ -265,7 +265,7 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
     }
 
     public void setSalvagedByEmployer(long l) {
-        this.salvagedByEmployer = l;
+        salvagedByEmployer = l;
     }
 
     public void addSalvageByEmployer(long l) {
@@ -393,7 +393,7 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
     }
 
     private int getTravelDays(Campaign c) {
-        if (null != this.getPlanet()) {
+        if (null != getPlanet()) {
             DateTime currentDate = Utilities.getDateTimeDay(c.getCalendar());
             JumpPath jumpPath = c.calculateJumpPath(c.getCurrentPlanet(), getPlanet());
             double days = Math.round(jumpPath.getTotalTime(currentDate, c.getLocation().getTransitTime()) * 100.0) / 100.0;

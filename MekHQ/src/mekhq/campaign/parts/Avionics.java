@@ -29,8 +29,8 @@ import megamek.common.Aero;
 import megamek.common.Compute;
 import megamek.common.CriticalSlot;
 import megamek.common.Entity;
-import megamek.common.EquipmentType;
 import megamek.common.IAero;
+import megamek.common.ITechnology;
 import megamek.common.LandAirMech;
 import megamek.common.TechAdvancement;
 import mekhq.campaign.Campaign;
@@ -53,10 +53,11 @@ public class Avionics extends Part {
     
     public Avionics(int tonnage, Campaign c) {
         super(tonnage, c);
-        this.name = "Avionics";
+        name = "Avionics";
     }
     
-    public Avionics clone() {
+    @Override
+	public Avionics clone() {
     	Avionics clone = new Avionics(0, campaign);
         clone.copyBaseData(this);
     	return clone;
@@ -216,7 +217,7 @@ public class Avionics extends Part {
 	@Override
 	public int getTechRating() {
 		//go with conventional fighter avionics
-		return EquipmentType.RATING_B;
+		return ITechnology.RATING_B;
 	}
 
 	@Override

@@ -32,7 +32,8 @@ public class PartsTableModel extends DataTableModel {
         data = new ArrayList<Part>();
     }
 
-    public int getRowCount() {
+    @Override
+	public int getRowCount() {
         return data.size();
     }
 
@@ -69,7 +70,8 @@ public class PartsTableModel extends DataTableModel {
         }
     }
 
-    public Object getValueAt(int row, int col) {
+    @Override
+	public Object getValueAt(int row, int col) {
         Part part;
         if(data.isEmpty()) {
             return "";
@@ -162,7 +164,8 @@ public class PartsTableModel extends DataTableModel {
 
         private static final long serialVersionUID = 9054581142945717303L;
 
-        public Component getTableCellRendererComponent(JTable table,
+        @Override
+		public Component getTableCellRendererComponent(JTable table,
                 Object value, boolean isSelected, boolean hasFocus,
                 int row, int column) {
             super.getTableCellRendererComponent(table, value, isSelected,

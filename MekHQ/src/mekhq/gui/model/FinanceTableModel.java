@@ -30,7 +30,8 @@ public class FinanceTableModel extends DataTableModel {
         data = new ArrayList<Transaction>();
     }
 
-    public int getRowCount() {
+    @Override
+	public int getRowCount() {
         return data.size();
     }
 
@@ -59,7 +60,8 @@ public class FinanceTableModel extends DataTableModel {
         }
     }
 
-    public Object getValueAt(int row, int col) {
+    @Override
+	public Object getValueAt(int row, int col) {
         Transaction transaction = getTransaction(row);
         long amount = transaction.getAmount();
         long balance = 0;
@@ -150,7 +152,8 @@ public class FinanceTableModel extends DataTableModel {
 
         private static final long serialVersionUID = 9054581142945717303L;
 
-        public Component getTableCellRendererComponent(JTable table,
+        @Override
+		public Component getTableCellRendererComponent(JTable table,
                 Object value, boolean isSelected, boolean hasFocus,
                 int row, int column) {
             super.getTableCellRendererComponent(table, value, isSelected,

@@ -136,20 +136,20 @@ public class AtBScenarioViewPanel extends JPanel {
 
     public AtBScenarioViewPanel(AtBScenario s, Campaign c, IconPackage ip, JFrame frame) {
         this.frame = frame;
-        this.scenario = s;
-        this.campaign = c;
-        this.icons = ip;
-        botStubs = new ArrayList<BotForceStub>();
+        scenario = s;
+        campaign = c;
+        icons = ip;
+        botStubs = new ArrayList<>();
 
         if(s.isCurrent()) {
             s.refresh(c);
-            this.playerForces = new ForceStub(s.getForces(campaign), campaign);
+            playerForces = new ForceStub(s.getForces(campaign), campaign);
             attachedAllyStub = s.generateEntityStub(s.getAlliesPlayer());
             for (int i = 0; i < s.getNumBots(); i++) {
                 botStubs.add(s.generateBotStub(s.getBotForce(i)));
             }
         } else {
-            this.playerForces = s.getForceStub();
+            playerForces = s.getForceStub();
             attachedAllyStub = s.getAlliesPlayerStub();
             botStubs = s.getBotForceStubs();
         }
@@ -671,7 +671,7 @@ public class AtBScenarioViewPanel extends JPanel {
     protected class StubTreeModel implements TreeModel {
 
         private ForceStub rootForce;
-        private Vector<TreeModelListener> listeners = new Vector<TreeModelListener>();
+        private Vector<TreeModelListener> listeners = new Vector<>();
 
         public StubTreeModel(ForceStub root) {
             rootForce = root;
@@ -838,7 +838,7 @@ public class AtBScenarioViewPanel extends JPanel {
     protected class EntityListModel implements TreeModel {
 
         private ArrayList<String> root;
-        private Vector<TreeModelListener> listeners = new Vector<TreeModelListener>();
+        private Vector<TreeModelListener> listeners = new Vector<>();
         private String name;
 
         public EntityListModel(ArrayList<String> root, String name) {
@@ -966,6 +966,6 @@ public class AtBScenarioViewPanel extends JPanel {
                 popup.show(e.getComponent(), e.getX(), e.getY());
             }
         }
-    };
+    }
 
 }

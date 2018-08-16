@@ -79,7 +79,7 @@ public class SelectUnusedAbilityDialog extends JDialog {
         	        ? getDisplayName(name) : SpecialAbility.getDefaultAbility(name).getDisplayName());
         	chk.setActionCommand(name);
         	chk.setToolTipText(SpecialAbility.getDefaultAbility(name) == null
-        	        ? this.getDesc(name) : SpecialAbility.getDefaultAbility(name).getDescription());
+        	        ? getDesc(name) : SpecialAbility.getDefaultAbility(name).getDescription());
         	group.add(chk);
         	panMain.add(chk);
         }
@@ -87,14 +87,16 @@ public class SelectUnusedAbilityDialog extends JDialog {
         JPanel panButtons = new JPanel(new GridLayout(0,2));
         btnOK.setText("Done"); // NOI18N
         btnOK.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 done();
             }
         });
         
         btnClose.setText("Cancel"); // NOI18N
         btnClose.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 cancel();
             }
         });
@@ -147,11 +149,11 @@ public class SelectUnusedAbilityDialog extends JDialog {
         		currentSPA.put(spa.getName(), spa);
         	}
     	}
-    	this.setVisible(false);
+    	setVisible(false);
     }
     
     private void cancel() {
-    	this.setVisible(false);
+    	setVisible(false);
     	cancelled = true;
     }
     

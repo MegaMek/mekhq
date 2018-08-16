@@ -45,7 +45,8 @@ public class HeatSink extends EquipmentPart {
         super(tonnage, et, equipNum, omniPodded, c);
     }
     
-    public HeatSink clone() {
+    @Override
+	public HeatSink clone() {
     	HeatSink clone = new HeatSink(getUnitTonnage(), getType(), getEquipmentNum(), omniPodded, campaign);
         clone.copyBaseData(this);
     	return clone;

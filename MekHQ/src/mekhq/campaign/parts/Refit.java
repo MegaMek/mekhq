@@ -209,8 +209,8 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 	}
 
 	public String[] getShoppingListDescription() {
-		Hashtable<String,Integer> tally = new Hashtable<String,Integer>();
-	    Hashtable<String,String> desc = new Hashtable<String,String>();
+		Hashtable<String,Integer> tally = new Hashtable<>();
+	    Hashtable<String,String> desc = new Hashtable<>();
 		for(Part p : shoppingList) {
 		    if(p instanceof Armor) {
 		        continue;
@@ -265,9 +265,9 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 		boolean replacingLocations = false;
 		boolean[] locationHasNewStuff = new boolean[Math.max(newEntity.locations(), oldUnit.getEntity().locations())];
 		boolean[] locationLostOldStuff = new boolean[Math.max(newEntity.locations(), oldUnit.getEntity().locations())];
-		HashMap<AmmoType,Integer> ammoNeeded = new HashMap<AmmoType,Integer>();
-		HashMap<AmmoType,Integer> ammoRemoved = new HashMap<AmmoType,Integer>();
-		ArrayList<Part> newPartList = new ArrayList<Part>();
+		HashMap<AmmoType,Integer> ammoNeeded = new HashMap<>();
+		HashMap<AmmoType,Integer> ammoRemoved = new HashMap<>();
+		ArrayList<Part> newPartList = new ArrayList<>();
 
 		//Step 1: put all of the parts from the current unit into a new arraylist so they can
 		//be removed when we find a match.
@@ -388,13 +388,13 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 		//at the same time, check spare parts for new equipment
 
 		//first put oldUnitParts in a new arraylist so they can be removed as we find them
-		ArrayList<Integer> tempParts = new ArrayList<Integer>();
+		ArrayList<Integer> tempParts = new ArrayList<>();
 		tempParts.addAll(oldUnitParts);
 
 		armorNeeded = 0;
 		int atype = 0;
 		boolean aclan = false;
-		HashMap<Integer,Integer> partQuantity = new HashMap<Integer,Integer>();
+		HashMap<Integer,Integer> partQuantity = new HashMap<>();
 		for(Part nPart : newPartList) {
 			//TODO: I don't think we need this here anymore
 			nPart.setUnit(oldUnit);
@@ -874,7 +874,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 		reserveNewParts();
 		if(customJob) {
 		    //add the stuff on the shopping list to the master shopping list
-		    ArrayList<Part> newShoppingList = new ArrayList<Part>();
+		    ArrayList<Part> newShoppingList = new ArrayList<>();
     		for(Part part : shoppingList) {
     			part.setUnit(null);
     			if(part instanceof Armor) {
@@ -945,7 +945,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 	    //if they are not on a unit already, then we need
 	    //to set the refit id. Also, if there is more than one part
 	    //then we need to clone a part and reserve that instead
-		ArrayList<Integer> newNewUnitParts = new ArrayList<Integer>();
+		ArrayList<Integer> newNewUnitParts = new ArrayList<>();
 		for(int id : newUnitParts) {
 			Part newPart = oldUnit.campaign.getPart(id);
 			if(newPart.isSpare()) {
@@ -991,7 +991,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
         	checkForArmorSupplies();
         	return kitFound && !partsInTransit() && (null == newArmorSupplies || (armorNeeded - newArmorSupplies.getAmount()) <= 0);
 	    }
-		ArrayList<Part> newShoppingList = new ArrayList<Part>();
+		ArrayList<Part> newShoppingList = new ArrayList<>();
 		for(Part part : shoppingList) {
 			if(part instanceof IAcquisitionWork) {
 			    //check to see if we found a replacement
@@ -1137,7 +1137,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 		List<IAcquisitionWork> toRemove = new ArrayList<>();
         toRemove.add(this);
 		for (IAcquisitionWork part : campaign.getShoppingList().getPartList()) {
-		    if ((part instanceof Part) && ((Part) part).getRefitId() == this.getRefitId()) {
+		    if ((part instanceof Part) && ((Part) part).getRefitId() == getRefitId()) {
 		        toRemove.add(part);
 		    }
 		}
@@ -1153,7 +1153,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 		boolean aclan = false;
 	    oldUnit.setRefit(null);
         Entity oldEntity = oldUnit.getEntity();
-        ArrayList<Person> soldiers = new ArrayList<Person>();
+        ArrayList<Person> soldiers = new ArrayList<>();
         //unload any soldiers to reload later, because troop size may have changed
         if(oldEntity instanceof Infantry) {
 			soldiers = oldUnit.getCrew();
@@ -1226,7 +1226,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 		oldUnit.setEntity(newEntity);
 	
 		//set up new parts
-		ArrayList<Part> newParts = new ArrayList<Part>();
+		ArrayList<Part> newParts = new ArrayList<>();
 		//We've already made the old suits go *poof*; now we materialize new ones.
 		if (newEntity instanceof BattleArmor) {
 		    for (int t = BattleArmor.LOC_TROOPER_1; t < newEntity.locations(); t++) {
@@ -1779,7 +1779,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 			}
 		} catch (Exception ex) {
 			// Doh!
-            MekHQ.getLogger().log(Refit.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(Refit.class, METHOD_NAME, ex);
 		}
 
 		return retVal;
@@ -1883,6 +1883,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 		return null;
 	}
 
+	@Override
 	public long getStickerPrice() {
 		return cost;
 	}
@@ -1925,7 +1926,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 		    }
 		    checkForArmorSupplies();
 		}
-		shoppingList = new ArrayList<Part>();
+		shoppingList = new ArrayList<>();
 		kitFound = true;
 	}
 
@@ -1948,7 +1949,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 	@Override
 	public TargetRoll getAllAcquisitionMods() {
         TargetRoll roll = new TargetRoll();
-		int avail = EquipmentType.RATING_A;
+		int avail = ITechnology.RATING_A;
 		int techBaseMod = 0;
 		for(Part part : shoppingList) {
 		    if(getTechBase() == T_CLAN && campaign.getCampaignOptions().getClanAcquisitionPenalty() > techBaseMod) {
@@ -2002,6 +2003,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 	    return Part.T_BOTH;
 	}
 
+	@Override
 	public void fixIdReferences(Map<Integer, UUID> uHash, Map<Integer, UUID> pHash) {
 		assignedTechId = pHash.get(oldTechId);
 		if(null != newArmorSupplies) {

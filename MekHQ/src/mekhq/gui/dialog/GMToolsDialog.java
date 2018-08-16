@@ -132,18 +132,18 @@ public class GMToolsDialog extends JDialog implements ActionListener {
             }
             
         });
-        factionPicker = new JComboBox<FactionChoice>(factionChoices.toArray(new FactionChoice[factionChoices.size()]));
+        factionPicker = new JComboBox<>(factionChoices.toArray(new FactionChoice[factionChoices.size()]));
         System.out.println(gui.getCampaign().getGameYear());
         yearPicker = new JTextField(5);
         yearPicker.setText(String.valueOf(gui.getCampaign().getGameYear()));
-        qualityPicker = new JComboBox<String>(qualityNames);
-        unitTypePicker = new JComboBox<String>();
+        qualityPicker = new JComboBox<>(qualityNames);
+        unitTypePicker = new JComboBox<>();
         for (int ut = 0; ut < UnitType.SIZE; ut++) {
             if (gui.getCampaign().getUnitGenerator().isSupportedUnitType(ut)) {
                 unitTypePicker.addItem(UnitType.getTypeName(ut));
             }
         }
-        unitWeightPicker = new JComboBox<String>(weightNames);
+        unitWeightPicker = new JComboBox<>(weightNames);
         unitPicked = new JLabel("-");
         unitTypePicker.addItemListener(ev ->
             unitWeightPicker.setEnabled(unitTypePicker.getSelectedItem().equals("Mek")
@@ -218,7 +218,7 @@ public class GMToolsDialog extends JDialog implements ActionListener {
                     MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
                             "Failed to load entity " + ms.getName() + " from " //$NON-NLS-1$
                                     + ms.getSourceFile().toString()); //$NON-NLS-1$
-                    MekHQ.getLogger().log(getClass(), METHOD_NAME, e1);
+                    MekHQ.getLogger().error(getClass(), METHOD_NAME, e1);
                     unitPicked.setText("Failed to load entity " + ms.getName());
                 }
             }

@@ -72,7 +72,8 @@ public class PortraitFileFactory implements ItemFileFactory {
      * @throws <code>IllegalArgumentException</code> if the <code>file</code>
      *             is <code>null</code>.
      */
-    public ItemFile getItemFile(final File file)
+    @Override
+	public ItemFile getItemFile(final File file)
             throws IllegalArgumentException {
 
         // Validate the input.
@@ -86,7 +87,8 @@ public class PortraitFileFactory implements ItemFileFactory {
             private File itemFile = file; // copy the file entry
             private BufferedImage image = null; // cache the Image
 
-            public Object getItem() throws Exception {
+            @Override
+			public Object getItem() throws Exception {
                 // Cache the image on first use.
                 if (null == image) {
                     String name = itemFile.getAbsolutePath();
@@ -114,7 +116,8 @@ public class PortraitFileFactory implements ItemFileFactory {
      *             <code>zipEntry</code> or the <code>zipFile</code> is
      *             <code>null</code>.
      */
-    public ItemFile getItemFile(final ZipEntry zipEntry, final ZipFile zipFile)
+    @Override
+	public ItemFile getItemFile(final ZipEntry zipEntry, final ZipFile zipFile)
             throws IllegalArgumentException {
 
         // Validate the input.
@@ -131,7 +134,8 @@ public class PortraitFileFactory implements ItemFileFactory {
             private ZipEntry itemEntry = zipEntry; // copy the ZipEntry
             private Image image = null; // cache the Image
 
-            public Object getItem() throws Exception {
+            @Override
+			public Object getItem() throws Exception {
 
                 // Cache the image on first use.
                 if (null == image) {
@@ -187,7 +191,8 @@ public class PortraitFileFactory implements ItemFileFactory {
      *            the named file.
      * @param name - the <code>String</code> name of the file.
      */
-    public boolean accept(File dir, String name) {
+    @Override
+	public boolean accept(File dir, String name) {
 
         // Convert the file name to upper case, and compare it to image
         // file extensions. Yeah, it's a bit of a hack, but whatever.
@@ -205,7 +210,8 @@ public class PortraitFileFactory implements ItemFileFactory {
      *            named file's entry.
      * @param name - the <code>String</code> name of the file.
      */
-    public boolean accept(ZipFile zipFile, String name) {
+    @Override
+	public boolean accept(ZipFile zipFile, String name) {
 
         // Convert the file name to upper case, and compare it to image
         // file extensions. Yeah, it's a bit of a hack, but whatever.

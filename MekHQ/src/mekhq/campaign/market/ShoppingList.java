@@ -69,7 +69,7 @@ public class ShoppingList implements MekHqXmlSerializable {
     private ArrayList<IAcquisitionWork> shoppingList;
 
     public ShoppingList() {
-        shoppingList = new ArrayList<IAcquisitionWork>();
+        shoppingList = new ArrayList<>();
     }
 
     public IAcquisitionWork getShoppingItem(Object newEquipment) {
@@ -139,7 +139,7 @@ public class ShoppingList implements MekHqXmlSerializable {
     }
 
     public void newDay(Campaign campaign) {
-        ArrayList<IAcquisitionWork> newShoppingList = new ArrayList<IAcquisitionWork>();
+        ArrayList<IAcquisitionWork> newShoppingList = new ArrayList<>();
         boolean noStaff = false;
         for(IAcquisitionWork shoppingItem : shoppingList) {
             shoppingItem.decrementDaysToWait();
@@ -208,14 +208,14 @@ public class ShoppingList implements MekHqXmlSerializable {
             }
         } catch (Exception ex) {
             // Doh!
-            MekHQ.getLogger().log(ShoppingList.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(ShoppingList.class, METHOD_NAME, ex);
         }
 
         return retVal;
     }
 
     public void restore() {
-    	ArrayList<IAcquisitionWork> newShoppingList = new ArrayList<IAcquisitionWork>();;
+    	ArrayList<IAcquisitionWork> newShoppingList = new ArrayList<>();
     	
 
         for(IAcquisitionWork shoppingItem : shoppingList) {
@@ -232,7 +232,7 @@ public class ShoppingList implements MekHqXmlSerializable {
     }
 
     public void removeZeroQuantityFromList() {
-    	ArrayList<IAcquisitionWork> newShoppingList = new ArrayList<IAcquisitionWork>();
+    	ArrayList<IAcquisitionWork> newShoppingList = new ArrayList<>();
         for(IAcquisitionWork shoppingItem : shoppingList) {
             if(shoppingItem.getQuantity() > 0) {
                 newShoppingList.add(shoppingItem);
@@ -242,7 +242,7 @@ public class ShoppingList implements MekHqXmlSerializable {
     }
 
     public ArrayList<IAcquisitionWork> getPartList() {
-        ArrayList<IAcquisitionWork> partList = new ArrayList<IAcquisitionWork>();
+        ArrayList<IAcquisitionWork> partList = new ArrayList<>();
         for(IAcquisitionWork shoppingItem : shoppingList) {
             if(shoppingItem instanceof Part) {
                 partList.add(shoppingItem);
@@ -252,7 +252,7 @@ public class ShoppingList implements MekHqXmlSerializable {
     }
 
     public ArrayList<IAcquisitionWork> getUnitList() {
-        ArrayList<IAcquisitionWork> unitList = new ArrayList<IAcquisitionWork>();
+        ArrayList<IAcquisitionWork> unitList = new ArrayList<>();
         for(IAcquisitionWork shoppingItem : shoppingList) {
             if(shoppingItem instanceof UnitOrder) {
                 unitList.add(shoppingItem);

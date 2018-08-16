@@ -225,7 +225,7 @@ public class CustomizeMissionDialog extends javax.swing.JDialog {
     	if(newMission) {
     		campaign.addMission(mission);
     	}
-    	this.setVisible(false);
+    	setVisible(false);
     }
 
     public int getMissionId() {
@@ -233,7 +233,7 @@ public class CustomizeMissionDialog extends javax.swing.JDialog {
     }
 
     private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
-    	this.setVisible(false);
+    	setVisible(false);
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnClose;

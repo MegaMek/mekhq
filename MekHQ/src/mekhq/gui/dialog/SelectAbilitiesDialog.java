@@ -66,8 +66,8 @@ public class SelectAbilitiesDialog extends JDialog {
         btnOK = new javax.swing.JButton();
         btnClose = new javax.swing.JButton();
     
-        chkAbil = new ArrayList<JCheckBox>();
-        spaNames = new ArrayList<String>();
+        chkAbil = new ArrayList<>();
+        spaNames = new ArrayList<>();
         
         for(String name: allSPA.keySet()) {
         	spaNames.add(name);
@@ -89,14 +89,16 @@ public class SelectAbilitiesDialog extends JDialog {
         JPanel panButtons = new JPanel(new GridLayout(0,2));
         btnOK.setText("Done"); // NOI18N
         btnOK.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 done();
             }
         });
         
         btnClose.setText("Cancel"); // NOI18N
         btnClose.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 cancel();
             }
         });
@@ -115,13 +117,13 @@ public class SelectAbilitiesDialog extends JDialog {
     }
     
     private void done() {
-    	selected = new Vector<String>();
+    	selected = new Vector<>();
     	for(int i = 0; i < spaNames.size(); i++) {
     		if(chkAbil.get(i).isSelected()) {
     			selected.add(spaNames.get(i));
     		}
     	}
-    	this.setVisible(false);
+    	setVisible(false);
     }
     
     public Vector<String> getSelected() {
@@ -129,7 +131,7 @@ public class SelectAbilitiesDialog extends JDialog {
     }
     
     private void cancel() {
-    	this.setVisible(false);
+    	setVisible(false);
     	cancelled = true;
     }
     

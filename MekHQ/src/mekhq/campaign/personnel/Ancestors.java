@@ -155,6 +155,7 @@ public class Ancestors implements Serializable, MekHqXmlSerializable {
 		return false;
 	}
 	
+	@Override
 	public void writeToXml(PrintWriter pw1, int indent) {
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "<ancestor id=\""
                 + id.toString()
@@ -220,7 +221,7 @@ public class Ancestors implements Serializable, MekHqXmlSerializable {
 			// Errrr, apparently either the class name was invalid...
             // Or the listed name doesn't exist.
             // Doh!
-		    MekHQ.getLogger().log(Ancestors.class, "generateInstanceFromXML(Node,Campaign,Version)", e); //$NON-NLS-1$
+		    MekHQ.getLogger().error(Ancestors.class, "generateInstanceFromXML(Node,Campaign,Version)", e); //$NON-NLS-1$
 		}
 		
 		return retVal;

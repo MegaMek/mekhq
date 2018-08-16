@@ -91,8 +91,8 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
     
     public CustomizeScenarioDialog(java.awt.Frame parent, boolean modal, Scenario s, Mission m, Campaign c) {
         super(parent, modal);
-        this.frame = parent;
-        this.mission = m;
+        frame = parent;
+        mission = m;
         if(null == s) {
         	scenario = new Scenario("New Scenario");
         	newScenario = true;
@@ -106,7 +106,7 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
         	date = campaign.getCalendar().getTime();
         }
         dateFormatter = new SimpleDateFormat("MM/dd/yyyy");
-        loots = new ArrayList<Loot>();
+        loots = new ArrayList<>();
         for(Loot loot : scenario.getLoot()) {
             loots.add((Loot)loot.clone());
         }
@@ -126,7 +126,7 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
         btnClose = new javax.swing.JButton();
         scrDesc = new javax.swing.JScrollPane();
         scrReport = new javax.swing.JScrollPane();
-        choiceStatus = new javax.swing.JComboBox<String>();
+        choiceStatus = new javax.swing.JComboBox<>();
         lblStatus = new javax.swing.JLabel();  
         panMain = new javax.swing.JPanel();
         panBtn = new javax.swing.JPanel();
@@ -169,7 +169,7 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
 	        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
 	        panMain.add(lblStatus, gridBagConstraints);
 	        
-	        DefaultComboBoxModel<String> statusModel = new DefaultComboBoxModel<String>();
+	        DefaultComboBoxModel<String> statusModel = new DefaultComboBoxModel<>();
 			for (int i = 1; i < Scenario.S_NUM; i++) {
 				statusModel.addElement(Scenario.getStatusName(i));
 			}
@@ -184,7 +184,8 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
 	        btnDate = new javax.swing.JButton();
 	        btnDate.setText(dateFormatter.format(date));
 	        btnDate.addActionListener(new java.awt.event.ActionListener() {
-	            public void actionPerformed(java.awt.event.ActionEvent evt) {
+	            @Override
+				public void actionPerformed(java.awt.event.ActionEvent evt) {
 	                changeDate();
 	            }
 	        });
@@ -263,7 +264,8 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
         btnOK.setText(resourceMap.getString("btnOkay.text")); // NOI18N
         btnOK.setName("btnOK"); // NOI18N
         btnOK.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnOKActionPerformed(evt);
             }
         });
@@ -272,7 +274,8 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
         btnClose.setText(resourceMap.getString("btnCancel.text")); // NOI18N
         btnClose.setName("btnClose"); // NOI18N
         btnClose.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnCloseActionPerformed(evt);
             }
         });
@@ -303,7 +306,7 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
     	if(newScenario) {
     		campaign.addScenario(scenario, mission);
     	}
-    	this.setVisible(false);
+    	setVisible(false);
     }
     
     public int getMissionId() {
@@ -311,7 +314,7 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
     }
 
     private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
-    	this.setVisible(false);
+    	setVisible(false);
     }
     
     private void changeDate() {
@@ -363,7 +366,8 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
         JPanel panBtns = new JPanel(new GridLayout(1,0));
         btnAdd = new JButton("Add Loot"); // NOI18N
         btnAdd.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 addLoot();
             }
         });
@@ -372,7 +376,8 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
         btnEdit = new JButton("Edit Loot"); // NOI18N
         btnEdit.setEnabled(false);
         btnEdit.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 editLoot();
             }
         });
@@ -381,7 +386,8 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
         btnDelete = new JButton("Delete Loot"); // NOI18N
         btnDelete.setEnabled(false);
         btnDelete.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                deleteLoot();
             }
         });
@@ -400,7 +406,8 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
         lootTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         lootTable.getSelectionModel().addListSelectionListener(
                 new javax.swing.event.ListSelectionListener() {
-                    public void valueChanged(
+                    @Override
+					public void valueChanged(
                             javax.swing.event.ListSelectionEvent evt) {
                         lootTableValueChanged(evt);
                     }

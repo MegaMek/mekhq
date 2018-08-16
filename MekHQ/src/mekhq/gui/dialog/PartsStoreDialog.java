@@ -73,7 +73,6 @@ import mekhq.campaign.parts.MekGyro;
 import mekhq.campaign.parts.MekLifeSupport;
 import mekhq.campaign.parts.MekLocation;
 import mekhq.campaign.parts.MekSensor;
-import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.OmniPod;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PartInventory;
@@ -148,9 +147,9 @@ public class PartsStoreDialog extends javax.swing.JDialog {
     public PartsStoreDialog(Frame frame, boolean modal, CampaignGUI gui, Campaign campaign, boolean add) {
         super(frame, modal);
         this.frame = frame;
-        this.campaignGUI = gui;
+        campaignGUI = gui;
         this.campaign = campaign;
-        this.addToCampaign = add;
+        addToCampaign = add;
         formatter = new DecimalFormat();
         partsModel = new PartsTableModel(campaign.getPartsStore().getInventory());
         initComponents();
@@ -170,7 +169,7 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 
         partsTable = new JTable(partsModel);
 		partsTable.setName("partsTable"); // NOI18N
-		partsSorter = new TableRowSorter<PartsTableModel>(partsModel);
+		partsSorter = new TableRowSorter<>(partsModel);
 		partsSorter.setComparator(PartsTableModel.COL_TARGET, new TargetSorter());
         partsSorter.setComparator(PartsTableModel.COL_COST, new FormattedNumberSorter());
         partsSorter.setComparator(PartsTableModel.COL_DETAIL, new PartsDetailSorter());
@@ -191,14 +190,15 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 		GridBagConstraints c = new GridBagConstraints();
 		panFilter = new JPanel();
 		lblPartsChoice = new JLabel(resourceMap.getString("lblPartsChoice.text")); // NOI18N
-		DefaultComboBoxModel<String> partsGroupModel = new DefaultComboBoxModel<String>();
+		DefaultComboBoxModel<String> partsGroupModel = new DefaultComboBoxModel<>();
 		for (int i = 0; i < SG_NUM; i++) {
 			partsGroupModel.addElement(getPartsGroupName(i));
 		}
-		choiceParts = new JComboBox<String>(partsGroupModel);
+		choiceParts = new JComboBox<>(partsGroupModel);
 		choiceParts.setName("choiceParts"); // NOI18N
 		choiceParts.setSelectedIndex(0);
 		choiceParts.addActionListener(new java.awt.event.ActionListener() {
+			@Override
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 				filterParts();
 			}
@@ -227,13 +227,16 @@ public class PartsStoreDialog extends javax.swing.JDialog {
         txtFilter.setPreferredSize(new java.awt.Dimension(200, 28));
         txtFilter.getDocument().addDocumentListener(
             new DocumentListener() {
-                public void changedUpdate(DocumentEvent e) {
+                @Override
+				public void changedUpdate(DocumentEvent e) {
                     filterParts();
                 }
-                public void insertUpdate(DocumentEvent e) {
+                @Override
+				public void insertUpdate(DocumentEvent e) {
                     filterParts();
                 }
-                public void removeUpdate(DocumentEvent e) {
+                @Override
+				public void removeUpdate(DocumentEvent e) {
                     filterParts();
                 }
             });
@@ -247,14 +250,16 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 		if (addToCampaign) {
 			btnAdd = new JButton(resourceMap.getString("btnAdd.text"));
 			btnAdd.addActionListener(new java.awt.event.ActionListener() {
-	            public void actionPerformed(java.awt.event.ActionEvent evt) {
+	            @Override
+				public void actionPerformed(java.awt.event.ActionEvent evt) {
 	                addPart(false, false);
 	            }
 	        });
 			btnAdd.setEnabled(campaign.isGM());
 			btnBuyBulk = new JButton(resourceMap.getString("btnBuyBulk.text"));
 			btnBuyBulk.addActionListener(new java.awt.event.ActionListener() {
-	            public void actionPerformed(java.awt.event.ActionEvent evt) {
+	            @Override
+				public void actionPerformed(java.awt.event.ActionEvent evt) {
 	            	addPart(true, true);
 	                partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(partsTable.getSelectedRow()), PartsTableModel.COL_TARGET);
 	                partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(partsTable.getSelectedRow()), PartsTableModel.COL_TRANSIT);
@@ -264,7 +269,8 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 	        });
 			btnBuy = new JButton(resourceMap.getString("btnBuy.text"));
 			btnBuy.addActionListener(new java.awt.event.ActionListener() {
-	            public void actionPerformed(java.awt.event.ActionEvent evt) {
+	            @Override
+				public void actionPerformed(java.awt.event.ActionEvent evt) {
 	                addPart(true, false);
 	                partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(partsTable.getSelectedRow()), PartsTableModel.COL_TARGET);
 	                partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(partsTable.getSelectedRow()), PartsTableModel.COL_TRANSIT);
@@ -276,7 +282,8 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 				int numBonusParts = campaign.totalBonusParts();
 				btnUseBonusPart.setText("Use Bonus Part (" + numBonusParts + ")");
 				btnUseBonusPart.addActionListener(new java.awt.event.ActionListener() {
-		            public void actionPerformed(java.awt.event.ActionEvent evt) {
+		            @Override
+					public void actionPerformed(java.awt.event.ActionEvent evt) {
 		                addPart(true, false, true);
 		                partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(partsTable.getSelectedRow()), PartsTableModel.COL_TARGET);
 		                partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(partsTable.getSelectedRow()), PartsTableModel.COL_TRANSIT);
@@ -291,7 +298,8 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 			}
 			btnClose = new JButton(resourceMap.getString("btnClose.text"));
 			btnClose.addActionListener(new java.awt.event.ActionListener() {
-	            public void actionPerformed(java.awt.event.ActionEvent evt) {
+	            @Override
+				public void actionPerformed(java.awt.event.ActionEvent evt) {
 	                setVisible(false);
 	            }
 	        });
@@ -307,7 +315,8 @@ public class PartsStoreDialog extends javax.swing.JDialog {
             //if we arent adding the unit to the campaign, then different buttons
             btnAdd = new JButton("Add");
 			btnAdd.addActionListener(new java.awt.event.ActionListener() {
-	            public void actionPerformed(java.awt.event.ActionEvent evt) {
+	            @Override
+				public void actionPerformed(java.awt.event.ActionEvent evt) {
 	                setSelectedPart();
 	                setVisible(false);
 	            }
@@ -316,7 +325,8 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 
             btnClose = new JButton("Cancel"); // NOI18N
 			btnClose.addActionListener(new java.awt.event.ActionListener() {
-	            public void actionPerformed(java.awt.event.ActionEvent evt) {
+	            @Override
+				public void actionPerformed(java.awt.event.ActionEvent evt) {
 	            	selectedPart = null;
 	                setVisible(false);
 	            }
@@ -324,7 +334,7 @@ public class PartsStoreDialog extends javax.swing.JDialog {
             panButtons.add(btnClose, new GridBagConstraints());
 		}
 		getContentPane().add(panButtons, BorderLayout.PAGE_END);
-		this.setPreferredSize(new Dimension(700,600));
+		setPreferredSize(new Dimension(700,600));
         pack();
     }
 
@@ -517,11 +527,13 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 			data = inventory;
 		}
 
+		@Override
 		public int getRowCount() {
             return data.size();
         }
 
-        public int getColumnCount() {
+        @Override
+		public int getColumnCount() {
             return N_COL;
         }
 
@@ -551,12 +563,13 @@ public class PartsStoreDialog extends javax.swing.JDialog {
             }
         }
 
+		@Override
 		public Object getValueAt(int row, int col) {
 	        Part part;
 	        if(data.isEmpty()) {
 	        	return "";
 	        } else {
-	        	part = (Part)data.get(row);
+	        	part = data.get(row);
 	        }
 	        PartInventory inventories = campaign.getPartInventory(part);
 			if(col == COL_NAME) {
@@ -581,7 +594,7 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 				return part.getTechBaseName();
 			}
 			if(col == COL_TARGET) {
-			    IAcquisitionWork shoppingItem = (MissingPart)part.getMissingPart();
+			    IAcquisitionWork shoppingItem = part.getMissingPart();
 		        if(null == shoppingItem && part instanceof IAcquisitionWork) {
 		            shoppingItem = (IAcquisitionWork)part;
 		        }
@@ -619,14 +632,14 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 		}
 
 		public Part getPartAt(int row) {
-			return ((Part) data.get(row));
+			return (data.get(row));
 		}
 
 		public Part[] getPartstAt(int[] rows) {
 			Part[] parts = new Part[rows.length];
 			for (int i = 0; i < rows.length; i++) {
 				int row = rows[i];
-				parts[i] = ((Part) data.get(row));
+				parts[i] = (data.get(row));
 			}
 			return parts;
 		}
@@ -665,11 +678,11 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 	            if(data.isEmpty()) {
 	                return null;
 	            } else {
-	                part = (Part)data.get(row);
+	                part = data.get(row);
 	            }
 	        	switch(col) {
 	        	case COL_TARGET:
-	        	    IAcquisitionWork shoppingItem = (MissingPart)part.getMissingPart();
+	        	    IAcquisitionWork shoppingItem = part.getMissingPart();
 	                if(null == shoppingItem && part instanceof IAcquisitionWork) {
 	                    shoppingItem = (IAcquisitionWork)part;
 	                }
@@ -691,6 +704,7 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 
 				private static final long serialVersionUID = 9054581142945717303L;
 
+				@Override
 				public Component getTableCellRendererComponent(JTable table,
 						Object value, boolean isSelected, boolean hasFocus,
 						int row, int column) {

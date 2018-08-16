@@ -57,7 +57,7 @@ import org.w3c.dom.DOMException;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
-import megamek.common.EquipmentType;
+import megamek.common.ITechnology;
 import megamek.common.logging.LogLevel;
 import megamek.common.util.EncodeControl;
 import mekhq.FileParser;
@@ -116,7 +116,7 @@ public class Planets {
                     Thread.sleep(10);
                 }
             } catch(InterruptedException iex) {
-                MekHQ.getLogger().log(Planets.class, "reload(boolean)", iex); //$NON-NLS-1$
+                MekHQ.getLogger().error(Planets.class, "reload(boolean)", iex); //$NON-NLS-1$
             }
         }
     }
@@ -232,7 +232,7 @@ public class Planets {
         Set<HPGLink> result = new HashSet<>();
         for(Planet planet : planetList.values()) {
             Integer hpg = planet.getHPG(when);
-            if((null != hpg) && (hpg.intValue() == EquipmentType.RATING_A)) {
+            if((null != hpg) && (hpg.intValue() == ITechnology.RATING_A)) {
                 Collection<Planet> neighbors = getNearbyPlanets(planet, 50);
                 for(Planet neighbor : neighbors) {
                     hpg = neighbor.getHPG(when);
@@ -282,7 +282,7 @@ public class Planets {
         try {
             marshaller.marshal(planet, out);
         } catch (Exception e) {
-            MekHQ.getLogger().log(getClass(), "writePlanet(OutputStream,Planet)", e); //$NON-NLS-1$
+            MekHQ.getLogger().error(getClass(), "writePlanet(OutputStream,Planet)", e); //$NON-NLS-1$
         }
     }
     
@@ -290,7 +290,7 @@ public class Planets {
         try {
             marshaller.marshal(planet, out);
         } catch (Exception e) {
-            MekHQ.getLogger().log(getClass(), "writePlanet(Writer,Planet)", e); //$NON-NLS-1$
+            MekHQ.getLogger().error(getClass(), "writePlanet(Writer,Planet)", e); //$NON-NLS-1$
         }
     }
     
@@ -299,7 +299,7 @@ public class Planets {
         try {
             marshaller.marshal(event, out);
         } catch (Exception e) {
-            MekHQ.getLogger().log(getClass(), "writePlanet(OutputStream,Planet.PlanetaryEvent)", e); //$NON-NLS-1$
+            MekHQ.getLogger().error(getClass(), "writePlanet(OutputStream,Planet.PlanetaryEvent)", e); //$NON-NLS-1$
         }
     }
     
@@ -307,7 +307,7 @@ public class Planets {
         try {
             marshaller.marshal(event, out);
         } catch (Exception e) {
-            MekHQ.getLogger().log(getClass(), "writePlanet(Writer,Planet.PlanetaryEvent)", e); //$NON-NLS-1$
+            MekHQ.getLogger().error(getClass(), "writePlanet(Writer,Planet.PlanetaryEvent)", e); //$NON-NLS-1$
         }
     }
     
@@ -315,7 +315,7 @@ public class Planets {
         try {
             return (Planet.PlanetaryEvent) unmarshaller.unmarshal(node);
         } catch (JAXBException e) {
-            MekHQ.getLogger().log(getClass(), "readPlanetaryEvent(Node)", e); //$NON-NLS-1$
+            MekHQ.getLogger().error(getClass(), "readPlanetaryEvent(Node)", e); //$NON-NLS-1$
         }
         return null;
     }
@@ -326,7 +326,7 @@ public class Planets {
         try {
             marshaller.marshal(temp, out);
         } catch (Exception e) {
-            MekHQ.getLogger().log(getClass(), "writePlanets(OutputStream,List<Planet>)", e); //$NON-NLS-1$
+            MekHQ.getLogger().error(getClass(), "writePlanets(OutputStream,List<Planet>)", e); //$NON-NLS-1$
         }
     }
     
@@ -336,7 +336,7 @@ public class Planets {
         try {
             generatePlanets();
         } catch (ParseException e) {
-            MekHQ.getLogger().log(getClass(), "initialize()", e); //$NON-NLS-1$
+            MekHQ.getLogger().error(getClass(), "initialize()", e); //$NON-NLS-1$
         }
     }
     
@@ -551,9 +551,9 @@ public class Planets {
         int unmatchedPlanets = 0;
         
         // this is pretty inefficient but it's not a frequent operation.
-        List<Planet> unmatchedCSVPlanets = new ArrayList<Planet>();
+        List<Planet> unmatchedCSVPlanets = new ArrayList<>();
         
-        Map<String, Planet> unmatchedXMLPlanets = new HashMap<String, Planet>();
+        Map<String, Planet> unmatchedXMLPlanets = new HashMap<>();
         for(String key : planetList.keySet()) {
             if(!key.startsWith("NP") &&
                     !key.startsWith("HL") &&
@@ -631,7 +631,7 @@ public class Planets {
      * @param planet The planet to add.
      */
     private void addPlanet(Planet planet) { 
-        this.planetList.put(planet.getId(), planet);
+        planetList.put(planet.getId(), planet);
         
         int x = (int)(planet.getX()/30.0);
         int y = (int)(planet.getY()/30.0);
@@ -651,14 +651,14 @@ public class Planets {
         
         try {
             FileOutputStream fos = new FileOutputStream(path);
-            ArrayList<Planet> localPlanetList = new ArrayList<>(this.planetList.values());
+            ArrayList<Planet> localPlanetList = new ArrayList<>(planetList.values());
             localPlanetList.sort(new Comparator<Planet>() {
                 @Override
                 public int compare(Planet arg0, Planet arg1) {
                     return arg0.getId().compareTo(arg1.getId());
                 }});
             
-            this.writePlanets(fos, localPlanetList);
+            writePlanets(fos, localPlanetList);
             fos.flush();
             fos.close();
             
@@ -703,7 +703,7 @@ public class Planets {
             try(FileInputStream fis = new FileInputStream(defaultFilePath)) { //$NON-NLS-1$
                 updatePlanets(fis);
             } catch (Exception ex) {
-                MekHQ.getLogger().log(getClass(), METHOD_NAME, ex);
+                MekHQ.getLogger().error(getClass(), METHOD_NAME, ex);
             }
             
             // Step 3: Load all the xml files within the planets subdirectory, if it exists
@@ -770,12 +770,12 @@ public class Planets {
         
         @SuppressWarnings("unused")
         private void afterUnmarshal(Unmarshaller unmarshaller, Object parent) {
-            toDelete = new ArrayList<String>();
+            toDelete = new ArrayList<>();
             if( null == list ) {
-                list = new ArrayList<Planet>();
+                list = new ArrayList<>();
             } else {
                 // Fill in the "toDelete" list
-                List<Planet> filteredList = new ArrayList<Planet>(list.size());
+                List<Planet> filteredList = new ArrayList<>(list.size());
                 for( Planet planet : list ) {
                     if( null != planet.delete && planet.delete && null != planet.getId() ) {
                         toDelete.add(planet.getId());

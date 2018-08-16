@@ -42,7 +42,6 @@ import megamek.common.EquipmentType;
 import megamek.common.WeaponType;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
-import megamek.common.options.Option;
 import megamek.common.options.OptionsConstants;
 import megamek.common.options.PilotOptions;
 import megamek.common.util.EncodeControl;
@@ -65,11 +64,11 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
 	 */
 	private static final long serialVersionUID = -6265589976779860566L;
 	private Person person;
-    private ArrayList<DialogOptionComponent> optionComps = new ArrayList<DialogOptionComponent>();
-    private Hashtable<String, JSpinner> skillLvls = new Hashtable<String, JSpinner>();
-    private Hashtable<String, JSpinner> skillBonus = new Hashtable<String, JSpinner>();
-    private Hashtable<String, JLabel> skillValues = new Hashtable<String, JLabel>();
-    private Hashtable<String, JCheckBox> skillChks = new Hashtable<String, JCheckBox>();
+    private ArrayList<DialogOptionComponent> optionComps = new ArrayList<>();
+    private Hashtable<String, JSpinner> skillLvls = new Hashtable<>();
+    private Hashtable<String, JSpinner> skillBonus = new Hashtable<>();
+    private Hashtable<String, JLabel> skillValues = new Hashtable<>();
+    private Hashtable<String, JCheckBox> skillChks = new Hashtable<>();
     private PilotOptions options;
     private GregorianCalendar birthdate;
     private GregorianCalendar recruitment;
@@ -120,19 +119,19 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
     public CustomizePersonDialog(java.awt.Frame parent, boolean modal, Person person, Campaign campaign) {
         super(parent, modal);
         this.campaign = campaign;
-        this.frame = parent;
-        this.dateFormat = new SimpleDateFormat("MMMM d yyyy");
+        frame = parent;
+        dateFormat = new SimpleDateFormat("MMMM d yyyy");
         this.person = person;
         initializePilotAndOptions();
         setLocationRelativeTo(parent);
     }
 
     private void initializePilotAndOptions () {
-        this.birthdate = (GregorianCalendar)person.getBirthday().clone();
+        birthdate = (GregorianCalendar)person.getBirthday().clone();
     	if(campaign.getCampaignOptions().getUseTimeInService() && person.getRecruitment() != null) {
-            this.recruitment = (GregorianCalendar)person.getRecruitment().clone();
+            recruitment = (GregorianCalendar)person.getRecruitment().clone();
         }
-    	this.options = person.getOptions();	
+    	options = person.getOptions();	
     	initComponents();
     }
 
@@ -154,7 +153,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         textBloodname = new javax.swing.JTextField();
         textToughness = new javax.swing.JTextField();
         lblToughness = new javax.swing.JLabel();
-        choiceGender = new javax.swing.JComboBox<String>();
+        choiceGender = new javax.swing.JComboBox<>();
         scrOptions = new javax.swing.JScrollPane();
         panOptions = new javax.swing.JPanel();
         scrSkills = new javax.swing.JScrollPane();
@@ -204,7 +203,8 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         btnRandomName.setText(resourceMap.getString("btnRandomName.text")); // NOI18N
         btnRandomName.setName("btnRandomName"); // NOI18N
         btnRandomName.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
             	randomName();
             }
         });
@@ -241,7 +241,8 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
             btnRandomBloodname.setText(resourceMap.getString("btnRandomBloodname.text")); // NOI18N
             btnRandomBloodname.setName("btnRandomBloodname"); // NOI18N
             btnRandomBloodname.addActionListener(new java.awt.event.ActionListener() {
-                public void actionPerformed(java.awt.event.ActionEvent evt) {
+                @Override
+				public void actionPerformed(java.awt.event.ActionEvent evt) {
                 	randomBloodname();
                  }
             });
@@ -282,14 +283,15 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
         panDemog.add(lblGender, gridBagConstraints);
 
-        DefaultComboBoxModel<String> genderModel = new DefaultComboBoxModel<String>();
+        DefaultComboBoxModel<String> genderModel = new DefaultComboBoxModel<>();
         genderModel.addElement(Person.getGenderName(Person.G_MALE));
         genderModel.addElement(Person.getGenderName(Person.G_FEMALE));
         choiceGender.setModel(genderModel);
         choiceGender.setName("choiceGender"); // NOI18N
         choiceGender.setSelectedIndex(person.getGender());
         choiceGender.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
             	randomName();
             }
         });
@@ -309,14 +311,15 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
         panDemog.add(new JLabel("Phenotype:"), gridBagConstraints);
 
-        DefaultComboBoxModel<String> phenoModel = new DefaultComboBoxModel<String>();
+        DefaultComboBoxModel<String> phenoModel = new DefaultComboBoxModel<>();
         for(int i = 0; i < Person.PHENOTYPE_NUM; i++) {
             phenoModel.addElement(Person.getPhenotypeName(i));
         }
-        choicePheno = new JComboBox<String>(phenoModel);
+        choicePheno = new JComboBox<>(phenoModel);
         choicePheno.setSelectedIndex(person.getPhenotype());
         choicePheno.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 backgroundChanged();
             }
         });
@@ -359,7 +362,8 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         btnDate.setText(getDateAsString());
         btnDate.setName("btnDate"); // NOI18N
         btnDate.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
             	btnDateActionPerformed(evt);
             }
         });
@@ -392,7 +396,8 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
                 btnServiceDate.setText(getDateAsString2());
                 btnServiceDate.setName("btnServiceDate"); // NOI18N
                 btnServiceDate.addActionListener(new java.awt.event.ActionListener() {
-                    public void actionPerformed(java.awt.event.ActionEvent evt) {
+                    @Override
+					public void actionPerformed(java.awt.event.ActionEvent evt) {
                         btnServiceDateActionPerformed(evt);
                     }
                 });
@@ -430,7 +435,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         lblUnit.setText("Original unit:"); // NOI18N
         lblUnit.setName("lblUnit"); // NOI18N
         
-        choiceUnitWeight = new JComboBox<String>();
+        choiceUnitWeight = new JComboBox<>();
         choiceUnitWeight.addItem("None");
         choiceUnitWeight.addItem("Light");
         choiceUnitWeight.addItem("Medium");
@@ -438,7 +443,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         choiceUnitWeight.addItem("Assault");
         choiceUnitWeight.setSelectedIndex(person.getOriginalUnitWeight());
 
-        choiceUnitTech = new JComboBox<String>();
+        choiceUnitTech = new JComboBox<>();
         choiceUnitTech.addItem("IS1");
         choiceUnitTech.addItem("IS2");
         choiceUnitTech.addItem("Clan");
@@ -450,7 +455,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         chkFounder = new JCheckBox("Founding member");
         chkFounder.setSelected(person.isFounder());
         
-        choiceOriginalUnit = new JComboBox<Unit>();
+        choiceOriginalUnit = new JComboBox<>();
         choiceOriginalUnit.setRenderer(new DefaultListCellRenderer() {
 			@Override
         	public Component getListCellRendererComponent(JList<?> list,
@@ -597,7 +602,8 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         btnOk.setText(resourceMap.getString("btnOk.text")); // NOI18N
         btnOk.setName("btnOk"); // NOI18N
         btnOk.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnOkActionPerformed(evt);
             }
         });
@@ -612,7 +618,8 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         btnClose.setText(resourceMap.getString("btnClose.text")); // NOI18N
         btnClose.setName("btnClose"); // NOI18N
         btnClose.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnCloseActionPerformed(evt);
             }
         });
@@ -819,7 +826,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
     
     public void refreshOptions() {
         panOptions.removeAll();
-        optionComps = new ArrayList<DialogOptionComponent>();
+        optionComps = new ArrayList<>();
 
         GridBagLayout gridbag = new GridBagLayout();
         GridBagConstraints c = new GridBagConstraints();
@@ -904,7 +911,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
             optionComp.addValue(Crew.HUMANTRO_VEE);
             optionComp.addValue(Crew.HUMANTRO_BA);
             optionComp.setSelected(option.stringValue());
-        } else if (option.getType() == Option.CHOICE) {
+        } else if (option.getType() == IOption.CHOICE) {
             SpecialAbility spa = SpecialAbility.getOption(option.getName());
             if (null != spa) {
                 for (String val : spa.getChoiceValues()) {
@@ -1055,7 +1062,8 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
     // Variables declaration - do not modify//GEN-BEGIN:variables
     
 
-    public void optionClicked(DialogOptionComponent arg0, IOption arg1, boolean arg2) {
+    @Override
+	public void optionClicked(DialogOptionComponent arg0, IOption arg1, boolean arg2) {
         //IMplement me!!
     }
 

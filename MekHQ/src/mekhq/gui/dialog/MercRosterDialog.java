@@ -53,9 +53,9 @@ public class MercRosterDialog extends javax.swing.JDialog implements PropertyCha
     public MercRosterDialog(java.awt.Frame parent, boolean modal, Campaign c) {
         super(parent, modal);
         frame = parent;
-        this.campaign = c;
+        campaign = c;
         initComponents();      
-        this.setLocationRelativeTo(parent);
+        setLocationRelativeTo(parent);
     }
 
     private void initComponents() {
@@ -142,13 +142,15 @@ public class MercRosterDialog extends javax.swing.JDialog implements PropertyCha
         panButtons.add(btnCancel);
         
         btnUpload.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 upload();
             }
         });
         
         btnCancel.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 setVisible(false);
             }
         });

@@ -66,7 +66,7 @@ public class DropshipDockingCollar extends Part {
     
     public DropshipDockingCollar(int tonnage, Campaign c, int collarType) {
         super(tonnage, c);
-        this.name = "Dropship Docking Collar";
+        name = "Dropship Docking Collar";
         if (collarType == Dropship.COLLAR_NO_BOOM) {
             name += " (No Boom)";
         } else if (collarType == Dropship.COLLAR_PROTOTYPE) {
@@ -74,7 +74,8 @@ public class DropshipDockingCollar extends Part {
         }
     }
     
-    public DropshipDockingCollar clone() {
+    @Override
+	public DropshipDockingCollar clone() {
     	DropshipDockingCollar clone = new DropshipDockingCollar(getUnitTonnage(), campaign, collarType);
         clone.copyBaseData(this);
         clone.boomDamaged = boomDamaged;

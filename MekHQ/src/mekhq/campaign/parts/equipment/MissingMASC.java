@@ -49,10 +49,11 @@ public class MissingMASC extends MissingEquipmentPart {
     public MissingMASC(int tonnage, EquipmentType et, int equipNum, Campaign c, double etonnage,
             int rating, boolean omniPodded) {
         super(tonnage, et, equipNum, c, etonnage, omniPodded);
-        this.engineRating = rating;
+        engineRating = rating;
     }
  
-    public void setUnit(Unit u) {
+    @Override
+	public void setUnit(Unit u) {
     	super.setUnit(u);
     	if(null != unit && null != unit.getEntity().getEngine()) {
     		engineRating = unit.getEntity().getEngine().getRating();

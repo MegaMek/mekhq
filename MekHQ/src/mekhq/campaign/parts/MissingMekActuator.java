@@ -58,8 +58,8 @@ public class MissingMekActuator extends MissingPart {
     	super(tonnage, c);
         this.type = type;
         Mech m = new BipedMech();
-        this.name = m.getSystemName(type) + " Actuator" ;
-        this.location = loc;
+        name = m.getSystemName(type) + " Actuator" ;
+        location = loc;
     }
     
     @Override 
@@ -79,7 +79,8 @@ public class MissingMekActuator extends MissingPart {
     	return 0;
     }
     
-    public int getLocation() {
+    @Override
+	public int getLocation() {
     	return location;
     }
     

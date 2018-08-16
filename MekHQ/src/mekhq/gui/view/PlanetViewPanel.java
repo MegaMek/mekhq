@@ -81,8 +81,8 @@ public class PlanetViewPanel extends JPanel {
     private Image planetIcon = null;
     
     public PlanetViewPanel(Planet p, Campaign c) {
-        this.planet = p;
-        this.campaign = c;
+        planet = p;
+        campaign = c;
         initComponents();
     }
     

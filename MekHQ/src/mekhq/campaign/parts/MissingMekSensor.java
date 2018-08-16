@@ -42,7 +42,7 @@ public class MissingMekSensor extends MissingPart {
 	
 	public MissingMekSensor(int tonnage, Campaign c) {
         super(tonnage, c);
-        this.name = "Mech Sensors";
+        name = "Mech Sensors";
     }
 	
 	@Override 

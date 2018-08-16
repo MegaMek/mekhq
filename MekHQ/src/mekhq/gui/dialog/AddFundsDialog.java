@@ -65,7 +65,8 @@ public class AddFundsDialog extends JDialog implements FocusListener {
         btnAddFunds.setActionCommand(resourceMap.getString("btnAddFunds.actionCommand")); // NOI18N
         btnAddFunds.setName("btnAddFunds"); // NOI18N
         btnAddFunds.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent evt) {
+            @Override
+			public void actionPerformed(ActionEvent evt) {
                 btnAddFundsActionPerformed(evt);
             }
         });
@@ -90,7 +91,7 @@ public class AddFundsDialog extends JDialog implements FocusListener {
         jFormattedTextFieldFundsQuantity.setColumns(10);
         panel.add(jFormattedTextFieldFundsQuantity);
 
-        categoryCombo = new JComboBox<String>(Transaction.getCategoryList());
+        categoryCombo = new JComboBox<>(Transaction.getCategoryList());
         categoryCombo.setSelectedItem(Transaction.getCategoryName(Transaction.C_MISC));
         categoryCombo.setToolTipText("The category the transaction falls into.");
         categoryCombo.setName("categoryCombo");
@@ -107,8 +108,8 @@ public class AddFundsDialog extends JDialog implements FocusListener {
     }
 
     private void btnAddFundsActionPerformed(ActionEvent evt) {//GEN-FIRST:event_btnAddFundsActionPerformed
-        this.closedType = JOptionPane.OK_OPTION;
-        this.setVisible(false);
+        closedType = JOptionPane.OK_OPTION;
+        setVisible(false);
     }//GEN-LAST:event_btnAddFundsActionPerformed
 
     /**
@@ -116,10 +117,12 @@ public class AddFundsDialog extends JDialog implements FocusListener {
     */
     public static void main(String args[]) {
         EventQueue.invokeLater(new Runnable() {
-            public void run() {
+            @Override
+			public void run() {
                 AddFundsDialog dialog = new AddFundsDialog(new JFrame(), true);
                 dialog.addWindowListener(new WindowAdapter() {
-                    public void windowClosing(WindowEvent e) {
+                    @Override
+					public void windowClosing(WindowEvent e) {
                         System.exit(0);
                     }
                 });

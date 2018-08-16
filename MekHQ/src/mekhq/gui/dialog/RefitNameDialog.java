@@ -60,8 +60,8 @@ public class RefitNameDialog extends JDialog {
     /** Creates new form RefitTeamDialog */
     public RefitNameDialog(Frame parent, boolean modal, Refit r) {
         super(parent, modal);
-        this.frame = parent;
-        this.refit = r;
+        frame = parent;
+        refit = r;
         cancelled = false;
         initComponents();
         setLocationRelativeTo(parent);
@@ -133,7 +133,8 @@ public class RefitNameDialog extends JDialog {
         btnOK.setText(resourceMap.getString("btnOK.text")); // NOI18N
         btnOK.setName("btnOK"); // NOI18N
         btnOK.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnOKActionPerformed(evt);
             }
         });
@@ -148,7 +149,8 @@ public class RefitNameDialog extends JDialog {
         btnCancel.setText(resourceMap.getString("btnCancel.text")); // NOI18N
         btnCancel.setName("btnClose"); // NOI18N
         btnCancel.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnCloseActionPerformed(evt);
             }
         });
@@ -181,12 +183,12 @@ public class RefitNameDialog extends JDialog {
     	}
     	refit.getNewEntity().setChassis(chassis);
     	refit.getNewEntity().setModel(model);
-    	this.setVisible(false);
+    	setVisible(false);
     }
 
     private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
     	cancelled = true;
-    	this.setVisible(false);
+    	setVisible(false);
     }
 
     public boolean wasCancelled() {

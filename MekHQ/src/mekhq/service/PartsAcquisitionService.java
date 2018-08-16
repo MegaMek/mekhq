@@ -15,7 +15,7 @@ import mekhq.campaign.work.IAcquisitionWork;
 
 public class PartsAcquisitionService {
 	private static Map<String, List<IAcquisitionWork>> acquisitionMap = null;
-	private static Map<String, PartCountInfo> partCountInfoMap = new HashMap<String, PartCountInfo>();
+	private static Map<String, PartCountInfo> partCountInfoMap = new HashMap<>();
 
 	private static int inTransitCount = 0;
 	private static int onOrderCount = 0;
@@ -101,7 +101,7 @@ public class PartsAcquisitionService {
 	}
 
 	public static void buildPartsList(Campaign campaign) {
-		acquisitionMap = new HashMap<String, List<IAcquisitionWork>>();
+		acquisitionMap = new HashMap<>();
 
 		for (Unit unit : campaign.getServiceableUnits()) {
 			ArrayList<IAcquisitionWork> unitPartsList = campaign.getAcquisitionsForUnit(unit.getId());
@@ -114,7 +114,7 @@ public class PartsAcquisitionService {
 				List<IAcquisitionWork> awList = acquisitionMap.get(aw.getAcquisitionDisplayName());
 
 				if (null == awList) {
-					awList = new ArrayList<IAcquisitionWork>();
+					awList = new ArrayList<>();
 					acquisitionMap.put(aw.getAcquisitionDisplayName(), awList);
 				}
 
@@ -126,7 +126,7 @@ public class PartsAcquisitionService {
 	}
 
 	public static void generateSummaryCounts(Campaign campaign) {
-		partCountInfoMap = new HashMap<String, PartCountInfo>();
+		partCountInfoMap = new HashMap<>();
 
 		Person admin = campaign.getLogisticsPerson();
 
@@ -297,6 +297,7 @@ public class PartsAcquisitionService {
 			this.canBeAcquired = canBeAcquired;
 		}
 
+		@Override
 		public String toString() {
 			StringBuilder sb = new StringBuilder();
 

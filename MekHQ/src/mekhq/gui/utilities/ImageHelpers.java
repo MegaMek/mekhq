@@ -19,8 +19,8 @@ public class ImageHelpers {
      */
     public static Image getScaledForBoundaries(Image image, Dimension boundary, int resamplingAlgorithm) {
 
-        double original_width = (double) image.getWidth(null);
-        double original_height = (double) image.getHeight(null);
+        double original_width = image.getWidth(null);
+        double original_height = image.getHeight(null);
         int bound_width = boundary.width;
         int bound_height = boundary.height;
         double new_width = original_width;

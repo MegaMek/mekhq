@@ -78,11 +78,11 @@ public class Loan implements MekHqXmlSerializable {
     }
     
     public Loan(long p, int r, int c, int y, int s, GregorianCalendar today, String i, String ref) {
-        this.principal = p;
-        this.rate = r;
-        this.collateral = c;
-        this.years = y;
-        this.schedule = s;
+        principal = p;
+        rate = r;
+        collateral = c;
+        years = y;
+        schedule = s;
         nextPayment = (GregorianCalendar)today.clone();
         setFirstPaymentDate();
         calculateAmortization();
@@ -106,7 +106,7 @@ public class Loan implements MekHqXmlSerializable {
             break;
         }
         while(keepGoing) {
-            nextPayment.add(GregorianCalendar.DAY_OF_YEAR, 1);
+            nextPayment.add(Calendar.DAY_OF_YEAR, 1);
             switch(schedule) {
             case Finances.SCHEDULE_BIWEEKLY:
                 if(nextPayment.get(Calendar.DAY_OF_WEEK) == 1) {
@@ -175,11 +175,11 @@ public class Loan implements MekHqXmlSerializable {
             denom = 1;
             break;
         }
-        double r = ((double)rate/100.0)/denom;
+        double r = (rate/100.0)/denom;
         nPayments = years * denom;
         payAmount = (long)((principal * r * Math.pow(1+r,nPayments))/(Math.pow(1+r, nPayments)-1));
         totalValue = payAmount * nPayments;
-        collateralValue = (long)(((double)collateral/100.0)*principal);
+        collateralValue = (long)((collateral/100.0)*principal);
     }
     
     public long getPrincipal() {
@@ -195,7 +195,7 @@ public class Loan implements MekHqXmlSerializable {
     }
     
     public void setInstitution(String s) {
-        this.institution = s;
+        institution = s;
     }
     
     public String getRefNumber() {
@@ -203,7 +203,7 @@ public class Loan implements MekHqXmlSerializable {
     }
     
     public void setRefNumber(String s) {
-        this.refNumber = s;
+        refNumber = s;
     }
     
     public boolean isOverdue() {
@@ -245,16 +245,16 @@ public class Loan implements MekHqXmlSerializable {
     public void paidLoan() {      
         switch(schedule) {
         case Finances.SCHEDULE_BIWEEKLY:
-            nextPayment.add(GregorianCalendar.WEEK_OF_YEAR, 2);
+            nextPayment.add(Calendar.WEEK_OF_YEAR, 2);
             break;
         case Finances.SCHEDULE_MONTHLY:
-            nextPayment.add(GregorianCalendar.MONTH, 1);
+            nextPayment.add(Calendar.MONTH, 1);
             break;
         case Finances.SCHEDULE_QUARTERLY:
-            nextPayment.add(GregorianCalendar.MONTH, 3);
+            nextPayment.add(Calendar.MONTH, 3);
             break;
         case Finances.SCHEDULE_YEARLY:
-            nextPayment.add(GregorianCalendar.YEAR, 1);
+            nextPayment.add(Calendar.YEAR, 1);
             break;
         }
         nPayments--;
@@ -431,7 +431,7 @@ public class Loan implements MekHqXmlSerializable {
                 retVal.nPayments = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("nextPayment")) {
                 SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-                retVal.nextPayment = (GregorianCalendar) GregorianCalendar.getInstance();
+                retVal.nextPayment = (GregorianCalendar) Calendar.getInstance();
                 try {
                     retVal.nextPayment.setTime(df.parse(wn2.getTextContent().trim()));
                 } catch (DOMException e) {
@@ -579,15 +579,15 @@ public class Loan implements MekHqXmlSerializable {
             return false;
         }
         Loan loan = (Loan)obj;
-        return this.getDescription().equals(loan.getDescription()) 
-                && this.getInterestRate() == loan.getInterestRate()
-                && this.getCollateralAmount() == loan.getCollateralAmount()
-                && this.getCollateralPercent() == loan.getCollateralPercent()
-                && this.getNextPayDate().equals(loan.getNextPayDate())
-                && this.getYears() == loan.getYears()
-                && this.getPrincipal() == loan.getPrincipal()
-                && this.getPaymentSchedule() == loan.getPaymentSchedule()
-                && this.getRemainingPayments() == loan.getRemainingPayments()
-                && this.getRemainingValue() == loan.getRemainingValue();
+        return getDescription().equals(loan.getDescription()) 
+                && getInterestRate() == loan.getInterestRate()
+                && getCollateralAmount() == loan.getCollateralAmount()
+                && getCollateralPercent() == loan.getCollateralPercent()
+                && getNextPayDate().equals(loan.getNextPayDate())
+                && getYears() == loan.getYears()
+                && getPrincipal() == loan.getPrincipal()
+                && getPaymentSchedule() == loan.getPaymentSchedule()
+                && getRemainingPayments() == loan.getRemainingPayments()
+                && getRemainingValue() == loan.getRemainingValue();
     }
 }

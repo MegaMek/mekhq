@@ -16,8 +16,8 @@ import java.awt.Image;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.text.DecimalFormat;
+import java.util.Calendar;
 import java.util.Comparator;
-import java.util.GregorianCalendar;
 import java.util.ResourceBundle;
 
 import javax.swing.DefaultComboBoxModel;
@@ -120,9 +120,9 @@ public class UnitSelectorDialog extends JDialog {
         //TODO: the proper way to do this would be to create a listener interface that has
         //methods like buyUnit, addUnit, etc. that we could register with this dialog
         //and then update when needed
-        this.campaign = c;
+        campaign = c;
         formatter = new DecimalFormat();
-        asd = new AdvancedSearchDialog(frame, campaign.getCalendar().get(GregorianCalendar.YEAR));
+        asd = new AdvancedSearchDialog(frame, campaign.getCalendar().get(Calendar.YEAR));
         initComponents();
 
         MechSummary[] allMechs = MechSummaryCache.getInstance().getAllMechs();
@@ -139,9 +139,9 @@ public class UnitSelectorDialog extends JDialog {
         panelFilterBtns = new JPanel();
         panelLeft = new JPanel();
         lblWeight = new JLabel();
-        comboWeight = new JComboBox<String>();
+        comboWeight = new JComboBox<>();
         lblUnitType = new JLabel();
-        comboUnitType = new JComboBox<String>();
+        comboUnitType = new JComboBox<>();
         txtFilter = new JTextField();
         lblFilter = new JLabel();
         lblImage = new JLabel();
@@ -170,7 +170,7 @@ public class UnitSelectorDialog extends JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panelFilterBtns.add(lblUnitType, gridBagConstraints);
 
-        DefaultComboBoxModel<String> unitTypeModel = new DefaultComboBoxModel<String>();
+        DefaultComboBoxModel<String> unitTypeModel = new DefaultComboBoxModel<>();
         for (int i = 0; i < UnitType.SIZE; i++) {
             unitTypeModel.addElement(UnitType.getTypeDisplayableName(i));
         }
@@ -180,7 +180,8 @@ public class UnitSelectorDialog extends JDialog {
         comboUnitType.setName("comboUnitType"); // NOI18N
         comboUnitType.setPreferredSize(new java.awt.Dimension(200, 27));
         comboUnitType.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 comboUnitTypeActionPerformed(evt);
             }
         });
@@ -198,7 +199,7 @@ public class UnitSelectorDialog extends JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panelFilterBtns.add(lblWeight, gridBagConstraints);
 
-        DefaultComboBoxModel<String> weightModel = new DefaultComboBoxModel<String>();
+        DefaultComboBoxModel<String> weightModel = new DefaultComboBoxModel<>();
         for (int i = 0; i < EntityWeightClass.SIZE; i++) {
             weightModel.addElement(EntityWeightClass.getClassName(i));
         }
@@ -209,7 +210,8 @@ public class UnitSelectorDialog extends JDialog {
         comboWeight.setName("comboWeight"); // NOI18N
         comboWeight.setPreferredSize(new java.awt.Dimension(200, 27));
         comboWeight.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 comboWeightActionPerformed(evt);
             }
         });
@@ -225,13 +227,16 @@ public class UnitSelectorDialog extends JDialog {
         txtFilter.setPreferredSize(new java.awt.Dimension(200, 28));
         txtFilter.getDocument().addDocumentListener(
                 new DocumentListener() {
-                    public void changedUpdate(DocumentEvent e) {
+                    @Override
+					public void changedUpdate(DocumentEvent e) {
                         filterUnits();
                     }
-                    public void insertUpdate(DocumentEvent e) {
+                    @Override
+					public void insertUpdate(DocumentEvent e) {
                         filterUnits();
                     }
-                    public void removeUpdate(DocumentEvent e) {
+                    @Override
+					public void removeUpdate(DocumentEvent e) {
                         filterUnits();
                     }
                 });
@@ -267,7 +272,8 @@ public class UnitSelectorDialog extends JDialog {
 
         btnAdvSearch.setText(Messages.getString("MechSelectorDialog.AdvSearch")); //$NON-NLS-1$
         btnAdvSearch.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 searchFilter = asd.showDialog();
                 btnResetSearch.setEnabled(searchFilter!=null);
                 filterUnits();
@@ -282,7 +288,8 @@ public class UnitSelectorDialog extends JDialog {
 
         btnResetSearch.setText(Messages.getString("MechSelectorDialog.Reset")); //$NON-NLS-1$
         btnResetSearch.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 asd.clearValues();
                 searchFilter=null;
                 btnResetSearch.setEnabled(false);
@@ -316,11 +323,12 @@ public class UnitSelectorDialog extends JDialog {
         tableUnits.setModel(unitModel);
         tableUnits.setName("tableUnits"); // NOI18N
         tableUnits.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
-        sorter = new TableRowSorter<MechTableModel>(unitModel);
+        sorter = new TableRowSorter<>(unitModel);
         sorter.setComparator(MechTableModel.COL_COST, new FormattedNumberSorter());
         tableUnits.setRowSorter(sorter);
         tableUnits.getSelectionModel().addListSelectionListener(new javax.swing.event.ListSelectionListener() {
-            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
+            @Override
+			public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
                 unitChanged(evt);
             }
         });
@@ -362,7 +370,8 @@ public class UnitSelectorDialog extends JDialog {
             btnBuy.setText("Buy (TN: --)");
             btnBuy.setName("btnBuy"); // NOI18N
             btnBuy.addActionListener(new java.awt.event.ActionListener() {
-                public void actionPerformed(java.awt.event.ActionEvent evt) {
+                @Override
+				public void actionPerformed(java.awt.event.ActionEvent evt) {
                     btnBuyActionPerformed(evt);
                 }
             });
@@ -370,7 +379,8 @@ public class UnitSelectorDialog extends JDialog {
 
             btnAddGM = new JButton("Add (GM)");
             btnAddGM.addActionListener(new java.awt.event.ActionListener() {
-                public void actionPerformed(java.awt.event.ActionEvent evt) {
+                @Override
+				public void actionPerformed(java.awt.event.ActionEvent evt) {
                     addUnitGM();
                 }
             });
@@ -381,7 +391,8 @@ public class UnitSelectorDialog extends JDialog {
             btnClose.setText(resourceMap.getString("btnClose.text")); // NOI18N
             btnClose.setName("btnClose"); // NOI18N
             btnClose.addActionListener(new java.awt.event.ActionListener() {
-                public void actionPerformed(java.awt.event.ActionEvent evt) {
+                @Override
+				public void actionPerformed(java.awt.event.ActionEvent evt) {
                     btnCloseActionPerformed(evt);
                 }
             });
@@ -393,7 +404,8 @@ public class UnitSelectorDialog extends JDialog {
 
             btnAddGM = new JButton("Add");
             btnAddGM.addActionListener(new java.awt.event.ActionListener() {
-                public void actionPerformed(java.awt.event.ActionEvent evt) {
+                @Override
+				public void actionPerformed(java.awt.event.ActionEvent evt) {
                     //the actual work will be done by whatever called this
                     setVisible(false);
                 }
@@ -402,7 +414,8 @@ public class UnitSelectorDialog extends JDialog {
 
             btnClose.setText("Cancel"); // NOI18N
             btnClose.addActionListener(new java.awt.event.ActionListener() {
-                public void actionPerformed(java.awt.event.ActionEvent evt) {
+                @Override
+				public void actionPerformed(java.awt.event.ActionEvent evt) {
                     selectedUnit = null;
                     setVisible(false);
                 }
@@ -466,7 +479,7 @@ public class UnitSelectorDialog extends JDialog {
         RowFilter<MechTableModel, Integer> unitTypeFilter = null;
         final int nClass = comboWeight.getSelectedIndex();
         final int nUnit = comboUnitType.getSelectedIndex();
-        final int year = campaign.getCalendar().get(GregorianCalendar.YEAR);
+        final int year = campaign.getCalendar().get(Calendar.YEAR);
         //If current expression doesn't parse, don't update.
         try {
             unitTypeFilter = new RowFilter<MechTableModel,Integer>() {
@@ -535,7 +548,7 @@ public class UnitSelectorDialog extends JDialog {
             MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
                     "Unable to load mech: " + ms.getSourceFile() + ": " //$NON-NLS-1$
                     + ms.getEntryName() + ": " + ex.getMessage()); //$NON-NLS-1$
-            MekHQ.getLogger().log(getClass(), METHOD_NAME, ex);
+            MekHQ.getLogger().error(getClass(), METHOD_NAME, ex);
             refreshUnitView();
             return;
         }
@@ -571,7 +584,7 @@ public class UnitSelectorDialog extends JDialog {
             try {
                 mt.loadFromFile("mechset.txt");
             } catch (IOException ex) {
-                MekHQ.getLogger().log(getClass(), METHOD_NAME, ex);
+                MekHQ.getLogger().error(getClass(), METHOD_NAME, ex);
                 //TODO: do something here
                 return;
             }
@@ -588,7 +601,7 @@ public class UnitSelectorDialog extends JDialog {
     }
      */
     public void setMechs (MechSummary [] m) {
-        this.mechs = m;
+        mechs = m;
 
         // break out if there are no units to filter
         if (mechs == null) {
@@ -608,7 +621,8 @@ public class UnitSelectorDialog extends JDialog {
         btnBuy.setText(resourceMap.getString("btnBuy.textSelect")); // NOI18N
 
         btnBuy.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnBuySelectActionPerformed(evt);
             }
         });
@@ -643,11 +657,13 @@ public class UnitSelectorDialog extends JDialog {
             //this.data = new MechSummary[0];
         }
 
-        public int getRowCount() {
+        @Override
+		public int getRowCount() {
             return data.length;
         }
 
-        public int getColumnCount() {
+        @Override
+		public int getColumnCount() {
             return N_COL;
         }
 
@@ -701,7 +717,8 @@ public class UnitSelectorDialog extends JDialog {
             fireTableDataChanged();
         }
 
-        public Object getValueAt(int row, int col) {
+        @Override
+		public Object getValueAt(int row, int col) {
             MechSummary ms = data[row];
             if(col == COL_MODEL) {
                 return ms.getModel();
@@ -744,7 +761,8 @@ public class UnitSelectorDialog extends JDialog {
 
             private static final long serialVersionUID = 9054581142945717303L;
 
-            public Component getTableCellRendererComponent(JTable table,
+            @Override
+			public Component getTableCellRendererComponent(JTable table,
                     Object value, boolean isSelected, boolean hasFocus,
                     int row, int column) {
                 super.getTableCellRendererComponent(table, value, isSelected,

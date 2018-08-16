@@ -75,7 +75,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
         super(frame, "Data Loading"); //$NON-NLS-1$
         this.frame = frame;
         this.app = app;
-        this.fileCampaign = f;
+        fileCampaign = f;
         
         resourceMap = ResourceBundle.getBundle("mekhq.resources.DataLoadingDialog", new EncodeControl()); //$NON-NLS-1$
 
@@ -107,7 +107,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
         getContentPane().add(progressBar, BorderLayout.PAGE_END);
 
         setSize(imgSplash.getWidth(null), imgSplash.getHeight(null));
-        this.setLocationRelativeTo(frame);
+        setLocationRelativeTo(frame);
 
         task = new Task();
         task.addPropertyChangeListener(this);

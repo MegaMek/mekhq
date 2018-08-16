@@ -35,7 +35,7 @@ public class CustomOption {
     private Object defaultVal;
     
     private CustomOption(String key) {
-        this.name = key;
+        name = key;
         group = PilotOptions.LVL3_ADVANTAGES;
         type = IOption.BOOLEAN;
         defaultVal = Boolean.FALSE;
@@ -72,7 +72,7 @@ public class CustomOption {
             // Parse using builder to get DOM representation of the XML file
             xmlDoc = db.parse(fis);
         } catch (Exception ex) {
-            MekHQ.getLogger().log(CustomOption.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(CustomOption.class, METHOD_NAME, ex);
         }
 
         Element spaEle = xmlDoc.getDocumentElement();

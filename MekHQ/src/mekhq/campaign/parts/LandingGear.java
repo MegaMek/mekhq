@@ -29,7 +29,7 @@ import megamek.common.Aero;
 import megamek.common.Compute;
 import megamek.common.CriticalSlot;
 import megamek.common.Entity;
-import megamek.common.EquipmentType;
+import megamek.common.ITechnology;
 import megamek.common.LandAirMech;
 import megamek.common.TechAdvancement;
 import mekhq.campaign.Campaign;
@@ -52,10 +52,11 @@ public class LandingGear extends Part {
     
     public LandingGear(int tonnage, Campaign c) {
         super(tonnage, c);
-        this.name = "Landing Gear";
+        name = "Landing Gear";
     }
         
-    public LandingGear clone() {
+    @Override
+	public LandingGear clone() {
     	LandingGear clone = new LandingGear(0, campaign);
         clone.copyBaseData(this);
     	return clone;
@@ -190,7 +191,7 @@ public class LandingGear extends Part {
 	@Override
 	public int getTechRating() {
 		//go with conventional fighter avionics
-		return EquipmentType.RATING_B;
+		return ITechnology.RATING_B;
 	}
 
 	@Override

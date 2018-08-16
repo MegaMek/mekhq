@@ -52,7 +52,7 @@ public class MissingDropshipDockingCollar extends MissingPart {
     public MissingDropshipDockingCollar(int tonnage, Campaign c, int collarType) {
         super(tonnage, c);
         this.collarType = collarType;
-        this.name = "Dropship Docking Collar";
+        name = "Dropship Docking Collar";
         if (collarType == Dropship.COLLAR_NO_BOOM) {
             name += " (No Boom)";
         } else if (collarType == Dropship.COLLAR_PROTOTYPE) {

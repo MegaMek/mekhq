@@ -3,7 +3,7 @@ package mekhq.gui.model;
 import java.awt.Color;
 import java.awt.Component;
 import java.text.DateFormat;
-import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 
 import javax.swing.JTable;
@@ -35,11 +35,13 @@ public class LoanTableModel extends DataTableModel {
         data = new ArrayList<Loan>();
     }
     
-    public int getRowCount() {
+    @Override
+	public int getRowCount() {
         return data.size();
     }
 
-    public int getColumnCount() {
+    @Override
+	public int getColumnCount() {
         return N_COL;
     }
 
@@ -69,22 +71,23 @@ public class LoanTableModel extends DataTableModel {
         }
     }
 
-    public Object getValueAt(int row, int col) {
+    @Override
+	public Object getValueAt(int row, int col) {
         Loan loan = getLoan(row);           
         if(col == COL_DESC) {
             return loan.getDescription();
         }
         if(col == COL_COLLATERAL) {
-            return DecimalFormat.getInstance().format(loan.getCollateralAmount());
+            return NumberFormat.getInstance().format(loan.getCollateralAmount());
         }
         if(col == COL_VALUE) {
-            return DecimalFormat.getInstance().format(loan.getRemainingValue());
+            return NumberFormat.getInstance().format(loan.getRemainingValue());
         }
         if(col == COL_PAYMENT) {
-            return DecimalFormat.getInstance().format(loan.getPaymentAmount());
+            return NumberFormat.getInstance().format(loan.getPaymentAmount());
         }
         if(col == COL_PRINCIPAL) {
-            return DecimalFormat.getInstance().format(loan.getPrincipal());
+            return NumberFormat.getInstance().format(loan.getPrincipal());
         }
         if(col == COL_SCHEDULE) {
             return Finances.getScheduleName(loan.getPaymentSchedule());
@@ -147,7 +150,8 @@ public class LoanTableModel extends DataTableModel {
 
         private static final long serialVersionUID = 9054581142945717303L;
 
-        public Component getTableCellRendererComponent(JTable table,
+        @Override
+		public Component getTableCellRendererComponent(JTable table,
                 Object value, boolean isSelected, boolean hasFocus,
                 int row, int column) {
             super.getTableCellRendererComponent(table, value, isSelected,

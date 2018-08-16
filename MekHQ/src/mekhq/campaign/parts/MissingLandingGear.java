@@ -24,7 +24,7 @@ package mekhq.campaign.parts;
 import megamek.common.Aero;
 import megamek.common.CriticalSlot;
 import megamek.common.Entity;
-import megamek.common.EquipmentType;
+import megamek.common.ITechnology;
 import megamek.common.LandAirMech;
 import megamek.common.TechAdvancement;
 import mekhq.campaign.Campaign;
@@ -48,7 +48,7 @@ public class MissingLandingGear extends MissingPart {
     
     public MissingLandingGear(int tonnage, Campaign c) {
     	super(0, c);
-    	this.name = "Landing Gear";
+    	name = "Landing Gear";
     }
     
     @Override 
@@ -95,7 +95,7 @@ public class MissingLandingGear extends MissingPart {
 	@Override
 	public int getTechRating() {
 		//go with conventional fighter avionics
-		return EquipmentType.RATING_B;
+		return ITechnology.RATING_B;
 	}
 
 	@Override

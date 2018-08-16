@@ -95,7 +95,7 @@ public class AceDuelBuiltInScenario extends AtBScenario {
 				en.getCrew().setPiloting(en.getCrew().getPiloting() - 1);
 			}
 			
-			enemyEntities = new ArrayList<Entity>();
+			enemyEntities = new ArrayList<>();
 			enemyEntities.add(en);
 			getSpecMissionEnemies().add(enemyEntities);
 		}

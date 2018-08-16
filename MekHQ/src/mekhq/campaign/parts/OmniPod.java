@@ -27,6 +27,7 @@ import org.w3c.dom.NodeList;
 import megamek.common.Aero;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
+import megamek.common.ITechnology;
 import megamek.common.MiscType;
 import megamek.common.TechAdvancement;
 import megamek.common.TechConstants;
@@ -131,7 +132,7 @@ public class OmniPod extends Part {
     //Using tech rating for Omni construction option from IOps.
     @Override
     public int getTechRating() {
-        return EquipmentType.RATING_E;
+        return ITechnology.RATING_E;
     }
     
     @Override

@@ -1,8 +1,8 @@
 package mekhq.gui.adapter;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
+import java.util.ResourceBundle;
+import java.util.function.BiConsumer;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -10,6 +10,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.event.MouseInputAdapter;
 
+import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.event.TransactionChangedEvent;
 import mekhq.campaign.event.TransactionVoidedEvent;
@@ -18,80 +19,79 @@ import mekhq.gui.CampaignGUI;
 import mekhq.gui.dialog.EditTransactionDialog;
 import mekhq.gui.model.FinanceTableModel;
 
-public class FinanceTableMouseAdapter extends MouseInputAdapter implements
-        ActionListener {
-    private CampaignGUI gui;
-    private JTable financeTable;
-    private FinanceTableModel financeModel;
+public class FinanceTableMouseAdapter extends MouseInputAdapter {
 
-    public FinanceTableMouseAdapter(CampaignGUI gui,
-            JTable financeTable,
-            FinanceTableModel financeModel) {
-        super();
-        this.gui = gui;
-        this.financeTable = financeTable;
-        this.financeModel = financeModel;
-    }
+	private static final ResourceBundle I18N = ResourceBundle.getBundle("mekhq.resources.FinanceTableMouseAdapter", new EncodeControl()); //$NON-NLS-1$
 
-    public void actionPerformed(ActionEvent action) {
-        String command = action.getActionCommand();
-        Transaction transaction = financeModel.getTransaction(financeTable
-                .getSelectedRow());
-        int row = financeTable.getSelectedRow();
-        if (null == transaction) {
-            return;
-        }
-        if (command.equalsIgnoreCase("DELETE")) {
-            gui.getCampaign().addReport(transaction.voidTransaction());
-            financeModel.deleteTransaction(row);
-            MekHQ.triggerEvent(new TransactionVoidedEvent(transaction));
-        } else if (command.contains("EDIT")) {
-            EditTransactionDialog dialog = new EditTransactionDialog(
-                    transaction, gui.getFrame(), true);
-            dialog.setVisible(true);
-            if (!transaction.equals(dialog.getOldTransaction())) {
-	            financeModel.setTransaction(row, transaction);
-	            MekHQ.triggerEvent(new TransactionChangedEvent(dialog.getOldTransaction(), transaction));
-	            gui.getCampaign().addReport(
-	                    transaction.updateTransaction(dialog
-	                            .getOldTransaction()));
-            }
-        }
-    }
+	public FinanceTableMouseAdapter(CampaignGUI gui, JTable financeTable, FinanceTableModel financeModel) {
+		this.gui = gui;
+		this.financeTable = financeTable;
+		this.financeModel = financeModel;
+	}
 
-    @Override
-    public void mousePressed(MouseEvent e) {
-        maybeShowPopup(e);
-    }
+	private final CampaignGUI gui;
+	private final JTable financeTable;
+	private final FinanceTableModel financeModel;
 
-    @Override
-    public void mouseReleased(MouseEvent e) {
-        maybeShowPopup(e);
-    }
+	@Override
+	public void mousePressed(MouseEvent evt) {
+		showPopup(evt);
+	}
 
-    private void maybeShowPopup(MouseEvent e) {
-        JPopupMenu popup = new JPopupMenu();
-        if (e.isPopupTrigger()) {
-            int row = financeTable.getSelectedRow();
-            if (row < 0) {
-                return;
-            }
-            JMenu menu = new JMenu("GM Mode");
-            popup.add(menu);
+	@Override
+	public void mouseReleased(MouseEvent evt) {
+		showPopup(evt);
+	}
 
-            JMenuItem deleteItem = new JMenuItem("Delete Transaction");
-            deleteItem.setActionCommand("DELETE");
-            deleteItem.addActionListener(this);
-            deleteItem.setEnabled(gui.getCampaign().isGM());
-            menu.add(deleteItem);
+	private void showPopup(MouseEvent me) {
+		if (!me.isPopupTrigger()) {
+			return;
+		}
 
-            JMenuItem editItem = new JMenuItem("Edit Transaction");
-            editItem.setActionCommand("EDIT");
-            editItem.addActionListener(this);
-            editItem.setEnabled(gui.getCampaign().isGM());
-            menu.add(editItem);
+		int row = financeTable.getSelectedRow();
+		if (row < 0) {
+			return;
+		}
 
-            popup.show(e.getComponent(), e.getX(), e.getY());
-        }
-    }
+		JPopupMenu popup = new JPopupMenu();
+		JMenu menu = new JMenu(I18N.getString("menu.gmMode")); //$NON-NLS-1$
+		popup.add(menu);
+
+		menu.add(makeGMOnlyItem("DELETE", I18N.getString("menu.gmMode.action.delete"), (idx, tx) -> { //$NON-NLS-1$ //$NON-NLS-2$
+
+			gui.getCampaign().addReport(tx.voidTransaction());
+			financeModel.deleteTransaction(idx);
+			MekHQ.triggerEvent(new TransactionVoidedEvent(tx));
+
+		}));
+
+		menu.add(makeGMOnlyItem("EDIT", I18N.getString("menu.gmMode.action.edit"), (idx, tx) -> { //$NON-NLS-1$ //$NON-NLS-2$
+
+			EditTransactionDialog dialog = new EditTransactionDialog(tx, gui.getFrame(), true);
+			dialog.setVisible(true);
+			if (!tx.equals(dialog.getOldTransaction())) {
+				financeModel.setTransaction(idx, tx);
+				MekHQ.triggerEvent(new TransactionChangedEvent(dialog.getOldTransaction(), tx));
+				gui.getCampaign().addReport(tx.updateTransaction(dialog.getOldTransaction()));
+			}
+
+		}));
+
+		popup.show(me.getComponent(), me.getX(), me.getY());
+	}
+
+	private JMenuItem makeGMOnlyItem(String command, String label, BiConsumer<Integer, Transaction> listener) {
+		JMenuItem deleteItem = new JMenuItem(label);
+		deleteItem.setActionCommand(command);
+		deleteItem.addActionListener(ae -> {
+			int idx = financeTable.getSelectedRow();
+			if (idx < 0) {
+				return;
+			}
+			listener.accept(idx, financeModel.getTransaction(idx));
+		});
+		deleteItem.setEnabled(gui.getCampaign().isGM());
+		return deleteItem;
+	}
+
 }

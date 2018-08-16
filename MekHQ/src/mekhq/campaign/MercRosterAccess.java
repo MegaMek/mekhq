@@ -51,9 +51,9 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
       this.port = port;
       passwd = p;
       campaign = c;
-      skillHash = new HashMap<String, Integer>();
-      personHash = new HashMap<UUID, Integer>();
-      forceHash = new HashMap<UUID, Integer>();
+      skillHash = new HashMap<>();
+      personHash = new HashMap<>();
+      forceHash = new HashMap<>();
       progressNote = "";
       progressTicker = 0;
     }
@@ -79,7 +79,7 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
             statement = connect.createStatement();
         } catch (SQLException e2) {
             e2.printStackTrace();
-        };
+        }
         
         writeBasicData();
         writeForceData();

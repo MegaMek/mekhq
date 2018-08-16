@@ -237,7 +237,7 @@ public class Campaign implements Serializable, ITechManager {
     // we will use the same basic system (borrowed from MegaMek) for tracking
     // all three
     // OK now we have more, parts, personnel, forces, missions, and scenarios.
-    private Map<UUID, Unit> units = new LinkedHashMap<UUID, Unit>();
+    private Map<UUID, Unit> units = new LinkedHashMap<>();
     private Map<UUID, Person> personnel = new LinkedHashMap<>();
     private Map<UUID, Ancestors> ancestors = new LinkedHashMap<>();
     private Map<Integer, Part> parts = new LinkedHashMap<>();
@@ -246,7 +246,7 @@ public class Campaign implements Serializable, ITechManager {
     private Map<Integer, Scenario> scenarios = new LinkedHashMap<>();
     private List<Kill> kills = new ArrayList<>();
 
-    private Map<String, Integer> duplicateNameHash = new HashMap<String, Integer>();
+    private Map<String, Integer> duplicateNameHash = new HashMap<>();
 
     private int astechPool;
     private int astechPoolMinutes;
@@ -291,7 +291,7 @@ public class Campaign implements Serializable, ITechManager {
 
     //this is updated and used per gaming session, it is enabled/disabled via the Campaign options
     //we're re-using the LogEntry class that is used to store Personnel entries
-    public LinkedList<LogEntry> inMemoryLogHistory = new LinkedList<LogEntry>();
+    public LinkedList<LogEntry> inMemoryLogHistory = new LinkedList<>();
 
     private boolean overtime;
     private boolean gmMode;
@@ -336,9 +336,9 @@ public class Campaign implements Serializable, ITechManager {
         game = new Game();
         player = new Player(0, "self");
         game.addPlayer(0, player);
-        currentReport = new ArrayList<String>();
+        currentReport = new ArrayList<>();
         currentReportHTML = "";
-        newReports = new ArrayList<String>();
+        newReports = new ArrayList<>();
         calendar = new GregorianCalendar(3067, Calendar.JANUARY, 1);
         dateFormat = new SimpleDateFormat("EEEE, MMMM d yyyy");
         shortDateFormat = new SimpleDateFormat("yyyyMMdd");
@@ -355,7 +355,7 @@ public class Campaign implements Serializable, ITechManager {
         forces = new Force(name);
         forceIds.put(Integer.valueOf(lastForceId), forces);
         lastForceId++;
-        lances = new Hashtable<Integer, Lance>();
+        lances = new Hashtable<>();
         finances = new Finances();
         location = new CurrentLocation(Planets.getInstance().getPlanets()
                 .get("Outreach"), 0);
@@ -369,7 +369,7 @@ public class Campaign implements Serializable, ITechManager {
         gameOptions.initialize();
         gameOptions.getOption("year").setValue(getGameYear());
         game.setOptions(gameOptions);
-        customs = new ArrayList<String>();
+        customs = new ArrayList<>();
         shoppingList = new ShoppingList();
         news = new News(getGameYear(), id.getLeastSignificantBits());
         personnelMarket = new PersonnelMarket();
@@ -425,7 +425,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public void setName(String s) {
-        this.name = s;
+        name = s;
     }
 
     public String getEraName() {
@@ -450,7 +450,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public void setRNG(RandomNameGenerator g) {
-        this.rng = g;
+        rng = g;
     }
 
     public String getCurrentPlanetName() {
@@ -474,7 +474,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public ArrayList<Lance> getLanceList() {
-        ArrayList<Lance> retVal = new ArrayList<Lance>();
+        ArrayList<Lance> retVal = new ArrayList<>();
         for (Lance l : lances.values()) {
             if (forceIds.containsKey(l.getForceId())) {
                 retVal.add(l);
@@ -663,7 +663,7 @@ public class Campaign implements Serializable, ITechManager {
         } catch (Exception ex) {
             MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
                     "Unable to load unit: " + ms.getEntryName()); //$NON-NLS-1$
-            MekHQ.getLogger().log(getClass(), METHOD_NAME, ex);
+            MekHQ.getLogger().error(getClass(), METHOD_NAME, ex);
         }
         Entity en = mechFileParser.getEntity();
 
@@ -1078,7 +1078,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public ArrayList<Entity> getEntities() {
-        ArrayList<Entity> entities = new ArrayList<Entity>();
+        ArrayList<Entity> entities = new ArrayList<>();
         for (Unit unit : getUnits()) {
             entities.add(unit.getEntity());
         }
@@ -1205,7 +1205,7 @@ public class Campaign implements Serializable, ITechManager {
      * @return ArrayList<Person>
      */
     public ArrayList<Person> getActivePersonnel() {
-        ArrayList<Person> activePersonnel = new ArrayList<Person>();
+        ArrayList<Person> activePersonnel = new ArrayList<>();
         for (Person p : getPersonnel()) {
             if (p.isActive()) {activePersonnel.add(p);}
         }
@@ -1228,7 +1228,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public ArrayList<Person> getPatients() {
-        ArrayList<Person> patients = new ArrayList<Person>();
+        ArrayList<Person> patients = new ArrayList<>();
         for (Person p : getPersonnel()) {
             if (p.needsFixing()
                     || (getCampaignOptions().useAdvancedMedical() && p.hasInjuries(true) && p.isActive())) {
@@ -1239,7 +1239,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public ArrayList<Unit> getServiceableUnits() {
-        ArrayList<Unit> service = new ArrayList<Unit>();
+        ArrayList<Unit> service = new ArrayList<>();
         for (Unit u : getUnits()) {
             if (!u.isAvailable()) {
                 continue;
@@ -1476,7 +1476,7 @@ public class Campaign implements Serializable, ITechManager {
 
     public Set<PartInUse> getPartsInUse() {
         // java.util.Set doesn't supply a get(Object) method, so we have to use a java.util.Map
-        Map<PartInUse, PartInUse> inUse = new HashMap<PartInUse, PartInUse>();
+        Map<PartInUse, PartInUse> inUse = new HashMap<>();
         for(Part p : getParts()) {
             PartInUse piu = getPartInUse(p);
             if(null == piu) {
@@ -1528,7 +1528,7 @@ public class Campaign implements Serializable, ITechManager {
 
     public List<String> fetchAndClearNewReports() {
         List<String> oldReports = newReports;
-        newReports = new ArrayList<String>();
+        newReports = new ArrayList<>();
         return oldReports;
     }
 
@@ -1681,7 +1681,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public List<Person> getAdmins() {
-        List<Person> admins = new ArrayList<Person>();
+        List<Person> admins = new ArrayList<>();
         for (Person p : getPersonnel()) {
             if (p.isAdmin() && p.isActive()) {
                 admins.add(p);
@@ -1704,7 +1704,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public ArrayList<Person> getDoctors() {
-        ArrayList<Person> docs = new ArrayList<Person>();
+        ArrayList<Person> docs = new ArrayList<>();
         for (Person p : getPersonnel()) {
             if (p.isDoctor() && p.isActive()) {
                 docs.add(p);
@@ -2447,7 +2447,7 @@ public class Campaign implements Serializable, ITechManager {
         // Add or remove dependents
         if (calendar.get(Calendar.DAY_OF_YEAR) == 1) {
             int numPersonnel = 0;
-            ArrayList<Person> dependents = new ArrayList<Person>();
+            ArrayList<Person> dependents = new ArrayList<>();
             for (Person p : getPersonnel()) {
                 if (p.isActive()) {
                     numPersonnel++;
@@ -2503,7 +2503,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public void processNewDayPersonnel() {
-        ArrayList<Person> babies = new ArrayList<Person>();
+        ArrayList<Person> babies = new ArrayList<>();
         for (Person p : getPersonnel()) {
             if (!p.isActive()) {
                 continue;
@@ -2592,8 +2592,8 @@ public class Campaign implements Serializable, ITechManager {
 
         // need to check for assigned tasks in two steps to avoid
         // concurrent mod problems
-        ArrayList<Integer> assignedPartIds = new ArrayList<Integer>();
-        ArrayList<Integer> arrivedPartIds = new ArrayList<Integer>();
+        ArrayList<Integer> assignedPartIds = new ArrayList<>();
+        ArrayList<Integer> arrivedPartIds = new ArrayList<>();
         for (Part part : getParts()) {
             if (part instanceof Refit) {
                 continue;
@@ -2713,7 +2713,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public ArrayList<Contract> getActiveContracts() {
-        ArrayList<Contract> active = new ArrayList<Contract>();
+        ArrayList<Contract> active = new ArrayList<>();
         for (Mission m : getMissions()) {
             if (!(m instanceof Contract)) {
                 continue;
@@ -2976,7 +2976,7 @@ public class Campaign implements Serializable, ITechManager {
         if (null != force.getParentForce()) {
             force.getParentForce().removeSubForce(fid);
         }
-        ArrayList<Force> subs = new ArrayList<Force>();
+        ArrayList<Force> subs = new ArrayList<>();
         for (Force sub : force.getSubForces()) {
             subs.add(sub);
         }
@@ -2994,7 +2994,7 @@ public class Campaign implements Serializable, ITechManager {
             u.setScenarioId(-1);
             if (u.getEntity().hasC3i()
                     && u.getEntity().calculateFreeC3Nodes() < 5) {
-                Vector<Unit> removedUnits = new Vector<Unit>();
+                Vector<Unit> removedUnits = new Vector<>();
                 removedUnits.add(u);
                 removeUnitsFromNetwork(removedUnits);
                 u.getEntity().setC3MasterIsUUIDAsString(null);
@@ -3038,8 +3038,8 @@ public class Campaign implements Serializable, ITechManager {
     public void restore() {
         // if we fail to restore equipment parts then remove them
         // and possibly re-initialize and diagnose unit
-        ArrayList<Part> partsToRemove = new ArrayList<Part>();
-        ArrayList<UUID> unitsToCheck = new ArrayList<UUID>();
+        ArrayList<Part> partsToRemove = new ArrayList<>();
+        ArrayList<UUID> unitsToCheck = new ArrayList<>();
 
         for (Part part : getParts()) {
             if (part instanceof EquipmentPart) {
@@ -3109,7 +3109,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public void setOvertime(boolean b) {
-        this.overtime = b;
+        overtime = b;
         MekHQ.triggerEvent(new OvertimeModeEvent(b));
     }
 
@@ -3118,7 +3118,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public void setGMMode(boolean b) {
-        this.gmMode = b;
+        gmMode = b;
         MekHQ.triggerEvent(new GMModeEvent(b));
     }
 
@@ -3131,7 +3131,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public void setFactionCode(String i) {
-        this.factionCode = i;
+        factionCode = i;
         updateTechFactionCode();
     }
 
@@ -3165,25 +3165,28 @@ public class Campaign implements Serializable, ITechManager {
      * @param r - the report String
      */
     public void beginReport(String r) {
-        if (this.getCampaignOptions().historicalDailyLog()) {
+        if (getCampaignOptions().historicalDailyLog()) {
             //add the new items to our in-memory cache
             addInMemoryLogHistory(new LogEntry(getDate(), ""));
         }
         addReportInternal(r);
     }
 
-    /**
-     * Adds a report to the daily log
-     * @param r - the report String
-     */
-    public void addReport(String r) {
-        if (this.getCampaignOptions().historicalDailyLog()) {
-            String htmlStripped = r.replaceAll("\\<[^>]*>",""); //remote HTML tags
-            //add the new items to our in-memory cache
-            addInMemoryLogHistory(new LogEntry(getDate(), htmlStripped));
-        }
-        addReportInternal(r);
-    }
+	/**
+	 * Adds a report to the daily log
+	 * 
+	 * @param r - the report String
+	 */
+	public void addReport(String r) {
+		if (getCampaignOptions().historicalDailyLog()) {
+			// #858: I'm not sure what the comment about the cache actually mean (it makes no sense to me),
+			//       but LogEntry now handles XML properly so I guess there's no need for this workaround anymore
+			// String htmlStripped = r.replaceAll("\\<[^>]*>",""); //remote HTML tags add the new items to our in-memory cache
+			// addInMemoryLogHistory(new LogEntry(getDate(), htmlStripped));
+			addInMemoryLogHistory(new LogEntry(getDate(), r));
+		}
+		addReportInternal(r);
+	}
 
     private void addReportInternal(String r) {
         currentReport.add(r);
@@ -3229,7 +3232,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public ArrayList<Part> getSpareParts() {
-        ArrayList<Part> spares = new ArrayList<Part>();
+        ArrayList<Part> spares = new ArrayList<>();
         for (Part part : getParts()) {
             if (part.isSpare()) {
                 spares.add(part);
@@ -3250,7 +3253,7 @@ public class Campaign implements Serializable, ITechManager {
             category = Transaction.C_MISC;
         }
         finances.credit(quantity, category, description, calendar.getTime());
-        NumberFormat numberFormat = DecimalFormat.getIntegerInstance();
+        NumberFormat numberFormat = NumberFormat.getIntegerInstance();
         String quantityString = numberFormat.format(quantity);
         addReport("Funds added : " + quantityString + " (" + description + ")");
     }
@@ -3407,7 +3410,7 @@ public class Campaign implements Serializable, ITechManager {
         try {
             mechFileParser = new MechFileParser(mechSummary.getSourceFile());
         } catch (EntityLoadingException ex) {
-            MekHQ.getLogger().log(Campaign.class, "getBrandNewUndamagedEntity(String)", ex);
+            MekHQ.getLogger().error(Campaign.class, "getBrandNewUndamagedEntity(String)", ex);
         }
         if (mechFileParser == null) {
             return null;
@@ -3610,7 +3613,7 @@ public class Campaign implements Serializable, ITechManager {
         pw1.println("\t</gameOptions>");
     }
 
-    /**
+    /* Commenting unused method * LATER remove this
      * A helper function to encapsulate writing the array/hash pairs out to XML. Each of the types requires a different XML
      * structure, but is in an identical holding structure. Thus, genericized function and interface to cleanly wrap it up.
      * God, I love 3rd-generation programming languages.
@@ -3621,7 +3624,6 @@ public class Campaign implements Serializable, ITechManager {
      * @param tag       The name of the tag to use to encapsulate it.
      * @param array     The list of objects to write out.
      * @param hashtab   The lookup hashtable for the associated array.
-     */
     private <arrType> void writeArrayAndHashToXml(PrintWriter pw1, int indent,
             String tag, ArrayList<arrType> array, Hashtable<Integer, arrType> hashtab) {
         // Hooray for implicitly-type-detected genericized functions!
@@ -3636,9 +3638,9 @@ public class Campaign implements Serializable, ITechManager {
         }
 
         pw1.println(MekHqXmlUtil.indentStr(indent) + "</" + tag + ">");
-    }
+    }*/
 
-    /**
+    /* Commenting unused method * LATER remove this
      * A helper function to encapsulate writing the array/hash pairs out to XML. Each of the types requires a different XML
      * structure, but is in an identical holding structure. Thus, genericized function and interface to cleanly wrap it up.
      * God, I love 3rd-generation programming languages.
@@ -3649,7 +3651,6 @@ public class Campaign implements Serializable, ITechManager {
      * @param tag       The name of the tag to use to encapsulate it.
      * @param array     The list of objects to write out.
      * @param hashtab   The lookup hashtable for the associated array.
-     */
     private <arrType> void writeArrayAndHashToXmlforUUID(PrintWriter pw1,
             int indent, String tag, ArrayList<arrType> array, Hashtable<UUID, arrType> hashtab) {
         // Hooray for implicitly-type-detected genericized functions!
@@ -3665,6 +3666,7 @@ public class Campaign implements Serializable, ITechManager {
 
         pw1.println(MekHqXmlUtil.indentStr(indent) + "</" + tag + ">");
     }
+     */
     
     /**
      * A helper function to encapsulate writing the map entries out to XML.
@@ -3698,7 +3700,7 @@ public class Campaign implements Serializable, ITechManager {
             try {
                 mechFileParser = new MechFileParser(ms.getSourceFile());
             } catch (EntityLoadingException ex) {
-                MekHQ.getLogger().log(Campaign.class, "writeCustoms(PrintWriter)", ex);
+                MekHQ.getLogger().error(Campaign.class, "writeCustoms(PrintWriter)", ex);
             }
             if (mechFileParser == null) {
                 continue;
@@ -3755,7 +3757,7 @@ public class Campaign implements Serializable, ITechManager {
             // Parse using builder to get DOM representation of the XML file
             xmlDoc = db.parse(fis);
         } catch (Exception ex) {
-            MekHQ.getLogger().log(Campaign.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(Campaign.class, METHOD_NAME, ex);
         }
 
         Element campaignEle = xmlDoc.getDocumentElement();
@@ -3994,8 +3996,8 @@ public class Campaign implements Serializable, ITechManager {
         timestamp = System.currentTimeMillis();
 
         // Process parts...
-        ArrayList<Part> spareParts = new ArrayList<Part>();
-        ArrayList<Part> removeParts = new ArrayList<Part>();
+        ArrayList<Part> spareParts = new ArrayList<>();
+        ArrayList<Part> removeParts = new ArrayList<>();
         for (Part prt : retVal.getParts()) {
             Unit u = retVal.getUnit(prt.getUnitId());
             prt.setUnit(u);
@@ -4316,7 +4318,7 @@ public class Campaign implements Serializable, ITechManager {
         //**EVERYTHING HAS BEEN LOADED. NOW FOR SANITY CHECKS**//
 
         //unload any ammo bins in the warehouse
-        ArrayList<AmmoBin> binsToUnload = new ArrayList<AmmoBin>();
+        ArrayList<AmmoBin> binsToUnload = new ArrayList<>();
         for(Part prt : retVal.getSpareParts()) {
             if (prt instanceof AmmoBin && !prt.isReservedForRefit() && ((AmmoBin) prt).getShotsNeeded() == 0) {
                 binsToUnload.add((AmmoBin) prt);
@@ -4350,8 +4352,8 @@ public class Campaign implements Serializable, ITechManager {
 
         //try to stack as much as possible the parts in the warehouse that may be unstacked
         //for a variety of reasons
-        ArrayList<Part> partsToRemove = new ArrayList<Part>();
-        ArrayList<Part> partsToKeep = new ArrayList<Part>();
+        ArrayList<Part> partsToRemove = new ArrayList<>();
+        ArrayList<Part> partsToKeep = new ArrayList<>();
         for(Part part : retVal.getParts()) {
             if (part.isSpare() && part.isPresent()) {
                 for (Part oPart : partsToKeep) {
@@ -4457,7 +4459,7 @@ public class Campaign implements Serializable, ITechManager {
         for (Part p : retVal.getParts()) {
             p.fixIdReferences(uHash, pHash);
         }
-        ArrayList<Kill> ghostKills = new ArrayList<Kill>();
+        ArrayList<Kill> ghostKills = new ArrayList<>();
         for (Kill k : retVal.kills) {
             k.fixIdReferences(pHash);
             if (null == k.getPilotId()) {
@@ -4934,7 +4936,7 @@ public class Campaign implements Serializable, ITechManager {
         MekHQ.getLogger().log(Campaign.class, METHOD_NAME, LogLevel.INFO, //$NON-NLS-1$
                 "Checking for missing entities..."); //$NON-NLS-1$
 
-        ArrayList<String> unitList = new ArrayList<String>();
+        ArrayList<String> unitList = new ArrayList<>();
         NodeList wList = wn.getChildNodes();
 
         // Okay, lets iterate through the children, eh?
@@ -5173,7 +5175,7 @@ public class Campaign implements Serializable, ITechManager {
                 if (xn.equalsIgnoreCase("calendar")) {
                     SimpleDateFormat df = new SimpleDateFormat(
                             "yyyy-MM-dd hh:mm:ss");
-                    retVal.calendar = (GregorianCalendar) GregorianCalendar
+                    retVal.calendar = (GregorianCalendar) Calendar
                             .getInstance();
                     retVal.calendar.setTime(df
                             .parse(wn.getTextContent().trim()));
@@ -5306,7 +5308,7 @@ public class Campaign implements Serializable, ITechManager {
         }
         retVal.currentReportHTML = Utilities.combineString(retVal.currentReport, REPORT_LINEBREAK);
         // Everything's new
-        retVal.newReports = new ArrayList<String>(retVal.currentReport.size() * 2);
+        retVal.newReports = new ArrayList<>(retVal.currentReport.size() * 2);
         boolean firstReport = true;
         for(String report : retVal.currentReport) {
             if (firstReport) {
@@ -5349,7 +5351,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public ArrayList<Planet> getPlanets() {
-        ArrayList<Planet> plnts = new ArrayList<Planet>();
+        ArrayList<Planet> plnts = new ArrayList<>();
         for (String key : Planets.getInstance().getPlanets().keySet()) {
             plnts.add(Planets.getInstance().getPlanets().get(key));
         }
@@ -5357,7 +5359,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public Vector<String> getPlanetNames() {
-        Vector<String> plntNames = new Vector<String>();
+        Vector<String> plntNames = new Vector<>();
         for (Planet key : Planets.getInstance().getPlanets().values()) {
             plntNames.add(key.getPrintableName(Utilities.getDateTimeDay(calendar)));
         }
@@ -5507,7 +5509,7 @@ public class Campaign implements Serializable, ITechManager {
         }
         // roll random secondary skill
         if (Utilities.rollProbability(rskillPrefs.getSecondSkillProb())) {
-            ArrayList<String> possibleSkills = new ArrayList<String>();
+            ArrayList<String> possibleSkills = new ArrayList<>();
             for (String stype : SkillType.skillList) {
                 if (!person.hasSkill(stype)) {
                     possibleSkills.add(stype);
@@ -5653,7 +5655,7 @@ public class Campaign implements Serializable, ITechManager {
      * @param type         The phenotype index
      */
     public void checkBloodnameAdd(Person person, int type) {
-        checkBloodnameAdd(person, type, false, this.factionCode);
+        checkBloodnameAdd(person, type, false, factionCode);
     }
     
     /**
@@ -5681,7 +5683,7 @@ public class Campaign implements Serializable, ITechManager {
      * @param ignoreDice   If true, skips the random roll and assigns a Bloodname automatically
      */
     public void checkBloodnameAdd(Person person, int type, boolean ignoreDice) {
-        checkBloodnameAdd(person, type, ignoreDice, this.factionCode);
+        checkBloodnameAdd(person, type, ignoreDice, factionCode);
     }
 
     /**
@@ -5825,7 +5827,7 @@ public class Campaign implements Serializable, ITechManager {
         }
 
         // create a weighted list based on XP
-        ArrayList<String> weightedList = new ArrayList<String>();
+        ArrayList<String> weightedList = new ArrayList<>();
         for (SpecialAbility spa : abilityList) {
             int weight = spa.getWeight();
             while (weight > 0) {
@@ -5884,7 +5886,7 @@ public class Campaign implements Serializable, ITechManager {
         } else if (name.equals("weapon_specialist")) {
             person.acquireAbility(PilotOptions.LVL3_ADVANTAGES, name,
                     SpecialAbility.chooseWeaponSpecialization(type, getFaction().isClan(),
-                            getCampaignOptions().getTechLevel(), getCalendar().get(GregorianCalendar.YEAR)));
+                            getCampaignOptions().getTechLevel(), getCalendar().get(Calendar.YEAR)));
         } else {
             person.acquireAbility(PilotOptions.LVL3_ADVANTAGES, name, true);
         }
@@ -5901,7 +5903,7 @@ public class Campaign implements Serializable, ITechManager {
 
     public List<String> getAllRankNamesFor(int profession) {
 
-        List<String> retVal = new ArrayList<String>();
+        List<String> retVal = new ArrayList<>();
         for(Rank rank : getRanks().getAllRanks()) {
             int p = profession;
             // Grab rank from correct profession as needed
@@ -5922,7 +5924,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public ArrayList<Force> getAllForces() {
-        ArrayList<Force> allForces = new ArrayList<Force>(forceIds.values());
+        ArrayList<Force> allForces = new ArrayList<>(forceIds.values());
         return allForces;
     }
 
@@ -5936,7 +5938,7 @@ public class Campaign implements Serializable, ITechManager {
 
     public ArrayList<IPartWork> getPartsNeedingServiceFor(UUID uid, boolean onlyNotBeingWorkedOn) {
         if (null == uid) {
-            return new ArrayList<IPartWork>();
+            return new ArrayList<>();
         }
         Unit u = getUnit(uid);
         if (u != null) {
@@ -5946,18 +5948,18 @@ public class Campaign implements Serializable, ITechManager {
                 return u.getPartsNeedingFixing(onlyNotBeingWorkedOn);
             }
         }
-        return new ArrayList<IPartWork>();
+        return new ArrayList<>();
     }
 
     public ArrayList<IAcquisitionWork> getAcquisitionsForUnit(UUID uid) {
         if (null == uid) {
-            return new ArrayList<IAcquisitionWork>();
+            return new ArrayList<>();
         }
         Unit u = getUnit(uid);
         if (u != null) {
             return u.getPartsNeeded();
         }
-        return new ArrayList<IAcquisitionWork>();
+        return new ArrayList<>();
     }
 
     /**
@@ -5983,8 +5985,8 @@ public class Campaign implements Serializable, ITechManager {
 
         final DateTime now = Utilities.getDateTimeDay(calendar);
         String current = startKey;
-        ArrayList<String> closed = new ArrayList<String>();
-        ArrayList<String> open = new ArrayList<String>();
+        ArrayList<String> closed = new ArrayList<>();
+        ArrayList<String> open = new ArrayList<>();
         boolean found = false;
         int jumps = 0;
 
@@ -6051,7 +6053,7 @@ public class Campaign implements Serializable, ITechManager {
         }
         // now we just need to back up from the last current by parents until we
         // hit null
-        ArrayList<Planet> path = new ArrayList<Planet>();
+        ArrayList<Planet> path = new ArrayList<>();
         String nextKey = current;
         while (null != nextKey) {
             path.add(Planets.getInstance().getPlanets().get(nextKey));
@@ -6613,7 +6615,7 @@ public class Campaign implements Serializable, ITechManager {
         }
         if(getCampaignOptions().disallowExtinctStuff() &&
                 (acquisition.isExtinctIn(getGameYear(), useClanTechBase(), getTechFaction())
-                        || acquisition.getAvailability() == EquipmentType.RATING_X)) {
+                        || acquisition.getAvailability() == ITechnology.RATING_X)) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE,
                     "It is extinct!");
         }
@@ -6632,7 +6634,7 @@ public class Campaign implements Serializable, ITechManager {
              * non-Clan units
              */
             if (acquisition.getTechBase() == Part.T_CLAN && !getFaction().isClan()) {
-                partAvailability = Math.max(partAvailability, EquipmentType.RATING_F);
+                partAvailability = Math.max(partAvailability, ITechnology.RATING_F);
             } else if (et != null) {
                 /*
                  * AtB rules do not simply affect difficulty of obtaining parts, but whether
@@ -6644,8 +6646,8 @@ public class Campaign implements Serializable, ITechManager {
                  */
                 if (et instanceof megamek.common.weapons.lasers.EnergyWeapon
                         && !(et instanceof megamek.common.weapons.flamers.FlamerWeapon)
-                        && partAvailability < EquipmentType.RATING_C) {
-                    partAvailability = EquipmentType.RATING_C;
+                        && partAvailability < ITechnology.RATING_C) {
+                    partAvailability = ITechnology.RATING_C;
                 }
                 if (et instanceof megamek.common.weapons.autocannons.ACWeapon) {
                     partAvailability -= 2;
@@ -7021,7 +7023,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public Vector<IBasicOption> getGameOptionsVector() {
-        Vector<IBasicOption> options = new Vector<IBasicOption>();
+        Vector<IBasicOption> options = new Vector<>();
         for (Enumeration<IOptionGroup> i = gameOptions.getGroups(); i
                 .hasMoreElements(); ) {
             IOptionGroup group = i.nextElement();
@@ -7056,7 +7058,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public ArrayList<Kill> getKillsFor(UUID pid) {
-        ArrayList<Kill> personalKills = new ArrayList<Kill>();
+        ArrayList<Kill> personalKills = new ArrayList<>();
         for (Kill k : kills) {
             if (k.getPilotId().equals(pid)) {
                 personalKills.add(k);
@@ -7273,7 +7275,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     private ArrayList<String> getPossibleRandomPortraits (DirectoryItems portraits, ArrayList<String> existingPortraits, String subDir ) {
-        ArrayList<String> possiblePortraits = new ArrayList<String>();
+        ArrayList<String> possiblePortraits = new ArrayList<>();
         Iterator<String> categories = portraits.getCategoryNames();
         while (categories.hasNext()) {
             String category = categories.next();
@@ -7295,8 +7297,8 @@ public class Campaign implements Serializable, ITechManager {
     public void assignRandomPortraitFor(Person p) {
         // first create a list of existing portait strings, so we can check for
         // duplicates
-        ArrayList<String> existingPortraits = new ArrayList<String>();
-        for (Person existingPerson : this.getPersonnel()) {
+        ArrayList<String> existingPortraits = new ArrayList<>();
+        for (Person existingPerson : getPersonnel()) {
             existingPortraits.add(existingPerson.getPortraitCategory() + ":"
                     + existingPerson.getPortraitFileName());
         }
@@ -7310,7 +7312,7 @@ public class Campaign implements Serializable, ITechManager {
         } catch (Exception e) {
             return;
         }
-        ArrayList<String> possiblePortraits = new ArrayList<String>();
+        ArrayList<String> possiblePortraits = new ArrayList<>();
 
         // Will search for portraits in the /gender/primaryrole folder first,
         // and if none are found then /gender/rolegroup, then /gender/combat or
@@ -7511,7 +7513,7 @@ public class Campaign implements Serializable, ITechManager {
 
     public void disbandNetworkOf(Unit u) {
         // collect all of the other units on this network to rebuild the uuids
-        Vector<Unit> networkedUnits = new Vector<Unit>();
+        Vector<Unit> networkedUnits = new Vector<>();
         for (Unit unit : getUnits()) {
             if (null != unit.getEntity().getC3NetId()
                     && unit.getEntity().getC3NetId().equals(u.getEntity().getC3NetId())) {
@@ -7529,8 +7531,8 @@ public class Campaign implements Serializable, ITechManager {
 
     public void removeUnitsFromNetwork(Vector<Unit> removedUnits) {
         // collect all of the other units on this network to rebuild the uuids
-        Vector<String> uuids = new Vector<String>();
-        Vector<Unit> networkedUnits = new Vector<Unit>();
+        Vector<String> uuids = new Vector<>();
+        Vector<Unit> networkedUnits = new Vector<>();
         String network = removedUnits.get(0).getEntity().getC3NetId();
         for (Unit unit : getUnits()) {
             if (removedUnits.contains(unit)) {
@@ -7560,8 +7562,8 @@ public class Campaign implements Serializable, ITechManager {
 
     public void addUnitsToNetwork(Vector<Unit> addedUnits, String netid) {
         // collect all of the other units on this network to rebuild the uuids
-        Vector<String> uuids = new Vector<String>();
-        Vector<Unit> networkedUnits = new Vector<Unit>();
+        Vector<String> uuids = new Vector<>();
+        Vector<Unit> networkedUnits = new Vector<>();
         for (Unit u : addedUnits) {
             uuids.add(u.getEntity().getC3UUIDAsString());
             networkedUnits.add(u);
@@ -7591,8 +7593,8 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public Vector<String[]> getAvailableC3iNetworks() {
-        Vector<String[]> networks = new Vector<String[]>();
-        Vector<String> networkNames = new Vector<String>();
+        Vector<String[]> networks = new Vector<>();
+        Vector<String> networkNames = new Vector<>();
 
         for(Unit u : getUnits()) {
 
@@ -7619,8 +7621,8 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public Vector<String[]> getAvailableC3MastersForSlaves() {
-        Vector<String[]> networks = new Vector<String[]>();
-        Vector<String> networkNames = new Vector<String>();
+        Vector<String[]> networks = new Vector<>();
+        Vector<String> networkNames = new Vector<>();
 
         for(Unit u : getUnits()) {
 
@@ -7653,8 +7655,8 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public Vector<String[]> getAvailableC3MastersForMasters() {
-        Vector<String[]> networks = new Vector<String[]>();
-        Vector<String> networkNames = new Vector<String>();
+        Vector<String[]> networks = new Vector<>();
+        Vector<String> networkNames = new Vector<>();
 
         for(Unit u : getUnits()) {
 
@@ -7971,7 +7973,7 @@ public class Campaign implements Serializable, ITechManager {
 
     public void addLoan(Loan loan) {
         addReport("You have taken out loan " + loan.getDescription()
-                + ". Your account has been credited " + DecimalFormat.getInstance().format(loan.getPrincipal())
+                + ". Your account has been credited " + NumberFormat.getInstance().format(loan.getPrincipal())
                 + " for the principal amount.");
         finances.addLoan(loan);
         MekHQ.triggerEvent(new LoanNewEvent(loan));
@@ -7984,7 +7986,7 @@ public class Campaign implements Serializable, ITechManager {
         if (finances.debit(loan.getRemainingValue(),
                 Transaction.C_LOAN_PAYMENT, "loan payoff for " + loan.getDescription(), calendar.getTime())) {
             addReport("You have paid off the remaining loan balance of "
-                    + DecimalFormat.getInstance().format(loan.getRemainingValue()) + "on " + loan.getDescription());
+                    + NumberFormat.getInstance().format(loan.getRemainingValue()) + "on " + loan.getDescription());
             finances.removeLoan(loan);
             MekHQ.triggerEvent(new LoanPaidEvent(loan));
         } else {
@@ -8063,47 +8065,47 @@ public class Campaign implements Serializable, ITechManager {
                 + smallCraft + proto + spareParts + getFinances().getTotalAssetValue();
         long liabilities = loans;
         long netWorth = assets - liabilities;
-        int longest = Math.max(DecimalFormat.getInstance().format(liabilities)
-                .length(), DecimalFormat.getInstance().format(assets).length());
-        longest = Math.max(DecimalFormat.getInstance().format(netWorth)
+        int longest = Math.max(NumberFormat.getInstance().format(liabilities)
+                .length(), NumberFormat.getInstance().format(assets).length());
+        longest = Math.max(NumberFormat.getInstance().format(netWorth)
                 .length(), longest);
         String formatted = "%1$" + longest + "s";
         sb.append("Net Worth................ ")
-                .append(String.format(formatted, DecimalFormat.getInstance().format(netWorth))).append("\n\n");
+                .append(String.format(formatted, NumberFormat.getInstance().format(netWorth))).append("\n\n");
         sb.append("    Assets............... ")
-                .append(String.format(formatted, DecimalFormat.getInstance().format(assets))).append("\n");
+                .append(String.format(formatted, NumberFormat.getInstance().format(assets))).append("\n");
         sb.append("       Cash.............. ")
-                .append(String.format(formatted, DecimalFormat.getInstance().format(cash))).append("\n");
+                .append(String.format(formatted, NumberFormat.getInstance().format(cash))).append("\n");
         if (mech > 0) {
             sb.append("       Mechs............. ")
-                    .append(String.format(formatted, DecimalFormat.getInstance().format(mech))).append("\n");
+                    .append(String.format(formatted, NumberFormat.getInstance().format(mech))).append("\n");
         }
         if (vee > 0) {
             sb.append("       Vehicles.......... ")
-                    .append(String.format(formatted, DecimalFormat.getInstance().format(vee))).append("\n");
+                    .append(String.format(formatted, NumberFormat.getInstance().format(vee))).append("\n");
         }
         if (ba > 0) {
             sb.append("       BattleArmor....... ")
-                    .append(String.format(formatted, DecimalFormat.getInstance().format(ba))).append("\n");
+                    .append(String.format(formatted, NumberFormat.getInstance().format(ba))).append("\n");
         }
         if (infantry > 0) {
             sb.append("       Infantry.......... ")
-                    .append(String.format(formatted, DecimalFormat.getInstance().format(infantry))).append("\n");
+                    .append(String.format(formatted, NumberFormat.getInstance().format(infantry))).append("\n");
         }
         if (proto > 0) {
             sb.append("       Protomechs........ ")
-                    .append(String.format(formatted, DecimalFormat.getInstance().format(proto))).append("\n");
+                    .append(String.format(formatted, NumberFormat.getInstance().format(proto))).append("\n");
         }
         if (smallCraft > 0) {
             sb.append("       Small Craft....... ")
-                    .append(String.format(formatted, DecimalFormat.getInstance().format(smallCraft))).append("\n");
+                    .append(String.format(formatted, NumberFormat.getInstance().format(smallCraft))).append("\n");
         }
         if (largeCraft > 0) {
             sb.append("       Large Craft....... ")
-                    .append(String.format(formatted, DecimalFormat.getInstance().format(largeCraft))).append("\n");
+                    .append(String.format(formatted, NumberFormat.getInstance().format(largeCraft))).append("\n");
         }
         sb.append("       Spare Parts....... ")
-                .append(String.format(formatted, DecimalFormat.getInstance().format(spareParts))).append("\n");
+                .append(String.format(formatted, NumberFormat.getInstance().format(spareParts))).append("\n");
 
         if (getFinances().getAllAssets().size() > 0) {
             for (Asset asset : getFinances().getAllAssets()) {
@@ -8118,38 +8120,38 @@ public class Campaign implements Serializable, ITechManager {
                 }
                 assetName += " ";
                 sb.append("       ").append(assetName)
-                        .append(String.format(formatted, DecimalFormat.getInstance().format(asset.getValue())))
+                        .append(String.format(formatted, NumberFormat.getInstance().format(asset.getValue())))
                         .append("\n");
             }
         }
         sb.append("\n");
         sb.append("    Liabilities.......... ")
-                .append(String.format(formatted, DecimalFormat.getInstance().format(liabilities))).append("\n");
+                .append(String.format(formatted, NumberFormat.getInstance().format(liabilities))).append("\n");
         sb.append("       Loans............. ")
-                .append(String.format(formatted, DecimalFormat.getInstance().format(loans))).append("\n\n\n");
+                .append(String.format(formatted, NumberFormat.getInstance().format(loans))).append("\n\n\n");
 
         sb.append("Monthly Profit........... ")
-                .append(String.format(formatted, DecimalFormat.getInstance().format(monthlyIncome - monthlyExpenses)))
+                .append(String.format(formatted, NumberFormat.getInstance().format(monthlyIncome - monthlyExpenses)))
                 .append("\n\n");
         sb.append("Monthly Income........... ")
-                .append(String.format(formatted, DecimalFormat.getInstance().format(monthlyIncome))).append("\n");
+                .append(String.format(formatted, NumberFormat.getInstance().format(monthlyIncome))).append("\n");
         sb.append("    Contract Payments.... ")
-                .append(String.format(formatted, DecimalFormat.getInstance().format(contracts))).append("\n\n");
+                .append(String.format(formatted, NumberFormat.getInstance().format(contracts))).append("\n\n");
         sb.append("Monthly Expenses......... ")
-                .append(String.format(formatted, DecimalFormat.getInstance().format(monthlyExpenses))).append("\n");
+                .append(String.format(formatted, NumberFormat.getInstance().format(monthlyExpenses))).append("\n");
         sb.append("    Salaries............. ")
-                .append(String.format(formatted, DecimalFormat.getInstance().format(salaries))).append("\n");
+                .append(String.format(formatted, NumberFormat.getInstance().format(salaries))).append("\n");
         sb.append("    Maintenance.......... ")
-                .append(String.format(formatted, DecimalFormat.getInstance().format(maintenance))).append("\n");
+                .append(String.format(formatted, NumberFormat.getInstance().format(maintenance))).append("\n");
         sb.append("    Overhead............. ")
-                .append(String.format(formatted, DecimalFormat.getInstance().format(overhead))).append("\n");
+                .append(String.format(formatted, NumberFormat.getInstance().format(overhead))).append("\n");
         if (campaignOptions.usePeacetimeCost()) {
             sb.append("    Spare Parts.......... ")
-                    .append(String.format(formatted, DecimalFormat.getInstance().format(coSpareParts))).append("\n");
+                    .append(String.format(formatted, NumberFormat.getInstance().format(coSpareParts))).append("\n");
             sb.append("    Training Munitions... ")
-                    .append(String.format(formatted, DecimalFormat.getInstance().format(coAmmo))).append("\n");
+                    .append(String.format(formatted, NumberFormat.getInstance().format(coAmmo))).append("\n");
             sb.append("    Fuel................. ")
-                    .append(String.format(formatted, DecimalFormat.getInstance().format(coFuel))).append("\n");
+                    .append(String.format(formatted, NumberFormat.getInstance().format(coFuel))).append("\n");
         }
 
         return new String(sb);
@@ -8422,12 +8424,12 @@ public class Campaign implements Serializable, ITechManager {
 
     public String getCargoDetails() {
         StringBuffer sb = new StringBuffer("Cargo\n\n");
-        double ccc = this.getTotalCombinedCargoCapacity();
-        double gcc = this.getTotalCargoCapacity();
-        double icc = this.getTotalInsulatedCargoCapacity();
-        double lcc = this.getTotalLiquidCargoCapacity();
-        double scc = this.getTotalLivestockCargoCapacity();
-        double rcc = this.getTotalRefrigeratedCargoCapacity();
+        double ccc = getTotalCombinedCargoCapacity();
+        double gcc = getTotalCargoCapacity();
+        double icc = getTotalInsulatedCargoCapacity();
+        double lcc = getTotalLiquidCargoCapacity();
+        double scc = getTotalLivestockCargoCapacity();
+        double rcc = getTotalRefrigeratedCargoCapacity();
         double tonnage = this.getCargoTonnage(false);
         double mothballedTonnage = this.getCargoTonnage(false, true);
         double mothballedUnits = Math.max(getNumberOfUnitsByType(Unit.ETYPE_MOTHBALLED), 0);
@@ -8880,7 +8882,7 @@ public class Campaign implements Serializable, ITechManager {
                 // dont do actual damage until we clear the for loop to avoid
                 // concurrent mod problems
                 // put it into a hash - 4 points of damage will mean destruction
-                HashMap<Integer, Integer> partsToDamage = new HashMap<Integer, Integer>();
+                HashMap<Integer, Integer> partsToDamage = new HashMap<>();
                 String maintenanceReport = "<emph>" + techName + " performing maintenance</emph><br><br>";
                 for (Part p : u.getParts()) {
                     String partReport = "<b>" + p.getName() + "</b> (Quality " + p.getQualityName() + ")";
@@ -9063,7 +9065,7 @@ public class Campaign implements Serializable, ITechManager {
                 }
             }
             if (!p.isDependent() && !p.isPrisoner() && !p.isBondsman()) {
-                GregorianCalendar cal = (GregorianCalendar) GregorianCalendar.getInstance();
+                GregorianCalendar cal = (GregorianCalendar) Calendar.getInstance();
                 // For that one in a billion chance the log is empty. Clone todays date and subtract a year
                 if (join == null) {
                     cal = (GregorianCalendar)calendar.clone();
@@ -9147,7 +9149,7 @@ public class Campaign implements Serializable, ITechManager {
                 }
             }
         }
-        addAllLances(this.forces);
+        addAllLances(forces);
         atbConfig = AtBConfiguration.loadFromXml();
         RandomFactionGenerator.getInstance().updateTables(calendar.getTime(), location.getCurrentPlanet(),
                 campaignOptions);
@@ -9169,7 +9171,7 @@ public class Campaign implements Serializable, ITechManager {
         if (overdueAmount > 0) {
             JOptionPane.showMessageDialog(
                     null,
-                    "You have overdue loan payments totaling " + DecimalFormat.getInstance().format(overdueAmount)
+                    "You have overdue loan payments totaling " + NumberFormat.getInstance().format(overdueAmount)
                             + " C-bills.\nYou must deal with these payments before advancing the day.\nHere are some options:\n  - Sell off equipment to generate funds.\n  - Pay off the collateral on the loan.\n  - Default on the loan.\n  - Just cheat and remove the loan via GM mode.",
                             "Overdue Loan Payments",
                             JOptionPane.WARNING_MESSAGE);

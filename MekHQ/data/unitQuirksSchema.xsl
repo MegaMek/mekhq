@@ -4,6 +4,7 @@
     <!-- unit elements -->
     <xs:element name="chassis" type="xs:string"/>
     <xs:element name="model" type="xs:string"/>
+    <xs:element name="unitType" type="xs:string"/>
     <xs:element name="quirk" type="xs:string"/>
     <!-- /unit elements -->
 
@@ -30,8 +31,9 @@
     <xs:element name="unit">
         <xs:complexType>
             <xs:sequence>
-                <xs:element maxOccurs="1" ref="chassis"/>
-                <xs:element maxOccurs="1" ref="model"/>
+                <xs:element minOccurs="1" maxOccurs="1" ref="chassis"/>
+                <xs:element minOccurs="0" maxOccurs="1" ref="model"/>
+                <xs:element minOccurs="0" maxOccurs="1" ref="unitType" />
                 <xs:element minOccurs="0" maxOccurs="unbounded" ref="quirk"/>
                 <xs:element minOccurs="0" maxOccurs="unbounded" ref="weaponQuirk"/>
             </xs:sequence>

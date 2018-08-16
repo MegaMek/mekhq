@@ -133,7 +133,7 @@ public final class InfirmaryTab extends CampaignGuiTab {
         add(btnUnassignDoc, gridBagConstraints);
 
         assignedPatientModel = new PatientTableModel(getCampaign());
-        listAssignedPatient = new JList<Person>(assignedPatientModel);
+        listAssignedPatient = new JList<>(assignedPatientModel);
         listAssignedPatient.setCellRenderer(assignedPatientModel.getRenderer(getIconPackage()));
         listAssignedPatient.setLayoutOrientation(JList.HORIZONTAL_WRAP);
         listAssignedPatient.setVisibleRowCount(-1);
@@ -145,7 +145,7 @@ public final class InfirmaryTab extends CampaignGuiTab {
         scrollAssignedPatient.setOpaque(false);
         scrollAssignedPatient.getViewport().setOpaque(false);
         unassignedPatientModel = new PatientTableModel(getCampaign());
-        listUnassignedPatient = new JList<Person>(unassignedPatientModel);
+        listUnassignedPatient = new JList<>(unassignedPatientModel);
         listUnassignedPatient.setCellRenderer(unassignedPatientModel.getRenderer(getIconPackage()));
         listUnassignedPatient.setLayoutOrientation(JList.HORIZONTAL_WRAP);
         listUnassignedPatient.setVisibleRowCount(-1);
@@ -228,7 +228,7 @@ public final class InfirmaryTab extends CampaignGuiTab {
     }
 
     protected ArrayList<Person> getSelectedAssignedPatients() {
-        ArrayList<Person> patients = new ArrayList<Person>();
+        ArrayList<Person> patients = new ArrayList<>();
         int[] indices = listAssignedPatient.getSelectedIndices();
         if (assignedPatientModel.getSize() == 0) {
             return patients;
@@ -244,7 +244,7 @@ public final class InfirmaryTab extends CampaignGuiTab {
     }
 
     protected ArrayList<Person> getSelectedUnassignedPatients() {
-        ArrayList<Person> patients = new ArrayList<Person>();
+        ArrayList<Person> patients = new ArrayList<>();
         int[] indices = listUnassignedPatient.getSelectedIndices();
         if (unassignedPatientModel.getSize() == 0) {
             return patients;
@@ -329,8 +329,8 @@ public final class InfirmaryTab extends CampaignGuiTab {
 
     public void refreshPatientList() {
         Person doctor = getSelectedDoctor();
-        ArrayList<Person> assigned = new ArrayList<Person>();
-        ArrayList<Person> unassigned = new ArrayList<Person>();
+        ArrayList<Person> assigned = new ArrayList<>();
+        ArrayList<Person> unassigned = new ArrayList<>();
         for (Person patient : getCampaign().getPatients()) {
             // Knock out inactive doctors
             if ((patient != null) && (patient.getDoctorId() != null)

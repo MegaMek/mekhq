@@ -65,7 +65,7 @@ public class BombsDialog extends JDialog implements ActionListener {
 
     public BombsDialog(IBomber iBomber, Campaign campaign, JFrame parent) {
         super(parent, "Select Bombs", true);
-        this.bomber = iBomber;
+        bomber = iBomber;
         this.campaign = campaign;
         bombChoices = bomber.getBombChoices();
         

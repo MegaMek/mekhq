@@ -77,7 +77,7 @@ public class StarLeagueCache1BuiltInScenario extends AtBScenario {
 		/* Only has enemy if SL 'Mech is not primitive */
 		for (int weight = EntityWeightClass.WEIGHT_LIGHT; weight <= EntityWeightClass.WEIGHT_ASSAULT; weight++) {
 			if (roll > 1) {
-			    enemyEntities = new ArrayList<Entity>();
+			    enemyEntities = new ArrayList<>();
 				for (int i = 0; i < 3; i++) {
 					enemyEntities
 							.add(getEntity(getContract(campaign).getEnemyCode(), getContract(campaign).getEnemySkill(),
@@ -90,7 +90,7 @@ public class StarLeagueCache1BuiltInScenario extends AtBScenario {
 
 		addBotForce(getEnemyBotForce(getContract(campaign), enemyStart, getSpecMissionEnemies().get(0)));
 
-		ArrayList<Entity> otherForce = new ArrayList<Entity>();
+		ArrayList<Entity> otherForce = new ArrayList<>();
 		MechSummary ms = null;
 
 		if (roll == 1) {

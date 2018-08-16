@@ -129,7 +129,7 @@ public class RetirementDefectionDialog extends JDialog {
 			AtBContract contract, boolean doRetirement) {
 		super(gui.getFrame(), true);
 		hqView = gui;
-		unitAssignments = new HashMap<UUID, UUID>();
+		unitAssignments = new HashMap<>();
 		this.contract = contract;
 		rdTracker = hqView.getCampaign().getRetirementDefectionTracker();
 		if (doRetirement) {
@@ -184,7 +184,7 @@ public class RetirementDefectionDialog extends JDialog {
         if (doRetirement) {
         	JPanel panOverview = new JPanel(new BorderLayout());
 
-        	cbGroupOverview = new JComboBox<String>();
+        	cbGroupOverview = new JComboBox<>();
         	for (int i = 0; i < PersonnelTab.PG_RETIRE; i++) {
         		cbGroupOverview.addItem(PersonnelTab.getPersonnelGroupName(i));
         	}
@@ -225,14 +225,14 @@ public class RetirementDefectionDialog extends JDialog {
         	RetirementTableModel model = new RetirementTableModel(hqView.getCampaign());
         	personnelTable = new RetirementTable(model, hqView);
 
-        	personnelSorter = new TableRowSorter<RetirementTableModel>(model);
+        	personnelSorter = new TableRowSorter<>(model);
             personnelSorter.setComparator(RetirementTableModel.COL_PERSON, new RankSorter(hqView.getCampaign()));
             personnelSorter.setComparator(RetirementTableModel.COL_PAYOUT, new FormattedNumberSorter());
             personnelSorter.setComparator(RetirementTableModel.COL_BONUS_COST, new BonusSorter());
             personnelSorter.setComparator(RetirementTableModel.COL_PAY_BONUS, new BonusSorter());
             personnelSorter.setComparator(RetirementTableModel.COL_SHARES, new FormattedNumberSorter());
         	personnelTable.setRowSorter(personnelSorter);
-        	ArrayList<RowSorter.SortKey> sortKeys = new ArrayList<RowSorter.SortKey>();
+        	ArrayList<RowSorter.SortKey> sortKeys = new ArrayList<>();
         	sortKeys.add(new RowSorter.SortKey(PersonnelTableModel.COL_RANK, SortOrder.DESCENDING));
         	personnelSorter.setSortKeys(sortKeys);
 
@@ -304,7 +304,7 @@ public class RetirementDefectionDialog extends JDialog {
 
         JPanel panRetirees = new JPanel(new BorderLayout());
 
-		cbGroupResults = new JComboBox<String>();
+		cbGroupResults = new JComboBox<>();
 		cbGroupResults.addItem("All Personnel");
         for (int i = 1; i < PersonnelTab.PG_NUM; i++) {
         	cbGroupResults.addItem(PersonnelTab.getPersonnelGroupName(i));
@@ -320,7 +320,7 @@ public class RetirementDefectionDialog extends JDialog {
         panTop.add(lblFinalPayout);
         panTop.add(Box.createRigidArea(new Dimension(5, 0)));
         panTop.add(lblPayment);
-        cbUnitCategory = new JComboBox<String>();
+        cbUnitCategory = new JComboBox<>();
         cbUnitCategory.addItem("All Units");
         for (int i = 0; i < UnitType.SIZE; i++) {
             cbUnitCategory.addItem(UnitType.getTypeDisplayableName(i));
@@ -352,10 +352,10 @@ public class RetirementDefectionDialog extends JDialog {
 
 		RetirementTableModel model = new RetirementTableModel(hqView.getCampaign());
 		retireeTable = new RetirementTable(model, hqView);
-        retireeSorter = new TableRowSorter<RetirementTableModel>(model);
+        retireeSorter = new TableRowSorter<>(model);
         retireeSorter.setComparator(RetirementTableModel.COL_PERSON, new RankSorter(hqView.getCampaign()));
         retireeTable.setRowSorter(retireeSorter);
-    	ArrayList<RowSorter.SortKey> sortKeys = new ArrayList<RowSorter.SortKey>();
+    	ArrayList<RowSorter.SortKey> sortKeys = new ArrayList<>();
     	sortKeys.add(new RowSorter.SortKey(PersonnelTableModel.COL_RANK, SortOrder.DESCENDING));
         retireeSorter.setSortKeys(sortKeys);
         cbGroupResults.addActionListener(new ActionListener() {
@@ -396,10 +396,10 @@ public class RetirementDefectionDialog extends JDialog {
         columnModel = new XTableColumnModel();
         unitAssignmentTable.setColumnModel(columnModel);
         unitAssignmentTable.createDefaultColumnsFromModel();
-        unitSorter = new TableRowSorter<UnitAssignmentTableModel>(unitModel);
+        unitSorter = new TableRowSorter<>(unitModel);
         unitSorter.setComparator(UnitAssignmentTableModel.COL_UNIT, new WeightClassSorter());
         unitAssignmentTable.setRowSorter(unitSorter);
-        ArrayList<RowSorter.SortKey> unitSortKeys = new ArrayList<RowSorter.SortKey>();
+        ArrayList<RowSorter.SortKey> unitSortKeys = new ArrayList<>();
         unitSortKeys.add(new RowSorter.SortKey(UnitAssignmentTableModel.COL_UNIT, SortOrder.DESCENDING));        sortKeys.add(new RowSorter.SortKey(UnitAssignmentTableModel.COL_UNIT, SortOrder.DESCENDING));
         unitSorter.setSortKeys(unitSortKeys);
         TableColumn column = null;
@@ -532,9 +532,9 @@ public class RetirementDefectionDialog extends JDialog {
 
 	private void initResults() {
 		/* Find unassigned units that can be stolen */
-		ArrayList<UUID> unassignedMechs = new ArrayList<UUID>();
-		ArrayList<UUID> unassignedASF = new ArrayList<UUID>();
-		ArrayList<UUID> availableUnits = new ArrayList<UUID>();
+		ArrayList<UUID> unassignedMechs = new ArrayList<>();
+		ArrayList<UUID> unassignedASF = new ArrayList<>();
+		ArrayList<UUID> availableUnits = new ArrayList<>();
 		for (Unit u : hqView.getCampaign().getUnits()) {
 			if (!u.isAvailable()) {
 				continue;
@@ -617,7 +617,7 @@ public class RetirementDefectionDialog extends JDialog {
 			((UnitAssignmentTableModel)unitAssignmentTable.getModel()).setData(availableUnits);
 		}
 
-		ArrayList<UUID> retireeList = new ArrayList<UUID>();
+		ArrayList<UUID> retireeList = new ArrayList<>();
 		boolean showRecruitColumn = false;
 		for (UUID pid : rdTracker.getRetirees(contract)) {
 			retireeList.add(pid);
@@ -972,7 +972,7 @@ class RetirementTable extends JTable {
 	public RetirementTable(RetirementTableModel model, CampaignGUI hqView) {
 		super(model);
         setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-        this.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         XTableColumnModel columnModel = new XTableColumnModel();
         setColumnModel(columnModel);
         createDefaultColumnsFromModel();
@@ -996,7 +996,7 @@ class RetirementTable extends JTable {
         getColumnModel().getColumn(convertColumnIndexToView(RetirementTableModel.COL_MISC_MOD)).
         	setCellEditor(new SpinnerEditor());
 
-        JComboBox<String> cbRecruitType = new JComboBox<String>();
+        JComboBox<String> cbRecruitType = new JComboBox<>();
         for (int i = Person.T_NONE; i < Person.T_NUM; i++) {
         	cbRecruitType.addItem(Person.getRoleDesc(i, hqView.getCampaign().getFaction().isClan()));
         }

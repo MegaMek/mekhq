@@ -45,7 +45,7 @@ public class News {
             // For debugging only!
             unmarshaller.setEventHandler(new javax.xml.bind.helpers.DefaultValidationEventHandler());
         } catch(JAXBException e) {
-            MekHQ.getLogger().log(News.class, "<init>", e);
+            MekHQ.getLogger().error(News.class, "<init>", e);
         }
     }
 
@@ -91,7 +91,7 @@ public class News {
                 // Parse using builder to get DOM representation of the XML file
                 xmlDoc = db.parse(fis);
             } catch (Exception ex) {
-                MekHQ.getLogger().log(getClass(), METHOD_NAME, ex);
+                MekHQ.getLogger().error(getClass(), METHOD_NAME, ex);
             }
         
             Element newsEle = xmlDoc.getDocumentElement();
@@ -122,7 +122,7 @@ public class News {
                         try {
                             newsItem = (NewsItem) unmarshaller.unmarshal(wn);
                         } catch(JAXBException e) {
-                            MekHQ.getLogger().log(getClass(), METHOD_NAME, e);
+                            MekHQ.getLogger().error(getClass(), METHOD_NAME, e);
                             continue;
                         }
                         if(null == newsItem.getDate()) {
@@ -135,7 +135,7 @@ public class News {
                         List<NewsItem> items;
                         newsItem.finalizeDate();
                         if(null == archive.get(newsItem.getDate())) {
-                            items = new ArrayList<NewsItem>();
+                            items = new ArrayList<>();
                             items.add(newsItem);
                             archive.put(newsItem.getDate(), items);
                         } else {
