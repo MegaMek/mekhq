@@ -33,14 +33,25 @@ public class FinanceTableMouseAdapter extends MouseInputAdapter {
 	private final JTable financeTable;
 	private final FinanceTableModel financeModel;
 
-	@Override public void  mousePressed(MouseEvent evt) { showPopup(evt); }
-	@Override public void mouseReleased(MouseEvent evt) { showPopup(evt); }
+	@Override
+	public void mousePressed(MouseEvent evt) {
+		showPopup(evt);
+	}
+
+	@Override
+	public void mouseReleased(MouseEvent evt) {
+		showPopup(evt);
+	}
 
 	private void showPopup(MouseEvent me) {
-		if (!me.isPopupTrigger()) return;
+		if (!me.isPopupTrigger()) {
+			return;
+		}
 
 		int row = financeTable.getSelectedRow();
-		if (row < 0) return;
+		if (row < 0) {
+			return;
+		}
 
 		JPopupMenu popup = new JPopupMenu();
 		JMenu menu = new JMenu(I18N.getString("menu.gmMode")); //$NON-NLS-1$
@@ -74,7 +85,9 @@ public class FinanceTableMouseAdapter extends MouseInputAdapter {
 		deleteItem.setActionCommand(command);
 		deleteItem.addActionListener(ae -> {
 			int idx = financeTable.getSelectedRow();
-			if (idx < 0) return;
+			if (idx < 0) {
+				return;
+			}
 			listener.accept(idx, financeModel.getTransaction(idx));
 		});
 		deleteItem.setEnabled(gui.getCampaign().isGM());

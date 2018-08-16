@@ -39,7 +39,7 @@ import mekhq.MekHqXmlUtil;
  */
 public class LogEntry implements Cloneable, MekHqXmlSerializable {
 
-	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss"); //$NON-NLS-1$
 	// LATER SimpleDateFormat is not thread-safe: use throw-away instances or switch to java.time
 	// private static final DateTimeFormatter DTF = DateTimeFormatter.ofPattern("", Locale.ENGLISH);
 
@@ -49,7 +49,7 @@ public class LogEntry implements Cloneable, MekHqXmlSerializable {
 	
 	public LogEntry(Date date, String desc, String type) {
 		this.date = date;
-		this.desc = desc != null ? desc : "";
+		this.desc = desc != null ? desc : ""; //$NON-NLS-1$
 		this.type = type;
 	}
 
@@ -57,23 +57,38 @@ public class LogEntry implements Cloneable, MekHqXmlSerializable {
 	private String desc; // non-null
 	private String type;
 
-	public Date getDate() { return date; }
-	public void setDate(Date date) { this.date = date; }
-
-	public String getDesc() { return desc; }
-	public void setDesc(String desc) { this.desc = desc != null ? desc : ""; }
-
-	public String getType() { return type; }
-	public void setType(String type) { this.type = type; }
+	public Date getDate() {
+		return date;
+	}
+	
+	public void setDate(Date date) {
+		this.date = date;
+	}
+	
+	public String getDesc() {
+		return desc;
+	}
+	
+	public void setDesc(String desc) {
+		this.desc = desc != null ? desc : ""; //$NON-NLS-1$
+	}
+	
+	public String getType() {
+		return type;
+	}
+	
+	public void setType(String type) {
+		this.type = type;
+	}
 
 	@Override
 	public void writeToXml(PrintWriter pw, int indent) {
 		StringBuilder sb = new StringBuilder();
-		sb.append(MekHqXmlUtil.indentStr(indent)).append("<logEntry>");
-		if (date != null)    sb.append("<date>").append(DATE_FORMAT.format(date)).append("</date>");
-		assert desc != null; sb.append("<desc>").append(MekHqXmlUtil.escape(desc)).append("</desc>");
-		if (type != null)    sb.append("<type>").append(MekHqXmlUtil.escape(type)).append("</type>");
-		sb.append("</logEntry>");
+		sb.append(MekHqXmlUtil.indentStr(indent)).append("<logEntry>"); //$NON-NLS-1$
+		if (date != null)    sb.append("<date>").append(DATE_FORMAT.format(date)).append("</date>"); //$NON-NLS-1$ //$NON-NLS-2$
+		assert desc != null; sb.append("<desc>").append(MekHqXmlUtil.escape(desc)).append("</desc>"); //$NON-NLS-1$ //$NON-NLS-2$
+		if (type != null)    sb.append("<type>").append(MekHqXmlUtil.escape(type)).append("</type>");  //$NON-NLS-1$//$NON-NLS-2$
+		sb.append("</logEntry>"); //$NON-NLS-1$
 		pw.println(sb.toString());
 	}
 
@@ -89,11 +104,11 @@ public class LogEntry implements Cloneable, MekHqXmlSerializable {
 			for (int x = 0; x < nl.getLength(); x++) {
 				Node   node = nl.item(x);
 				String nname = node.getNodeName();
-				if (nname.equalsIgnoreCase("desc")) {
+				if (nname.equalsIgnoreCase("desc")) { //$NON-NLS-1$
 					desc = MekHqXmlUtil.unEscape(node.getTextContent());
-				} else if (nname.equalsIgnoreCase("type")) {
+				} else if (nname.equalsIgnoreCase("type")) { //$NON-NLS-1$
 					type = MekHqXmlUtil.unEscape(node.getTextContent());
-				} else if (nname.equalsIgnoreCase("date")) {
+				} else if (nname.equalsIgnoreCase("date")) { //$NON-NLS-1$
 					date = DATE_FORMAT.parse(node.getTextContent().trim());
 				}
 			}
@@ -108,9 +123,9 @@ public class LogEntry implements Cloneable, MekHqXmlSerializable {
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		if (null != date) sb.append("[").append(DATE_FORMAT.format(date)).append("] ");
+		if (null != date) sb.append("[").append(DATE_FORMAT.format(date)).append("] "); //$NON-NLS-1$ //$NON-NLS-2$
 		sb.append(desc);
-		if (null != type) sb.append(" (").append(type).append(")");
+		if (null != type) sb.append(" (").append(type).append(")");  //$NON-NLS-1$//$NON-NLS-2$
 		return sb.toString();
 	}
 
