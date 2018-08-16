@@ -1,4 +1,4 @@
-rootProject.name = 'mekhq'
+rootProject.name = 'MekHQRoot'
 
 include 'MekHQ'
 

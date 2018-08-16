@@ -18,3 +18,4 @@ MekHQ.jar
 /*.blame
 /.classpath
 /.gradle/
+/build/

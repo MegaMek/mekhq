@@ -62,7 +62,7 @@ ext {
 }
 
 jar {
-	archiveName = "${rootProject.name}.${extension}"
+	archiveName = "MekHQ.jar"
 	manifest {
 	    attributes "Main-Class": mainClassName
 	    attributes 'Class-Path' : project.sourceSets.main.runtimeClasspath.files
@@ -111,14 +111,14 @@ task unixStartScript (type: CreateStartScripts) {
 	unixStartScriptGenerator.template = resources.text.fromFile(scriptTemplate)
 	doLast {
 		// The start script assumes all the files on the classpath will be in the lib directory.
-		unixScript.text = unixScript.text.replace("lib/${rootProject.name}", rootProject.name)
+		unixScript.text = unixScript.text.replace('lib/MekHQ', 'MekHQ')
 	}
 }
 
 distributions {
 	// Creates tasks which package distribution with MM jar and startup script in root directory
 	unix {
-		baseName = rootProject.name.toLowerCase()
+		baseName = 'mekhq'
 		contents {
 			from ("${mmDir}/megamek/build/libs/MegaMek.jar")
 			from ("${mmDir}/megamek/build/files")
@@ -131,7 +131,13 @@ distributions {
 				into "data/images"
 			}
 			from ("${mmlDir}/build/scripts/lab")
-			from fileStagingDir
+			from ("${mmlDir}/docs/history.txt") {
+				rename 'history.txt', 'mml-history.txt'
+				into 'docs'
+			}
+			from (fileStagingDir) {
+				rename 'history.txt', 'mm-history.txt'
+			}
 			from(unixStartScript.unixScript)
 			from(jar)
 			from (project.sourceSets.main.runtimeClasspath.files
@@ -139,28 +145,41 @@ distributions {
     			into "${libDir}"
 			}
 			
-			duplicatesStrategy = 'include'
+			duplicatesStrategy = 'exclude'
 		}
 	}
 	// Creates tasks which package distribution with MM jar wrapped in Windows executable
 	windows {
+		baseName = 'mekhq-windows'
 		contents {
-			from ("${mmDir}/megamek/build/launch4j")
+			from ("${mmDir}/megamek/build/launch4j") {
+				include '*.exe'
+			}
 			from ("${mmDir}/megamek/build/files")
-			from ("${mmlDir}/build/launch4j")
+			from ("${mmlDir}/build/launch4j") {
+				include '*.exe'
+			}
 			from ("${mmlDir}/build/files/data/fonts") {
 				into "data/fonts"
 			}
 			from ("${mmlDir}/build/files/data/images") {
 				into "data/images"
 			}
-			from fileStagingDir
-			from "${buildDir}/launch4j/*.exe"
+			from ("${mmlDir}/docs/history.txt") {
+				rename 'history.txt', 'mml-history.txt'
+				into 'docs'
+			}
+			from (fileStagingDir) {
+				rename 'history.txt', 'mm-history.txt'
+			}
+			from ("${buildDir}/launch4j") {
+				include '*.exe'
+			}
 			from (project.sourceSets.main.runtimeClasspath.files
     				.findAll { it.name.endsWith(".jar") && !it.name.toLowerCase().startsWith("megamek") }) {
     			into "${libDir}"
 			}
-			duplicatesStrategy = 'include'
+			duplicatesStrategy = 'exclude'
 		}
 	}
 }
@@ -172,8 +191,8 @@ createExe {
 	jvmOptions = project.ext.jvmOptions
 }
 
-task buildMM (type: GradleBuild) {
-	description = 'Builds the MegaMek project'
+task stageMM (type: GradleBuild) {
+	description = 'Prepares files from the MegaMek project'
 	group = 'distribution'
 	
 	buildFile = "${mmDir}/build.gradle"
@@ -181,8 +200,8 @@ task buildMM (type: GradleBuild) {
 	tasks = [ 'jar', 'stageFiles', 'createExe', 'unixStartScript' ]
 }
 
-task buildMML (type: GradleBuild) {
-	description = 'Builds the MegaMekLab project'
+task stageMML (type: GradleBuild) {
+	description = 'Prepares files from the MegaMekLab project'
 	group = 'distribution'
 	
 	buildFile = "${mmlDir}/build.gradle"
@@ -193,16 +212,16 @@ task buildMML (type: GradleBuild) {
 windowsDistZip {
 	description = 'Creates Windows distribution packaged as a zip archive'
 	dependsOn stageFiles
-	dependsOn buildMM
-	dependsOn buildMML
+	dependsOn stageMM
+	dependsOn stageMML
 	dependsOn createExe
 }
 
 unixDistTar {
 	description = 'Creates *nix distribution packaged as a tar ball'
 	dependsOn stageFiles
-	dependsOn buildMM
-	dependsOn buildMML
+	dependsOn stageMM
+	dependsOn stageMML
 	dependsOn unixStartScript
 	compression = Compression.GZIP
 }
@@ -235,7 +254,7 @@ task cloneMMRepo (type: Exec, dependsOn: deleteMMRepoDir) {
 	args "clone", "--branch", mmBranch, "--single-branch", mmGitRoot, "${mmRepoDir}"
 }
 
-task cloneMMLRepo (type: Exec, dependsOn: deleteMMRepoDir) {
+task cloneMMLRepo (type: Exec, dependsOn: deleteMMLRepoDir) {
 	description = 'Clones the MegaMekLab repository to ensure we are working with a clean directory tree'
 	group = 'distribution'
 	commandLine "git"
@@ -249,7 +268,7 @@ task sourceZip (type: Zip) {
 		exclude "**/build/**"
 		exclude "**/.*"
 	}
-	archiveName "${rootProject.name.toLowerCase()}-${version}-source.zip"
+	archiveName "mekhq-${version}-source.zip"
 	destinationDir file(distributionDir)
 }
 
@@ -259,7 +278,7 @@ task sourceTar (type: Tar) {
 		exclude "**/build/**"
 		exclude "**/.*"
 	}
-	archiveName "${rootProject.name.toLowerCase()}-${version}-source.tar.gz"
+	archiveName "mekhq-${version}-source.tar.gz"
 	compression = Compression.GZIP
 	destinationDir file(distributionDir)
 }
@@ -268,8 +287,8 @@ task sourceTar (type: Tar) {
 task assembleDist(overwrite: true) {
 	description = 'Build unix, Windows, and source packages'
 	group = 'distribution'
-	dependsOn buildMM
-	dependsOn buildMML
+	dependsOn stageMM
+	dependsOn stageMML
 	dependsOn unixDistTar
 	dependsOn windowsDistZip
 	dependsOn sourceZip
@@ -293,9 +312,48 @@ task release (type: Copy) {
 	group = 'distribution'
 	dependsOn buildFromRepo
 	
-	from "${repoDir}/build/distributions"
-//	from "${mmDir}/build/distributions"
-//	from "${mmlDir}/build/distributions"
+	from "${repoDir}/MekHQ/build/distributions"
+	into "${distributionDir}"
+}
+
+task buildMM (type: GradleBuild, dependsOn: cloneMMRepo) {
+	description = 'Prepares files from the MegaMek project'
+	group = 'distribution'
+	
+	buildFile = "${mmDir}/build.gradle"
+	dir = "${mmDir}"
+	tasks = [ 'assembleDist' ]
+}
+
+task buildMML (type: GradleBuild, dependsOn: cloneMMLRepo) {
+	description = 'Prepares files from the MegaMekLab project'
+	group = 'distribution'
+	
+	buildFile = "${mmlDir}/build.gradle"
+	dir = "${mmlDir}"
+	tasks = [ 'assembleDist' ]
+}
+
+task buildAllFromRepo (type: GradleBuild) {
+	description = 'Assembles the distribution packages in the clean repository copy'
+	group = 'distribution'
+	dependsOn cloneRepo
+	dependsOn buildMM
+	dependsOn buildMML
+	
+	buildFile = "${repoDir}/build.gradle"
+	dir = "${repoDir}"
+	tasks = [ 'unixDistTar', 'windowsDistZip', 'sourceTar', 'sourceZip' ]
+}
+
+task releaseAll (type: Copy) {
+	description = 'Builds the release packages for all the projects and copies them into the project build directory'
+	group = 'distribution'
+	dependsOn buildAllFromRepo
+	
+	from "${repoDir}/MekHQ/build/distributions"
+	from "${mmDir}/megamek/build/distributions"
+	from "${mmlDir}/build/distributions"
 	into "${distributionDir}"
 }
 
