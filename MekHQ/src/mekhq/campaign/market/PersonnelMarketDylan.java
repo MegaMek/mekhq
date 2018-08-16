@@ -29,7 +29,7 @@ public class PersonnelMarketDylan extends PersonnelMarketRandom {
         List<Person> retVal = new ArrayList<>();
         int q = generateRandomQuantity();
 
-        ArrayList<Long> mtf = new ArrayList<Long>();
+        ArrayList<Long> mtf = new ArrayList<>();
         long mostTypes = PersonnelMarket.getUnitMainForceTypes(c);
         if ((mostTypes & Entity.ETYPE_MECH) != 0) {
             mtf.add(Entity.ETYPE_MECH);

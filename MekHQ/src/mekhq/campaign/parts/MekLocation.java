@@ -64,13 +64,14 @@ public class MekLocation extends Part {
     	this(0, 0, 0, false, false, false, false, false, null);
     }
     
-    public MekLocation clone() {
+    @Override
+	public MekLocation clone() {
     	MekLocation clone = new MekLocation(loc, getUnitTonnage(), structureType, clan,
     	        tsm, forQuad, sensors, lifeSupport, campaign);
         clone.copyBaseData(this);
-    	clone.percent = this.percent;
-    	clone.breached = this.breached;
-    	clone.blownOff = this.blownOff;
+    	clone.percent = percent;
+    	clone.breached = breached;
+    	clone.blownOff = blownOff;
     	return clone;
     }
     
@@ -96,64 +97,65 @@ public class MekLocation extends Part {
         this.loc = loc;
         this.structureType = structureType;
         this.clan = clan;
-        this.tsm = hasTSM;
-        this.percent = 1.0;
-        this.forQuad = quad;
+        tsm = hasTSM;
+        percent = 1.0;
+        forQuad = quad;
         this.sensors = sensors;
         this.lifeSupport = lifeSupport;
-        this.breached = false;
+        breached = false;
         //TODO: need to account for internal structure and myomer types
         //crap, no static report for location names?
-        this.name = "Mech Location";
+        name = "Mech Location";
         switch(loc) {
         case(Mech.LOC_HEAD):
-            this.name = "Mech Head";
+            name = "Mech Head";
             break;
         case(Mech.LOC_CT):
-            this.name = "Mech Center Torso";
+            name = "Mech Center Torso";
             break;
         case(Mech.LOC_LT):
-            this.name = "Mech Left Torso";
+            name = "Mech Left Torso";
             break;
         case(Mech.LOC_RT):
-            this.name = "Mech Right Torso";
+            name = "Mech Right Torso";
             break;
         case(Mech.LOC_LARM):
-            this.name = "Mech Left Arm";
+            name = "Mech Left Arm";
         	if(forQuad) {
-        		this.name = "Mech Front Left Leg";
+        		name = "Mech Front Left Leg";
         	}
             break;
         case(Mech.LOC_RARM):
-            this.name = "Mech Right Arm";
+            name = "Mech Right Arm";
         	if(forQuad) {
-        		this.name = "Mech Front Right Leg";
+        		name = "Mech Front Right Leg";
     		}
             break;
         case(Mech.LOC_LLEG):
-            this.name = "Mech Left Leg";
+            name = "Mech Left Leg";
         	if(forQuad) {
-        		this.name = "Mech Rear Left Leg";
+        		name = "Mech Rear Left Leg";
         	}
             break;
         case(Mech.LOC_RLEG):
-            this.name = "Mech Right Leg";
+            name = "Mech Right Leg";
         	if(forQuad) {
-        		this.name = "Mech Rear Right Leg";
+        		name = "Mech Rear Right Leg";
         	}
             break;
         }
         if (EquipmentType.T_STRUCTURE_ENDO_STEEL == structureType) {
-            this.name += " (" + EquipmentType.getStructureTypeName(structureType, isClan()) + ")";
+            name += " (" + EquipmentType.getStructureTypeName(structureType, isClan()) + ")";
         } else if(structureType != EquipmentType.T_STRUCTURE_STANDARD) {
-            this.name += " (" + EquipmentType.getStructureTypeName(structureType) + ")";
+            name += " (" + EquipmentType.getStructureTypeName(structureType) + ")";
         }
         if(tsm) {
-            this.name += " (TSM)";
+            name += " (TSM)";
         }
     }
     
-    public double getTonnage() {
+    @Override
+	public double getTonnage() {
     	//TODO: how much should this weigh?
     	return 0;
     }
@@ -173,7 +175,7 @@ public class MekLocation extends Part {
         	    cost += 50000;
         	}
         }
-        return (long) Math.round(cost);
+        return Math.round(cost);
     }
 
     private boolean isArm() {
@@ -202,7 +204,7 @@ public class MekLocation extends Part {
     
     @Override
     public boolean isSameStatus(Part part) {
-    	return super.isSameStatus(part) && this.getPercent() == ((MekLocation)part).getPercent();
+    	return super.isSameStatus(part) && getPercent() == ((MekLocation)part).getPercent();
     }
 
     public double getPercent() {
@@ -645,6 +647,7 @@ public class MekLocation extends Part {
 		return super.getAllMods(tech);
 	}
 	
+	@Override
 	public String getDesc() {
 		if((!isBreached() && !isBlownOff()) || isSalvaging()) {
 			return super.getDesc();
@@ -735,7 +738,8 @@ public class MekLocation extends Part {
         }
     }
 	
-	 public void doMaintenanceDamage(int d) {
+	 @Override
+	public void doMaintenanceDamage(int d) {
 	     int points = unit.getEntity().getInternal(loc);
          points = Math.max(points -d, 1);
          unit.getEntity().setInternal(points, loc);

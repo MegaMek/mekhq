@@ -59,13 +59,13 @@ public class InfantryArmorPart extends Part {
     
     public InfantryArmorPart(int tonnage, Campaign c, double divisor, boolean enc, boolean dest, boolean camo, boolean ir, boolean ecm, boolean space) {
     	super(tonnage, c);
-    	this.damageDivisor = divisor;
-    	this.encumbering = enc;
+    	damageDivisor = divisor;
+    	encumbering = enc;
     	this.dest = dest;
-    	this.sneak_camo = camo;
-    	this.sneak_ecm = ecm;
-    	this.sneak_ir = ir;
-    	this.spaceSuit = space;
+    	sneak_camo = camo;
+    	sneak_ecm = ecm;
+    	sneak_ir = ir;
+    	spaceSuit = space;
     	assignName();
     }
     
@@ -83,7 +83,7 @@ public class InfantryArmorPart extends Part {
     		baseName = "Space Suit";
     	}
     	
-    	this.name = heavyString + baseName;
+    	name = heavyString + baseName;
     }
     
     @Override

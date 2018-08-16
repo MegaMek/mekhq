@@ -46,16 +46,17 @@ public class Rotor extends TankLocation {
     
     public Rotor(int tonnage, Campaign c) {
         super(VTOL.LOC_ROTOR, tonnage, c);
-        this.name = "Rotor";
-        this.damage = 0;
+        name = "Rotor";
+        damage = 0;
     }
     
-    public Rotor clone() {
+    @Override
+	public Rotor clone() {
     	Rotor clone = new Rotor(getUnitTonnage(), campaign);
         clone.copyBaseData(this);
-    	clone.loc = this.loc;
-    	clone.damage = this.damage;
-    	clone.breached = this.breached;
+    	clone.loc = loc;
+    	clone.damage = damage;
+    	clone.breached = breached;
     	return clone;
     }
  
@@ -64,8 +65,8 @@ public class Rotor extends TankLocation {
         return part instanceof Rotor 
         		&& getLoc() == ((Rotor)part).getLoc() 
         		&& getUnitTonnage() == ((Rotor)part).getUnitTonnage()
-        		&& this.getDamage() == ((Rotor)part).getDamage()
-        		&& part.getSkillMin() == this.getSkillMin();
+        		&& getDamage() == ((Rotor)part).getDamage()
+        		&& part.getSkillMin() == getSkillMin();
     }
 
 	@Override

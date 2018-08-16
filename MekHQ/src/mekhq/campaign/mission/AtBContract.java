@@ -38,9 +38,9 @@ import megamek.client.RandomSkillsGenerator;
 import megamek.client.RandomUnitGenerator;
 import megamek.common.Compute;
 import megamek.common.Entity;
+import megamek.common.IPlayer;
 import megamek.common.MechFileParser;
 import megamek.common.MechSummary;
-import megamek.common.Player;
 import megamek.common.UnitType;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.logging.LogLevel;
@@ -185,10 +185,10 @@ public class AtBContract extends Contract implements Serializable {
         enemyQuality = IUnitRating.DRAGOON_C;
         allyBotName = "Ally";
         enemyBotName = "Enemy";
-        allyCamoCategory = Player.NO_CAMO;
+        allyCamoCategory = IPlayer.NO_CAMO;
         allyCamoFileName = null;
         allyColorIndex = 1;
-        enemyCamoCategory = Player.NO_CAMO;
+        enemyCamoCategory = IPlayer.NO_CAMO;
         enemyCamoFileName = null;
         enemyColorIndex = 2;
         
@@ -703,7 +703,7 @@ public class AtBContract extends Contract implements Serializable {
                     en = null;
                     MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
                             "Unable to load entity: " + msl.get(0).getSourceFile() + ": " + msl.get(0).getEntryName() + ": " + ex.getMessage()); //$NON-NLS-1$
-                    MekHQ.getLogger().log(getClass(), METHOD_NAME, ex);
+                    MekHQ.getLogger().error(getClass(), METHOD_NAME, ex);
                 }
                 
             }
@@ -1087,7 +1087,8 @@ public class AtBContract extends Contract implements Serializable {
         }
     }
 
-    protected void writeToXmlBegin(PrintWriter pw1, int indent) {
+    @Override
+	protected void writeToXmlBegin(PrintWriter pw1, int indent) {
         super.writeToXmlBegin(pw1, indent);
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<employerCode>"
@@ -1213,7 +1214,8 @@ public class AtBContract extends Contract implements Serializable {
         }
     }
 
-    public void loadFieldsFromXmlNode(Node wn) throws ParseException {
+    @Override
+	public void loadFieldsFromXmlNode(Node wn) throws ParseException {
         super.loadFieldsFromXmlNode(wn);
         NodeList nl = wn.getChildNodes();
 

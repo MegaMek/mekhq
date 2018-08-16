@@ -71,25 +71,25 @@ public class Skill implements Serializable, MekHqXmlSerializable {
     }
     
     public Skill(String t, int exp, boolean random, int bonus, int rollMod) {
-        this.type = SkillType.getType(t);
-        this.level = type.getLevelFromExperience(exp);
+        type = SkillType.getType(t);
+        level = type.getLevelFromExperience(exp);
         //check to see if we should randomize
         if(random) {
             int roll = Compute.d6() + rollMod;
             if(roll < 2 && level > 0) {
-                this.level--;
+                level--;
             }
             else if(roll > 5 && level < 10) {
-                this.level++;
+                level++;
             }
         }
         this.bonus = bonus;
     }
     
     public Skill(String t, int lvl, int bns) {
-        this.type = SkillType.getType(t);
-        this.level = lvl;
-        this.bonus = bns;
+        type = SkillType.getType(t);
+        level = lvl;
+        bonus = bns;
     }
 
     public int getLevel() {
@@ -97,7 +97,7 @@ public class Skill implements Serializable, MekHqXmlSerializable {
     }
     
     public void setLevel(int l) {
-        this.level = l;
+        level = l;
     }
     
     public int getBonus() {
@@ -105,7 +105,7 @@ public class Skill implements Serializable, MekHqXmlSerializable {
     }
     
     public void setBonus(int b) {
-        this.bonus = b;
+        bonus = b;
     }
     
     public SkillType getType() {
@@ -156,7 +156,8 @@ public class Skill implements Serializable, MekHqXmlSerializable {
         }
     }    
     
-    public void writeToXml(PrintWriter pw1, int indent) {
+    @Override
+	public void writeToXml(PrintWriter pw1, int indent) {
         pw1.println(MekHqXmlUtil.indentStr(indent) + "<skill>");
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<type>"
@@ -199,7 +200,7 @@ public class Skill implements Serializable, MekHqXmlSerializable {
             // Errrr, apparently either the class name was invalid...
             // Or the listed name doesn't exist.
             // Doh!
-            MekHQ.getLogger().log(Skill.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(Skill.class, METHOD_NAME, ex);
         }
         
         return retVal;

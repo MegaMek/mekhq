@@ -119,8 +119,7 @@ public class UnitTechProgression {
         } catch (InterruptedException e) {
             task.cancel(true);
         } catch (ExecutionException e) {
-            MekHQ.getLogger().log(UnitTechProgression.class,
-                    "getProgression(MechSummary,int,boolean)", e);
+            MekHQ.getLogger().error(UnitTechProgression.class, "getProgression(MechSummary,int,boolean)", e);
         }
         return null;
     }
@@ -137,7 +136,7 @@ public class UnitTechProgression {
         } catch (EntityLoadingException ex) {
             MekHQ.getLogger().log(BuildMapTask.class, METHOD_NAME, LogLevel.ERROR,
                     "Exception loading entity " + ms.getName());
-            MekHQ.getLogger().log(BuildMapTask.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(BuildMapTask.class, METHOD_NAME, ex);
             return null;
         }
     }
@@ -156,11 +155,11 @@ public class UnitTechProgression {
         // Load all the Entities in the MechSummaryCache and calculate the tech level for the given faction.
         @Override
         public Map<MechSummary, ITechnology> call() throws Exception {
-            Map<MechSummary,ITechnology> map = new HashMap<MechSummary,ITechnology>();
+            Map<MechSummary,ITechnology> map = new HashMap<>();
             for (MechSummary ms : MechSummaryCache.getInstance().getAllMechs()) {
                 map.put(ms, calcTechProgression(ms, techFaction));
             }
             return map;
         }
-    };
+    }
 }

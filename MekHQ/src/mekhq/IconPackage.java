@@ -110,7 +110,7 @@ public class IconPackage {
             try {
                 mt.loadFromFile("mechset.txt");
             } catch (IOException ex) {
-                MekHQ.getLogger().log(getClass(), "loadDirectories()", ex);
+                MekHQ.getLogger().error(getClass(), "loadDirectories()", ex);
                 //TODO: do something here
             }
         }
@@ -210,7 +210,7 @@ public class IconPackage {
                     }
                 }
             } catch (Exception err) {
-                MekHQ.getLogger().log(IconPackage.class, METHOD_NAME, err);
+                MekHQ.getLogger().error(IconPackage.class, METHOD_NAME, err);
             } finally {
                 if (null != g2d) {
                     g2d.dispose();
@@ -234,7 +234,7 @@ public class IconPackage {
                 }
                 retVal = scaledImage;
             } catch (Exception err) {
-                MekHQ.getLogger().log(IconPackage.class, METHOD_NAME, err);
+                MekHQ.getLogger().error(IconPackage.class, METHOD_NAME, err);
             }
         }
         

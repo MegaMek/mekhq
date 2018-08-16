@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Enumeration;
-import java.util.Hashtable;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -65,7 +64,7 @@ public class Force implements Serializable {
     public static final int FORCE_NONE = -1;
     private String iconCategory = ROOT_ICON;
     private String iconFileName = ICON_NONE;
-    private LinkedHashMap<String, Vector<String>> iconMap = new LinkedHashMap<String, Vector<String>>();
+    private LinkedHashMap<String, Vector<String>> iconMap = new LinkedHashMap<>();
     
     private String name;
     private String desc;
@@ -81,18 +80,18 @@ public class Force implements Serializable {
     private int id;
     
     public Force(String n) {
-        this.name = n;
-        this.desc = "";
-        this.parentForce = null;
-        this.subForces = new Vector<Force>();
-        this.units = new Vector<UUID>();
-        this.oldUnits = new Vector<Integer>();
-        this.scenarioId = -1;
+        name = n;
+        desc = "";
+        parentForce = null;
+        subForces = new Vector<>();
+        units = new Vector<>();
+        oldUnits = new Vector<>();
+        scenarioId = -1;
     }
     
     public Force(String n, int id, Force parent) {
         this(n);
-        this.parentForce = parent;
+        parentForce = parent;
     }
     
     public String getName() {
@@ -100,7 +99,7 @@ public class Force implements Serializable {
     }
     
     public void setName(String n) {
-        this.name = n;
+        name = n;
     }
     
     public String getDescription() {
@@ -108,7 +107,7 @@ public class Force implements Serializable {
     }
     
     public void setDescription(String d) {
-        this.desc = d;
+        desc = d;
     }
     
     public int getScenarioId() {
@@ -116,7 +115,7 @@ public class Force implements Serializable {
     }
     
     public void setScenarioId(int i) {
-        this.scenarioId = i;
+        scenarioId = i;
         for(Force sub : getSubForces()) {
             sub.setScenarioId(i);
         }
@@ -143,7 +142,7 @@ public class Force implements Serializable {
     }
     
     public void setParentForce(Force parent) {
-        this.parentForce = parent;
+        parentForce = parent;
     }
     
     public Vector<Force> getSubForces() {
@@ -199,7 +198,7 @@ public class Force implements Serializable {
      * @return
      */
     public Vector<UUID> getAllUnits() {
-        Vector<UUID> allUnits = new Vector<UUID>();
+        Vector<UUID> allUnits = new Vector<>();
         for(UUID uid : units) {
             allUnits.add(uid);
         }
@@ -294,7 +293,8 @@ public class Force implements Serializable {
         setScenarioId(-1);
     }
     
-    public String toString() {
+    @Override
+	public String toString() {
         return name;
     }
     
@@ -303,7 +303,7 @@ public class Force implements Serializable {
     }
     
     public void setId(int i) {
-        this.id = i;
+        id = i;
     }
     
     public void removeSubForce(int id) {
@@ -326,7 +326,7 @@ public class Force implements Serializable {
     }
     
     public void setIconCategory(String s) {
-        this.iconCategory = s;
+        iconCategory = s;
     }
     
     public String getIconFileName() {
@@ -334,7 +334,7 @@ public class Force implements Serializable {
     }
     
     public void setIconFileName(String s) {
-        this.iconFileName = s;
+        iconFileName = s;
     }
     
     public LinkedHashMap<String, Vector<String>> getIconMap() {
@@ -478,7 +478,7 @@ public class Force implements Serializable {
             // Errrr, apparently either the class name was invalid...
             // Or the listed name doesn't exist.
             // Doh!
-            MekHQ.getLogger().log(Force.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(Force.class, METHOD_NAME, ex);
         }
         
         return retVal;
@@ -524,7 +524,7 @@ public class Force implements Serializable {
     }
     
     private static Vector<String> processIconMapSubNodes(Node wn, Version version) {
-        Vector<String> values = new Vector<String>();
+        Vector<String> values = new Vector<>();
         NodeList nl = wn.getChildNodes();
         for (int x=0; x<nl.getLength(); x++) {
             Node wn2 = nl.item(x);
@@ -545,13 +545,13 @@ public class Force implements Serializable {
     }
     
     public Vector<Object> getAllChildren(Campaign campaign) {
-        Vector<Object> children = new Vector<Object>();
+        Vector<Object> children = new Vector<>();
         children.addAll(subForces);
         //add any units
         Enumeration<UUID> uids = getUnits().elements();
         //put them into a temporary array so I can sort it by rank
-        ArrayList<Unit> units = new ArrayList<Unit>();
-        ArrayList<Unit> unmannedUnits = new ArrayList<Unit>();
+        ArrayList<Unit> units = new ArrayList<>();
+        ArrayList<Unit> unmannedUnits = new ArrayList<>();
         while(uids.hasMoreElements()) {
             Unit u = campaign.getUnit(uids.nextElement());
             if(null != u) {
@@ -563,7 +563,8 @@ public class Force implements Serializable {
             }
         }
         Collections.sort(units, new Comparator<Unit>(){         
-            public int compare(final Unit u1, final Unit u2) {
+            @Override
+			public int compare(final Unit u1, final Unit u2) {
                return ((Comparable<Integer>)u2.getCommander().getRankNumeric()).compareTo(u1.getCommander().getRankNumeric());
             }
         });

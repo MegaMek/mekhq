@@ -62,7 +62,8 @@ public class TOETransferHandler extends TransferHandler {
         return null;
     }
 
-    public boolean canImport(TransferHandler.TransferSupport support) {
+    @Override
+	public boolean canImport(TransferHandler.TransferSupport support) {
         if (!support.isDrop()) {
             return false;
         }
@@ -121,7 +122,8 @@ public class TOETransferHandler extends TransferHandler {
         return parent instanceof Force || parent instanceof Unit;
     }
 
-    public boolean importData(TransferHandler.TransferSupport support) {
+    @Override
+	public boolean importData(TransferHandler.TransferSupport support) {
         if (!canImport(support)) {
             return false;
         }

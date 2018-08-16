@@ -62,7 +62,7 @@ public class FactionComboBox extends JComboBox<Map.Entry<String, String>> {
 			}
 			
 		};
-		setModel(new SortedComboBoxModel<Map.Entry<String, String>>(comp));
+		setModel(new SortedComboBoxModel<>(comp));
 		setRenderer(new DefaultListCellRenderer() {
 			@Override
 			public  Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
@@ -76,8 +76,8 @@ public class FactionComboBox extends JComboBox<Map.Entry<String, String>> {
 	}
 	
 	public void addFactionEntries(Collection<String> list, int year) {
-		HashMap<String, String> map = new HashMap<String, String>();
-		HashSet<String> collisions = new HashSet<String>();
+		HashMap<String, String> map = new HashMap<>();
+		HashSet<String> collisions = new HashSet<>();
 		for (String key : list) {
 			String fullName = Faction.getFaction(key).getFullName(year);
 			if (map.containsValue(fullName)) {
@@ -111,7 +111,7 @@ public class FactionComboBox extends JComboBox<Map.Entry<String, String>> {
 	
 	public void setSelectedItemByKey(String key) {
 		for (int i = 0; i < getModel().getSize(); i++) {
-			if (key.equals(((Map.Entry<String, String>)(getModel().getElementAt(i))).getKey())) {
+			if (key.equals((getModel().getElementAt(i)).getKey())) {
 				setSelectedIndex(i);
 				return;
 			}

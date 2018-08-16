@@ -112,18 +112,18 @@ public class RandomFactionGenerator implements Serializable {
 	private Planet lastLocation = null;
 	
 	private RandomFactionGenerator() {
-		currentFactions = new TreeSet<String>();
-		employers = new ArrayList<String>();
-		deepPeriphery = new HashSet<String>();
-		neutralFactions = new HashSet<String>();
-		majorPowers = new HashSet<String>();
-		borders = new HashMap<String,HashMap<String,HashSet<Planet>>>();
-		wars = new HashMap<String, HashMap<String, ArrayList<FactionHint>>>();
-		alliances = new HashMap<String, HashMap<String, ArrayList<FactionHint>>>();
-		rivals = new HashMap<String, HashMap<String, ArrayList<FactionHint>>>();
-		neutralExceptions = new HashMap<String, HashMap<String, ArrayList<FactionHint>>>();
-		containedFactions = new HashMap<String, HashMap<String, ArrayList<AltLocation>>>();
-		listeners = new ArrayList<ActionListener>();
+		currentFactions = new TreeSet<>();
+		employers = new ArrayList<>();
+		deepPeriphery = new HashSet<>();
+		neutralFactions = new HashSet<>();
+		majorPowers = new HashSet<>();
+		borders = new HashMap<>();
+		wars = new HashMap<>();
+		alliances = new HashMap<>();
+		rivals = new HashMap<>();
+		neutralExceptions = new HashMap<>();
+		containedFactions = new HashMap<>();
+		listeners = new ArrayList<>();
 		
 		lastUpdate = new Date(0); //initialize 1 Jan 1970
 		lastLocation = Planets.getInstance().getPlanets().get("Terra");
@@ -137,6 +137,7 @@ public class RandomFactionGenerator implements Serializable {
 		if (!initialized && !initializing) {
 			initializing = true;
 			rfg.loader = new Thread(new Runnable() {
+				@Override
 				public void run() {
 					Planets p = Planets.getInstance();
 					while (!p.isInitialized()) {
@@ -162,9 +163,9 @@ public class RandomFactionGenerator implements Serializable {
 		try {
 			loadFactionHints();
 		} catch (DOMException e) {
-		    MekHQ.getLogger().log(getClass(), "initialize()", e); //$NON-NLS-1$
+		    MekHQ.getLogger().error(getClass(), "initialize()", e); //$NON-NLS-1$
 		} catch (ParseException e) {
-            MekHQ.getLogger().log(getClass(), "initialize()", e); //$NON-NLS-1$
+            MekHQ.getLogger().error(getClass(), "initialize()", e); //$NON-NLS-1$
 		}
 
 		initialized = true;
@@ -213,7 +214,7 @@ public class RandomFactionGenerator implements Serializable {
 	
 			xmlDoc = db.parse(fis);
 		} catch (Exception ex) {
-	        MekHQ.getLogger().log(getClass(), METHOD_NAME, ex);
+	        MekHQ.getLogger().error(getClass(), METHOD_NAME, ex);
 		}
 		
 		Element rootElement = xmlDoc.getDocumentElement();
@@ -287,7 +288,7 @@ public class RandomFactionGenerator implements Serializable {
 						} else if (wn2.getNodeName().equalsIgnoreCase("fraction")) {
 							fraction = Double.parseDouble(wn2.getTextContent().trim());
 						} else if (wn2.getNodeName().equalsIgnoreCase("opponents")) {
-							opponents = new ArrayList<String>();
+							opponents = new ArrayList<>();
 							for (String faction : wn2.getTextContent().trim().split(",")) {
 								if (Faction.getFaction(faction) != null) {
 									opponents.add(faction);
@@ -601,7 +602,7 @@ public class RandomFactionGenerator implements Serializable {
 			return "REB";
 		}
 		if (borders.get(fName) != null) {
-			ArrayList<String> enemiesList = new ArrayList<String>();
+			ArrayList<String> enemiesList = new ArrayList<>();
 			for (String eName : borders.get(fName).keySet()) {
 				if (eName.equals("PIR") ||
 						eName.equals("REB")) {
@@ -649,7 +650,7 @@ public class RandomFactionGenerator implements Serializable {
 	}
 	
 	public HashSet<String> getEmployerSet() {
-		HashSet<String> retval = new HashSet<String>();
+		HashSet<String> retval = new HashSet<>();
 		for (String fName : employers) {
 			retval.add(fName);
 		}
@@ -657,7 +658,7 @@ public class RandomFactionGenerator implements Serializable {
 	}	
 	
 	public ArrayList<String> getEnemyList(String employer) {
-		ArrayList<String> list = new ArrayList<String>();
+		ArrayList<String> list = new ArrayList<>();
 		if (borders.get(employer) != null) {
 			for (String enemy : borders.get(employer).keySet()) {
 				list.add(enemy);
@@ -708,7 +709,7 @@ public class RandomFactionGenerator implements Serializable {
 	
 	public ArrayList<Planet> getMissionTargetList(String attacker, String defender, Date date, Planet currentPlanet, int searchRadius) {
 		boolean filterByDistance = (currentPlanet != null);
-		ArrayList<Planet> planetList = new ArrayList<Planet>();
+		ArrayList<Planet> planetList = new ArrayList<>();
 		int maxJumps = 3;
 		if (deepPeriphery.contains(attacker) || deepPeriphery.contains(defender)) {
 			maxJumps = 8;
@@ -812,7 +813,7 @@ public class RandomFactionGenerator implements Serializable {
 	}
 	
 	private HashSet<String> getContainedFactions(String f, Date date) {
-		HashSet<String> retval = new HashSet<String>();
+		HashSet<String> retval = new HashSet<>();
 		if (containedFactions.get(f) != null) {
 			for (String f2 : containedFactions.get(f).keySet()) {
 				for (AltLocation l : containedFactions.get(f).get(f2)) {

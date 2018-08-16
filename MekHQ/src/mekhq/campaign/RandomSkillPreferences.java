@@ -112,7 +112,7 @@ public class RandomSkillPreferences implements Serializable {
     }
     
     public void setRandomizeSkill(boolean b) {
-    	this.randomizeSkill = b;
+    	randomizeSkill = b;
     }
     
     public boolean randomizeSkill() {
@@ -120,7 +120,7 @@ public class RandomSkillPreferences implements Serializable {
     }
     
     public void setUseClanBonuses(boolean b) {
-    	this.useClanBonuses = b;
+    	useClanBonuses = b;
     }
     
     public boolean useClanBonuses() {
@@ -163,7 +163,7 @@ public class RandomSkillPreferences implements Serializable {
     }
     
     public void setArtilleryProb(int b) {
-    	this.artilleryProb = b;
+    	artilleryProb = b;
     }
     
     public int getArtilleryProb() {
@@ -171,7 +171,7 @@ public class RandomSkillPreferences implements Serializable {
     }
     
     public void setArtilleryBonus(int b) {
-    	this.artilleryBonus = b;
+    	artilleryBonus = b;
     }
     
     public int getArtilleryBonus() {
@@ -179,7 +179,7 @@ public class RandomSkillPreferences implements Serializable {
     }
     
     public void setSecondSkillProb(int b) {
-    	this.secondSkillProb = b;
+    	secondSkillProb = b;
     }
     
     public int getSecondSkillProb() {
@@ -187,7 +187,7 @@ public class RandomSkillPreferences implements Serializable {
     }
     
     public void setSecondSkillBonus(int b) {
-    	this.secondSkillBonus = b;
+    	secondSkillBonus = b;
     }
     
     public int getSecondSkillBonus() {

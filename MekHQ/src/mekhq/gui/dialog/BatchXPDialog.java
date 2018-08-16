@@ -80,15 +80,15 @@ public final class BatchXPDialog extends JDialog {
     public BatchXPDialog(JFrame parent, Campaign campaign) {
         super(parent, "", true); //$NON-NLS-1$
         
-        this.resourceMap = ResourceBundle.getBundle("mekhq.resources.BatchXPDialog", new EncodeControl()); //$NON-NLS-1$
+        resourceMap = ResourceBundle.getBundle("mekhq.resources.BatchXPDialog", new EncodeControl()); //$NON-NLS-1$
         
         setTitle(resourceMap.getString("dialogue.title")); //$NON-NLS-1$
         choiceNoSkill = resourceMap.getString("skill.choice.text"); //$NON-NLS-1$
         
         this.campaign = Objects.requireNonNull(campaign);
-        this.personnelModel = new PersonnelTableModel(campaign);
+        personnelModel = new PersonnelTableModel(campaign);
         personnelModel.refreshData();
-        personnelSorter = new TableRowSorter<PersonnelTableModel>(personnelModel);
+        personnelSorter = new TableRowSorter<>(personnelModel);
         personnelSorter.setSortsOnUpdates(true);
         personnelSorter.setComparator(PersonnelTableModel.COL_RANK, new RankSorter(campaign));
         personnelSorter.setComparator(PersonnelTableModel.COL_AGE, new FormattedNumberSorter());
@@ -138,7 +138,7 @@ public final class BatchXPDialog extends JDialog {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
-        choiceType = new JComboBox<PersonTypeItem>();
+        choiceType = new JComboBox<>();
         choiceType.setMaximumSize(new Dimension(Short.MAX_VALUE, (int) choiceType.getPreferredSize().getHeight()));
         DefaultComboBoxModel<PersonTypeItem> personTypeModel = new DefaultComboBoxModel<>();
         personTypeModel.addElement(new PersonTypeItem(resourceMap.getString("primaryRole.choice.text"), null)); //$NON-NLS-1$
@@ -155,7 +155,7 @@ public final class BatchXPDialog extends JDialog {
         });
         panel.add(choiceType);
         
-        choiceExp = new JComboBox<PersonTypeItem>();
+        choiceExp = new JComboBox<>();
         choiceExp.setMaximumSize(new Dimension(Short.MAX_VALUE, (int) choiceType.getPreferredSize().getHeight()));
         DefaultComboBoxModel<PersonTypeItem> personExpModel = new DefaultComboBoxModel<>();
         personExpModel.addElement(new PersonTypeItem(resourceMap.getString("experience.choice.text"), null)); //$NON-NLS-1$
@@ -170,7 +170,7 @@ public final class BatchXPDialog extends JDialog {
         });
         panel.add(choiceExp);
         
-        choiceSkill = new JComboBox<String>();
+        choiceSkill = new JComboBox<>();
         choiceSkill.setMaximumSize(new Dimension(Short.MAX_VALUE, (int) choiceSkill.getPreferredSize().getHeight()));
         DefaultComboBoxModel<String> personSkillModel = new DefaultComboBoxModel<>();
         personSkillModel.addElement(choiceNoSkill);
@@ -220,7 +220,7 @@ public final class BatchXPDialog extends JDialog {
             updatePersonnelTable();
         });
         JPanel allowPrisonersPanel = new JPanel(new GridLayout(1, 1));
-        allowPrisonersPanel.setAlignmentY(JComponent.LEFT_ALIGNMENT);
+        allowPrisonersPanel.setAlignmentY(Component.LEFT_ALIGNMENT);
         allowPrisonersPanel.add(allowPrisoners);
         allowPrisonersPanel.setMaximumSize(new Dimension(Short.MAX_VALUE, (int) allowPrisonersPanel.getPreferredSize().getHeight()));
         panel.add(allowPrisonersPanel);

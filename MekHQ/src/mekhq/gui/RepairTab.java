@@ -230,11 +230,11 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         servicedUnitTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         servicedUnitTable.setColumnModel(new XTableColumnModel());
         servicedUnitTable.createDefaultColumnsFromModel();
-        servicedUnitSorter = new TableRowSorter<UnitTableModel>(servicedUnitModel);
+        servicedUnitSorter = new TableRowSorter<>(servicedUnitModel);
         servicedUnitSorter.setComparator(UnitTableModel.COL_STATUS, new UnitStatusSorter());
         servicedUnitSorter.setComparator(UnitTableModel.COL_TYPE, new UnitTypeSorter());
         servicedUnitTable.setRowSorter(servicedUnitSorter);
-        ArrayList<RowSorter.SortKey> sortKeys = new ArrayList<RowSorter.SortKey>();
+        ArrayList<RowSorter.SortKey> sortKeys = new ArrayList<>();
         sortKeys.add(new RowSorter.SortKey(UnitTableModel.COL_TYPE, SortOrder.DESCENDING));
         servicedUnitSorter.setSortKeys(sortKeys);
         TableColumn column = null;
@@ -281,10 +281,10 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         techTable.setRowHeight(60);
         techTable.getColumnModel().getColumn(0).setCellRenderer(techsModel.getRenderer(getIconPackage()));
         techTable.getSelectionModel().addListSelectionListener(ev -> techTableValueChanged(ev));
-        techSorter = new TableRowSorter<TechTableModel>(techsModel);
+        techSorter = new TableRowSorter<>(techsModel);
         techSorter.setComparator(0, new TechSorter());
         techTable.setRowSorter(techSorter);
-        sortKeys = new ArrayList<RowSorter.SortKey>();
+        sortKeys = new ArrayList<>();
         sortKeys.add(new RowSorter.SortKey(0, SortOrder.ASCENDING));
         techSorter.setSortKeys(sortKeys);
         JScrollPane scrollTechTable = new JScrollPane(techTable);
@@ -320,7 +320,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTH;
         panDoTask.add(lblTargetNum, gridBagConstraints);
 
-        choiceLocation = new JComboBox<String>();
+        choiceLocation = new JComboBox<>();
         choiceLocation.removeAllItems();
         choiceLocation.addItem("All");
         choiceLocation.setEnabled(false);
@@ -377,10 +377,10 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         taskTable.setRowHeight(70);
         taskTable.getColumnModel().getColumn(0).setCellRenderer(taskModel.getRenderer(getIconPackage()));
         taskTable.getSelectionModel().addListSelectionListener(ev -> taskTableValueChanged());
-        taskSorter = new TableRowSorter<TaskTableModel>(taskModel);
+        taskSorter = new TableRowSorter<>(taskModel);
         taskSorter.setComparator(0, new TaskSorter());
         taskTable.setRowSorter(taskSorter);
-        sortKeys = new ArrayList<RowSorter.SortKey>();
+        sortKeys = new ArrayList<>();
         sortKeys.add(new RowSorter.SortKey(0, SortOrder.ASCENDING));
         taskSorter.setSortKeys(sortKeys);
         taskTable.addMouseListener(new TaskTableMouseAdapter(getCampaignGui(),
@@ -592,7 +592,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         selectedLocation = choiceLocation.getSelectedIndex();
         selectedUnit = getSelectedServicedUnit();
         selectedTech = getSelectedTech();
-        IPartWork part = (IPartWork)getSelectedTask();
+        IPartWork part = getSelectedTask();
         if (null == part) {
             return;
         }
@@ -684,7 +684,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
             @Override
             public boolean include(Entry<? extends TaskTableModel, ? extends Integer> entry) {
                 TaskTableModel taskModel = entry.getModel();
-                IPartWork part = (IPartWork)taskModel.getTaskAt(entry.getIdentifier());
+                IPartWork part = taskModel.getTaskAt(entry.getIdentifier());
                 if (part == null) {
                     return false;
                 }

@@ -32,7 +32,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -122,7 +121,7 @@ public class Utilities {
     private static String[] romanNumerals = "M,CM,D,CD,C,XC,L,XL,X,IX,V,IV,I".split(","); //$NON-NLS-1$ //$NON-NLS-2$
 
     public static int roll3d6() {
-        Vector<Integer> rolls = new Vector<Integer>();
+        Vector<Integer> rolls = new Vector<>();
         rolls.add(Compute.d6());
         rolls.add(Compute.d6());
         rolls.add(Compute.d6());
@@ -278,7 +277,7 @@ public class Utilities {
     }
 
     public static ArrayList<AmmoType> getMunitionsFor(Entity entity, AmmoType cur_atype, int techLvl) {
-        ArrayList<AmmoType> atypes = new ArrayList<AmmoType>();
+        ArrayList<AmmoType> atypes = new ArrayList<>();
         for(AmmoType atype : AmmoType.getMunitionsFor(cur_atype.getAmmoType())) {
             //this is an abbreviated version of setupMunitions in the CustomMechDialog
             //TODO: clan/IS limitations?
@@ -345,7 +344,7 @@ public class Utilities {
 
 
     public static String getCurrencyString(long value) {
-        NumberFormat numberFormat = DecimalFormat.getIntegerInstance();
+        NumberFormat numberFormat = NumberFormat.getIntegerInstance();
         String text = numberFormat.format(value) + " C-Bills";
         return text;
     }
@@ -393,7 +392,7 @@ public class Utilities {
     public static ArrayList<String> getAllVariants(Entity en, Campaign campaign) {
         final String METHOD_NAME = "getAllVariants(Entity, Campaign)"; // $NON-NLS-1$
         CampaignOptions options = campaign.getCampaignOptions();
-        ArrayList<String> variants = new ArrayList<String>();
+        ArrayList<String> variants = new ArrayList<>();
         for(MechSummary summary : MechSummaryCache.getInstance().getAllMechs()) {
             // If this isn't the same chassis, is our current unit, or is a different weight we continue
             if(!en.getChassis().equalsIgnoreCase(summary.getChassis())
@@ -618,9 +617,9 @@ public class Utilities {
         String commanderName = oldCrew.getName();
         int averageGunnery = 0;
         int averagePiloting = 0;
-        List<Person> drivers = new ArrayList<Person>();
-        List<Person> gunners = new ArrayList<Person>();
-        List<Person> vesselCrew = new ArrayList<Person>();
+        List<Person> drivers = new ArrayList<>();
+        List<Person> gunners = new ArrayList<>();
+        List<Person> vesselCrew = new ArrayList<>();
         Person navigator = null;
         Person consoleCmdr = null;
         int totalGunnery = 0;
@@ -921,7 +920,7 @@ public class Utilities {
     private static void populateOptionsFromCrew(Person p, Crew oldCrew) {
         Enumeration<IOption> optionsEnum = oldCrew.getOptions().getOptions();
         while(optionsEnum.hasMoreElements()) {
-            IOption currentOption = (IOption) optionsEnum.nextElement();
+            IOption currentOption = optionsEnum.nextElement();
             p.getOptions().getOption(currentOption.getName()).setValue(currentOption.getValue());
         }
     }
@@ -1091,7 +1090,7 @@ public class Utilities {
             assignTroopersAndEquipmentNums(unit);
             return;
         }
-        List<Integer> equipNums = new ArrayList<Integer>();
+        List<Integer> equipNums = new ArrayList<>();
         for(Mounted m : unit.getEntity().getEquipment()) {
             equipNums.add(unit.getEntity().getEquipmentNum(m));
         }
@@ -1282,7 +1281,7 @@ public class Utilities {
         }
 
         //reset all hours mins and secs to zero on start date
-        Calendar startCal = GregorianCalendar.getInstance();
+        Calendar startCal = Calendar.getInstance();
         startCal.setTime(start);
         startCal.set(Calendar.HOUR_OF_DAY, 0);
         startCal.set(Calendar.MINUTE, 0);
@@ -1290,7 +1289,7 @@ public class Utilities {
         long startTime = startCal.getTimeInMillis();
 
         //reset all hours mins and secs to zero on end date
-        Calendar endCal = GregorianCalendar.getInstance();
+        Calendar endCal = Calendar.getInstance();
         endCal.setTime(end);
         endCal.set(Calendar.HOUR_OF_DAY, 0);
         endCal.set(Calendar.MINUTE, 0);
@@ -1303,9 +1302,9 @@ public class Utilities {
     public static int getDiffFullYears(Date date, GregorianCalendar b) {
         GregorianCalendar a = new GregorianCalendar();
         a.setTime(date);
-        int diff = b.get(GregorianCalendar.YEAR) - a.get(GregorianCalendar.YEAR);
-        if (a.get(GregorianCalendar.MONTH) > b.get(GregorianCalendar.MONTH) ||
-            (a.get(GregorianCalendar.MONTH) == b.get(GregorianCalendar.MONTH) && a.get(GregorianCalendar.DATE) > b.get(GregorianCalendar.DATE))) {
+        int diff = b.get(Calendar.YEAR) - a.get(Calendar.YEAR);
+        if (a.get(Calendar.MONTH) > b.get(Calendar.MONTH) ||
+            (a.get(Calendar.MONTH) == b.get(Calendar.MONTH) && a.get(Calendar.DATE) > b.get(Calendar.DATE))) {
             diff--;
         }
         return diff;
@@ -1314,7 +1313,7 @@ public class Utilities {
     public static int getDiffPartialYears(Date date, GregorianCalendar b) {
         GregorianCalendar a = new GregorianCalendar();
         a.setTime(date);
-        int diff = b.get(GregorianCalendar.YEAR) - a.get(GregorianCalendar.YEAR);
+        int diff = b.get(Calendar.YEAR) - a.get(Calendar.YEAR);
         if (diff == 0 && countDaysBetween(a.getTime(), b.getTime()) > 0) {
             return 1;
         }
@@ -1370,7 +1369,7 @@ public class Utilities {
 
     public static Vector<String> splitString(String str, String sep) {
         StringTokenizer st = new StringTokenizer(str, sep);
-        Vector<String> output = new Vector<String>();
+        Vector<String> output = new Vector<>();
         while(st.hasMoreTokens()) {
             output.add(st.nextToken());
         }
@@ -1465,7 +1464,7 @@ public class Utilities {
 
         // Convert Map to List
         List<Map.Entry<String, Integer>> list =
-            new LinkedList<Map.Entry<String, Integer>>(unsortMap.entrySet());
+            new LinkedList<>(unsortMap.entrySet());
 
         // Sort list with comparator, to compare the Map values
         Collections.sort(list, new Comparator<Map.Entry<String, Integer>>() {
@@ -1477,7 +1476,7 @@ public class Utilities {
         });
 
         // Convert sorted map back to a Map
-        Map<String, Integer> sortedMap = new LinkedHashMap<String, Integer>();
+        Map<String, Integer> sortedMap = new LinkedHashMap<>();
         if(highFirst) {
             ListIterator<Map.Entry<String, Integer>> li = list.listIterator(list.size());
             while(li.hasPrevious()) {
@@ -1547,7 +1546,7 @@ public class Utilities {
                             // Ignore this file then
                             MekHQ.getLogger().log(Utilities.class, METHOD_NAME, LogLevel.ERROR,
                                     "Exception trying to parse " + file.getPath() + " - ignoring."); //$NON-NLS-1$ //$NON-NLS-2$
-                            MekHQ.getLogger().log(Utilities.class, METHOD_NAME, ex);
+                            MekHQ.getLogger().error(Utilities.class, METHOD_NAME, ex);
                         }
                     }
                 }

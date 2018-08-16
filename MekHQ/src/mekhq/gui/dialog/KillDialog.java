@@ -46,8 +46,8 @@ public class KillDialog extends javax.swing.JDialog {
     /** Creates new form NewTeamDialog */
     public KillDialog(java.awt.Frame parent, boolean modal, Kill k, String pilotName) {
         super(parent, modal);
-        this.frame = parent;
-        this.kill = k;
+        frame = parent;
+        kill = k;
         date = kill.getDate();
         name = pilotName;
         cancelled = false;
@@ -123,7 +123,8 @@ public class KillDialog extends javax.swing.JDialog {
         btnDate.setText(getDateAsString());
         btnDate.setName("btnDate"); // NOI18N
         btnDate.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
             	changeDate();
             }
         });
@@ -138,7 +139,8 @@ public class KillDialog extends javax.swing.JDialog {
         btnOK.setText(resourceMap.getString("btnOK.text")); // NOI18N
         btnOK.setName("btnOK"); // NOI18N
         btnOK.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnOKActionPerformed(evt);
             }
         });
@@ -153,7 +155,8 @@ public class KillDialog extends javax.swing.JDialog {
         btnClose.setText(resourceMap.getString("btnClose.text")); // NOI18N
         btnClose.setName("btnClose"); // NOI18N
         btnClose.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnCloseActionPerformed(evt);
             }
         });
@@ -174,12 +177,12 @@ public class KillDialog extends javax.swing.JDialog {
     	kill.setWhatKilled(txtKill.getText());
     	kill.setKilledByWhat(txtKiller.getText());
     	kill.setDate(date);
-    	this.setVisible(false);
+    	setVisible(false);
     }
 
     private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
     	cancelled = true;
-    	this.setVisible(false);
+    	setVisible(false);
     }
     
     public Kill getKill() {

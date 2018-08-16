@@ -75,7 +75,7 @@ public class AllyRescueBuiltInScenario extends AtBScenario {
 					campaign));
 		}
 
-		ArrayList<Entity> otherForce = new ArrayList<Entity>();
+		ArrayList<Entity> otherForce = new ArrayList<>();
 		
 		for (int i = 0; i < 8; i++) {
 			otherForce.add(getEntity(getContract(campaign).getEmployerCode(), getContract(campaign).getAllySkill(),

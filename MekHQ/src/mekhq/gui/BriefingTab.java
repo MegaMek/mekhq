@@ -168,7 +168,7 @@ public final class BriefingTab extends CampaignGuiTab {
         panBriefing.add(new JLabel(resourceMap.getString("lblMission.text")), //$NON-NLS-1$ ;
                 gridBagConstraints);
 
-        choiceMission = new JComboBox<String>();
+        choiceMission = new JComboBox<>();
         choiceMission.addActionListener(ev -> changeMission());
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -345,14 +345,14 @@ public final class BriefingTab extends CampaignGuiTab {
                     ? new NewAtBContractDialog(getFrame(), true, getCampaign())
                     : new NewContractDialog(getFrame(), true, getCampaign());
             ncd.setVisible(true);
-            this.setVisible(false);
+            setVisible(false);
             if (ncd.getContractId() != -1) {
                 selectedMission = ncd.getContractId();
             }
         } else {
             CustomizeMissionDialog cmd = new CustomizeMissionDialog(getFrame(), true, null, getCampaign());
             cmd.setVisible(true);
-            this.setVisible(false);
+            setVisible(false);
             if (cmd.getMissionId() != -1) {
                 selectedMission = cmd.getMissionId();
             }
@@ -551,7 +551,7 @@ public final class BriefingTab extends CampaignGuiTab {
             return;
         }
 
-        Vector<Entity> chosen = new Vector<Entity>();
+        Vector<Entity> chosen = new Vector<>();
         // ArrayList<Unit> toDeploy = new ArrayList<Unit>();
         StringBuffer undeployed = new StringBuffer();
 
@@ -604,7 +604,7 @@ public final class BriefingTab extends CampaignGuiTab {
             return;
         }
 
-        ArrayList<Unit> chosen = new ArrayList<Unit>();
+        ArrayList<Unit> chosen = new ArrayList<>();
         // ArrayList<Unit> toDeploy = new ArrayList<Unit>();
         StringBuffer undeployed = new StringBuffer();
 
@@ -704,7 +704,7 @@ public final class BriefingTab extends CampaignGuiTab {
             return;
         }
 
-        ArrayList<Unit> chosen = new ArrayList<Unit>();
+        ArrayList<Unit> chosen = new ArrayList<>();
         // ArrayList<Unit> toDeploy = new ArrayList<Unit>();
         StringBuffer undeployed = new StringBuffer();
 
@@ -754,7 +754,7 @@ public final class BriefingTab extends CampaignGuiTab {
             return;
         }
 
-        ArrayList<Entity> chosen = new ArrayList<Entity>();
+        ArrayList<Entity> chosen = new ArrayList<>();
         // ArrayList<Unit> toDeploy = new ArrayList<Unit>();
         StringBuffer undeployed = new StringBuffer();
 

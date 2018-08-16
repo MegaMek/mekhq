@@ -41,7 +41,7 @@ class GameThread extends Thread implements CloseClientListener {
     protected Campaign campaign;
     protected boolean started;
 
-    protected ArrayList<Unit> units = new ArrayList<Unit>();
+    protected ArrayList<Unit> units = new ArrayList<>();
 
     protected volatile boolean stop = false;
     
@@ -53,11 +53,11 @@ class GameThread extends Thread implements CloseClientListener {
     public GameThread(String name, Client c, MekHQ app, ArrayList<Unit> units, boolean started) {
         super(name);
         myname = name.trim();
-        this.client = c;
+        client = c;
         this.app = app;
         this.units = units;
         this.started = started;
-        this.campaign = app.getCampaign();
+        campaign = app.getCampaign();
     }
 
     public Client getClient() {
@@ -84,7 +84,7 @@ class GameThread extends Thread implements CloseClientListener {
         } catch (Exception ex) {
             MekHQ.getLogger().log(getClass(), "run()", LogLevel.ERROR,
                     "MegaMek client failed to connect to server"); //$NON-NLS-1$
-            MekHQ.getLogger().log(getClass(), "run()", ex);
+            MekHQ.getLogger().error(getClass(), "run()", ex);
             return;
         }
 
@@ -131,7 +131,7 @@ class GameThread extends Thread implements CloseClientListener {
             	Thread.sleep(50);
             }
         } catch (Exception e) {
-            MekHQ.getLogger().log(getClass(), "run()", e);
+            MekHQ.getLogger().error(getClass(), "run()", e);
         }
         finally {
 	        client.die();
@@ -145,7 +145,8 @@ class GameThread extends Thread implements CloseClientListener {
      * from megamek.client.CloseClientListener clientClosed() Thanks to MM for
      * adding the listener. And to MMNet for the poorly documented code change.
      */
-    public void clientClosed() {
+    @Override
+	public void clientClosed() {
     	requestStop();
     	app.stopHost();
     }

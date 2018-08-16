@@ -145,7 +145,7 @@ public final class InjuryUtil {
 
     /** Generate combat injuries for a specific body location */
     public static Collection<Injury> genInjuries(Campaign c, Person p, BodyLocation loc, int hits) {
-        List<Injury> newInjuries = new ArrayList<Injury>();
+        List<Injury> newInjuries = new ArrayList<>();
         final BiFunction<InjuryType, Integer, Injury> gen = (it, severity) -> {
             return it.newInjury(c, p, loc, severity);
         };

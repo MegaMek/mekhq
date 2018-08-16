@@ -117,7 +117,8 @@ public class TableCellListener implements PropertyChangeListener, Runnable
   //
   //  Implement the PropertyChangeListener interface
   //
-  public void propertyChange(PropertyChangeEvent e)
+  @Override
+public void propertyChange(PropertyChangeEvent e)
   {
     //  A cell has started/stopped editing
 
@@ -146,7 +147,8 @@ public class TableCellListener implements PropertyChangeListener, Runnable
   /*
    *  See above.
    */
-  public void run()
+  @Override
+public void run()
   {
     row = table.convertRowIndexToModel(table.getEditingRow());
     column = table.convertColumnIndexToModel(table.getEditingColumn());

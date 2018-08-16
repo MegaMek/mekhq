@@ -74,45 +74,46 @@ public class ProtomekLocation extends Part {
         super(tonnage, c);
         this.loc = loc;
         this.structureType = structureType;
-        this.booster = hasBooster;
-        this.percent = 1.0;
-        this.forQuad = quad;
-        this.breached = false;
-        this.name = "Protomech Location";
+        booster = hasBooster;
+        percent = 1.0;
+        forQuad = quad;
+        breached = false;
+        name = "Protomech Location";
         switch(loc) {
         case(Protomech.LOC_HEAD):
-            this.name = "Protomech Head";
+            name = "Protomech Head";
             break;
         case(Protomech.LOC_TORSO):
-            this.name = "Protomech Torso";
+            name = "Protomech Torso";
             break;
         case(Protomech.LOC_LARM):
-            this.name = "Protomech Left Arm";
+            name = "Protomech Left Arm";
             break;
         case(Protomech.LOC_RARM):
-            this.name = "Protomech Right Arm";
+            name = "Protomech Right Arm";
             break;
         case(Protomech.LOC_LEG):
-            this.name = "Protomech Legs";
+            name = "Protomech Legs";
             if(forQuad) {
-                this.name = "Protomech Legs (Quad)";
+                name = "Protomech Legs (Quad)";
             }
             break;
         case(Protomech.LOC_MAINGUN):
-            this.name = "Protomech Main Gun";
+            name = "Protomech Main Gun";
             break;
         }
         if(booster) {
-            this.name += " (Myomer Booster)";
+            name += " (Myomer Booster)";
         }
     }
 
-    public ProtomekLocation clone() {
+    @Override
+	public ProtomekLocation clone() {
         ProtomekLocation clone = new ProtomekLocation(loc, getUnitTonnage(), structureType, booster, forQuad, campaign);
         clone.copyBaseData(this);
-        clone.percent = this.percent;
-        clone.breached = this.breached;
-        clone.blownOff = this.blownOff;
+        clone.percent = percent;
+        clone.breached = breached;
+        clone.blownOff = blownOff;
         return clone;
     }
 
@@ -130,7 +131,8 @@ public class ProtomekLocation extends Part {
 
 
 
-    public double getTonnage() {
+    @Override
+	public double getTonnage() {
         return 0;
     }
 
@@ -153,7 +155,7 @@ public class ProtomekLocation extends Part {
         if (loc == Protomech.LOC_TORSO) {
             cost += 575000;
         }
-        return (long) Math.round(cost);
+        return Math.round(cost);
     }
 
     public boolean forQuad() {
@@ -176,7 +178,7 @@ public class ProtomekLocation extends Part {
 
     @Override
     public boolean isSameStatus(Part part) {
-        return super.isSameStatus(part) && this.getPercent() == ((ProtomekLocation)part).getPercent();
+        return super.isSameStatus(part) && getPercent() == ((ProtomekLocation)part).getPercent();
     }
 
     public double getPercent() {
@@ -579,7 +581,8 @@ public class ProtomekLocation extends Part {
         return super.getAllMods(tech);
     }
 
-    public String getDesc() {
+    @Override
+	public String getDesc() {
         if((!isBreached() && !isBlownOff()) || isSalvaging()) {
             return super.getDesc();
         }
@@ -629,7 +632,8 @@ public class ProtomekLocation extends Part {
         return skillType.equals(SkillType.S_TECH_MECH);
     }
 
-    public void doMaintenanceDamage(int d) {
+    @Override
+	public void doMaintenanceDamage(int d) {
         int points = unit.getEntity().getInternal(loc);
         points = Math.max(points -d, 1);
         unit.getEntity().setInternal(points, loc);

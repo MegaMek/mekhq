@@ -51,8 +51,8 @@ import mekhq.module.PersonnelMarketServiceManager;
 import mekhq.module.api.PersonnelMarketMethod;
 
 public class PersonnelMarket {
-	private ArrayList<Person> personnel = new ArrayList<Person>();
-	private Hashtable<UUID, Person> personnelIds = new Hashtable<UUID, Person>();
+	private ArrayList<Person> personnel = new ArrayList<>();
+	private Hashtable<UUID, Person> personnelIds = new Hashtable<>();
 	private PersonnelMarketMethod method;
 
 	public static final int TYPE_RANDOM = 0;
@@ -64,7 +64,7 @@ public class PersonnelMarket {
 
 	/* Used by AtB to track Units assigned to recruits; the key
 	 * is the person UUID. */
-	private Hashtable<UUID, Entity> attachedEntities = new Hashtable<UUID, Entity>();
+	private Hashtable<UUID, Entity> attachedEntities = new Hashtable<>();
 	/* Alternate types of rolls, set by PersonnelMarketDialog */
 	private boolean paidRecruitment = false;
 	private int paidRecruitType;
@@ -283,7 +283,7 @@ public class PersonnelMarket {
                         MekHQ.getLogger().log(PersonnelMarket.class, METHOD_NAME, LogLevel.ERROR,
                                 "Unable to load entity: " + ms.getSourceFile() + ": " //$NON-NLS-1$
                                         + ms.getEntryName() + ": " + ex.getMessage()); //$NON-NLS-1$
-                        MekHQ.getLogger().log(PersonnelMarket.class, METHOD_NAME, ex);
+                        MekHQ.getLogger().error(PersonnelMarket.class, METHOD_NAME, ex);
         			}
                     if (null != en) {
                     	retVal.attachedEntities.put(id, en);
@@ -308,7 +308,7 @@ public class PersonnelMarket {
         	// Errrr, apparently either the class name was invalid...
         	// Or the listed name doesn't exist.
         	// Doh!
-            MekHQ.getLogger().log(PersonnelMarket.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(PersonnelMarket.class, METHOD_NAME, ex);
         }
 
         // All personnel need the rank reference fixed

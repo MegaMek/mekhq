@@ -69,7 +69,8 @@ public class BattleArmorEquipmentPart extends EquipmentPart {
         this.trooper = trooper;
     }
 
-    public EquipmentPart clone() {
+    @Override
+	public EquipmentPart clone() {
         BattleArmorEquipmentPart clone = new BattleArmorEquipmentPart(getUnitTonnage(), type, equipmentNum, trooper, campaign);
         clone.copyBaseData(this);
         if(hasVariableTonnage(type)) {
@@ -257,7 +258,7 @@ public class BattleArmorEquipmentPart extends EquipmentPart {
     	for (Mounted m : unit.getEntity().getMisc()){
     		if (m.getType() instanceof MiscType && m.getType().hasFlag(MiscType.F_BA_MEA) &&
     				type instanceof MiscType && type.hasFlag(MiscType.F_BA_MANIPULATOR)
-    				&& this.getBaMountLocation()== m.getBaMountLoc()){
+    				&& getBaMountLocation()== m.getBaMountLoc()){
     			return true;
     		}
     		/*if (type instanceof InfantryWeapon &&
@@ -269,11 +270,13 @@ public class BattleArmorEquipmentPart extends EquipmentPart {
     	return false;
     }
 
-    public boolean needsMaintenance() {
+    @Override
+	public boolean needsMaintenance() {
         return false;
     }
     
-    public boolean canNeverScrap() {
+    @Override
+	public boolean canNeverScrap() {
     	return isModular();
 	}
 }

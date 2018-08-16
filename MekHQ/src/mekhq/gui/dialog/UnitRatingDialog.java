@@ -110,9 +110,10 @@ public class UnitRatingDialog extends JDialog implements ActionListener {
         return panel;
     }
 
-    public void actionPerformed(ActionEvent e) {
+    @Override
+	public void actionPerformed(ActionEvent e) {
         if (okayButton.equals(e.getSource())) {
-            this.setVisible(false);
+            setVisible(false);
         }
         if (aboutButton.equals(e.getSource())) {
             JOptionPane.showMessageDialog(this, rating.getHelpText(), "About Dragoons Rating", JOptionPane.INFORMATION_MESSAGE);

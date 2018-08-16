@@ -69,7 +69,8 @@ public class CampaignOpsReputation extends AbstractUnitRating {
         super(campaign);
     }
 
-    public UnitRatingMethod getUnitRatingMethod() {
+    @Override
+	public UnitRatingMethod getUnitRatingMethod() {
         return UnitRatingMethod.CAMPAIGN_OPS;
     }
     
@@ -431,7 +432,8 @@ public class CampaignOpsReputation extends AbstractUnitRating {
         return SkillType.getExperienceLevelName(SkillType.EXP_ELITE);
     }
 
-    public int getExperienceValue() {
+    @Override
+	public int getExperienceValue() {
         if (getNumberUnits().compareTo(BigDecimal.ZERO) == 0) {
             return 0;
         }
@@ -687,7 +689,8 @@ public class CampaignOpsReputation extends AbstractUnitRating {
         return BigDecimal.ZERO;
     }
 
-    public int getFinancialValue() {
+    @Override
+	public int getFinancialValue() {
         return getCampaign().getFinances().isInDebt() ? -10 : 0;
     }
 

@@ -53,10 +53,10 @@ public class MissingAeroLifeSupport extends MissingPart {
 	 public MissingAeroLifeSupport(int tonnage, long cost, boolean f, Campaign c) {
 		 super(tonnage, c);
 		 this.cost = cost;
-		 this.name = "Fighter Life Support";
-		 this.fighter = f;
+		 name = "Fighter Life Support";
+		 fighter = f;
 		 if(!fighter) {
-			 this.name = "Spacecraft Life Support";
+			 name = "Spacecraft Life Support";
 		 }
 	 }
 	 

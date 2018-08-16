@@ -66,6 +66,7 @@ import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
+import javax.swing.WindowConstants;
 import javax.swing.filechooser.FileFilter;
 import javax.xml.parsers.DocumentBuilder;
 
@@ -245,7 +246,7 @@ public class CampaignGUI extends JPanel {
         mainPanel.setOneTouchExpandable(false);
         logDialog.setVisible(true);
         refreshReport();
-        this.revalidate();
+        revalidate();
         this.repaint();
     }
 
@@ -255,7 +256,7 @@ public class CampaignGUI extends JPanel {
         mainPanel.setOneTouchExpandable(true);
         miDetachLog.setEnabled(true);
         miAttachLog.setEnabled(false);
-        this.revalidate();
+        revalidate();
         this.repaint();
     }
 
@@ -336,7 +337,7 @@ public class CampaignGUI extends JPanel {
         resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI", new EncodeControl()); //$NON-NLS-1$
 
         frame = new JFrame("MekHQ"); //$NON-NLS-1$
-        frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 
         tabMain = new JTabbedPane();
         tabMain.setToolTipText(resourceMap.getString("tabMain.toolTipText")); // NOI18N
@@ -1459,7 +1460,7 @@ public class CampaignGUI extends JPanel {
         if (!getCampaign().getCampaignOptions().checkMaintenance()) {
             return false;
         }
-        Vector<Unit> notMaintained = new Vector<Unit>();
+        Vector<Unit> notMaintained = new Vector<>();
         int totalAstechMinutesNeeded = 0;
         for (Unit u : getCampaign().getUnits()) {
             if (u.requiresMaintenance() && null == u.getTech()) {
@@ -1619,7 +1620,7 @@ public class CampaignGUI extends JPanel {
             MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, //$NON-NLS-1$
                     "Campaign saved to " + file); //$NON-NLS-1$
         } catch (Exception ex) {
-            MekHQ.getLogger().log(getClass(), METHOD_NAME, ex); //$NON-NLS-1$
+            MekHQ.getLogger().error(getClass(), METHOD_NAME, ex); //$NON-NLS-1$
             JOptionPane
                     .showMessageDialog(
                             getFrame(),
@@ -1782,7 +1783,7 @@ public class CampaignGUI extends JPanel {
         try {
             loadListFile(true);
         } catch (IOException ex) {
-            MekHQ.getLogger().log(getClass(), "miLoadForcesActionPerformed(ActionEvent)", ex);
+            MekHQ.getLogger().error(getClass(), "miLoadForcesActionPerformed(ActionEvent)", ex);
         }
     }// GEN-LAST:event_miLoadForcesActionPerformed
 
@@ -1790,7 +1791,7 @@ public class CampaignGUI extends JPanel {
         try {
             loadPlanetTSVFile();
         } catch (Exception ex) {
-            MekHQ.getLogger().log(getClass(), "miLoadPlanetsActionPerformed", ex);
+            MekHQ.getLogger().error(getClass(), "miLoadPlanetsActionPerformed", ex);
         }
     }
     
@@ -1798,7 +1799,7 @@ public class CampaignGUI extends JPanel {
         try {
             loadPersonFile();
         } catch (IOException ex) {
-            MekHQ.getLogger().log(getClass(), "miImportPersonActionPerformed(ActionEvent)", ex);
+            MekHQ.getLogger().error(getClass(), "miImportPersonActionPerformed(ActionEvent)", ex);
         }
     }// GEN-LAST:event_miImportPersonActionPerformed
 
@@ -1806,7 +1807,7 @@ public class CampaignGUI extends JPanel {
         try {
             savePersonFile();
         } catch (IOException ex) {
-            MekHQ.getLogger().log(getClass(), "miExportPersonActionPerformed(ActionEvent)", ex);
+            MekHQ.getLogger().error(getClass(), "miExportPersonActionPerformed(ActionEvent)", ex);
         }
     }// GEN-LAST:event_miExportPersonActionPerformed
 
@@ -1814,7 +1815,7 @@ public class CampaignGUI extends JPanel {
         try {
             saveOptionsFile("xml", resourceMap.getString("dlgSaveCampaignXML.text"), getCampaign().getName() + getCampaign().getShortDateAsString() + "_ExportedCampaignSettings");
         } catch (IOException ex) {
-            MekHQ.getLogger().log(getClass(), "miExportOptionsActionPerformed(ActionEvent)", ex);
+            MekHQ.getLogger().error(getClass(), "miExportOptionsActionPerformed(ActionEvent)", ex);
         }
     }// GEN-LAST:event_miExportPersonActionPerformed
 
@@ -1822,7 +1823,7 @@ public class CampaignGUI extends JPanel {
         try {
             exportPlanets("xml", resourceMap.getString("dlgSavePlanetsXML.text"), getCampaign().getName() + getCampaign().getShortDateAsString() + "_ExportedPlanets");
         } catch (Exception ex) {
-            MekHQ.getLogger().log(getClass(), "miExportOptionsActionPerformed(ActionEvent)", ex);
+            MekHQ.getLogger().error(getClass(), "miExportOptionsActionPerformed(ActionEvent)", ex);
         }
     }
     
@@ -1830,7 +1831,7 @@ public class CampaignGUI extends JPanel {
         try {
             exportFinances("csv", resourceMap.getString("dlgSaveFinancesCSV.text"), getCampaign().getName() + getCampaign().getShortDateAsString() + "_ExportedFinances");
         } catch (Exception ex) {
-            MekHQ.getLogger().log(getClass(), "miExportOptionsActionPerformed(ActionEvent)", ex);
+            MekHQ.getLogger().error(getClass(), "miExportOptionsActionPerformed(ActionEvent)", ex);
         }
     }
     
@@ -1838,7 +1839,7 @@ public class CampaignGUI extends JPanel {
         try {
             exportPersonnel("csv", resourceMap.getString("dlgSavePersonnelCSV.text"), getCampaign().getName() + getCampaign().getShortDateAsString() + "_ExportedPersonnel");
         } catch (Exception ex) {
-            MekHQ.getLogger().log(getClass(), "miExportOptionsActionPerformed(ActionEvent)", ex);
+            MekHQ.getLogger().error(getClass(), "miExportOptionsActionPerformed(ActionEvent)", ex);
         }
     }
     
@@ -1846,7 +1847,7 @@ public class CampaignGUI extends JPanel {
         try {
             exportUnits("csv", resourceMap.getString("dlgSaveUnitsCSV.text"), getCampaign().getName() + getCampaign().getShortDateAsString() + "_ExportedUnits");
         } catch (Exception ex) {
-            MekHQ.getLogger().log(getClass(), "miExportOptionsActionPerformed(ActionEvent)", ex);
+            MekHQ.getLogger().error(getClass(), "miExportOptionsActionPerformed(ActionEvent)", ex);
         }
     }
     
@@ -1854,7 +1855,7 @@ public class CampaignGUI extends JPanel {
         try {
             loadOptionsFile();
         } catch (IOException ex) {
-            MekHQ.getLogger().log(getClass(), "miImportOptionsActionPerformed(ActionEvent)", ex);
+            MekHQ.getLogger().error(getClass(), "miImportOptionsActionPerformed(ActionEvent)", ex);
         }
     }// GEN-LAST:event_miExportPersonActionPerformed
 
@@ -1862,7 +1863,7 @@ public class CampaignGUI extends JPanel {
         try {
             loadPartsFile();
         } catch (IOException ex) {
-            MekHQ.getLogger().log(getClass(), "miImportPartsActionPerformed(ActionEvent)", ex);
+            MekHQ.getLogger().error(getClass(), "miImportPartsActionPerformed(ActionEvent)", ex);
         }
     }// GEN-LAST:event_miImportPersonActionPerformed
 
@@ -1870,7 +1871,7 @@ public class CampaignGUI extends JPanel {
         try {
             savePartsFile();
         } catch (IOException ex) {
-            MekHQ.getLogger().log(getClass(), "miExportPartsActionPerformed(ActionEvent)", ex);
+            MekHQ.getLogger().error(getClass(), "miExportPartsActionPerformed(ActionEvent)", ex);
         }
     }// GEN-LAST:event_miExportPersonActionPerformed
 
@@ -1907,7 +1908,7 @@ public class CampaignGUI extends JPanel {
             r.setTeamId(engineer.getId());
         } else if (getCampaign().getTechs().size() > 0) {
             String name;
-            HashMap<String, Person> techHash = new HashMap<String, Person>();
+            HashMap<String, Person> techHash = new HashMap<>();
             String skillLvl = "Unknown";
             int TimePerDay = 0;
             for (Person tech : getCampaign().getTechs()) {
@@ -2051,7 +2052,7 @@ public class CampaignGUI extends JPanel {
      */
     public @Nullable UUID selectTech(Unit u, String desc, boolean ignoreMaintenance) {
         String name;
-        HashMap<String, Person> techHash = new HashMap<String, Person>();
+        HashMap<String, Person> techHash = new HashMap<>();
         for (Person tech : getCampaign().getTechs()) {
             if (tech.canTech(u.getEntity()) && !tech.isMothballing()) {
                 int time = tech.getMinutesLeft();
@@ -2390,7 +2391,7 @@ public class CampaignGUI extends JPanel {
                 // Parse using builder to get DOM representation of the XML file
                 xmlDoc = db.parse(fis);
             } catch (Exception ex) {
-                MekHQ.getLogger().log(getClass(), METHOD_NAME, ex); //$NON-NLS-1$
+                MekHQ.getLogger().error(getClass(), METHOD_NAME, ex); //$NON-NLS-1$
             }
 
             Element personnelEle = xmlDoc.getDocumentElement();
@@ -2548,7 +2549,7 @@ public class CampaignGUI extends JPanel {
             MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, //$NON-NLS-1$
                     "Personnel saved to " + file); //$NON-NLS-1$
         } catch (Exception ex) {
-            MekHQ.getLogger().log(getClass(), METHOD_NAME, ex); //$NON-NLS-1$
+            MekHQ.getLogger().error(getClass(), METHOD_NAME, ex); //$NON-NLS-1$
             JOptionPane
                     .showMessageDialog(
                             getFrame(),
@@ -2622,7 +2623,7 @@ public class CampaignGUI extends JPanel {
             MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, //$NON-NLS-1$
                     "Campaign Options saved saved to " + file); //$NON-NLS-1$
         } catch (Exception ex) {
-            MekHQ.getLogger().log(getClass(), METHOD_NAME, ex); //$NON-NLS-1$
+            MekHQ.getLogger().error(getClass(), METHOD_NAME, ex); //$NON-NLS-1$
             JOptionPane
                     .showMessageDialog(
                             getFrame(),
@@ -2681,7 +2682,7 @@ public class CampaignGUI extends JPanel {
                 // Parse using builder to get DOM representation of the XML file
                 xmlDoc = db.parse(fis);
             } catch (Exception ex) {
-                MekHQ.getLogger().log(getClass(), METHOD_NAME, ex); //$NON-NLS-1$
+                MekHQ.getLogger().error(getClass(), METHOD_NAME, ex); //$NON-NLS-1$
             }
 
             Element partsEle = xmlDoc.getDocumentElement();
@@ -2771,7 +2772,7 @@ public class CampaignGUI extends JPanel {
                 // Parse using builder to get DOM representation of the XML file
                 xmlDoc = db.parse(fis);
             } catch (Exception ex) {
-                MekHQ.getLogger().log(getClass(), METHOD_NAME, ex); //$NON-NLS-1$
+                MekHQ.getLogger().error(getClass(), METHOD_NAME, ex); //$NON-NLS-1$
             }
 
             Element partsEle = xmlDoc.getDocumentElement();
@@ -2863,10 +2864,10 @@ public class CampaignGUI extends JPanel {
             }
 
             if (null != options) {
-                this.getCampaign().setCampaignOptions(options);
+                getCampaign().setCampaignOptions(options);
             }
             if (null != rsp) {
-                this.getCampaign().setRandomSkillPreferences(rsp);
+                getCampaign().setRandomSkillPreferences(rsp);
             }
 
             MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, //$NON-NLS-1$
@@ -2980,7 +2981,7 @@ public class CampaignGUI extends JPanel {
                 MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, //$NON-NLS-1$
                         "Parts saved to " + file); //$NON-NLS-1$
 	        } catch (Exception ex) {
-                MekHQ.getLogger().log(getClass(), METHOD_NAME, ex); //$NON-NLS-1$
+                MekHQ.getLogger().error(getClass(), METHOD_NAME, ex); //$NON-NLS-1$
 	            JOptionPane
 	                    .showMessageDialog(
 	                            getFrame(),

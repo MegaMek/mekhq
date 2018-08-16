@@ -74,7 +74,7 @@ public class EditPersonnelInjuriesDialog extends JDialog {
     /** Creates new form EditPersonnelInjuriesDialog */
     public EditPersonnelInjuriesDialog(Frame parent, boolean modal, Campaign c, Person p) {
         super(parent, modal);
-        this.frame = parent;
+        frame = parent;
         //campaign = c;
         person = p;
         injuries = p.getInjuries();
@@ -171,7 +171,7 @@ public class EditPersonnelInjuriesDialog extends JDialog {
 
     
     private void btnOKActionPerformed(ActionEvent evt) {//GEN-FIRST:event_btnHireActionPerformed
-        this.setVisible(false);
+        setVisible(false);
     }
     
     private void injuriesTableValueChanged(ListSelectionEvent evt) {
@@ -281,7 +281,7 @@ public class EditPersonnelInjuriesDialog extends JDialog {
             if(data.isEmpty()) {
                 return "";
             } else {
-                entry = (Injury)data.get(row);
+                entry = data.get(row);
             }
             if(col == COL_DAYS) {
                 return Integer.toString(entry.getTime());
@@ -321,7 +321,7 @@ public class EditPersonnelInjuriesDialog extends JDialog {
         }
 
         public Injury getEntryAt(int row) {
-            return (Injury) data.get(row);
+            return data.get(row);
         }
         
          public int getColumnWidth(int c) {

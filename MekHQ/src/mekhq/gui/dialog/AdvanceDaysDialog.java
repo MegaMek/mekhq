@@ -50,8 +50,8 @@ public class AdvanceDaysDialog extends JDialog implements ActionListener {
         this.listener = listener;
         setName("formADD"); // NOI18N
         getContentPane().setLayout(new java.awt.GridBagLayout());
-        this.setPreferredSize(new Dimension(500,500));
-        this.setMinimumSize(new Dimension(500,500));
+        setPreferredSize(new Dimension(500,500));
+        setMinimumSize(new Dimension(500,500));
         initComponents();
         setLocationRelativeTo(owner);
     }
@@ -61,7 +61,7 @@ public class AdvanceDaysDialog extends JDialog implements ActionListener {
         
         resourceMap = ResourceBundle.getBundle("mekhq.resources.AdvanceDaysDialog", new EncodeControl()); //$NON-NLS-1$
 
-        this.setTitle(resourceMap.getString("dlgTitle.text"));
+        setTitle(resourceMap.getString("dlgTitle.text"));
         lblDays = new JLabel(resourceMap.getString("dlgDays.text"));
         pnlNumDays = new JPanel();
         spnDays = new JSpinner(new SpinnerNumberModel(7, 1, 365, 1));

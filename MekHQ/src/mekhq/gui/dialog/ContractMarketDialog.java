@@ -121,7 +121,7 @@ public class ContractMarketDialog extends JDialog {
 		super(frame, true);
 		campaign = c;
 		contractMarket = c.getContractMarket();
-		possibleRetainerContracts = new ArrayList<String>();
+		possibleRetainerContracts = new ArrayList<>();
 		if (c.getFactionCode().equals("MERC")) {
 			countSuccessfulContracts();
 		}
@@ -134,7 +134,7 @@ public class ContractMarketDialog extends JDialog {
 	 * employer results in the offer of a retainer contract.
 	 */
 	private void countSuccessfulContracts() {
-		HashMap<String, Integer> successfulContracts = new HashMap<String, Integer>();
+		HashMap<String, Integer> successfulContracts = new HashMap<>();
 		for (Mission m : campaign.getMissions()) {
 			if (m.isActive() || !(m instanceof AtBContract) ||
 					((AtBContract)m).getEmployerCode().equals(campaign.getRetainerEmployerCode())) {
@@ -172,6 +172,7 @@ public class ContractMarketDialog extends JDialog {
 
 		chkMRBC = new JCheckBox();
 		chkMRBC.addItemListener(new ItemListener() {
+			@Override
 			public void itemStateChanged(ItemEvent arg0) {
 				payMRBC = chkMRBC.isSelected();
 				for (Contract c : contractMarket.getContracts()) {
@@ -186,6 +187,7 @@ public class ContractMarketDialog extends JDialog {
 		lblAdvance = new JLabel();
 		spnAdvance = new JSpinner(new SpinnerNumberModel(advance, 0, 25, 5));
 		spnAdvance.addChangeListener(new ChangeListener() {
+			@Override
 			public void stateChanged(ChangeEvent arg0) {
 				advance = (Integer)spnAdvance.getValue();
 				for (Contract c : contractMarket.getContracts()) {
@@ -200,6 +202,7 @@ public class ContractMarketDialog extends JDialog {
 		lblSigningBonus = new JLabel();
 		spnSigningBonus = new JSpinner(new SpinnerNumberModel(signingBonus, 0, 10, 1));
 		spnSigningBonus.addChangeListener(new ChangeListener() {
+			@Override
 			public void stateChanged(ChangeEvent arg0) {
 				signingBonus = (Integer)spnSigningBonus.getValue();
 				for (Contract c : contractMarket.getContracts()) {
@@ -215,6 +218,7 @@ public class ContractMarketDialog extends JDialog {
 		lblSharePct = new JLabel();
 		spnSharePct = new JSpinner(new SpinnerNumberModel(sharePct, 20, 50, 10));		
 		spnSharePct.addChangeListener(new ChangeListener() {
+			@Override
 			public void stateChanged(ChangeEvent arg0) {
 				sharePct = (Integer)spnSharePct.getValue();
 				for (Contract c : contractMarket.getContracts()) {
@@ -267,8 +271,8 @@ public class ContractMarketDialog extends JDialog {
 			panelFees.add(spnSharePct);
 		}
 
-		Vector<Vector<String>> data = new Vector<Vector<String>>();
-		Vector<String> colNames = new Vector<String>();
+		Vector<Vector<String>> data = new Vector<>();
+		Vector<String> colNames = new Vector<>();
 		for (Contract c : contractMarket.getContracts()) {
 			/* Changes in rating or force size since creation can alter some
 			 * details
@@ -286,7 +290,7 @@ public class ContractMarketDialog extends JDialog {
 			c.setSigningBonusPct(signingBonus);
 			
 			c.calculateContract(campaign);
-			Vector<String> row = new Vector<String>();
+			Vector<String> row = new Vector<>();
 			if (c instanceof AtBContract) {
 				row.add(((AtBContract)c).getEmployerName(campaign.getGameYear()));
 				row.add(((AtBContract)c).getEnemyName(campaign.getGameYear()));
@@ -311,6 +315,7 @@ public class ContractMarketDialog extends JDialog {
 		tblContracts.createDefaultColumnsFromModel();
 		tblContracts.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
 		tblContracts.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+			@Override
 			public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
 				if (!evt.getValueIsAdjusting()) {
 					contractChanged();
@@ -410,7 +415,8 @@ public class ContractMarketDialog extends JDialog {
         btnGenerate.setText(resourceMap.getString("btnGenerate.text"));
         btnGenerate.setName("btnGenerate"); // NOI18N
         btnGenerate.addActionListener(new java.awt.event.ActionListener() {
-        	public void actionPerformed(java.awt.event.ActionEvent evt) {
+        	@Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
         		AtBContract c = contractMarket.addAtBContract(campaign);
         		
         		if(c == null) {
@@ -428,10 +434,10 @@ public class ContractMarketDialog extends JDialog {
         		c.setSigningBonusPct(signingBonus);
 
         		c.calculateContract(campaign);
-        		Vector<String> row = new Vector<String>();
-        		row.add(((AtBContract)c).getEmployerName(campaign.getGameYear()));
-        		row.add(((AtBContract)c).getEnemyName(campaign.getGameYear()));
-        		row.add(((AtBContract)c).getMissionTypeName());
+        		Vector<String> row = new Vector<>();
+        		row.add(c.getEmployerName(campaign.getGameYear()));
+        		row.add(c.getEnemyName(campaign.getGameYear()));
+        		row.add(c.getMissionTypeName());
 
         		((DefaultTableModel)tblContracts.getModel()).addRow(row);
         	}
@@ -442,7 +448,8 @@ public class ContractMarketDialog extends JDialog {
         btnRemove.setText(resourceMap.getString("btnRemove.text"));
         btnRemove.setName("btnRemove"); // NOI18N
         btnRemove.addActionListener(new java.awt.event.ActionListener() {
-        	public void actionPerformed(java.awt.event.ActionEvent evt) {
+        	@Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
     	    	contractMarket.removeContract(selectedContract);
     	    	((DefaultTableModel)tblContracts.getModel()).removeRow(tblContracts.convertRowIndexToModel(tblContracts.getSelectedRow()));
         	}
@@ -452,7 +459,8 @@ public class ContractMarketDialog extends JDialog {
         btnAccept.setText(resourceMap.getString("btnAccept.text"));
         btnAccept.setName("btnAccept"); // NOI18N
         btnAccept.addActionListener(new java.awt.event.ActionListener() {
-        	public void actionPerformed(java.awt.event.ActionEvent evt) {
+        	@Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
         		acceptContract(evt);
         	}
         });
@@ -461,7 +469,8 @@ public class ContractMarketDialog extends JDialog {
         btnClose.setText(resourceMap.getString("btnClose.text")); // NOI18N
         btnClose.setName("btnClose"); // NOI18N
         btnClose.addActionListener(new java.awt.event.ActionListener() {
-        	public void actionPerformed(java.awt.event.ActionEvent evt) {
+        	@Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
         		btnCloseActionPerformed(evt);
         	}
         });
@@ -524,7 +533,8 @@ public class ContractMarketDialog extends JDialog {
  		//This odd code is to make sure that the scrollbar stays at the top
  		//I cant just call it here, because it ends up getting reset somewhere later
  		javax.swing.SwingUtilities.invokeLater(new Runnable() {
- 			public void run() { 
+ 			@Override
+			public void run() { 
  				scrollContractView.getVerticalScrollBar().setValue(0);
  			}
  		});

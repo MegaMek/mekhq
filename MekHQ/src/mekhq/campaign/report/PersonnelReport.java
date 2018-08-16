@@ -42,7 +42,8 @@ public class PersonnelReport extends Report {
         super(c);
     }
     
-    public String getTitle() {
+    @Override
+	public String getTitle() {
         return "Personnel Report";
     }
     
@@ -62,7 +63,8 @@ public class PersonnelReport extends Report {
         return txtSupport;
     }
       
-    public JTextPane getReport() {
+    @Override
+	public JTextPane getReport() {
         // SplitPane them
         JSplitPane splitOverviewPersonnel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, getCombatPersonnelReport(), getSupportPersonnelReport());
 		splitOverviewPersonnel.setName("splitOverviewPersonnel");

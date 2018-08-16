@@ -60,12 +60,13 @@ public class TankLocation extends Part {
     	this(0, 0, null);
     }
     
-    public TankLocation clone() {
+    @Override
+	public TankLocation clone() {
     	TankLocation clone = new TankLocation(loc, getUnitTonnage(), campaign);
         clone.copyBaseData(this);
-    	clone.loc = this.loc;
-    	clone.damage = this.damage;
-    	clone.breached = this.breached;
+    	clone.loc = loc;
+    	clone.damage = damage;
+    	clone.breached = breached;
     	return clone;
     }
     
@@ -76,21 +77,21 @@ public class TankLocation extends Part {
     public TankLocation(int loc, int tonnage, Campaign c) {
         super(tonnage, c);
         this.loc = loc;
-        this.damage = 0;
-        this.breached = false;
-        this.name = "Tank Location";
+        damage = 0;
+        breached = false;
+        name = "Tank Location";
         switch(loc) {
             case(Tank.LOC_FRONT):
-                this.name = "Vehicle Front";
+                name = "Vehicle Front";
                 break;
             case(Tank.LOC_LEFT):
-                this.name = "Vehicle Left Side";
+                name = "Vehicle Left Side";
                 break;
             case(Tank.LOC_RIGHT):
-                this.name = "Vehicle Right Side";
+                name = "Vehicle Right Side";
                 break;
             case(Tank.LOC_REAR):
-                this.name = "Vehicle Rear";
+                name = "Vehicle Rear";
                 break;
         }
         computeCost();
@@ -109,7 +110,7 @@ public class TankLocation extends Part {
     
     @Override
     public boolean isSameStatus(Part part) {
-    	return super.isSameStatus(part) && this.getDamage() == ((TankLocation)part).getDamage();
+    	return super.isSameStatus(part) && getDamage() == ((TankLocation)part).getDamage();
     }
 
     public int getDamage() {
@@ -314,7 +315,8 @@ public class TankLocation extends Part {
 		 return skillType.equals(SkillType.S_TECH_MECHANIC);
 	 }
 	 
-	 public void doMaintenanceDamage(int d) {
+	 @Override
+	public void doMaintenanceDamage(int d) {
          int points = unit.getEntity().getInternal(loc);
          points = Math.max(points -d, 1);
          unit.getEntity().setInternal(points, loc);

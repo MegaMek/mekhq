@@ -67,10 +67,10 @@ public class CurrentLocation implements Serializable {
 	}
 	
 	public CurrentLocation(Planet planet, double time) {
-		this.currentPlanet = planet;
-		this.transitTime = time;
-		this.rechargeTime = 0.0;
-		this.transitTime = 0.0;
+		currentPlanet = planet;
+		transitTime = time;
+		rechargeTime = 0.0;
+		transitTime = 0.0;
 	}
 	
 	public void setCurrentPlanet(Planet p) {
@@ -262,7 +262,7 @@ public class CurrentLocation implements Serializable {
 			// Errrr, apparently either the class name was invalid...
 			// Or the listed name doesn't exist.
 			// Doh!
-            MekHQ.getLogger().log(CurrentLocation.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(CurrentLocation.class, METHOD_NAME, ex);
 		}
 
 		return retVal;

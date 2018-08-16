@@ -79,13 +79,13 @@ public class MissingEquipmentPart extends MissingPart {
         // on which it would have a different price (only tonnage is taken into
         // account for compatibility)
         super(tonnage, c);
-        this.type =et;
+        type =et;
         if(null != type) {
-        	this.name = type.getName();
-        	this.typeName = type.getInternalName();
+        	name = type.getName();
+        	typeName = type.getInternalName();
         }
-        this.equipmentNum = equipNum;
-        this.equipTonnage = eTonnage;
+        equipmentNum = equipNum;
+        equipTonnage = eTonnage;
         this.omniPodded = omniPodded;
     }
 
@@ -289,6 +289,7 @@ public class MissingEquipmentPart extends MissingPart {
 	}
 */
 
+	@Override
 	public int getLocation() {
     	if(null != unit) {
     		Mounted mounted = unit.getEntity().getEquipment(equipmentNum);

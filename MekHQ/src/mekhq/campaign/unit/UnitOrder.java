@@ -35,7 +35,6 @@ import megamek.common.ConvFighter;
 import megamek.common.Entity;
 import megamek.common.EntityMovementMode;
 import megamek.common.EntityWeightClass;
-import megamek.common.EquipmentType;
 import megamek.common.ITechnology;
 import megamek.common.Infantry;
 import megamek.common.Mech;
@@ -182,7 +181,7 @@ public class UnitOrder extends Unit implements IAcquisitionWork, MekHqXmlSeriali
 
     @Override
     public void resetDaysToWait() {
-        this.daysToWait = campaign.getCampaignOptions().getWaitingPeriod();
+        daysToWait = campaign.getCampaignOptions().getWaitingPeriod();
     }
 
     @Override
@@ -303,7 +302,7 @@ public class UnitOrder extends Unit implements IAcquisitionWork, MekHqXmlSeriali
         //parts need to be initialized for this to work
         int avail = getAvailability();
         if(this.isExtinctIn(campaign.getCalendar().get(Calendar.YEAR))) {
-        	avail = EquipmentType.RATING_X;
+        	avail = ITechnology.RATING_X;
         }
         int availabilityMod = Availability.getAvailabilityModifier(avail);
         target.addModifier(availabilityMod, "availability (" + ITechnology.getRatingName(avail) + ")");      
@@ -339,7 +338,8 @@ public class UnitOrder extends Unit implements IAcquisitionWork, MekHqXmlSeriali
     /*
      * Don't need as much info as unit to re-create
      */
-    public void writeToXml(PrintWriter pw1, int indentLvl) {
+    @Override
+	public void writeToXml(PrintWriter pw1, int indentLvl) {
         pw1.println(MekHqXmlUtil.indentStr(indentLvl) + "<unitOrder>");
 
         pw1.println(MekHqXmlUtil.writeEntityToXmlString(getEntity(), indentLvl+1, campaign.getEntities()));
@@ -376,7 +376,7 @@ public class UnitOrder extends Unit implements IAcquisitionWork, MekHqXmlSeriali
             }
         } catch (Exception ex) {
             // Doh!
-            MekHQ.getLogger().log(UnitOrder.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(UnitOrder.class, METHOD_NAME, ex);
         }
         
         retVal.initializeParts(false);
@@ -397,7 +397,8 @@ public class UnitOrder extends Unit implements IAcquisitionWork, MekHqXmlSeriali
     /**
      * @return TechConstants tech level
      */
-    public int getTechLevel() {
+    @Override
+	public int getTechLevel() {
         return getSimpleTechLevel().getCompoundTechLevel(campaign.getFaction().isClan());
     }
 }

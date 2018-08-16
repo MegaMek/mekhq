@@ -51,13 +51,13 @@ import megamek.common.Compute;
 import megamek.common.Crew;
 import megamek.common.Entity;
 import megamek.common.EntityWeightClass;
+import megamek.common.IPlayer;
 import megamek.common.IStartingPositions;
 import megamek.common.Mech;
 import megamek.common.MechFileParser;
 import megamek.common.MechSummary;
 import megamek.common.MechSummaryCache;
 import megamek.common.PlanetaryConditions;
-import megamek.common.Player;
 import megamek.common.UnitType;
 import megamek.common.logging.LogLevel;
 import megamek.common.util.EncodeControl;
@@ -234,13 +234,13 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         super();
         lanceForceId = -1;
         lanceRole = Lance.ROLE_UNASSIGNED;
-        alliesPlayer = new ArrayList<Entity>();
-        botForces = new ArrayList<BotForce>();
-        alliesPlayerStub = new ArrayList<String>();
-        botForceStubs = new ArrayList<BotForceStub>();
-        attachedUnitIds = new ArrayList<UUID>();
-        survivalBonus = new ArrayList<UUID>();
-        entityIds = new HashMap<UUID, Entity>();
+        alliesPlayer = new ArrayList<>();
+        botForces = new ArrayList<>();
+        alliesPlayerStub = new ArrayList<>();
+        botForceStubs = new ArrayList<>();
+        attachedUnitIds = new ArrayList<>();
+        survivalBonus = new ArrayList<>();
+        entityIds = new HashMap<>();
 
         light = PlanetaryConditions.L_DAY;
         weather = PlanetaryConditions.WE_NONE;
@@ -256,19 +256,19 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     public void initialize(Campaign c, Lance lance, boolean attacker, Date date) {
         this.attacker = attacker;
 
-        alliesPlayer = new ArrayList<Entity>();
-        botForces = new ArrayList<BotForce>();
-        alliesPlayerStub = new ArrayList<String>();
-        botForceStubs = new ArrayList<BotForceStub>();
-        attachedUnitIds = new ArrayList<UUID>();
-        survivalBonus = new ArrayList<UUID>();
-        entityIds = new HashMap<UUID, Entity>();
+        alliesPlayer = new ArrayList<>();
+        botForces = new ArrayList<>();
+        alliesPlayerStub = new ArrayList<>();
+        botForceStubs = new ArrayList<>();
+        attachedUnitIds = new ArrayList<>();
+        survivalBonus = new ArrayList<>();
+        entityIds = new HashMap<>();
 
         if (null == lance) {
             lanceForceId = -1;
             lanceRole = Lance.ROLE_UNASSIGNED;
         } else {
-            this.lanceForceId = lance.getForceId();
+            lanceForceId = lance.getForceId();
             lanceRole = lance.getRole();
             setMissionId(lance.getMissionId());
 
@@ -704,7 +704,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         }
 
         /* The allyBot list will be passed to the BotForce constructor */
-        ArrayList<Entity> allyEntities = new ArrayList<Entity>();
+        ArrayList<Entity> allyEntities = new ArrayList<>();
         for (int i = 0; i < numAttachedBot; i++) {
             Entity en = getEntity(getContract(campaign).getEmployerCode(),
                     getContract(campaign).getAllySkill(), getContract(campaign).getAllyQuality(),
@@ -717,7 +717,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             }
         }
 
-        ArrayList<Entity> enemyEntities = new ArrayList<Entity>();
+        ArrayList<Entity> enemyEntities = new ArrayList<>();
         
         setExtraMissionForces(campaign, allyEntities, enemyEntities);
         addAeroReinforcements(campaign);
@@ -726,7 +726,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         /* Possible enemy reinforcements */
         int roll = Compute.d6();
         if (roll > 3) {
-            ArrayList<Entity> reinforcements = new ArrayList<Entity>();
+            ArrayList<Entity> reinforcements = new ArrayList<>();
             if (roll == 6) {
                 addLance(reinforcements, getContract(campaign).getEnemyCode(),
                     getContract(campaign).getEnemySkill(), getContract(campaign).getEnemyQuality(),
@@ -826,7 +826,8 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         addBotForce(getEnemyBotForce(getContract(campaign), enemyHome, enemyHome, enemyEntities));
 	}
     
-    public boolean canAddDropShips() {
+    @Override
+	public boolean canAddDropShips() {
     	return false;
     }
     
@@ -838,10 +839,10 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
      */
     private void setSpecialMissionForces(Campaign campaign) {
         //enemy must always be the first on the botforce list so we can find it on refresh()
-        specMissionEnemies = new ArrayList<ArrayList<Entity>>();
+        specMissionEnemies = new ArrayList<>();
         
-        ArrayList<Entity> enemyEntities = new ArrayList<Entity>();
-        ArrayList<Entity> allyEntities = new ArrayList<Entity>();
+        ArrayList<Entity> enemyEntities = new ArrayList<>();
+        ArrayList<Entity> allyEntities = new ArrayList<>();
         
         setExtraMissionForces(campaign, allyEntities, enemyEntities);
     }
@@ -857,12 +858,12 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
      * @param campaign
      */
     private void setBigBattleForces(Campaign campaign) {
-        ArrayList<Entity> enemyEntities = new ArrayList<Entity>();
-        ArrayList<Entity> allyEntities = new ArrayList<Entity>();
+        ArrayList<Entity> enemyEntities = new ArrayList<>();
+        ArrayList<Entity> allyEntities = new ArrayList<>();
         
         setExtraMissionForces(campaign, allyEntities, enemyEntities);
         
-        bigBattleAllies = new ArrayList<Entity>();
+        bigBattleAllies = new ArrayList<>();
         
         for (Entity en : alliesPlayer) {
             bigBattleAllies.add(en);
@@ -980,7 +981,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             en = null;
             MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
                     "Unable to load entity: " + ms.getSourceFile() + ": " + ms.getEntryName() + ": " + ex.getMessage()); //$NON-NLS-1$
-            MekHQ.getLogger().log(getClass(), METHOD_NAME, ex);
+            MekHQ.getLogger().error(getClass(), METHOD_NAME, ex);
             return null;
         }
 
@@ -1065,7 +1066,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         } catch (Exception ex) {
             MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
                     "Unable to load unit: " + name); //$NON-NLS-1$
-            MekHQ.getLogger().log(getClass(), METHOD_NAME, ex);
+            MekHQ.getLogger().error(getClass(), METHOD_NAME, ex);
         }
         if (mechFileParser == null) {
             return null;
@@ -1492,7 +1493,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         boolean spawnAerotech = !opForOwnsPlanet && Compute.d6() > 
                 CampaignOptions.MAXIMUM_D6_VALUE - campaign.getCampaignOptions().getOpforAeroChance() / 2;   
         
-        ArrayList<Entity> aircraft = new ArrayList<Entity>();
+        ArrayList<Entity> aircraft = new ArrayList<>();
         if (spawnConventional) {
             // skill level is 0-4 where 0 is "ultra-green" and 4 is "elite badass"
             for(int unitCount = 0; unitCount <= campaign.getCampaignOptions().getSkillLevel(); unitCount++) {
@@ -1552,7 +1553,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         boolean isTurretAppropriateTerrain = (terrainType == TER_HEAVYURBAN) || (terrainType == TER_LIGHTURBAN);
         boolean isInfantryAppropriateTerrain = isTurretAppropriateTerrain || terrainType == TER_WOODED;
         
-        ArrayList<Entity> scrubs = new ArrayList<Entity>();
+        ArrayList<Entity> scrubs = new ArrayList<>();
         // don't bother spawning turrets if there won't be anything to put them on
         if (spawnTurrets && isTurretAppropriateTerrain) {
             // skill level is 0-4 where 0 is "ultra-green" and 4 is "elite badass" and drives the number of extra units
@@ -1617,7 +1618,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     }
 	
 	public ArrayList<String> generateEntityStub(ArrayList<Entity> entities) {
-        ArrayList<String> stub = new ArrayList<String>();
+        ArrayList<String> stub = new ArrayList<>();
         for (Entity en : entities) {
             if (null == en) {
                 stub.add("<html><font color='red'>No random assignment table found for faction</font></html>");
@@ -1879,7 +1880,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                         } catch (Exception e) {
                             MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
                                     "Error loading allied unit in scenario"); //$NON-NLS-1$
-                            MekHQ.getLogger().log(getClass(), METHOD_NAME, e);
+                            MekHQ.getLogger().error(getClass(), METHOD_NAME, e);
                         }
                         if (en != null) {
                             alliesPlayer.add(en);
@@ -1888,7 +1889,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                     }
                 }
             } else if (wn2.getNodeName().equalsIgnoreCase("bigBattleAllies")) {
-                bigBattleAllies = new ArrayList<Entity>();
+                bigBattleAllies = new ArrayList<>();
                 NodeList nl2 = wn2.getChildNodes();
                 for (int i = 0; i < nl2.getLength(); i++) {
                     Node wn3 = nl2.item(i);
@@ -1903,7 +1904,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                         } catch (Exception e) {
                             MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
                                     "Error loading allied unit in scenario"); //$NON-NLS-1$
-                            MekHQ.getLogger().log(getClass(), METHOD_NAME, e);
+                            MekHQ.getLogger().error(getClass(), METHOD_NAME, e);
                         }
                         if (en != null) {
                             bigBattleAllies.add(en);
@@ -1912,7 +1913,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                     }
                 }
             } else if (wn2.getNodeName().equalsIgnoreCase("specMissionEnemies")) {
-                specMissionEnemies = new ArrayList<ArrayList<Entity>>();
+                specMissionEnemies = new ArrayList<>();
                 for (int i = 0; i < 4; i++) {
                     specMissionEnemies.add(new ArrayList<Entity>());
                 }
@@ -1935,7 +1936,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                                 } catch (Exception e) {
                                     MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
                                             "Error loading allied unit in scenario"); //$NON-NLS-1$
-                                    MekHQ.getLogger().log(getClass(), METHOD_NAME, e);
+                                    MekHQ.getLogger().error(getClass(), METHOD_NAME, e);
                                 }
                                 if (null != en) {
                                     specMissionEnemies.get(weightClass).add(en);
@@ -1952,7 +1953,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 } catch (Exception e) {
                     MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
                             "Error loading allied unit in scenario"); //$NON-NLS-1$
-                    MekHQ.getLogger().log(getClass(), METHOD_NAME, e);
+                    MekHQ.getLogger().error(getClass(), METHOD_NAME, e);
                     bf = null;
                 }
                 if (null != bf) {
@@ -1980,7 +1981,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
          * remove the entry from the list of entities that give survival bonuses
          * to avoid an critical error that prevents battle resolution.
          */
-        ArrayList<UUID> toRemove = new ArrayList<UUID>();
+        ArrayList<UUID> toRemove = new ArrayList<>();
         for (UUID uid : survivalBonus) {
             if (!entityIds.containsKey(uid)) {
                 toRemove.add(uid);
@@ -1990,7 +1991,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     }
 
     private ArrayList<String> getEntityStub(Node wn) {
-        ArrayList<String> stub = new ArrayList<String>();
+        ArrayList<String> stub = new ArrayList<>();
         NodeList nl = wn.getChildNodes();
         for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
@@ -2149,7 +2150,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     }
 
     public void setDeploymentDelay(int delay) {
-        this.deploymentDelay = delay;
+        deploymentDelay = delay;
     }
 
     public int getMapSizeX() {
@@ -2208,22 +2209,22 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         private BehaviorSettings behaviorSettings;
 
         public BotForce() {
-            this.entityList = new ArrayList<Entity>();
+            entityList = new ArrayList<>();
             try {
                 behaviorSettings = BehaviorSettingsFactory.getInstance().DEFAULT_BEHAVIOR.getCopy();
             } catch (PrincessException ex) {
                 MekHQ.getLogger().log(getClass(), "BotForce()", LogLevel.ERROR, //$NON-NLS-1$
                         "Error getting Princess default behaviors"); //$NON-NLS-1$
-                MekHQ.getLogger().log(getClass(), "BotForce()", ex); //$NON-NLS-1$
+                MekHQ.getLogger().error(getClass(), "BotForce()", ex); //$NON-NLS-1$
             }
         };
 
         public BotForce(String name, int team, int start, ArrayList<Entity> entityList) {
-            this(name, team, start, start, entityList, Player.NO_CAMO, null, -1);
+            this(name, team, start, start, entityList, IPlayer.NO_CAMO, null, -1);
         }
 
         public BotForce(String name, int team, int start, int home, ArrayList<Entity> entityList) {
-            this(name, team, start, home, entityList, Player.NO_CAMO, null, -1);
+            this(name, team, start, home, entityList, IPlayer.NO_CAMO, null, -1);
         }
 
         public BotForce(String name, int team, int start, int home, ArrayList<Entity> entityList,
@@ -2241,7 +2242,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             } catch (PrincessException ex) {
                 MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
                         "Error getting Princess default behaviors"); //$NON-NLS-1$
-                MekHQ.getLogger().log(getClass(), METHOD_NAME, ex);
+                MekHQ.getLogger().error(getClass(), METHOD_NAME, ex);
             }
             behaviorSettings.setRetreatEdge(CardinalEdge.NEAREST_OR_NONE);
             behaviorSettings.setDestinationEdge(CardinalEdge.NEAREST_OR_NONE);
@@ -2343,7 +2344,8 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             behaviorSettings.setRetreatEdge(findCardinalEdge(i));
         }
 
-        public void writeToXml(PrintWriter pw1, int indent) {
+        @Override
+		public void writeToXml(PrintWriter pw1, int indent) {
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "name", MekHqXmlUtil.escape(name));
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "team", team);
             MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "start", start);
@@ -2406,7 +2408,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                             } catch (Exception e) {
                                 MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
                                         "Error loading allied unit in scenario"); //$NON-NLS-1$
-                                MekHQ.getLogger().log(getClass(), METHOD_NAME, e);
+                                MekHQ.getLogger().error(getClass(), METHOD_NAME, e);
                             }
                             if (en != null) {
                                 entityList.add(en);

@@ -81,14 +81,14 @@ public class Scenario implements Serializable {
     }
     
     public Scenario(String n) {
-        this.name = n;
-        this.desc = "";
-        this.report = "";
-        this.status = S_CURRENT;
-        this.date = null;
-        this.subForceIds = new ArrayList<Integer>();
-        this.unitIds = new ArrayList<UUID>();
-        this.loots = new ArrayList<Loot>();
+        name = n;
+        desc = "";
+        report = "";
+        status = S_CURRENT;
+        date = null;
+        subForceIds = new ArrayList<>();
+        unitIds = new ArrayList<>();
+        loots = new ArrayList<>();
     }
     
     public static String getStatusName(int s) {
@@ -114,7 +114,7 @@ public class Scenario implements Serializable {
         return name;
     }
     public void setName(String n) {
-        this.name = n;
+        name = n;
     }
     
     public String getDescription() {
@@ -122,7 +122,7 @@ public class Scenario implements Serializable {
     }
     
     public void setDesc(String d) {
-        this.desc = d;
+        desc = d;
     }
     
     public String getReport() {
@@ -130,7 +130,7 @@ public class Scenario implements Serializable {
     }
     
     public void setReport(String r) {
-        this.report = r;
+        report = r;
     }
     
     public int getStatus() {
@@ -138,7 +138,7 @@ public class Scenario implements Serializable {
     }
     
     public void setStatus(int s) {
-        this.status = s;
+        status = s;
     }
     
     public String getStatusName() {
@@ -146,7 +146,7 @@ public class Scenario implements Serializable {
     }
     
     public void setDate(Date d) {
-        this.date = d;
+        date = d;
     }
     
     public Date getDate() {
@@ -158,7 +158,7 @@ public class Scenario implements Serializable {
     }
     
     public void setId(int i) {
-        this.id = i;
+        id = i;
     }
     
     public int getMissionId() {
@@ -166,7 +166,7 @@ public class Scenario implements Serializable {
     }
     
     public void setMissionId(int i) {
-        this.missionId = i;
+        missionId = i;
     }
     
     public Force getForces(Campaign campaign) {
@@ -206,7 +206,7 @@ public class Scenario implements Serializable {
     
     public void removeForce(int fid) {
         //int idx = -1;
-        ArrayList<Integer> toRemove = new ArrayList<Integer>();
+        ArrayList<Integer> toRemove = new ArrayList<>();
         for(int i = 0; i < subForceIds.size(); i++) {
             if(fid == subForceIds.get(i)) {
                 //idx = i;
@@ -239,8 +239,8 @@ public class Scenario implements Serializable {
                 MekHQ.triggerEvent(new DeploymentChangedEvent(u, this));
             }
         }
-        subForceIds = new ArrayList<Integer>();
-        unitIds = new ArrayList<UUID>();
+        subForceIds = new ArrayList<>();
+        unitIds = new ArrayList<>();
     }
     
     public void generateStub(Campaign c) {
@@ -410,7 +410,7 @@ public class Scenario implements Serializable {
             // Errrr, apparently either the class name was invalid...
             // Or the listed name doesn't exist.
             // Doh!
-            MekHQ.getLogger().log(Scenario.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(Scenario.class, METHOD_NAME, ex);
         }
         
         return retVal;
@@ -425,7 +425,7 @@ public class Scenario implements Serializable {
     }
     
     public void resetLoot() {
-        loots = new ArrayList<Loot>();
+        loots = new ArrayList<>();
     }
     
 }

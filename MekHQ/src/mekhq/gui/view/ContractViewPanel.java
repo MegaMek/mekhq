@@ -71,7 +71,7 @@ public class ContractViewPanel extends JPanel {
     private JLabel lblSalvagePct2;
     
     public ContractViewPanel(Contract c) {
-        this.contract = c;
+        contract = c;
         initComponents();
     }
     

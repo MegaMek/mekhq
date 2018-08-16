@@ -13,7 +13,6 @@ import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.Version;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.parts.Refit;
 import mekhq.campaign.personnel.Person;
 
 /**
@@ -46,13 +45,13 @@ public class MothballInfo implements MekHqXmlSerializable {
      * @param unit The unit to work with
      */
     public MothballInfo(Unit unit) {
-        techID = unit.getTechId();
-        forceID = unit.getForceId();
-        driverIDs = (List<UUID>) unit.getDriverIDs().clone();
-        gunnerIDs = (List<UUID>) unit.getGunnerIDs().clone();
-        vesselCrewIDs = (List<UUID>) unit.getVesselCrewIDs().clone();
+        techID        = unit.getTechId();
+        forceID       = unit.getForceId();
+        driverIDs     = new ArrayList<>(unit.getDriverIDs());
+        gunnerIDs     = new ArrayList<>(unit.getGunnerIDs());
+        vesselCrewIDs = new ArrayList<>(unit.getVesselCrewIDs());
         techOfficerID = unit.getTechOfficerID();
-        navigatorID = unit.getNavigatorID();
+        navigatorID   = unit.getNavigatorID();
     }
     
     /**
@@ -186,7 +185,7 @@ public class MothballInfo implements MekHqXmlSerializable {
             }
         } catch (Exception ex) {
             // Doh!
-            MekHQ.getLogger().log(Unit.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(Unit.class, METHOD_NAME, ex);
         }
         
         return retVal;

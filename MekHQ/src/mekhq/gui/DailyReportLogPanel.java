@@ -62,7 +62,8 @@ public class DailyReportLogPanel extends JPanel {
              */
             private static final long serialVersionUID = 9000659006965230883L;
 
-            public boolean getScrollableTracksViewportWidth() {
+            @Override
+			public boolean getScrollableTracksViewportWidth() {
                 return true;
             }
         };

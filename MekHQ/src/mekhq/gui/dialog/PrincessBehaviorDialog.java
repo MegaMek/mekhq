@@ -47,9 +47,9 @@ public class PrincessBehaviorDialog extends BotConfigDialog implements ActionLis
 	    } catch(Exception e) {
 	        handleError("PrincessBehaviorDialog", e);
 	    }
-	    this.setName(name);
+	    setName(name);
 	    
-	    this.nameField.setText(name);
+	    nameField.setText(name);
 	    super.setPrincessFields();
 	}
 	
@@ -73,7 +73,8 @@ public class PrincessBehaviorDialog extends BotConfigDialog implements ActionLis
     	princessBehavior.setBraveryIndex(braverySlidebar.getValue());
     }
 
-    public void actionPerformed(ActionEvent e) {
+    @Override
+	public void actionPerformed(ActionEvent e) {
         if (butOK.equals(e.getSource())) {
         	getPrincessFields();
             dialogAborted = false;
@@ -86,7 +87,7 @@ public class PrincessBehaviorDialog extends BotConfigDialog implements ActionLis
     private void handleError(String method, Throwable t) {
         JOptionPane.showMessageDialog(this, t.getMessage(),
                                       "ERROR", JOptionPane.ERROR_MESSAGE);
-        MekHQ.getLogger().log(getClass(), method, t);
+        MekHQ.getLogger().error(getClass(), method, t);
     }
 
     @Override

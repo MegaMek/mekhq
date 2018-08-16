@@ -67,13 +67,13 @@ public class RetirementTableModel extends AbstractTableModel {
     private DecimalFormat formatter;
 
     public RetirementTableModel(Campaign c) {
-        this.campaign = c;
-        data = new ArrayList<UUID>();
-        payBonus = new HashMap<UUID, Boolean>();
-        miscMods = new HashMap<UUID, Integer>();
+        campaign = c;
+        data = new ArrayList<>();
+        payBonus = new HashMap<>();
+        miscMods = new HashMap<>();
         generalMod = 0;
-        unitAssignments = new HashMap<UUID, UUID>();
-        altPayout = new HashMap<UUID, Integer>();
+        unitAssignments = new HashMap<>();
+        altPayout = new HashMap<>();
         editPayout = false;
         formatter = new DecimalFormat();
     }
@@ -340,7 +340,7 @@ public class RetirementTableModel extends AbstractTableModel {
             }
         } else if (col == COL_RECRUIT) {
             for (int i = 0; i < Person.T_NUM; i++) {
-                if (Person.getRoleDesc(i, campaign.getFaction().isClan()).equals((String)value)) {
+                if (Person.getRoleDesc(i, campaign.getFaction().isClan()).equals(value)) {
                     campaign.getRetirementDefectionTracker().getPayout(data.get(row)).setRecruitType(i);
                     break;
                 }
@@ -386,7 +386,8 @@ public class RetirementTableModel extends AbstractTableModel {
          */
          private static final long serialVersionUID = 770305943352316265L;
 
-        public Component getTableCellRendererComponent(JTable table,
+        @Override
+		public Component getTableCellRendererComponent(JTable table,
                 Object value, boolean isSelected, boolean hasFocus,
                 int row, int column) {
             super.getTableCellRendererComponent(table, value, isSelected,
@@ -424,7 +425,8 @@ public class RetirementTableModel extends AbstractTableModel {
             super(icons);
         }
 
-        public Component getTableCellRendererComponent(JTable table,
+        @Override
+		public Component getTableCellRendererComponent(JTable table,
                 Object value, boolean isSelected, boolean hasFocus,
                 int row, int column) {
             Component c = this;

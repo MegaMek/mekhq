@@ -77,7 +77,7 @@ public class ExtractionBuiltInScenario extends AtBScenario {
 		addEnemyForce(enemyEntities, getLance(campaign).getWeightClass(campaign), campaign);
 		addBotForce(getEnemyBotForce(getContract(campaign), enemyStart, getEnemyHome(), enemyEntities));
 
-		ArrayList<Entity> otherForce = new ArrayList<Entity>();
+		ArrayList<Entity> otherForce = new ArrayList<>();
 		addCivilianUnits(otherForce, 4, campaign);
 
 		try {

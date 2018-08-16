@@ -68,12 +68,12 @@ public class LootDialog extends javax.swing.JDialog {
     /** Creates new form NewTeamDialog */
     public LootDialog(java.awt.Frame parent, boolean modal, Loot l, Campaign c) {
         super(parent, modal);
-        this.frame = parent;
-        this.loot = l;
-        this.campaign = c;
+        frame = parent;
+        loot = l;
+        campaign = c;
         cancelled = true;
-        units = new ArrayList<Entity>();
-        parts = new ArrayList<Part>();
+        units = new ArrayList<>();
+        parts = new ArrayList<>();
         for(Entity e : l.getUnits()) {
             units.add(e);
         }
@@ -94,8 +94,8 @@ public class LootDialog extends javax.swing.JDialog {
         btnRemoveUnit = new JButton("Remove");
         btnAddPart = new JButton("Add");
         btnRemovePart = new JButton("Remove");
-        listUnits = new JList<String>(new DefaultListModel<String>());
-        listParts = new JList<String>(new DefaultListModel<String>());
+        listUnits = new JList<>(new DefaultListModel<String>());
+        listParts = new JList<>(new DefaultListModel<String>());
 
         //ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.KillDialog", new EncodeControl());
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
@@ -153,7 +153,8 @@ public class LootDialog extends javax.swing.JDialog {
         getContentPane().add(new JLabel("Units"), gridBagConstraints);
 
         btnAddUnit.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 addUnit();
             }
         });
@@ -168,7 +169,8 @@ public class LootDialog extends javax.swing.JDialog {
 
         btnRemoveUnit.setEnabled(false);
         btnRemoveUnit.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                removeUnit();
             }
         });
@@ -193,7 +195,8 @@ public class LootDialog extends javax.swing.JDialog {
         listUnits.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         listUnits.getSelectionModel().addListSelectionListener(
                 new javax.swing.event.ListSelectionListener() {
-                    public void valueChanged(
+                    @Override
+					public void valueChanged(
                             javax.swing.event.ListSelectionEvent evt) {
                         listUnitsValueChanged();
                     }
@@ -211,7 +214,8 @@ public class LootDialog extends javax.swing.JDialog {
         getContentPane().add(new JLabel("Parts"), gridBagConstraints);
 
         btnAddPart.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 addPart();
             }
         });
@@ -225,7 +229,8 @@ public class LootDialog extends javax.swing.JDialog {
 
         btnRemovePart.setEnabled(false);
         btnRemovePart.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                removePart();
             }
         });
@@ -250,7 +255,8 @@ public class LootDialog extends javax.swing.JDialog {
         listParts.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         listParts.getSelectionModel().addListSelectionListener(
                 new javax.swing.event.ListSelectionListener() {
-                    public void valueChanged(
+                    @Override
+					public void valueChanged(
                             javax.swing.event.ListSelectionEvent evt) {
                         listPartsValueChanged();
                     }
@@ -259,7 +265,8 @@ public class LootDialog extends javax.swing.JDialog {
         getContentPane().add(scrParts, gridBagConstraints);
 
         btnOK.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 done();
             }
         });
@@ -273,7 +280,8 @@ public class LootDialog extends javax.swing.JDialog {
         getContentPane().add(btnOK, gridBagConstraints);
 
         btnCancel.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 setVisible(false);
             }
         });
@@ -344,7 +352,7 @@ public class LootDialog extends javax.swing.JDialog {
         for(Part p : parts) {
             loot.addPart(p);
         }
-        this.setVisible(false);
+        setVisible(false);
     }
 
     private void refreshUnitList() {

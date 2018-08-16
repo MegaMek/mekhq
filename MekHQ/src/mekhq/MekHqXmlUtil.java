@@ -23,7 +23,6 @@ import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.apache.commons.text.StringEscapeUtils;
-
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
@@ -41,7 +40,6 @@ import megamek.common.Jumpship;
 import megamek.common.MULParser;
 import megamek.common.Tank;
 import megamek.common.logging.LogLevel;
-import megamek.common.util.StringUtil;
 
 public class MekHqXmlUtil {
 	private static DocumentBuilderFactory DOCUMENT_BUILDER_FACTORY;

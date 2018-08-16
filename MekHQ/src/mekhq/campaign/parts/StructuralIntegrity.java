@@ -72,13 +72,14 @@ public class StructuralIntegrity extends Part {
 	public StructuralIntegrity(int entityWeight, Campaign c) {
 		super(entityWeight, c);
 		pointsNeeded = 0;
-		this.name = "Structural Integrity";
+		name = "Structural Integrity";
 	}
 	
+	@Override
 	public StructuralIntegrity clone() {
 		StructuralIntegrity clone = new StructuralIntegrity(getUnitTonnage(), campaign);
         clone.copyBaseData(this);
-		clone.pointsNeeded = this.pointsNeeded;
+		clone.pointsNeeded = pointsNeeded;
 		return clone;
 	}
 	
@@ -210,6 +211,7 @@ public class StructuralIntegrity extends Part {
 		return pointsNeeded > 0;
 	}
 	
+	@Override
 	public void doMaintenanceDamage(int d) {
         int points = ((Aero)unit.getEntity()).getSI();
         points = Math.max(points - d, 1);

@@ -50,7 +50,7 @@ public class ChooseMulFilesDialog extends javax.swing.JDialog {
     /** Creates new form NewTeamDialog */
     public ChooseMulFilesDialog(java.awt.Frame parent, boolean modal, ResolveScenarioTracker t) {
         super(parent, modal);
-        this.tracker = t;
+        tracker = t;
         cancelled = false;
         initComponents();
         setLocationRelativeTo(parent);
@@ -99,7 +99,8 @@ public class ChooseMulFilesDialog extends javax.swing.JDialog {
     	 btnUnitFile.setText(resourceMap.getString("btnUnitFile.text")); // NOI18N
     	 btnUnitFile.setName("btnUnitFile"); // NOI18N
     	 btnUnitFile.addActionListener(new java.awt.event.ActionListener() {
-    		 public void actionPerformed(java.awt.event.ActionEvent evt) {
+    		 @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
     			 tracker.findUnitFile();
     			 txtUnitFile.setText(tracker.getUnitFilePath());
     		 }
@@ -133,7 +134,8 @@ public class ChooseMulFilesDialog extends javax.swing.JDialog {
     	 btnNext.setText(resourceMap.getString("btnNext.text")); // NOI18N
     	 btnNext.setName("btnNext"); // NOI18N
     	 btnNext.addActionListener(new java.awt.event.ActionListener() {
-    		 public void actionPerformed(java.awt.event.ActionEvent evt) {
+    		 @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
     			 btnNextActionPerformed(evt);
     		 }
     	 });
@@ -149,7 +151,8 @@ public class ChooseMulFilesDialog extends javax.swing.JDialog {
     	 btnCancel.setText(resourceMap.getString("btnCancel.text")); // NOI18N
     	 btnCancel.setName("btnClose"); // NOI18N
     	 btnCancel.addActionListener(new java.awt.event.ActionListener() {
-    		 public void actionPerformed(java.awt.event.ActionEvent evt) {
+    		 @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
     			 btnCancelActionPerformed(evt);
     		 }
     	 });
@@ -178,13 +181,13 @@ public class ChooseMulFilesDialog extends javax.swing.JDialog {
 
     private void btnNextActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHireActionPerformed
     	tracker.processMulFiles();
-    	this.setVisible(false);
+    	setVisible(false);
     }
 
 
     private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
     	cancelled = true;
-    	this.setVisible(false);
+    	setVisible(false);
     }
 
     public boolean wasCancelled() {

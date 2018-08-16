@@ -28,7 +28,7 @@ import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -45,6 +45,7 @@ import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 import javax.swing.JTabbedPane;
+import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -84,7 +85,7 @@ public class PayCollateralDialog extends JDialog {
     
     public PayCollateralDialog(java.awt.Frame parent, boolean modal, Campaign c, Loan l) {
         super(parent, modal);
-        this.frame = parent;
+        frame = parent;
         campaign = c;
         loan = l;
         cancelled = false;
@@ -126,7 +127,7 @@ public class PayCollateralDialog extends JDialog {
         Collection<Unit> units = campaign.getUnits();
         for(Unit u : units) {
             j++;
-            box = new JCheckBox(u.getName() + " (" + DecimalFormat.getInstance().format(u.getSellValue()) + "C-bills)");
+            box = new JCheckBox(u.getName() + " (" + NumberFormat.getInstance().format(u.getSellValue()) + "C-bills)");
             box.setSelected(false);
             box.setEnabled(u.isPresent() && !u.isDeployed());
             box.addItemListener(new ItemListener() {
@@ -166,7 +167,7 @@ public class PayCollateralDialog extends JDialog {
             if(p instanceof AmmoStorage) {
                 quantity = ((AmmoStorage)p).getQuantity();
             }
-            partSlider = new JSlider(JSlider.HORIZONTAL, 0, quantity, 0);           
+            partSlider = new JSlider(SwingConstants.HORIZONTAL, 0, quantity, 0);           
             //TODO: deal with armors
             partSlider.setMajorTickSpacing(1);
             if(quantity < 11) {
@@ -197,7 +198,7 @@ public class PayCollateralDialog extends JDialog {
             gridBagConstraints.gridx = 1;
             gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
             gridBagConstraints.weightx = 1.0;
-            pnlParts.add(new JLabel("<html>" + p.getName() + "<br>" + p.getDetails()  + ", "+ DecimalFormat.getInstance().format(p.getCurrentValue()) + "</html>"), gridBagConstraints);
+            pnlParts.add(new JLabel("<html>" + p.getName() + "<br>" + p.getDetails()  + ", "+ NumberFormat.getInstance().format(p.getCurrentValue()) + "</html>"), gridBagConstraints);
             i++;
         }    
         JScrollPane scrParts = new JScrollPane();
@@ -209,7 +210,8 @@ public class PayCollateralDialog extends JDialog {
         
         btnPay = new JButton(resourceMap.getString("btnPay.text")); // NOI18N
         btnPay.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 payCollateral();
             }
         });
@@ -218,7 +220,8 @@ public class PayCollateralDialog extends JDialog {
         
         btnDontPay = new JButton(resourceMap.getString("btnDontPay.text")); // NOI18N
         btnDontPay.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 dontPayCollateral();
             }
         });
@@ -227,20 +230,21 @@ public class PayCollateralDialog extends JDialog {
         btnCancel = new JButton(resourceMap.getString("btnCancel.text")); // NOI18N
         btnCancel.setName("btnCancel"); // NOI18N
         btnCancel.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 cancelled = true;
                 setVisible(false);
             }
         });
         panBtn.add(btnCancel);
 
-        assetBoxes = new ArrayList<JCheckBox>();
+        assetBoxes = new ArrayList<>();
         i = 0;
         j = 0;
         JPanel pnlAssets = new JPanel(new GridBagLayout());
         for(Asset a : campaign.getFinances().getAllAssets()) {
             j++;
-            box = new JCheckBox(a.getName() + " (" + DecimalFormat.getInstance().format(a.getValue()) + "C-bills)");
+            box = new JCheckBox(a.getName() + " (" + NumberFormat.getInstance().format(a.getValue()) + "C-bills)");
             box.setSelected(false);
             box.addItemListener(new ItemListener() {
                 @Override
@@ -325,7 +329,7 @@ public class PayCollateralDialog extends JDialog {
             btnPay.setEnabled(true);
         }
         barAmount.setValue(percent);
-        barAmount.setString(DecimalFormat.getInstance().format(amount) + "/" + DecimalFormat.getInstance().format(loan.getCollateralAmount()));
+        barAmount.setString(NumberFormat.getInstance().format(amount) + "/" + NumberFormat.getInstance().format(loan.getCollateralAmount()));
     }
     
     public ArrayList<UUID> getUnits() {
@@ -339,7 +343,7 @@ public class PayCollateralDialog extends JDialog {
     }
     
     public ArrayList<int[]> getParts() {
-        ArrayList<int[]> parts = new ArrayList<int[]>();
+        ArrayList<int[]> parts = new ArrayList<>();
         for (Map.Entry<JSlider, Integer> m : partSliders.entrySet()) {
             int quantity = m.getKey().getValue();
             if(quantity > 0) {
@@ -351,7 +355,7 @@ public class PayCollateralDialog extends JDialog {
     }
     
     public ArrayList<Asset> getRemainingAssets() {
-        ArrayList<Asset> newAssets = new ArrayList<Asset>();
+        ArrayList<Asset> newAssets = new ArrayList<>();
         for(int i = 0; i < assetBoxes.size(); i++) {
             JCheckBox box = assetBoxes.get(i);
             if(!box.isSelected()) {

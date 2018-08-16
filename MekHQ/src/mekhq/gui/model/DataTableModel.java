@@ -12,11 +12,13 @@ public abstract class DataTableModel extends AbstractTableModel {
     protected String[] columnNames;
     protected ArrayList<?> data;
 
-    public int getRowCount() {
+    @Override
+	public int getRowCount() {
         return data.size();
     }
 
-    public int getColumnCount() {
+    @Override
+	public int getColumnCount() {
         return columnNames.length;
     }
 

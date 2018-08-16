@@ -73,7 +73,7 @@ import javax.vecmath.Vector2d;
 
 import org.joda.time.DateTime;
 
-import megamek.common.EquipmentType;
+import megamek.common.ITechnology;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
@@ -588,8 +588,8 @@ public class InterstellarMapPanel extends JPanel {
                         if(isPlanetVisible(planet, true)) {
                             double x = map2scrX(planet.getX());
                             double y = map2scrY(planet.getY());
-                            int hpgRating = Utilities.nonNull(planet.getHPG(now), EquipmentType.RATING_X);
-                            if(hpgRating == EquipmentType.RATING_A) {
+                            int hpgRating = Utilities.nonNull(planet.getHPG(now), ITechnology.RATING_X);
+                            if(hpgRating == ITechnology.RATING_A) {
                                 g2.setPaint(Color.CYAN);
                                 arc.setArcByCenter(x, y, size * 1.6, 0, 360, Arc2D.OPEN);
                                 g2.setStroke(thick);
@@ -599,19 +599,19 @@ public class InterstellarMapPanel extends JPanel {
                                 //arc.setArcByCenter(x, y, size * 1.6, 0, 360, Arc2D.OPEN);
                                 //g2.fill(arc);
                             }
-                            if(hpgRating == EquipmentType.RATING_A || hpgRating == EquipmentType.RATING_B) {
+                            if(hpgRating == ITechnology.RATING_A || hpgRating == ITechnology.RATING_B) {
                                 g2.setPaint(Color.CYAN);
                                 arc.setArcByCenter(x, y, size * 1.3, 0, 360, Arc2D.OPEN);
                                 g2.setStroke(thin);
                                 g2.draw(arc);
                             }
-                            if(hpgRating == EquipmentType.RATING_C) {
+                            if(hpgRating == ITechnology.RATING_C) {
                                 g2.setPaint(Color.CYAN);
                                 arc.setArcByCenter(x, y, size * 1.3, 0, 360, Arc2D.OPEN);
                                 g2.setStroke(dashed);
                                 g2.draw(arc);
                             }
-                            if(hpgRating == EquipmentType.RATING_D) {
+                            if(hpgRating == ITechnology.RATING_D) {
                                 g2.setPaint(darkCyan);
                                 arc.setArcByCenter(x, y, size * 1.3, 0, 360, Arc2D.OPEN);
                                 g2.setStroke(dotted);
@@ -623,12 +623,12 @@ public class InterstellarMapPanel extends JPanel {
                         Planet p1 = link.primary;
                         Planet p2 = link.secondary;
                         if(isPlanetVisible(p1, false) || isPlanetVisible(p2, false)) {
-                            if(link.rating == EquipmentType.RATING_A) {
+                            if(link.rating == ITechnology.RATING_A) {
                                 g2.setPaint(Color.CYAN);
                                 g2.setStroke(thick);
                                 g2.draw(new Line2D.Double(map2scrX(p1.getX()), map2scrY(p1.getY()), map2scrX(p2.getX()), map2scrY(p2.getY())));
                             }
-                            if(link.rating == EquipmentType.RATING_B) {
+                            if(link.rating == ITechnology.RATING_B) {
                                 g2.setPaint(Color.CYAN);
                                 g2.setStroke(dashed);
                                 g2.draw(new Line2D.Double(map2scrX(p1.getX()), map2scrY(p1.getY()), map2scrX(p2.getX()), map2scrY(p2.getY())));
@@ -786,8 +786,8 @@ public class InterstellarMapPanel extends JPanel {
     }
 
     public void setCampaign(Campaign c) {
-        this.campaign = c;
-        this.planets = campaign.getPlanets();
+        campaign = c;
+        planets = campaign.getPlanets();
         repaint();
     }
 

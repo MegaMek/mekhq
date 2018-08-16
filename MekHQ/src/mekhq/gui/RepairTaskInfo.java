@@ -61,7 +61,7 @@ public class RepairTaskInfo extends JPanel {
         gridbag.setConstraints(lblSecondaryImage, c);
         add(lblSecondaryImage);
 
-        this.setBorder(BorderFactory.createEmptyBorder());
+        setBorder(BorderFactory.createEmptyBorder());
     }
 
     public void setText(String s, String color) {
@@ -71,11 +71,11 @@ public class RepairTaskInfo extends JPanel {
     
 
     public void highlightBorder() {
-    	this.setBorder(new javax.swing.border.LineBorder(Color.BLACK, 5, true));
+    	setBorder(new javax.swing.border.LineBorder(Color.BLACK, 5, true));
     }
 
     public void unhighlightBorder() {
-        this.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        setBorder(javax.swing.BorderFactory.createEtchedBorder());
     }
 
     public void setImage(Image img) {

@@ -269,7 +269,7 @@ public class SkillType implements Serializable {
     }
     
     public static void initializeTypes() {
-        lookupHash = new Hashtable<String, SkillType>();
+        lookupHash = new Hashtable<>();
         lookupHash.put(S_PILOT_MECH, createPilotingMech());
         lookupHash.put(S_GUN_MECH, createGunneryMech());
         lookupHash.put(S_PILOT_AERO, createPilotingAero());
@@ -504,7 +504,7 @@ public class SkillType implements Serializable {
             // Errrr, apparently either the class name was invalid...
             // Or the listed name doesn't exist.
             // Doh!
-            MekHQ.getLogger().log(SkillType.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(SkillType.class, METHOD_NAME, ex);
         }
         if(version.getMinorVersion() < 3) {
             //need to change negotiation and scrounge to be countUp=false with
@@ -557,7 +557,7 @@ public class SkillType implements Serializable {
             // Errrr, apparently either the class name was invalid...
             // Or the listed name doesn't exist.
             // Doh!
-            MekHQ.getLogger().log(SkillType.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(SkillType.class, METHOD_NAME, ex);
         }
         hash.put(retVal.name, retVal);
     }

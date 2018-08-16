@@ -52,9 +52,9 @@ public class MotiveSystem extends Part {
 	
 	public MotiveSystem(int ton, Campaign c) {
 		super(ton, c);
-		this.name = "Motive System";
-		this.damage = 0;
-		this.penalty = 0;
+		name = "Motive System";
+		damage = 0;
+		penalty = 0;
 	}
 	
 	@Override 
@@ -67,6 +67,7 @@ public class MotiveSystem extends Part {
 		return -1;
 	}
 	
+	@Override
 	public MotiveSystem clone() {
 		MotiveSystem clone = new MotiveSystem(getUnitTonnage(), campaign);
         clone.copyBaseData(this);

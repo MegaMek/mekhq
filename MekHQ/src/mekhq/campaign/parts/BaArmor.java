@@ -56,7 +56,8 @@ public class BaArmor extends Armor implements IAcquisitionWork {
         super(tonnage, type, points, loc, false, clan, c);
     }
     
-    public BaArmor clone() {
+    @Override
+	public BaArmor clone() {
         BaArmor clone = new BaArmor(0, amount, type, location, clan, campaign);
         clone.copyBaseData(this);
         return clone;
@@ -109,7 +110,7 @@ public class BaArmor extends Armor implements IAcquisitionWork {
     
     @Override
     public long getValueNeeded() {
-        return adjustCostsForCampaignOptions((long)(amountNeeded * getPointCost()));
+        return adjustCostsForCampaignOptions(amountNeeded * getPointCost());
     }
     
     @Override
@@ -127,16 +128,17 @@ public class BaArmor extends Armor implements IAcquisitionWork {
     public boolean isSamePartType(Part part) {
         return part instanceof BaArmor
                 && isClanTechBase() == part.isClanTechBase()
-                && ((BaArmor)part).getType() == this.getType()
+                && ((BaArmor)part).getType() == getType()
                 && getRefitId() == part.getRefitId();
     }
     
     @Override
     public boolean isSameStatus(Part part) {
-        return !hasParentPart() && !part.hasParentPart() && this.getDaysToArrival() == part.getDaysToArrival();
+        return !hasParentPart() && !part.hasParentPart() && getDaysToArrival() == part.getDaysToArrival();
     }
 
-    public double getArmorWeight(int points) {
+    @Override
+	public double getArmorWeight(int points) {
         return points * 50/1000.0;
     }
 
@@ -145,11 +147,13 @@ public class BaArmor extends Armor implements IAcquisitionWork {
         return new BaArmor(0, (int)Math.round(5 * getPointsPerTon()), type, -1, clan, campaign);
     }
 
-    public Part getNewPart() {
+    @Override
+	public Part getNewPart() {
         return new BaArmor(0, (int)Math.round(5 * getPointsPerTon()), type, -1, clan, campaign);
     }
     
-    public int getAmountAvailable() {
+    @Override
+	public int getAmountAvailable() {
         for(Part part : campaign.getSpareParts()) {
             if(part instanceof BaArmor) {
                 BaArmor a = (BaArmor)part;

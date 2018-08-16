@@ -62,6 +62,7 @@ public class MekActuator extends Part {
 		this(0, 0, null);
 	}
 	
+	@Override
 	public MekActuator clone() {
 		MekActuator clone = new MekActuator(getUnitTonnage(), type, location, campaign);
         clone.copyBaseData(this);
@@ -73,7 +74,7 @@ public class MekActuator extends Part {
     }
     
     public void setLocation(int loc) {
-    	this.location = loc;
+    	location = loc;
     }
     
     public MekActuator(int tonnage, int type, Campaign c) {
@@ -84,8 +85,8 @@ public class MekActuator extends Part {
     	super(tonnage, c);
         this.type = type;
         Mech m = new BipedMech();
-        this.name = m.getSystemName(type) + " Actuator" ;
-        this.location = loc;
+        name = m.getSystemName(type) + " Actuator" ;
+        location = loc;
     }
 
     @Override
@@ -144,7 +145,8 @@ public class MekActuator extends Part {
                 && getUnitTonnage() == ((MekActuator)part).getUnitTonnage();
     }
     
-    public int getLocation() {
+    @Override
+	public int getLocation() {
     	return location;
     }
     

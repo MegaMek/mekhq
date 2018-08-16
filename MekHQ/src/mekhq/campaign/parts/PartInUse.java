@@ -39,29 +39,29 @@ public class PartInUse {
             appendDetails(sb, part);
         }
         part.setUnit(u);
-        this.description = sb.toString();
-        this.partToBuy = part.getAcquisitionWork();
-        this.tonnagePerItem = part.getTonnage();
+        description = sb.toString();
+        partToBuy = part.getAcquisitionWork();
+        tonnagePerItem = part.getTonnage();
         // AmmoBin are special: They aren't buyable (yet?), but instead buy you the ammo inside
         // We redo the description based on that
         if(partToBuy instanceof AmmoStorage) {
             sb.setLength(0);
             sb.append(((AmmoStorage) partToBuy).getName());
             appendDetails(sb, (Part) ((AmmoStorage) partToBuy).getAcquisitionWork());
-            this.description = sb.toString();
+            description = sb.toString();
             AmmoType ammoType = (AmmoType) ((AmmoStorage) partToBuy).getType();
             if(ammoType.getKgPerShot() > 0) {
-                this.tonnagePerItem = ammoType.getKgPerShot() / 1000.0;
+                tonnagePerItem = ammoType.getKgPerShot() / 1000.0;
             } else {
-                this.tonnagePerItem = 1.0 / ammoType.getShots();
+                tonnagePerItem = 1.0 / ammoType.getShots();
             }
         }
         if(part instanceof Armor) {
             // Armor needs different tonnage values
-            this.tonnagePerItem = 1.0 / ((Armor) part).getArmorPointsPerTon();
+            tonnagePerItem = 1.0 / ((Armor) part).getArmorPointsPerTon();
         }
         if(null != partToBuy) {
-            this.cost = partToBuy.getBuyCost();
+            cost = partToBuy.getBuyCost();
         }
     }
     

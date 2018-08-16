@@ -56,7 +56,7 @@ public class EditLogEntryDialog extends javax.swing.JDialog {
     /** Creates new form NewTeamDialog */
     public EditLogEntryDialog(java.awt.Frame parent, boolean modal, LogEntry e) {
         super(parent, modal);
-        this.frame = parent;
+        frame = parent;
         entry = e;
         date = e.getDate();
         initComponents();
@@ -84,7 +84,8 @@ public class EditLogEntryDialog extends javax.swing.JDialog {
         btnDate = new javax.swing.JButton();
         btnDate.setText(getDateAsString());
         btnDate.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 changeDate();
             }
         });
@@ -121,7 +122,8 @@ public class EditLogEntryDialog extends javax.swing.JDialog {
         btnOK.setText(resourceMap.getString("btnOkay.text")); // NOI18N
         btnOK.setName("btnOK"); // NOI18N
         btnOK.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnOKActionPerformed(evt);
             }
         });
@@ -130,7 +132,8 @@ public class EditLogEntryDialog extends javax.swing.JDialog {
         btnClose.setText(resourceMap.getString("btnCancel.text")); // NOI18N
         btnClose.setName("btnClose"); // NOI18N
         btnClose.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnCloseActionPerformed(evt);
             }
         });
@@ -145,12 +148,12 @@ public class EditLogEntryDialog extends javax.swing.JDialog {
     private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {
     	entry.setDate(date);
     	entry.setDesc(txtDesc.getText());
-    	this.setVisible(false);
+    	setVisible(false);
     }
 
     private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {
     	entry = null;
-    	this.setVisible(false);
+    	setVisible(false);
     }
     
     public LogEntry getEntry() {

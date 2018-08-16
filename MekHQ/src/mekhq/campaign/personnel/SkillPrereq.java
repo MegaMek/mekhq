@@ -57,13 +57,14 @@ public class SkillPrereq implements MekHqXmlSerializable {
     private Hashtable<String, Integer> skillset;
     
     public SkillPrereq() {
-        skillset = new Hashtable<String, Integer>();
+        skillset = new Hashtable<>();
     }
     
-    @SuppressWarnings("unchecked") // FIXME: Broken Java with it's Object clones
+    @Override
+	@SuppressWarnings("unchecked") // FIXME: Broken Java with it's Object clones
 	public SkillPrereq clone() {
     	SkillPrereq clone = new SkillPrereq();
-    	clone.skillset = (Hashtable<String, Integer>)this.skillset.clone();
+    	clone.skillset = (Hashtable<String, Integer>)skillset.clone();
     	return clone;
     }
     
@@ -162,7 +163,7 @@ public class SkillPrereq implements MekHqXmlSerializable {
             // Errrr, apparently either the class name was invalid...
             // Or the listed name doesn't exist.
             // Doh!
-            MekHQ.getLogger().log(SkillPrereq.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(SkillPrereq.class, METHOD_NAME, ex);
         }
         return retVal;
     }

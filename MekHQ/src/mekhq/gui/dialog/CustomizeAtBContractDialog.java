@@ -51,7 +51,7 @@ import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 
 import megamek.client.ui.swing.util.PlayerColors;
-import megamek.common.Player;
+import megamek.common.IPlayer;
 import megamek.common.util.DirectoryItems;
 import megamek.common.util.EncodeControl;
 import mekhq.Utilities;
@@ -112,7 +112,7 @@ public class CustomizeAtBContractDialog extends JDialog {
 	
 	public CustomizeAtBContractDialog(Frame parent, boolean modal, AtBContract contract, Campaign c, DirectoryItems camos) {
 		super(parent, modal);
-		this.frame = parent;
+		frame = parent;
 		this.contract = contract;
 		this.camos = camos;
 		campaign = c;
@@ -166,7 +166,7 @@ public class CustomizeAtBContractDialog extends JDialog {
         cbEnemy.addFactionEntries(currentFactions, campaign.getGameYear());
         JLabel lblEnemy = new JLabel();
     	chkShowAllFactions = new JCheckBox();
-    	cbMissionType = new JComboBox<String>(AtBContract.missionTypeNames);
+    	cbMissionType = new JComboBox<>(AtBContract.missionTypeNames);
         JLabel lblType = new JLabel();
         btnOK = new JButton();
         btnClose = new JButton();
@@ -175,11 +175,11 @@ public class CustomizeAtBContractDialog extends JDialog {
         JLabel lblPlanetName = new JLabel();
         String[] skillNames = {"Green", "Regular", "Veteran", "Elite"};
         String[] ratingNames = {"F", "D", "C", "B", "A"};
-    	cbAllySkill = new JComboBox<String>(skillNames);
-    	cbAllyQuality = new JComboBox<String>(ratingNames);
+    	cbAllySkill = new JComboBox<>(skillNames);
+    	cbAllyQuality = new JComboBox<>(ratingNames);
         JLabel lblAllyRating = new JLabel();
-    	cbEnemySkill = new JComboBox<String>(skillNames);
-    	cbEnemyQuality = new JComboBox<String>(ratingNames);;
+    	cbEnemySkill = new JComboBox<>(skillNames);
+    	cbEnemyQuality = new JComboBox<>(ratingNames);
     	JLabel lblAllyBotName = new JLabel();
     	txtAllyBotName = new JTextField();
     	JLabel lblEnemyBotName = new JLabel();
@@ -197,7 +197,7 @@ public class CustomizeAtBContractDialog extends JDialog {
                 new SpinnerNumberModel(contract.getContractScoreArbitraryModifier(),
                         null,null,1));
         JLabel lblContractScoreArbitraryModifier = new JLabel();
-    	cbEnemyMorale = new JComboBox<String>(AtBContract.moraleLevelNames);
+    	cbEnemyMorale = new JComboBox<>(AtBContract.moraleLevelNames);
    	
     	int y = 0;
           
@@ -564,7 +564,7 @@ public class CustomizeAtBContractDialog extends JDialog {
             return;
         }
 
-        if (Player.NO_CAMO.equals(camoCategory)) {
+        if (IPlayer.NO_CAMO.equals(camoCategory)) {
             int colorInd = colorIndex;
             if (colorInd == -1) {
                 colorInd = 0;
@@ -581,7 +581,7 @@ public class CustomizeAtBContractDialog extends JDialog {
         // Try to get the camo file.
         try {
             // Translate the root camo directory name.
-            if (Player.ROOT_CAMO.equals(camoCategory)) {
+            if (IPlayer.ROOT_CAMO.equals(camoCategory)) {
                 camoCategory = ""; //$NON-NLS-1$
             }
             Image camo = (Image) camos.getItem(camoCategory, camoFileName);
@@ -597,7 +597,7 @@ public class CustomizeAtBContractDialog extends JDialog {
         			+ "data/images/camo folder.",
         			"Missing Camo File",
         			JOptionPane.WARNING_MESSAGE);
-        	camoCategory = Player.NO_CAMO;
+        	camoCategory = IPlayer.NO_CAMO;
         	colorIndex = 0;
         	setCamoIcon(btnCamo, camoCategory, camoFileName, colorIndex);
         }   	
@@ -635,11 +635,11 @@ public class CustomizeAtBContractDialog extends JDialog {
         }
     	
     	contract.setDesc(txtDesc.getText());
-    	this.setVisible(false);
+    	setVisible(false);
     }
     
     private void btnCloseActionPerformed(ActionEvent evt) {
-    	this.setVisible(false);
+    	setVisible(false);
     }
 
     private void showAllFactions(boolean allFactions) {

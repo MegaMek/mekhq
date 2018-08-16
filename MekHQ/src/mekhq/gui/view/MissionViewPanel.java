@@ -43,7 +43,7 @@ public class MissionViewPanel extends JPanel {
 	private JTextArea txtType;
 	
 	public MissionViewPanel(Mission m) {
-		this.mission = m;
+		mission = m;
 		initComponents();
 	}
 	

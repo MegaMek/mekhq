@@ -40,7 +40,7 @@ import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
-import megamek.common.EquipmentType;
+import megamek.common.ITechnology;
 import megamek.common.PlanetaryConditions;
 import megamek.common.util.EncodeControl;
 import mekhq.Utilities;
@@ -158,7 +158,7 @@ public class NewPlanetaryEventDialog extends JDialog {
         super(parent, modal);
         this.planet = new Planet(Objects.requireNonNull(planet).getId());
         this.planet.copyDataFrom(planet);
-        this.date = Utilities.getDateTimeDay(campaign.getCalendar());
+        date = Utilities.getDateTimeDay(campaign.getCalendar());
         initComponents();
         setLocationRelativeTo(parent);
     }
@@ -459,7 +459,7 @@ public class NewPlanetaryEventDialog extends JDialog {
         pane.add(new JLabel(resourceMap.getString("lifeform.text")), gbc); //$NON-NLS-1$
         
         gbc.gridx = 1;
-        lifeFormField = new JComboBox<LifeFormChoice>(new LifeFormChoice[]{
+        lifeFormField = new JComboBox<>(new LifeFormChoice[]{
             new LifeFormChoice(null),
             new LifeFormChoice(LifeForm.NONE), new LifeFormChoice(LifeForm.MICROBE), new LifeFormChoice(LifeForm.PLANT),
             new LifeFormChoice(LifeForm.INSECT), new LifeFormChoice(LifeForm.FISH), new LifeFormChoice(LifeForm.AMPH),
@@ -484,7 +484,7 @@ public class NewPlanetaryEventDialog extends JDialog {
         pane.add(new JLabel(resourceMap.getString("climate.text")), gbc); //$NON-NLS-1$
 
         gbc.gridx = 1;
-        climateField = new JComboBox<ClimateChoice>(new ClimateChoice[]{
+        climateField = new JComboBox<>(new ClimateChoice[]{
                 new ClimateChoice(null),
                 new ClimateChoice(Climate.ARCTIC), new ClimateChoice(Climate.BOREAL), new ClimateChoice(Climate.TEMPERATE),
                 new ClimateChoice(Climate.WARM), new ClimateChoice(Climate.TROPICAL), new ClimateChoice(Climate.SUPERTROPICAL),
@@ -582,11 +582,11 @@ public class NewPlanetaryEventDialog extends JDialog {
         pane.add(new JLabel(resourceMap.getString("hpg.text")), gbc); //$NON-NLS-1$
 
         gbc.gridx = 1;
-        hpgField = new JComboBox<HPGChoice>(new HPGChoice[]{
+        hpgField = new JComboBox<>(new HPGChoice[]{
                 new HPGChoice(null, resourceMap.getString("hpg.undefined.text")), //$NON-NLS-1$
-                new HPGChoice(EquipmentType.RATING_A, resourceMap.getString("hpg.a.text")), new HPGChoice(EquipmentType.RATING_B, resourceMap.getString("hpg.b.text")), //$NON-NLS-1$ //$NON-NLS-2$
-                new HPGChoice(EquipmentType.RATING_C, resourceMap.getString("hpg.c.text")), new HPGChoice(EquipmentType.RATING_D, resourceMap.getString("hpg.d.text")), //$NON-NLS-1$ //$NON-NLS-2$
-                new HPGChoice(EquipmentType.RATING_X, resourceMap.getString("hpg.none.text")) //$NON-NLS-1$
+                new HPGChoice(ITechnology.RATING_A, resourceMap.getString("hpg.a.text")), new HPGChoice(ITechnology.RATING_B, resourceMap.getString("hpg.b.text")), //$NON-NLS-1$ //$NON-NLS-2$
+                new HPGChoice(ITechnology.RATING_C, resourceMap.getString("hpg.c.text")), new HPGChoice(ITechnology.RATING_D, resourceMap.getString("hpg.d.text")), //$NON-NLS-1$ //$NON-NLS-2$
+                new HPGChoice(ITechnology.RATING_X, resourceMap.getString("hpg.none.text")) //$NON-NLS-1$
         });
         hpgField.addActionListener(changeValueAction);
         hpgField.setName(FIELD_HPG);
@@ -607,7 +607,7 @@ public class NewPlanetaryEventDialog extends JDialog {
         pane.add(new JLabel(resourceMap.getString("pressureCategory.text")), gbc); //$NON-NLS-1$
 
         gbc.gridx = 1;
-        pressureField = new JComboBox<PressureChoice>(new PressureChoice[]{
+        pressureField = new JComboBox<>(new PressureChoice[]{
                 new PressureChoice(-1, resourceMap.getString("pressureCategory.undefined.text")), //$NON-NLS-1$
                 new PressureChoice(PlanetaryConditions.ATMO_VACUUM), new PressureChoice(PlanetaryConditions.ATMO_TRACE),
                 new PressureChoice(PlanetaryConditions.ATMO_THIN), new PressureChoice(PlanetaryConditions.ATMO_STANDARD),
@@ -674,7 +674,7 @@ public class NewPlanetaryEventDialog extends JDialog {
         pane.add(new JLabel(resourceMap.getString("atmosphereType.text")), gbc); //$NON-NLS-1$
 
         gbc.gridx = 1;
-        atmosphereField = new JComboBox<String>(new String[]{
+        atmosphereField = new JComboBox<>(new String[]{
                 null,
                 resourceMap.getString("atmosphereType.breathable.text"), //$NON-NLS-1$
                 resourceMap.getString("atmosphereType.tainted.text"), resourceMap.getString("atmosphereType.tainted.caustic.text"), resourceMap.getString("atmosphereType.tainted.flammable.text"), resourceMap.getString("atmosphereType.tainted.poisonous.text"), resourceMap.getString("atmosphereType.tainted.radiological.text"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
@@ -761,7 +761,7 @@ public class NewPlanetaryEventDialog extends JDialog {
         pane.add(new JLabel(resourceMap.getString("population.text")), gbc); //$NON-NLS-1$
 
         gbc.gridx = 1;
-        popField = new JComboBox<PopulationChoice>(new PopulationChoice[]{
+        popField = new JComboBox<>(new PopulationChoice[]{
                 new PopulationChoice(null, resourceMap.getString("population.undefined.text")), //$NON-NLS-1$
                 new PopulationChoice(-1), new PopulationChoice(0), new PopulationChoice(1), new PopulationChoice(2),
                 new PopulationChoice(3), new PopulationChoice(4), new PopulationChoice(5), new PopulationChoice(6),
@@ -808,7 +808,7 @@ public class NewPlanetaryEventDialog extends JDialog {
         pane.add(new JLabel(resourceMap.getString("control.text")), gbc); //$NON-NLS-1$
         
         gbc.gridx = 1;
-        controlField = new JComboBox<ControlChoice>(new ControlChoice[]{
+        controlField = new JComboBox<>(new ControlChoice[]{
                 new ControlChoice(null, resourceMap.getString("control.undefined.text")), //$NON-NLS-1$
                 new ControlChoice(0), new ControlChoice(1), new ControlChoice(2),
                 new ControlChoice(3), new ControlChoice(4), new ControlChoice(5),

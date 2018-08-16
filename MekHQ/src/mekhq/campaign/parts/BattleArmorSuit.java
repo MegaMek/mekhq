@@ -32,8 +32,8 @@ import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.EntityMovementMode;
 import megamek.common.EntityWeightClass;
-import megamek.common.EquipmentType;
 import megamek.common.IArmorState;
+import megamek.common.ITechnology;
 import megamek.common.MechFileParser;
 import megamek.common.MechSummary;
 import megamek.common.MechSummaryCache;
@@ -79,52 +79,53 @@ public class BattleArmorSuit extends Part {
 
     public BattleArmorSuit() {
         super(0, null);
-        this.trooper = 0;
-        this.quad = false;
-        this.weightClass= 0;
-        this.groundMP = 0;
-        this.jumpMP = 0;
-        this.clan = false;
-        this.introYear = EquipmentType.DATE_NONE;
-        this.jumpType = EntityMovementMode.NONE;
-        this.name = "BattleArmor Suit";
+        trooper = 0;
+        quad = false;
+        weightClass= 0;
+        groundMP = 0;
+        jumpMP = 0;
+        clan = false;
+        introYear = ITechnology.DATE_NONE;
+        jumpType = EntityMovementMode.NONE;
+        name = "BattleArmor Suit";
     }
 
     public BattleArmorSuit(BattleArmor ba, int loc, Campaign c) {
         super((int)ba.getWeight(), c);
-        this.trooper = loc;
-        this.quad = ba.getChassisType() == BattleArmor.CHASSIS_TYPE_QUAD;
-        this.weightClass= ba.getWeightClass();
-        this.groundMP = ba.getOriginalWalkMP();
-        this.jumpMP = ba.getOriginalJumpMP();
-        this.clan = ba.isClan();
-        this.chassis = ba.getChassis();
-        this.model = ba.getModel();
-        this.jumpType = ba.getMovementMode();
-        this.name = chassis + " " + model + " Suit";
+        trooper = loc;
+        quad = ba.getChassisType() == BattleArmor.CHASSIS_TYPE_QUAD;
+        weightClass= ba.getWeightClass();
+        groundMP = ba.getOriginalWalkMP();
+        jumpMP = ba.getOriginalJumpMP();
+        clan = ba.isClan();
+        chassis = ba.getChassis();
+        model = ba.getModel();
+        jumpType = ba.getMovementMode();
+        name = chassis + " " + model + " Suit";
         initializeExtraCostsAndTons();
     }
 
     public BattleArmorSuit(String ch, String m, int ton, int t, int w, int gmp, int jmp, boolean q, boolean clan, EntityMovementMode mode, Campaign c) {
         super(ton, c);
-        this.trooper = t;
-        this.quad = q;
-        this.weightClass= w;
-        this.groundMP = gmp;
-        this.jumpMP = jmp;
+        trooper = t;
+        quad = q;
+        weightClass= w;
+        groundMP = gmp;
+        jumpMP = jmp;
         this.clan = clan;
-        this.chassis = ch;
-        this.model = m;
-        this.jumpType = mode;
-        this.name = chassis + " " + model + " Suit";
+        chassis = ch;
+        model = m;
+        jumpType = mode;
+        name = chassis + " " + model + " Suit";
         initializeExtraCostsAndTons();
     }
 
-    public BattleArmorSuit clone() {
+    @Override
+	public BattleArmorSuit clone() {
         BattleArmorSuit clone = new BattleArmorSuit(chassis, model, getUnitTonnage(), trooper, weightClass, groundMP, jumpMP, quad, clan, jumpType, campaign);
         clone.copyBaseData(this);
-        clone.alternateCost = this.alternateCost;
-        clone.alternateTon = this.alternateTon;
+        clone.alternateCost = alternateCost;
+        clone.alternateTon = alternateTon;
         return clone;
     }
 
@@ -136,7 +137,8 @@ public class BattleArmorSuit extends Part {
         trooper = i;
     }
 
-    public double getTonnage() {
+    @Override
+	public double getTonnage() {
     	//if there are no linked parts and the unit is null,
         //then use the pre-recorded alternate costs
         if(null == unit && childPartIds.size()==0) {
@@ -329,7 +331,7 @@ public class BattleArmorSuit extends Part {
         return part instanceof BattleArmorSuit
                 && chassis.equals(((BattleArmorSuit)part).getChassis())
                 && model.equals(((BattleArmorSuit)part).getModel())
-                && this.getStickerPrice() == part.getStickerPrice();
+                && getStickerPrice() == part.getStickerPrice();
     }
 
     @Override
@@ -429,7 +431,7 @@ public class BattleArmorSuit extends Part {
 
     @Override
     public void remove(boolean salvage) {
-        ArrayList<Part> trooperParts = new ArrayList<Part>();
+        ArrayList<Part> trooperParts = new ArrayList<>();
         if(null != unit) {
             Person trooperToRemove = null;
             if(unit.getEntity().getInternal(trooper) > 0) {
@@ -597,6 +599,7 @@ public class BattleArmorSuit extends Part {
 		return trooper;
 	}
 
+	@Override
 	public boolean needsMaintenance() {
         return false;
     }

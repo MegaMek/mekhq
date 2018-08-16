@@ -317,7 +317,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     /**
      * * Start Advanced Medical ***
      */
-    private ArrayList<Injury> injuries = new ArrayList<Injury>();
+    private ArrayList<Injury> injuries = new ArrayList<>();
     private Map<BodyLocation, Integer> hitsPerLocation = new EnumMap<>(BodyLocation.class);
     /**
      * * End Advanced Medical ***
@@ -380,7 +380,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         rankLevel = 0;
         status = S_ACTIVE;
         hits = 0;
-        skills = new Hashtable<String, Skill>();
+        skills = new Hashtable<>();
         salary = -1;
         campaign = c;
         doctorId = null;
@@ -390,8 +390,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
         toughness = 0;
         biography = "";
         nTasks = 0;
-        personnelLog = new ArrayList<LogEntry>();
-        awards = new ArrayList<Award>();
+        personnelLog = new ArrayList<>();
+        awards = new ArrayList<>();
         idleMonths = -1;
         daysToWaitForHealing = 15;
         resetMinutesLeft();
@@ -399,7 +399,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         dependent = false;
         commander = false;
         isClanTech = false;
-        techUnitIds = new ArrayList<UUID>();
+        techUnitIds = new ArrayList<>();
         salary = -1;
         phenotype = PHENOTYPE_NONE;
         clan = Faction.getFaction(factionCode).isClan();
@@ -659,7 +659,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public void setName(String n) {
-        this.name = n;
+        name = n;
     }
 
     public String getMaidenName() {
@@ -667,7 +667,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public void setMaidenName(String n) {
-        this.maidenname = n;
+        maidenname = n;
     }
 
     public String getFullName() {
@@ -686,7 +686,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public void setCallsign(String n) {
-        this.callsign = n;
+        callsign = n;
     }
 
     public String getPortraitCategory() {
@@ -698,19 +698,19 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public void setPortraitCategory(String s) {
-        this.portraitCategory = s;
+        portraitCategory = s;
     }
 
     public void setPortraitFileName(String s) {
-        this.portraitFile = s;
+        portraitFile = s;
     }
 
     public void setPortraitCategoryOverride(String s) {
-        this.portraitCategoryOverride = s;
+        portraitCategoryOverride = s;
     }
 
     public void setPortraitFileNameOverride(String s) {
-        this.portraitFileOverride = s;
+        portraitFileOverride = s;
     }
 
 
@@ -719,7 +719,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public void setPrimaryRole(int t) {
-        this.primaryRole = t;
+        primaryRole = t;
         //you can't be primary tech and a secondary astech
         //you can't be a primary astech and a secondary tech
         if ((isTechPrimary() && secondaryRole == T_ASTECH)
@@ -738,7 +738,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public void setSecondaryRole(int t) {
-        this.secondaryRole = t;
+        secondaryRole = t;
         MekHQ.triggerEvent(new PersonChangedEvent(this));
     }
 
@@ -747,7 +747,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public void setStatus(int s) {
-        this.status = s;
+        status = s;
     }
 
     public int getIdleMonths() {
@@ -755,7 +755,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public void setIdleMonths(int m) {
-        this.idleMonths = m;
+        idleMonths = m;
     }
 
     public int getDaysToWaitForHealing() {
@@ -763,7 +763,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public void setDaysToWaitForHealing(int d) {
-        this.daysToWaitForHealing = d;
+        daysToWaitForHealing = d;
     }
 
 
@@ -909,7 +909,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public void setGender(int g) {
-        this.gender = g;
+        gender = g;
     }
 
     public int getGender() {
@@ -917,7 +917,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public void setBirthday(GregorianCalendar date) {
-        this.birthday = date;
+        birthday = date;
     }
 
     public GregorianCalendar getBirthday() {
@@ -929,11 +929,11 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public void setDeathday(GregorianCalendar date) {
-        this.deathday = date;
+        deathday = date;
     }
 
     public void setRecruitment(GregorianCalendar date) {
-        this.recruitment = date;
+        recruitment = date;
     }
 
     public GregorianCalendar getRecruitment() {
@@ -1099,7 +1099,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 
                 if(concieved) {
                     GregorianCalendar tCal = (GregorianCalendar) campaign.getCalendar().clone();
-                    tCal.add(GregorianCalendar.DAY_OF_YEAR, PREGNANCY_DURATION.getAsInt());
+                    tCal.add(Calendar.DAY_OF_YEAR, PREGNANCY_DURATION.getAsInt());
                     setDueDate(tCal);
                     int size = PREGNANCY_SIZE.getAsInt();
                     extraData.set(PREGNANCY_CHILDREN_DATA, size);
@@ -1125,7 +1125,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     public void addPregnancy() {
         GregorianCalendar tCal = (GregorianCalendar) campaign.getCalendar().clone();
-        tCal.add(GregorianCalendar.DAY_OF_YEAR, PREGNANCY_DURATION.getAsInt());
+        tCal.add(Calendar.DAY_OF_YEAR, PREGNANCY_DURATION.getAsInt());
         setDueDate(tCal);
         int size = PREGNANCY_SIZE.getAsInt();
         extraData.set(PREGNANCY_CHILDREN_DATA, size);
@@ -1155,7 +1155,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     public boolean safeSpouse(Person p) {
         // Huge convoluted return statement
         return (
-                !this.equals(p)
+                !equals(p)
                 && (getAncestorsID() == null
                 || !campaign.getAncestors(getAncestorsID()).checkMutualAncestors(campaign.getAncestors(p.getAncestorsID())))
                 && p.getSpouseID() == null
@@ -1210,8 +1210,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public void setDoctorId(UUID t, int daysToWait) {
-        this.doctorId = t;
-        this.daysToWaitForHealing = daysToWait;
+        doctorId = t;
+        daysToWaitForHealing = daysToWait;
     }
 
     public boolean checkNaturalHealing(int daysToWait) {
@@ -1242,7 +1242,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public void setBiography(String s) {
-        this.biography = s;
+        biography = s;
     }
 
     public boolean isActive() {
@@ -1326,18 +1326,18 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     + "</idleMonths>");
         pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                     + "<id>"
-                    + this.id.toString()
+                    + id.toString()
                     + "</id>");
         if (ancestorsID != null) {
             pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                         + "<ancestors>"
-                        + this.ancestorsID.toString()
+                        + ancestorsID.toString()
                         + "</ancestors>");
         }
         if (spouse != null) {
             pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                         + "<spouse>"
-                        + this.spouse.toString()
+                        + spouse.toString()
                         + "</spouse>");
         }
         if (dueDate != null) {
@@ -1603,7 +1603,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     retVal.spouse = UUID.fromString(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("duedate")) {
                     SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-                    retVal.dueDate = (GregorianCalendar) GregorianCalendar.getInstance();
+                    retVal.dueDate = (GregorianCalendar) Calendar.getInstance();
                     retVal.dueDate.setTime(df.parse(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("teamId")) {
                     retVal.teamId = Integer.parseInt(wn2.getTextContent());
@@ -1668,15 +1668,15 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     retVal.overtimeLeft = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("birthday")) {
                     SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-                    retVal.birthday = (GregorianCalendar) GregorianCalendar.getInstance();
+                    retVal.birthday = (GregorianCalendar) Calendar.getInstance();
                     retVal.birthday.setTime(df.parse(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("deathday")) {
                     SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-                    retVal.deathday = (GregorianCalendar) GregorianCalendar.getInstance();
+                    retVal.deathday = (GregorianCalendar) Calendar.getInstance();
                     retVal.deathday.setTime(df.parse(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("recruitment")) {
                     SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-                    retVal.recruitment = (GregorianCalendar) GregorianCalendar.getInstance();
+                    retVal.recruitment = (GregorianCalendar) Calendar.getInstance();
                     retVal.recruitment.setTime(df.parse(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("advantages")) {
                     advantages = wn2.getTextContent();
@@ -1913,7 +1913,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
             // Errrr, apparently either the class name was invalid...
             // Or the listed name doesn't exist.
             // Doh!
-            MekHQ.getLogger().log(Person.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(Person.class, METHOD_NAME, ex);
         }
 
         if (retVal.id == null) {
@@ -2648,7 +2648,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public void setHits(int h) {
-        this.hits = h;
+        hits = h;
     }
 
     /**
@@ -2705,7 +2705,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public ArrayList<SpecialAbility> getEligibleSPAs(boolean generation) {
-        ArrayList<SpecialAbility> eligible = new ArrayList<SpecialAbility>();
+        ArrayList<SpecialAbility> eligible = new ArrayList<>();
         for (Enumeration<IOption> i = getOptions(PilotOptions.LVL3_ADVANTAGES); i.hasMoreElements(); ) {
             IOption ability = i.nextElement();
             if (!ability.booleanValue()) {
@@ -2889,7 +2889,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     public void acquireAbility(String type, String name, Object value) {
         //we might also need to remove some prior abilities
         SpecialAbility spa = SpecialAbility.getAbility(name);
-        Vector<String> toRemove = new Vector<String>();
+        Vector<String> toRemove = new Vector<>();
         if(null != spa) {
             toRemove = spa.getRemovedAbilities();
         }
@@ -3065,7 +3065,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public void setMinutesLeft(int m) {
-        this.minutesLeft = m;
+        minutesLeft = m;
         if(engineer && null != getUnitId()) {
             //set minutes for all crewmembers
             Unit u = campaign.getUnit(getUnitId());
@@ -3082,7 +3082,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public void setOvertimeLeft(int m) {
-        this.overtimeLeft = m;
+        overtimeLeft = m;
         if(engineer && null != getUnitId()) {
             //set minutes for all crewmembers
             Unit u = campaign.getUnit(getUnitId());
@@ -3096,12 +3096,12 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     public void resetMinutesLeft() {
         if (isTechPrimary() || getPrimaryRole() == T_DOCTOR) {
-            this.minutesLeft = 480;
-            this.overtimeLeft = 240;
+            minutesLeft = 480;
+            overtimeLeft = 240;
         }
         if (isTechSecondary() || getSecondaryRole() == T_DOCTOR) {
-            this.minutesLeft = 240;
-            this.overtimeLeft = 240;
+            minutesLeft = 240;
+            overtimeLeft = 240;
         }
     }
 
@@ -3870,7 +3870,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
             while (rankOrder <= rank && rankOrder < Ranks.RC_NUM) {
                 Rank rank = ranks.getAllRanks().get(rankOrder);
                 if (!rank.getName(getProfession()).equals("-")) {
-                    shares++;;
+                    shares++;
                 }
                 rankOrder++;
             }

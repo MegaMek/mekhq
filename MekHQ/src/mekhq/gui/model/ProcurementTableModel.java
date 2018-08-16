@@ -1,7 +1,7 @@
 package mekhq.gui.model;
 
 import java.awt.Component;
-import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 
 import javax.swing.JTable;
@@ -34,11 +34,13 @@ public class ProcurementTableModel extends DataTableModel {
         campaign = c;
     }
 
-    public int getRowCount() {
+    @Override
+	public int getRowCount() {
         return data.size();
     }
 
-    public int getColumnCount() {
+    @Override
+	public int getColumnCount() {
         return N_COL;
     }
 
@@ -64,19 +66,20 @@ public class ProcurementTableModel extends DataTableModel {
 
     public void incrementItem(int row) {
         ((IAcquisitionWork)data.get(row)).incrementQuantity();
-        this.fireTableCellUpdated(row, COL_QUEUE);
+        fireTableCellUpdated(row, COL_QUEUE);
     }
 
     public void decrementItem(int row) {
         ((IAcquisitionWork)data.get(row)).decrementQuantity();
-        this.fireTableCellUpdated(row, COL_QUEUE);
+        fireTableCellUpdated(row, COL_QUEUE);
     }
 
     public void removeRow(int row) {
         getCampaign().getShoppingList().removeItem(getNewEquipmentAt(row));
     }
 
-    public Object getValueAt(int row, int col) {
+    @Override
+	public Object getValueAt(int row, int col) {
         //Part part;
         IAcquisitionWork shoppingItem;
         if(data.isEmpty()) {
@@ -92,10 +95,10 @@ public class ProcurementTableModel extends DataTableModel {
             return shoppingItem.getAcquisitionName();
         }
         if(col == COL_COST) {
-            return DecimalFormat.getInstance().format(shoppingItem.getBuyCost());
+            return NumberFormat.getInstance().format(shoppingItem.getBuyCost());
         }
         if(col == COL_TOTAL_COST) {
-            return DecimalFormat.getInstance().format(shoppingItem.getBuyCost() * shoppingItem.getQuantity());
+            return NumberFormat.getInstance().format(shoppingItem.getBuyCost() * shoppingItem.getQuantity());
         }
         if(col == COL_TARGET) {
             TargetRoll target = getCampaign().getTargetForAcquisition(shoppingItem, getCampaign().getLogisticsPerson(), false);
@@ -197,7 +200,8 @@ public class ProcurementTableModel extends DataTableModel {
 
         private static final long serialVersionUID = 9054581142945717303L;
 
-        public Component getTableCellRendererComponent(JTable table,
+        @Override
+		public Component getTableCellRendererComponent(JTable table,
                 Object value, boolean isSelected, boolean hasFocus,
                 int row, int column) {
             super.getTableCellRendererComponent(table, value, isSelected,

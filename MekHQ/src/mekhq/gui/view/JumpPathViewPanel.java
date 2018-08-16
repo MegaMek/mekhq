@@ -47,8 +47,8 @@ public class JumpPathViewPanel extends javax.swing.JPanel {
     private javax.swing.JTextArea txtCost;
 
     public JumpPathViewPanel(JumpPath p, Campaign c) {
-        this.path = p;
-        this.campaign = c;
+        path = p;
+        campaign = c;
         initComponents();
     }
     

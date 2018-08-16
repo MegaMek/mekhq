@@ -139,7 +139,7 @@ public class PartsInUseTableModel extends DataTableModel {
     }
     
     public void setData(Set<PartInUse> data) {
-        setData(new ArrayList<PartInUse>(data));
+        setData(new ArrayList<>(data));
     }
     
     @SuppressWarnings("unchecked")
@@ -352,7 +352,7 @@ public class PartsInUseTableModel extends DataTableModel {
             }
             editButton.setEnabled(enabled && buyable);
             
-            this.editorValue = value;
+            editorValue = value;
             return editButton;
         }
 

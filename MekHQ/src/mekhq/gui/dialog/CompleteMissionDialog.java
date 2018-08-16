@@ -26,8 +26,8 @@ public class CompleteMissionDialog extends javax.swing.JDialog {
 	/** Creates new form */
     public CompleteMissionDialog(java.awt.Frame parent, boolean modal, Mission m) {
         super(parent, modal);  
-        this.mission = m;
-        this.status = -1;
+        mission = m;
+        status = -1;
         initComponents();     
         setLocationRelativeTo(parent);
     }
@@ -37,7 +37,7 @@ public class CompleteMissionDialog extends javax.swing.JDialog {
     	
         btnDone = new javax.swing.JButton();
         btnCancel = new javax.swing.JButton();
-        choiceOutcome = new javax.swing.JComboBox<String>();
+        choiceOutcome = new javax.swing.JComboBox<>();
         lblOutcome = new javax.swing.JLabel();
         
         ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CompleteMissionDialog", new EncodeControl()); //$NON-NLS-1$
@@ -57,7 +57,7 @@ public class CompleteMissionDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         getContentPane().add(lblOutcome, gridBagConstraints);
         
-        DefaultComboBoxModel<String> outcomeModel = new DefaultComboBoxModel<String>();
+        DefaultComboBoxModel<String> outcomeModel = new DefaultComboBoxModel<>();
 		for (int i = 1; i < Mission.S_NUM; i++) {
 			outcomeModel.addElement(Mission.getStatusName(i));
 		}
@@ -75,7 +75,8 @@ public class CompleteMissionDialog extends javax.swing.JDialog {
         btnDone.setText(resourceMap.getString("btnDone.text")); // NOI18N
         btnDone.setName("btnDone"); // NOI18N
         btnDone.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnDoneActionPerformed(evt);
             }
         });
@@ -90,7 +91,8 @@ public class CompleteMissionDialog extends javax.swing.JDialog {
         btnCancel.setText(resourceMap.getString("btnCancel.text")); // NOI18N
         btnCancel.setName("btnCancel"); // NOI18N
         btnCancel.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnCancelActionPerformed(evt);
             }
         });
@@ -108,12 +110,12 @@ public class CompleteMissionDialog extends javax.swing.JDialog {
 
     private void btnDoneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDoneActionPerformed
     	status = choiceOutcome.getSelectedIndex()+1;
-    	this.setVisible(false);
+    	setVisible(false);
     }
     
     private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDoneActionPerformed
         status = -1;
-    	this.setVisible(false);
+    	setVisible(false);
     }
 
     public int getStatus() {

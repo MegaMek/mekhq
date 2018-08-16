@@ -3,7 +3,6 @@ package mekhq.campaign.mission.atb.scenario;
 import java.util.ArrayList;
 
 import megamek.client.bot.princess.BehaviorSettingsFactory;
-import megamek.client.bot.princess.CardinalEdge;
 import megamek.client.bot.princess.PrincessException;
 import megamek.common.Board;
 import megamek.common.Compute;

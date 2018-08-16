@@ -48,7 +48,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import megamek.common.EquipmentType;
+import megamek.common.ITechnology;
 import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
@@ -205,10 +205,10 @@ public class Faction {
         if (part.getTechBase() == Part.T_IS && isPeriphery()) {
             // Availability of high tech rating equipment in low tech areas (periphery)
             switch (part.getTechRating()) {
-                case(EquipmentType.RATING_E) :
+                case(ITechnology.RATING_E) :
                     factionMod += 1;
                     break;
-                case(EquipmentType.RATING_F) :
+                case(ITechnology.RATING_F) :
                     factionMod += 2;
                     break;
             }
@@ -368,7 +368,7 @@ public class Faction {
             // Parse using builder to get DOM representation of the XML file
             xmlDoc = db.parse(fis);
         } catch (Exception ex) {
-            MekHQ.getLogger().log(Faction.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(Faction.class, METHOD_NAME, ex);
         }
 
         Element factionEle = xmlDoc.getDocumentElement();

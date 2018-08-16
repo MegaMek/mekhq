@@ -43,7 +43,7 @@ public class MissingProtomekSensor extends MissingPart {
 
     public MissingProtomekSensor(int tonnage, Campaign c) {
         super(tonnage, c);
-        this.name = "Protomech Sensors";
+        name = "Protomech Sensors";
     }
 
     @Override

@@ -38,11 +38,13 @@ public class RatingReport extends Report {
         super(c);
     }
 
-    public String getTitle() {
+    @Override
+	public String getTitle() {
         return "Unit Rating Report";
     }
 
-    public JTextPane getReport() {
+    @Override
+	public JTextPane getReport() {
         JTextPane txtReport = new JTextPane();
         txtReport.setFont(new Font("Courier New", Font.PLAIN, 12));
         txtReport.setText(getCampaign().getUnitRating().getDetails());

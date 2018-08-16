@@ -100,7 +100,7 @@ public class UnitMarket implements Serializable {
 	private ArrayList<MarketOffer> offers;
 
 	public UnitMarket() {
-		offers = new ArrayList<MarketOffer>();
+		offers = new ArrayList<>();
 	}
 	
 	public ArrayList<MarketOffer> getOffers() {
@@ -392,7 +392,7 @@ public class UnitMarket implements Serializable {
             // Errrr, apparently either the class name was invalid...
             // Or the listed name doesn't exist.
             // Doh!
-            MekHQ.getLogger().log(UnitMarket.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(UnitMarket.class, METHOD_NAME, ex);
         }
 
         return retVal;

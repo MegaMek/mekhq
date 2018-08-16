@@ -107,7 +107,7 @@ public class MekLabTab extends CampaignGuiTab {
 
     MekLabTab(CampaignGUI gui, String name) {
         super(gui, name);
-        this.campaignGUI = gui;
+        campaignGUI = gui;
 
         this.repaint();
     }
@@ -217,7 +217,7 @@ public class MekLabTab extends CampaignGuiTab {
         try {
             entity = (new MechFileParser(mechSummary.getSourceFile(), mechSummary.getEntryName())).getEntity();
         } catch (EntityLoadingException ex) {
-            MekHQ.getLogger().log(getClass(), "loadUnit(Unit)", ex); //$NON-NLS-1$
+            MekHQ.getLogger().error(getClass(), "loadUnit(Unit)", ex); //$NON-NLS-1$
         }
         entity.setYear(unit.campaign.getCalendar().get(Calendar.YEAR));
         UnitUtil.updateLoadedUnit(entity);
@@ -239,7 +239,7 @@ public class MekLabTab extends CampaignGuiTab {
     }
 
     public void clearUnit() {
-        this.unit = null;
+        unit = null;
         removeAll();
         add(emptyPanel, BorderLayout.CENTER);
         this.repaint();
@@ -251,7 +251,7 @@ public class MekLabTab extends CampaignGuiTab {
         try {
             entity = (new MechFileParser(mechSummary.getSourceFile(), mechSummary.getEntryName())).getEntity();
         } catch (EntityLoadingException ex) {
-            MekHQ.getLogger().log(getClass(), "resetUnit()", ex); //$NON-NLS-1$
+            MekHQ.getLogger().error(getClass(), "resetUnit()", ex); //$NON-NLS-1$
         }
         entity.setYear(unit.campaign.getCalendar().get(Calendar.YEAR));
         UnitUtil.updateLoadedUnit(entity);

@@ -52,7 +52,7 @@ public class JumpPath implements Serializable {
 	private ArrayList<Planet> path;
 	
 	public JumpPath() {
-		path = new ArrayList<Planet>();
+		path = new ArrayList<>();
 	}
 	
 	public JumpPath(ArrayList<Planet> p) {
@@ -188,7 +188,7 @@ public class JumpPath implements Serializable {
 			// Errrr, apparently either the class name was invalid...
 			// Or the listed name doesn't exist.
 			// Doh!
-            MekHQ.getLogger().log(JumpPath.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(JumpPath.class, METHOD_NAME, ex);
 		}
 		
 		return retVal;
