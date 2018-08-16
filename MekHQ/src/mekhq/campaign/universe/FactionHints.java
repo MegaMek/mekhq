@@ -562,7 +562,7 @@ public class FactionHints {
     
     private void setFactionHint(Map<Faction, Map<Faction, List<FactionHint>>> hint,
             Node node) throws DOMException, ParseException {
-        final String METHOD_NAME = "setFactionHint(Map<String,Map<String,List<FactionHint>>>,Node"; //$NON-NLS-1$
+        final String METHOD_NAME = "setFactionHint(Map<Faction,Map<Faction,List<FactionHint>>>,Node"; //$NON-NLS-1$
         
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 
@@ -605,7 +605,7 @@ public class FactionHints {
     }
     
     private void addNeutralExceptions(Faction faction, Node node) throws DOMException, ParseException {
-        final String METHOD_NAME = "addNeutralExceptions(String,Node)"; //$NON-NLS-1$
+        final String METHOD_NAME = "addNeutralExceptions(Faction,Node)"; //$NON-NLS-1$
         
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 
