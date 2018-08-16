@@ -76,8 +76,8 @@ public class FactionBordersTest {
         
         assertEquals(border.size(), 2);
         for (Planet p : border) {
-            assertEquals(Math.abs(p.getX()), 1, 0.001);
-            assertEquals(p.getY(), 0, 0.001);
+            assertEquals(Math.abs(p.getX()), 1, RegionPerimeter.EPSILON);
+            assertEquals(p.getY(), 0, RegionPerimeter.EPSILON);
         }
     }
 

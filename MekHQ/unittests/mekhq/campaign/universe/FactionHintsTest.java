@@ -129,7 +129,7 @@ public class FactionHintsTest {
         assertTrue(hints.getContainedFactions(outer, now).contains(inner));
         assertEquals(hints.getContainedFactionHost(inner, now), outer);
         assertTrue(hints.isContainedFactionOpponent(outer, inner, opponent, now));
-        assertEquals(hints.getAltLocationFraction(outer, inner, now), 0.5, 0.001);
+        assertEquals(hints.getAltLocationFraction(outer, inner, now), 0.5, RegionPerimeter.EPSILON);
     }
 
     @Test
