@@ -136,12 +136,7 @@ public class LogEntry implements Cloneable, MekHqXmlSerializable {
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((date == null) ? 0 : date.hashCode());
-        result = prime * result + desc.hashCode();
-        result = prime * result + ((type == null) ? 0 : type.hashCode());
-        return result;
+        return Objects.hash(date, desc, type);
     }
 
     @Override
