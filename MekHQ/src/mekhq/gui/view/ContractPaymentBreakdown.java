@@ -551,7 +551,7 @@ public class ContractPaymentBreakdown {
     }
 
     private void setLblMonthlyNetIncome2(){
-        lblMonthlyNetIncome2.setText(contract.getLength() + "x "
+        lblMonthlyNetIncome2.setText(generateMonthlyHeader(contract.getLength())
                 + formatter.format(contract.getMonthlyPayOut()));
     }
 
@@ -560,17 +560,16 @@ public class ContractPaymentBreakdown {
     }
 
     private void setLblOverheadExp2(){
-        lblOverheadExp2.setText(contract.getLengthPlusTravel(campaign) + "x "
+        lblOverheadExp2.setText(generateMonthlyHeader(contract.getLengthPlusTravel(campaign))
                 + "-" + formatter.format(campaign.getOverheadExpenses()));
     }
 
     private void setLblMaintenanceExp2(){
-        lblMaintenanceExp2.setText(contract.getLengthPlusTravel(campaign) + "x "
+        lblMaintenanceExp2.setText(generateMonthlyHeader(contract.getLengthPlusTravel(campaign))
                 + "-" + formatter.format(campaign.getMaintenanceCosts()));
     }
-
     private void setLblPayrollExp2(){
-        lblPayrollExp2.setText(contract.getLengthPlusTravel(campaign) + "x "
+        lblPayrollExp2.setText(generateMonthlyHeader(contract.getLengthPlusTravel(campaign))
                 + "-" +formatter.format(contract.getEstimatedPayrollExpenses(campaign)));
     }
 
@@ -588,5 +587,11 @@ public class ContractPaymentBreakdown {
 
     private void setLblEstimatedProfit2(){
         lblEstimatedProfit2.setText(formatter.format(contract.getEstimatedTotalProfit(campaign)));
+    }
+
+    private String generateMonthlyHeader(int lenght){
+        if(lenght > 1) return Integer.toString(lenght) + " " + resourceMap.getString("lblMonths.text") + " @ ";
+
+        return Integer.toString(lenght) + " " + resourceMap.getString("lblMonth.text") + " @ ";
     }
 }
