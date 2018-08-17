@@ -589,9 +589,9 @@ public class ContractPaymentBreakdown {
         lblEstimatedProfit2.setText(formatter.format(contract.getEstimatedTotalProfit(campaign)));
     }
 
-    private String generateMonthlyHeader(int lenght){
-        if(lenght > 1) return Integer.toString(lenght) + " " + resourceMap.getString("lblMonths.text") + " @ ";
+    private String generateMonthlyHeader(int length){
+        if(length > 1) return Integer.toString(length) + " " + resourceMap.getString("lblMonths.text") + " @ ";
 
-        return Integer.toString(lenght) + " " + resourceMap.getString("lblMonth.text") + " @ ";
+        return Integer.toString(length) + " " + resourceMap.getString("lblMonth.text") + " @ ";
     }
 }
