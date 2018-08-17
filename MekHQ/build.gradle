@@ -59,6 +59,7 @@ ext {
 	mmRepoDir = "${buildDir}/repo/megamek"
 	mmlRepoDir = "${buildDir}/repo/megameklab"
 	scriptTemplate = "startScriptTemplate.txt"
+	mavenPublishDir = "${buildDir}/mavenrepo"
 }
 
 jar {
@@ -392,6 +393,15 @@ publishing {
         }
 	}
 	repositories {
-		mavenLocal()
+		maven {
+			url uri(mavenPublishDir)
+		}
 	}
 }
+
+task cleanPublishingDir (type: Delete) {
+	delete = mavenPublishDir
+}
+
+publishPublishMMLibraryPublicationToMavenRepository.dependsOn cleanPublishingDir
+
