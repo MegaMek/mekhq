@@ -2476,12 +2476,9 @@ public class Campaign implements Serializable, ITechManager {
 
         if (calendar.get(Calendar.DAY_OF_MONTH) == 1) {
             /*
-             * First of the month; update employer/enemy tables, roll morale, track unit
-             * fatigue.
+             * First of the month; roll morale, track unit fatigue.
              */
 
-            RandomFactionGenerator.getInstance().updateTables(calendar.getTime(), location.getCurrentPlanet(),
-                    campaignOptions);
             IUnitRating rating = getUnitRating();
             rating.reInitialize();
 
@@ -3092,14 +3089,7 @@ public class Campaign implements Serializable, ITechManager {
         shoppingList.restore();
 
         if (getCampaignOptions().getUseAtB()) {
-            while (!RandomFactionGenerator.getInstance().isInitialized()) {
-                //Sleep for up to one second.
-                try {
-                    Thread.sleep(50);
-                } catch (InterruptedException ignore) {
-
-                }
-            }
+            RandomFactionGenerator.getInstance().startup(this);
             while (!RandomUnitGenerator.getInstance().isInitialized()) {
                 //Sleep for up to one second.
                 try {
@@ -3109,8 +3099,7 @@ public class Campaign implements Serializable, ITechManager {
                 }
             }
             RandomNameGenerator.getInstance();
-            RandomFactionGenerator.getInstance().updateTables(getDate(), location.getCurrentPlanet(),
-                    getCampaignOptions());
+            RandomFactionGenerator.getInstance().startup(this);
         }
     }
 
@@ -9159,8 +9148,7 @@ public class Campaign implements Serializable, ITechManager {
         }
         addAllLances(this.forces);
         atbConfig = AtBConfiguration.loadFromXml();
-        RandomFactionGenerator.getInstance().updateTables(calendar.getTime(), location.getCurrentPlanet(),
-                campaignOptions);
+        RandomFactionGenerator.getInstance().startup(this);
         atbEventProcessor = new AtBEventProcessor(this);
     }
     
