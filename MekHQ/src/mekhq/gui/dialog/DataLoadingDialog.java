@@ -48,6 +48,7 @@ import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.NullEntityException;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignFactory;
 import mekhq.campaign.GamePreset;
 import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.io.CampaignXmlParser;
@@ -191,7 +192,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
 
         		try {
         			fis = new FileInputStream(fileCampaign);
-        			campaign = new CampaignXmlParser(fis, app).parse();
+        			campaign = CampaignFactory.newInstance(app).createCampaign(fis);
         			// Restores all transient attributes from serialized objects
         			campaign.restore();
         			campaign.cleanUp();

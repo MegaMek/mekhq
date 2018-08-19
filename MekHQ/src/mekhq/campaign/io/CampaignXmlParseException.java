@@ -10,6 +10,10 @@ public class CampaignXmlParseException extends Exception {
     public CampaignXmlParseException() {
     }
 
+    public CampaignXmlParseException(String message) {
+        super(message);
+    }
+
     public CampaignXmlParseException(Throwable e) {
         super(e);
     }
