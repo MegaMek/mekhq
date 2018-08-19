@@ -50,6 +50,7 @@ import java.util.TreeMap;
 import java.util.UUID;
 import java.util.Vector;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Stream;
 
 import javax.swing.JOptionPane;
 
@@ -3610,6 +3611,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public ArrayList<Part> getSpareParts() {
+
         ArrayList<Part> spares = new ArrayList<Part>();
         for (Part part : getParts()) {
             if (part.isSpare()) {
@@ -3617,6 +3619,10 @@ public class Campaign implements Serializable, ITechManager {
             }
         }
         return spares;
+    }
+
+    public Stream<Part> getSparePartsEx() {
+        return parts.values().stream().filter((Part p) -> p.isSpare());
     }
 
     public void addFunds(long quantity) {
@@ -6251,8 +6257,9 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public Part checkForExistingSparePart(Part part) {
-        for (Part spare : getSpareParts()) {
-            if (spare.getId() == part.getId()) {
+        for (Part spare : parts.values()) {
+            if (!spare.isSpare() 
+                || spare.getId() == part.getId()) {
                 continue;
             }
             if (part.isSamePartTypeAndStatus(spare)) {
@@ -7219,8 +7226,9 @@ public class Campaign implements Serializable, ITechManager {
         int hv = getNumberOfUnitsByType(Entity.ETYPE_TANK, false);
         int protos = getNumberOfUnitsByType(Entity.ETYPE_PROTOMECH);
 
-        for (Part part : getSpareParts()) {
-            if (!inTransit && !part.isPresent()) {
+        // Calc tonnage of spare parts
+        for (Part part : parts.values()) {
+            if (!part.isSpare() || (!inTransit && !part.isPresent())) {
                 continue;
             }
             cargoTonnage += (part.getQuantity() * part.getTonnage());
