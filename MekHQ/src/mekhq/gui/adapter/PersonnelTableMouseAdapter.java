@@ -547,11 +547,11 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             }
             case CMD_ADD_AWARD:
             {
-                selectedPerson.addAndLogAward(data[1], data[2], gui.getCampaign().getDate());
+                selectedPerson.awardController.addAndLogAward(data[1], data[2], gui.getCampaign().getDate());
             }
             case CMD_RMV_AWARD:
             {
-                selectedPerson.removeAward(data[1], data[2], data[3]);
+                selectedPerson.awardController.removeAward(data[1], data[2], data[3]);
             }
             case CMD_IMPROVE:
             {
@@ -1786,25 +1786,28 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
 
                         if(!award.canBeAwarded(person)) continue;
 
-                        String awardMenuItem = String.format("%s", award.getName());
+                        StringBuilder awardMenuItem = new StringBuilder();
+                        awardMenuItem.append(String.format("%s", award.getName()));
 
                         if(award.getXPReward() != 0 || award.getEdgeReward() != 0){
-                            awardMenuItem += " (";
+                            awardMenuItem.append(" (");
 
                             if(award.getXPReward() != 0){
-                                awardMenuItem += Integer.toString(award.getXPReward()) + " XP";
+                                awardMenuItem.append(award.getXPReward()).append(" XP");
                                 if(award.getEdgeReward() != 0)
-                                    awardMenuItem += " & ";
+                                    awardMenuItem.append(" & ");
                             }
 
                             if(award.getEdgeReward() != 0){
-                                awardMenuItem += Integer.toString(award.getEdgeReward()) + " Edge";
+                                awardMenuItem.append(award.getEdgeReward()).append(" Edge");
                             }
 
-                            awardMenuItem += ")";
+                            awardMenuItem.append(")");
                         }
 
-                        menuItem = new JMenuItem(awardMenuItem);
+                        awardMenuItem.append(": ").append(award.getDescription());
+
+                        menuItem = new JMenuItem(awardMenuItem.toString());
                         menuItem.setToolTipText(award.getDescription());
 
                         if(!award.canBeAwarded(person) && !gui.getCampaign().isGM())
@@ -1820,20 +1823,18 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 awardMenu.addSeparator();
                 JMenu removeAwardMenu = new JMenu(resourceMap.getString("removeAward.text"));
 
-                if(!person.hasAwards() && !gui.getCampaign().isGM())
+                if(!person.awardController.hasAwards())
                     removeAwardMenu.setEnabled(false);
 
-                for(Award award : person.getAwards()){
-                    String awardMenuItem = String.format("(%s) %s",
-                            award.getFormatedDate(),
-                            award.getName());
-                    menuItem = new JMenuItem(awardMenuItem);
-                    menuItem.setToolTipText(award.getDescription());
-
-                    menuItem.setActionCommand(makeCommand(CMD_RMV_AWARD, award.getSet(), award.getName(), award.getFormatedDate()));
-                    menuItem.addActionListener(this);
-
-                    removeAwardMenu.add(menuItem);
+                for(Award award : person.awardController.getAwards()){
+                    JMenu singleAwardMenu = new JMenu(award.getName());
+                    for(String date : award.getFormatedDates()){
+                        JMenuItem specificAwardMenu = new JMenuItem(date);
+                        specificAwardMenu.setActionCommand(makeCommand(CMD_RMV_AWARD, award.getSet(), award.getName(), date));
+                        specificAwardMenu.addActionListener(this);
+                        singleAwardMenu.add(specificAwardMenu);
+                    }
+                    removeAwardMenu.add(singleAwardMenu);
                 }
                 awardMenu.add(removeAwardMenu);
                 popup.add(awardMenu);

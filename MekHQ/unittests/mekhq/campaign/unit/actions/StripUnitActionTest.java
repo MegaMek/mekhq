@@ -21,8 +21,9 @@
 
 package mekhq.campaign.unit.actions;
 
+import mekhq.TestUtilities;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.unit.TestUtilities;
+import mekhq.campaign.unit.UnitTestUtilities;
 import mekhq.campaign.unit.Unit;
 
 import org.junit.Assert;
@@ -33,7 +34,7 @@ public class StripUnitActionTest {
     public void strippedMekHasNoSalvageableParts() {
         StripUnitAction action = new StripUnitAction();
         Campaign campaign = TestUtilities.getTestCampaign();
-        Unit unit = TestUtilities.addAndGetUnit(campaign, TestUtilities.getLocustLCT1V());
+        Unit unit = UnitTestUtilities.addAndGetUnit(campaign, UnitTestUtilities.getLocustLCT1V());
         action.Execute(campaign, unit);
 
         Assert.assertTrue(0 == unit.getSalvageableParts().size());
@@ -43,7 +44,7 @@ public class StripUnitActionTest {
     public void strippedLAMHasNoSalvageableParts() {
         StripUnitAction action = new StripUnitAction();
         Campaign campaign = TestUtilities.getTestCampaign();
-        Unit unit = TestUtilities.addAndGetUnit(campaign, TestUtilities.getWaspLAMMk1());
+        Unit unit = UnitTestUtilities.addAndGetUnit(campaign, UnitTestUtilities.getWaspLAMMk1());
         action.Execute(campaign, unit);
 
         Assert.assertTrue(0 == unit.getSalvageableParts().size());
@@ -53,7 +54,7 @@ public class StripUnitActionTest {
     public void strippedQuadVeeHasNoSalvageableParts() {
         StripUnitAction action = new StripUnitAction();
         Campaign campaign = TestUtilities.getTestCampaign();
-        Unit unit = TestUtilities.addAndGetUnit(campaign, TestUtilities.getArionStandard());
+        Unit unit = UnitTestUtilities.addAndGetUnit(campaign, UnitTestUtilities.getArionStandard());
         action.Execute(campaign, unit);
 
         Assert.assertTrue(0 == unit.getSalvageableParts().size());
@@ -63,7 +64,7 @@ public class StripUnitActionTest {
     public void strippedUnitIsSalvaged() {
         StripUnitAction action = new StripUnitAction();
         Campaign campaign = TestUtilities.getTestCampaign();
-        Unit unit = TestUtilities.addAndGetUnit(campaign, TestUtilities.getLocustLCT1V());
+        Unit unit = UnitTestUtilities.addAndGetUnit(campaign, UnitTestUtilities.getLocustLCT1V());
         action.Execute(campaign, unit);
 
         Assert.assertTrue(unit.isSalvage());

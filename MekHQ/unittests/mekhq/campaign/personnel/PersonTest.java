@@ -1,10 +1,17 @@
 package mekhq.campaign.personnel;
 
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.spy;
 
+import mekhq.TestUtilities;
 import org.junit.Test;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+
 public class PersonTest {
+
+    private Person mockPerson;
 
     @Test
     public void testIsCombatRoleReturnsTrueAtEdgesOfRange() {
@@ -36,4 +43,55 @@ public class PersonTest {
         assertFalse(Person.isSupportRole(-1));
     }
 
+    @Test
+    public void testAddAndRemoveAward() throws ParseException {
+        initPerson();
+        initAwards();
+
+        mockPerson.awardController.addAndLogAward("TestSet","Test Award 1", new SimpleDateFormat("yyyy-MM-dd").parse("3000-01-01"));
+        mockPerson.awardController.addAndLogAward("TestSet","Test Award 1", new SimpleDateFormat("yyyy-MM-dd").parse("3000-01-02"));
+        mockPerson.awardController.addAndLogAward("TestSet","Test Award 2", new SimpleDateFormat("yyyy-MM-dd").parse("3000-01-01"));
+
+        mockPerson.awardController.removeAward("TestSet", "Test Award 1", "3000-01-01");
+
+        assertTrue(mockPerson.awardController.hasAwards());
+        assertEquals(2, mockPerson.awardController.getAwards().size());
+
+        mockPerson.awardController.removeAward("TestSet", "Test Award 2", "3000-01-01");
+
+        assertTrue(mockPerson.awardController.hasAwards());
+        assertEquals(1, mockPerson.awardController.getAwards().size());
+
+        mockPerson.awardController.removeAward("TestSet", "Test Award 1", "3000-01-02");
+
+        assertFalse(mockPerson.awardController.hasAwards());
+        assertEquals(0, mockPerson.awardController.getAwards().size());
+    }
+
+    @Test public void testGetNumberOfAwards() throws ParseException {
+        initPerson();
+        initAwards();
+
+        mockPerson.awardController.addAndLogAward("TestSet","Test Award 1", new SimpleDateFormat("yyyy-MM-dd").parse("3000-01-01"));
+        mockPerson.awardController.addAndLogAward("TestSet","Test Award 1", new SimpleDateFormat("yyyy-MM-dd").parse("3000-01-02"));
+        mockPerson.awardController.addAndLogAward("TestSet","Test Award 2", new SimpleDateFormat("yyyy-MM-dd").parse("3000-01-01"));
+
+        assertEquals( 2, mockPerson.awardController.getNumberOfAwards(PersonnelTestUtilities.getTestAward1()));
+
+        mockPerson.awardController.removeAward("TestSet", "Test Award 1", "3000-01-01");
+
+        assertEquals(1, mockPerson.awardController.getNumberOfAwards(PersonnelTestUtilities.getTestAward1()));
+
+        mockPerson.awardController.removeAward("TestSet", "Test Award 1", "3000-01-02");
+
+        assertEquals(0, mockPerson.awardController.getNumberOfAwards(PersonnelTestUtilities.getTestAward1()));
+    }
+
+    private void initPerson(){
+        mockPerson = spy(new Person("Test", TestUtilities.getTestCampaign(), "MERC"));
+    }
+
+    private void initAwards(){
+        AwardsFactory.getInstance().loadAwardsFromStream(PersonnelTestUtilities.getTestAwardSet(),"TestSet");
+    }
 }
