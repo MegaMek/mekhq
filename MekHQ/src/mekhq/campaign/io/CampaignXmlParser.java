@@ -100,9 +100,9 @@ import mekhq.module.atb.AtBEventProcessor;
 public class CampaignXmlParser {
 
     private InputStream is;
-	private MekHQ app;
+    private MekHQ app;
 
-	public CampaignXmlParser(InputStream is, MekHQ app) {
+    public CampaignXmlParser(InputStream is, MekHQ app) {
         this.is = is;
         this.app = app;
     }

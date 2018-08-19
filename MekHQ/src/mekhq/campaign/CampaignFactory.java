@@ -11,7 +11,8 @@ import mekhq.campaign.io.CampaignXmlParseException;
 import mekhq.campaign.io.CampaignXmlParser;
 
 /**
- * Defines a factory API that enables {@link Campaign} instances to be created from its detected format.
+ * Defines a factory API that enables {@link Campaign} instances to be created
+ * from its detected format.
  */
 public class CampaignFactory {
 
@@ -25,6 +26,7 @@ public class CampaignFactory {
 
     /**
      * Obtain a new instance of a CampaignFactory.
+     * 
      * @return New instance of a CampaignFactory.
      */
     public static CampaignFactory newInstance(MekHQ app) {
@@ -34,14 +36,19 @@ public class CampaignFactory {
     }
 
     /**
-     * Creates a new instance of a {@link Campaign} from the input stream using the currently configured parameters.
+     * Creates a new instance of a {@link Campaign} from the input stream using
+     * the currently configured parameters.
+     * 
      * @param is The {@link InputStream} to create the {@link Campaign} from.
      * @return A new instance of a {@link Campaign}.
-     * @throws CampaignXmlParseException if the XML for the campaign cannot be parsed.
-     * @throws IOException if an IO error is encountered reading the input stream.
-     * @throws NullEntityException if the campaign contains a null entity.
+     * @throws CampaignXmlParseException if the XML for the campaign cannot be
+     *                                   parsed.
+     * @throws IOException               if an IO error is encountered reading
+     *                                   the input stream.
+     * @throws NullEntityException       if the campaign contains a null entity
      */
-    public Campaign createCampaign(InputStream is) throws CampaignXmlParseException, IOException, NullEntityException {
+    public Campaign createCampaign(InputStream is) 
+        throws CampaignXmlParseException, IOException, NullEntityException {
         if (!is.markSupported()) {
             is = new BufferedInputStream(is);
         }
@@ -51,16 +58,18 @@ public class CampaignFactory {
         Boolean isGzipped = false;
         if (header.length >= 2 && header[0] == '<' && header[1] == '?') {
             // Do nothing, no need to wrap the stream as it looks like XML.
-        } else if (header.length >= 2 && header[0] == (byte)0x1f && header[1] == (byte)0x8b) {
+        } else if (header.length >= 2 && header[0] == (byte) 0x1f
+            && header[1] == (byte) 0x8b) {
             // Campaign is in a gzip file
             isGzipped = true;
             is = new GZIPInputStream(is);
         } else {
-            throw new CampaignXmlParseException("Unsupported Campaign file format");
+            throw new CampaignXmlParseException(
+                "Unsupported Campaign file format"); //$NON-NLS-1$
         }
 
         CampaignXmlParser parser = new CampaignXmlParser(is, this.app);
-        
+
         Campaign c = parser.parse();
         c.setPreferGzippedOutput(isGzipped);
 
