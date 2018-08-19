@@ -48,18 +48,23 @@ public class CampaignFactory {
 
         byte[] header = readHeader(is);
 
-        CampaignXmlParser parser;
+        Boolean isGzipped = false;
         if (header.length >= 2 && header[0] == '<' && header[1] == '?') {
-            // Do nothing, no need to wrap the stream, likely XML
-            parser = new CampaignXmlParser(is, this.app);
+            // Do nothing, no need to wrap the stream as it looks like XML.
         } else if (header.length >= 2 && header[0] == (byte)0x1f && header[1] == (byte)0x8b) {
             // Campaign is in a gzip file
-            parser = new CampaignXmlParser(new GZIPInputStream(is), this.app);
+            isGzipped = true;
+            is = new GZIPInputStream(is);
         } else {
             throw new CampaignXmlParseException("Unsupported Campaign file format");
         }
 
-        return parser.parse();
+        CampaignXmlParser parser = new CampaignXmlParser(is, this.app);
+        
+        Campaign c = parser.parse();
+        c.setPreferGzippedOutput(isGzipped);
+
+        return c;
     }
 
     private byte[] readHeader(InputStream is) throws IOException {

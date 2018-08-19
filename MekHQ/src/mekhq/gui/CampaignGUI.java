@@ -1648,7 +1648,14 @@ public class CampaignGUI extends JPanel {
         return FileDialogs.saveCampaign(frame, getCampaign()).orElse(null);
     }
 
-    private void menuLoadXmlActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_menuLoadActionPerformed
+    private String getExtensionForSaveFile(Campaign c) {
+        if (c.getPreferGzippedOutput()) {
+            return ".cpnx.gz";
+        }
+        return ".cpnx";
+    }
+
+	private void menuLoadXmlActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_menuLoadActionPerformed
         File f = selectLoadCampaignFile();
         if (null == f) {
             return;
