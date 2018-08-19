@@ -472,7 +472,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         this.rskillPrefs = c.getRandomSkillPreferences();
         //this is a hack but I have no idea what is going on here
         this.frame = parent;
-        this.date = campaign.calendar;
+        this.date = campaign.getCalendar();
         dateFormat = new SimpleDateFormat("EEEE, MMMM d yyyy");
         this.camoCategory = campaign.getCamoCategory();
         this.camoFileName = campaign.getCamoFileName();
@@ -4608,7 +4608,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
     private void updateOptions() {
     	campaign.setName(txtName.getText());
-    	campaign.calendar = date;
+    	campaign.setCalendar(date);
         // Ensure that the MegaMek year GameOption matches the campaign year
         GameOptions gameOpts = campaign.getGameOptions();
         int campaignYear = campaign.getCalendar().get(Calendar.YEAR);

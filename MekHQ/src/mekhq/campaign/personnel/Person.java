@@ -3497,7 +3497,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         if (status == Person.S_KIA) {
             addLogEntry(campaign.getDate(), "Died from " + getGenderPronoun(PRONOUN_HISHER) + " wounds");
             //set the deathday
-            setDeathday((GregorianCalendar) campaign.calendar.clone());
+            setDeathday((GregorianCalendar) campaign.getCalendar().clone());
         }
         if (status == Person.S_RETIRED) {
             addLogEntry(campaign.getDate(), "Retired from active duty due to " + getGenderPronoun(PRONOUN_HISHER) + " wounds");

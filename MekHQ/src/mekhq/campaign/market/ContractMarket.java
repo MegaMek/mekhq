@@ -327,7 +327,7 @@ public class ContractMarket implements Serializable {
 				+"-"
 				+Contract.generateRandomContractName()
 				+"-"
-				+(new SimpleDateFormat("yyyyMM")).format(campaign.calendar.getTime()));
+				+(new SimpleDateFormat("yyyyMM")).format(campaign.getCalendar().getTime()));
         lastId++;
         contract.setId(lastId);
         contractIds.put(lastId, contract);
