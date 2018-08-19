@@ -51,13 +51,13 @@ public class Award implements MekHqXmlSerializable, Comparable<Award>, Serializa
     private String description;
 
     @XmlElement(name = "medal")
-    private String medal;
+    private ArrayList<String> medals;
 
     @XmlElement(name = "ribbon")
     private ArrayList<String> ribbons;
 
     @XmlElement(name = "misc")
-    private String misc;
+    private ArrayList<String> miscs;
 
     @XmlElement(name = "xp")
     private int xp = 0;
@@ -76,13 +76,13 @@ public class Award implements MekHqXmlSerializable, Comparable<Award>, Serializa
 
     public Award(){}
 
-    public Award(String name, String set,  String description, String medal, ArrayList<String> ribbons, String misc, int xp, int edge, boolean stackable) {
+    public Award(String name, String set,  String description, ArrayList<String> medals, ArrayList<String> ribbons, ArrayList<String> miscs, int xp, int edge, boolean stackable) {
         this.name = name;
         this.set = set;
         this.description = description;
-        this.medal = medal;
+        this.medals = medals;
         this.ribbons = ribbons;
-        this.misc = misc;
+        this.miscs = miscs;
         this.xp = xp;
         this.edge = edge;
         this.stackable = stackable;
@@ -127,35 +127,52 @@ public class Award implements MekHqXmlSerializable, Comparable<Award>, Serializa
         return description;
     }
 
-    public String getConcatenatedFormatedDates(){
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+    /**
+     * Gets the file name of an award given i times.
+     * @param i times given the award
+     * @param fileNames list containing all of the file names
+     * @return the file name
+     */
+    private String getFileName(int i, List<String> fileNames){
+        if(i > fileNames.size()) return fileNames.get(fileNames.size()-1);
 
-        StringBuilder string = new StringBuilder();
-
-        for(Date date : dates){
-            string.append("(");
-            string.append(df.format(date.getTime()));
-            string.append(")");
-        }
-        return string.toString();
+        return fileNames.get(i-1);
     }
 
+    /**
+     * @param i number of times this award has been awarded
+     * @return the filename of the ribbon
+     */
     public String getRibbonFileName(int i){
-        if(i > ribbons.size()) return ribbons.get(ribbons.size()-1);
-
-        return ribbons.get(i-1);
+        return getFileName(i, ribbons);
     }
 
     public int getNumberOfRibbonFiles(){
-        return ribbons.size();
+        return ribbons == null ? 0 : ribbons.size();
     }
 
-    public String getMedalFileName(){
-        return medal;
+    /**
+     * @param i number of times this award has been awarded
+     * @return the filename of the medal
+     */
+    public String getMedalFileName(int i){
+        return getFileName(i, medals);
     }
 
-    public String getMiscFileName(){
-        return misc;
+    public int getNumberOfMedalFiles() {
+        return medals == null ? 0 : medals.size();
+    }
+
+    /**
+     * @param i number of times this award has been awarded
+     * @return the filename of the misc
+     */
+    public String getMiscFileName(int i){
+        return getFileName(i, miscs);
+    }
+
+    public int getNumberOfMiscFiles() {
+        return miscs == null ? 0 : miscs.size();
     }
 
     public int getXPReward(){
@@ -168,10 +185,9 @@ public class Award implements MekHqXmlSerializable, Comparable<Award>, Serializa
      * @return award with new date
      */
     public Award createCopy(){
-        Award awardCopy = new Award(this.name, this.set, this.description, this.medal, this.ribbons, this.misc, this.xp, this.edge, this.stackable);
+        Award awardCopy = new Award(this.name, this.set, this.description, this.medals, this.ribbons, this.miscs, this.xp, this.edge, this.stackable);
         return awardCopy;
     }
-
 
     /**
      * Checks if an award can be awarded to a given person
@@ -215,6 +231,10 @@ public class Award implements MekHqXmlSerializable, Comparable<Award>, Serializa
         return result;
     }
 
+    /**
+     * Adds a date to the award, as if the award was given again.
+     * @param date to be added.
+     */
     public void addDate(Date date) {
         dates.add(date);
     }
@@ -223,6 +243,18 @@ public class Award implements MekHqXmlSerializable, Comparable<Award>, Serializa
         this.dates = dates;
     }
 
+    /**
+     * Merges all dates from one award into the other
+     * @param award from the dates will be collected
+     */
+    public void mergeDatesFrom(Award award) {
+        this.dates.addAll(award.dates);
+    }
+
+    /**
+     * Generates a list of strings of formated dates yyyy-MM-dd
+     * @return a list of strings representing the dates in the format yyyy-MM-dd
+     */
     public List<String> getFormatedDates(){
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 
@@ -233,15 +265,55 @@ public class Award implements MekHqXmlSerializable, Comparable<Award>, Serializa
         return formatedDates;
     }
 
+    /**
+     * @param date date to be removed from this award
+     */
     public void removeDate(Date date){
         dates.remove(date);
     }
 
+    /**
+     * @return true if this award has any dates
+     */
     public boolean hasDates(){
         return dates.size() > 0;
     }
 
+    /**
+     * @return the number of times this award has been awarded to the person.
+     */
     public int getQuantity(){
         return dates.size();
+    }
+
+    /**
+     * @return an html formatted string to be used as tooltip.
+     */
+    public String getTooltip(){
+
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+
+        StringBuilder string = new StringBuilder();
+        string.append("<html>");
+
+        string.append(getName());
+
+        string.append("<br>");
+
+        string.append(getDescription());
+
+        string.append("<br>");
+        string.append("<br>");
+        for(Date date : dates){
+            string.append("(");
+            string.append(df.format(date.getTime()));
+            string.append(")");
+            string.append("<br>");
+        }
+
+        string.append("</html>");
+
+        return string.toString();
+
     }
 }

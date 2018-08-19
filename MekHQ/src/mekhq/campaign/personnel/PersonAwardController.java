@@ -1,3 +1,22 @@
+/*
+ * Copyright (C) 2018 MegaMek team
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package mekhq.campaign.personnel;
 
 import mekhq.MekHQ;
@@ -11,6 +30,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * This class is responsible for the awards given to a person.
+ * @author Miguel Azevedo
+ */
 public class PersonAwardController {
 
     private List<Award> awards;
@@ -64,14 +87,14 @@ public class PersonAwardController {
      * @return true if this person has one or more awards that are represented with a medal icon.
      */
     public boolean hasAwardsWithMedals(){
-        return awards.stream().filter(a -> a.getMedalFileName() != null).collect(Collectors.toList()).size() > 0;
+        return awards.stream().filter(a -> a.getNumberOfMedalFiles() > 0).collect(Collectors.toList()).size() > 0;
     }
 
     /**
      * @return true if this person has one or more awards that are represented by a misc icon.
      */
     public boolean hasAwardsWithMiscs(){
-        return awards.stream().filter(a -> a.getMiscFileName() != null).collect(Collectors.toList()).size() > 0;
+        return awards.stream().filter(a -> a.getNumberOfMiscFiles() > 0).collect(Collectors.toList()).size() > 0;
     }
 
     /**
@@ -102,7 +125,14 @@ public class PersonAwardController {
      * @param award is the award it was awarded
      */
     public void addAwardFromXml(Award award){
-        awards.add(award);
+        if(hasAward(award)){
+            Award existingAward = getAward(award.getSet(), award.getName());
+            existingAward.mergeDatesFrom(award);
+        }
+        else{
+            awards.add(award);
+        }
+
         MekHQ.triggerEvent(new PersonChangedEvent(person));
     }
 
@@ -156,6 +186,10 @@ public class PersonAwardController {
         return null;
     }
 
+    /**
+     * @param award to be counted.
+     * @return the number of times this award has been awarded to the same person.
+     */
     public int getNumberOfAwards(Award award){
         for(Award myAward : awards){
             if(award.equals(myAward.getSet(), myAward.getName())){

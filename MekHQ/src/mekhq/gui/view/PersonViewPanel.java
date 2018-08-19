@@ -332,8 +332,7 @@ public class PersonViewPanel extends JPanel {
                 if(ribbon == null) continue;
                 ribbon = ribbon.getScaledInstance(25,8, Image.SCALE_DEFAULT);
                 ribbonLabel.setIcon(new ImageIcon(ribbon));
-                ribbonLabel.setToolTipText(award.getConcatenatedFormatedDates() + " " + award.getName()
-                        + ": " + award.getDescription());
+                ribbonLabel.setToolTipText(award.getTooltip());
                 rowRibbonsBox.add(ribbonLabel, 0);
             }
             catch (Exception err) {
@@ -359,7 +358,7 @@ public class PersonViewPanel extends JPanel {
      * Draws the medals above the personal log.
      */
     private void drawMedals(){
-        List<Award> awards = person.awardController.getAwards().stream().filter(a -> a.getMedalFileName() != null).sorted()
+        List<Award> awards = person.awardController.getAwards().stream().filter(a -> a.getNumberOfMedalFiles() > 0).sorted()
                 .collect(Collectors.toList());
 
         for(Award award : awards){
@@ -367,11 +366,13 @@ public class PersonViewPanel extends JPanel {
 
             Image medal = null;
             try{
-                medal = (Image) awardIcons.getItem( award.getSet() + "/medals/", award.getMedalFileName());
+                int numberOfAwards = person.awardController.getNumberOfAwards(award);
+                String medalFileName = award.getMedalFileName(numberOfAwards);
+                medal = (Image) awardIcons.getItem(award.getSet() + "/medals/", medalFileName);
                 if(medal == null) continue;
                 medal = ImageHelpers.getScaledForBoundaries(medal, new Dimension(30,60), Image.SCALE_DEFAULT);
                 medalLabel.setIcon(new ImageIcon(medal));
-                medalLabel.setToolTipText(award.getConcatenatedFormatedDates() + " " + award.getName() + ": " + award.getDescription());
+                medalLabel.setToolTipText(award.getTooltip());
                 pnlMedals.add(medalLabel);
             }
             catch (Exception err) {
@@ -384,7 +385,7 @@ public class PersonViewPanel extends JPanel {
      * Draws the misc awards below the medals.
      */
     private void drawMiscAwards() {
-        ArrayList<Award> awards = person.awardController.getAwards().stream().filter(a -> a.getMiscFileName() != null)
+        ArrayList<Award> awards = person.awardController.getAwards().stream().filter(a -> a.getNumberOfMiscFiles() > 0)
                 .collect(Collectors.toCollection(ArrayList::new));
 
         for (Award award : awards) {
@@ -392,11 +393,13 @@ public class PersonViewPanel extends JPanel {
 
             Image miscAward = null;
             try {
-                Image miscAwardBufferedImage = (Image) awardIcons.getItem(award.getSet() + "/misc/", award.getMiscFileName());
+                int numberOfAwards = person.awardController.getNumberOfAwards(award);
+                String miscFileName = award.getMiscFileName(numberOfAwards);
+                Image miscAwardBufferedImage = (Image) awardIcons.getItem(award.getSet() + "/misc/", miscFileName);
                 if (miscAwardBufferedImage == null) continue;
                 miscAward = ImageHelpers.getScaledForBoundaries(miscAwardBufferedImage, new Dimension(100,100), Image.SCALE_DEFAULT);
                 miscLabel.setIcon(new ImageIcon(miscAward));
-                miscLabel.setToolTipText(award.getConcatenatedFormatedDates() + " " + award.getName() + ": " + award.getDescription());
+                miscLabel.setToolTipText(award.getTooltip());
                 pnlMiscAwards.add(miscLabel);
             } catch (Exception err) {
                 err.printStackTrace();
