@@ -83,9 +83,8 @@ jar {
 	archiveName = "MekHQ.jar"
 	manifest {
 	    attributes "Main-Class": mainClassName
-	    attributes 'Class-Path' : 'MegaMek.jar MegaMekLab.jar '
-	    	+ project.sourceSets.main.runtimeClasspath.files
-	    	.findAll { it.name.endsWith(".jar") }.collect { "${lib}/${it.name}" }.join(' ')
+	    attributes 'Class-Path' : 'MegaMek.jar MegaMekLab.jar ' + (project.sourceSets.main.runtimeClasspath.files
+	    	.findAll { it.name.endsWith(".jar") }.collect { "${lib}/${it.name}" }.join(' '))
 	}
 }
 
