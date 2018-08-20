@@ -83,7 +83,8 @@ jar {
 	archiveName = "MekHQ.jar"
 	manifest {
 	    attributes "Main-Class": mainClassName
-	    attributes 'Class-Path' : project.sourceSets.main.runtimeClasspath.files
+	    attributes 'Class-Path' : 'MegaMek.jar MegaMekLab.jar '
+	    	+ project.sourceSets.main.runtimeClasspath.files
 	    	.findAll { it.name.endsWith(".jar") }.collect { "${lib}/${it.name}" }.join(' ')
 	}
 }
@@ -193,7 +194,7 @@ distributions {
 			from (fileStagingDir) {
 				rename 'history.txt', 'mm-history.txt'
 			}
-			from(startScripts)
+			from(createStartScripts)
 			from(jar)
 			from (project.sourceSets.main.runtimeClasspath.files
     				.findAll { it.name.endsWith(".jar") && !it.name.toLowerCase().startsWith("megamek") }) {
@@ -238,7 +239,7 @@ distributions {
 		}
 	}
 	mac {
-		baseName = 'mekhq-hq'
+		baseName = 'mekhq-mac'
 		contents {
 			from osxBundleDir
 			from ("${mmDir}/megamek/build/files")
@@ -303,6 +304,7 @@ unixDistTar {
 	dependsOn stageMM
 	dependsOn stageMML
 	dependsOn startScripts
+	extension = 'tar.gz'
 	compression = Compression.GZIP
 }
 
