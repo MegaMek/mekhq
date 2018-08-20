@@ -19,7 +19,6 @@
 
 package mekhq.campaign.personnel;
 
-import jdk.internal.util.xml.impl.Input;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.AwardSet;
