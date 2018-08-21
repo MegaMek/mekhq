@@ -22,8 +22,7 @@ public class AwardSet{
     @XmlElement(name = "award")
     private ArrayList<Award> awards;
 
-    public List<Award> getAwards()
-    {
+    public List<Award> getAwards(){
         return Collections.unmodifiableList(awards);
     }
 }
