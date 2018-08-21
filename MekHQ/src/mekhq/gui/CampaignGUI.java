@@ -1734,14 +1734,7 @@ public class CampaignGUI extends JPanel {
             miRetirementDefectionDialog.setVisible(getCampaign()
                     .getCampaignOptions().getUseAtB());
             if (getCampaign().getCampaignOptions().getUseAtB()) {
-                while (!RandomFactionGenerator.getInstance().isInitialized()) {
-                    //Sleep for up to one second.
-                    try {
-                        Thread.sleep(50);
-                    } catch (InterruptedException ignore) {
-
-                    }
-                }
+                RandomFactionGenerator.getInstance().startup(getCampaign());
                 while (!RandomUnitGenerator.getInstance().isInitialized()) {
                     //Sleep for up to one second.
                     try {
@@ -1751,8 +1744,7 @@ public class CampaignGUI extends JPanel {
                     }
                 }
                 RandomNameGenerator.getInstance();
-                RandomFactionGenerator.getInstance().updateTables(getCampaign().getDate(),
-                        getCampaign().getCurrentPlanet(), getCampaign().getCampaignOptions());
+                RandomFactionGenerator.getInstance().startup(getCampaign());
             } else {
                 getCampaign().shutdownAtB();
             }

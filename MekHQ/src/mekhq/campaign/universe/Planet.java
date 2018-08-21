@@ -48,6 +48,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeComparator;
 
+import megamek.common.EquipmentType;
 import megamek.common.ITechnology;
 import megamek.common.PlanetaryConditions;
 import mekhq.Utilities;
@@ -318,16 +319,16 @@ public class Planet implements Serializable {
             }
             
             // now we have a primary name and possibly a name change planetary event
-            name = primaryName;
+            this.name = primaryName;
             
             if(null != nameChangeEvent) {
-                events.put(nameChangeYearDate, nameChangeEvent);
-                eventList.add(nameChangeEvent);
+                this.events.put(nameChangeYearDate, nameChangeEvent);
+                this.eventList.add(nameChangeEvent);
             }
             
-            id = name;
-            x = Double.parseDouble(infoElements[1]);
-            y = Double.parseDouble(infoElements[2]);
+            this.id = this.name;
+            this.x = Double.parseDouble(infoElements[1]);
+            this.y = Double.parseDouble(infoElements[2]);
             
             for(int x = 3; x < infoElements.length; x++) {
                 String infoElement = infoElements[x].replace("\"", "");
@@ -359,12 +360,12 @@ public class Planet implements Serializable {
                 if(x == 3 || !eventList.get(eventList.size() - 1).faction.get(0).equals(newFaction)) {
                     PlanetaryEvent pe = new PlanetaryEvent();
                     DateTime eventDate = years.get(x - 3);
-                    pe.faction = new ArrayList<>();
+                    pe.faction = new ArrayList<String>();
                     pe.faction.add(newFaction);
                     pe.date = eventDate;
                     
-                    eventList.add(pe);                
-                    events.put(eventDate, pe);
+                    this.eventList.add(pe);                
+                    this.events.put(eventDate, pe);
                 }
             }
         } catch(Exception e) {
@@ -414,7 +415,7 @@ public class Planet implements Serializable {
     }
 
     public List<String> getSatellites() {
-        return null != satellites ? new ArrayList<>(satellites) : null;
+        return null != satellites ? new ArrayList<String>(satellites) : null;
     }
 
     public String getSatelliteDescription() {
@@ -425,7 +426,7 @@ public class Planet implements Serializable {
     }
 
     public List<String> getLandMasses() {
-        return null != landMasses ? new ArrayList<>(landMasses) : null;
+        return null != landMasses ? new ArrayList<String>(landMasses) : null;
     }
 
     public String getLandMassDescription() {
@@ -552,7 +553,7 @@ public class Planet implements Serializable {
         if( null == events ) {
             return null;
         }
-        return new ArrayList<>(events.values());
+        return new ArrayList<PlanetaryEvent>(events.values());
     }
     
     protected <T> T getEventData(DateTime when, T defaultValue, EventGetter<T> getter) {
@@ -574,7 +575,7 @@ public class Planet implements Serializable {
         if( null == events ) {
             return Collections.<PlanetaryEvent>emptyList();
         }
-        List<PlanetaryEvent> result = new ArrayList<>();
+        List<PlanetaryEvent> result = new ArrayList<PlanetaryEvent>();
         for( DateTime date : events.navigableKeySet() ) {
             if( date.getYear() > year ) {
                 break;
@@ -747,13 +748,20 @@ public class Planet implements Serializable {
     }
 
     public List<String> getFactions(DateTime when) {
-        return getEventData(when, factions, new EventGetter<List<String>>() {
+        List<String> retVal = getEventData(when, factions, new EventGetter<List<String>>() {
             @Override public List<String> get(PlanetaryEvent e) { return e.faction; }
         });
+        if (retVal != null) {
+            return retVal;
+        }
+        return Collections.emptyList();
     }
 
     private static Set<Faction> getFactionsFrom(Collection<String> codes) {
-        Set<Faction> factions = new HashSet<>(codes.size());
+        if (null == codes) {
+            return Collections.emptySet();
+        }
+        Set<Faction> factions = new HashSet<Faction>(codes.size());
         for(String code : codes) {
             factions.add(Faction.getFaction(code));
         }
@@ -763,7 +771,7 @@ public class Planet implements Serializable {
     /** @return set of factions at a given date */
     public Set<Faction> getFactionSet(DateTime when) {
         List<String> currentFactions = getFactions(when);
-        return null != currentFactions ? getFactionsFrom(currentFactions) : null;
+        return getFactionsFrom(currentFactions);
     }
 
     public String getShortDesc(DateTime when) {
@@ -916,7 +924,7 @@ public class Planet implements Serializable {
     @SuppressWarnings("unused")
     private boolean beforeMarshal(Marshaller marshaller) {
         // Fill up our event list from the internal data type
-        eventList = new ArrayList<>(events.values());
+        eventList = new ArrayList<PlanetaryEvent>(events.values());
         return true;
     }
     
@@ -944,12 +952,12 @@ public class Planet implements Serializable {
     public String updateFromTSVPlanet(Planet tsvPlanet, boolean dryRun) {
         StringBuilder sb = new StringBuilder();
         
-        if(!tsvPlanet.x.equals(x) || !tsvPlanet.y.equals(y)) {
+        if(!tsvPlanet.x.equals(this.x) || !tsvPlanet.y.equals(this.y)) {
             sb.append("Coordinate update from " + x + ", " + y + " to " + tsvPlanet.x + ", " + tsvPlanet.y + "\r\n");
             
             if(!dryRun) {
-                x = tsvPlanet.x;
-                y = tsvPlanet.y;
+                this.x = tsvPlanet.x;
+                this.y = tsvPlanet.y;
             }
         }
         
@@ -971,7 +979,7 @@ public class Planet implements Serializable {
                 boolean eventHasActualFaction = eventFaction != null ? !eventFaction.is(Tag.INACTIVE) && !eventFaction.is(Tag.ABANDONED) : false;
                 
                 if(eventHasActualFaction) {
-                    List<String> currentFactions = getFactions(event.date);
+                    List<String> currentFactions = this.getFactions(event.date);
                                          
                     // if this planet has an "inactive and abandoned" current faction... 
                     // we also want to catch the situation where the next faction change isn't to the same exact faction 
@@ -992,7 +1000,7 @@ public class Planet implements Serializable {
                             nextEventDate = nextEvent.date;
                         }
                         
-                        List<String> nextFactions = getFactions(nextEventDate);
+                        List<String> nextFactions = this.getFactions(nextEventDate);
                         boolean factionBeforeNextEvent = !(nextFactions.size() == 1 &&
                                 Faction.getFaction(nextFactions.get(0)).is(Tag.INACTIVE) &&
                                 Faction.getFaction(nextFactions.get(0)).is(Tag.ABANDONED));
@@ -1001,7 +1009,7 @@ public class Planet implements Serializable {
                             sb.append("Adding faction change in " + event.date.getYear() + " from " + currentFactions.get(0) + " to " + event.faction + "\r\n");
                             
                             if(!dryRun) {
-                                events.put(event.date, event);
+                                this.events.put(event.date, event);
                             }
                         }
                     }
@@ -1010,7 +1018,7 @@ public class Planet implements Serializable {
         }
         
         if(sb.length() > 0) {
-            sb.insert(0, "Updating planet " + getId() + "\r\n");
+            sb.insert(0, "Updating planet " + this.getId() + "\r\n");
         }
         
         return sb.toString();
@@ -1094,34 +1102,34 @@ public class Planet implements Serializable {
 
     public static int convertRatingToCode(String rating) {
         if(rating.equalsIgnoreCase("A")) { //$NON-NLS-1$
-            return ITechnology.RATING_A;
+            return EquipmentType.RATING_A;
         }
         else if(rating.equalsIgnoreCase("B")) { //$NON-NLS-1$
-            return ITechnology.RATING_B;
+            return EquipmentType.RATING_B;
         }
         else if(rating.equalsIgnoreCase("C")) { //$NON-NLS-1$
-            return ITechnology.RATING_C;
+            return EquipmentType.RATING_C;
         }
         else if(rating.equalsIgnoreCase("D")) { //$NON-NLS-1$
-            return ITechnology.RATING_D;
+            return EquipmentType.RATING_D;
         }
         else if(rating.equalsIgnoreCase("E")) { //$NON-NLS-1$
-            return ITechnology.RATING_E;
+            return EquipmentType.RATING_E;
         }
         else if(rating.equalsIgnoreCase("F")) { //$NON-NLS-1$
-            return ITechnology.RATING_F;
+            return EquipmentType.RATING_F;
         }
-        return ITechnology.RATING_C;
+        return EquipmentType.RATING_C;
     }
 
     public static final class SocioIndustrialData {
         public static final SocioIndustrialData NONE = new SocioIndustrialData();
         static {
-            NONE.tech = ITechnology.RATING_X;
-            NONE.industry = ITechnology.RATING_X;
-            NONE.rawMaterials = ITechnology.RATING_X;
-            NONE.output = ITechnology.RATING_X;
-            NONE.agriculture = ITechnology.RATING_X;
+            NONE.tech = EquipmentType.RATING_X;
+            NONE.industry = EquipmentType.RATING_X;
+            NONE.rawMaterials = EquipmentType.RATING_X;
+            NONE.output = EquipmentType.RATING_X;
+            NONE.agriculture = EquipmentType.RATING_X;
         }
         
         public int tech;
@@ -1150,25 +1158,25 @@ public class Planet implements Serializable {
                 case -1:
                     sb.append("Advanced: Ultra high-tech world<br>");
                     break;
-                case ITechnology.RATING_A:
+                case EquipmentType.RATING_A:
                     sb.append("A: High-tech world<br>");
                     break;
-                case ITechnology.RATING_B:
+                case EquipmentType.RATING_B:
                     sb.append("B: Advanced world<br>");
                     break;
-                case ITechnology.RATING_C:
+                case EquipmentType.RATING_C:
                     sb.append("C: Moderately advanced world<br>");
                     break;
-                case ITechnology.RATING_D:
+                case EquipmentType.RATING_D:
                     sb.append("D: Lower-tech world; about 21st- to 22nd-century level<br>");
                     break;
-                case ITechnology.RATING_E:
+                case EquipmentType.RATING_E:
                     sb.append("E: Lower-tech world; about 20th century level<br>");
                     break;
-                case ITechnology.RATING_F:
+                case EquipmentType.RATING_F:
                     sb.append("F: Primitive world<br>");
                     break;
-                case ITechnology.RATING_X:
+                case EquipmentType.RATING_X:
                     sb.append("Regressed: Pre-industrial world<br>");
                     break;
                 default:
@@ -1176,22 +1184,22 @@ public class Planet implements Serializable {
                     break;
             }
             switch(industry) {
-                case ITechnology.RATING_A:
+                case EquipmentType.RATING_A:
                     sb.append("A: Heavily industrialized<br>");
                     break;
-                case ITechnology.RATING_B:
+                case EquipmentType.RATING_B:
                     sb.append("B: Moderately industrialized<br>");
                     break;
-                case ITechnology.RATING_C:
+                case EquipmentType.RATING_C:
                     sb.append("C: Basic heavy industry; about 22nd century level<br>");
                     break;
-                case ITechnology.RATING_D:
+                case EquipmentType.RATING_D:
                     sb.append("D: Low industrialization; about 20th century level<br>");
                     break;
-                case ITechnology.RATING_E:
+                case EquipmentType.RATING_E:
                     sb.append("E: Very low industrialization; about 19th century level<br>");
                     break;
-                case ITechnology.RATING_F:
+                case EquipmentType.RATING_F:
                     sb.append("F: No industrialization<br>");
                     break;
                 default:
@@ -1199,22 +1207,22 @@ public class Planet implements Serializable {
                     break;
             }
             switch(rawMaterials) {
-                case ITechnology.RATING_A:
+                case EquipmentType.RATING_A:
                     sb.append("A: Fully self-sufficient raw material production<br>");
                     break;
-                case ITechnology.RATING_B:
+                case EquipmentType.RATING_B:
                     sb.append("B: Mostly self-sufficient raw material production<br>");
                     break;
-                case ITechnology.RATING_C:
+                case EquipmentType.RATING_C:
                     sb.append("C: Limited raw material production<br>");
                     break;
-                case ITechnology.RATING_D:
+                case EquipmentType.RATING_D:
                     sb.append("D: Production dependent on imports of raw materials<br>");
                     break;
-                case ITechnology.RATING_E:
+                case EquipmentType.RATING_E:
                     sb.append("E: Production highly dependent on imports of raw materials<br>");
                     break;
-                case ITechnology.RATING_F:
+                case EquipmentType.RATING_F:
                     sb.append("F: No economically viable local raw material production<br>");
                     break;
                 default:
@@ -1222,22 +1230,22 @@ public class Planet implements Serializable {
                     break;
             }
             switch(output) {
-                case ITechnology.RATING_A:
+                case EquipmentType.RATING_A:
                     sb.append("A: High industrial output<br>");
                     break;
-                case ITechnology.RATING_B:
+                case EquipmentType.RATING_B:
                     sb.append("B: Good industrial output<br>");
                     break;
-                case ITechnology.RATING_C:
+                case EquipmentType.RATING_C:
                     sb.append("C: Limited industrial output<br>"); // Bad for Ferengi
                     break;
-                case ITechnology.RATING_D:
+                case EquipmentType.RATING_D:
                     sb.append("D: Negligable industrial output<br>");
                     break;
-                case ITechnology.RATING_E:
+                case EquipmentType.RATING_E:
                     sb.append("E: Negligable industrial output<br>");
                     break;
-                case ITechnology.RATING_F:
+                case EquipmentType.RATING_F:
                     sb.append("F: No industrial output<br>"); // Good for Ferengi
                     break;
                 default:
@@ -1245,22 +1253,22 @@ public class Planet implements Serializable {
                     break;
             }
             switch(agriculture) {
-                case ITechnology.RATING_A:
+                case EquipmentType.RATING_A:
                     sb.append("A: Breadbasket<br>");
                     break;
-                case ITechnology.RATING_B:
+                case EquipmentType.RATING_B:
                     sb.append("B: Agriculturally abundant world<br>");
                     break;
-                case ITechnology.RATING_C:
+                case EquipmentType.RATING_C:
                     sb.append("C: Modest agriculture<br>");
                     break;
-                case ITechnology.RATING_D:
+                case EquipmentType.RATING_D:
                     sb.append("D: Poor agriculture<br>");
                     break;
-                case ITechnology.RATING_E:
+                case EquipmentType.RATING_E:
                     sb.append("E: Very poor agriculture<br>");
                     break;
-                case ITechnology.RATING_F:
+                case EquipmentType.RATING_F:
                     sb.append("F: Barren world<br>");
                     break;
                 default:
