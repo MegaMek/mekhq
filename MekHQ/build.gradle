@@ -89,6 +89,17 @@ jar {
 	}
 }
 
+task mmlJar (type: Jar) {
+	archiveName = "MegaMekLab.jar"
+	from "${mmlDir}/build/classes/java/main"
+	from "${mmlDir}/build/resources/main"
+	manifest {
+	    attributes "Main-Class": mainClassName
+	    attributes 'Class-Path' : 'MegaMek.jar ' + (project.sourceSets.main.runtimeClasspath.files
+	    	.findAll { it.name.endsWith(".jar") }.collect { "${lib}/${it.name}" }.join(' '))
+	}
+}
+
 task stageFiles(type: Copy) {
 	description = 'Stages files that are to be copied into the distribution.'
 	
@@ -179,7 +190,7 @@ distributions {
 			from ("${mmDir}/megamek/build/scripts/startup") {
 				include 'startup*'
 			}
-			from ("${mmlDir}/build/libs/MegaMekLab.jar")
+			from (mmlJar)
 			from ("${mmlDir}/build/files/data/fonts") {
 				into "data/fonts"
 			}
@@ -282,7 +293,7 @@ task stageMM (type: GradleBuild) {
 	
 	buildFile = "${mmDir}/build.gradle"
 	dir = "${mmDir}"
-	tasks = [ 'jar', 'stageFiles', 'createExe', 'startScripts' ]
+	tasks = [ 'jar', 'stageFiles', 'createExe', 'createStartScripts' ]
 }
 
 task stageMML (type: GradleBuild) {
@@ -291,7 +302,7 @@ task stageMML (type: GradleBuild) {
 	
 	buildFile = "${mmlDir}/build.gradle"
 	dir = "${mmlDir}"
-	tasks = [ 'jar', 'stageFiles', 'createExe', 'startScripts' ]
+	tasks = [ 'compileJava', 'stageFiles', 'createExe', 'createStartScripts' ]
 }
 
 windowsDistZip {
