@@ -67,6 +67,7 @@ ext {
 	docs = 'docs'
 	lib = 'lib'
 	plugins = 'plugins'
+	campaign = 'campaign'
 	distributionDir = "${buildDir}/distributions"
 	fileStagingDir = "${buildDir}/files"
 	repoDir = "${buildDir}/repo/mekhq"
@@ -104,6 +105,7 @@ task stageFiles(type: Copy) {
 	include "${data}/images/misc/"
 	include "${data}/images/universe/"
 	include "${project.ext.plugins}/"
+	include "${campaign}/"
 
 	into fileStagingDir
 }
@@ -177,7 +179,9 @@ distributions {
 		contents {
 			from ("${mmDir}/megamek/build/libs/MegaMek.jar")
 			from ("${mmDir}/megamek/build/files")
-			from ("${mmDir}/megamek/build/scripts/startup")
+			from ("${mmDir}/megamek/build/scripts/startup") {
+				include 'startup*'
+			}
 			from ("${mmlDir}/build/libs/MegaMekLab.jar")
 			from ("${mmlDir}/build/files/data/fonts") {
 				into "data/fonts"
@@ -185,7 +189,9 @@ distributions {
 			from ("${mmlDir}/build/files/data/images") {
 				into "data/images"
 			}
-			from ("${mmlDir}/build/scripts/lab")
+			from ("${mmlDir}/build/scripts/lab") {
+				include 'lab*'
+			}
 			from ("${mmlDir}/docs/history.txt") {
 				rename 'history.txt', 'mml-history.txt'
 				into 'docs'
@@ -193,7 +199,9 @@ distributions {
 			from (fileStagingDir) {
 				rename 'history.txt', 'mm-history.txt'
 			}
-			from(createStartScripts)
+			from(createStartScripts) {
+				include 'hq*'
+			}
 			from(jar)
 			from (project.sourceSets.main.runtimeClasspath.files
     				.findAll { it.name.endsWith(".jar") && !it.name.toLowerCase().startsWith("megamek") }) {
@@ -277,7 +285,7 @@ task stageMM (type: GradleBuild) {
 	
 	buildFile = "${mmDir}/build.gradle"
 	dir = "${mmDir}"
-	tasks = [ 'jar', 'stageFiles', 'createExe', 'startScripts' ]
+	tasks = [ 'jar', 'createLogDir', 'createExe', 'startScripts' ]
 }
 
 task stageMML (type: GradleBuild) {
@@ -286,12 +294,12 @@ task stageMML (type: GradleBuild) {
 	
 	buildFile = "${mmlDir}/build.gradle"
 	dir = "${mmlDir}"
-	tasks = [ 'jar', 'stageFiles', 'createExe', 'startScripts' ]
+	tasks = [ 'jar', 'createLogDir', 'createExe', 'startScripts' ]
 }
 
 windowsDistZip {
 	description = 'Creates Windows distribution packaged as a zip archive'
-	dependsOn stageFiles
+	dependsOn createLogDir
 	dependsOn stageMM
 	dependsOn stageMML
 	dependsOn createExe
@@ -299,7 +307,7 @@ windowsDistZip {
 
 unixDistTar {
 	description = 'Creates *nix distribution packaged as a tar ball'
-	dependsOn stageFiles
+	dependsOn createLogDir
 	dependsOn stageMM
 	dependsOn stageMML
 	dependsOn startScripts
@@ -309,7 +317,7 @@ unixDistTar {
 
 macDistTar {
 	description = 'Creates mac OSX distribution'
-	dependsOn stageFiles
+	dependsOn createLogDir
 	dependsOn createOSXBundle
 	extension = 'tar.bz2'
 	compression = Compression.BZIP2
@@ -433,7 +441,7 @@ task buildAllFromRepo (type: GradleBuild) {
 	
 	buildFile = "${repoDir}/build.gradle"
 	dir = "${repoDir}"
-	tasks = [ 'unixDistTar', 'windowsDistZip', 'sourceTar', 'sourceZip' ]
+	tasks = [ 'unixDistTar', 'windowsDistZip', 'macDistTar', 'sourceTar', 'sourceZip' ]
 }
 
 task releaseAll (type: Copy) {
