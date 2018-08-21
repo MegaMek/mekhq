@@ -311,8 +311,8 @@ public class PersonViewPanel extends JPanel {
      * Draws the ribbons below the person portrait.
      */
     private void drawRibbons() {
-        List<Award> awards = person.getAwards().stream().filter(a -> a.getRibbonFileName() != null).sorted()
-                .collect(Collectors.toList());
+        List<Award> awards = person.getAwards().stream().filter(a -> a.getRibbonFileName() != null).collect(Collectors.toList());
+        Collections.reverse(awards);
 
         int i = 0;
         Box rowRibbonsBox = null;

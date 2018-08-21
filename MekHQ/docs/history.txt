@@ -12,6 +12,8 @@ v0.45.1-git
 + Issue #859: Fixed JSpinner text box overriding user-typed values.
 + Issue #857: Fixed bug where refit armor may not be attached to a unit on load.
 + Issue #843: Implemented sorting and scrollbar on several long lists in personnel right click menu.
++ Issue #877: Feature: Categorized births and pregnancy log entries as medical
++ Issue #858: Escaped XML was not correctly unescaped in LogEntry.generateInstanceFromXML()
 
 v0.45.0 (2018-08-02 0200 UTC)
 + PR #602: Add KIA checkbox and functionality to prisoners during scenario resolution.

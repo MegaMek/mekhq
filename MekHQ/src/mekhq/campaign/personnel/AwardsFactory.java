@@ -155,10 +155,14 @@ public class AwardsFactory {
 
                 Map<String, Award> tempAwardMap = new HashMap<>();
                 String currentSetName = file.getName().replaceFirst("[.][^.]+$", "");
+                int i = 0;
                 for (Award award : awardSet.getAwards()){
+                    award.setId(i);
+                    i++;
                     award.setSet(currentSetName);
                     tempAwardMap.put(award.getName(), award);
                 }
+
                 awardsMap.put(currentSetName, tempAwardMap);
             } catch (SAXException | ParserConfigurationException e) {
                 MekHQ.getLogger().error(AwardsFactory.class, "loadAwards", e);
