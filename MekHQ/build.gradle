@@ -102,6 +102,9 @@ task mmlJar (type: Jar) {
 	    attributes 'Class-Path' : 'MegaMek.jar ' + (project.sourceSets.main.runtimeClasspath.files
 	    	.findAll { it.name.endsWith(".jar") }.collect { "${lib}/${it.name}" }.join(' '))
 	}
+	inputs.dir "${mmlDir}/build/classes/java/main"
+	inputs.dir "${mmlDir}/build/resources/main"
+	outputs.file "${buildDir}/libs/${archiveName}"
 }
 
 task stageFiles(type: Copy) {
@@ -125,6 +128,14 @@ task stageFiles(type: Copy) {
 	include 'SubmitBug.html'
 
 	into fileStagingDir
+	
+	inputs.dir "${conf}"
+	inputs.dir "${docs}"
+	inputs.dir "${data}"
+	inputs.dir "${campaigns}"
+	inputs.dir "${project.ext.plugins}"
+	inputs.files 'license.txt', 'SubmitBug.html'
+	outputs.dir fileStagingDir
 
 	doLast {
 		mkdir "${fileStagingDir}/${log}"
@@ -292,9 +303,11 @@ createExe {
 	description = 'Create Windows executable that wraps MekHQ jar'
 	mainClassName = project.mainClassName
 	icon = "${projectDir}/data/images/misc/mekhq.ico"
-	downloadUrl = 'http://github.com/MegaMek/mekhq/'
+	def inifile = outfile.replace('.exe', '.l4j.ini')
+	outputs.file "${buildDir}/launch4j/${outfile}"
+	outputs.file "${buildDir}/launch4j/${inifile}"
 	doLast {
-        new File("${buildDir}/${outputDir}/MekHQ.l4j.ini").text = """# Launch4j runtime config
+        new File("${buildDir}/${outputDir}/${inifile}").text = """# Launch4j runtime config
 # you can add arguments here that will be processed by the JVM at runtime
 ${project.ext.jvmOptions.join('\n')}
 """		
@@ -312,8 +325,11 @@ task createMMExe (type: edu.sc.seis.launch4j.tasks.Launch4jLibraryTask) {
 	icon = "${mmDir}/megamek/data/images/misc/megamek.ico"
 	internalName = 'MegaMek'
 	dontWrapJar = true
+	def inifile = outfile.replace('.exe', '.l4j.ini')
+	outputs.file "${buildDir}/launch4j/${outfile}"
+	outputs.file "${buildDir}/launch4j/${inifile}"
 	doLast {
-        new File("${buildDir}/${outputDir}/MegaMek.l4j.ini").text = """# Launch4j runtime config
+        new File("${buildDir}/${outputDir}/${inifile}").text = """# Launch4j runtime config
 # you can add arguments here that will be processed by the JVM at runtime
 ${project.ext.jvmOptions.join('\n')}
 """		
@@ -331,8 +347,11 @@ task createMMLExe (type: edu.sc.seis.launch4j.tasks.Launch4jLibraryTask) {
 	icon = "${mmlDir}/data/images/misc/megameklab.ico"
 	internalName = 'MegaMekLab'
 	dontWrapJar = true
+	def inifile = outfile.replace('.exe', '.l4j.ini')
+	outputs.file "${buildDir}/launch4j/${outfile}"
+	outputs.file "${buildDir}/launch4j/${inifile}"
 	doLast {
-        new File("${buildDir}/${outputDir}/MegaMekLab.l4j.ini").text = """# Launch4j runtime config
+        new File("${buildDir}/${outputDir}/${inifile}").text = """# Launch4j runtime config
 # you can add arguments here that will be processed by the JVM at runtime
 ${project.ext.jvmOptions.join('\n')}
 """		
