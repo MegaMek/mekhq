@@ -66,6 +66,8 @@ public class Award implements MekHqXmlSerializable, Comparable<Award>, Serializa
     @XmlElement(name = "stackable")
     private boolean stackable = false;
 
+    private int id;
+
     private String set;
 
     private Date date;
@@ -74,7 +76,7 @@ public class Award implements MekHqXmlSerializable, Comparable<Award>, Serializa
 
     public Award(){}
 
-    public Award(String name, String set,  String description, String medal, String ribbon, String misc, int xp, int edge, boolean stackable) {
+    public Award(String name, String set,  String description, String medal, String ribbon, String misc, int xp, int edge, boolean stackable, int id) {
         this.name = name;
         this.set = set;
         this.description = description;
@@ -84,6 +86,7 @@ public class Award implements MekHqXmlSerializable, Comparable<Award>, Serializa
         this.xp = xp;
         this.edge = edge;
         this.stackable = stackable;
+        this.id = id;
     }
 
     /**
@@ -117,6 +120,8 @@ public class Award implements MekHqXmlSerializable, Comparable<Award>, Serializa
     public void setSet(String set){
         this.set = set;
     }
+
+    public void setId(int id) { this.id = id; }
 
     public String getDescription() {
         return description;
@@ -159,7 +164,8 @@ public class Award implements MekHqXmlSerializable, Comparable<Award>, Serializa
      * @return award with new date
      */
     public Award createCopy(Date date){
-        Award awardCopy = new Award(this.name, this.set, this.description, this.medal, this.ribbon, this.misc, this.xp, this.edge, this.stackable);
+        Award awardCopy = new Award(this.name, this.set, this.description, this.medal, this.ribbon, this.misc, this.xp,
+                this.edge, this.stackable, this.id);
         awardCopy.setDate(date);
         return awardCopy;
     }
@@ -195,16 +201,6 @@ public class Award implements MekHqXmlSerializable, Comparable<Award>, Serializa
      */
     @Override
     public int compareTo(Award other) {
-        int result = Integer.compare(this.xp, other.xp);
-
-        if(result == 0) {
-            result = Integer.compare(this.edge, other.edge);
-        }
-
-        if(result == 0) {
-            result = this.getName().compareTo(other.getName());
-        }
-
-        return result;
+        return Integer.compare(this.id, other.id);
     }
 }
