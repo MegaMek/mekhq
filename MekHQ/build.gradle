@@ -248,6 +248,7 @@ distributions {
 			from (fileStagingDir)
 			from ("${buildDir}/launch4j") {
 				include '*.exe'
+				include '*.ini'
 			}
 			from (project.sourceSets.main.runtimeClasspath.files
     				.findAll { it.name.endsWith(".jar") }) {
@@ -290,7 +291,12 @@ createExe {
 	mainClassName = project.mainClassName
 	icon = "${projectDir}/data/images/misc/mekhq.ico"
 	downloadUrl = 'http://github.com/MegaMek/mekhq/'
-	jvmOptions = project.ext.jvmOptions
+	doLast {
+        new File("${buildDir}/${outputDir}/MekHQ.l4j.ini").text = """# Launch4j runtime config
+# you can add arguments here that will be processed by the JVM at runtime
+${project.ext.jvmOptions.join('\n')}
+"""		
+	}
 }
 
 task createMMExe (type: edu.sc.seis.launch4j.tasks.Launch4jLibraryTask) {
@@ -303,8 +309,13 @@ task createMMExe (type: edu.sc.seis.launch4j.tasks.Launch4jLibraryTask) {
 	    	.findAll { it.name.endsWith(".jar") }.collect { "${lib}/${it.name}" }
 	icon = "${mmDir}/megamek/data/images/misc/megamek.ico"
 	internalName = 'MegaMek'
-	jvmOptions = project.ext.jvmOptions
 	dontWrapJar = true
+	doLast {
+        new File("${buildDir}/${outputDir}/MegaMek.l4j.ini").text = """# Launch4j runtime config
+# you can add arguments here that will be processed by the JVM at runtime
+${project.ext.jvmOptions.join('\n')}
+"""		
+	}
 }
 
 task createMMLExe (type: edu.sc.seis.launch4j.tasks.Launch4jLibraryTask) {
@@ -317,8 +328,13 @@ task createMMLExe (type: edu.sc.seis.launch4j.tasks.Launch4jLibraryTask) {
 	    	.findAll { it.name.endsWith(".jar") }.collect { "${lib}/${it.name}" }
 	icon = "${mmlDir}/data/images/misc/megameklab.ico"
 	internalName = 'MegaMekLab'
-	jvmOptions = project.ext.jvmOptions
 	dontWrapJar = true
+	doLast {
+        new File("${buildDir}/${outputDir}/MegaMekLab.l4j.ini").text = """# Launch4j runtime config
+# you can add arguments here that will be processed by the JVM at runtime
+${project.ext.jvmOptions.join('\n')}
+"""		
+	}
 }
 
 task stageMM (type: GradleBuild) {
