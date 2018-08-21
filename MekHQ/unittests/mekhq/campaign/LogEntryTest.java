@@ -21,6 +21,13 @@ package mekhq.campaign;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintWriter;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.Date;
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -43,6 +50,15 @@ public class LogEntryTest {
         checkMarshalling(new LogEntry(new Date(0l), "", ""));  //$NON-NLS-1$//$NON-NLS-2$
         checkMarshalling(new LogEntry(new Date(0l), "<desc>Some description</desc>", "<type>Some type</type>")); //$NON-NLS-1$ //$NON-NLS-2$
         checkMarshalling(new LogEntry(new Date(0l), "Some <em>xml-fragment</em> description", "Some <em>xml-fragment</em> type")); //$NON-NLS-1$ //$NON-NLS-2$
+    }
+
+    @Test
+    public void testDatesMarsalledIn24HFormat() throws Exception {
+        // The date format in LogEntry used to be yyyy-MM-dd hh:mm:ss (with lowercase hh), which
+        // caused pm times (eg: 14:00 / 2pm) to be converted to am ones during marshalling.
+        // This test is to ensure we have no regressions.
+        Instant todayAt2Pm = LocalDate.now().atStartOfDay(ZoneId.systemDefault()).withHour(14).toInstant();
+        checkMarshalling(new LogEntry(new Date(todayAt2Pm.toEpochMilli()), "", ""));  //$NON-NLS-1$//$NON-NLS-2$
     }
 
     private static void checkMarshalling(LogEntry le) throws Exception {
