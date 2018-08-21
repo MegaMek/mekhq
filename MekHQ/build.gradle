@@ -544,8 +544,8 @@ publishing {
                 url = "http://megamek.org"
                 licenses {
                     license {
-                        name = "GNU General Public License, version 2"
-                        url = "https://www.gnu.org/licenses/gpl-2.0.html"
+                        name = "GNU General Public License, version 3"
+                        url = "https://www.gnu.org/licenses/gpl-3.0.en.html"
                     }
                 }
             }
