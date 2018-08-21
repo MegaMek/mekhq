@@ -33,6 +33,8 @@ dependencies {
 		// We may want to specify different branches for MM and MML, so we need to exclude
 		// the transitive MM dependency
 		exclude group: 'org.megamek', module: "megameklab${mmlBranchTag}"
+		// We're not using any scripting, and this module will also pull in a rather large jython library
+		exclude group: 'org.apache.xmlgraphics', module: 'batik-script'
 	}
 	
 	// We have been using a modified version of svgSalamander in MML, which we'll keep around until
@@ -191,6 +193,10 @@ distributions {
 				include 'startup*'
 				rename 'startup(.*)', 'mm-startup$1'
 			}
+			from ("${mmDir}/docs/history.txt") {
+				rename 'history.txt', 'mm-history.txt'
+				into 'docs'
+			}
 			from (mmlJar)
 			from ("${mmlDir}/build/files/data/fonts") {
 				into "data/fonts"
@@ -205,9 +211,7 @@ distributions {
 				rename 'history.txt', 'mml-history.txt'
 				into 'docs'
 			}
-			from (fileStagingDir) {
-				rename 'history.txt', 'mm-history.txt'
-			}
+			from (fileStagingDir)
 			from(createStartScripts) {
 				include 'hq*'
 			}
@@ -224,13 +228,11 @@ distributions {
 	windows {
 		baseName = 'mekhq-windows'
 		contents {
-			from ("${mmDir}/megamek/build/launch4j") {
-				include '*.exe'
+			from ("${mmDir}/docs/history.txt") {
+				rename 'history.txt', 'mm-history.txt'
+				into 'docs'
 			}
 			from ("${mmDir}/megamek/build/files")
-			from ("${mmlDir}/build/launch4j") {
-				include '*.exe'
-			}
 			from ("${mmlDir}/build/files/data/fonts") {
 				into "data/fonts"
 			}
@@ -241,9 +243,7 @@ distributions {
 				rename 'history.txt', 'mml-history.txt'
 				into 'docs'
 			}
-			from (fileStagingDir) {
-				rename 'history.txt', 'mm-history.txt'
-			}
+			from (fileStagingDir)
 			from ("${buildDir}/launch4j") {
 				include '*.exe'
 			}
@@ -259,6 +259,10 @@ distributions {
 		contents {
 			from osxBundleDir
 			from ("${mmDir}/megamek/build/files")
+			from ("${mmDir}/docs/history.txt") {
+				rename 'history.txt', 'mml-history.txt'
+				into 'docs'
+			}
 			from ("${mmlDir}/build/files/data/fonts") {
 				into "data/fonts"
 			}
@@ -269,9 +273,7 @@ distributions {
 				rename 'history.txt', 'mml-history.txt'
 				into 'docs'
 			}
-			from (fileStagingDir) {
-				rename 'history.txt', 'mm-history.txt'
-			}
+			from (fileStagingDir)
 			from (project.sourceSets.main.runtimeClasspath.files
     				.findAll { it.name.endsWith(".jar") }) {
     			into "${lib}"
@@ -285,7 +287,36 @@ createExe {
 	description = 'Create Windows executable that wraps MekHQ jar'
 	mainClassName = project.mainClassName
 	icon = "${projectDir}/data/images/misc/mekhq.ico"
+	downloadUrl = 'http://github.com/MegaMek/mekhq/'
 	jvmOptions = project.ext.jvmOptions
+}
+
+task createMMExe (type: edu.sc.seis.launch4j.tasks.Launch4jLibraryTask) {
+	description = 'Create Windows executable stub for MM jar'
+	outfile = 'MegaMek.exe'
+	mainClassName = 'megamek.MegaMek'
+	jar = project.sourceSets.main.runtimeClasspath.files
+		.find { it.name.toLowerCase().startsWith('megamek-') }
+	classpath = project.sourceSets.main.runtimeClasspath.files
+	    	.findAll { it.name.endsWith(".jar") }.collect { "${lib}/${it.name}" }
+	icon = "${mmDir}/megamek/data/images/misc/megamek.ico"
+	internalName = 'MegaMek'
+	jvmOptions = project.ext.jvmOptions
+	dontWrapJar = true
+}
+
+task createMMLExe (type: edu.sc.seis.launch4j.tasks.Launch4jLibraryTask) {
+	description = 'Create Windows executable stub for MML jar'
+	outfile = 'MegaMekLab.exe'
+	mainClassName = 'megameklab.com.MegaMekLab'
+	jar = project.sourceSets.main.runtimeClasspath.files
+		.find { it.name.toLowerCase().startsWith('megameklab') }
+	classpath = project.sourceSets.main.runtimeClasspath.files
+	    	.findAll { it.name.endsWith(".jar") }.collect { "${lib}/${it.name}" }
+	icon = "${mmlDir}/data/images/misc/megameklab.ico"
+	internalName = 'MegaMekLab'
+	jvmOptions = project.ext.jvmOptions
+	dontWrapJar = true
 }
 
 task stageMM (type: GradleBuild) {
@@ -294,7 +325,7 @@ task stageMM (type: GradleBuild) {
 	
 	buildFile = "${mmDir}/build.gradle"
 	dir = "${mmDir}"
-	tasks = [ 'jar', 'stageFiles', 'createExe', 'createStartScripts' ]
+	tasks = [ 'stageFiles', 'createStartScripts' ]
 }
 
 task stageMML (type: GradleBuild) {
@@ -303,7 +334,7 @@ task stageMML (type: GradleBuild) {
 	
 	buildFile = "${mmlDir}/build.gradle"
 	dir = "${mmlDir}"
-	tasks = [ 'compileJava', 'stageFiles', 'createExe', 'createStartScripts' ]
+	tasks = [ 'stageFiles', 'createStartScripts' ]
 }
 
 windowsDistZip {
@@ -312,6 +343,8 @@ windowsDistZip {
 	dependsOn stageMM
 	dependsOn stageMML
 	dependsOn createExe
+	dependsOn createMMExe
+	dependsOn createMMLExe
 }
 
 unixDistTar {
