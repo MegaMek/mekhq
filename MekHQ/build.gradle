@@ -187,8 +187,9 @@ distributions {
 		contents {
 			from ("${mmDir}/megamek/build/libs/MegaMek.jar")
 			from ("${mmDir}/megamek/build/files")
-			from ("${mmDir}/megamek/build/scripts/startup") {
+			from ("${mmDir}/megamek/build/scripts") {
 				include 'startup*'
+				rename 'startup(.*)', 'mm-startup$1'
 			}
 			from (mmlJar)
 			from ("${mmlDir}/build/files/data/fonts") {
@@ -197,7 +198,7 @@ distributions {
 			from ("${mmlDir}/build/files/data/images") {
 				into "data/images"
 			}
-			from ("${mmlDir}/build/scripts/lab") {
+			from ("${mmlDir}/build/scripts") {
 				include 'lab*'
 			}
 			from ("${mmlDir}/docs/history.txt") {
