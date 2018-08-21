@@ -67,7 +67,7 @@ ext {
 	docs = 'docs'
 	lib = 'lib'
 	plugins = 'plugins'
-	campaign = 'campaign'
+	campaigns = 'campaigns'
 	distributionDir = "${buildDir}/distributions"
 	fileStagingDir = "${buildDir}/files"
 	repoDir = "${buildDir}/repo/mekhq"
@@ -105,13 +105,10 @@ task stageFiles(type: Copy) {
 	include "${data}/images/misc/"
 	include "${data}/images/universe/"
 	include "${project.ext.plugins}/"
-	include "${campaign}/"
+	include "${campaigns}/"
 
 	into fileStagingDir
-}
 
-task createLogDir (dependsOn: stageFiles) {
-	description 'Creates the log directory and the timestamp file.'
 	doLast {
 		mkdir "${fileStagingDir}/${log}"
 		ant.touch(file: "${fileStagingDir}/${log}/timestamp")
@@ -285,7 +282,7 @@ task stageMM (type: GradleBuild) {
 	
 	buildFile = "${mmDir}/build.gradle"
 	dir = "${mmDir}"
-	tasks = [ 'jar', 'createLogDir', 'createExe', 'startScripts' ]
+	tasks = [ 'jar', 'stageFiles', 'createExe', 'startScripts' ]
 }
 
 task stageMML (type: GradleBuild) {
@@ -294,12 +291,12 @@ task stageMML (type: GradleBuild) {
 	
 	buildFile = "${mmlDir}/build.gradle"
 	dir = "${mmlDir}"
-	tasks = [ 'jar', 'createLogDir', 'createExe', 'startScripts' ]
+	tasks = [ 'jar', 'stageFiles', 'createExe', 'startScripts' ]
 }
 
 windowsDistZip {
 	description = 'Creates Windows distribution packaged as a zip archive'
-	dependsOn createLogDir
+	dependsOn stageFiles
 	dependsOn stageMM
 	dependsOn stageMML
 	dependsOn createExe
@@ -307,7 +304,7 @@ windowsDistZip {
 
 unixDistTar {
 	description = 'Creates *nix distribution packaged as a tar ball'
-	dependsOn createLogDir
+	dependsOn stageFiles
 	dependsOn stageMM
 	dependsOn stageMML
 	dependsOn startScripts
@@ -317,7 +314,7 @@ unixDistTar {
 
 macDistTar {
 	description = 'Creates mac OSX distribution'
-	dependsOn createLogDir
+	dependsOn stageFiles
 	dependsOn createOSXBundle
 	extension = 'tar.bz2'
 	compression = Compression.BZIP2
@@ -418,8 +415,8 @@ task buildMM (type: GradleBuild, dependsOn: cloneMMRepo) {
 	description = 'Prepares files from the MegaMek project'
 	group = 'distribution'
 	
-	buildFile = "${mmDir}/build.gradle"
-	dir = "${mmDir}"
+	buildFile = "${mmRepoDir}/build.gradle"
+	dir = "${mmRepoDir}"
 	tasks = [ 'assembleDist' ]
 }
 
@@ -427,8 +424,8 @@ task buildMML (type: GradleBuild, dependsOn: cloneMMLRepo) {
 	description = 'Prepares files from the MegaMekLab project'
 	group = 'distribution'
 	
-	buildFile = "${mmlDir}/build.gradle"
-	dir = "${mmlDir}"
+	buildFile = "${mmlRepoDir}/build.gradle"
+	dir = "${mmlRepoDir}"
 	tasks = [ 'assembleDist' ]
 }
 
@@ -450,8 +447,8 @@ task releaseAll (type: Copy) {
 	dependsOn buildAllFromRepo
 	
 	from "${repoDir}/MekHQ/build/distributions"
-	from "${mmDir}/megamek/build/distributions"
-	from "${mmlDir}/build/distributions"
+	from "${mmRepoDir}/megamek/build/distributions"
+	from "${mmlRepoDir}/build/distributions"
 	into "${distributionDir}"
 }
 
