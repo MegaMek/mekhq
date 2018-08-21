@@ -121,6 +121,8 @@ task stageFiles(type: Copy) {
 	include "${data}/images/universe/"
 	include "${project.ext.plugins}/"
 	include "${campaigns}/"
+	include 'license.txt'
+	include 'SubmitBug.html'
 
 	into fileStagingDir
 
