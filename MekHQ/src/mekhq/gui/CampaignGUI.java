@@ -1638,22 +1638,14 @@ public class CampaignGUI extends JPanel {
     }
 
     private File selectSaveCampaignFile() {
-        JFileChooser saveCpgn = new JFileChooser("./campaigns/");
-        saveCpgn.setDialogTitle("Save Campaign");
-        saveCpgn.setFileFilter(new CampaignFileFilter());
-        saveCpgn.setSelectedFile(new File(getCampaign().getName()
-                + getCampaign().getShortDateAsString() + ".cpnx")); //$NON-NLS-1$
-        int returnVal = saveCpgn.showSaveDialog(mainPanel);
-
-        if ((returnVal != JFileChooser.APPROVE_OPTION)
-                || (saveCpgn.getSelectedFile() == null)) {
-            // I want a file, y'know!
-            return null;
-        }
-
-        File file = saveCpgn.getSelectedFile();
-
-        return file;
+        String fileName = getCampaign().getName()
+                        + getCampaign().getShortDateAsString()
+                        + ".cpnx";
+        return GUI.saveFileDialog( frame,
+                                   "Save Campaign",
+                                   new File(MekHQ.CAMPAIGN_DIRECTORY, fileName),
+                                   f -> (f.getName().endsWith(".cpnx") || f.getName().endsWith(".xml")) )
+                  .orElse(null);
     }
 
     private void menuLoadXmlActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_menuLoadActionPerformed
@@ -1681,20 +1673,11 @@ public class CampaignGUI extends JPanel {
     }
 
     private File selectLoadCampaignFile() {
-        JFileChooser loadCpgn = new JFileChooser("./campaigns/");
-        loadCpgn.setDialogTitle("Load Campaign");
-        loadCpgn.setFileFilter(new CampaignFileFilter());
-        int returnVal = loadCpgn.showOpenDialog(mainPanel);
-
-        if ((returnVal != JFileChooser.APPROVE_OPTION)
-                || (loadCpgn.getSelectedFile() == null)) {
-            // I want a file, y'know!
-            return null;
-        }
-
-        File file = loadCpgn.getSelectedFile();
-
-        return file;
+        return GUI.openFileDialog( frame,
+                                   "Load Campaign",
+                                   new File(MekHQ.CAMPAIGN_DIRECTORY),
+                                   f -> (f.getName().endsWith(".cpnx") || f.getName().endsWith(".xml")) )
+                  .orElse(null);
     }
 
     private void btnOvertimeActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnOvertimeActionPerformed

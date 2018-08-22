@@ -170,20 +170,11 @@ public class StartUpGUI extends javax.swing.JPanel {
     }
     
     private File selectLoadCampaignFile() {
-		JFileChooser loadCpgn = new JFileChooser(MekHQ.CAMPAIGN_DIRECTORY);
-		loadCpgn.setDialogTitle("Load Campaign");
-		loadCpgn.setFileFilter(new CampaignFileFilter());
-		int returnVal = loadCpgn.showOpenDialog(frame);
-
-		if ((returnVal != JFileChooser.APPROVE_OPTION)
-				|| (loadCpgn.getSelectedFile() == null)) {
-			// I want a file, y'know!
-			return null;
-		}
-		
-		File file = loadCpgn.getSelectedFile();
-
-		return file;
+        return GUI.openFileDialog( frame,
+                                   "Load Campaign",
+                                   new File(MekHQ.CAMPAIGN_DIRECTORY),
+                                   f -> (f.getName().endsWith(".cpnx") || f.getName().endsWith(".xml")) )
+                  .orElse(null);
 	}
     
     private javax.swing.JButton btnNewGame;
