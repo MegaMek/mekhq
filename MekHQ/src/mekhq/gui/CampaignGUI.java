@@ -2069,7 +2069,7 @@ public class CampaignGUI extends JPanel {
 	 * @param filename
 	 */
     protected void exportPlanets(FileType format, String dialogTitle, String filename) {
-        GUI.fileDialogOpen(frame, dialogTitle, new File("."), format).ifPresent(f -> {
+        GUI.fileDialogSave(frame, dialogTitle, new File(".", "planets." + format.getRecommendedExtension()), format).ifPresent(f -> {
             File file = checkFileEnding(f, format.getRecommendedExtension());
             checkToBackupFile(file, file.getPath());
             String report = Planets.getInstance().exportPlanets(file.getPath(), format.getRecommendedExtension());
@@ -2110,7 +2110,7 @@ public class CampaignGUI extends JPanel {
      */
     protected void exportFinances(FileType format, String dialogTitle, String filename) {
         if (!getCampaign().getFinances().getAllTransactions().isEmpty()) {
-            GUI.fileDialogSave(frame, dialogTitle, new File(".", filename), format).ifPresent(f -> {
+            GUI.fileDialogSave(frame, dialogTitle, new File(".", filename + "." + format.getRecommendedExtension()), format).ifPresent(f -> {
                 File file = checkFileEnding(f, format.getRecommendedExtension());
                 checkToBackupFile(file, file.getPath());
                 String report = getCampaign().getFinances().exportFinances(file.getPath(), format.getRecommendedExtension());
@@ -2370,7 +2370,7 @@ public class CampaignGUI extends JPanel {
     private void saveOptionsFile(FileType format, String dialogTitle, String filename) throws IOException {
         final String METHOD_NAME = "saveOptionsFile()";
         
-        Optional<File> maybeFile = GUI.fileDialogSave(frame, dialogTitle, new File("."), format);
+        Optional<File> maybeFile = GUI.fileDialogSave(frame, dialogTitle, new File(".", filename + "." + format.getRecommendedExtension()), format);
 
         if (!maybeFile.isPresent()) {
             return;
@@ -2734,7 +2734,7 @@ public class CampaignGUI extends JPanel {
     }
 
     private void exportTable(JTable table, String filename, FileType format, String dialogTitle) {
-        GUI.fileDialogSave(frame, dialogTitle, new File("."), format).ifPresent(f -> {
+        GUI.fileDialogSave(frame, dialogTitle, new File(".", filename + "." + format.getRecommendedExtension()), format).ifPresent(f -> {
             File file = checkFileEnding(f, format.getRecommendedExtension());
             checkToBackupFile(file, file.getPath());
             String report = "";
