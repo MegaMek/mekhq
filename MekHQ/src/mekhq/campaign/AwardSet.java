@@ -4,6 +4,9 @@ import mekhq.campaign.personnel.Award;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -17,9 +20,9 @@ public class AwardSet{
     public AwardSet(){}
 
     @XmlElement(name = "award")
-    private Set<Award> awards;
+    private ArrayList<Award> awards;
 
-    public Set<Award> getAwards(){
-        return awards;
+    public List<Award> getAwards(){
+        return Collections.unmodifiableList(awards);
     }
 }

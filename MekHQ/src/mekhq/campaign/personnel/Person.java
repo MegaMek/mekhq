@@ -1069,7 +1069,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
             baby.setAncestorsID(ancId);
             campaign.addReport(getHyperlinkedName() + " has given birth to " + baby.getHyperlinkedName() + ", a baby " + (baby.getGender() == G_MALE ? "boy!" : "girl!"));
             if (campaign.getCampaignOptions().logConception()) {
-                addLogEntry(campaign.getDate(), "Delivered a healthy baby " + (baby.getGender() == G_MALE ? "boy!" : "girl!"));
+                addLogEntry(campaign.getDate(), "Delivered a healthy baby " + (baby.getGender() == G_MALE ? "boy!" : "girl!"), Person.LOGTYPE_MEDICAL);
             }
             return baby;
         }).collect(Collectors.toList());
@@ -1110,12 +1110,12 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     if(null == sizeString) {
                         campaign.addReport(getHyperlinkedName()+" has conceived");
                         if (campaign.getCampaignOptions().logConception()) {
-                            addLogEntry(campaign.getDate(), "Has conceived");
+                            addLogEntry(campaign.getDate(), "Has conceived", Person.LOGTYPE_MEDICAL);
                         }
                     } else {
                         campaign.addReport(getHyperlinkedName()+" has conceived " + sizeString);
                         if (campaign.getCampaignOptions().logConception()) {
-                            addLogEntry(campaign.getDate(), "Has conceived " + sizeString);
+                            addLogEntry(campaign.getDate(), "Has conceived " + sizeString, Person.LOGTYPE_MEDICAL);
                         }
                     }
                 }
@@ -1136,12 +1136,12 @@ public class Person implements Serializable, MekHqXmlSerializable {
         if(null == sizeString) {
             campaign.addReport(getHyperlinkedName()+" has conceived");
             if (campaign.getCampaignOptions().logConception()) {
-                addLogEntry(campaign.getDate(), "Has conceived");
+                addLogEntry(campaign.getDate(), "Has conceived", Person.LOGTYPE_MEDICAL);
             }
         } else {
             campaign.addReport(getHyperlinkedName()+" has conceived " + sizeString);
             if (campaign.getCampaignOptions().logConception()) {
-                addLogEntry(campaign.getDate(), "Has conceived " + sizeString);
+                addLogEntry(campaign.getDate(), "Has conceived " + sizeString, Person.LOGTYPE_MEDICAL);
             }
         }
     }
