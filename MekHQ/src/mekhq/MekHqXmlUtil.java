@@ -660,4 +660,12 @@ public class MekHqXmlUtil {
         String model = attrs.getNamedItem("model").getTextContent();
         return chassis + " " + model;
     }
+
+	public static Date parseDate(String value) throws ParseException {
+		return new SimpleDateFormat("yyyy-MM-dd").parse(value.trim());
+	}
+	
+	public static String formatDate(Date date) {
+		return new SimpleDateFormat("yyyy-MM-dd").format(date);
+	}
 }
