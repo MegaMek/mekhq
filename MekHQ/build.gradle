@@ -33,8 +33,9 @@ dependencies {
 		// We may want to specify different branches for MM and MML, so we need to exclude
 		// the transitive MM dependency
 		exclude group: 'org.megamek', module: "megameklab${mmlBranchTag}"
-		// We're not using any scripting, and this module will also pull in a rather large jython library
-		exclude group: 'org.apache.xmlgraphics', module: 'batik-script'
+		// We don't need the python and javascript engine taking up space
+		exclude group: 'org.python', module: 'jython'
+		exclude group: 'org.mozilla', module: 'rhino'
 		// Looks like a misconfiguration; the individual batik modules should not declare a dependency on batik-all
 		exclude group: 'org.apache.xmlgraphics', module: 'batik-all'
 	}
