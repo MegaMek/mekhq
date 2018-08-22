@@ -14,6 +14,7 @@ v0.45.1-git
 + Issue #843: Implemented sorting and scrollbar on several long lists in personnel right click menu.
 + Issue #877: Feature: Categorized births and pregnancy log entries as medical
 + Issue #858: Escaped XML was not correctly unescaped in LogEntry.generateInstanceFromXML()
++ PR #894: Fixes generation of AtBContracts with 0 req. lances
 
 v0.45.0 (2018-08-02 0200 UTC)
 + PR #602: Add KIA checkbox and functionality to prisoners during scenario resolution.
