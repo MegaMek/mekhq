@@ -435,10 +435,9 @@ public class AtBContract extends Contract implements Serializable {
         if (isSubcontract()) {
             requiredLances = 1;
         } else {
-            int required = Math.max(getEffectiveNumUnits(campaign) / 6, 1);
-            if (campaign.getCampaignOptions().getAdjustPaymentForStrategy() &&
-                    required > maxDeployedLances) {
-                multiplier *= (double)maxDeployedLances / (double)required;
+            requiredLances = Math.max(getEffectiveNumUnits(campaign) / 6, 1);
+            if (requiredLances > maxDeployedLances && campaign.getCampaignOptions().getAdjustPaymentForStrategy()) {
+                multiplier *= (double)maxDeployedLances / (double)requiredLances;
                 requiredLances = maxDeployedLances;
             }
         }
