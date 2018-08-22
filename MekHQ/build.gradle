@@ -471,8 +471,6 @@ task assembleDist(overwrite: true) {
 	dependsOn unixDistTar
 	dependsOn windowsDistZip
 	dependsOn macDistTar
-	dependsOn sourceZip
-	dependsOn sourceTar
 }
 
 task buildFromRepo (type: GradleBuild) {
@@ -523,7 +521,7 @@ task buildAllFromRepo (type: GradleBuild) {
 	
 	buildFile = "${repoDir}/build.gradle"
 	dir = "${repoDir}"
-	tasks = [ 'unixDistTar', 'windowsDistZip', 'macDistTar', 'sourceTar', 'sourceZip' ]
+	tasks = [ 'unixDistTar', 'windowsDistZip', 'macDistTar' ]
 }
 
 task releaseAll (type: Copy) {
