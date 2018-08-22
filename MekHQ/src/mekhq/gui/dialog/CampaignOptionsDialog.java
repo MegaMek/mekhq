@@ -41,6 +41,7 @@ import java.util.GregorianCalendar;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.Vector;
@@ -56,7 +57,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
-import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
@@ -109,6 +109,7 @@ import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.RATManager;
+import mekhq.gui.FileDialogs;
 import mekhq.gui.SpecialAbilityPanel;
 import mekhq.gui.model.RankTableModel;
 import mekhq.gui.model.SortedComboBoxModel;
@@ -4348,23 +4349,14 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO,
                 "Saving campaign options..."); //$NON-NLS-1$
         // Choose a file...
-        JFileChooser saveOptions = new JFileChooser(MekHQ.PRESET_DIR);
-        saveOptions.setDialogTitle("Save Campaign Options as Presets");
-        //saveCpgn.setFileFilter(new CampaignFileFilter());
-        saveOptions.setSelectedFile(new File("myoptions.xml")); //$NON-NLS-1$
-        int returnVal = saveOptions.showSaveDialog(getParent());
+        Optional<File> maybeFile = FileDialogs.fileDialogSaveCampaignOptions(null);
 
-        if ((returnVal != JFileChooser.APPROVE_OPTION)
-                || (saveOptions.getSelectedFile() == null)) {
-            // I want a file, y'know!
+        if (!maybeFile.isPresent()) {
             return;
         }
 
-        File file = saveOptions.getSelectedFile();
-        if (file == null) {
-            // I want a file, y'know!
-            return;
-        }
+        File file = maybeFile.get();
+
         String path = file.getPath();
         if (!path.endsWith(".xml")) {
             path += ".xml";

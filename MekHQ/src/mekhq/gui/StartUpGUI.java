@@ -19,7 +19,6 @@ import java.io.FilenameFilter;
 import java.util.ResourceBundle;
 
 import javax.swing.Box;
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
@@ -170,11 +169,7 @@ public class StartUpGUI extends javax.swing.JPanel {
     }
     
     private File selectLoadCampaignFile() {
-        return GUI.openFileDialog( frame,
-                                   "Load Campaign",
-                                   new File(MekHQ.CAMPAIGN_DIRECTORY),
-                                   f -> (f.getName().endsWith(".cpnx") || f.getName().endsWith(".xml")) )
-                  .orElse(null);
+        return FileDialogs.fileDialogOpenCampaign(frame).orElse(null);
 	}
     
     private javax.swing.JButton btnNewGame;
