@@ -1263,8 +1263,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-
         pw1.println(MekHqXmlUtil.indentStr(indent) + "<person id=\""
                     + id.toString()
                     + "\" type=\""
@@ -1347,7 +1345,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         if (dueDate != null) {
             pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                         + "<dueDate>"
-                        + df.format(dueDate.getTime())
+                        + MekHqXmlUtil.formatDate(dueDate.getTime())
                         + "</dueDate>");
         }
         pw1.println(MekHqXmlUtil.indentStr(indent + 1)
@@ -1440,18 +1438,18 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     + "</overtimeLeft>");
         pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                     + "<birthday>"
-                    + df.format(birthday.getTime())
+                    + MekHqXmlUtil.formatDate(birthday.getTime())
                     + "</birthday>");
         if (null != deathday) {
             pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                         + "<deathday>"
-                        + df.format(deathday.getTime())
+                        + MekHqXmlUtil.formatDate(deathday.getTime())
                         + "</deathday>");
         }
         if (null != recruitment) {
             pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                         + "<recruitment>"
-                        + df.format(recruitment.getTime())
+                        + MekHqXmlUtil.formatDate(recruitment.getTime())
                         + "</recruitment>");
         }
         for (String skName : skills.keySet()) {
@@ -1606,9 +1604,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 } else if (wn2.getNodeName().equalsIgnoreCase("spouse")) {
                     retVal.spouse = UUID.fromString(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("duedate")) {
-                    SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
                     retVal.dueDate = (GregorianCalendar) GregorianCalendar.getInstance();
-                    retVal.dueDate.setTime(df.parse(wn2.getTextContent().trim()));
+                    retVal.dueDate.setTime(MekHqXmlUtil.parseDate(wn2.getTextContent()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("teamId")) {
                     retVal.teamId = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("portraitCategory")) {
@@ -1671,17 +1668,14 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 } else if (wn2.getNodeName().equalsIgnoreCase("overtimeLeft")) {
                     retVal.overtimeLeft = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("birthday")) {
-                    SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
                     retVal.birthday = (GregorianCalendar) GregorianCalendar.getInstance();
-                    retVal.birthday.setTime(df.parse(wn2.getTextContent().trim()));
+                    retVal.birthday.setTime(MekHqXmlUtil.parseDate(wn2.getTextContent()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("deathday")) {
-                    SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
                     retVal.deathday = (GregorianCalendar) GregorianCalendar.getInstance();
-                    retVal.deathday.setTime(df.parse(wn2.getTextContent().trim()));
+                    retVal.deathday.setTime(MekHqXmlUtil.parseDate(wn2.getTextContent()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("recruitment")) {
-                    SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
                     retVal.recruitment = (GregorianCalendar) GregorianCalendar.getInstance();
-                    retVal.recruitment.setTime(df.parse(wn2.getTextContent().trim()));
+                    retVal.recruitment.setTime(MekHqXmlUtil.parseDate(wn2.getTextContent()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("advantages")) {
                     advantages = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("edge")) {
@@ -3429,7 +3423,90 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return personnelLog;
     }
 
+    /**
+     * @return true if this person has one or more awards that are represented with a medal icon.
+     */
+    public boolean hasAwardsWithMedals(){
+        return awards.stream().filter(a -> a.getMedalFileName() != null).collect(Collectors.toList()).size() > 0;
+    }
 
+    /**
+     * @return true if this person has one or more awards that are represented by a misc icon.
+     */
+    public boolean hasAwardsWithMiscs(){
+        return awards.stream().filter(a -> a.getMiscFileName() != null).collect(Collectors.toList()).size() > 0;
+    }
+
+    /**
+     * Adds and logs an award to this person based on
+     * @param setName is the name of the set of the award
+     * @param awardName is the name of the award
+     * @param date is the date it was awarded
+     */
+    public void addAndLogAward(String setName, String awardName, Date date) {
+        Award award = AwardsFactory.getInstance().generateNew(setName, awardName, date);
+        setXp(getXp() + award.getXPReward());
+        setEdge(getEdge() + award.getEdgeReward());
+        addAward(award);
+        logAward(award);
+    }
+
+    /**
+     * Removes an award given to this person based on:
+     * @param setName is the name of the set of the award
+     * @param awardName is the name of the award
+     * @param stringDate is the date it was awarded
+     */
+    public void removeAward(String setName, String awardName, String stringDate){
+
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+
+        Date date = null;
+        try {
+            date = df.parse(stringDate);
+        } catch (ParseException e) {
+            MekHQ.getLogger().error(Person.class, "removeAward", "Could not parse award date: " + stringDate, e);
+        }
+
+        for(Award award : awards){
+            if(award.equals(setName, awardName, date)){
+                awards.remove(award);
+                MekHQ.triggerEvent(new PersonChangedEvent(this));
+                addLogEntry(campaign.getDate(), "Removed award " + award.getName());
+                return;
+            }
+        }
+    }
+
+    /**
+     * Gives the award to this person
+     * @param award is the award it was awarded
+     */
+    private void addAward(Award award){
+        awards.add(award);
+        MekHQ.triggerEvent(new PersonChangedEvent(this));
+    }
+
+    /**
+     * Adds an entry log for a given award.
+     * @param award that was given.
+     */
+    public void logAward(Award award){
+        addLogEntry(award.getDate(), "Awarded " + award.getName() + ": " + award.getDescription());
+        MekHQ.triggerEvent(new PersonChangedEvent(this));
+    }
+
+    /**
+     * @param award to check if this person has it
+     * @return true if it has the award
+     */
+    public boolean hasAward(Award award){
+        for(Award myAward : awards){
+            if(award.getName().equals(myAward.getName()) &&
+                    award.getSet().equals(myAward.getSet())) return true;
+        }
+        return false;
+    }
     
     public void addLogEntry(Date d, String desc, String type) {
         personnelLog.add(new LogEntry(d, desc, type));

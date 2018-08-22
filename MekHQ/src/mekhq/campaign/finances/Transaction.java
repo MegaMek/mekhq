@@ -29,6 +29,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Vector;
 
+import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 
 import org.w3c.dom.DOMException;
@@ -230,10 +231,9 @@ public class Transaction implements Serializable {
 				+"<category>"
 				+category
 				+"</category>");
-		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<date>"
-				+df.format(date)
+				+MekHqXmlUtil.formatDate(date)
 				+"</date>");
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "</transaction>");
 	}
@@ -251,15 +251,11 @@ public class Transaction implements Serializable {
 			} else if (wn2.getNodeName().equalsIgnoreCase("description")) {
 				retVal.description = wn2.getTextContent();
 			} else if (wn2.getNodeName().equalsIgnoreCase("date")) {
-				SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 				try {
-					retVal.date = df.parse(wn2.getTextContent().trim());
-				} catch (DOMException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					retVal.date = MekHqXmlUtil.parseDate(wn2.getTextContent());
 				} catch (ParseException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					MekHQ.getLogger().error(Transaction.class, "generateInstanceFromXML", 
+						"Could not parse <date>", e);
 				}
 			}
 		}

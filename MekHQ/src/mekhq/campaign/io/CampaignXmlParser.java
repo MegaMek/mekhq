@@ -35,12 +35,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.Vector;
 
 import javax.xml.parsers.DocumentBuilder;
 
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -49,6 +51,7 @@ import megamek.common.Entity;
 import megamek.common.EntityMovementMode;
 import megamek.common.EquipmentType;
 import megamek.common.Jumpship;
+import megamek.common.MULParser;
 import megamek.common.Mech;
 import megamek.common.MechSummaryCache;
 import megamek.common.MiscType;
@@ -315,7 +318,7 @@ public class CampaignXmlParser {
                     retVal.setRetirementDefectionTracker(RetirementDefectionTracker.generateInstanceFromXML(wn, retVal));
                 } else if (xn.equalsIgnoreCase("shipSearchStart")) {
                     Calendar c = new GregorianCalendar();
-                    c.setTime(parseDate(retVal.getShortDateFormatter(), wn.getTextContent()));
+                    c.setTime(parseDate(wn.getTextContent()));
                     retVal.setShipSearchStart(c);
                 } else if (xn.equalsIgnoreCase("shipSearchType")) {
                     retVal.setShipSearchType(Integer.parseInt(wn.getTextContent()));
@@ -323,7 +326,7 @@ public class CampaignXmlParser {
                     retVal.setShipSearchResult(wn.getTextContent());
                 } else if (xn.equalsIgnoreCase("shipSearchExpiration")) {
                     Calendar c = new GregorianCalendar();
-                    c.setTime(parseDate(retVal.getShortDateFormatter(), wn.getTextContent()));
+                    c.setTime(parseDate(wn.getTextContent()));
                     retVal.setShipSearchExpiration(c);
                 } else if (xn.equalsIgnoreCase("customPlanetaryEvents")) {
                     updatePlanetaryEventsFromXML(wn);
@@ -835,11 +838,9 @@ public class CampaignXmlParser {
                 // handle it.
                 // They're all primitives anyway...
                 if (xn.equalsIgnoreCase("calendar")) {
-                    SimpleDateFormat df = new SimpleDateFormat(
-                            "yyyy-MM-dd hh:mm:ss");
                     GregorianCalendar c = (GregorianCalendar) GregorianCalendar
                             .getInstance();
-                    c.setTime(parseDate(df, wn.getTextContent().trim()));
+                    c.setTime(parseDate(wn.getTextContent()));
                     retVal.setCalendar(c);
                 } else if (xn.equalsIgnoreCase("camoCategory")) {
                     String val = wn.getTextContent().trim();
@@ -990,9 +991,9 @@ public class CampaignXmlParser {
         retVal.setNewReports(newReports);
     }
 
-    private static Date parseDate(DateFormat df, String value) throws CampaignXmlParseException {
+    private static Date parseDate(String value) throws CampaignXmlParseException {
         try {
-            return df.parse(value);
+            return MekHqXmlUtil.parseDate(value);
         } catch (ParseException e) {
             throw new CampaignXmlParseException("Could not parse date: " + value, e);
         }
@@ -1551,8 +1552,7 @@ public class CampaignXmlParser {
                     try {
                         Entity e = MekHqXmlUtil.getEntityFromXmlElement((Element)wn3);
                         if (null == e) {
-                            String name = MekHqXmlUtil
-                                    .getEntityNameFromXmlString(wn3);
+                            String name = getEntityNameFromXmlString(wn3);
                             if (!unitList.contains(name)) {
                                 unitList.add(name);
                             }
@@ -1578,6 +1578,13 @@ public class CampaignXmlParser {
             }
             return unitListString;
         }
+    }
+
+    private static String getEntityNameFromXmlString(Node node) {
+    	NamedNodeMap attrs = node.getAttributes();
+		String chassis = attrs.getNamedItem("chassis").getTextContent();
+		String model = attrs.getNamedItem("model").getTextContent();
+		return chassis + " " + model;
     }
 
     private static void processUnitNodes(Campaign retVal, Node wn,

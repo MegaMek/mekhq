@@ -121,7 +121,7 @@ public class AwardsFactory {
                 Node wn2 = nl.item(x);
 
                 if (wn2.getNodeName().equalsIgnoreCase("date")) {
-                    dates.add(DATE_FORMAT.parse(wn2.getTextContent().trim()));
+                    dates.Add(MekHqXmlUtil.parseDate(wn2.getTextContent()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("name")) {
                     name = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("set")){
