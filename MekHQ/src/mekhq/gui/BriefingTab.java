@@ -28,13 +28,13 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.UUID;
 import java.util.Vector;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -43,7 +43,6 @@ import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
-import javax.swing.filechooser.FileFilter;
 
 import megamek.common.Entity;
 import megamek.common.EntityListFile;
@@ -787,33 +786,13 @@ public final class BriefingTab extends CampaignGuiTab {
             }
         }
 
-        JFileChooser saveList = new JFileChooser(".");
-        saveList.setDialogTitle("Deploy Units");
+        Optional<File> maybeUnitFile = FileDialogs.saveDeployUnits(getFrame(), scenario);
 
-        saveList.setFileFilter(new FileFilter() {
-            @Override
-            public boolean accept(File dir) {
-                if (dir.isDirectory()) {
-                    return true;
-                }
-                return dir.getName().endsWith(".mul");
-            }
-
-            @Override
-            public String getDescription() {
-                return "MUL file";
-            }
-        });
-
-        saveList.setSelectedFile(new File(scenario.getName() + ".mul")); //$NON-NLS-1$
-        int returnVal = saveList.showSaveDialog(this);
-
-        if ((returnVal != JFileChooser.APPROVE_OPTION) || (saveList.getSelectedFile() == null)) {
-            // I want a file, y'know!
+        if (!maybeUnitFile.isPresent()) {
             return;
         }
 
-        File unitFile = saveList.getSelectedFile();
+        File unitFile = maybeUnitFile.get();
 
         if (unitFile != null) {
             if (!(unitFile.getName().toLowerCase().endsWith(".mul") //$NON-NLS-1$

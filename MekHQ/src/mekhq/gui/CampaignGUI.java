@@ -44,6 +44,7 @@ import java.util.Calendar;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.UUID;
 import java.util.Vector;
@@ -51,7 +52,6 @@ import java.util.Vector;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JDialog;
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -67,7 +67,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.WindowConstants;
-import javax.swing.filechooser.FileFilter;
 import javax.xml.parsers.DocumentBuilder;
 
 import org.w3c.dom.Document;
@@ -159,6 +158,7 @@ import mekhq.gui.dialog.UnitCostReportDialog;
 import mekhq.gui.dialog.UnitMarketDialog;
 import mekhq.gui.dialog.UnitSelectorDialog;
 import mekhq.gui.model.PartsTableModel;
+import mekhq.io.FileType;
 
 /**
  * The application's main frame.
@@ -1639,22 +1639,7 @@ public class CampaignGUI extends JPanel {
     }
 
     private File selectSaveCampaignFile() {
-        JFileChooser saveCpgn = new JFileChooser("./campaigns/");
-        saveCpgn.setDialogTitle("Save Campaign");
-        saveCpgn.setFileFilter(new CampaignFileFilter());
-        saveCpgn.setSelectedFile(new File(getCampaign().getName()
-                + getCampaign().getShortDateAsString() + ".cpnx")); //$NON-NLS-1$
-        int returnVal = saveCpgn.showSaveDialog(mainPanel);
-
-        if ((returnVal != JFileChooser.APPROVE_OPTION)
-                || (saveCpgn.getSelectedFile() == null)) {
-            // I want a file, y'know!
-            return null;
-        }
-
-        File file = saveCpgn.getSelectedFile();
-
-        return file;
+        return FileDialogs.saveCampaign(frame, getCampaign()).orElse(null);
     }
 
     private void menuLoadXmlActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_menuLoadActionPerformed
@@ -1682,20 +1667,7 @@ public class CampaignGUI extends JPanel {
     }
 
     private File selectLoadCampaignFile() {
-        JFileChooser loadCpgn = new JFileChooser("./campaigns/");
-        loadCpgn.setDialogTitle("Load Campaign");
-        loadCpgn.setFileFilter(new CampaignFileFilter());
-        int returnVal = loadCpgn.showOpenDialog(mainPanel);
-
-        if ((returnVal != JFileChooser.APPROVE_OPTION)
-                || (loadCpgn.getSelectedFile() == null)) {
-            // I want a file, y'know!
-            return null;
-        }
-
-        File file = loadCpgn.getSelectedFile();
-
-        return file;
+        return FileDialogs.openCampaign(frame).orElse(null);
     }
 
     private void btnOvertimeActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnOvertimeActionPerformed
@@ -1805,7 +1777,7 @@ public class CampaignGUI extends JPanel {
 
     private void miExportOptionsActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_miExportPersonActionPerformed
         try {
-            saveOptionsFile("xml", resourceMap.getString("dlgSaveCampaignXML.text"), getCampaign().getName() + getCampaign().getShortDateAsString() + "_ExportedCampaignSettings");
+            saveOptionsFile(FileType.XML, resourceMap.getString("dlgSaveCampaignXML.text"), getCampaign().getName() + getCampaign().getShortDateAsString() + "_ExportedCampaignSettings");
         } catch (IOException ex) {
             MekHQ.getLogger().error(getClass(), "miExportOptionsActionPerformed(ActionEvent)", ex);
         }
@@ -1813,7 +1785,7 @@ public class CampaignGUI extends JPanel {
 
     private void miExportPlanetsXMLActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_miExportPersonActionPerformed
         try {
-            exportPlanets("xml", resourceMap.getString("dlgSavePlanetsXML.text"), getCampaign().getName() + getCampaign().getShortDateAsString() + "_ExportedPlanets");
+            exportPlanets(FileType.XML, resourceMap.getString("dlgSavePlanetsXML.text"), getCampaign().getName() + getCampaign().getShortDateAsString() + "_ExportedPlanets");
         } catch (Exception ex) {
             MekHQ.getLogger().error(getClass(), "miExportOptionsActionPerformed(ActionEvent)", ex);
         }
@@ -1821,7 +1793,7 @@ public class CampaignGUI extends JPanel {
     
     private void miExportFinancesCSVActionPerformed(java.awt.event.ActionEvent evt) {
         try {
-            exportFinances("csv", resourceMap.getString("dlgSaveFinancesCSV.text"), getCampaign().getName() + getCampaign().getShortDateAsString() + "_ExportedFinances");
+            exportFinances(FileType.CSV, resourceMap.getString("dlgSaveFinancesCSV.text"), getCampaign().getName() + getCampaign().getShortDateAsString() + "_ExportedFinances");
         } catch (Exception ex) {
             MekHQ.getLogger().error(getClass(), "miExportOptionsActionPerformed(ActionEvent)", ex);
         }
@@ -1829,7 +1801,7 @@ public class CampaignGUI extends JPanel {
     
     private void miExportPersonnelCSVActionPerformed(java.awt.event.ActionEvent evt) {
         try {
-            exportPersonnel("csv", resourceMap.getString("dlgSavePersonnelCSV.text"), getCampaign().getName() + getCampaign().getShortDateAsString() + "_ExportedPersonnel");
+            exportPersonnel(FileType.CSV, resourceMap.getString("dlgSavePersonnelCSV.text"), getCampaign().getName() + getCampaign().getShortDateAsString() + "_ExportedPersonnel");
         } catch (Exception ex) {
             MekHQ.getLogger().error(getClass(), "miExportOptionsActionPerformed(ActionEvent)", ex);
         }
@@ -1837,7 +1809,7 @@ public class CampaignGUI extends JPanel {
     
     private void miExportUnitCSVActionPerformed(java.awt.event.ActionEvent evt) {
         try {
-            exportUnits("csv", resourceMap.getString("dlgSaveUnitsCSV.text"), getCampaign().getName() + getCampaign().getShortDateAsString() + "_ExportedUnits");
+            exportUnits(FileType.CSV, resourceMap.getString("dlgSaveUnitsCSV.text"), getCampaign().getName() + getCampaign().getShortDateAsString() + "_ExportedUnits");
         } catch (Exception ex) {
             MekHQ.getLogger().error(getClass(), "miExportOptionsActionPerformed(ActionEvent)", ex);
         }
@@ -2085,36 +2057,10 @@ public class CampaignGUI extends JPanel {
     }
 
     protected void loadPlanetTSVFile() {
-        JFileChooser loadList = new JFileChooser(".");
-        loadList.setDialogTitle("Load Planets from SUCS format TSV file");
-        
-        loadList.setFileFilter(new FileFilter() {
-            @Override
-            public boolean accept(File dir) {
-                if (dir.isDirectory()) {
-                    return true;
-                }
-                return dir.getName().endsWith(".tsv");
-            }
-
-            @Override
-            public String getDescription() {
-                return "TSV file";
-            }
+        FileDialogs.openPlanetsTsv(frame).ifPresent(tsvFile -> {
+            String report = Planets.getInstance().importPlanetsFromTSV(tsvFile.getAbsolutePath());
+            JOptionPane.showMessageDialog(mainPanel, report);
         });
-        
-        int returnVal = loadList.showOpenDialog(mainPanel);
-
-        if ((returnVal != JFileChooser.APPROVE_OPTION)
-                || (loadList.getSelectedFile() == null)) {
-            // I want a file, y'know!
-            return;
-        }
-
-        File tsvFile = loadList.getSelectedFile();
-        String report = Planets.getInstance().importPlanetsFromTSV(tsvFile.getAbsolutePath());
-        
-        JOptionPane.showMessageDialog(mainPanel, report);
     }
     
 	/**
@@ -2123,19 +2069,13 @@ public class CampaignGUI extends JPanel {
 	 * @param dialogTitle
 	 * @param filename
 	 */
-    protected void exportPlanets(String format, String dialogTitle, String filename) {
-        JFileChooser fc = getExportFile(format, dialogTitle, filename);
-
-        File file = fc.getSelectedFile();
-        if (file == null) {
-            return; // something went wrong
-        }
-
-        file = checkFileEnding(file, format);
-        checkToBackupFile(file, file.getPath());
-        
-        String report = Planets.getInstance().exportPlanets(file.getPath(), format);
-        JOptionPane.showMessageDialog(mainPanel, report);
+    protected void exportPlanets(FileType format, String dialogTitle, String filename) {
+        GUI.fileDialogOpen(frame, dialogTitle, new File("."), format).ifPresent(f -> {
+            File file = checkFileEnding(f, format.getRecommendedExtension());
+            checkToBackupFile(file, file.getPath());
+            String report = Planets.getInstance().exportPlanets(file.getPath(), format.getRecommendedExtension());
+            JOptionPane.showMessageDialog(mainPanel, report);
+        });
     }
     
 	/**
@@ -2144,7 +2084,7 @@ public class CampaignGUI extends JPanel {
 	 * @param dialogTitle
 	 * @param filename
 	 */
-    protected void exportPersonnel(String format, String dialogTitle, String filename) {
+    protected void exportPersonnel(FileType format, String dialogTitle, String filename) {
     	if (((PersonnelTab)getTab(GuiTabType.PERSONNEL)).getPersonnelTable().getRowCount() != 0) {
     		exportTable(((PersonnelTab)getTab(GuiTabType.PERSONNEL)).getPersonnelTable(), filename, format, dialogTitle);
     	} else {
@@ -2158,84 +2098,31 @@ public class CampaignGUI extends JPanel {
 	 * @param dialogTitle
 	 * @param filename
 	 */
-    protected void exportUnits(String format, String dialogTitle, String filename) {
+    protected void exportUnits(FileType format, String dialogTitle, String filename) {
     	if (((HangarTab)getTab(GuiTabType.HANGAR)).getUnitTable().getRowCount() != 0) {
     		exportTable(((HangarTab)getTab(GuiTabType.HANGAR)).getUnitTable(), filename, format, dialogTitle);
     	} else {
     		JOptionPane.showMessageDialog(mainPanel, resourceMap.getString("dlgNoUnits"));
     	} 
     }
-    
-	/**
-	 * Exports Finances to a file (CSV, XML, etc.)
-	 * @param format
-	 * @param dialogTitle
-	 * @param filename
-	 */
-    protected void exportFinances(String format, String dialogTitle, String filename) {
-    	if (getCampaign().getFinances().getAllTransactions().size() != 0) {
-	        JFileChooser fc = getExportFile(format, dialogTitle, filename);
-	
-	        File file = fc.getSelectedFile();
-	        if (file == null) {
-	            return; // something went wrong
-	        }
-	
-	        file = checkFileEnding(file, format);
-	        checkToBackupFile(file, file.getPath());
-	
-	        String report = getCampaign().getFinances().exportFinances(file.getPath(), format);
-	        JOptionPane.showMessageDialog(mainPanel, report);
-    	} else {
-    		JOptionPane.showMessageDialog(mainPanel, resourceMap.getString("dlgNoFinances.text"));
-    		return;
-    	}
-    }
-    
-	/**
-	 * Gets a filename from the user using the JFileChooser
-	 * @param format
-	 * @param dialogTitle
-	 * @param filename
-	 * @return JFileChooser
-	 */
-    private JFileChooser getExportFile(String format, String dialogTitle, String filename) {
-    	JFileChooser filePicker = new JFileChooser(".");
-    	filePicker.setDialogTitle(dialogTitle);
-    	filePicker.setFileFilter(new FileFilter() {
-            @Override
-            public boolean accept(File dir) {
-                if (dir.isDirectory()) {
-                    return true;
-                }
-                return dir.getName().endsWith(format);
-            }
 
-            @Override
-            public String getDescription() {
-            	// TODO: future support TD or other formats?
-                if(format.equals("csv")) {
-                    return "CSV File";
-                } else if (format.equals("xml")) {
-                	return "XML File";
-                } else if (format.equals("json")) {
-                	return "JSON File";
-                } else {
-                    return "File";
-                }
-            }
-        });
-    	filePicker.setSelectedFile(new File(filename + "." + format));
-        int returnVal = filePicker.showSaveDialog(mainPanel);
-
-        if ((returnVal != JFileChooser.APPROVE_OPTION)
-                || (filePicker.getSelectedFile() == null)) {
-            // I want a file, y'know!
-            return null;
+    /**
+     * Exports Finances to a file (CSV, XML, etc.)
+     */
+    protected void exportFinances(FileType format, String dialogTitle, String filename) {
+        if (!getCampaign().getFinances().getAllTransactions().isEmpty()) {
+            GUI.fileDialogSave(frame, dialogTitle, new File(".", filename), format).ifPresent(f -> {
+                File file = checkFileEnding(f, format.getRecommendedExtension());
+                checkToBackupFile(file, file.getPath());
+                String report = getCampaign().getFinances().exportFinances(file.getPath(), format.getRecommendedExtension());
+                JOptionPane.showMessageDialog(mainPanel, report);
+            });
+        } else {
+            JOptionPane.showMessageDialog(mainPanel, resourceMap.getString("dlgNoFinances.text"));
+            return;
         }
-        return filePicker;
     }
-    
+
 	/**
 	 * Checks if a file already exists, if so it makes a backup copy.
 	 * @param file
@@ -2268,33 +2155,7 @@ public class CampaignGUI extends JPanel {
     protected void loadListFile(boolean allowNewPilots) throws IOException {
         final String METHOD_NAME = "loadListFile(boolean)";
         
-        JFileChooser loadList = new JFileChooser(".");
-        loadList.setDialogTitle("Load Units");
-
-        loadList.setFileFilter(new FileFilter() {
-            @Override
-            public boolean accept(File dir) {
-                if (dir.isDirectory()) {
-                    return true;
-                }
-                return dir.getName().endsWith(".mul");
-            }
-
-            @Override
-            public String getDescription() {
-                return "MUL file";
-            }
-        });
-
-        int returnVal = loadList.showOpenDialog(mainPanel);
-
-        if ((returnVal != JFileChooser.APPROVE_OPTION)
-                || (loadList.getSelectedFile() == null)) {
-            // I want a file, y'know!
-            return;
-        }
-
-        File unitFile = loadList.getSelectedFile();
+        File unitFile = FileDialogs.openUnits(frame).orElse(null);
 
         if (unitFile != null) {
             // I need to get the parser myself, because I want to pull both
@@ -2338,34 +2199,8 @@ public class CampaignGUI extends JPanel {
 
     protected void loadPersonFile() throws IOException {
         final String METHOD_NAME = "loadPersonFile()";
-        
-        JFileChooser loadList = new JFileChooser(".");
-        loadList.setDialogTitle("Load Personnel");
 
-        loadList.setFileFilter(new FileFilter() {
-            @Override
-            public boolean accept(File dir) {
-                if (dir.isDirectory()) {
-                    return true;
-                }
-                return dir.getName().endsWith(".prsx");
-            }
-
-            @Override
-            public String getDescription() {
-                return "Personnel file";
-            }
-        });
-
-        int returnVal = loadList.showOpenDialog(mainPanel);
-
-        if ((returnVal != JFileChooser.APPROVE_OPTION)
-                || (loadList.getSelectedFile() == null)) {
-            // I want a file, y'know!
-            return;
-        }
-
-        File personnelFile = loadList.getSelectedFile();
+        File personnelFile = FileDialogs.openPersonnel(frame).orElse(null);
 
         if (personnelFile != null) {
             // Open up the file.
@@ -2443,35 +2278,8 @@ public class CampaignGUI extends JPanel {
     //TODO: disable if not using personnel tab
     private void savePersonFile() throws IOException {
         final String METHOD_NAME = "savePersonFile()";
-        
-        JFileChooser savePersonnel = new JFileChooser(".");
-        savePersonnel.setDialogTitle("Save Personnel");
-        savePersonnel.setFileFilter(new FileFilter() {
-            @Override
-            public boolean accept(File dir) {
-                if (dir.isDirectory()) {
-                    return true;
-                }
-                return dir.getName().endsWith(".prsx");
-            }
 
-            @Override
-            public String getDescription() {
-                return "Personnel file";
-            }
-        });
-        savePersonnel.setSelectedFile(new File(getCampaign().getName()
-                + getCampaign().getShortDateAsString()
-                + "_ExportedPersonnel" + ".prsx")); //$NON-NLS-1$
-        int returnVal = savePersonnel.showSaveDialog(mainPanel);
-
-        if ((returnVal != JFileChooser.APPROVE_OPTION)
-                || (savePersonnel.getSelectedFile() == null)) {
-            // I want a file, y'know!
-            return;
-        }
-
-        File file = savePersonnel.getSelectedFile();
+        File file = FileDialogs.savePersonnel(frame, getCampaign()).orElse(null);
         if (file == null) {
             // I want a file, y'know!
             return;
@@ -2560,17 +2368,16 @@ public class CampaignGUI extends JPanel {
         }
     }
 
-    private void saveOptionsFile(String format, String dialogTitle, String filename) throws IOException {
+    private void saveOptionsFile(FileType format, String dialogTitle, String filename) throws IOException {
         final String METHOD_NAME = "saveOptionsFile()";
         
-        JFileChooser fc = getExportFile(format, dialogTitle, filename);
+        Optional<File> maybeFile = GUI.fileDialogSave(frame, dialogTitle, new File("."), format);
 
-        File file = fc.getSelectedFile();
-        if (file == null) {
-            return; // something went wrong
+        if (!maybeFile.isPresent()) {
+            return;
         }
 
-        file = checkFileEnding(file, format);
+        File file = checkFileEnding(maybeFile.get(), format.getRecommendedExtension());
         checkToBackupFile(file, file.getPath());
 
         // Then save it out to that file.
@@ -2630,33 +2437,14 @@ public class CampaignGUI extends JPanel {
 
     protected void loadPartsFile() throws IOException {
         final String METHOD_NAME = "loadPartsFile()";
-        JFileChooser loadList = new JFileChooser(".");
-        loadList.setDialogTitle("Load Parts");
 
-        loadList.setFileFilter(new FileFilter() {
-            @Override
-            public boolean accept(File dir) {
-                if (dir.isDirectory()) {
-                    return true;
-                }
-                return dir.getName().endsWith(".parts");
-            }
+        Optional<File> maybeFile = FileDialogs.openParts(frame);
 
-            @Override
-            public String getDescription() {
-                return "Parts file";
-            }
-        });
-
-        int returnVal = loadList.showOpenDialog(mainPanel);
-
-        if ((returnVal != JFileChooser.APPROVE_OPTION)
-                || (loadList.getSelectedFile() == null)) {
-            // I want a file, y'know!
+        if (!maybeFile.isPresent()) {
             return;
         }
 
-        File partsFile = loadList.getSelectedFile();
+        File partsFile = maybeFile.get();
 
         if (partsFile != null) {
             // Open up the file.
@@ -2719,34 +2507,14 @@ public class CampaignGUI extends JPanel {
 
     protected void loadOptionsFile() throws IOException {
         final String METHOD_NAME = "loadOptionsFile()";
-        
-        JFileChooser loadList = new JFileChooser(".");
-        loadList.setDialogTitle("Load Campaign Options");
 
-        loadList.setFileFilter(new FileFilter() {
-            @Override
-            public boolean accept(File dir) {
-                if (dir.isDirectory()) {
-                    return true;
-                }
-                return dir.getName().endsWith(".xml");
-            }
+        Optional<File> maybeFile = FileDialogs.openCampaignOptions(frame);
 
-            @Override
-            public String getDescription() {
-                return "Campaign options file";
-            }
-        });
-
-        int returnVal = loadList.showOpenDialog(mainPanel);
-
-        if ((returnVal != JFileChooser.APPROVE_OPTION)
-                || (loadList.getSelectedFile() == null)) {
-            // I want a file, y'know!
+        if (!maybeFile.isPresent()) {
             return;
         }
 
-        File optionsFile = loadList.getSelectedFile();
+        File optionsFile = maybeFile.get();
 
         if (optionsFile != null) {
             // Open up the file.
@@ -2873,47 +2641,21 @@ public class CampaignGUI extends JPanel {
 
     private void savePartsFile() throws IOException {
         String METHOD_NAME = "savePartsFile()";
-        
-        JFileChooser saveParts = new JFileChooser(".");
-        saveParts.setDialogTitle("Save Parts");
-        saveParts.setFileFilter(new FileFilter() {
-            @Override
-            public boolean accept(File dir) {
-                if (dir.isDirectory()) {
-                    return true;
-                }
-                return dir.getName().endsWith(".parts");
-            }
 
-            @Override
-            public String getDescription() {
-                return "Parts file";
-            }
-        });
-        saveParts.setSelectedFile(new File(getCampaign().getName()
-                + getCampaign().getShortDateAsString()
-                + "_ExportedParts" + ".parts")); //$NON-NLS-1$
-        int returnVal = saveParts.showSaveDialog(mainPanel);
+        Optional<File> maybeFile = FileDialogs.saveParts(frame, getCampaign());
 
-        if ((returnVal != JFileChooser.APPROVE_OPTION)
-                || (saveParts.getSelectedFile() == null)) {
-            // I want a file, y'know!
+        if (!maybeFile.isPresent()) {
             return;
         }
 
-        File file = saveParts.getSelectedFile();
-        if (file == null) {
-            // I want a file, y'know!
-            return;
-        }
-        String path = file.getPath();
-        if (!path.endsWith(".parts")) {
-            path += ".parts";
-            file = new File(path);
+        File file = maybeFile.get();
+
+        if (!file.getName().endsWith(".parts")) {
+            file = new File(file.getAbsolutePath() + ".parts");
         }
 
         // check for existing file and make a back-up if found
-        String path2 = path + "_backup";
+        String path2 = file.getAbsolutePath() + "_backup";
         File backupFile = new File(path2);
         if (file.exists()) {
             Utilities.copyfile(file, backupFile);
@@ -2992,28 +2734,18 @@ public class CampaignGUI extends JPanel {
         }
     }
 
-    private void exportTable(JTable table, String filename, String format, String dialogTitle) {
-        JFileChooser fc = getExportFile(format, dialogTitle, filename);
-        String report = "";
-
-        File file = fc.getSelectedFile();
-        if (file == null) {
-            return; // something went wrong
-        }
-
-        file = checkFileEnding(file, format);
-        checkToBackupFile(file, file.getPath());
-
-        if (format.equals("csv")) {
-        	report = Utilities.exportTabletoCSV(table, file);
-        } else if (format.equals("xml")) {
-        	// TODO
-        } else if (format.equals("json")) {
-        	// TODO
-        }
-        JOptionPane.showMessageDialog(mainPanel, report);
+    private void exportTable(JTable table, String filename, FileType format, String dialogTitle) {
+        GUI.fileDialogSave(frame, dialogTitle, new File("."), format).ifPresent(f -> {
+            File file = checkFileEnding(f, format.getRecommendedExtension());
+            checkToBackupFile(file, file.getPath());
+            String report = "";
+            // TODO add support for xml and json export
+            if (format.equals(FileType.CSV)) {
+                JOptionPane.showMessageDialog(mainPanel, report);
+            }
+        });
     }
-    
+
     public void refreshAllTabs() {
         for (int i = 0; i < tabMain.getTabCount(); i++) {
             ((CampaignGuiTab)tabMain.getComponentAt(i)).refreshAll();

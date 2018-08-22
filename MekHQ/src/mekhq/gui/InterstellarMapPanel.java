@@ -45,12 +45,14 @@ import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.imageio.ImageIO;
@@ -60,7 +62,6 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JFileChooser;
 import javax.swing.JLayeredPane;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -68,7 +69,6 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JViewport;
 import javax.swing.Timer;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.vecmath.Vector2d;
 
 import org.joda.time.DateTime;
@@ -296,16 +296,13 @@ public class InterstellarMapPanel extends JPanel {
                             double originalX = conf.centerX;
                             double originalY = conf.centerY;
                             try {
-                                JFileChooser openFile = new JFileChooser();
-                                openFile.setFileSelectionMode(JFileChooser.FILES_ONLY);
-                                openFile.removeChoosableFileFilter(openFile.getAcceptAllFileFilter());
-                                openFile.addChoosableFileFilter(new FileNameExtensionFilter("PNG file", "png"));
-                                if(openFile.showSaveDialog(hqview) == JFileChooser.APPROVE_OPTION) {
+                                Optional<File> file = FileDialogs.saveStarMap(hqview.getFrame());
+                                if (file.isPresent()) {
                                     mapPanel.setSize(imgSize, imgSize);
                                     conf.centerX += (imgSize - originalWidth) / conf.scale / 2.0;
                                     conf.centerY += (imgSize - originalHeight) / conf.scale / 2.0;
                                     mapPanel.print(g);
-                                    ImageIO.write(img, "png", openFile.getSelectedFile());
+                                    ImageIO.write(img, "png", file.get());
                                 }
                             } catch (IOException e) {
                                 e.printStackTrace();
