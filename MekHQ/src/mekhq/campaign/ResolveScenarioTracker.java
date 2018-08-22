@@ -148,7 +148,7 @@ public class ResolveScenarioTracker {
     }
 
     public void findUnitFile() {
-        unitList = FileDialogs.fileDialogOpenUnits(null);
+        unitList = FileDialogs.openUnits(null);
     }
 
     public String getUnitFilePath() {

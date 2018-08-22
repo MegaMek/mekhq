@@ -786,7 +786,7 @@ public final class BriefingTab extends CampaignGuiTab {
             }
         }
 
-        Optional<File> maybeUnitFile = FileDialogs.fileDialogSaveDeployUnits(getFrame(), scenario);
+        Optional<File> maybeUnitFile = FileDialogs.saveDeployUnits(getFrame(), scenario);
 
         if (!maybeUnitFile.isPresent()) {
             return;

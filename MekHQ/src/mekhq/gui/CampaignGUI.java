@@ -1638,7 +1638,7 @@ public class CampaignGUI extends JPanel {
     }
 
     private File selectSaveCampaignFile() {
-        return FileDialogs.fileDialogSaveCampaign(frame, getCampaign()).orElse(null);
+        return FileDialogs.saveCampaign(frame, getCampaign()).orElse(null);
     }
 
     private void menuLoadXmlActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_menuLoadActionPerformed
@@ -1666,7 +1666,7 @@ public class CampaignGUI extends JPanel {
     }
 
     private File selectLoadCampaignFile() {
-        return FileDialogs.fileDialogOpenCampaign(frame).orElse(null);
+        return FileDialogs.openCampaign(frame).orElse(null);
     }
 
     private void btnOvertimeActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnOvertimeActionPerformed
@@ -2056,7 +2056,7 @@ public class CampaignGUI extends JPanel {
     }
 
     protected void loadPlanetTSVFile() {
-        FileDialogs.fileDialogOpenPlanetsTsv(frame).ifPresent(tsvFile -> {
+        FileDialogs.openPlanetsTsv(frame).ifPresent(tsvFile -> {
             String report = Planets.getInstance().importPlanetsFromTSV(tsvFile.getAbsolutePath());
             JOptionPane.showMessageDialog(mainPanel, report);
         });
@@ -2154,7 +2154,7 @@ public class CampaignGUI extends JPanel {
     protected void loadListFile(boolean allowNewPilots) throws IOException {
         final String METHOD_NAME = "loadListFile(boolean)";
         
-        File unitFile = FileDialogs.fileDialogOpenUnits(frame).orElse(null);
+        File unitFile = FileDialogs.openUnits(frame).orElse(null);
 
         if (unitFile != null) {
             // I need to get the parser myself, because I want to pull both
@@ -2278,7 +2278,7 @@ public class CampaignGUI extends JPanel {
     private void savePersonFile() throws IOException {
         final String METHOD_NAME = "savePersonFile()";
 
-        File file = FileDialogs.fileDialogSavePersonnel(frame, getCampaign()).orElse(null);
+        File file = FileDialogs.savePersonnel(frame, getCampaign()).orElse(null);
         if (file == null) {
             // I want a file, y'know!
             return;
@@ -2437,7 +2437,7 @@ public class CampaignGUI extends JPanel {
     protected void loadPartsFile() throws IOException {
         final String METHOD_NAME = "loadPartsFile()";
 
-        Optional<File> maybeFile = FileDialogs.fileDialogOpenParts(frame);
+        Optional<File> maybeFile = FileDialogs.openParts(frame);
 
         if (!maybeFile.isPresent()) {
             return;
@@ -2507,7 +2507,7 @@ public class CampaignGUI extends JPanel {
     protected void loadOptionsFile() throws IOException {
         final String METHOD_NAME = "loadOptionsFile()";
 
-        Optional<File> maybeFile = FileDialogs.fileDialogOpenCampaignOptions(frame);
+        Optional<File> maybeFile = FileDialogs.openCampaignOptions(frame);
 
         if (!maybeFile.isPresent()) {
             return;
@@ -2641,7 +2641,7 @@ public class CampaignGUI extends JPanel {
     private void savePartsFile() throws IOException {
         String METHOD_NAME = "savePartsFile()";
 
-        Optional<File> maybeFile = FileDialogs.fileDialogSaveParts(frame, getCampaign());
+        Optional<File> maybeFile = FileDialogs.saveParts(frame, getCampaign());
 
         if (!maybeFile.isPresent()) {
             return;

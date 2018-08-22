@@ -4349,7 +4349,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO,
                 "Saving campaign options..."); //$NON-NLS-1$
         // Choose a file...
-        Optional<File> maybeFile = FileDialogs.fileDialogSaveCampaignOptions(null);
+        Optional<File> maybeFile = FileDialogs.saveCampaignOptions(null);
 
         if (!maybeFile.isPresent()) {
             return;

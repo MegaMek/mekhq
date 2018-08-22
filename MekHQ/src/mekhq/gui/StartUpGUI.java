@@ -169,7 +169,7 @@ public class StartUpGUI extends javax.swing.JPanel {
     }
     
     private File selectLoadCampaignFile() {
-        return FileDialogs.fileDialogOpenCampaign(frame).orElse(null);
+        return FileDialogs.openCampaign(frame).orElse(null);
 	}
     
     private javax.swing.JButton btnNewGame;

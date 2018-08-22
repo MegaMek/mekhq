@@ -42,7 +42,7 @@ public class FileDialogs {
      *
      * @return the file selected, if any
      */
-    public static Optional<File> fileDialogOpenPersonnel(JFrame frame) {
+    public static Optional<File> openPersonnel(JFrame frame) {
         return GUI.fileDialogOpen( frame,
                                    "Load Personnel",
                                    new File("."), //$NON-NLS-1$
@@ -54,7 +54,7 @@ public class FileDialogs {
      *
      * @return the file selected, if any
      */
-    public static Optional<File> fileDialogSavePersonnel(JFrame frame, Campaign campaign) {
+    public static Optional<File> savePersonnel(JFrame frame, Campaign campaign) {
 
         String fileName = String.format( "%s%_ExportedPersonnel.prsx", //$NON-NLS-1$
                                          campaign.getName(),
@@ -71,7 +71,7 @@ public class FileDialogs {
      *
      * @return the file selected, if any
      */
-    public static Optional<File> fileDialogOpenCampaignOptions(JFrame frame) {
+    public static Optional<File> openCampaignOptions(JFrame frame) {
         return GUI.fileDialogOpen( frame,
                                    "Load Campaign Options",
                                    new File("."), //$NON-NLS-1$
@@ -83,7 +83,7 @@ public class FileDialogs {
      *
      * @return the file selected, if any
      */
-    public static Optional<File> fileDialogOpenParts(JFrame frame) {
+    public static Optional<File> openParts(JFrame frame) {
         return GUI.fileDialogOpen( frame,
                                    "Load Pards",
                                    new File("."), //$NON-NLS-1$
@@ -95,7 +95,7 @@ public class FileDialogs {
      *
      * @return the file selected, if any
      */
-    public static Optional<File> fileDialogSaveParts(JFrame frame, Campaign campaign) {
+    public static Optional<File> saveParts(JFrame frame, Campaign campaign) {
 
         String fileName = String.format( "%s%s_ExportedParts.parts", //$NON-NLS-1$
                                          campaign.getName(),
@@ -112,7 +112,7 @@ public class FileDialogs {
      *
      * @return the file selected, if any
      */
-    public static Optional<File> fileDialogOpenPlanetsTsv(JFrame frame) {
+    public static Optional<File> openPlanetsTsv(JFrame frame) {
         return GUI.fileDialogOpen( frame,
                                    "Load Planets from SUCS format TSV file",
                                    new File("."), //$NON-NLS-1$
@@ -124,7 +124,7 @@ public class FileDialogs {
      *
      * @return the file selected, if any
      */
-    public static Optional<File> fileDialogSaveCampaignOptions(JFrame frame) {
+    public static Optional<File> saveCampaignOptions(JFrame frame) {
         return GUI.fileDialogSave( frame,
                                    "Save Campaign Options as Presets",
                                    new File(MekHQ.PRESET_DIR, "myoptions.mul"), //$NON-NLS-1$
@@ -136,7 +136,7 @@ public class FileDialogs {
      *
      * @return the file selected, if any
      */
-    public static Optional<File> fileDialogSaveStarMap(JFrame frame) {
+    public static Optional<File> saveStarMap(JFrame frame) {
         return GUI.fileDialogSave( frame,
                                    "",
                                    new File(".", "starmap.png"), //$NON-NLS-1$ //$NON-NLS-2$
@@ -148,7 +148,7 @@ public class FileDialogs {
      *
      * @return the file selected, if any
      */
-    public static Optional<File> fileDialogOpenUnits(JFrame frame) {
+    public static Optional<File> openUnits(JFrame frame) {
         return GUI.fileDialogOpen( frame,
                                    "Load Units",
                                    new File("."), //$NON-NLS-1$
@@ -160,7 +160,7 @@ public class FileDialogs {
      *
      * @return the file selected, if any
      */
-    public static Optional<File> fileDialogSaveDeployUnits(JFrame frame, Scenario scenario) {
+    public static Optional<File> saveDeployUnits(JFrame frame, Scenario scenario) {
         return GUI.fileDialogSave( frame,
                                    "Deploy Units",
                                    new File(".", scenario.getName() + ".mul"), //$NON-NLS-1$ //$NON-NLS-2$
@@ -172,7 +172,7 @@ public class FileDialogs {
      *
      * @return the file selected, if any
      */
-    public static Optional<File> fileDialogOpenCampaign(JFrame frame) {
+    public static Optional<File> openCampaign(JFrame frame) {
         return GUI.fileDialogOpen( frame,
                                    "Load Campaign",
                                    new File(MekHQ.CAMPAIGN_DIRECTORY),
@@ -184,13 +184,13 @@ public class FileDialogs {
      *
      * @return the file selected, if any
      */
-    public static Optional<File> fileDialogSaveCampaign(JFrame frame, Campaign campaign) {
+    public static Optional<File> saveCampaign(JFrame frame, Campaign campaign) {
 
         String fileName = String.format( "%s%s.cpnx", //$NON-NLS-1$
                                          campaign.getName(),
                                          campaign.getShortDateAsString() );
 
-        return GUI.fileDialogOpen( frame,
+        return GUI.fileDialogSave( frame,
                                    "Save Campaign",
                                    new File(MekHQ.CAMPAIGN_DIRECTORY, fileName),
                                    FileType.CPNX );

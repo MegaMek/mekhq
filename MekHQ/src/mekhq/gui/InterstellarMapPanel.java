@@ -296,7 +296,7 @@ public class InterstellarMapPanel extends JPanel {
                             double originalX = conf.centerX;
                             double originalY = conf.centerY;
                             try {
-                                Optional<File> file = FileDialogs.fileDialogSaveStarMap(hqview.getFrame());
+                                Optional<File> file = FileDialogs.saveStarMap(hqview.getFrame());
                                 if (file.isPresent()) {
                                     mapPanel.setSize(imgSize, imgSize);
                                     conf.centerX += (imgSize - originalWidth) / conf.scale / 2.0;
