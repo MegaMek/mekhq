@@ -68,6 +68,8 @@ public class Award implements MekHqXmlSerializable, Comparable<Award>, Serializa
     @XmlElement(name = "stackable")
     private boolean stackable = false;
 
+    private int id;
+
     private String set;
 
     private List<Date> dates;
@@ -76,7 +78,7 @@ public class Award implements MekHqXmlSerializable, Comparable<Award>, Serializa
 
     public Award(){}
 
-    public Award(String name, String set,  String description, ArrayList<String> medals, ArrayList<String> ribbons, ArrayList<String> miscs, int xp, int edge, boolean stackable) {
+    public Award(String name, String set,  String description, ArrayList<String> medals, ArrayList<String> ribbons, ArrayList<String> miscs, int xp, int edge, boolean stackable, int id) {
         this.name = name;
         this.set = set;
         this.description = description;
@@ -87,6 +89,7 @@ public class Award implements MekHqXmlSerializable, Comparable<Award>, Serializa
         this.edge = edge;
         this.stackable = stackable;
         dates = new ArrayList<>();
+        this.id = id;
     }
 
     /**
@@ -122,6 +125,8 @@ public class Award implements MekHqXmlSerializable, Comparable<Award>, Serializa
     public void setSet(String set){
         this.set = set;
     }
+
+    public void setId(int id) { this.id = id; }
 
     public String getDescription() {
         return description;
@@ -185,7 +190,7 @@ public class Award implements MekHqXmlSerializable, Comparable<Award>, Serializa
      * @return award with new date
      */
     public Award createCopy(){
-        Award awardCopy = new Award(this.name, this.set, this.description, this.medals, this.ribbons, this.miscs, this.xp, this.edge, this.stackable);
+        Award awardCopy = new Award(this.name, this.set, this.description, this.medals, this.ribbons, this.miscs, this.xp, this.edge, this.stackable, this.id);
         return awardCopy;
     }
 
@@ -218,17 +223,7 @@ public class Award implements MekHqXmlSerializable, Comparable<Award>, Serializa
      */
     @Override
     public int compareTo(Award other) {
-        int result = Integer.compare(this.xp, other.xp);
-
-        if(result == 0) {
-            result = Integer.compare(this.edge, other.edge);
-        }
-
-        if(result == 0) {
-            result = this.getName().compareTo(other.getName());
-        }
-
-        return result;
+        return Integer.compare(this.id, other.id);
     }
 
     /**

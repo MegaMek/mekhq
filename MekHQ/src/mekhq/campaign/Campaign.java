@@ -2476,12 +2476,9 @@ public class Campaign implements Serializable, ITechManager {
 
         if (calendar.get(Calendar.DAY_OF_MONTH) == 1) {
             /*
-             * First of the month; update employer/enemy tables, roll morale, track unit
-             * fatigue.
+             * First of the month; roll morale, track unit fatigue.
              */
 
-            RandomFactionGenerator.getInstance().updateTables(calendar.getTime(), location.getCurrentPlanet(),
-                    campaignOptions);
             IUnitRating rating = getUnitRating();
             rating.reInitialize();
 
@@ -3082,14 +3079,7 @@ public class Campaign implements Serializable, ITechManager {
         shoppingList.restore();
 
         if (getCampaignOptions().getUseAtB()) {
-            while (!RandomFactionGenerator.getInstance().isInitialized()) {
-                //Sleep for up to one second.
-                try {
-                    Thread.sleep(50);
-                } catch (InterruptedException ignore) {
-
-                }
-            }
+            RandomFactionGenerator.getInstance().startup(this);
             while (!RandomUnitGenerator.getInstance().isInitialized()) {
                 //Sleep for up to one second.
                 try {
@@ -3099,8 +3089,7 @@ public class Campaign implements Serializable, ITechManager {
                 }
             }
             RandomNameGenerator.getInstance();
-            RandomFactionGenerator.getInstance().updateTables(getDate(), location.getCurrentPlanet(),
-                    getCampaignOptions());
+            RandomFactionGenerator.getInstance().startup(this);
         }
     }
 
@@ -3178,9 +3167,7 @@ public class Campaign implements Serializable, ITechManager {
      */
     public void addReport(String r) {
         if (this.getCampaignOptions().historicalDailyLog()) {
-            String htmlStripped = r.replaceAll("\\<[^>]*>",""); //remote HTML tags
-            //add the new items to our in-memory cache
-            addInMemoryLogHistory(new LogEntry(getDate(), htmlStripped));
+            addInMemoryLogHistory(new LogEntry(getDate(), r));
         }
         addReportInternal(r);
     }
@@ -4186,9 +4173,12 @@ public class Campaign implements Serializable, ITechManager {
                 unit.getRefit().reCalc();
                 if (null == unit.getRefit().getNewArmorSupplies()
                         && unit.getRefit().getNewArmorSuppliesId() > 0) {
-                    unit.getRefit().setNewArmorSupplies(
-                            (Armor) retVal.getPart(unit.getRefit()
-                                    .getNewArmorSuppliesId()));
+                    Armor armorSupplies = (Armor) retVal.getPart(
+                            unit.getRefit().getNewArmorSuppliesId());
+                    unit.getRefit().setNewArmorSupplies(armorSupplies);
+                    if (null == armorSupplies.getUnit()) {
+                        armorSupplies.setUnit(unit);
+                    }
                 }
                 if (!unit.getRefit().isCustomJob()
                         && !unit.getRefit().kitFound()) {
@@ -9146,8 +9136,7 @@ public class Campaign implements Serializable, ITechManager {
         }
         addAllLances(this.forces);
         atbConfig = AtBConfiguration.loadFromXml();
-        RandomFactionGenerator.getInstance().updateTables(calendar.getTime(), location.getCurrentPlanet(),
-                campaignOptions);
+        RandomFactionGenerator.getInstance().startup(this);
         atbEventProcessor = new AtBEventProcessor(this);
     }
     

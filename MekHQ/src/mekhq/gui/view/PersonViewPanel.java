@@ -312,6 +312,7 @@ public class PersonViewPanel extends JPanel {
     private void drawRibbons() {
         List<Award> awards = person.awardController.getAwards().stream().filter(a -> a.getNumberOfRibbonFiles() > 0).sorted()
                 .collect(Collectors.toList());
+        Collections.reverse(awards);
 
         int i = 0;
         Box rowRibbonsBox = null;

@@ -35,116 +35,120 @@ import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 
 /**
- *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class LogEntry implements MekHqXmlSerializable {
-    private String type;
-    private Date date;
-    private String desc;
-    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+public class LogEntry implements Cloneable, MekHqXmlSerializable {
 
-    public LogEntry() {
-        this(null, "", null);
+    private static final SimpleDateFormat dateFormat() {
+        // LATER centralise date formatting so that every class doesn't have its own format and - possibly - switch to java.time
+        return new SimpleDateFormat("yyyy-MM-dd hh:mm:ss"); //$NON-NLS-1$
     }
-    
+
     public LogEntry(Date date, String desc) {
         this(date, desc, null);
     }
     
     public LogEntry(Date date, String desc, String type) {
         this.date = date;
-        this.desc = Objects.requireNonNull(desc);
+        this.desc = desc != null ? desc : ""; //$NON-NLS-1$
         this.type = type;
     }
-    
-    public void setDate(Date d) {
-        this.date = d;
-    }
-    
+
+    private Date date;
+    private String desc; // non-null
+    private String type;
+
     public Date getDate() {
         return date;
     }
-
-    public String getDateString() {
-        return date.toString();
-    }
-
-    public void setDesc(String d) {
-        this.desc = Objects.requireNonNull(d);
+    
+    public void setDate(Date date) {
+        this.date = date;
     }
     
     public String getDesc() {
         return desc;
     }
     
-    public void setType(String type) {
-        this.type = type;
+    public void setDesc(String desc) {
+        this.desc = desc != null ? desc : ""; //$NON-NLS-1$
     }
     
     public String getType() {
         return type;
     }
     
-    public boolean isType(String type) {
-        return Objects.equals(this.type, type);
+    public void setType(String type) {
+        this.type = type;
     }
-    
+
     @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
+    public void writeToXml(PrintWriter pw, int indent) {
         StringBuilder sb = new StringBuilder();
-        sb.append(MekHqXmlUtil.indentStr(indent)).append("<logEntry>");
-        if(null != date) {
-            sb.append("<date>").append(DATE_FORMAT.format(date)).append("</date>");
-        }
-        sb.append("<desc>").append(MekHqXmlUtil.escape(desc)).append("</desc>");
-        if(null != type) {
-            sb.append("<type>").append(MekHqXmlUtil.escape(type)).append("</type>");
-        }
-        sb.append("</logEntry>");
-        pw1.println(sb.toString());
+        sb.append(MekHqXmlUtil.indentStr(indent)).append("<logEntry>"); //$NON-NLS-1$
+        if (date != null)    sb.append("<date>").append(dateFormat().format(date)).append("</date>"); //$NON-NLS-1$ //$NON-NLS-2$
+        assert desc != null; sb.append("<desc>").append(MekHqXmlUtil.escape(desc)).append("</desc>"); //$NON-NLS-1$ //$NON-NLS-2$
+        if (type != null)    sb.append("<type>").append(MekHqXmlUtil.escape(type)).append("</type>");  //$NON-NLS-1$//$NON-NLS-2$
+        sb.append("</logEntry>"); //$NON-NLS-1$
+        pw.println(sb.toString());
     }
-    
+
     public static LogEntry generateInstanceFromXML(Node wn) {
         final String METHOD_NAME = "generateInstanceFromXML(Node)"; //$NON-NLS-1$
 
-        LogEntry retVal = new LogEntry();
-        
-        try {    
-            // Okay, now load fields!
+        Date   date = null;
+        String desc = null;
+        String type = null;
+
+        try {
             NodeList nl = wn.getChildNodes();
-            
-            for (int x=0; x<nl.getLength(); x++) {
-                Node wn2 = nl.item(x);
-                
-                if (wn2.getNodeName().equalsIgnoreCase("desc")) {
-                    retVal.desc = wn2.getTextContent();
-                } else if (wn2.getNodeName().equalsIgnoreCase("type")) {
-                    retVal.type = wn2.getTextContent();
-                } else if (wn2.getNodeName().equalsIgnoreCase("date")) {
-                    retVal.date = DATE_FORMAT.parse(wn2.getTextContent().trim());
+            for (int x = 0; x < nl.getLength(); x++) {
+                Node   node = nl.item(x);
+                String nname = node.getNodeName();
+                if (nname.equals("desc")) { //$NON-NLS-1$
+                    desc = MekHqXmlUtil.unEscape(node.getTextContent());
+                } else if (nname.equals("type")) { //$NON-NLS-1$
+                    type = MekHqXmlUtil.unEscape(node.getTextContent());
+                } else if (nname.equals("date")) { //$NON-NLS-1$
+                    date = dateFormat().parse(node.getTextContent().trim());
                 }
             }
         } catch (Exception ex) {
-            // Doh!
-            MekHQ.getLogger().log(LogEntry.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(LogEntry.class, METHOD_NAME, ex);
+            return null;
         }
-        
-        return retVal;
+
+        return new LogEntry(date, desc, type);
     }
-    
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        if(null != date) {
-            sb.append("[").append(DATE_FORMAT.format(date)).append("] ");
-        }
+        if (null != date) sb.append("[").append(dateFormat().format(date)).append("] "); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append(desc);
+        if (null != type) sb.append(" (").append(type).append(")");  //$NON-NLS-1$//$NON-NLS-2$
         return sb.toString();
     }
-    
+
     @Override
     public LogEntry clone() {
-        return new LogEntry(getDate(), getDesc(), getType());
+        return new LogEntry(date, desc, type);
     }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(date, desc, type);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null) return false;
+        if (getClass() != obj.getClass()) return false;
+        LogEntry other = (LogEntry) obj;
+        return Objects.equals(date, other.date)
+            && desc.equals(other.desc)
+            && Objects.equals(type, other.type);
+    }
+
 }
