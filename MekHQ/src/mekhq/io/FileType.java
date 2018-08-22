@@ -83,7 +83,7 @@ import java.util.function.Predicate;
     private final String description;
     private final Predicate<String> nameFilter;
     private final String recommendedExtension;
-    
+
     /**
      * @return the description of this file type
      */

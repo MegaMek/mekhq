@@ -40,7 +40,7 @@ public class GUI {
 
     /**
      * Displays a dialog window from which the user can select a file to open.
-     * 
+     *
      * @return the file selected, if any
      */
     public static Optional<File> fileDialogOpen( JFrame parent,
@@ -54,7 +54,7 @@ public class GUI {
 
     /**
      * Displays a dialog window from which the user can select a file to save to.
-     * 
+     *
      * @return the file selected, if any
      */
     public static Optional<File> fileDialogSave( JFrame parent,

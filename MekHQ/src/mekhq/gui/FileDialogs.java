@@ -39,7 +39,7 @@ public class FileDialogs {
 
     /**
      * Displays a dialog window from which the user can select an <tt>.xml</tt> file to open.
-     * 
+     *
      * @return the file selected, if any
      */
     public static Optional<File> fileDialogOpenPersonnel(JFrame frame) {
@@ -51,7 +51,7 @@ public class FileDialogs {
 
     /**
      * Displays a dialog window from which the user can select an <tt>.xml</tt> file to open.
-     * 
+     *
      * @return the file selected, if any
      */
     public static Optional<File> fileDialogSavePersonnel(JFrame frame, Campaign campaign) {
@@ -68,7 +68,7 @@ public class FileDialogs {
 
     /**
      * Displays a dialog window from which the user can select an <tt>.xml</tt> file to open.
-     * 
+     *
      * @return the file selected, if any
      */
     public static Optional<File> fileDialogOpenCampaignOptions(JFrame frame) {
@@ -80,7 +80,7 @@ public class FileDialogs {
 
     /**
      * Displays a dialog window from which the user can select a <tt>.parts</tt> file to open.
-     * 
+     *
      * @return the file selected, if any
      */
     public static Optional<File> fileDialogOpenParts(JFrame frame) {
@@ -92,7 +92,7 @@ public class FileDialogs {
 
     /**
      * Displays a dialog window from which the user can select a <tt>.parts</tt> file to save to.
-     * 
+     *
      * @return the file selected, if any
      */
     public static Optional<File> fileDialogSaveParts(JFrame frame, Campaign campaign) {
@@ -109,7 +109,7 @@ public class FileDialogs {
 
     /**
      * Displays a dialog window from which the user can select a <tt>.tsv</tt> file to open.
-     * 
+     *
      * @return the file selected, if any
      */
     public static Optional<File> fileDialogOpenPlanetsTsv(JFrame frame) {
@@ -121,7 +121,7 @@ public class FileDialogs {
 
     /**
      * Displays a dialog window from which the user can select a <tt>.mul</tt> file to save to.
-     * 
+     *
      * @return the file selected, if any
      */
     public static Optional<File> fileDialogSaveCampaignOptions(JFrame frame) {
@@ -133,7 +133,7 @@ public class FileDialogs {
 
     /**
      * Displays a dialog window from which the user can select a <tt>.png</tt> file to save to.
-     * 
+     *
      * @return the file selected, if any
      */
     public static Optional<File> fileDialogSaveStarMap(JFrame frame) {
@@ -145,7 +145,7 @@ public class FileDialogs {
 
     /**
      * Displays a dialog window from which the user can select a <tt>.mul</tt> file to open.
-     * 
+     *
      * @return the file selected, if any
      */
     public static Optional<File> fileDialogOpenUnits(JFrame frame) {
@@ -157,7 +157,7 @@ public class FileDialogs {
 
     /**
      * Displays a dialog window from which the user can select a <tt>.mul</tt> file to save to.
-     * 
+     *
      * @return the file selected, if any
      */
     public static Optional<File> fileDialogSaveDeployUnits(JFrame frame, Scenario scenario) {
@@ -169,7 +169,7 @@ public class FileDialogs {
 
     /**
      * Displays a dialog window from which the user can select a campaign file to open.
-     * 
+     *
      * @return the file selected, if any
      */
     public static Optional<File> fileDialogOpenCampaign(JFrame frame) {
@@ -181,7 +181,7 @@ public class FileDialogs {
 
     /**
      * Displays a dialog window from which the user can select a campaign file to save to.
-     * 
+     *
      * @return the file selected, if any
      */
     public static Optional<File> fileDialogSaveCampaign(JFrame frame, Campaign campaign) {
