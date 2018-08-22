@@ -26,6 +26,7 @@ import java.io.PrintWriter;
 import java.util.Calendar;
 import java.util.UUID;
 
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -383,7 +384,7 @@ public class UnitOrder extends Unit implements IAcquisitionWork, MekHqXmlSeriali
                 } else if (wn2.getNodeName().equalsIgnoreCase("daysToWait")) {
                     retVal.daysToWait = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("entity")) {
-                    retVal.entity = MekHqXmlUtil.getEntityFromXmlString(wn2);
+                    retVal.entity = MekHqXmlUtil.getEntityFromXmlElement((Element)wn2);
                 } 
             }
         } catch (Exception ex) {
