@@ -2199,7 +2199,7 @@ public class CampaignGUI extends JPanel {
     protected void loadPersonFile() throws IOException {
         final String METHOD_NAME = "loadPersonFile()";
 
-        File personnelFile = FileDialogs.fileDialogOpenPersonnel(frame).orElse(null);
+        File personnelFile = FileDialogs.openPersonnel(frame).orElse(null);
 
         if (personnelFile != null) {
             // Open up the file.
