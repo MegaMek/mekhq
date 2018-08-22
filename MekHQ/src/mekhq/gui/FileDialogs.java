@@ -127,7 +127,7 @@ public class FileDialogs {
     public static Optional<File> saveCampaignOptions(JFrame frame) {
         return GUI.fileDialogSave( frame,
                                    "Save Campaign Options as Presets",
-                                   new File(MekHQ.PRESET_DIR, "myoptions.mul"), //$NON-NLS-1$
+                                   new File(MekHQ.PRESET_DIR, "myoptions.xml"), //$NON-NLS-1$
                                    FileType.XML );
     }
 
