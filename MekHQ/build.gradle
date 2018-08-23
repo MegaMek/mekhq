@@ -421,7 +421,7 @@ task cloneRepo (type: Exec, dependsOn: deleteRepoDir) {
 	description = 'Clones the repository to ensure we are working with a clean directory tree'
 	group = 'distribution'
 	commandLine "git"
-	args "clone", "--branch", mmlBranch, "--single-branch", gitRoot, "${repoDir}"
+	args "clone", "--branch", mmlBranch, "--single-branch", hqGitRoot, "${repoDir}"
 }
 
 task cloneMMRepo (type: Exec, dependsOn: deleteMMRepoDir) {
