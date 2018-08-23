@@ -15,3 +15,5 @@ MekHQ/.idea/
 /.vscode
 /.gradle/
 /settings_local.gradle
+/.classpath
+/.project
