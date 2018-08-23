@@ -36,8 +36,6 @@ dependencies {
 		// We don't need the python and javascript engine taking up space
 		exclude group: 'org.python', module: 'jython'
 		exclude group: 'org.mozilla', module: 'rhino'
-		// Looks like a misconfiguration; the individual batik modules should not declare a dependency on batik-all
-		exclude group: 'org.apache.xmlgraphics', module: 'batik-all'
 	}
 	
 	// We have been using a modified version of svgSalamander in MML, which we'll keep around until
