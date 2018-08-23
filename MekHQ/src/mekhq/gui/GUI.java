@@ -67,6 +67,8 @@ public class GUI {
         });
     }
 
+    private static File lastDirectory = null;
+
     private static Optional<File> fileDialog( JFrame parent,
                                               String title,
                                               FileType fileType,
@@ -75,14 +77,25 @@ public class GUI {
         // Swing's JFileChooser is much less usable that FileDialog
         FileDialog fd = new FileDialog(parent, requireNonNull(title));
         setPath.accept(fd);
+        {
+            // override directory to the one that was used last (if any)
+            File last = lastDirectory; // doesn't hurt to be thread-safe
+            if (last != null) {
+                fd.setDirectory(last.getAbsolutePath());
+            }
+        }
         fd.setMode(fd.getFile() == null ? FileDialog.LOAD : FileDialog.SAVE);
         fd.setFilenameFilter((dir, file) -> fileType.getNameFilter().test(file.toLowerCase()));
         fd.setVisible(true);
-        String dir = fd.getDirectory();
-        String file = fd.getFile();
-        return (dir != null) && (file != null)
-             ? Optional.of(new File(dir, file))
-             : Optional.empty();
+        String f = fd.getFile();
+        String d = fd.getDirectory();
+        if ((f != null) && (d != null)) {
+            File dir = new File(d);
+            lastDirectory = dir;
+            return Optional.of(new File(dir, f));
+        } else {
+            return Optional.empty();
+        }
     }
 
 }
