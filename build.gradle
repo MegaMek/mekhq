@@ -1,45 +1,45 @@
 plugins {
-	id 'org.ajoberstar.grgit' version '2.3.0'
+    id 'org.ajoberstar.grgit' version '2.3.0'
 }
 
 allprojects {
-	apply plugin: 'java'
-	
-	sourceCompatibility = 1.8
-	targetCompatibility = 1.8
-	
-	repositories {
-		mavenLocal()
-		maven {
-			url 'https://github.com/MegaMek/mavenrepo/raw/master'
-		}
-		jcenter()
-	}
+    apply plugin: 'java'
+    
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+    
+    repositories {
+        mavenLocal()
+        maven {
+            url 'https://github.com/MegaMek/mavenrepo/raw/master'
+        }
+        jcenter()
+    }
 }
 
 subprojects {
-	group = 'org.megamek'
-	version = '0.45.1-SNAPSHOT'
+    group = 'org.megamek'
+    version = '0.45.1-SNAPSHOT'
 }
 
 ext {
-	hqGitRoot = 'https://github.com/MegaMek/mekhq.git'
-	mmGitRoot = 'https://github.com/MegaMek/megamek.git'
-	mmlGitRoot = 'https://github.com/MegaMek/megameklab.git'
-	// Work on MML or MHQ sometimes requires changes in MM as well. The maven publishing tasks use
-	// these properties to append the branch name to the artifact id if the repo is not in the master
-	// branch, making it available separately to the child project. 
-	hqBranch = grgit.branch.current.name
-	hqBranchTag = hqBranch.equals('master')? '' : '-' + hqBranch
-	
-	// Allows setting a dependency on a different MM branch.
-	mmBranch = 'gradle'
-	mmBranchTag = mmBranch.equals('master')? '' : '-' + mmBranch
-	mmlBranch = 'gradle'
-	mmlBranchTag = mmBranch.equals('master')? '' : '-' + mmlBranch
-	
-	mmDir = "${rootDir}/../megamek"
-	mmlDir = "${rootDir}/../megameklab"
+    hqGitRoot = 'https://github.com/MegaMek/mekhq.git'
+    mmGitRoot = 'https://github.com/MegaMek/megamek.git'
+    mmlGitRoot = 'https://github.com/MegaMek/megameklab.git'
+    // Work on MML or MHQ sometimes requires changes in MM as well. The maven publishing tasks use
+    // these properties to append the branch name to the artifact id if the repo is not in the master
+    // branch, making it available separately to the child project. 
+    hqBranch = grgit.branch.current.name
+    hqBranchTag = hqBranch.equals('master')? '' : '-' + hqBranch
+    
+    // Allows setting a dependency on a different MM branch.
+    mmBranch = 'gradle'
+    mmBranchTag = mmBranch.equals('master')? '' : '-' + mmBranch
+    mmlBranch = 'gradle'
+    mmlBranchTag = mmBranch.equals('master')? '' : '-' + mmlBranch
+    
+    mmDir = "${rootDir}/../megamek"
+    mmlDir = "${rootDir}/../megameklab"
 }
 
 // A settings_local.gradle file can be used to override any of the above options. For instance,
@@ -48,6 +48,6 @@ ext {
 
 def localSettings = file('settings_local.gradle')
 if (localSettings.exists()) {
-	apply from: localSettings
+    apply from: localSettings
 }
 
