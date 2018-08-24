@@ -22,11 +22,18 @@ import static java.util.Objects.requireNonNull;
 
 import java.awt.FileDialog;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.Optional;
-import java.util.function.Consumer;
+import java.util.Properties;
 
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
+import org.apache.batik.util.gui.CSSMediaPanel.Dialog;
+
+import mekhq.MekHQ;
 import mekhq.io.FileType;
 
 /**
@@ -45,11 +52,13 @@ public class GUI {
      */
     public static Optional<File> fileDialogOpen( JFrame parent,
                                                  String title,
-                                                 File initialDirectory,
+                                                 File recommendedDirectory,
                                                  FileType fileType ) {
-        return fileDialog(parent, title, fileType, fd -> {
-            fd.setDirectory(initialDirectory.getAbsolutePath());
-        });
+        return fileDialog( parent,
+                           title,
+                           fileType,
+                           recommendedDirectory.getAbsolutePath(),
+                           Optional.empty() );
     }
 
     /**
@@ -59,12 +68,40 @@ public class GUI {
      */
     public static Optional<File> fileDialogSave( JFrame parent,
                                                  String title,
-                                                 File initialFile,
+                                                 File recommendedFile,
                                                  FileType fileType ) {
-        return fileDialog(parent, title, fileType, fd -> {
-            fd.setDirectory(initialFile.getParentFile().getAbsolutePath());
-            fd.setFile(initialFile.getName());
-        });
+        return fileDialog( parent,
+                           title,
+                           fileType,
+                           recommendedFile.getParentFile().getAbsolutePath(),
+                           Optional.of(recommendedFile.getName()) );
+    }
+
+    private static final String PROP_KEY_FILE_DIALOG_KIND       = "gui.file.dialogs"; //$NON-NLS-1$
+    private static final String PROP_VAL_FILE_DIALOG_KIND_AWT   = "awt"; //$NON-NLS-1$
+    private static final String PROP_VAL_FILE_DIALOG_KIND_SWING = "swing"; //$NON-NLS-1$
+
+    // Please bear with this for now :-) this stuff is going into MekHQ
+    // when that class is cleaned up (ie: "soon")
+    //
+    // LATER use the preferences from MekHQ
+    //       also, document this property (eg as below)
+    //
+    //    # Determines which open/save file dialogs MekHQ uses.
+    //    #
+    //    # Supported values:
+    //    #  awt:   use awt FileChooser (default)
+    //    #  swing: use swing JFileChooser
+    //    #
+    //    gui.file.dialogs=awt
+    private static Properties mhqPreferences;
+    static {
+        mhqPreferences = new Properties();
+        try {
+            mhqPreferences.load(new FileInputStream(MekHQ.PROPERTIES_FILE));
+        } catch (@SuppressWarnings("unused") IOException e) {
+            // ignored
+        }
     }
 
     private static File lastDirectory = null;
@@ -72,30 +109,77 @@ public class GUI {
     private static Optional<File> fileDialog( JFrame parent,
                                               String title,
                                               FileType fileType,
-                                              Consumer<FileDialog> setPath ) {
-        // Yes, FileDialog is an old AWT class :)
-        // Swing's JFileChooser is much less usable that FileDialog
-        FileDialog fd = new FileDialog(parent, requireNonNull(title));
-        setPath.accept(fd);
-        {
-            // override directory to the one that was used last (if any)
-            File last = lastDirectory; // doesn't hurt to be thread-safe
-            if (last != null) {
-                fd.setDirectory(last.getAbsolutePath());
-            }
+                                              String recommendedDirectory,
+                                              Optional<String> recommendedFileName ) {
+        File last = lastDirectory; // thread-safety doesn't hurt
+        String effectiveDirectory = last != null
+                                  ? last.getAbsolutePath()
+                                  : recommendedDirectory;
+        Optional<File> selected = preferredfileDialog( parent, // this is actually nullable - let's not advertise that too much, though
+                                                       requireNonNull(title),
+                                                       requireNonNull(fileType),
+                                                       effectiveDirectory,
+                                                       requireNonNull(recommendedFileName) );
+        selected.ifPresent(path -> {
+            lastDirectory = path.isDirectory()
+                          ? path
+                          : path.getParentFile();
+        });
+        return selected;
+    }
+
+    private static Optional<File> preferredfileDialog( JFrame parent,
+                                                       String title,
+                                                       FileType fileType,
+                                                       String recommendedDirectory,
+                                                       Optional<String> recommendedFileName ) {
+        String property = mhqPreferences.getProperty(PROP_KEY_FILE_DIALOG_KIND, PROP_VAL_FILE_DIALOG_KIND_AWT).trim().toLowerCase();
+        switch (property) {
+            case PROP_VAL_FILE_DIALOG_KIND_SWING: return swingFileDialog(parent, title, fileType, recommendedDirectory, recommendedFileName);
+            case PROP_VAL_FILE_DIALOG_KIND_AWT:   // fall through
+            default:                              return   awtFileDialog(parent, title, fileType, recommendedDirectory, recommendedFileName);
         }
-        fd.setMode(fd.getFile() == null ? FileDialog.LOAD : FileDialog.SAVE);
-        fd.setFilenameFilter((dir, file) -> fileType.getNameFilter().test(file.toLowerCase()));
+    }
+
+    private static Optional<File> awtFileDialog( JFrame parent,
+                                                 String title,
+                                                 FileType fileType,
+                                                 String recommendedDirectory,
+                                                 Optional<String> recommendedFileName ) {
+        FileDialog fd = new FileDialog(parent, title);
+        fd.setDirectory(recommendedDirectory);
+        if (recommendedFileName.isPresent()) {
+            fd.setMode(FileDialog.SAVE);
+            fd.setFile(recommendedFileName.get());
+        } else {
+            fd.setMode(FileDialog.LOAD);
+        }
+        fd.setFilenameFilter((dir, file) -> fileType.getNameFilter().test(file));
         fd.setVisible(true);
         String f = fd.getFile();
         String d = fd.getDirectory();
         if ((f != null) && (d != null)) {
-            File dir = new File(d);
-            lastDirectory = dir;
-            return Optional.of(new File(dir, f));
+            return Optional.of(new File(d, f));
         } else {
             return Optional.empty();
         }
+    }
+
+    private static Optional<File> swingFileDialog( JFrame parent,
+                                                   String title,
+                                                   FileType fileType,
+                                                   String recommendedDirectory,
+                                                   Optional<String> recommendedFileName ) {
+        JFileChooser fd = new JFileChooser(recommendedDirectory);
+        fd.setDialogTitle(title);
+        recommendedFileName.ifPresent(f -> fd.setSelectedFile(new File(f)));
+        fd.addChoosableFileFilter(new FileNameExtensionFilter(fileType.getDescription(), fileType.getExtensions().toArray(new String[0])));
+        int buttonClicked = recommendedFileName.isPresent()
+                          ? fd.showSaveDialog(parent)
+                          : fd.showOpenDialog(parent);
+        return buttonClicked == Dialog.OK_OPTION
+             ? Optional.ofNullable(fd.getSelectedFile())
+             : Optional.empty();
     }
 
 }
