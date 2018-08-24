@@ -699,7 +699,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 alliesPlayer.add(en);
                 attachedUnitIds.add(UUID.fromString(en.getExternalIdAsString()));
             } else {
-                System.out.println("Entity for player-controlled allies is null");
+                MekHQ.getLogger().error(AtBScenario.class, "setStandardMissionForces", "Entity for player-controlled allies is null");
             }
         }
 
@@ -713,7 +713,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 allyEntities.add(en);
                 attachedUnitIds.add(UUID.fromString(en.getExternalIdAsString()));
             } else {
-                System.err.println("Entity for ally bot is null");
+                MekHQ.getLogger().error(AtBScenario.class, "setStandardMissionForces", "Entity for ally bot is null");
             }
         }
 
