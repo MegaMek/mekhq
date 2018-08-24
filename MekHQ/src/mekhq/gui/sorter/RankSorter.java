@@ -60,7 +60,7 @@ import mekhq.campaign.personnel.Ranks;
         	} catch (Exception e) {
                 MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
                         String.format("[DEBUG] RankSorter Exception, s0: %s, s1: %s", s00, s11)); //$NON-NLS-1$
-                MekHQ.getLogger().log(getClass(), METHOD_NAME, e);
+                MekHQ.getLogger().error(getClass(), METHOD_NAME, e);
         		return 0;
         	}
         }

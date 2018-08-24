@@ -339,7 +339,7 @@ public class SpecialAbility implements MekHqXmlSerializable {
             // Errrr, apparently either the class name was invalid...
             // Or the listed name doesn't exist.
             // Doh!
-            MekHQ.getLogger().log(SpecialAbility.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(SpecialAbility.class, METHOD_NAME, ex);
         }
 
         if(retVal.displayName.isEmpty()) {
@@ -418,7 +418,7 @@ public class SpecialAbility implements MekHqXmlSerializable {
             // Errrr, apparently either the class name was invalid...
             // Or the listed name doesn't exist.
             // Doh!
-            MekHQ.getLogger().log(SpecialAbility.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(SpecialAbility.class, METHOD_NAME, ex);
         }
 
         if(retVal.displayName.isEmpty()) {
@@ -453,7 +453,7 @@ public class SpecialAbility implements MekHqXmlSerializable {
             // Parse using builder to get DOM representation of the XML file
             xmlDoc = db.parse(fis);
         } catch (Exception ex) {
-            MekHQ.getLogger().log(SpecialAbility.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(SpecialAbility.class, METHOD_NAME, ex);
         }
 
         Element spaEle = xmlDoc.getDocumentElement();

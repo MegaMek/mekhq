@@ -663,7 +663,7 @@ public class Campaign implements Serializable, ITechManager {
         } catch (Exception ex) {
             MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
                     "Unable to load unit: " + ms.getEntryName()); //$NON-NLS-1$
-            MekHQ.getLogger().log(getClass(), METHOD_NAME, ex);
+            MekHQ.getLogger().error(getClass(), METHOD_NAME, ex);
         }
         Entity en = mechFileParser.getEntity();
 
@@ -3394,7 +3394,7 @@ public class Campaign implements Serializable, ITechManager {
         try {
             mechFileParser = new MechFileParser(mechSummary.getSourceFile());
         } catch (EntityLoadingException ex) {
-            MekHQ.getLogger().log(Campaign.class, "getBrandNewUndamagedEntity(String)", ex);
+            MekHQ.getLogger().error(Campaign.class, "getBrandNewUndamagedEntity(String)", ex);
         }
         if (mechFileParser == null) {
             return null;
@@ -3685,7 +3685,7 @@ public class Campaign implements Serializable, ITechManager {
             try {
                 mechFileParser = new MechFileParser(ms.getSourceFile());
             } catch (EntityLoadingException ex) {
-                MekHQ.getLogger().log(Campaign.class, "writeCustoms(PrintWriter)", ex);
+                MekHQ.getLogger().error(Campaign.class, "writeCustoms(PrintWriter)", ex);
             }
             if (mechFileParser == null) {
                 continue;
@@ -3742,7 +3742,7 @@ public class Campaign implements Serializable, ITechManager {
             // Parse using builder to get DOM representation of the XML file
             xmlDoc = db.parse(fis);
         } catch (Exception ex) {
-            MekHQ.getLogger().log(Campaign.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(Campaign.class, METHOD_NAME, ex);
         }
 
         Element campaignEle = xmlDoc.getDocumentElement();

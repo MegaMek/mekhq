@@ -188,7 +188,7 @@ public class JumpPath implements Serializable {
 			// Errrr, apparently either the class name was invalid...
 			// Or the listed name doesn't exist.
 			// Doh!
-            MekHQ.getLogger().log(JumpPath.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(JumpPath.class, METHOD_NAME, ex);
 		}
 		
 		return retVal;

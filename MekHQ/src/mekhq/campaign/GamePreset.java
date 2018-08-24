@@ -165,7 +165,7 @@ public class GamePreset implements MekHqXmlSerializable {
             // Parse using builder to get DOM representation of the XML file
             xmlDoc = db.parse(fis);
         } catch (Exception ex) {
-            MekHQ.getLogger().log(GamePreset.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(GamePreset.class, METHOD_NAME, ex);
             return preset;
         }
 

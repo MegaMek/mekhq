@@ -75,7 +75,7 @@ public class EditTransactionDialog extends JDialog implements ActionListener, Fo
             add(buildMainPanel(), BorderLayout.CENTER);
             add(buildButtonPanel(), BorderLayout.SOUTH);
         } catch (ParseException e) {
-            MekHQ.getLogger().log(getClass(), "initGUI()", e);
+            MekHQ.getLogger().error(getClass(), "initGUI()", e);
         }
     }
 

@@ -205,7 +205,7 @@ public class AtBEventProcessor {
                 MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
                         "Unable to load entity: " + ms.getSourceFile() + ": " //$NON-NLS-1$
                         + ms.getEntryName() + ": " + ex.getMessage()); //$NON-NLS-1$
-                MekHQ.getLogger().log(getClass(), METHOD_NAME, ex);
+                MekHQ.getLogger().error(getClass(), METHOD_NAME, ex);
             }
         } else {
             MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
