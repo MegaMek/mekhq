@@ -231,8 +231,13 @@ public class Campaign implements Serializable, ITechManager {
     private int astechPoolOvertime;
     private int medicPool;
 
+    private int lastPartId;
+    private int lastForceId;
+    private int lastMissionId;
+    private int lastScenarioId;
+
     // indicates whether or not the campaign should be gzipped, if possible.
-    private Boolean preferGzippedOutput;
+    private boolean preferGzippedOutput;
 
     // I need to put a basic game object in campaign so that I can
     // assign it to the entities, otherwise some entity methods may get NPE
@@ -388,7 +393,7 @@ public class Campaign implements Serializable, ITechManager {
      * @return A value indicating if the campaign should be written to a
      *         gzipped file, if possible.
      */
-    public Boolean getPreferGzippedOutput() {
+    public boolean getPreferGzippedOutput() {
         return preferGzippedOutput;
     }
 
@@ -399,7 +404,7 @@ public class Campaign implements Serializable, ITechManager {
      * @param preferGzip A value indicating whether or not the campaign
      *                   should be gzipped if possible.
      */
-    public void setPreferGzippedOutput(Boolean preferGzip) {
+    public void setPreferGzippedOutput(boolean preferGzip) {
         preferGzippedOutput = preferGzip;
     }
 
@@ -815,10 +820,6 @@ public class Campaign implements Serializable, ITechManager {
         return news;
     }
 
-    private int getLastForceId() {
-        return forceIds.size() > 0 ? forceIds.lastKey() : 0;
-    }
-
     /**
      * Add force to an existing superforce. This method will also assign the force an id and place it in the forceId hash
      *
@@ -826,11 +827,12 @@ public class Campaign implements Serializable, ITechManager {
      * @param superForce - the superforce to add the new force to
      */
     public void addForce(Force force, Force superForce) {
-        int id = getLastForceId() + 1;
+        int id = lastForceId + 1;
         force.setId(id);
         superForce.addSubForce(force, true);
         force.setScenarioId(superForce.getScenarioId());
         forceIds.put(Integer.valueOf(id), force);
+        lastForceId = id;
 
         if (campaignOptions.getUseAtB() && force.getUnits().size() > 0) {
             if (null == lances.get(Integer.valueOf(id))) {
@@ -860,7 +862,8 @@ public class Campaign implements Serializable, ITechManager {
      *
      * @param force
      */
-    public void addForceToHash(Force force) {
+    public void importForce(Force force) {
+        lastForceId = Math.max(lastForceId, force.getId());
         forceIds.put(force.getId(), force);
     }
 
@@ -869,7 +872,8 @@ public class Campaign implements Serializable, ITechManager {
      *
      * @param scenario
      */
-    public void addScenarioToHash(Scenario scenario) {
+    public void importScenario(Scenario scenario) {
+        lastScenarioId = Math.max(lastScenarioId, scenario.getId());
         scenarios.put(scenario.getId(), scenario);
     }
 
@@ -937,19 +941,16 @@ public class Campaign implements Serializable, ITechManager {
         }
     }
 
-    private int getLastMissionId() {
-        return missions.size() > 0 ? missions.lastKey() : 0;
-    }
-
     /**
      * Add a mission to the campaign
      *
      * @param m The mission to be added
      */
     public int addMission(Mission m) {
-        int id = getLastMissionId() + 1;
+        int id = lastMissionId + 1;
         m.setId(id);
         missions.put(Integer.valueOf(id), m);
+        lastMissionId = id;
         MekHQ.triggerEvent(new MissionNewEvent(m));
         return id;
     }
@@ -961,13 +962,14 @@ public class Campaign implements Serializable, ITechManager {
     public void importMission(Mission m) {
         // add scenarios to the scenarioId hash
         for (Scenario s : m.getScenarios()) {
-            addScenarioToHash(s);
+            importScenario(s);
         }
 
         addMissionWithoutId(m);
     }
 
     private void addMissionWithoutId(Mission m) {
+        lastMissionId = Math.max(lastMissionId, m.getId());
         missions.put(Integer.valueOf(m.getId()), m);
         MekHQ.triggerEvent(new MissionNewEvent(m));
     }
@@ -979,10 +981,6 @@ public class Campaign implements Serializable, ITechManager {
         return missions.values();
     }
 
-    private int getLastScenarioId() {
-        return scenarios.size() > 0 ? scenarios.lastKey() : 0;
-    }
-
     /**
      * Add scenario to an existing mission. This method will also assign the scenario an id and place it in the scenarioId
      * hash
@@ -991,10 +989,11 @@ public class Campaign implements Serializable, ITechManager {
      * @param m - the mission to add the new scenario to
      */
     public void addScenario(Scenario s, Mission m) {
-        int id = getLastScenarioId() + 1;
+        int id = lastScenarioId + 1;
         s.setId(id);
         m.addScenario(s);
         scenarios.put(Integer.valueOf(id), s);
+        lastScenarioId = id;
         MekHQ.triggerEvent(new ScenarioNewEvent(s));
     }
 
@@ -1393,10 +1392,6 @@ public class Campaign implements Serializable, ITechManager {
         return na;
     }
 
-    private int getLastPartId() {
-        return parts.size() > 0 ? parts.lastKey() : 0;
-    }
-
     public void addPart(Part p, int transitDays) {
         if (null != p.getUnit() && p.getUnit() instanceof TestUnit) {
             // if this is a test unit, then we won't add the part, so there
@@ -1406,7 +1401,7 @@ public class Campaign implements Serializable, ITechManager {
         p.setBrandNew(false);
         //need to add ID here in case post-processing part stuff needs it
         //we will set the id back one if we don't end up adding this part
-        int id = getLastPartId() + 1;
+        int id = lastPartId + 1;
         p.setId(id);
         //be careful in using this next line
         p.postProcessCampaignAddition();
@@ -1438,6 +1433,7 @@ public class Campaign implements Serializable, ITechManager {
             }
         }
         parts.put(Integer.valueOf(id), p);
+        lastPartId = id;
         MekHQ.triggerEvent(new PartNewEvent(p));
     }
 
@@ -1528,6 +1524,7 @@ public class Campaign implements Serializable, ITechManager {
             }
         }
 
+        lastPartId = Math.max(lastPartId, p.getId());
         parts.put(p.getId(), p);
         MekHQ.triggerEvent(new PartNewEvent(p));
     }
@@ -3849,10 +3846,10 @@ public class Campaign implements Serializable, ITechManager {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "camoCategory", camoCategory);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "camoFileName", camoFileName);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "colorIndex", colorIndex);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "lastPartId", getLastPartId());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "lastForceId", getLastForceId());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "lastMissionId", getLastMissionId());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "lastScenarioId", getLastScenarioId());
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "lastPartId", lastPartId);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "lastForceId", lastForceId);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "lastMissionId", lastMissionId);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "lastScenarioId", lastScenarioId);
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "calendar",
                 df.format(calendar.getTime()));
