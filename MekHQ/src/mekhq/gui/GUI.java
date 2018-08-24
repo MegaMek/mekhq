@@ -90,7 +90,7 @@ public class GUI {
     //    # Determines which open/save file dialogs MekHQ uses.
     //    #
     //    # Supported values:
-    //    #  awt:   use awt FileChooser (default)
+    //    #  awt:   use awt FileDialog (default)
     //    #  swing: use swing JFileChooser
     //    #
     //    gui.file.dialogs=awt
