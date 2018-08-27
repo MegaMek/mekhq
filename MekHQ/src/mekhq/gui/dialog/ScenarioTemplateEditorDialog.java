@@ -21,14 +21,21 @@ import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
 import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.border.LineBorder;
 
+import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.ScenarioForceTemplate;
 import mekhq.campaign.mission.ScenarioTemplate;
 
+/**
+ * Handles editing, saving and loading of scenario template definitions.
+ * @author NickAragua
+ *
+ */
 public class ScenarioTemplateEditorDialog extends JDialog implements ActionListener {
     
     private final Dimension spinnerSize = new Dimension(55, 25);
@@ -49,6 +56,10 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
     // the scenario template we're working on
     ScenarioTemplate scenarioTemplate = new ScenarioTemplate(); 
     
+    /**
+     * Constructor. Creates a new instance of this dialog with the given parent JFrame.
+     * @param parent
+     */
     public ScenarioTemplateEditorDialog(Frame parent) {
         super(parent, true);
         initComponents();
@@ -56,6 +67,9 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         validate();
     }
     
+    /**
+     * Initialize dialog components.
+     */
     protected void initComponents() {
         this.setTitle("Scenario Template Editor");
         getContentPane().setLayout(new GridBagLayout());
@@ -67,10 +81,11 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         setupForceEditorHeaders(gbc);
         setupForceEditor(gbc);
         initializeForceList(gbc);
+        setupMapParameters(gbc);
     }
     
     /**
-     * Sets up text entry boxes in the top
+     * Sets up text entry boxes in the top - briefing, scenario name, labels.
      * @param gbc
      */
     private void setupTopFluff(GridBagConstraints gbc) {
@@ -80,24 +95,25 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         gbc.anchor = GridBagConstraints.WEST;
         getContentPane().add(lblScenarioName, gbc);
         
-        JTextField txtScenarioName = new JTextField();
-        txtScenarioName.setColumns(160);
+        JTextField txtScenarioName = new JTextField(80);
         gbc.gridy++;
-        getContentPane().add(txtScenarioName);
+        getContentPane().add(txtScenarioName, gbc);
         
         JLabel lblScenarioBriefing = new JLabel("Briefing:");
         gbc.gridy++;
         getContentPane().add(lblScenarioBriefing, gbc);
         
-        JTextArea txtScenarioBriefing = new JTextArea();
+        JTextArea txtScenarioBriefing = new JTextArea(5, 80);
         txtScenarioBriefing.setEditable(true);
         txtScenarioBriefing.setLineWrap(true);
-        txtScenarioBriefing.setRows(5);
-        txtScenarioBriefing.setColumns(160);
         gbc.gridy++;
         getContentPane().add(txtScenarioBriefing, gbc);
     }
     
+    /**
+     * Worker function that sets up headers for the force template editor section.
+     * @param gbc
+     */
     private void setupForceEditorHeaders(GridBagConstraints gbc) {
         gbc.gridx = 0;
         gbc.gridwidth = 1;
@@ -134,7 +150,12 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         gbc.gridx++;
         getContentPane().add(lblAllowedUnitTypes, gbc);
     }
-    
+  
+    /**
+     * Worker function that sets up UI elements for the force template editor.
+     * Really goddamn ugly for now.
+     * @param gbc
+     */
     private void setupForceEditor(GridBagConstraints gbc) {
         gbc.gridx = 0;
         gbc.gridy++;
@@ -187,11 +208,13 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         getContentPane().add(btnAdd, gbc);
     }
         
+    /**
+     * Worker function called when initializing the dialog to place the force template list on the content pane.
+     * @param gbc Grid bag contraints.
+     */
     private void initializeForceList(GridBagConstraints gbc) {
         gbc.gridx = 0;
         gbc.gridy++;
-        gbc.gridwidth = GridBagConstraints.REMAINDER;
-        gbc.gridheight = GridBagConstraints.RELATIVE;
         panForceList = new JPanel(new GridBagLayout());
         panForceList.setBorder(new LineBorder(Color.GREEN));
 
@@ -200,6 +223,74 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         getContentPane().add(panForceList, gbc);
     }
     
+    /**
+     * Worker function called when initializing to place the map parameters.
+     * @param gbc
+     */
+    private void setupMapParameters(GridBagConstraints gbc) {
+        gbc.gridx = 0;
+        gbc.gridy++;
+        gbc.gridwidth = GridBagConstraints.REMAINDER;
+        gbc.gridheight = 1;
+        
+        JLabel lblMapParameters = new JLabel("Scenario Map Parameters");
+        getContentPane().add(lblMapParameters, gbc);
+        
+        gbc.gridy++;
+        gbc.gridwidth = 1;
+        JLabel lblBaseWidth = new JLabel("Base Width:");
+        getContentPane().add(lblBaseWidth, gbc);
+        
+        gbc.gridx++;
+        JTextField txtBaseWidth = new JTextField(4);
+        getContentPane().add(txtBaseWidth, gbc);
+        
+        gbc.gridx++;
+        JLabel lblAllowedTerrainTypes = new JLabel("Allowed Map Types:");
+        getContentPane().add(lblAllowedTerrainTypes, gbc);
+        
+        gbc.gridx++;
+        gbc.gridheight = GridBagConstraints.RELATIVE;
+        JList<String> lstAllowedTerrainTypes = new JList<>();
+        DefaultListModel<String> terrainTypeModel = new DefaultListModel<String>();
+        for(String terrainType : AtBScenario.terrainTypes) {
+            terrainTypeModel.addElement(terrainType);
+        }
+        lstAllowedTerrainTypes.setModel(terrainTypeModel);
+        getContentPane().add(lstAllowedTerrainTypes, gbc);
+        
+        gbc.gridy++;
+        gbc.gridx = 0;
+        gbc.gridheight = 1;
+        JLabel lblBaseHeight = new JLabel("Base Height:");
+        getContentPane().add(lblBaseHeight, gbc);
+        
+        gbc.gridx++;
+        JTextField txtBaseHeight = new JTextField(4);
+        getContentPane().add(txtBaseHeight, gbc);
+        
+        gbc.gridy++;
+        gbc.gridx = 0;
+        JLabel lblXIncrement = new JLabel("Scaled Width Increment:");
+        getContentPane().add(lblXIncrement, gbc);
+        
+        gbc.gridx++;
+        JTextField txtXIncrement = new JTextField(4);
+        getContentPane().add(txtXIncrement, gbc);
+        
+        gbc.gridy++;
+        gbc.gridx = 0;
+        JLabel lblYIncrement = new JLabel("Scaled Height Increment:");
+        getContentPane().add(lblYIncrement, gbc);
+        
+        gbc.gridx++;
+        JTextField txtYIncrement = new JTextField(4);
+        getContentPane().add(txtYIncrement, gbc);
+    }
+    
+    /**
+     * Worker function to re-draw the force template list.
+     */
     private void renderForceList() {
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -269,7 +360,10 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         panForceList.setPreferredSize(panForceList.getSize());
     }
     
-    
+    /** 
+     * Event handler for when the Add force button is pressed.
+     * Adds a new force with the currently selected parameters to the scenario template.
+     */
     private void addForceButtonHandler() {
         int forceAlignment = cboAlignment.getSelectedIndex();
         int generationMethod = cboGenerationMethod.getSelectedIndex();
@@ -297,6 +391,10 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         repaint();
     }
     
+    /**
+     * Event handler for when the "Remove" button is pressed for a particular force template.
+     * @param command The command string containing the index of the force to remove.
+     */
     private void deleteForceButtonHandler(String command) {
         int forceIndex = Integer.parseInt(command.substring(REMOVE_FORCE_COMMAND.length()));
         scenarioTemplate.scenarioForces.remove(forceIndex);
@@ -305,6 +403,10 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         repaint();
     }
 
+    /**
+     * General event handler for button clicks on this dialog.
+     * Examines the action command and invokes appropriate method.
+     */
     @Override
     public void actionPerformed(ActionEvent e) {
         if(e.getActionCommand() == ADD_FORCE_COMMAND) {
