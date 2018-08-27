@@ -41,16 +41,3 @@ public class ScenarioObjective {
     // For example: Primary - Destroy enemy force, 50%, 10 turns
     //              Secondary - Reach Location AlliedForces 50% 
 }
-
-/*public class ScenarioForceTemplate {
-    public enum ForceTeam {
-        Allied,
-        Opfor,
-        ThirdParty
-    }
-    
-    public enum 
-    
-    public ForceTeam team;
-    public double bvBudgetMultiplier = 1.0;
-}*/

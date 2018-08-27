@@ -34,6 +34,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
     private final Dimension spinnerSize = new Dimension(55, 25);
     
     private final static String ADD_FORCE_COMMAND = "ADDFORCE"; 
+    private final static String REMOVE_FORCE_COMMAND = "REMOVE_FORCE_";
     
     // controls which need to be accessible across the lifetime of this dialog
     JComboBox<String> cboAlignment;
@@ -52,6 +53,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         super(parent, true);
         initComponents();
         pack();
+        validate();
     }
     
     protected void initComponents() {
@@ -209,7 +211,8 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         
         panForceList.removeAll();
         
-        for(ScenarioForceTemplate sft : scenarioTemplate.scenarioForces) {
+        for(int forceIndex = 0; forceIndex < scenarioTemplate.scenarioForces.size(); forceIndex++) {
+            ScenarioForceTemplate sft = scenarioTemplate.scenarioForces.get(forceIndex);
             JLabel lblForceAlignment = new JLabel(ScenarioForceTemplate.FORCE_ALIGNMENTS[sft.getForceAlignment()]);
             panForceList.add(lblForceAlignment, gbc);
             
@@ -221,7 +224,15 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
             gbc.gridx++;
             panForceList.add(lblMultiplier, gbc);
             
-            JLabel lblDeploymentZones = new JLabel("PDZ");
+            JLabel lblDeploymentZones = new JLabel();
+            StringBuilder dzBuilder = new StringBuilder();
+            dzBuilder.append("<html>");
+            for(int zone : sft.getDeploymentZones()) {
+                dzBuilder.append(ScenarioForceTemplate.DEPLOYMENT_ZONES[zone]);
+                dzBuilder.append("<br/>");
+            }
+            dzBuilder.append("</html>");      
+            lblDeploymentZones.setText(dzBuilder.toString());
             gbc.gridx++;
             panForceList.add(lblDeploymentZones, gbc);
             
@@ -233,9 +244,23 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
             gbc.gridx++;
             panForceList.add(lblRetreatThreshold, gbc);
             
-            JLabel lblAllowedUnitTypes = new JLabel("AUT");
+            JLabel lblAllowedUnitTypes = new JLabel();
+            StringBuilder autBuilder = new StringBuilder();
+            autBuilder.append("<html>");
+            for(int unitType : sft.allowedUnitTypes()) {
+                autBuilder.append(ScenarioForceTemplate.UNIT_TYPES[unitType]);
+                autBuilder.append("<br/>");
+            }
+            autBuilder.append("</html>");
+            lblAllowedUnitTypes.setText(autBuilder.toString());
             gbc.gridx++;
             panForceList.add(lblAllowedUnitTypes, gbc);
+            
+            JButton btnRemoveForce = new JButton("Remove");
+            btnRemoveForce.setActionCommand(String.format("%s%s", REMOVE_FORCE_COMMAND, forceIndex));
+            btnRemoveForce.addActionListener(this);
+            gbc.gridx++;
+            panForceList.add(btnRemoveForce, gbc);
             
             gbc.gridy++;
             gbc.gridx = 0;
@@ -245,7 +270,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
     }
     
     
-    private void addButtonHandler() {
+    private void addForceButtonHandler() {
         int forceAlignment = cboAlignment.getSelectedIndex();
         int generationMethod = cboGenerationMethod.getSelectedIndex();
         double forceMultiplier = (double) spnMultiplier.getValue();
@@ -268,15 +293,24 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         scenarioTemplate.scenarioForces.add(sft);
         
         renderForceList();
-        this.pack();
-        this.repaint();
+        pack();
+        repaint();
+    }
+    
+    private void deleteForceButtonHandler(String command) {
+        int forceIndex = Integer.parseInt(command.substring(REMOVE_FORCE_COMMAND.length()));
+        scenarioTemplate.scenarioForces.remove(forceIndex);
+        renderForceList();
+        pack();
+        repaint();
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         if(e.getActionCommand() == ADD_FORCE_COMMAND) {
-            addButtonHandler();
+            addForceButtonHandler();
+        } else if(e.getActionCommand().contains(REMOVE_FORCE_COMMAND)) {
+            deleteForceButtonHandler(e.getActionCommand());
         }
-        
     }
 }
