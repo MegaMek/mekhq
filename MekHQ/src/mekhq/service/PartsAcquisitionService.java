@@ -145,11 +145,10 @@ public class PartsAcquisitionService {
 
 			if (!part.isOmniPodded()) {
 				part.setOmniPodded(true);
-				inventories = campaign.getPartInventory(part);
-				pci.setCountModifier(inventories.getCountModifier());
+				PartInventory omniPodInventory = campaign.getPartInventory(part);
 
-				if (inventories.getSupply() > 0) {
-					omniPod = inventories.getSupply();
+				if (omniPodInventory.getSupply() > 0) {
+					omniPod = omniPodInventory.getSupply();
 				}
 
 				part.setOmniPodded(false);

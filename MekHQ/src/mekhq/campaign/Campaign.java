@@ -7829,7 +7829,7 @@ public class Campaign implements Serializable, ITechManager {
         }
 
         inventory.setSupply(nSupply);
-        inventory.setSupply(nTransit);
+        inventory.setTransit(nTransit);
 
         int nOrdered = 0;
         IAcquisitionWork onOrder = getShoppingList().getShoppingItem(part);
