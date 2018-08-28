@@ -7,6 +7,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -15,21 +16,21 @@ import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.ListModel;
-import javax.swing.ListSelectionModel;
-import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.border.LineBorder;
+import javax.xml.bind.JAXBException;
 
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.ScenarioForceTemplate;
 import mekhq.campaign.mission.ScenarioTemplate;
+import mekhq.gui.CampaignFileFilter;
 
 /**
  * Handles editing, saving and loading of scenario template definitions.
@@ -42,6 +43,8 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
     
     private final static String ADD_FORCE_COMMAND = "ADDFORCE"; 
     private final static String REMOVE_FORCE_COMMAND = "REMOVE_FORCE_";
+    private final static String SAVE_TEMPLATE_COMMAND = "SAVE_TEMPLATE";
+    private final static String LOAD_TEMPLATE_COMMAND = "LOAD_TEMPLATE";
     
     // controls which need to be accessible across the lifetime of this dialog
     JComboBox<String> cboAlignment;
@@ -52,6 +55,14 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
     JSpinner spnRetreatThreshold;
     JList<String> lstUnitTypes;
     JPanel panForceList;
+    JTextField txtScenarioName;
+    JTextArea txtScenarioBriefing;
+    JTextArea txtLongBriefing;
+    JTextField txtBaseWidth;    
+    JList<String> lstAllowedTerrainTypes;
+    JTextField txtBaseHeight;
+    JTextField txtXIncrement;
+    JTextField txtYIncrement;
     
     // the scenario template we're working on
     ScenarioTemplate scenarioTemplate = new ScenarioTemplate(); 
@@ -82,6 +93,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         setupForceEditor(gbc);
         initializeForceList(gbc);
         setupMapParameters(gbc);
+        setupBottomButtons(gbc);
     }
     
     /**
@@ -95,19 +107,29 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         gbc.anchor = GridBagConstraints.WEST;
         getContentPane().add(lblScenarioName, gbc);
         
-        JTextField txtScenarioName = new JTextField(80);
+        txtScenarioName = new JTextField(80);
         gbc.gridy++;
         getContentPane().add(txtScenarioName, gbc);
         
-        JLabel lblScenarioBriefing = new JLabel("Briefing:");
+        JLabel lblScenarioBriefing = new JLabel("Short Briefing:");
         gbc.gridy++;
         getContentPane().add(lblScenarioBriefing, gbc);
         
-        JTextArea txtScenarioBriefing = new JTextArea(5, 80);
+        txtScenarioBriefing = new JTextArea(3, 80);
         txtScenarioBriefing.setEditable(true);
         txtScenarioBriefing.setLineWrap(true);
         gbc.gridy++;
         getContentPane().add(txtScenarioBriefing, gbc);
+        
+        JLabel lblLongBriefing = new JLabel("Detailed Briefing:");
+        gbc.gridy++;
+        getContentPane().add(lblLongBriefing, gbc);
+        
+        txtLongBriefing = new JTextArea(5, 80);
+        txtScenarioBriefing.setEditable(true);
+        txtScenarioBriefing.setLineWrap(true);
+        gbc.gridy++;
+        getContentPane().add(txtLongBriefing, gbc);
     }
     
     /**
@@ -242,7 +264,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         getContentPane().add(lblBaseWidth, gbc);
         
         gbc.gridx++;
-        JTextField txtBaseWidth = new JTextField(4);
+        txtBaseWidth = new JTextField(4);
         getContentPane().add(txtBaseWidth, gbc);
         
         gbc.gridx++;
@@ -251,7 +273,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         
         gbc.gridx++;
         gbc.gridheight = GridBagConstraints.RELATIVE;
-        JList<String> lstAllowedTerrainTypes = new JList<>();
+        lstAllowedTerrainTypes = new JList<>();
         DefaultListModel<String> terrainTypeModel = new DefaultListModel<String>();
         for(String terrainType : AtBScenario.terrainTypes) {
             terrainTypeModel.addElement(terrainType);
@@ -266,7 +288,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         getContentPane().add(lblBaseHeight, gbc);
         
         gbc.gridx++;
-        JTextField txtBaseHeight = new JTextField(4);
+        txtBaseHeight = new JTextField(4);
         getContentPane().add(txtBaseHeight, gbc);
         
         gbc.gridy++;
@@ -275,7 +297,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         getContentPane().add(lblXIncrement, gbc);
         
         gbc.gridx++;
-        JTextField txtXIncrement = new JTextField(4);
+        txtXIncrement = new JTextField(4);
         getContentPane().add(txtXIncrement, gbc);
         
         gbc.gridy++;
@@ -284,8 +306,28 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         getContentPane().add(lblYIncrement, gbc);
         
         gbc.gridx++;
-        JTextField txtYIncrement = new JTextField(4);
+        txtYIncrement = new JTextField(4);
         getContentPane().add(txtYIncrement, gbc);
+    }
+    
+    /**
+     * Worker function that sets up the buttons on the bottom of the dialog
+     * @param gbc
+     */
+    private void setupBottomButtons(GridBagConstraints gbc) {
+        gbc.gridx = 0;
+        gbc.gridy++;
+        
+        JButton btnSave = new JButton("Save");
+        btnSave.setActionCommand(SAVE_TEMPLATE_COMMAND);
+        btnSave.addActionListener(this);
+        getContentPane().add(btnSave, gbc);
+        
+        gbc.gridy++;
+        JButton btnLoad = new JButton("Load");
+        btnLoad.setActionCommand(LOAD_TEMPLATE_COMMAND);
+        btnLoad.addActionListener(this);
+        getContentPane().add(btnLoad, gbc);
     }
     
     /**
@@ -338,7 +380,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
             JLabel lblAllowedUnitTypes = new JLabel();
             StringBuilder autBuilder = new StringBuilder();
             autBuilder.append("<html>");
-            for(int unitType : sft.allowedUnitTypes()) {
+            for(int unitType : sft.getAllowedUnitTypes()) {
                 autBuilder.append(ScenarioForceTemplate.UNIT_TYPES[unitType]);
                 autBuilder.append("<br/>");
             }
@@ -402,6 +444,51 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         pack();
         repaint();
     }
+    
+    /**
+     * Event handler for the "Save" button.
+     */
+    private void saveTemplateButtonHandler() {
+        scenarioTemplate.name = txtScenarioName.getText();
+        scenarioTemplate.shortBriefing = txtScenarioBriefing.getText();
+        scenarioTemplate.detailedBriefing = txtLongBriefing.getText();
+        
+        scenarioTemplate.mapParameters.allowedTerrainTypes.clear();
+        for(int terrainType : lstAllowedTerrainTypes.getSelectedIndices()) {
+            scenarioTemplate.mapParameters.allowedTerrainTypes.add(terrainType);
+        }
+        scenarioTemplate.mapParameters.baseHeight = Integer.parseInt(txtBaseHeight.getText());
+        scenarioTemplate.mapParameters.baseWidth = Integer.parseInt(txtBaseWidth.getText());
+        scenarioTemplate.mapParameters.heightScalingIncrement = Integer.parseInt(txtYIncrement.getText());
+        scenarioTemplate.mapParameters.widthScalingIncrement = Integer.parseInt(txtXIncrement.getText());
+        
+        JFileChooser saveTemplateChooser = new JFileChooser("./");
+        saveTemplateChooser.setDialogTitle("Save Scenario Template");
+        int returnVal = saveTemplateChooser.showSaveDialog(this);
+
+        if ((returnVal != JFileChooser.APPROVE_OPTION)
+                || (saveTemplateChooser.getSelectedFile() == null)) {
+            return;
+        }
+
+        File file = saveTemplateChooser.getSelectedFile();
+        scenarioTemplate.Serialize(file);
+    }
+    
+    private void loadTemplateButtonHandler() {
+        JFileChooser saveTemplateChooser = new JFileChooser("./");
+        saveTemplateChooser.setDialogTitle("Save Scenario Template");
+        int returnVal = saveTemplateChooser.showSaveDialog(this);
+
+        if ((returnVal != JFileChooser.APPROVE_OPTION)
+                || (saveTemplateChooser.getSelectedFile() == null)) {
+            return;
+        }
+
+        File file = saveTemplateChooser.getSelectedFile();
+        scenarioTemplate.Deserialize(file);
+        this.repaint();
+    }
 
     /**
      * General event handler for button clicks on this dialog.
@@ -413,6 +500,10 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
             addForceButtonHandler();
         } else if(e.getActionCommand().contains(REMOVE_FORCE_COMMAND)) {
             deleteForceButtonHandler(e.getActionCommand());
+        } else if(e.getActionCommand() == SAVE_TEMPLATE_COMMAND) {
+            saveTemplateButtonHandler();
+        } else if(e.getActionCommand() == LOAD_TEMPLATE_COMMAND) {
+            loadTemplateButtonHandler();
         }
     }
 }

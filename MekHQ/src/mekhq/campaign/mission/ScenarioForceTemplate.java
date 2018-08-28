@@ -2,6 +2,9 @@ package mekhq.campaign.mission;
 
 import java.util.List;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+
 public class ScenarioForceTemplate {
     // A scenario force template is a way to describe a particular force that gets generated when creating a DymanicScenario
     // It contains the following characteristics
@@ -49,6 +52,8 @@ public class ScenarioForceTemplate {
         return forceMultiplier;
     }
     
+    @XmlElementWrapper(name="deploymentZones")
+    @XmlElement(name="deploymentZone")
     public List<Integer> getDeploymentZones() {
         return deploymentZones;
     }
@@ -61,7 +66,37 @@ public class ScenarioForceTemplate {
         return retreatThreshold;
     }
     
-    public List<Integer> allowedUnitTypes() {
+    @XmlElementWrapper(name="allowedUnitTypes")
+    @XmlElement(name="allowedUnitType")
+    public List<Integer> getAllowedUnitTypes() {
         return allowedUnitTypes;
+    }
+    
+    public void setForceAlignment(int forceAlignment) {
+        this.forceAlignment = forceAlignment;
+    }
+    
+    public void setGenerationMethod(int generationMethod) {
+        this.generationMethod = generationMethod;
+    }
+    
+    public void setForceMultiplier(double forceMultiplier) {
+        this.forceMultiplier = forceMultiplier;
+    }
+    
+    public void setDeploymentZones(List<Integer> deploymentZones) {
+        this.deploymentZones = deploymentZones;
+    }
+    
+    public void setDestinationZone(int destinationZone) {
+        this.destinationZone = destinationZone;
+    }
+    
+    public void setRetreatThreshold(double retreatThreshold) {
+        this.retreatThreshold = retreatThreshold;
+    }
+    
+    public void setAllowedUnitTypes(List<Integer> allowedUnitTypes) {
+        this.allowedUnitTypes = allowedUnitTypes;
     }
 }
