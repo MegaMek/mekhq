@@ -376,7 +376,7 @@ public class UnitOrder extends Unit implements IAcquisitionWork, MekHqXmlSeriali
             }
         } catch (Exception ex) {
             // Doh!
-            MekHQ.getLogger().log(UnitOrder.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(UnitOrder.class, METHOD_NAME, ex);
         }
         
         retVal.initializeParts(false);

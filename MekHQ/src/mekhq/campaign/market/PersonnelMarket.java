@@ -283,7 +283,7 @@ public class PersonnelMarket {
                         MekHQ.getLogger().log(PersonnelMarket.class, METHOD_NAME, LogLevel.ERROR,
                                 "Unable to load entity: " + ms.getSourceFile() + ": " //$NON-NLS-1$
                                         + ms.getEntryName() + ": " + ex.getMessage()); //$NON-NLS-1$
-                        MekHQ.getLogger().log(PersonnelMarket.class, METHOD_NAME, ex);
+                        MekHQ.getLogger().error(PersonnelMarket.class, METHOD_NAME, ex);
         			}
                     if (null != en) {
                     	retVal.attachedEntities.put(id, en);
@@ -308,7 +308,7 @@ public class PersonnelMarket {
         	// Errrr, apparently either the class name was invalid...
         	// Or the listed name doesn't exist.
         	// Doh!
-            MekHQ.getLogger().log(PersonnelMarket.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(PersonnelMarket.class, METHOD_NAME, ex);
         }
 
         // All personnel need the rank reference fixed

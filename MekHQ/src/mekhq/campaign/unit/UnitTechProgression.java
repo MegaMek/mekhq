@@ -119,7 +119,7 @@ public class UnitTechProgression {
         } catch (InterruptedException e) {
             task.cancel(true);
         } catch (ExecutionException e) {
-            MekHQ.getLogger().log(UnitTechProgression.class,
+            MekHQ.getLogger().error(UnitTechProgression.class,
                     "getProgression(MechSummary,int,boolean)", e);
         }
         return null;
@@ -137,7 +137,7 @@ public class UnitTechProgression {
         } catch (EntityLoadingException ex) {
             MekHQ.getLogger().log(BuildMapTask.class, METHOD_NAME, LogLevel.ERROR,
                     "Exception loading entity " + ms.getName());
-            MekHQ.getLogger().log(BuildMapTask.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(BuildMapTask.class, METHOD_NAME, ex);
             return null;
         }
     }

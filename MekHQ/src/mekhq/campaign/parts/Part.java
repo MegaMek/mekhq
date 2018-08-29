@@ -801,7 +801,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 			// Errrr, apparently either the class name was invalid...
 			// Or the listed name doesn't exist.
 			// Doh!
-		    MekHQ.getLogger().log(Part.class, METHOD_NAME, ex);
+		    MekHQ.getLogger().error(Part.class, METHOD_NAME, ex);
 		}
 
 		// Refit protection of unit id

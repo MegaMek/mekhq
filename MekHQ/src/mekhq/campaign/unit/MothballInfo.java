@@ -186,7 +186,7 @@ public class MothballInfo implements MekHqXmlSerializable {
             }
         } catch (Exception ex) {
             // Doh!
-            MekHQ.getLogger().log(Unit.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(Unit.class, METHOD_NAME, ex);
         }
         
         return retVal;

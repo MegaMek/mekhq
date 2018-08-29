@@ -137,7 +137,7 @@ public class Ranks {
             // Parse using builder to get DOM representation of the XML file
             xmlDoc = db.parse(fis);
         } catch (Exception ex) {
-            MekHQ.getLogger().log(Ranks.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(Ranks.class, METHOD_NAME, ex);
         }
     
         Element ranksEle = xmlDoc.getDocumentElement();
@@ -515,7 +515,7 @@ public class Ranks {
             // Errrr, apparently either the class name was invalid...
             // Or the listed name doesn't exist.
             // Doh!
-            MekHQ.getLogger().log(Ranks.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(Ranks.class, METHOD_NAME, ex);
         }
         
         return retVal;

@@ -218,7 +218,7 @@ public class GMToolsDialog extends JDialog implements ActionListener {
                     MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
                             "Failed to load entity " + ms.getName() + " from " //$NON-NLS-1$
                                     + ms.getSourceFile().toString()); //$NON-NLS-1$
-                    MekHQ.getLogger().log(getClass(), METHOD_NAME, e1);
+                    MekHQ.getLogger().error(getClass(), METHOD_NAME, e1);
                     unitPicked.setText("Failed to load entity " + ms.getName());
                 }
             }

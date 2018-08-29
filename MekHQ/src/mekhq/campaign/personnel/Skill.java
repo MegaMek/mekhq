@@ -199,7 +199,7 @@ public class Skill implements Serializable, MekHqXmlSerializable {
             // Errrr, apparently either the class name was invalid...
             // Or the listed name doesn't exist.
             // Doh!
-            MekHQ.getLogger().log(Skill.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(Skill.class, METHOD_NAME, ex);
         }
         
         return retVal;
