@@ -2846,18 +2846,47 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public void awardTrainingXP(Lance l) {
+        awardTrainingXPByMaximumRole(l);
+    }
+
+    /**
+     * Awards XP to the lance based on the maximum experience level of its
+     * commanding officer and the minumum experience level of the unit's
+     * members.
+     * @param l The {@link Lance} to calculate XP to award for training.
+     */
+    private void awardTrainingXPByMaximumRole(Lance l) {
         for (UUID trainerId : forceIds.get(l.getForceId()).getAllUnits()) {
-            if (getUnit(trainerId).getCommander() != null && getUnit(trainerId).getCommander().getRank().isOfficer()
-                    && getUnit(trainerId).getCommander().getExperienceLevel(false) > SkillType.EXP_REGULAR) {
-                for (UUID traineeId : forceIds.get(l.getForceId()).getAllUnits()) {
-                    for (Person p : getUnit(traineeId).getCrew()) {
-                        if (p.getExperienceLevel(false) < SkillType.EXP_REGULAR) {
-                            p.setXp(p.getXp() + 1);
-                            addReport(p.getHyperlinkedName() + " has gained 1 XP from training.");
+            Person commander = getUnit(trainerId).getCommander();
+            // AtB 2.31: Training lance – needs a officer with Veteran skill levels
+            //           and adds 1xp point to every Green skilled unit.
+            if (commander != null && commander.getRank().isOfficer()) {
+                // Take the maximum of the commander's Primary and Secondary Role
+                // experience to calculate their experience level...
+                int commanderExperience = Math.max(commander.getExperienceLevel(false),
+                        commander.getExperienceLevel(true));
+                if (commanderExperience > SkillType.EXP_REGULAR) {
+                    // ...and if the commander is better than a veteran, find all of
+                    // the personnel under their command...
+                    for (UUID traineeId : forceIds.get(l.getForceId()).getAllUnits()) {
+                        for (Person p : getUnit(traineeId).getCrew()) {
+                            if (p == commander) {
+                                continue;
+                            }
+                            // ...and if their weakest role is Green or Ultra-Green
+                            int experienceLevel = Math.min(p.getExperienceLevel(false),
+                                    p.getSecondaryRole() != Person.T_NONE
+                                            ? p.getExperienceLevel(true)
+                                            : SkillType.EXP_ELITE);
+                            if (experienceLevel >= 0 && experienceLevel < SkillType.EXP_REGULAR) {
+                                // ...add one XP.
+                                p.setXp(p.getXp() + 1);
+                                addReport(p.getHyperlinkedName() + " has gained 1 XP from training.");
+                            }
                         }
                     }
+                    break;
                 }
-                break;
             }
         }
     }
