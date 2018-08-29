@@ -18,6 +18,8 @@
  */
 package mekhq.io;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.function.Predicate;
 
 /**
@@ -68,21 +70,15 @@ import java.util.function.Predicate;
     /**
      * Value for campaign files.
      */
-    CPNX("Campaign file", fn -> (fn.toLowerCase().endsWith(".cpnx") || fn.toLowerCase().endsWith(".xml")), "cpnx");   //$NON-NLS-2$//$NON-NLS-3$//$NON-NLS-4$
+    CPNX("Campaign file", "cpnx", "xml"); //$NON-NLS-2$ //$NON-NLS-3$
 
-    private FileType(String description, String extension) {
-        this(description, fn -> fn.toLowerCase().endsWith("." + extension), extension); //$NON-NLS-1$
-    }
-
-    private FileType(String description, Predicate<String> nameFilter, String recommendedExtension) {
+    private FileType(String description, String... extensions) {
         this.description = description;
-        this.nameFilter = nameFilter;
-        this.recommendedExtension = recommendedExtension;
+        this.extensions = Arrays.asList(extensions);
     }
 
     private final String description;
-    private final Predicate<String> nameFilter;
-    private final String recommendedExtension;
+    private final List<String> extensions;
 
     /**
      * @return the description of this file type
@@ -92,17 +88,31 @@ import java.util.function.Predicate;
     }
 
     /**
-     * @return a matcher to filter files of this type based on the file name
+     * @return what extensions the files of type usually have
      */
-    public Predicate<String> getNameFilter() {
-        return nameFilter;
+    public List<String> getExtensions() {
+        return extensions;
     }
 
     /**
      * @return the recommended extension for files of this type
      */
     public String getRecommendedExtension() {
-        return recommendedExtension;
+        return extensions.get(0);
+    }
+
+    /**
+     * @return a matcher to filter files of this type based on the file name
+     */
+    public Predicate<String> getNameFilter() {
+        return fileName -> {
+            int lastDotIdx = fileName.lastIndexOf('.');
+            if (lastDotIdx < 0) {
+                return true;
+            } else {
+                return extensions.contains(fileName.substring(lastDotIdx +1).toLowerCase());
+            }
+        };
     }
 
 }
