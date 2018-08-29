@@ -33,6 +33,7 @@ import megamek.common.MiscType;
 import megamek.common.Mounted;
 import megamek.common.TechAdvancement;
 import megamek.common.WeaponType;
+import megamek.common.logging.LogLevel;
 import megamek.common.weapons.bayweapons.BayWeapon;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
@@ -96,7 +97,7 @@ public class EquipmentPart extends Part {
 	        try {
 	        	equipTonnage = type.getTonnage(null);
 	        } catch(NullPointerException ex) {
-	        	//System.out.println("Found a null entity while calculating tonnage for " + name);
+	            MekHQ.getLogger().error(EquipmentPart.class, "EquipmentPart", ex);
 	        }
         }
     }
@@ -573,7 +574,7 @@ public class EquipmentPart extends Part {
         }
         if (varCost == 0) {
           // if we don't know what it is...
-          System.out.println("I don't know how much " + name + " costs.");
+          MekHQ.getLogger().log(EquipmentPart.class, "resolveVariableCost", LogLevel.WARNING, "I don't know how much " + name + " costs.");
         }
         return (int) Math.ceil(varCost);
     }

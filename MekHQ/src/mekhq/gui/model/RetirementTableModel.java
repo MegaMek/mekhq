@@ -22,6 +22,7 @@ import megamek.common.Tank;
 import megamek.common.TargetRoll;
 import megamek.common.UnitType;
 import mekhq.IconPackage;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
@@ -173,7 +174,7 @@ public class RetirementTableModel extends AbstractTableModel {
         try {
             retVal = getValueAt(0, col).getClass();
         } catch (NullPointerException e) {
-            System.out.println("NPE at column " + colNames[col]);
+            MekHQ.getLogger().error(RetirementTableModel.class, "getColumnClass", e);
         }
         return retVal;
     }
