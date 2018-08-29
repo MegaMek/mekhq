@@ -8836,7 +8836,7 @@ public class Campaign implements Serializable, ITechManager {
         int minutesUsed = u.getMaintenanceTime();
         int astechsUsed = getAvailableAstechs(minutesUsed, false);
         boolean maintained = null != tech
-                && tech.getMinutesLeft() > minutesUsed && !tech.isMothballing();
+                && tech.getMinutesLeft() >= minutesUsed && !tech.isMothballing();
         boolean paidMaintenance = true;
         if (maintained) {
             // use the time
