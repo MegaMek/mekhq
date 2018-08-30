@@ -1428,6 +1428,7 @@ public class Campaign implements Serializable, ITechManager {
         }
         // Makes no sense buying those separately from the chasis
         if((p instanceof EquipmentPart)
+                && ((EquipmentPart) p).getType() != null
                 && (((EquipmentPart) p).getType().hasFlag(MiscType.F_CHASSIS_MODIFICATION)))
         {
             return null;
