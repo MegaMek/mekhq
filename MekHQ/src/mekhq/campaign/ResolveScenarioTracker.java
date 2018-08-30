@@ -111,7 +111,7 @@ public class ResolveScenarioTracker {
 
     Campaign campaign;
     Scenario scenario;
-    Optional<File> unitList;
+    Optional<File> unitList = Optional.empty();
     Client client;
     Boolean control;
     private GameVictoryEvent victoryEvent;
