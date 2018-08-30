@@ -727,12 +727,12 @@ public class CampaignXmlParser {
         timestamp = System.currentTimeMillis();
         
         //unload any ammo bins in the warehouse
-        ArrayList<AmmoBin> binsToUnload = new ArrayList<AmmoBin>();
-        retVal.getSparePartsEx()
-              .filter((Part prt) -> prt instanceof AmmoBin && !prt.isReservedForRefit() && ((AmmoBin) prt).getShotsNeeded() == 0)
-              .forEach((Part prt) -> binsToUnload.add((AmmoBin)prt));
-        for(AmmoBin bin : binsToUnload) {
-            bin.unload();
+        for (Part sparePart : retVal.getSpareParts()) {
+            if (sparePart instanceof AmmoBin 
+                && !sparePart.isReservedForRefit()
+                && ((AmmoBin) sparePart).getShotsNeeded() == 0) {
+                ((AmmoBin) sparePart).unload();
+            }
         }
 
         MekHQ.getLogger().log(CampaignXmlParser.class, METHOD_NAME, LogLevel.INFO,

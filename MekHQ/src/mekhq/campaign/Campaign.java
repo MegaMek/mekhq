@@ -220,6 +220,7 @@ public class Campaign implements Serializable, ITechManager {
     private Map<UUID, Person> personnel = new LinkedHashMap<>();
     private Map<UUID, Ancestors> ancestors = new LinkedHashMap<>();
     private TreeMap<Integer, Part> parts = new TreeMap<>();
+    private List<Part> spareParts = new ArrayList<>();
     private TreeMap<Integer, Force> forceIds = new TreeMap<>();
     private TreeMap<Integer, Mission> missions = new TreeMap<>();
     private TreeMap<Integer, Scenario> scenarios = new TreeMap<>();
@@ -1434,6 +1435,9 @@ public class Campaign implements Serializable, ITechManager {
             }
         }
         parts.put(Integer.valueOf(id), p);
+        if (p.isSpare()) {
+            spareParts.add(p);
+        }
         lastPartId = id;
         MekHQ.triggerEvent(new PartNewEvent(p));
     }
@@ -1527,6 +1531,9 @@ public class Campaign implements Serializable, ITechManager {
 
         lastPartId = Math.max(lastPartId, p.getId());
         parts.put(p.getId(), p);
+        if (p.isSpare()) {
+            spareParts.add(p);
+        }
         MekHQ.triggerEvent(new PartNewEvent(p));
     }
 
@@ -3310,6 +3317,9 @@ public class Campaign implements Serializable, ITechManager {
             return;
         }
         parts.remove(Integer.valueOf(part.getId()));
+        if (part.isSpare()) {
+            spareParts.remove(part);
+        }
         //remove child parts as well
         for(int childId : part.getChildPartIds()) {
             Part childPart = getPart(childId);
@@ -3610,19 +3620,8 @@ public class Campaign implements Serializable, ITechManager {
         colorIndex = index;
     }
 
-    public ArrayList<Part> getSpareParts() {
-
-        ArrayList<Part> spares = new ArrayList<Part>();
-        for (Part part : getParts()) {
-            if (part.isSpare()) {
-                spares.add(part);
-            }
-        }
-        return spares;
-    }
-
-    public Stream<Part> getSparePartsEx() {
-        return parts.values().stream().filter((Part p) -> p.isSpare());
+    public List<Part> getSpareParts() {
+        return Collections.unmodifiableList(spareParts);
     }
 
     public void addFunds(long quantity) {
@@ -6256,9 +6255,8 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public Part checkForExistingSparePart(Part part) {
-        for (Part spare : parts.values()) {
-            if (!spare.isSpare() 
-                || spare.getId() == part.getId()) {
+        for (Part spare : spareParts) {
+            if (spare.getId() == part.getId()) {
                 continue;
             }
             if (part.isSamePartTypeAndStatus(spare)) {
