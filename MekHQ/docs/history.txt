@@ -20,7 +20,8 @@ v0.45.1-git
 + PR #807: Cosmetic and accuracy improvements to AtB contract profit estimate display (in the contract market)
 + Issue #895: Fix invariant to check if tech time available for maintenance.
 + Issue #853: Do not report on the part's unit if not present during multi-day repairs.
-+ Issue #849: Consider a person's secondary role during training XP calculations
++ Issue #849: Consider a person's secondary role during training XP calculations.
++ Issue #836: Use native file dialogs and remember the last used folder.
 
 v0.45.0 (2018-08-02 0200 UTC)
 + PR #602: Add KIA checkbox and functionality to prisoners during scenario resolution.
