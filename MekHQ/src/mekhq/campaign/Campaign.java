@@ -2739,6 +2739,12 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public long getPayRoll(boolean noInfantry) {
+        if(!campaignOptions.payForSalaries()) return 0;
+
+        return getTheoreticalPayroll(noInfantry);
+    }
+
+    private long getTheoreticalPayroll(boolean noInfantry){
         long salaries = 0;
         for (Person p : getPersonnel()) {
             // Optionized infantry (Unofficial)
@@ -2761,10 +2767,12 @@ public class Campaign implements Serializable, ITechManager {
 
     public long getMaintenanceCosts() {
         long costs = 0;
-        for (Map.Entry<UUID, Unit> mu : units.entrySet()) {
-            Unit u = mu.getValue();
-            if (u.requiresMaintenance() && null != u.getTech()) {
-                costs += u.getMaintenanceCost();
+        if(campaignOptions.payForMaintain()) {
+            for (Map.Entry<UUID, Unit> mu : units.entrySet()) {
+                Unit u = mu.getValue();
+                if (u.requiresMaintenance() && null != u.getTech()) {
+                    costs += u.getMaintenanceCost();
+                }
             }
         }
         return costs;
@@ -2779,7 +2787,9 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public long getOverheadExpenses() {
-        return (long) (getPayRoll() * 0.05);
+        if(!campaignOptions.payForOverhead()) return 0;
+
+        return (long) (getTheoreticalPayroll(false) * 0.05);
     }
 
     public void removeUnit(UUID id) {
@@ -5351,7 +5361,7 @@ public class Campaign implements Serializable, ITechManager {
         return plntNames;
     }
 
-    public Planet getPlanet(String name) {
+    public Planet getPlanetByName(String name) {
         return Planets.getInstance().getPlanetByName(name, Utilities.getDateTimeDay(calendar));
     }
 
@@ -7952,7 +7962,7 @@ public class Campaign implements Serializable, ITechManager {
         } else if (getCampaignOptions().useEquipmentContractBase()) {
             return getForceValue(getCampaignOptions().useInfantryDontCount());
         } else {
-            return getPayRoll(getCampaignOptions().useInfantryDontCount());
+            return getTheoreticalPayroll(getCampaignOptions().useInfantryDontCount());
         }
     }
 
