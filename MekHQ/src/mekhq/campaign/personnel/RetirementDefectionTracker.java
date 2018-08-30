@@ -112,7 +112,7 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
 		} catch (Exception e) {
             MekHQ.getLogger().log(RetirementDefectionTracker.class, METHOD_NAME, LogLevel.ERROR,
                     "Error parsing net worth in financial report"); //$NON-NLS-1$
-            MekHQ.getLogger().log(RetirementDefectionTracker.class, METHOD_NAME, e);
+            MekHQ.getLogger().error(RetirementDefectionTracker.class, METHOD_NAME, e);
 		}
 		int totalShares = 0;
 		for (Person p : campaign.getActivePersonnel()) {
@@ -725,7 +725,7 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
             // Errrr, apparently either the class name was invalid...
             // Or the listed name doesn't exist.
             // Doh!
-            MekHQ.getLogger().log(RetirementDefectionTracker.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(RetirementDefectionTracker.class, METHOD_NAME, ex);
         }
 
         return retVal;

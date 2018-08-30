@@ -709,7 +709,7 @@ public class AtBContract extends Contract implements Serializable {
                     en = null;
                     MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
                             "Unable to load entity: " + msl.get(0).getSourceFile() + ": " + msl.get(0).getEntryName() + ": " + ex.getMessage()); //$NON-NLS-1$
-                    MekHQ.getLogger().log(getClass(), METHOD_NAME, ex);
+                    MekHQ.getLogger().error(getClass(), METHOD_NAME, ex);
                 }
                 
             }

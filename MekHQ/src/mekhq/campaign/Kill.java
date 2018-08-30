@@ -127,7 +127,7 @@ public class Kill implements Serializable {
 			// Errrr, apparently either the class name was invalid...
 			// Or the listed name doesn't exist.
 			// Doh!
-		    MekHQ.getLogger().log(Kill.class, METHOD_NAME, ex);
+		    MekHQ.getLogger().error(Kill.class, METHOD_NAME, ex);
 		}
 		return retVal;
 	}

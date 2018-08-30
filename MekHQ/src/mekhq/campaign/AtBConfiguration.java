@@ -173,7 +173,7 @@ public class AtBConfiguration implements Serializable {
 					} catch (ParseException ex) {
                         MekHQ.getLogger().log(getClass(), METHOD_NAME,
                                 LogLevel.ERROR, "Error parsing default date for hiring hall on " + fields[2]); //$NON-NLS-1$
-                        MekHQ.getLogger().log(getClass(), METHOD_NAME, ex); //$NON-NLS-1$
+                        MekHQ.getLogger().error(getClass(), METHOD_NAME, ex);
 					}
 				}
 				break;
@@ -364,7 +364,7 @@ public class AtBConfiguration implements Serializable {
 			retVal.setAllValuesToDefaults();
 			return retVal;
 		} catch (Exception ex) {
-            MekHQ.getLogger().log(AtBConfiguration.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(AtBConfiguration.class, METHOD_NAME, ex);
 			return retVal;
 		}
 		
@@ -442,7 +442,7 @@ public class AtBConfiguration implements Serializable {
 				} catch (Exception ex) {
                     MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
                             "Could not parse weight class attribute for enemy forces table"); //$NON-NLS-1$
-                    MekHQ.getLogger().log(getClass(), METHOD_NAME, ex);
+                    MekHQ.getLogger().error(getClass(), METHOD_NAME, ex);
 				}							
 			}
 		}
@@ -475,7 +475,7 @@ public class AtBConfiguration implements Serializable {
 						} catch (ParseException ex) {
 		                    MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
 		                            "Error parsing date for hiring hall on " + wn2.getTextContent()); //$NON-NLS-1$
-		                    MekHQ.getLogger().log(getClass(), METHOD_NAME, ex);
+		                    MekHQ.getLogger().error(getClass(), METHOD_NAME, ex);
 						}
 						hiringHalls.add(new DatedRecord<String>(start, end, wn2.getTextContent()));
 						break;

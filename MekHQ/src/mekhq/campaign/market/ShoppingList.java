@@ -208,7 +208,7 @@ public class ShoppingList implements MekHqXmlSerializable {
             }
         } catch (Exception ex) {
             // Doh!
-            MekHQ.getLogger().log(ShoppingList.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(ShoppingList.class, METHOD_NAME, ex);
         }
 
         return retVal;

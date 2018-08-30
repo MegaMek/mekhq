@@ -663,7 +663,7 @@ public class Campaign implements Serializable, ITechManager {
         } catch (Exception ex) {
             MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
                     "Unable to load unit: " + ms.getEntryName()); //$NON-NLS-1$
-            MekHQ.getLogger().log(getClass(), METHOD_NAME, ex);
+            MekHQ.getLogger().error(getClass(), METHOD_NAME, ex);
         }
         Entity en = mechFileParser.getEntity();
 
@@ -2739,6 +2739,12 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public long getPayRoll(boolean noInfantry) {
+        if(!campaignOptions.payForSalaries()) return 0;
+
+        return getTheoreticalPayroll(noInfantry);
+    }
+
+    private long getTheoreticalPayroll(boolean noInfantry){
         long salaries = 0;
         for (Person p : getPersonnel()) {
             // Optionized infantry (Unofficial)
@@ -2761,10 +2767,12 @@ public class Campaign implements Serializable, ITechManager {
 
     public long getMaintenanceCosts() {
         long costs = 0;
-        for (Map.Entry<UUID, Unit> mu : units.entrySet()) {
-            Unit u = mu.getValue();
-            if (u.requiresMaintenance() && null != u.getTech()) {
-                costs += u.getMaintenanceCost();
+        if(campaignOptions.payForMaintain()) {
+            for (Map.Entry<UUID, Unit> mu : units.entrySet()) {
+                Unit u = mu.getValue();
+                if (u.requiresMaintenance() && null != u.getTech()) {
+                    costs += u.getMaintenanceCost();
+                }
             }
         }
         return costs;
@@ -2779,7 +2787,9 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public long getOverheadExpenses() {
-        return (long) (getPayRoll() * 0.05);
+        if(!campaignOptions.payForOverhead()) return 0;
+
+        return (long) (getTheoreticalPayroll(false) * 0.05);
     }
 
     public void removeUnit(UUID id) {
@@ -3394,7 +3404,7 @@ public class Campaign implements Serializable, ITechManager {
         try {
             mechFileParser = new MechFileParser(mechSummary.getSourceFile());
         } catch (EntityLoadingException ex) {
-            MekHQ.getLogger().log(Campaign.class, "getBrandNewUndamagedEntity(String)", ex);
+            MekHQ.getLogger().error(Campaign.class, "getBrandNewUndamagedEntity(String)", ex);
         }
         if (mechFileParser == null) {
             return null;
@@ -3685,7 +3695,7 @@ public class Campaign implements Serializable, ITechManager {
             try {
                 mechFileParser = new MechFileParser(ms.getSourceFile());
             } catch (EntityLoadingException ex) {
-                MekHQ.getLogger().log(Campaign.class, "writeCustoms(PrintWriter)", ex);
+                MekHQ.getLogger().error(Campaign.class, "writeCustoms(PrintWriter)", ex);
             }
             if (mechFileParser == null) {
                 continue;
@@ -3742,7 +3752,7 @@ public class Campaign implements Serializable, ITechManager {
             // Parse using builder to get DOM representation of the XML file
             xmlDoc = db.parse(fis);
         } catch (Exception ex) {
-            MekHQ.getLogger().log(Campaign.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(Campaign.class, METHOD_NAME, ex);
         }
 
         Element campaignEle = xmlDoc.getDocumentElement();
@@ -5351,7 +5361,7 @@ public class Campaign implements Serializable, ITechManager {
         return plntNames;
     }
 
-    public Planet getPlanet(String name) {
+    public Planet getPlanetByName(String name) {
         return Planets.getInstance().getPlanetByName(name, Utilities.getDateTimeDay(calendar));
     }
 
@@ -7829,7 +7839,7 @@ public class Campaign implements Serializable, ITechManager {
         }
 
         inventory.setSupply(nSupply);
-        inventory.setSupply(nTransit);
+        inventory.setTransit(nTransit);
 
         int nOrdered = 0;
         IAcquisitionWork onOrder = getShoppingList().getShoppingItem(part);
@@ -7952,7 +7962,7 @@ public class Campaign implements Serializable, ITechManager {
         } else if (getCampaignOptions().useEquipmentContractBase()) {
             return getForceValue(getCampaignOptions().useInfantryDontCount());
         } else {
-            return getPayRoll(getCampaignOptions().useInfantryDontCount());
+            return getTheoreticalPayroll(getCampaignOptions().useInfantryDontCount());
         }
     }
 

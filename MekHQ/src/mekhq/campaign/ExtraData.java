@@ -89,7 +89,7 @@ public class ExtraData {
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
             u = context.createUnmarshaller();
         } catch(Exception ex) {
-            MekHQ.getLogger().log(ExtraData.class, "<init>", ex);
+            MekHQ.getLogger().error(ExtraData.class, "<init>", ex);
         }
         marshaller = m;
         unmarshaller = u;
@@ -179,7 +179,7 @@ public class ExtraData {
         try {
             marshaller.marshal(this, writer);
         } catch(JAXBException e) {
-            MekHQ.getLogger().log(getClass(), "writeToXml(Writer)", e);
+            MekHQ.getLogger().error(getClass(), "writeToXml(Writer)", e);
         }
     }
     
@@ -187,7 +187,7 @@ public class ExtraData {
         try {
             marshaller.marshal(this, os);
         } catch(JAXBException e) {
-            MekHQ.getLogger().log(getClass(), "writeToXml(OutputStream)", e);
+            MekHQ.getLogger().error(getClass(), "writeToXml(OutputStream)", e);
         }
     }
     
@@ -195,7 +195,7 @@ public class ExtraData {
         try {
             return (ExtraData) unmarshaller.unmarshal(wn);
         } catch(JAXBException e) {
-            MekHQ.getLogger().log(ExtraData.class, "createFromXml(Node)", e);
+            MekHQ.getLogger().error(ExtraData.class, "createFromXml(Node)", e);
             return null;
         }
     }

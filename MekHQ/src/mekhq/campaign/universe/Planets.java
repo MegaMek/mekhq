@@ -116,7 +116,7 @@ public class Planets {
                     Thread.sleep(10);
                 }
             } catch(InterruptedException iex) {
-                MekHQ.getLogger().log(Planets.class, "reload(boolean)", iex); //$NON-NLS-1$
+                MekHQ.getLogger().error(Planets.class, "reload(boolean)", iex); //$NON-NLS-1$
             }
         }
     }
@@ -282,7 +282,7 @@ public class Planets {
         try {
             marshaller.marshal(planet, out);
         } catch (Exception e) {
-            MekHQ.getLogger().log(getClass(), "writePlanet(OutputStream,Planet)", e); //$NON-NLS-1$
+            MekHQ.getLogger().error(getClass(), "writePlanet(OutputStream,Planet)", e); //$NON-NLS-1$
         }
     }
     
@@ -290,7 +290,7 @@ public class Planets {
         try {
             marshaller.marshal(planet, out);
         } catch (Exception e) {
-            MekHQ.getLogger().log(getClass(), "writePlanet(Writer,Planet)", e); //$NON-NLS-1$
+            MekHQ.getLogger().error(getClass(), "writePlanet(Writer,Planet)", e); //$NON-NLS-1$
         }
     }
     
@@ -299,7 +299,7 @@ public class Planets {
         try {
             marshaller.marshal(event, out);
         } catch (Exception e) {
-            MekHQ.getLogger().log(getClass(), "writePlanet(OutputStream,Planet.PlanetaryEvent)", e); //$NON-NLS-1$
+            MekHQ.getLogger().error(getClass(), "writePlanet(OutputStream,Planet.PlanetaryEvent)", e); //$NON-NLS-1$
         }
     }
     
@@ -307,7 +307,7 @@ public class Planets {
         try {
             marshaller.marshal(event, out);
         } catch (Exception e) {
-            MekHQ.getLogger().log(getClass(), "writePlanet(Writer,Planet.PlanetaryEvent)", e); //$NON-NLS-1$
+            MekHQ.getLogger().error(getClass(), "writePlanet(Writer,Planet.PlanetaryEvent)", e); //$NON-NLS-1$
         }
     }
     
@@ -315,7 +315,7 @@ public class Planets {
         try {
             return (Planet.PlanetaryEvent) unmarshaller.unmarshal(node);
         } catch (JAXBException e) {
-            MekHQ.getLogger().log(getClass(), "readPlanetaryEvent(Node)", e); //$NON-NLS-1$
+            MekHQ.getLogger().error(getClass(), "readPlanetaryEvent(Node)", e); //$NON-NLS-1$
         }
         return null;
     }
@@ -326,7 +326,7 @@ public class Planets {
         try {
             marshaller.marshal(temp, out);
         } catch (Exception e) {
-            MekHQ.getLogger().log(getClass(), "writePlanets(OutputStream,List<Planet>)", e); //$NON-NLS-1$
+            MekHQ.getLogger().error(getClass(), "writePlanets(OutputStream,List<Planet>)", e); //$NON-NLS-1$
         }
     }
     
@@ -336,7 +336,7 @@ public class Planets {
         try {
             generatePlanets();
         } catch (ParseException e) {
-            MekHQ.getLogger().log(getClass(), "initialize()", e); //$NON-NLS-1$
+            MekHQ.getLogger().error(getClass(), "initialize()", e); //$NON-NLS-1$
         }
     }
     
@@ -703,7 +703,7 @@ public class Planets {
             try(FileInputStream fis = new FileInputStream(defaultFilePath)) { //$NON-NLS-1$
                 updatePlanets(fis);
             } catch (Exception ex) {
-                MekHQ.getLogger().log(getClass(), METHOD_NAME, ex);
+                MekHQ.getLogger().error(getClass(), METHOD_NAME, ex);
             }
             
             // Step 3: Load all the xml files within the planets subdirectory, if it exists

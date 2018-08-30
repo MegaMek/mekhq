@@ -16,6 +16,8 @@ v0.45.1-git
 + Issue #858: Escaped XML was not correctly unescaped in LogEntry.generateInstanceFromXML()
 + PR #894: Fixes generation of AtBContracts with 0 req. lances
 + PR #121: allow purchasing and adding of parts en-masse
++ Issue #855: Fixed parts in transit not displaying correctly (showing up as "OmniPod")
++ PR #807: Cosmetic and accuracy improvements to AtB contract profit estimate display (in the contract market)
 
 v0.45.0 (2018-08-02 0200 UTC)
 + PR #602: Add KIA checkbox and functionality to prisoners during scenario resolution.

@@ -1779,7 +1779,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 			}
 		} catch (Exception ex) {
 			// Doh!
-            MekHQ.getLogger().log(Refit.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(Refit.class, METHOD_NAME, ex);
 		}
 
 		return retVal;
