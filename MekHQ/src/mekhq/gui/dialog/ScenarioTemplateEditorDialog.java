@@ -9,11 +9,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
@@ -25,12 +25,10 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.border.LineBorder;
-import javax.xml.bind.JAXBException;
 
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.ScenarioForceTemplate;
 import mekhq.campaign.mission.ScenarioTemplate;
-import mekhq.gui.CampaignFileFilter;
 
 /**
  * Handles editing, saving and loading of scenario template definitions.
@@ -54,6 +52,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
     JComboBox<String> cboDestinationZone;
     JSpinner spnRetreatThreshold;
     JList<String> lstUnitTypes;
+    JCheckBox chkReinforce;
     JPanel panForceList;
     JTextField txtScenarioName;
     JTextArea txtScenarioBriefing;
@@ -108,6 +107,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         getContentPane().add(lblScenarioName, gbc);
         
         txtScenarioName = new JTextField(80);
+        txtScenarioName.setText(scenarioTemplate.name);
         gbc.gridy++;
         getContentPane().add(txtScenarioName, gbc);
         
@@ -118,6 +118,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         txtScenarioBriefing = new JTextArea(3, 80);
         txtScenarioBriefing.setEditable(true);
         txtScenarioBriefing.setLineWrap(true);
+        txtScenarioBriefing.setText(scenarioTemplate.shortBriefing);
         gbc.gridy++;
         getContentPane().add(txtScenarioBriefing, gbc);
         
@@ -126,8 +127,9 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         getContentPane().add(lblLongBriefing, gbc);
         
         txtLongBriefing = new JTextArea(5, 80);
-        txtScenarioBriefing.setEditable(true);
-        txtScenarioBriefing.setLineWrap(true);
+        txtLongBriefing.setEditable(true);
+        txtLongBriefing.setLineWrap(true);
+        txtLongBriefing.setText(scenarioTemplate.detailedBriefing);
         gbc.gridy++;
         getContentPane().add(txtLongBriefing, gbc);
     }
@@ -171,6 +173,10 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         JLabel lblAllowedUnitTypes = new JLabel("Allowed Unit Types");
         gbc.gridx++;
         getContentPane().add(lblAllowedUnitTypes, gbc);
+        
+        JLabel lblCanReinforceLinked = new JLabel("<html>Can reinforce<br/>subsequent scenarios</html>");
+        gbc.gridx++;
+        getContentPane().add(lblCanReinforceLinked, gbc);
     }
   
     /**
@@ -223,6 +229,10 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         gbc.gridx++;
         getContentPane().add(lstUnitTypes, gbc);
         
+        chkReinforce = new JCheckBox();
+        gbc.gridx++;
+        getContentPane().add(chkReinforce, gbc);
+        
         JButton btnAdd = new JButton("Add");
         btnAdd.setActionCommand(ADD_FORCE_COMMAND);
         btnAdd.addActionListener(this);
@@ -232,11 +242,12 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         
     /**
      * Worker function called when initializing the dialog to place the force template list on the content pane.
-     * @param gbc Grid bag contraints.
+     * @param gbc Grid bag constraints.
      */
     private void initializeForceList(GridBagConstraints gbc) {
         gbc.gridx = 0;
         gbc.gridy++;
+        gbc.gridwidth = GridBagConstraints.REMAINDER;
         panForceList = new JPanel(new GridBagLayout());
         panForceList.setBorder(new LineBorder(Color.GREEN));
 
@@ -265,6 +276,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         
         gbc.gridx++;
         txtBaseWidth = new JTextField(4);
+        txtBaseWidth.setText(String.valueOf(scenarioTemplate.mapParameters.baseWidth));
         getContentPane().add(txtBaseWidth, gbc);
         
         gbc.gridx++;
@@ -278,6 +290,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         for(String terrainType : AtBScenario.terrainTypes) {
             terrainTypeModel.addElement(terrainType);
         }
+        lstAllowedTerrainTypes.setSelectedIndices(scenarioTemplate.mapParameters.getAllowedTerrainTypeArray());
         lstAllowedTerrainTypes.setModel(terrainTypeModel);
         getContentPane().add(lstAllowedTerrainTypes, gbc);
         
@@ -289,6 +302,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         
         gbc.gridx++;
         txtBaseHeight = new JTextField(4);
+        txtBaseHeight.setText(String.valueOf(scenarioTemplate.mapParameters.baseHeight));
         getContentPane().add(txtBaseHeight, gbc);
         
         gbc.gridy++;
@@ -298,6 +312,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         
         gbc.gridx++;
         txtXIncrement = new JTextField(4);
+        txtXIncrement.setText(String.valueOf(scenarioTemplate.mapParameters.widthScalingIncrement));
         getContentPane().add(txtXIncrement, gbc);
         
         gbc.gridy++;
@@ -307,6 +322,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         
         gbc.gridx++;
         txtYIncrement = new JTextField(4);
+        txtYIncrement.setText(String.valueOf(scenarioTemplate.mapParameters.heightScalingIncrement));
         getContentPane().add(txtYIncrement, gbc);
     }
     
@@ -389,6 +405,10 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
             gbc.gridx++;
             panForceList.add(lblAllowedUnitTypes, gbc);
             
+            JLabel lblReinforceLinked = new JLabel(sft.getCanReinforceLinked() ? "Can Reinforce" : "Cannot Reinforce");
+            gbc.gridx++;
+            panForceList.add(lblReinforceLinked, gbc);
+            
             JButton btnRemoveForce = new JButton("Remove");
             btnRemoveForce.setActionCommand(String.format("%s%s", REMOVE_FORCE_COMMAND, forceIndex));
             btnRemoveForce.addActionListener(this);
@@ -398,8 +418,6 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
             gbc.gridy++;
             gbc.gridx = 0;
         }
-        
-        panForceList.setPreferredSize(panForceList.getSize());
     }
     
     /** 
@@ -426,6 +444,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         
         ScenarioForceTemplate sft = new ScenarioForceTemplate(forceAlignment, generationMethod, forceMultiplier,
                 deploymentZones, destinationZone, retreatThreshold, allowedUnitTypes);
+        sft.setCanReinforceLinked(chkReinforce.isSelected());
         scenarioTemplate.scenarioForces.add(sft);
         
         renderForceList();
@@ -476,18 +495,21 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
     }
     
     private void loadTemplateButtonHandler() {
-        JFileChooser saveTemplateChooser = new JFileChooser("./");
-        saveTemplateChooser.setDialogTitle("Save Scenario Template");
-        int returnVal = saveTemplateChooser.showSaveDialog(this);
+        JFileChooser loadTemplateChooser = new JFileChooser("./");
+        loadTemplateChooser.setDialogTitle("Load Scenario Template");
+        int returnVal = loadTemplateChooser.showOpenDialog(this);
 
         if ((returnVal != JFileChooser.APPROVE_OPTION)
-                || (saveTemplateChooser.getSelectedFile() == null)) {
+                || (loadTemplateChooser.getSelectedFile() == null)) {
             return;
         }
 
-        File file = saveTemplateChooser.getSelectedFile();
-        scenarioTemplate.Deserialize(file);
-        this.repaint();
+        File file = loadTemplateChooser.getSelectedFile();
+        scenarioTemplate = ScenarioTemplate.Deserialize(file);
+        getContentPane().removeAll();
+        initComponents();
+        pack();
+        validate();
     }
 
     /**

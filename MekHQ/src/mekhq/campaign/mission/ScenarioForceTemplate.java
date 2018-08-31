@@ -28,6 +28,14 @@ public class ScenarioForceTemplate {
     private int destinationZone;
     private double retreatThreshold;
     private List<Integer> allowedUnitTypes;
+    private boolean canReinforceLinked;
+    
+    /**
+     * Blank constructor for deserialization purposes.
+     */
+    public ScenarioForceTemplate() {
+        
+    }
     
     public ScenarioForceTemplate(int forceAlignment, int generationMethod, double forceMultiplier, List<Integer> deploymentZones,
             int destinationZone, double retreatThreshold, List<Integer> allowedUnitTypes) {
@@ -72,6 +80,10 @@ public class ScenarioForceTemplate {
         return allowedUnitTypes;
     }
     
+    public boolean getCanReinforceLinked() {
+        return canReinforceLinked;
+    }
+    
     public void setForceAlignment(int forceAlignment) {
         this.forceAlignment = forceAlignment;
     }
@@ -98,5 +110,9 @@ public class ScenarioForceTemplate {
     
     public void setAllowedUnitTypes(List<Integer> allowedUnitTypes) {
         this.allowedUnitTypes = allowedUnitTypes;
+    }
+    
+    public void setCanReinforceLinked(boolean canReinforce) {
+        this.canReinforceLinked = canReinforce;
     }
 }

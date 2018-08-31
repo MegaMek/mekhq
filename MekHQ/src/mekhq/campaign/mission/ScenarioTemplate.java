@@ -11,13 +11,16 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.stream.StreamSource;
 
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 
+@XmlRootElement(name="ScenarioTemplate")
 public class ScenarioTemplate {
 
     public String name;
@@ -41,15 +44,19 @@ public class ScenarioTemplate {
         }
     }
     
-    public void Deserialize(File inputFile) {
+    public static ScenarioTemplate Deserialize(File inputFile) {
+        ScenarioTemplate resultingTemplate = null;
+        
         try {
             JAXBContext context = JAXBContext.newInstance(ScenarioTemplate.class);
             Unmarshaller um = context.createUnmarshaller();
-            JAXBElement<ScenarioTemplate> templateElement = (JAXBElement<ScenarioTemplate>) um.unmarshal(inputFile);
-            ScenarioTemplate test = templateElement.getValue();
+            JAXBElement<ScenarioTemplate> templateElement = um.unmarshal(new StreamSource(inputFile), ScenarioTemplate.class);
+            resultingTemplate = templateElement.getValue();
         } catch(Exception e) {
-            MekHQ.getLogger().error(ScenarioTemplate.class, "Serialize", e.getMessage());
+            MekHQ.getLogger().error(ScenarioTemplate.class, "Deserialize", "Error Deserializing Scenario Template", e);
         }
+        
+        return resultingTemplate;
     }
     
 }

@@ -25,4 +25,14 @@ public class ScenarioMapParameters {
     @XmlElementWrapper(name="allowedTerrainTypes")
     @XmlElement(name="allowedTerrainType")
     public List<Integer> allowedTerrainTypes = new ArrayList<>();
+    
+    public int[] getAllowedTerrainTypeArray() {
+        int[] retVal = new int[allowedTerrainTypes.size()];
+        
+        for(int x = 0; x < allowedTerrainTypes.size(); x++) {
+            retVal[x] = allowedTerrainTypes.get(x);
+        }
+        
+        return retVal;
+    }
 }
