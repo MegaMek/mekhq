@@ -23,6 +23,7 @@ v0.45.1-git
 + Issue #849: Consider a person's secondary role during training XP calculations.
 + Issue #836: Use native file dialogs and remember the last used folder.
 + PR #909: Fix NullPointerException in ResolveScenarioTracker.
++ PR #908: Fix NPE in getPartInUse if EquipmentType is null.
 
 v0.45.0 (2018-08-02 0200 UTC)
 + PR #602: Add KIA checkbox and functionality to prisoners during scenario resolution.
