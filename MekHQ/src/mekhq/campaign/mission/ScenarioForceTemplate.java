@@ -16,19 +16,69 @@ public class ScenarioForceTemplate {
     // 6) Allowed unit types - This is a set of unit types of which the force may consist
     
     public static final String[] FORCE_ALIGNMENTS = { "Player", "Allied", "Opposing", "Third" };
-    public static final String[] FORCE_GENERATION_METHODS = { "BV Scaled", "Unit Count Scaled", "Fixed Unit Count" };
-    public static final String[] DEPLOYMENT_ZONES = { "North", "Northeast", "East", "Southeast", "South", "Southwest", "West", "Northwest", "Edge", "Center", "Any" };
-    public static final String[] BOT_DESTINATION_ZONES = { "None", "Short Edge", "North", "East", "South", "West" };
-    public static final String[] UNIT_TYPES = { "Mek", "Vee", "Aero", "Conv. Fighter", "Gun Emplacement", "Infantry", "Battle Armor", "Naval" };
+    public static final String[] FORCE_GENERATION_METHODS = { "Player Deployed", "BV Scaled", "Unit Count Scaled", "Fixed Unit Count" };
+    public static final String[] DEPLOYMENT_ZONES = { "North", "Northeast", "East", "Southeast", "South", "Southwest", "West", "Northwest", "Edge", "Narrow Edge", "Center", "Any" };
+    public static final String[] BOT_DESTINATION_ZONES = { "None", "Other Narrow Edge", "North", "East", "South", "West" };
+    public static final String[] UNIT_TYPES = { "Mek", "Vee", "Aero", "Conv. Fighter", "Gun Emplacement", "Infantry", "Battle Armor", "Naval", "Civilian" };
     
+    /**
+     * The alignment of the force.
+     * Player - the "force" will be added to whatever units the player deploys or *is* the player-controlled force
+     * Allied - a bot-controlled force on the same team as the player
+     * Opposing - a bot-controlled force on the opposite team from the player
+     * Third - a bot-controlled force hostile to both the player and opposing bot
+     */
     private int forceAlignment;
+    
+    /**
+     * The mechanism used to generate the force.
+     * Player Deployed - the player will deploy this force.
+     * BV Scaled - the contents of this force are scaled based on the BV of player and allied forces
+     * Unit Count Scaled - the contents of this force are scaled based on the number of player and allied forces
+     * Fixed Unit Count - this force has a fixed number of units.
+     */
     private int generationMethod;
+    
+    /**
+     * This is used to multiply the BV budget or Unit count of the force if the generation method is scaled.
+     */
     private double forceMultiplier;
+    
+    /**
+     * The possible deployment zones for this force. "Narrow Edge" examines the board and picks one of the edges with the
+     * lowest dimensions.
+     */
     private List<Integer> deploymentZones;
+    
+    /**
+     * The zone to which this force will attempt to move. 
+     */
     private int destinationZone;
+    
+    /**
+     * This force will attempt to retreat after losing the specified percentage of units (by count or BV?)
+     */
     private double retreatThreshold;
+    
+    /**
+     * The unit types that may be generated for this force. 
+     */
     private List<Integer> allowedUnitTypes;
+    
+    /**
+     * Whether this force is allowed to reinforce linked scenarios (as described in the AtB Stratcon rules)
+     */
     private boolean canReinforceLinked;
+    
+    /**
+     * Whether this force contributes to the BV budget if the generation method is BV Scaled
+     */
+    private boolean contributesToBV;
+    
+    /**
+     * Whether this force contributes to the unit count if the generation method is Unit Count Scaled.
+     */
+    private boolean contributesToUnitCount;
     
     /**
      * Blank constructor for deserialization purposes.
@@ -84,6 +134,14 @@ public class ScenarioForceTemplate {
         return canReinforceLinked;
     }
     
+    public boolean getContributesToBV() {
+        return contributesToBV;
+    }
+    
+    public boolean getContributesToUnitCount() {
+        return contributesToUnitCount;
+    }
+    
     public void setForceAlignment(int forceAlignment) {
         this.forceAlignment = forceAlignment;
     }
@@ -114,5 +172,13 @@ public class ScenarioForceTemplate {
     
     public void setCanReinforceLinked(boolean canReinforce) {
         this.canReinforceLinked = canReinforce;
+    }
+    
+    public void setContributesToBV(boolean contributesToBV) {
+        this.contributesToBV = contributesToBV;
+    }
+    
+    public void setContributesToUnitCount(boolean contributesToUnitCount) {
+        this.contributesToUnitCount = contributesToUnitCount;
     }
 }

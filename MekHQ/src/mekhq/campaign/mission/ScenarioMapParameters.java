@@ -17,10 +17,35 @@ public class ScenarioMapParameters {
     // map scaling increment (width/height)
     // allowed terrain types
     
+    /**
+     * The fixed base width/x dimension of the map.
+     */
     public int baseWidth;
+    
+    /**
+     * The fixed base height/y dimension of the map.
+     */
     public int baseHeight;
-    public int widthScalingIncrement;
-    public int heightScalingIncrement;
+    
+    /**
+     * If the player deploys a force larger than a lance, the map will grow horizontally by this many hexes per extra lance
+     */
+    public int widthScalingIncrement = 5;
+    
+    /**
+     * If the player deploys a force larger than a lance, the map will grow vertically by this many hexes per extra lance
+     */
+    public int heightScalingIncrement = 5;
+    
+    /**
+     * Allow the map to potentially (with 50/50 odds) to be rotated 90 degrees. 
+     */
+    public boolean allowRotation;
+    
+    /**
+     * Use the AtB Map Sizes table to determine the base width and height of the map.
+     */
+    public boolean useStandardAtBSizing;
     
     @XmlElementWrapper(name="allowedTerrainTypes")
     @XmlElement(name="allowedTerrainType")

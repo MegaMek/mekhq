@@ -11,7 +11,10 @@ public class ScenarioObjective {
         Secondary
     };
     
-    public enum ObjectiveVerb {
+    public ObjectivePriority priority;
+    public String description;
+    
+    /*public enum ObjectiveVerb {
         Destroy,
         Capture,
         Protect,
@@ -26,7 +29,7 @@ public class ScenarioObjective {
         SpecificForce,
         OpposingForces,
         AlliedForces
-    }
+    }*/
     
     // an objective should have the following characteristics:
     // 1) A priority level. This is used to determine if the objective should be used to determine victory/defeat
