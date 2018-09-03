@@ -41,7 +41,7 @@ public class LogEntry implements Cloneable, MekHqXmlSerializable {
 
     private static final SimpleDateFormat dateFormat() {
         // LATER centralise date formatting so that every class doesn't have its own format and - possibly - switch to java.time
-        return new SimpleDateFormat("yyyy-MM-dd hh:mm:ss"); //$NON-NLS-1$
+        return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); //$NON-NLS-1$
     }
 
     public LogEntry(Date date, String desc) {
