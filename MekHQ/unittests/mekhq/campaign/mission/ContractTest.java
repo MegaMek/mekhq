@@ -148,7 +148,7 @@ public class ContractTest {
         JumpPath mockJumpPath = Mockito.mock(JumpPath.class);
         Mockito.when(mockJumpPath.getJumps()).thenReturn(2);
 
-        Mockito.when(mockCampaign.calculateJumpPath(Mockito.any(Planet.class), Mockito.any(Planet.class))).thenReturn(mockJumpPath);
+        Mockito.when(mockCampaign.calculateJumpPath(Mockito.nullable(Planet.class), Mockito.nullable(Planet.class))).thenReturn(mockJumpPath);
         Mockito.when(mockCampaign.calculateCostPerJump(Mockito.anyBoolean(), Mockito.anyBoolean())).thenReturn((long) 5);
         Mockito.when(mockCampaign.getUnitRatingMod()).thenReturn(10);
 
