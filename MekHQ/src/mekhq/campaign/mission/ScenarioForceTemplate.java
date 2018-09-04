@@ -17,8 +17,8 @@ public class ScenarioForceTemplate {
     
     public static final String[] FORCE_ALIGNMENTS = { "Player", "Allied", "Opposing", "Third" };
     public static final String[] FORCE_GENERATION_METHODS = { "Player Deployed", "BV Scaled", "Unit Count Scaled", "Fixed Unit Count" };
-    public static final String[] DEPLOYMENT_ZONES = { "North", "Northeast", "East", "Southeast", "South", "Southwest", "West", "Northwest", "Edge", "Narrow Edge", "Center", "Any" };
-    public static final String[] BOT_DESTINATION_ZONES = { "None", "Other Narrow Edge", "North", "East", "South", "West" };
+    public static final String[] DEPLOYMENT_ZONES = { "North", "Northeast", "East", "Southeast", "South", "Southwest", "West", "Northwest", "Edge", "Narrow Edge", "Center", "Any", "As Force Group", "Opposite Force Group" };
+    public static final String[] BOT_DESTINATION_ZONES = { "None", "Opposite Deployment Edge", "North", "East", "South", "West", "Random" };
     public static final String[] UNIT_TYPES = { "Mek", "Vee", "Aero", "Conv. Fighter", "Gun Emplacement", "Infantry", "Battle Armor", "Naval", "Civilian" };
     
     /**
@@ -79,6 +79,16 @@ public class ScenarioForceTemplate {
      * Whether this force contributes to the unit count if the generation method is Unit Count Scaled.
      */
     private boolean contributesToUnitCount;
+    
+    /**
+     * The group to which this force belongs. Used for coordination of deployment zones and retreat thresholds.
+     */
+    private String forceGroupID;
+    
+    //TODO: 
+    // Introduce possibility to deploy opposite/same as a given force group
+    // Probably set deployment zones to "opposite"
+    // and introduce "deploymentForceGroup" (a drop down with all force groups present so far)
     
     /**
      * Blank constructor for deserialization purposes.
@@ -142,6 +152,10 @@ public class ScenarioForceTemplate {
         return contributesToUnitCount;
     }
     
+    public String getForceGroupID() {
+        return forceGroupID;
+    }
+    
     public void setForceAlignment(int forceAlignment) {
         this.forceAlignment = forceAlignment;
     }
@@ -180,5 +194,9 @@ public class ScenarioForceTemplate {
     
     public void setContributesToUnitCount(boolean contributesToUnitCount) {
         this.contributesToUnitCount = contributesToUnitCount;
+    }
+    
+    public void setForceGroupID(String forceGroupID) {
+        this.forceGroupID = forceGroupID;
     }
 }
