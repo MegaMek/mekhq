@@ -31,8 +31,6 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import org.apache.batik.util.gui.CSSMediaPanel.Dialog;
-
 import mekhq.MekHQ;
 import mekhq.io.FileType;
 
@@ -177,7 +175,7 @@ public class GUI {
         int buttonClicked = recommendedFileName.isPresent()
                           ? fd.showSaveDialog(parent)
                           : fd.showOpenDialog(parent);
-        return buttonClicked == Dialog.OK_OPTION
+        return buttonClicked == JFileChooser.APPROVE_OPTION
              ? Optional.ofNullable(fd.getSelectedFile())
              : Optional.empty();
     }

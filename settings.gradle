@@ -1,0 +1,5 @@
+rootProject.name = 'MekHQRoot'
+
+include 'MekHQ'
+
+enableFeaturePreview('STABLE_PUBLISHING')

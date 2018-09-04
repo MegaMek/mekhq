@@ -9,7 +9,12 @@ MekHQ/MekHQ.iml
 
 # Build directories
 MekHQ/pkgdir
+/build/
 
 # IDE directories
 MekHQ/.idea/
 /.vscode
+/.gradle/
+/settings_local.gradle
+/.classpath
+/.project
