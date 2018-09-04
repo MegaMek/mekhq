@@ -1547,7 +1547,7 @@ public class Utilities {
                             // Ignore this file then
                             MekHQ.getLogger().log(Utilities.class, METHOD_NAME, LogLevel.ERROR,
                                     "Exception trying to parse " + file.getPath() + " - ignoring."); //$NON-NLS-1$ //$NON-NLS-2$
-                            MekHQ.getLogger().log(Utilities.class, METHOD_NAME, ex);
+                            MekHQ.getLogger().error(Utilities.class, METHOD_NAME, ex);
                         }
                     }
                 }

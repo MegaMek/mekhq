@@ -89,7 +89,7 @@ public class Era {
                 return "Star League";
             
             case E_ESW:
-                return "Early Sucession War";
+                return "Early Succession War";
             
             case E_LSW_LOSTECH:
                 return "Late Succession War - LosTech";

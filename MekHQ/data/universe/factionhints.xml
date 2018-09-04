@@ -581,7 +581,7 @@ they shouldn't be fighting DC and Stone's Coalition, so I make them neutral for 
 	<war name="Oriente-Andurien War" start="3138-02-06" end="3138-08-05">
 		<parties>DO,DA</parties>
 	</war>
-	<war name="Nova Cat Rebellion" start="3141-6-14" end="3143-01-06">
+	<war name="Nova Cat Rebellion" start="3141-06-14" end="3143-01-06">
 		<parties>DC,CNC</parties>
 	</war>
 	<alliance start="3140-01-15" end="3145-03-31">
@@ -633,10 +633,10 @@ they shouldn't be fighting DC and Stone's Coalition, so I make them neutral for 
 	<alliance end="3067-03-28">
 		<parties>FS,FC,LA,TFR</parties>
 	</alliance>
-	<alliance start="3059-05-20" end="3141-6-14">
+	<alliance start="3059-05-20" end="3141-06-14">
 		<parties>DC,CNC</parties>
 	</alliance>
-	<location start="3059-05-20" end="3141-6-14">
+	<location start="3059-05-20" end="3141-06-14">
 		<outer>DC</outer>
 		<inner>CNC</inner>
 		<fraction>0.4</fraction>

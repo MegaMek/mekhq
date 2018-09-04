@@ -27,6 +27,7 @@ import megamek.common.BattleArmor;
 import megamek.common.CriticalSlot;
 import megamek.common.EquipmentType;
 import megamek.common.Mounted;
+import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.AmmoStorage;
@@ -317,7 +318,7 @@ public class BattleArmorAmmoBin extends AmmoBin implements IAcquisitionWork {
         try {
         	equipTonnage = type.getTonnage(null);
         } catch(NullPointerException ex) {
-        	//System.out.println("Found a null entity while calculating tonnage for " + name);
+            MekHQ.getLogger().error(BattleArmorAmmoBin.class, "restore", ex);
         }
     }
 

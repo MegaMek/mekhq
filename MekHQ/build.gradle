@@ -28,8 +28,8 @@ configurations {
 }
 
 dependencies {
-    implementation "org.megamek:megamek${mmBranchTag}:0.45.1-SNAPSHOT"
-    implementation ("org.megamek:megameklab${mmlBranchTag}:0.45.1-SNAPSHOT") {
+    implementation "org.megamek:megamek${mmBranchTag}:${version}"
+    implementation ("org.megamek:megameklab${mmlBranchTag}:${version}") {
         // We may want to specify different branches for MM and MML, so we need to exclude
         // the transitive MM dependency
         exclude group: 'org.megamek', module: "megameklab${mmlBranchTag}"
