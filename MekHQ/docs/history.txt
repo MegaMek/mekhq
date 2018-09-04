@@ -1,5 +1,7 @@
 VERSION HISTORY:
 ----------------
+v0.45.2-git
+
 v0.45.1 (2018-09-03 2300 UTC)
 + PR #864: Security - address XXE vulnerabilities in XML parsers
 + Issue #814: Fixed AtB morale calculation to match AtB rules
@@ -27,8 +29,6 @@ v0.45.1 (2018-09-03 2300 UTC)
 + Add Skins Folder to MekHQ
 + Update MegaMek.jar to v0.45.1
 + Update MegaMekLab.jar to v0.45.1
-
-
 
 v0.45.0 (2018-08-02 0200 UTC)
 + PR #602: Add KIA checkbox and functionality to prisoners during scenario resolution.
