@@ -1,6 +1,6 @@
 VERSION HISTORY:
 ----------------
-v0.45.1-git
+v0.45.1 (2018-09-03 2300 UTC)
 + PR #864: Security - address XXE vulnerabilities in XML parsers
 + Issue #814: Fixed AtB morale calculation to match AtB rules
 + Fixed JAR packaging error that made personnel market methods inaccessible.
@@ -24,6 +24,7 @@ v0.45.1-git
 + Issue #836: Use native file dialogs and remember the last used folder.
 + PR #909: Fix NullPointerException in ResolveScenarioTracker.
 + PR #908: Fix NPE in getPartInUse if EquipmentType is null.
++ Add Skins Folder to MekHQ
 + Update MegaMek.jar to v0.45.1
 + Update MegaMekLab.jar to v0.45.1
 
