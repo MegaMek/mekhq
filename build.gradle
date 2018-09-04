@@ -36,7 +36,7 @@ ext {
     mmBranch = 'master'
     mmBranchTag = mmBranch.equals('master')? '' : '-' + mmBranch
     mmlBranch = 'master'
-    mmlBranchTag = mmBranch.equals('master')? '' : '-' + mmlBranch
+    mmlBranchTag = mmlBranch.equals('master')? '' : '-' + mmlBranch
     
     mmDir = "${rootDir}/../megamek"
     mmlDir = "${rootDir}/../megameklab"
