@@ -62,7 +62,7 @@ import mekhq.campaign.event.PersonEvent;
 import mekhq.campaign.event.ProcurementEvent;
 import mekhq.campaign.event.RepairStatusChangedEvent;
 import mekhq.campaign.event.ScenarioResolvedEvent;
-import mekhq.campaign.event.UnitEvent;
+import mekhq.campaign.event.UnitDataInvalidatedEvent;
 import mekhq.campaign.parts.MekLocation;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PodSpace;
@@ -898,7 +898,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
     }
 
     @Subscribe
-    public void handle(UnitEvent ev) {
+    public void handle(UnitDataInvalidatedEvent ev) {
         servicedUnitListScheduler.schedule();
     }
 

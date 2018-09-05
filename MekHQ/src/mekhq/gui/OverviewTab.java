@@ -52,7 +52,7 @@ import mekhq.campaign.event.PartEvent;
 import mekhq.campaign.event.PartWorkEvent;
 import mekhq.campaign.event.PersonEvent;
 import mekhq.campaign.event.ScenarioResolvedEvent;
-import mekhq.campaign.event.UnitEvent;
+import mekhq.campaign.event.UnitDataInvalidatedEvent;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PartInUse;
 import mekhq.campaign.report.CargoReport;
@@ -426,7 +426,7 @@ public final class OverviewTab extends CampaignGuiTab {
     }
 
     @Subscribe
-    public void handle(UnitEvent ev) {
+    public void handle(UnitDataInvalidatedEvent ev) {
         overviewScheduler.schedule();
     }
     

@@ -75,7 +75,7 @@ import mekhq.MhqFileUtil;
 import mekhq.Utilities;
 import mekhq.Version;
 import mekhq.campaign.event.PartChangedEvent;
-import mekhq.campaign.event.UnitRefitEvent;
+import mekhq.campaign.event.UnitDataInvalidatedEvent;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.HeatSink;
@@ -937,7 +937,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 	            campaign.addReport("You cannot afford to refurbish " + oldUnit.getEntity().getShortName() + ". Transaction cancelled");
 	        }
 	    }
-        MekHQ.triggerEvent(new UnitRefitEvent(oldUnit));
+        MekHQ.triggerEvent(new UnitDataInvalidatedEvent());
 	}
 
 	public void reserveNewParts() {
@@ -1144,7 +1144,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 		for (IAcquisitionWork work : toRemove) {
 		    campaign.getShoppingList().removeItem(work);
 		}
-		MekHQ.triggerEvent(new UnitRefitEvent(oldUnit));
+		MekHQ.triggerEvent(new UnitDataInvalidatedEvent());
 	}
 
 	private void complete() {
@@ -1295,7 +1295,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 	            }
 	        }
 	    }
-        MekHQ.triggerEvent(new UnitRefitEvent(oldUnit));
+		MekHQ.triggerEvent(new UnitDataInvalidatedEvent());
 	}
 
 	public void saveCustomization() throws EntityLoadingException, IOException {

@@ -52,7 +52,7 @@ import mekhq.campaign.event.PersonLogEvent;
 import mekhq.campaign.event.PersonNewEvent;
 import mekhq.campaign.event.PersonRemovedEvent;
 import mekhq.campaign.event.ScenarioResolvedEvent;
-import mekhq.campaign.event.UnitRemovedEvent;
+import mekhq.campaign.event.UnitDataInvalidatedEvent;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.adapter.PersonnelTableMouseAdapter;
 import mekhq.gui.model.PersonnelTableModel;
@@ -844,8 +844,8 @@ public final class PersonnelTab extends CampaignGuiTab {
     }
 
     @Subscribe
-    public void handle(UnitRemovedEvent ev) {
-        filterPersonnelScheduler.schedule();
+    public void handle(UnitDataInvalidatedEvent ev) {
+        personnelListScheduler.schedule();
     }
 
     @Subscribe

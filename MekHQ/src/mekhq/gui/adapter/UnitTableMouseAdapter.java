@@ -34,7 +34,7 @@ import megamek.common.loaders.BLKFile;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.event.RepairStatusChangedEvent;
-import mekhq.campaign.event.UnitChangedEvent;
+import mekhq.campaign.event.UnitDataInvalidatedEvent;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.MissingPart;
@@ -197,7 +197,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
             LargeCraftAmmoSwapDialog dialog = new LargeCraftAmmoSwapDialog(gui.getFrame(), selectedUnit);
             dialog.setVisible(true);
             if (!dialog.wasCanceled()) {
-                MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
+                MekHQ.triggerEvent(new UnitDataInvalidatedEvent());
             }
         } else if (command.contains("SWAP_AMMO")) {
             String[] fields = command.split(":");
@@ -209,7 +209,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
             AmmoBin ammo = (AmmoBin) part;
             AmmoType atype = (AmmoType) EquipmentType.get(fields[2]);
             ammo.changeMunition(atype);
-            MekHQ.triggerEvent(new UnitChangedEvent(part.getUnit()));
+            MekHQ.triggerEvent(new UnitDataInvalidatedEvent());
         } else if (command.contains("CHANGE_SITE")) {
             for (Unit unit : units) {
                 if (!unit.isDeployed()) {
@@ -371,7 +371,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                 tad.setVisible(true);
                 if (tad.wasChanged()) {
                     selectedUnit.setHistory(tad.getText());
-                    MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
+                    MekHQ.triggerEvent(new UnitDataInvalidatedEvent());
                 }
             }
         } else if (command.contains("REMOVE_INDI_CAMO")) {
@@ -391,7 +391,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
             if (ccd.clickedSelect() == true) {
                 selectedUnit.getEntity().setCamoCategory(ccd.getCategory());
                 selectedUnit.getEntity().setCamoFileName(ccd.getFileName());
-                MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
+                MekHQ.triggerEvent(new UnitDataInvalidatedEvent());
             }
         } else if (command.equalsIgnoreCase("CANCEL_ORDER")) {
             double refund = gui.getCampaign().getCampaignOptions()
@@ -436,7 +436,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
             }
             if (null != selectedUnit) {
                 selectedUnit.startMothballing(id);
-                MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
+                MekHQ.triggerEvent(new UnitDataInvalidatedEvent());
             }
         } else if (command.equalsIgnoreCase(COMMAND_ACTIVATE)) {
             if(units.length > 1) {
@@ -465,12 +465,12 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
             }
             if (null != selectedUnit) {
                 selectedUnit.startMothballing(id);
-                MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
+                MekHQ.triggerEvent(new UnitDataInvalidatedEvent());
             }
         } else if (command.equalsIgnoreCase("CANCEL_MOTHBALL")) {
             if (null != selectedUnit) {
                 selectedUnit.setMothballTime(0);
-                MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
+                MekHQ.triggerEvent(new UnitDataInvalidatedEvent());
             }
         } else if (command.equalsIgnoreCase("BOMBS")) {
             if (null != selectedUnit
@@ -479,14 +479,14 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                         (IBomber)selectedUnit.getEntity(), gui.getCampaign(),
                         gui.getFrame());
                 dialog.setVisible(true);
-                MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
+                MekHQ.triggerEvent(new UnitDataInvalidatedEvent());
             }
         } else if (command.equalsIgnoreCase("QUIRKS")) {
             if (null != selectedUnit) {
                 QuirksDialog dialog = new QuirksDialog(
                         selectedUnit.getEntity(), gui.getFrame());
                 dialog.setVisible(true);
-                MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
+                MekHQ.triggerEvent(new UnitDataInvalidatedEvent());
             }
         } else if (command.equalsIgnoreCase("EDIT_DAMAGE")) {
             if (null != selectedUnit) {
@@ -494,7 +494,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                 UnitEditorDialog med = new UnitEditorDialog(gui.getFrame(), entity);
                 med.setVisible(true);
                 selectedUnit.runDiagnostic(false);
-                MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
+                MekHQ.triggerEvent(new UnitDataInvalidatedEvent());
             }
         } else if (command.equalsIgnoreCase("FLUFF_NAME")) {
             if (selectedUnit != null) {
@@ -504,7 +504,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                         selectedUnit.getFluffName() == null ? ""
                                 : selectedUnit.getFluffName());
                 selectedUnit.setFluffName(fluffName);
-                MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
+                MekHQ.triggerEvent(new UnitDataInvalidatedEvent());
             }
         } else if(command.equalsIgnoreCase("RESTORE_UNIT")) {
             for (Unit unit : units) {
@@ -572,7 +572,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                         }
                     }
                 }
-                MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
+                MekHQ.triggerEvent(new UnitDataInvalidatedEvent());
             }
         }
         else if (command.equalsIgnoreCase("STRIP_UNIT")) {

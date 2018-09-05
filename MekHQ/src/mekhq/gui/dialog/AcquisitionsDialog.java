@@ -28,7 +28,7 @@ import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.event.PartChangedEvent;
-import mekhq.campaign.event.UnitChangedEvent;
+import mekhq.campaign.event.UnitDataInvalidatedEvent;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.parts.MissingPart;
@@ -608,7 +608,7 @@ public class AcquisitionsDialog extends JDialog {
                     }
 
                     campaignGUI.getCampaign().addReport(actualWork.find(0));
-                    MekHQ.triggerEvent(new UnitChangedEvent(actualWork.getUnit()));
+                    MekHQ.triggerEvent(new UnitDataInvalidatedEvent());
 
                     refresh();
                 });

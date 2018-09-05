@@ -113,7 +113,7 @@ import mekhq.Version;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.event.PersonCrewAssignmentEvent;
 import mekhq.campaign.event.PersonTechAssignmentEvent;
-import mekhq.campaign.event.UnitArrivedEvent;
+import mekhq.campaign.event.UnitDataInvalidatedEvent;
 import mekhq.campaign.parts.AeroHeatSink;
 import mekhq.campaign.parts.AeroLifeSupport;
 import mekhq.campaign.parts.AeroSensor;
@@ -3987,7 +3987,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         if(daysToArrival > 0) {
             daysToArrival--;
             if (daysToArrival == 0) {
-                MekHQ.triggerEvent(new UnitArrivedEvent(this));
+                MekHQ.triggerEvent(new UnitDataInvalidatedEvent());
                 return true;
             }
         }

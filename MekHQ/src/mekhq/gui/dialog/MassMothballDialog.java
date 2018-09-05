@@ -52,7 +52,7 @@ import javax.swing.event.ListSelectionListener;
 import megamek.common.UnitType;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.event.UnitChangedEvent;
+import mekhq.campaign.event.UnitDataInvalidatedEvent;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.adapter.UnitTableMouseAdapter;
@@ -266,7 +266,7 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
             // to approximately # units / # techs in mothball/reactivation tasks
             for(Unit unit : unitsByType.get(unitType)) {                
                 unit.startMothballing(selectedTechs.get(techIndex).getId());
-                MekHQ.triggerEvent(new UnitChangedEvent(unit));
+                MekHQ.triggerEvent(new UnitDataInvalidatedEvent());
                 
                 if(techIndex == selectedTechs.size() - 1) {
                     techIndex = 0;

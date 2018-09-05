@@ -71,7 +71,7 @@ import mekhq.campaign.event.MissionNewEvent;
 import mekhq.campaign.event.PartEvent;
 import mekhq.campaign.event.ScenarioResolvedEvent;
 import mekhq.campaign.event.TransactionEvent;
-import mekhq.campaign.event.UnitEvent;
+import mekhq.campaign.event.UnitDataInvalidatedEvent;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.mission.Contract;
 import mekhq.gui.adapter.FinanceTableMouseAdapter;
@@ -461,7 +461,7 @@ public final class FinancesTab extends CampaignGuiTab {
     }
     
     @Subscribe
-    public void handle(UnitEvent ev) {
+    public void handle(UnitDataInvalidatedEvent ev) {
         financialReportScheduler.schedule();
     }
     

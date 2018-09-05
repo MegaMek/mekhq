@@ -43,8 +43,7 @@ import mekhq.campaign.event.OrganizationChangedEvent;
 import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.event.PersonRemovedEvent;
 import mekhq.campaign.event.ScenarioResolvedEvent;
-import mekhq.campaign.event.UnitChangedEvent;
-import mekhq.campaign.event.UnitRemovedEvent;
+import mekhq.campaign.event.UnitDataInvalidatedEvent;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
@@ -123,7 +122,6 @@ public final class TOETab extends CampaignGuiTab {
 
     public void refreshOrganization() {
         javax.swing.SwingUtilities.invokeLater(() -> {
-            orgTree.updateUI();
             // This seems like bad juju since it makes it annoying as hell to
             // add multiple units to a force if it's de-selected every single
             // time
@@ -229,12 +227,9 @@ public final class TOETab extends CampaignGuiTab {
     }
 
     @Subscribe
-    public void unitChanged(UnitChangedEvent ev) {
+    public void handle(UnitDataInvalidatedEvent ev) {
         orgTree.repaint();
-    }
-
-    @Subscribe
-    public void unitRemoved(UnitRemovedEvent ev) {
         orgRefreshScheduler.schedule();
     }
+
 }
