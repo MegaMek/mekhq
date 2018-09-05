@@ -79,6 +79,9 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
     
     JPanel globalPanel;
     
+    JPanel forcedPanel;
+    JScrollPane forceScrollPane;
+    
     // the scenario template we're working on
     ScenarioTemplate scenarioTemplate = new ScenarioTemplate(); 
     
@@ -104,6 +107,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         globalPanel.setLayout(new GridBagLayout());
         
         JScrollPane globalScrollPane = new JScrollPane(globalPanel);
+        globalScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
         getContentPane().add(globalScrollPane);        
         
         GridBagConstraints gbc = new GridBagConstraints();
@@ -160,6 +164,35 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         globalPanel.add(scrLongBriefing, gbc);
     }
     
+    private void setupForceGroupEditorHeaders(GridBagConstraints gbc) {
+        gbc.gridx = 0;
+        gbc.gridwidth = 1;
+        
+        JLabel lblForces = new JLabel("Force Groups:");
+        gbc.gridy++;
+        globalPanel.add(lblForces, gbc);
+        
+        JButton btnHideShow = new JButton("Hide/Show");
+        btnHideShow.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                toggleForcePanelVisibility();
+            }
+            
+        });        
+        
+        gbc.gridx++;
+        int previousAnchor = gbc.anchor;
+        gbc.anchor = GridBagConstraints.EAST;
+        globalPanel.add(btnHideShow, gbc);
+        gbc.anchor = previousAnchor;
+    }
+    
+    private void setupForceGroupEditor(GridBagConstraints gbc) {
+        
+    }
+    
     /**
      * Worker function that sets up top-level headers for the force template editor section.
      * @param gbc
@@ -168,9 +201,25 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         gbc.gridx = 0;
         gbc.gridwidth = 1;
         
-        JLabel lblForces = new JLabel("Participating Forces");
+        JLabel lblForces = new JLabel("Participating Forces:");
         gbc.gridy++;
         globalPanel.add(lblForces, gbc);
+        
+        JButton btnHideShow = new JButton("Hide/Show");
+        btnHideShow.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                toggleForcePanelVisibility();
+            }
+            
+        });        
+        
+        gbc.gridx++;
+        int previousAnchor = gbc.anchor;
+        gbc.anchor = GridBagConstraints.EAST;
+        globalPanel.add(btnHideShow, gbc);
+        gbc.anchor = previousAnchor;
     }
   
     /**
@@ -179,8 +228,9 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
      * @param gbc
      */
     private void setupForceEditor(GridBagConstraints externalGBC) {
-        JPanel forcedPanel = new JPanel();
+        forcedPanel = new JPanel();
         forcedPanel.setLayout(new GridBagLayout());
+        forcedPanel.setBorder(new LineBorder(Color.BLACK));
         externalGBC.gridx = 0;
         externalGBC.gridy++;
         externalGBC.gridwidth = GridBagConstraints.REMAINDER;
@@ -335,13 +385,14 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         gbc.gridwidth = GridBagConstraints.REMAINDER;
         
         panForceList = new JPanel(new GridBagLayout());
-        panForceList.setBorder(new LineBorder(Color.GREEN));
 
         renderForceList();
         
-        JScrollPane forceScrollPane = new JScrollPane(panForceList);
+        forceScrollPane = new JScrollPane(panForceList);
         forceScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
         forceScrollPane.setPreferredSize(new Dimension(800, 200));
+        
+        forceScrollPane.setVisible(false);
         
         globalPanel.add(forceScrollPane, gbc);
     }
@@ -478,6 +529,10 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         gbc.ipady = 5;
         
         panForceList.removeAll();
+        
+        if(forceScrollPane != null) {
+            forceScrollPane.setVisible(!scenarioTemplate.scenarioForces.isEmpty());
+        }
         
         for(int forceIndex = 0; forceIndex < scenarioTemplate.scenarioForces.size(); forceIndex++) {
             ScenarioForceTemplate sft = scenarioTemplate.scenarioForces.get(forceIndex);
@@ -691,5 +746,10 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         } else if(e.getActionCommand() == LOAD_TEMPLATE_COMMAND) {
             loadTemplateButtonHandler();
         }
+    }
+    
+    public void toggleForcePanelVisibility() {
+        forcedPanel.setVisible(!forcedPanel.isVisible());
+        forceScrollPane.setVisible(!forceScrollPane.isVisible() && !scenarioTemplate.scenarioForces.isEmpty());
     }
 }
