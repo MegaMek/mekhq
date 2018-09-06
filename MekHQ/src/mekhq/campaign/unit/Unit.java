@@ -3281,7 +3281,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 int sumEdge = 0;
                 int sumEdgeUsed = 0;
                 String engineerName = "Nobody";
-                int bestRank = -1;
+                int bestRank = Integer.MIN_VALUE;
                 for(UUID pid : vesselCrew) {
                     Person p = campaign.getPerson(pid);
                     if(null == p) {

@@ -2062,7 +2062,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         }
 
         // If we're set to a rank that no longer exists, demote ourself
-        while (getRank().getName(profession).equals("-")) {
+        while (getRank().getName(profession).equals("-") && (rank > 0)) {
             setRankNumeric(--rank);
         }
 
