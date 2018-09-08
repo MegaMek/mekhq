@@ -108,7 +108,7 @@ import mekhq.campaign.event.OrganizationChangedEvent;
 import mekhq.campaign.event.PersonEvent;
 import mekhq.campaign.event.ReportEvent;
 import mekhq.campaign.event.TransactionEvent;
-import mekhq.campaign.event.UnitEvent;
+import mekhq.campaign.event.UnitDataInvalidatedEvent;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
@@ -2878,7 +2878,7 @@ public class CampaignGUI extends JPanel {
     }
     
     @Subscribe
-    public void handle(UnitEvent ev) {
+    public void handle(UnitDataInvalidatedEvent ev) {
         ratingScheduler.schedule();
     }
     

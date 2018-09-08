@@ -66,9 +66,7 @@ import mekhq.campaign.event.PartRemovedEvent;
 import mekhq.campaign.event.PartWorkEvent;
 import mekhq.campaign.event.PersonEvent;
 import mekhq.campaign.event.ProcurementEvent;
-import mekhq.campaign.event.UnitChangedEvent;
-import mekhq.campaign.event.UnitRefitEvent;
-import mekhq.campaign.event.UnitRemovedEvent;
+import mekhq.campaign.event.UnitDataInvalidatedEvent;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.BaArmor;
 import mekhq.campaign.parts.EnginePart;
@@ -764,17 +762,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
     private ActionScheduler procurementScheduler = new ActionScheduler(this::refreshProcurementList);
 
     @Subscribe
-    public void handle(UnitRemovedEvent ev) {
-        filterParts();
-    }
-    
-    @Subscribe
-    public void handle(UnitChangedEvent ev) {
-        filterParts();
-    }
-    
-    @Subscribe
-    public void handle(UnitRefitEvent ev) {
+    public void handle(UnitDataInvalidatedEvent ev) {
         partsScheduler.schedule();
         procurementScheduler.schedule();
     }

@@ -140,8 +140,7 @@ import mekhq.campaign.event.PersonTechAssignmentEvent;
 import mekhq.campaign.event.ReportEvent;
 import mekhq.campaign.event.ScenarioChangedEvent;
 import mekhq.campaign.event.ScenarioNewEvent;
-import mekhq.campaign.event.UnitNewEvent;
-import mekhq.campaign.event.UnitRemovedEvent;
+import mekhq.campaign.event.UnitDataInvalidatedEvent;
 import mekhq.campaign.finances.Asset;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Loan;
@@ -1040,7 +1039,7 @@ public class Campaign implements Serializable, ITechManager {
 
         checkDuplicateNamesDuringAdd(en);
         addReport(unit.getHyperlinkedName() + " has been added to the unit roster.");
-        MekHQ.triggerEvent(new UnitNewEvent(unit));
+        MekHQ.triggerEvent(new UnitDataInvalidatedEvent());
     }
 
     public Collection<Unit> getUnits() {
@@ -2822,7 +2821,7 @@ public class Campaign implements Serializable, ITechManager {
         units.remove(unit.getId());
         checkDuplicateNamesDuringDelete(unit.getEntity());
         addReport(unit.getName() + " has been removed from the unit roster.");
-        MekHQ.triggerEvent(new UnitRemovedEvent(unit));
+        MekHQ.triggerEvent(new UnitDataInvalidatedEvent());
     }
 
     public void removePerson(UUID id) {
@@ -3312,7 +3311,7 @@ public class Campaign implements Serializable, ITechManager {
         finances.credit(sellValue, Transaction.C_UNIT_SALE,
                 "Sale of " + unit.getName(), calendar.getTime());
         removeUnit(id);
-        MekHQ.triggerEvent(new UnitRemovedEvent(unit));
+        MekHQ.triggerEvent(new UnitDataInvalidatedEvent());
     }
 
     public void sellPart(Part part, int quantity) {

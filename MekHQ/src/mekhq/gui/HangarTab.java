@@ -63,9 +63,7 @@ import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.event.ProcurementEvent;
 import mekhq.campaign.event.RepairStatusChangedEvent;
 import mekhq.campaign.event.ScenarioResolvedEvent;
-import mekhq.campaign.event.UnitChangedEvent;
-import mekhq.campaign.event.UnitNewEvent;
-import mekhq.campaign.event.UnitRemovedEvent;
+import mekhq.campaign.event.UnitDataInvalidatedEvent;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.UnitOrder;
 import mekhq.gui.adapter.ProcurementTableMouseAdapter;
@@ -564,20 +562,10 @@ public final class HangarTab extends CampaignGuiTab {
     }
 
     @Subscribe
-    public void handle(UnitChangedEvent ev) {
-        filterUnitScheduler.schedule();;
-    }
-    
-    @Subscribe
-    public void handle(UnitNewEvent ev) {
+    public void handle(UnitDataInvalidatedEvent ev) {
         unitListScheduler.schedule();
     }
-    
-    @Subscribe
-    public void handle(UnitRemovedEvent ev) {
-        unitListScheduler.schedule();
-    }
-    
+
     @Subscribe
     public void handle(RepairStatusChangedEvent ev) {
         filterUnitScheduler.schedule();

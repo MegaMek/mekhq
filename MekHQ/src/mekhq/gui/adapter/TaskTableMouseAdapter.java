@@ -35,7 +35,7 @@ import megamek.common.TargetRoll;
 import mekhq.MekHQ;
 import mekhq.campaign.event.PartChangedEvent;
 import mekhq.campaign.event.PartModeChangedEvent;
-import mekhq.campaign.event.UnitChangedEvent;
+import mekhq.campaign.event.UnitDataInvalidatedEvent;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IPartWork;
@@ -86,7 +86,7 @@ public class TaskTableMouseAdapter extends MouseInputAdapter implements ActionLi
                 if (null != u && !u.isRepairable() && !u.hasSalvageableParts()) {
                     gui.getCampaign().removeUnit(u.getId());
                 }
-                MekHQ.triggerEvent(new UnitChangedEvent(u));
+                MekHQ.triggerEvent(new UnitDataInvalidatedEvent());
             }
         } else if (command.contains("SWAP_AMMO")) {
             /*

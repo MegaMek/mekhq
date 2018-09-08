@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 The MegaMek Team. All rights reserved.
+ * Copyright (c) 2017-2018 The MegaMek Team. All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -19,23 +19,19 @@
 
 package mekhq.campaign.event;
 
-import java.util.Objects;
-
 import megamek.common.event.MMEvent;
-import mekhq.campaign.unit.Unit;
 
 /**
- * Abstract base class for events involving a unit.
+ * Triggered to signal that one/some unit/units may have been modified and that
+ * therefore any derived data should be refreshed from the units list
+ * in {@linkplain mekhq.campaign.Campaign}.
  */
-abstract public class UnitEvent extends MMEvent {
+public final class UnitDataInvalidatedEvent extends MMEvent {
 
-    private final Unit unit;
-    
-    public UnitEvent(Unit unit) {
-        this.unit = Objects.requireNonNull(unit);
-    }
-    
-    public Unit getUnit() {
-        return unit;
-    }
+    // If you plan to make singleton out of this, please make sure
+    // that megamek.common.event.EventBus doesn't rely on object identity
+    // for any internal workings (eg: that it never puts events into a Set at
+    // some point) and also that this is documented in EventBus (least future
+    // modifications may break the implementation here).
+
 }

@@ -18,7 +18,7 @@ import megamek.common.EquipmentType;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.event.RepairStatusChangedEvent;
-import mekhq.campaign.event.UnitChangedEvent;
+import mekhq.campaign.event.UnitDataInvalidatedEvent;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.unit.Unit;
@@ -74,7 +74,7 @@ public class ServicedUnitsTableMouseAdapter extends MouseInputAdapter
             LargeCraftAmmoSwapDialog dialog = new LargeCraftAmmoSwapDialog(gui.getFrame(), selectedUnit);
             dialog.setVisible(true);
             if (!dialog.wasCanceled()) {
-                MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
+                MekHQ.triggerEvent(new UnitDataInvalidatedEvent());
             }
         } else if (command.contains("SWAP_AMMO")) {
             String sel = command.split(":")[1];
@@ -87,7 +87,7 @@ public class ServicedUnitsTableMouseAdapter extends MouseInputAdapter
             sel = command.split(":")[2];
             EquipmentType etype = EquipmentType.get(sel);
             ammo.changeMunition(etype);
-            MekHQ.triggerEvent(new UnitChangedEvent(part.getUnit()));
+            MekHQ.triggerEvent(new UnitDataInvalidatedEvent());
         } else if (command.contains("CHANGE_SITE")) {
             for (Unit unit : units) {
                 if (!unit.isDeployed()) {
@@ -126,7 +126,7 @@ public class ServicedUnitsTableMouseAdapter extends MouseInputAdapter
     					"Unit is deployed", JOptionPane.ERROR_MESSAGE);
             } else {
 				MassRepairService.performSingleUnitMassRepairOrSalvage(gui, unit);
-				MekHQ.triggerEvent(new UnitChangedEvent(unit));
+				MekHQ.triggerEvent(new UnitDataInvalidatedEvent());
             }
         }
     }
