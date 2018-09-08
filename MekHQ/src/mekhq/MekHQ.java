@@ -35,6 +35,7 @@ import java.io.PrintStream;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.ResourceBundle;
 
@@ -252,8 +253,7 @@ public class MekHQ implements GameListener {
     public static void main(String[] args) {
     	System.setProperty("apple.laf.useScreenMenuBar", "true");
         System.setProperty("com.apple.mrj.application.apple.menu.about.name","MekHQ");
-        //redirect output to log file
-        redirectOutput();
+        MegaMek.setupLog4j(MekHQ.class, Optional.empty());
         MekHQ.getInstance().startup();
     }
 
@@ -330,33 +330,6 @@ public class MekHQ implements GameListener {
     		e.printStackTrace();
     	} catch (UnsupportedLookAndFeelException e) {
         	e.printStackTrace();
-        }
-    }
-
-    /**
-     * This function redirects the standard error and output streams to the
-     * given File name.
-     *
-     */
-    private static void redirectOutput() {
-        try {
-            System.out.println("Redirecting output to mekhqlog.txt"); //$NON-NLS-1$
-            File logDir = new File("logs");
-            if (!logDir.exists()) {
-                logDir.mkdir();
-            }
-			final String logFilename = "logs" + File.separator + "mekhqlog.txt";
-			MegaMek.resetLogFile(logFilename);
-			PrintStream ps = new PrintStream(
-					new BufferedOutputStream(
-							new FileOutputStream(logFilename,
-												 true),
-							64));
-			System.setOut(ps);
-            System.setErr(ps);
-        } catch (Exception e) {
-            System.err.println("Unable to redirect output to mekhqlog.txt"); //$NON-NLS-1$
-            e.printStackTrace();
         }
     }
 

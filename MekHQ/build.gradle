@@ -37,7 +37,7 @@ dependencies {
         exclude group: 'org.python', module: 'jython'
         exclude group: 'org.mozilla', module: 'rhino'
     }
-    
+
     // We have been using a modified version of svgSalamander in MML, which we'll keep around until
     // the conversion to batik is complete.
     implementation files('lib/svgSalamander.jar')
@@ -48,7 +48,6 @@ dependencies {
     implementation 'org.apache.commons:commons-csv:1.4'
     implementation 'javax.vecmath:vecmath:1.5.2'
 
-    implementation 'log4j:log4j:1.2.17'
     implementation 'javax.xml.bind:jaxb-api:2.3.0'
     runtimeOnly 'org.glassfish.jaxb:jaxb-runtime:2.3.0'
     runtimeOnly 'org.glassfish.jaxb:jaxb-core:2.3.0'
@@ -56,7 +55,7 @@ dependencies {
 
     jarbundler 'com.ultramixer.jarbundler:jarbundler-core:3.3.0'
 
-    testImplementation 'junit:junit:4.12' 
+    testImplementation 'junit:junit:4.12'
     testImplementation 'org.mockito:mockito-core:2.20.1'
 }
 
@@ -108,7 +107,7 @@ task mmlJar (type: Jar) {
 
 task stageFiles(type: Copy) {
     description = 'Stages files that are to be copied into the distribution.'
-    
+
     from projectDir
     include "${conf}/**"
     include "${docs}/**"
@@ -127,7 +126,7 @@ task stageFiles(type: Copy) {
     include 'SubmitBug.html'
 
     into fileStagingDir
-    
+
     inputs.dir "${conf}"
     inputs.dir "${docs}"
     inputs.dir "${data}"
@@ -234,7 +233,7 @@ distributions {
                     .findAll { it.name.endsWith(".jar") && !it.name.toLowerCase().startsWith("megamek") }) {
                 into "${lib}"
             }
-            
+
             duplicatesStrategy = 'exclude'
         }
     }
@@ -309,7 +308,7 @@ createExe {
         new File("${buildDir}/${outputDir}/${inifile}").text = """# Launch4j runtime config
 # you can add arguments here that will be processed by the JVM at runtime
 ${project.ext.jvmOptions.join('\n')}
-"""        
+"""
     }
 }
 
@@ -331,7 +330,7 @@ task createMMExe (type: edu.sc.seis.launch4j.tasks.Launch4jLibraryTask) {
         new File("${buildDir}/${outputDir}/${inifile}").text = """# Launch4j runtime config
 # you can add arguments here that will be processed by the JVM at runtime
 ${project.ext.jvmOptions.join('\n')}
-"""        
+"""
     }
 }
 
@@ -353,14 +352,14 @@ task createMMLExe (type: edu.sc.seis.launch4j.tasks.Launch4jLibraryTask) {
         new File("${buildDir}/${outputDir}/${inifile}").text = """# Launch4j runtime config
 # you can add arguments here that will be processed by the JVM at runtime
 ${project.ext.jvmOptions.join('\n')}
-"""        
+"""
     }
 }
 
 task stageMM (type: GradleBuild) {
     description = 'Prepares files from the MegaMek project'
     group = 'distribution'
-    
+
     buildFile = "${mmDir}/build.gradle"
     dir = "${mmDir}"
     tasks = [ 'stageFiles', 'createStartScripts' ]
@@ -369,7 +368,7 @@ task stageMM (type: GradleBuild) {
 task stageMML (type: GradleBuild) {
     description = 'Prepares files from the MegaMekLab project'
     group = 'distribution'
-    
+
     buildFile = "${mmlDir}/build.gradle"
     dir = "${mmlDir}"
     tasks = [ 'stageFiles', 'createStartScripts' ]
@@ -483,7 +482,7 @@ task buildFromRepo (type: GradleBuild) {
     dependsOn cloneRepo
     dependsOn cloneMMRepo
     dependsOn cloneMMLRepo
-    
+
     buildFile = "${repoDir}/build.gradle"
     dir = "${repoDir}"
     tasks = [ 'assembleDist' ]
@@ -493,7 +492,7 @@ task release (type: Copy) {
     description = 'Builds the release packages from the repository and copies them into the project build directory'
     group = 'distribution'
     dependsOn buildFromRepo
-    
+
     from "${repoDir}/MekHQ/build/distributions"
     into "${distributionDir}"
 }
@@ -501,7 +500,7 @@ task release (type: Copy) {
 task buildMM (type: GradleBuild, dependsOn: cloneMMRepo) {
     description = 'Prepares files from the MegaMek project'
     group = 'distribution'
-    
+
     buildFile = "${mmRepoDir}/build.gradle"
     dir = "${mmRepoDir}"
     tasks = [ 'assembleDist' ]
@@ -510,7 +509,7 @@ task buildMM (type: GradleBuild, dependsOn: cloneMMRepo) {
 task buildMML (type: GradleBuild, dependsOn: cloneMMLRepo) {
     description = 'Prepares files from the MegaMekLab project'
     group = 'distribution'
-    
+
     buildFile = "${mmlRepoDir}/build.gradle"
     dir = "${mmlRepoDir}"
     tasks = [ 'assembleDist' ]
@@ -522,7 +521,7 @@ task buildAllFromRepo (type: GradleBuild) {
     dependsOn cloneRepo
     dependsOn buildMM
     dependsOn buildMML
-    
+
     buildFile = "${repoDir}/build.gradle"
     dir = "${repoDir}"
     tasks = [ 'unixDistTar', 'windowsDistZip', 'macDistTar' ]
@@ -532,7 +531,7 @@ task releaseAll (type: Copy) {
     description = 'Builds the release packages for all the projects and copies them into the project build directory'
     group = 'distribution'
     dependsOn buildAllFromRepo
-    
+
     from "${repoDir}/MekHQ/build/distributions"
     from "${mmRepoDir}/megamek/build/distributions"
     from "${mmlRepoDir}/build/distributions"
@@ -554,7 +553,7 @@ task javadocJar(type: Jar) {
 publishing {
     publications {
         publishMMLibrary(MavenPublication) {
-            artifactId = "mekhq${mmBranchTag}"
+            artifactId = "mekhq${hqBranchTag.replaceAll('[^A-Za-z0-9_\\-.]','-')}"
             from components.java
             artifact sourcesJar
 // Javadoc is full of errors
@@ -585,4 +584,3 @@ task cleanPublishingDir (type: Delete) {
 }
 
 publishPublishMMLibraryPublicationToMavenRepository.dependsOn cleanPublishingDir
-
