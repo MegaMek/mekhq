@@ -120,19 +120,19 @@ public class ShoppingList implements MekHqXmlSerializable {
              campaign.addReport("<font color='red'><b>You cannot afford to purchase " + newWork.getAcquisitionName() + "</b></font>");
              canAfford = false;
         }
-        while(canAfford && quantity > 0 && campaign.acquireEquipment(newWork)) {
+        while(quantity > 1) {
+            newWork.incrementQuantity();
             quantity--;
+        }
+        while(canAfford && newWork.getQuantity() > 0 && campaign.acquireEquipment(newWork)) {
             if(quantity > 0 && campaign.getFunds() < getTrueBuyCost(newWork, campaign)) {
                 canAfford = false;
                 campaign.addReport("<font color='red'><b>You cannot afford to purchase " + newWork.getAcquisitionName() + "</b></font>");
             }
         }
-        if(quantity > 0) {
-            campaign.addReport(newWork.getShoppingListReport(quantity));
-            while(quantity > 1) {
-                newWork.incrementQuantity();
-                quantity--;
-            }
+        if(newWork.getQuantity() > 0) {
+            campaign.addReport(newWork.getShoppingListReport(newWork.getQuantity()));
+            
             shoppingList.add(newWork);
             MekHQ.triggerEvent(new ProcurementEvent(newWork));
         }
@@ -151,7 +151,7 @@ public class ShoppingList implements MekHqXmlSerializable {
                      canAfford = false;
                 }
                 while(canAfford && shoppingItem.getQuantity() > 0 && campaign.acquireEquipment(shoppingItem)) {
-                    shoppingItem.decrementQuantity();
+                    //shoppingItem.decrementQuantity();
                     if(shoppingItem.getQuantity() > 0 && campaign.getFunds() < getTrueBuyCost(shoppingItem, campaign)) {
                         canAfford = false;
                         campaign.addReport("<font color='red'><b>You cannot afford to purchase " + shoppingItem.getAcquisitionName() + "</b></font>");

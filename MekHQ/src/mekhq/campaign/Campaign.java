@@ -1943,6 +1943,7 @@ public class Campaign implements Serializable, ITechManager {
         }
 
         if (found) {
+        	acquisition.decrementQuantity();
             MekHQ.triggerEvent(new AcquisitionEvent(acquisition));
         }
         addReport(report);
