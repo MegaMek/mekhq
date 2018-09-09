@@ -115,19 +115,14 @@ public class ShoppingList implements MekHqXmlSerializable {
                 return;
             }
         }
-        boolean canAfford = true;
-        if(campaign.getFunds() < getTrueBuyCost(newWork, campaign)) {
-             campaign.addReport("<font color='red'><b>You cannot afford to purchase " + newWork.getAcquisitionName() + "</b></font>");
-             canAfford = false;
-        }
+        
         while(quantity > 1) {
             newWork.incrementQuantity();
             quantity--;
         }
-        while(canAfford && newWork.getQuantity() > 0 && campaign.acquireEquipment(newWork)) {
-            if(quantity > 0 && campaign.getFunds() < getTrueBuyCost(newWork, campaign)) {
-                canAfford = false;
-                campaign.addReport("<font color='red'><b>You cannot afford to purchase " + newWork.getAcquisitionName() + "</b></font>");
+        while(newWork.getQuantity() > 0) {
+            if(!campaign.acquireEquipment(newWork)) {
+            	break;
             }
         }
         if(newWork.getQuantity() > 0) {
@@ -145,17 +140,10 @@ public class ShoppingList implements MekHqXmlSerializable {
             shoppingItem.decrementDaysToWait();
 
             if(shoppingItem.getDaysToWait() <= 0 && !noStaff) {
-            	boolean canAfford = true;
-                if(campaign.getFunds() < getTrueBuyCost(shoppingItem, campaign)) {
-                     campaign.addReport("<font color='red'><b>You cannot afford to purchase " + shoppingItem.getAcquisitionName() + "</b></font>");
-                     canAfford = false;
-                }
-                while(canAfford && shoppingItem.getQuantity() > 0 && campaign.acquireEquipment(shoppingItem)) {
-                    //shoppingItem.decrementQuantity();
-                    if(shoppingItem.getQuantity() > 0 && campaign.getFunds() < getTrueBuyCost(shoppingItem, campaign)) {
-                        canAfford = false;
-                        campaign.addReport("<font color='red'><b>You cannot afford to purchase " + shoppingItem.getAcquisitionName() + "</b></font>");
-                    }
+                while(shoppingItem.getQuantity() > 0) {
+                	if(!campaign.acquireEquipment(shoppingItem)) {
+                		break;
+                	}
                 }
             }
             if(shoppingItem.getQuantity() > 0 || shoppingItem.getDaysToWait() > 0) {
@@ -278,7 +266,7 @@ public class ShoppingList implements MekHqXmlSerializable {
         return false;
     }
 
-    private long getTrueBuyCost(IAcquisitionWork item, Campaign campaign) {
+    private long getTrueBuyCost2(IAcquisitionWork item, Campaign campaign) {
         long cost = Long.MIN_VALUE;
         if((item instanceof UnitOrder && campaign.getCampaignOptions().payForUnits()) ||
                 (item instanceof Part && campaign.getCampaignOptions().payForParts())

@@ -205,6 +205,7 @@ import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.campaign.unit.CrewType;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.unit.UnitOrder;
 import mekhq.campaign.unit.UnitTechProgression;
 import mekhq.campaign.universe.Era;
 import mekhq.campaign.universe.Faction;
@@ -1884,7 +1885,15 @@ public class Campaign implements Serializable, ITechManager {
             addReport("Your force has no one capable of acquiring equipment.");
             return false;
         }
-
+        
+        //check on funds
+        if(((acquisition instanceof UnitOrder && getCampaignOptions().payForUnits()) 
+        		||(acquisition instanceof Part && getCampaignOptions().payForParts())) 
+        		&& getFunds() < acquisition.getBuyCost()) {
+            addReport("<font color='red'><b>You cannot afford to purchase " + acquisition.getAcquisitionName() + "</b></font>");
+            return false;
+       }
+        
         TargetRoll target = getTargetForAcquisition(acquisition, person, false);
         if (target.getValue() == TargetRoll.IMPOSSIBLE) {
             addReport(target.getDesc());
