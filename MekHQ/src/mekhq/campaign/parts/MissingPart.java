@@ -332,7 +332,6 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 	
 	@Override
 	public String failToFind() {
-	    resetDaysToWait();
 		return "<font color='red'><b> part not found</b>.</font>";
 	}
 	

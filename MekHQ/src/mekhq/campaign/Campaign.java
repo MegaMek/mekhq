@@ -1923,6 +1923,7 @@ public class Campaign implements Serializable, ITechManager {
             if(shoppingItem.getDaysToWait() <= 0) {
                 while(shoppingItem.getQuantity() > 0) {
                 	if(!acquireEquipment(shoppingItem, person)) {
+                		shoppingItem.resetDaysToWait();
                 		break;
                 	}
                 }
