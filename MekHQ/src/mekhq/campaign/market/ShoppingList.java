@@ -71,7 +71,20 @@ public class ShoppingList implements MekHqXmlSerializable {
     public ShoppingList() {
         shoppingList = new ArrayList<IAcquisitionWork>();
     }
+    
+    public ShoppingList(ArrayList<IAcquisitionWork> items) {
+        shoppingList = items;
+    }
+    
+    public ShoppingList(IAcquisitionWork item) {
+        shoppingList = new ArrayList<IAcquisitionWork>();   
+        shoppingList.add(item);
+    }
 
+    public ArrayList<IAcquisitionWork> getAllShoppingItems() {
+    	return shoppingList;
+    }
+    
     public IAcquisitionWork getShoppingItem(Object newEquipment) {
         for(IAcquisitionWork shoppingItem : shoppingList) {
             if(isSameEquipment(shoppingItem.getNewEquipment(), newEquipment)) {
@@ -105,6 +118,9 @@ public class ShoppingList implements MekHqXmlSerializable {
         if(newWork instanceof AmmoBin) {
             newWork = ((AmmoBin) newWork).getAcquisitionWork();
         }
+        
+        //check to see if this is already on the shopping list. If so, then add quantity to the list
+        //and return
         for(IAcquisitionWork shoppingItem : shoppingList) {
             if(isSameEquipment(shoppingItem.getNewEquipment(), newWork.getNewEquipment())) {
                 campaign.addReport(newWork.getShoppingListReport(quantity));
@@ -116,41 +132,21 @@ public class ShoppingList implements MekHqXmlSerializable {
             }
         }
         
+        //if not on the shopping list then try to acquire it with a temporary short shopping list. 
+        //If we fail, then add it to the shopping list
         while(quantity > 1) {
             newWork.incrementQuantity();
             quantity--;
         }
-        while(newWork.getQuantity() > 0) {
-            if(!campaign.acquireEquipment(newWork)) {
-            	break;
-            }
-        }
+        ShoppingList shortList = new ShoppingList(newWork);
+        shortList = campaign.goShopping(shortList);      
+        
         if(newWork.getQuantity() > 0) {
             campaign.addReport(newWork.getShoppingListReport(newWork.getQuantity()));
             
             shoppingList.add(newWork);
             MekHQ.triggerEvent(new ProcurementEvent(newWork));
         }
-    }
-
-    public void newDay(Campaign campaign) {
-        ArrayList<IAcquisitionWork> newShoppingList = new ArrayList<IAcquisitionWork>();
-        boolean noStaff = false;
-        for(IAcquisitionWork shoppingItem : shoppingList) {
-            shoppingItem.decrementDaysToWait();
-
-            if(shoppingItem.getDaysToWait() <= 0 && !noStaff) {
-                while(shoppingItem.getQuantity() > 0) {
-                	if(!campaign.acquireEquipment(shoppingItem)) {
-                		break;
-                	}
-                }
-            }
-            if(shoppingItem.getQuantity() > 0 || shoppingItem.getDaysToWait() > 0) {
-                newShoppingList.add(shoppingItem);
-            }
-        }
-        shoppingList = newShoppingList;
     }
 
     @Override

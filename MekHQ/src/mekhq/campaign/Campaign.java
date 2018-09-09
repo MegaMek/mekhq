@@ -1876,6 +1876,37 @@ public class Campaign implements Serializable, ITechManager {
         return admin;
     }
 
+    public ShoppingList goShopping(ShoppingList sList) {
+    	
+    	//get the logistics person and return original list with a message if you don't have one
+    	Person person = getLogisticsPerson();
+        if(null == person && !getCampaignOptions().getAcquisitionSkill().equals(CampaignOptions.S_AUTO)) {
+            addReport("Your force has no one capable of acquiring equipment.");
+            return sList;
+        }
+        
+        //loop through shopping list. If its time to check, then check as appropriate. Items not
+        //found get added to the remaining item list
+        ArrayList<IAcquisitionWork> remainingItems = new ArrayList<IAcquisitionWork>();
+        for(IAcquisitionWork shoppingItem : sList.getAllShoppingItems()) {
+            shoppingItem.decrementDaysToWait();
+            
+            if(shoppingItem.getDaysToWait() <= 0) {
+                while(shoppingItem.getQuantity() > 0) {
+                	if(!acquireEquipment(shoppingItem)) {
+                		break;
+                	}
+                }
+            }
+            if(shoppingItem.getQuantity() > 0 || shoppingItem.getDaysToWait() > 0) {
+            	remainingItems.add(shoppingItem);
+            }
+        }
+        
+        return new ShoppingList(remainingItems);
+        
+    }
+    
     public boolean acquireEquipment(IAcquisitionWork acquisition) {
         boolean found = false;
         String report = "";
@@ -2713,7 +2744,7 @@ public class Campaign implements Serializable, ITechManager {
 
         resetAstechMinutes();
 
-        shoppingList.newDay(this);
+        shoppingList = goShopping(shoppingList);
 
         processNewDayUnits();
 
