@@ -4,8 +4,6 @@ v0.45.2-SNAPSHOT
 + Switched build system from ant to gradle.
 + Issue #917: Hire Full Compliment Regularly Hires Bondsmen
 + Issue #919: Dropship Crewmembers/techs displayed as "Nobody" In Repair Bay
-+ added tech specialist SPAs
-
 
 v0.45.1 (2018-09-03 2300 UTC)
 + PR #864: Security - address XXE vulnerabilities in XML parsers
