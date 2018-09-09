@@ -1885,15 +1885,44 @@ public class Campaign implements Serializable, ITechManager {
             return sList;
         }
         
+        //loop through shopping items and decrement days to wait
+        for(IAcquisitionWork shoppingItem : sList.getAllShoppingItems()) {
+            shoppingItem.decrementDaysToWait();
+        }
+        
+        /*
+        if(getCampaignOptions().usePlanetaryAcquisitions()) {      	
+            ArrayList<IAcquisitionWork> remainingItems = new ArrayList<IAcquisitionWork>();
+ 
+        	//TODO: loop through planets, and then loop through shopping list and run acquire equipment for each planet         
+            for(Planet p: planets) {
+	        	//loop through shopping list. If its time to check, then check as appropriate. Items not
+	            //found get added to the remaining item list
+	            for(IAcquisitionWork shoppingItem : sList.getAllShoppingItems()) {	                
+	                if(shoppingItem.getDaysToWait() <= 0) {
+	                    while(shoppingItem.getQuantity() > 0) {
+	                    	if(!acquireEquipment(shoppingItem, person)) {
+	                    		break;
+	                    	}
+	                    }
+	                }
+	                if(shoppingItem.getQuantity() > 0 || shoppingItem.getDaysToWait() > 0) {
+	                	remainingItems.add(shoppingItem);
+	                }
+	            }
+            }
+            
+            return new ShoppingList(remainingItems);
+        	
+        }*/
+        
         //loop through shopping list. If its time to check, then check as appropriate. Items not
         //found get added to the remaining item list
         ArrayList<IAcquisitionWork> remainingItems = new ArrayList<IAcquisitionWork>();
-        for(IAcquisitionWork shoppingItem : sList.getAllShoppingItems()) {
-            shoppingItem.decrementDaysToWait();
-            
+        for(IAcquisitionWork shoppingItem : sList.getAllShoppingItems()) {            
             if(shoppingItem.getDaysToWait() <= 0) {
                 while(shoppingItem.getQuantity() > 0) {
-                	if(!acquireEquipment(shoppingItem)) {
+                	if(!acquireEquipment(shoppingItem, person)) {
                 		break;
                 	}
                 }
@@ -1907,16 +1936,15 @@ public class Campaign implements Serializable, ITechManager {
         
     }
     
-    public boolean acquireEquipment(IAcquisitionWork acquisition) {
+    public boolean acquireEquipment(IAcquisitionWork acquisition, Person person) {
+    	return acquireEquipment(acquisition, person, null, false);
+    }
+    
+    public boolean acquireEquipment(IAcquisitionWork acquisition, Person person, Planet planet, boolean initialAttempt) {
         boolean found = false;
         String report = "";
-
-        Person person = getLogisticsPerson();
-        if(null == person && !getCampaignOptions().getAcquisitionSkill().equals(CampaignOptions.S_AUTO)) {
-            addReport("Your force has no one capable of acquiring equipment.");
-            return false;
-        }
-        
+        String planetaryReport = "";
+              
         //check on funds
         if(((acquisition instanceof UnitOrder && getCampaignOptions().payForUnits()) 
         		||(acquisition instanceof Part && getCampaignOptions().payForParts())) 
@@ -1933,6 +1961,16 @@ public class Campaign implements Serializable, ITechManager {
         if (null != person) {
             report += person.getHyperlinkedFullTitle() + " ";
         }
+        
+        //TODO: if planet is not null, then we are using planetary acquisition rules
+        //if initalAttempt is true, make initial rolls  to see if we can acquire on this planet, 
+        //before moving to actual acquisition rolls. Also don't show all the details for planetary 
+        //acquisition.
+        if(initialAttempt && Compute.d6(2) < target.getValue()) {
+        	//no contacts on this planet, move along
+        	return false;
+        }
+        
         report += "attempts to find " + acquisition.getAcquisitionName();
         int roll = Compute.d6(2);
         report += "  needs " + target.getValueAsString();
@@ -1986,7 +2024,11 @@ public class Campaign implements Serializable, ITechManager {
         	acquisition.decrementQuantity();
             MekHQ.triggerEvent(new AcquisitionEvent(acquisition));
         }
-        addReport(report);
+        if(null == planet) {
+        	addReport(report);
+        } else if(!planetaryReport.isEmpty()) {
+        	addReport(planetaryReport);
+        }
         return found;
     }
 
