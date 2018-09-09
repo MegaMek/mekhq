@@ -266,15 +266,4 @@ public class ShoppingList implements MekHqXmlSerializable {
         return false;
     }
 
-    private long getTrueBuyCost2(IAcquisitionWork item, Campaign campaign) {
-        long cost = Long.MIN_VALUE;
-        if((item instanceof UnitOrder && campaign.getCampaignOptions().payForUnits()) ||
-                (item instanceof Part && campaign.getCampaignOptions().payForParts())
-                ) {
-            cost = item.getBuyCost();
-        }
-        return cost;
-
-    }
-
 }
