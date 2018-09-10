@@ -18,3 +18,4 @@ MekHQ/.idea/
 /settings_local.gradle
 /.classpath
 /.project
+/properties_local.gradle

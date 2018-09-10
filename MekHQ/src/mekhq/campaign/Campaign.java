@@ -2794,6 +2794,7 @@ public class Campaign implements Serializable, ITechManager {
         }
 
         // ok now we can check for other stuff we might need to do to units
+        List<UUID> unitsToRemove = new ArrayList<>();
         for (Unit u : getUnits()) {
             if (u.isRefitting()) {
                 refit(u.getRefit());
@@ -2804,7 +2805,12 @@ public class Campaign implements Serializable, ITechManager {
             if (!u.isPresent()) {
                 u.checkArrival();
             }
+            if (!u.isRepairable() && !u.hasSalvageableParts()) {
+                unitsToRemove.add(u.getId());
+            }
         }
+        // Remove any unrepairable, unsalvageable units
+        unitsToRemove.forEach(uid -> removeUnit(uid));
     }
 
     /** @return <code>true</code> if the new day arrived */
