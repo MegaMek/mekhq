@@ -2,7 +2,9 @@ package mekhq.campaign.mission;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -26,12 +28,13 @@ public class ScenarioTemplate {
     public String name;
     public String shortBriefing;
     public String detailedBriefing;
+    //public List<ScenarioForceTemplate> scenarioForces = new ArrayList<>();
+    
+    public ScenarioMapParameters mapParameters = new ScenarioMapParameters();
     
     @XmlElementWrapper(name="scenarioForces")
     @XmlElement(name="scenarioForce")
-    public List<ScenarioForceTemplate> scenarioForces = new ArrayList<>();
-    
-    public ScenarioMapParameters mapParameters = new ScenarioMapParameters();
+    public Map<String, ScenarioForceTemplate> scenarioForces = new HashMap<>();
     
     public void Serialize(File outputFile) {
         try {

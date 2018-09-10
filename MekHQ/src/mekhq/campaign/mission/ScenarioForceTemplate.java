@@ -1,5 +1,6 @@
 package mekhq.campaign.mission;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlElement;
@@ -17,9 +18,18 @@ public class ScenarioForceTemplate {
     
     public static final String[] FORCE_ALIGNMENTS = { "Player", "Allied", "Opposing", "Third" };
     public static final String[] FORCE_GENERATION_METHODS = { "Player Deployed", "BV Scaled", "Unit Count Scaled", "Fixed Unit Count" };
-    public static final String[] DEPLOYMENT_ZONES = { "North", "Northeast", "East", "Southeast", "South", "Southwest", "West", "Northwest", "Edge", "Narrow Edge", "Center", "Any", "As Force Group", "Opposite Force Group" };
+    public static final String[] FORCE_DEPLOYMENT_SYNC_TYPES = { "None", "Same Edge", "Same Arc", "Opposite Edge", "Opposite Arc" };
+    public static final String[] DEPLOYMENT_ZONES = { "North", "Northeast", "East", "Southeast", "South", "Southwest", "West", "Northwest", "Edge", "Narrow Edge", "Center", "Any" };
     public static final String[] BOT_DESTINATION_ZONES = { "None", "Opposite Deployment Edge", "North", "East", "South", "West", "Random" };
-    public static final String[] UNIT_TYPES = { "Mek", "Vee", "Aero", "Conv. Fighter", "Gun Emplacement", "Infantry", "Battle Armor", "Naval", "Civilian" };
+    public static final String[] UNIT_TYPES = { "Mek", "Mixed Mek/Vee", "Vee", "Aero", "Conv. Fighter", "Gun Emplacement", "Infantry", "Battle Armor", "Naval", "Civilian" };
+    
+    public enum SynchronizedDeploymentType {
+        None,
+        SameEdge,
+        SameArc,
+        OppositeEdge,
+        OppositeArc
+    }
     
     /**
      * The alignment of the force.
@@ -81,9 +91,26 @@ public class ScenarioForceTemplate {
     private boolean contributesToUnitCount;
     
     /**
-     * The group to which this force belongs. Used for coordination of deployment zones and retreat thresholds.
+     * A short, unique name for the force.
      */
-    private String forceGroupID;
+    private String forceName;
+    
+    /**
+     * The identifier of a force with which this force is synchronized, for the purposes of sharing deployment zones
+     * and retreat thresholds. 
+     */
+    private String syncedForceName;
+    
+    /**
+     * In the case where this force is synchronized with another, 
+     */
+    private SynchronizedDeploymentType syncDeploymentType;
+    
+    /**
+     * Whether or not this force shares a retreat threshold with the synced force. 
+     * If yes, then all synced forces will retreat once 
+     */
+    private boolean syncRetreatThreshold;
     
     //TODO: 
     // Introduce possibility to deploy opposite/same as a given force group
@@ -102,7 +129,7 @@ public class ScenarioForceTemplate {
         this.forceAlignment = forceAlignment;
         this.generationMethod = generationMethod;
         this.forceMultiplier = forceMultiplier;
-        this.deploymentZones = deploymentZones;
+        this.deploymentZones = deploymentZones == null ? new ArrayList<>() : deploymentZones;
         this.destinationZone = destinationZone;
         this.retreatThreshold = retreatThreshold;
         this.allowedUnitTypes = allowedUnitTypes;
@@ -152,8 +179,20 @@ public class ScenarioForceTemplate {
         return contributesToUnitCount;
     }
     
-    public String getForceGroupID() {
-        return forceGroupID;
+    public String getForceName() {
+        return forceName;
+    }
+    
+    public String getSyncedForceName() {
+        return syncedForceName;
+    }
+    
+    public SynchronizedDeploymentType getSyncDeploymentType() {
+        return syncDeploymentType;
+    }
+    
+    public boolean getSyncRetreatThreshold() {
+        return syncRetreatThreshold;
     }
     
     public void setForceAlignment(int forceAlignment) {
@@ -196,7 +235,15 @@ public class ScenarioForceTemplate {
         this.contributesToUnitCount = contributesToUnitCount;
     }
     
-    public void setForceGroupID(String forceGroupID) {
-        this.forceGroupID = forceGroupID;
+    public void setForceName(String forceName) {
+        this.forceName = forceName;
+    }
+    
+    public void setSyncedForceName(String syncedForceName) {
+        this.syncedForceName = syncedForceName;
+    }
+    
+    public void setSyncDeploymentType(SynchronizedDeploymentType syncDeploymentType) {
+        this.syncDeploymentType = syncDeploymentType;
     }
 }

@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -21,6 +22,7 @@ import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
@@ -32,6 +34,7 @@ import javax.swing.border.LineBorder;
 
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.ScenarioForceTemplate;
+import mekhq.campaign.mission.ScenarioForceTemplate.SynchronizedDeploymentType;
 import mekhq.campaign.mission.ScenarioTemplate;
 
 /**
@@ -64,7 +67,10 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
     JCheckBox chkReinforce;
     JCheckBox chkContributesToBV;
     JCheckBox chkContributesToUnitCount;
-    JTextField txtGroupID;
+    JTextField txtForceName;
+    JComboBox<String> cboSyncForceName;
+    JComboBox<String> cboSyncDeploymentType;
+    
     JPanel panForceList;
     JTextField txtScenarioName;
     JTextArea txtScenarioBriefing;
@@ -80,6 +86,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
     JPanel globalPanel;
     
     JPanel forcedPanel;
+    //JPanel forcgedPanel;
     JScrollPane forceScrollPane;
     
     // the scenario template we're working on
@@ -101,13 +108,14 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
      */
     protected void initComponents() {
         this.setTitle("Scenario Template Editor");
-        getContentPane().setLayout(new GridBagLayout());
+        getContentPane().setLayout(new GridLayout());
         
         globalPanel = new JPanel();
         globalPanel.setLayout(new GridBagLayout());
         
         JScrollPane globalScrollPane = new JScrollPane(globalPanel);
         globalScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+        globalScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         getContentPane().add(globalScrollPane);        
         
         GridBagConstraints gbc = new GridBagConstraints();
@@ -121,6 +129,10 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         setupBottomButtons(gbc);
         
         forceAlignmentChangeHandler();
+        updateForceSyncList();
+        renderForceList();
+        
+        globalScrollPane.setPreferredSize(new Dimension((int) globalPanel.getPreferredSize().getWidth() + 10, (int) globalPanel.getPreferredSize().getHeight()));
     }
     
     /**
@@ -162,35 +174,6 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         JScrollPane scrLongBriefing = new JScrollPane(txtLongBriefing);
         gbc.gridy++;
         globalPanel.add(scrLongBriefing, gbc);
-    }
-    
-    private void setupForceGroupEditorHeaders(GridBagConstraints gbc) {
-        gbc.gridx = 0;
-        gbc.gridwidth = 1;
-        
-        JLabel lblForces = new JLabel("Force Groups:");
-        gbc.gridy++;
-        globalPanel.add(lblForces, gbc);
-        
-        JButton btnHideShow = new JButton("Hide/Show");
-        btnHideShow.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                toggleForcePanelVisibility();
-            }
-            
-        });        
-        
-        gbc.gridx++;
-        int previousAnchor = gbc.anchor;
-        gbc.anchor = GridBagConstraints.EAST;
-        globalPanel.add(btnHideShow, gbc);
-        gbc.anchor = previousAnchor;
-    }
-    
-    private void setupForceGroupEditor(GridBagConstraints gbc) {
-        
     }
     
     /**
@@ -248,7 +231,6 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
             public void itemStateChanged(ItemEvent e) {
                 forceAlignmentChangeHandler();
             }
-            
         };
         
         cboAlignment = new JComboBox<String>(ScenarioForceTemplate.FORCE_ALIGNMENTS);
@@ -322,15 +304,41 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         gbc.gridx = 1;
         forcedPanel.add(chkContributesToUnitCount, gbc);
         
-        JLabel lblGroupID = new JLabel("Force Group ID:");
-        lblGroupID.setToolTipText("The group to which this force belongs. Forces in the same group will deploy in the same zone.");
+        JLabel lblForceID = new JLabel("Force ID:");
+        lblForceID.setToolTipText("The identifier for this force. Used to synchronize the properties of other forces to this one.");
         gbc.gridx = 0;
         gbc.gridy++;
-        forcedPanel.add(lblGroupID, gbc);
+        forcedPanel.add(lblForceID, gbc);
         
-        txtGroupID = new JTextField(2);
+        txtForceName = new JTextField(10);
         gbc.gridx = 1;
-        forcedPanel.add(txtGroupID, gbc);
+        forcedPanel.add(txtForceName, gbc);
+        
+        JLabel lblSyncDeployment = new JLabel("Synchronized Deployment:");
+        lblSyncDeployment.setToolTipText("Whether or not, and how, to synchronize the deployment of this force with another.");
+        gbc.gridx = 0;
+        gbc.gridy++;
+        forcedPanel.add(lblSyncDeployment, gbc);
+        
+        cboSyncDeploymentType = new JComboBox<>(ScenarioForceTemplate.FORCE_DEPLOYMENT_SYNC_TYPES);
+        
+        ItemListener syncDeploymentChangeListener = new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                syncDeploymentChangeHandler();
+            }
+        };
+        cboSyncDeploymentType.addItemListener(syncDeploymentChangeListener);
+        
+        gbc.gridx = 1;
+        gbc.anchor = GridBagConstraints.WEST;
+        forcedPanel.add(cboSyncDeploymentType, gbc);
+        
+        cboSyncForceName = new JComboBox<>();
+        gbc.gridx = 1;
+        gbc.anchor = GridBagConstraints.EAST;
+        forcedPanel.add(cboSyncForceName, gbc);
+        
         
         DefaultListModel<String> zoneModel = new DefaultListModel<String>();
         for(String s : ScenarioForceTemplate.DEPLOYMENT_ZONES) {
@@ -339,6 +347,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         
         gbc.gridx = 2;
         gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.WEST;
         
         JLabel lblDeploymentZones = new JLabel("Possible Deployment Zones");
         forcedPanel.add(lblDeploymentZones, gbc);
@@ -390,7 +399,6 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         
         forceScrollPane = new JScrollPane(panForceList);
         forceScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-        forceScrollPane.setPreferredSize(new Dimension(800, 200));
         
         forceScrollPane.setVisible(false);
         
@@ -534,10 +542,10 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
             forceScrollPane.setVisible(!scenarioTemplate.scenarioForces.isEmpty());
         }
         
-        for(int forceIndex = 0; forceIndex < scenarioTemplate.scenarioForces.size(); forceIndex++) {
+        for(String forceIndex : scenarioTemplate.scenarioForces.keySet()) {
             ScenarioForceTemplate sft = scenarioTemplate.scenarioForces.get(forceIndex);
-            JLabel lblGroupID = new JLabel(sft.getForceGroupID());
-            panForceList.add(lblGroupID, gbc);
+            JLabel lblForceName = new JLabel(sft.getForceName());
+            panForceList.add(lblForceName, gbc);
             
             JLabel lblForceAlignment = new JLabel(ScenarioForceTemplate.FORCE_ALIGNMENTS[sft.getForceAlignment()]);
             gbc.gridx++;
@@ -553,12 +561,21 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
             
             JLabel lblDeploymentZones = new JLabel();
             StringBuilder dzBuilder = new StringBuilder();
-            dzBuilder.append("<html>");
-            for(int zone : sft.getDeploymentZones()) {
-                dzBuilder.append(ScenarioForceTemplate.DEPLOYMENT_ZONES[zone]);
-                dzBuilder.append("<br/>");
+            
+            if(!sft.getDeploymentZones().isEmpty()) {
+                dzBuilder.append("<html>");
+                for(int zone : sft.getDeploymentZones()) {
+                    dzBuilder.append(ScenarioForceTemplate.DEPLOYMENT_ZONES[zone]);
+                    dzBuilder.append("<br/>");
+                }
+                dzBuilder.append("</html>");
+            } else {
+                dzBuilder.append(ScenarioForceTemplate.FORCE_DEPLOYMENT_SYNC_TYPES[sft.getSyncDeploymentType().ordinal()]);
+                dzBuilder.append(" as ");
+                dzBuilder.append(sft.getSyncedForceName());
             }
-            dzBuilder.append("</html>");      
+            
+            
             lblDeploymentZones.setText(dzBuilder.toString());
             gbc.gridx++;
             panForceList.add(lblDeploymentZones, gbc);
@@ -611,6 +628,13 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
      * Adds a new force with the currently selected parameters to the scenario template.
      */
     private void addForceButtonHandler() {
+        String validationResult = addForceValidation();
+        
+        if(!validationResult.isEmpty()) {
+            JOptionPane.showMessageDialog(this, validationResult, "Invalid Force Configuration", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
         int forceAlignment = cboAlignment.getSelectedIndex();
         int generationMethod = cboGenerationMethod.getSelectedIndex();
         double forceMultiplier = (double) spnMultiplier.getValue();
@@ -629,16 +653,53 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         }
         
         ScenarioForceTemplate sft = new ScenarioForceTemplate(forceAlignment, generationMethod, forceMultiplier,
-                deploymentZones, destinationZone, retreatThreshold, allowedUnitTypes);
+                null, destinationZone, retreatThreshold, allowedUnitTypes);
         sft.setCanReinforceLinked(chkReinforce.isSelected());
         sft.setContributesToBV(chkContributesToBV.isSelected());
         sft.setContributesToUnitCount(chkContributesToUnitCount.isSelected());
-        sft.setForceGroupID(txtGroupID.getText());
-        scenarioTemplate.scenarioForces.add(sft);
+        sft.setForceName(txtForceName.getText());
         
+        sft.setSyncDeploymentType(SynchronizedDeploymentType.values()[cboSyncDeploymentType.getSelectedIndex()]);
+        
+        // if we have picked "None" for synchronization, then set explicit deployment zones. 
+        // otherwise, set the synced force name
+        if(sft.getSyncDeploymentType() != SynchronizedDeploymentType.None) {
+            sft.setSyncedForceName(cboSyncForceName.getSelectedItem().toString());
+        } else {
+            sft.setDeploymentZones(deploymentZones);
+        }
+        
+        scenarioTemplate.scenarioForces.put(txtForceName.getText(), sft);
+        
+        updateForceSyncList();
+        syncDeploymentChangeHandler();
         renderForceList();
         pack();
         repaint();
+    }
+    
+    /**
+     * Function that performs validation when the 'Add' button is clicked for a force
+     * and informs the user of any nonsense configuration they may have specified.
+     * @return Validation message for display.
+     */
+    private String addForceValidation() {
+        StringBuilder valBuilder = new StringBuilder();
+        
+        if(SynchronizedDeploymentType.values()[cboSyncDeploymentType.getSelectedIndex()] == SynchronizedDeploymentType.None &&
+                lstDeployZones.getSelectedIndices().length == 0) {
+            valBuilder.append("Force needs to be synced or have explicit deployment zones");
+        }
+        
+        if(scenarioTemplate.scenarioForces.containsKey(txtForceName.getText())) {
+            if(valBuilder.length() > 0) {
+                valBuilder.append("\n");
+            }
+            
+            valBuilder.append("Force with this key already exists!");
+        }
+        
+        return valBuilder.toString();
     }
     
     /**
@@ -646,11 +707,28 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
      * @param command The command string containing the index of the force to remove.
      */
     private void deleteForceButtonHandler(String command) {
-        int forceIndex = Integer.parseInt(command.substring(REMOVE_FORCE_COMMAND.length()));
+        String forceIndex = command.substring(REMOVE_FORCE_COMMAND.length());
         scenarioTemplate.scenarioForces.remove(forceIndex);
+        
+        updateForceSyncList();
         renderForceList();
         pack();
         repaint();
+    }
+    
+    /**
+     * Worker method that updates the "Force Sync" list
+     * and sets the relevant dropdowns to active or inactive
+     */
+    private void updateForceSyncList() {
+        cboSyncForceName.removeAllItems();
+        for(String forceID : scenarioTemplate.scenarioForces.keySet()) {
+            cboSyncForceName.addItem(forceID);
+        }
+        
+        boolean forcesAvailableToSync = cboSyncForceName.getItemCount() > 0;
+        cboSyncForceName.setEnabled(forcesAvailableToSync);
+        cboSyncDeploymentType.setEnabled(forcesAvailableToSync);
     }
     
     /**
@@ -679,6 +757,21 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         lstUnitTypes.setEnabled(!isPlayerForce);
         chkContributesToBV.setEnabled(!isEnemyForce);
         chkContributesToUnitCount.setEnabled(!isEnemyForce);
+    }
+    
+    /**
+     * Event handler for when the force sync dropdown changes value.
+     * Enables or disables the "force to sync" and "deployment zone" UI elements as appropriate.
+     */
+    private void syncDeploymentChangeHandler() {
+        SynchronizedDeploymentType syncDeploymentType = SynchronizedDeploymentType.values()[cboSyncDeploymentType.getSelectedIndex()];
+        boolean syncForceDeployment = syncDeploymentType != SynchronizedDeploymentType.None;
+        
+        cboSyncForceName.setEnabled(syncForceDeployment);
+        lstDeployZones.setEnabled(!syncForceDeployment);
+        if(!lstDeployZones.isEnabled()) {
+            lstDeployZones.clearSelection();
+        }
     }
     
     /**
@@ -713,6 +806,10 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         scenarioTemplate.Serialize(file);
     }
     
+    /**
+     * Event handler for when the load button is cleared. Invokes deserialization functionality
+     * for user-selected file, then reloads all UI elements.
+     */
     private void loadTemplateButtonHandler() {
         JFileChooser loadTemplateChooser = new JFileChooser("./");
         loadTemplateChooser.setDialogTitle("Load Scenario Template");
@@ -725,6 +822,13 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
 
         File file = loadTemplateChooser.getSelectedFile();
         scenarioTemplate = ScenarioTemplate.Deserialize(file);
+        
+        if(scenarioTemplate == null) {
+            JOptionPane.showMessageDialog(this, "Error loading specified file. See log for details.", "Load Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        getContentPane().removeAll();
         globalPanel.removeAll();
         initComponents();
         pack();
@@ -748,6 +852,9 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         }
     }
     
+    /**
+     * Helper method that hides or reveals the force editor section.
+     */
     public void toggleForcePanelVisibility() {
         forcedPanel.setVisible(!forcedPanel.isVisible());
         forceScrollPane.setVisible(!forceScrollPane.isVisible() && !scenarioTemplate.scenarioForces.isEmpty());
