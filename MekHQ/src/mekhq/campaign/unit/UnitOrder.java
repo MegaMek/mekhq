@@ -121,6 +121,14 @@ public class UnitOrder extends Unit implements IAcquisitionWork, MekHqXmlSeriali
     	//  - Dylan
         return getName();
     }
+    
+    public String getQuantityName(int quantity) {
+        String answer = "" + quantity + " " + getName();
+        if(quantity > 1) {
+            answer += "s";
+        }
+        return answer;
+    }
 
     @Override
     public Object getNewEquipment() {

@@ -1890,62 +1890,102 @@ public class Campaign implements Serializable, ITechManager {
             shoppingItem.decrementDaysToWait();
         }
         
-        /*
-        if(getCampaignOptions().usePlanetaryAcquisitions()) {      	
+        if(!getCampaignOptions().usesPlanetaryAcquisition()) {      
+        	//loop through shopping list. If its time to check, then check as appropriate. Items not
+            //found get added to the remaining item list
             ArrayList<IAcquisitionWork> remainingItems = new ArrayList<IAcquisitionWork>();
- 
-        	//TODO: loop through planets, and then loop through shopping list and run acquire equipment for each planet         
-            for(Planet p: planets) {
+            for(IAcquisitionWork shoppingItem : sList.getAllShoppingItems()) {            
+                if(shoppingItem.getDaysToWait() <= 0) {
+                    while(shoppingItem.getQuantity() > 0) {
+                    	if(!acquireEquipment(shoppingItem, person)) {
+                    		shoppingItem.resetDaysToWait();
+                    		break;
+                    	}
+                    }
+                }
+                if(shoppingItem.getQuantity() > 0 || shoppingItem.getDaysToWait() > 0) {
+                	remainingItems.add(shoppingItem);
+                }
+            }
+            
+            return new ShoppingList(remainingItems);
+            
+        } else {
+        	//we are shopping by planets, so more involved
+            ArrayList<IAcquisitionWork> currentList = sList.getAllShoppingItems();
+            DateTime currentDate = Utilities.getDateTimeDay(getCalendar());
+         
+            String personTitle = "";
+            if (null != person) {
+                personTitle = person.getHyperlinkedFullTitle() + " ";
+            }
+            
+            //find planets within a certain radius - the function will weed out dead planets
+            List<Planet> planets = Planets.getInstance().getShoppingPlanets(getCurrentPlanet(), 
+            		getCampaignOptions().getMaxJumpsPlanetaryAcquisition(), 
+            		currentDate);
+
+            
+            for(Planet planet: planets) {
+            	ArrayList<IAcquisitionWork> remainingItems = new ArrayList<IAcquisitionWork>();
+            	
 	        	//loop through shopping list. If its time to check, then check as appropriate. Items not
 	            //found get added to the remaining item list
-	            for(IAcquisitionWork shoppingItem : sList.getAllShoppingItems()) {	                
+	            for(IAcquisitionWork shoppingItem : currentList) {	                
 	                if(shoppingItem.getDaysToWait() <= 0) {
-	                    while(shoppingItem.getQuantity() > 0) {
-	                    	if(!acquireEquipment(shoppingItem, person)) {
-	                    		break;
-	                    	}
-	                    }
+	                	int totalQuantity = 0;
+	                	//use same delivery time for the batch of same part type on the same planet
+	                	int transitTime = calculatePartTransitTime(planet);
+	                	if(shoppingItem.getQuantity() > 0 
+	                			&& acquireEquipment(shoppingItem, person, planet, true, transitTime)) {
+	                		//we found a part on this planet, so we can keep trying to find more until
+	                		//we fail
+	                		totalQuantity++;
+	                		while(shoppingItem.getQuantity() > 0) {
+		                    	if(!acquireEquipment(shoppingItem, person, planet, false, transitTime)) {
+		                    		break;
+		                    	} else {
+		                    		totalQuantity++;
+		                    	}
+		                    }
+	                		addReport("<font color='green'><b>" + personTitle + " found " + shoppingItem.getQuantityName(totalQuantity) + " on " + planet.getName(currentDate) + ". Delivery in " + transitTime + " days.</font><b>");
+	                	}	                    
 	                }
+	                //if we didn't find everything on this planet, then add to the remaining list
 	                if(shoppingItem.getQuantity() > 0 || shoppingItem.getDaysToWait() > 0) {
 	                	remainingItems.add(shoppingItem);
 	                }
 	            }
+	            //we are done with this planet. replace our current list with the remaining items
+	            currentList = remainingItems;
             }
             
-            return new ShoppingList(remainingItems);
+            //loop through and reset waiting time on all items on the remaining shopping list if 
+            //they have no waiting time left
+            for(IAcquisitionWork shoppingItem : sList.getAllShoppingItems()) {
+            	if(shoppingItem.getDaysToWait() <= 0) {
+            		shoppingItem.resetDaysToWait();
+            	}
+            }
+            
+            return new ShoppingList(currentList);
         	
-        }*/
-        
-        //loop through shopping list. If its time to check, then check as appropriate. Items not
-        //found get added to the remaining item list
-        ArrayList<IAcquisitionWork> remainingItems = new ArrayList<IAcquisitionWork>();
-        for(IAcquisitionWork shoppingItem : sList.getAllShoppingItems()) {            
-            if(shoppingItem.getDaysToWait() <= 0) {
-                while(shoppingItem.getQuantity() > 0) {
-                	if(!acquireEquipment(shoppingItem, person)) {
-                		shoppingItem.resetDaysToWait();
-                		break;
-                	}
-                }
-            }
-            if(shoppingItem.getQuantity() > 0 || shoppingItem.getDaysToWait() > 0) {
-            	remainingItems.add(shoppingItem);
-            }
-        }
-        
-        return new ShoppingList(remainingItems);
-        
+        }    
     }
     
     public boolean acquireEquipment(IAcquisitionWork acquisition, Person person) {
-    	return acquireEquipment(acquisition, person, null, false);
+    	return acquireEquipment(acquisition, person, null, false, -1);
     }
     
-    public boolean acquireEquipment(IAcquisitionWork acquisition, Person person, Planet planet, boolean initialAttempt) {
+    public boolean acquireEquipment(IAcquisitionWork acquisition, Person person, Planet planet, boolean initialAttempt, int transitDays) {
         boolean found = false;
         String report = "";
-        String planetaryReport = "";
-              
+        DateTime currentDate = Utilities.getDateTimeDay(getCalendar());      
+        
+        if (null != person) {
+            report += person.getHyperlinkedFullTitle() + " ";
+        }
+        
         //check on funds
         if(((acquisition instanceof UnitOrder && getCampaignOptions().payForUnits()) 
         		||(acquisition instanceof Part && getCampaignOptions().payForParts())) 
@@ -1955,21 +1995,37 @@ public class Campaign implements Serializable, ITechManager {
        }
         
         TargetRoll target = getTargetForAcquisition(acquisition, person, false);
+        
+        if(null != planet) {
+        	target = planet.getAcquisitionMods(target, getDate(), getCampaignOptions(), getFaction());
+        }
+        
+        //if initalAttempt is true, make initial rolls to see if we can acquire on this planet, 
+        //before moving to actual acquisition rolls.
+        if(initialAttempt) {
+        	if (target.getValue() == TargetRoll.IMPOSSIBLE) {
+        		if(getCampaignOptions().usePlanetAcquisitionVerboseReporting()) {
+        			addReport("<font color='red'><b>Can't search on " + planet.getName(currentDate) + " because:</b></font>");
+        			addReport(target.getDesc());
+        		}
+        		return false;
+        	}
+        	if(Compute.d6(2) < target.getValue()) {
+        		//no contacts on this planet, move along
+        		if(getCampaignOptions().usePlanetAcquisitionVerboseReporting()) {
+        			addReport("<font color='red'><b>No contacts available for " + acquisition.getAcquisitionDisplayName() + " on " + planet.getName(currentDate) + "</b></font>");
+        		}
+        		return false;
+        	} else {
+        		if(getCampaignOptions().usePlanetAcquisitionVerboseReporting()) {
+        			addReport("<font color='green'>Possible contact for " + acquisition.getAcquisitionDisplayName() + " on " + planet.getName(currentDate) + "</font>");     	
+        		}
+        	}
+        }
+        
         if (target.getValue() == TargetRoll.IMPOSSIBLE) {
             addReport(target.getDesc());
             return false;
-        }
-        if (null != person) {
-            report += person.getHyperlinkedFullTitle() + " ";
-        }
-        
-        //TODO: if planet is not null, then we are using planetary acquisition rules
-        //if initalAttempt is true, make initial rolls  to see if we can acquire on this planet, 
-        //before moving to actual acquisition rolls. Also don't show all the details for planetary 
-        //acquisition.
-        if(initialAttempt && Compute.d6(2) < target.getValue()) {
-        	//no contacts on this planet, move along
-        	return false;
         }
         
         report += "attempts to find " + acquisition.getAcquisitionName();
@@ -1991,7 +2047,9 @@ public class Campaign implements Serializable, ITechManager {
         }
         int xpGained = 0;
         if (roll >= target.getValue()) {
-            int transitDays = calculatePartTransitTime(mos);
+        	if(transitDays < 0) {
+        		transitDays = calculatePartTransitTime(mos);
+        	}
             report = report + acquisition.find(transitDays);
             found = true;
             if (person != null) {
@@ -2025,11 +2083,9 @@ public class Campaign implements Serializable, ITechManager {
         	acquisition.decrementQuantity();
             MekHQ.triggerEvent(new AcquisitionEvent(acquisition));
         }
-        if(null == planet) {
-        	addReport(report);
-        } else if(!planetaryReport.isEmpty()) {
-        	addReport(planetaryReport);
-        }
+		if(getCampaignOptions().usePlanetAcquisitionVerboseReporting()) {
+			addReport(report);
+		}
         return found;
     }
 
@@ -7849,7 +7905,24 @@ public class Campaign implements Serializable, ITechManager {
         }
     }
 
-    public int calculatePartTransitTime(int mos) {
+    public int calculatePartTransitTime(Planet planet) {
+    	//calculate number of jumps by light year distance as the crow flies divided by 30
+    	//the basic formula assumes 7 days per jump + system transit time on each side + random days equal
+    	//to (1+number of jumps)d6
+    	double distance = planet.getDistanceTo(getCurrentPlanet());
+    	//calculate number of jumps by dividing by 30 
+    	int jumps = (int)Math.ceil(distance/30.0);
+    	//you need a recharge except for the first jump
+    	int recharges = Math.max(jumps - 1, 0);
+    	//if you are delivering from the same planet then no transit times
+    	int currentTransitTime = (distance>0) ? (int)Math.ceil(getCurrentPlanet().getTimeToJumpPoint(1.0)) : 0;
+    	int originTransitTime = (distance>0) ? (int)Math.ceil(planet.getTimeToJumpPoint(1.0)) : 0;
+    	int amazonFreeShipping = Compute.d6(1+jumps);
+    	return recharges*7+currentTransitTime+originTransitTime+amazonFreeShipping;
+   	}
+    
+    public int calculatePartTransitTime(int mos) {    	
+    	
         int nDice = getCampaignOptions().getNDiceTransitTime();
         int time = getCampaignOptions().getConstantTransitTime();
         if (nDice > 0) {

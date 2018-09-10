@@ -31,6 +31,7 @@ import java.util.List;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import megamek.common.EquipmentType;
 import megamek.common.TechConstants;
 import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
@@ -82,6 +83,12 @@ public class CampaignOptions implements Serializable {
     public final static double MAXIMUM_DROPSHIP_EQUIPMENT_PERCENT = 1.0;
     public final static double MAXIMUM_JUMPSHIP_EQUIPMENT_PERCENT = 1.0;
     public final static double MAXIMUM_WARSHIP_EQUIPMENT_PERCENT = 1.0;
+    
+    public final static int PLANET_ACQUISITION_ALL = 0;
+    public final static int PLANET_ACQUISITION_NEUTRAL = 1;
+    public final static int PLANET_ACQUISITION_ALLY = 2;
+    public final static int PLANET_ACQUISITION_SELF = 3;
+
     
     private boolean useFactionForNames;
     private boolean useUnitRating;
@@ -182,6 +189,15 @@ public class CampaignOptions implements Serializable {
     private int acquireMinimumTimeUnit;
     private int clanAcquisitionPenalty;
     private int isAcquisitionPenalty;
+    private boolean usePlanetaryAcquisition;
+    private int maxJumpsPlanetaryAcquisition;
+    private int[] planetTechAcquisitionBonus;
+    private int[] planetIndustryAcquisitionBonus;
+    private int[] planetOutputAcquisitionBonus;
+    private int planetAcquisitionFactionLimit;
+    private boolean planetAcquisitionNoClanCrossover;
+    private boolean planetAcquisitionVerbose;
+
 
     //xp related
     private int scenarioXP;
@@ -396,6 +412,32 @@ public class CampaignOptions implements Serializable {
         blcSaleValue = false;
         clanAcquisitionPenalty = 0;
         isAcquisitionPenalty = 0;
+        usePlanetaryAcquisition = true;
+        maxJumpsPlanetaryAcquisition = 2;
+        planetTechAcquisitionBonus = new int[6];
+        planetTechAcquisitionBonus[EquipmentType.RATING_A] = -1;
+        planetTechAcquisitionBonus[EquipmentType.RATING_B] = 0;
+        planetTechAcquisitionBonus[EquipmentType.RATING_C] = 1;
+        planetTechAcquisitionBonus[EquipmentType.RATING_D] = 2;
+        planetTechAcquisitionBonus[EquipmentType.RATING_E] = 4;
+        planetTechAcquisitionBonus[EquipmentType.RATING_F] = 8;
+        planetIndustryAcquisitionBonus = new int[6];
+        planetIndustryAcquisitionBonus[EquipmentType.RATING_A] = 0;
+        planetIndustryAcquisitionBonus[EquipmentType.RATING_B] = 0;
+        planetIndustryAcquisitionBonus[EquipmentType.RATING_C] = 0;
+        planetIndustryAcquisitionBonus[EquipmentType.RATING_D] = 0;
+        planetIndustryAcquisitionBonus[EquipmentType.RATING_E] = 0;
+        planetIndustryAcquisitionBonus[EquipmentType.RATING_F] = 0;
+        planetOutputAcquisitionBonus = new int[6];
+        planetOutputAcquisitionBonus[EquipmentType.RATING_A] = -1;
+        planetOutputAcquisitionBonus[EquipmentType.RATING_B] = 0;
+        planetOutputAcquisitionBonus[EquipmentType.RATING_C] = 1;
+        planetOutputAcquisitionBonus[EquipmentType.RATING_D] = 2;
+        planetOutputAcquisitionBonus[EquipmentType.RATING_E] = 4;
+        planetOutputAcquisitionBonus[EquipmentType.RATING_F] = 8;
+        planetAcquisitionFactionLimit = PLANET_ACQUISITION_NEUTRAL;
+        planetAcquisitionNoClanCrossover = true;
+        planetAcquisitionVerbose = true;
         healWaitingPeriod = 1;
         naturalHealingWaitingPeriod = 15;
         destroyByMargin = false;
@@ -1279,7 +1321,47 @@ public class CampaignOptions implements Serializable {
     public void setAcquireMinimumTime(int b) {
         acquireMinimumTime = b;
     }
+    
+    public boolean usesPlanetaryAcquisition() {
+    	return usePlanetaryAcquisition;
+    }
+    
+    public void setPlanetaryAcquisition(boolean b) {
+    	usePlanetaryAcquisition = b;
+    }
+    
+    public int getPlanetAcquisitionFactionLimit() {
+    	return planetAcquisitionFactionLimit;
+    }
+    
+    public void SetPlanetAcquisitionFactionLimit(int b) {
+    	planetAcquisitionFactionLimit = b;
+    }
+    
+    public boolean disallowPlanetAcquisitionClanCrossover() {
+    	return planetAcquisitionNoClanCrossover;
+    }
+    
+    public void setDisallowPlanetAcquisitionClanCrossover(boolean b) {
+    	planetAcquisitionNoClanCrossover = b;
+    }
+    
+    public int getMaxJumpsPlanetaryAcquisition() {
+    	return maxJumpsPlanetaryAcquisition;
+    }
+    
+    public void setMaxJumpsPlanetaryAcquisition(int m) {
+    	maxJumpsPlanetaryAcquisition = m;
+    }
 
+    public boolean usePlanetAcquisitionVerboseReporting() {
+    	return planetAcquisitionVerbose;
+    }
+    
+    public void setPlanetAcquisitionVerboseReporting(boolean b) {
+    	planetAcquisitionVerbose = b;
+    }
+    
     public double getEquipmentContractPercent() {
         return equipmentContractPercent;
     }
@@ -1350,6 +1432,48 @@ public class CampaignOptions implements Serializable {
 
     public void setIsAcquisitionPenalty(int b) {
         isAcquisitionPenalty = b;
+    }
+    
+    public int getPlanetTechAcquisitionBonus(int type) {
+        if (type < 0 || type >= planetTechAcquisitionBonus.length) {
+            return 0;
+        }
+        return planetTechAcquisitionBonus[type];
+    }
+
+    public void setPlanetTechAcquisitionBonus(int base, int type) {
+        if (type < 0 || type >= planetTechAcquisitionBonus.length) {
+            return;
+        }
+        this.planetTechAcquisitionBonus[type] = base;
+    }
+    
+    public int getPlanetIndustryAcquisitionBonus(int type) {
+        if (type < 0 || type >= planetIndustryAcquisitionBonus.length) {
+            return 0;
+        }
+        return planetIndustryAcquisitionBonus[type];
+    }
+
+    public void setPlanetIndustryAcquisitionBonus(int base, int type) {
+        if (type < 0 || type >= planetIndustryAcquisitionBonus.length) {
+            return;
+        }
+        this.planetIndustryAcquisitionBonus[type] = base;
+    }
+    
+    public int getPlanetOutputAcquisitionBonus(int type) {
+        if (type < 0 || type >= planetOutputAcquisitionBonus.length) {
+            return 0;
+        }
+        return planetOutputAcquisitionBonus[type];
+    }
+
+    public void setPlanetOutputAcquisitionBonus(int base, int type) {
+        if (type < 0 || type >= planetOutputAcquisitionBonus.length) {
+            return;
+        }
+        this.planetOutputAcquisitionBonus[type] = base;
     }
 
     public int getHealingWaitingPeriod() {
@@ -2159,6 +2283,11 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "acquireMosUnit", acquireMosUnit);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "acquireMinimumTime", acquireMinimumTime);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "acquireMinimumTimeUnit", acquireMinimumTimeUnit);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "usePlanetaryAcquisition", usePlanetaryAcquisition);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "planetAcquisitionFactionLimit", planetAcquisitionFactionLimit);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "planetAcquisitionNoClanCrossover", planetAcquisitionNoClanCrossover);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "planetAcquisitionVerbose", planetAcquisitionVerbose);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "maxJumpsPlanetaryAcquisition", maxJumpsPlanetaryAcquisition);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "equipmentContractPercent", equipmentContractPercent);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "dropshipContractPercent", dropshipContractPercent);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "jumpshipContractPercent", jumpshipContractPercent);
@@ -2290,6 +2419,19 @@ public class CampaignOptions implements Serializable {
         }
         
         pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "</massRepairOptions>");
+        
+        pw1.println(MekHqXmlUtil.indentStr(indent + 1)
+                + "<planetTechAcquisitionBonus>"
+                + Utilities.printIntegerArray(planetTechAcquisitionBonus)
+                + "</planetTechAcquisitionBonus>");
+        pw1.println(MekHqXmlUtil.indentStr(indent + 1)
+                + "<planetIndustryAcquisitionBonus>"
+                + Utilities.printIntegerArray(planetIndustryAcquisitionBonus)
+                + "</planetIndustryAcquisitionBonus>");
+        pw1.println(MekHqXmlUtil.indentStr(indent + 1)
+                + "<planetOutputAcquisitionBonus>"
+                + Utilities.printIntegerArray(planetOutputAcquisitionBonus)
+                + "</planetOutputAcquisitionBonus>");
         
         pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                     + "<salaryTypeBase>"
@@ -2485,6 +2627,31 @@ public class CampaignOptions implements Serializable {
                 retVal.clanAcquisitionPenalty = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("isAcquisitionPenalty")) {
                 retVal.isAcquisitionPenalty = Integer.parseInt(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("usePlanetaryAcquisition")) {
+                retVal.usePlanetaryAcquisition = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("planetAcquisitionFactionLimit")) {
+                retVal.planetAcquisitionFactionLimit = Integer.parseInt(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("planetAcquisitionNoClanCrossover")) {
+                retVal.planetAcquisitionNoClanCrossover = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("planetAcquisitionVerbose")) {
+                retVal.planetAcquisitionVerbose = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("maxJumpsPlanetaryAcquisition")) {
+                retVal.maxJumpsPlanetaryAcquisition = Integer.parseInt(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("planetTechAcquisitionBonus")) {
+                String[] values = wn2.getTextContent().split(",");
+                for (int i = 0; i < values.length; i++) {
+                    retVal.planetTechAcquisitionBonus[i] = Integer.parseInt(values[i]);
+                }
+            } else if (wn2.getNodeName().equalsIgnoreCase("planetIndustryAcquisitionBonus")) {
+                String[] values = wn2.getTextContent().split(",");
+                for (int i = 0; i < values.length; i++) {
+                    retVal.planetIndustryAcquisitionBonus[i] = Integer.parseInt(values[i]);
+                }
+            } else if (wn2.getNodeName().equalsIgnoreCase("planetOutputAcquisitionBonus")) {
+                String[] values = wn2.getTextContent().split(",");
+                for (int i = 0; i < values.length; i++) {
+                    retVal.planetOutputAcquisitionBonus[i] = Integer.parseInt(values[i]);
+                }
             } else if (wn2.getNodeName().equalsIgnoreCase("equipmentContractPercent")) {
                 retVal.setEquipmentContractPercent(Double.parseDouble(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("dropshipContractPercent")) {
