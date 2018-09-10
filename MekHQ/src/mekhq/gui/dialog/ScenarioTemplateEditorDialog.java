@@ -756,7 +756,9 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         spnRetreatThreshold.setEnabled(!isPlayerForce);
         lstUnitTypes.setEnabled(!isPlayerForce);
         chkContributesToBV.setEnabled(!isEnemyForce);
+        chkContributesToBV.setSelected(!isEnemyForce);
         chkContributesToUnitCount.setEnabled(!isEnemyForce);
+        chkContributesToUnitCount.setSelected(!isEnemyForce);
     }
     
     /**
