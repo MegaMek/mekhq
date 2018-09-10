@@ -462,6 +462,48 @@
         </skillPrereq>
         <miscPrereq>clanner:false</miscPrereq>
     </ability>
+    <ability>
+        <lookupName>tech_weapon_specialist</lookupName> 
+        <displayName>Tech Specialist, Weapon (Unofficial)</displayName>  
+        <desc>-1 to repair and maintenance checks when working with weapons</desc>  
+        <xpCost>4</xpCost>
+        <weight>2</weight>
+        <skillPrereq>
+            <skill>Tech/Mech::Regular</skill>
+            <skill>Tech/Mechanic::Regular</skill>
+            <skill>Tech/Aero::Regular</skill>
+            <skill>Tech/BA::Regular</skill>
+            <skill>Tech/Vessel::Regular</skill>
+        </skillPrereq>
+    </ability>
+    <ability>
+        <lookupName>tech_armor_specialist</lookupName> 
+        <displayName>Tech Specialist, Armor (Unofficial)</displayName>  
+        <desc>-1 to repair and maintenance checks when working with armor</desc> 
+        <xpCost>4</xpCost>
+        <weight>2</weight>
+        <skillPrereq>
+            <skill>Tech/Mech::Regular</skill>
+            <skill>Tech/Mechanic::Regular</skill>
+            <skill>Tech/Aero::Regular</skill>
+            <skill>Tech/BA::Regular</skill>
+            <skill>Tech/Vessel::Regular</skill>
+        </skillPrereq>
+    </ability>
+    <ability>
+        <lookupName>tech_internal_specialist</lookupName> 
+        <displayName>Tech Specialist, Internal (Unofficial)</displayName>   
+        <desc>-1 to repair and maintenance checks when working with internal systems</desc> 
+        <xpCost>6</xpCost>
+        <weight>2</weight>
+        <skillPrereq>
+            <skill>Tech/Mech::Regular</skill>
+            <skill>Tech/Mechanic::Regular</skill>
+            <skill>Tech/Aero::Regular</skill>
+            <skill>Tech/BA::Regular</skill>
+            <skill>Tech/Vessel::Regular</skill>
+        </skillPrereq>
+    </ability>
 	
 	<!-- OTHER SPA -->
 	<ability>
