@@ -134,6 +134,7 @@ public class ShoppingList implements MekHqXmlSerializable {
         
         //if not on the shopping list then try to acquire it with a temporary short shopping list. 
         //If we fail, then add it to the shopping list
+        int origQuantity = quantity;
         while(quantity > 1) {
             newWork.incrementQuantity();
             quantity--;
@@ -142,6 +143,14 @@ public class ShoppingList implements MekHqXmlSerializable {
         shortList = campaign.goShopping(shortList);      
         
         if(newWork.getQuantity() > 0) {
+        	//if using planetary acquisition check with low verbosity, check to see if nothing was found 
+        	//because it is not reported elsewhere
+        	if(newWork.getQuantity() == origQuantity && 
+        			campaign.getCampaignOptions().usesPlanetaryAcquisition() &&
+        			!campaign.getCampaignOptions().usePlanetAcquisitionVerboseReporting()) {
+        		campaign.addReport("<font color='red'><b>You failed to find " + newWork.getAcquisitionName() + " within " + campaign.getCampaignOptions().getMaxJumpsPlanetaryAcquisition() + " jumps</b></font>");
+        	}
+        	
             campaign.addReport(newWork.getShoppingListReport(newWork.getQuantity()));
             
             shoppingList.add(newWork);

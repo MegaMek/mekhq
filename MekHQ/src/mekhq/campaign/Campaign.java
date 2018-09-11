@@ -1948,7 +1948,7 @@ public class Campaign implements Serializable, ITechManager {
 		                    		totalQuantity++;
 		                    	}
 		                    }
-	                		addReport("<font color='green'><b>" + personTitle + " found " + shoppingItem.getQuantityName(totalQuantity) + " on " + planet.getName(currentDate) + ". Delivery in " + transitTime + " days.</font><b>");
+	                		addReport(personTitle + "<font color='green'><b> found " + shoppingItem.getQuantityName(totalQuantity) + " on " + planet.getName(currentDate) + ". Delivery in " + transitTime + " days.</b></font>");
 	                	}	                    
 	                }
 	                //if we didn't find everything on this planet, then add to the remaining list
@@ -2005,20 +2005,19 @@ public class Campaign implements Serializable, ITechManager {
         if(initialAttempt) {
         	if (target.getValue() == TargetRoll.IMPOSSIBLE) {
         		if(getCampaignOptions().usePlanetAcquisitionVerboseReporting()) {
-        			addReport("<font color='red'><b>Can't search on " + planet.getName(currentDate) + " because:</b></font>");
-        			addReport(target.getDesc());
+        			addReport("<font color='red'><b>Can't search for " + acquisition.getAcquisitionName() + " on " + planet.getName(currentDate) + " because:</b></font> " + target.getDesc());
         		}
         		return false;
         	}
         	if(Compute.d6(2) < target.getValue()) {
         		//no contacts on this planet, move along
         		if(getCampaignOptions().usePlanetAcquisitionVerboseReporting()) {
-        			addReport("<font color='red'><b>No contacts available for " + acquisition.getAcquisitionDisplayName() + " on " + planet.getName(currentDate) + "</b></font>");
+        			addReport("<font color='red'><b>No contacts available for " + acquisition.getAcquisitionName() + " on " + planet.getName(currentDate) + "</b></font>");
         		}
         		return false;
         	} else {
         		if(getCampaignOptions().usePlanetAcquisitionVerboseReporting()) {
-        			addReport("<font color='green'>Possible contact for " + acquisition.getAcquisitionDisplayName() + " on " + planet.getName(currentDate) + "</font>");     	
+        			addReport("<font color='green'>Possible contact for " + acquisition.getAcquisitionName() + " on " + planet.getName(currentDate) + "</font>");     	
         		}
         	}
         }
