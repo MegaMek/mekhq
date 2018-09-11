@@ -2848,10 +2848,11 @@ public class Campaign implements Serializable, ITechManager {
 
         resetAstechMinutes();
 
-        shoppingList = goShopping(shoppingList);
 
         processNewDayUnits();
 
+        shoppingList = goShopping(shoppingList);
+        
         // check for anything in finances
         finances.newDay(this);
 
