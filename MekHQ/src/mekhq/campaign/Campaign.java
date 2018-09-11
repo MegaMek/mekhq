@@ -2083,7 +2083,7 @@ public class Campaign implements Serializable, ITechManager {
         	acquisition.decrementQuantity();
             MekHQ.triggerEvent(new AcquisitionEvent(acquisition));
         }
-		if(getCampaignOptions().usePlanetAcquisitionVerboseReporting()) {
+		if(!getCampaignOptions().usesPlanetaryAcquisition() || getCampaignOptions().usePlanetAcquisitionVerboseReporting()) {
 			addReport(report);
 		}
         return found;
