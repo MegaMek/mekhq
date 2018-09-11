@@ -80,6 +80,7 @@ import mekhq.campaign.JumpPath;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Faction.Tag;
 import mekhq.campaign.universe.Planet;
+import mekhq.campaign.universe.Planet.SocioIndustrialData;
 import mekhq.campaign.universe.Planets;
 import mekhq.gui.dialog.NewPlanetaryEventDialog;
 
@@ -697,6 +698,7 @@ public class InterstellarMapPanel extends JPanel {
                             arc.setArcByCenter(x, y, size * 1.2, 0, 360, Arc2D.OPEN);
                             g2.fill(arc);
                         }
+                        /*
                         Set<Faction> factions = planet.getFactionSet(now);
                         if(null != factions && !isPlanetEmpty(planet)) {
                             int i = 0;
@@ -712,6 +714,12 @@ public class InterstellarMapPanel extends JPanel {
                             arc.setArcByCenter(x, y, size, 0, 360.0, Arc2D.PIE);
                             g2.fill(arc);
                         }
+                        */
+                        //The following function could be used to load different kinds of shading
+                        //currently it does tech level, but this could be expanded. 
+                        g2.setPaint(getPlanetColor(planet));
+                        arc.setArcByCenter(x, y, size, 0, 360.0, Arc2D.PIE);
+                        g2.fill(arc);
                     }
                 }
 
@@ -958,6 +966,29 @@ public class InterstellarMapPanel extends JPanel {
         selectedPlanet = p;
         jumpPath = new JumpPath();
         notifyListeners();
+    }
+    
+    public Color getPlanetColor(Planet p) {
+    	SocioIndustrialData socio = p.getSocioIndustrial(Utilities.getDateTimeDay(campaign.getCalendar()));
+    	if(null == socio) {
+    		return Color.GRAY;
+    	}
+    	switch(socio.tech) {
+    	case EquipmentType.RATING_F:
+    		return new Color(239,243,255);
+    	case EquipmentType.RATING_E:
+    		return new Color(198,219,239);
+    	case EquipmentType.RATING_D:
+    		return new Color(158,202,225);
+    	case EquipmentType.RATING_C:
+    		return new Color(107,174,214);
+    	case EquipmentType.RATING_B:
+    		return new Color(49,130,189);
+    	case EquipmentType.RATING_A:
+    		return new Color(8,81,156);
+    	default: 
+    		return Color.WHITE;
+    	}
     }
 
     private void openPlanetEventEditor(Planet p) {
