@@ -412,7 +412,7 @@ public class CampaignOptions implements Serializable {
         blcSaleValue = false;
         clanAcquisitionPenalty = 0;
         isAcquisitionPenalty = 0;
-        usePlanetaryAcquisition = true;
+        usePlanetaryAcquisition = false;
         maxJumpsPlanetaryAcquisition = 2;
         planetTechAcquisitionBonus = new int[6];
         planetTechAcquisitionBonus[EquipmentType.RATING_A] = -1;
@@ -437,7 +437,7 @@ public class CampaignOptions implements Serializable {
         planetOutputAcquisitionBonus[EquipmentType.RATING_F] = 8;
         planetAcquisitionFactionLimit = PLANET_ACQUISITION_NEUTRAL;
         planetAcquisitionNoClanCrossover = true;
-        planetAcquisitionVerbose = true;
+        planetAcquisitionVerbose = false;
         healWaitingPeriod = 1;
         naturalHealingWaitingPeriod = 15;
         destroyByMargin = false;
@@ -599,6 +599,21 @@ public class CampaignOptions implements Serializable {
                 return TechConstants.T_SIMPLE_NAMES[TechConstants.T_SIMPLE_EXPERIMENTAL];
             case TECH_UNOFFICIAL:
                 return TechConstants.T_SIMPLE_NAMES[TechConstants.T_SIMPLE_UNOFFICIAL];
+            default:
+                return "Unknown";
+        }
+    }
+    
+    public static String getFactionLimitName(int lvl) {
+        switch (lvl) {
+            case PLANET_ACQUISITION_ALL:
+                return "All factions";
+            case PLANET_ACQUISITION_NEUTRAL:
+                return "Neutral or allied factions";
+            case PLANET_ACQUISITION_ALLY:
+                return "Allied factions";
+            case PLANET_ACQUISITION_SELF:
+                return "Only own faction";
             default:
                 return "Unknown";
         }
