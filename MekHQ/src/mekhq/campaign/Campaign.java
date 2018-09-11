@@ -1915,6 +1915,9 @@ public class Campaign implements Serializable, ITechManager {
             ArrayList<IAcquisitionWork> currentList = sList.getAllShoppingItems();
             DateTime currentDate = Utilities.getDateTimeDay(getCalendar());
          
+            //a list of items than can be taken out of the search and put back on the shopping list
+            ArrayList<IAcquisitionWork> shelvedItems = new ArrayList<IAcquisitionWork>();
+            
             String personTitle = "";
             if (null != person) {
                 personTitle = person.getHyperlinkedFullTitle() + " ";
@@ -1952,17 +1955,29 @@ public class Campaign implements Serializable, ITechManager {
 	                	}	                    
 	                }
 	                //if we didn't find everything on this planet, then add to the remaining list
-	                if(shoppingItem.getQuantity() > 0 || shoppingItem.getDaysToWait() > 0) {
-	                	remainingItems.add(shoppingItem);
+	                if(shoppingItem.getQuantity() > 0 || shoppingItem.getDaysToWait() > 0) {	                	
+	                	//if we can't afford it, then don't keep searching for it on other planets
+	                	//check on funds
+	                    if(!canPayFor(shoppingItem)) {
+	                    	if(!getCampaignOptions().usePlanetAcquisitionVerboseReporting()) {
+	                			addReport("<font color='red'><b>You cannot afford to purchase another " + shoppingItem.getAcquisitionName() + "</b></font>");
+	                		}
+	                    	shelvedItems.add(shoppingItem);
+	                    } else {	                	
+	                    	remainingItems.add(shoppingItem);
+	                    }
 	                }
 	            }
 	            //we are done with this planet. replace our current list with the remaining items
 	            currentList = remainingItems;
             }
             
+            //add shelved items back to the currentlist
+            currentList.addAll(shelvedItems);
+            
             //loop through and reset waiting time on all items on the remaining shopping list if 
             //they have no waiting time left
-            for(IAcquisitionWork shoppingItem : sList.getAllShoppingItems()) {
+            for(IAcquisitionWork shoppingItem : currentList) {
             	if(shoppingItem.getDaysToWait() <= 0) {
             		shoppingItem.resetDaysToWait();
             	}
@@ -1971,6 +1986,15 @@ public class Campaign implements Serializable, ITechManager {
             return new ShoppingList(currentList);
         	
         }    
+    }
+    
+    public boolean canPayFor(IAcquisitionWork acquisition) {
+    	if((acquisition instanceof UnitOrder && getCampaignOptions().payForUnits()) 
+    		||(acquisition instanceof Part && getCampaignOptions().payForParts()) 
+    		&& getFunds() < acquisition.getBuyCost()) {
+			return false;
+		}
+		return true;
     }
     
     public boolean acquireEquipment(IAcquisitionWork acquisition, Person person) {
@@ -1987,11 +2011,11 @@ public class Campaign implements Serializable, ITechManager {
         }
         
         //check on funds
-        if(((acquisition instanceof UnitOrder && getCampaignOptions().payForUnits()) 
-        		||(acquisition instanceof Part && getCampaignOptions().payForParts())) 
-        		&& getFunds() < acquisition.getBuyCost()) {
-            addReport("<font color='red'><b>You cannot afford to purchase " + acquisition.getAcquisitionName() + "</b></font>");
-            return false;
+        if(!canPayFor(acquisition)) {
+    		if(!getCampaignOptions().usesPlanetaryAcquisition() || getCampaignOptions().usePlanetAcquisitionVerboseReporting()) {
+    			addReport("<font color='red'><b>You cannot afford to purchase another " + acquisition.getAcquisitionName() + "</b></font>");
+    		}
+            return false;        
        }
         
         TargetRoll target = getTargetForAcquisition(acquisition, person, false);
