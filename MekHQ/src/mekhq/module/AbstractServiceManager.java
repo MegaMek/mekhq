@@ -60,7 +60,7 @@ abstract public class AbstractServiceManager<T extends MekHQModule> {
                 services.put(service.getModuleName(), service);
             }
         } catch (ServiceConfigurationError err) {
-            MekHQ.getLogger().log(getClass(), "loadServices()", err); //$NON-NLS-1$
+            MekHQ.getLogger().error(getClass(), "loadServices()", err); //$NON-NLS-1$
         }
     }
     

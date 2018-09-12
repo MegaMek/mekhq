@@ -370,7 +370,7 @@ public class Faction {
             // Parse using builder to get DOM representation of the XML file
             xmlDoc = db.parse(fis);
         } catch (Exception ex) {
-            MekHQ.getLogger().log(Faction.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(Faction.class, METHOD_NAME, ex);
         }
 
         Element factionEle = xmlDoc.getDocumentElement();

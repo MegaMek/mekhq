@@ -277,10 +277,10 @@ public class Mission implements Serializable, MekHqXmlSerializable {
                 } else if (wn2.getNodeName().equalsIgnoreCase("planetId")) {
                     retVal.planetId = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("planetName")) {
-                    Planet planet = c.getPlanet(wn2.getTextContent());
+                    Planet planet = c.getPlanetByName(wn2.getTextContent());
                     
                     if(planet != null) {
-                        retVal.planetId = c.getPlanet(wn2.getTextContent()).getId();
+                        retVal.planetId = c.getPlanetByName(wn2.getTextContent()).getId();
                     } else {
                         retVal.legacyPlanetName = wn2.getTextContent();
                     }
@@ -320,7 +320,7 @@ public class Mission implements Serializable, MekHqXmlSerializable {
             // Errrr, apparently either the class name was invalid...
             // Or the listed name doesn't exist.
             // Doh!
-            MekHQ.getLogger().log(Mission.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(Mission.class, METHOD_NAME, ex);
         }
 
         return retVal;

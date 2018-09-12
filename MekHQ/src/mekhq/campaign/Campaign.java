@@ -663,7 +663,7 @@ public class Campaign implements Serializable, ITechManager {
         } catch (Exception ex) {
             MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
                     "Unable to load unit: " + ms.getEntryName()); //$NON-NLS-1$
-            MekHQ.getLogger().log(getClass(), METHOD_NAME, ex);
+            MekHQ.getLogger().error(getClass(), METHOD_NAME, ex);
         }
         Entity en = mechFileParser.getEntity();
 
@@ -1428,6 +1428,7 @@ public class Campaign implements Serializable, ITechManager {
         }
         // Makes no sense buying those separately from the chasis
         if((p instanceof EquipmentPart)
+                && ((EquipmentPart) p).getType() != null
                 && (((EquipmentPart) p).getType().hasFlag(MiscType.F_CHASSIS_MODIFICATION)))
         {
             return null;
@@ -2151,7 +2152,11 @@ public class Campaign implements Serializable, ITechManager {
                 }
                 partWork.setTeamId(tech.getId());
                 partWork.reservePart();
-                report += " - <b>Not enough time, the remainder of the task on " + partWork.getUnit().getName() + " will be finished tomorrow.</b>";
+                report += " - <b>Not enough time, the remainder of the task";
+                if (null != partWork.getUnit()) {
+                    report += " on " + partWork.getUnit().getName();
+                }
+                report += " will be finished tomorrow.</b>";
                 MekHQ.triggerEvent(new PartWorkEvent(tech, partWork));
                 addReport(report);
                 return;
@@ -2649,6 +2654,7 @@ public class Campaign implements Serializable, ITechManager {
         }
 
         // ok now we can check for other stuff we might need to do to units
+        List<UUID> unitsToRemove = new ArrayList<>();
         for (Unit u : getUnits()) {
             if (u.isRefitting()) {
                 refit(u.getRefit());
@@ -2659,7 +2665,12 @@ public class Campaign implements Serializable, ITechManager {
             if (!u.isPresent()) {
                 u.checkArrival();
             }
+            if (!u.isRepairable() && !u.hasSalvageableParts()) {
+                unitsToRemove.add(u.getId());
+            }
         }
+        // Remove any unrepairable, unsalvageable units
+        unitsToRemove.forEach(uid -> removeUnit(uid));
     }
 
     /** @return <code>true</code> if the new day arrived */
@@ -2739,6 +2750,12 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public long getPayRoll(boolean noInfantry) {
+        if(!campaignOptions.payForSalaries()) return 0;
+
+        return getTheoreticalPayroll(noInfantry);
+    }
+
+    private long getTheoreticalPayroll(boolean noInfantry){
         long salaries = 0;
         for (Person p : getPersonnel()) {
             // Optionized infantry (Unofficial)
@@ -2761,10 +2778,12 @@ public class Campaign implements Serializable, ITechManager {
 
     public long getMaintenanceCosts() {
         long costs = 0;
-        for (Map.Entry<UUID, Unit> mu : units.entrySet()) {
-            Unit u = mu.getValue();
-            if (u.requiresMaintenance() && null != u.getTech()) {
-                costs += u.getMaintenanceCost();
+        if(campaignOptions.payForMaintain()) {
+            for (Map.Entry<UUID, Unit> mu : units.entrySet()) {
+                Unit u = mu.getValue();
+                if (u.requiresMaintenance() && null != u.getTech()) {
+                    costs += u.getMaintenanceCost();
+                }
             }
         }
         return costs;
@@ -2779,7 +2798,9 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public long getOverheadExpenses() {
-        return (long) (getPayRoll() * 0.05);
+        if(!campaignOptions.payForOverhead()) return 0;
+
+        return (long) (getTheoreticalPayroll(false) * 0.05);
     }
 
     public void removeUnit(UUID id) {
@@ -2846,18 +2867,47 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public void awardTrainingXP(Lance l) {
+        awardTrainingXPByMaximumRole(l);
+    }
+
+    /**
+     * Awards XP to the lance based on the maximum experience level of its
+     * commanding officer and the minumum experience level of the unit's
+     * members.
+     * @param l The {@link Lance} to calculate XP to award for training.
+     */
+    private void awardTrainingXPByMaximumRole(Lance l) {
         for (UUID trainerId : forceIds.get(l.getForceId()).getAllUnits()) {
-            if (getUnit(trainerId).getCommander() != null && getUnit(trainerId).getCommander().getRank().isOfficer()
-                    && getUnit(trainerId).getCommander().getExperienceLevel(false) > SkillType.EXP_REGULAR) {
-                for (UUID traineeId : forceIds.get(l.getForceId()).getAllUnits()) {
-                    for (Person p : getUnit(traineeId).getCrew()) {
-                        if (p.getExperienceLevel(false) < SkillType.EXP_REGULAR) {
-                            p.setXp(p.getXp() + 1);
-                            addReport(p.getHyperlinkedName() + " has gained 1 XP from training.");
+            Person commander = getUnit(trainerId).getCommander();
+            // AtB 2.31: Training lance – needs a officer with Veteran skill levels
+            //           and adds 1xp point to every Green skilled unit.
+            if (commander != null && commander.getRank().isOfficer()) {
+                // Take the maximum of the commander's Primary and Secondary Role
+                // experience to calculate their experience level...
+                int commanderExperience = Math.max(commander.getExperienceLevel(false),
+                        commander.getExperienceLevel(true));
+                if (commanderExperience > SkillType.EXP_REGULAR) {
+                    // ...and if the commander is better than a veteran, find all of
+                    // the personnel under their command...
+                    for (UUID traineeId : forceIds.get(l.getForceId()).getAllUnits()) {
+                        for (Person p : getUnit(traineeId).getCrew()) {
+                            if (p == commander) {
+                                continue;
+                            }
+                            // ...and if their weakest role is Green or Ultra-Green
+                            int experienceLevel = Math.min(p.getExperienceLevel(false),
+                                    p.getSecondaryRole() != Person.T_NONE
+                                            ? p.getExperienceLevel(true)
+                                            : SkillType.EXP_ELITE);
+                            if (experienceLevel >= 0 && experienceLevel < SkillType.EXP_REGULAR) {
+                                // ...add one XP.
+                                p.setXp(p.getXp() + 1);
+                                addReport(p.getHyperlinkedName() + " has gained 1 XP from training.");
+                            }
                         }
                     }
+                    break;
                 }
-                break;
             }
         }
     }
@@ -3394,7 +3444,7 @@ public class Campaign implements Serializable, ITechManager {
         try {
             mechFileParser = new MechFileParser(mechSummary.getSourceFile());
         } catch (EntityLoadingException ex) {
-            MekHQ.getLogger().log(Campaign.class, "getBrandNewUndamagedEntity(String)", ex);
+            MekHQ.getLogger().error(Campaign.class, "getBrandNewUndamagedEntity(String)", ex);
         }
         if (mechFileParser == null) {
             return null;
@@ -3685,7 +3735,7 @@ public class Campaign implements Serializable, ITechManager {
             try {
                 mechFileParser = new MechFileParser(ms.getSourceFile());
             } catch (EntityLoadingException ex) {
-                MekHQ.getLogger().log(Campaign.class, "writeCustoms(PrintWriter)", ex);
+                MekHQ.getLogger().error(Campaign.class, "writeCustoms(PrintWriter)", ex);
             }
             if (mechFileParser == null) {
                 continue;
@@ -3742,7 +3792,7 @@ public class Campaign implements Serializable, ITechManager {
             // Parse using builder to get DOM representation of the XML file
             xmlDoc = db.parse(fis);
         } catch (Exception ex) {
-            MekHQ.getLogger().log(Campaign.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(Campaign.class, METHOD_NAME, ex);
         }
 
         Element campaignEle = xmlDoc.getDocumentElement();
@@ -5351,7 +5401,7 @@ public class Campaign implements Serializable, ITechManager {
         return plntNames;
     }
 
-    public Planet getPlanet(String name) {
+    public Planet getPlanetByName(String name) {
         return Planets.getInstance().getPlanetByName(name, Utilities.getDateTimeDay(calendar));
     }
 
@@ -7829,7 +7879,7 @@ public class Campaign implements Serializable, ITechManager {
         }
 
         inventory.setSupply(nSupply);
-        inventory.setSupply(nTransit);
+        inventory.setTransit(nTransit);
 
         int nOrdered = 0;
         IAcquisitionWork onOrder = getShoppingList().getShoppingItem(part);
@@ -7952,7 +8002,7 @@ public class Campaign implements Serializable, ITechManager {
         } else if (getCampaignOptions().useEquipmentContractBase()) {
             return getForceValue(getCampaignOptions().useInfantryDontCount());
         } else {
-            return getPayRoll(getCampaignOptions().useInfantryDontCount());
+            return getTheoreticalPayroll(getCampaignOptions().useInfantryDontCount());
         }
     }
 
@@ -8836,7 +8886,7 @@ public class Campaign implements Serializable, ITechManager {
         int minutesUsed = u.getMaintenanceTime();
         int astechsUsed = getAvailableAstechs(minutesUsed, false);
         boolean maintained = null != tech
-                && tech.getMinutesLeft() > minutesUsed && !tech.isMothballing();
+                && tech.getMinutesLeft() >= minutesUsed && !tech.isMothballing();
         boolean paidMaintenance = true;
         if (maintained) {
             // use the time

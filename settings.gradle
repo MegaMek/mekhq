@@ -1,0 +1,15 @@
+rootProject.name = 'MekHQRoot'
+
+include 'MekHQ'
+
+enableFeaturePreview('STABLE_PUBLISHING')
+
+// A settings_local.gradle file can be used to include local project dependencies as part of a composite
+// build. For example:
+// includeBuild('../megamek') will use the local megamek repository instead of a binary jar to fulfill
+// the depedency.
+
+def localSettings = file('settings_local.gradle')
+if (localSettings.exists()) {
+    apply from: localSettings
+}

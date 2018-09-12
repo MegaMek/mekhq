@@ -518,7 +518,7 @@ public class Lance implements Serializable, MekHqXmlSerializable {
                 }
             }
         } catch (Exception ex) {
-            MekHQ.getLogger().log(Lance.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(Lance.class, METHOD_NAME, ex);
         }
         return retVal;
     }

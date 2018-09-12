@@ -217,7 +217,7 @@ public class MekLabTab extends CampaignGuiTab {
         try {
             entity = (new MechFileParser(mechSummary.getSourceFile(), mechSummary.getEntryName())).getEntity();
         } catch (EntityLoadingException ex) {
-            MekHQ.getLogger().log(getClass(), "loadUnit(Unit)", ex); //$NON-NLS-1$
+            MekHQ.getLogger().error(getClass(), "loadUnit(Unit)", ex); //$NON-NLS-1$
         }
         entity.setYear(unit.campaign.getCalendar().get(Calendar.YEAR));
         UnitUtil.updateLoadedUnit(entity);
@@ -251,7 +251,7 @@ public class MekLabTab extends CampaignGuiTab {
         try {
             entity = (new MechFileParser(mechSummary.getSourceFile(), mechSummary.getEntryName())).getEntity();
         } catch (EntityLoadingException ex) {
-            MekHQ.getLogger().log(getClass(), "resetUnit()", ex); //$NON-NLS-1$
+            MekHQ.getLogger().error(getClass(), "resetUnit()", ex); //$NON-NLS-1$
         }
         entity.setYear(unit.campaign.getCalendar().get(Calendar.YEAR));
         UnitUtil.updateLoadedUnit(entity);
@@ -601,10 +601,10 @@ public class MekLabTab extends CampaignGuiTab {
         private static final long serialVersionUID = 4348862352101110686L;
         
         private SmallCraft entity;
-        private megameklab.com.ui.Dropship.tabs.DropshipStructureTab structureTab;
+        private megameklab.com.ui.aerospace.DropshipStructureTab structureTab;
         private megameklab.com.ui.Aero.tabs.EquipmentTab equipmentTab;
         private megameklab.com.ui.Aero.tabs.BuildTab buildTab;
-        private megameklab.com.ui.Dropship.tabs.TransportTab transportTab;
+        private megameklab.com.ui.aerospace.TransportTab transportTab;
         private megameklab.com.ui.Aero.tabs.PreviewTab previewTab;
 
         public DropshipPanel(SmallCraft a) {
@@ -620,12 +620,12 @@ public class MekLabTab extends CampaignGuiTab {
         public void reloadTabs() {
             removeAll();
 
-            structureTab = new megameklab.com.ui.Dropship.tabs.DropshipStructureTab(this);
+            structureTab = new megameklab.com.ui.aerospace.DropshipStructureTab(this);
             structureTab.setAsCustomization();
             previewTab = new megameklab.com.ui.Aero.tabs.PreviewTab(this);
             equipmentTab = new megameklab.com.ui.Aero.tabs.EquipmentTab(this);
             buildTab = new megameklab.com.ui.Aero.tabs.BuildTab(this, equipmentTab);
-            transportTab = new megameklab.com.ui.Dropship.tabs.TransportTab(this);
+            transportTab = new megameklab.com.ui.aerospace.TransportTab(this);
             structureTab.addRefreshedListener(this);
             equipmentTab.addRefreshedListener(this);
             buildTab.addRefreshedListener(this);

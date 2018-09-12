@@ -34,6 +34,7 @@ import megamek.common.ITechnology;
 import megamek.common.Mounted;
 import megamek.common.TargetRoll;
 import megamek.common.TechAdvancement;
+import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
@@ -103,7 +104,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
         try {
         	itemCost = (int) type.getCost(en, isArmored, -1);
         } catch(NullPointerException ex) {
-        	System.out.println("Found a null entity while calculating cost for " + name);
+            MekHQ.getLogger().error(AmmoStorage.class, "getStickerPrice", ex);
         }
     	return itemCost;
     }

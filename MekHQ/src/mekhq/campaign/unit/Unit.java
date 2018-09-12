@@ -1633,7 +1633,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             }
         } catch (Exception ex) {
             // Doh!
-            MekHQ.getLogger().log(Unit.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(Unit.class, METHOD_NAME, ex);
         }
 
         if (retVal.id == null) {
@@ -2729,7 +2729,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             MekHQ.getLogger().log(Unit.class, "addBayAmmoBin(EquipmentType, Mounted)",
                     LogLevel.ERROR, "Location full exception attempting to add " + etype.getDesc()
                     + " to unit " + getName());
-            MekHQ.getLogger().log(Unit.class, "addBayAmmoBin(EquipmentType, Mounted)", ex);
+            MekHQ.getLogger().error(Unit.class, "addBayAmmoBin(EquipmentType, Mounted)", ex);
             return null;
         }
         
@@ -3281,7 +3281,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 int sumEdge = 0;
                 int sumEdgeUsed = 0;
                 String engineerName = "Nobody";
-                int bestRank = -1;
+                int bestRank = Integer.MIN_VALUE;
                 for(UUID pid : vesselCrew) {
                     Person p = campaign.getPerson(pid);
                     if(null == p) {

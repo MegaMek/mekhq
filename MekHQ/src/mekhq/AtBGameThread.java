@@ -81,7 +81,7 @@ public class AtBGameThread extends GameThread {
         } catch (Exception ex) {
             MekHQ.getLogger().log(getClass(), "run", LogLevel.ERROR, //$NON-NLS-1$
                     "MegaMek client failed to connect to server"); //$NON-NLS-1$
-            MekHQ.getLogger().log(getClass(), "run", ex); //$NON-NLS-1$
+            MekHQ.getLogger().error(getClass(), "run", ex); //$NON-NLS-1$
             return;
         }
 
@@ -117,7 +117,7 @@ public class AtBGameThread extends GameThread {
                 } catch (FileNotFoundException ex) {
                     MekHQ.getLogger().log(getClass(), "run", LogLevel.ERROR, //$NON-NLS-1$
                             "Could not load map file data/mapgen/" + scenario.getMap() + ".xml"); //$NON-NLS-1$
-                    MekHQ.getLogger().log(getClass(), "run", ex); //$NON-NLS-1$
+                    MekHQ.getLogger().error(getClass(), "run", ex); //$NON-NLS-1$
                 }
                 mapSettings.setBoardSize(scenario.getMapX(), scenario.getMapY());
                 mapSettings.setMapSize(1,  1);
@@ -238,7 +238,7 @@ public class AtBGameThread extends GameThread {
                 	} catch (Exception e) {
                         MekHQ.getLogger().log(getClass(), "run", LogLevel.ERROR, //$NON-NLS-1$
                                 "Could not connect with Bot name " + bf.getName()); //$NON-NLS-1$
-                        MekHQ.getLogger().log(getClass(), "run", e); //$NON-NLS-1$
+                        MekHQ.getLogger().error(getClass(), "run", e); //$NON-NLS-1$
                 	}
                 	swingGui.getBots().put(name, botClient);
                 	
@@ -251,7 +251,7 @@ public class AtBGameThread extends GameThread {
             	Thread.sleep(50);
             }
         } catch (Exception e) {
-            MekHQ.getLogger().log(getClass(), "run", e); //$NON-NLS-1$
+            MekHQ.getLogger().error(getClass(), "run", e); //$NON-NLS-1$
         }
         finally {
 	        client.die();
@@ -305,7 +305,7 @@ public class AtBGameThread extends GameThread {
 				botClient.sendPlayerInfo();
 			}
 		} catch (Exception e) {
-            MekHQ.getLogger().log(getClass(), "configureBot", e); //$NON-NLS-1$
+            MekHQ.getLogger().error(getClass(), "configureBot", e); //$NON-NLS-1$
 		}    	
     }
 }

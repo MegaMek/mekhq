@@ -1,6 +1,13 @@
 VERSION HISTORY:
 ----------------
-v0.45.1-git
+v0.45.2-SNAPSHOT
++ Switched build system from ant to gradle.
++ Issue #917: Hire Full Compliment Regularly Hires Bondsmen
++ Issue #919: Dropship Crewmembers/techs displayed as "Nobody" In Repair Bay
++ Issue #860, #911: Remove unusable units after multi-day or mass repairs.
++ PR #923: Tech SPA
+
+v0.45.1 (2018-09-03 2300 UTC)
 + PR #864: Security - address XXE vulnerabilities in XML parsers
 + Issue #814: Fixed AtB morale calculation to match AtB rules
 + Fixed JAR packaging error that made personnel market methods inaccessible.
@@ -14,6 +21,19 @@ v0.45.1-git
 + Issue #843: Implemented sorting and scrollbar on several long lists in personnel right click menu.
 + Issue #877: Feature: Categorized births and pregnancy log entries as medical
 + Issue #858: Escaped XML was not correctly unescaped in LogEntry.generateInstanceFromXML()
++ PR #894: Fixes generation of AtBContracts with 0 req. lances
++ PR #121: allow purchasing and adding of parts en-masse
++ Issue #855: Fixed parts in transit not displaying correctly (showing up as "OmniPod")
++ PR #807: Cosmetic and accuracy improvements to AtB contract profit estimate display (in the contract market)
++ Issue #895: Fix invariant to check if tech time available for maintenance.
++ Issue #853: Do not report on the part's unit if not present during multi-day repairs.
++ Issue #849: Consider a person's secondary role during training XP calculations.
++ Issue #836: Use native file dialogs and remember the last used folder.
++ PR #909: Fix NullPointerException in ResolveScenarioTracker.
++ PR #908: Fix NPE in getPartInUse if EquipmentType is null.
++ Add Skins Folder to MekHQ
++ Update MegaMek.jar to v0.45.1
++ Update MegaMekLab.jar to v0.45.1
 
 v0.45.0 (2018-08-02 0200 UTC)
 + PR #602: Add KIA checkbox and functionality to prisoners during scenario resolution.

@@ -435,10 +435,9 @@ public class AtBContract extends Contract implements Serializable {
         if (isSubcontract()) {
             requiredLances = 1;
         } else {
-            int required = Math.max(getEffectiveNumUnits(campaign) / 6, 1);
-            if (campaign.getCampaignOptions().getAdjustPaymentForStrategy() &&
-                    required > maxDeployedLances) {
-                multiplier *= (double)maxDeployedLances / (double)required;
+            requiredLances = Math.max(getEffectiveNumUnits(campaign) / 6, 1);
+            if (requiredLances > maxDeployedLances && campaign.getCampaignOptions().getAdjustPaymentForStrategy()) {
+                multiplier *= (double)maxDeployedLances / (double)requiredLances;
                 requiredLances = maxDeployedLances;
             }
         }
@@ -710,7 +709,7 @@ public class AtBContract extends Contract implements Serializable {
                     en = null;
                     MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
                             "Unable to load entity: " + msl.get(0).getSourceFile() + ": " + msl.get(0).getEntryName() + ": " + ex.getMessage()); //$NON-NLS-1$
-                    MekHQ.getLogger().log(getClass(), METHOD_NAME, ex);
+                    MekHQ.getLogger().error(getClass(), METHOD_NAME, ex);
                 }
                 
             }

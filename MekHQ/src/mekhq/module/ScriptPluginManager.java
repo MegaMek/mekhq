@@ -82,7 +82,7 @@ public class ScriptPluginManager {
         } catch (FileNotFoundException | ScriptException e) {
             MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
                     "While parsing script " + script.getName());
-            MekHQ.getLogger().log(getClass(), METHOD_NAME, e);
+            MekHQ.getLogger().error(getClass(), METHOD_NAME, e);
         }
     }
 

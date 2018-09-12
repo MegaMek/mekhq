@@ -699,7 +699,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 alliesPlayer.add(en);
                 attachedUnitIds.add(UUID.fromString(en.getExternalIdAsString()));
             } else {
-                System.out.println("Entity for player-controlled allies is null");
+                MekHQ.getLogger().error(AtBScenario.class, "setStandardMissionForces", "Entity for player-controlled allies is null");
             }
         }
 
@@ -713,7 +713,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 allyEntities.add(en);
                 attachedUnitIds.add(UUID.fromString(en.getExternalIdAsString()));
             } else {
-                System.err.println("Entity for ally bot is null");
+                MekHQ.getLogger().error(AtBScenario.class, "setStandardMissionForces", "Entity for ally bot is null");
             }
         }
 
@@ -980,7 +980,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             en = null;
             MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
                     "Unable to load entity: " + ms.getSourceFile() + ": " + ms.getEntryName() + ": " + ex.getMessage()); //$NON-NLS-1$
-            MekHQ.getLogger().log(getClass(), METHOD_NAME, ex);
+            MekHQ.getLogger().error(getClass(), METHOD_NAME, ex);
             return null;
         }
 
@@ -1065,7 +1065,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         } catch (Exception ex) {
             MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
                     "Unable to load unit: " + name); //$NON-NLS-1$
-            MekHQ.getLogger().log(getClass(), METHOD_NAME, ex);
+            MekHQ.getLogger().error(getClass(), METHOD_NAME, ex);
         }
         if (mechFileParser == null) {
             return null;
@@ -1879,7 +1879,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                         } catch (Exception e) {
                             MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
                                     "Error loading allied unit in scenario"); //$NON-NLS-1$
-                            MekHQ.getLogger().log(getClass(), METHOD_NAME, e);
+                            MekHQ.getLogger().error(getClass(), METHOD_NAME, e);
                         }
                         if (en != null) {
                             alliesPlayer.add(en);
@@ -1903,7 +1903,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                         } catch (Exception e) {
                             MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
                                     "Error loading allied unit in scenario"); //$NON-NLS-1$
-                            MekHQ.getLogger().log(getClass(), METHOD_NAME, e);
+                            MekHQ.getLogger().error(getClass(), METHOD_NAME, e);
                         }
                         if (en != null) {
                             bigBattleAllies.add(en);
@@ -1935,7 +1935,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                                 } catch (Exception e) {
                                     MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
                                             "Error loading allied unit in scenario"); //$NON-NLS-1$
-                                    MekHQ.getLogger().log(getClass(), METHOD_NAME, e);
+                                    MekHQ.getLogger().error(getClass(), METHOD_NAME, e);
                                 }
                                 if (null != en) {
                                     specMissionEnemies.get(weightClass).add(en);
@@ -1952,7 +1952,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 } catch (Exception e) {
                     MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
                             "Error loading allied unit in scenario"); //$NON-NLS-1$
-                    MekHQ.getLogger().log(getClass(), METHOD_NAME, e);
+                    MekHQ.getLogger().error(getClass(), METHOD_NAME, e);
                     bf = null;
                 }
                 if (null != bf) {
@@ -2214,7 +2214,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             } catch (PrincessException ex) {
                 MekHQ.getLogger().log(getClass(), "BotForce()", LogLevel.ERROR, //$NON-NLS-1$
                         "Error getting Princess default behaviors"); //$NON-NLS-1$
-                MekHQ.getLogger().log(getClass(), "BotForce()", ex); //$NON-NLS-1$
+                MekHQ.getLogger().error(getClass(), "BotForce()", ex); //$NON-NLS-1$
             }
         };
 
@@ -2241,7 +2241,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             } catch (PrincessException ex) {
                 MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
                         "Error getting Princess default behaviors"); //$NON-NLS-1$
-                MekHQ.getLogger().log(getClass(), METHOD_NAME, ex);
+                MekHQ.getLogger().error(getClass(), METHOD_NAME, ex);
             }
             behaviorSettings.setRetreatEdge(CardinalEdge.NEAREST_OR_NONE);
             behaviorSettings.setDestinationEdge(CardinalEdge.NEAREST_OR_NONE);
@@ -2406,7 +2406,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                             } catch (Exception e) {
                                 MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
                                         "Error loading allied unit in scenario"); //$NON-NLS-1$
-                                MekHQ.getLogger().log(getClass(), METHOD_NAME, e);
+                                MekHQ.getLogger().error(getClass(), METHOD_NAME, e);
                             }
                             if (en != null) {
                                 entityList.add(en);

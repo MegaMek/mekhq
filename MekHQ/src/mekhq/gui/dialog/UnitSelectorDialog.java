@@ -535,7 +535,7 @@ public class UnitSelectorDialog extends JDialog {
             MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
                     "Unable to load mech: " + ms.getSourceFile() + ": " //$NON-NLS-1$
                     + ms.getEntryName() + ": " + ex.getMessage()); //$NON-NLS-1$
-            MekHQ.getLogger().log(getClass(), METHOD_NAME, ex);
+            MekHQ.getLogger().error(getClass(), METHOD_NAME, ex);
             refreshUnitView();
             return;
         }
@@ -571,7 +571,7 @@ public class UnitSelectorDialog extends JDialog {
             try {
                 mt.loadFromFile("mechset.txt");
             } catch (IOException ex) {
-                MekHQ.getLogger().log(getClass(), METHOD_NAME, ex);
+                MekHQ.getLogger().error(getClass(), METHOD_NAME, ex);
                 //TODO: do something here
                 return;
             }

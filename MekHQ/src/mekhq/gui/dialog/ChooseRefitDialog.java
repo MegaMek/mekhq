@@ -292,7 +292,7 @@ public class ChooseRefitDialog extends javax.swing.JDialog {
 					}
 				}
 			} catch (EntityLoadingException ex) {
-			    MekHQ.getLogger().log(getClass(), "populateRefits()", ex); //$NON-NLS-1$
+			    MekHQ.getLogger().error(getClass(), "populateRefits()", ex); //$NON-NLS-1$
 			}		
 		}
         refitModel = new RefitTableModel(refits);

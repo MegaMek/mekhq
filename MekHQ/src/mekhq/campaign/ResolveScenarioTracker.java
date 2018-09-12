@@ -31,12 +31,10 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
 import java.util.stream.Collectors;
-
-import javax.swing.JFileChooser;
-import javax.swing.filechooser.FileFilter;
 
 import megamek.client.Client;
 import megamek.common.Aero;
@@ -79,6 +77,7 @@ import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
+import mekhq.gui.FileDialogs;
 
 /**
  * This object will be the main workhorse for the scenario
@@ -112,7 +111,7 @@ public class ResolveScenarioTracker {
 
     Campaign campaign;
     Scenario scenario;
-    JFileChooser unitList;
+    Optional<File> unitList = Optional.empty();
     Client client;
     Boolean control;
     private GameVictoryEvent victoryEvent;
@@ -146,37 +145,15 @@ public class ResolveScenarioTracker {
                 unitsStatus.put(uid, new UnitStatus(u));
             }
         }
-        unitList = new JFileChooser(".");
-        unitList.setDialogTitle("Load Units");
-
-        unitList.setFileFilter(new FileFilter() {
-            @Override
-            public boolean accept(File dir) {
-                if (dir.isDirectory()) {
-                    return true;
-                }
-                return dir.getName().endsWith(".mul");
-            }
-
-            @Override
-            public String getDescription() {
-                return "MUL file";
-            }
-        });
-
     }
 
     public void findUnitFile() {
-        unitList.showOpenDialog(null);
+        unitList = FileDialogs.openUnits(null);
     }
 
     public String getUnitFilePath() {
-        File unitFile = unitList.getSelectedFile();
-        if(null == unitFile) {
-            return "No file selected";
-        } else {
-            return unitFile.getAbsolutePath();
-        }
+        return unitList.map(File::getAbsolutePath)
+                       .orElse("No file selected");
     }
 
     public void setClient(Client c) {
@@ -184,11 +161,10 @@ public class ResolveScenarioTracker {
     }
 
     public void processMulFiles() {
-        File unitFile = unitList.getSelectedFile();
         //File salvageFile = salvageList.getSelectedFile();
-        if(null != unitFile) {
+        if(unitList.isPresent()) {
             try {
-                loadUnitsAndPilots(unitFile);
+                loadUnitsAndPilots(unitList.get());
             } catch (IOException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();

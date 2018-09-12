@@ -1914,7 +1914,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
             // Errrr, apparently either the class name was invalid...
             // Or the listed name doesn't exist.
             // Doh!
-            MekHQ.getLogger().log(Person.class, METHOD_NAME, ex);
+            MekHQ.getLogger().error(Person.class, METHOD_NAME, ex);
         }
 
         if (retVal.id == null) {
@@ -2063,7 +2063,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         }
 
         // If we're set to a rank that no longer exists, demote ourself
-        while (getRank().getName(profession).equals("-")) {
+        while (getRank().getName(profession).equals("-") && (rank > 0)) {
             setRankNumeric(--rank);
         }
 
