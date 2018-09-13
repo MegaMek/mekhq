@@ -1815,10 +1815,8 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                             awardMenuItem.append(")");
                         }
 
-                        awardMenuItem.append(": ").append(award.getDescription());
-
                         menuItem = new JMenuItem(awardMenuItem.toString());
-                        menuItem.setToolTipText(award.getDescription());
+                        menuItem.setToolTipText("<html><p width=\"500\">" + award.getDescription() + "</p></html>");
 
                         if(!award.canBeAwarded(person) && !gui.getCampaign().isGM())
                             menuItem.setEnabled(false);
@@ -1827,10 +1825,9 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                         menuItem.addActionListener(this);
 
                         setAwardMenu.add(menuItem);
-
-                        if (setAwardMenu.getItemCount() > MAX_POPUP_ITEMS) {
-                            MenuScroller.setScrollerFor(setAwardMenu, MAX_POPUP_ITEMS);
-                        }
+                    }
+                    if (setAwardMenu.getItemCount() > MAX_POPUP_ITEMS) {
+                        MenuScroller.setScrollerFor(setAwardMenu, MAX_POPUP_ITEMS);
                     }
                     awardMenu.add(setAwardMenu);
                 }
