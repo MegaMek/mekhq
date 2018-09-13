@@ -1,17 +1,13 @@
 package mekhq.gui.adapter;
 
-import java.awt.Color;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.util.*;
+import java.util.List;
 
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPopupMenu;
-import javax.swing.JTable;
+import javax.swing.*;
 import javax.swing.event.MouseInputAdapter;
 
 import megamek.client.ui.swing.util.MenuScroller;
@@ -50,6 +46,7 @@ import mekhq.gui.dialog.PopupValueChoiceDialog;
 import mekhq.gui.dialog.RetirementDefectionDialog;
 import mekhq.gui.dialog.TextAreaDialog;
 import mekhq.gui.model.PersonnelTableModel;
+import mekhq.gui.utilities.MultiLineTooltip;
 import mekhq.gui.utilities.StaticChecks;
 
 public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
@@ -1816,7 +1813,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                         }
 
                         menuItem = new JMenuItem(awardMenuItem.toString());
-                        menuItem.setToolTipText("<html><p width=\"500\">" + award.getDescription() + "</p></html>");
+                        menuItem.setToolTipText(MultiLineTooltip.splitToolTip(award.getDescription()));
 
                         if(!award.canBeAwarded(person) && !gui.getCampaign().isGM())
                             menuItem.setEnabled(false);
