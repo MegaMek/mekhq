@@ -1933,8 +1933,7 @@ public class Campaign implements Serializable, ITechManager {
             List<Planet> planets = Planets.getInstance().getShoppingPlanets(getCurrentPlanet(), 
             		getCampaignOptions().getMaxJumpsPlanetaryAcquisition(), 
             		currentDate);
-
-            
+           
             for(Planet planet: planets) {
             	ArrayList<IAcquisitionWork> remainingItems = new ArrayList<IAcquisitionWork>();
             	
@@ -1942,36 +1941,28 @@ public class Campaign implements Serializable, ITechManager {
 	            //found get added to the remaining item list
 	            for(IAcquisitionWork shoppingItem : currentList) {	                
 	                if(shoppingItem.getDaysToWait() <= 0) {
-	                	int totalQuantity = 0;
-	                	//use same delivery time for the batch of same part type on the same planet
-	                	int transitTime = calculatePartTransitTime(planet);
-	                	if(shoppingItem.getQuantity() > 0 
-	                			&& acquireEquipment(shoppingItem, person, planet, true, transitTime)) {
-	                		//we found a part on this planet, so we can keep trying to find more until
-	                		//we fail
-	                		totalQuantity++;
-	                		while(shoppingItem.getQuantity() > 0) {
-		                    	if(!acquireEquipment(shoppingItem, person, planet, false, transitTime)) {
-		                    		break;
-		                    	} else {
-		                    		totalQuantity++;
-		                    	}
-		                    }
-	                		addReport(personTitle + "<font color='green'><b> found " + shoppingItem.getQuantityName(totalQuantity) + " on " + planet.getName(currentDate) + ". Delivery in " + transitTime + " days.</b></font>");
-	                	}	                    
+	                	if(findContactForAcquisition(shoppingItem, person, planet)) {	                	
+	                		int transitTime = calculatePartTransitTime(planet);	           
+	                		int totalQuantity = 0;
+	                		while(shoppingItem.getQuantity() > 0 && acquireEquipment(shoppingItem, person, planet, transitTime)) {
+	                			totalQuantity++;
+	                		}
+	                		if(totalQuantity > 0) {
+	                			addReport(personTitle + "<font color='green'><b> found " + shoppingItem.getQuantityName(totalQuantity) + " on " + planet.getName(currentDate) + ". Delivery in " + transitTime + " days.</b></font>");	 
+	                		}
+	                	}
 	                }
 	                //if we didn't find everything on this planet, then add to the remaining list
 	                if(shoppingItem.getQuantity() > 0 || shoppingItem.getDaysToWait() > 0) {	                	
 	                	//if we can't afford it, then don't keep searching for it on other planets
-	                	//check on funds
-	                    if(!canPayFor(shoppingItem)) {
-	                    	if(!getCampaignOptions().usePlanetAcquisitionVerboseReporting()) {
+	                	if(!canPayFor(shoppingItem)) {
+	                		if(!getCampaignOptions().usePlanetAcquisitionVerboseReporting()) {
 	                			addReport("<font color='red'><b>You cannot afford to purchase another " + shoppingItem.getAcquisitionName() + "</b></font>");
 	                		}
-	                    	shelvedItems.add(shoppingItem);
-	                    } else {	                	
-	                    	remainingItems.add(shoppingItem);
-	                    }
+	                		shelvedItems.add(shoppingItem);
+	                	} else {	                	
+	                		remainingItems.add(shoppingItem);
+	                	}
 	                }
 	            }
 	            //we are done with this planet. replace our current list with the remaining items
@@ -2010,6 +2001,39 @@ public class Campaign implements Serializable, ITechManager {
 		return true;
     }
     
+    /**
+     * Make an acquisition roll for a given planet to see if you can identify a contact. Used for planetary based acquisition.
+     * @param acquisition - The <code> IAcquisitionWork</code> being acquired.
+     * @param person - The <code>Person</code> object attempting to do the acquiring.  may be null if no one on the force has the skill or the user is using automatic acquisition. 
+     * @param planet - The <code>Planet</code> object where the acquisition is being attempted. This may be null if the user is not using planetary acquisition. 
+     * @return true if your target roll succeeded. 
+     */
+    public boolean findContactForAcquisition(IAcquisitionWork acquisition, Person person, Planet planet) {
+        
+    	DateTime currentDate = Utilities.getDateTimeDay(getCalendar());      
+    	TargetRoll target = getTargetForAcquisition(acquisition, person, false);
+    	target = planet.getAcquisitionMods(target, getDate(), getCampaignOptions(), getFaction());
+        
+        if (target.getValue() == TargetRoll.IMPOSSIBLE) {
+        	if(getCampaignOptions().usePlanetAcquisitionVerboseReporting()) {
+        		addReport("<font color='red'><b>Can't search for " + acquisition.getAcquisitionName() + " on " + planet.getName(currentDate) + " because:</b></font> " + target.getDesc());
+        	}
+        	return false;
+        }
+        if(Compute.d6(2) < target.getValue()) {
+        	//no contacts on this planet, move along
+        	if(getCampaignOptions().usePlanetAcquisitionVerboseReporting()) {
+        		addReport("<font color='red'><b>No contacts available for " + acquisition.getAcquisitionName() + " on " + planet.getName(currentDate) + "</b></font>");
+        	}
+        	return false;
+        } else {
+        	if(getCampaignOptions().usePlanetAcquisitionVerboseReporting()) {
+        		addReport("<font color='green'>Possible contact for " + acquisition.getAcquisitionName() + " on " + planet.getName(currentDate) + "</font>");     	
+        	}
+        	return true;
+        }
+    }
+    
     /***
      * Attempt to acquire a given <code>IAcquisitionWork</code> object. 
      * This is the default method used by for non-planetary based acquisition. 
@@ -2018,7 +2042,7 @@ public class Campaign implements Serializable, ITechManager {
      * @return a boolean indicating whether the attempt to acquire equipment was successful. 
      */
     public boolean acquireEquipment(IAcquisitionWork acquisition, Person person) {
-    	return acquireEquipment(acquisition, person, null, false, -1);
+    	return acquireEquipment(acquisition, person, null, -1);
     }
     
     /***
@@ -2026,61 +2050,40 @@ public class Campaign implements Serializable, ITechManager {
      * @param acquisition - The <code> IAcquisitionWork</code> being acquired.
      * @param person - The <code>Person</code> object attempting to do the acquiring.  may be null if no one on the force has the skill or the user is using automatic acquisition. 
      * @param planet - The <code>Planet</code> object where the acquisition is being attempted. This may be null if the user is not using planetary acquisition. 
-     * @param initialAttempt - A boolean indicating whether this is the initial attempt to acquire for planet based acquisition.
      * @param transitDays - The number of days that the part should take to be delivered. If this value is entered as -1, then this method will determine transit time based on the users campaign options. 
      * @return a boolean indicating whether the attempt to acquire equipment was successful. 
      */
-    public boolean acquireEquipment(IAcquisitionWork acquisition, Person person, Planet planet, boolean initialAttempt, int transitDays) {
+    private boolean acquireEquipment(IAcquisitionWork acquisition, Person person, Planet planet, int transitDays) {
         boolean found = false;
         String report = "";
-        DateTime currentDate = Utilities.getDateTimeDay(getCalendar());      
         
         if (null != person) {
             report += person.getHyperlinkedFullTitle() + " ";
         }
         
+        TargetRoll target = getTargetForAcquisition(acquisition, person, false);
+        
         //check on funds
         if(!canPayFor(acquisition)) {
-    		if(!getCampaignOptions().usesPlanetaryAcquisition() || getCampaignOptions().usePlanetAcquisitionVerboseReporting()) {
-    			addReport("<font color='red'><b>You cannot afford to purchase another " + acquisition.getAcquisitionName() + "</b></font>");
-    		}
-            return false;        
-       }
-        
-        TargetRoll target = getTargetForAcquisition(acquisition, person, false);
+        	target.addModifier(TargetRoll.IMPOSSIBLE, "Cannot afford this purchase");
+        }
         
         if(null != planet) {
         	target = planet.getAcquisitionMods(target, getDate(), getCampaignOptions(), getFaction());
-        }
+        }     
         
-        //if initalAttempt is true, make initial rolls to see if we can acquire on this planet, 
-        //before moving to actual acquisition rolls.
-        if(initialAttempt) {
-        	if (target.getValue() == TargetRoll.IMPOSSIBLE) {
-        		if(getCampaignOptions().usePlanetAcquisitionVerboseReporting()) {
-        			addReport("<font color='red'><b>Can't search for " + acquisition.getAcquisitionName() + " on " + planet.getName(currentDate) + " because:</b></font> " + target.getDesc());
-        		}
-        		return false;
-        	}
-        	if(Compute.d6(2) < target.getValue()) {
-        		//no contacts on this planet, move along
-        		if(getCampaignOptions().usePlanetAcquisitionVerboseReporting()) {
-        			addReport("<font color='red'><b>No contacts available for " + acquisition.getAcquisitionName() + " on " + planet.getName(currentDate) + "</b></font>");
-        		}
-        		return false;
-        	} else {
-        		if(getCampaignOptions().usePlanetAcquisitionVerboseReporting()) {
-        			addReport("<font color='green'>Possible contact for " + acquisition.getAcquisitionName() + " on " + planet.getName(currentDate) + "</font>");     	
-        		}
-        	}
-        }
+        report += "attempts to find " + acquisition.getAcquisitionName();
         
+        //if impossible then return
         if (target.getValue() == TargetRoll.IMPOSSIBLE) {
-            addReport(target.getDesc());
+            report += ":<font color='red'><b> " + target.getDesc() + "</b></font>";
+            if(!getCampaignOptions().usesPlanetaryAcquisition() || getCampaignOptions().usePlanetAcquisitionVerboseReporting()) {
+    			addReport(report);
+    		}
             return false;
         }
         
-        report += "attempts to find " + acquisition.getAcquisitionName();
+        
         int roll = Compute.d6(2);
         report += "  needs " + target.getValueAsString();
         report += " and rolls " + roll + ":";
