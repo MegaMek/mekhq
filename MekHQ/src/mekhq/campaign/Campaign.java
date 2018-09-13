@@ -1876,6 +1876,12 @@ public class Campaign implements Serializable, ITechManager {
         return admin;
     }
 
+    /***
+     * This is the main function for getting stuff (parts, units, etc.) All non-GM acquisition should
+     * go through this function to ensure the campaign rules for acquisition are followed.
+     * @param sList - A <code>ShoppingList</code> object including items that need to be purchased
+     * @return A <code>ShoppingList</code> object that includes all items that were not successfully acquired
+     */
     public ShoppingList goShopping(ShoppingList sList) {
     	
     	//get the logistics person and return original list with a message if you don't have one
@@ -1988,6 +1994,13 @@ public class Campaign implements Serializable, ITechManager {
         }    
     }
     
+    /***
+     * Checks whether the campaign can pay for a given <code>IAcquisitionWork</code> item. This will check
+     * both whether the campaign is required to pay for a given type of acquisition by the options and
+     * if so whether it has enough money to afford it. 
+     * @param acquisition - An <code>IAcquisitionWork<code> object
+     * @return true if the campaign can pay for the acquisition; false if it cannot. 
+     */
     public boolean canPayFor(IAcquisitionWork acquisition) {
     	if((acquisition instanceof UnitOrder && getCampaignOptions().payForUnits()) 
     		||(acquisition instanceof Part && getCampaignOptions().payForParts()) 
@@ -1997,10 +2010,26 @@ public class Campaign implements Serializable, ITechManager {
 		return true;
     }
     
+    /***
+     * Attempt to acquire a given <code>IAcquisitionWork</code> object. 
+     * This is the default method used by for non-planetary based acquisition. 
+     * @param acquisition  - The <code> IAcquisitionWork</code> being acquired.
+     * @param person - The <code>Person</code> object attempting to do the acquiring.  may be null if no one on the force has the skill or the user is using automatic acquisition. 
+     * @return a boolean indicating whether the attempt to acquire equipment was successful. 
+     */
     public boolean acquireEquipment(IAcquisitionWork acquisition, Person person) {
     	return acquireEquipment(acquisition, person, null, false, -1);
     }
     
+    /***
+     * Attempt to acquire a given <code>IAcquisitionWork</code> object. 
+     * @param acquisition - The <code> IAcquisitionWork</code> being acquired.
+     * @param person - The <code>Person</code> object attempting to do the acquiring.  may be null if no one on the force has the skill or the user is using automatic acquisition. 
+     * @param planet - The <code>Planet</code> object where the acquisition is being attempted. This may be null if the user is not using planetary acquisition. 
+     * @param initialAttempt - A boolean indicating whether this is the initial attempt to acquire for planet based acquisition.
+     * @param transitDays - The number of days that the part should take to be delivered. If this value is entered as -1, then this method will determine transit time based on the users campaign options. 
+     * @return a boolean indicating whether the attempt to acquire equipment was successful. 
+     */
     public boolean acquireEquipment(IAcquisitionWork acquisition, Person person, Planet planet, boolean initialAttempt, int transitDays) {
         boolean found = false;
         String report = "";
@@ -7935,6 +7964,17 @@ public class Campaign implements Serializable, ITechManager {
         }
     }
 
+    /***
+     * Calculate transit time for supplies based on what planet they are shipping from. To prevent extra
+     * computation. This method does not calculate an exact jump path but rather determines the number of jumps
+     * crudely by dividing distance in light years by 30 and then rounding up. Total part time is determined by 
+     * several by adding the following:
+     * - (number of jumps - 1)*7 days with a minimum value of zero. 
+     * - transit times from current planet and planet of supply origins in cases where the supply planet is not the same as current planet.
+     * - a random 1d6 days for each jump plus 1d6 to simulate all of the other logistics of delivery. 
+     * @param planet - A <code>Planet</code> object where the supplies are shipping from
+     * @return the number of days that supplies will take to arrive.
+     */
     public int calculatePartTransitTime(Planet planet) {
     	//calculate number of jumps by light year distance as the crow flies divided by 30
     	//the basic formula assumes 7 days per jump + system transit time on each side + random days equal
@@ -7951,6 +7991,12 @@ public class Campaign implements Serializable, ITechManager {
     	return recharges*7+currentTransitTime+originTransitTime+amazonFreeShipping;
    	}
     
+    /***
+     * Calculate transit times based on the margin of success from an acquisition roll. The values here are
+     * all based on what the user entered for the campaign options. 
+     * @param mos - an integer of the margin of success of an acquisition roll
+     * @return the number of days that supplies will take to arrive.
+     */
     public int calculatePartTransitTime(int mos) {    	
     	
         int nDice = getCampaignOptions().getNDiceTransitTime();

@@ -878,7 +878,12 @@ public class Planet implements Serializable {
         return Math.sqrt(Math.pow(x - this.x, 2) + Math.pow(y - this.y, 2));
     }
 
-    //adapted from interstellar map panel because OOP
+    /**
+     * Returns whether the planet has not been discovered or is a dead planet. This code was adapted from
+     * InterstellarPlanetMapPanel.isPlanetEmpty
+     * @param when - the <code>DateTime</code> object indicating what time we are asking about.
+     * @return true if the planet is empty; false if the planet is not empty
+     */
     public boolean isEmpty(DateTime when) {
         Set<Faction> factions = getFactionSet(when);
         if((null == factions) || factions.isEmpty()) {
