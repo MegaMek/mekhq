@@ -24,8 +24,11 @@ package mekhq.gui.dialog;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Frame;
+import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -36,6 +39,7 @@ import java.util.ResourceBundle;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -45,10 +49,14 @@ import javax.swing.table.TableColumn;
 
 import megamek.common.util.EncodeControl;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.AtBDynamicScenario;
+import mekhq.campaign.mission.AtBDynamicScenarioFactory;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.Loot;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.mission.ScenarioTemplate;
 import mekhq.gui.model.LootTableModel;
 
 /**
@@ -260,10 +268,20 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
 	        panMain.add(scrReport, gridBagConstraints);
         }
         
+        if(newScenario && (mission instanceof AtBContract)) {
+            JButton btnLoad = new JButton("Generate From Template");
+            btnLoad.addActionListener(new java.awt.event.ActionListener() {
+                public void actionPerformed(ActionEvent evt) {
+                    btnLoadActionPerformed(evt);
+                }
+            });
+            panBtn.add(btnLoad);
+        }
+        
         btnOK.setText(resourceMap.getString("btnOkay.text")); // NOI18N
         btnOK.setName("btnOK"); // NOI18N
         btnOK.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            public void actionPerformed(ActionEvent evt) {
                 btnOKActionPerformed(evt);
             }
         });
@@ -272,11 +290,11 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
         btnClose.setText(resourceMap.getString("btnCancel.text")); // NOI18N
         btnClose.setName("btnClose"); // NOI18N
         btnClose.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            public void actionPerformed(ActionEvent evt) {
                 btnCloseActionPerformed(evt);
             }
         });
-        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridx = GridBagConstraints.RELATIVE;
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.CENTER;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
@@ -288,7 +306,7 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
         pack();
     }
     
-    private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHireActionPerformed
+    private void btnOKActionPerformed(ActionEvent evt) {//GEN-FIRST:event_btnHireActionPerformed
     	scenario.setName(txtName.getText());
     	scenario.setDesc(txtDesc.getText());
     	if(!scenario.isCurrent() || (campaign.getCampaignOptions().getUseAtB() && scenario instanceof AtBScenario)) {
@@ -304,6 +322,32 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
     		campaign.addScenario(scenario, mission);
     	}
     	this.setVisible(false);
+    }
+    
+    private void btnLoadActionPerformed(ActionEvent evt) {
+        JFileChooser loadTemplateChooser = new JFileChooser("./");
+        loadTemplateChooser.setDialogTitle("Load Scenario Template");
+        int returnVal = loadTemplateChooser.showOpenDialog(this);
+
+        if ((returnVal != JFileChooser.APPROVE_OPTION)
+                || (loadTemplateChooser.getSelectedFile() == null)) {
+            return;
+        }
+
+        File file = loadTemplateChooser.getSelectedFile();
+        ScenarioTemplate scenarioTemplate = ScenarioTemplate.Deserialize(file);
+        
+        if(scenarioTemplate == null) {
+            JOptionPane.showMessageDialog(this, "Error loading specified file. See log for details.", "Load Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        AtBDynamicScenario scenario = AtBDynamicScenarioFactory.initializeScenarioFromTemplate(scenarioTemplate, (AtBContract) mission, campaign);
+        if(newScenario) {
+            campaign.addScenario(scenario, mission);
+        }
+        
+        this.setVisible(false);
     }
     
     public int getMissionId() {

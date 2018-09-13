@@ -41,6 +41,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import megamek.common.Compute;
+import megamek.common.EntityWeightClass;
 import megamek.common.MechSummary;
 import megamek.common.MechSummaryCache;
 import megamek.common.TargetRoll;
@@ -269,6 +270,24 @@ public class AtBConfiguration implements Serializable {
 		}
 		return null;
 	}
+	
+	/**
+     * Translates character code in the indicated position to the appropriate weight
+     * class constant.
+     *
+     * @param s        A String of single-character codes that indicate the weight classes of the units in a lance (e.g. "LMMH")
+     * @param i        The index of the code to be translated
+     * @return        The value used by UnitTableData to find the correct RAT for the weight class
+     */
+    public static int decodeWeightStr(String s, int i) {
+        switch (s.charAt(i)) {
+            case 'L': return EntityWeightClass.WEIGHT_LIGHT;
+            case 'M': return EntityWeightClass.WEIGHT_MEDIUM;
+            case 'H': return EntityWeightClass.WEIGHT_HEAVY;
+            case 'A': return EntityWeightClass.WEIGHT_ASSAULT;
+        }
+        return 0;
+    }
 	
 	public boolean isHiringHall(String planet, Date date) {
 		return hiringHalls.stream().anyMatch( rec -> rec.getValue().equals(planet)

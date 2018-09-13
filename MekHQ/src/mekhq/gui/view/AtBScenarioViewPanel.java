@@ -68,7 +68,7 @@ import mekhq.campaign.force.Force;
 import mekhq.campaign.force.ForceStub;
 import mekhq.campaign.force.UnitStub;
 import mekhq.campaign.mission.AtBScenario;
-import mekhq.campaign.mission.AtBScenario.BotForceStub;
+import mekhq.campaign.mission.BotForceStub;
 import mekhq.campaign.mission.Loot;
 import mekhq.gui.dialog.PrincessBehaviorDialog;
 

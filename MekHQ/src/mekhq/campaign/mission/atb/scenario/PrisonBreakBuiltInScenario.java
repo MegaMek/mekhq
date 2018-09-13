@@ -10,6 +10,7 @@ import megamek.common.EntityWeightClass;
 import megamek.common.UnitType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBScenario;
+import mekhq.campaign.mission.BotForce;
 import mekhq.campaign.mission.atb.AtBScenarioEnabled;
 import mekhq.campaign.unit.Unit;
 

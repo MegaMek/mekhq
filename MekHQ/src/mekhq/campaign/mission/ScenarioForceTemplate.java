@@ -21,7 +21,21 @@ public class ScenarioForceTemplate {
     public static final String[] FORCE_DEPLOYMENT_SYNC_TYPES = { "None", "Same Edge", "Same Arc", "Opposite Edge", "Opposite Arc" };
     public static final String[] DEPLOYMENT_ZONES = { "North", "Northeast", "East", "Southeast", "South", "Southwest", "West", "Northwest", "Edge", "Narrow Edge", "Center", "Any" };
     public static final String[] BOT_DESTINATION_ZONES = { "None", "Opposite Deployment Edge", "North", "East", "South", "West", "Random" };
-    public static final String[] UNIT_TYPES = { "Mek", "Mixed Mek/Vee", "Vee", "Aero", "Conv. Fighter", "Gun Emplacement", "Infantry", "Battle Armor", "Naval", "Civilian" };
+    public static final String[] UNIT_TYPES = { "Mek", "ATB Mixed Mek/Vee", "Vee", "Aero", "Conv. Fighter", "Gun Emplacement", "Infantry", "Battle Armor", "Naval", "Civilian" };
+    
+    public enum ForceAlignment {
+        Player,
+        Allied,
+        Opposing,
+        Third
+    }
+    
+    public enum ForceGenerationMethod {
+        PlayerDeployed,
+        BVScaled,
+        UnitCountScaled,
+        FixedUnitCount
+    }
     
     public enum SynchronizedDeploymentType {
         None,

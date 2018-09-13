@@ -39,6 +39,7 @@ import megamek.common.UnitType;
 import megamek.common.logging.LogLevel;
 import mekhq.campaign.force.Lance;
 import mekhq.campaign.mission.AtBScenario;
+import mekhq.campaign.mission.BotForce;
 import mekhq.campaign.unit.Unit;
 
 /**
@@ -222,7 +223,7 @@ public class AtBGameThread extends GameThread {
                 
                 /* Add bots */
                 for (int i = 0; i < scenario.getNumBots(); i++) {
-                	AtBScenario.BotForce bf = scenario.getBotForce(i);
+                	BotForce bf = scenario.getBotForce(i);
                 	String name = bf.getName();
                 	if (swingGui.getBots().containsKey(name)) {
                 		int append = 2;
@@ -269,7 +270,7 @@ public class AtBGameThread extends GameThread {
      * @param botClient
      * @param botForce
      */
-    private void configureBot(BotClient botClient, AtBScenario.BotForce botForce) {
+    private void configureBot(BotClient botClient, BotForce botForce) {
 		try {
 			/* Wait for the server to add the bot client, but allow a timeout
 			 * rather than blocking

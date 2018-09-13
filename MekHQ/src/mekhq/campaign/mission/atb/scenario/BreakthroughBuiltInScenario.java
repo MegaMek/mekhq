@@ -9,6 +9,7 @@ import megamek.common.Compute;
 import megamek.common.Entity;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBScenario;
+import mekhq.campaign.mission.BotForce;
 import mekhq.campaign.mission.atb.AtBScenarioEnabled;
 
 @AtBScenarioEnabled

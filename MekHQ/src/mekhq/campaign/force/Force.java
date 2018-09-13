@@ -590,4 +590,17 @@ public class Force implements Serializable {
 		}
 	}
 
+	public int getTotalBV(Campaign c) {
+        int bvTotal = 0;
+        
+        for(Force sforce : getSubForces()) {
+            bvTotal += sforce.getTotalBV(c);
+        }
+        
+        for(UUID id : getUnits()) {
+            bvTotal += c.getUnit(id).getEntity().calculateBattleValue();
+        }
+        
+        return bvTotal;
+    }
 }
