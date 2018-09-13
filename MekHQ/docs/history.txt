@@ -6,6 +6,8 @@ v0.45.2-SNAPSHOT
 + Issue #919: Dropship Crewmembers/techs displayed as "Nobody" In Repair Bay
 + Issue #860, #911: Remove unusable units after multi-day or mass repairs.
 + PR #923: Tech SPA
++ PR #928: Allow mothballed units in retirement dialog
++ PR #927: Map Colors for Socio-Industrial Level
 
 v0.45.1 (2018-09-03 2300 UTC)
 + PR #864: Security - address XXE vulnerabilities in XML parsers
