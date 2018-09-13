@@ -330,6 +330,14 @@ public class MassRepairService {
 			}
 		}
 
+		// Remove any units which after mass repair/salvage are no longer
+		// useable.
+		for (Unit u : units) {
+			if (!u.isRepairable() && !u.hasSalvageableParts()) {
+				campaignGUI.getCampaign().removeUnit(u.getId());
+			}
+		}
+
 		JOptionPane.showMessageDialog(campaignGUI.getFrame(), "Mass Repair/Salvage complete.", "Complete",
 				JOptionPane.INFORMATION_MESSAGE);
 	}

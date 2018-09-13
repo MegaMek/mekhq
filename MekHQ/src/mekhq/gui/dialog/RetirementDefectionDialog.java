@@ -536,7 +536,7 @@ public class RetirementDefectionDialog extends JDialog {
 		ArrayList<UUID> unassignedASF = new ArrayList<UUID>();
 		ArrayList<UUID> availableUnits = new ArrayList<UUID>();
 		for (Unit u : hqView.getCampaign().getUnits()) {
-			if (!u.isAvailable()) {
+			if (!u.isAvailable() && !u.isMothballing() && !u.isMothballed()) {
 				continue;
 			}
 			availableUnits.add(u.getId());
