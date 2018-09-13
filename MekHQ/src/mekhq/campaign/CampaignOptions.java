@@ -196,6 +196,8 @@ public class CampaignOptions implements Serializable {
     private int[] planetOutputAcquisitionBonus;
     private int planetAcquisitionFactionLimit;
     private boolean planetAcquisitionNoClanCrossover;
+    private int penaltyClanPartsFromIS;
+    private boolean noClanPartsFromIS;
     private boolean planetAcquisitionVerbose;
 
 
@@ -438,6 +440,8 @@ public class CampaignOptions implements Serializable {
         planetAcquisitionFactionLimit = PLANET_ACQUISITION_NEUTRAL;
         planetAcquisitionNoClanCrossover = true;
         planetAcquisitionVerbose = false;
+        noClanPartsFromIS = true;
+        penaltyClanPartsFromIS = 4;
         healWaitingPeriod = 1;
         naturalHealingWaitingPeriod = 15;
         destroyByMargin = false;
@@ -1349,7 +1353,7 @@ public class CampaignOptions implements Serializable {
     	return planetAcquisitionFactionLimit;
     }
     
-    public void SetPlanetAcquisitionFactionLimit(int b) {
+    public void setPlanetAcquisitionFactionLimit(int b) {
     	planetAcquisitionFactionLimit = b;
     }
     
@@ -1369,6 +1373,22 @@ public class CampaignOptions implements Serializable {
     	maxJumpsPlanetaryAcquisition = m;
     }
 
+    public int getPenaltyClanPartsFroIS() {
+    	return penaltyClanPartsFromIS;
+    }
+    
+    public void setPenaltyClanPartsFroIS(int i) {
+    	penaltyClanPartsFromIS = i ;
+    }
+    
+    public boolean disallowClanPartsFromIS() {
+    	return noClanPartsFromIS;
+    }
+    
+    public void setDisallowClanPartsFromIS(boolean b) {
+    	noClanPartsFromIS = b;
+    }
+    
     public boolean usePlanetAcquisitionVerboseReporting() {
     	return planetAcquisitionVerbose;
     }
@@ -2301,6 +2321,8 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "usePlanetaryAcquisition", usePlanetaryAcquisition);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "planetAcquisitionFactionLimit", planetAcquisitionFactionLimit);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "planetAcquisitionNoClanCrossover", planetAcquisitionNoClanCrossover);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "noClanPartsFromIS", noClanPartsFromIS);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "penaltyClanPartsFromIS", penaltyClanPartsFromIS);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "planetAcquisitionVerbose", planetAcquisitionVerbose);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "maxJumpsPlanetaryAcquisition", maxJumpsPlanetaryAcquisition);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "equipmentContractPercent", equipmentContractPercent);
@@ -2648,6 +2670,10 @@ public class CampaignOptions implements Serializable {
                 retVal.planetAcquisitionFactionLimit = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("planetAcquisitionNoClanCrossover")) {
                 retVal.planetAcquisitionNoClanCrossover = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("noClanPartsFromIS")) {
+                retVal.noClanPartsFromIS = Boolean.parseBoolean(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("penaltyClanPartsFromIS")) {
+                retVal.penaltyClanPartsFromIS = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("planetAcquisitionVerbose")) {
                 retVal.planetAcquisitionVerbose = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("maxJumpsPlanetaryAcquisition")) {

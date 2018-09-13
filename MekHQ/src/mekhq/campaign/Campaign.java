@@ -2012,7 +2012,8 @@ public class Campaign implements Serializable, ITechManager {
         
     	DateTime currentDate = Utilities.getDateTimeDay(getCalendar());      
     	TargetRoll target = getTargetForAcquisition(acquisition, person, false);
-    	target = planet.getAcquisitionMods(target, getDate(), getCampaignOptions(), getFaction());
+    	target = planet.getAcquisitionMods(target, getDate(), getCampaignOptions(), getFaction(),
+    			acquisition.getTechBase() == Part.T_CLAN);
         
         if (target.getValue() == TargetRoll.IMPOSSIBLE) {
         	if(getCampaignOptions().usePlanetAcquisitionVerboseReporting()) {
@@ -2069,7 +2070,8 @@ public class Campaign implements Serializable, ITechManager {
         }
         
         if(null != planet) {
-        	target = planet.getAcquisitionMods(target, getDate(), getCampaignOptions(), getFaction());
+        	target = planet.getAcquisitionMods(target, getDate(), getCampaignOptions(), getFaction(),
+        			acquisition.getTechBase() == Part.T_CLAN);
         }     
         
         report += "attempts to find " + acquisition.getAcquisitionName();

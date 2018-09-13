@@ -909,7 +909,7 @@ public class Planet implements Serializable {
      * @param options - the campaign options from which important values need to be determined
      * @return an updated TargetRoll with planet specific mods
      */
-    public TargetRoll getAcquisitionMods(TargetRoll target, Date when, CampaignOptions options, Faction faction) {
+    public TargetRoll getAcquisitionMods(TargetRoll target, Date when, CampaignOptions options, Faction faction, boolean clanPart) {
     	
     	//check faction limitations
     	Set<Faction> planetFactions = getFactionSet(Utilities.getDateTimeDay(when));
@@ -919,6 +919,7 @@ public class Planet implements Serializable {
     		boolean allies = false;
     		boolean ownFaction = false;
     		boolean clanCrossover = true;
+    		boolean noClansPresent = true;
     		for(Faction planetFaction : planetFactions) {
     			if(faction.equals(planetFaction)) {
     				ownFaction = true;
@@ -929,6 +930,9 @@ public class Planet implements Serializable {
     				allies = true;
     			} else {
     				neutrals = true;
+    			}
+    			if(faction.isClan()) {
+    				noClansPresent = false;
     			}
     			if(faction.isClan() == planetFaction.isClan()) {
     				clanCrossover = false;
@@ -948,8 +952,12 @@ public class Planet implements Serializable {
         			return new TargetRoll(TargetRoll.IMPOSSIBLE, "The clans and inner sphere do not trade supplies");
         		}
     		}
-    		
-    		
+    		if(noClansPresent && clanPart) {
+    			if(options.disallowClanPartsFromIS()) {
+    				return new TargetRoll(TargetRoll.IMPOSSIBLE, "No clan parts from non-clan factions");
+    			}
+    			target.addModifier(options.getPenaltyClanPartsFroIS(), "clan parts from non-clan faction");
+    		}		   		
     	}
     	
     	SocioIndustrialData socioIndustrial = getSocioIndustrial(Utilities.getDateTimeDay(when));

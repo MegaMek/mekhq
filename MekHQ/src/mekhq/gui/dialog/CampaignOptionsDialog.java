@@ -221,6 +221,9 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JSpinner[] spnPlanetAcquireTechBonus;
     private JSpinner[] spnPlanetAcquireIndustryBonus;
     private JSpinner[] spnPlanetAcquireOutputBonus;
+    private JCheckBox disallowClanPartsFromIS;
+    private JSpinner spnPenaltyClanPartsFromIS;
+
 
     private JTextField[] txtSalaryBase;
     private JSpinner[] spnSalaryXp;
@@ -524,6 +527,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
         usePlanetaryAcquisitions.setSelected(options.usesPlanetaryAcquisition());
         disallowPlanetaryAcquisitionClanCrossover.setSelected(options.disallowPlanetAcquisitionClanCrossover());
+        disallowClanPartsFromIS.setSelected(options.disallowClanPartsFromIS());
         usePlanetaryAcquisitionsVerbose.setSelected(options.usePlanetAcquisitionVerboseReporting());
         
         useDamageMargin.setSelected(options.isDestroyByMargin());
@@ -650,6 +654,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         usePlanetaryAcquisitionsVerbose = new JCheckBox();
         disallowPlanetaryAcquisitionClanCrossover = new JCheckBox();
         comboPlanetaryAcquisitionsFactionLimits = new JComboBox<String>();
+        disallowClanPartsFromIS = new JCheckBox();
+
         
         useDamageMargin = new JCheckBox();
         useAeroSystemHitsBox = new JCheckBox();
@@ -1343,11 +1349,37 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panSubPlanetAcquire.add(disallowPlanetaryAcquisitionClanCrossover, gridBagConstraints);
         
+        disallowClanPartsFromIS.setText(resourceMap.getString("disallowClanPartsFromIS.text")); // NOI18N
+        disallowClanPartsFromIS.setToolTipText(resourceMap.getString("disallowClanPartsFromIS.toolTipText")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.weightx = 0.0;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panSubPlanetAcquire.add(disallowClanPartsFromIS, gridBagConstraints);
+        
+        spnPenaltyClanPartsFromIS = new JSpinner(new SpinnerNumberModel(options.getPenaltyClanPartsFroIS(), 0, 12, 1));
+        JPanel panPenaltyClanPartsFromIS = new JPanel();
+        panPenaltyClanPartsFromIS.add(spnPenaltyClanPartsFromIS);
+        JLabel lblPenaltyClanPartsFromIS = new JLabel(resourceMap.getString("spnPenaltyClanPartsFromIS.text"));
+        lblPenaltyClanPartsFromIS.setToolTipText(resourceMap.getString("spnPenaltyClanPartsFromIS.toolTipText")); // NOI18N
+        panPenaltyClanPartsFromIS.add(lblPenaltyClanPartsFromIS);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 5;
+        gridBagConstraints.weightx = 0.0;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panSubPlanetAcquire.add(panPenaltyClanPartsFromIS, gridBagConstraints);
+        
         usePlanetaryAcquisitionsVerbose.setText(resourceMap.getString("usePlanetaryAcquisitionsVerbose.text")); // NOI18N
         usePlanetaryAcquisitionsVerbose.setToolTipText(resourceMap.getString("usePlanetaryAcquisitionsVerbose.toolTipText")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridy = 6;
         gridBagConstraints.weightx = 0.0;
         gridBagConstraints.weighty = 0.0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
@@ -1407,7 +1439,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.gridy = 0;
         gridBagConstraints.weightx = 0.0;
         gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.gridheight = 5;
+        gridBagConstraints.gridheight = 7;
         gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panSubPlanetAcquire.add(panSocioIndustrialBonus, gridBagConstraints);
@@ -4695,10 +4727,12 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setAcquireMinimumTimeUnit(choiceAcquireMinimumUnit.getSelectedIndex());
         options.setAcquireMosUnit(choiceAcquireMosUnits.getSelectedIndex());
         options.setPlanetaryAcquisition(usePlanetaryAcquisitions.isSelected());
+        options.setDisallowClanPartsFromIS(disallowClanPartsFromIS.isSelected());
         options.setPlanetAcquisitionVerboseReporting(usePlanetaryAcquisitionsVerbose.isSelected());
         options.setDisallowPlanetAcquisitionClanCrossover(disallowPlanetaryAcquisitionClanCrossover.isSelected());
         options.setMaxJumpsPlanetaryAcquisition((int)spnMaxJumpPlanetaryAcquisitions.getModel().getValue());
-        options.SetPlanetAcquisitionFactionLimit(comboPlanetaryAcquisitionsFactionLimits.getSelectedIndex());
+        options.setPenaltyClanPartsFroIS((int)spnPenaltyClanPartsFromIS.getModel().getValue());
+        options.setPlanetAcquisitionFactionLimit(comboPlanetaryAcquisitionsFactionLimits.getSelectedIndex());
         for (int i = ITechnology.RATING_A; i <= ITechnology.RATING_F; i++) {
             options.setPlanetTechAcquisitionBonus((int)spnPlanetAcquireTechBonus[i].getModel().getValue(), i);
             options.setPlanetIndustryAcquisitionBonus((int)spnPlanetAcquireIndustryBonus[i].getModel().getValue(), i);
