@@ -1037,6 +1037,11 @@ public class InterstellarMapPanel extends JPanel {
         notifyListeners();
     }
     
+    /**
+     * Return a planet color based on what the user has selected from the radio button options
+     * @param a Planet object
+     * @return a Color
+     */
     public Color getPlanetColor(Planet p) {
     	
     	//color shading is from https://colorbrewer2.org and should be color-blind safe
