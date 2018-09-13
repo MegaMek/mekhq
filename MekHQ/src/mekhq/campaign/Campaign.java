@@ -1918,7 +1918,7 @@ public class Campaign implements Serializable, ITechManager {
             
         } else {
         	//we are shopping by planets, so more involved
-            ArrayList<IAcquisitionWork> currentList = sList.getAllShoppingItems();
+            List<IAcquisitionWork> currentList = sList.getAllShoppingItems();
             DateTime currentDate = Utilities.getDateTimeDay(getCalendar());
          
             //a list of items than can be taken out of the search and put back on the shopping list

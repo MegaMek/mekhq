@@ -23,6 +23,7 @@ package mekhq.campaign.market;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -42,7 +43,7 @@ import mekhq.campaign.unit.UnitOrder;
 import mekhq.campaign.work.IAcquisitionWork;
 
 /**
- *  An arraylist of IAcquisitionWork
+ *  A list of IAcquisitionWork
  *
  *  When a new acquisition is requested (via the parts store or the acquisition tab), we
  *  iterate through this list and look for the MissingPart.getNewPart that matches
@@ -66,13 +67,13 @@ import mekhq.campaign.work.IAcquisitionWork;
  */
 public class ShoppingList implements MekHqXmlSerializable {
 
-    private ArrayList<IAcquisitionWork> shoppingList;
+    private List<IAcquisitionWork> shoppingList;
 
     public ShoppingList() {
         shoppingList = new ArrayList<IAcquisitionWork>();
     }
     
-    public ShoppingList(ArrayList<IAcquisitionWork> items) {
+    public ShoppingList(List<IAcquisitionWork> items) {
         shoppingList = items;
     }
     
@@ -81,7 +82,7 @@ public class ShoppingList implements MekHqXmlSerializable {
         shoppingList.add(item);
     }
 
-    public ArrayList<IAcquisitionWork> getAllShoppingItems() {
+    public List<IAcquisitionWork> getAllShoppingItems() {
     	return shoppingList;
     }
     
