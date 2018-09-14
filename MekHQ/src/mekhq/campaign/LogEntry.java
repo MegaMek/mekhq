@@ -27,6 +27,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Objects;
 
+import mekhq.campaign.log.LogEntryController;
+import mekhq.campaign.log.LogEntryType;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -44,11 +46,11 @@ public class LogEntry implements Cloneable, MekHqXmlSerializable {
         return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); //$NON-NLS-1$
     }
 
-    public LogEntry(Date date, String desc) {
+    protected LogEntry(Date date, String desc) {
         this(date, desc, null);
     }
     
-    public LogEntry(Date date, String desc, String type) {
+    protected LogEntry(Date date, String desc, LogEntryType type) {
         this.date = date;
         this.desc = desc != null ? desc : ""; //$NON-NLS-1$
         this.type = type;
@@ -56,7 +58,7 @@ public class LogEntry implements Cloneable, MekHqXmlSerializable {
 
     private Date date;
     private String desc; // non-null
-    private String type;
+    private LogEntryType type;
 
     public Date getDate() {
         return date;
@@ -74,11 +76,11 @@ public class LogEntry implements Cloneable, MekHqXmlSerializable {
         this.desc = desc != null ? desc : ""; //$NON-NLS-1$
     }
     
-    public String getType() {
+    public LogEntryType getType() {
         return type;
     }
     
-    public void setType(String type) {
+    public void setType(LogEntryType type) {
         this.type = type;
     }
 
@@ -88,7 +90,7 @@ public class LogEntry implements Cloneable, MekHqXmlSerializable {
         sb.append(MekHqXmlUtil.indentStr(indent)).append("<logEntry>"); //$NON-NLS-1$
         if (date != null)    sb.append("<date>").append(dateFormat().format(date)).append("</date>"); //$NON-NLS-1$ //$NON-NLS-2$
         assert desc != null; sb.append("<desc>").append(MekHqXmlUtil.escape(desc)).append("</desc>"); //$NON-NLS-1$ //$NON-NLS-2$
-        if (type != null)    sb.append("<type>").append(MekHqXmlUtil.escape(type)).append("</type>");  //$NON-NLS-1$//$NON-NLS-2$
+        if (type != null)    sb.append("<type>").append(MekHqXmlUtil.escape(type.toString())).append("</type>");  //$NON-NLS-1$//$NON-NLS-2$
         sb.append("</logEntry>"); //$NON-NLS-1$
         pw.println(sb.toString());
     }
@@ -98,7 +100,7 @@ public class LogEntry implements Cloneable, MekHqXmlSerializable {
 
         Date   date = null;
         String desc = null;
-        String type = null;
+        LogEntryType type = null;
 
         try {
             NodeList nl = wn.getChildNodes();
@@ -108,7 +110,8 @@ public class LogEntry implements Cloneable, MekHqXmlSerializable {
                 if (nname.equals("desc")) { //$NON-NLS-1$
                     desc = MekHqXmlUtil.unEscape(node.getTextContent());
                 } else if (nname.equals("type")) { //$NON-NLS-1$
-                    type = MekHqXmlUtil.unEscape(node.getTextContent());
+                    String typeString = MekHqXmlUtil.unEscape(node.getTextContent());
+                    type = LogEntryType.valueOf(ensureBackwardCompatibility(typeString));
                 } else if (nname.equals("date")) { //$NON-NLS-1$
                     date = dateFormat().parse(node.getTextContent().trim());
                 }
@@ -117,6 +120,12 @@ public class LogEntry implements Cloneable, MekHqXmlSerializable {
             MekHQ.getLogger().error(LogEntry.class, METHOD_NAME, ex);
             return null;
         }
+
+        String newDescription = LogEntryController.getInstance().updateOldDescription(desc);
+        if(!newDescription.isEmpty())
+            desc = newDescription;
+
+        if(type == null) type = LogEntryController.getInstance().determineTypeFromLogDescription(desc);
 
         return new LogEntry(date, desc, type);
     }
@@ -151,4 +160,9 @@ public class LogEntry implements Cloneable, MekHqXmlSerializable {
             && Objects.equals(type, other.type);
     }
 
+    private static String ensureBackwardCompatibility(String logType){
+        if(logType.equalsIgnoreCase("med")) return LogEntryType.MEDICAL.toString();
+
+        return logType;
+    }
 }

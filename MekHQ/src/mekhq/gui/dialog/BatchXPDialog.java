@@ -39,6 +39,9 @@ import megamek.common.options.PilotOptions;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.LogEntry;
+import mekhq.campaign.log.LogEntryController;
+import mekhq.campaign.log.PersonalLogEntry;
 import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Skill;
@@ -293,10 +296,10 @@ public final class BatchXPDialog extends JDialog {
                         if(null == spa) {
                             if(campaign.getCampaignOptions().useEdge()) {
                                 p.acquireAbility(PilotOptions.EDGE_ADVANTAGES, "edge", p.getEdge() + 1); //$NON-NLS-1$
-                                p.addLogEntry(campaign.getDate(), String.format(resourceMap.getString("gainedEdge.text"))); //$NON-NLS-1$
+                                LogEntryController.getPersonalLogEntryController().logGainedEdge(p, campaign.getDate());
                             }
                         } else {
-                            p.addLogEntry(campaign.getDate(), String.format(resourceMap.getString("gained.format"), spa)); //$NON-NLS-1$
+                            LogEntryController.getPersonalLogEntryController().logGained(p, campaign.getDate(), spa);
                         }
                     }
                 }

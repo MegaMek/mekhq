@@ -41,6 +41,7 @@ import javax.swing.table.TableColumn;
 
 import megamek.common.util.EncodeControl;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.log.CustomLogEntry;
 import mekhq.campaign.LogEntry;
 import mekhq.campaign.personnel.Person;
 
@@ -165,7 +166,7 @@ public class EditPersonnelLogDialog extends javax.swing.JDialog {
 	}
     
     private void addEntry() {
-    	EditLogEntryDialog eeld = new EditLogEntryDialog(frame, true, new LogEntry(campaign.getDate(), ""));
+    	EditLogEntryDialog eeld = new EditLogEntryDialog(frame, true, new CustomLogEntry(campaign.getDate(), ""));
 		eeld.setVisible(true);
 		if(null != eeld.getEntry()) {
 			person.addLogEntry(eeld.getEntry());

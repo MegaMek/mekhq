@@ -3,10 +3,7 @@ package mekhq.gui.adapter;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
-import java.util.HashMap;
-import java.util.StringTokenizer;
-import java.util.UUID;
-import java.util.Vector;
+import java.util.*;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -21,6 +18,7 @@ import megamek.common.EntityWeightClass;
 import megamek.common.GunEmplacement;
 import megamek.common.UnitType;
 import mekhq.MekHQ;
+import mekhq.campaign.log.LogEntryController;
 import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.event.NetworkChangedEvent;
 import mekhq.campaign.event.OrganizationChangedEvent;
@@ -118,10 +116,12 @@ ActionListener {
                     if (singleForce.getTechID() != null) {
                         Person oldTech = gui.getCampaign().getPerson(singleForce.getTechID());
                         oldTech.clearTechUnitIDs();
-                        oldTech.addLogEntry(gui.getCampaign().getDate(), "Removed from " + singleForce.getName());
+                        LogEntryController.getServiceLogController().logRemovedFrom(oldTech, gui.getCampaign().getDate(), singleForce.getName());
                     }
                     singleForce.setTechID(tech.getId());
-                    tech.addLogEntry(gui.getCampaign().getDate(), "Assigned to " + singleForce.getFullName());
+
+                    LogEntryController.getServiceLogController().logAssignedTo(tech, gui.getCampaign().getDate(), singleForce.getName());
+
                     if (singleForce.getAllUnits() !=null) {
                         String cantTech = "";
                         for (UUID uuid : singleForce.getAllUnits()) {
@@ -232,7 +232,9 @@ ActionListener {
             if (singleForce.getTechID() != null) {
                 Person oldTech = gui.getCampaign().getPerson(singleForce.getTechID());
                 oldTech.clearTechUnitIDs();
-                oldTech.addLogEntry(gui.getCampaign().getDate(), "Removed from " + singleForce.getName());
+
+                LogEntryController.getServiceLogController().logRemovedFrom(oldTech, gui.getCampaign().getDate(), singleForce.getName());
+
                 if (singleForce.getAllUnits() !=null) {
                     for (UUID uuid : singleForce.getAllUnits()) {
                         Unit u = gui.getCampaign().getUnit(uuid);
