@@ -7,9 +7,10 @@
 package mekhq.gui.dialog;
 
 import java.awt.BorderLayout;
-import java.util.GregorianCalendar;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.util.GregorianCalendar;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 import javax.swing.DefaultComboBoxModel;
@@ -23,6 +24,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Ranks;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.view.PersonViewPanel;
+import mekhq.util.ImageId;
 
 /**
  *
@@ -181,11 +183,13 @@ public class NewRecruitDialog extends javax.swing.JDialog {
     }
 
     private void choosePortrait() {
-        ImageChoiceDialog pcd = new ImageChoiceDialog(hqView.getFrame(), true, person.getPortraitCategory(),
-                person.getPortraitFileName(), hqView.getIconPackage().getPortraits());
+        Optional<ImageId> iid = person.getPortraitId();
+        
+        ImageChoiceDialog pcd = new ImageChoiceDialog(hqView.getFrame(), true, iid.map(ImageId::getCategory).orElse(null), iid.map(ImageId::getFileName).orElse(null), hqView.getIconPackage());
         pcd.setVisible(true);
-        person.setPortraitCategory(pcd.getCategory());
-        person.setPortraitFileName(pcd.getFileName());
+        
+        person.setPortraitId(ImageId.cleanupLegacyPortraitId(pcd.getCategory(), pcd.getFileName()));
+        
         refreshView();
     }
 

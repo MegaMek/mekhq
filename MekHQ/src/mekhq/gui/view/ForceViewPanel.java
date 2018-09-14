@@ -7,24 +7,19 @@
 package mekhq.gui.view;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Image;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.LinkedHashMap;
 import java.util.ResourceBundle;
 import java.util.UUID;
-import java.util.Vector;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
 import megamek.client.ui.Messages;
-import megamek.client.ui.swing.util.PlayerColors;
-import megamek.common.Crew;
 import megamek.common.Entity;
 import megamek.common.UnitType;
 import megamek.common.util.EncodeControl;
@@ -33,7 +28,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
-import mekhq.gui.EntityImage;
+import mekhq.util.Images;
 
 /**
  * A custom panel that gets filled in with goodies from a Force record
@@ -147,35 +142,8 @@ public class ForceViewPanel extends javax.swing.JPanel {
 		add(txtDesc, gridBagConstraints);
 	}
 	
-	private void setIcon(Force force, JLabel lbl, int scale) {
-        String category = force.getIconCategory();
-        String filename = force.getIconFileName();
-        LinkedHashMap<String, Vector<String>> iconMap = force.getIconMap();
-
-        if(Crew.ROOT_PORTRAIT.equals(category)) {
-            category = "";
-        }
-
-        // Return a null if the player has selected no portrait file.
-        if ((null == category) || (null == filename) || (Crew.PORTRAIT_NONE.equals(filename) && !Force.ROOT_LAYERED.equals(category))) {
-        	filename = "empty.png";
-        }
-
-        // Try to get the player's portrait file.
-        Image portrait = null;        
-        try {
-            portrait = IconPackage.buildForceIcon(category, filename, icons.getForceIcons(), iconMap);
-            if(null != portrait) {
-        		portrait = portrait.getScaledInstance(scale, -1, Image.SCALE_SMOOTH);  
-            } else {
-            	portrait = (Image) icons.getForceIcons().getItem("", "empty.png");
-            }
-        	portrait = portrait.getScaledInstance(scale, -1, Image.SCALE_SMOOTH);  
-            ImageIcon icon = new ImageIcon(portrait);
-        	lbl.setIcon(icon);
-        } catch (Exception err) {
-            err.printStackTrace();
-        }
+	private void setIcon(Force force, JLabel lbl, int size) {
+	    lbl.setIcon(new ImageIcon(Images.force(icons, force, size, size)));
 	}
 
 	
@@ -206,7 +174,7 @@ public class ForceViewPanel extends javax.swing.JPanel {
     	String LanceTech = "";
     	String assigned = "";
     	String type = null;
-    	ArrayList<Person> people = new ArrayList<Person>();
+    	ArrayList<Person> people = new ArrayList<>();
     	for(UUID uid : force.getAllUnits()) {
     		Unit u = campaign.getUnit(uid);
     		if(null != u) {
@@ -449,7 +417,7 @@ public class ForceViewPanel extends javax.swing.JPanel {
 			}
  		}
  		//sort person vector by rank
- 		Collections.sort(units, new Comparator<Unit>(){		 
+ 		Collections.sort(units, new Comparator<Unit>(){
             public int compare(final Unit u1, final Unit u2) {
                return ((Comparable<Integer>)u2.getCommander().getRankNumeric()).compareTo(u1.getCommander().getRankNumeric());
             }
@@ -474,10 +442,8 @@ public class ForceViewPanel extends javax.swing.JPanel {
 			gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
 			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 			pnlSubUnits.add(lblPerson, gridBagConstraints);
-			if(null != unit) {
-				lblUnit.setText(getSummaryFor(unit));
-				lblUnit.setIcon(new ImageIcon(getImageFor(unit, lblUnit)));			
-			}
+			lblUnit.setText(getSummaryFor(unit));
+			lblUnit.setIcon(new ImageIcon(Images.unit(icons, unit, 84, 72)));			
 			gridBagConstraints = new java.awt.GridBagConstraints();
 			gridBagConstraints.gridx = 1;
 			gridBagConstraints.gridy = nexty;
@@ -498,59 +464,9 @@ public class ForceViewPanel extends javax.swing.JPanel {
      *          or if there was an error loading it.
      */
     public void setPortrait(Person p, JLabel lbl) {
-
-        String category = p.getPortraitCategory();
-        String filename = p.getPortraitFileName();
-
-        if(Crew.ROOT_PORTRAIT.equals(category)) {
-            category = "";
-        }
-
-        // Return a null if the player has selected no portrait file.
-        if ((null == category) || (null == filename) || Crew.PORTRAIT_NONE.equals(filename)) {
-        	filename = "default.gif";
-        }
-
-        // Try to get the player's portrait file.
-        Image portrait = null;
-        try {
-            portrait = (Image) icons.getPortraits().getItem(category, filename);
-            if(null != portrait) {
-                portrait = portrait.getScaledInstance(72, -1, Image.SCALE_DEFAULT);               
-            } else {
-            	portrait = (Image) icons.getPortraits().getItem("", "default.gif");
-            	if(null != portrait) {
-                    portrait = portrait.getScaledInstance(72, -1, Image.SCALE_DEFAULT);               
-            	}
-            }
-            lbl.setIcon(new ImageIcon(portrait));
-        } catch (Exception err) {
-            err.printStackTrace();
-        }
+        lbl.setIcon(new ImageIcon(Images.portrait(icons, p, 72, 72)));
     }
-    
-    private Image getImageFor(Unit u, Component c) {
-        
-		if(null == icons.getMechTiles()) { 
-			return null;
-		}
-        Image base = icons.getMechTiles().imageFor(u.getEntity(), c, -1);
-        int tint = PlayerColors.getColorRGB(u.campaign.getColorIndex());
-        EntityImage entityImage = new EntityImage(base, tint, getCamo(u), c);
-        return entityImage.loadPreviewImage();
-    }
-    
-    private Image getCamo(Unit unit) {
-        // Try to get the player's camo file.
-        Image camo = null;
-        try {
-            camo = (Image) icons.getCamos().getItem(unit.getCamoCategory(), unit.getCamoFileName());
-        } catch (Exception err) {
-            err.printStackTrace();
-        }
-        return camo;
-    }
-    
+
     public String getSummaryFor(Person person, Unit unit) {
         String toReturn = "<html><font size='2'><b>" + person.getFullTitle() + "</b><br/>";
         toReturn += person.getSkillSummary() + " " + person.getRoleDesc();

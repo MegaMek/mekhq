@@ -47,15 +47,18 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.UUID;
 import java.util.Vector;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import javax.swing.JOptionPane;
 import javax.xml.parsers.DocumentBuilder;
 
+import org.apache.commons.lang3.RandomUtils;
 import org.joda.time.DateTime;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
@@ -80,6 +83,7 @@ import megamek.common.FighterSquadron;
 import megamek.common.Game;
 import megamek.common.GunEmplacement;
 import megamek.common.IBomber;
+import megamek.common.IPlayer;
 import megamek.common.ITechManager;
 import megamek.common.ITechnology;
 import megamek.common.Infantry;
@@ -222,6 +226,7 @@ import mekhq.gui.GuiTabType;
 import mekhq.gui.dialog.HistoricalDailyReportDialog;
 import mekhq.gui.utilities.PortraitFileFactory;
 import mekhq.module.atb.AtBEventProcessor;
+import mekhq.util.ImageId;
 
 /**
  * @author Taharqa The main campaign class, keeps track of teams and units
@@ -237,7 +242,7 @@ public class Campaign implements Serializable, ITechManager {
     // we will use the same basic system (borrowed from MegaMek) for tracking
     // all three
     // OK now we have more, parts, personnel, forces, missions, and scenarios.
-    private Map<UUID, Unit> units = new LinkedHashMap<UUID, Unit>();
+    private Map<UUID, Unit> units = new LinkedHashMap<>();
     private Map<UUID, Person> personnel = new LinkedHashMap<>();
     private Map<UUID, Ancestors> ancestors = new LinkedHashMap<>();
     private Map<Integer, Part> parts = new LinkedHashMap<>();
@@ -246,7 +251,7 @@ public class Campaign implements Serializable, ITechManager {
     private Map<Integer, Scenario> scenarios = new LinkedHashMap<>();
     private List<Kill> kills = new ArrayList<>();
 
-    private Map<String, Integer> duplicateNameHash = new HashMap<String, Integer>();
+    private Map<String, Integer> duplicateNameHash = new HashMap<>();
 
     private int astechPool;
     private int astechPoolMinutes;
@@ -291,13 +296,13 @@ public class Campaign implements Serializable, ITechManager {
 
     //this is updated and used per gaming session, it is enabled/disabled via the Campaign options
     //we're re-using the LogEntry class that is used to store Personnel entries
-    public LinkedList<LogEntry> inMemoryLogHistory = new LinkedList<LogEntry>();
+    public LinkedList<LogEntry> inMemoryLogHistory = new LinkedList<>();
 
     private boolean overtime;
     private boolean gmMode;
     private transient boolean overviewLoadingValue = true;
 
-    private String camoCategory = Player.NO_CAMO;
+    private String camoCategory = IPlayer.NO_CAMO;
     private String camoFileName = null;
     private int colorIndex = 0;
 
@@ -336,9 +341,9 @@ public class Campaign implements Serializable, ITechManager {
         game = new Game();
         player = new Player(0, "self");
         game.addPlayer(0, player);
-        currentReport = new ArrayList<String>();
+        currentReport = new ArrayList<>();
         currentReportHTML = "";
-        newReports = new ArrayList<String>();
+        newReports = new ArrayList<>();
         calendar = new GregorianCalendar(3067, Calendar.JANUARY, 1);
         dateFormat = new SimpleDateFormat("EEEE, MMMM d yyyy");
         shortDateFormat = new SimpleDateFormat("yyyyMMdd");
@@ -355,7 +360,7 @@ public class Campaign implements Serializable, ITechManager {
         forces = new Force(name);
         forceIds.put(Integer.valueOf(lastForceId), forces);
         lastForceId++;
-        lances = new Hashtable<Integer, Lance>();
+        lances = new Hashtable<>();
         finances = new Finances();
         location = new CurrentLocation(Planets.getInstance().getPlanets()
                 .get("Outreach"), 0);
@@ -369,7 +374,7 @@ public class Campaign implements Serializable, ITechManager {
         gameOptions.initialize();
         gameOptions.getOption("year").setValue(getGameYear());
         game.setOptions(gameOptions);
-        customs = new ArrayList<String>();
+        customs = new ArrayList<>();
         shoppingList = new ShoppingList();
         news = new News(getGameYear(), id.getLeastSignificantBits());
         personnelMarket = new PersonnelMarket();
@@ -474,7 +479,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public ArrayList<Lance> getLanceList() {
-        ArrayList<Lance> retVal = new ArrayList<Lance>();
+        ArrayList<Lance> retVal = new ArrayList<>();
         for (Lance l : lances.values()) {
             if (forceIds.containsKey(l.getForceId())) {
                 retVal.add(l);
@@ -953,7 +958,6 @@ public class Campaign implements Serializable, ITechManager {
      * This is for adding a TestUnit that was previously created and had parts added to
      * it. We need to do the normal stuff, but we also need to take the existing parts and
      * add them to the campaign.
-     * @param unit
      */
     public void addTestUnit(TestUnit tu) {
         // we really just want the entity and the parts so lets just wrap that around a
@@ -1078,7 +1082,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public ArrayList<Entity> getEntities() {
-        ArrayList<Entity> entities = new ArrayList<Entity>();
+        ArrayList<Entity> entities = new ArrayList<>();
         for (Unit unit : getUnits()) {
             entities.add(unit.getEntity());
         }
@@ -3550,7 +3554,7 @@ public class Campaign implements Serializable, ITechManager {
         // internally
         // from with writeToXML function for Force
         pw1.println("\t<forces>");
-        forces.writeToXml(pw1, 2);
+        forces.printXML(pw1, 2);
         pw1.println("\t</forces>");
         finances.writeToXml(pw1, 1);
         location.writeToXml(pw1, 1);
@@ -7309,8 +7313,8 @@ public class Campaign implements Serializable, ITechManager {
         p.addLogEntry(entry);
     }
 
-    private ArrayList<String> getPossibleRandomPortraits (DirectoryItems portraits, ArrayList<String> existingPortraits, String subDir ) {
-        ArrayList<String> possiblePortraits = new ArrayList<String>();
+    private ArrayList<ImageId> getPossibleRandomPortraits (DirectoryItems portraits, Set<ImageId> existingPortraits, String subDir ) {
+        ArrayList<ImageId> possiblePortraits = new ArrayList<ImageId>();
         Iterator<String> categories = portraits.getCategoryNames();
         while (categories.hasNext()) {
             String category = categories.next();
@@ -7319,10 +7323,11 @@ public class Campaign implements Serializable, ITechManager {
                 while (names.hasNext()) {
                     String name = names.next();
                     String location = category + ":" + name;
-                    if (existingPortraits.contains(location)) {
+                    ImageId iid = ImageId.of(category, name);
+                    if (!existingPortraits.contains(iid)) {
                         continue;
                     }
-                    possiblePortraits.add(location);
+                    possiblePortraits.add(iid);
                 }
             }
         }
@@ -7330,24 +7335,16 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public void assignRandomPortraitFor(Person p) {
-        // first create a list of existing portait strings, so we can check for
-        // duplicates
-        ArrayList<String> existingPortraits = new ArrayList<String>();
-        for (Person existingPerson : this.getPersonnel()) {
-            existingPortraits.add(existingPerson.getPortraitCategory() + ":"
-                    + existingPerson.getPortraitFileName());
-        }
-        // TODO: it would be nice to pull the portraits directory from MekHQ
-        // itself
+
+        // TODO: it would be nice to pull the portraits directory from MekHQ itself
         DirectoryItems portraits;
         try {
-            portraits = new DirectoryItems(
-                    new File("data/images/portraits"), "", //$NON-NLS-1$ //$NON-NLS-2$
-                    PortraitFileFactory.getInstance());
+            portraits = new DirectoryItems( new File("data/images/portraits"),
+                                            "",
+                                            PortraitFileFactory.getInstance());
         } catch (Exception e) {
             return;
         }
-        ArrayList<String> possiblePortraits = new ArrayList<String>();
 
         // Will search for portraits in the /gender/primaryrole folder first,
         // and if none are found then /gender/rolegroup, then /gender/combat or
@@ -7390,7 +7387,13 @@ public class Campaign implements Serializable, ITechManager {
             searchCat_CombatSupport = "Combat/";
         }
 
-        possiblePortraits = getPossibleRandomPortraits(portraits, existingPortraits, searchCat_Gender + searchCat_Role);
+        Set<ImageId> existingPortraits = getPersonnel().stream()
+                                                       .map(Person::getPortraitId)
+                                                       .filter(Optional::isPresent)
+                                                       .map(Optional::get)
+                                                       .collect(Collectors.toSet());
+
+        ArrayList<ImageId> possiblePortraits = getPossibleRandomPortraits(portraits, existingPortraits, searchCat_Gender + searchCat_Role);
 
         if (possiblePortraits.isEmpty() && !searchCat_RoleGroup.isEmpty()) {
             possiblePortraits = getPossibleRandomPortraits(portraits, existingPortraits, searchCat_Gender + searchCat_RoleGroup);
@@ -7402,13 +7405,8 @@ public class Campaign implements Serializable, ITechManager {
             possiblePortraits = getPossibleRandomPortraits(portraits, existingPortraits, searchCat_Gender);
         }
         if (!possiblePortraits.isEmpty()) {
-            String chosenPortrait = possiblePortraits.get(Compute.randomInt(possiblePortraits.size()));
-            String[] temp = chosenPortrait.split(":");
-            if (temp.length != 2) {
-                return;
-            }
-            p.setPortraitCategory(temp[0]);
-            p.setPortraitFileName(temp[1]);
+            int luckyIndex = RandomUtils.nextInt(0, possiblePortraits.size());
+            p.setPortraitId(possiblePortraits.get(luckyIndex));
         }
     }
 

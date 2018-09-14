@@ -25,7 +25,6 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -33,7 +32,6 @@ import java.awt.event.ItemListener;
 import java.awt.event.MouseEvent;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.ResourceBundle;
 import java.util.Vector;
 
@@ -58,19 +56,18 @@ import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
 import megamek.client.ui.swing.UnitEditorDialog;
-import megamek.common.Crew;
 import megamek.common.IStartingPositions;
 import megamek.common.PlanetaryConditions;
 import megamek.common.util.EncodeControl;
 import mekhq.IconPackage;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.force.Force;
 import mekhq.campaign.force.ForceStub;
 import mekhq.campaign.force.UnitStub;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.AtBScenario.BotForceStub;
 import mekhq.campaign.mission.Loot;
 import mekhq.gui.dialog.PrincessBehaviorDialog;
+import mekhq.util.Images;
 
 /**
  * @author Neoancient
@@ -771,68 +768,13 @@ public class AtBScenarioViewPanel extends JPanel {
         }
 
         protected Icon getIconFrom(UnitStub unit) {
-            String category = unit.getPortraitCategory();
-            String filename = unit.getPortraitFileName();
-
-            if(Crew.ROOT_PORTRAIT.equals(category)) {
-                category = "";
-            }
-
-            // Return a null if the player has selected no portrait file.
-            if ((null == category) || (null == filename) || Crew.PORTRAIT_NONE.equals(filename)) {
-                filename = "default.gif";
-            }
-            // Try to get the player's portrait file.
-            Image portrait = null;
-            try {
-                portrait = (Image) icons.getPortraits().getItem(category, filename);
-                if(null != portrait) {
-                    portrait = portrait.getScaledInstance(50, -1, Image.SCALE_DEFAULT);
-                } else {
-                    portrait = (Image) icons.getPortraits().getItem("", "default.gif");
-                    if(null != portrait) {
-                        portrait = portrait.getScaledInstance(50, -1, Image.SCALE_DEFAULT);
-                    }
-                }
-                return new ImageIcon(portrait);
-            } catch (Exception err) {
-                err.printStackTrace();
-                return null;
-            }
+            return new ImageIcon(Images.portrait(icons, unit.getPortraitId(), 58, 50));
         }
 
         protected Icon getIconFrom(ForceStub force) {
-            String category = force.getIconCategory();
-            String filename = force.getIconFileName();
-            LinkedHashMap<String, Vector<String>> iconMap = force.getIconMap();
-
-            if(Crew.ROOT_PORTRAIT.equals(category)) {
-                category = "";
-            }
-
-            // Return a null if the player has selected no portrait file.
-            if ((null == category) || (null == filename) || (Crew.PORTRAIT_NONE.equals(filename) && !Force.ROOT_LAYERED.equals(category))) {
-                filename = "empty.png";
-            }
-
-            // Try to get the player's portrait file.
-            Image portrait = null;
-            try {
-                portrait = IconPackage.buildForceIcon(category, filename, icons.getForceIcons(), iconMap);
-               if(null != portrait) {
-                portrait = portrait.getScaledInstance(58, -1, Image.SCALE_SMOOTH);
-            } else {
-                portrait = (Image) icons.getForceIcons().getItem("", "empty.png");
-                if(null != portrait) {
-                    portrait = portrait.getScaledInstance(58, -1, Image.SCALE_SMOOTH);
-                }
-                }
-                return new ImageIcon(portrait);
-            } catch (Exception err) {
-                err.printStackTrace();
-                return null;
-            }
+            return new ImageIcon(Images.force(icons, force.getForceIconId(), 58, 50));
        }
+
     }
 
     protected class EntityListModel implements TreeModel {

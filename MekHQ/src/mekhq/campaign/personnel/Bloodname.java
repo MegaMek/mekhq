@@ -524,13 +524,18 @@ class Clan {
 		nameChanges = new ArrayList<DatedRecord>();
 	}
 
+    @Override
+    public int hashCode() {
+        return code.hashCode();
+    }
+
 	@Override
 	public boolean equals(Object o) {
 		if (o instanceof Clan) {
 			return code.equals(((Clan)o).code);
 		}
 		if (o instanceof String) {
-			return code.equals((String)o);
+			return code.equals((String)o); // LATER this is asymmetric – it can't be any good
 		}
 		return false;
 	}

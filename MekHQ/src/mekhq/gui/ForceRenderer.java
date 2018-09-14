@@ -17,6 +17,7 @@ import mekhq.IconPackage;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
+import mekhq.util.Images;
 
 public class ForceRenderer extends DefaultTreeCellRenderer {
 
@@ -142,45 +143,13 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
     }
 
     protected Icon getIconFrom(Unit unit) {
-        Person person = unit.getCommander();
-        if(null == person) {
-            return null;
-        }
-        String category = person.getPortraitCategory();
-        String filename = person.getPortraitFileName();
-
-        if(Crew.ROOT_PORTRAIT.equals(category)) {
-            category = "";
-        }
-
-        // Return a null if the unit has no selected portrait file.
-        if ((null == category) || (null == filename) || Crew.PORTRAIT_NONE.equals(filename)) {
-            filename = "default.gif";
-        }
-        // Try to get the unit's portrait file.
-        Image portrait = null;
-        try {
-            portrait = (Image) getIconPackage().getPortraits().getItem(category, filename);
-            if(null != portrait) {
-                portrait = portrait.getScaledInstance(58, -1, Image.SCALE_DEFAULT);
-            } else {
-                portrait = (Image) getIconPackage().getPortraits().getItem("", "default.gif");
-                if(null != portrait) {
-                    portrait = portrait.getScaledInstance(58, -1, Image.SCALE_DEFAULT);
-                }
-            }
-            return new ImageIcon(portrait);
-        } catch (Exception err) {
-            err.printStackTrace();
-            return null;
-        }
+        Person commander = unit.getCommander();
+        return commander != null
+             ? new ImageIcon(Images.portrait(icons, commander, 58, 58))
+             : null;
     }
 
     protected Icon getIconFrom(Force force) {
-        Image forceImage = IconPackage.buildForceIcon(force.getIconCategory(), force.getIconFileName(), getIconPackage().getForceIcons(), force.getIconMap());
-        if(null != forceImage) {
-            forceImage = forceImage.getScaledInstance(58, -1, Image.SCALE_SMOOTH);
-        }
-        return new ImageIcon(forceImage);
+        return new ImageIcon(Images.force(icons, force, 58, 94)); // 58 * phi :-)
     }
 }

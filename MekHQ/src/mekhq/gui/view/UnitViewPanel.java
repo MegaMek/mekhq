@@ -7,10 +7,10 @@
 package mekhq.gui.view;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Font;
 import java.awt.Image;
 import java.text.DecimalFormat;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 import javax.swing.BorderFactory;
@@ -18,18 +18,16 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JTextArea;
 
-import megamek.client.ui.swing.MechTileset;
 import megamek.client.ui.swing.util.FluffImageHelper;
-import megamek.client.ui.swing.util.PlayerColors;
 import megamek.common.Entity;
 import megamek.common.MechView;
 import megamek.common.TechConstants;
 import megamek.common.UnitType;
-import megamek.common.util.DirectoryItems;
 import megamek.common.util.EncodeControl;
+import mekhq.IconPackage;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.unit.Unit;
-import mekhq.gui.EntityImage;
+import mekhq.util.Images;
 /**
  * A custom panel that gets filled in with goodies from a unit record
  * @author  Jay Lawson <jaylawson39 at yahoo.com>
@@ -44,10 +42,9 @@ public class UnitViewPanel extends javax.swing.JPanel {
 	private Unit unit;
 	private Entity entity;
 	private Campaign campaign;
-	
-	private MechTileset mt;
-    private DirectoryItems camos;
-	
+
+	private IconPackage iconPackage;
+
 	private javax.swing.JLabel lblImage;
 	//private javax.swing.JPanel pnlStats;
 	private javax.swing.JTextPane txtReadout;
@@ -66,14 +63,12 @@ public class UnitViewPanel extends javax.swing.JPanel {
 	private javax.swing.JLabel lblQuirk;
 	private javax.swing.JTextArea txtQuirk;
 	
-	public UnitViewPanel(Unit u, Campaign c, DirectoryItems camos, MechTileset mt) {
-		unit = u;
-		entity = u.getEntity();
-		campaign = c;
-		this.camos = camos;
-		this.mt = mt;
+	public UnitViewPanel(Unit unit, Campaign campaign, IconPackage iconPackage) {
+		this.unit = unit;
+		this.entity = unit.getEntity();
+		this.campaign = campaign;
+		this.iconPackage = iconPackage;
 		initComponents();
-		//setMinimumSize(new Dimension(400, 200));
 	}
 	
 	private void initComponents() {
@@ -90,28 +85,28 @@ public class UnitViewPanel extends javax.swing.JPanel {
 
 		setBackground(Color.WHITE);
 		
-		lblImage.setName("lblImage"); // NOI18N
+		lblImage.setName("lblImage"); //$NON-NLS-1$
 		lblImage.setBackground(Color.WHITE);
-		Image image = FluffImageHelper.getFluffImage(entity);
-		if(null == image) {
-			image = getImageFor(unit, lblImage);     
-		}
+
+        Image image = Optional.ofNullable(FluffImageHelper.getFluffImage(entity))
+                              .orElseGet(() -> Images.unit(iconPackage, unit, 120, 120));
         Icon icon = null;
-		if(null != image) {
-			if(image.getWidth(lblImage) > 200) {
-                image = image.getScaledInstance(200, -1, Image.SCALE_DEFAULT);               
+        if (null != image) {
+            if (image.getWidth(lblImage) > 120) {
+                image = image.getScaledInstance(120, -1, Image.SCALE_SMOOTH);
             }
             icon = new ImageIcon(image);
             lblImage.setIcon(icon);
         }
-		gridBagConstraints = new java.awt.GridBagConstraints();
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 0;
 		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.CENTER;
 		add(lblImage, gridBagConstraints);
 	
-		pnlStats.setName("pnlBasic");
+		pnlStats.setName("pnlBasic"); //$NON-NLS-1$
 		pnlStats.setBorder(BorderFactory.createTitledBorder(unit.getName()));
 		pnlStats.setBackground(Color.WHITE);
 		fillStats(resourceMap);
@@ -326,26 +321,5 @@ public class UnitViewPanel extends javax.swing.JPanel {
 		}
 		
 	}
-	
-	private Image getImageFor(Unit u, Component c) {
-        
-		if(null == mt) { 
-			return null;
-		}
-        Image base = mt.imageFor(u.getEntity(), c, -1);
-        int tint = PlayerColors.getColorRGB(u.campaign.getColorIndex());
-        EntityImage entityImage = new EntityImage(base, tint, getCamo(u), c);
-        return entityImage.loadPreviewImage();
-    }
-    
-    private Image getCamo(Unit unit) {
-        // Try to get the player's camo file.
-        Image camo = null;
-        try {
-            camo = (Image) camos.getItem(unit.getCamoCategory(), unit.getCamoFileName());
-        } catch (Exception err) {
-            err.printStackTrace();
-        }
-        return camo;
-    }
+
 }

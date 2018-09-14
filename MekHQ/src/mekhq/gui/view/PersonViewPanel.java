@@ -6,8 +6,14 @@
 
 package mekhq.gui.view;
 
-import java.awt.*;
+import java.awt.Color;
 import java.awt.Dialog.ModalityType;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Image;
+import java.awt.Insets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -32,11 +38,11 @@ import megamek.common.util.DirectoryItems;
 import megamek.common.util.EncodeControl;
 import mekhq.IconPackage;
 import mekhq.MekHQ;
-import mekhq.campaign.personnel.Award;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Kill;
 import mekhq.campaign.LogEntry;
 import mekhq.campaign.event.PersonChangedEvent;
+import mekhq.campaign.personnel.Award;
 import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
@@ -45,6 +51,7 @@ import mekhq.gui.model.PersonnelEventLogModel;
 import mekhq.gui.model.PersonnelKillLogModel;
 import mekhq.gui.utilities.ImageHelpers;
 import mekhq.gui.utilities.WrapLayout;
+import mekhq.util.Images;
 
 /**
  * A custom panel that gets filled in with goodies from a Person record
@@ -411,35 +418,7 @@ public class PersonViewPanel extends JPanel {
      *          or if there was an error loading it.
      */
     public void setPortrait() {
-
-        String category = person.getPortraitCategory();
-        String filename = person.getPortraitFileName();
-
-        if(Crew.ROOT_PORTRAIT.equals(category)) {
-            category = ""; //$NON-NLS-1$
-        }
-
-        // Return a null if the player has selected no portrait file.
-        if ((null == category) || (null == filename) || Crew.PORTRAIT_NONE.equals(filename)) {
-            filename = "default.gif"; //$NON-NLS-1$
-        }
-
-        // Try to get the player's portrait file.
-        Image portrait = null;
-        try {
-            portrait = (Image) portraits.getItem(category, filename);
-            if(null != portrait) {
-                portrait = portrait.getScaledInstance(100, -1, Image.SCALE_DEFAULT);
-            } else {
-                portrait = (Image) portraits.getItem("", "default.gif");  //$NON-NLS-1$ //$NON-NLS-2$
-                if(null != portrait) {
-                    portrait = portrait.getScaledInstance(100, -1, Image.SCALE_DEFAULT);
-                }
-            }
-            lblPortrait.setIcon(new ImageIcon(portrait));
-        } catch (Exception err) {
-            err.printStackTrace();
-        }
+        lblPortrait.setIcon(new ImageIcon(Images.portrait(ip, person, 100, 100)));
     }
 
     private void fillStats() {

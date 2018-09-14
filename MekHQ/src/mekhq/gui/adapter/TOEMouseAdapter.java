@@ -4,6 +4,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.util.HashMap;
+import java.util.Optional;
 import java.util.StringTokenizer;
 import java.util.UUID;
 import java.util.Vector;
@@ -15,6 +16,8 @@ import javax.swing.JPopupMenu;
 import javax.swing.JTree;
 import javax.swing.event.MouseInputAdapter;
 import javax.swing.tree.TreePath;
+
+import org.apache.log4j.Logger;
 
 import megamek.client.ui.swing.util.MenuScroller;
 import megamek.common.EntityWeightClass;
@@ -36,6 +39,8 @@ import mekhq.gui.CampaignGUI;
 import mekhq.gui.dialog.ImageChoiceDialog;
 import mekhq.gui.dialog.TextAreaDialog;
 import mekhq.gui.utilities.StaticChecks;
+import mekhq.util.ForceIconId;
+import mekhq.util.ImageId;
 
 public class TOEMouseAdapter extends MouseInputAdapter implements
 ActionListener {
@@ -53,8 +58,8 @@ ActionListener {
         String command = st.nextToken();
         String type = st.nextToken();
         String target = st.nextToken();
-        Vector<Force> forces = new Vector<Force>();
-        Vector<Unit> units = new Vector<Unit>();
+        Vector<Force> forces = new Vector<>();
+        Vector<Unit> units = new Vector<>();
         while (st.hasMoreTokens()) {
             String id = st.nextToken();
             if (type.equals("FORCE")) {
@@ -71,7 +76,7 @@ ActionListener {
             }
         }
         if (type.equals("FORCE")) {
-            Vector<Force> newForces = new Vector<Force>();
+            Vector<Force> newForces = new Vector<>();
             for (Force force : forces) {
                 boolean duplicate = false;
                 for (Force otherForce : forces) {
@@ -167,7 +172,7 @@ ActionListener {
             for (Force force : forces) {
                 gui.undeployForce(force);
                 force.clearScenarioIds(gui.getCampaign(), true);
-                if (null != force && null != scenario) {
+                if (scenario != null) {
                     scenario.addForces(force.getId());
                     force.setScenarioId(scenario.getId());
                     for (UUID uid : force.getAllUnits()) {
@@ -181,15 +186,22 @@ ActionListener {
             }
         } else if (command.contains("CHANGE_ICON")) {
             if (null != singleForce) {
-                ImageChoiceDialog pcd = new ImageChoiceDialog(
-                        gui.getFrame(), true, singleForce.getIconCategory(),
-                        singleForce.getIconFileName(), gui.getIconPackage()
-                        .getForceIcons(), true);
+                ImageId rootLayer = singleForce.getForceIconId().orElse(ForceIconId.defatultFrame()).layers().findFirst().get();
+                ImageChoiceDialog pcd = new ImageChoiceDialog(gui.getFrame(), true, rootLayer.getCategory(),rootLayer.getFileName(), gui.getIconPackage(), true);
                 pcd.setVisible(true);
                 if (pcd.isChanged()) {
-                    singleForce.setIconCategory(pcd.getCategory());
-                    singleForce.setIconFileName(pcd.getFileName());
-                    singleForce.setIconMap(pcd.getIconMap());
+                    // ImageChoiceDialog is designed in such way that
+                    // pcd.getIconMap() is only valid when pcd.getCategory() is
+                    // Force.ROOT_LAYERED (ie: "Layered"): if a "regular" icon 
+                    // is chosen, pcd.getIconMap() will not in general be empty
+                    // and it must be disregarded.
+                    Optional<ForceIconId> fii;
+                    if (pcd.getCategory().equals(Force.ROOT_LAYERED)) {
+                        fii = ForceIconId.cleanupLegacyIconId(pcd.getCategory(), pcd.getFileName(), pcd.getIconMap());
+                    } else {
+                        fii = ForceIconId.cleanupLegacyIconId(pcd.getCategory(), pcd.getFileName());
+                    }
+                    singleForce.setForceIconId(fii);
                     MekHQ.triggerEvent(new OrganizationChangedEvent(singleForce));
                 }
             }
@@ -241,9 +253,7 @@ ActionListener {
                             oldTech.removeTechUnitId(u.getId());
                             MekHQ.triggerEvent(new PersonTechAssignmentEvent(oldTech, u));
                         }
-                        if (u != null) {
-                            u.setTech((UUID)null);
-                        }
+                        u.setTech((UUID)null);
                     }
                 }
                 singleForce.setTechID(null);
@@ -291,7 +301,7 @@ ActionListener {
             // don't set them directly, set the C3i UUIDs and then
             // run gui.refreshNetworks on the campaign
             // TODO: is that too costly?
-            Vector<String> uuids = new Vector<String>();
+            Vector<String> uuids = new Vector<>();
             for (Unit unit : units) {
                 if (null == unit.getEntity()) {
                     continue;
@@ -377,10 +387,10 @@ ActionListener {
             // we will allow multiple selection of either units or forces
             // but not both - if both are selected then default to
             // unit and deselect all forces
-            Vector<Force> forces = new Vector<Force>();
-            Vector<Unit> unitsInForces = new Vector<Unit>();
-            Vector<Unit> units = new Vector<Unit>();
-            Vector<TreePath> uPath = new Vector<TreePath>();
+            Vector<Force> forces = new Vector<>();
+            Vector<Unit> unitsInForces = new Vector<>();
+            Vector<Unit> units = new Vector<>();
+            Vector<TreePath> uPath = new Vector<>();
             for (TreePath path : tree.getSelectionPaths()) {
                 Object node = path.getLastPathComponent();
                 if (node instanceof Force) {

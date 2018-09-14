@@ -293,7 +293,7 @@ public class Scenario implements Serializable {
                 +id
                 +"</id>");
         if(null != stub) {
-            stub.writeToXml(pw1, indent+1);
+            stub.printXML(pw1, indent+1);
         }
         if(loots.size() > 0 && status == S_CURRENT) {
             pw1.println(MekHqXmlUtil.indentStr(indent+1)+"<loots>");

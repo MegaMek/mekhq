@@ -183,8 +183,7 @@ public final class TOETab extends CampaignGuiTab {
                 scrollPerson.setPreferredSize(crewList.getPreferredScrollableViewportSize());
                 tabUnit.add(name, crewPanel);
             }
-            tabUnit.add("Unit",
-                    new UnitViewPanel(u, getCampaign(), getIconPackage().getCamos(), getIconPackage().getMechTiles()));
+            tabUnit.add("Unit", new UnitViewPanel(u, getCampaign(), getIconPackage()));
             scrollForceView.setViewportView(tabUnit);
             // This odd code is to make sure that the scrollbar stays at the top
             // I can't just call it here, because it ends up getting reset

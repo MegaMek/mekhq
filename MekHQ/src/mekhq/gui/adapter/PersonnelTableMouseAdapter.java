@@ -51,6 +51,7 @@ import mekhq.gui.dialog.RetirementDefectionDialog;
 import mekhq.gui.dialog.TextAreaDialog;
 import mekhq.gui.model.PersonnelTableModel;
 import mekhq.gui.utilities.StaticChecks;
+import mekhq.util.ImageId;
 
 public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
         ActionListener {
@@ -233,7 +234,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     gui.getCampaign().personUpdated(person);
                     if (gui.getCampaign().getCampaignOptions().usePortraitForType(role)
                             && gui.getCampaign().getCampaignOptions().getAssignPortraitOnRoleChange()
-                            && person.getPortraitFileName().equals(Crew.PORTRAIT_NONE)) {
+                            && !person.getPortraitId().isPresent()) {
                         gui.getCampaign().assignRandomPortraitFor(person);
                     }
                 }
@@ -838,7 +839,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 break;
             case CMD_RANDOM_PORTRAIT:
                 for (Person person: people) {
-                    if (person.getPortraitFileName().equals(Crew.PORTRAIT_NONE)) {
+                    if (!person.getPortraitId().isPresent()) {
                         gui.getCampaign().assignRandomPortraitFor(person);
                         gui.getCampaign().personUpdated(person);
                         MekHQ.triggerEvent(new PersonChangedEvent(person));
@@ -846,14 +847,11 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 }
                 break;
             case CMD_EDIT_PORTRAIT:
-                ImageChoiceDialog pcd = new ImageChoiceDialog(gui.getFrame(),
-                        true, selectedPerson.getPortraitCategory(),
-                        selectedPerson.getPortraitFileName(), gui.getIconPackage()
-                                .getPortraits());
+                Optional<ImageId> iid = selectedPerson.getPortraitId();
+                ImageChoiceDialog pcd = new ImageChoiceDialog(gui.getFrame(), true, iid.map(ImageId::getCategory).orElse(null), iid.map(ImageId::getFileName).orElse(null), gui.getIconPackage());
                 pcd.setVisible(true);
                 if (pcd.isChanged()) {
-                    selectedPerson.setPortraitCategory(pcd.getCategory());
-                    selectedPerson.setPortraitFileName(pcd.getFileName());
+                    selectedPerson.setPortraitId(ImageId.cleanupLegacyPortraitId(pcd.getCategory(), pcd.getFileName()));
                     gui.getCampaign().personUpdated(selectedPerson);
                     MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
                 }
