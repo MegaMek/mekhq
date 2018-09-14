@@ -509,16 +509,18 @@ public class AtBScenarioViewPanel extends JPanel {
         lblAtmosphere.setVisible(scenario.getAtmosphere() != PlanetaryConditions.ATMO_STANDARD);
         lblAtmosphereDesc.setVisible(scenario.getAtmosphere() != PlanetaryConditions.ATMO_STANDARD);
 
-        lblPlayerStart.setText(resourceMap.getString("lblPlayerStart.text"));
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = y;
-        gridBagConstraints.gridwidth = 1;
-        panStats.add(lblPlayerStart, gridBagConstraints);
-
-        lblPlayerStartPos.setText(IStartingPositions.START_LOCATION_NAMES[scenario.getStart()]);
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = y++;
-        panStats.add(lblPlayerStartPos, gridBagConstraints);
+        if(!(scenario instanceof AtBDynamicScenario)) {
+            lblPlayerStart.setText(resourceMap.getString("lblPlayerStart.text"));
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.gridwidth = 1;
+            panStats.add(lblPlayerStart, gridBagConstraints);
+    
+            lblPlayerStartPos.setText(IStartingPositions.START_LOCATION_NAMES[scenario.getStart()]);
+            gridBagConstraints.gridx = 2;
+            gridBagConstraints.gridy = y++;
+            panStats.add(lblPlayerStartPos, gridBagConstraints);
+        }
 
         if (scenario.isCurrent()) {
             btnReroll = new JButton(scenario.getRerollsRemaining() +
