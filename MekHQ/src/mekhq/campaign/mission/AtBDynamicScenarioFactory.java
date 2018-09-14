@@ -3,13 +3,11 @@ package mekhq.campaign.mission;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
-import java.util.stream.Collectors;
+import java.util.Vector;
 
 import megamek.client.RandomNameGenerator;
 import megamek.client.RandomSkillsGenerator;
-import megamek.client.RandomUnitGenerator;
 import megamek.common.Board;
 import megamek.common.Compute;
 import megamek.common.Crew;
@@ -25,11 +23,10 @@ import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.AtBConfiguration;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.CampaignOptions;
-import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
+import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
+import mekhq.campaign.mission.ScenarioForceTemplate.SynchronizedDeploymentType;
 import mekhq.campaign.personnel.Bloodname;
-import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.IUnitGenerator;
 import mekhq.campaign.universe.Planet;
@@ -64,15 +61,82 @@ public class AtBDynamicScenarioFactory {
      * @param campaign
      */
     public static void finalizeScenario(AtBDynamicScenario scenario, AtBContract contract, Campaign campaign) {
+        // fix the player force BV at the current time.
+        Force playerForce = scenario.getForces(campaign);
+        int playerForceBV = playerForce.getTotalBV(campaign);
+        int playerForceUnitCount = playerForce.getAllUnits().size();
+        int playerForceWeightClass = EntityWeightClass.WEIGHT_LIGHT;
+        int generatedLanceCount = 0;
+        
         // step 1: loop through all force templates, in the following order:
         //  any allied-player-controlled templates
         //  any allied-bot-controlled templates
         //  any enemy-bot-controlled templates
         for(ScenarioForceTemplate forceTemplate : scenario.getTemplate().scenarioForces.values()) {
-            //if(forceTemplate.)
+            // generate any player-controlled but not player-supplied forces
+            // method for generating any force:
+            // Step 1. Determine weight class of player-supplied forces (ignore dropships)
+            // Step 2. While force has not surpassed BV cap || unit cap
+            //      get me a unit types array
+            //      get me a unit weight string
+            //      use unit weight string to generate a list of entities
+            //  Step 2.1 If force has surpassed unit cap, remove randomly selected units until it's at unit cap
+            if(forceTemplate.getGenerationMethod() == ForceGenerationMethod.PlayerDeployed.ordinal()) {
+                continue;
+            }
+        
+            // determine generation parameters
+            int forceBV = 0;
+            int forceBVBudget = (int) (playerForceBV * forceTemplate.getForceMultiplier()); // don't forget to multiply by difficulty.
+            int forceUnitBudget = 0;
+            if(forceTemplate.getGenerationMethod() == ForceGenerationMethod.UnitCountScaled.ordinal()) {
+                forceUnitBudget = (int) (playerForceUnitCount * forceTemplate.getForceMultiplier());
+            } else if (forceTemplate.getGenerationMethod() == ForceGenerationMethod.FixedUnitCount.ordinal()) {
+                forceUnitBudget = (int) forceTemplate.getForceMultiplier();
+            }
+            
+            ArrayList<Entity> generatedEntities = new ArrayList<>();
+            
+            boolean stopGenerating = false;
+            
+            while(!stopGenerating) {
+                List<Integer> unitTypes = generateUnitTypes(forceTemplate, 4, campaign);
+                String unitWeights = generateUnitWeights(unitTypes, contract.getEnemyCode(), 
+                        playerForceWeightClass, EntityWeightClass.WEIGHT_ASSAULT, campaign);
+     
+                List<Entity> generatedLance = generateLance(contract.getEnemyCode(), contract.getEnemySkill(), 
+                        contract.getEnemyQuality(), unitTypes, unitWeights, campaign);
+                
+                // if force contributes to map size
+                generatedLanceCount++;
+                
+                for(Entity ent : generatedLance) {
+                    forceBV += ent.calculateBattleValue();
+                    generatedEntities.add(ent);
+                }
+                
+                if(forceTemplate.getGenerationMethod() == ForceGenerationMethod.BVScaled.ordinal()) {
+                    stopGenerating = forceBV > forceBVBudget;
+                } else {
+                    stopGenerating = generatedEntities.size() >= forceUnitBudget; 
+                }
+            }
+            
+            // chop out random units until we drop down to our unit count budget
+            while(forceUnitBudget > 0 && generatedEntities.size() >= forceUnitBudget) {
+                generatedEntities.remove(Compute.randomInt(generatedEntities.size()));
+            }
+            
+            BotForce generatedForce = new BotForce();
+            generatedForce.setEntityList(generatedEntities);
+            setBotForceParameters(generatedForce, forceTemplate, contract);
+            scenario.addBotForce(generatedForce, forceTemplate);
         }
         
-        //setScenarioMapSize(scenario);
+        // approximate estimate, anyway.
+        scenario.setLanceCount(generatedLanceCount + (playerForceUnitCount / 4));
+        setScenarioMapSize(scenario);
+        setDeploymentZones(scenario);
     }
     
     /**
@@ -226,8 +290,7 @@ public class AtBDynamicScenarioFactory {
      * @param campaign
      * @return                A new Entity with crew.
      */
-    public static Entity getEntity(String faction, int skill, int quality, int unitType, int weightClass, 
-            AtBContract contract, Campaign campaign) {
+    public static Entity getEntity(String faction, int skill, int quality, int unitType, int weightClass, Campaign campaign) {
         MechSummary ms = null;
         if (unitType == UnitType.TANK) {
             if (campaign.getCampaignOptions().getOpforUsesVTOLs()) {
@@ -249,7 +312,7 @@ public class AtBDynamicScenarioFactory {
             return null;
         }
         
-        return createEntityWithCrew(faction, skill, contract, campaign, ms);
+        return createEntityWithCrew(faction, skill, campaign, ms);
     }
 
     /**
@@ -259,8 +322,7 @@ public class AtBDynamicScenarioFactory {
      * @param ms Which entity to generate
      * @return An crewed entity
      */
-    public static Entity createEntityWithCrew(String faction, int skill,
-            AtBContract contract, Campaign campaign, MechSummary ms) {
+    public static Entity createEntityWithCrew(String faction, int skill, Campaign campaign, MechSummary ms) {
         final String METHOD_NAME = "createEntityWithCrew(String,int,Campaign,MechSummary)"; //$NON-NLS-1$
         Entity en = null;
         try {
@@ -291,8 +353,7 @@ public class AtBDynamicScenarioFactory {
         }
         int[] skills = rsg.getRandomSkills(en);
 
-        if (f.isClan() && Compute.d6(2) > 8 - contract.getEnemySkill()
-                + skills[0] + skills[1]) {
+        if (f.isClan() && Compute.d6(2) > 8 - skill + skills[0] + skills[1]) {
             int phenotype;
             switch (UnitType.determineUnitTypeCode(en)) {
             case UnitType.MEK:
@@ -428,5 +489,232 @@ public class AtBDynamicScenarioFactory {
             retVal = weights.replaceFirst("HA", "HH");
         }
         return retVal;
+    }
+    
+    private static List<Integer> generateUnitTypes(ScenarioForceTemplate template, int unitCount, Campaign campaign) {
+        List<Integer> unitTypes = new ArrayList<>(unitCount);
+        int actualUnitType = template.getAllowedUnitType(); 
+        
+        if(template.getAllowedUnitType() == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX) {
+            // logic mostly lifted from AtBScenario.java, uses campaign config to determine tank/mech mixture
+            if (campaign.getCampaignOptions().getUseVehicles()) {
+                int totalWeight = campaign.getCampaignOptions().getOpforLanceTypeMechs() +
+                        campaign.getCampaignOptions().getOpforLanceTypeMixed() +
+                        campaign.getCampaignOptions().getOpforLanceTypeVehicles();
+                if (totalWeight <= 0) {
+                    actualUnitType = UnitType.MEK;
+                } else {
+                    int roll = Compute.randomInt(totalWeight);
+                    if (roll < campaign.getCampaignOptions().getOpforLanceTypeVehicles()) {
+                        actualUnitType = UnitType.TANK;
+                    // if we actually rolled a mixed unit, apply "random" distribution of tank/mech
+                    } else if (roll < campaign.getCampaignOptions().getOpforLanceTypeVehicles() +
+                            campaign.getCampaignOptions().getOpforLanceTypeMixed()) {
+                        for(int x = 0; x < unitCount; x++) {
+                            boolean addTank = Compute.randomInt(2) == 0;
+                            if(addTank) {
+                                unitTypes.add(UnitType.TANK);
+                            } else {
+                                unitTypes.add(UnitType.MEK);
+                            }
+                        }
+                        
+                        return unitTypes;
+                    }
+                }
+            }
+        }
+        
+        for(int x = 0; x < unitCount; x++) {
+            unitTypes.add(actualUnitType);
+        }
+        
+        return unitTypes;
+    }
+    
+    private static String generateUnitWeights(List<Integer> unitTypes, String faction, int weightClass, int maxWeight, Campaign campaign) {
+        String weights = adjustForMaxWeight(campaign.getAtBConfig()
+                .selectBotUnitWeights(AtBConfiguration.ORG_IS, weightClass), maxWeight);
+        
+        weights = adjustWeightsForFaction(weights, faction);
+        
+        return weights;
+    }
+    
+    private static int calculateWeightClass(Vector<UUID> unitIDs, Campaign campaign) {
+        int retval = EntityWeightClass.WEIGHT_LIGHT;
+        /*int totalWeight = 0;
+        int unitCount = 0;
+        
+        for(UUID unitID : unitIDs) {
+            Entity 
+            totalWeight += campaign.getUnit(unitID).getEntity().getWeight();
+        }*/
+        
+        return retval;
+    }
+    
+    /**
+     * Generates a "lance" of entities given some parameters. Doesn't have to be a lance, could be 
+     * @param faction The faction from which to generate entities.
+     * @param skill Skill level of the crew.
+     * @param quality Quality of the units.
+     * @param unitTypes The types of units. Length had better be equal to the length of weights.
+     * @param weights 
+     * @param campaign
+     * @return
+     */
+    private static List<Entity> generateLance(String faction, int skill, int quality, List<Integer> unitTypes, String weights, Campaign campaign) {
+        List<Entity> retval = new ArrayList<>();
+        
+        for(int i = 0; i < unitTypes.size(); i++) {
+            Entity en = getEntity(faction, skill, quality, unitTypes.get(i), AtBConfiguration.decodeWeightStr(weights, i), campaign);
+            if(en != null) {
+                retval.add(en);
+            }
+        }
+        
+        return retval;
+    }
+    
+    /**
+     * Worker method that sets bot force properties such as name, color, team, starting zone and retreat zone
+     * @param generatedForce
+     * @param forceTemplate
+     * @param contract
+     */
+    private static void setBotForceParameters(BotForce generatedForce, ScenarioForceTemplate forceTemplate, AtBContract contract) {
+        if(forceTemplate.getForceAlignment() == ScenarioForceTemplate.ForceAlignment.Allied.ordinal()) {
+            generatedForce.setName(contract.getAllyBotName());
+            generatedForce.setColorIndex(contract.getAllyColorIndex());
+            generatedForce.setCamoCategory(contract.getAllyCamoCategory());
+            generatedForce.setCamoFileName(contract.getAllyCamoFileName());
+        } else if(forceTemplate.getForceAlignment() == ScenarioForceTemplate.ForceAlignment.Opposing.ordinal()) {
+            generatedForce.setName(contract.getEnemyBotName());
+            generatedForce.setColorIndex(contract.getEnemyColorIndex());
+            generatedForce.setCamoCategory(contract.getEnemyCamoCategory());
+            generatedForce.setCamoFileName(contract.getEnemyCamoFileName());
+        } else {
+            generatedForce.setName("Unknown Hostiles");
+        }
+        
+        generatedForce.setTeam(ScenarioForceTemplate.TEAM_IDS.get(forceTemplate.getForceAlignment()));
+    }
+    
+    private static void setDeploymentZones(AtBDynamicScenario scenario) {
+        // loop through all scenario player forces
+        //  for each one, look up the template. If none, random? If yes, calculateDeploymentZone
+        //  for 
+        // repeat for bot forces
+        
+        for(int forceID : scenario.getForceIDs()) {
+            ScenarioForceTemplate forceTemplate = scenario.getPlayerForceTemplates().get(forceID);
+            
+            if(forceTemplate != null) {
+                calculateDeploymentZone(forceTemplate, scenario, forceTemplate.getForceName());
+            }
+        }
+        
+        for(int botIndex = 0; botIndex < scenario.getNumBots(); botIndex++) {
+            BotForce botForce = scenario.getBotForce(botIndex);
+            ScenarioForceTemplate forceTemplate = scenario.getBotForceTemplates().get(botForce);
+            
+            if(forceTemplate != null) {
+                botForce.setStart(calculateDeploymentZone(forceTemplate, scenario, forceTemplate.getForceName()));
+            }
+        }
+    }
+    
+    /**
+     * Worker method that calculates the deployment zone of a given force template
+     * and any force templates with which it is synced.
+     * @param forceTemplate The force template for which to generate deployment zone
+     * @param scenario The scenario on which we're working
+     * @param originalForceTemplateID The ID of the force template where we started.
+     * @return Deployment zone as defined in Board.java
+     */
+    private static int calculateDeploymentZone(ScenarioForceTemplate forceTemplate, AtBDynamicScenario scenario, String originalForceTemplateID) {
+        int calculatedEdge = Board.START_ANY;
+        
+        // if we have a specific deployment zone OR have looped around
+        if(forceTemplate.getActualDeploymentZone() != Board.START_NONE) {
+            return forceTemplate.getActualDeploymentZone();
+        } else if(forceTemplate.getSyncDeploymentType() == SynchronizedDeploymentType.None ||
+                forceTemplate.getSyncedForceName() == originalForceTemplateID) {
+            calculatedEdge = forceTemplate.getDeploymentZones().get(Compute.randomInt(forceTemplate.getDeploymentZones().size()));
+        } else if (forceTemplate.getSyncDeploymentType() == SynchronizedDeploymentType.SameEdge) {
+            calculatedEdge = calculateDeploymentZone(scenario.getTemplate().scenarioForces.get(forceTemplate.getSyncedForceName()), scenario, originalForceTemplateID);
+        } else if (forceTemplate.getSyncDeploymentType() == SynchronizedDeploymentType.OppositeEdge) {
+            int syncDeploymentZone = calculateDeploymentZone(scenario.getTemplate().scenarioForces.get(forceTemplate.getSyncedForceName()), scenario, originalForceTemplateID);
+            calculatedEdge = getOppositeEdge(syncDeploymentZone);
+        } else if (forceTemplate.getSyncDeploymentType() == SynchronizedDeploymentType.SameArc) {
+            int syncDeploymentZone = calculateDeploymentZone(scenario.getTemplate().scenarioForces.get(forceTemplate.getSyncedForceName()), scenario, originalForceTemplateID);
+            List<Integer> arc = getArc(syncDeploymentZone, true);
+            calculatedEdge = arc.get(Compute.randomInt(arc.size()));
+        } else if (forceTemplate.getSyncDeploymentType() == SynchronizedDeploymentType.OppositeArc) {
+            int syncDeploymentZone = calculateDeploymentZone(scenario.getTemplate().scenarioForces.get(forceTemplate.getSyncedForceName()), scenario, originalForceTemplateID);
+            List<Integer> arc = getArc(syncDeploymentZone, false);
+            calculatedEdge = arc.get(Compute.randomInt(arc.size()));
+        }
+        
+        if(calculatedEdge == ScenarioForceTemplate.DEPLOYMENT_ZONE_NARROW_EDGE) {
+            List<Integer> edges = new ArrayList<>();
+            
+            if(scenario.getMapSizeX() > scenario.getMapSizeY()) {
+                edges.add(Board.START_N);
+                edges.add(Board.START_S);
+            } else {
+                edges.add(Board.START_E);
+                edges.add(Board.START_W);
+            }
+            
+            calculatedEdge = edges.get(Compute.randomInt(2));
+        }
+        
+        forceTemplate.setActualDeploymentZone(calculatedEdge);
+        return calculatedEdge;
+    }
+    
+    public static List<Integer> getArc(int edge, boolean same) {
+        ArrayList<Integer> edges = new ArrayList<>();
+        
+        int tempEdge = edge;
+        if(!same) {
+            tempEdge = getOppositeEdge(edge);
+        }
+        
+        switch(tempEdge) {
+        case Board.START_EDGE:
+            edges.add(Board.START_EDGE);
+            break;
+        case Board.START_CENTER:
+            edges.add(Board.START_CENTER);
+            break;
+        case Board.START_ANY:
+            edges.add(Board.START_ANY);
+            break;
+        default:
+            // directional edges start at 1
+            edges.add(((tempEdge + 6) % 8) + 1);
+            edges.add(((tempEdge - 1) % 8) + 1);
+            edges.add((tempEdge % 8) + 1);
+            break;
+        }
+        
+        return edges;
+    }
+    
+    public static int getOppositeEdge(int edge) {
+        switch(edge) {
+        case Board.START_EDGE:
+            return Board.START_CENTER;
+        case Board.START_CENTER:
+            return Board.START_EDGE;
+        case Board.START_ANY:
+            return Board.START_ANY;
+        default:
+            // directional edges start at 1
+            return ((edge + 3) % 8) + 1;
+        }
     }
 }

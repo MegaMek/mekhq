@@ -14,6 +14,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.ComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -32,6 +33,7 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.border.LineBorder;
 
+import megamek.common.UnitType;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.ScenarioForceTemplate;
 import mekhq.campaign.mission.ScenarioForceTemplate.SynchronizedDeploymentType;
@@ -63,7 +65,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
     JList<String> lstDeployZones;
     JComboBox<String> cboDestinationZone;
     JSpinner spnRetreatThreshold;
-    JList<String> lstUnitTypes;
+    JComboBox<String> cboUnitType;
     JCheckBox chkReinforce;
     JCheckBox chkContributesToBV;
     JCheckBox chkContributesToUnitCount;
@@ -364,15 +366,17 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         gbc.anchor = GridBagConstraints.CENTER;
         forcedPanel.add(lstDeployZones, gbc);
         
-        DefaultListModel<String> unitTypeModel = new DefaultListModel<String>();
-        for(String s : ScenarioForceTemplate.UNIT_TYPES) {
-            unitTypeModel.addElement(s); 
+        cboUnitType = new JComboBox<String>();
+        for(int key : ScenarioForceTemplate.SPECIAL_UNIT_TYPES.keySet()) {
+            cboUnitType.addItem(ScenarioForceTemplate.SPECIAL_UNIT_TYPES.get(key));
         }
         
-        lstUnitTypes = new JList<String>();
-        lstUnitTypes.setModel(unitTypeModel);
+        for(int unitTypeID = 0; unitTypeID < UnitType.SIZE; unitTypeID++) {
+            cboUnitType.addItem(UnitType.getTypeDisplayableName(unitTypeID));
+        }
+
         gbc.gridx++;
-        forcedPanel.add(lstUnitTypes, gbc);
+        forcedPanel.add(cboUnitType, gbc);
         
         JButton btnAdd = new JButton("Add");
         btnAdd.setActionCommand(ADD_FORCE_COMMAND);
@@ -589,14 +593,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
             panForceList.add(lblRetreatThreshold, gbc);
             
             JLabel lblAllowedUnitTypes = new JLabel();
-            StringBuilder autBuilder = new StringBuilder();
-            autBuilder.append("<html>");
-            for(int unitType : sft.getAllowedUnitTypes()) {
-                autBuilder.append(ScenarioForceTemplate.UNIT_TYPES[unitType]);
-                autBuilder.append("<br/>");
-            }
-            autBuilder.append("</html>");
-            lblAllowedUnitTypes.setText(autBuilder.toString());
+            lblAllowedUnitTypes.setText(UnitType.getTypeDisplayableName(sft.getAllowedUnitType()));
             gbc.gridx++;
             panForceList.add(lblAllowedUnitTypes, gbc);
             
@@ -647,13 +644,10 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         int destinationZone = cboDestinationZone.getSelectedIndex();
         double retreatThreshold = (int) spnRetreatThreshold.getValue() / 100.0;
         
-        List<Integer> allowedUnitTypes = new ArrayList<>();
-        for(int x : lstUnitTypes.getSelectedIndices()) {
-            allowedUnitTypes.add(x);
-        }
+        int allowedUnitType = cboUnitType.getSelectedIndex() - ScenarioForceTemplate.SPECIAL_UNIT_TYPES.size();
         
         ScenarioForceTemplate sft = new ScenarioForceTemplate(forceAlignment, generationMethod, forceMultiplier,
-                null, destinationZone, retreatThreshold, allowedUnitTypes);
+                null, destinationZone, retreatThreshold, allowedUnitType);
         sft.setCanReinforceLinked(chkReinforce.isSelected());
         sft.setContributesToBV(chkContributesToBV.isSelected());
         sft.setContributesToUnitCount(chkContributesToUnitCount.isSelected());
@@ -754,7 +748,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         
         spnMultiplier.setEnabled(!isPlayerForce);
         spnRetreatThreshold.setEnabled(!isPlayerForce);
-        lstUnitTypes.setEnabled(!isPlayerForce);
+        cboUnitType.setEnabled(!isPlayerForce);
         chkContributesToBV.setEnabled(!isEnemyForce);
         chkContributesToBV.setSelected(!isEnemyForce);
         chkContributesToUnitCount.setEnabled(!isEnemyForce);

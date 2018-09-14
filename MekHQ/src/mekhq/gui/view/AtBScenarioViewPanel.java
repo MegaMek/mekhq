@@ -67,9 +67,11 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.force.ForceStub;
 import mekhq.campaign.force.UnitStub;
+import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.BotForceStub;
 import mekhq.campaign.mission.Loot;
+import mekhq.campaign.mission.ScenarioForceTemplate;
 import mekhq.gui.dialog.PrincessBehaviorDialog;
 
 /**
@@ -316,7 +318,30 @@ public class AtBScenarioViewPanel extends JPanel {
 
             if (null != scenario.getLance(campaign)) {
                 lblForceDesc.setText(campaign.getForce(scenario.getLanceForceId()).getFullName());
+            } else if(scenario instanceof AtBDynamicScenario){
+            
+                StringBuilder forceBuilder = new StringBuilder();
+                forceBuilder.append("<html>");
+                boolean chop = false;
+                for(int forceID : scenario.getForceIDs()) {
+                    forceBuilder.append(campaign.getForce(forceID).getFullName());
+                    forceBuilder.append("<br/>");
+                    ScenarioForceTemplate template = ((AtBDynamicScenario) scenario).getPlayerForceTemplates().get(forceID);
+                    if(template != null && template.getActualDeploymentZone() >= 0) {
+                        forceBuilder.append("Deploy: ");
+                        forceBuilder.append(IStartingPositions.START_LOCATION_NAMES[template.getActualDeploymentZone()]);
+                        forceBuilder.append("<br/>");
+                    }
+                    chop = true;
+                }
+                
+                if(chop) {
+                    forceBuilder.delete(forceBuilder.length() - 5, forceBuilder.length());
+                }
+                forceBuilder.append("</html>");
+                lblForceDesc.setText(forceBuilder.toString());
             }
+            
             gridBagConstraints.gridx = 2;
             gridBagConstraints.gridy = y++;
             gridBagConstraints.gridwidth = 1;

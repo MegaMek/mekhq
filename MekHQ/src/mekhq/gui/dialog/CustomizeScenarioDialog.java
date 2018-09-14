@@ -276,6 +276,14 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
                 }
             });
             panBtn.add(btnLoad);
+        } else if (mission instanceof AtBContract) {
+            JButton btnFinalize = new JButton("Finalize");
+            btnFinalize.addActionListener(new java.awt.event.ActionListener() {
+                public void actionPerformed(ActionEvent evt) {
+                    btnFinalizeActionPerformed(evt);
+                }
+            });
+            panBtn.add(btnFinalize);
         }
         
         btnOK.setText(resourceMap.getString("btnOkay.text")); // NOI18N
@@ -347,6 +355,11 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
             campaign.addScenario(scenario, mission);
         }
         
+        this.setVisible(false);
+    }
+    
+    private void btnFinalizeActionPerformed(ActionEvent evt) {
+        AtBDynamicScenarioFactory.finalizeScenario((AtBDynamicScenario) scenario, (AtBContract) mission, campaign);
         this.setVisible(false);
     }
     

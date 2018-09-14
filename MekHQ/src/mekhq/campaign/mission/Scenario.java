@@ -169,6 +169,10 @@ public class Scenario implements Serializable {
         this.missionId = i;
     }
     
+    public List<Integer> getForceIDs() {
+        return subForceIds;
+    }
+    
     public Force getForces(Campaign campaign) {
         Force force = new Force("Assigned Forces");
         for(int subid : subForceIds) {

@@ -963,8 +963,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
      * @param ms Which entity to generate
      * @return An crewed entity
      */
-    protected Entity createEntityWithCrew(String faction, int skill,
-            Campaign campaign, MechSummary ms) {
+    protected Entity createEntityWithCrew(String faction, int skill, Campaign campaign, MechSummary ms) {
         final String METHOD_NAME = "createEntityWithCrew(String,int,Campaign,MechSummary)"; //$NON-NLS-1$
         Entity en = null;
         try {
@@ -995,8 +994,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         }
         int[] skills = rsg.getRandomSkills(en);
 
-        if (f.isClan() && Compute.d6(2) > 8 - getContract(campaign).getEnemySkill()
-                + skills[0] + skills[1]) {
+        if (f.isClan() && Compute.d6(2) > 8 - skill + skills[0] + skills[1]) {
             int phenotype;
             switch (UnitType.determineUnitTypeCode(en)) {
             case UnitType.MEK:

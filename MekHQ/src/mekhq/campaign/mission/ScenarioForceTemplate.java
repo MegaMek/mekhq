@@ -1,10 +1,14 @@
 package mekhq.campaign.mission;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
+
+import megamek.common.Board;
 
 public class ScenarioForceTemplate {
     // A scenario force template is a way to describe a particular force that gets generated when creating a DymanicScenario
@@ -19,9 +23,15 @@ public class ScenarioForceTemplate {
     public static final String[] FORCE_ALIGNMENTS = { "Player", "Allied", "Opposing", "Third" };
     public static final String[] FORCE_GENERATION_METHODS = { "Player Deployed", "BV Scaled", "Unit Count Scaled", "Fixed Unit Count" };
     public static final String[] FORCE_DEPLOYMENT_SYNC_TYPES = { "None", "Same Edge", "Same Arc", "Opposite Edge", "Opposite Arc" };
-    public static final String[] DEPLOYMENT_ZONES = { "North", "Northeast", "East", "Southeast", "South", "Southwest", "West", "Northwest", "Edge", "Narrow Edge", "Center", "Any" };
+    public static final String[] DEPLOYMENT_ZONES = { "Any", "Northwest", "North", "Northeast", "East", "Southeast", "South", "Southwest", "West", "Edge", "Center", "Narrow Edge" };
     public static final String[] BOT_DESTINATION_ZONES = { "None", "Opposite Deployment Edge", "North", "East", "South", "West", "Random" };
-    public static final String[] UNIT_TYPES = { "Mek", "ATB Mixed Mek/Vee", "Vee", "Aero", "Conv. Fighter", "Gun Emplacement", "Infantry", "Battle Armor", "Naval", "Civilian" };
+    public static final Map<Integer, String> SPECIAL_UNIT_TYPES;
+    public static final Map<Integer, Integer> TEAM_IDS;
+    
+    public static int SPECIAL_UNIT_TYPE_ATB_MIX = -1;
+    public static int SPECIAL_UNIT_TYPE_ATB_CIVILIANS = -2;
+    
+    public static int DEPLOYMENT_ZONE_NARROW_EDGE = DEPLOYMENT_ZONES.length - 1;
     
     public enum ForceAlignment {
         Player,
@@ -43,6 +53,18 @@ public class ScenarioForceTemplate {
         SameArc,
         OppositeEdge,
         OppositeArc
+    }
+    
+    static {
+        SPECIAL_UNIT_TYPES = new HashMap<>();
+        SPECIAL_UNIT_TYPES.put(SPECIAL_UNIT_TYPE_ATB_MIX, "Standard AtB Mix");
+        SPECIAL_UNIT_TYPES.put(SPECIAL_UNIT_TYPE_ATB_CIVILIANS, "AtB Civilian Units");
+        
+        TEAM_IDS = new HashMap<>();
+        TEAM_IDS.put(ForceAlignment.Player.ordinal(), 1);
+        TEAM_IDS.put(ForceAlignment.Allied.ordinal(), 1);
+        TEAM_IDS.put(ForceAlignment.Opposing.ordinal(), 2);
+        TEAM_IDS.put(ForceAlignment.Opposing.ordinal(), 3);
     }
     
     /**
@@ -87,7 +109,7 @@ public class ScenarioForceTemplate {
     /**
      * The unit types that may be generated for this force. 
      */
-    private List<Integer> allowedUnitTypes;
+    private int allowedUnitType;
     
     /**
      * Whether this force is allowed to reinforce linked scenarios (as described in the AtB Stratcon rules)
@@ -126,10 +148,10 @@ public class ScenarioForceTemplate {
      */
     private boolean syncRetreatThreshold;
     
-    //TODO: 
-    // Introduce possibility to deploy opposite/same as a given force group
-    // Probably set deployment zones to "opposite"
-    // and introduce "deploymentForceGroup" (a drop down with all force groups present so far)
+    /**
+     * The materialized deployment zone after this template has been applied to a force.
+     */
+    private int actualDeploymentZone = Board.START_NONE;
     
     /**
      * Blank constructor for deserialization purposes.
@@ -139,14 +161,14 @@ public class ScenarioForceTemplate {
     }
     
     public ScenarioForceTemplate(int forceAlignment, int generationMethod, double forceMultiplier, List<Integer> deploymentZones,
-            int destinationZone, double retreatThreshold, List<Integer> allowedUnitTypes) {
+            int destinationZone, double retreatThreshold, int allowedUnitType) {
         this.forceAlignment = forceAlignment;
         this.generationMethod = generationMethod;
         this.forceMultiplier = forceMultiplier;
         this.deploymentZones = deploymentZones == null ? new ArrayList<>() : deploymentZones;
         this.destinationZone = destinationZone;
         this.retreatThreshold = retreatThreshold;
-        this.allowedUnitTypes = allowedUnitTypes;
+        this.allowedUnitType = allowedUnitType;
     }
     
     public int getForceAlignment() {
@@ -175,10 +197,8 @@ public class ScenarioForceTemplate {
         return retreatThreshold;
     }
     
-    @XmlElementWrapper(name="allowedUnitTypes")
-    @XmlElement(name="allowedUnitType")
-    public List<Integer> getAllowedUnitTypes() {
-        return allowedUnitTypes;
+    public int getAllowedUnitType() {
+        return allowedUnitType;
     }
     
     public boolean getCanReinforceLinked() {
@@ -209,6 +229,11 @@ public class ScenarioForceTemplate {
         return syncRetreatThreshold;
     }
     
+    public int getActualDeploymentZone() {
+        return actualDeploymentZone;
+    }
+    
+    
     public void setForceAlignment(int forceAlignment) {
         this.forceAlignment = forceAlignment;
     }
@@ -233,8 +258,8 @@ public class ScenarioForceTemplate {
         this.retreatThreshold = retreatThreshold;
     }
     
-    public void setAllowedUnitTypes(List<Integer> allowedUnitTypes) {
-        this.allowedUnitTypes = allowedUnitTypes;
+    public void setAllowedUnitType(int allowedUnitType) {
+        this.allowedUnitType = allowedUnitType;
     }
     
     public void setCanReinforceLinked(boolean canReinforce) {
@@ -259,5 +284,9 @@ public class ScenarioForceTemplate {
     
     public void setSyncDeploymentType(SynchronizedDeploymentType syncDeploymentType) {
         this.syncDeploymentType = syncDeploymentType;
+    }
+    
+    public void setActualDeploymentZone(int zone) {
+        this.actualDeploymentZone = zone;
     }
 }
