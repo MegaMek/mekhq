@@ -141,17 +141,17 @@ public class ShoppingList implements MekHqXmlSerializable {
             quantity--;
         }
         ShoppingList shortList = new ShoppingList(newWork);
-        shortList = campaign.goShopping(shortList);      
+        shortList = campaign.goShopping(shortList);
         
         if(newWork.getQuantity() > 0) {
-        	//if using planetary acquisition check with low verbosity, check to see if nothing was found 
-        	//because it is not reported elsewhere
-        	if(newWork.getQuantity() == origQuantity && 
-        			campaign.getCampaignOptions().usesPlanetaryAcquisition() &&
-        			!campaign.getCampaignOptions().usePlanetAcquisitionVerboseReporting()) {
-        		campaign.addReport("<font color='red'><b>You failed to find " + newWork.getAcquisitionName() + " within " + campaign.getCampaignOptions().getMaxJumpsPlanetaryAcquisition() + " jumps</b></font>");
-        	}
-        	
+            //if using planetary acquisition check with low verbosity, check to see if nothing was found 
+            //because it is not reported elsewhere
+            if(newWork.getQuantity() == origQuantity && 
+                    campaign.getCampaignOptions().usesPlanetaryAcquisition() &&
+                    !campaign.getCampaignOptions().usePlanetAcquisitionVerboseReporting()) {
+                campaign.addReport("<font color='red'><b>You failed to find " + newWork.getAcquisitionName() + " within " + campaign.getCampaignOptions().getMaxJumpsPlanetaryAcquisition() + " jumps</b></font>");
+            }
+
             campaign.addReport(newWork.getShoppingListReport(newWork.getQuantity()));
             
             shoppingList.add(newWork);

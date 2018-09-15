@@ -910,84 +910,83 @@ public class Planet implements Serializable {
      * @return an updated TargetRoll with planet specific mods
      */
     public TargetRoll getAcquisitionMods(TargetRoll target, Date when, CampaignOptions options, Faction faction, boolean clanPart) {
-    	
-    	//check faction limitations
-    	Set<Faction> planetFactions = getFactionSet(Utilities.getDateTimeDay(when));
-    	if(null != planetFactions) {
-    		boolean enemies = false;
-    		boolean neutrals = false;
-    		boolean allies = false;
-    		boolean ownFaction = false;
-    		boolean clanCrossover = true;
-    		boolean noClansPresent = true;
-    		for(Faction planetFaction : planetFactions) {
-    			if(faction.equals(planetFaction)) {
-    				ownFaction = true;
-    			}
-    			if(RandomFactionGenerator.getInstance().getFactionHints().isAtWarWith(faction, planetFaction, when)) {
-    				enemies = true;
-    			} else if(RandomFactionGenerator.getInstance().getFactionHints().isAlliedWith(faction, planetFaction, when)) {
-    				allies = true;
-    			} else {
-    				neutrals = true;
-    			}
-    			if(faction.isClan()) {
-    				noClansPresent = false;
-    			}
-    			if(faction.isClan() == planetFaction.isClan()) {
-    				clanCrossover = false;
-    			}
-    		}
-    		if(!ownFaction) {
-    			if(enemies && !neutrals && !allies 
-    					&& options.getPlanetAcquisitionFactionLimit() > CampaignOptions.PLANET_ACQUISITION_ALL) {
-        			return new TargetRoll(TargetRoll.IMPOSSIBLE, "No supplies from enemy planets");
-    			} else if(neutrals && !allies 
-    					&& options.getPlanetAcquisitionFactionLimit() > CampaignOptions.PLANET_ACQUISITION_NEUTRAL) {
-        			return new TargetRoll(TargetRoll.IMPOSSIBLE, "No supplies from neutral planets");
-    			} else if(allies && options.getPlanetAcquisitionFactionLimit() > CampaignOptions.PLANET_ACQUISITION_ALLY) {
-        			return new TargetRoll(TargetRoll.IMPOSSIBLE, "No supplies from allied planets");
-    			}
-        		if(options.disallowPlanetAcquisitionClanCrossover() && clanCrossover) {
-        			return new TargetRoll(TargetRoll.IMPOSSIBLE, "The clans and inner sphere do not trade supplies");
-        		}
-    		}
-    		if(noClansPresent && clanPart) {
-    			if(options.disallowClanPartsFromIS()) {
-    				return new TargetRoll(TargetRoll.IMPOSSIBLE, "No clan parts from non-clan factions");
-    			}
-    			target.addModifier(options.getPenaltyClanPartsFroIS(), "clan parts from non-clan faction");
-    		}		   		
-    	}
-    	
-    	SocioIndustrialData socioIndustrial = getSocioIndustrial(Utilities.getDateTimeDay(when));
-    	if(null == socioIndustrial) {
-    		//nothing has been coded for this planet, so we will assume C across the board
-    		socioIndustrial = new SocioIndustrialData();
-    		socioIndustrial.tech = EquipmentType.RATING_C;
-    		socioIndustrial.industry = EquipmentType.RATING_C;
-    		socioIndustrial.output = EquipmentType.RATING_C;
-    		socioIndustrial.rawMaterials = EquipmentType.RATING_C;
-    		socioIndustrial.agriculture = EquipmentType.RATING_C;
-    	}
-    	
-    	//don't allow acquisitions from caveman planets
-    	if(socioIndustrial.tech==EquipmentType.RATING_X ||
-    			socioIndustrial.industry==EquipmentType.RATING_X ||
-    			socioIndustrial.output==EquipmentType.RATING_X) {
-        	return new TargetRoll(TargetRoll.IMPOSSIBLE,"Regressed: Pre-industrial world");
-    	}
-    	
-    	target.addModifier(options.getPlanetTechAcquisitionBonus(socioIndustrial.tech), 
-    			"planet tech: " + ITechnology.getRatingName(socioIndustrial.tech));
-    	target.addModifier(options.getPlanetIndustryAcquisitionBonus(socioIndustrial.industry), 
-    			"planet industry: " + ITechnology.getRatingName(socioIndustrial.industry));
-    	target.addModifier(options.getPlanetOutputAcquisitionBonus(socioIndustrial.output), 
-    			"planet output: " + ITechnology.getRatingName(socioIndustrial.output));
-    	
-    	
-    	return target;
-    	
+   
+        //check faction limitations
+        Set<Faction> planetFactions = getFactionSet(Utilities.getDateTimeDay(when));
+        if(null != planetFactions) {
+            boolean enemies = false;
+            boolean neutrals = false;
+            boolean allies = false;
+            boolean ownFaction = false;
+            boolean clanCrossover = true;
+            boolean noClansPresent = true;
+            for(Faction planetFaction : planetFactions) {
+                if(faction.equals(planetFaction)) {
+                    ownFaction = true;
+                }
+                if(RandomFactionGenerator.getInstance().getFactionHints().isAtWarWith(faction, planetFaction, when)) {
+                    enemies = true;
+                } else if(RandomFactionGenerator.getInstance().getFactionHints().isAlliedWith(faction, planetFaction, when)) {
+                    allies = true;
+                } else {
+                    neutrals = true;
+                      }
+                if(faction.isClan()) {
+                    noClansPresent = false;
+                }
+                if(faction.isClan() == planetFaction.isClan()) {
+                    clanCrossover = false;
+                }
+            }
+            if(!ownFaction) {
+                if(enemies && !neutrals && !allies 
+                        && options.getPlanetAcquisitionFactionLimit() > CampaignOptions.PLANET_ACQUISITION_ALL) {
+                    return new TargetRoll(TargetRoll.IMPOSSIBLE, "No supplies from enemy planets");
+                } else if(neutrals && !allies 
+                        && options.getPlanetAcquisitionFactionLimit() > CampaignOptions.PLANET_ACQUISITION_NEUTRAL) {
+                    return new TargetRoll(TargetRoll.IMPOSSIBLE, "No supplies from neutral planets");
+                } else if(allies && options.getPlanetAcquisitionFactionLimit() > CampaignOptions.PLANET_ACQUISITION_ALLY) {
+                    return new TargetRoll(TargetRoll.IMPOSSIBLE, "No supplies from allied planets");
+                }
+                if(options.disallowPlanetAcquisitionClanCrossover() && clanCrossover) {
+                    return new TargetRoll(TargetRoll.IMPOSSIBLE, "The clans and inner sphere do not trade supplies");
+                }
+            }
+            if(noClansPresent && clanPart) {
+                if(options.disallowClanPartsFromIS()) {
+                    return new TargetRoll(TargetRoll.IMPOSSIBLE, "No clan parts from non-clan factions");
+                }
+                target.addModifier(options.getPenaltyClanPartsFroIS(), "clan parts from non-clan faction");
+            }
+        }
+    
+        SocioIndustrialData socioIndustrial = getSocioIndustrial(Utilities.getDateTimeDay(when));
+        if(null == socioIndustrial) {
+            //nothing has been coded for this planet, so we will assume C across the board
+            socioIndustrial = new SocioIndustrialData();
+            socioIndustrial.tech = EquipmentType.RATING_C;
+            socioIndustrial.industry = EquipmentType.RATING_C;
+            socioIndustrial.output = EquipmentType.RATING_C;
+            socioIndustrial.rawMaterials = EquipmentType.RATING_C;
+            socioIndustrial.agriculture = EquipmentType.RATING_C;
+        }
+    
+        //don't allow acquisitions from caveman planets
+        if(socioIndustrial.tech==EquipmentType.RATING_X ||
+                socioIndustrial.industry==EquipmentType.RATING_X ||
+                socioIndustrial.output==EquipmentType.RATING_X) {
+            return new TargetRoll(TargetRoll.IMPOSSIBLE,"Regressed: Pre-industrial world");
+        }
+    
+        target.addModifier(options.getPlanetTechAcquisitionBonus(socioIndustrial.tech), 
+                "planet tech: " + ITechnology.getRatingName(socioIndustrial.tech));
+        target.addModifier(options.getPlanetIndustryAcquisitionBonus(socioIndustrial.industry), 
+                "planet industry: " + ITechnology.getRatingName(socioIndustrial.industry));
+        target.addModifier(options.getPlanetOutputAcquisitionBonus(socioIndustrial.output), 
+                "planet output: " + ITechnology.getRatingName(socioIndustrial.output));
+    
+        return target;
+    
     }
     
     // JAXB marshalling support

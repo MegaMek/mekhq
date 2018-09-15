@@ -224,7 +224,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JCheckBox disallowClanPartsFromIS;
     private JSpinner spnPenaltyClanPartsFromIS;
 
-
     private JTextField[] txtSalaryBase;
     private JSpinner[] spnSalaryXp;
     private JSpinner spnSalaryCommision;
