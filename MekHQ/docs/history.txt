@@ -8,6 +8,7 @@ v0.45.2-SNAPSHOT
 + PR #923: Tech SPA
 + PR #928: Allow mothballed units in retirement dialog
 + PR #927: Map Colors for Socio-Industrial Level
++ PR #926: Planet-based acquisition option
 
 v0.45.1 (2018-09-03 2300 UTC)
 + PR #864: Security - address XXE vulnerabilities in XML parsers

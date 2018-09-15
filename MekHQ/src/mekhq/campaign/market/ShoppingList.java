@@ -23,6 +23,7 @@ package mekhq.campaign.market;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -42,7 +43,7 @@ import mekhq.campaign.unit.UnitOrder;
 import mekhq.campaign.work.IAcquisitionWork;
 
 /**
- *  An arraylist of IAcquisitionWork
+ *  A list of IAcquisitionWork
  *
  *  When a new acquisition is requested (via the parts store or the acquisition tab), we
  *  iterate through this list and look for the MissingPart.getNewPart that matches
@@ -66,12 +67,25 @@ import mekhq.campaign.work.IAcquisitionWork;
  */
 public class ShoppingList implements MekHqXmlSerializable {
 
-    private ArrayList<IAcquisitionWork> shoppingList;
+    private List<IAcquisitionWork> shoppingList;
 
     public ShoppingList() {
         shoppingList = new ArrayList<IAcquisitionWork>();
     }
+    
+    public ShoppingList(List<IAcquisitionWork> items) {
+        shoppingList = items;
+    }
+    
+    public ShoppingList(IAcquisitionWork item) {
+        shoppingList = new ArrayList<IAcquisitionWork>();   
+        shoppingList.add(item);
+    }
 
+    public List<IAcquisitionWork> getAllShoppingItems() {
+    	return shoppingList;
+    }
+    
     public IAcquisitionWork getShoppingItem(Object newEquipment) {
         for(IAcquisitionWork shoppingItem : shoppingList) {
             if(isSameEquipment(shoppingItem.getNewEquipment(), newEquipment)) {
@@ -105,6 +119,9 @@ public class ShoppingList implements MekHqXmlSerializable {
         if(newWork instanceof AmmoBin) {
             newWork = ((AmmoBin) newWork).getAcquisitionWork();
         }
+        
+        //check to see if this is already on the shopping list. If so, then add quantity to the list
+        //and return
         for(IAcquisitionWork shoppingItem : shoppingList) {
             if(isSameEquipment(shoppingItem.getNewEquipment(), newWork.getNewEquipment())) {
                 campaign.addReport(newWork.getShoppingListReport(quantity));
@@ -115,54 +132,31 @@ public class ShoppingList implements MekHqXmlSerializable {
                 return;
             }
         }
-        boolean canAfford = true;
-        if(campaign.getFunds() < getTrueBuyCost(newWork, campaign)) {
-             campaign.addReport("<font color='red'><b>You cannot afford to purchase " + newWork.getAcquisitionName() + "</b></font>");
-             canAfford = false;
-        }
-        while(canAfford && quantity > 0 && campaign.acquireEquipment(newWork)) {
+        
+        //if not on the shopping list then try to acquire it with a temporary short shopping list. 
+        //If we fail, then add it to the shopping list
+        int origQuantity = quantity;
+        while(quantity > 1) {
+            newWork.incrementQuantity();
             quantity--;
-            if(quantity > 0 && campaign.getFunds() < getTrueBuyCost(newWork, campaign)) {
-                canAfford = false;
-                campaign.addReport("<font color='red'><b>You cannot afford to purchase " + newWork.getAcquisitionName() + "</b></font>");
-            }
         }
-        if(quantity > 0) {
-            campaign.addReport(newWork.getShoppingListReport(quantity));
-            while(quantity > 1) {
-                newWork.incrementQuantity();
-                quantity--;
+        ShoppingList shortList = new ShoppingList(newWork);
+        shortList = campaign.goShopping(shortList);
+        
+        if(newWork.getQuantity() > 0) {
+            //if using planetary acquisition check with low verbosity, check to see if nothing was found 
+            //because it is not reported elsewhere
+            if(newWork.getQuantity() == origQuantity && 
+                    campaign.getCampaignOptions().usesPlanetaryAcquisition() &&
+                    !campaign.getCampaignOptions().usePlanetAcquisitionVerboseReporting()) {
+                campaign.addReport("<font color='red'><b>You failed to find " + newWork.getAcquisitionName() + " within " + campaign.getCampaignOptions().getMaxJumpsPlanetaryAcquisition() + " jumps</b></font>");
             }
+
+            campaign.addReport(newWork.getShoppingListReport(newWork.getQuantity()));
+            
             shoppingList.add(newWork);
             MekHQ.triggerEvent(new ProcurementEvent(newWork));
         }
-    }
-
-    public void newDay(Campaign campaign) {
-        ArrayList<IAcquisitionWork> newShoppingList = new ArrayList<IAcquisitionWork>();
-        boolean noStaff = false;
-        for(IAcquisitionWork shoppingItem : shoppingList) {
-            shoppingItem.decrementDaysToWait();
-
-            if(shoppingItem.getDaysToWait() <= 0 && !noStaff) {
-            	boolean canAfford = true;
-                if(campaign.getFunds() < getTrueBuyCost(shoppingItem, campaign)) {
-                     campaign.addReport("<font color='red'><b>You cannot afford to purchase " + shoppingItem.getAcquisitionName() + "</b></font>");
-                     canAfford = false;
-                }
-                while(canAfford && shoppingItem.getQuantity() > 0 && campaign.acquireEquipment(shoppingItem)) {
-                    shoppingItem.decrementQuantity();
-                    if(shoppingItem.getQuantity() > 0 && campaign.getFunds() < getTrueBuyCost(shoppingItem, campaign)) {
-                        canAfford = false;
-                        campaign.addReport("<font color='red'><b>You cannot afford to purchase " + shoppingItem.getAcquisitionName() + "</b></font>");
-                    }
-                }
-            }
-            if(shoppingItem.getQuantity() > 0 || shoppingItem.getDaysToWait() > 0) {
-                newShoppingList.add(shoppingItem);
-            }
-        }
-        shoppingList = newShoppingList;
     }
 
     @Override
@@ -276,17 +270,6 @@ public class ShoppingList implements MekHqXmlSerializable {
             }
         }
         return false;
-    }
-
-    private long getTrueBuyCost(IAcquisitionWork item, Campaign campaign) {
-        long cost = Long.MIN_VALUE;
-        if((item instanceof UnitOrder && campaign.getCampaignOptions().payForUnits()) ||
-                (item instanceof Part && campaign.getCampaignOptions().payForParts())
-                ) {
-            cost = item.getBuyCost();
-        }
-        return cost;
-
     }
 
 }
