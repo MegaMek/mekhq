@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -21,6 +22,8 @@ import javax.xml.transform.stream.StreamSource;
 
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
+import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
+import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
 
 @XmlRootElement(name="ScenarioTemplate")
 public class ScenarioTemplate {
@@ -35,6 +38,30 @@ public class ScenarioTemplate {
     @XmlElementWrapper(name="scenarioForces")
     @XmlElement(name="scenarioForce")
     public Map<String, ScenarioForceTemplate> scenarioForces = new HashMap<>();
+    
+    public List<ScenarioForceTemplate> getAllScenarioForces() {
+        return (ArrayList) scenarioForces.values();
+    }
+    
+    public List<ScenarioForceTemplate> getAllPlayerControlledAllies() {
+        return scenarioForces.values().stream().filter(forceTemplate -> 
+            (forceTemplate.getForceAlignment() == ForceAlignment.Player.ordinal()))
+                .collect(Collectors.toList());
+    }
+    
+    public List<ScenarioForceTemplate> getAllBotControlledAllies() {
+        return scenarioForces.values().stream().filter(forceTemplate -> 
+            (forceTemplate.getForceAlignment() == ForceAlignment.Allied.ordinal()) &&
+            (forceTemplate.getGenerationMethod() != ForceGenerationMethod.PlayerDeployed.ordinal()))
+                .collect(Collectors.toList());
+    }
+    
+    public List<ScenarioForceTemplate> getAllPlayerControlledHostiles() {
+        return scenarioForces.values().stream().filter(forceTemplate -> 
+            (forceTemplate.getForceAlignment() == ForceAlignment.Opposing.ordinal()) ||
+            (forceTemplate.getForceAlignment() == ForceAlignment.Third.ordinal()))
+                .collect(Collectors.toList());
+    }
     
     public void Serialize(File outputFile) {
         try {

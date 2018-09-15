@@ -217,32 +217,8 @@ public class Lance implements Serializable, MekHqXmlSerializable {
          * weight class and decreasing the enemy force against vehicle/combined
          * lances.
          */
-        double weight = 0.0;
-        for (UUID id : c.getForce(forceId).getUnits()) {
-            Unit unit = c.getUnit(id);
-            if (null != unit) {
-                Entity entity = unit.getEntity();
-                if (null != entity) {
-                    if ((entity.getEntityType() & Entity.ETYPE_MECH) != 0 ||
-                            (entity.getEntityType() & Entity.ETYPE_PROTOMECH) != 0 ||
-                            (entity.getEntityType() & Entity.ETYPE_INFANTRY) != 0) {
-                        weight += entity.getWeight();
-                    } else if ((entity.getEntityType() & Entity.ETYPE_TANK) != 0) {
-                        if (c.getFaction().isClan() || c.getCampaignOptions().getAdjustPlayerVehicles()) {
-                            weight += entity.getWeight() * 0.5;
-                        } else {
-                            weight += entity.getWeight();
-                        }
-                    } else if ((entity.getEntityType() & Entity.ETYPE_AERO) != 0) {
-                        if (c.getFaction().isClan()) {
-                            weight += entity.getWeight() * 0.5;
-                        } else {
-                            weight += entity.getWeight();
-                        }
-                    }
-                }
-            }
-        }
+        double weight = calculateTotalWeight(c, forceId);
+                
         weight = weight * 4.0 / getStdLanceSize(c.getFaction());
         if (weight < 40) {
             return EntityWeightClass.WEIGHT_ULTRA_LIGHT;
@@ -521,5 +497,43 @@ public class Lance implements Serializable, MekHqXmlSerializable {
             MekHQ.getLogger().error(Lance.class, METHOD_NAME, ex);
         }
         return retVal;
+    }
+    
+    /** 
+     * Worker function that calculates the total weight of a force with the given ID
+     * @param c Campaign in which the force resides
+     * @param forceId Force for which to calculate weight
+     * @return Total force weight
+     */
+    public static double calculateTotalWeight(Campaign c, int forceId) {
+        double weight = 0.0;
+        
+        for (UUID id : c.getForce(forceId).getUnits()) {
+            Unit unit = c.getUnit(id);
+            if (null != unit) {
+                Entity entity = unit.getEntity();
+                if (null != entity) {
+                    if ((entity.getEntityType() & Entity.ETYPE_MECH) != 0 ||
+                            (entity.getEntityType() & Entity.ETYPE_PROTOMECH) != 0 ||
+                            (entity.getEntityType() & Entity.ETYPE_INFANTRY) != 0) {
+                        weight += entity.getWeight();
+                    } else if ((entity.getEntityType() & Entity.ETYPE_TANK) != 0) {
+                        if (c.getFaction().isClan() || c.getCampaignOptions().getAdjustPlayerVehicles()) {
+                            weight += entity.getWeight() * 0.5;
+                        } else {
+                            weight += entity.getWeight();
+                        }
+                    } else if ((entity.getEntityType() & Entity.ETYPE_AERO) != 0) {
+                        if (c.getFaction().isClan()) {
+                            weight += entity.getWeight() * 0.5;
+                        } else {
+                            weight += entity.getWeight();
+                        }
+                    }
+                }
+            }
+        }
+        
+        return weight;
     }
  }

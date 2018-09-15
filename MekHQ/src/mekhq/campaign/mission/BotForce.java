@@ -155,6 +155,16 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
     public void setColorIndex(int index) {
         colorIndex = index;
     }
+    
+    public int getTotalBV() {
+        int bv = 0;
+        
+        for(Entity entity : getEntityList()) {
+            bv += entity.calculateBattleValue(true, false);
+        }
+        
+        return bv;
+    }
 
     public BehaviorSettings getBehaviorSettings() {
         return behaviorSettings;

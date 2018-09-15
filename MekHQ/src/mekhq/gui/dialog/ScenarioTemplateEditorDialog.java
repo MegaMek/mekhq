@@ -593,7 +593,11 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
             panForceList.add(lblRetreatThreshold, gbc);
             
             JLabel lblAllowedUnitTypes = new JLabel();
-            lblAllowedUnitTypes.setText(UnitType.getTypeDisplayableName(sft.getAllowedUnitType()));
+            if(sft.getAllowedUnitType() > UnitType.SIZE || sft.getAllowedUnitType() < 0) {
+                lblAllowedUnitTypes.setText(ScenarioForceTemplate.SPECIAL_UNIT_TYPES.get(sft.getAllowedUnitType()));
+            } else {
+                lblAllowedUnitTypes.setText(UnitType.getTypeDisplayableName(sft.getAllowedUnitType()));
+            }
             gbc.gridx++;
             panForceList.add(lblAllowedUnitTypes, gbc);
             

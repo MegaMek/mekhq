@@ -28,8 +28,8 @@ public class ScenarioForceTemplate {
     public static final Map<Integer, String> SPECIAL_UNIT_TYPES;
     public static final Map<Integer, Integer> TEAM_IDS;
     
-    public static int SPECIAL_UNIT_TYPE_ATB_MIX = -1;
-    public static int SPECIAL_UNIT_TYPE_ATB_CIVILIANS = -2;
+    public static int SPECIAL_UNIT_TYPE_ATB_MIX = -2;
+    public static int SPECIAL_UNIT_TYPE_ATB_CIVILIANS = -1;
     
     public static int DEPLOYMENT_ZONE_NARROW_EDGE = DEPLOYMENT_ZONES.length - 1;
     

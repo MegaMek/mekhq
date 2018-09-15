@@ -24,6 +24,8 @@ import mekhq.Utilities;
 import mekhq.campaign.AtBConfiguration;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Lance;
+import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
 import mekhq.campaign.mission.ScenarioForceTemplate.SynchronizedDeploymentType;
 import mekhq.campaign.personnel.Bloodname;
@@ -62,37 +64,86 @@ public class AtBDynamicScenarioFactory {
      */
     public static void finalizeScenario(AtBDynamicScenario scenario, AtBContract contract, Campaign campaign) {
         // fix the player force BV at the current time.
-        Force playerForce = scenario.getForces(campaign);
-        int playerForceBV = playerForce.getTotalBV(campaign);
-        int playerForceUnitCount = playerForce.getAllUnits().size();
-        int playerForceWeightClass = EntityWeightClass.WEIGHT_LIGHT;
-        int generatedLanceCount = 0;
+        int playerForceBV = calculateEffectiveBV(scenario, campaign);
+        int playerForceUnitCount = calculateEffectiveUnitCount(scenario, campaign);
+        int playerForceWeightClass = calculatePlayerForceWeightClass(scenario, campaign);
         
-        // step 1: loop through all force templates, in the following order:
-        //  any allied-player-controlled templates
-        //  any allied-bot-controlled templates
-        //  any enemy-bot-controlled templates
-        for(ScenarioForceTemplate forceTemplate : scenario.getTemplate().scenarioForces.values()) {
-            // generate any player-controlled but not player-supplied forces
-            // method for generating any force:
-            // Step 1. Determine weight class of player-supplied forces (ignore dropships)
-            // Step 2. While force has not surpassed BV cap || unit cap
+        // at this point, only the player forces are present and contributing to BV/unit count
+        int generatedLanceCount = generateForces(scenario, contract, campaign,
+                        playerForceBV, playerForceUnitCount, playerForceWeightClass, ForceAlignment.Player);
+        
+        // now, we recalculate the BV/unit count to account for the attached allied units, 
+        // then generate the bot-controlled allies
+        playerForceBV = calculateEffectiveBV(scenario, campaign);
+        playerForceUnitCount = calculateEffectiveUnitCount(scenario, campaign);
+        generatedLanceCount += generateForces(scenario, contract, campaign,
+                playerForceBV, playerForceUnitCount, playerForceWeightClass, ForceAlignment.Allied);
+        
+        // now, we recalculate the BV/unit count to account for the bot-controlled allies 
+        // then generate the hostiles
+        playerForceBV = calculateEffectiveBV(scenario, campaign);
+        playerForceUnitCount = calculateEffectiveUnitCount(scenario, campaign);
+        generatedLanceCount += generateForces(scenario, contract, campaign,
+                playerForceBV, playerForceUnitCount, playerForceWeightClass, ForceAlignment.Opposing);
+                
+        // approximate estimate, anyway.
+        scenario.setLanceCount(generatedLanceCount + (playerForceUnitCount / 4));
+        setScenarioMapSize(scenario);
+        setDeploymentZones(scenario);
+    }
+    
+    public static int generateForces(AtBDynamicScenario scenario, AtBContract contract, Campaign campaign,
+            int effectiveBV, int effectiveUnitCount, int weightClass, ForceAlignment alignment) { 
+        
+        int generatedLanceCount = 0;
+        // these are some properties that need to be determined prior to generating the force
+        List<ScenarioForceTemplate> forceTemplates = new ArrayList<>();
+        String factionCode = "";
+        int skill = 0;
+        int quality = 0;
+        
+        switch(alignment) {
+        case Allied:
+            forceTemplates = scenario.getTemplate().getAllBotControlledAllies();
+            factionCode = contract.getEmployerCode();
+            skill = contract.getAllySkill();
+            quality = contract.getAllyQuality();
+            break;
+        case Player:
+            forceTemplates = scenario.getTemplate().getAllPlayerControlledAllies();
+            factionCode = contract.getEmployerCode();
+            skill = contract.getAllySkill();
+            quality = contract.getAllyQuality();
+            break;
+        case Opposing:
+        case Third:
+            forceTemplates = scenario.getTemplate().getAllPlayerControlledHostiles();
+            factionCode = contract.getEnemyCode();
+            skill = contract.getEnemySkill();
+            quality = contract.getEnemyQuality();
+            break;
+        }
+        
+        for(ScenarioForceTemplate forceTemplate : forceTemplates) {
+            //  While force has not surpassed BV cap || unit cap
             //      get me a unit types array
             //      get me a unit weight string
             //      use unit weight string to generate a list of entities
             //  Step 2.1 If force has surpassed unit cap, remove randomly selected units until it's at unit cap
+            
+            // don't generate forces flagged as player-supplied
             if(forceTemplate.getGenerationMethod() == ForceGenerationMethod.PlayerDeployed.ordinal()) {
                 continue;
             }
         
             // determine generation parameters
             int forceBV = 0;
-            int forceBVBudget = (int) (playerForceBV * forceTemplate.getForceMultiplier()); // don't forget to multiply by difficulty.
+            int forceBVBudget = (int) (effectiveBV * forceTemplate.getForceMultiplier());
             int forceUnitBudget = 0;
             if(forceTemplate.getGenerationMethod() == ForceGenerationMethod.UnitCountScaled.ordinal()) {
-                forceUnitBudget = (int) (playerForceUnitCount * forceTemplate.getForceMultiplier());
+                forceUnitBudget = (int) (effectiveUnitCount * forceTemplate.getForceMultiplier());
             } else if (forceTemplate.getGenerationMethod() == ForceGenerationMethod.FixedUnitCount.ordinal()) {
-                forceUnitBudget = (int) forceTemplate.getForceMultiplier();
+                forceUnitBudget = (int) forceTemplate.getForceMultiplier(); // this should really be another field
             }
             
             ArrayList<Entity> generatedEntities = new ArrayList<>();
@@ -101,11 +152,16 @@ public class AtBDynamicScenarioFactory {
             
             while(!stopGenerating) {
                 List<Integer> unitTypes = generateUnitTypes(forceTemplate, 4, campaign);
-                String unitWeights = generateUnitWeights(unitTypes, contract.getEnemyCode(), 
-                        playerForceWeightClass, EntityWeightClass.WEIGHT_ASSAULT, campaign);
+                String unitWeights = generateUnitWeights(unitTypes, factionCode, 
+                        weightClass, EntityWeightClass.WEIGHT_ASSAULT, campaign);
      
-                List<Entity> generatedLance = generateLance(contract.getEnemyCode(), contract.getEnemySkill(), 
-                        contract.getEnemyQuality(), unitTypes, unitWeights, campaign);
+                List<Entity> generatedLance = generateLance(factionCode, skill, 
+                        quality, unitTypes, unitWeights, campaign);
+                
+                if(generatedLance.isEmpty()) {
+                    stopGenerating = true;
+                    continue;
+                }
                 
                 // if force contributes to map size
                 generatedLanceCount++;
@@ -123,7 +179,7 @@ public class AtBDynamicScenarioFactory {
             }
             
             // chop out random units until we drop down to our unit count budget
-            while(forceUnitBudget > 0 && generatedEntities.size() >= forceUnitBudget) {
+            while(forceUnitBudget > 0 && generatedEntities.size() > forceUnitBudget) {
                 generatedEntities.remove(Compute.randomInt(generatedEntities.size()));
             }
             
@@ -133,11 +189,9 @@ public class AtBDynamicScenarioFactory {
             scenario.addBotForce(generatedForce, forceTemplate);
         }
         
-        // approximate estimate, anyway.
-        scenario.setLanceCount(generatedLanceCount + (playerForceUnitCount / 4));
-        setScenarioMapSize(scenario);
-        setDeploymentZones(scenario);
+        return generatedLanceCount;
     }
+    
     
     /**
      * Handles random determination of light conditions for the given scenario, as per AtB rules
@@ -541,17 +595,110 @@ public class AtBDynamicScenarioFactory {
         return weights;
     }
     
-    private static int calculateWeightClass(Vector<UUID> unitIDs, Campaign campaign) {
-        int retval = EntityWeightClass.WEIGHT_LIGHT;
-        /*int totalWeight = 0;
+    /**
+     * Calculates from scratch the current effective player and allied BV present in the given scenario.
+     * @param scenario The scenario to process.
+     * @param campaign The campaign in which the scenario resides.
+     * @return Effective BV.
+     */
+    private static int calculateEffectiveBV(AtBDynamicScenario scenario, Campaign campaign) {
+        // for each deployed player and bot force that's marked as contributing to the BV budget
+        int bvBudget = 0;
+        double difficultyMultiplier = getDifficultyMultiplier(campaign);
+        
+        // deployed player forces:
+        for(int forceID : scenario.getForceIDs()) {
+            ScenarioForceTemplate forceTemplate = scenario.getPlayerForceTemplates().get(forceID);
+            if(forceTemplate != null && forceTemplate.getContributesToBV()) {
+                int forceBVBudget = (int) (campaign.getForce(forceID).getTotalBV(campaign) * difficultyMultiplier);
+                bvBudget += forceBVBudget;
+            }
+        }
+        
+        // allied bot forces that contribute to BV do not get multiplied by the difficulty
+        // even if the player is super good, the AI doesn't get any better
+        for(int index = 0; index < scenario.getNumBots(); index++) {
+            BotForce botForce = scenario.getBotForce(index);
+            ScenarioForceTemplate forceTemplate = scenario.getBotForceTemplates().get(botForce);
+            if(forceTemplate != null && forceTemplate.getContributesToBV()) {
+                bvBudget += botForce.getTotalBV();
+            }
+        }
+        
+        return bvBudget;
+    }
+    
+    /**
+     * Calculates from scratch the current effective player and allied unit count present in the given scenario.
+     * @param scenario The scenario to process.
+     * @param campaign The campaign in which the scenario resides.
+     * @return Effective BV.
+     */
+    private static int calculateEffectiveUnitCount(AtBDynamicScenario scenario, Campaign campaign) {
+        // for each deployed player and bot force that's marked as contributing to the BV budget
+        int unitCount = 0;
+        double difficultyMultiplier = getDifficultyMultiplier(campaign);
+        
+        // deployed player forces:
+        for(int forceID : scenario.getForceIDs()) {
+            ScenarioForceTemplate forceTemplate = scenario.getPlayerForceTemplates().get(forceID);
+            if(forceTemplate != null && forceTemplate.getContributesToUnitCount()) {
+                int forceUnitCount = (int) (campaign.getForce(forceID).getUnits().size() * difficultyMultiplier);
+                unitCount += forceUnitCount;
+            }
+        }
+        
+        // allied bot forces that contribute to BV do not get multiplied by the difficulty
+        // even if the player is super good, the AI doesn't get any better
+        for(int index = 0; index < scenario.getNumBots(); index++) {
+            BotForce botForce = scenario.getBotForce(index);
+            ScenarioForceTemplate forceTemplate = scenario.getBotForceTemplates().get(botForce);
+            if(forceTemplate != null && forceTemplate.getContributesToUnitCount()) {
+                unitCount += botForce.getEntityList().size();
+            }
+        }
+        
+        return unitCount;
+    }
+    
+    /**
+     * Helper function that calculates the BV budget multiplier based on AtB skill level 
+     * @param c 
+     * @return
+     */
+    private static double getDifficultyMultiplier(Campaign c) {
+        // skill level is between 0 and 4 inclusive
+        // We want a number between .8 and 1.2, so the formula is 1 + ((skill level - 2) / 10)
+        return 1.0 + ((c.getCampaignOptions().getSkillLevel() - 2) * .1);
+    }
+    
+    private static int calculatePlayerForceWeightClass(AtBDynamicScenario scenario, Campaign campaign) {
+        double weight = 0.0;
         int unitCount = 0;
         
-        for(UUID unitID : unitIDs) {
-            Entity 
-            totalWeight += campaign.getUnit(unitID).getEntity().getWeight();
-        }*/
+        for(int forceID : scenario.getForceIDs()) {
+            weight += Lance.calculateTotalWeight(campaign, forceID);
+            unitCount += campaign.getForce(forceID).getUnits().size();
+        } 
         
-        return retval;
+        int normalizedWeight = (int) (weight / unitCount);
+        
+        if (normalizedWeight < 20) {
+            return EntityWeightClass.WEIGHT_ULTRA_LIGHT;
+        }
+        if (normalizedWeight < 40) {
+            return EntityWeightClass.WEIGHT_LIGHT;
+        }
+        if (normalizedWeight < 60) {
+            return EntityWeightClass.WEIGHT_MEDIUM;
+        }
+        if (normalizedWeight < 80) {
+            return EntityWeightClass.WEIGHT_HEAVY;
+        }
+        if (normalizedWeight < 100) {
+            return EntityWeightClass.WEIGHT_ASSAULT;
+        }
+        return EntityWeightClass.WEIGHT_SUPER_HEAVY;
     }
     
     /**
@@ -578,10 +725,10 @@ public class AtBDynamicScenarioFactory {
     }
     
     /**
-     * Worker method that sets bot force properties such as name, color, team, starting zone and retreat zone
-     * @param generatedForce
-     * @param forceTemplate
-     * @param contract
+     * Worker method that sets bot force properties such as name, color, team
+     * @param generatedForce The force for which to set parameters
+     * @param forceTemplate The force template from which to set parameters
+     * @param contract The contract from which to set parameters
      */
     private static void setBotForceParameters(BotForce generatedForce, ScenarioForceTemplate forceTemplate, AtBContract contract) {
         if(forceTemplate.getForceAlignment() == ScenarioForceTemplate.ForceAlignment.Allied.ordinal()) {
@@ -601,6 +748,11 @@ public class AtBDynamicScenarioFactory {
         generatedForce.setTeam(ScenarioForceTemplate.TEAM_IDS.get(forceTemplate.getForceAlignment()));
     }
     
+    /**
+     * Worker method that sets deployment zones for the currently-existing forces in a scenario.
+     * Best called after primary player forces have been assigned to the scenario.
+     * @param scenario The scenario to process
+     */
     private static void setDeploymentZones(AtBDynamicScenario scenario) {
         // loop through all scenario player forces
         //  for each one, look up the template. If none, random? If yes, calculateDeploymentZone
@@ -675,6 +827,13 @@ public class AtBDynamicScenarioFactory {
         return calculatedEdge;
     }
     
+    /**
+     * Method to compute an "arc" of deployment zones next to or opposite a particular edge.
+     * e.g. Northeast comes back with a list of north, northeast, east
+     * @param edge The edge to process
+     * @param same Whether the arc is on the same side or the opposite side.
+     * @return Three edges that form the arc, as defined in Board.java
+     */
     public static List<Integer> getArc(int edge, boolean same) {
         ArrayList<Integer> edges = new ArrayList<>();
         
@@ -704,6 +863,11 @@ public class AtBDynamicScenarioFactory {
         return edges;
     }
     
+    /**
+     * Computes the "opposite" edge of a given board start edge.
+     * @param edge The starting edge
+     * @return Opposite edge, as defined in Board.java
+     */
     public static int getOppositeEdge(int edge) {
         switch(edge) {
         case Board.START_EDGE:
