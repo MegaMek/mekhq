@@ -2036,6 +2036,10 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     public BotForce getBotForce(int i) {
         return botForces.get(i);
     }
+    
+    public void removeBotForce(int i) {
+        botForces.remove(i);
+    }
 
     public int getNumBots() {
         if (isCurrent()) {

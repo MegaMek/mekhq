@@ -5,9 +5,11 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.UUID;
 import java.util.Vector;
+import java.util.stream.Collectors;
 
 import megamek.client.RandomNameGenerator;
 import megamek.client.RandomSkillsGenerator;
+import megamek.client.RandomUnitGenerator;
 import megamek.common.Board;
 import megamek.common.Compute;
 import megamek.common.Crew;
@@ -40,6 +42,13 @@ import mekhq.campaign.universe.Planets;
  *
  */
 public class AtBDynamicScenarioFactory {
+    /**
+     * Method that sets some initial scenario parameters from the given template, prior to force generation and such.
+     * @param template The template to use when populating the new scenario.
+     * @param contract The contract in which the scenario is to occur.
+     * @param campaign The current campaign.
+     * @return
+     */
     public static AtBDynamicScenario initializeScenarioFromTemplate(ScenarioTemplate template, AtBContract contract, Campaign campaign) {        
         AtBDynamicScenario scenario = new AtBDynamicScenario();
         
@@ -58,9 +67,9 @@ public class AtBDynamicScenarioFactory {
      * Method that should be called when all "required" player forces have been assigned to a scenario.
      * It will generate all primary allied-player, allied-bot and enemy forces,
      * as well as rolling and applying scenario modifiers. 
-     * @param scenario
-     * @param contract
-     * @param campaign
+     * @param scenario Scenario to finalize
+     * @param contract Contract in which the scenario is occurring
+     * @param campaign Current campaign.
      */
     public static void finalizeScenario(AtBDynamicScenario scenario, AtBContract contract, Campaign campaign) {
         // fix the player force BV at the current time.
@@ -90,8 +99,21 @@ public class AtBDynamicScenarioFactory {
         scenario.setLanceCount(generatedLanceCount + (playerForceUnitCount / 4));
         setScenarioMapSize(scenario);
         setDeploymentZones(scenario);
+        
+        translatePlayerNPCsToAttached(scenario, campaign);
     }
     
+    /**
+     * "Meaty" function that generates a set of forces for the given scenario of the given force alignment.
+     * @param scenario Scenario for which we're generating forces
+     * @param contract The contract on which we're currently working. Used for skill/quality/planetary info parameters
+     * @param campaign The current campaign
+     * @param effectiveBV The effective battle value, up to this point, of player and allied units
+     * @param effectiveUnitCount The effective unit count, up to this point, of player and allied units
+     * @param weightClass The maximum weight class of the units to generate (ignored )
+     * @param alignment The alignment of the force - player controlled and supplied, player controlled NPC, allied bot, enemy 
+     * @return How many "lances" or other individual units were generated.
+     */
     public static int generateForces(AtBDynamicScenario scenario, AtBContract contract, Campaign campaign,
             int effectiveBV, int effectiveUnitCount, int weightClass, ForceAlignment alignment) { 
         
@@ -151,12 +173,21 @@ public class AtBDynamicScenarioFactory {
             boolean stopGenerating = false;
             
             while(!stopGenerating) {
-                List<Integer> unitTypes = generateUnitTypes(forceTemplate, 4, campaign);
-                String unitWeights = generateUnitWeights(unitTypes, factionCode, 
-                        weightClass, forceTemplate.getMaxWeightClass(), campaign);
-     
-                List<Entity> generatedLance = generateLance(factionCode, skill, 
-                        quality, unitTypes, unitWeights, campaign);
+                List<Entity> generatedLance;
+                
+                // some special cases that don't fit into the regular RAT generation mechanism
+                if(forceTemplate.getAllowedUnitType() == UnitType.GUN_EMPLACEMENT) {
+                    generatedLance = generateTurrets(4, skill, quality, campaign);
+                } else if(forceTemplate.getAllowedUnitType() == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_CIVILIANS) {
+                    generatedLance = generateCivilianUnits(4, campaign);
+                } else {
+                    List<Integer> unitTypes = generateUnitTypes(forceTemplate, 4, campaign);
+                    String unitWeights = generateUnitWeights(unitTypes, factionCode, 
+                            weightClass, forceTemplate.getMaxWeightClass(), campaign);
+         
+                    generatedLance = generateLance(factionCode, skill, 
+                            quality, unitTypes, unitWeights, campaign);
+                }
                 
                 if(generatedLance.isEmpty()) {
                     stopGenerating = true;
@@ -194,6 +225,66 @@ public class AtBDynamicScenarioFactory {
         return generatedLanceCount;
     }
     
+    /**
+     * Generates the indicated number of civilian entities.
+     *
+     * @param num        The number of civilian entities to generate
+     * @param campaign  Current campaign
+     */
+    public static List<Entity> generateCivilianUnits(int num, Campaign campaign) {
+        RandomUnitGenerator.getInstance().setChosenRAT("CivilianUnits");
+        ArrayList<MechSummary> msl = RandomUnitGenerator.getInstance().generate(num);
+        List<Entity> retval = new ArrayList<>();
+        
+        List<Entity> entities = msl.stream().map(ms -> createEntityWithCrew("IND",
+                RandomSkillsGenerator.L_GREEN, campaign, ms))
+                .collect(Collectors.<Entity>toList());
+        retval.addAll(entities);
+        return retval;
+    }
+    
+    /**
+     * Generates the indicated number of turret entities.
+     * Lifted from AtBScenario.java
+     *
+     * @param num        The number of turrets to generate
+     * @param skill     The skill level of the turret operators
+     * @param quality   The quality level of the turrets
+     * @param campaign  The campaign for which the turrets are being generated.
+     */
+    public static List<Entity> generateTurrets(int num, int skill, int quality, Campaign campaign) {
+        int currentYear = campaign.getCalendar().get(Calendar.YEAR);
+        List<Entity> retval = new ArrayList<>();
+        
+        List<MechSummary> msl = campaign.getUnitGenerator().generateTurrets(num, skill, quality, currentYear);
+        List<Entity> entities = msl.stream().map(ms -> createEntityWithCrew("IND",
+                skill, campaign, ms))
+                .collect(Collectors.<Entity>toList());
+        retval.addAll(entities);
+        return retval;
+    }
+
+    /**
+     * Takes all the "bot" forces where the template says they should be player-controlled
+     * and transforms them into attached units.
+     * @param scenario The scenario for which to translate units
+     * @param campaign Current campaign
+     */
+    private static void translatePlayerNPCsToAttached(AtBDynamicScenario scenario, Campaign campaign) {
+        for(int botIndex = 0; botIndex < scenario.getNumBots(); botIndex++) {
+            BotForce botForce = scenario.getBotForce(botIndex);
+            ScenarioForceTemplate forceTemplate = scenario.getBotForceTemplates().get(botForce);
+            
+            if(forceTemplate != null && forceTemplate.isAlliedPlayerForce()) {
+                for(Entity en : botForce.getEntityList()) {
+                    scenario.getAlliesPlayer().add(en);
+                }
+                
+                scenario.botForces.remove(botIndex);
+                botIndex--;
+            }
+        }
+    }
     
     /**
      * Handles random determination of light conditions for the given scenario, as per AtB rules
@@ -329,10 +420,6 @@ public class AtBDynamicScenarioFactory {
         
         scenario.setMapSizeX(mapSizeX);
         scenario.setMapSizeY(mapSizeY);
-    }
-
-    public static List<Entity> generateForce(ScenarioForceTemplate sft, AtBContract mission, Campaign campaign) {
-        return null;
     }
     
     /**
@@ -547,6 +634,14 @@ public class AtBDynamicScenarioFactory {
         return retVal;
     }
     
+    /**
+     * Generates a list of integers corresponding to megamek unit type constants (defined in Megamek.common.UnitType)
+     * TODO: Update for clans, marians, wobbies, etc.
+     * @param template The force template from which to generate units.
+     * @param unitCount How many units to generate.
+     * @param campaign Current campaign
+     * @return Array list of unit type integers.
+     */
     private static List<Integer> generateUnitTypes(ScenarioForceTemplate template, int unitCount, Campaign campaign) {
         List<Integer> unitTypes = new ArrayList<>(unitCount);
         int actualUnitType = template.getAllowedUnitType(); 
@@ -588,6 +683,16 @@ public class AtBDynamicScenarioFactory {
         return unitTypes;
     }
     
+    /**
+     * Logic that generates a "unit weights" string according to AtB rules.
+     * TODO: Update for clans, marian hegemony, wobbies, etc.
+     * @param unitTypes List of unit types (mek, tank, etc)
+     * @param faction Faction for unit generation
+     * @param weightClass "Base" weight class, drives the generated weights with some variation
+     * @param maxWeight Maximum weight class
+     * @param campaign Current campaign
+     * @return Unit weight string.
+     */
     private static String generateUnitWeights(List<Integer> unitTypes, String faction, int weightClass, int maxWeight, Campaign campaign) {
         String weights = adjustForMaxWeight(campaign.getAtBConfig()
                 .selectBotUnitWeights(AtBConfiguration.ORG_IS, weightClass), maxWeight);
