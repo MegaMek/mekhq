@@ -21,15 +21,19 @@ public class ScenarioForceTemplate {
     // 6) Allowed unit types - This is a set of unit types of which the force may consist
     
     public static final String[] FORCE_ALIGNMENTS = { "Player", "Allied", "Opposing", "Third" };
-    public static final String[] FORCE_GENERATION_METHODS = { "Player Deployed", "BV Scaled", "Unit Count Scaled", "Fixed Unit Count" };
+    public static final String[] FORCE_GENERATION_METHODS = { "Player Supplied", "BV Scaled", "Unit Count Scaled", "Fixed Unit Count" };
     public static final String[] FORCE_DEPLOYMENT_SYNC_TYPES = { "None", "Same Edge", "Same Arc", "Opposite Edge", "Opposite Arc" };
     public static final String[] DEPLOYMENT_ZONES = { "Any", "Northwest", "North", "Northeast", "East", "Southeast", "South", "Southwest", "West", "Edge", "Center", "Narrow Edge" };
     public static final String[] BOT_DESTINATION_ZONES = { "None", "Opposite Deployment Edge", "North", "East", "South", "West", "Random" };
     public static final Map<Integer, String> SPECIAL_UNIT_TYPES;
     public static final Map<Integer, Integer> TEAM_IDS;
+    public static final Map<Integer, String> SPECIAL_ARRIVAL_TURNS;
     
     public static int SPECIAL_UNIT_TYPE_ATB_MIX = -2;
     public static int SPECIAL_UNIT_TYPE_ATB_CIVILIANS = -1;
+    
+    public static int ARRIVAL_TURN_STAGGERED = -1;
+    public static int ARRIVAL_TURN_STAGGERED_BY_LANCE = -2;
     
     public static int DEPLOYMENT_ZONE_NARROW_EDGE = DEPLOYMENT_ZONES.length - 1;
     
@@ -41,7 +45,7 @@ public class ScenarioForceTemplate {
     }
     
     public enum ForceGenerationMethod {
-        PlayerDeployed,
+        PlayerSupplied,
         BVScaled,
         UnitCountScaled,
         FixedUnitCount
@@ -57,8 +61,12 @@ public class ScenarioForceTemplate {
     
     static {
         SPECIAL_UNIT_TYPES = new HashMap<>();
-        SPECIAL_UNIT_TYPES.put(SPECIAL_UNIT_TYPE_ATB_MIX, "Standard AtB Mix");
         SPECIAL_UNIT_TYPES.put(SPECIAL_UNIT_TYPE_ATB_CIVILIANS, "AtB Civilian Units");
+        SPECIAL_UNIT_TYPES.put(SPECIAL_UNIT_TYPE_ATB_MIX, "Standard AtB Mix");
+        
+        SPECIAL_ARRIVAL_TURNS = new HashMap<>();
+        SPECIAL_ARRIVAL_TURNS.put(ARRIVAL_TURN_STAGGERED, "Staggered");
+        SPECIAL_ARRIVAL_TURNS.put(ARRIVAL_TURN_STAGGERED_BY_LANCE, "Staggered By Lance");
         
         TEAM_IDS = new HashMap<>();
         TEAM_IDS.put(ForceAlignment.Player.ordinal(), 1);
@@ -149,9 +157,26 @@ public class ScenarioForceTemplate {
     private boolean syncRetreatThreshold;
     
     /**
+     * The turn on which this force arrives. Staggered = -1, Staggered By Lance = -2
+     */
+    private int arrivalTurn;
+    
+    /**
+     * Maximum weight class of this force.
+     */
+    private int maxWeightClass;
+    
+    /**
+     * Whether or not this force contributes to scaling map size.
+     */
+    private boolean contributesToMapSize;
+    
+    /**
      * The materialized deployment zone after this template has been applied to a force.
      */
     private int actualDeploymentZone = Board.START_NONE;
+    
+    private int fixedUnitCount = 0;
     
     /**
      * Blank constructor for deserialization purposes.
@@ -233,6 +258,21 @@ public class ScenarioForceTemplate {
         return actualDeploymentZone;
     }
     
+    public int getArrivalTurn() {
+        return arrivalTurn;
+    }
+    
+    public int getMaxWeightClass() {
+        return maxWeightClass;
+    }
+    
+    public boolean getContributesToMapSize() {
+        return contributesToMapSize;
+    }
+    
+    public int getFixedUnitCount() {
+        return fixedUnitCount;
+    }
     
     public void setForceAlignment(int forceAlignment) {
         this.forceAlignment = forceAlignment;
@@ -288,5 +328,54 @@ public class ScenarioForceTemplate {
     
     public void setActualDeploymentZone(int zone) {
         this.actualDeploymentZone = zone;
+    }
+    
+    public void setArrivalTurn(int arrivalTurn) {
+        this.arrivalTurn = arrivalTurn;
+    }
+    
+    public void setMaxWeightClass(int maxWeightClass) {
+        this.maxWeightClass = maxWeightClass;
+    }
+    
+    public void setContributesToMapSize(boolean contributesToMapSize) {
+        this.contributesToMapSize = contributesToMapSize;
+    }
+    
+    public void setFixedUnitCount(int fixedUnitCount) {
+        this.fixedUnitCount = fixedUnitCount;
+    }
+    
+    /**
+     * Whether this force is to be player controlled and supplied units
+     */
+    public boolean isPlayerForce() {
+        return getForceAlignment() == ForceAlignment.Player.ordinal() &&
+               getGenerationMethod() == ForceGenerationMethod.PlayerSupplied.ordinal(); 
+    }
+    
+    /**
+     * Whether this force is to be player controlled but externally-supplied units
+     */
+    public boolean isAlliedPlayerForce() {
+        return getForceAlignment() == ForceAlignment.Player.ordinal() &&
+                getGenerationMethod() != ForceGenerationMethod.PlayerSupplied.ordinal(); 
+    }
+    
+    /**
+     * Whether this force is bot-controlled and allied to the player
+     * @return
+     */
+    public boolean isAlliedBotForce() {
+        return getForceAlignment() == ForceAlignment.Allied.ordinal() &&
+                getGenerationMethod() == ForceGenerationMethod.PlayerSupplied.ordinal(); 
+    }
+    
+    /**
+     * Whether this force is bot-controlled and hostile to the player
+     */
+    public boolean isEnemyBotForce() {
+        return getForceAlignment() == ForceAlignment.Opposing.ordinal() ||
+                getForceAlignment() == ForceAlignment.Third.ordinal(); 
     }
 }

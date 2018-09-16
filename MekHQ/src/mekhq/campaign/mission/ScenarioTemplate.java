@@ -52,7 +52,7 @@ public class ScenarioTemplate {
     public List<ScenarioForceTemplate> getAllBotControlledAllies() {
         return scenarioForces.values().stream().filter(forceTemplate -> 
             (forceTemplate.getForceAlignment() == ForceAlignment.Allied.ordinal()) &&
-            (forceTemplate.getGenerationMethod() != ForceGenerationMethod.PlayerDeployed.ordinal()))
+            (forceTemplate.getGenerationMethod() != ForceGenerationMethod.PlayerSupplied.ordinal()))
                 .collect(Collectors.toList());
     }
     

@@ -132,7 +132,7 @@ public class AtBDynamicScenarioFactory {
             //  Step 2.1 If force has surpassed unit cap, remove randomly selected units until it's at unit cap
             
             // don't generate forces flagged as player-supplied
-            if(forceTemplate.getGenerationMethod() == ForceGenerationMethod.PlayerDeployed.ordinal()) {
+            if(forceTemplate.getGenerationMethod() == ForceGenerationMethod.PlayerSupplied.ordinal()) {
                 continue;
             }
         
@@ -143,7 +143,7 @@ public class AtBDynamicScenarioFactory {
             if(forceTemplate.getGenerationMethod() == ForceGenerationMethod.UnitCountScaled.ordinal()) {
                 forceUnitBudget = (int) (effectiveUnitCount * forceTemplate.getForceMultiplier());
             } else if (forceTemplate.getGenerationMethod() == ForceGenerationMethod.FixedUnitCount.ordinal()) {
-                forceUnitBudget = (int) forceTemplate.getForceMultiplier(); // this should really be another field
+                forceUnitBudget = (int) forceTemplate.getFixedUnitCount();
             }
             
             ArrayList<Entity> generatedEntities = new ArrayList<>();
@@ -153,7 +153,7 @@ public class AtBDynamicScenarioFactory {
             while(!stopGenerating) {
                 List<Integer> unitTypes = generateUnitTypes(forceTemplate, 4, campaign);
                 String unitWeights = generateUnitWeights(unitTypes, factionCode, 
-                        weightClass, EntityWeightClass.WEIGHT_ASSAULT, campaign);
+                        weightClass, forceTemplate.getMaxWeightClass(), campaign);
      
                 List<Entity> generatedLance = generateLance(factionCode, skill, 
                         quality, unitTypes, unitWeights, campaign);
@@ -163,8 +163,10 @@ public class AtBDynamicScenarioFactory {
                     continue;
                 }
                 
-                // if force contributes to map size
-                generatedLanceCount++;
+                // if force contributes to map size, increment the generated lance count
+                if(forceTemplate.getContributesToMapSize()) {
+                    generatedLanceCount++;
+                }
                 
                 for(Entity ent : generatedLance) {
                     forceBV += ent.calculateBattleValue();

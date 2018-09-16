@@ -46,7 +46,7 @@ public class AtBDynamicScenario extends AtBScenario {
         // loop through all player-supplied forces in the template
         // assign the newly-added force to the first template we find
         for(ScenarioForceTemplate forceTemplate : template.scenarioForces.values()) {
-            if((forceTemplate.getGenerationMethod() == ForceGenerationMethod.PlayerDeployed.ordinal()) &&
+            if((forceTemplate.getGenerationMethod() == ForceGenerationMethod.PlayerSupplied.ordinal()) &&
                     !playerForceTemplates.containsValue(forceTemplate)) {
                 playerForceTemplates.put(forceID, forceTemplate);
                 return;
