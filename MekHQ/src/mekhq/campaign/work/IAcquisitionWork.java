@@ -58,6 +58,8 @@ public interface IAcquisitionWork extends IWork {
     
     public int getQuantity();
     
+    public String getQuantityName(int quantity);
+    
     public void incrementQuantity();
     
     public void decrementQuantity();

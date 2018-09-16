@@ -17,3 +17,5 @@ MekHQ.jar
 /*.tar.bz2
 /*.blame
 /.classpath
+/.gradle/
+/build/

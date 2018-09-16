@@ -46,6 +46,9 @@ public class PersonnelOptions extends PilotOptions {
     public static final String EDGE_ADMIN_ACQUIRE_FAIL = "edge_when_admin_acquire_fail";
     
     public static final String TECH_CLAN_TECH_KNOWLEDGE = "clan_tech_knowledge";
+    public static final String TECH_WEAPON_SPECIALIST = "tech_weapon_specialist";
+    public static final String TECH_ARMOR_SPECIALIST = "tech_armor_specialist";
+    public static final String TECH_INTERNAL_SPECIALIST = "tech_internal_specialist";
     
     @Override
     public void initialize() {
@@ -88,6 +91,10 @@ public class PersonnelOptions extends PilotOptions {
         
         // Add MekHQ-specific options
         addOption(l3a, TECH_CLAN_TECH_KNOWLEDGE, false);
+        addOption(l3a, TECH_WEAPON_SPECIALIST, false);
+        addOption(l3a, TECH_ARMOR_SPECIALIST, false);
+        addOption(l3a, TECH_INTERNAL_SPECIALIST, false);
+
 
         addOption(edge, EDGE_MEDICAL, false);
         addOption(edge, EDGE_REPAIR_BREAK_PART, false);

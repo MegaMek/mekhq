@@ -3225,6 +3225,10 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         }
         entity.getCrew().setPiloting(Math.min(Math.max(piloting, 0), 8), slot);
         entity.getCrew().setGunnery(Math.min(Math.max(gunnery, 0), 7), slot);
+        //also set RPG gunnery skills in case present in game options
+        entity.getCrew().setGunneryL(Math.min(Math.max(gunnery, 0), 7), slot);
+        entity.getCrew().setGunneryM(Math.min(Math.max(gunnery, 0), 7), slot);
+        entity.getCrew().setGunneryB(Math.min(Math.max(gunnery, 0), 7), slot);
         entity.getCrew().setArtillery(Math.min(Math.max(artillery, 0), 7), slot);
         entity.getCrew().setToughness(p.getToughness(), slot);
         entity.getCrew().setExternalIdAsString(p.getId().toString(), slot);
@@ -3281,7 +3285,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 int sumEdge = 0;
                 int sumEdgeUsed = 0;
                 String engineerName = "Nobody";
-                int bestRank = -1;
+                int bestRank = Integer.MIN_VALUE;
                 for(UUID pid : vesselCrew) {
                     Person p = campaign.getPerson(pid);
                     if(null == p) {
