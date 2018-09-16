@@ -22,12 +22,9 @@ package mekhq.campaign.log;
 import java.util.Date;
 
 /**
- * This class is a specific log entry related to service.
+ * This class is a specific log entry related to the daily historical log.
  * @author Miguel Azevedo
  */
-public class ServiceLogEntry extends LogEntry {
-    public ServiceLogEntry(Date date, String desc){
-        super(date, desc, LogEntryType.SERVICE);
-    }
+public class HistoricalLogEntry extends LogEntry {
+    public HistoricalLogEntry(Date date, String desc){ super(date, desc, LogEntryType.HISTORICAL); }
 }
-

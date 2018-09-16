@@ -41,7 +41,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import megamek.common.util.EncodeControl;
-import mekhq.campaign.LogEntry;
+import mekhq.campaign.log.LogEntry;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.DailyReportLogPanel;
 

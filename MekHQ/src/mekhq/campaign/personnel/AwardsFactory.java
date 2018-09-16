@@ -22,7 +22,7 @@ package mekhq.campaign.personnel;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.AwardSet;
-import mekhq.campaign.LogEntry;
+import mekhq.campaign.log.LogEntry;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;

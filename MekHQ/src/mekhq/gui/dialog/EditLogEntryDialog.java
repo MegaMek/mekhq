@@ -34,7 +34,7 @@ import java.util.ResourceBundle;
 import javax.swing.BorderFactory;
 
 import megamek.common.util.EncodeControl;
-import mekhq.campaign.LogEntry;
+import mekhq.campaign.log.LogEntry;
 
 /**
  *

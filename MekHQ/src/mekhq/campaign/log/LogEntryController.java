@@ -1,3 +1,22 @@
+/*
+ * Copyright (C) 2018 MegaMek team
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package mekhq.campaign.log;
 
 import megamek.common.util.EncodeControl;
@@ -8,14 +27,13 @@ import java.util.ResourceBundle;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * This class is responsible of some general control of log entries.
+ * @author Miguel Azevedo
+ */
 public class LogEntryController {
 
     private static LogEntryController logEntryController = null;
-
-    private static ServiceLogEntryController serviceLogEntryController = null;
-    private static MedicalLogEntryController medicalLogEntryController = null;
-    private static PersonalLogEntryController personalLogEntryController = null;
-    private static AwardLogEntryController awardLogEntryController = null;
 
     private static ResourceBundle logEntriesResourceMap;
 
@@ -30,34 +48,11 @@ public class LogEntryController {
         return logEntryController;
     }
 
-    public static ServiceLogEntryController getServiceLogController(){
-        if(null == serviceLogEntryController){
-            serviceLogEntryController = new ServiceLogEntryController(logEntriesResourceMap);
-        }
-        return serviceLogEntryController;
-    }
-
-    public static MedicalLogEntryController getMedicalLogController(){
-        if(null == medicalLogEntryController){
-            medicalLogEntryController = new MedicalLogEntryController(logEntriesResourceMap);
-        }
-        return medicalLogEntryController;
-    }
-
-    public static PersonalLogEntryController getPersonalLogEntryController(){
-        if(null == personalLogEntryController){
-            personalLogEntryController = new PersonalLogEntryController(logEntriesResourceMap);
-        }
-        return personalLogEntryController;
-    }
-
-    public static AwardLogEntryController getAwardLogEntryController(){
-        if(null == awardLogEntryController){
-            awardLogEntryController = new AwardLogEntryController(logEntriesResourceMap);
-        }
-        return awardLogEntryController;
-    }
-
+    /**
+     * Generates a string with the rank of the person
+     * @param person whose rank we want to generate the string
+     * @return string with the rank
+     */
     public String generateRankEntryString(Person person){
         String rankEntry = "";
         if (person.getRankNumeric() > 0) {
@@ -68,6 +63,11 @@ public class LogEntryController {
         return rankEntry;
     }
 
+    /**
+     * Used for backward compatibility, determines the LogEntryType based solely on the description of the log entry
+     * @param description of the log entry
+     * @return type of the log entry.
+     */
     public LogEntryType determineTypeFromLogDescription(String description){
 
         if(foundExpressionWithOneVariable("madeBondsmanBy.text", description) ||
@@ -175,6 +175,12 @@ public class LogEntryController {
         return matcher.matches();
     }
 
+    /**
+     * Updates the description of an old log entry with a new one. This is used to maintain backward compatibilty,
+     * by substituting old log entries with improved ones.
+     * @param description to be changes
+     * @return string with the new description.
+     */
     public String updateOldDescription(String description){
         String newDescription = "";
 

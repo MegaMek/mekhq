@@ -42,7 +42,7 @@ import javax.swing.table.TableColumn;
 import megamek.common.util.EncodeControl;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.log.CustomLogEntry;
-import mekhq.campaign.LogEntry;
+import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.personnel.Person;
 
 /**

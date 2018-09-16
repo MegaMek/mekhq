@@ -30,12 +30,10 @@ import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.log.CustomLogEntry;
-import mekhq.campaign.log.LogEntryController;
-import mekhq.campaign.log.PersonalLogEntry;
-import mekhq.campaign.log.PersonalLogEntryController;
+import mekhq.campaign.log.PersonalLogger;
 import mekhq.campaign.personnel.Award;
 import mekhq.campaign.Kill;
-import mekhq.campaign.LogEntry;
+import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.event.PersonLogEvent;
 import mekhq.campaign.finances.Transaction;
@@ -485,8 +483,8 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             {
                 if (!selectedPerson.getSpouse().isDeadOrMIA()) {
 
-                    LogEntryController.getPersonalLogEntryController().logDivorcedFrom(selectedPerson, selectedPerson.getSpouse(), gui.getCampaign().getDate());
-                    LogEntryController.getPersonalLogEntryController().logDivorcedFrom(selectedPerson.getSpouse(), selectedPerson, gui.getCampaign().getDate());
+                    PersonalLogger.getInstance().divorcedFrom(selectedPerson, selectedPerson.getSpouse(), gui.getCampaign().getDate());
+                    PersonalLogger.getInstance().divorcedFrom(selectedPerson.getSpouse(), selectedPerson, gui.getCampaign().getDate());
 
                     if (selectedPerson.getMaidenName() != null) {
                         selectedPerson.setName(selectedPerson.getName().split(SPACE, 2)[0]
@@ -544,9 +542,9 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 }
 
                 spouse.setSpouseID(selectedPerson.getId());
-                LogEntryController.getPersonalLogEntryController().logMarriage(spouse, selectedPerson, gui.getCampaign().getDate());
+                PersonalLogger.getInstance().marriage(spouse, selectedPerson, gui.getCampaign().getDate());
                 selectedPerson.setSpouseID(spouse.getId());
-                LogEntryController.getPersonalLogEntryController().logMarriage(selectedPerson, spouse, gui.getCampaign().getDate());
+                PersonalLogger.getInstance().marriage(selectedPerson, spouse, gui.getCampaign().getDate());
                 MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
                 MekHQ.triggerEvent(new PersonChangedEvent(spouse));
                 break;

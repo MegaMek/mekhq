@@ -35,7 +35,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.personnel.Award;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Kill;
-import mekhq.campaign.LogEntry;
+import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.Person;

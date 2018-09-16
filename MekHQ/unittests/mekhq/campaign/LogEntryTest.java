@@ -25,9 +25,7 @@ import java.util.Date;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import mekhq.campaign.log.MedicalLogEntry;
-import mekhq.campaign.log.PersonalLogEntry;
-import mekhq.campaign.log.ServiceLogEntry;
+import mekhq.campaign.log.*;
 import org.junit.Assert;
 import org.junit.Test;
 import org.w3c.dom.Node;
@@ -37,7 +35,7 @@ public class LogEntryTest {
 
     @Test
     public void testNullDescriptionBecomesEmpty() {
-        Assert.assertEquals("", new LogEntry(null, null).getDesc()); //$NON-NLS-1$
+        Assert.assertEquals("", new HistoricalLogEntry(null, null).getDesc()); //$NON-NLS-1$
     }
 
     @Test

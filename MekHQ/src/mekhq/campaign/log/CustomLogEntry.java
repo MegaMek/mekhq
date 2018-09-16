@@ -1,14 +1,11 @@
 /*
- * MedicalLogEntry.java
- *
- * Copyright (C) 2009-2018 MegaMek team
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (C) 2018 MegaMek team
  *
  * This file is part of MekHQ.
  *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
+ * the Free Software Foundation, either version 2 of the License, or
  * (at your option) any later version.
  *
  * MekHQ is distributed in the hope that it will be useful,
@@ -22,10 +19,12 @@
 
 package mekhq.campaign.log;
 
-import mekhq.campaign.LogEntry;
-
 import java.util.Date;
 
+/**
+ * This class is a specific log entry related to custom entries.
+ * @author Miguel Azevedo
+ */
 public class CustomLogEntry extends LogEntry {
     public CustomLogEntry(Date date, String desc){
         super(date, desc, LogEntryType.CUSTOM);

@@ -29,7 +29,8 @@ import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.Mech;
 import mekhq.campaign.*;
-import mekhq.campaign.log.LogEntryController;
+import mekhq.campaign.log.MedicalLogger;
+import mekhq.campaign.log.ServiceLogger;
 import mekhq.campaign.personnel.BodyLocation;
 import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.InjuryType;
@@ -91,7 +92,7 @@ public final class InjuryUtil {
         Collection<Injury> newInjuries = genInjuries(c, person, hits);
         newInjuries.forEach((inj) -> person.addInjury(inj));
         if (newInjuries.size() > 0) {
-            LogEntryController.getMedicalLogController().logReturnedWithInjuries(person, c.getDate(), newInjuries);
+            MedicalLogger.getInstance().returnedWithInjuries(person, c.getDate(), newInjuries);
         }
     }
     
@@ -291,7 +292,7 @@ public final class InjuryUtil {
                         rnd -> {
                             int time = i.getTime();
                             i.setTime((int) Math.max(Math.ceil(time * 1.2), time + 5));
-                            LogEntryController.getMedicalLogController().logDocMadeAMistake(doc, p, i, c.getDate());
+                            MedicalLogger.getInstance().docMadeAMistake(doc, p, i, c.getDate());
                             if(rnd.applyAsInt(100) < (fumbleLimit / 4)) {
                                 // TODO: Add in special handling of the critical
                                 // injuries like broken back (make perm),
@@ -305,7 +306,7 @@ public final class InjuryUtil {
                             doc.getHyperlinkedFullTitle(), i.getName(), p.getHyperlinkedName(), critTimeReduction),
                         rnd -> {
                             i.setTime(i.getTime() - critTimeReduction);
-                            LogEntryController.getMedicalLogController().logDocAmazingWork(doc, p, i, c.getDate(), critTimeReduction);
+                            MedicalLogger.getInstance().docAmazingWork(doc, p, i, c.getDate(), critTimeReduction);
                         }));
                 } else {
                     final int xpChance = (int) Math.round(100.0 / c.getCampaignOptions().getNTasksXP());
@@ -319,12 +320,12 @@ public final class InjuryUtil {
                                 doc.setXp(doc.getXp() + taskXP);
                                 doc.setNTasks(0);
 
-                                LogEntryController.getServiceLogController().logGainedXpFromMedWork(doc, c.getDate(), taskXP);
+                                ServiceLogger.getInstance().gainedXpFromMedWork(doc, c.getDate(), taskXP);
                             } else {
                                 doc.setNTasks(doc.getNTasks() + 1);
                             }
                             i.setWorkedOn(true);
-                            LogEntryController.getMedicalLogController().logSuccessfullyTreated(doc, p, c.getDate(), i);
+                            MedicalLogger.getInstance().successfullyTreated(doc, p, c.getDate(), i);
                             Unit u = c.getUnit(p.getUnitId());
                             if(null != u) {
                                 u.resetPilotAndEntity();
@@ -362,9 +363,9 @@ public final class InjuryUtil {
                 rnd -> {
                     if(xp > 0) {
                         doc.setXp(doc.getXp() + xp);
-                        LogEntryController.getServiceLogController().logSuccessfullyTreatedWithXp(doc, p, c.getDate(), injuries, xp);
+                        ServiceLogger.getInstance().successfullyTreatedWithXp(doc, p, c.getDate(), injuries, xp);
                     } else {
-                        LogEntryController.getServiceLogController().logSuccessfullyTreated(doc, p, c.getDate(), injuries);
+                        ServiceLogger.getInstance().successfullyTreated(doc, p, c.getDate(), injuries);
                     }
                     p.setDaysToWaitForHealing(c.getCampaignOptions().getHealingWaitingPeriod());
                 }));
@@ -397,10 +398,10 @@ public final class InjuryUtil {
                             i.setTime(0);
                             if(rnd.applyAsInt(6) == 0) {
                                 i.setPermanent(true);
-                                LogEntryController.getMedicalLogController().logInjuryDidntHealProperly(p, c.getDate(), i);
+                                MedicalLogger.getInstance().injuryDidntHealProperly(p, c.getDate(), i);
                             } else {
                                 p.removeInjury(i);
-                                LogEntryController.getMedicalLogController().logInjuryHealed(p, c.getDate(), i);
+                                MedicalLogger.getInstance().injuryHealed(p, c.getDate(), i);
                             }
                         }));
                 } else {
@@ -409,7 +410,7 @@ public final class InjuryUtil {
                         rnd -> {
                             i.setTime(0);
                             p.removeInjury(i);
-                            LogEntryController.getMedicalLogController().logInjuryHealed(p, c.getDate(), i);
+                            MedicalLogger.getInstance().injuryHealed(p, c.getDate(), i);
                         }));
                 }
             } else if(i.getTime() > 1) {
@@ -423,7 +424,7 @@ public final class InjuryUtil {
                     String.format("%s becomes permanent", i.getName()),
                     rnd -> {
                         i.setTime(0);
-                        LogEntryController.getMedicalLogController().logInjuryBecamePermanent(p, c.getDate(), i);
+                        MedicalLogger.getInstance().injuryBecamePermanent(p, c.getDate(), i);
                     }));
             }
         });
@@ -433,17 +434,17 @@ public final class InjuryUtil {
                     boolean dismissed = false;
                     if(p.getStatus() == Person.S_KIA) {
                         dismissed = true;
-                        LogEntryController.getMedicalLogController().logDiedInInfirmary(p, c.getDate());
+                        MedicalLogger.getInstance().diedInInfirmary(p, c.getDate());
                     } else if(p.getStatus() == Person.S_MIA) {
                         // What? How?
                         dismissed = true;
-                        LogEntryController.getMedicalLogController().logAbductedFromInfirmary(p, c.getDate());
+                        MedicalLogger.getInstance().abductedFromInfirmary(p, c.getDate());
                     } else if(p.getStatus() == Person.S_RETIRED) {
                         dismissed = true;
-                        LogEntryController.getMedicalLogController().logRetiredAndTransferedFromInfirmary(p, c.getDate());
+                        MedicalLogger.getInstance().retiredAndTransferedFromInfirmary(p, c.getDate());
                     } else if(!p.needsFixing()) {
                         dismissed = true;
-                        LogEntryController.getMedicalLogController().logDismissedFromInfirmary(p, c.getDate());
+                        MedicalLogger.getInstance().dismissedFromInfirmary(p, c.getDate());
                     }
                     
                     if(dismissed) {

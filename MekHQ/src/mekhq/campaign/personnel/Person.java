@@ -31,8 +31,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import mekhq.campaign.*;
-import mekhq.campaign.log.AwardLogEntry;
-import mekhq.campaign.log.LogEntryController;
+import mekhq.campaign.log.*;
 import org.joda.time.DateTime;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -1051,7 +1050,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
             baby.setAncestorsID(ancId);
             campaign.addReport(getHyperlinkedName() + " has given birth to " + baby.getHyperlinkedName() + ", a baby " + (baby.getGender() == G_MALE ? "boy!" : "girl!"));
             if (campaign.getCampaignOptions().logConception()) {
-                LogEntryController.getMedicalLogController().logDeliveredBaby(this, baby, campaign.getDate());
+                MedicalLogger.getInstance().deliveredBaby(this, baby, campaign.getDate());
             }
             return baby;
         }).collect(Collectors.toList());
@@ -1095,7 +1094,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                         campaign.addReport(getHyperlinkedName()+" has conceived " + sizeString);
                     }
                     if (campaign.getCampaignOptions().logConception()) {
-                        LogEntryController.getMedicalLogController().logHasConceived(this, campaign.getDate(), sizeString);
+                        MedicalLogger.getInstance().hasConceived(this, campaign.getDate(), sizeString);
                     }
                 }
             }
@@ -1118,7 +1117,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
             campaign.addReport(getHyperlinkedName()+" has conceived " + sizeString);
         }
         if (campaign.getCampaignOptions().logConception()) {
-            LogEntryController.getMedicalLogController().logHasConceived(this, campaign.getDate(), sizeString);
+            MedicalLogger.getInstance().hasConceived(this, campaign.getDate(), sizeString);
         }
     }
 
@@ -3472,7 +3471,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
             if(award.equals(setName, awardName, date)){
                 awards.remove(award);
                 MekHQ.triggerEvent(new PersonChangedEvent(this));
-                LogEntryController.getAwardLogEntryController().logRemovedAward(this, campaign.getDate(), award);
+                AwardLogger.getInstance().removedAward(this, campaign.getDate(), award);
                 return;
             }
         }
@@ -3492,7 +3491,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
      * @param award that was given.
      */
     public void logAward(Award award){
-        LogEntryController.getAwardLogEntryController().logAward(this, award.getDate(), award);
+        AwardLogger.getInstance().award(this, award.getDate(), award);
         MekHQ.triggerEvent(new PersonChangedEvent(this));
     }
 
@@ -3564,12 +3563,12 @@ public class Person implements Serializable, MekHqXmlSerializable {
         }
         Unit u = campaign.getUnit(getUnitId());
         if (status == Person.S_KIA) {
-            LogEntryController.getMedicalLogController().logDiedFromWounds(this, campaign.getDate());
+            MedicalLogger.getInstance().diedFromWounds(this, campaign.getDate());
             //set the deathday
             setDeathday((GregorianCalendar) campaign.calendar.clone());
         }
         if (status == Person.S_RETIRED) {
-            LogEntryController.getServiceLogController().logRetireDueToWounds(this, campaign.getDate());
+            ServiceLogger.getInstance().retireDueToWounds(this, campaign.getDate());
         }
         setStatus(status);
         if (status != Person.S_ACTIVE) {

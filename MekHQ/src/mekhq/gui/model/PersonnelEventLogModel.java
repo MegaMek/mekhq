@@ -18,7 +18,7 @@ import javax.swing.text.StyleConstants;
 
 import megamek.common.util.EncodeControl;
 import mekhq.campaign.Kill;
-import mekhq.campaign.LogEntry;
+import mekhq.campaign.log.LogEntry;
 
 public class PersonnelEventLogModel extends DataTableModel {
     private static final long serialVersionUID = 2930826794853379580L;

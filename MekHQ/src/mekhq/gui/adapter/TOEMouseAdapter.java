@@ -24,6 +24,7 @@ import mekhq.campaign.event.NetworkChangedEvent;
 import mekhq.campaign.event.OrganizationChangedEvent;
 import mekhq.campaign.event.PersonTechAssignmentEvent;
 import mekhq.campaign.force.Force;
+import mekhq.campaign.log.ServiceLogger;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
@@ -116,11 +117,11 @@ ActionListener {
                     if (singleForce.getTechID() != null) {
                         Person oldTech = gui.getCampaign().getPerson(singleForce.getTechID());
                         oldTech.clearTechUnitIDs();
-                        LogEntryController.getServiceLogController().logRemovedFrom(oldTech, gui.getCampaign().getDate(), singleForce.getName());
+                        ServiceLogger.getInstance().removedFrom(oldTech, gui.getCampaign().getDate(), singleForce.getName());
                     }
                     singleForce.setTechID(tech.getId());
 
-                    LogEntryController.getServiceLogController().logAssignedTo(tech, gui.getCampaign().getDate(), singleForce.getName());
+                    ServiceLogger.getInstance().assignedTo(tech, gui.getCampaign().getDate(), singleForce.getName());
 
                     if (singleForce.getAllUnits() !=null) {
                         String cantTech = "";
@@ -233,7 +234,7 @@ ActionListener {
                 Person oldTech = gui.getCampaign().getPerson(singleForce.getTechID());
                 oldTech.clearTechUnitIDs();
 
-                LogEntryController.getServiceLogController().logRemovedFrom(oldTech, gui.getCampaign().getDate(), singleForce.getName());
+                ServiceLogger.getInstance().removedFrom(oldTech, gui.getCampaign().getDate(), singleForce.getName());
 
                 if (singleForce.getAllUnits() !=null) {
                     for (UUID uuid : singleForce.getAllUnits()) {

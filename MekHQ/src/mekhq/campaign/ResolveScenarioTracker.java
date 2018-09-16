@@ -60,6 +60,7 @@ import mekhq.Utilities;
 import mekhq.campaign.event.PersonBattleFinishedEvent;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.log.LogEntryController;
+import mekhq.campaign.log.ServiceLogger;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.Contract;
@@ -72,6 +73,8 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.FileDialogs;
+
+import javax.xml.ws.Service;
 
 /**
  * This object will be the main workhorse for the scenario
@@ -1087,7 +1090,7 @@ public class ResolveScenarioTracker {
             }
             if(status.wasDeployed()) {
                 person.setXp(person.getXp() + status.getXP());
-                LogEntryController.getServiceLogController().logParticipatedInMission(person, campaign.getDate(), scenario.getName(), m.getName());
+                ServiceLogger.getInstance().participatedInMission(person, campaign.getDate(), scenario.getName(), m.getName());
             }
             for(Kill k : status.getKills()) {
                 campaign.addKill(k);
@@ -1142,7 +1145,7 @@ public class ResolveScenarioTracker {
                 person.setHits(status.getHits());
             }
 
-            LogEntryController.getServiceLogController().logParticipatedInMission(person, campaign.getDate(), scenario.getName(), m.getName());
+            ServiceLogger.getInstance().participatedInMission(person, campaign.getDate(), scenario.getName(), m.getName());
 
             for(Kill k : status.getKills()) {
                 campaign.addKill(k);
