@@ -2325,6 +2325,10 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             menuItem.addActionListener(ev -> gui.miExportPersonActionPerformed(ev));
             menuItem.setEnabled(true);
             popup.add(menuItem);
+            menuItem = new JMenuItem(resourceMap.getString("exportAllPersonnelCSV.text")); //$NON-NLS-1$
+            menuItem.addActionListener(ev -> gui.miExportPersonnelCSVActionPerformed(ev));
+            menuItem.setEnabled(true);
+            popup.add(menuItem);
             if (gui.getCampaign().getCampaignOptions().getUseAtB()
                     && StaticChecks.areAllActive(selected)) {
                 menuItem = new JMenuItem(resourceMap.getString("sack.text")); //$NON-NLS-1$

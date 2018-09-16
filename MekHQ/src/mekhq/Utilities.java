@@ -21,7 +21,6 @@
 
 package mekhq;
 
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -30,8 +29,6 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -52,17 +49,11 @@ import java.util.ListIterator;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
-import java.util.ResourceBundle;
 import java.util.StringTokenizer;
 import java.util.UUID;
 import java.util.Vector;
 import java.util.stream.Collectors;
 
-import javax.swing.JTable;
-import javax.swing.table.TableModel;
-
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVPrinter;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDateTime;
@@ -94,7 +85,6 @@ import megamek.common.VTOL;
 import megamek.common.logging.LogLevel;
 import megamek.common.options.IOption;
 import megamek.common.options.OptionsConstants;
-import megamek.common.util.EncodeControl;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.parts.Part;
@@ -114,8 +104,6 @@ import mekhq.campaign.unit.UnitTechProgression;
  */
 public class Utilities {
     private static final int MILLISECONDS_IN_DAY = 1000 * 60 * 60 * 24;
-    
-    private static ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.Utilities", new EncodeControl()); //$NON-NLS-1$
 
     // A couple of arrays for use in the getLevelName() method
     private static int[]    arabicNumbers = {1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1};
@@ -1331,42 +1319,7 @@ public class Utilities {
         return new LocalDateTime(date).toDateTime(DateTimeZone.UTC);
     }
 
-    /**
-     * Export a JTable to a CSV file
-     * @param table
-     * @param file
-     * @return report
-     */
-    public static String exportTabletoCSV(JTable table, File file) {
-        String report;
-        try {
-            TableModel model = table.getModel();
-            BufferedWriter writer = Files.newBufferedWriter(Paths.get(file.getPath()));
-            String[] columns = new String[model.getColumnCount()];
-            for (int i = 0; i < model.getColumnCount(); i++) {
-                columns[i] = model.getColumnName(i);
-            }
-            CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT.withHeader(columns));
 
-            for (int i = 0; i < model.getRowCount(); i++) {
-                Object[] towrite = new String[model.getColumnCount()];
-                for (int j = 0; j < model.getColumnCount(); j++) {
-                    // use regex to remove any HTML tags
-                    towrite[j] = model.getValueAt(i,j).toString().replaceAll("\\<[^>]*>", "");
-                }
-                csvPrinter.printRecord(towrite);
-            }
-
-            csvPrinter.flush();
-            csvPrinter.close();
-
-            report = model.getRowCount() + " " + resourceMap.getString("RowsWritten.text");
-        } catch(Exception ioe) {
-            MekHQ.getLogger().log(Utilities.class, "exportTabletoCSV", LogLevel.INFO, "Error exporting JTable");
-            report = "Error exporting JTable. See log for details.";
-        }
-        return report;
-    }
 
     public static Vector<String> splitString(String str, String sep) {
         StringTokenizer st = new StringTokenizer(str, sep);

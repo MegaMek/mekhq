@@ -50,20 +50,38 @@ public class FileDialogs {
     }
 
     /**
-     * Displays a dialog window from which the user can select an <tt>.xml</tt> file to open.
+     * Displays a dialog window from which the user can select a file to open.
      *
      * @return the file selected, if any
      */
-    public static Optional<File> savePersonnel(JFrame frame, Campaign campaign) {
+    public static Optional<File> savePersonnel(JFrame frame, Campaign campaign, FileType format) {
 
-        String fileName = String.format( "%s%_ExportedPersonnel.prsx", //$NON-NLS-1$
-                                         campaign.getName(),
-                                         campaign.getShortDateAsString() );
+        String fileName = campaign.getName()
+                + campaign.getShortDateAsString()
+                + "_ExportedPersonnel." //$NON-NLS-1$
+                + format.getRecommendedExtension();
 
         return GUI.fileDialogSave( frame,
                                    "Save Personnel",
                                    new File(".", fileName), //$NON-NLS-1$
-                                   FileType.PRSX);
+                                   format );
+    }
+    
+    /**
+     * Displays a dialog window from which the user can select a file to open.
+     *
+     * @return the file selected, if any
+     */
+    public static Optional<File> saveTable(JFrame frame, String dialogTitle, FileType format, Campaign campaign) {
+
+        String fileName = campaign.getName() +
+                         campaign.getShortDateAsString() + "." +
+                         format.getRecommendedExtension();
+
+        return GUI.fileDialogSave( frame,
+                                   dialogTitle,
+                                   new File(".", fileName), //$NON-NLS-1$
+                                   format );
     }
 
     /**
@@ -85,7 +103,7 @@ public class FileDialogs {
      */
     public static Optional<File> openParts(JFrame frame) {
         return GUI.fileDialogOpen( frame,
-                                   "Load Pards",
+                                   "Load Parts",
                                    new File("."), //$NON-NLS-1$
                                    FileType.PARTS );
     }
@@ -95,16 +113,17 @@ public class FileDialogs {
      *
      * @return the file selected, if any
      */
-    public static Optional<File> saveParts(JFrame frame, Campaign campaign) {
+    public static Optional<File> saveParts(JFrame frame, Campaign campaign, FileType format) {
 
-        String fileName = String.format( "%s%s_ExportedParts.parts", //$NON-NLS-1$
-                                         campaign.getName(),
-                                         campaign.getShortDateAsString() );
+        String fileName = campaign.getName()
+                + campaign.getShortDateAsString()
+                + "_ExportedParts." //$NON-NLS-1$
+                + format.getRecommendedExtension();
 
         return GUI.fileDialogSave( frame,
-                                   "Save Pards",
+                                   "Save Parts",
                                    new File(".", fileName), //$NON-NLS-1$
-                                   FileType.PARTS );
+                                   format );
     }
 
     /**
@@ -130,6 +149,24 @@ public class FileDialogs {
                                    new File(MekHQ.PRESET_DIR, "myoptions.xml"), //$NON-NLS-1$
                                    FileType.XML );
     }
+    
+    /**
+     * Displays a dialog window from which the user can select a <tt>.csv</tt> file to save to.
+     *
+     * @return the file selected, if any
+     */
+    public static Optional<File> saveFinances(JFrame frame, Campaign campaign, FileType format) {
+        
+        String fileName = campaign.getName()
+                + campaign.getShortDateAsString()
+                + "_ExportedFinances." //$NON-NLS-1$
+                + format.getRecommendedExtension();
+        
+        return GUI.fileDialogSave( frame,
+                                   "Save Finances",
+                                   new File(".", fileName), //$NON-NLS-1$
+                                   format );
+    }
 
     /**
      * Displays a dialog window from which the user can select a <tt>.png</tt> file to save to.
@@ -141,6 +178,24 @@ public class FileDialogs {
                                    "",
                                    new File(".", "starmap.png"), //$NON-NLS-1$ //$NON-NLS-2$
                                    FileType.PNG );
+    }
+    
+    /**
+     * Displays a dialog window from which the user can select a <tt>.xml</tt> file to save to.
+     *
+     * @return the file selected, if any
+     */
+    public static Optional<File> savePlanets(JFrame frame, Campaign campaign, FileType format) {
+        
+        String fileName = campaign.getName()
+                + campaign.getShortDateAsString()
+                + "_ExportedPlanets." //$NON-NLS-1$
+                + format.getRecommendedExtension();
+        
+        return GUI.fileDialogSave( frame,
+                                   "Save Planets",
+                                   new File(".", fileName), //$NON-NLS-1$ //$NON-NLS-2$
+                                   format );
     }
 
     /**
@@ -185,10 +240,10 @@ public class FileDialogs {
      * @return the file selected, if any
      */
     public static Optional<File> saveCampaign(JFrame frame, Campaign campaign) {
-
-        String fileName = String.format( "%s%s.cpnx", //$NON-NLS-1$
-                                         campaign.getName(),
-                                         campaign.getShortDateAsString() );
+        
+        String fileName = campaign.getName()
+                + campaign.getShortDateAsString()
+                + ".cpnx"; //$NON-NLS-1$
 
         return GUI.fileDialogSave( frame,
                                    "Save Campaign",

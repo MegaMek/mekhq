@@ -56,6 +56,11 @@ import java.util.function.Predicate;
      * Value for xml files.
      */
     XML("XML file", "xml"), //$NON-NLS-2$
+    
+    /**
+     * Value for html files.
+     */
+    HTML("HTML file", "html"), //$NON-NLS-2$
 
     /**
      * Value for png files.

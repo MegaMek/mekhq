@@ -369,8 +369,12 @@ public class PartsTableMouseAdapter extends MouseInputAdapter implements ActionL
                 menuItem.addActionListener(this);
                 popup.add(menuItem);
             }
-            menuItem = new JMenuItem("Export Parts");
+            menuItem = new JMenuItem("Export Selected Parts To .parts");
             menuItem.addActionListener(ev -> gui.miExportPartsActionPerformed(ev));
+            menuItem.setEnabled(true);
+            popup.add(menuItem);
+            menuItem = new JMenuItem("Export All Parts To .csv");
+            menuItem.addActionListener(ev -> gui.miExportPartsCSVActionPerformed(ev));
             menuItem.setEnabled(true);
             popup.add(menuItem);
             
