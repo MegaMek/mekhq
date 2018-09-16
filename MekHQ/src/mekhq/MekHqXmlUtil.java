@@ -46,96 +46,96 @@ import megamek.common.logging.LogLevel;
 
 public class MekHqXmlUtil {
 
-	private static DocumentBuilderFactory DOCUMENT_BUILDER_FACTORY;
-	private static DocumentBuilderFactory UNSAFE_DOCUMENT_BUILDER_FACTORY;
-	private static SAXParserFactory SAX_PARSER_FACTORY;
+    private static DocumentBuilderFactory DOCUMENT_BUILDER_FACTORY;
+    private static DocumentBuilderFactory UNSAFE_DOCUMENT_BUILDER_FACTORY;
+    private static SAXParserFactory SAX_PARSER_FACTORY;
 
-	/**
-	 * Creates a DocumentBuilder safe from XML external entities
-	 * attacks, and XML entity expansion attacks.
-	 * @return A DocumentBuilder safe to use to read untrusted XML.
-	 */
-	public static DocumentBuilder newSafeDocumentBuilder() throws ParserConfigurationException {
-		DocumentBuilderFactory dbf = DOCUMENT_BUILDER_FACTORY;
-		if (null == dbf) {
-			// At worst we may do this twice if multiple threads
-			// hit this method. It is Ok to have more than one
-			// instance of the builder factory, as long as it is
-			// XXE safe.
-			dbf = DocumentBuilderFactory.newInstance();
+    /**
+     * Creates a DocumentBuilder safe from XML external entities
+     * attacks, and XML entity expansion attacks.
+     * @return A DocumentBuilder safe to use to read untrusted XML.
+     */
+    public static DocumentBuilder newSafeDocumentBuilder() throws ParserConfigurationException {
+        DocumentBuilderFactory dbf = DOCUMENT_BUILDER_FACTORY;
+        if (null == dbf) {
+            // At worst we may do this twice if multiple threads
+            // hit this method. It is Ok to have more than one
+            // instance of the builder factory, as long as it is
+            // XXE safe.
+            dbf = DocumentBuilderFactory.newInstance();
 
-			//
-			// Adapted from: https://www.owasp.org/index.php/XML_External_Entity_(XXE)_Prevention_Cheat_Sheet#JAXP_DocumentBuilderFactory.2C_SAXParserFactory_and_DOM4J
-			//
-			// "...The JAXP DocumentBuilderFactory setFeature method allows a
-			// developer to control which implementation-specific XML processor
-			// features are enabled or disabled. The features can either be set
-			// on the factory or the underlying XMLReader setFeature method. 
-			// Each XML processor implementation has its own features that 
-			// govern how DTDs and external entities are processed."
-			//
-			// "[disable] these as well, per Timothy Morgan's 2014 paper: 'XML 
-			// Schema, DTD, and Entity Attacks'"
-			dbf.setXIncludeAware(false);
-			dbf.setExpandEntityReferences(false);
+            //
+            // Adapted from: https://www.owasp.org/index.php/XML_External_Entity_(XXE)_Prevention_Cheat_Sheet#JAXP_DocumentBuilderFactory.2C_SAXParserFactory_and_DOM4J
+            //
+            // "...The JAXP DocumentBuilderFactory setFeature method allows a
+            // developer to control which implementation-specific XML processor
+            // features are enabled or disabled. The features can either be set
+            // on the factory or the underlying XMLReader setFeature method.
+            // Each XML processor implementation has its own features that
+            // govern how DTDs and external entities are processed."
+            //
+            // "[disable] these as well, per Timothy Morgan's 2014 paper: 'XML
+            // Schema, DTD, and Entity Attacks'"
+            dbf.setXIncludeAware(false);
+            dbf.setExpandEntityReferences(false);
 
-			// "This is the PRIMARY defense. If DTDs (doctypes) are disallowed,
-			// almost all XML entity attacks are prevented"
-			String FEATURE = "http://apache.org/xml/features/disallow-doctype-decl";
-			dbf.setFeature(FEATURE, true);
+            // "This is the PRIMARY defense. If DTDs (doctypes) are disallowed,
+            // almost all XML entity attacks are prevented"
+            String FEATURE = "http://apache.org/xml/features/disallow-doctype-decl";
+            dbf.setFeature(FEATURE, true);
 
-			DOCUMENT_BUILDER_FACTORY = dbf;
-		}
+            DOCUMENT_BUILDER_FACTORY = dbf;
+        }
 
-		return dbf.newDocumentBuilder();
-	}
+        return dbf.newDocumentBuilder();
+    }
 
-	/**
-	 * USE WITH CARE. Creates a DocumentBuilder safe from XML external entities
-	 * attacks, but unsafe from XML entity expansion attacks.
-	 * @return A DocumentBuilder less safe to use to read untrusted XML.
-	 */
-	public static DocumentBuilder newUnsafeDocumentBuilder() throws ParserConfigurationException {
-		DocumentBuilderFactory dbf = UNSAFE_DOCUMENT_BUILDER_FACTORY;
-		if (null == dbf) {
-			// At worst we may do this twice if multiple threads
-			// hit this method. It is Ok to have more than one
-			// instance of the builder factory, as long as it is
-			// XXE safe.
+    /**
+     * USE WITH CARE. Creates a DocumentBuilder safe from XML external entities
+     * attacks, but unsafe from XML entity expansion attacks.
+     * @return A DocumentBuilder less safe to use to read untrusted XML.
+     */
+    public static DocumentBuilder newUnsafeDocumentBuilder() throws ParserConfigurationException {
+        DocumentBuilderFactory dbf = UNSAFE_DOCUMENT_BUILDER_FACTORY;
+        if (null == dbf) {
+            // At worst we may do this twice if multiple threads
+            // hit this method. It is Ok to have more than one
+            // instance of the builder factory, as long as it is
+            // XXE safe.
 
-			//
-			// For further background, see newSafeDocumentBuilder()
-			//
-			dbf = DocumentBuilderFactory.newInstance();
-			dbf.setXIncludeAware(false);
-			dbf.setExpandEntityReferences(false);
+            //
+            // For further background, see newSafeDocumentBuilder()
+            //
+            dbf = DocumentBuilderFactory.newInstance();
+            dbf.setXIncludeAware(false);
+            dbf.setExpandEntityReferences(false);
 
-			//
-			// "If you can't completely disable DTDs, then at least do the 
-			// following:"
-			//
+            //
+            // "If you can't completely disable DTDs, then at least do the
+            // following:"
+            //
 
-			// Disable external entities
-			String FEATURE = "http://xml.org/sax/features/external-general-entities";
-			dbf.setFeature(FEATURE, false);
+            // Disable external entities
+            String FEATURE = "http://xml.org/sax/features/external-general-entities";
+            dbf.setFeature(FEATURE, false);
 
-			// Disable external parameters
-			FEATURE = "http://xml.org/sax/features/external-parameter-entities";
-       		dbf.setFeature(FEATURE, false);
- 
-       		// Disable external DTDs as well
-       		FEATURE = "http://apache.org/xml/features/nonvalidating/load-external-dtd";
-       		dbf.setFeature(FEATURE, false);
+            // Disable external parameters
+            FEATURE = "http://xml.org/sax/features/external-parameter-entities";
+               dbf.setFeature(FEATURE, false);
 
-			UNSAFE_DOCUMENT_BUILDER_FACTORY = dbf;
-		}
+               // Disable external DTDs as well
+               FEATURE = "http://apache.org/xml/features/nonvalidating/load-external-dtd";
+               dbf.setFeature(FEATURE, false);
 
-		return dbf.newDocumentBuilder();
-	}
+            UNSAFE_DOCUMENT_BUILDER_FACTORY = dbf;
+        }
+
+        return dbf.newDocumentBuilder();
+    }
 
     /**
      * @return a SAX {@linkplain XMLReader} that is safe from external entities and entity expansion attacks.
-     * 
+     *
      * @see "https://www.owasp.org/index.php/XML_External_Entity_(XXE)_Prevention_Cheat_Sheet#JAXB_Unmarshaller"
      */
     @SuppressWarnings("nls")
@@ -167,68 +167,74 @@ public class MekHqXmlUtil {
     /**
      * @return a {@linkplain Source} for the provided input stream that is safe
      * from external entities and entity expansion attacks.
-     * 
+     *
      * @see "https://www.owasp.org/index.php/XML_External_Entity_(XXE)_Prevention_Cheat_Sheet#JAXB_Unmarshaller"
      */
-	public static Source createSafeXmlSource(InputStream inputStream) {
-		return new SAXSource(createSafeXMLReader(), new InputSource(inputStream));
-	}
+    public static Source createSafeXmlSource(InputStream inputStream) {
+        return new SAXSource(createSafeXMLReader(), new InputSource(inputStream));
+    }
 
-	public static void writeSimpleXmlTag(PrintWriter pw1, int indent, String name, String val) {
-		for (int x=0; x<indent; x++)
-			pw1.print("\t");
+    public static void writeSimpleXmlTag(PrintWriter pw1, int indent, String name, String val) {
+        for (int x=0; x<indent; x++) {
+            pw1.print("\t");
+        }
 
-		pw1.print("<"+name+">");
-		pw1.print(escape(val));
-		pw1.println("</"+name+">");
-	}
+        pw1.print("<"+name+">");
+        pw1.print(escape(val));
+        pw1.println("</"+name+">");
+    }
 
-	public static void writeSimpleXmlTag(PrintWriter pw1, int indent, String name, int val) {
-		for (int x=0; x<indent; x++)
-			pw1.print("\t");
+    public static void writeSimpleXmlTag(PrintWriter pw1, int indent, String name, int val) {
+        for (int x=0; x<indent; x++) {
+            pw1.print("\t");
+        }
 
-		pw1.print("<"+name+">");
-		pw1.print(val);
-		pw1.println("</"+name+">");
-	}
+        pw1.print("<"+name+">");
+        pw1.print(val);
+        pw1.println("</"+name+">");
+    }
 
-	public static void writeSimpleXmlTag(PrintWriter pw1, int indent, String name, boolean val) {
-		for (int x=0; x<indent; x++)
-			pw1.print("\t");
+    public static void writeSimpleXmlTag(PrintWriter pw1, int indent, String name, boolean val) {
+        for (int x=0; x<indent; x++) {
+            pw1.print("\t");
+        }
 
-		pw1.print("<"+name+">");
-		pw1.print(val);
-		pw1.println("</"+name+">");
-	}
+        pw1.print("<"+name+">");
+        pw1.print(val);
+        pw1.println("</"+name+">");
+    }
 
-	public static void writeSimpleXmlTag(PrintWriter pw1, int indent, String name, long val) {
-		for (int x=0; x<indent; x++)
-			pw1.print("\t");
+    public static void writeSimpleXmlTag(PrintWriter pw1, int indent, String name, long val) {
+        for (int x=0; x<indent; x++) {
+            pw1.print("\t");
+        }
 
-		pw1.print("<"+name+">");
-		pw1.print(val);
-		pw1.println("</"+name+">");
-	}
+        pw1.print("<"+name+">");
+        pw1.print(val);
+        pw1.println("</"+name+">");
+    }
 
-	public static void writeSimpleXmlTag(PrintWriter pw1, int indent, String name, double val) {
-		for (int x=0; x<indent; x++)
-			pw1.print("\t");
+    public static void writeSimpleXmlTag(PrintWriter pw1, int indent, String name, double val) {
+        for (int x=0; x<indent; x++) {
+            pw1.print("\t");
+        }
 
-		pw1.print("<"+name+">");
-		pw1.print(val);
-		pw1.println("</"+name+">");
-	}
+        pw1.print("<"+name+">");
+        pw1.print(val);
+        pw1.println("</"+name+">");
+    }
 
-	public static String indentStr(int level) {
-		String retVal = "";
+    public static String indentStr(int level) {
+        String retVal = "";
 
-		for (int x=0; x<level; x++)
-			retVal += "\t";
+        for (int x=0; x<level; x++) {
+            retVal += "\t";
+        }
 
-		return retVal;
-	}
+        return retVal;
+    }
 
-	public static String xmlToString(Node node) throws TransformerException {
+    public static String xmlToString(Node node) throws TransformerException {
         Source source = new DOMSource(node);
         StringWriter stringWriter = new StringWriter();
         Result result = new StreamResult(stringWriter);
@@ -239,159 +245,159 @@ public class MekHqXmlUtil {
         return stringWriter.getBuffer().toString();
     }
 
-	/**
-	 * Contents copied from megamek.common.EntityListFile.saveTo(...) Modified
-	 * to support saving to/from XML for our purposes in MekHQ TODO: Some of
-	 * this may want to be back-ported into entity itself in MM and then
-	 * re-factored out of EntityListFile.
-	 *
-	 * @param tgtEnt
-	 *            The entity to serialize to XML.
-	 * @return A string containing the XML representation of the entity.
-	 */
-	public static String writeEntityToXmlString(Entity tgtEnt, int indentLvl, ArrayList<Entity> list) {
-		// Holdover from EntityListFile in MM.
-		// I guess they simply ignored all squadrons for writing out entities?
-		if (tgtEnt instanceof FighterSquadron) {
-			return "";
-		}
+    /**
+     * Contents copied from megamek.common.EntityListFile.saveTo(...) Modified
+     * to support saving to/from XML for our purposes in MekHQ TODO: Some of
+     * this may want to be back-ported into entity itself in MM and then
+     * re-factored out of EntityListFile.
+     *
+     * @param tgtEnt
+     *            The entity to serialize to XML.
+     * @return A string containing the XML representation of the entity.
+     */
+    public static String writeEntityToXmlString(Entity tgtEnt, int indentLvl, ArrayList<Entity> list) {
+        // Holdover from EntityListFile in MM.
+        // I guess they simply ignored all squadrons for writing out entities?
+        if (tgtEnt instanceof FighterSquadron) {
+            return "";
+        }
 
-		String retVal = "";
+        String retVal = "";
 
-		// Start writing this entity to the file.
-		retVal += MekHqXmlUtil.indentStr(indentLvl) + "<entity chassis=\""
-				+ escape(tgtEnt.getChassis())
-				+ "\" model=\"" + escape(tgtEnt.getModel())
-				+ "\" type=\"" + escape(tgtEnt.getMovementModeAsString())
-				+ "\" commander=\"" + String.valueOf(tgtEnt.isCommander());
+        // Start writing this entity to the file.
+        retVal += MekHqXmlUtil.indentStr(indentLvl) + "<entity chassis=\""
+                + escape(tgtEnt.getChassis())
+                + "\" model=\"" + escape(tgtEnt.getModel())
+                + "\" type=\"" + escape(tgtEnt.getMovementModeAsString())
+                + "\" commander=\"" + String.valueOf(tgtEnt.isCommander());
 
-		retVal += "\" externalId=\"";
-		retVal += tgtEnt.getExternalIdAsString();
+        retVal += "\" externalId=\"";
+        retVal += tgtEnt.getExternalIdAsString();
 
-		if (tgtEnt.countQuirks() > 0) {
-			retVal += "\" quirks=\"";
-			retVal += String.valueOf(escape(tgtEnt.getQuirkList("::")));
-		}
-		if (tgtEnt.getC3Master() != null) {
-			retVal += "\" c3MasterIs=\"";
-			retVal += tgtEnt.getGame()
-				.getEntity(tgtEnt.getC3Master().getId())
-				.getC3UUIDAsString();
-		}
-		if (tgtEnt.hasC3() || tgtEnt.hasC3i()) {
-			retVal += "\" c3UUID=\"";
-			retVal += tgtEnt.getC3UUIDAsString();
-		}
+        if (tgtEnt.countQuirks() > 0) {
+            retVal += "\" quirks=\"";
+            retVal += String.valueOf(escape(tgtEnt.getQuirkList("::")));
+        }
+        if (tgtEnt.getC3Master() != null) {
+            retVal += "\" c3MasterIs=\"";
+            retVal += tgtEnt.getGame()
+                .getEntity(tgtEnt.getC3Master().getId())
+                .getC3UUIDAsString();
+        }
+        if (tgtEnt.hasC3() || tgtEnt.hasC3i()) {
+            retVal += "\" c3UUID=\"";
+            retVal += tgtEnt.getC3UUIDAsString();
+        }
 
-         if (null != tgtEnt.getCamoCategory()
-        		 && tgtEnt.getCamoCategory() != IPlayer.NO_CAMO
-        		 && !tgtEnt.getCamoCategory().isEmpty()) {
+         if ((null != tgtEnt.getCamoCategory())
+                 && (tgtEnt.getCamoCategory() != IPlayer.NO_CAMO)
+                 && !tgtEnt.getCamoCategory().isEmpty()) {
              retVal += "\" camoCategory=\"";
              retVal += String.valueOf(escape(tgtEnt.getCamoCategory()));
          }
 
-         if (null != tgtEnt.getCamoFileName()
-        		 && tgtEnt.getCamoFileName() != IPlayer.NO_CAMO
-        		 && !tgtEnt.getCamoFileName().isEmpty()) {
+         if ((null != tgtEnt.getCamoFileName())
+                 && (tgtEnt.getCamoFileName() != IPlayer.NO_CAMO)
+                 && !tgtEnt.getCamoFileName().isEmpty()) {
              retVal += "\" camoFileName=\"";
              retVal += String.valueOf(escape(tgtEnt.getCamoFileName()));
          }
 
-		retVal += "\">\n";
+        retVal += "\">\n";
 
-		// If it's a tank, add a movement tag.
-		// Since tank movement can be affected by damage other than equipment
-		// damage...
-		// And thus can't necessarily be calculated.
-		if (tgtEnt instanceof Tank) {
-			Tank tentity = (Tank) tgtEnt;
-			retVal += getMovementString(tentity, indentLvl+1);
+        // If it's a tank, add a movement tag.
+        // Since tank movement can be affected by damage other than equipment
+        // damage...
+        // And thus can't necessarily be calculated.
+        if (tgtEnt instanceof Tank) {
+            Tank tentity = (Tank) tgtEnt;
+            retVal += getMovementString(tentity, indentLvl+1);
 
-			if (tentity.isTurretLocked(Tank.LOC_TURRET)) {
-				retVal += getTurretLockedString(tentity, indentLvl+1);
-			}
+            if (tentity.isTurretLocked(Tank.LOC_TURRET)) {
+                retVal += getTurretLockedString(tentity, indentLvl+1);
+            }
 
-			// Crits
-			retVal += getTankCritString(tentity, indentLvl+1);
-		}
+            // Crits
+            retVal += getTankCritString(tentity, indentLvl+1);
+        }
 
-		// add a bunch of stuff for aeros
-		if (tgtEnt instanceof Aero) {
-			Aero a = (Aero) tgtEnt;
+        // add a bunch of stuff for aeros
+        if (tgtEnt instanceof Aero) {
+            Aero a = (Aero) tgtEnt;
 
-			// SI
-			retVal += MekHqXmlUtil.indentStr(indentLvl+1) + "<structural integrity=\""
-					+ String.valueOf(a.getSI()) + "\"/>\n";
+            // SI
+            retVal += MekHqXmlUtil.indentStr(indentLvl+1) + "<structural integrity=\""
+                    + String.valueOf(a.getSI()) + "\"/>\n";
 
-			// Heat sinks
-			retVal += MekHqXmlUtil.indentStr(indentLvl+1) + "<heat sinks=\"" + String.valueOf(a.getHeatSinks())
-					+ "\"/>\n";
+            // Heat sinks
+            retVal += MekHqXmlUtil.indentStr(indentLvl+1) + "<heat sinks=\"" + String.valueOf(a.getHeatSinks())
+                    + "\"/>\n";
 
-			// Fuel
-			retVal += MekHqXmlUtil.indentStr(indentLvl+1) + "<fuel left=\"" + String.valueOf(a.getFuel())
-					+ "\"/>\n";
+            // Fuel
+            retVal += MekHqXmlUtil.indentStr(indentLvl+1) + "<fuel left=\"" + String.valueOf(a.getFuel())
+                    + "\"/>\n";
 
-			// TODO: dropship docking collars, bays
+            // TODO: dropship docking collars, bays
 
-			// Large craft stuff
-			if (a instanceof Jumpship) {
-				Jumpship j = (Jumpship) a;
+            // Large craft stuff
+            if (a instanceof Jumpship) {
+                Jumpship j = (Jumpship) a;
 
-				// KF integrity
-				retVal += MekHqXmlUtil.indentStr(indentLvl+1) + "<KF integrity=\""
-						+ String.valueOf(j.getKFIntegrity()) + "\"/>\n";
+                // KF integrity
+                retVal += MekHqXmlUtil.indentStr(indentLvl+1) + "<KF integrity=\""
+                        + String.valueOf(j.getKFIntegrity()) + "\"/>\n";
 
-				// KF sail integrity
-				retVal += MekHqXmlUtil.indentStr(indentLvl+1) + "<sail integrity=\""
-						+ String.valueOf(j.getSailIntegrity()) + "\"/>\n";
-			}
+                // KF sail integrity
+                retVal += MekHqXmlUtil.indentStr(indentLvl+1) + "<sail integrity=\""
+                        + String.valueOf(j.getSailIntegrity()) + "\"/>\n";
+            }
 
-			// Crits
-			retVal += getAeroCritString(a, indentLvl+1);
-		}
-		
-		// If the entity carries bombs, write those out
-		if(tgtEnt instanceof IBomber) {
-		    retVal += getBombChoiceString((IBomber) tgtEnt, indentLvl);
-		}
+            // Crits
+            retVal += getAeroCritString(a, indentLvl+1);
+        }
 
-		// Add the locations of this entity (if any are needed).
-		String loc = EntityListFile.getLocString(tgtEnt, indentLvl+1);
+        // If the entity carries bombs, write those out
+        if(tgtEnt instanceof IBomber) {
+            retVal += getBombChoiceString((IBomber) tgtEnt, indentLvl);
+        }
 
-		if (null != loc) {
-			retVal += loc;
-		}
+        // Add the locations of this entity (if any are needed).
+        String loc = EntityListFile.getLocString(tgtEnt, indentLvl+1);
 
-		// Write the C3i Data if needed
-		if (tgtEnt.hasC3i()) {
-			retVal += MekHqXmlUtil.indentStr(indentLvl+1) + "<c3iset>";
-			retVal += CommonConstants.NL;
-			Iterator<Entity> c3iList = list.iterator();
-			while (c3iList.hasNext()) {
-				final Entity C3iEntity = c3iList.next();
+        if (null != loc) {
+            retVal += loc;
+        }
 
-				if (C3iEntity.onSameC3NetworkAs(tgtEnt, true)) {
-					retVal += MekHqXmlUtil.indentStr(indentLvl+2) + "<c3i_link link=\"";
-					retVal += C3iEntity.getC3UUIDAsString();
-					retVal += "\"/>";
-					retVal += CommonConstants.NL;
-				}
-			}
-			retVal += MekHqXmlUtil.indentStr(indentLvl+1) + "</c3iset>";
-			retVal += CommonConstants.NL;
-		}
+        // Write the C3i Data if needed
+        if (tgtEnt.hasC3i()) {
+            retVal += MekHqXmlUtil.indentStr(indentLvl+1) + "<c3iset>";
+            retVal += CommonConstants.NL;
+            Iterator<Entity> c3iList = list.iterator();
+            while (c3iList.hasNext()) {
+                final Entity C3iEntity = c3iList.next();
 
-		// Finish writing this entity to the file.
-		retVal += MekHqXmlUtil.indentStr(indentLvl) + "</entity>";
+                if (C3iEntity.onSameC3NetworkAs(tgtEnt, true)) {
+                    retVal += MekHqXmlUtil.indentStr(indentLvl+2) + "<c3i_link link=\"";
+                    retVal += C3iEntity.getC3UUIDAsString();
+                    retVal += "\"/>";
+                    retVal += CommonConstants.NL;
+                }
+            }
+            retVal += MekHqXmlUtil.indentStr(indentLvl+1) + "</c3iset>";
+            retVal += CommonConstants.NL;
+        }
 
-		// Okay, return whatever we've got!
-		return retVal;
-	}
+        // Finish writing this entity to the file.
+        retVal += MekHqXmlUtil.indentStr(indentLvl) + "</entity>";
 
-	private static String getBombChoiceString(IBomber bomber, int indentLvl) {
-	    String retVal = "";
-	    
-	    int[] bombChoices = bomber.getBombChoices();
+        // Okay, return whatever we've got!
+        return retVal;
+    }
+
+    private static String getBombChoiceString(IBomber bomber, int indentLvl) {
+        String retVal = "";
+
+        int[] bombChoices = bomber.getBombChoices();
         if (bombChoices.length > 0) {
             retVal += MekHqXmlUtil.indentStr(indentLvl+1) + "<bombs>\n";
             for (int type = 0; type < BombType.B_NUM; type++) {
@@ -406,220 +412,221 @@ public class MekHqXmlUtil {
             }
             retVal += MekHqXmlUtil.indentStr(indentLvl+1) + "</bombs>\n";
         }
-        
+
         return retVal;
-	}
-	
-	/**
-	 * Contents copied from megamek.common.EntityListFile.getAeroCritString(...)
-	 * Modified to support saving to/from XML for our purposes in MekHQ
-	 *
-	 * @param a
-	 *            The Aero unit to generate a crit string for.
-	 * @return The generated crit string.
-	 */
-	private static String getAeroCritString(Aero a, int indentLvl) {
-		String retVal = MekHqXmlUtil.indentStr(indentLvl) + "<acriticals";
-		String critVal = "";
+    }
 
-		// crits
-		if (a.getAvionicsHits() > 0) {
-			critVal = critVal.concat(" avionics=\"");
-			critVal = critVal.concat(Integer.toString(a.getAvionicsHits()));
-			critVal = critVal.concat("\"");
-		}
+    /**
+     * Contents copied from megamek.common.EntityListFile.getAeroCritString(...)
+     * Modified to support saving to/from XML for our purposes in MekHQ
+     *
+     * @param a
+     *            The Aero unit to generate a crit string for.
+     * @return The generated crit string.
+     */
+    private static String getAeroCritString(Aero a, int indentLvl) {
+        String retVal = MekHqXmlUtil.indentStr(indentLvl) + "<acriticals";
+        String critVal = "";
 
-		if (a.getSensorHits() > 0) {
-			critVal = critVal.concat(" sensors=\"");
-			critVal = critVal.concat(Integer.toString(a.getSensorHits()));
-			critVal = critVal.concat("\"");
-		}
+        // crits
+        if (a.getAvionicsHits() > 0) {
+            critVal = critVal.concat(" avionics=\"");
+            critVal = critVal.concat(Integer.toString(a.getAvionicsHits()));
+            critVal = critVal.concat("\"");
+        }
 
-		if (a.getEngineHits() > 0) {
-			critVal = critVal.concat(" engine=\"");
-			critVal = critVal.concat(Integer.toString(a.getEngineHits()));
-			critVal = critVal.concat("\"");
-		}
+        if (a.getSensorHits() > 0) {
+            critVal = critVal.concat(" sensors=\"");
+            critVal = critVal.concat(Integer.toString(a.getSensorHits()));
+            critVal = critVal.concat("\"");
+        }
 
-		if (a.getFCSHits() > 0) {
-			critVal = critVal.concat(" fcs=\"");
-			critVal = critVal.concat(Integer.toString(a.getFCSHits()));
-			critVal = critVal.concat("\"");
-		}
+        if (a.getEngineHits() > 0) {
+            critVal = critVal.concat(" engine=\"");
+            critVal = critVal.concat(Integer.toString(a.getEngineHits()));
+            critVal = critVal.concat("\"");
+        }
 
-		if (a.getCICHits() > 0) {
-			critVal = critVal.concat(" cic=\"");
-			critVal = critVal.concat(Integer.toString(a.getCICHits()));
-			critVal = critVal.concat("\"");
-		}
+        if (a.getFCSHits() > 0) {
+            critVal = critVal.concat(" fcs=\"");
+            critVal = critVal.concat(Integer.toString(a.getFCSHits()));
+            critVal = critVal.concat("\"");
+        }
 
-		if (a.getLeftThrustHits() > 0) {
-			critVal = critVal.concat(" leftThrust=\"");
-			critVal = critVal.concat(Integer.toString(a.getLeftThrustHits()));
-			critVal = critVal.concat("\"");
-		}
+        if (a.getCICHits() > 0) {
+            critVal = critVal.concat(" cic=\"");
+            critVal = critVal.concat(Integer.toString(a.getCICHits()));
+            critVal = critVal.concat("\"");
+        }
 
-		if (a.getRightThrustHits() > 0) {
-			critVal = critVal.concat(" rightThrust=\"");
-			critVal = critVal.concat(Integer.toString(a.getRightThrustHits()));
-			critVal = critVal.concat("\"");
-		}
+        if (a.getLeftThrustHits() > 0) {
+            critVal = critVal.concat(" leftThrust=\"");
+            critVal = critVal.concat(Integer.toString(a.getLeftThrustHits()));
+            critVal = critVal.concat("\"");
+        }
 
-		if (!a.hasLifeSupport()) {
-			critVal = critVal.concat(" lifeSupport=\"none\"");
-		}
+        if (a.getRightThrustHits() > 0) {
+            critVal = critVal.concat(" rightThrust=\"");
+            critVal = critVal.concat(Integer.toString(a.getRightThrustHits()));
+            critVal = critVal.concat("\"");
+        }
 
-		if (a.isGearHit()) {
-			critVal = critVal.concat(" gear=\"none\"");
-		}
+        if (!a.hasLifeSupport()) {
+            critVal = critVal.concat(" lifeSupport=\"none\"");
+        }
 
-		if (!critVal.equals("")) {
-			// then add beginning and end
-			retVal = retVal.concat(critVal);
-			retVal = retVal.concat("/>\n");
-		} else {
-			return critVal;
-		}
+        if (a.isGearHit()) {
+            critVal = critVal.concat(" gear=\"none\"");
+        }
 
-		return retVal;
-	}
+        if (!critVal.equals("")) {
+            // then add beginning and end
+            retVal = retVal.concat(critVal);
+            retVal = retVal.concat("/>\n");
+        } else {
+            return critVal;
+        }
 
-	/**
-	 * Contents copied from
-	 * megamek.common.EntityListFile.getTurretLockedString(...) Modified to
-	 * support saving to/from XML for our purposes in MekHQ
-	 *
-	 * @param e
-	 *            The tank to generate a turret-locked string for.
-	 * @return The generated string.
-	 */
-	private static String getTurretLockedString(Tank e, int indentLvl) {
-		String retval = MekHqXmlUtil.indentStr(indentLvl) + "<turretlock direction=\"";
-		retval = retval.concat(Integer.toString(e.getSecondaryFacing()));
-		retval = retval.concat("\"/>\n");
+        return retVal;
+    }
 
-		return retval;
-	}
+    /**
+     * Contents copied from
+     * megamek.common.EntityListFile.getTurretLockedString(...) Modified to
+     * support saving to/from XML for our purposes in MekHQ
+     *
+     * @param e
+     *            The tank to generate a turret-locked string for.
+     * @return The generated string.
+     */
+    private static String getTurretLockedString(Tank e, int indentLvl) {
+        String retval = MekHqXmlUtil.indentStr(indentLvl) + "<turretlock direction=\"";
+        retval = retval.concat(Integer.toString(e.getSecondaryFacing()));
+        retval = retval.concat("\"/>\n");
 
-	/**
-	 * Contents copied from megamek.common.EntityListFile.getMovementString(...)
-	 * Modified to support saving to/from XML for our purposes in MekHQ
-	 *
-	 * @param e
-	 *            The tank to generate a movement string for.
-	 * @return The generated string.
-	 */
-	private static String getMovementString(Tank e, int indentLvl) {
-		String retVal = MekHqXmlUtil.indentStr(indentLvl) + "<movement speed=\"";
-		boolean im = false;
+        return retval;
+    }
 
-		// This can throw an NPE for no obvious reason.
-		// Okay, fine.  If the tank doesn't even *have* an object related to this...
-		// Lets assume it's fully mobile, as any other fact hasn't been recorded.
-		try {
-			 im = e.isImmobile();
-		} catch (NullPointerException ex) {
-			// Ignore - just don't completely fail out.
-		}
+    /**
+     * Contents copied from megamek.common.EntityListFile.getMovementString(...)
+     * Modified to support saving to/from XML for our purposes in MekHQ
+     *
+     * @param e
+     *            The tank to generate a movement string for.
+     * @return The generated string.
+     */
+    private static String getMovementString(Tank e, int indentLvl) {
+        String retVal = MekHqXmlUtil.indentStr(indentLvl) + "<movement speed=\"";
+        boolean im = false;
 
-		if (im) {
-			retVal = retVal.concat("immobile");
-		} else {
-			retVal = retVal.concat(Integer.toString(e.getOriginalWalkMP()));
-		}
+        // This can throw an NPE for no obvious reason.
+        // Okay, fine.  If the tank doesn't even *have* an object related to this...
+        // Lets assume it's fully mobile, as any other fact hasn't been recorded.
+        try {
+             im = e.isImmobile();
+        } catch (NullPointerException ex) {
+            // Ignore - just don't completely fail out.
+        }
 
-		retVal = retVal.concat("\"/>\n");
+        if (im) {
+            retVal = retVal.concat("immobile");
+        } else {
+            retVal = retVal.concat(Integer.toString(e.getOriginalWalkMP()));
+        }
 
-		// save any motive hits
-		retVal = retVal.concat(MekHqXmlUtil.indentStr(indentLvl) + "<motive damage=\"");
-		retVal = retVal.concat(Integer.toString(e.getMotiveDamage()));
-		retVal = retVal.concat("\" penalty=\"");
-		retVal = retVal.concat(Integer.toString(e.getMotivePenalty()));
-		retVal = retVal.concat("\"/>\n");
+        retVal = retVal.concat("\"/>\n");
 
-		return retVal;
-	}
+        // save any motive hits
+        retVal = retVal.concat(MekHqXmlUtil.indentStr(indentLvl) + "<motive damage=\"");
+        retVal = retVal.concat(Integer.toString(e.getMotiveDamage()));
+        retVal = retVal.concat("\" penalty=\"");
+        retVal = retVal.concat(Integer.toString(e.getMotivePenalty()));
+        retVal = retVal.concat("\"/>\n");
 
-	/**
-	 * Contents copied from megamek.common.EntityListFile.getTankCritString(...)
-	 * Modified to support saving to/from XML for our purposes in MekHQ
-	 *
-	 * @param e
-	 *            The tank to generate a movement string for.
-	 * @return The generated string.
-	 */
-	 private static String getTankCritString(Tank e, int indentLvl) {
+        return retVal;
+    }
 
-	     String retVal = MekHqXmlUtil.indentStr(indentLvl) + "<tcriticals";
-	     String critVal = "";
+    /**
+     * Contents copied from megamek.common.EntityListFile.getTankCritString(...)
+     * Modified to support saving to/from XML for our purposes in MekHQ
+     *
+     * @param e
+     *            The tank to generate a movement string for.
+     * @return The generated string.
+     */
+     private static String getTankCritString(Tank e, int indentLvl) {
 
-	     // crits
-	     if (e.getSensorHits() > 0) {
-		 critVal = critVal.concat(" sensors=\"");
-		 critVal = critVal.concat(Integer.toString(e.getSensorHits()));
-		 critVal = critVal.concat("\"");
-	     }
-	     if (e.isEngineHit()) {
-		 critVal = critVal.concat(" engine=\"");
-		 critVal = critVal.concat("hit");
-		 critVal = critVal.concat("\"");
-	     }
+         String retVal = MekHqXmlUtil.indentStr(indentLvl) + "<tcriticals";
+         String critVal = "";
 
-	     /* crew are handled as a Person object in MekHq...
-	     if (e.isDriverHit()) {
-		 critVal = critVal.concat(" driver=\"");
-		 critVal = critVal.concat("hit");
-		 critVal = critVal.concat("\"");
-	     }
+         // crits
+         if (e.getSensorHits() > 0) {
+         critVal = critVal.concat(" sensors=\"");
+         critVal = critVal.concat(Integer.toString(e.getSensorHits()));
+         critVal = critVal.concat("\"");
+         }
+         if (e.isEngineHit()) {
+         critVal = critVal.concat(" engine=\"");
+         critVal = critVal.concat("hit");
+         critVal = critVal.concat("\"");
+         }
 
-	     if (e.isCommanderHit()) {
-		 critVal = critVal.concat(" commander=\"");
-		 critVal = critVal.concat("hit");
-		 critVal = critVal.concat("\"");
-	     }
-	     */
+         /* crew are handled as a Person object in MekHq...
+         if (e.isDriverHit()) {
+         critVal = critVal.concat(" driver=\"");
+         critVal = critVal.concat("hit");
+         critVal = critVal.concat("\"");
+         }
 
-	     if (!critVal.equals("")) {
-		 // then add beginning and end
-		 retVal = retVal.concat(critVal);
-		 retVal = retVal.concat("/>\n");
-	     } else {
-		 return critVal;
-	     }
+         if (e.isCommanderHit()) {
+         critVal = critVal.concat(" commander=\"");
+         critVal = critVal.concat("hit");
+         critVal = critVal.concat("\"");
+         }
+         */
 
-	     return retVal;
+         if (!critVal.equals("")) {
+         // then add beginning and end
+         retVal = retVal.concat(critVal);
+         retVal = retVal.concat("/>\n");
+         } else {
+         return critVal;
+         }
 
-	}
+         return retVal;
 
-	public static Entity getEntityFromXmlString(Node xml)
-			throws UnsupportedEncodingException, TransformerException {
-	    MekHQ.getLogger().log(MekHqXmlUtil.class, "getEntityFromXmlString(Node)", LogLevel.TRACE,
-	            "Executing getEntityFromXmlString(Node)..."); //$NON-NLS-1$
+    }
 
-		return getEntityFromXmlString(MekHqXmlUtil.xmlToString(xml));
-	}
+    public static Entity getEntityFromXmlString(Node xml)
+            throws UnsupportedEncodingException, TransformerException {
+        MekHQ.getLogger().log(MekHqXmlUtil.class, "getEntityFromXmlString(Node)", LogLevel.TRACE,
+                "Executing getEntityFromXmlString(Node)..."); //$NON-NLS-1$
 
-	public static Entity getEntityFromXmlString(String xml)
-			throws UnsupportedEncodingException {
+        return getEntityFromXmlString(MekHqXmlUtil.xmlToString(xml));
+    }
+
+    public static Entity getEntityFromXmlString(String xml)
+            throws UnsupportedEncodingException {
         MekHQ.getLogger().log(MekHqXmlUtil.class, "getEntityFromXmlString(String)", LogLevel.TRACE,
                 "Executing getEntityFromXmlString(Node)..."); //$NON-NLS-1$
 
-		Entity retVal = null;
+        Entity retVal = null;
 
-		MULParser prs = new MULParser(new ByteArrayInputStream(xml.getBytes("UTF-8")));
-		Vector<Entity> ents = prs.getEntities();
+        MULParser prs = new MULParser(new ByteArrayInputStream(xml.getBytes("UTF-8")));
+        Vector<Entity> ents = prs.getEntities();
 
-		if (ents.size() > 1)
-			throw new IllegalArgumentException(
-					"More than one entity contained in XML string!  Expecting a single entity.");
-		else if (ents.size() != 0)
-			retVal = ents.get(0);
+        if (ents.size() > 1) {
+            throw new IllegalArgumentException(
+                    "More than one entity contained in XML string!  Expecting a single entity.");
+        } else if (ents.size() != 0) {
+            retVal = ents.get(0);
+        }
 
         MekHQ.getLogger().log(MekHqXmlUtil.class, "getEntityFromXmlString(String)", LogLevel.TRACE,
                 "Returning "+retVal+" from getEntityFromXmlString(String)..."); //$NON-NLS-1$
 
-		return retVal;
-	}
+        return retVal;
+    }
 
     /** Escapes a string to store in an XML element.
       * @param string The string to be encoded
@@ -637,9 +644,9 @@ public class MekHqXmlUtil {
     }
 
     public static String getEntityNameFromXmlString(Node node) {
-    	NamedNodeMap attrs = node.getAttributes();
-		String chassis = attrs.getNamedItem("chassis").getTextContent();
-		String model = attrs.getNamedItem("model").getTextContent();
-		return chassis + " " + model;
+        NamedNodeMap attrs = node.getAttributes();
+        String chassis = attrs.getNamedItem("chassis").getTextContent();
+        String model = attrs.getNamedItem("model").getTextContent();
+        return chassis + " " + model;
     }
 }
