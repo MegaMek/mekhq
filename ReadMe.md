@@ -11,10 +11,9 @@ the website: http://megamek.org/mekhq
 
 ### Compiling
 
-1) Install [Java Ant](https://ant.apache.org/)
+1) Install [Gradle](https://gradle.org/).
 
-2) Run `ant jar` in the `MekHQ` folder.  This will use the `MekHQ/build.xml`
-file and create `MekHQ/MekHQ.jar`.
+2) Follow the [instructions on the wiki](https://github.com/MegaMek/megamek/wiki/Working-With-Gradle) for using Gradle.
 
 
 ### Support
