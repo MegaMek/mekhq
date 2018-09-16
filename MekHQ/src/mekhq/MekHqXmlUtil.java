@@ -23,11 +23,13 @@ import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.apache.commons.text.StringEscapeUtils;
-
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXNotRecognizedException;
+import org.xml.sax.SAXNotSupportedException;
+import org.xml.sax.XMLReader;
 
 import megamek.common.Aero;
 import megamek.common.BombType;
@@ -41,9 +43,9 @@ import megamek.common.Jumpship;
 import megamek.common.MULParser;
 import megamek.common.Tank;
 import megamek.common.logging.LogLevel;
-import megamek.common.util.StringUtil;
 
 public class MekHqXmlUtil {
+
 	private static DocumentBuilderFactory DOCUMENT_BUILDER_FACTORY;
 	private static DocumentBuilderFactory UNSAFE_DOCUMENT_BUILDER_FACTORY;
 	private static SAXParserFactory SAX_PARSER_FACTORY;
@@ -132,36 +134,44 @@ public class MekHqXmlUtil {
 	}
 
     /**
-     * Creates a JAXB compatible Source safe from XML external entities
-     * attacks, and XML entity expansion attacks.
-     * @return A Source safe to use to read untrusted XML from a JAXB unmarshaller.
+     * @return a SAX {@linkplain XMLReader} that is safe from external entities and entity expansion attacks.
+     * 
+     * @see "https://www.owasp.org/index.php/XML_External_Entity_(XXE)_Prevention_Cheat_Sheet#JAXB_Unmarshaller"
      */
-	public static Source createSafeXmlSource(InputStream inputStream) throws SAXException, ParserConfigurationException {
-		SAXParserFactory spf = SAX_PARSER_FACTORY;
-		if (null == spf) {
-			// At worst we may do this twice if multiple threads
-			// hit this method. It is Ok to have more than one
-			// instance of the parser factory, as long as it is
-			// XXE safe.
-			spf = SAXParserFactory.newInstance();
+    @SuppressWarnings("nls")
+    public static XMLReader createSafeXMLReader() {
+        if (SAX_PARSER_FACTORY == null) {
+            SAXParserFactory spf = SAXParserFactory.newInstance();
+            try {
+                spf.setFeature("http://xml.org/sax/features/external-general-entities", false);
+                spf.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+                spf.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+            } catch (SAXNotRecognizedException | SAXNotSupportedException e) {
+                throw new AssertionError("SAX implementation does not recognize or support the features we want to disable", e);
+            } catch (ParserConfigurationException e) {
+                throw new AssertionError(e); // Only if we messed up the CFG above
+            }
+            SAX_PARSER_FACTORY = spf;
+        }
+        try {
+            return SAX_PARSER_FACTORY.newSAXParser().getXMLReader();
+        } catch (ParserConfigurationException e) {
+            throw new AssertionError(e); // Only if we messed up the CFG above
+        } catch (SAXException e) {
+            throw new AssertionError(e); // Whatever - just blow up. :-)
+                                         // As of 2018-11, Xerces does not throw generic SAXExceptions.
+                                         // Yes, SAX was designed when checked exception were all the rage.
+        }
+    }
 
-			//
-			// Adapted from: https://www.owasp.org/index.php/XML_External_Entity_(XXE)_Prevention_Cheat_Sheet#JAXB_Unmarshaller
-			//
-			// "Since a javax.xml.bind.Unmarshaller parses XML and does not
-			// support any flags for disabling XXE, it’s imperative to parse 
-			// the untrusted XML through a configurable secure parser first, 
-			// generate a source object as a result, and pass the source
-			// object to the Unmarshaller."
-			//
-			spf.setFeature("http://xml.org/sax/features/external-general-entities", false);
-			spf.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
-			spf.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
-
-			SAX_PARSER_FACTORY = spf;
-		}
-
-		return new SAXSource(spf.newSAXParser().getXMLReader(), new InputSource(inputStream));
+    /**
+     * @return a {@linkplain Source} for the provided input stream that is safe
+     * from external entities and entity expansion attacks.
+     * 
+     * @see "https://www.owasp.org/index.php/XML_External_Entity_(XXE)_Prevention_Cheat_Sheet#JAXB_Unmarshaller"
+     */
+	public static Source createSafeXmlSource(InputStream inputStream) {
+		return new SAXSource(createSafeXMLReader(), new InputSource(inputStream));
 	}
 
 	public static void writeSimpleXmlTag(PrintWriter pw1, int indent, String name, String val) {

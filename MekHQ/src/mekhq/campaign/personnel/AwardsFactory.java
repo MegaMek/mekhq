@@ -19,21 +19,28 @@
 
 package mekhq.campaign.personnel;
 
-import mekhq.MekHQ;
-import mekhq.MekHqXmlUtil;
-import mekhq.campaign.AwardSet;
-import mekhq.campaign.LogEntry;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.*;
-import java.text.SimpleDateFormat;
-import java.util.*;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import mekhq.MekHQ;
+import mekhq.MekHqXmlUtil;
+import mekhq.campaign.AwardSet;
+import mekhq.campaign.LogEntry;
 
 /**
  * This class is responsible to control the awards. It loads one instance of each awards, then it creates a copy of it
@@ -50,8 +57,6 @@ public class AwardsFactory {
      * Here is where the blueprints are stored, mapped by set and name.
      */
     private Map<String, Map<String,Award>> awardsMap;
-
-    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 
     private AwardsFactory(){
         awardsMap = new HashMap<>();
@@ -104,6 +109,7 @@ public class AwardsFactory {
      */
     public Award generateNewFromXML(Node node){
         final String METHOD_NAME = "generateNewFromXML(Node)"; //$NON-NLS-1$
+        final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 
         String name = null;
         String set = null;
@@ -164,8 +170,6 @@ public class AwardsFactory {
                 }
 
                 awardsMap.put(currentSetName, tempAwardMap);
-            } catch (SAXException | ParserConfigurationException e) {
-                MekHQ.getLogger().error(AwardsFactory.class, "loadAwards", e);
             } catch (FileNotFoundException e) {
                 MekHQ.getLogger().error(AwardsFactory.class, "loadAwards", "Cannot find XML awards file: " + file.getName(), e);
             } catch (JAXBException e) {

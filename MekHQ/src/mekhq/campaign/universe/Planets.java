@@ -51,12 +51,10 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.joda.time.DateTime;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Node;
-import org.xml.sax.SAXException;
 
 import megamek.common.EquipmentType;
 import megamek.common.logging.LogLevel;
@@ -65,7 +63,6 @@ import mekhq.FileParser;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
-import mekhq.campaign.mission.Mission;
 import mekhq.campaign.universe.Planet.PlanetaryEvent;
 
 public class Planets {
@@ -425,8 +422,6 @@ public class Planets {
                     planetList.remove(planetId);
                 }
             }
-        } catch (SAXException | ParserConfigurationException e) {
-            MekHQ.getLogger().error(getClass(), METHOD_NAME, e);
         } catch (JAXBException e) {
             MekHQ.getLogger().error(getClass(), METHOD_NAME, e);
         } catch(IOException e) {
