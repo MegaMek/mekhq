@@ -231,7 +231,6 @@ public class UnitMarketDialog extends JDialog {
         scrollTableUnits.setName("srcTablePersonnel"); // NOI18N
         scrollTableUnits.setPreferredSize(new java.awt.Dimension(500, 400));
 
-        gbc = new GridBagConstraints();
         tableUnits.setModel(marketModel);
         tableUnits.setName("tableUnits"); // NOI18N
         tableUnits.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);

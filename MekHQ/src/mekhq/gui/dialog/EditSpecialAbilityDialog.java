@@ -310,7 +310,7 @@ public class EditSpecialAbilityDialog extends JDialog {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
             	EditSkillPrereqDialog nspd = new EditSkillPrereqDialog(null, new SkillPrereq());
             	nspd.setVisible(true);
-            	if(!nspd.wasCancelled() & !nspd.getPrereq().isEmpty()) {
+            	if(!nspd.wasCancelled() && !nspd.getPrereq().isEmpty()) {
                 	prereqSkills.add(nspd.getPrereq());
                 	refreshGUI();
                 }
@@ -467,7 +467,7 @@ public class EditSpecialAbilityDialog extends JDialog {
     private void editSkillPrereq(int i) {
     	EditSkillPrereqDialog nspd = new EditSkillPrereqDialog(null, prereqSkills.get(i));
     	nspd.setVisible(true);
-    	if(!nspd.wasCancelled() & !nspd.getPrereq().isEmpty()) {
+    	if(!nspd.wasCancelled() && !nspd.getPrereq().isEmpty()) {
         	prereqSkills.set(i, nspd.getPrereq());
         	refreshGUI();
         }

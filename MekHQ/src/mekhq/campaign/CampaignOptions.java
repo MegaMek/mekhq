@@ -542,7 +542,6 @@ public class CampaignOptions {
         instantUnitMarketDelivery = false;
         useWeatherConditions = true;
     	useLightConditions = true;
-    	usePlanetaryConditions = true;
     	usePlanetaryConditions = false;
     	useLeadership = true;
     	useStrategy = true;

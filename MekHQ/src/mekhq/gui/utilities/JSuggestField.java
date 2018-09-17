@@ -232,7 +232,7 @@ public class JSuggestField extends JTextField {
 					list.ensureIndexIsVisible(list.getSelectedIndex() - 1);
 					return;
 				} else if (e.getKeyCode() == KeyEvent.VK_ENTER
-						& list.getSelectedIndex() != -1 & suggestions.size() > 0) {
+						&& list.getSelectedIndex() != -1 && suggestions.size() > 0) {
 					setText((String) list.getSelectedValue());
 					lastChosenExistingVariable = list.getSelectedValue().toString();
 					fireActionEvent();

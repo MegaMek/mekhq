@@ -2714,7 +2714,7 @@ public class Person implements MekHqXmlSerializable {
                 if(!spa.isEligible(this)) {
                     continue;
                 }
-                if(generation & spa.getWeight() <= 0) {
+                if(generation && spa.getWeight() <= 0) {
                     continue;
                 }
                 eligible.add(spa);
