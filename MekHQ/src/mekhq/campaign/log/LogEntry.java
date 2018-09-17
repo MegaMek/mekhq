@@ -92,41 +92,6 @@ public class LogEntry implements Cloneable, MekHqXmlSerializable {
         pw.println(sb.toString());
     }
 
-    public static LogEntry generateInstanceFromXML(Node wn) {
-        final String METHOD_NAME = "generateInstanceFromXML(Node)"; //$NON-NLS-1$
-
-        Date   date = null;
-        String desc = null;
-        LogEntryType type = null;
-
-        try {
-            NodeList nl = wn.getChildNodes();
-            for (int x = 0; x < nl.getLength(); x++) {
-                Node   node = nl.item(x);
-                String nname = node.getNodeName();
-                if (nname.equals("desc")) { //$NON-NLS-1$
-                    desc = MekHqXmlUtil.unEscape(node.getTextContent());
-                } else if (nname.equals("type")) { //$NON-NLS-1$
-                    String typeString = MekHqXmlUtil.unEscape(node.getTextContent());
-                    type = LogEntryType.valueOf(ensureBackwardCompatibility(typeString));
-                } else if (nname.equals("date")) { //$NON-NLS-1$
-                    date = dateFormat().parse(node.getTextContent().trim());
-                }
-            }
-        } catch (Exception ex) {
-            MekHQ.getLogger().error(LogEntry.class, METHOD_NAME, ex);
-            return null;
-        }
-
-        String newDescription = LogEntryController.getInstance().updateOldDescription(desc);
-        if(!newDescription.isEmpty())
-            desc = newDescription;
-
-        if(type == null) type = LogEntryController.getInstance().determineTypeFromLogDescription(desc);
-
-        return new LogEntry(date, desc, type);
-    }
-
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -155,11 +120,5 @@ public class LogEntry implements Cloneable, MekHqXmlSerializable {
         return Objects.equals(date, other.date)
             && desc.equals(other.desc)
             && Objects.equals(type, other.type);
-    }
-
-    private static String ensureBackwardCompatibility(String logType){
-        if(logType.equalsIgnoreCase("med")) return LogEntryType.MEDICAL.toString();
-
-        return logType;
     }
 }

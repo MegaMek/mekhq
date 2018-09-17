@@ -41,9 +41,10 @@ public class LogEntryTest {
     @Test
     public void testXmlMarshalling() throws Exception {
         checkMarshalling(new PersonalLogEntry(null, null));
-        checkMarshalling(new MedicalLogEntry(new Date(0l), ""));  //$NON-NLS-1$//$NON-NLS-2$
-        checkMarshalling(new PersonalLogEntry(new Date(0l), "<desc>Some description</desc>")); //$NON-NLS-1$ //$NON-NLS-2$
-        checkMarshalling(new ServiceLogEntry(new Date(0l), "Some <em>xml-fragment</em> description")); //$NON-NLS-1$ //$NON-NLS-2$
+        checkMarshalling(new AwardLogEntry(new Date(0l), ""));  //$NON-NLS-1$//$NON-NLS-2$
+        checkMarshalling(new CustomLogEntry(new Date(0l), "Description"));  //$NON-NLS-1$//$NON-NLS-2$
+        checkMarshalling(new ServiceLogEntry(new Date(0l), "<desc>Some description</desc>")); //$NON-NLS-1$ //$NON-NLS-2$
+        checkMarshalling(new MedicalLogEntry(new Date(0l), "Some <em>xml-fragment</em> description")); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     private static void checkMarshalling(LogEntry le) throws Exception {
@@ -58,7 +59,7 @@ public class LogEntryTest {
                                           .parse(new InputSource(new ByteArrayInputStream(baos.toByteArray())))
                                           .getDocumentElement();
         
-        Assert.assertEquals(le, LogEntry.generateInstanceFromXML(node));
+        Assert.assertEquals(le, LogEntryFactory.getInstance().generateInstanceFromXML(node));
     }
 
 }

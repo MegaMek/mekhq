@@ -1715,7 +1715,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                                     "Unknown node type not loaded in personnel log nodes: " + wn3.getNodeName()); //$NON-NLS-1$
                             continue;
                         }
-                        retVal.addLogEntry(LogEntry.generateInstanceFromXML(wn3));
+                        retVal.addLogEntry(LogEntryFactory.getInstance().generateInstanceFromXML(wn3));
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("awards")){
                     NodeList nl2 = wn2.getChildNodes();
