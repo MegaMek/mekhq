@@ -22,7 +22,6 @@
 package mekhq.campaign;
 
 import java.io.PrintWriter;
-import java.io.Serializable;
 import java.util.Date;
 import java.util.Locale;
 
@@ -49,12 +48,7 @@ import mekhq.campaign.universe.Planets;
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class CurrentLocation implements Serializable {
-
-    /**
-     *
-     */
-    private static final long serialVersionUID = -4337642922571022697L;
+public class CurrentLocation {
 
     private Planet currentPlanet;
     //keep track of jump path

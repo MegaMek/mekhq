@@ -19,7 +19,6 @@
 
 package mekhq.campaign.parts;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -47,10 +46,8 @@ import mekhq.campaign.work.IPartWork;
  * @author Neoancient
  *
  */
-public class PodSpace implements Serializable, IPartWork {
+public class PodSpace implements IPartWork {
 
-    private static final long serialVersionUID = -9022671736030862210L;
-    
     protected Campaign campaign;
     protected Unit unit;
     protected int location;

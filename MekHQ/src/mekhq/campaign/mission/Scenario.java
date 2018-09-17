@@ -22,7 +22,6 @@
 package mekhq.campaign.mission;
 
 import java.io.PrintWriter;
-import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -51,9 +50,8 @@ import mekhq.campaign.unit.Unit;
  * 
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class Scenario implements Serializable {
-    private static final long serialVersionUID = -2193761569359938090L;
-    
+public class Scenario {
+
     public static final int S_CURRENT  = 0;
     public static final int S_VICTORY  = 1;
     public static final int S_MVICTORY = 2;

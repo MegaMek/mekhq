@@ -22,7 +22,6 @@
 package mekhq.campaign.market;
 
 import java.io.PrintWriter;
-import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -61,12 +60,7 @@ import mekhq.campaign.universe.RandomFactionGenerator;
  * @author Neoancient
  *
  */
-public class ContractMarket implements Serializable {
-
-	/**
-	 *
-	 */
-	private static final long serialVersionUID = 1303462872220110093L;
+public class ContractMarket {
 
 	public static int TYPE_ATBMONTHLY = 0;
 	//TODO: Implement a method that rolls each day to see whether a new contract appears or an offer disappears

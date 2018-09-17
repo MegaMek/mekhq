@@ -1,8 +1,10 @@
 package mekhq.campaign.personnel;
 
 import java.io.PrintWriter;
-import java.io.Serializable;
 import java.util.UUID;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
@@ -10,14 +12,8 @@ import mekhq.MekHqXmlUtil;
 import mekhq.Version;
 import mekhq.campaign.Campaign;
 
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+public class Ancestors implements MekHqXmlSerializable {
 
-public class Ancestors implements Serializable, MekHqXmlSerializable {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -6350146649504329173L;
 	// UUID
 	private UUID id;
 	private UUID fatherID;

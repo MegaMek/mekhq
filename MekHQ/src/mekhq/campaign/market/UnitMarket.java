@@ -22,7 +22,6 @@
 package mekhq.campaign.market;
 
 import java.io.PrintWriter;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Set;
@@ -52,14 +51,8 @@ import mekhq.campaign.universe.RandomFactionGenerator;
  * Generates units available for sale.
  * 
  * @author Neoancient
- *
  */
-public class UnitMarket implements Serializable {
-	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -2085002038852079114L;
+public class UnitMarket {
 
 	public class MarketOffer {
 		public int market;

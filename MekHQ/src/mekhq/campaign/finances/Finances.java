@@ -23,7 +23,6 @@ package mekhq.campaign.finances;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.Serializable;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.DecimalFormat;
@@ -35,12 +34,11 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.ResourceBundle;
 
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVPrinter;
 
 import megamek.common.logging.LogLevel;
 import megamek.common.util.EncodeControl;
@@ -59,12 +57,7 @@ import mekhq.campaign.mission.Contract;
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class Finances implements Serializable {
-
-    /**
-     *
-     */
-    private static final long serialVersionUID = 8533117455496219692L;
+public class Finances {
 
     private ResourceBundle resourceMap;
 
