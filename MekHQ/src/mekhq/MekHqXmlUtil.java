@@ -1,13 +1,11 @@
 package mekhq;
 
-import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Vector;
+import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -23,6 +21,7 @@ import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.apache.commons.text.StringEscapeUtils;
+import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
@@ -597,35 +596,47 @@ public class MekHqXmlUtil {
 
     }
 
-    public static Entity getEntityFromXmlString(Node xml)
-            throws UnsupportedEncodingException, TransformerException {
-        MekHQ.getLogger().log(MekHqXmlUtil.class, "getEntityFromXmlString(Node)", LogLevel.TRACE,
-                "Executing getEntityFromXmlString(Node)..."); //$NON-NLS-1$
-
-        return getEntityFromXmlString(MekHqXmlUtil.xmlToString(xml));
+    /** @deprecated use {@link #parseSingleEntityMul(Element)} instead */
+    @Deprecated
+    public static Entity getEntityFromXmlString(Node xml) {
+        return parseSingleEntityMul((Element) xml);
     }
 
-    public static Entity getEntityFromXmlString(String xml)
-            throws UnsupportedEncodingException {
-        MekHQ.getLogger().log(MekHqXmlUtil.class, "getEntityFromXmlString(String)", LogLevel.TRACE,
-                "Executing getEntityFromXmlString(Node)..."); //$NON-NLS-1$
+    /**
+     * Parses the given node as if it was a .mul file and returns the first
+     * entity it contains.
+     * <p>
+     * In theme with {@link MULParser}, this method fails silently and returns
+     * {@code null} if the input can't be parsed; if it can be parsed and
+     * contains more than one entity, an {@linkplain IllegalArgumentException}
+     * is thrown.
+     * 
+     * @param element
+     *        the xml tag to parse
+     * 
+     * @return the first entity parsed from the given element, or {@code null}
+     *         if anything is wrong with the input
+     *
+     * @throws IllegalArgumentException
+     *         if the given element parses to multiple entities
+     */
+    public static Entity parseSingleEntityMul(Element element) {
+        MekHQ.getLogger().log(MekHqXmlUtil.class, "getEntityFromXmlString(Element)", LogLevel.TRACE, "Executing getEntityFromXmlString(Node)..."); //$NON-NLS-2$
 
-        Entity retVal = null;
+        MULParser prs = new MULParser();
+        prs.parse(element);
+        List<Entity> entities = prs.getEntities();
 
-        MULParser prs = new MULParser(new ByteArrayInputStream(xml.getBytes("UTF-8")));
-        Vector<Entity> ents = prs.getEntities();
-
-        if (ents.size() > 1) {
-            throw new IllegalArgumentException(
-                    "More than one entity contained in XML string!  Expecting a single entity.");
-        } else if (ents.size() != 0) {
-            retVal = ents.get(0);
+        switch (entities.size()) {
+            case 0:
+                return null;
+            case 1:
+                Entity entity = entities.get(0);
+                MekHQ.getLogger().log(MekHqXmlUtil.class, "getEntityFromXmlString(Element)", LogLevel.TRACE, "Returning " + entity + " from getEntityFromXmlString(String)..."); //$NON-NLS-1$
+                return entity;
+            default:
+                throw new IllegalArgumentException("More than one entity contained in XML string!  Expecting a single entity.");
         }
-
-        MekHQ.getLogger().log(MekHqXmlUtil.class, "getEntityFromXmlString(String)", LogLevel.TRACE,
-                "Returning "+retVal+" from getEntityFromXmlString(String)..."); //$NON-NLS-1$
-
-        return retVal;
     }
 
     /** Escapes a string to store in an XML element.
