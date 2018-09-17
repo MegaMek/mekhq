@@ -1179,14 +1179,14 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 partsValue += js.getArmorWeight(js.locations()) * EquipmentType.getArmorCost(js.getArmorType(0));
 
                 // heat sinks
-                long sinkCost = 2000 + 4000l * js.getHeatType();// == HEAT_DOUBLE ? 6000:
+                long sinkCost = 2000L + 4000L * js.getHeatType();// == HEAT_DOUBLE ? 6000:
                                                            // 2000;
                 partsValue += sinkCost * js.getHeatSinks();
 
                 // grav deck
-                partsValue += 5000000l  * js.getGravDeck();
-                partsValue += 10000000l * js.getGravDeckLarge();
-                partsValue += 40000000l * js.getGravDeckHuge();
+                partsValue += 5000000L  * js.getGravDeck();
+                partsValue += 10000000L * js.getGravDeckLarge();
+                partsValue += 40000000L * js.getGravDeckHuge();
 
                 // get bays
                 int baydoors = 0;
