@@ -2,6 +2,7 @@ plugins {
     id 'application'
     id 'maven-publish'
     id 'edu.sc.seis.launch4j' version '2.4.4'
+    id 'findbugs'
 }
 
 sourceSets {
@@ -104,6 +105,20 @@ task mmlJar (type: Jar) {
     inputs.dir "${mmlDir}/build/classes/java/main"
     inputs.dir "${mmlDir}/build/resources/main"
     outputs.file "${buildDir}/libs/${archiveName}"
+}
+
+findbugs {
+	ignoreFailures = true
+	effort = "default" // as of 2018-11, "max" causes StackOverflowError - try "max" again when findbugs is updated or after we address some reported issues
+	showProgress = true
+	reportLevel = "high" // set to "medium" and then "low" as we address issues
+}
+
+tasks.withType(FindBugs) {
+    reports {
+        xml.enabled false
+        html.enabled true
+    }
 }
 
 task stageFiles(type: Copy) {
