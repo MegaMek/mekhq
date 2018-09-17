@@ -202,12 +202,14 @@ public final class StarUtil {
 
     private static final double[] RECHARGE_HOURS_CLASS_T = {
             7973.0, 13371.0, 21315.0, 35876.0, 70424.0, 134352.0, 215620.0, 32188.0, 569703.0, 892922.0, 10000000.0};
-    
-    private static final Set<String> VALID_WHITE_DWARF_SUBCLASSES = new TreeSet<String>();
+
+    private static final Set<String> VALID_WHITE_DWARF_SUBCLASSES = new TreeSet<>();
     static {
-        VALID_WHITE_DWARF_SUBCLASSES.addAll(Arrays.asList("", //$NON-NLS-1$
-            "A,B,O,Q,Z,AB,AO,AQ,AZ,BO,BQ,BZ,QZ,ABO,ABQ,ABZ,AOQ,AOZ,AQZ,BOQ," //$NON-NLS-1$
-            + "BOZ,BQZ,OQZ,ABOQ,ABOZ,ABQZ,AOQZ,BOQZ,ABOQZ,C,X".split(","))); //$NON-NLS-1$ //$NON-NLS-2$
+        VALID_WHITE_DWARF_SUBCLASSES.add(""); //$NON-NLS-1$
+        String csvSubclasses = "A,B,O,Q,Z,AB,AO,AQ,AZ,BO,BQ,BZ,QZ,ABO,ABQ,ABZ," //$NON-NLS-1$
+                             + "AOQ,AOZ,AQZ,BOQ,BOZ,BQZ,OQZ,ABOQ,ABOZ,ABQZ," //$NON-NLS-1$
+                             + "AOQZ,BOQZ,ABOQZ,C,X"; //$NON-NLS-1$
+        VALID_WHITE_DWARF_SUBCLASSES.addAll(Arrays.asList(csvSubclasses.split(","))); //$NON-NLS-1$
     }
 
     private static final String ICON_DATA_FILE = "images/universe/planet_icons.txt";
@@ -446,7 +448,7 @@ public final class StarUtil {
             // main class
             return String.format(Locale.ROOT, "%s" + subtypeFormat + "%s", //$NON-NLS-1$ //$NON-NLS-2$
                     getSpectralClassName(spectralClass),
-                    subtypeValue / 100.0, (null != luminosity ? luminosity : Planet.LUM_V));
+                    subtypeValue / 100.0, luminosity);
         }
     }
 

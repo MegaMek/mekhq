@@ -124,7 +124,7 @@ public class PersonnelMarket {
 		}
 	}
 
-    /*
+    /**
      * Remove personnel from market on a new day
      * The better they are, the faster they disappear
      */
@@ -133,9 +133,7 @@ public class PersonnelMarket {
             List<Person> toRemove = method.removePersonnelForDay(c, personnel);
             if (null != toRemove) {
                 for (Person p : toRemove) {
-                	if (attachedEntities.contains(p.getId())) {
-                		attachedEntities.remove(p.getId());
-                	}
+                    attachedEntities.remove(p.getId());
                 }
                 personnel.removeAll(toRemove);
             }

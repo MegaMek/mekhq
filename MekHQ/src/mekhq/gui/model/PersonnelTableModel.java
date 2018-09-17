@@ -671,16 +671,15 @@ import mekhq.gui.BasicInfo;
                     setPortrait(p);
                     setText(p.getFullDesc(false), color);
                 }
-                if(actualCol == COL_ASSIGN) {
-                	if (loadAssignmentFromMarket) {
-                		Entity en = personnelMarket.getAttachedEntity(p);
-                		
-                		if (null == en) {
-                			setText("-", color);
-                		}
-                		
-                		setText(en.getDisplayName(), color);
-                	} else {
+                if (actualCol == COL_ASSIGN) {
+                    if (loadAssignmentFromMarket) {
+                        Entity en = personnelMarket.getAttachedEntity(p);
+                        if (null == en) {
+                            setText("-", color);
+                        } else {
+                            setText(en.getDisplayName(), color);
+                        }
+                    } else {
 	                    Unit u = getCampaign().getUnit(p.getUnitId());
 	                    if(!p.getTechUnitIDs().isEmpty()) {
 	                        u = getCampaign().getUnit(p.getTechUnitIDs().get(0));

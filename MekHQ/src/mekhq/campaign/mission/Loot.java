@@ -36,6 +36,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.parts.Part;
 
+import org.apache.commons.text.StringEscapeUtils;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -161,10 +162,9 @@ public class Loot implements MekHqXmlSerializable {
                 +"</cash>");
         for(Entity e : units) {
             String lookupName = e.getChassis() + " " + e.getModel();
-            lookupName.replaceAll("\\s+$", "");
             pw1.println(MekHqXmlUtil.indentStr(indent+1)
                     +"<entityName>"
-                    +lookupName
+                    +StringEscapeUtils.escapeXml10(lookupName)
                     +"</entityName>");
         }
         for(Part p : parts) {

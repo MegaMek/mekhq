@@ -2910,7 +2910,7 @@ public class Person implements MekHqXmlSerializable {
      *         role
      */
     public boolean isCombat() {
-        return isCombatRole(primaryRole) || isCombatRole(primaryRole);
+        return isCombatRole(primaryRole) || isCombatRole(secondaryRole);
     }
 
     /**

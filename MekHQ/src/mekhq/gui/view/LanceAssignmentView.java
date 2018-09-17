@@ -314,7 +314,10 @@ class RequiredLancesTableModel extends DataTableModel {
 	public static final int COL_TRAINING = 5;
 	public static final int COL_NUM = 6;
 
-    protected String[] columnNames = {"Contract", "Total", "Fight", "Defend", "Scout", "Training"};
+    public RequiredLancesTableModel() {
+        columnNames = new String[] { "Contract", "Total", "Fight", "Defend", "Scout", "Training" };
+    }
+
     
     private Campaign campaign;
     
@@ -323,16 +326,6 @@ class RequiredLancesTableModel extends DataTableModel {
     	data = new ArrayList<AtBContract>();
     }
 
-    @Override
-    public int getColumnCount() {
-        return COL_NUM;
-    }
-
-    @Override
-    public String getColumnName(int column) {
-    	return columnNames[column];
-    }
-	
     public int getColumnWidth(int col) {
         if (col == COL_CONTRACT) {
         	return 100;
@@ -420,7 +413,10 @@ class LanceAssignmentTableModel extends DataTableModel {
 	public static final int COL_ROLE = 3;
 	public static final int COL_NUM = 4;
 
-    protected String[] columnNames = {"Force", "Wt", "Mission", "Role"};
+    public LanceAssignmentTableModel() {
+        columnNames = new String[] { "Force", "Wt", "Mission", "Role" };
+    }
+
     private Campaign campaign;
     
     public LanceAssignmentTableModel(Campaign campaign) {
@@ -428,16 +424,6 @@ class LanceAssignmentTableModel extends DataTableModel {
     	data = new ArrayList<Lance>();
     }
 
-    @Override
-    public int getColumnCount() {
-        return COL_NUM;
-    }
-
-    @Override
-    public String getColumnName(int column) {
-    	return columnNames[column];
-    }
-	
     public int getColumnWidth(int col) {
     	switch (col) {
     	case COL_FORCE:

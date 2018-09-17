@@ -59,11 +59,7 @@ public class PodSpace implements IPartWork {
     protected int shorthandedMod = 0;
     
     protected boolean repairInPlace = false;
-    
-    public PodSpace() {
-        this(Entity.LOC_NONE, null);
-    }
-    
+
     public PodSpace(int location, Unit unit) {
         this.location = location;
         this.unit = unit;
