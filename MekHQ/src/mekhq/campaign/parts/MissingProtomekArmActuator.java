@@ -128,7 +128,7 @@ public class MissingProtomekArmActuator extends MissingPart {
     public void fix() {
         Part replacement = findReplacement(false);
         if(null != replacement) {
-            Part actualReplacement = replacement.clone();
+            Part actualReplacement = replacement.copy();
             unit.addPart(actualReplacement);
             campaign.addPart(actualReplacement, 0);
             replacement.decrementQuantity();

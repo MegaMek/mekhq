@@ -231,8 +231,8 @@ public class OmniPod extends Part {
     
     @Override
     public void fix() {
-        Part newPart = partType.clone();
-        Part oldPart = campaign.checkForExistingSparePart(newPart.clone());
+        Part newPart = partType.copy();
+        Part oldPart = campaign.checkForExistingSparePart(newPart.copy());
         if(null != oldPart) {
             newPart.setOmniPodded(true);
             campaign.addPart(newPart, 0);
@@ -320,7 +320,7 @@ public class OmniPod extends Part {
     }
 
     @Override
-    public Part clone() {
+    public Part copy() {
         Part p = new OmniPod(partType, campaign);
         p.copyBaseData(this);
         return p;

@@ -90,15 +90,15 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
         }
     }
 
-    public AmmoBin clone() {
-        AmmoBin clone = new AmmoBin(getUnitTonnage(), getType(), getEquipmentNum(), shotsNeeded, oneShot,
-                omniPodded, campaign);
+    @Override
+    public AmmoBin copy() {
+        AmmoBin clone = new AmmoBin(getUnitTonnage(), getType(), getEquipmentNum(), shotsNeeded, oneShot, omniPodded, campaign);
         clone.copyBaseData(this);
         clone.shotsNeeded = this.shotsNeeded;
         clone.munition = this.munition;
         return clone;
     }
-    
+
     /* Per TM, ammo for fighters is stored in the fuselage. This makes a difference for omnifighter
      * pod space, so we're going to stick them in LOC_NONE where the heat sinks are */ 
     @Override

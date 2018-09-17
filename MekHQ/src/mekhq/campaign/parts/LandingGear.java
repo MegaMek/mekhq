@@ -54,13 +54,14 @@ public class LandingGear extends Part {
         super(tonnage, c);
         this.name = "Landing Gear";
     }
-        
-    public LandingGear clone() {
-    	LandingGear clone = new LandingGear(0, campaign);
+
+    @Override
+    public LandingGear copy() {
+        LandingGear clone = new LandingGear(0, campaign);
         clone.copyBaseData(this);
-    	return clone;
+        return clone;
     }
-    
+
 	@Override
 	public void updateConditionFromEntity(boolean checkForDestruction) {
 		int priorHits = hits;

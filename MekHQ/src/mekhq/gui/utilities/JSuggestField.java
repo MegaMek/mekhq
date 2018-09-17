@@ -276,15 +276,14 @@ public class JSuggestField extends JTextField {
 		return true;
 	}
 
-	/**
-	 * Get all words that are available for suggestion.
-	 *
-	 * @return Vector containing Strings
-	 */
-	@SuppressWarnings("unchecked")
-	public Vector<String> getSuggestData() {
-		return (Vector<String>) data.clone();
-	}
+    /**
+     * Get all words that are available for suggestion.
+     *
+     * @return Vector containing Strings
+     */
+    public Vector<String> getSuggestData() {
+        return new Vector<>(data);
+    }
 
 	/**
 	 * Set preferred size for the drop-down that will appear.

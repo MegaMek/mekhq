@@ -61,13 +61,14 @@ public class Thrusters extends Part {
         isLeftThrusters = left;
         this.name = "Thrusters";
     }
-    
-    public Thrusters clone() {
-    	Thrusters clone = new Thrusters(0, campaign, isLeftThrusters);
+
+    @Override
+    public Thrusters copy() {
+        Thrusters clone = new Thrusters(0, campaign, isLeftThrusters);
         clone.copyBaseData(this);
-    	return clone;
+        return clone;
     }
-        
+
 	@Override
 	public void updateConditionFromEntity(boolean checkForDestruction) {
 		if(null != unit && unit.getEntity() instanceof Aero) {

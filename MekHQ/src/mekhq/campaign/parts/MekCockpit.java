@@ -55,13 +55,14 @@ public class MekCockpit extends Part {
         this.name = Mech.getCockpitDisplayString(type);
         this.isClan = isClan;
     }
-	
-	public MekCockpit clone() {
-		MekCockpit clone = new MekCockpit(getUnitTonnage(), type, isClan, campaign);
+
+    @Override
+    public MekCockpit copy() {
+        MekCockpit clone = new MekCockpit(getUnitTonnage(), type, isClan, campaign);
         clone.copyBaseData(this);
-		return clone;
-	}
-	
+        return clone;
+    }
+
 	@Override
 	public double getTonnage() {
 		switch (type) {

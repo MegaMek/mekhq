@@ -58,9 +58,8 @@ public class Loot implements MekHqXmlSerializable {
         units = new ArrayList<Entity>();
         parts = new ArrayList<Part>();
     }
-    
-    @Override
-    public Object clone() {
+
+    public Loot copy() {
         Loot newLoot = new Loot();
         newLoot.name = name;
         newLoot.cash = cash;
@@ -68,7 +67,7 @@ public class Loot implements MekHqXmlSerializable {
         newLoot.parts = parts;
         return newLoot;
     }
-    
+
     public String getName() {
         return name;
     }

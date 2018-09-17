@@ -1165,8 +1165,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 		shorthandedMod = i;
 	}
 
-	@Override
-	public abstract Part clone();
+    public abstract Part copy();
 
     protected void copyBaseData(Part part) {
         this.mode = part.mode;

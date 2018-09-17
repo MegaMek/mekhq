@@ -67,13 +67,14 @@ public class AeroLifeSupport extends Part {
         	this.name = "Spacecraft Life Support";
         }
     }
-    
-    public AeroLifeSupport clone() {
-    	AeroLifeSupport clone = new AeroLifeSupport(getUnitTonnage(), cost, fighter, campaign);
+
+    @Override
+    public AeroLifeSupport copy() {
+        AeroLifeSupport clone = new AeroLifeSupport(getUnitTonnage(), cost, fighter, campaign);
         clone.copyBaseData(this);
-    	return clone;
+        return clone;
     }
-        
+
 	@Override
 	public void updateConditionFromEntity(boolean checkForDestruction) {
 		int priorHits = hits;

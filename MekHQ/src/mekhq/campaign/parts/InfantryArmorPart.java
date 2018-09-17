@@ -342,12 +342,12 @@ public class InfantryArmorPart extends Part {
 		}
 	}
 
-	@Override
-	public Part clone() {
-		return new InfantryArmorPart(getUnitTonnage(), campaign, damageDivisor, encumbering, dest, sneak_camo, sneak_ecm, sneak_ir, spaceSuit);
-	}
-	
-	@Override
+    @Override
+    public Part copy() {
+        return new InfantryArmorPart(getUnitTonnage(), campaign, damageDivisor, encumbering, dest, sneak_camo, sneak_ecm, sneak_ir, spaceSuit);
+    }
+
+    @Override
     public boolean needsMaintenance() {
         return false;
     }

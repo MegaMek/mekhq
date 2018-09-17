@@ -107,7 +107,8 @@ public class ProtomekLocation extends Part {
         }
     }
 
-    public ProtomekLocation clone() {
+    @Override
+    public ProtomekLocation copy() {
         ProtomekLocation clone = new ProtomekLocation(loc, getUnitTonnage(), structureType, booster, forQuad, campaign);
         clone.copyBaseData(this);
         clone.percent = this.percent;

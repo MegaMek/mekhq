@@ -66,13 +66,14 @@ public class MotiveSystem extends Part {
 	public int getDifficulty() {
 		return -1;
 	}
-	
-	public MotiveSystem clone() {
-		MotiveSystem clone = new MotiveSystem(getUnitTonnage(), campaign);
+
+    @Override
+    public MotiveSystem copy() {
+        MotiveSystem clone = new MotiveSystem(getUnitTonnage(), campaign);
         clone.copyBaseData(this);
         return clone;
-	}
-	
+    }
+
 	@Override
 	public int getBaseAvailability(int era) {
 		return RATING_B;

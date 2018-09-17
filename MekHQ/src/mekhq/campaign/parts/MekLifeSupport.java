@@ -48,13 +48,14 @@ public class MekLifeSupport extends Part {
         super(tonnage, c);
         this.name = "Mech Life Support System";
     }
-	
-	public MekLifeSupport clone() {
-		MekLifeSupport clone = new MekLifeSupport(getUnitTonnage(), campaign);
+
+    @Override
+    public MekLifeSupport copy() {
+        MekLifeSupport clone = new MekLifeSupport(getUnitTonnage(), campaign);
         clone.copyBaseData(this);
-		return clone;
-	}
-	
+        return clone;
+    }
+
 	@Override
 	public double getTonnage() {
 		//TODO: what should this tonnage be?

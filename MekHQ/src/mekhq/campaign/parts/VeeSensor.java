@@ -48,12 +48,13 @@ public class VeeSensor extends Part {
         this.name = "Vehicle Sensors";
     }
 
-	public VeeSensor clone() {
-		VeeSensor clone = new VeeSensor(getUnitTonnage(), campaign);
+    @Override
+    public VeeSensor copy() {
+        VeeSensor clone = new VeeSensor(getUnitTonnage(), campaign);
         clone.copyBaseData(this);
-		return clone;
-	}
-	
+        return clone;
+    }
+
     @Override
     public boolean isSamePartType(Part part) {
         return part instanceof VeeSensor;

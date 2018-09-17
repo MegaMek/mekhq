@@ -2324,11 +2324,11 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         tabOptions.addTab(resourceMap.getString("panMercenary.TabConstraints.tabTitle"), panMercenary); // NOI18N
 
         Set<String> spaNames = SpecialAbility.getAllSpecialAbilities().keySet();
-        //We need to create a temporary hash of special abilities that we can modify without
-        //changing the underlying one in case the user cancels the changes
+        // We need to create a temporary hash of special abilities that we can modify without
+        // changing the underlying one in case the user cancels the changes
         tempSPA = new Hashtable<String, SpecialAbility>();
-        for(String name : spaNames) {
-        	tempSPA.put(name, SpecialAbility.getAbility(name).clone());
+        for (String name : spaNames) {
+            tempSPA.put(name, SpecialAbility.getAbility(name).copy());
         }
 
         panXP.setName("panXP"); // NOI18N

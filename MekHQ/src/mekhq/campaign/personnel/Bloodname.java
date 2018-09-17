@@ -717,10 +717,9 @@ class Fraction {
 		denominator = f.denominator;
 	}
 
-	@Override
-	public Object clone() {
-		return new Fraction(this);
-	}
+    public Fraction copy() {
+        return new Fraction(this);
+    }
 
 	@Override
 	public String toString() {

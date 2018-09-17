@@ -118,20 +118,19 @@ public class SpecialAbility implements MekHqXmlSerializable {
         weight = 1;
     }
 
-    @SuppressWarnings("unchecked") // FIXME: Broken Java with it's Object clones
-	public SpecialAbility clone() {
-    	SpecialAbility clone = new SpecialAbility(lookupName);
-    	clone.displayName = this.displayName;
-    	clone.desc = this.desc;
-    	clone.xpCost = this.xpCost;
-    	clone.weight = this.weight;
-    	clone.prereqAbilities = (Vector<String>)this.prereqAbilities.clone();
-    	clone.invalidAbilities = (Vector<String>)this.invalidAbilities.clone();
-    	clone.removeAbilities = (Vector<String>)this.removeAbilities.clone();
-    	clone.choiceValues = (Vector<String>)this.choiceValues.clone();
-    	clone.prereqSkills = (Vector<SkillPrereq>)this.prereqSkills.clone();
-    	clone.prereqMisc = new HashMap<>(this.prereqMisc);
-    	return clone;
+    public SpecialAbility copy() {
+        SpecialAbility clone = new SpecialAbility(lookupName);
+        clone.displayName = this.displayName;
+        clone.desc = this.desc;
+        clone.xpCost = this.xpCost;
+        clone.weight = this.weight;
+        clone.prereqAbilities = new Vector<>(prereqAbilities);
+        clone.invalidAbilities = new Vector<>(invalidAbilities);
+        clone.removeAbilities = new Vector<>(removeAbilities);
+        clone.choiceValues = new Vector<>(choiceValues);
+        clone.prereqSkills = new Vector<>(prereqSkills);
+        clone.prereqMisc = new HashMap<>(this.prereqMisc);
+        return clone;
     }
 
     public boolean isEligible(Person p) {
@@ -359,7 +358,7 @@ public class SpecialAbility implements MekHqXmlSerializable {
             if (defaultSpecialAbilities != null && Version.versionCompare(v, "0.3.6-r1965")) {
                 if (defaultSpecialAbilities.get(retVal.lookupName) != null
                         && defaultSpecialAbilities.get(retVal.lookupName).getPrereqSkills() != null) {
-                    retVal.prereqSkills = (Vector<SkillPrereq>) defaultSpecialAbilities.get(retVal.lookupName).getPrereqSkills().clone();
+                    retVal.prereqSkills = new Vector<>(defaultSpecialAbilities.get(retVal.lookupName).getPrereqSkills());
                 }
             }
         }
@@ -676,7 +675,7 @@ public class SpecialAbility implements MekHqXmlSerializable {
 
     @SuppressWarnings("unchecked")
     public static void trackDefaultSPA() {
-        defaultSpecialAbilities = (Hashtable<String, SpecialAbility>)specialAbilities.clone();
+        defaultSpecialAbilities = new Hashtable<>(specialAbilities);
     }
 
     public static void nullifyDefaultSPA() {

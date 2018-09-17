@@ -61,9 +61,8 @@ public class AeroHeatSink extends Part {
             this.name = "Aero Double Heat Sink";
         }
     }
-    
-    @Override
-    public AeroHeatSink clone() {
+
+    public AeroHeatSink copy() {
         AeroHeatSink clone = new AeroHeatSink(getUnitTonnage(), type, omniPodded, campaign);
         clone.copyBaseData(this);
         return clone;

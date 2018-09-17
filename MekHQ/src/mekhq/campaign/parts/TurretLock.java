@@ -55,13 +55,14 @@ public class TurretLock extends Part {
 	public int getDifficulty() {
 		return -1;
 	}
-	
-	public TurretLock clone() {
-		TurretLock clone = new TurretLock(campaign);
+
+    @Override
+    public TurretLock copy() {
+        TurretLock clone = new TurretLock(campaign);
         clone.copyBaseData(this);
         return clone;
-	}
-	
+    }
+
 	@Override
 	public long getStickerPrice() {
 		return 0;

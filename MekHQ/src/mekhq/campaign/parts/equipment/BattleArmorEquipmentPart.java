@@ -69,10 +69,11 @@ public class BattleArmorEquipmentPart extends EquipmentPart {
         this.trooper = trooper;
     }
 
-    public EquipmentPart clone() {
+    @Override
+    public EquipmentPart copy() {
         BattleArmorEquipmentPart clone = new BattleArmorEquipmentPart(getUnitTonnage(), type, equipmentNum, trooper, campaign);
         clone.copyBaseData(this);
-        if(hasVariableTonnage(type)) {
+        if (hasVariableTonnage(type)) {
             clone.setEquipTonnage(equipTonnage);
         }
         return clone;

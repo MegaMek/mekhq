@@ -202,11 +202,11 @@ public class InfantryMotiveType extends Part {
 		}
 	}
 
-	@Override
-	public Part clone() {
-		return new InfantryMotiveType(0, campaign, mode);
-	}
-	
+    @Override
+    public Part copy() {
+        return new InfantryMotiveType(0, campaign, mode);
+    }
+
 	public EntityMovementMode getMovementMode() {
 		return mode;
 	}

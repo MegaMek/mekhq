@@ -72,13 +72,12 @@ public class LargeCraftAmmoBin extends AmmoBin {
     }
 
     @Override
-    public LargeCraftAmmoBin clone() {
-        LargeCraftAmmoBin clone = new LargeCraftAmmoBin(getUnitTonnage(), getType(), getEquipmentNum(),
-                shotsNeeded, capacity, campaign);
+    public LargeCraftAmmoBin copy() {
+        LargeCraftAmmoBin clone = new LargeCraftAmmoBin(getUnitTonnage(), getType(), getEquipmentNum(), shotsNeeded, capacity, campaign);
         clone.copyBaseData(this);
         return clone;
     }
-    
+
     /**
      * @return The <code>Mounted</code> of the unit's <code>Entity</code> that contains this ammo bin,
      *         or null if there is no unit or the ammo bin is not in any bay.

@@ -63,17 +63,17 @@ public class MekLocation extends Part {
     public MekLocation() {
     	this(0, 0, 0, false, false, false, false, false, null);
     }
-    
-    public MekLocation clone() {
-    	MekLocation clone = new MekLocation(loc, getUnitTonnage(), structureType, clan,
-    	        tsm, forQuad, sensors, lifeSupport, campaign);
+
+    @Override
+    public MekLocation copy() {
+        MekLocation clone = new MekLocation(loc, getUnitTonnage(), structureType, clan, tsm, forQuad, sensors, lifeSupport, campaign);
         clone.copyBaseData(this);
-    	clone.percent = this.percent;
-    	clone.breached = this.breached;
-    	clone.blownOff = this.blownOff;
-    	return clone;
+        clone.percent = this.percent;
+        clone.breached = this.breached;
+        clone.blownOff = this.blownOff;
+        return clone;
     }
-    
+
     public int getLoc() {
         return loc;
     }

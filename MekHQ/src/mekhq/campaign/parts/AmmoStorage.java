@@ -66,14 +66,15 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
         }
 
     }
-    
-    public AmmoStorage clone() {
-    	AmmoStorage storage = new AmmoStorage(0, getType(), shots, campaign);
+
+    @Override
+    public AmmoStorage copy() {
+        AmmoStorage storage = new AmmoStorage(0, getType(), shots, campaign);
         storage.copyBaseData(this);
-    	storage.munition = this.munition;
-    	return storage;
+        storage.munition = this.munition;
+        return storage;
     }
-    
+
     @Override
     public double getTonnage() {
     	if(((AmmoType)type).getKgPerShot() > 0) {

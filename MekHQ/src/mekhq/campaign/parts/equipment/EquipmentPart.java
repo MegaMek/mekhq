@@ -114,13 +114,14 @@ public class EquipmentPart extends Part {
     	equipTonnage = ton;
     }
 
-    public EquipmentPart clone() {
-    	EquipmentPart clone = new EquipmentPart(getUnitTonnage(), type, equipmentNum, omniPodded, campaign);
+    @Override
+    public EquipmentPart copy() {
+        EquipmentPart clone = new EquipmentPart(getUnitTonnage(), type, equipmentNum, omniPodded, campaign);
         clone.copyBaseData(this);
-        if(hasVariableTonnage(type)) {
+        if (hasVariableTonnage(type)) {
             clone.setEquipTonnage(equipTonnage);
         }
-    	return clone;
+        return clone;
     }
 
     @Override

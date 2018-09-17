@@ -73,14 +73,15 @@ public class DropshipDockingCollar extends Part {
             name += " (Prototype)";
         }
     }
-    
-    public DropshipDockingCollar clone() {
-    	DropshipDockingCollar clone = new DropshipDockingCollar(getUnitTonnage(), campaign, collarType);
+
+    @Override
+    public DropshipDockingCollar copy() {
+        DropshipDockingCollar clone = new DropshipDockingCollar(getUnitTonnage(), campaign, collarType);
         clone.copyBaseData(this);
         clone.boomDamaged = boomDamaged;
-    	return clone;
+        return clone;
     }
-    
+
     public int getCollarType() {
         return collarType;
     }

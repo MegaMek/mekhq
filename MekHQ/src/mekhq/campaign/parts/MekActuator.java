@@ -61,13 +61,14 @@ public class MekActuator extends Part {
 	public MekActuator() {
 		this(0, 0, null);
 	}
-	
-	public MekActuator clone() {
-		MekActuator clone = new MekActuator(getUnitTonnage(), type, location, campaign);
+
+    @Override
+    public MekActuator copy() {
+        MekActuator clone = new MekActuator(getUnitTonnage(), type, location, campaign);
         clone.copyBaseData(this);
-		return clone;
-	}
-	
+        return clone;
+    }
+
     public int getType() {
         return type;
     }

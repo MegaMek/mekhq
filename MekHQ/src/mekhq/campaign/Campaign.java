@@ -2255,7 +2255,7 @@ public class Campaign implements Serializable, ITechManager {
 
     public Part fixWarehousePart(Part part, Person tech) {
         // get a new cloned part to work with and decrement original
-        Part repairable = part.clone();
+        Part repairable = part.copy();
         part.decrementQuantity();
         fixPart(repairable, tech);
         if (!(repairable instanceof OmniPod)) {
@@ -3576,12 +3576,12 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public void depodPart(Part part, int quantity) {
-        Part unpodded = part.clone();
+        Part unpodded = part.copy();
         unpodded.setOmniPodded(false);
         OmniPod pod = new OmniPod(unpodded, this);
         while (quantity > 0 && part.getQuantity() > 0) {
-            addPart(unpodded.clone(), 0);
-            addPart(pod.clone(), 0);
+            addPart(unpodded.copy(), 0);
+            addPart(pod.copy(), 0);
             part.decrementQuantity();
             quantity--;
         }
@@ -7215,7 +7215,7 @@ public class Campaign implements Serializable, ITechManager {
             // If we're assigned as a tech for any unit, remove us from it/them
             if (!person.getTechUnitIDs().isEmpty()) {
                 @SuppressWarnings("unchecked") // Broken assed Java returning Object from clone
-                ArrayList<UUID> techIDs = (ArrayList<UUID>) person.getTechUnitIDs().clone();
+                ArrayList<UUID> techIDs = new ArrayList<>(person.getTechUnitIDs());
                 for (UUID tuuid : techIDs) {
                     Unit t = getUnit(tuuid);
                     t.remove(person, true);

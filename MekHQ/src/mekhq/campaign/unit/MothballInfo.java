@@ -13,7 +13,6 @@ import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.Version;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.parts.Refit;
 import mekhq.campaign.personnel.Person;
 
 /**
@@ -40,7 +39,7 @@ public class MothballInfo implements MekHqXmlSerializable {
         gunnerIDs = new ArrayList<>();
         vesselCrewIDs = new ArrayList<>();
     }
-    
+
     /**
      * Creates a set of mothball info for a given unit
      * @param unit The unit to work with
@@ -48,13 +47,13 @@ public class MothballInfo implements MekHqXmlSerializable {
     public MothballInfo(Unit unit) {
         techID = unit.getTechId();
         forceID = unit.getForceId();
-        driverIDs = (List<UUID>) unit.getDriverIDs().clone();
-        gunnerIDs = (List<UUID>) unit.getGunnerIDs().clone();
-        vesselCrewIDs = (List<UUID>) unit.getVesselCrewIDs().clone();
+        driverIDs = new ArrayList<>(unit.getDriverIDs());
+        gunnerIDs = new ArrayList<>(unit.getGunnerIDs());
+        vesselCrewIDs = new ArrayList<>(unit.getVesselCrewIDs());
         techOfficerID = unit.getTechOfficerID();
         navigatorID = unit.getNavigatorID();
     }
-    
+
     /**
      * Restore a unit's pilot, assigned tech and force, to the best of our ability
      * @param unit The unit to restore

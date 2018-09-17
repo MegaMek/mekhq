@@ -44,13 +44,14 @@ public class HeatSink extends EquipmentPart {
     public HeatSink(int tonnage, EquipmentType et, int equipNum, boolean omniPodded, Campaign c) {
         super(tonnage, et, equipNum, omniPodded, c);
     }
-    
-    public HeatSink clone() {
-    	HeatSink clone = new HeatSink(getUnitTonnage(), getType(), getEquipmentNum(), omniPodded, campaign);
+
+    @Override
+    public HeatSink copy() {
+        HeatSink clone = new HeatSink(getUnitTonnage(), getType(), getEquipmentNum(), omniPodded, campaign);
         clone.copyBaseData(this);
-    	return clone;
+        return clone;
     }
-    
+
     /**
      * Copied from megamek.common.Entity.getWeaponsAndEquipmentCost(StringBuffer detail, boolean ignoreAmmo)
      *

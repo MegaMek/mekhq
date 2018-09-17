@@ -62,13 +62,14 @@ public class AeroSensor extends Part {
         this.name = "Aerospace Sensors";
         this.largeCraft = lc;
     }
-    
-    public AeroSensor clone() {
-    	AeroSensor clone = new AeroSensor(getUnitTonnage(), largeCraft, campaign);
+
+    @Override
+    public AeroSensor copy() {
+        AeroSensor clone = new AeroSensor(getUnitTonnage(), largeCraft, campaign);
         clone.copyBaseData(this);
-    	return clone;
+        return clone;
     }
-        
+
 	@Override
 	public void updateConditionFromEntity(boolean checkForDestruction) {
 		int priorHits = hits;
