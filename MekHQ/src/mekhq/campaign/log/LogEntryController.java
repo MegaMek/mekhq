@@ -71,66 +71,66 @@ public class LogEntryController {
     public LogEntryType determineTypeFromLogDescription(String description){
 
         if(foundExpressionWithOneVariable("madeBondsmanBy.text", description) ||
-           foundExpressionWithOneVariable("madePrisonerBy.text", description) ||
-           foundExpressionWithOneVariable("joined.text", description) ||
-           foundSingleExpression("freed.text", description) ||
-           foundSingleExpression("madePrisoner.text", description) ||
-           foundSingleExpression("madeBondsman.text", description) ||
-           foundSingleExpression("kia.text", description) ||
-           foundSingleExpression("mia.text", description) ||
-           foundSingleExpression("recoveredMia.text", description) ||
-           foundSingleExpression("retired.text", description) ||
-           foundExpressionWithOneVariable("promotedTo.text", description) ||
-           foundExpressionWithOneVariable("demotedTo.text", description) ||
-           foundExpressionWithTwoVariables("participatedInMission.text", description) ||
-           foundExpressionWithTwoVariables("successfullyTreatedForXInjuries.text", description) ||
-           foundExpressionWithThreeVariables("successfullyTreatedWithXp.text", description) ||
-           foundExpressionWithOneVariable("gainedXpFromMedWork.text", description) ||
-           foundExpressionWithOneVariable("retiredDueToWounds.text", description) ||
-           foundExpressionWithOneVariable("reassignedTo.text", description) ||
-           foundExpressionWithOneVariable("assignedTo.text", description) ||
-           foundExpressionWithOneVariable("removedFrom.text", description)
-           )
+                foundExpressionWithOneVariable("madePrisonerBy.text", description) ||
+                foundExpressionWithOneVariable("joined.text", description) ||
+                foundSingleExpression("freed.text", description) ||
+                foundSingleExpression("madePrisoner.text", description) ||
+                foundSingleExpression("madeBondsman.text", description) ||
+                foundSingleExpression("kia.text", description) ||
+                foundSingleExpression("mia.text", description) ||
+                foundSingleExpression("recoveredMia.text", description) ||
+                foundSingleExpression("retired.text", description) ||
+                foundExpressionWithOneVariable("promotedTo.text", description) ||
+                foundExpressionWithOneVariable("demotedTo.text", description) ||
+                foundExpressionWithTwoVariables("participatedInMission.text", description) ||
+                foundExpressionWithTwoVariables("successfullyTreatedForXInjuries.text", description) ||
+                foundExpressionWithThreeVariables("successfullyTreatedWithXp.text", description) ||
+                foundExpressionWithOneVariable("gainedXpFromMedWork.text", description) ||
+                foundExpressionWithOneVariable("retiredDueToWounds.text", description) ||
+                foundExpressionWithOneVariable("reassignedTo.text", description) ||
+                foundExpressionWithOneVariable("assignedTo.text", description) ||
+                foundExpressionWithOneVariable("removedFrom.text", description)
+                )
             return LogEntryType.SERVICE;
 
         if(foundExpressionWithOneVariable("spouseKia.text",description) ||
-           foundExpressionWithOneVariable("divorcedFrom.text", description) ||
-           foundExpressionWithOneVariable("marries.text", description) ||
-           foundExpressionWithOneVariable("gained.text", description) ||
-           foundSingleExpression("gainedEdge.text", description)
-           )
+                foundExpressionWithOneVariable("divorcedFrom.text", description) ||
+                foundExpressionWithOneVariable("marries.text", description) ||
+                foundExpressionWithOneVariable("gained.text", description) ||
+                foundSingleExpression("gainedEdge.text", description)
+                )
             return LogEntryType.PERSONAL;
 
         if(foundExpressionWithOneVariable("removedAward.text", description) ||
-          foundExpressionWithTwoVariables("awarded.text", description)
-          )
+                foundExpressionWithTwoVariables("awarded.text", description)
+                )
             return LogEntryType.AWARD;
 
 
         if(foundExpressionWithTwoVariables("severedSpine.text", description) ||
-           foundExpressionWithOneVariable("brokenRibPunctureDead.text", description) ||
-           foundExpressionWithOneVariable("brokenRibPuncture.text", description) ||
-           foundSingleExpression("developedEncephalopathy.text", description) ||
-           foundSingleExpression("concussionWorsened.text", description) ||
-           foundSingleExpression("developedCerebralContusion.text", description) ||
-           foundSingleExpression("diedDueToBrainTrauma.text", description) ||
-           foundSingleExpression("diedOfInternalBleeding.text", description) ||
-           foundSingleExpression("internalBleedingWorsened.text", description) ||
-           foundBeginningOfExpressionEndingWithMultilineAndTab("returnedWithInjuries.text", description) ||
-           foundExpressionWithTwoVariables("docMadeAMistake.text", description) ||
-           foundExpressionWithThreeVariables("docAmazingWork.text", description) ||
-           foundExpressionWithTwoVariables("successfullyTreated.text", description) ||
-           foundExpressionWithOneVariable("didntHealProperly.text", description) ||
-           foundExpressionWithOneVariable("healed.text", description) ||
-           foundExpressionWithOneVariable("becamePermanent.text", description) ||
-           foundSingleExpression("diedInInfirmary.text", description) ||
-           foundSingleExpression("abductedFromInfirmary.text", description) ||
-           foundSingleExpression("retiredAndTransferedFromInfirmary.text", description) ||
-           foundSingleExpression("dismissedFromInfirmary.text", description) ||
-           foundExpressionWithOneVariable("deliveredBaby.text", description) ||
-           foundSingleExpression("hasConceived.text", description) ||
-           foundExpressionWithOneVariable("hasConceived.text", description)
-           )
+                foundExpressionWithOneVariable("brokenRibPunctureDead.text", description) ||
+                foundExpressionWithOneVariable("brokenRibPuncture.text", description) ||
+                foundSingleExpression("developedEncephalopathy.text", description) ||
+                foundSingleExpression("concussionWorsened.text", description) ||
+                foundSingleExpression("developedCerebralContusion.text", description) ||
+                foundSingleExpression("diedDueToBrainTrauma.text", description) ||
+                foundSingleExpression("diedOfInternalBleeding.text", description) ||
+                foundSingleExpression("internalBleedingWorsened.text", description) ||
+                foundBeginningOfExpressionEndingWithMultilineAndTab("returnedWithInjuries.text", description) ||
+                foundExpressionWithTwoVariables("docMadeAMistake.text", description) ||
+                foundExpressionWithThreeVariables("docAmazingWork.text", description) ||
+                foundExpressionWithTwoVariables("successfullyTreated.text", description) ||
+                foundExpressionWithOneVariable("didntHealProperly.text", description) ||
+                foundExpressionWithOneVariable("healed.text", description) ||
+                foundExpressionWithOneVariable("becamePermanent.text", description) ||
+                foundSingleExpression("diedInInfirmary.text", description) ||
+                foundSingleExpression("abductedFromInfirmary.text", description) ||
+                foundSingleExpression("retiredAndTransferedFromInfirmary.text", description) ||
+                foundSingleExpression("dismissedFromInfirmary.text", description) ||
+                foundExpressionWithOneVariable("deliveredBaby.text", description) ||
+                foundSingleExpression("hasConceived.text", description) ||
+                foundExpressionWithOneVariable("hasConceived.text", description)
+                )
             return LogEntryType.MEDICAL;
 
         return LogEntryType.CUSTOM;
