@@ -996,6 +996,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return id;
     }
 
+    @Nullable
     public UUID getSpouseID() {
         return spouse;
     }
@@ -1004,8 +1005,16 @@ public class Person implements Serializable, MekHqXmlSerializable {
         this.spouse = spouse;
     }
 
+    @Nullable
     public Person getSpouse() {
         return campaign.getPerson(spouse);
+    }
+
+    public boolean hasSpouse(){
+        if(null == campaign.getPerson(spouse))
+            setSpouseID(null);
+
+        return (getSpouseID() != null);
     }
 
     public GregorianCalendar getDueDate() {
@@ -1080,17 +1089,19 @@ public class Person implements Serializable, MekHqXmlSerializable {
             return;
         }
         // Spouse NULL protection...
+        /*
         if((getSpouseID() != null) && (getSpouse() == null)) {
             setSpouseID(null);
         }
+        */
         if (!isDeployed()) {
             // Age limitations...
             if (getAge(campaign.getCalendar()) > 13 && getAge(campaign.getCalendar()) < 51) {
                 boolean concieved = false;
-                if (getSpouse() == null && campaign.getCampaignOptions().useUnofficialProcreationNoRelationship()) {
+                if (!hasSpouse() && campaign.getCampaignOptions().useUnofficialProcreationNoRelationship()) {
                     // 0.005% chance that this procreation attempt will create a child
                     concieved = (Compute.randomInt(100000) < 2);
-                } else if (getSpouse() != null) {
+                } else if (hasSpouse()) {
                     if (getSpouse().isActive() && !getSpouse().isDeployed() && getSpouse().getAge(campaign.getCalendar()) > 13) {
                         // 0.05% chance that this procreation attempt will create a child
                         concieved = (Compute.randomInt(10000) < 2);
@@ -1104,7 +1115,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     int size = PREGNANCY_SIZE.getAsInt();
                     extraData.set(PREGNANCY_CHILDREN_DATA, size);
                     extraData.set(PREGNANCY_FATHER_DATA,
-                        (null != getSpouseID()) ? getSpouseID().toString() : null);
+                        (hasSpouse()) ? getSpouseID().toString() : null);
 
                     String sizeString = (size < PREGNANCY_MULTIPLE_NAMES.length) ? PREGNANCY_MULTIPLE_NAMES[size] : null;
                     if(null == sizeString) {
@@ -1130,7 +1141,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         int size = PREGNANCY_SIZE.getAsInt();
         extraData.set(PREGNANCY_CHILDREN_DATA, size);
         extraData.set(PREGNANCY_FATHER_DATA,
-            (null != getSpouseID()) ? getSpouseID().toString() : null);
+            (hasSpouse()) ? getSpouseID().toString() : null);
 
         String sizeString = (size < PREGNANCY_MULTIPLE_NAMES.length) ? PREGNANCY_MULTIPLE_NAMES[size] : null;
         if(null == sizeString) {
@@ -1158,7 +1169,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 !this.equals(p)
                 && (getAncestorsID() == null
                 || !campaign.getAncestors(getAncestorsID()).checkMutualAncestors(campaign.getAncestors(p.getAncestorsID())))
-                && p.getSpouseID() == null
+                && !p.hasSpouse()
                 && getGender() != p.getGender()
                 && p.getAge(campaign.getCalendar()) > 13
         );

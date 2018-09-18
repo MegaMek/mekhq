@@ -762,6 +762,9 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                         JOptionPane.YES_NO_OPTION)) {
                     for (Person person : people) {
                         gui.getCampaign().removePerson(person.getId());
+                        if(person.hasSpouse()){
+                            person.getSpouse().setSpouseID(null);
+                        }
                     }
                 }
                 break;
@@ -1713,7 +1716,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             if (oneSelected && person.isActive()) {
                 GregorianCalendar calendar = gui.getCampaign().getCalendar();
 
-                if ((person.getAge(calendar) > 13) && (person.getSpouseID() == null)) {
+                if ((person.getAge(calendar) > 13) && (!person.hasSpouse())) {
                     menu = new JMenu(resourceMap.getString("changeSpouse.text")); //$NON-NLS-1$
                     JMenuItem surnameMenu;
                     JMenu spouseMenu;
@@ -1776,7 +1779,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     }
                     popup.add(menu);
                 }
-                if (person.getSpouseID() != null) {
+                if (person.hasSpouse()) {
                     menuItem = new JMenuItem(resourceMap.getString("removeSpouse.text")); //$NON-NLS-1$
                     menuItem.setActionCommand(CMD_REMOVE_SPOUSE);
                     menuItem.addActionListener(this);

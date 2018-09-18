@@ -727,7 +727,7 @@ public class PersonViewPanel extends JPanel {
             secondy = firsty;
         }
 
-        if (null != person.getSpouseID()) {
+        if (person.hasSpouse()) {
             secondy++;
             lblSpouse1.setName("lblSpouse1"); // NOI18N //$NON-NLS-1$
             lblSpouse1.setText(resourceMap.getString("lblSpouse1.text")); //$NON-NLS-1$

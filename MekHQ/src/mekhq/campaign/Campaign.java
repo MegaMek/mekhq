@@ -7184,7 +7184,7 @@ public class Campaign implements Serializable, ITechManager {
         if (status == Person.S_KIA) {
             person.addLogEntry(getDate(), "Killed in action");
             // Don't forget to tell the spouse
-            if (person.getSpouseID() != null) {
+            if (person.hasSpouse()) {
                 Person spouse = person.getSpouse();
                 spouse.addLogEntry(getDate(), "Spouse, " + person.getName() + ", killed in action");
                 spouse.setSpouseID(null);
