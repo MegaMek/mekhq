@@ -1011,9 +1011,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public boolean hasSpouse(){
-        if(null == campaign.getPerson(spouse))
-            setSpouseID(null);
-
         return (getSpouseID() != null);
     }
 
@@ -1088,12 +1085,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         if(!isFemale() || isPregnant()) {
             return;
         }
-        // Spouse NULL protection...
-        /*
-        if((getSpouseID() != null) && (getSpouse() == null)) {
-            setSpouseID(null);
-        }
-        */
+
         if (!isDeployed()) {
             // Age limitations...
             if (getAge(campaign.getCalendar()) > 13 && getAge(campaign.getCalendar()) < 51) {

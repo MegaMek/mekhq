@@ -193,6 +193,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
         			campaign = Campaign.createCampaignFromXMLFileInputStream(fis, app);
         			// Restores all transient attributes from serialized objects
         			campaign.restore();
+        			campaign.cleanUp();
         			fis.close();
         		} catch (NullEntityException ex) {
         			JOptionPane.showMessageDialog(null,

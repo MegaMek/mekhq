@@ -3341,6 +3341,20 @@ public class Campaign implements Serializable, ITechManager {
         }
     }
 
+    /**
+     * Cleans incongruent data present in the campaign
+     */
+    public void cleanUp(){
+        // Cleans non-existing spouses
+        for(Person p : personnel.values()){
+            if(p.hasSpouse()){
+                if(!personnel.containsKey(p.getSpouseID())){
+                    p.setSpouseID(null);
+                }
+            }
+        }
+    }
+
     public boolean isOvertimeAllowed() {
         return overtime;
     }
