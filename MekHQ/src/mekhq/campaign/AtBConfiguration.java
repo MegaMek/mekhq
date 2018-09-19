@@ -52,6 +52,7 @@ import mekhq.MekHqXmlUtil;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.rating.IUnitRating;
+import mekhq.campaign.universe.Faction;
 
 /**
  * @author Neoancient
@@ -289,6 +290,19 @@ public class AtBConfiguration implements Serializable {
         return 0;
     }
 	
+    public static String getParentFactionType(String factionCode) {
+        String org = AtBConfiguration.ORG_IS;
+        Faction faction = Faction.getFaction(factionCode);
+        
+        if (faction.isComstar()) {
+            org = AtBConfiguration.ORG_CS;
+        } else if(faction.isClan()) {
+            org = AtBConfiguration.ORG_CLAN;
+        }
+        
+        return org;
+    }
+    
 	public boolean isHiringHall(String planet, Date date) {
 		return hiringHalls.stream().anyMatch( rec -> rec.getValue().equals(planet)
 				&& rec.fitsDate(date));

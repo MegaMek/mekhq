@@ -24,7 +24,7 @@ public class ScenarioForceTemplate {
     public static final String[] FORCE_GENERATION_METHODS = { "Player Supplied", "BV Scaled", "Unit Count Scaled", "Fixed Unit Count" };
     public static final String[] FORCE_DEPLOYMENT_SYNC_TYPES = { "None", "Same Edge", "Same Arc", "Opposite Edge", "Opposite Arc" };
     public static final String[] DEPLOYMENT_ZONES = { "Any", "Northwest", "North", "Northeast", "East", "Southeast", "South", "Southwest", "West", "Edge", "Center", "Narrow Edge" };
-    public static final String[] BOT_DESTINATION_ZONES = { "None", "Opposite Deployment Edge", "North", "East", "South", "West", "Random" };
+    public static final String[] BOT_DESTINATION_ZONES = { "North", "East", "South", "West", "None", "Opposite Deployment Edge", "Random" };
     public static final Map<Integer, String> SPECIAL_UNIT_TYPES;
     public static final Map<Integer, Integer> TEAM_IDS;
     public static final Map<Integer, String> SPECIAL_ARRIVAL_TURNS;
@@ -36,6 +36,9 @@ public class ScenarioForceTemplate {
     public static int ARRIVAL_TURN_STAGGERED_BY_LANCE = -2;
     
     public static int DEPLOYMENT_ZONE_NARROW_EDGE = DEPLOYMENT_ZONES.length - 1;
+    
+    public static int DESTINATION_EDGE_OPPOSITE_DEPLOYMENT = 5;
+    public static int DESTINATION_EDGE_RANDOM = 6;    
     
     public enum ForceAlignment {
         Player,

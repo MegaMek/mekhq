@@ -3,7 +3,6 @@ package mekhq.campaign.mission;
 import java.util.HashMap;
 import java.util.Map;
 
-import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
 
 /**
@@ -21,10 +20,6 @@ public class AtBDynamicScenario extends AtBScenario {
     // derived fields used for various calculations
     private int effectivePlayerUnitCount;
     private int effectivePlayerBV;
-    
-    // fields intrinsic to the scenario. Map size for now.
-    private int mapSizeX;
-    private int mapSizeY;
     
     // convenient pointers that let us keep data around that would otherwise need reloading
     private ScenarioTemplate template;      // the template that is being used to generate this scenario

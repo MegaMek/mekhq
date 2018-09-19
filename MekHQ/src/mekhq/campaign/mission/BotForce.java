@@ -95,8 +95,10 @@ public class BotForce implements Serializable, MekHqXmlSerializable {
             return (Compute.randomInt(2) == 0) ? CardinalEdge.SOUTH : CardinalEdge.WEST;
         case Board.START_SE:
             return (Compute.randomInt(2) == 0) ? CardinalEdge.SOUTH : CardinalEdge.EAST;
-        default:
+        case Board.START_ANY:
             return CardinalEdge.getCardinalEdge(Compute.randomInt(4));
+        default:
+            return CardinalEdge.NEAREST_OR_NONE;
         }
     }
 

@@ -4,12 +4,12 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.UUID;
-import java.util.Vector;
 import java.util.stream.Collectors;
 
 import megamek.client.RandomNameGenerator;
 import megamek.client.RandomSkillsGenerator;
 import megamek.client.RandomUnitGenerator;
+import megamek.client.bot.princess.CardinalEdge;
 import megamek.common.Board;
 import megamek.common.Compute;
 import megamek.common.Crew;
@@ -25,7 +25,6 @@ import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.AtBConfiguration;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.force.Force;
 import mekhq.campaign.force.Lance;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
@@ -59,6 +58,9 @@ public class AtBDynamicScenarioFactory {
         setLightConditions(scenario);
         setWeather(scenario);
         setPlanetaryConditions(scenario, contract, campaign);
+        // call in base methods to initialize terrain and map
+        scenario.setTerrain();
+        scenario.setMapFile();
         
         return scenario;
     }
@@ -146,6 +148,8 @@ public class AtBDynamicScenarioFactory {
             break;
         }
         
+        String parentFactionType = AtBConfiguration.getParentFactionType(factionCode);
+        
         for(ScenarioForceTemplate forceTemplate : forceTemplates) {
             //  While force has not surpassed BV cap || unit cap
             //      get me a unit types array
@@ -171,9 +175,16 @@ public class AtBDynamicScenarioFactory {
             ArrayList<Entity> generatedEntities = new ArrayList<>();
             
             boolean stopGenerating = false;
+            String currentLanceWeightString = "";
             
             while(!stopGenerating) {
                 List<Entity> generatedLance;
+            
+                // atb generates between 1 and 3 lances at a time
+                // so we generate a new batch each time we run out
+                if(currentLanceWeightString.isEmpty()) {
+                    currentLanceWeightString = campaign.getAtBConfig().selectBotLances(parentFactionType, weightClass);
+                }
                 
                 // some special cases that don't fit into the regular RAT generation mechanism
                 if(forceTemplate.getAllowedUnitType() == UnitType.GUN_EMPLACEMENT) {
@@ -183,18 +194,19 @@ public class AtBDynamicScenarioFactory {
                 } else {
                     List<Integer> unitTypes = generateUnitTypes(forceTemplate, 4, campaign);
                     String unitWeights = generateUnitWeights(unitTypes, factionCode, 
-                            weightClass, forceTemplate.getMaxWeightClass(), campaign);
+                            AtBConfiguration.decodeWeightStr(currentLanceWeightString, 0), forceTemplate.getMaxWeightClass(), campaign);
          
                     generatedLance = generateLance(factionCode, skill, 
                             quality, unitTypes, unitWeights, campaign);
                 }
                 
+                // no reason to go into an endless loop if we can't generate a lance
                 if(generatedLance.isEmpty()) {
                     stopGenerating = true;
                     continue;
                 }
                 
-                // if force contributes to map size, increment the generated lance count
+                // if force contributes to map size, increment the generated "lance" count
                 if(forceTemplate.getContributesToMapSize()) {
                     generatedLanceCount++;
                 }
@@ -204,11 +216,14 @@ public class AtBDynamicScenarioFactory {
                     generatedEntities.add(ent);
                 }
                 
+                // terminate force generation if we've gone over our unit count or bv budget
                 if(forceTemplate.getGenerationMethod() == ForceGenerationMethod.BVScaled.ordinal()) {
                     stopGenerating = forceBV > forceBVBudget;
                 } else {
                     stopGenerating = generatedEntities.size() >= forceUnitBudget; 
                 }
+                
+                currentLanceWeightString = currentLanceWeightString.substring(1);
             }
             
             // chop out random units until we drop down to our unit count budget
@@ -853,6 +868,7 @@ public class AtBDynamicScenarioFactory {
         }
         
         generatedForce.setTeam(ScenarioForceTemplate.TEAM_IDS.get(forceTemplate.getForceAlignment()));
+        setDestinationZone(generatedForce, forceTemplate);
     }
     
     /**
@@ -920,11 +936,11 @@ public class AtBDynamicScenarioFactory {
             List<Integer> edges = new ArrayList<>();
             
             if(scenario.getMapSizeX() > scenario.getMapSizeY()) {
-                edges.add(Board.START_N);
-                edges.add(Board.START_S);
-            } else {
                 edges.add(Board.START_E);
                 edges.add(Board.START_W);
+            } else {
+                edges.add(Board.START_N);
+                edges.add(Board.START_S);
             }
             
             calculatedEdge = edges.get(Compute.randomInt(2));
@@ -932,6 +948,32 @@ public class AtBDynamicScenarioFactory {
         
         forceTemplate.setActualDeploymentZone(calculatedEdge);
         return calculatedEdge;
+    }
+    
+    /**
+     * Determines and sets the destination edge for a given bot force that follows a given force template. 
+     * @param force The bot force for which to set the edge.
+     * @param forceTemplate The template which governs the destination edge.
+     */
+    private static void setDestinationZone(BotForce force, ScenarioForceTemplate forceTemplate) {
+        int actualDestinationEdge = forceTemplate.getDestinationZone();
+        
+        if(forceTemplate.getDestinationZone() == ScenarioForceTemplate.DESTINATION_EDGE_RANDOM) {
+            // compute a random cardinal edge between 0 and 3 to avoid None
+            actualDestinationEdge = Compute.randomInt(CardinalEdge.values().length - 1);
+        } else if (forceTemplate.getDestinationZone() == ScenarioForceTemplate.DESTINATION_EDGE_OPPOSITE_DEPLOYMENT) {
+            actualDestinationEdge = getOppositeEdge(force.getStart());
+        }
+        
+        force.setDestinationEdge(actualDestinationEdge);
+    }
+    
+    /**
+     * Sets up the deployment turns
+     * @param scenario
+     */
+    public static void setDeploymentTurns(AtBDynamicScenario scenario) {
+        //TODO: implement
     }
     
     /**

@@ -880,16 +880,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
      */
     protected void addEnemyForce(ArrayList<Entity> list, int weightClass,
             int maxWeight, int rollMod, int weightMod, Campaign campaign) {
-        String org = AtBConfiguration.ORG_IS;
-        if (getContract(campaign).getEnemyCode().equals("CS")
-                || getContract(campaign).getEnemyCode().equals("WOB")) {
-            org = AtBConfiguration.ORG_CS;
-        } else {
-            Faction f = Faction.getFaction(getContract(campaign).getEnemyCode());
-            if (f != null && f.isClan()) {
-                org = AtBConfiguration.ORG_CLAN;
-            }
-        }
+        String org = AtBConfiguration.getParentFactionType(getContract(campaign).getEnemyCode());
         
         String lances = campaign.getAtBConfig().selectBotLances(org, weightClass, rollMod/20f);
         int maxLances = Math.min(lances.length(), campaign.getCampaignOptions().getSkillLevel() + 1);
