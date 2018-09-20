@@ -20,6 +20,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
@@ -31,7 +32,10 @@ import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.border.LineBorder;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
+import megamek.client.bot.princess.CardinalEdge;
 import megamek.common.EntityWeightClass;
 import megamek.common.UnitType;
 import mekhq.campaign.mission.AtBScenario;
@@ -39,7 +43,9 @@ import mekhq.campaign.mission.ScenarioForceTemplate;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
 import mekhq.campaign.mission.ScenarioForceTemplate.SynchronizedDeploymentType;
+import mekhq.io.FileType;
 import mekhq.campaign.mission.ScenarioTemplate;
+import mekhq.gui.FileDialogs;
 
 /**
  * Handles editing, saving and loading of scenario template definitions.
@@ -258,11 +264,12 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         forcedPanel.add(cboGenerationMethod, gbc);
         
         JLabel lblMultiplier = new JLabel("Scaling Multiplier:");
+        lblMultiplier.setToolTipText("For scaling force generation methods, multiplies the metric being scaled against.");
         gbc.gridx = 0;
         gbc.gridy++;
         forcedPanel.add(lblMultiplier, gbc);
         
-        spnMultiplier = new JSpinner(new SpinnerNumberModel(1.0, 0.0, 2.0, .05));
+        spnMultiplier = new JSpinner(new SpinnerNumberModel(1.0, 0.0, 4.0, .05));
         spnMultiplier.setPreferredSize(spinnerSize);
         gbc.gridx = 1;
         forcedPanel.add(spnMultiplier, gbc);
@@ -273,6 +280,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         forcedPanel.add(lblDestinationZones, gbc);
         
         cboDestinationZone = new JComboBox<String>(ScenarioForceTemplate.BOT_DESTINATION_ZONES);
+        cboDestinationZone.setSelectedIndex(CardinalEdge.NEAREST_OR_NONE.ordinal());
         gbc.gridx = 1;
         forcedPanel.add(cboDestinationZone, gbc);
         
@@ -965,17 +973,10 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         scenarioTemplate.mapParameters.allowRotation = chkAllowRotation.isSelected();
         scenarioTemplate.mapParameters.useStandardAtBSizing = chkUseAtBSizing.isSelected();
         
-        JFileChooser saveTemplateChooser = new JFileChooser("./");
-        saveTemplateChooser.setDialogTitle("Save Scenario Template");
-        int returnVal = saveTemplateChooser.showSaveDialog(this);
-
-        if ((returnVal != JFileChooser.APPROVE_OPTION)
-                || (saveTemplateChooser.getSelectedFile() == null)) {
-            return;
+        File file = FileDialogs.saveScenarioTemplate((JFrame) getOwner(), scenarioTemplate).orElse(null);
+        if(file != null) {
+            scenarioTemplate.Serialize(file);
         }
-
-        File file = saveTemplateChooser.getSelectedFile();
-        scenarioTemplate.Serialize(file);
     }
     
     /**
@@ -983,16 +984,11 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
      * for user-selected file, then reloads all UI elements.
      */
     private void loadTemplateButtonHandler() {
-        JFileChooser loadTemplateChooser = new JFileChooser("./");
-        loadTemplateChooser.setDialogTitle("Load Scenario Template");
-        int returnVal = loadTemplateChooser.showOpenDialog(this);
-
-        if ((returnVal != JFileChooser.APPROVE_OPTION)
-                || (loadTemplateChooser.getSelectedFile() == null)) {
+        File file = FileDialogs.openScenarioTemplate((JFrame) getOwner()).orElse(null);
+        if(file == null) {
             return;
         }
-
-        File file = loadTemplateChooser.getSelectedFile();
+        
         scenarioTemplate = ScenarioTemplate.Deserialize(file);
         
         if(scenarioTemplate == null) {

@@ -1601,6 +1601,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                     bf.getName() + " <i>" +
                     ((bf.getTeam() == 1)?"Allied":"Enemy") + "</i>" +
                     " Start: " + IStartingPositions.START_LOCATION_NAMES[bf.getStart()] +
+                    " BV: " + bf.getTotalBV() +
                     "</html>",
                     generateEntityStub(bf.getEntityList()));
     }

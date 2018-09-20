@@ -9,29 +9,29 @@ import java.util.stream.Collectors;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.namespace.QName;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.stream.StreamSource;
 
 import mekhq.MekHQ;
-import mekhq.MekHqXmlUtil;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
 
+/**
+ * This is the root data structure for organizing information related to a scenario template.
+ * @author NickAragua
+ *
+ */
 @XmlRootElement(name="ScenarioTemplate")
 public class ScenarioTemplate {
 
     public String name;
     public String shortBriefing;
     public String detailedBriefing;
-    //public List<ScenarioForceTemplate> scenarioForces = new ArrayList<>();
     
     public ScenarioMapParameters mapParameters = new ScenarioMapParameters();
     

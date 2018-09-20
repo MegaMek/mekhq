@@ -40,6 +40,7 @@ import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -57,6 +58,7 @@ import mekhq.campaign.mission.Loot;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.ScenarioTemplate;
+import mekhq.gui.FileDialogs;
 import mekhq.gui.model.LootTableModel;
 
 /**
@@ -333,16 +335,11 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
     }
     
     private void btnLoadActionPerformed(ActionEvent evt) {
-        JFileChooser loadTemplateChooser = new JFileChooser("./");
-        loadTemplateChooser.setDialogTitle("Load Scenario Template");
-        int returnVal = loadTemplateChooser.showOpenDialog(this);
-
-        if ((returnVal != JFileChooser.APPROVE_OPTION)
-                || (loadTemplateChooser.getSelectedFile() == null)) {
+        File file = FileDialogs.openScenarioTemplate((JFrame) getOwner()).orElse(null);
+        if(file == null) {
             return;
         }
-
-        File file = loadTemplateChooser.getSelectedFile();
+        
         ScenarioTemplate scenarioTemplate = ScenarioTemplate.Deserialize(file);
         
         if(scenarioTemplate == null) {

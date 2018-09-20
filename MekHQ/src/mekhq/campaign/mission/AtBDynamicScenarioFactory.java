@@ -74,6 +74,11 @@ public class AtBDynamicScenarioFactory {
      * @param campaign Current campaign.
      */
     public static void finalizeScenario(AtBDynamicScenario scenario, AtBContract contract, Campaign campaign) {
+        // just in case, clear old bot forces.
+        for(int x = scenario.getNumBots() - 1; x >= 0; x--) {
+            scenario.removeBotForce(x);
+        }
+        
         // fix the player force BV at the current time.
         int playerForceBV = calculateEffectiveBV(scenario, campaign);
         int playerForceUnitCount = calculateEffectiveUnitCount(scenario, campaign);

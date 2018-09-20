@@ -1,7 +1,10 @@
 package mekhq.campaign.mission;
 
+import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.w3c.dom.Node;
 
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
 
@@ -110,5 +113,9 @@ public class AtBDynamicScenario extends AtBScenario {
     public String getResourceKey() {
         // TODO Auto-generated method stub
         return "baseAttack";
+    }
+    
+    protected void loadFieldsFromXmlNode(Node wn) throws ParseException {
+        super.loadFieldsFromXmlNode(wn);
     }
 }
