@@ -28,6 +28,7 @@ import java.util.function.Predicate;
 
 import megamek.common.EntityMovementMode;
 import megamek.common.MechSummary;
+import megamek.common.UnitType;
 
 /**
  * Common interface to interact with various methods for generating units.
@@ -43,6 +44,15 @@ public interface IUnitGenerator {
     final static EnumSet<EntityMovementMode> MIXED_TANK_VTOL = EnumSet.of(EntityMovementMode.TRACKED,
             EntityMovementMode.WHEELED, EntityMovementMode.HOVER, EntityMovementMode.WIGE,
             EntityMovementMode.VTOL);
+    
+    /**
+     * Convenience function to let us know whether a unit type supports weight class selection.
+     * @param unitType The unit type to check.
+     * @return Whether or not the unit type supports weight class selection.
+     */
+    static boolean unitTypeSupportsWeightClass(int unitType) {
+        return unitType == UnitType.AERO || unitType == UnitType.MEK || unitType == UnitType.TANK;
+    }
     
 	/**
 	 * 

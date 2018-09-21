@@ -38,6 +38,7 @@ import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.mission.AtBDynamicScenarioFactory;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.IUnitGenerator;
 import mekhq.gui.CampaignGUI;
@@ -238,7 +239,7 @@ public class GMToolsDialog extends JDialog implements ActionListener {
             int unitQuality = qualityPicker.getSelectedIndex();
             int unitWeight = unitWeightPicker.getSelectedIndex() + EntityWeightClass.WEIGHT_LIGHT;
             if (!unitWeightPicker.isEnabled()) {
-                unitWeight = -1;
+                unitWeight = AtBDynamicScenarioFactory.UNIT_WEIGHT_UNSPECIFIED;
             }
             
             int targetYear = Integer.parseInt(yearPicker.getText());

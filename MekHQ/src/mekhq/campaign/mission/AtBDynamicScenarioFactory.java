@@ -42,6 +42,11 @@ import mekhq.campaign.universe.Planets;
  */
 public class AtBDynamicScenarioFactory {
     /**
+     * Unspecified weight class for units, used when the unit type doesn't support weight classes 
+     */
+    public static int UNIT_WEIGHT_UNSPECIFIED = -1;
+    
+    /**
      * Method that sets some initial scenario parameters from the given template, prior to force generation and such.
      * @param template The template to use when populating the new scenario.
      * @param contract The contract in which the scenario is to occur.
@@ -58,9 +63,7 @@ public class AtBDynamicScenarioFactory {
         setLightConditions(scenario);
         setWeather(scenario);
         setPlanetaryConditions(scenario, contract, campaign);
-        // call in base methods to initialize terrain and map
-        scenario.setTerrain();
-        scenario.setMapFile();
+        setTerrain(scenario);
         
         return scenario;
     }
@@ -192,22 +195,33 @@ public class AtBDynamicScenarioFactory {
                 }
                 
                 // some special cases that don't fit into the regular RAT generation mechanism
+                // gun emplacements use a separate set of rats
                 if(forceTemplate.getAllowedUnitType() == UnitType.GUN_EMPLACEMENT) {
                     generatedLance = generateTurrets(4, skill, quality, campaign);
+                // atb civilians use a separate rat
                 } else if(forceTemplate.getAllowedUnitType() == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_CIVILIANS) {
                     generatedLance = generateCivilianUnits(4, campaign);
-                } else {
+                // meks, asf and tanks support weight class specification, as does the "standard atb mix"
+                } else if(IUnitGenerator.unitTypeSupportsWeightClass(forceTemplate.getAllowedUnitType()) ||
+                        (forceTemplate.getAllowedUnitType() == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX)) { 
                     List<Integer> unitTypes = generateUnitTypes(forceTemplate, 4, campaign);
                     String unitWeights = generateUnitWeights(unitTypes, factionCode, 
                             AtBConfiguration.decodeWeightStr(currentLanceWeightString, 0), forceTemplate.getMaxWeightClass(), campaign);
          
                     generatedLance = generateLance(factionCode, skill, 
                             quality, unitTypes, unitWeights, campaign);
+                // everything else doesn't support weight class specification
+                } else {
+                    List<Integer> unitTypes = generateUnitTypes(forceTemplate, 4, campaign);
+                    generatedLance = generateLance(factionCode, skill, quality, unitTypes, campaign);
                 }
                 
                 // no reason to go into an endless loop if we can't generate a lance
                 if(generatedLance.isEmpty()) {
                     stopGenerating = true;
+                    MekHQ.getLogger().log(AtBDynamicScenarioFactory.class, "generateForces", LogLevel.WARNING, 
+                            String.format("Unable to generate units from RAT: %d, type %d, weight %d", 
+                                    factionCode, forceTemplate.getAllowedUnitType(), weightClass));
                     continue;
                 }
                 
@@ -365,6 +379,16 @@ public class AtBDynamicScenarioFactory {
     }
     
     /**
+     * Handles random determination of terrain and corresponding map file from allowed terrain types
+     * @param scenario
+     */
+    public static void setTerrain(AtBDynamicScenario scenario) {
+        int terrainIndex = Compute.randomInt(scenario.getTemplate().mapParameters.allowedTerrainTypes.size());
+        scenario.setTerrainType(scenario.getTemplate().mapParameters.allowedTerrainTypes.get(terrainIndex));
+        scenario.setMapFile();
+    }
+    
+    /**
      * Method that handles setting planetary conditions - atmospheric pressure and gravity currently -
      * based on the planet on which the scenario is taking place.
      * @param scenario The scenario to manipulate
@@ -465,6 +489,9 @@ public class AtBDynamicScenarioFactory {
                         .generate(faction, unitType, weightClass, campaign.getCalendar()
                                 .get(Calendar.YEAR), quality, v -> !v.getUnitType().equals("VTOL"));
             }
+            // todo: introduce the possibility of infantry being field guns instead
+            // how: refactor IUnitGenerator interface to use UnitTable.Parameters class to avoid
+            //  many overloads
         } else {
             ms = campaign.getUnitGenerator()
                     .generate(faction, unitType, weightClass, campaign.getCalendar()
@@ -691,6 +718,8 @@ public class AtBDynamicScenarioFactory {
                         }
                         
                         return unitTypes;
+                    } else {
+                        actualUnitType = UnitType.MEK;
                     }
                 }
             }
@@ -829,14 +858,36 @@ public class AtBDynamicScenarioFactory {
     }
     
     /**
-     * Generates a "lance" of entities given some parameters. Doesn't have to be a lance, could be 
+     * Generates a "lance" of entities given some parameters, with weight not specified. Doesn't have to be a lance, could be any number.
      * @param faction The faction from which to generate entities.
      * @param skill Skill level of the crew.
      * @param quality Quality of the units.
      * @param unitTypes The types of units. Length had better be equal to the length of weights.
-     * @param weights 
-     * @param campaign
-     * @return
+     * @param campaign working campaign.
+     * @return Generated entity list.
+     */
+    private static List<Entity> generateLance(String faction, int skill, int quality, List<Integer> unitTypes, Campaign campaign) {
+        List<Entity> retval = new ArrayList<>();
+        
+        for(int i = 0; i < unitTypes.size(); i++) {
+            Entity en = getEntity(faction, skill, quality, unitTypes.get(i), UNIT_WEIGHT_UNSPECIFIED, campaign);
+            if(en != null) {
+                retval.add(en);
+            }
+        }
+        
+        return retval;
+    }
+    
+    /**
+     * Generates a "lance" of entities given some parameters. Doesn't have to be a lance, could be any number.
+     * @param faction The faction from which to generate entities.
+     * @param skill Skill level of the crew.
+     * @param quality Quality of the units.
+     * @param unitTypes The types of units. Length had better be equal to the length of weights.
+     * @param weights Weight class string
+     * @param campaign Working campaign
+     * @return List of generated entities.
      */
     private static List<Entity> generateLance(String faction, int skill, int quality, List<Integer> unitTypes, String weights, Campaign campaign) {
         List<Entity> retval = new ArrayList<>();
