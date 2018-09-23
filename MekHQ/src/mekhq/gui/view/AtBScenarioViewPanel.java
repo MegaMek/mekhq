@@ -406,7 +406,7 @@ public class AtBScenarioViewPanel extends JPanel {
             chkReroll[REROLL_MAPSIZE].addItemListener(checkBoxListener);
         }
 
-        lblMapSizeDesc.setText(scenario.getMapX() + "x" + scenario.getMapY());
+        lblMapSizeDesc.setText(scenario.getMapSizeX() + "x" + scenario.getMapSizeY());
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = y++;
         panStats.add(lblMapSizeDesc, gridBagConstraints);
@@ -672,7 +672,7 @@ public class AtBScenarioViewPanel extends JPanel {
             scenario.setMapSize();
             scenario.useReroll();
             chkReroll[REROLL_MAPSIZE].setSelected(false);
-            lblMapSizeDesc.setText(scenario.getMapX() + "x" + scenario.getMapY());
+            lblMapSizeDesc.setText(scenario.getMapSizeX() + "x" + scenario.getMapSizeY());
         }
         if (chkReroll[REROLL_LIGHT].isSelected()) {
             scenario.setLightConditions();

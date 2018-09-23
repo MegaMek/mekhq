@@ -40,7 +40,7 @@ public class ScenarioTemplate {
     public Map<String, ScenarioForceTemplate> scenarioForces = new HashMap<>();
     
     public List<ScenarioForceTemplate> getAllScenarioForces() {
-        return (ArrayList) scenarioForces.values();
+        return scenarioForces.values().stream().collect(Collectors.toList());
     }
     
     public List<ScenarioForceTemplate> getAllPlayerControlledAllies() {

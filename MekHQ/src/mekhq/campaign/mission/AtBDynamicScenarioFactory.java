@@ -2,7 +2,10 @@ package mekhq.campaign.mission;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -82,28 +85,12 @@ public class AtBDynamicScenarioFactory {
             scenario.removeBotForce(x);
         }
         
-        // fix the player force BV at the current time.
-        int playerForceBV = calculateEffectiveBV(scenario, campaign);
-        int playerForceUnitCount = calculateEffectiveUnitCount(scenario, campaign);
+        // fix the player force weight class and unit count at the current time.
         int playerForceWeightClass = calculatePlayerForceWeightClass(scenario, campaign);
+        int playerForceUnitCount = calculateEffectiveUnitCount(scenario, campaign);
         
         // at this point, only the player forces are present and contributing to BV/unit count
-        int generatedLanceCount = generateForces(scenario, contract, campaign,
-                        playerForceBV, playerForceUnitCount, playerForceWeightClass, ForceAlignment.Player);
-        
-        // now, we recalculate the BV/unit count to account for the attached allied units, 
-        // then generate the bot-controlled allies
-        playerForceBV = calculateEffectiveBV(scenario, campaign);
-        playerForceUnitCount = calculateEffectiveUnitCount(scenario, campaign);
-        generatedLanceCount += generateForces(scenario, contract, campaign,
-                playerForceBV, playerForceUnitCount, playerForceWeightClass, ForceAlignment.Allied);
-        
-        // now, we recalculate the BV/unit count to account for the bot-controlled allies 
-        // then generate the hostiles
-        playerForceBV = calculateEffectiveBV(scenario, campaign);
-        playerForceUnitCount = calculateEffectiveUnitCount(scenario, campaign);
-        generatedLanceCount += generateForces(scenario, contract, campaign,
-                playerForceBV, playerForceUnitCount, playerForceWeightClass, ForceAlignment.Opposing);
+        int generatedLanceCount = generateForces(scenario, contract, campaign, playerForceWeightClass);
                 
         // approximate estimate, anyway.
         scenario.setLanceCount(generatedLanceCount + (playerForceUnitCount / 4));
@@ -118,143 +105,188 @@ public class AtBDynamicScenarioFactory {
      * @param scenario Scenario for which we're generating forces
      * @param contract The contract on which we're currently working. Used for skill/quality/planetary info parameters
      * @param campaign The current campaign
-     * @param effectiveBV The effective battle value, up to this point, of player and allied units
-     * @param effectiveUnitCount The effective unit count, up to this point, of player and allied units
      * @param weightClass The maximum weight class of the units to generate (ignored )
-     * @param alignment The alignment of the force - player controlled and supplied, player controlled NPC, allied bot, enemy 
      * @return How many "lances" or other individual units were generated.
      */
-    public static int generateForces(AtBDynamicScenario scenario, AtBContract contract, Campaign campaign,
-            int effectiveBV, int effectiveUnitCount, int weightClass, ForceAlignment alignment) { 
+    public static int generateForces(AtBDynamicScenario scenario, AtBContract contract, Campaign campaign, int weightClass) { 
         
         int generatedLanceCount = 0;
-        // these are some properties that need to be determined prior to generating the force
-        List<ScenarioForceTemplate> forceTemplates = new ArrayList<>();
+        List<ScenarioForceTemplate> forceTemplates = scenario.getTemplate().getAllScenarioForces();
+        
+        // organize the forces by bucket.
+        Map<Integer, List<ScenarioForceTemplate>> orderedForceTemplates = new HashMap<>();
+        List<Integer> generationOrders = new ArrayList<>();
+        
+        for(ScenarioForceTemplate forceTemplate : forceTemplates) {
+            if(!orderedForceTemplates.containsKey(forceTemplate.getGenerationOrder())) {
+                orderedForceTemplates.put(forceTemplate.getGenerationOrder(), new ArrayList<>());
+                generationOrders.add(forceTemplate.getGenerationOrder());
+            }
+            
+            orderedForceTemplates.get(forceTemplate.getGenerationOrder()).add(forceTemplate);
+        }
+        
+        // sort it by bucket in ascending order just in case
+        Collections.sort(generationOrders);
+        int effectiveBV;
+        int effectiveUnitCount;
+        
+        // loop through all the generation orders we have, in ascending order
+        // generate all forces in a specific order level taking into account previously generated but not current order levels.
+        // recalculate effective BV and unit count each time we change levels
+        for(int generationOrder : generationOrders) {
+            List<ScenarioForceTemplate> currentForceTemplates = orderedForceTemplates.get(generationOrder);
+            effectiveBV = calculateEffectiveBV(scenario, campaign);
+            effectiveUnitCount = calculateEffectiveUnitCount(scenario, campaign);
+            
+            for(ScenarioForceTemplate forceTemplate : currentForceTemplates) {
+                generatedLanceCount += generateForce(scenario, contract, campaign, 
+                    effectiveBV, effectiveUnitCount, weightClass, forceTemplate);
+            }
+        }
+        
+        return generatedLanceCount;
+    }
+    
+    /** "Meaty" function that generates a set of forces for the given scenario of the given force alignment.
+    * @param scenario Scenario for which we're generating forces
+    * @param contract The contract on which we're currently working. Used for skill/quality/planetary info parameters
+    * @param campaign The current campaign
+    * @param effectiveBV The effective battle value, up to this point, of player and allied units
+    * @param effectiveUnitCount The effective unit count, up to this point, of player and allied units
+    * @param weightClass The maximum weight class of the units to generate (ignored )
+    * @param forceTemplate The force template to use to generate the force
+    * @return How many "lances" or other individual units were generated. 
+    */
+    public static int generateForce(AtBDynamicScenario scenario, AtBContract contract, Campaign campaign,
+            int effectiveBV, int effectiveUnitCount, int weightClass, ScenarioForceTemplate forceTemplate) {
         String factionCode = "";
         int skill = 0;
         int quality = 0;
+        int generatedLanceCount = 0;
+        ForceAlignment forceAlignment = ForceAlignment.getForceAlignment(forceTemplate.getForceAlignment());
         
-        switch(alignment) {
+        switch(forceAlignment) {
         case Allied:
-            forceTemplates = scenario.getTemplate().getAllBotControlledAllies();
+            //forceTemplates = scenario.getTemplate().getAllBotControlledAllies();
             factionCode = contract.getEmployerCode();
             skill = contract.getAllySkill();
             quality = contract.getAllyQuality();
             break;
         case Player:
-            forceTemplates = scenario.getTemplate().getAllPlayerControlledAllies();
+            //forceTemplates = scenario.getTemplate().getAllPlayerControlledAllies();
             factionCode = contract.getEmployerCode();
             skill = contract.getAllySkill();
             quality = contract.getAllyQuality();
             break;
         case Opposing:
         case Third:
-            forceTemplates = scenario.getTemplate().getAllPlayerControlledHostiles();
+            //forceTemplates = scenario.getTemplate().getAllPlayerControlledHostiles();
             factionCode = contract.getEnemyCode();
             skill = contract.getEnemySkill();
             quality = contract.getEnemyQuality();
             break;
+        default:
+            MekHQ.getLogger().log(AtBDynamicScenarioFactory.class, "generateForce", LogLevel.WARNING, 
+                    String.format("Invalid force alignment %d", forceTemplate.getForceAlignment()));
         }
         
         String parentFactionType = AtBConfiguration.getParentFactionType(factionCode);
         
-        for(ScenarioForceTemplate forceTemplate : forceTemplates) {
-            //  While force has not surpassed BV cap || unit cap
-            //      get me a unit types array
-            //      get me a unit weight string
-            //      use unit weight string to generate a list of entities
-            //  Step 2.1 If force has surpassed unit cap, remove randomly selected units until it's at unit cap
+        // don't generate forces flagged as player-supplied
+        if(forceTemplate.getGenerationMethod() == ForceGenerationMethod.PlayerSupplied.ordinal()) {
+            return 0;
+        }
+    
+        // determine generation parameters
+        int forceBV = 0;
+        int forceBVBudget = (int) (effectiveBV * forceTemplate.getForceMultiplier());
+        int forceUnitBudget = 0;
+        if(forceTemplate.getGenerationMethod() == ForceGenerationMethod.UnitCountScaled.ordinal()) {
+            forceUnitBudget = (int) (effectiveUnitCount * forceTemplate.getForceMultiplier());
+        } else if (forceTemplate.getGenerationMethod() == ForceGenerationMethod.FixedUnitCount.ordinal()) {
+            forceUnitBudget = (int) forceTemplate.getFixedUnitCount();
+        }
+        
+        ArrayList<Entity> generatedEntities = new ArrayList<>();
+        
+        boolean stopGenerating = false;
+        String currentLanceWeightString = "";
+        
+        //  While force has not surpassed BV cap || unit cap
+        //      get me a unit types array
+        //      get me a unit weight string
+        //      use unit weight string to generate a list of entities
+        //  Step 2.1 If force has surpassed unit cap, remove randomly selected units until it's at unit cap        
+        while(!stopGenerating) {
+            List<Entity> generatedLance;
+        
+            // atb generates between 1 and 3 lances at a time
+            // so we generate a new batch each time we run out
+            if(currentLanceWeightString.isEmpty()) {
+                currentLanceWeightString = campaign.getAtBConfig().selectBotLances(parentFactionType, weightClass);
+            }
             
-            // don't generate forces flagged as player-supplied
-            if(forceTemplate.getGenerationMethod() == ForceGenerationMethod.PlayerSupplied.ordinal()) {
+            // some special cases that don't fit into the regular RAT generation mechanism
+            // gun emplacements use a separate set of rats
+            if(forceTemplate.getAllowedUnitType() == UnitType.GUN_EMPLACEMENT) {
+                generatedLance = generateTurrets(4, skill, quality, campaign);
+            // atb civilians use a separate rat
+            } else if(forceTemplate.getAllowedUnitType() == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_CIVILIANS) {
+                generatedLance = generateCivilianUnits(4, campaign);
+            // meks, asf and tanks support weight class specification, as does the "standard atb mix"
+            } else if(IUnitGenerator.unitTypeSupportsWeightClass(forceTemplate.getAllowedUnitType()) ||
+                    (forceTemplate.getAllowedUnitType() == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX)) { 
+                List<Integer> unitTypes = generateUnitTypes(forceTemplate, 4, campaign);
+                String unitWeights = generateUnitWeights(unitTypes, factionCode, 
+                        AtBConfiguration.decodeWeightStr(currentLanceWeightString, 0), forceTemplate.getMaxWeightClass(), campaign);
+     
+                generatedLance = generateLance(factionCode, skill, 
+                        quality, unitTypes, unitWeights, campaign);
+            // everything else doesn't support weight class specification
+            } else {
+                List<Integer> unitTypes = generateUnitTypes(forceTemplate, 4, campaign);
+                generatedLance = generateLance(factionCode, skill, quality, unitTypes, campaign);
+            }
+            
+            // no reason to go into an endless loop if we can't generate a lance
+            if(generatedLance.isEmpty()) {
+                stopGenerating = true;
+                MekHQ.getLogger().log(AtBDynamicScenarioFactory.class, "generateForces", LogLevel.WARNING, 
+                        String.format("Unable to generate units from RAT: %d, type %d, weight %d", 
+                                factionCode, forceTemplate.getAllowedUnitType(), weightClass));
                 continue;
             }
-        
-            // determine generation parameters
-            int forceBV = 0;
-            int forceBVBudget = (int) (effectiveBV * forceTemplate.getForceMultiplier());
-            int forceUnitBudget = 0;
-            if(forceTemplate.getGenerationMethod() == ForceGenerationMethod.UnitCountScaled.ordinal()) {
-                forceUnitBudget = (int) (effectiveUnitCount * forceTemplate.getForceMultiplier());
-            } else if (forceTemplate.getGenerationMethod() == ForceGenerationMethod.FixedUnitCount.ordinal()) {
-                forceUnitBudget = (int) forceTemplate.getFixedUnitCount();
+            
+            // if force contributes to map size, increment the generated "lance" count
+            if(forceTemplate.getContributesToMapSize()) {
+                generatedLanceCount++;
             }
             
-            ArrayList<Entity> generatedEntities = new ArrayList<>();
-            
-            boolean stopGenerating = false;
-            String currentLanceWeightString = "";
-            
-            while(!stopGenerating) {
-                List<Entity> generatedLance;
-            
-                // atb generates between 1 and 3 lances at a time
-                // so we generate a new batch each time we run out
-                if(currentLanceWeightString.isEmpty()) {
-                    currentLanceWeightString = campaign.getAtBConfig().selectBotLances(parentFactionType, weightClass);
-                }
-                
-                // some special cases that don't fit into the regular RAT generation mechanism
-                // gun emplacements use a separate set of rats
-                if(forceTemplate.getAllowedUnitType() == UnitType.GUN_EMPLACEMENT) {
-                    generatedLance = generateTurrets(4, skill, quality, campaign);
-                // atb civilians use a separate rat
-                } else if(forceTemplate.getAllowedUnitType() == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_CIVILIANS) {
-                    generatedLance = generateCivilianUnits(4, campaign);
-                // meks, asf and tanks support weight class specification, as does the "standard atb mix"
-                } else if(IUnitGenerator.unitTypeSupportsWeightClass(forceTemplate.getAllowedUnitType()) ||
-                        (forceTemplate.getAllowedUnitType() == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX)) { 
-                    List<Integer> unitTypes = generateUnitTypes(forceTemplate, 4, campaign);
-                    String unitWeights = generateUnitWeights(unitTypes, factionCode, 
-                            AtBConfiguration.decodeWeightStr(currentLanceWeightString, 0), forceTemplate.getMaxWeightClass(), campaign);
-         
-                    generatedLance = generateLance(factionCode, skill, 
-                            quality, unitTypes, unitWeights, campaign);
-                // everything else doesn't support weight class specification
-                } else {
-                    List<Integer> unitTypes = generateUnitTypes(forceTemplate, 4, campaign);
-                    generatedLance = generateLance(factionCode, skill, quality, unitTypes, campaign);
-                }
-                
-                // no reason to go into an endless loop if we can't generate a lance
-                if(generatedLance.isEmpty()) {
-                    stopGenerating = true;
-                    MekHQ.getLogger().log(AtBDynamicScenarioFactory.class, "generateForces", LogLevel.WARNING, 
-                            String.format("Unable to generate units from RAT: %d, type %d, weight %d", 
-                                    factionCode, forceTemplate.getAllowedUnitType(), weightClass));
-                    continue;
-                }
-                
-                // if force contributes to map size, increment the generated "lance" count
-                if(forceTemplate.getContributesToMapSize()) {
-                    generatedLanceCount++;
-                }
-                
-                for(Entity ent : generatedLance) {
-                    forceBV += ent.calculateBattleValue();
-                    generatedEntities.add(ent);
-                }
-                
-                // terminate force generation if we've gone over our unit count or bv budget
-                if(forceTemplate.getGenerationMethod() == ForceGenerationMethod.BVScaled.ordinal()) {
-                    stopGenerating = forceBV > forceBVBudget;
-                } else {
-                    stopGenerating = generatedEntities.size() >= forceUnitBudget; 
-                }
-                
-                currentLanceWeightString = currentLanceWeightString.substring(1);
+            for(Entity ent : generatedLance) {
+                forceBV += ent.calculateBattleValue();
+                generatedEntities.add(ent);
             }
             
-            // chop out random units until we drop down to our unit count budget
-            while(forceUnitBudget > 0 && generatedEntities.size() > forceUnitBudget) {
-                generatedEntities.remove(Compute.randomInt(generatedEntities.size()));
+            // terminate force generation if we've gone over our unit count or bv budget
+            if(forceTemplate.getGenerationMethod() == ForceGenerationMethod.BVScaled.ordinal()) {
+                stopGenerating = forceBV > forceBVBudget;
+            } else {
+                stopGenerating = generatedEntities.size() >= forceUnitBudget; 
             }
             
-            BotForce generatedForce = new BotForce();
-            generatedForce.setEntityList(generatedEntities);
-            setBotForceParameters(generatedForce, forceTemplate, contract);
-            scenario.addBotForce(generatedForce, forceTemplate);
+            currentLanceWeightString = currentLanceWeightString.substring(1);
         }
+        
+        // chop out random units until we drop down to our unit count budget
+        while(forceUnitBudget > 0 && generatedEntities.size() > forceUnitBudget) {
+            generatedEntities.remove(Compute.randomInt(generatedEntities.size()));
+        }
+        
+        BotForce generatedForce = new BotForce();
+        generatedForce.setEntityList(generatedEntities);
+        setBotForceParameters(generatedForce, forceTemplate, contract);
+        scenario.addBotForce(generatedForce, forceTemplate);
         
         return generatedLanceCount;
     }
@@ -1019,6 +1051,9 @@ public class AtBDynamicScenarioFactory {
             actualDestinationEdge = Compute.randomInt(CardinalEdge.values().length - 1);
         } else if (forceTemplate.getDestinationZone() == ScenarioForceTemplate.DESTINATION_EDGE_OPPOSITE_DEPLOYMENT) {
             actualDestinationEdge = getOppositeEdge(force.getStart());
+        } else {
+            force.getBehaviorSettings().setDestinationEdge(CardinalEdge.getCardinalEdge(actualDestinationEdge));
+            return;
         }
         
         force.setDestinationEdge(actualDestinationEdge);

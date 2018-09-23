@@ -8,6 +8,7 @@ import java.util.Map;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 
+import megamek.client.bot.princess.CardinalEdge;
 import megamek.common.Board;
 
 public class ScenarioForceTemplate {
@@ -37,14 +38,23 @@ public class ScenarioForceTemplate {
     
     public static int DEPLOYMENT_ZONE_NARROW_EDGE = DEPLOYMENT_ZONES.length - 1;
     
-    public static int DESTINATION_EDGE_OPPOSITE_DEPLOYMENT = 5;
-    public static int DESTINATION_EDGE_RANDOM = 6;    
+    public static int DESTINATION_EDGE_OPPOSITE_DEPLOYMENT = -1;
+    public static int DESTINATION_EDGE_RANDOM = -2;    
     
     public enum ForceAlignment {
         Player,
         Allied,
         Opposing,
-        Third
+        Third;
+        
+        public static ForceAlignment getForceAlignment(int ordinal) {
+            for (ForceAlignment he : values()) {
+                if (he.ordinal() == ordinal) {
+                    return he;
+                }
+            }
+            return null;
+        }
     }
     
     public enum ForceGenerationMethod {
@@ -179,7 +189,17 @@ public class ScenarioForceTemplate {
      */
     private int actualDeploymentZone = Board.START_NONE;
     
+    /**
+     * How many units to generate, in case of a fixed unit count.
+     */
     private int fixedUnitCount = 0;
+    
+    /**
+     * The "generation bucket" to which this force template is assigned. 
+     * Forces within a particular "generation bucket" will be generated at the same time, taking into account
+     * forces previously generated.
+     */
+    private int generationOrder = 0;
     
     /**
      * Blank constructor for deserialization purposes.
@@ -273,6 +293,10 @@ public class ScenarioForceTemplate {
         return contributesToMapSize;
     }
     
+    public int getGenerationOrder() {
+        return generationOrder;
+    }
+    
     public int getFixedUnitCount() {
         return fixedUnitCount;
     }
@@ -347,6 +371,10 @@ public class ScenarioForceTemplate {
     
     public void setFixedUnitCount(int fixedUnitCount) {
         this.fixedUnitCount = fixedUnitCount;
+    }
+    
+    public void setGenerationOrder(int generationOrder) {
+        this.generationOrder = generationOrder;
     }
     
     /**

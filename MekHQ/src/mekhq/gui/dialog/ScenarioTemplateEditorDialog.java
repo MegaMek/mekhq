@@ -12,14 +12,15 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -32,8 +33,6 @@ import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.border.LineBorder;
-import javax.swing.filechooser.FileFilter;
-import javax.swing.filechooser.FileNameExtensionFilter;
 
 import megamek.client.bot.princess.CardinalEdge;
 import megamek.common.EntityWeightClass;
@@ -43,7 +42,6 @@ import mekhq.campaign.mission.ScenarioForceTemplate;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
 import mekhq.campaign.mission.ScenarioForceTemplate.SynchronizedDeploymentType;
-import mekhq.io.FileType;
 import mekhq.campaign.mission.ScenarioTemplate;
 import mekhq.gui.FileDialogs;
 
@@ -59,6 +57,9 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
      */
     private static final long serialVersionUID = 9179434871199751998L;
 
+    // this maps indexes in the destination zone drop down to CardinalEdge enum values and special cases in the scenario force template
+    private static Map<Integer, Integer> destinationZoneMapping;
+    
     private final Dimension spinnerSize = new Dimension(55, 25);
     
     private final static String ADD_FORCE_COMMAND = "ADDFORCE"; 
@@ -84,6 +85,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
     JSpinner spnFixedUnitCount;
     JComboBox<String> cboMaxWeightClass;
     JCheckBox chkContributesToMapSize;
+    JSpinner spnGenerationOrder;
     
     
     JPanel panForceList;
@@ -101,11 +103,21 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
     JPanel globalPanel;
     
     JPanel forcedPanel;
-    //JPanel forcgedPanel;
     JScrollPane forceScrollPane;
     
     // the scenario template we're working on
     ScenarioTemplate scenarioTemplate = new ScenarioTemplate(); 
+    
+    static {
+        destinationZoneMapping = new HashMap<>();
+        destinationZoneMapping.put(0, CardinalEdge.NORTH.ordinal());
+        destinationZoneMapping.put(1, CardinalEdge.EAST.ordinal());
+        destinationZoneMapping.put(2, CardinalEdge.SOUTH.ordinal());
+        destinationZoneMapping.put(3, CardinalEdge.WEST.ordinal());
+        destinationZoneMapping.put(4, CardinalEdge.NEAREST_OR_NONE.ordinal());
+        destinationZoneMapping.put(5, ScenarioForceTemplate.DESTINATION_EDGE_OPPOSITE_DEPLOYMENT);
+        destinationZoneMapping.put(6, ScenarioForceTemplate.DESTINATION_EDGE_RANDOM);
+    }
     
     /**
      * Constructor. Creates a new instance of this dialog with the given parent JFrame.
@@ -433,6 +445,16 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         chkContributesToMapSize = new JCheckBox();
         gbc.gridx++;
         forcedPanel.add(chkContributesToMapSize, gbc);
+        
+        JLabel lblGenerationOrder = new JLabel("Generation Order:");
+        lblGenerationOrder.setToolTipText("Controls when this force will be generated related to other forces. Higher numbers will be generated later.");
+        gbc.gridy++;
+        gbc.gridx--;
+        forcedPanel.add(lblGenerationOrder, gbc);
+        
+        spnGenerationOrder = new JSpinner(new SpinnerNumberModel(1, 1, 100, 1));
+        gbc.gridx++;
+        forcedPanel.add(spnGenerationOrder, gbc);
         
         JButton btnAdd = new JButton("Add");
         btnAdd.setActionCommand(ADD_FORCE_COMMAND);
@@ -800,7 +822,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
             deploymentZones.add(x);
         }
         
-        int destinationZone = cboDestinationZone.getSelectedIndex();
+        int destinationZone = destinationZoneMapping.get(cboDestinationZone.getSelectedIndex());
         double retreatThreshold = (int) spnRetreatThreshold.getValue() / 100.0;
         
         int allowedUnitType = cboUnitType.getSelectedIndex() - ScenarioForceTemplate.SPECIAL_UNIT_TYPES.size();
@@ -815,6 +837,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         sft.setFixedUnitCount((int) spnFixedUnitCount.getValue());
         sft.setContributesToMapSize(chkContributesToMapSize.isSelected());
         sft.setMaxWeightClass(cboMaxWeightClass.getSelectedIndex());
+        sft.setGenerationOrder((int) spnGenerationOrder.getValue());
         
         sft.setSyncDeploymentType(SynchronizedDeploymentType.values()[cboSyncDeploymentType.getSelectedIndex()]);
         
