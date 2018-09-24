@@ -7324,7 +7324,7 @@ public class Campaign implements Serializable, ITechManager {
                     String name = names.next();
                     String location = category + ":" + name;
                     ImageId iid = ImageId.of(category, name);
-                    if (!existingPortraits.contains(iid)) {
+                    if (existingPortraits.contains(iid)) {
                         continue;
                     }
                     possiblePortraits.add(iid);
