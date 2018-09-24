@@ -563,7 +563,7 @@ public class AtBScenarioViewPanel extends JPanel {
                     scenario.getResourceBundle().getString("battleDetails." +
                     scenario.getResourceKey() +
                     ".observations"));
-        } else {
+        } else if(!(scenario instanceof AtBDynamicScenario)) {
             txtDetails.setText("Victory Conditions:\n" +
             		scenario.getResourceBundle().getString("battleDetails." +
                     scenario.getResourceKey() +
@@ -597,7 +597,7 @@ public class AtBScenarioViewPanel extends JPanel {
         txtDesc.setWrapStyleWord(true);
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y++;
-        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.gridwidth = 3;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 20);

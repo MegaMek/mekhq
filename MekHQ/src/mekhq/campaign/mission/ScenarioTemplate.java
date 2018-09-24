@@ -1,7 +1,7 @@
 package mekhq.campaign.mission;
 
 import java.io.File;
-import java.util.ArrayList;
+import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,6 +17,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.namespace.QName;
 import javax.xml.transform.stream.StreamSource;
 
+import org.w3c.dom.Node;
+
 import mekhq.MekHQ;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
@@ -28,7 +30,9 @@ import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
  */
 @XmlRootElement(name="ScenarioTemplate")
 public class ScenarioTemplate {
-
+    public static final String ROOT_XML_ELEMENT_NAME = "ScenarioTemplate";
+    
+    
     public String name;
     public String shortBriefing;
     public String detailedBriefing;
@@ -63,10 +67,15 @@ public class ScenarioTemplate {
                 .collect(Collectors.toList());
     }
     
+    /**
+     * Serialize this instance of a scenario template to a File
+     * Please pass in a non-null file.
+     * @param outputFile The destination file.
+     */
     public void Serialize(File outputFile) {
         try {
             JAXBContext context = JAXBContext.newInstance(ScenarioTemplate.class);
-            JAXBElement<ScenarioTemplate> templateElement = new JAXBElement<>(new QName("ScenarioTemplate"), ScenarioTemplate.class, this);
+            JAXBElement<ScenarioTemplate> templateElement = new JAXBElement<>(new QName(ROOT_XML_ELEMENT_NAME), ScenarioTemplate.class, this);
             Marshaller m = context.createMarshaller();
             m.marshal(templateElement, outputFile);
         } catch(Exception e) {
@@ -74,6 +83,28 @@ public class ScenarioTemplate {
         }
     }
     
+    /**
+     * Serialize this instance of a scenario template to a PrintWriter
+     * Omits initial xml declaration
+     * @param pw The destination print writer
+     */
+    public void Serialize(PrintWriter pw) {
+        try {
+            JAXBContext context = JAXBContext.newInstance(ScenarioTemplate.class);
+            JAXBElement<ScenarioTemplate> templateElement = new JAXBElement<>(new QName(ROOT_XML_ELEMENT_NAME), ScenarioTemplate.class, this);
+            Marshaller m = context.createMarshaller();
+            m.setProperty("jaxb.fragment", true);
+            m.marshal(templateElement, pw);
+        } catch(Exception e) {
+            MekHQ.getLogger().error(ScenarioTemplate.class, "Serialize", e.getMessage());
+        }
+    }
+    
+    /**
+     * Attempt to deserialize an instance of a ScenarioTemplate from the passed-in file 
+     * @param inputFile The source file
+     * @return Possibly an instance of a ScenarioTemplate
+     */
     public static ScenarioTemplate Deserialize(File inputFile) {
         ScenarioTemplate resultingTemplate = null;
         
@@ -81,6 +112,26 @@ public class ScenarioTemplate {
             JAXBContext context = JAXBContext.newInstance(ScenarioTemplate.class);
             Unmarshaller um = context.createUnmarshaller();
             JAXBElement<ScenarioTemplate> templateElement = um.unmarshal(new StreamSource(inputFile), ScenarioTemplate.class);
+            resultingTemplate = templateElement.getValue();
+        } catch(Exception e) {
+            MekHQ.getLogger().error(ScenarioTemplate.class, "Deserialize", "Error Deserializing Scenario Template", e);
+        }
+        
+        return resultingTemplate;
+    }
+    
+    /**
+     * Attempt to deserialize an instance of a ScenarioTemplate from the passed-in XML Node
+     * @param inputFile The source file
+     * @return Possibly an instance of a ScenarioTemplate
+     */
+    public static ScenarioTemplate Deserialize(Node xmlNode) {
+        ScenarioTemplate resultingTemplate = null;
+        
+        try {
+            JAXBContext context = JAXBContext.newInstance(ScenarioTemplate.class);
+            Unmarshaller um = context.createUnmarshaller();
+            JAXBElement<ScenarioTemplate> templateElement = um.unmarshal(xmlNode, ScenarioTemplate.class);
             resultingTemplate = templateElement.getValue();
         } catch(Exception e) {
             MekHQ.getLogger().error(ScenarioTemplate.class, "Deserialize", "Error Deserializing Scenario Template", e);

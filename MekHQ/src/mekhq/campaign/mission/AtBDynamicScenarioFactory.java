@@ -168,20 +168,17 @@ public class AtBDynamicScenarioFactory {
         
         switch(forceAlignment) {
         case Allied:
-            //forceTemplates = scenario.getTemplate().getAllBotControlledAllies();
             factionCode = contract.getEmployerCode();
             skill = contract.getAllySkill();
             quality = contract.getAllyQuality();
             break;
         case Player:
-            //forceTemplates = scenario.getTemplate().getAllPlayerControlledAllies();
             factionCode = contract.getEmployerCode();
             skill = contract.getAllySkill();
             quality = contract.getAllyQuality();
             break;
         case Opposing:
         case Third:
-            //forceTemplates = scenario.getTemplate().getAllPlayerControlledHostiles();
             factionCode = contract.getEnemyCode();
             skill = contract.getEnemySkill();
             quality = contract.getEnemyQuality();

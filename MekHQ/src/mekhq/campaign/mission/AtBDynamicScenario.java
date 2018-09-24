@@ -1,15 +1,17 @@
 package mekhq.campaign.mission;
 
+import java.io.PrintWriter;
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
 
 /**
- * Data structure intended to hold data relevant to AtB Scenarios (AtB 3.0) 
+ * Data structure intended to hold data relevant to AtB Dynamic Scenarios (AtB 3.0) 
  * @author NickAragua
  *
  */
@@ -41,13 +43,15 @@ public class AtBDynamicScenario extends AtBScenario {
     public void addForces(int forceID) {
         super.addForces(forceID);
         
-        // loop through all player-supplied forces in the template
+        // loop through all player-supplied forces in the template, if there is one
         // assign the newly-added force to the first template we find
-        for(ScenarioForceTemplate forceTemplate : template.scenarioForces.values()) {
-            if((forceTemplate.getGenerationMethod() == ForceGenerationMethod.PlayerSupplied.ordinal()) &&
-                    !playerForceTemplates.containsValue(forceTemplate)) {
-                playerForceTemplates.put(forceID, forceTemplate);
-                return;
+        if(template != null) {
+            for(ScenarioForceTemplate forceTemplate : template.scenarioForces.values()) {
+                if((forceTemplate.getGenerationMethod() == ForceGenerationMethod.PlayerSupplied.ordinal()) &&
+                        !playerForceTemplates.containsValue(forceTemplate)) {
+                    playerForceTemplates.put(forceID, forceTemplate);
+                    return;
+                }
             }
         }
         
@@ -58,6 +62,39 @@ public class AtBDynamicScenario extends AtBScenario {
     public void removeForce(int fid) {
         super.removeForce(fid);
         playerForceTemplates.remove(fid);
+    }
+    
+    @Override
+    public int getStart() {
+        // If we've assigned at least one force
+        // and there's a player force template associated with the first force
+        // then return the generated deployment zone associated with the first force
+        if(!getForceIDs().isEmpty() &&
+                playerForceTemplates.containsKey(getForceIDs().get(0))) {
+            return playerForceTemplates.get(getForceIDs().get(0)).getActualDeploymentZone();
+        }
+        
+        return super.getStart();
+    }
+    
+    /**
+     * Horizontal map size.
+     * Unlike the AtBScenario, we only perform map size calculations once (once all primary forces are committed),
+     * so we don't re-calculate the map size each time.
+     */
+    @Override
+    public int getMapX() {
+        return getMapSizeX();
+    }
+    
+    /**
+     * Vertical map size.
+     * Unlike the AtBScenario, we only perform map size calculations once (once all primary forces are committed),
+     * so we don't re-calculate the map size each time.
+     */
+    @Override
+    public int getMapY() {
+        return getMapSizeY();
     }
     
     public void addBotForce(BotForce botForce, ScenarioForceTemplate forceTemplate) {
@@ -99,23 +136,40 @@ public class AtBDynamicScenario extends AtBScenario {
 
     @Override
     public int getScenarioType() {
-        // TODO Auto-generated method stub
         return 0;
     }
 
     @Override
     public String getScenarioTypeDescription() {
-        // TODO Auto-generated method stub
         return "Dynamic Scenario";
     }
 
     @Override
     public String getResourceKey() {
-        // TODO Auto-generated method stub
-        return "baseAttack";
+        return null;
     }
     
+    @Override
+    protected void writeToXmlEnd(PrintWriter pw1, int indent) {
+        if(template != null) {
+            template.Serialize(pw1);
+        }
+        
+        super.writeToXmlEnd(pw1, indent);
+    }
+    
+    @Override
     protected void loadFieldsFromXmlNode(Node wn) throws ParseException {
+        NodeList nl = wn.getChildNodes();
+
+        for (int x=0; x<nl.getLength(); x++) {
+            Node wn2 = nl.item(x);
+            
+            if (wn2.getNodeName().equalsIgnoreCase(ScenarioTemplate.ROOT_XML_ELEMENT_NAME)) {
+                template = ScenarioTemplate.Deserialize(wn2);
+            }
+        }
+        
         super.loadFieldsFromXmlNode(wn);
     }
 }
