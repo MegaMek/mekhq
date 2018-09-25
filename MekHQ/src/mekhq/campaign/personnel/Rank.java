@@ -182,7 +182,7 @@ public class Rank implements MekHqXmlSerializable {
                 	String[] rNames = { wn2.getTextContent(), "--MW", "--MW", "--MW", "--MW", "--MW" };
                     retVal.rankNames = new ArrayList<String>(Arrays.asList(rNames));
                 } else if (wn2.getNodeName().equalsIgnoreCase("rankNames")) {
-                    retVal.rankNames = new ArrayList<String>(Arrays.asList(wn2.getTextContent().split(",")));
+                    retVal.rankNames = new ArrayList<String>(Arrays.asList(wn2.getTextContent().split(",", -1)));
                     for (int i = 0; i < retVal.rankNames.size(); i++) {
                     	retVal.rankLevels.add(0);
                     	if (retVal.rankNames.get(i).contains(":")) {
