@@ -30,6 +30,8 @@ import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.personnel.Award;
+import mekhq.campaign.personnel.ranks.ManeiDominiClass;
+import mekhq.campaign.personnel.ranks.ManeiDominiRank;
 import mekhq.campaign.Kill;
 import mekhq.campaign.LogEntry;
 import mekhq.campaign.event.PersonChangedEvent;
@@ -56,8 +58,6 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
         ActionListener {
     private static final String CMD_RANKSYSTEM = "RANKSYSTEM"; //$NON-NLS-1$
     private static final String CMD_RANK = "RANK"; //$NON-NLS-1$
-    private static final String CMD_MANEI_DOMINI_RANK = "MD_RANK"; //$NON-NLS-1$
-    private static final String CMD_MANEI_DOMINI_CLASS = "MD_CLASS"; //$NON-NLS-1$
     private static final String CMD_PRIMARY_ROLE = "PROLE"; //$NON-NLS-1$
     private static final String CMD_SECONDARY_ROLE = "SROLE"; //$NON-NLS-1$
     private static final String CMD_PRIMARY_DESIGNATOR = "DESIG_PRI"; //$NON-NLS-1$
@@ -200,18 +200,6 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
 
                 for (Person person : people) {
                     gui.getCampaign().changeRank(person, rank, level, true);
-                }
-                break;
-            case CMD_MANEI_DOMINI_RANK:
-                int md_rank = Integer.parseInt(data[1]);
-                for (Person person : people) {
-                    person.setManeiDominiRank(md_rank);
-                }
-                break;
-            case CMD_MANEI_DOMINI_CLASS:
-                int md_class = Integer.parseInt(data[1]);
-                for (Person person : people) {
-                    person.setManeiDominiClass(md_class);
                 }
                 break;
             case CMD_PRIMARY_DESIGNATOR:
@@ -1224,36 +1212,14 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             popup.add(menu);
             if (StaticChecks.areAllWoB(selected)) {
                 // MD Ranks
-                menu = new JMenu(resourceMap.getString("changeMDRank.text")); //$NON-NLS-1$
-                for (int i = Rank.MD_RANK_NONE; i < Rank.MD_RANK_NUM; i++) {
-                    cbMenuItem = new JCheckBoxMenuItem(
-                            Rank.getManeiDominiRankName(i));
-                    cbMenuItem.setActionCommand(makeCommand(CMD_MANEI_DOMINI_RANK, String.valueOf(i)));
-                    cbMenuItem.addActionListener(this);
-                    cbMenuItem.setEnabled(true);
-                    if (i == person.getManeiDominiRank()) {
-                        cbMenuItem.setSelected(true);
-                    }
-                    menu.add(cbMenuItem);
-                }
+                menu = maneiDominiRankMenu(person, resourceMap.getString("changeMDRank.text"), resourceMap.getString("changeMDRank.none")); //$NON-NLS-1$ //$NON-NLS-2$
                 if (menu.getItemCount() > MAX_POPUP_ITEMS) {
                     MenuScroller.setScrollerFor(menu, MAX_POPUP_ITEMS);
                 }
                 popup.add(menu);
 
                 // MD Classes
-                menu = new JMenu(resourceMap.getString("changeMDClass.text")); //$NON-NLS-1$
-                for (int i = Person.MD_NONE; i < Person.MD_NUM; i++) {
-                    cbMenuItem = new JCheckBoxMenuItem(
-                            Person.getManeiDominiClassNames(i, Ranks.RS_WOB));
-                    cbMenuItem.setActionCommand(makeCommand(CMD_MANEI_DOMINI_CLASS, String.valueOf(i)));
-                    cbMenuItem.addActionListener(this);
-                    cbMenuItem.setEnabled(true);
-                    if (i == person.getManeiDominiClass()) {
-                        cbMenuItem.setSelected(true);
-                    }
-                    menu.add(cbMenuItem);
-                }
+                menu = maneiDominiClassMenu(person, resourceMap.getString("changeMDClass.text"), resourceMap.getString("changeMDClass.none")); //$NON-NLS-1$ //$NON-NLS-2$
                 if (menu.getItemCount() > MAX_POPUP_ITEMS) {
                     MenuScroller.setScrollerFor(menu, MAX_POPUP_ITEMS);
                 }
@@ -2447,4 +2413,43 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
         result.setEnabled(true);
         return result;
     }
+
+    private static JMenu maneiDominiRankMenu(Person person, String menuLabel, String setNoRankLabel) {
+        JMenu menu = new JMenu(menuLabel);
+        {
+            JCheckBoxMenuItem mi = new JCheckBoxMenuItem(setNoRankLabel);
+            mi.addActionListener(evt -> person.setManeiDominiRank(Optional.empty()));
+            mi.setEnabled(true);
+            mi.setSelected(!person.getManeiDominiRank().isPresent());
+            menu.add(mi);
+        }
+        for (ManeiDominiRank mdRank : ManeiDominiRank.values()) {
+            JCheckBoxMenuItem mi = new JCheckBoxMenuItem(mdRank.getDisplayName());
+            mi.addActionListener(evt -> person.setManeiDominiRank(Optional.of(mdRank)));
+            mi.setEnabled(true);
+            mi.setSelected(person.getManeiDominiRank().filter(mdRank::equals).isPresent());
+            menu.add(mi);
+        }
+        return menu;
+    }
+
+    private static JMenu maneiDominiClassMenu(Person person, String menuLabel, String setNoRankLabel) {
+        JMenu menu = new JMenu(menuLabel);
+        {
+            JCheckBoxMenuItem mi = new JCheckBoxMenuItem(setNoRankLabel);
+            mi.addActionListener(e -> person.setManeiDominiClass(Optional.empty()));
+            mi.setEnabled(true);
+            mi.setSelected(!person.getManeiDominiClass().isPresent());
+            menu.add(mi);
+        }
+        for (ManeiDominiClass mdClass : ManeiDominiClass.values()) {
+            JCheckBoxMenuItem mi = new JCheckBoxMenuItem(mdClass.getDisplayName());
+            mi.addActionListener(e -> person.setManeiDominiClass(Optional.of(mdClass)));
+            mi.setEnabled(true);
+            mi.setSelected(person.getManeiDominiClass().filter(mdClass::equals).isPresent());
+            menu.add(mi);
+        }
+        return menu;
+    }
+
 }
