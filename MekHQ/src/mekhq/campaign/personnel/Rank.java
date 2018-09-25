@@ -80,7 +80,7 @@ public class Rank implements MekHqXmlSerializable {
         rankLevels = new ArrayList<>();
         for (int i = 0; i < rankNames.size(); i++) {
         	rankLevels.add(0);
-        	if (rankNames.get(i).contains(":")) {
+        	if (rankNames.get(i).matches(".+:\\d+\\s*$")) {
         		String[] temp = rankNames.get(i).split(":");
         		rankNames.set(i, temp[0].trim());
         		rankLevels.set(i, Integer.parseInt(temp[1].trim()));
@@ -186,7 +186,7 @@ public class Rank implements MekHqXmlSerializable {
                     retVal.rankNames = Arrays.asList(wn2.getTextContent().split(",", -1));
                     for (int i = 0; i < retVal.rankNames.size(); i++) {
                     	retVal.rankLevels.add(0);
-                    	if (retVal.rankNames.get(i).contains(":")) {
+                    	if (retVal.rankNames.get(i).matches(".+:\\d+\\s*$")) {
                     		String[] temp = retVal.rankNames.get(i).split(":");
                     		retVal.rankNames.set(i, temp[0].trim());
                     		retVal.rankLevels.set(i, Integer.parseInt(temp[1].trim()));
