@@ -627,7 +627,12 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         gbc.gridy++;
         gbc.gridx = 0;
         //headers
+        JLabel lblGenerationOrder = new JLabel("Order");
+        lblGenerationOrder.setBorder(new LineBorder(Color.GRAY));
+        panForceList.add(lblGenerationOrder, gbc);
+        
         JLabel lblForceNameHeader = new JLabel("Force ID");
+        gbc.gridx++;
         lblForceNameHeader.setBorder(new LineBorder(Color.GRAY));
         panForceList.add(lblForceNameHeader, gbc);
         
@@ -641,7 +646,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         gbc.gridx++;
         panForceList.add(lblGenerationMethodHeader, gbc);
         
-        JLabel lblMultiplierHeader = new JLabel("Multiplier");
+        JLabel lblMultiplierHeader = new JLabel("<html>Multiplier /<br/> Unit Count</html>");
         lblMultiplierHeader.setBorder(new LineBorder(Color.GRAY));
         gbc.gridx++;
         panForceList.add(lblMultiplierHeader, gbc);
@@ -666,7 +671,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         gbc.gridx++;
         panForceList.add(lblAllowedUnitTypesHeader, gbc);
         
-        JLabel lblWeightClassHeader = new JLabel("Weight Class");
+        JLabel lblWeightClassHeader = new JLabel("Max Wt Class");
         lblWeightClassHeader.setBorder(new LineBorder(Color.GRAY));
         gbc.gridx++;
         panForceList.add(lblWeightClassHeader, gbc);
@@ -701,7 +706,11 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         
         for(String forceIndex : scenarioTemplate.scenarioForces.keySet()) {
             ScenarioForceTemplate sft = scenarioTemplate.scenarioForces.get(forceIndex);
+            JLabel lblForceOrder = new JLabel(((Integer) sft.getGenerationOrder()).toString());
+            panForceList.add(lblForceOrder, gbc);
+            
             JLabel lblForceName = new JLabel(sft.getForceName());
+            gbc.gridx++;
             panForceList.add(lblForceName, gbc);
             
             JLabel lblForceAlignment = new JLabel(ScenarioForceTemplate.FORCE_ALIGNMENTS[sft.getForceAlignment()]);
@@ -712,11 +721,16 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
             gbc.gridx++;
             panForceList.add(lblGenerationMethod, gbc);
             
-            JLabel lblMultiplier = new JLabel(((Double) sft.getForceMultiplier()).toString());
+            JLabel lblMultiplier = new JLabel();
             gbc.gridx++;
             
             if(!sft.isPlayerForce() && 
                     (sft.getGenerationMethod() != ScenarioForceTemplate.ForceGenerationMethod.FixedUnitCount.ordinal())) {
+                lblMultiplier.setText(((Double) sft.getForceMultiplier()).toString());
+                panForceList.add(lblMultiplier, gbc);
+            } else if(!sft.isPlayerForce() &&
+                (sft.getGenerationMethod() == ScenarioForceTemplate.ForceGenerationMethod.FixedUnitCount.ordinal())) {
+                lblMultiplier.setText(((Integer) sft.getFixedUnitCount()).toString());
                 panForceList.add(lblMultiplier, gbc);
             }
             
@@ -959,6 +973,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         chkContributesToUnitCount.setSelected(!isEnemyForce);
         chkContributesToMapSize.setSelected(true);
         
+        spnMultiplier.setEnabled(cboGenerationMethod.getSelectedIndex() != ForceGenerationMethod.FixedUnitCount.ordinal());
         spnFixedUnitCount.setEnabled(cboGenerationMethod.getSelectedIndex() == ForceGenerationMethod.FixedUnitCount.ordinal());
     }
     
