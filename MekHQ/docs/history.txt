@@ -9,6 +9,7 @@ v0.45.2-SNAPSHOT
 + PR #928: Allow mothballed units in retirement dialog
 + PR #927: Map Colors for Socio-Industrial Level
 + PR #926: Planet-based acquisition option
++ Issue #946: Some personnel (techs and admins) no longer able to be right clicked.
 
 v0.45.1 (2018-09-03 2300 UTC)
 + PR #864: Security - address XXE vulnerabilities in XML parsers
