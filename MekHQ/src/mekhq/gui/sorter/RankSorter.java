@@ -10,6 +10,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Ranks;
+import mekhq.campaign.personnel.ranks.ManeiDominiRank;
 
  /**
      * A comparator for ranks written as strings with "-" sorted to the bottom always
@@ -17,6 +18,12 @@ import mekhq.campaign.personnel.Ranks;
      *
      */
     public class RankSorter implements Comparator<String> {
+        
+        private static final Comparator<Person> ORDER_BY_MDRANK = Comparator.<Person,Integer>comparing(p -> {
+            return p.getManeiDominiRank()
+                    .map(ManeiDominiRank::ordinal)
+                    .orElse(Integer.MIN_VALUE);
+        });
 
         private Campaign campaign;
         private Pattern pattern;
@@ -52,7 +59,8 @@ import mekhq.campaign.personnel.Ranks;
 	        		    if(p0.getManeiDominiRank() == p1.getManeiDominiRank()) {
 	        		        return s0.compareTo(s1);
 	        		    }
-	        		    return Integer.compare(p0.getManeiDominiRank(), p1.getManeiDominiRank());
+	        		    Comparator.<Person,Integer>comparing(p -> p.getManeiDominiRank().map(ManeiDominiRank::ordinal).orElse(Integer.MIN_VALUE));
+	        		    return ORDER_BY_MDRANK.compare(p0, p1);
 	        		}
 	        		return Integer.compare(p0.getRankLevel(), p1.getRankLevel());
 	        	}

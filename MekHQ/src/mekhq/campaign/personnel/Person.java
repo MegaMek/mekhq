@@ -38,16 +38,18 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.StringTokenizer;
 import java.util.UUID;
 import java.util.Vector;
+import java.util.function.Function;
 import java.util.function.IntSupplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import org.joda.time.DateTime;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import megamek.common.Aero;
 import megamek.common.BattleArmor;
@@ -82,10 +84,13 @@ import mekhq.campaign.ExtraData;
 import mekhq.campaign.LogEntry;
 import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.mod.am.InjuryUtil;
+import mekhq.campaign.personnel.ranks.ManeiDominiClass;
+import mekhq.campaign.personnel.ranks.ManeiDominiRank;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.universe.Faction;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
-import mekhq.campaign.universe.Faction;
+import mekhq.util.dom.DomProcessor;
 
 /**
  * @author Jay Lawson <jaylawson39 at yahoo.com>
@@ -294,19 +299,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
     // AwardNames
     private List<Award> awards;
 
-
-    // Manei Domini "Classes"
-    public static final int MD_NONE			= 0;
-    public static final int MD_GHOST		= 1;
-    public static final int MD_WRAITH		= 2;
-    public static final int MD_BANSHEE		= 3;
-    public static final int MD_ZOMBIE		= 4;
-    public static final int MD_PHANTOM		= 5;
-    public static final int MD_SPECTER		= 6;
-    public static final int MD_POLTERGEIST	= 7;
-    public static final int MD_NUM			= 8;
-    private int maneiDominiClass = MD_NONE;
-    private int maneiDominiRank = Rank.MD_RANK_NONE;
+    private ManeiDominiClass maneiDominiClass = null;
+    private ManeiDominiRank  maneiDominiRank = null;
 
     //stuff to track for support teams
     protected int minutesLeft;
@@ -1378,14 +1372,12 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     + "<rankSystem>"
                     + rankSystem
                     + "</rankSystem>");
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                    + "<maneiDominiRank>"
-                    + maneiDominiRank
-                    + "</maneiDominiRank>");
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                    + "<maneiDominiClass>"
-                    + maneiDominiClass
-                    + "</maneiDominiClass>");
+        if (maneiDominiRank != null) {
+            pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<maneiDominiRank>" + maneiDominiRank + "</maneiDominiRank>");
+        }
+        if (maneiDominiClass != null) {
+            pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<maneiDominiClass>" + maneiDominiClass + "</maneiDominiClass>");
+        }
         pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                     + "<nTasks>"
                     + nTasks
@@ -1531,269 +1523,176 @@ public class Person implements Serializable, MekHqXmlSerializable {
         pw1.println(MekHqXmlUtil.indentStr(indent) + "</person>");
     }
 
-    public static Person generateInstanceFromXML(Node wn, Campaign c, Version version) {
+    public static Person generateInstanceFromXML(Node wn, Campaign campaign, Version version) {
         final String METHOD_NAME = "generateInstanceFromXML(Node,Campaign,Version)"; //$NON-NLS-1$
-        
-        Person retVal = null;
 
         try {
-            // Instantiate the correct child class, and call its parsing function.
-            retVal = new Person(c);
 
-            // Okay, now load Person-specific fields!
-            NodeList nl = wn.getChildNodes();
+            Person retVal = new Person(campaign);
+            DomProcessor dp = DomProcessor.at((Element) wn);
+            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 
-            String advantages = null;
-            String edge = null;
-            String implants = null;
+            retVal.name       = dp.text("name", "Biff the Understudy");
+            retVal.maidenname = dp.text("maidenname", null);
+            retVal.callsign   = dp.text("callsign", "");
+            retVal.commander  = dp.text("commander", txt -> Boolean.parseBoolean(txt.trim()), false);
+            retVal.dependent  = dp.text("dependent", txt -> Boolean.parseBoolean(txt.trim()), false);
+
+            retVal.clan = dp.children("isClanTech","clan")
+                            .reduce((a,b) -> b) // reduce to the last one
+                            .map(element -> Boolean.parseBoolean(element.getTextContent().trim()))
+                            .orElse(Faction.getFaction(campaign.getFactionCode()).isClan());
+
+            retVal.phenotype = dp.text("phenotype", Integer::parseInt, PHENOTYPE_NONE);
+            retVal.bloodname = dp.text("bloodname", "");
+            retVal.biography = dp.text("biography", "");
+
+            retVal.primaryRole   = dp.text("primaryRole",   Integer::parseInt, Person.T_NONE);
+            retVal.secondaryRole = dp.text("secondaryRole", Integer::parseInt, Person.T_NONE);
+            retVal.acquisitions  = dp.text("acquisitions",  Integer::parseInt, 0);
+
+            retVal.primaryDesignator    = dp.text("primaryDesignator",    Integer::parseInt, Person.DESIG_NONE);
+            retVal.secondaryDesignator  = dp.text("secondaryDesignator",  Integer::parseInt, Person.DESIG_NONE);
+            retVal.daysToWaitForHealing = dp.text("daysToWaitForHealing", Integer::parseInt, 15);
+            retVal.idleMonths           = dp.text("idleMonths",           Integer::parseInt, -1);
+
+            boolean versionIsOlderThan_0_2_14 = version.getMajorVersion() == 0 && version.getMinorVersion() < 2 && version.getSnapshot() < 14;
+
+            retVal.oldId = versionIsOlderThan_0_2_14
+                         ? dp.text("id", Integer::parseInt, 0)
+                         : 0;
+            retVal.id = versionIsOlderThan_0_2_14
+                      ? null
+                      : dp.text("id", UUID::fromString, UUID.randomUUID());
+
+            retVal.ancestorsID = dp.text("ancestors", UUID::fromString, null);
+            retVal.spouse      = dp.text("spouse", UUID::fromString, null);
+            retVal.dueDate     = dp.text("duedate", s -> { GregorianCalendar cal = new GregorianCalendar(); cal.setTime(df.parse(s.trim())); return cal; }, null);
+
+            retVal.teamId = dp.text("teamId", Integer::parseInt, -1); // LATER is this used anywhere?
+
+            retVal.portraitCategory = dp.text("portraitCategory", Crew.ROOT_PORTRAIT);
+            retVal.portraitFile     = dp.text("portraitFile", Crew.PORTRAIT_NONE);
+
+            retVal.xp     = dp.text("xp", Integer::parseInt, 0);
+            retVal.nTasks = dp.text("ntasks", Integer::parseInt, 0);
+            retVal.hits   = dp.text("hits", Integer::parseInt, 0);
+
+            retVal.hits = dp.children("hits","pilotHits")
+                            .reduce((a,b) -> b) // reduce to the last one
+                            .map(element -> Integer.parseInt(element.getTextContent()))
+                            .orElse(0);
+
+            retVal.gender = dp.text("gender", Integer::parseInt, Person.G_MALE);
+
+            boolean versionIsOlderThan_0_3_04r1782 = Version.versionCompare(version, "0.3.4-r1782");
+
+            retVal.rank = versionIsOlderThan_0_3_04r1782
+                        ? dp.text("rank", s -> { try { return new RankTranslator(campaign).getNewRank(campaign.getRanks().getOldRankSystem(), Integer.parseInt(s)); } catch(@SuppressWarnings("unused") ArrayIndexOutOfBoundsException ignored) { return 0; } }, 0)
+                        : dp.text("rank", Integer::parseInt, 0);
+
+            retVal.rankLevel = dp.text("rankLevel", Integer::parseInt, 0);
+            
+            retVal.rankSystem = dp.text("rankSystem", s -> {
+                int prs = Integer.parseInt(s);
+                int crs = campaign.getRanks().getRankSystem();
+                return prs != crs ? prs : -1;
+            }, -1);
+            
+            retVal.maneiDominiRank = dp.text("maneiDominiRank", txt -> {
+                // up to 0.45.1, numeric ids where used for manei domini
+                // ranks, with a magic value of -1 signifying "no rank"
+                if (txt.matches("-?\\d+")) {
+                   return "-1".equals(txt) ? null : ManeiDominiRank.ofId(Integer.parseInt(txt)).get();
+               } else {
+                   return ManeiDominiRank.valueOf(txt);
+               }
+            }, null);
+
+            retVal.maneiDominiClass = dp.text("maneiDominiClass", txt -> {
+                // up to 0.45.1, numeric ids where used for manei domini
+                // classes, with a magic value of 0 signifying "no class"
+                if (txt.matches("-?\\d+")) {
+                   return "0".equals(txt) ? null : ManeiDominiClass.ofId(Integer.parseInt(txt)).get();
+               } else {
+                   return ManeiDominiClass.valueOf(txt);
+               }
+            }, null);
+
+            retVal.oldDoctorId = versionIsOlderThan_0_2_14
+                               ? dp.text("doctorId", Integer::parseInt, 0)
+                               : 0;
+            retVal.doctorId = versionIsOlderThan_0_2_14
+                            ? null
+                            : dp.text("doctorId", s -> "null".equals(s) ? null : UUID.fromString(s), null);
+
+            retVal.oldUnitId = versionIsOlderThan_0_2_14
+                             ? dp.text("unitId", Integer::parseInt, 0)
+                             : 0;
+            retVal.unitId = versionIsOlderThan_0_2_14
+                          ? null
+                          : dp.text("unitId", s -> "null".equals(s) ? null : UUID.fromString(s), null);
+
+            retVal.status          = dp.text("status",         Integer::parseInt, Person.S_ACTIVE);
+            retVal.prisonerStatus  = dp.text("prisonerstatus", Integer::parseInt, Person.PRISONER_NOT);
+            retVal.willingToDefect = dp.text("willingToDefect", Boolean::parseBoolean, false);
+            
+            retVal.salary       = dp.text("salary",       Integer::parseInt, -1);
+            retVal.minutesLeft  = dp.text("minutesLeft",  Integer::parseInt, 0);
+            retVal.overtimeLeft = dp.text("overtimeLeft", Integer::parseInt, 0);
+
+            retVal.birthday    = dp.text("birthday",    s -> { GregorianCalendar c = new GregorianCalendar(); c.setTime(df.parse(s.trim())); return c; }, new GregorianCalendar(3042, Calendar.JANUARY, 1));
+            retVal.deathday    = dp.text("deathday",    s -> { GregorianCalendar c = new GregorianCalendar(); c.setTime(df.parse(s.trim())); return c; }, null);
+            retVal.recruitment = dp.text("recruitment", s -> { GregorianCalendar c = new GregorianCalendar(); c.setTime(df.parse(s.trim())); return c; }, null);
+
+            String advantages = dp.text("advantages", null);
+            String edge       = dp.text("edge",       null);
+            String implants   = dp.text("implants",   null);
+
+            retVal.toughness = dp.text("toughness", Integer::parseInt, 0);
 
             //backwards compatability
-            String pilotName = null;
-            String pilotNickname = null;
-            int pilotGunnery = -1;
-            int pilotPiloting = -1;
-            int pilotCommandBonus = -1;
-            int type = 0;
+            int pilotGunnery      = dp.text("pilotGunnery",      Integer::parseInt, -1);
+            int pilotPiloting     = dp.text("pilotPiloting",     Integer::parseInt, -1);
+            int pilotCommandBonus = dp.text("pilotCommandBonus", Integer::parseInt, -1);
+            int type              = dp.text("type",              Integer::parseInt,  0);
+            String pilotName      = dp.text("pilotName",     null);
+            String pilotNickname  = dp.text("pilotNickname", null);
 
-            for (int x = 0; x < nl.getLength(); x++) {
-                Node wn2 = nl.item(x);
+            Map<String, Skill> skills = dp.children("skill")
+                                          .map(Skill::generateInstanceFromXML)
+                                          .collect(Collectors.toMap(s -> s.getType().getName(), Function.identity()));
+           retVal.skills.putAll(skills);
 
-                if (wn2.getNodeName().equalsIgnoreCase("name")) {
-                    retVal.name = wn2.getTextContent();
-                } else if (wn2.getNodeName().equalsIgnoreCase("maidenname")) {
-                    retVal.maidenname = wn2.getTextContent();
-                } else if (wn2.getNodeName().equalsIgnoreCase("callsign")) {
-                    retVal.callsign = wn2.getTextContent();
-                } else if (wn2.getNodeName().equalsIgnoreCase("commander")) {
-                    retVal.commander = Boolean.parseBoolean(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("dependent")) {
-                    retVal.dependent = Boolean.parseBoolean(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("isClanTech")
-                           || wn2.getNodeName().equalsIgnoreCase("clan")) {
-                    retVal.clan = Boolean.parseBoolean(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("phenotype")) {
-                    retVal.phenotype = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("bloodname")) {
-                    retVal.bloodname = wn2.getTextContent();
-                } else if (wn2.getNodeName().equalsIgnoreCase("biography")) {
-                    retVal.biography = wn2.getTextContent();
-                } else if (wn2.getNodeName().equalsIgnoreCase("primaryRole")) {
-                    retVal.primaryRole = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("secondaryRole")) {
-                    retVal.secondaryRole = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("acquisitions")) {
-                    retVal.acquisitions = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("primaryDesignator")) {
-                    retVal.primaryDesignator = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("secondaryDesignator")) {
-                    retVal.secondaryDesignator = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("daysToWaitForHealing")) {
-                    retVal.daysToWaitForHealing = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("idleMonths")) {
-                    retVal.idleMonths = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("id")) {
-                    if (version.getMajorVersion() == 0 && version.getMinorVersion() < 2 && version.getSnapshot() < 14) {
-                        retVal.oldId = Integer.parseInt(wn2.getTextContent());
-                    } else {
-                        retVal.id = UUID.fromString(wn2.getTextContent());
-                    }
-                } else if (wn2.getNodeName().equalsIgnoreCase("ancestors")) {
-                    retVal.ancestorsID = UUID.fromString(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("spouse")) {
-                    retVal.spouse = UUID.fromString(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("duedate")) {
-                    SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-                    retVal.dueDate = (GregorianCalendar) GregorianCalendar.getInstance();
-                    retVal.dueDate.setTime(df.parse(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("teamId")) {
-                    retVal.teamId = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("portraitCategory")) {
-                    retVal.setPortraitCategory(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("portraitFile")) {
-                    retVal.setPortraitFileName(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("xp")) {
-                    retVal.xp = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("nTasks")) {
-                    retVal.nTasks = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("hits")) {
-                    retVal.hits = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("gender")) {
-                    retVal.gender = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("rank")) {
-                    if (Version.versionCompare(version, "0.3.4-r1782")) {
-                        RankTranslator rt = new RankTranslator(c);
-                        try {
-                            retVal.rank = rt.getNewRank(c.getRanks().getOldRankSystem(), Integer.parseInt(wn2.getTextContent()));
-                        } catch (ArrayIndexOutOfBoundsException e) {
-                            // Do nothing
-                        }
-                    } else {
-                        retVal.rank = Integer.parseInt(wn2.getTextContent());
-                    }
-                } else if (wn2.getNodeName().equalsIgnoreCase("rankLevel")) {
-                    retVal.rankLevel = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("rankSystem")) {
-                    retVal.setRankSystem(Integer.parseInt(wn2.getTextContent()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("maneiDominiRank")) {
-                    retVal.maneiDominiRank = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("maneiDominiClass")) {
-                    retVal.maneiDominiClass = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("doctorId")) {
-                    if (version.getMajorVersion() == 0 && version.getMinorVersion() < 2 && version.getSnapshot() < 14) {
-                        retVal.oldDoctorId = Integer.parseInt(wn2.getTextContent());
-                    } else {
-                        if (!wn2.getTextContent().equals("null")) {
-                            retVal.doctorId = UUID.fromString(wn2.getTextContent());
-                        }
-                    }
-                } else if (wn2.getNodeName().equalsIgnoreCase("unitId")) {
-                    if (version.getMajorVersion() == 0 && version.getMinorVersion() < 2 && version.getSnapshot() < 14) {
-                        retVal.oldUnitId = Integer.parseInt(wn2.getTextContent());
-                    } else {
-                        if (!wn2.getTextContent().equals("null")) {
-                            retVal.unitId = UUID.fromString(wn2.getTextContent());
-                        }
-                    }
-                } else if (wn2.getNodeName().equalsIgnoreCase("status")) {
-                    retVal.status = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("prisonerstatus")) {
-                    retVal.prisonerStatus = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("willingToDefect")) {
-                    retVal.willingToDefect = Boolean.parseBoolean(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("salary")) {
-                    retVal.salary = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("minutesLeft")) {
-                    retVal.minutesLeft = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("overtimeLeft")) {
-                    retVal.overtimeLeft = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("birthday")) {
-                    SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-                    retVal.birthday = (GregorianCalendar) GregorianCalendar.getInstance();
-                    retVal.birthday.setTime(df.parse(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("deathday")) {
-                    SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-                    retVal.deathday = (GregorianCalendar) GregorianCalendar.getInstance();
-                    retVal.deathday.setTime(df.parse(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("recruitment")) {
-                    SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-                    retVal.recruitment = (GregorianCalendar) GregorianCalendar.getInstance();
-                    retVal.recruitment.setTime(df.parse(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("advantages")) {
-                    advantages = wn2.getTextContent();
-                } else if (wn2.getNodeName().equalsIgnoreCase("edge")) {
-                    edge = wn2.getTextContent();
-                } else if (wn2.getNodeName().equalsIgnoreCase("implants")) {
-                    implants = wn2.getTextContent();
-                } else if (wn2.getNodeName().equalsIgnoreCase("toughness")) {
-                    retVal.toughness = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("pilotGunnery")) {
-                    pilotGunnery = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("pilotPiloting")) {
-                    pilotPiloting = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("pilotHits")) {
-                    retVal.hits = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("pilotCommandBonus")) {
-                    pilotCommandBonus = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("pilotName")) {
-                    pilotName = wn2.getTextContent();
-                } else if (wn2.getNodeName().equalsIgnoreCase("pilotNickname")) {
-                    pilotNickname = wn2.getTextContent();
-                } else if (wn2.getNodeName().equalsIgnoreCase("type")) {
-                    type = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("skill")) {
-                    Skill s = Skill.generateInstanceFromXML(wn2);
-                    if (null != s && null != s.getType()) {
-                        retVal.skills.put(s.getType().getName(), s);
-                    }
-                } else if (wn2.getNodeName().equalsIgnoreCase("techUnitIds")) {
-                    NodeList nl2 = wn2.getChildNodes();
-                    for (int y = 0; y < nl2.getLength(); y++) {
-                        Node wn3 = nl2.item(y);
-                        // If it's not an element node, we ignore it.
-                        if (wn3.getNodeType() != Node.ELEMENT_NODE) {
-                            continue;
-                        }
+           retVal.techUnitIds = dp.child("techUnitIds")
+                                  .children("id")
+                                  .map(el -> UUID.fromString(el.getTextContent()))
+                                  .collect(Collectors.toCollection(ArrayList::new));
 
-                        if (!wn3.getNodeName().equalsIgnoreCase("id")) {
-                            // Error condition of sorts!
-                            // Errr, what should we do here?
-                            MekHQ.getLogger().log(Person.class, METHOD_NAME, LogLevel.ERROR,
-                                    "Unknown node type not loaded in techUnitIds nodes: " + wn3.getNodeName()); //$NON-NLS-1$
-                            continue;
-                        }
-                        retVal.techUnitIds.add(UUID.fromString(wn3.getTextContent()));
+           retVal.personnelLog = dp.child("personnelLog")
+                                   .children("logEntry")
+                                   .map(LogEntry::generateInstanceFromXML)
+                                   .collect(Collectors.toCollection(ArrayList::new));
 
-                    }
-                } else if (wn2.getNodeName().equalsIgnoreCase("personnelLog")) {
-                    NodeList nl2 = wn2.getChildNodes();
-                    for (int y = 0; y < nl2.getLength(); y++) {
-                        Node wn3 = nl2.item(y);
-                        // If it's not an element node, we ignore it.
-                        if (wn3.getNodeType() != Node.ELEMENT_NODE) {
-                            continue;
-                        }
+           retVal.awards = dp.child("award")
+                             .children("award")
+                             .map(AwardsFactory.getInstance()::generateNewFromXML)
+                             .collect(Collectors.toCollection(ArrayList::new));
 
-                        if (!wn3.getNodeName().equalsIgnoreCase("logEntry")) {
-                            // Error condition of sorts!
-                            // Errr, what should we do here?
-                            MekHQ.getLogger().log(Person.class, METHOD_NAME, LogLevel.ERROR,
-                                    "Unknown node type not loaded in personnel log nodes: " + wn3.getNodeName()); //$NON-NLS-1$
-                            continue;
-                        }
-                        retVal.addLogEntry(LogEntry.generateInstanceFromXML(wn3));
-                    }
-                } else if (wn2.getNodeName().equalsIgnoreCase("awards")){
-                    NodeList nl2 = wn2.getChildNodes();
-                    for (int y = 0; y < nl2.getLength(); y++) {
+           retVal.injuries = dp.child("injuries")
+                               .streamChildren("injury")
+                               .map(Injury::generateInstanceFromXML)
+                               .peek(inj -> { if (inj.getStart() == null) inj.setStart(new DateTime(campaign.getCalendar()).minusDays(inj.getOriginalTime() - inj.getTime())); })
+                               .collect(Collectors.toCollection(ArrayList::new));
 
-                        Node wn3 = nl2.item(y);
+           retVal.founder = dp.text("founder", Boolean::parseBoolean, false);
+           
+           retVal.originalUnitWeight = dp.text("originalUnitWeight", Integer::parseInt, 0);
+           retVal.originalUnitTech   = dp.text("originalUnitTech",   Integer::parseInt, 0);
+           retVal.originalUnitId     = dp.text("originalUnitId",     UUID::fromString, null);
 
-                        if (wn3.getNodeType() != Node.ELEMENT_NODE) {
-                            continue;
-                        }
-
-                        if (!wn3.getNodeName().equalsIgnoreCase("award")) {
-                            MekHQ.getLogger().log(Person.class, METHOD_NAME, LogLevel.ERROR,
-                                    "Unknown node type not loaded in personnel log nodes: " + wn3.getNodeName()); //$NON-NLS-1$
-                            continue;
-                        }
-
-                        retVal.addAward(AwardsFactory.getInstance().generateNewFromXML(wn3));
-                    }
-
-                } else if (wn2.getNodeName().equalsIgnoreCase("injuries")) {
-                    NodeList nl2 = wn2.getChildNodes();
-                    for (int y = 0; y < nl2.getLength(); y++) {
-                        Node wn3 = nl2.item(y);
-                        // If it's not an element node, we ignore it.
-                        if (wn3.getNodeType() != Node.ELEMENT_NODE) {
-                            continue;
-                        }
-
-                        if (!wn3.getNodeName().equalsIgnoreCase("injury")) {
-                            // Error condition of sorts!
-                            // Errr, what should we do here?
-                            MekHQ.getLogger().log(Person.class, METHOD_NAME, LogLevel.ERROR,
-                                    "Unknown node type not loaded in injury nodes: " + wn3.getNodeName()); //$NON-NLS-1$
-                            continue;
-                        }
-                        retVal.injuries.add(Injury.generateInstanceFromXML(wn3));
-                    }
-                    DateTime now = new DateTime(c.getCalendar());
-                    retVal.injuries.stream().filter(inj -> (null == inj.getStart()))
-                        .forEach(inj -> inj.setStart(now.minusDays(inj.getOriginalTime() - inj.getTime())));
-                } else if (wn2.getNodeName().equalsIgnoreCase("founder")) {
-                    retVal.founder = Boolean.parseBoolean(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("originalUnitWeight")) {
-                    retVal.originalUnitWeight = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("originalUnitTech")) {
-                    retVal.originalUnitTech = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("originalUnitId")) {
-                    retVal.originalUnitId = UUID.fromString(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("extraData")) {
-                    retVal.extraData = ExtraData.createFromXml(wn2);
-                }
-            }
+           retVal.extraData = dp.uniqueChildElement("extradata")
+                                .map(ExtraData::createFromXml).orElseGet(ExtraData::new);
 
             if (version.getMajorVersion() == 0 && version.getMinorVersion() < 2 && version.getSnapshot() < 13) {
                 if (retVal.primaryRole > T_INFANTRY) {
@@ -1909,29 +1808,31 @@ public class Person implements Serializable, MekHqXmlSerializable {
             if (null != pilotNickname) {
                 retVal.setCallsign(pilotNickname);
             }
+
+            if (retVal.id == null) {
+                MekHQ.getLogger().log(Person.class, METHOD_NAME, LogLevel.ERROR,
+                    "ID not pre-defined; generating person's ID."); //$NON-NLS-1$
+                retVal.id = UUID.randomUUID();
+            }
+
+            // Prisoner and Bondsman updating
+            if (retVal.prisonerStatus != PRISONER_NOT && retVal.rank == 0) {
+                if (retVal.prisonerStatus == PRISONER_BONDSMAN) {
+                    retVal.setRankNumeric(Ranks.RANK_BONDSMAN);
+                } else {
+                    retVal.setRankNumeric(Ranks.RANK_PRISONER);
+                }
+            }
+
+            return retVal;
+
         } catch (Exception ex) {
             // Errrr, apparently either the class name was invalid...
             // Or the listed name doesn't exist.
             // Doh!
             MekHQ.getLogger().error(Person.class, METHOD_NAME, ex);
+            return null;
         }
-
-        if (retVal.id == null) {
-            MekHQ.getLogger().log(Person.class, METHOD_NAME, LogLevel.ERROR,
-                    "ID not pre-defined; generating person's ID."); //$NON-NLS-1$
-            retVal.id = UUID.randomUUID();
-        }
-
-        // Prisoner and Bondsman updating
-        if (retVal.prisonerStatus != PRISONER_NOT && retVal.rank == 0) {
-            if (retVal.prisonerStatus == PRISONER_BONDSMAN) {
-                retVal.setRankNumeric(Ranks.RANK_BONDSMAN);
-            } else {
-                retVal.setRankNumeric(Ranks.RANK_PRISONER);
-            }
-        }
-
-        return retVal;
     }
 
     public void setSalary(int s) {
@@ -2085,16 +1986,16 @@ public class Person implements Serializable, MekHqXmlSerializable {
         rankName = getRank().getName(profession);
 
         // Manei Domini Additions
-        if (getRankSystem() != Ranks.RS_WOB) {
+        if (!getRanks().isManeiDominiRelevant()) {
             // Oops, clear our MD variables
-            maneiDominiClass = MD_NONE;
-            maneiDominiRank = Rank.MD_RANK_NONE;
+            maneiDominiClass = null;
+            maneiDominiRank = null;
         }
-        if (maneiDominiClass != MD_NONE) {
-            rankName = getManeiDominiClassNames() + " " + rankName;
+        if (maneiDominiClass != null) {
+            rankName = maneiDominiClass.getDisplayName() + " " + rankName;
         }
-        if (maneiDominiRank != Rank.MD_RANK_NONE) {
-            rankName += " " + Rank.getManeiDominiRankName(maneiDominiRank);
+        if (maneiDominiRank != null) {
+            rankName += " " + maneiDominiRank.getDisplayName();
         }
         if (getRankSystem() == Ranks.RS_COM || getRankSystem() == Ranks.RS_WOB) {
             rankName += getComstarBranchDesignation();
@@ -2112,44 +2013,27 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return rankName;
     }
 
-    public int getManeiDominiClass() {
-        return maneiDominiClass;
+    public Optional<ManeiDominiClass> getManeiDominiClass() {
+        return Optional.ofNullable(maneiDominiClass);
     }
 
-    public void setManeiDominiClass(int maneiDominiClass) {
-        this.maneiDominiClass = maneiDominiClass;
+    public void setManeiDominiClass(Optional<ManeiDominiClass> maneiDominiClass) {
+        this.maneiDominiClass = maneiDominiClass.orElse(null);
         MekHQ.triggerEvent(new PersonChangedEvent(this));
     }
 
-    public int getManeiDominiRank() {
-        return maneiDominiRank;
+    /** Convenience for {@code setManeiDominiClass(Optional.ofNullable(maneiDominiClass))} */
+    public void setManeiDominiClass(ManeiDominiClass maneiDominiClass) {
+        setManeiDominiClass(Optional.ofNullable(maneiDominiClass));
     }
 
-    public void setManeiDominiRank(int maneiDominiRank) {
-        this.maneiDominiRank = maneiDominiRank;
+    public Optional<ManeiDominiRank> getManeiDominiRank() {
+        return Optional.ofNullable(maneiDominiRank);
+    }
+
+    public void setManeiDominiRank(Optional<ManeiDominiRank> maneiDominiRank) {
+        this.maneiDominiRank = maneiDominiRank.orElse(null);
         MekHQ.triggerEvent(new PersonChangedEvent(this));
-    }
-
-    public String getManeiDominiClassNames() {
-        return getManeiDominiClassNames(maneiDominiClass, getRankSystem());
-    }
-
-    public static String getManeiDominiClassNames(int maneiDominiClass, int rankSystem) {
-        // Only WoB
-        if (rankSystem != Ranks.RS_WOB)
-            return "";
-
-        switch (maneiDominiClass) {
-            case MD_NONE: return "";
-            case MD_GHOST: return "Ghost";
-            case MD_WRAITH: return "Wraith";
-            case MD_BANSHEE: return "Banshee";
-            case MD_ZOMBIE: return "Zombie";
-            case MD_PHANTOM: return "Phantom";
-            case MD_SPECTER: return "Specter";
-            case MD_POLTERGEIST: return "Poltergeist";
-            default: return "";
-        }
     }
 
     /**
@@ -3940,4 +3824,5 @@ public class Person implements Serializable, MekHqXmlSerializable {
             return OTHER_RANSOM_VALUES.get(getExperienceLevel(false));
         }
     }
+
 }
