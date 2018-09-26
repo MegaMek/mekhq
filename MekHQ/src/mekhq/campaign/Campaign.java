@@ -6018,33 +6018,7 @@ public class Campaign implements Serializable, ITechManager {
             bloodnameTarget += Math.min(0, ranks.getOfficerCut() - person.getRankNumeric());
 
             if (Compute.d6(2) >= bloodnameTarget || ignoreDice) {
-                /*
-                 * The Bloodname generator has slight differences in categories that do not map
-                 * easily onto Person constants
-                 */
-                int phenotype = Bloodname.P_GENERAL;
-                switch (type) {
-                    case Person.T_MECHWARRIOR:
-                        phenotype = Bloodname.P_MECHWARRIOR;
-                        break;
-                    case Person.T_BA:
-                        phenotype = Bloodname.P_ELEMENTAL;
-                        break;
-                    case Person.T_AERO_PILOT:
-                    case Person.T_CONV_PILOT:
-                        phenotype = Bloodname.P_AEROSPACE;
-                        break;
-                    case Person.T_SPACE_CREW:
-                    case Person.T_NAVIGATOR:
-                    case Person.T_SPACE_GUNNER:
-                    case Person.T_SPACE_PILOT:
-                        phenotype = Bloodname.P_NAVAL;
-                        break;
-                    case Person.T_PROTO_PILOT:
-                        phenotype = Bloodname.P_PROTOMECH;
-                        break;
-                }
-                Bloodname bloodname = Bloodname.randomBloodname(factionCode, phenotype, getGameYear());
+                Bloodname bloodname = Bloodname.randomBloodnameFromPersonRole(factionCode, type, getGameYear());
                 if (null != bloodname) {
                     person.setBloodname(bloodname.getName());
                 }
