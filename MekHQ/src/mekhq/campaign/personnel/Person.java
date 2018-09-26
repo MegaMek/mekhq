@@ -1529,11 +1529,9 @@ public class Person implements Serializable, MekHqXmlSerializable {
         try {
 
             Person retVal = new Person(campaign);
-
             DomProcessor dp = DomProcessor.at((Element) wn);
-            
             SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-            
+
             retVal.name       = dp.text("name", "Biff the Understudy");
             retVal.maidenname = dp.text("maidenname", null);
             retVal.callsign   = dp.text("callsign", "");
@@ -1621,19 +1619,19 @@ public class Person implements Serializable, MekHqXmlSerializable {
                }
             }, null);
 
-            int oldDoctorId = versionIsOlderThan_0_2_14
-                            ? dp.text("doctorId", Integer::parseInt, 0)
-                            : 0;
-            UUID doctorId = versionIsOlderThan_0_2_14
-                          ? null
-                          : dp.text("doctorId", s -> "null".equals(s) ? null : UUID.fromString(s), null);
+            retVal.oldDoctorId = versionIsOlderThan_0_2_14
+                               ? dp.text("doctorId", Integer::parseInt, 0)
+                               : 0;
+            retVal.doctorId = versionIsOlderThan_0_2_14
+                            ? null
+                            : dp.text("doctorId", s -> "null".equals(s) ? null : UUID.fromString(s), null);
 
-            int oldUnitId = versionIsOlderThan_0_2_14
-                          ? dp.text("unitId", Integer::parseInt, 0)
-                          : 0;
-            UUID unitId = versionIsOlderThan_0_2_14
-                        ? null
-                        : dp.text("unitId", s -> "null".equals(s) ? null : UUID.fromString(s), null);
+            retVal.oldUnitId = versionIsOlderThan_0_2_14
+                             ? dp.text("unitId", Integer::parseInt, 0)
+                             : 0;
+            retVal.unitId = versionIsOlderThan_0_2_14
+                          ? null
+                          : dp.text("unitId", s -> "null".equals(s) ? null : UUID.fromString(s), null);
 
             retVal.status          = dp.text("status",         Integer::parseInt, Person.S_ACTIVE);
             retVal.prisonerStatus  = dp.text("prisonerstatus", Integer::parseInt, Person.PRISONER_NOT);
