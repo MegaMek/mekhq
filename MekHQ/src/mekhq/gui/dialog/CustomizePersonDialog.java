@@ -238,6 +238,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
             textBloodname.setText(person.getBloodname());
             panDemog.add(textBloodname, gridBagConstraints);
 
+            btnRandomBloodname.setEnabled(campaign.getFaction().isClan());
             btnRandomBloodname.setText(resourceMap.getString("btnRandomBloodname.text")); // NOI18N
             btnRandomBloodname.setName("btnRandomBloodname"); // NOI18N
             btnRandomBloodname.addActionListener(new java.awt.event.ActionListener() {
