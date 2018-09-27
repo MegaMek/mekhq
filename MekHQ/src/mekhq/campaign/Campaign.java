@@ -205,6 +205,7 @@ import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.campaign.unit.CrewType;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.unit.UnitOrder;
 import mekhq.campaign.unit.UnitTechProgression;
 import mekhq.campaign.universe.Era;
 import mekhq.campaign.universe.Faction;
@@ -1875,25 +1876,216 @@ public class Campaign implements Serializable, ITechManager {
         return admin;
     }
 
-    public boolean acquireEquipment(IAcquisitionWork acquisition) {
-        boolean found = false;
-        String report = "";
-
+    /***
+     * This is the main function for getting stuff (parts, units, etc.) All non-GM acquisition should
+     * go through this function to ensure the campaign rules for acquisition are followed.
+     * @param sList - A <code>ShoppingList</code> object including items that need to be purchased
+     * @return A <code>ShoppingList</code> object that includes all items that were not successfully acquired
+     */
+    public ShoppingList goShopping(ShoppingList sList) {
+        
+        //get the logistics person and return original list with a message if you don't have one
         Person person = getLogisticsPerson();
         if(null == person && !getCampaignOptions().getAcquisitionSkill().equals(CampaignOptions.S_AUTO)) {
             addReport("Your force has no one capable of acquiring equipment.");
-            return false;
+            return sList;
         }
+        
+        //loop through shopping items and decrement days to wait
+        for(IAcquisitionWork shoppingItem : sList.getAllShoppingItems()) {
+            shoppingItem.decrementDaysToWait();
+        }
+        
+        if(!getCampaignOptions().usesPlanetaryAcquisition()) {      
+            //loop through shopping list. If its time to check, then check as appropriate. Items not
+            //found get added to the remaining item list
+            ArrayList<IAcquisitionWork> remainingItems = new ArrayList<IAcquisitionWork>();
+            for(IAcquisitionWork shoppingItem : sList.getAllShoppingItems()) {            
+                if(shoppingItem.getDaysToWait() <= 0) {
+                    while(shoppingItem.getQuantity() > 0) {
+                        if(!acquireEquipment(shoppingItem, person)) {
+                            shoppingItem.resetDaysToWait();
+                            break;
+                        }
+                    }
+                }
+                if(shoppingItem.getQuantity() > 0 || shoppingItem.getDaysToWait() > 0) {
+                    remainingItems.add(shoppingItem);
+                }
+            }
+            
+            return new ShoppingList(remainingItems);
+            
+        } else {
+            //we are shopping by planets, so more involved
+            List<IAcquisitionWork> currentList = sList.getAllShoppingItems();
+            DateTime currentDate = Utilities.getDateTimeDay(getCalendar());
 
-        TargetRoll target = getTargetForAcquisition(acquisition, person, false);
-        if (target.getValue() == TargetRoll.IMPOSSIBLE) {
-            addReport(target.getDesc());
+            //a list of items than can be taken out of the search and put back on the shopping list
+            ArrayList<IAcquisitionWork> shelvedItems = new ArrayList<IAcquisitionWork>();
+            
+            String personTitle = "";
+            if (null != person) {
+                personTitle = person.getHyperlinkedFullTitle() + " ";
+            }
+            
+            //find planets within a certain radius - the function will weed out dead planets
+            List<Planet> planets = Planets.getInstance().getShoppingPlanets(getCurrentPlanet(), 
+                    getCampaignOptions().getMaxJumpsPlanetaryAcquisition(), 
+                    currentDate);
+           
+            for(Planet planet: planets) {
+                ArrayList<IAcquisitionWork> remainingItems = new ArrayList<IAcquisitionWork>();
+                
+                //loop through shopping list. If its time to check, then check as appropriate. Items not
+                //found get added to the remaining item list
+                for(IAcquisitionWork shoppingItem : currentList) {
+                    if(shoppingItem.getDaysToWait() <= 0) {
+                        if(findContactForAcquisition(shoppingItem, person, planet)) {	                	
+                            int transitTime = calculatePartTransitTime(planet);	           
+                            int totalQuantity = 0;
+                            while(shoppingItem.getQuantity() > 0 && acquireEquipment(shoppingItem, person, planet, transitTime)) {
+                                totalQuantity++;
+                            }
+                            if(totalQuantity > 0) {
+                                addReport(personTitle + "<font color='green'><b> found " + shoppingItem.getQuantityName(totalQuantity) + " on " + planet.getName(currentDate) + ". Delivery in " + transitTime + " days.</b></font>");	 
+                            }
+                        }
+                }
+                //if we didn't find everything on this planet, then add to the remaining list
+                if(shoppingItem.getQuantity() > 0 || shoppingItem.getDaysToWait() > 0) {	                	
+                    //if we can't afford it, then don't keep searching for it on other planets
+                    if(!canPayFor(shoppingItem)) {
+                        if(!getCampaignOptions().usePlanetAcquisitionVerboseReporting()) {
+                            addReport("<font color='red'><b>You cannot afford to purchase another " + shoppingItem.getAcquisitionName() + "</b></font>");
+                        }
+                        shelvedItems.add(shoppingItem);
+                    } else {
+                        remainingItems.add(shoppingItem);
+                    }
+                }
+            }
+            //we are done with this planet. replace our current list with the remaining items
+            currentList = remainingItems;
+            }
+            
+            //add shelved items back to the currentlist
+            currentList.addAll(shelvedItems);
+            
+            //loop through and reset waiting time on all items on the remaining shopping list if 
+            //they have no waiting time left
+            for(IAcquisitionWork shoppingItem : currentList) {
+                if(shoppingItem.getDaysToWait() <= 0) {
+                    shoppingItem.resetDaysToWait();
+            }
+            }
+            
+            return new ShoppingList(currentList);
+
+        }
+    }
+    
+    /***
+     * Checks whether the campaign can pay for a given <code>IAcquisitionWork</code> item. This will check
+     * both whether the campaign is required to pay for a given type of acquisition by the options and
+     * if so whether it has enough money to afford it. 
+     * @param acquisition - An <code>IAcquisitionWork<code> object
+     * @return true if the campaign can pay for the acquisition; false if it cannot. 
+     */
+    public boolean canPayFor(IAcquisitionWork acquisition) {
+        if((acquisition instanceof UnitOrder && getCampaignOptions().payForUnits()) 
+                ||(acquisition instanceof Part && getCampaignOptions().payForParts()) 
+                && getFunds() < acquisition.getBuyCost()) {
             return false;
         }
+        return true;
+    }
+    
+    /**
+     * Make an acquisition roll for a given planet to see if you can identify a contact. Used for planetary based acquisition.
+     * @param acquisition - The <code> IAcquisitionWork</code> being acquired.
+     * @param person - The <code>Person</code> object attempting to do the acquiring.  may be null if no one on the force has the skill or the user is using automatic acquisition. 
+     * @param planet - The <code>Planet</code> object where the acquisition is being attempted. This may be null if the user is not using planetary acquisition. 
+     * @return true if your target roll succeeded. 
+     */
+    public boolean findContactForAcquisition(IAcquisitionWork acquisition, Person person, Planet planet) {
+
+        DateTime currentDate = Utilities.getDateTimeDay(getCalendar());
+        TargetRoll target = getTargetForAcquisition(acquisition, person, false);
+        target = planet.getAcquisitionMods(target, getDate(), getCampaignOptions(), getFaction(),
+                acquisition.getTechBase() == Part.T_CLAN);
+        
+        if (target.getValue() == TargetRoll.IMPOSSIBLE) {
+            if(getCampaignOptions().usePlanetAcquisitionVerboseReporting()) {
+                addReport("<font color='red'><b>Can't search for " + acquisition.getAcquisitionName() + " on " + planet.getName(currentDate) + " because:</b></font> " + target.getDesc());
+            }
+            return false;
+        }
+        if(Compute.d6(2) < target.getValue()) {
+            //no contacts on this planet, move along
+            if(getCampaignOptions().usePlanetAcquisitionVerboseReporting()) {
+                addReport("<font color='red'><b>No contacts available for " + acquisition.getAcquisitionName() + " on " + planet.getName(currentDate) + "</b></font>");
+            }
+            return false;
+        } else {
+            if(getCampaignOptions().usePlanetAcquisitionVerboseReporting()) {
+                addReport("<font color='green'>Possible contact for " + acquisition.getAcquisitionName() + " on " + planet.getName(currentDate) + "</font>");     	
+            }
+            return true;
+        }
+    }
+    
+    /***
+     * Attempt to acquire a given <code>IAcquisitionWork</code> object. 
+     * This is the default method used by for non-planetary based acquisition. 
+     * @param acquisition  - The <code> IAcquisitionWork</code> being acquired.
+     * @param person - The <code>Person</code> object attempting to do the acquiring.  may be null if no one on the force has the skill or the user is using automatic acquisition. 
+     * @return a boolean indicating whether the attempt to acquire equipment was successful. 
+     */
+    public boolean acquireEquipment(IAcquisitionWork acquisition, Person person) {
+        return acquireEquipment(acquisition, person, null, -1);
+    }
+    
+    /***
+     * Attempt to acquire a given <code>IAcquisitionWork</code> object. 
+     * @param acquisition - The <code> IAcquisitionWork</code> being acquired.
+     * @param person - The <code>Person</code> object attempting to do the acquiring.  may be null if no one on the force has the skill or the user is using automatic acquisition. 
+     * @param planet - The <code>Planet</code> object where the acquisition is being attempted. This may be null if the user is not using planetary acquisition. 
+     * @param transitDays - The number of days that the part should take to be delivered. If this value is entered as -1, then this method will determine transit time based on the users campaign options. 
+     * @return a boolean indicating whether the attempt to acquire equipment was successful. 
+     */
+    private boolean acquireEquipment(IAcquisitionWork acquisition, Person person, Planet planet, int transitDays) {
+        boolean found = false;
+        String report = "";
+        
         if (null != person) {
             report += person.getHyperlinkedFullTitle() + " ";
         }
+        
+        TargetRoll target = getTargetForAcquisition(acquisition, person, false);
+        
+        //check on funds
+        if(!canPayFor(acquisition)) {
+            target.addModifier(TargetRoll.IMPOSSIBLE, "Cannot afford this purchase");
+        }
+        
+        if(null != planet) {
+            target = planet.getAcquisitionMods(target, getDate(), getCampaignOptions(), getFaction(),
+                    acquisition.getTechBase() == Part.T_CLAN);
+        }     
+        
         report += "attempts to find " + acquisition.getAcquisitionName();
+        
+        //if impossible then return
+        if (target.getValue() == TargetRoll.IMPOSSIBLE) {
+            report += ":<font color='red'><b> " + target.getDesc() + "</b></font>";
+            if(!getCampaignOptions().usesPlanetaryAcquisition() || getCampaignOptions().usePlanetAcquisitionVerboseReporting()) {
+                addReport(report);
+            }
+            return false;
+        }
+        
+        
         int roll = Compute.d6(2);
         report += "  needs " + target.getValueAsString();
         report += " and rolls " + roll + ":";
@@ -1912,7 +2104,9 @@ public class Campaign implements Serializable, ITechManager {
         }
         int xpGained = 0;
         if (roll >= target.getValue()) {
-            int transitDays = calculatePartTransitTime(mos);
+            if(transitDays < 0) {
+                transitDays = calculatePartTransitTime(mos);
+            }
             report = report + acquisition.find(transitDays);
             found = true;
             if (person != null) {
@@ -1943,9 +2137,12 @@ public class Campaign implements Serializable, ITechManager {
         }
 
         if (found) {
+        	acquisition.decrementQuantity();
             MekHQ.triggerEvent(new AcquisitionEvent(acquisition));
         }
-        addReport(report);
+        if(!getCampaignOptions().usesPlanetaryAcquisition() || getCampaignOptions().usePlanetAcquisitionVerboseReporting()) {
+            addReport(report);
+        }
         return found;
     }
 
@@ -2709,10 +2906,11 @@ public class Campaign implements Serializable, ITechManager {
 
         resetAstechMinutes();
 
-        shoppingList.newDay(this);
 
         processNewDayUnits();
 
+        shoppingList = goShopping(shoppingList);
+        
         // check for anything in finances
         finances.newDay(this);
 
@@ -7771,7 +7969,41 @@ public class Campaign implements Serializable, ITechManager {
         }
     }
 
-    public int calculatePartTransitTime(int mos) {
+    /***
+     * Calculate transit time for supplies based on what planet they are shipping from. To prevent extra
+     * computation. This method does not calculate an exact jump path but rather determines the number of jumps
+     * crudely by dividing distance in light years by 30 and then rounding up. Total part time is determined by 
+     * several by adding the following:
+     * - (number of jumps - 1)*7 days with a minimum value of zero. 
+     * - transit times from current planet and planet of supply origins in cases where the supply planet is not the same as current planet.
+     * - a random 1d6 days for each jump plus 1d6 to simulate all of the other logistics of delivery. 
+     * @param planet - A <code>Planet</code> object where the supplies are shipping from
+     * @return the number of days that supplies will take to arrive.
+     */
+    public int calculatePartTransitTime(Planet planet) {
+        //calculate number of jumps by light year distance as the crow flies divided by 30
+        //the basic formula assumes 7 days per jump + system transit time on each side + random days equal
+        //to (1+number of jumps)d6
+        double distance = planet.getDistanceTo(getCurrentPlanet());
+        //calculate number of jumps by dividing by 30 
+        int jumps = (int)Math.ceil(distance/30.0);
+        //you need a recharge except for the first jump
+        int recharges = Math.max(jumps - 1, 0);
+        //if you are delivering from the same planet then no transit times
+        int currentTransitTime = (distance>0) ? (int)Math.ceil(getCurrentPlanet().getTimeToJumpPoint(1.0)) : 0;
+        int originTransitTime = (distance>0) ? (int)Math.ceil(planet.getTimeToJumpPoint(1.0)) : 0;
+        int amazonFreeShipping = Compute.d6(1+jumps);
+        return recharges*7+currentTransitTime+originTransitTime+amazonFreeShipping;
+    }
+    
+    /***
+     * Calculate transit times based on the margin of success from an acquisition roll. The values here are
+     * all based on what the user entered for the campaign options. 
+     * @param mos - an integer of the margin of success of an acquisition roll
+     * @return the number of days that supplies will take to arrive.
+     */
+    public int calculatePartTransitTime(int mos) {    	
+    
         int nDice = getCampaignOptions().getNDiceTransitTime();
         int time = getCampaignOptions().getConstantTransitTime();
         if (nDice > 0) {
