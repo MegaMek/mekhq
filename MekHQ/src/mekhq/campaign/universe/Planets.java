@@ -51,21 +51,17 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.joda.time.DateTime;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Node;
-import org.xml.sax.SAXException;
 
 import megamek.common.EquipmentType;
 import megamek.common.logging.LogLevel;
 import megamek.common.util.EncodeControl;
-import mekhq.FileParser;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
-import mekhq.campaign.mission.Mission;
 import mekhq.campaign.universe.Planet.PlanetaryEvent;
 
 public class Planets {
@@ -425,8 +421,6 @@ public class Planets {
                     planetList.remove(planetId);
                 }
             }
-        } catch (SAXException | ParserConfigurationException e) {
-            MekHQ.getLogger().error(getClass(), METHOD_NAME, e);
         } catch (JAXBException e) {
             MekHQ.getLogger().error(getClass(), METHOD_NAME, e);
         } catch(IOException e) {
@@ -752,13 +746,7 @@ public class Planets {
             }
             
             // Step 3: Load all the xml files within the planets subdirectory, if it exists
-            Utilities.parseXMLFiles(planetsPath, //$NON-NLS-1$
-                    new FileParser() {
-                        @Override
-                        public void parse(FileInputStream is) {
-                            updatePlanets(is);
-                        }
-                    });
+            Utilities.parseXMLFiles(planetsPath, this::updatePlanets);
             
             List<Planet> toRemove = new ArrayList<>();
             for (Planet planet : planetList.values()) {

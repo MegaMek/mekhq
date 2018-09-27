@@ -56,6 +56,7 @@ import java.util.ResourceBundle;
 import java.util.StringTokenizer;
 import java.util.UUID;
 import java.util.Vector;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import javax.swing.JTable;
@@ -1509,14 +1510,14 @@ public class Utilities {
     /**
      * Run through the directory and call parser.parse(fis) for each XML file found. Don't recurse.
      */
-    public static void parseXMLFiles(String dirName, FileParser parser) {
+    public static void parseXMLFiles(String dirName, Consumer<FileInputStream> parser) {
         parseXMLFiles(dirName, parser, false);
     }
 
     /**
      * Run through the directory and call parser.parse(fis) for each XML file found.
      */
-    public static void parseXMLFiles(String dirName, FileParser parser, boolean recurse) {
+    public static void parseXMLFiles(String dirName, Consumer<FileInputStream> parser, boolean recurse) {
         final String METHOD_NAME = "parseXMLFiles(String,FileParser,boolean)"; //$NON-NLS-1$
 
         if( null == dirName || null == parser ) {
@@ -1542,7 +1543,7 @@ public class Utilities {
                 for( File file : files ) {
                     if( file.isFile() ) {
                         try(FileInputStream fis = new FileInputStream(file)) {
-                            parser.parse(fis);
+                            parser.accept(fis);
                         } catch(Exception ex) {
                             // Ignore this file then
                             MekHQ.getLogger().log(Utilities.class, METHOD_NAME, LogLevel.ERROR,
