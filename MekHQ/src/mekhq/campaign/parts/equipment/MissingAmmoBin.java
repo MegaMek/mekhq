@@ -78,15 +78,6 @@ public class MissingAmmoBin extends MissingEquipmentPart {
     }
     
     @Override
-    public boolean isInLocation(String loc) {
-        if (unit.getEntity() instanceof Aero
-                && !((unit.getEntity() instanceof SmallCraft) || (unit.getEntity() instanceof Jumpship))){
-            return loc.equals("FSLG");
-        }
-        return super.isInLocation(loc);
-    }
-
-    @Override
 	public int getDifficulty() {
 		return -2;
 	}
