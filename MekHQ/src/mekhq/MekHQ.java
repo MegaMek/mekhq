@@ -411,19 +411,30 @@ public class MekHQ implements GameListener {
     }
 
     public void startHost(Scenario scenario, boolean loadSavegame, ArrayList<Unit> meks) {
-    	LaunchGameDialog lgd = new LaunchGameDialog(campaigngui.getFrame(), true, campaign);
-		lgd.setVisible(true);
 
-		if(lgd.cancelled) {
-		    stopHost();
-		    return;
-		}
-		
-    	try {
-            myServer = new Server("", lgd.port);
+        int port;
+        String playerName;
+        {
+            LaunchGameDialog lgd = new LaunchGameDialog(campaigngui.getFrame(), true, campaign);
+            lgd.setVisible(true);
+            if (lgd.cancelled) {
+                stopHost();
+                return;
+            } else {
+                port = lgd.port;
+                playerName = lgd.playerName;
+            }
+            lgd.dispose(); // Force cleanup of the current modal, since we are 
+                           // (possibly) about to display a new one and MacOS
+                           // seems to struggle with that.
+                           // (see https://github.com/MegaMek/mekhq/issues/953)
+        }
+
+        try {
+            myServer = new Server("", port);
             if (loadSavegame) {
                 FileDialog f = new FileDialog(campaigngui.getFrame(), "Load Savegame");
-                f.setDirectory(System.getProperty("user.dir") + "/savegames");
+                f.setDirectory(System.getProperty("user.dir") + "/savegames"); //$NON-NLS-1$ //$NON-NLS-2$
                 f.setVisible(true);
                 if (null != f.getFile()) {
                     myServer.loadGame(new File(f.getDirectory(), f.getFile()));
@@ -432,28 +443,27 @@ public class MekHQ implements GameListener {
                     return; // exceptions as flow control? no thanks.
                 }
             }
-    	} catch (FileNotFoundException ex) {
-    	    // The dialog was cancelled or the file not found
-    	    // Return to the UI
-    	    stopHost();
-    	    return;
+        } catch (FileNotFoundException ex) {
+            // The dialog was cancelled or the file not found
+            // Return to the UI
+            stopHost();
+            return;
         } catch (Exception ex) {
-        	MekHQ.logMessage("Failed to start up server properly");
-			MekHQ.logError(ex);
-			stopHost();
+            MekHQ.getLogger().error(getClass(), "startHost", "Failed to start up server", ex); //$NON-NLS-1$ //$NON-NLS-2$
+            stopHost();
             return;
         }
 
-        client = new Client(lgd.playerName, "127.0.0.1", lgd.port);
+        client = new Client(playerName, "127.0.0.1", port); //$NON-NLS-1$
 
         client.getGame().addGameListener(this);
         currentScenario = scenario;
 
-        //Start the game thread
+        // Start the game thread
         if (campaign.getCampaignOptions().getUseAtB() && scenario instanceof AtBScenario) {
-        	gameThread = new AtBGameThread(lgd.playerName, client, this, meks, (AtBScenario)scenario);
+            gameThread = new AtBGameThread(playerName, client, this, meks, (AtBScenario) scenario);
         } else {
-        	gameThread = new GameThread(lgd.playerName, client, this, meks);
+            gameThread = new GameThread(playerName, client, this, meks);
         }
         gameThread.start();
     }
