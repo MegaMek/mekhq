@@ -27,7 +27,6 @@ import java.text.DecimalFormat;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import megamek.common.Aero;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.IArmorState;
@@ -372,7 +371,7 @@ public class Armor extends Part implements IAcquisitionWork {
 			return 3;
 		}
 		//December 2017 errata, only large craft should return 15m/point.
-		else if(entity.hasETypeFlag(entity.ETYPE_DROPSHIP) || entity.hasETypeFlag(entity.ETYPE_JUMPSHIP)) {
+		else if(entity.hasETypeFlag(Entity.ETYPE_DROPSHIP) || entity.hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
 			return 15;
 		}
 		return 5;
