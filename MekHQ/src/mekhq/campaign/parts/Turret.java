@@ -56,16 +56,17 @@ public class Turret extends TankLocation {
     	weight = 0;
     	this.name = "Turret";
     }
-    
-    public Turret clone() {
-    	Turret clone = new Turret(0, getUnitTonnage(), weight, campaign);
+
+    @Override
+    public Turret copy() {
+        Turret clone = new Turret(0, getUnitTonnage(), weight, campaign);
         clone.copyBaseData(this);
-    	clone.loc = this.loc;
-    	clone.damage = this.damage;
-    	clone.breached = this.breached;
-    	return clone;
+        clone.loc = this.loc;
+        clone.damage = this.damage;
+        clone.breached = this.breached;
+        return clone;
     }
-    
+
     public Turret(int loc, int tonnage, double weight, Campaign c) {
         super(loc, tonnage, c);
         this.weight = weight;

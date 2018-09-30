@@ -722,17 +722,17 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 		        // If the number changes we need to add them to either the warehouse at the end of
 		        // refit or the shopping list at the beginning.
                 for (int i = 0; i < oldCount - newCount; i++) {
-                    oldIntegratedHS.add(oldHS.clone());
+                    oldIntegratedHS.add(oldHS.copy());
                 }
                 for (int i = 0; i < newCount - oldCount; i++) {
-                    newIntegratedHS.add(oldHS.clone());
+                    newIntegratedHS.add(oldHS.copy());
                 }
 		    } else {
                 for (int i = 0; i < oldCount; i++) {
-                    oldIntegratedHS.add(oldHS.clone());
+                    oldIntegratedHS.add(oldHS.copy());
                 }
                 for (int i = 0; i < newCount; i++) {
-                    newIntegratedHS.add(newHS.clone());
+                    newIntegratedHS.add(newHS.copy());
                 }
                 updateRefitClass(CLASS_D);
 		    }
@@ -751,10 +751,10 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 		    if (oldHS != newHS) {
 		        Part hsPart = heatSinkPart(newEntity); // only single HS allowed, so they have to be of the same type
                 for (int i = oldHS; i < newHS; i++) {
-                    newIntegratedHS.add(hsPart.clone());
+                    newIntegratedHS.add(hsPart.copy());
                 }
                 for (int i = newHS; i < oldHS; i++) {
-                    oldIntegratedHS.add(hsPart.clone());
+                    oldIntegratedHS.add(hsPart.copy());
                 }
 		    }
 		}
@@ -951,7 +951,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 			if(newPart.isSpare()) {
 				if(newPart.getQuantity() > 1) {
 					newPart.decrementQuantity();
-					newPart = newPart.clone();
+					newPart = newPart.copy();
 					newPart.setRefitId(oldUnit.getId());
 					oldUnit.campaign.addPart(newPart, 0);
 					newNewUnitParts.add(newPart.getId());
@@ -1001,7 +1001,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 			    }
 			    if(null != replacement) {
 			        if(replacement.getQuantity() > 1) {
-			            Part actualReplacement = replacement.clone();
+			            Part actualReplacement = replacement.copy();
 			            actualReplacement.setRefitId(oldUnit.getId());
 			            oldUnit.campaign.addPart(actualReplacement, 0);
 			            newUnitParts.add(actualReplacement.getId());
@@ -2291,7 +2291,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
     }
 
     @Override
-    public Part clone() {
+    public Part copy() {
         // TODO Auto-generated method stub
         return null;
     }

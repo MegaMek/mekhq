@@ -22,7 +22,6 @@
 package mekhq.campaign;
 
 import java.io.PrintWriter;
-import java.io.Serializable;
 import java.util.ArrayList;
 
 import org.joda.time.DateTime;
@@ -43,14 +42,10 @@ import mekhq.campaign.universe.Planet;
  * 
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class JumpPath implements Serializable {
+public class JumpPath {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 708430867050359759L;
 	private ArrayList<Planet> path;
-	
+
 	public JumpPath() {
 		path = new ArrayList<Planet>();
 	}

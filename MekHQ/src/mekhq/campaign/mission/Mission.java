@@ -21,7 +21,6 @@
 package mekhq.campaign.mission;
 
 import java.io.PrintWriter;
-import java.io.Serializable;
 import java.text.ParseException;
 import java.util.ArrayList;
 
@@ -46,12 +45,7 @@ import mekhq.campaign.universe.Planets;
  * 
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class Mission implements Serializable, MekHqXmlSerializable {
-
-    /**
-     * 
-     */
-    private static final long serialVersionUID = -5692134027829715149L;
+public class Mission implements MekHqXmlSerializable {
 
     public static final int S_ACTIVE = 0;
     public static final int S_SUCCESS = 1;

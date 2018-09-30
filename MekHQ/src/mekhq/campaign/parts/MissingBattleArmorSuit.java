@@ -227,7 +227,7 @@ public class MissingBattleArmorSuit extends MissingPart {
     public void fix() {
         Part replacement = findReplacement(false);
         if(null != replacement) {
-        	BattleArmorSuit newSuit = (BattleArmorSuit)replacement.clone();
+        	BattleArmorSuit newSuit = (BattleArmorSuit)replacement.copy();
             //lets also clone the subparts
             unit.addPart(newSuit);
             //this is admittedly hacky, but lets go ahead and add something to the newSuit
@@ -262,7 +262,7 @@ public class MissingBattleArmorSuit extends MissingPart {
         			for(MissingBattleArmorEquipmentPart p : missingStuff) {
 	            		if(null != childPart && null != p.getUnit() && p.isAcceptableReplacement(childPart, false)) {
 	            			//then add child part and remove current part from unit and campaign
-	            			Part newPart = childPart.clone();
+	            			Part newPart = childPart.copy();
 	            			unit.addPart(newPart);
 	            			((EquipmentPart)newPart).setEquipmentNum(p.getEquipmentNum());
 	                        ((BattleArmorEquipmentPart)newPart).setTrooper(trooper);

@@ -949,7 +949,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     Kill kill = nkd.getKill();
                     if (people.length > 1) {
                         for (Person person : people) {
-                            Kill k = kill.clone();
+                            Kill k = kill.copy();
                             k.setPilotId(person.getId());
                             gui.getCampaign().addKill(k);
                         }
@@ -975,7 +975,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 LogEntry entry = eeld.getEntry();
                 if (null != entry) {
                     for (Person person : people) {
-                        person.addLogEntry(entry.clone());
+                        person.addLogEntry(entry.copy());
                         MekHQ.triggerEvent(new PersonLogEvent(selectedPerson));
                     }
                 }

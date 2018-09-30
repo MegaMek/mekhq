@@ -24,7 +24,6 @@ package mekhq.campaign.personnel;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -45,14 +44,8 @@ import mekhq.MekHqXmlUtil;
 
 /**
  * @author Neoancient
- *
- *
  */
-public class Bloodname implements Serializable {
-	/**
-	 *
-	 */
-	private static final long serialVersionUID = 3958964485520416824L;
+public class Bloodname {
 
 	private static ArrayList<Bloodname> bloodnames;
 
@@ -717,10 +710,9 @@ class Fraction {
 		denominator = f.denominator;
 	}
 
-	@Override
-	public Object clone() {
-		return new Fraction(this);
-	}
+    public Fraction copy() {
+        return new Fraction(this);
+    }
 
 	@Override
 	public String toString() {

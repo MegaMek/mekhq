@@ -55,12 +55,13 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 	public MissingPart(int tonnage, boolean isOmniPodded, Campaign c) {
 		super(tonnage, isOmniPodded, c);
 	}
-	
-	public MissingPart clone() {
-		//should never be called
-		return null;
-	}
-	
+
+    @Override
+    public MissingPart copy() {
+        // should never be called
+        return null;
+    }
+
 	@Override
 	public long getStickerPrice() {
 		//missing parts aren't worth a thing
@@ -133,7 +134,7 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 	public void fix() {
 		Part replacement = findReplacement(false);
 		if(null != replacement) {
-			Part actualReplacement = replacement.clone();
+			Part actualReplacement = replacement.copy();
 			unit.addPart(actualReplacement);
 			campaign.addPart(actualReplacement, 0);
 			replacement.decrementQuantity();
@@ -395,7 +396,7 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 		UUID teamId = getTeamId();
 		if(null != replacement && null != teamId) {
 			if(replacement.getQuantity() > 1) {
-				Part actualReplacement = replacement.clone();
+				Part actualReplacement = replacement.copy();
 				actualReplacement.setReserveId(teamId);
 				campaign.addPart(actualReplacement, 0);
 				replacementId = actualReplacement.getId();

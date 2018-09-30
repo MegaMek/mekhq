@@ -59,16 +59,17 @@ public class TankLocation extends Part {
     public TankLocation() {
     	this(0, 0, null);
     }
-    
-    public TankLocation clone() {
-    	TankLocation clone = new TankLocation(loc, getUnitTonnage(), campaign);
+
+    @Override
+    public TankLocation copy() {
+        TankLocation clone = new TankLocation(loc, getUnitTonnage(), campaign);
         clone.copyBaseData(this);
-    	clone.loc = this.loc;
-    	clone.damage = this.damage;
-    	clone.breached = this.breached;
-    	return clone;
+        clone.loc = this.loc;
+        clone.damage = this.damage;
+        clone.breached = this.breached;
+        return clone;
     }
-    
+
     public int getLoc() {
         return loc;
     }

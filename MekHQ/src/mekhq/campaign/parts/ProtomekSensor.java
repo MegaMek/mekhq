@@ -44,12 +44,12 @@ public class ProtomekSensor extends Part {
         this(0, null);
     }
 
-    public ProtomekSensor clone() {
+    @Override
+    public ProtomekSensor copy() {
         ProtomekSensor clone = new ProtomekSensor(getUnitTonnage(), campaign);
         clone.copyBaseData(this);
         return clone;
     }
-
 
     public ProtomekSensor(int tonnage, Campaign c) {
         super(tonnage, c);

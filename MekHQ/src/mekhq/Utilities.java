@@ -64,6 +64,7 @@ import javax.swing.table.TableModel;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
+import org.apache.commons.lang3.ArrayUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDateTime;
@@ -1446,9 +1447,9 @@ public class Utilities {
         String roman = name;
 
         for (int i = 0; i < roman.length(); i++) {
-            int num = romanNumerals.toString().indexOf(roman.charAt(i));
+            int num = ArrayUtils.indexOf(romanNumerals, roman.charAt(i)); // untested
             if (i < roman.length()) {
-                int temp = romanNumerals.toString().indexOf(roman.charAt(i+1));
+                int temp = ArrayUtils.indexOf(romanNumerals, roman.charAt(i+1)); // untested
                 // If this is a larger number, then we need to combine them
                 if (temp > num) {
                     num = temp - num;

@@ -55,13 +55,14 @@ public class BaArmor extends Armor implements IAcquisitionWork {
         // Amount is used for armor quantity, not tonnage
         super(tonnage, type, points, loc, false, clan, c);
     }
-    
-    public BaArmor clone() {
+
+    @Override
+    public BaArmor copy() {
         BaArmor clone = new BaArmor(0, amount, type, location, clan, campaign);
         clone.copyBaseData(this);
         return clone;
     }
-    
+
     @Override
     public double getTonnage() {
         return EquipmentType.getBaArmorWeightPerPoint(type, clan) * amount;

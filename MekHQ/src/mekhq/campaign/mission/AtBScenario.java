@@ -23,7 +23,6 @@
 package mekhq.campaign.mission;
 
 import java.io.PrintWriter;
-import java.io.Serializable;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -83,10 +82,8 @@ import mekhq.campaign.universe.Planets;
 
 /**
  * @author Neoancient
- *
  */
 public abstract class AtBScenario extends Scenario implements IAtBScenario {
-    private static final long serialVersionUID = 1148105510264408943L;
 
     public static final int BASEATTACK = 0;
     public static final int EXTRACTION = 1;
@@ -2192,11 +2189,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         rerollsRemaining--;
     }
 
-    public class BotForce implements Serializable, MekHqXmlSerializable {
-        /**
-         *
-         */
-        private static final long serialVersionUID = 8259058549964342518L;
+    public class BotForce implements MekHqXmlSerializable {
 
         private String name;
         private ArrayList<Entity> entityList;

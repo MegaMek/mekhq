@@ -177,7 +177,7 @@ public class Cubicle extends Part {
     }
 
     @Override
-    public Part clone() {
+    public Part copy() {
         Part part = new Cubicle(getUnitTonnage(), bayType, campaign);
         copyBaseData(part);
         return part;

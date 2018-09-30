@@ -2218,6 +2218,7 @@ public class CampaignGUI extends JPanel {
                 xmlDoc = db.parse(fis);
             } catch (Exception ex) {
                 MekHQ.getLogger().error(getClass(), METHOD_NAME, ex); //$NON-NLS-1$
+                throw new RuntimeException(ex);
             }
 
             Element personnelEle = xmlDoc.getDocumentElement();
@@ -2257,11 +2258,9 @@ public class CampaignGUI extends JPanel {
                     MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR, //$NON-NLS-1$
                             "ERROR: Cannot load person who exists, ignoring. (Name: " //$NON-NLS-1$
                             + p.getFullName() + ")"); //$NON-NLS-1$
-                    p = null;
+                    return;
                 }
-                if (p != null) {
-                    getCampaign().addPersonWithoutId(p, true);
-                }
+                getCampaign().addPersonWithoutId(p, true);
 
                 // Clear some values we no longer should have set in case this
                 // has transferred campaigns or things in the campaign have

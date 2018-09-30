@@ -61,13 +61,8 @@ import mekhq.campaign.rating.IUnitRating;
  * tables in the rules, or they avoid hard-coding universe details.
  *
  */
-public class AtBConfiguration implements Serializable {
-	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 515628415152924457L;
-	
+public class AtBConfiguration {
+
 	/* Used to indicate size of lance or equivalent in opfor forces */
 	public static final String ORG_IS = "IS";
 	public static final String ORG_CLAN = "CLAN";

@@ -240,7 +240,7 @@ public class TransportBayPart extends Part {
     }
 
     @Override
-    public Part clone() {
+    public Part copy() {
         // TODO Auto-generated method stub
         return null;
     }

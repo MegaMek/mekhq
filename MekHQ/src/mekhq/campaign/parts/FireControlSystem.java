@@ -58,13 +58,14 @@ public class FireControlSystem extends Part {
         this.cost = cost;
         this.name = "Fire Control System";
     }
-        
-    public FireControlSystem clone() {
-    	FireControlSystem clone = new FireControlSystem(0, cost, campaign);
+
+    @Override
+    public FireControlSystem copy() {
+        FireControlSystem clone = new FireControlSystem(0, cost, campaign);
         clone.copyBaseData(this);
-    	return clone;
+        return clone;
     }
-    
+
 	@Override
 	public void updateConditionFromEntity(boolean checkForDestruction) {
 		int priorHits = hits;

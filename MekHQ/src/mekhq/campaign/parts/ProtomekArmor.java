@@ -41,14 +41,14 @@ public class ProtomekArmor extends Armor implements IAcquisitionWork {
         super(tonnage, -1, points, loc, false, clan, c);
         this.name = "Protomech Armor";
     }
-    
+
     @Override
-    public ProtomekArmor clone() {
+    public ProtomekArmor copy() {
         ProtomekArmor clone = new ProtomekArmor(0, 0, amount, clan, campaign);
         clone.copyBaseData(this);
         return clone;
     }
-    
+
     @Override
     public double getTonnage() {
         return 50 * amount/1000.0;

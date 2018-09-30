@@ -1173,20 +1173,20 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 }
 
                 // fuel tanks
-                partsValue += 200 * js.getFuel() / js.getFuelPerTon();
+                partsValue += 200L * js.getFuel() / js.getFuelPerTon();
 
                 // armor
                 partsValue += js.getArmorWeight(js.locations()) * EquipmentType.getArmorCost(js.getArmorType(0));
 
                 // heat sinks
-                int sinkCost = 2000 + 4000 * js.getHeatType();// == HEAT_DOUBLE ? 6000:
+                long sinkCost = 2000L + 4000L * js.getHeatType();// == HEAT_DOUBLE ? 6000:
                                                            // 2000;
                 partsValue += sinkCost * js.getHeatSinks();
 
                 // grav deck
-                partsValue += 5000000 * js.getGravDeck();
-                partsValue += 10000000 * js.getGravDeckLarge();
-                partsValue += 40000000 * js.getGravDeckHuge();
+                partsValue += 5000000L  * js.getGravDeck();
+                partsValue += 10000000L * js.getGravDeckLarge();
+                partsValue += 40000000L * js.getGravDeckHuge();
 
                 // get bays
                 int baydoors = 0;

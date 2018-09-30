@@ -55,13 +55,14 @@ public class Avionics extends Part {
         super(tonnage, c);
         this.name = "Avionics";
     }
-    
-    public Avionics clone() {
-    	Avionics clone = new Avionics(0, campaign);
+
+    @Override
+    public Avionics copy() {
+        Avionics clone = new Avionics(0, campaign);
         clone.copyBaseData(this);
-    	return clone;
+        return clone;
     }
-        
+
 	@Override
 	public void updateConditionFromEntity(boolean checkForDestruction) {
 		int priorHits = hits;

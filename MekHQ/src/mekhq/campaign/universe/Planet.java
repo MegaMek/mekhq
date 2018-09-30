@@ -22,7 +22,6 @@
 
 package mekhq.campaign.universe;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -75,8 +74,7 @@ import mekhq.campaign.universe.Faction.Tag;
  */
 @XmlRootElement(name="planet")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class Planet implements Serializable {
-    private static final long serialVersionUID = -8699502165157515100L;
+public class Planet {
 
     // Star classification data and methods
     

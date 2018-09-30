@@ -48,12 +48,12 @@ public class InfantryWeaponPart extends EquipmentPart {
         super(tonnage, et, equipNum, c);
         primary = p;
     }
-    
+
     @Override
-    public InfantryWeaponPart clone() {
-    	InfantryWeaponPart clone = new InfantryWeaponPart(getUnitTonnage(), getType(), getEquipmentNum(), campaign, primary);
+    public InfantryWeaponPart copy() {
+        InfantryWeaponPart clone = new InfantryWeaponPart(getUnitTonnage(), getType(), getEquipmentNum(), campaign, primary);
         clone.copyBaseData(this);
-    	return clone;
+        return clone;
     }
 
 	@Override

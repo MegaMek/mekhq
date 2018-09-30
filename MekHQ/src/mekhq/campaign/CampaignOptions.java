@@ -22,7 +22,6 @@
 package mekhq.campaign;
 
 import java.io.PrintWriter;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -46,7 +45,7 @@ import mekhq.campaign.rating.UnitRatingMethod;
 /**
  * @author natit
  */
-public class CampaignOptions implements Serializable {
+public class CampaignOptions {
     private static final long serialVersionUID = 5698008431749303602L;
 
     public final static int TECH_INTRO = 0;
@@ -543,7 +542,6 @@ public class CampaignOptions implements Serializable {
         instantUnitMarketDelivery = false;
         useWeatherConditions = true;
     	useLightConditions = true;
-    	usePlanetaryConditions = true;
     	usePlanetaryConditions = false;
     	useLeadership = true;
     	useStrategy = true;

@@ -74,15 +74,15 @@ public class StructuralIntegrity extends Part {
 		pointsNeeded = 0;
 		this.name = "Structural Integrity";
 	}
-	
-	public StructuralIntegrity clone() {
-		StructuralIntegrity clone = new StructuralIntegrity(getUnitTonnage(), campaign);
+
+    @Override
+    public StructuralIntegrity copy() {
+        StructuralIntegrity clone = new StructuralIntegrity(getUnitTonnage(), campaign);
         clone.copyBaseData(this);
-		clone.pointsNeeded = this.pointsNeeded;
-		return clone;
-	}
-	
-	
+        clone.pointsNeeded = this.pointsNeeded;
+        return clone;
+    }
+
 	@Override
 	public long getStickerPrice() {
 		if(null != unit && unit.getEntity() instanceof Aero) {

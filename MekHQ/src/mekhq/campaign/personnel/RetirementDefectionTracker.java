@@ -60,13 +60,8 @@ import mekhq.campaign.mission.Mission;
  * in battle.
  *
  */
-public class RetirementDefectionTracker implements Serializable, MekHqXmlSerializable{
-	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 7245317499458320654L;
-	
+public class RetirementDefectionTracker implements MekHqXmlSerializable{
+
 	/* In case the dialog is closed after making the retirement rolls
 	 * and determining payouts but before the retirees have been paid,
 	 * we store those results to avoid making the rolls again.

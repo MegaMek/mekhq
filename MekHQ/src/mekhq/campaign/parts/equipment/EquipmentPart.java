@@ -114,13 +114,14 @@ public class EquipmentPart extends Part {
     	equipTonnage = ton;
     }
 
-    public EquipmentPart clone() {
-    	EquipmentPart clone = new EquipmentPart(getUnitTonnage(), type, equipmentNum, omniPodded, campaign);
+    @Override
+    public EquipmentPart copy() {
+        EquipmentPart clone = new EquipmentPart(getUnitTonnage(), type, equipmentNum, omniPodded, campaign);
         clone.copyBaseData(this);
-        if(hasVariableTonnage(type)) {
+        if (hasVariableTonnage(type)) {
             clone.setEquipTonnage(equipTonnage);
         }
-    	return clone;
+        return clone;
     }
 
     @Override
@@ -566,9 +567,9 @@ public class EquipmentPart extends Part {
                 //int multiplier = entity.locationIsLeg(loc) ? 700 : 500;
                 //costValue = (int) Math.ceil(entity.getWeight() * multiplier);
             } else if (type.hasFlag(MiscType.F_HAND_WEAPON) && (type.hasSubType(MiscType.S_CLAW))) {
-                varCost = (int) Math.ceil(getUnitTonnage() * 200);
+                varCost = getUnitTonnage() * 200;
             } else if (type.hasFlag(MiscType.F_CLUB) && (type.hasSubType(MiscType.S_LANCE))) {
-                varCost = (int) Math.ceil(getUnitTonnage() * 150);
+                varCost = getUnitTonnage() * 150;
             }
 
         }

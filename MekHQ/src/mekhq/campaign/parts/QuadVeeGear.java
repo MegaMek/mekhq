@@ -44,8 +44,9 @@ public class QuadVeeGear extends Part {
         super(tonnage, c);
         this.name = "Conversion Gear";
     }
-    
-    public QuadVeeGear clone() {
+
+    @Override
+    public QuadVeeGear copy() {
         QuadVeeGear clone = new QuadVeeGear(0, campaign);
         clone.copyBaseData(this);
         return clone;

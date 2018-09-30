@@ -26,7 +26,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
-import java.io.Serializable;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
@@ -227,10 +226,9 @@ import mekhq.module.atb.AtBEventProcessor;
 /**
  * @author Taharqa The main campaign class, keeps track of teams and units
  */
-public class Campaign implements Serializable, ITechManager {
-    private static final String REPORT_LINEBREAK = "<br/><br/>"; //$NON-NLS-1$
+public class Campaign implements ITechManager {
 
-    private static final long serialVersionUID = -6312434701389973056L;
+    private static final String REPORT_LINEBREAK = "<br/><br/>"; //$NON-NLS-1$
 
     private UUID id;
 
@@ -287,8 +285,8 @@ public class Campaign implements Serializable, ITechManager {
     private Ranks ranks;
 
     private ArrayList<String> currentReport;
-    private transient String currentReportHTML;
-    private transient List<String> newReports;
+    private String currentReportHTML;
+    private List<String> newReports;
 
     //this is updated and used per gaming session, it is enabled/disabled via the Campaign options
     //we're re-using the LogEntry class that is used to store Personnel entries
@@ -296,7 +294,7 @@ public class Campaign implements Serializable, ITechManager {
 
     private boolean overtime;
     private boolean gmMode;
-    private transient boolean overviewLoadingValue = true;
+    private boolean overviewLoadingValue = true;
 
     private String camoCategory = Player.NO_CAMO;
     private String camoFileName = null;
@@ -2255,7 +2253,7 @@ public class Campaign implements Serializable, ITechManager {
 
     public Part fixWarehousePart(Part part, Person tech) {
         // get a new cloned part to work with and decrement original
-        Part repairable = part.clone();
+        Part repairable = part.copy();
         part.decrementQuantity();
         fixPart(repairable, tech);
         if (!(repairable instanceof OmniPod)) {
@@ -3576,12 +3574,12 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public void depodPart(Part part, int quantity) {
-        Part unpodded = part.clone();
+        Part unpodded = part.copy();
         unpodded.setOmniPodded(false);
         OmniPod pod = new OmniPod(unpodded, this);
         while (quantity > 0 && part.getQuantity() > 0) {
-            addPart(unpodded.clone(), 0);
-            addPart(pod.clone(), 0);
+            addPart(unpodded.copy(), 0);
+            addPart(pod.copy(), 0);
             part.decrementQuantity();
             quantity--;
         }
@@ -7215,7 +7213,7 @@ public class Campaign implements Serializable, ITechManager {
             // If we're assigned as a tech for any unit, remove us from it/them
             if (!person.getTechUnitIDs().isEmpty()) {
                 @SuppressWarnings("unchecked") // Broken assed Java returning Object from clone
-                ArrayList<UUID> techIDs = (ArrayList<UUID>) person.getTechUnitIDs().clone();
+                ArrayList<UUID> techIDs = new ArrayList<>(person.getTechUnitIDs());
                 for (UUID tuuid : techIDs) {
                     Unit t = getUnit(tuuid);
                     t.remove(person, true);

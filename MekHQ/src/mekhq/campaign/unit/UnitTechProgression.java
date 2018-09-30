@@ -124,24 +124,23 @@ public class UnitTechProgression {
         }
         return null;
     }
-    
+
     private static ITechnology calcTechProgression(MechSummary ms, int techFaction) {
-        final String METHOD_NAME = "calcTechProgression(MechSummary, int)"; // $NON-NLS-1$
+        final String METHOD_NAME = "calcTechProgression(MechSummary, int)"; //$NON-NLS-1$
         try {
             Entity en = new MechFileParser(ms.getSourceFile(), ms.getEntryName()).getEntity();
             if (null == en) {
-                MekHQ.getLogger().log(BuildMapTask.class, METHOD_NAME, LogLevel.ERROR,
-                        "Entity was null: " + ms.getName());
+                MekHQ.getLogger().log(BuildMapTask.class, METHOD_NAME, LogLevel.ERROR, "Entity was null: " + ms.getName());
+                return null;
             }
             return en.factionTechLevel(techFaction);
         } catch (EntityLoadingException ex) {
-            MekHQ.getLogger().log(BuildMapTask.class, METHOD_NAME, LogLevel.ERROR,
-                    "Exception loading entity " + ms.getName());
+            MekHQ.getLogger().log(BuildMapTask.class, METHOD_NAME, LogLevel.ERROR, "Exception loading entity " + ms.getName());
             MekHQ.getLogger().error(BuildMapTask.class, METHOD_NAME, ex);
             return null;
         }
     }
-    
+
     /**
      * Goes through all the entries in MechSummaryCache, loads them, and calculates the composite
      * tech level of all the equipment and construction options for a specific faction.

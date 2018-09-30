@@ -52,12 +52,13 @@ public class VeeStabiliser extends Part {
         this.loc = loc;
         this.name = "Vehicle Stabiliser";
     }
-	
-	public VeeStabiliser clone() {
-		VeeStabiliser clone = new VeeStabiliser(getUnitTonnage(), 0, campaign);
+
+    @Override
+    public VeeStabiliser copy() {
+        VeeStabiliser clone = new VeeStabiliser(getUnitTonnage(), 0, campaign);
         clone.copyBaseData(this);
-		return clone;
-	}
+        return clone;
+    }
 
     @Override
     public boolean isSamePartType(Part part) {

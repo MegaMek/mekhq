@@ -37,7 +37,7 @@ import mekhq.MekHqXmlUtil;
 /**
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class LogEntry implements Cloneable, MekHqXmlSerializable {
+public class LogEntry implements MekHqXmlSerializable {
 
     private static final SimpleDateFormat dateFormat() {
         // LATER centralise date formatting so that every class doesn't have its own format and - possibly - switch to java.time
@@ -130,8 +130,7 @@ public class LogEntry implements Cloneable, MekHqXmlSerializable {
         return sb.toString();
     }
 
-    @Override
-    public LogEntry clone() {
+    public LogEntry copy() {
         return new LogEntry(date, desc, type);
     }
 

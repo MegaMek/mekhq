@@ -49,16 +49,17 @@ public class Rotor extends TankLocation {
         this.name = "Rotor";
         this.damage = 0;
     }
-    
-    public Rotor clone() {
-    	Rotor clone = new Rotor(getUnitTonnage(), campaign);
+
+    @Override
+    public Rotor copy() {
+        Rotor clone = new Rotor(getUnitTonnage(), campaign);
         clone.copyBaseData(this);
-    	clone.loc = this.loc;
-    	clone.damage = this.damage;
-    	clone.breached = this.breached;
-    	return clone;
+        clone.loc = this.loc;
+        clone.damage = this.damage;
+        clone.breached = this.breached;
+        return clone;
     }
- 
+
     @Override
     public boolean isSamePartType(Part part) {
         return part instanceof Rotor 

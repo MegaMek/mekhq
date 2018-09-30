@@ -120,7 +120,8 @@ public class BattleArmorSuit extends Part {
         initializeExtraCostsAndTons();
     }
 
-    public BattleArmorSuit clone() {
+    @Override
+    public BattleArmorSuit copy() {
         BattleArmorSuit clone = new BattleArmorSuit(chassis, model, getUnitTonnage(), trooper, weightClass, groundMP, jumpMP, quad, clan, jumpType, campaign);
         clone.copyBaseData(this);
         clone.alternateCost = this.alternateCost;
@@ -446,7 +447,7 @@ public class BattleArmorSuit extends Part {
                 	addChildPart(part);
                 }
                 if(part instanceof BaArmor && ((BaArmor)part).getLocation() == trooper) {
-                    BaArmor armorClone = (BaArmor)part.clone();
+                    BaArmor armorClone = (BaArmor)part.copy();
                     armorClone.setAmount(((BaArmor)part).getAmount());
 	                armorClone.setParentPartId(getId());
                     campaign.addPart(armorClone, 0);
@@ -627,13 +628,13 @@ public class BattleArmorSuit extends Part {
     		//find method
 	        for(Part part : newUnit.getParts()) {
 	            if(part instanceof BattleArmorEquipmentPart && ((BattleArmorEquipmentPart)part).getTrooper() == BattleArmor.LOC_TROOPER_1) {
-	                Part newEquip = part.clone();
+	                Part newEquip = part.copy();
 	                newEquip.setParentPartId(getId());
 	                campaign.addPart(newEquip, 0);
 	                addChildPart(newEquip);
 	            }
 	            else if(part instanceof BaArmor && ((BaArmor)part).getLocation() == BattleArmor.LOC_TROOPER_1) {
-	            	BaArmor armorClone = (BaArmor)part.clone();
+	            	BaArmor armorClone = (BaArmor)part.copy();
                     armorClone.setAmount(newUnit.getEntity().getOArmor(BattleArmor.LOC_TROOPER_1));
 	                armorClone.setParentPartId(getId());
                     campaign.addPart(armorClone, 0);

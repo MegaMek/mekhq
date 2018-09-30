@@ -22,7 +22,6 @@
 package mekhq.campaign.personnel;
 
 import java.io.PrintWriter;
-import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -83,15 +82,14 @@ import mekhq.campaign.LogEntry;
 import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.mod.am.InjuryUtil;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.universe.Faction;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
-import mekhq.campaign.universe.Faction;
 
 /**
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class Person implements Serializable, MekHqXmlSerializable {
-    private static final long serialVersionUID = -847642980395311152L;
+public class Person implements MekHqXmlSerializable {
 
     public static final int G_MALE = 0;
     public static final int G_FEMALE = 1;
@@ -2716,7 +2714,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 if(!spa.isEligible(this)) {
                     continue;
                 }
-                if(generation & spa.getWeight() <= 0) {
+                if(generation && spa.getWeight() <= 0) {
                     continue;
                 }
                 eligible.add(spa);
@@ -2912,7 +2910,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
      *         role
      */
     public boolean isCombat() {
-        return isCombatRole(primaryRole) || isCombatRole(primaryRole);
+        return isCombatRole(primaryRole) || isCombatRole(secondaryRole);
     }
 
     /**

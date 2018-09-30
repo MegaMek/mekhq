@@ -163,7 +163,7 @@ public class BayDoor extends Part {
     }
 
     @Override
-    public Part clone() {
+    public Part copy() {
         Part newPart = new BayDoor(getUnitTonnage(), campaign);
         copyBaseData(newPart);
         return newPart;

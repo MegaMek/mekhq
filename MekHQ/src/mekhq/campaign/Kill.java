@@ -159,8 +159,7 @@ public class Kill implements Serializable {
     	pilotId = pHash.get(oldPilotId);
     }
 	
-	@Override
-	public Kill clone() {
+	public Kill copy() {
 		return new Kill(getPilotId(), getWhatKilled(), getKilledByWhat(), getDate());
 	}
 	

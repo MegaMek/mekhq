@@ -108,7 +108,7 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
         dateFormatter = new SimpleDateFormat("MM/dd/yyyy");
         loots = new ArrayList<Loot>();
         for(Loot loot : scenario.getLoot()) {
-            loots.add((Loot)loot.clone());
+            loots.add(loot.copy());
         }
         lootModel = new LootTableModel(loots);
         initComponents();
