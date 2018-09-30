@@ -22487,18 +22487,22 @@ Honor is the 4th planet in the system and is best described as an arctic planet 
         <ycood>601.855</ycood>
         <id>Columbus (Epsilon Pegasus)</id>
         <name>Columbus (Epsilon Pegasus)</name>
-        <sysPos>4</sysPos>
         <spectralType>G2V</spectralType>
         <spectralClass>G</spectralClass>
-        <subtype>2.0</subtype>
+        <subtype>2</subtype>
         <luminosity>V</luminosity>
+        <sysPos>4</sysPos>
         <satellite>Amor</satellite>
         <gravity>0.9</gravity>
-        <nadirCharge>false</nadirCharge>
-        <zenithCharge>false</zenithCharge>
-        <pressure>3</pressure>
-        <lifeForm>MAMMAL</lifeForm>
+        <pressure>2</pressure>
+        <climate>2</climate>
+        <temperature>67</temperature>
+        <percentWater>67</percentWater>
         <hpg>A</hpg>
+        <lifeForm>7</lifeForm>
+        <pop>0</pop>
+        <socioIndustrial>X-X-X-X-X</socioIndustrial>
+
         <faction>UND</faction>
         <desc>Columbus was settled in 2549 by deep exploration crews for the Terran Hegemony. The station continued as a send off point for explorers throughout the Star League and the facilities were eventually upgraded to include a dropship repair facility on Amor, the planets moon. The planet was abandoned in 2780, just prior to Kerensky's Exodus and remained abandoned until Comstar rediscovered the facility in 3023 and began using it as a staging base for their Explorer Corps. The facility was very small until the early 3050s when the need to find the Clan Homeworlds reignited the need for the Explorer Corps.</desc>
         <event>
@@ -34700,12 +34704,22 @@ Olympus Construction Vehicles</desc>
         <ycood>567.699</ycood>
         <id>Far Reach</id>
         <name>Far Reach</name>
-        <spectralType>G5V</spectralType>
-        <spectralClass>G</spectralClass>
-        <subtype>5.0</subtype>
+        <spectralType>B3V</spectralType>
+        <spectralClass>B</spectralClass>
+        <subtype>3</subtype>
         <luminosity>V</luminosity>
-        <nadirCharge>false</nadirCharge>
-        <zenithCharge>false</zenithCharge>
+        <sysPos>2</sysPos>
+        <satellite>Paris</satellite>
+        <satellite>Helene</satellite>
+        <gravity>1.06</gravity>
+        <pressure>3</pressure>
+        <climate>3</climate>
+        <temperature>32</temperature>
+        <percentWater>95</percentWater>
+        <hpg>X</hpg>
+        <lifeForm>5</lifeForm>
+        <pop>6</pop>
+        <socioIndustrial>C-D-D-C-F</socioIndustrial>
         <faction>UND</faction>
         <event>
             <date>2750-01-01</date>
@@ -36613,12 +36627,24 @@ During the Capellan-Republic war, Foot Fall was the center of some of the fierce
         <ycood>561.806</ycood>
         <id>Fredotto</id>
         <name>Fredotto</name>
-        <spectralType>K8V</spectralType>
-        <spectralClass>K</spectralClass>
-        <subtype>8.0</subtype>
+        <spectralType>M5V</spectralType>
+        <spectralClass>M</spectralClass>
+        <subtype>5</subtype>
         <luminosity>V</luminosity>
-        <nadirCharge>false</nadirCharge>
-        <zenithCharge>false</zenithCharge>
+        <sysPos>1</sysPos>
+        <satellite>Rigoletto</satellite>
+        <satellite>Rodolfo</satellite>
+        <satellite>Angeletto</satellite>
+        <gravity>1.03</gravity>
+        <pressure>3</pressure>
+       <atmosphere>Tainted</atmosphere>
+        <climate>3</climate>
+        <temperature>30</temperature>
+        <percentWater>55</percentWater>
+        <hpg>X</hpg>
+        <lifeForm>5</lifeForm>
+        <pop>5</pop>
+        <socioIndustrial>D-D-F-D-C</socioIndustrial>
         <faction>UND</faction>
         <event>
             <date>2750-01-01</date>
@@ -43732,12 +43758,25 @@ The planet is defended by an AFFS security force located on the moon Bane and is
         <ycood>580.452</ycood>
         <id>Haublan</id>
         <name>Haublan</name>
-        <spectralType>G0V</spectralType>
-        <spectralClass>G</spectralClass>
-        <subtype>0.0</subtype>
+        <spectralType>B0V</spectralType>
+        <spectralClass>B</spectralClass>
+        <subtype>0</subtype>
         <luminosity>V</luminosity>
-        <nadirCharge>false</nadirCharge>
-        <zenithCharge>false</zenithCharge>
+        <sysPos>1</sysPos>
+        <satellite>Uno</satellite>
+        <satellite>Duce</satellite>
+        <satellite>Trois</satellite>
+        <satellite>Forte</satellite>
+        <satellite>Fiver</satellite>
+        <gravity>0.94</gravity>
+        <pressure>2</pressure>
+        <climate>2</climate>
+        <temperature>30</temperature>
+        <percentWater>24</percentWater>
+        <hpg>X</hpg>
+        <lifeForm>1</lifeForm>
+        <pop>4</pop>
+        <socioIndustrial>D-D-F-D-C</socioIndustrial>
         <faction>UND</faction>
         <event>
             <date>2864-01-01</date>
@@ -47638,12 +47677,22 @@ Huntress was the capital of Clan Smoke Jaguar and their primary holding. They ha
         <ycood>584.489</ycood>
         <id>Idrmach/Idrmarch</id>
         <name>Idrmach/Idrmarch</name>
-        <spectralType>F5V</spectralType>
-        <spectralClass>F</spectralClass>
-        <subtype>5.0</subtype>
+        <spectralType>G0V</spectralType>
+        <spectralClass>G</spectralClass>
+        <subtype>0</subtype>
         <luminosity>V</luminosity>
-        <nadirCharge>false</nadirCharge>
-        <zenithCharge>false</zenithCharge>
+        <sysPos>4</sysPos>
+        <satellite>Ruby</satellite>
+        <satellite>Azure</satellite>
+        <gravity>1.01</gravity>
+        <pressure>3</pressure>
+        <climate>3</climate>
+        <temperature>35</temperature>
+        <percentWater>65</percentWater>
+        <hpg>B</hpg>
+        <lifeForm>5</lifeForm>
+        <pop>6</pop>
+        <socioIndustrial>B-D-F-D-D</socioIndustrial>
         <faction>UND</faction>
         <event>
             <date>2864-01-01</date>
@@ -48777,12 +48826,22 @@ Ingress‘s temporary military weakness made it an easy target during the Blakis
         <ycood>570.181</ycood>
         <id>Ingvolstand</id>
         <name>Ingvolstand</name>
-        <spectralType>M5V</spectralType>
-        <spectralClass>M</spectralClass>
-        <subtype>5.0</subtype>
+        <spectralType>F2V</spectralType>
+        <spectralClass>F</spectralClass>
+        <subtype>2</subtype>
         <luminosity>V</luminosity>
-        <nadirCharge>false</nadirCharge>
-        <zenithCharge>false</zenithCharge>
+        <sysPos>3</sysPos>
+        <satellite>Apollo</satellite>
+        <satellite>Hermes</satellite>
+        <gravity>1.23</gravity>
+        <pressure>3</pressure>
+        <climate>2</climate>
+        <temperature>22</temperature>
+        <percentWater>75</percentWater>
+        <hpg>X</hpg>
+        <lifeForm>1</lifeForm>
+        <pop>5</pop>
+        <socioIndustrial>D-D-D-D-C</socioIndustrial>
         <faction>UND</faction>
         <event>
             <date>2750-01-01</date>
@@ -49157,15 +49216,29 @@ Irian’s terrain is best described as bland. The planet’s terrain is dominate
         <ycood>445.546</ycood>
         <id>Iron Land</id>
         <name>Iron Land</name>
-        <spectralType>G1V</spectralType>
+        <spectralType>G2V</spectralType>
         <spectralClass>G</spectralClass>
-        <subtype>1.0</subtype>
+        <subtype>2</subtype>
         <luminosity>V</luminosity>
-        <nadirCharge>false</nadirCharge>
-        <zenithCharge>false</zenithCharge>
+        <sysPos>3</sysPos>
+        <gravity>1.1</gravity>
+        <pressure>3</pressure>
+        <climate>5</climate>
+        <temperature>45</temperature>
+        <percentWater>83</percentWater>
+        <hpg>X</hpg>
+        <lifeForm>8</lifeForm>
+        <pop>4</pop>
+        <socioIndustrial>F-F-A-D-B</socioIndustrial>
+        <landMass>Nepean</landMass>
+        <landMass>Norfolk (Kingston)</landMass>
+        <landMass>Phillip</landMass>
+        <desc>Too hot to be comfortably settled the planet never had a large population but Iron Land had enough natural resources to attract corporations and was settled as a secret prison world by the Rim Worlds Republic in 2350. The planet remained a prison world for more than four centuries.
+
+The fall of the RWR also brought about the fall of Iron Land and the planet was left almost entirely depopulated after the prisons were liberated. Those that could not leave the planet or chose not to were left behind and continued to survive primarily as scavengers mostly cut off from the rest of the Inner Sphere.</desc>
         <faction>UND</faction>
         <event>
-            <date>2750-01-01</date>
+            <date>2350-01-01</date>
             <faction>RWR</faction>
         </event>
         <event>
@@ -68231,7 +68304,7 @@ These episodic invasions kept Mirach from realizing its true potential, and the 
         <percentWater>84</percentWater>
         <landMass>Majestica</landMass>
         <landMass>Paradasia</landMass>
-        <landMass>Solasia (NouveauParis)</landMass>
+        <landMass>Solasia (New Venice Beach)</landMass>
         <landMass>Utopian Isles</landMass>
         <landMass>Wunderlund</landMass>
         <nadirCharge>true</nadirCharge>
@@ -68240,15 +68313,17 @@ These episodic invasions kept Mirach from realizing its true potential, and the 
         <temperature>52</temperature>
         <climate>TROPICAL</climate>
         <lifeForm>MAMMAL</lifeForm>
+        <pop>9</pop>
         <hpg>B</hpg>
         <faction>UND</faction>
+        <socioIndustrial>B-B-B-B-A</socioIndustrial>
         <desc>Mizar is an exceptionally unique planet: it orbits a rare double binary and the four small A class suns constantly bake the planet. Mizar is kept liveable due to large bodies of water and being the planet furthest from the stars in the system.
 
-Mizar has been a resort planet of some renown since before the time of the Star League. As a result the populace takes a deep pride (and spends quite a bit of money) in keeping the planet beautiful.
+Mizar has been a resort planet of some renown since before the time of the Star League. As a result the populace takes a deep pride (and spends quite a bit of money) in keeping the planet beautiful. The planet's capital has been known as both Nouveau Paris and New Venice Beach.
 
 3135 - Though it bakes beneath a huge sun that is, in fact, part of a double-binary star system, Mizar has managed to become known as one of the greatest resort worlds in the Inner Sphere. The arrangement of the double binary system leads to complex solar cycles on Mizar that assure the planet is fully lit almost perpetually. Varying degrees of sunlight from the four A-class suns of the Mizar system produce peculiarly long and irregular seasons, varying from a temperate terrestrial springtime to a lingering tropical heat wave—even at the poles. Despite the heat, however, Mizar was miraculously blessed with an abundance of water, native life, and breathtaking vistas from New Venice Beach, the planet‘s longest stretch of snow-white sands, along the eastern coast of the Paradasia continent, to the “plastic crystal” mountains of the southern Utopian Isles. These features made Mizar a tourist spot almost from the moment of its discovery, and the hospitality of the natives became legendary. They welcomed the Terran Hegemony when Admiral McKenna first forged the empire that would one day rule the Star League, and throughout humanity‘s Golden Age Mizar was jointly administered by the Hegemony and the neighboring Lyran Commonwealth. Their economy booming as a tourist spot, the Mizarians came to obsess about appearances and all the finer things in life, from fancy cars and the latest fashions, to palatial estates and cutting-edge sculptures made from native “plastic crystal” all meticulously groomed and refined for maximum beauty at all times. The Amaris Crisis, which precipitated the fall of the Star League, spared Mizar only because the Lyran government‘s troops were already on-planet in force when word of the coup broke out; Amaris decided against putting another Successor State at his throat while Kerensky‘s noose closed around him. Throughout the Succession Wars few raids were launched against the world, but those few invaders who did land on the surface often as not found themselves unable to bring themselves to harm the planet‘s greatest natural and man-made wonders, instead hoping to capture this world intact. The absence of significant military or industrial resources also made Mizar a poor invasion candidate; even the Word of Blake managed to cause little damage to the planet. Today, visitors are more than welcome to land at any of the four major spaceports on the Majestica, Paradasia, Solasia, and Wunderlund continents, though the capital city of NouveauParis on Solasia remains the most stunning of the planet‘s hot spots—and the best place to get a good Fire Lizard, Mizar‘s very own specialty drink.</desc>
         <event>
-            <date>2242-01-01</date>
+            <date>2153-01-01</date>
             <faction>IND</faction>
         </event>
         <event>
@@ -79114,12 +79189,20 @@ Challenge Systems</desc>
         <ycood>548.708</ycood>
         <id>Paran</id>
         <name>Paran</name>
-        <spectralType>M9V</spectralType>
-        <spectralClass>M</spectralClass>
-        <subtype>9.0</subtype>
+        <spectralType>A6V</spectralType>
+        <spectralClass>A</spectralClass>
+        <subtype>6</subtype>
         <luminosity>V</luminosity>
-        <nadirCharge>false</nadirCharge>
-        <zenithCharge>false</zenithCharge>
+        <sysPos>6</sysPos>
+        <gravity>1.05</gravity>
+        <pressure>3</pressure>
+        <climate>2</climate>
+        <temperature>25</temperature>
+        <percentWater>70</percentWater>
+        <hpg>B</hpg>
+        <lifeForm>3</lifeForm>
+        <pop>5</pop>
+        <socioIndustrial>D-D-D-D-C</socioIndustrial>
         <faction>UND</faction>
         <event>
             <date>2750-01-01</date>
@@ -95967,15 +96050,41 @@ J. B. BattleMechs Inc.</desc>
         <ycood>-201.446</ycood>
         <id>Stotzing</id>
         <name>Stotzing</name>
-        <spectralType>G4V</spectralType>
-        <spectralClass>G</spectralClass>
-        <subtype>4.0</subtype>
+        <spectralType>K5V</spectralType>
+        <spectralClass>K</spectralClass>
+        <subtype>5</subtype>
         <luminosity>V</luminosity>
-        <nadirCharge>false</nadirCharge>
-        <zenithCharge>false</zenithCharge>
+        <sysPos>2</sysPos>
+        <gravity>0.85</gravity>
+        <pressure>3</pressure>
+        <climate>3</climate>
+        <temperature>22</temperature>
+        <percentWater>52</percentWater>
+        <hpg>B</hpg>
+        <lifeForm>1</lifeForm>
+        <pop>7</pop>
+        <socioIndustrial>B-C-A-C-B</socioIndustrial>
+        <landMass>Burgenland</landMass>
+        <landMass>Mattersburg</landMass>
+        <landMass>Obertwart (Sophia)</landMass>
+        <landMass>Umgebung</landMass>
+        <desc>Stotzing was located and roughly categorized by Terran Alliance scientists decades before a JumpShip was ever dispatched. The TAS Peekaboo’s eventual survey efforts confirmed those findings; poor for colonization and only of interest in the terraforming corporations that were booming.
+
+A permanent research base was established in 2250 and a colony attempted to take root in 2345 but the genetically engineered crops failed and the planet was abandoned for almost 250 years, due to the poor atmosphere, high ultraviolet light, and voracious native bacteria. Terraforming efforts resumed in the 2400s and were eventually successful. Stotzing was officially resettled in 2598 with the founding of the capitol Alt-Eisenstadt, later renamed Sophia. Truthfully it took the Star League until 2650 for the planet to be the paradise envisioned at the start of terraforming efforts. Much like Promised Land, it was gifted to the Free Worlds League as a token of goodwill.
+
+Stotzing was a booming world until the Succession Wars. Damage suffered nearly wiped out the imported ecology by the 3rd Succession War and century of work were undone, returning paradise to wasteland. The decline was only reversed with the assistance of ComStar starting in 2943. The planet was saved and the citizens became deeply loyal to ComStar.</desc>
+
         <faction>UND</faction>
         <event>
-            <date>2750-01-01</date>
+            <date>2250-01-01</date>
+            <faction>IND</faction>
+        </event>
+        <event>
+            <date>2345-01-01</date>
+            <faction>ABN</faction>
+        </event>
+        <event>
+            <date>2598-01-01</date>
             <faction>FWL</faction>
         </event>
         <event>
@@ -97549,12 +97658,21 @@ For most of the planet’s history it was a Lyran Commonwealth planet bordering 
         <ycood>576.382</ycood>
         <id>Syrstart</id>
         <name>Syrstart</name>
-        <spectralType>K1V</spectralType>
-        <spectralClass>K</spectralClass>
-        <subtype>1.0</subtype>
+        <spectralType>A3V</spectralType>
+        <spectralClass>A</spectralClass>
+        <subtype>3</subtype>
         <luminosity>V</luminosity>
-        <nadirCharge>false</nadirCharge>
-        <zenithCharge>false</zenithCharge>
+        <sysPos>6</sysPos>
+        <satellite>Utopia</satellite>
+        <gravity>1.03</gravity>
+        <pressure>2</pressure>
+        <climate>3</climate>
+        <temperature>40</temperature>
+        <percentWater>86</percentWater>
+        <hpg>X</hpg>
+        <lifeForm>7</lifeForm>
+        <pop>4</pop>
+        <socioIndustrial>D-D-D-D-D</socioIndustrial>
         <faction>UND</faction>
         <event>
             <date>2750-01-01</date>
@@ -106061,12 +106179,21 @@ In the centuries of the Succession Wars, Unukalhai was largely overlooked by inv
         <ycood>548.318</ycood>
         <id>Vannes</id>
         <name>Vannes</name>
-        <spectralType>G7V</spectralType>
-        <spectralClass>G</spectralClass>
-        <subtype>7.0</subtype>
+        <spectralType>K0V</spectralType>
+        <spectralClass>K</spectralClass>
+        <subtype>0</subtype>
         <luminosity>V</luminosity>
-        <nadirCharge>false</nadirCharge>
-        <zenithCharge>false</zenithCharge>
+        <sysPos>1</sysPos>
+        <satellite>Cartagia</satellite>
+        <gravity>0.9</gravity>
+        <pressure>2</pressure>
+        <climate>2</climate>
+        <temperature>28</temperature>
+        <percentWater>45</percentWater>
+        <hpg>X</hpg>
+        <lifeForm>4</lifeForm>
+        <pop>5</pop>
+        <socioIndustrial>C-D-D-D-D</socioIndustrial>
         <faction>UND</faction>
         <event>
             <date>2750-01-01</date>
@@ -110657,12 +110784,38 @@ Woodstock‘s third continent, Essex, is the only blemish on this otherwise beau
         <ycood>269.932</ycood>
         <id>Wynn's Roost</id>
         <name>Wynn's Roost</name>
-        <spectralType>K4V</spectralType>
+        <spectralType>K7V</spectralType>
         <spectralClass>K</spectralClass>
-        <subtype>4.0</subtype>
+        <subtype>7</subtype>
         <luminosity>V</luminosity>
-        <nadirCharge>false</nadirCharge>
-        <zenithCharge>false</zenithCharge>
+        <sysPos>2</sysPos>
+        <satellite>Santa Monica</satellite>
+        <gravity>1.0</gravity>
+        <pressure>3</pressure>
+        <atmosphere>Tainted</atmosphere>
+        <climate>3</climate>
+        <temperature>34</temperature>
+        <percentWater>50</percentWater>
+        <hpg>B</hpg>
+        <lifeForm>7</lifeForm>
+        <pop>4</pop>
+        <socioIndustrial>D-D-A-B-C</socioIndustrial>
+        <landMass>Oneland</landMass>
+        <landMass>Twoland</landMass>
+        <landMass>Threeland</landMass>
+        <landMass>Wynnland</landMass>
+        <landMass>Turnerland (Turnerville)</landMass>
+        <desc>Wynnland was settled during the Golden Years of the Star League by the Outworlds Alliance. Due to the relative peace in the Outworlds Alliance, Wynnland attracted settlers from the Terran Hegemony, Federated Suns, and even the Draconis Combine.
+
+Founded by Turner Wynn of the Wynn Conglomerate, the planet was one of many mining-industrial colonies setup to support the booming demands of the Star League and the Inner Sphere. The main difference being that Wynn’s Roost was a relatively comfortable planet with plenty of water and arable land and thanks to staying out of serious conflict even during the Succession Wars, continued to thrive.</desc>
+        <event>
+            <date>3130-01-01</date>
+            <socioIndustrial>C-C-A-B-C</socioIndustrial>
+        </event>
+        <event>
+            <date>3130-01-01</date>
+            <HPG>X</HPG>
+        </event>
         <faction>UND</faction>
         <event>
             <date>2750-01-01</date>
