@@ -34,6 +34,7 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import megamek.common.Aero;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.ITechnology;
@@ -1421,9 +1422,6 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
     public boolean isInLocation(String loc) {
         if (null == unit || null == unit.getEntity()) {
             return false;
-        }
-        if (loc.equals("FSLG")) {
-            return getLocation() == Entity.LOC_NONE;
         }
     	return getLocation() == getUnit().getEntity().getLocationFromAbbr(loc);
     }

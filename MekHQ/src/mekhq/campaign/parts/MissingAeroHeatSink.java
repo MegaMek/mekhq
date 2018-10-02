@@ -95,16 +95,22 @@ public class MissingAeroHeatSink extends MissingPart {
 		//nothing to load
 	}
 
-	@Override
-	public String getLocationName() {
-		return "Fuselage";
-	}
+    @Override
+    public String getLocationName() {
+        if (null != unit) {
+            return unit.getEntity().getLocationName(unit.getEntity().getBodyLocation());
+        }
+        return null;
+    }
 
-	@Override
-	public int getLocation() {
-		return Entity.LOC_NONE;
-	}
-	
+    @Override
+    public int getLocation() {
+        if (null != unit) {
+            return unit.getEntity().getBodyLocation();
+        }
+        return Entity.LOC_NONE;
+    }
+    
     @Override
     public TechAdvancement getTechAdvancement() {
         if (type == Aero.HEAT_SINGLE) {

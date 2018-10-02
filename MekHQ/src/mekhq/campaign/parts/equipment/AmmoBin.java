@@ -34,7 +34,6 @@ import megamek.common.CriticalSlot;
 import megamek.common.EquipmentType;
 import megamek.common.ITechnology;
 import megamek.common.Jumpship;
-import megamek.common.MiscType;
 import megamek.common.Mounted;
 import megamek.common.Protomech;
 import megamek.common.SmallCraft;
@@ -119,15 +118,6 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
         return super.getLocation();
     }
     
-    @Override
-    public boolean isInLocation(String loc) {
-        if (unit.getEntity() instanceof Aero
-                && !((unit.getEntity() instanceof SmallCraft) || (unit.getEntity() instanceof Jumpship))){
-            return loc.equals("FSLG");
-        }
-        return super.isInLocation(loc);
-    }
-
     @Override
     public double getTonnage() {
         return (1.0 * getFullShots())/((AmmoType)type).getShots();
