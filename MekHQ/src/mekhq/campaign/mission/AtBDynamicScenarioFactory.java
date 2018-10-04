@@ -108,7 +108,7 @@ public class AtBDynamicScenarioFactory {
      * @param weightClass The maximum weight class of the units to generate (ignored )
      * @return How many "lances" or other individual units were generated.
      */
-    public static int generateForces(AtBDynamicScenario scenario, AtBContract contract, Campaign campaign, int weightClass) { 
+    private static int generateForces(AtBDynamicScenario scenario, AtBContract contract, Campaign campaign, int weightClass) { 
         
         int generatedLanceCount = 0;
         List<ScenarioForceTemplate> forceTemplates = scenario.getTemplate().getAllScenarioForces();
@@ -158,7 +158,7 @@ public class AtBDynamicScenarioFactory {
     * @param forceTemplate The force template to use to generate the force
     * @return How many "lances" or other individual units were generated. 
     */
-    public static int generateForce(AtBDynamicScenario scenario, AtBContract contract, Campaign campaign,
+    private static int generateForce(AtBDynamicScenario scenario, AtBContract contract, Campaign campaign,
             int effectiveBV, int effectiveUnitCount, int weightClass, ScenarioForceTemplate forceTemplate) {
         String factionCode = "";
         int skill = 0;
@@ -353,7 +353,7 @@ public class AtBDynamicScenarioFactory {
      * Handles random determination of light conditions for the given scenario, as per AtB rules
      * @param scenario The scenario for which to set lighting conditions.
      */
-    public static void setLightConditions(AtBDynamicScenario scenario) {
+    private static void setLightConditions(AtBDynamicScenario scenario) {
         int light = PlanetaryConditions.L_DAY;
 
         int roll = Compute.randomInt(10) + 1;
@@ -370,7 +370,7 @@ public class AtBDynamicScenarioFactory {
      * Handles random determination of weather/wind/fog conditions for the given scenario, as per AtB rules
      * @param scenario The scenario for which to set weather conditions.
      */
-    public static void setWeather(AtBDynamicScenario scenario) {
+    private static void setWeather(AtBDynamicScenario scenario) {
         int weather = PlanetaryConditions.WE_NONE;
         int wind = PlanetaryConditions.WI_NONE;
         int fog = PlanetaryConditions.FOG_NONE;
@@ -411,7 +411,7 @@ public class AtBDynamicScenarioFactory {
      * Handles random determination of terrain and corresponding map file from allowed terrain types
      * @param scenario
      */
-    public static void setTerrain(AtBDynamicScenario scenario) {
+    private static void setTerrain(AtBDynamicScenario scenario) {
         int terrainIndex = Compute.randomInt(scenario.getTemplate().mapParameters.allowedTerrainTypes.size());
         scenario.setTerrainType(scenario.getTemplate().mapParameters.allowedTerrainTypes.get(terrainIndex));
         scenario.setMapFile();
@@ -424,7 +424,7 @@ public class AtBDynamicScenarioFactory {
      * @param mission The active mission for the scenario 
      * @param campaign The current campaign
      */
-    public static void setPlanetaryConditions(AtBDynamicScenario scenario, AtBContract mission, Campaign campaign) {
+    private static void setPlanetaryConditions(AtBDynamicScenario scenario, AtBContract mission, Campaign campaign) {
         if (null != mission) {
             Planet p = Planets.getInstance().getPlanets().get(mission.getPlanetId());
             if (null != p) {
@@ -441,7 +441,7 @@ public class AtBDynamicScenarioFactory {
      * Sets dynamic AtB-sized base map size for the given scenario.
      * @param scenario The scenario to process.
      */
-    public static void setScenarioMapSize(AtBDynamicScenario scenario) {
+    private static void setScenarioMapSize(AtBDynamicScenario scenario) {
         int mapSizeX;
         int mapSizeY;
         ScenarioTemplate template = scenario.getTemplate();
@@ -506,7 +506,7 @@ public class AtBDynamicScenarioFactory {
      * @param campaign
      * @return                A new Entity with crew.
      */
-    public static Entity getEntity(String faction, int skill, int quality, int unitType, int weightClass, Campaign campaign) {
+    private static Entity getEntity(String faction, int skill, int quality, int unitType, int weightClass, Campaign campaign) {
         MechSummary ms = null;
         if (unitType == UnitType.TANK) {
             if (campaign.getCampaignOptions().getOpforUsesVTOLs()) {
@@ -541,7 +541,7 @@ public class AtBDynamicScenarioFactory {
      * @param ms Which entity to generate
      * @return An crewed entity
      */
-    public static Entity createEntityWithCrew(String faction, int skill, Campaign campaign, MechSummary ms) {
+    private static Entity createEntityWithCrew(String faction, int skill, Campaign campaign, MechSummary ms) {
         final String METHOD_NAME = "createEntityWithCrew(String,int,Campaign,MechSummary)"; //$NON-NLS-1$
         Entity en = null;
         try {
@@ -615,7 +615,7 @@ public class AtBDynamicScenarioFactory {
      * @param campaign
      * @return                A new Entity
      */
-    public static Entity getEntityByName(String name, String fName, int skill, Campaign campaign) {
+    private static Entity getEntityByName(String name, String fName, int skill, Campaign campaign) {
         final String METHOD_NAME = "getEntityByName(String,String,int,Campaign"; //$NON-NLS-1$
         
         MechSummary mechSummary = MechSummaryCache.getInstance().getMech(
@@ -1071,7 +1071,7 @@ public class AtBDynamicScenarioFactory {
      * @param same Whether the arc is on the same side or the opposite side.
      * @return Three edges that form the arc, as defined in Board.java
      */
-    public static List<Integer> getArc(int edge, boolean same) {
+    private static List<Integer> getArc(int edge, boolean same) {
         ArrayList<Integer> edges = new ArrayList<>();
         
         int tempEdge = edge;
@@ -1105,7 +1105,7 @@ public class AtBDynamicScenarioFactory {
      * @param edge The starting edge
      * @return Opposite edge, as defined in Board.java
      */
-    public static int getOppositeEdge(int edge) {
+    private static int getOppositeEdge(int edge) {
         switch(edge) {
         case Board.START_EDGE:
             return Board.START_CENTER;
