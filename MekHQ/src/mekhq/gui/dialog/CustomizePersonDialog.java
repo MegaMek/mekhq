@@ -238,6 +238,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
             textBloodname.setText(person.getBloodname());
             panDemog.add(textBloodname, gridBagConstraints);
 
+            btnRandomBloodname.setEnabled(campaign.getFaction().isClan());
             btnRandomBloodname.setText(resourceMap.getString("btnRandomBloodname.text")); // NOI18N
             btnRandomBloodname.setName("btnRandomBloodname"); // NOI18N
             btnRandomBloodname.addActionListener(new java.awt.event.ActionListener() {
@@ -665,30 +666,10 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
 	}
     
     private void randomBloodname() {
-		int phenotype = Bloodname.P_GENERAL;
-		switch (person.getPrimaryRole()) {
-		case Person.T_MECHWARRIOR:
-			phenotype = Bloodname.P_MECHWARRIOR;
-			break;
-		case Person.T_BA:
-			phenotype = Bloodname.P_ELEMENTAL;
-			break;
-		case Person.T_AERO_PILOT:
-		case Person.T_CONV_PILOT:
-			phenotype = Bloodname.P_AEROSPACE;
-			break;
-		case Person.T_SPACE_CREW:
-		case Person.T_NAVIGATOR:
-		case Person.T_SPACE_GUNNER:
-		case Person.T_SPACE_PILOT:
-			phenotype = Bloodname.P_NAVAL;
-			break;
-		case Person.T_PROTO_PILOT:
-			phenotype = Bloodname.P_PROTOMECH;
-			break;
-		}
-		textBloodname.setText(Bloodname.randomBloodname(campaign.getFactionCode(), phenotype,
-					campaign.getCalendar().get(Calendar.YEAR)).getName());   	
+        Bloodname bloodname = Bloodname.randomBloodnameFromPersonRole( campaign.getFactionCode(),
+                                                                       person.getPrimaryRole(),
+                                                                       campaign.getCalendar().get(Calendar.YEAR) );
+        textBloodname.setText(bloodname.getName());
     }
 
     public void refreshSkills() {

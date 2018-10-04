@@ -255,9 +255,48 @@ public class Bloodname implements Serializable {
 
     /**
      * Determines a likely Bloodname based on Clan, phenotype, and year.
+     *
+     * @param factionCode The faction code for the Clan; must exist in data/names/bloodnames/clans.xml
+     * @param personRole One of the Person.T_* constants
+     * @param year The current campaign year
+     * @return An object representing the chosen Bloodname
+     *
+     * Though based as much as possible on official sources, the method employed here involves a
+     * considerable amount of speculation.
+     */
+    public static @Nullable Bloodname randomBloodnameFromPersonRole(String factionCode, int personRole, int year) {
+        int phenotype;
+        switch (personRole) {
+            case Person.T_MECHWARRIOR:
+                phenotype = Bloodname.P_MECHWARRIOR;
+                break;
+            case Person.T_BA:
+                phenotype = Bloodname.P_ELEMENTAL;
+                break;
+            case Person.T_AERO_PILOT:
+            case Person.T_CONV_PILOT:
+                phenotype = Bloodname.P_AEROSPACE;
+                break;
+            case Person.T_SPACE_CREW:
+            case Person.T_NAVIGATOR:
+            case Person.T_SPACE_GUNNER:
+            case Person.T_SPACE_PILOT:
+                phenotype = Bloodname.P_NAVAL;
+                break;
+            case Person.T_PROTO_PILOT:
+                phenotype = Bloodname.P_PROTOMECH;
+                break;
+            default:
+                phenotype = Bloodname.P_GENERAL;
+        }
+        return randomBloodname(factionCode, phenotype, year);
+    }
+
+    /**
+     * Determines a likely Bloodname based on Clan, phenotype, and year.
      * 
-     * @param faction The faction code for the Clan; must exist in data/names/bloodnames/clans.xml
-     * @param phenotype One of the Person.PHENOTYPE_* constants
+     * @param factionCode The faction code for the Clan; must exist in data/names/bloodnames/clans.xml
+     * @param phenotype One of the Bloodname.P_* constants
      * @param year The current campaign year
      * @return An object representing the chosen Bloodname
      * 
@@ -272,7 +311,7 @@ public class Bloodname implements Serializable {
 	 * Determines a likely Bloodname based on Clan, phenotype, and year.
 	 * 
 	 * @param faction The Clan faction; must exist in data/names/bloodnames/clans.xml
-	 * @param phenotype One of the Person.PHENOTYPE_* constants
+	 * @param phenotype One of the Bloodname.P_* constants
 	 * @param year The current campaign year
 	 * @return An object representing the chosen Bloodname
 	 * 
