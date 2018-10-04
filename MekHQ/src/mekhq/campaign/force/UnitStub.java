@@ -1,7 +1,7 @@
 /*
  * UnitStub.java
  * 
- * Copyright (c) 2011 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2018 the MegaMek Team.
  * 
  * This file is part of MekHQ.
  * 
@@ -12,124 +12,124 @@
  * 
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  * 
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 
 package mekhq.campaign.force;
 
 import java.io.PrintWriter;
 import java.io.Serializable;
+import java.util.Optional;
 
-import megamek.common.Crew;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
+import mekhq.util.ImageId;
+import mekhq.util.dom.DomProcessor;
 
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-
+/**
+ * This is a snapshot of a {@linkplain Unit} object containing just the
+ * information needed to display it in a (completed) scenario.
+ */
 public class UnitStub implements Serializable {
-    private static final long serialVersionUID = 1448449600864209589L;
-    
-    private String desc;
-    private String portraitCategory;
-    private String portraitFileName;
-    
-    public UnitStub() {
-        portraitCategory = Crew.ROOT_PORTRAIT;
-        portraitFileName = Crew.PORTRAIT_NONE;
-        desc = "";
-    }
-    
+
+    private static final long serialVersionUID = 1L;
+
+    @SuppressWarnings("javadoc")
     public UnitStub(Unit u) {
-        portraitCategory = Crew.ROOT_PORTRAIT;
-        portraitFileName = Crew.PORTRAIT_NONE;
         desc = getUnitDescription(u);
         Person commander = u.getCommander();
-        if(null != commander) {
-            portraitCategory = commander.getPortraitCategory();
-            portraitFileName = commander.getPortraitFileName();
+        if (commander != null) {
+            portraitId = commander.getPortraitId().orElse(null);
         }
     }
-    
+
+    private UnitStub(String desc, ImageId portraitId) {
+        this.desc = desc;
+        this.portraitId = portraitId;
+    }
+
+    private String desc;
+    private ImageId portraitId; // nullable
+
+    @Override
     public String toString() {
         return desc;
     }
-    
-    public String getPortraitCategory() {
-        return portraitCategory;
+
+    @SuppressWarnings("javadoc")
+    public Optional<ImageId> getPortraitId() {
+        return Optional.ofNullable(portraitId);
     }
-    
-    public String getPortraitFileName() {
-        return portraitFileName;
-    }
-    
-    private String getUnitDescription(Unit u) {
+
+    private static String getUnitDescription(Unit u) {
         String name = "<font color='red'>No Crew</font>";
         String uname = "";
         Person pp = u.getCommander();
-        if(null != pp) {
+        if (null != pp) {
             name = pp.getFullTitle();
             name += " (" + u.getEntity().getCrew().getGunnery() + "/" + u.getEntity().getCrew().getPiloting() + ")";
-            if(pp.needsFixing()) {
+            if (pp.needsFixing()) {
                 name = "<font color='red'>" + name + "</font>";
-            }     
+            }
         }
         uname = "<i>" + u.getName() + "</i>";
-        if(u.isDamaged()) {
+        if (u.isDamaged()) {
             uname = "<font color='red'>" + uname + "</font>";
-        }              
+        }
         return "<html>" + name + ", " + uname + "</html>";
     }
-    
-    public void writeToXml(PrintWriter pw1, int indent) {
-        pw1.println(MekHqXmlUtil.indentStr(indent) + "<unitStub>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<desc>"
-                +MekHqXmlUtil.escape(desc)
-                +"</desc>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<portraitCategory>"
-                +MekHqXmlUtil.escape(portraitCategory)
-                +"</portraitCategory>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<portraitFileName>"
-                +MekHqXmlUtil.escape(portraitFileName)
-                +"</portraitFileName>");
-        pw1.println(MekHqXmlUtil.indentStr(indent) + "</unitStub>");
-    }
-    
-    public static UnitStub generateInstanceFromXML(Node wn) {
-        final String METHOD_NAME = "generateInstanceFromXML(Node)"; //$NON-NLS-1$
 
-        UnitStub retVal = null;
-        
-        try {        
-            retVal = new UnitStub();
-            NodeList nl = wn.getChildNodes();
+    /**
+     * Prints something like:
+     * 
+     * <pre>{@literal
+     * <unitStub>
+     *     <desc>bla bla bla</desc>
+     *     <portraitCategory>some category/</portraitCategory>
+     *     <portraitFileName>whatever.jpg</portraitFileName>
+     * </unitStub>
+     * }</pre> 
+     */
+    @SuppressWarnings("nls")
+    public void printXML(PrintWriter out, int indent) {
+        String indent0 = MekHqXmlUtil.indentStr(indent);
+        out.println(indent0 + "<unitStub>");
+        MekHqXmlUtil.writeSimpleXmlTag(out, indent + 1, "desc", desc);
+        if (portraitId != null) {
+            MekHqXmlUtil.writeSimpleXmlTag(out, indent + 1, "portraitCategory", portraitId.getCategory());
+            MekHqXmlUtil.writeSimpleXmlTag(out, indent + 1, "portraitFileName", portraitId.getFileName());
+        }
+        out.println(indent0 + "</unitStub>");
+    }
+
+    @SuppressWarnings("nls")
+    public static UnitStub generateInstanceFromXML(Node wn) {
+        final String METHOD_NAME = "generateInstanceFromXML(Node)";
+        try {
             
-            for (int x=0; x<nl.getLength(); x++) {
-                Node wn2 = nl.item(x);
-                if (wn2.getNodeName().equalsIgnoreCase("desc")) {
-                    retVal.desc = wn2.getTextContent();
-                } else if (wn2.getNodeName().equalsIgnoreCase("portraitCategory")) {
-                    retVal.portraitCategory = wn2.getTextContent();
-                } else if (wn2.getNodeName().equalsIgnoreCase("portraitFileName")) {
-                    retVal.portraitFileName = wn2.getTextContent();
-                } 
-            }
+            DomProcessor p = DomProcessor.at((Element) wn);
+
+            String desc = p.text("desc", "?");
+            ImageId portraitId = ImageId.cleanupLegacyPortraitId(p.text("portraitCategory", null), p.text("portraitFileName", null)).orElse(null);
+
+            return new UnitStub(desc, portraitId);
+
         } catch (Exception ex) {
             // Errrr, apparently either the class name was invalid...
             // Or the listed name doesn't exist.
-            // Doh!
+            // Doh! (programmer panic?)
             MekHQ.getLogger().error(UnitStub.class, METHOD_NAME, ex);
+            return null;
         }
-        return retVal;
     }
+
 }

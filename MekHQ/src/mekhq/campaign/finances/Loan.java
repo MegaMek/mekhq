@@ -572,7 +572,12 @@ public class Loan implements MekHqXmlSerializable {
         }
         return buffer.toString();
     }
-    
+
+    @Override
+    public int hashCode() {
+        return institution.hashCode() + 13 * refNumber.hashCode();
+    }
+
     @Override
     public boolean equals(Object obj) {
         if(!(obj instanceof Loan)) {

@@ -510,8 +510,7 @@ public final class HangarTab extends CampaignGuiTab {
             return;
         }
         Unit selectedUnit = unitModel.getUnit(unitTable.convertRowIndexToModel(row));
-        scrollUnitView.setViewportView(new UnitViewPanel(selectedUnit, getCampaign(), getIconPackage().getCamos(),
-                getIconPackage().getMechTiles()));
+        scrollUnitView.setViewportView(new UnitViewPanel(selectedUnit, getCampaign(), getIconPackage()));
         // This odd code is to make sure that the scrollbar stays at the top
         // I can't just call it here, because it ends up getting reset somewhere
         // later

@@ -38,6 +38,7 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.StringTokenizer;
 import java.util.UUID;
 import java.util.Vector;
@@ -83,14 +84,16 @@ import mekhq.campaign.LogEntry;
 import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.mod.am.InjuryUtil;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.universe.Faction;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
-import mekhq.campaign.universe.Faction;
+import mekhq.util.ImageId;
 
 /**
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class Person implements Serializable, MekHqXmlSerializable {
+
     private static final long serialVersionUID = -847642980395311152L;
 
     public static final int G_MALE = 0;
@@ -277,12 +280,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     protected int idleMonths;
     protected int daysToWaitForHealing;
 
-    //portrait
-    protected String portraitCategory;
-    protected String portraitFile;
-    // runtime override (not saved)
-    protected transient String portraitCategoryOverride;
-    protected transient String portraitFileOverride;
+    private ImageId portraitId; // nullable exposed as Optional<ImageId> (Optional is not Serializable)
 
     // Our rank
     private int rank;
@@ -368,10 +366,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     public Person(String name, Campaign c, String factionCode) {
         this.name = name;
         callsign = "";
-        portraitCategory = Crew.ROOT_PORTRAIT;
-        portraitFile = Crew.PORTRAIT_NONE;
-        portraitCategoryOverride = null;
-        portraitFileOverride = null;
+        portraitId = null;
         xp = 0;
         acquisitions = 0;
         gender = G_MALE;
@@ -689,30 +684,20 @@ public class Person implements Serializable, MekHqXmlSerializable {
         this.callsign = n;
     }
 
-    public String getPortraitCategory() {
-        return Utilities.nonNull(portraitCategoryOverride, portraitCategory);
+    public Optional<ImageId> getPortraitId() {
+        return Optional.ofNullable(portraitId);
     }
 
-    public String getPortraitFileName() {
-        return Utilities.nonNull(portraitFileOverride, portraitFile);
+    public void setPortraitId(Optional<ImageId> portraitId) {
+        this.portraitId = portraitId.orElse(null);
     }
 
-    public void setPortraitCategory(String s) {
-        this.portraitCategory = s;
+    /**
+     * Convenience for {@code setPortraitId(Optional.ofNullable(portraitId))} 
+     */
+    public void setPortraitId(ImageId portraitId) {
+        this.portraitId = portraitId;
     }
-
-    public void setPortraitFileName(String s) {
-        this.portraitFile = s;
-    }
-
-    public void setPortraitCategoryOverride(String s) {
-        this.portraitCategoryOverride = s;
-    }
-
-    public void setPortraitFileNameOverride(String s) {
-        this.portraitFileOverride = s;
-    }
-
 
     public int getPrimaryRole() {
         return primaryRole;
@@ -1346,14 +1331,11 @@ public class Person implements Serializable, MekHqXmlSerializable {
                         + df.format(dueDate.getTime())
                         + "</dueDate>");
         }
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                    + "<portraitCategory>"
-                    + MekHqXmlUtil.escape(portraitCategory)
-                    + "</portraitCategory>");
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                    + "<portraitFile>"
-                    + MekHqXmlUtil.escape(portraitFile)
-                    + "</portraitFile>");
+        
+        if (portraitId != null) {
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "portraitCategory", portraitId.getCategory());
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "portraitFile",     portraitId.getFileName());
+        }
         pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                     + "<xp>"
                     + xp
@@ -1450,10 +1432,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
                         + df.format(recruitment.getTime())
                         + "</recruitment>");
         }
-        for (String skName : skills.keySet()) {
+        skills.keySet().stream().sorted().forEach(skName -> { // sorted to get consistent .cpnx files
             Skill skill = skills.get(skName);
             skill.writeToXml(pw1, indent + 1);
-        }
+        });
         if (countOptions(PilotOptions.LVL3_ADVANTAGES) > 0) {
             pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                         + "<advantages>"
@@ -1554,6 +1536,9 @@ public class Person implements Serializable, MekHqXmlSerializable {
             int pilotPiloting = -1;
             int pilotCommandBonus = -1;
             int type = 0;
+            
+            String portraitCategory = null;
+            String portraitFilename = null;
 
             for (int x = 0; x < nl.getLength(); x++) {
                 Node wn2 = nl.item(x);
@@ -1608,9 +1593,9 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 } else if (wn2.getNodeName().equalsIgnoreCase("teamId")) {
                     retVal.teamId = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("portraitCategory")) {
-                    retVal.setPortraitCategory(wn2.getTextContent());
+                    portraitCategory = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("portraitFile")) {
-                    retVal.setPortraitFileName(wn2.getTextContent());
+                    portraitFilename = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("xp")) {
                     retVal.xp = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("nTasks")) {
@@ -1795,6 +1780,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 }
             }
 
+            retVal.setPortraitId(ImageId.cleanupLegacyPortraitId(portraitCategory, portraitFilename));
+            
             if (version.getMajorVersion() == 0 && version.getMinorVersion() < 2 && version.getSnapshot() < 13) {
                 if (retVal.primaryRole > T_INFANTRY) {
                     retVal.primaryRole += 4;

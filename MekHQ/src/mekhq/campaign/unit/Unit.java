@@ -205,6 +205,7 @@ import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
+import mekhq.util.ImageId;
 
 /**
  * This is a wrapper class for entity, so that we can add some functionality to
@@ -2923,8 +2924,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             }
             entity.getCrew().setName(commander.getFullTitle(), 0);
             entity.getCrew().setNickname(commander.getCallsign(), 0);
-            entity.getCrew().setPortraitCategory(commander.getPortraitCategory(), 0);
-            entity.getCrew().setPortraitFileName(commander.getPortraitFileName(), 0);
+            entity.getCrew().setPortraitCategory(commander.getPortraitId().map(ImageId::getCategory).orElse(null), 0);
+            entity.getCrew().setPortraitFileName(commander.getPortraitId().map(ImageId::getFileName).orElse(null), 0);
             entity.getCrew().setExternalIdAsString(commander.getId().toString(), 0);
             entity.getCrew().setToughness(commander.getToughness(), 0);
             
@@ -3204,8 +3205,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     private void assignToCrewSlot(Person p, int slot, String gunType, String driveType) {
         entity.getCrew().setName(p.getFullTitle(), slot);
         entity.getCrew().setNickname(p.getCallsign(), slot);
-        entity.getCrew().setPortraitCategory(p.getPortraitCategory(), slot);
-        entity.getCrew().setPortraitFileName(p.getPortraitFileName(), slot);
+        entity.getCrew().setPortraitCategory(p.getPortraitId().map(ImageId::getCategory).orElse(null), slot);
+        entity.getCrew().setPortraitFileName(p.getPortraitId().map(ImageId::getFileName).orElse(null), slot);
         entity.getCrew().setHits(p.getHits(), slot);
         int gunnery = 7;
         int artillery = 7;

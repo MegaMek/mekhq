@@ -47,6 +47,8 @@ import megamek.common.util.DirectoryItems;
 import megamek.common.util.EncodeControl;
 import mekhq.IconPackage;
 import mekhq.campaign.force.Force;
+import mekhq.util.ForceIconId;
+import mekhq.util.Images;
 
 /**
  *
@@ -56,14 +58,10 @@ public class ImageChoiceDialog extends JDialog {
 
     private static final String PANEL_IMAGES = "panel_images";
     private static final String PANEL_LAYERED = "panel_layered";
-    
-    /**
-     *
-     */
+
     private static final long serialVersionUID = 1L;
-    /**
-     * The categorized image patterns.
-     */
+
+    private IconPackage iconPackage;
     private DirectoryItems imageItems;
     private ImageTableModel imageTableModel = new ImageTableModel();
     private String category;
@@ -122,18 +120,19 @@ public class ImageChoiceDialog extends JDialog {
     // END: Layered Images Support
 
     /** Creates new form ImageChoiceDialog */
-    public ImageChoiceDialog(Frame parent, boolean modal, String category, String file, DirectoryItems items) {
-        this(parent, modal, category, file, items, false);
+    public ImageChoiceDialog(Frame parent, boolean modal, String category, String file, IconPackage iconPackage) {
+        this(parent, modal, category, file, iconPackage, false);
     }
 
 
     /** Creates new form ImageChoiceDialog */
-    public ImageChoiceDialog(Frame parent, boolean modal, String category, String file, DirectoryItems items, boolean force) {
+    public ImageChoiceDialog(Frame parent, boolean modal, String category, String file, IconPackage iconPackage, boolean force) {
         super(parent, modal);
         this.category = category;
         filename = file;
         imagesMouseAdapter = new ImageTableMouseAdapter();
-        this.imageItems = items;
+        this.iconPackage = iconPackage;
+        this.imageItems = force ? iconPackage.getForceIcons() : iconPackage.getPortraits();
         this.force = force;
         // If we're doing forces, initialize the hashmap for use
         if (force) {
@@ -609,7 +608,7 @@ public class ImageChoiceDialog extends JDialog {
         category = Force.ROOT_LAYERED;
         filename = Force.ICON_NONE;
         // Build the layered image
-        Image forceImage = IconPackage.buildForceIcon(category, filename, imageItems, iconMap);
+        Image forceImage = Images.force(iconPackage, ForceIconId.cleanupLegacyIconId(category, filename, iconMap), 300, 225);
         imageIcon = new ImageIcon(forceImage);
         // Disable selection of a static icon
         tableImages.clearSelection();
@@ -799,20 +798,17 @@ public class ImageChoiceDialog extends JDialog {
         }
 
         public void setImage(String category, String name) {
-
-            if (null == category
-                    || name.equals(Crew.PORTRAIT_NONE)) {
+            if (category == null || name.equals(Crew.PORTRAIT_NONE)) {
                 return;
             }
-
             // Try to get the image file.
             try {
                 // Translate the root image directory name.
                 if (Crew.ROOT_PORTRAIT.equals(category))
                     category = ""; //$NON-NLS-1$
                 Image image = (Image) items.getItem(category, name);
-                if(null != image) {
-                    if((null != category) && category.startsWith("Pieces/")) {
+                if (null != image) {
+                    if (category.startsWith("Pieces/")) {
                         image = image.getScaledInstance(110, -1, Image.SCALE_SMOOTH);
                     } else {
                         image = image.getScaledInstance(-1, 76, Image.SCALE_SMOOTH);
@@ -823,9 +819,9 @@ public class ImageChoiceDialog extends JDialog {
                 err.printStackTrace();
             }
         }
-        // Variables declaration - do not modify//GEN-BEGIN:variables
+
         private JLabel lblImage;
-        // End of variables declaration//GEN-END:variables
 
     }
+
 }
