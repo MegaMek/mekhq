@@ -34,7 +34,6 @@ import megamek.common.Entity;
 import megamek.common.MechFileParser;
 import megamek.common.MechSummary;
 import megamek.common.MechSummaryCache;
-import megamek.common.TargetRoll;
 import megamek.common.event.Subscribe;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.logging.LogLevel;
@@ -45,14 +44,13 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.event.MarketNewPersonnelEvent;
 import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.SkillType;
-import mekhq.campaign.rating.IUnitRating;
 import mekhq.module.PersonnelMarketServiceManager;
 import mekhq.module.api.PersonnelMarketMethod;
 
 public class PersonnelMarket {
-	private ArrayList<Person> personnel = new ArrayList<Person>();
-	private Hashtable<UUID, Person> personnelIds = new Hashtable<UUID, Person>();
+
+	private ArrayList<Person> personnel = new ArrayList<>();
+	private Hashtable<UUID, Person> personnelIds = new Hashtable<>();
 	private PersonnelMarketMethod method;
 
 	public static final int TYPE_RANDOM = 0;
@@ -64,7 +62,7 @@ public class PersonnelMarket {
 
 	/* Used by AtB to track Units assigned to recruits; the key
 	 * is the person UUID. */
-	private Hashtable<UUID, Entity> attachedEntities = new Hashtable<UUID, Entity>();
+	private Hashtable<UUID, Entity> attachedEntities = new Hashtable<>();
 	/* Alternate types of rolls, set by PersonnelMarketDialog */
 	private boolean paidRecruitment = false;
 	private int paidRecruitType;
@@ -82,7 +80,7 @@ public class PersonnelMarket {
 	
 	/**
 	 * Sets the method for generating potential recruits for the personnel market.
-	 * @param type  The lookup name of the market type to use.
+	 * @param key  The lookup name of the market type to use.
 	 */
 	public void setType(String key) {
 	    method = PersonnelMarketServiceManager.getInstance().getService(key);
@@ -429,23 +427,6 @@ public class PersonnelMarket {
             retval = retval | Entity.ETYPE_PROTOMECH;
         }
         return retval;
-    }
-    
-    public TargetRoll getShipSearchTarget(Campaign campaign, boolean jumpship) {
-    	TargetRoll target = new TargetRoll(jumpship?12:10, "Base");
-		Person adminLog = campaign.findBestInRole(Person.T_ADMIN_LOG, SkillType.S_ADMIN);
-		int adminLogExp = (adminLog == null)?SkillType.EXP_ULTRA_GREEN:adminLog.getSkill(SkillType.S_ADMIN).getExperienceLevel();
-    	for (Person p : campaign.getAdmins()) {
-			if ((p.getPrimaryRole() == Person.T_ADMIN_LOG ||
-					p.getSecondaryRole() == Person.T_ADMIN_LOG) &&
-					p.getSkill(SkillType.S_ADMIN).getExperienceLevel() > adminLogExp) {
-				adminLogExp = p.getSkill(SkillType.S_ADMIN).getExperienceLevel();
-			}
-    	}
-    	target.addModifier(SkillType.EXP_REGULAR - adminLogExp, "Admin/Logistics");
-    	target.addModifier(IUnitRating.DRAGOON_C - campaign.getUnitRatingMod(),
-    			"Unit Rating");
-    	return target;
     }
 
 }
