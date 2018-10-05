@@ -98,6 +98,7 @@ public class AtBDynamicScenarioFactory {
         setDeploymentZones(scenario);
         
         translatePlayerNPCsToAttached(scenario, campaign);
+        setDeploymentTurns(scenario);
     }
     
     /**
@@ -409,11 +410,20 @@ public class AtBDynamicScenarioFactory {
     
     /**
      * Handles random determination of terrain and corresponding map file from allowed terrain types
-     * @param scenario
+     * @param scenario The scenario to work on.
      */
     private static void setTerrain(AtBDynamicScenario scenario) {
-        int terrainIndex = Compute.randomInt(scenario.getTemplate().mapParameters.allowedTerrainTypes.size());
-        scenario.setTerrainType(scenario.getTemplate().mapParameters.allowedTerrainTypes.get(terrainIndex));
+        int terrainIndex = 0;
+        
+        // if we are allowing all terrain types, then pick one from the list
+        // otherwise, pick one from the allowed ones
+        if(scenario.getTemplate().mapParameters.allowAllTerrainTypes) {
+            terrainIndex = Compute.randomInt(AtBScenario.terrainTypes.length);
+            scenario.setTerrainType(terrainIndex);
+        } else {
+            terrainIndex = Compute.randomInt(scenario.getTemplate().mapParameters.allowedTerrainTypes.size());
+            scenario.setTerrainType(scenario.getTemplate().mapParameters.allowedTerrainTypes.get(terrainIndex));
+        }
         scenario.setMapFile();
     }
     
@@ -574,7 +584,7 @@ public class AtBDynamicScenarioFactory {
 
         if (f.isClan() && Compute.d6(2) > 8 - skill + skills[0] + skills[1]) {
             int phenotype;
-            switch (UnitType.determineUnitTypeCode(en)) {
+            switch (en.getUnitType()) {
             case UnitType.MEK:
                 phenotype = Bloodname.P_MECHWARRIOR;
                 break;
@@ -1057,11 +1067,103 @@ public class AtBDynamicScenarioFactory {
     }
     
     /**
-     * Sets up the deployment turns
+     * Sets up the deployment turns as they are specified
      * @param scenario
      */
-    public static void setDeploymentTurns(AtBDynamicScenario scenario) {
-        //TODO: implement
+    private static void setDeploymentTurns(AtBDynamicScenario scenario) {
+        for(int x = 0; x < scenario.getNumBots(); x++) {
+            BotForce currentBotForce = scenario.getBotForce(x);
+            ScenarioForceTemplate forceTemplate = scenario.getBotForceTemplates().get(currentBotForce);
+            int deployRound = forceTemplate.getArrivalTurn();
+            
+            if(deployRound == ScenarioForceTemplate.ARRIVAL_TURN_STAGGERED) {
+                setDeploymentTurnsStaggered(currentBotForce.getEntityList());
+            } else if(deployRound == ScenarioForceTemplate.ARRIVAL_TURN_STAGGERED_BY_LANCE) {
+                setDeploymentTurnsStaggeredByLance(currentBotForce.getEntityList());
+            } else {                
+                for(Entity entity : currentBotForce.getEntityList()) {
+                    entity.setDeployRound(deployRound);
+                }
+            }
+        }
+        
+        //TODO: Set player unit deployment. Look in BriefingTab.startScenario for logic
+    }
+    
+    /**
+     * Uses the "individual staggered deployment" algorithm to determine individual deployment turns 
+     * @param botForce The bot force whose entities to process.
+     */
+    private static void setDeploymentTurnsStaggered(List<Entity> entityList) {
+        // loop through all the entities
+        // highest movement entity deploys on turn 0
+        // other entities deploy on highest move - "walk" MP.
+        int maxWalkMP = -1;
+        List<Integer> entityWalkMPs = new ArrayList<>();
+        
+        for(Entity entity : entityList) {
+            // AtB has a legacy mechanism where units with jump jets are counted a little faster
+            // for arrival times. We calculate it once and store it.
+            int speed = calculateAtBSpeed(entity);
+            
+            entityWalkMPs.add(speed);
+            if(speed > maxWalkMP) {
+                maxWalkMP = speed;
+            }
+        }
+        
+        for(int x = 0; x < entityList.size(); x++) {
+            // since we're iterating through the same unchanged collection, we can use implicit indexing.
+            entityList.get(x).setDeployRound(maxWalkMP - entityWalkMPs.get(x));
+        }
+    }
+    
+    /**
+     * Uses the "lance staggered deployment" algorithm to determine individual deployment turns 
+     * @param botForce The bot force whose entities to process.
+     */
+    private static void setDeploymentTurnsStaggeredByLance(List<Entity> entityList) {
+        // loop through all the entities
+        // for every four entities, determine the lowest walk MP.
+        // 
+        // then apply the individual staggered deployment algorithm to each lance
+        // other entities deploy on highest move - "walk" MP.
+        
+        // TODO: Stick a pin in this for now, the algorithm is annoyingly complicated
+        
+        /*int maxWalkMP = -1;
+        int lanceMinWalkMP = 999;
+        List<Integer> lanceWalkMPs = new ArrayList<>(); 
+        
+        for(int x = 0; x < botForce.getEntityList().size(); x++) {
+            Entity entity = botForce.getEntityList().get(x);
+            int speed = calculateAtBSpeed(entity);
+            int lanceIndex = x / 4;
+            
+            if()
+        }
+        
+        for(Entity entity : botForce.getEntityList()) {
+            entity.setDeployRound(maxWalkMP - entity.getWalkMP());
+        }*/
+    }
+    
+    /** 
+     * Worker function that calculates the AtB-rules walk MP for an entity, for deployment purposes.
+     * @param entity The entity to examine.
+     * @return The walk MP.
+     */
+    private static int calculateAtBSpeed(Entity entity) {
+        int speed = entity.getWalkMP();
+        if (entity.getJumpMP() > 0) {
+            if (entity instanceof megamek.common.Infantry) {
+                speed = entity.getJumpMP();
+            } else {
+                speed++;
+            }
+        }
+        
+        return speed;
     }
     
     /**

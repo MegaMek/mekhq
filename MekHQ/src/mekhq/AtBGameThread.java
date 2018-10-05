@@ -170,7 +170,7 @@ public class AtBGameThread extends GameThread {
                 	// Set the owner
                 	entity.setOwner(client.getLocalPlayer()); 
                 	// Calculate deployment round
-            		int speed = entity.getWalkMP();
+            		/*int speed = entity.getWalkMP();
             		if (entity.getJumpMP() > 0) {
 	            		if (entity instanceof megamek.common.Infantry) {
 	            			speed = entity.getJumpMP();
@@ -178,16 +178,16 @@ public class AtBGameThread extends GameThread {
 	            			speed++;
 	            		}
             		}
-            		/* Set scenario type-specific delay */
+            		// Set scenario type-specific delay
                 	int deploymentRound = Math.max(entity.getDeployRound(), scenario.getDeploymentDelay() - speed);
-                	/* Lances deployed in scout roles always deploy units in 6-walking speed turns */
+                	// Lances deployed in scout roles always deploy units in 6-walking speed turns
                 	if ((scenario.getLanceRole() == Lance.ROLE_SCOUT)
                 	        && (scenario.getLance(campaign) != null)
                 			&& (scenario.getLance(campaign).getForceId() == scenario.getLanceForceId())
                 			&& !useDropship) {
                 		deploymentRound = Math.max(deploymentRound, 6 - speed);
-                	}
-                	entity.setDeployRound(Math.max(0, deploymentRound));
+                	}*/
+                	entity.setDeployRound(entity.getDeployRound());
                 	// Add Mek to game
                 	client.sendAddEntity(entity);
                 	// Wait a few secs to not overuse bandwith
@@ -200,7 +200,7 @@ public class AtBGameThread extends GameThread {
                 		continue;
                 	}
                 	entity.setOwner(client.getLocalPlayer());
-            		int speed = entity.getWalkMP();
+            		/*int speed = entity.getWalkMP();
             		if (entity.getJumpMP() > 0) {
 	            		if (entity instanceof megamek.common.Infantry) {
 	            			speed = entity.getJumpMP();
@@ -213,8 +213,8 @@ public class AtBGameThread extends GameThread {
                 			&& scenario.getLance(campaign).getForceId() == scenario.getLanceForceId()
                 			&& !useDropship) {
                 		deploymentRound = Math.max(deploymentRound, 6 - speed);
-                	}
-                	entity.setDeployRound(Math.max(0, deploymentRound));
+                	}*/
+                	entity.setDeployRound(entity.getDeployRound());
                 	client.sendAddEntity(entity);
                 	Thread.sleep(campaign.getCampaignOptions().getStartGameDelay());
                 }

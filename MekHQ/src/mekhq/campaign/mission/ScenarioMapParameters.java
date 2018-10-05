@@ -47,6 +47,11 @@ public class ScenarioMapParameters {
      */
     public boolean useStandardAtBSizing;
     
+    /**
+     * Allow all terrain types, rather than an explicit subset.
+     */
+    public boolean allowAllTerrainTypes;
+    
     @XmlElementWrapper(name="allowedTerrainTypes")
     @XmlElement(name="allowedTerrainType")
     public List<Integer> allowedTerrainTypes = new ArrayList<>();

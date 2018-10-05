@@ -99,6 +99,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
     JTextField txtYIncrement;
     JCheckBox chkAllowRotation;
     JCheckBox chkUseAtBSizing;
+    JCheckBox chkAllowAllMapTypes;
     
     JPanel globalPanel;
     
@@ -514,6 +515,22 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         JLabel lblAllowedTerrainTypes = new JLabel("Allowed Map Types:");
         globalPanel.add(lblAllowedTerrainTypes, gbc);
         
+        gbc.gridy++;
+        chkAllowAllMapTypes = new JCheckBox();
+        chkAllowAllMapTypes.setText("Allow All");
+        chkAllowAllMapTypes.setSelected(scenarioTemplate.mapParameters.allowAllTerrainTypes);
+        chkAllowAllMapTypes.addItemListener(new ItemListener() {
+
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                allowAllMapTypesChangeHandler();
+            }
+            
+        });
+        globalPanel.add(chkAllowAllMapTypes, gbc);
+        
+        gbc.gridy--;
+        
         gbc.gridx++;
         gbc.gridheight = GridBagConstraints.RELATIVE;
         lstAllowedTerrainTypes = new JList<>();
@@ -522,7 +539,8 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
             terrainTypeModel.addElement(terrainType);
         }
         lstAllowedTerrainTypes.setModel(terrainTypeModel);
-        lstAllowedTerrainTypes.setSelectedIndices(scenarioTemplate.mapParameters.getAllowedTerrainTypeArray());        
+        lstAllowedTerrainTypes.setSelectedIndices(scenarioTemplate.mapParameters.getAllowedTerrainTypeArray());       
+        allowAllMapTypesChangeHandler();
         globalPanel.add(lstAllowedTerrainTypes, gbc);
         
         gbc.gridy++;
@@ -952,6 +970,14 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
     }
     
     /**
+     * Event handler for when the "allow all map types" checkbox's state changes. Disables/enables the 
+     * explicit map type selector.
+     */
+    private void allowAllMapTypesChangeHandler() {
+        lstAllowedTerrainTypes.setEnabled(!chkAllowAllMapTypes.isSelected());
+    }
+    
+    /**
      * Event handler for when the force alignment/generation method is changed.
      * Enables or disables some controls based on whether or not the force is a player deployed force,
      * or an enemy force.
@@ -1010,6 +1036,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         scenarioTemplate.mapParameters.widthScalingIncrement = Integer.parseInt(txtXIncrement.getText());
         scenarioTemplate.mapParameters.allowRotation = chkAllowRotation.isSelected();
         scenarioTemplate.mapParameters.useStandardAtBSizing = chkUseAtBSizing.isSelected();
+        scenarioTemplate.mapParameters.allowAllTerrainTypes = chkAllowAllMapTypes.isSelected();
         
         File file = FileDialogs.saveScenarioTemplate((JFrame) getOwner(), scenarioTemplate).orElse(null);
         if(file != null) {
