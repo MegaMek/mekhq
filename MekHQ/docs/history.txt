@@ -17,6 +17,7 @@ v0.45.2-SNAPSHOT
 + Issue #852: Support for Award clusters if an award is given multiple times to a person.
 + Issue #905: Fixes NPE when a spouse is missing on campaign load or personnel menu click.
 + PR #882: Adds support for gzipped Campaign files (*.cpnx.gz).
++ Planets: Reunification War data for Outworlds Alliance + start of RWR 
 
 v0.45.1 (2018-09-03 2300 UTC)
 + PR #864: Security - address XXE vulnerabilities in XML parsers

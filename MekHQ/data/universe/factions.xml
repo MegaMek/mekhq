@@ -442,6 +442,18 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<end>2779</end>
 	</faction>
 	<faction>
+		<shortname>RPG</shortname>
+		<id>19</id>
+		<fullname>Rim Provisional Government</fullname>
+		<startingPlanet>Apollo</startingPlanet>
+		<eraMods>1,1,1,0,0,0,0,0,0</eraMods>
+		<nameGenerator>General</nameGenerator>
+		<colorRGB>164,113,215</colorRGB>
+		<tags>periphery</tags>
+		<start>2575</start>
+		<end>2597</end>
+	</faction>
+	<faction>
 		<shortname>THW</shortname>
 		<fullname>Taurian Homeworlds</fullname>
 		<startingPlanet>Taurus</startingPlanet>
