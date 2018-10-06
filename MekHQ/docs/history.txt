@@ -15,6 +15,7 @@ v0.45.2-SNAPSHOT
 + PR #956: System-wide equipment [Aerospace system equipment not associated with weapons shows in a fuselage
            or hull location when filtering by location in repair tab].
 + Issue #852: Support for Award clusters if an award is given multiple times to a person.
++ Issue #905: Fixes NPE when a spouse is missing on campaign load or personnel menu click.
 
 v0.45.1 (2018-09-03 2300 UTC)
 + PR #864: Security - address XXE vulnerabilities in XML parsers
