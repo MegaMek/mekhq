@@ -1550,7 +1550,7 @@ public class CampaignXmlParser {
                 Node wn3 = nl.item(y);
                 if (wn3.getNodeName().equalsIgnoreCase("entity")) {
                     try {
-                        Entity e = MekHqXmlUtil.getEntityFromXmlElement((Element)wn3);
+                        Entity e = MekHqXmlUtil.parseSingleEntityMul((Element)wn3);
                         if (null == e) {
                             String name = getEntityNameFromXmlString(wn3);
                             if (!unitList.contains(name)) {

@@ -1625,7 +1625,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 } else if (wn2.getNodeName().equalsIgnoreCase("entity")) {
                     Entity e = mappedEntities != null ? mappedEntities.get(wn2) : null;
                     if (e == null) {
-                        retVal.entity = MekHqXmlUtil.getEntityFromXmlElement((Element)wn2);
+                        retVal.entity = MekHqXmlUtil.parseSingleEntityMul((Element)wn2);
                     } else {
                         retVal.entity = e;
                     }
