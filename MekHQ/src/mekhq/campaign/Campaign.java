@@ -3341,6 +3341,20 @@ public class Campaign implements Serializable, ITechManager {
         }
     }
 
+    /**
+     * Cleans incongruent data present in the campaign
+     */
+    public void cleanUp(){
+        // Cleans non-existing spouses
+        for(Person p : personnel.values()){
+            if(p.hasSpouse()){
+                if(!personnel.containsKey(p.getSpouseID())){
+                    p.setSpouseID(null);
+                }
+            }
+        }
+    }
+
     public boolean isOvertimeAllowed() {
         return overtime;
     }
@@ -7184,7 +7198,7 @@ public class Campaign implements Serializable, ITechManager {
         if (status == Person.S_KIA) {
             person.addLogEntry(getDate(), "Killed in action");
             // Don't forget to tell the spouse
-            if (person.getSpouseID() != null) {
+            if (person.hasSpouse()) {
                 Person spouse = person.getSpouse();
                 spouse.addLogEntry(getDate(), "Spouse, " + person.getName() + ", killed in action");
                 spouse.setSpouseID(null);
