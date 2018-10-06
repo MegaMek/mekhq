@@ -2160,6 +2160,10 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     public void useReroll() {
         rerollsRemaining--;
     }
+    
+    protected void setRerolls(int rerolls) {
+        rerollsRemaining = rerolls;
+    }
 
     public int getEnemyHome() {
         return enemyHome;

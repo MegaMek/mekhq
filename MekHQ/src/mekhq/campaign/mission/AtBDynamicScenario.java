@@ -8,7 +8,10 @@ import java.util.Map;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import mekhq.campaign.Campaign;
+import mekhq.campaign.force.Lance;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
+import mekhq.campaign.personnel.Person;
 
 /**
  * Data structure intended to hold data relevant to AtB Dynamic Scenarios (AtB 3.0) 
@@ -132,6 +135,25 @@ public class AtBDynamicScenario extends AtBScenario {
     
     public Map<BotForce, ScenarioForceTemplate> getBotForceTemplates() {
         return botForceTemplates;
+    }
+    
+    /**
+     * Convenience method that returns the commander of the first force assigned to this scenario.
+     * @return
+     */
+    public Person getLanceCommander(Campaign campaign) {
+        if(getForceIDs().isEmpty()) {
+            return null; // if we don't have forces, just a bunch of units, then get the highest-ranked?
+        }
+        
+        Lance lance = campaign.getLances().get(getForceIDs().get(0));
+        
+        if(lance != null) {
+            lance.refreshCommander(campaign);
+            return lance.getCommander(campaign);
+        } else {
+            return null;
+        }
     }
 
     @Override

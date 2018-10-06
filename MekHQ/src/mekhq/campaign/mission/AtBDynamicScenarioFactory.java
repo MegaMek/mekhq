@@ -28,11 +28,14 @@ import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.AtBConfiguration;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.force.Force;
 import mekhq.campaign.force.Lance;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
 import mekhq.campaign.mission.ScenarioForceTemplate.SynchronizedDeploymentType;
 import mekhq.campaign.personnel.Bloodname;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.IUnitGenerator;
 import mekhq.campaign.universe.Planet;
@@ -97,8 +100,10 @@ public class AtBDynamicScenarioFactory {
         setScenarioMapSize(scenario);
         setDeploymentZones(scenario);
         
+        setScenarioRerolls(scenario, campaign);
+        
         translatePlayerNPCsToAttached(scenario, campaign);
-        setDeploymentTurns(scenario);
+        setDeploymentTurns(scenario, campaign);
     }
     
     /**
@@ -1070,14 +1075,14 @@ public class AtBDynamicScenarioFactory {
      * Sets up the deployment turns as they are specified
      * @param scenario
      */
-    private static void setDeploymentTurns(AtBDynamicScenario scenario) {
+    private static void setDeploymentTurns(AtBDynamicScenario scenario, Campaign campaign) {
         for(int x = 0; x < scenario.getNumBots(); x++) {
             BotForce currentBotForce = scenario.getBotForce(x);
             ScenarioForceTemplate forceTemplate = scenario.getBotForceTemplates().get(currentBotForce);
             int deployRound = forceTemplate.getArrivalTurn();
             
             if(deployRound == ScenarioForceTemplate.ARRIVAL_TURN_STAGGERED) {
-                setDeploymentTurnsStaggered(currentBotForce.getEntityList());
+                setDeploymentTurnsStaggered(currentBotForce.getEntityList(), 0);
             } else if(deployRound == ScenarioForceTemplate.ARRIVAL_TURN_STAGGERED_BY_LANCE) {
                 setDeploymentTurnsStaggeredByLance(currentBotForce.getEntityList());
             } else {                
@@ -1088,13 +1093,72 @@ public class AtBDynamicScenarioFactory {
         }
         
         //TODO: Set player unit deployment. Look in BriefingTab.startScenario for logic
+        
+        // for player forces where there's an associated force template, we can set the deployment turn explicitly
+        // or use a stagger algorithm.
+        // for player forces where there's not an associated force template, we calculate the deployment turn
+        // as if they were reinforcements
+        for(int forceID : scenario.getForceIDs()) {
+            ScenarioForceTemplate forceTemplate = scenario.getPlayerForceTemplates().get(forceID);
+            List<Entity> forceEntities = new ArrayList<>();            
+            Force playerForce = campaign.getForce(forceID);
+            
+            for(UUID unitID : playerForce.getAllUnits()) {
+                forceEntities.add(campaign.getUnit(unitID).getEntity());
+            }
+            
+            // make note of battle commander strategy
+            Person commander = scenario.getLanceCommander(campaign);
+            int strategy = 0;
+            
+            if(commander != null) {
+                strategy = commander.getSkill(SkillType.S_STRATEGY).getLevel();
+            }
+            
+            // now, attempt to set deployment turns
+            // if the force has a template, then use the appropriate algorithm
+            // otherwise, treat it as reinforcements
+            if(forceTemplate != null) {
+                int deployRound = forceTemplate.getArrivalTurn();
+                
+                if(deployRound == ScenarioForceTemplate.ARRIVAL_TURN_STAGGERED) {
+                    setDeploymentTurnsStaggered(forceEntities, strategy);
+                } else if(deployRound == ScenarioForceTemplate.ARRIVAL_TURN_STAGGERED_BY_LANCE) {
+                    setDeploymentTurnsStaggeredByLance(forceEntities);
+                } else {                
+                    for(Entity entity : forceEntities) {
+                        entity.setDeployRound(deployRound);
+                    }
+                }
+            } else {
+                int minWalkMP = 999;
+                
+                // calculate the slowest walk speed
+                for(Entity entity : forceEntities) {                    
+                    int speed = calculateAtBSpeed(entity);
+                    
+                    if(speed < minWalkMP) {
+                        minWalkMP = speed;
+                    }
+                }
+
+                // can't have a deployment round earlier than 0
+                int deployRound = Math.max(0, 12 - minWalkMP - strategy);
+                
+                // set deployment round
+                for(Entity entity : forceEntities) {
+                    entity.setDeployRound(deployRound);
+                }
+            }
+        }
     }
     
     /**
      * Uses the "individual staggered deployment" algorithm to determine individual deployment turns 
      * @param botForce The bot force whose entities to process.
+     * @param turnModifier The deployment round is reduced by this amount
      */
-    private static void setDeploymentTurnsStaggered(List<Entity> entityList) {
+    private static void setDeploymentTurnsStaggered(List<Entity> entityList, int turnModifier) {
         // loop through all the entities
         // highest movement entity deploys on turn 0
         // other entities deploy on highest move - "walk" MP.
@@ -1114,7 +1178,7 @@ public class AtBDynamicScenarioFactory {
         
         for(int x = 0; x < entityList.size(); x++) {
             // since we're iterating through the same unchanged collection, we can use implicit indexing.
-            entityList.get(x).setDeployRound(maxWalkMP - entityWalkMPs.get(x));
+            entityList.get(x).setDeployRound(Math.max(0, maxWalkMP - entityWalkMPs.get(x) - turnModifier));
         }
     }
     
@@ -1147,7 +1211,7 @@ public class AtBDynamicScenarioFactory {
             entity.setDeployRound(maxWalkMP - entity.getWalkMP());
         }*/
     }
-    
+
     /** 
      * Worker function that calculates the AtB-rules walk MP for an entity, for deployment purposes.
      * @param entity The entity to examine.
@@ -1218,6 +1282,19 @@ public class AtBDynamicScenarioFactory {
         default:
             // directional edges start at 1
             return ((edge + 3) % 8) + 1;
+        }
+    }
+    
+    /**
+     * Worker function that calculates the appropriate number of rerolls to use for the scenario.
+     * @param scenario The scenario for which to set rerolls
+     * @param campaign Campaign in which the scenario is occurring
+     */
+    private static void setScenarioRerolls(AtBDynamicScenario scenario, Campaign campaign) {
+        Person commander = scenario.getLanceCommander(campaign);
+        
+        if(commander != null) {
+            scenario.setRerolls(commander.getSkill(SkillType.S_TACTICS).getLevel());
         }
     }
 }
