@@ -1,5 +1,5 @@
 /*
- * TestUtilities.java
+ * UnitTestUtilities.java
  *
  * Copyright (C) 2018 MegaMek team
  *
@@ -21,22 +21,18 @@
 
 package mekhq.campaign.unit;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.util.Base64;
-
+import megamek.common.loaders.EntityLoadingException;
+import megamek.common.loaders.MtfFile;
+import mekhq.TestUtilities;
 import org.junit.Assert;
 
 import megamek.common.Entity;
-import megamek.common.loaders.EntityLoadingException;
-import megamek.common.loaders.MtfFile;
 import mekhq.campaign.Campaign;
 
-public final class TestUtilities {
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 
-    public static Campaign getTestCampaign() {
-        return new Campaign();
-    }
+public final class UnitTestUtilities {
 
     public static Unit addAndGetUnit(Campaign campaign, Entity entity) {
         campaign.addUnit(entity, false, 0);        
@@ -45,6 +41,19 @@ public final class TestUtilities {
         }
 
         Assert.fail("Did not add unit to campaign");
+        return null;
+    }
+
+    public static Entity ParseBase64MtfFile(String base64) {
+        try {
+            InputStream in = new ByteArrayInputStream(TestUtilities.Decode(base64));
+            MtfFile parser = new MtfFile(in);
+
+            return parser.getEntity();
+        } catch (EntityLoadingException e) {
+            Assert.fail(e.toString());
+        }
+
         return null;
     }
 
@@ -155,22 +164,5 @@ public final class TestUtilities {
             + "Zvb3QgQWN0dWF0b3IKQ29udmVyc2lvbiBHZWFyClRyYWNrcwoKUmVhciBSaWdodC"
             + "BMZWc6CkhpcApVcHBlciBMZWcgQWN0dWF0b3IKTG93ZXIgTGVnIEFjdHVhdG9yCk"
             + "Zvb3QgQWN0dWF0b3IKQ29udmVyc2lvbiBHZWFyClRyYWNrcwoK");
-    }
-
-    public static Entity ParseBase64MtfFile(String base64) {
-        try {
-            InputStream in = new ByteArrayInputStream(Decode(base64));
-            MtfFile parser = new MtfFile(in);
-            
-            return parser.getEntity();
-        } catch (EntityLoadingException e) {
-            Assert.fail(e.toString());
-        }
-
-        return null;
-    }
-
-    private static byte[] Decode(String base64) {
-        return Base64.getDecoder().decode(base64);
     }
 }
