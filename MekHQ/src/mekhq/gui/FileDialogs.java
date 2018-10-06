@@ -186,9 +186,10 @@ public class FileDialogs {
      */
     public static Optional<File> saveCampaign(JFrame frame, Campaign campaign) {
 
-        String fileName = String.format( "%s%s.cpnx", //$NON-NLS-1$
+        String fileName = String.format( "%s%s.%s", //$NON-NLS-1$
                                          campaign.getName(),
-                                         campaign.getShortDateAsString() );
+                                         campaign.getShortDateAsString(),
+                                         campaign.getPreferGzippedOutput() ? "cpnx.gz" : "cpnx" );
 
         return GUI.fileDialogSave( frame,
                                    "Save Campaign",
