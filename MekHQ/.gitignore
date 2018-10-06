@@ -8,6 +8,7 @@
 /mmconf/megameklab.properties
 /mmconf/mekhq.properties
 /campaigns/*.cpnx
+/campaigns/*.cpnx.gz
 /*.mul
 /.settings/
 /classes

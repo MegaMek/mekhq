@@ -22,7 +22,9 @@ package mekhq.campaign.personnel;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
@@ -49,13 +51,13 @@ public class Award implements MekHqXmlSerializable, Comparable<Award>, Serializa
     private String description;
 
     @XmlElement(name = "medal")
-    private String medal;
+    private ArrayList<String> medals;
 
     @XmlElement(name = "ribbon")
-    private String ribbon;
+    private ArrayList<String> ribbons;
 
     @XmlElement(name = "misc")
-    private String misc;
+    private ArrayList<String> miscs;
 
     @XmlElement(name = "xp")
     private int xp = 0;
@@ -70,22 +72,23 @@ public class Award implements MekHqXmlSerializable, Comparable<Award>, Serializa
 
     private String set;
 
-    private Date date;
+    private List<Date> dates;
 
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 
     public Award(){}
 
-    public Award(String name, String set,  String description, String medal, String ribbon, String misc, int xp, int edge, boolean stackable, int id) {
+    public Award(String name, String set,  String description, ArrayList<String> medals, ArrayList<String> ribbons, ArrayList<String> miscs, int xp, int edge, boolean stackable, int id) {
         this.name = name;
         this.set = set;
         this.description = description;
-        this.medal = medal;
-        this.ribbon = ribbon;
-        this.misc = misc;
+        this.medals = medals;
+        this.ribbons = ribbons;
+        this.miscs = miscs;
         this.xp = xp;
         this.edge = edge;
         this.stackable = stackable;
+        dates = new ArrayList<>();
         this.id = id;
     }
 
@@ -98,7 +101,9 @@ public class Award implements MekHqXmlSerializable, Comparable<Award>, Serializa
     public void writeToXml(PrintWriter pw1, int indent) {
         pw1.append(MekHqXmlUtil.indentStr(indent)).append("<award>");
 
-        pw1.append("<date>").append(DATE_FORMAT.format(date)).append("</date>");
+        for(Date date : dates){
+            pw1.append("<date>").append(DATE_FORMAT.format(date)).append("</date>");
+        }
         pw1.append("<set>").append(MekHqXmlUtil.escape(this.set)).append("</set>");
         pw1.append("<name>").append(MekHqXmlUtil.escape(this.name)).append("</name>");
 
@@ -127,30 +132,52 @@ public class Award implements MekHqXmlSerializable, Comparable<Award>, Serializa
         return description;
     }
 
-    public void setDate(Date date){
-        this.date = date;
+    /**
+     * Gets the file name of an award given i times.
+     * @param i times given the award
+     * @param fileNames list containing all of the file names
+     * @return the file name
+     */
+    private String getFileName(int i, List<String> fileNames){
+        if(i > fileNames.size()) return fileNames.get(fileNames.size()-1);
+
+        return fileNames.get(i-1);
     }
 
-    public Date getDate(){
-        return date;
+    /**
+     * @param i number of times this award has been awarded
+     * @return the filename of the ribbon
+     */
+    public String getRibbonFileName(int i){
+        return getFileName(i, ribbons);
     }
 
-    public String getFormatedDate(){
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-        return df.format(date.getTime());
+    public int getNumberOfRibbonFiles(){
+        return ribbons == null ? 0 : ribbons.size();
     }
 
-
-    public String getRibbonFileName(){
-        return ribbon;
+    /**
+     * @param i number of times this award has been awarded
+     * @return the filename of the medal
+     */
+    public String getMedalFileName(int i){
+        return getFileName(i, medals);
     }
 
-    public String getMedalFileName(){
-        return medal;
+    public int getNumberOfMedalFiles() {
+        return medals == null ? 0 : medals.size();
     }
 
-    public String getMiscFileName(){
-        return misc;
+    /**
+     * @param i number of times this award has been awarded
+     * @return the filename of the misc
+     */
+    public String getMiscFileName(int i){
+        return getFileName(i, miscs);
+    }
+
+    public int getNumberOfMiscFiles() {
+        return miscs == null ? 0 : miscs.size();
     }
 
     public int getXPReward(){
@@ -160,16 +187,12 @@ public class Award implements MekHqXmlSerializable, Comparable<Award>, Serializa
 
     /**
      * Creates a copy of this award and sets a given date.
-     * @param date when the award was given
      * @return award with new date
      */
-    public Award createCopy(Date date){
-        Award awardCopy = new Award(this.name, this.set, this.description, this.medal, this.ribbon, this.misc, this.xp,
-                this.edge, this.stackable, this.id);
-        awardCopy.setDate(date);
+    public Award createCopy(){
+        Award awardCopy = new Award(this.name, this.set, this.description, this.medals, this.ribbons, this.miscs, this.xp, this.edge, this.stackable, this.id);
         return awardCopy;
     }
-
 
     /**
      * Checks if an award can be awarded to a given person
@@ -180,18 +203,17 @@ public class Award implements MekHqXmlSerializable, Comparable<Award>, Serializa
         // If we wish to force the user to not be able to give awards for some reason (e.g. lack of kill count),
         // we need to create classes for each awards and override this method.
 
-        return (!person.hasAward(this) || stackable);
+        return (!person.awardController.hasAward(this) || stackable);
     }
 
     /**
      * Checks if two awards are equal
-     * @param setName is the name of the set of this award
+     * @param set is the name of the set of this award
      * @param name is the name of the award
-     * @param date is the date this award was given
      * @return true if it is equal
      */
-    public boolean equals(String setName, String name, Date date){
-        return (this.set.equals(setName) && this.name.equals(name) && this.date.equals(date));
+    public boolean equals(String set, String name){
+        return (this.set.equals(set) && this.name.equals(name));
     }
 
     /**
@@ -202,5 +224,91 @@ public class Award implements MekHqXmlSerializable, Comparable<Award>, Serializa
     @Override
     public int compareTo(Award other) {
         return Integer.compare(this.id, other.id);
+    }
+
+    /**
+     * Adds a date to the award, as if the award was given again.
+     * @param date to be added.
+     */
+    public void addDate(Date date) {
+        dates.add(date);
+    }
+
+    public void setDates(List<Date> dates){
+        this.dates = dates;
+    }
+
+    /**
+     * Merges all dates from one award into the other
+     * @param award from the dates will be collected
+     */
+    public void mergeDatesFrom(Award award) {
+        this.dates.addAll(award.dates);
+    }
+
+    /**
+     * Generates a list of strings of formated dates yyyy-MM-dd
+     * @return a list of strings representing the dates in the format yyyy-MM-dd
+     */
+    public List<String> getFormatedDates(){
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+
+        ArrayList<String> formatedDates = new ArrayList<>();
+        for(Date date : dates){
+            formatedDates.add(df.format(date.getTime()));
+        }
+        return formatedDates;
+    }
+
+    /**
+     * @param date date to be removed from this award
+     */
+    public void removeDate(Date date){
+        dates.remove(date);
+    }
+
+    /**
+     * @return true if this award has any dates
+     */
+    public boolean hasDates(){
+        return dates.size() > 0;
+    }
+
+    /**
+     * @return the number of times this award has been awarded to the person.
+     */
+    public int getQuantity(){
+        return dates.size();
+    }
+
+    /**
+     * @return an html formatted string to be used as tooltip.
+     */
+    public String getTooltip(){
+
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+
+        StringBuilder string = new StringBuilder();
+        string.append("<html>");
+
+        string.append(getName());
+
+        string.append("<br>");
+
+        string.append(getDescription());
+
+        string.append("<br>");
+        string.append("<br>");
+        for(Date date : dates){
+            string.append("(");
+            string.append(df.format(date.getTime()));
+            string.append(")");
+            string.append("<br>");
+        }
+
+        string.append("</html>");
+
+        return string.toString();
+
     }
 }

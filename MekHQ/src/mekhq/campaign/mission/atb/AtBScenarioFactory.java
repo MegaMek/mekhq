@@ -256,7 +256,7 @@ public class AtBScenarioFactory {
     				if (lList.size() > 0) {
     					Lance lance = Utilities.getRandomItem(lList);
     					AtBScenario scenario = AtBScenarioFactory.createScenario(c, lance, AtBScenario.BASEATTACK, false,
-    							Lance.getBattleDate(c.calendar));
+    							Lance.getBattleDate(c.getCalendar()));
     					for (int i = 0; i < sList.size(); i++) {
     						if (sList.get(i).getLanceForceId() ==
     								lance.getForceId()) {

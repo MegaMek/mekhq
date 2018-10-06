@@ -177,6 +177,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
     private static final Map<Integer, Integer> OTHER_RANSOM_VALUES;
     
 
+    public PersonAwardController awardController;
+
     private static final IntSupplier PREGNANCY_DURATION = () -> {
         double gaussian = Math.sqrt(-2 * Math.log(Math.nextUp(Math.random())))
             * Math.cos(2.0 * Math.PI * Math.random());
@@ -291,9 +293,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
     private int rankSystem = -1;
     private Ranks ranks;
 
-    // AwardNames
-    private List<Award> awards;
-
 
     // Manei Domini "Classes"
     public static final int MD_NONE			= 0;
@@ -391,7 +390,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
         biography = "";
         nTasks = 0;
         personnelLog = new ArrayList<LogEntry>();
-        awards = new ArrayList<Award>();
         idleMonths = -1;
         daysToWaitForHealing = 15;
         resetMinutesLeft();
@@ -406,7 +404,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
         bloodname = "";
         primaryDesignator = DESIG_NONE;
         secondaryDesignator = DESIG_NONE;
+        awardController = new PersonAwardController(this);
     }
+
+    public Campaign getCampaign(){return campaign;}
 
     public int getPhenotype() {
         return phenotype;
@@ -996,6 +997,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return id;
     }
 
+    @Nullable
     public UUID getSpouseID() {
         return spouse;
     }
@@ -1004,8 +1006,13 @@ public class Person implements Serializable, MekHqXmlSerializable {
         this.spouse = spouse;
     }
 
+    @Nullable
     public Person getSpouse() {
         return campaign.getPerson(spouse);
+    }
+
+    public boolean hasSpouse(){
+        return (getSpouseID() != null);
     }
 
     public GregorianCalendar getDueDate() {
@@ -1079,18 +1086,15 @@ public class Person implements Serializable, MekHqXmlSerializable {
         if(!isFemale() || isPregnant()) {
             return;
         }
-        // Spouse NULL protection...
-        if((getSpouseID() != null) && (getSpouse() == null)) {
-            setSpouseID(null);
-        }
+
         if (!isDeployed()) {
             // Age limitations...
             if (getAge(campaign.getCalendar()) > 13 && getAge(campaign.getCalendar()) < 51) {
                 boolean concieved = false;
-                if (getSpouse() == null && campaign.getCampaignOptions().useUnofficialProcreationNoRelationship()) {
+                if (!hasSpouse() && campaign.getCampaignOptions().useUnofficialProcreationNoRelationship()) {
                     // 0.005% chance that this procreation attempt will create a child
                     concieved = (Compute.randomInt(100000) < 2);
-                } else if (getSpouse() != null) {
+                } else if (hasSpouse()) {
                     if (getSpouse().isActive() && !getSpouse().isDeployed() && getSpouse().getAge(campaign.getCalendar()) > 13) {
                         // 0.05% chance that this procreation attempt will create a child
                         concieved = (Compute.randomInt(10000) < 2);
@@ -1104,7 +1108,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     int size = PREGNANCY_SIZE.getAsInt();
                     extraData.set(PREGNANCY_CHILDREN_DATA, size);
                     extraData.set(PREGNANCY_FATHER_DATA,
-                        (null != getSpouseID()) ? getSpouseID().toString() : null);
+                        (hasSpouse()) ? getSpouseID().toString() : null);
 
                     String sizeString = (size < PREGNANCY_MULTIPLE_NAMES.length) ? PREGNANCY_MULTIPLE_NAMES[size] : null;
                     if(null == sizeString) {
@@ -1130,7 +1134,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         int size = PREGNANCY_SIZE.getAsInt();
         extraData.set(PREGNANCY_CHILDREN_DATA, size);
         extraData.set(PREGNANCY_FATHER_DATA,
-            (null != getSpouseID()) ? getSpouseID().toString() : null);
+            (hasSpouse()) ? getSpouseID().toString() : null);
 
         String sizeString = (size < PREGNANCY_MULTIPLE_NAMES.length) ? PREGNANCY_MULTIPLE_NAMES[size] : null;
         if(null == sizeString) {
@@ -1158,7 +1162,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 !this.equals(p)
                 && (getAncestorsID() == null
                 || !campaign.getAncestors(getAncestorsID()).checkMutualAncestors(campaign.getAncestors(p.getAncestorsID())))
-                && p.getSpouseID() == null
+                && !p.hasSpouse()
                 && getGender() != p.getGender()
                 && p.getAge(campaign.getCalendar()) > 13
         );
@@ -1489,9 +1493,9 @@ public class Person implements Serializable, MekHqXmlSerializable {
             }
             pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "</personnelLog>");
         }
-        if (!awards.isEmpty()) {
+        if (!awardController.getAwards().isEmpty()) {
             pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<awards>");
-            for (Award award : awards) {
+            for (Award award : awardController.getAwards()) {
                 award.writeToXml(pw1, indent + 2);
             }
             pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "</awards>");
@@ -1758,7 +1762,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                             continue;
                         }
 
-                        retVal.addAward(AwardsFactory.getInstance().generateNewFromXML(wn3));
+                        retVal.awardController.addAwardFromXml(AwardsFactory.getInstance().generateNewFromXML(wn3));
                     }
 
                 } else if (wn2.getNodeName().equalsIgnoreCase("injuries")) {
@@ -3425,112 +3429,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return personnelLog;
     }
 
-    /**
-     * @return this person's award list.
-     */
-    public List<Award> getAwards(){
-        Collections.sort(awards);
-        return awards;
-    }
 
-    /**
-     * @return true if this person has one or more awards.
-     */
-    public boolean hasAwards() {
-        return awards.size() > 0;
-    }
-
-    /**
-     * @return true if this person has one or more awards that are represented with a ribbon icon.
-     */
-    public boolean hasAwardsWithRibbons(){
-        return awards.stream().filter(a -> a.getRibbonFileName() != null).collect(Collectors.toList()).size() > 0;
-    }
-
-    /**
-     * @return true if this person has one or more awards that are represented with a medal icon.
-     */
-    public boolean hasAwardsWithMedals(){
-        return awards.stream().filter(a -> a.getMedalFileName() != null).collect(Collectors.toList()).size() > 0;
-    }
-
-    /**
-     * @return true if this person has one or more awards that are represented by a misc icon.
-     */
-    public boolean hasAwardsWithMiscs(){
-        return awards.stream().filter(a -> a.getMiscFileName() != null).collect(Collectors.toList()).size() > 0;
-    }
-
-    /**
-     * Adds and logs an award to this person based on
-     * @param setName is the name of the set of the award
-     * @param awardName is the name of the award
-     * @param date is the date it was awarded
-     */
-    public void addAndLogAward(String setName, String awardName, Date date) {
-        Award award = AwardsFactory.getInstance().generateNew(setName, awardName, date);
-        setXp(getXp() + award.getXPReward());
-        setEdge(getEdge() + award.getEdgeReward());
-        addAward(award);
-        logAward(award);
-    }
-
-    /**
-     * Removes an award given to this person based on:
-     * @param setName is the name of the set of the award
-     * @param awardName is the name of the award
-     * @param stringDate is the date it was awarded
-     */
-    public void removeAward(String setName, String awardName, String stringDate){
-
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-
-        Date date = null;
-        try {
-            date = df.parse(stringDate);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
-        for(Award award : awards){
-            if(award.equals(setName, awardName, date)){
-                awards.remove(award);
-                MekHQ.triggerEvent(new PersonChangedEvent(this));
-                addLogEntry(campaign.getDate(), "Removed award " + award.getName());
-                return;
-            }
-        }
-    }
-
-    /**
-     * Gives the award to this person
-     * @param award is the award it was awarded
-     */
-    private void addAward(Award award){
-        awards.add(award);
-        MekHQ.triggerEvent(new PersonChangedEvent(this));
-    }
-
-    /**
-     * Adds an entry log for a given award.
-     * @param award that was given.
-     */
-    public void logAward(Award award){
-        addLogEntry(award.getDate(), "Awarded " + award.getName() + ": " + award.getDescription());
-        MekHQ.triggerEvent(new PersonChangedEvent(this));
-    }
-
-    /**
-     * @param award to check if this person has it
-     * @return true if it has the award
-     */
-    public boolean hasAward(Award award){
-        for(Award myAward : awards){
-            if(award.getName().equals(myAward.getName()) &&
-                    award.getSet().equals(myAward.getSet())) return true;
-        }
-        return false;
-    }
     
     public void addLogEntry(Date d, String desc, String type) {
         personnelLog.add(new LogEntry(d, desc, type));
@@ -3598,7 +3497,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         if (status == Person.S_KIA) {
             addLogEntry(campaign.getDate(), "Died from " + getGenderPronoun(PRONOUN_HISHER) + " wounds");
             //set the deathday
-            setDeathday((GregorianCalendar) campaign.calendar.clone());
+            setDeathday((GregorianCalendar) campaign.getCalendar().clone());
         }
         if (status == Person.S_RETIRED) {
             addLogEntry(campaign.getDate(), "Retired from active duty due to " + getGenderPronoun(PRONOUN_HISHER) + " wounds");

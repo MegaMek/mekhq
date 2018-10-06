@@ -20,3 +20,5 @@ MekHQ/.idea/
 /.classpath
 /.project
 /properties_local.gradle
+
+MekHQ/out/
