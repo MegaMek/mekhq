@@ -32,6 +32,7 @@ import java.util.ResourceBundle;
  * @author Miguel Azevedo
  */
 public class AwardLogger {
+
     private ResourceBundle logEntriesResourceMap;
     private static AwardLogger awardLogger;
 
