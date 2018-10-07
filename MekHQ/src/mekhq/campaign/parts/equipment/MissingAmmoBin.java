@@ -83,7 +83,7 @@ public class MissingAmmoBin extends MissingEquipmentPart {
 	}
 
 	@Override 
-    public void fix(boolean hasInfiniteResources) {
+    public void fix(boolean gmMode) {
 		Part replacement = findReplacement(false);
 		if(null != replacement) {
 		    Part actualReplacement;

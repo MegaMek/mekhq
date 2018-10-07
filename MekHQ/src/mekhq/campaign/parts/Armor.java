@@ -313,11 +313,11 @@ public class Armor extends Part implements IAcquisitionWork {
 	}
 
 	@Override
-	public void fix(boolean hasInfiniteResources) {
-		int amountFound = hasInfiniteResources ? amountNeeded : Math.min(getAmountAvailable(), amountNeeded);
+	public void fix(boolean gmMode) {
+		int amountFound = gmMode ? amountNeeded : Math.min(getAmountAvailable(), amountNeeded);
 		int fixAmount = Math.min(amount + amountFound, unit.getEntity().getOArmor(location, rear));
 		unit.getEntity().setArmor(fixAmount, location, rear);
-		if (!hasInfiniteResources) {
+		if (!gmMode) {
 			changeAmountAvailable(-1 * amountFound);
 		}
 		updateConditionFromEntity(false);

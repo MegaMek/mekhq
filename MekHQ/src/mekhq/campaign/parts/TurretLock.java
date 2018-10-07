@@ -96,8 +96,8 @@ public class TurretLock extends Part {
 	}
 
 	@Override
-    public void fix(boolean hasInfiniteResources) {
-        super.fix(hasInfiniteResources);
+    public void fix(boolean gmMode) {
+        super.fix(gmMode);
 		if(null != unit && unit.getEntity() instanceof Tank) {
 			((Tank)unit.getEntity()).unlockTurret();
 		}

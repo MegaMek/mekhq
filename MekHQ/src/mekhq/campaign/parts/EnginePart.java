@@ -215,8 +215,8 @@ public class EnginePart extends Part {
 	}
 
 	@Override
-	public void fix(boolean hasInfiniteResources) {
-		super.fix(hasInfiniteResources);
+	public void fix(boolean gmMode) {
+		super.fix(gmMode);
 		if(null != unit) {
 		    if(unit.getEntity() instanceof Mech) {
 		        unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_ENGINE);

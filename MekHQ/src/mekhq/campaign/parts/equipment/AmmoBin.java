@@ -309,17 +309,17 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     }
 
     @Override
-    public void fix(boolean hasInfiniteResources) {
-        loadBin(hasInfiniteResources);
+    public void fix(boolean gmMode) {
+        loadBin(gmMode);
     }
 
     public void loadBin() {
         loadBin(false);
     }
 
-    protected void loadBin(boolean hasInfiniteResources) {
+    protected void loadBin(boolean gmMode) {
         int shotsNeeded = getShotsNeeded();
-        int shots = hasInfiniteResources ? shotsNeeded : Math.min(getAmountAvailable(), shotsNeeded);
+        int shots = gmMode ? shotsNeeded : Math.min(getAmountAvailable(), shotsNeeded);
         if (null != unit) {
             Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
             if (null != mounted) {
@@ -335,7 +335,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
                         mounted.setShotsLeft(shots);
                     }
 
-                    if (!hasInfiniteResources) {
+                    if (!gmMode) {
                         changeAmountAvailable(-1 * shots, (AmmoType)type);
                     }
                     shotsNeeded -= shots;

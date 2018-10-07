@@ -200,23 +200,23 @@ public class LargeCraftAmmoBin extends AmmoBin {
     }
 
     @Override
-    public void fix(boolean hasInfiniteResources) {
+    public void fix(boolean gmMode) {
         if (shotsNeeded < 0) {
             unloadSingle();
         } else {
-            loadBinSingle(hasInfiniteResources);
+            loadBinSingle(gmMode);
         }
     }
     
-    public void loadBinSingle(boolean hasInfiniteResources) {
-        int shots = hasInfiniteResources ? shotsNeeded : Math.min(getAmountAvailable(), Math.min(shotsNeeded, ((AmmoType) type).getShots()));
+    public void loadBinSingle(boolean gmMode) {
+        int shots = gmMode ? shotsNeeded : Math.min(getAmountAvailable(), Math.min(shotsNeeded, ((AmmoType) type).getShots()));
         if(null != unit) {
             Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
             if(null != mounted && mounted.getType() instanceof AmmoType) {
                 mounted.setShotsLeft(mounted.getBaseShotsLeft() + shots);
             }
         }
-        if (!hasInfiniteResources) {
+        if (!gmMode) {
             changeAmountAvailable(-1 * shots, (AmmoType)type);
         }
         shotsNeeded -= shots;

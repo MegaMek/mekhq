@@ -81,8 +81,8 @@ public class ProtomekLegActuator extends Part {
     }
 
     @Override
-    public void fix(boolean hasInfiniteResources) {
-        super.fix(hasInfiniteResources);
+    public void fix(boolean gmMode) {
+        super.fix(gmMode);
         if(null != unit) {
             unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Protomech.SYSTEM_LEGCRIT, Protomech.LOC_LEG);
         }

@@ -148,8 +148,8 @@ public class AeroSensor extends Part {
 	}
 
 	@Override
-	public void fix(boolean hasInfiniteResources) {
-		super.fix(hasInfiniteResources);
+	public void fix(boolean gmMode) {
+		super.fix(gmMode);
 		if(null != unit && unit.getEntity() instanceof Aero) {
 			((Aero)unit.getEntity()).setSensorHits(0);
 		}

@@ -133,8 +133,8 @@ public class MotiveSystem extends Part {
 	}
 
 	@Override
-	public void fix(boolean hasInfiniteResources) {
-		super.fix(hasInfiniteResources);
+	public void fix(boolean gmMode) {
+		super.fix(gmMode);
 		damage = 0;
 		penalty = 0;
 		if(null != unit && unit.getEntity() instanceof Tank) {

@@ -146,8 +146,8 @@ public class BattleArmorAmmoBin extends AmmoBin implements IAcquisitionWork {
     }
     
     @Override
-    protected void loadBin(boolean hasInfiniteResources) {
-        int shots = hasInfiniteResources ? shotsNeeded : Math.min(getAmountAvailable(), shotsNeeded);
+    protected void loadBin(boolean gmMode) {
+        int shots = gmMode ? shotsNeeded : Math.min(getAmountAvailable(), shotsNeeded);
         int shotsPerTrooper = shots / getNumTroopers();
         shots = shotsPerTrooper * getNumTroopers();
         if(null != unit) {
@@ -166,7 +166,7 @@ public class BattleArmorAmmoBin extends AmmoBin implements IAcquisitionWork {
             }
         }
 
-        if (!hasInfiniteResources) {
+        if (!gmMode) {
             changeAmountAvailable(-1 * shots, (AmmoType)type);
         }
         shotsNeeded -= shots;

@@ -246,8 +246,8 @@ public class ProtomekLocation extends Part {
     }
 
     @Override
-    public void fix(boolean hasInfiniteResources) {
-        super.fix(hasInfiniteResources);
+    public void fix(boolean gmMode) {
+        super.fix(gmMode);
         if(isBlownOff()) {
             blownOff = false;
             unit.getEntity().setLocationBlownOff(loc, false);

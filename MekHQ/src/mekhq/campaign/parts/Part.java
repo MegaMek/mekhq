@@ -1050,7 +1050,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
     }
 	
 	@Override
-	public void fix(boolean hasInfiniteResources) {
+	public void fix(boolean gmMode) {
 		hits = 0;
 		resetRepairSettings();
 	}

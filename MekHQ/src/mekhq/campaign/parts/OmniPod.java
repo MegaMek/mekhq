@@ -230,7 +230,7 @@ public class OmniPod extends Part {
     }
     
     @Override
-    public void fix(boolean hasInfiniteResources) {
+    public void fix(boolean gmMode) {
         Part newPart = partType.clone();
         Part oldPart = campaign.checkForExistingSparePart(newPart.clone());
         if(null != oldPart) {

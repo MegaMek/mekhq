@@ -125,9 +125,9 @@ public class AeroHeatSink extends Part {
     }
 
     @Override
-    public void fix(boolean hasInfiniteResources) {
+    public void fix(boolean gmMode) {
         boolean fixed = needsFixing();
-        super.fix(hasInfiniteResources);
+        super.fix(gmMode);
         if(fixed && (null != unit)
                 && unit.getEntity() instanceof Aero) {
             ((Aero) unit.getEntity()).setHeatSinks(((Aero) unit.getEntity()).getHeatSinks() + 1);

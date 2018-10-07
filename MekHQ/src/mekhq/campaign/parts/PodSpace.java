@@ -117,7 +117,7 @@ public class PodSpace implements Serializable, IPartWork {
     }
 
     @Override
-    public void fix(boolean hasInfiniteResources) {
+    public void fix(boolean gmMode) {
         shorthandedMod = 0;
         for (int pid : childPartIds) {
             final Part part = campaign.getPart(pid);
@@ -133,7 +133,7 @@ public class PodSpace implements Serializable, IPartWork {
         for (int pid : childPartIds) {
             final Part part = campaign.getPart(pid);
             if (part != null && part instanceof MissingPart) {
-                part.fix(hasInfiniteResources);
+                part.fix(gmMode);
                 MekHQ.triggerEvent(new PartChangedEvent(part));
             }
         }

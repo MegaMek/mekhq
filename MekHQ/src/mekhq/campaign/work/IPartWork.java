@@ -60,7 +60,11 @@ public interface IPartWork extends IWork {
     
     void updateConditionFromEntity(boolean checkForDestruction);
     void updateConditionFromPart();
-    void fix(boolean hasInfiniteResources);
+    /**
+     * Completes a repair operation on the part.
+     * @param gmMode The operation is being completed in GM Mode.
+     */
+    void fix(boolean gmMode);
     void remove(boolean salvage);
     MissingPart getMissingPart();
     
