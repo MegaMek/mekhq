@@ -615,10 +615,9 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
     @Override
     protected void writeToXmlBegin(PrintWriter pw1, int indent) {
         super.writeToXmlBegin(pw1, indent);
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<nMonths>" + nMonths + "</nMonths>");
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<startDate>" + df.format(startDate) + "</startDate>");
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<endDate>" + df.format(endDate) + "</endDate>");
+        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<startDate>" + MekHqXmlUtil.formatDate(startDate) + "</startDate>");
+        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<endDate>" + MekHqXmlUtil.formatDate(endDate) + "</endDate>");
         pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<employer>" + MekHqXmlUtil.escape(employer) + "</employer>");
         pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<paymentMultiplier>" + paymentMultiplier
                 + "</paymentMultiplier>");
@@ -649,17 +648,15 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
     public void loadFieldsFromXmlNode(Node wn) throws ParseException {
         // Okay, now load mission-specific fields!
         NodeList nl = wn.getChildNodes();
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-
         for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
 
             if (wn2.getNodeName().equalsIgnoreCase("employer")) {
                 employer = wn2.getTextContent();
             } else if (wn2.getNodeName().equalsIgnoreCase("startDate")) {
-                startDate = df.parse(wn2.getTextContent().trim());
+                startDate = MekHqXmlUtil.parseDate(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("endDate")) {
-                endDate = df.parse(wn2.getTextContent().trim());
+                endDate = MekHqXmlUtil.parseDate(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("nMonths")) {
                 nMonths = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("paymentMultiplier")) {

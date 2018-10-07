@@ -36,6 +36,7 @@ import java.util.UUID;
 import java.util.Vector;
 import java.util.stream.Collectors;
 
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -1871,7 +1872,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                     if (wn3.getNodeName().equalsIgnoreCase("entity")) {
                         Entity en = null;
                         try {
-                            en = MekHqXmlUtil.getEntityFromXmlString(wn3);
+                            en = MekHqXmlUtil.parseSingleEntityMul((Element)wn3);
                             if (wn3.getAttributes().getNamedItem("deployment") != null) {
                                 en.setDeployRound(Math.max(0,
                                         Integer.parseInt(wn3.getAttributes().getNamedItem("deployment").getTextContent())));
@@ -1895,7 +1896,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                     if (wn3.getNodeName().equalsIgnoreCase("entity")) {
                         Entity en = null;
                         try {
-                            en = MekHqXmlUtil.getEntityFromXmlString(wn3);
+                            en = MekHqXmlUtil.parseSingleEntityMul((Element)wn3);
                             if (wn3.getAttributes().getNamedItem("deployment") != null) {
                                 en.setDeployRound(Math.max(0,
                                         Integer.parseInt(wn3.getAttributes().getNamedItem("deployment").getTextContent())));
@@ -1927,7 +1928,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                             if (wn4.getNodeName().equalsIgnoreCase("entity")) {
                                 Entity en = null;
                                 try {
-                                    en = MekHqXmlUtil.getEntityFromXmlString(wn4);
+                                    en = MekHqXmlUtil.parseSingleEntityMul((Element)wn4);
                                     if (wn4.getAttributes().getNamedItem("deployment") != null) {
                                         en.setDeployRound(Math.max(0,
                                                 Integer.parseInt(wn4.getAttributes().getNamedItem("deployment").getTextContent())));
@@ -2398,7 +2399,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                         if (wn3.getNodeName().equalsIgnoreCase("entity")) {
                             Entity en = null;
                             try {
-                                en = MekHqXmlUtil.getEntityFromXmlString(wn3);
+                                en = MekHqXmlUtil.parseSingleEntityMul((Element)wn3);
                                 if (wn3.getAttributes().getNamedItem("deployment") != null) {
                                     en.setDeployRound(Math.max(0,
                                             Integer.parseInt(wn3.getAttributes().getNamedItem("deployment").getTextContent())));

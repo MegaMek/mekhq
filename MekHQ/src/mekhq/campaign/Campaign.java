@@ -50,6 +50,7 @@ import java.util.TreeMap;
 import java.util.UUID;
 import java.util.Vector;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Stream;
 
 import javax.swing.JOptionPane;
 
@@ -219,6 +220,7 @@ public class Campaign implements Serializable, ITechManager {
     private Map<UUID, Person> personnel = new LinkedHashMap<>();
     private Map<UUID, Ancestors> ancestors = new LinkedHashMap<>();
     private TreeMap<Integer, Part> parts = new TreeMap<>();
+    private List<Part> spareParts = new ArrayList<>();
     private TreeMap<Integer, Force> forceIds = new TreeMap<>();
     private TreeMap<Integer, Mission> missions = new TreeMap<>();
     private TreeMap<Integer, Scenario> scenarios = new TreeMap<>();
@@ -1433,6 +1435,9 @@ public class Campaign implements Serializable, ITechManager {
             }
         }
         parts.put(Integer.valueOf(id), p);
+        if (p.isSpare()) {
+            spareParts.add(p);
+        }
         lastPartId = id;
         MekHQ.triggerEvent(new PartNewEvent(p));
     }
@@ -1526,6 +1531,9 @@ public class Campaign implements Serializable, ITechManager {
 
         lastPartId = Math.max(lastPartId, p.getId());
         parts.put(p.getId(), p);
+        if (p.isSpare()) {
+            spareParts.add(p);
+        }
         MekHQ.triggerEvent(new PartNewEvent(p));
     }
 
@@ -3309,6 +3317,9 @@ public class Campaign implements Serializable, ITechManager {
             return;
         }
         parts.remove(Integer.valueOf(part.getId()));
+        if (part.isSpare()) {
+            spareParts.remove(part);
+        }
         //remove child parts as well
         for(int childId : part.getChildPartIds()) {
             Part childPart = getPart(childId);
@@ -3609,14 +3620,8 @@ public class Campaign implements Serializable, ITechManager {
         colorIndex = index;
     }
 
-    public ArrayList<Part> getSpareParts() {
-        ArrayList<Part> spares = new ArrayList<Part>();
-        for (Part part : getParts()) {
-            if (part.isSpare()) {
-                spares.add(part);
-            }
-        }
-        return spares;
+    public List<Part> getSpareParts() {
+        return Collections.unmodifiableList(spareParts);
     }
 
     public void addFunds(long quantity) {
@@ -3850,9 +3855,8 @@ public class Campaign implements Serializable, ITechManager {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "lastForceId", lastForceId);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "lastMissionId", lastMissionId);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "lastScenarioId", lastScenarioId);
-        DateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "calendar",
-                df.format(calendar.getTime()));
+                MekHqXmlUtil.formatDate(calendar.getTime()));
         MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "fatigueLevel", fatigueLevel);
         {
             pw1.println("\t\t<nameGen>");
@@ -6251,7 +6255,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public Part checkForExistingSparePart(Part part) {
-        for (Part spare : getSpareParts()) {
+        for (Part spare : spareParts) {
             if (spare.getId() == part.getId()) {
                 continue;
             }
@@ -7219,8 +7223,9 @@ public class Campaign implements Serializable, ITechManager {
         int hv = getNumberOfUnitsByType(Entity.ETYPE_TANK, false);
         int protos = getNumberOfUnitsByType(Entity.ETYPE_PROTOMECH);
 
-        for (Part part : getSpareParts()) {
-            if (!inTransit && !part.isPresent()) {
+        // Calc tonnage of spare parts
+        for (Part part : parts.values()) {
+            if (!part.isSpare() || (!inTransit && !part.isPresent())) {
                 continue;
             }
             cargoTonnage += (part.getQuantity() * part.getTonnage());

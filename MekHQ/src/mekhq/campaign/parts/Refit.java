@@ -36,6 +36,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -1754,7 +1755,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 					else
 						retVal.sameArmorType = false;
 				} else if (wn2.getNodeName().equalsIgnoreCase("entity")) {
-					retVal.newEntity = MekHqXmlUtil.getEntityFromXmlString(wn2);
+					retVal.newEntity = MekHqXmlUtil.parseSingleEntityMul((Element)wn2);
 				} else if (wn2.getNodeName().equalsIgnoreCase("oldUnitParts")) {
 					NodeList nl2 = wn2.getChildNodes();
 					for (int y=0; y<nl2.getLength(); y++) {
