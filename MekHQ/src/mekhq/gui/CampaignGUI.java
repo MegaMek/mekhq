@@ -36,6 +36,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.lang.reflect.Method;
@@ -48,6 +49,7 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.UUID;
 import java.util.Vector;
+import java.util.zip.GZIPOutputStream;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
@@ -1589,7 +1591,7 @@ public class CampaignGUI extends JPanel {
             return;
         }
         String path = file.getPath();
-        if (!path.endsWith(".cpnx")) {
+        if (!path.endsWith(".cpnx") && !path.endsWith(".cpnx.gz")) {
             path += ".cpnx";
             file = new File(path);
         }
@@ -1603,11 +1605,16 @@ public class CampaignGUI extends JPanel {
 
         // Then save it out to that file.
         FileOutputStream fos = null;
+        OutputStream os = null;
         PrintWriter pw = null;
 
         try {
-            fos = new FileOutputStream(file);
-            pw = new PrintWriter(new OutputStreamWriter(fos, "UTF-8"));
+            os = fos = new FileOutputStream(file);
+            if (path.endsWith(".gz")) {
+                os = new GZIPOutputStream(fos);
+            }
+
+            pw = new PrintWriter(new OutputStreamWriter(os, "UTF-8"));
             getCampaign().writeToXml(pw);
             pw.flush();
             pw.close();
@@ -1641,7 +1648,14 @@ public class CampaignGUI extends JPanel {
         return FileDialogs.saveCampaign(frame, getCampaign()).orElse(null);
     }
 
-    private void menuLoadXmlActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_menuLoadActionPerformed
+    private String getExtensionForSaveFile(Campaign c) {
+        if (c.getPreferGzippedOutput()) {
+            return ".cpnx.gz";
+        }
+        return ".cpnx";
+    }
+
+	private void menuLoadXmlActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_menuLoadActionPerformed
         File f = selectLoadCampaignFile();
         if (null == f) {
             return;

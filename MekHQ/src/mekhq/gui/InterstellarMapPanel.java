@@ -57,22 +57,27 @@ import java.util.Set;
 
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.JRadioButton;
 import javax.swing.JViewport;
 import javax.swing.Timer;
 import javax.vecmath.Vector2d;
 
 import org.joda.time.DateTime;
 
+import megamek.common.Compute;
 import megamek.common.EquipmentType;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
@@ -80,6 +85,7 @@ import mekhq.campaign.JumpPath;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Faction.Tag;
 import mekhq.campaign.universe.Planet;
+import mekhq.campaign.universe.Planet.SocioIndustrialData;
 import mekhq.campaign.universe.Planets;
 import mekhq.gui.dialog.NewPlanetaryEventDialog;
 
@@ -107,6 +113,13 @@ public class InterstellarMapPanel extends JPanel {
     private JButton optionButton;
     
     // Map view options
+    private JRadioButton optFactions;
+    private JRadioButton optTech;
+    private JRadioButton optIndustry;
+    private JRadioButton optRawMaterials;
+    private JRadioButton optOutput;
+    private JRadioButton optAgriculture;
+
     private JCheckBox optEmptySystems;
     private JCheckBox optHPGNetwork;
     private JCheckBox optISWAreas;
@@ -697,20 +710,29 @@ public class InterstellarMapPanel extends JPanel {
                             arc.setArcByCenter(x, y, size * 1.2, 0, 360, Arc2D.OPEN);
                             g2.fill(arc);
                         }
-                        Set<Faction> factions = planet.getFactionSet(now);
-                        if(null != factions && !isPlanetEmpty(planet)) {
-                            int i = 0;
-                            for(Faction faction : factions) {
-                                g2.setPaint(faction.getColor());
-                                arc.setArcByCenter(x, y, size, 0, 360.0 * (1-((double)i)/factions.size()), Arc2D.PIE);
-                                g2.fill(arc);
-                                ++ i;
-                            }
+                        
+                        //if factions are selected then we need to do it differently, because
+                        //of multiple factions per planet
+                        if(isFactionsSelected()) {
+	                        Set<Faction> factions = planet.getFactionSet(now);
+	                        if(null != factions && !isPlanetEmpty(planet)) {
+	                            int i = 0;
+	                            for(Faction faction : factions) {
+	                                g2.setPaint(faction.getColor());
+	                                arc.setArcByCenter(x, y, size, 0, 360.0 * (1-((double)i)/factions.size()), Arc2D.PIE);
+	                                g2.fill(arc);
+	                                ++ i;
+	                            }
+	                        } else {
+	                            // Just a black circle then
+	                            g2.setPaint(new Color(0.0f, 0.0f, 0.0f, 0.5f));
+	                            arc.setArcByCenter(x, y, size, 0, 360.0, Arc2D.PIE);
+	                            g2.fill(arc);
+	                        }
                         } else {
-                            // Just a black circle then
-                            g2.setPaint(new Color(0.0f, 0.0f, 0.0f, 0.5f));
-                            arc.setArcByCenter(x, y, size, 0, 360.0, Arc2D.PIE);
-                            g2.fill(arc);
+	                        g2.setPaint(getPlanetColor(planet));
+	                        arc.setArcByCenter(x, y, size, 0, 360.0, Arc2D.PIE);
+	                        g2.fill(arc);
                         }
                     }
                 }
@@ -748,6 +770,34 @@ public class InterstellarMapPanel extends JPanel {
         Icon checkboxIcon = new ImageIcon("data/images/misc/checkbox_unselected.png");
         Icon checkboxSelectedIcon = new ImageIcon("data/images/misc/checkbox_selected.png");
         
+        optionPanel.add(createLabel("Color:"));
+
+        optFactions = createOptionRadioButton("Faction", checkboxIcon, checkboxSelectedIcon);
+        optionPanel.add(optFactions);
+        optTech = createOptionRadioButton("Technology", checkboxIcon, checkboxSelectedIcon);
+        optionPanel.add(optTech);
+        optIndustry = createOptionRadioButton("Industry", checkboxIcon, checkboxSelectedIcon);
+        optionPanel.add(optIndustry);
+        optRawMaterials = createOptionRadioButton("Raw Materials", checkboxIcon, checkboxSelectedIcon);
+        optionPanel.add(optRawMaterials);
+        optOutput = createOptionRadioButton("Output", checkboxIcon, checkboxSelectedIcon);
+        optionPanel.add(optOutput);
+        optAgriculture = createOptionRadioButton("Agriculture", checkboxIcon, checkboxSelectedIcon);
+        optionPanel.add(optAgriculture);
+
+        ButtonGroup colorChoice = new ButtonGroup();
+        colorChoice.add(optFactions);
+        colorChoice.add(optTech);
+        colorChoice.add(optIndustry);
+        colorChoice.add(optRawMaterials);
+        colorChoice.add(optOutput);
+        colorChoice.add(optAgriculture);
+        
+        //factions by default
+        optFactions.setSelected(true);
+        
+        optionPanel.add(Box.createRigidArea(new Dimension(0,10)));
+        optionPanel.add(createLabel("Options:"));
         optEmptySystems = createOptionCheckBox("Empty systems", checkboxIcon, checkboxSelectedIcon);
         optEmptySystems.setSelected(true);
         optionPanel.add(optEmptySystems);
@@ -804,6 +854,14 @@ public class InterstellarMapPanel extends JPanel {
         super.paintComponent(g);
     }
     
+    private JLabel createLabel(String text) {
+    	JLabel label = new JLabel(text);
+    	label.setOpaque(false);
+    	label.setForeground(new Color(150, 220, 255));
+    	label.setFont(label.getFont().deriveFont(Font.BOLD));
+    	return(label);
+    }
+    
     private JCheckBox createOptionCheckBox(String text, Icon checkboxIcon, Icon checkboxSelectedIcon) {
         JCheckBox checkBox = new JCheckBox(text);
         checkBox.setOpaque(false);
@@ -821,6 +879,25 @@ public class InterstellarMapPanel extends JPanel {
             }
         });
         return checkBox;
+    }
+    
+    private JRadioButton createOptionRadioButton(String text, Icon checkboxIcon, Icon checkboxSelectedIcon) {
+        JRadioButton radioButton = new JRadioButton(text);
+        radioButton.setOpaque(false);
+        radioButton.setForeground(new Color(150, 220, 255));
+        radioButton.setFocusable(false);
+        radioButton.setFont(radioButton.getFont().deriveFont(Font.BOLD));
+        radioButton.setPreferredSize(new Dimension(150, 20));
+        radioButton.setIcon(checkboxIcon);
+        radioButton.setSelectedIcon(checkboxSelectedIcon);
+        radioButton.setSelected(false);
+        radioButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                repaint();
+            }
+        });
+        return radioButton;
     }
     
     private void setupHexPath(GeneralPath path, double centerX, double centerY, double radius) {
@@ -959,6 +1036,121 @@ public class InterstellarMapPanel extends JPanel {
         jumpPath = new JumpPath();
         notifyListeners();
     }
+    
+    /**
+     * Return a planet color based on what the user has selected from the radio button options
+     * @param a Planet object
+     * @return a Color
+     */
+    public Color getPlanetColor(Planet p) {
+    	
+    	//color shading is from https://colorbrewer2.org and should be color-blind safe
+    	
+    	SocioIndustrialData socio = p.getSocioIndustrial(Utilities.getDateTimeDay(campaign.getCalendar()));
+
+    	//just for testing lets randomly fill in missing values
+    	/*if(null == socio) {
+    		socio = new SocioIndustrialData();
+    		socio.tech = Compute.d6(1)-1;
+    		socio.industry = Compute.d6(1)-1;
+    		socio.rawMaterials = Compute.d6(1)-1;
+    		socio.output = Compute.d6(1)-1;
+    		socio.agriculture = Compute.d6(1)-1;
+    	}*/
+    	
+    	if(null != socio && optTech.isSelected()) {
+	    	switch(socio.tech) {
+	    		case EquipmentType.RATING_F:
+	    			return new Color(239,243,255);
+	    		case EquipmentType.RATING_E:
+	    			return new Color(198,219,239);
+	    		case EquipmentType.RATING_D:
+	    			return new Color(158,202,225);
+	    		case EquipmentType.RATING_C:
+	    			return new Color(107,174,214);
+	    		case EquipmentType.RATING_B:
+	    			return new Color(49,130,189);
+	    		case EquipmentType.RATING_A:
+	    			return new Color(8,81,156);
+	    		default: 
+	    			return Color.WHITE;
+	    	}
+    	}
+    	if(null != socio && optIndustry.isSelected()) {
+	    	switch(socio.industry) {
+	    		case EquipmentType.RATING_F:
+	    			return new Color(242,240,247);
+	    		case EquipmentType.RATING_E:
+	    			return new Color(218,218,235);
+	    		case EquipmentType.RATING_D:
+	    			return new Color(188,189,220);
+	    		case EquipmentType.RATING_C:
+	    			return new Color(158,154,200);
+	    		case EquipmentType.RATING_B:
+	    			return new Color(117,107,177);
+	    		case EquipmentType.RATING_A:
+	    			return new Color(84,39,143);
+	    		default: 
+	    			return Color.WHITE;
+	    	}
+    	}
+    	if(null != socio && optRawMaterials.isSelected()) {
+	    	switch(socio.rawMaterials) {
+	    		case EquipmentType.RATING_F:
+	    			return new Color(254,237,222);
+	    		case EquipmentType.RATING_E:
+	    			return new Color(253,208,162);
+	    		case EquipmentType.RATING_D:
+	    			return new Color(253,174,107);
+	    		case EquipmentType.RATING_C:
+	    			return new Color(253,141,60);
+	    		case EquipmentType.RATING_B:
+	    			return new Color(230,85,13);
+	    		case EquipmentType.RATING_A:
+	    			return new Color(166,54,3);
+	    		default: 
+	    			return Color.WHITE;
+	    	}
+    	}
+    	if(null != socio && optOutput.isSelected()) {
+	    	switch(socio.output) {
+	    		case EquipmentType.RATING_F:
+	    			return new Color(254,229,217);
+	    		case EquipmentType.RATING_E:
+	    			return new Color(252,187,161);
+	    		case EquipmentType.RATING_D:
+	    			return new Color(252,146,114);
+	    		case EquipmentType.RATING_C:
+	    			return new Color(251,106,74);
+	    		case EquipmentType.RATING_B:
+	    			return new Color(222,45,38);
+	    		case EquipmentType.RATING_A:
+	    			return new Color(165,15,21);
+	    		default: 
+	    			return Color.WHITE;
+	    	}
+    	}
+    	if(null != socio && optAgriculture.isSelected()) {
+	    	switch(socio.agriculture) {
+	    		case EquipmentType.RATING_F:
+	    			return new Color(237,248,233);
+	    		case EquipmentType.RATING_E:
+	    			return new Color(199,233,192);
+	    		case EquipmentType.RATING_D:
+	    			return new Color(161,217,155);
+	    		case EquipmentType.RATING_C:
+	    			return new Color(116,196,118);
+	    		case EquipmentType.RATING_B:
+	    			return new Color(49,163,84);
+	    		case EquipmentType.RATING_A:
+	    			return new Color(0,109,44);
+	    		default: 
+	    			return Color.WHITE;
+	    	}
+    	}
+    	
+		return Color.GRAY;
+    }
 
     private void openPlanetEventEditor(Planet p) {
         NewPlanetaryEventDialog editor = new NewPlanetaryEventDialog(null, campaign, selectedPlanet);
@@ -1026,6 +1218,10 @@ public class InterstellarMapPanel extends JPanel {
     private void notifyListeners() {
         ActionEvent ev = new ActionEvent(this, ActionEvent.ACTION_FIRST, "refresh");
         listeners.forEach(l -> l.actionPerformed(ev));
+    }
+    
+    public boolean isFactionsSelected() {
+    	return optFactions.isSelected();
     }
 
 }

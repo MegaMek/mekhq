@@ -49,6 +49,7 @@ import java.util.Vector;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultCellEditor;
 import javax.swing.DefaultComboBoxModel;
@@ -84,6 +85,8 @@ import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumn;
 
 import megamek.client.ui.swing.util.PlayerColors;
+import megamek.common.EquipmentType;
+import megamek.common.ITechnology;
 import megamek.common.Player;
 import megamek.common.logging.LogLevel;
 import megamek.common.options.GameOptions;
@@ -162,6 +165,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JLabel lblName;
     private JPanel panGeneral;
     private JPanel panRepair;
+    private JPanel panSupplies;
     private JPanel panTech;
     private JPanel panPersonnel;
     private JPanel panFinances;
@@ -207,6 +211,18 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JCheckBox useExtendedPartsModifierBox;
     private JCheckBox showPeacetimeCostBox;
     private JCheckBox chkAssignPortraitOnRoleChange;
+
+    //planetary acquisitions
+    private JCheckBox usePlanetaryAcquisitions;
+    private JSpinner spnMaxJumpPlanetaryAcquisitions;
+    private JComboBox<String> comboPlanetaryAcquisitionsFactionLimits;
+    private JCheckBox disallowPlanetaryAcquisitionClanCrossover;
+    private JCheckBox usePlanetaryAcquisitionsVerbose;
+    private JSpinner[] spnPlanetAcquireTechBonus;
+    private JSpinner[] spnPlanetAcquireIndustryBonus;
+    private JSpinner[] spnPlanetAcquireOutputBonus;
+    private JCheckBox disallowClanPartsFromIS;
+    private JSpinner spnPenaltyClanPartsFromIS;
 
     private JTextField[] txtSalaryBase;
     private JSpinner[] spnSalaryXp;
@@ -456,7 +472,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         this.rskillPrefs = c.getRandomSkillPreferences();
         //this is a hack but I have no idea what is going on here
         this.frame = parent;
-        this.date = campaign.calendar;
+        this.date = campaign.getCalendar();
         dateFormat = new SimpleDateFormat("EEEE, MMMM d yyyy");
         this.camoCategory = campaign.getCamoCategory();
         this.camoFileName = campaign.getCamoFileName();
@@ -508,6 +524,11 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         showPeacetimeCostBox.setSelected(options.showPeacetimeCost());
         chkAssignPortraitOnRoleChange.setSelected(options.getAssignPortraitOnRoleChange());
 
+        usePlanetaryAcquisitions.setSelected(options.usesPlanetaryAcquisition());
+        disallowPlanetaryAcquisitionClanCrossover.setSelected(options.disallowPlanetAcquisitionClanCrossover());
+        disallowClanPartsFromIS.setSelected(options.disallowClanPartsFromIS());
+        usePlanetaryAcquisitionsVerbose.setSelected(options.usePlanetAcquisitionVerboseReporting());
+        
         useDamageMargin.setSelected(options.isDestroyByMargin());
         useAeroSystemHitsBox.setSelected(options.useAeroSystemHits());
         useQualityMaintenance.setSelected(options.useQualityMaintenance());
@@ -558,6 +579,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         btnCamo = new JButton();
         lblCamo = new JLabel();
         panRepair = new JPanel();
+        panSupplies = new JPanel();
         panPersonnel = new JPanel();
         panFinances = new JPanel();
         panMercenary = new JPanel();
@@ -627,6 +649,13 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         btnCancel = new JButton();
         scrRanks = new JScrollPane();
 
+        usePlanetaryAcquisitions = new JCheckBox();
+        usePlanetaryAcquisitionsVerbose = new JCheckBox();
+        disallowPlanetaryAcquisitionClanCrossover = new JCheckBox();
+        comboPlanetaryAcquisitionsFactionLimits = new JComboBox<String>();
+        disallowClanPartsFromIS = new JCheckBox();
+
+        
         useDamageMargin = new JCheckBox();
         useAeroSystemHitsBox = new JCheckBox();
         useQualityMaintenance = new JCheckBox();
@@ -785,13 +814,9 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
         JPanel panSubRepair = new JPanel(new GridBagLayout());
         JPanel panSubMaintenance = new JPanel(new GridBagLayout());
-        JPanel panSubAcquire = new JPanel(new GridBagLayout());
-        JPanel panSubDelivery = new JPanel(new GridBagLayout());
-
+       
         panSubRepair.setBorder(BorderFactory.createTitledBorder("Repair"));
         panSubMaintenance.setBorder(BorderFactory.createTitledBorder("Maintenance"));
-        panSubAcquire.setBorder(BorderFactory.createTitledBorder("Acquisition"));
-        panSubDelivery.setBorder(BorderFactory.createTitledBorder("Delivery"));
         
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -804,25 +829,10 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.weightx = .5;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        panRepair.add(panSubAcquire, gridBagConstraints);
-        
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         panRepair.add(panSubMaintenance, gridBagConstraints);
-        
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        panRepair.add(panSubDelivery, gridBagConstraints);
-        
+
         //We want the new mass repair panel to span two cells
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -830,6 +840,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.weighty = 1;
         gridBagConstraints.gridwidth = GridBagConstraints.REMAINDER;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        
 
         useEraModsCheckBox.setText(resourceMap.getString("useEraModsCheckBox.text")); // NOI18N
         useEraModsCheckBox.setToolTipText(resourceMap.getString("useEraModsCheckBox.toolTipText")); // NOI18N
@@ -1060,6 +1071,45 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panSubMaintenance.add(logMaintenance, gridBagConstraints);
 
+        tabOptions.addTab(resourceMap.getString("panRepair.TabConstraints.tabTitle"), panRepair); // NOI18N
+        
+        panSupplies.setName("panSupplies"); // NOI18N
+        panSupplies.setLayout(new java.awt.GridBagLayout());
+
+        JPanel panSubAcquire = new JPanel(new GridBagLayout());
+        JPanel panSubDelivery = new JPanel(new GridBagLayout());
+        JPanel panSubPlanetAcquire = new JPanel(new GridBagLayout());
+
+        panSubAcquire.setBorder(BorderFactory.createTitledBorder("Acquisition"));
+        panSubDelivery.setBorder(BorderFactory.createTitledBorder("Delivery"));
+        panSubPlanetAcquire.setBorder(BorderFactory.createTitledBorder("Planetary Acquisition"));
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.weightx = .5;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        panSupplies.add(panSubAcquire, gridBagConstraints);
+        
+        
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.weightx = .5;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        panSupplies.add(panSubDelivery, gridBagConstraints);
+        
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        panSupplies.add(panSubPlanetAcquire, gridBagConstraints);
+        
+        
         spnAcquireWaitingPeriod = new JSpinner(new SpinnerNumberModel(options.getWaitingPeriod(), 1, 365, 1));
         ((JSpinner.DefaultEditor) spnAcquireWaitingPeriod.getEditor()).getTextField().setEditable(false);
 
@@ -1228,7 +1278,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.weighty = 0.0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panSubDelivery.add(pnlMinTransit, gridBagConstraints);
-
+        
         JPanel pnlMosBonus = new JPanel();
         pnlMosBonus.add(new JLabel("Reduce delivery time by"));
         pnlMosBonus.add(spnAcquireMosBonus);
@@ -1243,8 +1293,158 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panSubDelivery.add(pnlMosBonus, gridBagConstraints);
+                
+        usePlanetaryAcquisitions.setText(resourceMap.getString("usePlanetaryAcquisitions.text")); // NOI18N
+        usePlanetaryAcquisitions.setToolTipText(resourceMap.getString("usePlanetaryAcquisitions.toolTipText")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.weightx = 0.0;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panSubPlanetAcquire.add(usePlanetaryAcquisitions, gridBagConstraints);
+        
+        spnMaxJumpPlanetaryAcquisitions = new JSpinner(new SpinnerNumberModel(options.getMaxJumpsPlanetaryAcquisition(), 0, 5, 1));
+        JPanel panMaxJump = new JPanel();
+        panMaxJump.add(spnMaxJumpPlanetaryAcquisitions);
+        panMaxJump.add(new JLabel("Maximum number of jumps away to search for supplies"));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.weightx = 0.0;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panSubPlanetAcquire.add(panMaxJump, gridBagConstraints);
+        
+        DefaultComboBoxModel<String> factionLimitComboBoxModel = new DefaultComboBoxModel<String>();
+        factionLimitComboBoxModel.addElement(CampaignOptions.getFactionLimitName(CampaignOptions.PLANET_ACQUISITION_ALL));
+        factionLimitComboBoxModel.addElement(CampaignOptions.getFactionLimitName(CampaignOptions.PLANET_ACQUISITION_NEUTRAL));
+        factionLimitComboBoxModel.addElement(CampaignOptions.getFactionLimitName(CampaignOptions.PLANET_ACQUISITION_ALLY));
+        factionLimitComboBoxModel.addElement(CampaignOptions.getFactionLimitName(CampaignOptions.PLANET_ACQUISITION_SELF));
+        comboPlanetaryAcquisitionsFactionLimits.setModel(factionLimitComboBoxModel);
+        comboPlanetaryAcquisitionsFactionLimits.setSelectedIndex(options.getPlanetAcquisitionFactionLimit());
+        JPanel panFactionLimit = new JPanel();
+        panFactionLimit.add(new JLabel("Faction supply limitations"));
+        panFactionLimit.add(comboPlanetaryAcquisitionsFactionLimits);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.weightx = 0.0;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panSubPlanetAcquire.add(panFactionLimit, gridBagConstraints);
+        
+        disallowPlanetaryAcquisitionClanCrossover.setText(resourceMap.getString("disallowPlanetaryAcquisitionClanCrossover.text")); // NOI18N
+        disallowPlanetaryAcquisitionClanCrossover.setToolTipText(resourceMap.getString("disallowPlanetaryAcquisitionClanCrossover.toolTipText")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.weightx = 0.0;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panSubPlanetAcquire.add(disallowPlanetaryAcquisitionClanCrossover, gridBagConstraints);
+        
+        disallowClanPartsFromIS.setText(resourceMap.getString("disallowClanPartsFromIS.text")); // NOI18N
+        disallowClanPartsFromIS.setToolTipText(resourceMap.getString("disallowClanPartsFromIS.toolTipText")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.weightx = 0.0;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panSubPlanetAcquire.add(disallowClanPartsFromIS, gridBagConstraints);
+        
+        spnPenaltyClanPartsFromIS = new JSpinner(new SpinnerNumberModel(options.getPenaltyClanPartsFroIS(), 0, 12, 1));
+        JPanel panPenaltyClanPartsFromIS = new JPanel();
+        panPenaltyClanPartsFromIS.add(spnPenaltyClanPartsFromIS);
+        JLabel lblPenaltyClanPartsFromIS = new JLabel(resourceMap.getString("spnPenaltyClanPartsFromIS.text"));
+        lblPenaltyClanPartsFromIS.setToolTipText(resourceMap.getString("spnPenaltyClanPartsFromIS.toolTipText")); // NOI18N
+        panPenaltyClanPartsFromIS.add(lblPenaltyClanPartsFromIS);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 5;
+        gridBagConstraints.weightx = 0.0;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panSubPlanetAcquire.add(panPenaltyClanPartsFromIS, gridBagConstraints);
+        
+        usePlanetaryAcquisitionsVerbose.setText(resourceMap.getString("usePlanetaryAcquisitionsVerbose.text")); // NOI18N
+        usePlanetaryAcquisitionsVerbose.setToolTipText(resourceMap.getString("usePlanetaryAcquisitionsVerbose.toolTipText")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 6;
+        gridBagConstraints.weightx = 0.0;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panSubPlanetAcquire.add(usePlanetaryAcquisitionsVerbose, gridBagConstraints);
+        
+        JPanel panSocioIndustrialBonus = new JPanel();
+        panSocioIndustrialBonus.setLayout(new BoxLayout(panSocioIndustrialBonus, BoxLayout.LINE_AXIS));
+        panSocioIndustrialBonus.setBorder(BorderFactory.createTitledBorder("Planet socio-industrial modifiers "));
 
-        tabOptions.addTab(resourceMap.getString("panRepair.TabConstraints.tabTitle"), panRepair); // NOI18N
+        JPanel panTechBonus = new JPanel(new GridBagLayout());
+        JPanel panIndustryBonus = new JPanel(new GridBagLayout());
+        JPanel panOutputBonus = new JPanel(new GridBagLayout());
+
+        spnPlanetAcquireTechBonus = new JSpinner[6];
+        spnPlanetAcquireIndustryBonus = new JSpinner[6];
+        spnPlanetAcquireOutputBonus = new JSpinner[6];
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridwidth = 2;
+        panTechBonus.add(new JLabel("<html><b>Tech<b></html>"), gridBagConstraints);
+        panIndustryBonus.add(new JLabel("<html><b>Industry<b></html>"), gridBagConstraints);
+        panOutputBonus.add(new JLabel("<html><b>Output<b></html>"), gridBagConstraints);
+        for (int i = EquipmentType.RATING_A; i <= EquipmentType.RATING_F; i++) {
+            gridBagConstraints.gridwidth = 1;
+            gridBagConstraints.gridy++;
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.insets = new Insets(0, 20, 0, 0);
+            panTechBonus.add(new JLabel(ITechnology.getRatingName(i) + " Level"), gridBagConstraints);
+            panIndustryBonus.add(new JLabel(ITechnology.getRatingName(i) + " Level"), gridBagConstraints);
+            panOutputBonus.add(new JLabel(ITechnology.getRatingName(i) + " Level"), gridBagConstraints);
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+            spnPlanetAcquireTechBonus[i] = new JSpinner(new SpinnerNumberModel(options.getPlanetTechAcquisitionBonus(i), -12, 12, 1));
+            spnPlanetAcquireIndustryBonus[i] = new JSpinner(new SpinnerNumberModel(options.getPlanetIndustryAcquisitionBonus(i), -12, 12, 1));
+            spnPlanetAcquireOutputBonus[i] = new JSpinner(new SpinnerNumberModel(options.getPlanetOutputAcquisitionBonus(i), -12, 12, 1));
+            ((JSpinner.DefaultEditor) spnPlanetAcquireTechBonus[i].getEditor()).getTextField().setEditable(false);
+            ((JSpinner.DefaultEditor) spnPlanetAcquireIndustryBonus[i].getEditor()).getTextField().setEditable(false);
+            ((JSpinner.DefaultEditor) spnPlanetAcquireOutputBonus[i].getEditor()).getTextField().setEditable(false);
+
+            panTechBonus.add(spnPlanetAcquireTechBonus[i], gridBagConstraints);
+            panOutputBonus.add(spnPlanetAcquireOutputBonus[i], gridBagConstraints);
+            panIndustryBonus.add(spnPlanetAcquireIndustryBonus[i], gridBagConstraints);
+
+        }
+        
+        
+        panSocioIndustrialBonus.add(panTechBonus);
+        panSocioIndustrialBonus.add(panIndustryBonus);
+        panSocioIndustrialBonus.add(panOutputBonus);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.weightx = 0.0;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.gridheight = 7;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panSubPlanetAcquire.add(panSocioIndustrialBonus, gridBagConstraints);
+        
+        
+        tabOptions.addTab(resourceMap.getString("panSupplies.TabConstraints.tabTitle"), panSupplies); // NOI18N
 
         panTech.setName("panTech"); // NOI18N
         panTech.setLayout(new java.awt.GridBagLayout());
@@ -4408,7 +4608,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
     private void updateOptions() {
     	campaign.setName(txtName.getText());
-    	campaign.calendar = date;
+    	campaign.setCalendar(date);
         // Ensure that the MegaMek year GameOption matches the campaign year
         GameOptions gameOpts = campaign.getGameOptions();
         int campaignYear = campaign.getCalendar().get(Calendar.YEAR);
@@ -4525,7 +4725,19 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setAcquireMinimumTime((Integer) spnAcquireMinimum.getModel().getValue());
         options.setAcquireMinimumTimeUnit(choiceAcquireMinimumUnit.getSelectedIndex());
         options.setAcquireMosUnit(choiceAcquireMosUnits.getSelectedIndex());
+        options.setPlanetaryAcquisition(usePlanetaryAcquisitions.isSelected());
+        options.setDisallowClanPartsFromIS(disallowClanPartsFromIS.isSelected());
+        options.setPlanetAcquisitionVerboseReporting(usePlanetaryAcquisitionsVerbose.isSelected());
+        options.setDisallowPlanetAcquisitionClanCrossover(disallowPlanetaryAcquisitionClanCrossover.isSelected());
+        options.setMaxJumpsPlanetaryAcquisition((int)spnMaxJumpPlanetaryAcquisitions.getModel().getValue());
+        options.setPenaltyClanPartsFroIS((int)spnPenaltyClanPartsFromIS.getModel().getValue());
+        options.setPlanetAcquisitionFactionLimit(comboPlanetaryAcquisitionsFactionLimits.getSelectedIndex());
+        for (int i = ITechnology.RATING_A; i <= ITechnology.RATING_F; i++) {
+            options.setPlanetTechAcquisitionBonus((int)spnPlanetAcquireTechBonus[i].getModel().getValue(), i);
+            options.setPlanetIndustryAcquisitionBonus((int)spnPlanetAcquireIndustryBonus[i].getModel().getValue(), i);
+            options.setPlanetOutputAcquisitionBonus((int)spnPlanetAcquireOutputBonus[i].getModel().getValue(), i);
 
+        }
 
         options.setScenarioXP((Integer) spnScenarioXP.getModel().getValue());
         options.setKillsForXP((Integer) spnKills.getModel().getValue());

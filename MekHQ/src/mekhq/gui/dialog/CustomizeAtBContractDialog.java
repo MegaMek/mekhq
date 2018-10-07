@@ -188,8 +188,10 @@ public class CustomizeAtBContractDialog extends JDialog {
     	btnEnemyCamo = new JButton();
         JLabel lblEnemyRating = new JLabel();
     	JLabel lblRequiredLances = new JLabel();
-    	spnRequiredLances = new JSpinner(new SpinnerNumberModel(contract.getRequiredLances(), 1,
-    			null, 1));
+    	
+    	int requiredLances = contract.getRequiredLances() > 0 ? contract.getRequiredLances() : 1; 
+    	
+    	spnRequiredLances = new JSpinner(new SpinnerNumberModel(requiredLances, 1, null, 1));
     	JLabel lblEnemyMorale = new JLabel();
         spnContractScoreArbitraryModifier = new JSpinner(
                 new SpinnerNumberModel(contract.getContractScoreArbitraryModifier(),

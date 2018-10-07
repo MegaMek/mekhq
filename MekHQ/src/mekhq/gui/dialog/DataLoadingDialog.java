@@ -48,6 +48,7 @@ import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.NullEntityException;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignFactory;
 import mekhq.campaign.GamePreset;
 import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.mod.am.InjuryTypes;
@@ -190,9 +191,10 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
 
         		try {
         			fis = new FileInputStream(fileCampaign);
-        			campaign = Campaign.createCampaignFromXMLFileInputStream(fis, app);
+        			campaign = CampaignFactory.newInstance(app).createCampaign(fis);
         			// Restores all transient attributes from serialized objects
         			campaign.restore();
+        			campaign.cleanUp();
         			fis.close();
         		} catch (NullEntityException ex) {
         			JOptionPane.showMessageDialog(null,
@@ -223,10 +225,10 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
             setProgress(4);
             if(newCampaign) {
             	// show the date chooser
-                DateChooser dc = new DateChooser(frame, campaign.calendar);
+                DateChooser dc = new DateChooser(frame, campaign.getCalendar());
                 // user can either choose a date or cancel by closing
                 if (dc.showDateChooser() == DateChooser.OK_OPTION) {
-                	campaign.calendar = dc.getDate();
+                	campaign.setCalendar(dc.getDate());
                 	// Ensure that the MegaMek year GameOption matches the campaign year
                     GameOptions gameOpts = campaign.getGameOptions();
                     int campaignYear = campaign.getCalendar().get(Calendar.YEAR);

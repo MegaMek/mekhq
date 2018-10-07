@@ -34,6 +34,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -50,17 +51,14 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.joda.time.DateTime;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Node;
-import org.xml.sax.SAXException;
 
 import megamek.common.EquipmentType;
 import megamek.common.logging.LogLevel;
 import megamek.common.util.EncodeControl;
-import mekhq.FileParser;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
@@ -171,6 +169,49 @@ public class Planets {
     
     public List<Planet> getNearbyPlanets(final Planet planet, int distance) {
         return getNearbyPlanets(planet.getX(), planet.getY(), distance);
+    }
+    
+    /**
+     * Get a list of planets within a certain jump radius (30ly per jump) that 
+     * you can shop on, sorted by number of jumps and in system transit time
+     * @param planet
+     * @param jumps
+     * @return a list of planets where you can go shopping
+     */
+    public List<Planet> getShoppingPlanets(final Planet planet, int jumps, DateTime when) {
+    	
+    	List<Planet> shoppingPlanets = getNearbyPlanets(planet, jumps*30);
+    	
+    	//remove dead planets
+    	Iterator<Planet> iter = shoppingPlanets.iterator();
+    	while (iter.hasNext()) {
+    	  Planet p = iter.next();
+    	  if (p.isEmpty(when)) {
+    		  iter.remove();
+    	  }
+    	}
+    	
+    	Collections.sort(shoppingPlanets, new Comparator<Planet>() {
+            @Override
+            public int compare(final Planet p1, final Planet p2) {
+            	
+            	//sort first on number of jumps required
+            	int jump1 = (int)Math.ceil(p1.getDistanceTo(planet)/30.0);
+            	int jump2 = (int)Math.ceil(p2.getDistanceTo(planet)/30.0);
+            	int sComp = Integer.compare(jump1, jump2);
+
+                if (sComp != 0) {
+                   return sComp;
+                } 
+                
+                //if number of jumps the same then sort on in system transit time
+                return Double.compare(p1.getTimeToJumpPoint(1.0), p2.getTimeToJumpPoint(1.0));
+                
+            }
+        });
+    	
+    	return shoppingPlanets;
+    	
     }
 
     public ConcurrentMap<String, Planet> getPlanets() {
@@ -380,8 +421,6 @@ public class Planets {
                     planetList.remove(planetId);
                 }
             }
-        } catch (SAXException | ParserConfigurationException e) {
-            MekHQ.getLogger().error(getClass(), METHOD_NAME, e);
         } catch (JAXBException e) {
             MekHQ.getLogger().error(getClass(), METHOD_NAME, e);
         } catch(IOException e) {
@@ -707,13 +746,7 @@ public class Planets {
             }
             
             // Step 3: Load all the xml files within the planets subdirectory, if it exists
-            Utilities.parseXMLFiles(planetsPath, //$NON-NLS-1$
-                    new FileParser() {
-                        @Override
-                        public void parse(FileInputStream is) {
-                            updatePlanets(is);
-                        }
-                    });
+            Utilities.parseXMLFiles(planetsPath, this::updatePlanets);
             
             List<Planet> toRemove = new ArrayList<>();
             for (Planet planet : planetList.values()) {

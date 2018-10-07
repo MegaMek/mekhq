@@ -38,6 +38,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.ResourceBundle;
@@ -59,6 +61,8 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
+
+import org.apache.log4j.Logger;
 
 import megamek.common.util.EncodeControl;
 import mekhq.campaign.Campaign;
@@ -116,19 +120,20 @@ public class ContractMarketDialog extends JDialog {
 	private JLabel lblRetainerAvailable;
 	private FactionComboBox cbRetainerEmployer;
 	private JButton btnStartRetainer;
-	
-	public ContractMarketDialog(Frame frame, Campaign c) {
-		super(frame, true);
-		campaign = c;
-		contractMarket = c.getContractMarket();
-		possibleRetainerContracts = new ArrayList<String>();
-		if (c.getFactionCode().equals("MERC")) {
-			countSuccessfulContracts();
-		}
-		
+
+	private static final Logger log = Logger.getLogger(ContractMarketDialog.class);
+
+    public ContractMarketDialog(Frame frame, Campaign c) {
+        super(frame, true);
+        campaign = c;
+        contractMarket = c.getContractMarket();
+        possibleRetainerContracts = new ArrayList<>();
+        if (c.getFactionCode().equals("MERC")) { //$NON-NLS-1$
+            countSuccessfulContracts();
+        }
         initComponents();
         setLocationRelativeTo(frame);
-	}
+    }
 
 	/* A balance of six or more successful contracts with the same
 	 * employer results in the offer of a retainer contract.
@@ -231,8 +236,6 @@ public class ContractMarketDialog extends JDialog {
 			}
 		});
 		
-		tblContracts = new JTable();
-		
 		lblCurrentRetainer = new JLabel();
 		lblRetainerEmployer = new JLabel();
 		btnEndRetainer = new JButton();
@@ -305,18 +308,26 @@ public class ContractMarketDialog extends JDialog {
 		colNames.add("Employer");
 		colNames.add("Enemy");
 		colNames.add("Mission Type");
-		tblContracts.setModel(new DefaultTableModel(data, colNames));
-		tblContracts.setName("tblContracts"); // NOI18N
-		tblContracts.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		tblContracts.createDefaultColumnsFromModel();
-		tblContracts.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-		tblContracts.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-			public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
-				if (!evt.getValueIsAdjusting()) {
-					contractChanged();
-				}
-			}
-		});
+
+        tblContracts = new JTable();
+        DefaultTableModel tblContractsModel = new DefaultTableModel(data, colNames) {
+            private static final long serialVersionUID = 1L;
+            @Override public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+        tblContracts.setModel(tblContractsModel);
+        tblContracts.setName("tblContracts"); // NOI18N
+        tblContracts.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        tblContracts.createDefaultColumnsFromModel();
+        tblContracts.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+        tblContracts.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            @Override public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
+                if (!evt.getValueIsAdjusting()) {
+                    contractChanged();
+                }
+            }
+        });
 
         tblContracts.setIntercellSpacing(new Dimension(0, 0));
         tblContracts.setShowGrid(false);

@@ -217,17 +217,22 @@ public class StructuralIntegrity extends Part {
         updateConditionFromEntity(false);
     }
 
-	@Override
-	public String getLocationName() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public String getLocationName() {
+        if (null != unit) {
+            return unit.getEntity().getLocationName(unit.getEntity().getBodyLocation());
+        }
+        return null;
+    }
 
-	@Override
-	public int getLocation() {
-		return Entity.LOC_NONE;
-	}
-	
+    @Override
+    public int getLocation() {
+        if (null != unit) {
+            return unit.getEntity().getBodyLocation();
+        }
+        return Entity.LOC_NONE;
+    }
+    
 	@Override
 	public TechAdvancement getTechAdvancement() {
 	    if (null == getUnit()) {
