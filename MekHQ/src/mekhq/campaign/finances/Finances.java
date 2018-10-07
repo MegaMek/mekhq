@@ -203,7 +203,8 @@ public class Finances implements Serializable {
             asset.writeToXml(pw1, indent+1);
         }
         if (null != wentIntoDebt) {
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "wentIntoDebt", MekHqXmlUtil.formatDate(wentIntoDebt));
+            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "wentIntoDebt", df.format(wentIntoDebt));
         }
         pw1.println(MekHqXmlUtil.indentStr(indent) + "</finances>");
     }
@@ -222,10 +223,15 @@ public class Finances implements Serializable {
             } else if (wn2.getNodeName().equalsIgnoreCase("loanDefaults")) {
                 retVal.loanDefaults = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("wentIntoDebt")) {
+                SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
                 try {
-                    retVal.wentIntoDebt = MekHqXmlUtil.parseDate(wn2.getTextContent());
+                    retVal.wentIntoDebt = df.parse(wn2.getTextContent().trim());
+                } catch (DOMException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
                 } catch (ParseException e) {
-                    MekHQ.getLogger().error(Finances.class, "generateInstanceFromXML", "Could not parse <wentIntoDebt>", e);
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
                 }
             }
         }

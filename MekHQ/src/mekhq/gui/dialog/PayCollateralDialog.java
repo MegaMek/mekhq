@@ -32,7 +32,6 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.UUID;
@@ -160,7 +159,7 @@ public class PayCollateralDialog extends JDialog {
         i = 0;
         j = 0;
         JSlider partSlider;
-        List<Part> spareParts = campaign.getSpareParts();
+        ArrayList<Part> spareParts = campaign.getSpareParts();
         for(Part p : spareParts) {
             j++;
             int quantity = p.getQuantity();

@@ -711,15 +711,9 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 		}
 
 		try {
-			long timestamp = System.currentTimeMillis();
-
 			// Instantiate the correct child class, and call its parsing function.
 			retVal = (Part) Class.forName(className).newInstance();
 			retVal.loadFieldsFromXmlNode(wn);
-
-			MekHQ.getLogger().debug(Part.class, METHOD_NAME,
-				className + " " + (System.currentTimeMillis() - timestamp) + " ms"); //$NON-NLS-1$
-			timestamp = System.currentTimeMillis();
 
 			// Okay, now load Part-specific fields!
 			NodeList nl = wn.getChildNodes();
@@ -804,9 +798,6 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
                     retVal.childPartIds.add(Integer.parseInt(wn2.getTextContent()));
                 }
 			}
-
-			MekHQ.getLogger().debug(Part.class, METHOD_NAME, 
-			"After " + className + " " + (System.currentTimeMillis() - timestamp) + " ms"); //$NON-NLS-1$
 		} catch (Exception ex) {
 			// Errrr, apparently either the class name was invalid...
 			// Or the listed name doesn't exist.

@@ -37,7 +37,6 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -1536,10 +1535,6 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     }
 
     public static Unit generateInstanceFromXML(Node wn, Version version) {
-        return generateInstanceFromXML(wn, version, null);
-    }
-
-    public static Unit generateInstanceFromXML(Node wn, Version version, Map<Node, Entity> mappedEntities) {
         final String METHOD_NAME = "generateInstanceFromXML(Node,Version)"; //$NON-NLS-1$
 
         Unit retVal = new Unit();
@@ -1623,12 +1618,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     else
                         retVal.mothballed = false;
                 } else if (wn2.getNodeName().equalsIgnoreCase("entity")) {
-                    Entity e = mappedEntities != null ? mappedEntities.get(wn2) : null;
-                    if (e == null) {
-                        retVal.entity = MekHqXmlUtil.parseSingleEntityMul((Element)wn2);
-                    } else {
-                        retVal.entity = e;
-                    }
+                    retVal.entity = MekHqXmlUtil.getEntityFromXmlString(wn2);
                 } else if (wn2.getNodeName().equalsIgnoreCase("refit")) {
                     retVal.refit = Refit.generateInstanceFromXML(wn2, retVal, version);
                 } else if (wn2.getNodeName().equalsIgnoreCase("history")) {

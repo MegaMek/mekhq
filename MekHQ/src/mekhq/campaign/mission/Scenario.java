@@ -266,6 +266,7 @@ public class Scenario implements Serializable {
     }
     
     protected void writeToXmlBegin(PrintWriter pw1, int indent) {
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         pw1.println(MekHqXmlUtil.indentStr(indent) + "<scenario id=\""
                 +id
                 +"\" type=\""
@@ -304,7 +305,7 @@ public class Scenario implements Serializable {
         if(null != date) {
             pw1.println(MekHqXmlUtil.indentStr(indent+1)
                     +"<date>"
-                    +MekHqXmlUtil.formatDate(date)
+                    +df.format(date)
                     +"</date>");
         }
     }
@@ -324,6 +325,7 @@ public class Scenario implements Serializable {
         NamedNodeMap attrs = wn.getAttributes();
         Node classNameNode = attrs.getNamedItem("type");
         String className = classNameNode.getTextContent();
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         
         try {
             // Instantiate the correct child class, and call its parsing function.
@@ -383,7 +385,7 @@ public class Scenario implements Serializable {
                 } else if (wn2.getNodeName().equalsIgnoreCase("forceStub")) {
                     retVal.stub = ForceStub.generateInstanceFromXML(wn2);
                 } else if (wn2.getNodeName().equalsIgnoreCase("date")) {
-                    retVal.date = MekHqXmlUtil.parseDate(wn2.getTextContent());
+                    retVal.date = df.parse(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("loots")) {
                     NodeList nl2 = wn2.getChildNodes();
                     for (int y=0; y<nl2.getLength(); y++) {

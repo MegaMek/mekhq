@@ -35,14 +35,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.Vector;
 
 import javax.xml.parsers.DocumentBuilder;
 
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -51,7 +49,6 @@ import megamek.common.Entity;
 import megamek.common.EntityMovementMode;
 import megamek.common.EquipmentType;
 import megamek.common.Jumpship;
-import megamek.common.MULParser;
 import megamek.common.Mech;
 import megamek.common.MechSummaryCache;
 import megamek.common.MiscType;
@@ -208,7 +205,6 @@ public class CampaignXmlParser {
         MechSummaryCache.getInstance().loadMechData();
 
         // the second time to check for any null entities
-        Map<Node, Entity> mappedEntities = new HashMap<>();
         for (int x = 0; x < nl.getLength(); x++) {
             Node wn = nl.item(x);
 
@@ -226,7 +222,7 @@ public class CampaignXmlParser {
                 String xn = wn.getNodeName();
 
                 if (xn.equalsIgnoreCase("units")) {
-                    String missingList = checkUnits(wn, mappedEntities);
+                    String missingList = checkUnits(wn);
                     if (null != missingList) {
                         throw new NullEntityException(missingList);
                     }
@@ -279,7 +275,7 @@ public class CampaignXmlParser {
                 } else if (xn.equalsIgnoreCase("ancestors")) {
                     processAncestorNodes(retVal, wn, version);
                 } else if (xn.equalsIgnoreCase("units")) {
-                    processUnitNodes(retVal, wn, version, mappedEntities);
+                    processUnitNodes(retVal, wn, version);
                 } else if (xn.equalsIgnoreCase("missions")) {
                     processMissionNodes(retVal, wn, version);
                 } else if (xn.equalsIgnoreCase("forces")) {
@@ -318,7 +314,7 @@ public class CampaignXmlParser {
                     retVal.setRetirementDefectionTracker(RetirementDefectionTracker.generateInstanceFromXML(wn, retVal));
                 } else if (xn.equalsIgnoreCase("shipSearchStart")) {
                     Calendar c = new GregorianCalendar();
-                    c.setTime(parseDate(wn.getTextContent()));
+                    c.setTime(parseDate(retVal.getShortDateFormatter(), wn.getTextContent()));
                     retVal.setShipSearchStart(c);
                 } else if (xn.equalsIgnoreCase("shipSearchType")) {
                     retVal.setShipSearchType(Integer.parseInt(wn.getTextContent()));
@@ -326,7 +322,7 @@ public class CampaignXmlParser {
                     retVal.setShipSearchResult(wn.getTextContent());
                 } else if (xn.equalsIgnoreCase("shipSearchExpiration")) {
                     Calendar c = new GregorianCalendar();
-                    c.setTime(parseDate(wn.getTextContent()));
+                    c.setTime(parseDate(retVal.getShortDateFormatter(), wn.getTextContent()));
                     retVal.setShipSearchExpiration(c);
                 } else if (xn.equalsIgnoreCase("customPlanetaryEvents")) {
                     updatePlanetaryEventsFromXML(wn);
@@ -703,6 +699,7 @@ public class CampaignXmlParser {
         MekHQ.getLogger().log(CampaignXmlParser.class, METHOD_NAME, LogLevel.INFO,
                 String.format("[Campaign Load] News loaded in %dms", //$NON-NLS-1$
                         System.currentTimeMillis() - timestamp));
+        timestamp = System.currentTimeMillis();
 
         // If we don't have a personnel market, create one.
         if (!foundPersonnelMarket) {
@@ -724,15 +721,15 @@ public class CampaignXmlParser {
 
         //**EVERYTHING HAS BEEN LOADED. NOW FOR SANITY CHECKS**//
 
-        timestamp = System.currentTimeMillis();
-        
         //unload any ammo bins in the warehouse
-        for (Part sparePart : retVal.getSpareParts()) {
-            if (sparePart instanceof AmmoBin 
-                && !sparePart.isReservedForRefit()
-                && ((AmmoBin) sparePart).getShotsNeeded() == 0) {
-                ((AmmoBin) sparePart).unload();
+        ArrayList<AmmoBin> binsToUnload = new ArrayList<AmmoBin>();
+        for(Part prt : retVal.getSpareParts()) {
+            if (prt instanceof AmmoBin && !prt.isReservedForRefit() && ((AmmoBin) prt).getShotsNeeded() == 0) {
+                binsToUnload.add((AmmoBin) prt);
             }
+        }
+        for(AmmoBin bin : binsToUnload) {
+            bin.unload();
         }
 
         MekHQ.getLogger().log(CampaignXmlParser.class, METHOD_NAME, LogLevel.INFO,
@@ -838,9 +835,11 @@ public class CampaignXmlParser {
                 // handle it.
                 // They're all primitives anyway...
                 if (xn.equalsIgnoreCase("calendar")) {
+                    SimpleDateFormat df = new SimpleDateFormat(
+                            "yyyy-MM-dd hh:mm:ss");
                     GregorianCalendar c = (GregorianCalendar) GregorianCalendar
                             .getInstance();
-                    c.setTime(parseDate(wn.getTextContent()));
+                    c.setTime(parseDate(df, wn.getTextContent().trim()));
                     retVal.setCalendar(c);
                 } else if (xn.equalsIgnoreCase("camoCategory")) {
                     String val = wn.getTextContent().trim();
@@ -991,9 +990,9 @@ public class CampaignXmlParser {
         retVal.setNewReports(newReports);
     }
 
-    private static Date parseDate(String value) throws CampaignXmlParseException {
+    private static Date parseDate(DateFormat df, String value) throws CampaignXmlParseException {
         try {
-            return MekHqXmlUtil.parseDate(value);
+            return df.parse(value);
         } catch (ParseException e) {
             throw new CampaignXmlParseException("Could not parse date: " + value, e);
         }
@@ -1522,7 +1521,7 @@ public class CampaignXmlParser {
                 "Load Mission Nodes Complete!"); //$NON-NLS-1$
     }
 
-    private static String checkUnits(Node wn, Map<Node, Entity> mappedEntities) {
+    private static String checkUnits(Node wn) {
         final String METHOD_NAME = "checkUnits(Node)"; //$NON-NLS-1$
 
         MekHQ.getLogger().log(CampaignXmlParser.class, METHOD_NAME, LogLevel.INFO, //$NON-NLS-1$
@@ -1550,14 +1549,12 @@ public class CampaignXmlParser {
                 Node wn3 = nl.item(y);
                 if (wn3.getNodeName().equalsIgnoreCase("entity")) {
                     try {
-                        Entity e = MekHqXmlUtil.parseSingleEntityMul((Element)wn3);
-                        if (null == e) {
-                            String name = getEntityNameFromXmlString(wn3);
+                        if (null == MekHqXmlUtil.getEntityFromXmlString(wn3)) {
+                            String name = MekHqXmlUtil
+                                    .getEntityNameFromXmlString(wn3);
                             if (!unitList.contains(name)) {
                                 unitList.add(name);
                             }
-                        } else {
-                            mappedEntities.put(wn3, e);
                         }
                     } catch (Exception e) {
                         MekHQ.getLogger().error(CampaignXmlParser.class, METHOD_NAME,
@@ -1580,15 +1577,8 @@ public class CampaignXmlParser {
         }
     }
 
-    private static String getEntityNameFromXmlString(Node node) {
-    	NamedNodeMap attrs = node.getAttributes();
-		String chassis = attrs.getNamedItem("chassis").getTextContent();
-		String model = attrs.getNamedItem("model").getTextContent();
-		return chassis + " " + model;
-    }
-
     private static void processUnitNodes(Campaign retVal, Node wn,
-            Version version, Map<Node, Entity> mappedEntities) {
+            Version version) {
         final String METHOD_NAME = "processUnitNodes(Campaign,Node,Version)"; //$NON-NLS-1$
 
         MekHQ.getLogger().log(CampaignXmlParser.class, METHOD_NAME, LogLevel.INFO,
@@ -1615,7 +1605,7 @@ public class CampaignXmlParser {
                 continue;
             }
 
-            Unit u = Unit.generateInstanceFromXML(wn2, version, mappedEntities);
+            Unit u = Unit.generateInstanceFromXML(wn2, version);
 
             if (u != null) {
                 retVal.importUnit(u);
@@ -1630,10 +1620,10 @@ public class CampaignXmlParser {
             Version version) {
         final String METHOD_NAME = "processPartNodes(Campaign,Node,Version)"; //$NON-NLS-1$
 
-        NodeList wList = wn.getChildNodes();
-
         MekHQ.getLogger().log(CampaignXmlParser.class, METHOD_NAME, LogLevel.INFO,
-                "Loading " + wList.getLength() + " Part Nodes from XML..."); //$NON-NLS-1$
+                "Loading Part Nodes from XML..."); //$NON-NLS-1$
+
+        NodeList wList = wn.getChildNodes();
 
         // Okay, lets iterate through the children, eh?
         for (int x = 0; x < wList.getLength(); x++) {

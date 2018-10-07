@@ -119,7 +119,8 @@ public class Kill implements Serializable {
 				} else if (wn2.getNodeName().equalsIgnoreCase("killer")) {
 					retVal.killer = (wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("date")) {
-					retVal.date = MekHqXmlUtil.parseDate(wn2.getTextContent());
+					SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+					retVal.date = df.parse(wn2.getTextContent().trim());
 				}
 			}
 		} catch (Exception ex) {
@@ -145,9 +146,10 @@ public class Kill implements Serializable {
 				+"<killer>"
 				+MekHqXmlUtil.escape(killer)
 				+"</killer>");
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<date>"
-				+MekHqXmlUtil.formatDate(date)
+				+df.format(date)
 				+"</date>");
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "</kill>");
 		
