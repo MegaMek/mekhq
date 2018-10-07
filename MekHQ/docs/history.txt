@@ -18,6 +18,7 @@ v0.45.2-SNAPSHOT
 + Issue #905: Fixes NPE when a spouse is missing on campaign load or personnel menu click.
 + PR #882: Adds support for gzipped Campaign files (*.cpnx.gz).
 + Planets: Reunification War data for Outworlds Alliance + start of RWR 
++ PR #959: Fix for inability to repair damaged VTOL internal structure after loading campaign
 
 v0.45.1 (2018-09-03 2300 UTC)
 + PR #864: Security - address XXE vulnerabilities in XML parsers
