@@ -158,8 +158,8 @@ public class MekGyro extends Part {
 	}
 
 	@Override
-	public void fix() {
-		super.fix();
+	public void fix(boolean hasInfiniteResources) {
+		super.fix(hasInfiniteResources);
 		if(null != unit) {
 			unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_GYRO, Mech.LOC_CT);
 		}

@@ -92,7 +92,7 @@ public class MissingCubicle extends MissingPart {
     }
 
     @Override
-    public void fix() {
+    public void fix(boolean hasInfiniteResources) {
         Part replacement = findReplacement(false);
         if(null != replacement) {
             Part actualReplacement = replacement.clone();

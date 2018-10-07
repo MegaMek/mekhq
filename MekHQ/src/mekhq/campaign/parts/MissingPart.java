@@ -125,12 +125,12 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 	
 	@Override
 	public String succeed() {	
-		fix();
+		fix(false);
 		return " <font color='green'><b> replaced.</b></font>";
 	}
 	
 	@Override 
-	public void fix() {
+	public void fix(boolean hasInfiniteParts) {
 		Part replacement = findReplacement(false);
 		if(null != replacement) {
 			Part actualReplacement = replacement.clone();

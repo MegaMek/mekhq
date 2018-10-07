@@ -187,12 +187,6 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
 	public TechAdvancement getTechAdvancement() {
 	    return type.getTechAdvancement();
 	}
-	
-	@Override
-	public void fix() {
-		//nothing to fix
-		return;
-	}
 
 	@Override
 	public MissingPart getMissingPart() {

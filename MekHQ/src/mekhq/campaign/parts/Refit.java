@@ -1588,7 +1588,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 	}
 
 	@Override
-	public void fix() {
+    public void fix(boolean hasInfiniteResources) {
 		//do nothing
 	}
 

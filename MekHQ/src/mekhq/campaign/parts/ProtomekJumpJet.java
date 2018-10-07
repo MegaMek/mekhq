@@ -92,8 +92,8 @@ public class ProtomekJumpJet extends Part {
     }
 
     @Override
-    public void fix() {
-        super.fix();
+    public void fix(boolean hasInfiniteResources) {
+        super.fix(hasInfiniteResources);
         if(null != unit) {
             //repair depending upon how many others are still damaged
             int damageJJ = getOtherDamagedJumpJets();

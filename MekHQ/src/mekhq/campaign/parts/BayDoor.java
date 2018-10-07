@@ -76,8 +76,8 @@ public class BayDoor extends Part {
     }
     
     @Override
-    public void fix() {
-        super.fix();
+	public void fix(boolean hasInfiniteResources) {
+		super.fix(hasInfiniteResources);
         Part bayPart = campaign.getPart(parentPartId);
         if (null != bayPart) {
             Bay bay = ((TransportBayPart) bayPart).getBay();

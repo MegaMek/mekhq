@@ -158,8 +158,8 @@ public class TransportBayPart extends Part {
     }
     
     @Override
-    public void fix() {
-        super.fix();
+    public void fix(boolean hasInfiniteResources) {
+        super.fix(hasInfiniteResources);
         Bay bay = getBay();
         if (null != bay) {
             bay.setBayDamage(0);

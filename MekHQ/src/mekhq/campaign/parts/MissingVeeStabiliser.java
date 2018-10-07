@@ -107,7 +107,7 @@ public class MissingVeeStabiliser extends MissingPart {
 	}
 	
 	@Override 
-	public void fix() {
+	public void fix(boolean hasInfiniteResources) {
 		VeeStabiliser replacement = (VeeStabiliser)findReplacement(false);
 		if(null != replacement) {
 			VeeStabiliser actualReplacement = replacement.clone();

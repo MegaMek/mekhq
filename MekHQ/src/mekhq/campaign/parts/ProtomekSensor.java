@@ -81,8 +81,8 @@ public class ProtomekSensor extends Part {
     }
 
     @Override
-    public void fix() {
-        super.fix();
+    public void fix(boolean hasInfiniteResources) {
+        super.fix(hasInfiniteResources);
         if(null != unit) {
             unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Protomech.SYSTEM_HEADCRIT, Protomech.LOC_HEAD);
         }

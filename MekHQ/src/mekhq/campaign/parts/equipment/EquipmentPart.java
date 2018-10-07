@@ -206,8 +206,8 @@ public class EquipmentPart extends Part {
 	}
 
 	@Override
-	public void fix() {
-		super.fix();
+	public void fix(boolean hasInfiniteResources) {
+		super.fix(hasInfiniteResources);
 		if(null != unit) {
 			Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
 			if(null != mounted) {

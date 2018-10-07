@@ -131,8 +131,8 @@ public class DropshipDockingCollar extends Part {
 	}
 
 	@Override
-	public void fix() {
-		super.fix();
+	public void fix(boolean hasInfiniteResources) {
+		super.fix(hasInfiniteResources);
 		boomDamaged = false;
 		if(null != unit && unit.getEntity() instanceof Dropship) {
 			((Dropship)unit.getEntity()).setDamageDockCollar(false);

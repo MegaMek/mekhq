@@ -313,14 +313,15 @@ public class Armor extends Part implements IAcquisitionWork {
 	}
 
 	@Override
-	public void fix() {
-		int amountFound = Math.min(getAmountAvailable(), amountNeeded);
+	public void fix(boolean hasInfiniteResources) {
+		int amountFound = hasInfiniteResources ? amountNeeded : Math.min(getAmountAvailable(), amountNeeded);
 		int fixAmount = Math.min(amount + amountFound, unit.getEntity().getOArmor(location, rear));
 		unit.getEntity().setArmor(fixAmount, location, rear);
-		changeAmountAvailable(-1 * amountFound);
+		if (!hasInfiniteResources) {
+			changeAmountAvailable(-1 * amountFound);
+		}
 		updateConditionFromEntity(false);
-		skillMin = SkillType.EXP_GREEN;
-		shorthandedMod = 0;
+		resetRepairSettings();
 	}
 
 	@Override

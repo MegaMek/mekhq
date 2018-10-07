@@ -1050,7 +1050,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
     }
 	
 	@Override
-	public void fix() {
+	public void fix(boolean hasInfiniteResources) {
 		hits = 0;
 		resetRepairSettings();
 	}
@@ -1078,7 +1078,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 			remove(true);
 			return " <font color='green'><b> salvaged.</b></font>";
 		} else {
-			fix();
+			fix(false);
 			return " <font color='green'><b> fixed.</b></font>";
 		}
 	}

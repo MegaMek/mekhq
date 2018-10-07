@@ -415,8 +415,8 @@ public class BattleArmorSuit extends Part {
     }
     
     @Override
-    public void fix() {
-        super.fix();
+	public void fix(boolean hasInfiniteResources) {
+		super.fix(hasInfiniteResources);
         if(null != unit) {
             unit.getEntity().setInternal(unit.getEntity().getOInternal(trooper), trooper);
         }

@@ -69,8 +69,8 @@ public class Rotor extends TankLocation {
     }
 
 	@Override
-	public void fix() {
-		super.fix();
+    public void fix(boolean hasInfiniteResources) {
+        super.fix(hasInfiniteResources);
 		damage--;
 		if(null != unit && unit.getEntity() instanceof VTOL) {
 		    int currIsVal = unit.getEntity().getInternal(VTOL.LOC_ROTOR); 

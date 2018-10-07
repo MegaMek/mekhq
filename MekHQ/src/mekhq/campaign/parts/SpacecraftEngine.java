@@ -156,8 +156,8 @@ public class SpacecraftEngine extends Part {
     }
 
     @Override
-    public void fix() {
-        super.fix();
+    public void fix(boolean hasInfiniteResources) {
+        super.fix(hasInfiniteResources);
         if(null != unit) {
             if(unit.getEntity() instanceof Aero) {
                 ((Aero)unit.getEntity()).setEngineHits(0);

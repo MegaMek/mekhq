@@ -519,7 +519,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                         if(part instanceof MissingPart) {
                             // We magically acquire a replacement part, then fix the missing one.
                             part.getCampaign().addPart(((MissingPart) part).getNewPart(), 0);
-                            part.fix();
+                            part.fix(true);
                             part.resetTimeSpent();
                             part.resetOvertime();
                             part.setTeamId(null);
@@ -529,7 +529,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                         } else {
                             if(part.needsFixing()) {
                                 needsCheck = true;
-                                part.fix();
+                                part.fix(true);
                             } else {
                                 part.resetRepairSettings();
                             }

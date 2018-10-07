@@ -155,8 +155,8 @@ public class TankLocation extends Part {
 	}
 
 	@Override
-	public void fix() {
-		super.fix();
+    public void fix(boolean hasInfiniteResources) {
+        super.fix(hasInfiniteResources);
 		if(isBreached()) {
 			breached = false;
 			unit.getEntity().setLocationStatus(loc, ILocationExposureStatus.NORMAL, true);

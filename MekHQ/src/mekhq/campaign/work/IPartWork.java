@@ -60,7 +60,7 @@ public interface IPartWork extends IWork {
     
     void updateConditionFromEntity(boolean checkForDestruction);
     void updateConditionFromPart();
-    void fix();
+    void fix(boolean hasInfiniteResources);
     void remove(boolean salvage);
     MissingPart getMissingPart();
     
