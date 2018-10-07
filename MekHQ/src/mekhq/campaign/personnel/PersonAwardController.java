@@ -21,6 +21,7 @@ package mekhq.campaign.personnel;
 
 import mekhq.MekHQ;
 import mekhq.campaign.event.PersonChangedEvent;
+import mekhq.campaign.log.AwardLogEntry;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -157,8 +158,8 @@ public class PersonAwardController {
             if(award.equals(setName, awardName)){
                 award.removeDate(date);
                 if(!award.hasDates()) awards.remove(award);
+                person.addLogEntry(new AwardLogEntry(person.getCampaign().getDate(), "Removed award " + award.getName()));
                 MekHQ.triggerEvent(new PersonChangedEvent(person));
-                person.addLogEntry(person.getCampaign().getDate(), "Removed award " + award.getName());
                 return;
             }
         }
@@ -169,7 +170,7 @@ public class PersonAwardController {
      * @param award that was given.
      */
     public void logAward(Award award, Date date){
-        person.addLogEntry(date, "Awarded " + award.getName() + ": " + award.getDescription());
+        person.addLogEntry(new AwardLogEntry(date, "Awarded " + award.getName() + ": " + award.getDescription()));
         MekHQ.triggerEvent(new PersonChangedEvent(person));
     }
 

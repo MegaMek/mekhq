@@ -34,13 +34,13 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
+import mekhq.campaign.log.LogEntry;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.AwardSet;
-import mekhq.campaign.LogEntry;
 
 /**
  * This class is responsible to control the awards. It loads one instance of each awards, then it creates a copy of it
