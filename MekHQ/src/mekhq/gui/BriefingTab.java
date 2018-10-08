@@ -66,6 +66,8 @@ import mekhq.campaign.event.ScenarioResolvedEvent;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.force.Lance;
 import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.AtBDynamicScenario;
+import mekhq.campaign.mission.AtBDynamicScenarioFactory;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
@@ -609,7 +611,8 @@ public final class BriefingTab extends CampaignGuiTab {
 
         for (UUID uid : uids) {
             Unit u = getCampaign().getUnit(uid);
-            if (null != u.getEntity()) {
+            if ((null != u) &&
+                    (null != u.getEntity())) {
                 if (null == u.checkDeployment()) {
                     // Make sure the unit's entity and pilot are fully up to
                     // date!
@@ -624,6 +627,10 @@ public final class BriefingTab extends CampaignGuiTab {
                     undeployed.append("\n").append(u.getName()).append(" (").append(u.checkDeployment()).append(")");
                 }
             }
+        }
+        
+        if(scenario instanceof AtBDynamicScenario) {
+            AtBDynamicScenarioFactory.setPlayerDeploymentTurns((AtBDynamicScenario) scenario, getCampaign());
         }
 
         if (undeployed.length() > 0) {

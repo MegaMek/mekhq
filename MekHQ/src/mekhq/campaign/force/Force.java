@@ -598,6 +598,11 @@ public class Force implements Serializable {
         }
         
         for(UUID id : getUnits()) {
+            // no idea how this would happen, but some times a unit in a forces unit ID list has an invalid ID?
+            if(c.getUnit(id) == null) {
+                continue;
+            }
+            
             bvTotal += c.getUnit(id).getEntity().calculateBattleValue();
         }
         

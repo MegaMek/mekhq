@@ -35,7 +35,9 @@ import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
 import mekhq.campaign.mission.ScenarioForceTemplate.SynchronizedDeploymentType;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.IUnitGenerator;
 import mekhq.campaign.universe.Planet;
@@ -1072,7 +1074,7 @@ public class AtBDynamicScenarioFactory {
     }
     
     /**
-     * Sets up the deployment turns as they are specified
+     * Sets up the deployment turns for bot units as they are specified
      * @param scenario
      */
     private static void setDeploymentTurns(AtBDynamicScenario scenario, Campaign campaign) {
@@ -1091,9 +1093,16 @@ public class AtBDynamicScenarioFactory {
                 }
             }
         }
-        
-        //TODO: Set player unit deployment. Look in BriefingTab.startScenario for logic
-        
+    }
+    
+    /**
+     * Set up deployment turns for player units as specified in the scenario's template.
+     * Note that this is currently invoked during the BriefingTab.startScenario() method,
+     * as that method resets all properties of for each player entity. Hence it being public.
+     * @param scenario The scenario to process.
+     * @param campaign The campaign in which the scenario is occurring.
+     */
+    public static void setPlayerDeploymentTurns(AtBDynamicScenario scenario, Campaign campaign) {
         // for player forces where there's an associated force template, we can set the deployment turn explicitly
         // or use a stagger algorithm.
         // for player forces where there's not an associated force template, we calculate the deployment turn
@@ -1104,14 +1113,18 @@ public class AtBDynamicScenarioFactory {
             Force playerForce = campaign.getForce(forceID);
             
             for(UUID unitID : playerForce.getAllUnits()) {
-                forceEntities.add(campaign.getUnit(unitID).getEntity());
+                Unit currentUnit = campaign.getUnit(unitID);
+                if(currentUnit != null) {
+                    forceEntities.add(currentUnit.getEntity());
+                }
             }
             
             // make note of battle commander strategy
             Person commander = scenario.getLanceCommander(campaign);
             int strategy = 0;
             
-            if(commander != null) {
+            if((commander != null) &&
+                    commander.hasSkill(SkillType.S_STRATEGY)) {
                 strategy = commander.getSkill(SkillType.S_STRATEGY).getLevel();
             }
             
@@ -1292,8 +1305,9 @@ public class AtBDynamicScenarioFactory {
      */
     private static void setScenarioRerolls(AtBDynamicScenario scenario, Campaign campaign) {
         Person commander = scenario.getLanceCommander(campaign);
-        
-        if(commander != null) {
+
+        if((commander != null) &&
+                commander.hasSkill(SkillType.S_TACTICS)) {
             scenario.setRerolls(commander.getSkill(SkillType.S_TACTICS).getLevel());
         }
     }
