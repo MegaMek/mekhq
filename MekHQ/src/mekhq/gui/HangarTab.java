@@ -349,7 +349,7 @@ public final class HangarTab extends CampaignGuiTab {
                 Entity en = unit.getEntity();
                 int type = -1;
                 if (null != en) {
-                    type = UnitType.determineUnitTypeCode(en);
+                    type = en.getUnitType();
                 }
                 return type == nGroup;
             }

@@ -284,7 +284,7 @@ public class Lance implements Serializable, MekHqXmlSerializable {
             if (null != unit) {
                 Entity entity = unit.getEntity();
                 if (null != entity) {
-                    if (UnitType.determineUnitTypeCode(entity) >= UnitType.JUMPSHIP) {
+                    if (entity.getUnitType() >= UnitType.JUMPSHIP) {
                         return false;
                     }
                     if ((entity.getEntityType() & ETYPE_GROUND) != 0) {
