@@ -24,6 +24,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Objects;
 
+import megamek.common.annotations.Nullable;
+import mekhq.campaign.personnel.Person;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -121,4 +123,14 @@ public class LogEntry implements Cloneable, MekHqXmlSerializable {
             && desc.equals(other.desc)
             && Objects.equals(type, other.type);
     }
+
+    /**
+     * This method is called when the log entry is edited via UI
+     * @param originalDate the original date of the log entry
+     * @param newDate the new date of the log entry
+     * @param originalDesc the original description of the log entry
+     * @param newDesc the new description of the log entry
+     * @param person whose person this log entry belongs
+     */
+    public void onLogEntryEdited(Date originalDate, Date newDate, String originalDesc, String newDesc, @Nullable Person person){}
 }

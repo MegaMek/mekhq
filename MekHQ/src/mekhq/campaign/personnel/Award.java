@@ -309,6 +309,21 @@ public class Award implements MekHqXmlSerializable, Comparable<Award>, Serializa
         string.append("</html>");
 
         return string.toString();
+    }
 
+    /**
+     * Replaces a date of an award
+     * @param toReplace date to replace
+     * @param newDate new date that will replace the other
+     */
+    public void replaceDate(Date toReplace, Date newDate){
+        if(toReplace.equals(newDate)) return;
+
+        int i = 0;
+        for(Date date : dates){
+            if(date.equals(toReplace)) continue;
+            i++;
+        }
+        dates.set(i, newDate);
     }
 }

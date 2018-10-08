@@ -549,10 +549,12 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             case CMD_ADD_AWARD:
             {
                 selectedPerson.awardController.addAndLogAward(data[1], data[2], gui.getCampaign().getDate());
+                break;
             }
             case CMD_RMV_AWARD:
             {
                 selectedPerson.awardController.removeAward(data[1], data[2], data[3]);
+                break;
             }
             case CMD_IMPROVE:
             {
@@ -972,7 +974,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 MekHQ.triggerEvent(new PersonLogEvent(selectedPerson));
                 break;
             case CMD_EDIT_LOG_ENTRY:
-                EditLogEntryDialog eeld = new EditLogEntryDialog(gui.getFrame(), true, new CustomLogEntry(gui.getCampaign().getDate(), "")); //$NON-NLS-1$
+                EditLogEntryDialog eeld = new EditLogEntryDialog(gui.getFrame(), true, new CustomLogEntry(gui.getCampaign().getDate(), ""), selectedPerson); //$NON-NLS-1$
                 eeld.setVisible(true);
                 LogEntry entry = eeld.getEntry();
                 if (null != entry) {

@@ -19,6 +19,10 @@
 
 package mekhq.campaign.log;
 
+import megamek.common.annotations.Nullable;
+import mekhq.campaign.personnel.Award;
+import mekhq.campaign.personnel.Person;
+
 import java.util.Date;
 
 /**
@@ -26,7 +30,16 @@ import java.util.Date;
  * @author Miguel Azevedo
  */
 public class AwardLogEntry extends LogEntry {
-    public AwardLogEntry(Date date, String desc) {
+
+    public AwardLogEntry(Date date, String desc){
         super(date, desc, LogEntryType.AWARD);
+    }
+
+    @Override
+    public void onLogEntryEdited(Date originalDate, Date newDate, String originalDesc, String newDesc, @Nullable Person person) {
+        if(person == null) return;
+
+        Award award = AwardLogger.getInstance().getAwardFromLogEntry(person, originalDesc);
+        award.replaceDate(originalDate, newDate);
     }
 }

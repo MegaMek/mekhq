@@ -179,10 +179,23 @@ public class PersonAwardController {
      * @param name String with the name of the award
      * @return the award
      */
-    private Award getAward(String set, String name){
+    public Award getAward(String set, String name){
         for(Award myAward : awards){
             if(name.equals(myAward.getName()) &&
                     set.equals(myAward.getSet())) return myAward;
+        }
+        return null;
+    }
+
+    /**
+     * Finds an award with a given name, without taking into account the set name. This is used for backward compatibility
+     * and should be avoided.
+     * @param name String with the name of the award
+     * @return the award
+     */
+    public Award getFirstAwardIgnoringSet(String name){
+        for(Award myAward : awards){
+            if(name.equals(myAward.getName())) return myAward;
         }
         return null;
     }
