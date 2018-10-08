@@ -247,6 +247,7 @@ public class CampaignOpsReputationTest {
         when(mockVeeTechSkill.getLevel()).thenReturn(7);
 
         when(mockThunderbolt1.getEntityType()).thenReturn(Entity.ETYPE_MECH);
+        when(mockThunderbolt1.getUnitType()).thenCallRealMethod();
         when(mockThunderboltUnit1.getEntity()).thenReturn(mockThunderbolt1);
         when(mockThunderbolt1Pilot.isAdmin()).thenReturn(false);
         when(mockThunderbolt1Pilot.getSkill(SkillType.S_GUN_MECH)).thenReturn(mockMechGunnery);
@@ -268,6 +269,7 @@ public class CampaignOpsReputationTest {
         astechs += 6;
 
         when(mockThunderbolt2.getEntityType()).thenReturn(Entity.ETYPE_MECH);
+        when(mockThunderbolt2.getUnitType()).thenCallRealMethod();
         when(mockThunderboltUnit2.getEntity()).thenReturn(mockThunderbolt2);
         when(mockThunderbolt2Pilot.isAdmin()).thenReturn(false);
         when(mockThunderbolt2Pilot.getSkill(SkillType.S_GUN_MECH)).thenReturn(mockMechGunnery);
@@ -289,6 +291,7 @@ public class CampaignOpsReputationTest {
         astechs += 6;
 
         when(mockGrasshopper1.getEntityType()).thenReturn(Entity.ETYPE_MECH);
+        when(mockGrasshopper1.getUnitType()).thenCallRealMethod();
         when(mockGrasshopperUnit1.getEntity()).thenReturn(mockGrasshopper1);
         when(mockGrasshopper1Pilot.isAdmin()).thenReturn(false);
         when(mockGrasshopper1Pilot.getSkill(SkillType.S_GUN_MECH)).thenReturn(mockMechGunnery);
@@ -310,6 +313,7 @@ public class CampaignOpsReputationTest {
         astechs += 6;
 
         when(mockGrasshopper2.getEntityType()).thenReturn(Entity.ETYPE_MECH);
+        when(mockGrasshopper2.getUnitType()).thenCallRealMethod();
         when(mockGrasshopperUnit2.getEntity()).thenReturn(mockGrasshopper2);
         when(mockGrasshopper2Pilot.isAdmin()).thenReturn(false);
         when(mockGrasshopper2Pilot.getSkill(SkillType.S_GUN_MECH)).thenReturn(mockMechGunnery);
@@ -335,6 +339,7 @@ public class CampaignOpsReputationTest {
         astechs += 6;
 
         when(mockBulldog1.getEntityType()).thenReturn(Entity.ETYPE_TANK);
+        when(mockBulldog1.getUnitType()).thenCallRealMethod();
         when(mockBulldogUnit1.getEntity()).thenReturn(mockBulldog1);
         when(mockBulldog1Driver.getSkill(SkillType.S_PILOT_GVEE)).thenReturn(mockTankPilot);
         when(mockBulldog1Driver.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
@@ -371,6 +376,7 @@ public class CampaignOpsReputationTest {
         astechs += 6;
 
         when(mockBulldog2.getEntityType()).thenReturn(Entity.ETYPE_TANK);
+        when(mockBulldog2.getUnitType()).thenCallRealMethod();
         when(mockBulldog2Driver.getSkill(SkillType.S_PILOT_GVEE)).thenReturn(mockTankPilot);
         when(mockBulldog2Driver.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
         when(mockBulldog2Gunner1.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
@@ -407,6 +413,7 @@ public class CampaignOpsReputationTest {
         astechs += 6;
 
         when(mockBulldog3.getEntityType()).thenReturn(Entity.ETYPE_TANK);
+        when(mockBulldog3.getUnitType()).thenCallRealMethod();
         when(mockBulldog3Driver.getSkill(SkillType.S_PILOT_GVEE)).thenReturn(mockTankPilot);
         when(mockBulldog3Driver.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
         when(mockBulldog3Gunner1.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
@@ -443,6 +450,7 @@ public class CampaignOpsReputationTest {
         astechs += 6;
 
         when(mockBulldog4.getEntityType()).thenReturn(Entity.ETYPE_TANK);
+        when(mockBulldog4.getUnitType()).thenCallRealMethod();
         when(mockBulldog4Driver.getSkill(SkillType.S_PILOT_GVEE)).thenReturn(mockTankPilot);
         when(mockBulldog4Driver.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
         when(mockBulldog4Gunner1.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
@@ -479,6 +487,7 @@ public class CampaignOpsReputationTest {
         astechs += 6;
 
         when(mockPackrat1.getEntityType()).thenReturn(Entity.ETYPE_TANK);
+        when(mockPackrat1.getUnitType()).thenCallRealMethod();
         when(mockPackrat1Driver.getSkill(SkillType.S_PILOT_GVEE)).thenReturn(mockTankPilot);
         when(mockPackrat1Driver.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
         when(mockPackrat1Gunner.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
@@ -505,6 +514,7 @@ public class CampaignOpsReputationTest {
         astechs += 6;
 
         when(mockPackrat2.getEntityType()).thenReturn(Entity.ETYPE_TANK);
+        when(mockPackrat2.getUnitType()).thenCallRealMethod();
         when(mockPackrat2Driver.getSkill(SkillType.S_PILOT_GVEE)).thenReturn(mockTankPilot);
         when(mockPackrat2Driver.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
         when(mockPackrat2Gunner.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
@@ -531,6 +541,7 @@ public class CampaignOpsReputationTest {
         astechs += 6;
 
         when(mockPackrat3.getEntityType()).thenReturn(Entity.ETYPE_TANK);
+        when(mockPackrat3.getUnitType()).thenCallRealMethod();
         when(mockPackrat3Driver.getSkill(SkillType.S_PILOT_GVEE)).thenReturn(mockTankPilot);
         when(mockPackrat3Driver.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
         when(mockPackrat3Gunner.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
@@ -557,6 +568,7 @@ public class CampaignOpsReputationTest {
         astechs += 6;
 
         when(mockPackrat4.getEntityType()).thenReturn(Entity.ETYPE_TANK);
+        when(mockPackrat4.getUnitType()).thenCallRealMethod();
         when(mockPackrat4Driver.getSkill(SkillType.S_PILOT_GVEE)).thenReturn(mockTankPilot);
         when(mockPackrat4Driver.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
         when(mockPackrat4Gunner.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
@@ -583,6 +595,7 @@ public class CampaignOpsReputationTest {
         astechs += 6;
 
         when(mockLaserPlatoon.getEntityType()).thenReturn(Entity.ETYPE_INFANTRY);
+        when(mockLaserPlatoon.getUnitType()).thenCallRealMethod();
         when(mockLaserPlatoon.getSquadSize()).thenReturn(7);
         when(mockLaserPlatoon.getSquadN()).thenReturn(4);
         when(mockLaserPlatoonUnit.getEntity()).thenReturn(mockLaserPlatoon);
@@ -602,6 +615,7 @@ public class CampaignOpsReputationTest {
         personnelList.addAll(infantryPersonnel);
 
         when(mockCorsair1.getEntityType()).thenReturn(Entity.ETYPE_AERO);
+        when(mockCorsair1.getUnitType()).thenCallRealMethod();
         when(mockCorsairUnit1.getEntity()).thenReturn(mockCorsair1);
         when(mockCorsair1Pilot.isAdmin()).thenReturn(false);
         when(mockCorsair1Pilot.getSkill(SkillType.S_GUN_AERO)).thenReturn(mockAeroGunnery);
@@ -623,6 +637,7 @@ public class CampaignOpsReputationTest {
         astechs += 6;
 
         when(mockCorsair2.getEntityType()).thenReturn(Entity.ETYPE_AERO);
+        when(mockCorsair2.getUnitType()).thenCallRealMethod();
         when(mockCorsairUnit2.getEntity()).thenReturn(mockCorsair2);
         when(mockCorsair2Pilot.isAdmin()).thenReturn(false);
         when(mockCorsair2Pilot.getSkill(SkillType.S_GUN_AERO)).thenReturn(mockAeroGunnery);
@@ -644,6 +659,7 @@ public class CampaignOpsReputationTest {
         astechs += 6;
 
         when(mockSeeker.getEntityType()).thenReturn(Entity.ETYPE_DROPSHIP);
+        when(mockSeeker.getUnitType()).thenCallRealMethod();
         when(mockSeekerUnit.getEntity()).thenReturn(mockSeeker);
         Bay transportBay;
         Vector<Bay> bayList = new Vector<>();
@@ -679,6 +695,7 @@ public class CampaignOpsReputationTest {
         when(mockSeeker.getCrew()).thenReturn(mockSeekerCrew);
 
         when(mockInvader.getEntityType()).thenReturn(Entity.ETYPE_JUMPSHIP);
+        when(mockInvader.getUnitType()).thenCallRealMethod();
         when(mockInvaderUnit.getEntity()).thenReturn(mockInvader);
         DockingCollar collar;
         Vector<DockingCollar> collarList = new Vector<>(4);

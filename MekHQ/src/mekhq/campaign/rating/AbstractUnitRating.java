@@ -881,7 +881,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
             return;
         }
 
-        int unitType = UnitType.determineUnitTypeCode(e);
+        int unitType = e.getUnitType();
         getLogger().log(getClass(), METHOD_NAME, LogLevel.DEBUG,
                         "Unit " + u.getName() + " is a " +
                         UnitType.getTypeDisplayableName(unitType));
