@@ -52,6 +52,11 @@ public class ScenarioMapParameters {
      */
     public boolean allowAllTerrainTypes;
     
+    /**
+     * Whether or not the map should actually be in space.
+     */
+    public boolean useSpaceMap;
+    
     @XmlElementWrapper(name="allowedTerrainTypes")
     @XmlElement(name="allowedTerrainType")
     public List<Integer> allowedTerrainTypes = new ArrayList<>();

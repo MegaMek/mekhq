@@ -106,6 +106,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     public static final int CONVOYATTACK = 20; //Big Battle
     public static final int PIRATEFREEFORALL = 21; //Big Battle
 
+    public static final int TER_SPACE = -1;
     public static final int TER_HILLS = 0;
     public static final int TER_BADLANDS = 1;
     public static final int TER_WETLANDS = 2;

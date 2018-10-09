@@ -35,7 +35,6 @@ import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
 import mekhq.campaign.mission.ScenarioForceTemplate.SynchronizedDeploymentType;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
@@ -382,6 +381,10 @@ public class AtBDynamicScenarioFactory {
         int weather = PlanetaryConditions.WE_NONE;
         int wind = PlanetaryConditions.WI_NONE;
         int fog = PlanetaryConditions.FOG_NONE;
+        
+        if(scenario.getTerrainType() == AtBScenario.TER_SPACE) {
+            return;
+        }
 
         int roll = Compute.randomInt(10) + 1;
         int r2 = Compute.d6();
@@ -427,11 +430,14 @@ public class AtBDynamicScenarioFactory {
         if(scenario.getTemplate().mapParameters.allowAllTerrainTypes) {
             terrainIndex = Compute.randomInt(AtBScenario.terrainTypes.length);
             scenario.setTerrainType(terrainIndex);
+            scenario.setMapFile();
+        } else if (scenario.getTemplate().mapParameters.useSpaceMap) {
+            scenario.setTerrainType(AtBScenario.TER_SPACE);
         } else {
             terrainIndex = Compute.randomInt(scenario.getTemplate().mapParameters.allowedTerrainTypes.size());
             scenario.setTerrainType(scenario.getTemplate().mapParameters.allowedTerrainTypes.get(terrainIndex));
+            scenario.setMapFile();
         }
-        scenario.setMapFile();
     }
     
     /**
@@ -442,6 +448,10 @@ public class AtBDynamicScenarioFactory {
      * @param campaign The current campaign
      */
     private static void setPlanetaryConditions(AtBDynamicScenario scenario, AtBContract mission, Campaign campaign) {
+        if(scenario.getTerrainType() == AtBScenario.TER_SPACE) {
+            return;
+        }
+        
         if (null != mission) {
             Planet p = Planets.getInstance().getPlanets().get(mission.getPlanetId());
             if (null != p) {

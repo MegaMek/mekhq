@@ -113,14 +113,22 @@ public class AtBGameThread extends GameThread {
                 }
 
                 MapSettings mapSettings = MapSettings.getInstance();
-                File mapgenFile = new File("data/mapgen/" + scenario.getMap() + ".xml");
-                try {
-                	mapSettings = MapSettings.getInstance(new FileInputStream(mapgenFile));
-                } catch (FileNotFoundException ex) {
-                    MekHQ.getLogger().log(getClass(), "run", LogLevel.ERROR, //$NON-NLS-1$
-                            "Could not load map file data/mapgen/" + scenario.getMap() + ".xml"); //$NON-NLS-1$
-                    MekHQ.getLogger().error(getClass(), "run", ex); //$NON-NLS-1$
+                
+                // if the scenario is taking place in space, do space settings instead
+                if((scenario instanceof AtBScenario) &&
+                        scenario.getTerrainType() == AtBScenario.TER_SPACE) {
+                    mapSettings.setMedium(MapSettings.MEDIUM_SPACE);
+                } else {
+                    File mapgenFile = new File("data/mapgen/" + scenario.getMap() + ".xml");
+                    try {
+                    	mapSettings = MapSettings.getInstance(new FileInputStream(mapgenFile));
+                    } catch (FileNotFoundException ex) {
+                        MekHQ.getLogger().log(getClass(), "run", LogLevel.ERROR, //$NON-NLS-1$
+                                "Could not load map file data/mapgen/" + scenario.getMap() + ".xml"); //$NON-NLS-1$
+                        MekHQ.getLogger().error(getClass(), "run", ex); //$NON-NLS-1$
+                    }
                 }
+                
                 mapSettings.setBoardSize(scenario.getMapX(), scenario.getMapY());
                 mapSettings.setMapSize(1,  1);
                 mapSettings.getBoardsSelectedVector().clear();

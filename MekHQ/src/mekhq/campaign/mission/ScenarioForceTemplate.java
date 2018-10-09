@@ -37,8 +37,8 @@ public class ScenarioForceTemplate {
     
     public static int DEPLOYMENT_ZONE_NARROW_EDGE = DEPLOYMENT_ZONES.length - 1;
     
-    public static int DESTINATION_EDGE_OPPOSITE_DEPLOYMENT = -1;
-    public static int DESTINATION_EDGE_RANDOM = -2;    
+    public static int DESTINATION_EDGE_OPPOSITE_DEPLOYMENT = 5;
+    public static int DESTINATION_EDGE_RANDOM = 6;    
     
     public enum ForceAlignment {
         Player,

@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.ButtonGroup;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -26,6 +27,7 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTextArea;
@@ -99,7 +101,9 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
     JTextField txtYIncrement;
     JCheckBox chkAllowRotation;
     JCheckBox chkUseAtBSizing;
-    JCheckBox chkAllowAllMapTypes;
+    JRadioButton btnAllowAllMapTypes;
+    JRadioButton btnUseSpaceMap;
+    JRadioButton btnUseSpecificMapTypes;
     
     JPanel globalPanel;
     
@@ -516,19 +520,54 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         globalPanel.add(lblAllowedTerrainTypes, gbc);
         
         gbc.gridy++;
-        chkAllowAllMapTypes = new JCheckBox();
-        chkAllowAllMapTypes.setText("Allow All");
-        chkAllowAllMapTypes.setSelected(scenarioTemplate.mapParameters.allowAllTerrainTypes);
-        chkAllowAllMapTypes.addItemListener(new ItemListener() {
+        btnAllowAllMapTypes = new JRadioButton();
+        btnAllowAllMapTypes.setText("Allow All");
+        btnAllowAllMapTypes.setSelected(scenarioTemplate.mapParameters.allowAllTerrainTypes);
+        btnAllowAllMapTypes.addItemListener(new ItemListener() {
 
             @Override
             public void itemStateChanged(ItemEvent e) {
-                allowAllMapTypesChangeHandler();
+                mapTypeChangeHandler();
             }
             
         });
-        globalPanel.add(chkAllowAllMapTypes, gbc);
+        globalPanel.add(btnAllowAllMapTypes, gbc);
         
+        gbc.gridy++;
+        btnUseSpaceMap = new JRadioButton();
+        btnUseSpaceMap.setText("Use Space Map");
+        btnUseSpaceMap.setSelected(scenarioTemplate.mapParameters.useSpaceMap);
+        btnUseSpaceMap.addItemListener(new ItemListener() {
+
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                mapTypeChangeHandler();
+            }
+            
+        });
+        globalPanel.add(btnUseSpaceMap, gbc);
+        
+        gbc.gridy++;
+        btnUseSpecificMapTypes = new JRadioButton();
+        btnUseSpecificMapTypes.setText("Specific Map Types");
+        btnUseSpecificMapTypes.setSelected(scenarioTemplate.mapParameters.useSpaceMap);
+        btnUseSpecificMapTypes.addItemListener(new ItemListener() {
+
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                mapTypeChangeHandler();
+            }
+            
+        });
+        globalPanel.add(btnUseSpecificMapTypes, gbc);
+        
+        ButtonGroup mapTypeGroup = new ButtonGroup();
+        mapTypeGroup.add(btnAllowAllMapTypes);
+        mapTypeGroup.add(btnUseSpaceMap);
+        mapTypeGroup.add(btnUseSpecificMapTypes);
+        
+        gbc.gridy--;
+        gbc.gridy--;
         gbc.gridy--;
         
         gbc.gridx++;
@@ -540,7 +579,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         }
         lstAllowedTerrainTypes.setModel(terrainTypeModel);
         lstAllowedTerrainTypes.setSelectedIndices(scenarioTemplate.mapParameters.getAllowedTerrainTypeArray());       
-        allowAllMapTypesChangeHandler();
+        mapTypeChangeHandler();
         globalPanel.add(lstAllowedTerrainTypes, gbc);
         
         gbc.gridy++;
@@ -973,8 +1012,8 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
      * Event handler for when the "allow all map types" checkbox's state changes. Disables/enables the 
      * explicit map type selector.
      */
-    private void allowAllMapTypesChangeHandler() {
-        lstAllowedTerrainTypes.setEnabled(!chkAllowAllMapTypes.isSelected());
+    private void mapTypeChangeHandler() {
+        lstAllowedTerrainTypes.setEnabled(btnUseSpecificMapTypes.isSelected());
     }
     
     /**
@@ -1036,7 +1075,8 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         scenarioTemplate.mapParameters.widthScalingIncrement = Integer.parseInt(txtXIncrement.getText());
         scenarioTemplate.mapParameters.allowRotation = chkAllowRotation.isSelected();
         scenarioTemplate.mapParameters.useStandardAtBSizing = chkUseAtBSizing.isSelected();
-        scenarioTemplate.mapParameters.allowAllTerrainTypes = chkAllowAllMapTypes.isSelected();
+        scenarioTemplate.mapParameters.allowAllTerrainTypes = btnAllowAllMapTypes.isSelected();
+        scenarioTemplate.mapParameters.useSpaceMap = btnUseSpaceMap.isSelected();
         
         File file = FileDialogs.saveScenarioTemplate((JFrame) getOwner(), scenarioTemplate).orElse(null);
         if(file != null) {

@@ -348,6 +348,141 @@ public class AtBScenarioViewPanel extends JPanel {
             panStats.add(lblForceDesc, gridBagConstraints);
         }
 
+        if(scenario.getTerrainType() == AtBScenario.TER_SPACE) {
+            y = fillSpaceStats(gridBagConstraints, resourceMap, y);
+        } else {
+            y = fillPlanetSideStats(gridBagConstraints, resourceMap, y);
+        }
+
+        if(!(scenario instanceof AtBDynamicScenario)) {
+            lblPlayerStart.setText(resourceMap.getString("lblPlayerStart.text"));
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.gridwidth = 1;
+            panStats.add(lblPlayerStart, gridBagConstraints);
+    
+            lblPlayerStartPos.setText(IStartingPositions.START_LOCATION_NAMES[scenario.getStart()]);
+            gridBagConstraints.gridx = 2;
+            gridBagConstraints.gridy = y++;
+            panStats.add(lblPlayerStartPos, gridBagConstraints);
+        }
+
+        if (scenario.isCurrent()) {
+            btnReroll = new JButton(scenario.getRerollsRemaining() +
+                    " Reroll" + ((scenario.getRerollsRemaining() == 1)?"":"s") +
+                    " Remaining");
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y++;
+            gridBagConstraints.gridwidth = 1;
+            panStats.add(btnReroll, gridBagConstraints);
+            btnReroll.setEnabled(scenario.getRerollsRemaining() > 0);
+            btnReroll.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent arg0) {
+                    rerollBattleConditions();
+                }
+            });
+        }
+
+        txtDetails.setLineWrap(true);
+        txtDetails.setWrapStyleWord(true);
+        txtDetails.setEditable(false);
+        
+        if (scenario.isSpecialMission()) {
+            txtDetails.setText("Details:\n" +
+                    scenario.getResourceBundle().getString("battleDetails." +
+                    scenario.getResourceKey() +
+                    ".description"));
+        } else if (scenario.isBigBattle()) {
+            txtDetails.setText("Special Conditions:\n" +
+            		scenario.getResourceBundle().getString("battleDetails." +
+                    scenario.getResourceKey() +
+                    ".specialConditions") + "\n\n" +
+
+                    "Victory Conditions:\n" +
+                    scenario.getResourceBundle().getString("battleDetails." +
+                    scenario.getResourceKey() +
+                    ".victory") + "\n\n" +
+
+                    "Observations:\n" +
+                    scenario.getResourceBundle().getString("battleDetails." +
+                    scenario.getResourceKey() +
+                    ".observations"));
+        } else if(!(scenario instanceof AtBDynamicScenario)) {
+            txtDetails.setText("Victory Conditions:\n" +
+            		scenario.getResourceBundle().getString("battleDetails." +
+                    scenario.getResourceKey() +
+                    (scenario.isAttacker()?
+                            ".attacker.victory":
+                                ".defender.victory")) + "\n\n" +
+
+                    "Observations:\n" +
+                    scenario.getResourceBundle().getString("battleDetails." +
+                    scenario.getResourceKey() +
+                    (scenario.isAttacker()?
+                            ".attacker.observations":
+                                ".defender.observations")));
+        }
+
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = y++;
+        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 20);
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panStats.add(txtDetails, gridBagConstraints);
+
+
+        txtDesc.setName("txtDesc");
+        txtDesc.setText(scenario.getDescription());
+        txtDesc.setEditable(false);
+        txtDesc.setLineWrap(true);
+        txtDesc.setWrapStyleWord(true);
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = y++;
+        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 20);
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panStats.add(txtDesc, gridBagConstraints);
+
+        if(scenario.getLoot().size() > 0) {
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y++;
+            gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.weighty = 0.0;
+            gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 0);
+            gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+            gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+            panStats.add(new JLabel("<html><b>Potential Rewards:</b></html>"), gridBagConstraints);
+
+            for(Loot loot : scenario.getLoot()) {
+                gridBagConstraints.gridx = 0;
+                gridBagConstraints.gridy++;
+                gridBagConstraints.gridwidth = 2;
+                gridBagConstraints.weightx = 1.0;
+                gridBagConstraints.weighty = 0.0;
+                gridBagConstraints.insets = new java.awt.Insets(0, 10, 5, 0);
+                gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+                gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+                panStats.add(new JLabel(loot.getShortDescription()), gridBagConstraints);
+            }
+        }
+    }
+
+    /**
+     * Worker function that generates UI elements appropriate for planet-side scenarios
+     * @param gridBagConstraints Current grid bag constraints in use
+     * @param resourceMap Text resource
+     * @param y current row in the parent UI element
+     * @return the row at which we wind up after doing all this
+     */
+    private int fillPlanetSideStats(GridBagConstraints gridBagConstraints, ResourceBundle resourceMap, int y) {
         chkReroll[REROLL_TERRAIN] = new JCheckBox();
         lblTerrain.setText(resourceMap.getString("lblTerrain.text"));
         gridBagConstraints.gridx = 0;
@@ -508,128 +643,53 @@ public class AtBScenarioViewPanel extends JPanel {
         panStats.add(lblAtmosphereDesc, gridBagConstraints);
         lblAtmosphere.setVisible(scenario.getAtmosphere() != PlanetaryConditions.ATMO_STANDARD);
         lblAtmosphereDesc.setVisible(scenario.getAtmosphere() != PlanetaryConditions.ATMO_STANDARD);
+        
+        return y;
+    }
+    
+    /**
+     * Worker function that generates UI elements appropriate for space scenarios
+     * @param gridBagConstraints Current grid bag constraints in use
+     * @param resourceMap Text resource
+     * @param y current row in the parent UI element
+     * @return the row at which we wind up after doing all this
+     */
+    private int fillSpaceStats(GridBagConstraints gridBagConstraints, ResourceBundle resourceMap, int y) {
+        lblTerrain.setText(resourceMap.getString("lblTerrain.text"));
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = y;
+        gridBagConstraints.gridwidth = 1;
+        panStats.add(lblTerrain, gridBagConstraints);
 
-        if(!(scenario instanceof AtBDynamicScenario)) {
-            lblPlayerStart.setText(resourceMap.getString("lblPlayerStart.text"));
-            gridBagConstraints.gridx = 0;
+        lblTerrainDesc.setText("Space");
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = y++;
+        panStats.add(lblTerrainDesc, gridBagConstraints);
+        
+        lblMapSize.setText(resourceMap.getString("lblMapSize.text"));
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = y;
+        gridBagConstraints.gridwidth = 1;
+        panStats.add(lblMapSize, gridBagConstraints);
+
+        chkReroll[REROLL_MAPSIZE] = new JCheckBox();
+        if (scenario.isCurrent()) {
+            gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = y;
             gridBagConstraints.gridwidth = 1;
-            panStats.add(lblPlayerStart, gridBagConstraints);
-    
-            lblPlayerStartPos.setText(IStartingPositions.START_LOCATION_NAMES[scenario.getStart()]);
-            gridBagConstraints.gridx = 2;
-            gridBagConstraints.gridy = y++;
-            panStats.add(lblPlayerStartPos, gridBagConstraints);
+            panStats.add(chkReroll[REROLL_MAPSIZE], gridBagConstraints);
+            chkReroll[REROLL_MAPSIZE].setVisible(scenario.getRerollsRemaining() > 0 && scenario.canRerollMapSize());
+            chkReroll[REROLL_MAPSIZE].addItemListener(checkBoxListener);
         }
 
-        if (scenario.isCurrent()) {
-            btnReroll = new JButton(scenario.getRerollsRemaining() +
-                    " Reroll" + ((scenario.getRerollsRemaining() == 1)?"":"s") +
-                    " Remaining");
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = y++;
-            gridBagConstraints.gridwidth = 1;
-            panStats.add(btnReroll, gridBagConstraints);
-            btnReroll.setEnabled(scenario.getRerollsRemaining() > 0);
-            btnReroll.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent arg0) {
-                    rerollBattleConditions();
-                }
-            });
-        }
-
-        txtDetails.setLineWrap(true);
-        txtDetails.setWrapStyleWord(true);
-        txtDetails.setEditable(false);
+        lblMapSizeDesc.setText(scenario.getMapSizeX() + "x" + scenario.getMapSizeY());
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = y++;
+        panStats.add(lblMapSizeDesc, gridBagConstraints);
         
-        if (scenario.isSpecialMission()) {
-            txtDetails.setText("Details:\n" +
-                    scenario.getResourceBundle().getString("battleDetails." +
-                    scenario.getResourceKey() +
-                    ".description"));
-        } else if (scenario.isBigBattle()) {
-            txtDetails.setText("Special Conditions:\n" +
-            		scenario.getResourceBundle().getString("battleDetails." +
-                    scenario.getResourceKey() +
-                    ".specialConditions") + "\n\n" +
-
-                    "Victory Conditions:\n" +
-                    scenario.getResourceBundle().getString("battleDetails." +
-                    scenario.getResourceKey() +
-                    ".victory") + "\n\n" +
-
-                    "Observations:\n" +
-                    scenario.getResourceBundle().getString("battleDetails." +
-                    scenario.getResourceKey() +
-                    ".observations"));
-        } else if(!(scenario instanceof AtBDynamicScenario)) {
-            txtDetails.setText("Victory Conditions:\n" +
-            		scenario.getResourceBundle().getString("battleDetails." +
-                    scenario.getResourceKey() +
-                    (scenario.isAttacker()?
-                            ".attacker.victory":
-                                ".defender.victory")) + "\n\n" +
-
-                    "Observations:\n" +
-                    scenario.getResourceBundle().getString("battleDetails." +
-                    scenario.getResourceKey() +
-                    (scenario.isAttacker()?
-                            ".attacker.observations":
-                                ".defender.observations")));
-        }
-
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = y++;
-        gridBagConstraints.gridwidth = 3;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 20);
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        panStats.add(txtDetails, gridBagConstraints);
-
-
-        txtDesc.setName("txtDesc");
-        txtDesc.setText(scenario.getDescription());
-        txtDesc.setEditable(false);
-        txtDesc.setLineWrap(true);
-        txtDesc.setWrapStyleWord(true);
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = y++;
-        gridBagConstraints.gridwidth = 3;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 20);
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        panStats.add(txtDesc, gridBagConstraints);
-
-        if(scenario.getLoot().size() > 0) {
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = y++;
-            gridBagConstraints.gridwidth = 2;
-            gridBagConstraints.weightx = 1.0;
-            gridBagConstraints.weighty = 0.0;
-            gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 0);
-            gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-            gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-            panStats.add(new JLabel("<html><b>Potential Rewards:</b></html>"), gridBagConstraints);
-
-            for(Loot loot : scenario.getLoot()) {
-                gridBagConstraints.gridx = 0;
-                gridBagConstraints.gridy++;
-                gridBagConstraints.gridwidth = 2;
-                gridBagConstraints.weightx = 1.0;
-                gridBagConstraints.weighty = 0.0;
-                gridBagConstraints.insets = new java.awt.Insets(0, 10, 5, 0);
-                gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-                gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-                panStats.add(new JLabel(loot.getShortDescription()), gridBagConstraints);
-            }
-        }
+        return y;
     }
-
+    
     private ItemListener checkBoxListener = new ItemListener() {
         @Override
         public void itemStateChanged(ItemEvent e) {
