@@ -2125,10 +2125,11 @@ public class Campaign implements Serializable, ITechManager {
      * @return true if the campaign can pay for the acquisition; false if it cannot. 
      */
     public boolean canPayFor(IAcquisitionWork acquisition) {
-        if((acquisition instanceof UnitOrder && getCampaignOptions().payForUnits()) 
-                ||(acquisition instanceof Part && getCampaignOptions().payForParts()) 
-                && getFunds() < acquisition.getBuyCost()) {
-            return false;
+    	//SHOULD we check to see if this acquisition needs to be paid for
+        if( (acquisition instanceof UnitOrder && getCampaignOptions().payForUnits()) 
+                ||(acquisition instanceof Part && getCampaignOptions().payForParts()) ) {
+        	//CAN the acquisition actually be paid for
+            return (getFunds() >= acquisition.getBuyCost());
         }
         return true;
     }
