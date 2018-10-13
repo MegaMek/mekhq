@@ -214,7 +214,7 @@ public class ForceViewPanel extends javax.swing.JPanel {
     			bv += u.getEntity().calculateBattleValue(true, !u.hasPilot());
     			cost += u.getEntity().getCost(true);
     			ton += u.getEntity().getWeight();
-    			String utype = UnitType.getTypeDisplayableName(UnitType.determineUnitTypeCode(u.getEntity()));
+    			String utype = UnitType.getTypeDisplayableName(u.getEntity().getUnitType());
     			if(null == type) {
     				type = utype;
     			} else if(!utype.equals(type)) {

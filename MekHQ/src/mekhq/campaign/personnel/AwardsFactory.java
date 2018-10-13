@@ -19,21 +19,28 @@
 
 package mekhq.campaign.personnel;
 
-import mekhq.MekHQ;
-import mekhq.MekHqXmlUtil;
-import mekhq.campaign.AwardSet;
-import mekhq.campaign.LogEntry;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.*;
-import java.text.SimpleDateFormat;
-import java.util.*;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import mekhq.MekHQ;
+import mekhq.MekHqXmlUtil;
+import mekhq.campaign.AwardSet;
+import mekhq.campaign.LogEntry;
 
 /**
  * This class is responsible to control the awards. It loads one instance of each awards, then it creates a copy of it
@@ -50,8 +57,6 @@ public class AwardsFactory {
      * Here is where the blueprints are stored, mapped by set and name.
      */
     private Map<String, Map<String,Award>> awardsMap;
-
-    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 
     private AwardsFactory(){
         awardsMap = new HashMap<>();
@@ -88,13 +93,12 @@ public class AwardsFactory {
      * award in order for it to be given to someone.
      * @param setName the name of the set
      * @param awardName the name of the award
-     * @param date the date it was awarded
      * @return list with the awards belonging to that set
      */
-    public Award generateNew(String setName, String awardName, Date date){
+    public Award generateNew(String setName, String awardName){
         Map<String, Award> awardSet = awardsMap.get(setName);
         Award blueprintAward = awardSet.get(awardName);
-        return blueprintAward.createCopy(date);
+        return blueprintAward.createCopy();
     }
 
     /**
@@ -104,10 +108,11 @@ public class AwardsFactory {
      */
     public Award generateNewFromXML(Node node){
         final String METHOD_NAME = "generateNewFromXML(Node)"; //$NON-NLS-1$
+        final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 
         String name = null;
         String set = null;
-        Date date = null;
+        ArrayList<Date> dates = new ArrayList<>();
 
         try {
             NodeList nl = node.getChildNodes();
@@ -116,7 +121,7 @@ public class AwardsFactory {
                 Node wn2 = nl.item(x);
 
                 if (wn2.getNodeName().equalsIgnoreCase("date")) {
-                    date = DATE_FORMAT.parse(wn2.getTextContent().trim());
+                    dates.add(DATE_FORMAT.parse(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("name")) {
                     name = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("set")){
@@ -128,13 +133,15 @@ public class AwardsFactory {
             MekHQ.getLogger().error(LogEntry.class, METHOD_NAME, ex);
         }
 
-        return generateNew(set, name, date);
+        Award award = generateNew(set, name);
+        award.setDates(dates);
+        return award;
     }
 
     /**
      * Generates the "blueprint" awards by reading the data from XML sources.
      */
-    private void loadAwards(){
+    private void loadAwards() {
         File dir = new File(AWARDS_XML_ROOT_PATH);
         File[] files =  dir.listFiles((dir1, filename) -> filename.endsWith(".xml"));
 
@@ -143,34 +150,37 @@ public class AwardsFactory {
         }
         
         for(File file : files) {
-
-            AwardSet awardSet = null;
-
-            try {
+            try{
                 InputStream inputStream = new FileInputStream(file);
-                JAXBContext jaxbContext = JAXBContext.newInstance(AwardSet.class, Award.class);
-                Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-
-                awardSet = unmarshaller.unmarshal(MekHqXmlUtil.createSafeXmlSource(inputStream), AwardSet.class).getValue();
-
-                Map<String, Award> tempAwardMap = new HashMap<>();
-                String currentSetName = file.getName().replaceFirst("[.][^.]+$", "");
-                int i = 0;
-                for (Award award : awardSet.getAwards()){
-                    award.setId(i);
-                    i++;
-                    award.setSet(currentSetName);
-                    tempAwardMap.put(award.getName(), award);
-                }
-
-                awardsMap.put(currentSetName, tempAwardMap);
-            } catch (SAXException | ParserConfigurationException e) {
-                MekHQ.getLogger().error(AwardsFactory.class, "loadAwards", e);
-            } catch (FileNotFoundException e) {
-                MekHQ.getLogger().error(AwardsFactory.class, "loadAwards", "Cannot find XML awards file: " + file.getName(), e);
-            } catch (JAXBException e) {
-                MekHQ.getLogger().error(AwardsFactory.class, "loadAwards", "Error loading XML for awards", e);
+                loadAwardsFromStream(inputStream, file.getName());
             }
+            catch (FileNotFoundException e){
+                MekHQ.getLogger().error(AwardsFactory.class, "loadAwards", e);
+            }
+        }
+    }
+
+    public void loadAwardsFromStream(InputStream inputStream, String fileName){
+        AwardSet awardSet;
+
+        try {
+            JAXBContext jaxbContext = JAXBContext.newInstance(AwardSet.class, Award.class);
+            Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+
+            awardSet = unmarshaller.unmarshal(MekHqXmlUtil.createSafeXmlSource(inputStream), AwardSet.class).getValue();
+
+            Map<String, Award> tempAwardMap = new HashMap<>();
+            String currentSetName = fileName.replaceFirst("[.][^.]+$", "");
+            int i = 0;
+            for (Award award : awardSet.getAwards()){
+                award.setId(i);
+                i++;
+                award.setSet(currentSetName);
+                tempAwardMap.put(award.getName(), award);
+            }
+            awardsMap.put(currentSetName, tempAwardMap);
+        } catch (JAXBException e) {
+            MekHQ.getLogger().error(AwardsFactory.class, "loadAwards", "Error loading XML for awards", e);
         }
     }
 }

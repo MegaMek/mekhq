@@ -1104,7 +1104,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
                         "Unit " + u.getName() +
                         " updating advanced tech count.");
 
-        int unitType = UnitType.determineUnitTypeCode(u.getEntity());
+        int unitType = u.getEntity().getUnitType();
         switch (unitType) {
             case UnitType.MEK:
             case UnitType.PROTOMEK:

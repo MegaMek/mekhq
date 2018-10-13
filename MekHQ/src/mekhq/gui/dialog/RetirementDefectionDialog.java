@@ -540,12 +540,12 @@ public class RetirementDefectionDialog extends JDialog {
 				continue;
 			}
 			availableUnits.add(u.getId());
-			if (UnitType.MEK == UnitType.determineUnitTypeCode(u.getEntity())) {
+			if (UnitType.MEK == u.getEntity().getUnitType()) {
 				if (null == u.getCommander()) {
 					unassignedMechs.add(u.getId());
 				}
 			}
-			if (UnitType.AERO == UnitType.determineUnitTypeCode(u.getEntity())) {
+			if (UnitType.AERO == u.getEntity().getUnitType()) {
 				if (null == u.getCommander()) {
 					unassignedASF.add(u.getId());
 				}
@@ -693,8 +693,8 @@ public class RetirementDefectionDialog extends JDialog {
             		}
             	}
                 /* Can't really give a platoon as payment */
-                if (UnitType.determineUnitTypeCode(unit.getEntity()) == UnitType.BATTLE_ARMOR ||
-                		UnitType.determineUnitTypeCode(unit.getEntity()) == UnitType.INFANTRY) {
+                if (unit.getEntity().getUnitType() == UnitType.BATTLE_ARMOR ||
+                        unit.getEntity().getUnitType() == UnitType.INFANTRY) {
                 	return false;
                 }
                 if (unitAssignments.values().contains(unit.getId())) {
@@ -706,7 +706,7 @@ public class RetirementDefectionDialog extends JDialog {
                 Entity en = unit.getEntity();
                 int type = -1;
                 if (null != en) {
-                    type = UnitType.determineUnitTypeCode(en);
+                    type = unit.getEntity().getUnitType();
                 }
                 return type == nGroup;
             }

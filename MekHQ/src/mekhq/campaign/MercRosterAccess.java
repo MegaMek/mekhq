@@ -539,7 +539,7 @@ public class MercRosterAccess extends SwingWorker<Void, Void> {
         for(Unit u : campaign.getUnits()) {
             try {
                 preparedStatement = connect.prepareStatement("UPDATE " + table + ".equipment SET type=?, name=?, subtype=?, crew=?, weight=?, regnumber=?, notes=? WHERE uuid=?"); 
-                preparedStatement.setInt(1, UnitType.determineUnitTypeCode(u.getEntity())+1);
+                preparedStatement.setInt(1, u.getEntity().getUnitType() + 1);
                 preparedStatement.setString(2, truncateString(u.getEntity().getChassis(), 45));
                 preparedStatement.setString(3, truncateString(u.getEntity().getModel(), 45));
                 if(null != u.getCommander()) {

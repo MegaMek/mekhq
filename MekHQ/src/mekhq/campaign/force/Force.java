@@ -473,7 +473,7 @@ public class Force implements Serializable {
                     }
                 }
             }    
-            c.addForceToHash(retVal);    
+            c.importForce(retVal);
         } catch (Exception ex) {
             // Errrr, apparently either the class name was invalid...
             // Or the listed name doesn't exist.

@@ -2107,6 +2107,10 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                             Turret turret = new Turret(i, (int)getEntity().getWeight(), campaign);
                             addPart(turret);
                             partsToAdd.add(turret);
+                        } else {
+                            TankLocation tankLocation = new TankLocation(i, (int) getEntity().getWeight(), campaign);
+                            addPart(tankLocation);
+                            partsToAdd.add(tankLocation);
                         }
                     } else if(i == Tank.LOC_TURRET) {
                          if(((Tank)entity).hasNoTurret()) {

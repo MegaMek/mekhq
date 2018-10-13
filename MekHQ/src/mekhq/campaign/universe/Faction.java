@@ -257,7 +257,9 @@ public class Faction {
     }
 
     public static Faction getFaction(String sname) {
-        return factions.get(sname);
+        Faction defaultFaction = new Faction();
+        if(factions == null) return defaultFaction;
+        return factions.getOrDefault(sname, defaultFaction);
     }
 
     public static Faction getFactionFromFullName(String fname, int year) {

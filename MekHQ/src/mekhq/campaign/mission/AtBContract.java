@@ -316,28 +316,28 @@ public class AtBContract extends Contract implements Serializable {
             if (null == campaign.getUnit(uuid)) {
                 continue;
             }
-            switch (UnitType.determineUnitTypeCode(campaign.getUnit(uuid).getEntity())) {
-            case UnitType.MEK:
-                numUnits += 1;
-                break;
-            case UnitType.TANK:
-            case UnitType.VTOL:
-            case UnitType.NAVAL:
-                numUnits += campaign.getFaction().isClan()?0.5:1;
-                break;
-            case UnitType.CONV_FIGHTER:
-            case UnitType.AERO:
-                if (campaign.getCampaignOptions().getUseAero()) {
+            switch (campaign.getUnit(uuid).getEntity().getUnitType()) {
+                case UnitType.MEK:
+                    numUnits += 1;
+                    break;
+                case UnitType.TANK:
+                case UnitType.VTOL:
+                case UnitType.NAVAL:
                     numUnits += campaign.getFaction().isClan()?0.5:1;
-                }
-                break;
-            case UnitType.PROTOMEK:
-                numUnits += 0.2;
-                break;
-            case UnitType.BATTLE_ARMOR:
-            case UnitType.INFANTRY:
-            default:
-                /* don't count */
+                    break;
+                case UnitType.CONV_FIGHTER:
+                case UnitType.AERO:
+                    if (campaign.getCampaignOptions().getUseAero()) {
+                        numUnits += campaign.getFaction().isClan()?0.5:1;
+                    }
+                    break;
+                case UnitType.PROTOMEK:
+                    numUnits += 0.2;
+                    break;
+                case UnitType.BATTLE_ARMOR:
+                case UnitType.INFANTRY:
+                default:
+                    /* don't count */
             }
         }
         return (int)numUnits;

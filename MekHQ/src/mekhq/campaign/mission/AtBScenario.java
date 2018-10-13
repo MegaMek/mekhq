@@ -988,7 +988,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
         if (f.isClan() && Compute.d6(2) > 8 - skill + skills[0] + skills[1]) {
             int phenotype;
-            switch (UnitType.determineUnitTypeCode(en)) {
+            switch (en.getUnitType()) {
             case UnitType.MEK:
                 phenotype = Bloodname.P_MECHWARRIOR;
                 break;

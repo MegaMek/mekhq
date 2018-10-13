@@ -49,7 +49,6 @@ import javax.swing.border.LineBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import megamek.common.UnitType;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.event.UnitChangedEvent;
@@ -237,7 +236,7 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
      */
     private void sortUnitsByType(Unit[] units) {
         for(int x = 0; x < units.length; x++) {
-            int unitType = UnitType.determineUnitTypeCode(units[x].getEntity());
+            int unitType = units[x].getEntity().getUnitType();
             
             if(!unitsByType.containsKey(unitType)) {
                 unitsByType.put(unitType, new ArrayList<>());
@@ -284,6 +283,7 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
      */
     @Override
     public void valueChanged(ListSelectionEvent e) {
+        @SuppressWarnings("unchecked")
         JList<Person> techList = (JList<Person>) e.getSource();
         
         int unitType = -1;

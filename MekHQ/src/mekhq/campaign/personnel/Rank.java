@@ -24,6 +24,7 @@ package mekhq.campaign.personnel;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import mekhq.MekHQ;
 import mekhq.MekHqXmlSerializable;
@@ -39,10 +40,10 @@ import org.w3c.dom.NodeList;
 
 public class Rank implements MekHqXmlSerializable {
 
-    private ArrayList<String> rankNames;
+    private List<String> rankNames;
     private boolean officer;
     private double payMultiplier;
-    private ArrayList<Integer> rankLevels;
+    private List<Integer> rankLevels;
 
     // Manei Domini Ranks
     // These should be safe as completely static items
@@ -57,29 +58,29 @@ public class Rank implements MekHqXmlSerializable {
 	public static final int MD_RANK_NUM	= 7;
 
     public Rank() {
-        this(new ArrayList<String>(), false, 1.0);
+        this(new ArrayList<>(), false, 1.0);
     }
 
     public Rank(String[] names) {
         this(names, false, 1.0);
     }
 
-    public Rank(ArrayList<String> names) {
+    public Rank(List<String> names) {
         this(names, false, 1.0);
     }
 
     public Rank(String[] name, boolean b, double mult) {
-        this(new ArrayList<String>(Arrays.asList(name)), b, mult);
+        this(Arrays.asList(name), b, mult);
     }
 
-    public Rank(ArrayList<String> names, boolean b, double mult) {
+    public Rank(List<String> names, boolean b, double mult) {
     	rankNames = names;
         officer = b;
         payMultiplier = mult;
-        rankLevels = new ArrayList<Integer>();
+        rankLevels = new ArrayList<>();
         for (int i = 0; i < rankNames.size(); i++) {
         	rankLevels.add(0);
-        	if (rankNames.get(i).contains(":")) {
+        	if (rankNames.get(i).matches(".+:\\d+\\s*$")) {
         		String[] temp = rankNames.get(i).split(":");
         		rankNames.set(i, temp[0].trim());
         		rankLevels.set(i, Integer.parseInt(temp[1].trim()));
@@ -180,12 +181,12 @@ public class Rank implements MekHqXmlSerializable {
 
                 if (wn2.getNodeName().equalsIgnoreCase("rankName")) {
                 	String[] rNames = { wn2.getTextContent(), "--MW", "--MW", "--MW", "--MW", "--MW" };
-                    retVal.rankNames = new ArrayList<String>(Arrays.asList(rNames));
+                    retVal.rankNames = Arrays.asList(rNames);
                 } else if (wn2.getNodeName().equalsIgnoreCase("rankNames")) {
-                    retVal.rankNames = new ArrayList<String>(Arrays.asList(wn2.getTextContent().split(",")));
+                    retVal.rankNames = Arrays.asList(wn2.getTextContent().split(",", -1));
                     for (int i = 0; i < retVal.rankNames.size(); i++) {
                     	retVal.rankLevels.add(0);
-                    	if (retVal.rankNames.get(i).contains(":")) {
+                    	if (retVal.rankNames.get(i).matches(".+:\\d+\\s*$")) {
                     		String[] temp = retVal.rankNames.get(i).split(":");
                     		retVal.rankNames.set(i, temp[0].trim());
                     		retVal.rankLevels.set(i, Integer.parseInt(temp[1].trim()));
