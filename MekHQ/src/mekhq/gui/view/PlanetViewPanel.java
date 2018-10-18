@@ -280,7 +280,7 @@ public class PlanetViewPanel extends JPanel {
         pnlStats.add(txtStarType, gridBagConstraints);
         
         int infoRow = 2;
-        if((null != planet.getSystemPosition()) || (null != planet.getOrbitSemimajorAxis())) {
+        if((null != planet.getSystemPosition()) || (null != planet.getOrbitRadius())) {
             lblPosition.setName("lblPosition"); // NOI18N
             lblPosition.setText(resourceMap.getString("lblPosition.text"));
             gridBagConstraints = new GridBagConstraints();
@@ -292,9 +292,9 @@ public class PlanetViewPanel extends JPanel {
             
             txtPosition.setName("txtPosition"); // NOI18N
             String text;
-            if(null != planet.getOrbitSemimajorAxis()) {
+            if(null != planet.getOrbitRadius()) {
                 text = String.format("%s (%.3f AU)", //$NON-NLS-1$
-                    planet.getSystemPositionText(), planet.getOrbitSemimajorAxis());
+                    planet.getSystemPositionText(), planet.getOrbitRadius());
             } else {
                 text = planet.getSystemPositionText();
             }
@@ -418,7 +418,7 @@ public class PlanetViewPanel extends JPanel {
             ++ infoRow;
         }
         
-        if((null != planet.getTemperature(currentDate)) || (null != planet.getClimate(currentDate))) {
+        if((null != planet.getTemperature(currentDate))) {
             lblTemp.setName("lblTemp1"); // NOI18N
             lblTemp.setText(resourceMap.getString("lblTemp1.text"));
             gridBagConstraints = new GridBagConstraints();
@@ -429,14 +429,7 @@ public class PlanetViewPanel extends JPanel {
             pnlStats.add(lblTemp, gridBagConstraints);
             
             txtTemp.setName("lblTemp2"); // NOI18N
-            String text;
-            if( null == planet.getClimate(currentDate) ) {
-                text = planet.getTemperature(currentDate) + "°C";
-            } else if( null == planet.getTemperature(currentDate) ) {
-                text = "(" + planet.getClimateName(currentDate) + ")";
-            } else {
-                text = planet.getTemperature(currentDate) + "°C (" + planet.getClimateName(currentDate) + ")";
-            }
+            String  text = planet.getTemperature(currentDate) + "°C";
             txtTemp.setText(text);
             txtTemp.setEditable(false);
             txtTemp.setLineWrap(true);
@@ -560,7 +553,7 @@ public class PlanetViewPanel extends JPanel {
         }
         
         // Social stuff
-        if(null != planet.getPopulationRating(currentDate)) {
+        /*if(null != planet.getPopulationRating(currentDate)) {
             JLabel label = new JLabel(resourceMap.getString("lblPopulation.text"));
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
@@ -616,7 +609,7 @@ public class PlanetViewPanel extends JPanel {
             pnlStats.add(textArea, gridBagConstraints);
             
             ++ infoRow;
-        }
+        }*/
 
         if(null != planet.getSocioIndustrial(currentDate)) {
             lblSocioIndustrial.setName("lblSocioIndustrial1"); // NOI18N
