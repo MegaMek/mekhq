@@ -60,6 +60,7 @@ import mekhq.campaign.universe.RATManager;
 import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.gui.preferences.JWindowPreference;
 import mekhq.preferences.PreferencesNode;
+import mekhq.campaign.universe.Systems;
 
 public class DataLoadingDialog extends JDialog implements PropertyChangeListener {
 
@@ -160,6 +161,14 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
     			ex.printStackTrace();
             }
             while (!Planets.getInstance().isInitialized()) {
+                //Sleep for up to one second.
+                try {
+                    Thread.sleep(50);
+                } catch (InterruptedException ignore) {
+
+                }
+            }
+            while (!Systems.getInstance().isInitialized()) {
                 //Sleep for up to one second.
                 try {
                     Thread.sleep(50);

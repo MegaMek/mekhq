@@ -136,6 +136,10 @@ public class PlanetarySystem implements Serializable {
     //the location of the primary planet for this system
     private int primarySlot;
     
+    /** Marker for "please delete this system" */
+    @XmlJavaTypeAdapter(BooleanValueAdapter.class)
+    public Boolean delete;
+    
     
     public PlanetarySystem() {
     }
@@ -143,6 +147,29 @@ public class PlanetarySystem implements Serializable {
     public PlanetarySystem(String id) {
         this.id = id;
     }
+     
+    public String getId() {
+        return id;
+    }
+    
+    public Double getX() {
+        return x;
+    }
+
+    public Double getY() {
+        return y;
+    }
+    
+    /** @return the distance to a point in space in light years */
+    public double getDistanceTo(double x, double y) {
+        return Math.sqrt(Math.pow(x - this.x, 2) + Math.pow(y - this.y, 2));
+    }
+    
+    /** @return the distance to another system in light years (0 if both are in the same system) */
+    public double getDistanceTo(PlanetarySystem anotherSystem) {
+        return Math.sqrt(Math.pow(x - anotherSystem.x, 2) + Math.pow(y - anotherSystem.y, 2));
+    }
+    
     public Boolean isNadirCharge(DateTime when) {
         //TODO: add event stuff to system so I can get this information
         /*
