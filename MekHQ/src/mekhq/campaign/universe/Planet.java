@@ -77,45 +77,6 @@ import mekhq.campaign.universe.Faction.Tag;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Planet implements Serializable {
     private static final long serialVersionUID = -8699502165157515100L;
-
-    // Star classification data and methods
-    
-    public static final int SPECTRAL_O = 0;
-    public static final int SPECTRAL_B = 1;
-    public static final int SPECTRAL_A = 2;
-    public static final int SPECTRAL_F = 3;
-    public static final int SPECTRAL_G = 4;
-    public static final int SPECTRAL_K = 5;
-    public static final int SPECTRAL_M = 6;
-    public static final int SPECTRAL_L = 7;
-    public static final int SPECTRAL_T = 8;
-    public static final int SPECTRAL_Y = 9;
-    // Spectral class "D" (white dwarfs) are determined by their luminosity "VII" - the number is here for sorting
-    public static final int SPECTRAL_D = 99;
-    // "Q" - not a proper star (neutron stars QN, pulsars QP, black holes QB, ...)
-    public static final int SPECTRAL_Q = 100;
-    // TODO: Wolf-Rayet stars ("W"), carbon stars ("C"), S-type stars ("S"), 
-    
-    public static final String LUM_0           = "0"; //$NON-NLS-1$
-    public static final String LUM_IA          = "Ia"; //$NON-NLS-1$
-    public static final String LUM_IAB         = "Iab"; //$NON-NLS-1$
-    public static final String LUM_IB          = "Ib"; //$NON-NLS-1$
-    // Generic class, consisting of Ia, Iab and Ib
-    public static final String LUM_I           = "I"; //$NON-NLS-1$
-    public static final String LUM_II_EVOLVED  = "I/II"; //$NON-NLS-1$
-    public static final String LUM_II          = "II"; //$NON-NLS-1$
-    public static final String LUM_III_EVOLVED = "II/III"; //$NON-NLS-1$
-    public static final String LUM_III         = "III"; //$NON-NLS-1$
-    public static final String LUM_IV_EVOLVED  = "III/IV"; //$NON-NLS-1$
-    public static final String LUM_IV          = "IV"; //$NON-NLS-1$
-    public static final String LUM_V_EVOLVED   = "IV/V"; //$NON-NLS-1$
-    public static final String LUM_V           = "V"; //$NON-NLS-1$
-    // typically used as a prefix "sd", not as a suffix
-    public static final String LUM_VI          = "VI";  //$NON-NLS-1$
-    // typically used as a prefix "esd", not as a suffix
-    public static final String LUM_VI_PLUS     = "VI+"; //$NON-NLS-1$
-    // always used as class designation "D", never as a suffix
-    public static final String LUM_VII         = "VII"; //$NON-NLS-1$
     
     @XmlElement(name = "xcood")
     private Double x;
@@ -129,21 +90,11 @@ public class Planet implements Serializable {
     private String name;
     private String shortName;
     private Integer sysPos;
-
-    //Star data (to be factored out)
-    private String spectralType;
-    @XmlJavaTypeAdapter(SpectralClassAdapter.class)
-    private Integer spectralClass;
-    private Double subtype;
-    private String luminosity;
-
-    // Orbital information
-    /** Semimajor axis (average distance to parent star), in AU */
+    
+    //Orbital information
+    /** orbital radius (average distance to parent star), in AU */
     @XmlElement(name = "orbitRadius")
-    private Double orbitSemimajorAxis;
-    private Double orbitEccentricity;
-    /** Degrees to the system's invariable plane */
-    private Double orbitInclination;
+    private Double orbitRadius;
     
     // Stellar neighbourhood
     @XmlElement(name="satellites")
@@ -152,15 +103,14 @@ public class Planet implements Serializable {
     private List<String> satellites;
     
     // Global physical characteristics
-    /** Mass in Earth masses */
-    private Double mass;
-    /** Radius in Earth radii */
-    private Double radius;
-    /** Density in kg/m^3 */
+    /** diameter in km */
+    private int diameter;
+    /** Density in g/m^3 */
     private Double density;
     private Double gravity;
     private Double dayLength;
-    private Double tilt;
+    private Double yearLength;
+
     @XmlElement(name = "class")
     private String className;
     
@@ -172,39 +122,21 @@ public class Planet implements Serializable {
     private Integer tectonicActivity;
     @XmlElement(name="landMass")
     private List<String> landMasses;
-    @XmlJavaTypeAdapter(BooleanValueAdapter.class)
-    private Boolean nadirCharge;
-    @XmlJavaTypeAdapter(BooleanValueAdapter.class)
-    private Boolean zenithCharge;
-
+    
     // Atmospheric description
     /** Pressure classification */
     private Integer pressure;
-    /** Pressure in standard pressure (101325 Pa) */
-    private Double pressureAtm;
     /** Atmospheric description */
     private String atmosphere;
-    /** Atmospheric mass compared to Earth's 28.9645 kg/mol */
-    private Double atmMass;
-    private Double albedo;
-    @XmlElement(name="greenhouse")
-    private Double greenhouseEffect;
-    /** Average surface temperature at equator in °C */
     private Integer temperature;
-    @XmlJavaTypeAdapter(ClimateAdapter.class)
-    private Climate climate;
     
     // Ecosphere
     @XmlJavaTypeAdapter(LifeFormAdapter.class)
     private LifeForm lifeForm;
-    private Integer habitability;
     
     // Human influence
-    /** Order of magnitude of the population - 1 */
-    @XmlElement(name = "pop")
-    private Integer populationRating;
-    private String government;
-    private Integer controlRating;
+    @XmlElement(name = "population")
+    private Integer population;
     @XmlJavaTypeAdapter(SocioIndustrialDataAdapter.class)
     private SocioIndustrialData socioIndustrial;
     @XmlJavaTypeAdapter(HPGRatingAdapter.class)
@@ -215,6 +147,12 @@ public class Planet implements Serializable {
     
     //private List<String> garrisonUnits;
 
+    //boolean to indicate if this is the primary planet of this system
+    private boolean primary;
+    
+    //the system that this planet belongs to
+    private PlanetarySystem parentSystem;
+    
     // Fluff
     private String desc;
     private String icon;
@@ -392,30 +330,22 @@ public class Planet implements Serializable {
         return gravity;
     }
     
-    public Double getMass() {
-        return mass;
-    }
-    
     public Double getDensity() {
         return density;
     }
     
-    public Double getRadius() {
-        return radius;
+    public Integer getDiameter() {
+        return diameter;
     }
     
     public String getGravityText() {
         return null != gravity ? gravity.toString() + "g" : "unknown"; //$NON-NLS-1$
     }
 
-    public Double getOrbitSemimajorAxis() {
-        return orbitSemimajorAxis;
+    public Double getOrbitRadius() {
+        return orbitRadius;
     }
-    
-    /** @return orbital semimajor axis in km; in the middle of the star's life zone if not set */
-    public double getOrbitSemimajorAxisKm() {
-        return null != orbitSemimajorAxis ? orbitSemimajorAxis * StarUtil.AU : getStarAverageLifeZone();
-    }
+
 
     public List<String> getSatellites() {
         return null != satellites ? new ArrayList<String>(satellites) : null;
@@ -455,18 +385,6 @@ public class Planet implements Serializable {
     public String getSystemPositionText() {
         return null != sysPos ? sysPos.toString() : "?"; //$NON-NLS-1$
     }
-
-    public Double getOrbitEccentricity() {
-        return orbitEccentricity;
-    }
-
-    public Double getOrbitInclination() {
-        return orbitInclination;
-    }
-
-    public Double getTilt() {
-        return tilt;
-    }
     
     public String getDescription() {
         return desc;
@@ -484,46 +402,6 @@ public class Planet implements Serializable {
 
     public Double getY() {
         return y;
-    }
-
-    public String getSpectralType() {
-        return spectralType;
-    }
-    
-    /** @return normalized spectral type, for display */
-    public String getSpectralTypeNormalized() {
-        return null != spectralType ? StarUtil.getSpectralType(spectralClass, subtype, luminosity) : "?"; //$NON-NLS-1$
-    }
-    
-    public String getSpectralTypeText() {
-        if(null == spectralType || spectralType.isEmpty()) {
-            return "unknown";
-        }
-        if(spectralType.startsWith("Q")) {
-            switch(spectralType) {
-                case "QB": return "black hole"; //$NON-NLS-1$
-                case "QN": return "neutron star"; //$NON-NLS-1$
-                case "QP": return "pulsar"; //$NON-NLS-1$
-                default: return "unknown";
-            }
-        }
-        return spectralType;
-    }
-
-    public Integer getSpectralClass() {
-        return spectralClass;
-    }
-
-    public void setSpectralClass(Integer spectralClass) {
-        this.spectralClass = spectralClass;
-    }
-
-    public Double getSubtype() {
-        return subtype;
-    }
-
-    public void setSubtype(double subtype) {
-        this.subtype = subtype;
     }
 
     // Date-dependant data
@@ -642,33 +520,12 @@ public class Planet implements Serializable {
         return StarUtil.getHPGClass(getHPG(when));
     }
 
-    public Integer getPopulationRating(DateTime when) {
-        return getEventData(when, populationRating, new EventGetter<Integer>() {
+    public Integer getPopulation(DateTime when) {
+        return getEventData(when, population, new EventGetter<Integer>() {
             @Override public Integer get(PlanetaryEvent e) { return e.populationRating; }
         });
     }
-    
-    public String getPopulationRatingString(DateTime when) {
-        Integer pops = getPopulationRating(when);
-        return (null != pops) ? StarUtil.getPopulationRatingString(pops.intValue()) : "unknown";
-    }
-    
-    public String getGovernment(DateTime when) {
-        return getEventData(when, government, new EventGetter<String>() {
-            @Override public String get(PlanetaryEvent e) { return e.government; }
-        });
-    }
 
-    public Integer getControlRating(DateTime when) {
-        return getEventData(when, controlRating, new EventGetter<Integer>() {
-            @Override public Integer get(PlanetaryEvent e) { return e.controlRating; }
-        });
-    }
-    
-    public String getControlRatingString(DateTime when) {
-        Integer cr = getControlRating(when);
-        return (null != cr) ? StarUtil.getControlRatingString(cr.intValue()) : "actual situation unclear";
-    }
     
     public LifeForm getLifeForm(DateTime when) {
         return getEventData(when, null != lifeForm ? lifeForm : LifeForm.NONE, new EventGetter<LifeForm>() {
@@ -678,17 +535,6 @@ public class Planet implements Serializable {
 
     public String getLifeFormName(DateTime when) {
         return getLifeForm(when).name;
-    }
-
-    public Climate getClimate(DateTime when) {
-        return getEventData(when, climate, new EventGetter<Climate>() {
-            @Override public Climate get(PlanetaryEvent e) { return e.climate; }
-        });
-    }
-
-    public String getClimateName(DateTime when) {
-        Climate c = getClimate(when);
-        return null != c ? c.climateName : null;
     }
 
     public Integer getPercentWater(DateTime when) {
@@ -714,39 +560,9 @@ public class Planet implements Serializable {
         return null != currentPressure ? PlanetaryConditions.getAtmosphereDisplayableName(currentPressure) : "unknown";
     }
 
-    public Double getPressureAtm(DateTime when) {
-        return getEventData(when, pressureAtm, new EventGetter<Double>() {
-            @Override public Double get(PlanetaryEvent e) { return e.pressureAtm; }
-        });
-    }
-
-    public Double getAtmMass(DateTime when) {
-        return getEventData(when, atmMass, new EventGetter<Double>() {
-            @Override public Double get(PlanetaryEvent e) { return e.atmMass; }
-        });
-    }
-
     public String getAtmosphere(DateTime when) {
         return getEventData(when, atmosphere, new EventGetter<String>() {
             @Override public String get(PlanetaryEvent e) { return e.atmosphere; }
-        });
-    }
-
-    public Double getAlbedo(DateTime when) {
-        return getEventData(when, albedo, new EventGetter<Double>() {
-            @Override public Double get(PlanetaryEvent e) { return e.albedo; }
-        });
-    }
-
-    public Double getGreenhouseEffect(DateTime when) {
-        return getEventData(when, greenhouseEffect, new EventGetter<Double>() {
-            @Override public Double get(PlanetaryEvent e) { return e.greenhouseEffect; }
-        });
-    }
-
-    public Integer getHabitability(DateTime when) {
-        return getEventData(when, habitability, new EventGetter<Integer>() {
-            @Override public Integer get(PlanetaryEvent e) { return e.habitability; }
         });
     }
 
@@ -782,89 +598,6 @@ public class Planet implements Serializable {
     public String getFactionDesc(DateTime when) {
         return Faction.getFactionNames(getFactionSet(when), when.getYear());
     }
-
-    // Stellar event data, to be moved
-    
-    public Boolean isNadirCharge(DateTime when) {
-        return getEventData(when, nadirCharge, new EventGetter<Boolean>() {
-            @Override public Boolean get(PlanetaryEvent e) { return e.nadirCharge; }
-        });
-    }
-
-    public boolean isZenithCharge(DateTime when) {
-        return getEventData(when, zenithCharge, new EventGetter<Boolean>() {
-            @Override public Boolean get(PlanetaryEvent e) { return e.zenithCharge; }
-        });
-    }
-
-    public String getRechargeStationsText(DateTime when) {
-        Boolean nadir = isNadirCharge(when);
-        Boolean zenith = isZenithCharge(when);
-        if(null != nadir && null != zenith && nadir.booleanValue() && zenith.booleanValue()) {
-            return "Zenith, Nadir";
-        } else if(null != zenith && zenith.booleanValue()) {
-            return "Zenith";
-        } else if(null != nadir && nadir.booleanValue()) {
-            return "Nadir";
-        } else {
-            return "None";
-        }
-    }
-    
-    /** Recharge time in hours (assuming the usage of the fastest charing method available) */
-    public double getRechargeTime(DateTime when) {
-        if(isZenithCharge(when) || isNadirCharge(when)) {
-            return Math.min(176.0, 141 + 10*spectralClass + subtype);
-        } else {
-            return getSolarRechargeTime();
-        }
-    }
-    
-    /** Recharge time in hours using solar radiation alone (at jump point and 100% efficiency) */
-    public double getSolarRechargeTime() {
-        if( null == spectralClass || null == subtype ) {
-            return 183;
-        }
-        return StarUtil.getSolarRechargeTime(spectralClass, subtype);
-    }
-
-    public String getRechargeTimeText(DateTime when) {
-        double time = getRechargeTime(when);
-        if(Double.isInfinite(time)) {
-            return "recharging impossible"; //$NON-NLS-1$
-        } else {
-            return String.format("%.0f hours", time); //$NON-NLS-1$
-        }
-    }
-    
-    // Astronavigation
-    
-    /** @return the average travel time from low orbit to the jump point at 1g, in Terran days */
-    public double getTimeToJumpPoint(double acceleration) {
-        //based on the formula in StratOps
-        return Math.sqrt((getDistanceToJumpPoint() * 1000) / (StarUtil.G * acceleration)) / 43200;
-    }
-
-    /** @return the average distance to the system's jump point in km */
-    public double getDistanceToJumpPoint() {
-        return Math.sqrt(Math.pow(getOrbitSemimajorAxisKm(), 2) + Math.pow(getStarDistanceToJumpPoint(), 2));
-    }
-
-    private double getStarDistanceToJumpPoint() {
-        if( null == spectralClass || null == subtype ) {
-            return StarUtil.getDistanceToJumpPoint(42);
-        }
-        return StarUtil.getDistanceToJumpPoint(spectralClass, subtype);
-    }
-    
-    /** @return the rough middle of the habitable zone around this star, in km */
-    private double getStarAverageLifeZone() {
-        // TODO Calculate from luminosity and the like. For now, using the table in IO Beta.
-        if( null == spectralClass || null == subtype ) {
-            return (StarUtil.getMinLifeZone(42) + StarUtil.getMaxLifeZone(42)) / 2;
-        }
-        return (StarUtil.getMinLifeZone(spectralClass, subtype) + StarUtil.getMaxLifeZone(spectralClass, subtype)) / 2;
-    }
     
     /** @return the distance to another planet in light years (0 if both are in the same system) */
     public double getDistanceTo(Planet anotherPlanet) {
@@ -876,6 +609,30 @@ public class Planet implements Serializable {
         return Math.sqrt(Math.pow(x - this.x, 2) + Math.pow(y - this.y, 2));
     }
 
+    // Astronavigation
+    
+    /** @return the average travel time from low orbit to the jump point at 1g, in Terran days */
+    public double getTimeToJumpPoint(double acceleration) {
+        //based on the formula in StratOps
+        return Math.sqrt((getDistanceToJumpPoint() * 1000) / (StarUtil.G * acceleration)) / 43200;
+    }
+
+    /** @return the average distance to the system's jump point in km */
+    public double getDistanceToJumpPoint() {
+        //TODO: put in parent system information
+        return 150000000;
+        //return Math.sqrt(Math.pow(getOrbitRadiusKm(), 2) + Math.pow(parentSystem.getStarDistanceToJumpPoint(), 2));
+    }
+    
+    public double getOrbitRadiusKm() {
+        if(null == orbitRadius) {
+            //TODO: figure out a better way to handle missing orbit radius (really this should not be missing)
+            return 0.5 * StarUtil.AU;
+        }
+        return  orbitRadius * StarUtil.AU;
+    }
+
+    
     /**
      * Returns whether the planet has not been discovered or is a dead planet. This code was adapted from
      * InterstellarPlanetMapPanel.isPlanetEmpty
@@ -895,6 +652,26 @@ public class Planet implements Serializable {
         }
         
         return true;
+    }
+    
+    public String getSpectralTypeText() {
+        //TODO: eventually this will come from the PlanetarySystem object
+        return "Nothing";
+    }
+    
+    public String getRechargeTimeText(DateTime when) {
+        //TODO: eventually this will come from the PlanetarySystem object
+        return "Nothing";
+    }
+    
+    public String getRechargeStationsText(DateTime when) {
+        //TODO: eventually this will come from the PlanetarySystem object
+        return "Nothing";
+    }
+    
+    public double getRechargeTime(DateTime when) {
+      //TODO: eventually this will come from the PlanetarySystem object
+        return 0;
     }
     
     /**
@@ -995,6 +772,7 @@ public class Planet implements Serializable {
             id = name;
         }
         
+        /*
         // Spectral classification: use spectralType if available, else the separate values
         if( null != spectralType ) {
             setSpectralType(spectralType);
@@ -1007,7 +785,7 @@ public class Planet implements Serializable {
         if( null == spectralType ) {
             setSpectralType(StarUtil.generateSpectralType(
                 new Random(id.hashCode() + 133773), true, (null != spectralClass) ? spectralClass.intValue() : -1));
-        }        
+        }*/        
         
         // Fill up events
         events = new TreeMap<DateTime, PlanetaryEvent>(DateTimeComparator.getDateOnlyInstance());
@@ -1038,20 +816,6 @@ public class Planet implements Serializable {
         // Fill up our event list from the internal data type
         eventList = new ArrayList<PlanetaryEvent>(events.values());
         return true;
-    }
-    
-    /** Includes a parser for spectral type strings */
-    protected void setSpectralType(String type) {
-        SpectralDefinition scDef = StarUtil.parseSpectralType(type);
-        
-        if( null == scDef ) {
-            return;
-        }
-        
-        spectralType = scDef.spectralType;
-        spectralClass = scDef.spectralClass;
-        subtype = scDef.subtype;
-        luminosity = scDef.luminosity;
     }
     
     /**
@@ -1148,34 +912,18 @@ public class Planet implements Serializable {
             shortName = Utilities.nonNull(other.shortName, shortName);
             x = Utilities.nonNull(other.x, x);
             y = Utilities.nonNull(other.y, y);
-            spectralType = Utilities.nonNull(other.spectralType, spectralType);
-            spectralClass =Utilities.nonNull(other.spectralClass, spectralClass);
-            subtype = Utilities.nonNull(other.subtype, subtype);
-            luminosity = Utilities.nonNull(other.luminosity, luminosity);
-            climate = Utilities.nonNull(other.climate, climate);
             desc = Utilities.nonNull(other.desc, desc);
             factions = Utilities.nonNull(other.factions, factions);
             gravity = Utilities.nonNull(other.gravity, gravity);
             hpg = Utilities.nonNull(other.hpg, hpg);
             landMasses = Utilities.nonNull(other.landMasses, landMasses);
             lifeForm = Utilities.nonNull(other.lifeForm, lifeForm);
-            orbitSemimajorAxis = Utilities.nonNull(other.orbitSemimajorAxis, orbitSemimajorAxis);
-            orbitEccentricity = Utilities.nonNull(other.orbitEccentricity, orbitEccentricity);
-            orbitInclination = Utilities.nonNull(other.orbitInclination, orbitInclination);
             percentWater = Utilities.nonNull(other.percentWater, percentWater);
             pressure = Utilities.nonNull(other.pressure, pressure);
-            pressureAtm = Utilities.nonNull(other.pressureAtm, pressureAtm);
-            pressureAtm = Utilities.nonNull(other.pressureAtm, pressureAtm);
-            atmMass = Utilities.nonNull(other.atmMass, atmMass);
             atmosphere = Utilities.nonNull(other.atmosphere, atmosphere);
-            albedo = Utilities.nonNull(other.albedo, albedo);
-            greenhouseEffect = Utilities.nonNull(other.greenhouseEffect, greenhouseEffect);
             volcanicActivity = Utilities.nonNull(other.volcanicActivity, volcanicActivity);
             tectonicActivity = Utilities.nonNull(other.tectonicActivity, tectonicActivity);
-            populationRating = Utilities.nonNull(other.populationRating, populationRating);
-            government = Utilities.nonNull(other.government, government);
-            controlRating = Utilities.nonNull(other.controlRating, controlRating);
-            habitability = Utilities.nonNull(other.habitability, habitability);
+            population = Utilities.nonNull(other.population, population);
             dayLength = Utilities.nonNull(other.dayLength, dayLength);
             satellites = Utilities.nonNull(other.satellites, satellites);
             sysPos = Utilities.nonNull(other.sysPos, sysPos);
