@@ -11,6 +11,15 @@ v0.45.2-SNAPSHOT
 + PR #926: Planet-based acquisition option
 + Issue #946: Some personnel (techs and admins) no longer able to be right clicked.
 + Issue #856: Invalid AtB required lances number no longer prevents user from editing contract
++ Planets: Added additional data to planets.xml
++ PR #956: System-wide equipment [Aerospace system equipment not associated with weapons shows in a fuselage
+           or hull location when filtering by location in repair tab].
++ Issue #852: Support for Award clusters if an award is given multiple times to a person.
++ Issue #905: Fixes NPE when a spouse is missing on campaign load or personnel menu click.
++ PR #882: Adds support for gzipped Campaign files (*.cpnx.gz).
++ Planets: Reunification War data for Outworlds Alliance + start of RWR 
++ PR #959: Fix for inability to repair damaged VTOL internal structure after loading campaign
++ Issue #967: Fix bug where acquired Units could never be bought
 
 v0.45.1 (2018-09-03 2300 UTC)
 + PR #864: Security - address XXE vulnerabilities in XML parsers

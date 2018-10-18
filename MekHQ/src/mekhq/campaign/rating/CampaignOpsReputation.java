@@ -126,13 +126,12 @@ public class CampaignOpsReputation extends AbstractUnitRating {
 
             Entity entity = u.getEntity();
             updateBayCount(entity);
-            int unitType = UnitType.determineUnitTypeCode(entity);
+            int unitType = entity.getUnitType();
             if (UnitType.INFANTRY == unitType ||
                 UnitType.BATTLE_ARMOR == unitType) {
                 updateTotalSkill((Infantry) entity);
             } else {
-                updateTotalSkill(u.getEntity().getCrew(),
-                                 UnitType.determineUnitTypeCode(entity));
+                updateTotalSkill(u.getEntity().getCrew(), entity.getUnitType());
             }
 
             // todo: Add Mobile Structure when Megamek supports it.
@@ -300,7 +299,7 @@ public class CampaignOpsReputation extends AbstractUnitRating {
         }
 
         return getTotalSkillLevels().divide(BigDecimal.valueOf(totalCombatUnits),
-                                            2, BigDecimal.ROUND_HALF_DOWN);
+                                            2,RoundingMode.HALF_DOWN);
     }
 
     private void calcNeededTechs() {
@@ -627,7 +626,7 @@ public class CampaignOpsReputation extends AbstractUnitRating {
             setSupportPercent(BigDecimal.valueOf(getTotalTechTeams())
                                         .divide(BigDecimal.valueOf(totalTechTeamsNeeded),
                                                 5,
-                                                BigDecimal.ROUND_HALF_UP)
+                                                RoundingMode.HALF_UP)
                                         .multiply(HUNDRED));
         }
 

@@ -801,9 +801,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
             choiceLocation.removeAllItems();
             choiceLocation.addItem("All");
             for (String s : getSelectedServicedUnit().getEntity().getLocationAbbrs()) {
-                if (s.equals("WNG")) {
-                    choiceLocation.addItem("FSLG");
-                } else {
+                if (!s.equals("WNG")) {
                     choiceLocation.addItem(s);
                 }
             }

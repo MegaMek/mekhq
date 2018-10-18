@@ -13,9 +13,12 @@ MekHQ/pkgdir
 
 # IDE directories
 MekHQ/.idea/
+/out/
 /.vscode
 /.gradle/
 /settings_local.gradle
 /.classpath
 /.project
 /properties_local.gradle
+
+MekHQ/out/

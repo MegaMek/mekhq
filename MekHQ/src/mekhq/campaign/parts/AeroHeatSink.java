@@ -243,13 +243,16 @@ public class AeroHeatSink extends Part {
     @Override
     public String getLocationName() {
         if (null != unit) {
-            return "Fuselage";
+            return unit.getEntity().getLocationName(unit.getEntity().getBodyLocation());
         }
         return null;
     }
 
     @Override
     public int getLocation() {
+        if (null != unit) {
+            return unit.getEntity().getBodyLocation();
+        }
         return Entity.LOC_NONE;
     }
     

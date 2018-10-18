@@ -187,7 +187,7 @@ public class UnitViewPanel extends javax.swing.JPanel {
 		pnlStats.setLayout(new java.awt.GridBagLayout());
 		
 		lblType.setName("lblType"); // NOI18N
-		lblType.setText("<html><i>" + UnitType.getTypeDisplayableName(UnitType.determineUnitTypeCode(entity)) + "</i></html>");
+		lblType.setText("<html><i>" + UnitType.getTypeDisplayableName(entity.getUnitType()) + "</i></html>");
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 0;

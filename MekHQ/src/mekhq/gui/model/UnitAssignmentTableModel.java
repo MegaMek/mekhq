@@ -191,7 +191,7 @@ public class UnitAssignmentTableModel extends AbstractTableModel {
                     String desc = "<b>" + u.getName() + "</b><br>";
                     desc += u.getEntity().getWeightClassName();
                     if(!(u.getEntity() instanceof SmallCraft || u.getEntity() instanceof Jumpship)) {
-                        desc += " " + UnitType.getTypeDisplayableName(UnitType.determineUnitTypeCode(u.getEntity()));
+                        desc += " " + UnitType.getTypeDisplayableName(u.getEntity().getUnitType());
                     }
                     desc += "<br>" + u.getStatus() + "";
                     setText(desc, color);

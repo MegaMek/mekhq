@@ -9,10 +9,9 @@ package mekhq.gui.view;
 import java.awt.*;
 import java.awt.Dialog.ModalityType;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.*;
 import java.util.List;
-import java.util.ResourceBundle;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.swing.BorderFactory;
@@ -170,8 +169,8 @@ public class PersonViewPanel extends JPanel {
 
         int gridy = 1;
         
-        if(person.hasAwards()) {
-            if(person.hasAwardsWithRibbons()){
+        if(person.awardController.hasAwards()) {
+            if(person.awardController.hasAwardsWithRibbons()){
                 boxRibbons = Box.createVerticalBox();
                 boxRibbons.add(Box.createRigidArea(new Dimension(100,0)));
                 drawRibbons();
@@ -185,7 +184,7 @@ public class PersonViewPanel extends JPanel {
                 pnlPortrait.add(boxRibbons, gbc_pnlAllRibbons);
             }
 
-            if(person.hasAwardsWithMedals()){
+            if(person.awardController.hasAwardsWithMedals()){
                 pnlMedals = new JPanel();
                 pnlMedals.setName("pnlMedals");
                 pnlMedals.setBackground(Color.WHITE);
@@ -203,7 +202,7 @@ public class PersonViewPanel extends JPanel {
                 gridy++;
             }
 
-            if(person.hasAwardsWithMiscs()){
+            if(person.awardController.hasAwardsWithMiscs()){
                 pnlMiscAwards = new JPanel();
                 pnlMiscAwards.setName("pnlMiscAwards");
                 pnlMiscAwards.setBackground(Color.WHITE);
@@ -311,7 +310,8 @@ public class PersonViewPanel extends JPanel {
      * Draws the ribbons below the person portrait.
      */
     private void drawRibbons() {
-        List<Award> awards = person.getAwards().stream().filter(a -> a.getRibbonFileName() != null).collect(Collectors.toList());
+        List<Award> awards = person.awardController.getAwards().stream().filter(a -> a.getNumberOfRibbonFiles() > 0).sorted()
+                .collect(Collectors.toList());
         Collections.reverse(awards);
 
         int i = 0;
@@ -327,12 +327,13 @@ public class PersonViewPanel extends JPanel {
                 rowRibbonsBox.setBackground(Color.RED);
             }
             try{
-                ribbon = (Image) awardIcons.getItem(award.getSet() + "/ribbons/", award.getRibbonFileName());
+                int numberOfAwards = person.awardController.getNumberOfAwards(award);
+                String ribbonFileName = award.getRibbonFileName(numberOfAwards);
+                ribbon = (Image) awardIcons.getItem(award.getSet() + "/ribbons/", ribbonFileName);
                 if(ribbon == null) continue;
                 ribbon = ribbon.getScaledInstance(25,8, Image.SCALE_DEFAULT);
                 ribbonLabel.setIcon(new ImageIcon(ribbon));
-                ribbonLabel.setToolTipText("(" + award.getFormatedDate() + ") " + award.getName()
-                        + ": " + award.getDescription());
+                ribbonLabel.setToolTipText(award.getTooltip());
                 rowRibbonsBox.add(ribbonLabel, 0);
             }
             catch (Exception err) {
@@ -358,7 +359,7 @@ public class PersonViewPanel extends JPanel {
      * Draws the medals above the personal log.
      */
     private void drawMedals(){
-        List<Award> awards = person.getAwards().stream().filter(a -> a.getMedalFileName() != null).sorted()
+        List<Award> awards = person.awardController.getAwards().stream().filter(a -> a.getNumberOfMedalFiles() > 0).sorted()
                 .collect(Collectors.toList());
 
         for(Award award : awards){
@@ -366,11 +367,13 @@ public class PersonViewPanel extends JPanel {
 
             Image medal = null;
             try{
-                medal = (Image) awardIcons.getItem( award.getSet() + "/medals/", award.getMedalFileName());
+                int numberOfAwards = person.awardController.getNumberOfAwards(award);
+                String medalFileName = award.getMedalFileName(numberOfAwards);
+                medal = (Image) awardIcons.getItem(award.getSet() + "/medals/", medalFileName);
                 if(medal == null) continue;
                 medal = ImageHelpers.getScaledForBoundaries(medal, new Dimension(30,60), Image.SCALE_DEFAULT);
                 medalLabel.setIcon(new ImageIcon(medal));
-                medalLabel.setToolTipText("(" + award.getFormatedDate() + ") " + award.getName() + ": " + award.getDescription());
+                medalLabel.setToolTipText(award.getTooltip());
                 pnlMedals.add(medalLabel);
             }
             catch (Exception err) {
@@ -383,7 +386,7 @@ public class PersonViewPanel extends JPanel {
      * Draws the misc awards below the medals.
      */
     private void drawMiscAwards() {
-        ArrayList<Award> awards = person.getAwards().stream().filter(a -> a.getMiscFileName() != null)
+        ArrayList<Award> awards = person.awardController.getAwards().stream().filter(a -> a.getNumberOfMiscFiles() > 0)
                 .collect(Collectors.toCollection(ArrayList::new));
 
         for (Award award : awards) {
@@ -391,11 +394,13 @@ public class PersonViewPanel extends JPanel {
 
             Image miscAward = null;
             try {
-                Image miscAwardBufferedImage = (Image) awardIcons.getItem(award.getSet() + "/misc/", award.getMiscFileName());
+                int numberOfAwards = person.awardController.getNumberOfAwards(award);
+                String miscFileName = award.getMiscFileName(numberOfAwards);
+                Image miscAwardBufferedImage = (Image) awardIcons.getItem(award.getSet() + "/misc/", miscFileName);
                 if (miscAwardBufferedImage == null) continue;
                 miscAward = ImageHelpers.getScaledForBoundaries(miscAwardBufferedImage, new Dimension(100,100), Image.SCALE_DEFAULT);
                 miscLabel.setIcon(new ImageIcon(miscAward));
-                miscLabel.setToolTipText("(" + award.getFormatedDate() + ") " + award.getName() + ": " + award.getDescription());
+                miscLabel.setToolTipText(award.getTooltip());
                 pnlMiscAwards.add(miscLabel);
             } catch (Exception err) {
                 err.printStackTrace();
@@ -727,7 +732,7 @@ public class PersonViewPanel extends JPanel {
             secondy = firsty;
         }
 
-        if (null != person.getSpouseID()) {
+        if (person.hasSpouse()) {
             secondy++;
             lblSpouse1.setName("lblSpouse1"); // NOI18N //$NON-NLS-1$
             lblSpouse1.setText(resourceMap.getString("lblSpouse1.text")); //$NON-NLS-1$

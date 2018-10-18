@@ -45,235 +45,240 @@ import mekhq.campaign.personnel.SkillType;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class SpacecraftEngine extends Part {
-	private static final long serialVersionUID = -6961398614705924172L;
-	
-	static final TechAdvancement TECH_ADVANCEMENT = new TechAdvancement(TECH_BASE_ALL)
-	        .setAdvancement(DATE_ES, DATE_ES, DATE_ES).setTechRating(RATING_D)
-	        .setAvailability(RATING_C, RATING_D, RATING_C, RATING_C)
-	        .setStaticTechLevel(SimpleTechLevel.STANDARD);
-	
-	double engineTonnage;  
-	boolean clan;
-	
-	public SpacecraftEngine() {
-		this(0, 0, null, false);
-	}
+    private static final long serialVersionUID = -6961398614705924172L;
 
-	public SpacecraftEngine(int tonnage, double etonnage, Campaign c, boolean clan) {
-		super(tonnage, c);
-		this.engineTonnage = etonnage;
-		this.clan = clan;
-		this.name = "Spacecraft Engine";
-	}
-	
-	public SpacecraftEngine clone() {
-		SpacecraftEngine clone = new SpacecraftEngine(getUnitTonnage(), engineTonnage, campaign, clan);
+    static final TechAdvancement TECH_ADVANCEMENT = new TechAdvancement(TECH_BASE_ALL)
+            .setAdvancement(DATE_ES, DATE_ES, DATE_ES).setTechRating(RATING_D)
+            .setAvailability(RATING_C, RATING_D, RATING_C, RATING_C)
+            .setStaticTechLevel(SimpleTechLevel.STANDARD);
+
+    double engineTonnage;  
+    boolean clan;
+
+    public SpacecraftEngine() {
+        this(0, 0, null, false);
+    }
+
+    public SpacecraftEngine(int tonnage, double etonnage, Campaign c, boolean clan) {
+        super(tonnage, c);
+        this.engineTonnage = etonnage;
+        this.clan = clan;
+        this.name = "Spacecraft Engine";
+    }
+
+    public SpacecraftEngine clone() {
+        SpacecraftEngine clone = new SpacecraftEngine(getUnitTonnage(), engineTonnage, campaign, clan);
         clone.copyBaseData(this);
-		return clone;
-	}
-	
-	@Override
-	public double getTonnage() {
-		return engineTonnage;
-	}
-	
-	public void calculateTonnage() {
-		
-		if(null != unit) {
-			clan = unit.getEntity().isClan();
-			if(unit.getEntity() instanceof SmallCraft) {
-			    double moveFactor = unit.getEntity().getWeight() * unit.getEntity().getOriginalWalkMP();
-				if(clan) {
-					engineTonnage = Math.round(moveFactor * 0.061 * 2)/2f;
-				} else {
-					engineTonnage = Math.round(moveFactor * 0.065 * 2)/2f;
-				}
-			} else if(unit.getEntity() instanceof Jumpship) {
-				if(unit.getEntity() instanceof Warship) {
-					engineTonnage = Math.round(unit.getEntity().getWeight() * 0.06 *  unit.getEntity().getOriginalWalkMP() * 2)/2f;
-				} else {
-					engineTonnage = Math.round(unit.getEntity().getWeight() * 0.012 * 2)/2f;
-				}
-			}
-		}
-	}
-	
-	@Override 
-	public long getStickerPrice() {
-		return (long)Math.round(engineTonnage * 1000);
-	}
-	
-	@Override
-	public boolean isSamePartType(Part part) {
-		return part instanceof SpacecraftEngine
-				&& getName().equals(part.getName())
-				&& getTonnage() == ((SpacecraftEngine)part).getTonnage();
-	}
+        return clone;
+    }
 
-	@Override
-	public int getTechLevel() {
-		if(clan) {
-			return TechConstants.T_CLAN_TW;
-		} else {
-			return TechConstants.T_IS_TW_NON_BOX;
-		}
-	}
-
-	@Override
-	public void writeToXml(PrintWriter pw1, int indent) {
-		writeToXmlBegin(pw1, indent);
-		// The engine is a MM object...
-		// And doesn't support XML serialization...
-		// But it's defined by 3 ints. So we'll save those here.
-		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<engineTonnage>"
-				+engineTonnage
-				+"</engineTonnage>");
-		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<clan>"
-				+clan
-				+"</clan>");
-		writeToXmlEnd(pw1, indent);
-	}
-
-	@Override
-	protected void loadFieldsFromXmlNode(Node wn) {
-		NodeList nl = wn.getChildNodes();
-		
-		for (int x=0; x<nl.getLength(); x++) {
-			Node wn2 = nl.item(x);
-			
-			if (wn2.getNodeName().equalsIgnoreCase("engineTonnage")) {
-				engineTonnage = Double.parseDouble(wn2.getTextContent());
-			} else if (wn2.getNodeName().equalsIgnoreCase("clan")) {
-				if(wn2.getTextContent().equalsIgnoreCase("true")) {
-					clan = true;
-				} else {
-					clan = false;
-				}
-			} 
-		}
-	}
-
-	@Override
-	public void fix() {
-		super.fix();
-		if(null != unit) {
-			if(unit.getEntity() instanceof Aero) {
-				((Aero)unit.getEntity()).setEngineHits(0);
-			}
-		}
-	}
-
-	@Override
-	public MissingPart getMissingPart() {
-		return new MissingSpacecraftEngine(getUnitTonnage(), engineTonnage, campaign, clan);
-	}
-
-	@Override
-	public void remove(boolean salvage) {
-		if(null != unit) {
-			unit.destroySystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_ENGINE);
-			if(unit.getEntity() instanceof Aero) {
-				((Aero)unit.getEntity()).setEngineHits(((Aero)unit.getEntity()).getMaxEngineHits());
-			}
-			Part spare = campaign.checkForExistingSparePart(this);
-			if(!salvage) {
-				campaign.removePart(this);
-			} else if(null != spare) {
-				spare.incrementQuantity();
-				campaign.removePart(this);
-			}
-			unit.removePart(this);
-			Part missing = getMissingPart();
-			unit.addPart(missing);
-			campaign.addPart(missing, 0);
-		}
-		setUnit(null);
-		updateConditionFromEntity(false);
-	}
-
-	@Override
-	public void updateConditionFromEntity(boolean checkForDestruction) {
-		if(null != unit) {
-			int engineHits = 0;
-			int engineCrits = 0;
-			if(unit.getEntity() instanceof Aero) {
-				engineHits = ((Aero)unit.getEntity()).getEngineHits();
-				engineCrits = 3;
-			}
-			if(engineHits >= engineCrits) {
-				remove(false);
-				return;
-			} 
-			else if(engineHits > 0) {
-				hits = engineHits;
-			} else {
-				hits = 0;
-			}
-		}
-	}
-	
-	@Override 
-	public int getBaseTime() {
-		if(isSalvaging()) {
-			return 43200;
-		}
-		return 300;
-	}
-	
-	@Override
-	public int getDifficulty() {
-		return 1;
-	}
-
-	@Override
-	public boolean needsFixing() {
-		return hits > 0;
-	}
-
-	@Override
-	public void updateConditionFromPart() {
-		if(null != unit) {
-			if(unit.getEntity() instanceof Aero) {
-				((Aero)unit.getEntity()).setEngineHits(hits);
-			}
-		}
-	}
-	
-	@Override
-	 public String checkFixable() {
-		 return null;
-	 }
-	
-	@Override
-	public boolean isMountedOnDestroyedLocation() {
-		return false;
-	}
-	 
-	 @Override
-	 public boolean isRightTechType(String skillType) {
-		 return skillType.equals(SkillType.S_TECH_AERO);	
-	 }
-
-	@Override
-	public String getLocationName() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public int getLocation() {
-		return Entity.LOC_NONE;
-	}
-	
-	@Override
-	public TechAdvancement getTechAdvancement() {
-	    return TECH_ADVANCEMENT;
-	}
-    
     @Override
-	public int getMassRepairOptionType() {
-    	return Part.REPAIR_PART_TYPE.ENGINE;
+    public double getTonnage() {
+        return engineTonnage;
+    }
+
+    public void calculateTonnage() {
+
+        if(null != unit) {
+            clan = unit.getEntity().isClan();
+            if(unit.getEntity() instanceof SmallCraft) {
+                double moveFactor = unit.getEntity().getWeight() * unit.getEntity().getOriginalWalkMP();
+                if(clan) {
+                    engineTonnage = Math.round(moveFactor * 0.061 * 2)/2f;
+                } else {
+                    engineTonnage = Math.round(moveFactor * 0.065 * 2)/2f;
+                }
+            } else if(unit.getEntity() instanceof Jumpship) {
+                if(unit.getEntity() instanceof Warship) {
+                    engineTonnage = Math.round(unit.getEntity().getWeight() * 0.06 *  unit.getEntity().getOriginalWalkMP() * 2)/2f;
+                } else {
+                    engineTonnage = Math.round(unit.getEntity().getWeight() * 0.012 * 2)/2f;
+                }
+            }
+        }
+    }
+
+    @Override 
+    public long getStickerPrice() {
+        return (long)Math.round(engineTonnage * 1000);
+    }
+
+    @Override
+    public boolean isSamePartType(Part part) {
+        return part instanceof SpacecraftEngine
+                && getName().equals(part.getName())
+                && getTonnage() == ((SpacecraftEngine)part).getTonnage();
+    }
+
+    @Override
+    public int getTechLevel() {
+        if(clan) {
+            return TechConstants.T_CLAN_TW;
+        } else {
+            return TechConstants.T_IS_TW_NON_BOX;
+        }
+    }
+
+    @Override
+    public void writeToXml(PrintWriter pw1, int indent) {
+        writeToXmlBegin(pw1, indent);
+        // The engine is a MM object...
+        // And doesn't support XML serialization...
+        // But it's defined by 3 ints. So we'll save those here.
+        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"<engineTonnage>"
+                +engineTonnage
+                +"</engineTonnage>");
+        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"<clan>"
+                +clan
+                +"</clan>");
+        writeToXmlEnd(pw1, indent);
+    }
+
+    @Override
+    protected void loadFieldsFromXmlNode(Node wn) {
+        NodeList nl = wn.getChildNodes();
+
+        for (int x=0; x<nl.getLength(); x++) {
+            Node wn2 = nl.item(x);
+
+            if (wn2.getNodeName().equalsIgnoreCase("engineTonnage")) {
+                engineTonnage = Double.parseDouble(wn2.getTextContent());
+            } else if (wn2.getNodeName().equalsIgnoreCase("clan")) {
+                if(wn2.getTextContent().equalsIgnoreCase("true")) {
+                    clan = true;
+                } else {
+                    clan = false;
+                }
+            } 
+        }
+    }
+
+    @Override
+    public void fix() {
+        super.fix();
+        if(null != unit) {
+            if(unit.getEntity() instanceof Aero) {
+                ((Aero)unit.getEntity()).setEngineHits(0);
+            }
+        }
+    }
+
+    @Override
+    public MissingPart getMissingPart() {
+        return new MissingSpacecraftEngine(getUnitTonnage(), engineTonnage, campaign, clan);
+    }
+
+    @Override
+    public void remove(boolean salvage) {
+        if(null != unit) {
+            unit.destroySystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_ENGINE);
+            if(unit.getEntity() instanceof Aero) {
+                ((Aero)unit.getEntity()).setEngineHits(((Aero)unit.getEntity()).getMaxEngineHits());
+            }
+            Part spare = campaign.checkForExistingSparePart(this);
+            if(!salvage) {
+                campaign.removePart(this);
+            } else if(null != spare) {
+                spare.incrementQuantity();
+                campaign.removePart(this);
+            }
+            unit.removePart(this);
+            Part missing = getMissingPart();
+            unit.addPart(missing);
+            campaign.addPart(missing, 0);
+        }
+        setUnit(null);
+        updateConditionFromEntity(false);
+    }
+
+    @Override
+    public void updateConditionFromEntity(boolean checkForDestruction) {
+        if(null != unit) {
+            int engineHits = 0;
+            int engineCrits = 0;
+            if(unit.getEntity() instanceof Aero) {
+                engineHits = ((Aero)unit.getEntity()).getEngineHits();
+                engineCrits = 3;
+            }
+            if(engineHits >= engineCrits) {
+                remove(false);
+                return;
+            } 
+            else if(engineHits > 0) {
+                hits = engineHits;
+            } else {
+                hits = 0;
+            }
+        }
+    }
+
+    @Override 
+    public int getBaseTime() {
+        if(isSalvaging()) {
+            return 43200;
+        }
+        return 300;
+    }
+
+    @Override
+    public int getDifficulty() {
+        return 1;
+    }
+
+    @Override
+    public boolean needsFixing() {
+        return hits > 0;
+    }
+
+    @Override
+    public void updateConditionFromPart() {
+        if(null != unit) {
+            if(unit.getEntity() instanceof Aero) {
+                ((Aero)unit.getEntity()).setEngineHits(hits);
+            }
+        }
+    }
+
+    @Override
+    public String checkFixable() {
+        return null;
+    }
+
+    @Override
+    public boolean isMountedOnDestroyedLocation() {
+        return false;
+    }
+
+    @Override
+    public boolean isRightTechType(String skillType) {
+        return skillType.equals(SkillType.S_TECH_AERO);	
+    }
+
+    @Override
+    public String getLocationName() {
+        if (null != unit) {
+            return unit.getEntity().getLocationName(unit.getEntity().getBodyLocation());
+        }
+        return null;
+    }
+
+    @Override
+    public int getLocation() {
+        if (null != unit) {
+            return unit.getEntity().getBodyLocation();
+        }
+        return Entity.LOC_NONE;
+    }
+
+    @Override
+    public TechAdvancement getTechAdvancement() {
+        return TECH_ADVANCEMENT;
+    }
+
+    @Override
+    public int getMassRepairOptionType() {
+        return Part.REPAIR_PART_TYPE.ENGINE;
     }
 }

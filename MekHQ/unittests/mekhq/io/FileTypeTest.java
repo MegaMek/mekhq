@@ -44,6 +44,7 @@ public class FileTypeTest {
         Arrays.asList(
             "file.cpnx", "file.CPNX",
             "file.xml",  "file.XML",
+            "file.cpnx.gz", "file.CPNX.GZ", "file.CPNX.gz",
             "some/dir/file.xml"
         ).forEach(fn -> assertTrue(fn + " was not accepted",FileType.CPNX.getNameFilter().test(fn)));
 

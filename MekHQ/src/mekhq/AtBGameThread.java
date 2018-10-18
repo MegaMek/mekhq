@@ -146,14 +146,14 @@ public class AtBGameThread extends GameThread {
                 boolean useDropship = false;
                 if (scenario.getLanceRole() == Lance.ROLE_SCOUT) {
 	                for (Entity en : scenario.getAlliesPlayer()) {
-	                	if (UnitType.determineUnitTypeCode(en) == UnitType.DROPSHIP) {
+	                	if (en.getUnitType() == UnitType.DROPSHIP) {
 	                		useDropship = true;
 	                		break;
 	                	}
 	                }
 	                if (!useDropship) {
 		                for (Unit unit : units) {
-		                	if (UnitType.determineUnitTypeCode(unit.getEntity()) == UnitType.DROPSHIP) {
+		                	if (unit.getEntity().getUnitType() == UnitType.DROPSHIP) {
 		                		useDropship = true;
 		                		break;
 		                	}
