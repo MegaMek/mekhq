@@ -306,7 +306,7 @@ public class ContractSummaryPanel extends JPanel {
 		mainPanel.add(lblLocation, gridBagConstraints);
 
 		txtLocation.setName("txtLocation"); // NOI18N
-        txtLocation.setText(contract.getPlanetName(Utilities.getDateTimeDay(campaign.getCalendar())));
+        txtLocation.setText(contract.getSystemName(Utilities.getDateTimeDay(campaign.getCalendar())));
 		txtLocation.setEditable(false);
 		txtLocation.setLineWrap(true);
 		txtLocation.setWrapStyleWord(true);
@@ -319,7 +319,7 @@ public class ContractSummaryPanel extends JPanel {
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		mainPanel.add(txtLocation, gridBagConstraints);
 
-		if(Planets.getInstance().getPlanets().get(contract.getPlanetId()) != null) {
+		if(Planets.getInstance().getPlanets().get(contract.getSystemId()) != null) {
 			lblDistance.setName("lblDistance"); // NOI18N
 			lblDistance.setText(resourceMap.getString("lblDistance.text"));
 			gridBagConstraints = new java.awt.GridBagConstraints();
@@ -330,10 +330,10 @@ public class ContractSummaryPanel extends JPanel {
 			mainPanel.add(lblDistance, gridBagConstraints);
 
 			txtDistance.setName("txtDistance"); // NOI18N
-			JumpPath path = campaign.calculateJumpPath(campaign.getCurrentPlanet(), contract.getPlanet());
+			JumpPath path = campaign.calculateJumpPath(campaign.getCurrentSystem(), contract.getSystem());
 			int days = (int)Math.ceil((path).getTotalTime(Utilities.getDateTimeDay(contract.getStartDate()), campaign.getLocation().getTransitTime()));
 			int jumps = path.getJumps();
-            if (campaign.getCurrentPlanet().getId().equals(contract.getPlanetId())
+            if (campaign.getCurrentPlanet().getId().equals(contract.getSystemId())
                     && campaign.getLocation().isOnPlanet()) {
 				days = 0;
 				jumps = 0;

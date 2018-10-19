@@ -79,7 +79,9 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.IUnitGenerator;
 import mekhq.campaign.universe.Planet;
+import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.Planets;
+import mekhq.campaign.universe.Systems;
 
 /**
  * @author Neoancient
@@ -404,11 +406,14 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
     public void setPlanetaryConditions(Mission mission, Campaign campaign) {
         if (null != mission) {
-            Planet p = Planets.getInstance().getPlanets().get(mission.getPlanetId());
+            /*
+             * TODO: fix this once we have a way of identifying planet within a system
+            PlanetarySystem p = Systems.getInstance().getSystem().get(mission.getSystemId());
             if (null != p) {
                 atmosphere = Utilities.nonNull(p.getPressure(Utilities.getDateTimeDay(campaign.getCalendar())), atmosphere);
                 gravity = Utilities.nonNull(p.getGravity(), gravity).floatValue();
             }
+            */
         }
     }
 
@@ -1482,7 +1487,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         
         AtBContract contract = getContract(campaign);
         
-        boolean opForOwnsPlanet = contract.getPlanet().getFactions(Utilities.getDateTimeDay(campaign.getCalendar()))
+        boolean opForOwnsPlanet = contract.getSystem().getFactions(Utilities.getDateTimeDay(campaign.getCalendar()))
                                     .contains(contract.getEnemyCode());
 
         boolean spawnConventional = opForOwnsPlanet && Compute.d6() >= 
@@ -1538,7 +1543,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         
         AtBContract contract = getContract(campaign);
         
-        boolean opForOwnsPlanet = contract.getPlanet().getFactions(Utilities.getDateTimeDay(campaign.getCalendar()))
+        boolean opForOwnsPlanet = contract.getSystem().getFactions(Utilities.getDateTimeDay(campaign.getCalendar()))
                                     .contains(contract.getEnemyCode());
         boolean spawnTurrets = opForOwnsPlanet && 
                 Compute.d6() >= CampaignOptions.MAXIMUM_D6_VALUE - campaign.getCampaignOptions().getOpforLocalUnitChance(); 

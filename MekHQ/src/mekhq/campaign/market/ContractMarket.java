@@ -374,11 +374,11 @@ public class ContractMarket implements Serializable {
 				(contract.getMissionType() == AtBContract.MT_RELIEFDUTY && Compute.d6() < 4) ||
 				contract.getEnemyCode().equals("REB"));
 		if (isAttacker) {
-			contract.setPlanetId(RandomFactionGenerator.getInstance().getMissionTarget(contract.getEmployerCode(), contract.getEnemyCode()));
+			contract.setSystemId(RandomFactionGenerator.getInstance().getMissionTarget(contract.getEmployerCode(), contract.getEnemyCode()));
 		} else {
-			contract.setPlanetId(RandomFactionGenerator.getInstance().getMissionTarget(contract.getEnemyCode(), contract.getEmployerCode()));
+			contract.setSystemId(RandomFactionGenerator.getInstance().getMissionTarget(contract.getEnemyCode(), contract.getEmployerCode()));
 		}
-        if (contract.getPlanet() == null) {
+        if (contract.getSystem() == null) {
 		    MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.WARNING,
 		            "Could not find contract location for " //$NON-NLS-1$
 		                    + contract.getEmployerCode() + " vs. " + contract.getEnemyCode()); //$NON-NLS-1$
@@ -390,7 +390,7 @@ public class ContractMarket implements Serializable {
 		}
 		JumpPath jp = null;
 		try {
-			jp = campaign.calculateJumpPath(campaign.getCurrentPlanet(), contract.getPlanet());
+			jp = campaign.calculateJumpPath(campaign.getCurrentSystem(), contract.getSystem());
 		} catch (NullPointerException ex) {
 			// could not calculate jump path; leave jp null
 		}
@@ -483,7 +483,7 @@ public class ContractMarket implements Serializable {
 				contract.getMissionType() >= AtBContract.MT_PLANETARYASSAULT ||
 				(contract.getMissionType() == AtBContract.MT_RELIEFDUTY && Compute.d6() < 4) ||
 				contract.getEnemyCode().equals("REB"));
-        contract.setPlanetId(parent.getPlanetId());
+        contract.setSystemId(parent.getSystemId());
 		setAllyRating(contract, isAttacker, campaign.getCalendar().get(Calendar.YEAR));
 		setEnemyRating(contract, isAttacker, campaign.getCalendar().get(Calendar.YEAR));
 
@@ -523,7 +523,7 @@ public class ContractMarket implements Serializable {
 		AtBContract followup = new AtBContract("Followup Contract");
 		followup.setEmployerCode(contract.getEmployerCode(), campaign.getGameYear());
 		followup.setEnemyCode(contract.getEnemyCode());
-		followup.setPlanetId(contract.getPlanetId());
+		followup.setSystemId(contract.getSystemId());
 		switch (contract.getMissionType()) {
 		case AtBContract.MT_DIVERSIONARYRAID:
 			followup.setMissionType(AtBContract.MT_OBJECTIVERAID);

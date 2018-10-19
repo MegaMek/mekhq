@@ -628,9 +628,11 @@ public class Planet implements Serializable {
 
     /** @return the average distance to the system's jump point in km */
     public double getDistanceToJumpPoint() {
-        //TODO: put in parent system information
-        return 150000000;
-        //return Math.sqrt(Math.pow(getOrbitRadiusKm(), 2) + Math.pow(parentSystem.getStarDistanceToJumpPoint(), 2));
+        if(null == parentSystem) {
+            //TODO: shouldnt happen, produce error in log
+            return 0;
+        }
+        return Math.sqrt(Math.pow(getOrbitRadiusKm(), 2) + Math.pow(parentSystem.getStarDistanceToJumpPoint(), 2));
     }
     
     public double getOrbitRadiusKm() {

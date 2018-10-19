@@ -35,6 +35,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.StarUtil;
 import mekhq.campaign.universe.Planet.SocioIndustrialData;
+import mekhq.campaign.universe.PlanetarySystem;
 
 /**
  * A custom panel that gets filled in with goodies from a Planet record
@@ -43,6 +44,7 @@ import mekhq.campaign.universe.Planet.SocioIndustrialData;
 public class PlanetViewPanel extends JPanel {
     private static final long serialVersionUID = 7004741688464105277L;
 
+    private PlanetarySystem system;
     private Planet planet;
     private Campaign campaign;
     
@@ -80,8 +82,10 @@ public class PlanetViewPanel extends JPanel {
     
     private Image planetIcon = null;
     
-    public PlanetViewPanel(Planet p, Campaign c) {
-        this.planet = p;
+    public PlanetViewPanel(PlanetarySystem s, Campaign c) {
+        this.system = s;
+        //TODO: do a better job of grabbing primary planet
+        this.planet = s.getPrimaryPlanet();
         this.campaign = c;
         initComponents();
     }
@@ -112,6 +116,7 @@ public class PlanetViewPanel extends JPanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;    
         add(pnlStats, gridBagConstraints);
         
+        /*
         pnlNeighbors.setName("pnlNeighbors");
         pnlNeighbors.setBorder(BorderFactory.createTitledBorder("Planets within 30 light years"));
         pnlNeighbors.setBackground(Color.WHITE);
@@ -126,6 +131,7 @@ public class PlanetViewPanel extends JPanel {
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;    
         add(pnlNeighbors, gridBagConstraints);
+        */
         
         txtDesc.setName("txtDesc");
         ((DefaultCaret) txtDesc.getCaret()).setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
@@ -149,7 +155,8 @@ public class PlanetViewPanel extends JPanel {
         
         planetIcon = ImageUtil.loadImageFromFile("data/" + StarUtil.getIconImage(planet));
     }
-
+    
+    /*
     private void getNeighbors() {
         GridBagConstraints gridBagConstraints;
         pnlNeighbors.setLayout(new GridBagLayout());
@@ -185,7 +192,7 @@ public class PlanetViewPanel extends JPanel {
 
             ++ i;
         }        
-    }
+    }*/
     
     @Override
     protected void paintChildren(Graphics g) {

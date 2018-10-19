@@ -33,6 +33,7 @@ import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.universe.Planet;
+import mekhq.campaign.universe.PlanetarySystem;
 
 /**
  * This is an array list of planets for a jump path, from which we can derive
@@ -49,17 +50,17 @@ public class JumpPath implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = 708430867050359759L;
-	private ArrayList<Planet> path;
+	private ArrayList<PlanetarySystem> path;
 	
 	public JumpPath() {
-		path = new ArrayList<Planet>();
+		path = new ArrayList<PlanetarySystem>();
 	}
 	
-	public JumpPath(ArrayList<Planet> p) {
+	public JumpPath(ArrayList<PlanetarySystem> p) {
 		path = p;
 	}
 	
-	public ArrayList<Planet> getPlanets() {
+	public ArrayList<PlanetarySystem> getSystems() {
 		return path;
 	}
 	
@@ -67,7 +68,7 @@ public class JumpPath implements Serializable {
 		return path.isEmpty();
 	}
 	
-	public Planet getFirstPlanet() {
+	public PlanetarySystem getFirstSystem() {
 		if(path.isEmpty()) {
 			return null;
 		} else {
@@ -75,7 +76,7 @@ public class JumpPath implements Serializable {
 		}
 	}
 	
-	public Planet getLastPlanet() {
+	public PlanetarySystem getLastSystem() {
 		if(path.isEmpty()) {
 			return null;
 		} else {
@@ -85,30 +86,30 @@ public class JumpPath implements Serializable {
 	
 	public double getStartTime(double currentTransit) {
 		double startTime = 0.0;
-		if(null != getFirstPlanet()) {
-			startTime = getFirstPlanet().getTimeToJumpPoint(1.0);
+		if(null != getFirstSystem()) {
+			startTime = getFirstSystem().getTimeToJumpPoint(1.0);
 		}
 		return startTime - currentTransit;
 	}
 	
 	public double getEndTime() {
 		double endTime = 0.0;
-		if(null != getLastPlanet()) {
-			endTime = getLastPlanet().getTimeToJumpPoint(1.0);
+		if(null != getLastSystem()) {
+			endTime = getLastSystem().getTimeToJumpPoint(1.0);
 		}
 		return endTime;
 	}
 	
 	public double getTotalRechargeTime(DateTime when) {
 		int rechargeTime = 0;
-		for(Planet planet : path) {
-			if(planet.equals(getFirstPlanet())) {
+		for(PlanetarySystem system : path) {
+			if(system.equals(getFirstSystem())) {
 				continue;
 			}
-			if(planet.equals(getLastPlanet())) {
+			if(system.equals(getLastSystem())) {
 				continue;
 			}
-			rechargeTime += planet.getRechargeTime(when);
+			rechargeTime += system.getRechargeTime(when);
 		}
 		return rechargeTime/24.0;
 	}
@@ -121,15 +122,15 @@ public class JumpPath implements Serializable {
 		return getTotalRechargeTime(when) + getStartTime(currentTransit) + getEndTime();
 	}
 	
-	public void addPlanet(Planet p) {
-		path.add(p);
+	public void addSystem(PlanetarySystem s) {
+		path.add(s);
 	}
 	
-	public void addPlanets(ArrayList<Planet> planets) {
-		path.addAll(planets);
+	public void addSystems(ArrayList<PlanetarySystem> systems) {
+		path.addAll(systems);
 	}
 	
-	public void removeFirstPlanet() {
+	public void removeFirstSystem() {
 		if(!path.isEmpty()) {
 			path.remove(0);
 		}
@@ -139,7 +140,7 @@ public class JumpPath implements Serializable {
 		return path.size();
 	}
 	
-	public Planet get(int i) {
+	public PlanetarySystem get(int i) {
 		if(i >= size()) {
 			return null;
 		} else {
@@ -147,13 +148,13 @@ public class JumpPath implements Serializable {
 		}
 	}
 	
-	public boolean contains(Planet planet) {
-		return path.contains(planet);
+	public boolean contains(PlanetarySystem system) {
+		return path.contains(system);
 	}
 	
 	public void writeToXml(PrintWriter pw1, int indent) {
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "<jumpPath>");
-		for(Planet p : path) {
+		for(PlanetarySystem p : path) {
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<planetName>"
 				+MekHqXmlUtil.escape(p.getId())
@@ -175,9 +176,9 @@ public class JumpPath implements Serializable {
 			for (int x=0; x<nl.getLength(); x++) {
 				Node wn2 = nl.item(x);
 				if (wn2.getNodeName().equalsIgnoreCase("planetName")) {
-					Planet p = c.getPlanetByName(wn2.getTextContent());
+					PlanetarySystem p = c.getSystemByName(wn2.getTextContent());
 					if(null != p) {
-						retVal.addPlanet(p);
+						retVal.addSystem(p);
 					} else {
 					    MekHQ.getLogger().log(JumpPath.class, METHOD_NAME, LogLevel.ERROR,
 					            "Couldn't find planet named " + wn2.getTextContent()); //$NON-NLS-1$

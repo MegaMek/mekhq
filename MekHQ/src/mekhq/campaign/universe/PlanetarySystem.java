@@ -52,6 +52,8 @@ import org.joda.time.DateTimeComparator;
 import mekhq.Utilities;
 import mekhq.adapter.BooleanValueAdapter;
 import mekhq.adapter.SpectralClassAdapter;
+import mekhq.campaign.universe.Planet.PlanetaryEvent;
+import mekhq.campaign.universe.Planet.SocioIndustrialData;
 import mekhq.campaign.universe.Planet.SpectralDefinition;
 
 
@@ -161,6 +163,64 @@ public class PlanetarySystem implements Serializable {
         return y;
     }
     
+    public String getName(DateTime when) {
+        return id;
+        /*return getEventData(when, name, new EventGetter<String>() {
+            @Override public String get(PlanetaryEvent e) { return e.name; }
+        });*/
+    }
+
+    public String getShortName(DateTime when) {
+        return null;
+        /*return getEventData(when, shortName, new EventGetter<String>() {
+            @Override public String get(PlanetaryEvent e) { return e.shortName; }
+        });*/
+    }
+    
+    public List<String> getFactions(DateTime when) {
+        //TODO: eventually identify through primary planet, and maybe any other inhabited planets
+        //for now just loop through planets until you get the first non-null set
+        for(Planet planet : planets) {
+            List<String> factions = planet.getFactions(when);
+            if(null != factions) {
+                return factions;
+            }
+        }
+        return null;
+    }
+    
+    public Set<Faction> getFactionSet(DateTime when) {
+        //TODO: eventually identify through primary planet, and maybe any other inhabited planets
+        //for now just loop through planets until you get the first non-null set
+        for(Planet planet : planets) {
+            Set<Faction> factions = planet.getFactionSet(when);
+            if(null != factions) {
+                return factions;
+            }
+        }
+        return null;
+        //return getPrimaryPlanet().getFactionSet(when);
+    }
+    
+    public SocioIndustrialData getSocioIndustrial(DateTime when) {
+        for(Planet planet : planets) {
+            SocioIndustrialData sic = planet.getSocioIndustrial(when);
+            if(null != sic) {
+                return sic;
+            }
+        }
+        return null;
+    }
+    
+    /** @return short name if set, else full name, else "unnamed" */
+    public String getPrintableName(DateTime when) {
+        String result = getShortName(when);
+        if( null == result ) {
+            result = getName(when);
+        }
+        return null != result ? result : "unnamed"; //$NON-NLS-1$
+    }
+    
     /** @return the distance to a point in space in light years */
     public double getDistanceTo(double x, double y) {
         return Math.sqrt(Math.pow(x - this.x, 2) + Math.pow(y - this.y, 2));
@@ -178,7 +238,7 @@ public class PlanetarySystem implements Serializable {
             @Override public Boolean get(PlanetaryEvent e) { return e.nadirCharge; }
         });
         */
-        return false;
+        return nadirCharge;
     }
 
     public boolean isZenithCharge(DateTime when) {
@@ -188,7 +248,7 @@ public class PlanetarySystem implements Serializable {
             @Override public Boolean get(PlanetaryEvent e) { return e.zenithCharge; }
         });
         */
-        return false;
+        return zenithCharge;
     }
 
     public String getRechargeStationsText(DateTime when) {
@@ -238,6 +298,12 @@ public class PlanetarySystem implements Serializable {
         return StarUtil.getDistanceToJumpPoint(spectralClass, subtype);
     }
     
+    /** @return the average travel time from low orbit to the jump point at 1g, in Terran days for a given planetary position*/
+    public double getTimeToJumpPoint(double acceleration) {
+        //TODO: make system position adjustable
+        int pos = 1;
+        return planets.get(pos).getTimeToJumpPoint(acceleration);
+    }
 
     public String getSpectralType() {
         return spectralType;
@@ -280,7 +346,14 @@ public class PlanetarySystem implements Serializable {
     }
     
     public Planet getPrimaryPlanet() {
-        return planets.get(primarySlot);
+        //TODO: identify this from XML data
+        for(Planet planet : planets) {
+            if(planet.getLifeForm(null) != null) {
+                return planet;
+            }
+        }
+        return planets.get(0);
+        //return planets.get(primarySlot);
     }
     
     /** Includes a parser for spectral type strings */

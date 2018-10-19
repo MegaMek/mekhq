@@ -37,7 +37,9 @@ import mekhq.Utilities;
 import mekhq.campaign.event.LocationChangedEvent;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.universe.Planet;
+import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.Planets;
+import mekhq.campaign.universe.Systems;
 
 
 /**
@@ -57,6 +59,7 @@ public class CurrentLocation implements Serializable {
     private static final long serialVersionUID = -4337642922571022697L;
 
     private Planet currentPlanet;
+    private PlanetarySystem currentSystem;
     //keep track of jump path
     private JumpPath jumpPath;
     private double rechargeTime;
@@ -68,6 +71,8 @@ public class CurrentLocation implements Serializable {
     }
 
     public CurrentLocation(Planet planet, double time) {
+        //FIXME: just for testing
+        this.currentSystem = Systems.getInstance().getSystems().get("Terra");
         this.currentPlanet = planet;
         this.transitTime = time;
         this.rechargeTime = 0.0;
@@ -76,6 +81,11 @@ public class CurrentLocation implements Serializable {
 
     public void setCurrentPlanet(Planet p) {
         currentPlanet = p;
+        MekHQ.triggerEvent(new LocationChangedEvent(this, false));
+    }
+    
+    public void setCurrentSystem(PlanetarySystem s) {
+        currentSystem = s;
         MekHQ.triggerEvent(new LocationChangedEvent(this, false));
     }
 
@@ -98,6 +108,10 @@ public class CurrentLocation implements Serializable {
     public Planet getCurrentPlanet() {
         return currentPlanet;
     }
+    
+    public PlanetarySystem getCurrentSystem() {
+        return currentSystem;
+    }
 
     public double getTransitTime() {
         return transitTime;
@@ -109,7 +123,7 @@ public class CurrentLocation implements Serializable {
         sb.append("<html><b>Current Location</b><br>");
         sb.append(currentPlanet.getPrintableName(now)).append("<br>");
         if((null != jumpPath) && !jumpPath.isEmpty()) {
-            sb.append("In transit to ").append(jumpPath.getLastPlanet().getPrintableName(now)).append(" ");
+            sb.append("In transit to ").append(jumpPath.getLastSystem().getPrintableName(now)).append(" ");
         }
         if(isOnPlanet()) {
             sb.append("<i>on planet</i>");
@@ -175,12 +189,12 @@ public class CurrentLocation implements Serializable {
                     }
                 }
                 campaign.addReport("Jumping to " + jumpPath.get(1).getPrintableName(currentDate));
-                currentPlanet = jumpPath.get(1);
-                jumpPath.removeFirstPlanet();
+                currentSystem = jumpPath.get(1);
+                jumpPath.removeFirstSystem();
                 MekHQ.triggerEvent(new LocationChangedEvent(this, true));
                 //reduce remaining hours by usedRechargeTime or usedTransitTime, whichever is greater
                 hours -= Math.max(usedRechargeTime, usedTransitTime);
-                transitTime = currentPlanet.getTimeToJumpPoint(1.0);
+                transitTime = currentSystem.getTimeToJumpPoint(1.0);
                 rechargeTime = 0;
                 //if there are hours remaining, then begin recharging jump drive
                 usedRechargeTime = Math.min(hours, neededRechargeTime - rechargeTime);
@@ -199,7 +213,7 @@ public class CurrentLocation implements Serializable {
             campaign.addReport("Dropships spent " + (Math.round(100.0 * usedTransitTime)/100.0) + " hours transiting into system");
             transitTime -= usedTransitTime/24.0;
             if(transitTime <= 0) {
-                campaign.addReport(jumpPath.getLastPlanet().getPrintableName(currentDate) + " reached.");
+                campaign.addReport(jumpPath.getLastSystem().getPrintableName(currentDate) + " reached.");
                 //we are here!
                 transitTime = 0;
                 jumpPath = null;

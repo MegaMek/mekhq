@@ -135,6 +135,27 @@ public class Systems {
         return systemGrid.get(x).get(y);
     }
     
+    /** Return the planet by given name at a given time point */
+    public PlanetarySystem getSystemByName(String name, DateTime when) {
+        if(null == name) {
+            return null;
+        }
+        name = name.toLowerCase(Locale.ROOT);
+        for(PlanetarySystem system : systemList.values()) {
+            if(null != system) {
+                String systemName = system.getName(when);
+                if((null != systemName) && systemName.toLowerCase(Locale.ROOT).equals(name)) {
+                    return system;
+                }
+                systemName = system.getShortName(when);
+                if((null != systemName) && systemName.toLowerCase(Locale.ROOT).equals(name)) {
+                    return system;
+                }
+            }
+        }
+        return null;
+    }
+    
     public List<PlanetarySystem> getNearbySystems(final double centerX, final double centerY, int distance) {
         List<PlanetarySystem> neighbors = new ArrayList<>();
         int gridRadius = (int)Math.ceil(distance / 30.0);

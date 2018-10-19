@@ -416,9 +416,9 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
     }
 
     private int getTravelDays(Campaign c) {
-        if (null != this.getPlanet()) {
+        if (null != this.getSystem()) {
             DateTime currentDate = Utilities.getDateTimeDay(c.getCalendar());
-            JumpPath jumpPath = c.calculateJumpPath(c.getCurrentPlanet(), getPlanet());
+            JumpPath jumpPath = c.calculateJumpPath(c.getCurrentSystem(), getSystem());
             double days = Math.round(jumpPath.getTotalTime(currentDate, c.getLocation().getTransitTime()) * 100.0) / 100.0;
             return (int) Math.round(days);
         }
@@ -475,8 +475,8 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
      * @return the total (2-way) estimated transportation fee from the player's current location to this contract's planet
      */
     public long getTotalTransportationFees(Campaign c){
-        if(null != getPlanet() && c.getCampaignOptions().payForTransport()) {
-            JumpPath jumpPath = c.calculateJumpPath(c.getCurrentPlanet(), getPlanet());
+        if(null != getSystem() && c.getCampaignOptions().payForTransport()) {
+            JumpPath jumpPath = c.calculateJumpPath(c.getCurrentSystem(), getSystem());
 
             boolean campaignOps = c.getCampaignOptions().useEquipmentContractBase();
 
@@ -558,8 +558,8 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
         }
 
         //calculate transportation costs
-        if (null != getPlanet()) {
-            JumpPath jumpPath = c.calculateJumpPath(c.getCurrentPlanet(), getPlanet());
+        if (null != getSystem()) {
+            JumpPath jumpPath = c.calculateJumpPath(c.getCurrentSystem(), getSystem());
 
             // FM:Mercs transport payments take into account owned transports and do not use CampaignOps dropship costs.
             // CampaignOps doesn't care about owned transports and does use its own dropship costs.
@@ -571,7 +571,7 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
         if (c.getCampaignOptions().usePeacetimeCost()
                 && c.getCampaignOptions().getUnitRatingMethod().equals(mekhq.campaign.rating.UnitRatingMethod.CAMPAIGN_OPS)) {
             //contract base * transport period * reputation * employer modifier
-            transitAmount = (long)(c.getContractBase() * (((c.calculateJumpPath(c.getCurrentPlanet(), getPlanet()).getJumps()) * 2) / 4) * (c.getUnitRatingMod() * .2 + .5) * 1.2);
+            transitAmount = (long)(c.getContractBase() * (((c.calculateJumpPath(c.getCurrentSystem(), getSystem()).getJumps()) * 2) / 4) * (c.getUnitRatingMod() * .2 + .5) * 1.2);
         } else {
             transitAmount = 0;
         }
@@ -595,8 +595,8 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
         }
         GregorianCalendar cal = new GregorianCalendar();
         cal.setTime(startDate);
-        if (adjustStartDate && null != c.getPlanetByName(planetId)) {
-            int days = (int) Math.ceil(c.calculateJumpPath(c.getCurrentPlanet(), getPlanet())
+        if (adjustStartDate && null != c.getPlanetByName(systemId)) {
+            int days = (int) Math.ceil(c.calculateJumpPath(c.getCurrentSystem(), getSystem())
                     .getTotalTime(Utilities.getDateTimeDay(cal), c.getLocation().getTransitTime()));
             while (days > 0) {
                 cal.add(Calendar.DAY_OF_YEAR, 1);

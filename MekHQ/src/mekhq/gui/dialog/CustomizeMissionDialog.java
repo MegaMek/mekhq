@@ -137,7 +137,7 @@ public class CustomizeMissionDialog extends javax.swing.JDialog {
 
         suggestPlanet = new JSuggestField(this, campaign.getPlanetNames());
         if(!newMission) {
-            suggestPlanet.setText(mission.getPlanetName(Utilities.getDateTimeDay(campaign.getCalendar())));
+            suggestPlanet.setText(mission.getSystemName(Utilities.getDateTimeDay(campaign.getCalendar())));
         }
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -215,9 +215,9 @@ public class CustomizeMissionDialog extends javax.swing.JDialog {
                 Utilities.getDateTimeDay(campaign.getCalendar()));
     	
     	if(canonPlanet != null) {
-    	    mission.setPlanetId(canonPlanet.getId());
+    	    mission.setSystemId(canonPlanet.getId());
     	} else {
-    	    mission.setPlanetId(null);
+    	    mission.setSystemId(null);
     	    mission.setLegacyPlanetName(suggestPlanet.getText());
     	}
     	

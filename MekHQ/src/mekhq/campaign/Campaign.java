@@ -190,10 +190,12 @@ import mekhq.campaign.universe.IUnitGenerator;
 import mekhq.campaign.universe.News;
 import mekhq.campaign.universe.NewsItem;
 import mekhq.campaign.universe.Planet;
+import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.Planets;
 import mekhq.campaign.universe.RATGeneratorConnector;
 import mekhq.campaign.universe.RATManager;
 import mekhq.campaign.universe.RandomFactionGenerator;
+import mekhq.campaign.universe.Systems;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
 import mekhq.gui.GuiTabType;
@@ -475,6 +477,10 @@ public class Campaign implements Serializable, ITechManager {
 
     public Planet getCurrentPlanet() {
         return location.getCurrentPlanet();
+    }
+    
+    public PlanetarySystem getCurrentSystem() {
+        return location.getCurrentSystem();
     }
 
     public long getFunds() {
@@ -2645,7 +2651,7 @@ public class Campaign implements Serializable, ITechManager {
              * system for transport or splitting the unit, etc.
              */
             if (!getLocation().isOnPlanet() && 
-                    getLocation().getJumpPath().getLastPlanet().getId().equals(m.getPlanetId())) {
+                    getLocation().getJumpPath().getLastSystem().getId().equals(m.getSystemId())) {
                 /*
                  * transitTime is measured in days; round up to the next whole day, then convert
                  * to milliseconds
@@ -4115,6 +4121,14 @@ public class Campaign implements Serializable, ITechManager {
         }
         return plnts;
     }
+    
+    public ArrayList<PlanetarySystem> getSystems() {
+        ArrayList<PlanetarySystem> systems = new ArrayList<PlanetarySystem>();
+        for (String key : Systems.getInstance().getSystems().keySet()) {
+            systems.add(Systems.getInstance().getSystems().get(key));
+        }
+        return systems;
+    }
 
     public Vector<String> getPlanetNames() {
         Vector<String> plntNames = new Vector<String>();
@@ -4126,6 +4140,10 @@ public class Campaign implements Serializable, ITechManager {
 
     public Planet getPlanetByName(String name) {
         return Planets.getInstance().getPlanetByName(name, Utilities.getDateTimeDay(calendar));
+    }
+    
+    public PlanetarySystem getSystemByName(String name) {
+        return Systems.getInstance().getSystemByName(name, Utilities.getDateTimeDay(calendar));
     }
 
     public Person newPerson(int type) {
@@ -4737,13 +4755,13 @@ public class Campaign implements Serializable, ITechManager {
      * @param endKey
      * @return
      */
-    public JumpPath calculateJumpPath(Planet start, Planet end) {
+    public JumpPath calculateJumpPath(PlanetarySystem start, PlanetarySystem end) {
         if(null == start) {
             return null;
         }
         if((null == end) || start.getId().equals(end.getId())) {
             JumpPath jpath = new JumpPath();
-            jpath.addPlanet(start);
+            jpath.addSystem(start);
             return jpath;
         }
         String startKey = start.getId();
@@ -4765,10 +4783,10 @@ public class Campaign implements Serializable, ITechManager {
         // hash of G for each planet which might change
         Hashtable<String, Double> scoreG = new Hashtable<>();
 
-        for (String key : Planets.getInstance().getPlanets().keySet()) {
+        for (String key : Systems.getInstance().getSystems().keySet()) {
             scoreH.put(
                     key,
-                    end.getDistanceTo(Planets.getInstance().getPlanets()
+                    end.getDistanceTo(Systems.getInstance().getSystems()
                             .get(key)));
         }
         scoreG.put(current, 0.0);
@@ -4819,10 +4837,10 @@ public class Campaign implements Serializable, ITechManager {
         }
         // now we just need to back up from the last current by parents until we
         // hit null
-        ArrayList<Planet> path = new ArrayList<Planet>();
+        ArrayList<PlanetarySystem> path = new ArrayList<PlanetarySystem>();
         String nextKey = current;
         while (null != nextKey) {
-            path.add(Planets.getInstance().getPlanets().get(nextKey));
+            path.add(Systems.getInstance().getSystems().get(nextKey));
             // MekHQApp.logMessage(nextKey);
             nextKey = parent.get(nextKey);
 
@@ -4830,7 +4848,7 @@ public class Campaign implements Serializable, ITechManager {
         // now reverse the direaction
         JumpPath finalPath = new JumpPath();
         for (int i = (path.size() - 1); i >= 0; i--) {
-            finalPath.addPlanet(path.get(i));
+            finalPath.addSystem(path.get(i));
         }
         return finalPath;
     }

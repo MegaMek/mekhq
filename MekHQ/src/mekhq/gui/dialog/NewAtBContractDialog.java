@@ -46,6 +46,7 @@ import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.Planets;
 import mekhq.campaign.universe.RandomFactionGenerator;
+import mekhq.campaign.universe.Systems;
 import mekhq.gui.FactionComboBox;
 import mekhq.gui.model.SortedComboBoxModel;
 import mekhq.gui.utilities.JSuggestField;
@@ -105,7 +106,7 @@ public class NewAtBContractDialog extends NewContractDialog {
         	((AtBContract)contract).setEnemyCode(getCurrentEnemyCode());
         }
         ((AtBContract) contract)
-                .setPlanetId((Planets.getInstance().getPlanetByName((String) cbPlanets.getSelectedItem(),
+                .setSystemId((Systems.getInstance().getSystemByName((String) cbPlanets.getSelectedItem(),
                         Utilities.getDateTimeDay(campaign.getCalendar()))).getId());
         spnMultiplier.setModel(new SpinnerNumberModel(contract.getMultiplier(), 0.1, 10.0, 0.1));
         updatePaymentMultiplier();
@@ -516,7 +517,7 @@ public class NewAtBContractDialog extends NewContractDialog {
 		if (chkShowAllPlanets.isSelected()) {
 	    	//contract.setPlanetName(suggestPlanet.getText());
 		} else {
-            contract.setPlanetId((Planets.getInstance().getPlanetByName((String) cbPlanets.getSelectedItem(),
+            contract.setSystemId((Systems.getInstance().getSystemByName((String) cbPlanets.getSelectedItem(),
                     Utilities.getDateTimeDay(campaign.getCalendar()))).getId());
 		}
     	contract.setEmployerCode(getCurrentEmployerCode(), campaign.getGameYear());
@@ -547,7 +548,7 @@ public class NewAtBContractDialog extends NewContractDialog {
 		boolean needUpdatePayment = false;
     	AtBContract contract = (AtBContract)this.contract;
         if (cbPlanets.equals(source) && null != cbPlanets.getSelectedItem()) {
-            contract.setPlanetId((Planets.getInstance().getPlanetByName((String) cbPlanets.getSelectedItem(),
+            contract.setSystemId((Systems.getInstance().getSystemByName((String) cbPlanets.getSelectedItem(),
                     Utilities.getDateTimeDay(campaign.getCalendar()))).getId());
             //reset the start date as null so we recalculate travel time
             contract.setStartDate(null);

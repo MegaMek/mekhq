@@ -56,6 +56,7 @@ import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.universe.Planets;
+import mekhq.campaign.universe.Systems;
 import mekhq.gui.utilities.JSuggestField;
 import mekhq.gui.view.ContractPaymentBreakdown;
 
@@ -799,7 +800,7 @@ public class NewContractDialog extends javax.swing.JDialog {
 
     protected void doUpdateContract(Object source) {
         if (suggestPlanet.equals(source)) {
-            contract.setPlanetId((Planets.getInstance().getPlanetByName(suggestPlanet.getText(),
+            contract.setSystemId((Systems.getInstance().getSystemByName(suggestPlanet.getText(),
                     Utilities.getDateTimeDay(campaign.getCalendar()))).getId());
             //reset the start date as null so we recalculate travel time
             contract.setStartDate(null);
