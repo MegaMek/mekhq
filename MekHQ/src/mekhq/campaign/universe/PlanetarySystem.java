@@ -49,7 +49,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeComparator;
 
-
+import mekhq.Utilities;
 import mekhq.adapter.BooleanValueAdapter;
 import mekhq.adapter.SpectralClassAdapter;
 import mekhq.campaign.universe.Planet.SpectralDefinition;
@@ -131,6 +131,7 @@ public class PlanetarySystem implements Serializable {
     @XmlJavaTypeAdapter(BooleanValueAdapter.class)
     private Boolean zenithCharge;
     
+    @XmlElement(name = "planet")
     private List<Planet> planets;
 
     //the location of the primary planet for this system
@@ -294,5 +295,26 @@ public class PlanetarySystem implements Serializable {
         spectralClass = scDef.spectralClass;
         subtype = scDef.subtype;
         luminosity = scDef.luminosity;
+    }
+    
+    // JAXB marshalling support
+    @SuppressWarnings({ "unused", "unchecked" })
+    private void afterUnmarshal(Unmarshaller unmarshaller, Object parent) {
+        if( null == id ) {
+            id = name;
+        }
+        
+        // Spectral classification: use spectralType if available, else the separate values
+        if( null != spectralType ) {
+            setSpectralType(spectralType);
+        }
+        nadirCharge = Utilities.nonNull(nadirCharge, Boolean.FALSE);
+        zenithCharge = Utilities.nonNull(zenithCharge, Boolean.FALSE);
+        
+        //TODO: Probably best to reorganize the ordering of the planet list to
+        //correspond to system position
+        for(Planet p : planets) {
+            p.setParentSystem(this);
+        }
     }
 }

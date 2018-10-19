@@ -25,15 +25,15 @@ public enum LifeForm {
     // For old life form data
     public static LifeForm parseLifeForm(String val) {
         switch(val) {
-            case "0": return NONE;
-            case "1": return MICROBE;
-            case "2": return PLANT;
-            case "3": return FISH;
-            case "4": return AMPH;
-            case "5": return REPTILE;
-            case "6": return BIRD;
-            case "7": return MAMMAL;
-            case "8": return INSECT;
+            case "None": return NONE;
+            case "Microbes": return MICROBE;
+            case "Plants": return PLANT;
+            case "Fish": return FISH;
+            case "Amphibians": return AMPH;
+            case "Reptiles": return REPTILE;
+            case "Birds": return BIRD;
+            case "Mammals": return MAMMAL;
+            case "Insects": return INSECT;
             default: return LifeForm.valueOf(val);
         }
     }

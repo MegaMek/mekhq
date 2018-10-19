@@ -161,7 +161,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
                 }
             }
             RandomNameGenerator.getInstance();
-           setProgress(1);
+            setProgress(1);
             try {
                 QuirksHandler.initQuirksList();
             } catch (IOException e) {

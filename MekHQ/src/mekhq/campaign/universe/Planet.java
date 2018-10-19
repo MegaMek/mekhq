@@ -59,6 +59,7 @@ import mekhq.adapter.ClimateAdapter;
 import mekhq.adapter.DateAdapter;
 import mekhq.adapter.HPGRatingAdapter;
 import mekhq.adapter.LifeFormAdapter;
+import mekhq.adapter.PressureAdapter;
 import mekhq.adapter.SocioIndustrialDataAdapter;
 import mekhq.adapter.SpectralClassAdapter;
 import mekhq.adapter.StringListAdapter;
@@ -93,7 +94,7 @@ public class Planet implements Serializable {
     
     //Orbital information
     /** orbital radius (average distance to parent star), in AU */
-    @XmlElement(name = "orbitRadius")
+    @XmlElement(name = "orbitalDist")
     private Double orbitRadius;
     
     // Stellar neighbourhood
@@ -103,6 +104,8 @@ public class Planet implements Serializable {
     private List<String> satellites;
     
     // Global physical characteristics
+    @XmlElement(name = "type")
+    private String planetType;
     /** diameter in km */
     private int diameter;
     /** Density in g/m^3 */
@@ -115,6 +118,7 @@ public class Planet implements Serializable {
     private String className;
     
     // Surface description
+    @XmlElement(name = "water")
     private Integer percentWater;
     @XmlElement(name = "volcanism")
     private Integer volcanicActivity;
@@ -125,17 +129,19 @@ public class Planet implements Serializable {
     
     // Atmospheric description
     /** Pressure classification */
+    @XmlJavaTypeAdapter(PressureAdapter.class)
     private Integer pressure;
-    /** Atmospheric description */
+    /** Atmospheric classification */
+    //TODO: convert this into an integer code
     private String atmosphere;
+    private String composition;
     private Integer temperature;
     
     // Ecosphere
     @XmlJavaTypeAdapter(LifeFormAdapter.class)
-    private LifeForm lifeForm;
+    private LifeForm life;
     
     // Human influence
-    @XmlElement(name = "population")
     private Integer population;
     @XmlJavaTypeAdapter(SocioIndustrialDataAdapter.class)
     private SocioIndustrialData socioIndustrial;
@@ -147,9 +153,6 @@ public class Planet implements Serializable {
     
     //private List<String> garrisonUnits;
 
-    //boolean to indicate if this is the primary planet of this system
-    private boolean primary;
-    
     //the system that this planet belongs to
     private PlanetarySystem parentSystem;
     
@@ -345,6 +348,10 @@ public class Planet implements Serializable {
     public Double getOrbitRadius() {
         return orbitRadius;
     }
+    
+    public void setParentSystem(PlanetarySystem system) {
+        parentSystem = system;
+    }
 
 
     public List<String> getSatellites() {
@@ -528,7 +535,7 @@ public class Planet implements Serializable {
 
     
     public LifeForm getLifeForm(DateTime when) {
-        return getEventData(when, null != lifeForm ? lifeForm : LifeForm.NONE, new EventGetter<LifeForm>() {
+        return getEventData(when, null != life ? life : LifeForm.NONE, new EventGetter<LifeForm>() {
             @Override public LifeForm get(PlanetaryEvent e) { return e.lifeForm; }
         });
     }
@@ -919,7 +926,7 @@ public class Planet implements Serializable {
             gravity = Utilities.nonNull(other.gravity, gravity);
             hpg = Utilities.nonNull(other.hpg, hpg);
             landMasses = Utilities.nonNull(other.landMasses, landMasses);
-            lifeForm = Utilities.nonNull(other.lifeForm, lifeForm);
+            life = Utilities.nonNull(other.life, life);
             percentWater = Utilities.nonNull(other.percentWater, percentWater);
             pressure = Utilities.nonNull(other.pressure, pressure);
             atmosphere = Utilities.nonNull(other.atmosphere, atmosphere);

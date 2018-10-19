@@ -108,6 +108,8 @@ public class Systems {
             systems.loader.setPriority(Thread.NORM_PRIORITY - 1);
             systems.loader.start();
         }
+        //TODO: For debugging, delete later 
+        Systems temp_systems = systems;
         return systems;
     }
     
