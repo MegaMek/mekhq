@@ -37,7 +37,7 @@ import org.joda.time.DateTime;
 public class FactionBorders {
     
     private final Faction faction;
-    private Set<Planet> planets;
+    private Set<PlanetarySystem> systems;
     private RegionPerimeter border;
     
     /**
@@ -58,11 +58,11 @@ public class FactionBorders {
      * @param when    The date to use to determine planet control.
      * @param region  A collection of planets within a region of space.
      */
-    public FactionBorders(Faction faction, DateTime when, Collection<Planet> region) {
+    public FactionBorders(Faction faction, DateTime when, Collection<PlanetarySystem> region) {
         this.faction = faction;
         calculateRegion(when, region);
     }
-    
+
     /**
      * Finds all planets currently owned (completely or partially) by the faction and finds
      * its border.
@@ -70,7 +70,7 @@ public class FactionBorders {
      * @param when The date for testing faction ownership.
      */
     public void calculateRegion(DateTime when) {
-        calculateRegion(when, Planets.getInstance().getPlanets().values());
+        calculateRegion(when, Systems.getInstance().getSystems().values());
     }
     
     /**
@@ -81,11 +81,11 @@ public class FactionBorders {
      * @param when    The date for testing faction ownership.
      * @param planets The set of planets to include in the region.
      */
-    public void calculateRegion(DateTime when, Collection<Planet> planets) {
-        this.planets = planets.stream()
+    public void calculateRegion(DateTime when, Collection<PlanetarySystem> systems) {
+        this.systems = systems.stream()
                 .filter(p -> p.getFactionSet(when).contains(faction))
                 .collect(Collectors.toSet());
-        border = new RegionPerimeter(planets);
+        border = new RegionPerimeter(systems);
     }
     
     /**
@@ -98,8 +98,8 @@ public class FactionBorders {
     /**
      * @return The planets controlled by the indicated faction at the indicated time.
      */
-    public Set<Planet> getPlanets() {
-        return Collections.unmodifiableSet(planets);
+    public Set<PlanetarySystem> getSystems() {
+        return Collections.unmodifiableSet(systems);
     }
     
     /**
@@ -117,33 +117,33 @@ public class FactionBorders {
      * @return            All planets from the other faction that are within borderSize light years
      *                    of one of this faction's planets.
      */
-    List<Planet> getBorderPlanets(FactionBorders other, double borderSize) {
+    List<PlanetarySystem> getBorderSystems(FactionBorders other, double borderSize) {
         List<RegionPerimeter.Point> intersection = border.intersection(other.getBorder(), borderSize);
         if (intersection.isEmpty()) {
             return Collections.emptyList();
         }
-        List<Planet> theirPlanets = other.getPlanets().stream()
+        List<PlanetarySystem> theirSystems = other.getSystems().stream()
                 .filter(p -> RegionPerimeter.isInsideRegion(p.getX(), p.getY(), intersection))
                 .sorted((p1, p2) -> Double.compare(p1.getX(), p2.getX()))
                 .collect(Collectors.toList());
-        List<Planet> ourPlanets = getPlanets().stream()
+        List<PlanetarySystem> ourSystems = getSystems().stream()
                 .filter(p -> RegionPerimeter.isInsideRegion(p.getX(), p.getY(), intersection))
                 .sorted((p1, p2) -> Double.compare(p1.getX(), p2.getX()))
                 .collect(Collectors.toList());
         
-        List<Planet> retVal = new ArrayList<>();
+        List<PlanetarySystem> retVal = new ArrayList<>();
         int start = 0;
-        for (Planet p : theirPlanets) {
+        for (PlanetarySystem p : theirSystems) {
             // As we work through the list of potential enemy planets we move the start index
             // of the friendly planets so we don't have to iterate over the ones out of range.
-            while ((start < ourPlanets.size()) && (p.getX() > ourPlanets.get(start).getX() + borderSize)) {
+            while ((start < ourSystems.size()) && (p.getX() > ourSystems.get(start).getX() + borderSize)) {
                 start++;
             }
-            if (start >= ourPlanets.size()) {
+            if (start >= ourSystems.size()) {
                 break;
             }
-            for (int i = start; i < ourPlanets.size(); i++) {
-                final Planet p2 = ourPlanets.get(i);
+            for (int i = start; i < ourSystems.size(); i++) {
+                final PlanetarySystem p2 = ourSystems.get(i);
                 if (p.getX() < p2.getX() - borderSize) {
                     break;
                 }

@@ -49,15 +49,17 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeComparator;
 
-
+import megamek.common.EquipmentType;
+import mekhq.Utilities;
 import mekhq.adapter.BooleanValueAdapter;
 import mekhq.adapter.SpectralClassAdapter;
-import mekhq.campaign.universe.Planet.SpectralDefinition;
+import mekhq.campaign.universe.Planet.PlanetaryEvent;
+import mekhq.campaign.universe.SocioIndustrialData;
 
 
 /**
  * This is a PlanetarySystem object which will contain information
- * about the system as well as an arraylist of the Planet objects
+ * about the system as well as an ArrayList of the Planet objects
  * that make up the system
  *
  * @author Taharqa
@@ -131,7 +133,13 @@ public class PlanetarySystem implements Serializable {
     @XmlJavaTypeAdapter(BooleanValueAdapter.class)
     private Boolean zenithCharge;
     
-    private List<Planet> planets;
+    //tree map of planets sorted by system position
+    @XmlTransient
+    private TreeMap<Integer, Planet> planets;
+    
+    //for reading in because lists are easier
+    @XmlElement(name = "planet")
+    private List<Planet> planetList;
 
     //the location of the primary planet for this system
     private int primarySlot;
@@ -140,6 +148,19 @@ public class PlanetarySystem implements Serializable {
     @XmlJavaTypeAdapter(BooleanValueAdapter.class)
     public Boolean delete;
     
+    /**
+     * a hash to keep track of dynamic planet changes
+     * <p>
+     * sorted map of [date of change: change information]
+     * <p>
+     * Package-private so that Planets can access it
+     */
+    @XmlTransient
+    TreeMap<DateTime, PlanetaryEvent> events;
+    
+    // For export and import only (lists are easier than maps) */
+    @XmlElement(name = "event")
+    private List<Planet.PlanetaryEvent> eventList;
     
     public PlanetarySystem() {
     }
@@ -160,6 +181,102 @@ public class PlanetarySystem implements Serializable {
         return y;
     }
     
+    public String getName(DateTime when) {
+        if(null != getPrimaryPlanet()) {
+            return getPrimaryPlanet().getName(when);
+        }
+        return "Unknown";
+        
+    }
+
+    public String getShortName(DateTime when) {
+        if(null != getPrimaryPlanet()) {
+            return getPrimaryPlanet().getName(when);
+        }
+        return "Unknown";
+    }
+    
+    public List<String> getFactions(DateTime when) {
+        ArrayList<String> factions = new ArrayList<String>();
+        for(Planet planet : planets.values()) {
+            List<String> f = planet.getFactions(when);
+            if(null != f) {
+                factions.addAll(f);
+            }
+        }
+        return factions;
+    }
+    
+    public Set<Faction> getFactionSet(DateTime when) {
+        Set<Faction> factions = new HashSet<Faction>();
+        for(Planet planet : planets.values()) {
+            Set<Faction> f = planet.getFactionSet(when);
+            if(null != f) {
+                factions.addAll(f);
+            }
+        }
+        return factions;
+    }
+
+    /** highest socio-industrial ratings among all planets in system for the map **/
+    public SocioIndustrialData getSocioIndustrial(DateTime when) {
+        int tech = EquipmentType.RATING_X;
+        int industry = EquipmentType.RATING_X;
+        int rawMaterials = EquipmentType.RATING_X;
+        int output = EquipmentType.RATING_X;
+        int agriculture = EquipmentType.RATING_X;
+        
+        for(Planet planet : planets.values()) {
+            SocioIndustrialData sic = planet.getSocioIndustrial(when);
+            if(null != sic) {
+                if(sic.tech < tech) {
+                    tech = sic.tech;
+                }
+                if(sic.industry < industry) {
+                    industry = sic.industry;
+                }
+                if(sic.rawMaterials < rawMaterials) {
+                    rawMaterials = sic.rawMaterials;
+                }
+                if(sic.output < output) {
+                    output = sic.output;
+                }
+                if(sic.agriculture < agriculture) {
+                    agriculture = sic.agriculture;
+                }
+            }
+        }
+        return new SocioIndustrialData(tech, industry, rawMaterials, output, agriculture);
+    }
+    
+    /** @return the highest HPG rating among planets **/
+    public Integer getHPG(DateTime when) {
+        int rating = EquipmentType.RATING_X;
+        for(Planet planet : planets.values()) {
+            if(null != planet.getHPG(when) && planet.getHPG(when) < rating) {
+                rating = planet.getHPG(when);
+            }
+        }
+        return rating;
+    }
+    
+    /** @return short name if set, else full name, else "unnamed" */
+    public String getPrintableName(DateTime when) {
+        String result = getPrimaryPlanet().getPrintableName(when);
+        if(null == result) {
+            return "Unnamed";
+        }
+        //remove numbers or roman numerals from name
+        String new_result = "";
+        for(String str : result.split("\\s+")) {
+            if(str.matches("\\d+") || str.matches("(I|II|III|IV|V|VI|VII|VIII|IX|X|XI|XII|XIII|XIV|XV)")) {
+                continue;
+            }
+            new_result = new_result + " " + str;
+        }
+        return new_result; //$NON-NLS-1$
+    }
+    
     /** @return the distance to a point in space in light years */
     public double getDistanceTo(double x, double y) {
         return Math.sqrt(Math.pow(x - this.x, 2) + Math.pow(y - this.y, 2));
@@ -177,7 +294,7 @@ public class PlanetarySystem implements Serializable {
             @Override public Boolean get(PlanetaryEvent e) { return e.nadirCharge; }
         });
         */
-        return false;
+        return nadirCharge;
     }
 
     public boolean isZenithCharge(DateTime when) {
@@ -187,7 +304,7 @@ public class PlanetarySystem implements Serializable {
             @Override public Boolean get(PlanetaryEvent e) { return e.zenithCharge; }
         });
         */
-        return false;
+        return zenithCharge;
     }
 
     public String getRechargeStationsText(DateTime when) {
@@ -237,6 +354,15 @@ public class PlanetarySystem implements Serializable {
         return StarUtil.getDistanceToJumpPoint(spectralClass, subtype);
     }
     
+    /** @return the average travel time from low orbit to the jump point at 1g, in Terran days for a given planetary position*/
+    public double getTimeToJumpPoint(double acceleration) {
+        return getTimeToJumpPoint(acceleration, primarySlot);
+    }
+    
+    /** @return the average travel time from low orbit to the jump point at 1g, in Terran days for a given planetary position*/
+    public double getTimeToJumpPoint(double acceleration, int sysPos) {
+        return planets.get(sysPos).getTimeToJumpPoint(acceleration);
+    }
 
     public String getSpectralType() {
         return spectralType;
@@ -279,7 +405,67 @@ public class PlanetarySystem implements Serializable {
     }
     
     public Planet getPrimaryPlanet() {
+        //TODO: safety checks please, a lot depends on this
         return planets.get(primarySlot);
+    }
+    
+    public int getPrimaryPlanetPosition() {
+        return primarySlot;
+    }
+    
+    public Planet getPlanet(int pos) {
+        return planets.get(pos);
+    }
+    
+    public Set<Integer> getPlanetPositions() {
+        return planets.keySet();
+    }
+    
+    public Collection<Planet> getPlanets() {
+        return planets.values();
+    }
+    
+    @Override
+    public boolean equals(Object object) {
+        if(this == object) {
+            return true;
+        }
+        if((null == object) || (getClass() != object.getClass())) {
+            return false;
+        }
+        final PlanetarySystem other = (PlanetarySystem) object;
+        return Objects.equals(id, other.id);
+    }
+    
+    @SuppressWarnings("unchecked")
+    public PlanetaryEvent getOrCreateEvent(DateTime when) {
+        if(null == when) {
+            return null;
+        }
+        if(null == events) {
+            events = new TreeMap<DateTime, PlanetaryEvent>(DateTimeComparator.getDateOnlyInstance());
+        }
+        PlanetaryEvent event = events.get(when);
+        if(null == event) {
+            event = new PlanetaryEvent();
+            event.date = when;
+            events.put(when, event);
+        }
+        return event;
+    }
+    
+    public PlanetaryEvent getEvent(DateTime when) {
+        if((null == when) || (null == events)) {
+            return null;
+        }
+        return events.get(when);
+    }
+    
+    public List<PlanetaryEvent> getEvents() {
+        if( null == events ) {
+            return null;
+        }
+        return new ArrayList<PlanetaryEvent>(events.values());
     }
     
     /** Includes a parser for spectral type strings */
@@ -294,5 +480,99 @@ public class PlanetarySystem implements Serializable {
         spectralClass = scDef.spectralClass;
         subtype = scDef.subtype;
         luminosity = scDef.luminosity;
+    }
+    
+    // JAXB marshalling support
+    @SuppressWarnings({ "unused", "unchecked" })
+    private void afterUnmarshal(Unmarshaller unmarshaller, Object parent) {
+        if( null == id ) {
+            id = name;
+        }
+        
+        // Spectral classification: use spectralType if available, else the separate values
+        if( null != spectralType ) {
+            setSpectralType(spectralType);
+        }
+        nadirCharge = Utilities.nonNull(nadirCharge, Boolean.FALSE);
+        zenithCharge = Utilities.nonNull(zenithCharge, Boolean.FALSE);
+        
+        //fill up planets
+        planets = new TreeMap<Integer, Planet>();
+        if(null != planetList) {
+            for(Planet p : planetList) {
+                p.setParentSystem(this);
+                if(!planets.containsKey(p.getSystemPosition())) {
+                    planets.put(p.getSystemPosition(), p);
+                }
+            }
+            planetList.clear();
+        }
+        planetList = null;
+        // Fill up events
+        events = new TreeMap<DateTime, PlanetaryEvent>(DateTimeComparator.getDateOnlyInstance());
+        if( null != eventList ) {
+            for( PlanetaryEvent event : eventList ) {
+                if( null != event && null != event.date ) {
+                    events.put(event.date, event);
+                }
+            }
+            eventList.clear();
+        }
+        eventList = null;
+    }
+    
+    @SuppressWarnings("unused")
+    private boolean beforeMarshal(Marshaller marshaller) {
+        // Fill up our event list from the internal data type
+        eventList = new ArrayList<PlanetaryEvent>(events.values());
+        //same for planet list
+        planetList = new ArrayList<Planet>(planets.values());
+        return true;
+    }
+    
+    public void copyDataFrom(PlanetarySystem other) {
+        if( null != other ) {
+            // We don't change the ID
+            name = Utilities.nonNull(other.name, name);
+            shortName = Utilities.nonNull(other.shortName, shortName);
+            x = Utilities.nonNull(other.x, x);
+            y = Utilities.nonNull(other.y, y);
+            //TODO: some other changes should be possible
+            // Merge (not replace!) events
+            if(null != other.events) {
+                for(PlanetaryEvent event : other.getEvents()) {
+                    if( null != event && null != event.date ) {
+                        PlanetaryEvent myEvent = getOrCreateEvent(event.date);
+                        myEvent.copyDataFrom(event);
+                    }
+                }
+            }
+            //check for planet level changes
+            if(null != other.planets) {
+                for(Planet p : other.planets.values()) {
+                    int pos = p.getSystemPosition();
+                    if(planets.containsKey(pos)) {
+                        planets.get(pos).copyDataFrom(p);
+                    } else {
+                        planets.put(pos, p);
+                    }
+                }
+            }
+        }
+    }
+    
+    /** Data class to hold parsed spectral definitions */
+    public static final class SpectralDefinition {
+        public String spectralType;
+        public int spectralClass;
+        public double subtype;
+        public String luminosity;
+        
+        public SpectralDefinition(String spectralType, int spectralClass, double subtype, String luminosity) {
+            this.spectralType = Objects.requireNonNull(spectralType);
+            this.spectralClass = spectralClass;
+            this.subtype = subtype;
+            this.luminosity = Objects.requireNonNull(luminosity);
+        }
     }
 }

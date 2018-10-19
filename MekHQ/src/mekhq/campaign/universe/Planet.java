@@ -32,7 +32,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Random;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.UUID;
@@ -59,8 +58,8 @@ import mekhq.adapter.ClimateAdapter;
 import mekhq.adapter.DateAdapter;
 import mekhq.adapter.HPGRatingAdapter;
 import mekhq.adapter.LifeFormAdapter;
+import mekhq.adapter.PressureAdapter;
 import mekhq.adapter.SocioIndustrialDataAdapter;
-import mekhq.adapter.SpectralClassAdapter;
 import mekhq.adapter.StringListAdapter;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.universe.Faction.Tag;
@@ -93,7 +92,7 @@ public class Planet implements Serializable {
     
     //Orbital information
     /** orbital radius (average distance to parent star), in AU */
-    @XmlElement(name = "orbitRadius")
+    @XmlElement(name = "orbitalDist")
     private Double orbitRadius;
     
     // Stellar neighbourhood
@@ -103,6 +102,8 @@ public class Planet implements Serializable {
     private List<String> satellites;
     
     // Global physical characteristics
+    @XmlElement(name = "type")
+    private String planetType;
     /** diameter in km */
     private int diameter;
     /** Density in g/m^3 */
@@ -115,6 +116,7 @@ public class Planet implements Serializable {
     private String className;
     
     // Surface description
+    @XmlElement(name = "water")
     private Integer percentWater;
     @XmlElement(name = "volcanism")
     private Integer volcanicActivity;
@@ -125,18 +127,20 @@ public class Planet implements Serializable {
     
     // Atmospheric description
     /** Pressure classification */
+    @XmlJavaTypeAdapter(PressureAdapter.class)
     private Integer pressure;
-    /** Atmospheric description */
+    /** Atmospheric classification */
+    //TODO: convert this into an integer code
     private String atmosphere;
+    private String composition;
     private Integer temperature;
     
     // Ecosphere
     @XmlJavaTypeAdapter(LifeFormAdapter.class)
-    private LifeForm lifeForm;
+    private LifeForm life;
     
     // Human influence
-    @XmlElement(name = "population")
-    private Integer population;
+    private Long population;
     @XmlJavaTypeAdapter(SocioIndustrialDataAdapter.class)
     private SocioIndustrialData socioIndustrial;
     @XmlJavaTypeAdapter(HPGRatingAdapter.class)
@@ -147,9 +151,6 @@ public class Planet implements Serializable {
     
     //private List<String> garrisonUnits;
 
-    //boolean to indicate if this is the primary planet of this system
-    private boolean primary;
-    
     //the system that this planet belongs to
     private PlanetarySystem parentSystem;
     
@@ -250,7 +251,7 @@ public class Planet implements Serializable {
                 // there are a few situations where all this stuff with parens is for naught, which is
                 // PlanetName (FactionCode) or if the PlanetName (AltName) is already in our planets "database"
                 
-                if(null == Faction.getFaction(altName) && null == Planets.getInstance().getPlanetById(primaryName)) {
+                if(null == Faction.getFaction(altName) && null == Systems.getInstance().getSystemById(primaryName)) {
                     primaryName = nameString.substring(0, parenIndex - 1);
                     
                     nameChangeEvent = new PlanetaryEvent();
@@ -345,6 +346,10 @@ public class Planet implements Serializable {
     public Double getOrbitRadius() {
         return orbitRadius;
     }
+    
+    public void setParentSystem(PlanetarySystem system) {
+        parentSystem = system;
+    }
 
 
     public List<String> getSatellites() {
@@ -378,6 +383,14 @@ public class Planet implements Serializable {
         return dayLength;
     }
     
+    public Double getYearLength() {
+        return yearLength;
+    }
+    
+    public String getPlanetType() {
+        return planetType;
+    }
+    
     public Integer getSystemPosition() {
         return sysPos;
     }
@@ -402,6 +415,10 @@ public class Planet implements Serializable {
 
     public Double getY() {
         return y;
+    }
+    
+    public PlanetarySystem getParentSystem() {
+        return parentSystem;
     }
 
     // Date-dependant data
@@ -520,15 +537,15 @@ public class Planet implements Serializable {
         return StarUtil.getHPGClass(getHPG(when));
     }
 
-    public Integer getPopulation(DateTime when) {
-        return getEventData(when, population, new EventGetter<Integer>() {
-            @Override public Integer get(PlanetaryEvent e) { return e.populationRating; }
+    public Long getPopulation(DateTime when) {
+        return getEventData(when, population, new EventGetter<Long>() {
+            @Override public Long get(PlanetaryEvent e) { return e.population; }
         });
     }
 
     
     public LifeForm getLifeForm(DateTime when) {
-        return getEventData(when, null != lifeForm ? lifeForm : LifeForm.NONE, new EventGetter<LifeForm>() {
+        return getEventData(when, null != life ? life : LifeForm.NONE, new EventGetter<LifeForm>() {
             @Override public LifeForm get(PlanetaryEvent e) { return e.lifeForm; }
         });
     }
@@ -619,9 +636,11 @@ public class Planet implements Serializable {
 
     /** @return the average distance to the system's jump point in km */
     public double getDistanceToJumpPoint() {
-        //TODO: put in parent system information
-        return 150000000;
-        //return Math.sqrt(Math.pow(getOrbitRadiusKm(), 2) + Math.pow(parentSystem.getStarDistanceToJumpPoint(), 2));
+        if(null == parentSystem) {
+            //TODO: shouldnt happen, produce error in log
+            return 0;
+        }
+        return Math.sqrt(Math.pow(getOrbitRadiusKm(), 2) + Math.pow(parentSystem.getStarDistanceToJumpPoint(), 2));
     }
     
     public double getOrbitRadiusKm() {
@@ -917,7 +936,7 @@ public class Planet implements Serializable {
             gravity = Utilities.nonNull(other.gravity, gravity);
             hpg = Utilities.nonNull(other.hpg, hpg);
             landMasses = Utilities.nonNull(other.landMasses, landMasses);
-            lifeForm = Utilities.nonNull(other.lifeForm, lifeForm);
+            life = Utilities.nonNull(other.life, life);
             percentWater = Utilities.nonNull(other.percentWater, percentWater);
             pressure = Utilities.nonNull(other.pressure, pressure);
             atmosphere = Utilities.nonNull(other.atmosphere, atmosphere);
@@ -982,163 +1001,7 @@ public class Planet implements Serializable {
         return EquipmentType.RATING_C;
     }
 
-    public static final class SocioIndustrialData {
-        public static final SocioIndustrialData NONE = new SocioIndustrialData();
-        static {
-            NONE.tech = EquipmentType.RATING_X;
-            NONE.industry = EquipmentType.RATING_X;
-            NONE.rawMaterials = EquipmentType.RATING_X;
-            NONE.output = EquipmentType.RATING_X;
-            NONE.agriculture = EquipmentType.RATING_X;
-        }
-        
-        public int tech;
-        public int industry;
-        public int rawMaterials;
-        public int output;
-        public int agriculture;
-        
-        @Override
-        public String toString() {
-             return ITechnology.getRatingName(tech)
-                + "-" + ITechnology.getRatingName(industry) //$NON-NLS-1$
-                + "-" + ITechnology.getRatingName(rawMaterials) //$NON-NLS-1$
-                + "-" + ITechnology.getRatingName(output) //$NON-NLS-1$
-                + "-" + ITechnology.getRatingName(agriculture); //$NON-NLS-1$
-         }
-        
-        /** @return the USILR rating as a HTML description */
-        public String getHTMLDescription() {
-            // TODO: Internationalization
-            // TODO: Some way to encode "advanced" ultra-tech worlds (rating "AA" for technological sophistication)
-            // TODO: Some way to encode "regressed" worlds
-            // Note that rating "E" isn't used in official USILR codes, but we add them for completeness
-            StringBuilder sb = new StringBuilder("<html><body style='width: 50px; font: 10px sans-serif'>");
-            switch(tech) {
-                case -1:
-                    sb.append("Advanced: Ultra high-tech world<br>");
-                    break;
-                case EquipmentType.RATING_A:
-                    sb.append("A: High-tech world<br>");
-                    break;
-                case EquipmentType.RATING_B:
-                    sb.append("B: Advanced world<br>");
-                    break;
-                case EquipmentType.RATING_C:
-                    sb.append("C: Moderately advanced world<br>");
-                    break;
-                case EquipmentType.RATING_D:
-                    sb.append("D: Lower-tech world; about 21st- to 22nd-century level<br>");
-                    break;
-                case EquipmentType.RATING_E:
-                    sb.append("E: Lower-tech world; about 20th century level<br>");
-                    break;
-                case EquipmentType.RATING_F:
-                    sb.append("F: Primitive world<br>");
-                    break;
-                case EquipmentType.RATING_X:
-                    sb.append("Regressed: Pre-industrial world<br>");
-                    break;
-                default:
-                    sb.append("X: Technological sophistication unknown<br>");
-                    break;
-            }
-            switch(industry) {
-                case EquipmentType.RATING_A:
-                    sb.append("A: Heavily industrialized<br>");
-                    break;
-                case EquipmentType.RATING_B:
-                    sb.append("B: Moderately industrialized<br>");
-                    break;
-                case EquipmentType.RATING_C:
-                    sb.append("C: Basic heavy industry; about 22nd century level<br>");
-                    break;
-                case EquipmentType.RATING_D:
-                    sb.append("D: Low industrialization; about 20th century level<br>");
-                    break;
-                case EquipmentType.RATING_E:
-                    sb.append("E: Very low industrialization; about 19th century level<br>");
-                    break;
-                case EquipmentType.RATING_F:
-                    sb.append("F: No industrialization<br>");
-                    break;
-                default:
-                    sb.append("X: Industrialization level unknown<br>");
-                    break;
-            }
-            switch(rawMaterials) {
-                case EquipmentType.RATING_A:
-                    sb.append("A: Fully self-sufficient raw material production<br>");
-                    break;
-                case EquipmentType.RATING_B:
-                    sb.append("B: Mostly self-sufficient raw material production<br>");
-                    break;
-                case EquipmentType.RATING_C:
-                    sb.append("C: Limited raw material production<br>");
-                    break;
-                case EquipmentType.RATING_D:
-                    sb.append("D: Production dependent on imports of raw materials<br>");
-                    break;
-                case EquipmentType.RATING_E:
-                    sb.append("E: Production highly dependent on imports of raw materials<br>");
-                    break;
-                case EquipmentType.RATING_F:
-                    sb.append("F: No economically viable local raw material production<br>");
-                    break;
-                default:
-                    sb.append("X: Raw material dependence unknown<br>");
-                    break;
-            }
-            switch(output) {
-                case EquipmentType.RATING_A:
-                    sb.append("A: High industrial output<br>");
-                    break;
-                case EquipmentType.RATING_B:
-                    sb.append("B: Good industrial output<br>");
-                    break;
-                case EquipmentType.RATING_C:
-                    sb.append("C: Limited industrial output<br>"); // Bad for Ferengi
-                    break;
-                case EquipmentType.RATING_D:
-                    sb.append("D: Negligable industrial output<br>");
-                    break;
-                case EquipmentType.RATING_E:
-                    sb.append("E: Negligable industrial output<br>");
-                    break;
-                case EquipmentType.RATING_F:
-                    sb.append("F: No industrial output<br>"); // Good for Ferengi
-                    break;
-                default:
-                    sb.append("X: Industrial output unknown<br>");
-                    break;
-            }
-            switch(agriculture) {
-                case EquipmentType.RATING_A:
-                    sb.append("A: Breadbasket<br>");
-                    break;
-                case EquipmentType.RATING_B:
-                    sb.append("B: Agriculturally abundant world<br>");
-                    break;
-                case EquipmentType.RATING_C:
-                    sb.append("C: Modest agriculture<br>");
-                    break;
-                case EquipmentType.RATING_D:
-                    sb.append("D: Poor agriculture<br>");
-                    break;
-                case EquipmentType.RATING_E:
-                    sb.append("E: Very poor agriculture<br>");
-                    break;
-                case EquipmentType.RATING_F:
-                    sb.append("F: Barren world<br>");
-                    break;
-                default:
-                    sb.append("X: Agricultural level unknown<br>");
-                    break;
-            }
-
-            return sb.append("</body></html>").toString();
-        }
-    }
+    
 
     /** A class representing some event, possibly changing planetary information */
     @XmlRootElement(name="event")
@@ -1161,17 +1024,9 @@ public class Planet implements Serializable {
         @XmlJavaTypeAdapter(HPGRatingAdapter.class)
         public Integer hpg;
         public Integer pressure;
-        public Double pressureAtm;
-        public Double atmMass;
         public String atmosphere;
-        public Double albedo;
-        public Double greenhouseEffect;
-        public Integer habitability;
-        @XmlElement(name = "pop")
-        public Integer populationRating;
-        public String government;
-        public Integer controlRating;
-        // Stellar support, to be moved later
+        public String composition;
+        public Long population;
         public Boolean nadirCharge;
         public Boolean zenithCharge;
         // Events marked as "custom" are saved to scenario files and loaded from there
@@ -1189,15 +1044,9 @@ public class Planet implements Serializable {
             socioIndustrial = Utilities.nonNull(other.socioIndustrial, socioIndustrial);
             temperature = Utilities.nonNull(other.temperature, temperature);
             pressure = Utilities.nonNull(other.pressure, pressure);
-            pressureAtm = Utilities.nonNull(other.pressureAtm, pressureAtm);
-            atmMass = Utilities.nonNull(other.atmMass, atmMass);
             atmosphere = Utilities.nonNull(other.atmosphere, atmosphere);
-            albedo = Utilities.nonNull(other.albedo, albedo);
-            greenhouseEffect = Utilities.nonNull(other.greenhouseEffect, greenhouseEffect);
-            habitability = Utilities.nonNull(other.habitability, habitability);
-            populationRating = Utilities.nonNull(other.populationRating, populationRating);
-            government = Utilities.nonNull(other.government, government);
-            controlRating = Utilities.nonNull(other.controlRating, controlRating);
+            composition = Utilities.nonNull(other.composition, composition);
+            population = Utilities.nonNull(other.population, population);
             nadirCharge = Utilities.nonNull(other.nadirCharge, nadirCharge);
             zenithCharge = Utilities.nonNull(other.zenithCharge, zenithCharge);
             custom = (other.custom || custom);
@@ -1215,15 +1064,9 @@ public class Planet implements Serializable {
             socioIndustrial = other.socioIndustrial;
             temperature = other.temperature;
             pressure = other.pressure;
-            pressureAtm = other.pressureAtm;
-            atmMass = other.atmMass;
             atmosphere = other.atmosphere;
-            albedo = other.albedo;
-            greenhouseEffect = other.greenhouseEffect;
-            habitability = other.habitability;
-            populationRating = other.populationRating;
-            government = other.government;
-            controlRating = other.controlRating;
+            composition = other.composition;
+            population = other.population;
             nadirCharge = other.nadirCharge;
             zenithCharge = other.zenithCharge;
             custom = (other.custom || custom);
@@ -1233,10 +1076,9 @@ public class Planet implements Serializable {
         public boolean isEmpty() {
             return (null == climate) && (null == faction) && (null == hpg) && (null == lifeForm)
                 && (null == message) && (null == name) && (null == shortName) && (null == socioIndustrial)
-                && (null == temperature) && (null == pressure) && (null == pressureAtm)
-                && (null == atmMass) && (null == atmosphere) && (null == albedo) && (null == greenhouseEffect)
-                && (null == habitability) && (null == populationRating) && (null == government)
-                && (null == controlRating) && (null == nadirCharge) && (null == zenithCharge);
+                && (null == temperature) && (null == pressure) && (null == atmosphere) 
+                && (null == composition) && (null == population) && (null == nadirCharge) 
+                && (null == zenithCharge);
         }
     }
     
@@ -1264,20 +1106,5 @@ public class Planet implements Serializable {
     /** BT planet types */
     public static enum PlanetaryType {
         SMALL_ASTEROID, MEDIUM_ASTEROID, DWARF_TERRESTRIAL, TERRESTRIAL, GIANT_TERRESTRIAL, GAS_GIANT, ICE_GIANT;
-    }
-    
-    /** Data class to hold parsed spectral definitions */
-    public static final class SpectralDefinition {
-        public String spectralType;
-        public int spectralClass;
-        public double subtype;
-        public String luminosity;
-        
-        public SpectralDefinition(String spectralType, int spectralClass, double subtype, String luminosity) {
-            this.spectralType = Objects.requireNonNull(spectralType);
-            this.spectralClass = spectralClass;
-            this.subtype = subtype;
-            this.luminosity = Objects.requireNonNull(luminosity);
-        }
     }
 }

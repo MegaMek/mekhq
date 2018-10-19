@@ -167,10 +167,11 @@ import mekhq.campaign.universe.IUnitGenerator;
 import mekhq.campaign.universe.News;
 import mekhq.campaign.universe.NewsItem;
 import mekhq.campaign.universe.Planet;
-import mekhq.campaign.universe.Planets;
+import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.RATGeneratorConnector;
 import mekhq.campaign.universe.RATManager;
 import mekhq.campaign.universe.RandomFactionGenerator;
+import mekhq.campaign.universe.Systems;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
 import mekhq.gui.GuiTabType;
@@ -318,7 +319,8 @@ public class Campaign implements Serializable, ITechManager {
         forceIds.put(0, forces);
         lances = new Hashtable<>();
         finances = new Finances();
-        location = new CurrentLocation(Planets.getInstance().getPlanets().get("Outreach"), 0);
+        location = new CurrentLocation(Systems.getInstance().getSystems()
+                .get("Outreach"), 0);
         SkillType.initializeTypes();
         SpecialAbility.initializeSPA();
         astechPool = 0;
@@ -451,16 +453,12 @@ public class Campaign implements Serializable, ITechManager {
         this.rng = g;
     }
 
-    public String getCurrentPlanetName() {
-        return location.getCurrentPlanet().getPrintableName(Utilities.getDateTimeDay(calendar));
+    public String getCurrentSystemName() {
+        return location.getCurrentSystem().getPrintableName(Utilities.getDateTimeDay(calendar));
     }
-
-    public Planet getCurrentPlanet() {
-        if (location == null) {
-            return  null;
-        }
-
-        return location.getCurrentPlanet();
+    
+    public PlanetarySystem getCurrentSystem() {
+        return location.getCurrentSystem();
     }
 
     public Money getFunds() {
@@ -2129,32 +2127,27 @@ public class Campaign implements Serializable, ITechManager {
             if (null != person) {
                 personTitle = person.getHyperlinkedFullTitle() + " ";
             }
-
-            // find planets within a certain radius - the function will weed out dead
-            // planets
-            List<Planet> planets = Planets.getInstance().getShoppingPlanets(getCurrentPlanet(),
-                    getCampaignOptions().getMaxJumpsPlanetaryAcquisition(), currentDate);
-
-            for (Planet planet : planets) {
+            
+            //find planets within a certain radius - the function will weed out dead planets
+            List<PlanetarySystem> systems = Systems.getInstance().getShoppingSystems(getCurrentSystem(), 
+                    getCampaignOptions().getMaxJumpsPlanetaryAcquisition(), 
+                    currentDate);
+           
+            for(PlanetarySystem system: systems) {
                 ArrayList<IAcquisitionWork> remainingItems = new ArrayList<IAcquisitionWork>();
-
-                // loop through shopping list. If its time to check, then check as appropriate.
-                // Items not
-                // found get added to the remaining item list
-                for (IAcquisitionWork shoppingItem : currentList) {
-                    if (shoppingItem.getDaysToWait() <= 0) {
-                        if (findContactForAcquisition(shoppingItem, person, planet)) {
-                            int transitTime = calculatePartTransitTime(planet);
+                
+                //loop through shopping list. If its time to check, then check as appropriate. Items not
+                //found get added to the remaining item list
+                for(IAcquisitionWork shoppingItem : currentList) {
+                    if(shoppingItem.getDaysToWait() <= 0) {
+                        if(findContactForAcquisition(shoppingItem, person, system)) {	                	
+                            int transitTime = calculatePartTransitTime(system);	           
                             int totalQuantity = 0;
-                            while (shoppingItem.getQuantity() > 0
-                                    && acquireEquipment(shoppingItem, person, planet, transitTime)) {
+                            while(shoppingItem.getQuantity() > 0 && acquireEquipment(shoppingItem, person, system, transitTime)) {
                                 totalQuantity++;
                             }
-                            if (totalQuantity > 0) {
-                                addReport(personTitle + "<font color='green'><b> found "
-                                        + shoppingItem.getQuantityName(totalQuantity) + " on "
-                                        + planet.getName(currentDate) + ". Delivery in " + transitTime
-                                        + " days.</b></font>");
+                            if(totalQuantity > 0) {
+                                addReport(personTitle + "<font color='green'><b> found " + shoppingItem.getQuantityName(totalQuantity) + " on " + system.getPrintableName(currentDate) + ". Delivery in " + transitTime + " days.</b></font>");	 
                             }
                         }
                     }
@@ -2216,27 +2209,28 @@ public class Campaign implements Serializable, ITechManager {
      * @param planet - The <code>Planet</code> object where the acquisition is being attempted. This may be null if the user is not using planetary acquisition.
      * @return true if your target roll succeeded.
      */
-    public boolean findContactForAcquisition(IAcquisitionWork acquisition, Person person, Planet planet) {
+    public boolean findContactForAcquisition(IAcquisitionWork acquisition, Person person, PlanetarySystem system) {
+
         DateTime currentDate = Utilities.getDateTimeDay(getCalendar());
         TargetRoll target = getTargetForAcquisition(acquisition, person, false);
-        target = planet.getAcquisitionMods(target, getDate(), getCampaignOptions(), getFaction(),
+        target = system.getPrimaryPlanet().getAcquisitionMods(target, getDate(), getCampaignOptions(), getFaction(),
                 acquisition.getTechBase() == Part.T_CLAN);
 
         if (target.getValue() == TargetRoll.IMPOSSIBLE) {
             if(getCampaignOptions().usePlanetAcquisitionVerboseReporting()) {
-                addReport("<font color='red'><b>Can't search for " + acquisition.getAcquisitionName() + " on " + planet.getName(currentDate) + " because:</b></font> " + target.getDesc());
+                addReport("<font color='red'><b>Can't search for " + acquisition.getAcquisitionName() + " on " + system.getPrintableName(currentDate) + " because:</b></font> " + target.getDesc());
             }
             return false;
         }
         if(Compute.d6(2) < target.getValue()) {
             //no contacts on this planet, move along
             if(getCampaignOptions().usePlanetAcquisitionVerboseReporting()) {
-                addReport("<font color='red'><b>No contacts available for " + acquisition.getAcquisitionName() + " on " + planet.getName(currentDate) + "</b></font>");
+                addReport("<font color='red'><b>No contacts available for " + acquisition.getAcquisitionName() + " on " + system.getPrintableName(currentDate) + "</b></font>");
             }
             return false;
         } else {
             if(getCampaignOptions().usePlanetAcquisitionVerboseReporting()) {
-                addReport("<font color='green'>Possible contact for " + acquisition.getAcquisitionName() + " on " + planet.getName(currentDate) + "</font>");
+                addReport("<font color='green'>Possible contact for " + acquisition.getAcquisitionName() + " on " + system.getPrintableName(currentDate) + "</font>");     	
             }
             return true;
         }
@@ -2261,7 +2255,7 @@ public class Campaign implements Serializable, ITechManager {
      * @param transitDays - The number of days that the part should take to be delivered. If this value is entered as -1, then this method will determine transit time based on the users campaign options.
      * @return a boolean indicating whether the attempt to acquire equipment was successful.
      */
-    private boolean acquireEquipment(IAcquisitionWork acquisition, Person person, Planet planet, int transitDays) {
+    private boolean acquireEquipment(IAcquisitionWork acquisition, Person person, PlanetarySystem system, int transitDays) {
         boolean found = false;
         String report = "";
 
@@ -2275,9 +2269,9 @@ public class Campaign implements Serializable, ITechManager {
         if(!canPayFor(acquisition)) {
             target.addModifier(TargetRoll.IMPOSSIBLE, "Cannot afford this purchase");
         }
-
-        if(null != planet) {
-            target = planet.getAcquisitionMods(target, getDate(), getCampaignOptions(), getFaction(),
+        
+        if(null != system) {
+            target = system.getPrimaryPlanet().getAcquisitionMods(target, getDate(), getCampaignOptions(), getFaction(),
                     acquisition.getTechBase() == Part.T_CLAN);
         }
 
@@ -2788,7 +2782,7 @@ public class Campaign implements Serializable, ITechManager {
         for(NewsItem article : news.fetchNewsFor(now)) {
             addReport(article.getHeadlineForReport());
         }
-        for(NewsItem article : Planets.getInstance().getPlanetaryNews(now)) {
+        for(NewsItem article : Systems.getInstance().getPlanetaryNews(now)) {
             addReport(article.getHeadlineForReport());
         }
     }
@@ -2834,8 +2828,8 @@ public class Campaign implements Serializable, ITechManager {
              * unit is actually on route to the planet in case the user is using a custom
              * system for transport or splitting the unit, etc.
              */
-            if (!getLocation().isOnPlanet() &&
-                    getLocation().getJumpPath().getLastPlanet().getId().equals(m.getPlanetId())) {
+            if (!getLocation().isOnPlanet() && 
+                    getLocation().getJumpPath().getLastSystem().getId().equals(m.getSystemId())) {
                 /*
                  * transitTime is measured in days; round up to the next whole day, then convert
                  * to milliseconds
@@ -4182,8 +4176,9 @@ public class Campaign implements Serializable, ITechManager {
         }
 
         // Customised planetary events
+        //TODO: fix this to work with new XML structure
         pw1.println("\t<customPlanetaryEvents>");
-        for(Planet p : Planets.getInstance().getPlanets().values()) {
+        for(PlanetarySystem p : Systems.getInstance().getSystems().values()) {
             List<Planet.PlanetaryEvent> customEvents = new ArrayList<>();
             for(Planet.PlanetaryEvent event : p.getEvents()) {
                 if(event.custom) {
@@ -4193,7 +4188,7 @@ public class Campaign implements Serializable, ITechManager {
             if(!customEvents.isEmpty()) {
                 pw1.println("\t\t<planet><id>" + p.getId() + "</id>");
                 for(Planet.PlanetaryEvent event : customEvents) {
-                    Planets.getInstance().writePlanetaryEvent(pw1, event);
+                    //Systems.getInstance().writePlanetaryEvent(pw1, event);
                     pw1.println();
                 }
                 pw1.println("\t\t</planet>");
@@ -4334,25 +4329,25 @@ public class Campaign implements Serializable, ITechManager {
             pw1.println("\t</custom>");
         }
     }
-
-    public ArrayList<Planet> getPlanets() {
-        ArrayList<Planet> plnts = new ArrayList<>(Planets.getInstance().getPlanets().size());
-        for (String key : Planets.getInstance().getPlanets().keySet()) {
-            plnts.add(Planets.getInstance().getPlanets().get(key));
+    
+    public ArrayList<PlanetarySystem> getSystems() {
+        ArrayList<PlanetarySystem> systems = new ArrayList<PlanetarySystem>();
+        for (String key : Systems.getInstance().getSystems().keySet()) {
+            systems.add(Systems.getInstance().getSystems().get(key));
         }
-        return plnts;
+        return systems;
     }
 
-    public Vector<String> getPlanetNames() {
-        Vector<String> plntNames = new Vector<>(Planets.getInstance().getPlanets().size());
-        for (Planet key : Planets.getInstance().getPlanets().values()) {
-            plntNames.add(key.getPrintableName(Utilities.getDateTimeDay(calendar)));
+    public Vector<String> getSystemNames() {
+        Vector<String> systemNames = new Vector<String>();
+        for (PlanetarySystem key : Systems.getInstance().getSystems().values()) {
+            systemNames.add(key.getPrintableName(Utilities.getDateTimeDay(calendar)));
         }
-        return plntNames;
+        return systemNames;
     }
-
-    public Planet getPlanetByName(String name) {
-        return Planets.getInstance().getPlanetByName(name, Utilities.getDateTimeDay(calendar));
+    
+    public PlanetarySystem getSystemByName(String name) {
+        return Systems.getInstance().getSystemByName(name, Utilities.getDateTimeDay(calendar));
     }
 
     public Person newPerson(int type) {
@@ -4958,13 +4953,13 @@ public class Campaign implements Serializable, ITechManager {
      * @param end
      * @return
      */
-    public JumpPath calculateJumpPath(Planet start, Planet end) {
-        if (null == start) {
+    public JumpPath calculateJumpPath(PlanetarySystem start, PlanetarySystem end) {
+        if(null == start) {
             return null;
         }
         if ((null == end) || start.getId().equals(end.getId())) {
             JumpPath jpath = new JumpPath();
-            jpath.addPlanet(start);
+            jpath.addSystem(start);
             return jpath;
         }
 
@@ -4987,10 +4982,10 @@ public class Campaign implements Serializable, ITechManager {
         // hash of G for each planet which might change
         Map<String, Double> scoreG = new HashMap<>();
 
-        for (String key : Planets.getInstance().getPlanets().keySet()) {
+        for (String key : Systems.getInstance().getSystems().keySet()) {
             scoreH.put(
                     key,
-                    end.getDistanceTo(Planets.getInstance().getPlanets()
+                    end.getDistanceTo(Systems.getInstance().getSystems()
                             .get(key)));
         }
         scoreG.put(current, 0.0);
@@ -4998,25 +4993,25 @@ public class Campaign implements Serializable, ITechManager {
 
         while (!found && jumps < 10000) {
             jumps++;
-            double currentG = scoreG.get(current) + Planets.getInstance().getPlanetById(current).getRechargeTime(now);
-
             final String localCurrent = current;
-            Planets.getInstance().visitNearbyPlanets(Planets.getInstance().getPlanetById(current), 30, p -> {
-                if (closed.contains(p.getId())) {
-                    return;
-                } else if (open.contains(p.getId())) {
+            double currentG = scoreG.get(current) + Systems.getInstance().getSystemById(current).getRechargeTime(now);
+            List<PlanetarySystem> neighborKeys = Systems.getInstance().getNearbySystems(Systems.getInstance().getSystemById(current), 30);
+            for (PlanetarySystem neighborKey : neighborKeys) {
+                if (closed.contains(neighborKey.getId())) {
+                    continue;
+                } else if (open.contains(neighborKey.getId())) {
                     // is the current G better than the existing G
-                    if (currentG < scoreG.get(p.getId())) {
+                    if (currentG < scoreG.get(neighborKey.getId())) {
                         // then change G and parent
-                        scoreG.put(p.getId(), currentG);
-                        parent.put(p.getId(), localCurrent);
+                        scoreG.put(neighborKey.getId(), currentG);
+                        parent.put(neighborKey.getId(), localCurrent);
                     }
                 } else {
                     // put the current G for this one in memory
-                    scoreG.put(p.getId(), currentG);
+                    scoreG.put(neighborKey.getId(), currentG);
                     // put the parent in memory
-                    parent.put(p.getId(), localCurrent);
-                    open.add(p.getId());
+                    parent.put(neighborKey.getId(), localCurrent);
+                    open.add(neighborKey.getId());
                 }
             });
 
@@ -5046,10 +5041,10 @@ public class Campaign implements Serializable, ITechManager {
 
         // now we just need to back up from the last current by parents until we
         // hit null
-        List<Planet> path = new ArrayList<>();
+        ArrayList<PlanetarySystem> path = new ArrayList<PlanetarySystem>();
         String nextKey = current;
         while (null != nextKey) {
-            path.add(Planets.getInstance().getPlanetById(nextKey));
+            path.add(Systems.getInstance().getSystems().get(nextKey));
             // MekHQApp.logMessage(nextKey);
             nextKey = parent.get(nextKey);
         }
@@ -5057,14 +5052,14 @@ public class Campaign implements Serializable, ITechManager {
         // now reverse the direaction
         JumpPath finalPath = new JumpPath();
         for (int i = (path.size() - 1); i >= 0; i--) {
-            finalPath.addPlanet(path.get(i));
+            finalPath.addSystem(path.get(i));
         }
 
         return finalPath;
     }
 
-    public List<Planet> getAllReachablePlanetsFrom(Planet planet) {
-        return Planets.getInstance().getNearbyPlanets(planet, 30);
+    public List<PlanetarySystem> getAllReachableSystemsFrom(PlanetarySystem system) {
+        return Systems.getInstance().getNearbySystems(system, 30);
     }
 
     /**
@@ -6317,19 +6312,19 @@ public class Campaign implements Serializable, ITechManager {
         rskillPrefs = prefs;
     }
 
-    public void setStartingPlanet() {
-        Map<String, Planet> planetList = Planets.getInstance().getPlanets();
-        Planet startingPlanet = planetList.get(getFaction().getStartingPlanet(getGameYear()));
+    public void setStartingSystem() {
+        Map<String, PlanetarySystem> systemList = Systems.getInstance().getSystems();
+        PlanetarySystem startingSystem = systemList.get(getFaction().getStartingPlanet(getGameYear()));
 
-        if (startingPlanet == null) {
-            startingPlanet = planetList.get(JOptionPane.showInputDialog(
+        if (startingSystem == null) {
+            startingSystem = systemList.get(JOptionPane.showInputDialog(
                     "This faction does not have a starting planet for this era. Please choose a planet."));
-            while (startingPlanet == null) {
-                startingPlanet = planetList.get(JOptionPane
+            while (startingSystem == null) {
+                startingSystem = systemList.get(JOptionPane
                         .showInputDialog("This planet you entered does not exist. Please choose a valid planet."));
             }
         }
-        location = new CurrentLocation(startingPlanet, 0);
+        location = new CurrentLocation(startingSystem, 0);
     }
 
     public void addLogEntry(Person p, LogEntry entry) {
@@ -6809,18 +6804,18 @@ public class Campaign implements Serializable, ITechManager {
      * @param planet - A <code>Planet</code> object where the supplies are shipping from
      * @return the number of days that supplies will take to arrive.
      */
-    public int calculatePartTransitTime(Planet planet) {
+    public int calculatePartTransitTime(PlanetarySystem system) {
         //calculate number of jumps by light year distance as the crow flies divided by 30
         //the basic formula assumes 7 days per jump + system transit time on each side + random days equal
         //to (1+number of jumps)d6
-        double distance = planet.getDistanceTo(getCurrentPlanet());
-        //calculate number of jumps by dividing by 30
+        double distance = system.getDistanceTo(getCurrentSystem());
+        //calculate number of jumps by dividing by 30 
         int jumps = (int)Math.ceil(distance/30.0);
         //you need a recharge except for the first jump
         int recharges = Math.max(jumps - 1, 0);
         //if you are delivering from the same planet then no transit times
-        int currentTransitTime = (distance>0) ? (int)Math.ceil(getCurrentPlanet().getTimeToJumpPoint(1.0)) : 0;
-        int originTransitTime = (distance>0) ? (int)Math.ceil(planet.getTimeToJumpPoint(1.0)) : 0;
+        int currentTransitTime = (distance>0) ? (int)Math.ceil(getCurrentSystem().getTimeToJumpPoint(1.0)) : 0;
+        int originTransitTime = (distance>0) ? (int)Math.ceil(system.getTimeToJumpPoint(1.0)) : 0;
         int amazonFreeShipping = Compute.d6(1+jumps);
         return recharges*7+currentTransitTime+originTransitTime+amazonFreeShipping;
     }

@@ -89,7 +89,7 @@ public class Systems {
             // For debugging only!
             // unmarshaller.setEventHandler(new javax.xml.bind.helpers.DefaultValidationEventHandler());
         } catch(JAXBException e) {
-            MekHQ.getLogger().error(Planets.class, "<init>", e); //$NON-NLS-1$
+            MekHQ.getLogger().error(Systems.class, "<init>", e); //$NON-NLS-1$
         }
     }
     
@@ -108,6 +108,8 @@ public class Systems {
             systems.loader.setPriority(Thread.NORM_PRIORITY - 1);
             systems.loader.start();
         }
+        //TODO: For debugging, delete later 
+        Systems temp_systems = systems;
         return systems;
     }
     
@@ -117,7 +119,7 @@ public class Systems {
     private HashMap<Integer, Map<Integer, Set<PlanetarySystem>>> systemGrid = new HashMap<>();
     
     // HPG Network cache (to not recalculate all the damn time)
-    private Collection<Planets.HPGLink> hpgNetworkCache = null;
+    private Collection<Systems.HPGLink> hpgNetworkCache = null;
     private DateTime hpgNetworkCacheDate = null;
     
     private Thread loader;
@@ -131,6 +133,27 @@ public class Systems {
             return null;
         }
         return systemGrid.get(x).get(y);
+    }
+    
+    /** Return the planet by given name at a given time point */
+    public PlanetarySystem getSystemByName(String name, DateTime when) {
+        if(null == name) {
+            return null;
+        }
+        name = name.toLowerCase(Locale.ROOT);
+        for(PlanetarySystem system : systemList.values()) {
+            if(null != system) {
+                String systemName = system.getName(when);
+                if((null != systemName) && systemName.toLowerCase(Locale.ROOT).equals(name)) {
+                    return system;
+                }
+                systemName = system.getShortName(when);
+                if((null != systemName) && systemName.toLowerCase(Locale.ROOT).equals(name)) {
+                    return system;
+                }
+            }
+        }
+        return null;
     }
     
     public List<PlanetarySystem> getNearbySystems(final double centerX, final double centerY, int distance) {
@@ -169,6 +192,106 @@ public class Systems {
     
     public PlanetarySystem getSystemById(String id) {
         return( null != id ? systemList.get(id) : null);
+    }
+    
+    /**
+     * Get a list of planets within a certain jump radius (30ly per jump) that 
+     * you can shop on, sorted by number of jumps and in system transit time
+     * @param planet
+     * @param jumps
+     * @return a list of planets where you can go shopping
+     */
+    public List<PlanetarySystem> getShoppingSystems(final PlanetarySystem system, int jumps, DateTime when) {
+        
+        List<PlanetarySystem> shoppingSystems = getNearbySystems(system, jumps*30);
+        
+        //remove dead planets
+        Iterator<PlanetarySystem> iter = shoppingSystems.iterator();
+        while (iter.hasNext()) {
+          PlanetarySystem s = iter.next();
+          if (null == s.getPrimaryPlanet() || s.getPrimaryPlanet().isEmpty(when)) {
+              iter.remove();
+          }
+        }
+        
+        Collections.sort(shoppingSystems, new Comparator<PlanetarySystem>() {
+            @Override
+            public int compare(final PlanetarySystem p1, final PlanetarySystem p2) {
+                
+                //sort first on number of jumps required
+                int jump1 = (int)Math.ceil(p1.getDistanceTo(system)/30.0);
+                int jump2 = (int)Math.ceil(p2.getDistanceTo(system)/30.0);
+                int sComp = Integer.compare(jump1, jump2);
+
+                if (sComp != 0) {
+                   return sComp;
+                } 
+                
+                //if number of jumps the same then sort on in system transit time
+                return Double.compare(p1.getTimeToJumpPoint(1.0), p2.getTimeToJumpPoint(1.0));
+                
+            }
+        });
+        
+        return shoppingSystems;
+    }
+
+    public List<NewsItem> getPlanetaryNews(DateTime when) {
+        List<NewsItem> news = new ArrayList<>();
+        for(PlanetarySystem system : systemList.values()) {
+            if(null != system) {
+                Planet.PlanetaryEvent event = system.getEvent(when);
+                if((null != event) && (null != event.message)) {
+                    NewsItem item = new NewsItem();
+                    item.setHeadline(event.message);
+                    item.setDate(event.date);
+                    item.setLocation(system.getPrintableName(when));
+                    news.add(item);
+                }
+                for(Planet p : system.getPlanets()) {
+                    event = p.getEvent(when);
+                    if((null != event) && (null != event.message)) {
+                        NewsItem item = new NewsItem();
+                        item.setHeadline(event.message);
+                        item.setDate(event.date);
+                        item.setLocation(p.getPrintableName(when));
+                        news.add(item);
+                    }
+                }
+            }
+        }
+        return news;
+    }
+    
+    /** Clean up the local HPG network cache */
+    public void recalcHPGNetwork() {
+        hpgNetworkCacheDate = null;
+    }
+    
+    public Collection<Systems.HPGLink> getHPGNetwork(DateTime when) {
+        if((null != when) && when.equals(hpgNetworkCacheDate)) {
+            return hpgNetworkCache;
+        }
+        
+        Set<HPGLink> result = new HashSet<>();
+        for(PlanetarySystem system : systemList.values()) {
+            Integer hpg = system.getHPG(when);
+            if((null != hpg) && (hpg.intValue() == EquipmentType.RATING_A)) {
+                Collection<PlanetarySystem> neighbors = getNearbySystems(system, 50);
+                for(PlanetarySystem neighbor : neighbors) {
+                    hpg = neighbor.getHPG(when);
+                    if(null != hpg) {
+                        HPGLink link = new HPGLink(system, neighbor, hpg.intValue());
+                        if(!result.contains(link)) {
+                            result.add(link);
+                        }
+                    }
+                }
+            }
+        }
+        hpgNetworkCache = result;
+        hpgNetworkCacheDate = when;
+        return result;
     }
     
 // Data loading methods
@@ -210,9 +333,8 @@ public class Systems {
                     systemList.put(system.getId(), system);
                 } else {
                     // Update with new data
-                    //TODO: deal with updating
-                    //oldSystem.copyDataFrom(system);
-                    //system = oldSystem;
+                    oldSystem.copyDataFrom(system);
+                    system = oldSystem;
                 }
             }
             
@@ -269,8 +391,7 @@ public class Systems {
             }
             
             // Step 3: Load all the xml files within the planets subdirectory, if it exists
-            //TODO: Not sure we even want to allow this as an option for systems
-            //Utilities.parseXMLFiles(planetsPath, this::updatePlanets);
+            Utilities.parseXMLFiles(planetsPath, this::updateSystems);
             
             List<PlanetarySystem> toRemove = new ArrayList<>();
             for (PlanetarySystem system : systemList.values()) {
@@ -342,6 +463,38 @@ public class Systems {
                 }
                 list = filteredList;
             }
+        }
+    }
+    
+    /** A data class representing a HPG link between two planets */
+    public static final class HPGLink {
+        /** In case of HPG-A to HPG-B networks, <code>primary</code> holds the HPG-A node. Else the order doesn't matter. */
+        public final PlanetarySystem primary;
+        public final PlanetarySystem secondary;
+        public final int rating;
+        
+        public HPGLink(PlanetarySystem primary, PlanetarySystem secondary, int rating) {
+            this.primary = primary;
+            this.secondary = secondary;
+            this.rating = rating;
+        }
+        
+        @Override
+        public int hashCode() {
+            return Objects.hash(primary, secondary, rating);
+        }
+        
+        @Override
+        public boolean equals(Object obj) {
+            if(this == obj) {
+                return true;
+            }
+            if((null == obj) || (getClass() != obj.getClass())) {
+                return false;
+            }
+            final HPGLink other = (HPGLink) obj;
+            return Objects.equals(primary, other.primary) && Objects.equals(secondary, other.secondary)
+                && (rating == other.rating);
         }
     }
 }

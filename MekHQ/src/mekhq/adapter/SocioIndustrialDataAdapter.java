@@ -26,8 +26,9 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 import megamek.common.EquipmentType;
 import mekhq.campaign.universe.Planet;
+import mekhq.campaign.universe.SocioIndustrialData;
 
-public class SocioIndustrialDataAdapter extends XmlAdapter<String, Planet.SocioIndustrialData> {
+public class SocioIndustrialDataAdapter extends XmlAdapter<String, SocioIndustrialData> {
     private final static Map<String, Integer> stringToEquipmentTypeMap = new HashMap<String, Integer>(6);
     private final static Map<Integer, String> equipmentTypeToStringMap = new HashMap<Integer, String>(6);
     static {
@@ -59,9 +60,9 @@ public class SocioIndustrialDataAdapter extends XmlAdapter<String, Planet.SocioI
     }
     
     @Override
-    public Planet.SocioIndustrialData unmarshal(String v) throws Exception {
+    public SocioIndustrialData unmarshal(String v) throws Exception {
         String[] socio = v.split(SEPARATOR);
-        Planet.SocioIndustrialData result = new Planet.SocioIndustrialData();
+        SocioIndustrialData result = new SocioIndustrialData();
         if(socio.length >= 5) {
             result.tech = convertRatingToCode(socio[0]);
             if(result.tech == EquipmentType.RATING_C) {
@@ -82,7 +83,7 @@ public class SocioIndustrialDataAdapter extends XmlAdapter<String, Planet.SocioI
     }
 
     @Override
-    public String marshal(Planet.SocioIndustrialData v) throws Exception {
+    public String marshal(SocioIndustrialData v) throws Exception {
         StringBuilder sb = new StringBuilder();
         sb.append(convertCodeToRating(v.tech)).append(SEPARATOR);
         sb.append(convertCodeToRating(v.industry)).append(SEPARATOR);

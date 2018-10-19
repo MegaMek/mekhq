@@ -37,7 +37,8 @@ import mekhq.MekHqXmlUtil;
 import mekhq.Version;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.universe.Planet;
-import mekhq.campaign.universe.Planets;
+import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.campaign.universe.Systems;
 
 /**
  * Missions are primarily holder objects for a set of scenarios.
@@ -60,7 +61,7 @@ public class Mission implements Serializable, MekHqXmlSerializable {
     public static final int S_NUM = 4;
 
     private String name;
-    protected String planetId;
+    protected String systemId;
     private int status;
     private String desc;
     private String type;
@@ -74,7 +75,7 @@ public class Mission implements Serializable, MekHqXmlSerializable {
 
     public Mission(String n) {
         this.name = n;
-        this.planetId = "Unknown Planet";
+        this.systemId = "Unknown System";
         this.desc = "";
         this.type = "";
         this.status = S_ACTIVE;
@@ -113,16 +114,16 @@ public class Mission implements Serializable, MekHqXmlSerializable {
         this.type = t;
     }
 
-    public String getPlanetId() {
-        return getPlanet().getId();
+    public String getSystemId() {
+        return getSystem().getId();
     }
 
-    public void setPlanetId(String n) {
-        this.planetId = n;
+    public void setSystemId(String n) {
+        this.systemId = n;
     }
 
-    public Planet getPlanet() {
-        return Planets.getInstance().getPlanetById(planetId);
+    public PlanetarySystem getSystem() {
+        return Systems.getInstance().getSystemById(systemId);
     }
     
     /**
@@ -131,12 +132,12 @@ public class Mission implements Serializable, MekHqXmlSerializable {
      * in which case we return whatever was stored.
      * @return
      */
-    public String getPlanetName(DateTime when) {
-        if(getPlanet() == null) {
+    public String getSystemName(DateTime when) {
+        if(getSystem() == null) {
             return legacyPlanetName;
         }
         
-        return getPlanet().getName(when);
+        return getSystem().getName(when);
     }
     
     public void setLegacyPlanetName(String name) {
@@ -229,8 +230,8 @@ public class Mission implements Serializable, MekHqXmlSerializable {
         pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<name>" + MekHqXmlUtil.escape(name) + "</name>");
         pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<type>" + MekHqXmlUtil.escape(type) + "</type>");
         
-        if(planetId != null) {         
-            pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<planetId>" + MekHqXmlUtil.escape(planetId) + "</planetId>");
+        if(systemId != null) {         
+            pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<systemId>" + MekHqXmlUtil.escape(systemId) + "</systemId>");
         } else {
             pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<planetName>" + MekHqXmlUtil.escape(legacyPlanetName) + "</planetName>");
         }
@@ -274,13 +275,13 @@ public class Mission implements Serializable, MekHqXmlSerializable {
 
                 if (wn2.getNodeName().equalsIgnoreCase("name")) {
                     retVal.name = wn2.getTextContent();
-                } else if (wn2.getNodeName().equalsIgnoreCase("planetId")) {
-                    retVal.planetId = wn2.getTextContent();
+                } else if (wn2.getNodeName().equalsIgnoreCase("planetId") || wn2.getNodeName().equalsIgnoreCase("systemId")) {
+                    retVal.systemId = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("planetName")) {
-                    Planet planet = c.getPlanetByName(wn2.getTextContent());
+                    PlanetarySystem system = c.getSystemByName(wn2.getTextContent());
                     
-                    if(planet != null) {
-                        retVal.planetId = c.getPlanetByName(wn2.getTextContent()).getId();
+                    if(system != null) {
+                        retVal.systemId = c.getSystemByName(wn2.getTextContent()).getId();
                     } else {
                         retVal.legacyPlanetName = wn2.getTextContent();
                     }

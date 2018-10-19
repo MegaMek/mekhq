@@ -115,7 +115,6 @@ import mekhq.campaign.report.Report;
 import mekhq.campaign.report.TransportReport;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.NewsItem;
-import mekhq.campaign.universe.Planets;
 import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.gui.model.PartsTableModel;
 import mekhq.io.FileType;
@@ -2065,10 +2064,11 @@ public class CampaignGUI extends JPanel {
     }
 
     protected void loadPlanetTSVFile() {
-        FileDialogs.openPlanetsTsv(frame).ifPresent(tsvFile -> {
+        //TODO: fix this
+       /* FileDialogs.openPlanetsTsv(frame).ifPresent(tsvFile -> {
             String report = Planets.getInstance().importPlanetsFromTSV(tsvFile.getAbsolutePath());
             JOptionPane.showMessageDialog(mainPanel, report);
-        });
+        });*/
     }
     
     /**
@@ -2078,6 +2078,8 @@ public class CampaignGUI extends JPanel {
      * @param filename
      */
     protected void exportPlanets(FileType format, String dialogTitle, String filename) {
+        //TODO: Fix this
+        /*
         GUI.fileDialogSave(
                 frame,
                 dialogTitle,
@@ -2091,6 +2093,14 @@ public class CampaignGUI extends JPanel {
                     String report = Planets.getInstance().exportPlanets(file.getPath(), format.getRecommendedExtension());
                     JOptionPane.showMessageDialog(mainPanel, report);
                 });
+
+        GUI.fileDialogSave(frame, dialogTitle, new File(".", "planets." + format.getRecommendedExtension()), format).ifPresent(f -> {
+            File file = checkFileEnding(f, format.getRecommendedExtension());
+            checkToBackupFile(file, file.getPath());
+            String report = Planets.getInstance().exportPlanets(file.getPath(), format.getRecommendedExtension());
+            JOptionPane.showMessageDialog(mainPanel, report);
+        });
+        */
     }
     
     /**
