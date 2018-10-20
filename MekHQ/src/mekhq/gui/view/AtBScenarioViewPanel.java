@@ -350,6 +350,8 @@ public class AtBScenarioViewPanel extends JPanel {
 
         if(scenario.getTerrainType() == AtBScenario.TER_SPACE) {
             y = fillSpaceStats(gridBagConstraints, resourceMap, y);
+        } else if (scenario.getTerrainType() == AtBScenario.TER_LOW_ATMO) {
+            y = fillLowAtmoStats(gridBagConstraints, resourceMap, y);
         } else {
             y = fillPlanetSideStats(gridBagConstraints, resourceMap, y);
         }
@@ -690,6 +692,49 @@ public class AtBScenarioViewPanel extends JPanel {
         return y;
     }
     
+    /**
+     * Worker function that generates UI elements appropriate for low atmosphere scenarios
+     * @param gridBagConstraints Current grid bag constraints in use
+     * @param resourceMap Text resource
+     * @param y current row in the parent UI element
+     * @return the row at which we wind up after doing all this
+     */
+    private int fillLowAtmoStats(GridBagConstraints gridBagConstraints, ResourceBundle resourceMap, int y) {
+        lblTerrain.setText(resourceMap.getString("lblTerrain.text"));
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = y;
+        gridBagConstraints.gridwidth = 1;
+        panStats.add(lblTerrain, gridBagConstraints);
+
+        lblTerrainDesc.setText("Low Atmosphere");
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = y++;
+        panStats.add(lblTerrainDesc, gridBagConstraints);
+        
+        lblMapSize.setText(resourceMap.getString("lblMapSize.text"));
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = y;
+        gridBagConstraints.gridwidth = 1;
+        panStats.add(lblMapSize, gridBagConstraints);
+
+        chkReroll[REROLL_MAPSIZE] = new JCheckBox();
+        if (scenario.isCurrent()) {
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.gridwidth = 1;
+            panStats.add(chkReroll[REROLL_MAPSIZE], gridBagConstraints);
+            chkReroll[REROLL_MAPSIZE].setVisible(scenario.getRerollsRemaining() > 0 && scenario.canRerollMapSize());
+            chkReroll[REROLL_MAPSIZE].addItemListener(checkBoxListener);
+        }
+
+        lblMapSizeDesc.setText(scenario.getMapSizeX() + "x" + scenario.getMapSizeY());
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = y++;
+        panStats.add(lblMapSizeDesc, gridBagConstraints);
+        
+        return y;
+    }
+    
     private ItemListener checkBoxListener = new ItemListener() {
         @Override
         public void itemStateChanged(ItemEvent e) {
@@ -700,7 +745,7 @@ public class AtBScenarioViewPanel extends JPanel {
     private void countRerollBoxes() {
         int checkedBoxes = 0;
         for (int i = 0; i < REROLL_NUM; i++) {
-            if (chkReroll[i].isSelected()) checkedBoxes++;
+            if (chkReroll[i] != null && chkReroll[i].isSelected()) checkedBoxes++;
         }
 
         /* Once the number of checked boxes hits the number of rerolls
@@ -708,13 +753,15 @@ public class AtBScenarioViewPanel extends JPanel {
          * If the number falls below that, all are re-enabled.
          */
         for (int i = 0; i < REROLL_NUM; i++) {
-            chkReroll[i].setEnabled(checkedBoxes < scenario.getRerollsRemaining() ||
-                    chkReroll[i].isSelected());
+            if(chkReroll[i] != null) {            
+                chkReroll[i].setEnabled(checkedBoxes < scenario.getRerollsRemaining() ||
+                        chkReroll[i].isSelected());
+            }
         }
     }
 
     private void rerollBattleConditions() {
-        if (chkReroll[REROLL_TERRAIN].isSelected()) {
+        if (chkReroll[REROLL_TERRAIN] != null && chkReroll[REROLL_TERRAIN].isSelected()) {
             scenario.setTerrain();
             scenario.setMapFile();
             scenario.useReroll();
@@ -722,25 +769,25 @@ public class AtBScenarioViewPanel extends JPanel {
             lblTerrainDesc.setText(AtBScenario.terrainTypes[scenario.getTerrainType()]);
             lblMapDesc.setText(scenario.getMap());
         }
-        if (chkReroll[REROLL_MAP].isSelected()) {
+        if (chkReroll[REROLL_MAP] != null && chkReroll[REROLL_MAP].isSelected()) {
             scenario.setMapFile();
             scenario.useReroll();
             chkReroll[REROLL_MAP].setSelected(false);
             lblMapDesc.setText(scenario.getMap());
         }
-        if (chkReroll[REROLL_MAPSIZE].isSelected()) {
+        if (chkReroll[REROLL_MAPSIZE] != null && chkReroll[REROLL_MAPSIZE].isSelected()) {
             scenario.setMapSize();
             scenario.useReroll();
             chkReroll[REROLL_MAPSIZE].setSelected(false);
             lblMapSizeDesc.setText(scenario.getMapSizeX() + "x" + scenario.getMapSizeY());
         }
-        if (chkReroll[REROLL_LIGHT].isSelected()) {
+        if (chkReroll[REROLL_LIGHT] != null && chkReroll[REROLL_LIGHT].isSelected()) {
             scenario.setLightConditions();
             scenario.useReroll();
             chkReroll[REROLL_LIGHT].setSelected(false);
             lblLightDesc.setText(PlanetaryConditions.getLightDisplayableName(scenario.getLight()));
         }
-        if (chkReroll[REROLL_WEATHER].isSelected()) {
+        if (chkReroll[REROLL_WEATHER] != null && chkReroll[REROLL_WEATHER].isSelected()) {
             scenario.setWeather();
             scenario.useReroll();
             chkReroll[REROLL_WEATHER].setSelected(false);

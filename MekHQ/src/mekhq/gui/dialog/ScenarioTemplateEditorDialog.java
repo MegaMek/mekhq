@@ -41,6 +41,7 @@ import megamek.common.EntityWeightClass;
 import megamek.common.UnitType;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.ScenarioForceTemplate;
+import mekhq.campaign.mission.ScenarioMapParameters;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
 import mekhq.campaign.mission.ScenarioForceTemplate.SynchronizedDeploymentType;
@@ -104,6 +105,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
     JRadioButton btnAllowAllMapTypes;
     JRadioButton btnUseSpaceMap;
     JRadioButton btnUseSpecificMapTypes;
+    JRadioButton btnUseLowAtmosphereMap;
     
     JPanel globalPanel;
     
@@ -522,7 +524,6 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         gbc.gridy++;
         btnAllowAllMapTypes = new JRadioButton();
         btnAllowAllMapTypes.setText("Allow All");
-        btnAllowAllMapTypes.setSelected(scenarioTemplate.mapParameters.allowAllTerrainTypes);
         btnAllowAllMapTypes.addItemListener(new ItemListener() {
 
             @Override
@@ -536,7 +537,6 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         gbc.gridy++;
         btnUseSpaceMap = new JRadioButton();
         btnUseSpaceMap.setText("Use Space Map");
-        btnUseSpaceMap.setSelected(scenarioTemplate.mapParameters.useSpaceMap);
         btnUseSpaceMap.addItemListener(new ItemListener() {
 
             @Override
@@ -548,9 +548,21 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         globalPanel.add(btnUseSpaceMap, gbc);
         
         gbc.gridy++;
+        btnUseLowAtmosphereMap = new JRadioButton();
+        btnUseLowAtmosphereMap.setText("Use Low Atmo Map");
+        btnUseLowAtmosphereMap.addItemListener(new ItemListener() {
+
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                mapTypeChangeHandler();
+            }
+            
+        });
+        globalPanel.add(btnUseLowAtmosphereMap, gbc);        
+        
+        gbc.gridy++;
         btnUseSpecificMapTypes = new JRadioButton();
         btnUseSpecificMapTypes.setText("Specific Map Types");
-        btnUseSpecificMapTypes.setSelected(scenarioTemplate.mapParameters.useSpaceMap);
         btnUseSpecificMapTypes.addItemListener(new ItemListener() {
 
             @Override
@@ -564,7 +576,25 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         ButtonGroup mapTypeGroup = new ButtonGroup();
         mapTypeGroup.add(btnAllowAllMapTypes);
         mapTypeGroup.add(btnUseSpaceMap);
+        mapTypeGroup.add(btnUseLowAtmosphereMap);
         mapTypeGroup.add(btnUseSpecificMapTypes);
+        
+        if(scenarioTemplate.mapParameters.mapLocation != null) {
+            switch(scenarioTemplate.mapParameters.mapLocation) {
+            case AllGroundTerrain:
+                btnAllowAllMapTypes.setSelected(true);
+                break;
+            case Space:
+                btnUseSpaceMap.setSelected(true);
+                break;
+            case LowAtmosphere:
+                btnUseLowAtmosphereMap.setSelected(true);
+                break;
+            case SpecificGroundTerrain:
+                btnUseSpecificMapTypes.setSelected(true);
+                break;
+            }
+        }
         
         gbc.gridy--;
         gbc.gridy--;
@@ -1013,7 +1043,9 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
      * explicit map type selector.
      */
     private void mapTypeChangeHandler() {
-        lstAllowedTerrainTypes.setEnabled(btnUseSpecificMapTypes.isSelected());
+        if(lstAllowedTerrainTypes != null) {
+            lstAllowedTerrainTypes.setEnabled(btnUseSpecificMapTypes.isSelected());
+        }
     }
     
     /**
@@ -1075,9 +1107,17 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         scenarioTemplate.mapParameters.widthScalingIncrement = Integer.parseInt(txtXIncrement.getText());
         scenarioTemplate.mapParameters.allowRotation = chkAllowRotation.isSelected();
         scenarioTemplate.mapParameters.useStandardAtBSizing = chkUseAtBSizing.isSelected();
-        scenarioTemplate.mapParameters.allowAllTerrainTypes = btnAllowAllMapTypes.isSelected();
-        scenarioTemplate.mapParameters.useSpaceMap = btnUseSpaceMap.isSelected();
         
+        if(btnAllowAllMapTypes.isSelected()) {
+            scenarioTemplate.mapParameters.mapLocation = ScenarioMapParameters.MapLocation.AllGroundTerrain;
+        } else if(btnUseSpaceMap.isSelected()) {
+            scenarioTemplate.mapParameters.mapLocation = ScenarioMapParameters.MapLocation.Space;
+        } else if(btnUseLowAtmosphereMap.isSelected()) {
+            scenarioTemplate.mapParameters.mapLocation = ScenarioMapParameters.MapLocation.LowAtmosphere;
+        } else if(btnUseSpecificMapTypes.isSelected()) {
+            scenarioTemplate.mapParameters.mapLocation = ScenarioMapParameters.MapLocation.SpecificGroundTerrain;
+        }
+            
         File file = FileDialogs.saveScenarioTemplate((JFrame) getOwner(), scenarioTemplate).orElse(null);
         if(file != null) {
             scenarioTemplate.Serialize(file);

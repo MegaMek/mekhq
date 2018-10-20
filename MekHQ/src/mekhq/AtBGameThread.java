@@ -127,6 +127,10 @@ public class AtBGameThread extends GameThread {
                                 "Could not load map file data/mapgen/" + scenario.getMap() + ".xml"); //$NON-NLS-1$
                         MekHQ.getLogger().error(getClass(), "run", ex); //$NON-NLS-1$
                     }
+                    
+                    if(scenario.getTerrainType() == AtBScenario.TER_LOW_ATMO) {
+                        mapSettings.setMedium(MapSettings.MEDIUM_ATMOSPHERE);
+                    }
                 }
                 
                 mapSettings.setBoardSize(scenario.getMapX(), scenario.getMapY());

@@ -14,7 +14,7 @@ public class ScenarioObjective {
     public ObjectivePriority priority;
     public String description;
     
-    /*public enum ObjectiveVerb {
+    public enum ObjectiveVerb {
         Destroy,
         Capture,
         Protect,
@@ -29,17 +29,25 @@ public class ScenarioObjective {
         SpecificForce,
         OpposingForces,
         AlliedForces
-    }*/
+    }
     
     // an objective should have the following characteristics:
     // 1) A priority level. This is used to determine if the objective should be used to determine victory/defeat
-    // 2) An objective group ID. Optional. This is used to create "complex" objectives where more than one task must be accomplished
-    // 3) An objective verb. This describes what the player must *do* (e.g. destroy, protect)
-    // 4) An objective noun. This describes the objective's subject (e.g. a specific force, a location, all allied forces)
-    // 5) A target number. How much stuff must be done for the objective to count as completed.
-    // 5a) Whether 5) is a fixed number or a percentage. 
-    // 6) A time limit. The objective must be either completed within the time limit or prevented from failing within the time limit,
+    // 2-6 should be a separate struct, in a list
+    // 2) An objective verb. This describes what the player must *do* (e.g. destroy, protect)
+    // 3) An objective noun. This describes the objective's subject (e.g. a specific force, a location, all allied forces)
+    // 4) A target number. How much stuff must be done for the objective to count as completed.
+    // 4a) Whether 4) is a fixed number or a percentage. 
+    // 5) A time limit. The objective must be either completed within the time limit or prevented from failing within the time limit,
     //      depending on the objective verb
+    // 6) A text description 
+    // 7) Scenario Effects (a list) 
+    //      One of the following:
+    //      Victory
+    //      Battlefield Control (can salvage, etc)
+    //      Spawn scenario (select template) (
+    //      Unlock scenario (select template)
+    //
     
     // For example: Primary - Destroy enemy force, 50%, 10 turns
     //              Secondary - Reach Location AlliedForces 50% 

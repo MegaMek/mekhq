@@ -194,4 +194,9 @@ public class AtBDynamicScenario extends AtBScenario {
         
         super.loadFieldsFromXmlNode(wn);
     }
+    
+    @Override
+    public void setTerrain() {
+        AtBDynamicScenarioFactory.setTerrain(this);
+    }
 }

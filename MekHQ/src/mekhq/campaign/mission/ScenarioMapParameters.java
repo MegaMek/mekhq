@@ -12,10 +12,12 @@ import javax.xml.bind.annotation.XmlElementWrapper;
  *
  */
 public class ScenarioMapParameters {
-    // map properties:
-    // base width/height range
-    // map scaling increment (width/height)
-    // allowed terrain types
+    public enum MapLocation {
+        AllGroundTerrain,
+        SpecificGroundTerrain,
+        Space,
+        LowAtmosphere
+    }
     
     /**
      * The fixed base width/x dimension of the map.
@@ -48,14 +50,9 @@ public class ScenarioMapParameters {
     public boolean useStandardAtBSizing;
     
     /**
-     * Allow all terrain types, rather than an explicit subset.
+     * What kind of map it should be: space, low atmo, any ground map, specific ground map
      */
-    public boolean allowAllTerrainTypes;
-    
-    /**
-     * Whether or not the map should actually be in space.
-     */
-    public boolean useSpaceMap;
+    public MapLocation mapLocation;
     
     @XmlElementWrapper(name="allowedTerrainTypes")
     @XmlElement(name="allowedTerrainType")

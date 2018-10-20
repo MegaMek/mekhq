@@ -382,7 +382,9 @@ public class AtBDynamicScenarioFactory {
         int wind = PlanetaryConditions.WI_NONE;
         int fog = PlanetaryConditions.FOG_NONE;
         
-        if(scenario.getTerrainType() == AtBScenario.TER_SPACE) {
+        // weather is irrelevant in these situations.
+        if(scenario.getTerrainType() == AtBScenario.TER_SPACE ||
+                scenario.getTerrainType() == AtBScenario.TER_LOW_ATMO) {
             return;
         }
 
@@ -422,17 +424,25 @@ public class AtBDynamicScenarioFactory {
      * Handles random determination of terrain and corresponding map file from allowed terrain types
      * @param scenario The scenario to work on.
      */
-    private static void setTerrain(AtBDynamicScenario scenario) {
+    public static void setTerrain(AtBDynamicScenario scenario) {
         int terrainIndex = 0;
         
         // if we are allowing all terrain types, then pick one from the list
         // otherwise, pick one from the allowed ones
-        if(scenario.getTemplate().mapParameters.allowAllTerrainTypes) {
+        if(scenario.getTemplate().mapParameters.mapLocation == ScenarioMapParameters.MapLocation.AllGroundTerrain) {
             terrainIndex = Compute.randomInt(AtBScenario.terrainTypes.length);
             scenario.setTerrainType(terrainIndex);
             scenario.setMapFile();
-        } else if (scenario.getTemplate().mapParameters.useSpaceMap) {
+        } else if (scenario.getTemplate().mapParameters.mapLocation == ScenarioMapParameters.MapLocation.Space) {
             scenario.setTerrainType(AtBScenario.TER_SPACE);
+        } else if (scenario.getTemplate().mapParameters.mapLocation == ScenarioMapParameters.MapLocation.LowAtmosphere) {
+            // low atmo actually makes use of the terrain, so we generate some here as well
+            terrainIndex = Compute.randomInt(AtBScenario.terrainTypes.length);
+            scenario.setTerrainType(terrainIndex);
+            scenario.setMapFile();
+            
+            // but then we set the terrain to low atmosphere
+            scenario.setTerrainType(AtBScenario.TER_LOW_ATMO);
         } else {
             terrainIndex = Compute.randomInt(scenario.getTemplate().mapParameters.allowedTerrainTypes.size());
             scenario.setTerrainType(scenario.getTemplate().mapParameters.allowedTerrainTypes.get(terrainIndex));
@@ -966,12 +976,12 @@ public class AtBDynamicScenarioFactory {
      */
     private static void setBotForceParameters(BotForce generatedForce, ScenarioForceTemplate forceTemplate, AtBContract contract) {
         if(forceTemplate.getForceAlignment() == ScenarioForceTemplate.ForceAlignment.Allied.ordinal()) {
-            generatedForce.setName(contract.getAllyBotName());
+            generatedForce.setName(String.format("%s %s", contract.getAllyBotName(), forceTemplate.getForceName()));
             generatedForce.setColorIndex(contract.getAllyColorIndex());
             generatedForce.setCamoCategory(contract.getAllyCamoCategory());
             generatedForce.setCamoFileName(contract.getAllyCamoFileName());
         } else if(forceTemplate.getForceAlignment() == ScenarioForceTemplate.ForceAlignment.Opposing.ordinal()) {
-            generatedForce.setName(contract.getEnemyBotName());
+            generatedForce.setName(String.format("%s %s", contract.getEnemyBotName(), forceTemplate.getForceName()));
             generatedForce.setColorIndex(contract.getEnemyColorIndex());
             generatedForce.setCamoCategory(contract.getEnemyCamoCategory());
             generatedForce.setCamoFileName(contract.getEnemyCamoFileName());
@@ -1069,6 +1079,11 @@ public class AtBDynamicScenarioFactory {
      */
     private static void setDestinationZone(BotForce force, ScenarioForceTemplate forceTemplate) {
         int actualDestinationEdge = forceTemplate.getDestinationZone();
+        
+        // set the 'auto flee' flag to true if the bot has a destination edge
+        if(actualDestinationEdge != CardinalEdge.NEAREST_OR_NONE.ordinal()) {
+            force.getBehaviorSettings().setAutoFlee(true);
+        }
         
         if(forceTemplate.getDestinationZone() == ScenarioForceTemplate.DESTINATION_EDGE_RANDOM) {
             // compute a random cardinal edge between 0 and 3 to avoid None
