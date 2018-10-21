@@ -21,12 +21,15 @@ package mekhq.gui;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 import java.util.UUID;
 
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
@@ -111,6 +114,7 @@ public final class PersonnelTab extends CampaignGuiTab {
     private JComboBox<String> choicePerson;
     private JComboBox<String> choicePersonView;
     private JScrollPane scrollPersonnelView;
+    private JCheckBox chkGroupByUnit;
 
     private PersonnelTableModel personModel;
     private TableRowSorter<PersonnelTableModel> personnelSorter;
@@ -167,6 +171,9 @@ public final class PersonnelTab extends CampaignGuiTab {
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.weightx = 0.0;
+        gridBagConstraints.weighty = 0.0;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         add(new JLabel(resourceMap.getString("lblPersonView.text")), gridBagConstraints);
@@ -187,6 +194,22 @@ public final class PersonnelTab extends CampaignGuiTab {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         add(choicePersonView, gridBagConstraints);
+
+        chkGroupByUnit = new JCheckBox(resourceMap.getString("chkGroupByUnit.text"));
+        chkGroupByUnit.setToolTipText(resourceMap.getString("chkGroupByUnit.toolTipText"));
+        chkGroupByUnit.addActionListener(new ActionListener(){
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                personModel.setGroupByUnit(chkGroupByUnit.isSelected());
+                personModel.refreshData();
+            }
+        });
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 4;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        add(chkGroupByUnit, gridBagConstraints);
 
         personModel = new PersonnelTableModel(getCampaign());
         personnelTable = new JTable(personModel);
@@ -251,7 +274,7 @@ public final class PersonnelTab extends CampaignGuiTab {
         splitPersonnel.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, ev -> refreshPersonnelView());
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = 4;
+        gridBagConstraints.gridwidth = 5;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
