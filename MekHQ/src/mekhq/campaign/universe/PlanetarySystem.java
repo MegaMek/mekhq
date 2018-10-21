@@ -133,8 +133,13 @@ public class PlanetarySystem implements Serializable {
     @XmlJavaTypeAdapter(BooleanValueAdapter.class)
     private Boolean zenithCharge;
     
+    //tree map of planets sorted by system position
+    @XmlTransient
+    private TreeMap<Integer, Planet> planets;
+    
+    //for reading in because lists are easier
     @XmlElement(name = "planet")
-    private List<Planet> planets;
+    private List<Planet> planetList;
 
     //the location of the primary planet for this system
     private int primarySlot;
@@ -143,6 +148,19 @@ public class PlanetarySystem implements Serializable {
     @XmlJavaTypeAdapter(BooleanValueAdapter.class)
     public Boolean delete;
     
+    /**
+     * a hash to keep track of dynamic planet changes
+     * <p>
+     * sorted map of [date of change: change information]
+     * <p>
+     * Package-private so that Planets can access it
+     */
+    @XmlTransient
+    TreeMap<DateTime, PlanetaryEvent> events;
+    
+    // For export and import only (lists are easier than maps) */
+    @XmlElement(name = "event")
+    private List<Planet.PlanetaryEvent> eventList;
     
     public PlanetarySystem() {
     }
@@ -180,7 +198,7 @@ public class PlanetarySystem implements Serializable {
     public List<String> getFactions(DateTime when) {
         //TODO: eventually identify through primary planet, and maybe any other inhabited planets
         //for now just loop through planets until you get the first non-null set
-        for(Planet planet : planets) {
+        for(Planet planet : planets.values()) {
             List<String> factions = planet.getFactions(when);
             if(null != factions) {
                 return factions;
@@ -192,7 +210,7 @@ public class PlanetarySystem implements Serializable {
     public Set<Faction> getFactionSet(DateTime when) {
         //TODO: eventually identify through primary planet, and maybe any other inhabited planets
         //for now just loop through planets until you get the first non-null set
-        for(Planet planet : planets) {
+        for(Planet planet : planets.values()) {
             Set<Faction> factions = planet.getFactionSet(when);
             if(null != factions) {
                 return factions;
@@ -203,7 +221,7 @@ public class PlanetarySystem implements Serializable {
     }
     
     public SocioIndustrialData getSocioIndustrial(DateTime when) {
-        for(Planet planet : planets) {
+        for(Planet planet : planets.values()) {
             SocioIndustrialData sic = planet.getSocioIndustrial(when);
             if(null != sic) {
                 return sic;
@@ -347,13 +365,44 @@ public class PlanetarySystem implements Serializable {
     
     public Planet getPrimaryPlanet() {
         //TODO: identify this from XML data
-        for(Planet planet : planets) {
+        for(Planet planet : planets.values()) {
             if(planet.getLifeForm(null) != null) {
                 return planet;
             }
         }
         return planets.get(0);
         //return planets.get(primarySlot);
+    }
+    
+    @SuppressWarnings("unchecked")
+    public PlanetaryEvent getOrCreateEvent(DateTime when) {
+        if(null == when) {
+            return null;
+        }
+        if(null == events) {
+            events = new TreeMap<DateTime, PlanetaryEvent>(DateTimeComparator.getDateOnlyInstance());
+        }
+        PlanetaryEvent event = events.get(when);
+        if(null == event) {
+            event = new PlanetaryEvent();
+            event.date = when;
+            events.put(when, event);
+        }
+        return event;
+    }
+    
+    public PlanetaryEvent getEvent(DateTime when) {
+        if((null == when) || (null == events)) {
+            return null;
+        }
+        return events.get(when);
+    }
+    
+    public List<PlanetaryEvent> getEvents() {
+        if( null == events ) {
+            return null;
+        }
+        return new ArrayList<PlanetaryEvent>(events.values());
     }
     
     /** Includes a parser for spectral type strings */
@@ -384,10 +433,61 @@ public class PlanetarySystem implements Serializable {
         nadirCharge = Utilities.nonNull(nadirCharge, Boolean.FALSE);
         zenithCharge = Utilities.nonNull(zenithCharge, Boolean.FALSE);
         
-        //TODO: Probably best to reorganize the ordering of the planet list to
-        //correspond to system position
-        for(Planet p : planets) {
-            p.setParentSystem(this);
+        //fill up planets
+        planets = new TreeMap<Integer, Planet>();
+        if(null != planetList) {
+            for(Planet p : planetList) {
+                p.setParentSystem(this);
+                if(!planets.containsKey(p.getSystemPosition())) {
+                    planets.put(p.getSystemPosition(), p);
+                }
+            }
+            planetList.clear();
+        }
+        planetList = null;
+        // Fill up events
+        events = new TreeMap<DateTime, PlanetaryEvent>(DateTimeComparator.getDateOnlyInstance());
+        if( null != eventList ) {
+            for( PlanetaryEvent event : eventList ) {
+                if( null != event && null != event.date ) {
+                    events.put(event.date, event);
+                }
+            }
+            eventList.clear();
+        }
+        eventList = null;
+    }
+    
+    @SuppressWarnings("unused")
+    private boolean beforeMarshal(Marshaller marshaller) {
+        // Fill up our event list from the internal data type
+        eventList = new ArrayList<PlanetaryEvent>(events.values());
+        //same for planet list
+        planetList = new ArrayList<Planet>(planets.values());
+        return true;
+    }
+    
+    public void copyDataFrom(PlanetarySystem other) {
+        if( null != other ) {
+            // We don't change the ID
+            name = Utilities.nonNull(other.name, name);
+            shortName = Utilities.nonNull(other.shortName, shortName);
+            x = Utilities.nonNull(other.x, x);
+            y = Utilities.nonNull(other.y, y);
+            // Merge (not replace!) events
+            if(null != other.events) {
+                for(PlanetaryEvent event : other.getEvents()) {
+                    if( null != event && null != event.date ) {
+                        PlanetaryEvent myEvent = getOrCreateEvent(event.date);
+                        myEvent.copyDataFrom(event);
+                    }
+                }
+            }
+            //check for planet level changes
+            if(null != other.planets) {
+                //for(Planet planet : other.planets) {
+                //}
+            }
         }
     }
 }
