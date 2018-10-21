@@ -233,9 +233,8 @@ public class Systems {
                     systemList.put(system.getId(), system);
                 } else {
                     // Update with new data
-                    //TODO: deal with updating
-                    //oldSystem.copyDataFrom(system);
-                    //system = oldSystem;
+                    oldSystem.copyDataFrom(system);
+                    system = oldSystem;
                 }
             }
             
@@ -292,8 +291,7 @@ public class Systems {
             }
             
             // Step 3: Load all the xml files within the planets subdirectory, if it exists
-            //TODO: Not sure we even want to allow this as an option for systems
-            //Utilities.parseXMLFiles(planetsPath, this::updatePlanets);
+            Utilities.parseXMLFiles(planetsPath, this::updateSystems);
             
             List<PlanetarySystem> toRemove = new ArrayList<>();
             for (PlanetarySystem system : systemList.values()) {

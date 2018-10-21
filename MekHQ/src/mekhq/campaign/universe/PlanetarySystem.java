@@ -485,8 +485,14 @@ public class PlanetarySystem implements Serializable {
             }
             //check for planet level changes
             if(null != other.planets) {
-                //for(Planet planet : other.planets) {
-                //}
+                for(Planet p : other.planets.values()) {
+                    int pos = p.getSystemPosition();
+                    if(planets.containsKey(pos)) {
+                        planets.get(pos).copyDataFrom(p);
+                    } else {
+                        planets.put(pos, p);
+                    }
+                }
             }
         }
     }
