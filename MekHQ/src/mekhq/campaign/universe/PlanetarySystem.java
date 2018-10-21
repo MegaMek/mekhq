@@ -182,42 +182,33 @@ public class PlanetarySystem implements Serializable {
     }
     
     public String getName(DateTime when) {
-        return id;
-        /*return getEventData(when, name, new EventGetter<String>() {
-            @Override public String get(PlanetaryEvent e) { return e.name; }
-        });*/
+        return getPrimaryPlanet().getName(when);
     }
 
     public String getShortName(DateTime when) {
-        return null;
-        /*return getEventData(when, shortName, new EventGetter<String>() {
-            @Override public String get(PlanetaryEvent e) { return e.shortName; }
-        });*/
+        return getPrimaryPlanet().getName(when);
     }
     
     public List<String> getFactions(DateTime when) {
-        //TODO: eventually identify through primary planet, and maybe any other inhabited planets
-        //for now just loop through planets until you get the first non-null set
+        ArrayList<String> factions = new ArrayList<String>();
         for(Planet planet : planets.values()) {
-            List<String> factions = planet.getFactions(when);
-            if(null != factions) {
-                return factions;
+            List<String> f = planet.getFactions(when);
+            if(null != f) {
+                factions.addAll(f);
             }
         }
-        return null;
+        return factions;
     }
     
     public Set<Faction> getFactionSet(DateTime when) {
-        //TODO: eventually identify through primary planet, and maybe any other inhabited planets
-        //for now just loop through planets until you get the first non-null set
+        Set<Faction> factions = new HashSet<Faction>();
         for(Planet planet : planets.values()) {
-            Set<Faction> factions = planet.getFactionSet(when);
-            if(null != factions) {
-                return factions;
+            Set<Faction> f = planet.getFactionSet(when);
+            if(null != f) {
+                factions.addAll(f);
             }
         }
-        return null;
-        //return getPrimaryPlanet().getFactionSet(when);
+        return factions;
     }
     
     public SocioIndustrialData getSocioIndustrial(DateTime when) {
@@ -364,14 +355,8 @@ public class PlanetarySystem implements Serializable {
     }
     
     public Planet getPrimaryPlanet() {
-        //TODO: identify this from XML data
-        for(Planet planet : planets.values()) {
-            if(planet.getLifeForm(null) != null) {
-                return planet;
-            }
-        }
-        return planets.get(0);
-        //return planets.get(primarySlot);
+        //TODO: safety checks please, a lot depends on this
+        return planets.get(primarySlot);
     }
     
     @SuppressWarnings("unchecked")
