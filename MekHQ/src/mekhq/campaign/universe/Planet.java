@@ -533,7 +533,7 @@ public class Planet implements Serializable {
 
     public Integer getPopulation(DateTime when) {
         return getEventData(when, population, new EventGetter<Integer>() {
-            @Override public Integer get(PlanetaryEvent e) { return e.populationRating; }
+            @Override public Integer get(PlanetaryEvent e) { return e.population; }
         });
     }
 
@@ -1020,17 +1020,9 @@ public class Planet implements Serializable {
         @XmlJavaTypeAdapter(HPGRatingAdapter.class)
         public Integer hpg;
         public Integer pressure;
-        public Double pressureAtm;
-        public Double atmMass;
         public String atmosphere;
-        public Double albedo;
-        public Double greenhouseEffect;
-        public Integer habitability;
-        @XmlElement(name = "pop")
-        public Integer populationRating;
-        public String government;
-        public Integer controlRating;
-        // Stellar support, to be moved later
+        public String composition;
+        public Integer population;
         public Boolean nadirCharge;
         public Boolean zenithCharge;
         // Events marked as "custom" are saved to scenario files and loaded from there
@@ -1048,15 +1040,9 @@ public class Planet implements Serializable {
             socioIndustrial = Utilities.nonNull(other.socioIndustrial, socioIndustrial);
             temperature = Utilities.nonNull(other.temperature, temperature);
             pressure = Utilities.nonNull(other.pressure, pressure);
-            pressureAtm = Utilities.nonNull(other.pressureAtm, pressureAtm);
-            atmMass = Utilities.nonNull(other.atmMass, atmMass);
             atmosphere = Utilities.nonNull(other.atmosphere, atmosphere);
-            albedo = Utilities.nonNull(other.albedo, albedo);
-            greenhouseEffect = Utilities.nonNull(other.greenhouseEffect, greenhouseEffect);
-            habitability = Utilities.nonNull(other.habitability, habitability);
-            populationRating = Utilities.nonNull(other.populationRating, populationRating);
-            government = Utilities.nonNull(other.government, government);
-            controlRating = Utilities.nonNull(other.controlRating, controlRating);
+            composition = Utilities.nonNull(other.composition, composition);
+            population = Utilities.nonNull(other.population, population);
             nadirCharge = Utilities.nonNull(other.nadirCharge, nadirCharge);
             zenithCharge = Utilities.nonNull(other.zenithCharge, zenithCharge);
             custom = (other.custom || custom);
@@ -1074,15 +1060,9 @@ public class Planet implements Serializable {
             socioIndustrial = other.socioIndustrial;
             temperature = other.temperature;
             pressure = other.pressure;
-            pressureAtm = other.pressureAtm;
-            atmMass = other.atmMass;
             atmosphere = other.atmosphere;
-            albedo = other.albedo;
-            greenhouseEffect = other.greenhouseEffect;
-            habitability = other.habitability;
-            populationRating = other.populationRating;
-            government = other.government;
-            controlRating = other.controlRating;
+            composition = other.composition;
+            population = other.population;
             nadirCharge = other.nadirCharge;
             zenithCharge = other.zenithCharge;
             custom = (other.custom || custom);
@@ -1092,10 +1072,9 @@ public class Planet implements Serializable {
         public boolean isEmpty() {
             return (null == climate) && (null == faction) && (null == hpg) && (null == lifeForm)
                 && (null == message) && (null == name) && (null == shortName) && (null == socioIndustrial)
-                && (null == temperature) && (null == pressure) && (null == pressureAtm)
-                && (null == atmMass) && (null == atmosphere) && (null == albedo) && (null == greenhouseEffect)
-                && (null == habitability) && (null == populationRating) && (null == government)
-                && (null == controlRating) && (null == nadirCharge) && (null == zenithCharge);
+                && (null == temperature) && (null == pressure) && (null == atmosphere) 
+                && (null == composition) && (null == population) && (null == nadirCharge) 
+                && (null == zenithCharge);
         }
     }
     
