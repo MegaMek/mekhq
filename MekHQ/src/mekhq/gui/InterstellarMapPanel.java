@@ -264,8 +264,8 @@ public class InterstellarMapPanel extends JPanel {
                     }
                     centerM.add(item);
                     item = new JMenuItem("On Current Location");
-                    item.setEnabled(campaign.getCurrentPlanet() != null);
-                    if (campaign.getCurrentPlanet() != null) {// only add if there is a planet to center on
+                    item.setEnabled(campaign.getCurrentSystem() != null);
+                    if (campaign.getCurrentSystem() != null) {// only add if there is a planet to center on
                         item.addActionListener(new ActionListener() {
                             @Override
                             public void actionPerformed(ActionEvent ae) {
@@ -593,11 +593,9 @@ public class InterstellarMapPanel extends JPanel {
                 }
 
                 // Brute-force HPG network drawing. Will be optimised
-                /*
-                 * TODO: re-enable later
                 if(optHPGNetwork.isSelected()) {
                     // Grab the network from the planet manager
-                    Collection<Planets.HPGLink> hpgNetwork = Planets.getInstance().getHPGNetwork(now);
+                    Collection<Systems.HPGLink> hpgNetwork = Systems.getInstance().getHPGNetwork(now);
                     
                     for(PlanetarySystem system : systems) {
                         if(isSystemVisible(system, true)) {
@@ -634,9 +632,9 @@ public class InterstellarMapPanel extends JPanel {
                             }
                         }
                     }
-                    for(Planets.HPGLink link : hpgNetwork) {
-                        Planet p1 = link.primary;
-                        Planet p2 = link.secondary;
+                    for(Systems.HPGLink link : hpgNetwork) {
+                        PlanetarySystem p1 = link.primary;
+                        PlanetarySystem p2 = link.secondary;
                         if(isSystemVisible(p1, false) || isSystemVisible(p2, false)) {
                             if(link.rating == EquipmentType.RATING_A) {
                                 g2.setPaint(Color.CYAN);
@@ -652,7 +650,6 @@ public class InterstellarMapPanel extends JPanel {
                     }
                     g2.setStroke(new BasicStroke(1.0f));
                 }
-                */
                 
                 //check to see if the unit is traveling on a jump path currently and if so
                 //draw this one too, in a different color
@@ -687,7 +684,7 @@ public class InterstellarMapPanel extends JPanel {
                     if(isSystemVisible(system, false)) {
                         double x = map2scrX(system.getX());
                         double y = map2scrY(system.getY());
-                        if(system.equals(campaign.getCurrentPlanet())) {
+                        if(system.equals(campaign.getCurrentSystem())) {
                             //lest try rings
                             g2.setPaint(Color.ORANGE);
                             arc.setArcByCenter(x, y, size * 1.8, 0, 360, Arc2D.OPEN);
@@ -993,7 +990,7 @@ public class InterstellarMapPanel extends JPanel {
             return false;
         }
         // The current planet and the selected one are always visible
-        if(system.equals(campaign.getCurrentPlanet()) || system.equals(selectedSystem)) {
+        if(system.equals(campaign.getCurrentSystem()) || system.equals(selectedSystem)) {
             return true;
         }
         // viewport check

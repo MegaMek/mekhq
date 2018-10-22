@@ -55,7 +55,6 @@ import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
-import mekhq.campaign.universe.Planets;
 import mekhq.campaign.universe.Systems;
 import mekhq.gui.utilities.JSuggestField;
 import mekhq.gui.view.ContractPaymentBreakdown;
@@ -229,7 +228,7 @@ public class NewContractDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         descPanel.add(lblPlanetName, gridBagConstraints);
         
-        suggestPlanet = new JSuggestField(this, campaign.getPlanetNames());
+        suggestPlanet = new JSuggestField(this, campaign.getSystemNames());
         /*suggestPlanet.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 				contract.setPlanetName(suggestPlanet.getText());

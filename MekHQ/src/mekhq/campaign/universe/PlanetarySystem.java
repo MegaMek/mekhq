@@ -249,6 +249,17 @@ public class PlanetarySystem implements Serializable {
         return new SocioIndustrialData(tech, industry, rawMaterials, output, agriculture);
     }
     
+    /** @return the highest HPG rating among planets **/
+    public Integer getHPG(DateTime when) {
+        int rating = EquipmentType.RATING_X;
+        for(Planet planet : planets.values()) {
+            if(null != planet.getHPG(when) && planet.getHPG(when) < rating) {
+                rating = planet.getHPG(when);
+            }
+        }
+        return rating;
+    }
+    
     /** @return short name if set, else full name, else "unnamed" */
     public String getPrintableName(DateTime when) {
         String result = getPrimaryPlanet().getPrintableName(when);
@@ -408,6 +419,22 @@ public class PlanetarySystem implements Serializable {
     
     public Set<Integer> getPlanetPositions() {
         return planets.keySet();
+    }
+    
+    public Collection<Planet> getPlanets() {
+        return planets.values();
+    }
+    
+    @Override
+    public boolean equals(Object object) {
+        if(this == object) {
+            return true;
+        }
+        if((null == object) || (getClass() != object.getClass())) {
+            return false;
+        }
+        final PlanetarySystem other = (PlanetarySystem) object;
+        return Objects.equals(id, other.id);
     }
     
     @SuppressWarnings("unchecked")

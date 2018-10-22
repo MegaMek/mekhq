@@ -39,7 +39,7 @@ import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
-import mekhq.campaign.universe.Planets;
+import mekhq.campaign.universe.Systems;
 
 /**
  * Contract summary view for ContractMarketDialog
@@ -319,7 +319,7 @@ public class ContractSummaryPanel extends JPanel {
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		mainPanel.add(txtLocation, gridBagConstraints);
 
-		if(Planets.getInstance().getPlanets().get(contract.getSystemId()) != null) {
+		if(Systems.getInstance().getSystems().get(contract.getSystemId()) != null) {
 			lblDistance.setName("lblDistance"); // NOI18N
 			lblDistance.setText(resourceMap.getString("lblDistance.text"));
 			gridBagConstraints = new java.awt.GridBagConstraints();
@@ -333,7 +333,7 @@ public class ContractSummaryPanel extends JPanel {
 			JumpPath path = campaign.calculateJumpPath(campaign.getCurrentSystem(), contract.getSystem());
 			int days = (int)Math.ceil((path).getTotalTime(Utilities.getDateTimeDay(contract.getStartDate()), campaign.getLocation().getTransitTime()));
 			int jumps = path.getJumps();
-            if (campaign.getCurrentPlanet().getId().equals(contract.getSystemId())
+            if (campaign.getCurrentSystem().getId().equals(contract.getSystemId())
                     && campaign.getLocation().isOnPlanet()) {
 				days = 0;
 				jumps = 0;

@@ -49,9 +49,9 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.Planet;
-import mekhq.campaign.universe.Planets;
+import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.RandomFactionGenerator;
+import mekhq.campaign.universe.Systems;
 
 /**
  * Contract offers that are generated monthly under AtB rules.
@@ -172,7 +172,7 @@ public class ContractMarket implements Serializable {
 
 			DateTime currentDate = Utilities.getDateTimeDay(campaign.getCalendar());
 			Set<Faction> currentFactions =
-					campaign.getCurrentPlanet().getFactionSet(currentDate);
+					campaign.getCurrentSystem().getFactionSet(currentDate);
 			boolean inMinorFaction = true;
 			for (Faction f : currentFactions) {
 				if (RandomFactionGenerator.getInstance().getFactionHints().isISMajorPower(f) ||
@@ -198,7 +198,7 @@ public class ContractMarket implements Serializable {
                 // Just one faction. Are there any others nearby?
                 Faction onlyFaction = currentFactions.iterator().next();
                 if( !onlyFaction.isPeriphery() ) {
-                    for (Planet key : Planets.getInstance().getNearbyPlanets(campaign.getCurrentPlanet(), 30)) {
+                    for (PlanetarySystem key : Systems.getInstance().getNearbySystems(campaign.getCurrentSystem(), 30)) {
                         for (Faction f : key.getFactionSet(currentDate)) {
                             if( !onlyFaction.equals(f) ) {
                                 inBackwater = false;
@@ -217,7 +217,7 @@ public class ContractMarket implements Serializable {
 			}
 
 			if (campaign.getFactionCode().equals("MERC") || campaign.getFactionCode().equals("PIR")) {
-				if (campaign.getAtBConfig().isHiringHall(campaign.getCurrentPlanet().getId(), campaign.getDate())) {
+				if (campaign.getAtBConfig().isHiringHall(campaign.getCurrentSystem().getId(), campaign.getDate())) {
 					numContracts++;
 					/* Though the rules do not state these modifiers are mutually exclusive, the fact that the
 					 * distance of Galatea from a border means that it has no advantage for Mercs over border
@@ -236,9 +236,9 @@ public class ContractMarket implements Serializable {
 			/* If located on a faction's capital (interpreted as the starting planet for that faction),
 			 * generate one contract offer for that faction.
 			 */
-			for (Faction f : campaign.getCurrentPlanet().getFactionSet(currentDate)) {
+			for (Faction f : campaign.getCurrentSystem().getFactionSet(currentDate)) {
 				try {
-					if (f.getStartingPlanet(campaign.getGameYear()).equals(campaign.getCurrentPlanet().getId())
+					if (f.getStartingPlanet(campaign.getGameYear()).equals(campaign.getCurrentSystem().getId())
 							&& RandomFactionGenerator.getInstance().getEmployerSet().contains(f.getShortName())) {
 						AtBContract c = generateAtBContract(campaign, f.getShortName(), unitRatingMod);
 						if (c != null) {
@@ -466,7 +466,7 @@ public class ContractMarket implements Serializable {
         if (!contract.getEnemyCode().equals("REB") &&
         		!contract.getEnemyCode().equals("PIR")) {
         	boolean factionValid = false;
-        	for (Planet p : Planets.getInstance().getNearbyPlanets(campaign.getCurrentPlanet(), 30)) {
+        	for (PlanetarySystem p : Systems.getInstance().getNearbySystems(campaign.getCurrentSystem(), 30)) {
         		if (factionValid) break;
         		for (Faction f : p.getFactionSet(Utilities.getDateTimeDay(campaign.getCalendar()))) {
         			if (f.getShortName().equals(contract.getEnemyCode())) {

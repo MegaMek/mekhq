@@ -110,7 +110,7 @@ import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
-import mekhq.campaign.universe.Planets;
+import mekhq.campaign.universe.Systems;
 import mekhq.module.atb.AtBEventProcessor;
 
 public class CampaignXmlParser {
@@ -1735,8 +1735,9 @@ public class CampaignXmlParser {
     }
     
     private static void updatePlanetaryEventsFromXML(Node wn) {
-        // TODO: make Planets a member of Campaign
-        Planets.reload(true);
+        // TODO: FIX THIS for new structure
+        /*
+        Planet.reload(true);
 
         NodeList wList = wn.getChildNodes();
         for (int x = 0; x < wList.getLength(); x++) {
@@ -1759,7 +1760,7 @@ public class CampaignXmlParser {
                     if(planetNode.getNodeName().equalsIgnoreCase("id")) {
                         planetId = planetNode.getTextContent();
                     } else if(planetNode.getNodeName().equalsIgnoreCase("event")) {
-                        Planet.PlanetaryEvent event = Planets.getInstance().readPlanetaryEvent(planetNode);
+                        Planet.PlanetaryEvent event = Planet.getInstance().readPlanetaryEvent(planetNode);
                         if(null != event) {
                             event.custom = true;
                             events.add(event);
@@ -1770,6 +1771,6 @@ public class CampaignXmlParser {
                     Planets.getInstance().updatePlanetaryEvents(planetId, events, true);
                 }
             }
-        }
+        }*/
     }
 }

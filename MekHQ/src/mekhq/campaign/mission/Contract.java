@@ -595,7 +595,7 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
         }
         GregorianCalendar cal = new GregorianCalendar();
         cal.setTime(startDate);
-        if (adjustStartDate && null != c.getPlanetByName(systemId)) {
+        if (adjustStartDate && null != c.getSystemByName(systemId)) {
             int days = (int) Math.ceil(c.calculateJumpPath(c.getCurrentSystem(), getSystem())
                     .getTotalTime(Utilities.getDateTimeDay(cal), c.getLocation().getTransitTime()));
             while (days > 0) {

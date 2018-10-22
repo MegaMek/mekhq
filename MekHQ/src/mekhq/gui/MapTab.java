@@ -90,7 +90,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
         panMapView.add(new JLabel(resourceMap.getString("lblFindPlanet.text")), //$NON-NLS-1$ ;
                 gridBagConstraints);
 
-        suggestPlanet = new JSuggestField(getFrame(), getCampaign().getPlanetNames());
+        suggestPlanet = new JSuggestField(getFrame(), getCampaign().getSystemNames());
         suggestPlanet.addActionListener(ev -> {
             PlanetarySystem p = getCampaign().getSystemByName(suggestPlanet.getText());
             if (null != p) {
@@ -211,7 +211,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
     @Subscribe
     public void handle(NewDayEvent ev) {
         panMap.repaint();
-        suggestPlanet.setSuggestData(getCampaign().getPlanetNames());
+        suggestPlanet.setSuggestData(getCampaign().getSystemNames());
     }
 
     @Subscribe

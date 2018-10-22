@@ -58,9 +58,9 @@ import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.Planet;
-import mekhq.campaign.universe.Planets;
+import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.RandomFactionGenerator;
+import mekhq.campaign.universe.Systems;
 import mekhq.gui.FactionComboBox;
 import mekhq.gui.utilities.JSuggestField;
 
@@ -279,7 +279,7 @@ public class CustomizeAtBContractDialog extends JDialog {
         gbc.insets = new java.awt.Insets(5, 5, 5, 5);
         leftPanel.add(lblPlanetName, gbc);
         
-        suggestPlanet = new JSuggestField(this, campaign.getPlanetNames());       
+        suggestPlanet = new JSuggestField(this, campaign.getSystemNames());       
         suggestPlanet.setText(contract.getSystemName(Utilities.getDateTimeDay(campaign.getCalendar())));
         gbc.gridx = 1;
         gbc.gridy = y++;
@@ -624,11 +624,11 @@ public class CustomizeAtBContractDialog extends JDialog {
     	contract.setEnemyCamoFileName(enemyCamoFileName);
     	contract.setEnemyColorIndex(enemyColorIndex);
         
-    	Planet canonPlanet = Planets.getInstance().getPlanetByName(suggestPlanet.getText(),
+    	PlanetarySystem canonSystem = Systems.getInstance().getSystemByName(suggestPlanet.getText(),
                 Utilities.getDateTimeDay(campaign.getCalendar()));
         
-        if(canonPlanet != null) {
-            contract.setSystemId(canonPlanet.getId());
+        if(canonSystem != null) {
+            contract.setSystemId(canonSystem.getId());
         } else {
             contract.setSystemId(null);
             contract.setLegacyPlanetName(suggestPlanet.getText());

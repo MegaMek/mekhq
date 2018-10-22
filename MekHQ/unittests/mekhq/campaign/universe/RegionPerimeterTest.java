@@ -33,12 +33,12 @@ import org.junit.Test;
 
 public class RegionPerimeterTest {
     
-    private Planet createMockPlanet(final double x, final double y) {
-        Planet mockPlanet = mock(Planet.class);
-        when(mockPlanet.getX()).thenReturn(x);
-        when(mockPlanet.getY()).thenReturn(y);
-        when(mockPlanet.getId()).thenReturn(x + "," + y);
-        return mockPlanet;
+    private PlanetarySystem createMockSystem(final double x, final double y) {
+        PlanetarySystem mockSystem = mock(PlanetarySystem.class);
+        when(mockSystem.getX()).thenReturn(x);
+        when(mockSystem.getY()).thenReturn(y);
+        when(mockSystem.getId()).thenReturn(x + "," + y);
+        return mockSystem;
     }
     
     @Test
@@ -109,10 +109,10 @@ public class RegionPerimeterTest {
     
     @Test
     public void testFindBorderOf3x3Grid() {
-        List<Planet> list = new ArrayList<>();
+        List<PlanetarySystem> list = new ArrayList<>();
         for (int x = -1; x <= 1; x++) {
             for (int y = -1; y <= 1; y++) {
-                list.add(createMockPlanet(x, y));
+                list.add(createMockSystem(x, y));
             }
         }
         
@@ -125,13 +125,13 @@ public class RegionPerimeterTest {
     
     @Test
     public void testIsInsideRegion() {
-        List<Planet> hexagon = new ArrayList<>();
-        hexagon.add(createMockPlanet(-1, -1));
-        hexagon.add(createMockPlanet(1, -1));
-        hexagon.add(createMockPlanet(2, 0));
-        hexagon.add(createMockPlanet(1, 1));
-        hexagon.add(createMockPlanet(-1, 1));
-        hexagon.add(createMockPlanet(-2, 0));
+        List<PlanetarySystem> hexagon = new ArrayList<>();
+        hexagon.add(createMockSystem(-1, -1));
+        hexagon.add(createMockSystem(1, -1));
+        hexagon.add(createMockSystem(2, 0));
+        hexagon.add(createMockSystem(1, 1));
+        hexagon.add(createMockSystem(-1, 1));
+        hexagon.add(createMockSystem(-2, 0));
         RegionPerimeter border = new RegionPerimeter(hexagon);
 
         assertTrue(border.isInsideRegion(new RegionPerimeter.Point(0, 0.5)));
@@ -182,17 +182,17 @@ public class RegionPerimeterTest {
     
     @Test
     public void testScaledIntersection() {
-        List<Planet> list = new ArrayList<>();
-        list.add(createMockPlanet(-2, -2));
-        list.add(createMockPlanet(0, -2));
-        list.add(createMockPlanet(0, 2));
-        list.add(createMockPlanet(-2, 2));
+        List<PlanetarySystem> list = new ArrayList<>();
+        list.add(createMockSystem(-2, -2));
+        list.add(createMockSystem(0, -2));
+        list.add(createMockSystem(0, 2));
+        list.add(createMockSystem(-2, 2));
         RegionPerimeter r1 = new RegionPerimeter(list);
         list = new ArrayList<>();
-        list.add(createMockPlanet(2, -2));
-        list.add(createMockPlanet(0, -2));
-        list.add(createMockPlanet(0, 2));
-        list.add(createMockPlanet(2, 2));
+        list.add(createMockSystem(2, -2));
+        list.add(createMockSystem(0, -2));
+        list.add(createMockSystem(0, 2));
+        list.add(createMockSystem(2, 2));
         RegionPerimeter r2 = new RegionPerimeter(list);
         
         List<RegionPerimeter.Point> intersection = r1.intersection(r2, 1.0);

@@ -251,7 +251,7 @@ public class Planet implements Serializable {
                 // there are a few situations where all this stuff with parens is for naught, which is
                 // PlanetName (FactionCode) or if the PlanetName (AltName) is already in our planets "database"
                 
-                if(null == Faction.getFaction(altName) && null == Planets.getInstance().getPlanetById(primaryName)) {
+                if(null == Faction.getFaction(altName) && null == Systems.getInstance().getSystemById(primaryName)) {
                     primaryName = nameString.substring(0, parenIndex - 1);
                     
                     nameChangeEvent = new PlanetaryEvent();

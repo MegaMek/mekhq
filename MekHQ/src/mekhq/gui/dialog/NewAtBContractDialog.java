@@ -44,7 +44,7 @@ import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.universe.Planet;
-import mekhq.campaign.universe.Planets;
+import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.campaign.universe.Systems;
 import mekhq.gui.FactionComboBox;
@@ -240,7 +240,7 @@ public class NewAtBContractDialog extends NewContractDialog {
         gbc.insets = new java.awt.Insets(5, 5, 5, 5);
         descPanel.add(lblPlanetName, gbc);
         
-        suggestPlanet = new JSuggestField(this, campaign.getPlanetNames());       
+        suggestPlanet = new JSuggestField(this, campaign.getSystemNames());       
         gbc.gridx = 1;
         gbc.gridy = y++;
         gbc.gridwidth = 2;
@@ -474,26 +474,26 @@ public class NewAtBContractDialog extends NewContractDialog {
 			return;
 		}
 		AtBContract contract = (AtBContract)this.contract;
-		HashSet<String> planets = new HashSet<String>();
+		HashSet<String> systems = new HashSet<String>();
 		if (contract.getMissionType() >= AtBContract.MT_PLANETARYASSAULT ||
 				getCurrentEnemyCode().equals("REB") ||
 				getCurrentEnemyCode().equals("PIR")) {
-			for (Planet p : RandomFactionGenerator.getInstance().
+			for (PlanetarySystem p : RandomFactionGenerator.getInstance().
 					getMissionTargetList(getCurrentEmployerCode(), getCurrentEnemyCode())) {
-				planets.add(p.getName(Utilities.getDateTimeDay(campaign.getCalendar())));
+			    systems.add(p.getName(Utilities.getDateTimeDay(campaign.getCalendar())));
 			}
 		}
 		if ((contract.getMissionType() < AtBContract.MT_PLANETARYASSAULT ||
 				contract.getMissionType() == AtBContract.MT_RELIEFDUTY) &&
 				!contract.getEnemyCode().equals("REB")) {
-			for (Planet p : RandomFactionGenerator.getInstance().
+			for (PlanetarySystem p : RandomFactionGenerator.getInstance().
 					getMissionTargetList(getCurrentEnemyCode(), getCurrentEmployerCode())) {
-				planets.add(p.getName(Utilities.getDateTimeDay(campaign.getCalendar())));
+				systems.add(p.getName(Utilities.getDateTimeDay(campaign.getCalendar())));
 			}
 		}
 		cbPlanets.removeAllItems();
-		for (String planet : planets) {
-			cbPlanets.addItem(planet);
+		for (String system : systems) {
+			cbPlanets.addItem(system);
 		}
 	}
 

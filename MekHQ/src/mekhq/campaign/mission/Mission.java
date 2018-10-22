@@ -38,7 +38,6 @@ import mekhq.Version;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
-import mekhq.campaign.universe.Planets;
 import mekhq.campaign.universe.Systems;
 
 /**
@@ -276,13 +275,13 @@ public class Mission implements Serializable, MekHqXmlSerializable {
 
                 if (wn2.getNodeName().equalsIgnoreCase("name")) {
                     retVal.name = wn2.getTextContent();
-                } else if (wn2.getNodeName().equalsIgnoreCase("planetId") || wn2.getNodeName().equalsIgnoreCase("systemid")) {
+                } else if (wn2.getNodeName().equalsIgnoreCase("planetId") || wn2.getNodeName().equalsIgnoreCase("systemId")) {
                     retVal.systemId = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("planetName")) {
                     PlanetarySystem system = c.getSystemByName(wn2.getTextContent());
                     
                     if(system != null) {
-                        retVal.systemId = c.getPlanetByName(wn2.getTextContent()).getId();
+                        retVal.systemId = c.getSystemByName(wn2.getTextContent()).getId();
                     } else {
                         retVal.legacyPlanetName = wn2.getTextContent();
                     }

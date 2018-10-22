@@ -48,15 +48,15 @@ public class RegionPerimeter {
      * 
      * @param planets A list of planets that define the region.
      */
-    public RegionPerimeter(Collection<Planet> planets) {
-        if (!planets.isEmpty()) {
+    public RegionPerimeter(Collection<PlanetarySystem> systems) {
+        if (!systems.isEmpty()) {
             List<Point> points = new ArrayList<>();
             boundsX1 = Double.MAX_VALUE;
             boundsY1 = Double.MAX_VALUE;
             boundsX2 = Double.MIN_VALUE;
             boundsY2 = Double.MIN_VALUE;
-            for (Planet planet : planets) {
-                Point p = new Point(planet.getX(), planet.getY());
+            for (PlanetarySystem system : systems) {
+                Point p = new Point(system.getX(), system.getY());
                 boundsX1 = Math.min(boundsX1, p.getX());
                 boundsX2 = Math.max(boundsX2, p.getX());
                 boundsY1 = Math.min(boundsY1, p.getY());
