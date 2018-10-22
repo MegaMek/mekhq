@@ -49,17 +49,18 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeComparator;
 
+import megamek.common.EquipmentType;
 import mekhq.Utilities;
 import mekhq.adapter.BooleanValueAdapter;
 import mekhq.adapter.SpectralClassAdapter;
 import mekhq.campaign.universe.Planet.PlanetaryEvent;
-import mekhq.campaign.universe.Planet.SocioIndustrialData;
+import mekhq.campaign.universe.SocioIndustrialData;
 import mekhq.campaign.universe.Planet.SpectralDefinition;
 
 
 /**
  * This is a PlanetarySystem object which will contain information
- * about the system as well as an arraylist of the Planet objects
+ * about the system as well as an ArrayList of the Planet objects
  * that make up the system
  *
  * @author Taharqa
@@ -182,11 +183,18 @@ public class PlanetarySystem implements Serializable {
     }
     
     public String getName(DateTime when) {
-        return getPrimaryPlanet().getName(when);
+        if(null != getPrimaryPlanet()) {
+            return getPrimaryPlanet().getName(when);
+        }
+        return "Unknown";
+        
     }
 
     public String getShortName(DateTime when) {
-        return getPrimaryPlanet().getName(when);
+        if(null != getPrimaryPlanet()) {
+            return getPrimaryPlanet().getName(when);
+        }
+        return "Unknown";
     }
     
     public List<String> getFactions(DateTime when) {
@@ -210,15 +218,36 @@ public class PlanetarySystem implements Serializable {
         }
         return factions;
     }
-    
+
+    /** highest socio-industrial ratings among all planets in system for the map **/
     public SocioIndustrialData getSocioIndustrial(DateTime when) {
+        int tech = EquipmentType.RATING_X;
+        int industry = EquipmentType.RATING_X;
+        int rawMaterials = EquipmentType.RATING_X;
+        int output = EquipmentType.RATING_X;
+        int agriculture = EquipmentType.RATING_X;
+        
         for(Planet planet : planets.values()) {
             SocioIndustrialData sic = planet.getSocioIndustrial(when);
             if(null != sic) {
-                return sic;
+                if(sic.tech < tech) {
+                    tech = sic.tech;
+                }
+                if(sic.industry < industry) {
+                    tech = sic.industry;
+                }
+                if(sic.rawMaterials < rawMaterials) {
+                    tech = sic.rawMaterials;
+                }
+                if(sic.output < output) {
+                    tech = sic.output;
+                }
+                if(sic.agriculture < agriculture) {
+                    tech = sic.agriculture;
+                }
             }
         }
-        return null;
+        return new SocioIndustrialData(tech, industry, rawMaterials, output, agriculture);
     }
     
     /** @return short name if set, else full name, else "unnamed" */

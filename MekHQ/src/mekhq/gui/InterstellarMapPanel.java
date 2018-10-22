@@ -84,10 +84,8 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Faction.Tag;
-import mekhq.campaign.universe.Planet;
-import mekhq.campaign.universe.Planet.SocioIndustrialData;
+import mekhq.campaign.universe.SocioIndustrialData;
 import mekhq.campaign.universe.PlanetarySystem;
-import mekhq.campaign.universe.Planets;
 import mekhq.campaign.universe.Systems;
 import mekhq.gui.dialog.NewPlanetaryEventDialog;
 

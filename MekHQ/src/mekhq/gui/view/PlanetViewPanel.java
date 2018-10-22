@@ -34,7 +34,7 @@ import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.StarUtil;
-import mekhq.campaign.universe.Planet.SocioIndustrialData;
+import mekhq.campaign.universe.SocioIndustrialData;
 import mekhq.campaign.universe.PlanetarySystem;
 
 /**
