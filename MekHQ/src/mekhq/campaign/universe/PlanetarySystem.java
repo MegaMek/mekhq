@@ -252,7 +252,18 @@ public class PlanetarySystem implements Serializable {
     /** @return short name if set, else full name, else "unnamed" */
     public String getPrintableName(DateTime when) {
         String result = getPrimaryPlanet().getPrintableName(when);
-        return null != result ? result : "unnamed"; //$NON-NLS-1$
+        if(null == result) {
+            return "Unnamed";
+        }
+        //remove numbers or roman numerals from name
+        String new_result = "";
+        for(String str : result.split("\\s+")) {
+            if(str.matches("\\d+") || str.matches("(I|II|III|IV|V|VI|VII|VIII|IX|X|XI|XII|XIII|XIV|XV)")) {
+                continue;
+            }
+            new_result = new_result + " " + str;
+        }
+        return new_result; //$NON-NLS-1$
     }
     
     /** @return the distance to a point in space in light years */
@@ -385,6 +396,18 @@ public class PlanetarySystem implements Serializable {
     public Planet getPrimaryPlanet() {
         //TODO: safety checks please, a lot depends on this
         return planets.get(primarySlot);
+    }
+    
+    public int getPrimaryPlanetPosition() {
+        return primarySlot;
+    }
+    
+    public Planet getPlanet(int pos) {
+        return planets.get(pos);
+    }
+    
+    public Set<Integer> getPlanetPositions() {
+        return planets.keySet();
     }
     
     @SuppressWarnings("unchecked")
