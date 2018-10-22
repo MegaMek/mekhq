@@ -223,10 +223,7 @@ public class PlanetarySystem implements Serializable {
     
     /** @return short name if set, else full name, else "unnamed" */
     public String getPrintableName(DateTime when) {
-        String result = getShortName(when);
-        if( null == result ) {
-            result = getName(when);
-        }
+        String result = getPrimaryPlanet().getPrintableName(when);
         return null != result ? result : "unnamed"; //$NON-NLS-1$
     }
     
@@ -309,9 +306,12 @@ public class PlanetarySystem implements Serializable {
     
     /** @return the average travel time from low orbit to the jump point at 1g, in Terran days for a given planetary position*/
     public double getTimeToJumpPoint(double acceleration) {
-        //TODO: make system position adjustable
-        int pos = 1;
-        return planets.get(pos).getTimeToJumpPoint(acceleration);
+        return getTimeToJumpPoint(acceleration, primarySlot);
+    }
+    
+    /** @return the average travel time from low orbit to the jump point at 1g, in Terran days for a given planetary position*/
+    public double getTimeToJumpPoint(double acceleration, int sysPos) {
+        return planets.get(sysPos).getTimeToJumpPoint(acceleration);
     }
 
     public String getSpectralType() {
@@ -459,6 +459,7 @@ public class PlanetarySystem implements Serializable {
             shortName = Utilities.nonNull(other.shortName, shortName);
             x = Utilities.nonNull(other.x, x);
             y = Utilities.nonNull(other.y, y);
+            //TODO: some other changes should be possible
             // Merge (not replace!) events
             if(null != other.events) {
                 for(PlanetaryEvent event : other.getEvents()) {

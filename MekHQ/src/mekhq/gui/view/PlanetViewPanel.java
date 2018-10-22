@@ -273,7 +273,7 @@ public class PlanetViewPanel extends JPanel {
         pnlStats.add(lblStarType, gridBagConstraints);
         
         txtStarType.setName("lblStarType2"); // NOI18N
-        txtStarType.setText(planet.getSpectralTypeText() + " (" + planet.getRechargeTimeText(currentDate) + ")");
+        txtStarType.setText(planet.getParentSystem().getSpectralTypeText() + " (" + planet.getParentSystem().getRechargeTimeText(currentDate) + ")");
         txtStarType.setEditable(false);
         txtStarType.setLineWrap(true);
         txtStarType.setWrapStyleWord(true);

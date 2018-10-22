@@ -410,6 +410,10 @@ public class Planet implements Serializable {
     public Double getY() {
         return y;
     }
+    
+    public PlanetarySystem getParentSystem() {
+        return parentSystem;
+    }
 
     // Date-dependant data
     
