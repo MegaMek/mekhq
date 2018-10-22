@@ -1,0 +1,408 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<systems>
+  <system>
+    <id>Adhara (Trip 3040+)</id>
+    <planet>
+      <sysPos>1</sysPos>
+      <event>
+        <date>0000-01-01</date>
+        <name>Adhara</name>
+      </event>
+      <event>
+        <date>3040-01-01</date>
+        <name>Trip</name>
+        <message>Adhara renamed to Trip</message>
+      </event>
+    </planet>
+  </system>
+  <system>
+    <id>Andiron (Helbrent 3025-)</id>
+    <planet>
+      <sysPos>2</sysPos>
+      <event>
+        <date>0000-01-01</date>
+        <name>Helbrent</name>
+      </event>
+      <event>
+        <date>3025-01-01</date>
+        <name>Andiron</name>
+        <message>Helbrent renamed to Andiron</message>
+      </event>
+    </planet>
+  </system>
+  <system>
+    <id>Baltazar III (Himmels 3025-)</id>
+    <planet>
+      <sysPos>1</sysPos>
+      <event>
+        <date>0000-01-01</date>
+        <name>Helbrent</name>
+      </event>
+      <event>
+        <date>3025-01-01</date>
+        <name>Baltazar III</name>
+        <message>Himmels renamed to Baltazar III</message>
+      </event>
+    </planet>
+  </system>
+  <system>
+    <id>Barlow's Folly (Cussar 2864-)</id>
+    <planet>
+      <sysPos>4</sysPos>
+      <event>
+        <date>0000-01-01</date>
+        <name>Cussar</name>
+      </event>
+      <event>
+        <date>2864-01-01</date>
+        <name>Barlow's Folly</name>
+        <message>Cussar renamed to Barlow's Folly</message>
+      </event>
+    </planet>
+  </system>
+  <system>
+    <id>Blantleff (Dersidatz 3025-)</id>
+    <planet>
+      <sysPos>1</sysPos>
+      <event>
+        <date>0000-01-01</date>
+        <name>Dersidatz</name>
+      </event>
+      <event>
+        <date>3025-01-01</date>
+        <name>Blantleff</name>
+        <message>Dersidatz renamed to Blantleff</message>
+      </event>
+    </planet>
+  </system>
+  <system>
+    <id>Carver V (Liberty 3063+)</id>
+    <planet>
+      <sysPos>1</sysPos>
+      <event>
+        <date>0000-01-01</date>
+        <name>Carver V</name>
+      </event>
+      <event>
+        <date>3063-01-01</date>
+        <name>Liberty</name>
+        <message>Carver V renamed to Liberty</message>
+      </event>
+    </planet>
+  </system>
+  <system>
+    <id>Clayborne II (Green Stone 3025-)</id>
+    <planet>
+      <sysPos>1</sysPos>
+      <event>
+        <date>0000-01-01</date>
+        <name>Green Stone</name>
+      </event>
+      <event>
+        <date>3025-01-01</date>
+        <name>Clayborne II</name>
+        <message>Green Stone renamed to Clayborne II</message>
+      </event>
+    </planet>
+  </system>
+  <system>
+    <id>Diedre's Den (Iolas 3025-)</id>
+    <planet>
+      <sysPos>1</sysPos>
+      <event>
+        <date>0000-01-01</date>
+        <name>Iolas</name>
+      </event>
+      <event>
+        <date>3025-01-01</date>
+        <name>Diedre's Den</name>
+        <message>Iolas renamed to Diedre's Den</message>
+      </event>
+    </planet>
+  </system>
+  <system>
+    <id>Elgin (Chisholm 2878-)</id>
+    <planet>
+      <sysPos>4</sysPos>
+      <event>
+        <date>0000-01-01</date>
+        <name>Chisholm</name>
+      </event>
+      <event>
+        <date>2878-01-01</date>
+        <name>Elgin</name>
+        <message>Chisholm renamed to Elgin</message>
+      </event>
+    </planet>
+  </system>
+  <system>
+    <id>Gulf Breeze (Commonwealth Mining Outpost 26 3057-)</id>
+    <planet>
+      <sysPos>2</sysPos>
+      <event>
+        <date>0000-01-01</date>
+        <name>Commonwealth Mining Outpost 26</name>
+      </event>
+      <event>
+        <date>3057-01-01</date>
+        <name>Gulf Breeze</name>
+        <message>Commonwealth Mining Outpost 26 renamed to Gulf Breeze</message>
+      </event>
+    </planet>
+  </system>
+  <system>
+    <id>Homer (Zara 2850-)</id>
+    <planet>
+      <sysPos>1</sysPos>
+      <event>
+        <date>0000-01-01</date>
+        <name>Zara</name>
+      </event>
+      <event>
+        <date>2850-01-01</date>
+        <name>Homer</name>
+        <message>Zara renamed to Homer</message>
+      </event>
+    </planet>
+  </system>
+  <system>
+    <id>Jardine (Herakleion 2822+)</id>
+    <planet>
+      <sysPos>1</sysPos>
+      <event>
+        <date>0000-01-01</date>
+        <name>Jardine</name>
+      </event>
+      <event>
+        <date>2822-01-01</date>
+        <name>Herakleion</name>
+        <message>Jardine renamed to Herakleion</message>
+      </event>
+    </planet>
+  </system>
+  <system>
+    <id>Liao (Cynthiana 2202-)</id>
+    <planet>
+      <sysPos>1</sysPos>
+      <event>
+        <date>0000-01-01</date>
+        <name>Cynthiana</name>
+      </event>
+      <event>
+        <date>2202-01-01</date>
+        <name>Liao</name>
+        <message>Cynthiana renamed to Liao</message>
+      </event>
+    </planet>
+  </system>
+  <system>
+    <id>Murrain (Richmond's World 3025-)</id>
+    <planet>
+      <sysPos>2</sysPos>
+      <event>
+        <date>0000-01-01</date>
+        <name>Richmond's World</name>
+      </event>
+      <event>
+        <date>3025-01-01</date>
+        <name>Murrain</name>
+        <message>Richmond's World renamed to Murrain</message>
+      </event>
+    </planet>
+  </system>
+  <system>
+    <id>Neukirchen (Jodipur 3025-)</id>
+    <planet>
+      <sysPos>4</sysPos>
+      <event>
+        <date>0000-01-01</date>
+        <name>Jodipur</name>
+      </event>
+      <event>
+        <date>3025-01-01</date>
+        <name>Neukirchen</name>
+        <message>Jodipur renamed to Neukirchen</message>
+      </event>
+    </planet>
+  </system>
+  <system>
+    <id>New Earth (Tau Ceti 2116-)</id>
+    <planet>
+      <sysPos>4</sysPos>
+      <event>
+        <date>0000-01-01</date>
+        <name>Tau Ceti</name>
+      </event>
+      <event>
+        <date>2116-01-01</date>
+        <name>New Earth</name>
+        <message>Tau Ceti renamed to New Earth</message>
+      </event>
+    </planet>
+  </system>
+  <system>
+    <id>Pain (Dijonne 3050-)</id>
+    <planet>
+      <sysPos>3</sysPos>
+      <event>
+        <date>0000-01-01</date>
+        <name>Dijonne</name>
+      </event>
+      <event>
+        <date>3050-01-01</date>
+        <name>Pain</name>
+        <message>Dijonne renamed to Pain</message>
+      </event>
+    </planet>
+  </system>
+  <system>
+    <id>Pirates Haven (50) (Badlands Cluster 3025-)</id>
+    <planet>
+      <sysPos>1</sysPos>
+      <event>
+        <date>0000-01-01</date>
+        <name>Badlands Cluster (50)</name>
+      </event>
+      <event>
+        <date>3025-01-01</date>
+        <name>Pirates Haven (50)</name>
+        <message>Badlands Cluster (50) renamed to Pirates Haven (50)</message>
+      </event>
+    </planet>
+  </system>
+  <system>
+    <id>Randis IV (Hope IV 2988-)</id>
+    <planet>
+      <sysPos>1</sysPos>
+      <event>
+        <date>0000-01-01</date>
+        <name>Hope IV</name>
+      </event>
+      <event>
+        <date>2988-01-01</date>
+        <name>Randis IV</name>
+        <message>Hope IV renamed to Randis IV</message>
+      </event>
+    </planet>
+  </system>
+  <system>
+    <id>Sharpe (Obeedah 3025+)</id>
+    <planet>
+      <sysPos>3</sysPos>
+      <event>
+        <date>0000-01-01</date>
+        <name>Sharpe</name>
+      </event>
+      <event>
+        <date>3025-01-01</date>
+        <name>Obeedah</name>
+        <message>Sharpe renamed to Obeedah</message>
+      </event>
+    </planet>
+  </system>
+  <system>
+    <id>Shaula (Perrot 3025-)</id>
+    <planet>
+      <sysPos>1</sysPos>
+      <event>
+        <date>0000-01-01</date>
+        <name>Perrot</name>
+      </event>
+      <event>
+        <date>3025-01-01</date>
+        <name>Shaula</name>
+        <message>Perrot renamed to Shaula</message>
+      </event>
+    </planet>
+  </system>
+  <system>
+    <id>Tanis (Radulov 2600-)</id>
+    <planet>
+      <sysPos>4</sysPos>
+      <event>
+        <date>0000-01-01</date>
+        <name>Radulov</name>
+      </event>
+      <event>
+        <date>2600-01-01</date>
+        <name>Tanis</name>
+        <message>Radulov renamed to Tanis</message>
+      </event>
+    </planet>
+  </system>
+  <system>
+    <id>The Rack (Port Vail 3050-)</id>
+    <planet>
+      <sysPos>2</sysPos>
+      <event>
+        <date>0000-01-01</date>
+        <name>Port Vail</name>
+      </event>
+      <event>
+        <date>3050-01-01</date>
+        <name>The Rack</name>
+        <message>Port Vail renamed to The Rack</message>
+      </event>
+    </planet>
+  </system>
+  <system>
+    <id>Versailles (Taussen 2822+)</id>
+    <planet>
+      <sysPos>1</sysPos>
+      <event>
+        <date>0000-01-01</date>
+        <name>Versailles</name>
+      </event>
+      <event>
+        <date>2822-01-01</date>
+        <name>Taussen</name>
+        <message>Versailles renamed to Taussen</message>
+      </event>
+    </planet>
+  </system>
+  <system>
+    <id>Victoria (Meglan 2537-)</id>
+    <planet>
+      <sysPos>1</sysPos>
+      <event>
+        <date>0000-01-01</date>
+        <name>Meglan</name>
+      </event>
+      <event>
+        <date>2537-01-01</date>
+        <name>Victoria</name>
+        <message>Meglan renamed to Victoria</message>
+      </event>
+    </planet>
+  </system>
+  <system>
+    <id>Von Strang's World (Erin 2830-)</id>
+    <planet>
+      <sysPos>1</sysPos>
+      <event>
+        <date>0000-01-01</date>
+        <name>Erin</name>
+      </event>
+      <event>
+        <date>2830-01-01</date>
+        <name>Von Strang's World</name>
+        <message>Erin renamed to Von Strang's World</message>
+      </event>
+    </planet>
+  </system>
+  <system>
+    <id>Winfield (Treeline 2863-)</id>
+    <planet>
+      <sysPos>3</sysPos>
+      <event>
+        <date>0000-01-01</date>
+        <name>Treeline</name>
+      </event>
+      <event>
+        <date>2863-01-01</date>
+        <name>Winfield</name>
+        <message>Treeline renamed to Winfield</message>
+      </event>
+    </planet>
+  </system>
+</systems>
