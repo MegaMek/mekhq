@@ -147,6 +147,18 @@ public class PlanetViewPanel extends JPanel {
         gbcText.anchor = GridBagConstraints.WEST;  
         int infoRow = 1;
         
+        //Planet type
+        JLabel lblPlanetType = new JLabel(resourceMap.getString("lblPlanetaryType1.text"));
+        gbcLabel.gridy = infoRow;
+        panel.add(lblPlanetType, gbcLabel);        
+        JTextArea txtPlanetType = new JTextArea(planet.getPlanetType());
+        txtPlanetType.setEditable(false);
+        txtPlanetType.setLineWrap(true);
+        txtPlanetType.setWrapStyleWord(true);
+        gbcText.gridy = infoRow;
+        panel.add(txtPlanetType, gbcText);
+        ++ infoRow;
+        
         //System Position
         if((null != planet.getSystemPosition()) || (null != planet.getOrbitRadius())) {
             JLabel lblPosition = new JLabel(resourceMap.getString("lblPosition.text"));
@@ -179,6 +191,34 @@ public class PlanetViewPanel extends JPanel {
         gbcText.gridy = infoRow;
         panel.add(txtJumpPoint, gbcText);
         ++ infoRow;
+        
+        //Year length
+        if(null != planet.getYearLength()) {
+            JLabel lblYear = new JLabel(resourceMap.getString("lblYear1.text"));
+            gbcLabel.gridy = infoRow;
+            panel.add(lblYear, gbcLabel);        
+            JTextArea txtYear = new JTextArea(Double.toString(planet.getYearLength()) + " Terran years");
+            txtYear.setEditable(false);
+            txtYear.setLineWrap(true);
+            txtYear.setWrapStyleWord(true);
+            gbcText.gridy = infoRow;
+            panel.add(txtYear, gbcText);
+            ++ infoRow;
+        }
+        
+        //day length
+        if(null != planet.getDayLength()) {
+            JLabel lblDay = new JLabel(resourceMap.getString("lblDay1.text"));
+            gbcLabel.gridy = infoRow;
+            panel.add(lblDay, gbcLabel);        
+            JTextArea txtDay = new JTextArea(Double.toString(planet.getDayLength()) + " hours");
+            txtDay.setEditable(false);
+            txtDay.setLineWrap(true);
+            txtDay.setWrapStyleWord(true);
+            gbcText.gridy = infoRow;
+            panel.add(txtDay, gbcText);
+            ++ infoRow;
+        }
         
         /*
            * TODO: fix satelllite information

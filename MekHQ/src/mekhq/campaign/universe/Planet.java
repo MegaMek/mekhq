@@ -32,7 +32,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Random;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.UUID;
@@ -61,7 +60,6 @@ import mekhq.adapter.HPGRatingAdapter;
 import mekhq.adapter.LifeFormAdapter;
 import mekhq.adapter.PressureAdapter;
 import mekhq.adapter.SocioIndustrialDataAdapter;
-import mekhq.adapter.SpectralClassAdapter;
 import mekhq.adapter.StringListAdapter;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.universe.Faction.Tag;
@@ -383,6 +381,14 @@ public class Planet implements Serializable {
 
     public Double getDayLength() {
         return dayLength;
+    }
+    
+    public Double getYearLength() {
+        return yearLength;
+    }
+    
+    public String getPlanetType() {
+        return planetType;
     }
     
     public Integer getSystemPosition() {
