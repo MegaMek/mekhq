@@ -55,7 +55,6 @@ import mekhq.adapter.BooleanValueAdapter;
 import mekhq.adapter.SpectralClassAdapter;
 import mekhq.campaign.universe.Planet.PlanetaryEvent;
 import mekhq.campaign.universe.SocioIndustrialData;
-import mekhq.campaign.universe.Planet.SpectralDefinition;
 
 
 /**
@@ -509,6 +508,21 @@ public class PlanetarySystem implements Serializable {
                     }
                 }
             }
+        }
+    }
+    
+    /** Data class to hold parsed spectral definitions */
+    public static final class SpectralDefinition {
+        public String spectralType;
+        public int spectralClass;
+        public double subtype;
+        public String luminosity;
+        
+        public SpectralDefinition(String spectralType, int spectralClass, double subtype, String luminosity) {
+            this.spectralType = Objects.requireNonNull(spectralType);
+            this.spectralClass = spectralClass;
+            this.subtype = subtype;
+            this.luminosity = Objects.requireNonNull(luminosity);
         }
     }
 }

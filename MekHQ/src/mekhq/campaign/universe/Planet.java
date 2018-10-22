@@ -1124,19 +1124,4 @@ public class Planet implements Serializable {
     public static enum PlanetaryType {
         SMALL_ASTEROID, MEDIUM_ASTEROID, DWARF_TERRESTRIAL, TERRESTRIAL, GIANT_TERRESTRIAL, GAS_GIANT, ICE_GIANT;
     }
-    
-    /** Data class to hold parsed spectral definitions */
-    public static final class SpectralDefinition {
-        public String spectralType;
-        public int spectralClass;
-        public double subtype;
-        public String luminosity;
-        
-        public SpectralDefinition(String spectralType, int spectralClass, double subtype, String luminosity) {
-            this.spectralType = Objects.requireNonNull(spectralType);
-            this.spectralClass = spectralClass;
-            this.subtype = subtype;
-            this.luminosity = Objects.requireNonNull(luminosity);
-        }
-    }
 }

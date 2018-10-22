@@ -34,7 +34,7 @@ import java.util.TreeSet;
 import megamek.common.EquipmentType;
 import mekhq.MekHQ;
 import mekhq.Utilities;
-import mekhq.campaign.universe.Planet.SpectralDefinition;
+import mekhq.campaign.universe.PlanetarySystem.SpectralDefinition;
 
 /** Static method only helper class for stars */
 public final class StarUtil {
