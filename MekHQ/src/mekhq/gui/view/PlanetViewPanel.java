@@ -26,6 +26,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextPane;
+import javax.swing.border.Border;
+import javax.swing.border.TitledBorder;
 import javax.swing.text.DefaultCaret;
 
 import org.joda.time.DateTime;
@@ -67,9 +69,6 @@ public class PlanetViewPanel extends JPanel {
         setBackground(Color.WHITE);
 
         pnlSystem = getSystemPanel();
-               
-
-
         pnlSystem.setBorder(BorderFactory.createTitledBorder(system.getPrintableName(Utilities.getDateTimeDay(campaign.getCalendar())) + " " + resourceMap.getString("system.text")));
         pnlSystem.setBackground(Color.WHITE);
         add(pnlSystem);
@@ -77,7 +76,8 @@ public class PlanetViewPanel extends JPanel {
         Planet primary = system.getPrimaryPlanet();
         if(null != primary) {
             pnlPrimary = getPlanetPanel(primary);
-            pnlPrimary.setBorder(BorderFactory.createTitledBorder(primary.getPrintableName(Utilities.getDateTimeDay(campaign.getCalendar()))  + " " + resourceMap.getString("primaryPlanet.text")));
+            pnlPrimary.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.BLACK, 2),
+                    "<html><b>" + primary.getPrintableName(Utilities.getDateTimeDay(campaign.getCalendar()))  + " " + resourceMap.getString("primaryPlanet.text") + "</b></html>"));
             pnlPrimary.setBackground(Color.WHITE);
             add(pnlPrimary);
         };
