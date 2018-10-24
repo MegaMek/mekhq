@@ -3,7 +3,7 @@
   <system>
     <id>Adhara (Trip 3040+)</id>
     <planet>
-      <sysPos>1</sysPos>
+      <sysPos>2</sysPos>
       <event>
         <date>0000-01-01</date>
         <name>Adhara</name>
@@ -18,7 +18,7 @@
   <system>
     <id>Andiron (Helbrent 3025-)</id>
     <planet>
-      <sysPos>2</sysPos>
+      <sysPos>3</sysPos>
       <event>
         <date>0000-01-01</date>
         <name>Helbrent</name>
@@ -33,7 +33,7 @@
   <system>
     <id>Baltazar III (Himmels 3025-)</id>
     <planet>
-      <sysPos>1</sysPos>
+      <sysPos>2</sysPos>
       <event>
         <date>0000-01-01</date>
         <name>Helbrent</name>
@@ -48,7 +48,7 @@
   <system>
     <id>Barlow's Folly (Cussar 2864-)</id>
     <planet>
-      <sysPos>4</sysPos>
+      <sysPos>1</sysPos>
       <event>
         <date>0000-01-01</date>
         <name>Cussar</name>
@@ -63,7 +63,7 @@
   <system>
     <id>Blantleff (Dersidatz 3025-)</id>
     <planet>
-      <sysPos>1</sysPos>
+      <sysPos>3</sysPos>
       <event>
         <date>0000-01-01</date>
         <name>Dersidatz</name>
@@ -93,7 +93,7 @@
   <system>
     <id>Clayborne II (Green Stone 3025-)</id>
     <planet>
-      <sysPos>1</sysPos>
+      <sysPos>4</sysPos>
       <event>
         <date>0000-01-01</date>
         <name>Green Stone</name>
@@ -123,7 +123,7 @@
   <system>
     <id>Elgin (Chisholm 2878-)</id>
     <planet>
-      <sysPos>4</sysPos>
+      <sysPos>3</sysPos>
       <event>
         <date>0000-01-01</date>
         <name>Chisholm</name>
@@ -138,7 +138,7 @@
   <system>
     <id>Gulf Breeze (Commonwealth Mining Outpost 26 3057-)</id>
     <planet>
-      <sysPos>2</sysPos>
+      <sysPos>3</sysPos>
       <event>
         <date>0000-01-01</date>
         <name>Commonwealth Mining Outpost 26</name>
@@ -168,7 +168,7 @@
   <system>
     <id>Jardine (Herakleion 2822+)</id>
     <planet>
-      <sysPos>1</sysPos>
+      <sysPos>2</sysPos>
       <event>
         <date>0000-01-01</date>
         <name>Jardine</name>
@@ -198,7 +198,7 @@
   <system>
     <id>Murrain (Richmond's World 3025-)</id>
     <planet>
-      <sysPos>2</sysPos>
+      <sysPos>1</sysPos>
       <event>
         <date>0000-01-01</date>
         <name>Richmond's World</name>
@@ -213,7 +213,7 @@
   <system>
     <id>Neukirchen (Jodipur 3025-)</id>
     <planet>
-      <sysPos>4</sysPos>
+      <sysPos>1</sysPos>
       <event>
         <date>0000-01-01</date>
         <name>Jodipur</name>
@@ -243,7 +243,7 @@
   <system>
     <id>Pain (Dijonne 3050-)</id>
     <planet>
-      <sysPos>3</sysPos>
+      <sysPos>1</sysPos>
       <event>
         <date>0000-01-01</date>
         <name>Dijonne</name>
@@ -303,7 +303,7 @@
   <system>
     <id>Shaula (Perrot 3025-)</id>
     <planet>
-      <sysPos>1</sysPos>
+      <sysPos>4</sysPos>
       <event>
         <date>0000-01-01</date>
         <name>Perrot</name>
@@ -318,7 +318,7 @@
   <system>
     <id>Tanis (Radulov 2600-)</id>
     <planet>
-      <sysPos>4</sysPos>
+      <sysPos>3</sysPos>
       <event>
         <date>0000-01-01</date>
         <name>Radulov</name>
@@ -333,7 +333,7 @@
   <system>
     <id>The Rack (Port Vail 3050-)</id>
     <planet>
-      <sysPos>2</sysPos>
+      <sysPos>3</sysPos>
       <event>
         <date>0000-01-01</date>
         <name>Port Vail</name>
@@ -348,7 +348,7 @@
   <system>
     <id>Versailles (Taussen 2822+)</id>
     <planet>
-      <sysPos>1</sysPos>
+      <sysPos>4</sysPos>
       <event>
         <date>0000-01-01</date>
         <name>Versailles</name>
@@ -363,7 +363,7 @@
   <system>
     <id>Victoria (Meglan 2537-)</id>
     <planet>
-      <sysPos>1</sysPos>
+      <sysPos>2</sysPos>
       <event>
         <date>0000-01-01</date>
         <name>Meglan</name>
@@ -393,7 +393,7 @@
   <system>
     <id>Winfield (Treeline 2863-)</id>
     <planet>
-      <sysPos>3</sysPos>
+      <sysPos>2</sysPos>
       <event>
         <date>0000-01-01</date>
         <name>Treeline</name>

@@ -233,16 +233,16 @@ public class PlanetarySystem implements Serializable {
                     tech = sic.tech;
                 }
                 if(sic.industry < industry) {
-                    tech = sic.industry;
+                    industry = sic.industry;
                 }
                 if(sic.rawMaterials < rawMaterials) {
-                    tech = sic.rawMaterials;
+                    rawMaterials = sic.rawMaterials;
                 }
                 if(sic.output < output) {
-                    tech = sic.output;
+                    output = sic.output;
                 }
                 if(sic.agriculture < agriculture) {
-                    tech = sic.agriculture;
+                    agriculture = sic.agriculture;
                 }
             }
         }
