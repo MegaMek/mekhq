@@ -53,6 +53,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.swing.JOptionPane;
 
+import mekhq.campaign.log.*;
 import org.joda.time.DateTime;
 
 import megamek.client.RandomNameGenerator;
@@ -1058,7 +1059,7 @@ public class Campaign implements Serializable, ITechManager {
      * This is for adding a TestUnit that was previously created and had parts added to
      * it. We need to do the normal stuff, but we also need to take the existing parts and
      * add them to the campaign.
-     * @param unit
+     * @param tu
      */
     public void addTestUnit(TestUnit tu) {
         // we really just want the entity and the parts so lets just wrap that around a
@@ -1239,26 +1240,23 @@ public class Campaign implements Serializable, ITechManager {
             astechPoolMinutes += 240;
             astechPoolOvertime += 120;
         }
-        String rankEntry = "";
-        if (p.getRankNumeric() > 0) {
-            rankEntry = " as a " + p.getRankName();
-        }
+        String rankEntry = LogEntryController.getInstance().generateRankEntryString(p);
         if (prisoner) {
             if (getCampaignOptions().getDefaultPrisonerStatus() == CampaignOptions.BONDSMAN_RANK) {
                 p.setBondsman();
                 if (log) {
-                    p.addLogEntry(getDate(), "Made Bondsman " + getName() + rankEntry);
+                    ServiceLogger.getInstance().madeBondsman(p, getDate(), getName(), rankEntry);
                 }
             } else {
                 p.setPrisoner();
                 if (log) {
-                    p.addLogEntry(getDate(), "Made Prisoner " + getName() + rankEntry);
+                    ServiceLogger.getInstance().madePrisoner(p, getDate(), getName(), rankEntry);
                 }
             }
         } else {
             p.setFreeMan();
             if (log) {
-                p.addLogEntry(getDate(), "Joined " + getName() + rankEntry);
+                ServiceLogger.getInstance().joined(p, getDate(), getName(), rankEntry);
             }
         }
         MekHQ.triggerEvent(new PersonNewEvent(p));
@@ -1306,11 +1304,8 @@ public class Campaign implements Serializable, ITechManager {
             astechPoolMinutes += 240;
             astechPoolOvertime += 120;
         }
-        String rankEntry = "";
-        if (p.getRankNumeric() > 0) {
-            rankEntry = " as a " + p.getRankName();
-        }
-        p.addLogEntry(getDate(), "Joined " + getName() + rankEntry);
+        String rankEntry = LogEntryController.getInstance().generateRankEntryString(p);
+        ServiceLogger.getInstance().joined(p, getDate(), getName(), rankEntry);
     }
 
     public Date getDate() {
@@ -3551,7 +3546,7 @@ public class Campaign implements Serializable, ITechManager {
     public void beginReport(String r) {
         if (this.getCampaignOptions().historicalDailyLog()) {
             //add the new items to our in-memory cache
-            addInMemoryLogHistory(new LogEntry(getDate(), ""));
+            addInMemoryLogHistory(new HistoricalLogEntry(getDate(), ""));
         }
         addReportInternal(r);
     }
@@ -3562,7 +3557,7 @@ public class Campaign implements Serializable, ITechManager {
      */
     public void addReport(String r) {
         if (this.getCampaignOptions().historicalDailyLog()) {
-            addInMemoryLogHistory(new LogEntry(getDate(), r));
+            addInMemoryLogHistory(new HistoricalLogEntry(getDate(), r));
         }
         addReportInternal(r);
     }
@@ -4052,7 +4047,7 @@ public class Campaign implements Serializable, ITechManager {
      * A helper function to encapsulate writing the map entries out to XML.
      *
      * @param <keyType> The key type of the map.
-     * @param <arrType> The object type of the map. Must implement MekHqXmlSerializable.
+     * @param <valueType> The object type of the map. Must implement MekHqXmlSerializable.
      * @param pw1       The PrintWriter to output XML to.
      * @param indent    The indentation level to use for writing XML (purely for neatness).
      * @param tag       The name of the tag to use to encapsulate it.
@@ -4733,8 +4728,8 @@ public class Campaign implements Serializable, ITechManager {
      * of jumps but we could extend this to take advantage of recharge information or other variables as well Based on
      * http://www.policyalmanac.org/games/aStarTutorial.htm
      *
-     * @param startKey
-     * @param endKey
+     * @param start
+     * @param end
      * @return
      */
     public JumpPath calculateJumpPath(Planet start, Planet end) {
@@ -5689,7 +5684,7 @@ public class Campaign implements Serializable, ITechManager {
                 if (p.getRankNumeric() < 0) {
                     changeRank(p, 0, false);
                 }
-                p.addLogEntry(getDate(), "Freed");
+                ServiceLogger.getInstance().freed(p, getDate());
                 if (getCampaignOptions().getUseTimeInService()) {
                     p.setRecruitment((GregorianCalendar) getCalendar().clone());
                 }
@@ -5700,7 +5695,7 @@ public class Campaign implements Serializable, ITechManager {
                     // rank is Prisoner or Bondsman.
                 }
                 p.setPrisoner();
-                p.addLogEntry(getDate(), "Made Prisoner");
+                ServiceLogger.getInstance().madePrisoner(p, getDate());
                 if (getCampaignOptions().getUseTimeInService()) {
                     p.setRecruitment(null);
                 }
@@ -5711,7 +5706,7 @@ public class Campaign implements Serializable, ITechManager {
                     // rank is Prisoner or Bondsman.
                 }
                 p.setBondsman();
-                p.addLogEntry(getDate(), "Made Bondsman");
+                ServiceLogger.getInstance().madeBondsman(p, getDate());
                 if (getCampaignOptions().getUseTimeInService()) {
                     p.setRecruitment(null);
                 }
@@ -5731,11 +5726,11 @@ public class Campaign implements Serializable, ITechManager {
     public void changeStatus(Person person, int status) {
         Unit u = getUnit(person.getUnitId());
         if (status == Person.S_KIA) {
-            person.addLogEntry(getDate(), "Killed in action");
+            ServiceLogger.getInstance().kia(person, getDate());
             // Don't forget to tell the spouse
             if (person.hasSpouse()) {
                 Person spouse = person.getSpouse();
-                spouse.addLogEntry(getDate(), "Spouse, " + person.getName() + ", killed in action");
+                PersonalLogger.getInstance().spouseKia(spouse, person, getDate());
                 spouse.setSpouseID(null);
             }
             // set the deathday
@@ -5745,13 +5740,13 @@ public class Campaign implements Serializable, ITechManager {
             person.setDeathday(null);
         }
         if (status == Person.S_MIA) {
-            person.addLogEntry(getDate(), "Missing in action");
+            ServiceLogger.getInstance().mia(person, getDate());
         }
         if (status == Person.S_RETIRED) {
-            person.addLogEntry(getDate(), "Retired from active duty");
+            ServiceLogger.getInstance().retired(person, getDate());
         }
         if (status == Person.S_ACTIVE && person.getStatus() == Person.S_MIA) {
-            person.addLogEntry(getDate(), "Recovered from MIA status");
+            ServiceLogger.getInstance().recoveredMia(person, getDate());
         }
         person.setStatus(status);
         if (status != Person.S_ACTIVE) {
@@ -5793,9 +5788,9 @@ public class Campaign implements Serializable, ITechManager {
         MekHQ.triggerEvent(new PersonChangedEvent(person));
         if (report) {
             if (rank > oldRank || (rank == oldRank && rankLevel > oldRankLevel)) {
-                person.addLogEntry(getDate(), "Promoted to " + person.getRankName());
+                ServiceLogger.getInstance().promotedTo(person, getDate());
             } else if (rank < oldRank || (rank == oldRank && rankLevel < oldRankLevel)) {
-                person.addLogEntry(getDate(), "Demoted to " + person.getRankName());
+                ServiceLogger.getInstance().demotedTo(person, getDate());
             }
         }
     }
