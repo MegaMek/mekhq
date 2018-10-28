@@ -107,11 +107,11 @@ public class LogEntryFactory {
             return null;
         }
 
-        String newDescription = LogEntryController.getInstance().updateOldDescription(desc);
+        String newDescription = LogEntryController.updateOldDescription(desc);
         if(!newDescription.isEmpty())
             desc = newDescription;
 
-        if(type == null) type = LogEntryController.getInstance().determineTypeFromLogDescription(desc);
+        if(type == null) type = LogEntryController.determineTypeFromLogDescription(desc);
 
         return generateNew(date, desc, type);
     }

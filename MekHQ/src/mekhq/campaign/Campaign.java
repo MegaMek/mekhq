@@ -1240,23 +1240,23 @@ public class Campaign implements Serializable, ITechManager {
             astechPoolMinutes += 240;
             astechPoolOvertime += 120;
         }
-        String rankEntry = LogEntryController.getInstance().generateRankEntryString(p);
+        String rankEntry = LogEntryController.generateRankEntryString(p);
         if (prisoner) {
             if (getCampaignOptions().getDefaultPrisonerStatus() == CampaignOptions.BONDSMAN_RANK) {
                 p.setBondsman();
                 if (log) {
-                    ServiceLogger.getInstance().madeBondsman(p, getDate(), getName(), rankEntry);
+                    ServiceLogger.madeBondsman(p, getDate(), getName(), rankEntry);
                 }
             } else {
                 p.setPrisoner();
                 if (log) {
-                    ServiceLogger.getInstance().madePrisoner(p, getDate(), getName(), rankEntry);
+                    ServiceLogger.madePrisoner(p, getDate(), getName(), rankEntry);
                 }
             }
         } else {
             p.setFreeMan();
             if (log) {
-                ServiceLogger.getInstance().joined(p, getDate(), getName(), rankEntry);
+                ServiceLogger.joined(p, getDate(), getName(), rankEntry);
             }
         }
         MekHQ.triggerEvent(new PersonNewEvent(p));
@@ -1304,8 +1304,8 @@ public class Campaign implements Serializable, ITechManager {
             astechPoolMinutes += 240;
             astechPoolOvertime += 120;
         }
-        String rankEntry = LogEntryController.getInstance().generateRankEntryString(p);
-        ServiceLogger.getInstance().joined(p, getDate(), getName(), rankEntry);
+        String rankEntry = LogEntryController.generateRankEntryString(p);
+        ServiceLogger.joined(p, getDate(), getName(), rankEntry);
     }
 
     public Date getDate() {
@@ -5683,7 +5683,7 @@ public class Campaign implements Serializable, ITechManager {
                 if (p.getRankNumeric() < 0) {
                     changeRank(p, 0, false);
                 }
-                ServiceLogger.getInstance().freed(p, getDate());
+                ServiceLogger.freed(p, getDate());
                 if (getCampaignOptions().getUseTimeInService()) {
                     p.setRecruitment((GregorianCalendar) getCalendar().clone());
                 }
@@ -5694,7 +5694,7 @@ public class Campaign implements Serializable, ITechManager {
                     // rank is Prisoner or Bondsman.
                 }
                 p.setPrisoner();
-                ServiceLogger.getInstance().madePrisoner(p, getDate());
+                ServiceLogger.madePrisoner(p, getDate());
                 if (getCampaignOptions().getUseTimeInService()) {
                     p.setRecruitment(null);
                 }
@@ -5705,7 +5705,7 @@ public class Campaign implements Serializable, ITechManager {
                     // rank is Prisoner or Bondsman.
                 }
                 p.setBondsman();
-                ServiceLogger.getInstance().madeBondsman(p, getDate());
+                ServiceLogger.madeBondsman(p, getDate());
                 if (getCampaignOptions().getUseTimeInService()) {
                     p.setRecruitment(null);
                 }
@@ -5725,11 +5725,11 @@ public class Campaign implements Serializable, ITechManager {
     public void changeStatus(Person person, int status) {
         Unit u = getUnit(person.getUnitId());
         if (status == Person.S_KIA) {
-            ServiceLogger.getInstance().kia(person, getDate());
+            ServiceLogger.kia(person, getDate());
             // Don't forget to tell the spouse
             if (person.hasSpouse()) {
                 Person spouse = person.getSpouse();
-                PersonalLogger.getInstance().spouseKia(spouse, person, getDate());
+                PersonalLogger.spouseKia(spouse, person, getDate());
                 spouse.setSpouseID(null);
             }
             // set the deathday
@@ -5739,13 +5739,13 @@ public class Campaign implements Serializable, ITechManager {
             person.setDeathday(null);
         }
         if (status == Person.S_MIA) {
-            ServiceLogger.getInstance().mia(person, getDate());
+            ServiceLogger.mia(person, getDate());
         }
         if (status == Person.S_RETIRED) {
-            ServiceLogger.getInstance().retired(person, getDate());
+            ServiceLogger.retired(person, getDate());
         }
         if (status == Person.S_ACTIVE && person.getStatus() == Person.S_MIA) {
-            ServiceLogger.getInstance().recoveredMia(person, getDate());
+            ServiceLogger.recoveredMia(person, getDate());
         }
         person.setStatus(status);
         if (status != Person.S_ACTIVE) {
@@ -5787,9 +5787,9 @@ public class Campaign implements Serializable, ITechManager {
         MekHQ.triggerEvent(new PersonChangedEvent(person));
         if (report) {
             if (rank > oldRank || (rank == oldRank && rankLevel > oldRankLevel)) {
-                ServiceLogger.getInstance().promotedTo(person, getDate());
+                ServiceLogger.promotedTo(person, getDate());
             } else if (rank < oldRank || (rank == oldRank && rankLevel < oldRankLevel)) {
-                ServiceLogger.getInstance().demotedTo(person, getDate());
+                ServiceLogger.demotedTo(person, getDate());
             }
         }
     }

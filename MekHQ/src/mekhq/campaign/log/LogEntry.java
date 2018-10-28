@@ -19,19 +19,14 @@
 
 package mekhq.campaign.log;
 
+import mekhq.MekHqXmlSerializable;
+import mekhq.MekHqXmlUtil;
+import mekhq.campaign.personnel.Person;
+
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Objects;
-
-import megamek.common.annotations.Nullable;
-import mekhq.campaign.personnel.Person;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import mekhq.MekHQ;
-import mekhq.MekHqXmlSerializable;
-import mekhq.MekHqXmlUtil;
 
 /**
  * @author Jay Lawson <jaylawson39 at yahoo.com>
@@ -132,5 +127,5 @@ public class LogEntry implements Cloneable, MekHqXmlSerializable {
      * @param newDesc the new description of the log entry
      * @param person whose person this log entry belongs
      */
-    public void onLogEntryEdited(Date originalDate, Date newDate, String originalDesc, String newDesc, @Nullable Person person){}
+    public void onLogEntryEdited(Date originalDate, Date newDate, String originalDesc, String newDesc, Person person){}
 }

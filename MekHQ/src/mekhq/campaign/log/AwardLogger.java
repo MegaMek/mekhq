@@ -35,25 +35,14 @@ import java.util.regex.Pattern;
  */
 public class AwardLogger {
 
-    private ResourceBundle logEntriesResourceMap;
-    private static AwardLogger awardLogger;
+    private static ResourceBundle logEntriesResourceMap = ResourceBundle.getBundle("mekhq.resources.LogEntries", new EncodeControl());;
 
-    public AwardLogger() {
-        this.logEntriesResourceMap = ResourceBundle.getBundle("mekhq.resources.LogEntries", new EncodeControl());
-    }
-    public static AwardLogger getInstance(){
-        if(null == awardLogger){
-            awardLogger = new AwardLogger();
-        }
-        return awardLogger;
-    }
-
-    public void award(Person person, Date date, Award award){
+    public static void award(Person person, Date date, Award award){
         String message = logEntriesResourceMap.getString("awarded.text");
         person.addLogEntry(new AwardLogEntry(date, MessageFormat.format(message, award.getName(), award.getSet(), award.getDescription())));
     }
 
-    public void removedAward(Person person, Date date, Award award){
+    public static void removedAward(Person person, Date date, Award award){
         String message = logEntriesResourceMap.getString("removedAward.text");
         person.addLogEntry(new AwardLogEntry(date, MessageFormat.format(message, award.getName(), award.getSet())));
     }
@@ -64,7 +53,7 @@ public class AwardLogger {
      * @param logEntryText text of the log entry
      * @return award of the owner corresponding to the log entry text
      */
-    public Award getAwardFromLogEntry(Person person, String logEntryText){
+    public static Award getAwardFromLogEntry(Person person, String logEntryText){
         String message = logEntriesResourceMap.getString("awarded.text");
         Pattern pattern = Pattern.compile(MessageFormat.format(message, "(.*)", "(.*)", "(.*)"));
         Matcher matcher = pattern.matcher(logEntryText);

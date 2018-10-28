@@ -31,41 +31,28 @@ import java.util.ResourceBundle;
  * @author Miguel Azevedo
  */
 public class PersonalLogger {
-    private ResourceBundle logEntriesResourceMap;
+    private static ResourceBundle logEntriesResourceMap = ResourceBundle.getBundle("mekhq.resources.LogEntries", new EncodeControl());;
 
-    private static PersonalLogger personalLogger = null;
-
-    public PersonalLogger() {
-        this.logEntriesResourceMap = ResourceBundle.getBundle("mekhq.resources.LogEntries", new EncodeControl());
-    }
-
-    public static PersonalLogger getInstance(){
-        if(null == personalLogger){
-            personalLogger = new PersonalLogger();
-        }
-        return personalLogger;
-    }
-
-    public void spouseKia(Person spouse, Person person, Date date){
+    public static void spouseKia(Person spouse, Person person, Date date){
         String message = logEntriesResourceMap.getString("spouseKia.text");
         spouse.addLogEntry(new PersonalLogEntry(date, MessageFormat.format(message, person.getName())));
     }
 
-    public void divorcedFrom(Person person, Person spouse, Date date){
+    public static void divorcedFrom(Person person, Person spouse, Date date){
         String message = logEntriesResourceMap.getString("divorcedFrom.text");
         person.addLogEntry(new PersonalLogEntry(date, MessageFormat.format(message, spouse.getFullName())));
     }
 
-    public void marriage(Person person, Person spouse, Date date){
+    public static void marriage(Person person, Person spouse, Date date){
         String message = logEntriesResourceMap.getString("marries.text");
         person.addLogEntry(new PersonalLogEntry(date, MessageFormat.format(message, spouse.getFullName())));
     }
 
-    public void gainedEdge(Person person, Date date){
+    public static void gainedEdge(Person person, Date date){
         person.addLogEntry(new PersonalLogEntry(date, logEntriesResourceMap.getString("gainedEdge.text")));
     }
 
-    public void gained(Person person, Date date, String spa){
+    public static void gained(Person person, Date date, String spa){
         String message = logEntriesResourceMap.getString("gained.text");
         person.addLogEntry(new PersonalLogEntry(date, MessageFormat.format(message, spa)));
     }
