@@ -1664,6 +1664,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<nameGenerator>Clan</nameGenerator>
 		<colorRGB>153,255,51</colorRGB>
 		<tags>clan</tags>
+		<start>3138</start>
 	</faction>
 	<faction>
 		<shortname>RR</shortname>
