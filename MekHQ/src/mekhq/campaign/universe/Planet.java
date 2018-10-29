@@ -140,7 +140,7 @@ public class Planet implements Serializable {
     private LifeForm life;
     
     // Human influence
-    private Integer population;
+    private Long population;
     @XmlJavaTypeAdapter(SocioIndustrialDataAdapter.class)
     private SocioIndustrialData socioIndustrial;
     @XmlJavaTypeAdapter(HPGRatingAdapter.class)
@@ -537,9 +537,9 @@ public class Planet implements Serializable {
         return StarUtil.getHPGClass(getHPG(when));
     }
 
-    public Integer getPopulation(DateTime when) {
-        return getEventData(when, population, new EventGetter<Integer>() {
-            @Override public Integer get(PlanetaryEvent e) { return e.population; }
+    public Long getPopulation(DateTime when) {
+        return getEventData(when, population, new EventGetter<Long>() {
+            @Override public Long get(PlanetaryEvent e) { return e.population; }
         });
     }
 
@@ -1028,7 +1028,7 @@ public class Planet implements Serializable {
         public Integer pressure;
         public String atmosphere;
         public String composition;
-        public Integer population;
+        public Long population;
         public Boolean nadirCharge;
         public Boolean zenithCharge;
         // Events marked as "custom" are saved to scenario files and loaded from there

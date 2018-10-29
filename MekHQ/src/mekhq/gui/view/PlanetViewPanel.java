@@ -336,7 +336,7 @@ public class PlanetViewPanel extends JPanel {
         if(null != planet.getPopulation(currentDate)) {
             JLabel lblPopulation = new JLabel(resourceMap.getString("lblPopulation.text"));
             gbcLabel.gridy = infoRow;
-            panel.add(lblPopulation, gbcLabel);        
+            panel.add(lblPopulation, gbcLabel);
             JTextArea txtPopulation = new JTextArea(NumberFormat.getNumberInstance(Locale.getDefault()).format(planet.getPopulation(currentDate)));
             txtPopulation.setEditable(false);
             txtPopulation.setLineWrap(true);
