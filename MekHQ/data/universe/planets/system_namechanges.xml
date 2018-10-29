@@ -3,7 +3,7 @@
   <system>
     <id>Adhara (Trip 3040+)</id>
     <planet>
-      <sysPos>2</sysPos>
+      <sysPos>1</sysPos>
       <event>
         <date>0000-01-01</date>
         <name>Adhara</name>
@@ -48,7 +48,7 @@
   <system>
     <id>Barlow's Folly (Cussar 2864-)</id>
     <planet>
-      <sysPos>1</sysPos>
+      <sysPos>4</sysPos>
       <event>
         <date>0000-01-01</date>
         <name>Cussar</name>
@@ -63,7 +63,7 @@
   <system>
     <id>Blantleff (Dersidatz 3025-)</id>
     <planet>
-      <sysPos>3</sysPos>
+      <sysPos>2</sysPos>
       <event>
         <date>0000-01-01</date>
         <name>Dersidatz</name>
@@ -93,7 +93,7 @@
   <system>
     <id>Clayborne II (Green Stone 3025-)</id>
     <planet>
-      <sysPos>4</sysPos>
+      <sysPos>1</sysPos>
       <event>
         <date>0000-01-01</date>
         <name>Green Stone</name>
@@ -168,7 +168,7 @@
   <system>
     <id>Jardine (Herakleion 2822+)</id>
     <planet>
-      <sysPos>2</sysPos>
+      <sysPos>1</sysPos>
       <event>
         <date>0000-01-01</date>
         <name>Jardine</name>
@@ -198,7 +198,7 @@
   <system>
     <id>Murrain (Richmond's World 3025-)</id>
     <planet>
-      <sysPos>1</sysPos>
+      <sysPos>2</sysPos>
       <event>
         <date>0000-01-01</date>
         <name>Richmond's World</name>
@@ -213,7 +213,7 @@
   <system>
     <id>Neukirchen (Jodipur 3025-)</id>
     <planet>
-      <sysPos>1</sysPos>
+      <sysPos>2</sysPos>
       <event>
         <date>0000-01-01</date>
         <name>Jodipur</name>
@@ -258,7 +258,7 @@
   <system>
     <id>Pirates Haven (50) (Badlands Cluster 3025-)</id>
     <planet>
-      <sysPos>1</sysPos>
+      <sysPos>2</sysPos>
       <event>
         <date>0000-01-01</date>
         <name>Badlands Cluster (50)</name>
@@ -303,7 +303,7 @@
   <system>
     <id>Shaula (Perrot 3025-)</id>
     <planet>
-      <sysPos>4</sysPos>
+      <sysPos>2</sysPos>
       <event>
         <date>0000-01-01</date>
         <name>Perrot</name>
@@ -348,7 +348,7 @@
   <system>
     <id>Versailles (Taussen 2822+)</id>
     <planet>
-      <sysPos>4</sysPos>
+      <sysPos>1</sysPos>
       <event>
         <date>0000-01-01</date>
         <name>Versailles</name>
@@ -363,7 +363,7 @@
   <system>
     <id>Victoria (Meglan 2537-)</id>
     <planet>
-      <sysPos>2</sysPos>
+      <sysPos>3</sysPos>
       <event>
         <date>0000-01-01</date>
         <name>Meglan</name>
