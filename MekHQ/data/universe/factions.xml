@@ -1691,6 +1691,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<nameGenerator>General</nameGenerator>
 		<colorRGB>0,255,0</colorRGB>
 		<tags>periphery</tags>
+		<start>2830</start>
 	</faction>
 	<faction>
 		<shortname>REB</shortname>
