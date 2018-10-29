@@ -521,7 +521,9 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<eraMods>0,0,0,1,2,3,2,0,0</eraMods>
 		<nameGenerator>LA</nameGenerator>
 		<colorRGB>218,165,32</colorRGB>
-		<tags>is</tags>
+		<tags>is,minor</tags>
+		<start>3057</start>
+		<end>3067</end>
 	</faction>
 	<faction>
 		<shortname>AB</shortname>
