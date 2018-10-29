@@ -1707,6 +1707,8 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<nameGenerator>DC</nameGenerator>
 		<colorRGB>234,45,46</colorRGB>
 		<tags>is,minor</tags>
+		<start>3034</start>
+		<end>3035</end>
 	</faction>
 	<faction>
 		<shortname>AXP</shortname>
