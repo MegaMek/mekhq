@@ -873,7 +873,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
 		<nameGenerator>FWL</nameGenerator>
 		<colorRGB>148,148,255</colorRGB>
-		<tags>is</tags>
+		<tags>is,minor</tags>
 		<start>3030</start>
 	</faction>
 	<faction>
@@ -883,7 +883,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
 		<nameGenerator>FWL</nameGenerator>
 		<colorRGB>143,190,192</colorRGB>
-		<tags>is</tags>
+		<tags>is,minor</tags>
 		<start>3079</start>
 		<end>3082</end>
 	</faction>
@@ -894,7 +894,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
 		<nameGenerator>FWL</nameGenerator>
 		<colorRGB>163,112,120</colorRGB>
-		<tags>is</tags>
+		<tags>is,minor</tags>
 		<start>3079</start>
 		<end>3086</end>
 	</faction>
@@ -905,7 +905,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
 		<nameGenerator>FWL</nameGenerator>
 		<colorRGB>164,94,126</colorRGB>
-		<tags>is</tags>
+		<tags>is,minor</tags>
 		<start>3079</start>
 		<end>3086</end>
 	</faction>
@@ -916,7 +916,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<eraMods>1,0,0,1,2,3,2,1,0</eraMods>
 		<nameGenerator>CC</nameGenerator>
 		<colorRGB>107,142,35</colorRGB>
-		<tags>is</tags>
+		<tags>is,minor</tags>
 		<start>3058</start>
 		<end>3066</end>
 	</faction>
@@ -927,7 +927,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
 		<nameGenerator>FWL</nameGenerator>
 		<colorRGB>99,94,165</colorRGB>
-		<tags>is</tags>
+		<tags>is,minor</tags>
 		<start>3078</start>
 		<end>3139</end>
 	</faction>
@@ -938,7 +938,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
 		<nameGenerator>FWL</nameGenerator>
 		<colorRGB>158,60,147</colorRGB>
-		<tags>is</tags>
+		<tags>is,minor</tags>
 		<start>3071</start>
 		<end>3078</end>
 	</faction>
@@ -990,7 +990,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<eraMods>0,0,0,0,0,0,2,1,0</eraMods>
 		<nameGenerator>FRR</nameGenerator>
 		<colorRGB>116,171,206</colorRGB>
-		<tags>is</tags>
+		<tags>is,minor</tags>
 		<start>3034</start>
 		<end>3103</end>
 	</faction>
@@ -1086,7 +1086,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<eraMods>0,0,0,0,0,0,0,0,0</eraMods>
 		<nameGenerator>FS</nameGenerator>
 		<colorRGB>224,126,39</colorRGB>
-		<tags>is</tags>
+		<tags>is,minor</tags>
 		<start>3073</start>
 		<end>3080</end>
 	</faction>
@@ -1194,7 +1194,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
 		<nameGenerator>FWL</nameGenerator>
 		<colorRGB>165,94,160</colorRGB>
-		<tags>is</tags>
+		<tags>is,minor</tags>
 		<start>3079</start>
 		<end>3081</end>
 	</faction>
@@ -1247,7 +1247,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<eraMods>1,0,0,1,2,3,2,1,0</eraMods>
 		<nameGenerator>CC</nameGenerator>
 		<colorRGB>160,165,94</colorRGB>
-		<tags>is</tags>
+		<tags>is,minor</tags>
 		<start>3079</start>
 		<end>3081</end>
 	</faction>
@@ -1258,7 +1258,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
 		<nameGenerator>FWL</nameGenerator>
 		<colorRGB>163,112,120</colorRGB>
-		<tags>is</tags>
+		<tags>is,minor</tags>
 		<start>3086</start>
 		<end>3139</end>
 	</faction>
@@ -1269,7 +1269,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
 		<nameGenerator>FWL</nameGenerator>
 		<colorRGB>250,250,250</colorRGB>
-		<tags>is</tags>
+		<tags>is,minor</tags>
 		<start>3079</start>
 	</faction>
 	<faction>
@@ -1279,7 +1279,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
 		<nameGenerator>FWL</nameGenerator>
 		<colorRGB>192,143,189</colorRGB>
-		<tags>is</tags>
+		<tags>is,minor</tags>
 		<start>2247</start>
 		<end>3086</end>
 	</faction>
@@ -1290,7 +1290,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<eraMods>0,0,0,0,0,0,2,1,0</eraMods>
 		<nameGenerator>FRR</nameGenerator>
 		<colorRGB>188,222,235</colorRGB>
-		<tags>clan,is</tags>
+		<tags>clan,is,minor</tags>
 		<start>3103</start>
 	</faction>
 	<faction>
@@ -1310,7 +1310,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
 		<nameGenerator>FWL</nameGenerator>
 		<colorRGB>255,51,51</colorRGB>
-		<tags>is</tags>
+		<tags>is,minor</tags>
 		<start>3086</start>
 	</faction>
 	<faction>
@@ -1320,7 +1320,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
 		<nameGenerator>FWL</nameGenerator>
 		<colorRGB>165,94,160</colorRGB>
-		<tags>is</tags>
+		<tags>is,minor</tags>
 		<start>3079</start>
 		<end>3086</end>
 	</faction>
@@ -1342,7 +1342,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<eraMods>0,0,0,0,0,0,0,0,0</eraMods>
 		<nameGenerator>General</nameGenerator>
 		<colorRGB>207,119,57</colorRGB>
-		<tags>is</tags>
+		<tags>is,minor</tags>
 		<start>3073</start>
 		<end>3081</end>
 	</faction>
@@ -1392,7 +1392,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<eraMods>0,0,0,0,0,0,0,0,0</eraMods>
 		<nameGenerator>CC</nameGenerator>
 		<colorRGB>128,128,0</colorRGB>
-		<tags>is</tags>
+		<tags>is,minor</tags>
 		<start>3057</start>
 		<end>3068</end>
 	</faction>
@@ -1402,7 +1402,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<eraMods>1,0,0,1,2,3,2,1,0</eraMods>
 		<nameGenerator>CC</nameGenerator>
 		<colorRGB>184,134,11</colorRGB>
-		<tags>is</tags>
+		<tags>is,minor</tags>
 	</faction>
 	<faction>
 		<shortname>SIS</shortname>
@@ -1410,7 +1410,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<eraMods>1,0,0,1,2,3,2,1,0</eraMods>
 		<nameGenerator>CC</nameGenerator>
 		<colorRGB>145,166,242</colorRGB>
-		<tags>is</tags>
+		<tags>is,minor</tags>
 	</faction>
 	<faction>
 		<shortname>SHC</shortname>
@@ -1419,7 +1419,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
 		<nameGenerator>FWL</nameGenerator>
 		<colorRGB>255,0,127</colorRGB>
-		<tags>is</tags>
+		<tags>is,minor</tags>
 		<start>3079</start>
 	</faction>
 	<faction>
@@ -1430,7 +1430,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<eraMods>1,0,0,1,2,3,2,1,0</eraMods>
 		<nameGenerator>CC</nameGenerator>
 		<colorRGB>188,223,186</colorRGB>
-		<tags>is</tags>
+		<tags>is,minor</tags>
 		<start>3029</start>
 		<end>3063</end>
 	</faction>
@@ -1461,7 +1461,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
 		<nameGenerator>FWL</nameGenerator>
 		<colorRGB>76,0,153</colorRGB>
-		<tags>is</tags>
+		<tags>is,minor</tags>
 	</faction>
 	<faction>
 		<shortname>SKC</shortname>
@@ -1470,7 +1470,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<eraMods>1,0,0,1,2,3,2,1,0</eraMods>
 		<nameGenerator>CC</nameGenerator>
 		<colorRGB>0,139,139</colorRGB>
-		<tags>is</tags>
+		<tags>is,minor</tags>
 		<start>3058</start>
 		<end>3067</end>
 	</faction>
@@ -1481,7 +1481,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<eraMods>1,0,0,1,2,3,2,1,0</eraMods>
 		<nameGenerator>CC</nameGenerator>
 		<colorRGB>0,139,139</colorRGB>
-		<tags>is</tags>
+		<tags>is,minor</tags>
 	</faction>
 	<faction>
 		<shortname>TCC</shortname>
@@ -1490,7 +1490,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<eraMods>1,0,0,1,2,3,2,1,0</eraMods>
 		<nameGenerator>CC</nameGenerator>
 		<colorRGB>233,150,122</colorRGB>
-		<tags>is</tags>
+		<tags>is,minor</tags>
 		<start>3058</start>
 		<end>3067</end>
 	</faction>
@@ -1510,7 +1510,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
 		<nameGenerator>FWL</nameGenerator>
 		<colorRGB>255,51,51</colorRGB>
-		<tags>is</tags>
+		<tags>is,minor</tags>
 		<start>3079</start>
 	</faction>
 	<faction>
@@ -1520,7 +1520,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<eraMods>1,1,1,1,2,3,2,2,1</eraMods>
 		<nameGenerator>CC</nameGenerator>
 		<colorRGB>255,160,122</colorRGB>
-		<tags>is</tags>
+		<tags>is,minor</tags>
 		<start>3029</start>
 		<end>3031</end>
 	</faction>
@@ -1549,7 +1549,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<eraMods>0,0,0,0,0,0,0,1,1</eraMods>
 		<nameGenerator>General</nameGenerator>
 		<colorRGB>205,192,176</colorRGB>
-		<tags>is</tags>
+		<tags>is,minor</tags>
 		<start>3052</start>
 	</faction>
 	<faction>
@@ -1598,7 +1598,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<eraMods>0,0,0,0,0,0,0,0,0</eraMods>
 		<nameGenerator>General</nameGenerator>
 		<colorRGB>255,102,153</colorRGB>
-		<tags>is</tags>
+		<tags>is,minor</tags>
 		<start>3135</start>
 		<end>3142</end>
 	</faction>
@@ -1609,7 +1609,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<eraMods>0,0,0,0,0,0,0,0,0</eraMods>
 		<nameGenerator>General</nameGenerator>
 		<colorRGB>255,102,153</colorRGB>
-		<tags>is</tags>
+		<tags>is,minor</tags>
 	</faction>
 	<faction>
 		<shortname>TTU</shortname>
@@ -1618,7 +1618,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<eraMods>1,0,0,1,2,3,2,1,0</eraMods>
 		<nameGenerator>CC</nameGenerator>
 		<colorRGB>153,153,51</colorRGB>
-		<tags>is</tags>
+		<tags>is,minor</tags>
 	</faction>
 	<faction>
 		<shortname>ShA</shortname>
@@ -1627,7 +1627,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
 		<nameGenerator>FWL</nameGenerator>
 		<colorRGB>97,26,92</colorRGB>
-		<tags>is</tags>
+		<tags>is,minor</tags>
 	</faction>
 	<faction>
 		<shortname>CvW</shortname>
@@ -1636,7 +1636,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
 		<nameGenerator>FWL</nameGenerator>
 		<colorRGB>102,51,51</colorRGB>
-		<tags>is</tags>
+		<tags>is,minor</tags>
 	</faction>
 	<faction>
 		<shortname>PC</shortname>
@@ -1645,7 +1645,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
 		<nameGenerator>FWL</nameGenerator>
 		<colorRGB>51,51,102</colorRGB>
-		<tags>is</tags>
+		<tags>is,minor</tags>
 	</faction>
 	<faction>
 		<shortname>MiC</shortname>
@@ -1654,7 +1654,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
 		<nameGenerator>FWL</nameGenerator>
 		<colorRGB>255,0,51</colorRGB>
-		<tags>is</tags>
+		<tags>is,minor</tags>
 	</faction>
 	<faction>
 		<shortname>CP</shortname>
@@ -1672,7 +1672,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<eraMods>0,0,0,0,0,0,0,0,0</eraMods>
 		<nameGenerator>General</nameGenerator>
 		<colorRGB>128,40,0</colorRGB>
-		<tags>is</tags>
+		<tags>is,minor</tags>
 		<start>3135</start>
 	</faction>
 	<faction>
@@ -1706,7 +1706,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<eraMods>0,0,0,1,2,2,1,0,0</eraMods>
 		<nameGenerator>DC</nameGenerator>
 		<colorRGB>234,45,46</colorRGB>
-		<tags>is</tags>
+		<tags>is,minor</tags>
 	</faction>
 	<faction>
 		<shortname>AXP</shortname>
@@ -1738,7 +1738,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<startingPlanet>Galatea</startingPlanet>
 		<nameGenerator>General</nameGenerator>
 		<colorRGB>102,255,255</colorRGB>
-		<tags>is</tags>
+		<tags>is,minor</tags>
 	</faction>
 	<faction>
       <shortname>GL</shortname>
@@ -1746,7 +1746,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
       <startingPlanet>Galatea</startingPlanet>
       <nameGenerator>General</nameGenerator>
       <colorRGB>102,255,255</colorRGB>
-		<tags>is</tags>
+		<tags>is,minor</tags>
    	<start>3144</start>
 	</faction>
    <faction>
