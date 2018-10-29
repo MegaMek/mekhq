@@ -1779,6 +1779,9 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
       <nameGenerator>General</nameGenerator>
       <colorRGB>191,171,120</colorRGB>
 		<tags>periphery,minor</tags>
+		 <start>2779</start>
+		 <!-- May be sooner than that, but no later -->
+		 <end>2822</end>
    </faction>
 	 <faction>
       <shortname>RU</shortname>
