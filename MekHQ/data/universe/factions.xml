@@ -1663,7 +1663,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
 		<nameGenerator>Clan</nameGenerator>
 		<colorRGB>153,255,51</colorRGB>
-		<tags>clan</tags>
+		<tags>clan,minor</tags>
 		<start>3138</start>
 	</faction>
 	<faction>
