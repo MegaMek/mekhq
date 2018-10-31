@@ -1610,6 +1610,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<nameGenerator>General</nameGenerator>
 		<colorRGB>255,102,153</colorRGB>
 		<tags>is,minor</tags>
+		<start>3142</start>
 	</faction>
 	<faction>
 		<shortname>TTU</shortname>
