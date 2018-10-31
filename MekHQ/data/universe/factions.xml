@@ -1628,6 +1628,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<nameGenerator>FWL</nameGenerator>
 		<colorRGB>97,26,92</colorRGB>
 		<tags>is,minor</tags>
+		<start>3135</start>
 	</faction>
 	<faction>
 		<shortname>CvW</shortname>
