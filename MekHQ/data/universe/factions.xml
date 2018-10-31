@@ -1531,7 +1531,8 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<eraMods>1,1,1,1,2,3,2,2,1</eraMods>
 		<nameGenerator>General</nameGenerator>
 		<colorRGB>34,139,34</colorRGB>
-		<tags>periphery</tags>
+		<tags>periphery,pirate</tags>
+		<start>2577</start>
 	</faction>
 	<faction>
 		<shortname>UND</shortname>
