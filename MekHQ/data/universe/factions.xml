@@ -79,7 +79,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<eraMods>-1,-1,-1,0,0,0,0,0,0</eraMods>
 		<nameGenerator>General</nameGenerator>
 		<colorRGB>255,255,255</colorRGB>
-		<tags>is</tags>
+		<tags>is,super</tags>
 		<start>2315</start>
 		<end>2790</end>
 	</faction>
@@ -969,7 +969,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<eraMods>0,0,0,1,2,2,1,0,0</eraMods>
 		<nameGenerator>General</nameGenerator>
 		<colorRGB>248,212,44</colorRGB>
-		<tags>is</tags>
+		<tags>is,super</tags>
 	</faction>
 	<faction>
 		<shortname>FVC</shortname>
@@ -1441,7 +1441,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<eraMods>-1,-1,-1,0,0,0,0,0,0</eraMods>
 		<nameGenerator>General</nameGenerator>
 		<colorRGB>176,196,222</colorRGB>
-		<tags>is</tags>
+		<tags>is,super</tags>
 		<start>2570</start>
 		<end>2781</end>
 	</faction>
