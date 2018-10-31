@@ -1580,7 +1580,8 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<startingPlanet>Randis IV</startingPlanet>
 		<nameGenerator>General</nameGenerator>
 		<colorRGB>30,144,255</colorRGB>
-		<tags>periphery</tags>
+		<tags>periphery,minor</tags>
+		<start>2988</start>
 	</faction>
 	<faction>
 		<shortname>MM</shortname>
