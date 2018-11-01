@@ -38,7 +38,7 @@ public class MedicalLogger {
     public static MedicalLogEntry severedSpine(Person person, Date date){
         String message = logEntriesResourceMap.getString("severedSpine.text");
         MedicalLogEntry medicalLogEntry = new MedicalLogEntry(date, MessageFormat.format(message,
-                        person.getGenderPronoun(person.PRONOUN_HISHER),
+                        person.getGenderPronoun(Person.PRONOUN_HISHER),
                         person.getGenderPronoun(Person.PRONOUN_HIMHER)));
         person.addLogEntry(medicalLogEntry);
         return medicalLogEntry;
@@ -47,7 +47,7 @@ public class MedicalLogger {
     public static MedicalLogEntry brokenRibPunctureDead(Person person, Date date){
         String message = logEntriesResourceMap.getString("brokenRibPunctureDead.text");
         MedicalLogEntry medicalLogEntry = new MedicalLogEntry(date, MessageFormat.format(message,
-                person.getGenderPronoun(person.PRONOUN_HISHER)));
+                person.getGenderPronoun(Person.PRONOUN_HISHER)));
         person.addLogEntry(medicalLogEntry);
         return medicalLogEntry;
     }
@@ -55,7 +55,7 @@ public class MedicalLogger {
     public static MedicalLogEntry brokenRibPuncture(Person person, Date date){
         String message = logEntriesResourceMap.getString("brokenRibPuncture.text");
         MedicalLogEntry medicalLogEntry = new MedicalLogEntry(date, MessageFormat.format(message,
-                person.getGenderPronoun(person.PRONOUN_HISHER)));
+                person.getGenderPronoun(Person.PRONOUN_HISHER)));
         person.addLogEntry(medicalLogEntry);
         return medicalLogEntry;
     }
