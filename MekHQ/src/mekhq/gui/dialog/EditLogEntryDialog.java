@@ -34,7 +34,8 @@ import java.util.ResourceBundle;
 import javax.swing.BorderFactory;
 
 import megamek.common.util.EncodeControl;
-import mekhq.campaign.LogEntry;
+import mekhq.campaign.log.LogEntry;
+import mekhq.campaign.personnel.Person;
 
 /**
  *
@@ -45,6 +46,9 @@ public class EditLogEntryDialog extends javax.swing.JDialog {
     private Frame frame;
     private LogEntry entry;
     private Date date;
+    private Date originalDate;
+    private String originalDescription;
+    private Person person;
     
     private javax.swing.JButton btnClose;
     private javax.swing.JButton btnOK;
@@ -54,12 +58,15 @@ public class EditLogEntryDialog extends javax.swing.JDialog {
     private javax.swing.JPanel panMain;
     
     /** Creates new form NewTeamDialog */
-    public EditLogEntryDialog(java.awt.Frame parent, boolean modal, LogEntry e) {
+    public EditLogEntryDialog(java.awt.Frame parent, boolean modal, LogEntry e, Person person) {
         super(parent, modal);
         this.frame = parent;
+        this.person = person;
         entry = e;
         date = e.getDate();
+        originalDate = e.getDate();
         initComponents();
+        originalDescription = txtDesc.getText();
         setLocationRelativeTo(parent);
     }
 
@@ -145,6 +152,7 @@ public class EditLogEntryDialog extends javax.swing.JDialog {
     private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {
     	entry.setDate(date);
     	entry.setDesc(txtDesc.getText());
+    	entry.onLogEntryEdited(originalDate, date, originalDescription, txtDesc.getText(), person);
     	this.setVisible(false);
     }
 

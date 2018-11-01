@@ -25,9 +25,11 @@ import megamek.common.options.PilotOptions;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.Utilities;
+import mekhq.campaign.log.CustomLogEntry;
+import mekhq.campaign.log.PersonalLogger;
 import mekhq.campaign.personnel.Award;
 import mekhq.campaign.Kill;
-import mekhq.campaign.LogEntry;
+import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.event.PersonLogEvent;
 import mekhq.campaign.finances.Transaction;
@@ -477,10 +479,10 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             case CMD_REMOVE_SPOUSE:
             {
                 if (!selectedPerson.getSpouse().isDeadOrMIA()) {
-                    selectedPerson.getSpouse().addLogEntry(gui.getCampaign().getDate(),
-                        String.format(resourceMap.getString("divorcedFrom.format"), selectedPerson.getFullName())); //$NON-NLS-1$
-                    selectedPerson.addLogEntry(gui.getCampaign().getDate(),
-                        String.format(resourceMap.getString("divorcedFrom.format"), selectedPerson.getSpouse().getFullName())); //$NON-NLS-1$
+
+                    PersonalLogger.divorcedFrom(selectedPerson, selectedPerson.getSpouse(), gui.getCampaign().getDate());
+                    PersonalLogger.divorcedFrom(selectedPerson.getSpouse(), selectedPerson, gui.getCampaign().getDate());
+
                     if (selectedPerson.getMaidenName() != null) {
                         selectedPerson.setName(selectedPerson.getName().split(SPACE, 2)[0]
                                 + SPACE
@@ -537,9 +539,9 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 }
 
                 spouse.setSpouseID(selectedPerson.getId());
-                spouse.addLogEntry(gui.getCampaign().getDate(), String.format(resourceMap.getString("marries.format"), selectedPerson.getFullName())); //$NON-NLS-1$
+                PersonalLogger.marriage(spouse, selectedPerson, gui.getCampaign().getDate());
                 selectedPerson.setSpouseID(spouse.getId());
-                selectedPerson.addLogEntry(gui.getCampaign().getDate(), String.format(resourceMap.getString("marries.format"), spouse.getFullName())); //$NON-NLS-1$
+                PersonalLogger.marriage(selectedPerson, spouse, gui.getCampaign().getDate());
                 MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
                 MekHQ.triggerEvent(new PersonChangedEvent(spouse));
                 break;
@@ -547,10 +549,12 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             case CMD_ADD_AWARD:
             {
                 selectedPerson.awardController.addAndLogAward(data[1], data[2], gui.getCampaign().getDate());
+                break;
             }
             case CMD_RMV_AWARD:
             {
                 selectedPerson.awardController.removeAward(data[1], data[2], data[3]);
+                break;
             }
             case CMD_IMPROVE:
             {
@@ -970,7 +974,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 MekHQ.triggerEvent(new PersonLogEvent(selectedPerson));
                 break;
             case CMD_EDIT_LOG_ENTRY:
-                EditLogEntryDialog eeld = new EditLogEntryDialog(gui.getFrame(), true, new LogEntry(gui.getCampaign().getDate(), "")); //$NON-NLS-1$
+                EditLogEntryDialog eeld = new EditLogEntryDialog(gui.getFrame(), true, new CustomLogEntry(gui.getCampaign().getDate(), ""), selectedPerson); //$NON-NLS-1$
                 eeld.setVisible(true);
                 LogEntry entry = eeld.getEntry();
                 if (null != entry) {

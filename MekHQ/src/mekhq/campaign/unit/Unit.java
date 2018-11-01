@@ -25,18 +25,11 @@ package mekhq.campaign.unit;
 import java.io.PrintWriter;
 import java.math.BigInteger;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
+import mekhq.campaign.log.LogEntryController;
+import mekhq.campaign.log.ServiceLogger;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -3469,10 +3462,9 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         p.setUnitId(getId());
         resetPilotAndEntity();
         if (useTransfers) {
-            p.addLogEntry(campaign.getDate(), "Reassigned to " + getName());
+            ServiceLogger.reassignedTo(p, campaign.getDate(), getName());
         } else {
-            p.addLogEntry(campaign.getDate(), "Assigned to " + getName());
-        }
+            ServiceLogger.assignedTo(p, campaign.getDate(), getName());        }
         MekHQ.triggerEvent(new PersonCrewAssignmentEvent(p, this));
     }
 
@@ -3486,9 +3478,9 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         p.setUnitId(getId());
         resetPilotAndEntity();
         if (useTransfers) {
-            p.addLogEntry(campaign.getDate(), "Reassigned to " + getName());
+            ServiceLogger.reassignedTo(p, campaign.getDate(), getName());
         } else {
-            p.addLogEntry(campaign.getDate(), "Assigned to " + getName());
+            ServiceLogger.assignedTo(p, campaign.getDate(), getName());
         }
         MekHQ.triggerEvent(new PersonCrewAssignmentEvent(p, this));
     }
@@ -3503,9 +3495,9 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         p.setUnitId(getId());
         resetPilotAndEntity();
         if (useTransfers) {
-            p.addLogEntry(campaign.getDate(), "Reassigned to " + getName());
+            ServiceLogger.reassignedTo(p, campaign.getDate(), getName());
         } else {
-            p.addLogEntry(campaign.getDate(), "Assigned to " + getName());
+            ServiceLogger.assignedTo(p, campaign.getDate(), getName());
         }
         MekHQ.triggerEvent(new PersonCrewAssignmentEvent(p, this));
     }
@@ -3520,9 +3512,9 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         p.setUnitId(getId());
         resetPilotAndEntity();
         if (useTransfers) {
-            p.addLogEntry(campaign.getDate(), "Reassigned to " + getName());
+            ServiceLogger.reassignedTo(p, campaign.getDate(), getName());
         } else {
-            p.addLogEntry(campaign.getDate(), "Assigned to " + getName());
+            ServiceLogger.assignedTo(p, campaign.getDate(), getName());
         }
         MekHQ.triggerEvent(new PersonCrewAssignmentEvent(p, this));
     }
@@ -3541,9 +3533,9 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         p.setUnitId(getId());
         resetPilotAndEntity();
         if (useTransfers) {
-            p.addLogEntry(campaign.getDate(), "Reassigned to " + getName());
+            ServiceLogger.reassignedTo(p, campaign.getDate(), getName());
         } else {
-            p.addLogEntry(campaign.getDate(), "Assigned to " + getName());
+            ServiceLogger.assignedTo(p, campaign.getDate(), getName());
         }
         MekHQ.triggerEvent(new PersonCrewAssignmentEvent(p, this));
     }
@@ -3552,7 +3544,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         ensurePersonIsRegistered(p);
         tech = p.getId();
         p.addTechUnitID(getId());
-        p.addLogEntry(campaign.getDate(), "Assigned to " + getName());
+        ServiceLogger.assignedTo(p, campaign.getDate(), getName());
         MekHQ.triggerEvent(new PersonTechAssignmentEvent(p, this));
     }
 
@@ -3588,9 +3580,9 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         p.setUnitId(getId());
         resetPilotAndEntity();
         if (useTransfers) {
-            p.addLogEntry(campaign.getDate(), "Reassigned to " + getName());
+            ServiceLogger.reassignedTo(p, campaign.getDate(), getName());
         } else {
-            p.addLogEntry(campaign.getDate(), "Assigned to " + getName());
+            ServiceLogger.assignedTo(p, campaign.getDate(), getName());
         }
         MekHQ.triggerEvent(new PersonCrewAssignmentEvent(p, this));
     }
@@ -3619,7 +3611,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             MekHQ.triggerEvent(new PersonCrewAssignmentEvent(p, this));
         }
         if(log) {
-            p.addLogEntry(campaign.getDate(), "Removed from " + getName());
+            ServiceLogger.removedFrom(p, campaign.getDate(), getName());
         }
     }
 

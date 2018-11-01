@@ -26,14 +26,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import megamek.client.Client;
@@ -66,6 +59,8 @@ import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.event.PersonBattleFinishedEvent;
 import mekhq.campaign.finances.Transaction;
+import mekhq.campaign.log.LogEntryController;
+import mekhq.campaign.log.ServiceLogger;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.Contract;
@@ -78,6 +73,8 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.FileDialogs;
+
+import javax.xml.ws.Service;
 
 /**
  * This object will be the main workhorse for the scenario
@@ -1093,7 +1090,7 @@ public class ResolveScenarioTracker {
             }
             if(status.wasDeployed()) {
                 person.setXp(person.getXp() + status.getXP());
-                person.addLogEntry(campaign.getDate(), "Participated in " + scenario.getName() + " during mission " + m.getName());
+                ServiceLogger.participatedInMission(person, campaign.getDate(), scenario.getName(), m.getName());
             }
             for(Kill k : status.getKills()) {
                 campaign.addKill(k);
@@ -1147,7 +1144,9 @@ public class ResolveScenarioTracker {
             if(status.getHits() > person.getHits()) {
                 person.setHits(status.getHits());
             }
-            person.addLogEntry(campaign.getDate(), "Participated in " + scenario.getName() + " during mission " + m.getName());
+
+            ServiceLogger.participatedInMission(person, campaign.getDate(), scenario.getName(), m.getName());
+
             for(Kill k : status.getKills()) {
                 campaign.addKill(k);
             }
