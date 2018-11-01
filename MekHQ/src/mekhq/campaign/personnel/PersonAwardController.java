@@ -158,7 +158,7 @@ public class PersonAwardController {
             if(award.equals(setName, awardName)){
                 award.removeDate(date);
                 if(!award.hasDates()) awards.remove(award);
-                AwardLogger.getInstance().removedAward(person, date, award);
+                AwardLogger.removedAward(person, date, award);
                 MekHQ.triggerEvent(new PersonChangedEvent(person));
                 return;
             }
@@ -170,7 +170,7 @@ public class PersonAwardController {
      * @param award that was given.
      */
     public void logAward(Award award, Date date){
-        AwardLogger.getInstance().award(person, date, award);
+        AwardLogger.award(person, date, award);
         MekHQ.triggerEvent(new PersonChangedEvent(person));
     }
 

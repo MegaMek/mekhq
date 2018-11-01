@@ -33,27 +33,14 @@ import java.util.regex.Pattern;
  */
 public class LogEntryController {
 
-    private static LogEntryController logEntryController = null;
-
-    private static ResourceBundle logEntriesResourceMap;
-
-    public LogEntryController() {
-        logEntriesResourceMap = ResourceBundle.getBundle("mekhq.resources.LogEntries", new EncodeControl());
-    }
-
-    public static LogEntryController getInstance() {
-        if (null == logEntryController){
-            logEntryController = new LogEntryController();
-        }
-        return logEntryController;
-    }
+    private static ResourceBundle logEntriesResourceMap = ResourceBundle.getBundle("mekhq.resources.LogEntries", new EncodeControl());
 
     /**
      * Generates a string with the rank of the person
      * @param person whose rank we want to generate the string
      * @return string with the rank
      */
-    public String generateRankEntryString(Person person){
+    public static String generateRankEntryString(Person person){
         String rankEntry = "";
         if (person.getRankNumeric() > 0) {
             String message = logEntriesResourceMap.getString("asA.text");
@@ -68,7 +55,7 @@ public class LogEntryController {
      * @param description of the log entry
      * @return type of the log entry.
      */
-    public LogEntryType determineTypeFromLogDescription(String description){
+    public static LogEntryType determineTypeFromLogDescription(String description){
 
         if(foundExpressionWithOneVariable("madeBondsmanBy.text", description) ||
                 foundExpressionWithOneVariable("madePrisonerBy.text", description) ||
@@ -136,14 +123,14 @@ public class LogEntryController {
         return LogEntryType.CUSTOM;
     }
 
-    private boolean foundSingleExpression(String logEntryProperty, String description){
+    private static boolean foundSingleExpression(String logEntryProperty, String description){
         Pattern pattern = Pattern.compile(logEntriesResourceMap.getString(logEntryProperty));
         Matcher matcher = pattern.matcher(description);
 
         return matcher.matches();
     }
 
-    private boolean foundExpressionWithOneVariable(String logEntryProperty, String description){
+    private static boolean foundExpressionWithOneVariable(String logEntryProperty, String description){
         String message = logEntriesResourceMap.getString(logEntryProperty);
         Pattern pattern = Pattern.compile(MessageFormat.format(message, "(.*)"));
         Matcher matcher = pattern.matcher(description);
@@ -151,7 +138,7 @@ public class LogEntryController {
         return matcher.matches();
     }
 
-    private boolean foundBeginningOfExpressionEndingWithMultilineAndTab(String logEntryProperty, String description){
+    private static boolean foundBeginningOfExpressionEndingWithMultilineAndTab(String logEntryProperty, String description){
         String message = logEntriesResourceMap.getString(logEntryProperty);
         Pattern pattern = Pattern.compile(message + "((.|\\n)*)");
         Matcher matcher = pattern.matcher(description);
@@ -159,7 +146,7 @@ public class LogEntryController {
         return matcher.matches();
     }
 
-    private boolean foundExpressionWithTwoVariables(String logEntryProperty, String description){
+    private static boolean foundExpressionWithTwoVariables(String logEntryProperty, String description){
         String message = logEntriesResourceMap.getString(logEntryProperty);
         Pattern pattern = Pattern.compile(MessageFormat.format(message, "(.*)", "(.*)"));
         Matcher matcher = pattern.matcher(description);
@@ -167,7 +154,7 @@ public class LogEntryController {
         return matcher.matches();
     }
 
-    private boolean foundExpressionWithThreeVariables(String logEntryProperty, String description){
+    private static boolean foundExpressionWithThreeVariables(String logEntryProperty, String description){
         String message = logEntriesResourceMap.getString(logEntryProperty);
         Pattern pattern = Pattern.compile(MessageFormat.format(message, "(.*)", "(.*)", "(.*)"));
         Matcher matcher = pattern.matcher(description);
@@ -181,7 +168,7 @@ public class LogEntryController {
      * @param description to be changes
      * @return string with the new description.
      */
-    public String updateOldDescription(String description){
+    public static String updateOldDescription(String description){
         String newDescription = "";
 
         newDescription = updatePrisonerDescription(description);
@@ -193,7 +180,7 @@ public class LogEntryController {
         return "";
     }
 
-    private String updatePrisonerDescription(String description){
+    private static String updatePrisonerDescription(String description){
         Pattern pattern = Pattern.compile("Made Prisoner (.*)");
         Matcher matcher = pattern.matcher(description);
 
@@ -211,7 +198,7 @@ public class LogEntryController {
         return "";
     }
 
-    private String updateBondsmanDescription(String description){
+    private static String updateBondsmanDescription(String description){
         Pattern pattern = Pattern.compile("Made Bondsman (.*)");
         Matcher matcher = pattern.matcher(description);
 

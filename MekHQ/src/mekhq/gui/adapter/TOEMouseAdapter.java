@@ -117,11 +117,11 @@ ActionListener {
                     if (singleForce.getTechID() != null) {
                         Person oldTech = gui.getCampaign().getPerson(singleForce.getTechID());
                         oldTech.clearTechUnitIDs();
-                        ServiceLogger.getInstance().removedFrom(oldTech, gui.getCampaign().getDate(), singleForce.getName());
+                        ServiceLogger.removedFrom(oldTech, gui.getCampaign().getDate(), singleForce.getName());
                     }
                     singleForce.setTechID(tech.getId());
 
-                    ServiceLogger.getInstance().assignedTo(tech, gui.getCampaign().getDate(), singleForce.getName());
+                    ServiceLogger.assignedTo(tech, gui.getCampaign().getDate(), singleForce.getName());
 
                     if (singleForce.getAllUnits() !=null) {
                         String cantTech = "";
@@ -234,7 +234,7 @@ ActionListener {
                 Person oldTech = gui.getCampaign().getPerson(singleForce.getTechID());
                 oldTech.clearTechUnitIDs();
 
-                ServiceLogger.getInstance().removedFrom(oldTech, gui.getCampaign().getDate(), singleForce.getName());
+                ServiceLogger.removedFrom(oldTech, gui.getCampaign().getDate(), singleForce.getName());
 
                 if (singleForce.getAllUnits() !=null) {
                     for (UUID uuid : singleForce.getAllUnits()) {

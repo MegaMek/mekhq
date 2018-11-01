@@ -1057,7 +1057,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
             baby.setAncestorsID(ancId);
             campaign.addReport(getHyperlinkedName() + " has given birth to " + baby.getHyperlinkedName() + ", a baby " + (baby.getGender() == G_MALE ? "boy!" : "girl!"));
             if (campaign.getCampaignOptions().logConception()) {
-                MedicalLogger.getInstance().deliveredBaby(this, baby, campaign.getDate());
+                MedicalLogger.deliveredBaby(this, baby, campaign.getDate());
             }
             return baby;
         }).collect(Collectors.toList());
@@ -1098,7 +1098,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                         campaign.addReport(getHyperlinkedName()+" has conceived " + sizeString);
                     }
                     if (campaign.getCampaignOptions().logConception()) {
-                        MedicalLogger.getInstance().hasConceived(this, campaign.getDate(), sizeString);
+                        MedicalLogger.hasConceived(this, campaign.getDate(), sizeString);
                     }
                 }
             }
@@ -1121,7 +1121,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
             campaign.addReport(getHyperlinkedName()+" has conceived " + sizeString);
         }
         if (campaign.getCampaignOptions().logConception()) {
-            MedicalLogger.getInstance().hasConceived(this, campaign.getDate(), sizeString);
+            MedicalLogger.hasConceived(this, campaign.getDate(), sizeString);
         }
     }
 
@@ -3460,12 +3460,12 @@ public class Person implements Serializable, MekHqXmlSerializable {
         }
         Unit u = campaign.getUnit(getUnitId());
         if (status == Person.S_KIA) {
-            MedicalLogger.getInstance().diedFromWounds(this, campaign.getDate());
+            MedicalLogger.diedFromWounds(this, campaign.getDate());
             //set the deathday
             setDeathday((GregorianCalendar) campaign.getCalendar().clone());
         }
         if (status == Person.S_RETIRED) {
-            ServiceLogger.getInstance().retireDueToWounds(this, campaign.getDate());
+            ServiceLogger.retireDueToWounds(this, campaign.getDate());
         }
         setStatus(status);
         if (status != Person.S_ACTIVE) {

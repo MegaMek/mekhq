@@ -480,8 +480,8 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             {
                 if (!selectedPerson.getSpouse().isDeadOrMIA()) {
 
-                    PersonalLogger.getInstance().divorcedFrom(selectedPerson, selectedPerson.getSpouse(), gui.getCampaign().getDate());
-                    PersonalLogger.getInstance().divorcedFrom(selectedPerson.getSpouse(), selectedPerson, gui.getCampaign().getDate());
+                    PersonalLogger.divorcedFrom(selectedPerson, selectedPerson.getSpouse(), gui.getCampaign().getDate());
+                    PersonalLogger.divorcedFrom(selectedPerson.getSpouse(), selectedPerson, gui.getCampaign().getDate());
 
                     if (selectedPerson.getMaidenName() != null) {
                         selectedPerson.setName(selectedPerson.getName().split(SPACE, 2)[0]
@@ -539,9 +539,9 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 }
 
                 spouse.setSpouseID(selectedPerson.getId());
-                PersonalLogger.getInstance().marriage(spouse, selectedPerson, gui.getCampaign().getDate());
+                PersonalLogger.marriage(spouse, selectedPerson, gui.getCampaign().getDate());
                 selectedPerson.setSpouseID(spouse.getId());
-                PersonalLogger.getInstance().marriage(selectedPerson, spouse, gui.getCampaign().getDate());
+                PersonalLogger.marriage(selectedPerson, spouse, gui.getCampaign().getDate());
                 MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
                 MekHQ.triggerEvent(new PersonChangedEvent(spouse));
                 break;
