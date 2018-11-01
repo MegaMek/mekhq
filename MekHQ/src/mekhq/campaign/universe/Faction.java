@@ -463,8 +463,17 @@ public class Faction {
         MERC,
         /** Major trading company */
         TRADER,
-        /** Faction is limited to a single star system, or potentially just a part of a planet */
+        /** Super Power: the Terran Hegemony, the First Star League, and the Federated Commonwealth. (CamOps p12) */
+        SUPER,
+        /**
+         * Major Power: e.g. Inner Sphere Great Houses, Republic of the Sphere, Terran Alliance,
+         * Second Star League, Inner Sphere Clans. (CamOps p12)
+         */
+        MAJOR,
+        /** Faction is limited to a single star system, or potentially just a part of a planet (CamOps p12) */
         MINOR,
+        /** Independent world or Small State (CamOps p12) */
+        SMALL,
         /** Faction is rebelling against the superior ("parent") faction */
         REBEL,
         /** Faction isn't overtly acting on the political/military scale; think ComStar before clan invasion */
