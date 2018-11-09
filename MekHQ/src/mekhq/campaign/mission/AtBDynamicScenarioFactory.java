@@ -13,6 +13,10 @@ import megamek.client.RandomNameGenerator;
 import megamek.client.RandomSkillsGenerator;
 import megamek.client.RandomUnitGenerator;
 import megamek.client.bot.princess.CardinalEdge;
+import megamek.client.ratgenerator.ForceDescriptor;
+import megamek.client.ratgenerator.ForceNode;
+import megamek.client.ratgenerator.FormationType;
+import megamek.client.ratgenerator.Ruleset;
 import megamek.common.Board;
 import megamek.common.Compute;
 import megamek.common.Crew;
@@ -922,6 +926,23 @@ public class AtBDynamicScenarioFactory {
         }
         return EntityWeightClass.WEIGHT_SUPER_HEAVY;
     }
+    
+    /*private static void generateBasicForceUnit(String faction, int unitType, int weightClass, int year, int skill, int rating) {
+        ForceDescriptor fd = new ForceDescriptor();
+        fd.setUnitType(unitType);
+        fd.setWeightClass(weightClass);
+        fd.setYear(year);
+        fd.setExperience(skill);
+        fd.setEschelon(3); // this is a "lance", "star" or "maniple"
+        
+        if (!Ruleset.isInitialized()) {
+            Ruleset.loadData();
+        }
+        
+        Ruleset ruleSet = Ruleset.findRuleset(faction);
+        ruleSet.processRoot(fd, null);
+        fd.getAllChildren()
+    }*/
     
     /**
      * Generates a "lance" of entities given some parameters, with weight not specified. Doesn't have to be a lance, could be any number.

@@ -67,6 +67,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
     
     private final static String ADD_FORCE_COMMAND = "ADDFORCE"; 
     private final static String REMOVE_FORCE_COMMAND = "REMOVE_FORCE_";
+    private final static String EDIT_FORCE_COMMAND = "EDIT_FORCE_";
     private final static String SAVE_TEMPLATE_COMMAND = "SAVE_TEMPLATE";
     private final static String LOAD_TEMPLATE_COMMAND = "LOAD_TEMPLATE";
     
@@ -241,7 +242,6 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
   
     /**
      * Worker function that sets up UI elements for the force template editor.
-     * Really goddamn ugly for now.
      * @param gbc
      */
     private void setupForceEditor(GridBagConstraints externalGBC) {
@@ -463,7 +463,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         gbc.gridx++;
         forcedPanel.add(spnGenerationOrder, gbc);
         
-        JButton btnAdd = new JButton("Add");
+        JButton btnAdd = new JButton("Save");
         btnAdd.setActionCommand(ADD_FORCE_COMMAND);
         btnAdd.addActionListener(this);
         gbc.gridx++;
@@ -473,6 +473,37 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         externalGBC.gridheight = 1;
     }
         
+    /** 
+     * Helper function that loads the given force template into the force editor interface.
+     * @param forceTemplate The force template.
+     */
+    private void loadForce(ScenarioForceTemplate forceTemplate) {
+        cboAlignment.setSelectedIndex(forceTemplate.getForceAlignment());
+        cboGenerationMethod.setSelectedIndex(forceTemplate.getGenerationMethod());
+        spnMultiplier.setValue(forceTemplate.getForceMultiplier());
+        cboDestinationZone.setSelectedIndex(forceTemplate.getDestinationZone());
+        spnRetreatThreshold.setValue(forceTemplate.getRetreatThreshold() * 100);
+        chkReinforce.setSelected(forceTemplate.getCanReinforceLinked());
+        chkContributesToBV.setSelected(forceTemplate.getContributesToBV());
+        chkContributesToUnitCount.setSelected(forceTemplate.getContributesToUnitCount());
+        txtForceName.setText(forceTemplate.getForceName());
+        cboSyncDeploymentType.setSelectedIndex(forceTemplate.getSyncDeploymentType().ordinal());
+        cboSyncForceName.setSelectedItem(forceTemplate.getSyncedForceName());
+        
+        int[] deploymentZones = new int[forceTemplate.getDeploymentZones().size()];
+        for(int x = 0; x < forceTemplate.getDeploymentZones().size(); x++) {
+            deploymentZones[x] = forceTemplate.getDeploymentZones().get(x);
+        }
+        
+        lstDeployZones.setSelectedIndices(deploymentZones);
+        cboUnitType.setSelectedIndex(forceTemplate.getAllowedUnitType() + ScenarioForceTemplate.SPECIAL_UNIT_TYPES.size());
+        spnArrivalTurn.setValue(forceTemplate.getArrivalTurn());
+        spnFixedUnitCount.setValue(forceTemplate.getFixedUnitCount());
+        cboMaxWeightClass.setSelectedIndex(forceTemplate.getMaxWeightClass());
+        chkContributesToMapSize.setSelected(forceTemplate.getContributesToMapSize());
+        spnGenerationOrder.setValue(forceTemplate.getGenerationOrder());
+    }
+    
     /**
      * Worker function called when initializing the dialog to place the force template list on the content pane.
      * @param gbc Grid bag constraints.
@@ -897,6 +928,12 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
             gbc.gridx++;
             panForceList.add(btnRemoveForce, gbc);
             
+            JButton btnEditForce = new JButton("Edit");
+            btnEditForce.setActionCommand(String.format("%s%s", EDIT_FORCE_COMMAND, forceIndex));
+            btnEditForce.addActionListener(this);
+            gbc.gridx++;
+            panForceList.add(btnEditForce, gbc);
+            
             gbc.gridy++;
             gbc.gridx = 0;
         }
@@ -989,13 +1026,13 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
             valBuilder.append("Bot-controlled forces cannot be player-supplied.");
         }
         
-        if(scenarioTemplate.scenarioForces.containsKey(txtForceName.getText())) {
+        /*if(scenarioTemplate.scenarioForces.containsKey(txtForceName.getText())) {
             if(valBuilder.length() > 0) {
                 valBuilder.append("\n");
             }
             
             valBuilder.append("Force with this key already exists!");
-        }
+        }*/
         
         return valBuilder.toString();
     }
@@ -1012,6 +1049,15 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         renderForceList();
         pack();
         repaint();
+    }
+    
+    /**
+     * Event handler for when the "Edit" button is pressed for a particular force template.
+     * @param command The command string containing the index of the force to edit.
+     */
+    private void editForceButtonHandler(String command) {
+        String forceIndex = command.substring(EDIT_FORCE_COMMAND.length());
+        loadForce(scenarioTemplate.scenarioForces.get(forceIndex));
     }
     
     /**
@@ -1158,6 +1204,8 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
             addForceButtonHandler();
         } else if(e.getActionCommand().contains(REMOVE_FORCE_COMMAND)) {
             deleteForceButtonHandler(e.getActionCommand());
+        } else if(e.getActionCommand().contains(EDIT_FORCE_COMMAND)) {
+            editForceButtonHandler(e.getActionCommand());
         } else if(e.getActionCommand() == SAVE_TEMPLATE_COMMAND) {
             saveTemplateButtonHandler();
         } else if(e.getActionCommand() == LOAD_TEMPLATE_COMMAND) {
