@@ -2672,7 +2672,8 @@ public class Campaign implements Serializable, ITechManager {
                 if (!s.isCurrent() || !(s instanceof AtBScenario)) {
                     continue;
                 }
-                if (s.getDate().before(calendar.getTime())) {
+                if (s.getDate() != null && 
+                        s.getDate().before(calendar.getTime())) {
                     s.setStatus(Scenario.S_DEFEAT);
                     s.clearAllForcesAndPersonnel(this);
                     ((AtBContract) m).addPlayerMinorBreach();
