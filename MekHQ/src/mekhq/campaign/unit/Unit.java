@@ -2855,6 +2855,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     }
 
     public void resetPilotAndEntity() {
+        entity.getCrew().resetGameState();
         if (entity.getCrew().getSlotCount() > 1) {
             final String driveType = SkillType.getDrivingSkillFor(entity);
             final String gunType = SkillType.getGunnerySkillFor(entity);
@@ -2930,8 +2931,6 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             }
             entity.getCrew().setMissing(false, 0);
         }
-        entity.getCrew().resetFatigue();
-        entity.getCrew().setEjected(false);
 
         // Clear any stale game data that may somehow have gotten set incorrectly
         campaign.clearGameData(entity);
