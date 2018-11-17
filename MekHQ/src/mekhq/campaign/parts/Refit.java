@@ -671,6 +671,8 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 			}
 			if(oPart instanceof Armor && sameArmorType) {
 				recycledArmorPoints += ((Armor)oPart).getAmount();
+				// Refund the time we added above for the "new" armor that actually wasn't.
+				time -= ((Armor)oPart).getAmount() * ((Armor)oPart).getBaseTimeFor(oldUnit.getEntity());
 				continue;
 			}
 			boolean isSalvaging = oldUnit.isSalvage();
