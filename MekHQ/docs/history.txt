@@ -24,6 +24,7 @@ v0.45.2-SNAPSHOT
 + Issue #865: Changing Award Date Does Not Update Award Tooltip
 + Issue #973: No contracts are offered at the start of an AtB campaign.
 + Issue #949: Mechwarrior KO'ed at beginning of battle
++ Issue #981: Fixed bug where refits overcharged for armor or would perform excess moves
 
 v0.45.1 (2018-09-03 2300 UTC)
 + PR #864: Security - address XXE vulnerabilities in XML parsers
