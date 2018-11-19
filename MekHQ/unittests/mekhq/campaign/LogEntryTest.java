@@ -25,6 +25,7 @@ import java.util.Date;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import mekhq.campaign.log.*;
 import org.junit.Assert;
 import org.junit.Test;
 import org.w3c.dom.Node;
@@ -34,15 +35,16 @@ public class LogEntryTest {
 
     @Test
     public void testNullDescriptionBecomesEmpty() {
-        Assert.assertEquals("", new LogEntry(null, null).getDesc()); //$NON-NLS-1$
+        Assert.assertEquals("", new HistoricalLogEntry(null, null).getDesc()); //$NON-NLS-1$
     }
 
     @Test
     public void testXmlMarshalling() throws Exception {
-        checkMarshalling(new LogEntry(null, null, null));
-        checkMarshalling(new LogEntry(new Date(0l), "", ""));  //$NON-NLS-1$//$NON-NLS-2$
-        checkMarshalling(new LogEntry(new Date(0l), "<desc>Some description</desc>", "<type>Some type</type>")); //$NON-NLS-1$ //$NON-NLS-2$
-        checkMarshalling(new LogEntry(new Date(0l), "Some <em>xml-fragment</em> description", "Some <em>xml-fragment</em> type")); //$NON-NLS-1$ //$NON-NLS-2$
+        checkMarshalling(new PersonalLogEntry(null, null));
+        checkMarshalling(new AwardLogEntry(new Date(0l), ""));  //$NON-NLS-1$//$NON-NLS-2$
+        checkMarshalling(new CustomLogEntry(new Date(0l), "Description"));  //$NON-NLS-1$//$NON-NLS-2$
+        checkMarshalling(new ServiceLogEntry(new Date(0l), "<desc>Some description</desc>")); //$NON-NLS-1$ //$NON-NLS-2$
+        checkMarshalling(new MedicalLogEntry(new Date(0l), "Some <em>xml-fragment</em> description")); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     private static void checkMarshalling(LogEntry le) throws Exception {
@@ -57,7 +59,7 @@ public class LogEntryTest {
                                           .parse(new InputSource(new ByteArrayInputStream(baos.toByteArray())))
                                           .getDocumentElement();
         
-        Assert.assertEquals(le, LogEntry.generateInstanceFromXML(node));
+        Assert.assertEquals(le, LogEntryFactory.getInstance().generateInstanceFromXML(node));
     }
 
 }

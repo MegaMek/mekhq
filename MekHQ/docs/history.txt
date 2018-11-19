@@ -1,6 +1,8 @@
 VERSION HISTORY:
 ----------------
-v0.45.2-SNAPSHOT
+v0.45.3-SNAPSHOT
+
+v0.45.2 (2018-11-18 0200 UTC)
 + Switched build system from ant to gradle.
 + Issue #917: Hire Full Compliment Regularly Hires Bondsmen
 + Issue #919: Dropship Crewmembers/techs displayed as "Nobody" In Repair Bay
@@ -20,6 +22,11 @@ v0.45.2-SNAPSHOT
 + Planets: Reunification War data for Outworlds Alliance + start of RWR 
 + PR #959: Fix for inability to repair damaged VTOL internal structure after loading campaign
 + Issue #967: Fix bug where acquired Units could never be bought
++ PR #971: Feature allowing grouping personnel by their unit on the Personnel tab
++ Issue #865: Changing Award Date Does Not Update Award Tooltip
++ Issue #973: No contracts are offered at the start of an AtB campaign.
++ Issue #949: Mechwarrior KO'ed at beginning of battle
++ Issue #981: Fixed bug where refits overcharged for armor or would perform excess moves
 
 v0.45.1 (2018-09-03 2300 UTC)
 + PR #864: Security - address XXE vulnerabilities in XML parsers

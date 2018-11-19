@@ -474,7 +474,7 @@ public class MekLabTab extends CampaignGuiTab {
         private megameklab.com.ui.Aero.tabs.StructureTab structureTab;
         private megameklab.com.ui.Aero.tabs.EquipmentTab equipmentTab;
         private megameklab.com.ui.Aero.tabs.BuildTab buildTab;
-        private megameklab.com.ui.Aero.tabs.PreviewTab previewTab;
+        private megameklab.com.ui.tabs.PreviewTab previewTab;
 
         public AeroPanel(Aero a) {
             entity = a;
@@ -491,7 +491,7 @@ public class MekLabTab extends CampaignGuiTab {
 
             structureTab = new megameklab.com.ui.Aero.tabs.StructureTab(this);
             structureTab.setAsCustomization();
-            previewTab = new megameklab.com.ui.Aero.tabs.PreviewTab(this);
+            previewTab = new megameklab.com.ui.tabs.PreviewTab(this);
             equipmentTab = new megameklab.com.ui.Aero.tabs.EquipmentTab(this);
             buildTab = new megameklab.com.ui.Aero.tabs.BuildTab(this, equipmentTab);
             structureTab.addRefreshedListener(this);
@@ -605,7 +605,7 @@ public class MekLabTab extends CampaignGuiTab {
         private megameklab.com.ui.Aero.tabs.EquipmentTab equipmentTab;
         private megameklab.com.ui.Aero.tabs.BuildTab buildTab;
         private megameklab.com.ui.aerospace.TransportTab transportTab;
-        private megameklab.com.ui.Aero.tabs.PreviewTab previewTab;
+        private megameklab.com.ui.tabs.PreviewTab previewTab;
 
         public DropshipPanel(SmallCraft a) {
             entity = a;
@@ -622,7 +622,7 @@ public class MekLabTab extends CampaignGuiTab {
 
             structureTab = new megameklab.com.ui.aerospace.DropshipStructureTab(this);
             structureTab.setAsCustomization();
-            previewTab = new megameklab.com.ui.Aero.tabs.PreviewTab(this);
+            previewTab = new megameklab.com.ui.tabs.PreviewTab(this);
             equipmentTab = new megameklab.com.ui.Aero.tabs.EquipmentTab(this);
             buildTab = new megameklab.com.ui.Aero.tabs.BuildTab(this, equipmentTab);
             transportTab = new megameklab.com.ui.aerospace.TransportTab(this);
@@ -739,7 +739,7 @@ public class MekLabTab extends CampaignGuiTab {
         private megameklab.com.ui.Mek.tabs.StructureTab structureTab;
         private megameklab.com.ui.Mek.tabs.EquipmentTab equipmentTab;
         private megameklab.com.ui.Mek.tabs.BuildTab buildTab;
-        private megameklab.com.ui.Mek.tabs.PreviewTab previewTab;
+        private megameklab.com.ui.tabs.PreviewTab previewTab;
 
         public MekPanel(Mech m) {
             entity = m;
@@ -757,7 +757,7 @@ public class MekLabTab extends CampaignGuiTab {
             structureTab = new megameklab.com.ui.Mek.tabs.StructureTab(this);
             structureTab.setAsCustomization();
             equipmentTab = new megameklab.com.ui.Mek.tabs.EquipmentTab(this);
-            previewTab = new megameklab.com.ui.Mek.tabs.PreviewTab(this);
+            previewTab = new megameklab.com.ui.tabs.PreviewTab(this);
             buildTab = new megameklab.com.ui.Mek.tabs.BuildTab(this, equipmentTab);
             structureTab.addRefreshedListener(this);
             equipmentTab.addRefreshedListener(this);
@@ -1112,7 +1112,7 @@ public class MekLabTab extends CampaignGuiTab {
 
         private Infantry entity;
         private megameklab.com.ui.Infantry.tabs.StructureTab structureTab;
-        private megameklab.com.ui.Infantry.tabs.PreviewTab previewTab;
+        private megameklab.com.ui.tabs.PreviewTab previewTab;
 
         public InfantryPanel(Infantry inf) {
             entity = inf;
@@ -1130,7 +1130,7 @@ public class MekLabTab extends CampaignGuiTab {
             structureTab = new megameklab.com.ui.Infantry.tabs.StructureTab(this);
             structureTab.setAsCustomization();
             structureTab.addRefreshedListener(this);
-            previewTab = new megameklab.com.ui.Infantry.tabs.PreviewTab(this);
+            previewTab = new megameklab.com.ui.tabs.PreviewTab(this);
 
             addTab("Build", new JScrollPane(structureTab));
             addTab("Preview", new JScrollPane(previewTab));
