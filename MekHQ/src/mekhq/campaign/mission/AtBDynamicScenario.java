@@ -29,6 +29,9 @@ public class AtBDynamicScenario extends AtBScenario {
     private int effectivePlayerUnitCount;
     private int effectivePlayerBV;
     
+    private int effectiveOpforSkill;
+    private int effectiveOpforQuality;
+    
     // convenient pointers that let us keep data around that would otherwise need reloading
     private ScenarioTemplate template;      // the template that is being used to generate this scenario
     
@@ -135,6 +138,22 @@ public class AtBDynamicScenario extends AtBScenario {
     
     public Map<BotForce, ScenarioForceTemplate> getBotForceTemplates() {
         return botForceTemplates;
+    }
+    
+    public int getEffectiveOpforSkill() {
+        return effectiveOpforSkill;
+    }
+    
+    public int getEffectiveOpforQuality() {
+        return effectiveOpforQuality;
+    }
+    
+    public void setEffectiveOpforSkill(int skillLevel) {
+        effectiveOpforSkill = skillLevel;
+    }
+    
+    public void setEffectiveOpforQuality(int qualityLevel) {
+        effectiveOpforQuality = qualityLevel;
     }
     
     /**

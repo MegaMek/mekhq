@@ -90,6 +90,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
     JComboBox<String> cboMaxWeightClass;
     JCheckBox chkContributesToMapSize;
     JSpinner spnGenerationOrder;
+    JCheckBox chkAllowAeroBombs;
     
     
     JPanel panForceList;
@@ -401,6 +402,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         forcedPanel.add(lblAllowedUnitTypes, gbc);
         
         cboUnitType = new JComboBox<String>();
+        cboUnitType.addItem(ScenarioForceTemplate.SPECIAL_UNIT_TYPES.get(ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_AERO_MIX));
         cboUnitType.addItem(ScenarioForceTemplate.SPECIAL_UNIT_TYPES.get(ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX));
         cboUnitType.addItem(ScenarioForceTemplate.SPECIAL_UNIT_TYPES.get(ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_CIVILIANS));
         
@@ -410,6 +412,14 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
 
         gbc.gridx++;
         forcedPanel.add(cboUnitType, gbc);
+        
+        ItemListener unitTypeChangeListener = new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                unitTypeChangeHandler();
+            }
+        };
+        cboUnitType.addItemListener(unitTypeChangeListener);
         
         JLabel lblArrivalTurn = new JLabel("Arrival Turn:");
         lblArrivalTurn.setToolTipText("The turn on which this force arrives. Enter -1 for staggered arrival, -2 for staggered arrival by lance.");
@@ -422,12 +432,12 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         forcedPanel.add(spnArrivalTurn, gbc);
         
         JLabel lblFixedUnitCount = new JLabel("Fixed Unit Count:");
-        lblFixedUnitCount.setToolTipText("How many units in the force, if using the fixed unit count generation method.");
+        lblFixedUnitCount.setToolTipText("How many units in the force, if using the fixed unit count generation method. -1 indicates a lance, appropriate to the owner's faction.");
         gbc.gridy++;
         gbc.gridx--;
         forcedPanel.add(lblFixedUnitCount, gbc);
         
-        spnFixedUnitCount = new JSpinner(new SpinnerNumberModel(0, 0, 100, 1));
+        spnFixedUnitCount = new JSpinner(new SpinnerNumberModel(0, -1, 100, 1));
         gbc.gridx++;
         forcedPanel.add(spnFixedUnitCount, gbc);
         
@@ -444,7 +454,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         gbc.gridx++;
         forcedPanel.add(cboMaxWeightClass, gbc);
         
-        JLabel lblContributesToMapSize = new JLabel("Contributes to Map Size");
+        JLabel lblContributesToMapSize = new JLabel("Contributes to Map Size:");
         gbc.gridx--;
         gbc.gridy++;
         forcedPanel.add(lblContributesToMapSize, gbc);
@@ -462,6 +472,16 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         spnGenerationOrder = new JSpinner(new SpinnerNumberModel(1, 1, 100, 1));
         gbc.gridx++;
         forcedPanel.add(spnGenerationOrder, gbc);
+        
+        JLabel lblAllowAeroBombs = new JLabel("Allow Aero Bombs:");
+        gbc.gridx--;
+        gbc.gridy++;
+        forcedPanel.add(lblAllowAeroBombs, gbc);
+        
+        chkAllowAeroBombs = new JCheckBox();
+        chkAllowAeroBombs.setEnabled(false);
+        gbc.gridx++;
+        forcedPanel.add(chkAllowAeroBombs, gbc);
         
         JButton btnAdd = new JButton("Save");
         btnAdd.setActionCommand(ADD_FORCE_COMMAND);
@@ -482,7 +502,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         cboGenerationMethod.setSelectedIndex(forceTemplate.getGenerationMethod());
         spnMultiplier.setValue(forceTemplate.getForceMultiplier());
         cboDestinationZone.setSelectedIndex(forceTemplate.getDestinationZone());
-        spnRetreatThreshold.setValue(forceTemplate.getRetreatThreshold() * 100);
+        spnRetreatThreshold.setValue(forceTemplate.getRetreatThreshold());
         chkReinforce.setSelected(forceTemplate.getCanReinforceLinked());
         chkContributesToBV.setSelected(forceTemplate.getContributesToBV());
         chkContributesToUnitCount.setSelected(forceTemplate.getContributesToUnitCount());
@@ -502,6 +522,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         cboMaxWeightClass.setSelectedIndex(forceTemplate.getMaxWeightClass());
         chkContributesToMapSize.setSelected(forceTemplate.getContributesToMapSize());
         spnGenerationOrder.setValue(forceTemplate.getGenerationOrder());
+        chkAllowAeroBombs.setSelected(forceTemplate.getAllowAeroBombs());
     }
     
     /**
@@ -848,7 +869,12 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
                 panForceList.add(lblMultiplier, gbc);
             } else if(!sft.isPlayerForce() &&
                 (sft.getGenerationMethod() == ScenarioForceTemplate.ForceGenerationMethod.FixedUnitCount.ordinal())) {
-                lblMultiplier.setText(((Integer) sft.getFixedUnitCount()).toString());
+                               
+                if(sft.getFixedUnitCount() >= 0) {
+                    lblMultiplier.setText(((Integer) sft.getFixedUnitCount()).toString());
+                } else {
+                    lblMultiplier.setText("Lance");
+                }
                 panForceList.add(lblMultiplier, gbc);
             }
             
@@ -876,7 +902,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
             gbc.gridx++;
             panForceList.add(lblDestinationZones, gbc);
             
-            JLabel lblRetreatThreshold = new JLabel(((Double) sft.getRetreatThreshold()).toString());
+            JLabel lblRetreatThreshold = new JLabel(((Integer) sft.getRetreatThreshold()).toString());
             gbc.gridx++;
             panForceList.add(lblRetreatThreshold, gbc);
             
@@ -961,7 +987,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         }
         
         int destinationZone = destinationZoneMapping.get(cboDestinationZone.getSelectedIndex());
-        double retreatThreshold = (int) spnRetreatThreshold.getValue() / 100.0;
+        int retreatThreshold = (int) spnRetreatThreshold.getValue();
         
         int allowedUnitType = cboUnitType.getSelectedIndex() - ScenarioForceTemplate.SPECIAL_UNIT_TYPES.size();
         
@@ -976,6 +1002,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         sft.setContributesToMapSize(chkContributesToMapSize.isSelected());
         sft.setMaxWeightClass(cboMaxWeightClass.getSelectedIndex());
         sft.setGenerationOrder((int) spnGenerationOrder.getValue());
+        sft.setAllowAeroBombs(chkAllowAeroBombs.isSelected());
         
         sft.setSyncDeploymentType(SynchronizedDeploymentType.values()[cboSyncDeploymentType.getSelectedIndex()]);
         
@@ -1133,6 +1160,19 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         if(!lstDeployZones.isEnabled()) {
             lstDeployZones.clearSelection();
         }
+    }
+    
+    /**
+     * Event handler for when the unit type dropdown changes value.
+     * Enables or disables the "allow aero bombs" UI element as appropriate.
+     */
+    private void unitTypeChangeHandler() {
+        int selectedItem = cboUnitType.getSelectedIndex() - ScenarioForceTemplate.SPECIAL_UNIT_TYPES.size();
+        boolean isAero = selectedItem == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_AERO_MIX ||
+                        selectedItem == UnitType.CONV_FIGHTER ||
+                        selectedItem == UnitType.AERO;
+        
+        chkAllowAeroBombs.setEnabled(isAero);
     }
     
     /**

@@ -70,6 +70,8 @@ public class AtBDynamicScenarioFactory {
         scenario.setName(template.name);
         scenario.setDesc(template.detailedBriefing);
         scenario.setScenarioTemplate(template);
+        scenario.setEffectiveOpforSkill(contract.getEnemySkill());
+        scenario.setEffectiveOpforQuality(contract.getEnemyQuality());
         
         setLightConditions(scenario);
         setWeather(scenario);
@@ -169,7 +171,7 @@ public class AtBDynamicScenarioFactory {
     * @param forceTemplate The force template to use to generate the force
     * @return How many "lances" or other individual units were generated. 
     */
-    private static int generateForce(AtBDynamicScenario scenario, AtBContract contract, Campaign campaign,
+    public static int generateForce(AtBDynamicScenario scenario, AtBContract contract, Campaign campaign,
             int effectiveBV, int effectiveUnitCount, int weightClass, ScenarioForceTemplate forceTemplate) {
         String factionCode = "";
         int skill = 0;
@@ -191,8 +193,8 @@ public class AtBDynamicScenarioFactory {
         case Opposing:
         case Third:
             factionCode = contract.getEnemyCode();
-            skill = contract.getEnemySkill();
-            quality = contract.getEnemyQuality();
+            skill = scenario.getEffectiveOpforSkill();
+            quality = scenario.getEffectiveOpforQuality();
             break;
         default:
             MekHQ.getLogger().log(AtBDynamicScenarioFactory.class, "generateForce", LogLevel.WARNING, 
@@ -200,6 +202,14 @@ public class AtBDynamicScenarioFactory {
         }
         
         String parentFactionType = AtBConfiguration.getParentFactionType(factionCode);
+        boolean isPlanetOwner = contract.getPlanet().getFactions(Utilities.getDateTimeDay(campaign.getCalendar())).contains(factionCode);
+        boolean usingAerospace = forceTemplate.getAllowedUnitType() == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_AERO_MIX ||
+                                    forceTemplate.getAllowedUnitType() == UnitType.CONV_FIGHTER ||
+                                    forceTemplate.getAllowedUnitType() == UnitType.AERO;
+        
+        // here we determine the "lance size". Aircraft almost always come in pairs, mechs and tanks, not so much.
+        int lanceSize = usingAerospace ? 2 : getLanceSize(factionCode);
+        
         
         // don't generate forces flagged as player-supplied
         if(forceTemplate.getGenerationMethod() == ForceGenerationMethod.PlayerSupplied.ordinal()) {
@@ -213,7 +223,8 @@ public class AtBDynamicScenarioFactory {
         if(forceTemplate.getGenerationMethod() == ForceGenerationMethod.UnitCountScaled.ordinal()) {
             forceUnitBudget = (int) (effectiveUnitCount * forceTemplate.getForceMultiplier());
         } else if (forceTemplate.getGenerationMethod() == ForceGenerationMethod.FixedUnitCount.ordinal()) {
-            forceUnitBudget = (int) forceTemplate.getFixedUnitCount();
+            forceUnitBudget = forceTemplate.getFixedUnitCount() == ScenarioForceTemplate.FIXED_UNIT_SIZE_LANCE ?
+                    lanceSize : forceTemplate.getFixedUnitCount();
         }
         
         ArrayList<Entity> generatedEntities = new ArrayList<>();
@@ -235,17 +246,24 @@ public class AtBDynamicScenarioFactory {
                 currentLanceWeightString = campaign.getAtBConfig().selectBotLances(parentFactionType, weightClass);
             }
             
+            int actualUnitType = forceTemplate.getAllowedUnitType();
+            if(isPlanetOwner && actualUnitType == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_AERO_MIX) {
+                actualUnitType = Compute.d6() > 3 ? UnitType.AERO : UnitType.CONV_FIGHTER;
+            } else if(actualUnitType == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_AERO_MIX) {
+                actualUnitType = UnitType.AERO;
+            }
+            
             // some special cases that don't fit into the regular RAT generation mechanism
             // gun emplacements use a separate set of rats
-            if(forceTemplate.getAllowedUnitType() == UnitType.GUN_EMPLACEMENT) {
+            if(actualUnitType == UnitType.GUN_EMPLACEMENT) {
                 generatedLance = generateTurrets(4, skill, quality, campaign);
             // atb civilians use a separate rat
-            } else if(forceTemplate.getAllowedUnitType() == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_CIVILIANS) {
+            } else if(actualUnitType == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_CIVILIANS) {
                 generatedLance = generateCivilianUnits(4, campaign);
             // meks, asf and tanks support weight class specification, as does the "standard atb mix"
-            } else if(IUnitGenerator.unitTypeSupportsWeightClass(forceTemplate.getAllowedUnitType()) ||
-                    (forceTemplate.getAllowedUnitType() == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX)) { 
-                List<Integer> unitTypes = generateUnitTypes(forceTemplate, 4, campaign);
+            } else if(IUnitGenerator.unitTypeSupportsWeightClass(actualUnitType) ||
+                    (actualUnitType == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX)) { 
+                List<Integer> unitTypes = generateUnitTypes(actualUnitType, lanceSize, campaign);
                 String unitWeights = generateUnitWeights(unitTypes, factionCode, 
                         AtBConfiguration.decodeWeightStr(currentLanceWeightString, 0), forceTemplate.getMaxWeightClass(), campaign);
      
@@ -253,7 +271,7 @@ public class AtBDynamicScenarioFactory {
                         quality, unitTypes, unitWeights, campaign);
             // everything else doesn't support weight class specification
             } else {
-                List<Integer> unitTypes = generateUnitTypes(forceTemplate, 4, campaign);
+                List<Integer> unitTypes = generateUnitTypes(actualUnitType, lanceSize, campaign);
                 generatedLance = generateLance(factionCode, skill, quality, unitTypes, campaign);
             }
             
@@ -261,7 +279,7 @@ public class AtBDynamicScenarioFactory {
             if(generatedLance.isEmpty()) {
                 stopGenerating = true;
                 MekHQ.getLogger().log(AtBDynamicScenarioFactory.class, "generateForces", LogLevel.WARNING, 
-                        String.format("Unable to generate units from RAT: %d, type %d, weight %d", 
+                        String.format("Unable to generate units from RAT: %d, type %d, max weight %d", 
                                 factionCode, forceTemplate.getAllowedUnitType(), weightClass));
                 continue;
             }
@@ -753,17 +771,17 @@ public class AtBDynamicScenarioFactory {
     
     /**
      * Generates a list of integers corresponding to megamek unit type constants (defined in Megamek.common.UnitType)
-     * TODO: Update for clans, marians, wobbies, etc.
-     * @param template The force template from which to generate units.
+     * TODO: Update AtB mix for clans, marians, wobbies, etc.
+     * @param unitTypeCode The type of units to generate, .
      * @param unitCount How many units to generate.
      * @param campaign Current campaign
      * @return Array list of unit type integers.
      */
-    private static List<Integer> generateUnitTypes(ScenarioForceTemplate template, int unitCount, Campaign campaign) {
+    private static List<Integer> generateUnitTypes(int unitTypeCode, int unitCount, Campaign campaign) {
         List<Integer> unitTypes = new ArrayList<>(unitCount);
-        int actualUnitType = template.getAllowedUnitType(); 
+        int actualUnitType = unitTypeCode; 
         
-        if(template.getAllowedUnitType() == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX) {
+        if(unitTypeCode == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX) {
             // logic mostly lifted from AtBScenario.java, uses campaign config to determine tank/mech mixture
             if (campaign.getCampaignOptions().getUseVehicles()) {
                 int totalWeight = campaign.getCampaignOptions().getOpforLanceTypeMechs() +
@@ -803,6 +821,22 @@ public class AtBDynamicScenarioFactory {
     }
     
     /**
+     * Generates a list of integers corresponding to megamek unit type constants.
+     * Specific to aerospace units, where the unit may randomly be composed of aerospace or conventional fighters.
+     * @param isPlanetOwner Whether the owner of the aero units is the planet owner.
+     * @param unitCount How many units to generate.
+     * @param campaign Current campaign
+     * @return Array list of unit type integers.
+     */
+    private static List<Integer> generateAeroTypes(boolean isPlanetOwner, int unitCount, Campaign campaign) {
+        int useASFRoll = isPlanetOwner ? Compute.d6() : 6;
+        // if we are the planet owner, we may use ASF or conventional fighters 
+        boolean useASF = useASFRoll >= 4;
+
+        return generateUnitTypes(useASF ? UnitType.AERO : UnitType.CONV_FIGHTER, unitCount, campaign);
+    }
+    
+    /**
      * Logic that generates a "unit weights" string according to AtB rules.
      * TODO: Update for clans, marian hegemony, wobbies, etc.
      * @param unitTypes List of unit types (mek, tank, etc)
@@ -827,7 +861,7 @@ public class AtBDynamicScenarioFactory {
      * @param campaign The campaign in which the scenario resides.
      * @return Effective BV.
      */
-    private static int calculateEffectiveBV(AtBDynamicScenario scenario, Campaign campaign) {
+    public static int calculateEffectiveBV(AtBDynamicScenario scenario, Campaign campaign) {
         // for each deployed player and bot force that's marked as contributing to the BV budget
         int bvBudget = 0;
         double difficultyMultiplier = getDifficultyMultiplier(campaign);
@@ -860,7 +894,7 @@ public class AtBDynamicScenarioFactory {
      * @param campaign The campaign in which the scenario resides.
      * @return Effective BV.
      */
-    private static int calculateEffectiveUnitCount(AtBDynamicScenario scenario, Campaign campaign) {
+    public static int calculateEffectiveUnitCount(AtBDynamicScenario scenario, Campaign campaign) {
         // for each deployed player and bot force that's marked as contributing to the BV budget
         int unitCount = 0;
         double difficultyMultiplier = getDifficultyMultiplier(campaign);
@@ -898,6 +932,14 @@ public class AtBDynamicScenarioFactory {
         return 1.0 + ((c.getCampaignOptions().getSkillLevel() - 2) * .1);
     }
     
+    /**
+     * Helper function that calculates the "weight class" of the player force.
+     * Putting any kind of dropship or other unit that doesn't fit into the "light-medium-heavy-assault" pattern
+     * will probably cause it to return "ASSAULT". 
+     * @param scenario
+     * @param campaign
+     * @return
+     */
     private static int calculatePlayerForceWeightClass(AtBDynamicScenario scenario, Campaign campaign) {
         double weight = 0.0;
         int unitCount = 0;
@@ -1355,6 +1397,51 @@ public class AtBDynamicScenarioFactory {
         if((commander != null) &&
                 commander.hasSkill(SkillType.S_TACTICS)) {
             scenario.setRerolls(commander.getSkill(SkillType.S_TACTICS).getLevel());
+        }
+    }
+    
+    /**
+     * Convenience function to get the "lance" (basic unit) size, based on faction.
+     * @param factionCode The faction code.
+     * @return "Lance" size.
+     */
+    public static int getLanceSize(String factionCode) {
+        Faction faction = Faction.getFaction(factionCode);
+        if(faction != null) {
+            // clans and marian hegemony use a fundamental unit size of 5.
+            if(faction.isClan() ||
+                    factionCode == "MH") {
+                return 5;
+            // comstar and wobbies use a fundamental unit size of 6.
+            } else if(faction.isComstar()) {
+                return 6;
+            }
+        }
+        
+        return 4;
+    }
+    
+    /**
+     * Worker function to determine the "lance size" of a group of aircraft.
+     * Either 2 for ASF
+     * @param isPlanetOwner
+     * @return
+     */
+    public static int getAeroLanceSize(int unitTypeCode, boolean isPlanetOwner) {
+        if(unitTypeCode == UnitType.AERO) {
+            return 2;
+        } else if(unitTypeCode == UnitType.CONV_FIGHTER) {
+            return (Compute.randomInt(3) + 1) * 2;
+        } else {
+            int useASFRoll = isPlanetOwner ? Compute.d6() : 6;
+            int weightCountRoll = (Compute.randomInt(3) + 1 * 2); // # of conventional fighters, just in case
+            
+            // if we are the planet owner, we may use ASF or conventional fighters 
+            boolean useASF = useASFRoll >= 4;
+            // if we are using ASF, we "always" use 2 at a time, otherwise, use the # of conventional fighters 
+            int unitCount = useASF ? 2 : weightCountRoll;
+            
+            return unitCount;
         }
     }
 }

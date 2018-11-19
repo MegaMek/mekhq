@@ -1,6 +1,9 @@
 package mekhq.campaign.mission.atb;
 
-public class AtBScenarioModifier {
+import mekhq.campaign.Campaign;
+import mekhq.campaign.mission.AtBDynamicScenario;
+
+public abstract class AtBScenarioModifier {
  // possible scenario effects:
  // add bot force(s) to template - preGeneration
  // re-generate bot skill levels - postGeneration
@@ -10,4 +13,13 @@ public class AtBScenarioModifier {
  // switch scenario templates - preGeneration
  // set scenario flag - preGeneration
  // add objective - preGeneration
+    public String additionalBriefingText;
+        
+    public void preApply(AtBDynamicScenario scenario, Campaign campaign) {
+        
+    }
+    
+    public void postApply(AtBDynamicScenario scenario, Campaign campaign) {
+        scenario.setDesc(String.format("%s\n\n%s", scenario.getDescription(), additionalBriefingText));
+    }
 }
