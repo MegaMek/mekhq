@@ -29,6 +29,8 @@ import mekhq.MekHqXmlUtil;
  */
 public class CustomOption {
     
+    private static List<CustomOption> customAbilities = null;
+    
     private String name;
     private String group;
     private int type;
@@ -57,9 +59,21 @@ public class CustomOption {
         return defaultVal;
     }
     
+    /**
+     * Loads custom abilities from the data directory the first time it is called.
+     * 
+     * @return The list of user-defined special abilities.
+     */
     public static List<CustomOption> getCustomAbilities() {
-        final String METHOD_NAME = "getCustomAbilities()"; //$NON-NLS-1$
-        List<CustomOption> retVal = new ArrayList<>();
+        if (null == customAbilities) {
+            initCustomAbilities();
+        }
+        return customAbilities;
+    }
+    
+    private static void initCustomAbilities() {
+        final String METHOD_NAME = "initCustomAbilities()"; //$NON-NLS-1$
+        customAbilities = new ArrayList<>();
 
         Document xmlDoc = null;
 
@@ -101,12 +115,11 @@ public class CustomOption {
                 if (xn.equalsIgnoreCase("option")) {
                     CustomOption option = CustomOption.generateInstanceFromXML(wn);
                     if (null != option) {
-                        retVal.add(option);
+                        customAbilities.add(option);
                     }
                 }
             }
         }
-        return retVal;
     }
 
     public static CustomOption generateInstanceFromXML(Node wn) {
@@ -139,10 +152,10 @@ public class CustomOption {
                     retVal.defaultVal = Boolean.FALSE;
                     break;
                 case IOption.INTEGER:
-                    retVal.defaultVal = new Integer(0);
+                    retVal.defaultVal = Integer.valueOf(0);
                     break;
                 case IOption.FLOAT:
-                    retVal.defaultVal = new Float(0.0f);
+                    retVal.defaultVal = Float.valueOf(0.0f);
                     break;
                 case IOption.STRING:
                 case IOption.CHOICE:
