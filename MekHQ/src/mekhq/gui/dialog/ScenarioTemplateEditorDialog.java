@@ -934,13 +934,13 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
             
             JLabel lblContributesToBV = new JLabel(sft.getContributesToBV() ? "Yes" : "No");
             gbc.gridx++;
-            if(!sft.isEnemyBotForce()) {
+            if(!(sft.isEnemyBotForce() || (sft.getForceAlignment() == ForceAlignment.PlanetOwner.ordinal()))) {
                 panForceList.add(lblContributesToBV, gbc);
             }
             
             JLabel lblContributesToUnitCount = new JLabel(sft.getContributesToUnitCount() ? "Yes" : "No");
             gbc.gridx++;
-            if(!sft.isEnemyBotForce()) {
+            if(!(sft.isEnemyBotForce() || (sft.getForceAlignment() == ForceAlignment.PlanetOwner.ordinal()))) {
                 panForceList.add(lblContributesToUnitCount, gbc);
             }
             
@@ -1130,8 +1130,9 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         boolean isPlayerForce = (cboAlignment.getSelectedItem() == ScenarioForceTemplate.FORCE_ALIGNMENTS[0]) &&
                 (cboGenerationMethod.getSelectedItem() == ScenarioForceTemplate.FORCE_GENERATION_METHODS[0]);
         
-        boolean isEnemyForce = (cboAlignment.getSelectedItem() == ScenarioForceTemplate.FORCE_ALIGNMENTS[2]) ||
-                (cboAlignment.getSelectedItem() == ScenarioForceTemplate.FORCE_ALIGNMENTS[3]);
+        boolean isEnemyForce = (cboAlignment.getSelectedIndex() == ScenarioForceTemplate.ForceAlignment.Opposing.ordinal()) ||
+                (cboAlignment.getSelectedIndex() == ScenarioForceTemplate.ForceAlignment.Third.ordinal()) ||
+                (cboAlignment.getSelectedIndex() == ScenarioForceTemplate.ForceAlignment.PlanetOwner.ordinal());
         
         spnMultiplier.setEnabled(!isPlayerForce);
         spnRetreatThreshold.setEnabled(!isPlayerForce);

@@ -5,10 +5,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 
+import org.w3c.dom.Node;
+
 import megamek.common.Board;
+import mekhq.MekHQ;
 
 public class ScenarioForceTemplate {
     // A scenario force template is a way to describe a particular force that gets generated when creating a DymanicScenario
@@ -20,7 +26,7 @@ public class ScenarioForceTemplate {
     // 5) Retreat threshold - The force will switch to retreat mode when this percentage (or fixed number) of its units are out of action
     // 6) Allowed unit types - This is a set of unit types of which the force may consist
     
-    public static final String[] FORCE_ALIGNMENTS = { "Player", "Allied", "Opposing", "Third" };
+    public static final String[] FORCE_ALIGNMENTS = { "Player", "Allied", "Opposing", "Third", "Planet Owner" };
     public static final String[] FORCE_GENERATION_METHODS = { "Player Supplied", "BV Scaled", "Unit Count Scaled", "Fixed Unit Count" };
     public static final String[] FORCE_DEPLOYMENT_SYNC_TYPES = { "None", "Same Edge", "Same Arc", "Opposite Edge", "Opposite Arc" };
     public static final String[] DEPLOYMENT_ZONES = { "Any", "Northwest", "North", "Northeast", "East", "Southeast", "South", "Southwest", "West", "Edge", "Center", "Narrow Edge" };
@@ -48,7 +54,8 @@ public class ScenarioForceTemplate {
         Player,
         Allied,
         Opposing,
-        Third;
+        Third,
+        PlanetOwner;
         
         public static ForceAlignment getForceAlignment(int ordinal) {
             for (ForceAlignment he : values()) {
@@ -89,7 +96,7 @@ public class ScenarioForceTemplate {
         TEAM_IDS.put(ForceAlignment.Player.ordinal(), 1);
         TEAM_IDS.put(ForceAlignment.Allied.ordinal(), 1);
         TEAM_IDS.put(ForceAlignment.Opposing.ordinal(), 2);
-        TEAM_IDS.put(ForceAlignment.Opposing.ordinal(), 3);
+        TEAM_IDS.put(ForceAlignment.Third.ordinal(), 3);
     }
     
     /**
@@ -426,5 +433,25 @@ public class ScenarioForceTemplate {
     public boolean isEnemyBotForce() {
         return getForceAlignment() == ForceAlignment.Opposing.ordinal() ||
                 getForceAlignment() == ForceAlignment.Third.ordinal(); 
+    }
+    
+    /**
+     * Attempt to deserialize an instance of a ScenarioTemplate from the passed-in XML Node
+     * @param inputFile The source file
+     * @return Possibly an instance of a ScenarioTemplate
+     */
+    public static ScenarioForceTemplate Deserialize(Node xmlNode) {
+        ScenarioForceTemplate resultingTemplate = null;
+        
+        try {
+            JAXBContext context = JAXBContext.newInstance(ScenarioForceTemplate.class);
+            Unmarshaller um = context.createUnmarshaller();
+            JAXBElement<ScenarioForceTemplate> templateElement = um.unmarshal(xmlNode, ScenarioForceTemplate.class);
+            resultingTemplate = templateElement.getValue();
+        } catch(Exception e) {
+            MekHQ.getLogger().error(ScenarioTemplate.class, "Deserialize", "Error Deserializing Scenario Force Template", e);
+        }
+        
+        return resultingTemplate;
     }
 }

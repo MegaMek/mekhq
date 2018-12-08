@@ -9,6 +9,8 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.joda.time.DateTime;
+
 import megamek.client.RandomNameGenerator;
 import megamek.client.RandomSkillsGenerator;
 import megamek.client.RandomUnitGenerator;
@@ -18,6 +20,7 @@ import megamek.client.ratgenerator.ForceNode;
 import megamek.client.ratgenerator.FormationType;
 import megamek.client.ratgenerator.Ruleset;
 import megamek.common.Board;
+import megamek.common.BombType;
 import megamek.common.Compute;
 import megamek.common.Crew;
 import megamek.common.Entity;
@@ -42,6 +45,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.Faction.Tag;
 import mekhq.campaign.universe.IUnitGenerator;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.Planets;
@@ -56,6 +60,8 @@ public class AtBDynamicScenarioFactory {
      * Unspecified weight class for units, used when the unit type doesn't support weight classes 
      */
     public static int UNIT_WEIGHT_UNSPECIFIED = -1;
+    
+    private static int[] validBotBombs = { BombType.B_HE, BombType.B_CLUSTER, BombType.B_RL, BombType.B_INFERNO, BombType.B_THUNDER };
     
     /**
      * Method that sets some initial scenario parameters from the given template, prior to force generation and such.
@@ -177,14 +183,11 @@ public class AtBDynamicScenarioFactory {
         int skill = 0;
         int quality = 0;
         int generatedLanceCount = 0;
+        DateTime currentDate = Utilities.getDateTimeDay(campaign.getCalendar());
         ForceAlignment forceAlignment = ForceAlignment.getForceAlignment(forceTemplate.getForceAlignment());
         
         switch(forceAlignment) {
         case Allied:
-            factionCode = contract.getEmployerCode();
-            skill = contract.getAllySkill();
-            quality = contract.getAllyQuality();
-            break;
         case Player:
             factionCode = contract.getEmployerCode();
             skill = contract.getAllySkill();
@@ -196,13 +199,31 @@ public class AtBDynamicScenarioFactory {
             skill = scenario.getEffectiveOpforSkill();
             quality = scenario.getEffectiveOpforQuality();
             break;
+        case PlanetOwner:
+            // planet owner is the first of the factions that owns the current planet.
+            // if there's no such thing, then mercenaries.
+            List<String> planetFactions = contract.getPlanet().getFactions(currentDate);
+            if(planetFactions != null && !planetFactions.isEmpty()) {
+                factionCode = planetFactions.get(0);
+                Faction ownerFaction = Faction.getFaction(factionCode);
+                
+                if(ownerFaction.is(Tag.ABANDONED)) {
+                    factionCode = "MERC";
+                }
+            } else {
+                factionCode = "MERC";
+            }
+            
+            skill = scenario.getEffectiveOpforSkill();
+            quality = scenario.getEffectiveOpforQuality();
+            break;
         default:
             MekHQ.getLogger().log(AtBDynamicScenarioFactory.class, "generateForce", LogLevel.WARNING, 
                     String.format("Invalid force alignment %d", forceTemplate.getForceAlignment()));
         }
         
         String parentFactionType = AtBConfiguration.getParentFactionType(factionCode);
-        boolean isPlanetOwner = contract.getPlanet().getFactions(Utilities.getDateTimeDay(campaign.getCalendar())).contains(factionCode);
+        boolean isPlanetOwner = contract.getPlanet().getFactions(currentDate).contains(factionCode);
         boolean usingAerospace = forceTemplate.getAllowedUnitType() == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_AERO_MIX ||
                                     forceTemplate.getAllowedUnitType() == UnitType.CONV_FIGHTER ||
                                     forceTemplate.getAllowedUnitType() == UnitType.AERO;
@@ -246,6 +267,7 @@ public class AtBDynamicScenarioFactory {
                 currentLanceWeightString = campaign.getAtBConfig().selectBotLances(parentFactionType, weightClass);
             }
             
+            // if we are using the 'atb aero mix', let's decide now whether it's aero or conventional fighter
             int actualUnitType = forceTemplate.getAllowedUnitType();
             if(isPlanetOwner && actualUnitType == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_AERO_MIX) {
                 actualUnitType = Compute.d6() > 3 ? UnitType.AERO : UnitType.CONV_FIGHTER;
@@ -282,6 +304,10 @@ public class AtBDynamicScenarioFactory {
                         String.format("Unable to generate units from RAT: %d, type %d, max weight %d", 
                                 factionCode, forceTemplate.getAllowedUnitType(), weightClass));
                 continue;
+            }
+            
+            if(forceTemplate.getAllowAeroBombs()) {
+                populateAeroBombs(generatedLance, campaign);
             }
             
             // if force contributes to map size, increment the generated "lance" count
@@ -1442,6 +1468,33 @@ public class AtBDynamicScenarioFactory {
             int unitCount = useASF ? 2 : weightCountRoll;
             
             return unitCount;
+        }
+    }
+    
+    /**
+     * Helper function that makes some of the units in the given list of entities
+     * carry bombs.
+     * @param entity
+     * @param campaign
+     */
+    private static void populateAeroBombs(List<Entity> entityList, Campaign campaign) {
+        int maxBombers = Compute.randomInt(entityList.size()) + 1;
+        int numBombers = 0;
+        
+        for(Entity entity : entityList) {
+            if(numBombers >= maxBombers) {
+                break;
+            }
+            
+            if(entity.isBomber()) {
+                int[] bombChoices = new int[BombType.B_NUM];
+                int numBombs = (int) (entity.getWeight() / 5);
+                int bombIndex = validBotBombs[(Compute.randomInt(validBotBombs.length))];
+                bombChoices[bombIndex] = numBombs;
+                
+                ((megamek.common.IBomber) entity).setBombChoices(bombChoices);
+                numBombers++;
+            }
         }
     }
 }

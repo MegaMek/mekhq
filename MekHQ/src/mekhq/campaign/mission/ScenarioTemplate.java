@@ -60,7 +60,7 @@ public class ScenarioTemplate {
                 .collect(Collectors.toList());
     }
     
-    public List<ScenarioForceTemplate> getAllPlayerControlledHostiles() {
+    public List<ScenarioForceTemplate> getAllBotControlledHostiles() {
         return scenarioForces.values().stream().filter(forceTemplate -> 
             (forceTemplate.getForceAlignment() == ForceAlignment.Opposing.ordinal()) ||
             (forceTemplate.getForceAlignment() == ForceAlignment.Third.ordinal()))
