@@ -7,6 +7,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ResourceBundle;
 import java.util.UUID;
 import java.util.Vector;
 
@@ -31,6 +34,7 @@ import megamek.common.Mech;
 import megamek.common.MechSummaryCache;
 import megamek.common.Player;
 import megamek.common.loaders.BLKFile;
+import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.event.RepairStatusChangedEvent;
@@ -64,6 +68,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
     private CampaignGUI gui;
     private JTable unitTable;
     private UnitTableModel unitModel;
+    private ResourceBundle resourceMap = null;
     
     public final static String COMMAND_MOTHBALL = "MOTHBALL";
     public final static String COMMAND_ACTIVATE = "ACTIVATE";
@@ -74,6 +79,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
         this.gui = gui;
         this.unitTable = unitTable;
         this.unitModel = unitModel;
+        resourceMap = ResourceBundle.getBundle("mekhq.resources.UnitTableMouseAdapter", new EncodeControl()); //$NON-NLS-1$
     }
 
     public void actionPerformed(ActionEvent action) {
@@ -302,13 +308,23 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
             }
             MechSummaryCache.getInstance().loadMechData();
         } else if (command.equalsIgnoreCase("REMOVE")) {
+            List<Unit> toRemove = new ArrayList<>();
             for (Unit unit : units) {
                 if (!unit.isDeployed()) {
-                    if (0 == JOptionPane.showConfirmDialog(
-                            null,
-                            "Do you really want to remove "
-                                    + unit.getName() + "?", "Remove Unit?",
-                            JOptionPane.YES_NO_OPTION)) {
+                    toRemove.add(unit);
+                }
+            }
+            if (toRemove.size() > 0) {
+                String title = String.format(resourceMap.getString("deleteUnitsCount.text"), toRemove.size()); //$NON-NLS-1$
+                if (toRemove.size() == 1) {
+                    title = toRemove.get(0).getName();
+                }
+                if (0 == JOptionPane.showConfirmDialog(
+                        null,
+                        String.format(resourceMap.getString("confirmRemove.format"), title), //$NON-NLS-1$
+                        resourceMap.getString("removeQ.text"), //$NON-NLS-1$
+                        JOptionPane.YES_NO_OPTION)) {
+                    for (Unit unit : toRemove) {
                         gui.getCampaign().removeUnit(unit.getId());
                     }
                 }
