@@ -23,7 +23,10 @@ import megamek.common.util.EncodeControl;
 import mekhq.campaign.personnel.Person;
 
 import java.text.MessageFormat;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -35,8 +38,9 @@ public class LogEntryController {
 
     private static ResourceBundle logEntriesResourceMap = ResourceBundle.getBundle("mekhq.resources.LogEntries", new EncodeControl());
 
-    private static Pattern madePrisonerPattern = Pattern.compile("Made Prisoner (.*)");
-    private static Pattern madeBondsmanPattern = Pattern.compile("Made Bondsman (.*)");
+    private static final Pattern madePrisonerPattern = Pattern.compile("Made Prisoner (.*)");
+    private static final Pattern madeBondsmanPattern = Pattern.compile("Made Bondsman (.*)");
+    private static final Map<String, Pattern> patternCache = new HashMap<>();
 
     /**
      * Generates a string with the rank of the person
@@ -51,6 +55,16 @@ public class LogEntryController {
         }
 
         return rankEntry;
+    }
+
+    private static Pattern compilePattern(String key, Supplier<String> regex) {
+        Pattern pattern = patternCache.get(key);
+        if (null == pattern) {
+            pattern = Pattern.compile(regex.get());
+            patternCache.put(key, pattern);
+        }
+
+        return pattern;
     }
 
     /**
@@ -126,39 +140,40 @@ public class LogEntryController {
     }
 
     private static boolean foundSingleExpression(String logEntryProperty, String description) {
-        Pattern pattern = Pattern.compile(logEntriesResourceMap.getString(logEntryProperty));
+        Pattern pattern = compilePattern(logEntryProperty, 
+            () -> logEntriesResourceMap.getString(logEntryProperty));
         Matcher matcher = pattern.matcher(description);
 
         return matcher.matches();
     }
 
     private static boolean foundExpressionWithOneVariable(String logEntryProperty, String description) {
-        String message = logEntriesResourceMap.getString(logEntryProperty);
-        Pattern pattern = Pattern.compile(MessageFormat.format(message, "(.*)"));
+        Pattern pattern = compilePattern(logEntryProperty,
+            () -> MessageFormat.format(logEntriesResourceMap.getString(logEntryProperty), "(.*)"));
         Matcher matcher = pattern.matcher(description);
 
         return matcher.matches();
     }
 
     private static boolean foundBeginningOfExpressionEndingWithMultilineAndTab(String logEntryProperty, String description) {
-        String message = logEntriesResourceMap.getString(logEntryProperty);
-        Pattern pattern = Pattern.compile(message + "((.|\\n)*)");
+        Pattern pattern = compilePattern(logEntryProperty,
+            () -> logEntriesResourceMap.getString(logEntryProperty) + "((.|\\n)*)");
         Matcher matcher = pattern.matcher(description);
 
         return matcher.matches();
     }
 
     private static boolean foundExpressionWithTwoVariables(String logEntryProperty, String description) {
-        String message = logEntriesResourceMap.getString(logEntryProperty);
-        Pattern pattern = Pattern.compile(MessageFormat.format(message, "(.*)", "(.*)"));
+        Pattern pattern = compilePattern(logEntryProperty,
+            () -> MessageFormat.format(logEntriesResourceMap.getString(logEntryProperty), "(.*)", "(.*)"));
         Matcher matcher = pattern.matcher(description);
 
         return matcher.matches();
     }
 
     private static boolean foundExpressionWithThreeVariables(String logEntryProperty, String description) {
-        String message = logEntriesResourceMap.getString(logEntryProperty);
-        Pattern pattern = Pattern.compile(MessageFormat.format(message, "(.*)", "(.*)", "(.*)"));
+        Pattern pattern = compilePattern(logEntryProperty,
+            () -> MessageFormat.format(logEntriesResourceMap.getString(logEntryProperty), "(.*)", "(.*)", "(.*)"));
         Matcher matcher = pattern.matcher(description);
 
         return matcher.matches();
