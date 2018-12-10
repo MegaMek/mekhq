@@ -55,9 +55,9 @@ public class LogEntryController {
      * @param description of the log entry
      * @return type of the log entry.
      */
-    public static LogEntryType determineTypeFromLogDescription(String description){
+    public static LogEntryType determineTypeFromLogDescription(String description) {
 
-        if(foundExpressionWithOneVariable("madeBondsmanBy.text", description) ||
+        if (foundExpressionWithOneVariable("madeBondsmanBy.text", description) ||
                 foundExpressionWithOneVariable("madePrisonerBy.text", description) ||
                 foundExpressionWithOneVariable("joined.text", description) ||
                 foundSingleExpression("freed.text", description) ||
@@ -76,25 +76,24 @@ public class LogEntryController {
                 foundExpressionWithOneVariable("retiredDueToWounds.text", description) ||
                 foundExpressionWithOneVariable("reassignedTo.text", description) ||
                 foundExpressionWithOneVariable("assignedTo.text", description) ||
-                foundExpressionWithOneVariable("removedFrom.text", description)
-                )
+                foundExpressionWithOneVariable("removedFrom.text", description)) {
             return LogEntryType.SERVICE;
+        }
 
-        if(foundExpressionWithOneVariable("spouseKia.text",description) ||
+        if (foundExpressionWithOneVariable("spouseKia.text", description) ||
                 foundExpressionWithOneVariable("divorcedFrom.text", description) ||
                 foundExpressionWithOneVariable("marries.text", description) ||
                 foundExpressionWithOneVariable("gained.text", description) ||
-                foundSingleExpression("gainedEdge.text", description)
-                )
+                foundSingleExpression("gainedEdge.text", description)) {
             return LogEntryType.PERSONAL;
+        }
 
-        if(foundExpressionWithOneVariable("removedAward.text", description) ||
-                foundExpressionWithTwoVariables("awarded.text", description)
-                )
+        if (foundExpressionWithOneVariable("removedAward.text", description) ||
+                foundExpressionWithTwoVariables("awarded.text", description)) {
             return LogEntryType.AWARD;
+        }
 
-
-        if(foundExpressionWithTwoVariables("severedSpine.text", description) ||
+        if (foundExpressionWithTwoVariables("severedSpine.text", description) ||
                 foundExpressionWithOneVariable("brokenRibPunctureDead.text", description) ||
                 foundExpressionWithOneVariable("brokenRibPuncture.text", description) ||
                 foundSingleExpression("developedEncephalopathy.text", description) ||
@@ -116,21 +115,21 @@ public class LogEntryController {
                 foundSingleExpression("dismissedFromInfirmary.text", description) ||
                 foundExpressionWithOneVariable("deliveredBaby.text", description) ||
                 foundSingleExpression("hasConceived.text", description) ||
-                foundExpressionWithOneVariable("hasConceived.text", description)
-                )
+                foundExpressionWithOneVariable("hasConceived.text", description)) {
             return LogEntryType.MEDICAL;
+        }
 
         return LogEntryType.CUSTOM;
     }
 
-    private static boolean foundSingleExpression(String logEntryProperty, String description){
+    private static boolean foundSingleExpression(String logEntryProperty, String description) {
         Pattern pattern = Pattern.compile(logEntriesResourceMap.getString(logEntryProperty));
         Matcher matcher = pattern.matcher(description);
 
         return matcher.matches();
     }
 
-    private static boolean foundExpressionWithOneVariable(String logEntryProperty, String description){
+    private static boolean foundExpressionWithOneVariable(String logEntryProperty, String description) {
         String message = logEntriesResourceMap.getString(logEntryProperty);
         Pattern pattern = Pattern.compile(MessageFormat.format(message, "(.*)"));
         Matcher matcher = pattern.matcher(description);
@@ -138,7 +137,7 @@ public class LogEntryController {
         return matcher.matches();
     }
 
-    private static boolean foundBeginningOfExpressionEndingWithMultilineAndTab(String logEntryProperty, String description){
+    private static boolean foundBeginningOfExpressionEndingWithMultilineAndTab(String logEntryProperty, String description) {
         String message = logEntriesResourceMap.getString(logEntryProperty);
         Pattern pattern = Pattern.compile(message + "((.|\\n)*)");
         Matcher matcher = pattern.matcher(description);
@@ -146,7 +145,7 @@ public class LogEntryController {
         return matcher.matches();
     }
 
-    private static boolean foundExpressionWithTwoVariables(String logEntryProperty, String description){
+    private static boolean foundExpressionWithTwoVariables(String logEntryProperty, String description) {
         String message = logEntriesResourceMap.getString(logEntryProperty);
         Pattern pattern = Pattern.compile(MessageFormat.format(message, "(.*)", "(.*)"));
         Matcher matcher = pattern.matcher(description);
@@ -154,7 +153,7 @@ public class LogEntryController {
         return matcher.matches();
     }
 
-    private static boolean foundExpressionWithThreeVariables(String logEntryProperty, String description){
+    private static boolean foundExpressionWithThreeVariables(String logEntryProperty, String description) {
         String message = logEntriesResourceMap.getString(logEntryProperty);
         Pattern pattern = Pattern.compile(MessageFormat.format(message, "(.*)", "(.*)", "(.*)"));
         Matcher matcher = pattern.matcher(description);
@@ -168,23 +167,27 @@ public class LogEntryController {
      * @param description to be changes
      * @return string with the new description.
      */
-    public static String updateOldDescription(String description){
+    public static String updateOldDescription(String description) {
         String newDescription = "";
 
         newDescription = updatePrisonerDescription(description);
-        if(!newDescription.isEmpty()) return newDescription;
+        if (!newDescription.isEmpty()) {
+            return newDescription;
+        }
 
         newDescription = updateBondsmanDescription(description);
-        if(!newDescription.isEmpty()) return newDescription;
+        if (!newDescription.isEmpty()) {
+            return newDescription;
+        }
 
         return "";
     }
 
-    private static String updatePrisonerDescription(String description){
+    private static String updatePrisonerDescription(String description) {
         Pattern pattern = Pattern.compile("Made Prisoner (.*)");
         Matcher matcher = pattern.matcher(description);
 
-        if(matcher.matches()){
+        if (matcher.matches()) {
             return MessageFormat.format(logEntriesResourceMap.getString("madePrisonerBy.text"), matcher.group(1));
         }
 
@@ -199,7 +202,7 @@ public class LogEntryController {
         Pattern pattern = Pattern.compile("Made Bondsman (.*)");
         Matcher matcher = pattern.matcher(description);
 
-        if(matcher.matches()){
+        if (matcher.matches()) {
             return MessageFormat.format(logEntriesResourceMap.getString("madeBondsmanBy.text"), matcher.group(1));
         }
 
