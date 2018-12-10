@@ -35,6 +35,9 @@ public class LogEntryController {
 
     private static ResourceBundle logEntriesResourceMap = ResourceBundle.getBundle("mekhq.resources.LogEntries", new EncodeControl());
 
+    private static Pattern madePrisonerPattern = Pattern.compile("Made Prisoner (.*)");
+    private static Pattern madeBondsmanPattern = Pattern.compile("Made Bondsman (.*)");
+
     /**
      * Generates a string with the rank of the person
      * @param person whose rank we want to generate the string
@@ -184,8 +187,8 @@ public class LogEntryController {
     }
 
     private static String updatePrisonerDescription(String description) {
-        Pattern pattern = Pattern.compile("Made Prisoner (.*)");
-        Matcher matcher = pattern.matcher(description);
+
+        Matcher matcher = madePrisonerPattern.matcher(description);
 
         if (matcher.matches()) {
             return MessageFormat.format(logEntriesResourceMap.getString("madePrisonerBy.text"), matcher.group(1));
@@ -198,9 +201,9 @@ public class LogEntryController {
         return "";
     }
 
-    private static String updateBondsmanDescription(String description){
-        Pattern pattern = Pattern.compile("Made Bondsman (.*)");
-        Matcher matcher = pattern.matcher(description);
+    private static String updateBondsmanDescription(String description) {
+
+        Matcher matcher = madeBondsmanPattern.matcher(description);
 
         if (matcher.matches()) {
             return MessageFormat.format(logEntriesResourceMap.getString("madeBondsmanBy.text"), matcher.group(1));
