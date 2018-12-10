@@ -188,11 +188,8 @@ public class LogEntryController {
             return MessageFormat.format(logEntriesResourceMap.getString("madePrisonerBy.text"), matcher.group(1));
         }
 
-        pattern = Pattern.compile("Made Prisoner");
-        matcher = pattern.matcher(description);
-
-        if(matcher.matches()){
-            return MessageFormat.format(logEntriesResourceMap.getString("madePrisoner.text"), matcher.group(1));
+        if (description.contains("Made Prisoner")) {
+            return logEntriesResourceMap.getString("madePrisoner.text");
         }
 
         return "";
@@ -206,11 +203,8 @@ public class LogEntryController {
             return MessageFormat.format(logEntriesResourceMap.getString("madeBondsmanBy.text"), matcher.group(1));
         }
 
-        pattern = Pattern.compile("Made Bondsman");
-        matcher = pattern.matcher(description);
-
-        if(matcher.matches()){
-            return MessageFormat.format(logEntriesResourceMap.getString("madeBondsman.text"), matcher.group(1));
+        if (description.contains("Made Bondsman")) {
+            return logEntriesResourceMap.getString("madeBondsman.text");
         }
 
         return "";
