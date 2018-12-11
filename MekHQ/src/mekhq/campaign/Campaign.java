@@ -1405,26 +1405,28 @@ public class Campaign implements Serializable, ITechManager {
                 && (null == p.getUnit() || null == p.getUnitId())) {
             return;
         }
-        Part spare = checkForExistingSparePart(p);
-        if (null == p.getUnit() && null != spare) {
-            if (p instanceof Armor) {
-                if (spare instanceof Armor) {
-                    ((Armor) spare).setAmount(((Armor) spare).getAmount()
-                            + ((Armor) p).getAmount());
+        if (null == p.getUnit()) {
+            Part spare = checkForExistingSparePart(p);
+            if (null != spare) {
+                if (p instanceof Armor) {
+                    if (spare instanceof Armor) {
+                        ((Armor) spare).setAmount(((Armor) spare).getAmount()
+                                + ((Armor) p).getAmount());
+                        MekHQ.triggerEvent(new PartChangedEvent(spare));
+                        return;
+                    }
+                } else if (p instanceof AmmoStorage) {
+                    if (spare instanceof AmmoStorage) {
+                        ((AmmoStorage) spare).changeShots(((AmmoStorage) p)
+                                .getShots());
+                        MekHQ.triggerEvent(new PartChangedEvent(spare));
+                        return;
+                    }
+                } else {
+                    spare.incrementQuantity();
                     MekHQ.triggerEvent(new PartChangedEvent(spare));
                     return;
                 }
-            } else if (p instanceof AmmoStorage) {
-                if (spare instanceof AmmoStorage) {
-                    ((AmmoStorage) spare).changeShots(((AmmoStorage) p)
-                            .getShots());
-                    MekHQ.triggerEvent(new PartChangedEvent(spare));
-                    return;
-                }
-            } else {
-                spare.incrementQuantity();
-                MekHQ.triggerEvent(new PartChangedEvent(spare));
-                return;
             }
         }
         parts.put(Integer.valueOf(id), p);
@@ -1497,9 +1499,9 @@ public class Campaign implements Serializable, ITechManager {
         }
         // go ahead and check for existing parts because some version weren't
         // properly collecting parts
-        if (!(p instanceof MissingPart)) {
+        if (!(p instanceof MissingPart) && null == p.getUnitId()) {
             Part spare = checkForExistingSparePart(p);
-            if (null == p.getUnitId() && null != spare) {
+            if (null != spare) {
                 if (p instanceof Armor) {
                     if (spare instanceof Armor) {
                         ((Armor) spare).setAmount(((Armor) spare).getAmount()
@@ -6247,8 +6249,8 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public Part checkForExistingSparePart(Part part) {
-        for (Part spare : getSpareParts()) {
-            if (spare.getId() == part.getId()) {
+        for (Part spare : parts.values()) {
+            if (!spare.isSpare() || spare.getId() == part.getId()) {
                 continue;
             }
             if (part.isSamePartTypeAndStatus(spare)) {
