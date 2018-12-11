@@ -238,6 +238,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     boolean commander;
     boolean isClanTech;
     int edgeUsedThisRound;
+    int currentEdge;
 
     //phenotype and background
     private int phenotype;
@@ -2789,6 +2790,30 @@ public class Person implements Serializable, MekHqXmlSerializable {
         }
     }
     
+    /**
+     * Resets support personnel edge points to the purchased level. Used for weekly refresh.
+     * 
+     */
+    public void resetCurrentEdge() {
+        setCurrentEdge(getEdge());
+    }
+    
+    /**
+     * Sets support personnel edge points to the value 'e'. Used for weekly refresh.
+     * @param e - integer used to track this person's edge points available for the current week
+     */
+    public void setCurrentEdge(int e) {
+        currentEdge = e;
+    }
+    
+    /**
+     *  Returns this person's currently available edge points. Used for weekly refresh.
+     * 
+     */
+    public int getCurrentEdge() {
+        return currentEdge;
+    }
+    
     public void setEdgeUsed(int e) {
         edgeUsedThisRound = e;
     }
@@ -2797,7 +2822,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return edgeUsedThisRound;
     }
 
-    /*
+    /**
      * This will set a specific edge trigger, regardless of the current status
      */
     public void setEdgeTrigger(String name, boolean status) {
