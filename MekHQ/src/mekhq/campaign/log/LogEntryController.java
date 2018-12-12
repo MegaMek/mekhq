@@ -47,7 +47,7 @@ public class LogEntryController {
      * @param person whose rank we want to generate the string
      * @return string with the rank
      */
-    public static String generateRankEntryString(Person person){
+    public static String generateRankEntryString(Person person) {
         String rankEntry = "";
         if (person.getRankNumeric() > 0) {
             String message = logEntriesResourceMap.getString("asA.text");
@@ -186,9 +186,7 @@ public class LogEntryController {
      * @return string with the new description.
      */
     public static String updateOldDescription(String description) {
-        String newDescription = "";
-
-        newDescription = updatePrisonerDescription(description);
+        String newDescription = updatePrisonerDescription(description);
         if (!newDescription.isEmpty()) {
             return newDescription;
         }
