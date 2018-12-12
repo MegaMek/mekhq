@@ -2877,6 +2877,13 @@ public class Campaign implements Serializable, ITechManager {
                     u.resetPilotAndEntity();
                 }
             }
+            
+            // Reset edge points to the purchased value each week. This should only
+            // apply for support personnel - combat troops reset with each new mm game
+            if ((p.isAdmin() || p.isDoctor() || p.isEngineer() || p.isTech())
+                    && calendar.get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY) {
+                p.resetCurrentEdge();
+            }
 
             if (getCampaignOptions().getIdleXP() > 0 && calendar.get(Calendar.DAY_OF_MONTH) == 1 && p.isActive()
                     && !p.isPrisoner()) { // Prisoners no
@@ -2892,7 +2899,6 @@ public class Campaign implements Serializable, ITechManager {
                     p.setIdleMonths(0);
                 }
             }
-
         }
 
         for (Person baby : babies) {
