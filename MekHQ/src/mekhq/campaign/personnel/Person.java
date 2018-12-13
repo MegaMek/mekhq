@@ -243,6 +243,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     private int phenotype;
     private boolean clan;
     private String bloodname;
+    private Faction originFaction;
 
     //assignments
     private UUID unitId;
@@ -380,7 +381,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
         techUnitIds = new ArrayList<UUID>();
         salary = -1;
         phenotype = PHENOTYPE_NONE;
-        clan = Faction.getFaction(factionCode).isClan();
+        originFaction = Faction.getFaction(factionCode);
+        clan = originFaction.isClan();
         bloodname = "";
         primaryDesignator = DESIG_NONE;
         secondaryDesignator = DESIG_NONE;
@@ -419,6 +421,14 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     public void setBloodname(String bn) {
         bloodname = bn;
+    }
+
+    public Faction getOriginFaction() {
+        return originFaction;
+    }
+
+    public void setOriginFaction(Faction f) {
+        originFaction = f;
     }
 
     public boolean isCommander() {
@@ -1283,6 +1293,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     + MekHqXmlUtil.escape(Boolean.toString(dependent))
                     + "</dependent>");
         pw1.println(MekHqXmlUtil.indentStr(indent + 1)
+                    + "<faction>"
+                    + originFaction.getShortName()
+                    + "</faction>");
+        pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                     + "<clan>"
                     + clan
                     + "</clan>");
@@ -1546,6 +1560,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     retVal.commander = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("dependent")) {
                     retVal.dependent = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("faction")) {
+                    retVal.originFaction = Faction.getFaction(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("isClanTech")
                            || wn2.getNodeName().equalsIgnoreCase("clan")) {
                     retVal.clan = Boolean.parseBoolean(wn2.getTextContent().trim());
