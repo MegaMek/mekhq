@@ -1533,7 +1533,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
             String advantages = null;
             String edge = null;
-            String edgeAvailable = null;
             String implants = null;
 
             //backwards compatability
@@ -1672,7 +1671,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 } else if (wn2.getNodeName().equalsIgnoreCase("edge")) {
                     edge = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("edgeAvailable")) {
-                    edgeAvailable = wn2.getTextContent();
+                    retVal.currentEdge = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("implants")) {
                     implants = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("toughness")) {
@@ -1849,22 +1848,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     } catch (Exception e) {
                         MekHQ.getLogger().log(Person.class, METHOD_NAME, LogLevel.ERROR,
                                 "Error restoring edge: " + adv); //$NON-NLS-1$
-                    }
-                }
-            }
-            //Track edge usage for support personnel
-            if ((null != edgeAvailable) && (edgeAvailable.trim().length() > 0)) {
-                StringTokenizer st = new StringTokenizer(edgeAvailable, "::");
-                while (st.hasMoreTokens()) {
-                    String adv = st.nextToken();
-                    String advName = Crew.parseAdvantageName(adv);
-                    Object value = Crew.parseAdvantageValue(adv);
-
-                    try {
-                        retVal.getOptions().getOption(advName).setValue(value);
-                    } catch (Exception e) {
-                        MekHQ.getLogger().log(Person.class, METHOD_NAME, LogLevel.ERROR,
-                                "Error restoring available edge: " + adv); //$NON-NLS-1$
                     }
                 }
             }
