@@ -368,7 +368,12 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         choiceFaction.setSelectedIndex(factionsModel.getIndexOf(person.getOriginFaction()));
         choiceFaction.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                backgroundChanged();
+                // Update the clan check box based on the new selected faction
+                Faction selectedFaction = (Faction)choiceFaction.getSelectedItem();
+                chkClan.setSelected(selectedFaction.is(Tag.CLAN));
+
+                // We don't have to call backgroundChanged because it is already
+                // called when we update the chkClan checkbox.
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
