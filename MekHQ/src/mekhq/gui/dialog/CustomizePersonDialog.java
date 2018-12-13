@@ -322,17 +322,26 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
 
         DefaultComboBoxModel<Faction> factionsModel = new DefaultComboBoxModel<Faction>();
         for (Faction faction : Faction.getFactions()) {
-            if (faction.is(Tag.HIDDEN)) {
-                continue;
-            }
-            int endYear = person.getRecruitment() != null
-                ? Math.max(person.getRecruitment().get(Calendar.YEAR), person.getCampaign().getGameYear())
-                : person.getCampaign().getGameYear();
-            if (faction.validBetween(person.getBirthday().get(Calendar.YEAR), endYear))
-            {
+            // Always include the person's faction
+            if (faction == person.getOriginFaction()) {
                 factionsModel.addElement(faction);
+            } else {
+                if (faction.is(Tag.HIDDEN) || faction.is(Tag.SPECIAL)) {
+                    continue;
+                }
+
+                // Allow factions between the person's birthday
+                // and when they were recruited, or now if we're
+                // not tracking recruitment.
+                int endYear = person.getRecruitment() != null
+                    ? Math.max(person.getRecruitment().get(Calendar.YEAR), person.getCampaign().getGameYear())
+                    : person.getCampaign().getGameYear();
+                if (faction.validBetween(person.getBirthday().get(Calendar.YEAR), endYear)) {
+                    factionsModel.addElement(faction);
+                }
             }
         }
+
         choiceFaction = new JComboBox<Faction>(factionsModel);
         choiceFaction.setRenderer(new DefaultListCellRenderer() {
             @Override

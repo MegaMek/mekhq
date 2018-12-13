@@ -489,6 +489,8 @@ public class Faction {
         /** Faction is campaign-specific, generated on the fly */
         GENERATED,
         /** Faction is hidden from view */
-        HIDDEN
+        HIDDEN,
+        /** Faction code is not intended to be for players */
+        SPECIAL
     }
 }
