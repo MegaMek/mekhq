@@ -237,7 +237,9 @@ public class Person implements Serializable, MekHqXmlSerializable {
     boolean dependent;
     boolean commander;
     boolean isClanTech;
+    // Supports edge usage by a ship's engineer composite crewman
     int edgeUsedThisRound;
+    // To track how many edge points support personnel have left until next refresh
     int currentEdge;
 
     //phenotype and background
@@ -1444,6 +1446,13 @@ public class Person implements Serializable, MekHqXmlSerializable {
                         + "<edge>"
                         + String.valueOf(getOptionList("::", PilotOptions.EDGE_ADVANTAGES))
                         + "</edge>");
+            // For support personnel, write an available edge value
+            if (isSupport() || isEngineer()) {
+                pw1.println(MekHqXmlUtil.indentStr(indent + 1)
+                        + "<edgeAvailable>"
+                        + getCurrentEdge()
+                        + "</edgeAvailable>");
+            }
         }
         if (countOptions(PilotOptions.MD_ADVANTAGES) > 0) {
             pw1.println(MekHqXmlUtil.indentStr(indent + 1)
@@ -1524,6 +1533,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
             String advantages = null;
             String edge = null;
+            String edgeAvailable = null;
             String implants = null;
 
             //backwards compatability
@@ -1661,6 +1671,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     advantages = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("edge")) {
                     edge = wn2.getTextContent();
+                } else if (wn2.getNodeName().equalsIgnoreCase("edgeAvailable")) {
+                    edgeAvailable = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("implants")) {
                     implants = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("toughness")) {
@@ -1837,6 +1849,22 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     } catch (Exception e) {
                         MekHQ.getLogger().log(Person.class, METHOD_NAME, LogLevel.ERROR,
                                 "Error restoring edge: " + adv); //$NON-NLS-1$
+                    }
+                }
+            }
+            //Track edge usage for support personnel
+            if ((null != edgeAvailable) && (edgeAvailable.trim().length() > 0)) {
+                StringTokenizer st = new StringTokenizer(edgeAvailable, "::");
+                while (st.hasMoreTokens()) {
+                    String adv = st.nextToken();
+                    String advName = Crew.parseAdvantageName(adv);
+                    Object value = Crew.parseAdvantageValue(adv);
+
+                    try {
+                        retVal.getOptions().getOption(advName).setValue(value);
+                    } catch (Exception e) {
+                        MekHQ.getLogger().log(Person.class, METHOD_NAME, LogLevel.ERROR,
+                                "Error restoring available edge: " + adv); //$NON-NLS-1$
                     }
                 }
             }
