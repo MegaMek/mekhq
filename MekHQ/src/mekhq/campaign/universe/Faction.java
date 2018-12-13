@@ -229,6 +229,10 @@ public class Faction {
         return validIn(time.getYear());
     }
 
+    public boolean validBetween(int startYear, int endYear) {
+        return (startYear <= end) && (endYear >= start);
+    }
+
     public Integer getId() {
         return id;
     }
