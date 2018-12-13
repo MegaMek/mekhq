@@ -88,6 +88,8 @@ public class PersonViewPanel extends JPanel {
     private JLabel lblTough2;
     private JLabel lblEdge1;
     private JLabel lblEdge2;
+    private JLabel lblEdgeAvail1;
+    private JLabel lblEdgeAvail2;
     private JLabel lblAbility1;
     private JLabel lblAbility2;
     private JLabel lblImplants1;
@@ -725,6 +727,30 @@ public class PersonViewPanel extends JPanel {
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlStats.add(lblEdge2, gridBagConstraints);
+            
+            if (person.isAdmin() || person.isDoctor() || person.isTech()) {
+                //Add the Edge Available field for support personnel only
+                secondy++;
+                lblEdgeAvail1.setName("lblEdgeAvail1"); // NOI18N //$NON-NLS-1$
+                lblEdgeAvail1.setText(resourceMap.getString("lblEdgeAvail1.text")); //$NON-NLS-1$
+                gridBagConstraints = new GridBagConstraints();
+                gridBagConstraints.gridx = 2;
+                gridBagConstraints.gridy = secondy;
+                gridBagConstraints.fill = GridBagConstraints.NONE;
+                gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+                pnlStats.add(lblEdgeAvail1, gridBagConstraints);
+
+                lblEdgeAvail2.setName("lblEdgeAvail2"); // NOI18N //$NON-NLS-1$
+                lblEdgeAvail2.setText(Integer.toString(person.getCurrentEdge()));
+                gridBagConstraints = new GridBagConstraints();
+                gridBagConstraints.gridx = 3;
+                gridBagConstraints.gridy = secondy;
+                gridBagConstraints.weightx = 0.5;
+                gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+                gridBagConstraints.fill = GridBagConstraints.NONE;
+                gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+                pnlStats.add(lblEdgeAvail2, gridBagConstraints);
+            }
         }
 
         //special abilities and implants need to be three columns wide to handle their large width
