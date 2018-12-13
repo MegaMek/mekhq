@@ -21,7 +21,9 @@ import java.util.Calendar;
 import java.util.Enumeration;
 import java.util.GregorianCalendar;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
@@ -54,6 +56,7 @@ import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Faction.Tag;
+import mekhq.gui.sorter.FactionSorter;
 
 /**
  *
@@ -321,7 +324,10 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         panDemog.add(new JLabel("Origin Faction:"), gridBagConstraints);
 
         DefaultComboBoxModel<Faction> factionsModel = new DefaultComboBoxModel<Faction>();
-        for (Faction faction : Faction.getFactions()) {
+        List<Faction> orderedFactions = Faction.getFactions().stream()
+            .sorted(new FactionSorter(person.getCampaign()))
+            .collect(Collectors.toList());
+        for (Faction faction : orderedFactions) {
             // Always include the person's faction
             if (faction == person.getOriginFaction()) {
                 factionsModel.addElement(faction);
