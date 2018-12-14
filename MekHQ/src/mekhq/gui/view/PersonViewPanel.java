@@ -469,6 +469,8 @@ public class PersonViewPanel extends JPanel {
         lblTough2 = new JLabel();
         lblEdge1 = new JLabel();
         lblEdge2 = new JLabel();
+        lblEdgeAvail1 = new JLabel();
+        lblEdgeAvail2 = new JLabel();
         lblAbility1 = new JLabel();
         lblAbility2 = new JLabel();
         lblImplants1 = new JLabel();
