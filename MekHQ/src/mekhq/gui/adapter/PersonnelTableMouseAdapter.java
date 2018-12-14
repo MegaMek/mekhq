@@ -915,6 +915,8 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 for (Person person : people) {
                     selectedPerson.setXp(selectedPerson.getXp() - cost);
                     person.setEdge(person.getEdge() + 1);
+                    //Make the new edge point available to support personnel, but don't reset until the week ends
+                    person.setCurrentEdge(person.getCurrentEdge() + 1);
                     gui.getCampaign().personUpdated(person);
                     MekHQ.triggerEvent(new PersonChangedEvent(person));
                 }
@@ -932,6 +934,8 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 int i = pvcd.getValue();
                 for (Person person : people) {
                     person.setEdge(i);
+                    //Reset currentEdge for support people
+                    person.resetCurrentEdge();
                     gui.getCampaign().personUpdated(person);
                     MekHQ.triggerEvent(new PersonChangedEvent(person));
                 }
