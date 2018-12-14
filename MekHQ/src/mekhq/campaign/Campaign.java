@@ -1108,7 +1108,7 @@ public class Campaign implements Serializable, ITechManager {
      *
      * @param en An <code>Entity</code> object that the new unit will be wrapped around
      */
-    public void addUnit(Entity en, boolean allowNewPilots, int days) {
+    public Unit addUnit(Entity en, boolean allowNewPilots, int days) {
         // reset the game object
         en.setOwner(player);
         en.setGame(game);
@@ -1147,6 +1147,8 @@ public class Campaign implements Serializable, ITechManager {
         checkDuplicateNamesDuringAdd(en);
         addReport(unit.getHyperlinkedName() + " has been added to the unit roster.");
         MekHQ.triggerEvent(new UnitNewEvent(unit));
+
+        return unit;
     }
 
     public Collection<Unit> getUnits() {
