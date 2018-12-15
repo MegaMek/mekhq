@@ -56,7 +56,6 @@ import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Faction.Tag;
-import mekhq.gui.sorter.FactionSorter;
 
 /**
  *
@@ -323,31 +322,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
         panDemog.add(new JLabel("Origin Faction:"), gridBagConstraints);
 
-        DefaultComboBoxModel<Faction> factionsModel = new DefaultComboBoxModel<Faction>();
-        List<Faction> orderedFactions = Faction.getFactions().stream()
-            .sorted(new FactionSorter(person.getCampaign()))
-            .collect(Collectors.toList());
-        for (Faction faction : orderedFactions) {
-            // Always include the person's faction
-            if (faction == person.getOriginFaction()) {
-                factionsModel.addElement(faction);
-            } else {
-                if (faction.is(Tag.HIDDEN) || faction.is(Tag.SPECIAL)) {
-                    continue;
-                }
-
-                // Allow factions between the person's birthday
-                // and when they were recruited, or now if we're
-                // not tracking recruitment.
-                int endYear = person.getRecruitment() != null
-                    ? Math.max(person.getRecruitment().get(Calendar.YEAR), person.getCampaign().getGameYear())
-                    : person.getCampaign().getGameYear();
-                if (faction.validBetween(person.getBirthday().get(Calendar.YEAR), endYear)) {
-                    factionsModel.addElement(faction);
-                }
-            }
-        }
-
+        DefaultComboBoxModel<Faction> factionsModel = getFactionsComboBoxModel();
         choiceFaction = new JComboBox<Faction>(factionsModel);
         choiceFaction.setRenderer(new DefaultListCellRenderer() {
             @Override
@@ -359,7 +334,10 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
                 super.getListCellRendererComponent(list, value, index, isSelected,
                                                    cellHasFocus);
                 if (value instanceof Faction) {
-                    setText(((Faction) value).getFullName(person.getCampaign().getGameYear()));
+                    Faction faction = (Faction)value;
+                    setText(String.format("%s [%s]", 
+                        faction.getFullName(person.getCampaign().getGameYear()), 
+                        faction.getShortName()));
                 }
 
                 return this;
@@ -725,12 +703,43 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
-        setVisible(false);
-    }//GEN-LAST:event_btnCloseActionPerformed
+	private DefaultComboBoxModel<Faction> getFactionsComboBoxModel() {
+        int year = person.getCampaign().getGameYear();
+        List<Faction> orderedFactions = Faction.getFactions().stream()
+            .sorted((a, b) -> a.getFullName(year).compareToIgnoreCase(b.getFullName(year)))
+            .collect(Collectors.toList());
 
-    private void btnOkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOkActionPerformed
-        
+        DefaultComboBoxModel<Faction> factionsModel = new DefaultComboBoxModel<Faction>();
+        for (Faction faction : orderedFactions) {
+            // Always include the person's faction
+            if (faction == person.getOriginFaction()) {
+                factionsModel.addElement(faction);
+            } else {
+                if (faction.is(Tag.HIDDEN) || faction.is(Tag.SPECIAL)) {
+                    continue;
+                }
+
+                // Allow factions between the person's birthday
+                // and when they were recruited, or now if we're
+                // not tracking recruitment.
+                int endYear = person.getRecruitment() != null
+                    ? Math.min(person.getRecruitment().get(Calendar.YEAR), year)
+                    : year;
+                if (faction.validBetween(person.getBirthday().get(Calendar.YEAR), endYear)) {
+                    factionsModel.addElement(faction);
+                }
+            }
+        }
+
+        return factionsModel;
+    }
+
+    private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnCloseActionPerformed
+        setVisible(false);
+    }// GEN-LAST:event_btnCloseActionPerformed
+
+    private void btnOkActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnOkActionPerformed
+
         person.setName(textName.getText());
         person.setCallsign(textNickname.getText());
         person.setBloodname(textBloodname.getText());
@@ -738,13 +747,13 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         person.setGender(choiceGender.getSelectedIndex());
         person.setBirthday(birthdate);
         person.setRecruitment(recruitment);
-        person.setOriginFaction((Faction)choiceFaction.getSelectedItem());
+        person.setOriginFaction((Faction) choiceFaction.getSelectedItem());
         person.setPhenotype(choicePheno.getSelectedIndex());
         person.setClanner(chkClan.isSelected());
         try {
-        	person.setToughness(Integer.parseInt(textToughness.getText()));
-        } catch(NumberFormatException e) {
-        	//dont do anything
+            person.setToughness(Integer.parseInt(textToughness.getText()));
+        } catch (NumberFormatException e) {
+            // dont do anything
         }
         if (null == choiceOriginalUnit.getSelectedItem()) {
         	person.setOriginalUnitWeight(choiceUnitWeight.getSelectedIndex());
