@@ -113,6 +113,9 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
         super(owner, "Date Chooser", true);
         date = d;
         workingDate = date;
+        
+        // Ensure the dialog isn't hidden
+        setAlwaysOnTop(true);
 
         Container contentPane = getContentPane();
         contentPane.setLayout(new BorderLayout());
