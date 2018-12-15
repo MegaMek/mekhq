@@ -1,6 +1,22 @@
 /*
- * GM Tools Dialog
- * Added 2013/09/27
+ * GMToolsDialog.java
+ *
+ * Copyright (c) 2013-2018 MegaMek Team.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package mekhq.gui.dialog;
@@ -12,9 +28,7 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.function.Predicate;
 
@@ -63,25 +77,38 @@ public class GMToolsDialog extends JDialog implements ActionListener {
     private CampaignGUI gui;
     private Person person;
 
+    /** The last unit rolled, used when clicking 'Add Random Unit'
+     * after Roll for RAT is clicked.
+     */
     private MechSummary lastRolledUnit;
+
+    private static final String[] QUALITY_NAMES = {"F", "D", "C", "B", "A", "A*"};
+    private final String[] WEIGHT_NAMES = {"Light", "Medium", "Heavy", "Assault"};
 
     private static final String GM_TOOL_DICE = "gmToolDice";
     private static final String RAT_ROLLER_TOOL = "ratRollerTool";
     private static final String RAT_ADDER_TOOL = "ratAdderTool";
 
+    /**
+     * Creates a generic GM Tools dialog, with a dice roller
+     * and a RAT roller that can add units to the campaign.
+     */
     public GMToolsDialog(Frame parent, CampaignGUI gui) {
         super(parent, false);
         this.gui = gui;
         setName("formGMTools"); // NOI18N
         setTitle("GM Tools");
         getContentPane().setLayout(new java.awt.GridBagLayout());
-        //this.setPreferredSize(new Dimension(600,300));
-        //this.setMinimumSize(new Dimension(600,300));
         initComponents();
         pack();
         setLocationRelativeTo(parent);
     }
 
+    /**
+     * Creates a GM Tools dialog specific to a given person. The
+     * dice roller and RAT roller are both available, however, the
+     * RAT roller adds the unit directly to the person.
+     */
     public GMToolsDialog(Frame parent, CampaignGUI gui, Person p) {
         super(parent, false);
         this.gui = gui;
@@ -89,8 +116,6 @@ public class GMToolsDialog extends JDialog implements ActionListener {
         setName("formGMTools"); // NOI18N
         setTitle("GM Tools - " + p.getFullName());
         getContentPane().setLayout(new java.awt.GridBagLayout());
-        //this.setPreferredSize(new Dimension(600,300));
-        //this.setMinimumSize(new Dimension(600,300));
         initComponents();
         pack();
         setLocationRelativeTo(parent);
@@ -120,61 +145,66 @@ public class GMToolsDialog extends JDialog implements ActionListener {
         return dicePanel;
     }
     
+    /**
+     * Gets a list of factions sorted by name.
+     */
+    private List<FactionChoice> getFactionChoices() {
+        List<FactionChoice> factionChoices = new ArrayList<>();
+
+        int year = gui.getCampaign().getGameYear();
+        for(Faction faction : Faction.getFactions()) {
+            factionChoices.add(
+                new FactionChoice(faction, year));
+        }
+
+        Collections.sort(factionChoices, (a, b) -> a.name.compareToIgnoreCase(b.name));
+
+        return factionChoices;
+    }
+
+    /**
+     * Finds the initial faction, which is either the person's faction (if
+     * the dialog was launched for a specific person) or the campaign's
+     * faction.
+     */
+    private int findInitialSelectedFaction(Iterable<FactionChoice> factionChoices) {
+        String factionId = person != null 
+            ? person.getOriginFaction().getShortName() 
+            : person.getCampaign().getFactionCode();
+        if (factionId == null || factionId.isEmpty()) {
+            return 0;
+        }
+
+        int index = 0;
+        for (FactionChoice factionChoice : factionChoices) {
+            if (factionChoice.id.equalsIgnoreCase(factionId)) {
+                return index;
+            }
+
+            index++;
+        }
+
+        return 0;
+    }
+
     private JPanel getRATRoller() {
-    	final String[] qualityNames = {"F", "D", "C", "B", "A", "A*"};
-    	final String[] weightNames = {"Light", "Medium", "Heavy", "Assault"};
         JPanel ratPanel = new JPanel(new GridBagLayout());
         ratPanel.setBorder(BorderFactory.createTitledBorder("RAT Roller"));
         
-        int selectedFaction = 0;
-        FactionChoice selectedFactionChoice = null;
-        Collection<String> factionIds = Faction.getFactionList();
-        List<FactionChoice> factionChoices = new ArrayList<>(factionIds.size());
-        int year = gui.getCampaign().getGameYear();
-        StringBuilder sb = new StringBuilder();
-        for(String factionId : factionIds) {
-            sb.setLength(0);
-            sb.append(Faction.getFaction(factionId).getFullName(year)).append(" [").append(factionId).append("]");
-            FactionChoice fc = new FactionChoice(factionId, sb.toString());
-            factionChoices.add(fc);
-            if (null != person && person.getOriginFaction().getShortName().equalsIgnoreCase(factionId)) {
-                selectedFactionChoice = fc;
-            } else if (null == person && gui.getCampaign().getFactionCode().equalsIgnoreCase(factionId)) {
-                selectedFactionChoice = fc;
-            }
-        }
-        Collections.sort(factionChoices, new Comparator<FactionChoice>() {
-            @Override
-            public int compare(FactionChoice o1, FactionChoice o2) {
-                if(o1 == o2 || o1.faction == o2.faction) {
-                    return 0;
-                }
-                if(null == o1 || null == o1.faction) {
-                    return -1;
-                }
-                if(null == o2 || null == o2.faction) {
-                    return 1;
-                }
-                return o1.faction.compareTo(o2.faction);
-            }
-            
-        });
-        if (selectedFactionChoice != null) {
-            selectedFaction = factionChoices.indexOf(selectedFactionChoice);
-        }
+        List<FactionChoice> factionChoices = getFactionChoices();
         factionPicker = new JComboBox<FactionChoice>(factionChoices.toArray(new FactionChoice[factionChoices.size()]));
-        factionPicker.setSelectedIndex(selectedFaction);
-        System.out.println(gui.getCampaign().getGameYear());
+        factionPicker.setSelectedIndex(findInitialSelectedFaction(factionChoices));
+
         yearPicker = new JTextField(5);
         yearPicker.setText(String.valueOf(gui.getCampaign().getGameYear()));
-        qualityPicker = new JComboBox<String>(qualityNames);
+        qualityPicker = new JComboBox<String>(QUALITY_NAMES);
         unitTypePicker = new JComboBox<String>();
         for (int ut = 0; ut < UnitType.SIZE; ut++) {
             if (gui.getCampaign().getUnitGenerator().isSupportedUnitType(ut)) {
                 unitTypePicker.addItem(UnitType.getTypeName(ut));
             }
         }
-        unitWeightPicker = new JComboBox<String>(weightNames);
+        unitWeightPicker = new JComboBox<String>(WEIGHT_NAMES);
         unitPicked = new JLabel("-");
         unitTypePicker.addItemListener(ev ->
             unitWeightPicker.setEnabled(unitTypePicker.getSelectedItem().equals("Mek")
@@ -250,6 +280,7 @@ public class GMToolsDialog extends JDialog implements ActionListener {
                     Unit u = gui.getCampaign().addUnit(e, false, 0);
                     if (null != person) {
                         u.addPilotOrSoldier(person);
+                        person.setOriginalUnit(u);
                         setVisible(false);
                     }
                 } catch (EntityLoadingException e1) {
@@ -306,17 +337,20 @@ public class GMToolsDialog extends JDialog implements ActionListener {
     }
     
     private static class FactionChoice {
-        public final String faction;
+        public final String name;
         public final String id;
+
+        private final String displayName;
         
-        public FactionChoice(String id, String faction) {
-            this.id = id;
-            this.faction = faction;
+        public FactionChoice(Faction faction, int year) {
+            id = faction.getShortName();
+            name = faction.getFullName(year);
+            displayName = String.format("%s [%s]", name, id);
         }
         
         @Override
         public String toString() {
-            return faction;
+            return displayName;
         }
     }
 }
