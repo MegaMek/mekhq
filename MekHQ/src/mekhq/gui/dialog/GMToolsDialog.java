@@ -199,11 +199,16 @@ public class GMToolsDialog extends JDialog implements ActionListener {
         yearPicker.setText(String.valueOf(gui.getCampaign().getGameYear()));
         qualityPicker = new JComboBox<String>(QUALITY_NAMES);
         unitTypePicker = new JComboBox<String>();
+        int selectedUnitType = -1;
         for (int ut = 0; ut < UnitType.SIZE; ut++) {
             if (gui.getCampaign().getUnitGenerator().isSupportedUnitType(ut)) {
                 unitTypePicker.addItem(UnitType.getTypeName(ut));
+                if (null != person && selectedUnitType == -1 && doesPersonPrimarilyDriveUnitType(person, ut)) {
+                    selectedUnitType = ut;
+                }
             }
         }
+        unitTypePicker.setSelectedIndex(Math.max(selectedUnitType, 0));
         unitWeightPicker = new JComboBox<String>(WEIGHT_NAMES);
         unitPicked = new JLabel("-");
         unitTypePicker.addItemListener(ev ->
@@ -240,6 +245,41 @@ public class GMToolsDialog extends JDialog implements ActionListener {
         roll2.addActionListener(this);
         ratPanel.add(roll2, newGridBagConstraints(6, 3));
         return ratPanel;
+    }
+
+    /**
+     * Determine if a person's primary role supports operating a
+     * given unit type.
+     */
+    private boolean doesPersonPrimarilyDriveUnitType(Person p, int unitType) {
+        int primaryRole = p.getPrimaryRole();
+        switch (unitType) {
+            case UnitType.AERO:
+                return primaryRole == Person.T_AERO_PILOT;
+            case UnitType.BATTLE_ARMOR:
+                return primaryRole == Person.T_BA;
+            case UnitType.CONV_FIGHTER:
+                return primaryRole == Person.T_CONV_PILOT || primaryRole == Person.T_AERO_PILOT;
+            case UnitType.DROPSHIP:
+            case UnitType.JUMPSHIP:
+            case UnitType.SMALL_CRAFT:
+            case UnitType.WARSHIP:
+                return primaryRole == Person.T_SPACE_PILOT;
+            case UnitType.INFANTRY:
+                return primaryRole == Person.T_INFANTRY;
+            case UnitType.MEK:
+                return primaryRole == Person.T_MECHWARRIOR;
+            case UnitType.NAVAL:
+                return primaryRole == Person.T_NVEE_DRIVER;
+            case UnitType.PROTOMEK:
+                return primaryRole == Person.T_PROTO_PILOT;
+            case UnitType.TANK:
+                return primaryRole == Person.T_GVEE_DRIVER;
+            case UnitType.VTOL:
+                return primaryRole == Person.T_VTOL_PILOT;
+            default:
+                return false;
+        }
     }
     
     private GridBagConstraints newGridBagConstraints(int x, int y) {
