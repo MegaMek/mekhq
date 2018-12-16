@@ -586,26 +586,28 @@ public class PersonViewPanel extends JPanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(lblStatus2, gridBagConstraints);
 
-        firsty++;
-        lblOrigin1.setName("lblOrigin1"); // NOI18N
-        lblOrigin1.setText(resourceMap.getString("lblOrigin1.text")); //$NON-NLS-1$
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = firsty;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        pnlStats.add(lblOrigin1, gridBagConstraints);
+        if (campaign.getCampaignOptions().showOriginFaction()) {
+            firsty++;
+            lblOrigin1.setName("lblOrigin1"); // NOI18N
+            lblOrigin1.setText(resourceMap.getString("lblOrigin1.text")); //$NON-NLS-1$
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = firsty;
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlStats.add(lblOrigin1, gridBagConstraints);
 
-        lblOrigin2.setName("lblOrigin2"); // NOI18N
-        lblOrigin2.setText(person.getOriginFaction().getFullName(person.getCampaign().getGameYear()));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = firsty;
-        gridBagConstraints.weightx = 0.5;
-        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        pnlStats.add(lblOrigin2, gridBagConstraints);
+            lblOrigin2.setName("lblOrigin2"); // NOI18N
+            lblOrigin2.setText(person.getOriginFaction().getFullName(person.getCampaign().getGameYear()));
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = firsty;
+            gridBagConstraints.weightx = 0.5;
+            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlStats.add(lblOrigin2, gridBagConstraints);
+        }
 
         if (campaign.getCampaignOptions().getUseTimeInService()) {
             if ((null != person.getRecruitmentAsString()) && !person.isDependent() && !person.isPrisoner() && !person.isBondsman()) {
