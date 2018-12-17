@@ -329,7 +329,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JCheckBox chkLogConception;
     private JCheckBox chkUseTransfers;
     private JCheckBox chkUseTimeInService;
-
+    private JCheckBox chkShowOriginFaction;
 
     private JSpinner spnNDiceTransitTime;
     private JSpinner spnConstantTransitTime;
@@ -1820,6 +1820,11 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         chkUseTimeInService.setSelected(options.getUseTimeInService());
         gridBagConstraints.gridy = 23;
         panPersonnel.add(chkUseTimeInService, gridBagConstraints);
+
+        chkShowOriginFaction = new JCheckBox("Show Origin Faction"); // NOI18N
+        chkShowOriginFaction.setSelected(options.showOriginFaction());
+        gridBagConstraints.gridy = 24;
+        panPersonnel.add(chkShowOriginFaction, gridBagConstraints);
 
         JPanel panSalary = new JPanel(new GridBagLayout());
         panSalary.setBorder(BorderFactory.createTitledBorder("Salary"));
@@ -4784,6 +4789,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setLogConception(chkLogConception.isSelected());
         options.setUseTransfers(chkUseTransfers.isSelected());
         options.setUseTimeInService(chkUseTimeInService.isSelected());
+        options.setShowOriginFaction(chkShowOriginFaction.isSelected());
         options.setDefaultPrisonerStatus(comboPrisonerStatus.getSelectedIndex());
 
         rskillPrefs.setOverallRecruitBonus((Integer) spnOverallRecruitBonus.getModel().getValue());

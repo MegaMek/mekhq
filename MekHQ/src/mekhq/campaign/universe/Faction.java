@@ -229,6 +229,10 @@ public class Faction {
         return validIn(time.getYear());
     }
 
+    public boolean validBetween(int startYear, int endYear) {
+        return (startYear <= end) && (endYear >= start);
+    }
+
     public Integer getId() {
         return id;
     }
@@ -485,6 +489,8 @@ public class Faction {
         /** Faction is campaign-specific, generated on the fly */
         GENERATED,
         /** Faction is hidden from view */
-        HIDDEN
+        HIDDEN,
+        /** Faction code is not intended to be for players */
+        SPECIAL
     }
 }
