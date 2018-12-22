@@ -276,12 +276,12 @@ public final class InjuryUtil {
                 final int critTimeReduction = i.getTime() - (int) Math.floor(i.getTime() * 0.9);
                 //Reroll fumbled treatment check with Edge if applicable
                 if (roll < fumbleLimit && c.getCampaignOptions().useSupportEdge()
-                        && (doc.getOptions().booleanOption(PersonnelOptions.EDGE_MEDICAL) && doc.getEdge() > 0)) {
+                        && (doc.getOptions().booleanOption(PersonnelOptions.EDGE_MEDICAL) && doc.getCurrentEdge() > 0)) {
                     result.add(new GameEffect(
                     String.format("%s made a mistake, but used Edge to reroll.",
                             doc.getHyperlinkedFullTitle(), p.getHyperlinkedName(),
                             p.getGenderPronoun(Person.PRONOUN_HISHER), i.getName())));
-                    doc.setEdge(doc.getEdge() - 1);
+                    doc.setCurrentEdge(doc.getCurrentEdge() - 1);
                     roll = Compute.randomInt(100);
                 }
                 if(roll < fumbleLimit) {                    
