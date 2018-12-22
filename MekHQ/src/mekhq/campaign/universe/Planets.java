@@ -43,6 +43,7 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.function.Consumer;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -143,21 +144,9 @@ public class Planets {
     
     public List<Planet> getNearbyPlanets(final double centerX, final double centerY, int distance) {
         List<Planet> neighbors = new ArrayList<>();
-        int gridRadius = (int)Math.ceil(distance / 30.0);
-        int gridX = (int)(centerX / 30.0);
-        int gridY = (int)(centerY / 30.0);
-        for (int x = gridX - gridRadius; x <= gridX + gridRadius; x++) {
-            for (int y = gridY - gridRadius; y <= gridY + gridRadius; y++) {
-                Set<Planet> grid = getPlanetGrid(x, y);
-                if(null != grid) {
-                    for(Planet p : grid) {
-                        if(p.getDistanceTo(centerX, centerY) <= distance) {
-                            neighbors.add(p);
-                        }
-                    }
-                }
-            }
-        }
+
+        visitNearbyPlanets(centerX, centerY, distance, neighbors::add);
+
         Collections.sort(neighbors, new Comparator<Planet>() {
             @Override
             public int compare(Planet o1, Planet o2) {
@@ -166,9 +155,31 @@ public class Planets {
         });
         return neighbors;
     }
-    
+
+    public void visitNearbyPlanets(final double centerX, final double centerY, final int distance, Consumer<Planet> visitor) {
+        int gridRadius = (int)Math.ceil(distance / 30.0);
+        int gridX = (int)(centerX / 30.0);
+        int gridY = (int)(centerY / 30.0);
+        for (int x = gridX - gridRadius; x <= gridX + gridRadius; x++) {
+            for (int y = gridY - gridRadius; y <= gridY + gridRadius; y++) {
+                Set<Planet> grid = getPlanetGrid(x, y);
+                if (null != grid) {
+                    for (Planet p : grid) {
+                        if (p.getDistanceTo(centerX, centerY) <= distance) {
+                            visitor.accept(p);
+                        }
+                    }
+                }
+            }
+        }
+    }
+         
     public List<Planet> getNearbyPlanets(final Planet planet, int distance) {
         return getNearbyPlanets(planet.getX(), planet.getY(), distance);
+    }
+       
+    public void visitNearbyPlanets(final Planet planet, final int distance, Consumer<Planet> visitor) {
+        visitNearbyPlanets(planet.getX(), planet.getY(), distance, visitor);
     }
     
     /**

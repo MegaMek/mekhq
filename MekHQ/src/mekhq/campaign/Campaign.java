@@ -37,6 +37,7 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -4737,32 +4738,33 @@ public class Campaign implements Serializable, ITechManager {
      * @return
      */
     public JumpPath calculateJumpPath(Planet start, Planet end) {
-        if(null == start) {
+        if (null == start) {
             return null;
         }
-        if((null == end) || start.getId().equals(end.getId())) {
+        if ((null == end) || start.getId().equals(end.getId())) {
             JumpPath jpath = new JumpPath();
             jpath.addPlanet(start);
             return jpath;
         }
+
         String startKey = start.getId();
         String endKey = end.getId();
 
         final DateTime now = Utilities.getDateTimeDay(calendar);
         String current = startKey;
-        ArrayList<String> closed = new ArrayList<String>();
-        ArrayList<String> open = new ArrayList<String>();
+        Set<String> closed = new HashSet<>();
+        Set<String> open = new HashSet<>();
         boolean found = false;
         int jumps = 0;
 
         // we are going to through and set up some hashes that will make our
         // work easier
         // hash of parent key
-        Hashtable<String, String> parent = new Hashtable<>();
+        Map<String, String> parent = new HashMap<>();
         // hash of H for each planet which will not change
-        Hashtable<String, Double> scoreH = new Hashtable<>();
+        Map<String, Double> scoreH = new HashMap<>();
         // hash of G for each planet which might change
-        Hashtable<String, Double> scoreG = new Hashtable<>();
+        Map<String, Double> scoreG = new HashMap<>();
 
         for (String key : Planets.getInstance().getPlanets().keySet()) {
             scoreH.put(
@@ -4776,25 +4778,27 @@ public class Campaign implements Serializable, ITechManager {
         while (!found && jumps < 10000) {
             jumps++;
             double currentG = scoreG.get(current) + Planets.getInstance().getPlanetById(current).getRechargeTime(now);
-            List<Planet> neighborKeys = Planets.getInstance().getNearbyPlanets(Planets.getInstance().getPlanetById(current), 30);
-            for (Planet neighborKey : neighborKeys) {
-                if (closed.contains(neighborKey.getId())) {
-                    continue;
-                } else if (open.contains(neighborKey.getId())) {
+
+            final String localCurrent = current;
+            Planets.getInstance().visitNearbyPlanets(Planets.getInstance().getPlanetById(current), 30, p -> {
+                if (closed.contains(p.getId())) {
+                    return;
+                } else if (open.contains(p.getId())) {
                     // is the current G better than the existing G
-                    if (currentG < scoreG.get(neighborKey.getId())) {
+                    if (currentG < scoreG.get(p.getId())) {
                         // then change G and parent
-                        scoreG.put(neighborKey.getId(), currentG);
-                        parent.put(neighborKey.getId(), current);
+                        scoreG.put(p.getId(), currentG);
+                        parent.put(p.getId(), localCurrent);
                     }
                 } else {
                     // put the current G for this one in memory
-                    scoreG.put(neighborKey.getId(), currentG);
+                    scoreG.put(p.getId(), currentG);
                     // put the parent in memory
-                    parent.put(neighborKey.getId(), current);
-                    open.add(neighborKey.getId());
+                    parent.put(p.getId(), localCurrent);
+                    open.add(p.getId());
                 }
-            }
+            });
+
             String bestMatch = null;
             double bestF = Double.POSITIVE_INFINITY;
             for (String possible : open) {
@@ -4805,32 +4809,36 @@ public class Campaign implements Serializable, ITechManager {
                     bestF = currentF;
                 }
             }
+
             current = bestMatch;
             if(null == current) {
                 // We're done - probably failed to find anything
                 break;
             }
+            
             closed.add(current);
             open.remove(current);
             if (current.equals(endKey)) {
                 found = true;
             }
         }
+
         // now we just need to back up from the last current by parents until we
         // hit null
-        ArrayList<Planet> path = new ArrayList<Planet>();
+        List<Planet> path = new ArrayList<>();
         String nextKey = current;
         while (null != nextKey) {
-            path.add(Planets.getInstance().getPlanets().get(nextKey));
+            path.add(Planets.getInstance().getPlanetById(nextKey));
             // MekHQApp.logMessage(nextKey);
             nextKey = parent.get(nextKey);
-
         }
+
         // now reverse the direaction
         JumpPath finalPath = new JumpPath();
         for (int i = (path.size() - 1); i >= 0; i--) {
             finalPath.addPlanet(path.get(i));
         }
+
         return finalPath;
     }
 
