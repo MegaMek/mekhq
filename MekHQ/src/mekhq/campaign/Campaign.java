@@ -1266,6 +1266,36 @@ public class Campaign implements Serializable, ITechManager {
         return true;
     }
 
+    /** Adds a person to the campaign unconditionally, without paying for the person. */
+    public void addPerson(Person p) {
+        if (p == null) {
+            return;
+        }
+
+        UUID id = UUID.randomUUID();
+        while (null != personnel.get(id)) {
+            id = UUID.randomUUID();
+        }
+        p.setId(id);
+        personnel.put(id, p);
+
+        //TODO: implement a boolean check based on campaign options
+        addReport(p.getHyperlinkedName() + " has been added to the personnel roster.");
+        if (p.getPrimaryRole() == Person.T_ASTECH) {
+            astechPoolMinutes += 480;
+            astechPoolOvertime += 240;
+        }
+        if (p.getSecondaryRole() == Person.T_ASTECH) {
+            astechPoolMinutes += 240;
+            astechPoolOvertime += 120;
+        }
+        String rankEntry = LogEntryController.generateRankEntryString(p);
+    
+        p.setFreeMan();
+        ServiceLogger.joined(p, getDate(), getName(), rankEntry);
+        MekHQ.triggerEvent(new PersonNewEvent(p));
+    }
+
     /**
      * Imports a {@link Person} into a campaign.
      * @param p A {@link Person} to import into the campaign.

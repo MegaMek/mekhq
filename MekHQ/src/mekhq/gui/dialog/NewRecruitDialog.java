@@ -108,6 +108,15 @@ public class NewRecruitDialog extends javax.swing.JDialog {
         panButtons.add(button, gridBagConstraints);
         gridBagConstraints.gridx++;
 
+        if (hqView.getCampaign().isGM()) {
+            button = new JButton(resourceMap.getString("btnAddGM.text")); // NOI18N
+            button.setName("btnGM"); // NOI18N
+            button.addActionListener(e -> addGM());
+
+            panButtons.add(button, gridBagConstraints);
+            gridBagConstraints.gridx++;
+        }
+
         button = new JButton(resourceMap.getString("btnClose.text")); // NOI18N
         button.setName("btnClose"); // NOI18N
         button.addActionListener(e -> setVisible(false));
@@ -162,12 +171,29 @@ public class NewRecruitDialog extends javax.swing.JDialog {
                 GregorianCalendar rawrecruit = (GregorianCalendar) hqView.getCampaign().getCalendar().clone();
                 person.setRecruitment(rawrecruit);
             }
-            person = hqView.getCampaign().newPerson(person.getPrimaryRole());
-            refreshRanksCombo();
-            hqView.getCampaign().changeRank(person, hqView.getCampaign().getRanks().getRankNumericFromNameAndProfession(
-                    person.getProfession(), (String) choiceRanks.getSelectedItem()), false);
+
+            createNewRecruit();
         }
+
         refreshView();
+    }
+
+    private void addGM() {
+        hqView.getCampaign().addPerson(person);
+        if (hqView.getCampaign().getCampaignOptions().getUseTimeInService()) {
+            GregorianCalendar rawrecruit = (GregorianCalendar) hqView.getCampaign().getCalendar().clone();
+            person.setRecruitment(rawrecruit);
+        }
+
+        createNewRecruit();
+        refreshView();
+    }
+
+    private void createNewRecruit() {
+        person = hqView.getCampaign().newPerson(person.getPrimaryRole());
+        refreshRanksCombo();
+        hqView.getCampaign().changeRank(person, hqView.getCampaign().getRanks().getRankNumericFromNameAndProfession(
+                person.getProfession(), (String) choiceRanks.getSelectedItem()), false);
     }
 
     private void randomName() {
