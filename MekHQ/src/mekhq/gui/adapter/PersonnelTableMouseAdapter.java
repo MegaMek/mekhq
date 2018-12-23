@@ -42,6 +42,7 @@ import mekhq.gui.dialog.EditLogEntryDialog;
 import mekhq.gui.dialog.EditPersonnelHitsDialog;
 import mekhq.gui.dialog.EditPersonnelInjuriesDialog;
 import mekhq.gui.dialog.EditPersonnelLogDialog;
+import mekhq.gui.dialog.GMToolsDialog;
 import mekhq.gui.dialog.ImageChoiceDialog;
 import mekhq.gui.dialog.KillDialog;
 import mekhq.gui.dialog.PopupValueChoiceDialog;
@@ -95,6 +96,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
     private static final String CMD_EDIT_PORTRAIT = "PORTRAIT"; //$NON-NLS-1$
     private static final String CMD_EDIT_HITS = "EDIT_HITS"; //$NON-NLS-1$
     private static final String CMD_EDIT = "EDIT"; //$NON-NLS-1$
+    private static final String CMD_ROLL_MECH = "ROLL_MECH"; //$NON-NLS-1$
     private static final String CMD_SACK = "SACK"; //$NON-NLS-1$
     private static final String CMD_REMOVE = "REMOVE"; //$NON-NLS-1$
     private static final String CMD_EDGE_TRIGGER = "EDGE"; //$NON-NLS-1$
@@ -830,6 +832,13 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 gui.getCampaign().personUpdated(selectedPerson);
                 MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
                 break;
+            case CMD_ROLL_MECH:
+                GMToolsDialog gmToolsDialog = new GMToolsDialog(
+                    gui.getFrame(), gui, selectedPerson);
+                gmToolsDialog.setVisible(true);
+                gui.getCampaign().personUpdated(selectedPerson);
+                MekHQ.triggerEvent(new PersonChangedEvent(selectedPerson));
+                break;
             case CMD_EDIT_HITS:
                 EditPersonnelHitsDialog ephd = new EditPersonnelHitsDialog(gui.getFrame(), true, selectedPerson);
                 ephd.setVisible(true);
@@ -915,6 +924,8 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 for (Person person : people) {
                     selectedPerson.setXp(selectedPerson.getXp() - cost);
                     person.setEdge(person.getEdge() + 1);
+                    //Make the new edge point available to support personnel, but don't reset until the week ends
+                    person.setCurrentEdge(person.getCurrentEdge() + 1);
                     gui.getCampaign().personUpdated(person);
                     MekHQ.triggerEvent(new PersonChangedEvent(person));
                 }
@@ -932,6 +943,8 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 int i = pvcd.getValue();
                 for (Person person : people) {
                     person.setEdge(i);
+                    //Reset currentEdge for support people
+                    person.resetCurrentEdge();
                     gui.getCampaign().personUpdated(person);
                     MekHQ.triggerEvent(new PersonChangedEvent(person));
                 }
@@ -2396,6 +2409,14 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 menuItem.addActionListener(this);
                 menuItem.setEnabled(gui.getCampaign().isGM());
                 menu.add(menuItem);
+
+                if (null == person.getUnitId()) {
+                    menuItem = new JMenuItem(resourceMap.getString("rollForUnit.text")); //$NON-NLS-1$
+                    menuItem.setActionCommand(CMD_ROLL_MECH);
+                    menuItem.addActionListener(this);
+                    menuItem.setEnabled(gui.getCampaign().isGM());
+                    menu.add(menuItem);
+                }
             }
             if (gui.getCampaign().getCampaignOptions().useAdvancedMedical()) {
                 menuItem = new JMenuItem(resourceMap.getString("removeAllInjuries.text")); //$NON-NLS-1$

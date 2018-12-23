@@ -78,6 +78,8 @@ public class PersonViewPanel extends JPanel {
     private JLabel lblGender2;
     private JLabel lblStatus1;
     private JLabel lblStatus2;
+    private JLabel lblOrigin1;
+    private JLabel lblOrigin2;
     private JLabel lblRecruited1;
     private JLabel lblRecruited2;
     private JLabel lblTimeServed1;
@@ -88,6 +90,8 @@ public class PersonViewPanel extends JPanel {
     private JLabel lblTough2;
     private JLabel lblEdge1;
     private JLabel lblEdge2;
+    private JLabel lblEdgeAvail1;
+    private JLabel lblEdgeAvail2;
     private JLabel lblAbility1;
     private JLabel lblAbility2;
     private JLabel lblImplants1;
@@ -457,6 +461,8 @@ public class PersonViewPanel extends JPanel {
         lblGender2 = new JLabel();
         lblStatus1 = new JLabel();
         lblStatus2 = new JLabel();
+        lblOrigin1 = new JLabel();
+        lblOrigin2 = new JLabel();
         lblRecruited1 = new JLabel();
         lblRecruited2 = new JLabel();
         lblTimeServed1 = new JLabel();
@@ -467,6 +473,8 @@ public class PersonViewPanel extends JPanel {
         lblTough2 = new JLabel();
         lblEdge1 = new JLabel();
         lblEdge2 = new JLabel();
+        lblEdgeAvail1 = new JLabel();
+        lblEdgeAvail2 = new JLabel();
         lblAbility1 = new JLabel();
         lblAbility2 = new JLabel();
         lblImplants1 = new JLabel();
@@ -581,6 +589,29 @@ public class PersonViewPanel extends JPanel {
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(lblStatus2, gridBagConstraints);
+
+        if (campaign.getCampaignOptions().showOriginFaction()) {
+            firsty++;
+            lblOrigin1.setName("lblOrigin1"); // NOI18N
+            lblOrigin1.setText(resourceMap.getString("lblOrigin1.text")); //$NON-NLS-1$
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = firsty;
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlStats.add(lblOrigin1, gridBagConstraints);
+
+            lblOrigin2.setName("lblOrigin2"); // NOI18N
+            lblOrigin2.setText(person.getOriginFaction().getFullName(person.getCampaign().getGameYear()));
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = firsty;
+            gridBagConstraints.weightx = 0.5;
+            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlStats.add(lblOrigin2, gridBagConstraints);
+        }
 
         if (campaign.getCampaignOptions().getUseTimeInService()) {
             if ((null != person.getRecruitmentAsString()) && !person.isDependent() && !person.isPrisoner() && !person.isBondsman()) {
@@ -725,6 +756,30 @@ public class PersonViewPanel extends JPanel {
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlStats.add(lblEdge2, gridBagConstraints);
+            
+            if (person.isAdmin() || person.isDoctor() || person.isTech()) {
+                //Add the Edge Available field for support personnel only
+                secondy++;
+                lblEdgeAvail1.setName("lblEdgeAvail1"); // NOI18N //$NON-NLS-1$
+                lblEdgeAvail1.setText(resourceMap.getString("lblEdgeAvail1.text")); //$NON-NLS-1$
+                gridBagConstraints = new GridBagConstraints();
+                gridBagConstraints.gridx = 2;
+                gridBagConstraints.gridy = secondy;
+                gridBagConstraints.fill = GridBagConstraints.NONE;
+                gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+                pnlStats.add(lblEdgeAvail1, gridBagConstraints);
+
+                lblEdgeAvail2.setName("lblEdgeAvail2"); // NOI18N //$NON-NLS-1$
+                lblEdgeAvail2.setText(Integer.toString(person.getCurrentEdge()));
+                gridBagConstraints = new GridBagConstraints();
+                gridBagConstraints.gridx = 3;
+                gridBagConstraints.gridy = secondy;
+                gridBagConstraints.weightx = 0.5;
+                gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+                gridBagConstraints.fill = GridBagConstraints.NONE;
+                gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+                pnlStats.add(lblEdgeAvail2, gridBagConstraints);
+            }
         }
 
         //special abilities and implants need to be three columns wide to handle their large width

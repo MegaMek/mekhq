@@ -3291,8 +3291,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     if (engineer != null) {
                         if (engineer.getEdgeUsed() > 0) {
                             //Don't subtract an Edge if the individual has none left
-                            if (p.getEdge() > 0) {
-                                p.setEdge(p.getEdge() - 1);
+                            if (p.getCurrentEdge() > 0) {
+                                p.setCurrentEdge(p.getCurrentEdge() - 1);
                                 engineer.setEdgeUsed(engineer.getEdgeUsed() - 1);
                             }
                         }
@@ -3340,7 +3340,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     }
                     engineer.addSkill(SkillType.S_TECH_VESSEL, sumSkill/nCrew, sumBonus/nCrew);
                     engineer.setEdgeUsed(sumEdgeUsed);
-                    engineer.setEdge((sumEdge - sumEdgeUsed)/nCrew);
+                    engineer.setCurrentEdge((sumEdge - sumEdgeUsed)/nCrew);
                     engineer.setUnitId(this.getId());
                 } else {
                     engineer = null;

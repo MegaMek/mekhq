@@ -506,12 +506,12 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<eraMods>1,1,1,1,2,3,2,2,1</eraMods>
 		<nameGenerator>General</nameGenerator>
 		<colorRGB>0,0,0</colorRGB>
-		<tags>abandoned,inactive,chaos</tags>
+		<tags>abandoned,inactive,chaos,special</tags>
 	</faction>
 	<faction>
 		<shortname>DIS</shortname>
 		<fullname>Disputed</fullname>
-		<tags>chaos</tags>
+		<tags>chaos,special</tags>
 	</faction>
 	<faction>
 		<shortname>ARDC</shortname>
@@ -1545,7 +1545,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<eraMods>1,1,1,1,2,3,2,2,1</eraMods>
 		<nameGenerator>General</nameGenerator>
 		<colorRGB>0,0,0</colorRGB>
-		<tags>abandoned,inactive,chaos</tags>
+		<tags>abandoned,inactive,chaos,special</tags>
 	</faction>
 	<faction>
 		<shortname>WOB</shortname>
@@ -1564,7 +1564,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<startingPlanet>Strana Mechty</startingPlanet>
 		<nameGenerator>Clan</nameGenerator>
 		<colorRGB>139,69,19</colorRGB>
-		<tags>clan</tags>
+		<tags>clan,special</tags>
 		<start>2807</start>
 	</faction>
 	<faction>
@@ -1578,7 +1578,7 @@ tags - a comma-separated list of tags. Currently recognised tags: "is", "periphe
 		<shortname>NONE</shortname>
 		<fullname>Unexplored</fullname>
 		<colorRGB>0,0,0</colorRGB>
-		<tags>periphery,abandoned,inactive,chaos</tags>
+		<tags>periphery,abandoned,inactive,chaos,special</tags>
 	</faction>
 	<faction>
 		<shortname>FOR</shortname>

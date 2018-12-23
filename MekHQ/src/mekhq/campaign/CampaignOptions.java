@@ -119,6 +119,7 @@ public class CampaignOptions implements Serializable {
     private boolean useTimeInService;
     private boolean capturePrisoners;
     private int defaultPrisonerStatus;
+    private boolean showOriginFaction;
 
     //personnel market related
     private boolean personnelMarketReportRefresh;
@@ -339,6 +340,7 @@ public class CampaignOptions implements Serializable {
         useAdvancedMedical = false;
         useDylansRandomXp = false;
         useQuirks = false;
+        showOriginFaction = true;
         payForParts = false;
         payForRepairs = false;
         payForUnits = false;
@@ -987,6 +989,22 @@ public class CampaignOptions implements Serializable {
 
     public void setQuirks(boolean b) {
         this.useQuirks = b;
+    }
+
+    /**
+     * Gets a value indicating whether or not to show a person's
+     * origin faction when displaying their details.
+     */
+    public boolean showOriginFaction() {
+        return showOriginFaction;
+    }
+
+    /**
+     * Sets a value indicating whether or not to show a person's
+     * origin faction when displaying their details.
+     */
+    public void setShowOriginFaction(boolean b) {
+        showOriginFaction = b;
     }
 
     public int getScenarioXP() {
@@ -2263,6 +2281,7 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useAdvancedMedical", useAdvancedMedical);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useDylansRandomXp", useDylansRandomXp);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useQuirks", useQuirks);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "showOriginFaction", showOriginFaction);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "payForParts", payForParts);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "payForRepairs", payForRepairs);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "payForUnits", payForUnits);
@@ -2566,6 +2585,8 @@ public class CampaignOptions implements Serializable {
                 retVal.useDylansRandomXp = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("useQuirks")) {
                 retVal.useQuirks = Boolean.parseBoolean(wn2.getTextContent());
+            } else if (wn2.getNodeName().equalsIgnoreCase("showOriginFaction")) {
+                retVal.showOriginFaction = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("payForParts")) {
                 retVal.payForParts = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("payForRepairs")) {

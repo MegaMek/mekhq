@@ -1108,7 +1108,7 @@ public class Campaign implements Serializable, ITechManager {
      *
      * @param en An <code>Entity</code> object that the new unit will be wrapped around
      */
-    public void addUnit(Entity en, boolean allowNewPilots, int days) {
+    public Unit addUnit(Entity en, boolean allowNewPilots, int days) {
         // reset the game object
         en.setOwner(player);
         en.setGame(game);
@@ -1147,6 +1147,8 @@ public class Campaign implements Serializable, ITechManager {
         checkDuplicateNamesDuringAdd(en);
         addReport(unit.getHyperlinkedName() + " has been added to the unit roster.");
         MekHQ.triggerEvent(new UnitNewEvent(unit));
+
+        return unit;
     }
 
     public Collection<Unit> getUnits() {
@@ -1405,26 +1407,28 @@ public class Campaign implements Serializable, ITechManager {
                 && (null == p.getUnit() || null == p.getUnitId())) {
             return;
         }
-        Part spare = checkForExistingSparePart(p);
-        if (null == p.getUnit() && null != spare) {
-            if (p instanceof Armor) {
-                if (spare instanceof Armor) {
-                    ((Armor) spare).setAmount(((Armor) spare).getAmount()
-                            + ((Armor) p).getAmount());
+        if (null == p.getUnit()) {
+            Part spare = checkForExistingSparePart(p);
+            if (null != spare) {
+                if (p instanceof Armor) {
+                    if (spare instanceof Armor) {
+                        ((Armor) spare).setAmount(((Armor) spare).getAmount()
+                                + ((Armor) p).getAmount());
+                        MekHQ.triggerEvent(new PartChangedEvent(spare));
+                        return;
+                    }
+                } else if (p instanceof AmmoStorage) {
+                    if (spare instanceof AmmoStorage) {
+                        ((AmmoStorage) spare).changeShots(((AmmoStorage) p)
+                                .getShots());
+                        MekHQ.triggerEvent(new PartChangedEvent(spare));
+                        return;
+                    }
+                } else {
+                    spare.incrementQuantity();
                     MekHQ.triggerEvent(new PartChangedEvent(spare));
                     return;
                 }
-            } else if (p instanceof AmmoStorage) {
-                if (spare instanceof AmmoStorage) {
-                    ((AmmoStorage) spare).changeShots(((AmmoStorage) p)
-                            .getShots());
-                    MekHQ.triggerEvent(new PartChangedEvent(spare));
-                    return;
-                }
-            } else {
-                spare.incrementQuantity();
-                MekHQ.triggerEvent(new PartChangedEvent(spare));
-                return;
             }
         }
         parts.put(Integer.valueOf(id), p);
@@ -1497,9 +1501,9 @@ public class Campaign implements Serializable, ITechManager {
         }
         // go ahead and check for existing parts because some version weren't
         // properly collecting parts
-        if (!(p instanceof MissingPart)) {
+        if (!(p instanceof MissingPart) && null == p.getUnitId()) {
             Part spare = checkForExistingSparePart(p);
-            if (null == p.getUnitId() && null != spare) {
+            if (null != spare) {
                 if (p instanceof Armor) {
                     if (spare instanceof Armor) {
                         ((Armor) spare).setAmount(((Armor) spare).getAmount()
@@ -1890,8 +1894,8 @@ public class Campaign implements Serializable, ITechManager {
         //If we get a natural 2 that isn't an automatic success, reroll if Edge is available and in use.
         if (getCampaignOptions().useSupportEdge()
                 && (doctor.getOptions().booleanOption(PersonnelOptions.EDGE_MEDICAL))) {
-            if (roll == 2  && doctor.getEdge() > 0 && target.getValue() != TargetRoll.AUTOMATIC_SUCCESS) {
-                doctor.setEdge(doctor.getEdge() - 1);
+            if (roll == 2  && doctor.getCurrentEdge() > 0 && target.getValue() != TargetRoll.AUTOMATIC_SUCCESS) {
+                doctor.setCurrentEdge(doctor.getCurrentEdge() - 1);
                 roll = Compute.d6(2);
                 report += medWork.fail(0) + "\n" + doctor.getHyperlinkedFullTitle() + " uses Edge to reroll:"
                         + " rolls " + roll + ":";
@@ -2221,8 +2225,8 @@ public class Campaign implements Serializable, ITechManager {
         if (roll < target.getValue()
                 && getCampaignOptions().useSupportEdge() 
                 && person.getOptions().booleanOption(PersonnelOptions.EDGE_ADMIN_ACQUIRE_FAIL)
-                && person.getEdge() > 0) {
-            person.setEdge(person.getEdge() - 1);
+                && person.getCurrentEdge() > 0) {
+            person.setCurrentEdge(person.getCurrentEdge() - 1);
             roll = Compute.d6(2);
             report += " <b>failed!</b> but uses Edge to reroll...getting a " + roll + ": ";
         }
@@ -2352,8 +2356,8 @@ public class Campaign implements Serializable, ITechManager {
                 report = report + ",  needs " + target.getValueAsString() + " and rolls " + roll + ": ";
                 if (roll < target.getValue() && getCampaignOptions().useSupportEdge()
                         && tech.getOptions().booleanOption(PersonnelOptions.EDGE_REPAIR_FAILED_REFIT)
-                        && tech.getEdge() > 0) {
-                    tech.setEdge(tech.getEdge() - 1);
+                        && tech.getCurrentEdge() > 0) {
+                    tech.setCurrentEdge(tech.getCurrentEdge() - 1);
                     if (tech.isRightTechTypeFor(r)) {
                         roll = Compute.d6(2);
                     } else {
@@ -2513,14 +2517,14 @@ public class Campaign implements Serializable, ITechManager {
         //if we fail and would break a part, here's a chance to use Edge for a reroll...
         if (getCampaignOptions().useSupportEdge() 
                 && tech.getOptions().booleanOption(PersonnelOptions.EDGE_REPAIR_BREAK_PART)
-                && tech.getEdge() > 0
+                && tech.getCurrentEdge() > 0
                 && target.getValue() != TargetRoll.AUTOMATIC_SUCCESS) {
             if ((getCampaignOptions().isDestroyByMargin()
                     && getCampaignOptions().getDestroyMargin() <= (target.getValue() - roll))
                     || (!getCampaignOptions().isDestroyByMargin() && (tech.getExperienceLevel(false) == SkillType.EXP_ELITE //if an elite, primary tech and destroy by margin is NOT on
                                     || tech.getPrimaryRole() == Person.T_SPACE_CREW)) // For vessel crews
                             && roll < target.getValue()) {
-                tech.setEdge(tech.getEdge() - 1);
+                tech.setCurrentEdge(tech.getCurrentEdge() - 1);
                 if (tech.isRightTechTypeFor(partWork)) {
                     roll = Compute.d6(2);
                 } else {
@@ -2878,6 +2882,13 @@ public class Campaign implements Serializable, ITechManager {
                     u.resetPilotAndEntity();
                 }
             }
+            
+            // Reset edge points to the purchased value each week. This should only
+            // apply for support personnel - combat troops reset with each new mm game
+            if ((p.isAdmin() || p.isDoctor() || p.isEngineer() || p.isTech())
+                    && calendar.get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY) {
+                p.resetCurrentEdge();
+            }
 
             if (getCampaignOptions().getIdleXP() > 0 && calendar.get(Calendar.DAY_OF_MONTH) == 1 && p.isActive()
                     && !p.isPrisoner()) { // Prisoners no
@@ -2893,7 +2904,6 @@ public class Campaign implements Serializable, ITechManager {
                     p.setIdleMonths(0);
                 }
             }
-
         }
 
         for (Person baby : babies) {
@@ -6248,8 +6258,8 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public Part checkForExistingSparePart(Part part) {
-        for (Part spare : getSpareParts()) {
-            if (spare.getId() == part.getId()) {
+        for (Part spare : parts.values()) {
+            if (!spare.isSpare() || spare.getId() == part.getId()) {
                 continue;
             }
             if (part.isSamePartTypeAndStatus(spare)) {

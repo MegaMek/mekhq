@@ -23,7 +23,6 @@ package mekhq.campaign.personnel;
 
 import java.io.PrintWriter;
 import java.io.Serializable;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.function.IntSupplier;
@@ -238,12 +237,16 @@ public class Person implements Serializable, MekHqXmlSerializable {
     boolean dependent;
     boolean commander;
     boolean isClanTech;
+    // Supports edge usage by a ship's engineer composite crewman
     int edgeUsedThisRound;
+    // To track how many edge points support personnel have left until next refresh
+    int currentEdge;
 
     //phenotype and background
     private int phenotype;
     private boolean clan;
     private String bloodname;
+    private Faction originFaction;
 
     //assignments
     private UUID unitId;
@@ -381,7 +384,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
         techUnitIds = new ArrayList<UUID>();
         salary = -1;
         phenotype = PHENOTYPE_NONE;
-        clan = Faction.getFaction(factionCode).isClan();
+        originFaction = Faction.getFaction(factionCode);
+        clan = originFaction.isClan();
         bloodname = "";
         primaryDesignator = DESIG_NONE;
         secondaryDesignator = DESIG_NONE;
@@ -420,6 +424,14 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     public void setBloodname(String bn) {
         bloodname = bn;
+    }
+
+    public Faction getOriginFaction() {
+        return originFaction;
+    }
+
+    public void setOriginFaction(Faction f) {
+        originFaction = f;
     }
 
     public boolean isCommander() {
@@ -1284,6 +1296,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     + MekHqXmlUtil.escape(Boolean.toString(dependent))
                     + "</dependent>");
         pw1.println(MekHqXmlUtil.indentStr(indent + 1)
+                    + "<faction>"
+                    + originFaction.getShortName()
+                    + "</faction>");
+        pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                     + "<clan>"
                     + clan
                     + "</clan>");
@@ -1444,6 +1460,13 @@ public class Person implements Serializable, MekHqXmlSerializable {
                         + "<edge>"
                         + String.valueOf(getOptionList("::", PilotOptions.EDGE_ADVANTAGES))
                         + "</edge>");
+            // For support personnel, write an available edge value
+            if (isSupport() || isEngineer()) {
+                pw1.println(MekHqXmlUtil.indentStr(indent + 1)
+                        + "<edgeAvailable>"
+                        + getCurrentEdge()
+                        + "</edgeAvailable>");
+            }
         }
         if (countOptions(PilotOptions.MD_ADVANTAGES) > 0) {
             pw1.println(MekHqXmlUtil.indentStr(indent + 1)
@@ -1547,6 +1570,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     retVal.commander = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("dependent")) {
                     retVal.dependent = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("faction")) {
+                    retVal.originFaction = Faction.getFaction(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("isClanTech")
                            || wn2.getNodeName().equalsIgnoreCase("clan")) {
                     retVal.clan = Boolean.parseBoolean(wn2.getTextContent().trim());
@@ -1661,6 +1686,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     advantages = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("edge")) {
                     edge = wn2.getTextContent();
+                } else if (wn2.getNodeName().equalsIgnoreCase("edgeAvailable")) {
+                    retVal.currentEdge = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("implants")) {
                     implants = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("toughness")) {
@@ -2790,6 +2817,30 @@ public class Person implements Serializable, MekHqXmlSerializable {
         }
     }
     
+    /**
+     * Resets support personnel edge points to the purchased level. Used for weekly refresh.
+     * 
+     */
+    public void resetCurrentEdge() {
+        setCurrentEdge(getEdge());
+    }
+    
+    /**
+     * Sets support personnel edge points to the value 'e'. Used for weekly refresh.
+     * @param e - integer used to track this person's edge points available for the current week
+     */
+    public void setCurrentEdge(int e) {
+        currentEdge = e;
+    }
+    
+    /**
+     *  Returns this person's currently available edge points. Used for weekly refresh.
+     * 
+     */
+    public int getCurrentEdge() {
+        return currentEdge;
+    }
+    
     public void setEdgeUsed(int e) {
         edgeUsedThisRound = e;
     }
@@ -2798,7 +2849,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return edgeUsedThisRound;
     }
 
-    /*
+    /**
      * This will set a specific edge trigger, regardless of the current status
      */
     public void setEdgeTrigger(String name, boolean status) {
