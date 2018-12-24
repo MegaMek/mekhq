@@ -171,7 +171,7 @@ public class GMToolsDialog extends JDialog implements ActionListener {
     private int findInitialSelectedFaction(Iterable<FactionChoice> factionChoices) {
         String factionId = person != null 
             ? person.getOriginFaction().getShortName() 
-            : person.getCampaign().getFactionCode();
+            : gui.getCampaign().getFactionCode();
         if (factionId == null || factionId.isEmpty()) {
             return 0;
         }

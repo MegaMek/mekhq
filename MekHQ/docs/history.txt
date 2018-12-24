@@ -7,6 +7,8 @@ v0.45.3-SNAPSHOT
 + PR #998: Fix Mac OS X issue so the DateChooser dialog isn't hidden when you create a new campaign
 + PR #996: Feature: adds origin faction to a person's details and support for RAT roller in a person's GM menu
 + PR #997: Add weekly Support Personnel edge refresh and usage
++ PR #1006: Speed up calculation of jump paths
++ PR #999: Adds a GM hire button to new recruit dialog
 
 v0.45.2 (2018-11-18 0200 UTC)
 + Switched build system from ant to gradle.
