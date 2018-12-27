@@ -273,10 +273,8 @@ public class BattleArmorSuit extends Part {
         	if(null != p) {
         		if(p instanceof BaArmor) {
         			cost += p.getCurrentValue();
-        		} else {
-        			if(p instanceof BattleArmorSuit) {
-        			}
-        			cost += p.getStickerPrice();
+        		} else if (!(p instanceof BattleArmorSuit)) {
+                    cost += p.getStickerPrice();
         		}
         	}
         }
