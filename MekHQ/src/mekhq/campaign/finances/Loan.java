@@ -390,12 +390,16 @@ public class Loan implements MekHqXmlSerializable {
                 +"</payAmount>");
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<collateralValue>"
-                +totalValue
+                +collateralValue
                 +"</collateralValue>");
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<overdue>"
                 +overdue
                 +"</overdue>");
+        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"<totalValue>"
+                +totalValue
+                +"</totalValue>");
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "nextPayment", df.format(nextPayment.getTime()));
         pw1.println(MekHqXmlUtil.indentStr(indent) + "</loan>");
