@@ -94,6 +94,7 @@ import megamek.common.annotations.Nullable;
 import megamek.common.logging.LogLevel;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
+import megamek.common.options.OptionsConstants;
 import megamek.common.options.PilotOptions;
 import megamek.common.weapons.InfantryAttack;
 import megamek.common.weapons.bayweapons.BayWeapon;
@@ -2949,6 +2950,25 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 }
                 entity.getCrew().setOptions(options);
             }
+            
+            //Assign edge points to spacecraft crews
+            if (entity instanceof SmallCraft || entity instanceof Jumpship) {
+                int sumEdge = 0;
+                int edge = 0;
+                for (UUID pid : drivers) {
+                    Person p = campaign.getPerson(pid);
+                    sumEdge += p.getEdge();
+                }
+                for (UUID pid : gunners) {
+                    Person p = campaign.getPerson(pid);
+                    sumEdge += p.getEdge();
+                }
+                //We need to average the edge values of pilots and gunners. Don't mess with the engineer here.
+                edge = (sumEdge / (gunners.size() + drivers.size()));
+                IOption edgeOption = entity.getCrew().getOptions().getOption(OptionsConstants.EDGE);
+                edgeOption.setValue((Integer) edge);
+            }
+            
             if(usesSoloPilot()) {
                 if(!commander.isActive()) {
                     entity.getCrew().setMissing(true, 0);;
