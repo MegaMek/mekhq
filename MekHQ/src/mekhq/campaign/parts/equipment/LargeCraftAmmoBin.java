@@ -275,6 +275,10 @@ public class LargeCraftAmmoBin extends AmmoBin {
         if (isSalvaging()) {
             return 120;
         } else {
+            //Capital Missiles take a flat 60m per missile per errata
+            if (type.hasFlag(AmmoType.F_CAP_MISSILE)) {
+                return 60;
+            }
             return (int) Math.ceil(15 * type.getTonnage(null));
         }
     }
