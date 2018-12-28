@@ -10,6 +10,7 @@ v0.45.3-SNAPSHOT
 + PR #1006: Speed up calculation of jump paths
 + PR #999: Adds a GM hire button to new recruit dialog
 + PR #1017: Adds the list of missing units on campaign load to the log
++ Issue #1010: Battle Armor fails to load with StackOverflowException
 
 v0.45.2 (2018-11-18 0200 UTC)
 + Switched build system from ant to gradle.
