@@ -15,10 +15,7 @@ import megamek.client.RandomNameGenerator;
 import megamek.client.RandomSkillsGenerator;
 import megamek.client.RandomUnitGenerator;
 import megamek.client.bot.princess.CardinalEdge;
-import megamek.client.ratgenerator.ForceDescriptor;
-import megamek.client.ratgenerator.ForceNode;
-import megamek.client.ratgenerator.FormationType;
-import megamek.client.ratgenerator.Ruleset;
+import megamek.client.ratgenerator.MissionRole;
 import megamek.common.Board;
 import megamek.common.BombType;
 import megamek.common.Compute;
@@ -49,6 +46,7 @@ import mekhq.campaign.universe.Faction.Tag;
 import mekhq.campaign.universe.IUnitGenerator;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.Planets;
+import mekhq.campaign.universe.UnitGeneratorParameters;
 
 /**
  * This class handles the creation and substantive manipulation of AtBDynamicScenarios
@@ -301,7 +299,7 @@ public class AtBDynamicScenarioFactory {
             if(generatedLance.isEmpty()) {
                 stopGenerating = true;
                 MekHQ.getLogger().log(AtBDynamicScenarioFactory.class, "generateForces", LogLevel.WARNING, 
-                        String.format("Unable to generate units from RAT: %d, type %d, max weight %d", 
+                        String.format("Unable to generate units from RAT: %s, type %d, max weight %d", 
                                 factionCode, forceTemplate.getAllowedUnitType(), weightClass));
                 continue;
             }
@@ -593,23 +591,34 @@ public class AtBDynamicScenarioFactory {
      */
     private static Entity getEntity(String faction, int skill, int quality, int unitType, int weightClass, Campaign campaign) {
         MechSummary ms = null;
+        
+        UnitGeneratorParameters params = new UnitGeneratorParameters();
+        params.faction = faction;
+        params.quality = quality;
+        params.unitType = unitType;
+        params.weightClass = weightClass;
+        params.year = campaign.getCalendar().get(Calendar.YEAR);
+                
         if (unitType == UnitType.TANK) {
             if (campaign.getCampaignOptions().getOpforUsesVTOLs()) {
-                ms = campaign.getUnitGenerator()
-                        .generate(faction, unitType, weightClass, campaign.getCalendar()
-                                .get(Calendar.YEAR), quality, IUnitGenerator.MIXED_TANK_VTOL, null);            
+                params.movementModes.addAll(IUnitGenerator.MIXED_TANK_VTOL);
+                ms = campaign.getUnitGenerator().generate(params);            
             } else {
-                ms = campaign.getUnitGenerator()
-                        .generate(faction, unitType, weightClass, campaign.getCalendar()
-                                .get(Calendar.YEAR), quality, v -> !v.getUnitType().equals("VTOL"));
+                params.filter = v -> !v.getUnitType().equals("VTOL");
+                ms = campaign.getUnitGenerator().generate(params);
             }
-            // todo: introduce the possibility of infantry being field guns instead
-            // how: refactor IUnitGenerator interface to use UnitTable.Parameters class to avoid
-            //  many overloads
-        } else {
-            ms = campaign.getUnitGenerator()
-                    .generate(faction, unitType, weightClass, campaign.getCalendar()
-                            .get(Calendar.YEAR), quality);
+        } else if (unitType == UnitType.INFANTRY) {
+            boolean useFieldGuns = true;//Compute.d6() <= 2;
+            if(useFieldGuns) {
+                params.missionRoles.add(MissionRole.FIELD_GUN);
+            }
+            
+            params.movementModes.addAll(IUnitGenerator.ALL_INFANTRY_MODES);
+            
+            ms = campaign.getUnitGenerator().generate(params);
+        }
+        else {
+            ms = campaign.getUnitGenerator().generate(params);
         }
 
         if (ms == null) {

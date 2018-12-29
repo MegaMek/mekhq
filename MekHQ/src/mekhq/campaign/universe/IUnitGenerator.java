@@ -46,6 +46,14 @@ public interface IUnitGenerator {
             EntityMovementMode.VTOL);
     
     /**
+     * For convenience in generating infantry units.
+     */
+    final static EnumSet<EntityMovementMode> ALL_INFANTRY_MODES = EnumSet.of(EntityMovementMode.INF_JUMP,
+            EntityMovementMode.INF_LEG, EntityMovementMode.INF_MOTORIZED, EntityMovementMode.INF_UMU,
+            EntityMovementMode.TRACKED, EntityMovementMode.WHEELED, EntityMovementMode.HOVER);
+            
+    
+    /**
      * Convenience function to let us know whether a unit type supports weight class selection.
      * @param unitType The unit type to check.
      * @return Whether or not the unit type supports weight class selection.
@@ -151,6 +159,23 @@ public interface IUnitGenerator {
 	List<MechSummary> generate(int count, String faction, int unitType, int weightClass,
 			int year, int quality, Collection<EntityMovementMode> movementModes,
 			Predicate<MechSummary> filter);
+	
+	/**
+	 * Generates the given count of units, for the given faction, using the given set of parameters.
+	 * Note that some of the properties of the parameters may be ignored for generation mechanisms that aren't the RAT Generator
+	 * @param count How many to generate
+	 * @param parameters data structure containing unit generation parameters
+	 * @return List of generated units. Empty if none generated.
+	 */
+	List<MechSummary> generate(int count, UnitGeneratorParameters parameters);
+	
+	/**
+     * Generates a single unit, for the given faction, using the given set of parameters.
+     * Note that some of the properties of the parameters may be ignored for generation mechanisms that aren't the RAT Generator
+     * @param parameters data structure containing unit generation parameters
+     * @return Generated units. Null if none generated.
+     */
+	MechSummary generate(UnitGeneratorParameters parameters);
 	
 	/**
 	 * Generates a list of turrets given a skill level, quality and year
