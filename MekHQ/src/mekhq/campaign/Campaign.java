@@ -2284,8 +2284,6 @@ public class Campaign implements Serializable, ITechManager {
                     xpGained += getCampaignOptions().getTaskXP();
                     person.setNTasks(0);
                 }
-                // The person should have their acquisitions incremented
-                person.incrementAcquisition();
             }
         } else {
             report = report + acquisition.failToFind();
@@ -2294,6 +2292,12 @@ public class Campaign implements Serializable, ITechManager {
                 xpGained += getCampaignOptions().getMistakeXP();
             }
         }
+
+        if (null != person) {
+            // The person should have their acquisitions incremented
+            person.incrementAcquisition();
+        }
+
         if (xpGained > 0) {
             person.setXp(person.getXp() + xpGained);
             report += " (" + xpGained + "XP gained) ";
