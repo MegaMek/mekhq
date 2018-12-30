@@ -2951,9 +2951,16 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 entity.getCrew().setOptions(options);
             }
             
-            //Assign edge points to spacecraft crews
-            if (entity instanceof SmallCraft || entity instanceof Jumpship) {
-                int sumEdge = 0;
+            //This is intended to replace the block above that only looks at the Commander's abilities.
+            //What crew-served units have I not considered correctly?
+            
+            //Assign edge points to spacecraft and vehicle crews and infantry units
+            if (entity instanceof SmallCraft 
+                    || entity instanceof Jumpship
+                    /*|| entity instanceof Tank
+                    || entity instanceof Infantry*/) {
+                double crewSize = (gunners.size() + drivers.size());
+                double sumEdge = 0;
                 int edge = 0;
                 for (UUID pid : drivers) {
                     Person p = campaign.getPerson(pid);
@@ -2964,7 +2971,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     sumEdge += p.getEdge();
                 }
                 //We need to average the edge values of pilots and gunners. Don't mess with the engineer here.
-                edge = (sumEdge / (gunners.size() + drivers.size()));
+                
+                edge = (int) Math.round(sumEdge / crewSize);
                 IOption edgeOption = entity.getCrew().getOptions().getOption(OptionsConstants.EDGE);
                 edgeOption.setValue((Integer) edge);
             }
