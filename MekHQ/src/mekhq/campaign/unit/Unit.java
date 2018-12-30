@@ -2951,30 +2951,53 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 entity.getCrew().setOptions(options);
             }
             
-            //This is intended to replace the block above that only looks at the Commander's abilities.
-            //What crew-served units have I not considered correctly?
-            
-            //Assign edge points to spacecraft and vehicle crews and infantry units
+            //For crew-served units, let's look at the abilities of the group. If more than half the crew
+            //(gunners and drivers only, for spacecraft) have an SPA or implant, grant the benefit to the unit
             if (entity instanceof SmallCraft 
                     || entity instanceof Jumpship
                     /*|| entity instanceof Tank
                     || entity instanceof Infantry*/) {
-                double crewSize = (gunners.size() + drivers.size());
-                double sumEdge = 0;
-                int edge = 0;
+                //Combine drivers and gunners for this
+                List<UUID> combatCrew = new ArrayList<UUID>();
                 for (UUID pid : drivers) {
-                    Person p = campaign.getPerson(pid);
-                    sumEdge += p.getEdge();
+                    combatCrew.add(pid);
                 }
                 for (UUID pid : gunners) {
-                    Person p = campaign.getPerson(pid);
-                    sumEdge += p.getEdge();
+                    combatCrew.add(pid);
                 }
-                //We need to average the edge values of pilots and gunners. Don't mess with the engineer here.
-                
-                edge = (int) Math.round(sumEdge / crewSize);
-                IOption edgeOption = entity.getCrew().getOptions().getOption(OptionsConstants.EDGE);
-                edgeOption.setValue((Integer) edge);
+                double crewSize = combatCrew.size();
+                if (campaign.getCampaignOptions().useAbilities()) {
+                    List<PilotOptions> crewOptions = new ArrayList<PilotOptions>();
+                    for (UUID pid : combatCrew) {
+                        Person p = campaign.getPerson(pid);
+                        PilotOptions options = new PilotOptions();
+                        for (Enumeration<IOptionGroup> i = options.getGroups(); i.hasMoreElements();) {
+                            IOptionGroup group = i.nextElement();
+                            for (Enumeration<IOption> j = group.getOptions(); j.hasMoreElements();) {
+                                IOption option = j.nextElement();
+                                option.setValue(p.getOptions().getOption(option.getName()).getValue());
+                            }
+                        }
+                        crewOptions.add(options);
+                    }
+                }
+                //Assign edge points to spacecraft and vehicle crews and infantry units
+                if (campaign.getCampaignOptions().useEdge()) {
+                    double sumEdge = 0;
+                    int edge = 0;
+                    for (UUID pid : drivers) {
+                        Person p = campaign.getPerson(pid);
+                        sumEdge += p.getEdge();
+                    }
+                    for (UUID pid : gunners) {
+                        Person p = campaign.getPerson(pid);
+                        sumEdge += p.getEdge();
+                    }
+                    //We need to average the edge values of pilots and gunners. Don't mess with the engineer here.
+                    edge = (int) Math.round(sumEdge / crewSize);
+                    IOption edgeOption = entity.getCrew().getOptions().getOption(OptionsConstants.EDGE);
+                    edgeOption.setValue((Integer) edge);
+                }
             }
             
             if(usesSoloPilot()) {
