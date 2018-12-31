@@ -91,7 +91,9 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
     JCheckBox chkContributesToMapSize;
     JSpinner spnGenerationOrder;
     JCheckBox chkAllowAeroBombs;
-    
+    JCheckBox chkUseArtillery;
+    JSpinner spnStartingAltitude;
+    JCheckBox chkOffBoard;
     
     JPanel panForceList;
     JTextField txtScenarioName;
@@ -483,6 +485,34 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         gbc.gridx++;
         forcedPanel.add(chkAllowAeroBombs, gbc);
         
+        JLabel lblStartingAltitude = new JLabel("Start Altitude:");
+        lblStartingAltitude.setToolTipText("Starting elevation for VTOLs or altitude for aeros/ground units. Ignored in space. Use with caution as it may lead to splattering.");
+        gbc.gridy++;
+        gbc.gridx--;
+        forcedPanel.add(lblStartingAltitude, gbc);
+        
+        spnStartingAltitude = new JSpinner(new SpinnerNumberModel(0, 0, 10, 1));
+        gbc.gridx++;
+        forcedPanel.add(spnStartingAltitude, gbc);
+        
+        JLabel lblUseArtillery = new JLabel("Is Artillery:");
+        gbc.gridx--;
+        gbc.gridy++;
+        forcedPanel.add(lblUseArtillery, gbc);
+        
+        chkUseArtillery = new JCheckBox();
+        gbc.gridx++;
+        forcedPanel.add(chkUseArtillery, gbc);
+        
+        JLabel lblOffboard = new JLabel("Deploy Offboard:");
+        gbc.gridx--;
+        gbc.gridy++;
+        forcedPanel.add(lblOffboard, gbc);
+        
+        chkOffBoard = new JCheckBox();
+        gbc.gridx++;
+        forcedPanel.add(chkOffBoard, gbc);
+        
         JButton btnAdd = new JButton("Save");
         btnAdd.setActionCommand(ADD_FORCE_COMMAND);
         btnAdd.addActionListener(this);
@@ -523,6 +553,9 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         chkContributesToMapSize.setSelected(forceTemplate.getContributesToMapSize());
         spnGenerationOrder.setValue(forceTemplate.getGenerationOrder());
         chkAllowAeroBombs.setSelected(forceTemplate.getAllowAeroBombs());
+        chkOffBoard.setSelected(forceTemplate.getDeployOffboard());
+        spnStartingAltitude.setValue(forceTemplate.getStartingAltitude());
+        chkUseArtillery.setSelected(forceTemplate.getUseArtillery());
     }
     
     /**
@@ -1003,6 +1036,9 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         sft.setMaxWeightClass(cboMaxWeightClass.getSelectedIndex());
         sft.setGenerationOrder((int) spnGenerationOrder.getValue());
         sft.setAllowAeroBombs(chkAllowAeroBombs.isSelected());
+        sft.setStartingAltitude((int) spnStartingAltitude.getValue());
+        sft.setUseArtillery(chkUseArtillery.isSelected());
+        sft.setDeployOffboard(chkOffBoard.isSelected());
         
         sft.setSyncDeploymentType(SynchronizedDeploymentType.values()[cboSyncDeploymentType.getSelectedIndex()]);
         
@@ -1051,6 +1087,14 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
             }
             
             valBuilder.append("Bot-controlled forces cannot be player-supplied.");
+        }
+        
+        if(chkOffBoard.isSelected() && !chkUseArtillery.isSelected()) {
+            if(valBuilder.length() > 0) {
+                valBuilder.append("\n");
+            }
+            
+            valBuilder.append("Non-artillery units cannot be deployed off board.");
         }
         
         /*if(scenarioTemplate.scenarioForces.containsKey(txtForceName.getText())) {

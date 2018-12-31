@@ -25,6 +25,7 @@ import megamek.common.EntityWeightClass;
 import megamek.common.MechFileParser;
 import megamek.common.MechSummary;
 import megamek.common.MechSummaryCache;
+import megamek.common.OffBoardDirection;
 import megamek.common.PlanetaryConditions;
 import megamek.common.UnitType;
 import megamek.common.logging.LogLevel;
@@ -37,6 +38,7 @@ import mekhq.campaign.force.Lance;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
 import mekhq.campaign.mission.ScenarioForceTemplate.SynchronizedDeploymentType;
+import mekhq.campaign.mission.ScenarioMapParameters.MapLocation;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
@@ -61,6 +63,10 @@ public class AtBDynamicScenarioFactory {
     
     private static int[] validBotBombs = { BombType.B_HE, BombType.B_CLUSTER, BombType.B_RL, BombType.B_INFERNO, BombType.B_THUNDER };
     
+    private static int IS_LANCE_SIZE = 4;
+    private static int CLAN_MH_LANCE_SIZE = 5;
+    private static int COMSTAR_LANCE_SIZE = 6;
+    
     /**
      * Method that sets some initial scenario parameters from the given template, prior to force generation and such.
      * @param template The template to use when populating the new scenario.
@@ -77,9 +83,21 @@ public class AtBDynamicScenarioFactory {
         scenario.setEffectiveOpforSkill(contract.getEnemySkill());
         scenario.setEffectiveOpforQuality(contract.getEnemyQuality());
         
-        setLightConditions(scenario);
-        setWeather(scenario);
-        setPlanetaryConditions(scenario, contract, campaign);
+        if(campaign.getCampaignOptions().getUseLightConditions()) {
+            setLightConditions(scenario);
+        }
+        
+        // set weather conditions if the user wants to play with them and is on a ground map
+        if(campaign.getCampaignOptions().getUseWeatherConditions() &&
+                (template.mapParameters.mapLocation == MapLocation.AllGroundTerrain ||
+                template.mapParameters.mapLocation == MapLocation.SpecificGroundTerrain)) {
+            setWeather(scenario);
+        }
+        
+        if(campaign.getCampaignOptions().getUsePlanetaryConditions()) {
+            setPlanetaryConditions(scenario, contract, campaign);
+        }
+        
         setTerrain(scenario);
         
         return scenario;
@@ -284,15 +302,23 @@ public class AtBDynamicScenarioFactory {
             } else if(IUnitGenerator.unitTypeSupportsWeightClass(actualUnitType) ||
                     (actualUnitType == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX)) { 
                 List<Integer> unitTypes = generateUnitTypes(actualUnitType, lanceSize, campaign);
-                String unitWeights = generateUnitWeights(unitTypes, factionCode, 
-                        AtBConfiguration.decodeWeightStr(currentLanceWeightString, 0), forceTemplate.getMaxWeightClass(), campaign);
-     
-                generatedLance = generateLance(factionCode, skill, 
-                        quality, unitTypes, unitWeights, campaign);
+                
+                // special case: if we're generating artillery, there's not a lot of variety
+                // in artillery unit weight classes, so we ignore that specification
+                if(!forceTemplate.getUseArtillery()) {
+                    String unitWeights = generateUnitWeights(unitTypes, factionCode, 
+                            AtBConfiguration.decodeWeightStr(currentLanceWeightString, 0), forceTemplate.getMaxWeightClass(), campaign);
+         
+                    generatedLance = generateLance(factionCode, skill, 
+                            quality, unitTypes, unitWeights, false, campaign);
+                } else {
+                    generatedLance = generateLance(factionCode, skill, 
+                            quality, unitTypes, true, campaign);
+                }
             // everything else doesn't support weight class specification
             } else {
                 List<Integer> unitTypes = generateUnitTypes(actualUnitType, lanceSize, campaign);
-                generatedLance = generateLance(factionCode, skill, quality, unitTypes, campaign);
+                generatedLance = generateLance(factionCode, skill, quality, unitTypes, forceTemplate.getUseArtillery(), campaign);
             }
             
             // no reason to go into an endless loop if we can't generate a lance
@@ -308,6 +334,12 @@ public class AtBDynamicScenarioFactory {
                 populateAeroBombs(generatedLance, campaign);
             }
             
+            if(forceTemplate.getUseArtillery() && forceTemplate.getDeployOffboard()) {
+                deployArtilleryOffBoard(generatedLance);
+            }
+            
+            setStartingAltitude(generatedLance, forceTemplate.getStartingAltitude());
+                        
             // if force contributes to map size, increment the generated "lance" count
             if(forceTemplate.getContributesToMapSize()) {
                 generatedLanceCount++;
@@ -585,11 +617,28 @@ public class AtBDynamicScenarioFactory {
      * @param skill            The RandomSkillGenerator constant that represents the skill level of the overall force.
      * @param quality        The equipment rating of the force.
      * @param unitType        The UnitTableData constant for the type of unit to generate.
-     * @param weightClass    The weight class of the unit to generate
+     * @param weightClass    The weight class of the unit to generate                
      * @param campaign
      * @return                A new Entity with crew.
      */
-    private static Entity getEntity(String faction, int skill, int quality, int unitType, int weightClass, Campaign campaign) {
+    public static Entity getEntity(String faction, int skill, int quality, int unitType, int weightClass, Campaign campaign) {
+        return getEntity(faction, skill, quality, unitType, weightClass, false, campaign);
+    }
+    
+    /**
+     * Determines the most appropriate RAT and uses it to generate a random Entity
+     *
+     * @param faction        The faction code to use for locating the correct RAT and assigning a crew name
+     * @param skill            The RandomSkillGenerator constant that represents the skill level of the overall force.
+     * @param quality        The equipment rating of the force.
+     * @param unitType        The UnitTableData constant for the type of unit to generate.
+     * @param weightClass    The weight class of the unit to generate
+     * @param artillery     Whether the unit should be artillery or not. Use with caution, as some unit types simply do not have
+     *                      support artillery.                      
+     * @param campaign
+     * @return                A new Entity with crew.
+     */
+    public static Entity getEntity(String faction, int skill, int quality, int unitType, int weightClass, boolean artillery, Campaign campaign) {
         MechSummary ms = null;
         
         UnitGeneratorParameters params = new UnitGeneratorParameters();
@@ -600,22 +649,9 @@ public class AtBDynamicScenarioFactory {
         params.year = campaign.getCalendar().get(Calendar.YEAR);
                 
         if (unitType == UnitType.TANK) {
-            if (campaign.getCampaignOptions().getOpforUsesVTOLs()) {
-                params.movementModes.addAll(IUnitGenerator.MIXED_TANK_VTOL);
-                ms = campaign.getUnitGenerator().generate(params);            
-            } else {
-                params.filter = v -> !v.getUnitType().equals("VTOL");
-                ms = campaign.getUnitGenerator().generate(params);
-            }
+            return getTankEntity(params, skill, artillery, campaign);
         } else if (unitType == UnitType.INFANTRY) {
-            boolean useFieldGuns = true;//Compute.d6() <= 2;
-            if(useFieldGuns) {
-                params.missionRoles.add(MissionRole.FIELD_GUN);
-            }
-            
-            params.movementModes.addAll(IUnitGenerator.ALL_INFANTRY_MODES);
-            
-            ms = campaign.getUnitGenerator().generate(params);
+            return getInfantryEntity(params, skill, artillery, campaign);
         }
         else {
             ms = campaign.getUnitGenerator().generate(params);
@@ -628,6 +664,64 @@ public class AtBDynamicScenarioFactory {
         return createEntityWithCrew(faction, skill, campaign, ms);
     }
 
+    /**
+     * Generates a tank entity, either artillery or normal.
+     * @param params Unit generation parameters.
+     * @param skill skill level
+     * @param artillery whether or not the unit generated should be artillery
+     * @return Entity or null if unable to generate.
+     */
+    public static Entity getTankEntity(UnitGeneratorParameters params, int skill, boolean artillery, Campaign campaign) {
+        MechSummary ms = null;
+        
+        if(artillery) {
+            params.missionRoles.add(MissionRole.ARTILLERY);
+        }
+        
+        if (campaign.getCampaignOptions().getOpforUsesVTOLs()) {
+            params.movementModes.addAll(IUnitGenerator.MIXED_TANK_VTOL);
+            ms = campaign.getUnitGenerator().generate(params);            
+        } else {
+            params.filter = v -> !v.getUnitType().equals("VTOL");
+            ms = campaign.getUnitGenerator().generate(params);
+        }
+        
+        if (ms == null) {
+            return null;
+        }
+        
+        return createEntityWithCrew(params.faction, skill, campaign, ms);
+    }
+    
+    /**
+     * Generates an infantry entity, either artillery or normal with a 33% chance of field guns.
+     * @param params Unit generation parameters.
+     * @param skill skill level
+     * @param artillery whether or not the unit generated should be artillery
+     * @return Entity or null if unable to generate.
+     */
+    public static Entity getInfantryEntity(UnitGeneratorParameters params, int skill, boolean artillery, Campaign campaign) {
+        // note that the "ARTILLERY" mission role appears mutually exclusive with the "FIELD_GUN" mission role
+        if(artillery) {
+            params.missionRoles.add(MissionRole.ARTILLERY);
+        } else {
+            boolean useFieldGuns = Compute.d6() <= 2;
+            if(useFieldGuns) {
+                params.missionRoles.add(MissionRole.FIELD_GUN);
+            }
+        }
+        
+        params.movementModes.addAll(IUnitGenerator.ALL_INFANTRY_MODES);
+        
+        MechSummary ms = campaign.getUnitGenerator().generate(params);
+        
+        if (ms == null) {
+            return null;
+        }
+        
+        return createEntityWithCrew(params.faction, skill, campaign, ms);
+    }
+    
     /**
      * @param faction Faction to use for name generation
      * @param skill Skill rating of the crew
@@ -700,8 +794,7 @@ public class AtBDynamicScenarioFactory {
     }
 
     /**
-     * Generates a new Entity without using a RAT. Used for turrets and employer-assigned
-     * Leopard Dropships.
+     * Generates a new Entity without using a RAT. Useful for "persistent" or fixed units.
      *
      * @param name            Full name (chassis + model) of the entity to generate.
      * @param fName            Faction code to use for crew name generation
@@ -854,26 +947,9 @@ public class AtBDynamicScenarioFactory {
         
         return unitTypes;
     }
-    
-    /**
-     * Generates a list of integers corresponding to megamek unit type constants.
-     * Specific to aerospace units, where the unit may randomly be composed of aerospace or conventional fighters.
-     * @param isPlanetOwner Whether the owner of the aero units is the planet owner.
-     * @param unitCount How many units to generate.
-     * @param campaign Current campaign
-     * @return Array list of unit type integers.
-     */
-    private static List<Integer> generateAeroTypes(boolean isPlanetOwner, int unitCount, Campaign campaign) {
-        int useASFRoll = isPlanetOwner ? Compute.d6() : 6;
-        // if we are the planet owner, we may use ASF or conventional fighters 
-        boolean useASF = useASFRoll >= 4;
-
-        return generateUnitTypes(useASF ? UnitType.AERO : UnitType.CONV_FIGHTER, unitCount, campaign);
-    }
-    
+   
     /**
      * Logic that generates a "unit weights" string according to AtB rules.
-     * TODO: Update for clans, marian hegemony, wobbies, etc.
      * @param unitTypes List of unit types (mek, tank, etc)
      * @param faction Faction for unit generation
      * @param weightClass "Base" weight class, drives the generated weights with some variation
@@ -882,8 +958,16 @@ public class AtBDynamicScenarioFactory {
      * @return Unit weight string.
      */
     private static String generateUnitWeights(List<Integer> unitTypes, String faction, int weightClass, int maxWeight, Campaign campaign) {
+        Faction genFaction = Faction.getFaction(faction);
+        String factionWeightString = AtBConfiguration.ORG_IS;
+        if(genFaction.isClan() || faction == "MH") {
+            factionWeightString = AtBConfiguration.ORG_CLAN;
+        } else if (genFaction.isComstar()) {
+            factionWeightString = AtBConfiguration.ORG_CS;
+        }
+        
         String weights = adjustForMaxWeight(campaign.getAtBConfig()
-                .selectBotUnitWeights(AtBConfiguration.ORG_IS, weightClass), maxWeight);
+                .selectBotUnitWeights(factionWeightString, weightClass), maxWeight);
         
         weights = adjustWeightsForFaction(weights, faction);
         
@@ -1030,11 +1114,13 @@ public class AtBDynamicScenarioFactory {
      * @param campaign working campaign.
      * @return Generated entity list.
      */
-    private static List<Entity> generateLance(String faction, int skill, int quality, List<Integer> unitTypes, Campaign campaign) {
+    private static List<Entity> generateLance(String faction, int skill, int quality, List<Integer> unitTypes, 
+            boolean artillery, Campaign campaign) {
         List<Entity> retval = new ArrayList<>();
         
         for(int i = 0; i < unitTypes.size(); i++) {
-            Entity en = getEntity(faction, skill, quality, unitTypes.get(i), UNIT_WEIGHT_UNSPECIFIED, campaign);
+            Entity en = getEntity(faction, skill, quality, unitTypes.get(i),
+                    UNIT_WEIGHT_UNSPECIFIED, artillery, campaign);
             if(en != null) {
                 retval.add(en);
             }
@@ -1053,11 +1139,13 @@ public class AtBDynamicScenarioFactory {
      * @param campaign Working campaign
      * @return List of generated entities.
      */
-    private static List<Entity> generateLance(String faction, int skill, int quality, List<Integer> unitTypes, String weights, Campaign campaign) {
+    private static List<Entity> generateLance(String faction, int skill, int quality, List<Integer> unitTypes, 
+            String weights, boolean artillery, Campaign campaign) {
         List<Entity> retval = new ArrayList<>();
         
         for(int i = 0; i < unitTypes.size(); i++) {
-            Entity en = getEntity(faction, skill, quality, unitTypes.get(i), AtBConfiguration.decodeWeightStr(weights, i), campaign);
+            Entity en = getEntity(faction, skill, quality, unitTypes.get(i), 
+                    AtBConfiguration.decodeWeightStr(weights, i), artillery, campaign);
             if(en != null) {
                 retval.add(en);
             }
@@ -1446,14 +1534,14 @@ public class AtBDynamicScenarioFactory {
             // clans and marian hegemony use a fundamental unit size of 5.
             if(faction.isClan() ||
                     factionCode == "MH") {
-                return 5;
+                return CLAN_MH_LANCE_SIZE;
             // comstar and wobbies use a fundamental unit size of 6.
             } else if(faction.isComstar()) {
-                return 6;
+                return COMSTAR_LANCE_SIZE;
             }
         }
         
-        return 4;
+        return IS_LANCE_SIZE;
     }
     
     /**
@@ -1481,10 +1569,40 @@ public class AtBDynamicScenarioFactory {
     }
     
     /**
+     * Helper function that deploys the given units off board a random distance 1-2 boards in a random direction
+     * @param entityList
+     */
+    private static void deployArtilleryOffBoard(List<Entity> entityList) {
+        OffBoardDirection direction = OffBoardDirection.getDirection(Compute.randomInt(4) + 1);
+        int distance = Compute.randomInt(2) + 1;
+        
+        for(Entity entity : entityList) {
+            entity.setOffBoard(distance, direction);
+        }
+    }
+    
+    /**
+     * Helper function that puts the units in the given list at the given altitude, and
+     * VTOLs at the elevation. Use with caution, as may lead to splattering.
+     * @param entityList The entity list to process.
+     * @param startingAltitude Starting altitude.
+     */
+    private static void setStartingAltitude(List<Entity> entityList, int startingAltitude) {
+        for(Entity entity : entityList) {
+            if(entity.hasETypeFlag(Entity.ETYPE_VTOL)) {
+                entity.setElevation(startingAltitude);
+            } else {
+                entity.setAltitude(startingAltitude);
+            }
+        }
+    }
+    
+    /**
      * Helper function that makes some of the units in the given list of entities
      * carry bombs.
-     * @param entity
-     * @param campaign
+     * @param entityList The list of entities to process
+     * @param campaign Campaign object. In the future, may be used to check list of bombs
+     * for technological availability.
      */
     private static void populateAeroBombs(List<Entity> entityList, Campaign campaign) {
         int maxBombers = Compute.randomInt(entityList.size()) + 1;

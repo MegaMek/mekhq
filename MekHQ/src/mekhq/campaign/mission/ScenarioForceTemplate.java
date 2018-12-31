@@ -219,6 +219,26 @@ public class ScenarioForceTemplate {
     private boolean allowAeroBombs = false;
     
     /**
+     * The altitude/elevation at which this unit starts.
+     * For normally ground units, this indicates a "hot drop" (is it possible?)
+     * For helos, it's the elevation
+     * For aircraft it's actual altitude, with 0 being grounded.
+     * Ignored in space.
+     */
+    private int startingAltitude;
+    
+    /**
+     * Whether or not this force will be composed of artillery units.
+     * For some unit types this may result in failure to generate a force, so use with caution.
+     */
+    private boolean useArtillery = false;
+    
+    /**
+     * Whether or not this force will deploy artillery units off-board. 
+     */
+    private boolean deployOffBoard = false;
+    
+    /**
      * Blank constructor for deserialization purposes.
      */
     public ScenarioForceTemplate() {
@@ -322,6 +342,18 @@ public class ScenarioForceTemplate {
         return allowAeroBombs;
     }
     
+    public int getStartingAltitude() {
+        return startingAltitude;
+    }
+    
+    public boolean getUseArtillery() {
+        return useArtillery;
+    }
+    
+    public boolean getDeployOffboard() {
+        return deployOffBoard;
+    }
+    
     public void setForceAlignment(int forceAlignment) {
         this.forceAlignment = forceAlignment;
     }
@@ -400,6 +432,18 @@ public class ScenarioForceTemplate {
     
     public void setAllowAeroBombs(boolean allowAeroBombs) {
         this.allowAeroBombs = allowAeroBombs;
+    }
+    
+    public void setUseArtillery(boolean useArtillery) {
+        this.useArtillery = useArtillery;
+    }
+    
+    public void setStartingAltitude(int startingAltitude) {
+        this.startingAltitude = startingAltitude;
+    }
+    
+    public void setDeployOffboard(boolean deployOffBoard) {
+        this.deployOffBoard = deployOffBoard;
     }
     
     /**
