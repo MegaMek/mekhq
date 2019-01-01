@@ -2967,16 +2967,15 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 }
                 double crewSize = combatCrew.size();
                 if (campaign.getCampaignOptions().useAbilities()) {
-                    Stream<Person> pilots = combatCrew.stream();
-                        final Map<String, Object> crewOptions =
-                                pilots.stream().flatMap(p -> getOptions())
-                                    .collect(Collectors.groupingBy(
-                                        IOption::getName,
-                                        Collectors.collectingAndThen(
-                                            Collectors.groupingBy(IOption::getValue, Collectors.counting()),
-                                            m -> m.entrySet().stream().max(Map.Entry.comparingByValue()).get().getKey()
-                                        )
-                                    ));
+                    final Map<String, Object> crewOptions =
+                            combatCrew.map(id -> campaign.getPerson(id).stream().flatMap(p -> getOptions())
+                                .collect(Collectors.groupingBy(
+                                    IOption::getName,
+                                    Collectors.collectingAndThen(
+                                        Collectors.groupingBy(IOption::getValue, Collectors.counting()),
+                                        m -> m.entrySet().stream().max(Map.Entry.comparingByValue()).get().getKey()
+                                    )
+                                )));
                 }
                 //Assign edge points to spacecraft and vehicle crews and infantry units
                 if (campaign.getCampaignOptions().useEdge()) {
