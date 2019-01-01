@@ -608,7 +608,10 @@ public class AcquisitionsDialog extends JDialog {
                     }
 
                     campaignGUI.getCampaign().addReport(actualWork.find(0));
-                    MekHQ.triggerEvent(new UnitChangedEvent(actualWork.getUnit()));
+                    Unit unit = actualWork.getUnit();
+                    if (null != unit) {
+                        MekHQ.triggerEvent(new UnitChangedEvent(unit));
+                    }
 
                     refresh();
                 });
