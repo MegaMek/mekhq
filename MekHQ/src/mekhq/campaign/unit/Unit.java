@@ -2967,19 +2967,16 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 }
                 double crewSize = combatCrew.size();
                 if (campaign.getCampaignOptions().useAbilities()) {
-                    List<PilotOptions> crewOptions = new ArrayList<PilotOptions>();
-                    for (UUID pid : combatCrew) {
-                        Person p = campaign.getPerson(pid);
-                        PilotOptions options = new PilotOptions();
-                        for (Enumeration<IOptionGroup> i = options.getGroups(); i.hasMoreElements();) {
-                            IOptionGroup group = i.nextElement();
-                            for (Enumeration<IOption> j = group.getOptions(); j.hasMoreElements();) {
-                                IOption option = j.nextElement();
-                                option.setValue(p.getOptions().getOption(option.getName()).getValue());
-                            }
-                        }
-                        crewOptions.add(options);
-                    }
+                    Stream<Person> pilots = combatCrew.stream();
+                        final Map<String, Object> crewOptions =
+                                pilots.stream().flatMap(p -> getOptions())
+                                    .collect(Collectors.groupingBy(
+                                        IOption::getName,
+                                        Collectors.collectingAndThen(
+                                            Collectors.groupingBy(IOption::getValue, Collectors.counting()),
+                                            m -> m.entrySet().stream().max(Map.Entry.comparingByValue()).get().getKey()
+                                        )
+                                    ));
                 }
                 //Assign edge points to spacecraft and vehicle crews and infantry units
                 if (campaign.getCampaignOptions().useEdge()) {
