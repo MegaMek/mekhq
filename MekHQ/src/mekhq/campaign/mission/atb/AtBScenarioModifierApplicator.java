@@ -1,6 +1,9 @@
 package mekhq.campaign.mission.atb;
 
+import java.util.UUID;
+
 import megamek.client.RandomSkillsGenerator;
+import megamek.common.Board;
 import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.EntityWeightClass;
@@ -8,12 +11,15 @@ import megamek.common.HitData;
 import megamek.common.Mounted;
 import megamek.common.ToHitData;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.AtBDynamicScenarioFactory;
 import mekhq.campaign.mission.BotForce;
 import mekhq.campaign.mission.ScenarioForceTemplate;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.atb.AtBScenarioModifier.EventTiming;
+import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 
 public class AtBScenarioModifierApplicator {
@@ -178,6 +184,72 @@ public class AtBScenarioModifierApplicator {
                     
                     en.getCrew().setGunnery(skills[0]);
                     en.getCrew().setPiloting(skills[1]);
+                }
+            }
+        }
+    }
+    
+    /**
+     * Helper function that sets up and "ambush", meaning declaring as "hidden" some portion of: 
+     * all non-airborne units on the specified side
+     * that will be on the battlefield at the start of the scenario 
+     * 
+     * Also marks any such forces as able to deploy "anywhere".
+     * @param scenario
+     * @param campaign
+     * @param eventRecipient
+     */
+    public static void setupAmbush(AtBDynamicScenario scenario, Campaign campaign, ForceAlignment eventRecipient) {
+        if(eventRecipient == ForceAlignment.Player) {
+            for(int forceID : scenario.getForceIDs()) {
+                ScenarioForceTemplate forceTemplate = scenario.getPlayerForceTemplates().get(forceID);
+                
+                if(forceTemplate.getArrivalTurn() == 0) {
+                    forceTemplate.setActualDeploymentZone(Board.START_ANY);
+                    Force playerForce = campaign.getForce(forceID);
+                    
+                    // we can hide the "commander tactics skill" number of units, but we must keep at least one visible
+                    // as the bot is unable to handle an invisible opfor at the moment.
+                    int maxHiddenUnits = Math.min(playerForce.getAllUnits().size() - 1, scenario.getLanceCommanderSkill(SkillType.S_TACTICS, campaign));
+                    int numHiddenUnits = 0;
+                
+                    for(UUID unitID : playerForce.getAllUnits()) {
+                        if(numHiddenUnits >= maxHiddenUnits) {
+                            break;
+                        }
+                        
+                        Unit currentUnit = campaign.getUnit(unitID);
+                        // to hide, a unit must exist and not be in mid-air
+                        if(currentUnit != null && !currentUnit.getEntity().isAero() && !currentUnit.getEntity().hasETypeFlag(Entity.ETYPE_VTOL)) {
+                            currentUnit.getEntity().setHidden(true);
+                            numHiddenUnits++;
+                        }
+                    }
+                }
+            }
+        // logic for bot ambushes is a little different
+        } else if (eventRecipient == ForceAlignment.Opposing) {
+            for(int x = 0; x < scenario.getNumBots(); x++) {
+                BotForce currentBotForce = scenario.getBotForce(x);
+                ScenarioForceTemplate forceTemplate = scenario.getBotForceTemplates().get(currentBotForce);
+
+                if(forceTemplate.getArrivalTurn() == 0) {
+                    forceTemplate.setActualDeploymentZone(Board.START_ANY);
+                    
+                    int maxHiddenUnits = currentBotForce.getEntityList().size() / 2;
+                    int numHiddenUnits = 0;
+                    
+                    for(Entity entity : currentBotForce.getEntityList()) {
+                        if(numHiddenUnits >= maxHiddenUnits) {
+                            break;
+                        }
+                        
+                     // to hide, a unit must not be in mid-air
+                        if(!entity.isAero() && !entity.hasETypeFlag(Entity.ETYPE_VTOL)) {
+                            entity.setHidden(true);
+                            numHiddenUnits++;
+                        }
+                    }
                 }
             }
         }

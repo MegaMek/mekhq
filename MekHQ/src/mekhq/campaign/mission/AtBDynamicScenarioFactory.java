@@ -40,7 +40,6 @@ import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
 import mekhq.campaign.mission.ScenarioForceTemplate.SynchronizedDeploymentType;
 import mekhq.campaign.mission.ScenarioMapParameters.MapLocation;
 import mekhq.campaign.personnel.Bloodname;
-import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
@@ -1331,13 +1330,7 @@ public class AtBDynamicScenarioFactory {
             }
             
             // make note of battle commander strategy
-            Person commander = scenario.getLanceCommander(campaign);
-            int strategy = 0;
-            
-            if((commander != null) &&
-                    commander.hasSkill(SkillType.S_STRATEGY)) {
-                strategy = commander.getSkill(SkillType.S_STRATEGY).getLevel();
-            }
+            int strategy = scenario.getLanceCommanderSkill(SkillType.S_STRATEGY, campaign);
             
             // now, attempt to set deployment turns
             // if the force has a template, then use the appropriate algorithm
@@ -1515,12 +1508,9 @@ public class AtBDynamicScenarioFactory {
      * @param campaign Campaign in which the scenario is occurring
      */
     private static void setScenarioRerolls(AtBDynamicScenario scenario, Campaign campaign) {
-        Person commander = scenario.getLanceCommander(campaign);
+        int tacticsSkill = scenario.getLanceCommanderSkill(SkillType.S_TACTICS, campaign);
 
-        if((commander != null) &&
-                commander.hasSkill(SkillType.S_TACTICS)) {
-            scenario.setRerolls(commander.getSkill(SkillType.S_TACTICS).getLevel());
-        }
+        scenario.setRerolls(tacticsSkill);
     }
     
     /**

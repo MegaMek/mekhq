@@ -2595,7 +2595,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     public Skill getSkill(String skillName) {
         return skills.get(skillName);
     }
-
+    
     public void addSkill(String skillName, int lvl, int bonus) {
         skills.put(skillName, new Skill(skillName, lvl, bonus));
     }

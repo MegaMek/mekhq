@@ -105,6 +105,8 @@ public class SkillType implements Serializable {
     
     public static Hashtable<String, SkillType> lookupHash;    
 
+    public static final int SKILL_NONE = 0;
+    
     public static final int EXP_ULTRA_GREEN = 0;
     public static final int EXP_GREEN = 1;
     public static final int EXP_REGULAR = 2;

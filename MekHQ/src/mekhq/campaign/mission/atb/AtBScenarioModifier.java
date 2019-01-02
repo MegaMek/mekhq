@@ -17,6 +17,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.ScenarioForceTemplate;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
+import mekhq.campaign.mission.ScenarioMapParameters.MapLocation;
 
 @XmlRootElement(name="AtBScenarioModifier")
 public class AtBScenarioModifier {
@@ -42,14 +43,16 @@ public class AtBScenarioModifier {
     public Integer battleDamageIntensity = null;
     public Integer ammoExpenditureIntensity = null;
     public Integer unitRemovalCount = null;
+    public List<MapLocation> allowedMapLocations = null;
+    public Boolean useAmbushLogic = null; 
     
     /**
-     * Process this event for a particular scenario, given a particular timing indicator.
+     * Process this scenario modifier for a particular scenario, given a particular timing indicator.
      * @param scenario
      * @param campaign
      * @param eventTiming Whether this is occurring before or after primary forces have been generated.
      */
-    public void processEvent(AtBDynamicScenario scenario, Campaign campaign, EventTiming eventTiming) {
+    public void processModifier(AtBDynamicScenario scenario, Campaign campaign, EventTiming eventTiming) {
         if(eventTiming == this.eventTiming) {
             if(additionalBriefingText != null & additionalBriefingText.length() > 0) {
                 AtBScenarioModifierApplicator.appendScenarioBriefingText(scenario, additionalBriefingText);
@@ -77,6 +80,10 @@ public class AtBScenarioModifier {
             
             if(unitRemovalCount != null && eventRecipient != null) {
                 AtBScenarioModifierApplicator.removeUnits(scenario, campaign, eventRecipient, unitRemovalCount);
+            }
+            
+            if(useAmbushLogic != null && eventRecipient != null) {
+                AtBScenarioModifierApplicator.setupAmbush(scenario, campaign, eventRecipient);
             }
         }
     }
@@ -124,24 +131,6 @@ public class AtBScenarioModifier {
      */
     private static void loadScenarios() {
         scenarioModifiers = new ArrayList<>();
-        
-        /*String filePath = "./data/ScenarioModifiers/test.xml";
-        File outputFile = new File(filePath);
-        
-        try {
-            AtBScenarioModifier atbs = new AtBScenarioModifier();
-            atbs.effectFlags = new HashMap<>();
-            atbs.effectFlags.put("Alpha", "Beta");
-            atbs.effectFlags.put("Gamma", "Delta");
-            
-            JAXBContext context = JAXBContext.newInstance(AtBScenarioModifier.class);
-            JAXBElement<AtBScenarioModifier> templateElement = new JAXBElement<>(new QName("AtBScenarioModifier"), AtBScenarioModifier.class, atbs);
-            Marshaller m = context.createMarshaller();
-            m.marshal(templateElement, outputFile);
-        } catch(Exception e) {
-            MekHQ.getLogger().error(ScenarioTemplate.class, "Serialize", e.getMessage());
-        }*/
-        
         
         for(String fileName : scenarioModifierManifest.fileNameList) {
             String filePath = String.format("./data/ScenarioModifiers/%s", fileName);

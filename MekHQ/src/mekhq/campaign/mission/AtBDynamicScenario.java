@@ -3,6 +3,7 @@ package mekhq.campaign.mission;
 import java.io.PrintWriter;
 import java.text.ParseException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.w3c.dom.Node;
@@ -11,7 +12,9 @@ import org.w3c.dom.NodeList;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Lance;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
+import mekhq.campaign.mission.atb.AtBScenarioModifier;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.SkillType;
 
 /**
  * Data structure intended to hold data relevant to AtB Dynamic Scenarios (AtB 3.0) 
@@ -37,6 +40,8 @@ public class AtBDynamicScenario extends AtBScenario {
     
     private Map<BotForce, ScenarioForceTemplate> botForceTemplates;
     private Map<Integer, ScenarioForceTemplate> playerForceTemplates;
+    
+    private List<AtBScenarioModifier> scenarioModifiers;
     
     public AtBDynamicScenario() {
         super();
@@ -173,6 +178,32 @@ public class AtBDynamicScenario extends AtBScenario {
         } else {
             return null;
         }
+    }
+    
+    /**
+     * Convenience method to return the int value of the lance commander's skill in the specified area.
+     * Encapsulates a fairly obnoxious number of null checks and other safety code.
+     * @param skill The type of skill to check.
+     * @return The skill level. SKILL_NONE (0) if not present.
+     */
+    public int getLanceCommanderSkill(String skillType, Campaign campaign) {
+        Person commander = getLanceCommander(campaign);
+        int skillValue = SkillType.SKILL_NONE;
+        
+        if((commander != null) &&
+                commander.hasSkill(skillType)) {
+            skillValue = commander.getSkill(skillType).getLevel();
+        }
+        
+        return skillValue;
+    }
+    
+    public void setScenarioModifiers(List<AtBScenarioModifier> scenarioModifiers) {
+        this.scenarioModifiers = scenarioModifiers;
+    }
+    
+    public List<AtBScenarioModifier> getScenarioModifiers() {
+        return scenarioModifiers;
     }
 
     @Override
