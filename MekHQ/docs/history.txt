@@ -9,6 +9,13 @@ v0.45.3-SNAPSHOT
 + PR #997: Add weekly Support Personnel edge refresh and usage
 + PR #1006: Speed up calculation of jump paths
 + PR #999: Adds a GM hire button to new recruit dialog
++ PR #1017: Adds the list of missing units on campaign load to the log
++ Issue #1010: Battle Armor fails to load with StackOverflowException
++ Issue #991: Fix bug where loan collateral and total value is incorrect after save and load.
++ Issue #986: Fix bug where Retirement/Defection dialog doesn't show details for first row.
++ Issue #985: Fix bug where personnel could not be exported.
++ Issue #1022: Fix bug where failed acquisitions did not count against logistics person's limit
++ Issue #964: Do not raise UnitChangedEvent if there is no unit in GM Acquire Instantly
 
 v0.45.2 (2018-11-18 0200 UTC)
 + Switched build system from ant to gradle.

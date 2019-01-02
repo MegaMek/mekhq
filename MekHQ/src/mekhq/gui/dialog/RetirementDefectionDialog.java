@@ -246,7 +246,7 @@ public class RetirementDefectionDialog extends JDialog {
         	personnelTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
         		@Override
                 public void valueChanged(ListSelectionEvent ev) {
-        			if (personnelTable.getSelectedRow() <= 0) {
+        			if (personnelTable.getSelectedRow() < 0) {
         				return;
         			}
         			int row = personnelTable.convertRowIndexToModel(personnelTable.getSelectedRow());

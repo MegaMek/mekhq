@@ -57,7 +57,7 @@ public class FileDialogs {
      */
     public static Optional<File> savePersonnel(JFrame frame, Campaign campaign) {
 
-        String fileName = String.format( "%s%_ExportedPersonnel.prsx", //$NON-NLS-1$
+        String fileName = String.format( "%s%s_ExportedPersonnel.prsx", //$NON-NLS-1$
                                          campaign.getName(),
                                          campaign.getShortDateAsString() );
 
