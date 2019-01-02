@@ -2387,7 +2387,7 @@ public class Campaign implements Serializable, ITechManager {
             r.addTimeSpent(tech.getMinutesLeft());
             tech.setMinutesLeft(0);
             report = report + ", " + r.getTimeLeft() + " minutes left.";
-                } else {
+        } else {
             tech.setMinutesLeft(tech.getMinutesLeft() - minutes);
             r.addTimeSpent(minutes);
             if (r.hasFailedCheck()) {
@@ -2427,8 +2427,8 @@ public class Campaign implements Serializable, ITechManager {
                     }
                 }
                 report += wrongType;
-                    }
-                }
+            }
+        }
         MekHQ.triggerEvent(new PartWorkEvent(tech, r));
         addReport(report);
     }
@@ -2509,14 +2509,17 @@ public class Campaign implements Serializable, ITechManager {
             } else {
                 // we need to finish the task tomorrow
                 minutesUsed = tech.getMinutesLeft();
+                int overtimeUsed = 0;
                 if (isOvertimeAllowed()) {
-                    minutesUsed += tech.getOvertimeLeft();
+                    // Can't use more overtime than there are minutes remaining on the part
+                    overtimeUsed = Math.min(minutes, tech.getOvertimeLeft());
+                    minutesUsed += overtimeUsed;
                     partWork.setWorkedOvertime(true);
                     usedOvertime = true;
                 }
                 partWork.addTimeSpent(minutesUsed);
                 tech.setMinutesLeft(0);
-                tech.setOvertimeLeft(0);
+                tech.setOvertimeLeft(tech.getOvertimeLeft() - overtimeUsed);
                 int helpMod = getShorthandedMod(
                         getAvailableAstechs(minutesUsed, usedOvertime), false);
                 if (null != partWork.getUnit()
@@ -2533,7 +2536,15 @@ public class Campaign implements Serializable, ITechManager {
                 if (null != partWork.getUnit()) {
                     report += " on " + partWork.getUnit().getName();
                 }
-                report += " will be finished tomorrow.</b>";
+                if (minutesUsed > 0) {
+                    report += " will be finished tomorrow.</b>";
+                } else {
+                    report += " cannot be finished because there was no time left after maintenance tasks.</b>";
+                    partWork.resetTimeSpent();
+                    partWork.resetOvertime();
+                    partWork.setTeamId(null);
+                    partWork.cancelReservation();
+                }
                 MekHQ.triggerEvent(new PartWorkEvent(tech, partWork));
                 addReport(report);
                 return;
@@ -5294,15 +5305,9 @@ public class Campaign implements Serializable, ITechManager {
             isOvertime = true;
         }
 
-        int minutes = partWork.getTimeLeft();
-        if (minutes > tech.getMinutesLeft()) {
-            if (isOvertimeAllowed()) {
-                if (minutes > (tech.getMinutesLeft() + tech.getOvertimeLeft())) {
-                    minutes = tech.getMinutesLeft() + tech.getOvertimeLeft();
-                }
-            } else {
-                minutes = tech.getMinutesLeft();
-            }
+        int minutes = Math.min(partWork.getTimeLeft(), tech.getMinutesLeft());
+        if (isOvertimeAllowed()) {
+            minutes = Math.min(minutes, tech.getMinutesLeft() + tech.getOvertimeLeft());
         }
         int helpMod = 0;
         if (null != partWork.getUnit() && partWork.getUnit().isSelfCrewed()) {
