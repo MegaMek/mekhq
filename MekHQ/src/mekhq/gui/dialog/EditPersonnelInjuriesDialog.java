@@ -182,6 +182,7 @@ public class EditPersonnelInjuriesDialog extends JDialog {
     
     private void addEntry() {
         EditInjuryEntryDialog eied = new EditInjuryEntryDialog(frame, true, new Injury());
+        eied.setAlwaysOnTop(true);
         eied.setVisible(true);
         if(null != eied.getEntry()) {
             person.addInjury(eied.getEntry());
@@ -193,6 +194,7 @@ public class EditPersonnelInjuriesDialog extends JDialog {
         Injury entry = injuryModel.getEntryAt(injuriesTable.getSelectedRow());
         if(null != entry) {
             EditInjuryEntryDialog eied = new EditInjuryEntryDialog(frame, true, entry);
+            eied.setAlwaysOnTop(true);
             eied.setVisible(true);
             refreshTable();
         }
