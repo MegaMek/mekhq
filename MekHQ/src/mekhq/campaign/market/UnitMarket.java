@@ -30,6 +30,7 @@ import java.util.Set;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import megamek.client.ratgenerator.MissionRole;
 import megamek.common.Compute;
 import megamek.common.EntityWeightClass;
 import megamek.common.MechSummary;
@@ -47,6 +48,7 @@ import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.IUnitGenerator;
 import mekhq.campaign.universe.RandomFactionGenerator;
+import mekhq.campaign.universe.UnitGeneratorParameters;
 
 /**
  * Generates units available for sale.
@@ -216,17 +218,27 @@ public class UnitMarket implements Serializable {
 			faction = campaign.getFactionCode();
 			market = MARKET_EMPLOYER;
 		}
+		
+		UnitGeneratorParameters params = new UnitGeneratorParameters();
+		params.faction = faction;
+		params.year = campaign.getCalendar().get(Calendar.YEAR);
+		params.unitType = unitType;
+		params.quality = quality;
+		
 		for (int i = 0; i < num; i++) {
-			int weight = getRandomWeight(unitType, faction,
-					campaign.getCampaignOptions().getRegionalMechVariations());
+			params.weightClass = getRandomWeight(unitType, faction,
+                    campaign.getCampaignOptions().getRegionalMechVariations());
+			params.missionRoles.clear();
+			
 			MechSummary ms;
 			if (unitType == UnitType.TANK) {
-			    ms = campaign.getUnitGenerator().generate(faction, unitType, weight,
-	                    campaign.getCalendar().get(Calendar.YEAR), quality,
-	                    IUnitGenerator.MIXED_TANK_VTOL, null);
+			    params.movementModes = IUnitGenerator.MIXED_TANK_VTOL;
+			    params.missionRoles.add(MissionRole.MIXED_ARTILLERY);
+			    
+			    ms = campaign.getUnitGenerator().generate(params);
 			} else {
-			    ms = campaign.getUnitGenerator().generate(faction, unitType, weight,
-					campaign.getCalendar().get(Calendar.YEAR), quality);
+			    params.movementModes.clear();
+			    ms = campaign.getUnitGenerator().generate(params);
 			}
 			if (ms != null) {
 				if (campaign.getCampaignOptions().limitByYear() &&
