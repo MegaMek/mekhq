@@ -258,5 +258,4 @@ public class AtBScenarioModifierApplicator {
     public static void appendScenarioBriefingText(AtBDynamicScenario scenario, String additionalBriefingText) {
         scenario.setDesc(String.format("%s\n\n%s", scenario.getDescription(), additionalBriefingText));
     }
-    
 }

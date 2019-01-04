@@ -2,6 +2,7 @@ package mekhq.campaign.mission;
 
 import java.io.PrintWriter;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,6 +49,7 @@ public class AtBDynamicScenario extends AtBScenario {
         
         botForceTemplates = new HashMap<>();
         playerForceTemplates = new HashMap<>();
+        scenarioModifiers = new ArrayList<>();
     }
 
     @Override

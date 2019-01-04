@@ -39,6 +39,8 @@ import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
 import mekhq.campaign.mission.ScenarioForceTemplate.SynchronizedDeploymentType;
 import mekhq.campaign.mission.ScenarioMapParameters.MapLocation;
+import mekhq.campaign.mission.atb.AtBScenarioModifier;
+import mekhq.campaign.mission.atb.AtBScenarioModifier.EventTiming;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
@@ -99,6 +101,10 @@ public class AtBDynamicScenarioFactory {
         
         setTerrain(scenario);
         
+        setScenarioModifiers(scenario);
+        
+        applyScenarioModifiers(scenario, campaign, EventTiming.PreForceGeneration);
+        
         return scenario;
     }
     
@@ -127,6 +133,8 @@ public class AtBDynamicScenarioFactory {
         scenario.setLanceCount(generatedLanceCount + (playerForceUnitCount / 4));
         setScenarioMapSize(scenario);
         setDeploymentZones(scenario);
+        
+        applyScenarioModifiers(scenario, campaign, EventTiming.PostForceGeneration);
         
         setScenarioRerolls(scenario, campaign);
         
@@ -201,6 +209,12 @@ public class AtBDynamicScenarioFactory {
         DateTime currentDate = Utilities.getDateTimeDay(campaign.getCalendar());
         ForceAlignment forceAlignment = ForceAlignment.getForceAlignment(forceTemplate.getForceAlignment());
         
+        // planet owner logic requires some special handling
+        if(forceAlignment == ForceAlignment.PlanetOwner) {
+            factionCode = getPlanetOwnerFaction(contract, currentDate);
+            forceAlignment = getPlanetOwnerAlignment(contract, factionCode, currentDate);
+        }
+        
         switch(forceAlignment) {
         case Allied:
         case Player:
@@ -209,26 +223,9 @@ public class AtBDynamicScenarioFactory {
             quality = contract.getAllyQuality();
             break;
         case Opposing:
-        case Third:
             factionCode = contract.getEnemyCode();
-            skill = scenario.getEffectiveOpforSkill();
-            quality = scenario.getEffectiveOpforQuality();
-            break;
-        case PlanetOwner:
-            // planet owner is the first of the factions that owns the current planet.
-            // if there's no such thing, then mercenaries.
-            List<String> planetFactions = contract.getPlanet().getFactions(currentDate);
-            if(planetFactions != null && !planetFactions.isEmpty()) {
-                factionCode = planetFactions.get(0);
-                Faction ownerFaction = Faction.getFaction(factionCode);
-                
-                if(ownerFaction.is(Tag.ABANDONED)) {
-                    factionCode = "MERC";
-                }
-            } else {
-                factionCode = "MERC";
-            }
-            
+        // intentional fall-through: "third" parties have already had their faction code set.
+        case Third:
             skill = scenario.getEffectiveOpforSkill();
             quality = scenario.getEffectiveOpforQuality();
             break;
@@ -366,7 +363,7 @@ public class AtBDynamicScenarioFactory {
         
         BotForce generatedForce = new BotForce();
         generatedForce.setEntityList(generatedEntities);
-        setBotForceParameters(generatedForce, forceTemplate, contract);
+        setBotForceParameters(generatedForce, forceTemplate, forceAlignment, contract);
         scenario.addBotForce(generatedForce, forceTemplate);
         
         return generatedLanceCount;
@@ -607,6 +604,43 @@ public class AtBDynamicScenarioFactory {
         
         scenario.setMapSizeX(mapSizeX);
         scenario.setMapSizeY(mapSizeY);
+    }
+    
+    /**
+     * Sets up scenario modifiers for this scenario.
+     * @param scenario
+     */
+    private static void setScenarioModifiers(AtBDynamicScenario scenario) {
+        // this is hardcoded for now, but the eventual plan is to let the user configure how many modifiers
+        // they want applied
+        int numMods = 2;//Compute.randomInt(2);
+        
+        for(int x = 0; x < numMods; x++) {
+            int scenarioIndex = Compute.randomInt(AtBScenarioModifier.getScenarioModifiers().size());
+            
+            AtBScenarioModifier scenarioMod = AtBScenarioModifier.getScenarioModifiers().get(scenarioIndex);
+         
+            if((scenarioMod.allowedMapLocations == null) ||
+                    scenarioMod.allowedMapLocations.contains(scenario.getTemplate().mapParameters.mapLocation)) {
+                scenario.getScenarioModifiers().add(scenarioMod);
+                
+                if(scenarioMod.blockFurtherEvents == true) {
+                    break;
+                }
+            }
+        }
+    }
+    
+    /**
+     * Simple method to process all scenario modifiers for a given scenario.
+     * @param scenario The scenario to modify
+     * @param campaign The campaign
+     * @param when Before or after force generation
+     */
+    private static void applyScenarioModifiers(AtBDynamicScenario scenario, Campaign campaign, EventTiming when) {
+        for(AtBScenarioModifier scenarioMod : scenario.getScenarioModifiers()) {
+            scenarioMod.processModifier(scenario, campaign, when);
+        }
     }
     
     /**
@@ -1159,13 +1193,14 @@ public class AtBDynamicScenarioFactory {
      * @param forceTemplate The force template from which to set parameters
      * @param contract The contract from which to set parameters
      */
-    private static void setBotForceParameters(BotForce generatedForce, ScenarioForceTemplate forceTemplate, AtBContract contract) {
-        if(forceTemplate.getForceAlignment() == ScenarioForceTemplate.ForceAlignment.Allied.ordinal()) {
+    private static void setBotForceParameters(BotForce generatedForce, ScenarioForceTemplate forceTemplate, 
+            ForceAlignment forceAlignment, AtBContract contract) {
+        if(forceAlignment == ScenarioForceTemplate.ForceAlignment.Allied) {
             generatedForce.setName(String.format("%s %s", contract.getAllyBotName(), forceTemplate.getForceName()));
             generatedForce.setColorIndex(contract.getAllyColorIndex());
             generatedForce.setCamoCategory(contract.getAllyCamoCategory());
             generatedForce.setCamoFileName(contract.getAllyCamoFileName());
-        } else if(forceTemplate.getForceAlignment() == ScenarioForceTemplate.ForceAlignment.Opposing.ordinal()) {
+        } else if(forceAlignment == ScenarioForceTemplate.ForceAlignment.Opposing) {
             generatedForce.setName(String.format("%s %s", contract.getEnemyBotName(), forceTemplate.getForceName()));
             generatedForce.setColorIndex(contract.getEnemyColorIndex());
             generatedForce.setCamoCategory(contract.getEnemyCamoCategory());
@@ -1613,5 +1648,36 @@ public class AtBDynamicScenarioFactory {
                 numBombers++;
             }
         }
+    }
+    
+    private static String getPlanetOwnerFaction(AtBContract contract, DateTime currentDate) {
+        String factionCode = "MERC";
+        
+        // planet owner is the first of the factions that owns the current planet.
+        // if there's no such thing, then mercenaries.
+        List<String> planetFactions = contract.getPlanet().getFactions(currentDate);
+        if(planetFactions != null && !planetFactions.isEmpty()) {
+            factionCode = planetFactions.get(0);
+            Faction ownerFaction = Faction.getFaction(factionCode);
+            
+            if(ownerFaction.is(Tag.ABANDONED)) {
+                factionCode = "MERC";
+            }
+        }
+        
+        return factionCode;
+    }
+    
+    private static ForceAlignment getPlanetOwnerAlignment(AtBContract contract, String factionCode, DateTime currentDate) {
+        // if the faction 
+        if(contract.getPlanet().getFactions(currentDate).contains(factionCode)) {
+            if(factionCode == contract.getEmployerCode()) {
+                return ForceAlignment.Allied;
+            } else if(factionCode == contract.getEnemyCode()) {
+                return ForceAlignment.Opposing;
+            }
+        } 
+        
+        return ForceAlignment.Third;
     }
 }

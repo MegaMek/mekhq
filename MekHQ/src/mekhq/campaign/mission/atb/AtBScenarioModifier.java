@@ -33,8 +33,8 @@ public class AtBScenarioModifier {
     }
 
     public String additionalBriefingText = null;
-    public Boolean benefitsPlayer = null;
-    public Boolean blockFurtherEvents = null;
+    public Boolean benefitsPlayer = false;
+    public Boolean blockFurtherEvents = false;
     public EventTiming eventTiming = null;
     public ScenarioForceTemplate forceDefinition = null;
     public Integer skillAdjustment = null;
@@ -135,10 +135,16 @@ public class AtBScenarioModifier {
         for(String fileName : scenarioModifierManifest.fileNameList) {
             String filePath = String.format("./data/ScenarioModifiers/%s", fileName);
             
-            AtBScenarioModifier modifier = Deserialize(filePath);
-            
-            if(modifier != null) {
-                scenarioModifiers.add(modifier);
+            try {
+                AtBScenarioModifier modifier = Deserialize(filePath);
+                
+                if(modifier != null) {
+                    scenarioModifiers.add(modifier);
+                }
+            }
+            catch(Exception e) {
+                MekHQ.getLogger().error(ScenarioModifierManifest.class, "Deserialize", 
+                        String.format("Error Loading Scenario %s", filePath), e);
             }
         }
     }
@@ -194,7 +200,7 @@ class ScenarioModifierManifest {
             Unmarshaller um = context.createUnmarshaller();
             File xmlFile = new File(fileName);
             if(!xmlFile.exists()) {
-                MekHQ.getLogger().warning(ScenarioModifierManifest.class, "Deserialize", String.format("Specified file %d does not exist", fileName));
+                MekHQ.getLogger().warning(ScenarioModifierManifest.class, "Deserialize", String.format("Specified file %s does not exist", fileName));
                 return null;
             }
             
