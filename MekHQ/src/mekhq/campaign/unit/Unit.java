@@ -27,6 +27,7 @@ import java.math.BigInteger;
 import java.text.DecimalFormat;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import mekhq.campaign.log.LogEntryController;
 import mekhq.campaign.log.ServiceLogger;
@@ -2967,15 +2968,19 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 }
                 double crewSize = combatCrew.size();
                 if (campaign.getCampaignOptions().useAbilities()) {
-                    final Map<String, Object> crewOptions =
-                            combatCrew.map(id -> campaign.getPerson(id).stream().flatMap(p -> getOptions())
+                    Stream<PilotOptions> optionsList = 
+                            combatCrew.stream().map(id -> campaign.getPerson(id))
+                            .flatMap(p -> p.getOptions().getOption(IOption.getName().getValue().collect(Collectors.groupingBy(
+                                    IOption::getName)));
+                   /* final Map<String, Object> crewOptions =
+                            
                                 .collect(Collectors.groupingBy(
                                     IOption::getName,
                                     Collectors.collectingAndThen(
                                         Collectors.groupingBy(IOption::getValue, Collectors.counting()),
                                         m -> m.entrySet().stream().max(Map.Entry.comparingByValue()).get().getKey()
                                     )
-                                )));
+                                ))); */
                 }
                 //Assign edge points to spacecraft and vehicle crews and infantry units
                 if (campaign.getCampaignOptions().useEdge()) {
