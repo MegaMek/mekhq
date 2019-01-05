@@ -2936,29 +2936,28 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
 
         // Clear any stale game data that may somehow have gotten set incorrectly
         campaign.clearGameData(entity);
-        //create a new set of options. For now we will just assign based on commander, but
-        //we really should be more detailed about this.
-        Person commander = getCommander();
-        if (null != commander) {
-            if (campaign.getCampaignOptions().useAbilities()) {
-                PilotOptions options = new PilotOptions();
-                for (Enumeration<IOptionGroup> i = options.getGroups(); i.hasMoreElements();) {
-                     IOptionGroup group = i.nextElement();
-                     for (Enumeration<IOption> j = group.getOptions(); j.hasMoreElements();) {
-                         IOption option = j.nextElement();
-                         option.setValue(commander.getOptions().getOption(option.getName()).getValue());
-                     }
-                }
-                entity.getCrew().setOptions(options);
+        //Set up SPAs, Implants, Edge, etc
+        if (campaign.getCampaignOptions().useAbilities()) {
+            PilotOptions options = new PilotOptions();
+            //This double enumeration is annoying to work with for crew-served units.
+            //Get the option names while we enumerate so they can be used later
+            List<String> optionNames = new ArrayList<String>();
+            for (Enumeration<IOptionGroup> i = options.getGroups(); i.hasMoreElements();) {
+                 IOptionGroup group = i.nextElement();
+                 for (Enumeration<IOption> j = group.getOptions(); j.hasMoreElements();) {
+                     IOption option = j.nextElement();
+                     optionNames.add(option.getName());
+                     //option.setValue(commander.getOptions().getOption(option.getName()).getValue());
+                 }
             }
             
             //For crew-served units, let's look at the abilities of the group. If more than half the crew
-            //(gunners and drivers only, for spacecraft) have an SPA or implant, grant the benefit to the unit
-            if (entity instanceof SmallCraft 
-                    || entity instanceof Jumpship
-                    /*|| entity instanceof Tank
-                    || entity instanceof Infantry*/) {
-                //Combine drivers and gunners for this
+            //(gunners and pilots only, for spacecraft) have an ability, grant the benefit to the unit
+            if (entity.hasETypeFlag(Entity.ETYPE_SMALL_CRAFT)
+                    || entity.hasETypeFlag(Entity.ETYPE_JUMPSHIP)
+                    /*|| entity.hasETypeFlag(Entity.ETYPE_TANK)
+                    || entity.hasETypeFlag(Entity.ETYPE_INFANTRY)*/) {
+                //Combine drivers and gunners into a single list
                 List<UUID> combatCrew = new ArrayList<UUID>();
                 for (UUID pid : drivers) {
                     combatCrew.add(pid);
@@ -2967,20 +2966,18 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     combatCrew.add(pid);
                 }
                 double crewSize = combatCrew.size();
-                if (campaign.getCampaignOptions().useAbilities()) {
-                    Stream<PilotOptions> optionsList = 
-                            combatCrew.stream().map(id -> campaign.getPerson(id))
-                            .flatMap(p -> p.getOptions().getOption(IOption.getName().getValue().collect(Collectors.groupingBy(
-                                    IOption::getName)));
-                   /* final Map<String, Object> crewOptions =
-                            
-                                .collect(Collectors.groupingBy(
-                                    IOption::getName,
-                                    Collectors.collectingAndThen(
-                                        Collectors.groupingBy(IOption::getValue, Collectors.counting()),
-                                        m -> m.entrySet().stream().max(Map.Entry.comparingByValue()).get().getKey()
-                                    )
-                                ))); */
+                Stream<Person> crew = combatCrew.stream().map(id -> campaign.getPerson(id));
+            }
+            Person commander = getCommander();
+            if (null != commander) {
+            
+                
+                entity.getCrew().setOptions(options);
+            }
+                    
+                    Stream<PilotOptions> pOptions = crew.map(p -> p.getOptions());
+                            //.flatMap(p -> p.getOptions().getOption(IOption.getName().getValue().collect(Collectors.groupingBy(
+                                    //IOption::getName)));
                 }
                 //Assign edge points to spacecraft and vehicle crews and infantry units
                 if (campaign.getCampaignOptions().useEdge()) {
