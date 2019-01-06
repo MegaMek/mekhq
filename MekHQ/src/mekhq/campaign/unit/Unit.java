@@ -2957,6 +2957,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     || entity.hasETypeFlag(Entity.ETYPE_JUMPSHIP)
                     /*|| entity.hasETypeFlag(Entity.ETYPE_TANK)
                     || entity.hasETypeFlag(Entity.ETYPE_INFANTRY)*/) {
+                //Find the unit commander
+                Person commander = getCommander();
                 //Combine drivers and gunners into a single list
                 List<UUID> combatCrew = new ArrayList<UUID>();
                 for (UUID pid : drivers) {
@@ -2967,18 +2969,12 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 }
                 double crewSize = combatCrew.size();
                 Stream<Person> crew = combatCrew.stream().map(id -> campaign.getPerson(id));
-            }
-            Person commander = getCommander();
-            if (null != commander) {
-            
                 
-                entity.getCrew().setOptions(options);
-            }
-                    
-                    Stream<PilotOptions> pOptions = crew.map(p -> p.getOptions());
-                            //.flatMap(p -> p.getOptions().getOption(IOption.getName().getValue().collect(Collectors.groupingBy(
-                                    //IOption::getName)));
-                }
+                //Set up a collection of all the IOption names and all of the different values for each 
+                //held by various crewmembers
+                Stream<IOption> pOptions = crew.flatMap(p -> optionNames.stream().map(name -> p.getOptions().getOption(name)));
+                Map<String, List<Object>> allCrewOptions = pOptions.collect(Collectors.groupingBy(o -> o.getName(), o -> o.getValue()));
+                
                 //Assign edge points to spacecraft and vehicle crews and infantry units
                 if (campaign.getCampaignOptions().useEdge()) {
                     double sumEdge = 0;
@@ -2996,21 +2992,39 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     IOption edgeOption = entity.getCrew().getOptions().getOption(OptionsConstants.EDGE);
                     edgeOption.setValue((Integer) edge);
                 }
-            }
-            
-            if(usesSoloPilot()) {
-                if(!commander.isActive()) {
-                    entity.getCrew().setMissing(true, 0);;
-                    return;
+                
+                // Composite technician used by spacecraft and infantry
+                resetEngineer();
+                //Tactics command bonus. This should actually reflect the unit's commander,
+                //unlike most everything else in this block.
+                //TODO: game option to use tactics as command and ind init bonus
+                if(commander.hasSkill(SkillType.S_TACTICS)) {
+                    entity.getCrew().setCommandBonus(commander.getSkill(SkillType.S_TACTICS).getFinalSkillValue());
+                } else {
+                    entity.getCrew().setCommandBonus(0);
                 }
-                entity.getCrew().setHits(commander.getHits(), 0);
-            }
-            resetEngineer();
-            //TODO: game option to use tactics as command and ind init bonus
-            if(commander.hasSkill(SkillType.S_TACTICS)) {
-                entity.getCrew().setCommandBonus(commander.getSkill(SkillType.S_TACTICS).getFinalSkillValue());
             } else {
-                entity.getCrew().setCommandBonus(0);
+                Person commander = getCommander();
+                if (null != commander) {
+            
+                
+                entity.getCrew().setOptions(options);
+                }
+            
+                if(usesSoloPilot()) {
+                    if(!commander.isActive()) {
+                        entity.getCrew().setMissing(true, 0);;
+                        return;
+                    }
+                    entity.getCrew().setHits(commander.getHits(), 0);
+                }
+                resetEngineer();
+                //TODO: game option to use tactics as command and ind init bonus
+                if(commander.hasSkill(SkillType.S_TACTICS)) {
+                    entity.getCrew().setCommandBonus(commander.getSkill(SkillType.S_TACTICS).getFinalSkillValue());
+                } else {
+                    entity.getCrew().setCommandBonus(0);
+                }
             }
         }
     }
