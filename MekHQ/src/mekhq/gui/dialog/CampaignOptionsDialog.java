@@ -4065,6 +4065,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         spnIntensity.setModel(new SpinnerNumberModel(options.getIntensity(), 0.0, 5.0, 0.1));
         spnIntensity.setToolTipText(resourceMap.getString("spnIntensity.toolTipText"));
         spnIntensity.setValue(options.getIntensity());
+        spnIntensity.setMinimumSize(new Dimension(60, 25));
+        spnIntensity.setPreferredSize(new Dimension(60, 25));
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 11;
         panSubAtBContract.add(spnIntensity, gridBagConstraints);
