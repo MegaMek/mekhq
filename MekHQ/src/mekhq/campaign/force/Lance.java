@@ -83,6 +83,9 @@ public class Lance implements Serializable, MekHqXmlSerializable {
     public static final long ETYPE_GROUND = Entity.ETYPE_MECH |
             Entity.ETYPE_TANK | Entity.ETYPE_INFANTRY | Entity.ETYPE_PROTOMECH;
 
+    /** Indicates a lance has no assigned mission */
+    public static final int NO_MISSION = -1;
+
     private int forceId;
     private int missionId;
     private int role;
@@ -133,7 +136,7 @@ public class Lance implements Serializable, MekHqXmlSerializable {
 
     public void setContract(AtBContract c) {
         if (null == c) {
-            missionId = -1;
+            missionId = NO_MISSION;
         } else {
             missionId = c.getId();
         }
