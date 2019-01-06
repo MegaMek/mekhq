@@ -192,7 +192,6 @@ public class MassRepairService {
 		List<Unit> units = new ArrayList<Unit>();
 
 		for (Unit unit : campaignGUI.getCampaign().getServiceableUnits()) {
-
 			if (!isValidMRMSUnit(unit)) {
 				continue;
 			}
@@ -217,12 +216,13 @@ public class MassRepairService {
 			}
 		});
 
-		massRepairSalvageUnits(campaignGUI, units);
+		List<MassRepairOption> activeMROs = createActiveMROsFromConfiguration(campaignGUI);
+
+		massRepairSalvageUnits(campaignGUI, units, activeMROs);
 	}
 
-	public static void massRepairSalvageUnits(CampaignGUI campaignGUI, List<Unit> units) {
+	public static void massRepairSalvageUnits(CampaignGUI campaignGUI, List<Unit> units, List<MassRepairOption> activeMROs) {
 		CampaignOptions options = campaignGUI.getCampaign().getCampaignOptions();
-		List<MassRepairOption> activeMROs = createActiveMROsFromConfiguration(campaignGUI);
 
 		Map<MassRepairUnitAction.STATUS, List<MassRepairUnitAction>> unitActionsByStatus = new HashMap<MassRepairUnitAction.STATUS, List<MassRepairUnitAction>>();
 
