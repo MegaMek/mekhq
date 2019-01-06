@@ -5183,7 +5183,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
     private void updateBattleChances() {
         double intensity = (Double)spnIntensity.getValue();
-        if (intensity > AtBContract.MINIMUM_INTENSITY) {
+        if (intensity >= AtBContract.MINIMUM_INTENSITY) {
             lblFightPct.setText((int)(40.0 * intensity / (40.0 * intensity + 60.0) * 100.0 + 0.5) + "%");
             lblDefendPct.setText((int)(20.0 * intensity / (20.0 * intensity + 80.0) * 100.0 + 0.5) + "%");
             lblScoutPct.setText((int)(60.0 * intensity / (60.0 * intensity + 40.0) * 100.0 + 0.5) + "%");
