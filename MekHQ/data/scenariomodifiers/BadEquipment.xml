@@ -1,0 +1,7 @@
+<AtBScenarioModifier>
+	<additionalBriefingText>The enemy force appears to be poorly equipped.</additionalBriefingText>
+	<benefitsPlayer>true</benefitsPlayer>
+	<eventTiming>PreForceGeneration</eventTiming>
+	<eventRecipient>Opposing</eventRecipient>
+	<qualityAdjustment>-1</qualityAdjustment>
+</AtBScenarioModifier>
