@@ -1718,7 +1718,7 @@ public class CampaignGUI extends JPanel {
         }
         if (atb != getCampaign().getCampaignOptions().getUseAtB()) {
             if (getCampaign().getCampaignOptions().getUseAtB()) {
-                getCampaign().initAtB();
+                getCampaign().initAtB(false);
                 //refresh lance assignment table
                 MekHQ.triggerEvent(new OrganizationChangedEvent(getCampaign().getForces()));
             }
@@ -1731,17 +1731,18 @@ public class CampaignGUI extends JPanel {
             miRetirementDefectionDialog.setVisible(getCampaign()
                     .getCampaignOptions().getUseAtB());
             if (getCampaign().getCampaignOptions().getUseAtB()) {
-                RandomFactionGenerator.getInstance().startup(getCampaign());
-                while (!RandomUnitGenerator.getInstance().isInitialized()) {
-                    //Sleep for up to one second.
+                int loops = 0;
+                while (!RandomUnitGenerator.getInstance().isInitialized()
+                    || !RandomNameGenerator.getInstance().isInitialized()) {
                     try {
                         Thread.sleep(50);
+                        if (++loops > 20) {
+                            // Wait for up to a second
+                            break;
+                        }
                     } catch (InterruptedException ignore) {
-
                     }
                 }
-                RandomNameGenerator.getInstance();
-                RandomFactionGenerator.getInstance().startup(getCampaign());
             } else {
                 getCampaign().shutdownAtB();
             }

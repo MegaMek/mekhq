@@ -324,6 +324,7 @@ public class GMToolsDialog extends JDialog implements ActionListener {
                         person.setOriginalUnit(u);
                         setVisible(false);
                     }
+                    lastRolledUnit = null;
                 } catch (EntityLoadingException e1) {
                     MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
                             "Failed to load entity " + lastRolledUnit.getName() + " from " //$NON-NLS-1$

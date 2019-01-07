@@ -2387,7 +2387,7 @@ public class Campaign implements Serializable, ITechManager {
             r.addTimeSpent(tech.getMinutesLeft());
             tech.setMinutesLeft(0);
             report = report + ", " + r.getTimeLeft() + " minutes left.";
-                } else {
+        } else {
             tech.setMinutesLeft(tech.getMinutesLeft() - minutes);
             r.addTimeSpent(minutes);
             if (r.hasFailedCheck()) {
@@ -2427,8 +2427,8 @@ public class Campaign implements Serializable, ITechManager {
                     }
                 }
                 report += wrongType;
-                    }
-                }
+            }
+        }
         MekHQ.triggerEvent(new PartWorkEvent(tech, r));
         addReport(report);
     }
@@ -2509,14 +2509,17 @@ public class Campaign implements Serializable, ITechManager {
             } else {
                 // we need to finish the task tomorrow
                 minutesUsed = tech.getMinutesLeft();
+                int overtimeUsed = 0;
                 if (isOvertimeAllowed()) {
-                    minutesUsed += tech.getOvertimeLeft();
+                    // Can't use more overtime than there are minutes remaining on the part
+                    overtimeUsed = Math.min(minutes, tech.getOvertimeLeft());
+                    minutesUsed += overtimeUsed;
                     partWork.setWorkedOvertime(true);
                     usedOvertime = true;
                 }
                 partWork.addTimeSpent(minutesUsed);
                 tech.setMinutesLeft(0);
-                tech.setOvertimeLeft(0);
+                tech.setOvertimeLeft(tech.getOvertimeLeft() - overtimeUsed);
                 int helpMod = getShorthandedMod(
                         getAvailableAstechs(minutesUsed, usedOvertime), false);
                 if (null != partWork.getUnit()
@@ -2533,7 +2536,15 @@ public class Campaign implements Serializable, ITechManager {
                 if (null != partWork.getUnit()) {
                     report += " on " + partWork.getUnit().getName();
                 }
-                report += " will be finished tomorrow.</b>";
+                if (minutesUsed > 0) {
+                    report += " will be finished tomorrow.</b>";
+                } else {
+                    report += " cannot be finished because there was no time left after maintenance tasks.</b>";
+                    partWork.resetTimeSpent();
+                    partWork.resetOvertime();
+                    partWork.setTeamId(null);
+                    partWork.cancelReservation();
+                }
                 MekHQ.triggerEvent(new PartWorkEvent(tech, partWork));
                 addReport(report);
                 return;
@@ -3514,17 +3525,21 @@ public class Campaign implements Serializable, ITechManager {
         shoppingList.restore();
 
         if (getCampaignOptions().getUseAtB()) {
+            RandomNameGenerator.initialize();
             RandomFactionGenerator.getInstance().startup(this);
-            while (!RandomUnitGenerator.getInstance().isInitialized()) {
-                //Sleep for up to one second.
+
+            int loops = 0;
+            while (!RandomUnitGenerator.getInstance().isInitialized()
+                || !RandomNameGenerator.getInstance().isInitialized()) {
                 try {
                     Thread.sleep(50);
+                    if (++loops > 20) {
+                        // Wait for up to a second
+                        break;
+                    }
                 } catch (InterruptedException ignore) {
-
                 }
             }
-            RandomNameGenerator.getInstance();
-            RandomFactionGenerator.getInstance().startup(this);
         }
     }
 
@@ -5295,15 +5310,9 @@ public class Campaign implements Serializable, ITechManager {
             isOvertime = true;
         }
 
-        int minutes = partWork.getTimeLeft();
-        if (minutes > tech.getMinutesLeft()) {
-            if (isOvertimeAllowed()) {
-                if (minutes > (tech.getMinutesLeft() + tech.getOvertimeLeft())) {
-                    minutes = tech.getMinutesLeft() + tech.getOvertimeLeft();
-                }
-            } else {
-                minutes = tech.getMinutesLeft();
-            }
+        int minutes = Math.min(partWork.getTimeLeft(), tech.getMinutesLeft());
+        if (isOvertimeAllowed()) {
+            minutes = Math.min(minutes, tech.getMinutesLeft() + tech.getOvertimeLeft());
         }
         int helpMod = 0;
         if (null != partWork.getUnit() && partWork.getUnit().isSelfCrewed()) {
@@ -7968,79 +7977,86 @@ public class Campaign implements Serializable, ITechManager {
         }
     }
 
-    public void initAtB() {
-        retirementDefectionTracker.setLastRetirementRoll(calendar);
+    public void initAtB(boolean newCampaign) {
+        getRetirementDefectionTracker().setLastRetirementRoll(getCalendar());
 
-        /*
-         * Switch all contracts to AtBContract's
-         */
-        for (Map.Entry<Integer, Mission> me : missions.entrySet()) {
-            Mission m = me.getValue();
-            if (m instanceof Contract && !(m instanceof AtBContract)) {
-                me.setValue(new AtBContract((Contract)m, this));
-            }
-        }
-
-        /*
-         * Go through all the personnel records and assume the earliest date is the date
-         * the unit was founded.
-         */
-        Date founding = null;
-        for (Person p : getPersonnel()) {
-            for (LogEntry e : p.getPersonnelLog()) {
-                if (null == founding || e.getDate().before(founding)) {
-                    founding = e.getDate();
+        if (!newCampaign) {
+            /*
+            * Switch all contracts to AtBContract's
+            */
+            for (Map.Entry<Integer, Mission> me : missions.entrySet()) {
+                Mission m = me.getValue();
+                if (m instanceof Contract && !(m instanceof AtBContract)) {
+                    me.setValue(new AtBContract((Contract)m, this));
                 }
             }
-        }
-        /*
-         * Go through the personnel records again and assume that any person who joined
-         * the unit on the founding date is one of the founding members. Also assume
-         * that MWs assigned to a non-Assault 'Mech on the date they joined came with
-         * that 'Mech (which is a less certain assumption)
-         */
-        for (Person p : getPersonnel()) {
-            Date join = null;
-            for (LogEntry e : p.getPersonnelLog()) {
-                if (e.getDesc().startsWith("Joined ")) {
-                    join = e.getDate();
-                    break;
-                }
-            }
-            if (null != join && join.equals(founding)) {
-                p.setFounder(true);
-            }
-            if (p.getPrimaryRole() == Person.T_MECHWARRIOR
-                    || (p.getPrimaryRole() == Person.T_AERO_PILOT && getCampaignOptions().getAeroRecruitsHaveUnits())
-                    || p.getPrimaryRole() == Person.T_PROTO_PILOT) {
+
+            /*
+            * Go through all the personnel records and assume the earliest date is the date
+            * the unit was founded.
+            */
+            Date founding = null;
+            for (Person p : getPersonnel()) {
                 for (LogEntry e : p.getPersonnelLog()) {
-                    if (e.getDate().equals(join) && e.getDesc().startsWith("Assigned to ")) {
-                        String mech = e.getDesc().substring(12);
-                        MechSummary ms = MechSummaryCache.getInstance().getMech(mech);
-                        if (null != ms && (p.isFounder()
-                                || ms.getWeightClass() < megamek.common.EntityWeightClass.WEIGHT_ASSAULT)) {
-                            p.setOriginalUnitWeight(ms.getWeightClass());
-                            if (ms.isClan()) {
-                                p.setOriginalUnitTech(2);
-                            } else if (ms.getYear() > 3050) {
-                                /*
-                                 * We're only guessing anyway, so we use this hack to avoid actually loading the
-                                 * entity to check for IS2
-                                 */
-                                p.setOriginalUnitTech(1);
-                            }
-                            if (null != p.getUnitId() && null != units.get(p.getUnitId())
-                                    && ms.getName().equals(units.get(p.getUnitId()).getEntity().getShortNameRaw())) {
-                                p.setOriginalUnitId(p.getUnitId());
+                    if (null == founding || e.getDate().before(founding)) {
+                        founding = e.getDate();
+                    }
+                }
+            }
+            /*
+            * Go through the personnel records again and assume that any person who joined
+            * the unit on the founding date is one of the founding members. Also assume
+            * that MWs assigned to a non-Assault 'Mech on the date they joined came with
+            * that 'Mech (which is a less certain assumption)
+            */
+            for (Person p : getPersonnel()) {
+                Date join = null;
+                for (LogEntry e : p.getPersonnelLog()) {
+                    if (e.getDesc().startsWith("Joined ")) {
+                        join = e.getDate();
+                        break;
+                    }
+                }
+                if (null != join && join.equals(founding)) {
+                    p.setFounder(true);
+                }
+                if (p.getPrimaryRole() == Person.T_MECHWARRIOR
+                        || (p.getPrimaryRole() == Person.T_AERO_PILOT && getCampaignOptions().getAeroRecruitsHaveUnits())
+                        || p.getPrimaryRole() == Person.T_PROTO_PILOT) {
+                    for (LogEntry e : p.getPersonnelLog()) {
+                        if (e.getDate().equals(join) && e.getDesc().startsWith("Assigned to ")) {
+                            String mech = e.getDesc().substring(12);
+                            MechSummary ms = MechSummaryCache.getInstance().getMech(mech);
+                            if (null != ms && (p.isFounder()
+                                    || ms.getWeightClass() < megamek.common.EntityWeightClass.WEIGHT_ASSAULT)) {
+                                p.setOriginalUnitWeight(ms.getWeightClass());
+                                if (ms.isClan()) {
+                                    p.setOriginalUnitTech(2);
+                                } else if (ms.getYear() > 3050) {
+                                    /*
+                                    * We're only guessing anyway, so we use this hack to avoid actually loading the
+                                    * entity to check for IS2
+                                    */
+                                    p.setOriginalUnitTech(1);
+                                }
+                                if (null != p.getUnitId() && null != units.get(p.getUnitId())
+                                        && ms.getName().equals(units.get(p.getUnitId()).getEntity().getShortNameRaw())) {
+                                    p.setOriginalUnitId(p.getUnitId());
+                                }
                             }
                         }
                     }
                 }
             }
+
+            addAllLances(this.forces);
         }
-        addAllLances(this.forces);
+
         setAtBConfig(AtBConfiguration.loadFromXml());
+        RandomNameGenerator.initialize();
         RandomFactionGenerator.getInstance().startup(this);
+        getContractMarket().generateContractOffers(this, newCampaign);
+        getUnitMarket().generateUnitOffers(this);
         setAtBEventProcessor(new AtBEventProcessor(this));
     }
     
