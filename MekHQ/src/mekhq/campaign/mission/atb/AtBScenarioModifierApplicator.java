@@ -10,6 +10,7 @@ import megamek.common.EntityWeightClass;
 import megamek.common.HitData;
 import megamek.common.Mounted;
 import megamek.common.ToHitData;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBDynamicScenario;
@@ -19,6 +20,7 @@ import mekhq.campaign.mission.ScenarioForceTemplate;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.atb.AtBScenarioModifier.EventTiming;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 
@@ -88,7 +90,7 @@ public class AtBScenarioModifierApplicator {
         for(int x = 0; x < actualUnitsToRemove; x++) {
             int botForceIndex = Compute.randomInt(scenario.getNumBots());
             BotForce bf = scenario.getBotForce(botForceIndex);
-            if(bf.getTeam() == ScenarioForceTemplate.TEAM_IDS.size()) {
+            if(bf.getTeam() == ScenarioForceTemplate.TEAM_IDS.get(eventRecipient.ordinal())) {
                 int unitIndexToRemove = Compute.randomInt(bf.getEntityList().size()); 
                 bf.getEntityList().remove(unitIndexToRemove);
             }
@@ -187,6 +189,29 @@ public class AtBScenarioModifierApplicator {
                 }
             }
         }
+    }
+    
+    /**
+     * Worker function that adjusts the scenario's unit quality by the indicated amount,
+     * capped between 0 and 5. Only effective for units generated after the adjustment has taken place.
+     * Only capable of being applied to opfor.
+     * @param scenario Scenario to modify.
+     * @param c Working campaign
+     * @param eventRecipient Whose
+     * @param qualityAdjustment
+     */
+    public static void adjustQuality(AtBDynamicScenario scenario, Campaign c, ForceAlignment eventRecipient, int qualityAdjustment) {
+        if(eventRecipient != ForceAlignment.Opposing) {
+            MekHQ.getLogger().warning(AtBScenarioModifierApplicator.class, "adjustQuality", "Cannot only adjust opfor unit quality");
+            return;
+        }
+        
+        int currentQuality = scenario.getContract(c).getEnemyQuality();
+                
+        currentQuality += qualityAdjustment;
+        currentQuality = Math.min(IUnitRating.DRAGOON_ASTAR, currentQuality);
+        currentQuality = Math.max(IUnitRating.DRAGOON_F, currentQuality);
+        scenario.setEffectiveOpforQuality(currentQuality);
     }
     
     /**

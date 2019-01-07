@@ -32,6 +32,10 @@ public class ScenarioForceTemplate {
     public static final String[] DEPLOYMENT_ZONES = { "Any", "Northwest", "North", "Northeast", "East", "Southeast", "South", "Southwest", "West", "Edge", "Center", "Narrow Edge" };
     public static final String[] BOT_DESTINATION_ZONES = { "North", "East", "South", "West", "None", "Opposite Deployment Edge", "Random" };
     public static final Map<Integer, String> SPECIAL_UNIT_TYPES;
+    
+    /**
+     * Team IDs, indexed by FORCE_ALIGNMENT
+     */
     public static final Map<Integer, Integer> TEAM_IDS;
     public static final Map<Integer, String> SPECIAL_ARRIVAL_TURNS;
     

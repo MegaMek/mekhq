@@ -39,7 +39,7 @@ import java.util.ResourceBundle;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
-import javax.swing.JFileChooser;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -58,6 +58,8 @@ import mekhq.campaign.mission.Loot;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.ScenarioTemplate;
+import mekhq.campaign.mission.atb.AtBScenarioModifier;
+import mekhq.campaign.mission.atb.AtBScenarioModifier.EventTiming;
 import mekhq.gui.FileDialogs;
 import mekhq.gui.model.LootTableModel;
 
@@ -83,6 +85,8 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
     private ArrayList<Loot> loots;
     private JTable lootTable;
     private JPanel panLoot;
+    
+    private JComboBox<AtBScenarioModifier> modifierBox;
     
     private javax.swing.JPanel panMain;
     private javax.swing.JPanel panBtn;
@@ -246,6 +250,27 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         panMain.add(scrDesc, gridBagConstraints);
+        
+        if(scenario instanceof AtBDynamicScenario && scenario.isCurrent()) {
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy++;
+            gridBagConstraints.gridwidth = 1;
+            
+            modifierBox = new JComboBox<>();
+            for(AtBScenarioModifier modifier : AtBScenarioModifier.getScenarioModifiers()) {
+                modifierBox.addItem(modifier);
+            }
+            panMain.add(modifierBox, gridBagConstraints);
+            
+            JButton addEventButton = new JButton("Apply Modifier");
+            addEventButton.addActionListener(new java.awt.event.ActionListener() {
+                public void actionPerformed(ActionEvent evt) {
+                    btnAddModifierActionPerformed(evt);
+                }
+            });
+            gridBagConstraints.gridx = 1;
+            panMain.add(addEventButton, gridBagConstraints);
+        }
         
         if(!scenario.isCurrent()) {
 	        txtReport.setText(scenario.getReport());
@@ -507,6 +532,18 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
                 }
             }
         }
+    }
+    
+    /**
+     * Event handler for the 'add modifier' butotn.
+     * @param event
+     */
+    private void btnAddModifierActionPerformed(ActionEvent event) {
+        AtBDynamicScenario scenarioPtr = (AtBDynamicScenario) scenario;
+        AtBScenarioModifier modifierPtr = (AtBScenarioModifier) modifierBox.getSelectedItem();
+        EventTiming timing = scenarioPtr.getNumBots() > 0 ? EventTiming.PostForceGeneration : EventTiming.PreForceGeneration;
+        
+        modifierPtr.processModifier(scenarioPtr, campaign, timing);
     }
     
 }

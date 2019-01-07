@@ -101,7 +101,7 @@ public class AtBDynamicScenarioFactory {
         
         setTerrain(scenario);
         
-        setScenarioModifiers(scenario);
+        //setScenarioModifiers(scenario);
         
         applyScenarioModifiers(scenario, campaign, EventTiming.PreForceGeneration);
         
@@ -1209,7 +1209,7 @@ public class AtBDynamicScenarioFactory {
             generatedForce.setName("Unknown Hostiles");
         }
         
-        generatedForce.setTeam(ScenarioForceTemplate.TEAM_IDS.get(forceTemplate.getForceAlignment()));
+        generatedForce.setTeam(ScenarioForceTemplate.TEAM_IDS.get(forceAlignment.ordinal()));
         setDestinationZone(generatedForce, forceTemplate);
     }
     
@@ -1671,9 +1671,9 @@ public class AtBDynamicScenarioFactory {
     private static ForceAlignment getPlanetOwnerAlignment(AtBContract contract, String factionCode, DateTime currentDate) {
         // if the faction 
         if(contract.getPlanet().getFactions(currentDate).contains(factionCode)) {
-            if(factionCode == contract.getEmployerCode()) {
+            if(factionCode.equals(contract.getEmployerCode())) {
                 return ForceAlignment.Allied;
-            } else if(factionCode == contract.getEnemyCode()) {
+            } else if(factionCode.equals(contract.getEnemyCode())) {
                 return ForceAlignment.Opposing;
             }
         } 

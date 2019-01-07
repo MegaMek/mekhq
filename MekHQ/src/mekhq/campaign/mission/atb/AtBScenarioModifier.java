@@ -32,6 +32,7 @@ public class AtBScenarioModifier {
         PostForceGeneration
     }
 
+    public String modifierName = null;
     public String additionalBriefingText = null;
     public Boolean benefitsPlayer = false;
     public Boolean blockFurtherEvents = false;
@@ -67,7 +68,7 @@ public class AtBScenarioModifier {
             }
             
             if(qualityAdjustment != null && eventRecipient != null) {
-                // AtBScenarioModifierApplicator.adjustQuality(scenario, campaign, eventRecipient, skillAdjustment);
+                AtBScenarioModifierApplicator.adjustQuality(scenario, campaign, eventRecipient, qualityAdjustment);
             }
             
             if(battleDamageIntensity != null && eventRecipient != null) {
@@ -105,7 +106,7 @@ public class AtBScenarioModifier {
     
     static {
         loadManifest();
-        loadScenarios();
+        loadScenarioModifiers();
     }
     
     /**
@@ -127,9 +128,9 @@ public class AtBScenarioModifier {
     }
     
     /** 
-     * Loads the defined scenarios from the manifest.
+     * Loads the defined scenario modifiers from the manifest.
      */
-    private static void loadScenarios() {
+    private static void loadScenarioModifiers() {
         scenarioModifiers = new ArrayList<>();
         
         for(String fileName : scenarioModifierManifest.fileNameList) {
@@ -139,6 +140,10 @@ public class AtBScenarioModifier {
                 AtBScenarioModifier modifier = Deserialize(filePath);
                 
                 if(modifier != null) {
+                    if(modifier.modifierName == null) {
+                        modifier.modifierName = fileName;
+                    }
+                    
                     scenarioModifiers.add(modifier);
                 }
             }
@@ -173,7 +178,12 @@ public class AtBScenarioModifier {
         }
         
         return resultingList;
-    }    
+    }
+    
+    @Override
+    public String toString() {
+        return modifierName;
+    }
 }
 
 /**
