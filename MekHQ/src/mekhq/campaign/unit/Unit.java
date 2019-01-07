@@ -2970,10 +2970,35 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 double crewSize = combatCrew.size();
                 Stream<Person> crew = combatCrew.stream().map(id -> campaign.getPerson(id));
                 
-                //Set up a collection of all the IOption names and all of the different values for each 
-                //held by various crewmembers
-                Stream<IOption> pOptions = crew.flatMap(p -> optionNames.stream().map(name -> p.getOptions().getOption(name)));
-                Map<String, List<Object>> allCrewOptions = pOptions.collect(Collectors.groupingBy(o -> o.getName(), o -> o.getValue()));
+                // This does the following:
+                // 1. For each crew member, get all of their PilotOptions by name
+                // 2. Flatten the crew member options into one stream
+                // 3. Group these options by their name
+                // 4. For each group, group by the object value and get the counts for each value
+                // 5. Take each group which has more than crewSize/2 values, and find the maximum value
+                Map<String, Optional<Object>> bestOptions = crew.flatMap(p -> optionNames.stream().map(n -> p.getOptions().getOption(n)))
+                    .collect(Collectors.groupingBy(
+                        IOption::getName,
+                        Collectors.collectingAndThen(
+                            Collectors.groupingBy(IOption::getValue, Collectors.counting()),
+                            m -> m.entrySet().stream().filter(e -> e.getValue() > crewSize / 2)
+                                .max(Map.Entry.comparingByValue()).map(e -> e.getKey())
+                        )
+                    ));             
+
+                // Go through all the options and start with the commander's value,
+                // then add any values which more than half our crew had
+                for (String optionName : optionNames) {
+                    IOption option = commander.getOptions().getOption(optionName);
+                    if (null != option) {
+                        options.getOption(optionName).setValue(option.getValue());
+                    }
+
+                    if (bestOptions.containsKey(optionName)) {
+                        Optional<Object> crewOption = bestOptions.get(optionName);
+                        crewOption.ifPresent(o -> options.getOption(optionName).setValue(o));
+                    }
+                }
                 
                 //Assign edge points to spacecraft and vehicle crews and infantry units
                 if (campaign.getCampaignOptions().useEdge()) {
@@ -2987,7 +3012,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                         Person p = campaign.getPerson(pid);
                         sumEdge += p.getEdge();
                     }
-                    //We need to average the edge values of pilots and gunners. Don't mess with the engineer here.
+                    //Average the edge values of pilots and gunners. The Spacecraft Engineer (vessel crewmembers)
+                    //handle edge solely through MHQ as noncombat personnel, so aren't considered here
                     edge = (int) Math.round(sumEdge / crewSize);
                     IOption edgeOption = entity.getCrew().getOptions().getOption(OptionsConstants.EDGE);
                     edgeOption.setValue((Integer) edge);
