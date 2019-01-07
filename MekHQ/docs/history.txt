@@ -20,6 +20,7 @@ v0.45.3-SNAPSHOT
 + Issue #976: Fix bug where techs without any minutes left may get stuck on overnight tasks
 + PR #1031: Fix bug where selected repair task moves when you change mode
 + Issue #1028: Fix bug where Mass Repair Options were not applied unless you clicked Save
++ Issue #1005: Allow fractional tons to be loaded in LargeCraftAmmoBins
 
 v0.45.2 (2018-11-18 0200 UTC)
 + Switched build system from ant to gradle.
