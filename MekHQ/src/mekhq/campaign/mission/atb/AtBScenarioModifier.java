@@ -141,7 +141,8 @@ public class AtBScenarioModifier {
                 
                 if(modifier != null) {
                     if(modifier.modifierName == null) {
-                        modifier.modifierName = fileName;
+                        modifier.modifierName = String.format("%s (%s)", fileName,
+                                modifier.eventTiming == EventTiming.PreForceGeneration ? "Pre" : "Post");
                     }
                     
                     scenarioModifiers.add(modifier);

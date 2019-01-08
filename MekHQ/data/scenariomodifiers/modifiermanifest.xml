@@ -10,6 +10,9 @@
 			EnemyReinforcements.xml
 		</modifier>
 		<modifier>
+			EnemyArty.xml
+		</modifier>
+		<modifier>
 			LocalGarrisonInfantry.xml
 		</modifier>
 		<modifier>
@@ -34,11 +37,9 @@
 		<modifier>
 			EnemyHotDrop.xml
 		</modifier>
-		<!--modifier>
-			Need ability to figure out scenario map type and set start alt. based on it
-			Need ability to sync designate force template as primary and sync with it
-			GroundedEnemyDropship.xml
-		</modifier-->
+		<modifier>
+			EnemyGroundedDropship.xml
+		</modifier>
 		<modifier>
 			GoodIntel.xml
 		</modifier>
@@ -63,7 +64,13 @@
 			AlliedAirSupport.xml
 		</modifier>
 		<modifier>
+			AlliedAirSupportBombers.xml
+		</modifier>
+		<modifier>
 			AlliedGroundSupport.xml
+		</modifier>
+		<modifier>
+			AlliedArtySupport.xml
 		</modifier>
 		<!--modifier>
 			Need campaign state
@@ -84,13 +91,28 @@
 
 		<!-- Fixed scenario modifiers suitable for specific scenario types go here -->
 		<modifier>
-			MechBaseGarrison.xml
+			AlliedMechGarrison.xml
 		</modifier>
 		<modifier>
-			TankBaseGarrison.xml
+			AlliedTankGarrison.xml
 		</modifier>
 		<modifier>
-			AirBaseGarrison.xml
+			AlliedAirGarrison.xml
+		</modifier>
+		<modifier>
+			AlliedArtyGarrison.xml
+		</modifier>
+		<modifier>
+			EnemyMechGarrison.xml
+		</modifier>
+		<modifier>
+			EnemyTankGarrison.xml
+		</modifier>
+		<modifier>
+			EnemyAirGarrison.xml
+		</modifier>
+		<modifier>
+			EnemyArtyGarrison.xml
 		</modifier>
 		<modifier>
 			ExtraGoodEvent.xml

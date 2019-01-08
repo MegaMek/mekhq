@@ -12,6 +12,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -876,8 +877,10 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         gbc.gridy++;
         gbc.gridx = 0;
         
-        for(String forceIndex : scenarioTemplate.scenarioForces.keySet()) {
-            ScenarioForceTemplate sft = scenarioTemplate.scenarioForces.get(forceIndex);
+        List<ScenarioForceTemplate> forceTemplateList = new ArrayList<>(scenarioTemplate.scenarioForces.values());
+        Collections.sort(forceTemplateList);
+        
+        for(ScenarioForceTemplate sft : forceTemplateList) {
             JLabel lblForceOrder = new JLabel(((Integer) sft.getGenerationOrder()).toString());
             panForceList.add(lblForceOrder, gbc);
             
@@ -982,13 +985,13 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
             panForceList.add(lblMapSize, gbc);
             
             JButton btnRemoveForce = new JButton("Remove");
-            btnRemoveForce.setActionCommand(String.format("%s%s", REMOVE_FORCE_COMMAND, forceIndex));
+            btnRemoveForce.setActionCommand(String.format("%s%s", REMOVE_FORCE_COMMAND, sft.getForceName()));
             btnRemoveForce.addActionListener(this);
             gbc.gridx++;
             panForceList.add(btnRemoveForce, gbc);
             
             JButton btnEditForce = new JButton("Edit");
-            btnEditForce.setActionCommand(String.format("%s%s", EDIT_FORCE_COMMAND, forceIndex));
+            btnEditForce.setActionCommand(String.format("%s%s", EDIT_FORCE_COMMAND, sft.getForceName()));
             btnEditForce.addActionListener(this);
             gbc.gridx++;
             panForceList.add(btnEditForce, gbc);

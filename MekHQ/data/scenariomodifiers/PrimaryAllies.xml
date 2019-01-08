@@ -1,0 +1,30 @@
+<AtBScenarioModifier>
+	<additionalBriefingText>To compensate for the presence of a large opposing force, allied units will be working alongside us on this operation.</additionalBriefingText>
+	<benefitsPlayer>true</benefitsPlayer>
+	<eventTiming>PreForceGeneration</eventTiming>
+	<forceDefinition>
+		<actualDeploymentZone>-1</actualDeploymentZone>
+<allowAeroBombs>false</allowAeroBombs>
+<allowedUnitType>-2</allowedUnitType>
+<arrivalTurn>0</arrivalTurn>
+<canReinforceLinked>false</canReinforceLinked>
+<contributesToBV>true</contributesToBV>
+<contributesToMapSize>true</contributesToMapSize>
+<contributesToUnitCount>true</contributesToUnitCount>
+<deployOffboard>false</deployOffboard>
+<deploymentZones/>
+<destinationZone>4</destinationZone>
+<fixedUnitCount>-1</fixedUnitCount>
+<forceAlignment>1</forceAlignment>
+<forceMultiplier>1.0</forceMultiplier>
+<forceName>Allied Force</forceName>
+<generationMethod>3</generationMethod>
+<generationOrder>1</generationOrder>
+<maxWeightClass>4</maxWeightClass>
+<retreatThreshold>0</retreatThreshold>
+<startingAltitude>0</startingAltitude>
+<syncDeploymentType>SameEdge</syncDeploymentType>
+<syncedForceName>Player</syncedForceName>
+<useArtillery>false</useArtillery>
+	</forceDefinition>
+</AtBScenarioModifier>

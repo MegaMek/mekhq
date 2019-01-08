@@ -1,6 +1,7 @@
 package mekhq.campaign.mission;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,7 +17,7 @@ import org.w3c.dom.Node;
 import megamek.common.Board;
 import mekhq.MekHQ;
 
-public class ScenarioForceTemplate {
+public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> {
     // A scenario force template is a way to describe a particular force that gets generated when creating a DymanicScenario
     // It contains the following characteristics
     // 1) Force Alignment - whether the force is on the player's team, the opfor team or a third team
@@ -501,5 +502,16 @@ public class ScenarioForceTemplate {
         }
         
         return resultingTemplate;
+    }
+
+    @Override
+    public int compareTo(ScenarioForceTemplate o) {
+        if(this.forceAlignment > o.forceAlignment) {
+            return 1;
+        } else if(this.forceAlignment < o.forceAlignment) {
+            return -1;
+        } else {
+            return this.forceName.charAt(0) > o.forceName.charAt(0) ? 1 : -1;
+        }
     }
 }
