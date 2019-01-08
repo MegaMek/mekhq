@@ -1727,8 +1727,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                                     "Unknown node type not loaded in techUnitIds nodes: " + wn3.getNodeName()); //$NON-NLS-1$
                             continue;
                         }
-                        retVal.techUnitIds.add(UUID.fromString(wn3.getTextContent()));
-
+                        retVal.addTechUnitID(UUID.fromString(wn3.getTextContent()));
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("personnelLog")) {
                     NodeList nl2 = wn2.getChildNodes();
@@ -3074,8 +3073,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
         techUnitIds.remove(i);
     }
 
-    public void addTechUnitID(UUID i) {
-        techUnitIds.add(i);
+    public void addTechUnitID(UUID id) {
+        if (!techUnitIds.contains(id)) {
+            techUnitIds.add(id);
+        }
     }
 
     public void clearTechUnitIDs() {
