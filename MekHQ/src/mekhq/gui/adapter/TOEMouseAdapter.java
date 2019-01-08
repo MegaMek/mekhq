@@ -128,15 +128,12 @@ ActionListener {
                         for (UUID uuid : singleForce.getAllUnits()) {
                             Unit u = gui.getCampaign().getUnit(uuid);
                             if (u != null) {
-                                if (null != u.getTech()) {
-                                    Person oldTech = u.getTech();
-                                    oldTech.removeTechUnitId(u.getId());
-                                    u.removeTech();
-                                }
                                 if (tech.canTech(u.getEntity())) {
-                                    u.setTech(tech.getId());
-                                    tech.addTechUnitID(u.getId());
-                                    MekHQ.triggerEvent(new PersonTechAssignmentEvent(tech, u));
+                                    if (null != u.getTech()) {
+                                        u.removeTech();
+                                    }
+                                    
+                                    u.setTech(tech);
                                 } else {
                                     cantTech += tech.getName() + " cannot maintain " + u.getName() + "\n";
                                 }
@@ -240,12 +237,7 @@ ActionListener {
                     for (UUID uuid : singleForce.getAllUnits()) {
                         Unit u = gui.getCampaign().getUnit(uuid);
                         if (null != u.getTech()) {
-                            oldTech = u.getTech();
-                            oldTech.removeTechUnitId(u.getId());
-                            MekHQ.triggerEvent(new PersonTechAssignmentEvent(oldTech, u));
-                        }
-                        if (u != null) {
-                            u.setTech((UUID)null);
+                            u.removeTech();
                         }
                     }
                 }
@@ -259,9 +251,6 @@ ActionListener {
                         gui.getCampaign().removeUnitFromForce(unit);
                         if (null != parentForce.getTechID()) {
                             unit.removeTech();
-                            Person forceTech = gui.getCampaign().getPerson(parentForce.getTechID());
-                            forceTech.removeTechUnitId(unit.getId());
-                            MekHQ.triggerEvent(new PersonTechAssignmentEvent(forceTech, unit));
                         }
                     }
                     MekHQ.triggerEvent(new OrganizationChangedEvent(parentForce, unit));

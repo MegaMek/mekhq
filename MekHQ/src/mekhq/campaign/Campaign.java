@@ -892,8 +892,6 @@ public class Campaign implements Serializable, ITechManager {
             MekHQ.triggerEvent(new OrganizationChangedEvent(prevForce, u));
             if (null != prevForce.getTechID()) {
                 u.removeTech();
-                Person forceTech = getPerson(prevForce.getTechID());
-                forceTech.removeTechUnitId(u.getId());
             }
         }
         Force force = forceIds.get(id);
@@ -903,16 +901,13 @@ public class Campaign implements Serializable, ITechManager {
             u.setScenarioId(force.getScenarioId());
             MekHQ.triggerEvent(new OrganizationChangedEvent(force, u));
             if (null != force.getTechID()) {
-                if (null != u.getTech()) {
-                    Person oldTech = u.getTech();
-                    oldTech.removeTechUnitId(u.getId());
-                    MekHQ.triggerEvent(new PersonTechAssignmentEvent(oldTech, u));
-                }
                 Person forceTech = getPerson(force.getTechID());
                 if (forceTech.canTech(u.getEntity())) {
-                    u.setTech(force.getTechID());
-                    forceTech.addTechUnitID(u.getId());
-                    MekHQ.triggerEvent(new PersonTechAssignmentEvent(forceTech, u));
+                    if (null != u.getTech()) {
+                        u.removeTech();
+                    }
+
+                    u.setTech(forceTech);
                 } else {
                     String cantTech = forceTech.getName() + " cannot maintain " + u.getName() + "\n"
                             + "You will need to assign a tech manually.";

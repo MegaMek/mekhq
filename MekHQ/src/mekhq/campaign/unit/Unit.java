@@ -3540,6 +3540,10 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     }
 
     public void setTech(Person p) {
+        if (null != tech) {
+            MekHQ.getLogger().log(Unit.class, "setTech(Person)", LogLevel.WARNING,
+                String.format("New tech assigned %s without removing previous tech %s", p.getName(), tech));
+        }
         ensurePersonIsRegistered(p);
         tech = p.getId();
         p.addTechUnitID(getId());
@@ -3547,21 +3551,23 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         MekHQ.triggerEvent(new PersonTechAssignmentEvent(p, this));
     }
 
-    public void setTech(UUID pid) {
-        tech = pid;
-    }
-
     public void removeTech() {
         if (tech != null) {
-            MekHQ.triggerEvent(new PersonTechAssignmentEvent(campaign.getPerson(tech), this));
+            Person p = campaign.getPerson(tech);
+            if (null != p) {
+                p.removeTechUnitId(getId());
+            }
             tech = null;
+            MekHQ.triggerEvent(new PersonTechAssignmentEvent(p, this));
         }
     }
 
     private void ensurePersonIsRegistered(Person p) {
         Objects.requireNonNull(p);
-        if(null == campaign.getPerson(p.getId())) {
+        if (null == campaign.getPerson(p.getId())) {
             campaign.addPersonWithoutId(p, false);
+            MekHQ.getLogger().log(Unit.class, "ensurePersonIsRegistered(Person)", LogLevel.WARNING,
+                String.format("The person %s added this unit %s, was not in the campaign.", p.getName(), getName()));
         }
     }
     
@@ -3589,9 +3595,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     public void remove(Person p, boolean log) {
         ensurePersonIsRegistered(p);
         if(p.getId().equals(tech)) {
-            tech = null;
-            p.removeTechUnitId(getId());
-            MekHQ.triggerEvent(new PersonTechAssignmentEvent(p, this));
+            removeTech();
         } else {
             p.setUnitId(null);
             drivers.remove(p.getId());

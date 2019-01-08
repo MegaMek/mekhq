@@ -256,14 +256,8 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     }
                     // check for tech unit assignments
                     if (!person.getTechUnitIDs().isEmpty()) {
-                        // I need to create a new array list to avoid concurrent
-                        // problems
-                        ArrayList<UUID> temp = new ArrayList<UUID>();
-                        for (UUID i : person.getTechUnitIDs()) {
-                            temp.add(i);
-                        }
-                        for (UUID i : temp) {
-                            u = gui.getCampaign().getUnit(i);
+                        for (UUID id : new ArrayList<>(person.getTechUnitIDs())) {
+                            u = gui.getCampaign().getUnit(id);
                             if (null != u) {
                                 u.remove(person, true);
                                 u.resetEngineer();
