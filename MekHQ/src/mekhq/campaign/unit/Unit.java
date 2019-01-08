@@ -2947,7 +2947,6 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                  for (Enumeration<IOption> j = group.getOptions(); j.hasMoreElements();) {
                      IOption option = j.nextElement();
                      optionNames.add(option.getName());
-                     //option.setValue(commander.getOptions().getOption(option.getName()).getValue());
                  }
             }
             
@@ -3019,7 +3018,11 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     edgeOption.setValue((Integer) edge);
                 }
                 
-                // Composite technician used by spacecraft and infantry
+                //Assign the options to our unit
+                entity.getCrew().setOptions(options);
+                
+                // Reset the composite technician used by spacecraft and infantry
+                // Important if you just changed technician edge options for members of either unit type
                 resetEngineer();
                 //Tactics command bonus. This should actually reflect the unit's commander,
                 //unlike most everything else in this block.
@@ -3029,12 +3032,16 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 } else {
                     entity.getCrew().setCommandBonus(0);
                 }
+                
+                //TODO: Set up crew hits. This might only apply to spacecraft, and should reflect
+                //the unit's current crew size vs its required crew size. There's also the question
+                //of what to do with extra crew quarters and crewmember assignments beyond the minimum.
+                
             } else {
+                //For other unit types, just use the unit commander's abilities.
                 Person commander = getCommander();
                 if (null != commander) {
-            
-                
-                entity.getCrew().setOptions(options);
+                    entity.getCrew().setOptions(commander.getOptions());
                 }
             
                 if(usesSoloPilot()) {
@@ -3044,6 +3051,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     }
                     entity.getCrew().setHits(commander.getHits(), 0);
                 }
+                //TODO: Leave this here until infantry is actually added to the crew-served units block
                 resetEngineer();
                 //TODO: game option to use tactics as command and ind init bonus
                 if(commander.hasSkill(SkillType.S_TACTICS)) {
