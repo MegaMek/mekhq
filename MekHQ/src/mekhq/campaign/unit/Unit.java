@@ -3015,9 +3015,12 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                         Person p = campaign.getPerson(pid);
                         sumEdge += p.getEdge();
                     }
-                    for (UUID pid : gunners) {
-                        Person p = campaign.getPerson(pid);
-                        sumEdge += p.getEdge();
+                    //Again, don't count infantrymen twice
+                    if (!entity.hasETypeFlag(Entity.ETYPE_INFANTRY)) {
+                        for (UUID pid : gunners) {
+                            Person p = campaign.getPerson(pid);
+                            sumEdge += p.getEdge();
+                        }
                     }
                     //Average the edge values of pilots and gunners. The Spacecraft Engineer (vessel crewmembers)
                     //handle edge solely through MHQ as noncombat personnel, so aren't considered here
