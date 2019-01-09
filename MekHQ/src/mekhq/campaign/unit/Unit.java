@@ -2954,8 +2954,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             //(gunners and pilots only, for spacecraft) have an ability, grant the benefit to the unit
             if (entity.hasETypeFlag(Entity.ETYPE_SMALL_CRAFT)
                     || entity.hasETypeFlag(Entity.ETYPE_JUMPSHIP)
-                    /*|| entity.hasETypeFlag(Entity.ETYPE_TANK)
-                    || entity.hasETypeFlag(Entity.ETYPE_INFANTRY)*/) {
+                    //|| entity.hasETypeFlag(Entity.ETYPE_TANK)
+                    || entity.hasETypeFlag(Entity.ETYPE_INFANTRY)) {
                 //Find the unit commander
                 Person commander = getCommander();
                 //Combine drivers and gunners into a single list
@@ -2963,8 +2963,12 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 for (UUID pid : drivers) {
                     combatCrew.add(pid);
                 }
-                for (UUID pid : gunners) {
-                    combatCrew.add(pid);
+                //Infantry and BA troops count as both drivers and gunners
+                //only count them once.
+                if (!entity.hasETypeFlag(Entity.ETYPE_INFANTRY)) {
+                    for (UUID pid : gunners) {
+                        combatCrew.add(pid);
+                    }
                 }
                 double crewSize = combatCrew.size();
                 Stream<Person> crew = combatCrew.stream().map(id -> campaign.getPerson(id));
