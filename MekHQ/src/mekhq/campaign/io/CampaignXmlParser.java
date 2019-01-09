@@ -808,14 +808,13 @@ public class CampaignXmlParser {
     }
 
     /**
-     * This will fixup unit-tech problems seen in some save games,
-     * such as techs having been double-assigned or being assigned
-     * to mothballed units.
+     * This will fixup unit-tech problems seen in some save games, such as techs
+     * having been double-assigned or being assigned to mothballed units.
      */
-	private void fixupUnitTechProblems(Campaign retVal) {
+    private void fixupUnitTechProblems(Campaign retVal) {
         final String METHOD_NAME = "fixupUnitTechProblems(Campaign)";
 
-		// Cleanup problems with techs and units
+        // Cleanup problems with techs and units
         for (Person tech : retVal.getTechs()) {
             for (UUID id : new ArrayList<>(tech.getTechUnitIDs())) {
                 Unit u = retVal.getUnit(id);
