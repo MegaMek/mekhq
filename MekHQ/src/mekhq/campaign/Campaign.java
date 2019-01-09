@@ -2673,22 +2673,19 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public int getDeploymentDeficit(AtBContract contract) {
+        if (!contract.isActive()) {
+            // Inactive contracts have no deficits.
+            return 0;
+        } else if (contract.getStartDate().after(getDate())) {
+            // Contracts in the future don't have deficits...yet.
+            return 0;
+        }
+
         int total = -contract.getRequiredLances();
         int role = -Math.max(1, contract.getRequiredLances() / 2);
-        boolean hasScenarios = contract.getScenarios().size() > 0;
 
         for (Lance l : lances.values()) {
-            if (hasScenarios) {
-                if (l.getMissionId() == contract.getId() && l.getRole() != Lance.ROLE_UNASSIGNED) {
-                    total++;
-                    if (l.getRole() == contract.getRequiredLanceType()) {
-                        role++;
-                    }
-                }
-            } else if (l.getMissionId() == Lance.NO_MISSION && l.getRole() != Lance.ROLE_UNASSIGNED) {
-                // We have no scenarios, so check by lance type. This isn't perfect,
-                // but prevents IRL players from getting nagged that they lack deployment
-                // levels when there are no scenarios into which they can deploy units
+            if (l.getMissionId() == contract.getId() && l.getRole() != Lance.ROLE_UNASSIGNED) {
                 total++;
                 if (l.getRole() == contract.getRequiredLanceType()) {
                     role++;
