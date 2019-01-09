@@ -2999,7 +2999,11 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     }
                 }
                 
+                //Assign the options to our unit
+                entity.getCrew().setOptions(options);
+                
                 //Assign edge points to spacecraft and vehicle crews and infantry units
+                //This overwrites the Edge value assigned above.
                 if (campaign.getCampaignOptions().useEdge()) {
                     double sumEdge = 0;
                     int edge = 0;
@@ -3017,9 +3021,6 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     IOption edgeOption = entity.getCrew().getOptions().getOption(OptionsConstants.EDGE);
                     edgeOption.setValue((Integer) edge);
                 }
-                
-                //Assign the options to our unit
-                entity.getCrew().setOptions(options);
                 
                 // Reset the composite technician used by spacecraft and infantry
                 // Important if you just changed technician edge options for members of either unit type
