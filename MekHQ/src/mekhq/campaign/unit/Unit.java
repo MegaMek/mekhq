@@ -3061,8 +3061,9 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     }
                     entity.getCrew().setHits(commander.getHits(), 0);
                 }
-                //TODO: Leave this here until infantry is actually added to the crew-served units block
-                resetEngineer();
+                //There was a resetEngineer() here. We shouldn't need it as spacecraft and infantry are handled
+                //by the preceding block
+                
                 //TODO: game option to use tactics as command and ind init bonus
                 if(commander.hasSkill(SkillType.S_TACTICS)) {
                     entity.getCrew().setCommandBonus(commander.getSkill(SkillType.S_TACTICS).getFinalSkillValue());
