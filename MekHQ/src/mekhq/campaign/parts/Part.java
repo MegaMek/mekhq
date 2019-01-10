@@ -822,7 +822,8 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 
 	@Override
 	public int getTimeLeft() {
-		return getActualTime() - getTimeSpent();
+		// Cannot be less than 0 time left.
+		return Math.max(0, getActualTime() - getTimeSpent());
 	}
 
 	@Override

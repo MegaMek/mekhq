@@ -1573,6 +1573,8 @@ public class CampaignXmlParser {
             for (String s : unitList) {
                 unitListString += "\n" + s;
             }
+            MekHQ.getLogger().log(CampaignXmlParser.class, METHOD_NAME, LogLevel.ERROR,
+                String.format("Could not load the following units: %s", unitListString)); //$NON-NLS-1$
             return unitListString;
         }
     }

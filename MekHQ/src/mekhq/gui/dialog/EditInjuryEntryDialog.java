@@ -94,26 +94,26 @@ public class EditInjuryEntryDialog extends JDialog {
             locations[i] = new BodyLocationChoice(loc);
             ++ i;
         }
-        types = InjuryType.getAllTypes().stream()
-            .map((type) -> new InjuryTypeChoice(type))
-            .collect(Collectors.toList()).toArray(new InjuryTypeChoice[0]);
-        String[] tf = { "True", "False" };
-        txtDays = new JTextArea();
-        ddLocation = new JComboBox<>(locations);
-        ddType = new JComboBox<>(types);
-        ddTypeModel = new FilterableComboBoxModel<InjuryTypeChoice>(ddType.getModel());
-        ddType.setModel(ddTypeModel);
-        ddTypeModel.setFilter(it -> {
-            BodyLocation loc = ((BodyLocationChoice) ddLocation.getSelectedItem()).loc;
-            return it.type.isValidInLocation(loc);
-        });
 
+        ddLocation = new JComboBox<>(locations);
         for (BodyLocationChoice choice : locations) {
             if (injury.getLocation() == choice.loc) {
                 ddLocation.setSelectedItem(choice);
                 break;
             }
         }
+
+        types = InjuryType.getAllTypes().stream()
+            .map((type) -> new InjuryTypeChoice(type))
+            .collect(Collectors.toList()).toArray(new InjuryTypeChoice[0]);
+
+        ddType = new JComboBox<>(types);
+        ddTypeModel = new FilterableComboBoxModel<InjuryTypeChoice>(ddType.getModel());
+        ddTypeModel.setFilter(it -> {
+            BodyLocation loc = ((BodyLocationChoice) ddLocation.getSelectedItem()).loc;
+            return it.type.isValidInLocation(loc);
+        });
+        ddType.setModel(ddTypeModel);
 
         for (InjuryTypeChoice choice : types) {
             if (injury.getType() == choice.type) {
@@ -122,8 +122,10 @@ public class EditInjuryEntryDialog extends JDialog {
             }
         }
         
+        txtDays = new JTextArea();
         txtFluff = new JTextArea();
         txtHits = new JTextArea();
+        String[] tf = { "True", "False" };
         ddPermanent = new JComboBox<String>(tf);
         ddWorkedOn = new JComboBox<String>(tf);
         ddExtended = new JComboBox<String>(tf);

@@ -308,7 +308,7 @@ public class LargeCraftAmmoBin extends AmmoBin {
     @Override
     public boolean needsFixing() {
         return (shotsNeeded < 0)
-                || ((shotsNeeded > 0) && (type.getTonnage(null) <= bayAvailableCapacity())); 
+                || ((shotsNeeded > 0) && (type.getTonnage(null) <= Math.ceil(bayAvailableCapacity()))); 
     }
 
     /**

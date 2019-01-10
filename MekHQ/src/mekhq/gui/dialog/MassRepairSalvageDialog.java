@@ -1147,7 +1147,7 @@ public class MassRepairSalvageDialog extends JDialog {
 			MassRepairService.MassRepairConfiguredOptions configuredOptions = new MassRepairService.MassRepairConfiguredOptions();
 			configuredOptions.setup(this);
 
-			MassRepairService.massRepairSalvageUnits(campaignGUI, units);
+			MassRepairService.massRepairSalvageUnits(campaignGUI, units, activeMROs);
 
 			filterUnits();
 		} else if (isModeWarehouse()) {
