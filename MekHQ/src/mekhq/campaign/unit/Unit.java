@@ -2952,10 +2952,12 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             
             //For crew-served units, let's look at the abilities of the group. If more than half the crew
             //(gunners and pilots only, for spacecraft) have an ability, grant the benefit to the unit
+            //TODO: Mobile structures, large naval support vehicles
             if (entity.hasETypeFlag(Entity.ETYPE_SMALL_CRAFT)
                     || entity.hasETypeFlag(Entity.ETYPE_JUMPSHIP)
-                    //|| entity.hasETypeFlag(Entity.ETYPE_TANK)
-                    || entity.hasETypeFlag(Entity.ETYPE_INFANTRY)) {
+                    || entity.hasETypeFlag(Entity.ETYPE_TANK)
+                    || entity.hasETypeFlag(Entity.ETYPE_INFANTRY)
+                    || entity.hasETypeFlag(Entity.ETYPE_TRIPOD_MECH)) {
                 //Find the unit commander
                 Person commander = getCommander();
                 //Combine drivers and gunners into a single list
