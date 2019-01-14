@@ -2129,7 +2129,58 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     cbMenuItem.addActionListener(this);
                     menu.add(cbMenuItem);
                     //Aero pilots and gunners
-                    
+                    cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("edgeTriggerAeroAltLoss.text")); //$NON-NLS-1$
+                    cbMenuItem.setSelected(person.getOptions()
+                            .booleanOption(OPT_EDGE_WHEN_AERO_ALT_LOSS));
+                    cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_WHEN_AERO_ALT_LOSS));
+                    if (person.getPrimaryRole() != Person.T_SPACE_PILOT
+                            && person.getPrimaryRole() != Person.T_SPACE_GUNNER
+                            && person.getPrimaryRole() != Person.T_AERO_PILOT) { cbMenuItem.setForeground(new Color(150, 150, 150)); }
+                    cbMenuItem.addActionListener(this);
+                    menu.add(cbMenuItem);
+                    cbMenuItem = new JCheckBoxMenuItem(
+                            resourceMap.getString("edgeTriggerAeroExplosion.text")); //$NON-NLS-1$
+                    cbMenuItem.setSelected(person.getOptions()
+                            .booleanOption(OPT_EDGE_TA));
+                    cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_TAC));
+                    if (person.getPrimaryRole() != Person.T_SPACE_PILOT
+                            && person.getPrimaryRole() != Person.T_SPACE_GUNNER
+                            && person.getPrimaryRole() != Person.T_AERO_PILOT) { cbMenuItem.setForeground(new Color(150, 150, 150)); }
+                    cbMenuItem.addActionListener(this);
+                    menu.add(cbMenuItem);
+                    cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("edgeTriggerAeroKO.text")); //$NON-NLS-1$
+                    cbMenuItem.setSelected(person.getOptions()
+                            .booleanOption(OPT_EDGE_O));
+                    cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_KO));
+                    if (person.getPrimaryRole() != Person.T_AERO_PILOT) { cbMenuItem.setForeground(new Color(150, 150, 150)); }
+                    cbMenuItem.addActionListener(this);
+                    menu.add(cbMenuItem);
+                    cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("edgeTriggerAeroLuckyCrit.text")); //$NON-NLS-1$
+                    cbMenuItem.setSelected(person.getOptions()
+                            .booleanOption(OPT_EDGE_EXPLOSIO));
+                    cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_EXPLOSION));
+                    if (person.getPrimaryRole() != Person.T_SPACE_PILOT
+                            && person.getPrimaryRole() != Person.T_SPACE_GUNNER
+                            && person.getPrimaryRole() != Person.T_AERO_PILOT) { cbMenuItem.setForeground(new Color(150, 150, 150)); }
+                    cbMenuItem.addActionListener(this);
+                    menu.add(cbMenuItem);
+                    cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("edgeTriggerAeroNukeCrit.text")); //$NON-NLS-1$
+                    cbMenuItem.setSelected(person.getOptions()
+                            .booleanOption(OPT_EDGE_MASC_FAILUE));
+                    cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_MASC_FAILURE));
+                    //MM would allow you to use this for a fighter pilot, but that's pointless...
+                    if (person.getPrimaryRole() != Person.T_SPACE_PILOT
+                            && person.getPrimaryRole() != Person.T_SPACE_GUNNER) { cbMenuItem.setForeground(new Color(150, 150, 150)); }
+                    cbMenuItem.addActionListener(this);
+                    menu.add(cbMenuItem);
+                    cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("edgeTriggerAeroTrnBayCrit.text")); //$NON-NLS-1$
+                    cbMenuItem.setSelected(person.getOptions()
+                            .booleanOption(OPT_EDGE_MASC_FAIURE));
+                    cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_MASC_FAILURE));
+                    if (person.getPrimaryRole() != Person.T_SPACE_PILOT
+                            && person.getPrimaryRole() != Person.T_SPACE_GUNNER) { cbMenuItem.setForeground(new Color(150, 150, 150)); }
+                    cbMenuItem.addActionListener(this);
+                    menu.add(cbMenuItem);
                     // Support Edge
                     if (gui.getCampaign().getCampaignOptions().useSupportEdge()) {
                         //Doctors
