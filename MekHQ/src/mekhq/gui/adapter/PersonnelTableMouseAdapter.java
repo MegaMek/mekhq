@@ -2141,8 +2141,8 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     cbMenuItem = new JCheckBoxMenuItem(
                             resourceMap.getString("edgeTriggerAeroExplosion.text")); //$NON-NLS-1$
                     cbMenuItem.setSelected(person.getOptions()
-                            .booleanOption(OPT_EDGE_TA));
-                    cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_TAC));
+                            .booleanOption(OPT_EDGE_WHEN_AERO_EXPLOSION));
+                    cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_WHEN_AERO_EXPLOSION));
                     if (person.getPrimaryRole() != Person.T_SPACE_PILOT
                             && person.getPrimaryRole() != Person.T_SPACE_GUNNER
                             && person.getPrimaryRole() != Person.T_AERO_PILOT) { cbMenuItem.setForeground(new Color(150, 150, 150)); }
@@ -2150,15 +2150,15 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     menu.add(cbMenuItem);
                     cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("edgeTriggerAeroKO.text")); //$NON-NLS-1$
                     cbMenuItem.setSelected(person.getOptions()
-                            .booleanOption(OPT_EDGE_O));
-                    cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_KO));
+                            .booleanOption(OPT_EDGE_WHEN_AERO_KO));
+                    cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_WHEN_AERO_KO));
                     if (person.getPrimaryRole() != Person.T_AERO_PILOT) { cbMenuItem.setForeground(new Color(150, 150, 150)); }
                     cbMenuItem.addActionListener(this);
                     menu.add(cbMenuItem);
                     cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("edgeTriggerAeroLuckyCrit.text")); //$NON-NLS-1$
                     cbMenuItem.setSelected(person.getOptions()
-                            .booleanOption(OPT_EDGE_EXPLOSIO));
-                    cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_EXPLOSION));
+                            .booleanOption(OPT_EDGE_WHEN_AERO_LUCKY_CRIT));
+                    cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_WHEN_AERO_LUCKY_CRIT));
                     if (person.getPrimaryRole() != Person.T_SPACE_PILOT
                             && person.getPrimaryRole() != Person.T_SPACE_GUNNER
                             && person.getPrimaryRole() != Person.T_AERO_PILOT) { cbMenuItem.setForeground(new Color(150, 150, 150)); }
@@ -2166,17 +2166,16 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     menu.add(cbMenuItem);
                     cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("edgeTriggerAeroNukeCrit.text")); //$NON-NLS-1$
                     cbMenuItem.setSelected(person.getOptions()
-                            .booleanOption(OPT_EDGE_MASC_FAILUE));
-                    cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_MASC_FAILURE));
-                    //MM would allow you to use this for a fighter pilot, but that's pointless...
+                            .booleanOption(OPT_EDGE_WHEN_AERO_NUKE_CRIT));
+                    cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_WHEN_AERO_NUKE_CRIT));
                     if (person.getPrimaryRole() != Person.T_SPACE_PILOT
                             && person.getPrimaryRole() != Person.T_SPACE_GUNNER) { cbMenuItem.setForeground(new Color(150, 150, 150)); }
                     cbMenuItem.addActionListener(this);
                     menu.add(cbMenuItem);
                     cbMenuItem = new JCheckBoxMenuItem(resourceMap.getString("edgeTriggerAeroTrnBayCrit.text")); //$NON-NLS-1$
                     cbMenuItem.setSelected(person.getOptions()
-                            .booleanOption(OPT_EDGE_MASC_FAIURE));
-                    cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_MASC_FAILURE));
+                            .booleanOption(OPT_EDGE_WHEN_AERO_UNIT_CARGO_LOST));
+                    cbMenuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_WHEN_AERO_UNIT_CARGO_LOST));
                     if (person.getPrimaryRole() != Person.T_SPACE_PILOT
                             && person.getPrimaryRole() != Person.T_SPACE_GUNNER) { cbMenuItem.setForeground(new Color(150, 150, 150)); }
                     cbMenuItem.addActionListener(this);
