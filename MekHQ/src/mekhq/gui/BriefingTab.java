@@ -63,8 +63,6 @@ import mekhq.campaign.event.ScenarioChangedEvent;
 import mekhq.campaign.event.ScenarioNewEvent;
 import mekhq.campaign.event.ScenarioRemovedEvent;
 import mekhq.campaign.event.ScenarioResolvedEvent;
-import mekhq.campaign.force.Force;
-import mekhq.campaign.force.Lance;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.AtBDynamicScenarioFactory;
@@ -631,6 +629,7 @@ public final class BriefingTab extends CampaignGuiTab {
         
         if(scenario instanceof AtBDynamicScenario) {
             AtBDynamicScenarioFactory.setPlayerDeploymentTurns((AtBDynamicScenario) scenario, getCampaign());
+            AtBDynamicScenarioFactory.finalizeStaggeredDeploymentTurns((AtBDynamicScenario) scenario, getCampaign());
         }
 
         if (undeployed.length() > 0) {
@@ -646,45 +645,6 @@ public final class BriefingTab extends CampaignGuiTab {
 
         if (getCampaign().getCampaignOptions().getUseAtB() && scenario instanceof AtBScenario) {
             ((AtBScenario) scenario).refresh(getCampaign());
-
-            /*
-             * For standard battles, any deployed unit not part of the lance
-             * assigned to the battle is assumed to be reinforcements.
-             */
-            if (null != ((AtBScenario) scenario).getLance(getCampaign())) {
-                int assignedForceId = ((AtBScenario) scenario).getLance(getCampaign()).getForceId();
-                int cmdrStrategy = 0;
-                Person commander = getCampaign().getPerson(Lance.findCommander(assignedForceId, getCampaign()));
-                if (null != commander && null != commander.getSkill(SkillType.S_STRATEGY)) {
-                    cmdrStrategy = commander.getSkill(SkillType.S_STRATEGY).getLevel();
-                }
-                for (Force f : scenario.getForces(getCampaign()).getSubForces()) {
-                    if (f.getId() != assignedForceId) {
-                        Vector<UUID> units = f.getAllUnits();
-                        int slowest = 12;
-                        for (UUID id : units) {
-                            if (chosen.contains(getCampaign().getUnit(id))) {
-                                int speed = getCampaign().getUnit(id).getEntity().getWalkMP();
-                                if (getCampaign().getUnit(id).getEntity().getJumpMP() > 0) {
-                                    if (getCampaign().getUnit(id).getEntity() instanceof megamek.common.Infantry) {
-                                        speed = getCampaign().getUnit(id).getEntity().getJumpMP();
-                                    } else {
-                                        speed++;
-                                    }
-                                }
-                                slowest = Math.min(slowest, speed);
-                            }
-                        }
-                        int deployRound = Math.max(0, 12 - slowest - cmdrStrategy);
-
-                        for (UUID id : units) {
-                            if (chosen.contains(getCampaign().getUnit(id))) {
-                                getCampaign().getUnit(id).getEntity().setDeployRound(deployRound);
-                            }
-                        }
-                    }
-                }
-            }
         }
 
         if (chosen.size() > 0) {

@@ -1,7 +1,6 @@
 package mekhq.campaign.mission;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,6 +45,7 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
     
     public static int ARRIVAL_TURN_STAGGERED = -1;
     public static int ARRIVAL_TURN_STAGGERED_BY_LANCE = -2;
+    public static int ARRIVAL_TURN_AS_REINFORCEMENTS = -3;
     
     public static int DEPLOYMENT_ZONE_NARROW_EDGE = DEPLOYMENT_ZONES.length - 1;
     

@@ -207,7 +207,7 @@ public class AtBDynamicScenario extends AtBScenario {
     public List<AtBScenarioModifier> getScenarioModifiers() {
         return scenarioModifiers;
     }
-
+    
     @Override
     public int getScenarioType() {
         return 0;
@@ -225,7 +225,9 @@ public class AtBDynamicScenario extends AtBScenario {
     
     @Override
     protected void writeToXmlEnd(PrintWriter pw1, int indent) {
-        if(template != null) {
+        // if we have a scenario template and haven't played the scenario out yet, serialize the template
+        // in its current state
+        if(template != null && isCurrent()) {
             template.Serialize(pw1);
         }
         

@@ -68,6 +68,8 @@ public class AtBDynamicScenarioFactory {
     private static int CLAN_MH_LANCE_SIZE = 5;
     private static int COMSTAR_LANCE_SIZE = 6;
     
+    private static int REINFORCEMENT_ARRIVAL_SCALE = 30;
+    
     /**
      * Method that sets some initial scenario parameters from the given template, prior to force generation and such.
      * @param template The template to use when populating the new scenario.
@@ -138,8 +140,8 @@ public class AtBDynamicScenarioFactory {
         
         setScenarioRerolls(scenario, campaign);
         
-        translatePlayerNPCsToAttached(scenario, campaign);
         setDeploymentTurns(scenario, campaign);
+        translatePlayerNPCsToAttached(scenario, campaign);
     }
     
     /**
@@ -610,7 +612,7 @@ public class AtBDynamicScenarioFactory {
      * Sets up scenario modifiers for this scenario.
      * @param scenario
      */
-    private static void setScenarioModifiers(AtBDynamicScenario scenario) {
+    public static void setScenarioModifiers(AtBDynamicScenario scenario) {
         // this is hardcoded for now, but the eventual plan is to let the user configure how many modifiers
         // they want applied
         int numMods = 2;//Compute.randomInt(2);
@@ -1319,8 +1321,49 @@ public class AtBDynamicScenarioFactory {
     }
     
     /**
-     * Sets up the deployment turns for bot units as they are specified
+     * 
      * @param scenario
+     * @param campaign
+     */
+    public static void finalizeStaggeredDeploymentTurns(AtBDynamicScenario scenario, Campaign campaign) {
+        // assemble a list of all entities that have an "STAGGERED" arrival turn into a list
+        // then run setDeploymentTurnsStaggered on them
+        List<Entity> staggeredEntities = new ArrayList<>();
+        
+        for(int x = 0; x < scenario.getNumBots(); x++) {
+            BotForce currentBotForce = scenario.getBotForce(x);
+            for(Entity entity : currentBotForce.getEntityList()) {
+                if(entity.getDeployRound() == ScenarioForceTemplate.ARRIVAL_TURN_STAGGERED) {
+                    staggeredEntities.add(entity);
+                }
+            }
+        }
+        
+        for(int forceID : scenario.getForceIDs()) {    
+            Force playerForce = campaign.getForce(forceID);
+            
+            for(UUID unitID : playerForce.getAllUnits()) {
+                Unit currentUnit = campaign.getUnit(unitID);
+                if(currentUnit != null && (currentUnit.getEntity().getDeployRound() == ScenarioForceTemplate.ARRIVAL_TURN_STAGGERED)) {
+                    staggeredEntities.add(currentUnit.getEntity());
+                }
+            }
+        }
+        
+        for(Entity entity : scenario.getAlliesPlayer()) {
+            if(entity.getDeployRound() == ScenarioForceTemplate.ARRIVAL_TURN_STAGGERED) {
+                staggeredEntities.add(entity);
+            }
+        }
+        
+        int strategy = scenario.getLanceCommanderSkill(SkillType.S_STRATEGY, campaign);
+        
+        setDeploymentTurnsStaggered(staggeredEntities, strategy);
+    }
+    
+    /**
+     * Sets up the deployment turns for all bot units within the specified scenario
+     * @param scenario The scenario to process
      */
     private static void setDeploymentTurns(AtBDynamicScenario scenario, Campaign campaign) {
         for(int x = 0; x < scenario.getNumBots(); x++) {
@@ -1328,10 +1371,10 @@ public class AtBDynamicScenarioFactory {
             ScenarioForceTemplate forceTemplate = scenario.getBotForceTemplates().get(currentBotForce);
             int deployRound = forceTemplate.getArrivalTurn();
             
-            if(deployRound == ScenarioForceTemplate.ARRIVAL_TURN_STAGGERED) {
-                setDeploymentTurnsStaggered(currentBotForce.getEntityList(), 0);
-            } else if(deployRound == ScenarioForceTemplate.ARRIVAL_TURN_STAGGERED_BY_LANCE) {
+            if(deployRound == ScenarioForceTemplate.ARRIVAL_TURN_STAGGERED_BY_LANCE) {
                 setDeploymentTurnsStaggeredByLance(currentBotForce.getEntityList());
+            } else if(deployRound == ScenarioForceTemplate.ARRIVAL_TURN_AS_REINFORCEMENTS) {
+                setDeploymentTurnsForReinforcements(currentBotForce.getEntityList(), 0);
             } else {                
                 for(Entity entity : currentBotForce.getEntityList()) {
                     entity.setDeployRound(deployRound);
@@ -1348,6 +1391,9 @@ public class AtBDynamicScenarioFactory {
      * @param campaign The campaign in which the scenario is occurring.
      */
     public static void setPlayerDeploymentTurns(AtBDynamicScenario scenario, Campaign campaign) {
+        // make note of battle commander strategy
+        int strategy = scenario.getLanceCommanderSkill(SkillType.S_STRATEGY, campaign);
+        
         // for player forces where there's an associated force template, we can set the deployment turn explicitly
         // or use a stagger algorithm.
         // for player forces where there's not an associated force template, we calculate the deployment turn
@@ -1364,50 +1410,30 @@ public class AtBDynamicScenarioFactory {
                 }
             }
             
-            // make note of battle commander strategy
-            int strategy = scenario.getLanceCommanderSkill(SkillType.S_STRATEGY, campaign);
-            
             // now, attempt to set deployment turns
             // if the force has a template, then use the appropriate algorithm
             // otherwise, treat it as reinforcements
             if(forceTemplate != null) {
                 int deployRound = forceTemplate.getArrivalTurn();
                 
-                if(deployRound == ScenarioForceTemplate.ARRIVAL_TURN_STAGGERED) {
-                    setDeploymentTurnsStaggered(forceEntities, strategy);
-                } else if(deployRound == ScenarioForceTemplate.ARRIVAL_TURN_STAGGERED_BY_LANCE) {
+                if(deployRound == ScenarioForceTemplate.ARRIVAL_TURN_STAGGERED_BY_LANCE) {
                     setDeploymentTurnsStaggeredByLance(forceEntities);
-                } else {                
+                } else if (deployRound == ScenarioForceTemplate.ARRIVAL_TURN_AS_REINFORCEMENTS) {
+                    setDeploymentTurnsForReinforcements(forceEntities, strategy);   
+                } else {
                     for(Entity entity : forceEntities) {
                         entity.setDeployRound(deployRound);
                     }
                 }
             } else {
-                int minWalkMP = 999;
-                
-                // calculate the slowest walk speed
-                for(Entity entity : forceEntities) {                    
-                    int speed = calculateAtBSpeed(entity);
-                    
-                    if(speed < minWalkMP) {
-                        minWalkMP = speed;
-                    }
-                }
-
-                // can't have a deployment round earlier than 0
-                int deployRound = Math.max(0, 12 - minWalkMP - strategy);
-                
-                // set deployment round
-                for(Entity entity : forceEntities) {
-                    entity.setDeployRound(deployRound);
-                }
+                setDeploymentTurnsForReinforcements(forceEntities, strategy);
             }
         }
     }
     
     /**
      * Uses the "individual staggered deployment" algorithm to determine individual deployment turns 
-     * @param botForce The bot force whose entities to process.
+     * @param entityList List of entities to process. May be from many players.
      * @param turnModifier The deployment round is reduced by this amount
      */
     private static void setDeploymentTurnsStaggered(List<Entity> entityList, int turnModifier) {
@@ -1429,39 +1455,55 @@ public class AtBDynamicScenarioFactory {
         }
         
         for(int x = 0; x < entityList.size(); x++) {
+            int actualTurnModifier = 0;
+            
+            Entity entity = entityList.get(x);
+            // the turn modifier is only applicable to player-controlled units
+            if(entity.getOwner().getTeam() == ScenarioForceTemplate.TEAM_IDS.get(ForceAlignment.Player.ordinal())) {
+                actualTurnModifier = turnModifier;
+            }
+            
             // since we're iterating through the same unchanged collection, we can use implicit indexing.
-            entityList.get(x).setDeployRound(Math.max(0, maxWalkMP - entityWalkMPs.get(x) - turnModifier));
+            entity.setDeployRound(Math.max(0, maxWalkMP - entityWalkMPs.get(x) - actualTurnModifier));
         }
     }
     
     /**
-     * Uses the "lance staggered deployment" algorithm to determine individual deployment turns 
-     * @param botForce The bot force whose entities to process.
+     * Given a list of entities, set the arrival turns for them as if they were all reinforcements on the same side.
+     * 
+     * @param entityList List of entities to process
+     * @param turnModifier Turn modifier.
+     */
+    private static void setDeploymentTurnsForReinforcements(List<Entity> entityList, int turnModifier) {
+        int minimumSpeed = 999;
+        
+        // first, we figure out the slowest "atb speed" of this group.
+        for(Entity entity : entityList) {
+            int speed = calculateAtBSpeed(entity);
+            if(speed < minimumSpeed) {
+                minimumSpeed = speed;
+            }
+        }
+ 
+        // the actual arrival turn will be the scale divided by the slowest speed.
+        // so, a group of Atlases (3/5) should arrive on turn 10 (30 / 3)
+        // a group of jump-capable Griffins (5/8/5) should arrive on turn 5 (30 / 6)
+        // a group of Ostscouts (8/12/8) should arrive on turn 3 (30 / 9, rounded down)
+        // we then subtract the passed-in turn modifier, which is usually the commander's strategy skill level.
+        int actualArrivalTurn = Math.max(0, (REINFORCEMENT_ARRIVAL_SCALE / minimumSpeed) - turnModifier);
+        
+        for(Entity entity : entityList) {
+            entity.setDeployRound(actualArrivalTurn);
+        }
+    }
+    
+    /**
+     * Uses the "lance staggered deployment" algorithm to determine individual deployment turns
+     * Not actually implemented currently. 
+     * @param botForce The list of entities to process.
      */
     private static void setDeploymentTurnsStaggeredByLance(List<Entity> entityList) {
-        // loop through all the entities
-        // for every four entities, determine the lowest walk MP.
-        // 
-        // then apply the individual staggered deployment algorithm to each lance
-        // other entities deploy on highest move - "walk" MP.
-        
-        // TODO: Stick a pin in this for now, the algorithm is annoyingly complicated
-        
-        /*int maxWalkMP = -1;
-        int lanceMinWalkMP = 999;
-        List<Integer> lanceWalkMPs = new ArrayList<>(); 
-        
-        for(int x = 0; x < botForce.getEntityList().size(); x++) {
-            Entity entity = botForce.getEntityList().get(x);
-            int speed = calculateAtBSpeed(entity);
-            int lanceIndex = x / 4;
-            
-            if()
-        }
-        
-        for(Entity entity : botForce.getEntityList()) {
-            entity.setDeployRound(maxWalkMP - entity.getWalkMP());
-        }*/
+        MekHQ.getLogger().warning(AtBDynamicScenarioFactory.class, "setDeploymentTurnsStaggeredByLance", "Deployment Turn - Staggered by Lance not implemented");
     }
 
     /** 
@@ -1650,6 +1692,12 @@ public class AtBDynamicScenarioFactory {
         }
     }
     
+    /**
+     * Worker function that returns the faction code of the first owner of the planet where the contract is taking place.
+     * @param contract Current contract.
+     * @param currentDate Current date.
+     * @return Faction code.
+     */
     private static String getPlanetOwnerFaction(AtBContract contract, DateTime currentDate) {
         String factionCode = "MERC";
         
@@ -1668,8 +1716,15 @@ public class AtBDynamicScenarioFactory {
         return factionCode;
     }
     
+    /**
+     * Worker function that determines the ForceAlignment of the specified faction. 
+     * @param contract Current contract, for determining the planet we're on.
+     * @param factionCode Faction code to check.
+     * @param currentDate Current date.
+     * @return ForceAlignment.
+     */
     private static ForceAlignment getPlanetOwnerAlignment(AtBContract contract, String factionCode, DateTime currentDate) {
-        // if the faction 
+        // if the faction is one of the planet owners, see if it's either the employer or opfor. If it's not, third-party.
         if(contract.getPlanet().getFactions(currentDate).contains(factionCode)) {
             if(factionCode.equals(contract.getEmployerCode())) {
                 return ForceAlignment.Allied;
