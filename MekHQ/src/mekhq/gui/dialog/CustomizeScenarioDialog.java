@@ -535,7 +535,7 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
     }
     
     /**
-     * Event handler for the 'add modifier' butotn.
+     * Event handler for the 'add modifier' button.
      * @param event
      */
     private void btnAddModifierActionPerformed(ActionEvent event) {
@@ -544,6 +544,7 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
         EventTiming timing = scenarioPtr.getNumBots() > 0 ? EventTiming.PostForceGeneration : EventTiming.PreForceGeneration;
         
         modifierPtr.processModifier(scenarioPtr, campaign, timing);
+        txtDesc.setText(txtDesc.getText() + "\n\n" + modifierPtr.additionalBriefingText);
     }
     
 }

@@ -86,14 +86,17 @@ public class AtBDynamicScenarioFactory {
         scenario.setEffectiveOpforSkill(contract.getEnemySkill());
         scenario.setEffectiveOpforQuality(contract.getEnemyQuality());
         
-        if(campaign.getCampaignOptions().getUseLightConditions()) {
+        boolean planetsideScenario = template.mapParameters.mapLocation == MapLocation.AllGroundTerrain ||
+                template.mapParameters.mapLocation == MapLocation.SpecificGroundTerrain;
+        
+        // set lighting conditions if the user wants to play with them and is on a ground map
+        // theoretically some lighting conditions apply to space maps as well, but requires additional work to implement properly
+        if(campaign.getCampaignOptions().getUseLightConditions() && planetsideScenario) {
             setLightConditions(scenario);
         }
         
         // set weather conditions if the user wants to play with them and is on a ground map
-        if(campaign.getCampaignOptions().getUseWeatherConditions() &&
-                (template.mapParameters.mapLocation == MapLocation.AllGroundTerrain ||
-                template.mapParameters.mapLocation == MapLocation.SpecificGroundTerrain)) {
+        if(campaign.getCampaignOptions().getUseWeatherConditions() && planetsideScenario) {
             setWeather(scenario);
         }
         

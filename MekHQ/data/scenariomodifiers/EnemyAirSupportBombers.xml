@@ -6,7 +6,7 @@
 		<actualDeploymentZone>-1</actualDeploymentZone>
 		<allowAeroBombs>true</allowAeroBombs>
 		<allowedUnitType>-3</allowedUnitType>
-		<arrivalTurn>-2</arrivalTurn>
+		<arrivalTurn>-3</arrivalTurn>
 		<canReinforceLinked>true</canReinforceLinked>
 		<contributesToBV>false</contributesToBV>
 		<contributesToMapSize>false</contributesToMapSize>
