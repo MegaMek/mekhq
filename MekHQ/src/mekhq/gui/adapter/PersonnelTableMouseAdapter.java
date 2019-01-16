@@ -2274,6 +2274,30 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     menuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_MASC_FAILURE, TRUE));
                     menuItem.addActionListener(this);
                     submenu.add(menuItem);
+                    menuItem = new JMenuItem(resourceMap.getString("edgeTriggerAeroAltLoss.text")); //$NON-NLS-1$
+                    menuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_WHEN_AERO_ALT_LOSS, TRUE));
+                    menuItem.addActionListener(this);
+                    submenu.add(menuItem);
+                    menuItem = new JMenuItem(resourceMap.getString("edgeTriggerAeroExplosion.text")); //$NON-NLS-1$
+                    menuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_WHEN_AERO_EXPLOSION, TRUE));
+                    menuItem.addActionListener(this);
+                    submenu.add(menuItem);
+                    menuItem = new JMenuItem(resourceMap.getString("edgeTriggerAeroKO.text")); //$NON-NLS-1$
+                    menuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_WHEN_AERO_KO, TRUE));
+                    menuItem.addActionListener(this);
+                    submenu.add(menuItem);
+                    menuItem = new JMenuItem(resourceMap.getString("edgeTriggerAeroLuckyCrit.text")); //$NON-NLS-1$
+                    menuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_WHEN_AERO_LUCKY_CRIT, TRUE));
+                    menuItem.addActionListener(this);
+                    submenu.add(menuItem);
+                    menuItem = new JMenuItem(resourceMap.getString("edgeTriggerAeroNukeCrit.text")); //$NON-NLS-1$
+                    menuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_WHEN_AERO_NUKE_CRIT, TRUE));
+                    menuItem.addActionListener(this);
+                    submenu.add(menuItem);
+                    menuItem = new JMenuItem(resourceMap.getString("edgeTriggerAeroTrnBayCrit.text")); //$NON-NLS-1$
+                    menuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_WHEN_AERO_UNIT_CARGO_LOST, TRUE));
+                    menuItem.addActionListener(this);
+                    submenu.add(menuItem);
                     if (gui.getCampaign().getCampaignOptions().useSupportEdge()) {
                         menuItem = new JMenuItem(resourceMap.getString("edgeTriggerHealCheck.text")); //$NON-NLS-1$
                         menuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, PersonnelOptions.EDGE_MEDICAL, TRUE));
@@ -2312,6 +2336,30 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     submenu.add(menuItem);
                     menuItem = new JMenuItem(resourceMap.getString("edgeTriggerMASCFailure.text")); //$NON-NLS-1$
                     menuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_MASC_FAILURE, FALSE));
+                    menuItem.addActionListener(this);
+                    submenu.add(menuItem);
+                    menuItem = new JMenuItem(resourceMap.getString("edgeTriggerAeroAltLoss.text")); //$NON-NLS-1$
+                    menuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_WHEN_AERO_ALT_LOSS, FALSE));
+                    menuItem.addActionListener(this);
+                    submenu.add(menuItem);
+                    menuItem = new JMenuItem(resourceMap.getString("edgeTriggerAeroExplosion.text")); //$NON-NLS-1$
+                    menuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_WHEN_AERO_EXPLOSION, FALSE));
+                    menuItem.addActionListener(this);
+                    submenu.add(menuItem);
+                    menuItem = new JMenuItem(resourceMap.getString("edgeTriggerAeroKO.text")); //$NON-NLS-1$
+                    menuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_WHEN_AERO_KO, FALSE));
+                    menuItem.addActionListener(this);
+                    submenu.add(menuItem);
+                    menuItem = new JMenuItem(resourceMap.getString("edgeTriggerAeroLuckyCrit.text")); //$NON-NLS-1$
+                    menuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_WHEN_AERO_LUCKY_CRIT, FALSE));
+                    menuItem.addActionListener(this);
+                    submenu.add(menuItem);
+                    menuItem = new JMenuItem(resourceMap.getString("edgeTriggerAeroNukeCrit.text")); //$NON-NLS-1$
+                    menuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_WHEN_AERO_NUKE_CRIT, FALSE));
+                    menuItem.addActionListener(this);
+                    submenu.add(menuItem);
+                    menuItem = new JMenuItem(resourceMap.getString("edgeTriggerAeroTrnBayCrit.text")); //$NON-NLS-1$
+                    menuItem.setActionCommand(makeCommand(CMD_EDGE_TRIGGER, OPT_EDGE_WHEN_AERO_UNIT_CARGO_LOST, FALSE));
                     menuItem.addActionListener(this);
                     submenu.add(menuItem);
                     if (gui.getCampaign().getCampaignOptions().useSupportEdge()) {
