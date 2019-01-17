@@ -116,6 +116,9 @@ public class AtBContract extends Contract implements Serializable {
     public static final int EVT_SPECIALEVENTS = 9;
     public static final int EVT_BIGBATTLE = 10;
 
+    /** The minimum intensity below which no scenarios will be generated */
+    public static final double MINIMUM_INTENSITY = 0.01;
+
     /* null unless subcontract */
     protected AtBContract parentContract;
     /* hired by another mercenary unit on contract to a third-party employer */

@@ -2673,8 +2673,17 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public int getDeploymentDeficit(AtBContract contract) {
+        if (!contract.isActive()) {
+            // Inactive contracts have no deficits.
+            return 0;
+        } else if (contract.getStartDate().after(getDate())) {
+            // Contracts in the future don't have deficits...yet.
+            return 0;
+        }
+
         int total = -contract.getRequiredLances();
         int role = -Math.max(1, contract.getRequiredLances() / 2);
+
         for (Lance l : lances.values()) {
             if (l.getMissionId() == contract.getId() && l.getRole() != Lance.ROLE_UNASSIGNED) {
                 total++;
