@@ -102,12 +102,6 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                     unit.remove(p, true);
                 }
                 
-                Person tech = unit.getTech();
-                
-                if (null != tech) {
-                	tech.removeTechUnitId(unit.getId());
-                }
-                
                 unit.removeTech();
                 
                 Person engineer = unit.getEngineer();

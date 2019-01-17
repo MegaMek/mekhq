@@ -721,6 +721,8 @@ public class CampaignXmlParser {
 
         //**EVERYTHING HAS BEEN LOADED. NOW FOR SANITY CHECKS**//
 
+        fixupUnitTechProblems(retVal);
+
         //unload any ammo bins in the warehouse
         ArrayList<AmmoBin> binsToUnload = new ArrayList<AmmoBin>();
         for(Part prt : retVal.getSpareParts()) {
@@ -804,17 +806,55 @@ public class CampaignXmlParser {
 
         return retVal;
     }
-    
+
     /**
-     * Pulled out purely for encapsulation. Makes the code neater and easier to read.
+     * This will fixup unit-tech problems seen in some save games, such as techs
+     * having been double-assigned or being assigned to mothballed units.
+     */
+    private void fixupUnitTechProblems(Campaign retVal) {
+        final String METHOD_NAME = "fixupUnitTechProblems(Campaign)";
+
+        // Cleanup problems with techs and units
+        for (Person tech : retVal.getTechs()) {
+            for (UUID id : new ArrayList<>(tech.getTechUnitIDs())) {
+                Unit u = retVal.getUnit(id);
+
+                String reason = null;
+                String unitDesc = id.toString();
+                if (null == u) {
+                    reason = "referenced missing unit";
+                    tech.removeTechUnitId(id);
+                } else if (null == u.getTechId()) {
+                    reason = "was not referenced by unit";
+                    u.setTech(tech);
+                } else if (u.isMothballed()) {
+                    reason = "referenced mothballed unit";
+                    unitDesc = u.getName();
+                    tech.removeTechUnitId(id);
+                } else if (!tech.getId().equals(u.getTechId())) {
+                    reason = String.format("referenced tech %s's maintained unit", u.getTech().getName());
+                    unitDesc = u.getName();
+                    tech.removeTechUnitId(id);
+                }
+                if (null != reason) {
+                    MekHQ.getLogger().log(CampaignXmlParser.class, METHOD_NAME, LogLevel.WARNING,
+                            String.format("Tech %s %s %s (fixed)", tech.getName(), reason, unitDesc));
+                }
+            }
+        }
+    }
+
+    /**
+     * Pulled out purely for encapsulation. Makes the code neater and easier to
+     * read.
      *
      * @param retVal The Campaign object that is being populated.
      * @param wni    The XML node we're working from.
      * @throws ParseException
      * @throws DOMException
      */
-    private static void processInfoNode(Campaign retVal, Node wni,
-            Version version) throws DOMException, CampaignXmlParseException {
+    private static void processInfoNode(Campaign retVal, Node wni, Version version)
+            throws DOMException, CampaignXmlParseException {
         NodeList nl = wni.getChildNodes();
 
         String rankNames = null;

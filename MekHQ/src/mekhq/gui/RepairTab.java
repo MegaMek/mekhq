@@ -857,7 +857,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         // If requested, switch to top entry
         if(getCampaign().getCampaignOptions().useResetToFirstTech() && techTable.getRowCount() > 0) {
             techTable.setRowSelectionInterval(0, 0);
-        } else {
+        } else if (selectedTech != null) {
             // Or get the selected tech back
             for (int i = 0; i < techTable.getRowCount(); i++) {
                 Person p = techsModel
