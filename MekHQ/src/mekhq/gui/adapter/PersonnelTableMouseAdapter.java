@@ -715,7 +715,9 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 }
                 break;
             case CMD_RECRUIT:
-                gui.getCampaign().changePrisonerStatus(selectedPerson, Person.PRISONER_NOT);
+                for(Person person : people) {
+                    gui.getCampaign().changePrisonerStatus(person, Person.PRISONER_NOT);
+                }
                 break;
             case CMD_RANSOM:
                 // ask the user if they want to sell off their prisoners. If yes, then add a daily report entry, add the money and remove them all.
