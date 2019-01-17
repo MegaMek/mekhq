@@ -1195,6 +1195,10 @@ public class AtBContract extends Contract implements Serializable {
                 +employerMinorBreaches
                 +"</employerMinorBreaches>");
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"<contractScoreArbitraryModifier>"
+                +contractScoreArbitraryModifier
+                +"</contractScoreArbitraryModifier>");
+        pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<priorLogisticsFailure>"
                 +priorLogisticsFailure
                 +"</priorLogisticsFailure>");
@@ -1275,6 +1279,8 @@ public class AtBContract extends Contract implements Serializable {
                 playerMinorBreaches = Integer.parseInt(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("employerMinorBreaches")) {
                 employerMinorBreaches = Integer.parseInt(wn2.getTextContent());
+            } else if (wn2.getNodeName().equalsIgnoreCase("contractScoreArbitraryModifier")) {
+                contractScoreArbitraryModifier = Integer.parseInt(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("priorLogisticsFailure")) {
                 priorLogisticsFailure = Boolean.parseBoolean(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("battleTypeMod")) {
