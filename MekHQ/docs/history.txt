@@ -25,6 +25,7 @@ v0.45.3-SNAPSHOT
 + Issue #970: Can now recruit multiple prisoners at a time
 + Issue #1036: Enable zero intensity level for AtB Scenario Generation
 + Issue #779: Fix AtB deployment nag before a contract has started
++ PR #1036: Make startup GUI show all four buttons at lower resolutions
 
 v0.45.2 (2018-11-18 0200 UTC)
 + Switched build system from ant to gradle.
