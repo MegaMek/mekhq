@@ -710,7 +710,9 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 break;
             case CMD_RECRUIT:
                 for(Person person : people) {
-                    gui.getCampaign().changePrisonerStatus(person, Person.PRISONER_NOT);
+                    if (StaticChecks.isWillingToDefect(person)) {
+                        gui.getCampaign().changePrisonerStatus(person, Person.PRISONER_NOT);
+                    }
                 }
                 break;
             case CMD_RANSOM:
@@ -1331,7 +1333,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     && StaticChecks.areAllPrisoners(selected)) {
                 popup.add(newMenuItem(resourceMap.getString("ransom.text"), CMD_RANSOM));
                 popup.add(newMenuItem(resourceMap.getString("recruit.text"), CMD_RECRUIT, //$NON-NLS-1$
-                        StaticChecks.areAllWillingToDefect(selected)));
+                        StaticChecks.areAnyWillingToDefect(selected)));
             }
 
             menu = new JMenu(resourceMap.getString("changePrimaryRole.text")); //$NON-NLS-1$
