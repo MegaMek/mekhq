@@ -306,14 +306,22 @@ public class StaticChecks {
         return true;
     }
 
-    public static boolean areAllWillingToDefect(Person[] people) {
-        for (Person person : people) {
-            if (!(person.isBondsman() || person.isWillingToDefect())) {
-                return false;
-            }
+    public static boolean isWillingToDefect(Person person) {
+        if (!(person.isBondsman() || person.isWillingToDefect())) {
+            return false;
         }
 
         return true;
+    }
+
+    public static boolean areAnyWillingToDefect(Person[] people) {
+        for (Person person : people) {
+            if (isWillingToDefect((person))) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public static boolean areAllWoB(Person[] people) {
