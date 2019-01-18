@@ -3050,8 +3050,15 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             } else {
                 //For other unit types, just use the unit commander's abilities.
                 Person commander = getCommander();
+                PilotOptions cdrOptions = new PilotOptions();
                 if (null != commander) {
-                    entity.getCrew().setOptions(commander.getOptions());
+                    for (String optionName : optionNames) {
+                        IOption option = commander.getOptions().getOption(optionName);
+                        if (null != option) {
+                            cdrOptions.getOption(optionName).setValue(option.getValue());
+                        }
+                    }
+                    entity.getCrew().setOptions(cdrOptions);
                 }
             
                 if(usesSoloPilot()) {
