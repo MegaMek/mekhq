@@ -2942,11 +2942,16 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             //This double enumeration is annoying to work with for crew-served units.
             //Get the option names while we enumerate so they can be used later
             List<String> optionNames = new ArrayList<String>();
+            List<String> cyberOptionNames = new ArrayList<String>();
             for (Enumeration<IOptionGroup> i = options.getGroups(); i.hasMoreElements();) {
                  IOptionGroup group = i.nextElement();
                  for (Enumeration<IOption> j = group.getOptions(); j.hasMoreElements();) {
                      IOption option = j.nextElement();
-                     optionNames.add(option.getName());
+                     if (group.getKey().equals(PilotOptions.MD_ADVANTAGES)) {
+                         cyberOptionNames.add(option.getName());
+                     } else {
+                         optionNames.add(option.getName());
+                     }
                  }
             }
             
@@ -2986,7 +2991,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                         IOption::getName,
                         Collectors.collectingAndThen(
                             Collectors.groupingBy(IOption::getValue, Collectors.counting()),
-                            m -> m.entrySet().stream().filter(e -> e.getValue() > crewSize / 2)
+                            m -> m.entrySet().stream().filter(e -> (cyberOptionNames.contains(e.getKey()) ? e.getValue() >= crewSize : e.getValue() > crewSize / 2))
                                 .max(Map.Entry.comparingByValue()).map(e -> e.getKey())
                         )
                     ));             
@@ -3009,6 +3014,17 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 // A few just require 1/4 the crew, there's at least one commander only, some just add an effect for every
                 // trooper who has the implant...you get the idea.
                 // TODO: Revisit this once all implants are fully implemented.
+                for (String implantName : cyberOptionNames) {
+                    IOption option = commander.getOptions().getOption(implantName);
+                    if (null != option) {
+                        options.getOption(implantName).setValue(option.getValue());
+                    }
+
+                    if (bestOptions.containsKey(implantName)) {
+                        Optional<Object> crewOption = bestOptions.get(implantName);
+                        crewOption.ifPresent(o -> options.getOption(implantName).setValue(o));
+                    }
+                }
                 
                 //Assign the options to our unit
                 entity.getCrew().setOptions(options);
@@ -3061,6 +3077,12 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                         IOption option = commander.getOptions().getOption(optionName);
                         if (null != option) {
                             cdrOptions.getOption(optionName).setValue(option.getValue());
+                        }
+                    }
+                    for (String implantName : cyberOptionNames) {
+                        IOption option = commander.getOptions().getOption(implantName);
+                        if (null != option) {
+                            cdrOptions.getOption(implantName).setValue(option.getValue());
                         }
                     }
                     entity.getCrew().setOptions(cdrOptions);
