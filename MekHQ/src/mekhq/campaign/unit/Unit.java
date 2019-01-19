@@ -2942,16 +2942,11 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             //This double enumeration is annoying to work with for crew-served units.
             //Get the option names while we enumerate so they can be used later
             List<String> optionNames = new ArrayList<String>();
-            List<String> cyberOptionNames = new ArrayList<String>();
             for (Enumeration<IOptionGroup> i = options.getGroups(); i.hasMoreElements();) {
                  IOptionGroup group = i.nextElement();
                  for (Enumeration<IOption> j = group.getOptions(); j.hasMoreElements();) {
                      IOption option = j.nextElement();
-                     if (group.getKey().equals(PilotOptions.MD_ADVANTAGES)) {
-                         cyberOptionNames.add(option.getName());
-                     } else {
-                         optionNames.add(option.getName());
-                     }
+                     optionNames.add(option.getName());
                  }
             }
             
@@ -3009,6 +3004,11 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                         crewOption.ifPresent(o -> options.getOption(optionName).setValue(o));
                     }
                 }
+                
+                // Yuck. Most cybernetic implants require all members of a unit's crew to have the implant rather than half.
+                // A few just require 1/4 the crew, there's at least one commander only, some just add an effect for every
+                // trooper who has the implant...you get the idea.
+                // TODO: Revisit this once all implants are fully implemented.
                 
                 //Assign the options to our unit
                 entity.getCrew().setOptions(options);
