@@ -9,6 +9,8 @@ import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.time.Duration;
 import java.util.GregorianCalendar;
 import java.util.ResourceBundle;
@@ -78,6 +80,17 @@ public class AdvanceDaysDialog extends JDialog implements ActionListener {
 
         logPanel = new DailyReportLogPanel(listener);
         getContentPane().add(logPanel, BorderLayout.CENTER);
+
+        addWindowListener(new WindowAdapter()
+        {
+            public void windowClosing(WindowEvent e)
+            {
+                // We need to unregister here as unregistering in the actionPerformed
+                // method will lead to incorrect behaviour if the user tries to advance
+                // days again without exiting this dialog
+                MekHQ.unregisterHandler(this);
+            }
+        });
     }
 
     /* (non-Javadoc)
@@ -98,7 +111,6 @@ public class AdvanceDaysDialog extends JDialog implements ActionListener {
                 days = Math.abs((int)duration.toDays());
             }
             for (int numDays = days; numDays > 0; numDays--) {
-                spnDays.setValue(numDays);
                 if (gui.getCampaign().checkOverDueLoans()
                         || gui.nagShortMaintenance()
                         || (gui.getCampaign().getCampaignOptions().getUseAtB())
@@ -123,8 +135,7 @@ public class AdvanceDaysDialog extends JDialog implements ActionListener {
                     logPanel.appendLog(gui.getCampaign().fetchAndClearNewReports());
                 }
             }
-            MekHQ.unregisterHandler(this);
-            
+
             gui.refreshCalendar();
             gui.refreshLocation();
             gui.initReport();
