@@ -1,6 +1,7 @@
 package mekhq.campaign.mission;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -63,9 +64,9 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
         PlanetOwner;
         
         public static ForceAlignment getForceAlignment(int ordinal) {
-            for (ForceAlignment he : values()) {
-                if (he.ordinal() == ordinal) {
-                    return he;
+            for (ForceAlignment fe : values()) {
+                if (fe.ordinal() == ordinal) {
+                    return fe;
                 }
             }
             return null;
@@ -255,10 +256,12 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
         this.forceAlignment = forceAlignment;
         this.generationMethod = generationMethod;
         this.forceMultiplier = forceMultiplier;
-        this.deploymentZones = deploymentZones == null ? new ArrayList<>() : deploymentZones;
+        this.deploymentZones = new ArrayList<>();
         this.destinationZone = destinationZone;
         this.retreatThreshold = retreatThreshold;
         this.allowedUnitType = allowedUnitType;
+        
+        Collections.copy(this.deploymentZones, deploymentZones);
     }
     
     public int getForceAlignment() {

@@ -38,7 +38,10 @@
 			EnemyHotDrop.xml
 		</modifier>
 		<modifier>
-			EnemyGroundedDropship.xml
+			EnemyDropship.xml
+		</modifier>
+		<modifier>
+			GroundedEnemyDropship.xml
 		</modifier>
 		<modifier>
 			GoodIntel.xml

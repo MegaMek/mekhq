@@ -544,7 +544,7 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
         EventTiming timing = scenarioPtr.getNumBots() > 0 ? EventTiming.PostForceGeneration : EventTiming.PreForceGeneration;
         
         modifierPtr.processModifier(scenarioPtr, campaign, timing);
-        txtDesc.setText(txtDesc.getText() + "\n\n" + modifierPtr.additionalBriefingText);
+        txtDesc.setText(txtDesc.getText() + "\n\n" + modifierPtr.getAdditionalBriefingText());
     }
     
 }

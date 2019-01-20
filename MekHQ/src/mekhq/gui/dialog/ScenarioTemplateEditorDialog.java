@@ -600,7 +600,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         
         gbc.gridx++;
         txtBaseWidth = new JTextField(4);
-        txtBaseWidth.setText(String.valueOf(scenarioTemplate.mapParameters.baseWidth));
+        txtBaseWidth.setText(String.valueOf(scenarioTemplate.mapParameters.getBaseWidth()));
         globalPanel.add(txtBaseWidth, gbc);
         
         gbc.gridx++;
@@ -665,8 +665,8 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         mapTypeGroup.add(btnUseLowAtmosphereMap);
         mapTypeGroup.add(btnUseSpecificMapTypes);
         
-        if(scenarioTemplate.mapParameters.mapLocation != null) {
-            switch(scenarioTemplate.mapParameters.mapLocation) {
+        if(scenarioTemplate.mapParameters.getMapLocation() != null) {
+            switch(scenarioTemplate.mapParameters.getMapLocation()) {
             case AllGroundTerrain:
                 btnAllowAllMapTypes.setSelected(true);
                 break;
@@ -706,7 +706,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         
         gbc.gridx++;
         txtBaseHeight = new JTextField(4);
-        txtBaseHeight.setText(String.valueOf(scenarioTemplate.mapParameters.baseHeight));
+        txtBaseHeight.setText(String.valueOf(scenarioTemplate.mapParameters.getBaseHeight()));
         globalPanel.add(txtBaseHeight, gbc);
         
         gbc.gridy++;
@@ -716,7 +716,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         
         gbc.gridx++;
         txtXIncrement = new JTextField(4);
-        txtXIncrement.setText(String.valueOf(scenarioTemplate.mapParameters.widthScalingIncrement));
+        txtXIncrement.setText(String.valueOf(scenarioTemplate.mapParameters.getWidthScalingIncrement()));
         globalPanel.add(txtXIncrement, gbc);
         
         gbc.gridy++;
@@ -726,7 +726,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         
         gbc.gridx++;
         txtYIncrement = new JTextField(4);
-        txtYIncrement.setText(String.valueOf(scenarioTemplate.mapParameters.heightScalingIncrement));
+        txtYIncrement.setText(String.valueOf(scenarioTemplate.mapParameters.getHeightScalingIncrement()));
         globalPanel.add(txtYIncrement, gbc);
         
         gbc.gridy++;
@@ -736,7 +736,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         
         gbc.gridx++;
         chkAllowRotation = new JCheckBox();
-        chkAllowRotation.setSelected(scenarioTemplate.mapParameters.allowRotation);
+        chkAllowRotation.setSelected(scenarioTemplate.mapParameters.isAllowRotation());
         globalPanel.add(chkAllowRotation, gbc);
         
         gbc.gridy++;
@@ -755,7 +755,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
             }
             
         });
-        chkUseAtBSizing.setSelected(scenarioTemplate.mapParameters.useStandardAtBSizing);
+        chkUseAtBSizing.setSelected(scenarioTemplate.mapParameters.isUseStandardAtBSizing());
         globalPanel.add(chkUseAtBSizing, gbc);
     }
     
@@ -1235,21 +1235,21 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         for(int terrainType : lstAllowedTerrainTypes.getSelectedIndices()) {
             scenarioTemplate.mapParameters.allowedTerrainTypes.add(terrainType);
         }
-        scenarioTemplate.mapParameters.baseHeight = Integer.parseInt(txtBaseHeight.getText());
-        scenarioTemplate.mapParameters.baseWidth = Integer.parseInt(txtBaseWidth.getText());
-        scenarioTemplate.mapParameters.heightScalingIncrement = Integer.parseInt(txtYIncrement.getText());
-        scenarioTemplate.mapParameters.widthScalingIncrement = Integer.parseInt(txtXIncrement.getText());
-        scenarioTemplate.mapParameters.allowRotation = chkAllowRotation.isSelected();
-        scenarioTemplate.mapParameters.useStandardAtBSizing = chkUseAtBSizing.isSelected();
+        scenarioTemplate.mapParameters.setBaseHeight(Integer.parseInt(txtBaseHeight.getText()));
+        scenarioTemplate.mapParameters.setBaseWidth(Integer.parseInt(txtBaseWidth.getText()));
+        scenarioTemplate.mapParameters.setHeightScalingIncrement(Integer.parseInt(txtYIncrement.getText()));
+        scenarioTemplate.mapParameters.setWidthScalingIncrement(Integer.parseInt(txtXIncrement.getText()));
+        scenarioTemplate.mapParameters.setAllowRotation(chkAllowRotation.isSelected());
+        scenarioTemplate.mapParameters.setUseStandardAtBSizing(chkUseAtBSizing.isSelected());
         
         if(btnAllowAllMapTypes.isSelected()) {
-            scenarioTemplate.mapParameters.mapLocation = ScenarioMapParameters.MapLocation.AllGroundTerrain;
+            scenarioTemplate.mapParameters.setMapLocation(ScenarioMapParameters.MapLocation.AllGroundTerrain);
         } else if(btnUseSpaceMap.isSelected()) {
-            scenarioTemplate.mapParameters.mapLocation = ScenarioMapParameters.MapLocation.Space;
+            scenarioTemplate.mapParameters.setMapLocation(ScenarioMapParameters.MapLocation.Space);
         } else if(btnUseLowAtmosphereMap.isSelected()) {
-            scenarioTemplate.mapParameters.mapLocation = ScenarioMapParameters.MapLocation.LowAtmosphere;
+            scenarioTemplate.mapParameters.setMapLocation(ScenarioMapParameters.MapLocation.LowAtmosphere);
         } else if(btnUseSpecificMapTypes.isSelected()) {
-            scenarioTemplate.mapParameters.mapLocation = ScenarioMapParameters.MapLocation.SpecificGroundTerrain;
+            scenarioTemplate.mapParameters.setMapLocation(ScenarioMapParameters.MapLocation.SpecificGroundTerrain);
         }
             
         File file = FileDialogs.saveScenarioTemplate((JFrame) getOwner(), scenarioTemplate).orElse(null);

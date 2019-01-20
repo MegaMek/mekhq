@@ -168,8 +168,8 @@ public class AtBEventProcessor {
                 
                 // infantry will have a 1/3 chance of being field guns
                 if(Compute.d6() <= 2) {
-                    params.missionRoles.add(MissionRole.FIELD_GUN);
-                    params.movementModes.addAll(IUnitGenerator.ALL_INFANTRY_MODES);
+                    params.getMissionRoles().add(MissionRole.FIELD_GUN);
+                    params.getMovementModes().addAll(IUnitGenerator.ALL_INFANTRY_MODES);
                 }
                 
                 break;
@@ -203,11 +203,11 @@ public class AtBEventProcessor {
 
         String faction = getRecruitFaction(campaign);
         
-        params.faction = faction;
-        params.unitType = unitType;
-        params.weightClass = weight;
-        params.year = campaign.getCalendar().get(Calendar.YEAR);
-        params.quality = IUnitRating.DRAGOON_F;
+        params.setFaction(faction);
+        params.setUnitType(unitType);
+        params.setWeightClass(weight);
+        params.setYear(campaign.getCalendar().get(Calendar.YEAR));
+        params.setQuality(IUnitRating.DRAGOON_F);
         
         MechSummary ms = campaign.getUnitGenerator().generate(params);
         if (null != ms) {

@@ -22,37 +22,37 @@ public class ScenarioMapParameters {
     /**
      * The fixed base width/x dimension of the map.
      */
-    public int baseWidth;
+    private int baseWidth;
     
     /**
      * The fixed base height/y dimension of the map.
      */
-    public int baseHeight;
+    private int baseHeight;
     
     /**
      * If the player deploys a force larger than a lance, the map will grow horizontally by this many hexes per extra lance
      */
-    public int widthScalingIncrement = 5;
+    private int widthScalingIncrement = 5;
     
     /**
      * If the player deploys a force larger than a lance, the map will grow vertically by this many hexes per extra lance
      */
-    public int heightScalingIncrement = 5;
+    private int heightScalingIncrement = 5;
     
     /**
      * Allow the map to potentially (with 50/50 odds) to be rotated 90 degrees. 
      */
-    public boolean allowRotation;
+    private boolean allowRotation;
     
     /**
      * Use the AtB Map Sizes table to determine the base width and height of the map.
      */
-    public boolean useStandardAtBSizing;
+    private boolean useStandardAtBSizing;
     
     /**
      * What kind of map it should be: space, low atmo, any ground map, specific ground map
      */
-    public MapLocation mapLocation;
+    private MapLocation mapLocation;
     
     @XmlElementWrapper(name="allowedTerrainTypes")
     @XmlElement(name="allowedTerrainType")
@@ -66,5 +66,61 @@ public class ScenarioMapParameters {
         }
         
         return retVal;
+    }
+
+    public int getBaseWidth() {
+        return baseWidth;
+    }
+
+    public void setBaseWidth(int baseWidth) {
+        this.baseWidth = baseWidth;
+    }
+
+    public int getBaseHeight() {
+        return baseHeight;
+    }
+
+    public void setBaseHeight(int baseHeight) {
+        this.baseHeight = baseHeight;
+    }
+
+    public int getWidthScalingIncrement() {
+        return widthScalingIncrement;
+    }
+
+    public void setWidthScalingIncrement(int widthScalingIncrement) {
+        this.widthScalingIncrement = widthScalingIncrement;
+    }
+
+    public int getHeightScalingIncrement() {
+        return heightScalingIncrement;
+    }
+
+    public void setHeightScalingIncrement(int heightScalingIncrement) {
+        this.heightScalingIncrement = heightScalingIncrement;
+    }
+
+    public boolean isAllowRotation() {
+        return allowRotation;
+    }
+
+    public void setAllowRotation(boolean allowRotation) {
+        this.allowRotation = allowRotation;
+    }
+
+    public boolean isUseStandardAtBSizing() {
+        return useStandardAtBSizing;
+    }
+
+    public void setUseStandardAtBSizing(boolean useStandardAtBSizing) {
+        this.useStandardAtBSizing = useStandardAtBSizing;
+    }
+
+    public MapLocation getMapLocation() {
+        return mapLocation;
+    }
+
+    public void setMapLocation(MapLocation mapLocation) {
+        this.mapLocation = mapLocation;
     }
 }

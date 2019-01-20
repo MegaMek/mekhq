@@ -1,6 +1,7 @@
 package mekhq.campaign.mission.atb;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,9 +11,10 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.transform.stream.StreamSource;
+import javax.xml.transform.Source;
 
 import mekhq.MekHQ;
+import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.ScenarioForceTemplate;
@@ -32,20 +34,20 @@ public class AtBScenarioModifier {
         PostForceGeneration
     }
 
-    public String modifierName = null;
-    public String additionalBriefingText = null;
-    public Boolean benefitsPlayer = false;
-    public Boolean blockFurtherEvents = false;
-    public EventTiming eventTiming = null;
-    public ScenarioForceTemplate forceDefinition = null;
-    public Integer skillAdjustment = null;
-    public Integer qualityAdjustment = null;
-    public ForceAlignment eventRecipient = null;
-    public Integer battleDamageIntensity = null;
-    public Integer ammoExpenditureIntensity = null;
-    public Integer unitRemovalCount = null;
-    public List<MapLocation> allowedMapLocations = null;
-    public Boolean useAmbushLogic = null; 
+    private String modifierName = null;
+    private String additionalBriefingText = null;
+    private Boolean benefitsPlayer = false;
+    private Boolean blockFurtherEvents = false;
+    private EventTiming eventTiming = null;
+    private ScenarioForceTemplate forceDefinition = null;
+    private Integer skillAdjustment = null;
+    private Integer qualityAdjustment = null;
+    private ForceAlignment eventRecipient = null;
+    private Integer battleDamageIntensity = null;
+    private Integer ammoExpenditureIntensity = null;
+    private Integer unitRemovalCount = null;
+    private List<MapLocation> allowedMapLocations = null;
+    private Boolean useAmbushLogic = null; 
     
     /**
      * Process this scenario modifier for a particular scenario, given a particular timing indicator.
@@ -54,37 +56,37 @@ public class AtBScenarioModifier {
      * @param eventTiming Whether this is occurring before or after primary forces have been generated.
      */
     public void processModifier(AtBDynamicScenario scenario, Campaign campaign, EventTiming eventTiming) {
-        if(eventTiming == this.eventTiming) {
-            if(additionalBriefingText != null & additionalBriefingText.length() > 0) {
-                AtBScenarioModifierApplicator.appendScenarioBriefingText(scenario, additionalBriefingText);
+        if(eventTiming == this.getEventTiming()) {
+            if(getAdditionalBriefingText() != null & getAdditionalBriefingText().length() > 0) {
+                AtBScenarioModifierApplicator.appendScenarioBriefingText(scenario, getAdditionalBriefingText());
             }
             
-            if(forceDefinition != null) {
-                AtBScenarioModifierApplicator.addForce(campaign, scenario, forceDefinition, eventTiming);
+            if(getForceDefinition() != null) {
+                AtBScenarioModifierApplicator.addForce(campaign, scenario, getForceDefinition(), eventTiming);
             }
             
-            if(skillAdjustment != null && eventRecipient != null) {
-                AtBScenarioModifierApplicator.adjustSkill(scenario, campaign, eventRecipient, skillAdjustment);
+            if(getSkillAdjustment() != null && getEventRecipient() != null) {
+                AtBScenarioModifierApplicator.adjustSkill(scenario, campaign, getEventRecipient(), getSkillAdjustment());
             }
             
-            if(qualityAdjustment != null && eventRecipient != null) {
-                AtBScenarioModifierApplicator.adjustQuality(scenario, campaign, eventRecipient, qualityAdjustment);
+            if(getQualityAdjustment() != null && getEventRecipient() != null) {
+                AtBScenarioModifierApplicator.adjustQuality(scenario, campaign, getEventRecipient(), getQualityAdjustment());
             }
             
-            if(battleDamageIntensity != null && eventRecipient != null) {
-                AtBScenarioModifierApplicator.inflictBattleDamage(scenario, campaign, eventRecipient, battleDamageIntensity);
+            if(getBattleDamageIntensity() != null && getEventRecipient() != null) {
+                AtBScenarioModifierApplicator.inflictBattleDamage(scenario, campaign, getEventRecipient(), getBattleDamageIntensity());
             }
             
-            if(ammoExpenditureIntensity != null && eventRecipient != null) {
-                AtBScenarioModifierApplicator.expendAmmo(scenario, campaign, eventRecipient, ammoExpenditureIntensity);
+            if(getAmmoExpenditureIntensity() != null && getEventRecipient() != null) {
+                AtBScenarioModifierApplicator.expendAmmo(scenario, campaign, getEventRecipient(), getAmmoExpenditureIntensity());
             }
             
-            if(unitRemovalCount != null && eventRecipient != null) {
-                AtBScenarioModifierApplicator.removeUnits(scenario, campaign, eventRecipient, unitRemovalCount);
+            if(getUnitRemovalCount() != null && getEventRecipient() != null) {
+                AtBScenarioModifierApplicator.removeUnits(scenario, campaign, getEventRecipient(), getUnitRemovalCount());
             }
             
-            if(useAmbushLogic != null && eventRecipient != null) {
-                AtBScenarioModifierApplicator.setupAmbush(scenario, campaign, eventRecipient);
+            if(getUseAmbushLogic() != null && getEventRecipient() != null) {
+                AtBScenarioModifierApplicator.setupAmbush(scenario, campaign, getEventRecipient());
             }
         }
     }
@@ -140,9 +142,9 @@ public class AtBScenarioModifier {
                 AtBScenarioModifier modifier = Deserialize(filePath);
                 
                 if(modifier != null) {
-                    if(modifier.modifierName == null) {
-                        modifier.modifierName = String.format("%s (%s)", fileName,
-                                modifier.eventTiming == EventTiming.PreForceGeneration ? "Pre" : "Post");
+                    if(modifier.getModifierName() == null) {
+                        modifier.setModifierName(String.format("%s (%s)", fileName,
+                                modifier.getEventTiming() == EventTiming.PreForceGeneration ? "Pre" : "Post"));
                     }
                     
                     scenarioModifiers.add(modifier);
@@ -172,7 +174,8 @@ public class AtBScenarioModifier {
                 return null;
             }
             
-            JAXBElement<AtBScenarioModifier> templateElement = um.unmarshal(new StreamSource(xmlFile), AtBScenarioModifier.class);
+            Source inputSource = MekHqXmlUtil.createSafeXmlSource(new FileInputStream(xmlFile));
+            JAXBElement<AtBScenarioModifier> templateElement = um.unmarshal(inputSource, AtBScenarioModifier.class);
             resultingList = templateElement.getValue();
         } catch(Exception e) {
             MekHQ.getLogger().error(ScenarioModifierManifest.class, "Deserialize", "Error Deserializing Scenario Modifier", e);
@@ -183,7 +186,119 @@ public class AtBScenarioModifier {
     
     @Override
     public String toString() {
+        return getModifierName();
+    }
+
+    public String getModifierName() {
         return modifierName;
+    }
+
+    public void setModifierName(String modifierName) {
+        this.modifierName = modifierName;
+    }
+
+    public String getAdditionalBriefingText() {
+        return additionalBriefingText;
+    }
+
+    public void setAdditionalBriefingText(String additionalBriefingText) {
+        this.additionalBriefingText = additionalBriefingText;
+    }
+
+    public Boolean getBenefitsPlayer() {
+        return benefitsPlayer;
+    }
+
+    public void setBenefitsPlayer(Boolean benefitsPlayer) {
+        this.benefitsPlayer = benefitsPlayer;
+    }
+
+    public Boolean getBlockFurtherEvents() {
+        return blockFurtherEvents;
+    }
+
+    public void setBlockFurtherEvents(Boolean blockFurtherEvents) {
+        this.blockFurtherEvents = blockFurtherEvents;
+    }
+
+    public EventTiming getEventTiming() {
+        return eventTiming;
+    }
+
+    public void setEventTiming(EventTiming eventTiming) {
+        this.eventTiming = eventTiming;
+    }
+
+    public ScenarioForceTemplate getForceDefinition() {
+        return forceDefinition;
+    }
+
+    public void setForceDefinition(ScenarioForceTemplate forceDefinition) {
+        this.forceDefinition = forceDefinition;
+    }
+
+    public Integer getSkillAdjustment() {
+        return skillAdjustment;
+    }
+
+    public void setSkillAdjustment(Integer skillAdjustment) {
+        this.skillAdjustment = skillAdjustment;
+    }
+
+    public Integer getQualityAdjustment() {
+        return qualityAdjustment;
+    }
+
+    public void setQualityAdjustment(Integer qualityAdjustment) {
+        this.qualityAdjustment = qualityAdjustment;
+    }
+
+    public ForceAlignment getEventRecipient() {
+        return eventRecipient;
+    }
+
+    public void setEventRecipient(ForceAlignment eventRecipient) {
+        this.eventRecipient = eventRecipient;
+    }
+
+    public Integer getBattleDamageIntensity() {
+        return battleDamageIntensity;
+    }
+
+    public void setBattleDamageIntensity(Integer battleDamageIntensity) {
+        this.battleDamageIntensity = battleDamageIntensity;
+    }
+
+    public Integer getAmmoExpenditureIntensity() {
+        return ammoExpenditureIntensity;
+    }
+
+    public void setAmmoExpenditureIntensity(Integer ammoExpenditureIntensity) {
+        this.ammoExpenditureIntensity = ammoExpenditureIntensity;
+    }
+
+    public Integer getUnitRemovalCount() {
+        return unitRemovalCount;
+    }
+
+    public void setUnitRemovalCount(Integer unitRemovalCount) {
+        this.unitRemovalCount = unitRemovalCount;
+    }
+
+    public List<MapLocation> getAllowedMapLocations() {
+        return allowedMapLocations;
+    }
+
+    public void setAllowedMapLocations(List<MapLocation> allowedMapLocations) {
+        this.allowedMapLocations = allowedMapLocations;
+    }
+
+    public Boolean getUseAmbushLogic() {
+        return useAmbushLogic;
+    }
+
+    public void setUseAmbushLogic(Boolean useAmbushLogic) {
+        this.useAmbushLogic = useAmbushLogic;
     }
 }
 
@@ -215,7 +330,8 @@ class ScenarioModifierManifest {
                 return null;
             }
             
-            JAXBElement<ScenarioModifierManifest> templateElement = um.unmarshal(new StreamSource(xmlFile), ScenarioModifierManifest.class);
+            Source inputSource = MekHqXmlUtil.createSafeXmlSource(new FileInputStream(xmlFile));
+            JAXBElement<ScenarioModifierManifest> templateElement = um.unmarshal(inputSource, ScenarioModifierManifest.class);
             resultingList = templateElement.getValue();
         } catch(Exception e) {
             MekHQ.getLogger().error(ScenarioModifierManifest.class, "Deserialize", "Error Deserializing Scenario Modifier List", e);

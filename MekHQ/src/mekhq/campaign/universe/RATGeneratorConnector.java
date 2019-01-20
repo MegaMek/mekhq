@@ -176,7 +176,7 @@ public class RATGeneratorConnector extends AbstractUnitGenerator implements IUni
         UnitTable ut = UnitTable.findTable(parameters.getRATGeneratorParameters());
         
         return ut == null ? new ArrayList<MechSummary>() : 
-            ut.generateUnits(count, parameters.filter == null ? null : ms -> parameters.filter.test(ms));
+            ut.generateUnits(count, parameters.getFilter() == null ? null : ms -> parameters.getFilter().test(ms));
     }
     
     /**
@@ -193,6 +193,6 @@ public class RATGeneratorConnector extends AbstractUnitGenerator implements IUni
         UnitTable ut = UnitTable.findTable(parameters.getRATGeneratorParameters());
         
         return ut == null ? null : 
-            ut.generateUnit(parameters.filter == null ? null : ms -> parameters.filter.test(ms));
+            ut.generateUnit(parameters.getFilter() == null ? null : ms -> parameters.getFilter().test(ms));
     }
 }

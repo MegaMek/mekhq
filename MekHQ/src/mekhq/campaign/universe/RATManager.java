@@ -519,8 +519,8 @@ public class RATManager extends AbstractUnitGenerator implements IUnitGenerator 
      */
     @Override
     public List<MechSummary> generate(int count, UnitGeneratorParameters parameters) {
-        return generate(count, parameters.faction, parameters.unitType, parameters.weightClass,  
-                parameters.year, parameters.quality, parameters.movementModes, parameters.filter);
+        return generate(count, parameters.getFaction(), parameters.getUnitType(), parameters.getWeightClass(),  
+                parameters.getYear(), parameters.getQuality(), parameters.getMovementModes(), parameters.getFilter());
     }
     
     /**
@@ -531,8 +531,8 @@ public class RATManager extends AbstractUnitGenerator implements IUnitGenerator 
      */
     @Override
     public MechSummary generate(UnitGeneratorParameters parameters) {
-        return generate(parameters.faction, parameters.unitType, parameters.weightClass,  
-                parameters.year, parameters.quality, parameters.movementModes, parameters.filter);
+        return generate(parameters.getFaction(), parameters.getUnitType(), parameters.getWeightClass(),  
+                parameters.getYear(), parameters.getQuality(), parameters.getMovementModes(), parameters.getFilter());
     }
     
     private static class RAT {

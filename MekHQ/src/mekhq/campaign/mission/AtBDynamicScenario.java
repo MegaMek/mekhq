@@ -3,6 +3,7 @@ package mekhq.campaign.mission;
 import java.io.PrintWriter;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -201,7 +202,8 @@ public class AtBDynamicScenario extends AtBScenario {
     }
     
     public void setScenarioModifiers(List<AtBScenarioModifier> scenarioModifiers) {
-        this.scenarioModifiers = scenarioModifiers;
+        scenarioModifiers = new ArrayList<>();
+        Collections.copy(this.scenarioModifiers, scenarioModifiers);
     }
     
     public List<AtBScenarioModifier> getScenarioModifiers() {

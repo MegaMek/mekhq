@@ -86,8 +86,8 @@ public class AtBDynamicScenarioFactory {
         scenario.setEffectiveOpforSkill(contract.getEnemySkill());
         scenario.setEffectiveOpforQuality(contract.getEnemyQuality());
         
-        boolean planetsideScenario = template.mapParameters.mapLocation == MapLocation.AllGroundTerrain ||
-                template.mapParameters.mapLocation == MapLocation.SpecificGroundTerrain;
+        boolean planetsideScenario = template.mapParameters.getMapLocation() == MapLocation.AllGroundTerrain ||
+                template.mapParameters.getMapLocation() == MapLocation.SpecificGroundTerrain;
         
         // set lighting conditions if the user wants to play with them and is on a ground map
         // theoretically some lighting conditions apply to space maps as well, but requires additional work to implement properly
@@ -508,13 +508,13 @@ public class AtBDynamicScenarioFactory {
         
         // if we are allowing all terrain types, then pick one from the list
         // otherwise, pick one from the allowed ones
-        if(scenario.getTemplate().mapParameters.mapLocation == ScenarioMapParameters.MapLocation.AllGroundTerrain) {
+        if(scenario.getTemplate().mapParameters.getMapLocation() == ScenarioMapParameters.MapLocation.AllGroundTerrain) {
             terrainIndex = Compute.randomInt(AtBScenario.terrainTypes.length);
             scenario.setTerrainType(terrainIndex);
             scenario.setMapFile();
-        } else if (scenario.getTemplate().mapParameters.mapLocation == ScenarioMapParameters.MapLocation.Space) {
+        } else if (scenario.getTemplate().mapParameters.getMapLocation() == ScenarioMapParameters.MapLocation.Space) {
             scenario.setTerrainType(AtBScenario.TER_SPACE);
-        } else if (scenario.getTemplate().mapParameters.mapLocation == ScenarioMapParameters.MapLocation.LowAtmosphere) {
+        } else if (scenario.getTemplate().mapParameters.getMapLocation() == ScenarioMapParameters.MapLocation.LowAtmosphere) {
             // low atmo actually makes use of the terrain, so we generate some here as well
             terrainIndex = Compute.randomInt(AtBScenario.terrainTypes.length);
             scenario.setTerrainType(terrainIndex);
@@ -563,7 +563,7 @@ public class AtBDynamicScenarioFactory {
         ScenarioTemplate template = scenario.getTemplate();
         
         // if the template says to use standard AtB sizing, determine it randomly here
-        if(template.mapParameters.useStandardAtBSizing) {
+        if(template.mapParameters.isUseStandardAtBSizing()) {
             int roll = Compute.randomInt(20) + 1;
             if (roll < 6) {
                 mapSizeX = 20;
@@ -589,16 +589,16 @@ public class AtBDynamicScenarioFactory {
             }
         // otherwise, the map width/height have been specified explicitly 
         } else {
-            mapSizeX = template.mapParameters.baseWidth;
-            mapSizeY = template.mapParameters.baseHeight;
+            mapSizeX = template.mapParameters.getBaseWidth();
+            mapSizeY = template.mapParameters.getBaseHeight();
         }
         
         // increment map size by template-specified increments
-        mapSizeX += template.mapParameters.widthScalingIncrement * scenario.getLanceCount();
-        mapSizeY += template.mapParameters.heightScalingIncrement * scenario.getLanceCount();
+        mapSizeX += template.mapParameters.getWidthScalingIncrement() * scenario.getLanceCount();
+        mapSizeY += template.mapParameters.getHeightScalingIncrement() * scenario.getLanceCount();
         
         // 50/50 odds to rotate the map 90 degrees if specified.
-        if(template.mapParameters.allowRotation) {
+        if(template.mapParameters.isAllowRotation()) {
             int roll = Compute.randomInt(20) + 1;
             if(roll <= 10) {
                 int swap = mapSizeX;
@@ -625,11 +625,11 @@ public class AtBDynamicScenarioFactory {
             
             AtBScenarioModifier scenarioMod = AtBScenarioModifier.getScenarioModifiers().get(scenarioIndex);
          
-            if((scenarioMod.allowedMapLocations == null) ||
-                    scenarioMod.allowedMapLocations.contains(scenario.getTemplate().mapParameters.mapLocation)) {
+            if((scenarioMod.getAllowedMapLocations() == null) ||
+                    scenarioMod.getAllowedMapLocations().contains(scenario.getTemplate().mapParameters.getMapLocation())) {
                 scenario.getScenarioModifiers().add(scenarioMod);
                 
-                if(scenarioMod.blockFurtherEvents == true) {
+                if(scenarioMod.getBlockFurtherEvents() == true) {
                     break;
                 }
             }
@@ -680,11 +680,11 @@ public class AtBDynamicScenarioFactory {
         MechSummary ms = null;
         
         UnitGeneratorParameters params = new UnitGeneratorParameters();
-        params.faction = faction;
-        params.quality = quality;
-        params.unitType = unitType;
-        params.weightClass = weightClass;
-        params.year = campaign.getCalendar().get(Calendar.YEAR);
+        params.setFaction(faction);
+        params.setQuality(quality);
+        params.setUnitType(unitType);
+        params.setWeightClass(weightClass);
+        params.setYear(campaign.getCalendar().get(Calendar.YEAR));
                 
         if (unitType == UnitType.TANK) {
             return getTankEntity(params, skill, artillery, campaign);
@@ -713,14 +713,14 @@ public class AtBDynamicScenarioFactory {
         MechSummary ms = null;
         
         if(artillery) {
-            params.missionRoles.add(MissionRole.ARTILLERY);
+            params.getMissionRoles().add(MissionRole.ARTILLERY);
         }
         
         if (campaign.getCampaignOptions().getOpforUsesVTOLs()) {
-            params.movementModes.addAll(IUnitGenerator.MIXED_TANK_VTOL);
+            params.getMovementModes().addAll(IUnitGenerator.MIXED_TANK_VTOL);
             ms = campaign.getUnitGenerator().generate(params);            
         } else {
-            params.filter = v -> !v.getUnitType().equals("VTOL");
+            params.setFilter(v -> !v.getUnitType().equals("VTOL"));
             ms = campaign.getUnitGenerator().generate(params);
         }
         
@@ -728,7 +728,7 @@ public class AtBDynamicScenarioFactory {
             return null;
         }
         
-        return createEntityWithCrew(params.faction, skill, campaign, ms);
+        return createEntityWithCrew(params.getFaction(), skill, campaign, ms);
     }
     
     /**
@@ -741,15 +741,15 @@ public class AtBDynamicScenarioFactory {
     public static Entity getInfantryEntity(UnitGeneratorParameters params, int skill, boolean artillery, Campaign campaign) {
         // note that the "ARTILLERY" mission role appears mutually exclusive with the "FIELD_GUN" mission role
         if(artillery) {
-            params.missionRoles.add(MissionRole.ARTILLERY);
+            params.getMissionRoles().add(MissionRole.ARTILLERY);
         } else {
             boolean useFieldGuns = Compute.d6() <= 2;
             if(useFieldGuns) {
-                params.missionRoles.add(MissionRole.FIELD_GUN);
+                params.getMissionRoles().add(MissionRole.FIELD_GUN);
             }
         }
         
-        params.movementModes.addAll(IUnitGenerator.ALL_INFANTRY_MODES);
+        params.getMovementModes().addAll(IUnitGenerator.ALL_INFANTRY_MODES);
         
         MechSummary ms = campaign.getUnitGenerator().generate(params);
         
@@ -757,7 +757,7 @@ public class AtBDynamicScenarioFactory {
             return null;
         }
         
-        return createEntityWithCrew(params.faction, skill, campaign, ms);
+        return createEntityWithCrew(params.getFaction(), skill, campaign, ms);
     }
     
     /**
@@ -773,7 +773,6 @@ public class AtBDynamicScenarioFactory {
         try {
             en = new MechFileParser(ms.getSourceFile(), ms.getEntryName()).getEntity();
         } catch (Exception ex) {
-            en = null;
             MekHQ.getLogger().log(AtBDynamicScenarioFactory.class, METHOD_NAME, LogLevel.ERROR,
                     "Unable to load entity: " + ms.getSourceFile() + ": " + ms.getEntryName() + ": " + ex.getMessage()); //$NON-NLS-1$
             MekHQ.getLogger().error(AtBDynamicScenarioFactory.class, METHOD_NAME, ex);
@@ -1180,6 +1179,12 @@ public class AtBDynamicScenarioFactory {
     private static List<Entity> generateLance(String faction, int skill, int quality, List<Integer> unitTypes, 
             String weights, boolean artillery, Campaign campaign) {
         List<Entity> retval = new ArrayList<>();
+        
+        if(unitTypes.size() != weights.length()) {
+            MekHQ.getLogger().error(AtBDynamicScenarioFactory.class, "generateLance", 
+                    String.format("Mismatch between unit types (%d)and weights (%d) list sizes.", unitTypes.size(), weights.length()));
+            return retval;
+        }
         
         for(int i = 0; i < unitTypes.size(); i++) {
             Entity en = getEntity(faction, skill, quality, unitTypes.get(i), 

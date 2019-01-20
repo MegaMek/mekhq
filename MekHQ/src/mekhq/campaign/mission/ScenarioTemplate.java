@@ -1,6 +1,7 @@
 package mekhq.campaign.mission;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.List;
@@ -15,11 +16,13 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.namespace.QName;
+import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 
 import org.w3c.dom.Node;
 
 import mekhq.MekHQ;
+import mekhq.MekHqXmlUtil;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
 
@@ -111,7 +114,8 @@ public class ScenarioTemplate {
         try {
             JAXBContext context = JAXBContext.newInstance(ScenarioTemplate.class);
             Unmarshaller um = context.createUnmarshaller();
-            JAXBElement<ScenarioTemplate> templateElement = um.unmarshal(new StreamSource(inputFile), ScenarioTemplate.class);
+            Source inputSource = MekHqXmlUtil.createSafeXmlSource(new FileInputStream(inputFile));
+            JAXBElement<ScenarioTemplate> templateElement = um.unmarshal(inputSource, ScenarioTemplate.class);
             resultingTemplate = templateElement.getValue();
         } catch(Exception e) {
             MekHQ.getLogger().error(ScenarioTemplate.class, "Deserialize", "Error Deserializing Scenario Template", e);

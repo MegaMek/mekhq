@@ -220,24 +220,24 @@ public class UnitMarket implements Serializable {
 		}
 		
 		UnitGeneratorParameters params = new UnitGeneratorParameters();
-		params.faction = faction;
-		params.year = campaign.getCalendar().get(Calendar.YEAR);
-		params.unitType = unitType;
-		params.quality = quality;
+		params.setFaction(faction);
+		params.setYear(campaign.getCalendar().get(Calendar.YEAR));
+		params.setUnitType(unitType);
+		params.setQuality(quality);
 		
 		for (int i = 0; i < num; i++) {
-			params.weightClass = getRandomWeight(unitType, faction,
-                    campaign.getCampaignOptions().getRegionalMechVariations());
-			params.missionRoles.clear();
+			params.setWeightClass(getRandomWeight(unitType, faction,
+                    campaign.getCampaignOptions().getRegionalMechVariations()));
+			params.clearMissionRoles();
 			
 			MechSummary ms;
 			if (unitType == UnitType.TANK) {
-			    params.movementModes = IUnitGenerator.MIXED_TANK_VTOL;
-			    params.missionRoles.add(MissionRole.MIXED_ARTILLERY);
+			    params.setMovementModes(IUnitGenerator.MIXED_TANK_VTOL);
+			    params.addMissionRole(MissionRole.MIXED_ARTILLERY);
 			    
 			    ms = campaign.getUnitGenerator().generate(params);
 			} else {
-			    params.movementModes.clear();
+			    params.clearMovementModes();
 			    ms = campaign.getUnitGenerator().generate(params);
 			}
 			if (ms != null) {

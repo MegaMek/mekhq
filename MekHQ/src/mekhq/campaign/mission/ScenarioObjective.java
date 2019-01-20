@@ -11,8 +11,8 @@ public class ScenarioObjective {
         Secondary
     };
     
-    public ObjectivePriority priority;
-    public String description;
+    private ObjectivePriority priority;
+    private String description;
     
     public enum ObjectiveVerb {
         Destroy,
@@ -29,6 +29,22 @@ public class ScenarioObjective {
         SpecificForce,
         OpposingForces,
         AlliedForces
+    }
+
+    public ObjectivePriority getPriority() {
+        return priority;
+    }
+
+    public void setPriority(ObjectivePriority priority) {
+        this.priority = priority;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
     
     // an objective should have the following characteristics:
