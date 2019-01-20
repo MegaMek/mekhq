@@ -106,8 +106,6 @@ public class AtBDynamicScenarioFactory {
         
         setTerrain(scenario);
         
-        //setScenarioModifiers(scenario);
-        
         applyScenarioModifiers(scenario, campaign, EventTiming.PreForceGeneration);
         
         return scenario;
