@@ -2942,7 +2942,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             //This double enumeration is annoying to work with for crew-served units.
             //Get the option names while we enumerate so they can be used later
             List<String> optionNames = new ArrayList<String>();
-            List<String> cyberOptionNames = new ArrayList<String>();
+            Set<String> cyberOptionNames = new HashSet<String>();
             for (Enumeration<IOptionGroup> i = options.getGroups(); i.hasMoreElements();) {
                  IOptionGroup group = i.nextElement();
                  for (Enumeration<IOption> j = group.getOptions(); j.hasMoreElements();) {
