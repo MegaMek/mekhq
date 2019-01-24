@@ -1177,14 +1177,18 @@ public class AtBDynamicScenarioFactory {
     private static List<Entity> generateLance(String faction, int skill, int quality, List<Integer> unitTypes, 
             String weights, boolean artillery, Campaign campaign) {
         List<Entity> retval = new ArrayList<>();
+        int unitTypeSize = unitTypes.size();
         
-        if(unitTypes.size() != weights.length()) {
+        // it's possible that a unit type list will be longer than the passed-in weights string
+        // if so, we log a warning, then generate what we can.
+        // having a longer weight string is not an issue, as we simply generate the first N units where N is the size of unitTypes.
+        if(unitTypeSize > weights.length()) {
             MekHQ.getLogger().error(AtBDynamicScenarioFactory.class, "generateLance", 
-                    String.format("Mismatch between unit types (%d)and weights (%d) list sizes.", unitTypes.size(), weights.length()));
-            return retval;
+                    String.format("More unit types (%d) provided than weights (%d). Truncating generated lance.", unitTypes.size(), weights.length()));
+            unitTypeSize = weights.length();
         }
         
-        for(int i = 0; i < unitTypes.size(); i++) {
+        for(int i = 0; i < unitTypeSize; i++) {
             Entity en = getEntity(faction, skill, quality, unitTypes.get(i), 
                     AtBConfiguration.decodeWeightStr(weights, i), artillery, campaign);
             if(en != null) {
@@ -1647,7 +1651,7 @@ public class AtBDynamicScenarioFactory {
      */
     private static void deployArtilleryOffBoard(List<Entity> entityList) {
         OffBoardDirection direction = OffBoardDirection.getDirection(Compute.randomInt(4) + 1);
-        int distance = Compute.randomInt(2) + 1;
+        int distance = (Compute.randomInt(2) + 1) * 17;
         
         for(Entity entity : entityList) {
             entity.setOffBoard(distance, direction);
@@ -1662,11 +1666,11 @@ public class AtBDynamicScenarioFactory {
      */
     private static void setStartingAltitude(List<Entity> entityList, int startingAltitude) {
         for(Entity entity : entityList) {
-            if(entity.hasETypeFlag(Entity.ETYPE_VTOL)) {
-                entity.setElevation(startingAltitude);
-            } else {
+            if(!entity.hasETypeFlag(Entity.ETYPE_VTOL)) {
                 entity.setAltitude(startingAltitude);
             }
+            
+            entity.setElevation(startingAltitude);
         }
     }
     
