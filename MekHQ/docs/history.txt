@@ -27,6 +27,7 @@ v0.45.3-SNAPSHOT
 + Issue #779: Fix AtB deployment nag before a contract has started
 + PR #1036: Make startup GUI show all four buttons at lower resolutions
 + PR #1041: Fix some unit/tech mismatches at CPNX load
++ Issue #772: Fix graphical display issues with multiple-day advancement
 
 v0.45.2 (2018-11-18 0200 UTC)
 + Switched build system from ant to gradle.
