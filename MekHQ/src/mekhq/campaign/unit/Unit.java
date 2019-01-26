@@ -27,6 +27,7 @@ import java.math.BigInteger;
 import java.text.DecimalFormat;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import mekhq.campaign.log.LogEntryController;
 import mekhq.campaign.log.ServiceLogger;
@@ -94,6 +95,7 @@ import megamek.common.annotations.Nullable;
 import megamek.common.logging.LogLevel;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
+import megamek.common.options.OptionsConstants;
 import megamek.common.options.PilotOptions;
 import megamek.common.weapons.InfantryAttack;
 import megamek.common.weapons.bayweapons.BayWeapon;
@@ -2934,34 +2936,174 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
 
         // Clear any stale game data that may somehow have gotten set incorrectly
         campaign.clearGameData(entity);
-        //create a new set of options. For now we will just assign based on commander, but
-        //we really should be more detailed about this.
-        Person commander = getCommander();
-        if (null != commander) {
-            if (campaign.getCampaignOptions().useAbilities()) {
-                PilotOptions options = new PilotOptions();
-                for (Enumeration<IOptionGroup> i = options.getGroups(); i.hasMoreElements();) {
-                     IOptionGroup group = i.nextElement();
-                     for (Enumeration<IOption> j = group.getOptions(); j.hasMoreElements();) {
-                         IOption option = j.nextElement();
-                         option.setValue(commander.getOptions().getOption(option.getName()).getValue());
+        //Set up SPAs, Implants, Edge, etc
+        if (campaign.getCampaignOptions().useAbilities()) {
+            PilotOptions options = new PilotOptions();
+            //This double enumeration is annoying to work with for crew-served units.
+            //Get the option names while we enumerate so they can be used later
+            List<String> optionNames = new ArrayList<String>();
+            Set<String> cyberOptionNames = new HashSet<String>();
+            for (Enumeration<IOptionGroup> i = options.getGroups(); i.hasMoreElements();) {
+                 IOptionGroup group = i.nextElement();
+                 for (Enumeration<IOption> j = group.getOptions(); j.hasMoreElements();) {
+                     IOption option = j.nextElement();
+                     if (group.getKey().equals(PilotOptions.MD_ADVANTAGES)) {
+                         cyberOptionNames.add(option.getName());
+                     } else {
+                         optionNames.add(option.getName());
                      }
+                 }
+            }
+            
+            //For crew-served units, let's look at the abilities of the group. If more than half the crew
+            //(gunners and pilots only, for spacecraft) have an ability, grant the benefit to the unit
+            //TODO: Mobile structures, large naval support vehicles
+            if (entity.hasETypeFlag(Entity.ETYPE_SMALL_CRAFT)
+                    || entity.hasETypeFlag(Entity.ETYPE_JUMPSHIP)
+                    || entity.hasETypeFlag(Entity.ETYPE_TANK)
+                    || entity.hasETypeFlag(Entity.ETYPE_INFANTRY)
+                    || entity.hasETypeFlag(Entity.ETYPE_TRIPOD_MECH)) {
+                //Find the unit commander
+                Person commander = getCommander();
+                //Combine drivers and gunners into a single list
+                List<UUID> combatCrew = new ArrayList<UUID>();
+                for (UUID pid : drivers) {
+                    combatCrew.add(pid);
                 }
+                //Infantry and BA troops count as both drivers and gunners
+                //only count them once.
+                if (!entity.hasETypeFlag(Entity.ETYPE_INFANTRY)) {
+                    for (UUID pid : gunners) {
+                        combatCrew.add(pid);
+                    }
+                }
+                double crewSize = combatCrew.size();
+                Stream<Person> crew = combatCrew.stream().map(id -> campaign.getPerson(id));
+                
+                // This does the following:
+                // 1. For each crew member, get all of their PilotOptions by name
+                // 2. Flatten the crew member options into one stream
+                // 3. Group these options by their name
+                // 4. For each group, group by the object value and get the counts for each value
+                // 5. Take each group which has more than crewSize/2 values, and find the maximum value
+                Map<String, Optional<Object>> bestOptions = crew.flatMap(p -> optionNames.stream().map(n -> p.getOptions().getOption(n)))
+                    .collect(Collectors.groupingBy(
+                        IOption::getName,
+                        Collectors.collectingAndThen(
+                            Collectors.groupingBy(IOption::getValue, Collectors.counting()),
+                            m -> m.entrySet().stream().filter(e -> (cyberOptionNames.contains(e.getKey()) ? e.getValue() >= crewSize : e.getValue() > crewSize / 2))
+                                .max(Map.Entry.comparingByValue()).map(e -> e.getKey())
+                        )
+                    ));             
+
+                // Go through all the options and start with the commander's value,
+                // then add any values which more than half our crew had
+                for (String optionName : optionNames) {
+                    IOption option = commander.getOptions().getOption(optionName);
+                    if (null != option) {
+                        options.getOption(optionName).setValue(option.getValue());
+                    }
+
+                    if (bestOptions.containsKey(optionName)) {
+                        Optional<Object> crewOption = bestOptions.get(optionName);
+                        crewOption.ifPresent(o -> options.getOption(optionName).setValue(o));
+                    }
+                }
+                
+                // Yuck. Most cybernetic implants require all members of a unit's crew to have the implant rather than half.
+                // A few just require 1/4 the crew, there's at least one commander only, some just add an effect for every
+                // trooper who has the implant...you get the idea.
+                // TODO: Revisit this once all implants are fully implemented.
+                for (String implantName : cyberOptionNames) {
+                    IOption option = commander.getOptions().getOption(implantName);
+                    if (null != option) {
+                        options.getOption(implantName).setValue(option.getValue());
+                    }
+
+                    if (bestOptions.containsKey(implantName)) {
+                        Optional<Object> crewOption = bestOptions.get(implantName);
+                        crewOption.ifPresent(o -> options.getOption(implantName).setValue(o));
+                    }
+                }
+                
+                //Assign the options to our unit
                 entity.getCrew().setOptions(options);
-            }
-            if(usesSoloPilot()) {
-                if(!commander.isActive()) {
-                    entity.getCrew().setMissing(true, 0);;
-                    return;
+                
+                //Assign edge points to spacecraft and vehicle crews and infantry units
+                //This overwrites the Edge value assigned above.
+                if (campaign.getCampaignOptions().useEdge()) {
+                    double sumEdge = 0;
+                    int edge = 0;
+                    for (UUID pid : drivers) {
+                        Person p = campaign.getPerson(pid);
+                        sumEdge += p.getEdge();
+                    }
+                    //Again, don't count infantrymen twice
+                    if (!entity.hasETypeFlag(Entity.ETYPE_INFANTRY)) {
+                        for (UUID pid : gunners) {
+                            Person p = campaign.getPerson(pid);
+                            sumEdge += p.getEdge();
+                        }
+                    }
+                    //Average the edge values of pilots and gunners. The Spacecraft Engineer (vessel crewmembers)
+                    //handle edge solely through MHQ as noncombat personnel, so aren't considered here
+                    edge = (int) Math.round(sumEdge / crewSize);
+                    IOption edgeOption = entity.getCrew().getOptions().getOption(OptionsConstants.EDGE);
+                    edgeOption.setValue((Integer) edge);
                 }
-                entity.getCrew().setHits(commander.getHits(), 0);
-            }
-            resetEngineer();
-            //TODO: game option to use tactics as command and ind init bonus
-            if(commander.hasSkill(SkillType.S_TACTICS)) {
-                entity.getCrew().setCommandBonus(commander.getSkill(SkillType.S_TACTICS).getFinalSkillValue());
+                
+                // Reset the composite technician used by spacecraft and infantry
+                // Important if you just changed technician edge options for members of either unit type
+                resetEngineer();
+                //Tactics command bonus. This should actually reflect the unit's commander,
+                //unlike most everything else in this block.
+                //TODO: game option to use tactics as command and ind init bonus
+                if(commander.hasSkill(SkillType.S_TACTICS)) {
+                    entity.getCrew().setCommandBonus(commander.getSkill(SkillType.S_TACTICS).getFinalSkillValue());
+                } else {
+                    entity.getCrew().setCommandBonus(0);
+                }
+                
+                //TODO: Set up crew hits. This might only apply to spacecraft, and should reflect
+                //the unit's current crew size vs its required crew size. There's also the question
+                //of what to do with extra crew quarters and crewmember assignments beyond the minimum.
+                
             } else {
-                entity.getCrew().setCommandBonus(0);
+                //For other unit types, just use the unit commander's abilities.
+                Person commander = getCommander();
+                PilotOptions cdrOptions = new PilotOptions();
+                if (null != commander) {
+                    for (String optionName : optionNames) {
+                        IOption option = commander.getOptions().getOption(optionName);
+                        if (null != option) {
+                            cdrOptions.getOption(optionName).setValue(option.getValue());
+                        }
+                    }
+                    for (String implantName : cyberOptionNames) {
+                        IOption option = commander.getOptions().getOption(implantName);
+                        if (null != option) {
+                            cdrOptions.getOption(implantName).setValue(option.getValue());
+                        }
+                    }
+                    entity.getCrew().setOptions(cdrOptions);
+                }
+            
+                if(usesSoloPilot()) {
+                    if(!commander.isActive()) {
+                        entity.getCrew().setMissing(true, 0);;
+                        return;
+                    }
+                    entity.getCrew().setHits(commander.getHits(), 0);
+                }
+                //There was a resetEngineer() here. We shouldn't need it as spacecraft and infantry are handled
+                //by the preceding block
+                
+                //TODO: game option to use tactics as command and ind init bonus
+                if(commander.hasSkill(SkillType.S_TACTICS)) {
+                    entity.getCrew().setCommandBonus(commander.getSkill(SkillType.S_TACTICS).getFinalSkillValue());
+                } else {
+                    entity.getCrew().setCommandBonus(0);
+                }
             }
         }
     }
