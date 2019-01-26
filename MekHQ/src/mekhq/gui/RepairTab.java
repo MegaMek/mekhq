@@ -862,7 +862,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
             for (int i = 0; i < techTable.getRowCount(); i++) {
                 Person p = techsModel
                         .getTechAt(techTable.convertRowIndexToModel(i));
-                if (selectedTech.getId().equals(p.getId())) {
+                if (p != null && selectedTech.getId().equals(p.getId())) {
                     techTable.setRowSelectionInterval(i, i);
                     break;
                 }
