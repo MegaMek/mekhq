@@ -1,0 +1,30 @@
+<AtBScenarioModifier>
+	<additionalBriefingText>Allied bombers will be supporting your forces.</additionalBriefingText>
+	<benefitsPlayer>true</benefitsPlayer>
+	<eventTiming>PostForceGeneration</eventTiming>
+	<forceDefinition>
+		<actualDeploymentZone>-1</actualDeploymentZone>
+<allowAeroBombs>true</allowAeroBombs>
+<allowedUnitType>-3</allowedUnitType>
+<arrivalTurn>-3</arrivalTurn>
+<canReinforceLinked>false</canReinforceLinked>
+<contributesToBV>false</contributesToBV>
+<contributesToMapSize>false</contributesToMapSize>
+<contributesToUnitCount>false</contributesToUnitCount>
+<deployOffboard>false</deployOffboard>
+<deploymentZones/>
+<destinationZone>4</destinationZone>
+<fixedUnitCount>-1</fixedUnitCount>
+<forceAlignment>1</forceAlignment>
+<forceMultiplier>1.0</forceMultiplier>
+<forceName>Allied Bombers</forceName>
+<generationMethod>3</generationMethod>
+<generationOrder>3</generationOrder>
+<maxWeightClass>4</maxWeightClass>
+<retreatThreshold>50</retreatThreshold>
+<startingAltitude>5</startingAltitude>
+<syncDeploymentType>SameEdge</syncDeploymentType>
+<syncedForceName>Player</syncedForceName>
+<useArtillery>false</useArtillery>
+	</forceDefinition>
+</AtBScenarioModifier>

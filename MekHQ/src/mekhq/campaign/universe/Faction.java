@@ -48,6 +48,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import megamek.client.ratgenerator.FactionRecord;
+import megamek.client.ratgenerator.RATGenerator;
 import megamek.common.EquipmentType;
 import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
@@ -281,6 +283,35 @@ public class Faction {
         return faction;
     }
 
+    /**
+     * Helper function that gets the faction record for the specified faction, or a fallback general faction record.
+     * Useful for RAT generator activity.
+     * @param faction The faction whose Megamek faction record to retrieve.
+     * @return Found faction record or null.
+     */
+    public static FactionRecord getFactionRecordOrFallback(String faction) {
+        FactionRecord fRec = RATGenerator.getInstance().getFaction(faction);
+        if (fRec == null) {
+            Faction f = Faction.getFaction(faction);
+            if (f != null) {
+                if (f.isPeriphery()) {
+                    fRec = RATGenerator.getInstance().getFaction("Periphery");
+                } else if (f.isClan()) {
+                    fRec = RATGenerator.getInstance().getFaction("CLAN");                   
+                } else {
+                    fRec = RATGenerator.getInstance().getFaction("IS");
+                }
+            }
+            
+            if (fRec == null) {
+                MekHQ.getLogger().log(RATGenerator.class, "getFactionRecordOrFallback", LogLevel.ERROR,
+                        "Could not locate faction record for " + faction); //$NON-NLS-1$
+            }
+        }
+        
+        return fRec;
+    }
+    
     public static String getFactionCode(int faction) {
         Faction f = factionIdMap.get(faction);
         return (null != f) ? f.getShortName() : "IND"; //$NON-NLS-1$

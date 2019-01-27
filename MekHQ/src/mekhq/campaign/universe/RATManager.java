@@ -510,6 +510,31 @@ public class RATManager extends AbstractUnitGenerator implements IUnitGenerator 
         return new ArrayList<MechSummary>();
     }
 
+    /**
+     * Generates a list of mech summaries from a RAT determined by the given faction, quality and other parameters.
+     * Note that for the purposes of this implementation, the only properties of "parameters" used are 
+     * unit type, year, weight classes and movement modes. We also expect the rating to be a number 1-5, rather than A-F.
+     * @param count How many units to generate
+     * @param parameters RATGenerator parameters (some are ignored)
+     */
+    @Override
+    public List<MechSummary> generate(int count, UnitGeneratorParameters parameters) {
+        return generate(count, parameters.getFaction(), parameters.getUnitType(), parameters.getWeightClass(),  
+                parameters.getYear(), parameters.getQuality(), parameters.getMovementModes(), parameters.getFilter());
+    }
+    
+    /**
+     * Generates a single unit, for the given faction, using the given set of parameters.
+     * Note that some of the properties of the parameters may be ignored for generation mechanisms that aren't the RAT Generator
+     * @param parameters data structure containing unit generation parameters
+     * @return Generated units. Null if none generated.
+     */
+    @Override
+    public MechSummary generate(UnitGeneratorParameters parameters) {
+        return generate(parameters.getFaction(), parameters.getUnitType(), parameters.getWeightClass(),  
+                parameters.getYear(), parameters.getQuality(), parameters.getMovementModes(), parameters.getFilter());
+    }
+    
     private static class RAT {
         String ratName = null;
         HashSet<String> factions = new HashSet<>();

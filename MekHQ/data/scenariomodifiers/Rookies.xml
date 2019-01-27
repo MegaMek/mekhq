@@ -1,0 +1,7 @@
+<AtBScenarioModifier>
+	<additionalBriefingText>Opfor markings indicate a training cadre.</additionalBriefingText>
+	<benefitsPlayer>true</benefitsPlayer>
+	<eventTiming>PostForceGeneration</eventTiming>
+	<eventRecipient>Opposing</eventRecipient>
+	<skillAdjustment>-1</skillAdjustment>
+</AtBScenarioModifier>

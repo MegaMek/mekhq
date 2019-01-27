@@ -33,8 +33,6 @@ import megamek.client.ratgenerator.UnitTable;
 import megamek.common.EntityMovementMode;
 import megamek.common.MechSummary;
 import megamek.common.UnitType;
-import megamek.common.logging.LogLevel;
-import mekhq.MekHQ;
 
 /**
  * Provides access to RATGenerator through IUnitGenerator interface.
@@ -58,32 +56,14 @@ public class RATGeneratorConnector extends AbstractUnitGenerator implements IUni
 	}
 	
 	private UnitTable findTable(String faction, int unitType, int weightClass, int year,
-			int quality, Collection<EntityMovementMode> movementModes) {
-	    final String METHOD_NAME = "findTable(String,int,int,int,int,Collection<EntityMovementMode>)"; //$NON-NLS-1$
-	    
-		FactionRecord fRec = RATGenerator.getInstance().getFaction(faction);
-		if (fRec == null) {
-			Faction f = Faction.getFaction(faction);
-			if (f != null) {
-				if (f.isPeriphery()) {
-					fRec = RATGenerator.getInstance().getFaction("Periphery");
-				} else if (f.isClan()) {
-					fRec = RATGenerator.getInstance().getFaction("CLAN");					
-				} else {
-					fRec = RATGenerator.getInstance().getFaction("IS");
-				}
-			}
-			if (fRec == null) {
-		        MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
-		                "Could not locate faction record for " + faction); //$NON-NLS-1$
-				return null;
-			}
+			int quality, Collection<EntityMovementMode> movementModes) {   
+		FactionRecord fRec = Faction.getFactionRecordOrFallback(faction);
+		if(fRec == null) {
+		    return null;
 		}
-		String rating = null;
-		if (fRec.getRatingLevels().size() != 1) {
-			List<String> ratings = fRec.getRatingLevelSystem();
-			rating = ratings.get(Math.min(quality, ratings.size() - 1));
-		}
+		
+		String rating = getFactionSpecificRating(fRec, quality);
+		
 		ArrayList<Integer> wcs = new ArrayList<Integer>();
 		if (weightClass >= 0) {
 			wcs.add(weightClass);
@@ -92,7 +72,24 @@ public class RATGeneratorConnector extends AbstractUnitGenerator implements IUni
 		return UnitTable.findTable(fRec, unitType, year, rating, wcs,
 					ModelRecord.NETWORK_NONE, movementModes, new ArrayList<>(), 2, fRec);
 	}
-
+	
+	/**
+     * Helper function that extracts the string-based unit rating from the given int-based unit-rating
+     * for the given faction.
+     * @param fRec Faction record
+     * @param quality Unit quality number
+     * @return Unit quality string
+     */
+    public static String getFactionSpecificRating(FactionRecord fRec, int quality) {
+        String rating = null;
+        if (fRec.getRatingLevels().size() != 1) {
+            List<String> ratings = fRec.getRatingLevelSystem();
+            rating = ratings.get(Math.min(quality, ratings.size() - 1));
+        }
+        
+        return rating;
+    }
+    
 	/* (non-Javadoc)
 	 * @see mekhq.campaign.universe.IUnitGenerator#isSupportedUnitType(int)
 	 */
@@ -163,5 +160,39 @@ public class RATGeneratorConnector extends AbstractUnitGenerator implements IUni
         UnitTable ut = findTable(faction, unitType, weightClass, year, quality, movementModes);
         return ut == null? new ArrayList<MechSummary>() : ut.generateUnits(count,
                 filter == null? null : ms -> filter.test(ms));
+    }
+    
+    /**
+     * Generates a list of mech summaries from a RAT determined by the given faction, quality and other parameters.
+     * Note that for the purposes of this implementation, any faction record or unit quality are ignored.
+     * @param count How many units to generate
+     * @param faction Who to generate the units for
+     * @param quality integer indicator of unit quality
+     * @param parameters RATGenerator parameters
+     * @param filter Post-generation filter
+     */
+    @Override
+    public List<MechSummary> generate(int count, UnitGeneratorParameters parameters) {       
+        UnitTable ut = UnitTable.findTable(parameters.getRATGeneratorParameters());
+        
+        return ut == null ? new ArrayList<MechSummary>() : 
+            ut.generateUnits(count, parameters.getFilter() == null ? null : ms -> parameters.getFilter().test(ms));
+    }
+    
+    /**
+     * Generates a single mech summar from a RAT determined by the given faction, quality and other parameters.
+     * Note that for the purposes of this implementation, any faction record or unit quality are ignored.
+     * @param count How many units to generate
+     * @param faction Who to generate the units for
+     * @param quality integer indicator of unit quality
+     * @param parameters RATGenerator parameters
+     * @param filter Post-generation filter
+     */
+    @Override
+    public MechSummary generate(UnitGeneratorParameters parameters) {       
+        UnitTable ut = UnitTable.findTable(parameters.getRATGeneratorParameters());
+        
+        return ut == null ? null : 
+            ut.generateUnit(parameters.getFilter() == null ? null : ms -> parameters.getFilter().test(ms));
     }
 }

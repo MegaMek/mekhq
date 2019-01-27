@@ -169,6 +169,10 @@ public class Scenario implements Serializable {
         this.missionId = i;
     }
     
+    public List<Integer> getForceIDs() {
+        return subForceIds;
+    }
+    
     public Force getForces(Campaign campaign) {
         Force force = new Force("Assigned Forces");
         for(int subid : subForceIds) {
@@ -205,18 +209,12 @@ public class Scenario implements Serializable {
     }
     
     public void removeForce(int fid) {
-        //int idx = -1;
         ArrayList<Integer> toRemove = new ArrayList<Integer>();
         for(int i = 0; i < subForceIds.size(); i++) {
             if(fid == subForceIds.get(i)) {
-                //idx = i;
-                //break;
                 toRemove.add(subForceIds.get(i));
             }
         }
-        //if(idx > -1) {
-        //    subForceIds.remove(idx);
-        //}
         subForceIds.removeAll(toRemove);
     }
     

@@ -1,0 +1,7 @@
+<AtBScenarioModifier>
+	<additionalBriefingText>Your force has the drop on the enemy!</additionalBriefingText>
+	<benefitsPlayer>true</benefitsPlayer>
+	<eventTiming>PostForceGeneration</eventTiming>
+	<eventRecipient>Player</eventRecipient>
+	<useAmbushLogic>true</useAmbushLogic>
+</AtBScenarioModifier>

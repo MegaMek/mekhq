@@ -1,0 +1,7 @@
+<AtBScenarioModifier>
+	<additionalBriefingText>Enemy presence appears much smaller than indicated. Keep an eye out!</additionalBriefingText>
+	<benefitsPlayer>false</benefitsPlayer>
+	<eventTiming>PostForceGeneration</eventTiming>
+	<eventRecipient>Opposing</eventRecipient>
+	<useAmbushLogic>true</useAmbushLogic>
+</AtBScenarioModifier>

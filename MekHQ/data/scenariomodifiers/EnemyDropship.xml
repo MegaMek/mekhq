@@ -1,0 +1,30 @@
+<AtBScenarioModifier>
+	<additionalBriefingText>An enemy dropship has been grounded in this area, but it's weapons are still active so pay attention.</additionalBriefingText>
+	<benefitsPlayer>false</benefitsPlayer>
+	<eventTiming>PostForceGeneration</eventTiming>
+	<forceDefinition>
+<actualDeploymentZone>-1</actualDeploymentZone>
+<allowAeroBombs>false</allowAeroBombs>
+<allowedUnitType>11</allowedUnitType>
+<arrivalTurn>0</arrivalTurn>
+<canReinforceLinked>false</canReinforceLinked>
+<contributesToBV>false</contributesToBV>
+<contributesToMapSize>false</contributesToMapSize>
+<contributesToUnitCount>false</contributesToUnitCount>
+<deployOffboard>false</deployOffboard>
+<deploymentZones/>
+<destinationZone>4</destinationZone>
+<fixedUnitCount>1</fixedUnitCount>
+<forceAlignment>2</forceAlignment>
+<forceMultiplier>1.0</forceMultiplier>
+<forceName>Opfor Grounded Dropship</forceName>
+<generationMethod>3</generationMethod>
+<generationOrder>3</generationOrder>
+<maxWeightClass>4</maxWeightClass>
+<retreatThreshold>50</retreatThreshold>
+<startingAltitude>0</startingAltitude>
+<syncDeploymentType>SameEdge</syncDeploymentType>
+<syncedForceName>Primary Opfor</syncedForceName>
+<useArtillery>false</useArtillery>
+	</forceDefinition>
+</AtBScenarioModifier>
