@@ -8154,8 +8154,8 @@ public class Campaign implements Serializable, ITechManager {
         return unitRating;
     }
 
-    public int getPeacetimeCost() {
-        int cost = 0;
+    public long getPeacetimeCost() {
+        long cost = 0;
 
         cost += getPayRoll(getCampaignOptions().useInfantryDontCount());
         cost += getMonthlySpareParts();
