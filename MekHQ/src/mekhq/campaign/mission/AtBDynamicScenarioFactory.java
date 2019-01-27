@@ -1332,8 +1332,8 @@ public class AtBDynamicScenarioFactory {
     
     /**
      * 
-     * @param scenario
-     * @param campaign
+     * @param scenario Dynamic scenario to process.
+     * @param campaign Campaign
      */
     public static void finalizeStaggeredDeploymentTurns(AtBDynamicScenario scenario, Campaign campaign) {
         // assemble a list of all entities that have an "STAGGERED" arrival turn into a list
@@ -1482,9 +1482,9 @@ public class AtBDynamicScenarioFactory {
      * Given a list of entities, set the arrival turns for them as if they were all reinforcements on the same side.
      * 
      * @param entityList List of entities to process
-     * @param turnModifier Turn modifier.
+     * @param turnModifier A number to subtract from the deployment turn.
      */
-    private static void setDeploymentTurnsForReinforcements(List<Entity> entityList, int turnModifier) {
+    public static void setDeploymentTurnsForReinforcements(List<Entity> entityList, int turnModifier) {
         int minimumSpeed = 999;
         
         // first, we figure out the slowest "atb speed" of this group.
