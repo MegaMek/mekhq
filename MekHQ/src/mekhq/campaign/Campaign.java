@@ -1210,7 +1210,7 @@ public class Campaign implements Serializable, ITechManager {
         }
         // Only pay if option set and this isn't a prisoner or bondsman
         if (getCampaignOptions().payForRecruitment() && !prisoner) {
-            if (!getFinances().debit(2 * p.getSalary(), Transaction.C_SALARY,
+            if (!getFinances().debit(2L * p.getSalary(), Transaction.C_SALARY,
                     "recruitment of " + p.getFullName(), getCalendar().getTime())) {
                 addReport("<font color='red'><b>Insufficient funds to recruit "
                         + p.getFullName() + "</b></font>");
@@ -3171,8 +3171,8 @@ public class Campaign implements Serializable, ITechManager {
         // add in astechs from the astech pool
         // we will assume Mech Tech * able-bodied * enlisted (changed from vee mechanic)
         // 800 * 0.5 * 0.6 = 240
-        salaries += (240 * astechPool);
-        salaries += (320 * medicPool);
+        salaries += (240L * astechPool);
+        salaries += (320L * medicPool);
         return salaries;
     }
 
@@ -4936,7 +4936,7 @@ public class Campaign implements Serializable, ITechManager {
      */
     @SuppressWarnings("unused") // FIXME: Waiting for Dylan to finish re-writing
     public long calculateCostPerJump(boolean excludeOwnTransports, boolean campaignOpsCosts) {
-        int collarCost = (campaignOpsCosts ? 100000 : 50000);
+        long collarCost = (campaignOpsCosts ? 100000 : 50000);
 
         // first we need to get the total number of units by type
         int nMech = getNumberOfUnitsByType(Entity.ETYPE_MECH);
