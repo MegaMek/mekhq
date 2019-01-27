@@ -485,7 +485,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
                 if (nGroup == SG_ALL) {
                     inGroup = true;
                 } else if (nGroup == SG_ARMOR) {
-                    inGroup = (part instanceof Armor || part instanceof ProtomekArmor || part instanceof BaArmor);
+                    inGroup = (part instanceof Armor);
                 } else if (nGroup == SG_SYSTEM) {
                     inGroup = part instanceof MekGyro || part instanceof EnginePart || part instanceof MekActuator
                             || part instanceof MekLifeSupport || part instanceof MekSensor;

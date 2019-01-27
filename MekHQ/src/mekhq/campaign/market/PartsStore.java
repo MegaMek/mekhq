@@ -143,7 +143,7 @@ public class PartsStore implements Serializable {
 			p.setBrandNew(true);
 			sb.setLength(0);
 			sb.append(p.getName());
-			if(!(p instanceof Armor || p instanceof BaArmor || p instanceof ProtomekArmor)) {
+			if(!(p instanceof Armor)) {
 				String details = p.getDetails();
 				details = cleanUp2.matcher(cleanUp1.matcher(details).replaceFirst("")).replaceFirst(""); //$NON-NLS-1$ //$NON-NLS-2$
 				if (details.length() > 0) {

@@ -385,7 +385,7 @@ public class PartsStoreDialog extends javax.swing.JDialog {
         		if(nGroup == SG_ALL) {
         			return true;
         		} else if(nGroup == SG_ARMOR) {
-        			return part instanceof Armor || part instanceof ProtomekArmor || part instanceof BaArmor;
+        			return part instanceof Armor;
         		} else if(nGroup == SG_SYSTEM) {
         			return part instanceof MekLifeSupport
         				|| part instanceof MekSensor

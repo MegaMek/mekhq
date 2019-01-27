@@ -1154,7 +1154,7 @@ public class Utilities {
                     for(int equipNum : equipNums) {
                         i++;
                         Mounted m = unit.getEntity().getEquipment(equipNum);
-                        if (!allMunitions && (part instanceof AmmoBin)
+                        if (!allMunitions
                                 && (!(m.getType() instanceof AmmoType)
                                         || (((AmmoType) epart.getType()).getMunitionType()
                                                 != ((AmmoType) m.getType()).getMunitionType()))) {

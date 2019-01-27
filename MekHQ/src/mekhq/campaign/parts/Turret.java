@@ -47,10 +47,6 @@ public class Turret extends TankLocation {
     	this(0, 0, null);
     }
     
-    public int getLoc() {
-        return loc;
-    }
-    
     public Turret(int loc, int tonnage, Campaign c) {
     	super(loc, tonnage, c);
     	weight = 0;

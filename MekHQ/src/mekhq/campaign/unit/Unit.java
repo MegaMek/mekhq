@@ -29,7 +29,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import mekhq.campaign.log.LogEntryController;
 import mekhq.campaign.log.ServiceLogger;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -575,9 +574,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         //problems because some updateCondition methods will remove the part and put
         //in a new one
         ArrayList<Part> tempParts = new ArrayList<Part>();
-        for(Part p : parts) {
-            tempParts.add(p);
-        }
+        tempParts.addAll(parts);
+
         for(Part part : tempParts) {
             part.updateConditionFromEntity(checkForDestruction);
         }
@@ -1698,7 +1696,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
 
     public int getWeeklyMaintenanceCost() {
         Entity en = getEntity();
-        Boolean isOmni = en.isOmni();
+        boolean isOmni = en.isOmni();
         double mCost = 0;
         double value = 0;
 
@@ -1884,12 +1882,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 locations[part.getLocation()] = part;
             } else if(part instanceof TankLocation) {
                 locations[((TankLocation)part).getLoc()] = part;
-            } else if(part instanceof Rotor) {
-                locations[((Rotor)part).getLoc()] = part;
             } else if(part instanceof MissingRotor) {
                 locations[VTOL.LOC_ROTOR] = part;
-            } else if(part instanceof Turret) {
-                locations[((Turret)part).getLoc()] = part;
             } else if(part instanceof MissingTurret) {
                 locations[Tank.LOC_TURRET] = part;
             } else if(part instanceof ProtomekLocation) {
@@ -1902,18 +1896,14 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 locations[((MissingBattleArmorSuit)part).getTrooper()] = part;
             } else if(part instanceof Armor) {
                 if(((Armor)part).isRearMounted()) {
-                    armorRear[((Armor)part).getLocation()] = (Armor)part;
+                    armorRear[part.getLocation()] = part;
                 } else {
-                    armor[((Armor)part).getLocation()] = (Armor)part;
+                    armor[part.getLocation()] = part;
                 }
-            } else if(part instanceof ProtomekArmor) {
-                armor[((ProtomekArmor)part).getLocation()] = (ProtomekArmor)part;
-            } else if(part instanceof BaArmor) {
-                armor[((BaArmor)part).getLocation()] = (BaArmor)part;
             } else if(part instanceof VeeStabiliser) {
-                stabilisers[((VeeStabiliser)part).getLocation()] = part;
+                stabilisers[part.getLocation()] = part;
             } else if(part instanceof MissingVeeStabiliser) {
-                stabilisers[((MissingVeeStabiliser)part).getLocation()] = part;
+                stabilisers[part.getLocation()] = part;
             } else if(part instanceof AmmoBin) {
                 ammoParts.put(((AmmoBin)part).getEquipmentNum(), part);
             } else if(part instanceof MissingAmmoBin) {
@@ -2079,7 +2069,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     addPart(mekLocation);
                     partsToAdd.add(mekLocation);
                 } else if(entity instanceof Protomech && i != Protomech.LOC_NMISS) {
-                    ProtomekLocation protomekLocation = new ProtomekLocation(i, (int) getEntity().getWeight(), getEntity().getStructureType(), ((Protomech)getEntity()).hasMyomerBooster(), entity instanceof QuadMech, campaign);
+                    ProtomekLocation protomekLocation = new ProtomekLocation(i, (int) getEntity().getWeight(), getEntity().getStructureType(), ((Protomech)getEntity()).hasMyomerBooster(), false, campaign);
                     addPart(protomekLocation);
                     partsToAdd.add(protomekLocation);
                 } else if(entity instanceof Tank && i != Tank.LOC_BODY) {
@@ -2252,8 +2242,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                         if(type instanceof InfantryAttack) {
                             continue;
                         }
-                        if(entity instanceof Infantry && !(entity instanceof BattleArmor)
-                                && m.getLocation() != Infantry.LOC_FIELD_GUNS) {
+                        if(entity instanceof Infantry &&
+                                m.getLocation() != Infantry.LOC_FIELD_GUNS) {
                             //don't add weapons here for infantry, unless field guns
                             continue;
                         }
@@ -2677,7 +2667,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             }
         }
         for (Mounted m : entity.getAmmo()) {
-            Integer eqNum = entity.getEquipmentNum(m);
+            int eqNum = entity.getEquipmentNum(m);
             Part part = ammoParts.get(eqNum);
             if (null == part) {
                 part = new LargeCraftAmmoBin((int)entity.getWeight(), m.getType(), eqNum,
@@ -2967,15 +2957,13 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 Person commander = getCommander();
                 //Combine drivers and gunners into a single list
                 List<UUID> combatCrew = new ArrayList<UUID>();
-                for (UUID pid : drivers) {
-                    combatCrew.add(pid);
-                }
+
+                combatCrew.addAll(drivers);
+
                 //Infantry and BA troops count as both drivers and gunners
                 //only count them once.
                 if (!entity.hasETypeFlag(Entity.ETYPE_INFANTRY)) {
-                    for (UUID pid : gunners) {
-                        combatCrew.add(pid);
-                    }
+                    combatCrew.addAll(gunners);
                 }
                 double crewSize = combatCrew.size();
                 Stream<Person> crew = combatCrew.stream().map(id -> campaign.getPerson(id));
@@ -3218,7 +3206,6 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     }
                     bestSuits = Utilities.sortMapByValue(bestSuits, true);
                 }
-                bestSuits.keySet();
                 for(String key : bestSuits.keySet()) {
                     int i = Integer.parseInt(key);
                     if(!isBattleArmorSuitOperable(i)) {

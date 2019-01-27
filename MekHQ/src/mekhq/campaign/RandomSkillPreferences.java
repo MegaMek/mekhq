@@ -84,28 +84,28 @@ public class RandomSkillPreferences implements Serializable {
     }
     
     public int getRecruitBonus(int type) {
-    	if(type > recruitBonuses.length) {
+    	if(type >= recruitBonuses.length) {
     		return 0;
     	} 
     	return recruitBonuses[type];
     }
     
     public void setRecruitBonus(int type, int bonus) {
-    	if(type > recruitBonuses.length) {
+    	if(type >= recruitBonuses.length) {
     		return;
     	}
     	recruitBonuses[type] = bonus;
     }
     
     public int getSpecialAbilBonus(int type) {
-    	if(type > specialAbilBonus.length) {
+    	if(type >= specialAbilBonus.length) {
     		return 0;
     	} 
     	return specialAbilBonus[type];
     }
     
     public void setSpecialAbilBonus(int type, int bonus) {
-    	if(type > specialAbilBonus.length) {
+    	if(type >= specialAbilBonus.length) {
     		return;
     	}
     	specialAbilBonus[type] = bonus;
@@ -156,7 +156,7 @@ public class RandomSkillPreferences implements Serializable {
     }
     
     public void setTacticsMod(int lvl, int bonus) {
-    	if(lvl > tacticsMod.length) {
+    	if(lvl >= tacticsMod.length) {
     		return;
     	}
     	tacticsMod[lvl] = bonus;
