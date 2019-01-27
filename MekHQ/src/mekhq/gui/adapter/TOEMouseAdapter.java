@@ -1139,29 +1139,31 @@ ActionListener {
      * @param force The force to create a camouflage choice dialog for.
      * @return A CamoChoiceDialog for the given force.
      */
-	private CamoChoiceDialog getCamoChoiceDialogForForce(Force force) {
-		String category = gui.getCampaign().getCamoCategory();
-		String fileName = gui.getCampaign().getCamoFileName();
+    private CamoChoiceDialog getCamoChoiceDialogForForce(Force force) {
+        String category = gui.getCampaign().getCamoCategory();
+        String fileName = gui.getCampaign().getCamoFileName();
 
         // Gather the most used camo category/file name for the force
-		Optional<Pair<String, String>> used = force.getAllUnits().stream()
-		    .map(id -> gui.getCampaign().getUnit(id))
-		    .filter(u -> u != null)
-		    .map(u -> u.getEntity())
-		    .collect(
-		        Collectors.collectingAndThen(
-		            Collectors.groupingBy(e -> Pair.of(e.getCamoCategory(), e.getCamoFileName()), Collectors.counting()),
-		            m -> m.entrySet().stream().max(Map.Entry.comparingByValue()).map(o -> o.getKey())
-		        )
-		    );
-		if (used.isPresent()) {
-		    // IF there is a camo category and its not blank...
-		    if (used.get().getKey() != "" && used.get().getKey() != null) {
+        Optional<Pair<String, String>> used = force.getAllUnits().stream()
+            .map(id -> gui.getCampaign().getUnit(id))
+            .filter(u -> u != null)
+            .map(u -> u.getEntity())
+            .collect(
+                Collectors.collectingAndThen(
+                    Collectors.groupingBy(
+                        e -> Pair.of(e.getCamoCategory(), e.getCamoFileName()), 
+                        Collectors.counting()),
+                    m -> m.entrySet().stream().max(Map.Entry.comparingByValue()).map(o -> o.getKey())
+                )
+            );
+        if (used.isPresent()) {
+            // IF there is a camo category and its not blank...
+            if (used.get().getKey() != "" && used.get().getKey() != null) {
                 // ...use it as the category/fileName
-		        category = used.get().getKey();
-		        fileName = used.get().getValue();
-		    }
-		}
+                category = used.get().getKey();
+                fileName = used.get().getValue();
+            }
+        }
 
         return new CamoChoiceDialog(gui.getFrame(), true, category, fileName, 
             gui.getCampaign().getColorIndex(), gui.getIconPackage().getCamos());
