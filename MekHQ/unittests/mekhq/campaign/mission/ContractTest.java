@@ -155,7 +155,7 @@ public class ContractTest {
         Mockito.when(mockCampaign.getOverheadExpenses()).thenReturn((long) 1);
         Mockito.when(mockCampaign.getContractBase()).thenReturn((long) 10);
         Mockito.when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
-        Mockito.when(mockCampaign.getPeacetimeCost()).thenReturn(1);
+        Mockito.when(mockCampaign.getPeacetimeCost()).thenReturn(1L);
         Mockito.when(mockCampaign.getCalendar()).thenReturn(new GregorianCalendar(3067, Calendar.JANUARY, 1));
     }
 }
