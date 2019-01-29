@@ -62,6 +62,7 @@ import java.util.stream.Collectors;
 import javax.swing.JTable;
 import javax.swing.table.TableModel;
 
+import mekhq.campaign.parts.equipment.*;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.joda.time.DateTime;
@@ -99,10 +100,6 @@ import megamek.common.util.EncodeControl;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.parts.Part;
-import mekhq.campaign.parts.equipment.AmmoBin;
-import mekhq.campaign.parts.equipment.BattleArmorEquipmentPart;
-import mekhq.campaign.parts.equipment.EquipmentPart;
-import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.CrewType;
@@ -1154,7 +1151,7 @@ public class Utilities {
                     for(int equipNum : equipNums) {
                         i++;
                         Mounted m = unit.getEntity().getEquipment(equipNum);
-                        if (!allMunitions
+                        if (!allMunitions && (part instanceof MissingAmmoBinAmmoBin)
                                 && (!(m.getType() instanceof AmmoType)
                                         || (((AmmoType) epart.getType()).getMunitionType()
                                                 != ((AmmoType) m.getType()).getMunitionType()))) {

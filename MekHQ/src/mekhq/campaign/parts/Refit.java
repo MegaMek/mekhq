@@ -883,7 +883,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
                 time = 40320;
             } else if (newEntity instanceof megamek.common.Dropship || newEntity instanceof megamek.common.Jumpship) {
                 time = 13440;
-            } else if (newEntity instanceof Mech || newEntity instanceof megamek.common.Aero) {
+            } else if (newEntity instanceof Mech || newEntity instanceof megamek.common.Aero) { // ConvFighter and SmallCraft are derived from Aero
                 time = 6720;
             } else if (newEntity instanceof BattleArmor || newEntity instanceof megamek.common.Tank || newEntity instanceof megamek.common.Protomech) {
                 time = 3360;

@@ -79,7 +79,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
     public static final int G_FEMALE = 1;
 
     /* If any new roles are added they should go at the end. They should also be accounted for
-     * in isCombatRole(int) or isSupportRole(int)
+     * in isCombatRole(int) or isSupportRole(int). You should also increase the value of T_NUM
+     * if you add new roles.
      */
     public static final int T_NONE = 0;
     public static final int T_MECHWARRIOR = 1;
@@ -109,6 +110,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
     public static final int T_ADMIN_HR = 25; // End of support roles
     public static final int T_LAM_PILOT = 26; // Not a separate type, but an alias for MW + Aero pilot
                                               // Does not count as either combat or support role
+
+    // This value should always be +1 of the last defined role
     public static final int T_NUM = 27;
 
     public static final int S_ACTIVE = 0;

@@ -6718,7 +6718,7 @@ public class Campaign implements Serializable, ITechManager {
             }
             if (part.isSamePartType(p)) {
                 if (p.isPresent()) {
-                    if (p instanceof Armor) {
+                    if (p instanceof Armor) { // ProtomekArmor and BaArmor are derived from Armor
                         nSupply += ((Armor) p).getAmount();
                     } else if (p instanceof AmmoStorage) {
                         nSupply += ((AmmoStorage) p).getShots();
@@ -6726,7 +6726,7 @@ public class Campaign implements Serializable, ITechManager {
                         nSupply += p.getQuantity();
                     }
                 } else {
-                    if (p instanceof Armor) {
+                    if (p instanceof Armor) { // ProtomekArmor and BaArmor are derived from Armor
                         nTransit += ((Armor) p).getAmount();
                     } else if (p instanceof AmmoStorage) {
                         nTransit += ((AmmoStorage) p).getShots();
@@ -6743,7 +6743,7 @@ public class Campaign implements Serializable, ITechManager {
         int nOrdered = 0;
         IAcquisitionWork onOrder = getShoppingList().getShoppingItem(part);
         if (null != onOrder) {
-            if (onOrder instanceof Armor) {
+            if (onOrder instanceof Armor) { // ProtomekArmor and BaArmor are derived from Armor
                 nOrdered += ((Armor) onOrder).getAmount();
             } else if (onOrder instanceof AmmoStorage) {
                 nOrdered += ((AmmoStorage) onOrder).getShots();
@@ -6755,7 +6755,7 @@ public class Campaign implements Serializable, ITechManager {
         inventory.setOrdered(nOrdered);
 
         String countModifier = "";
-        if (part instanceof Armor) {
+        if (part instanceof Armor) { // ProtomekArmor and BaArmor are derived from Armor
             countModifier = "points";
         }
         if (part instanceof AmmoStorage) {
