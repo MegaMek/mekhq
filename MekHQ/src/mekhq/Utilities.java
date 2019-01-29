@@ -1094,7 +1094,6 @@ public class Utilities {
             equipNums.add(unit.getEntity().getEquipmentNum(m));
         }
         List<Part> remaining = new ArrayList<>();
-        List<Part> notFound = new ArrayList<>();
         for (Part part : unit.getParts()) {
             int eqnum = -1;
             EquipmentType etype = null;
@@ -1116,66 +1115,59 @@ public class Utilities {
         }
         // For ammo types we want to match the same munition type if possible to avoid the possibility
         // imposing unnecessary ammo swaps.
-        boolean allMunitions = false;
-        while ((remaining.size() > 0) && !allMunitions) {
-            for(Part part : remaining) {
-                if (part instanceof EquipmentPart) {
-                    EquipmentPart epart = (EquipmentPart)part;
-                    int i = -1;
-                    boolean found = false;
-                    for (int equipNum : equipNums) {
-                        i++;
-                        Mounted m = unit.getEntity().getEquipment(equipNum);
-                        if (!allMunitions && (part instanceof AmmoBin)
-                                && (!(m.getType() instanceof AmmoType)
-                                        || (((AmmoType) epart.getType()).getMunitionType()
-                                                != ((AmmoType) m.getType()).getMunitionType()))) {
-                                continue;
-                        }
-                        if (m.getType().equals(epart.getType())
-                                && !m.isDestroyed()) {
-                            epart.setEquipmentNum(equipNum);
-                            found = true;
-                            break;
-                        }
+        List<Part> notFound = new ArrayList<>();
+        for(Part part : remaining) {
+            boolean found = false;
+            int i = -1;
+
+            if (part instanceof EquipmentPart) {
+                EquipmentPart epart = (EquipmentPart)part;
+                for (int equipNum : equipNums) {
+                    i++;
+                    Mounted m = unit.getEntity().getEquipment(equipNum);
+                    if (part instanceof AmmoBin
+                            && (!(m.getType() instanceof AmmoType)
+                            || (((AmmoType) epart.getType()).getMunitionType()
+                            != ((AmmoType) m.getType()).getMunitionType()))) {
+                        continue;
                     }
-                    if(found) {
-                        equipNums.remove(i);
-                    } else {
-                        notFound.add(epart);
+                    if (m.getType().equals(epart.getType())
+                            && !m.isDestroyed()) {
+                        epart.setEquipmentNum(equipNum);
+                        found = true;
+                        break;
                     }
-                } else if (part instanceof MissingEquipmentPart) {
-                    MissingEquipmentPart epart = (MissingEquipmentPart)part;
-                    int i = -1;
-                    boolean found = false;
-                    for(int equipNum : equipNums) {
-                        i++;
-                        Mounted m = unit.getEntity().getEquipment(equipNum);
-                        if (!allMunitions && (part instanceof MissingAmmoBinAmmoBin)
-                                && (!(m.getType() instanceof AmmoType)
-                                        || (((AmmoType) epart.getType()).getMunitionType()
-                                                != ((AmmoType) m.getType()).getMunitionType()))) {
-                            continue;
-                        }
-                        if (m.getType().equals(epart.getType())
-                                && !m.isDestroyed()) {
-                            epart.setEquipmentNum(equipNum);
-                            found = true;
-                            break;
-                        }
+                }
+            } else if (part instanceof MissingEquipmentPart) {
+                MissingEquipmentPart epart = (MissingEquipmentPart)part;
+                for(int equipNum : equipNums) {
+                    i++;
+                    Mounted m = unit.getEntity().getEquipment(equipNum);
+                    if (part instanceof MissingAmmoBin
+                            && (!(m.getType() instanceof AmmoType)
+                            || (((AmmoType) epart.getType()).getMunitionType()
+                            != ((AmmoType) m.getType()).getMunitionType()))) {
+                        continue;
                     }
-                    if(found) {
-                        equipNums.remove(i);
-                    } else {
-                        notFound.add(epart);
+                    if (m.getType().equals(epart.getType())
+                            && !m.isDestroyed()) {
+                        epart.setEquipmentNum(equipNum);
+                        found = true;
+                        break;
                     }
                 }
             }
-            allMunitions = true;
-            remaining = new ArrayList<>(notFound);
-            notFound.clear();
+
+            if(found) {
+                equipNums.remove(i);
+            } else {
+                notFound.add(part);
+            }
         }
-        
+
+        remaining = new ArrayList<>(notFound);
+        notFound.clear();
+
         if (remaining.size() > 0) {
             StringBuilder builder = new StringBuilder();
             builder.append(String.format("Could not unscramble equipment for %s (%s)\r\n\r\n", unit.getName(), unit.getId()));
@@ -1192,7 +1184,7 @@ public class Utilities {
             builder.append("\r\nEquipment Parts:\r\n");
             for (Part p : unit.getParts()) {
                 if (!(p instanceof EquipmentPart) &&
-                    (!(p instanceof MissingEquipmentPart))) {
+                        (!(p instanceof MissingEquipmentPart))) {
                     continue;
                 }
                 int equipNum = -1;
