@@ -1831,12 +1831,12 @@ public class Campaign implements Serializable, ITechManager {
         
         for(Person tech : techs) {
             if((tech.getPrimaryRole() == roleType) ||
-                    (tech.getSecondaryRole() == roleType)) {
+               (tech.getSecondaryRole() == roleType)) {
                 retval.add(tech);
             }       
         }
         
-        return techs;
+        return retval;
     }
 
     public List<Person> getAdmins() {
@@ -6718,24 +6718,16 @@ public class Campaign implements Serializable, ITechManager {
             }
             if (part.isSamePartType(p)) {
                 if (p.isPresent()) {
-                    if (p instanceof Armor) {
+                    if (p instanceof Armor) { // ProtomekArmor and BaArmor are derived from Armor
                         nSupply += ((Armor) p).getAmount();
-                    } else if (p instanceof ProtomekArmor) {
-                        nSupply += ((ProtomekArmor) p).getAmount();
-                    } else if (p instanceof BaArmor) {
-                        nSupply += ((BaArmor) p).getAmount();
                     } else if (p instanceof AmmoStorage) {
                         nSupply += ((AmmoStorage) p).getShots();
                     } else {
                         nSupply += p.getQuantity();
                     }
                 } else {
-                    if (p instanceof Armor) {
+                    if (p instanceof Armor) { // ProtomekArmor and BaArmor are derived from Armor
                         nTransit += ((Armor) p).getAmount();
-                    } else if (p instanceof ProtomekArmor) {
-                        nTransit += ((ProtomekArmor) p).getAmount();
-                    } else if (p instanceof BaArmor) {
-                        nTransit += ((BaArmor) p).getAmount();
                     } else if (p instanceof AmmoStorage) {
                         nTransit += ((AmmoStorage) p).getShots();
                     } else {
@@ -6751,12 +6743,8 @@ public class Campaign implements Serializable, ITechManager {
         int nOrdered = 0;
         IAcquisitionWork onOrder = getShoppingList().getShoppingItem(part);
         if (null != onOrder) {
-            if (onOrder instanceof Armor) {
+            if (onOrder instanceof Armor) { // ProtomekArmor and BaArmor are derived from Armor
                 nOrdered += ((Armor) onOrder).getAmount();
-            } else if (onOrder instanceof ProtomekArmor) {
-                nOrdered += ((ProtomekArmor) onOrder).getAmount();
-            } else if (onOrder instanceof BaArmor) {
-                nOrdered += ((BaArmor) onOrder).getAmount();
             } else if (onOrder instanceof AmmoStorage) {
                 nOrdered += ((AmmoStorage) onOrder).getShots();
             } else {
@@ -6767,8 +6755,7 @@ public class Campaign implements Serializable, ITechManager {
         inventory.setOrdered(nOrdered);
 
         String countModifier = "";
-        if (part instanceof Armor || part instanceof ProtomekArmor
-                || part instanceof BaArmor) {
+        if (part instanceof Armor) { // ProtomekArmor and BaArmor are derived from Armor
             countModifier = "points";
         }
         if (part instanceof AmmoStorage) {
@@ -7636,7 +7623,7 @@ public class Campaign implements Serializable, ITechManager {
                 countTotal);
         sb.append(buffer);
 
-        for (int i = 0; i <= Person.T_NUM; i++) {
+        for (int i = 0; i < Person.T_NUM; i++) {
             if (Person.isCombatRole(i)) {
                 buffer = String.format("    %-30s    %4s\n", Person.getRoleDesc(i, getFaction().isClan()),
                         countPersonByType[i]);
