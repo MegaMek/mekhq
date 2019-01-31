@@ -1213,7 +1213,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             partsValue += 2000.0 * sinks;
         }
 
-        return (long)(partsValue * getUnitCostMultiplier());
+        return Math.round(partsValue * getUnitCostMultiplier());
     }
 
     public double getCargoCapacity() {
@@ -1424,7 +1424,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         if(entity.isClan()) {
             cost *= campaign.getCampaignOptions().getClanPriceModifier();
         }
-        return (long)cost;
+        return Math.round(cost);
     }
 
     public int getDamageState() {
@@ -4374,7 +4374,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
 
         entity = getEntity();
         if (isMothballed()) {
-            return (long)partsCost;
+            return 0;
         }
         if (entity instanceof Jumpship) { // SpaceStation derives from Jumpship
             partsCost += entity.getWeight() * .0001 * 15000;
@@ -4461,20 +4461,19 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             }
         }
 
-        return (long)partsCost;
+        return Math.round(partsCost);
     }
 
     public long getAmmoCost() {
-        long ammoCost = 0;
+        double ammoCost = 0;
 
         for (Part p : getParts()) {
             if (p instanceof EquipmentPart && ((EquipmentPart)p).getType() instanceof AmmoType) {
                 ammoCost += p.getStickerPrice();
             }
         }
-        ammoCost = (long)(ammoCost * .25);
 
-        return ammoCost;
+        return Math.round(ammoCost * .25);
     }
 
     public long getFuelCost() {
@@ -4494,7 +4493,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             fuelCost += getInfantryFuelCost(entity);
         }
 
-        return (long)fuelCost;
+        return Math.round(fuelCost);
     }
 
     public double getTonsBurnDay(Entity e) {

@@ -13,8 +13,6 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.transform.Source;
 
-import org.apache.commons.io.IOUtils;
-
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
@@ -161,12 +159,11 @@ public class AtBScenarioModifier {
     
     /**
      * Attempt to deserialize an instance of a scenario modifier from the passed-in file
-     * @param xmlNode the node to deserialize
+     * @param fileName Name of the file that contains the scenario modifier
      * @return Possibly an instance of a scenario modifier list
      */
     public static AtBScenarioModifier Deserialize(String fileName) {
         AtBScenarioModifier resultingList = null;
-        FileInputStream file = null;
 
         try {
             JAXBContext context = JAXBContext.newInstance(AtBScenarioModifier.class);
@@ -177,14 +174,13 @@ public class AtBScenarioModifier {
                 return null;
             }
 
-            file = new FileInputStream(xmlFile);
-            Source inputSource = MekHqXmlUtil.createSafeXmlSource(file);
-            JAXBElement<AtBScenarioModifier> templateElement = um.unmarshal(inputSource, AtBScenarioModifier.class);
-            resultingList = templateElement.getValue();
+            try (FileInputStream fileStream = new FileInputStream(xmlFile)) {
+                Source inputSource = MekHqXmlUtil.createSafeXmlSource(fileStream);
+                JAXBElement<AtBScenarioModifier> templateElement = um.unmarshal(inputSource, AtBScenarioModifier.class);
+                resultingList = templateElement.getValue();
+            }
         } catch(Exception e) {
             MekHQ.getLogger().error(ScenarioModifierManifest.class, "Deserialize", "Error Deserializing Scenario Modifier", e);
-        } finally {
-            IOUtils.closeQuietly(file);
         }
 
         return resultingList;
@@ -321,12 +317,11 @@ class ScenarioModifierManifest {
     
     /**
      * Attempt to deserialize an instance of a scenario modifier list from the passed-in file
-     * @param xmlNode the node to deserialize
+     * @param fileName Name of the file that contains the scenario modifier list
      * @return Possibly an instance of a scenario modifier list
      */
     public static ScenarioModifierManifest Deserialize(String fileName) {
         ScenarioModifierManifest resultingList = null;
-        FileInputStream file = null;
 
         try {
             JAXBContext context = JAXBContext.newInstance(ScenarioModifierManifest.class);
@@ -337,16 +332,15 @@ class ScenarioModifierManifest {
                 return null;
             }
 
-            file = new FileInputStream(xmlFile);
-            Source inputSource = MekHqXmlUtil.createSafeXmlSource(file);
-            JAXBElement<ScenarioModifierManifest> templateElement = um.unmarshal(inputSource, ScenarioModifierManifest.class);
-            resultingList = templateElement.getValue();
+            try (FileInputStream fileStream = new FileInputStream(xmlFile)) {
+                Source inputSource = MekHqXmlUtil.createSafeXmlSource(fileStream);
+                JAXBElement<ScenarioModifierManifest> templateElement = um.unmarshal(inputSource, ScenarioModifierManifest.class);
+                resultingList = templateElement.getValue();
+            }
         } catch(Exception e) {
             MekHQ.getLogger().error(ScenarioModifierManifest.class, "Deserialize", "Error Deserializing Scenario Modifier List", e);
-        } finally {
-            IOUtils.closeQuietly(file);
         }
-        
+
         return resultingList;
     }
 }
