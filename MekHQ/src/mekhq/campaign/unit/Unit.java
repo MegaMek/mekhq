@@ -1113,7 +1113,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     }
 
     public long getSellValue() {
-        long partsValue = 0;
+        double partsValue = 0;
         for(Part part : parts) {
             partsValue += part.getActualValue() * part.getQuantity();
         }
@@ -1183,7 +1183,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
 
                 // get bays
                 int baydoors = 0;
-                int bayCost = 0;
+                double bayCost = 0;
                 for (Bay next : js.getTransportBays()) {
                     baydoors += next.getDoors();
                     if ((next instanceof MechBay) || (next instanceof ASFBay) || (next instanceof SmallCraftBay)) {
@@ -1276,8 +1276,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         return getEntity().getDocks();
     }
 
-    public int getLightVehicleCapacity() {
-        int bays = 0;
+    public double getLightVehicleCapacity() {
+        double bays = 0;
         for (Bay b : getEntity().getTransportBays()) {
             if (b instanceof LightVehicleBay) {
                 bays += b.getCapacity();
@@ -1286,8 +1286,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         return bays;
     }
 
-    public int getHeavyVehicleCapacity() {
-        int bays = 0;
+    public double getHeavyVehicleCapacity() {
+        double bays = 0;
         for (Bay b : getEntity().getTransportBays()) {
             if (b instanceof HeavyVehicleBay) {
                 bays += b.getCapacity();
@@ -1296,8 +1296,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         return bays;
     }
 
-    public int getBattleArmorCapacity() {
-        int bays = 0;
+    public double getBattleArmorCapacity() {
+        double bays = 0;
         for (Bay b : getEntity().getTransportBays()) {
             if (b instanceof BattleArmorBay) {
                 bays += b.getCapacity();
@@ -1306,8 +1306,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         return bays;
     }
 
-    public int getInfantryCapacity() {
-        int bays = 0;
+    public double getInfantryCapacity() {
+        double bays = 0;
         for (Bay b : getEntity().getTransportBays()) {
             if (b instanceof InfantryBay) {
                 bays += b.getCapacity() / ((InfantryBay) b).getPlatoonType().getWeight();
@@ -1316,8 +1316,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         return bays;
     }
 
-    public int getASFCapacity() {
-        int bays = 0;
+    public double getASFCapacity() {
+        double bays = 0;
         for (Bay b : getEntity().getTransportBays()) {
             if (b instanceof ASFBay) {
                 bays += b.getCapacity();
@@ -1326,8 +1326,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         return bays;
     }
 
-    public int getSmallCraftCapacity() {
-        int bays = 0;
+    public double getSmallCraftCapacity() {
+        double bays = 0;
         for (Bay b : getEntity().getTransportBays()) {
             if (b instanceof SmallCraftBay) {
                 bays += b.getCapacity();
@@ -1336,8 +1336,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         return bays;
     }
 
-    public int getMechCapacity() {
-        int bays = 0;
+    public double getMechCapacity() {
+        double bays = 0;
         for (Bay b : getEntity().getTransportBays()) {
             if (b instanceof MechBay) {
                 bays += b.getCapacity();
@@ -1346,8 +1346,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         return bays;
     }
 
-    public int getProtomechCapacity() {
-        int bays = 0;
+    public double getProtomechCapacity() {
+        double bays = 0;
         for (Bay b : getEntity().getTransportBays()) {
             if (b instanceof ProtomechBay) {
                 bays += b.getCapacity();
@@ -1417,14 +1417,14 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     }
 
     public long getBuyCost() {
-        long cost = (long) Math.round(getEntity().getCost(false));
+        double cost = Math.round(getEntity().getCost(false));
         if(entity instanceof Infantry) {
-            cost = (long) Math.round(getEntity().getAlternateCost());
+            cost = Math.round(getEntity().getAlternateCost());
         }
         if(entity.isClan()) {
             cost *= campaign.getCampaignOptions().getClanPriceModifier();
         }
-        return cost;
+        return (long)cost;
     }
 
     public int getDamageState() {
@@ -4370,21 +4370,21 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
 
     public long getSparePartsCost() {
         final String METHOD_NAME = "getSparePartsCost()"; //$NON-NLS-1$
-        long partsCost = 0;
+        double partsCost = 0;
 
         entity = getEntity();
         if (isMothballed()) {
-            return partsCost;
+            return (long)partsCost;
         }
         if ((entity instanceof Jumpship) || (entity instanceof SpaceStation)) {
-            partsCost += ((long)entity.getWeight()) * .0001 * 15000;
+            partsCost += entity.getWeight() * .0001 * 15000;
         } else if (entity instanceof Aero) {
-            partsCost += ((long)entity.getWeight()) * .001 * 15000;
+            partsCost += entity.getWeight() * .001 * 15000;
         } else if (entity instanceof Tank) {
-            partsCost += ((long)entity.getWeight()) * .001 * 8000;
+            partsCost += entity.getWeight() * .001 * 8000;
         } else if ((entity instanceof Mech) || (entity instanceof BattleArmor)
                 || ((Infantry) entity).isMechanized()) {
-            partsCost += ((long)entity.getWeight()) * .001 * 10000;
+            partsCost += entity.getWeight() * .001 * 10000;
         } else if (entity instanceof Infantry) {
             if (entity.getMovementMode() == EntityMovementMode.INF_LEG) {
                 partsCost += 3 * .002 * 10000;
@@ -4393,12 +4393,11 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             } else if (entity.getMovementMode() == EntityMovementMode.INF_MOTORIZED) {
                 partsCost += 6 * .002 * 10000;
             } else {
-                partsCost += ((long)entity.getWeight()) * .002 * 10000;
+                partsCost += entity.getWeight() * .002 * 10000;
                 MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
                         getName() + " is not a generic CI. Movement mode is "
                         + entity.getMovementModeAsString());
             }
-
         } else {
             // Only protomechs should fall here. Anything else needs to be logged
             if (!(entity instanceof Protomech)) {
@@ -4410,16 +4409,16 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
 
         // Handle cost for quirks if used
         if (entity.hasQuirk("easy_maintain")) {
-            partsCost = (long)(partsCost * .8);
+            partsCost = partsCost * .8;
         }
         if (entity.hasQuirk("difficult_maintain")) {
-            partsCost = (long)(partsCost * 1.25);
+            partsCost = partsCost * 1.25;
         }
         if (entity.hasQuirk("non_standard")) {
-            partsCost = (long)(partsCost * 2.0);
+            partsCost = partsCost * 2.0;
         }
         if (entity.hasQuirk("ubiquitous_is")) {
-            partsCost = (long)(partsCost * .75);
+            partsCost = partsCost * .75;
         }
         // TODO Obsolete quirk
 
@@ -4431,38 +4430,38 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             if (((currentYear > 2859) && (currentYear < 3040))
                     && (!campaign.getFaction().isClan() && !campaign.getFaction().isComstar())) {
                 if (rating > EquipmentType.RATING_D) {
-                    partsCost = (long)(partsCost * 5.0);
+                    partsCost = partsCost * 5.0;
                 }
             }
             if (rating == EquipmentType.RATING_E) {
-                partsCost = (long)(partsCost * 1.1);
+                partsCost *= 1.1;
             }
             if (rating == EquipmentType.RATING_F) {
-                partsCost = (long)(partsCost * 1.25);
+                partsCost *= 1.25;
             }
             if ((entity instanceof Tank)
                     && (en.getEngineType() == Engine.NORMAL_ENGINE)) {
-                partsCost = (long)(partsCost * 2.0);
+                partsCost *= 2.0;
             }
             if (!(entity instanceof Infantry)) {
                 if ((en.getEngineType() == Engine.XL_ENGINE)
                         || (en.getEngineType() == Engine.XXL_ENGINE)) {
-                    partsCost = (long)(partsCost * 2.5);
+                    partsCost *= 2.5;
                 }
                 if (en.getEngineType() == Engine.LIGHT_ENGINE) {
-                    partsCost = (long)(partsCost * 1.5);
+                    partsCost *= 1.5;
                 }
             }
             if (entity.isClan()) {
                 if ((currentYear >3048) && (currentYear < 3071)) {
-                    partsCost = (long)(partsCost * 5.0);
+                    partsCost *= 5.0;
                 } else if (currentYear > 3070) {
-                    partsCost = (long)(partsCost * 4.0);
+                    partsCost *= 4.0;
                 }
             }
         }
 
-        return partsCost;
+        return (long)partsCost;
     }
 
     public long getAmmoCost() {
@@ -4479,23 +4478,23 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     }
 
     public long getFuelCost() {
-        long fuelCost = 0;
+        double fuelCost = 0;
 
         if ((entity instanceof Warship) || (entity instanceof SmallCraft) ) {
-            fuelCost += ((long)getTonsBurnDay(entity));
+            fuelCost += getTonsBurnDay(entity);
         } else if (entity instanceof Jumpship) {
-            fuelCost += ((long)getTonsBurnDay(entity));// * 3 * 15000;
+            fuelCost += getTonsBurnDay(entity);// * 3 * 15000;
         } else if (entity instanceof ConvFighter) {
             fuelCost += getFighterFuelCost(entity);
         } else if (entity instanceof megamek.common.Aero) {
-            fuelCost += ((long)((Aero) entity).getFuelTonnage()) * 4 * 15000;
+            fuelCost += ((Aero) entity).getFuelTonnage() * 4 * 15000;
         } else if ((entity instanceof Tank) || (entity instanceof Mech)) {
             fuelCost += getVehicleFuelCost(entity);
         } else if (entity instanceof Infantry) {
             fuelCost += getInfantryFuelCost(entity);
         }
 
-        return fuelCost;
+        return (long)fuelCost;
     }
 
     public double getTonsBurnDay(Entity e) {
