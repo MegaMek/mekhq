@@ -4376,7 +4376,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         if (isMothballed()) {
             return (long)partsCost;
         }
-        if ((entity instanceof Jumpship) || (entity instanceof SpaceStation)) {
+        if (entity instanceof Jumpship) { // SpaceStation derives from Jumpship
             partsCost += entity.getWeight() * .0001 * 15000;
         } else if (entity instanceof Aero) {
             partsCost += entity.getWeight() * .001 * 15000;
@@ -4409,16 +4409,16 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
 
         // Handle cost for quirks if used
         if (entity.hasQuirk("easy_maintain")) {
-            partsCost = partsCost * .8;
+            partsCost *= .8;
         }
         if (entity.hasQuirk("difficult_maintain")) {
-            partsCost = partsCost * 1.25;
+            partsCost *= 1.25;
         }
         if (entity.hasQuirk("non_standard")) {
-            partsCost = partsCost * 2.0;
+            partsCost *= 2.0;
         }
         if (entity.hasQuirk("ubiquitous_is")) {
-            partsCost = partsCost * .75;
+            partsCost *= .75;
         }
         // TODO Obsolete quirk
 
