@@ -64,7 +64,6 @@ import mekhq.campaign.event.ScenarioChangedEvent;
 import mekhq.campaign.event.ScenarioNewEvent;
 import mekhq.campaign.event.ScenarioRemovedEvent;
 import mekhq.campaign.event.ScenarioResolvedEvent;
-import mekhq.campaign.force.Force;
 import mekhq.campaign.force.Lance;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBDynamicScenario;
@@ -647,7 +646,7 @@ public final class BriefingTab extends CampaignGuiTab {
         }
 
         // code to support deployment of reinforcements for legacy ATB scenarios.
-        if(scenario instanceof AtBScenario) {
+        if((scenario instanceof AtBScenario) && !(scenario instanceof AtBDynamicScenario)) {
             int assignedForceId = ((AtBScenario) scenario).getLance(getCampaign()).getForceId();
             int cmdrStrategy = 0;
             Person commander = getCampaign().getPerson(Lance.findCommander(assignedForceId, getCampaign()));
