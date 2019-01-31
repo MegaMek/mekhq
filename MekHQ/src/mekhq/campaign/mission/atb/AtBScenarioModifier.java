@@ -13,6 +13,8 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.transform.Source;
 
+import org.apache.commons.io.IOUtils;
+
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
@@ -164,7 +166,8 @@ public class AtBScenarioModifier {
      */
     public static AtBScenarioModifier Deserialize(String fileName) {
         AtBScenarioModifier resultingList = null;
-        
+        FileInputStream file = null;
+
         try {
             JAXBContext context = JAXBContext.newInstance(AtBScenarioModifier.class);
             Unmarshaller um = context.createUnmarshaller();
@@ -173,14 +176,17 @@ public class AtBScenarioModifier {
                 MekHQ.getLogger().warning(AtBScenarioModifier.class, "Deserialize", String.format("Specified file %d does not exist", fileName));
                 return null;
             }
-            
-            Source inputSource = MekHqXmlUtil.createSafeXmlSource(new FileInputStream(xmlFile));
+
+            file = new FileInputStream(xmlFile);
+            Source inputSource = MekHqXmlUtil.createSafeXmlSource(file);
             JAXBElement<AtBScenarioModifier> templateElement = um.unmarshal(inputSource, AtBScenarioModifier.class);
             resultingList = templateElement.getValue();
         } catch(Exception e) {
             MekHQ.getLogger().error(ScenarioModifierManifest.class, "Deserialize", "Error Deserializing Scenario Modifier", e);
+        } finally {
+            IOUtils.closeQuietly(file);
         }
-        
+
         return resultingList;
     }
     
@@ -320,7 +326,8 @@ class ScenarioModifierManifest {
      */
     public static ScenarioModifierManifest Deserialize(String fileName) {
         ScenarioModifierManifest resultingList = null;
-        
+        FileInputStream file = null;
+
         try {
             JAXBContext context = JAXBContext.newInstance(ScenarioModifierManifest.class);
             Unmarshaller um = context.createUnmarshaller();
@@ -329,12 +336,15 @@ class ScenarioModifierManifest {
                 MekHQ.getLogger().warning(ScenarioModifierManifest.class, "Deserialize", String.format("Specified file %s does not exist", fileName));
                 return null;
             }
-            
-            Source inputSource = MekHqXmlUtil.createSafeXmlSource(new FileInputStream(xmlFile));
+
+            file = new FileInputStream(xmlFile);
+            Source inputSource = MekHqXmlUtil.createSafeXmlSource(file);
             JAXBElement<ScenarioModifierManifest> templateElement = um.unmarshal(inputSource, ScenarioModifierManifest.class);
             resultingList = templateElement.getValue();
         } catch(Exception e) {
             MekHQ.getLogger().error(ScenarioModifierManifest.class, "Deserialize", "Error Deserializing Scenario Modifier List", e);
+        } finally {
+            IOUtils.closeQuietly(file);
         }
         
         return resultingList;
