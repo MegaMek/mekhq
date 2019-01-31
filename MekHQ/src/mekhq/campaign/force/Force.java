@@ -27,9 +27,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Enumeration;
-import java.util.Hashtable;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.Vector;
 
@@ -179,7 +179,7 @@ public class Force implements Serializable {
      * should not be called directly to add forces to the campaign
      * because they will not be assigned an id. Use {@link Campaign#addForce(Force, Force)}
      * instead
-     * The boolean assignParent here is set to false when assigning forces from the 
+     * The boolean assignParent here is set to false when assigning forces from the
      * TOE to a scenario, because we don't want to switch this forces real parent
      * @param sub
      */
@@ -206,11 +206,11 @@ public class Force implements Serializable {
         for(Force f : subForces) {
             allUnits.addAll(f.getAllUnits());
         }
-        return allUnits;    
+        return allUnits;
     }
 
     /**
-     * Add a unit id to the units vector. In general, this 
+     * Add a unit id to the units vector. In general, this
      * should not be called directly to add unid because they will
      * not be assigned a force id. Use {@link Campaign#addUnitToForce(mekhq.campaign.unit.Unit, int)}
      * instead
@@ -259,7 +259,7 @@ public class Force implements Serializable {
                     break;
                 }
             }
-        } 
+        }
         return found;
     }
 
@@ -411,7 +411,7 @@ public class Force implements Serializable {
         }
         if(subForces.size() > 0) {
             pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                    +"<subforces>");        
+                    +"<subforces>");
             for(Force sub : subForces) {
                 sub.writeToXml(pw1, indent+2);
             }
@@ -430,7 +430,7 @@ public class Force implements Serializable {
         Node idNameNode = attrs.getNamedItem("id");
         String idString = idNameNode.getTextContent();
 
-        try {        
+        try {
             retVal = new Force("");
             NodeList nl = wn.getChildNodes();
             retVal.id = Integer.parseInt(idString);
@@ -450,7 +450,7 @@ public class Force implements Serializable {
                 } else if (wn2.getNodeName().equalsIgnoreCase("scenarioId")) {
                     retVal.scenarioId = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("techId")) {
-                    retVal.techId = UUID.fromString(wn2.getTextContent());    
+                    retVal.techId = UUID.fromString(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("units")) {
                     processUnitNodes(retVal, wn2, version);
                 } else if (wn2.getNodeName().equalsIgnoreCase("subforces")) {
@@ -472,7 +472,7 @@ public class Force implements Serializable {
                         retVal.addSubForce(generateInstanceFromXML(wn3, c, version), true);
                     }
                 }
-            }    
+            }
             c.importForce(retVal);
         } catch (Exception ex) {
             // Errrr, apparently either the class name was invalid...
@@ -497,7 +497,7 @@ public class Force implements Serializable {
             if(version.getMajorVersion() == 0 && version.getMinorVersion() < 2 && version.getSnapshot() < 14) {
                 retVal.oldUnits.add(Integer.parseInt(idString));
             } else {
-                retVal.addUnit(UUID.fromString(idString));    
+                retVal.addUnit(UUID.fromString(idString));
             }
         }
     }
@@ -562,7 +562,7 @@ public class Force implements Serializable {
                 }
             }
         }
-        Collections.sort(units, new Comparator<Unit>(){         
+        Collections.sort(units, new Comparator<Unit>(){
             public int compare(final Unit u1, final Unit u2) {
                 return ((Comparable<Integer>)u2.getCommander().getRankNumeric()).compareTo(u1.getCommander().getRankNumeric());
             }
@@ -576,6 +576,11 @@ public class Force implements Serializable {
     @Override
     public boolean equals(Object o) {
         return o instanceof Force && ((Force)o).getId() == id && ((Force)o).getFullName().equals(getFullName());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId(), getFullName());
     }
 
     public void fixIdReferences(Map<Integer, UUID> uHash) {
