@@ -84,7 +84,7 @@ public class PersonnelMarket {
 
 	/**
 	 * Sets the method for generating potential recruits for the personnel market.
-	 * @param type  The lookup name of the market type to use.
+	 * @param key The lookup name of the market type to use.
 	 */
 	public void setType(String key) {
 	    method = PersonnelMarketServiceManager.getInstance().getService(key);
@@ -306,19 +306,19 @@ public class PersonnelMarket {
             	}
 
             }
+
+            // All personnel need the rank reference fixed
+            for (int x = 0; x < retVal.personnel.size(); x++) {
+                Person psn = retVal.personnel.get(x);
+
+                // skill types might need resetting
+                psn.resetSkillTypes();
+            }
         } catch (Exception ex) {
         	// Errrr, apparently either the class name was invalid...
         	// Or the listed name doesn't exist.
         	// Doh!
             MekHQ.getLogger().error(PersonnelMarket.class, METHOD_NAME, ex);
-        }
-
-        // All personnel need the rank reference fixed
-        for (int x = 0; x < retVal.personnel.size(); x++) {
-        	Person psn = retVal.personnel.get(x);
-
-        	// skill types might need resetting
-        	psn.resetSkillTypes();
         }
 
         return retVal;
