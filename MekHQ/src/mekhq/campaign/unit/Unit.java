@@ -1125,7 +1125,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             //computer
             partsValue += 200000;
             //drive unit
-            partsValue += 500 * entity.getOriginalWalkMP() * entity.getWeight()/100;
+            partsValue += 500.0 * entity.getOriginalWalkMP() * entity.getWeight() / 100;
             // KF Drive, Docking Collars, etc...
             if (entity instanceof Jumpship && !(entity instanceof SpaceStation)) {
                 Jumpship js = (Jumpship) entity;
@@ -1159,27 +1159,27 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 partsValue += driveCost;
 
                 // Docking Collars
-                partsValue += 100000 * js.getDocks();
+                partsValue += 100000.0 * js.getDocks();
                 // HPG
                 if (js.hasHPG()) {
                     partsValue += 1000000000;
                 }
 
                 // fuel tanks
-                partsValue += 200 * js.getFuel() / js.getFuelPerTon();
+                partsValue += 200.0 * js.getFuel() / js.getFuelPerTon();
 
                 // armor
                 partsValue += js.getArmorWeight(js.locations()) * EquipmentType.getArmorCost(js.getArmorType(0));
 
                 // heat sinks
-                int sinkCost = 2000 + 4000 * js.getHeatType();// == HEAT_DOUBLE ? 6000:
+                double sinkCost = 2000 + 4000.0 * js.getHeatType();// == HEAT_DOUBLE ? 6000:
                                                            // 2000;
                 partsValue += sinkCost * js.getHeatSinks();
 
                 // grav deck
-                partsValue += 5000000 * js.getGravDeck();
-                partsValue += 10000000 * js.getGravDeckLarge();
-                partsValue += 40000000 * js.getGravDeckHuge();
+                partsValue += 5000000.0 * js.getGravDeck();
+                partsValue += 10000000.0 * js.getGravDeckLarge();
+                partsValue += 40000000.0 * js.getGravDeckHuge();
 
                 // get bays
                 int baydoors = 0;
@@ -1194,10 +1194,10 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     }
                 }
 
-                partsValue += bayCost + baydoors * 1000;
+                partsValue += bayCost + baydoors * 1000.0;
 
                 // life boats and escape pods
-                partsValue += 5000 * (js.getLifeBoats() + js.getEscapePods());
+                partsValue += 5000.0 * (js.getLifeBoats() + js.getEscapePods());
             }
         }
 
@@ -1210,7 +1210,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     sinks += wtype.getHeat();
                 }
             }
-            partsValue += 2000 * sinks;
+            partsValue += 2000.0 * sinks;
         }
 
         return (long)(partsValue * getUnitCostMultiplier());
