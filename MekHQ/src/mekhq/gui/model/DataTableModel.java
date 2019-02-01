@@ -1,16 +1,16 @@
 package mekhq.gui.model;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.table.AbstractTableModel;
 
 /**
- * An table model for displaying data in array lists
+ * An table model for displaying data in lists
  */
 public abstract class DataTableModel extends AbstractTableModel {
     private static final long serialVersionUID = 9081706049165214129L;
     protected String[] columnNames;
-    protected ArrayList<?> data;
+    protected List<?> data;
 
     public int getRowCount() {
         return data.size();
@@ -34,15 +34,14 @@ public abstract class DataTableModel extends AbstractTableModel {
     public boolean isCellEditable(int row, int col) {
         return false;
     }
-    
-    public ArrayList<?> getData() {
+
+    public List<?> getData() {
         return data;
     }
 
     // fill table with values
-    public void setData(ArrayList<?> array) {
+    public void setData(List<?> array) {
         data = array;
         fireTableDataChanged();
     }
-
 }

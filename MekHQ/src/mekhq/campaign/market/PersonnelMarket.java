@@ -23,8 +23,10 @@ package mekhq.campaign.market;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Hashtable;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.w3c.dom.Node;
@@ -51,8 +53,8 @@ import mekhq.module.PersonnelMarketServiceManager;
 import mekhq.module.api.PersonnelMarketMethod;
 
 public class PersonnelMarket {
-	private ArrayList<Person> personnel = new ArrayList<Person>();
-	private Hashtable<UUID, Person> personnelIds = new Hashtable<UUID, Person>();
+	private List<Person> personnel = new ArrayList<>();
+	private Map<UUID, Person> personnelIds = new LinkedHashMap<>();
 	private PersonnelMarketMethod method;
 
 	public static final int TYPE_RANDOM = 0;
@@ -64,7 +66,7 @@ public class PersonnelMarket {
 
 	/* Used by AtB to track Units assigned to recruits; the key
 	 * is the person UUID. */
-	private Hashtable<UUID, Entity> attachedEntities = new Hashtable<UUID, Entity>();
+	private Map<UUID, Entity> attachedEntities = new LinkedHashMap<>();
 	/* Alternate types of rolls, set by PersonnelMarketDialog */
 	private boolean paidRecruitment = false;
 	private int paidRecruitType;
@@ -79,10 +81,10 @@ public class PersonnelMarket {
 		setType(c.getCampaignOptions().getPersonnelMarketType());
 		MekHQ.registerHandler(this);
 	}
-	
+
 	/**
 	 * Sets the method for generating potential recruits for the personnel market.
-	 * @param type  The lookup name of the market type to use.
+	 * @param key The lookup name of the market type to use.
 	 */
 	public void setType(String key) {
 	    method = PersonnelMarketServiceManager.getInstance().getService(key);
@@ -90,7 +92,7 @@ public class PersonnelMarket {
 	        method = new PersonnelMarketRandom();
 	    }
 	}
-	
+
 	@Subscribe
 	public void handleCampaignOptionsEvent(OptionsChangedEvent ev) {
 	    setType(ev.getOptions().getPersonnelMarketType());
@@ -133,7 +135,7 @@ public class PersonnelMarket {
             List<Person> toRemove = method.removePersonnelForDay(c, personnel);
             if (null != toRemove) {
                 for (Person p : toRemove) {
-                	if (attachedEntities.contains(p.getId())) {
+                	if (attachedEntities.containsKey(p.getId())) {
                 		attachedEntities.remove(p.getId());
                 	}
                 }
@@ -142,12 +144,12 @@ public class PersonnelMarket {
         }
     }
 
-    public void setPersonnel(ArrayList<Person> p) {
-        personnel = p;
+    public void setPersonnel(List<Person> p) {
+        personnel = new ArrayList<>(p);
     }
 
-    public ArrayList<Person> getPersonnel() {
-        return personnel;
+    public List<Person> getPersonnel() {
+        return Collections.unmodifiableList(personnel);
     }
 
     public void addPerson(Person p) {
@@ -170,7 +172,7 @@ public class PersonnelMarket {
         	attachedEntities.remove(p.getId());
         }
     }
-    
+
     /**
      * Assign an <code>Entity</code> to a recruit
      * @param pid  The recruit's id
@@ -234,7 +236,7 @@ public class PersonnelMarket {
         	pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<paidRecruitment/>");
         }
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "paidRecruitType", paidRecruitType);
-        
+
         for (UUID id : attachedEntities.keySet()) {
             pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                     + "<entity id=\"" + id.toString() + "\">"
@@ -246,7 +248,7 @@ public class PersonnelMarket {
 
     public static PersonnelMarket generateInstanceFromXML(Node wn, Campaign c, Version version) {
         final String METHOD_NAME = "generateInstanceFromXML(Node,Campaign,Version)"; //$NON-NLS-1$
-        
+
         PersonnelMarket retVal = null;
 
         try {
@@ -265,7 +267,7 @@ public class PersonnelMarket {
             	if (wn2.getNodeType() != Node.ELEMENT_NODE) {
             		continue;
             	}
-            	
+
             	if (wn2.getNodeName().equalsIgnoreCase("person")) {
             		Person p = Person.generateInstanceFromXML(wn2, c, version);
 
@@ -304,19 +306,19 @@ public class PersonnelMarket {
             	}
 
             }
+
+            // All personnel need the rank reference fixed
+            for (int x = 0; x < retVal.personnel.size(); x++) {
+                Person psn = retVal.personnel.get(x);
+
+                // skill types might need resetting
+                psn.resetSkillTypes();
+            }
         } catch (Exception ex) {
         	// Errrr, apparently either the class name was invalid...
         	// Or the listed name doesn't exist.
         	// Doh!
             MekHQ.getLogger().error(PersonnelMarket.class, METHOD_NAME, ex);
-        }
-
-        // All personnel need the rank reference fixed
-        for (int x = 0; x < retVal.personnel.size(); x++) {
-        	Person psn = retVal.personnel.get(x);
-
-        	// skill types might need resetting
-        	psn.resetSkillTypes();
         }
 
         return retVal;
@@ -338,7 +340,6 @@ public class PersonnelMarket {
                 return "ERROR: Default case reached in PersonnelMarket.getTypeName()";
         }
     }
-    
 
     public static long getUnitMainForceType(Campaign c) {
         long mostTypes = getUnitMainForceTypes(c);
@@ -430,7 +431,7 @@ public class PersonnelMarket {
         }
         return retval;
     }
-    
+
     public TargetRoll getShipSearchTarget(Campaign campaign, boolean jumpship) {
     	TargetRoll target = new TargetRoll(jumpship?12:10, "Base");
 		Person adminLog = campaign.findBestInRole(Person.T_ADMIN_LOG, SkillType.S_ADMIN);
@@ -447,5 +448,4 @@ public class PersonnelMarket {
     			"Unit Rating");
     	return target;
     }
-
 }
