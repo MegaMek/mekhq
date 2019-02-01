@@ -17,7 +17,6 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.namespace.QName;
 import javax.xml.transform.Source;
-import javax.xml.transform.stream.StreamSource;
 
 import org.w3c.dom.Node;
 
@@ -110,23 +109,25 @@ public class ScenarioTemplate {
      */
     public static ScenarioTemplate Deserialize(File inputFile) {
         ScenarioTemplate resultingTemplate = null;
-        
+
         try {
             JAXBContext context = JAXBContext.newInstance(ScenarioTemplate.class);
             Unmarshaller um = context.createUnmarshaller();
-            Source inputSource = MekHqXmlUtil.createSafeXmlSource(new FileInputStream(inputFile));
-            JAXBElement<ScenarioTemplate> templateElement = um.unmarshal(inputSource, ScenarioTemplate.class);
-            resultingTemplate = templateElement.getValue();
+            try (FileInputStream fileStream = new FileInputStream(inputFile)) {
+                Source inputSource = MekHqXmlUtil.createSafeXmlSource(fileStream);
+                JAXBElement<ScenarioTemplate> templateElement = um.unmarshal(inputSource, ScenarioTemplate.class);
+                resultingTemplate = templateElement.getValue();
+            }
         } catch(Exception e) {
             MekHQ.getLogger().error(ScenarioTemplate.class, "Deserialize", "Error Deserializing Scenario Template", e);
         }
-        
+
         return resultingTemplate;
     }
     
     /**
      * Attempt to deserialize an instance of a ScenarioTemplate from the passed-in XML Node
-     * @param inputFile The source file
+     * @param xmlNode The node with the scenario template
      * @return Possibly an instance of a ScenarioTemplate
      */
     public static ScenarioTemplate Deserialize(Node xmlNode) {
@@ -143,5 +144,4 @@ public class ScenarioTemplate {
         
         return resultingTemplate;
     }
-    
 }

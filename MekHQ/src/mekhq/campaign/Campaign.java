@@ -3198,9 +3198,11 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public long getOverheadExpenses() {
-        if(!campaignOptions.payForOverhead()) return 0;
+        if(!campaignOptions.payForOverhead()) {
+            return 0;
+        }
 
-        return (long) (getTheoreticalPayroll(false) * 0.05);
+        return Math.round(getTheoreticalPayroll(false) * 0.05);
     }
 
     public void removeUnit(UUID id) {
@@ -3765,8 +3767,8 @@ public class Campaign implements Serializable, ITechManager {
     public void sellAmmo(AmmoStorage ammo, int shots) {
         shots = Math.min(shots, ammo.getShots());
         boolean sellingAllAmmo = shots == ammo.getShots();
-        long cost = (long) (ammo.getActualValue() * ((double) shots / ammo.getShots()));
-        finances.credit(cost, Transaction.C_EQUIP_SALE, "Sale of " + shots
+        double cost = (ammo.getActualValue() * ((double) shots / ammo.getShots()));
+        finances.credit(Math.round(cost), Transaction.C_EQUIP_SALE, "Sale of " + shots
                 + " " + ammo.getName(), calendar.getTime());
         if (sellingAllAmmo) {
             ammo.decrementQuantity();
@@ -3784,8 +3786,8 @@ public class Campaign implements Serializable, ITechManager {
             // to avoid rounding error
             proportion = 1.0;
         }
-        long cost = (long) (armor.getActualValue() * proportion);
-        finances.credit(cost, Transaction.C_EQUIP_SALE, "Sale of " + points
+        double cost = armor.getActualValue() * proportion;
+        finances.credit(Math.round(cost), Transaction.C_EQUIP_SALE, "Sale of " + points
                 + " " + armor.getName(), calendar.getTime());
         if (sellingAllArmor) {
             armor.decrementQuantity();
@@ -3828,7 +3830,7 @@ public class Campaign implements Serializable, ITechManager {
 
     public boolean buyPart(Part part, double multiplier, int transitDays) {
         if (getCampaignOptions().payForParts()) {
-            if (finances.debit((long) (multiplier * part.getStickerPrice()),
+            if (finances.debit(Math.round(multiplier * part.getStickerPrice()),
                     Transaction.C_EQUIP, "Purchase of " + part.getName(), calendar.getTime())) {
                 if (part instanceof Refit) {
                     ((Refit) part).addRefitKitParts(transitDays);
@@ -4984,7 +4986,7 @@ public class Campaign implements Serializable, ITechManager {
         freehv -= placedlv;
         int noVehicles = (nohv + newNolv);
 
-        long dropshipCost = 0;
+        double dropshipCost = 0;
         // The cost-figuring process: using prototypical dropships, figure out how
         // many collars are required. Charge for the prototypical dropships and
         // the docking collar, based on the rules selected. Allow prototypical
@@ -5002,36 +5004,36 @@ public class Campaign implements Serializable, ITechManager {
         int largeDropshipMechCapacity = 36;
         int largeMechDropshipASFCapacity = 6;
         int largeMechDropshipCargoCapacity = 120;
-        long largeMechDropshipCost = (campaignOpsCosts ? (long)(1750000 / 4.2) : 400000);
+        double largeMechDropshipCost = campaignOpsCosts ? (1750000.0 / 4.2) : 400000;
 
         // Roughly a Union
         int averageDropshipMechCapacity = 12;
         int mechDropshipASFCapacity = 2;
         int mechDropshipCargoCapacity = 75;
-        long mechDropshipCost = (campaignOpsCosts ? (long)(1450000 / 4.2) : 150000);
+        double mechDropshipCost = campaignOpsCosts ? (1450000.0 / 4.2) : 150000;
 
         // Roughly a Leopard CV
         int averageDropshipASFCapacity = 6;
         int asfDropshipCargoCapacity = 90;
-        long asfDropshipCost = (campaignOpsCosts ? (long)(900000 / 4.2) : 80000);
+        double asfDropshipCost = campaignOpsCosts ? (900000.0 / 4.2) : 80000;
 
         // Roughly a Triumph
         int largeDropshipVehicleCapacity = 50;
         int largeVehicleDropshipCargoCapacity = 750;
-        long largeVehicleDropshipCost = (campaignOpsCosts ? (long)(1750000 / 4.2) : 430000);
+        double largeVehicleDropshipCost = campaignOpsCosts ? (1750000.0 / 4.2) : 430000;
 
         // Roughly a Gazelle
         int averageDropshipVehicleCapacity = 15;
         int vehicleDropshipCargoCapacity = 65;
-        long vehicleDropshipCost = (campaignOpsCosts ? (long)(900000 / 4.2): 40000);
+        double vehicleDropshipCost = campaignOpsCosts ? (900000.0 / 4.2): 40000;
 
         // Roughly a Mule
         int largeDropshipCargoCapacity = 8000;
-        long largeCargoDropshipCost = (campaignOpsCosts ? (long)(750000 / 4.2) : 800000);
+        double largeCargoDropshipCost = campaignOpsCosts ? (750000.0 / 4.2) : 800000;
 
         // Roughly a Buccaneer
         int averageDropshipCargoCapacity = 2300;
-        long cargoDropshipCost = (campaignOpsCosts ? (long)(550000 / 4.2) : 250000);
+        double cargoDropshipCost = campaignOpsCosts ? (550000.0 / 4.2) : 250000;
 
         int mechCollars = 0;
         double leasedLargeMechDropships = 0;
@@ -5180,16 +5182,16 @@ public class Campaign implements Serializable, ITechManager {
             }
         }
 
-        dropshipCost = (long) (leasedAverageMechDropships * mechDropshipCost);
-        dropshipCost += (long) (leasedLargeMechDropships * largeMechDropshipCost);
+        dropshipCost = leasedAverageMechDropships * mechDropshipCost;
+        dropshipCost += leasedLargeMechDropships * largeMechDropshipCost;
 
-        dropshipCost += (long) (leasedAverageASFDropships * asfDropshipCost);
+        dropshipCost += leasedAverageASFDropships * asfDropshipCost;
 
-        dropshipCost += (long) (leasedAverageVehicleDropships * vehicleDropshipCost);
-        dropshipCost += (long) (leasedLargeVehicleDropships * largeVehicleDropshipCost);
+        dropshipCost += leasedAverageVehicleDropships * vehicleDropshipCost;
+        dropshipCost += leasedLargeVehicleDropships * largeVehicleDropshipCost;
 
-        dropshipCost += (long) (leasedAverageCargoDropships * cargoDropshipCost);
-        dropshipCost += (long) (leasedLargeCargoDropships * largeCargoDropshipCost);
+        dropshipCost += leasedAverageCargoDropships * cargoDropshipCost;
+        dropshipCost += leasedLargeCargoDropships * largeCargoDropshipCost;
 
         // Smaller/half-dropships are cheaper to rent, but still take one collar each
         int collarsNeeded = mechCollars + asfCollars + vehicleCollars + cargoCollars;
@@ -5200,12 +5202,12 @@ public class Campaign implements Serializable, ITechManager {
         // now factor in owned jumpships
         collarsNeeded = Math.max(0, collarsNeeded - nCollars);
 
-        long totalCost = dropshipCost + collarsNeeded * collarCost;
+        double totalCost = dropshipCost + collarsNeeded * collarCost;
 
         // FM:Mercs reimburses for owned transport (CamOps handles it in peacetime costs)
         if(!excludeOwnTransports) {
-            long ownDropshipCost = 0;
-            long ownJumpshipCost = 0;
+            double ownDropshipCost = 0;
+            double ownJumpshipCost = 0;
             for(Unit u : getUnits()) {
                 if(!u.isMothballed()) {
                     Entity e = u.getEntity();
@@ -5224,7 +5226,7 @@ public class Campaign implements Serializable, ITechManager {
             totalCost = totalCost + ownDropshipCost + ownJumpshipCost;
         }
 
-        return totalCost;
+        return Math.round(totalCost);
     }
 
     public void personUpdated(Person p) {
@@ -6827,8 +6829,8 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public long getEquipmentContractValue(Unit u, boolean useSaleValue) {
-        long value;
-        long percentValue = 0;
+        double value;
+        double percentValue = 0;
         if (useSaleValue) {
             value = u.getSellValue();
         } else {
@@ -6836,23 +6838,23 @@ public class Campaign implements Serializable, ITechManager {
         }
 
         if (u.getEntity().hasETypeFlag(Entity.ETYPE_DROPSHIP)) {
-            percentValue = (long) ((getCampaignOptions().getDropshipContractPercent() / 100) * value);
+            percentValue = (getCampaignOptions().getDropshipContractPercent() / 100) * value;
         } else if (u.getEntity().hasETypeFlag(Entity.ETYPE_WARSHIP)) {
-            percentValue = (long) ((getCampaignOptions().getWarshipContractPercent() / 100) * value);
+            percentValue = (getCampaignOptions().getWarshipContractPercent() / 100) * value;
         } else if (u.getEntity().hasETypeFlag(Entity.ETYPE_JUMPSHIP) || u.getEntity().hasETypeFlag(Entity.ETYPE_SPACE_STATION)) {
-            percentValue = (long) ((getCampaignOptions().getJumpshipContractPercent() / 100) * value);
+            percentValue = (getCampaignOptions().getJumpshipContractPercent() / 100) * value;
         } else {
-            percentValue = (long) ((getCampaignOptions().getEquipmentContractPercent() / 100) * value);
+            percentValue = (getCampaignOptions().getEquipmentContractPercent() / 100) * value;
         }
 
-        return percentValue;
+        return Math.round(percentValue);
     }
 
     public long getContractBase() {
         if (getCampaignOptions().usePeacetimeCost()) {
             double peacetimecost = (getPeacetimeCost() * .75) +
                     getForceValue(getCampaignOptions().useInfantryDontCount());
-            return (long) peacetimecost;
+            return Math.round(peacetimecost);
         } else if (getCampaignOptions().useEquipmentContractBase()) {
             return getForceValue(getCampaignOptions().useInfantryDontCount());
         } else {
@@ -7074,77 +7076,77 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public int getTotalMechBays() {
-        int bays = 0;
+        double bays = 0;
         for (Unit u : getUnits()) {
             bays += u.getMechCapacity();
         }
-        return bays;
+        return (int)Math.round(bays);
     }
 
     public int getTotalASFBays() {
-        int bays = 0;
+        double bays = 0;
         for (Unit u : getUnits()) {
             bays += u.getASFCapacity();
         }
-        return bays;
+        return (int)Math.round(bays);
     }
 
     public int getTotalSmallCraftBays() {
-        int bays = 0;
+        double bays = 0;
         for (Unit u : getUnits()) {
             bays += u.getSmallCraftCapacity();
         }
-        return bays;
+        return (int)Math.round(bays);
     }
 
     public int getTotalBattleArmorBays() {
-        int bays = 0;
+        double bays = 0;
         for (Unit u : getUnits()) {
             bays += u.getBattleArmorCapacity();
         }
-        return bays;
+        return (int)Math.round(bays);
     }
 
     public int getTotalInfantryBays() {
-        int bays = 0;
+        double bays = 0;
         for (Unit u : getUnits()) {
             bays += u.getInfantryCapacity();
         }
-        return bays;
+        return (int)Math.round(bays);
     }
 
     public int getTotalHeavyVehicleBays() {
-        int bays = 0;
+        double bays = 0;
         for (Unit u : getUnits()) {
             bays += u.getHeavyVehicleCapacity();
         }
-        return bays;
+        return (int)Math.round(bays);
     }
 
     public int getTotalLightVehicleBays() {
-        int bays = 0;
+        double bays = 0;
         for (Unit u : getUnits()) {
             bays += u.getLightVehicleCapacity();
         }
-        return bays;
+        return (int)Math.round(bays);
     }
 
     public int getTotalProtomechBays() {
-        int bays = 0;
+        double bays = 0;
         for (Unit u : getUnits()) {
             bays += u.getProtomechCapacity();
         }
-        return bays;
+        return (int)Math.round(bays);
     }
 
     public int getTotalDockingCollars() {
-        int collars = 0;
+        double collars = 0;
         for (Unit u : getUnits()) {
             if (u.getEntity() instanceof Jumpship) {
                 collars += u.getDocks();
             }
         }
-        return collars;
+        return (int)Math.round(collars);
     }
 
     public double getTotalInsulatedCargoCapacity() {
