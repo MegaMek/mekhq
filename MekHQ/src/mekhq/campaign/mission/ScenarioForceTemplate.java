@@ -260,8 +260,7 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
         this.destinationZone = destinationZone;
         this.retreatThreshold = retreatThreshold;
         this.allowedUnitType = allowedUnitType;
-        
-        Collections.copy(this.deploymentZones, deploymentZones);
+        this.deploymentZones = deploymentZones == null ? new ArrayList<>() : new ArrayList<>(deploymentZones);
     }
     
     public int getForceAlignment() {
