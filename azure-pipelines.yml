@@ -34,9 +34,24 @@ steps:
     tasks: 'releaseAll'
 
 - task: CopyFiles@2
+  condition: eq(variables['Agent.OS'], 'Windows_NT')
   inputs:
     sourceFolder: 'MekHQ/build/distributions'
-    contents: '**/*'
+    contents: '**/*windows*'
+    targetFolder: '$(Build.ArtifactStagingDirectory)/$(Agent.OS)-$(Agent.OSArchitecture)'
+
+- task: CopyFiles@2
+  condition: eq(variables['Agent.OS'], 'Darwin')
+  inputs:
+    sourceFolder: 'MekHQ/build/distributions'
+    contents: '**/*mac*'
+    targetFolder: '$(Build.ArtifactStagingDirectory)/$(Agent.OS)-$(Agent.OSArchitecture)'
+
+- task: CopyFiles@2
+  condition: eq(variables['Agent.OS'], 'Linux')
+  inputs:
+    sourceFolder: 'MekHQ/build/distributions'
+    contents: '**/*.tar.gz'
     targetFolder: '$(Build.ArtifactStagingDirectory)/$(Agent.OS)-$(Agent.OSArchitecture)'
 
 - task: PublishBuildArtifacts@1
