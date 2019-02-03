@@ -31,4 +31,10 @@ steps:
     testResultsFiles: '**/TEST-*.xml'
     tasks: 'releaseAll'
 
+- task: CopyFiles@2
+  inputs:
+    sourceFolder: 'MekHQ/build/distributions'
+    contents: '**/*'
+    targetFolder: '$(Build.ArtifactStagingDirectory)'
+
 - task: PublishBuildArtifacts@1
