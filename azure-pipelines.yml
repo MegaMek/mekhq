@@ -30,3 +30,5 @@ steps:
     publishJUnitResults: false
     testResultsFiles: '**/TEST-*.xml'
     tasks: 'releaseAll'
+
+- task: PublishBuildArtifacts@1
