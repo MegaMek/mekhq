@@ -39,7 +39,7 @@ steps:
   inputs:
     sourceFolder: 'MekHQ/build/distributions'
     contents: '**/*'
-    targetFolder: '$(Build.ArtifactStagingDirectory)/$(Agent.OS)-$(Agent.OSArchitecture)'
+    targetFolder: '$(Build.ArtifactStagingDirectory)'
 
 - task: PublishBuildArtifacts@1
   condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
