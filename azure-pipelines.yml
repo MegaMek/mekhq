@@ -19,6 +19,8 @@ pool:
   vmImage: $(imageName)
 
 steps:
+- powershell: 'New-Item -ItemType directory -Path $(Build.SourcesDirectory)/build/tmp'
+
 - task: Gradle@2
   inputs:
     workingDirectory: ''
