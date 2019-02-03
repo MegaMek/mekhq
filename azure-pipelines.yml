@@ -4,7 +4,7 @@
 # https://docs.microsoft.com/azure/devops/pipelines/languages/java
 
 trigger:
-- azure-pipelines
+- master
 
 strategy:
   matrix:
@@ -19,13 +19,11 @@ pool:
   vmImage: $(imageName)
 
 steps:
-- powershell: 'New-Item -ItemType directory -Path $(Build.SourcesDirectory)/build/tmp'
-
 - task: Gradle@2
   inputs:
     workingDirectory: ''
     gradleWrapperFile: 'gradlew'
-    gradleOptions: '-Xmx3072m -Djava.io.tmpdir=$(Build.SourcesDirectory)/build/tmp'
+    gradleOptions: '-Xmx3072m'
     javaHomeOption: 'JDKVersion'
     jdkVersionOption: '1.8'
     jdkArchitectureOption: 'x64'
@@ -33,25 +31,15 @@ steps:
     testResultsFiles: '**/TEST-*.xml'
     tasks: 'releaseAll'
 
+#
+# We really only need to do these last two for one of the agents, we'll pick Linux
+#
 - task: CopyFiles@2
-  condition: eq(variables['Agent.OS'], 'Windows_NT')
+  condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
   inputs:
     sourceFolder: 'MekHQ/build/distributions'
-    contents: '**/*windows*'
-    targetFolder: '$(Build.ArtifactStagingDirectory)/$(Agent.OS)-$(Agent.OSArchitecture)'
-
-- task: CopyFiles@2
-  condition: eq(variables['Agent.OS'], 'Darwin')
-  inputs:
-    sourceFolder: 'MekHQ/build/distributions'
-    contents: '**/*mac*'
-    targetFolder: '$(Build.ArtifactStagingDirectory)/$(Agent.OS)-$(Agent.OSArchitecture)'
-
-- task: CopyFiles@2
-  condition: eq(variables['Agent.OS'], 'Linux')
-  inputs:
-    sourceFolder: 'MekHQ/build/distributions'
-    contents: '**/*.tar.gz'
+    contents: '**/*'
     targetFolder: '$(Build.ArtifactStagingDirectory)/$(Agent.OS)-$(Agent.OSArchitecture)'
 
 - task: PublishBuildArtifacts@1
+  condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
