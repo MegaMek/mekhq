@@ -23,7 +23,7 @@ steps:
   inputs:
     workingDirectory: ''
     gradleWrapperFile: 'gradlew'
-    gradleOptions: '-Xmx3072m'
+    gradleOptions: '-Xmx3072m -Djava.io.tmpdir=$(Build.SourcesDirectory)/build/tmp'
     javaHomeOption: 'JDKVersion'
     jdkVersionOption: '1.8'
     jdkArchitectureOption: 'x64'
@@ -35,6 +35,6 @@ steps:
   inputs:
     sourceFolder: 'MekHQ/build/distributions'
     contents: '**/*'
-    targetFolder: '$(Build.ArtifactStagingDirectory)'
+    targetFolder: '$(Build.ArtifactStagingDirectory)/$(Agent.OS)-$(Agent.OSArchitecture)'
 
 - task: PublishBuildArtifacts@1
