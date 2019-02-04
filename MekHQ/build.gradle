@@ -92,6 +92,21 @@ jar {
     }
 }
 
+task mmJar (type: Jar) {
+    archiveName = "MegaMek.jar"
+    from "${mmDir}/build/classes/java/main"
+    from "${mmDir}/build/resources/main"
+    manifest {
+        attributes "Main-Class": mainClassName
+        attributes 'Class-Path' : (project.sourceSets.main.runtimeClasspath.files
+            .findAll { it.name.endsWith(".jar") }.collect { "${lib}/${it.name}" }.join(' '))
+    }
+    ext.jarLocation = "${buildDir}/libs/${archiveName}"
+    inputs.dir "${mmDir}/build/classes/java/main"
+    inputs.dir "${mmDir}/build/resources/main"
+    outputs.file jarLocation
+}
+
 task mmlJar (type: Jar) {
     archiveName = "MegaMekLab.jar"
     from "${mmlDir}/build/classes/java/main"
@@ -101,9 +116,10 @@ task mmlJar (type: Jar) {
         attributes 'Class-Path' : 'MegaMek.jar ' + (project.sourceSets.main.runtimeClasspath.files
             .findAll { it.name.endsWith(".jar") }.collect { "${lib}/${it.name}" }.join(' '))
     }
+    ext.jarLocation = "${buildDir}/libs/${archiveName}"
     inputs.dir "${mmlDir}/build/classes/java/main"
     inputs.dir "${mmlDir}/build/resources/main"
-    outputs.file "${buildDir}/libs/${archiveName}"
+    outputs.file jarLocation
 }
 
 task stageFiles(type: Copy) {
@@ -201,7 +217,6 @@ distributions {
     unix {
         baseName = 'mekhq'
         contents {
-            from ("${mmDir}/megamek/build/libs/MegaMek.jar")
             from ("${mmDir}/megamek/build/files")
             from ("${mmDir}/megamek/build/scripts") {
                 include 'startup*'
@@ -211,6 +226,7 @@ distributions {
                 rename 'history.txt', 'mm-history.txt'
                 into 'docs'
             }
+            from (mmJar)
             from (mmlJar)
             from ("${mmlDir}/build/files/data/fonts") {
                 into "data/fonts"
@@ -263,7 +279,13 @@ distributions {
                 include '*.ini'
             }
             from (project.sourceSets.main.runtimeClasspath.files
-                    .findAll { it.name.endsWith(".jar") }) {
+                    .findAll { it.name.endsWith(".jar") && !it.name.toLowerCase().startsWith("megamek") }) {
+                into "${lib}"
+            }
+            from (mmJar) {
+                into "${lib}"
+            }
+            from (mmlJar) {
                 into "${lib}"
             }
             duplicatesStrategy = 'exclude'
@@ -290,7 +312,13 @@ distributions {
             }
             from (fileStagingDir)
             from (project.sourceSets.main.runtimeClasspath.files
-                    .findAll { it.name.endsWith(".jar") }) {
+                    .findAll { it.name.endsWith(".jar") && !it.name.toLowerCase().startsWith("megamek") }) {
+                into "${lib}"
+            }
+            from (mmJar) {
+                into "${lib}"
+            }
+            from (mmlJar) {
                 into "${lib}"
             }
             duplicatesStrategy = 'exclude'
@@ -313,12 +341,11 @@ ${project.ext.jvmOptions.join('\n')}
     }
 }
 
-task createMMExe (type: edu.sc.seis.launch4j.tasks.Launch4jLibraryTask) {
+task createMMExe (type: edu.sc.seis.launch4j.tasks.Launch4jLibraryTask, dependsOn: mmJar) {
     description = 'Create Windows executable stub for MM jar'
     outfile = 'MegaMek.exe'
     mainClassName = 'megamek.MegaMek'
-    jar = project.sourceSets.main.runtimeClasspath.files
-        .find { it.name.toLowerCase().startsWith('megamek-') }
+    jar = "${mmJar.jarLocation}"
     classpath = project.sourceSets.main.runtimeClasspath.files
             .findAll { it.name.endsWith(".jar") }.collect { "${lib}/${it.name}" }
     icon = "${mmDir}/megamek/data/images/misc/megamek.ico"
@@ -335,12 +362,11 @@ ${project.ext.jvmOptions.join('\n')}
     }
 }
 
-task createMMLExe (type: edu.sc.seis.launch4j.tasks.Launch4jLibraryTask) {
+task createMMLExe (type: edu.sc.seis.launch4j.tasks.Launch4jLibraryTask, dependsOn: mmlJar) {
     description = 'Create Windows executable stub for MML jar'
     outfile = 'MegaMekLab.exe'
     mainClassName = 'megameklab.com.MegaMekLab'
-    jar = project.sourceSets.main.runtimeClasspath.files
-        .find { it.name.toLowerCase().startsWith('megameklab') }
+    jar = "${mmlJar.jarLocation}"
     classpath = project.sourceSets.main.runtimeClasspath.files
             .findAll { it.name.endsWith(".jar") }.collect { "${lib}/${it.name}" }
     icon = "${mmlDir}/data/images/misc/megameklab.ico"
