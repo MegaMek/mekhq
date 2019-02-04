@@ -399,6 +399,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         forcedPanel.add(lstDeployZones, gbc);
         
         JLabel lblAllowedUnitTypes = new JLabel("Unit Type:");
+        lblAllowedUnitTypes.setToolTipText("The type of unit. If player-supplied, indicates a limitation on the type of unit the player can deploy.");
         gbc.gridx = 3;
         gbc.gridy = 1;
         gbc.gridheight = 1;
@@ -435,7 +436,8 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         forcedPanel.add(spnArrivalTurn, gbc);
         
         JLabel lblFixedUnitCount = new JLabel("Fixed Unit Count:");
-        lblFixedUnitCount.setToolTipText("How many units in the force, if using the fixed unit count generation method. -1 indicates a lance, appropriate to the owner's faction.");
+        lblFixedUnitCount.setToolTipText("How many units in the force, if using the fixed unit count generation method. -1 indicates a lance, appropriate to the owner's faction.\n" +
+                        "If player-supplied, indicates an upper bound on the number of units the player can deploy.");
         gbc.gridy++;
         gbc.gridx--;
         forcedPanel.add(lblFixedUnitCount, gbc);
@@ -1184,7 +1186,6 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         spnMultiplier.setEnabled(!isPlayerForce);
         spnRetreatThreshold.setEnabled(!isPlayerForce);
         cboMaxWeightClass.setEnabled(!isPlayerForce);
-        cboUnitType.setEnabled(!isPlayerForce);
         chkContributesToBV.setEnabled(!isEnemyForce);
         chkContributesToBV.setSelected(!isEnemyForce);
         chkContributesToUnitCount.setEnabled(!isEnemyForce);
@@ -1192,7 +1193,6 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         chkContributesToMapSize.setSelected(true);
         
         spnMultiplier.setEnabled(cboGenerationMethod.getSelectedIndex() != ForceGenerationMethod.FixedUnitCount.ordinal());
-        spnFixedUnitCount.setEnabled(cboGenerationMethod.getSelectedIndex() == ForceGenerationMethod.FixedUnitCount.ordinal());
     }
     
     /**

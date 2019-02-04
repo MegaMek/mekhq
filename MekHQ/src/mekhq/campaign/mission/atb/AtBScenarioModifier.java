@@ -48,6 +48,7 @@ public class AtBScenarioModifier {
     private Integer unitRemovalCount = null;
     private List<MapLocation> allowedMapLocations = null;
     private Boolean useAmbushLogic = null; 
+    private Boolean switchSides = null;
     
     /**
      * Process this scenario modifier for a particular scenario, given a particular timing indicator.
@@ -87,6 +88,10 @@ public class AtBScenarioModifier {
             
             if(getUseAmbushLogic() != null && getEventRecipient() != null) {
                 AtBScenarioModifierApplicator.setupAmbush(scenario, campaign, getEventRecipient());
+            }
+            
+            if(getSwitchSides() != null && getEventRecipient() != null) {
+                AtBScenarioModifierApplicator.switchSides(scenario, getEventRecipient());
             }
         }
     }
@@ -301,6 +306,14 @@ public class AtBScenarioModifier {
 
     public void setUseAmbushLogic(Boolean useAmbushLogic) {
         this.useAmbushLogic = useAmbushLogic;
+    }
+    
+    public Boolean getSwitchSides() {
+        return switchSides;
+    }
+    
+    public void setSwitchSides(Boolean switchSides) {
+        this.switchSides = switchSides;
     }
 }
 

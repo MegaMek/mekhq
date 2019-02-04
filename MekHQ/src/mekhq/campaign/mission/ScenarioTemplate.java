@@ -103,6 +103,21 @@ public class ScenarioTemplate {
     }
     
     /**
+     * Attempt to deserialize a file at the given path.
+     * @param filePath The location of the file
+     * @return Possibly an instance of a scenario template.
+     */
+    public static ScenarioTemplate Deserialize(String filePath) {
+        File inputFile = new File(filePath);
+        if(!inputFile.exists()) {
+            MekHQ.getLogger().error(ScenarioTemplate.class, "Deserialize", String.format("Cannot deserialize file %s, does not exist", filePath));
+            return null;
+        }
+        
+        return Deserialize(inputFile);
+    }
+    
+    /**
      * Attempt to deserialize an instance of a ScenarioTemplate from the passed-in file 
      * @param inputFile The source file
      * @return Possibly an instance of a ScenarioTemplate

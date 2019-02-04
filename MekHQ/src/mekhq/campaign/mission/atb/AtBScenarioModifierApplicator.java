@@ -280,6 +280,35 @@ public class AtBScenarioModifierApplicator {
         }
     }
     
+    /**
+     * Worker method that turns all your allies into treacherous enemies
+     * Look into a variant of this where some hostiles defect or go rogue?
+     * @param scenario The scenario to process.
+     * @param recipient Who's switching sides. Only valid recipient is Allied currently.
+     */
+    public static void switchSides(AtBDynamicScenario scenario, ForceAlignment recipient) {
+        // this operation is only meaningful for the allied forces currently
+        if(recipient != ForceAlignment.Allied) {
+            return;
+        }
+
+        int team = ScenarioForceTemplate.TEAM_IDS.get(recipient.ordinal());
+        int oppositeTeam = ScenarioForceTemplate.TEAM_IDS.get(ForceAlignment.Opposing);
+        
+        for(int x = 0; x < scenario.getNumBots(); x++) {
+            BotForce bf = scenario.getBotForce(x);
+            if(bf.getTeam() == team) {
+                bf.setTeam(oppositeTeam);
+            }
+        }
+    }
+    
+    
+    /**
+     * Appends the given text to the scenario briefing.
+     * @param scenario The scenario to modify.
+     * @param additionalBriefingText The additional briefing text.
+     */
     public static void appendScenarioBriefingText(AtBDynamicScenario scenario, String additionalBriefingText) {
         scenario.setDesc(String.format("%s\n\n%s", scenario.getDescription(), additionalBriefingText));
     }
