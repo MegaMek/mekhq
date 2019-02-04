@@ -46,6 +46,7 @@ import mekhq.campaign.mission.ScenarioMapParameters;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
 import mekhq.campaign.mission.ScenarioForceTemplate.SynchronizedDeploymentType;
+import mekhq.campaign.mission.atb.AtBScenarioModifier;
 import mekhq.campaign.mission.ScenarioTemplate;
 import mekhq.gui.FileDialogs;
 
@@ -111,6 +112,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
     JRadioButton btnUseSpaceMap;
     JRadioButton btnUseSpecificMapTypes;
     JRadioButton btnUseLowAtmosphereMap;
+    JComboBox<AtBScenarioModifier> modifierBox;
     
     JPanel globalPanel;
     
@@ -588,13 +590,12 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
      */
     private void setupMapParameters(GridBagConstraints gbc) {
         gbc.gridx = 0;
-        gbc.gridy++;
-        gbc.gridwidth = GridBagConstraints.REMAINDER;
-        gbc.gridheight = 1;
-        
+        int currentGridY = gbc.gridy;
+                
         JLabel lblMapParameters = new JLabel("Scenario Map Parameters");
         globalPanel.add(lblMapParameters, gbc);
         
+        // the first two columns
         gbc.gridy++;
         gbc.gridwidth = 1;
         JLabel lblBaseWidth = new JLabel("Base Width:");
@@ -605,7 +606,70 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         txtBaseWidth.setText(String.valueOf(scenarioTemplate.mapParameters.getBaseWidth()));
         globalPanel.add(txtBaseWidth, gbc);
         
+        gbc.gridx = 0;
+        gbc.gridy++;
+        JLabel lblBaseHeight = new JLabel("Base Height:");
+        globalPanel.add(lblBaseHeight, gbc);
+        
         gbc.gridx++;
+        txtBaseHeight = new JTextField(4);
+        txtBaseHeight.setText(String.valueOf(scenarioTemplate.mapParameters.getBaseHeight()));
+        globalPanel.add(txtBaseHeight, gbc);
+
+        gbc.gridy++;
+        gbc.gridx = 0;
+        JLabel lblXIncrement = new JLabel("Scaled Width Increment:");
+        globalPanel.add(lblXIncrement, gbc);
+        
+        gbc.gridx++;
+        txtXIncrement = new JTextField(4);
+        txtXIncrement.setText(String.valueOf(scenarioTemplate.mapParameters.getWidthScalingIncrement()));
+        globalPanel.add(txtXIncrement, gbc);
+        
+        gbc.gridy++;
+        gbc.gridx = 0;
+        JLabel lblYIncrement = new JLabel("Scaled Height Increment:");
+        globalPanel.add(lblYIncrement, gbc);
+        
+        gbc.gridx++;
+        txtYIncrement = new JTextField(4);
+        txtYIncrement.setText(String.valueOf(scenarioTemplate.mapParameters.getHeightScalingIncrement()));
+        globalPanel.add(txtYIncrement, gbc);
+        
+        gbc.gridy++;
+        gbc.gridx = 0;
+        JLabel lblAllowRotation = new JLabel("Allow 90 Degree Rotation:");
+        globalPanel.add(lblAllowRotation, gbc);
+        
+        gbc.gridx++;
+        chkAllowRotation = new JCheckBox();
+        chkAllowRotation.setSelected(scenarioTemplate.mapParameters.isAllowRotation());
+        globalPanel.add(chkAllowRotation, gbc);
+        
+        gbc.gridy++;
+        gbc.gridx = 0;
+        JLabel lblUseAtBSizing = new JLabel("Use AtB Base Dimensions:");
+        lblUseAtBSizing.setToolTipText("Use the AtB Map Sizes table to determine the base width and height of the map.");
+        globalPanel.add(lblUseAtBSizing, gbc);
+        
+        gbc.gridx++;
+        chkUseAtBSizing = new JCheckBox();
+        chkUseAtBSizing.addItemListener(new ItemListener() {
+
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                atbSizingCheckboxChangeHandler();
+            }
+            
+        });
+        chkUseAtBSizing.setSelected(scenarioTemplate.mapParameters.isUseStandardAtBSizing());
+        globalPanel.add(chkUseAtBSizing, gbc);
+        int bottomGridY = gbc.gridy;
+        
+        gbc.gridy = currentGridY;
+        gbc.gridx = 2;
+        
+        // the allowed map types columns
         JLabel lblAllowedTerrainTypes = new JLabel("Allowed Map Types:");
         globalPanel.add(lblAllowedTerrainTypes, gbc);
         
@@ -684,11 +748,8 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
             }
         }
         
-        gbc.gridy--;
-        gbc.gridy--;
-        gbc.gridy--;
-        
         gbc.gridx++;
+        gbc.gridy = currentGridY;
         gbc.gridheight = GridBagConstraints.RELATIVE;
         lstAllowedTerrainTypes = new JList<>();
         DefaultListModel<String> terrainTypeModel = new DefaultListModel<String>();
@@ -700,65 +761,20 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         mapTypeChangeHandler();
         globalPanel.add(lstAllowedTerrainTypes, gbc);
         
-        gbc.gridy++;
-        gbc.gridx = 0;
+        // the fixed events columns
+        gbc.gridy = currentGridY;
+        gbc.gridx++;
         gbc.gridheight = 1;
-        JLabel lblBaseHeight = new JLabel("Base Height:");
-        globalPanel.add(lblBaseHeight, gbc);
-        
-        gbc.gridx++;
-        txtBaseHeight = new JTextField(4);
-        txtBaseHeight.setText(String.valueOf(scenarioTemplate.mapParameters.getBaseHeight()));
-        globalPanel.add(txtBaseHeight, gbc);
+        globalPanel.add(new JLabel("Fixed Modifiers"), gbc);
         
         gbc.gridy++;
-        gbc.gridx = 0;
-        JLabel lblXIncrement = new JLabel("Scaled Width Increment:");
-        globalPanel.add(lblXIncrement, gbc);
+        modifierBox = new JComboBox<>();
+        for(AtBScenarioModifier modifier : AtBScenarioModifier.getScenarioModifiers()) {
+            modifierBox.addItem(modifier);
+        }
+        globalPanel.add(modifierBox, gbc);
         
-        gbc.gridx++;
-        txtXIncrement = new JTextField(4);
-        txtXIncrement.setText(String.valueOf(scenarioTemplate.mapParameters.getWidthScalingIncrement()));
-        globalPanel.add(txtXIncrement, gbc);
-        
-        gbc.gridy++;
-        gbc.gridx = 0;
-        JLabel lblYIncrement = new JLabel("Scaled Height Increment:");
-        globalPanel.add(lblYIncrement, gbc);
-        
-        gbc.gridx++;
-        txtYIncrement = new JTextField(4);
-        txtYIncrement.setText(String.valueOf(scenarioTemplate.mapParameters.getHeightScalingIncrement()));
-        globalPanel.add(txtYIncrement, gbc);
-        
-        gbc.gridy++;
-        gbc.gridx = 0;
-        JLabel lblAllowRotation = new JLabel("Allow 90 Degree Rotation:");
-        globalPanel.add(lblAllowRotation, gbc);
-        
-        gbc.gridx++;
-        chkAllowRotation = new JCheckBox();
-        chkAllowRotation.setSelected(scenarioTemplate.mapParameters.isAllowRotation());
-        globalPanel.add(chkAllowRotation, gbc);
-        
-        gbc.gridy++;
-        gbc.gridx = 0;
-        JLabel lblUseAtBSizing = new JLabel("Use AtB Base Dimensions:");
-        lblUseAtBSizing.setToolTipText("Use the AtB Map Sizes table to determine the base width and height of the map.");
-        globalPanel.add(lblUseAtBSizing, gbc);
-        
-        gbc.gridx++;
-        chkUseAtBSizing = new JCheckBox();
-        chkUseAtBSizing.addItemListener(new ItemListener() {
-
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                atbSizingCheckboxChangeHandler();
-            }
-            
-        });
-        chkUseAtBSizing.setSelected(scenarioTemplate.mapParameters.isUseStandardAtBSizing());
-        globalPanel.add(chkUseAtBSizing, gbc);
+        gbc.gridy = bottomGridY + 1;
     }
     
     /**
@@ -767,7 +783,6 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
      */
     private void setupBottomButtons(GridBagConstraints gbc) {
         gbc.gridx = 0;
-        gbc.gridy += 2;
         
         JButton btnSave = new JButton("Save");
         btnSave.setActionCommand(SAVE_TEMPLATE_COMMAND);
