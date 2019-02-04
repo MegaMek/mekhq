@@ -1,6 +1,6 @@
 VERSION HISTORY:
 ----------------
-v0.45.3-SNAPSHOT
+v0.45.3 (2019-02-12 0500 UTC)
 + Issue #990: Feature: Add bulk confirm dialog if more than one unit is removed
 + PR #995: Speed up campaign load times by optimizing spare parts importing
 + PR #994: Fix exception seen during log entry updates
