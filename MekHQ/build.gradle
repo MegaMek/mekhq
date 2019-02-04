@@ -311,16 +311,17 @@ distributions {
                 into 'docs'
             }
             from (fileStagingDir)
-            from (project.sourceSets.main.runtimeClasspath.files
-                    .findAll { it.name.endsWith(".jar") && !it.name.toLowerCase().startsWith("megamek") }) {
-                into "${lib}"
-            }
             from (mmJar) {
-                into "${lib}"
+                into "${createOSXBundle.jarSubdir}/${lib}" 
             }
             from (mmlJar) {
-                into "${lib}"
+                into "${createOSXBundle.jarSubdir}/${lib}" 
             }
+            from (project.sourceSets.main.runtimeClasspath.files
+                    .findAll { it.name.endsWith(".jar") && !it.name.toLowerCase().startsWith("megamek") }) {
+                into "${createOSXBundle.jarSubdir}/${lib}" 
+            }
+            duplicatesStrategy = 'exclude'
             duplicatesStrategy = 'exclude'
         }
     }
