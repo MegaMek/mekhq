@@ -83,15 +83,6 @@ ext {
     osxBundleDir = "${buildDir}/osxBundle"
 }
 
-jar {
-    archiveName = "MekHQ.jar"
-    manifest {
-        attributes "Main-Class": mainClassName
-        attributes 'Class-Path' : 'MegaMek.jar MegaMekLab.jar ' + (project.sourceSets.main.runtimeClasspath.files
-            .findAll { it.name.endsWith(".jar") }.collect { "${lib}/${it.name}" }.join(' '))
-    }
-}
-
 task mmJar (type: Jar) {
     archiveName = "MegaMek.jar"
     from "${mmDir}/build/classes/java/main"
@@ -113,13 +104,24 @@ task mmlJar (type: Jar) {
     from "${mmlDir}/build/resources/main"
     manifest {
         attributes "Main-Class": mainClassName
-        attributes 'Class-Path' : 'MegaMek.jar ' + (project.sourceSets.main.runtimeClasspath.files
-            .findAll { it.name.endsWith(".jar") }.collect { "${lib}/${it.name}" }.join(' '))
+        attributes 'Class-Path' : "${mmJar.archiveName} " + (project.sourceSets.main.runtimeClasspath.files
+            .findAll { it.name.endsWith(".jar") && !it.name.toLowerCase().startsWith("megamek")}
+            .collect { "${lib}/${it.name}" }.join(' '))
     }
     ext.jarLocation = "${buildDir}/libs/${archiveName}"
     inputs.dir "${mmlDir}/build/classes/java/main"
     inputs.dir "${mmlDir}/build/resources/main"
     outputs.file jarLocation
+}
+
+jar {
+    archiveName = "MekHQ.jar"
+    manifest {
+        attributes "Main-Class": mainClassName
+        attributes 'Class-Path' : "${mmJar.archiveName} ${mmlJar.archiveName} " + (project.sourceSets.main.runtimeClasspath.files
+            .findAll { it.name.endsWith(".jar") && !it.name.toLowerCase().startsWith("megamek") }
+            .collect { "${lib}/${it.name}" }.join(' '))
+    }
 }
 
 task stageFiles(type: Copy) {
