@@ -162,6 +162,9 @@ public class CurrencyManager extends CurrencyUnitDataProvider {
             }
         }
 
+        // No default currency, get the main currency of the first faction of the planet
+        //this.campaign.getCurrentPlanet().getFactions(campaign.getDate())
+
         MekHQ.getLogger().log(
                 CurrencyManager.class,
                 "getDefaultCurrency",
