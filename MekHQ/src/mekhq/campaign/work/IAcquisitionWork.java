@@ -24,6 +24,7 @@ package mekhq.campaign.work;
 import megamek.common.TargetRoll;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.unit.Unit;
+import org.joda.money.Money;
 
 public interface IAcquisitionWork extends IWork {
     public String getAcquisitionName();
@@ -64,7 +65,7 @@ public interface IAcquisitionWork extends IWork {
     
     public void decrementQuantity();
     
-    public long getBuyCost();
+    public Money getBuyCost();
     
     public boolean isIntroducedBy(int year, boolean clan, int techFaction);
     

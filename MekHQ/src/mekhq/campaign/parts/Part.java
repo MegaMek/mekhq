@@ -23,18 +23,21 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 import java.io.Serializable;
-import java.text.DecimalFormat;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Map;
 import java.util.StringJoiner;
 import java.util.UUID;
 
+import mekhq.campaign.finances.CurrencyManager;
+import org.joda.money.BigMoney;
+import org.joda.money.Money;
+import org.joda.money.MoneyUtils;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import megamek.common.Aero;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.ITechnology;
@@ -103,19 +106,19 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
     public static final int QUALITY_F = 5;
 
 	public interface REPAIR_PART_TYPE {
-		public static final int ARMOR = 0;
-		public static final int AMMO = 1;
-		public static final int WEAPON = 2;
-		public static final int GENERAL_LOCATION = 3;
-		public static final int ENGINE = 4;
-		public static final int GYRO = 5;
-		public static final int ACTUATOR = 6;
-		public static final int ELECTRONICS = 7;
-		public static final int GENERAL = 8;
-		public static final int HEATSINK = 9;
-		public static final int MEK_LOCATION = 10;
-		public static final int PHYSICAL_WEAPON = 11;
-		public static final int POD_SPACE = 12;
+		int ARMOR = 0;
+		int AMMO = 1;
+		int WEAPON = 2;
+		int GENERAL_LOCATION = 3;
+		int ENGINE = 4;
+		int GYRO = 5;
+		int ACTUATOR = 6;
+		int ELECTRONICS = 7;
+		int GENERAL = 8;
+		int HEATSINK = 9;
+		int MEK_LOCATION = 10;
+		int PHYSICAL_WEAPON = 11;
+		int POD_SPACE = 12;
 	}
     
 	private static final String[] partTypeLabels = { "Armor", "Weapon", "Ammo",
@@ -204,12 +207,12 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	 */
 	protected int quantity;
 
-	//reverse-compatability
+	//reverse-compatibility
 	protected int oldUnitId = -1;
 	protected int oldTeamId = -1;
 	protected int oldRefitId = -1;
 
-	//only relevant for acquisitionable parts
+	//only relevant for parts that can be acquired
 	protected int daysToWait;
 	protected int replacementId;
 
@@ -240,7 +243,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 		this.replacementId = -1;
 		this.quality = QUALITY_D;
 		this.parentPartId = -1;
-		this.childPartIds = new ArrayList<Integer>();
+		this.childPartIds = new ArrayList<>();
 		this.isTeamSalvaging = false;
 	}
 
@@ -313,14 +316,14 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	 * Sticker price is the value of the part according to the rulebooks
 	 * @return
 	 */
-	public abstract long getStickerPrice();
+	public abstract Money getStickerPrice();
 
 	/**
 	 * This is the actual value of the part as affected by any characteristics
 	 * of the part itself
 	 * @return
 	 */
-	public long getCurrentValue() {
+	public Money getCurrentValue() {
 		return getStickerPrice();
 	}
 
@@ -328,30 +331,33 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	 * This is the value of the part that may be affected by campaign options
 	 * @return
 	 */
-	public long getActualValue() {
+	public Money getActualValue() {
 		return adjustCostsForCampaignOptions(getCurrentValue());
 	}
 
-	public boolean isPriceAdustedForAmount() {
+	public boolean isPriceAdjustedForAmount() {
 	    return false;
 	}
 
-	protected long adjustCostsForCampaignOptions(long cost) {
+	protected Money adjustCostsForCampaignOptions(Money cost) {
 	    // if the part doesn't cost anything, no amount of multiplication will change it
-	    if(cost == 0) { 
+	    if(MoneyUtils.isZero(cost)) {
 	        return cost;
 	    }
-	    
+
+        BigMoney temporal = cost.toBigMoney();
+
 		if(getTechBase() == T_CLAN) {
-			cost *= campaign.getCampaignOptions().getClanPriceModifier();
+            temporal = temporal.multipliedBy(campaign.getCampaignOptions().getClanPriceModifier());
 		}
-		if(needsFixing() && !isPriceAdustedForAmount()) {
-			cost *= campaign.getCampaignOptions().getDamagedPartsValue();
+		if(needsFixing() && !isPriceAdjustedForAmount()) {
+            temporal = temporal.multipliedBy(campaign.getCampaignOptions().getDamagedPartsValue());
 			//TODO: parts that cant be fixed should also be further reduced in price
 		} else if(!isBrandNew()) {
-			cost *= campaign.getCampaignOptions().getUsedPartsValue(getQuality());
+            temporal = temporal.multipliedBy(campaign.getCampaignOptions().getUsedPartsValue(getQuality()));
 		}
-		return cost;
+
+		return temporal.toMoney(RoundingMode.HALF_EVEN);
 	}
 
 	public boolean isBrandNew() {
@@ -531,11 +537,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	 * otherwise, we will just replace the existing availability code with X
 	 */
 	public boolean isIntroducedBy(int year) {
-        if (year < getIntroductionDate()) {
-            return false;
-        }
-        
-        return true;
+        return year >= getIntroductionDate();
     }
 
 	/**
@@ -672,13 +674,12 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 
 	public static Part generateInstanceFromXML(Node wn, Version version) {
 	    final String METHOD_NAME = "generateInstanceFromXML(Node,Version)"; //$NON-NLS-1$
-	    
-		Part retVal = null;
-		NamedNodeMap attrs = wn.getAttributes();
+
+        NamedNodeMap attrs = wn.getAttributes();
 		Node classNameNode = attrs.getNamedItem("type");
 		String className = classNameNode.getTextContent();
 
-		//reverse compatability checks
+		//reverse compatibility checks
 		if(className.equalsIgnoreCase("mekhq.campaign.parts.MekEngine")) {
 			className = "mekhq.campaign.parts.EnginePart";
 		}
@@ -710,7 +711,8 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 			className = "mekhq.campaign.parts.equipment.MissingHeatSink";
 		}
 
-		try {
+        Part retVal = null;
+        try {
 			// Instantiate the correct child class, and call its parsing function.
 			retVal = (Part) Class.forName(className).newInstance();
 			retVal.loadFieldsFromXmlNode(wn);
@@ -770,23 +772,11 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 				} else if (wn2.getNodeName().equalsIgnoreCase("daysToArrival")) {
 					retVal.daysToArrival = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("workingOvertime")) {
-					if(wn2.getTextContent().equalsIgnoreCase("true")) {
-						retVal.workingOvertime = true;
-					} else {
-						retVal.workingOvertime = false;
-					}
+                     retVal.workingOvertime = wn2.getTextContent().equalsIgnoreCase("true");
 				} else if (wn2.getNodeName().equalsIgnoreCase("isTeamSalvaging")) {
-					if(wn2.getTextContent().equalsIgnoreCase("true")) {
-						retVal.isTeamSalvaging = true;
-					} else {
-						retVal.isTeamSalvaging = false;
-					}
+                     retVal.isTeamSalvaging = wn2.getTextContent().equalsIgnoreCase("true");
 				} else if (wn2.getNodeName().equalsIgnoreCase("brandNew")) {
-					if(wn2.getTextContent().equalsIgnoreCase("true")) {
-						retVal.brandNew = true;
-					} else {
-						retVal.brandNew = false;
-					}
+                     retVal.brandNew = wn2.getTextContent().equalsIgnoreCase("true");
 				}
 				else if (wn2.getNodeName().equalsIgnoreCase("replacementId")) {
 					retVal.replacementId = Integer.parseInt(wn2.getTextContent());
@@ -806,7 +796,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 		}
 
 		// Refit protection of unit id
-		if (retVal.unitId != null && retVal.refitId != null) {
+		if (retVal != null && retVal.unitId != null && retVal.refitId != null) {
 		    retVal.setUnit(null);
 		}
 
@@ -1095,9 +1085,8 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	    }
         sj.add(hits + " hit(s)");
         if (campaign.getCampaignOptions().payForRepairs() && (hits > 0)) {
-            int repairCost = (int) (getStickerPrice() * .2);
-            DecimalFormat numFormatter = new DecimalFormat();
-            sj.add(numFormatter.format(repairCost) + " C-bills to repair");
+            Money repairCost = getStickerPrice().multipliedBy(0.2, RoundingMode.HALF_EVEN);
+            sj.add(CurrencyManager.getInstance().getShortUiMoneyFormatter().print(repairCost) + " to repair");
         }
         return sj.toString();
     }
@@ -1112,10 +1101,9 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
         String inTransitString = inventories.getTransit() == 0 ? "" : inventories.transitAsString() + " in transit";
         String onOrderString = inventories.getOrdered() == 0 ? "" : inventories.orderedAsString() + " on order";
         String transitOrderSeparator = inTransitString.length() > 0 && onOrderString.length() > 0 ? ", " : "";
-        String orderTransitString = (inTransitString.length() > 0 || onOrderString.length() > 0) ? 
+
+        return (inTransitString.length() > 0 || onOrderString.length() > 0) ?
                 String.format("(%s%s%s)", inTransitString, transitOrderSeparator, onOrderString) : "";
-    
-        return orderTransitString;
 	}
 
 	@Override
@@ -1135,7 +1123,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	}
 
 	public String scrap() {
-		String msg = "";
+		String msg;
 		
 		if (null == getUnit()) {
 			msg = getName() + " scrapped.";
@@ -1376,7 +1364,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
     }
 
     public void removeChildPart(int childId) {
-    	ArrayList<Integer> tempArray = new ArrayList<Integer>();
+    	ArrayList<Integer> tempArray = new ArrayList<>();
     	for(int cid : childPartIds) {
     		if(cid == childId) {
     			Part part = campaign.getPart(childId);
@@ -1397,7 +1385,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
     			part.setParentPartId(-1);
     		}
     	}
-    	childPartIds = new ArrayList<Integer>();
+    	childPartIds = new ArrayList<>();
     }
     
     /**

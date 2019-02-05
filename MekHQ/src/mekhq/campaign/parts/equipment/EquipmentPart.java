@@ -21,7 +21,11 @@
 package mekhq.campaign.parts.equipment;
 
 import java.io.PrintWriter;
+import java.math.RoundingMode;
 
+import mekhq.campaign.finances.CurrencyManager;
+import org.joda.money.BigMoney;
+import org.joda.money.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -55,7 +59,7 @@ import mekhq.campaign.unit.Unit;
 public class EquipmentPart extends Part {
 	private static final long serialVersionUID = 2892728320891712304L;
 
-	//crap equipmenttype is not serialized!
+	//crap EquipmentType is not serialized!
     protected transient EquipmentType type;
     protected String typeName;
 	protected int equipmentNum = -1;
@@ -472,7 +476,7 @@ public class EquipmentPart extends Part {
      *
      */
     @Override
-    public long getStickerPrice() {
+    public Money getStickerPrice() {
     	//OK, we cant use the resolveVariableCost methods from megamek, because they
     	//rely on entity which may be null if this is a spare part. So we use our
     	//own resolveVariableCost method
@@ -483,10 +487,13 @@ public class EquipmentPart extends Part {
     	// use that to determine how to add things to the parts store and to
     	// determine whether what can be used as a replacement
     	//why does all the proto ammo have no cost?
-    	Entity en = null;
+    	Entity en;
     	boolean isArmored = false;
-        double itemCost = type.getRawCost();
-        if (itemCost == EquipmentType.COST_VARIABLE) {
+        BigMoney itemCost = BigMoney.of(
+                CurrencyManager.getInstance().getDefaultCurrency(),
+                type.getRawCost());
+
+        if (itemCost.getAmountMajorInt() == EquipmentType.COST_VARIABLE) {
             itemCost = resolveVariableCost(isArmored);
         }
     	if (unit != null) {
@@ -495,17 +502,18 @@ public class EquipmentPart extends Part {
             if(null != mounted) {
             	isArmored = mounted.isArmored();
             }
-            type.getCost(en, isArmored, getLocation());
+            itemCost = BigMoney.of(
+                    CurrencyManager.getInstance().getDefaultCurrency(),
+                    type.getCost(en, isArmored, getLocation()));
     	}
         if (isOmniPodded()) {
-            itemCost *= 1.25;
+            itemCost = itemCost.multipliedBy(1.25);
         }
-    	int finalCost = (int)itemCost;
     	if (isArmored) {
             //need a getCriticals command - but how does this work?
             //finalCost += 150000 * getCriticals(entity);
         }
-        return finalCost;
+        return itemCost.toMoney(RoundingMode.HALF_EVEN);
     }
 
     private int resolveVariableCost(boolean isArmored) {

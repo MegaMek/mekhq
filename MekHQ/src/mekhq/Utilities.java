@@ -341,13 +341,6 @@ public class Utilities {
         return true;
     }
 
-
-    public static String getCurrencyString(long value) {
-        NumberFormat numberFormat = DecimalFormat.getIntegerInstance();
-        String text = numberFormat.format(value) + " C-Bills";
-        return text;
-    }
-
     /**
      * Returns the last file modified in a directory and all subdirectories
      * that conforms to a FilenameFilter

@@ -22,15 +22,17 @@ package mekhq.campaign.mission;
 
 import java.io.PrintWriter;
 import java.io.Serializable;
+import java.math.RoundingMode;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
-import mekhq.campaign.universe.Planet;
+import mekhq.campaign.finances.CurrencyManager;
 import org.apache.commons.text.CharacterPredicate;
 import org.apache.commons.text.RandomStringGenerator;
+import org.joda.money.Money;
 import org.joda.time.DateTime;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -91,18 +93,18 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
     private int signBonus;
 
     // need to keep track of total value salvaged for salvage rights
-    private long salvagedByUnit     = 0;
-    private long salvagedByEmployer = 0;
+    private Money salvagedByUnit     = Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
+    private Money salvagedByEmployer = Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
 
     // actual amounts
-    private long advanceAmount;
-    private long signingAmount;
-    private long transportAmount;
-    private long transitAmount;
-    private long overheadAmount;
-    private long supportAmount;
-    private long baseAmount;
-    private long feeAmount;
+    private Money advanceAmount;
+    private Money signingAmount;
+    private Money transportAmount;
+    private Money transitAmount;
+    private Money overheadAmount;
+    private Money supportAmount;
+    private Money baseAmount;
+    private Money feeAmount;
 
     public Contract() {
         this(null, null);
@@ -251,28 +253,28 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
         return salvagePct > 0;
     }
 
-    public long getSalvagedByUnit() {
+    public Money getSalvagedByUnit() {
         return salvagedByUnit;
     }
 
-    public void setSalvagedByUnit(long l) {
+    public void setSalvagedByUnit(Money l) {
         this.salvagedByUnit = l;
     }
 
-    public void addSalvageByUnit(long l) {
-        salvagedByUnit += l;
+    public void addSalvageByUnit(Money l) {
+        salvagedByUnit = salvagedByUnit.plus(l);
     }
 
-    public long getSalvagedByEmployer() {
+    public Money getSalvagedByEmployer() {
         return salvagedByEmployer;
     }
 
-    public void setSalvagedByEmployer(long l) {
+    public void setSalvagedByEmployer(Money l) {
         this.salvagedByEmployer = l;
     }
 
-    public void addSalvageByEmployer(long l) {
-        salvagedByEmployer += l;
+    public void addSalvageByEmployer(Money l) {
+        salvagedByEmployer = salvagedByEmployer.plus(l);
     }
 
     public int getSigningBonusPct() {
@@ -301,103 +303,109 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
         mrbcFee = b;
     }
 
-    public long getTotalAmountPlusFeesAndBonuses() {
-        return getTotalAmountPlusFees() + signingAmount;
+    public Money getTotalAmountPlusFeesAndBonuses() {
+        return getTotalAmountPlusFees().plus(signingAmount);
     }
 
-    public long getTotalAmountPlusFees(){
-        return getTotalAmount() - feeAmount;
+    public Money getTotalAmountPlusFees(){
+        return getTotalAmount().minus(feeAmount);
     }
 
-    public long getTotalAmount() {
-        return baseAmount + supportAmount + overheadAmount + transportAmount + transitAmount;
+    public Money getTotalAmount() {
+        return baseAmount
+                .plus(supportAmount)
+                .plus(overheadAmount)
+                .plus(transportAmount)
+                .plus(transitAmount);
     }
 
-    public long getAdvanceAmount() {
+    public Money getAdvanceAmount() {
         return advanceAmount;
     }
 
-
     /**
-     * @return total amount that will be paid on contract acception.
+     * @return total amount that will be paid on contract acceptance.
      */
-    public long getTotalAdvanceAmount() {
-        return advanceAmount + signingAmount;
+    public Money getTotalAdvanceAmount() {
+        return advanceAmount.plus(signingAmount);
     }
 
-    protected void setAdvanceAmount(long amount) {
+    protected void setAdvanceAmount(Money amount) {
         advanceAmount = amount;
     }
 
-    public long getFeeAmount() {
+    public Money getFeeAmount() {
         return feeAmount;
     }
 
-    protected void setFeeAmount(long amount) {
+    protected void setFeeAmount(Money amount) {
         feeAmount = amount;
     }
 
-    public long getBaseAmount() {
+    public Money getBaseAmount() {
         return baseAmount;
     }
 
-    protected void setBaseAmount(long amount) {
+    protected void setBaseAmount(Money amount) {
         baseAmount = amount;
     }
 
-    public long getOverheadAmount() {
+    public Money getOverheadAmount() {
         return overheadAmount;
     }
 
-    protected void setOverheadAmount(long amount) {
+    protected void setOverheadAmount(Money amount) {
         overheadAmount = amount;
     }
 
-    public long getSupportAmount() {
+    public Money getSupportAmount() {
         return supportAmount;
     }
 
-    protected void setSupportAmount(long amount) {
+    protected void setSupportAmount(Money amount) {
         supportAmount = amount;
     }
 
-    public long getTransitAmount() {
+    public Money getTransitAmount() {
         return transitAmount;
     }
 
-    protected void setTransitAmount(long amount) {
+    protected void setTransitAmount(Money amount) {
         transitAmount = amount;
     }
 
-    public long getTransportAmount() {
+    public Money getTransportAmount() {
         return transportAmount;
     }
 
-    protected void setTransportAmount(long amount) {
+    protected void setTransportAmount(Money amount) {
         transportAmount = amount;
     }
 
-    public long getSigningBonusAmount() {
+    public Money getSigningBonusAmount() {
         return signingAmount;
     }
 
-    protected void setSigningBonusAmount(long amount) {
+    protected void setSigningBonusAmount(Money amount) {
         signingAmount = amount;
     }
 
-    public long getMonthlyPayOut() {
-        return (getTotalAmountPlusFeesAndBonuses() - getTotalAdvanceAmount()) / getLength();
+    public Money getMonthlyPayOut() {
+        return getTotalAmountPlusFeesAndBonuses()
+                .minus(getTotalAdvanceAmount())
+                .dividedBy(getLength(), RoundingMode.HALF_EVEN);
     }
 
     /**
      * @param c campaign loaded
      * @return the cumulative sum the estimated monthly incomes - expenses
      */
-    public long getTotalMonthlyPayOut(Campaign c){
-        return (getMonthlyPayOut()*getLength())
-                - getTotalEstimatedOverheadExpenses(c)
-                - getTotalEstimatedMaintenanceExpenses(c)
-                - getTotalEstimatedPayrollExpenses(c);
+    public Money getTotalMonthlyPayOut(Campaign c){
+        return getMonthlyPayOut()
+                .multipliedBy(getLength())
+                .minus(getTotalEstimatedOverheadExpenses(c))
+                .minus(getTotalEstimatedMaintenanceExpenses(c))
+                .minus(getTotalEstimatedPayrollExpenses(c));
     }
 
     public static String generateRandomContractName() {
@@ -406,7 +414,7 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
         return generator.generate(15);
     }
 
-    public static enum UpperCaseAndDigits implements CharacterPredicate {
+    public enum UpperCaseAndDigits implements CharacterPredicate {
         UPPERANDDIGITS {
             @Override
             public boolean test(int codePoint) {
@@ -492,18 +500,20 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
      * plus the travel time from the unit's current world to the contract world and back.
      *
      * @param c The campaign with which this contract is associated.
-     * @return The estimated profit in C-bills.
+     * @return The estimated profit in the current default currency.
      */
-    public long getEstimatedTotalProfit(Campaign c) {
-        return getTotalAdvanceAmount() + getTotalMonthlyPayOut(c) - getTotalTransportationFees(c);
+    public Money getEstimatedTotalProfit(Campaign c) {
+        return getTotalAdvanceAmount()
+                .plus(getTotalMonthlyPayOut(c))
+                .minus(getTotalTransportationFees(c));
 	}
 
     /**
      * Get the number of months left in this contract after the given date. Partial months are counted as
      * full months.
      *
-     * @param date
-     * @return
+     * @param date the date to use in the calculation
+     * @return the number of months left
      */
 	public int getMonthsLeft(Date date) {
 		GregorianCalendar cal = new GregorianCalendar();
@@ -671,10 +681,7 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
             } else if (wn2.getNodeName().equalsIgnoreCase("salvagePct")) {
                 salvagePct = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("salvageExchange")) {
-                if (wn2.getTextContent().trim().equals("true"))
-                    salvageExchange = true;
-                else
-                    salvageExchange = false;
+                salvageExchange = wn2.getTextContent().trim().equals("true");
             } else if (wn2.getNodeName().equalsIgnoreCase("straightSupport")) {
                 straightSupport = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("battleLossComp")) {
@@ -688,10 +695,7 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
             } else if (wn2.getNodeName().equalsIgnoreCase("signBonus")) {
                 signBonus = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("mrbcFee")) {
-                if (wn2.getTextContent().trim().equals("true"))
-                    mrbcFee = true;
-                else
-                    mrbcFee = false;
+                mrbcFee = wn2.getTextContent().trim().equals("true");
             } else if (wn2.getNodeName().equalsIgnoreCase("advanceAmount")) {
                 advanceAmount = Long.parseLong(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("signingAmount")) {

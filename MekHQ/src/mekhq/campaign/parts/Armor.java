@@ -635,7 +635,7 @@ public class Armor extends Part implements IAcquisitionWork {
     }
 
     @Override
-    public boolean isPriceAdustedForAmount() {
+    public boolean isPriceAdjustedForAmount() {
         return true;
     }
 

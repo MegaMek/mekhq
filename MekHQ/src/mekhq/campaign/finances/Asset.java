@@ -32,7 +32,7 @@ import org.w3c.dom.NodeList;
 
 /**
  * An asset is a fake pre-existing asset that a user can enter in order to increase loan
- * collateral and get bigger loans - it is generally for merc campaigns that are just starting out
+ * collateral and get bigger loans - it is generally for mercenary campaigns that are just starting out
  * Assets can also generate income on a schedule
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */

@@ -24,7 +24,6 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Serializable;
-import java.math.RoundingMode;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.DecimalFormat;
@@ -37,7 +36,6 @@ import java.util.GregorianCalendar;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
-import org.joda.money.BigMoney;
 import org.joda.money.Money;
 import org.joda.money.MoneyUtils;
 import org.w3c.dom.DOMException;
@@ -114,15 +112,13 @@ public class Finances implements Serializable {
     }
 
     public Money getBalance() {
-        BigMoney balance = BigMoney.zero(CurrencyManager.getInstance().getDefaultCurrency());
-        balance.plus(transactions.stream().map(x -> x.getAmount()).collect(Collectors.toList()));
-        return balance.toMoney(RoundingMode.HALF_EVEN);
+        Money balance = Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
+        return balance.plus(transactions.stream().map(Transaction::getAmount).collect(Collectors.toList()));
     }
 
     public Money getLoanBalance() {
-        BigMoney balance = BigMoney.zero(CurrencyManager.getInstance().getDefaultCurrency());
-        balance.plus(loans.stream().map(x -> x.getRemainingValue()).collect(Collectors.toList()));
-        return balance.toMoney(RoundingMode.HALF_EVEN);
+        Money balance = Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
+        return balance.plus(loans.stream().map(Loan::getRemainingValue).collect(Collectors.toList()));
     }
 
     public boolean isInDebt() {
@@ -143,11 +139,11 @@ public class Finances implements Serializable {
         return Utilities.getDiffPartialYears(wentIntoDebt, cal);
     }
 
-    public boolean debit(long amount, int category, String reason, Date date) {
-        if (getBalance() < amount) {
+    public boolean debit(Money amount, int category, String reason, Date date) {
+        if (getBalance().isLessThan(amount)) {
             return false;
         }
-        Transaction t = new Transaction(-1 * amount, category, reason, date);
+        Transaction t = new Transaction(amount.multipliedBy(-1), category, reason, date);
         transactions.add(t);
         if (null != wentIntoDebt && !isInDebt()) {
             wentIntoDebt = null;
@@ -156,7 +152,7 @@ public class Finances implements Serializable {
         return true;
     }
 
-    public void credit(long amount, int category, String reason, Date date) {
+    public void credit(Money amount, int category, String reason, Date date) {
         Transaction t = new Transaction(amount, category, reason, date);
         transactions.add(t);
         if (null == wentIntoDebt && isInDebt()) {
@@ -171,8 +167,8 @@ public class Finances implements Serializable {
      * in order to keep the transaction record from becoming too large
      */
     public void newFiscalYear(Date date) {
-        long carryover = getBalance();
-        transactions = new ArrayList<Transaction>();
+        Money carryover = getBalance();
+        transactions = new ArrayList<>();
         credit(carryover, Transaction.C_START, resourceMap.getString("Carryover.text"), date);
     }
 
@@ -227,10 +223,7 @@ public class Finances implements Serializable {
                 SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
                 try {
                     retVal.wentIntoDebt = df.parse(wn2.getTextContent().trim());
-                } catch (DOMException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                } catch (ParseException e) {
+                } catch (DOMException | ParseException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
@@ -250,7 +243,7 @@ public class Finances implements Serializable {
         GregorianCalendar calendar = campaign.getCalendar();
 
         // check for a new year
-        if (calendar.get(Calendar.MONTH) == 0 && calendar.get(Calendar.DAY_OF_MONTH) == 1) {
+        if (calendar.get(Calendar.MONTH) == Calendar.JANUARY && calendar.get(Calendar.DAY_OF_MONTH) == 1) {
             // clear the ledger
             newFiscalYear(calendar.getTime());
         }
@@ -362,36 +355,36 @@ public class Finances implements Serializable {
             }
         }
 
-            ArrayList<Loan> newLoans = new ArrayList<Loan>();
-            for (Loan loan : loans) {
-                if (loan.checkLoanPayment(campaign.getCalendar())) {
-                    if (debit(loan.getPaymentAmount(), Transaction.C_LOAN_PAYMENT,
-                            String.format(resourceMap.getString("Loan.title"), loan.getDescription()),
-                            campaign.getCalendar().getTime())) {
-                        campaign.addReport(String.format(resourceMap.getString("Loan.text"),
-                                DecimalFormat.getInstance().format(loan.getPaymentAmount()), loan.getDescription()));
-                        loan.paidLoan();
-                    } else {
-                        campaign.addReport(String.format(resourceMap.getString("Loan.insufficient"),
-                                loan.getDescription(), DecimalFormat.getInstance().format(loan.getPaymentAmount())));
-                        loan.setOverdue(true);
-                    }
-                }
-                if (loan.getRemainingPayments() > 0) {
-                    newLoans.add(loan);
+        ArrayList<Loan> newLoans = new ArrayList<>();
+        for (Loan loan : loans) {
+            if (loan.checkLoanPayment(campaign.getCalendar())) {
+                if (debit(loan.getPaymentAmount(), Transaction.C_LOAN_PAYMENT,
+                        String.format(resourceMap.getString("Loan.title"), loan.getDescription()),
+                        campaign.getCalendar().getTime())) {
+                    campaign.addReport(String.format(resourceMap.getString("Loan.text"),
+                            DecimalFormat.getInstance().format(loan.getPaymentAmount()), loan.getDescription()));
+                    loan.paidLoan();
                 } else {
-                    campaign.addReport(String.format(resourceMap.getString("Loan.paid"), loan.getDescription()));
+                    campaign.addReport(String.format(resourceMap.getString("Loan.insufficient"),
+                            loan.getDescription(), DecimalFormat.getInstance().format(loan.getPaymentAmount())));
+                    loan.setOverdue(true);
                 }
             }
-            if (null != wentIntoDebt && !isInDebt()) {
-                wentIntoDebt = null;
+            if (loan.getRemainingPayments() > 0) {
+                newLoans.add(loan);
+            } else {
+                campaign.addReport(String.format(resourceMap.getString("Loan.paid"), loan.getDescription()));
             }
-            loans = newLoans;
+        }
+        if (null != wentIntoDebt && !isInDebt()) {
+            wentIntoDebt = null;
+        }
+        loans = newLoans;
     }
 
-    public long checkOverdueLoanPayments(Campaign campaign) {
-        ArrayList<Loan> newLoans = new ArrayList<Loan>();
-        long overdueAmount = 0;
+    public Money checkOverdueLoanPayments(Campaign campaign) {
+        ArrayList<Loan> newLoans = new ArrayList<>();
+        Money overdueAmount = Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
         for (Loan loan : loans) {
             if(loan.isOverdue()) {
                 if (debit(loan.getPaymentAmount(), Transaction.C_LOAN_PAYMENT,
@@ -401,7 +394,7 @@ public class Finances implements Serializable {
                             DecimalFormat.getInstance().format(loan.getPaymentAmount()), loan.getDescription()));
                     loan.paidLoan();
                 } else {
-                    overdueAmount += loan.getPaymentAmount();
+                    overdueAmount = overdueAmount.plus(loan.getPaymentAmount());
                 }
             }
             if(loan.getRemainingPayments() > 0) {
@@ -441,27 +434,21 @@ public class Finances implements Serializable {
         return failCollateral;
     }
 
-    public long getTotalLoanCollateral() {
-        long amount = 0;
-        for (Loan loan : loans) {
-            amount += loan.getCollateralAmount();
-        }
-        return amount;
+    public Money getTotalLoanCollateral() {
+        Money amount = Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
+        return amount.plus(loans.stream().map(Loan::getCollateralAmount).collect(Collectors.toList()));
     }
 
-    public long getTotalAssetValue() {
-        long amount = 0;
-        for (Asset asset : assets) {
-            amount += asset.getValue();
-        }
-        return amount;
+    public Money getTotalAssetValue() {
+        Money amount = Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
+        return amount.plus(assets.stream().map(Asset::getValue).collect(Collectors.toList()));
     }
 
     public void setAssets(ArrayList<Asset> newAssets) {
         assets = newAssets;
     }
 
-    public long getMaxCollateral(Campaign c) {
+    public Money getMaxCollateral(Campaign c) {
         return c.getTotalEquipmentValue() + getTotalAssetValue() - getTotalLoanCollateral();
     }
     
@@ -473,17 +460,16 @@ public class Finances implements Serializable {
 			CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT.withHeader("Date", "Category", "Description", "Amount", "RunningTotal"));
 			SimpleDateFormat df = new SimpleDateFormat("MM/dd/yyyy");
 			
-			int running_total = 0;
-			for (int i = 0; i < transactions.size(); i++) {
-				running_total += transactions.get(i).getAmount();
-				csvPrinter.printRecord(
-					df.format(transactions.get(i).getDate()),
-					transactions.get(i).getCategoryName(),
-					transactions.get(i).getDescription(),
-					transactions.get(i).getAmount(),
-					running_total
-				);
-			}
+			Money running_total = Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
+            for (Transaction transaction : transactions) {
+                running_total = running_total.plus(transaction.getAmount());
+                csvPrinter.printRecord(
+                        df.format(transaction.getDate()),
+                        transaction.getCategoryName(),
+                        transaction.getDescription(),
+                        transaction.getAmount(),
+                        CurrencyManager.getInstance().getShortUiMoneyFormatter().print(running_total));
+            }
 
 			csvPrinter.flush();
 			csvPrinter.close();

@@ -4668,7 +4668,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setCheckMaintenance(checkMaintenance.isSelected());
         options.setUseQualityMaintenance(useQualityMaintenance.isSelected());
         options.setReverseQualityNames(reverseQualityNames.isSelected());
-        options.setUseUnofficalMaintenance(useUnofficalMaintenance.isSelected());
+        options.setUseUnofficialMaintenance(useUnofficalMaintenance.isSelected());
         options.setMaintenanceBonus((Integer) spnMaintenanceBonus.getModel().getValue());
         options.setMaintenanceCycleDays((Integer) spnMaintenanceDays.getModel().getValue());
         options.setInitBonus(useInitBonusBox.isSelected());

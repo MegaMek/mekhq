@@ -23,6 +23,7 @@ package mekhq.campaign.personnel;
 
 import java.io.PrintWriter;
 import java.io.Serializable;
+import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.function.IntSupplier;
@@ -30,7 +31,11 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import mekhq.campaign.*;
+import mekhq.campaign.finances.CurrencyManager;
 import mekhq.campaign.log.*;
+import org.joda.money.BigMoney;
+import org.joda.money.Money;
+import org.joda.money.MoneyUtils;
 import org.joda.time.DateTime;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -158,7 +163,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
     
     private static final Map<Integer, Integer> MECHWARRIOR_AERO_RANSOM_VALUES;
     private static final Map<Integer, Integer> OTHER_RANSOM_VALUES;
-    
 
     public PersonAwardController awardController;
 
@@ -231,7 +235,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     protected int xp;
     protected int engXp;
     protected int acquisitions;
-    protected int salary;
+    protected Money salary;
     private int hits;
     private int prisonerStatus;
     // Is this person willing to defect? Only for prisoners ...
@@ -275,7 +279,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     // Our rank
     private int rank;
-    private int rankLevel = 0;
+    private int rankLevel;
     // If this Person uses a custom rank system (-1 for no)
     private int rankSystem = -1;
     private Ranks ranks;
@@ -303,7 +307,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     /**
      * * Start Advanced Medical ***
      */
-    private ArrayList<Injury> injuries = new ArrayList<Injury>();
+    private ArrayList<Injury> injuries = new ArrayList<>();
     private Map<BodyLocation, Integer> hitsPerLocation = new EnumMap<>(BodyLocation.class);
     /**
      * * End Advanced Medical ***
@@ -366,8 +370,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
         rankLevel = 0;
         status = S_ACTIVE;
         hits = 0;
-        skills = new Hashtable<String, Skill>();
-        salary = -1;
+        skills = new Hashtable<>();
+        salary = Money.of(CurrencyManager.getInstance().getDefaultCurrency(), -1);
         campaign = c;
         doctorId = null;
         unitId = null;
@@ -376,7 +380,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         toughness = 0;
         biography = "";
         nTasks = 0;
-        personnelLog = new ArrayList<LogEntry>();
+        personnelLog = new ArrayList<>();
         idleMonths = -1;
         daysToWaitForHealing = 15;
         resetMinutesLeft();
@@ -384,8 +388,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         dependent = false;
         commander = false;
         isClanTech = false;
-        techUnitIds = new ArrayList<UUID>();
-        salary = -1;
+        techUnitIds = new ArrayList<>();
         phenotype = PHENOTYPE_NONE;
         originFaction = Faction.getFaction(factionCode);
         clan = originFaction.isClan();
@@ -459,10 +462,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public boolean isPrisoner() {
-        if (prisonerStatus == PRISONER_YES) {
-            return true;
-        }
-        return false;
+        return prisonerStatus == PRISONER_YES;
     }
 
     public void setPrisoner() {
@@ -471,10 +471,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public boolean isBondsman() {
-        if (prisonerStatus == PRISONER_BONDSMAN) {
-            return true;
-        }
-        return false;
+        return prisonerStatus == PRISONER_BONDSMAN;
     }
 
     public void setBondsman() {
@@ -942,8 +939,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
             return null;
         }
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-        String recruitdate = df.format(recruitment.getTime());
-        return recruitdate;
+        return df.format(recruitment.getTime());
     }
 
     public int getAge(GregorianCalendar today) {
@@ -1401,8 +1397,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
                         + "</unitId>");
         }
         pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                    + "<salary>"
-                    + salary
+                    + "<salary version=\"2\">"
+                    + MekHqXmlUtil.getXmlStringFromMoney(salary)
                     + "</salary>");
         pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                     + "<status>"
@@ -1668,7 +1664,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 } else if (wn2.getNodeName().equalsIgnoreCase("willingToDefect")) {
                     retVal.willingToDefect = Boolean.parseBoolean(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("salary")) {
-                    retVal.salary = Integer.parseInt(wn2.getTextContent());
+                    retVal.salary = MekHqXmlUtil.getMoneyFromXmlNode(wn2);
                 } else if (wn2.getNodeName().equalsIgnoreCase("minutesLeft")) {
                     retVal.minutesLeft = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("overtimeLeft")) {
@@ -1942,48 +1938,49 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return retVal;
     }
 
-    public void setSalary(int s) {
+    public void setSalary(Money s) {
         salary = s;
     }
 
-    public int getRawSalary() {
+    public Money getRawSalary() {
         return salary;
     }
 
-    public int getSalary() {
+    public Money getSalary() {
 
         if (isPrisoner() || isBondsman()) {
-            return 0;
+            return Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
         }
 
-        if (salary > -1) {
+        if (MoneyUtils.isPositiveOrZero(salary)) {
             return salary;
         }
 
         //if salary is -1, then use the standard amounts
-        int primaryBase = campaign.getCampaignOptions().getBaseSalary(getPrimaryRole());
-        primaryBase *= campaign.getCampaignOptions().getSalaryXpMultiplier(getExperienceLevel(false));
+        BigMoney primaryBase = campaign.getCampaignOptions().getBaseSalary(getPrimaryRole()).toBigMoney();
+        primaryBase = primaryBase.multipliedBy(campaign.getCampaignOptions().getSalaryXpMultiplier(getExperienceLevel(false)));
         if (hasSkill(SkillType.S_ANTI_MECH) && (getPrimaryRole() == T_INFANTRY || getPrimaryRole() == T_BA)) {
-            primaryBase *= campaign.getCampaignOptions().getSalaryAntiMekMultiplier();
+            primaryBase = primaryBase.multipliedBy(campaign.getCampaignOptions().getSalaryAntiMekMultiplier());
         }
 
-        int secondaryBase = campaign.getCampaignOptions().getBaseSalary(getSecondaryRole()) / 2;
-        secondaryBase *= campaign.getCampaignOptions().getSalaryXpMultiplier(getExperienceLevel(true));
+        BigMoney secondaryBase = campaign.getCampaignOptions().getBaseSalary(getSecondaryRole()).toBigMoney()
+                .dividedBy(2, RoundingMode.HALF_EVEN);
+        secondaryBase = secondaryBase.multipliedBy(campaign.getCampaignOptions().getSalaryXpMultiplier(getExperienceLevel(true)));
         if (hasSkill(SkillType.S_ANTI_MECH) && (getSecondaryRole() == T_INFANTRY || getSecondaryRole() == T_BA)) {
-            secondaryBase *= campaign.getCampaignOptions().getSalaryAntiMekMultiplier();
+            secondaryBase = secondaryBase.multipliedBy(campaign.getCampaignOptions().getSalaryAntiMekMultiplier());
         }
 
-        int totalBase = primaryBase + secondaryBase;
+        BigMoney totalBase = primaryBase.plus(secondaryBase);
 
         if (getRank().isOfficer()) {
-            totalBase *= campaign.getCampaignOptions().getSalaryCommissionMultiplier();
+            totalBase = totalBase.multipliedBy(campaign.getCampaignOptions().getSalaryCommissionMultiplier());
         } else {
-            totalBase *= campaign.getCampaignOptions().getSalaryEnlistedMultiplier();
+            totalBase = totalBase.multipliedBy(campaign.getCampaignOptions().getSalaryEnlistedMultiplier());
         }
 
-        totalBase *= getRank().getPayMultiplier();
+        totalBase = totalBase.multipliedBy(getRank().getPayMultiplier());
 
-        return totalBase;
+        return totalBase.toMoney(RoundingMode.HALF_EVEN);
         //TODO: distinguish dropship, jumpship, and warship crew
         //TODO: Add era mod to salary calc..
     }
@@ -2581,8 +2578,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public TargetRoll getHealingMods(Person doctor) {
-        TargetRoll mods = new TargetRoll(getHealingDifficulty(), "difficulty");
-        return mods;
+        return new TargetRoll(getHealingDifficulty(), "difficulty");
     }
 
     public String fail(int rating) {
@@ -2713,7 +2709,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public ArrayList<SpecialAbility> getEligibleSPAs(boolean generation) {
-        ArrayList<SpecialAbility> eligible = new ArrayList<SpecialAbility>();
+        ArrayList<SpecialAbility> eligible = new ArrayList<>();
         for (Enumeration<IOption> i = getOptions(PilotOptions.LVL3_ADVANTAGES); i.hasMoreElements(); ) {
             IOption ability = i.nextElement();
             if (!ability.booleanValue()) {
@@ -2776,7 +2772,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
      * Returns a string of all the option "codes" for this pilot, for a given group, using sep as the separator
      */
     public String getOptionList(String sep, String grpKey) {
-        StringBuffer adv = new StringBuffer();
+        StringBuilder adv = new StringBuilder();
 
         if (null == sep) {
             sep = "";
@@ -2921,7 +2917,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     public void acquireAbility(String type, String name, Object value) {
         //we might also need to remove some prior abilities
         SpecialAbility spa = SpecialAbility.getAbility(name);
-        Vector<String> toRemove = new Vector<String>();
+        Vector<String> toRemove = new Vector<>();
         if(null != spa) {
             toRemove = spa.getRemovedAbilities();
         }
@@ -3172,7 +3168,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
         }
         if (hasSkill(SkillType.S_TECH_BA) && getSkill(SkillType.S_TECH_BA).getExperienceLevel() > lvl) {
             skill = getSkill(SkillType.S_TECH_BA);
-            lvl = getSkill(SkillType.S_TECH_BA).getExperienceLevel();
         }
         return skill;
     }
@@ -3450,12 +3445,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public ArrayList<LogEntry> getPersonnelLog() {
-        Collections.sort(personnelLog, new Comparator<LogEntry>() {
-            @Override
-            public int compare(final LogEntry u1, final LogEntry u2) {
-                return u1.getDate().compareTo(u2.getDate());
-            }
-        });
+        personnelLog.sort(Comparator.comparing(LogEntry::getDate));
         return personnelLog;
     }
 
@@ -3622,7 +3612,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     public boolean hasInjuryModifiers() {
         return injuries.stream().flatMap(i -> i.getModifiers().stream())
-            .filter(mod -> mod.tags.contains(InjuryType.MODTAG_INJURY)).findFirst().isPresent();
+            .anyMatch(mod -> mod.tags.contains(InjuryType.MODTAG_INJURY));
     }
     
     public boolean hasInjuries(boolean permCheck) {
@@ -3789,7 +3779,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
             while (rankOrder <= rank && rankOrder < Ranks.RC_NUM) {
                 Rank rank = ranks.getAllRanks().get(rankOrder);
                 if (!rank.getName(getProfession()).equals("-")) {
-                    shares++;;
+                    shares++;
                 }
                 rankOrder++;
             }

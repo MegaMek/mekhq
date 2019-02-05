@@ -390,7 +390,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
     }
     
     @Override
-    public boolean isPriceAdustedForAmount() {
+    public boolean isPriceAdjustedForAmount() {
         return true;
     }
 
