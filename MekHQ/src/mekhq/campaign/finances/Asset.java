@@ -26,6 +26,7 @@ import java.io.PrintWriter;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 
+import org.joda.money.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -38,25 +39,18 @@ import org.w3c.dom.NodeList;
 public class Asset implements MekHqXmlSerializable {
 
     private String name;
-    private long value;
+    private Money value;
     //lets only allow monthly and yearly and pay at the first of each
     private int schedule;
-    private long income;
+    private Money income;
     
     public Asset() {
         name = "New Asset";
-        value = 0;
+        value = Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
         schedule = Finances.SCHEDULE_YEARLY;
-        income = 0;
+        income = Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
     }
-    
-    public Asset(String n, long v, long inc, int s) {
-        name = n;
-        schedule = s;
-        value = v;
-        income = inc;
-    }
-    
+
     public String getName() {
         return name;
     }
@@ -65,11 +59,11 @@ public class Asset implements MekHqXmlSerializable {
         name = s;
     }
     
-    public long getValue() {
+    public Money getValue() {
         return value;
     }
     
-    public void setValue(Long l) {
+    public void setValue(Money l) {
         value = l;
     }
     
@@ -81,11 +75,11 @@ public class Asset implements MekHqXmlSerializable {
         schedule = s;
     }
     
-    public long getIncome() {
+    public Money getIncome() {
         return income;
     }
     
-    public void setIncome(long l) {
+    public void setIncome(Money l) {
         income = l;
     }
     
@@ -97,16 +91,16 @@ public class Asset implements MekHqXmlSerializable {
                 +MekHqXmlUtil.escape(name)
                 +"</name>");
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<value>"
-                +value
+                +"<value version=\"2\">"
+                +MekHqXmlUtil.getXmlStringFromMoney(value)
                 +"</value>");
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<schedule>"
                 +schedule
                 +"</schedule>");
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<income>"
-                +income
+                +"<income version=\"2\">"
+                +MekHqXmlUtil.getXmlStringFromMoney(income)
                 +"</income>");
         pw1.println(MekHqXmlUtil.indentStr(indent) + "</asset>");
     }
@@ -120,9 +114,9 @@ public class Asset implements MekHqXmlSerializable {
             if (wn2.getNodeName().equalsIgnoreCase("name")) {
                 retVal.name = wn2.getTextContent();
             } else if (wn2.getNodeName().equalsIgnoreCase("value")) {
-                retVal.value = Long.parseLong(wn2.getTextContent().trim());
+                retVal.value = MekHqXmlUtil.getMoneyFromXmlNode(wn2);
             } else if (wn2.getNodeName().equalsIgnoreCase("income")) {
-                retVal.income = Long.parseLong(wn2.getTextContent().trim());
+                retVal.income = MekHqXmlUtil.getMoneyFromXmlNode(wn2);
             } else if (wn2.getNodeName().equalsIgnoreCase("schedule")) {
                 retVal.schedule = Integer.parseInt(wn2.getTextContent().trim());
             } 

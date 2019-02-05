@@ -147,7 +147,11 @@ public class Transaction implements Serializable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(amount, category, date, description);
+        return Objects.hash(
+                getAmount(),
+                getCategory(),
+                getDate(),
+                getDescription());
     }
 
     @Override
@@ -215,7 +219,7 @@ public class Transaction implements Serializable {
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "<transaction>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<amount version=\"2\">"
-				+CurrencyManager.getInstance().getXmlMoneyFormatter().print(amount)
+				+MekHqXmlUtil.getXmlStringFromMoney(amount)
 				+"</amount>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<description>"
@@ -240,14 +244,7 @@ public class Transaction implements Serializable {
 		for (int x=0; x<nl.getLength(); x++) {
 			Node wn2 = nl.item(x);
 			if (wn2.getNodeName().equalsIgnoreCase("amount")) {
-			    if (wn2.hasAttributes() &&
-                        wn2.getAttributes().getNamedItem("version").getNodeValue().contentEquals("2")) { // version 2 save
-                    retVal.amount = CurrencyManager.getInstance().getXmlMoneyFormatter().parseMoney(wn2.getTextContent().trim());
-                } else { // Old save, transform the long into a Money
-                    retVal.amount = Money.of(
-                            CurrencyManager.getInstance().getDefaultCurrency(),
-                            Long.parseLong(wn2.getTextContent().trim()));
-                }
+			    retVal.amount = MekHqXmlUtil.getMoneyFromXmlNode(wn2);
 			} else if (wn2.getNodeName().equalsIgnoreCase("category")) {
 				retVal.category = Integer.parseInt(wn2.getTextContent().trim());
 			} else if (wn2.getNodeName().equalsIgnoreCase("description")) {

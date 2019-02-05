@@ -24,6 +24,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Serializable;
+import java.math.RoundingMode;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.DecimalFormat;
@@ -34,7 +35,11 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 
+import org.joda.money.BigMoney;
+import org.joda.money.Money;
+import org.joda.money.MoneyUtils;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -97,9 +102,9 @@ public class Finances implements Serializable {
     }
 
     public Finances() {
-        transactions = new ArrayList<Transaction>();
-        loans = new ArrayList<Loan>();
-        assets = new ArrayList<Asset>();
+        transactions = new ArrayList<>();
+        loans = new ArrayList<>();
+        assets = new ArrayList<>();
         loanDefaults = 0;
         failCollateral = 0;
         wentIntoDebt = null;
@@ -108,24 +113,20 @@ public class Finances implements Serializable {
         resourceMap = ResourceBundle.getBundle("mekhq.resources.Finances", new EncodeControl()); //$NON-NLS-1$
     }
 
-    public long getBalance() {
-        long balance = 0;
-        for (Transaction transaction : transactions) {
-            balance += transaction.getAmount();
-        }
-        return balance;
+    public Money getBalance() {
+        BigMoney balance = BigMoney.zero(CurrencyManager.getInstance().getDefaultCurrency());
+        balance.plus(transactions.stream().map(x -> x.getAmount()).collect(Collectors.toList()));
+        return balance.toMoney(RoundingMode.HALF_EVEN);
     }
 
-    public long getLoanBalance() {
-        long balance = 0;
-        for (Loan loan : loans) {
-            balance += loan.getRemainingValue();
-        }
-        return balance;
+    public Money getLoanBalance() {
+        BigMoney balance = BigMoney.zero(CurrencyManager.getInstance().getDefaultCurrency());
+        balance.plus(loans.stream().map(x -> x.getRemainingValue()).collect(Collectors.toList()));
+        return balance.toMoney(RoundingMode.HALF_EVEN);
     }
 
     public boolean isInDebt() {
-        return getLoanBalance() > 0;
+        return MoneyUtils.isPositive(getLoanBalance());
     }
 
     public int getFullYearsInDebt(GregorianCalendar cal) {

@@ -20,7 +20,9 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamResult;
 
+import mekhq.campaign.finances.CurrencyManager;
 import org.apache.commons.text.StringEscapeUtils;
+import org.joda.money.Money;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -659,5 +661,32 @@ public class MekHqXmlUtil {
         String chassis = attrs.getNamedItem("chassis").getTextContent();
         String model = attrs.getNamedItem("model").getTextContent();
         return chassis + " " + model;
+    }
+
+    /**
+     * Parses a node for the money information it contains handling
+     * different save versions
+     * @param node node that contains the money information
+     * @return a money object
+     */
+    public static Money getMoneyFromXmlNode(Node node) {
+        if (node.hasAttributes() &&
+                node.getAttributes().getNamedItem("version").getNodeValue().contentEquals("2")) { // version 2 save
+            return CurrencyManager.getInstance().getXmlMoneyFormatter().parseMoney(node.getTextContent().trim());
+        } else { // Old save, transform the long into a Money
+            return Money.of(
+                    CurrencyManager.getInstance().getDefaultCurrency(),
+                    Long.parseLong(node.getTextContent().trim()));
+        }
+    }
+
+    /**
+     * Transforms a money into a string ready to be written in a XML node
+     * different save versions
+     * @param amount money to transform into a string
+     * @return a string representation of the money
+     */
+    public static String getXmlStringFromMoney(Money amount) {
+        return CurrencyManager.getInstance().getXmlMoneyFormatter().print(amount);
     }
 }
