@@ -83,10 +83,18 @@ ext {
     osxBundleDir = "${buildDir}/osxBundle"
 }
 
-task mmJar (type: Jar) {
+task compileMM (type: GradleBuild) {
+    description = 'Compiles the MM directory for packaging in a Jar'
+    
+    buildFile = "${mmDir}/build.gradle"
+    dir = "${mmDir}"
+    tasks = [ 'compileTestJava' ]
+}
+
+task mmJar (type: Jar, dependsOn: compileMM) {
     archiveName = "MegaMek.jar"
-    from "${mmDir}/build/classes/java/main"
-    from "${mmDir}/build/resources/main"
+    from "${mmDir}/megamek/build/classes/java/main"
+    from "${mmDir}/megamek/build/resources/main"
     manifest {
         attributes "Main-Class": mainClassName
         attributes 'Class-Path' : (project.sourceSets.main.runtimeClasspath.files
@@ -98,7 +106,15 @@ task mmJar (type: Jar) {
     outputs.file jarLocation
 }
 
-task mmlJar (type: Jar) {
+task compileMML (type: GradleBuild) {
+    description = 'Compiles the MML directory for packaging in a Jar'
+    
+    buildFile = "${mmlDir}/build.gradle"
+    dir = "${mmlDir}"
+    tasks = [ 'compileTestJava' ]
+}
+
+task mmlJar (type: Jar, dependsOn: compileMML) {
     archiveName = "MegaMekLab.jar"
     from "${mmlDir}/build/classes/java/main"
     from "${mmlDir}/build/resources/main"
@@ -323,7 +339,6 @@ distributions {
                     .findAll { it.name.endsWith(".jar") && !it.name.toLowerCase().startsWith("megamek") }) {
                 into "${createOSXBundle.jarSubdir}/${lib}" 
             }
-            duplicatesStrategy = 'exclude'
             duplicatesStrategy = 'exclude'
         }
     }
