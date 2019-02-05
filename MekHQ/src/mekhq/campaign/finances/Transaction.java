@@ -27,10 +27,12 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Objects;
 import java.util.Vector;
 
 import mekhq.MekHqXmlUtil;
 
+import org.joda.money.Money;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -62,7 +64,7 @@ public class Transaction implements Serializable {
     public final static int C_NUM            = 16;
 
     public static Vector<String> getCategoryList() {
-        Vector<String> out = new Vector<String>();
+        Vector<String> out = new Vector<>();
 
         for (int i = 0; i < C_NUM; i++) {
             out.add(Transaction.getCategoryName(i));
@@ -110,16 +112,16 @@ public class Transaction implements Serializable {
 		}
 	}
 
-	private long amount;
+	private Money amount;
 	private String description;
 	private Date date;
 	private int category;
 	
 	public Transaction() {
-		this(-1,-1,"",null);
+		this(Money.zero(CurrencyManager.getInstance().getDefaultCurrency()),-1,"",null);
 	}
 	
-	public Transaction(long a, int c, String d, Date dt) {
+	public Transaction(Money a, int c, String d, Date dt) {
 		amount = a;
 		category = c;
 		description = d;
@@ -145,13 +147,7 @@ public class Transaction implements Serializable {
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + (int) (amount ^ (amount >>> 32));
-        result = prime * result + category;
-        result = prime * result + ((date == null) ? 0 : date.hashCode());
-        result = prime * result + ((description == null) ? 0 : description.hashCode());
-        return result;
+        return Objects.hash(amount, category, date, description);
     }
 
     @Override
@@ -173,18 +169,17 @@ public class Transaction implements Serializable {
         } else if (!date.equals(other.date))
             return false;
         if (description == null) {
-            if (other.description != null)
-                return false;
-        } else if (!description.equals(other.description))
-            return false;
-        return true;
+            return other.description == null;
+        } else {
+            return description.equals(other.description);
+        }
     }
 
-    public Long getAmount() {
+    public Money getAmount() {
 		return amount;
 	}
 	
-	public void setAmount(long a) {
+	public void setAmount(Money a) {
 		this.amount = a;
 	}
 	
@@ -219,8 +214,8 @@ public class Transaction implements Serializable {
 	protected void writeToXml(PrintWriter pw1, int indent) {
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "<transaction>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<amount>"
-				+amount
+				+"<amount version=\"2\">"
+				+CurrencyManager.getInstance().getXmlMoneyFormatter().print(amount)
 				+"</amount>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<description>"
@@ -245,7 +240,14 @@ public class Transaction implements Serializable {
 		for (int x=0; x<nl.getLength(); x++) {
 			Node wn2 = nl.item(x);
 			if (wn2.getNodeName().equalsIgnoreCase("amount")) {
-				retVal.amount = Long.parseLong(wn2.getTextContent().trim());
+			    if (wn2.hasAttributes() &&
+                        wn2.getAttributes().getNamedItem("version").getNodeValue().contentEquals("2")) { // version 2 save
+                    retVal.amount = CurrencyManager.getInstance().getXmlMoneyFormatter().parseMoney(wn2.getTextContent().trim());
+                } else { // Old save, transform the long into a Money
+                    retVal.amount = Money.of(
+                            CurrencyManager.getInstance().getDefaultCurrency(),
+                            Long.parseLong(wn2.getTextContent().trim()));
+                }
 			} else if (wn2.getNodeName().equalsIgnoreCase("category")) {
 				retVal.category = Integer.parseInt(wn2.getTextContent().trim());
 			} else if (wn2.getNodeName().equalsIgnoreCase("description")) {
@@ -254,14 +256,11 @@ public class Transaction implements Serializable {
 				SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 				try {
 					retVal.date = df.parse(wn2.getTextContent().trim());
-				} catch (DOMException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (ParseException e) {
+				} catch (DOMException | ParseException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-			}
+            }
 		}
 		return retVal;
 	}
