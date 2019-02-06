@@ -24,6 +24,8 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 import java.util.GregorianCalendar;
 
+import mekhq.campaign.finances.CurrencyManager;
+import org.joda.money.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -118,8 +120,10 @@ public class EnginePart extends Part {
 	}
 
 	@Override
-	public long getStickerPrice() {
-		return (long)Math.round((getEngine().getBaseCost()/75.0) * getEngine().getRating() * getUnitTonnage());
+	public Money getStickerPrice() {
+		return Money.of(
+		        CurrencyManager.getInstance().getDefaultCurrency(),
+                (double)getEngine().getBaseCost() / 75.0 * getEngine().getRating() * getUnitTonnage());
 	}
 	
 	@Override
@@ -203,11 +207,7 @@ public class EnginePart extends Part {
 			} else if (wn2.getNodeName().equalsIgnoreCase("engineFlags")) {
 				engineFlags = Integer.parseInt(wn2.getTextContent());
 			} else if (wn2.getNodeName().equalsIgnoreCase("forHover")) {
-				if(wn2.getTextContent().equalsIgnoreCase("true")) {
-					forHover = true;
-				} else {
-					forHover = false;
-				}
+                forHover = wn2.getTextContent().equalsIgnoreCase("true");
 			}
 		}
 

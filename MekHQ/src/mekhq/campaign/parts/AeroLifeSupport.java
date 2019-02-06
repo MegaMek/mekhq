@@ -23,6 +23,8 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import mekhq.campaign.finances.CurrencyManager;
+import org.joda.money.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -46,7 +48,7 @@ public class AeroLifeSupport extends Part {
 	 */
 	private static final long serialVersionUID = -717866644605314883L;
 
-	private long cost;
+	private Money cost;
 	private boolean fighter;
 	
 	static final TechAdvancement TECH_ADVANCEMENT = new TechAdvancement(TECH_BASE_ALL)
@@ -55,10 +57,10 @@ public class AeroLifeSupport extends Part {
 	        .setStaticTechLevel(SimpleTechLevel.STANDARD);
 		
 	public AeroLifeSupport() {
-    	this(0, 0, false, null);
+    	this(0, Money.zero(CurrencyManager.getInstance().getDefaultCurrency()), false, null);
     }
     
-    public AeroLifeSupport(int tonnage, long cost, boolean f, Campaign c) {
+    public AeroLifeSupport(int tonnage, Money cost, boolean f, Campaign c) {
         super(tonnage, c);
         this.cost = cost;
         this.name = "Fighter Life Support";
@@ -87,7 +89,6 @@ public class AeroLifeSupport extends Part {
 						&& hits > priorHits 
 						&& Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
 				 remove(false);
-				 return;
 			 }
 		}	
 	}
@@ -193,16 +194,16 @@ public class AeroLifeSupport extends Part {
 	}
 
 	@Override
-	public long getStickerPrice() {
+	public Money getStickerPrice() {
 		return cost;
 	}
 	
 	public void calculateCost() {
 		if(fighter) {
-			cost = 50000;
+			cost = Money.of(CurrencyManager.getInstance().getDefaultCurrency(), 50000);
 		}
 		if(null != unit) {
-			cost = 5000 * (((Aero)unit.getEntity()).getNCrew() + ((Aero)unit.getEntity()).getNPassenger());
+			cost = Money.of(CurrencyManager.getInstance().getDefaultCurrency(), 5000.0 * (((Aero)unit.getEntity()).getNCrew() + ((Aero)unit.getEntity()).getNPassenger()));
 		}	
 	}
 
@@ -229,8 +230,8 @@ public class AeroLifeSupport extends Part {
 				+fighter
 				+"</fighter>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<cost>"
-				+cost
+				+"<cost version=\"2\">"
+				+ MekHqXmlUtil.getXmlStringFromMoney(cost)
 				+"</cost>");
 		writeToXmlEnd(pw1, indent);
 	}
@@ -242,14 +243,10 @@ public class AeroLifeSupport extends Part {
 		for (int x=0; x<nl.getLength(); x++) {
 			Node wn2 = nl.item(x);		
 			if (wn2.getNodeName().equalsIgnoreCase("fighter")) {
-				if(wn2.getTextContent().trim().equalsIgnoreCase("true")) {
-					fighter = true;
-				} else {
-					fighter = false;
-				}
+                fighter = wn2.getTextContent().trim().equalsIgnoreCase("true");
 			}
 			else if (wn2.getNodeName().equalsIgnoreCase("cost")) {
-				cost = Long.parseLong(wn2.getTextContent());
+				cost = MekHqXmlUtil.getMoneyFromXmlNode(wn2);
 			} 
 		}
 	}

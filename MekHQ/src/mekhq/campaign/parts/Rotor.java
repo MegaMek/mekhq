@@ -26,6 +26,8 @@ import megamek.common.SimpleTechLevel;
 import megamek.common.TechAdvancement;
 import megamek.common.VTOL;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.finances.CurrencyManager;
+import org.joda.money.Money;
 
 /**
  *
@@ -167,8 +169,10 @@ public class Rotor extends TankLocation {
 	}
 
 	@Override
-	public long getStickerPrice() {
-		return (long)(40000 * getTonnage());
+	public Money getStickerPrice() {
+        return Money.of(
+                CurrencyManager.getInstance().getDefaultCurrency(),
+		        40000 * getTonnage());
 	}
 	
 	@Override

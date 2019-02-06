@@ -39,6 +39,7 @@ import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.event.MarketNewPersonnelEvent;
 import mekhq.campaign.event.NewDayEvent;
+import mekhq.campaign.finances.CurrencyManager;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
@@ -47,6 +48,7 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.IUnitGenerator;
 import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.campaign.universe.UnitGeneratorParameters;
+import org.joda.money.Money;
 
 /**
  * Main engine of the Against the Bot campaign system.
@@ -72,7 +74,7 @@ public class AtBEventProcessor {
         // TODO: move code from Campaign here
         if (campaign.getPersonnelMarket().getPaidRecruitment()
                 && campaign.getCalendar().get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY) {
-            if (campaign.getFinances().debit(100000, Transaction.C_MISC,
+            if (campaign.getFinances().debit(Money.of(CurrencyManager.getInstance().getDefaultCurrency(), 100000), Transaction.C_MISC,
                     "Paid recruitment roll", campaign.getDate())) {
                 doPaidRecruitment();
             } else {

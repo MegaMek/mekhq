@@ -23,6 +23,8 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import mekhq.campaign.finances.CurrencyManager;
+import org.joda.money.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -93,7 +95,6 @@ public class AeroHeatSink extends Part {
                     && hits > priorHits 
                     && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
                 remove(false);
-                return;
             }
         }
     }
@@ -172,11 +173,11 @@ public class AeroHeatSink extends Part {
     }
 
     @Override
-    public long getStickerPrice() {
+    public Money getStickerPrice() {
         if(type == Aero.HEAT_DOUBLE) {
-            return isOmniPodded()? 7500 : 6000;
+            return Money.of(CurrencyManager.getInstance().getDefaultCurrency(), isOmniPodded()? 7500 : 6000);
         } else {
-            return isOmniPodded()? 2500 : 2000;
+            return Money.of(CurrencyManager.getInstance().getDefaultCurrency(), isOmniPodded()? 2500 : 2000);
         }
     }
 

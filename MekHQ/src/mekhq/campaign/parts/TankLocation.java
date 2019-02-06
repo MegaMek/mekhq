@@ -23,6 +23,8 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import mekhq.campaign.finances.CurrencyManager;
+import org.joda.money.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -277,9 +279,9 @@ public class TankLocation extends Part {
 	}
 
 	@Override
-	public long getStickerPrice() {
+	public Money getStickerPrice() {
 		// TODO Auto-generated method stub
-		return 0;
+		return Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
 	}
 	
 	@Override

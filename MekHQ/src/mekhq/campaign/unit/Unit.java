@@ -4478,20 +4478,20 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         return Math.round(partsCost);
     }
 
-    public long getAmmoCost() {
-        double ammoCost = 0;
+    public Money getAmmoCost() {
+        Money ammoCost = Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
 
         for (Part p : getParts()) {
             if (p instanceof EquipmentPart && ((EquipmentPart)p).getType() instanceof AmmoType) {
-                ammoCost += p.getStickerPrice();
+                ammoCost = ammoCost.plus(p.getStickerPrice());
             }
         }
 
-        return Math.round(ammoCost * .25);
+        return ammoCost.multipliedBy(0.25, RoundingMode.HALF_EVEN);
     }
 
     public Money getFuelCost() {
-        BigMoney fuelCost = BigMoney.of(CurrencyManager.getInstance().getDefaultCurrency());
+        Money fuelCost = Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
 
         if ((entity instanceof Warship) || (entity instanceof SmallCraft) ) {
             fuelCost = fuelCost.plus(getTonsBurnDay(entity));
@@ -4507,7 +4507,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             fuelCost = fuelCost.plus(getInfantryFuelCost(entity));
         }
 
-        return fuelCost.toMoney(RoundingMode.HALF_EVEN);
+        return fuelCost;
     }
 
     public double getTonsBurnDay(Entity e) {

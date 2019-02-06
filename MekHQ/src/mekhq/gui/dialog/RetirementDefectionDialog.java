@@ -54,6 +54,7 @@ import megamek.common.TargetRoll;
 import megamek.common.UnitType;
 import megamek.common.util.EncodeControl;
 import mekhq.Utilities;
+import mekhq.campaign.finances.CurrencyManager;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
@@ -69,6 +70,7 @@ import mekhq.gui.sorter.BonusSorter;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.RankSorter;
 import mekhq.gui.sorter.WeightClassSorter;
+import org.joda.money.Money;
 
 /**
  * @author Neoancient
@@ -725,9 +727,9 @@ public class RetirementDefectionDialog extends JDialog {
 		return Math.max(0, retVal);
 	}
 
-	public long totalPayout() {
+	public Money totalPayout() {
 		if (null == rdTracker.getRetirees(contract)) {
-			return 0;
+			return Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
 		}
 		long retVal = 0;
 		for (UUID id : rdTracker.getRetirees(contract)) {

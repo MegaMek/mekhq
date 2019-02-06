@@ -23,6 +23,8 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import mekhq.campaign.finances.CurrencyManager;
+import org.joda.money.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -44,13 +46,13 @@ public class MissingAeroLifeSupport extends MissingPart {
 	private static final long serialVersionUID = 2806921577150714477L;
 
 	private boolean fighter;
-	private long cost;
+	private Money cost;
 	
 	public MissingAeroLifeSupport() {
-    	this(0, 0, false, null);
+    	this(0, Money.zero(CurrencyManager.getInstance().getDefaultCurrency()), false, null);
     }
     
-	 public MissingAeroLifeSupport(int tonnage, long cost, boolean f, Campaign c) {
+	 public MissingAeroLifeSupport(int tonnage, Money cost, boolean f, Campaign c) {
 		 super(tonnage, c);
 		 this.cost = cost;
 		 this.name = "Fighter Life Support";
@@ -123,8 +125,8 @@ public class MissingAeroLifeSupport extends MissingPart {
 				+fighter
 				+"</fighter>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<cost>"
-				+cost
+				+"<cost version=\"2\">"
+				+ MekHqXmlUtil.getXmlStringFromMoney(cost)
 				+"</cost>");
 		writeToXmlEnd(pw1, indent);
 	}
@@ -136,14 +138,10 @@ public class MissingAeroLifeSupport extends MissingPart {
 		for (int x=0; x<nl.getLength(); x++) {
 			Node wn2 = nl.item(x);		
 			if (wn2.getNodeName().equalsIgnoreCase("fighter")) {
-				if(wn2.getTextContent().trim().equalsIgnoreCase("true")) {
-					fighter = true;
-				} else {
-					fighter = false;
-				}
+                fighter = wn2.getTextContent().trim().equalsIgnoreCase("true");
 			}
 			else if (wn2.getNodeName().equalsIgnoreCase("cost")) {
-				cost = Long.parseLong(wn2.getTextContent());
+				cost = MekHqXmlUtil.getMoneyFromXmlNode(wn2);
 			} 
 		}
 	}

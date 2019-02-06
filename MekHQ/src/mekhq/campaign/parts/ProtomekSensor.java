@@ -23,6 +23,8 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import mekhq.campaign.finances.CurrencyManager;
+import org.joda.money.Money;
 import org.w3c.dom.Node;
 
 import megamek.common.Compute;
@@ -64,8 +66,10 @@ public class ProtomekSensor extends Part {
     }
 
     @Override
-    public long getStickerPrice() {
-        return getUnitTonnage() * 2000;
+    public Money getStickerPrice() {
+        return Money.of(
+                CurrencyManager.getInstance().getDefaultCurrency(),
+                getUnitTonnage() * 2000);
     }
 
     @Override
@@ -133,7 +137,6 @@ public class ProtomekSensor extends Part {
 					&& hits > priorHits
 					&& Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
 				remove(false);
-				return;
 			}
         }
     }

@@ -171,11 +171,7 @@ public class MissingAmmoBin extends MissingEquipmentPart {
 			} else if (wn2.getNodeName().equalsIgnoreCase("daysToWait")) {
                 daysToWait = Integer.parseInt(wn2.getTextContent());
 			} else if (wn2.getNodeName().equalsIgnoreCase("oneShot")) {
-				if(wn2.getTextContent().equalsIgnoreCase("true")) {
-					oneShot = true;
-				} else {
-					oneShot = false;
-				}
+                oneShot = wn2.getTextContent().equalsIgnoreCase("true");
 			} 
 		}
 		restore();

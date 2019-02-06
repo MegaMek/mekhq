@@ -24,6 +24,8 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 
+import mekhq.campaign.finances.CurrencyManager;
+import org.joda.money.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -73,7 +75,7 @@ public class BattleArmorSuit extends Part {
     protected int jumpMP;
     protected EntityMovementMode jumpType;
     protected int weightClass;
-    private long alternateCost;
+    private Money alternateCost;
     private double alternateTon;
     private int introYear;
 
@@ -231,50 +233,49 @@ public class BattleArmorSuit extends Part {
     }
 
     @Override
-    public long getStickerPrice() {
+    public Money getStickerPrice() {
     	//if there are no linked parts and the unit is null,
         //then use the pre-recorded alternate costs
         if(null == unit && childPartIds.size()==0) {
         	return alternateCost;
         }
-        long cost = 0;
+        Money cost = Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
         switch(weightClass) {
         case EntityWeightClass.WEIGHT_MEDIUM:
-            cost += 100000;
+            cost = cost.plus(100000);
             if(jumpType == EntityMovementMode.VTOL) {
-                cost += jumpMP * 100000;
+                cost = cost.plus(jumpMP * 100000);
             } else {
-                cost += jumpMP * 75000;
+                cost = cost.plus(jumpMP * 75000);
             }
             break;
         case EntityWeightClass.WEIGHT_HEAVY:
-            cost += 200000;
+            cost = cost.plus(200000);
             if(jumpType == EntityMovementMode.INF_UMU) {
-                cost += jumpMP * 100000;
+                cost = cost.plus(jumpMP * 100000);
             } else {
-                cost += jumpMP * 150000;
+                cost = cost.plus(jumpMP * 150000);
             }
             break;
         case EntityWeightClass.WEIGHT_ASSAULT:
-            cost += 400000;
+            cost = cost.plus(400000);
             if(jumpType == EntityMovementMode.INF_UMU) {
-                cost += jumpMP * 150000;
+                cost = cost.plus(jumpMP * 150000);
             } else {
-                cost += jumpMP * 300000;
+                cost = cost.plus(jumpMP * 300000);
             }
             break;
         default:
-            cost += 50000;
-            cost += 50000 * jumpMP;
+            cost = cost.plus(50000 * (jumpMP + 1));
         }
-        cost += 25000 * (groundMP-1);
+        cost = cost.plus(25000 * (groundMP-1));
         for(int childId : childPartIds) {
         	Part p = campaign.getPart(childId);
         	if(null != p) {
         		if(p instanceof BaArmor) {
-        			cost += p.getCurrentValue();
+        			cost = cost.plus(p.getCurrentValue());
         		} else if (!(p instanceof BattleArmorSuit)) {
-                    cost += p.getStickerPrice();
+                    cost = cost.plus(p.getStickerPrice());
         		}
         	}
         }
@@ -283,14 +284,16 @@ public class BattleArmorSuit extends Part {
     }
 
     private void initializeExtraCostsAndTons() {
-    	alternateCost = 0;
+    	alternateCost = Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
     	alternateTon = 0;
     	//simplest way to do this is just get the full cost and tonnage of a new unit and divide by
     	//squad size
     	MechSummary summary = MechSummaryCache.getInstance().getMech(getChassis() + " " + getModel());
  		if(null != summary) {
- 			int squadSize = summary.getArmorTypes().length - 1;
- 		    alternateCost = summary.getAlternateCost()/squadSize;
+ 			double squadSize = summary.getArmorTypes().length - 1;
+ 		    alternateCost = Money.of(
+ 		                        CurrencyManager.getInstance().getDefaultCurrency(),
+                                (double)summary.getAlternateCost()/squadSize);
  		    alternateTon = summary.getSuitWeight();
  		    introYear = summary.getYear();
  		}
@@ -370,8 +373,8 @@ public class BattleArmorSuit extends Part {
                 +MekHqXmlUtil.escape(EntityMovementMode.token(jumpType))
                 +"</jumpType>");
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<alternateCost>"
-                +alternateCost
+                +"<alternateCost version=\"2\">"
+                +MekHqXmlUtil.getXmlStringFromMoney(alternateCost)
                 +"</alternateCost>");
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<alternateTon>"
@@ -405,7 +408,7 @@ public class BattleArmorSuit extends Part {
             } else if (wn2.getNodeName().equalsIgnoreCase("jumpType")) {
                 jumpType = EntityMovementMode.type(MekHqXmlUtil.unEscape(wn2.getTextContent()));
             } else if (wn2.getNodeName().equalsIgnoreCase("alternateCost")) {
-                alternateCost = Long.parseLong(wn2.getTextContent());
+                alternateCost = MekHqXmlUtil.getMoneyFromXmlNode(wn2);
             } else if (wn2.getNodeName().equalsIgnoreCase("alternateTon")) {
             	alternateTon = Double.parseDouble(wn2.getTextContent());
             }
@@ -427,7 +430,7 @@ public class BattleArmorSuit extends Part {
 
     @Override
     public void remove(boolean salvage) {
-        ArrayList<Part> trooperParts = new ArrayList<Part>();
+        ArrayList<Part> trooperParts = new ArrayList<>();
         if(null != unit) {
             Person trooperToRemove = null;
             if(unit.getEntity().getInternal(trooper) > 0) {
@@ -494,11 +497,9 @@ public class BattleArmorSuit extends Part {
             if(unit.getEntity().getInternal(trooper) == IArmorState.ARMOR_DESTROYED) {
             	if(!checkForDestruction) {
             		remove(false);
-            		return;
             	} else {
             		if(Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
             			remove(false);
-                		return;
             		} else {
             			//it seems a little weird to change the entity here, but no other
             			//way to guarantee this happens

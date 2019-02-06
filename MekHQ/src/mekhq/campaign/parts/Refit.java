@@ -26,6 +26,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.PrintWriter;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -36,6 +37,8 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import mekhq.campaign.finances.CurrencyManager;
+import org.joda.money.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -119,7 +122,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 	private int refitClass;
 	private int time;
 	private int timeSpent;
-	private long cost;
+	private Money cost;
 	private boolean failedCheck;
 	private boolean customJob;
 	private boolean isRefurbishing;
@@ -200,7 +203,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 		return refitClass;
 	}
 
-	public long getCost() {
+	public Money getCost() {
 		return cost;
 	}
 
@@ -209,8 +212,8 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 	}
 
 	public String[] getShoppingListDescription() {
-		Hashtable<String,Integer> tally = new Hashtable<String,Integer>();
-	    Hashtable<String,String> desc = new Hashtable<String,String>();
+		Hashtable<String,Integer> tally = new Hashtable<>();
+	    Hashtable<String,String> desc = new Hashtable<>();
 		for(Part p : shoppingList) {
 		    if(p instanceof Armor) {
 		        continue;
@@ -265,9 +268,9 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 		boolean replacingLocations = false;
 		boolean[] locationHasNewStuff = new boolean[Math.max(newEntity.locations(), oldUnit.getEntity().locations())];
 		boolean[] locationLostOldStuff = new boolean[Math.max(newEntity.locations(), oldUnit.getEntity().locations())];
-		HashMap<AmmoType,Integer> ammoNeeded = new HashMap<AmmoType,Integer>();
-		HashMap<AmmoType,Integer> ammoRemoved = new HashMap<AmmoType,Integer>();
-		ArrayList<Part> newPartList = new ArrayList<Part>();
+		HashMap<AmmoType,Integer> ammoNeeded = new HashMap<>();
+		HashMap<AmmoType,Integer> ammoRemoved = new HashMap<>();
+		ArrayList<Part> newPartList = new ArrayList<>();
 
 		//Step 1: put all of the parts from the current unit into a new arraylist so they can
 		//be removed when we find a match.
@@ -442,13 +445,13 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 		//at the same time, check spare parts for new equipment
 
 		//first put oldUnitParts in a new arraylist so they can be removed as we find them
-		ArrayList<Integer> tempParts = new ArrayList<Integer>();
+		ArrayList<Integer> tempParts = new ArrayList<>();
 		tempParts.addAll(oldUnitParts);
 
 		armorNeeded = 0;
 		int atype = 0;
 		boolean aclan = false;
-		HashMap<Integer,Integer> partQuantity = new HashMap<Integer,Integer>();
+		HashMap<Integer,Integer> partQuantity = new HashMap<>();
 		for(Part nPart : newPartList) {
 			//TODO: I don't think we need this here anymore
 			nPart.setUnit(oldUnit);
@@ -476,7 +479,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 					replacement = ((MissingPart)nPart).getNewPart();
 					//set entity for variable cost items
 					replacement.setUnit(newUnit);
-					cost += replacement.getActualValue();
+					cost = cost.plus(replacement.getActualValue());
 					shoppingList.add(nPart);
 				}
 			} else if(nPart instanceof Armor) {
@@ -736,7 +739,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 		}
 
 		if(sameArmorType) {
-			//if this is the same armor type then we can recyle armor
+			//if this is the same armor type then we can recycle armor
 			armorNeeded -= recycledArmorPoints;
 		}
 		if(armorNeeded > 0) {
@@ -750,7 +753,12 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 				tonnageNeeded = Math.max(0, tonnageNeeded - existingArmorSupplies.getTonnage());
 			}
 			newArmorSupplies.setUnit(oldUnit);
-			cost += newArmorSupplies.getStickerPrice() * (tonnageNeeded / 5.0);
+			cost = cost.plus(newArmorSupplies
+                                .getStickerPrice()
+                                .toBigMoney()
+                                .multipliedBy(tonnageNeeded)
+                                .dividedBy(5.0, RoundingMode.HALF_EVEN)
+                                .toMoney());
 			newArmorSupplies.setUnit(null);
 		}
 
@@ -759,7 +767,9 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 		for(AmmoType type : ammoNeeded.keySet()) {
 			int shotsNeeded = Math.max(ammoNeeded.get(type) - getAmmoAvailable(type), 0);
 			int shotsPerTon = type.getShots();
-			cost += type.getCost(newEntity, false, -1) * ((double)shotsNeeded/shotsPerTon);
+			cost = cost.plus(Money.of(
+			        CurrencyManager.getInstance().getDefaultCurrency(),
+                    type.getCost(newEntity, false, -1) * ((double)shotsNeeded/shotsPerTon)));
 		}
 		
 		/*
@@ -836,7 +846,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 		//multiply time by refit class
 		time *= getTimeMultiplier();
 		if(!customJob) {
-			cost *= 1.1;
+			cost = cost.multipliedBy(1.1, RoundingMode.HALF_EVEN);
 		}
 
 		//TODO: track the number of locations changed so we can get stuff for omnis
@@ -894,7 +904,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
             }
 
             // The cost is equal to 10 percent of the units base value (not modified for quality).
-            cost = (long) (oldUnit.getBuyCost() * .1);
+            cost = oldUnit.getBuyCost().multipliedBy(0.1, RoundingMode.HALF_EVEN);
         }
 	}
 
@@ -1666,7 +1676,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 
 	@Override
 	public String getDetails() {
-		return "(" + getRefitClassName() + "/" + getTimeLeft() + " minutes/" + Utilities.getCurrencyString(getCost()) + ")";
+		return "(" + getRefitClassName() + "/" + getTimeLeft() + " minutes/" + CurrencyManager.getInstance().getShortUiMoneyFormatter().print(getCost()) + ")";
 	}
 
 	@Override
@@ -1694,7 +1704,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 				+ "</timeSpent>");
 		pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<refitClass>" + refitClass
 				+ "</refitClass>");
-		pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<cost>" + cost
+		pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<cost version=\"2\">" + MekHqXmlUtil.getXmlStringFromMoney(cost)
 				+ "</cost>");
 		pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<failedCheck>" + failedCheck
 				+ "</failedCheck>");
@@ -1773,7 +1783,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
                 } else if (wn2.getNodeName().equalsIgnoreCase("daysToWait")) {
                     retVal.daysToWait = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("cost")) {
-					retVal.cost = Long.parseLong(wn2.getTextContent());
+					retVal.cost = MekHqXmlUtil.getMoneyFromXmlNode(wn2);
 				} else if (wn2.getNodeName().equalsIgnoreCase("newArmorSuppliesId")) {
 					retVal.newArmorSuppliesId = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("assignedTechId")) {
@@ -1939,12 +1949,12 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 		return null;
 	}
 
-	public long getStickerPrice() {
+	public Money getStickerPrice() {
 		return cost;
 	}
 
 	@Override
-	public long getBuyCost() {
+	public Money getBuyCost() {
 	    return getStickerPrice();
 	}
 
@@ -1981,7 +1991,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 		    }
 		    checkForArmorSupplies();
 		}
-		shoppingList = new ArrayList<Part>();
+		shoppingList = new ArrayList<>();
 		kitFound = true;
 	}
 

@@ -29,12 +29,13 @@ import megamek.common.ITechnology;
 import megamek.common.TargetRoll;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
-import mekhq.Utilities;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.finances.CurrencyManager;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
 import mekhq.campaign.work.WorkTime;
+import org.joda.money.Money;
 
 /**
  * A missing part is a placeholder on a unit to indicate that a replacement
@@ -62,13 +63,13 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 	}
 	
 	@Override
-	public long getStickerPrice() {
+	public Money getStickerPrice() {
 		//missing parts aren't worth a thing
-		return 0;
+		return Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
 	}
 	
 	@Override
-	public long getBuyCost() {
+	public Money getBuyCost() {
 	    return getNewPart().getStickerPrice();
 	}
 	
@@ -281,7 +282,7 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 		    }
 		}
 		toReturn += "<br/>";
-		toReturn += Utilities.getCurrencyString(getBuyCost()) + "<br/>";
+		toReturn += CurrencyManager.getInstance().getShortUiMoneyFormatter().print(getBuyCost()) + "<br/>";
 		toReturn += "</font></html>";
 		return toReturn;
 	}

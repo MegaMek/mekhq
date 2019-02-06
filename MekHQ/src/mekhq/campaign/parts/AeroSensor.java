@@ -23,6 +23,8 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import mekhq.campaign.finances.CurrencyManager;
+import org.joda.money.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -79,10 +81,8 @@ public class AeroSensor extends Part {
 					&& (hits < 3 && !campaign.getCampaignOptions().useAeroSystemHits())
                     && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
 				remove(false);
-				return;
 			} else if (hits >= 3) {
                 remove(false);
-                return;
             }
 		}
 	}
@@ -191,11 +191,11 @@ public class AeroSensor extends Part {
 	}
 
 	@Override
-	public long getStickerPrice() {
+	public Money getStickerPrice() {
 		if(largeCraft) {
-			return 80000;
+			return Money.of(CurrencyManager.getInstance().getDefaultCurrency(), 80000);
 		}
-		return 2000 * getUnitTonnage();
+		return Money.of(CurrencyManager.getInstance().getDefaultCurrency(), 2000 * getUnitTonnage());
 	}
 
 	@Override
@@ -230,11 +230,7 @@ public class AeroSensor extends Part {
 		for (int x=0; x<nl.getLength(); x++) {
 			Node wn2 = nl.item(x);		
 			if (wn2.getNodeName().equalsIgnoreCase("dropship")) {
-				if(wn2.getTextContent().trim().equalsIgnoreCase("true")) {
-					largeCraft = true;
-				} else {
-					largeCraft = false;
-				}
+                largeCraft = wn2.getTextContent().trim().equalsIgnoreCase("true");
 			}
 		}
 	}

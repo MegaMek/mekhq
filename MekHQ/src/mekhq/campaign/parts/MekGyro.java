@@ -23,6 +23,8 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import mekhq.campaign.finances.CurrencyManager;
+import org.joda.money.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -42,7 +44,7 @@ public class MekGyro extends Part {
 	private static final long serialVersionUID = 3420475726506139139L;
 	protected int type;
 	protected double gyroTonnage;
-	protected boolean isClan = false;
+	protected boolean isClan;
 
     public MekGyro() {
     	this(0, 0, 0, false, null);
@@ -95,20 +97,16 @@ public class MekGyro extends Part {
     }
 
     @Override
-    public long getStickerPrice() {
-        double c = 0;
-
+    public Money getStickerPrice() {
         if (getType() == Mech.GYRO_XL) {
-            c = 750000 * getTonnage();
+            return Money.of(CurrencyManager.getInstance().getDefaultCurrency(), 750000.0 * getTonnage());
         } else if (getType() == Mech.GYRO_COMPACT) {
-            c = 400000 * getTonnage();
+            return Money.of(CurrencyManager.getInstance().getDefaultCurrency(), 400000.0 * getTonnage());
         } else if (getType() == Mech.GYRO_HEAVY_DUTY) {
-            c = 500000 * getTonnage();
+            return Money.of(CurrencyManager.getInstance().getDefaultCurrency(), 500000.0 * getTonnage());
         } else {
-            c = 300000 * getTonnage();
+            return Money.of(CurrencyManager.getInstance().getDefaultCurrency(), 300000.0 * getTonnage());
         }
-
-        return (long) Math.round(c);
     }
 
     @Override
@@ -200,7 +198,6 @@ public class MekGyro extends Part {
 					&& hits > priorHits && hits >= 3
 					&& Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
 				remove(false);
-				return;
 			}
 		}
 	}

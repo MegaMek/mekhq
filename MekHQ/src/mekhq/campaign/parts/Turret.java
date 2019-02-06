@@ -23,6 +23,8 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import mekhq.campaign.finances.CurrencyManager;
+import org.joda.money.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -234,7 +236,9 @@ public class Turret extends TankLocation {
 	}
 	
 	@Override
-	public long getStickerPrice() {
-		return (long)(5000 * weight);
+	public Money getStickerPrice() {
+        return Money.of(
+                CurrencyManager.getInstance().getDefaultCurrency(),
+		        5000 * weight);
 	}
 }

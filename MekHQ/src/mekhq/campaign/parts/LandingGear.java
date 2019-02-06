@@ -23,6 +23,8 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import mekhq.campaign.finances.CurrencyManager;
+import org.joda.money.Money;
 import org.w3c.dom.Node;
 
 import megamek.common.Aero;
@@ -78,7 +80,6 @@ public class LandingGear extends Part {
 					&& hits > priorHits 
 					&& Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
 				remove(false);
-				return;
 			}
 		}
 	}
@@ -178,8 +179,8 @@ public class LandingGear extends Part {
 	}
 
 	@Override
-	public long getStickerPrice() {
-		return 10 * getUnitTonnage();
+	public Money getStickerPrice() {
+		return Money.of(CurrencyManager.getInstance().getDefaultCurrency(), 10.0 * getUnitTonnage());
 	}
 
 	@Override

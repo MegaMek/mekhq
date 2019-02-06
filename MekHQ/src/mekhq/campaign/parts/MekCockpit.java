@@ -23,6 +23,8 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import mekhq.campaign.finances.CurrencyManager;
+import org.joda.money.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -86,27 +88,27 @@ public class MekCockpit extends Part {
 	}
 	
 	@Override
-	public long getStickerPrice() {
+	public Money getStickerPrice() {
 		switch (type) {
         case Mech.COCKPIT_COMMAND_CONSOLE:
             // 500000 for command console + 200000 for primary cockpit
-            return 700000;
+            return Money.of(CurrencyManager.getInstance().getDefaultCurrency(), 700000);
         case Mech.COCKPIT_SMALL:
-            return 175000;
+            return Money.of(CurrencyManager.getInstance().getDefaultCurrency(), 175000);
         case Mech.COCKPIT_TORSO_MOUNTED:
-            return 750000;
+            return Money.of(CurrencyManager.getInstance().getDefaultCurrency(), 750000);
         case Mech.COCKPIT_STANDARD:
-            return 200000;
+            return Money.of(CurrencyManager.getInstance().getDefaultCurrency(), 200000);
         case Mech.COCKPIT_INDUSTRIAL:
-            return 100000;
+            return Money.of(CurrencyManager.getInstance().getDefaultCurrency(), 100000);
         case Mech.COCKPIT_DUAL:
-            return 40000;
+            return Money.of(CurrencyManager.getInstance().getDefaultCurrency(), 40000);
         case Mech.COCKPIT_VRRP:
-            return 1250000;
+            return Money.of(CurrencyManager.getInstance().getDefaultCurrency(), 1250000);
         case Mech.COCKPIT_QUADVEE:
-            return 375000;
+            return Money.of(CurrencyManager.getInstance().getDefaultCurrency(), 375000);
         default:
-            return 200000;
+            return Money.of(CurrencyManager.getInstance().getDefaultCurrency(), 200000);
 		}
 	}
 
@@ -197,7 +199,6 @@ public class MekCockpit extends Part {
 					&& hits > priorHits 
 					&& Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
 				remove(false);
-				return;
 			}
 		}
 	}

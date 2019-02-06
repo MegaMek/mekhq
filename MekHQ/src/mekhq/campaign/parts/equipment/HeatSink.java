@@ -27,8 +27,10 @@ import megamek.common.EquipmentType;
 import megamek.common.MiscType;
 import megamek.common.Mounted;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.finances.CurrencyManager;
 import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.Part;
+import org.joda.money.Money;
 
 /**
  *
@@ -56,11 +58,11 @@ public class HeatSink extends EquipmentPart {
      *
      */
     @Override
-    public long getStickerPrice() {		
+    public Money getStickerPrice() {
     	if(type.hasFlag(MiscType.F_DOUBLE_HEAT_SINK) || type.hasFlag(MiscType.F_LASER_HEAT_SINK)) {
-    		return isOmniPodded()? 7500 : 6000;
+    		return Money.of(CurrencyManager.getInstance().getDefaultCurrency(), isOmniPodded()? 7500 : 6000);
     	} else {
-    		return isOmniPodded()? 2500 : 2000;
+    		return Money.of(CurrencyManager.getInstance().getDefaultCurrency(), isOmniPodded()? 2500 : 2000);
     	}
     }
 
@@ -85,7 +87,6 @@ public class HeatSink extends EquipmentPart {
 					&& hits > priorHits 
 					&& Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
 				remove(false);
-				return;
 			}
 		}
 	}

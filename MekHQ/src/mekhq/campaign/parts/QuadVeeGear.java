@@ -5,6 +5,8 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import mekhq.campaign.finances.CurrencyManager;
+import org.joda.money.Money;
 import org.w3c.dom.Node;
 
 import megamek.common.CriticalSlot;
@@ -162,7 +164,7 @@ public class QuadVeeGear extends Part {
     }
 
     @Override
-    public long getStickerPrice() {
+    public Money getStickerPrice() {
         /*
          * The cost for conversion equipment is calculated as 10% of the total cost of weapons/equipment
          * and structure. This is unworkable for the conversion gear sticker price, since this
@@ -170,7 +172,9 @@ public class QuadVeeGear extends Part {
          * We will use a general 10,000 * part tonnage and assume the remainder is part of the
          * turret mechanism that is only destroyed if the center torso is destroyed.
          */
-        return (long)Math.ceil(getTonnage() * 10000);
+        return Money.of(
+                CurrencyManager.getInstance().getDefaultCurrency(),
+                getTonnage() * 10000);
     }
 
     @Override

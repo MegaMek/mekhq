@@ -24,6 +24,8 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 import java.text.DecimalFormat;
 
+import mekhq.campaign.finances.CurrencyManager;
+import org.joda.money.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -35,7 +37,6 @@ import megamek.common.Tank;
 import megamek.common.TargetRoll;
 import megamek.common.TechAdvancement;
 import mekhq.MekHqXmlUtil;
-import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.work.IAcquisitionWork;
@@ -84,8 +85,10 @@ public class Armor extends Part implements IAcquisitionWork {
     }
 
     @Override
-    public long getCurrentValue() {
-    	return (long)(getTonnage() * EquipmentType.getArmorCost(type));
+    public Money getCurrentValue() {
+    	return Money.of(
+    	        CurrencyManager.getInstance().getDefaultCurrency(),
+                getTonnage() * EquipmentType.getArmorCost(type));
     }
 
     public double getTonnageNeeded() {
@@ -96,18 +99,22 @@ public class Armor extends Part implements IAcquisitionWork {
         return amountNeeded / armorPerTon;
     }
 
-    public long getValueNeeded() {
-    	return adjustCostsForCampaignOptions((long)(getTonnageNeeded() * EquipmentType.getArmorCost(type)));
+    public Money getValueNeeded() {
+    	return adjustCostsForCampaignOptions(Money.of(
+    	        CurrencyManager.getInstance().getDefaultCurrency(),
+                getTonnageNeeded() * EquipmentType.getArmorCost(type)));
     }
 
     @Override
-    public long getStickerPrice() {
+    public Money getStickerPrice() {
     	//always in 5-ton increments
-    	return (long)(5 * EquipmentType.getArmorCost(type));
+    	return Money.of(
+    	        CurrencyManager.getInstance().getDefaultCurrency(),
+                5 * EquipmentType.getArmorCost(type));
     }
 
     @Override
-    public long getBuyCost() {
+    public Money getBuyCost() {
         return getStickerPrice();
     }
 
@@ -152,7 +159,7 @@ public class Armor extends Part implements IAcquisitionWork {
 				rearMount = " (R)";
 			}
 			if(!isSalvaging()) {
-				String availability = "";
+				String availability;
 				int amountAvailable = getAmountAvailable();
 				PartInventory inventories = campaign.getPartInventory(getNewPart());
 				
@@ -297,17 +304,9 @@ public class Armor extends Part implements IAcquisitionWork {
 			} else if (wn2.getNodeName().equalsIgnoreCase("amountNeeded")) {
 				amountNeeded = Integer.parseInt(wn2.getTextContent());
 			} else if (wn2.getNodeName().equalsIgnoreCase("rear")) {
-				if(wn2.getTextContent().equalsIgnoreCase("true")) {
-					rear = true;
-				} else {
-					rear = false;
-				}
+                rear = wn2.getTextContent().equalsIgnoreCase("true");
 			} else if (wn2.getNodeName().equalsIgnoreCase("clan")) {
-				if(wn2.getTextContent().equalsIgnoreCase("true")) {
-					clan = true;
-				} else {
-					clan = false;
-				}
+                clan = wn2.getTextContent().equalsIgnoreCase("true");
 			}
 		}
 	}
@@ -463,7 +462,7 @@ public class Armor extends Part implements IAcquisitionWork {
 		toReturn += getAcquisitionExtraDesc() + "<br/>";
 		PartInventory inventories = campaign.getPartInventory(getAcquisitionPart());
         toReturn += inventories.getTransitOrderedDetails() + "<br/>";
-		toReturn += Utilities.getCurrencyString(adjustCostsForCampaignOptions(getStickerPrice())) + "<br/>";
+		toReturn += CurrencyManager.getInstance().getShortUiMoneyFormatter().print(adjustCostsForCampaignOptions(getStickerPrice())) + "<br/>";
 		toReturn += "</font></html>";
 		return toReturn;
 	}

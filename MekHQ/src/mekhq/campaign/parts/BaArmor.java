@@ -23,7 +23,11 @@ package mekhq.campaign.parts;
 
 import megamek.common.EquipmentType;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.finances.CurrencyManager;
 import mekhq.campaign.work.IAcquisitionWork;
+import org.joda.money.Money;
+
+import java.math.RoundingMode;
 
 /**
  *
@@ -67,24 +71,24 @@ public class BaArmor extends Armor implements IAcquisitionWork {
         return EquipmentType.getBaArmorWeightPerPoint(type, clan) * amount;
     }
     
-    public int getPointCost() {
+    public Money getPointCost() {
         switch(type) {
         case EquipmentType.T_ARMOR_BA_STANDARD_ADVANCED:
-            return 12500;
+            return Money.of(CurrencyManager.getInstance().getDefaultCurrency(), 12500);
         case EquipmentType.T_ARMOR_BA_MIMETIC:
         case EquipmentType.T_ARMOR_BA_STEALTH:
-            return 15000;
+            return Money.of(CurrencyManager.getInstance().getDefaultCurrency(), 15000);
         case EquipmentType.T_ARMOR_BA_STEALTH_BASIC:
-            return 12000;
+            return Money.of(CurrencyManager.getInstance().getDefaultCurrency(), 12000);
         case EquipmentType.T_ARMOR_BA_STEALTH_IMP:
-            return 20000;
+            return Money.of(CurrencyManager.getInstance().getDefaultCurrency(), 20000);
         case EquipmentType.T_ARMOR_BA_STEALTH_PROTOTYPE:
-            return 50000;
+            return Money.of(CurrencyManager.getInstance().getDefaultCurrency(), 50000);
         case EquipmentType.T_ARMOR_BA_FIRE_RESIST:
         case EquipmentType.T_ARMOR_BA_STANDARD_PROTOTYPE:
         case EquipmentType.T_ARMOR_BA_STANDARD:
         default:
-            return 10000;           
+            return Money.of(CurrencyManager.getInstance().getDefaultCurrency(), 10000);
         }
     }
     
@@ -98,8 +102,8 @@ public class BaArmor extends Armor implements IAcquisitionWork {
     }
     
     @Override
-    public long getCurrentValue() {
-        return amount * getPointCost();
+    public Money getCurrentValue() {
+        return getPointCost().multipliedBy(amount);
     }
     
     @Override
@@ -108,18 +112,18 @@ public class BaArmor extends Armor implements IAcquisitionWork {
     }
     
     @Override
-    public long getValueNeeded() {
-        return adjustCostsForCampaignOptions((long)(amountNeeded * getPointCost()));
+    public Money getValueNeeded() {
+        return adjustCostsForCampaignOptions(getPointCost().multipliedBy(amountNeeded));
     }
     
     @Override
-    public long getStickerPrice() {
+    public Money getStickerPrice() {
         //always in 5-ton increments
-        return (long)(5 * getPointsPerTon() * getPointCost());
+        return getPointCost().multipliedBy(5).multipliedBy(getPointsPerTon(), RoundingMode.HALF_EVEN);
     }
     
     @Override
-    public long getBuyCost() {
+    public Money getBuyCost() {
         return getStickerPrice();
     }
     

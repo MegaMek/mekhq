@@ -22,6 +22,8 @@ import java.io.PrintWriter;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import mekhq.campaign.finances.CurrencyManager;
+import org.joda.money.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -202,9 +204,9 @@ public class TransportBayPart extends Part {
     }
 
     @Override
-    public long getStickerPrice() {
+    public Money getStickerPrice() {
         // Considered part of the structure, though cubicles and doors can add to this value
-        return 0;
+        return Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
     }
 
     @Override

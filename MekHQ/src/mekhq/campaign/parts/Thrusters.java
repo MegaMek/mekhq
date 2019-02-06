@@ -23,6 +23,8 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import mekhq.campaign.finances.CurrencyManager;
+import org.joda.money.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -223,8 +225,10 @@ public class Thrusters extends Part {
 	}
 
 	@Override
-	public long getStickerPrice() {
-		return 12500;
+	public Money getStickerPrice() {
+		return Money.of(
+                CurrencyManager.getInstance().getDefaultCurrency(),
+                12500);
 	}
 
 	@Override

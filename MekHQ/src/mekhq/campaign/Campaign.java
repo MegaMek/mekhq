@@ -26,7 +26,6 @@ import java.io.PrintWriter;
 import java.io.Serializable;
 import java.math.RoundingMode;
 import java.text.DateFormat;
-import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -39,7 +38,6 @@ import mekhq.*;
 import mekhq.campaign.finances.*;
 import mekhq.campaign.log.*;
 import org.joda.money.BigMoney;
-import org.joda.money.BigMoneyProvider;
 import org.joda.money.Money;
 import org.joda.money.MoneyUtils;
 import org.joda.time.DateTime;
@@ -3693,8 +3691,7 @@ public class Campaign implements Serializable, ITechManager {
             category = Transaction.C_MISC;
         }
         finances.credit(quantity, category, description, calendar.getTime());
-        NumberFormat numberFormat = DecimalFormat.getIntegerInstance();
-        String quantityString = numberFormat.format(quantity);
+        String quantityString = CurrencyManager.getInstance().getShortUiMoneyFormatter().print(quantity);
         addReport("Funds added : " + quantityString + " (" + description + ")");
     }
 
@@ -6932,57 +6929,58 @@ public class Campaign implements Serializable, ITechManager {
             coAmmo = getMonthlyAmmo();
             coFuel = getMonthlyFuel();
         }
-        for (Contract contract : getActiveContracts()) {
-            contracts += contract.getMonthlyPayOut();
-        }
-        monthlyIncome += contracts;
-        monthlyExpenses = maintenance + salaries + overhead + coSpareParts + coAmmo + coFuel;
 
-        Money assets = cash + mech + vee + ba + infantry + largeCraft
-                + smallCraft + proto + spareParts + getFinances().getTotalAssetValue();
+        contracts = contracts.plus(getActiveContracts().stream().map(Contract::getMonthlyPayOut).collect(Collectors.toList()));
+        monthlyIncome = monthlyIncome.plus(contracts);
+        monthlyExpenses = maintenance.plus(salaries).plus(overhead).plus(coSpareParts).plus(coAmmo).plus(coFuel);
+
+        Money assets = cash.plus(mech).plus(vee).plus(ba).plus(infantry).plus(largeCraft)
+                            .plus(smallCraft).plus(proto).plus(spareParts).plus(getFinances().getTotalAssetValue());
         Money liabilities = loans;
         Money netWorth = assets.minus(liabilities);
-        int longest = Math.max(DecimalFormat.getInstance().format(liabilities)
-                .length(), DecimalFormat.getInstance().format(assets).length());
-        longest = Math.max(DecimalFormat.getInstance().format(netWorth)
-                .length(), longest);
+        int longest = Math.max(
+                CurrencyManager.getInstance().getShortUiMoneyFormatter().print(liabilities).length(),
+                CurrencyManager.getInstance().getShortUiMoneyFormatter().print(assets).length());
+        longest = Math.max(
+                CurrencyManager.getInstance().getShortUiMoneyFormatter().print(netWorth).length(),
+                longest);
         String formatted = "%1$" + longest + "s";
         sb.append("Net Worth................ ")
-                .append(String.format(formatted, DecimalFormat.getInstance().format(netWorth))).append("\n\n");
+                .append(String.format(formatted, CurrencyManager.getInstance().getShortUiMoneyFormatter().print(netWorth))).append("\n\n");
         sb.append("    Assets............... ")
-                .append(String.format(formatted, DecimalFormat.getInstance().format(assets))).append("\n");
+                .append(String.format(formatted, CurrencyManager.getInstance().getShortUiMoneyFormatter().print(assets))).append("\n");
         sb.append("       Cash.............. ")
-                .append(String.format(formatted, DecimalFormat.getInstance().format(cash))).append("\n");
+                .append(String.format(formatted, CurrencyManager.getInstance().getShortUiMoneyFormatter().print(cash))).append("\n");
         if (MoneyUtils.isPositive(mech)) {
             sb.append("       Mechs............. ")
-                    .append(String.format(formatted, DecimalFormat.getInstance().format(mech))).append("\n");
+                    .append(String.format(formatted, CurrencyManager.getInstance().getShortUiMoneyFormatter().print(mech))).append("\n");
         }
-        if (vee > 0) {
+        if (MoneyUtils.isPositive(vee)) {
             sb.append("       Vehicles.......... ")
-                    .append(String.format(formatted, DecimalFormat.getInstance().format(vee))).append("\n");
+                    .append(String.format(formatted, CurrencyManager.getInstance().getShortUiMoneyFormatter().print(vee))).append("\n");
         }
-        if (ba > 0) {
+        if (MoneyUtils.isPositive(ba)) {
             sb.append("       BattleArmor....... ")
-                    .append(String.format(formatted, DecimalFormat.getInstance().format(ba))).append("\n");
+                    .append(String.format(formatted, CurrencyManager.getInstance().getShortUiMoneyFormatter().print(ba))).append("\n");
         }
-        if (infantry > 0) {
+        if (MoneyUtils.isPositive(infantry)) {
             sb.append("       Infantry.......... ")
-                    .append(String.format(formatted, DecimalFormat.getInstance().format(infantry))).append("\n");
+                    .append(String.format(formatted, CurrencyManager.getInstance().getShortUiMoneyFormatter().print(infantry))).append("\n");
         }
-        if (proto > 0) {
+        if (MoneyUtils.isPositive(proto)) {
             sb.append("       Protomechs........ ")
-                    .append(String.format(formatted, DecimalFormat.getInstance().format(proto))).append("\n");
+                    .append(String.format(formatted, CurrencyManager.getInstance().getShortUiMoneyFormatter().print(proto))).append("\n");
         }
-        if (smallCraft > 0) {
+        if (MoneyUtils.isPositive(smallCraft)) {
             sb.append("       Small Craft....... ")
-                    .append(String.format(formatted, DecimalFormat.getInstance().format(smallCraft))).append("\n");
+                    .append(String.format(formatted, CurrencyManager.getInstance().getShortUiMoneyFormatter().print(smallCraft))).append("\n");
         }
-        if (largeCraft > 0) {
+        if (MoneyUtils.isPositive(largeCraft)) {
             sb.append("       Large Craft....... ")
-                    .append(String.format(formatted, DecimalFormat.getInstance().format(largeCraft))).append("\n");
+                    .append(String.format(formatted, CurrencyManager.getInstance().getShortUiMoneyFormatter().print(largeCraft))).append("\n");
         }
         sb.append("       Spare Parts....... ")
-                .append(String.format(formatted, DecimalFormat.getInstance().format(spareParts))).append("\n");
+                .append(String.format(formatted, CurrencyManager.getInstance().getShortUiMoneyFormatter().print(spareParts))).append("\n");
 
         if (getFinances().getAllAssets().size() > 0) {
             for (Asset asset : getFinances().getAllAssets()) {
@@ -6997,38 +6995,38 @@ public class Campaign implements Serializable, ITechManager {
                 }
                 assetName += " ";
                 sb.append("       ").append(assetName)
-                        .append(String.format(formatted, DecimalFormat.getInstance().format(asset.getValue())))
+                        .append(String.format(formatted, CurrencyManager.getInstance().getShortUiMoneyFormatter().print(asset.getValue())))
                         .append("\n");
             }
         }
         sb.append("\n");
         sb.append("    Liabilities.......... ")
-                .append(String.format(formatted, DecimalFormat.getInstance().format(liabilities))).append("\n");
+                .append(String.format(formatted, CurrencyManager.getInstance().getShortUiMoneyFormatter().print(liabilities))).append("\n");
         sb.append("       Loans............. ")
-                .append(String.format(formatted, DecimalFormat.getInstance().format(loans))).append("\n\n\n");
+                .append(String.format(formatted, CurrencyManager.getInstance().getShortUiMoneyFormatter().print(loans))).append("\n\n\n");
 
         sb.append("Monthly Profit........... ")
-                .append(String.format(formatted, DecimalFormat.getInstance().format(monthlyIncome - monthlyExpenses)))
+                .append(String.format(formatted, CurrencyManager.getInstance().getShortUiMoneyFormatter().print(monthlyIncome.minus(monthlyExpenses))))
                 .append("\n\n");
         sb.append("Monthly Income........... ")
-                .append(String.format(formatted, DecimalFormat.getInstance().format(monthlyIncome))).append("\n");
+                .append(String.format(formatted, CurrencyManager.getInstance().getShortUiMoneyFormatter().print(monthlyIncome))).append("\n");
         sb.append("    Contract Payments.... ")
-                .append(String.format(formatted, DecimalFormat.getInstance().format(contracts))).append("\n\n");
+                .append(String.format(formatted, CurrencyManager.getInstance().getShortUiMoneyFormatter().print(contracts))).append("\n\n");
         sb.append("Monthly Expenses......... ")
-                .append(String.format(formatted, DecimalFormat.getInstance().format(monthlyExpenses))).append("\n");
+                .append(String.format(formatted, CurrencyManager.getInstance().getShortUiMoneyFormatter().print(monthlyExpenses))).append("\n");
         sb.append("    Salaries............. ")
-                .append(String.format(formatted, DecimalFormat.getInstance().format(salaries))).append("\n");
+                .append(String.format(formatted, CurrencyManager.getInstance().getShortUiMoneyFormatter().print(salaries))).append("\n");
         sb.append("    Maintenance.......... ")
-                .append(String.format(formatted, DecimalFormat.getInstance().format(maintenance))).append("\n");
+                .append(String.format(formatted, CurrencyManager.getInstance().getShortUiMoneyFormatter().print(maintenance))).append("\n");
         sb.append("    Overhead............. ")
-                .append(String.format(formatted, DecimalFormat.getInstance().format(overhead))).append("\n");
+                .append(String.format(formatted, CurrencyManager.getInstance().getShortUiMoneyFormatter().print(overhead))).append("\n");
         if (campaignOptions.usePeacetimeCost()) {
             sb.append("    Spare Parts.......... ")
-                    .append(String.format(formatted, DecimalFormat.getInstance().format(coSpareParts))).append("\n");
+                    .append(String.format(formatted, CurrencyManager.getInstance().getShortUiMoneyFormatter().print(coSpareParts))).append("\n");
             sb.append("    Training Munitions... ")
-                    .append(String.format(formatted, DecimalFormat.getInstance().format(coAmmo))).append("\n");
+                    .append(String.format(formatted, CurrencyManager.getInstance().getShortUiMoneyFormatter().print(coAmmo))).append("\n");
             sb.append("    Fuel................. ")
-                    .append(String.format(formatted, DecimalFormat.getInstance().format(coFuel))).append("\n");
+                    .append(String.format(formatted, CurrencyManager.getInstance().getShortUiMoneyFormatter().print(coFuel))).append("\n");
         }
 
         return new String(sb);

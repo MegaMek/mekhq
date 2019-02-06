@@ -27,7 +27,9 @@ import megamek.common.EquipmentType;
 import megamek.common.MiscType;
 import megamek.common.Mounted;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.finances.CurrencyManager;
 import mekhq.campaign.parts.MissingPart;
+import org.joda.money.Money;
 
 /**
  *
@@ -85,11 +87,11 @@ public class JumpJet extends EquipmentPart {
      *
      */
     @Override
-    public long getStickerPrice() {
+    public Money getStickerPrice() {
         if (isOmniPodded()) {
-            return 250 * getUnitTonnage();
+            return Money.of(CurrencyManager.getInstance().getDefaultCurrency(),250 * getUnitTonnage());
         }
-    	return 200 * getUnitTonnage();	
+        return Money.of(CurrencyManager.getInstance().getDefaultCurrency(),200 * getUnitTonnage());
     }
     
     @Override
@@ -121,7 +123,6 @@ public class JumpJet extends EquipmentPart {
 					&& hits > priorHits 
 					&& Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
 				remove(false);
-				return;
 			}
 		}
 	}

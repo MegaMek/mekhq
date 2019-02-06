@@ -23,6 +23,8 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import mekhq.campaign.finances.CurrencyManager;
+import org.joda.money.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -43,13 +45,13 @@ public class MissingFireControlSystem extends MissingPart {
 	 */
 	private static final long serialVersionUID = 2806921577150714477L;
 
-	private long cost;
+	private Money cost;
 	
 	public MissingFireControlSystem() {
-    	this(0, 0, null);
+    	this(0, Money.zero(CurrencyManager.getInstance().getDefaultCurrency()), null);
     }
     
-    public MissingFireControlSystem(int tonnage, long cost, Campaign c) {
+    public MissingFireControlSystem(int tonnage, Money cost, Campaign c) {
     	super(0, c);
     	this.cost = cost;
     	this.name = "Fire Control System";
@@ -109,8 +111,8 @@ public class MissingFireControlSystem extends MissingPart {
 	public void writeToXml(PrintWriter pw1, int indent) {
 		writeToXmlBegin(pw1, indent);
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<cost>"
-				+cost
+				+"<cost version=\"2\">"
+				+ MekHqXmlUtil.getXmlStringFromMoney(cost)
 				+"</cost>");
 		writeToXmlEnd(pw1, indent);
 	}
@@ -122,7 +124,7 @@ public class MissingFireControlSystem extends MissingPart {
 		for (int x=0; x<nl.getLength(); x++) {
 			Node wn2 = nl.item(x);		
 			if (wn2.getNodeName().equalsIgnoreCase("cost")) {
-				cost = Long.parseLong(wn2.getTextContent());
+				cost = MekHqXmlUtil.getMoneyFromXmlNode(wn2);
 			} 
 		}
 	}
