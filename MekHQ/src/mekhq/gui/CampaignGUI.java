@@ -70,6 +70,8 @@ import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 import javax.xml.parsers.DocumentBuilder;
 
+import mekhq.campaign.finances.CurrencyManager;
+import org.joda.money.Money;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -2819,14 +2821,15 @@ public class CampaignGUI extends JPanel {
     }
 
     private void refreshFunds() {
-        long funds = getCampaign().getFunds();
-        NumberFormat numberFormat = NumberFormat.getIntegerInstance();
+        Money funds = getCampaign().getFunds();
         String inDebt = "";
         if (getCampaign().getFinances().isInDebt()) {
             inDebt = " <font color='red'>(in Debt)</font>";
         }
-        String text = "<html><b>Funds:</b> " + numberFormat.format(funds)
-                + " C-Bills" + inDebt + "</html>";
+        String text = "<html><b>Funds:</b> "
+                + CurrencyManager.getInstance().getShortUiMoneyFormatter().print(funds)
+                + inDebt
+                + "</html>";
         lblFunds.setText(text);
     }
 

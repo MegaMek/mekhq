@@ -29,6 +29,7 @@ import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.event.PartChangedEvent;
 import mekhq.campaign.event.UnitChangedEvent;
+import mekhq.campaign.finances.CurrencyManager;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.parts.MissingPart;
@@ -41,6 +42,7 @@ import mekhq.gui.GuiTabType;
 import mekhq.gui.RepairTab;
 import mekhq.service.PartsAcquisitionService;
 import mekhq.service.PartsAcquisitionService.PartCountInfo;
+import org.joda.money.MoneyUtils;
 
 /**
  * @author Kipsta
@@ -51,7 +53,7 @@ public class AcquisitionsDialog extends JDialog {
     private static final long serialVersionUID = -1942823778220741544L;
 
     private CampaignGUI campaignGUI;
-    private Map<String, AcquisitionPanel> partPanelMap = new HashMap<String, AcquisitionPanel>();
+    private Map<String, AcquisitionPanel> partPanelMap = new HashMap<>();
 
     private JPanel pnlSummary;
     private JLabel lblSummary;
@@ -219,9 +221,9 @@ public class AcquisitionsDialog extends JDialog {
         sbText.append(inventoryInfo);
         sbText.append("<br/>");
 
-        if (PartsAcquisitionService.getMissingTotalPrice() > 0) {
+        if (MoneyUtils.isPositive(PartsAcquisitionService.getMissingTotalPrice())) {
             String price = "Missing item price: "
-                    + Utilities.getCurrencyString(PartsAcquisitionService.getMissingTotalPrice());
+                    + CurrencyManager.getInstance().getShortUiMoneyFormatter().print(PartsAcquisitionService.getMissingTotalPrice());
 
             sbText.append(price);
             sbText.append("<br/>");
@@ -404,14 +406,14 @@ public class AcquisitionsDialog extends JDialog {
                 sbText.append(inventoryInfo);
                 sbText.append("<br/>");
 
-                String price = "Item Price: " + Utilities.getCurrencyString(partCountInfo.getStickerPrice());
+                String price = "Item Price: " + CurrencyManager.getInstance().getShortUiMoneyFormatter().print(partCountInfo.getStickerPrice());
 
                 sbText.append(price);
                 sbText.append("<br/>");
 
                 if (partCountInfo.getMissingCount() > 1) {
-                    price = "Missing item price: " + Utilities
-                            .getCurrencyString(partCountInfo.getStickerPrice() * partCountInfo.getMissingCount());
+                    price = "Missing item price: " + CurrencyManager.getInstance().getShortUiMoneyFormatter().print(
+                            partCountInfo.getStickerPrice().multipliedBy(partCountInfo.getMissingCount()));
 
                     sbText.append(price);
                     sbText.append("<br/>");
@@ -472,7 +474,7 @@ public class AcquisitionsDialog extends JDialog {
             gbcMain.gridwidth = 3;
             gbcMain.insets = insetsOriginal;
 
-            Map<Unit, Integer> unitMap = new HashMap<Unit, Integer>();
+            Map<Unit, Integer> unitMap = new HashMap<>();
 
             for (IAcquisitionWork awUnit : awList) {
                 if (!unitMap.containsKey(awUnit.getUnit())) {

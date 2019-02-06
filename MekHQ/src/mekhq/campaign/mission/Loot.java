@@ -33,9 +33,12 @@ import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.Version;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.finances.CurrencyManager;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.parts.Part;
 
+import org.joda.money.Money;
+import org.joda.money.MoneyUtils;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -47,16 +50,16 @@ import org.w3c.dom.NodeList;
 public class Loot implements MekHqXmlSerializable {
    
     private String name;
-    private long cash;
+    private Money cash;
     private ArrayList<Entity> units;
     private ArrayList<Part> parts;
     //Personnel?
     
     public Loot() {
         name = "None";
-        cash = 0;
-        units = new ArrayList<Entity>();
-        parts = new ArrayList<Part>();
+        cash = Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
+        units = new ArrayList<>();
+        parts = new ArrayList<>();
     }
     
     @Override
@@ -77,11 +80,11 @@ public class Loot implements MekHqXmlSerializable {
         name = s;
     }
     
-    public void setCash(long c) {
+    public void setCash(Money c) {
         cash = c;
     }
     
-    public long getCash() {
+    public Money getCash() {
         return cash;
     }
     
@@ -94,7 +97,7 @@ public class Loot implements MekHqXmlSerializable {
     }
     
     public void clearUnits() {
-        units = new ArrayList<Entity>();
+        units = new ArrayList<>();
     }
     
     public ArrayList<Part> getParts() {
@@ -106,20 +109,20 @@ public class Loot implements MekHqXmlSerializable {
     }
     
     public void clearParts() {
-        parts = new ArrayList<Part>();
+        parts = new ArrayList<>();
     }
     
     public String getShortDescription() {
         String desc = getName() + " - ";
-        if(cash > 0) {
-            desc += DecimalFormat.getIntegerInstance().format(cash) + " C-bills";
+        if(MoneyUtils.isPositive(cash)) {
+            desc += CurrencyManager.getInstance().getShortUiMoneyFormatter().print(cash);
         }
         if(units.size() > 0) {
             String s = units.size() + " unit";
             if(units.size() > 1) {
                 s += "s";
             }
-            if(cash > 0) {
+            if(MoneyUtils.isPositive(cash)) {
                 s = ", " + s;
             }
             desc += s;
@@ -129,7 +132,7 @@ public class Loot implements MekHqXmlSerializable {
             if(parts.size() > 1) {
                 s += "s";
             }
-            if(cash > 0 || units.size() > 0) {
+            if(MoneyUtils.isPositive(cash) || units.size() > 0) {
                 s = ", " + s;
             }
             desc += s;
@@ -139,7 +142,7 @@ public class Loot implements MekHqXmlSerializable {
     
     public void get(Campaign campaign, Scenario s) {
         //TODO: put in some reports
-        if(cash > 0) {
+        if(MoneyUtils.isPositive(cash)) {
             campaign.getFinances().credit(cash, Transaction.C_MISC, "Reward for " + getName() + " during " + s.getName(), campaign.getDate());
         }
         for(Entity e : units) {
@@ -157,8 +160,8 @@ public class Loot implements MekHqXmlSerializable {
                 +MekHqXmlUtil.escape(name)
                 +"</name>");
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<cash>"
-                +cash
+                +"<cash version=\"2\">"
+                +MekHqXmlUtil.getXmlStringFromMoney(cash)
                 +"</cash>");
         for(Entity e : units) {
             String lookupName = e.getChassis() + " " + e.getModel();
@@ -190,7 +193,7 @@ public class Loot implements MekHqXmlSerializable {
                 if (wn2.getNodeName().equalsIgnoreCase("name")) {
                     retVal.name = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("cash")) {
-                    retVal.cash = Long.parseLong(wn2.getTextContent());
+                    retVal.cash = MekHqXmlUtil.getMoneyFromXmlNode(wn2);
                 } else if (wn2.getNodeName().equalsIgnoreCase("entityName")) {              
                     MechSummary summary = MechSummaryCache.getInstance().getMech(wn2.getTextContent());
                     if(null == summary) {

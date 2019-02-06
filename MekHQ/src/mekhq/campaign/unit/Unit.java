@@ -2478,7 +2478,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 partsToAdd.add(avionics);
             }
             if(null == fcs) {
-                fcs = new FireControlSystem((int)entity.getWeight(), 0, campaign);
+                fcs = new FireControlSystem((int)entity.getWeight(), Money.zero(CurrencyManager.getInstance().getDefaultCurrency()), campaign);
                 addPart(fcs);
                 partsToAdd.add(fcs);
                 ((FireControlSystem)fcs).calculateCost();
@@ -2494,7 +2494,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 partsToAdd.add(landingGear);
             }
             if(null == lifeSupport) {
-                lifeSupport = new AeroLifeSupport((int) entity.getWeight(), 0, !(entity instanceof SmallCraft || entity instanceof Jumpship), campaign);
+                lifeSupport = new AeroLifeSupport((int) entity.getWeight(), Money.zero(CurrencyManager.getInstance().getDefaultCurrency()), !(entity instanceof SmallCraft || entity instanceof Jumpship), campaign);
                 addPart(lifeSupport);
                 partsToAdd.add(lifeSupport);
                 ((AeroLifeSupport)lifeSupport).calculateCost();
@@ -4382,32 +4382,32 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         return unitMonthlyCost;
     }
 
-    public long getSparePartsCost() {
+    public Money getSparePartsCost() {
         final String METHOD_NAME = "getSparePartsCost()"; //$NON-NLS-1$
-        double partsCost = 0;
+        BigMoney partsCost = BigMoney.zero(CurrencyManager.getInstance().getDefaultCurrency());
 
         entity = getEntity();
         if (isMothballed()) {
-            return 0;
+            return Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
         }
         if (entity instanceof Jumpship) { // SpaceStation derives from Jumpship
-            partsCost += entity.getWeight() * .0001 * 15000;
+            partsCost = partsCost.plus(entity.getWeight() * .0001 * 15000);
         } else if (entity instanceof Aero) {
-            partsCost += entity.getWeight() * .001 * 15000;
+            partsCost = partsCost.plus(entity.getWeight() * .001 * 15000);
         } else if (entity instanceof Tank) {
-            partsCost += entity.getWeight() * .001 * 8000;
+            partsCost = partsCost.plus(entity.getWeight() * .001 * 8000);
         } else if ((entity instanceof Mech) || (entity instanceof BattleArmor)
                 || ((Infantry) entity).isMechanized()) {
-            partsCost += entity.getWeight() * .001 * 10000;
+            partsCost = partsCost.plus(entity.getWeight() * .001 * 10000);
         } else if (entity instanceof Infantry) {
             if (entity.getMovementMode() == EntityMovementMode.INF_LEG) {
-                partsCost += 3 * .002 * 10000;
+                partsCost = partsCost.plus(3 * .002 * 10000);
             } else if (entity.getMovementMode() == EntityMovementMode.INF_JUMP) {
-                partsCost += 4 * .002 * 10000;
+                partsCost = partsCost.plus(4 * .002 * 10000);
             } else if (entity.getMovementMode() == EntityMovementMode.INF_MOTORIZED) {
-                partsCost += 6 * .002 * 10000;
+                partsCost = partsCost.plus(6 * .002 * 10000);
             } else {
-                partsCost += entity.getWeight() * .002 * 10000;
+                partsCost = partsCost.plus(entity.getWeight() * .002 * 10000);
                 MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
                         getName() + " is not a generic CI. Movement mode is "
                         + entity.getMovementModeAsString());
@@ -4423,16 +4423,16 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
 
         // Handle cost for quirks if used
         if (entity.hasQuirk("easy_maintain")) {
-            partsCost *= .8;
+            partsCost = partsCost.multipliedBy(.8);
         }
         if (entity.hasQuirk("difficult_maintain")) {
-            partsCost *= 1.25;
+            partsCost = partsCost.multipliedBy(1.25);
         }
         if (entity.hasQuirk("non_standard")) {
-            partsCost *= 2.0;
+            partsCost = partsCost.multipliedBy(2.0);
         }
         if (entity.hasQuirk("ubiquitous_is")) {
-            partsCost *= .75;
+            partsCost = partsCost.multipliedBy(.75);
         }
         // TODO Obsolete quirk
 
@@ -4444,38 +4444,38 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             if (((currentYear > 2859) && (currentYear < 3040))
                     && (!campaign.getFaction().isClan() && !campaign.getFaction().isComstar())) {
                 if (rating > EquipmentType.RATING_D) {
-                    partsCost = partsCost * 5.0;
+                    partsCost = partsCost.multipliedBy(5.0);
                 }
             }
             if (rating == EquipmentType.RATING_E) {
-                partsCost *= 1.1;
+                partsCost = partsCost.multipliedBy(1.1);
             }
             if (rating == EquipmentType.RATING_F) {
-                partsCost *= 1.25;
+                partsCost = partsCost.multipliedBy(1.25);
             }
             if ((entity instanceof Tank)
                     && (en.getEngineType() == Engine.NORMAL_ENGINE)) {
-                partsCost *= 2.0;
+                partsCost = partsCost.multipliedBy(2.0);
             }
             if (!(entity instanceof Infantry)) {
                 if ((en.getEngineType() == Engine.XL_ENGINE)
                         || (en.getEngineType() == Engine.XXL_ENGINE)) {
-                    partsCost *= 2.5;
+                    partsCost = partsCost.multipliedBy(2.5);
                 }
                 if (en.getEngineType() == Engine.LIGHT_ENGINE) {
-                    partsCost *= 1.5;
+                    partsCost = partsCost.multipliedBy(1.5);
                 }
             }
             if (entity.isClan()) {
                 if ((currentYear >3048) && (currentYear < 3071)) {
-                    partsCost *= 5.0;
+                    partsCost = partsCost.multipliedBy(5.0);
                 } else if (currentYear > 3070) {
-                    partsCost *= 4.0;
+                    partsCost = partsCost.multipliedBy(4.0);
                 }
             }
         }
 
-        return Math.round(partsCost);
+        return partsCost.toMoney(RoundingMode.HALF_EVEN);
     }
 
     public Money getAmmoCost() {
@@ -4582,7 +4582,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                         CurrencyManager.getInstance().getDefaultCurrency(),
                         ((SupportTank) e).getFuelTonnage() * 1000.0 * 4.0);
             } else {
-                return Money.zero(CurrencyManager.getInstance().getDefaultCurrency());;
+                return Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
             }
         } else {
             if (en.getEngineType() == Engine.FUEL_CELL) {
@@ -4594,7 +4594,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                         CurrencyManager.getInstance().getDefaultCurrency(),
                         en.getWeightEngine(e) * 0.1 * 1000.0 * 4.0);
             } else {
-                return Money.zero(CurrencyManager.getInstance().getDefaultCurrency());;
+                return Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
             }
         }
     }

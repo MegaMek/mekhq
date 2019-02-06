@@ -23,6 +23,7 @@ package mekhq.campaign.mission;
 
 import java.io.PrintWriter;
 import java.io.Serializable;
+import java.math.RoundingMode;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -31,6 +32,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.UUID;
 
+import org.joda.money.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -1072,17 +1074,22 @@ public class AtBContract extends Contract implements Serializable {
     }
     
     @Override
-    public long getMonthlyPayOut() {
+    public Money getMonthlyPayOut() {
         if (extensionLength == 0) {
             return super.getMonthlyPayOut();
         }
-        /* The tranport clause and the advance monies have already been
+        /* The transport clause and the advance monies have already been
          * accounted for over the original length of the contract. The extension
          * uses the base monthly amounts for support and overhead, with a 
          * 50% bonus to the base amount.
          */
-        return (long)((getBaseAmount() * 1.5 + getSupportAmount()
-                + getOverheadAmount()) / getLength());
+        return getBaseAmount()
+                .toBigMoney()
+                .multipliedBy(1.5)
+                .plus(getSupportAmount())
+                .plus(getOverheadAmount())
+                .dividedBy(getLength(), RoundingMode.HALF_EVEN)
+                .toMoney();
     }
     
     public void checkForFollowup(Campaign campaign) {

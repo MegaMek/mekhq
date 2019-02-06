@@ -6,6 +6,7 @@ import java.util.regex.Pattern;
 import megamek.common.AmmoType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IAcquisitionWork;
+import org.joda.money.Money;
 
 public class PartInUse {
     private static final Pattern cleanUp1 = Pattern.compile("\\d+\\shit\\(s\\),\\s"); //$NON-NLS-1$
@@ -18,7 +19,7 @@ public class PartInUse {
     private double tonnagePerItem;
     private int transferCount;
     private int plannedCount;
-    private long cost;
+    private Money cost;
     
     private void appendDetails(StringBuilder sb, Part part) {
         String details = part.getDetails();
@@ -65,7 +66,7 @@ public class PartInUse {
         }
     }
     
-    public PartInUse(String description, IAcquisitionWork partToBuy, long cost) {
+    public PartInUse(String description, IAcquisitionWork partToBuy, Money cost) {
         this.description = Objects.requireNonNull(description);
         this.partToBuy = Objects.requireNonNull(partToBuy);
         this.cost = cost;
@@ -135,7 +136,7 @@ public class PartInUse {
         ++ plannedCount;
     }
     
-    public long getCost() {
+    public Money getCost() {
         return cost;
     }
     

@@ -23,6 +23,8 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import mekhq.campaign.finances.CurrencyManager;
+import org.joda.money.Money;
 import org.w3c.dom.Node;
 
 import megamek.common.Aero;
@@ -203,9 +205,9 @@ public class Avionics extends Part {
 	}
 
 	@Override
-	public long getStickerPrice() {
+	public Money getStickerPrice() {
 		//TODO: table in TechManual makes no sense - where are control systems for ASFs?
-		return 0;
+		return Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
 	}
 
 	@Override

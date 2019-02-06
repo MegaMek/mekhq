@@ -4921,7 +4921,9 @@ public class Campaign implements Serializable, ITechManager {
      */
     @SuppressWarnings("unused") // FIXME: Waiting for Dylan to finish re-writing
     public Money calculateCostPerJump(boolean excludeOwnTransports, boolean campaignOpsCosts) {
-        long collarCost = (campaignOpsCosts ? 100000 : 50000);
+        BigMoney collarCost = BigMoney.of(
+                CurrencyManager.getInstance().getDefaultCurrency(),
+                campaignOpsCosts ? 100000 : 50000);
 
         // first we need to get the total number of units by type
         int nMech = getNumberOfUnitsByType(Entity.ETYPE_MECH);
@@ -4969,7 +4971,7 @@ public class Campaign implements Serializable, ITechManager {
         freehv -= placedlv;
         int noVehicles = (nohv + newNolv);
 
-        double dropshipCost = 0;
+        BigMoney dropshipCost;
         // The cost-figuring process: using prototypical dropships, figure out how
         // many collars are required. Charge for the prototypical dropships and
         // the docking collar, based on the rules selected. Allow prototypical
@@ -4987,36 +4989,50 @@ public class Campaign implements Serializable, ITechManager {
         int largeDropshipMechCapacity = 36;
         int largeMechDropshipASFCapacity = 6;
         int largeMechDropshipCargoCapacity = 120;
-        double largeMechDropshipCost = campaignOpsCosts ? (1750000.0 / 4.2) : 400000;
+        BigMoney largeMechDropshipCost = BigMoney.of(
+                CurrencyManager.getInstance().getDefaultCurrency(),
+                campaignOpsCosts ? (1750000.0 / 4.2) : 400000);
 
         // Roughly a Union
         int averageDropshipMechCapacity = 12;
         int mechDropshipASFCapacity = 2;
         int mechDropshipCargoCapacity = 75;
-        double mechDropshipCost = campaignOpsCosts ? (1450000.0 / 4.2) : 150000;
+        BigMoney mechDropshipCost = BigMoney.of(
+                CurrencyManager.getInstance().getDefaultCurrency(),
+                campaignOpsCosts ? (1450000.0 / 4.2) : 150000);
 
         // Roughly a Leopard CV
         int averageDropshipASFCapacity = 6;
         int asfDropshipCargoCapacity = 90;
-        double asfDropshipCost = campaignOpsCosts ? (900000.0 / 4.2) : 80000;
+        BigMoney asfDropshipCost = BigMoney.of(
+                CurrencyManager.getInstance().getDefaultCurrency(),
+                campaignOpsCosts ? (900000.0 / 4.2) : 80000);
 
         // Roughly a Triumph
         int largeDropshipVehicleCapacity = 50;
         int largeVehicleDropshipCargoCapacity = 750;
-        double largeVehicleDropshipCost = campaignOpsCosts ? (1750000.0 / 4.2) : 430000;
+        BigMoney largeVehicleDropshipCost = BigMoney.of(
+                CurrencyManager.getInstance().getDefaultCurrency(),
+                campaignOpsCosts ? (1750000.0 / 4.2) : 430000);
 
         // Roughly a Gazelle
         int averageDropshipVehicleCapacity = 15;
         int vehicleDropshipCargoCapacity = 65;
-        double vehicleDropshipCost = campaignOpsCosts ? (900000.0 / 4.2): 40000;
+        BigMoney vehicleDropshipCost = BigMoney.of(
+                CurrencyManager.getInstance().getDefaultCurrency(),
+                campaignOpsCosts ? (900000.0 / 4.2): 40000);
 
         // Roughly a Mule
         int largeDropshipCargoCapacity = 8000;
-        double largeCargoDropshipCost = campaignOpsCosts ? (750000.0 / 4.2) : 800000;
+        BigMoney largeCargoDropshipCost = BigMoney.of(
+                CurrencyManager.getInstance().getDefaultCurrency(),
+                campaignOpsCosts ? (750000.0 / 4.2) : 800000);
 
         // Roughly a Buccaneer
         int averageDropshipCargoCapacity = 2300;
-        double cargoDropshipCost = campaignOpsCosts ? (550000.0 / 4.2) : 250000;
+        BigMoney cargoDropshipCost = BigMoney.of(
+                CurrencyManager.getInstance().getDefaultCurrency(),
+                campaignOpsCosts ? (550000.0 / 4.2) : 250000);
 
         int mechCollars = 0;
         double leasedLargeMechDropships = 0;
@@ -5165,16 +5181,16 @@ public class Campaign implements Serializable, ITechManager {
             }
         }
 
-        dropshipCost = leasedAverageMechDropships * mechDropshipCost;
-        dropshipCost += leasedLargeMechDropships * largeMechDropshipCost;
+        dropshipCost = mechDropshipCost.multipliedBy(leasedAverageMechDropships);
+        dropshipCost = dropshipCost.plus(largeMechDropshipCost.multipliedBy(leasedLargeMechDropships ));
 
-        dropshipCost += leasedAverageASFDropships * asfDropshipCost;
+        dropshipCost = dropshipCost.plus(asfDropshipCost.multipliedBy(leasedAverageASFDropships));
 
-        dropshipCost += leasedAverageVehicleDropships * vehicleDropshipCost;
-        dropshipCost += leasedLargeVehicleDropships * largeVehicleDropshipCost;
+        dropshipCost = dropshipCost.plus(vehicleDropshipCost.multipliedBy(leasedAverageVehicleDropships));
+        dropshipCost = dropshipCost.plus(largeVehicleDropshipCost.multipliedBy(leasedLargeVehicleDropships));
 
-        dropshipCost += leasedAverageCargoDropships * cargoDropshipCost;
-        dropshipCost += leasedLargeCargoDropships * largeCargoDropshipCost;
+        dropshipCost = dropshipCost.plus(cargoDropshipCost.multipliedBy(leasedAverageCargoDropships));
+        dropshipCost = dropshipCost.plus(largeCargoDropshipCost.multipliedBy(leasedLargeCargoDropships));
 
         // Smaller/half-dropships are cheaper to rent, but still take one collar each
         int collarsNeeded = mechCollars + asfCollars + vehicleCollars + cargoCollars;
@@ -5185,31 +5201,31 @@ public class Campaign implements Serializable, ITechManager {
         // now factor in owned jumpships
         collarsNeeded = Math.max(0, collarsNeeded - nCollars);
 
-        double totalCost = dropshipCost + collarsNeeded * collarCost;
+        BigMoney totalCost = dropshipCost.plus(collarCost.multipliedBy(collarsNeeded));
 
         // FM:Mercs reimburses for owned transport (CamOps handles it in peacetime costs)
         if(!excludeOwnTransports) {
-            double ownDropshipCost = 0;
-            double ownJumpshipCost = 0;
+            BigMoney ownDropshipCost = BigMoney.zero(CurrencyManager.getInstance().getDefaultCurrency());
+            BigMoney ownJumpshipCost = BigMoney.zero(CurrencyManager.getInstance().getDefaultCurrency());
             for(Unit u : getUnits()) {
                 if(!u.isMothballed()) {
                     Entity e = u.getEntity();
                     if((e.getEntityType() & Entity.ETYPE_DROPSHIP) != 0) {
-                        ownDropshipCost += u.getMechCapacity() * (mechDropshipCost / averageDropshipMechCapacity);
-                        ownDropshipCost += u.getASFCapacity() * (asfDropshipCost / averageDropshipASFCapacity);
-                        ownDropshipCost += (u.getHeavyVehicleCapacity() + u.getLightVehicleCapacity()) * (vehicleDropshipCost / averageDropshipVehicleCapacity);
-                        ownDropshipCost += u.getCargoCapacity() * (cargoDropshipCost / averageDropshipCargoCapacity);
+                        ownDropshipCost = ownDropshipCost.plus(mechDropshipCost.multipliedBy(u.getMechCapacity()).dividedBy(averageDropshipMechCapacity, RoundingMode.HALF_EVEN));
+                        ownDropshipCost = ownDropshipCost.plus(asfDropshipCost.multipliedBy(u.getASFCapacity()).dividedBy(averageDropshipASFCapacity, RoundingMode.HALF_EVEN));
+                        ownDropshipCost = ownDropshipCost.plus(vehicleDropshipCost.multipliedBy(u.getHeavyVehicleCapacity() + u.getLightVehicleCapacity()).dividedBy(averageDropshipVehicleCapacity, RoundingMode.HALF_EVEN));
+                        ownDropshipCost = ownDropshipCost.plus(cargoDropshipCost.multipliedBy(u.getCargoCapacity()).dividedBy(averageDropshipCargoCapacity, RoundingMode.HALF_EVEN));
                     }
                     else if((e.getEntityType() & Entity.ETYPE_JUMPSHIP) != 0) {
-                        ownJumpshipCost += e.getDockingCollars().size() * collarCost;
+                        ownJumpshipCost = ownDropshipCost.plus(collarCost.multipliedBy(e.getDockingCollars().size()));
                     }
                 }
             }
 
-            totalCost = totalCost + ownDropshipCost + ownJumpshipCost;
+            totalCost = totalCost.plus(ownDropshipCost).plus(ownJumpshipCost);
         }
 
-        return Math.round(totalCost);
+        return totalCost.toMoney(RoundingMode.HALF_EVEN);
     }
 
     public void personUpdated(Person p) {
@@ -7574,7 +7590,7 @@ public class Campaign implements Serializable, ITechManager {
         int countMIA = 0;
         int countKIA = 0;
         int countRetired = 0;
-        long salary = 0;
+        Money salary = Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
 
         for (Person p : getPersonnel()) {
             // Add them to the total count
@@ -7588,7 +7604,7 @@ public class Campaign implements Serializable, ITechManager {
                 } else if (p.getHits() > 0) {
                     countInjured++;
                 }
-                salary += p.getSalary();
+                salary = salary.plus(p.getSalary());
             } else if (Person.isCombatRole(p.getPrimaryRole())
                     && p.getStatus() == Person.S_RETIRED) {
                 countRetired++;
@@ -7603,9 +7619,7 @@ public class Campaign implements Serializable, ITechManager {
 
         StringBuffer sb = new StringBuffer("Combat Personnel\n\n");
 
-        String buffer = "";
-
-        buffer = String.format("%-30s        %4s\n", "Total Combat Personnel",
+        String buffer = String.format("%-30s        %4s\n", "Total Combat Personnel",
                 countTotal);
         sb.append(buffer);
 
@@ -7630,7 +7644,7 @@ public class Campaign implements Serializable, ITechManager {
                 "Retired Combat Personnel", countRetired);
         sb.append(buffer);
 
-        sb.append("\nMonthly Salary For Combat Personnel: " + salary);
+        sb.append("\nMonthly Salary For Combat Personnel: " + CurrencyManager.getInstance().getShortUiMoneyFormatter().print(salary));
 
         return new String(sb);
     }
@@ -7642,7 +7656,7 @@ public class Campaign implements Serializable, ITechManager {
         int countMIA = 0;
         int countKIA = 0;
         int countRetired = 0;
-        long salary = 0;
+        Money salary = Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
         int prisoners = 0;
         int bondsmen = 0;
 
@@ -7655,7 +7669,7 @@ public class Campaign implements Serializable, ITechManager {
                 if (p.getInjuries().size() > 0 || p.getHits() > 0) {
                     countInjured++;
                 }
-                salary += p.getSalary();
+                salary = salary.plus(p.getSalary());
             } else if (p.isPrisoner() && p.isActive()) {
                 prisoners++;
                 if (p.getInjuries().size() > 0 || p.getHits() > 0) {
@@ -7680,9 +7694,7 @@ public class Campaign implements Serializable, ITechManager {
 
         StringBuffer sb = new StringBuffer("Support Personnel\n\n");
 
-        String buffer = "";
-
-        buffer = String.format("%-30s        %4s\n", "Total Support Personnel",
+        String buffer = String.format("%-30s        %4s\n", "Total Support Personnel",
                 countTotal);
         sb.append(buffer);
 
@@ -7707,7 +7719,7 @@ public class Campaign implements Serializable, ITechManager {
                 "Retired Support Personnel", countRetired);
         sb.append(buffer);
 
-        sb.append("\nMonthly Salary For Support Personnel: " + salary);
+        sb.append("\nMonthly Salary For Support Personnel: " + CurrencyManager.getInstance().getShortUiMoneyFormatter().print(salary));
 
         sb.append(String.format("\nYou have " + prisoners + " prisoner%s",
                 prisoners == 1 ? "" : "s"));

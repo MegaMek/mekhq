@@ -22,7 +22,10 @@
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
+import java.math.RoundingMode;
 
+import mekhq.campaign.finances.CurrencyManager;
+import org.joda.money.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -83,11 +86,11 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
     }
     
     @Override
-    public long getStickerPrice() {
+    public Money getStickerPrice() {
     	//costs are a total nightmare
         //some costs depend on entity, but we can't do it that way
         //because spare parts don't have entities. If parts start on an entity
-        //thats fine, but this will become problematic when we set up a parts
+        //that's fine, but this will become problematic when we set up a parts
         //store. For now I am just going to pass in a null entity and attempt
     	//to catch any resulting NPEs
     	Entity en = null;
@@ -100,9 +103,9 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
             }
     	}
 
-        int itemCost = 0;      
+        Money itemCost = Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
         try {
-        	itemCost = (int) type.getCost(en, isArmored, -1);
+        	itemCost = itemCost.plus(type.getCost(en, isArmored, -1));
         } catch(NullPointerException ex) {
             MekHQ.getLogger().error(AmmoStorage.class, "getStickerPrice", ex);
         }
@@ -110,13 +113,13 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
     }
     
     @Override
-    public long getBuyCost() {
+    public Money getBuyCost() {
         return getStickerPrice();
     }
     
     @Override
-    public long getCurrentValue() {
-    	return (long)(getStickerPrice() * ((double)shots / ((AmmoType)type).getShots()));
+    public Money getCurrentValue() {
+    	return getStickerPrice().multipliedBy(shots).dividedBy(((AmmoType)type).getShots(), RoundingMode.HALF_EVEN);
     }
 
     public int getShots() {
@@ -191,7 +194,6 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
 	@Override
 	public void fix() {
 		//nothing to fix
-		return;
 	}
 
 	@Override
@@ -214,13 +216,11 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
 	@Override
 	public void updateConditionFromEntity(boolean checkForDestruction) {
 		//nothing to do here
-		return;
 	}
 	
 	@Override
 	public void updateConditionFromPart() {
 		//nothing to do here
-		return;
 	}
 
 	@Override
@@ -306,7 +306,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
         toReturn += getAcquisitionExtraDesc() + "<br/>";
         PartInventory inventories = campaign.getPartInventory(getAcquisitionPart());
         toReturn += inventories.getTransitOrderedDetails() + "<br/>"; 
-        toReturn += Utilities.getCurrencyString(getStickerPrice()) + "<br/>";
+        toReturn += CurrencyManager.getInstance().getShortUiMoneyFormatter().print(getStickerPrice()) + "<br/>";
         toReturn += "</font></html>";
         return toReturn;
     }
