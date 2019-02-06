@@ -3,6 +3,7 @@ package mekhq.gui.adapter;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
+import java.math.RoundingMode;
 
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
@@ -16,6 +17,7 @@ import megamek.common.TargetRoll;
 import mekhq.MekHQ;
 import mekhq.campaign.event.PartChangedEvent;
 import mekhq.campaign.event.PartModeChangedEvent;
+import mekhq.campaign.finances.CurrencyManager;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Armor;
@@ -25,6 +27,7 @@ import mekhq.gui.CampaignGUI;
 import mekhq.gui.dialog.MassRepairSalvageDialog;
 import mekhq.gui.dialog.PopupValueChoiceDialog;
 import mekhq.gui.model.PartsTableModel;
+import org.joda.money.Money;
 
 public class PartsTableMouseAdapter extends MouseInputAdapter implements ActionListener {
 
@@ -89,15 +92,15 @@ public class PartsTableMouseAdapter extends MouseInputAdapter implements ActionL
             }
         } else if (command.equalsIgnoreCase("CANCEL_ORDER")) {
             double refund = gui.getCampaign().getCampaignOptions().GetCanceledOrderReimbursement();
-            long refundAmount = 0;
+            Money refundAmount = Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
             for (Part p : parts) {
                 if (null != p) {
-                    refundAmount += (refund * p.getStickerPrice() * p.getQuantity());
+                    refundAmount = refundAmount.plus(p.getStickerPrice().multipliedBy(p.getQuantity()).multipliedBy(refund, RoundingMode.HALF_EVEN));
                     gui.getCampaign().removePart(p);
                 }
             }
             gui.getCampaign().getFinances().credit(refundAmount, Transaction.C_EQUIP,
-                    "refund for cancelled equipmemt sale", gui.getCampaign().getDate());
+                    "refund for cancelled equipment sale", gui.getCampaign().getDate());
         } else if (command.equalsIgnoreCase("ARRIVE")) {
             for (Part p : parts) {
                 if (null != p) {

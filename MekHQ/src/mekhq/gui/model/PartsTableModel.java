@@ -1,13 +1,13 @@
 package mekhq.gui.model;
 
 import java.awt.Component;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 
+import mekhq.campaign.finances.CurrencyManager;
 import mekhq.campaign.parts.Part;
 
 /**
@@ -76,7 +76,7 @@ public class PartsTableModel extends DataTableModel {
         } else {
             part = (Part)data.get(row);
         }
-        DecimalFormat format = new DecimalFormat();
+
         if(col == COL_NAME) {
             return "<html><nobr>"+part.getName()+"</nobr></html>";
         }
@@ -84,10 +84,10 @@ public class PartsTableModel extends DataTableModel {
             return "<html><nobr>"+part.getDetails()+"</nobr></html>";
         }
         if(col == COL_COST) {
-            return format.format(part.getActualValue());
+            return CurrencyManager.getInstance().getShortUiMoneyFormatter().print(part.getActualValue());
         }
         if(col == COL_TOTAL_COST) {
-            return format.format(part.getActualValue() * part.getQuantity());
+            return CurrencyManager.getInstance().getShortUiMoneyFormatter().print(part.getActualValue().multipliedBy(part.getQuantity()));
         }
         if(col == COL_QUANTITY) {
             return part.getQuantity();

@@ -43,6 +43,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.table.TableColumn;
 
+import mekhq.campaign.finances.CurrencyManager;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -81,6 +82,7 @@ import mekhq.gui.dialog.ManageAssetsDialog;
 import mekhq.gui.dialog.NewLoanDialog;
 import mekhq.gui.model.FinanceTableModel;
 import mekhq.gui.model.LoanTableModel;
+import org.joda.money.Money;
 
 /**
  * Shows record of financial transactions.
@@ -385,7 +387,9 @@ public final class FinancesTab extends CampaignGuiTab {
         AddFundsDialog addFundsDialog = new AddFundsDialog(getFrame(), true);
         addFundsDialog.setVisible(true);
         if (addFundsDialog.getClosedType() == JOptionPane.OK_OPTION) {
-            long funds = addFundsDialog.getFundsQuantity();
+            Money funds = Money.of(
+                    CurrencyManager.getInstance().getDefaultCurrency(),
+                    addFundsDialog.getFundsQuantity());
             String description = addFundsDialog.getFundsDescription();
             int category = addFundsDialog.getCategory();
             getCampaign().addFunds(funds, description, category);

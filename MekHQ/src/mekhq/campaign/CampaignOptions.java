@@ -24,9 +24,9 @@ package mekhq.campaign;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import mekhq.campaign.finances.CurrencyManager;
 import org.joda.money.Money;
@@ -202,7 +202,6 @@ public class CampaignOptions implements Serializable {
     private int penaltyClanPartsFromIS;
     private boolean noClanPartsFromIS;
     private boolean planetAcquisitionVerbose;
-
 
     //xp related
     private int scenarioXP;
@@ -2488,7 +2487,7 @@ public class CampaignOptions implements Serializable {
         
         pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                     + "<salaryTypeBase>"
-                    + Utilities.printIntegerArray(salaryTypeBase)
+                    + Utilities.printIntegerList(Arrays.stream(salaryTypeBase).map(Money::getAmountMajorInt).collect(Collectors.toList()))
                     + "</salaryTypeBase>");
         pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                     + "<salaryXpMultiplier>"
@@ -2833,7 +2832,7 @@ public class CampaignOptions implements Serializable {
             } else if (wn2.getNodeName().equalsIgnoreCase("salaryTypeBase")) {
                 String[] values = wn2.getTextContent().split(",");
                 for (int i = 0; i < values.length; i++) {
-                    retVal.salaryTypeBase[i] = Integer.parseInt(values[i]);
+                    retVal.salaryTypeBase[i] = Money.of(CurrencyManager.getInstance().getDefaultCurrency(), Integer.parseInt(values[i]));
                 }
             } else if (wn2.getNodeName().equalsIgnoreCase("salaryXpMultiplier")) {
                 String[] values = wn2.getTextContent().split(",");

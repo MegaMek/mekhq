@@ -53,6 +53,7 @@ import megamek.common.options.GameOptions;
 import megamek.common.util.EncodeControl;
 import megameklab.com.util.UnitPrintManager;
 import mekhq.MekHQ;
+import mekhq.MekHqMoneyUtil;
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.event.MissionChangedEvent;
 import mekhq.campaign.event.MissionCompletedEvent;
@@ -169,7 +170,7 @@ public final class BriefingTab extends CampaignGuiTab {
         panBriefing.add(new JLabel(resourceMap.getString("lblMission.text")), //$NON-NLS-1$ ;
                 gridBagConstraints);
 
-        choiceMission = new JComboBox<String>();
+        choiceMission = new JComboBox<>();
         choiceMission.addActionListener(ev -> changeMission());
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -415,7 +416,7 @@ public final class BriefingTab extends CampaignGuiTab {
                                 } else {
                                     if (null != getCampaign().getRetirementDefectionTracker()
                                             .getRetirees((AtBContract) mission)
-                                            && getCampaign().getFinances().getBalance() >= rdd.totalPayout()) {
+                                            && MekHqMoneyUtil.isGreaterOrEqual(getCampaign().getFinances().getBalance(), rdd.totalPayout())) {
                                         final int[] admins = { Person.T_ADMIN_COM, Person.T_ADMIN_HR,
                                                 Person.T_ADMIN_LOG, Person.T_ADMIN_TRA };
                                         for (int role : admins) {
@@ -552,9 +553,9 @@ public final class BriefingTab extends CampaignGuiTab {
             return;
         }
 
-        Vector<Entity> chosen = new Vector<Entity>();
-        // ArrayList<Unit> toDeploy = new ArrayList<Unit>();
-        StringBuffer undeployed = new StringBuffer();
+        Vector<Entity> chosen = new Vector<>();
+        // ArrayList<Unit> toDeploy = new ArrayList<>();
+        StringBuilder undeployed = new StringBuilder();
 
         for (UUID uid : uids) {
             Unit u = getCampaign().getUnit(uid);
@@ -605,9 +606,9 @@ public final class BriefingTab extends CampaignGuiTab {
             return;
         }
 
-        ArrayList<Unit> chosen = new ArrayList<Unit>();
-        // ArrayList<Unit> toDeploy = new ArrayList<Unit>();
-        StringBuffer undeployed = new StringBuffer();
+        ArrayList<Unit> chosen = new ArrayList<>();
+        // ArrayList<Unit> toDeploy = new ArrayList<>();
+        StringBuilder undeployed = new StringBuilder();
 
         for (UUID uid : uids) {
             Unit u = getCampaign().getUnit(uid);
@@ -691,9 +692,9 @@ public final class BriefingTab extends CampaignGuiTab {
             return;
         }
 
-        ArrayList<Unit> chosen = new ArrayList<Unit>();
-        // ArrayList<Unit> toDeploy = new ArrayList<Unit>();
-        StringBuffer undeployed = new StringBuffer();
+        ArrayList<Unit> chosen = new ArrayList<>();
+        // ArrayList<Unit> toDeploy = new ArrayList<>();
+        StringBuilder undeployed = new StringBuilder();
 
         for (UUID uid : uids) {
             Unit u = getCampaign().getUnit(uid);
@@ -741,9 +742,9 @@ public final class BriefingTab extends CampaignGuiTab {
             return;
         }
 
-        ArrayList<Entity> chosen = new ArrayList<Entity>();
+        ArrayList<Entity> chosen = new ArrayList<>();
         // ArrayList<Unit> toDeploy = new ArrayList<Unit>();
-        StringBuffer undeployed = new StringBuffer();
+        StringBuilder undeployed = new StringBuilder();
 
         for (UUID uid : uids) {
             Unit u = getCampaign().getUnit(uid);

@@ -14,6 +14,7 @@ import javax.swing.JTable;
 import javax.swing.event.MouseInputAdapter;
 
 import mekhq.MekHQ;
+import mekhq.MekHqMoneyUtil;
 import mekhq.campaign.event.LoanRemovedEvent;
 import mekhq.campaign.event.PartRemovedEvent;
 import mekhq.campaign.finances.Loan;
@@ -115,8 +116,10 @@ public class LoanTableMouseAdapter extends MouseInputAdapter implements
                     + DecimalFormat.getInstance().format(
                             loan.getRemainingValue()) + ")");
             menuItem.setActionCommand("PAY_BALANCE");
-            menuItem.setEnabled(gui.getCampaign().getFunds() >= loan
-                    .getRemainingValue());
+            menuItem.setEnabled(
+                    MekHqMoneyUtil.isGreaterOrEqual(
+                            gui.getCampaign().getFunds(),
+                            loan.getRemainingValue()));
             menuItem.addActionListener(this);
             popup.add(menuItem);
             menuItem = new JMenuItem("Default on This Loan");

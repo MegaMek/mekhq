@@ -988,6 +988,17 @@ public class Utilities {
         return name;
     }
 
+    public static String printIntegerList(List<Integer> list) {
+        String values = ""; //$NON-NLS-1$
+        for(int i = 0; i < list.size(); i++) {
+            values += Integer.toString(list.get(i));
+            if(i < (list.size()-1)) {
+                values += ","; //$NON-NLS-1$
+            }
+        }
+        return values;
+    }
+
     public static String printIntegerArray(int[] array) {
         String values = ""; //$NON-NLS-1$
         for(int i = 0; i < array.length; i++) {

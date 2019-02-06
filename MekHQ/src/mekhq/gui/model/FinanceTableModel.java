@@ -2,7 +2,6 @@ package mekhq.gui.model;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
@@ -10,7 +9,10 @@ import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 
+import mekhq.campaign.finances.CurrencyManager;
 import mekhq.campaign.finances.Transaction;
+import org.joda.money.Money;
+import org.joda.money.MoneyUtils;
 
 /**
  * A table model for displaying financial transactions (i.e. a ledger)
@@ -61,12 +63,11 @@ public class FinanceTableModel extends DataTableModel {
 
     public Object getValueAt(int row, int col) {
         Transaction transaction = getTransaction(row);
-        long amount = transaction.getAmount();
-        long balance = 0;
+        Money amount = transaction.getAmount();
+        Money balance = Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
         for(int i = 0; i <= row; i++) {
-            balance += getTransaction(i).getAmount();
+            balance = balance.plus(getTransaction(i).getAmount());
         }
-        DecimalFormat formatter = new DecimalFormat();
         if(col == COL_CATEGORY) {
             return transaction.getCategoryName();
         }
@@ -74,21 +75,21 @@ public class FinanceTableModel extends DataTableModel {
             return transaction.getDescription();
         }
         if(col == COL_DEBIT) {
-            if(amount < 0) {
-                return formatter.format(-1 * amount);
+            if(MoneyUtils.isNegative(amount)) {
+                return CurrencyManager.getInstance().getShortUiMoneyFormatter().print(amount.multipliedBy(-1));
             } else {
                 return "";
             }
         }
         if(col == COL_CREDIT) {
-            if(amount > 0) {
-                return formatter.format(amount);
+            if(MoneyUtils.isPositive(amount)) {
+                return CurrencyManager.getInstance().getShortUiMoneyFormatter().print(amount);
             } else {
                 return "";
             }
         }
         if(col == COL_BALANCE) {
-            return formatter.format(balance);
+            return CurrencyManager.getInstance().getShortUiMoneyFormatter().print(balance);
         }
         if(col == COL_DATE) {
             SimpleDateFormat shortDateFormat = new SimpleDateFormat("MM/dd/yyyy");

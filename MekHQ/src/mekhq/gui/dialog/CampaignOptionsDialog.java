@@ -103,6 +103,7 @@ import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.GamePreset;
 import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.event.OptionsChangedEvent;
+import mekhq.campaign.finances.CurrencyManager;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.parts.Part;
@@ -120,6 +121,7 @@ import mekhq.gui.model.SortedComboBoxModel;
 import mekhq.gui.utilities.TableCellListener;
 import mekhq.module.PersonnelMarketServiceManager;
 import mekhq.module.api.PersonnelMarketMethod;
+import org.joda.money.Money;
 
 /**
  * @author Jay Lawson <jaylawson39 at yahoo.com>
@@ -1891,7 +1893,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         txtSalaryBase = new JTextField[Person.T_NUM];
         for (int i = 1; i < Person.T_NUM; i++) {
             txtType = new JTextField();
-            txtType.setText(Integer.toString(options.getBaseSalary(i)));
+            txtType.setText(Integer.toString(options.getBaseSalary(i).getAmountMajorInt()));
             txtType.setPreferredSize(new Dimension(75, 20));
             panType = new JPanel(new GridBagLayout());
             gridBagConstraints = new java.awt.GridBagConstraints();
@@ -4824,7 +4826,9 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         //start salary
         for (int i = 1; i < Person.T_NUM; i++) {
             try {
-                int salary = Integer.parseInt(txtSalaryBase[i].getText());
+                Money salary = Money.of(
+                        CurrencyManager.getInstance().getDefaultCurrency(),
+                        Integer.parseInt(txtSalaryBase[i].getText()));
                 options.setBaseSalary(salary, i);
             } catch (NumberFormatException ex) {
                 //dont change it

@@ -531,7 +531,7 @@ public class AtBConfiguration implements Serializable {
             Node wn = nl.item(i);
             switch (wn.getNodeName()) {
             case "shipSearchCost":
-                shipSearchCost = Integer.parseInt(wn.getTextContent());
+                shipSearchCost = Money.of(CurrencyManager.getInstance().getDefaultCurrency(), Integer.parseInt(wn.getTextContent()));
                 break;
             case "shipSearchLengthWeeks":
                 shipSearchLengthWeeks = Integer.parseInt(wn.getTextContent());

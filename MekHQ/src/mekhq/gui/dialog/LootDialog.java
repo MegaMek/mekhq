@@ -132,7 +132,7 @@ public class LootDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         getContentPane().add(new JLabel("Cash"), gridBagConstraints);
 
-        spnCash = new JSpinner(new SpinnerNumberModel(loot.getCash(), 0, 300000000, 10000));
+        spnCash = new JSpinner(new SpinnerNumberModel(loot.getCash().getAmountMajorLong(), 0, 300000000, 10000));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;

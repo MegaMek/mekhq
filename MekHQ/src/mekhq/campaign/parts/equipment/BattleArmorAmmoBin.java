@@ -30,6 +30,7 @@ import megamek.common.Mounted;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.finances.CurrencyManager;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PartInventory;
@@ -234,7 +235,7 @@ public class BattleArmorAmmoBin extends AmmoBin implements IAcquisitionWork {
         toReturn += getAcquisitionExtraDesc() + "<br/>";
         PartInventory inventories = campaign.getPartInventory(getAcquisitionPart());
         toReturn += inventories.getTransitOrderedDetails() + "<br/>"; 
-        toReturn += Utilities.getCurrencyString(getBuyCost()) + "<br/>";
+        toReturn += CurrencyManager.getInstance().getShortUiMoneyFormatter().print(getBuyCost()) + "<br/>";
         toReturn += "</font></html>";
         return toReturn;
     }
