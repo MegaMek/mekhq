@@ -24,7 +24,7 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 import java.math.RoundingMode;
 
-import mekhq.campaign.finances.CurrencyManager;
+import mekhq.campaign.finances.MekHqMoneyUtil;
 import org.joda.money.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -39,7 +39,6 @@ import megamek.common.TargetRoll;
 import megamek.common.TechAdvancement;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
-import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.personnel.Person;
@@ -103,7 +102,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
             }
     	}
 
-        Money itemCost = Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
+        Money itemCost = MekHqMoneyUtil.zero();
         try {
         	itemCost = itemCost.plus(type.getCost(en, isArmored, -1));
         } catch(NullPointerException ex) {
@@ -306,7 +305,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
         toReturn += getAcquisitionExtraDesc() + "<br/>";
         PartInventory inventories = campaign.getPartInventory(getAcquisitionPart());
         toReturn += inventories.getTransitOrderedDetails() + "<br/>"; 
-        toReturn += CurrencyManager.getInstance().getShortUiMoneyFormatter().print(getStickerPrice()) + "<br/>";
+        toReturn += MekHqMoneyUtil.shortUiMoneyPrinter().print(getStickerPrice()) + "<br/>";
         toReturn += "</font></html>";
         return toReturn;
     }

@@ -23,7 +23,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import mekhq.campaign.finances.CurrencyManager;
+import mekhq.campaign.finances.MekHqMoneyUtil;
 import org.joda.money.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -148,10 +148,7 @@ public class TankLocation extends Part {
 			} else if (wn2.getNodeName().equalsIgnoreCase("damage")) {
 				damage = Integer.parseInt(wn2.getTextContent());
 			} else if (wn2.getNodeName().equalsIgnoreCase("breached")) {
-				if (wn2.getTextContent().equalsIgnoreCase("true"))
-					breached = true;
-				else
-					breached = false;
+                breached = wn2.getTextContent().equalsIgnoreCase("true");
 			} 
 		}
 	}
@@ -281,7 +278,7 @@ public class TankLocation extends Part {
 	@Override
 	public Money getStickerPrice() {
 		// TODO Auto-generated method stub
-		return Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
+		return MekHqMoneyUtil.zero();
 	}
 	
 	@Override

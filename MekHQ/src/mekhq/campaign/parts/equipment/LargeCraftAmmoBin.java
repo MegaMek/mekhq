@@ -21,7 +21,7 @@ package mekhq.campaign.parts.equipment;
 import java.io.PrintWriter;
 import java.math.RoundingMode;
 
-import mekhq.campaign.finances.CurrencyManager;
+import mekhq.campaign.finances.MekHqMoneyUtil;
 import org.joda.money.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -171,9 +171,7 @@ public class LargeCraftAmmoBin extends AmmoBin {
     protected Money getPricePerTon() {
         // Since ammo swaps are handled by moving capacity from one bay to another, the ammo type
         // of the bay and the unit should be the same.
-        return Money.of(
-                CurrencyManager.getInstance().getDefaultCurrency(),
-                getType().getRawCost());
+        return MekHqMoneyUtil.money(getType().getRawCost());
     }
     
     @Override

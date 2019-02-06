@@ -23,7 +23,7 @@ package mekhq.campaign.personnel;
 
 import java.io.PrintWriter;
 import java.io.Serializable;
-import java.text.DecimalFormat;
+import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Enumeration;
@@ -35,6 +35,8 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import mekhq.campaign.finances.MekHqMoneyUtil;
+import org.joda.money.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -77,9 +79,9 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
 	private GregorianCalendar lastRetirementRoll;
 	
 	public RetirementDefectionTracker() {
-		rollRequired = new HashSet<Integer>();
-		unresolvedPersonnel = new HashMap<Integer, HashSet<UUID>>();
-		payouts = new HashMap<UUID, Payout>();
+		rollRequired = new HashSet<>();
+		unresolvedPersonnel = new HashMap<>();
+		payouts = new HashMap<>();
 		lastRetirementRoll = new GregorianCalendar();
 	}
 
@@ -88,25 +90,24 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
 	 * @param campaign
 	 * @return The value of each share in C-bills
 	 */
-	public static long getShareValue(Campaign campaign) {
+	public static Money getShareValue(Campaign campaign) {
         final String METHOD_NAME = "getShareValue(Campaign)"; //$NON-NLS-1$
 
         if (!campaign.getCampaignOptions().getUseShareSystem()) {
-			return 0;
+			return MekHqMoneyUtil.zero();
 		}
 		String financialReport = campaign.getFinancialReport();
-		long netWorth = 0;
+		Money netWorth = MekHqMoneyUtil.zero();
 		try {
-			DecimalFormat df = new DecimalFormat();
 			Pattern p = Pattern.compile("Net Worth\\D*(.*)");
 			Matcher m = p.matcher(financialReport);
 			m.find();
-			netWorth = (Long)(df.parse(m.group(1)));
+			netWorth = MekHqMoneyUtil.uiAmountMoneyFormatter().parseMoney(m.group(1));
 			if (campaign.getCampaignOptions().getSharesExcludeLargeCraft()) {
 				p = Pattern.compile("Large Craft\\D*(.*)");
 				m = p.matcher(financialReport);				
 				if (m.find() && null != m.group(1)) {
-					netWorth -= (Long)(df.parse(m.group(1)));
+					netWorth = netWorth.minus(MekHqMoneyUtil.uiAmountMoneyFormatter().parseMoney(m.group(1)));
 				}
 			}
 		} catch (Exception e) {
@@ -118,7 +119,7 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
 		for (Person p : campaign.getActivePersonnel()) {
 			totalShares += p.getNumShares(campaign.getCampaignOptions().getSharesForAll());
 		}
-		return netWorth / totalShares;
+		return netWorth.dividedBy(totalShares, RoundingMode.HALF_EVEN);
 	}
 
 	/**
@@ -134,7 +135,7 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
 	 */
     public HashMap<UUID, TargetRoll> calculateTargetNumbers(AtBContract contract,
     		Campaign campaign) {
-    	HashMap <UUID, TargetRoll> targets = new HashMap<UUID, TargetRoll>();
+    	HashMap <UUID, TargetRoll> targets = new HashMap<>();
     	int combatLeadershipMod = 0;
     	int supportLeadershipMod = 0;
     	
@@ -286,9 +287,9 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
      * @param campaign
      */
     public void rollRetirement(AtBContract contract,
-    		HashMap<UUID, TargetRoll> targets, long shareValue, Campaign campaign) {
+    		HashMap<UUID, TargetRoll> targets, Money shareValue, Campaign campaign) {
     	if (null != contract && !unresolvedPersonnel.keySet().contains(contract.getId())) {
-    		unresolvedPersonnel.put(contract.getId(), new HashSet<UUID>());
+    		unresolvedPersonnel.put(contract.getId(), new HashSet<>());
     	}
     	for (UUID id : targets.keySet()) {
     		if (Compute.d6(2) < targets.get(id).getValue()) {
@@ -339,7 +340,7 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
     			killed, campaign.getCampaignOptions().getSharesForAll()));
     	if (null != contract) {
     		if (null == unresolvedPersonnel.get(contract.getId())) {
-    			unresolvedPersonnel.put(contract.getId(), new HashSet<UUID>());
+    			unresolvedPersonnel.put(contract.getId(), new HashSet<>());
     		}
     		unresolvedPersonnel.get(contract.getId()).add(person.getId());
     	}
@@ -408,17 +409,17 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
      * @param person
      * @return	The amount in C-bills required to get a bonus to the retirement/defection roll
      */
-	public static long getBonusCost(Person person) {
+	public static Money getBonusCost(Person person) {
 		switch (person.getExperienceLevel(false)) {
 		case SkillType.EXP_ELITE:
-			return (person.getProfession() == Ranks.RPROF_MW)?300000:150000;
+			return MekHqMoneyUtil.money((person.getProfession() == Ranks.RPROF_MW)?300000:150000);
 		case SkillType.EXP_VETERAN:
-			return (person.getProfession() == Ranks.RPROF_MW)?150000:50000;
+			return MekHqMoneyUtil.money((person.getProfession() == Ranks.RPROF_MW)?150000:50000);
 		case SkillType.EXP_REGULAR:
-			return (person.getProfession() == Ranks.RPROF_MW)?50000:20000;
+			return MekHqMoneyUtil.money((person.getProfession() == Ranks.RPROF_MW)?50000:20000);
 		case SkillType.EXP_GREEN:
 		default:
-			return (person.getProfession() == Ranks.RPROF_MW)?20000:10000;
+			return MekHqMoneyUtil.money((person.getProfession() == Ranks.RPROF_MW)?20000:10000);
 		}
 	}
 	
@@ -431,7 +432,7 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
 	public class Payout {
 		int weightClass = 0;
 		int dependents = 0;
-		long cbills = 0;
+		Money payoutAmount = MekHqMoneyUtil.zero();
 		boolean recruit = false;
 		int recruitType = Person.T_NONE;
 		boolean heir = false;
@@ -440,10 +441,10 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
 		
 		public Payout() {}
 		
-		public Payout(Person p, long shareValue, boolean killed, boolean sharesForAll) {
-			calculatePayout(p, killed, shareValue > 0);
-			if (shareValue > 0) {
-				cbills += shareValue * p.getNumShares(sharesForAll);
+		public Payout(Person p, Money shareValue, boolean killed, boolean sharesForAll) {
+			calculatePayout(p, killed, shareValue.isPositive());
+			if (shareValue.isPositive()) {
+				payoutAmount = payoutAmount.plus(shareValue.multipliedBy(p.getNumShares(sharesForAll)));
 			}
 			if (killed) {
 				switch (Compute.d6()) {
@@ -484,12 +485,12 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
 			} else {
 				if (p.getProfession() == Ranks.RPROF_INF) {
 					if (p.getUnitId() != null) {
-						cbills = 50000;
+						payoutAmount = MekHqMoneyUtil.money(50000);
 					}
 				} else {
-					cbills = getBonusCost(p);
+					payoutAmount = getBonusCost(p);
 					if (p.getRank().isOfficer()) {
-						cbills *= 2;
+						payoutAmount = payoutAmount.multipliedBy(2);
 					}
 				}
 				if (!shareSystem &&
@@ -524,12 +525,12 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
 			dependents = d;
 		}
 
-		public long getCbills() {
-			return cbills;
+		public Money getPayoutAmount() {
+			return payoutAmount;
 		}
 
-		public void setCbills(long cbills) {
-			this.cbills = cbills;
+		public void setPayoutAmount(Money payoutAmount) {
+			this.payoutAmount = payoutAmount;
 		}
 
 		public boolean hasRecruit() {
@@ -613,7 +614,7 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
         	MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 3,
         			"dependents", payouts.get(pid).getDependents());
         	MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 3,
-        			"cbills", payouts.get(pid).getCbills());
+        			"cbills", MekHqXmlUtil.getXmlStringFromMoney(payouts.get(pid).getPayoutAmount()));
         	MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 3,
         			"recruit", payouts.get(pid).hasRecruit());
         	MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 3,
@@ -673,7 +674,7 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
                 		}
                 		if (wn3.getNodeName().equalsIgnoreCase("contract")) {
                 			int id = Integer.parseInt(wn3.getAttributes().getNamedItem("id").getTextContent());
-                			HashSet<UUID> pids = new HashSet<UUID>();
+                			HashSet<UUID> pids = new HashSet<>();
                 			String [] ids = wn3.getTextContent().split(",");
                 			for (String s : ids) {
                 				pids.add(UUID.fromString(s));
@@ -702,7 +703,7 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
                 				} else if (wn4.getNodeName().equalsIgnoreCase("dependents")) {
                 					payout.setDependents(Integer.parseInt(wn4.getTextContent()));
                 				} else if (wn4.getNodeName().equalsIgnoreCase("cbills")) {
-                					payout.setCbills(Long.parseLong(wn4.getTextContent()));
+                					payout.setPayoutAmount(MekHqXmlUtil.getMoneyFromXmlNode(wn4));
                 				} else if (wn4.getNodeName().equalsIgnoreCase("recruit")) {
                 					payout.setRecruit(Boolean.parseBoolean(wn4.getTextContent()));
                 				} else if (wn4.getNodeName().equalsIgnoreCase("heir")) {

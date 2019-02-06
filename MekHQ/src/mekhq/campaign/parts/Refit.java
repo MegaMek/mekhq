@@ -37,7 +37,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import mekhq.campaign.finances.CurrencyManager;
+import mekhq.campaign.finances.MekHqMoneyUtil;
 import org.joda.money.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -767,9 +767,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 		for(AmmoType type : ammoNeeded.keySet()) {
 			int shotsNeeded = Math.max(ammoNeeded.get(type) - getAmmoAvailable(type), 0);
 			int shotsPerTon = type.getShots();
-			cost = cost.plus(Money.of(
-			        CurrencyManager.getInstance().getDefaultCurrency(),
-                    type.getCost(newEntity, false, -1) * ((double)shotsNeeded/shotsPerTon)));
+			cost = cost.plus(MekHqMoneyUtil.money(type.getCost(newEntity, false, -1) * ((double)shotsNeeded/shotsPerTon)));
 		}
 		
 		/*
@@ -1676,7 +1674,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 
 	@Override
 	public String getDetails() {
-		return "(" + getRefitClassName() + "/" + getTimeLeft() + " minutes/" + CurrencyManager.getInstance().getShortUiMoneyFormatter().print(getCost()) + ")";
+		return "(" + getRefitClassName() + "/" + getTimeLeft() + " minutes/" + MekHqMoneyUtil.shortUiMoneyPrinter().print(getCost()) + ")";
 	}
 
 	@Override
@@ -1793,32 +1791,17 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 						retVal.assignedTechId = UUID.fromString(wn2.getTextContent());
 					}
 				} else if (wn2.getNodeName().equalsIgnoreCase("failedCheck")) {
-					if (wn2.getTextContent().equalsIgnoreCase("true"))
-						retVal.failedCheck = true;
-					else
-						retVal.failedCheck = false;
+                    retVal.failedCheck = wn2.getTextContent().equalsIgnoreCase("true");
 				} else if (wn2.getNodeName().equalsIgnoreCase("customJob")) {
-					if (wn2.getTextContent().equalsIgnoreCase("true"))
-						retVal.customJob = true;
-					else
-						retVal.customJob = false;
+                    retVal.customJob = wn2.getTextContent().equalsIgnoreCase("true");
 				} else if (wn2.getNodeName().equalsIgnoreCase("kitFound")) {
-					if (wn2.getTextContent().equalsIgnoreCase("true"))
-						retVal.kitFound = true;
-					else
-						retVal.kitFound = false;
+                    retVal.kitFound = wn2.getTextContent().equalsIgnoreCase("true");
 				} else if (wn2.getNodeName().equalsIgnoreCase("isRefurbishing")) {
-                    if (wn2.getTextContent().equalsIgnoreCase("true"))
-                        retVal.isRefurbishing = true;
-                    else 
-                        retVal.isRefurbishing = false;
+                    retVal.isRefurbishing = wn2.getTextContent().equalsIgnoreCase("true");
 				} else if (wn2.getNodeName().equalsIgnoreCase("armorNeeded")) {
 					retVal.armorNeeded = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("sameArmorType")) {
-					if (wn2.getTextContent().equalsIgnoreCase("true"))
-						retVal.sameArmorType = true;
-					else
-						retVal.sameArmorType = false;
+                    retVal.sameArmorType = wn2.getTextContent().equalsIgnoreCase("true");
 				} else if (wn2.getNodeName().equalsIgnoreCase("entity")) {
 					retVal.newEntity = MekHqXmlUtil.getEntityFromXmlString(wn2);
 				} else if (wn2.getNodeName().equalsIgnoreCase("oldUnitParts")) {

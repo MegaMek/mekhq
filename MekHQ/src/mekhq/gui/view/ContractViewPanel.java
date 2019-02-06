@@ -22,6 +22,7 @@ import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ResourceBundle;
@@ -381,7 +382,11 @@ public class ContractViewPanel extends JPanel {
         } else {
             lblSalvagePct1.setText(resourceMap.getString("lblSalvagePct.text"));   
             int maxSalvagePct = contract.getSalvagePct();
-            int currentSalvagePct = (int)(100*((double)contract.getSalvagedByUnit())/(contract.getSalvagedByUnit()+contract.getSalvagedByEmployer()));
+            int currentSalvagePct = contract.getSalvagedByUnit()
+                    .dividedBy(contract.getSalvagedByUnit().plus(contract.getSalvagedByEmployer()).getAmount(), RoundingMode.HALF_EVEN)
+                    .multipliedBy(100)
+                    .getAmount()
+                    .intValue();
             String lead = "<html><font color='black'>";
             if(currentSalvagePct > maxSalvagePct) {
                 lead = "<html><font color='red'>";

@@ -5,7 +5,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import mekhq.campaign.finances.CurrencyManager;
+import mekhq.campaign.finances.MekHqMoneyUtil;
 import org.joda.money.Money;
 import org.w3c.dom.Node;
 
@@ -172,9 +172,7 @@ public class QuadVeeGear extends Part {
          * We will use a general 10,000 * part tonnage and assume the remainder is part of the
          * turret mechanism that is only destroyed if the center torso is destroyed.
          */
-        return Money.of(
-                CurrencyManager.getInstance().getDefaultCurrency(),
-                getTonnage() * 10000);
+        return MekHqMoneyUtil.money(getTonnage() * 10000);
     }
 
     @Override

@@ -23,7 +23,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import mekhq.campaign.finances.CurrencyManager;
+import mekhq.campaign.finances.MekHqMoneyUtil;
 import org.joda.money.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -171,7 +171,7 @@ public class InfantryArmorPart extends Part {
 
 	@Override
 	public Money getStickerPrice() {
-		long price = 0;
+		double price = 0;
 		if(damageDivisor > 1) {
 			if(isEncumbering()) {
 				price += 1600;
@@ -207,7 +207,7 @@ public class InfantryArmorPart extends Part {
 			price += 5000;
 		}
 		
-		return Money.of(CurrencyManager.getInstance().getDefaultCurrency(), price);
+		return MekHqMoneyUtil.money(price);
 	}
 
 	@Override
@@ -300,46 +300,22 @@ public class InfantryArmorPart extends Part {
 				damageDivisor =Double.parseDouble(wn2.getTextContent());
 			} 
 			else if (wn2.getNodeName().equalsIgnoreCase("dest")) {
-				if(wn2.getTextContent().equalsIgnoreCase("true")) {
-					dest = true;
-				} else {
-					dest = false;
-				}
+                dest = wn2.getTextContent().equalsIgnoreCase("true");
 			}
 			else if (wn2.getNodeName().equalsIgnoreCase("encumbering")) {
-				if(wn2.getTextContent().equalsIgnoreCase("true")) {
-					encumbering = true;
-				} else {
-					encumbering = false;
-				}
+                encumbering = wn2.getTextContent().equalsIgnoreCase("true");
 			}
 			else if (wn2.getNodeName().equalsIgnoreCase("sneak_camo")) {
-				if(wn2.getTextContent().equalsIgnoreCase("true")) {
-					sneak_camo = true;
-				} else {
-					sneak_camo = false;
-				}
+                sneak_camo = wn2.getTextContent().equalsIgnoreCase("true");
 			}
 			else if (wn2.getNodeName().equalsIgnoreCase("sneak_ecm")) {
-				if(wn2.getTextContent().equalsIgnoreCase("true")) {
-					sneak_ecm = true;
-				} else {
-					sneak_ecm = false;
-				}
+                sneak_ecm = wn2.getTextContent().equalsIgnoreCase("true");
 			}
 			else if (wn2.getNodeName().equalsIgnoreCase("sneak_ir")) {
-				if(wn2.getTextContent().equalsIgnoreCase("true")) {
-					sneak_ir = true;
-				} else {
-					sneak_ir = false;
-				}
+                sneak_ir = wn2.getTextContent().equalsIgnoreCase("true");
 			}
 			else if (wn2.getNodeName().equalsIgnoreCase("spaceSuit")) {
-				if(wn2.getTextContent().equalsIgnoreCase("true")) {
-					spaceSuit = true;
-				} else {
-					spaceSuit = false;
-				}
+                spaceSuit = wn2.getTextContent().equalsIgnoreCase("true");
 			}
 		}
 	}

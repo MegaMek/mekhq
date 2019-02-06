@@ -23,7 +23,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import mekhq.campaign.finances.CurrencyManager;
+import mekhq.campaign.finances.MekHqMoneyUtil;
 import org.joda.money.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -92,23 +92,23 @@ public class MekCockpit extends Part {
 		switch (type) {
         case Mech.COCKPIT_COMMAND_CONSOLE:
             // 500000 for command console + 200000 for primary cockpit
-            return Money.of(CurrencyManager.getInstance().getDefaultCurrency(), 700000);
+            return MekHqMoneyUtil.money(700000);
         case Mech.COCKPIT_SMALL:
-            return Money.of(CurrencyManager.getInstance().getDefaultCurrency(), 175000);
+            return MekHqMoneyUtil.money(175000);
         case Mech.COCKPIT_TORSO_MOUNTED:
-            return Money.of(CurrencyManager.getInstance().getDefaultCurrency(), 750000);
+            return MekHqMoneyUtil.money(750000);
         case Mech.COCKPIT_STANDARD:
-            return Money.of(CurrencyManager.getInstance().getDefaultCurrency(), 200000);
+            return MekHqMoneyUtil.money(200000);
         case Mech.COCKPIT_INDUSTRIAL:
-            return Money.of(CurrencyManager.getInstance().getDefaultCurrency(), 100000);
+            return MekHqMoneyUtil.money(100000);
         case Mech.COCKPIT_DUAL:
-            return Money.of(CurrencyManager.getInstance().getDefaultCurrency(), 40000);
+            return MekHqMoneyUtil.money(40000);
         case Mech.COCKPIT_VRRP:
-            return Money.of(CurrencyManager.getInstance().getDefaultCurrency(), 1250000);
+            return MekHqMoneyUtil.money(1250000);
         case Mech.COCKPIT_QUADVEE:
-            return Money.of(CurrencyManager.getInstance().getDefaultCurrency(), 375000);
+            return MekHqMoneyUtil.money(375000);
         default:
-            return Money.of(CurrencyManager.getInstance().getDefaultCurrency(), 200000);
+            return MekHqMoneyUtil.money(200000);
 		}
 	}
 

@@ -18,6 +18,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.event.PartChangedEvent;
 import mekhq.campaign.event.PartModeChangedEvent;
 import mekhq.campaign.finances.CurrencyManager;
+import mekhq.campaign.finances.MekHqMoneyUtil;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Armor;
@@ -92,7 +93,7 @@ public class PartsTableMouseAdapter extends MouseInputAdapter implements ActionL
             }
         } else if (command.equalsIgnoreCase("CANCEL_ORDER")) {
             double refund = gui.getCampaign().getCampaignOptions().GetCanceledOrderReimbursement();
-            Money refundAmount = Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
+            Money refundAmount = MekHqMoneyUtil.zero();
             for (Part p : parts) {
                 if (null != p) {
                     refundAmount = refundAmount.plus(p.getStickerPrice().multipliedBy(p.getQuantity()).multipliedBy(refund, RoundingMode.HALF_EVEN));

@@ -49,7 +49,7 @@ import megamek.common.weapons.InfantryAttack;
 import megamek.common.weapons.Weapon;
 import megamek.common.weapons.bayweapons.BayWeapon;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.finances.CurrencyManager;
+import mekhq.campaign.finances.MekHqMoneyUtil;
 import mekhq.campaign.parts.AeroHeatSink;
 import mekhq.campaign.parts.AeroSensor;
 import mekhq.campaign.parts.AmmoStorage;
@@ -85,8 +85,6 @@ import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.HeatSink;
 import mekhq.campaign.parts.equipment.JumpJet;
 import mekhq.campaign.parts.equipment.MASC;
-import org.joda.money.Money;
-
 
 /**
  * This is a parts store which will contain one copy of every possible
@@ -111,8 +109,8 @@ public class PartsStore implements Serializable {
 	private Map<String, Part> nameAndDetailMap;
 
 	public PartsStore(Campaign c) {
-		parts = new ArrayList<Part>(EXPECTED_SIZE);
-		nameAndDetailMap = new HashMap<String, Part>(EXPECTED_SIZE);
+		parts = new ArrayList<>(EXPECTED_SIZE);
+		nameAndDetailMap = new HashMap<>(EXPECTED_SIZE);
 		stock(c);
 	}
 
@@ -352,8 +350,7 @@ public class PartsStore implements Serializable {
         if (engine.hasFlag(Engine.TANK_ENGINE) && engine.isFusion()) {
             weight *= 1.5f;
         }
-        double toReturn = TestEntity.ceilMaxHalf(weight, TestEntity.Ceil.HALFTON);
-        return toReturn;
+        return TestEntity.ceilMaxHalf(weight, TestEntity.Ceil.HALFTON);
 	}
 
 	private void stockEngines(Campaign c) {
@@ -446,7 +443,7 @@ public class PartsStore implements Serializable {
 		}
 		parts.add(new AeroSensor(0, true, c));
 		parts.add(new Avionics(0, c));
-		parts.add(new FireControlSystem(0, Money.zero(CurrencyManager.getInstance().getDefaultCurrency()), c));
+		parts.add(new FireControlSystem(0, MekHqMoneyUtil.zero(), c));
 		parts.add(new LandingGear(0, c));
 		parts.add(new BayDoor(0, c));
 		for (BayType btype : BayType.values()) {

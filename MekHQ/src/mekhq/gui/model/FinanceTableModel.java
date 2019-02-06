@@ -9,7 +9,7 @@ import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 
-import mekhq.campaign.finances.CurrencyManager;
+import mekhq.campaign.finances.MekHqMoneyUtil;
 import mekhq.campaign.finances.Transaction;
 import org.joda.money.Money;
 import org.joda.money.MoneyUtils;
@@ -64,7 +64,7 @@ public class FinanceTableModel extends DataTableModel {
     public Object getValueAt(int row, int col) {
         Transaction transaction = getTransaction(row);
         Money amount = transaction.getAmount();
-        Money balance = Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
+        Money balance = MekHqMoneyUtil.zero();
         for(int i = 0; i <= row; i++) {
             balance = balance.plus(getTransaction(i).getAmount());
         }
@@ -76,20 +76,20 @@ public class FinanceTableModel extends DataTableModel {
         }
         if(col == COL_DEBIT) {
             if(MoneyUtils.isNegative(amount)) {
-                return CurrencyManager.getInstance().getShortUiMoneyFormatter().print(amount.multipliedBy(-1));
+                return MekHqMoneyUtil.shortUiMoneyPrinter().print(amount.multipliedBy(-1));
             } else {
                 return "";
             }
         }
         if(col == COL_CREDIT) {
             if(MoneyUtils.isPositive(amount)) {
-                return CurrencyManager.getInstance().getShortUiMoneyFormatter().print(amount);
+                return MekHqMoneyUtil.shortUiMoneyPrinter().print(amount);
             } else {
                 return "";
             }
         }
         if(col == COL_BALANCE) {
-            return CurrencyManager.getInstance().getShortUiMoneyFormatter().print(balance);
+            return MekHqMoneyUtil.shortUiMoneyPrinter().print(balance);
         }
         if(col == COL_DATE) {
             SimpleDateFormat shortDateFormat = new SimpleDateFormat("MM/dd/yyyy");

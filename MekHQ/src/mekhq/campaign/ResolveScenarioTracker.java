@@ -59,7 +59,7 @@ import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.event.PersonBattleFinishedEvent;
-import mekhq.campaign.finances.CurrencyManager;
+import mekhq.campaign.finances.MekHqMoneyUtil;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.log.ServiceLogger;
 import mekhq.campaign.mission.AtBContract;
@@ -1185,7 +1185,7 @@ public class ResolveScenarioTracker {
                 if(blc > 0) {
                     Money value = unitValue.multipliedBy(blc, RoundingMode.HALF_EVEN);
                     campaign.getFinances().credit(value, Transaction.C_BLC, "Battle loss compensation for " + unit.getName(), campaign.getCalendar().getTime());
-                    campaign.addReport(CurrencyManager.getInstance().getShortUiMoneyFormatter().print(value) + " in battle loss compensation for " + unit.getName() + " has been credited to your account.");
+                    campaign.addReport(MekHqMoneyUtil.shortUiMoneyPrinter().print(value) + " in battle loss compensation for " + unit.getName() + " has been credited to your account.");
                 }
                 campaign.removeUnit(unit.getId());
             } else {
@@ -1208,7 +1208,7 @@ public class ResolveScenarioTracker {
                 //check for BLC
                 Money newValue = unit.getValueOfAllMissingParts();
                 Money blcValue = newValue.minus(currentValue);
-                Money repairBLC = Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
+                Money repairBLC = MekHqMoneyUtil.zero();
                 String blcString = "battle loss compensation (parts) for " + unit.getName();
                 if(!unit.isRepairable()) {
                     //if the unit is not repairable, you should get BLC for it but we should subtract
@@ -1227,7 +1227,7 @@ public class ResolveScenarioTracker {
                 if(blc > 0 && MoneyUtils.isPositive(blcValue)) {
                     Money finalValue = blcValue.multipliedBy(blc, RoundingMode.HALF_EVEN);
                     campaign.getFinances().credit(finalValue, Transaction.C_BLC, "B" + blcString, campaign.getCalendar().getTime());
-                    campaign.addReport(CurrencyManager.getInstance().getShortUiMoneyFormatter().print(finalValue) + " in b" + blcString + " has been credited to your account.");
+                    campaign.addReport( MekHqMoneyUtil.shortUiMoneyPrinter().print(finalValue) + " in b" + blcString + " has been credited to your account.");
                 }
             }
         }
@@ -1247,14 +1247,14 @@ public class ResolveScenarioTracker {
             }
         }
         if(getMission() instanceof Contract) {
-            Money value = Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
+            Money value = MekHqMoneyUtil.zero();
             for(Unit salvageUnit : leftoverSalvage) {
                 value = value.plus(salvageUnit.getSellValue());
             }
             if(((Contract)getMission()).isSalvageExchange()) {
                 value = value.multipliedBy(((Contract)getMission()).getSalvagePct()).dividedBy(100.0, RoundingMode.HALF_EVEN);
                 campaign.getFinances().credit(value, Transaction.C_SALVAGE, "salvage exchange for " + scenario.getName(),  campaign.getCalendar().getTime());
-                campaign.addReport(CurrencyManager.getInstance().getShortUiMoneyFormatter().print(value) + " have been credited to your account for salvage exchange.");
+                campaign.addReport(MekHqMoneyUtil.shortUiMoneyPrinter().print(value) + " have been credited to your account for salvage exchange.");
             } else {
                 ((Contract)getMission()).addSalvageByEmployer(value);
             }

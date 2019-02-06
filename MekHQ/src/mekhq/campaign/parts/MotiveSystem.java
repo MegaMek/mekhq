@@ -23,7 +23,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import mekhq.campaign.finances.CurrencyManager;
+import mekhq.campaign.finances.MekHqMoneyUtil;
 import org.joda.money.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -83,7 +83,7 @@ public class MotiveSystem extends Part {
 	@Override
 	public Money getStickerPrice() {
 		// TODO Auto-generated method stub
-		return Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
+		return MekHqMoneyUtil.zero();
 	}
 	
 	@Override

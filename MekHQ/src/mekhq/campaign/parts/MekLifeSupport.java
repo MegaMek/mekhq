@@ -23,7 +23,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import mekhq.campaign.finances.CurrencyManager;
+import mekhq.campaign.finances.MekHqMoneyUtil;
 import org.joda.money.Money;
 import org.w3c.dom.Node;
 
@@ -65,7 +65,7 @@ public class MekLifeSupport extends Part {
 	
 	@Override
 	public Money getStickerPrice() {
-		return Money.of(CurrencyManager.getInstance().getDefaultCurrency(), 50000);
+		return MekHqMoneyUtil.money(50000);
 	}
 
     @Override
@@ -138,7 +138,6 @@ public class MekLifeSupport extends Part {
 					&& hits > priorHits && hits >= 2
 					&& Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
 				remove(false);
-				return;
 			}
 		}
 	}

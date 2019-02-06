@@ -75,6 +75,7 @@ import megamek.server.Server;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.event.ScenarioResolvedEvent;
+import mekhq.campaign.finances.CurrencyManager;
 import mekhq.campaign.handler.XPHandler;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;

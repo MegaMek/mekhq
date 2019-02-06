@@ -23,7 +23,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import mekhq.campaign.finances.CurrencyManager;
+import mekhq.campaign.finances.MekHqMoneyUtil;
 import org.joda.money.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -103,7 +103,6 @@ public class DropshipDockingCollar extends Part {
 					         || (boomDamaged && !priorBoomDamage))
 					 && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
 				 remove(false);
-				 return;
 			 }
 		}
 	}
@@ -181,11 +180,11 @@ public class DropshipDockingCollar extends Part {
 	@Override
 	public Money getStickerPrice() {
 	    if (collarType == Dropship.COLLAR_STANDARD) {
-	        return Money.of(CurrencyManager.getInstance().getDefaultCurrency(), 10000);
+	        return MekHqMoneyUtil.money(10000);
 	    } else if (collarType == Dropship.COLLAR_PROTOTYPE) {
-	        return Money.of(CurrencyManager.getInstance().getDefaultCurrency(), 1010000) ;
+	        return MekHqMoneyUtil.money(1010000) ;
 	    } else {
-	        return Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
+	        return MekHqMoneyUtil.zero();
 	    }
 	}
 	

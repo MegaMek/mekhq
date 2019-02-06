@@ -21,6 +21,7 @@ import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamResult;
 
 import mekhq.campaign.finances.CurrencyManager;
+import mekhq.campaign.finances.MekHqMoneyUtil;
 import org.apache.commons.text.StringEscapeUtils;
 import org.joda.money.Money;
 import org.w3c.dom.Element;
@@ -670,14 +671,15 @@ public class MekHqXmlUtil {
      * @return a money object
      */
     public static Money getMoneyFromXmlNode(Node node) {
-        if (node.hasAttributes() &&
-                node.getAttributes().getNamedItem("version").getNodeValue().contentEquals("2")) { // version 2 save
-            return CurrencyManager.getInstance().getXmlMoneyFormatter().parseMoney(node.getTextContent().trim());
-        } else { // Old save, transform the long into a Money
-            return Money.of(
-                    CurrencyManager.getInstance().getDefaultCurrency(),
-                    Long.parseLong(node.getTextContent().trim()));
+        // Check the XML data version
+        if (node.hasAttributes()) {
+            Node attribute = node.getAttributes().getNamedItem("version");
+            if (attribute != null && attribute.getTextContent().trim().equals("2")) {
+                return MekHqMoneyUtil.xmlMoneyFormatter().parseMoney(node.getTextContent().trim());
+            }
         }
+        // Old save, transform the long into a money
+        return MekHqMoneyUtil.money(Long.parseLong(node.getTextContent().trim()));
     }
 
     /**
@@ -687,6 +689,6 @@ public class MekHqXmlUtil {
      * @return a string representation of the money
      */
     public static String getXmlStringFromMoney(Money amount) {
-        return CurrencyManager.getInstance().getXmlMoneyFormatter().print(amount);
+        return MekHqMoneyUtil.xmlMoneyFormatter().print(amount);
     }
 }

@@ -43,7 +43,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.table.TableColumn;
 
-import mekhq.campaign.finances.CurrencyManager;
+import mekhq.campaign.finances.MekHqMoneyUtil;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -240,17 +240,17 @@ public final class FinancesTab extends CampaignGuiTab {
     	ArrayList<Transaction> transactions = getCampaign().getFinances().getAllTransactions();
     	Calendar cal = Calendar.getInstance();
     	
-    	long balance = 0;
+    	Money balance = MekHqMoneyUtil.zero();
     	for (int i = 0; i < transactions.size(); i++) {
-    		balance += transactions.get(i).getAmount();
+    		balance = balance.plus(transactions.get(i).getAmount());
     		cal.setTime(transactions.get(i).getDate());
     		// since there may be more than one entry per day and the dataset for the graph can only have one entry per day
     		// we use addOrUpdate() which assumes transactions are in sequential order by date so we always have the most
     		// up-to-date entry for each day
     		s1.addOrUpdate(new Day(cal.get(Calendar.DAY_OF_MONTH),
-    				cal.get(Calendar.MONTH)+1, // Gregorian and Julian calendars start at 0: https://docs.oracle.com/javase/7/docs/api/java/util/Calendar.html#MONTH
-    				cal.get(Calendar.YEAR)), 
-    				balance);
+    				        cal.get(Calendar.MONTH)+1, // Gregorian and Julian calendars start at 0: https://docs.oracle.com/javase/7/docs/api/java/util/Calendar.html#MONTH
+    				               cal.get(Calendar.YEAR)),
+    				        balance.getAmount().doubleValue());
     	}
                 
         TimeSeriesCollection dataset = new TimeSeriesCollection();
@@ -266,37 +266,37 @@ public final class FinancesTab extends CampaignGuiTab {
     	Calendar cal = Calendar.getInstance();
     	
     	String pastMonthYear = "";
-    	long monthlyRevenue = 0;
-    	long monthlyExpenditures = 0;
+    	Money monthlyRevenue = MekHqMoneyUtil.zero();
+        Money monthlyExpenditures = MekHqMoneyUtil.zero();
     	for (int i = 0; i < transactions.size(); i++) {
     		cal.setTime(transactions.get(i).getDate());
     		
     		if (pastMonthYear.equals(df.format(cal.getTime()))) {
-    			if (transactions.get(i).getAmount() > 0) {
-    				monthlyRevenue += transactions.get(i).getAmount();
+    			if (transactions.get(i).getAmount().isPositive()) {
+    				monthlyRevenue = monthlyRevenue.plus(transactions.get(i).getAmount());
     			} else {
-    				monthlyExpenditures += Math.abs(transactions.get(i).getAmount());
+    				monthlyExpenditures = monthlyExpenditures.plus(transactions.get(i).getAmount());
     			}
     		} else {
     			// as long as we're not at the first transaction, add the previous month and reset
     			if (i != 0) {
-    				dataset.addValue(monthlyRevenue, resourceMap.getString("graphMonthlyRevenue.text"), pastMonthYear);
-    				dataset.addValue(monthlyExpenditures, resourceMap.getString("graphMonthlyExpenditures.text"), pastMonthYear);
-    				monthlyRevenue = 0;
-    				monthlyExpenditures = 0;
+    				dataset.addValue(monthlyRevenue.getAmount().doubleValue(), resourceMap.getString("graphMonthlyRevenue.text"), pastMonthYear);
+    				dataset.addValue(monthlyExpenditures.getAmount().doubleValue(), resourceMap.getString("graphMonthlyExpenditures.text"), pastMonthYear);
+    				monthlyRevenue = MekHqMoneyUtil.zero();
+    				monthlyExpenditures = MekHqMoneyUtil.zero();
     			}
     			pastMonthYear = df.format(cal.getTime());
-    			if (transactions.get(i).getAmount() > 0) {
+    			if (transactions.get(i).getAmount().isPositive()) {
     				monthlyRevenue = transactions.get(i).getAmount();
     			} else {
-    				monthlyExpenditures = Math.abs(transactions.get(i).getAmount());
+    				monthlyExpenditures = transactions.get(i).getAmount();
     			}
     		}
     		
     		// if we're at the last transaction, save it off
 			if (i == transactions.size()-1) {
-				dataset.addValue(monthlyRevenue, resourceMap.getString("graphMonthlyRevenue.text"), pastMonthYear);
-				dataset.addValue(monthlyExpenditures, resourceMap.getString("graphMonthlyExpenditures.text"), pastMonthYear);
+				dataset.addValue(monthlyRevenue.getAmount().doubleValue(), resourceMap.getString("graphMonthlyRevenue.text"), pastMonthYear);
+				dataset.addValue(monthlyExpenditures.getAmount().doubleValue(), resourceMap.getString("graphMonthlyExpenditures.text"), pastMonthYear);
 			}
     	}
         
@@ -387,9 +387,7 @@ public final class FinancesTab extends CampaignGuiTab {
         AddFundsDialog addFundsDialog = new AddFundsDialog(getFrame(), true);
         addFundsDialog.setVisible(true);
         if (addFundsDialog.getClosedType() == JOptionPane.OK_OPTION) {
-            Money funds = Money.of(
-                    CurrencyManager.getInstance().getDefaultCurrency(),
-                    addFundsDialog.getFundsQuantity());
+            Money funds = MekHqMoneyUtil.money(addFundsDialog.getFundsQuantity());
             String description = addFundsDialog.getFundsDescription();
             int category = addFundsDialog.getCategory();
             getCampaign().addFunds(funds, description, category);

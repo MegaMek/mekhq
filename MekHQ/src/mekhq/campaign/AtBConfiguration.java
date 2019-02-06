@@ -36,7 +36,7 @@ import java.util.function.Function;
 
 import javax.xml.parsers.DocumentBuilder;
 
-import mekhq.campaign.finances.CurrencyManager;
+import mekhq.campaign.finances.MekHqMoneyUtil;
 import org.joda.money.Money;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -101,7 +101,7 @@ public class AtBConfiguration implements Serializable {
         dsTable = new WeightedTable<>();
         jsTable = new WeightedTable<>();
         defaultProperties = ResourceBundle.getBundle("mekhq.resources.AtBConfigDefaults");
-        shipSearchCost = Money.of(CurrencyManager.getInstance().getDefaultCurrency(), 100000.0);
+        shipSearchCost = MekHqMoneyUtil.money(100000.0);
     }
 
     /**
@@ -184,9 +184,7 @@ public class AtBConfiguration implements Serializable {
                 }
                 break;
             case "shipSearchCost":
-                shipSearchCost = Money.of(
-                        CurrencyManager.getInstance().getDefaultCurrency(),
-                        Integer.parseInt(property));
+                shipSearchCost = MekHqMoneyUtil.money(Integer.parseInt(property));
                 break;
             case "shipSearchLengthWeeks":
                 shipSearchLengthWeeks = Integer.parseInt(property);
@@ -531,7 +529,7 @@ public class AtBConfiguration implements Serializable {
             Node wn = nl.item(i);
             switch (wn.getNodeName()) {
             case "shipSearchCost":
-                shipSearchCost = Money.of(CurrencyManager.getInstance().getDefaultCurrency(), Integer.parseInt(wn.getTextContent()));
+                shipSearchCost = MekHqMoneyUtil.money(Integer.parseInt(wn.getTextContent()));
                 break;
             case "shipSearchLengthWeeks":
                 shipSearchLengthWeeks = Integer.parseInt(wn.getTextContent());

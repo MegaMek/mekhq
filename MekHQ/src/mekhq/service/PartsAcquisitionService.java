@@ -7,7 +7,7 @@ import java.util.Map;
 
 import megamek.common.TargetRoll;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.finances.CurrencyManager;
+import mekhq.campaign.finances.MekHqMoneyUtil;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PartInventory;
 import mekhq.campaign.personnel.Person;
@@ -25,7 +25,7 @@ public class PartsAcquisitionService {
 	private static int missingCount = 0;
 	private static int requiredCount = 0;
 	private static int unavailableCount = 0;
-	private static Money missingTotalPrice = Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
+	private static Money missingTotalPrice = MekHqMoneyUtil.zero();
 
 	private PartsAcquisitionService() {
 	}
@@ -181,7 +181,7 @@ public class PartsAcquisitionService {
 		missingCount = 0;
 		requiredCount = 0;
 		unavailableCount = 0;
-		missingTotalPrice = Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
+		missingTotalPrice = MekHqMoneyUtil.zero();
 
 		//campaign.addReport("***START: generateSummaryCounts");
 		

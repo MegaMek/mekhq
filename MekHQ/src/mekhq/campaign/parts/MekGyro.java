@@ -23,7 +23,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import mekhq.campaign.finances.CurrencyManager;
+import mekhq.campaign.finances.MekHqMoneyUtil;
 import org.joda.money.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -99,13 +99,13 @@ public class MekGyro extends Part {
     @Override
     public Money getStickerPrice() {
         if (getType() == Mech.GYRO_XL) {
-            return Money.of(CurrencyManager.getInstance().getDefaultCurrency(), 750000.0 * getTonnage());
+            return MekHqMoneyUtil.money(750000.0 * getTonnage());
         } else if (getType() == Mech.GYRO_COMPACT) {
-            return Money.of(CurrencyManager.getInstance().getDefaultCurrency(), 400000.0 * getTonnage());
+            return MekHqMoneyUtil.money(400000.0 * getTonnage());
         } else if (getType() == Mech.GYRO_HEAVY_DUTY) {
-            return Money.of(CurrencyManager.getInstance().getDefaultCurrency(), 500000.0 * getTonnage());
+            return MekHqMoneyUtil.money(500000.0 * getTonnage());
         } else {
-            return Money.of(CurrencyManager.getInstance().getDefaultCurrency(), 300000.0 * getTonnage());
+            return MekHqMoneyUtil.money(300000.0 * getTonnage());
         }
     }
 

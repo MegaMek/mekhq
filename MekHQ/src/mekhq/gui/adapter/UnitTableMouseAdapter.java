@@ -6,6 +6,7 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
+import java.math.RoundingMode;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +40,7 @@ import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.event.RepairStatusChangedEvent;
 import mekhq.campaign.event.UnitChangedEvent;
+import mekhq.campaign.finances.MekHqMoneyUtil;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.MissingPart;
@@ -61,6 +63,7 @@ import mekhq.gui.dialog.QuirksDialog;
 import mekhq.gui.dialog.TextAreaDialog;
 import mekhq.gui.model.UnitTableModel;
 import mekhq.gui.utilities.StaticChecks;
+import org.joda.money.Money;
 
 public class UnitTableMouseAdapter extends MouseInputAdapter implements
         ActionListener {
@@ -68,7 +71,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
     private CampaignGUI gui;
     private JTable unitTable;
     private UnitTableModel unitModel;
-    private ResourceBundle resourceMap = null;
+    private ResourceBundle resourceMap;
     
     public final static String COMMAND_MOTHBALL = "MOTHBALL";
     public final static String COMMAND_ACTIVATE = "ACTIVATE";
@@ -171,11 +174,10 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
         } else if (command.equalsIgnoreCase("SELL")) {
             for (Unit unit : units) {
                 if (!unit.isDeployed()) {
-                    long sellValue = unit.getSellValue();
+                    Money sellValue = unit.getSellValue();
                     NumberFormat numberFormat = NumberFormat
                             .getNumberInstance();
-                    String text = numberFormat.format(sellValue) + " "
-                            + (sellValue != 0 ? "CBills" : "CBill");
+                    String text = MekHqMoneyUtil.shortUiMoneyPrinter().print(sellValue);
                     if (0 == JOptionPane.showConfirmDialog(null,
                             "Do you really want to sell " + unit.getName()
                                     + " for " + text, "Sell Unit?",
@@ -330,7 +332,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                             "Do you really want to disband this unit "
                                     + unit.getName() + "?",
                             "Disband Unit?", JOptionPane.YES_NO_OPTION)) {
-                        Vector<Part> parts = new Vector<Part>();
+                        Vector<Part> parts = new Vector<>();
                         for (Part p : unit.getParts()) {
                             parts.add(p);
                         }
@@ -407,12 +409,12 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
             double refund = gui.getCampaign().getCampaignOptions()
                     .GetCanceledOrderReimbursement();
             if (null != selectedUnit) {
-                long refundAmount = (long) (refund * selectedUnit
-                        .getBuyCost());
+                Money refundAmount = selectedUnit.getBuyCost().multipliedBy(refund, RoundingMode.HALF_EVEN);
                 gui.getCampaign().removeUnit(selectedUnit.getId());
-                gui.getCampaign().getFinances().credit(refundAmount,
+                gui.getCampaign().getFinances().credit(
+                        refundAmount,
                         Transaction.C_EQUIP,
-                        "refund for cancelled equipmemt sale",
+                        "refund for cancelled equipment sale",
                         gui.getCampaign().getDate());
             }
         } else if (command.equalsIgnoreCase("ARRIVE")) {
@@ -642,7 +644,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
             }
             // change the location
             menu = new JMenu("Change site");
-            int i = 0;
+            int i;
             for (i = 0; i < Unit.SITE_N; i++) {
                 cbMenuItem = new JCheckBoxMenuItem(Unit.getSiteName(i));
                 if (StaticChecks.areAllSameSite(units) && unit.getSite() == i) {

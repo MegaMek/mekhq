@@ -24,7 +24,7 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 
-import mekhq.campaign.finances.CurrencyManager;
+import mekhq.campaign.finances.MekHqMoneyUtil;
 import org.joda.money.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -239,7 +239,7 @@ public class BattleArmorSuit extends Part {
         if(null == unit && childPartIds.size()==0) {
         	return alternateCost;
         }
-        Money cost = Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
+        Money cost = MekHqMoneyUtil.zero();
         switch(weightClass) {
         case EntityWeightClass.WEIGHT_MEDIUM:
             cost = cost.plus(100000);
@@ -284,16 +284,14 @@ public class BattleArmorSuit extends Part {
     }
 
     private void initializeExtraCostsAndTons() {
-    	alternateCost = Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
+    	alternateCost = MekHqMoneyUtil.zero();
     	alternateTon = 0;
     	//simplest way to do this is just get the full cost and tonnage of a new unit and divide by
     	//squad size
     	MechSummary summary = MechSummaryCache.getInstance().getMech(getChassis() + " " + getModel());
  		if(null != summary) {
  			double squadSize = summary.getArmorTypes().length - 1;
- 		    alternateCost = Money.of(
- 		                        CurrencyManager.getInstance().getDefaultCurrency(),
-                                (double)summary.getAlternateCost()/squadSize);
+ 		    alternateCost = MekHqMoneyUtil.money((double)summary.getAlternateCost()/squadSize);
  		    alternateTon = summary.getSuitWeight();
  		    introYear = summary.getYear();
  		}

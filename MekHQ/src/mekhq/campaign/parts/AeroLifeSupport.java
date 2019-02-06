@@ -23,7 +23,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import mekhq.campaign.finances.CurrencyManager;
+import mekhq.campaign.finances.MekHqMoneyUtil;
 import org.joda.money.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -57,7 +57,7 @@ public class AeroLifeSupport extends Part {
 	        .setStaticTechLevel(SimpleTechLevel.STANDARD);
 		
 	public AeroLifeSupport() {
-    	this(0, Money.zero(CurrencyManager.getInstance().getDefaultCurrency()), false, null);
+    	this(0, MekHqMoneyUtil.zero(), false, null);
     }
     
     public AeroLifeSupport(int tonnage, Money cost, boolean f, Campaign c) {
@@ -200,10 +200,10 @@ public class AeroLifeSupport extends Part {
 	
 	public void calculateCost() {
 		if(fighter) {
-			cost = Money.of(CurrencyManager.getInstance().getDefaultCurrency(), 50000);
+			cost = MekHqMoneyUtil.money(50000);
 		}
 		if(null != unit) {
-			cost = Money.of(CurrencyManager.getInstance().getDefaultCurrency(), 5000.0 * (((Aero)unit.getEntity()).getNCrew() + ((Aero)unit.getEntity()).getNPassenger()));
+			cost = MekHqMoneyUtil.money(5000.0 * (((Aero)unit.getEntity()).getNCrew() + ((Aero)unit.getEntity()).getNPassenger()));
 		}	
 	}
 

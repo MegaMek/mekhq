@@ -36,6 +36,7 @@ import javax.swing.SpinnerNumberModel;
 
 import megamek.common.Entity;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.finances.MekHqMoneyUtil;
 import mekhq.campaign.mission.Loot;
 import mekhq.campaign.parts.Part;
 
@@ -72,8 +73,8 @@ public class LootDialog extends javax.swing.JDialog {
         this.loot = l;
         this.campaign = c;
         cancelled = true;
-        units = new ArrayList<Entity>();
-        parts = new ArrayList<Part>();
+        units = new ArrayList<>();
+        parts = new ArrayList<>();
         for(Entity e : l.getUnits()) {
             units.add(e);
         }
@@ -94,8 +95,8 @@ public class LootDialog extends javax.swing.JDialog {
         btnRemoveUnit = new JButton("Remove");
         btnAddPart = new JButton("Add");
         btnRemovePart = new JButton("Remove");
-        listUnits = new JList<String>(new DefaultListModel<String>());
-        listParts = new JList<String>(new DefaultListModel<String>());
+        listUnits = new JList<>(new DefaultListModel<>());
+        listParts = new JList<>(new DefaultListModel<>());
 
         //ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.KillDialog", new EncodeControl());
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
@@ -334,7 +335,7 @@ public class LootDialog extends javax.swing.JDialog {
 
     private void done() {
         loot.setName(txtName.getText());
-        loot.setCash((int)Math.ceil((Double)spnCash.getModel().getValue()));
+        loot.setCash(MekHqMoneyUtil.money((Double)spnCash.getModel().getValue()));
         cancelled = false;
         loot.clearUnits();
         loot.clearParts();

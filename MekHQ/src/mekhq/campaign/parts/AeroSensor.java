@@ -23,7 +23,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import mekhq.campaign.finances.CurrencyManager;
+import mekhq.campaign.finances.MekHqMoneyUtil;
 import org.joda.money.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -193,9 +193,9 @@ public class AeroSensor extends Part {
 	@Override
 	public Money getStickerPrice() {
 		if(largeCraft) {
-			return Money.of(CurrencyManager.getInstance().getDefaultCurrency(), 80000);
+			return MekHqMoneyUtil.money(80000);
 		}
-		return Money.of(CurrencyManager.getInstance().getDefaultCurrency(), 2000 * getUnitTonnage());
+		return MekHqMoneyUtil.money(2000 * getUnitTonnage());
 	}
 
 	@Override

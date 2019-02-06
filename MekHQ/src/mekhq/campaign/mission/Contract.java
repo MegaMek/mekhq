@@ -29,7 +29,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
-import mekhq.campaign.finances.CurrencyManager;
+import mekhq.campaign.finances.MekHqMoneyUtil;
 import org.apache.commons.text.CharacterPredicate;
 import org.apache.commons.text.RandomStringGenerator;
 import org.joda.money.Money;
@@ -93,8 +93,8 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
     private int signBonus;
 
     // need to keep track of total value salvaged for salvage rights
-    private Money salvagedByUnit     = Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
-    private Money salvagedByEmployer = Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
+    private Money salvagedByUnit     = MekHqMoneyUtil.zero();
+    private Money salvagedByEmployer = MekHqMoneyUtil.zero();
 
     // actual amounts
     private Money advanceAmount;
@@ -490,7 +490,7 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
 
             return c.calculateCostPerJump(campaignOps, campaignOps).multipliedBy(jumpPath.getJumps()).multipliedBy(2);
         }
-        return Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
+        return MekHqMoneyUtil.zero();
     }
 
     /**
@@ -551,7 +551,7 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
             overheadAmount = c.getOverheadExpenses().multipliedBy(getLength());
             break;
         default:
-            overheadAmount = Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
+            overheadAmount = MekHqMoneyUtil.zero();
         }
 
         //calculate support amount
@@ -561,7 +561,7 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
                                 .multipliedBy(getLength())
                                 .multipliedBy((double)straightSupport/100.0, RoundingMode.HALF_EVEN);
         } else {
-            Money maintCosts = Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
+            Money maintCosts = MekHqMoneyUtil.zero();
             for (Unit u : c.getUnits()) {
                 if (u.getEntity() instanceof Infantry && !(u.getEntity() instanceof BattleArmor)) {
                     continue;
@@ -598,7 +598,7 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
                                     .multipliedBy(1.2)
                                     .toMoney(RoundingMode.HALF_EVEN);
         } else {
-            transitAmount = Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
+            transitAmount = MekHqMoneyUtil.zero();
         }
 
         signingAmount = baseAmount
@@ -616,7 +616,7 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
                             .plus(supportAmount)
                             .multipliedBy((double)getMrbcFeePercentage()/100.0, RoundingMode.HALF_EVEN);
         } else {
-            feeAmount = Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
+            feeAmount = MekHqMoneyUtil.zero();
         }
 
         advanceAmount = getTotalAmountPlusFees().multipliedBy((double)advancePct/100.0, RoundingMode.HALF_EVEN);

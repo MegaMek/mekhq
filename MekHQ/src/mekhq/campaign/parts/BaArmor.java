@@ -23,7 +23,7 @@ package mekhq.campaign.parts;
 
 import megamek.common.EquipmentType;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.finances.CurrencyManager;
+import mekhq.campaign.finances.MekHqMoneyUtil;
 import mekhq.campaign.work.IAcquisitionWork;
 import org.joda.money.Money;
 
@@ -74,21 +74,21 @@ public class BaArmor extends Armor implements IAcquisitionWork {
     public Money getPointCost() {
         switch(type) {
         case EquipmentType.T_ARMOR_BA_STANDARD_ADVANCED:
-            return Money.of(CurrencyManager.getInstance().getDefaultCurrency(), 12500);
+            return MekHqMoneyUtil.money(12500);
         case EquipmentType.T_ARMOR_BA_MIMETIC:
         case EquipmentType.T_ARMOR_BA_STEALTH:
-            return Money.of(CurrencyManager.getInstance().getDefaultCurrency(), 15000);
+            return MekHqMoneyUtil.money(15000);
         case EquipmentType.T_ARMOR_BA_STEALTH_BASIC:
-            return Money.of(CurrencyManager.getInstance().getDefaultCurrency(), 12000);
+            return MekHqMoneyUtil.money(12000);
         case EquipmentType.T_ARMOR_BA_STEALTH_IMP:
-            return Money.of(CurrencyManager.getInstance().getDefaultCurrency(), 20000);
+            return MekHqMoneyUtil.money(20000);
         case EquipmentType.T_ARMOR_BA_STEALTH_PROTOTYPE:
-            return Money.of(CurrencyManager.getInstance().getDefaultCurrency(), 50000);
+            return MekHqMoneyUtil.money(50000);
         case EquipmentType.T_ARMOR_BA_FIRE_RESIST:
         case EquipmentType.T_ARMOR_BA_STANDARD_PROTOTYPE:
         case EquipmentType.T_ARMOR_BA_STANDARD:
         default:
-            return Money.of(CurrencyManager.getInstance().getDefaultCurrency(), 10000);
+            return MekHqMoneyUtil.money(10000);
         }
     }
     

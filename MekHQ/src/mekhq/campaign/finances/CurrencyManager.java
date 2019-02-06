@@ -69,9 +69,10 @@ public class CurrencyManager extends CurrencyUnitDataProvider {
     private HashMap<String, String> currencySymbols;
     private ArrayList<DefaultCurrency> defaultCurrencies;
 
+    private MoneyFormatter uiAmountMoneyFormatter;
     private MoneyFormatter xmlMoneyFormatter;
-    private MoneyFormatter shortUiMoneyFormatter;
-    private MoneyFormatter longUiMoneyFormatter;
+    private MoneyFormatter shortUiMoneyPrinter;
+    private MoneyFormatter longUiMoneyPrinter;
 
     private CurrencyManager() {
         this.initialized = false;
@@ -87,17 +88,22 @@ public class CurrencyManager extends CurrencyUnitDataProvider {
 
         this.registerCurrencies();
 
+        this.uiAmountMoneyFormatter = new MoneyFormatterBuilder()
+                .appendAmountLocalized()
+                .append(null, new UiMoneyParser())
+                .toFormatter();
+
         this.xmlMoneyFormatter = new MoneyFormatterBuilder()
                 .append(new XmlMoneyWriter(), new XmlMoneyParser())
                 .toFormatter();
 
-        this.shortUiMoneyFormatter = new MoneyFormatterBuilder()
+        this.shortUiMoneyPrinter = new MoneyFormatterBuilder()
                 .appendAmountLocalized()
                 .appendLiteral(" ")
                 .append(new CurrencyDataLookupWriter(this.currencySymbols), null)
                 .toFormatter();
 
-        this.longUiMoneyFormatter = new MoneyFormatterBuilder()
+        this.longUiMoneyPrinter = new MoneyFormatterBuilder()
                 .appendAmountLocalized()
                 .appendLiteral(" ")
                 .append(new CurrencyDataLookupWriter(this.currencyNames), null)
@@ -110,7 +116,19 @@ public class CurrencyManager extends CurrencyUnitDataProvider {
         return instance;
     }
 
-    public MoneyFormatter getXmlMoneyFormatter() {
+    MoneyFormatter getUiAmountMoneyFormatter() {
+        if (!this.initialized) {
+            MekHQ.getLogger().log(
+                    CurrencyManager.class,
+                    "getUiAmountMoneyFormatter",
+                    LogLevel.FATAL,
+                    "Attempted to use CurrencyManager before calling initialize"); //$NON-NLS-1$
+        }
+
+        return this.uiAmountMoneyFormatter;
+    }
+
+    MoneyFormatter getXmlMoneyFormatter() {
         if (!this.initialized) {
             MekHQ.getLogger().log(
                     CurrencyManager.class,
@@ -122,7 +140,7 @@ public class CurrencyManager extends CurrencyUnitDataProvider {
         return this.xmlMoneyFormatter;
     }
 
-    public MoneyFormatter getShortUiMoneyFormatter() {
+    MoneyFormatter getShortUiMoneyPrinter() {
         if (!this.initialized) {
             MekHQ.getLogger().log(
                     CurrencyManager.class,
@@ -131,10 +149,10 @@ public class CurrencyManager extends CurrencyUnitDataProvider {
                     "Attempted to use CurrencyManager before calling initialize"); //$NON-NLS-1$
         }
 
-        return this.shortUiMoneyFormatter;
+        return this.shortUiMoneyPrinter;
     }
 
-    public MoneyFormatter getLongUiMoneyFormatter() {
+    MoneyFormatter getLongUiMoneyPrinter() {
         if (!this.initialized) {
             MekHQ.getLogger().log(
                     CurrencyManager.class,
@@ -143,10 +161,10 @@ public class CurrencyManager extends CurrencyUnitDataProvider {
                     "Attempted to use CurrencyManager before calling initialize"); //$NON-NLS-1$
         }
 
-        return this.longUiMoneyFormatter;
+        return this.longUiMoneyPrinter;
     }
 
-    public CurrencyUnit getDefaultCurrency() {
+    CurrencyUnit getDefaultCurrency() {
         if (!this.initialized) {
             MekHQ.getLogger().log(
                     CurrencyManager.class,

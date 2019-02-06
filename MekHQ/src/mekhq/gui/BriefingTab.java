@@ -53,7 +53,7 @@ import megamek.common.options.GameOptions;
 import megamek.common.util.EncodeControl;
 import megameklab.com.util.UnitPrintManager;
 import mekhq.MekHQ;
-import mekhq.MekHqMoneyUtil;
+import mekhq.campaign.finances.MekHqMoneyUtil;
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.event.MissionChangedEvent;
 import mekhq.campaign.event.MissionCompletedEvent;

@@ -26,8 +26,7 @@ import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
+import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -45,16 +44,16 @@ import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 import javax.swing.JTabbedPane;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 import megamek.common.util.EncodeControl;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Asset;
 import mekhq.campaign.finances.Loan;
+import mekhq.campaign.finances.MekHqMoneyUtil;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.unit.Unit;
+import org.joda.money.Money;
 
 /**
  * A dialog to decide how you want to pay off collateral when you 
@@ -129,12 +128,7 @@ public class PayCollateralDialog extends JDialog {
             box = new JCheckBox(u.getName() + " (" + DecimalFormat.getInstance().format(u.getSellValue()) + "C-bills)");
             box.setSelected(false);
             box.setEnabled(u.isPresent() && !u.isDeployed());
-            box.addItemListener(new ItemListener() {
-                @Override
-                public void itemStateChanged(ItemEvent evt) {
-                    updateAmount();
-                }
-            });
+            box.addItemListener(evt -> updateAmount());
             unitBoxes.put(box, u.getId());
             gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 0;
@@ -174,12 +168,7 @@ public class PayCollateralDialog extends JDialog {
             }
             partSlider.setPaintTicks(true);
             partSlider.setSnapToTicks(true);
-            partSlider.addChangeListener(new ChangeListener() {
-                @Override
-                public void stateChanged(ChangeEvent e) {
-                    updateAmount();
-                }
-            });
+            partSlider.addChangeListener(e -> updateAmount());
             partSlider.setEnabled(p.isPresent() && !p.isReservedForRefit() && !p.isReservedForReplacement());
             partSliders.put(partSlider, p.getId());
             gridBagConstraints = new java.awt.GridBagConstraints();
@@ -208,33 +197,23 @@ public class PayCollateralDialog extends JDialog {
         //TODO: use cash reserves
         
         btnPay = new JButton(resourceMap.getString("btnPay.text")); // NOI18N
-        btnPay.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                payCollateral();
-            }
-        });
+        btnPay.addActionListener(evt -> payCollateral());
         btnPay.setEnabled(false);
         panBtn.add(btnPay);
         
         btnDontPay = new JButton(resourceMap.getString("btnDontPay.text")); // NOI18N
-        btnDontPay.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                dontPayCollateral();
-            }
-        });
+        btnDontPay.addActionListener(evt -> dontPayCollateral());
         panBtn.add(btnDontPay);
 
         btnCancel = new JButton(resourceMap.getString("btnCancel.text")); // NOI18N
         btnCancel.setName("btnCancel"); // NOI18N
-        btnCancel.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cancelled = true;
-                setVisible(false);
-            }
+        btnCancel.addActionListener(evt -> {
+            cancelled = true;
+            setVisible(false);
         });
         panBtn.add(btnCancel);
 
-        assetBoxes = new ArrayList<JCheckBox>();
+        assetBoxes = new ArrayList<>();
         i = 0;
         j = 0;
         JPanel pnlAssets = new JPanel(new GridBagLayout());
@@ -242,12 +221,7 @@ public class PayCollateralDialog extends JDialog {
             j++;
             box = new JCheckBox(a.getName() + " (" + DecimalFormat.getInstance().format(a.getValue()) + "C-bills)");
             box.setSelected(false);
-            box.addItemListener(new ItemListener() {
-                @Override
-                public void itemStateChanged(ItemEvent evt) {
-                    updateAmount();
-                }
-            });
+            box.addItemListener(evt -> updateAmount());
             assetBoxes.add(box);
             gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 0;
@@ -298,34 +272,34 @@ public class PayCollateralDialog extends JDialog {
     }
     
     private void updateAmount() {
-        long amount = 0;
+        Money amount = MekHqMoneyUtil.zero();
         for (Map.Entry<JCheckBox, UUID> m : unitBoxes.entrySet()) {
             if (m.getKey().isSelected()) {
-                amount += campaign.getUnit(m.getValue()).getSellValue();
+                amount = amount.plus(campaign.getUnit(m.getValue()).getSellValue());
             }
         }
 
         for (Map.Entry<JSlider, Integer> m : partSliders.entrySet()) {
             int quantity = m.getKey().getValue();
             if(quantity > 0) {
-                amount += campaign.getPart(m.getValue()).getCurrentValue() * quantity;
+                amount = amount.plus(campaign.getPart(m.getValue()).getCurrentValue().multipliedBy(quantity));
             }
         }
 
         for(int i = 0; i < assetBoxes.size(); i++) {
             JCheckBox box = assetBoxes.get(i);
             if(box.isSelected()) {
-                amount += campaign.getFinances().getAllAssets().get(i).getValue();
+                amount = amount.plus(campaign.getFinances().getAllAssets().get(i).getValue());
             }
         }
-        int percent = Math.round(100 * amount / loan.getCollateralAmount());
+        int percent = amount.multipliedBy(100).dividedBy(loan.getCollateralAmount().getAmount(), RoundingMode.HALF_EVEN).getAmountMajorInt();
         if(percent < 100) {
             btnPay.setEnabled(false);
         } else {
             btnPay.setEnabled(true);
         }
         barAmount.setValue(percent);
-        barAmount.setString(DecimalFormat.getInstance().format(amount) + "/" + DecimalFormat.getInstance().format(loan.getCollateralAmount()));
+        barAmount.setString(MekHqMoneyUtil.uiAmountMoneyFormatter().print(amount) + "/" + MekHqMoneyUtil.uiAmountMoneyFormatter().print(loan.getCollateralAmount()));
     }
     
     public ArrayList<UUID> getUnits() {
@@ -339,7 +313,7 @@ public class PayCollateralDialog extends JDialog {
     }
     
     public ArrayList<int[]> getParts() {
-        ArrayList<int[]> parts = new ArrayList<int[]>();
+        ArrayList<int[]> parts = new ArrayList<>();
         for (Map.Entry<JSlider, Integer> m : partSliders.entrySet()) {
             int quantity = m.getKey().getValue();
             if(quantity > 0) {
@@ -351,7 +325,7 @@ public class PayCollateralDialog extends JDialog {
     }
     
     public ArrayList<Asset> getRemainingAssets() {
-        ArrayList<Asset> newAssets = new ArrayList<Asset>();
+        ArrayList<Asset> newAssets = new ArrayList<>();
         for(int i = 0; i < assetBoxes.size(); i++) {
             JCheckBox box = assetBoxes.get(i);
             if(!box.isSelected()) {

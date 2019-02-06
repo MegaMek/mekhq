@@ -27,7 +27,7 @@ import megamek.common.EquipmentType;
 import megamek.common.MiscType;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.finances.CurrencyManager;
+import mekhq.campaign.finances.MekHqMoneyUtil;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.unit.Unit;
 
@@ -64,13 +64,9 @@ public class MissingMASC extends MissingEquipmentPart {
     @Override
     public Money getStickerPrice() {
     	if (isSupercharger()) {
-    		return Money.of(
-                    CurrencyManager.getInstance().getDefaultCurrency(),
-                    engineRating * 10000);
+    		return MekHqMoneyUtil.money(engineRating * 10000);
     	} else {
-            return Money.of(
-                    CurrencyManager.getInstance().getDefaultCurrency(),
-                    engineRating * getTonnage() * 1000);
+            return MekHqMoneyUtil.money(engineRating * getTonnage() * 1000);
         }
     }
     

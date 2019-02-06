@@ -30,7 +30,7 @@ import java.util.Map;
 import java.util.StringJoiner;
 import java.util.UUID;
 
-import mekhq.campaign.finances.CurrencyManager;
+import mekhq.campaign.finances.MekHqMoneyUtil;
 import org.joda.money.BigMoney;
 import org.joda.money.Money;
 import org.joda.money.MoneyUtils;
@@ -1086,7 +1086,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
         sj.add(hits + " hit(s)");
         if (campaign.getCampaignOptions().payForRepairs() && (hits > 0)) {
             Money repairCost = getStickerPrice().multipliedBy(0.2, RoundingMode.HALF_EVEN);
-            sj.add(CurrencyManager.getInstance().getShortUiMoneyFormatter().print(repairCost) + " to repair");
+            sj.add(MekHqMoneyUtil.shortUiMoneyPrinter().print(repairCost) + " to repair");
         }
         return sj.toString();
     }

@@ -24,7 +24,7 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 import java.util.GregorianCalendar;
 
-import mekhq.campaign.finances.CurrencyManager;
+import mekhq.campaign.finances.MekHqMoneyUtil;
 import org.joda.money.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -109,21 +109,19 @@ public class EnginePart extends Part {
         weight = TestEntity.ceilMaxHalf(weight, TestEntity.Ceil.HALFTON);
 
         if (engine.hasFlag(Engine.TANK_ENGINE) && engine.isFusion()) {
-            weight *= 1.5f;
+            weight *= 1.5;
         }
         double toReturn = TestEntity.ceilMaxHalf(weight, TestEntity.Ceil.HALFTON);
         // hover have a minimum weight of 20%
         if (forHover) {
-            return Math.max(TestEntity.ceilMaxHalf(getUnitTonnage()/5, TestEntity.Ceil.HALFTON), toReturn);
+            return Math.max(TestEntity.ceilMaxHalf(getUnitTonnage()/5.0, TestEntity.Ceil.HALFTON), toReturn);
         }
         return toReturn;
 	}
 
 	@Override
 	public Money getStickerPrice() {
-		return Money.of(
-		        CurrencyManager.getInstance().getDefaultCurrency(),
-                (double)getEngine().getBaseCost() / 75.0 * getEngine().getRating() * getUnitTonnage());
+		return MekHqMoneyUtil.money((double)getEngine().getBaseCost() / 75.0 * getEngine().getRating() * getUnitTonnage());
 	}
 	
 	@Override
@@ -302,7 +300,6 @@ public class EnginePart extends Part {
 			}
 			if(engineHits >= engineCrits) {
 				remove(false);
-				return;
 			}
 			else if(engineHits > 0) {
 				hits = engineHits;

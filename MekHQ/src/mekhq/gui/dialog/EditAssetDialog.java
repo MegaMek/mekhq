@@ -32,6 +32,7 @@ import javax.swing.JTextField;
 
 import mekhq.campaign.finances.Asset;
 import mekhq.campaign.finances.Finances;
+import mekhq.campaign.finances.MekHqMoneyUtil;
 
 
 /**
@@ -40,10 +41,8 @@ import mekhq.campaign.finances.Finances;
  */
 public class EditAssetDialog extends JDialog {
     private static final long serialVersionUID = -8038099101234445018L;
-    @SuppressWarnings("unused")
-	private Frame frame; // FIXME: Why is this here?
     private Asset asset;
-    
+
     private JButton btnClose;
     private JButton btnOK;
     private JTextField txtName;
@@ -54,7 +53,6 @@ public class EditAssetDialog extends JDialog {
     
     public EditAssetDialog(Frame parent, Asset a) {
         super(parent, true);
-        this.frame = parent;
         this.asset = a;
         cancelled = false;
         initComponents();
@@ -102,7 +100,7 @@ public class EditAssetDialog extends JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         getContentPane().add(new JLabel("Value of Asset:"), gridBagConstraints);
         
-        txtValue.setText(Long.toString(asset.getValue()));
+        txtValue.setText(MekHqMoneyUtil.uiAmountMoneyFormatter().print(asset.getValue()));
         txtValue.setMinimumSize(new java.awt.Dimension(150, 28));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -122,7 +120,7 @@ public class EditAssetDialog extends JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         getContentPane().add(new JLabel("Income supplied:"), gridBagConstraints);
         
-        txtIncome.setText(Long.toString(asset.getIncome()));
+        txtIncome.setText(MekHqMoneyUtil.uiAmountMoneyFormatter().print(asset.getIncome()));
         txtIncome.setMinimumSize(new java.awt.Dimension(150, 28));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -142,10 +140,10 @@ public class EditAssetDialog extends JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         getContentPane().add(new JLabel("Income Schedule:"), gridBagConstraints);
         
-        DefaultComboBoxModel<String> scheduleModel = new DefaultComboBoxModel<String>();
+        DefaultComboBoxModel<String> scheduleModel = new DefaultComboBoxModel<>();
         scheduleModel.addElement(Finances.getScheduleName(Finances.SCHEDULE_MONTHLY));
         scheduleModel.addElement(Finances.getScheduleName(Finances.SCHEDULE_YEARLY));
-        choiceSchedule = new JComboBox<String>(scheduleModel);
+        choiceSchedule = new JComboBox<>(scheduleModel);
         choiceSchedule.setSelectedIndex(0);
         if(asset.getSchedule() == Finances.SCHEDULE_YEARLY) {
             choiceSchedule.setSelectedIndex(1);
@@ -198,13 +196,13 @@ public class EditAssetDialog extends JDialog {
     private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {
         asset.setName(txtName.getText());
         try {
-            asset.setValue(Long.parseLong(txtValue.getText()));
-        } catch(NumberFormatException e) {
+            asset.setValue(MekHqMoneyUtil.uiAmountMoneyFormatter().parseMoney(txtValue.getText()));
+        } catch(Exception e) {
             
         }
         try {
-            asset.setIncome(Long.parseLong(txtIncome.getText()));
-        } catch(NumberFormatException e) {
+            asset.setIncome(MekHqMoneyUtil.uiAmountMoneyFormatter().parseMoney(txtIncome.getText()));
+        } catch(Exception e) {
             
         }
         if(choiceSchedule.getSelectedIndex() == 1) {

@@ -31,6 +31,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import mekhq.campaign.finances.CurrencyManager;
+import mekhq.campaign.finances.MekHqMoneyUtil;
 import mekhq.campaign.log.ServiceLogger;
 import org.joda.money.BigMoney;
 import org.joda.money.Money;
@@ -708,7 +709,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     }
 
     public Money getValueOfAllMissingParts() {
-        BigMoney value = BigMoney.zero(CurrencyManager.getInstance().getDefaultCurrency());
+        BigMoney value = MekHqMoneyUtil.bigZero();
         for(Part part : parts) {
             if(part instanceof MissingAmmoBin) {
                 AmmoBin newBin = (AmmoBin) ((MissingAmmoBin)part).getNewEquipment();
@@ -1114,9 +1115,10 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     }
 
     public Money getSellValue() {
-        BigMoney partsValue = BigMoney.zero(CurrencyManager.getInstance().getDefaultCurrency());
+        BigMoney partsValue = MekHqMoneyUtil.bigZero();
 
-        partsValue = partsValue.plus(parts.stream()
+        partsValue = partsValue
+                .plus(parts.stream()
                 .map(x -> x.getActualValue().toBigMoney().multipliedBy(x.getQuality()))
                 .collect(Collectors.toList()));
 
@@ -1132,7 +1134,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             // KF Drive, Docking Collars, etc...
             if ((entity instanceof Jumpship) && !(entity instanceof SpaceStation)) {
                 Jumpship js = (Jumpship) entity;
-                BigMoney driveCost = BigMoney.zero(CurrencyManager.getInstance().getDefaultCurrency());
+                BigMoney driveCost = MekHqMoneyUtil.bigZero();
                 // coil
                 driveCost = driveCost.plus(60000000.0 + (75000000.0 * js.getDocks()));
                 // initiator
@@ -1175,19 +1177,17 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 partsValue = partsValue.plus(js.getArmorWeight(js.locations()) * EquipmentType.getArmorCost(js.getArmorType(0)));
 
                 // heat sinks
-                BigMoney sinkCost = BigMoney.of(
-                        CurrencyManager.getInstance().getDefaultCurrency(),
-                        2000.0 + 4000.0 * js.getHeatType());// == HEAT_DOUBLE ? 6000 : 2000
+                BigMoney sinkCost = MekHqMoneyUtil.bigMoney(2000.0 + 4000.0 * js.getHeatType());// == HEAT_DOUBLE ? 6000 : 2000
                 partsValue = partsValue.plus(sinkCost.multipliedBy(js.getHeatSinks()));
 
                 // grav deck
                 partsValue = partsValue.plus(5000000.0 * js.getGravDeck());
                 partsValue = partsValue.plus(10000000.0 * js.getGravDeckLarge());
-                partsValue = partsValue.plus(40000000.0 * js.getGravDeckHuge());
+                    partsValue = partsValue.plus(40000000.0 * js.getGravDeckHuge());
 
                 // get bays
                 int baydoors = 0;
-                BigMoney bayCost = BigMoney.zero(CurrencyManager.getInstance().getDefaultCurrency());
+                BigMoney bayCost = MekHqMoneyUtil.bigZero();
                 for (Bay next : js.getTransportBays()) {
                     baydoors += next.getDoors();
                     if ((next instanceof MechBay) || (next instanceof ASFBay) || (next instanceof SmallCraftBay)) {
@@ -1198,10 +1198,10 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                     }
                 }
 
-                partsValue = partsValue.plus(bayCost.plus(baydoors).multipliedBy(1000.0));
+                partsValue = partsValue.plus(bayCost.plus(baydoors * 1000.0));
 
                 // life boats and escape pods
-                partsValue = partsValue.plus(5000.0 * (js.getLifeBoats() + js.getEscapePods()));
+                partsValue = partsValue.plus((js.getLifeBoats() + js.getEscapePods()) * 5000.0);
             }
         }
 
@@ -1424,13 +1424,9 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         BigMoney cost;
 
         if(entity instanceof Infantry) {
-            cost = BigMoney.of(
-                    CurrencyManager.getInstance().getDefaultCurrency(),
-                    getEntity().getAlternateCost());
+            cost = MekHqMoneyUtil.bigMoney(getEntity().getAlternateCost());
         } else {
-            cost = BigMoney.of(
-                    CurrencyManager.getInstance().getDefaultCurrency(),
-                    getEntity().getCost(false));
+            cost = MekHqMoneyUtil.bigMoney(getEntity().getCost(false));
         }
         if(entity.isClan()) {
             cost = cost.multipliedBy(campaign.getCampaignOptions().getClanPriceModifier());
@@ -1612,15 +1608,9 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 } else if (wn2.getNodeName().equalsIgnoreCase("scenarioId")) {
                     retVal.scenarioId = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("salvaged")) {
-                    if (wn2.getTextContent().equalsIgnoreCase("true"))
-                        retVal.salvaged = true;
-                    else
-                        retVal.salvaged = false;
+                    retVal.salvaged = wn2.getTextContent().equalsIgnoreCase("true");
                 } else if (wn2.getNodeName().equalsIgnoreCase("mothballed")) {
-                    if (wn2.getTextContent().equalsIgnoreCase("true"))
-                        retVal.mothballed = true;
-                    else
-                        retVal.mothballed = false;
+                    retVal.mothballed = wn2.getTextContent().equalsIgnoreCase("true");
                 } else if (wn2.getNodeName().equalsIgnoreCase("entity")) {
                     retVal.entity = MekHqXmlUtil.getEntityFromXmlString(wn2);
                 } else if (wn2.getNodeName().equalsIgnoreCase("refit")) {
@@ -1709,7 +1699,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
 
     public Money getWeeklyMaintenanceCost() {
         Entity en = getEntity();
-        BigMoney mCost = BigMoney.zero(CurrencyManager.getInstance().getDefaultCurrency());
+        BigMoney mCost = MekHqMoneyUtil.bigZero();
         BigMoney value;
 
         //we will assume sale value for now, but make this customizable
@@ -1748,39 +1738,37 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         } else {
             if(en instanceof Mech) {
                 if(en.isOmni()) {
-                    return Money.of(CurrencyManager.getInstance().getDefaultCurrency(), 100.0);
+                    return MekHqMoneyUtil.money(100.0);
                 } else {
-                    return Money.of(CurrencyManager.getInstance().getDefaultCurrency(), 75.0);
+                    return MekHqMoneyUtil.money(75.0);
                 }
             } else if(en instanceof Warship) {
-                return Money.of(CurrencyManager.getInstance().getDefaultCurrency(), 5000.0);
+                return MekHqMoneyUtil.money(5000.0);
             } else if(en instanceof Jumpship) {
-                return Money.of(CurrencyManager.getInstance().getDefaultCurrency(), 800.0);
+                return MekHqMoneyUtil.money(800.0);
             } else if(en instanceof Dropship) {
-                return Money.of(CurrencyManager.getInstance().getDefaultCurrency(), 500.0);
+                return MekHqMoneyUtil.money(500.0);
             } else if(en instanceof ConvFighter) {
-                return Money.of(CurrencyManager.getInstance().getDefaultCurrency(), 50.0);
+                return MekHqMoneyUtil.money(50.0);
             } else if(en instanceof Aero) {
                 if(en.isOmni()) {
-                    return Money.of(CurrencyManager.getInstance().getDefaultCurrency(), 125.0);
+                    return MekHqMoneyUtil.money(125.0);
                 } else  {
-                    return Money.of(CurrencyManager.getInstance().getDefaultCurrency(), 65.0);
+                    return MekHqMoneyUtil.money(65.0);
                 }
             } else if(en instanceof VTOL) {
-                return Money.of(CurrencyManager.getInstance().getDefaultCurrency(), 65.0);
+                return MekHqMoneyUtil.money(65.0);
             } else if(en instanceof Tank) {
-                return Money.of(CurrencyManager.getInstance().getDefaultCurrency(), 25.0);
+                return MekHqMoneyUtil.money(25.0);
             } else if(en instanceof BattleArmor) {
-                return Money.of(
-                        CurrencyManager.getInstance().getDefaultCurrency(),
-                        ((BattleArmor)en).getTroopers() * 50.0);
+                return MekHqMoneyUtil.money(((BattleArmor)en).getTroopers() * 50.0);
             } else if(en instanceof Infantry) {
-                return Money.of(
-                        CurrencyManager.getInstance().getDefaultCurrency(),
-                        ((Infantry)en).getSquadN()*10.0);
+                return MekHqMoneyUtil.money(((Infantry)en).getSquadN()*10.0);
             }
         }
-        return mCost.dividedBy(52.0, RoundingMode.HALF_EVEN).toMoney(RoundingMode.HALF_EVEN);
+        return mCost
+                .dividedBy(52.0, RoundingMode.HALF_EVEN)
+                .toMoney();
     }
 
     public void addPart(Part part) {
@@ -1801,7 +1789,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
             erating = entity.getEngine().getRating();
         }
 
-        ArrayList<Part> partsToAdd = new ArrayList<Part>();
+        ArrayList<Part> partsToAdd = new ArrayList<>();
 
         Part gyro = null;
         Part engine = null;
@@ -1832,17 +1820,17 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         Part[] armor = new Part[entity.locations()];
         Part[] armorRear = new Part[entity.locations()];
         Part[] stabilisers = new Part[entity.locations()];
-        Hashtable<Integer,Part> equipParts = new Hashtable<Integer,Part>();
-        Hashtable<Integer,Part> ammoParts = new Hashtable<Integer,Part>();
-        Hashtable<Integer,Part> heatSinks = new Hashtable<Integer,Part>();
-        Hashtable<Integer,Part> jumpJets = new Hashtable<Integer,Part>();
-        Hashtable<Integer,Part[]> baEquipParts = new Hashtable<Integer, Part[]>();
+        Hashtable<Integer,Part> equipParts = new Hashtable<>();
+        Hashtable<Integer,Part> ammoParts = new Hashtable<>();
+        Hashtable<Integer,Part> heatSinks = new Hashtable<>();
+        Hashtable<Integer,Part> jumpJets = new Hashtable<>();
+        Hashtable<Integer,Part[]> baEquipParts = new Hashtable<>();
         Part motiveSystem = null;
         Part avionics = null;
         Part fcs = null;
         Part landingGear = null;
         Part turretLock = null;
-        ArrayList<Part> aeroHeatSinks = new ArrayList<Part>();
+        ArrayList<Part> aeroHeatSinks = new ArrayList<>();
         int podAeroHeatSinks = 0;
         Part motiveType = null;
         Part primaryW = null;
@@ -1852,7 +1840,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         Part protoLeftArmActuator = null;
         Part protoRightArmActuator = null;
         Part protoLegsActuator = null;
-        ArrayList<Part> protoJumpJets = new ArrayList<Part>();
+        ArrayList<Part> protoJumpJets = new ArrayList<>();
         Part aeroThrustersLeft = null;
         Part aeroThrustersRight = null;
         Map<Integer, Part> bays = new HashMap<>();
@@ -2478,7 +2466,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 partsToAdd.add(avionics);
             }
             if(null == fcs) {
-                fcs = new FireControlSystem((int)entity.getWeight(), Money.zero(CurrencyManager.getInstance().getDefaultCurrency()), campaign);
+                fcs = new FireControlSystem((int)entity.getWeight(), MekHqMoneyUtil.zero(), campaign);
                 addPart(fcs);
                 partsToAdd.add(fcs);
                 ((FireControlSystem)fcs).calculateCost();
@@ -2494,7 +2482,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 partsToAdd.add(landingGear);
             }
             if(null == lifeSupport) {
-                lifeSupport = new AeroLifeSupport((int) entity.getWeight(), Money.zero(CurrencyManager.getInstance().getDefaultCurrency()), !(entity instanceof SmallCraft || entity instanceof Jumpship), campaign);
+                lifeSupport = new AeroLifeSupport((int) entity.getWeight(), MekHqMoneyUtil.zero(), !(entity instanceof SmallCraft || entity instanceof Jumpship), campaign);
                 addPart(lifeSupport);
                 partsToAdd.add(lifeSupport);
                 ((AeroLifeSupport)lifeSupport).calculateCost();
@@ -4384,11 +4372,11 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
 
     public Money getSparePartsCost() {
         final String METHOD_NAME = "getSparePartsCost()"; //$NON-NLS-1$
-        BigMoney partsCost = BigMoney.zero(CurrencyManager.getInstance().getDefaultCurrency());
+        BigMoney partsCost = MekHqMoneyUtil.bigZero();
 
         entity = getEntity();
         if (isMothballed()) {
-            return Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
+            return MekHqMoneyUtil.zero();
         }
         if (entity instanceof Jumpship) { // SpaceStation derives from Jumpship
             partsCost = partsCost.plus(entity.getWeight() * .0001 * 15000);
@@ -4479,7 +4467,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     }
 
     public Money getAmmoCost() {
-        Money ammoCost = Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
+        Money ammoCost = MekHqMoneyUtil.zero();
 
         for (Part p : getParts()) {
             if (p instanceof EquipmentPart && ((EquipmentPart)p).getType() instanceof AmmoType) {
@@ -4491,7 +4479,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     }
 
     public Money getFuelCost() {
-        Money fuelCost = Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
+        Money fuelCost = MekHqMoneyUtil.zero();
 
         if ((entity instanceof Warship) || (entity instanceof SmallCraft) ) {
             fuelCost = fuelCost.plus(getTonsBurnDay(entity));
@@ -4560,13 +4548,9 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     public Money getFighterFuelCost(Entity e) {
         Engine en = e.getEngine();
         if (en.isFusion()) {
-            return Money.of(
-                    CurrencyManager.getInstance().getDefaultCurrency(),
-                    ((Aero) e).getFuelTonnage() * 4.0 * 15000.0);
+            return MekHqMoneyUtil.money(((Aero) e).getFuelTonnage() * 4.0 * 15000.0);
         } else {
-            return Money.of(
-                    CurrencyManager.getInstance().getDefaultCurrency(),
-                    ((Aero) e).getFuelTonnage() * 4.0 * 1000.0);
+            return MekHqMoneyUtil.money(((Aero) e).getFuelTonnage() * 4.0 * 1000.0);
         }
     }
 
@@ -4574,27 +4558,19 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         Engine en = e.getEngine();
         if (e instanceof SupportTank) {
             if (en.getEngineType() == Engine.FUEL_CELL) {
-                return Money.of(
-                        CurrencyManager.getInstance().getDefaultCurrency(),
-                        ((SupportTank) e).getFuelTonnage() * 15000.0 * 4.0);
+                return MekHqMoneyUtil.money(((SupportTank) e).getFuelTonnage() * 15000.0 * 4.0);
             } else if (en.getEngineType() == Engine.COMBUSTION_ENGINE) {
-                return Money.of(
-                        CurrencyManager.getInstance().getDefaultCurrency(),
-                        ((SupportTank) e).getFuelTonnage() * 1000.0 * 4.0);
+                return MekHqMoneyUtil.money(((SupportTank) e).getFuelTonnage() * 1000.0 * 4.0);
             } else {
-                return Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
+                return MekHqMoneyUtil.zero();
             }
         } else {
             if (en.getEngineType() == Engine.FUEL_CELL) {
-                return Money.of(
-                        CurrencyManager.getInstance().getDefaultCurrency(),
-                        en.getWeightEngine(e) * 0.1 * 15000.0 * 4.0);
+                return MekHqMoneyUtil.money(en.getWeightEngine(e) * 0.1 * 15000.0 * 4.0);
             } else if (en.getEngineType() == Engine.COMBUSTION_ENGINE) {
-                return Money.of(
-                        CurrencyManager.getInstance().getDefaultCurrency(),
-                        en.getWeightEngine(e) * 0.1 * 1000.0 * 4.0);
+                return MekHqMoneyUtil.money(en.getWeightEngine(e) * 0.1 * 1000.0 * 4.0);
             } else {
-                return Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
+                return MekHqMoneyUtil.zero();
             }
         }
     }
@@ -4602,19 +4578,15 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     public Money getInfantryFuelCost(Entity e) {
         if (e instanceof BattleArmor) {
             if (e.getJumpMP() > 0) {
-                return Money.of(
-                        CurrencyManager.getInstance().getDefaultCurrency(),
-                        e.getWeight() * 0.02 * 1000.0 * 4.0);
+                return MekHqMoneyUtil.money(e.getWeight() * 0.02 * 1000.0 * 4.0);
             } else {
-                return Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
+                return MekHqMoneyUtil.zero();
             }
         }
         if (e.getMovementMode() == EntityMovementMode.INF_LEG) {
-            return Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
+            return MekHqMoneyUtil.zero();
         } else {
-            return Money.of(
-                    CurrencyManager.getInstance().getDefaultCurrency(),
-                    e.getWeight() * 0.02 * 1000.0 * 4.0);
+            return MekHqMoneyUtil.money(e.getWeight() * 0.02 * 1000.0 * 4.0);
         }
     }
     

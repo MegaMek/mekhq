@@ -21,7 +21,6 @@
 package mekhq.campaign.mission;
 
 import java.io.PrintWriter;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 import megamek.common.Entity;
@@ -33,7 +32,7 @@ import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.Version;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.finances.CurrencyManager;
+import mekhq.campaign.finances.MekHqMoneyUtil;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.parts.Part;
 
@@ -57,7 +56,7 @@ public class Loot implements MekHqXmlSerializable {
     
     public Loot() {
         name = "None";
-        cash = Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
+        cash = MekHqMoneyUtil.zero();
         units = new ArrayList<>();
         parts = new ArrayList<>();
     }
@@ -115,7 +114,7 @@ public class Loot implements MekHqXmlSerializable {
     public String getShortDescription() {
         String desc = getName() + " - ";
         if(MoneyUtils.isPositive(cash)) {
-            desc += CurrencyManager.getInstance().getShortUiMoneyFormatter().print(cash);
+            desc += MekHqMoneyUtil.shortUiMoneyPrinter().print(cash);
         }
         if(units.size() > 0) {
             String s = units.size() + " unit";

@@ -255,7 +255,7 @@ public class Finances implements Serializable {
                         calendar.getTime());
                 campaign.addReport(String.format(
                         resourceMap.getString("ContractPaymentCredit.text"),
-                        CurrencyManager.getInstance().getShortUiMoneyFormatter().print(contract.getMonthlyPayOut()),
+                        CurrencyManager.getInstance().getShortUiMoneyPrinter().print(contract.getMonthlyPayOut()),
                         contract.getName()));
 
                 if (campaignOptions.getUseAtB() && campaignOptions.getUseShareSystem()
@@ -268,7 +268,7 @@ public class Finances implements Serializable {
                             calendar.getTime())) {
                         campaign.addReport(String.format(
                                 resourceMap.getString("DistributedShares.text"),
-                                CurrencyManager.getInstance().getShortUiMoneyFormatter().print(shares)));
+                                CurrencyManager.getInstance().getShortUiMoneyPrinter().print(shares)));
                     } else {
                         /*
                          * This should not happen, as the shares payment is less than the contract
@@ -288,14 +288,14 @@ public class Finances implements Serializable {
                         campaign.getCalendar().getTime());
                 campaign.addReport(String.format(
                         resourceMap.getString("AssetPayment.text"),
-                        CurrencyManager.getInstance().getShortUiMoneyFormatter().print(asset.getIncome()),
+                        CurrencyManager.getInstance().getShortUiMoneyPrinter().print(asset.getIncome()),
                         asset.getName()));
             } else if (asset.getSchedule() == SCHEDULE_MONTHLY && campaign.getCalendar().get(Calendar.DAY_OF_MONTH) == 1) {
                 credit(asset.getIncome(), Transaction.C_MISC, "income from " + asset.getName(),
                         campaign.getCalendar().getTime());
                 campaign.addReport(String.format(
                         resourceMap.getString("AssetPayment.text"),
-                        CurrencyManager.getInstance().getShortUiMoneyFormatter().print(asset.getIncome()),
+                        CurrencyManager.getInstance().getShortUiMoneyPrinter().print(asset.getIncome()),
                         asset.getName()));
             }
         }
@@ -308,7 +308,7 @@ public class Finances implements Serializable {
                             resourceMap.getString("PeacetimeCosts.title"), calendar.getTime())) {
                         campaign.addReport(String.format(
                                 resourceMap.getString("PeacetimeCosts.text"),
-                                CurrencyManager.getInstance().getShortUiMoneyFormatter().print(campaign.getPeacetimeCost())));
+                                CurrencyManager.getInstance().getShortUiMoneyPrinter().print(campaign.getPeacetimeCost())));
                     } else {
                         campaign.addReport(
                                 String.format(resourceMap.getString("NotImplemented.text"), "for operating costs"));
@@ -318,7 +318,7 @@ public class Finances implements Serializable {
                             resourceMap.getString("PeacetimeCostsParts.title"), calendar.getTime())) {
                         campaign.addReport(String.format(
                                 resourceMap.getString("PeacetimeCostsParts.text"),
-                                CurrencyManager.getInstance().getShortUiMoneyFormatter().print(campaign.getMonthlySpareParts())));
+                                CurrencyManager.getInstance().getShortUiMoneyPrinter().print(campaign.getMonthlySpareParts())));
                     } else {
                         campaign.addReport(
                                 String.format(resourceMap.getString("NotImplemented.text"), "for spare parts"));
@@ -327,7 +327,7 @@ public class Finances implements Serializable {
                             resourceMap.getString("PeacetimeCostsAmmunition.title"), calendar.getTime())) {
                         campaign.addReport(String.format(
                                 resourceMap.getString("PeacetimeCostsAmmunition.text"),
-                                CurrencyManager.getInstance().getShortUiMoneyFormatter().print(campaign.getMonthlySpareParts())));
+                                CurrencyManager.getInstance().getShortUiMoneyPrinter().print(campaign.getMonthlySpareParts())));
                     } else {
                         campaign.addReport(
                                 String.format(resourceMap.getString("NotImplemented.text"), "for training munitions"));
@@ -336,7 +336,7 @@ public class Finances implements Serializable {
                             resourceMap.getString("PeacetimeCostsFuel.title"), calendar.getTime())) {
                         campaign.addReport(String.format(
                                 resourceMap.getString("PeacetimeCostsFuel.text"),
-                                CurrencyManager.getInstance().getShortUiMoneyFormatter().print(campaign.getMonthlySpareParts())));
+                                CurrencyManager.getInstance().getShortUiMoneyPrinter().print(campaign.getMonthlySpareParts())));
                     } else {
                         campaign.addReport(String.format(resourceMap.getString("NotImplemented.text"), "for fuel"));
                     }
@@ -347,7 +347,7 @@ public class Finances implements Serializable {
                         calendar.getTime())) {
                     campaign.addReport(
                             String.format(resourceMap.getString("Salaries.text"),
-                                    CurrencyManager.getInstance().getShortUiMoneyFormatter().print(campaign.getPayRoll())));
+                                    CurrencyManager.getInstance().getShortUiMoneyPrinter().print(campaign.getPayRoll())));
                 } else {
                     campaign.addReport(
                             String.format(resourceMap.getString("NotImplemented.text"), "payroll costs"));
@@ -361,7 +361,7 @@ public class Finances implements Serializable {
                         calendar.getTime())) {
                     campaign.addReport(String.format(
                             resourceMap.getString("Overhead.text"),
-                            CurrencyManager.getInstance().getShortUiMoneyFormatter().print(campaign.getOverheadExpenses())));
+                            CurrencyManager.getInstance().getShortUiMoneyPrinter().print(campaign.getOverheadExpenses())));
                 } else {
                     campaign.addReport(
                             String.format(resourceMap.getString("NotImplemented.text"), "overhead costs"));
@@ -377,13 +377,13 @@ public class Finances implements Serializable {
                         campaign.getCalendar().getTime())) {
                     campaign.addReport(String.format(
                             resourceMap.getString("Loan.text"),
-                            CurrencyManager.getInstance().getShortUiMoneyFormatter().print(loan.getPaymentAmount()),
+                            CurrencyManager.getInstance().getShortUiMoneyPrinter().print(loan.getPaymentAmount()),
                             loan.getDescription()));
                     loan.paidLoan();
                 } else {
                     campaign.addReport(String.format(
                             resourceMap.getString("Loan.insufficient"),
-                            CurrencyManager.getInstance().getShortUiMoneyFormatter().print(loan.getPaymentAmount())));
+                            CurrencyManager.getInstance().getShortUiMoneyPrinter().print(loan.getPaymentAmount())));
                     loan.setOverdue(true);
                 }
             }
@@ -409,7 +409,7 @@ public class Finances implements Serializable {
                         campaign.getCalendar().getTime())) {
                     campaign.addReport(String.format(
                             resourceMap.getString("Loan.text"),
-                            CurrencyManager.getInstance().getShortUiMoneyFormatter().print(loan.getPaymentAmount()),
+                            CurrencyManager.getInstance().getShortUiMoneyPrinter().print(loan.getPaymentAmount()),
                             loan.getDescription()));
                     loan.paidLoan();
                 } else {
@@ -487,7 +487,7 @@ public class Finances implements Serializable {
                         transaction.getCategoryName(),
                         transaction.getDescription(),
                         transaction.getAmount(),
-                        CurrencyManager.getInstance().getShortUiMoneyFormatter().print(running_total));
+                        CurrencyManager.getInstance().getShortUiMoneyPrinter().print(running_total));
             }
 
 			csvPrinter.flush();

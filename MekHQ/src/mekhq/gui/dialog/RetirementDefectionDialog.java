@@ -54,7 +54,7 @@ import megamek.common.TargetRoll;
 import megamek.common.UnitType;
 import megamek.common.util.EncodeControl;
 import mekhq.Utilities;
-import mekhq.campaign.finances.CurrencyManager;
+import mekhq.campaign.finances.MekHqMoneyUtil;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
@@ -131,7 +131,7 @@ public class RetirementDefectionDialog extends JDialog {
 			AtBContract contract, boolean doRetirement) {
 		super(gui.getFrame(), true);
 		hqView = gui;
-		unitAssignments = new HashMap<UUID, UUID>();
+		unitAssignments = new HashMap<>();
 		this.contract = contract;
 		rdTracker = hqView.getCampaign().getRetirementDefectionTracker();
 		if (doRetirement) {
@@ -186,7 +186,7 @@ public class RetirementDefectionDialog extends JDialog {
         if (doRetirement) {
         	JPanel panOverview = new JPanel(new BorderLayout());
 
-        	cbGroupOverview = new JComboBox<String>();
+        	cbGroupOverview = new JComboBox<>();
         	for (int i = 0; i < PersonnelTab.PG_RETIRE; i++) {
         		cbGroupOverview.addItem(PersonnelTab.getPersonnelGroupName(i));
         	}
@@ -201,12 +201,7 @@ public class RetirementDefectionDialog extends JDialog {
         	if (hqView.getCampaign().getCampaignOptions().getCustomRetirementMods()) {
         		panTop.add(lblGeneralMod);
         		panTop.add(spnGeneralMod);
-        		spnGeneralMod.addChangeListener(new ChangeListener() {
-        			@Override
-        			public void stateChanged(ChangeEvent arg0) {
-        				personnelTable.setGeneralMod((Integer)spnGeneralMod.getValue());
-        			}
-        		});
+        		spnGeneralMod.addChangeListener(arg0 -> personnelTable.setGeneralMod((Integer)spnGeneralMod.getValue()));
         	}
 
         	JLabel lblTotalDesc = new JLabel();
@@ -227,23 +222,18 @@ public class RetirementDefectionDialog extends JDialog {
         	RetirementTableModel model = new RetirementTableModel(hqView.getCampaign());
         	personnelTable = new RetirementTable(model, hqView);
 
-        	personnelSorter = new TableRowSorter<RetirementTableModel>(model);
+        	personnelSorter = new TableRowSorter<>(model);
             personnelSorter.setComparator(RetirementTableModel.COL_PERSON, new RankSorter(hqView.getCampaign()));
             personnelSorter.setComparator(RetirementTableModel.COL_PAYOUT, new FormattedNumberSorter());
             personnelSorter.setComparator(RetirementTableModel.COL_BONUS_COST, new BonusSorter());
             personnelSorter.setComparator(RetirementTableModel.COL_PAY_BONUS, new BonusSorter());
             personnelSorter.setComparator(RetirementTableModel.COL_SHARES, new FormattedNumberSorter());
         	personnelTable.setRowSorter(personnelSorter);
-        	ArrayList<RowSorter.SortKey> sortKeys = new ArrayList<RowSorter.SortKey>();
+        	ArrayList<RowSorter.SortKey> sortKeys = new ArrayList<>();
         	sortKeys.add(new RowSorter.SortKey(PersonnelTableModel.COL_RANK, SortOrder.DESCENDING));
         	personnelSorter.setSortKeys(sortKeys);
 
-        	cbGroupOverview.addActionListener(new ActionListener() {
-        		@Override
-                public void actionPerformed(ActionEvent evt) {
-        			filterPersonnel(personnelSorter, cbGroupOverview.getSelectedIndex(), false);
-        		}
-        	});
+        	cbGroupOverview.addActionListener(evt -> filterPersonnel(personnelSorter, cbGroupOverview.getSelectedIndex(), false));
 
         	personnelTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
         		@Override
@@ -278,8 +268,8 @@ public class RetirementDefectionDialog extends JDialog {
         		@Override
         		public void tableChanged(TableModelEvent ev) {
         			if (!hqView.getCampaign().getCampaignOptions().getUseShareSystem()) {
-        			    long bonus = getTotalBonus();
-        			    if (bonus > hqView.getCampaign().getFinances().getBalance()) {
+        			    Money bonus = getTotalBonus();
+        			    if (bonus.isGreaterThan(hqView.getCampaign().getFinances().getBalance())) {
         			        lblTotal.setText("<html><font color='red'>"
         			                + formatter.format(getTotalBonus()) + "</font></html>");
         			        btnRoll.setEnabled(false);
@@ -514,13 +504,13 @@ public class RetirementDefectionDialog extends JDialog {
 				} else {
 					txtInstructions.setText(resourceMap.getString("txtInstructions.Results.text"));
 				}
-                if (getTotalBonus() > 0) {
+                if (getTotalBonus().isPositive()) {
                     hqView.getCampaign().getFinances().debit(getTotalBonus(), Transaction.C_SALARY, "Bonus Payments",
                             hqView.getCampaign().getDate());
                 }
 			} else if (ev.getSource().equals(btnDone)) {
 				for (UUID pid : ((RetirementTableModel)retireeTable.getModel()).getAltPayout().keySet()) {
-					rdTracker.getPayout(pid).setCbills(((RetirementTableModel)retireeTable.getModel()).getAltPayout().get(pid));
+					rdTracker.getPayout(pid).setPayoutAmount(((RetirementTableModel)retireeTable.getModel()).getAltPayout().get(pid));
 				}
 				aborted = false;
 				setVisible(false);
@@ -603,10 +593,14 @@ public class RetirementDefectionDialog extends JDialog {
 					null != hqView.getCampaign().getUnit(p.getOriginalUnitId())) {
 				unitAssignments.put(id, p.getOriginalUnitId());
 				if (hqView.getCampaign().getCampaignOptions().getUseShareSystem()) {
-					rdTracker.
-					getPayout(id).setCbills(Math.max(0,
-							rdTracker.getPayout(id).getCbills() -
-							hqView.getCampaign().getUnit(p.getOriginalUnitId()).getBuyCost()));
+				    Money temp = rdTracker.getPayout(id).getPayoutAmount()
+                            .minus(hqView.getCampaign().getUnit(p.getOriginalUnitId()).getBuyCost());
+
+				    if (temp.isNegative()) {
+				        temp = MekHqMoneyUtil.zero();
+                    }
+
+					rdTracker.getPayout(id).setPayoutAmount(temp);
 				}
 			}
 			/* For infantry, the unit commander makes a retirement roll on behalf of the
@@ -619,7 +613,7 @@ public class RetirementDefectionDialog extends JDialog {
 			((UnitAssignmentTableModel)unitAssignmentTable.getModel()).setData(availableUnits);
 		}
 
-		ArrayList<UUID> retireeList = new ArrayList<UUID>();
+		ArrayList<UUID> retireeList = new ArrayList<>();
 		boolean showRecruitColumn = false;
 		for (UUID pid : rdTracker.getRetirees(contract)) {
 			retireeList.add(pid);
@@ -729,30 +723,30 @@ public class RetirementDefectionDialog extends JDialog {
 
 	public Money totalPayout() {
 		if (null == rdTracker.getRetirees(contract)) {
-			return Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
+			return MekHqMoneyUtil.zero();
 		}
-		long retVal = 0;
+		Money retVal = MekHqMoneyUtil.zero();
 		for (UUID id : rdTracker.getRetirees(contract)) {
 			if (null == rdTracker.getPayout(id)) {
 				continue;
 			}
 			if (((RetirementTableModel)retireeTable.getModel()).getAltPayout().keySet().contains(id)) {
-				retVal += ((RetirementTableModel)retireeTable.getModel()).getAltPayout().get(id);
+				retVal = retVal.plus(((RetirementTableModel)retireeTable.getModel()).getAltPayout().get(id));
 				continue;
 			}
-			long payout = rdTracker.getPayout(id).getCbills();
+			Money payout = rdTracker.getPayout(id).getPayoutAmount();
 			/* If no unit is required as part of the payout, the unit is part or all of the
 			 * final payout.
 			 */
 			if ((rdTracker.getPayout(id).getWeightClass() == 0 &&
 					null != unitAssignments.get(id) &&
 							null != hqView.getCampaign().getUnit(unitAssignments.get(id)))) {
-				payout -= hqView.getCampaign().getUnit(unitAssignments.get(id)).getBuyCost();
+				payout = payout.minus(hqView.getCampaign().getUnit(unitAssignments.get(id)).getBuyCost());
 			} else if ((hqView.getCampaign().getCampaignOptions().getUseShareSystem() &&
 							hqView.getCampaign().getCampaignOptions().getTrackOriginalUnit() &&
 							hqView.getCampaign().getPerson(id).getOriginalUnitId() == unitAssignments.get(id)) &&
 					null != hqView.getCampaign().getUnit(unitAssignments.get(id))) {
-				payout -= hqView.getCampaign().getUnit(unitAssignments.get(id)).getBuyCost();
+				payout = payout.minus(hqView.getCampaign().getUnit(unitAssignments.get(id)).getBuyCost());
 			}
 			/*  If using the share system and tracking the original unit,
 			 * the payout is also reduced by the value of the unit.
@@ -761,21 +755,27 @@ public class RetirementDefectionDialog extends JDialog {
 					hqView.getCampaign().getCampaignOptions().getTrackOriginalUnit() &&
 					hqView.getCampaign().getPerson(id).getOriginalUnitId() == unitAssignments.get(id) &&
 					null != hqView.getCampaign().getUnit(unitAssignments.get(id))) {
-				payout -= hqView.getCampaign().getUnit(unitAssignments.get(id)).getBuyCost();
+				payout = payout.minus(hqView.getCampaign().getUnit(unitAssignments.get(id)).getBuyCost());
 			}
 			/* If the unit given in payment is of lower quality than required, pay
 			 * an additional 3M C-bills per class.
 			 */
 			if (null != unitAssignments.get(id)) {
-				payout += getShortfallAdjustment(rdTracker.getPayout(id).getWeightClass(),
-						RetirementDefectionDialog.weightClassIndex(hqView.getCampaign().getUnit(unitAssignments.get(id))));
+				payout = payout.plus(getShortfallAdjustment(
+				                        rdTracker.getPayout(id).getWeightClass(),
+						                RetirementDefectionDialog.weightClassIndex(hqView.getCampaign().getUnit(unitAssignments.get(id)))));
 			}
 			/* If the pilot has stolen a unit, there is no payout */
 			if (rdTracker.getPayout(id).hasStolenUnit() &&
 					null != unitAssignments.get(id)) {
-				payout = 0;
+				payout = MekHqMoneyUtil.zero();
 			}
-			retVal += Math.max(0, payout);
+			// If the payout is negative just set it to zero
+			if (payout.isNegative()) {
+			    payout = MekHqMoneyUtil.zero();
+            }
+
+			retVal = retVal.plus(payout);
 		}
 		return retVal;
 	}
@@ -797,27 +797,27 @@ public class RetirementDefectionDialog extends JDialog {
 		return retVal;
 	}
 
-	private long getTotalBonus() {
-		long retVal = 0;
+	private Money getTotalBonus() {
+		Money retVal = MekHqMoneyUtil.zero();
 		for (UUID id : targetRolls.keySet()) {
 			if (((RetirementTableModel)(personnelTable.getModel())).getPayBonus(id)) {
-				retVal += RetirementDefectionTracker.getBonusCost(hqView.getCampaign().getPerson(id));
+				retVal = retVal.plus(RetirementDefectionTracker.getBonusCost(hqView.getCampaign().getPerson(id)));
 			}
 		}
 		return retVal;
 	}
 
 	/* It is possible that there may not be enough units of the required
-	 * weight/tech level for all retirees. This is not address by the AtB
+	 * weight/tech level for all retirees. This is not addressed by the AtB
 	 * rules, so I have improvised by allowing smaller units to be given,
 	 * but at a penalty of 3,000,000 C-bills per class difference (based
 	 * on the values given in IOps Beta/Creating a Force).
 	 */
-	public static long getShortfallAdjustment(int required, int actual) {
+	public static Money getShortfallAdjustment(int required, int actual) {
 		if (actual >= required) {
-			return 0;
+			return MekHqMoneyUtil.zero();
 		}
-		return (required - actual) * 3000000;
+		return MekHqMoneyUtil.money((required - actual) * 3000000);
 	}
 
 	public UUID getUnitId(UUID pid) {
@@ -998,7 +998,7 @@ class RetirementTable extends JTable {
         getColumnModel().getColumn(convertColumnIndexToView(RetirementTableModel.COL_MISC_MOD)).
         	setCellEditor(new SpinnerEditor());
 
-        JComboBox<String> cbRecruitType = new JComboBox<String>();
+        JComboBox<String> cbRecruitType = new JComboBox<>();
         for (int i = Person.T_NONE; i < Person.T_NUM; i++) {
         	cbRecruitType.addItem(Person.getRoleDesc(i, hqView.getCampaign().getFaction().isClan()));
         }

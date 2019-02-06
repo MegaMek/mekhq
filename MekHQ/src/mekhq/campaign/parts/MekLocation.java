@@ -23,7 +23,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import mekhq.campaign.finances.CurrencyManager;
+import mekhq.campaign.finances.MekHqMoneyUtil;
 import org.joda.money.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -175,9 +175,7 @@ public class MekLocation extends Part {
         	    cost += 50000;
         	}
         }
-        return Money.of(
-                CurrencyManager.getInstance().getDefaultCurrency(),
-                cost);
+        return MekHqMoneyUtil.money(cost);
     }
 
     private boolean isArm() {

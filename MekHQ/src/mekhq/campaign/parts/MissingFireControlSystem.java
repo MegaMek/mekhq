@@ -23,7 +23,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import mekhq.campaign.finances.CurrencyManager;
+import mekhq.campaign.finances.MekHqMoneyUtil;
 import org.joda.money.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -48,7 +48,7 @@ public class MissingFireControlSystem extends MissingPart {
 	private Money cost;
 	
 	public MissingFireControlSystem() {
-    	this(0, Money.zero(CurrencyManager.getInstance().getDefaultCurrency()), null);
+    	this(0, MekHqMoneyUtil.zero(), null);
     }
     
     public MissingFireControlSystem(int tonnage, Money cost, Campaign c) {

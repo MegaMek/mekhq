@@ -68,7 +68,7 @@ public class LootTableModel extends AbstractTableModel {
                 case COL_NAME:
                     return "Name";
                 case COL_MONEY:
-                    return "Money";
+                    return "money";
                 case COL_MECHS:
                     return "# Units";
                 case COL_PARTS:

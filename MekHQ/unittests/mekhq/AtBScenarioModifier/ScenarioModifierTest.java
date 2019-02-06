@@ -21,15 +21,10 @@
 package mekhq.AtBScenarioModifier;
 
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
-import mekhq.campaign.personnel.Person;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.mockito.Mockito;
-
-import java.util.ArrayList;
-import java.util.UUID;
 
 /**
  * @author NickAragua

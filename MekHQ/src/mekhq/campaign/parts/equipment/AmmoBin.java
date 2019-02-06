@@ -26,7 +26,7 @@ import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.HashSet;
 
-import mekhq.campaign.finances.CurrencyManager;
+import mekhq.campaign.finances.MekHqMoneyUtil;
 import org.joda.money.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -166,8 +166,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
                 curType = mounted.getType();
             }
         }
-        return Money.of(CurrencyManager.getInstance().getDefaultCurrency(),
-                curType.getRawCost());
+        return MekHqMoneyUtil.money(curType.getRawCost());
     }
     
     protected int getShotsPerTon() {
@@ -712,7 +711,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
         toReturn += getAcquisitionExtraDesc() + "<br/>";
         PartInventory inventories = campaign.getPartInventory(getAcquisitionPart());
         toReturn += inventories.getTransitOrderedDetails() + "<br/>";
-        toReturn += CurrencyManager.getInstance().getShortUiMoneyFormatter().print(getBuyCost()) + "<br/>";
+        toReturn += MekHqMoneyUtil.shortUiMoneyPrinter().print(getBuyCost()) + "<br/>";
         toReturn += "</font></html>";
         return toReturn;
     }

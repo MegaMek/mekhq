@@ -23,7 +23,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import mekhq.campaign.finances.CurrencyManager;
+import mekhq.campaign.finances.MekHqMoneyUtil;
 import org.joda.money.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -52,7 +52,7 @@ public class FireControlSystem extends Part {
 	private Money cost;
 	
 	public FireControlSystem() {
-    	this(0, Money.zero(CurrencyManager.getInstance().getDefaultCurrency()), null);
+    	this(0, MekHqMoneyUtil.zero(), null);
     }
     
     public FireControlSystem(int tonnage, Money cost, Campaign c) {
@@ -196,14 +196,10 @@ public class FireControlSystem extends Part {
 	public void calculateCost() {
 		if(null != unit) {
 			if(unit.getEntity() instanceof SmallCraft) {
-				cost = Money.of(
-				        CurrencyManager.getInstance().getDefaultCurrency(),
-                        100000 + 10000 * ((SmallCraft)unit.getEntity()).getArcswGuns());
+				cost = MekHqMoneyUtil.money(100000 + 10000 * ((SmallCraft)unit.getEntity()).getArcswGuns());
 			}
 			else if(unit.getEntity() instanceof Jumpship) {
-				cost = Money.of(
-                        CurrencyManager.getInstance().getDefaultCurrency(),
-                        100000 + 10000 * ((Jumpship)unit.getEntity()).getArcswGuns());
+				cost = MekHqMoneyUtil.money(100000 + 10000 * ((Jumpship)unit.getEntity()).getArcswGuns());
 			}
 		}
 	}

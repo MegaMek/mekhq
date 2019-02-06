@@ -25,7 +25,7 @@ import java.io.PrintWriter;
 import java.math.RoundingMode;
 import java.util.StringJoiner;
 
-import mekhq.campaign.finances.CurrencyManager;
+import mekhq.campaign.finances.MekHqMoneyUtil;
 import org.joda.money.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -136,7 +136,7 @@ public class MekActuator extends Part {
                 break;
             }
         }
-        return Money.of(CurrencyManager.getInstance().getDefaultCurrency(), getUnitTonnage() * unitCost);
+        return MekHqMoneyUtil.money(getUnitTonnage() * unitCost);
     }
 
     @Override
@@ -266,7 +266,7 @@ public class MekActuator extends Part {
             }
             if (campaign.getCampaignOptions().payForRepairs()) {
                 Money repairCost = getStickerPrice().multipliedBy(0.2, RoundingMode.HALF_EVEN);
-                sj.add(CurrencyManager.getInstance().getShortUiMoneyFormatter().print(repairCost) + " to repair");
+                sj.add(MekHqMoneyUtil.shortUiMoneyPrinter().print(repairCost) + " to repair");
             }
             return sj.toString();
 		}

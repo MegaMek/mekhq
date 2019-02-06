@@ -25,11 +25,10 @@ import javax.swing.JScrollPane;
 import megamek.common.logging.LogLevel;
 import megamek.common.util.StringUtil;
 import mekhq.MekHQ;
-import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.event.PartChangedEvent;
 import mekhq.campaign.event.UnitChangedEvent;
-import mekhq.campaign.finances.CurrencyManager;
+import mekhq.campaign.finances.MekHqMoneyUtil;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.parts.MissingPart;
@@ -223,7 +222,7 @@ public class AcquisitionsDialog extends JDialog {
 
         if (MoneyUtils.isPositive(PartsAcquisitionService.getMissingTotalPrice())) {
             String price = "Missing item price: "
-                    + CurrencyManager.getInstance().getShortUiMoneyFormatter().print(PartsAcquisitionService.getMissingTotalPrice());
+                    + MekHqMoneyUtil.shortUiMoneyPrinter().print(PartsAcquisitionService.getMissingTotalPrice());
 
             sbText.append(price);
             sbText.append("<br/>");
@@ -406,13 +405,13 @@ public class AcquisitionsDialog extends JDialog {
                 sbText.append(inventoryInfo);
                 sbText.append("<br/>");
 
-                String price = "Item Price: " + CurrencyManager.getInstance().getShortUiMoneyFormatter().print(partCountInfo.getStickerPrice());
+                String price = "Item Price: " + MekHqMoneyUtil.shortUiMoneyPrinter().print(partCountInfo.getStickerPrice());
 
                 sbText.append(price);
                 sbText.append("<br/>");
 
                 if (partCountInfo.getMissingCount() > 1) {
-                    price = "Missing item price: " + CurrencyManager.getInstance().getShortUiMoneyFormatter().print(
+                    price = "Missing item price: " + MekHqMoneyUtil.shortUiMoneyPrinter().print(
                             partCountInfo.getStickerPrice().multipliedBy(partCountInfo.getMissingCount()));
 
                     sbText.append(price);
@@ -534,9 +533,7 @@ public class AcquisitionsDialog extends JDialog {
             btnUseBonus.setText(String.format("Use Bonus Part (%s)", numBonusParts)); // NOI18N
             btnUseBonus.setToolTipText("Use a bonus part to acquire this item");
             btnUseBonus.setName("btnUseBonus"); // NOI18N
-            btnUseBonus.addActionListener(ev -> {
-                useBonusPart();
-            });
+            btnUseBonus.addActionListener(ev -> useBonusPart());
 
             if (numBonusParts == 0) {
                 btnUseBonus.setVisible(false);
@@ -563,9 +560,7 @@ public class AcquisitionsDialog extends JDialog {
                 btnOrderAll.setText("Order All (" + partCountInfo.getMissingCount() + ")"); // NOI18N
                 btnOrderAll.setToolTipText("Order all missing");
                 btnOrderAll.setName("btnOrderAll"); // NOI18N
-                btnOrderAll.addActionListener(ev -> {
-                    orderAllMissing();
-                });
+                btnOrderAll.addActionListener(ev -> orderAllMissing());
 
                 actionButtons.add(btnOrderAll, gbcActions);
                 gbcActions.gridy++;

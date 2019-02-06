@@ -31,6 +31,7 @@ import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.ResourceBundle;
@@ -68,11 +69,13 @@ import megamek.common.logging.LogLevel;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.finances.MekHqMoneyUtil;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.market.UnitMarket;
 import mekhq.gui.model.UnitMarketTableModel;
 import mekhq.gui.model.XTableColumnModel;
 import mekhq.gui.sorter.WeightClassSorter;
+import org.joda.money.Money;
 
 /**
  * Code copied heavily from PersonnelMarketDialog
@@ -237,7 +240,7 @@ public class UnitMarketDialog extends JDialog {
         tableUnits.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tableUnits.setColumnModel(new XTableColumnModel());
         tableUnits.createDefaultColumnsFromModel();
-        sorter = new TableRowSorter<UnitMarketTableModel>(marketModel);
+        sorter = new TableRowSorter<>(marketModel);
         sorter.setComparator(UnitMarketTableModel.COL_WEIGHTCLASS, new WeightClassSorter());
         Comparator<String> numComparator = new Comparator<String>() {
 			public int compare(String arg0, String arg1) {
@@ -301,31 +304,19 @@ public class UnitMarketDialog extends JDialog {
 
         btnPurchase.setText(resourceMap.getString("btnPurchase.text"));
         btnPurchase.setName("btnPurchase"); // NOI18N
-        btnPurchase.addActionListener(new java.awt.event.ActionListener() {
-        	public void actionPerformed(java.awt.event.ActionEvent evt) {
-        		purchaseUnit(evt);
-        	}
-        });
+        btnPurchase.addActionListener(evt -> purchaseUnit(evt));
         panelOKBtns.add(btnPurchase, new java.awt.GridBagConstraints());
         btnPurchase.setEnabled(null != selectedEntity);
 
         btnAdd = new JButton(resourceMap.getString("btnAdd.text"));
-        btnAdd.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                addUnit();
-            }
-        });
+        btnAdd.addActionListener(evt -> addUnit());
         btnAdd.setEnabled(null !=  selectedEntity);
         panelOKBtns.add(btnAdd, new java.awt.GridBagConstraints());
 
 
         btnClose.setText(resourceMap.getString("btnClose.text")); // NOI18N
         btnClose.setName("btnClose"); // NOI18N
-        btnClose.addActionListener(new java.awt.event.ActionListener() {
-        	public void actionPerformed(java.awt.event.ActionEvent evt) {
-        		btnCloseActionPerformed(evt);
-        	}
-        });
+        btnClose.addActionListener(evt -> btnCloseActionPerformed(evt));
         panelOKBtns.add(btnClose, new java.awt.GridBagConstraints());
 
         getContentPane().add(panelOKBtns, BorderLayout.PAGE_END);
@@ -342,18 +333,18 @@ public class UnitMarketDialog extends JDialog {
 	    	int transitDays = campaign.getCampaignOptions().getInstantUnitMarketDelivery()?0:
 	    		campaign.calculatePartTransitTime(Compute.d6(2) - 2);
 			UnitMarket.MarketOffer offer = marketModel.getOffer(tableUnits.convertRowIndexToModel(tableUnits.getSelectedRow()));
-			long cost = (long)Math.ceil(offer.unit.getCost() * offer.pct / 100.0);
-			if (campaign.getFunds() < cost) {
+			Money cost = MekHqMoneyUtil.money(offer.unit.getCost() * offer.pct / 100.0);
+			if (campaign.getFunds().isLessThan(cost)) {
 				 campaign.addReport("<font color='red'><b> You cannot afford this unit. Transaction cancelled</b>.</font>");
 				 return;
 			}
 
 			int roll = Compute.d6();
 			if (offer.market == UnitMarket.MARKET_BLACK && roll <= 2) {
-				campaign.getFinances().debit(cost / roll, Transaction.C_UNIT,
+				campaign.getFinances().debit(cost.dividedBy(roll, RoundingMode.HALF_EVEN), Transaction.C_UNIT,
 						"Purchased " + selectedEntity.getShortName() + " (lost on black market)",
 						campaign.getCalendar().getTime());
-				campaign.addReport("<font color='red'>Swindled! Money was paid, but no unit delivered.</font>");
+				campaign.addReport("<font color='red'>Swindled! money was paid, but no unit delivered.</font>");
 			} else {
 				campaign.getFinances().debit(cost, Transaction.C_UNIT,
 						"Purchased " + selectedEntity.getShortName(),

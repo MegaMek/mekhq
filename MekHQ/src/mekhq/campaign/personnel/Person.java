@@ -32,6 +32,7 @@ import java.util.stream.IntStream;
 
 import mekhq.campaign.*;
 import mekhq.campaign.finances.CurrencyManager;
+import mekhq.campaign.finances.MekHqMoneyUtil;
 import mekhq.campaign.log.*;
 import org.joda.money.BigMoney;
 import org.joda.money.Money;
@@ -161,8 +162,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
     public static final int DESIG_GAMMA   = 13;
     public static final int DESIG_NUM     = 14;
     
-    private static final Map<Integer, Integer> MECHWARRIOR_AERO_RANSOM_VALUES;
-    private static final Map<Integer, Integer> OTHER_RANSOM_VALUES;
+    private static final Map<Integer, Money> MECHWARRIOR_AERO_RANSOM_VALUES;
+    private static final Map<Integer, Money> OTHER_RANSOM_VALUES;
 
     public PersonAwardController awardController;
 
@@ -328,18 +329,18 @@ public class Person implements Serializable, MekHqXmlSerializable {
     // initializes the AtB ransom values
     static {
         MECHWARRIOR_AERO_RANSOM_VALUES = new HashMap<>();
-        MECHWARRIOR_AERO_RANSOM_VALUES.put(SkillType.EXP_ULTRA_GREEN, 5000);    // no official AtB rules for really inexperienced scrubs, but...
-        MECHWARRIOR_AERO_RANSOM_VALUES.put(SkillType.EXP_GREEN, 10000);
-        MECHWARRIOR_AERO_RANSOM_VALUES.put(SkillType.EXP_REGULAR, 25000);
-        MECHWARRIOR_AERO_RANSOM_VALUES.put(SkillType.EXP_VETERAN, 75000);
-        MECHWARRIOR_AERO_RANSOM_VALUES.put(SkillType.EXP_ELITE, 150000);
+        MECHWARRIOR_AERO_RANSOM_VALUES.put(SkillType.EXP_ULTRA_GREEN, MekHqMoneyUtil.money(5000)); // no official AtB rules for really inexperienced scrubs, but...
+        MECHWARRIOR_AERO_RANSOM_VALUES.put(SkillType.EXP_GREEN, MekHqMoneyUtil.money(10000));
+        MECHWARRIOR_AERO_RANSOM_VALUES.put(SkillType.EXP_REGULAR, MekHqMoneyUtil.money(25000));
+        MECHWARRIOR_AERO_RANSOM_VALUES.put(SkillType.EXP_VETERAN, MekHqMoneyUtil.money(75000));
+        MECHWARRIOR_AERO_RANSOM_VALUES.put(SkillType.EXP_ELITE, MekHqMoneyUtil.money(150000));
         
         OTHER_RANSOM_VALUES = new HashMap<>();
-        OTHER_RANSOM_VALUES.put(SkillType.EXP_ULTRA_GREEN, 2500);
-        OTHER_RANSOM_VALUES.put(SkillType.EXP_GREEN, 5000);
-        OTHER_RANSOM_VALUES.put(SkillType.EXP_REGULAR, 10000);
-        OTHER_RANSOM_VALUES.put(SkillType.EXP_VETERAN, 25000);
-        OTHER_RANSOM_VALUES.put(SkillType.EXP_ELITE, 50000);
+        OTHER_RANSOM_VALUES.put(SkillType.EXP_ULTRA_GREEN, MekHqMoneyUtil.money(2500));
+        OTHER_RANSOM_VALUES.put(SkillType.EXP_GREEN, MekHqMoneyUtil.money(5000));
+        OTHER_RANSOM_VALUES.put(SkillType.EXP_REGULAR, MekHqMoneyUtil.money(10000));
+        OTHER_RANSOM_VALUES.put(SkillType.EXP_VETERAN, MekHqMoneyUtil.money(25000));
+        OTHER_RANSOM_VALUES.put(SkillType.EXP_ELITE, MekHqMoneyUtil.money(50000));
     }
     
     //default constructor
@@ -371,7 +372,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         status = S_ACTIVE;
         hits = 0;
         skills = new Hashtable<>();
-        salary = Money.of(CurrencyManager.getInstance().getDefaultCurrency(), -1);
+        salary = MekHqMoneyUtil.money(-1);
         campaign = c;
         doctorId = null;
         unitId = null;
@@ -1947,9 +1948,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public Money getSalary() {
-
         if (isPrisoner() || isBondsman()) {
-            return Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
+            return MekHqMoneyUtil.zero();
         }
 
         if (MoneyUtils.isPositiveOrZero(salary)) {
@@ -3840,7 +3840,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     
     /** Returns the ransom value of this individual
     * Useful for prisoner who you want to ransom or hand off to your employer in an AtB context */
-    public int getRansomValue() {
+    public Money getRansomValue() {
         // mechwarriors and aero pilots are worth more than the other types of scrubs
         if(primaryRole == T_MECHWARRIOR || primaryRole == T_AERO_PILOT) {
             return MECHWARRIOR_AERO_RANSOM_VALUES.get(getExperienceLevel(false));

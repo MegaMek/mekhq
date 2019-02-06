@@ -14,7 +14,7 @@ import javax.swing.JTable;
 import javax.swing.event.MouseInputAdapter;
 
 import mekhq.MekHQ;
-import mekhq.MekHqMoneyUtil;
+import mekhq.campaign.finances.MekHqMoneyUtil;
 import mekhq.campaign.event.LoanRemovedEvent;
 import mekhq.campaign.event.PartRemovedEvent;
 import mekhq.campaign.finances.Loan;

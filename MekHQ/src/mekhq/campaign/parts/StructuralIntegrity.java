@@ -23,7 +23,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import mekhq.campaign.finances.CurrencyManager;
+import mekhq.campaign.finances.MekHqMoneyUtil;
 import org.joda.money.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -89,21 +89,15 @@ public class StructuralIntegrity extends Part {
 	public Money getStickerPrice() {
 		if(null != unit && unit.getEntity() instanceof Aero) {
 			if(unit.getEntity() instanceof Dropship || unit.getEntity() instanceof SmallCraft) {
-				return Money.of(
-                        CurrencyManager.getInstance().getDefaultCurrency(),
-                        ((Aero)unit.getEntity()).get0SI() * 100000);
+				return MekHqMoneyUtil.money(((Aero)unit.getEntity()).get0SI() * 100000);
 			}
 			else if(unit.getEntity() instanceof ConvFighter) {
-                return Money.of(
-                        CurrencyManager.getInstance().getDefaultCurrency(),
-                        ((Aero)unit.getEntity()).get0SI() * 4000);
+                return MekHqMoneyUtil.money(((Aero)unit.getEntity()).get0SI() * 4000);
 			} else {
-                return Money.of(
-                        CurrencyManager.getInstance().getDefaultCurrency(),
-                        ((Aero)unit.getEntity()).get0SI() * 50000);
+                return MekHqMoneyUtil.money(((Aero)unit.getEntity()).get0SI() * 50000);
 			}
 		}
-		return Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
+		return MekHqMoneyUtil.zero();
 	}
 	
 	@Override

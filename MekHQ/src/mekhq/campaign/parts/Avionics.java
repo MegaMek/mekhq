@@ -23,7 +23,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import mekhq.campaign.finances.CurrencyManager;
+import mekhq.campaign.finances.MekHqMoneyUtil;
 import org.joda.money.Money;
 import org.w3c.dom.Node;
 
@@ -75,10 +75,8 @@ public class Avionics extends Part {
 					&& (hits < 3 && !campaign.getCampaignOptions().useAeroSystemHits())
 					&& Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
 				remove(false);
-				return;
 			} else if (hits >= 3) {
 			    remove(false);
-			    return;
 			}
 		}
 	}
@@ -207,7 +205,7 @@ public class Avionics extends Part {
 	@Override
 	public Money getStickerPrice() {
 		//TODO: table in TechManual makes no sense - where are control systems for ASFs?
-		return Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
+		return MekHqMoneyUtil.zero();
 	}
 
 	@Override

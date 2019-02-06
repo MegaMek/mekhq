@@ -51,7 +51,9 @@ import megamek.common.util.EncodeControl;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Loan;
+import mekhq.campaign.finances.MekHqMoneyUtil;
 import mekhq.campaign.rating.IUnitRating;
+import org.joda.money.Money;
 
 /**
  * @author Taharqa
@@ -63,7 +65,7 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
     private Campaign campaign;
     private DecimalFormat formatter;
     private int rating;
-    private long maxCollateralValue;
+    private Money maxCollateralValue;
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private JPanel panMain;
@@ -225,46 +227,14 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
         btnPlusTenK = new JButton("+10K");
         btnMinusTenK = new JButton("-10K");
         checkMinusButtons();
-        btnPlusTenMillion.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                adjustPrincipal(10000000);
-            }
-        });
-        btnMinusTenMillion.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                adjustPrincipal(-10000000);
-            }
-        });
-        btnPlusMillion.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                adjustPrincipal(1000000);
-            }
-        });
-        btnMinusMillion.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                adjustPrincipal(-1000000);
-            }
-        });
-        btnPlusHundredK.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                adjustPrincipal(100000);
-            }
-        });
-        btnMinusHundredK.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                adjustPrincipal(-100000);
-            }
-        });
-        btnPlusTenK.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                adjustPrincipal(10000);
-            }
-        });
-        btnMinusTenK.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                adjustPrincipal(-10000);
-            }
-        });
+        btnPlusTenMillion.addActionListener(evt -> adjustPrincipal(MekHqMoneyUtil.money(10000000)));
+        btnMinusTenMillion.addActionListener(evt -> adjustPrincipal(MekHqMoneyUtil.money(-10000000)));
+        btnPlusMillion.addActionListener(evt -> adjustPrincipal(MekHqMoneyUtil.money(1000000)));
+        btnMinusMillion.addActionListener(evt -> adjustPrincipal(MekHqMoneyUtil.money(-1000000)));
+        btnPlusHundredK.addActionListener(evt -> adjustPrincipal(MekHqMoneyUtil.money(100000)));
+        btnMinusHundredK.addActionListener(evt -> adjustPrincipal(MekHqMoneyUtil.money(-100000)));
+        btnPlusTenK.addActionListener(evt -> adjustPrincipal(MekHqMoneyUtil.money(10000)));
+        btnMinusTenK.addActionListener(evt -> adjustPrincipal(MekHqMoneyUtil.money(-10000)));
 
         JPanel plusPanel = new JPanel(new GridLayout(2, 4));
         plusPanel.add(btnPlusTenMillion);
@@ -281,11 +251,11 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
         sldCollateral.addChangeListener(this);
         sldLength.addChangeListener(this);
 
-        DefaultComboBoxModel<String> scheduleModel = new DefaultComboBoxModel<String>();
+        DefaultComboBoxModel<String> scheduleModel = new DefaultComboBoxModel<>();
         for (int i = 0; i < Finances.SCHEDULE_NUM; i++) {
             scheduleModel.addElement(Finances.getScheduleName(i));
         }
-        choiceSchedule = new JComboBox<String>(scheduleModel);
+        choiceSchedule = new JComboBox<>(scheduleModel);
         choiceSchedule.setSelectedIndex(loan.getPaymentSchedule());
 
         choiceSchedule.addActionListener(this);
@@ -396,20 +366,12 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
 
         btnAdd = new JButton(resourceMap.getString("btnOkay.text")); // NOI18N
         btnAdd.setName("btnOK"); // NOI18N
-        btnAdd.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                addLoan();
-            }
-        });
+        btnAdd.addActionListener(evt -> addLoan());
         panBtn.add(btnAdd);
 
         btnCancel = new JButton(resourceMap.getString("btnCancel.text")); // NOI18N
         btnCancel.setName("btnClose"); // NOI18N
-        btnCancel.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cancel();
-            }
-        });
+        btnCancel.addActionListener(evt -> cancel());
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.CENTER;
@@ -548,7 +510,7 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
         panInfo.add(panRight);
     }
 
-    private void refreshLoan(long principal) {
+    private void refreshLoan(Money principal) {
     	// Modify loan settings
     	loan.setPrincipal(principal);
     	loan.setRate((int) sldInterest.getValue());
@@ -583,7 +545,7 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
 
 
     private void addLoan() {
-        if (maxCollateralValue < loan.getCollateralAmount()) {
+        if (maxCollateralValue.isLessThan(loan.getCollateralAmount())) {
             JOptionPane.showMessageDialog(frame,
                                           "The collateral amount of this loan is higher than the total value of assets",
                                           "Collateral Too High",
@@ -664,17 +626,16 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
         refreshLoan(loan.getPrincipal());
     }
 
-    private void adjustPrincipal(long value) {
-        long newPrincipal = loan.getPrincipal() + value;
+    private void adjustPrincipal(Money value) {
+        Money newPrincipal = loan.getPrincipal().plus(value);
         refreshLoan(newPrincipal);
         checkMinusButtons();
     }
 
     private void checkMinusButtons() {
-        btnMinusTenMillion.setEnabled(loan.getPrincipal() > 10000000);
-        btnMinusMillion.setEnabled(loan.getPrincipal() > 1000000);
-        btnMinusHundredK.setEnabled(loan.getPrincipal() > 100000);
-        btnMinusTenK.setEnabled(loan.getPrincipal() > 10000);
+        btnMinusTenMillion.setEnabled(loan.getPrincipal().isGreaterThan(MekHqMoneyUtil.money(10000000)));
+        btnMinusMillion.setEnabled(loan.getPrincipal().isGreaterThan(MekHqMoneyUtil.money(1000000)));
+        btnMinusHundredK.setEnabled(loan.getPrincipal().isGreaterThan(MekHqMoneyUtil.money(100000)));
+        btnMinusTenK.setEnabled(loan.getPrincipal().isGreaterThan(MekHqMoneyUtil.money(10000)));
     }
-
 }

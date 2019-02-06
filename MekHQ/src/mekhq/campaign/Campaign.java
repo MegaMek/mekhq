@@ -194,7 +194,7 @@ public class Campaign implements Serializable, ITechManager {
     // we will use the same basic system (borrowed from MegaMek) for tracking
     // all three
     // OK now we have more, parts, personnel, forces, missions, and scenarios.
-    private Map<UUID, Unit> units = new LinkedHashMap<UUID, Unit>();
+    private Map<UUID, Unit> units = new LinkedHashMap<>();
     private Map<UUID, Person> personnel = new LinkedHashMap<>();
     private Map<UUID, Ancestors> ancestors = new LinkedHashMap<>();
     private TreeMap<Integer, Part> parts = new TreeMap<>();
@@ -250,7 +250,7 @@ public class Campaign implements Serializable, ITechManager {
 
     //this is updated and used per gaming session, it is enabled/disabled via the Campaign options
     //we're re-using the LogEntry class that is used to store Personnel entries
-    public LinkedList<LogEntry> inMemoryLogHistory = new LinkedList<LogEntry>();
+    public LinkedList<LogEntry> inMemoryLogHistory = new LinkedList<>();
 
     private boolean overtime;
     private boolean gmMode;
@@ -295,9 +295,9 @@ public class Campaign implements Serializable, ITechManager {
         game = new Game();
         player = new Player(0, "self");
         game.addPlayer(0, player);
-        currentReport = new ArrayList<String>();
+        currentReport = new ArrayList<>();
         currentReportHTML = "";
-        newReports = new ArrayList<String>();
+        newReports = new ArrayList<>();
         calendar = new GregorianCalendar(3067, Calendar.JANUARY, 1);
         dateFormat = "EEEE, MMMM d yyyy";
         shortDateFormat = "yyyyMMdd";
@@ -312,7 +312,7 @@ public class Campaign implements Serializable, ITechManager {
         Ranks.initializeRankSystems();
         ranks = Ranks.getRanksFromSystem(Ranks.RS_SL);
         forces = new Force(name);
-        forceIds.put(Integer.valueOf(0), forces);
+        forceIds.put(0, forces);
         lances = new Hashtable<>();
         finances = new Finances();
         location = new CurrentLocation(Planets.getInstance().getPlanets()
@@ -477,7 +477,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public ArrayList<Lance> getLanceList() {
-        ArrayList<Lance> retVal = new ArrayList<Lance>();
+        ArrayList<Lance> retVal = new ArrayList<>();
         for (Lance l : lances.values()) {
             if (forceIds.containsKey(l.getForceId())) {
                 retVal.add(l);
@@ -568,8 +568,7 @@ public class Campaign implements Serializable, ITechManager {
             rm.setIgnoreRatEra(campaignOptions.canIgnoreRatEra());
             unitGenerator = rm;
         } else {
-            RATGeneratorConnector rgc = new RATGeneratorConnector(getGameYear());
-            unitGenerator = rgc;
+            unitGenerator = new RATGeneratorConnector(getGameYear());
         }
     }
 
@@ -711,9 +710,7 @@ public class Campaign implements Serializable, ITechManager {
             return;
         }
 
-        Money cost = Money.of(
-                CurrencyManager.getInstance().getDefaultCurrency(),
-                ms.getCost());
+        Money cost = MekHqMoneyUtil.money(ms.getCost());
 
         if (getFunds().isLessThan(cost)) {
             addReport("<font color='red'><b> You cannot afford this unit. Transaction cancelled</b>.</font>");
@@ -2577,7 +2574,7 @@ public class Campaign implements Serializable, ITechManager {
                     && !(partWork instanceof Armor)) {
                 Money cost = ((Part) partWork).getStickerPrice().multipliedBy(0.2, RoundingMode.HALF_EVEN);
                 report += "<br>Repairs cost " +
-                        CurrencyManager.getInstance().getShortUiMoneyFormatter().print(cost) +
+                        MekHqMoneyUtil.shortUiMoneyPrinter().print(cost) +
                         " worth of parts.";
                 finances.debit(cost, Transaction.C_REPAIRS, "Repair of " + partWork.getPartName(), calendar.getTime());
             }
@@ -3132,14 +3129,14 @@ public class Campaign implements Serializable, ITechManager {
 
     public Money getPayRoll(boolean noInfantry) {
         if(!campaignOptions.payForSalaries()) {
-            return Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
+            return MekHqMoneyUtil.zero();
         }
 
         return getTheoreticalPayroll(noInfantry);
     }
 
     private Money getTheoreticalPayroll(boolean noInfantry){
-        BigMoney salaries = BigMoney.zero(CurrencyManager.getInstance().getDefaultCurrency());
+        BigMoney salaries = MekHqMoneyUtil.bigZero();
         for (Person p : getPersonnel()) {
             // Optionized infantry (Unofficial)
             if (noInfantry && p.getPrimaryRole() == Person.T_INFANTRY) {
@@ -3161,7 +3158,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public Money getMaintenanceCosts() {
-        BigMoney costs = BigMoney.zero(CurrencyManager.getInstance().getDefaultCurrency());
+        Money costs = MekHqMoneyUtil.zero();
         if(campaignOptions.payForMaintain()) {
             for (Map.Entry<UUID, Unit> mu : units.entrySet()) {
                 Unit u = mu.getValue();
@@ -3170,20 +3167,20 @@ public class Campaign implements Serializable, ITechManager {
                 }
             }
         }
-        return costs.toMoney(RoundingMode.HALF_EVEN);
+        return costs;
     }
 
     public Money getWeeklyMaintenanceCosts() {
-        BigMoney costs = BigMoney.zero(CurrencyManager.getInstance().getDefaultCurrency());
+        Money costs = MekHqMoneyUtil.zero();
         for (Map.Entry<UUID, Unit> u : units.entrySet()) {
             costs = costs.plus(u.getValue().getWeeklyMaintenanceCost());
         }
-        return costs.toMoney(RoundingMode.HALF_EVEN);
+        return costs;
     }
 
     public Money getOverheadExpenses() {
         if(!campaignOptions.payForOverhead()) {
-            return Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
+            return MekHqMoneyUtil.zero();
         }
 
         return getTheoreticalPayroll(false).multipliedBy(0.05, RoundingMode.HALF_EVEN);
@@ -3691,7 +3688,7 @@ public class Campaign implements Serializable, ITechManager {
             category = Transaction.C_MISC;
         }
         finances.credit(quantity, category, description, calendar.getTime());
-        String quantityString = CurrencyManager.getInstance().getShortUiMoneyFormatter().print(quantity);
+        String quantityString = MekHqMoneyUtil.shortUiMoneyPrinter().print(quantity);
         addReport("Funds added : " + quantityString + " (" + description + ")");
     }
 
@@ -4921,9 +4918,7 @@ public class Campaign implements Serializable, ITechManager {
      */
     @SuppressWarnings("unused") // FIXME: Waiting for Dylan to finish re-writing
     public Money calculateCostPerJump(boolean excludeOwnTransports, boolean campaignOpsCosts) {
-        BigMoney collarCost = BigMoney.of(
-                CurrencyManager.getInstance().getDefaultCurrency(),
-                campaignOpsCosts ? 100000 : 50000);
+        BigMoney collarCost = MekHqMoneyUtil.bigMoney(campaignOpsCosts ? 100000 : 50000);
 
         // first we need to get the total number of units by type
         int nMech = getNumberOfUnitsByType(Entity.ETYPE_MECH);
@@ -4989,50 +4984,36 @@ public class Campaign implements Serializable, ITechManager {
         int largeDropshipMechCapacity = 36;
         int largeMechDropshipASFCapacity = 6;
         int largeMechDropshipCargoCapacity = 120;
-        BigMoney largeMechDropshipCost = BigMoney.of(
-                CurrencyManager.getInstance().getDefaultCurrency(),
-                campaignOpsCosts ? (1750000.0 / 4.2) : 400000);
+        BigMoney largeMechDropshipCost = MekHqMoneyUtil.bigMoney(campaignOpsCosts ? (1750000.0 / 4.2) : 400000);
 
         // Roughly a Union
         int averageDropshipMechCapacity = 12;
         int mechDropshipASFCapacity = 2;
         int mechDropshipCargoCapacity = 75;
-        BigMoney mechDropshipCost = BigMoney.of(
-                CurrencyManager.getInstance().getDefaultCurrency(),
-                campaignOpsCosts ? (1450000.0 / 4.2) : 150000);
+        BigMoney mechDropshipCost = MekHqMoneyUtil.bigMoney(campaignOpsCosts ? (1450000.0 / 4.2) : 150000);
 
         // Roughly a Leopard CV
         int averageDropshipASFCapacity = 6;
         int asfDropshipCargoCapacity = 90;
-        BigMoney asfDropshipCost = BigMoney.of(
-                CurrencyManager.getInstance().getDefaultCurrency(),
-                campaignOpsCosts ? (900000.0 / 4.2) : 80000);
+        BigMoney asfDropshipCost = MekHqMoneyUtil.bigMoney(campaignOpsCosts ? (900000.0 / 4.2) : 80000);
 
         // Roughly a Triumph
         int largeDropshipVehicleCapacity = 50;
         int largeVehicleDropshipCargoCapacity = 750;
-        BigMoney largeVehicleDropshipCost = BigMoney.of(
-                CurrencyManager.getInstance().getDefaultCurrency(),
-                campaignOpsCosts ? (1750000.0 / 4.2) : 430000);
+        BigMoney largeVehicleDropshipCost = MekHqMoneyUtil.bigMoney(campaignOpsCosts ? (1750000.0 / 4.2) : 430000);
 
         // Roughly a Gazelle
         int averageDropshipVehicleCapacity = 15;
         int vehicleDropshipCargoCapacity = 65;
-        BigMoney vehicleDropshipCost = BigMoney.of(
-                CurrencyManager.getInstance().getDefaultCurrency(),
-                campaignOpsCosts ? (900000.0 / 4.2): 40000);
+        BigMoney vehicleDropshipCost = MekHqMoneyUtil.bigMoney(campaignOpsCosts ? (900000.0 / 4.2): 40000);
 
         // Roughly a Mule
         int largeDropshipCargoCapacity = 8000;
-        BigMoney largeCargoDropshipCost = BigMoney.of(
-                CurrencyManager.getInstance().getDefaultCurrency(),
-                campaignOpsCosts ? (750000.0 / 4.2) : 800000);
+        BigMoney largeCargoDropshipCost = MekHqMoneyUtil.bigMoney(campaignOpsCosts ? (750000.0 / 4.2) : 800000);
 
         // Roughly a Buccaneer
         int averageDropshipCargoCapacity = 2300;
-        BigMoney cargoDropshipCost = BigMoney.of(
-                CurrencyManager.getInstance().getDefaultCurrency(),
-                campaignOpsCosts ? (550000.0 / 4.2) : 250000);
+        BigMoney cargoDropshipCost = MekHqMoneyUtil.bigMoney(campaignOpsCosts ? (550000.0 / 4.2) : 250000);
 
         int mechCollars = 0;
         double leasedLargeMechDropships = 0;
@@ -5205,8 +5186,8 @@ public class Campaign implements Serializable, ITechManager {
 
         // FM:Mercs reimburses for owned transport (CamOps handles it in peacetime costs)
         if(!excludeOwnTransports) {
-            BigMoney ownDropshipCost = BigMoney.zero(CurrencyManager.getInstance().getDefaultCurrency());
-            BigMoney ownJumpshipCost = BigMoney.zero(CurrencyManager.getInstance().getDefaultCurrency());
+            BigMoney ownDropshipCost = MekHqMoneyUtil.bigZero();
+            BigMoney ownJumpshipCost = MekHqMoneyUtil.bigZero();
             for(Unit u : getUnits()) {
                 if(!u.isMothballed()) {
                     Entity e = u.getEntity();
@@ -6598,7 +6579,7 @@ public class Campaign implements Serializable, ITechManager {
                 finances.credit(remainingMoney, Transaction.C_CONTRACT,
                         "Remaining payment for " + contract.getName(), calendar.getTime());
                 addReport("Your account has been credited for "
-                        + CurrencyManager.getInstance().getShortUiMoneyFormatter().print(remainingMoney)
+                        + MekHqMoneyUtil.shortUiMoneyPrinter().print(remainingMoney)
                         + " for the remaining payout from contract "
                         + contract.getName());
             }
@@ -6768,12 +6749,9 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public Money getTotalEquipmentValue() {
-        Money value = Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
-
-        value = value.plus(getUnits().stream().map(Unit::getSellValue).collect(Collectors.toList()));
-        value = value.plus(getSpareParts().stream().map(Part::getActualValue).collect(Collectors.toList()));
-
-        return value;
+        return MekHqMoneyUtil.zero()
+                .plus(getUnits().stream().map(Unit::getSellValue).collect(Collectors.toList()))
+                .plus(getSpareParts().stream().map(Part::getActualValue).collect(Collectors.toList()));
     }
 
     /**
@@ -6793,7 +6771,7 @@ public class Campaign implements Serializable, ITechManager {
      * @return
      */
     public Money getForceValue(boolean noInfantry) {
-        Money value = Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
+        Money value = MekHqMoneyUtil.zero();
         for (UUID uuid : forces.getAllUnits()) {
             Unit u = getUnit(uuid);
             if (null == u) {
@@ -6863,7 +6841,7 @@ public class Campaign implements Serializable, ITechManager {
     public void addLoan(Loan loan) {
         addReport("You have taken out loan " + loan.getDescription()
                 + ". Your account has been credited "
-                + CurrencyManager.getInstance().getShortUiMoneyFormatter().print(loan.getPrincipal())
+                + MekHqMoneyUtil.shortUiMoneyPrinter().print(loan.getPrincipal())
                 + " for the principal amount.");
         finances.addLoan(loan);
         MekHQ.triggerEvent(new LoanNewEvent(loan));
@@ -6875,7 +6853,7 @@ public class Campaign implements Serializable, ITechManager {
         if (finances.debit(loan.getRemainingValue(),
                 Transaction.C_LOAN_PAYMENT, "loan payoff for " + loan.getDescription(), calendar.getTime())) {
             addReport("You have paid off the remaining loan balance of "
-                    + CurrencyManager.getInstance().getShortUiMoneyFormatter().print(loan.getRemainingValue())
+                    + MekHqMoneyUtil.shortUiMoneyPrinter().print(loan.getRemainingValue())
                     + "on " + loan.getDescription());
             finances.removeLoan(loan);
             MekHQ.triggerEvent(new LoanPaidEvent(loan));
@@ -6890,14 +6868,14 @@ public class Campaign implements Serializable, ITechManager {
         StringBuffer sb = new StringBuffer();
         Money cash = finances.getBalance();
         Money loans = finances.getLoanBalance();
-        Money mech = Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
-        Money vee = Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
-        Money ba = Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
-        Money infantry = Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
-        Money smallCraft = Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
-        Money largeCraft = Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
-        Money proto = Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
-        Money spareParts = Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
+        Money mech = MekHqMoneyUtil.zero();
+        Money vee = MekHqMoneyUtil.zero();
+        Money ba = MekHqMoneyUtil.zero();
+        Money infantry = MekHqMoneyUtil.zero();
+        Money smallCraft = MekHqMoneyUtil.zero();
+        Money largeCraft = MekHqMoneyUtil.zero();
+        Money proto = MekHqMoneyUtil.zero();
+        Money spareParts = MekHqMoneyUtil.zero();
         for (Map.Entry<UUID, Unit> mu : units.entrySet()) {
             Unit u = mu.getValue();
             Money value = u.getSellValue();
@@ -6921,15 +6899,15 @@ public class Campaign implements Serializable, ITechManager {
 
         spareParts = spareParts.plus(getSpareParts().stream().map(x -> x.getActualValue().multipliedBy(x.getQuantity())).collect(Collectors.toList()));
 
-        Money monthlyIncome = Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
-        Money monthlyExpenses = Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
-        Money coSpareParts = Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
-        Money coFuel = Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
-        Money coAmmo = Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
-        Money maintenance = Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
-        Money salaries = Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
-        Money overhead = Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
-        Money contracts = Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
+        Money monthlyIncome = MekHqMoneyUtil.zero();
+        Money monthlyExpenses = MekHqMoneyUtil.zero();
+        Money coSpareParts = MekHqMoneyUtil.zero();
+        Money coFuel = MekHqMoneyUtil.zero();
+        Money coAmmo = MekHqMoneyUtil.zero();
+        Money maintenance = MekHqMoneyUtil.zero();
+        Money salaries = MekHqMoneyUtil.zero();
+        Money overhead = MekHqMoneyUtil.zero();
+        Money contracts = MekHqMoneyUtil.zero();
 
         if (campaignOptions.payForMaintain()) {
             maintenance = getWeeklyMaintenanceCosts().multipliedBy(4);
@@ -6955,48 +6933,48 @@ public class Campaign implements Serializable, ITechManager {
         Money liabilities = loans;
         Money netWorth = assets.minus(liabilities);
         int longest = Math.max(
-                CurrencyManager.getInstance().getShortUiMoneyFormatter().print(liabilities).length(),
-                CurrencyManager.getInstance().getShortUiMoneyFormatter().print(assets).length());
+                MekHqMoneyUtil.shortUiMoneyPrinter().print(liabilities).length(),
+                MekHqMoneyUtil.shortUiMoneyPrinter().print(assets).length());
         longest = Math.max(
-                CurrencyManager.getInstance().getShortUiMoneyFormatter().print(netWorth).length(),
+                MekHqMoneyUtil.shortUiMoneyPrinter().print(netWorth).length(),
                 longest);
         String formatted = "%1$" + longest + "s";
         sb.append("Net Worth................ ")
-                .append(String.format(formatted, CurrencyManager.getInstance().getShortUiMoneyFormatter().print(netWorth))).append("\n\n");
+                .append(String.format(formatted, MekHqMoneyUtil.shortUiMoneyPrinter().print(netWorth))).append("\n\n");
         sb.append("    Assets............... ")
-                .append(String.format(formatted, CurrencyManager.getInstance().getShortUiMoneyFormatter().print(assets))).append("\n");
+                .append(String.format(formatted, MekHqMoneyUtil.shortUiMoneyPrinter().print(assets))).append("\n");
         sb.append("       Cash.............. ")
-                .append(String.format(formatted, CurrencyManager.getInstance().getShortUiMoneyFormatter().print(cash))).append("\n");
+                .append(String.format(formatted, MekHqMoneyUtil.shortUiMoneyPrinter().print(cash))).append("\n");
         if (MoneyUtils.isPositive(mech)) {
             sb.append("       Mechs............. ")
-                    .append(String.format(formatted, CurrencyManager.getInstance().getShortUiMoneyFormatter().print(mech))).append("\n");
+                    .append(String.format(formatted, MekHqMoneyUtil.shortUiMoneyPrinter().print(mech))).append("\n");
         }
         if (MoneyUtils.isPositive(vee)) {
             sb.append("       Vehicles.......... ")
-                    .append(String.format(formatted, CurrencyManager.getInstance().getShortUiMoneyFormatter().print(vee))).append("\n");
+                    .append(String.format(formatted, MekHqMoneyUtil.shortUiMoneyPrinter().print(vee))).append("\n");
         }
         if (MoneyUtils.isPositive(ba)) {
             sb.append("       BattleArmor....... ")
-                    .append(String.format(formatted, CurrencyManager.getInstance().getShortUiMoneyFormatter().print(ba))).append("\n");
+                    .append(String.format(formatted, MekHqMoneyUtil.shortUiMoneyPrinter().print(ba))).append("\n");
         }
         if (MoneyUtils.isPositive(infantry)) {
             sb.append("       Infantry.......... ")
-                    .append(String.format(formatted, CurrencyManager.getInstance().getShortUiMoneyFormatter().print(infantry))).append("\n");
+                    .append(String.format(formatted, MekHqMoneyUtil.shortUiMoneyPrinter().print(infantry))).append("\n");
         }
         if (MoneyUtils.isPositive(proto)) {
             sb.append("       Protomechs........ ")
-                    .append(String.format(formatted, CurrencyManager.getInstance().getShortUiMoneyFormatter().print(proto))).append("\n");
+                    .append(String.format(formatted, MekHqMoneyUtil.shortUiMoneyPrinter().print(proto))).append("\n");
         }
         if (MoneyUtils.isPositive(smallCraft)) {
             sb.append("       Small Craft....... ")
-                    .append(String.format(formatted, CurrencyManager.getInstance().getShortUiMoneyFormatter().print(smallCraft))).append("\n");
+                    .append(String.format(formatted, MekHqMoneyUtil.shortUiMoneyPrinter().print(smallCraft))).append("\n");
         }
         if (MoneyUtils.isPositive(largeCraft)) {
             sb.append("       Large Craft....... ")
-                    .append(String.format(formatted, CurrencyManager.getInstance().getShortUiMoneyFormatter().print(largeCraft))).append("\n");
+                    .append(String.format(formatted, MekHqMoneyUtil.shortUiMoneyPrinter().print(largeCraft))).append("\n");
         }
         sb.append("       Spare Parts....... ")
-                .append(String.format(formatted, CurrencyManager.getInstance().getShortUiMoneyFormatter().print(spareParts))).append("\n");
+                .append(String.format(formatted, MekHqMoneyUtil.shortUiMoneyPrinter().print(spareParts))).append("\n");
 
         if (getFinances().getAllAssets().size() > 0) {
             for (Asset asset : getFinances().getAllAssets()) {
@@ -7011,38 +6989,38 @@ public class Campaign implements Serializable, ITechManager {
                 }
                 assetName += " ";
                 sb.append("       ").append(assetName)
-                        .append(String.format(formatted, CurrencyManager.getInstance().getShortUiMoneyFormatter().print(asset.getValue())))
+                        .append(String.format(formatted, MekHqMoneyUtil.shortUiMoneyPrinter().print(asset.getValue())))
                         .append("\n");
             }
         }
         sb.append("\n");
         sb.append("    Liabilities.......... ")
-                .append(String.format(formatted, CurrencyManager.getInstance().getShortUiMoneyFormatter().print(liabilities))).append("\n");
+                .append(String.format(formatted, MekHqMoneyUtil.shortUiMoneyPrinter().print(liabilities))).append("\n");
         sb.append("       Loans............. ")
-                .append(String.format(formatted, CurrencyManager.getInstance().getShortUiMoneyFormatter().print(loans))).append("\n\n\n");
+                .append(String.format(formatted, MekHqMoneyUtil.shortUiMoneyPrinter().print(loans))).append("\n\n\n");
 
         sb.append("Monthly Profit........... ")
-                .append(String.format(formatted, CurrencyManager.getInstance().getShortUiMoneyFormatter().print(monthlyIncome.minus(monthlyExpenses))))
+                .append(String.format(formatted, MekHqMoneyUtil.shortUiMoneyPrinter().print(monthlyIncome.minus(monthlyExpenses))))
                 .append("\n\n");
         sb.append("Monthly Income........... ")
-                .append(String.format(formatted, CurrencyManager.getInstance().getShortUiMoneyFormatter().print(monthlyIncome))).append("\n");
+                .append(String.format(formatted, MekHqMoneyUtil.shortUiMoneyPrinter().print(monthlyIncome))).append("\n");
         sb.append("    Contract Payments.... ")
-                .append(String.format(formatted, CurrencyManager.getInstance().getShortUiMoneyFormatter().print(contracts))).append("\n\n");
+                .append(String.format(formatted, MekHqMoneyUtil.shortUiMoneyPrinter().print(contracts))).append("\n\n");
         sb.append("Monthly Expenses......... ")
-                .append(String.format(formatted, CurrencyManager.getInstance().getShortUiMoneyFormatter().print(monthlyExpenses))).append("\n");
+                .append(String.format(formatted, MekHqMoneyUtil.shortUiMoneyPrinter().print(monthlyExpenses))).append("\n");
         sb.append("    Salaries............. ")
-                .append(String.format(formatted, CurrencyManager.getInstance().getShortUiMoneyFormatter().print(salaries))).append("\n");
+                .append(String.format(formatted, MekHqMoneyUtil.shortUiMoneyPrinter().print(salaries))).append("\n");
         sb.append("    Maintenance.......... ")
-                .append(String.format(formatted, CurrencyManager.getInstance().getShortUiMoneyFormatter().print(maintenance))).append("\n");
+                .append(String.format(formatted, MekHqMoneyUtil.shortUiMoneyPrinter().print(maintenance))).append("\n");
         sb.append("    Overhead............. ")
-                .append(String.format(formatted, CurrencyManager.getInstance().getShortUiMoneyFormatter().print(overhead))).append("\n");
+                .append(String.format(formatted, MekHqMoneyUtil.shortUiMoneyPrinter().print(overhead))).append("\n");
         if (campaignOptions.usePeacetimeCost()) {
             sb.append("    Spare Parts.......... ")
-                    .append(String.format(formatted, CurrencyManager.getInstance().getShortUiMoneyFormatter().print(coSpareParts))).append("\n");
+                    .append(String.format(formatted, MekHqMoneyUtil.shortUiMoneyPrinter().print(coSpareParts))).append("\n");
             sb.append("    Training Munitions... ")
-                    .append(String.format(formatted, CurrencyManager.getInstance().getShortUiMoneyFormatter().print(coAmmo))).append("\n");
+                    .append(String.format(formatted, MekHqMoneyUtil.shortUiMoneyPrinter().print(coAmmo))).append("\n");
             sb.append("    Fuel................. ")
-                    .append(String.format(formatted, CurrencyManager.getInstance().getShortUiMoneyFormatter().print(coFuel))).append("\n");
+                    .append(String.format(formatted, MekHqMoneyUtil.shortUiMoneyPrinter().print(coFuel))).append("\n");
         }
 
         return new String(sb);
@@ -7590,7 +7568,7 @@ public class Campaign implements Serializable, ITechManager {
         int countMIA = 0;
         int countKIA = 0;
         int countRetired = 0;
-        Money salary = Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
+        Money salary = MekHqMoneyUtil.zero();
 
         for (Person p : getPersonnel()) {
             // Add them to the total count
@@ -7644,7 +7622,7 @@ public class Campaign implements Serializable, ITechManager {
                 "Retired Combat Personnel", countRetired);
         sb.append(buffer);
 
-        sb.append("\nMonthly Salary For Combat Personnel: " + CurrencyManager.getInstance().getShortUiMoneyFormatter().print(salary));
+        sb.append("\nMonthly Salary For Combat Personnel: " + MekHqMoneyUtil.shortUiMoneyPrinter().print(salary));
 
         return new String(sb);
     }
@@ -7656,7 +7634,7 @@ public class Campaign implements Serializable, ITechManager {
         int countMIA = 0;
         int countKIA = 0;
         int countRetired = 0;
-        Money salary = Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
+        Money salary = MekHqMoneyUtil.zero();
         int prisoners = 0;
         int bondsmen = 0;
 
@@ -7719,7 +7697,7 @@ public class Campaign implements Serializable, ITechManager {
                 "Retired Support Personnel", countRetired);
         sb.append(buffer);
 
-        sb.append("\nMonthly Salary For Support Personnel: " + CurrencyManager.getInstance().getShortUiMoneyFormatter().print(salary));
+        sb.append("\nMonthly Salary For Support Personnel: " + MekHqMoneyUtil.shortUiMoneyPrinter().print(salary));
 
         sb.append(String.format("\nYou have " + prisoners + " prisoner%s",
                 prisoners == 1 ? "" : "s"));
@@ -7769,7 +7747,7 @@ public class Campaign implements Serializable, ITechManager {
                 // dont do actual damage until we clear the for loop to avoid
                 // concurrent mod problems
                 // put it into a hash - 4 points of damage will mean destruction
-                HashMap<Integer, Integer> partsToDamage = new HashMap<Integer, Integer>();
+                HashMap<Integer, Integer> partsToDamage = new HashMap<>();
                 String maintenanceReport = "<emph>" + techName + " performing maintenance</emph><br><br>";
                 for (Part p : u.getParts()) {
                     String partReport = "<b>" + p.getName() + "</b> (Quality " + p.getQualityName() + ")";
@@ -8065,7 +8043,7 @@ public class Campaign implements Serializable, ITechManager {
             JOptionPane.showMessageDialog(
                     null,
                     "You have overdue loan payments totaling "
-                            + CurrencyManager.getInstance().getShortUiMoneyFormatter().print(overdueAmount)
+                            + MekHqMoneyUtil.shortUiMoneyPrinter().print(overdueAmount)
                             + "\nYou must deal with these payments before advancing the day.\nHere are some options:\n  - Sell off equipment to generate funds.\n  - Pay off the collateral on the loan.\n  - Default on the loan.\n  - Just cheat and remove the loan via GM mode.",
                             "Overdue Loan Payments",
                             JOptionPane.WARNING_MESSAGE);
@@ -8141,7 +8119,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public Money getPeacetimeCost() {
-        return Money.zero(CurrencyManager.getInstance().getDefaultCurrency())
+        return MekHqMoneyUtil.zero()
                 .plus(getPayRoll(getCampaignOptions().useInfantryDontCount()))
                 .plus(getMonthlySpareParts())
                 .plus(getMonthlyFuel())
@@ -8149,7 +8127,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public Money getMonthlySpareParts() {
-        Money partsCost = Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
+        Money partsCost = MekHqMoneyUtil.zero();
 
         for (Unit u : getUnits()) {
             if (u.isMothballed()) {
@@ -8161,7 +8139,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public Money getMonthlyFuel() {
-        Money fuelCost = Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
+        Money fuelCost = MekHqMoneyUtil.zero();
 
         for (Unit u : getUnits()) {
             if (u.isMothballed()) {
@@ -8173,7 +8151,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public Money getMonthlyAmmo() {
-        Money ammoCost= Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
+        Money ammoCost = MekHqMoneyUtil.zero();
 
         for (Unit u : getUnits()) {
             if (u.isMothballed()) {

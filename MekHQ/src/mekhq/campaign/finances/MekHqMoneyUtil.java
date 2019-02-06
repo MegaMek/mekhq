@@ -18,17 +18,51 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq;
+package mekhq.campaign.finances;
 
-import org.joda.money.BigMoney;
-import org.joda.money.BigMoneyProvider;
-import org.joda.money.Money;
-import org.joda.money.MoneyUtils;
+import org.joda.money.*;
+import org.joda.money.format.MoneyFormatter;
 
 /**
  * Class with helper methods to operate on money classes from joda.money.
  */
 public class MekHqMoneyUtil {
+    public static CurrencyUnit defaultCurrency() {
+        return CurrencyManager.getInstance().getDefaultCurrency();
+    }
+
+    public static Money zero() {
+        return Money.zero(defaultCurrency());
+    }
+
+    public static BigMoney bigZero() {
+        return BigMoney.zero(defaultCurrency());
+    }
+
+    public static Money money(double amount) {
+        return Money.of(defaultCurrency(), amount);
+    }
+
+    public static BigMoney bigMoney(double amount) {
+        return BigMoney.of(defaultCurrency(), amount);
+    }
+
+    public static MoneyFormatter uiAmountMoneyFormatter() {
+        return CurrencyManager.getInstance().getUiAmountMoneyFormatter();
+    }
+
+    public static MoneyFormatter xmlMoneyFormatter() {
+        return CurrencyManager.getInstance().getXmlMoneyFormatter();
+    }
+
+    public static MoneyFormatter shortUiMoneyPrinter() {
+        return CurrencyManager.getInstance().getShortUiMoneyPrinter();
+    }
+
+    public static MoneyFormatter longUiMoneyPrinter() {
+        return CurrencyManager.getInstance().getLongUiMoneyPrinter();
+    }
+
     public static boolean isGreaterOrEqual(Money left, Money right) {
         return left.isGreaterThan(right) || left.isEqual(right);
     }

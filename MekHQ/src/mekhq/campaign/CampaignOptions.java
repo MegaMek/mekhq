@@ -28,7 +28,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import mekhq.campaign.finances.CurrencyManager;
+import mekhq.campaign.finances.MekHqMoneyUtil;
 import org.joda.money.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -477,31 +477,30 @@ public class CampaignOptions implements Serializable {
         personnelMarketRandomUltraGreenRemoval = 4;
         personnelMarketDylansWeight = 0.3;
         salaryTypeBase = new Money[Person.T_NUM];
-        salaryTypeBase[Person.T_MECHWARRIOR] = Money.of(CurrencyManager.getInstance().getDefaultCurrency(), 1500);
-        salaryTypeBase[Person.T_AERO_PILOT] = Money.of(CurrencyManager.getInstance().getDefaultCurrency(), 1500);
-        salaryTypeBase[Person.T_VEE_GUNNER] = Money.of(CurrencyManager.getInstance().getDefaultCurrency(), 900);
-        salaryTypeBase[Person.T_GVEE_DRIVER] = Money.of(CurrencyManager.getInstance().getDefaultCurrency(), 900);
-        salaryTypeBase[Person.T_NVEE_DRIVER] = Money.of(CurrencyManager.getInstance().getDefaultCurrency(), 900);
-        salaryTypeBase[Person.T_VTOL_PILOT] = Money.of(CurrencyManager.getInstance().getDefaultCurrency(), 900);
-        salaryTypeBase[Person.T_CONV_PILOT] = Money.of(CurrencyManager.getInstance().getDefaultCurrency(), 900);
-        salaryTypeBase[Person.T_INFANTRY] = Money.of(CurrencyManager.getInstance().getDefaultCurrency(), 750);
-        salaryTypeBase[Person.T_BA] = Money.of(CurrencyManager.getInstance().getDefaultCurrency(), 960);
-        salaryTypeBase[Person.T_SPACE_PILOT] = Money.of(CurrencyManager.getInstance().getDefaultCurrency(), 1000);
-        salaryTypeBase[Person.T_SPACE_GUNNER] = Money.of(CurrencyManager.getInstance().getDefaultCurrency(), 1000);
-        salaryTypeBase[Person.T_SPACE_CREW] = Money.of(CurrencyManager.getInstance().getDefaultCurrency(), 1000);
-        salaryTypeBase[Person.T_NAVIGATOR] = Money.of(CurrencyManager.getInstance().getDefaultCurrency(), 1000);
-        salaryTypeBase[Person.T_DOCTOR] = Money.of(CurrencyManager.getInstance().getDefaultCurrency(), 1500);
-        salaryTypeBase[Person.T_ADMIN_COM] = Money.of(CurrencyManager.getInstance().getDefaultCurrency(), 500);
-        salaryTypeBase[Person.T_ADMIN_HR] = Money.of(CurrencyManager.getInstance().getDefaultCurrency(), 500);
-        salaryTypeBase[Person.T_ADMIN_LOG] = Money.of(CurrencyManager.getInstance().getDefaultCurrency(), 500);
-        salaryTypeBase[Person.T_ADMIN_TRA] = Money.of(CurrencyManager.getInstance().getDefaultCurrency(), 500);
-        salaryTypeBase[Person.T_MECH_TECH] = Money.of(CurrencyManager.getInstance().getDefaultCurrency(), 800);
-        salaryTypeBase[Person.T_AERO_TECH] = Money.of(CurrencyManager.getInstance().getDefaultCurrency(), 800);
-        salaryTypeBase[Person.T_BA_TECH] = Money.of(CurrencyManager.getInstance().getDefaultCurrency(), 800);
-        salaryTypeBase[Person.T_MECHANIC] = Money.of(CurrencyManager.getInstance().getDefaultCurrency(), 800);
-        salaryTypeBase[Person.T_ASTECH] = Money.of(CurrencyManager.getInstance().getDefaultCurrency(), 400);
-        salaryTypeBase[Person.T_MEDIC] = Money.of(CurrencyManager.getInstance().getDefaultCurrency(), 400);
-        salaryTypeBase[Person.T_PROTO_PILOT] = Money.of(CurrencyManager.getInstance().getDefaultCurrency(), 960);
+        salaryTypeBase[Person.T_MECHWARRIOR] = MekHqMoneyUtil.money(1500);
+        salaryTypeBase[Person.T_AERO_PILOT] = MekHqMoneyUtil.money(1500);
+        salaryTypeBase[Person.T_VEE_GUNNER] = MekHqMoneyUtil.money(900);
+        salaryTypeBase[Person.T_GVEE_DRIVER] = MekHqMoneyUtil.money(900);
+        salaryTypeBase[Person.T_NVEE_DRIVER] = MekHqMoneyUtil.money(900);
+        salaryTypeBase[Person.T_VTOL_PILOT] = MekHqMoneyUtil.money(900);
+        salaryTypeBase[Person.T_CONV_PILOT] = MekHqMoneyUtil.money(900);
+        salaryTypeBase[Person.T_INFANTRY] = MekHqMoneyUtil.money(750);
+        salaryTypeBase[Person.T_BA] = MekHqMoneyUtil.money(960);
+        salaryTypeBase[Person.T_SPACE_PILOT] = MekHqMoneyUtil.money(1000);
+        salaryTypeBase[Person.T_SPACE_GUNNER] = MekHqMoneyUtil.money(1000);
+        salaryTypeBase[Person.T_SPACE_CREW] = MekHqMoneyUtil.money(1000);
+        salaryTypeBase[Person.T_NAVIGATOR] = MekHqMoneyUtil.money( 1000);
+        salaryTypeBase[Person.T_DOCTOR] = MekHqMoneyUtil.money(1500);
+        salaryTypeBase[Person.T_ADMIN_HR] = MekHqMoneyUtil.money(500);
+        salaryTypeBase[Person.T_ADMIN_LOG] = MekHqMoneyUtil.money(500);
+        salaryTypeBase[Person.T_ADMIN_TRA] = MekHqMoneyUtil.money(500);
+        salaryTypeBase[Person.T_MECH_TECH] = MekHqMoneyUtil.money(800);
+        salaryTypeBase[Person.T_AERO_TECH] = MekHqMoneyUtil.money(800);
+        salaryTypeBase[Person.T_BA_TECH] = MekHqMoneyUtil.money(800);
+        salaryTypeBase[Person.T_MECHANIC] = MekHqMoneyUtil.money(800);
+        salaryTypeBase[Person.T_ASTECH] = MekHqMoneyUtil.money(400);
+        salaryTypeBase[Person.T_MEDIC] = MekHqMoneyUtil.money(400);
+        salaryTypeBase[Person.T_PROTO_PILOT] = MekHqMoneyUtil.money(960);
         salaryXpMultiplier = new double[5];
         salaryXpMultiplier[SkillType.EXP_ULTRA_GREEN] = 0.6;
         salaryXpMultiplier[SkillType.EXP_GREEN] = 0.6;
@@ -1716,7 +1715,7 @@ public class CampaignOptions implements Serializable {
 
     public Money getBaseSalary(int type) {
         if (type < 0 || type >= salaryTypeBase.length) {
-            return Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
+            return MekHqMoneyUtil.zero();
         }
         return salaryTypeBase[type];
     }
@@ -2832,7 +2831,7 @@ public class CampaignOptions implements Serializable {
             } else if (wn2.getNodeName().equalsIgnoreCase("salaryTypeBase")) {
                 String[] values = wn2.getTextContent().split(",");
                 for (int i = 0; i < values.length; i++) {
-                    retVal.salaryTypeBase[i] = Money.of(CurrencyManager.getInstance().getDefaultCurrency(), Integer.parseInt(values[i]));
+                    retVal.salaryTypeBase[i] = MekHqMoneyUtil.money(Integer.parseInt(values[i]));
                 }
             } else if (wn2.getNodeName().equalsIgnoreCase("salaryXpMultiplier")) {
                 String[] values = wn2.getTextContent().split(",");
