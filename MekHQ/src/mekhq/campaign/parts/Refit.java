@@ -758,7 +758,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
                                 .toBigMoney()
                                 .multipliedBy(tonnageNeeded)
                                 .dividedBy(5.0, RoundingMode.HALF_EVEN)
-                                .toMoney());
+                                .toMoney(RoundingMode.HALF_EVEN));
 			newArmorSupplies.setUnit(null);
 		}
 
@@ -1674,7 +1674,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 
 	@Override
 	public String getDetails() {
-		return "(" + getRefitClassName() + "/" + getTimeLeft() + " minutes/" + MekHqMoneyUtil.shortUiMoneyPrinter().print(getCost()) + ")";
+		return "(" + getRefitClassName() + "/" + getTimeLeft() + " minutes/" + MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(getCost()) + ")";
 	}
 
 	@Override

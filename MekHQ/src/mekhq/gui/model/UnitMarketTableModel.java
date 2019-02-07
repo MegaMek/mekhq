@@ -22,13 +22,13 @@
 
 package mekhq.gui.model;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 import javax.swing.SwingConstants;
 
 import megamek.common.EntityWeightClass;
 import megamek.common.UnitType;
+import mekhq.campaign.finances.MekHqMoneyUtil;
 import mekhq.campaign.market.UnitMarket;
 
 /**
@@ -123,7 +123,6 @@ public class UnitMarketTableModel extends DataTableModel {
     @Override
     public Object getValueAt(int row, int col) {
         UnitMarket.MarketOffer o;
-        DecimalFormat formatter = new DecimalFormat();
         if(data.isEmpty()) {
             return "";
         } else {
@@ -149,7 +148,7 @@ public class UnitMarketTableModel extends DataTableModel {
         	if (null == o.unit) {
         		return "";
         	}
-            return formatter.format(Math.ceil(o.unit.getCost() * o.pct / 100.0));
+            return MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(MekHqMoneyUtil.money((double)o.unit.getCost() * o.pct / 100.0));
         }
         if(col == COL_PERCENT) {
        		return o.pct + "%";

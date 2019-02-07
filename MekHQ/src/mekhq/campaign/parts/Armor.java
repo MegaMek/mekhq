@@ -456,7 +456,7 @@ public class Armor extends Part implements IAcquisitionWork {
 		toReturn += getAcquisitionExtraDesc() + "<br/>";
 		PartInventory inventories = campaign.getPartInventory(getAcquisitionPart());
         toReturn += inventories.getTransitOrderedDetails() + "<br/>";
-		toReturn += MekHqMoneyUtil.shortUiMoneyPrinter().print(adjustCostsForCampaignOptions(getStickerPrice())) + "<br/>";
+		toReturn += MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(adjustCostsForCampaignOptions(getStickerPrice())) + "<br/>";
 		toReturn += "</font></html>";
 		return toReturn;
 	}

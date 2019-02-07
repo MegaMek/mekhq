@@ -112,12 +112,12 @@ public class Finances implements Serializable {
     }
 
     public Money getBalance() {
-        Money balance = Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
+        Money balance = MekHqMoneyUtil.zero();
         return balance.plus(transactions.stream().map(Transaction::getAmount).collect(Collectors.toList()));
     }
 
     public Money getLoanBalance() {
-        Money balance = Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
+        Money balance = MekHqMoneyUtil.zero();
         return balance.plus(loans.stream().map(Loan::getRemainingValue).collect(Collectors.toList()));
     }
 
@@ -255,7 +255,7 @@ public class Finances implements Serializable {
                         calendar.getTime());
                 campaign.addReport(String.format(
                         resourceMap.getString("ContractPaymentCredit.text"),
-                        CurrencyManager.getInstance().getShortUiMoneyPrinter().print(contract.getMonthlyPayOut()),
+                        MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(contract.getMonthlyPayOut()),
                         contract.getName()));
 
                 if (campaignOptions.getUseAtB() && campaignOptions.getUseShareSystem()
@@ -268,7 +268,7 @@ public class Finances implements Serializable {
                             calendar.getTime())) {
                         campaign.addReport(String.format(
                                 resourceMap.getString("DistributedShares.text"),
-                                CurrencyManager.getInstance().getShortUiMoneyPrinter().print(shares)));
+                                MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(shares)));
                     } else {
                         /*
                          * This should not happen, as the shares payment is less than the contract
@@ -288,14 +288,14 @@ public class Finances implements Serializable {
                         campaign.getCalendar().getTime());
                 campaign.addReport(String.format(
                         resourceMap.getString("AssetPayment.text"),
-                        CurrencyManager.getInstance().getShortUiMoneyPrinter().print(asset.getIncome()),
+                        MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(asset.getIncome()),
                         asset.getName()));
             } else if (asset.getSchedule() == SCHEDULE_MONTHLY && campaign.getCalendar().get(Calendar.DAY_OF_MONTH) == 1) {
                 credit(asset.getIncome(), Transaction.C_MISC, "income from " + asset.getName(),
                         campaign.getCalendar().getTime());
                 campaign.addReport(String.format(
                         resourceMap.getString("AssetPayment.text"),
-                        CurrencyManager.getInstance().getShortUiMoneyPrinter().print(asset.getIncome()),
+                        MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(asset.getIncome()),
                         asset.getName()));
             }
         }
@@ -308,7 +308,7 @@ public class Finances implements Serializable {
                             resourceMap.getString("PeacetimeCosts.title"), calendar.getTime())) {
                         campaign.addReport(String.format(
                                 resourceMap.getString("PeacetimeCosts.text"),
-                                CurrencyManager.getInstance().getShortUiMoneyPrinter().print(campaign.getPeacetimeCost())));
+                                MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(campaign.getPeacetimeCost())));
                     } else {
                         campaign.addReport(
                                 String.format(resourceMap.getString("NotImplemented.text"), "for operating costs"));
@@ -318,7 +318,7 @@ public class Finances implements Serializable {
                             resourceMap.getString("PeacetimeCostsParts.title"), calendar.getTime())) {
                         campaign.addReport(String.format(
                                 resourceMap.getString("PeacetimeCostsParts.text"),
-                                CurrencyManager.getInstance().getShortUiMoneyPrinter().print(campaign.getMonthlySpareParts())));
+                                MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(campaign.getMonthlySpareParts())));
                     } else {
                         campaign.addReport(
                                 String.format(resourceMap.getString("NotImplemented.text"), "for spare parts"));
@@ -327,7 +327,7 @@ public class Finances implements Serializable {
                             resourceMap.getString("PeacetimeCostsAmmunition.title"), calendar.getTime())) {
                         campaign.addReport(String.format(
                                 resourceMap.getString("PeacetimeCostsAmmunition.text"),
-                                CurrencyManager.getInstance().getShortUiMoneyPrinter().print(campaign.getMonthlySpareParts())));
+                                MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(campaign.getMonthlySpareParts())));
                     } else {
                         campaign.addReport(
                                 String.format(resourceMap.getString("NotImplemented.text"), "for training munitions"));
@@ -336,7 +336,7 @@ public class Finances implements Serializable {
                             resourceMap.getString("PeacetimeCostsFuel.title"), calendar.getTime())) {
                         campaign.addReport(String.format(
                                 resourceMap.getString("PeacetimeCostsFuel.text"),
-                                CurrencyManager.getInstance().getShortUiMoneyPrinter().print(campaign.getMonthlySpareParts())));
+                                MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(campaign.getMonthlySpareParts())));
                     } else {
                         campaign.addReport(String.format(resourceMap.getString("NotImplemented.text"), "for fuel"));
                     }
@@ -347,7 +347,7 @@ public class Finances implements Serializable {
                         calendar.getTime())) {
                     campaign.addReport(
                             String.format(resourceMap.getString("Salaries.text"),
-                                    CurrencyManager.getInstance().getShortUiMoneyPrinter().print(campaign.getPayRoll())));
+                                    MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(campaign.getPayRoll())));
                 } else {
                     campaign.addReport(
                             String.format(resourceMap.getString("NotImplemented.text"), "payroll costs"));
@@ -361,7 +361,7 @@ public class Finances implements Serializable {
                         calendar.getTime())) {
                     campaign.addReport(String.format(
                             resourceMap.getString("Overhead.text"),
-                            CurrencyManager.getInstance().getShortUiMoneyPrinter().print(campaign.getOverheadExpenses())));
+                            MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(campaign.getOverheadExpenses())));
                 } else {
                     campaign.addReport(
                             String.format(resourceMap.getString("NotImplemented.text"), "overhead costs"));
@@ -377,13 +377,13 @@ public class Finances implements Serializable {
                         campaign.getCalendar().getTime())) {
                     campaign.addReport(String.format(
                             resourceMap.getString("Loan.text"),
-                            CurrencyManager.getInstance().getShortUiMoneyPrinter().print(loan.getPaymentAmount()),
+                            MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(loan.getPaymentAmount()),
                             loan.getDescription()));
                     loan.paidLoan();
                 } else {
                     campaign.addReport(String.format(
                             resourceMap.getString("Loan.insufficient"),
-                            CurrencyManager.getInstance().getShortUiMoneyPrinter().print(loan.getPaymentAmount())));
+                            MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(loan.getPaymentAmount())));
                     loan.setOverdue(true);
                 }
             }
@@ -401,7 +401,7 @@ public class Finances implements Serializable {
 
     public Money checkOverdueLoanPayments(Campaign campaign) {
         ArrayList<Loan> newLoans = new ArrayList<>();
-        Money overdueAmount = Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
+        Money overdueAmount = MekHqMoneyUtil.zero();
         for (Loan loan : loans) {
             if(loan.isOverdue()) {
                 if (debit(loan.getPaymentAmount(), Transaction.C_LOAN_PAYMENT,
@@ -409,7 +409,7 @@ public class Finances implements Serializable {
                         campaign.getCalendar().getTime())) {
                     campaign.addReport(String.format(
                             resourceMap.getString("Loan.text"),
-                            CurrencyManager.getInstance().getShortUiMoneyPrinter().print(loan.getPaymentAmount()),
+                            MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(loan.getPaymentAmount()),
                             loan.getDescription()));
                     loan.paidLoan();
                 } else {
@@ -454,12 +454,12 @@ public class Finances implements Serializable {
     }
 
     public Money getTotalLoanCollateral() {
-        Money amount = Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
+        Money amount = MekHqMoneyUtil.zero();
         return amount.plus(loans.stream().map(Loan::getCollateralAmount).collect(Collectors.toList()));
     }
 
     public Money getTotalAssetValue() {
-        Money amount = Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
+        Money amount = MekHqMoneyUtil.zero();
         return amount.plus(assets.stream().map(Asset::getValue).collect(Collectors.toList()));
     }
 
@@ -468,7 +468,9 @@ public class Finances implements Serializable {
     }
 
     public Money getMaxCollateral(Campaign c) {
-        return c.getTotalEquipmentValue().plus(getTotalAssetValue()).minus(getTotalLoanCollateral());
+        return c.getTotalEquipmentValue()
+                .plus(getTotalAssetValue())
+                .minus(getTotalLoanCollateral());
     }
     
     public String exportFinances(String path, String format) {
@@ -479,7 +481,7 @@ public class Finances implements Serializable {
 			CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT.withHeader("Date", "Category", "Description", "Amount", "RunningTotal"));
 			SimpleDateFormat df = new SimpleDateFormat("MM/dd/yyyy");
 			
-			Money running_total = Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
+			Money running_total = MekHqMoneyUtil.zero();
             for (Transaction transaction : transactions) {
                 running_total = running_total.plus(transaction.getAmount());
                 csvPrinter.printRecord(
@@ -487,7 +489,7 @@ public class Finances implements Serializable {
                         transaction.getCategoryName(),
                         transaction.getDescription(),
                         transaction.getAmount(),
-                        CurrencyManager.getInstance().getShortUiMoneyPrinter().print(running_total));
+                        MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(running_total));
             }
 
 			csvPrinter.flush();

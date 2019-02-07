@@ -76,20 +76,20 @@ public class FinanceTableModel extends DataTableModel {
         }
         if(col == COL_DEBIT) {
             if(MoneyUtils.isNegative(amount)) {
-                return MekHqMoneyUtil.shortUiMoneyPrinter().print(amount.multipliedBy(-1));
+                return MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(amount.multipliedBy(-1));
             } else {
                 return "";
             }
         }
         if(col == COL_CREDIT) {
             if(MoneyUtils.isPositive(amount)) {
-                return MekHqMoneyUtil.shortUiMoneyPrinter().print(amount);
+                return MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(amount);
             } else {
                 return "";
             }
         }
         if(col == COL_BALANCE) {
-            return MekHqMoneyUtil.shortUiMoneyPrinter().print(balance);
+            return MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(balance);
         }
         if(col == COL_DATE) {
             SimpleDateFormat shortDateFormat = new SimpleDateFormat("MM/dd/yyyy");

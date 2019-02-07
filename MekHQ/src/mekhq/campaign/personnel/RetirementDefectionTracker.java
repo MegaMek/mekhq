@@ -102,12 +102,12 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
 			Pattern p = Pattern.compile("Net Worth\\D*(.*)");
 			Matcher m = p.matcher(financialReport);
 			m.find();
-			netWorth = MekHqMoneyUtil.uiAmountMoneyFormatter().parseMoney(m.group(1));
+			netWorth = MekHqMoneyUtil.money(Double.parseDouble(m.group(1)));
 			if (campaign.getCampaignOptions().getSharesExcludeLargeCraft()) {
 				p = Pattern.compile("Large Craft\\D*(.*)");
 				m = p.matcher(financialReport);				
 				if (m.find() && null != m.group(1)) {
-					netWorth = netWorth.minus(MekHqMoneyUtil.uiAmountMoneyFormatter().parseMoney(m.group(1)));
+					netWorth = netWorth.minus(MekHqMoneyUtil.money(Double.parseDouble(m.group(1))));
 				}
 			}
 		} catch (Exception e) {
@@ -119,6 +119,11 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
 		for (Person p : campaign.getActivePersonnel()) {
 			totalShares += p.getNumShares(campaign.getCampaignOptions().getSharesForAll());
 		}
+
+		if (totalShares <= 0) {
+		    return MekHqMoneyUtil.zero();
+        }
+
 		return netWorth.dividedBy(totalShares, RoundingMode.HALF_EVEN);
 	}
 

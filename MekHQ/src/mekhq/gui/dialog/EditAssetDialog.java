@@ -22,14 +22,14 @@
 package mekhq.gui.dialog;
 
 import java.awt.Frame;
+import java.text.NumberFormat;
+import java.util.ResourceBundle;
 
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JTextField;
+import javax.swing.*;
+import javax.swing.text.DefaultFormatterFactory;
+import javax.swing.text.NumberFormatter;
 
+import megamek.common.util.EncodeControl;
 import mekhq.campaign.finances.Asset;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.MekHqMoneyUtil;
@@ -43,11 +43,12 @@ public class EditAssetDialog extends JDialog {
     private static final long serialVersionUID = -8038099101234445018L;
     private Asset asset;
 
+    private ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditAssetDialog", new EncodeControl()); //$NON-NLS-1$
     private JButton btnClose;
     private JButton btnOK;
     private JTextField txtName;
-    private JTextField txtValue;
-    private JTextField txtIncome;
+    private JFormattedTextField assetValueField;
+    private JFormattedTextField assetIncomeField;
     private JComboBox<String> choiceSchedule;
     boolean cancelled;
     
@@ -60,16 +61,10 @@ public class EditAssetDialog extends JDialog {
     }
 
     private void initComponents() {
-         java.awt.GridBagConstraints gridBagConstraints;
+        java.awt.GridBagConstraints gridBagConstraints;
 
-        txtName = new JTextField();
-        txtValue = new JTextField();
-        txtIncome = new JTextField();
-        btnOK = new javax.swing.JButton();
-        btnClose = new javax.swing.JButton();
-    
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("Edit Asset");
+        setTitle(resourceMap.getString("dialogTitle.text"));
         getContentPane().setLayout(new java.awt.GridBagLayout());
         
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -78,8 +73,9 @@ public class EditAssetDialog extends JDialog {
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        getContentPane().add(new JLabel("Name:"), gridBagConstraints);
-        
+        getContentPane().add(new JLabel(resourceMap.getString("labelName.text")), gridBagConstraints);
+
+        txtName = new JTextField();
         txtName.setText(asset.getName());
         txtName.setMinimumSize(new java.awt.Dimension(150, 28));
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -98,10 +94,14 @@ public class EditAssetDialog extends JDialog {
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        getContentPane().add(new JLabel("Value of Asset:"), gridBagConstraints);
-        
-        txtValue.setText(MekHqMoneyUtil.uiAmountMoneyFormatter().print(asset.getValue()));
-        txtValue.setMinimumSize(new java.awt.Dimension(150, 28));
+        getContentPane().add(new JLabel(resourceMap.getString("labelValue.text")), gridBagConstraints);
+
+        assetValueField = new JFormattedTextField();
+        assetValueField.setFormatterFactory(new DefaultFormatterFactory(new NumberFormatter(NumberFormat.getInstance())));
+        assetValueField.setText(MekHqMoneyUtil.uiAmountPrinter().print(asset.getValue()));
+        assetValueField.setToolTipText(resourceMap.getString("assetValueField.toolTipText")); // NOI18N
+        assetValueField.setName("assetValueField"); // NOI18N
+        assetValueField.setMinimumSize(new java.awt.Dimension(150, 28));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
@@ -110,7 +110,7 @@ public class EditAssetDialog extends JDialog {
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        getContentPane().add(txtValue, gridBagConstraints);
+        getContentPane().add(assetValueField, gridBagConstraints);
         
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -118,10 +118,14 @@ public class EditAssetDialog extends JDialog {
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        getContentPane().add(new JLabel("Income supplied:"), gridBagConstraints);
-        
-        txtIncome.setText(MekHqMoneyUtil.uiAmountMoneyFormatter().print(asset.getIncome()));
-        txtIncome.setMinimumSize(new java.awt.Dimension(150, 28));
+        getContentPane().add(new JLabel(resourceMap.getString("labelIncome.text")), gridBagConstraints);
+
+        assetIncomeField = new JFormattedTextField();
+        assetIncomeField.setFormatterFactory(new DefaultFormatterFactory(new NumberFormatter(NumberFormat.getInstance())));
+        assetIncomeField.setText(MekHqMoneyUtil.uiAmountPrinter().print(asset.getIncome()));
+        assetIncomeField.setToolTipText(resourceMap.getString("assetIncomeField.toolTipText")); // NOI18N
+        assetIncomeField.setName("assetIncomeField"); // NOI18N
+        assetIncomeField.setMinimumSize(new java.awt.Dimension(150, 28));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 2;
@@ -130,7 +134,7 @@ public class EditAssetDialog extends JDialog {
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        getContentPane().add(txtIncome, gridBagConstraints);
+        getContentPane().add(assetIncomeField, gridBagConstraints);
  
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -157,14 +161,12 @@ public class EditAssetDialog extends JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         getContentPane().add(choiceSchedule, gridBagConstraints);
-                
-        btnOK.setText("OK"); // NOI18N
+
+        btnOK = new javax.swing.JButton();
+        btnOK.setText(resourceMap.getString("btnOK.text")); // NOI18N
+        btnOK.setActionCommand(resourceMap.getString("btnOK.actionCommand"));
         btnOK.setName("btnOK"); // NOI18N
-        btnOK.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnOKActionPerformed(evt);
-            }
-        });
+        btnOK.addActionListener(evt -> btnOKActionPerformed(evt));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 4;
@@ -173,13 +175,11 @@ public class EditAssetDialog extends JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         getContentPane().add(btnOK, gridBagConstraints);
 
-        btnClose.setText("Cancel"); // NOI18N
+        btnClose = new javax.swing.JButton();
+        btnClose.setText(resourceMap.getString("btnClose.text")); // NOI18N
+        btnClose.setActionCommand(resourceMap.getString("btnClose.actionCommand")); // NOI18N
         btnClose.setName("btnClose"); // NOI18N
-        btnClose.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnCloseActionPerformed(evt);
-            }
-        });
+        btnClose.addActionListener(evt -> btnCloseActionPerformed(evt));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 4;
@@ -191,18 +191,16 @@ public class EditAssetDialog extends JDialog {
         pack();
     }
 
-    
-    
     private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {
         asset.setName(txtName.getText());
         try {
-            asset.setValue(MekHqMoneyUtil.uiAmountMoneyFormatter().parseMoney(txtValue.getText()));
-        } catch(Exception e) {
+            asset.setValue(MekHqMoneyUtil.money(Double.parseDouble(assetValueField.getValue().toString())));
+        } catch(Exception ignored) {
             
         }
         try {
-            asset.setIncome(MekHqMoneyUtil.uiAmountMoneyFormatter().parseMoney(txtIncome.getText()));
-        } catch(Exception e) {
+            asset.setIncome(MekHqMoneyUtil.money(Double.parseDouble(assetIncomeField.getValue().toString())));
+        } catch(Exception ignored) {
             
         }
         if(choiceSchedule.getSelectedIndex() == 1) {

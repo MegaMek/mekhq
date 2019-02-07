@@ -266,7 +266,7 @@ public class MekActuator extends Part {
             }
             if (campaign.getCampaignOptions().payForRepairs()) {
                 Money repairCost = getStickerPrice().multipliedBy(0.2, RoundingMode.HALF_EVEN);
-                sj.add(MekHqMoneyUtil.shortUiMoneyPrinter().print(repairCost) + " to repair");
+                sj.add(MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(repairCost) + " to repair");
             }
             return sj.toString();
 		}

@@ -84,10 +84,10 @@ public class PartsTableModel extends DataTableModel {
             return "<html><nobr>"+part.getDetails()+"</nobr></html>";
         }
         if(col == COL_COST) {
-            return MekHqMoneyUtil.shortUiMoneyPrinter().print(part.getActualValue());
+            return MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(part.getActualValue());
         }
         if(col == COL_TOTAL_COST) {
-            return MekHqMoneyUtil.shortUiMoneyPrinter().print(
+            return MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(
                     part.getActualValue()
                             .multipliedBy(part.getQuantity()));
         }

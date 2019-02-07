@@ -1,7 +1,6 @@
 package mekhq.gui.model;
 
 import java.awt.Component;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 import javax.swing.JTable;
@@ -10,7 +9,6 @@ import javax.swing.table.DefaultTableCellRenderer;
 
 import megamek.common.TargetRoll;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.finances.CurrencyManager;
 import mekhq.campaign.finances.MekHqMoneyUtil;
 import mekhq.campaign.work.IAcquisitionWork;
 
@@ -94,10 +92,10 @@ public class ProcurementTableModel extends DataTableModel {
             return shoppingItem.getAcquisitionName();
         }
         if(col == COL_COST) {
-            return DecimalFormat.getInstance().format(shoppingItem.getBuyCost());
+            return MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(shoppingItem.getBuyCost());
         }
         if(col == COL_TOTAL_COST) {
-            return MekHqMoneyUtil.shortUiMoneyPrinter().print(shoppingItem.getBuyCost().multipliedBy(shoppingItem.getQuantity()));
+            return MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(shoppingItem.getBuyCost().multipliedBy(shoppingItem.getQuantity()));
         }
         if(col == COL_TARGET) {
             TargetRoll target = getCampaign().getTargetForAcquisition(shoppingItem, getCampaign().getLogisticsPerson(), false);

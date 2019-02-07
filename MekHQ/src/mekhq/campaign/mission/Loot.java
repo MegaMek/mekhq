@@ -114,7 +114,7 @@ public class Loot implements MekHqXmlSerializable {
     public String getShortDescription() {
         String desc = getName() + " - ";
         if(MoneyUtils.isPositive(cash)) {
-            desc += MekHqMoneyUtil.shortUiMoneyPrinter().print(cash);
+            desc += MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(cash);
         }
         if(units.size() > 0) {
             String s = units.size() + " unit";

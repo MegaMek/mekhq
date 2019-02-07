@@ -25,12 +25,10 @@ package mekhq.campaign.unit;
 import java.io.PrintWriter;
 import java.math.BigInteger;
 import java.math.RoundingMode;
-import java.text.DecimalFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import mekhq.campaign.finances.CurrencyManager;
 import mekhq.campaign.finances.MekHqMoneyUtil;
 import mekhq.campaign.log.ServiceLogger;
 import org.joda.money.BigMoney;
@@ -1768,7 +1766,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
         }
         return mCost
                 .dividedBy(52.0, RoundingMode.HALF_EVEN)
-                .toMoney();
+                .toMoney(RoundingMode.HALF_EVEN);
     }
 
     public void addPart(Part part) {
@@ -4362,11 +4360,9 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     }
     
     public String displayMonthlyCost() {
-        DecimalFormat numFormatter = new DecimalFormat();
-        
-        String unitMonthlyCost = "<b>Spare Parts</b>: " + numFormatter.format(getSparePartsCost()) + " C-bills<br>"
-                               + "<b>Ammunition</b>: " + numFormatter.format(getAmmoCost()) + " C-bills<br>"
-                               + "<b>Fuel</b>: " + numFormatter.format(getFuelCost()) + " C-bills<br>";
+        String unitMonthlyCost = "<b>Spare Parts</b>: " + MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(getSparePartsCost()) + "<br>"
+                               + "<b>Ammunition</b>: " + MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(getAmmoCost()) + "<br>"
+                               + "<b>Fuel</b>: " + MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(getFuelCost()) + "<br>";
         return unitMonthlyCost;
     }
 

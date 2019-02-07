@@ -15,6 +15,7 @@ import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.util.Comparator;
 import java.util.GregorianCalendar;
@@ -60,8 +61,10 @@ import megamek.common.logging.LogLevel;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.finances.MekHqMoneyUtil;
 import mekhq.campaign.unit.UnitOrder;
 import mekhq.campaign.unit.UnitTechProgression;
+import org.joda.money.Money;
 
 /**
  *
@@ -82,8 +85,6 @@ public class UnitSelectorDialog extends JDialog {
     private TableRowSorter<MechTableModel> sorter;
 
     private Campaign campaign;
-
-    private DecimalFormat formatter;
 
     private MechSearchFilter searchFilter;
     AdvancedSearchDialog asd;
@@ -121,7 +122,6 @@ public class UnitSelectorDialog extends JDialog {
         //methods like buyUnit, addUnit, etc. that we could register with this dialog
         //and then update when needed
         this.campaign = c;
-        formatter = new DecimalFormat();
         asd = new AdvancedSearchDialog(frame, campaign.getCalendar().get(GregorianCalendar.YEAR));
         initComponents();
 
@@ -139,9 +139,9 @@ public class UnitSelectorDialog extends JDialog {
         panelFilterBtns = new JPanel();
         panelLeft = new JPanel();
         lblWeight = new JLabel();
-        comboWeight = new JComboBox<String>();
+        comboWeight = new JComboBox<>();
         lblUnitType = new JLabel();
-        comboUnitType = new JComboBox<String>();
+        comboUnitType = new JComboBox<>();
         txtFilter = new JTextField();
         lblFilter = new JLabel();
         lblImage = new JLabel();
@@ -170,7 +170,7 @@ public class UnitSelectorDialog extends JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panelFilterBtns.add(lblUnitType, gridBagConstraints);
 
-        DefaultComboBoxModel<String> unitTypeModel = new DefaultComboBoxModel<String>();
+        DefaultComboBoxModel<String> unitTypeModel = new DefaultComboBoxModel<>();
         for (int i = 0; i < UnitType.SIZE; i++) {
             unitTypeModel.addElement(UnitType.getTypeDisplayableName(i));
         }
@@ -179,11 +179,7 @@ public class UnitSelectorDialog extends JDialog {
         comboUnitType.setMinimumSize(new java.awt.Dimension(200, 27));
         comboUnitType.setName("comboUnitType"); // NOI18N
         comboUnitType.setPreferredSize(new java.awt.Dimension(200, 27));
-        comboUnitType.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                comboUnitTypeActionPerformed(evt);
-            }
-        });
+        comboUnitType.addActionListener(evt -> comboUnitTypeActionPerformed(evt));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
@@ -198,7 +194,7 @@ public class UnitSelectorDialog extends JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panelFilterBtns.add(lblWeight, gridBagConstraints);
 
-        DefaultComboBoxModel<String> weightModel = new DefaultComboBoxModel<String>();
+        DefaultComboBoxModel<String> weightModel = new DefaultComboBoxModel<>();
         for (int i = 0; i < EntityWeightClass.SIZE; i++) {
             weightModel.addElement(EntityWeightClass.getClassName(i));
         }
@@ -208,11 +204,7 @@ public class UnitSelectorDialog extends JDialog {
         comboWeight.setMinimumSize(new java.awt.Dimension(200, 27));
         comboWeight.setName("comboWeight"); // NOI18N
         comboWeight.setPreferredSize(new java.awt.Dimension(200, 27));
-        comboWeight.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                comboWeightActionPerformed(evt);
-            }
-        });
+        comboWeight.addActionListener(evt -> comboWeightActionPerformed(evt));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
@@ -316,14 +308,10 @@ public class UnitSelectorDialog extends JDialog {
         tableUnits.setModel(unitModel);
         tableUnits.setName("tableUnits"); // NOI18N
         tableUnits.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
-        sorter = new TableRowSorter<MechTableModel>(unitModel);
+        sorter = new TableRowSorter<>(unitModel);
         sorter.setComparator(MechTableModel.COL_COST, new FormattedNumberSorter());
         tableUnits.setRowSorter(sorter);
-        tableUnits.getSelectionModel().addListSelectionListener(new javax.swing.event.ListSelectionListener() {
-            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
-                unitChanged(evt);
-            }
-        });
+        tableUnits.getSelectionModel().addListSelectionListener(evt -> unitChanged(evt));
         TableColumn column = null;
         for (int i = 0; i < MechTableModel.N_COL; i++) {
             column = tableUnits.getColumnModel().getColumn(i);
@@ -361,30 +349,18 @@ public class UnitSelectorDialog extends JDialog {
 
             btnBuy.setText("Buy (TN: --)");
             btnBuy.setName("btnBuy"); // NOI18N
-            btnBuy.addActionListener(new java.awt.event.ActionListener() {
-                public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    btnBuyActionPerformed(evt);
-                }
-            });
+            btnBuy.addActionListener(evt -> btnBuyActionPerformed(evt));
             panelOKBtns.add(btnBuy, new java.awt.GridBagConstraints());
 
             btnAddGM = new JButton("Add (GM)");
-            btnAddGM.addActionListener(new java.awt.event.ActionListener() {
-                public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    addUnitGM();
-                }
-            });
+            btnAddGM.addActionListener(evt -> addUnitGM());
             btnAddGM.setEnabled(campaign.isGM());
             panelOKBtns.add(btnAddGM, new java.awt.GridBagConstraints());
 
 
             btnClose.setText(resourceMap.getString("btnClose.text")); // NOI18N
             btnClose.setName("btnClose"); // NOI18N
-            btnClose.addActionListener(new java.awt.event.ActionListener() {
-                public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    btnCloseActionPerformed(evt);
-                }
-            });
+            btnClose.addActionListener(evt -> btnCloseActionPerformed(evt));
             panelOKBtns.add(btnClose, new java.awt.GridBagConstraints());
 
         } else {
@@ -392,20 +368,16 @@ public class UnitSelectorDialog extends JDialog {
             panelOKBtns.setLayout(new java.awt.GridBagLayout());
 
             btnAddGM = new JButton("Add");
-            btnAddGM.addActionListener(new java.awt.event.ActionListener() {
-                public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    //the actual work will be done by whatever called this
-                    setVisible(false);
-                }
+            btnAddGM.addActionListener(evt -> {
+                //the actual work will be done by whatever called this
+                setVisible(false);
             });
             panelOKBtns.add(btnAddGM, new java.awt.GridBagConstraints());
 
             btnClose.setText("Cancel"); // NOI18N
-            btnClose.addActionListener(new java.awt.event.ActionListener() {
-                public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    selectedUnit = null;
-                    setVisible(false);
-                }
+            btnClose.addActionListener(evt -> {
+                selectedUnit = null;
+                setVisible(false);
             });
             panelOKBtns.add(btnClose, new java.awt.GridBagConstraints());
 
@@ -537,7 +509,6 @@ public class UnitSelectorDialog extends JDialog {
                     + ms.getEntryName() + ": " + ex.getMessage()); //$NON-NLS-1$
             MekHQ.getLogger().error(getClass(), METHOD_NAME, ex);
             refreshUnitView();
-            return;
         }
     }
 
@@ -607,11 +578,7 @@ public class UnitSelectorDialog extends JDialog {
         ResourceBundle resourceMap = ResourceBundle.getBundle("UnitSelectorDialog", new EncodeControl()); //$NON-NLS-1$
         btnBuy.setText(resourceMap.getString("btnBuy.textSelect")); // NOI18N
 
-        btnBuy.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnBuySelectActionPerformed(evt);
-            }
-        });
+        btnBuy.addActionListener(evt -> btnBuySelectActionPerformed(evt));
     }
 
     public JComboBox<String> getComboUnitType() {
@@ -719,19 +686,19 @@ public class UnitSelectorDialog extends JDialog {
                 return ms.getYear();
             }
             if(col == COL_COST) {
-                return formatter.format(getPurchasePrice(ms));
+                return MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(getPurchasePrice(ms));
             }
             return "?";
         }
 
-        private long getPurchasePrice(MechSummary ms) {
-            long cost = ms.getCost();
+        private Money getPurchasePrice(MechSummary ms) {
+            Money cost = MekHqMoneyUtil.money(ms.getCost());
             if(ms.getUnitType().equals(UnitType.getTypeName(UnitType.INFANTRY))
                     || ms.getUnitType().equals(UnitType.getTypeName(UnitType.BATTLE_ARMOR))) {
-                cost = ms.getAlternateCost();
+                cost = MekHqMoneyUtil.money(ms.getAlternateCost());
             }
             if(TechConstants.isClan(ms.getType())) {
-                cost *= campaign.getCampaignOptions().getClanPriceModifier();
+                cost = cost.multipliedBy(campaign.getCampaignOptions().getClanPriceModifier(), RoundingMode.HALF_EVEN);
             }
             return cost;
         }
@@ -770,17 +737,16 @@ public class UnitSelectorDialog extends JDialog {
         @Override
         public int compare(String s0, String s1) {
             //lets find the weight class integer for each name
-            DecimalFormat format = new DecimalFormat();
             long l0 = 0;
             try {
-                l0 = format.parse(s0.replace(",", "")).longValue();
+                l0 = DecimalFormat.getInstance().parse(s0.replace(",", "")).longValue();
             } catch (java.text.ParseException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
             long l1 = 0;
             try {
-                l1 = format.parse(s1.replace(",", "")).longValue();
+                l1 = DecimalFormat.getInstance().parse(s1.replace(",", "")).longValue();
             } catch (java.text.ParseException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();

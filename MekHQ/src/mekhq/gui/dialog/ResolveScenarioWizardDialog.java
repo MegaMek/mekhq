@@ -28,13 +28,11 @@ import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
@@ -68,6 +66,7 @@ import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.ResolveScenarioTracker.PersonStatus;
 import mekhq.campaign.ResolveScenarioTracker.PrisonerStatus;
 import mekhq.campaign.ResolveScenarioTracker.UnitStatus;
+import mekhq.campaign.finances.MekHqMoneyUtil;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Loot;
@@ -171,8 +170,6 @@ public class ResolveScenarioWizardDialog extends JDialog {
     private int currentSalvagePct;
     private int maxSalvagePct;
 
-    DecimalFormat formatter;
-
     /*
      * Assign Kills components
      */
@@ -220,7 +217,6 @@ public class ResolveScenarioWizardDialog extends JDialog {
                                 .divide(salvageUnit.plus(salvageEmployer).getAmount(), RoundingMode.HALF_EVEN)
                                 .intValue();
         }
-        formatter = new DecimalFormat();
         currentPanel = UNITSPANEL;
         initComponents();
         setLocationRelativeTo(parent);
@@ -577,7 +573,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
             gridBagConstraints.weightx = 0.0;
             gridBagConstraints.insets = new Insets(5, 5, 0, 0);
             pnlSalvageValue.add(lblSalvageValueUnit1, gridBagConstraints);
-        	lblSalvageValueUnit2 = new JLabel(formatter.format(salvageUnit) + " C-Bills");
+        	lblSalvageValueUnit2 = new JLabel(MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(salvageUnit));
         	gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = 0;
@@ -596,7 +592,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
             gridBagConstraints.insets = new Insets(5, 5, 0, 0);
             gridBagConstraints.weightx = 0.0;
             pnlSalvageValue.add(lblSalvageValueEmployer1, gridBagConstraints);
-        	lblSalvageValueEmployer2 = new JLabel(formatter.format(salvageEmployer) + " C-Bills");
+        	lblSalvageValueEmployer2 = new JLabel(MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(salvageEmployer));
         	gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = 1;
@@ -649,7 +645,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         	j++;
         	salvageables.add(u);
         	UnitStatus status = tracker.getSalvageStatus().get(u.getId());
-        	String txtBoxString = status.getDesc(formatter);
+        	String txtBoxString = status.getDesc(true);
         	box = new JCheckBox(txtBoxString);
         	box.setSelected(false);
         	box.setEnabled(!tracker.usesSalvageExchange());
@@ -1168,18 +1164,16 @@ public class ResolveScenarioWizardDialog extends JDialog {
     	for(int i = (panelOrder.length-1); i >= 0; i--) {
     		String name = panelOrder[i];
     		if(passedCurrent) {
-    			if(passedCurrent) {
-        			if(usePanel(name)) {
-        				if(!switchMade) {
-        					switchPanel(name);
-        					switchMade = true;
-        				} else {
-        					btnBack.setEnabled(true);
-        					break;
-        				}
-        			}
-        		}
-    		}
+                if(usePanel(name)) {
+                    if(!switchMade) {
+                        switchPanel(name);
+                        switchMade = true;
+                    } else {
+                        btnBack.setEnabled(true);
+                        break;
+                    }
+                }
+            }
     		else if(name.equals(currentPanel)) {
     			passedCurrent = true;
     		}
@@ -1361,8 +1355,8 @@ public class ResolveScenarioWizardDialog extends JDialog {
     			box.setEnabled(true);
     		}
     	}
-    	lblSalvageValueUnit2.setText(formatter.format(salvageUnit) + " C-Bills");
-    	lblSalvageValueEmployer2.setText(formatter.format(salvageEmployer) + " C-Bills");
+    	lblSalvageValueUnit2.setText(MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(salvageUnit));
+    	lblSalvageValueEmployer2.setText(MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(salvageEmployer));
     	String lead = "<html><font color='black'>";
         if(currentSalvagePct > maxSalvagePct) {
         	lead = "<html><font color='red'>";

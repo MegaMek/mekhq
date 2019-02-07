@@ -30,8 +30,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -122,6 +120,7 @@ import mekhq.gui.utilities.TableCellListener;
 import mekhq.module.PersonnelMarketServiceManager;
 import mekhq.module.api.PersonnelMarketMethod;
 import org.joda.money.Money;
+import org.joda.money.format.MoneyFormatException;
 
 /**
  * @author Jay Lawson <jaylawson39 at yahoo.com>
@@ -601,12 +600,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         javax.swing.JLabel clanPriceModifierLabel = new JLabel();
         javax.swing.JLabel usedPartsValueLabel = new JLabel();
         javax.swing.JLabel damagedPartsValueLabel = new JLabel();
-        DecimalFormat numberFormat = (DecimalFormat) DecimalFormat.getInstance();
-        numberFormat.setMaximumFractionDigits(2);
-        DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols();
-        decimalFormatSymbols.setGroupingSeparator(' ');
-        decimalFormatSymbols.setDecimalSeparator('.');
-        numberFormat.setDecimalFormatSymbols(decimalFormatSymbols);
         useFactionForNamesBox = new JCheckBox();
         useTacticsBox = new JCheckBox();
         useInitBonusBox = new JCheckBox();
@@ -687,12 +680,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         txtName.setMinimumSize(new java.awt.Dimension(500, 30));
         txtName.setName("txtName"); // NOI18N
         txtName.setPreferredSize(new java.awt.Dimension(500, 30));
-        txtName.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtNameActionPerformed(evt);
-            }
-        });
+        txtName.addActionListener(evt -> txtNameActionPerformed(evt));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
@@ -727,12 +715,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         btnDate.setMinimumSize(new java.awt.Dimension(400, 30));
         btnDate.setName("btnDate"); // NOI18N
         btnDate.setPreferredSize(new java.awt.Dimension(400, 30));
-        btnDate.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnDateActionPerformed(evt);
-            }
-        });
+        btnDate.addActionListener(evt -> btnDateActionPerformed(evt));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 3;
@@ -751,12 +734,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         comboFaction.setMinimumSize(new java.awt.Dimension(400, 30));
         comboFaction.setName("comboFaction"); // NOI18N
         comboFaction.setPreferredSize(new java.awt.Dimension(400, 30));
-        comboFaction.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                factionSelected();
-            }
-        });
+        comboFaction.addActionListener(evt -> factionSelected());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
@@ -790,12 +768,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         btnCamo.setMinimumSize(new java.awt.Dimension(84, 72));
         btnCamo.setName("btnCamo"); // NOI18N
         btnCamo.setPreferredSize(new java.awt.Dimension(84, 72));
-        btnCamo.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnCamoActionPerformed(evt);
-            }
-        });
+        btnCamo.addActionListener(evt -> btnCamoActionPerformed(evt));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 5;
@@ -2733,12 +2706,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         panSpecialAbilities = new JPanel(new GridBagLayout());
 
         btnAddSPA = new JButton("Add Another Special Ability");
-        btnAddSPA.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnAddSPA();
-            }
-        });
+        btnAddSPA.addActionListener(evt -> btnAddSPA());
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.fill = GridBagConstraints.NONE;
@@ -2817,7 +2785,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         JPanel panRecruit;
         for (int i = 0; i < Person.T_NUM; i++) {
             panRecruit = new JPanel(new GridBagLayout());
-            gridBagConstraints = new java.awt.GridBagConstraints();
             spin = new JSpinner(new SpinnerNumberModel(rskillPrefs.getRecruitBonus(i), -12, 12, 1));
             ((JSpinner.DefaultEditor) spin.getEditor()).getTextField().setEditable(false);
             spnTypeRecruitBonus[i] = spin;
@@ -3210,12 +3177,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         useFactionForNamesBox.setToolTipText(resourceMap.getString("useFactionForNamesBox.toolTipText")); // NOI18N
         useFactionForNamesBox.setName("useFactionForNamesBox"); // NOI18N
         useFactionForNamesBox.setSelected(options.useFactionForNames());
-        useFactionForNamesBox.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                useFactionForNamesBoxEvent(evt);
-            }
-        });
+        useFactionForNamesBox.addActionListener(evt -> useFactionForNamesBoxEvent(evt));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridy = 0;
@@ -4378,12 +4340,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
         btnOkay.setText(resourceMap.getString("btnOkay.text")); // NOI18N
         btnOkay.setName("btnOkay"); // NOI18N
-        btnOkay.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnOkayActionPerformed();
-            }
-        });
+        btnOkay.addActionListener(evt -> btnOkayActionPerformed());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -4393,12 +4350,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
         btnSave.setText(resourceMap.getString("btnSave.text")); // NOI18N
         btnSave.setName("btnSave"); // NOI18N
-        btnSave.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnSaveActionPerformed();
-            }
-        });
+        btnSave.addActionListener(evt -> btnSaveActionPerformed());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
@@ -4408,12 +4360,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
         btnLoad.setText(resourceMap.getString("btnLoad.text")); // NOI18N
         btnLoad.setName("btnLoad"); // NOI18N
-        btnLoad.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnLoadActionPerformed();
-            }
-        });
+        btnLoad.addActionListener(evt -> btnLoadActionPerformed());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 1;
@@ -4424,12 +4371,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
         btnCancel.setText(resourceMap.getString("btnCancel.text")); // NOI18N
         btnCancel.setName("btnCancel"); // NOI18N
-        btnCancel.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnCancelActionPerformed(evt);
-            }
-        });
+        btnCancel.addActionListener(evt -> btnCancelActionPerformed(evt));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 1;
@@ -4826,9 +4768,9 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         //start salary
         for (int i = 1; i < Person.T_NUM; i++) {
             try {
-                Money salary = MekHqMoneyUtil.uiAmountMoneyFormatter().parseMoney(txtSalaryBase[i].getText());
+                Money salary = MekHqMoneyUtil.money(Double.parseDouble(txtSalaryBase[i].getText()));
                 options.setBaseSalary(salary, i);
-            } catch (NumberFormatException ex) {
+            } catch (MoneyFormatException ex) {
                 //dont change it
             }
         }

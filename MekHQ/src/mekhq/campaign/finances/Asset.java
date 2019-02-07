@@ -46,9 +46,9 @@ public class Asset implements MekHqXmlSerializable {
     
     public Asset() {
         name = "New Asset";
-        value = Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
+        value = MekHqMoneyUtil.zero();
         schedule = Finances.SCHEDULE_YEARLY;
-        income = Money.zero(CurrencyManager.getInstance().getDefaultCurrency());
+        income = MekHqMoneyUtil.zero();
     }
 
     public String getName() {

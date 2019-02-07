@@ -32,6 +32,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.UUID;
 
+import mekhq.campaign.finances.MekHqMoneyUtil;
 import org.joda.money.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -1083,13 +1084,18 @@ public class AtBContract extends Contract implements Serializable {
          * uses the base monthly amounts for support and overhead, with a 
          * 50% bonus to the base amount.
          */
+
+        if (getLength() <= 0) {
+            return MekHqMoneyUtil.zero();
+        }
+
         return getBaseAmount()
                 .toBigMoney()
                 .multipliedBy(1.5)
                 .plus(getSupportAmount())
                 .plus(getOverheadAmount())
                 .dividedBy(getLength(), RoundingMode.HALF_EVEN)
-                .toMoney();
+                .toMoney(RoundingMode.HALF_EVEN);
     }
     
     public void checkForFollowup(Campaign campaign) {

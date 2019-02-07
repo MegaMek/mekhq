@@ -26,7 +26,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.RoundingMode;
-import java.text.DecimalFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -1185,7 +1184,7 @@ public class ResolveScenarioTracker {
                 if(blc > 0) {
                     Money value = unitValue.multipliedBy(blc, RoundingMode.HALF_EVEN);
                     campaign.getFinances().credit(value, Transaction.C_BLC, "Battle loss compensation for " + unit.getName(), campaign.getCalendar().getTime());
-                    campaign.addReport(MekHqMoneyUtil.shortUiMoneyPrinter().print(value) + " in battle loss compensation for " + unit.getName() + " has been credited to your account.");
+                    campaign.addReport(MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(value) + " in battle loss compensation for " + unit.getName() + " has been credited to your account.");
                 }
                 campaign.removeUnit(unit.getId());
             } else {
@@ -1227,7 +1226,7 @@ public class ResolveScenarioTracker {
                 if(blc > 0 && MoneyUtils.isPositive(blcValue)) {
                     Money finalValue = blcValue.multipliedBy(blc, RoundingMode.HALF_EVEN);
                     campaign.getFinances().credit(finalValue, Transaction.C_BLC, "B" + blcString, campaign.getCalendar().getTime());
-                    campaign.addReport( MekHqMoneyUtil.shortUiMoneyPrinter().print(finalValue) + " in b" + blcString + " has been credited to your account.");
+                    campaign.addReport( MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(finalValue) + " in b" + blcString + " has been credited to your account.");
                 }
             }
         }
@@ -1254,7 +1253,7 @@ public class ResolveScenarioTracker {
             if(((Contract)getMission()).isSalvageExchange()) {
                 value = value.multipliedBy(((Contract)getMission()).getSalvagePct()).dividedBy(100.0, RoundingMode.HALF_EVEN);
                 campaign.getFinances().credit(value, Transaction.C_SALVAGE, "salvage exchange for " + scenario.getName(),  campaign.getCalendar().getTime());
-                campaign.addReport(MekHqMoneyUtil.shortUiMoneyPrinter().print(value) + " have been credited to your account for salvage exchange.");
+                campaign.addReport(MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(value) + " have been credited to your account for salvage exchange.");
             } else {
                 ((Contract)getMission()).addSalvageByEmployer(value);
             }
@@ -1626,10 +1625,10 @@ public class ResolveScenarioTracker {
         }
 
         public String getDesc() {
-            return getDesc(null);
+            return getDesc(false);
         }
 
-        public String getDesc(DecimalFormat formatter) {
+        public String getDesc(boolean printSellValue) {
             if(null == entity) {
                 return "Whoops, No Entity";
             }
@@ -1657,11 +1656,12 @@ public class ResolveScenarioTracker {
                         break;
                 }
             }
-            String s = "<html><b>" + getName() + "</b><br><font color='" + color + "'>"+ status + "</font></html>";
-            if(null != formatter) {
-                s = "<html><b>" + getName() + "</b><br> (" + formatter.format(unit.getSellValue()) + "C-bills) <font color='" + color + "'>"+ status + "</font></html>";
+
+            if (printSellValue) {
+                return "<html><b>" + getName() + "</b><br> (" + MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(unit.getSellValue()) + "C-bills) <font color='" + color + "'>"+ status + "</font></html>";
+            } else {
+                return "<html><b>" + getName() + "</b><br><font color='" + color + "'>"+ status + "</font></html>";
             }
-            return s;
         }
 
         public boolean isLikelyCaptured() {

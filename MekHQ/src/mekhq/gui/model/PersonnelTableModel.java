@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Image;
 import java.awt.Toolkit;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -21,6 +20,7 @@ import megamek.common.UnitType;
 import megamek.common.options.PilotOptions;
 import mekhq.IconPackage;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.finances.MekHqMoneyUtil;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.personnel.Person;
@@ -287,7 +287,6 @@ import mekhq.gui.BasicInfo;
         @Override
         public Object getValueAt(int row, int col) {
             Person p;
-            DecimalFormat formatter = new DecimalFormat();
             if(data.isEmpty()) {
                 return "";
             } else {
@@ -647,7 +646,7 @@ import mekhq.gui.BasicInfo;
                 }
             }
             if(col == COL_SALARY) {
-                return formatter.format(p.getSalary());
+                return MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(p.getSalary());
             }
             if(col == COL_KILLS) {
                 return Integer.toString(getCampaign().getKillsFor(p.getId()).size());

@@ -7,7 +7,6 @@
 package mekhq.gui.view;
 
 import java.awt.Color;
-import java.text.DecimalFormat;
 import java.util.ResourceBundle;
 
 import javax.swing.BorderFactory;
@@ -141,8 +140,6 @@ public class JumpPathViewPanel extends javax.swing.JPanel {
         java.awt.GridBagConstraints gridBagConstraints;
         pnlStats.setLayout(new java.awt.GridBagLayout());
         
-        DecimalFormat formatter = new DecimalFormat();
-        
         lblJumps.setName("lblJumps"); // NOI18N
         lblJumps.setText(resourceMap.getString("lblJumps1.text"));
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -269,7 +266,7 @@ public class JumpPathViewPanel extends javax.swing.JPanel {
             pnlStats.add(lblCost, gridBagConstraints);
 
             txtCost.setName("lblCost2"); // NOI18N
-            txtCost.setText(MekHqMoneyUtil.shortUiMoneyPrinter().print(
+            txtCost.setText(MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(
                     campaign.calculateCostPerJump(true, campaign.getCampaignOptions().useEquipmentContractBase())
                             .multipliedBy(path.getJumps())));
             txtCost.setEditable(false);

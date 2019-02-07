@@ -47,6 +47,7 @@ import mekhq.campaign.event.AssetNewEvent;
 import mekhq.campaign.event.AssetRemovedEvent;
 import mekhq.campaign.finances.Asset;
 import mekhq.campaign.finances.Finances;
+import mekhq.campaign.finances.MekHqMoneyUtil;
 import mekhq.gui.model.DataTableModel;
 
 /**
@@ -90,32 +91,20 @@ public class ManageAssetsDialog extends JDialog {
         
         JPanel panBtns = new JPanel(new GridLayout(1,0));
         btnAdd.setText("Add Asset"); // NOI18N
-        btnAdd.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                addAsset();
-            }
-        });
+        btnAdd.addActionListener(evt -> addAsset());
         panBtns.add(btnAdd);
         btnEdit.setText("Edit Asset"); // NOI18N
         btnEdit.setEnabled(false);
-        btnEdit.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                editAsset();
-            }
-        });
+        btnEdit.addActionListener(evt -> editAsset());
         panBtns.add(btnEdit);
         btnDelete.setText("Remove Asset"); // NOI18N
         btnDelete.setEnabled(false);
-        btnDelete.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                deleteAsset();
-            }
-        });
+        btnDelete.addActionListener(evt -> deleteAsset());
         panBtns.add(btnDelete);
         getContentPane().add(panBtns, BorderLayout.PAGE_START);
         
         assetTable = new JTable(assetModel);
-        TableColumn column = null;
+        TableColumn column;
         for (int i = 0; i <AssetTableModel.N_COL; i++) {
             column = assetTable.getColumnModel().getColumn(i);
             column.setPreferredWidth(assetModel.getColumnWidth(i));
@@ -124,30 +113,18 @@ public class ManageAssetsDialog extends JDialog {
         assetTable.setIntercellSpacing(new Dimension(0, 0));
         assetTable.setShowGrid(false);
         assetTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        assetTable.getSelectionModel().addListSelectionListener(
-                new javax.swing.event.ListSelectionListener() {
-                    public void valueChanged(
-                            javax.swing.event.ListSelectionEvent evt) {
-                        assetTableValueChanged(evt);
-                    }
-                });
+        assetTable.getSelectionModel().addListSelectionListener(evt -> assetTableValueChanged(evt));
         scrollAssetTable = new JScrollPane(assetTable);
         getContentPane().add(scrollAssetTable, BorderLayout.CENTER);
 
-        
         btnOK.setText(resourceMap.getString("btnOK.text")); // NOI18N
         btnOK.setName("btnOK"); // NOI18N
-        btnOK.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnOKActionPerformed(evt);
-            }
-        });
+        btnOK.addActionListener(evt -> btnOKActionPerformed(evt));
         getContentPane().add(btnOK, BorderLayout.PAGE_END);
 
         pack();
     }
 
-    
     private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {
         this.setVisible(false);
     }
@@ -251,10 +228,10 @@ public class ManageAssetsDialog extends JDialog {
                 return asset.getName();
             }
             if(col == COL_VALUE) {
-                return asset.getValue();
+                return MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(asset.getValue());
             }
             if(col == COL_INCOME) {
-                return asset.getIncome();
+                return MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(asset.getIncome());
             }
             if(col == COL_SCHEDULE) {
                 return Finances.getScheduleName(asset.getSchedule());
@@ -271,52 +248,50 @@ public class ManageAssetsDialog extends JDialog {
             return (Asset) data.get(row);
         }
         
-         public int getColumnWidth(int c) {
-                switch(c) {
-                default:
-                    return 10;
-                }
+        public int getColumnWidth(int c) {
+            switch(c) {
+            default:
+                return 10;
             }
-            
-            public int getAlignment(int col) {
-                switch(col) {
-                case COL_NAME:
-                    return SwingConstants.LEFT;
-                default:
-                    return SwingConstants.RIGHT;
-                }
+        }
+
+        public int getAlignment(int col) {
+            switch(col) {
+            case COL_NAME:
+                return SwingConstants.LEFT;
+            default:
+                return SwingConstants.RIGHT;
             }
+        }
 
-            public String getTooltip(int row, int col) {
-                switch(col) {
-                default:
-                    return null;
-                }
+        public String getTooltip(int row, int col) {
+            switch(col) {
+            default:
+                return null;
             }
-            
-            public AssetTableModel.Renderer getRenderer() {
-                return new AssetTableModel.Renderer();
+        }
+
+        public AssetTableModel.Renderer getRenderer() {
+            return new AssetTableModel.Renderer();
+        }
+
+        public class Renderer extends DefaultTableCellRenderer {
+
+            private static final long serialVersionUID = 9054581142945717303L;
+
+            public Component getTableCellRendererComponent(JTable table,
+                    Object value, boolean isSelected, boolean hasFocus,
+                    int row, int column) {
+                super.getTableCellRendererComponent(table, value, isSelected,
+                        hasFocus, row, column);
+                setOpaque(true);
+                int actualCol = table.convertColumnIndexToModel(column);
+                int actualRow = table.convertRowIndexToModel(row);
+                setHorizontalAlignment(getAlignment(actualCol));
+                setToolTipText(getTooltip(actualRow, actualCol));
+
+                return this;
             }
-
-            public class Renderer extends DefaultTableCellRenderer {
-
-                private static final long serialVersionUID = 9054581142945717303L;
-
-                public Component getTableCellRendererComponent(JTable table,
-                        Object value, boolean isSelected, boolean hasFocus,
-                        int row, int column) {
-                    super.getTableCellRendererComponent(table, value, isSelected,
-                            hasFocus, row, column);
-                    setOpaque(true);
-                    int actualCol = table.convertColumnIndexToModel(column);
-                    int actualRow = table.convertRowIndexToModel(row);
-                    setHorizontalAlignment(getAlignment(actualCol));
-                    setToolTipText(getTooltip(actualRow, actualCol));
-                    
-                    return this;
-                }
-
-            }
+        }
     }
-
 }

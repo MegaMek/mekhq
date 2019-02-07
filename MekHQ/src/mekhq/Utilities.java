@@ -32,8 +32,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -62,9 +60,11 @@ import java.util.stream.Collectors;
 import javax.swing.JTable;
 import javax.swing.table.TableModel;
 
+import mekhq.campaign.finances.MekHqMoneyUtil;
 import mekhq.campaign.parts.equipment.*;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
+import org.joda.money.Money;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDateTime;
@@ -105,6 +105,7 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.CrewType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.UnitTechProgression;
+import org.w3c.dom.Node;
 
 /**
  *
@@ -120,7 +121,7 @@ public class Utilities {
     private static String[] romanNumerals = "M,CM,D,CD,C,XC,L,XL,X,IX,V,IV,I".split(","); //$NON-NLS-1$ //$NON-NLS-2$
 
     public static int roll3d6() {
-        Vector<Integer> rolls = new Vector<Integer>();
+        Vector<Integer> rolls = new Vector<>();
         rolls.add(Compute.d6());
         rolls.add(Compute.d6());
         rolls.add(Compute.d6());
@@ -276,7 +277,7 @@ public class Utilities {
     }
 
     public static ArrayList<AmmoType> getMunitionsFor(Entity entity, AmmoType cur_atype, int techLvl) {
-        ArrayList<AmmoType> atypes = new ArrayList<AmmoType>();
+        ArrayList<AmmoType> atypes = new ArrayList<>();
         for(AmmoType atype : AmmoType.getMunitionsFor(cur_atype.getAmmoType())) {
             //this is an abbreviated version of setupMunitions in the CustomMechDialog
             //TODO: clan/IS limitations?
@@ -609,9 +610,9 @@ public class Utilities {
         String commanderName = oldCrew.getName();
         int averageGunnery = 0;
         int averagePiloting = 0;
-        List<Person> drivers = new ArrayList<Person>();
-        List<Person> gunners = new ArrayList<Person>();
-        List<Person> vesselCrew = new ArrayList<Person>();
+        List<Person> drivers = new ArrayList<>();
+        List<Person> gunners = new ArrayList<>();
+        List<Person> vesselCrew = new ArrayList<>();
         Person navigator = null;
         Person consoleCmdr = null;
         int totalGunnery = 0;
@@ -988,15 +989,38 @@ public class Utilities {
         return name;
     }
 
-    public static String printIntegerList(List<Integer> list) {
+    public static String printMoneyArray(Money[] array) {
         String values = ""; //$NON-NLS-1$
-        for(int i = 0; i < list.size(); i++) {
-            values += Integer.toString(list.get(i));
-            if(i < (list.size()-1)) {
+        for(int i = 0; i < array.length; i++) {
+            values += MekHqXmlUtil.getXmlStringFromMoney(array[i]);
+            if(i < (array.length-1)) {
                 values += ","; //$NON-NLS-1$
             }
         }
         return values;
+    }
+
+    public static Money[] readMoneyArray(Node node) {
+        String[] values = node.getTextContent().split(",");
+        Money[] result = new Money[values.length];
+
+        // Check the XML data version
+        if (node.hasAttributes()) {
+            Node attribute = node.getAttributes().getNamedItem("version");
+            if (attribute != null && attribute.getTextContent().trim().equals("2")) {
+                for (int i = 0; i < values.length; i++) {
+                    result[i] = MekHqMoneyUtil.xmlMoneyFormatter().parseMoney(values[i]);
+                }
+
+                return result;
+            }
+        }
+
+        for (int i = 0; i < values.length; i++) {
+            result[i] = MekHqMoneyUtil.money(Long.parseLong(values[i]));
+        }
+
+        return result;
     }
 
     public static String printIntegerArray(int[] array) {
@@ -1093,7 +1117,7 @@ public class Utilities {
             assignTroopersAndEquipmentNums(unit);
             return;
         }
-        List<Integer> equipNums = new ArrayList<Integer>();
+        List<Integer> equipNums = new ArrayList<>();
         for(Mounted m : unit.getEntity().getEquipment()) {
             equipNums.add(unit.getEntity().getEquipmentNum(m));
         }
@@ -1386,7 +1410,7 @@ public class Utilities {
 
     public static Vector<String> splitString(String str, String sep) {
         StringTokenizer st = new StringTokenizer(str, sep);
-        Vector<String> output = new Vector<String>();
+        Vector<String> output = new Vector<>();
         while(st.hasMoreTokens()) {
             output.add(st.nextToken());
         }
@@ -1481,7 +1505,7 @@ public class Utilities {
 
         // Convert Map to List
         List<Map.Entry<String, Integer>> list =
-            new LinkedList<Map.Entry<String, Integer>>(unsortMap.entrySet());
+            new LinkedList<>(unsortMap.entrySet());
 
         // Sort list with comparator, to compare the Map values
         Collections.sort(list, new Comparator<Map.Entry<String, Integer>>() {
@@ -1493,7 +1517,7 @@ public class Utilities {
         });
 
         // Convert sorted map back to a Map
-        Map<String, Integer> sortedMap = new LinkedHashMap<String, Integer>();
+        Map<String, Integer> sortedMap = new LinkedHashMap<>();
         if(highFirst) {
             ListIterator<Map.Entry<String, Integer>> li = list.listIterator(list.size());
             while(li.hasPrevious()) {

@@ -10,7 +10,6 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.ResourceBundle;
@@ -38,8 +37,6 @@ import javax.swing.RowSorter;
 import javax.swing.SortOrder;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
@@ -124,7 +121,6 @@ public class RetirementDefectionDialog extends JDialog {
 	private JButton btnRoll;
 	private JButton btnDone;
 
-    DecimalFormat formatter = new DecimalFormat();
 	private boolean aborted = true;
 
 	public RetirementDefectionDialog (CampaignGUI gui,
@@ -271,10 +267,10 @@ public class RetirementDefectionDialog extends JDialog {
         			    Money bonus = getTotalBonus();
         			    if (bonus.isGreaterThan(hqView.getCampaign().getFinances().getBalance())) {
         			        lblTotal.setText("<html><font color='red'>"
-        			                + formatter.format(getTotalBonus()) + "</font></html>");
+        			                + MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(getTotalBonus()) + "</font></html>");
         			        btnRoll.setEnabled(false);
         			    } else {
-        			        lblTotal.setText(formatter.format(getTotalBonus()));
+        			        lblTotal.setText(MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(getTotalBonus()));
         			        btnRoll.setEnabled(true);
         			    }
         			}
@@ -364,12 +360,7 @@ public class RetirementDefectionDialog extends JDialog {
 				setUnitGroup();
 			}
         });
-        model.addTableModelListener(new TableModelListener() {
-			@Override
-			public void tableChanged(TableModelEvent arg0) {
-				lblPayment.setText(formatter.format(totalPayout()));
-			}
-        });
+        model.addTableModelListener(arg0 -> lblPayment.setText(MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(totalPayout())));
 
         XTableColumnModel columnModel = (XTableColumnModel)retireeTable.getColumnModel();
         columnModel.setColumnVisible(columnModel.getColumn(retireeTable.convertColumnIndexToView(RetirementTableModel.COL_ASSIGN)), false);
@@ -626,7 +617,7 @@ public class RetirementDefectionDialog extends JDialog {
         ((XTableColumnModel)retireeTable.getColumnModel()).setColumnVisible(retireeTable.getColumnModel().getColumn(retireeTable.convertColumnIndexToView(RetirementTableModel.COL_RECRUIT)), !showRecruitColumn);
 		((RetirementTableModel)retireeTable.getModel()).setData(retireeList, unitAssignments);
 		filterPersonnel(retireeSorter, cbGroupResults.getSelectedIndex(), true);
-		lblPayment.setText(formatter.format(totalPayout()));
+		lblPayment.setText(MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(totalPayout()));
 	}
 
 	private void filterPersonnel(TableRowSorter<RetirementTableModel> sorter, int groupIndex, boolean resultsView) {

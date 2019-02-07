@@ -27,7 +27,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.math.RoundingMode;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -125,7 +124,7 @@ public class PayCollateralDialog extends JDialog {
         Collection<Unit> units = campaign.getUnits();
         for(Unit u : units) {
             j++;
-            box = new JCheckBox(u.getName() + " (" + DecimalFormat.getInstance().format(u.getSellValue()) + "C-bills)");
+            box = new JCheckBox(u.getName() + " (" + MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(u.getSellValue()));
             box.setSelected(false);
             box.setEnabled(u.isPresent() && !u.isDeployed());
             box.addItemListener(evt -> updateAmount());
@@ -186,7 +185,7 @@ public class PayCollateralDialog extends JDialog {
             gridBagConstraints.gridx = 1;
             gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
             gridBagConstraints.weightx = 1.0;
-            pnlParts.add(new JLabel("<html>" + p.getName() + "<br>" + p.getDetails()  + ", "+ DecimalFormat.getInstance().format(p.getCurrentValue()) + "</html>"), gridBagConstraints);
+            pnlParts.add(new JLabel("<html>" + p.getName() + "<br>" + p.getDetails()  + ", "+ MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(p.getCurrentValue()) + "</html>"), gridBagConstraints);
             i++;
         }    
         JScrollPane scrParts = new JScrollPane();
@@ -219,7 +218,7 @@ public class PayCollateralDialog extends JDialog {
         JPanel pnlAssets = new JPanel(new GridBagLayout());
         for(Asset a : campaign.getFinances().getAllAssets()) {
             j++;
-            box = new JCheckBox(a.getName() + " (" + DecimalFormat.getInstance().format(a.getValue()) + "C-bills)");
+            box = new JCheckBox(a.getName() + " (" + MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(a.getValue()));
             box.setSelected(false);
             box.addItemListener(evt -> updateAmount());
             assetBoxes.add(box);
@@ -292,14 +291,19 @@ public class PayCollateralDialog extends JDialog {
                 amount = amount.plus(campaign.getFinances().getAllAssets().get(i).getValue());
             }
         }
-        int percent = amount.multipliedBy(100).dividedBy(loan.getCollateralAmount().getAmount(), RoundingMode.HALF_EVEN).getAmountMajorInt();
+
+        int percent = 0;
+        if (loan.getCollateralAmount().isPositive()) {
+            percent = amount.multipliedBy(100).dividedBy(loan.getCollateralAmount().getAmount(), RoundingMode.HALF_EVEN).getAmountMajorInt();
+        }
+
         if(percent < 100) {
             btnPay.setEnabled(false);
         } else {
             btnPay.setEnabled(true);
         }
         barAmount.setValue(percent);
-        barAmount.setString(MekHqMoneyUtil.uiAmountMoneyFormatter().print(amount) + "/" + MekHqMoneyUtil.uiAmountMoneyFormatter().print(loan.getCollateralAmount()));
+        barAmount.setString(MekHqMoneyUtil.uiAmountPrinter().print(amount) + "/" + MekHqMoneyUtil.uiAmountPrinter().print(loan.getCollateralAmount()));
     }
     
     public ArrayList<UUID> getUnits() {

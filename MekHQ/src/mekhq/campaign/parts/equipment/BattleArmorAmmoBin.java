@@ -233,7 +233,7 @@ public class BattleArmorAmmoBin extends AmmoBin implements IAcquisitionWork {
         toReturn += getAcquisitionExtraDesc() + "<br/>";
         PartInventory inventories = campaign.getPartInventory(getAcquisitionPart());
         toReturn += inventories.getTransitOrderedDetails() + "<br/>"; 
-        toReturn += MekHqMoneyUtil.shortUiMoneyPrinter().print(getBuyCost()) + "<br/>";
+        toReturn += MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(getBuyCost()) + "<br/>";
         toReturn += "</font></html>";
         return toReturn;
     }

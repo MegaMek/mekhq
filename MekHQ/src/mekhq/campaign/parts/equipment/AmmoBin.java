@@ -151,6 +151,10 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     }
 
     public Money getValueNeeded() {
+        if (getShotsPerTon() <= 0) {
+            return MekHqMoneyUtil.zero();
+        }
+
         return adjustCostsForCampaignOptions(getPricePerTon()
                 .multipliedBy(shotsNeeded)
                 .dividedBy(getShotsPerTon(), RoundingMode.HALF_EVEN));
@@ -180,6 +184,10 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     
     @Override
     public Money getStickerPrice() {
+        if (getShotsPerTon() <= 0) {
+            return MekHqMoneyUtil.zero();
+        }
+
         return getPricePerTon()
                 .multipliedBy(getCurrentShots())
                 .dividedBy(getShotsPerTon(), RoundingMode.HALF_EVEN);
@@ -711,7 +719,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
         toReturn += getAcquisitionExtraDesc() + "<br/>";
         PartInventory inventories = campaign.getPartInventory(getAcquisitionPart());
         toReturn += inventories.getTransitOrderedDetails() + "<br/>";
-        toReturn += MekHqMoneyUtil.shortUiMoneyPrinter().print(getBuyCost()) + "<br/>";
+        toReturn += MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(getBuyCost()) + "<br/>";
         toReturn += "</font></html>";
         return toReturn;
     }

@@ -3,7 +3,6 @@ package mekhq.gui.model;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Image;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 import javax.swing.JTable;
@@ -19,6 +18,7 @@ import megamek.common.TechConstants;
 import megamek.common.UnitType;
 import mekhq.IconPackage;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.finances.MekHqMoneyUtil;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.BasicInfo;
@@ -191,7 +191,6 @@ public class UnitTableModel extends DataTableModel {
         }
         Entity e = u.getEntity();
         //PilotPerson pp = u.getPilot();
-        DecimalFormat format = new DecimalFormat();
         if(null == e) {
             return "?";
         }
@@ -208,7 +207,7 @@ public class UnitTableModel extends DataTableModel {
             return e.getWeightClassName();
         }
         if(col == COL_COST) {
-            return format.format(u.getSellValue());
+            return MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(u.getSellValue());
         }
         if(col == COL_MAINTAIN) {
             return u.getMaintenanceCost();

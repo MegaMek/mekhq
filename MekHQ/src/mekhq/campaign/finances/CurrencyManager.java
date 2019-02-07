@@ -25,13 +25,13 @@ import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.io.CampaignXmlParseException;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.CurrencyUnitDataProvider;
 import org.joda.money.format.MoneyFormatter;
 import org.joda.money.format.MoneyFormatterBuilder;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -69,16 +69,16 @@ public class CurrencyManager extends CurrencyUnitDataProvider {
     private HashMap<String, String> currencySymbols;
     private ArrayList<DefaultCurrency> defaultCurrencies;
 
-    private MoneyFormatter uiAmountMoneyFormatter;
     private MoneyFormatter xmlMoneyFormatter;
-    private MoneyFormatter shortUiMoneyPrinter;
-    private MoneyFormatter longUiMoneyPrinter;
+    private MoneyFormatter uiAmountPrinter;
+    private MoneyFormatter uiAmountAndSymbolPrinter;
+    private MoneyFormatter uiAmountAndNamePrinter;
 
     private CurrencyManager() {
         this.initialized = false;
     }
 
-    public void initialize(Campaign campaign) throws Exception {
+    public void initialize(Campaign campaign) {
         assert campaign != null;
 
         this.campaign = campaign;
@@ -88,22 +88,21 @@ public class CurrencyManager extends CurrencyUnitDataProvider {
 
         this.registerCurrencies();
 
-        this.uiAmountMoneyFormatter = new MoneyFormatterBuilder()
+        this.uiAmountPrinter = new MoneyFormatterBuilder()
                 .appendAmountLocalized()
-                .append(null, new UiMoneyParser())
                 .toFormatter();
 
         this.xmlMoneyFormatter = new MoneyFormatterBuilder()
                 .append(new XmlMoneyWriter(), new XmlMoneyParser())
                 .toFormatter();
 
-        this.shortUiMoneyPrinter = new MoneyFormatterBuilder()
+        this.uiAmountAndSymbolPrinter = new MoneyFormatterBuilder()
                 .appendAmountLocalized()
                 .appendLiteral(" ")
                 .append(new CurrencyDataLookupWriter(this.currencySymbols), null)
                 .toFormatter();
 
-        this.longUiMoneyPrinter = new MoneyFormatterBuilder()
+        this.uiAmountAndNamePrinter = new MoneyFormatterBuilder()
                 .appendAmountLocalized()
                 .appendLiteral(" ")
                 .append(new CurrencyDataLookupWriter(this.currencyNames), null)
@@ -114,18 +113,6 @@ public class CurrencyManager extends CurrencyUnitDataProvider {
 
     public static CurrencyManager getInstance() {
         return instance;
-    }
-
-    MoneyFormatter getUiAmountMoneyFormatter() {
-        if (!this.initialized) {
-            MekHQ.getLogger().log(
-                    CurrencyManager.class,
-                    "getUiAmountMoneyFormatter",
-                    LogLevel.FATAL,
-                    "Attempted to use CurrencyManager before calling initialize"); //$NON-NLS-1$
-        }
-
-        return this.uiAmountMoneyFormatter;
     }
 
     MoneyFormatter getXmlMoneyFormatter() {
@@ -140,7 +127,19 @@ public class CurrencyManager extends CurrencyUnitDataProvider {
         return this.xmlMoneyFormatter;
     }
 
-    MoneyFormatter getShortUiMoneyPrinter() {
+    MoneyFormatter getUiAmountPrinter() {
+        if (!this.initialized) {
+            MekHQ.getLogger().log(
+                    CurrencyManager.class,
+                    "getUiAmountPrinter",
+                    LogLevel.FATAL,
+                    "Attempted to use CurrencyManager before calling initialize"); //$NON-NLS-1$
+        }
+
+        return this.uiAmountPrinter;
+    }
+
+    MoneyFormatter getUiAmountAndSymbolPrinter() {
         if (!this.initialized) {
             MekHQ.getLogger().log(
                     CurrencyManager.class,
@@ -149,10 +148,10 @@ public class CurrencyManager extends CurrencyUnitDataProvider {
                     "Attempted to use CurrencyManager before calling initialize"); //$NON-NLS-1$
         }
 
-        return this.shortUiMoneyPrinter;
+        return this.uiAmountAndSymbolPrinter;
     }
 
-    MoneyFormatter getLongUiMoneyPrinter() {
+    MoneyFormatter getUiAmountAndNamePrinter() {
         if (!this.initialized) {
             MekHQ.getLogger().log(
                     CurrencyManager.class,
@@ -161,7 +160,7 @@ public class CurrencyManager extends CurrencyUnitDataProvider {
                     "Attempted to use CurrencyManager before calling initialize"); //$NON-NLS-1$
         }
 
-        return this.longUiMoneyPrinter;
+        return this.uiAmountAndNamePrinter;
     }
 
     CurrencyUnit getDefaultCurrency() {
@@ -174,8 +173,8 @@ public class CurrencyManager extends CurrencyUnitDataProvider {
         }
 
         for (DefaultCurrency defaultCurrency : this.defaultCurrencies) {
-            if ((defaultCurrency.start >= this.campaign.getGameYear()) &&
-                    (defaultCurrency.end <= this.campaign.getGameYear())) {
+            if ((this.campaign.getGameYear() >= defaultCurrency.start) &&
+                    (this.campaign.getGameYear() <= defaultCurrency.end )) {
                 return defaultCurrency.currency;
             }
         }
@@ -193,12 +192,8 @@ public class CurrencyManager extends CurrencyUnitDataProvider {
     }
 
     @Override
-    protected void registerCurrencies() throws Exception {
-        this.loadFromXmlFile("/build/data/currencies.xml");
-    }
-
-    private void loadFromXmlFile(String xmlFile) throws CampaignXmlParseException {
-        final String METHOD_NAME = "loadFromXmlFile(String xmlFile)"; //$NON-NLS-1$
+    protected void registerCurrencies() {
+        final String METHOD_NAME = "registerCurrencies()"; //$NON-NLS-1$
 
         MekHQ.getLogger().log(
                 CurrencyManager.class,
@@ -211,28 +206,48 @@ public class CurrencyManager extends CurrencyUnitDataProvider {
             DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
 
             // Parse using builder to get DOM representation of the XML file
-            Document xmlDoc = db.parse(new FileInputStream(xmlFile));
+            Document xmlDoc = db.parse(new FileInputStream("data/universe/currencies.xml"));
 
             Element root = xmlDoc.getDocumentElement();
             root.normalize();
-            NodeList currencies = root.getChildNodes();
+            NodeList currencies = root.getElementsByTagName("currency");
+
 
             for (int i = 0; i < currencies.getLength(); i++) {
-                NodeList currencyData = currencies.item(i).getChildNodes();
+                String name = "", code = "", symbol = "";
+                int decimalPlaces = 0, defaultStart = -1, defaultEnd = -1;
 
-                String name = currencyData.item(0).getNodeValue();
-                String code = currencyData.item(1).getNodeValue();
-                int decimalPlaces = Integer.parseInt(currencyData.item(2).getNodeValue());
-                String symbol = currencyData.item(3).getNodeValue();
+                NodeList currencyData = currencies.item(i).getChildNodes();
+                for (int j = 0; j < currencyData.getLength(); j++) {
+                    Node currencyField = currencyData.item(j);
+
+                    switch (currencyField.getNodeName()) {
+                        case "name":
+                            name = currencyField.getTextContent();
+                            break;
+                        case "code":
+                            code = currencyField.getTextContent();
+                            break;
+                        case "symbol":
+                            symbol = currencyField.getTextContent();
+                            break;
+                        case "decimalPlaces":
+                            decimalPlaces = Integer.parseInt(currencyField.getTextContent());
+                            break;
+                        case "defaultStart":
+                            defaultStart = Integer.parseInt(currencyField.getTextContent());
+                            break;
+                        case "defaultEnd":
+                            defaultEnd = Integer.parseInt(currencyField.getTextContent());
+                            break;
+                    }
+                }
 
                 CurrencyUnit currency = CurrencyUnit.registerCurrency(code, -1, decimalPlaces, true);
                 this.currencyNames.put(code, name);
                 this.currencySymbols.put(code, symbol);
 
-                // Check if the currency contains default information
-                if (currencyData.getLength() > 4) {
-                    int defaultStart = Integer.parseInt(currencyData.item(4).getNodeValue());
-                    int defaultEnd = Integer.parseInt(currencyData.item(5).getNodeValue());
+                if (defaultStart != -1 && defaultEnd != -1) {
                     this.defaultCurrencies.add(new DefaultCurrency(currency, defaultStart, defaultEnd));
                 }
             }
@@ -244,7 +259,12 @@ public class CurrencyManager extends CurrencyUnitDataProvider {
                     "Load of currency information complete!"); //$NON-NLS-1$
         } catch (Exception ex) {
             MekHQ.getLogger().error(CurrencyManager.class, METHOD_NAME, ex);
-            throw new CampaignXmlParseException(ex);
+
+            // There was an error loading the currencies data, create a default currency
+            CurrencyUnit defaultCurrency = CurrencyUnit.registerCurrency("CSB", -1, 0, true);
+            this.currencyNames.put("CSB", "ComStar bill");
+            this.currencySymbols.put("CSB", "C-Bill");
+            this.defaultCurrencies.add(new DefaultCurrency(defaultCurrency, 0, 9999));
         }
     }
 }

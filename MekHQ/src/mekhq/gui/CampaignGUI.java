@@ -2826,7 +2826,7 @@ public class CampaignGUI extends JPanel {
             inDebt = " <font color='red'>(in Debt)</font>";
         }
         String text = "<html><b>Funds:</b> "
-                + MekHqMoneyUtil.shortUiMoneyPrinter().print(funds)
+                + MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(funds)
                 + inDebt
                 + "</html>";
         lblFunds.setText(text);

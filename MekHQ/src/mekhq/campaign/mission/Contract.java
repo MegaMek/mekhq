@@ -391,6 +391,10 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
     }
 
     public Money getMonthlyPayOut() {
+        if (getLength() <= 0) {
+            return MekHqMoneyUtil.zero();
+        }
+
         return getTotalAmountPlusFeesAndBonuses()
                 .minus(getTotalAdvanceAmount())
                 .dividedBy(getLength(), RoundingMode.HALF_EVEN);
@@ -585,6 +589,8 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
                                     .multipliedBy(jumpPath.getJumps())
                                     .multipliedBy(2)
                                     .multipliedBy((double)transportComp/100.0, RoundingMode.HALF_EVEN);
+        } else {
+            transportAmount = MekHqMoneyUtil.zero();
         }
 
         //calculate transit amount for CO

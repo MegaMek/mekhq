@@ -270,7 +270,7 @@ public class Campaign implements Serializable, ITechManager {
 
     private ArrayList<String> customs;
 
-    private CampaignOptions campaignOptions = new CampaignOptions();
+    private CampaignOptions campaignOptions;
     private RandomSkillPreferences rskillPrefs = new RandomSkillPreferences();
     private MekHQ app;
 
@@ -295,10 +295,12 @@ public class Campaign implements Serializable, ITechManager {
         game = new Game();
         player = new Player(0, "self");
         game.addPlayer(0, player);
+        calendar = new GregorianCalendar(3067, Calendar.JANUARY, 1);
+        CurrencyManager.getInstance().initialize(this);
+        campaignOptions = new CampaignOptions();
         currentReport = new ArrayList<>();
         currentReportHTML = "";
         newReports = new ArrayList<>();
-        calendar = new GregorianCalendar(3067, Calendar.JANUARY, 1);
         dateFormat = "EEEE, MMMM d yyyy";
         shortDateFormat = "yyyyMMdd";
         name = "My Campaign";
@@ -2574,7 +2576,7 @@ public class Campaign implements Serializable, ITechManager {
                     && !(partWork instanceof Armor)) {
                 Money cost = ((Part) partWork).getStickerPrice().multipliedBy(0.2, RoundingMode.HALF_EVEN);
                 report += "<br>Repairs cost " +
-                        MekHqMoneyUtil.shortUiMoneyPrinter().print(cost) +
+                        MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(cost) +
                         " worth of parts.";
                 finances.debit(cost, Transaction.C_REPAIRS, "Repair of " + partWork.getPartName(), calendar.getTime());
             }
@@ -3688,7 +3690,7 @@ public class Campaign implements Serializable, ITechManager {
             category = Transaction.C_MISC;
         }
         finances.credit(quantity, category, description, calendar.getTime());
-        String quantityString = MekHqMoneyUtil.shortUiMoneyPrinter().print(quantity);
+        String quantityString = MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(quantity);
         addReport("Funds added : " + quantityString + " (" + description + ")");
     }
 
@@ -3747,7 +3749,12 @@ public class Campaign implements Serializable, ITechManager {
     public void sellAmmo(AmmoStorage ammo, int shots) {
         shots = Math.min(shots, ammo.getShots());
         boolean sellingAllAmmo = shots == ammo.getShots();
-        Money cost = ammo.getActualValue().multipliedBy(shots).dividedBy(ammo.getShots(), RoundingMode.HALF_EVEN);
+
+        Money cost = MekHqMoneyUtil.zero();
+        if (ammo.getShots() > 0) {
+            cost = ammo.getActualValue().multipliedBy(shots).dividedBy(ammo.getShots(), RoundingMode.HALF_EVEN);
+        }
+
         finances.credit(cost, Transaction.C_EQUIP_SALE, "Sale of " + shots
                 + " " + ammo.getName(), calendar.getTime());
         if (sellingAllAmmo) {
@@ -6579,7 +6586,7 @@ public class Campaign implements Serializable, ITechManager {
                 finances.credit(remainingMoney, Transaction.C_CONTRACT,
                         "Remaining payment for " + contract.getName(), calendar.getTime());
                 addReport("Your account has been credited for "
-                        + MekHqMoneyUtil.shortUiMoneyPrinter().print(remainingMoney)
+                        + MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(remainingMoney)
                         + " for the remaining payout from contract "
                         + contract.getName());
             }
@@ -6841,7 +6848,7 @@ public class Campaign implements Serializable, ITechManager {
     public void addLoan(Loan loan) {
         addReport("You have taken out loan " + loan.getDescription()
                 + ". Your account has been credited "
-                + MekHqMoneyUtil.shortUiMoneyPrinter().print(loan.getPrincipal())
+                + MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(loan.getPrincipal())
                 + " for the principal amount.");
         finances.addLoan(loan);
         MekHQ.triggerEvent(new LoanNewEvent(loan));
@@ -6853,7 +6860,7 @@ public class Campaign implements Serializable, ITechManager {
         if (finances.debit(loan.getRemainingValue(),
                 Transaction.C_LOAN_PAYMENT, "loan payoff for " + loan.getDescription(), calendar.getTime())) {
             addReport("You have paid off the remaining loan balance of "
-                    + MekHqMoneyUtil.shortUiMoneyPrinter().print(loan.getRemainingValue())
+                    + MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(loan.getRemainingValue())
                     + "on " + loan.getDescription());
             finances.removeLoan(loan);
             MekHQ.triggerEvent(new LoanPaidEvent(loan));
@@ -6933,48 +6940,48 @@ public class Campaign implements Serializable, ITechManager {
         Money liabilities = loans;
         Money netWorth = assets.minus(liabilities);
         int longest = Math.max(
-                MekHqMoneyUtil.shortUiMoneyPrinter().print(liabilities).length(),
-                MekHqMoneyUtil.shortUiMoneyPrinter().print(assets).length());
+                MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(liabilities).length(),
+                MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(assets).length());
         longest = Math.max(
-                MekHqMoneyUtil.shortUiMoneyPrinter().print(netWorth).length(),
+                MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(netWorth).length(),
                 longest);
         String formatted = "%1$" + longest + "s";
         sb.append("Net Worth................ ")
-                .append(String.format(formatted, MekHqMoneyUtil.shortUiMoneyPrinter().print(netWorth))).append("\n\n");
+                .append(String.format(formatted, MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(netWorth))).append("\n\n");
         sb.append("    Assets............... ")
-                .append(String.format(formatted, MekHqMoneyUtil.shortUiMoneyPrinter().print(assets))).append("\n");
+                .append(String.format(formatted, MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(assets))).append("\n");
         sb.append("       Cash.............. ")
-                .append(String.format(formatted, MekHqMoneyUtil.shortUiMoneyPrinter().print(cash))).append("\n");
+                .append(String.format(formatted, MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(cash))).append("\n");
         if (MoneyUtils.isPositive(mech)) {
             sb.append("       Mechs............. ")
-                    .append(String.format(formatted, MekHqMoneyUtil.shortUiMoneyPrinter().print(mech))).append("\n");
+                    .append(String.format(formatted, MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(mech))).append("\n");
         }
         if (MoneyUtils.isPositive(vee)) {
             sb.append("       Vehicles.......... ")
-                    .append(String.format(formatted, MekHqMoneyUtil.shortUiMoneyPrinter().print(vee))).append("\n");
+                    .append(String.format(formatted, MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(vee))).append("\n");
         }
         if (MoneyUtils.isPositive(ba)) {
             sb.append("       BattleArmor....... ")
-                    .append(String.format(formatted, MekHqMoneyUtil.shortUiMoneyPrinter().print(ba))).append("\n");
+                    .append(String.format(formatted, MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(ba))).append("\n");
         }
         if (MoneyUtils.isPositive(infantry)) {
             sb.append("       Infantry.......... ")
-                    .append(String.format(formatted, MekHqMoneyUtil.shortUiMoneyPrinter().print(infantry))).append("\n");
+                    .append(String.format(formatted, MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(infantry))).append("\n");
         }
         if (MoneyUtils.isPositive(proto)) {
             sb.append("       Protomechs........ ")
-                    .append(String.format(formatted, MekHqMoneyUtil.shortUiMoneyPrinter().print(proto))).append("\n");
+                    .append(String.format(formatted, MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(proto))).append("\n");
         }
         if (MoneyUtils.isPositive(smallCraft)) {
             sb.append("       Small Craft....... ")
-                    .append(String.format(formatted, MekHqMoneyUtil.shortUiMoneyPrinter().print(smallCraft))).append("\n");
+                    .append(String.format(formatted, MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(smallCraft))).append("\n");
         }
         if (MoneyUtils.isPositive(largeCraft)) {
             sb.append("       Large Craft....... ")
-                    .append(String.format(formatted, MekHqMoneyUtil.shortUiMoneyPrinter().print(largeCraft))).append("\n");
+                    .append(String.format(formatted, MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(largeCraft))).append("\n");
         }
         sb.append("       Spare Parts....... ")
-                .append(String.format(formatted, MekHqMoneyUtil.shortUiMoneyPrinter().print(spareParts))).append("\n");
+                .append(String.format(formatted, MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(spareParts))).append("\n");
 
         if (getFinances().getAllAssets().size() > 0) {
             for (Asset asset : getFinances().getAllAssets()) {
@@ -6989,38 +6996,38 @@ public class Campaign implements Serializable, ITechManager {
                 }
                 assetName += " ";
                 sb.append("       ").append(assetName)
-                        .append(String.format(formatted, MekHqMoneyUtil.shortUiMoneyPrinter().print(asset.getValue())))
+                        .append(String.format(formatted, MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(asset.getValue())))
                         .append("\n");
             }
         }
         sb.append("\n");
         sb.append("    Liabilities.......... ")
-                .append(String.format(formatted, MekHqMoneyUtil.shortUiMoneyPrinter().print(liabilities))).append("\n");
+                .append(String.format(formatted, MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(liabilities))).append("\n");
         sb.append("       Loans............. ")
-                .append(String.format(formatted, MekHqMoneyUtil.shortUiMoneyPrinter().print(loans))).append("\n\n\n");
+                .append(String.format(formatted, MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(loans))).append("\n\n\n");
 
         sb.append("Monthly Profit........... ")
-                .append(String.format(formatted, MekHqMoneyUtil.shortUiMoneyPrinter().print(monthlyIncome.minus(monthlyExpenses))))
+                .append(String.format(formatted, MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(monthlyIncome.minus(monthlyExpenses))))
                 .append("\n\n");
         sb.append("Monthly Income........... ")
-                .append(String.format(formatted, MekHqMoneyUtil.shortUiMoneyPrinter().print(monthlyIncome))).append("\n");
+                .append(String.format(formatted, MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(monthlyIncome))).append("\n");
         sb.append("    Contract Payments.... ")
-                .append(String.format(formatted, MekHqMoneyUtil.shortUiMoneyPrinter().print(contracts))).append("\n\n");
+                .append(String.format(formatted, MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(contracts))).append("\n\n");
         sb.append("Monthly Expenses......... ")
-                .append(String.format(formatted, MekHqMoneyUtil.shortUiMoneyPrinter().print(monthlyExpenses))).append("\n");
+                .append(String.format(formatted, MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(monthlyExpenses))).append("\n");
         sb.append("    Salaries............. ")
-                .append(String.format(formatted, MekHqMoneyUtil.shortUiMoneyPrinter().print(salaries))).append("\n");
+                .append(String.format(formatted, MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(salaries))).append("\n");
         sb.append("    Maintenance.......... ")
-                .append(String.format(formatted, MekHqMoneyUtil.shortUiMoneyPrinter().print(maintenance))).append("\n");
+                .append(String.format(formatted, MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(maintenance))).append("\n");
         sb.append("    Overhead............. ")
-                .append(String.format(formatted, MekHqMoneyUtil.shortUiMoneyPrinter().print(overhead))).append("\n");
+                .append(String.format(formatted, MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(overhead))).append("\n");
         if (campaignOptions.usePeacetimeCost()) {
             sb.append("    Spare Parts.......... ")
-                    .append(String.format(formatted, MekHqMoneyUtil.shortUiMoneyPrinter().print(coSpareParts))).append("\n");
+                    .append(String.format(formatted, MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(coSpareParts))).append("\n");
             sb.append("    Training Munitions... ")
-                    .append(String.format(formatted, MekHqMoneyUtil.shortUiMoneyPrinter().print(coAmmo))).append("\n");
+                    .append(String.format(formatted, MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(coAmmo))).append("\n");
             sb.append("    Fuel................. ")
-                    .append(String.format(formatted, MekHqMoneyUtil.shortUiMoneyPrinter().print(coFuel))).append("\n");
+                    .append(String.format(formatted, MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(coFuel))).append("\n");
         }
 
         return new String(sb);
@@ -7622,7 +7629,7 @@ public class Campaign implements Serializable, ITechManager {
                 "Retired Combat Personnel", countRetired);
         sb.append(buffer);
 
-        sb.append("\nMonthly Salary For Combat Personnel: " + MekHqMoneyUtil.shortUiMoneyPrinter().print(salary));
+        sb.append("\nMonthly Salary For Combat Personnel: " + MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(salary));
 
         return new String(sb);
     }
@@ -7697,7 +7704,7 @@ public class Campaign implements Serializable, ITechManager {
                 "Retired Support Personnel", countRetired);
         sb.append(buffer);
 
-        sb.append("\nMonthly Salary For Support Personnel: " + MekHqMoneyUtil.shortUiMoneyPrinter().print(salary));
+        sb.append("\nMonthly Salary For Support Personnel: " + MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(salary));
 
         sb.append(String.format("\nYou have " + prisoners + " prisoner%s",
                 prisoners == 1 ? "" : "s"));
@@ -8043,7 +8050,7 @@ public class Campaign implements Serializable, ITechManager {
             JOptionPane.showMessageDialog(
                     null,
                     "You have overdue loan payments totaling "
-                            + MekHqMoneyUtil.shortUiMoneyPrinter().print(overdueAmount)
+                            + MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(overdueAmount)
                             + "\nYou must deal with these payments before advancing the day.\nHere are some options:\n  - Sell off equipment to generate funds.\n  - Pay off the collateral on the loan.\n  - Default on the loan.\n  - Just cheat and remove the loan via GM mode.",
                             "Overdue Loan Payments",
                             JOptionPane.WARNING_MESSAGE);

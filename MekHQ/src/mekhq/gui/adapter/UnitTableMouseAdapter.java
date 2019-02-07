@@ -177,7 +177,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                     Money sellValue = unit.getSellValue();
                     NumberFormat numberFormat = NumberFormat
                             .getNumberInstance();
-                    String text = MekHqMoneyUtil.shortUiMoneyPrinter().print(sellValue);
+                    String text = MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(sellValue);
                     if (0 == JOptionPane.showConfirmDialog(null,
                             "Do you really want to sell " + unit.getName()
                                     + " for " + text, "Sell Unit?",

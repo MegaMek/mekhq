@@ -193,7 +193,6 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
         		try {
         			fis = new FileInputStream(fileCampaign);
         			campaign = CampaignFactory.newInstance(app).createCampaign(fis);
-                    CurrencyManager.getInstance().initialize(campaign);
         			// Restores all transient attributes from serialized objects
         			campaign.restore();
         			campaign.cleanUp();

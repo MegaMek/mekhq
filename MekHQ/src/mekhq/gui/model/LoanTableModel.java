@@ -3,7 +3,6 @@ package mekhq.gui.model;
 import java.awt.Color;
 import java.awt.Component;
 import java.text.DateFormat;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 import javax.swing.JTable;
@@ -12,6 +11,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Loan;
+import mekhq.campaign.finances.MekHqMoneyUtil;
 
 /**
  * A table model for displaying active loans
@@ -75,16 +75,16 @@ public class LoanTableModel extends DataTableModel {
             return loan.getDescription();
         }
         if(col == COL_COLLATERAL) {
-            return DecimalFormat.getInstance().format(loan.getCollateralAmount());
+            return MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(loan.getCollateralAmount());
         }
         if(col == COL_VALUE) {
-            return DecimalFormat.getInstance().format(loan.getRemainingValue());
+            return MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(loan.getRemainingValue());
         }
         if(col == COL_PAYMENT) {
-            return DecimalFormat.getInstance().format(loan.getPaymentAmount());
+            return MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(loan.getPaymentAmount());
         }
         if(col == COL_PRINCIPAL) {
-            return DecimalFormat.getInstance().format(loan.getPrincipal());
+            return MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(loan.getPrincipal());
         }
         if(col == COL_SCHEDULE) {
             return Finances.getScheduleName(loan.getPaymentSchedule());

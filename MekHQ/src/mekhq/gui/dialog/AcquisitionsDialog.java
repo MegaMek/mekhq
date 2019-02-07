@@ -222,7 +222,7 @@ public class AcquisitionsDialog extends JDialog {
 
         if (MoneyUtils.isPositive(PartsAcquisitionService.getMissingTotalPrice())) {
             String price = "Missing item price: "
-                    + MekHqMoneyUtil.shortUiMoneyPrinter().print(PartsAcquisitionService.getMissingTotalPrice());
+                    + MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(PartsAcquisitionService.getMissingTotalPrice());
 
             sbText.append(price);
             sbText.append("<br/>");
@@ -405,13 +405,13 @@ public class AcquisitionsDialog extends JDialog {
                 sbText.append(inventoryInfo);
                 sbText.append("<br/>");
 
-                String price = "Item Price: " + MekHqMoneyUtil.shortUiMoneyPrinter().print(partCountInfo.getStickerPrice());
+                String price = "Item Price: " + MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(partCountInfo.getStickerPrice());
 
                 sbText.append(price);
                 sbText.append("<br/>");
 
                 if (partCountInfo.getMissingCount() > 1) {
-                    price = "Missing item price: " + MekHqMoneyUtil.shortUiMoneyPrinter().print(
+                    price = "Missing item price: " + MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(
                             partCountInfo.getStickerPrice().multipliedBy(partCountInfo.getMissingCount()));
 
                     sbText.append(price);

@@ -23,6 +23,8 @@ package mekhq.campaign.finances;
 import org.joda.money.*;
 import org.joda.money.format.MoneyFormatter;
 
+import java.math.RoundingMode;
+
 /**
  * Class with helper methods to operate on money classes from joda.money.
  */
@@ -40,27 +42,27 @@ public class MekHqMoneyUtil {
     }
 
     public static Money money(double amount) {
-        return Money.of(defaultCurrency(), amount);
+        return bigMoney(amount).toMoney(RoundingMode.HALF_EVEN);
     }
 
     public static BigMoney bigMoney(double amount) {
         return BigMoney.of(defaultCurrency(), amount);
     }
 
-    public static MoneyFormatter uiAmountMoneyFormatter() {
-        return CurrencyManager.getInstance().getUiAmountMoneyFormatter();
-    }
-
     public static MoneyFormatter xmlMoneyFormatter() {
         return CurrencyManager.getInstance().getXmlMoneyFormatter();
     }
 
-    public static MoneyFormatter shortUiMoneyPrinter() {
-        return CurrencyManager.getInstance().getShortUiMoneyPrinter();
+    public static MoneyFormatter uiAmountPrinter() {
+        return CurrencyManager.getInstance().getUiAmountPrinter();
     }
 
-    public static MoneyFormatter longUiMoneyPrinter() {
-        return CurrencyManager.getInstance().getLongUiMoneyPrinter();
+    public static MoneyFormatter uiAmountAndSymbolPrinter() {
+        return CurrencyManager.getInstance().getUiAmountAndSymbolPrinter();
+    }
+
+    public static MoneyFormatter uiAmountAndNamePrinter() {
+        return CurrencyManager.getInstance().getUiAmountAndNamePrinter();
     }
 
     public static boolean isGreaterOrEqual(Money left, Money right) {

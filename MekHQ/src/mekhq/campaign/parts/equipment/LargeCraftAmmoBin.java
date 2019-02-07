@@ -159,12 +159,16 @@ public class LargeCraftAmmoBin extends AmmoBin {
     
     @Override
     public Money getValueNeeded() {
+        if (getShotsPerTon() <= 0) {
+            return MekHqMoneyUtil.zero();
+        }
+
         return adjustCostsForCampaignOptions(getPricePerTon()
                 .toBigMoney()
                 .multipliedBy(capacity)
                 .multipliedBy(shotsNeeded)
                 .dividedBy(getShotsPerTon(), RoundingMode.HALF_EVEN)
-                .toMoney());
+                .toMoney(RoundingMode.HALF_EVEN));
     }
 
     @Override
@@ -176,12 +180,16 @@ public class LargeCraftAmmoBin extends AmmoBin {
     
     @Override
     public Money getStickerPrice() {
+        if (getShotsPerTon() <= 0) {
+            return MekHqMoneyUtil.zero();
+        }
+
         return getPricePerTon()
                 .toBigMoney()
                 .multipliedBy(capacity)
                 .multipliedBy(getCurrentShots())
                 .dividedBy(getShotsPerTon(), RoundingMode.HALF_EVEN)
-                .toMoney();
+                .toMoney(RoundingMode.HALF_EVEN);
     }
 
     @Override

@@ -387,7 +387,7 @@ public final class FinancesTab extends CampaignGuiTab {
         AddFundsDialog addFundsDialog = new AddFundsDialog(getFrame(), true);
         addFundsDialog.setVisible(true);
         if (addFundsDialog.getClosedType() == JOptionPane.OK_OPTION) {
-            Money funds = MekHqMoneyUtil.money(addFundsDialog.getFundsQuantity());
+            Money funds = addFundsDialog.getFundsQuantity();
             String description = addFundsDialog.getFundsDescription();
             int category = addFundsDialog.getCategory();
             getCampaign().addFunds(funds, description, category);

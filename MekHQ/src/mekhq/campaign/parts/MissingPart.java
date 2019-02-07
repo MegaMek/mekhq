@@ -282,7 +282,7 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 		    }
 		}
 		toReturn += "<br/>";
-		toReturn += MekHqMoneyUtil.shortUiMoneyPrinter().print(getBuyCost()) + "<br/>";
+		toReturn += MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(getBuyCost()) + "<br/>";
 		toReturn += "</font></html>";
 		return toReturn;
 	}

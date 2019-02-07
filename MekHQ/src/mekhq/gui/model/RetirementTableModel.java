@@ -241,7 +241,7 @@ public class RetirementTableModel extends AbstractTableModel {
                     (payBonus.get(p.getId())?1:0) +
                     miscMods.get(p.getId()) + generalMod;
         case COL_BONUS_COST:
-            return MekHqMoneyUtil.shortUiMoneyPrinter().print(RetirementDefectionTracker.getBonusCost(p));
+            return MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(RetirementDefectionTracker.getBonusCost(p));
         case COL_PAY_BONUS:
             if (null == payBonus.get(p.getId())) {
                 return false;
@@ -259,7 +259,7 @@ public class RetirementTableModel extends AbstractTableModel {
                 return "";
             }
             if (altPayout.keySet().contains(p.getId())) {
-                return MekHqMoneyUtil.shortUiMoneyPrinter().print(altPayout.get(p.getId()));
+                return MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(altPayout.get(p.getId()));
             }
             Money payout = campaign.getRetirementDefectionTracker().getPayout(p.getId()).getPayoutAmount();
             /* If no unit is required as part of the payout, the unit is part or all of the
@@ -287,7 +287,7 @@ public class RetirementTableModel extends AbstractTableModel {
             if (payout.isNegative()) {
                 payout = MekHqMoneyUtil.zero();
             }
-            return MekHqMoneyUtil.shortUiMoneyPrinter().print(payout);
+            return MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(payout);
         case COL_UNIT:
             if (null == campaign.getRetirementDefectionTracker().getPayout(p.getId()) ||
                     null == unitAssignments) {
@@ -326,7 +326,7 @@ public class RetirementTableModel extends AbstractTableModel {
         if (col == COL_PAYOUT) {
             Money payout;
             try {
-                payout = MekHqMoneyUtil.uiAmountMoneyFormatter().parseMoney((String)value);
+                payout = MekHqMoneyUtil.money(Double.parseDouble(value.toString()));
             } catch (Exception e1) {
                 return;
             }

@@ -3,7 +3,6 @@ package mekhq.gui.model;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Image;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -18,6 +17,7 @@ import megamek.common.SmallCraft;
 import megamek.common.UnitType;
 import mekhq.IconPackage;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.finances.MekHqMoneyUtil;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.BasicInfo;
 import mekhq.gui.dialog.RetirementDefectionDialog;
@@ -103,7 +103,6 @@ public class UnitAssignmentTableModel extends AbstractTableModel {
     @Override
     public Object getValueAt(int row, int col) {
         Unit u;
-        DecimalFormat formatter = new DecimalFormat();
         if(data.isEmpty()) {
             return "";
         } else {
@@ -118,7 +117,7 @@ public class UnitAssignmentTableModel extends AbstractTableModel {
         case COL_CLASS:
             return RetirementDefectionDialog.weightClassIndex(u);
         case COL_COST:
-            return formatter.format(u.getBuyCost());
+            return MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(u.getBuyCost());
         default:
             return "?";
         }

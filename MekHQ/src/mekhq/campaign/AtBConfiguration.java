@@ -321,6 +321,10 @@ public class AtBConfiguration implements Serializable {
     }
 
     public Money shipSearchCostPerWeek() {
+        if (shipSearchLengthWeeks <= 0) {
+            return MekHqMoneyUtil.zero();
+        }
+
         return shipSearchCost.dividedBy(shipSearchLengthWeeks, RoundingMode.HALF_EVEN);
     }
 

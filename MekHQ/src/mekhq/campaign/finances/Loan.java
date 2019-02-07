@@ -457,23 +457,15 @@ public class Loan implements MekHqXmlSerializable {
         //we are going to treat the score from StellarOps the same as dragoons score
         //TODO: pirates and government forces
         if(rating <= 0) {
-            return new Loan(
-                    Money.of(CurrencyManager.getInstance().getDefaultCurrency() ,10000000),
-                    35, 80, 1, Finances.SCHEDULE_MONTHLY, cal);
-        }
-        else if(rating < 5) {
-            return new Loan(
-                    Money.of(CurrencyManager.getInstance().getDefaultCurrency() , 10000000),
-                    20, 60, 1, Finances.SCHEDULE_MONTHLY, cal);
+            return new Loan(MekHqMoneyUtil.money(10000000), 35, 80, 1, Finances.SCHEDULE_MONTHLY, cal);
+        } else if(rating < 5) {
+            return new Loan(MekHqMoneyUtil.money(10000000), 20, 60, 1, Finances.SCHEDULE_MONTHLY, cal);
         } else if(rating < 10) {
-            return new Loan(Money.of(CurrencyManager.getInstance().getDefaultCurrency() ,10000000),
-                    15, 40, 2, Finances.SCHEDULE_MONTHLY, cal);
+            return new Loan(MekHqMoneyUtil.money(10000000), 15, 40, 2, Finances.SCHEDULE_MONTHLY, cal);
         } else if(rating < 14) {
-            return new Loan(Money.of(CurrencyManager.getInstance().getDefaultCurrency() ,10000000),
-                    10, 25, 3, Finances.SCHEDULE_MONTHLY, cal);
+            return new Loan(MekHqMoneyUtil.money(10000000), 10, 25, 3, Finances.SCHEDULE_MONTHLY, cal);
         } else {
-            return new Loan(Money.of(CurrencyManager.getInstance().getDefaultCurrency() ,10000000),
-                    7, 15, 5, Finances.SCHEDULE_MONTHLY, cal);
+            return new Loan(MekHqMoneyUtil.money(10000000), 7, 15, 5, Finances.SCHEDULE_MONTHLY, cal);
         }
     }
 

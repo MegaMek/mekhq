@@ -118,7 +118,7 @@ public class Transaction implements Serializable {
 	private int category;
 	
 	public Transaction() {
-		this(Money.zero(CurrencyManager.getInstance().getDefaultCurrency()),-1,"",null);
+		this(MekHqMoneyUtil.zero(),-1,"",null);
 	}
 	
 	public Transaction(Money a, int c, String d, Date dt) {

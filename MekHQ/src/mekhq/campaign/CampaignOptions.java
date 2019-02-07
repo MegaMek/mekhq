@@ -2485,8 +2485,8 @@ public class CampaignOptions implements Serializable {
                 + "</planetOutputAcquisitionBonus>");
         
         pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                    + "<salaryTypeBase>"
-                    + Utilities.printIntegerList(Arrays.stream(salaryTypeBase).map(Money::getAmountMajorInt).collect(Collectors.toList()))
+                    + "<salaryTypeBase version=\"2\">"
+                    + Utilities.printMoneyArray(salaryTypeBase)
                     + "</salaryTypeBase>");
         pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                     + "<salaryXpMultiplier>"
@@ -2829,10 +2829,7 @@ public class CampaignOptions implements Serializable {
             } else if (wn2.getNodeName().equalsIgnoreCase("salaryAntiMekMultiplier")) {
                 retVal.salaryAntiMekMultiplier = Double.parseDouble(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("salaryTypeBase")) {
-                String[] values = wn2.getTextContent().split(",");
-                for (int i = 0; i < values.length; i++) {
-                    retVal.salaryTypeBase[i] = MekHqMoneyUtil.money(Integer.parseInt(values[i]));
-                }
+                retVal.salaryTypeBase = Utilities.readMoneyArray(wn2);
             } else if (wn2.getNodeName().equalsIgnoreCase("salaryXpMultiplier")) {
                 String[] values = wn2.getTextContent().split(",");
                 for (int i = 0; i < values.length; i++) {

@@ -118,6 +118,10 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
     
     @Override
     public Money getCurrentValue() {
+        if (((AmmoType)type).getShots() <= 0) {
+            return MekHqMoneyUtil.zero();
+        }
+
     	return getStickerPrice().multipliedBy(shots).dividedBy(((AmmoType)type).getShots(), RoundingMode.HALF_EVEN);
     }
 
@@ -305,7 +309,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
         toReturn += getAcquisitionExtraDesc() + "<br/>";
         PartInventory inventories = campaign.getPartInventory(getAcquisitionPart());
         toReturn += inventories.getTransitOrderedDetails() + "<br/>"; 
-        toReturn += MekHqMoneyUtil.shortUiMoneyPrinter().print(getStickerPrice()) + "<br/>";
+        toReturn += MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(getStickerPrice()) + "<br/>";
         toReturn += "</font></html>";
         return toReturn;
     }

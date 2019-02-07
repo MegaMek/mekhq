@@ -1086,7 +1086,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
         sj.add(hits + " hit(s)");
         if (campaign.getCampaignOptions().payForRepairs() && (hits > 0)) {
             Money repairCost = getStickerPrice().multipliedBy(0.2, RoundingMode.HALF_EVEN);
-            sj.add(MekHqMoneyUtil.shortUiMoneyPrinter().print(repairCost) + " to repair");
+            sj.add(MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(repairCost) + " to repair");
         }
         return sj.toString();
     }

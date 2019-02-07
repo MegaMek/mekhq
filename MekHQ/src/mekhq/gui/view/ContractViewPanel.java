@@ -23,7 +23,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.math.RoundingMode;
-import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ResourceBundle;
 
@@ -33,6 +32,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
 import megamek.common.util.EncodeControl;
+import mekhq.campaign.finances.MekHqMoneyUtil;
 import mekhq.campaign.mission.Contract;
 
 /**
@@ -264,10 +264,9 @@ public class ContractViewPanel extends JPanel {
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(lblPayout, gridBagConstraints);
-        
-        DecimalFormat numFormatter = new DecimalFormat();
+
         txtPayout.setName("txtPayout"); // NOI18N
-        txtPayout.setText(numFormatter.format(contract.getMonthlyPayOut()) + " C-Bills");
+        txtPayout.setText(MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(contract.getMonthlyPayOut()));
         txtPayout.setEditable(false);
         txtPayout.setLineWrap(true);
         txtPayout.setWrapStyleWord(true);
@@ -325,8 +324,7 @@ public class ContractViewPanel extends JPanel {
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(txtBLC, gridBagConstraints);
-        
-        DecimalFormat formatter = new DecimalFormat();
+
         int i = 9;
         if(contract.getSalvagePct() > 0 && !contract.isSalvageExchange()) {
             lblSalvageValueMerc = new JLabel(resourceMap.getString("lblSalvageValueMerc.text"));       
@@ -337,7 +335,7 @@ public class ContractViewPanel extends JPanel {
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlStats.add(lblSalvageValueMerc, gridBagConstraints);
             txtSalvageValueMerc = new JTextArea();
-            txtSalvageValueMerc.setText(formatter.format(contract.getSalvagedByUnit()) + " C-Bills");       
+            txtSalvageValueMerc.setText(MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(contract.getSalvagedByUnit()));
             txtSalvageValueMerc.setEditable(false);
             txtSalvageValueMerc.setLineWrap(true);
             txtSalvageValueMerc.setWrapStyleWord(true);
@@ -358,7 +356,7 @@ public class ContractViewPanel extends JPanel {
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlStats.add(lblSalvageValueEmployer, gridBagConstraints);
             txtSalvageValueEmployer = new JTextArea();
-            txtSalvageValueEmployer.setText(formatter.format(contract.getSalvagedByEmployer()) + " C-Bills");       
+            txtSalvageValueEmployer.setText(MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(contract.getSalvagedByEmployer()));
             txtSalvageValueEmployer.setEditable(false);
             txtSalvageValueEmployer.setLineWrap(true);
             txtSalvageValueEmployer.setWrapStyleWord(true);
@@ -382,11 +380,16 @@ public class ContractViewPanel extends JPanel {
         } else {
             lblSalvagePct1.setText(resourceMap.getString("lblSalvagePct.text"));   
             int maxSalvagePct = contract.getSalvagePct();
-            int currentSalvagePct = contract.getSalvagedByUnit()
-                    .dividedBy(contract.getSalvagedByUnit().plus(contract.getSalvagedByEmployer()).getAmount(), RoundingMode.HALF_EVEN)
-                    .multipliedBy(100)
-                    .getAmount()
-                    .intValue();
+
+            int currentSalvagePct = 0;
+            if (contract.getSalvagedByUnit().plus(contract.getSalvagedByUnit()).isPositive()) {
+                currentSalvagePct = contract.getSalvagedByUnit()
+                        .dividedBy(contract.getSalvagedByUnit().plus(contract.getSalvagedByEmployer()).getAmount(), RoundingMode.HALF_EVEN)
+                        .multipliedBy(100)
+                        .getAmount()
+                        .intValue();
+            }
+
             String lead = "<html><font color='black'>";
             if(currentSalvagePct > maxSalvagePct) {
                 lead = "<html><font color='red'>";
