@@ -206,49 +206,51 @@ public class CurrencyManager extends CurrencyUnitDataProvider {
             DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
 
             // Parse using builder to get DOM representation of the XML file
-            Document xmlDoc = db.parse(new FileInputStream("data/universe/currencies.xml"));
+            try (FileInputStream xmlFile = new FileInputStream("data/universe/currencies.xml")){
+                Document xmlDoc = db.parse(xmlFile);
 
-            Element root = xmlDoc.getDocumentElement();
-            root.normalize();
-            NodeList currencies = root.getElementsByTagName("currency");
+                Element root = xmlDoc.getDocumentElement();
+                root.normalize();
+                NodeList currencies = root.getElementsByTagName("currency");
 
 
-            for (int i = 0; i < currencies.getLength(); i++) {
-                String name = "", code = "", symbol = "";
-                int decimalPlaces = 0, defaultStart = -1, defaultEnd = -1;
+                for (int i = 0; i < currencies.getLength(); i++) {
+                    String name = "", code = "", symbol = "";
+                    int decimalPlaces = 0, defaultStart = -1, defaultEnd = -1;
 
-                NodeList currencyData = currencies.item(i).getChildNodes();
-                for (int j = 0; j < currencyData.getLength(); j++) {
-                    Node currencyField = currencyData.item(j);
+                    NodeList currencyData = currencies.item(i).getChildNodes();
+                    for (int j = 0; j < currencyData.getLength(); j++) {
+                        Node currencyField = currencyData.item(j);
 
-                    switch (currencyField.getNodeName()) {
-                        case "name":
-                            name = currencyField.getTextContent();
-                            break;
-                        case "code":
-                            code = currencyField.getTextContent();
-                            break;
-                        case "symbol":
-                            symbol = currencyField.getTextContent();
-                            break;
-                        case "decimalPlaces":
-                            decimalPlaces = Integer.parseInt(currencyField.getTextContent());
-                            break;
-                        case "defaultStart":
-                            defaultStart = Integer.parseInt(currencyField.getTextContent());
-                            break;
-                        case "defaultEnd":
-                            defaultEnd = Integer.parseInt(currencyField.getTextContent());
-                            break;
+                        switch (currencyField.getNodeName()) {
+                            case "name":
+                                name = currencyField.getTextContent();
+                                break;
+                            case "code":
+                                code = currencyField.getTextContent();
+                                break;
+                            case "symbol":
+                                symbol = currencyField.getTextContent();
+                                break;
+                            case "decimalPlaces":
+                                decimalPlaces = Integer.parseInt(currencyField.getTextContent());
+                                break;
+                            case "defaultStart":
+                                defaultStart = Integer.parseInt(currencyField.getTextContent());
+                                break;
+                            case "defaultEnd":
+                                defaultEnd = Integer.parseInt(currencyField.getTextContent());
+                                break;
+                        }
                     }
-                }
 
-                CurrencyUnit currency = CurrencyUnit.registerCurrency(code, -1, decimalPlaces, true);
-                this.currencyNames.put(code, name);
-                this.currencySymbols.put(code, symbol);
+                    CurrencyUnit currency = CurrencyUnit.registerCurrency(code, -1, decimalPlaces, true);
+                    this.currencyNames.put(code, name);
+                    this.currencySymbols.put(code, symbol);
 
-                if (defaultStart != -1 && defaultEnd != -1) {
-                    this.defaultCurrencies.add(new DefaultCurrency(currency, defaultStart, defaultEnd));
+                    if (defaultStart != -1 && defaultEnd != -1) {
+                        this.defaultCurrencies.add(new DefaultCurrency(currency, defaultStart, defaultEnd));
+                    }
                 }
             }
 

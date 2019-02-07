@@ -5,7 +5,6 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.spy;
 
 import megamek.common.logging.DefaultMmLogger;
-import mekhq.TestUtilities;
 import mekhq.campaign.finances.CurrencyManager;
 import mekhq.campaign.finances.MekHqMoneyUtil;
 import org.joda.money.CurrencyUnit;
@@ -15,14 +14,18 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({MekHqMoneyUtil.class, CurrencyManager.class, DefaultMmLogger.class})
+@PowerMockIgnore({"com.sun.org.apache.xerces.*", "javax.xml.*", "org.xml.*", "org.w3c.dom.*"})
+@PrepareForTest({MekHqMoneyUtil.class, CurrencyManager.class, DefaultMmLogger.class, Ranks.class, SpecialAbility.class, CustomOption.class})
 public class PersonTest {
     private Person mockPerson;
 
@@ -43,6 +46,12 @@ public class PersonTest {
 
         PowerMockito.mockStatic(DefaultMmLogger.class);
         Mockito.when(DefaultMmLogger.getInstance()).thenReturn(defaultMMLoggerMock);
+
+        PowerMockito.mockStatic(Ranks.class);
+        PowerMockito.mockStatic(SpecialAbility.class);
+
+        PowerMockito.mockStatic(CustomOption.class);
+        Mockito.when(CustomOption.getCustomAbilities()).thenReturn(new ArrayList<>());
     }
 
     @Test
@@ -121,7 +130,7 @@ public class PersonTest {
     }
 
     private void initPerson(){
-        mockPerson = spy(new Person("Test", TestUtilities.getTestCampaign(), "MERC"));
+        mockPerson = spy(new Person("Test", null, "MERC"));
     }
 
     private void initAwards(){

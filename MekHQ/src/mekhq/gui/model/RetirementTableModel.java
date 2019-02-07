@@ -324,13 +324,16 @@ public class RetirementTableModel extends AbstractTableModel {
     @Override
     public void setValueAt(Object value, int row, int col) {
         if (col == COL_PAYOUT) {
-            Money payout;
             try {
-                payout = MekHqMoneyUtil.money(Double.parseDouble(value.toString()));
+                if (value == null) {
+                    return;
+                }
+
+                Money payout = MekHqMoneyUtil.money(Double.parseDouble(value.toString()));
+                altPayout.put(data.get(row), payout);
             } catch (Exception e1) {
                 return;
             }
-            altPayout.put(data.get(row), payout);
         } else if (col == COL_PAY_BONUS) {
             payBonus.put(data.get(row), (Boolean)value);
         } else if (col == COL_MISC_MOD) {
