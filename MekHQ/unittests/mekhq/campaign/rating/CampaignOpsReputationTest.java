@@ -37,6 +37,7 @@ import megamek.common.MechBay;
 import megamek.common.Tank;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Finances;
+import mekhq.campaign.finances.MekHqMoneyUtil;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Skill;
@@ -44,10 +45,16 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 
+import org.joda.money.CurrencyUnit;
+import org.joda.money.Money;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+import org.mockito.Mockito;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -66,143 +73,148 @@ import static org.junit.Assert.*;
  * @since 9/28/13 11:20 AM
  */
 @SuppressWarnings("FieldCanBeLocal")
-@RunWith(JUnit4.class)
+@RunWith(PowerMockRunner.class)
+@PrepareForTest(MekHqMoneyUtil.class)
 public class CampaignOpsReputationTest {
 
-    private Campaign mockCampaign = mock(Campaign.class);
-    private ArrayList<Unit> unitList = new ArrayList<>();
-    private ArrayList<Person> personnelList = new ArrayList<>();
-    private ArrayList<Person> activePersonnelList = new ArrayList<>();
-    private ArrayList<Mission> missionList = new ArrayList<>();
+    private Campaign mockCampaign;
+    private ArrayList<Unit> unitList;
+    private ArrayList<Person> personnelList;
+    private ArrayList<Person> activePersonnelList;
+    private ArrayList<Mission> missionList;
 
     // Mothballed units.
-    private Unit mockMechMothballed = mock(Unit.class);
-    private Unit mockAeroMothballed = mock(Unit.class);
-    private Unit mockTankMothballed = mock(Unit.class);
+    private Unit mockMechMothballed;
+    private Unit mockAeroMothballed;
+    private Unit mockTankMothballed;
 
     // Mechs
-    private Skill mockMechGunnery = mock(Skill.class);
-    private Skill mockMechPilot = mock(Skill.class);
-    private Skill mockLeader = mock(Skill.class);
-    private Skill mockTactics = mock(Skill.class);
-    private Skill mockStrategy = mock(Skill.class);
-    private Skill mockNegotiation = mock(Skill.class);
-    private BipedMech mockThunderbolt1 = mock(BipedMech.class);
-    private Unit mockThunderboltUnit1 = mock(Unit.class);
-    private Person mockThunderbolt1Pilot = mock(Person.class);
-    private Person mockThunderbolt1Tech = mock(Person.class);
-    private BipedMech mockThunderbolt2 = mock(BipedMech.class);
-    private Unit mockThunderboltUnit2 = mock(Unit.class);
-    private Person mockThunderbolt2Pilot = mock(Person.class);
-    private Person mockThunderbolt2Tech = mock(Person.class);
-    private BipedMech mockGrasshopper1 = mock(BipedMech.class);
-    private Unit mockGrasshopperUnit1 = mock(Unit.class);
-    private Person mockGrasshopper1Pilot = mock(Person.class);
-    private Person mockGrasshopper1Tech = mock(Person.class);
-    private BipedMech mockGrasshopper2 = mock(BipedMech.class);
-    private Unit mockGrasshopperUnit2 = mock(Unit.class);
-    private Person mockGrasshopper2Pilot = mock(Person.class);
-    private Person mockGrasshopper2Tech = mock(Person.class);
+    private Skill mockMechGunnery;
+    private Skill mockMechPilot;
+    private Skill mockLeader ;
+    private Skill mockTactics;
+    private Skill mockStrategy;
+    private Skill mockNegotiation;
+    private BipedMech mockThunderbolt1;
+    private Unit mockThunderboltUnit1;
+    private Person mockThunderbolt1Pilot;
+    private Person mockThunderbolt1Tech;
+    private BipedMech mockThunderbolt2;
+    private Unit mockThunderboltUnit2;
+    private Person mockThunderbolt2Pilot;
+    private Person mockThunderbolt2Tech;
+    private BipedMech mockGrasshopper1;
+    private Unit mockGrasshopperUnit1;
+    private Person mockGrasshopper1Pilot;
+    private Person mockGrasshopper1Tech;
+    private BipedMech mockGrasshopper2;
+    private Unit mockGrasshopperUnit2;
+    private Person mockGrasshopper2Pilot;
+    private Person mockGrasshopper2Tech;
 
     // Tanks
-    private Skill mockTankGunnery = mock(Skill.class);
-    private Skill mockTankPilot = mock(Skill.class);
-    private Tank mockBulldog1 = mock(Tank.class);
-    private Unit mockBulldogUnit1 = mock(Unit.class);
-    private Person mockBulldog1Driver = mock(Person.class);
-    private Person mockBulldog1Gunner1 = mock(Person.class);
-    private Person mockBulldog1Gunner2 = mock(Person.class);
-    private Person mockBulldog1Gunner3 = mock(Person.class);
-    private Person mockBulldog1Tech = mock(Person.class);
-    private Tank mockBulldog2 = mock(Tank.class);
-    private Unit mockBulldogUnit2 = mock(Unit.class);
-    private Person mockBulldog2Driver = mock(Person.class);
-    private Person mockBulldog2Gunner1 = mock(Person.class);
-    private Person mockBulldog2Gunner2 = mock(Person.class);
-    private Person mockBulldog2Gunner3 = mock(Person.class);
-    private Person mockBulldog2Tech = mock(Person.class);
-    private Tank mockBulldog3 = mock(Tank.class);
-    private Unit mockBulldogUnit3 = mock(Unit.class);
-    private Person mockBulldog3Driver = mock(Person.class);
-    private Person mockBulldog3Gunner1 = mock(Person.class);
-    private Person mockBulldog3Gunner2 = mock(Person.class);
-    private Person mockBulldog3Gunner3 = mock(Person.class);
-    private Person mockBulldog3Tech = mock(Person.class);
-    private Tank mockBulldog4 = mock(Tank.class);
-    private Unit mockBulldogUnit4 = mock(Unit.class);
-    private Person mockBulldog4Driver = mock(Person.class);
-    private Person mockBulldog4Gunner1 = mock(Person.class);
-    private Person mockBulldog4Gunner2 = mock(Person.class);
-    private Person mockBulldog4Gunner3 = mock(Person.class);
-    private Person mockBulldog4Tech = mock(Person.class);
-    private Tank mockPackrat1 = mock(Tank.class);
-    private Unit mockPackratUnit1 = mock(Unit.class);
-    private Person mockPackrat1Driver = mock(Person.class);
-    private Person mockPackrat1Gunner = mock(Person.class);
-    private Person mockPackrat1Tech = mock(Person.class);
-    private Tank mockPackrat2 = mock(Tank.class);
-    private Unit mockPackratUnit2 = mock(Unit.class);
-    private Person mockPackrat2Driver = mock(Person.class);
-    private Person mockPackrat2Gunner = mock(Person.class);
-    private Person mockPackrat2Tech = mock(Person.class);
-    private Tank mockPackrat3 = mock(Tank.class);
-    private Unit mockPackratUnit3 = mock(Unit.class);
-    private Person mockPackrat3Driver = mock(Person.class);
-    private Person mockPackrat3Gunner = mock(Person.class);
-    private Person mockPackrat3Tech = mock(Person.class);
-    private Tank mockPackrat4 = mock(Tank.class);
-    private Unit mockPackratUnit4 = mock(Unit.class);
-    private Person mockPackrat4Driver = mock(Person.class);
-    private Person mockPackrat4Gunner = mock(Person.class);
-    private Person mockPackrat4Tech = mock(Person.class);
+    private Skill mockTankGunnery;
+    private Skill mockTankPilot;
+    private Tank mockBulldog1;
+    private Unit mockBulldogUnit1;
+    private Person mockBulldog1Driver;
+    private Person mockBulldog1Gunner1;
+    private Person mockBulldog1Gunner2;
+    private Person mockBulldog1Gunner3;
+    private Person mockBulldog1Tech;
+    private Tank mockBulldog2;
+    private Unit mockBulldogUnit2;
+    private Person mockBulldog2Driver;
+    private Person mockBulldog2Gunner1;
+    private Person mockBulldog2Gunner2;
+    private Person mockBulldog2Gunner3;
+    private Person mockBulldog2Tech;
+    private Tank mockBulldog3;
+    private Unit mockBulldogUnit3;
+    private Person mockBulldog3Driver;
+    private Person mockBulldog3Gunner1;
+    private Person mockBulldog3Gunner2;
+    private Person mockBulldog3Gunner3;
+    private Person mockBulldog3Tech;
+    private Tank mockBulldog4;
+    private Unit mockBulldogUnit4;
+    private Person mockBulldog4Driver;
+    private Person mockBulldog4Gunner1;
+    private Person mockBulldog4Gunner2;
+    private Person mockBulldog4Gunner3;
+    private Person mockBulldog4Tech;
+    private Tank mockPackrat1;
+    private Unit mockPackratUnit1;
+    private Person mockPackrat1Driver;
+    private Person mockPackrat1Gunner;
+    private Person mockPackrat1Tech;
+    private Tank mockPackrat2;
+    private Unit mockPackratUnit2;
+    private Person mockPackrat2Driver;
+    private Person mockPackrat2Gunner;
+    private Person mockPackrat2Tech;
+    private Tank mockPackrat3;
+    private Unit mockPackratUnit3;
+    private Person mockPackrat3Driver;
+    private Person mockPackrat3Gunner;
+    private Person mockPackrat3Tech;
+    private Tank mockPackrat4;
+    private Unit mockPackratUnit4;
+    private Person mockPackrat4Driver;
+    private Person mockPackrat4Gunner;
+    private Person mockPackrat4Tech;
 
     // Infantry
-    private Skill mockInfantryGunnery = mock(Skill.class);
-    private Infantry mockLaserPlatoon = mock(Infantry.class);
-    private Unit mockLaserPlatoonUnit = mock(Unit.class);
-    private Collection<Person> infantryPersonnel = new HashSet<>(28);
+    private Skill mockInfantryGunnery;
+    private Infantry mockLaserPlatoon;
+    private Unit mockLaserPlatoonUnit;
+    private Collection<Person> infantryPersonnel;
 
     // Fighters
-    private Skill mockAeroGunnery = mock(Skill.class);
-    private Skill mockAeroPilot = mock(Skill.class);
-    private Aero mockCorsair1 = mock(Aero.class);
-    private Unit mockCorsairUnit1 = mock(Unit.class);
-    private Person mockCorsair1Pilot = mock(Person.class);
-    private Person getMockCorsair1Tech = mock(Person.class);
-    private Aero mockCorsair2 = mock(Aero.class);
-    private Unit mockCorsairUnit2 = mock(Unit.class);
-    private Person mockCorsair2Pilot = mock(Person.class);
-    private Person getMockCorsair2Tech = mock(Person.class);
+    private Skill mockAeroGunnery;
+    private Skill mockAeroPilot;
+    private Aero mockCorsair1;
+    private Unit mockCorsairUnit1;
+    private Person mockCorsair1Pilot;
+    private Person getMockCorsair1Tech;
+    private Aero mockCorsair2;
+    private Unit mockCorsairUnit2;
+    private Person mockCorsair2Pilot;
+    private Person getMockCorsair2Tech;
 
     // Dropships
-    private Skill mockDropGunnery = mock(Skill.class);
-    private Skill mockDropPilot = mock(Skill.class);
-    private Dropship mockSeeker = mock(Dropship.class);
-    private Unit mockSeekerUnit = mock(Unit.class);
-    private Collection<Person> seekerCrew = new HashSet<>(20);
+    private Skill mockDropGunnery;
+    private Skill mockDropPilot;
+    private Dropship mockSeeker;
+    private Unit mockSeekerUnit;
+    private Collection<Person> seekerCrew;
 
     // Jumpships
-    private Skill mockJumpGunnery = mock(Skill.class);
-    private Skill mockJumpPilot = mock(Skill.class);
-    private Jumpship mockInvader = mock(Jumpship.class);
-    private Unit mockInvaderUnit = mock(Unit.class);
-    private Collection<Person> invaderCrew = new HashSet<>(24);
+    private Skill mockJumpGunnery;
+    private Skill mockJumpPilot;
+    private Jumpship mockInvader;
+    private Unit mockInvaderUnit;
+    private Collection<Person> invaderCrew;
 
     // Techs
-    private Skill mockMechTechSkillRegular = mock(Skill.class);
-    private Skill mockMechTechSkillElite = mock(Skill.class);
-    private Skill mockFighterTechSkill = mock(Skill.class);
-    private Skill mockFighterTechSkillElite = mock(Skill.class);
-    private Skill mockVeeTechSkill = mock(Skill.class);
-    private Collection<Person> regularAdmins = new HashSet<>(10);
+    private Skill mockMechTechSkillRegular;
+    private Skill mockMechTechSkillElite;
+    private Skill mockFighterTechSkill;
+    private Skill mockFighterTechSkillElite;
+    private Skill mockVeeTechSkill;
+    private Collection<Person> regularAdmins;
 
     // Finances
-    private Finances mockFinances = mock(Finances.class);
+    private Finances mockFinances;
 
     private CampaignOpsReputation spyReputation = spy(new CampaignOpsReputation(mockCampaign));
 
     @Before
     public void setUp() {
+        PowerMockito.mockStatic(MekHqMoneyUtil.class);
+        Mockito.when(MekHqMoneyUtil.zero()).thenReturn(Money.zero(CurrencyUnit.USD));
+        Mockito.when(MekHqMoneyUtil.money(Mockito.anyDouble())).thenReturn(Money.of(CurrencyUnit.USD, 2500));
+
         int astechs = 0;
         mockCampaign = mock(Campaign.class);
         Faction mockFaction = mock(Faction.class);
@@ -779,7 +791,6 @@ public class CampaignOpsReputationTest {
 
     @Test
     public void testCalculateSupportNeeds() {
-
         // Test the example company.
         BigDecimal expectedTotalSkill = new BigDecimal("144.00");
         BigDecimal expectedAverageSkill = new BigDecimal("9.00");

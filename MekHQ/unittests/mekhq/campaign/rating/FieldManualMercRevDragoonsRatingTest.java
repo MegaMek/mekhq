@@ -32,16 +32,24 @@ import megamek.common.Jumpship;
 import megamek.common.MechBay;
 import megamek.common.Tank;
 import megamek.common.TechConstants;
+import megamek.common.logging.DefaultMmLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.finances.MekHqMoneyUtil;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
+import org.joda.money.CurrencyUnit;
+import org.joda.money.Money;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+import org.mockito.Mockito;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -57,26 +65,52 @@ import static org.junit.Assert.*;
  * @version %Id%
  * @since 9/23/2013
  */
-@RunWith(JUnit4.class)
+@RunWith(PowerMockRunner.class)
+@PrepareForTest({MekHqMoneyUtil.class, DefaultMmLogger.class})
 public class FieldManualMercRevDragoonsRatingTest {
 
-    private Campaign mockCampaign = mock(Campaign.class);
+    private Campaign mockCampaign;
 
-    private ArrayList<Person> mockPersonnelList = new ArrayList<>();
-    private ArrayList<Person> mockActivePersonnelList = new ArrayList<>();
+    private ArrayList<Person> mockPersonnelList;
+    private ArrayList<Person> mockActivePersonnelList;
 
-    private Person mockDoctor = mock(Person.class);
-    private Person mockTech = mock(Person.class);
+    private Person mockDoctor;
+    private Person mockTech;
 
-    private Skill mockDoctorSkillRegular = mock(Skill.class);
-    private Skill mockDoctorSkillGreen = mock(Skill.class);
-    private Skill mockMedicSkill = mock(Skill.class);
-    private Skill mockMechTechSkillVeteran = mock(Skill.class);
-    private Skill mockMechTechSkillRegular = mock(Skill.class);
-    private Skill mockAstechSkill = mock(Skill.class);
+    private Skill mockDoctorSkillRegular;
+    private Skill mockDoctorSkillGreen;
+    private Skill mockMedicSkill;
+    private Skill mockMechTechSkillVeteran;
+    private Skill mockMechTechSkillRegular;
+    private Skill mockAstechSkill;
 
     @Before
     public void setUp() {
+        PowerMockito.mockStatic(MekHqMoneyUtil.class);
+        Mockito.when(MekHqMoneyUtil.zero()).thenReturn(Money.zero(CurrencyUnit.USD));
+        Mockito.when(MekHqMoneyUtil.money(Mockito.anyDouble())).thenReturn(Money.of(CurrencyUnit.USD, 2500));
+
+        DefaultMmLogger mock = PowerMockito.mock(DefaultMmLogger.class);
+        Mockito.doNothing().when(mock).methodBegin(any(), anyString());
+
+        PowerMockito.mockStatic(DefaultMmLogger.class);
+        Mockito.when(DefaultMmLogger.getInstance()).thenReturn(mock);
+
+        mockCampaign = mock(Campaign.class);
+
+        mockPersonnelList = new ArrayList<>();
+        mockActivePersonnelList = new ArrayList<>();
+
+        mockDoctor = mock(Person.class);
+        mockTech = mock(Person.class);
+
+        mockDoctorSkillRegular = mock(Skill.class);
+        mockDoctorSkillGreen = mock(Skill.class);
+        mockMedicSkill = mock(Skill.class);
+        mockMechTechSkillVeteran = mock(Skill.class);
+        mockMechTechSkillRegular = mock(Skill.class);
+        mockAstechSkill = mock(Skill.class);
+
         // Set up the doctor.
         when(mockDoctorSkillRegular.getExperienceLevel()).thenReturn(SkillType.EXP_REGULAR);
         when(mockDoctorSkillGreen.getExperienceLevel()).thenReturn(SkillType.EXP_GREEN);

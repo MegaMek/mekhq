@@ -126,7 +126,6 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
         this.mrbcFee = true;
         this.advancePct = 25;
         this.signBonus = 0;
-
     }
 
     public static String getOverheadCompName(int i) {

@@ -31,7 +31,6 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import mekhq.campaign.*;
-import mekhq.campaign.finances.CurrencyManager;
 import mekhq.campaign.finances.MekHqMoneyUtil;
 import mekhq.campaign.log.*;
 import org.joda.money.BigMoney;
@@ -372,7 +371,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         status = S_ACTIVE;
         hits = 0;
         skills = new Hashtable<>();
-        salary = MekHqMoneyUtil.money(-1);
+        salary = MekHqMoneyUtil.zero();
         campaign = c;
         doctorId = null;
         unitId = null;

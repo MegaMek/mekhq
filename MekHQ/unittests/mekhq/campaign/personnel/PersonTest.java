@@ -1,17 +1,49 @@
 package mekhq.campaign.personnel;
 
 import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.spy;
 
+import megamek.common.logging.DefaultMmLogger;
 import mekhq.TestUtilities;
+import mekhq.campaign.finances.CurrencyManager;
+import mekhq.campaign.finances.MekHqMoneyUtil;
+import org.joda.money.CurrencyUnit;
+import org.joda.money.Money;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mockito;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
+@RunWith(PowerMockRunner.class)
+@PrepareForTest({MekHqMoneyUtil.class, CurrencyManager.class, DefaultMmLogger.class})
 public class PersonTest {
-
     private Person mockPerson;
+
+    @Before
+    public void setUp() {
+        PowerMockito.mockStatic(MekHqMoneyUtil.class);
+        Mockito.when(MekHqMoneyUtil.zero()).thenReturn(Money.zero(CurrencyUnit.USD));
+        Mockito.when(MekHqMoneyUtil.money(anyDouble())).thenReturn(Money.of(CurrencyUnit.USD, 2500));
+
+        CurrencyManager currencyManagerMock = PowerMockito.mock(CurrencyManager.class);
+        Mockito.doNothing().when(currencyManagerMock).initialize(any());
+
+        PowerMockito.mockStatic(CurrencyManager.class);
+        Mockito.when(CurrencyManager.getInstance()).thenReturn(currencyManagerMock);
+
+        DefaultMmLogger defaultMMLoggerMock = PowerMockito.mock(DefaultMmLogger.class);
+        Mockito.doNothing().when(defaultMMLoggerMock).methodBegin(any(), anyString());
+
+        PowerMockito.mockStatic(DefaultMmLogger.class);
+        Mockito.when(DefaultMmLogger.getInstance()).thenReturn(defaultMMLoggerMock);
+    }
 
     @Test
     public void testIsCombatRoleReturnsTrueAtEdgesOfRange() {
@@ -68,7 +100,8 @@ public class PersonTest {
         assertEquals(0, mockPerson.awardController.getAwards().size());
     }
 
-    @Test public void testGetNumberOfAwards() throws ParseException {
+    @Test
+    public void testGetNumberOfAwards() throws ParseException {
         initPerson();
         initAwards();
 
