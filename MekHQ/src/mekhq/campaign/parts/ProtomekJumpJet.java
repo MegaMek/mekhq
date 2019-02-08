@@ -23,8 +23,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import mekhq.campaign.finances.MekHqMoneyUtil;
-import org.joda.money.Money;
+import mekhq.campaign.finances.Money;
 import org.w3c.dom.Node;
 
 import megamek.common.CriticalSlot;
@@ -78,7 +77,7 @@ public class ProtomekJumpJet extends Part {
 
     @Override
     public Money getStickerPrice() {
-        return MekHqMoneyUtil.money(getUnitTonnage() * 400);
+        return Money.of(getUnitTonnage() * 400);
     }
 
     @Override

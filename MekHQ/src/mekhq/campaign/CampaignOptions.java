@@ -24,12 +24,9 @@ package mekhq.campaign;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
-import mekhq.campaign.finances.MekHqMoneyUtil;
-import org.joda.money.Money;
+import mekhq.campaign.finances.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -477,30 +474,30 @@ public class CampaignOptions implements Serializable {
         personnelMarketRandomUltraGreenRemoval = 4;
         personnelMarketDylansWeight = 0.3;
         salaryTypeBase = new Money[Person.T_NUM];
-        salaryTypeBase[Person.T_MECHWARRIOR] = MekHqMoneyUtil.money(1500);
-        salaryTypeBase[Person.T_AERO_PILOT] = MekHqMoneyUtil.money(1500);
-        salaryTypeBase[Person.T_VEE_GUNNER] = MekHqMoneyUtil.money(900);
-        salaryTypeBase[Person.T_GVEE_DRIVER] = MekHqMoneyUtil.money(900);
-        salaryTypeBase[Person.T_NVEE_DRIVER] = MekHqMoneyUtil.money(900);
-        salaryTypeBase[Person.T_VTOL_PILOT] = MekHqMoneyUtil.money(900);
-        salaryTypeBase[Person.T_CONV_PILOT] = MekHqMoneyUtil.money(900);
-        salaryTypeBase[Person.T_INFANTRY] = MekHqMoneyUtil.money(750);
-        salaryTypeBase[Person.T_BA] = MekHqMoneyUtil.money(960);
-        salaryTypeBase[Person.T_SPACE_PILOT] = MekHqMoneyUtil.money(1000);
-        salaryTypeBase[Person.T_SPACE_GUNNER] = MekHqMoneyUtil.money(1000);
-        salaryTypeBase[Person.T_SPACE_CREW] = MekHqMoneyUtil.money(1000);
-        salaryTypeBase[Person.T_NAVIGATOR] = MekHqMoneyUtil.money( 1000);
-        salaryTypeBase[Person.T_DOCTOR] = MekHqMoneyUtil.money(1500);
-        salaryTypeBase[Person.T_ADMIN_HR] = MekHqMoneyUtil.money(500);
-        salaryTypeBase[Person.T_ADMIN_LOG] = MekHqMoneyUtil.money(500);
-        salaryTypeBase[Person.T_ADMIN_TRA] = MekHqMoneyUtil.money(500);
-        salaryTypeBase[Person.T_MECH_TECH] = MekHqMoneyUtil.money(800);
-        salaryTypeBase[Person.T_AERO_TECH] = MekHqMoneyUtil.money(800);
-        salaryTypeBase[Person.T_BA_TECH] = MekHqMoneyUtil.money(800);
-        salaryTypeBase[Person.T_MECHANIC] = MekHqMoneyUtil.money(800);
-        salaryTypeBase[Person.T_ASTECH] = MekHqMoneyUtil.money(400);
-        salaryTypeBase[Person.T_MEDIC] = MekHqMoneyUtil.money(400);
-        salaryTypeBase[Person.T_PROTO_PILOT] = MekHqMoneyUtil.money(960);
+        salaryTypeBase[Person.T_MECHWARRIOR] = Money.of(1500);
+        salaryTypeBase[Person.T_AERO_PILOT] = Money.of(1500);
+        salaryTypeBase[Person.T_VEE_GUNNER] = Money.of(900);
+        salaryTypeBase[Person.T_GVEE_DRIVER] = Money.of(900);
+        salaryTypeBase[Person.T_NVEE_DRIVER] = Money.of(900);
+        salaryTypeBase[Person.T_VTOL_PILOT] = Money.of(900);
+        salaryTypeBase[Person.T_CONV_PILOT] = Money.of(900);
+        salaryTypeBase[Person.T_INFANTRY] = Money.of(750);
+        salaryTypeBase[Person.T_BA] = Money.of(960);
+        salaryTypeBase[Person.T_SPACE_PILOT] = Money.of(1000);
+        salaryTypeBase[Person.T_SPACE_GUNNER] = Money.of(1000);
+        salaryTypeBase[Person.T_SPACE_CREW] = Money.of(1000);
+        salaryTypeBase[Person.T_NAVIGATOR] = Money.of( 1000);
+        salaryTypeBase[Person.T_DOCTOR] = Money.of(1500);
+        salaryTypeBase[Person.T_ADMIN_HR] = Money.of(500);
+        salaryTypeBase[Person.T_ADMIN_LOG] = Money.of(500);
+        salaryTypeBase[Person.T_ADMIN_TRA] = Money.of(500);
+        salaryTypeBase[Person.T_MECH_TECH] = Money.of(800);
+        salaryTypeBase[Person.T_AERO_TECH] = Money.of(800);
+        salaryTypeBase[Person.T_BA_TECH] = Money.of(800);
+        salaryTypeBase[Person.T_MECHANIC] = Money.of(800);
+        salaryTypeBase[Person.T_ASTECH] = Money.of(400);
+        salaryTypeBase[Person.T_MEDIC] = Money.of(400);
+        salaryTypeBase[Person.T_PROTO_PILOT] = Money.of(960);
         salaryXpMultiplier = new double[5];
         salaryXpMultiplier[SkillType.EXP_ULTRA_GREEN] = 0.6;
         salaryXpMultiplier[SkillType.EXP_GREEN] = 0.6;
@@ -1715,7 +1712,7 @@ public class CampaignOptions implements Serializable {
 
     public Money getBaseSalary(int type) {
         if (type < 0 || type >= salaryTypeBase.length) {
-            return MekHqMoneyUtil.zero();
+            return Money.zero();
         }
         return salaryTypeBase[type];
     }

@@ -18,7 +18,6 @@ import megamek.common.TechConstants;
 import megamek.common.UnitType;
 import mekhq.IconPackage;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.finances.MekHqMoneyUtil;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.BasicInfo;
@@ -207,7 +206,7 @@ public class UnitTableModel extends DataTableModel {
             return e.getWeightClassName();
         }
         if(col == COL_COST) {
-            return MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(u.getSellValue());
+            return u.getSellValue().toAmountAndSymbolString();
         }
         if(col == COL_MAINTAIN) {
             return u.getMaintenanceCost();

@@ -23,8 +23,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import mekhq.campaign.finances.MekHqMoneyUtil;
-import org.joda.money.Money;
+import mekhq.campaign.finances.Money;
 import org.w3c.dom.Node;
 
 import megamek.common.Compute;
@@ -65,7 +64,7 @@ public class MekLifeSupport extends Part {
 	
 	@Override
 	public Money getStickerPrice() {
-		return MekHqMoneyUtil.money(50000);
+		return Money.of(50000);
 	}
 
     @Override

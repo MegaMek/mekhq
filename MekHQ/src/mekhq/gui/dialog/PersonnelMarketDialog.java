@@ -36,7 +36,7 @@ import megamek.common.util.DirectoryItems;
 import megamek.common.util.EncodeControl;
 import megamek.common.util.StringUtil;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.finances.MekHqMoneyUtil;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.mission.Mission;
@@ -49,7 +49,6 @@ import mekhq.gui.model.XTableColumnModel;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.LevelSorter;
 import mekhq.gui.view.PersonViewPanel;
-import org.joda.money.Money;
 
 /**
  *
@@ -67,7 +66,7 @@ public class PersonnelMarketDialog extends JDialog {
     Person selectedPerson = null;
     @SuppressWarnings("unused")
     private DirectoryItems portraits;
-    private Money unitCost = MekHqMoneyUtil.zero();
+    private Money unitCost = Money.zero();
 
     private JButton btnAdd;
     private javax.swing.JButton btnHire;
@@ -294,7 +293,7 @@ public class PersonnelMarketDialog extends JDialog {
 	private void hirePerson(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHireActionPerformed
 	    if(null != selectedPerson) {
 	    	if (campaign.getFunds().isLessThan(
-                    (campaign.getCampaignOptions().payForRecruitment() ? selectedPerson.getSalary().multipliedBy(2) : MekHqMoneyUtil.zero())
+                    (campaign.getCampaignOptions().payForRecruitment() ? selectedPerson.getSalary().multipliedBy(2) : Money.zero())
                             .plus(unitCost))){
 				 campaign.addReport("<font color='red'><b>Insufficient funds. Transaction cancelled</b>.</font>");
 	    	} else {
@@ -437,15 +436,15 @@ public class PersonnelMarketDialog extends JDialog {
         selectedPerson = personnelModel.getPerson(tablePersonnel.convertRowIndexToModel(view));
     	Entity en =  personnelMarket.getAttachedEntity(selectedPerson);
     	if (null == en) {
-    		unitCost = MekHqMoneyUtil.zero();
+    		unitCost = Money.zero();
     	} else {
     		if (!campaign.getCampaignOptions().getUseShareSystem() &&
     				(en instanceof megamek.common.Mech ||
     						en instanceof megamek.common.Tank ||
     						en instanceof megamek.common.Aero)) {
-    			unitCost = MekHqMoneyUtil.money(en.getCost(false) / 2.0);
+    			unitCost = Money.of(en.getCost(false)).dividedBy(2.0);
     		} else {
-    			unitCost = MekHqMoneyUtil.zero();
+    			unitCost = Money.zero();
     		}
     	}
         refreshPersonView();

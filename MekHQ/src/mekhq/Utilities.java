@@ -60,11 +60,10 @@ import java.util.stream.Collectors;
 import javax.swing.JTable;
 import javax.swing.table.TableModel;
 
-import mekhq.campaign.finances.MekHqMoneyUtil;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.equipment.*;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
-import org.joda.money.Money;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDateTime;
@@ -992,7 +991,7 @@ public class Utilities {
     public static String printMoneyArray(Money[] array) {
         String values = ""; //$NON-NLS-1$
         for(int i = 0; i < array.length; i++) {
-            values += MekHqXmlUtil.getXmlStringFromMoney(array[i]);
+            values += array[i].toXmlString();
             if(i < (array.length-1)) {
                 values += ","; //$NON-NLS-1$
             }
@@ -1009,7 +1008,7 @@ public class Utilities {
             Node attribute = node.getAttributes().getNamedItem("version");
             if (attribute != null && attribute.getTextContent().trim().equals("2")) {
                 for (int i = 0; i < values.length; i++) {
-                    result[i] = MekHqMoneyUtil.xmlMoneyFormatter().parseMoney(values[i]);
+                    result[i] = Money.fromXmlString(values[i]);
                 }
 
                 return result;
@@ -1017,7 +1016,7 @@ public class Utilities {
         }
 
         for (int i = 0; i < values.length; i++) {
-            result[i] = MekHqMoneyUtil.money(Long.parseLong(values[i]));
+            result[i] = Money.of(Long.parseLong(values[i]));
         }
 
         return result;

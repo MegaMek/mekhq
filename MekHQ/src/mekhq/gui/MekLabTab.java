@@ -68,7 +68,6 @@ import megameklab.com.util.CConfig;
 import megameklab.com.util.RefreshListener;
 import megameklab.com.util.UnitUtil;
 import mekhq.MekHQ;
-import mekhq.campaign.finances.MekHqMoneyUtil;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.unit.Unit;
 
@@ -335,7 +334,7 @@ public class MekLabTab extends CampaignGuiTab {
         lblName.setText("<html><b>" + unit.getName() + "</b></html>");
         lblRefit.setText(refit.getRefitClassName());
         lblTime.setText(refit.getTime() + " minutes");
-        lblCost.setText(MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(refit.getCost()));
+        lblCost.setText(refit.getCost().toAmountAndSymbolString());
         lblMove.setText("Movement: " + walk + "/" + run + "/" + jump);
         if (bvDiff > 0) {
             lblBV.setText("<html>BV: " + entity.calculateBattleValue(true, true) + " (<font color='green'>+"

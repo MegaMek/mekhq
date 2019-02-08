@@ -23,7 +23,6 @@ package mekhq.campaign;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.Serializable;
-import java.math.RoundingMode;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -36,8 +35,7 @@ import java.util.function.Function;
 
 import javax.xml.parsers.DocumentBuilder;
 
-import mekhq.campaign.finances.MekHqMoneyUtil;
-import org.joda.money.Money;
+import mekhq.campaign.finances.Money;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -101,7 +99,7 @@ public class AtBConfiguration implements Serializable {
         dsTable = new WeightedTable<>();
         jsTable = new WeightedTable<>();
         defaultProperties = ResourceBundle.getBundle("mekhq.resources.AtBConfigDefaults");
-        shipSearchCost = MekHqMoneyUtil.money(100000.0);
+        shipSearchCost = Money.of(100000.0);
     }
 
     /**
@@ -184,7 +182,7 @@ public class AtBConfiguration implements Serializable {
                 }
                 break;
             case "shipSearchCost":
-                shipSearchCost = MekHqMoneyUtil.money(Integer.parseInt(property));
+                shipSearchCost = Money.of(Integer.parseInt(property));
                 break;
             case "shipSearchLengthWeeks":
                 shipSearchLengthWeeks = Integer.parseInt(property);
@@ -322,10 +320,10 @@ public class AtBConfiguration implements Serializable {
 
     public Money shipSearchCostPerWeek() {
         if (shipSearchLengthWeeks <= 0) {
-            return MekHqMoneyUtil.zero();
+            return Money.zero();
         }
 
-        return shipSearchCost.dividedBy(shipSearchLengthWeeks, RoundingMode.HALF_EVEN);
+        return shipSearchCost.dividedBy(shipSearchLengthWeeks);
     }
 
     public Integer getDropshipSearchTarget() {
@@ -533,7 +531,7 @@ public class AtBConfiguration implements Serializable {
             Node wn = nl.item(i);
             switch (wn.getNodeName()) {
             case "shipSearchCost":
-                shipSearchCost = MekHqMoneyUtil.money(Integer.parseInt(wn.getTextContent()));
+                shipSearchCost = Money.of(Integer.parseInt(wn.getTextContent()));
                 break;
             case "shipSearchLengthWeeks":
                 shipSearchLengthWeeks = Integer.parseInt(wn.getTextContent());

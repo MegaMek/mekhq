@@ -22,7 +22,7 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 import java.math.RoundingMode;
 
-import org.joda.money.Money;
+import mekhq.campaign.finances.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -282,7 +282,7 @@ public class OmniPod extends Part {
 
     @Override
     public Money getStickerPrice() {
-        return partType.getStickerPrice().dividedBy(5.0, RoundingMode.HALF_EVEN);
+        return partType.getStickerPrice().dividedBy(5.0);
     }
 
     @Override

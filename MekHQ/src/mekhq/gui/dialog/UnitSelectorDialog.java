@@ -15,7 +15,6 @@ import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.event.ActionListener;
 import java.io.IOException;
-import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.util.Comparator;
 import java.util.GregorianCalendar;
@@ -61,10 +60,9 @@ import megamek.common.logging.LogLevel;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.finances.MekHqMoneyUtil;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.unit.UnitOrder;
 import mekhq.campaign.unit.UnitTechProgression;
-import org.joda.money.Money;
 
 /**
  *
@@ -686,19 +684,19 @@ public class UnitSelectorDialog extends JDialog {
                 return ms.getYear();
             }
             if(col == COL_COST) {
-                return MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(getPurchasePrice(ms));
+                return getPurchasePrice(ms).toAmountAndSymbolString();
             }
             return "?";
         }
 
         private Money getPurchasePrice(MechSummary ms) {
-            Money cost = MekHqMoneyUtil.money(ms.getCost());
+            Money cost = Money.of(ms.getCost());
             if(ms.getUnitType().equals(UnitType.getTypeName(UnitType.INFANTRY))
                     || ms.getUnitType().equals(UnitType.getTypeName(UnitType.BATTLE_ARMOR))) {
-                cost = MekHqMoneyUtil.money(ms.getAlternateCost());
+                cost = Money.of(ms.getAlternateCost());
             }
             if(TechConstants.isClan(ms.getType())) {
-                cost = cost.multipliedBy(campaign.getCampaignOptions().getClanPriceModifier(), RoundingMode.HALF_EVEN);
+                cost = cost.multipliedBy(campaign.getCampaignOptions().getClanPriceModifier());
             }
             return cost;
         }

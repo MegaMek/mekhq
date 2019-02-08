@@ -22,9 +22,9 @@
 package mekhq.campaign.work;
 
 import megamek.common.TargetRoll;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.unit.Unit;
-import org.joda.money.Money;
 
 public interface IAcquisitionWork extends IWork {
     public String getAcquisitionName();

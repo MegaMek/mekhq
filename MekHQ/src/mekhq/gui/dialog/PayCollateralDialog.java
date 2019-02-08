@@ -26,7 +26,6 @@ import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
-import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -48,11 +47,10 @@ import megamek.common.util.EncodeControl;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Asset;
 import mekhq.campaign.finances.Loan;
-import mekhq.campaign.finances.MekHqMoneyUtil;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.unit.Unit;
-import org.joda.money.Money;
 
 /**
  * A dialog to decide how you want to pay off collateral when you 
@@ -124,7 +122,7 @@ public class PayCollateralDialog extends JDialog {
         Collection<Unit> units = campaign.getUnits();
         for(Unit u : units) {
             j++;
-            box = new JCheckBox(u.getName() + " (" + MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(u.getSellValue()));
+            box = new JCheckBox(u.getName() + " (" + u.getSellValue().toAmountAndSymbolString());
             box.setSelected(false);
             box.setEnabled(u.isPresent() && !u.isDeployed());
             box.addItemListener(evt -> updateAmount());
@@ -185,7 +183,7 @@ public class PayCollateralDialog extends JDialog {
             gridBagConstraints.gridx = 1;
             gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
             gridBagConstraints.weightx = 1.0;
-            pnlParts.add(new JLabel("<html>" + p.getName() + "<br>" + p.getDetails()  + ", "+ MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(p.getCurrentValue()) + "</html>"), gridBagConstraints);
+            pnlParts.add(new JLabel("<html>" + p.getName() + "<br>" + p.getDetails()  + ", "+ p.getCurrentValue().toAmountAndSymbolString() + "</html>"), gridBagConstraints);
             i++;
         }    
         JScrollPane scrParts = new JScrollPane();
@@ -218,7 +216,7 @@ public class PayCollateralDialog extends JDialog {
         JPanel pnlAssets = new JPanel(new GridBagLayout());
         for(Asset a : campaign.getFinances().getAllAssets()) {
             j++;
-            box = new JCheckBox(a.getName() + " (" + MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(a.getValue()));
+            box = new JCheckBox(a.getName() + " (" + a.getValue().toAmountAndSymbolString());
             box.setSelected(false);
             box.addItemListener(evt -> updateAmount());
             assetBoxes.add(box);
@@ -271,7 +269,7 @@ public class PayCollateralDialog extends JDialog {
     }
     
     private void updateAmount() {
-        Money amount = MekHqMoneyUtil.zero();
+        Money amount = Money.zero();
         for (Map.Entry<JCheckBox, UUID> m : unitBoxes.entrySet()) {
             if (m.getKey().isSelected()) {
                 amount = amount.plus(campaign.getUnit(m.getValue()).getSellValue());
@@ -294,7 +292,10 @@ public class PayCollateralDialog extends JDialog {
 
         int percent = 0;
         if (loan.getCollateralAmount().isPositive()) {
-            percent = amount.multipliedBy(100).dividedBy(loan.getCollateralAmount().getAmount(), RoundingMode.HALF_EVEN).getAmountMajorInt();
+            percent = amount
+                    .multipliedBy(100)
+                    .dividedBy(loan.getCollateralAmount().getAmount().doubleValue())
+                    .getAmount().intValue();
         }
 
         if(percent < 100) {
@@ -303,7 +304,7 @@ public class PayCollateralDialog extends JDialog {
             btnPay.setEnabled(true);
         }
         barAmount.setValue(percent);
-        barAmount.setString(MekHqMoneyUtil.uiAmountPrinter().print(amount) + "/" + MekHqMoneyUtil.uiAmountPrinter().print(loan.getCollateralAmount()));
+        barAmount.setString(amount.toAmountString() + "/" + loan.getCollateralAmount().toAmountString());
     }
     
     public ArrayList<UUID> getUnits() {

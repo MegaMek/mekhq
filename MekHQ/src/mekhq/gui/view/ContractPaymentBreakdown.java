@@ -2,7 +2,6 @@ package mekhq.gui.view;
 
 import megamek.common.util.EncodeControl;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.finances.MekHqMoneyUtil;
 import mekhq.campaign.mission.Contract;
 
 import javax.swing.*;
@@ -506,27 +505,27 @@ public class ContractPaymentBreakdown {
     }
 
     private void setLblBaseAmount2() {
-        lblBaseAmount2.setText(MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(contract.getBaseAmount()));
+        lblBaseAmount2.setText(contract.getBaseAmount().toAmountAndSymbolString());
     }
 
     private void setLblOverheadAmount2(){
-        lblOverheadAmount2.setText(MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(contract.getOverheadAmount()));
+        lblOverheadAmount2.setText(contract.getOverheadAmount().toAmountAndSymbolString());
     }
 
     private void setLblSupportAmount2(){
-        lblSupportAmount2.setText(MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(contract.getSupportAmount()));
+        lblSupportAmount2.setText(contract.getSupportAmount().toAmountAndSymbolString());
     }
 
     private void setLblTransportAmount2(){
-        lblTransportAmount2.setText(MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(contract.getTransportAmount()));
+        lblTransportAmount2.setText(contract.getTransportAmount().toAmountAndSymbolString());
     }
 
     private void setLblTransitAmount2(){
-        lblTransitAmount2.setText(MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(contract.getTransitAmount()));
+        lblTransitAmount2.setText(contract.getTransitAmount().toAmountAndSymbolString());
     }
 
     private void setLblNetIncome2(){
-        lblNetIncome2.setText(MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(contract.getTotalAmountPlusFees()));
+        lblNetIncome2.setText(contract.getTotalAmountPlusFees().toAmountAndSymbolString());
     }
 
     private void setLblAdvanceNetIncome1(){
@@ -535,11 +534,11 @@ public class ContractPaymentBreakdown {
     }
 
     private void setLblAdvanceNetIncome2(){
-        lblAdvanceNetIncome2.setText(MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(contract.getAdvanceAmount()));
+        lblAdvanceNetIncome2.setText(contract.getAdvanceAmount().toAmountAndSymbolString());
     }
 
     private void setLblSignBonusAmount2(){
-        lblSignBonusAmount2.setText(MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(contract.getSigningBonusAmount()));
+        lblSignBonusAmount2.setText(contract.getSigningBonusAmount().toAmountAndSymbolString());
     }
 
     private void setLblMonthlyNetIncome1() {
@@ -549,41 +548,41 @@ public class ContractPaymentBreakdown {
 
     private void setLblMonthlyNetIncome2(){
         lblMonthlyNetIncome2.setText(generateMonthlyHeader(contract.getLength())
-                + MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(contract.getMonthlyPayOut()));
+                + contract.getMonthlyPayOut().toAmountAndSymbolString());
     }
 
     private void setLblFeeAmount2(){
-        lblFeeAmount2.setText("-" + MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(contract.getFeeAmount()));
+        lblFeeAmount2.setText("-" + contract.getFeeAmount().toAmountAndSymbolString());
     }
 
     private void setLblOverheadExp2(){
         lblOverheadExp2.setText(generateMonthlyHeader(contract.getLengthPlusTravel(campaign))
-                + "-" + MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(campaign.getOverheadExpenses()));
+                + "-" + campaign.getOverheadExpenses().toAmountAndSymbolString());
     }
 
     private void setLblMaintenanceExp2(){
         lblMaintenanceExp2.setText(generateMonthlyHeader(contract.getLengthPlusTravel(campaign))
-                + "-" + MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(campaign.getMaintenanceCosts()));
+                + "-" + campaign.getMaintenanceCosts().toAmountAndSymbolString());
     }
     private void setLblPayrollExp2(){
         lblPayrollExp2.setText(generateMonthlyHeader(contract.getLengthPlusTravel(campaign))
-                + "-" + MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(contract.getEstimatedPayrollExpenses(campaign)));
+                + "-" + contract.getEstimatedPayrollExpenses(campaign).toAmountAndSymbolString());
     }
 
     private void setLblTotalAdvanceMoney2(){
-        lblTotalAdvanceMoney2.setText(MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(contract.getTotalAdvanceAmount()));
+        lblTotalAdvanceMoney2.setText(contract.getTotalAdvanceAmount().toAmountAndSymbolString());
     }
 
     private void setLblTotalMonthlyMoney2(){
-        lblTotalMonthlyMoney2.setText(MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(contract.getTotalMonthlyPayOut(campaign)));
+        lblTotalMonthlyMoney2.setText(contract.getTotalMonthlyPayOut(campaign).toAmountAndSymbolString());
     }
 
     private void setLblTransportationExpenses2(){
-        lblTransportationExpenses2.setText("-" + MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(contract.getTotalTransportationFees(campaign)));
+        lblTransportationExpenses2.setText("-" + contract.getTotalTransportationFees(campaign).toAmountAndSymbolString());
     }
 
     private void setLblEstimatedProfit2(){
-        lblEstimatedProfit2.setText(MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(contract.getEstimatedTotalProfit(campaign)));
+        lblEstimatedProfit2.setText(contract.getEstimatedTotalProfit(campaign).toAmountAndSymbolString());
     }
 
     private String generateMonthlyHeader(int length){

@@ -30,12 +30,11 @@ import megamek.common.UnitType;
 import megamek.common.util.EncodeControl;
 import mekhq.IconPackage;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.finances.MekHqMoneyUtil;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.EntityImage;
-import org.joda.money.Money;
 
 /**
  * A custom panel that gets filled in with goodies from a Force record
@@ -202,7 +201,7 @@ public class ForceViewPanel extends javax.swing.JPanel {
 		pnlStats.setLayout(new java.awt.GridBagLayout());
 		
 	 	long bv = 0;
-    	Money cost = MekHqMoneyUtil.zero();
+    	Money cost = Money.zero();
     	double ton = 0;
     	String commander = "";
     	String LanceTech = "";
@@ -391,7 +390,7 @@ public class ForceViewPanel extends javax.swing.JPanel {
 		pnlStats.add(lblCost1, gridBagConstraints);
 		
 		lblCost2.setName("lblCost2"); // NOI18N
-		lblCost2.setText(MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(cost));
+		lblCost2.setText(cost.toAmountAndSymbolString());
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 1;
 		gridBagConstraints.gridy = nexty;
@@ -591,7 +590,7 @@ public class ForceViewPanel extends javax.swing.JPanel {
     	//we are not going to use the campaign methods here because we can be more efficient
     	//by only traversing once
     	int bv = 0;
-    	Money cost = MekHqMoneyUtil.zero();
+    	Money cost = Money.zero();
     	double ton = 0;
     	int number = 0;
     	String commander = "No personnel found";
@@ -626,7 +625,7 @@ public class ForceViewPanel extends javax.swing.JPanel {
         toReturn += "<b>Number of Units:</b> " + number + "<br/>";
         toReturn += bv + " BV, ";
         toReturn += DecimalFormat.getInstance().format(ton) + " tons, ";
-        toReturn += MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(cost);
+        toReturn += cost.toAmountAndSymbolString();
         toReturn += "</font></html>";
         return toReturn;
     }

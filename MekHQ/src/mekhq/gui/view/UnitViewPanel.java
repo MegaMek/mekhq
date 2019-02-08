@@ -27,9 +27,9 @@ import megamek.common.UnitType;
 import megamek.common.util.DirectoryItems;
 import megamek.common.util.EncodeControl;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.finances.MekHqMoneyUtil;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.EntityImage;
+
 /**
  * A custom panel that gets filled in with goodies from a unit record
  * @author  Jay Lawson <jaylawson39 at yahoo.com>
@@ -284,7 +284,7 @@ public class UnitViewPanel extends javax.swing.JPanel {
 		pnlStats.add(lblCost, gridBagConstraints);
 		
 		txtCost.setName("lblCost2"); // NOI18N
-		txtCost.setText(MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(unit.getSellValue()));
+		txtCost.setText(unit.getSellValue().toAmountAndSymbolString());
 		txtCost.setEditable(false);
 		txtCost.setLineWrap(true);
 		txtCost.setWrapStyleWord(true);

@@ -23,8 +23,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import mekhq.campaign.finances.MekHqMoneyUtil;
-import org.joda.money.Money;
+import mekhq.campaign.finances.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -92,23 +91,23 @@ public class MekCockpit extends Part {
 		switch (type) {
         case Mech.COCKPIT_COMMAND_CONSOLE:
             // 500000 for command console + 200000 for primary cockpit
-            return MekHqMoneyUtil.money(700000);
+            return Money.of(700000);
         case Mech.COCKPIT_SMALL:
-            return MekHqMoneyUtil.money(175000);
+            return Money.of(175000);
         case Mech.COCKPIT_TORSO_MOUNTED:
-            return MekHqMoneyUtil.money(750000);
+            return Money.of(750000);
         case Mech.COCKPIT_STANDARD:
-            return MekHqMoneyUtil.money(200000);
+            return Money.of(200000);
         case Mech.COCKPIT_INDUSTRIAL:
-            return MekHqMoneyUtil.money(100000);
+            return Money.of(100000);
         case Mech.COCKPIT_DUAL:
-            return MekHqMoneyUtil.money(40000);
+            return Money.of(40000);
         case Mech.COCKPIT_VRRP:
-            return MekHqMoneyUtil.money(1250000);
+            return Money.of(1250000);
         case Mech.COCKPIT_QUADVEE:
-            return MekHqMoneyUtil.money(375000);
+            return Money.of(375000);
         default:
-            return MekHqMoneyUtil.money(200000);
+            return Money.of(200000);
 		}
 	}
 

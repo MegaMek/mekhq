@@ -43,7 +43,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.table.TableColumn;
 
-import mekhq.campaign.finances.MekHqMoneyUtil;
+import mekhq.campaign.finances.Money;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -82,7 +82,6 @@ import mekhq.gui.dialog.ManageAssetsDialog;
 import mekhq.gui.dialog.NewLoanDialog;
 import mekhq.gui.model.FinanceTableModel;
 import mekhq.gui.model.LoanTableModel;
-import org.joda.money.Money;
 
 /**
  * Shows record of financial transactions.
@@ -240,7 +239,7 @@ public final class FinancesTab extends CampaignGuiTab {
     	ArrayList<Transaction> transactions = getCampaign().getFinances().getAllTransactions();
     	Calendar cal = Calendar.getInstance();
     	
-    	Money balance = MekHqMoneyUtil.zero();
+    	Money balance = Money.zero();
     	for (int i = 0; i < transactions.size(); i++) {
     		balance = balance.plus(transactions.get(i).getAmount());
     		cal.setTime(transactions.get(i).getDate());
@@ -266,8 +265,8 @@ public final class FinancesTab extends CampaignGuiTab {
     	Calendar cal = Calendar.getInstance();
     	
     	String pastMonthYear = "";
-    	Money monthlyRevenue = MekHqMoneyUtil.zero();
-        Money monthlyExpenditures = MekHqMoneyUtil.zero();
+    	Money monthlyRevenue = Money.zero();
+        Money monthlyExpenditures = Money.zero();
     	for (int i = 0; i < transactions.size(); i++) {
     		cal.setTime(transactions.get(i).getDate());
     		
@@ -282,8 +281,8 @@ public final class FinancesTab extends CampaignGuiTab {
     			if (i != 0) {
     				dataset.addValue(monthlyRevenue.getAmount().doubleValue(), resourceMap.getString("graphMonthlyRevenue.text"), pastMonthYear);
     				dataset.addValue(monthlyExpenditures.getAmount().doubleValue(), resourceMap.getString("graphMonthlyExpenditures.text"), pastMonthYear);
-    				monthlyRevenue = MekHqMoneyUtil.zero();
-    				monthlyExpenditures = MekHqMoneyUtil.zero();
+    				monthlyRevenue = Money.zero();
+    				monthlyExpenditures = Money.zero();
     			}
     			pastMonthYear = df.format(cal.getTime());
     			if (transactions.get(i).getAmount().isPositive()) {

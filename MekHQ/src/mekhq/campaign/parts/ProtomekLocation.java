@@ -23,8 +23,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import mekhq.campaign.finances.MekHqMoneyUtil;
-import org.joda.money.Money;
+import mekhq.campaign.finances.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -155,7 +154,7 @@ public class ProtomekLocation extends Part {
         if (loc == Protomech.LOC_TORSO) {
             cost += 575000;
         }
-        return MekHqMoneyUtil.money(cost);
+        return Money.of(cost);
     }
 
     public boolean forQuad() {

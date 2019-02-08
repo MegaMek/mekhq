@@ -23,11 +23,8 @@ package mekhq.campaign.parts;
 
 import megamek.common.EquipmentType;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.finances.MekHqMoneyUtil;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.work.IAcquisitionWork;
-import org.joda.money.Money;
-
-import java.math.RoundingMode;
 
 /**
  *
@@ -74,21 +71,21 @@ public class BaArmor extends Armor implements IAcquisitionWork {
     public Money getPointCost() {
         switch(type) {
         case EquipmentType.T_ARMOR_BA_STANDARD_ADVANCED:
-            return MekHqMoneyUtil.money(12500);
+            return Money.of(12500);
         case EquipmentType.T_ARMOR_BA_MIMETIC:
         case EquipmentType.T_ARMOR_BA_STEALTH:
-            return MekHqMoneyUtil.money(15000);
+            return Money.of(15000);
         case EquipmentType.T_ARMOR_BA_STEALTH_BASIC:
-            return MekHqMoneyUtil.money(12000);
+            return Money.of(12000);
         case EquipmentType.T_ARMOR_BA_STEALTH_IMP:
-            return MekHqMoneyUtil.money(20000);
+            return Money.of(20000);
         case EquipmentType.T_ARMOR_BA_STEALTH_PROTOTYPE:
-            return MekHqMoneyUtil.money(50000);
+            return Money.of(50000);
         case EquipmentType.T_ARMOR_BA_FIRE_RESIST:
         case EquipmentType.T_ARMOR_BA_STANDARD_PROTOTYPE:
         case EquipmentType.T_ARMOR_BA_STANDARD:
         default:
-            return MekHqMoneyUtil.money(10000);
+            return Money.of(10000);
         }
     }
     
@@ -119,7 +116,7 @@ public class BaArmor extends Armor implements IAcquisitionWork {
     @Override
     public Money getStickerPrice() {
         //always in 5-ton increments
-        return getPointCost().multipliedBy(5).multipliedBy(getPointsPerTon(), RoundingMode.HALF_EVEN);
+        return getPointCost().multipliedBy(5).multipliedBy(getPointsPerTon());
     }
     
     @Override

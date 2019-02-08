@@ -23,8 +23,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import mekhq.campaign.finances.MekHqMoneyUtil;
-import org.joda.money.Money;
+import mekhq.campaign.finances.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -102,7 +101,7 @@ public class SpacecraftEngine extends Part {
 
     @Override 
     public Money getStickerPrice() {
-        return MekHqMoneyUtil.money(engineTonnage * 1000);
+        return Money.of(engineTonnage * 1000);
     }
 
     @Override

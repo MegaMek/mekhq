@@ -24,8 +24,7 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 import java.text.DecimalFormat;
 
-import mekhq.campaign.finances.MekHqMoneyUtil;
-import org.joda.money.Money;
+import mekhq.campaign.finances.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -86,7 +85,7 @@ public class Armor extends Part implements IAcquisitionWork {
 
     @Override
     public Money getCurrentValue() {
-    	return MekHqMoneyUtil.money(getTonnage() * EquipmentType.getArmorCost(type));
+    	return Money.of(getTonnage() * EquipmentType.getArmorCost(type));
     }
 
     public double getTonnageNeeded() {
@@ -98,13 +97,13 @@ public class Armor extends Part implements IAcquisitionWork {
     }
 
     public Money getValueNeeded() {
-    	return adjustCostsForCampaignOptions(MekHqMoneyUtil.money(getTonnageNeeded() * EquipmentType.getArmorCost(type)));
+    	return adjustCostsForCampaignOptions(Money.of(getTonnageNeeded() * EquipmentType.getArmorCost(type)));
     }
 
     @Override
     public Money getStickerPrice() {
     	//always in 5-ton increments
-    	return MekHqMoneyUtil.money(5 * EquipmentType.getArmorCost(type));
+    	return Money.of(5 * EquipmentType.getArmorCost(type));
     }
 
     @Override
@@ -456,7 +455,7 @@ public class Armor extends Part implements IAcquisitionWork {
 		toReturn += getAcquisitionExtraDesc() + "<br/>";
 		PartInventory inventories = campaign.getPartInventory(getAcquisitionPart());
         toReturn += inventories.getTransitOrderedDetails() + "<br/>";
-		toReturn += MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(adjustCostsForCampaignOptions(getStickerPrice())) + "<br/>";
+		toReturn += adjustCostsForCampaignOptions(getStickerPrice()).toAmountAndSymbolString() + "<br/>";
 		toReturn += "</font></html>";
 		return toReturn;
 	}

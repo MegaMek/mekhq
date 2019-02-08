@@ -23,9 +23,7 @@ package mekhq.campaign.parts.equipment;
 import java.io.PrintWriter;
 import java.math.RoundingMode;
 
-import mekhq.campaign.finances.MekHqMoneyUtil;
-import org.joda.money.BigMoney;
-import org.joda.money.Money;
+import mekhq.campaign.finances.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -487,10 +485,10 @@ public class EquipmentPart extends Part {
     	//why does all the proto ammo have no cost?
     	Entity en;
     	boolean isArmored = false;
-        BigMoney itemCost = MekHqMoneyUtil.bigMoney(type.getRawCost());
+        Money itemCost = Money.of(type.getRawCost());
 
-        if (itemCost.getAmountMajorInt() == EquipmentType.COST_VARIABLE) {
-            itemCost = resolveVariableCost(isArmored).toBigMoney();
+        if (itemCost.getAmount().intValue() == EquipmentType.COST_VARIABLE) {
+            itemCost = resolveVariableCost(isArmored);
         }
     	if (unit != null) {
             en = unit.getEntity();
@@ -498,7 +496,7 @@ public class EquipmentPart extends Part {
             if(null != mounted) {
             	isArmored = mounted.isArmored();
             }
-            itemCost = MekHqMoneyUtil.bigMoney(type.getCost(en, isArmored, getLocation()));
+            itemCost = Money.of(type.getCost(en, isArmored, getLocation()));
     	}
         if (isOmniPodded()) {
             itemCost = itemCost.multipliedBy(1.25);
@@ -507,70 +505,70 @@ public class EquipmentPart extends Part {
             //need a getCriticals command - but how does this work?
             //finalCost += 150000 * getCriticals(entity);
         }
-        return itemCost.toMoney(RoundingMode.HALF_EVEN);
+        return itemCost;
     }
 
     private Money resolveVariableCost(boolean isArmored) {
-    	Money varCost = MekHqMoneyUtil.zero();
+    	Money varCost = Money.zero();
     	Entity en = null;
     	if (getUnit() != null) {
     		en = getUnit().getEntity();
     	}
     	if (en != null) {
-    		varCost = MekHqMoneyUtil.money(type.getCost(en, isArmored, getLocation()));
+    		varCost = Money.of(type.getCost(en, isArmored, getLocation()));
     	} else if (type instanceof MiscType) {
         	if (type.hasFlag(MiscType.F_DRONE_CARRIER_CONTROL)) {
-                varCost = MekHqMoneyUtil.money(getTonnage() * 10000);
+                varCost = Money.of(getTonnage() * 10000);
             } else if (type.hasFlag(MiscType.F_OFF_ROAD)) {
-                varCost = MekHqMoneyUtil.money(10 * getTonnage() * getTonnage());
+                varCost = Money.of(10 * getTonnage() * getTonnage());
             } else if (type.hasFlag(MiscType.F_FLOTATION_HULL) || type.hasFlag(MiscType.F_VACUUM_PROTECTION) || type.hasFlag(MiscType.F_ENVIRONMENTAL_SEALING) || type.hasFlag(MiscType.F_OFF_ROAD)) {
                 //??
             } else if (type.hasFlag(MiscType.F_LIMITED_AMPHIBIOUS) || type.hasFlag((MiscType.F_FULLY_AMPHIBIOUS))) {
-                varCost = MekHqMoneyUtil.money(getTonnage() * 10000);
+                varCost = Money.of(getTonnage() * 10000);
             } else if (type.hasFlag(MiscType.F_DUNE_BUGGY)) {
-                varCost = MekHqMoneyUtil.money(10 * getTonnage() * getTonnage());
+                varCost = Money.of(10 * getTonnage() * getTonnage());
             } else if (type.hasFlag(MiscType.F_MASC) && type.hasFlag(MiscType.F_BA_EQUIPMENT)) {
                 //TODO: handle this one differently
                 //costValue = entity.getRunMP() * 75000;
             } else if (type.hasFlag(MiscType.F_HEAD_TURRET) || type.hasFlag(MiscType.F_SHOULDER_TURRET) || type.hasFlag(MiscType.F_QUAD_TURRET)) {
-                varCost = MekHqMoneyUtil.money(getTonnage() * 10000);
+                varCost = Money.of(getTonnage() * 10000);
             } else if (type.hasFlag(MiscType.F_SPONSON_TURRET)) {
-                varCost = MekHqMoneyUtil.money(getTonnage() * 4000);
+                varCost = Money.of(getTonnage() * 4000);
             } else if (type.hasFlag(MiscType.F_PINTLE_TURRET)) {
-                varCost = MekHqMoneyUtil.money(getTonnage() * 1000);
+                varCost = Money.of(getTonnage() * 1000);
             } else if (type.hasFlag(MiscType.F_ARMORED_MOTIVE_SYSTEM)) {
                 //TODO: handle this through motive system part
-                varCost = MekHqMoneyUtil.money(getTonnage() * 100000);
+                varCost = Money.of(getTonnage() * 100000);
             } else if (type.hasFlag(MiscType.F_JET_BOOSTER)) {
                 //TODO: Handle this one through subtyping
                 //varCost = entity.getEngine().getRating() * 10000;
             } else if (type.hasFlag(MiscType.F_DRONE_OPERATING_SYSTEM)) {
-                varCost = MekHqMoneyUtil.money((getTonnage() * 10000) + 5000);
+                varCost = Money.of((getTonnage() * 10000) + 5000);
             } else if (type.hasFlag(MiscType.F_TARGCOMP)) {
-                varCost = MekHqMoneyUtil.money(getTonnage() * 10000);
+                varCost = Money.of(getTonnage() * 10000);
             } else if (type.hasFlag(MiscType.F_CLUB) && (type.hasSubType(MiscType.S_HATCHET) || type.hasSubType(MiscType.S_MACE_THB))) {
-                varCost = MekHqMoneyUtil.money(getTonnage() * 5000);
+                varCost = Money.of(getTonnage() * 5000);
             } else if (type.hasFlag(MiscType.F_CLUB) && type.hasSubType(MiscType.S_SWORD)) {
-                varCost = MekHqMoneyUtil.money(getTonnage() * 10000);
+                varCost = Money.of(getTonnage() * 10000);
             } else if (type.hasFlag(MiscType.F_CLUB) && type.hasSubType(MiscType.S_RETRACTABLE_BLADE)) {
-                varCost = MekHqMoneyUtil.money((1 + getTonnage()) * 10000);
+                varCost = Money.of((1 + getTonnage()) * 10000);
             } else if (type.hasFlag(MiscType.F_TRACKS)) {
                 //TODO: Handle this through subtyping
                 //varCost = (int) Math.ceil((500 * entity.getEngine().getRating() * entity.getWeight()) / 75);
             } else if (type.hasFlag(MiscType.F_TALON)) {
-                varCost = MekHqMoneyUtil.money(getTonnage() * 300);
+                varCost = Money.of(getTonnage() * 300);
             } else if (type.hasFlag(MiscType.F_SPIKES)) {
-                varCost = MekHqMoneyUtil.money(getTonnage() * 50);
+                varCost = Money.of(getTonnage() * 50);
             } else if (type.hasFlag(MiscType.F_PARTIAL_WING)) {
-                varCost = MekHqMoneyUtil.money(getTonnage() * 50000);
+                varCost = Money.of(getTonnage() * 50000);
             } else if (type.hasFlag(MiscType.F_ACTUATOR_ENHANCEMENT_SYSTEM)) {
                 //TODO: subtype this one
                 //int multiplier = entity.locationIsLeg(loc) ? 700 : 500;
                 //costValue = (int) Math.ceil(entity.getWeight() * multiplier);
             } else if (type.hasFlag(MiscType.F_HAND_WEAPON) && (type.hasSubType(MiscType.S_CLAW))) {
-                varCost = MekHqMoneyUtil.money(getUnitTonnage() * 200);
+                varCost = Money.of(getUnitTonnage() * 200);
             } else if (type.hasFlag(MiscType.F_CLUB) && (type.hasSubType(MiscType.S_LANCE))) {
-                varCost = MekHqMoneyUtil.money(getUnitTonnage() * 150);
+                varCost = Money.of(getUnitTonnage() * 150);
             }
         }
         if (varCost.isZero()) {

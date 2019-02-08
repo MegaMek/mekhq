@@ -28,7 +28,6 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.event.PartChangedEvent;
 import mekhq.campaign.event.UnitChangedEvent;
-import mekhq.campaign.finances.MekHqMoneyUtil;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.parts.MissingPart;
@@ -41,7 +40,6 @@ import mekhq.gui.GuiTabType;
 import mekhq.gui.RepairTab;
 import mekhq.service.PartsAcquisitionService;
 import mekhq.service.PartsAcquisitionService.PartCountInfo;
-import org.joda.money.MoneyUtils;
 
 /**
  * @author Kipsta
@@ -220,9 +218,9 @@ public class AcquisitionsDialog extends JDialog {
         sbText.append(inventoryInfo);
         sbText.append("<br/>");
 
-        if (MoneyUtils.isPositive(PartsAcquisitionService.getMissingTotalPrice())) {
+        if (PartsAcquisitionService.getMissingTotalPrice().isPositive()) {
             String price = "Missing item price: "
-                    + MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(PartsAcquisitionService.getMissingTotalPrice());
+                    + PartsAcquisitionService.getMissingTotalPrice().toAmountAndSymbolString();
 
             sbText.append(price);
             sbText.append("<br/>");
@@ -405,14 +403,14 @@ public class AcquisitionsDialog extends JDialog {
                 sbText.append(inventoryInfo);
                 sbText.append("<br/>");
 
-                String price = "Item Price: " + MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(partCountInfo.getStickerPrice());
+                String price = "Item Price: " + partCountInfo.getStickerPrice().toAmountAndSymbolString();
 
                 sbText.append(price);
                 sbText.append("<br/>");
 
                 if (partCountInfo.getMissingCount() > 1) {
-                    price = "Missing item price: " + MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(
-                            partCountInfo.getStickerPrice().multipliedBy(partCountInfo.getMissingCount()));
+                    price = "Missing item price: " +
+                            partCountInfo.getStickerPrice().multipliedBy(partCountInfo.getMissingCount()).toAmountAndSymbolString();
 
                     sbText.append(price);
                     sbText.append("<br/>");

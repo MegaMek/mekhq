@@ -23,8 +23,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import mekhq.campaign.finances.MekHqMoneyUtil;
-import org.joda.money.Money;
+import mekhq.campaign.finances.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -89,15 +88,15 @@ public class StructuralIntegrity extends Part {
 	public Money getStickerPrice() {
 		if(null != unit && unit.getEntity() instanceof Aero) {
 			if(unit.getEntity() instanceof Dropship || unit.getEntity() instanceof SmallCraft) {
-				return MekHqMoneyUtil.money(((Aero)unit.getEntity()).get0SI() * 100000);
+				return Money.of(((Aero)unit.getEntity()).get0SI() * 100000);
 			}
 			else if(unit.getEntity() instanceof ConvFighter) {
-                return MekHqMoneyUtil.money(((Aero)unit.getEntity()).get0SI() * 4000);
+                return Money.of(((Aero)unit.getEntity()).get0SI() * 4000);
 			} else {
-                return MekHqMoneyUtil.money(((Aero)unit.getEntity()).get0SI() * 50000);
+                return Money.of(((Aero)unit.getEntity()).get0SI() * 50000);
 			}
 		}
-		return MekHqMoneyUtil.zero();
+		return Money.zero();
 	}
 	
 	@Override

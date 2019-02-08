@@ -7,13 +7,12 @@ import java.util.Map;
 
 import megamek.common.TargetRoll;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.finances.MekHqMoneyUtil;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PartInventory;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IAcquisitionWork;
-import org.joda.money.Money;
 
 public class PartsAcquisitionService {
 	private static Map<String, List<IAcquisitionWork>> acquisitionMap = null;
@@ -25,7 +24,7 @@ public class PartsAcquisitionService {
 	private static int missingCount = 0;
 	private static int requiredCount = 0;
 	private static int unavailableCount = 0;
-	private static Money missingTotalPrice = MekHqMoneyUtil.zero();
+	private static Money missingTotalPrice = Money.zero();
 
 	private PartsAcquisitionService() {
 	}
@@ -181,7 +180,7 @@ public class PartsAcquisitionService {
 		missingCount = 0;
 		requiredCount = 0;
 		unavailableCount = 0;
-		missingTotalPrice = MekHqMoneyUtil.zero();
+		missingTotalPrice = Money.zero();
 
 		//campaign.addReport("***START: generateSummaryCounts");
 		

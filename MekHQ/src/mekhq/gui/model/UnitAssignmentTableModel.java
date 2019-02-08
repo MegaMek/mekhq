@@ -17,7 +17,6 @@ import megamek.common.SmallCraft;
 import megamek.common.UnitType;
 import mekhq.IconPackage;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.finances.MekHqMoneyUtil;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.BasicInfo;
 import mekhq.gui.dialog.RetirementDefectionDialog;
@@ -117,7 +116,7 @@ public class UnitAssignmentTableModel extends AbstractTableModel {
         case COL_CLASS:
             return RetirementDefectionDialog.weightClassIndex(u);
         case COL_COST:
-            return MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(u.getBuyCost());
+            return u.getBuyCost().toAmountAndSymbolString();
         default:
             return "?";
         }

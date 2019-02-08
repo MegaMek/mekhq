@@ -66,14 +66,13 @@ import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.ResolveScenarioTracker.PersonStatus;
 import mekhq.campaign.ResolveScenarioTracker.PrisonerStatus;
 import mekhq.campaign.ResolveScenarioTracker.UnitStatus;
-import mekhq.campaign.finances.MekHqMoneyUtil;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Loot;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
-import org.joda.money.Money;
 
 /**
  *
@@ -573,7 +572,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
             gridBagConstraints.weightx = 0.0;
             gridBagConstraints.insets = new Insets(5, 5, 0, 0);
             pnlSalvageValue.add(lblSalvageValueUnit1, gridBagConstraints);
-        	lblSalvageValueUnit2 = new JLabel(MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(salvageUnit));
+        	lblSalvageValueUnit2 = new JLabel(salvageUnit.toAmountAndSymbolString());
         	gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = 0;
@@ -592,7 +591,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
             gridBagConstraints.insets = new Insets(5, 5, 0, 0);
             gridBagConstraints.weightx = 0.0;
             pnlSalvageValue.add(lblSalvageValueEmployer1, gridBagConstraints);
-        	lblSalvageValueEmployer2 = new JLabel(MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(salvageEmployer));
+        	lblSalvageValueEmployer2 = new JLabel(salvageEmployer.toAmountAndSymbolString());
         	gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = 1;
@@ -1355,8 +1354,8 @@ public class ResolveScenarioWizardDialog extends JDialog {
     			box.setEnabled(true);
     		}
     	}
-    	lblSalvageValueUnit2.setText(MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(salvageUnit));
-    	lblSalvageValueEmployer2.setText(MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(salvageEmployer));
+    	lblSalvageValueUnit2.setText(salvageUnit.toAmountAndSymbolString());
+    	lblSalvageValueEmployer2.setText(salvageEmployer.toAmountAndSymbolString());
     	String lead = "<html><font color='black'>";
         if(currentSalvagePct > maxSalvagePct) {
         	lead = "<html><font color='red'>";

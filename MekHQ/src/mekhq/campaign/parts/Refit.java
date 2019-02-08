@@ -26,7 +26,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.PrintWriter;
-import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -37,8 +36,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import mekhq.campaign.finances.MekHqMoneyUtil;
-import org.joda.money.Money;
+import mekhq.campaign.finances.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -755,10 +753,8 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 			newArmorSupplies.setUnit(oldUnit);
 			cost = cost.plus(newArmorSupplies
                                 .getStickerPrice()
-                                .toBigMoney()
                                 .multipliedBy(tonnageNeeded)
-                                .dividedBy(5.0, RoundingMode.HALF_EVEN)
-                                .toMoney(RoundingMode.HALF_EVEN));
+                                .dividedBy(5.0));
 			newArmorSupplies.setUnit(null);
 		}
 
@@ -767,7 +763,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 		for(AmmoType type : ammoNeeded.keySet()) {
 			int shotsNeeded = Math.max(ammoNeeded.get(type) - getAmmoAvailable(type), 0);
 			int shotsPerTon = type.getShots();
-			cost = cost.plus(MekHqMoneyUtil.money(type.getCost(newEntity, false, -1) * ((double)shotsNeeded/shotsPerTon)));
+			cost = cost.plus(Money.of(type.getCost(newEntity, false, -1) * ((double)shotsNeeded/shotsPerTon)));
 		}
 		
 		/*
@@ -844,7 +840,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 		//multiply time by refit class
 		time *= getTimeMultiplier();
 		if(!customJob) {
-			cost = cost.multipliedBy(1.1, RoundingMode.HALF_EVEN);
+			cost = cost.multipliedBy(1.1);
 		}
 
 		//TODO: track the number of locations changed so we can get stuff for omnis
@@ -902,7 +898,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
             }
 
             // The cost is equal to 10 percent of the units base value (not modified for quality).
-            cost = oldUnit.getBuyCost().multipliedBy(0.1, RoundingMode.HALF_EVEN);
+            cost = oldUnit.getBuyCost().multipliedBy(0.);
         }
 	}
 
@@ -938,7 +934,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 		reserveNewParts();
 		if(customJob) {
 		    //add the stuff on the shopping list to the master shopping list
-		    ArrayList<Part> newShoppingList = new ArrayList<Part>();
+		    ArrayList<Part> newShoppingList = new ArrayList<>();
     		for(Part part : shoppingList) {
     			part.setUnit(null);
     			if(part instanceof Armor) {
@@ -1009,7 +1005,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 	    //if they are not on a unit already, then we need
 	    //to set the refit id. Also, if there is more than one part
 	    //then we need to clone a part and reserve that instead
-		ArrayList<Integer> newNewUnitParts = new ArrayList<Integer>();
+		ArrayList<Integer> newNewUnitParts = new ArrayList<>();
 		for(int id : newUnitParts) {
 			Part newPart = oldUnit.campaign.getPart(id);
 			if(newPart.isSpare()) {
@@ -1055,7 +1051,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
         	checkForArmorSupplies();
         	return kitFound && !partsInTransit() && (null == newArmorSupplies || (armorNeeded - newArmorSupplies.getAmount()) <= 0);
 	    }
-		ArrayList<Part> newShoppingList = new ArrayList<Part>();
+		ArrayList<Part> newShoppingList = new ArrayList<>();
 		for(Part part : shoppingList) {
 			if(part instanceof IAcquisitionWork) {
 			    //check to see if we found a replacement
@@ -1217,7 +1213,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 		boolean aclan = false;
 	    oldUnit.setRefit(null);
         Entity oldEntity = oldUnit.getEntity();
-        ArrayList<Person> soldiers = new ArrayList<Person>();
+        ArrayList<Person> soldiers = new ArrayList<>();
         //unload any soldiers to reload later, because troop size may have changed
         if(oldEntity instanceof Infantry) {
 			soldiers = oldUnit.getCrew();
@@ -1290,7 +1286,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 		oldUnit.setEntity(newEntity);
 	
 		//set up new parts
-		ArrayList<Part> newParts = new ArrayList<Part>();
+		ArrayList<Part> newParts = new ArrayList<>();
 		//We've already made the old suits go *poof*; now we materialize new ones.
 		if (newEntity instanceof BattleArmor) {
 		    for (int t = BattleArmor.LOC_TROOPER_1; t < newEntity.locations(); t++) {
@@ -1362,7 +1358,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
         MekHQ.triggerEvent(new UnitRefitEvent(oldUnit));
 	}
 
-	public void saveCustomization() throws EntityLoadingException, IOException {
+	public void saveCustomization() throws EntityLoadingException {
 		UnitUtil.compactCriticals(newEntity);
 	    //UnitUtil.reIndexCrits(newEntity); Method is gone?
 
@@ -1674,7 +1670,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 
 	@Override
 	public String getDetails() {
-		return "(" + getRefitClassName() + "/" + getTimeLeft() + " minutes/" + MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(getCost()) + ")";
+		return "(" + getRefitClassName() + "/" + getTimeLeft() + " minutes/" + getCost().toAmountAndSymbolString() + ")";
 	}
 
 	@Override
@@ -1702,7 +1698,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 				+ "</timeSpent>");
 		pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<refitClass>" + refitClass
 				+ "</refitClass>");
-		pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<cost version=\"2\">" + MekHqXmlUtil.getXmlStringFromMoney(cost)
+		pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<cost version=\"2\">" + cost.toXmlString()
 				+ "</cost>");
 		pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<failedCheck>" + failedCheck
 				+ "</failedCheck>");

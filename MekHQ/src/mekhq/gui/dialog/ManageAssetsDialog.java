@@ -47,7 +47,6 @@ import mekhq.campaign.event.AssetNewEvent;
 import mekhq.campaign.event.AssetRemovedEvent;
 import mekhq.campaign.finances.Asset;
 import mekhq.campaign.finances.Finances;
-import mekhq.campaign.finances.MekHqMoneyUtil;
 import mekhq.gui.model.DataTableModel;
 
 /**
@@ -228,10 +227,10 @@ public class ManageAssetsDialog extends JDialog {
                 return asset.getName();
             }
             if(col == COL_VALUE) {
-                return MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(asset.getValue());
+                return asset.getValue().toAmountAndSymbolString();
             }
             if(col == COL_INCOME) {
-                return MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(asset.getIncome());
+                return asset.getIncome().toAmountAndSymbolString();
             }
             if(col == COL_SCHEDULE) {
                 return Finances.getScheduleName(asset.getSchedule());

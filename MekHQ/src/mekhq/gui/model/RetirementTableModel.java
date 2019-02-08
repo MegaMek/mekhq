@@ -22,14 +22,13 @@ import megamek.common.UnitType;
 import mekhq.IconPackage;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.finances.MekHqMoneyUtil;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.RetirementDefectionTracker;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.BasicInfo;
 import mekhq.gui.dialog.RetirementDefectionDialog;
-import org.joda.money.Money;
 
 public class RetirementTableModel extends AbstractTableModel {
     /**
@@ -241,7 +240,7 @@ public class RetirementTableModel extends AbstractTableModel {
                     (payBonus.get(p.getId())?1:0) +
                     miscMods.get(p.getId()) + generalMod;
         case COL_BONUS_COST:
-            return MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(RetirementDefectionTracker.getBonusCost(p));
+            return RetirementDefectionTracker.getBonusCost(p).toAmountAndSymbolString();
         case COL_PAY_BONUS:
             if (null == payBonus.get(p.getId())) {
                 return false;
@@ -259,7 +258,7 @@ public class RetirementTableModel extends AbstractTableModel {
                 return "";
             }
             if (altPayout.keySet().contains(p.getId())) {
-                return MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(altPayout.get(p.getId()));
+                return altPayout.get(p.getId()).toAmountAndSymbolString();
             }
             Money payout = campaign.getRetirementDefectionTracker().getPayout(p.getId()).getPayoutAmount();
             /* If no unit is required as part of the payout, the unit is part or all of the
@@ -281,13 +280,13 @@ public class RetirementTableModel extends AbstractTableModel {
             /* No payout if the pilot stole a unit */
             if (campaign.getRetirementDefectionTracker().getPayout(p.getId()).hasStolenUnit() &&
                     null != unitAssignments.get(p.getId())) {
-                payout = MekHqMoneyUtil.zero();
+                payout = Money.zero();
             }
             // If payout is negative then just make it zero
             if (payout.isNegative()) {
-                payout = MekHqMoneyUtil.zero();
+                payout = Money.zero();
             }
-            return MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(payout);
+            return payout.toAmountAndSymbolString();
         case COL_UNIT:
             if (null == campaign.getRetirementDefectionTracker().getPayout(p.getId()) ||
                     null == unitAssignments) {
@@ -329,7 +328,7 @@ public class RetirementTableModel extends AbstractTableModel {
                     return;
                 }
 
-                Money payout = MekHqMoneyUtil.money(Double.parseDouble(value.toString()));
+                Money payout = Money.of(Double.parseDouble(value.toString()));
                 altPayout.put(data.get(row), payout);
             } catch (Exception e1) {
                 return;

@@ -101,7 +101,7 @@ import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.GamePreset;
 import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.event.OptionsChangedEvent;
-import mekhq.campaign.finances.MekHqMoneyUtil;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.parts.Part;
@@ -119,8 +119,6 @@ import mekhq.gui.model.SortedComboBoxModel;
 import mekhq.gui.utilities.TableCellListener;
 import mekhq.module.PersonnelMarketServiceManager;
 import mekhq.module.api.PersonnelMarketMethod;
-import org.joda.money.Money;
-import org.joda.money.format.MoneyFormatException;
 
 /**
  * @author Jay Lawson <jaylawson39 at yahoo.com>
@@ -1863,10 +1861,11 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         JPanel panAllTypes = new JPanel(new GridLayout(Person.T_NUM / 2, 2));
         JTextField txtType;
         JPanel panType;
+        // TODO: use JFormattedTextField with Numeric formatter
         txtSalaryBase = new JTextField[Person.T_NUM];
         for (int i = 1; i < Person.T_NUM; i++) {
             txtType = new JTextField();
-            txtType.setText(Integer.toString(options.getBaseSalary(i).getAmountMajorInt()));
+            txtType.setText(Integer.toString(options.getBaseSalary(i).getAmount().intValue()));
             txtType.setPreferredSize(new Dimension(75, 20));
             panType = new JPanel(new GridBagLayout());
             gridBagConstraints = new java.awt.GridBagConstraints();
@@ -4768,10 +4767,10 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         //start salary
         for (int i = 1; i < Person.T_NUM; i++) {
             try {
-                Money salary = MekHqMoneyUtil.money(Double.parseDouble(txtSalaryBase[i].getText()));
+                Money salary = Money.of(Double.parseDouble(txtSalaryBase[i].getText()));
                 options.setBaseSalary(salary, i);
-            } catch (MoneyFormatException ex) {
-                //dont change it
+            } catch (Exception ignored) {
+
             }
         }
         for (int i = 0; i < 5; i++) {

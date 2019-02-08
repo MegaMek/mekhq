@@ -22,12 +22,10 @@
 package mekhq.campaign.parts.equipment;
 
 import java.io.PrintWriter;
-import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.HashSet;
 
-import mekhq.campaign.finances.MekHqMoneyUtil;
-import org.joda.money.Money;
+import mekhq.campaign.finances.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -152,12 +150,12 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 
     public Money getValueNeeded() {
         if (getShotsPerTon() <= 0) {
-            return MekHqMoneyUtil.zero();
+            return Money.zero();
         }
 
         return adjustCostsForCampaignOptions(getPricePerTon()
                 .multipliedBy(shotsNeeded)
-                .dividedBy(getShotsPerTon(), RoundingMode.HALF_EVEN));
+                .dividedBy(getShotsPerTon()));
     }
 
     protected Money getPricePerTon() {
@@ -170,7 +168,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
                 curType = mounted.getType();
             }
         }
-        return MekHqMoneyUtil.money(curType.getRawCost());
+        return Money.of(curType.getRawCost());
     }
     
     protected int getShotsPerTon() {
@@ -185,12 +183,12 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     @Override
     public Money getStickerPrice() {
         if (getShotsPerTon() <= 0) {
-            return MekHqMoneyUtil.zero();
+            return Money.zero();
         }
 
         return getPricePerTon()
                 .multipliedBy(getCurrentShots())
-                .dividedBy(getShotsPerTon(), RoundingMode.HALF_EVEN);
+                .dividedBy(getShotsPerTon());
     }
 
     @Override
@@ -719,7 +717,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
         toReturn += getAcquisitionExtraDesc() + "<br/>";
         PartInventory inventories = campaign.getPartInventory(getAcquisitionPart());
         toReturn += inventories.getTransitOrderedDetails() + "<br/>";
-        toReturn += MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(getBuyCost()) + "<br/>";
+        toReturn += getBuyCost().toAmountAndSymbolString() + "<br/>";
         toReturn += "</font></html>";
         return toReturn;
     }

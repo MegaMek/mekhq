@@ -20,10 +20,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamResult;
 
-import mekhq.campaign.finances.CurrencyManager;
-import mekhq.campaign.finances.MekHqMoneyUtil;
 import org.apache.commons.text.StringEscapeUtils;
-import org.joda.money.Money;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -45,6 +42,8 @@ import megamek.common.Jumpship;
 import megamek.common.MULParser;
 import megamek.common.Tank;
 import megamek.common.logging.LogLevel;
+
+import mekhq.campaign.finances.Money;
 
 public class MekHqXmlUtil {
 
@@ -675,20 +674,11 @@ public class MekHqXmlUtil {
         if (node.hasAttributes()) {
             Node attribute = node.getAttributes().getNamedItem("version");
             if (attribute != null && attribute.getTextContent().trim().equals("2")) {
-                return MekHqMoneyUtil.xmlMoneyFormatter().parseMoney(node.getTextContent().trim());
+                return Money.fromXmlString(node.getTextContent().trim());
             }
         }
-        // Old save, transform the long into a money
-        return MekHqMoneyUtil.money(Long.parseLong(node.getTextContent().trim()));
-    }
 
-    /**
-     * Transforms a money into a string ready to be written in a XML node
-     * different save versions
-     * @param amount money to transform into a string
-     * @return a string representation of the money
-     */
-    public static String getXmlStringFromMoney(Money amount) {
-        return MekHqMoneyUtil.xmlMoneyFormatter().print(amount);
+        // Old save, transform the long into a money
+        return Money.of(Long.parseLong(node.getTextContent().trim()));
     }
 }

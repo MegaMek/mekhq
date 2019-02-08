@@ -30,10 +30,7 @@ import java.util.Map;
 import java.util.StringJoiner;
 import java.util.UUID;
 
-import mekhq.campaign.finances.MekHqMoneyUtil;
-import org.joda.money.BigMoney;
-import org.joda.money.Money;
-import org.joda.money.MoneyUtils;
+import mekhq.campaign.finances.Money;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -341,23 +338,21 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 
 	protected Money adjustCostsForCampaignOptions(Money cost) {
 	    // if the part doesn't cost anything, no amount of multiplication will change it
-	    if(MoneyUtils.isZero(cost)) {
+	    if(cost.isZero()) {
 	        return cost;
 	    }
 
-        BigMoney temporal = cost.toBigMoney();
-
 		if(getTechBase() == T_CLAN) {
-            temporal = temporal.multipliedBy(campaign.getCampaignOptions().getClanPriceModifier());
+            cost = cost.multipliedBy(campaign.getCampaignOptions().getClanPriceModifier());
 		}
 		if(needsFixing() && !isPriceAdjustedForAmount()) {
-            temporal = temporal.multipliedBy(campaign.getCampaignOptions().getDamagedPartsValue());
+            cost = cost.multipliedBy(campaign.getCampaignOptions().getDamagedPartsValue());
 			//TODO: parts that cant be fixed should also be further reduced in price
 		} else if(!isBrandNew()) {
-            temporal = temporal.multipliedBy(campaign.getCampaignOptions().getUsedPartsValue(getQuality()));
+            cost = cost.multipliedBy(campaign.getCampaignOptions().getUsedPartsValue(getQuality()));
 		}
 
-		return temporal.toMoney(RoundingMode.HALF_EVEN);
+		return cost;
 	}
 
 	public boolean isBrandNew() {
@@ -1085,8 +1080,8 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	    }
         sj.add(hits + " hit(s)");
         if (campaign.getCampaignOptions().payForRepairs() && (hits > 0)) {
-            Money repairCost = getStickerPrice().multipliedBy(0.2, RoundingMode.HALF_EVEN);
-            sj.add(MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(repairCost) + " to repair");
+            Money repairCost = getStickerPrice().multipliedBy(0.2);
+            sj.add(repairCost.toAmountAndSymbolString() + " to repair");
         }
         return sj.toString();
     }

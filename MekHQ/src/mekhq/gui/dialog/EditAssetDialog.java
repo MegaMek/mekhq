@@ -32,8 +32,7 @@ import javax.swing.text.NumberFormatter;
 import megamek.common.util.EncodeControl;
 import mekhq.campaign.finances.Asset;
 import mekhq.campaign.finances.Finances;
-import mekhq.campaign.finances.MekHqMoneyUtil;
-
+import mekhq.campaign.finances.Money;
 
 /**
  *
@@ -98,7 +97,7 @@ public class EditAssetDialog extends JDialog {
 
         assetValueField = new JFormattedTextField();
         assetValueField.setFormatterFactory(new DefaultFormatterFactory(new NumberFormatter(NumberFormat.getInstance())));
-        assetValueField.setText(MekHqMoneyUtil.uiAmountPrinter().print(asset.getValue()));
+        assetValueField.setText(asset.getValue().toAmountString());
         assetValueField.setToolTipText(resourceMap.getString("assetValueField.toolTipText")); // NOI18N
         assetValueField.setName("assetValueField"); // NOI18N
         assetValueField.setMinimumSize(new java.awt.Dimension(150, 28));
@@ -122,7 +121,7 @@ public class EditAssetDialog extends JDialog {
 
         assetIncomeField = new JFormattedTextField();
         assetIncomeField.setFormatterFactory(new DefaultFormatterFactory(new NumberFormatter(NumberFormat.getInstance())));
-        assetIncomeField.setText(MekHqMoneyUtil.uiAmountPrinter().print(asset.getIncome()));
+        assetIncomeField.setText(asset.getIncome().toAmountString());
         assetIncomeField.setToolTipText(resourceMap.getString("assetIncomeField.toolTipText")); // NOI18N
         assetIncomeField.setName("assetIncomeField"); // NOI18N
         assetIncomeField.setMinimumSize(new java.awt.Dimension(150, 28));
@@ -194,12 +193,12 @@ public class EditAssetDialog extends JDialog {
     private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {
         asset.setName(txtName.getText());
         try {
-            asset.setValue(MekHqMoneyUtil.money(Double.parseDouble(assetValueField.getValue().toString())));
+            asset.setValue(Money.of(Double.parseDouble(assetValueField.getValue().toString())));
         } catch(Exception ignored) {
             
         }
         try {
-            asset.setIncome(MekHqMoneyUtil.money(Double.parseDouble(assetIncomeField.getValue().toString())));
+            asset.setIncome(Money.of(Double.parseDouble(assetIncomeField.getValue().toString())));
         } catch(Exception ignored) {
             
         }

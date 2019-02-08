@@ -40,7 +40,7 @@ import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.event.RepairStatusChangedEvent;
 import mekhq.campaign.event.UnitChangedEvent;
-import mekhq.campaign.finances.MekHqMoneyUtil;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.MissingPart;
@@ -63,7 +63,6 @@ import mekhq.gui.dialog.QuirksDialog;
 import mekhq.gui.dialog.TextAreaDialog;
 import mekhq.gui.model.UnitTableModel;
 import mekhq.gui.utilities.StaticChecks;
-import org.joda.money.Money;
 
 public class UnitTableMouseAdapter extends MouseInputAdapter implements
         ActionListener {
@@ -177,7 +176,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
                     Money sellValue = unit.getSellValue();
                     NumberFormat numberFormat = NumberFormat
                             .getNumberInstance();
-                    String text = MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(sellValue);
+                    String text = sellValue.toAmountAndSymbolString();
                     if (0 == JOptionPane.showConfirmDialog(null,
                             "Do you really want to sell " + unit.getName()
                                     + " for " + text, "Sell Unit?",
@@ -409,7 +408,7 @@ public class UnitTableMouseAdapter extends MouseInputAdapter implements
             double refund = gui.getCampaign().getCampaignOptions()
                     .GetCanceledOrderReimbursement();
             if (null != selectedUnit) {
-                Money refundAmount = selectedUnit.getBuyCost().multipliedBy(refund, RoundingMode.HALF_EVEN);
+                Money refundAmount = selectedUnit.getBuyCost().multipliedBy(refund);
                 gui.getCampaign().removeUnit(selectedUnit.getId());
                 gui.getCampaign().getFinances().credit(
                         refundAmount,

@@ -23,7 +23,6 @@ package mekhq.campaign.personnel;
 
 import java.io.PrintWriter;
 import java.io.Serializable;
-import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Enumeration;
@@ -35,8 +34,7 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import mekhq.campaign.finances.MekHqMoneyUtil;
-import org.joda.money.Money;
+import mekhq.campaign.finances.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -94,20 +92,20 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
         final String METHOD_NAME = "getShareValue(Campaign)"; //$NON-NLS-1$
 
         if (!campaign.getCampaignOptions().getUseShareSystem()) {
-			return MekHqMoneyUtil.zero();
+			return Money.zero();
 		}
 		String financialReport = campaign.getFinancialReport();
-		Money netWorth = MekHqMoneyUtil.zero();
+		Money netWorth = Money.zero();
 		try {
 			Pattern p = Pattern.compile("Net Worth\\D*(.*)");
 			Matcher m = p.matcher(financialReport);
 			m.find();
-			netWorth = MekHqMoneyUtil.money(Double.parseDouble(m.group(1)));
+			netWorth = Money.of(Double.parseDouble(m.group(1)));
 			if (campaign.getCampaignOptions().getSharesExcludeLargeCraft()) {
 				p = Pattern.compile("Large Craft\\D*(.*)");
 				m = p.matcher(financialReport);				
 				if (m.find() && null != m.group(1)) {
-					netWorth = netWorth.minus(MekHqMoneyUtil.money(Double.parseDouble(m.group(1))));
+					netWorth = netWorth.minus(Money.of(Double.parseDouble(m.group(1))));
 				}
 			}
 		} catch (Exception e) {
@@ -121,10 +119,10 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
 		}
 
 		if (totalShares <= 0) {
-		    return MekHqMoneyUtil.zero();
+		    return Money.zero();
         }
 
-		return netWorth.dividedBy(totalShares, RoundingMode.HALF_EVEN);
+		return netWorth.dividedBy(totalShares);
 	}
 
 	/**
@@ -291,8 +289,7 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
      * @param shareValue	The value of each share in the unit; if not using the share system, this is zero. 
      * @param campaign
      */
-    public void rollRetirement(AtBContract contract,
-    		HashMap<UUID, TargetRoll> targets, Money shareValue, Campaign campaign) {
+    public void rollRetirement(AtBContract contract, HashMap<UUID, TargetRoll> targets, Money shareValue, Campaign campaign) {
     	if (null != contract && !unresolvedPersonnel.keySet().contains(contract.getId())) {
     		unresolvedPersonnel.put(contract.getId(), new HashSet<>());
     	}
@@ -417,14 +414,14 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
 	public static Money getBonusCost(Person person) {
 		switch (person.getExperienceLevel(false)) {
 		case SkillType.EXP_ELITE:
-			return MekHqMoneyUtil.money((person.getProfession() == Ranks.RPROF_MW)?300000:150000);
+			return Money.of((person.getProfession() == Ranks.RPROF_MW)?300000:150000);
 		case SkillType.EXP_VETERAN:
-			return MekHqMoneyUtil.money((person.getProfession() == Ranks.RPROF_MW)?150000:50000);
+			return Money.of((person.getProfession() == Ranks.RPROF_MW)?150000:50000);
 		case SkillType.EXP_REGULAR:
-			return MekHqMoneyUtil.money((person.getProfession() == Ranks.RPROF_MW)?50000:20000);
+			return Money.of((person.getProfession() == Ranks.RPROF_MW)?50000:20000);
 		case SkillType.EXP_GREEN:
 		default:
-			return MekHqMoneyUtil.money((person.getProfession() == Ranks.RPROF_MW)?20000:10000);
+			return Money.of((person.getProfession() == Ranks.RPROF_MW)?20000:10000);
 		}
 	}
 	
@@ -437,7 +434,7 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
 	public class Payout {
 		int weightClass = 0;
 		int dependents = 0;
-		Money payoutAmount = MekHqMoneyUtil.zero();
+		Money payoutAmount = Money.zero();
 		boolean recruit = false;
 		int recruitType = Person.T_NONE;
 		boolean heir = false;
@@ -490,7 +487,7 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
 			} else {
 				if (p.getProfession() == Ranks.RPROF_INF) {
 					if (p.getUnitId() != null) {
-						payoutAmount = MekHqMoneyUtil.money(50000);
+						payoutAmount = Money.of(50000);
 					}
 				} else {
 					payoutAmount = getBonusCost(p);
@@ -619,7 +616,7 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
         	MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 3,
         			"dependents", payouts.get(pid).getDependents());
         	MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 3,
-        			"cbills", MekHqXmlUtil.getXmlStringFromMoney(payouts.get(pid).getPayoutAmount()));
+        			"cbills", payouts.get(pid).getPayoutAmount().toXmlString());
         	MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 3,
         			"recruit", payouts.get(pid).hasRecruit());
         	MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 3,

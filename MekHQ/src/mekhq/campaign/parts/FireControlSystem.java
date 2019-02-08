@@ -23,8 +23,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import mekhq.campaign.finances.MekHqMoneyUtil;
-import org.joda.money.Money;
+import mekhq.campaign.finances.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -52,7 +51,7 @@ public class FireControlSystem extends Part {
 	private Money cost;
 	
 	public FireControlSystem() {
-    	this(0, MekHqMoneyUtil.zero(), null);
+    	this(0, Money.zero(), null);
     }
     
     public FireControlSystem(int tonnage, Money cost, Campaign c) {
@@ -196,10 +195,10 @@ public class FireControlSystem extends Part {
 	public void calculateCost() {
 		if(null != unit) {
 			if(unit.getEntity() instanceof SmallCraft) {
-				cost = MekHqMoneyUtil.money(100000 + 10000 * ((SmallCraft)unit.getEntity()).getArcswGuns());
+				cost = Money.of(100000 + 10000 * ((SmallCraft)unit.getEntity()).getArcswGuns());
 			}
 			else if(unit.getEntity() instanceof Jumpship) {
-				cost = MekHqMoneyUtil.money(100000 + 10000 * ((Jumpship)unit.getEntity()).getArcswGuns());
+				cost = Money.of(100000 + 10000 * ((Jumpship)unit.getEntity()).getArcswGuns());
 			}
 		}
 	}
@@ -224,7 +223,7 @@ public class FireControlSystem extends Part {
 		writeToXmlBegin(pw1, indent);
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<cost version=\"2\">"
-				+MekHqXmlUtil.getXmlStringFromMoney(cost)
+				+cost.toXmlString()
 				+"</cost>");
 		writeToXmlEnd(pw1, indent);
 	}

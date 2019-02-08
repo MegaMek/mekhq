@@ -45,9 +45,8 @@ import megamek.common.util.EncodeControl;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Loan;
-import mekhq.campaign.finances.MekHqMoneyUtil;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.rating.IUnitRating;
-import org.joda.money.Money;
 
 /**
  * @author Taharqa
@@ -214,7 +213,7 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
 
         txtPrincipal = new javax.swing.JFormattedTextField();
         txtPrincipal.setFormatterFactory(new DefaultFormatterFactory(numberFormatter));
-        txtPrincipal.setText(MekHqMoneyUtil.uiAmountPrinter().print(loan.getPrincipal()));
+        txtPrincipal.setText(loan.getPrincipal().toAmountString());
         txtPrincipal.setEditable(false);
         btnPlusTenMillion = new JButton(resourceMap.getString("btnPlus10mil.text"));
         btnMinusTenMillion = new JButton(resourceMap.getString("btnMinus10mil.text"));
@@ -225,14 +224,14 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
         btnPlusTenK = new JButton(resourceMap.getString("btnPlus10k.text"));
         btnMinusTenK = new JButton(resourceMap.getString("btnMinus10k.text"));
         checkMinusButtons();
-        btnPlusTenMillion.addActionListener(evt -> adjustPrincipal(MekHqMoneyUtil.money(10000000)));
-        btnMinusTenMillion.addActionListener(evt -> adjustPrincipal(MekHqMoneyUtil.money(-10000000)));
-        btnPlusMillion.addActionListener(evt -> adjustPrincipal(MekHqMoneyUtil.money(1000000)));
-        btnMinusMillion.addActionListener(evt -> adjustPrincipal(MekHqMoneyUtil.money(-1000000)));
-        btnPlusHundredK.addActionListener(evt -> adjustPrincipal(MekHqMoneyUtil.money(100000)));
-        btnMinusHundredK.addActionListener(evt -> adjustPrincipal(MekHqMoneyUtil.money(-100000)));
-        btnPlusTenK.addActionListener(evt -> adjustPrincipal(MekHqMoneyUtil.money(10000)));
-        btnMinusTenK.addActionListener(evt -> adjustPrincipal(MekHqMoneyUtil.money(-10000)));
+        btnPlusTenMillion.addActionListener(evt -> adjustPrincipal(Money.of(10000000)));
+        btnMinusTenMillion.addActionListener(evt -> adjustPrincipal(Money.of(-10000000)));
+        btnPlusMillion.addActionListener(evt -> adjustPrincipal(Money.of(1000000)));
+        btnMinusMillion.addActionListener(evt -> adjustPrincipal(Money.of(-1000000)));
+        btnPlusHundredK.addActionListener(evt -> adjustPrincipal(Money.of(100000)));
+        btnMinusHundredK.addActionListener(evt -> adjustPrincipal(Money.of(-100000)));
+        btnPlusTenK.addActionListener(evt -> adjustPrincipal(Money.of(10000)));
+        btnMinusTenK.addActionListener(evt -> adjustPrincipal(Money.of(-10000)));
 
         JPanel plusPanel = new JPanel(new GridLayout(2, 4));
         plusPanel.add(btnPlusTenMillion);
@@ -501,7 +500,7 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
         gridBagConstraints.gridx = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
-        panRight.add(new JLabel(MekHqMoneyUtil.uiAmountPrinter().print(maxCollateralValue)), gridBagConstraints);
+        panRight.add(new JLabel(maxCollateralValue.toAmountAndSymbolString()), gridBagConstraints);
 
         panInfo.add(panLeft);
         panInfo.add(panRight);
@@ -528,17 +527,17 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
 
     private void refreshValues() {
         try {
-            txtPrincipal.setText(MekHqMoneyUtil.uiAmountPrinter().print(loan.getPrincipal()));
+            txtPrincipal.setText(loan.getPrincipal().toAmountString());
             lblAPR.setText(loan.getInterestRate() + "%");
             lblCollateralPct.setText(loan.getCollateralPercent() + "%");
             lblYears.setText(loan.getYears() + " years");
             lblSchedule.setText(Finances.getScheduleName(loan.getPaymentSchedule()));
-            lblPrincipal.setText(MekHqMoneyUtil.uiAmountPrinter().print(loan.getPrincipal()));
+            lblPrincipal.setText(loan.getPrincipal().toAmountString());
             lblFirstPayment.setText(SimpleDateFormat.getDateInstance().format(loan.getNextPayDate()));
-            lblPayAmount.setText(MekHqMoneyUtil.uiAmountPrinter().print(loan.getPaymentAmount()));
+            lblPayAmount.setText(loan.getPaymentAmount().toAmountString());
             lblNPayment.setText(numberFormatter.valueToString(loan.getRemainingPayments()));
-            lblTotalPayment.setText(MekHqMoneyUtil.uiAmountPrinter().print(loan.getRemainingValue()));
-            lblCollateralAmount.setText(MekHqMoneyUtil.uiAmountPrinter().print(loan.getCollateralAmount()));
+            lblTotalPayment.setText(loan.getRemainingValue().toAmountString());
+            lblCollateralAmount.setText(loan.getCollateralAmount().toAmountString());
         } catch (Exception ignored ){
 
         }
@@ -633,9 +632,9 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
     }
 
     private void checkMinusButtons() {
-        btnMinusTenMillion.setEnabled(loan.getPrincipal().isGreaterThan(MekHqMoneyUtil.money(10000000)));
-        btnMinusMillion.setEnabled(loan.getPrincipal().isGreaterThan(MekHqMoneyUtil.money(1000000)));
-        btnMinusHundredK.setEnabled(loan.getPrincipal().isGreaterThan(MekHqMoneyUtil.money(100000)));
-        btnMinusTenK.setEnabled(loan.getPrincipal().isGreaterThan(MekHqMoneyUtil.money(10000)));
+        btnMinusTenMillion.setEnabled(loan.getPrincipal().isGreaterThan(Money.of(10000000)));
+        btnMinusMillion.setEnabled(loan.getPrincipal().isGreaterThan(Money.of(1000000)));
+        btnMinusHundredK.setEnabled(loan.getPrincipal().isGreaterThan(Money.of(100000)));
+        btnMinusTenK.setEnabled(loan.getPrincipal().isGreaterThan(Money.of(10000)));
     }
 }

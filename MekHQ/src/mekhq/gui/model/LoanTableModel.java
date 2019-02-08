@@ -11,7 +11,6 @@ import javax.swing.table.DefaultTableCellRenderer;
 
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Loan;
-import mekhq.campaign.finances.MekHqMoneyUtil;
 
 /**
  * A table model for displaying active loans
@@ -75,16 +74,16 @@ public class LoanTableModel extends DataTableModel {
             return loan.getDescription();
         }
         if(col == COL_COLLATERAL) {
-            return MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(loan.getCollateralAmount());
+            return loan.getCollateralAmount().toAmountAndSymbolString();
         }
         if(col == COL_VALUE) {
-            return MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(loan.getRemainingValue());
+            return loan.getRemainingValue().toAmountAndSymbolString();
         }
         if(col == COL_PAYMENT) {
-            return MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(loan.getPaymentAmount());
+            return loan.getPaymentAmount().toAmountAndSymbolString();
         }
         if(col == COL_PRINCIPAL) {
-            return MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(loan.getPrincipal());
+            return loan.getPrincipal().toAmountAndSymbolString();
         }
         if(col == COL_SCHEDULE) {
             return Finances.getScheduleName(loan.getPaymentSchedule());

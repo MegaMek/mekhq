@@ -13,7 +13,6 @@ import javax.swing.JTable;
 import javax.swing.event.MouseInputAdapter;
 
 import mekhq.MekHQ;
-import mekhq.campaign.finances.MekHqMoneyUtil;
 import mekhq.campaign.event.LoanRemovedEvent;
 import mekhq.campaign.event.PartRemovedEvent;
 import mekhq.campaign.finances.Loan;
@@ -112,12 +111,9 @@ public class LoanTableMouseAdapter extends MouseInputAdapter implements
             JMenu menu = null;
             // **lets fill the pop up menu**//
             menuItem = new JMenuItem("Pay Off Full Balance ("
-                    + MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(loan.getRemainingValue()) + ")");
+                    + loan.getRemainingValue().toAmountAndSymbolString() + ")");
             menuItem.setActionCommand("PAY_BALANCE");
-            menuItem.setEnabled(
-                    MekHqMoneyUtil.isGreaterOrEqual(
-                            gui.getCampaign().getFunds(),
-                            loan.getRemainingValue()));
+            menuItem.setEnabled(gui.getCampaign().getFunds().isGreaterOrEqualThan(loan.getRemainingValue()));
             menuItem.addActionListener(this);
             popup.add(menuItem);
             menuItem = new JMenuItem("Default on This Loan");

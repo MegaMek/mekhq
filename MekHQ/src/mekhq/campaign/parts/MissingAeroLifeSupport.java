@@ -23,8 +23,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import mekhq.campaign.finances.MekHqMoneyUtil;
-import org.joda.money.Money;
+import mekhq.campaign.finances.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -49,7 +48,7 @@ public class MissingAeroLifeSupport extends MissingPart {
 	private Money cost;
 	
 	public MissingAeroLifeSupport() {
-    	this(0, MekHqMoneyUtil.zero(), false, null);
+    	this(0, Money.zero(), false, null);
     }
     
 	 public MissingAeroLifeSupport(int tonnage, Money cost, boolean f, Campaign c) {
@@ -126,7 +125,7 @@ public class MissingAeroLifeSupport extends MissingPart {
 				+"</fighter>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<cost version=\"2\">"
-				+ MekHqXmlUtil.getXmlStringFromMoney(cost)
+				+ cost.toXmlString()
 				+"</cost>");
 		writeToXmlEnd(pw1, indent);
 	}

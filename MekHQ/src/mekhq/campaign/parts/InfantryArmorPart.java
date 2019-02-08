@@ -23,8 +23,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import mekhq.campaign.finances.MekHqMoneyUtil;
-import org.joda.money.Money;
+import mekhq.campaign.finances.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -207,7 +206,7 @@ public class InfantryArmorPart extends Part {
 			price += 5000;
 		}
 		
-		return MekHqMoneyUtil.money(price);
+		return Money.of(price);
 	}
 
 	@Override

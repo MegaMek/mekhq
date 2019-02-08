@@ -11,7 +11,6 @@ import java.util.ResourceBundle;
 
 import javax.swing.BorderFactory;
 
-import mekhq.campaign.finances.MekHqMoneyUtil;
 import org.joda.time.DateTime;
 
 import megamek.common.util.EncodeControl;
@@ -266,9 +265,12 @@ public class JumpPathViewPanel extends javax.swing.JPanel {
             pnlStats.add(lblCost, gridBagConstraints);
 
             txtCost.setName("lblCost2"); // NOI18N
-            txtCost.setText(MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(
-                    campaign.calculateCostPerJump(true, campaign.getCampaignOptions().useEquipmentContractBase())
-                            .multipliedBy(path.getJumps())));
+            txtCost.setText(
+                    campaign.calculateCostPerJump(
+                                true,
+                                campaign.getCampaignOptions().useEquipmentContractBase())
+                            .multipliedBy(path.getJumps())
+                                .toAmountAndSymbolString());
             txtCost.setEditable(false);
             txtCost.setLineWrap(true);
             txtCost.setWrapStyleWord(true);

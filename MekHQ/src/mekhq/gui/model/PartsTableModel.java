@@ -7,7 +7,6 @@ import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 
-import mekhq.campaign.finances.MekHqMoneyUtil;
 import mekhq.campaign.parts.Part;
 
 /**
@@ -84,12 +83,10 @@ public class PartsTableModel extends DataTableModel {
             return "<html><nobr>"+part.getDetails()+"</nobr></html>";
         }
         if(col == COL_COST) {
-            return MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(part.getActualValue());
+            return part.getActualValue().toAmountAndSymbolString();
         }
         if(col == COL_TOTAL_COST) {
-            return MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(
-                    part.getActualValue()
-                            .multipliedBy(part.getQuantity()));
+            return part.getActualValue().multipliedBy(part.getQuantity()).toAmountAndSymbolString();
         }
         if(col == COL_QUANTITY) {
             return part.getQuantity();

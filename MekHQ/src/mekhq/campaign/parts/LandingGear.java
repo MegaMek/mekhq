@@ -23,8 +23,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import mekhq.campaign.finances.MekHqMoneyUtil;
-import org.joda.money.Money;
+import mekhq.campaign.finances.Money;
 import org.w3c.dom.Node;
 
 import megamek.common.Aero;
@@ -180,7 +179,7 @@ public class LandingGear extends Part {
 
 	@Override
 	public Money getStickerPrice() {
-		return MekHqMoneyUtil.money(10.0 * getUnitTonnage());
+		return Money.of(10.0 * getUnitTonnage());
 	}
 
 	@Override

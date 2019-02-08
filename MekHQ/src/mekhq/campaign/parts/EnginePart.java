@@ -24,8 +24,7 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 import java.util.GregorianCalendar;
 
-import mekhq.campaign.finances.MekHqMoneyUtil;
-import org.joda.money.Money;
+import mekhq.campaign.finances.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -121,7 +120,7 @@ public class EnginePart extends Part {
 
 	@Override
 	public Money getStickerPrice() {
-		return MekHqMoneyUtil.money((double)getEngine().getBaseCost() / 75.0 * getEngine().getRating() * getUnitTonnage());
+		return Money.of((double)getEngine().getBaseCost() / 75.0 * getEngine().getRating() * getUnitTonnage());
 	}
 	
 	@Override

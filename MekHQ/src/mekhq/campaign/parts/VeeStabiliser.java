@@ -23,8 +23,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import mekhq.campaign.finances.MekHqMoneyUtil;
-import org.joda.money.Money;
+import mekhq.campaign.finances.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -191,7 +190,7 @@ public class VeeStabiliser extends Part {
 	@Override
 	public Money getStickerPrice() {
 		// TODO Auto-generated method stub
-        return MekHqMoneyUtil.zero();
+        return Money.zero();
 	}
 	
 	@Override

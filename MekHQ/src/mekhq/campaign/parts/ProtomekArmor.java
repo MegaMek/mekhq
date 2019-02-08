@@ -23,9 +23,8 @@ package mekhq.campaign.parts;
 
 import megamek.common.TechAdvancement;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.finances.MekHqMoneyUtil;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.work.IAcquisitionWork;
-import org.joda.money.Money;
 
 /**
  *
@@ -58,7 +57,7 @@ public class ProtomekArmor extends Armor implements IAcquisitionWork {
     
     @Override
     public Money getCurrentValue() {
-        return MekHqMoneyUtil.money(amount * 625);
+        return Money.of(amount * 625);
     }
     
     public double getTonnageNeeded() {
@@ -67,13 +66,13 @@ public class ProtomekArmor extends Armor implements IAcquisitionWork {
     }
     
     public Money getValueNeeded() {
-        return adjustCostsForCampaignOptions(MekHqMoneyUtil.money(amountNeeded * 625));
+        return adjustCostsForCampaignOptions(Money.of(amountNeeded * 625));
     }
     
     @Override
     public Money getStickerPrice() {
         //always in 5-ton increments
-        return MekHqMoneyUtil.money(5 * 20 * 625);
+        return Money.of(5 * 20 * 625);
     }
     
     @Override

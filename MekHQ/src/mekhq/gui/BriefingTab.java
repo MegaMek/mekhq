@@ -53,7 +53,6 @@ import megamek.common.options.GameOptions;
 import megamek.common.util.EncodeControl;
 import megameklab.com.util.UnitPrintManager;
 import mekhq.MekHQ;
-import mekhq.campaign.finances.MekHqMoneyUtil;
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.event.MissionChangedEvent;
 import mekhq.campaign.event.MissionCompletedEvent;
@@ -414,9 +413,8 @@ public final class BriefingTab extends CampaignGuiTab {
                                         mission.setStatus(Mission.S_ACTIVE);
                                     }
                                 } else {
-                                    if (null != getCampaign().getRetirementDefectionTracker()
-                                            .getRetirees((AtBContract) mission)
-                                            && MekHqMoneyUtil.isGreaterOrEqual(getCampaign().getFinances().getBalance(), rdd.totalPayout())) {
+                                    if (null != getCampaign().getRetirementDefectionTracker().getRetirees((AtBContract) mission) &&
+                                            getCampaign().getFinances().getBalance().isGreaterOrEqualThan(rdd.totalPayout())) {
                                         final int[] admins = { Person.T_ADMIN_COM, Person.T_ADMIN_HR,
                                                 Person.T_ADMIN_LOG, Person.T_ADMIN_TRA };
                                         for (int role : admins) {

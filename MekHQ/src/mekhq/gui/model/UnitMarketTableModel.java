@@ -28,7 +28,7 @@ import javax.swing.SwingConstants;
 
 import megamek.common.EntityWeightClass;
 import megamek.common.UnitType;
-import mekhq.campaign.finances.MekHqMoneyUtil;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.market.UnitMarket;
 
 /**
@@ -148,7 +148,10 @@ public class UnitMarketTableModel extends DataTableModel {
         	if (null == o.unit) {
         		return "";
         	}
-            return MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(MekHqMoneyUtil.money((double)o.unit.getCost() * o.pct / 100.0));
+            return Money.of((double)o.unit.getCost())
+                    .multipliedBy(o.pct)
+                    .dividedBy(100)
+                    .toAmountAndSymbolString();
         }
         if(col == COL_PERCENT) {
        		return o.pct + "%";

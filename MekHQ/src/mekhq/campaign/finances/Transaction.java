@@ -32,7 +32,6 @@ import java.util.Vector;
 
 import mekhq.MekHqXmlUtil;
 
-import org.joda.money.Money;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -118,7 +117,7 @@ public class Transaction implements Serializable {
 	private int category;
 	
 	public Transaction() {
-		this(MekHqMoneyUtil.zero(),-1,"",null);
+		this(Money.zero(),-1,"",null);
 	}
 	
 	public Transaction(Money a, int c, String d, Date dt) {
@@ -219,7 +218,7 @@ public class Transaction implements Serializable {
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "<transaction>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<amount version=\"2\">"
-				+MekHqXmlUtil.getXmlStringFromMoney(amount)
+				+amount.toXmlString()
 				+"</amount>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<description>"

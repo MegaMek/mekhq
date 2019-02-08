@@ -23,8 +23,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import mekhq.campaign.finances.MekHqMoneyUtil;
-import org.joda.money.Money;
+import mekhq.campaign.finances.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -57,7 +56,7 @@ public class AeroLifeSupport extends Part {
 	        .setStaticTechLevel(SimpleTechLevel.STANDARD);
 		
 	public AeroLifeSupport() {
-    	this(0, MekHqMoneyUtil.zero(), false, null);
+    	this(0, Money.zero(), false, null);
     }
     
     public AeroLifeSupport(int tonnage, Money cost, boolean f, Campaign c) {
@@ -200,10 +199,10 @@ public class AeroLifeSupport extends Part {
 	
 	public void calculateCost() {
 		if(fighter) {
-			cost = MekHqMoneyUtil.money(50000);
+			cost = Money.of(50000);
 		}
 		if(null != unit) {
-			cost = MekHqMoneyUtil.money(5000.0 * (((Aero)unit.getEntity()).getNCrew() + ((Aero)unit.getEntity()).getNPassenger()));
+			cost = Money.of(5000.0 * (((Aero)unit.getEntity()).getNCrew() + ((Aero)unit.getEntity()).getNPassenger()));
 		}	
 	}
 
@@ -231,7 +230,7 @@ public class AeroLifeSupport extends Part {
 				+"</fighter>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<cost version=\"2\">"
-				+ MekHqXmlUtil.getXmlStringFromMoney(cost)
+				+ cost.toXmlString()
 				+"</cost>");
 		writeToXmlEnd(pw1, indent);
 	}

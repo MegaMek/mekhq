@@ -22,17 +22,15 @@ package mekhq.campaign.mission;
 
 import java.io.PrintWriter;
 import java.io.Serializable;
-import java.math.RoundingMode;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
-import mekhq.campaign.finances.MekHqMoneyUtil;
+import mekhq.campaign.finances.Money;
 import org.apache.commons.text.CharacterPredicate;
 import org.apache.commons.text.RandomStringGenerator;
-import org.joda.money.Money;
 import org.joda.time.DateTime;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -93,8 +91,8 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
     private int signBonus;
 
     // need to keep track of total value salvaged for salvage rights
-    private Money salvagedByUnit     = MekHqMoneyUtil.zero();
-    private Money salvagedByEmployer = MekHqMoneyUtil.zero();
+    private Money salvagedByUnit     = Money.zero();
+    private Money salvagedByEmployer = Money.zero();
 
     // actual amounts
     private Money advanceAmount;
@@ -391,12 +389,12 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
 
     public Money getMonthlyPayOut() {
         if (getLength() <= 0) {
-            return MekHqMoneyUtil.zero();
+            return Money.zero();
         }
 
         return getTotalAmountPlusFeesAndBonuses()
                 .minus(getTotalAdvanceAmount())
-                .dividedBy(getLength(), RoundingMode.HALF_EVEN);
+                .dividedBy(getLength());
     }
 
     /**
@@ -493,7 +491,7 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
 
             return c.calculateCostPerJump(campaignOps, campaignOps).multipliedBy(jumpPath.getJumps()).multipliedBy(2);
         }
-        return MekHqMoneyUtil.zero();
+        return Money.zero();
     }
 
     /**
@@ -541,20 +539,20 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
         //calculate base amount
         baseAmount = c.getContractBase()
                 .multipliedBy(getLength())
-                .multipliedBy(paymentMultiplier, RoundingMode.HALF_EVEN);
+                .multipliedBy(paymentMultiplier);
 
         //calculate overhead
         switch(overheadComp) {
         case OH_HALF:
             overheadAmount = c.getOverheadExpenses()
                     .multipliedBy(getLength())
-                    .multipliedBy(0.5, RoundingMode.HALF_EVEN);
+                    .multipliedBy(0.5);
             break;
         case OH_FULL:
             overheadAmount = c.getOverheadExpenses().multipliedBy(getLength());
             break;
         default:
-            overheadAmount = MekHqMoneyUtil.zero();
+            overheadAmount = Money.zero();
         }
 
         //calculate support amount
@@ -562,9 +560,10 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
                 && c.getCampaignOptions().getUnitRatingMethod().equals(mekhq.campaign.rating.UnitRatingMethod.CAMPAIGN_OPS)) {
             supportAmount = c.getPeacetimeCost()
                                 .multipliedBy(getLength())
-                                .multipliedBy((double)straightSupport/100.0, RoundingMode.HALF_EVEN);
+                                .multipliedBy(straightSupport)
+                                .dividedBy(100);
         } else {
-            Money maintCosts = MekHqMoneyUtil.zero();
+            Money maintCosts = Money.zero();
             for (Unit u : c.getUnits()) {
                 if (u.getEntity() instanceof Infantry && !(u.getEntity() instanceof BattleArmor)) {
                     continue;
@@ -574,7 +573,8 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
             maintCosts = maintCosts.multipliedBy(4);
             supportAmount = maintCosts
                                 .multipliedBy(getLength())
-                                .multipliedBy((double)straightSupport/100.0, RoundingMode.HALF_EVEN);
+                                .multipliedBy(straightSupport)
+                                .dividedBy(100);
         }
 
         //calculate transportation costs
@@ -587,9 +587,10 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
             transportAmount = c.calculateCostPerJump(campaignOps, campaignOps)
                                     .multipliedBy(jumpPath.getJumps())
                                     .multipliedBy(2)
-                                    .multipliedBy((double)transportComp/100.0, RoundingMode.HALF_EVEN);
+                                    .multipliedBy(transportComp)
+                                    .dividedBy(100);
         } else {
-            transportAmount = MekHqMoneyUtil.zero();
+            transportAmount = Money.zero();
         }
 
         //calculate transit amount for CO
@@ -597,13 +598,11 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
                 && c.getCampaignOptions().getUnitRatingMethod().equals(mekhq.campaign.rating.UnitRatingMethod.CAMPAIGN_OPS)) {
             //contract base * transport period * reputation * employer modifier
             transitAmount = c.getContractBase()
-                                    .toBigMoney()
                                     .multipliedBy(((c.calculateJumpPath(c.getCurrentPlanet(), getPlanet()).getJumps()) * 2.0) / 4.0)
                                     .multipliedBy(c.getUnitRatingMod() * 0.2 + 0.5)
-                                    .multipliedBy(1.2)
-                                    .toMoney(RoundingMode.HALF_EVEN);
+                                    .multipliedBy(1.2);
         } else {
-            transitAmount = MekHqMoneyUtil.zero();
+            transitAmount = Money.zero();
         }
 
         signingAmount = baseAmount
@@ -611,7 +610,8 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
                             .plus(transportAmount)
                             .plus(transitAmount)
                             .plus(supportAmount)
-                            .multipliedBy((double)signBonus/100.0, RoundingMode.HALF_EVEN);
+                            .multipliedBy(signBonus)
+                            .dividedBy(100);
 
         if (mrbcFee) {
             feeAmount = baseAmount
@@ -619,12 +619,15 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
                             .plus(transportAmount)
                             .plus(transitAmount)
                             .plus(supportAmount)
-                            .multipliedBy((double)getMrbcFeePercentage()/100.0, RoundingMode.HALF_EVEN);
+                            .multipliedBy(getMrbcFeePercentage())
+                            .dividedBy(100);
         } else {
-            feeAmount = MekHqMoneyUtil.zero();
+            feeAmount = Money.zero();
         }
 
-        advanceAmount = getTotalAmountPlusFees().multipliedBy((double)advancePct/100.0, RoundingMode.HALF_EVEN);
+        advanceAmount = getTotalAmountPlusFees()
+                            .multipliedBy(advancePct)
+                            .dividedBy(100);
 
         // only adjust the start date for travel if the start date is currently null
         boolean adjustStartDate = false;
@@ -671,16 +674,16 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
         pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<mrbcFee>" + mrbcFee + "</mrbcFee>");
         pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<advancePct>" + advancePct + "</advancePct>");
         pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<signBonus>" + signBonus + "</signBonus>");
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<advanceAmount  version=\"2\">" +  MekHqXmlUtil.getXmlStringFromMoney(advanceAmount) + "</advanceAmount>");
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<signingAmount version=\"2\">" +  MekHqXmlUtil.getXmlStringFromMoney(signingAmount) + "</signingAmount>");
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<transportAmount version=\"2\">" +  MekHqXmlUtil.getXmlStringFromMoney(transportAmount) + "</transportAmount>");
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<transitAmount version=\"2\">" +  MekHqXmlUtil.getXmlStringFromMoney(transitAmount) + "</transitAmount>");
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<overheadAmount version=\"2\">" +  MekHqXmlUtil.getXmlStringFromMoney(overheadAmount) + "</overheadAmount>");
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<supportAmount version=\"2\">" +  MekHqXmlUtil.getXmlStringFromMoney(supportAmount) + "</supportAmount>");
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<baseAmount version=\"2\">" +  MekHqXmlUtil.getXmlStringFromMoney(baseAmount) + "</baseAmount>");
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<feeAmount version=\"2\">" +  MekHqXmlUtil.getXmlStringFromMoney(feeAmount) + "</feeAmount>");
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<salvagedByUnit version=\"2\">" +  MekHqXmlUtil.getXmlStringFromMoney(salvagedByUnit) + "</salvagedByUnit>");
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<salvagedByEmployer version=\"2\">" + MekHqXmlUtil.getXmlStringFromMoney(salvagedByEmployer) + "</salvagedByEmployer>");
+        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<advanceAmount  version=\"2\">" +  advanceAmount.toXmlString() + "</advanceAmount>");
+        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<signingAmount version=\"2\">" +  signingAmount.toXmlString() + "</signingAmount>");
+        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<transportAmount version=\"2\">" +  transportAmount.toXmlString() + "</transportAmount>");
+        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<transitAmount version=\"2\">" +  transitAmount.toXmlString() + "</transitAmount>");
+        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<overheadAmount version=\"2\">" +  overheadAmount.toXmlString() + "</overheadAmount>");
+        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<supportAmount version=\"2\">" +  supportAmount.toXmlString() + "</supportAmount>");
+        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<baseAmount version=\"2\">" +  baseAmount.toXmlString() + "</baseAmount>");
+        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<feeAmount version=\"2\">" +  feeAmount.toXmlString() + "</feeAmount>");
+        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<salvagedByUnit version=\"2\">" +  salvagedByUnit.toXmlString() + "</salvagedByUnit>");
+        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<salvagedByEmployer version=\"2\">" + salvagedByEmployer.toXmlString() + "</salvagedByEmployer>");
     }
 
     @Override

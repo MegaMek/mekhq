@@ -54,11 +54,9 @@ import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.finances.MekHqMoneyUtil;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
-
 
 /**
  *
@@ -375,7 +373,7 @@ public class ChooseRefitDialog extends javax.swing.JDialog {
 				return r.getShoppingList().size();
 			}
 			if(col == COL_COST) {
-				return MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(r.getCost());
+				return r.getCost().toAmountAndSymbolString();
 			}
 			if(col == COL_TARGET) {
 			    return campaign.getTargetForAcquisition(r, campaign.getLogisticsPerson(), false).getValueAsString();
@@ -389,7 +387,7 @@ public class ChooseRefitDialog extends javax.swing.JDialog {
 		}
 		
 		@Override
-		public Class<? extends Object> getColumnClass(int c) {
+		public Class<?> getColumnClass(int c) {
 			return getValueAt(0, c).getClass();
 		}
 

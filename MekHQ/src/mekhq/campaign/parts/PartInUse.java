@@ -4,9 +4,9 @@ import java.util.Objects;
 import java.util.regex.Pattern;
 
 import megamek.common.AmmoType;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IAcquisitionWork;
-import org.joda.money.Money;
 
 public class PartInUse {
     private static final Pattern cleanUp1 = Pattern.compile("\\d+\\shit\\(s\\),\\s"); //$NON-NLS-1$

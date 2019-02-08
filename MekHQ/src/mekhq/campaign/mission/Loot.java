@@ -32,15 +32,12 @@ import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.Version;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.finances.MekHqMoneyUtil;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.parts.Part;
 
-import org.joda.money.Money;
-import org.joda.money.MoneyUtils;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
 
 /**
  * 
@@ -56,7 +53,7 @@ public class Loot implements MekHqXmlSerializable {
     
     public Loot() {
         name = "None";
-        cash = MekHqMoneyUtil.zero();
+        cash = Money.zero();
         units = new ArrayList<>();
         parts = new ArrayList<>();
     }
@@ -113,15 +110,15 @@ public class Loot implements MekHqXmlSerializable {
     
     public String getShortDescription() {
         String desc = getName() + " - ";
-        if(MoneyUtils.isPositive(cash)) {
-            desc += MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(cash);
+        if(cash.isPositive()) {
+            desc += cash.toAmountAndSymbolString();
         }
         if(units.size() > 0) {
             String s = units.size() + " unit";
             if(units.size() > 1) {
                 s += "s";
             }
-            if(MoneyUtils.isPositive(cash)) {
+            if(cash.isPositive()) {
                 s = ", " + s;
             }
             desc += s;
@@ -131,7 +128,7 @@ public class Loot implements MekHqXmlSerializable {
             if(parts.size() > 1) {
                 s += "s";
             }
-            if(MoneyUtils.isPositive(cash) || units.size() > 0) {
+            if(cash.isPositive() || units.size() > 0) {
                 s = ", " + s;
             }
             desc += s;
@@ -141,7 +138,7 @@ public class Loot implements MekHqXmlSerializable {
     
     public void get(Campaign campaign, Scenario s) {
         //TODO: put in some reports
-        if(MoneyUtils.isPositive(cash)) {
+        if(cash.isPositive()) {
             campaign.getFinances().credit(cash, Transaction.C_MISC, "Reward for " + getName() + " during " + s.getName(), campaign.getDate());
         }
         for(Entity e : units) {
@@ -160,7 +157,7 @@ public class Loot implements MekHqXmlSerializable {
                 +"</name>");
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<cash version=\"2\">"
-                +MekHqXmlUtil.getXmlStringFromMoney(cash)
+                +cash.toXmlString()
                 +"</cash>");
         for(Entity e : units) {
             String lookupName = e.getChassis() + " " + e.getModel();

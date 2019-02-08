@@ -31,11 +31,8 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import mekhq.campaign.*;
-import mekhq.campaign.finances.MekHqMoneyUtil;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.log.*;
-import org.joda.money.BigMoney;
-import org.joda.money.Money;
-import org.joda.money.MoneyUtils;
 import org.joda.time.DateTime;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -328,18 +325,18 @@ public class Person implements Serializable, MekHqXmlSerializable {
     // initializes the AtB ransom values
     static {
         MECHWARRIOR_AERO_RANSOM_VALUES = new HashMap<>();
-        MECHWARRIOR_AERO_RANSOM_VALUES.put(SkillType.EXP_ULTRA_GREEN, MekHqMoneyUtil.money(5000)); // no official AtB rules for really inexperienced scrubs, but...
-        MECHWARRIOR_AERO_RANSOM_VALUES.put(SkillType.EXP_GREEN, MekHqMoneyUtil.money(10000));
-        MECHWARRIOR_AERO_RANSOM_VALUES.put(SkillType.EXP_REGULAR, MekHqMoneyUtil.money(25000));
-        MECHWARRIOR_AERO_RANSOM_VALUES.put(SkillType.EXP_VETERAN, MekHqMoneyUtil.money(75000));
-        MECHWARRIOR_AERO_RANSOM_VALUES.put(SkillType.EXP_ELITE, MekHqMoneyUtil.money(150000));
+        MECHWARRIOR_AERO_RANSOM_VALUES.put(SkillType.EXP_ULTRA_GREEN, Money.of(5000)); // no official AtB rules for really inexperienced scrubs, but...
+        MECHWARRIOR_AERO_RANSOM_VALUES.put(SkillType.EXP_GREEN, Money.of(10000));
+        MECHWARRIOR_AERO_RANSOM_VALUES.put(SkillType.EXP_REGULAR, Money.of(25000));
+        MECHWARRIOR_AERO_RANSOM_VALUES.put(SkillType.EXP_VETERAN, Money.of(75000));
+        MECHWARRIOR_AERO_RANSOM_VALUES.put(SkillType.EXP_ELITE, Money.of(150000));
         
         OTHER_RANSOM_VALUES = new HashMap<>();
-        OTHER_RANSOM_VALUES.put(SkillType.EXP_ULTRA_GREEN, MekHqMoneyUtil.money(2500));
-        OTHER_RANSOM_VALUES.put(SkillType.EXP_GREEN, MekHqMoneyUtil.money(5000));
-        OTHER_RANSOM_VALUES.put(SkillType.EXP_REGULAR, MekHqMoneyUtil.money(10000));
-        OTHER_RANSOM_VALUES.put(SkillType.EXP_VETERAN, MekHqMoneyUtil.money(25000));
-        OTHER_RANSOM_VALUES.put(SkillType.EXP_ELITE, MekHqMoneyUtil.money(50000));
+        OTHER_RANSOM_VALUES.put(SkillType.EXP_ULTRA_GREEN, Money.of(2500));
+        OTHER_RANSOM_VALUES.put(SkillType.EXP_GREEN, Money.of(5000));
+        OTHER_RANSOM_VALUES.put(SkillType.EXP_REGULAR, Money.of(10000));
+        OTHER_RANSOM_VALUES.put(SkillType.EXP_VETERAN, Money.of(25000));
+        OTHER_RANSOM_VALUES.put(SkillType.EXP_ELITE, Money.of(50000));
     }
     
     //default constructor
@@ -371,7 +368,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         status = S_ACTIVE;
         hits = 0;
         skills = new Hashtable<>();
-        salary = MekHqMoneyUtil.zero();
+        salary = Money.zero();
         campaign = c;
         doctorId = null;
         unitId = null;
@@ -1398,7 +1395,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         }
         pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                     + "<salary version=\"2\">"
-                    + MekHqXmlUtil.getXmlStringFromMoney(salary)
+                    + salary.toXmlString()
                     + "</salary>");
         pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                     + "<status>"
@@ -1948,28 +1945,27 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     public Money getSalary() {
         if (isPrisoner() || isBondsman()) {
-            return MekHqMoneyUtil.zero();
+            return Money.zero();
         }
 
-        if (MoneyUtils.isPositiveOrZero(salary)) {
+        if (salary.isPositiveOrZero()) {
             return salary;
         }
 
         //if salary is -1, then use the standard amounts
-        BigMoney primaryBase = campaign.getCampaignOptions().getBaseSalary(getPrimaryRole()).toBigMoney();
+        Money primaryBase = campaign.getCampaignOptions().getBaseSalary(getPrimaryRole());
         primaryBase = primaryBase.multipliedBy(campaign.getCampaignOptions().getSalaryXpMultiplier(getExperienceLevel(false)));
         if (hasSkill(SkillType.S_ANTI_MECH) && (getPrimaryRole() == T_INFANTRY || getPrimaryRole() == T_BA)) {
             primaryBase = primaryBase.multipliedBy(campaign.getCampaignOptions().getSalaryAntiMekMultiplier());
         }
 
-        BigMoney secondaryBase = campaign.getCampaignOptions().getBaseSalary(getSecondaryRole()).toBigMoney()
-                .dividedBy(2, RoundingMode.HALF_EVEN);
+        Money secondaryBase = campaign.getCampaignOptions().getBaseSalary(getSecondaryRole()).dividedBy(2);
         secondaryBase = secondaryBase.multipliedBy(campaign.getCampaignOptions().getSalaryXpMultiplier(getExperienceLevel(true)));
         if (hasSkill(SkillType.S_ANTI_MECH) && (getSecondaryRole() == T_INFANTRY || getSecondaryRole() == T_BA)) {
             secondaryBase = secondaryBase.multipliedBy(campaign.getCampaignOptions().getSalaryAntiMekMultiplier());
         }
 
-        BigMoney totalBase = primaryBase.plus(secondaryBase);
+        Money totalBase = primaryBase.plus(secondaryBase);
 
         if (getRank().isOfficer()) {
             totalBase = totalBase.multipliedBy(campaign.getCampaignOptions().getSalaryCommissionMultiplier());
@@ -1979,7 +1975,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
         totalBase = totalBase.multipliedBy(getRank().getPayMultiplier());
 
-        return totalBase.toMoney(RoundingMode.HALF_EVEN);
+        return totalBase;
         //TODO: distinguish dropship, jumpship, and warship crew
         //TODO: Add era mod to salary calc..
     }

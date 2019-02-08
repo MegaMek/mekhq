@@ -28,7 +28,6 @@ import javax.swing.SwingConstants;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 
-import mekhq.campaign.finances.MekHqMoneyUtil;
 import mekhq.campaign.mission.Loot;
 
     /**
@@ -87,7 +86,7 @@ public class LootTableModel extends AbstractTableModel {
             return loot.getName();
         }
         if(col == COL_MONEY) {
-            return MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(loot.getCash());
+            return loot.getCash().toAmountAndSymbolString();
         }
         if(col == COL_MECHS) {
             return loot.getUnits().size();

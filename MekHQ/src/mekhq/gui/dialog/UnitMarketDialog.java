@@ -69,13 +69,12 @@ import megamek.common.logging.LogLevel;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.finances.MekHqMoneyUtil;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.market.UnitMarket;
 import mekhq.gui.model.UnitMarketTableModel;
 import mekhq.gui.model.XTableColumnModel;
 import mekhq.gui.sorter.WeightClassSorter;
-import org.joda.money.Money;
 
 /**
  * Code copied heavily from PersonnelMarketDialog
@@ -333,7 +332,7 @@ public class UnitMarketDialog extends JDialog {
 	    	int transitDays = campaign.getCampaignOptions().getInstantUnitMarketDelivery()?0:
 	    		campaign.calculatePartTransitTime(Compute.d6(2) - 2);
 			UnitMarket.MarketOffer offer = marketModel.getOffer(tableUnits.convertRowIndexToModel(tableUnits.getSelectedRow()));
-			Money cost = MekHqMoneyUtil.money(offer.unit.getCost() * offer.pct / 100.0);
+			Money cost = Money.of(offer.unit.getCost() * offer.pct / 100.0);
 			if (campaign.getFunds().isLessThan(cost)) {
 				 campaign.addReport("<font color='red'><b> You cannot afford this unit. Transaction cancelled</b>.</font>");
 				 return;
@@ -341,7 +340,7 @@ public class UnitMarketDialog extends JDialog {
 
 			int roll = Compute.d6();
 			if (offer.market == UnitMarket.MARKET_BLACK && roll <= 2) {
-				campaign.getFinances().debit(cost.dividedBy(roll, RoundingMode.HALF_EVEN), Transaction.C_UNIT,
+				campaign.getFinances().debit(cost.dividedBy(roll), Transaction.C_UNIT,
 						"Purchased " + selectedEntity.getShortName() + " (lost on black market)",
 						campaign.getCalendar().getTime());
 				campaign.addReport("<font color='red'>Swindled! money was paid, but no unit delivered.</font>");

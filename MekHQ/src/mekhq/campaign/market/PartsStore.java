@@ -49,7 +49,7 @@ import megamek.common.weapons.InfantryAttack;
 import megamek.common.weapons.Weapon;
 import megamek.common.weapons.bayweapons.BayWeapon;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.finances.MekHqMoneyUtil;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.AeroHeatSink;
 import mekhq.campaign.parts.AeroSensor;
 import mekhq.campaign.parts.AmmoStorage;
@@ -443,7 +443,7 @@ public class PartsStore implements Serializable {
 		}
 		parts.add(new AeroSensor(0, true, c));
 		parts.add(new Avionics(0, c));
-		parts.add(new FireControlSystem(0, MekHqMoneyUtil.zero(), c));
+		parts.add(new FireControlSystem(0, Money.zero(), c));
 		parts.add(new LandingGear(0, c));
 		parts.add(new BayDoor(0, c));
 		for (BayType btype : BayType.values()) {

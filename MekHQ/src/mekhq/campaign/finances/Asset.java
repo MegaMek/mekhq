@@ -26,7 +26,6 @@ import java.io.PrintWriter;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 
-import org.joda.money.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -46,9 +45,9 @@ public class Asset implements MekHqXmlSerializable {
     
     public Asset() {
         name = "New Asset";
-        value = MekHqMoneyUtil.zero();
+        value = Money.zero();
         schedule = Finances.SCHEDULE_YEARLY;
-        income = MekHqMoneyUtil.zero();
+        income = Money.zero();
     }
 
     public String getName() {
@@ -92,7 +91,7 @@ public class Asset implements MekHqXmlSerializable {
                 +"</name>");
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<value version=\"2\">"
-                +MekHqXmlUtil.getXmlStringFromMoney(value)
+                +value.toXmlString()
                 +"</value>");
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<schedule>"
@@ -100,7 +99,7 @@ public class Asset implements MekHqXmlSerializable {
                 +"</schedule>");
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<income version=\"2\">"
-                +MekHqXmlUtil.getXmlStringFromMoney(income)
+                +income.toXmlString()
                 +"</income>");
         pw1.println(MekHqXmlUtil.indentStr(indent) + "</asset>");
     }

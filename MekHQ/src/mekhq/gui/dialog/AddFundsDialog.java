@@ -27,9 +27,8 @@ import javax.swing.text.DefaultFormatterFactory;
 import javax.swing.text.NumberFormatter;
 
 import megamek.common.util.EncodeControl;
-import mekhq.campaign.finances.MekHqMoneyUtil;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.Transaction;
-import org.joda.money.Money;
 
 /**
  *
@@ -121,7 +120,7 @@ public class AddFundsDialog extends JDialog implements FocusListener, KeyListene
     }
 
     public Money getFundsQuantity () {
-        return MekHqMoneyUtil.money(Double.parseDouble(jFormattedTextFieldFundsQuantity.getValue().toString()));
+        return Money.of(Double.parseDouble(jFormattedTextFieldFundsQuantity.getValue().toString()));
     }
 
     public String getFundsDescription() {

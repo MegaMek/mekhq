@@ -69,8 +69,7 @@ import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 import javax.xml.parsers.DocumentBuilder;
 
-import mekhq.campaign.finances.MekHqMoneyUtil;
-import org.joda.money.Money;
+import mekhq.campaign.finances.Money;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -2826,7 +2825,7 @@ public class CampaignGUI extends JPanel {
             inDebt = " <font color='red'>(in Debt)</font>";
         }
         String text = "<html><b>Funds:</b> "
-                + MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(funds)
+                + funds.toAmountAndSymbolString()
                 + inDebt
                 + "</html>";
         lblFunds.setText(text);

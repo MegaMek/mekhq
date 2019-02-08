@@ -51,7 +51,7 @@ import megamek.common.TargetRoll;
 import megamek.common.UnitType;
 import megamek.common.util.EncodeControl;
 import mekhq.Utilities;
-import mekhq.campaign.finances.MekHqMoneyUtil;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.personnel.Person;
@@ -67,7 +67,6 @@ import mekhq.gui.sorter.BonusSorter;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.RankSorter;
 import mekhq.gui.sorter.WeightClassSorter;
-import org.joda.money.Money;
 
 /**
  * @author Neoancient
@@ -267,10 +266,10 @@ public class RetirementDefectionDialog extends JDialog {
         			    Money bonus = getTotalBonus();
         			    if (bonus.isGreaterThan(hqView.getCampaign().getFinances().getBalance())) {
         			        lblTotal.setText("<html><font color='red'>"
-        			                + MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(getTotalBonus()) + "</font></html>");
+        			                + getTotalBonus().toAmountAndSymbolString() + "</font></html>");
         			        btnRoll.setEnabled(false);
         			    } else {
-        			        lblTotal.setText(MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(getTotalBonus()));
+        			        lblTotal.setText(getTotalBonus().toAmountAndSymbolString());
         			        btnRoll.setEnabled(true);
         			    }
         			}
@@ -360,7 +359,7 @@ public class RetirementDefectionDialog extends JDialog {
 				setUnitGroup();
 			}
         });
-        model.addTableModelListener(arg0 -> lblPayment.setText(MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(totalPayout())));
+        model.addTableModelListener(arg0 -> lblPayment.setText(totalPayout().toAmountAndSymbolString()));
 
         XTableColumnModel columnModel = (XTableColumnModel)retireeTable.getColumnModel();
         columnModel.setColumnVisible(columnModel.getColumn(retireeTable.convertColumnIndexToView(RetirementTableModel.COL_ASSIGN)), false);
@@ -588,7 +587,7 @@ public class RetirementDefectionDialog extends JDialog {
                             .minus(hqView.getCampaign().getUnit(p.getOriginalUnitId()).getBuyCost());
 
 				    if (temp.isNegative()) {
-				        temp = MekHqMoneyUtil.zero();
+				        temp = Money.zero();
                     }
 
 					rdTracker.getPayout(id).setPayoutAmount(temp);
@@ -617,7 +616,7 @@ public class RetirementDefectionDialog extends JDialog {
         ((XTableColumnModel)retireeTable.getColumnModel()).setColumnVisible(retireeTable.getColumnModel().getColumn(retireeTable.convertColumnIndexToView(RetirementTableModel.COL_RECRUIT)), !showRecruitColumn);
 		((RetirementTableModel)retireeTable.getModel()).setData(retireeList, unitAssignments);
 		filterPersonnel(retireeSorter, cbGroupResults.getSelectedIndex(), true);
-		lblPayment.setText(MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(totalPayout()));
+		lblPayment.setText(totalPayout().toAmountAndSymbolString());
 	}
 
 	private void filterPersonnel(TableRowSorter<RetirementTableModel> sorter, int groupIndex, boolean resultsView) {
@@ -714,9 +713,9 @@ public class RetirementDefectionDialog extends JDialog {
 
 	public Money totalPayout() {
 		if (null == rdTracker.getRetirees(contract)) {
-			return MekHqMoneyUtil.zero();
+			return Money.zero();
 		}
-		Money retVal = MekHqMoneyUtil.zero();
+		Money retVal = Money.zero();
 		for (UUID id : rdTracker.getRetirees(contract)) {
 			if (null == rdTracker.getPayout(id)) {
 				continue;
@@ -759,11 +758,11 @@ public class RetirementDefectionDialog extends JDialog {
 			/* If the pilot has stolen a unit, there is no payout */
 			if (rdTracker.getPayout(id).hasStolenUnit() &&
 					null != unitAssignments.get(id)) {
-				payout = MekHqMoneyUtil.zero();
+				payout = Money.zero();
 			}
 			// If the payout is negative just set it to zero
 			if (payout.isNegative()) {
-			    payout = MekHqMoneyUtil.zero();
+			    payout = Money.zero();
             }
 
 			retVal = retVal.plus(payout);
@@ -789,7 +788,7 @@ public class RetirementDefectionDialog extends JDialog {
 	}
 
 	private Money getTotalBonus() {
-		Money retVal = MekHqMoneyUtil.zero();
+		Money retVal = Money.zero();
 		for (UUID id : targetRolls.keySet()) {
 			if (((RetirementTableModel)(personnelTable.getModel())).getPayBonus(id)) {
 				retVal = retVal.plus(RetirementDefectionTracker.getBonusCost(hqView.getCampaign().getPerson(id)));
@@ -806,9 +805,9 @@ public class RetirementDefectionDialog extends JDialog {
 	 */
 	public static Money getShortfallAdjustment(int required, int actual) {
 		if (actual >= required) {
-			return MekHqMoneyUtil.zero();
+			return Money.zero();
 		}
-		return MekHqMoneyUtil.money((required - actual) * 3000000);
+		return Money.of((required - actual) * 3000000);
 	}
 
 	public UUID getUnitId(UUID pid) {

@@ -25,7 +25,6 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 
 import megamek.common.util.EncodeControl;
-import mekhq.campaign.finances.MekHqMoneyUtil;
 import mekhq.campaign.parts.PartInUse;
 
 public class PartsInUseTableModel extends DataTableModel {
@@ -107,7 +106,7 @@ public class PartsInUseTableModel extends DataTableModel {
                     return EMPTY_CELL;
                 }
             case COL_COST:
-                return MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(piu.getCost());
+                return piu.getCost().toAmountAndSymbolString();
             case COL_BUTTON_BUY:
                 return resourceMap.getString("buy.text"); //$NON-NLS-1$
             case COL_BUTTON_BUY_BULK:
@@ -140,7 +139,7 @@ public class PartsInUseTableModel extends DataTableModel {
     }
     
     public void setData(Set<PartInUse> data) {
-        setData(new ArrayList<PartInUse>(data));
+        setData(new ArrayList<>(data));
     }
     
     @SuppressWarnings("unchecked")

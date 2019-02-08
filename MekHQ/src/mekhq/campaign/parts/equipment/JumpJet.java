@@ -27,9 +27,8 @@ import megamek.common.EquipmentType;
 import megamek.common.MiscType;
 import megamek.common.Mounted;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.finances.MekHqMoneyUtil;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.MissingPart;
-import org.joda.money.Money;
 
 /**
  *
@@ -89,9 +88,9 @@ public class JumpJet extends EquipmentPart {
     @Override
     public Money getStickerPrice() {
         if (isOmniPodded()) {
-            return MekHqMoneyUtil.money(250 * getUnitTonnage());
+            return Money.of(250 * getUnitTonnage());
         } else {
-            return MekHqMoneyUtil.money(200 * getUnitTonnage());
+            return Money.of(200 * getUnitTonnage());
         }
     }
     

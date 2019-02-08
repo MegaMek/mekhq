@@ -20,7 +20,6 @@ import megamek.common.UnitType;
 import megamek.common.options.PilotOptions;
 import mekhq.IconPackage;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.finances.MekHqMoneyUtil;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.personnel.Person;
@@ -646,7 +645,7 @@ import mekhq.gui.BasicInfo;
                 }
             }
             if(col == COL_SALARY) {
-                return MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(p.getSalary());
+                return p.getSalary().toAmountAndSymbolString();
             }
             if(col == COL_KILLS) {
                 return Integer.toString(getCampaign().getKillsFor(p.getId()).size());

@@ -22,7 +22,6 @@
 package mekhq.campaign.finances;
 
 import java.io.PrintWriter;
-import java.math.RoundingMode;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -37,7 +36,6 @@ import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
 
-import org.joda.money.Money;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -180,9 +178,9 @@ public class Loan implements MekHqXmlSerializable {
         }
         double r = ((double)rate/100.0)/denom;
         nPayments = years * denom;
-        payAmount = principal.multipliedBy(r * Math.pow(1+r,nPayments) / (Math.pow(1+r, nPayments)-1), RoundingMode.HALF_EVEN);
+        payAmount = principal.multipliedBy(r * Math.pow(1+r,nPayments)).dividedBy(Math.pow(1+r, nPayments)-1);
         totalValue = payAmount.multipliedBy(nPayments);
-        collateralValue = principal.multipliedBy((double)collateral/100.0, RoundingMode.HALF_EVEN);
+        collateralValue = principal.multipliedBy(collateral).dividedBy(100);
     }
 
     public Money getPrincipal() {
@@ -365,7 +363,7 @@ public class Loan implements MekHqXmlSerializable {
                 +"</refNumber>");
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<principal version=\"2\">"
-                +MekHqXmlUtil.getXmlStringFromMoney(principal)
+                +principal.toXmlString()
                 +"</principal>");
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<rate>"
@@ -389,11 +387,11 @@ public class Loan implements MekHqXmlSerializable {
                 +"</nPayments>");
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<payAmount version=\"2\">"
-                +MekHqXmlUtil.getXmlStringFromMoney(payAmount)
+                +payAmount.toXmlString()
                 +"</payAmount>");
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<collateralValue version=\"2\">"
-                +MekHqXmlUtil.getXmlStringFromMoney(collateralValue)
+                +collateralValue.toXmlString()
                 +"</collateralValue>");
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<overdue>"
@@ -402,7 +400,7 @@ public class Loan implements MekHqXmlSerializable {
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<totalValue version=\"2\">"
                 +totalValue
-                +MekHqXmlUtil.getXmlStringFromMoney(totalValue)
+                +totalValue.toXmlString()
                 +"</totalValue>");
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "nextPayment", df.format(nextPayment.getTime()));
@@ -457,15 +455,15 @@ public class Loan implements MekHqXmlSerializable {
         //we are going to treat the score from StellarOps the same as dragoons score
         //TODO: pirates and government forces
         if(rating <= 0) {
-            return new Loan(MekHqMoneyUtil.money(10000000), 35, 80, 1, Finances.SCHEDULE_MONTHLY, cal);
+            return new Loan(Money.of(10000000), 35, 80, 1, Finances.SCHEDULE_MONTHLY, cal);
         } else if(rating < 5) {
-            return new Loan(MekHqMoneyUtil.money(10000000), 20, 60, 1, Finances.SCHEDULE_MONTHLY, cal);
+            return new Loan(Money.of(10000000), 20, 60, 1, Finances.SCHEDULE_MONTHLY, cal);
         } else if(rating < 10) {
-            return new Loan(MekHqMoneyUtil.money(10000000), 15, 40, 2, Finances.SCHEDULE_MONTHLY, cal);
+            return new Loan(Money.of(10000000), 15, 40, 2, Finances.SCHEDULE_MONTHLY, cal);
         } else if(rating < 14) {
-            return new Loan(MekHqMoneyUtil.money(10000000), 10, 25, 3, Finances.SCHEDULE_MONTHLY, cal);
+            return new Loan(Money.of(10000000), 10, 25, 3, Finances.SCHEDULE_MONTHLY, cal);
         } else {
-            return new Loan(MekHqMoneyUtil.money(10000000), 7, 15, 5, Finances.SCHEDULE_MONTHLY, cal);
+            return new Loan(Money.of(10000000), 7, 15, 5, Finances.SCHEDULE_MONTHLY, cal);
         }
     }
 

@@ -26,7 +26,7 @@ import megamek.common.options.PilotOptions;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.Utilities;
-import mekhq.campaign.finances.MekHqMoneyUtil;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.log.CustomLogEntry;
 import mekhq.campaign.log.PersonalLogger;
 import mekhq.campaign.personnel.Award;
@@ -53,7 +53,6 @@ import mekhq.gui.dialog.TextAreaDialog;
 import mekhq.gui.model.PersonnelTableModel;
 import mekhq.gui.utilities.MultiLineTooltip;
 import mekhq.gui.utilities.StaticChecks;
-import org.joda.money.Money;
 
 public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
         ActionListener {
@@ -729,7 +728,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 break;
             case CMD_RANSOM:
                 // ask the user if they want to sell off their prisoners. If yes, then add a daily report entry, add the money and remove them all.
-                Money total = MekHqMoneyUtil.zero();
+                Money total = Money.zero();
                 total = total.plus(Arrays.stream(people).map(Person::getRansomValue).collect(Collectors.toList()));
                 
                 if (0 == JOptionPane.showConfirmDialog(
@@ -1100,7 +1099,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                         gui.getFrame(),
                         true,
                         resourceMap.getString("changeSalary.text"), //$NON-NLS-1$
-                        selectedPerson.getSalary().getAmountMajorInt(),
+                        selectedPerson.getSalary().getAmount().intValue(),
                         -1,
                         100000);
                 pcvd.setVisible(true);
@@ -1109,7 +1108,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     return;
                 }
                 for (Person person : people) {
-                    person.setSalary(MekHqMoneyUtil.money(salary));
+                    person.setSalary(Money.of(salary));
                     MekHQ.triggerEvent(new PersonChangedEvent(person));
                 }
                 break;

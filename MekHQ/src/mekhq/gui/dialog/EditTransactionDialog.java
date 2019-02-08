@@ -31,7 +31,7 @@ import javax.swing.text.NumberFormatter;
 
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
-import mekhq.campaign.finances.MekHqMoneyUtil;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.Transaction;
 
 public class EditTransactionDialog extends JDialog implements ActionListener, FocusListener, MouseListener {
@@ -181,7 +181,7 @@ public class EditTransactionDialog extends JDialog implements ActionListener, Fo
     @Override
     public void actionPerformed(ActionEvent e) {
         if (saveButton.equals(e.getSource())) {
-            newTransaction.setAmount(MekHqMoneyUtil.money((double)amountField.getValue()));
+            newTransaction.setAmount(Money.of((double)amountField.getValue()));
             newTransaction.setCategory(Transaction.getCategoryIndex((String) categoryCombo.getSelectedItem()));
             newTransaction.setDescription(descriptionField.getText());
             try {

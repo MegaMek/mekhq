@@ -22,11 +22,9 @@
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
-import java.math.RoundingMode;
 import java.util.StringJoiner;
 
-import mekhq.campaign.finances.MekHqMoneyUtil;
-import org.joda.money.Money;
+import mekhq.campaign.finances.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -136,7 +134,7 @@ public class MekActuator extends Part {
                 break;
             }
         }
-        return MekHqMoneyUtil.money(getUnitTonnage() * unitCost);
+        return Money.of(getUnitTonnage() * unitCost);
     }
 
     @Override
@@ -265,8 +263,8 @@ public class MekActuator extends Part {
                 sj.add(getLocationName());
             }
             if (campaign.getCampaignOptions().payForRepairs()) {
-                Money repairCost = getStickerPrice().multipliedBy(0.2, RoundingMode.HALF_EVEN);
-                sj.add(MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(repairCost) + " to repair");
+                Money repairCost = getStickerPrice().multipliedBy(0.2);
+                sj.add(repairCost.toAmountAndSymbolString() + " to repair");
             }
             return sj.toString();
 		}

@@ -29,12 +29,11 @@ import megamek.common.MiscType;
 import megamek.common.TechConstants;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.finances.MekHqMoneyUtil;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.unit.Unit;
 
-import org.joda.money.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -84,9 +83,9 @@ public class MASC extends EquipmentPart {
     @Override
     public Money getStickerPrice() {
     	if (isSupercharger()) {
-    		return MekHqMoneyUtil.money(engineRating * (isOmniPodded()? 1250 : 10000));
+    		return Money.of(engineRating * (isOmniPodded()? 1250 : 10000));
     	} else {           
-            return MekHqMoneyUtil.money(engineRating * getTonnage() * 1000);
+            return Money.of(engineRating * getTonnage() * 1000);
         }
     }
     

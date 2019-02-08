@@ -25,7 +25,6 @@ import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
 import java.util.ResourceBundle;
 
@@ -37,7 +36,6 @@ import javax.swing.JTextArea;
 import megamek.common.util.EncodeControl;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.finances.MekHqMoneyUtil;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 
@@ -377,7 +375,7 @@ public class AtBContractViewPanel extends JPanel {
         pnlStats.add(lblPayout, gridBagConstraints);
 
         txtPayout.setName("txtPayout"); // NOI18N
-        txtPayout.setText(MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(contract.getMonthlyPayOut()));
+        txtPayout.setText(contract.getMonthlyPayOut().toAmountAndSymbolString());
         txtPayout.setEditable(false);
         txtPayout.setLineWrap(true);
         txtPayout.setWrapStyleWord(true);
@@ -445,7 +443,7 @@ public class AtBContractViewPanel extends JPanel {
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlStats.add(lblSalvageValueMerc, gridBagConstraints);
             txtSalvageValueMerc = new JTextArea();
-            txtSalvageValueMerc.setText(MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(contract.getSalvagedByUnit()));
+            txtSalvageValueMerc.setText(contract.getSalvagedByUnit().toAmountAndSymbolString());
             txtSalvageValueMerc.setEditable(false);
             txtSalvageValueMerc.setLineWrap(true);
             txtSalvageValueMerc.setWrapStyleWord(true);
@@ -466,7 +464,7 @@ public class AtBContractViewPanel extends JPanel {
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlStats.add(lblSalvageValueEmployer, gridBagConstraints);
             txtSalvageValueEmployer = new JTextArea();
-            txtSalvageValueEmployer.setText(MekHqMoneyUtil.uiAmountAndSymbolPrinter().print(contract.getSalvagedByEmployer()));
+            txtSalvageValueEmployer.setText(contract.getSalvagedByEmployer().toAmountAndSymbolString());
             txtSalvageValueEmployer.setEditable(false);
             txtSalvageValueEmployer.setLineWrap(true);
             txtSalvageValueEmployer.setWrapStyleWord(true);
@@ -497,7 +495,7 @@ public class AtBContractViewPanel extends JPanel {
             int currentSalvagePct = 0;
             if (contract.getSalvagedByUnit().plus(contract.getSalvagedByEmployer()).isPositive()) {
                 currentSalvagePct = contract.getSalvagedByUnit()
-                        .dividedBy(contract.getSalvagedByUnit().plus(contract.getSalvagedByEmployer()).getAmount(), RoundingMode.HALF_EVEN)
+                        .dividedBy(contract.getSalvagedByUnit().plus(contract.getSalvagedByEmployer()).getAmount().doubleValue())
                         .multipliedBy(100)
                         .getAmount()
                         .intValue();

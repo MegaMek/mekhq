@@ -42,7 +42,7 @@ import megamek.common.MechSummaryCache;
 import megamek.common.TargetRoll;
 import megamek.common.UnitType;
 import megamek.common.util.EncodeControl;
-import mekhq.campaign.finances.MekHqMoneyUtil;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.Contract;
 import mekhq.gui.CampaignGUI;
 
@@ -199,7 +199,7 @@ public class ShipSearchDialog extends JDialog {
 			panButtons.add(button);
 			button.addActionListener(ev -> purchase());
 			button.setEnabled(ms != null && gui.getCampaign().getFunds()
-                    .isGreaterThan(MekHqMoneyUtil.money(ms.getCost())));
+                    .isGreaterThan(Money.of(ms.getCost())));
 		}
 
 		if (isInSearch()) {

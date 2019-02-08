@@ -23,7 +23,6 @@ package mekhq.campaign.mission;
 
 import java.io.PrintWriter;
 import java.io.Serializable;
-import java.math.RoundingMode;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -32,8 +31,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.UUID;
 
-import mekhq.campaign.finances.MekHqMoneyUtil;
-import org.joda.money.Money;
+import mekhq.campaign.finances.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -1086,16 +1084,14 @@ public class AtBContract extends Contract implements Serializable {
          */
 
         if (getLength() <= 0) {
-            return MekHqMoneyUtil.zero();
+            return Money.zero();
         }
 
         return getBaseAmount()
-                .toBigMoney()
                 .multipliedBy(1.5)
                 .plus(getSupportAmount())
                 .plus(getOverheadAmount())
-                .dividedBy(getLength(), RoundingMode.HALF_EVEN)
-                .toMoney(RoundingMode.HALF_EVEN);
+                .dividedBy(getLength());
     }
     
     public void checkForFollowup(Campaign campaign) {
