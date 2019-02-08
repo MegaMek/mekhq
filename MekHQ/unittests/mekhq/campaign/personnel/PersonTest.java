@@ -4,8 +4,6 @@ import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.spy;
 
-import megamek.common.logging.DefaultMmLogger;
-import mekhq.campaign.finances.CurrencyManager;
 import mekhq.campaign.finances.MekHqMoneyUtil;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
@@ -20,12 +18,10 @@ import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.List;
 
 @RunWith(PowerMockRunner.class)
 @PowerMockIgnore({"com.sun.org.apache.xerces.*", "javax.xml.*", "org.xml.*", "org.w3c.dom.*"})
-@PrepareForTest({MekHqMoneyUtil.class, CurrencyManager.class, DefaultMmLogger.class, Ranks.class, SpecialAbility.class, CustomOption.class})
+@PrepareForTest({MekHqMoneyUtil.class})
 public class PersonTest {
     private Person mockPerson;
 
@@ -34,24 +30,6 @@ public class PersonTest {
         PowerMockito.mockStatic(MekHqMoneyUtil.class);
         Mockito.when(MekHqMoneyUtil.zero()).thenReturn(Money.zero(CurrencyUnit.USD));
         Mockito.when(MekHqMoneyUtil.money(anyDouble())).thenReturn(Money.of(CurrencyUnit.USD, 2500));
-
-        CurrencyManager currencyManagerMock = PowerMockito.mock(CurrencyManager.class);
-        Mockito.doNothing().when(currencyManagerMock).initialize(any());
-
-        PowerMockito.mockStatic(CurrencyManager.class);
-        Mockito.when(CurrencyManager.getInstance()).thenReturn(currencyManagerMock);
-
-        DefaultMmLogger defaultMMLoggerMock = PowerMockito.mock(DefaultMmLogger.class);
-        Mockito.doNothing().when(defaultMMLoggerMock).methodBegin(any(), anyString());
-
-        PowerMockito.mockStatic(DefaultMmLogger.class);
-        Mockito.when(DefaultMmLogger.getInstance()).thenReturn(defaultMMLoggerMock);
-
-        PowerMockito.mockStatic(Ranks.class);
-        PowerMockito.mockStatic(SpecialAbility.class);
-
-        PowerMockito.mockStatic(CustomOption.class);
-        Mockito.when(CustomOption.getCustomAbilities()).thenReturn(new ArrayList<>());
     }
 
     @Test
