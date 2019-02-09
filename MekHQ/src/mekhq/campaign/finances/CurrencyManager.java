@@ -25,10 +25,13 @@ import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
 import mekhq.campaign.Campaign;
-import org.joda.money.CurrencyUnit;
+import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.Contract;
+import mekhq.campaign.universe.Faction;
 import org.joda.money.CurrencyUnitDataProvider;
 import org.joda.money.format.MoneyFormatter;
 import org.joda.money.format.MoneyFormatterBuilder;
+import org.joda.time.DateTime;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -38,6 +41,7 @@ import javax.xml.parsers.DocumentBuilder;
 import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Set;
 
 /**
  * Main class used to handle all money and currency information.
@@ -49,25 +53,13 @@ import java.util.HashMap;
  *
  */
 public class CurrencyManager extends CurrencyUnitDataProvider {
-    private class DefaultCurrency {
-        CurrencyUnit currency;
-        int start;
-        int end;
-
-        DefaultCurrency(CurrencyUnit currency, int start, int end) {
-            this.currency = currency;
-            this.start = start;
-            this.end = end;
-        }
-    }
-
     private static final CurrencyManager instance = new CurrencyManager();
-    private boolean initialized;
 
     private Campaign campaign;
-    private HashMap<String, String> currencyNames;
-    private HashMap<String, String> currencySymbols;
-    private ArrayList<DefaultCurrency> defaultCurrencies;
+    private ArrayList<Currency> currencies;
+    private HashMap<String, String> currencyCodeToNameMap;
+    private HashMap<String, String> currencyCodeToSymbolMap;
+    private Currency backupCurrency;
 
     private MoneyFormatter xmlMoneyFormatter;
     private MoneyFormatter uiAmountPrinter;
@@ -75,120 +67,95 @@ public class CurrencyManager extends CurrencyUnitDataProvider {
     private MoneyFormatter uiAmountAndNamePrinter;
 
     private CurrencyManager() {
-        this.initialized = false;
-    }
+        this.currencies = new ArrayList<>();
+        this.currencyCodeToNameMap = new HashMap<>();
+        this.currencyCodeToSymbolMap = new HashMap<>();
 
-    public void initialize(Campaign campaign) {
-        assert campaign != null;
+        this.backupCurrency = new Currency(
+                "CSB",
+                -1,
+                0,
+                "ComStart bill",
+                "C-Bill",
+                2835,
+                999999,
+                true,
+                true);
 
-        this.campaign = campaign;
-        this.currencyNames = new HashMap<>();
-        this.currencySymbols = new HashMap<>();
-        this.defaultCurrencies = new ArrayList<>();
-
-        this.registerCurrencies();
-
-        this.uiAmountPrinter = new MoneyFormatterBuilder()
-                .appendAmountLocalized()
-                .toFormatter();
-
-        this.xmlMoneyFormatter = new MoneyFormatterBuilder()
-                .append(new XmlMoneyWriter(), new XmlMoneyParser())
-                .toFormatter();
-
-        this.uiAmountAndSymbolPrinter = new MoneyFormatterBuilder()
-                .appendAmountLocalized()
-                .appendLiteral(" ")
-                .append(new CurrencyDataLookupWriter(this.currencySymbols), null)
-                .toFormatter();
-
-        this.uiAmountAndNamePrinter = new MoneyFormatterBuilder()
-                .appendAmountLocalized()
-                .appendLiteral(" ")
-                .append(new CurrencyDataLookupWriter(this.currencyNames), null)
-                .toFormatter();
-
-        this.initialized = true;
+        this.createFormatters();
     }
 
     public static CurrencyManager getInstance() {
         return instance;
     }
 
-    MoneyFormatter getXmlMoneyFormatter() {
-        if (!this.initialized) {
-            MekHQ.getLogger().log(
-                    CurrencyManager.class,
-                    "GetXmlMoneyFormatter",
-                    LogLevel.FATAL,
-                    "Attempted to use CurrencyManager before calling initialize"); //$NON-NLS-1$
-        }
+    public void loadCurrencies() {
+        this.registerCurrencies();
+    }
 
+    public void setCampaign(Campaign campaign) {
+        assert campaign != null;
+        this.campaign = campaign;
+    }
+
+    MoneyFormatter getXmlMoneyFormatter() {
         return this.xmlMoneyFormatter;
     }
 
     MoneyFormatter getUiAmountPrinter() {
-        if (!this.initialized) {
-            MekHQ.getLogger().log(
-                    CurrencyManager.class,
-                    "getUiAmountPrinter",
-                    LogLevel.FATAL,
-                    "Attempted to use CurrencyManager before calling initialize"); //$NON-NLS-1$
-        }
-
         return this.uiAmountPrinter;
     }
 
     MoneyFormatter getUiAmountAndSymbolPrinter() {
-        if (!this.initialized) {
-            MekHQ.getLogger().log(
-                    CurrencyManager.class,
-                    "GetShortUiMoneyFormatter",
-                    LogLevel.FATAL,
-                    "Attempted to use CurrencyManager before calling initialize"); //$NON-NLS-1$
-        }
-
         return this.uiAmountAndSymbolPrinter;
     }
 
     MoneyFormatter getUiAmountAndNamePrinter() {
-        if (!this.initialized) {
-            MekHQ.getLogger().log(
-                    CurrencyManager.class,
-                    "GetLongUiMoneyFormatter",
-                    LogLevel.FATAL,
-                    "Attempted to use CurrencyManager before calling initialize"); //$NON-NLS-1$
-        }
-
         return this.uiAmountAndNamePrinter;
     }
 
-    CurrencyUnit getDefaultCurrency() {
-        if (!this.initialized) {
-            MekHQ.getLogger().log(
-                    CurrencyManager.class,
-                    "getDefaultCurrency",
-                    LogLevel.FATAL,
-                    "Attempted to use CurrencyManager before calling initialize"); //$NON-NLS-1$
-        }
+    Currency getDefaultCurrency() {
+        if (campaign != null) {
+            HashMap<String, Currency> possibleCurrencies = new HashMap<>();
 
-        for (DefaultCurrency defaultCurrency : this.defaultCurrencies) {
-            if ((this.campaign.getGameYear() >= defaultCurrency.start) &&
-                    (this.campaign.getGameYear() <= defaultCurrency.end )) {
-                return defaultCurrency.currency;
+            // Use the default currency in this time period, if it exists
+            for (Currency currency : this.currencies) {
+                if ((this.campaign.getGameYear() >= currency.getStartYear()) &&
+                        (this.campaign.getGameYear() <= currency.getEndYear())) {
+
+                    if (currency.getIsDefault()) {
+                        return currency;
+                    }
+
+                    possibleCurrencies.put(currency.getCode(), currency);
+                }
+            }
+
+            // Use the currency of the Faction in any of our contracts, if it exists
+            for (Contract contract : this.campaign.getActiveContracts()) {
+                if (contract instanceof AtBContract) {
+                    Currency currency = possibleCurrencies.getOrDefault(
+                            Faction.getFaction(((AtBContract)contract).getEmployerCode()).getCurrencyCode(),
+                            null);
+
+                    if (currency != null) {
+                        return currency;
+                    }
+                }
+            }
+
+            // Use the currency of one of the factions in the planet where the unit is deployed, if it exists
+            Set<Faction> factions = campaign.getCurrentPlanet().getFactionSet(new DateTime(campaign.getDate()));
+            for (Faction faction : factions) {
+                Currency currency = possibleCurrencies.getOrDefault(faction.getCurrencyCode(), null);
+                if (currency != null) {
+                    return currency;
+                }
             }
         }
 
-        // No default currency, get the main currency of the first faction of the planet
-        //this.campaign.getCurrentPlanet().getFactions(campaign.getDate())
-
-        MekHQ.getLogger().log(
-                CurrencyManager.class,
-                "getDefaultCurrency",
-                LogLevel.FATAL,
-                "No default currently defined for year " + this.campaign.getGameYear()); //$NON-NLS-1$
-
-        return null;
+        // No currency found, return the backup
+        return this.backupCurrency;
     }
 
     @Override
@@ -216,7 +183,8 @@ public class CurrencyManager extends CurrencyUnitDataProvider {
 
                 for (int i = 0; i < currencies.getLength(); i++) {
                     String name = "", code = "", symbol = "";
-                    int decimalPlaces = 0, defaultStart = -1, defaultEnd = -1;
+                    int numericCurrencyCode = -1, decimalPlaces = 0, startYear = Integer.MAX_VALUE, endYear = Integer.MIN_VALUE;
+                    boolean isDefault = false, isBackup = false;
 
                     NodeList currencyData = currencies.item(i).getChildNodes();
                     for (int j = 0; j < currencyData.getLength(); j++) {
@@ -235,21 +203,60 @@ public class CurrencyManager extends CurrencyUnitDataProvider {
                             case "decimalPlaces":
                                 decimalPlaces = Integer.parseInt(currencyField.getTextContent());
                                 break;
-                            case "defaultStart":
-                                defaultStart = Integer.parseInt(currencyField.getTextContent());
+                            case "numericCurrencyCode":
+                                numericCurrencyCode = Integer.parseInt(currencyField.getTextContent());
                                 break;
-                            case "defaultEnd":
-                                defaultEnd = Integer.parseInt(currencyField.getTextContent());
+                            case "startYear":
+                                startYear = Integer.parseInt(currencyField.getTextContent());
+                                break;
+                            case "endYear":
+                                endYear = Integer.parseInt(currencyField.getTextContent());
+                                break;
+                            case "isDefault":
+                                isDefault = Boolean.parseBoolean(currencyField.getTextContent());
+                                break;
+                            case "isBackup":
+                                isBackup = Boolean.parseBoolean(currencyField.getTextContent());
                                 break;
                         }
                     }
 
-                    CurrencyUnit currency = CurrencyUnit.registerCurrency(code, -1, decimalPlaces, true);
-                    this.currencyNames.put(code, name);
-                    this.currencySymbols.put(code, symbol);
+                    // Adjust the currency start and end dates if needed by the
+                    // start/end dates of the factions that use it
+                    for (Faction faction : Faction.getFactions()) {
+                        if (faction.getCurrencyCode().equals(code)) {
+                            if (faction.getStart() < startYear) {
+                                startYear = faction.getStart();
+                            }
 
-                    if (defaultStart != -1 && defaultEnd != -1) {
-                        this.defaultCurrencies.add(new DefaultCurrency(currency, defaultStart, defaultEnd));
+                            if (faction.getEnd() > endYear) {
+                                endYear = faction.getEnd();
+                            }
+                        }
+                    }
+
+                    // Sanity check for dates in case we are still
+                    // using the initial values (MAX_VALUE, MIN_VALUE)
+                    if (startYear > endYear) {
+                        startYear = endYear;
+                    }
+
+                    Currency currency = new Currency(
+                            code,
+                            numericCurrencyCode,
+                            decimalPlaces,
+                            name,
+                            symbol,
+                            startYear,
+                            endYear,
+                            isDefault,
+                            isBackup);
+                    this.currencies.add(currency);
+                    this.currencyCodeToNameMap.put(code, name);
+                    this.currencyCodeToSymbolMap.put(code, symbol);
+
+                    if (isBackup) {
+                        this.backupCurrency = currency;
                     }
                 }
             }
@@ -261,12 +268,28 @@ public class CurrencyManager extends CurrencyUnitDataProvider {
                     "Load of currency information complete!"); //$NON-NLS-1$
         } catch (Exception ex) {
             MekHQ.getLogger().error(CurrencyManager.class, METHOD_NAME, ex);
-
-            // There was an error loading the currencies data, create a default currency
-            CurrencyUnit defaultCurrency = CurrencyUnit.registerCurrency("CSB", -1, 0, true);
-            this.currencyNames.put("CSB", "ComStar bill");
-            this.currencySymbols.put("CSB", "C-Bill");
-            this.defaultCurrencies.add(new DefaultCurrency(defaultCurrency, 0, 9999));
         }
+    }
+
+    private void createFormatters() {
+        this.uiAmountPrinter = new MoneyFormatterBuilder()
+                .appendAmountLocalized()
+                .toFormatter();
+
+        this.xmlMoneyFormatter = new MoneyFormatterBuilder()
+                .append(new XmlMoneyWriter(), new XmlMoneyParser())
+                .toFormatter();
+
+        this.uiAmountAndSymbolPrinter = new MoneyFormatterBuilder()
+                .appendAmountLocalized()
+                .appendLiteral(" ")
+                .append(new CurrencyDataLookupWriter(this.currencyCodeToSymbolMap), null)
+                .toFormatter();
+
+        this.uiAmountAndNamePrinter = new MoneyFormatterBuilder()
+                .appendAmountLocalized()
+                .appendLiteral(" ")
+                .append(new CurrencyDataLookupWriter(this.currencyCodeToNameMap), null)
+                .toFormatter();
     }
 }

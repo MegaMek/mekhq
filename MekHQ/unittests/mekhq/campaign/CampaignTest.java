@@ -20,15 +20,13 @@
  */
 package mekhq.campaign;
 
-import mekhq.campaign.finances.MekHqMoneyUtil;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.Person;
 import org.joda.money.CurrencyUnit;
-import org.joda.money.Money;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
 import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -43,13 +41,15 @@ import java.util.UUID;
  * @since 6/10/14 10:23 AM
  */
 @RunWith(PowerMockRunner.class)
-@PrepareForTest(MekHqMoneyUtil.class)
+@PrepareForTest(Money.class)
 public class CampaignTest {
     @Before
     public void setUp() {
-        PowerMockito.mockStatic(MekHqMoneyUtil.class);
-        Mockito.when(MekHqMoneyUtil.zero()).thenReturn(Money.zero(CurrencyUnit.USD));
-        Mockito.when(MekHqMoneyUtil.money(Mockito.anyDouble())).thenReturn(Money.of(CurrencyUnit.USD, 2500));
+        PowerMockito.mockStatic(Money.class);
+        Money zero = Money.zero(CurrencyUnit.USD);
+        Money amount = Money.of(2500, CurrencyUnit.USD);
+        Mockito.when(Money.zero()).thenReturn(zero);
+        Mockito.when(Money.of(Mockito.anyDouble())).thenReturn(amount);
     }
 
     @Test

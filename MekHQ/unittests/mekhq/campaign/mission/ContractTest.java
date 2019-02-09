@@ -24,10 +24,9 @@ package mekhq.campaign.mission;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.JumpPath;
-import mekhq.campaign.finances.MekHqMoneyUtil;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.universe.Planet;
 import org.joda.money.CurrencyUnit;
-import org.joda.money.Money;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -48,88 +47,103 @@ import static org.mockito.Mockito.spy;
  * @since 20/07/18 10:23 AM
  */
 @RunWith(PowerMockRunner.class)
-@PrepareForTest(MekHqMoneyUtil.class)
+@PrepareForTest(Money.class)
 public class ContractTest {
 
     private Contract contract;
     private Campaign mockCampaign;
 
+    private Money jumpCost;
+    private Money contractBase;
+    private Money overHeadExpenses;
+    private Money peacetimeCost;
+
     @Before
     public void setUp() {
-        PowerMockito.mockStatic(MekHqMoneyUtil.class);
-        Mockito.when(MekHqMoneyUtil.zero()).thenReturn(Money.zero(CurrencyUnit.USD));
+        // We need to create these objects before we tell PowerMockito to
+        // mock the class. After we tell the class to be mocked, all methods not
+        // covered with a when call will just return null;
+        jumpCost = Money.of(5, CurrencyUnit.USD);
+        contractBase = Money.of(10, CurrencyUnit.USD);
+        overHeadExpenses = Money.of(1, CurrencyUnit.USD);
+        peacetimeCost = Money.of(1, CurrencyUnit.USD);
+
+        PowerMockito.mockStatic(Money.class);
+        Money zero = Money.zero(CurrencyUnit.USD);
+
+        Mockito.when(Money.zero()).thenReturn(zero);
     }
 
     @Test
     public void testGetBaseAmount() {
         initializeTest();
-        Assert.assertEquals(Money.of(CurrencyUnit.USD, 130), contract.getBaseAmount());
+        Assert.assertEquals("USD 130.0", contract.getBaseAmount().toString());
     }
 
     @Test
     public void testGetOverheadAmount() {
         initializeTest();
-        Assert.assertEquals(Money.of(CurrencyUnit.USD, 10), contract.getOverheadAmount());
+        Assert.assertEquals("USD 10", contract.getOverheadAmount().toString());
     }
 
     @Test
     public void testGetSupportAmount() {
         initializeTest();
-        Assert.assertEquals(Money.of(CurrencyUnit.USD, 10), contract.getSupportAmount());
+        Assert.assertEquals("USD 10", contract.getSupportAmount().toString());
     }
 
     @Test
     public void testGetTransportAmount() {
         initializeTest();
-        Assert.assertEquals(Money.of(CurrencyUnit.USD, 20), contract.getTransportAmount());
+        Assert.assertEquals("USD 20", contract.getTransportAmount().toString());
     }
 
     @Test
     public void testGetTransitAmount() {
         initializeTest();
-        Assert.assertEquals(Money.of(CurrencyUnit.USD, 30), contract.getTransitAmount());
+        Assert.assertEquals("USD 30.00", contract.getTransitAmount().toString());
     }
 
     @Test
     public void testSigningBonusAmount() {
         initializeTest();
-        Assert.assertEquals(Money.of(CurrencyUnit.USD, 20), contract.getSigningBonusAmount());
+        Assert.assertEquals("USD 20.00", contract.getSigningBonusAmount().toString());
     }
 
     @Test
     public void testGetFeeAmount() {
         initializeTest();
-        Assert.assertEquals(Money.of(CurrencyUnit.USD, 10), contract.getFeeAmount());
+        Assert.assertEquals("USD 10.00", contract.getFeeAmount().toString());
     }
 
     @Test
     public void testGetTotalAmount() {
         initializeTest();
-        Assert.assertEquals(Money.of(CurrencyUnit.USD, 200), contract.getTotalAmount());
+        Assert.assertEquals("USD 200.00", contract.getTotalAmount().toString());
     }
 
     @Test
     public void testGetTotalAmountPlusFees(){
         initializeTest();
-        Assert.assertEquals(Money.of(CurrencyUnit.USD, 190), contract.getTotalAmountPlusFees());
+        Assert.assertEquals("USD 190.00", contract.getTotalAmountPlusFees().toString());
     }
 
     @Test
     public void testGetAdvanceAmount(){
         initializeTest();
-        Assert.assertEquals(Money.of(CurrencyUnit.USD, 19), contract.getAdvanceAmount());
+        Assert.assertEquals("USD 19.00", contract.getAdvanceAmount().toString());
     }
 
     @Test
     public void testGetTotalAmountPlusFeesAndBonuses() {
         initializeTest();
-        Assert.assertEquals(Money.of(CurrencyUnit.USD, 210), contract.getTotalAmountPlusFeesAndBonuses());
+        Assert.assertEquals("USD 210.00", contract.getTotalAmountPlusFeesAndBonuses().toString());
     }
 
     @Test
     public void testGetMonthlyPayout(){
         initializeTest();
-        Assert.assertEquals(Money.of(CurrencyUnit.USD, (190.0-19.0) / 10.0), contract.getMonthlyPayOut());
+        Assert.assertEquals("USD 17.10", contract.getMonthlyPayOut().toString());
     }
 
     private void initializeTest() {
@@ -156,7 +170,7 @@ public class ContractTest {
         Mockito.when(contract.getPlanet()).thenReturn(new Planet());
     }
 
-    private void initCampaign(){
+    private void initCampaign() {
         mockCampaign = Mockito.mock(Campaign.class);
 
         CampaignOptions mockCampaignOptions = Mockito.mock(CampaignOptions.class);
@@ -167,13 +181,12 @@ public class ContractTest {
         Mockito.when(mockJumpPath.getJumps()).thenReturn(2);
 
         Mockito.when(mockCampaign.calculateJumpPath(Mockito.nullable(Planet.class), Mockito.nullable(Planet.class))).thenReturn(mockJumpPath);
-        Mockito.when(mockCampaign.calculateCostPerJump(Mockito.anyBoolean(), Mockito.anyBoolean())).thenReturn(Money.of(CurrencyUnit.USD, 5));
+        Mockito.when(mockCampaign.calculateCostPerJump(Mockito.anyBoolean(), Mockito.anyBoolean())).thenReturn(jumpCost);
         Mockito.when(mockCampaign.getUnitRatingMod()).thenReturn(10);
-
-        Mockito.when(mockCampaign.getOverheadExpenses()).thenReturn(Money.of(CurrencyUnit.USD, 1));
-        Mockito.when(mockCampaign.getContractBase()).thenReturn(Money.of(CurrencyUnit.USD, 10));
+        Mockito.when(mockCampaign.getOverheadExpenses()).thenReturn(overHeadExpenses);
+        Mockito.when(mockCampaign.getContractBase()).thenReturn(contractBase);
         Mockito.when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
-        Mockito.when(mockCampaign.getPeacetimeCost()).thenReturn(Money.of(CurrencyUnit.USD, 1));
+        Mockito.when(mockCampaign.getPeacetimeCost()).thenReturn(peacetimeCost);
         Mockito.when(mockCampaign.getCalendar()).thenReturn(new GregorianCalendar(3067, Calendar.JANUARY, 1));
     }
 }

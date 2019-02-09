@@ -35,7 +35,7 @@ defaultEnd - Indicates which year the currency ended being the default currency 
         <decimalPlaces>0</decimalPlaces>
         <symbol>C-Bill</symbol>
         <defaultStart>1</defaultStart>
-        <defaultEnd>9999</defaultEnd>
+        <defaultEnd>999999</defaultEnd>
     </currency>
     <currency>
         <name>Lyran Alliance Kroner</name>

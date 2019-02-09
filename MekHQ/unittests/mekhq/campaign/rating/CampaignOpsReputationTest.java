@@ -37,7 +37,7 @@ import megamek.common.MechBay;
 import megamek.common.Tank;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Finances;
-import mekhq.campaign.finances.MekHqMoneyUtil;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Skill;
@@ -46,7 +46,6 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 
 import org.joda.money.CurrencyUnit;
-import org.joda.money.Money;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -75,7 +74,7 @@ import static org.junit.Assert.*;
 @SuppressWarnings("FieldCanBeLocal")
 @RunWith(PowerMockRunner.class)
 @PowerMockIgnore({"com.sun.org.apache.xerces.*", "javax.xml.*", "org.xml.*", "org.w3c.dom.*"})
-@PrepareForTest(MekHqMoneyUtil.class)
+@PrepareForTest(Money.class)
 public class CampaignOpsReputationTest {
 
     private Campaign mockCampaign;
@@ -212,9 +211,11 @@ public class CampaignOpsReputationTest {
 
     @Before
     public void setUp() {
-        PowerMockito.mockStatic(MekHqMoneyUtil.class);
-        Mockito.when(MekHqMoneyUtil.zero()).thenReturn(Money.zero(CurrencyUnit.USD));
-        Mockito.when(MekHqMoneyUtil.money(Mockito.anyDouble())).thenReturn(Money.of(CurrencyUnit.USD, 2500));
+        PowerMockito.mockStatic(Money.class);
+        Money zero = Money.zero(CurrencyUnit.USD);
+        Money amount = Money.of(2500, CurrencyUnit.USD);
+        Mockito.when(Money.zero()).thenReturn(zero);
+        Mockito.when(Money.of(Mockito.anyDouble())).thenReturn(amount);
 
         mockCampaign = mock(Campaign.class);
         Faction mockFaction = mock(Faction.class);

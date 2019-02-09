@@ -293,7 +293,7 @@ public class Campaign implements Serializable, ITechManager {
         player = new Player(0, "self");
         game.addPlayer(0, player);
         calendar = new GregorianCalendar(3067, Calendar.JANUARY, 1);
-        CurrencyManager.getInstance().initialize(this);
+        CurrencyManager.getInstance().setCampaign(this);
         campaignOptions = new CampaignOptions();
         currentReport = new ArrayList<>();
         currentReportHTML = "";
@@ -4168,7 +4168,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public ArrayList<Planet> getPlanets() {
-        ArrayList<Planet> plnts = new ArrayList<Planet>();
+        ArrayList<Planet> plnts = new ArrayList<>(Planets.getInstance().getPlanets().size());
         for (String key : Planets.getInstance().getPlanets().keySet()) {
             plnts.add(Planets.getInstance().getPlanets().get(key));
         }
@@ -4176,7 +4176,7 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public Vector<String> getPlanetNames() {
-        Vector<String> plntNames = new Vector<String>();
+        Vector<String> plntNames = new Vector<>(Planets.getInstance().getPlanets().size());
         for (Planet key : Planets.getInstance().getPlanets().values()) {
             plntNames.add(key.getPrintableName(Utilities.getDateTimeDay(calendar)));
         }

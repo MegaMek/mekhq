@@ -133,6 +133,11 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
             } catch (Exception ex) {
     			ex.printStackTrace();
             }
+            try{
+                CurrencyManager.getInstance().loadCurrencies();
+            } catch (Exception ex) {
+                ex.printStackTrace();;
+            }
             try {
             	Bloodname.loadBloodnameData();
             } catch (Exception ex) {

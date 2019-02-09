@@ -751,9 +751,7 @@ public class Planet implements Serializable {
     }
 
     public List<String> getFactions(DateTime when) {
-        List<String> retVal = getEventData(when, factions, new EventGetter<List<String>>() {
-            @Override public List<String> get(PlanetaryEvent e) { return e.faction; }
-        });
+        List<String> retVal = getEventData(when, factions, e -> e.faction);
         if (retVal != null) {
             return retVal;
         }

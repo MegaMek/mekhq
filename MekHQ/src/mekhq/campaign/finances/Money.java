@@ -21,7 +21,7 @@
 
 package mekhq.campaign.finances;
 
-import org.joda.money.CurrencyUnit;
+import org.joda.money.BigMoney;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -36,27 +36,27 @@ import java.util.stream.Collectors;
  *
  */
 public class Money {
-    private org.joda.money.BigMoney wrapped;
+    private BigMoney wrapped;
 
-    private Money(org.joda.money.BigMoney money) {
+    private Money(BigMoney money) {
         assert money != null;
         this.wrapped = money;
     }
 
-    public static Money of(double amount, CurrencyUnit currencyUnit) {
-        return new Money(org.joda.money.BigMoney.of(currencyUnit, amount));
+    public static Money of(double amount, Currency currency) {
+        return new Money(BigMoney.of(currency.getCurrencyUnit(), amount));
     }
 
     public static Money of(double amount) {
-        return new Money(org.joda.money.BigMoney.of(CurrencyManager.getInstance().getDefaultCurrency(), amount));
+        return Money.of(amount, CurrencyManager.getInstance().getDefaultCurrency());
     }
 
-    public static Money zero(CurrencyUnit currencyUnit) {
-        return new Money(org.joda.money.BigMoney.zero(currencyUnit));
+    public static Money zero(Currency currency) {
+        return new Money(BigMoney.zero(currency.getCurrencyUnit()));
     }
 
     public static Money zero() {
-        return new Money(org.joda.money.BigMoney.zero(CurrencyManager.getInstance().getDefaultCurrency()));
+        return zero(CurrencyManager.getInstance().getDefaultCurrency());
     }
 
     public static Money fromXmlString(String xmlData) {
@@ -157,7 +157,7 @@ public class Money {
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof Money) {
-            return this.wrapped.isEqual(((Money)obj).wrapped);
+            return this.wrapped.equals(((Money)obj).wrapped);
         }
 
         return false;

@@ -41,6 +41,8 @@ import java.util.TreeMap;
 
 import javax.xml.parsers.DocumentBuilder;
 
+import mekhq.campaign.finances.Currency;
+import mekhq.campaign.finances.CurrencyManager;
 import org.joda.time.DateTime;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
@@ -81,6 +83,7 @@ public class Faction {
     // Start and end years (inclusive)
     private int start;
     private int end;
+    private String currencyCode = ""; // Currency of the faction, if any
 
     public Faction() {
         this("???", "Unknown");
@@ -238,6 +241,18 @@ public class Faction {
     public Integer getId() {
         return id;
     }
+
+    public int getStart() {
+        return this.start;
+    }
+
+    public int getEnd() {
+        return this.end;
+    }
+
+    public String getCurrencyCode() {
+        return this.currencyCode;
+    }
     
     public boolean hasName(String name) {
         if (name.equals(fullname)
@@ -371,6 +386,8 @@ public class Faction {
                 retVal.id = Integer.valueOf(wn2.getTextContent());
             } else if(wn2.getNodeName().equalsIgnoreCase("start")) {
                 retVal.start = Integer.valueOf(wn2.getTextContent());
+            } else if(wn2.getNodeName().equalsIgnoreCase("currencyCode")) {
+                retVal.currencyCode = wn2.getTextContent();
             } else if(wn2.getNodeName().equalsIgnoreCase("end")) {
                 retVal.end = Integer.valueOf(wn2.getTextContent());
             } else if(wn2.getNodeName().equalsIgnoreCase("tags")) {
