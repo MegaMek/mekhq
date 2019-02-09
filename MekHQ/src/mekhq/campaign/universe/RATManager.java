@@ -245,6 +245,7 @@ public class RATManager extends AbstractUnitGenerator implements IUnitGenerator 
             MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO,
                     "While loading altFactions: "); //$NON-NLS-1$
             MekHQ.getLogger().error(getClass(), METHOD_NAME, ex);
+            return;
         }
 
         Element elem = xmlDoc.getDocumentElement();
