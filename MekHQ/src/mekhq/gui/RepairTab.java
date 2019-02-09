@@ -570,9 +570,10 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
                 MechView mv = new MechView(unit.getEntity(), true, true);
                 txtServicedUnitView.setText("<div style='font: 12pt monospaced'>" + mv.getMechReadoutBasic() + "<br>"
                         + mv.getMechReadoutLoadout() + "</div>");
-            }
-            if (!unit.equals(selectedUnit)) {
-                choiceLocation.setSelectedIndex(0);
+
+                if (!unit.equals(selectedUnit)) {
+                    choiceLocation.setSelectedIndex(0);
+                }
             }
             selectedUnit = unit;
         } else {
