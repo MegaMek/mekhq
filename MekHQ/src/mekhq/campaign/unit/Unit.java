@@ -2772,7 +2772,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     }
 
     public String getCamoFileName() {
-        if (null == getCampaign() && null == entity) {
+        if (null == getCampaign() || null == entity) {
             return "";
         }
 
