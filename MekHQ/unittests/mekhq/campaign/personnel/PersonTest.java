@@ -3,34 +3,13 @@ package mekhq.campaign.personnel;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.spy;
 
-import mekhq.campaign.finances.Money;
-import org.joda.money.CurrencyUnit;
-import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
-@RunWith(PowerMockRunner.class)
-@PowerMockIgnore({"com.sun.org.apache.xerces.*", "javax.xml.*", "org.xml.*", "org.w3c.dom.*"})
-@PrepareForTest(Money.class)
 public class PersonTest {
     private Person mockPerson;
-
-    @Before
-    public void setUp() {
-        PowerMockito.mockStatic(Money.class);
-        Money zero = Money.zero(CurrencyUnit.USD);
-        Money amount = Money.of(2500, CurrencyUnit.USD);
-        Mockito.when(Money.zero()).thenReturn(zero);
-        Mockito.when(Money.of(Mockito.anyDouble())).thenReturn(amount);
-    }
 
     @Test
     public void testIsCombatRoleReturnsTrueAtEdgesOfRange() {

@@ -452,6 +452,10 @@ public class Campaign implements Serializable, ITechManager {
     }
 
     public Planet getCurrentPlanet() {
+        if (location == null) {
+            return  null;
+        }
+
         return location.getCurrentPlanet();
     }
 

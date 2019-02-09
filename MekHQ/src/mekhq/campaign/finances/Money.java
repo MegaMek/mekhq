@@ -157,7 +157,7 @@ public class Money {
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof Money) {
-            return this.wrapped.equals(((Money)obj).wrapped);
+            return this.wrapped.isEqual(((Money)obj).wrapped);
         }
 
         return false;

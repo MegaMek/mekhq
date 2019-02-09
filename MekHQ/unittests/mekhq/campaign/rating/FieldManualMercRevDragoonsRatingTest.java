@@ -32,22 +32,14 @@ import megamek.common.Jumpship;
 import megamek.common.MechBay;
 import megamek.common.Tank;
 import megamek.common.TechConstants;
-import megamek.common.logging.DefaultMmLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
-import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
-import org.joda.money.CurrencyUnit;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -62,8 +54,6 @@ import static org.junit.Assert.*;
  * @version %Id%
  * @since 9/23/2013
  */
-@RunWith(PowerMockRunner.class)
-@PrepareForTest({Money.class, DefaultMmLogger.class})
 public class FieldManualMercRevDragoonsRatingTest {
 
     private Campaign mockCampaign;
@@ -83,18 +73,6 @@ public class FieldManualMercRevDragoonsRatingTest {
 
     @Before
     public void setUp() {
-        PowerMockito.mockStatic(Money.class);
-        Money zero = Money.zero(CurrencyUnit.USD);
-        Money amount = Money.of(2500, CurrencyUnit.USD);
-        Mockito.when(Money.zero()).thenReturn(zero);
-        Mockito.when(Money.of(Mockito.anyDouble())).thenReturn(amount);
-
-        DefaultMmLogger mock = PowerMockito.mock(DefaultMmLogger.class);
-        Mockito.doNothing().when(mock).methodBegin(any(), anyString());
-
-        PowerMockito.mockStatic(DefaultMmLogger.class);
-        Mockito.when(DefaultMmLogger.getInstance()).thenReturn(mock);
-
         mockCampaign = mock(Campaign.class);
 
         mockPersonnelList = new ArrayList<>();

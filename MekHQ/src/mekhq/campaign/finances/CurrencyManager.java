@@ -28,6 +28,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.Planet;
 import org.joda.money.CurrencyUnitDataProvider;
 import org.joda.money.format.MoneyFormatter;
 import org.joda.money.format.MoneyFormatterBuilder;
@@ -145,11 +146,14 @@ public class CurrencyManager extends CurrencyUnitDataProvider {
             }
 
             // Use the currency of one of the factions in the planet where the unit is deployed, if it exists
-            Set<Faction> factions = campaign.getCurrentPlanet().getFactionSet(new DateTime(campaign.getDate()));
-            for (Faction faction : factions) {
-                Currency currency = possibleCurrencies.getOrDefault(faction.getCurrencyCode(), null);
-                if (currency != null) {
-                    return currency;
+            Planet planet = campaign.getCurrentPlanet();
+            if (planet != null) {
+                Set<Faction> factions = planet.getFactionSet(new DateTime(campaign.getDate()));
+                for (Faction faction : factions) {
+                    Currency currency = possibleCurrencies.getOrDefault(faction.getCurrencyCode(), null);
+                    if (currency != null) {
+                        return currency;
+                    }
                 }
             }
         }

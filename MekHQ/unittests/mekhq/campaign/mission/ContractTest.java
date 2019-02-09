@@ -26,15 +26,9 @@ import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.universe.Planet;
-import org.joda.money.CurrencyUnit;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -46,104 +40,80 @@ import static org.mockito.Mockito.spy;
  * @version %Id%
  * @since 20/07/18 10:23 AM
  */
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(Money.class)
 public class ContractTest {
-
     private Contract contract;
     private Campaign mockCampaign;
-
-    private Money jumpCost;
-    private Money contractBase;
-    private Money overHeadExpenses;
-    private Money peacetimeCost;
-
-    @Before
-    public void setUp() {
-        // We need to create these objects before we tell PowerMockito to
-        // mock the class. After we tell the class to be mocked, all methods not
-        // covered with a when call will just return null;
-        jumpCost = Money.of(5, CurrencyUnit.USD);
-        contractBase = Money.of(10, CurrencyUnit.USD);
-        overHeadExpenses = Money.of(1, CurrencyUnit.USD);
-        peacetimeCost = Money.of(1, CurrencyUnit.USD);
-
-        PowerMockito.mockStatic(Money.class);
-        Money zero = Money.zero(CurrencyUnit.USD);
-
-        Mockito.when(Money.zero()).thenReturn(zero);
-    }
 
     @Test
     public void testGetBaseAmount() {
         initializeTest();
-        Assert.assertEquals("USD 130.0", contract.getBaseAmount().toString());
+        Assert.assertEquals(Money.of(130), contract.getBaseAmount());
     }
 
     @Test
     public void testGetOverheadAmount() {
         initializeTest();
-        Assert.assertEquals("USD 10", contract.getOverheadAmount().toString());
+        Assert.assertEquals(Money.of(10), contract.getOverheadAmount());
     }
 
     @Test
     public void testGetSupportAmount() {
         initializeTest();
-        Assert.assertEquals("USD 10", contract.getSupportAmount().toString());
+        Assert.assertEquals(Money.of(10), contract.getSupportAmount());
     }
 
     @Test
     public void testGetTransportAmount() {
         initializeTest();
-        Assert.assertEquals("USD 20", contract.getTransportAmount().toString());
+        Assert.assertEquals(Money.of(20), contract.getTransportAmount());
     }
 
     @Test
     public void testGetTransitAmount() {
         initializeTest();
-        Assert.assertEquals("USD 30.00", contract.getTransitAmount().toString());
+        Assert.assertEquals(Money.of(30), contract.getTransitAmount());
     }
 
     @Test
     public void testSigningBonusAmount() {
         initializeTest();
-        Assert.assertEquals("USD 20.00", contract.getSigningBonusAmount().toString());
+        Assert.assertEquals(Money.of(20), contract.getSigningBonusAmount());
     }
 
     @Test
     public void testGetFeeAmount() {
         initializeTest();
-        Assert.assertEquals("USD 10.00", contract.getFeeAmount().toString());
+        Assert.assertEquals(Money.of(10), contract.getFeeAmount());
     }
 
     @Test
     public void testGetTotalAmount() {
         initializeTest();
-        Assert.assertEquals("USD 200.00", contract.getTotalAmount().toString());
+        Assert.assertEquals(Money.of(200), contract.getTotalAmount());
     }
 
     @Test
     public void testGetTotalAmountPlusFees(){
         initializeTest();
-        Assert.assertEquals("USD 190.00", contract.getTotalAmountPlusFees().toString());
+        Assert.assertEquals(Money.of(190), contract.getTotalAmountPlusFees());
     }
 
     @Test
     public void testGetAdvanceAmount(){
         initializeTest();
-        Assert.assertEquals("USD 19.00", contract.getAdvanceAmount().toString());
+        Assert.assertEquals(Money.of(19), contract.getAdvanceAmount());
     }
 
     @Test
     public void testGetTotalAmountPlusFeesAndBonuses() {
         initializeTest();
-        Assert.assertEquals("USD 210.00", contract.getTotalAmountPlusFeesAndBonuses().toString());
+        Assert.assertEquals(Money.of(210), contract.getTotalAmountPlusFeesAndBonuses());
     }
 
     @Test
     public void testGetMonthlyPayout(){
         initializeTest();
-        Assert.assertEquals("USD 17.10", contract.getMonthlyPayOut().toString());
+        Assert.assertEquals(Money.of(17.10), contract.getMonthlyPayOut());
     }
 
     private void initializeTest() {
@@ -179,6 +149,11 @@ public class ContractTest {
 
         JumpPath mockJumpPath = Mockito.mock(JumpPath.class);
         Mockito.when(mockJumpPath.getJumps()).thenReturn(2);
+
+        Money jumpCost = Money.of(5);
+        Money contractBase = Money.of(10);
+        Money overHeadExpenses = Money.of(1);
+        Money peacetimeCost = Money.of(1);
 
         Mockito.when(mockCampaign.calculateJumpPath(Mockito.nullable(Planet.class), Mockito.nullable(Planet.class))).thenReturn(mockJumpPath);
         Mockito.when(mockCampaign.calculateCostPerJump(Mockito.anyBoolean(), Mockito.anyBoolean())).thenReturn(jumpCost);

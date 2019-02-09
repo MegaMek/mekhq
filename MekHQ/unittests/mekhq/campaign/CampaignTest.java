@@ -20,17 +20,10 @@
  */
 package mekhq.campaign;
 
-import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.Person;
-import org.joda.money.CurrencyUnit;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.util.ArrayList;
 import java.util.UUID;
@@ -40,18 +33,7 @@ import java.util.UUID;
  * @version %Id%
  * @since 6/10/14 10:23 AM
  */
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(Money.class)
 public class CampaignTest {
-    @Before
-    public void setUp() {
-        PowerMockito.mockStatic(Money.class);
-        Money zero = Money.zero(CurrencyUnit.USD);
-        Money amount = Money.of(2500, CurrencyUnit.USD);
-        Mockito.when(Money.zero()).thenReturn(zero);
-        Mockito.when(Money.of(Mockito.anyDouble())).thenReturn(amount);
-    }
-
     @Test
     public void testGetTechs() {
         final UUID testId = UUID.fromString("c8682a91-346f-49b0-9f1f-28e669ee4e95");
