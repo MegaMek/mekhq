@@ -211,10 +211,14 @@ public class ResolveScenarioWizardDialog extends JDialog {
 	        salvageEmployer = ((Contract)tracker.getMission()).getSalvagedByEmployer();
 	    	salvageUnit = ((Contract)tracker.getMission()).getSalvagedByUnit();
 	    	maxSalvagePct = ((Contract)tracker.getMission()).getSalvagePct();
-	    	currentSalvagePct = salvageUnit.getAmount()
-                                .multiply(new BigDecimal(100))
-                                .divide(salvageUnit.plus(salvageEmployer).getAmount(), RoundingMode.HALF_EVEN)
-                                .intValue();
+
+	    	currentSalvagePct = 0;
+	    	if (salvageUnit.plus(salvageEmployer).isPositive()) {
+                currentSalvagePct = salvageUnit.getAmount()
+                        .multiply(new BigDecimal(100))
+                        .divide(salvageUnit.plus(salvageEmployer).getAmount(), RoundingMode.HALF_EVEN)
+                        .intValue();
+            }
         }
         currentPanel = UNITSPANEL;
         initComponents();
