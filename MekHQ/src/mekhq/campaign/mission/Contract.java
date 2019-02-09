@@ -674,16 +674,16 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
         pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<mrbcFee>" + mrbcFee + "</mrbcFee>");
         pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<advancePct>" + advancePct + "</advancePct>");
         pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<signBonus>" + signBonus + "</signBonus>");
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<advanceAmount  version=\"2\">" +  advanceAmount.toXmlString() + "</advanceAmount>");
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<signingAmount version=\"2\">" +  signingAmount.toXmlString() + "</signingAmount>");
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<transportAmount version=\"2\">" +  transportAmount.toXmlString() + "</transportAmount>");
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<transitAmount version=\"2\">" +  transitAmount.toXmlString() + "</transitAmount>");
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<overheadAmount version=\"2\">" +  overheadAmount.toXmlString() + "</overheadAmount>");
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<supportAmount version=\"2\">" +  supportAmount.toXmlString() + "</supportAmount>");
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<baseAmount version=\"2\">" +  baseAmount.toXmlString() + "</baseAmount>");
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<feeAmount version=\"2\">" +  feeAmount.toXmlString() + "</feeAmount>");
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<salvagedByUnit version=\"2\">" +  salvagedByUnit.toXmlString() + "</salvagedByUnit>");
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<salvagedByEmployer version=\"2\">" + salvagedByEmployer.toXmlString() + "</salvagedByEmployer>");
+        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<advanceAmount>" +  advanceAmount.toXmlString() + "</advanceAmount>");
+        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<signingAmount>" +  signingAmount.toXmlString() + "</signingAmount>");
+        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<transportAmount>" +  transportAmount.toXmlString() + "</transportAmount>");
+        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<transitAmount>" +  transitAmount.toXmlString() + "</transitAmount>");
+        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<overheadAmount>" +  overheadAmount.toXmlString() + "</overheadAmount>");
+        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<supportAmount>" +  supportAmount.toXmlString() + "</supportAmount>");
+        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<baseAmount>" +  baseAmount.toXmlString() + "</baseAmount>");
+        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<feeAmount>" +  feeAmount.toXmlString() + "</feeAmount>");
+        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<salvagedByUnit>" +  salvagedByUnit.toXmlString() + "</salvagedByUnit>");
+        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<salvagedByEmployer>" + salvagedByEmployer.toXmlString() + "</salvagedByEmployer>");
     }
 
     @Override
@@ -728,25 +728,25 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
             } else if (wn2.getNodeName().equalsIgnoreCase("mrbcFee")) {
                 mrbcFee = wn2.getTextContent().trim().equals("true");
             } else if (wn2.getNodeName().equalsIgnoreCase("advanceAmount")) {
-                advanceAmount = MekHqXmlUtil.getMoneyFromXmlNode(wn2);
+                advanceAmount = Money.fromXmlString(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("signingAmount")) {
-                signingAmount = MekHqXmlUtil.getMoneyFromXmlNode(wn2);
+                signingAmount = Money.fromXmlString(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("transportAmount")) {
-                transportAmount = MekHqXmlUtil.getMoneyFromXmlNode(wn2);
+                transportAmount = Money.fromXmlString(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("transitAmount")) {
-                transitAmount = MekHqXmlUtil.getMoneyFromXmlNode(wn2);
+                transitAmount = Money.fromXmlString(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("overheadAmount")) {
-                overheadAmount = MekHqXmlUtil.getMoneyFromXmlNode(wn2);
+                overheadAmount = Money.fromXmlString(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("supportAmount")) {
-                supportAmount = MekHqXmlUtil.getMoneyFromXmlNode(wn2);
+                supportAmount = Money.fromXmlString(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("baseAmount")) {
-                baseAmount = MekHqXmlUtil.getMoneyFromXmlNode(wn2);
+                baseAmount = Money.fromXmlString(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("feeAmount")) {
-                feeAmount = MekHqXmlUtil.getMoneyFromXmlNode(wn2);
+                feeAmount = Money.fromXmlString(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("salvagedByUnit")) {
-                salvagedByUnit = MekHqXmlUtil.getMoneyFromXmlNode(wn2);
+                salvagedByUnit = Money.fromXmlString(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("salvagedByEmployer")) {
-                salvagedByEmployer = MekHqXmlUtil.getMoneyFromXmlNode(wn2);
+                salvagedByEmployer = Money.fromXmlString(wn2.getTextContent().trim());
             }
         }
     }

@@ -106,7 +106,7 @@ public class Money {
     }
 
     public Money plus(List<Money> amounts) {
-        return new Money(this.wrapped.plus(amounts.stream().map(x -> x.wrapped).collect(Collectors.toList())));
+        return new Money(this.wrapped.plus((Iterable<BigMoney>)(amounts.stream().map(x -> x.wrapped)::iterator)));
     }
 
     public Money minus(Money amount) {

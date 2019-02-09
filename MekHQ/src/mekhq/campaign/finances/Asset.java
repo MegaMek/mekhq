@@ -90,7 +90,7 @@ public class Asset implements MekHqXmlSerializable {
                 +MekHqXmlUtil.escape(name)
                 +"</name>");
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<value version=\"2\">"
+                +"<value>"
                 +value.toXmlString()
                 +"</value>");
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
@@ -98,7 +98,7 @@ public class Asset implements MekHqXmlSerializable {
                 +schedule
                 +"</schedule>");
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<income version=\"2\">"
+                +"<income>"
                 +income.toXmlString()
                 +"</income>");
         pw1.println(MekHqXmlUtil.indentStr(indent) + "</asset>");
@@ -113,9 +113,9 @@ public class Asset implements MekHqXmlSerializable {
             if (wn2.getNodeName().equalsIgnoreCase("name")) {
                 retVal.name = wn2.getTextContent();
             } else if (wn2.getNodeName().equalsIgnoreCase("value")) {
-                retVal.value = MekHqXmlUtil.getMoneyFromXmlNode(wn2);
+                retVal.value = Money.fromXmlString(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("income")) {
-                retVal.income = MekHqXmlUtil.getMoneyFromXmlNode(wn2);
+                retVal.income = Money.fromXmlString(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("schedule")) {
                 retVal.schedule = Integer.parseInt(wn2.getTextContent().trim());
             } 

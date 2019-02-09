@@ -1394,7 +1394,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                         + "</unitId>");
         }
         pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                    + "<salary version=\"2\">"
+                    + "<salary>"
                     + salary.toXmlString()
                     + "</salary>");
         pw1.println(MekHqXmlUtil.indentStr(indent + 1)
@@ -1661,7 +1661,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                 } else if (wn2.getNodeName().equalsIgnoreCase("willingToDefect")) {
                     retVal.willingToDefect = Boolean.parseBoolean(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("salary")) {
-                    retVal.salary = MekHqXmlUtil.getMoneyFromXmlNode(wn2);
+                    retVal.salary = Money.fromXmlString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("minutesLeft")) {
                     retVal.minutesLeft = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("overtimeLeft")) {

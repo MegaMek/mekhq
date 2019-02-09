@@ -28,14 +28,19 @@ defaultEnd - Indicates which year the currency ended being the default currency 
         <code>SLD</code>
         <decimalPlaces>2</decimalPlaces>
         <symbol>SL$</symbol>
+        <startYear>2571</startYear>
+        <endYear>2785</endYear>
+        <isDefault>true</isDefault>
     </currency>
     <currency>
         <name>ComStar bill</name>
         <code>CSB</code>
         <decimalPlaces>0</decimalPlaces>
         <symbol>C-Bill</symbol>
-        <defaultStart>1</defaultStart>
-        <defaultEnd>999999</defaultEnd>
+        <startYear>1</startYear>
+        <endYear>999999</endYear>
+        <isDefault>true</isDefault>
+        <isBackup>true</isBackup>
     </currency>
     <currency>
         <name>Lyran Alliance Kroner</name>

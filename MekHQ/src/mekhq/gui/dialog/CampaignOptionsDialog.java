@@ -116,6 +116,7 @@ import mekhq.gui.FileDialogs;
 import mekhq.gui.SpecialAbilityPanel;
 import mekhq.gui.model.RankTableModel;
 import mekhq.gui.model.SortedComboBoxModel;
+import mekhq.gui.utilities.JMoneyTextField;
 import mekhq.gui.utilities.TableCellListener;
 import mekhq.module.PersonnelMarketServiceManager;
 import mekhq.module.api.PersonnelMarketMethod;
@@ -224,7 +225,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JCheckBox disallowClanPartsFromIS;
     private JSpinner spnPenaltyClanPartsFromIS;
 
-    private JTextField[] txtSalaryBase;
+    private JMoneyTextField[] txtSalaryBase;
     private JSpinner[] spnSalaryXp;
     private JSpinner spnSalaryCommision;
     private JSpinner spnSalaryEnlisted;
@@ -1859,13 +1860,13 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         panSalary.add(panXpMultiplier, gridBagConstraints);
 
         JPanel panAllTypes = new JPanel(new GridLayout(Person.T_NUM / 2, 2));
-        JTextField txtType;
+        JMoneyTextField txtType;
         JPanel panType;
         // TODO: use JFormattedTextField with Numeric formatter
-        txtSalaryBase = new JTextField[Person.T_NUM];
+        txtSalaryBase = new JMoneyTextField[Person.T_NUM];
         for (int i = 1; i < Person.T_NUM; i++) {
-            txtType = new JTextField();
-            txtType.setText(Integer.toString(options.getBaseSalary(i).getAmount().intValue()));
+            txtType = new JMoneyTextField();
+            txtType.setMoney(options.getBaseSalary(i));
             txtType.setPreferredSize(new Dimension(75, 20));
             panType = new JPanel(new GridBagLayout());
             gridBagConstraints = new java.awt.GridBagConstraints();
@@ -4767,7 +4768,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         //start salary
         for (int i = 1; i < Person.T_NUM; i++) {
             try {
-                Money salary = Money.of(Double.parseDouble(txtSalaryBase[i].getText()));
+                Money salary = txtSalaryBase[i].getMoney();
                 options.setBaseSalary(salary, i);
             } catch (Exception ignored) {
 

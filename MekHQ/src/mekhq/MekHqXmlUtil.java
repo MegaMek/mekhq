@@ -43,8 +43,6 @@ import megamek.common.MULParser;
 import megamek.common.Tank;
 import megamek.common.logging.LogLevel;
 
-import mekhq.campaign.finances.Money;
-
 public class MekHqXmlUtil {
 
     private static DocumentBuilderFactory DOCUMENT_BUILDER_FACTORY;
@@ -661,24 +659,5 @@ public class MekHqXmlUtil {
         String chassis = attrs.getNamedItem("chassis").getTextContent();
         String model = attrs.getNamedItem("model").getTextContent();
         return chassis + " " + model;
-    }
-
-    /**
-     * Parses a node for the money information it contains handling
-     * different save versions
-     * @param node node that contains the money information
-     * @return a money object
-     */
-    public static Money getMoneyFromXmlNode(Node node) {
-        // Check the XML data version
-        if (node.hasAttributes()) {
-            Node attribute = node.getAttributes().getNamedItem("version");
-            if (attribute != null && attribute.getTextContent().trim().equals("2")) {
-                return Money.fromXmlString(node.getTextContent().trim());
-            }
-        }
-
-        // Old save, transform the long into a money
-        return Money.of(Long.parseLong(node.getTextContent().trim()));
     }
 }

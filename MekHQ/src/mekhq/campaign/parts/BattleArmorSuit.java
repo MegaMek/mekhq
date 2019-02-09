@@ -370,7 +370,7 @@ public class BattleArmorSuit extends Part {
                 +MekHqXmlUtil.escape(EntityMovementMode.token(jumpType))
                 +"</jumpType>");
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<alternateCost version=\"2\">"
+                +"<alternateCost>"
                 +alternateCost.toXmlString()
                 +"</alternateCost>");
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
@@ -405,7 +405,7 @@ public class BattleArmorSuit extends Part {
             } else if (wn2.getNodeName().equalsIgnoreCase("jumpType")) {
                 jumpType = EntityMovementMode.type(MekHqXmlUtil.unEscape(wn2.getTextContent()));
             } else if (wn2.getNodeName().equalsIgnoreCase("alternateCost")) {
-                alternateCost = MekHqXmlUtil.getMoneyFromXmlNode(wn2);
+                alternateCost = Money.fromXmlString(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("alternateTon")) {
             	alternateTon = Double.parseDouble(wn2.getTextContent());
             }

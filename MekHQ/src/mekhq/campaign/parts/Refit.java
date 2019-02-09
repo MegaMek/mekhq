@@ -1698,7 +1698,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 				+ "</timeSpent>");
 		pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<refitClass>" + refitClass
 				+ "</refitClass>");
-		pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<cost version=\"2\">" + cost.toXmlString()
+		pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<cost>" + cost.toXmlString()
 				+ "</cost>");
 		pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<failedCheck>" + failedCheck
 				+ "</failedCheck>");
@@ -1777,7 +1777,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
                 } else if (wn2.getNodeName().equalsIgnoreCase("daysToWait")) {
                     retVal.daysToWait = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("cost")) {
-					retVal.cost = MekHqXmlUtil.getMoneyFromXmlNode(wn2);
+					retVal.cost = Money.fromXmlString(wn2.getTextContent().trim());
 				} else if (wn2.getNodeName().equalsIgnoreCase("newArmorSuppliesId")) {
 					retVal.newArmorSuppliesId = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("assignedTechId")) {

@@ -36,14 +36,23 @@ import org.joda.money.format.MoneyParser;
 class XmlMoneyParser implements MoneyParser {
     @Override
     public void parse(MoneyParseContext context) {
-        String money = context.getText().toString();
-        int separator = money.indexOf(" ");
+        String moneyAsString = context.getText().toString();
+        int separator = moneyAsString.indexOf(" ");
 
-        BigDecimal moneyAmount = new BigDecimal(money.subSequence(0, separator).toString());
-        CurrencyUnit currency = CurrencyUnit.of(money.substring(separator + 1));
+        BigDecimal moneyAmount;
+        CurrencyUnit currency;
+
+        // Check if this is an old save value with no currency data
+        if (separator == -1) {
+            moneyAmount = new BigDecimal(moneyAsString);
+            currency = CurrencyManager.getInstance().getDefaultCurrency().getCurrencyUnit();
+        } else {
+            moneyAmount = new BigDecimal(moneyAsString.subSequence(0, separator).toString());
+            currency = CurrencyUnit.of(moneyAsString.substring(separator + 1));
+        }
 
         context.setAmount(moneyAmount);
         context.setCurrency(currency);
-        context.setIndex(money.length());
+        context.setIndex(moneyAsString.length());
     }
 }

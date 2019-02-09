@@ -705,7 +705,7 @@ public class RetirementDefectionTracker implements Serializable, MekHqXmlSeriali
                 				} else if (wn4.getNodeName().equalsIgnoreCase("dependents")) {
                 					payout.setDependents(Integer.parseInt(wn4.getTextContent()));
                 				} else if (wn4.getNodeName().equalsIgnoreCase("cbills")) {
-                					payout.setPayoutAmount(MekHqXmlUtil.getMoneyFromXmlNode(wn4));
+                					payout.setPayoutAmount(Money.fromXmlString(wn4.getTextContent().trim()));
                 				} else if (wn4.getNodeName().equalsIgnoreCase("recruit")) {
                 					payout.setRecruit(Boolean.parseBoolean(wn4.getTextContent()));
                 				} else if (wn4.getNodeName().equalsIgnoreCase("heir")) {

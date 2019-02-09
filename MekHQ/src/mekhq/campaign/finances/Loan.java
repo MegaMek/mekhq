@@ -362,7 +362,7 @@ public class Loan implements MekHqXmlSerializable {
                 +MekHqXmlUtil.escape(refNumber)
                 +"</refNumber>");
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<principal version=\"2\">"
+                +"<principal>"
                 +principal.toXmlString()
                 +"</principal>");
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
@@ -386,11 +386,11 @@ public class Loan implements MekHqXmlSerializable {
                 +nPayments
                 +"</nPayments>");
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<payAmount version=\"2\">"
+                +"<payAmount>"
                 +payAmount.toXmlString()
                 +"</payAmount>");
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<collateralValue version=\"2\">"
+                +"<collateralValue>"
                 +collateralValue.toXmlString()
                 +"</collateralValue>");
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
@@ -398,7 +398,7 @@ public class Loan implements MekHqXmlSerializable {
                 +overdue
                 +"</overdue>");
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<totalValue version=\"2\">"
+                +"<totalValue>"
                 +totalValue
                 +totalValue.toXmlString()
                 +"</totalValue>");
@@ -418,13 +418,13 @@ public class Loan implements MekHqXmlSerializable {
             } else if (wn2.getNodeName().equalsIgnoreCase("refNumber")) {
                 retVal.refNumber = wn2.getTextContent();
             } else if (wn2.getNodeName().equalsIgnoreCase("principal")) {
-                retVal.principal = MekHqXmlUtil.getMoneyFromXmlNode(wn2);
+                retVal.principal = Money.fromXmlString(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("payAmount")) {
-                retVal.payAmount = MekHqXmlUtil.getMoneyFromXmlNode(wn2);
+                retVal.payAmount = Money.fromXmlString(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("totalValue")) {
-                retVal.totalValue = MekHqXmlUtil.getMoneyFromXmlNode(wn2);
+                retVal.totalValue = Money.fromXmlString(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("collateralValue")) {
-                retVal.collateralValue = MekHqXmlUtil.getMoneyFromXmlNode(wn2);
+                retVal.collateralValue = Money.fromXmlString(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("rate")) {
                 retVal.rate = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("years")) {

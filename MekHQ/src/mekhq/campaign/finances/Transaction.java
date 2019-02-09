@@ -217,7 +217,7 @@ public class Transaction implements Serializable {
 	protected void writeToXml(PrintWriter pw1, int indent) {
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "<transaction>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<amount version=\"2\">"
+				+"<amount>"
 				+amount.toXmlString()
 				+"</amount>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
@@ -243,7 +243,7 @@ public class Transaction implements Serializable {
 		for (int x=0; x<nl.getLength(); x++) {
 			Node wn2 = nl.item(x);
 			if (wn2.getNodeName().equalsIgnoreCase("amount")) {
-			    retVal.amount = MekHqXmlUtil.getMoneyFromXmlNode(wn2);
+			    retVal.amount = Money.fromXmlString(wn2.getTextContent().trim());
 			} else if (wn2.getNodeName().equalsIgnoreCase("category")) {
 				retVal.category = Integer.parseInt(wn2.getTextContent().trim());
 			} else if (wn2.getNodeName().equalsIgnoreCase("description")) {

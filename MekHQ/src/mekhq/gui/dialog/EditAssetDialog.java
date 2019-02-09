@@ -22,17 +22,14 @@
 package mekhq.gui.dialog;
 
 import java.awt.Frame;
-import java.text.NumberFormat;
 import java.util.ResourceBundle;
 
 import javax.swing.*;
-import javax.swing.text.DefaultFormatterFactory;
-import javax.swing.text.NumberFormatter;
 
 import megamek.common.util.EncodeControl;
 import mekhq.campaign.finances.Asset;
 import mekhq.campaign.finances.Finances;
-import mekhq.campaign.finances.Money;
+import mekhq.gui.utilities.JMoneyTextField;
 
 /**
  *
@@ -46,8 +43,8 @@ public class EditAssetDialog extends JDialog {
     private JButton btnClose;
     private JButton btnOK;
     private JTextField txtName;
-    private JFormattedTextField assetValueField;
-    private JFormattedTextField assetIncomeField;
+    private JMoneyTextField assetValueField;
+    private JMoneyTextField assetIncomeField;
     private JComboBox<String> choiceSchedule;
     boolean cancelled;
     
@@ -63,7 +60,6 @@ public class EditAssetDialog extends JDialog {
         java.awt.GridBagConstraints gridBagConstraints;
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle(resourceMap.getString("dialogTitle.text"));
         getContentPane().setLayout(new java.awt.GridBagLayout());
         
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -95,9 +91,8 @@ public class EditAssetDialog extends JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         getContentPane().add(new JLabel(resourceMap.getString("labelValue.text")), gridBagConstraints);
 
-        assetValueField = new JFormattedTextField();
-        assetValueField.setFormatterFactory(new DefaultFormatterFactory(new NumberFormatter(NumberFormat.getInstance())));
-        assetValueField.setText(asset.getValue().toAmountString());
+        assetValueField = new JMoneyTextField(() -> btnOKActionPerformed(null));
+        assetValueField.setMoney(asset.getValue());
         assetValueField.setToolTipText(resourceMap.getString("assetValueField.toolTipText")); // NOI18N
         assetValueField.setName("assetValueField"); // NOI18N
         assetValueField.setMinimumSize(new java.awt.Dimension(150, 28));
@@ -119,9 +114,8 @@ public class EditAssetDialog extends JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         getContentPane().add(new JLabel(resourceMap.getString("labelIncome.text")), gridBagConstraints);
 
-        assetIncomeField = new JFormattedTextField();
-        assetIncomeField.setFormatterFactory(new DefaultFormatterFactory(new NumberFormatter(NumberFormat.getInstance())));
-        assetIncomeField.setText(asset.getIncome().toAmountString());
+        assetIncomeField = new JMoneyTextField(() -> btnOKActionPerformed(null));
+        assetIncomeField.setMoney(asset.getIncome());
         assetIncomeField.setToolTipText(resourceMap.getString("assetIncomeField.toolTipText")); // NOI18N
         assetIncomeField.setName("assetIncomeField"); // NOI18N
         assetIncomeField.setMinimumSize(new java.awt.Dimension(150, 28));
@@ -193,12 +187,12 @@ public class EditAssetDialog extends JDialog {
     private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {
         asset.setName(txtName.getText());
         try {
-            asset.setValue(Money.of(Double.parseDouble(assetValueField.getValue().toString())));
+            asset.setValue(assetValueField.getMoney());
         } catch(Exception ignored) {
             
         }
         try {
-            asset.setIncome(Money.of(Double.parseDouble(assetIncomeField.getValue().toString())));
+            asset.setIncome(assetIncomeField.getMoney());
         } catch(Exception ignored) {
             
         }

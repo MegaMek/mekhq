@@ -11,7 +11,6 @@ import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.awt.event.*;
-import java.text.NumberFormat;
 import java.util.ResourceBundle;
 
 import javax.swing.JButton;
@@ -23,22 +22,21 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
-import javax.swing.text.DefaultFormatterFactory;
-import javax.swing.text.NumberFormatter;
 
 import megamek.common.util.EncodeControl;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.Transaction;
+import mekhq.gui.utilities.JMoneyTextField;
 
 /**
  *
  * @author natit
  */
-public class AddFundsDialog extends JDialog implements FocusListener, KeyListener {
+public class AddFundsDialog extends JDialog implements FocusListener {
 	private static final long serialVersionUID = -6946480787293179307L;
 
     private JButton btnAddFunds;
-    private JFormattedTextField jFormattedTextFieldFundsQuantity;
+    private JMoneyTextField fundsQuantityField;
     private JFormattedTextField descriptionField;
     private JComboBox<String> categoryCombo;
     private ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AddFundsDialog", new EncodeControl()); //$NON-NLS-1$
@@ -71,15 +69,12 @@ public class AddFundsDialog extends JDialog implements FocusListener, KeyListene
     private JPanel buildFieldsPanel() {
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT, 2, 2));
 
-        jFormattedTextFieldFundsQuantity = new JFormattedTextField();
-        jFormattedTextFieldFundsQuantity.addFocusListener(this);
-        jFormattedTextFieldFundsQuantity.addKeyListener(this);
-        jFormattedTextFieldFundsQuantity.setFormatterFactory(new DefaultFormatterFactory(new NumberFormatter(NumberFormat.getInstance())));
-        jFormattedTextFieldFundsQuantity.setText(resourceMap.getString("jFormattedTextFieldFundsQuantity.text")); // NOI18N
-        jFormattedTextFieldFundsQuantity.setToolTipText(resourceMap.getString("jFormattedTextFieldFundsQuantity.toolTipText")); // NOI18N
-        jFormattedTextFieldFundsQuantity.setName("jFormattedTextFieldFundsQuantity"); // NOI18N
-        jFormattedTextFieldFundsQuantity.setColumns(10);
-        panel.add(jFormattedTextFieldFundsQuantity);
+        fundsQuantityField = new JMoneyTextField(() ->  btnAddFundsActionPerformed(null));
+        fundsQuantityField.setText(resourceMap.getString("jFormattedTextFieldFundsQuantity.text")); // NOI18N
+        fundsQuantityField.setToolTipText(resourceMap.getString("jFormattedTextFieldFundsQuantity.toolTipText")); // NOI18N
+        fundsQuantityField.setName("jFormattedTextFieldFundsQuantity"); // NOI18N
+        fundsQuantityField.setColumns(10);
+        panel.add(fundsQuantityField);
 
         categoryCombo = new JComboBox<>(Transaction.getCategoryList());
         categoryCombo.setSelectedItem(Transaction.getCategoryName(Transaction.C_MISC));
@@ -88,39 +83,17 @@ public class AddFundsDialog extends JDialog implements FocusListener, KeyListene
         panel.add(categoryCombo);
 
         descriptionField = new JFormattedTextField("Rich Uncle");
+        descriptionField.addActionListener(x -> this.btnAddFundsActionPerformed(null));
         descriptionField.addFocusListener(this);
         descriptionField.setToolTipText("Description of the transaction.");
         descriptionField.setName("descriptionField");
         descriptionField.setColumns(20);
         panel.add(descriptionField);
-
         return panel;
     }
 
-    private void btnAddFundsActionPerformed(ActionEvent evt) {//GEN-FIRST:event_btnAddFundsActionPerformed
-        this.closedType = JOptionPane.OK_OPTION;
-        this.setVisible(false);
-    }//GEN-LAST:event_btnAddFundsActionPerformed
-
-    /**
-    * @param args the command line arguments
-    */
-    public static void main(String args[]) {
-        EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                AddFundsDialog dialog = new AddFundsDialog(new JFrame(), true);
-                dialog.addWindowListener(new WindowAdapter() {
-                    public void windowClosing(WindowEvent e) {
-                        System.exit(0);
-                    }
-                });
-                dialog.setVisible(true);
-            }
-        });
-    }
-
-    public Money getFundsQuantity () {
-        return Money.of(Double.parseDouble(jFormattedTextFieldFundsQuantity.getValue().toString()));
+    public Money getFundsQuantityField() {
+        return fundsQuantityField.getMoney();
     }
 
     public String getFundsDescription() {
@@ -133,25 +106,8 @@ public class AddFundsDialog extends JDialog implements FocusListener, KeyListene
 
     @Override
     public void focusGained(FocusEvent e) {
-        if (jFormattedTextFieldFundsQuantity.equals(e.getSource())) {
-            selectAllTextInField(jFormattedTextFieldFundsQuantity);
-        } else if (descriptionField.equals(e.getSource())) {
-            selectAllTextInField(descriptionField);
-        }
-    }
-
-    private void selectAllTextInField(final JFormattedTextField field) {
-        SwingUtilities.invokeLater(() -> field.selectAll());
-    }
-
-    public int getClosedType() {
-        return closedType;
-    }
-
-    @Override
-    public void keyReleased(KeyEvent e) {
-        if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-            btnAddFundsActionPerformed(null);
+        if (descriptionField.equals(e.getSource())) {
+            SwingUtilities.invokeLater(() -> descriptionField.selectAll());
         }
     }
 
@@ -160,13 +116,29 @@ public class AddFundsDialog extends JDialog implements FocusListener, KeyListene
         //not used
     }
 
-    @Override
-    public void keyTyped(KeyEvent e) {
-        //not used
+    public int getClosedType() {
+        return closedType;
     }
 
-    @Override
-    public void keyPressed(KeyEvent e) {
-        //not used
+    private void btnAddFundsActionPerformed(ActionEvent evt) {//GEN-FIRST:event_btnAddFundsActionPerformed
+        this.closedType = JOptionPane.OK_OPTION;
+        this.setVisible(false);
+    }//GEN-LAST:event_btnAddFundsActionPerformed
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String args[]) {
+        EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                AddFundsDialog dialog = new AddFundsDialog(new JFrame(), true);
+                dialog.addWindowListener(new WindowAdapter() {
+                    public void windowClosing(WindowEvent e) {
+                        System.exit(0);
+                    }
+                });
+                dialog.setVisible(true);
+            }
+        });
     }
 }

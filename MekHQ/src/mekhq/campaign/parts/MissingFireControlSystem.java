@@ -110,7 +110,7 @@ public class MissingFireControlSystem extends MissingPart {
 	public void writeToXml(PrintWriter pw1, int indent) {
 		writeToXmlBegin(pw1, indent);
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<cost version=\"2\">"
+				+"<cost>"
 				+ cost.toXmlString()
 				+"</cost>");
 		writeToXmlEnd(pw1, indent);
@@ -123,7 +123,7 @@ public class MissingFireControlSystem extends MissingPart {
 		for (int x=0; x<nl.getLength(); x++) {
 			Node wn2 = nl.item(x);		
 			if (wn2.getNodeName().equalsIgnoreCase("cost")) {
-				cost = MekHqXmlUtil.getMoneyFromXmlNode(wn2);
+				cost = Money.fromXmlString(wn2.getTextContent().trim());
 			} 
 		}
 	}

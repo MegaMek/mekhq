@@ -124,7 +124,7 @@ public class MissingAeroLifeSupport extends MissingPart {
 				+fighter
 				+"</fighter>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<cost version=\"2\">"
+				+"<cost>"
 				+ cost.toXmlString()
 				+"</cost>");
 		writeToXmlEnd(pw1, indent);
@@ -140,7 +140,7 @@ public class MissingAeroLifeSupport extends MissingPart {
                 fighter = wn2.getTextContent().trim().equalsIgnoreCase("true");
 			}
 			else if (wn2.getNodeName().equalsIgnoreCase("cost")) {
-				cost = MekHqXmlUtil.getMoneyFromXmlNode(wn2);
+				cost = Money.fromXmlString(wn2.getTextContent().trim());
 			} 
 		}
 	}

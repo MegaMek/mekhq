@@ -156,7 +156,7 @@ public class Loot implements MekHqXmlSerializable {
                 +MekHqXmlUtil.escape(name)
                 +"</name>");
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<cash version=\"2\">"
+                +"<cash>"
                 +cash.toXmlString()
                 +"</cash>");
         for(Entity e : units) {
@@ -189,7 +189,7 @@ public class Loot implements MekHqXmlSerializable {
                 if (wn2.getNodeName().equalsIgnoreCase("name")) {
                     retVal.name = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("cash")) {
-                    retVal.cash = MekHqXmlUtil.getMoneyFromXmlNode(wn2);
+                    retVal.cash = Money.fromXmlString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("entityName")) {              
                     MechSummary summary = MechSummaryCache.getInstance().getMech(wn2.getTextContent());
                     if(null == summary) {

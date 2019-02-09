@@ -55,6 +55,8 @@ import mekhq.gui.model.DataTableModel;
  */
 public class ManageAssetsDialog extends JDialog {
     private static final long serialVersionUID = -8038099101234445018L;
+
+    private ResourceBundle resourceMap;
     private Frame frame;
     private Campaign campaign;
     private AssetTableModel assetModel;
@@ -83,20 +85,20 @@ public class ManageAssetsDialog extends JDialog {
         btnEdit = new javax.swing.JButton();
         btnDelete = new javax.swing.JButton();
 
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditPersonnelLogDialog", new EncodeControl()); //$NON-NLS-1$
+        resourceMap = ResourceBundle.getBundle("mekhq.resources.ManageAssetsDialog", new EncodeControl()); //$NON-NLS-1$
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("Manage Assets");
+        setTitle(resourceMap.getString("dialogTitle.text"));
         getContentPane().setLayout(new java.awt.BorderLayout());
         
         JPanel panBtns = new JPanel(new GridLayout(1,0));
-        btnAdd.setText("Add Asset"); // NOI18N
+        btnAdd.setText(resourceMap.getString("btnAddAsset.text")); // NOI18N
         btnAdd.addActionListener(evt -> addAsset());
         panBtns.add(btnAdd);
-        btnEdit.setText("Edit Asset"); // NOI18N
+        btnEdit.setText(resourceMap.getString("btnEditAsset.text")); // NOI18N
         btnEdit.setEnabled(false);
         btnEdit.addActionListener(evt -> editAsset());
         panBtns.add(btnEdit);
-        btnDelete.setText("Remove Asset"); // NOI18N
+        btnDelete.setText(resourceMap.getString("btnRemoveAsset.text")); // NOI18N
         btnDelete.setEnabled(false);
         btnDelete.addActionListener(evt -> deleteAsset());
         panBtns.add(btnDelete);
@@ -137,18 +139,22 @@ public class ManageAssetsDialog extends JDialog {
     private void addAsset() {
         Asset a = new Asset();
         EditAssetDialog ead = new EditAssetDialog(frame, a);
+        ead.setTitle(resourceMap.getString("addAssetDialogTitle.text"));
         ead.setVisible(true);
         if(!ead.wasCancelled()) {
+            ead.dispose();
             campaign.getFinances().getAllAssets().add(a);
             MekHQ.triggerEvent(new AssetNewEvent(a));
+            refreshTable();
         }
-        refreshTable();
     }
     
     private void editAsset() {
+        // TODO: fix this to use a cloned asset and the user has to confirm edits with OK
         Asset a = assetModel.getAssetAt(assetTable.getSelectedRow());
         if(null != a) {
             EditAssetDialog ead = new EditAssetDialog(frame, a);
+            ead.setTitle(resourceMap.getString("editAssetDialogTitle.text"));
             ead.setVisible(true);
             MekHQ.triggerEvent(new AssetChangedEvent(a));
             refreshTable();

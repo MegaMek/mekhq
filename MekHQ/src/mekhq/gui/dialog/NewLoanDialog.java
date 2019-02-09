@@ -213,7 +213,7 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
 
         txtPrincipal = new javax.swing.JFormattedTextField();
         txtPrincipal.setFormatterFactory(new DefaultFormatterFactory(numberFormatter));
-        txtPrincipal.setText(loan.getPrincipal().toAmountString());
+        txtPrincipal.setText(loan.getPrincipal().toAmountAndSymbolString());
         txtPrincipal.setEditable(false);
         btnPlusTenMillion = new JButton(resourceMap.getString("btnPlus10mil.text"));
         btnMinusTenMillion = new JButton(resourceMap.getString("btnMinus10mil.text"));
@@ -527,17 +527,17 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
 
     private void refreshValues() {
         try {
-            txtPrincipal.setText(loan.getPrincipal().toAmountString());
+            txtPrincipal.setText(loan.getPrincipal().toAmountAndSymbolString());
             lblAPR.setText(loan.getInterestRate() + "%");
             lblCollateralPct.setText(loan.getCollateralPercent() + "%");
             lblYears.setText(loan.getYears() + " years");
             lblSchedule.setText(Finances.getScheduleName(loan.getPaymentSchedule()));
-            lblPrincipal.setText(loan.getPrincipal().toAmountString());
+            lblPrincipal.setText(loan.getPrincipal().toAmountAndSymbolString());
             lblFirstPayment.setText(SimpleDateFormat.getDateInstance().format(loan.getNextPayDate()));
-            lblPayAmount.setText(loan.getPaymentAmount().toAmountString());
+            lblPayAmount.setText(loan.getPaymentAmount().toAmountAndSymbolString());
             lblNPayment.setText(numberFormatter.valueToString(loan.getRemainingPayments()));
-            lblTotalPayment.setText(loan.getRemainingValue().toAmountString());
-            lblCollateralAmount.setText(loan.getCollateralAmount().toAmountString());
+            lblTotalPayment.setText(loan.getRemainingValue().toAmountAndSymbolString());
+            lblCollateralAmount.setText(loan.getCollateralAmount().toAmountAndSymbolString());
         } catch (Exception ignored ){
 
         }
