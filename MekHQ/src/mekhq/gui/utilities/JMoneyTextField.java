@@ -35,11 +35,13 @@ import java.text.NumberFormat;
  * Control used when a field in the UI represents an editable money amount.
  */
 public class JMoneyTextField extends JFormattedTextField implements FocusListener {
+    private NumberFormat format;
     private mekhq.Action whenEnterPressed;
 
     public JMoneyTextField() {
+        this.format = NumberFormat.getInstance();
         this.addFocusListener(this);
-        this.setFormatterFactory(new DefaultFormatterFactory(new NumberFormatter(NumberFormat.getInstance())));
+        this.setFormatterFactory(new DefaultFormatterFactory(new NumberFormatter(this.format)));
     }
 
     public JMoneyTextField(mekhq.Action whenEnterPressed) {
@@ -53,14 +55,14 @@ public class JMoneyTextField extends JFormattedTextField implements FocusListene
 
     public Money getMoney() {
         try {
-            return Money.of(Double.parseDouble(this.getValue().toString()));
+            return Money.of(this.format.parse(this.getText()).doubleValue());
         } catch (Exception ignored) {
             return Money.zero();
         }
     }
 
     public void setMoney(Money money) {
-        assert money != null;
+       assert money != null;
         this.setText(money.toAmountString());
     }
 

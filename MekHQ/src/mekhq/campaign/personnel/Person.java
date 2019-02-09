@@ -368,7 +368,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         status = S_ACTIVE;
         hits = 0;
         skills = new Hashtable<>();
-        salary = Money.zero();
+        salary = Money.of(-1);
         campaign = c;
         doctorId = null;
         unitId = null;
@@ -1952,7 +1952,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
             return salary;
         }
 
-        //if salary is -1, then use the standard amounts
+        //if salary is negative, then use the standard amounts
         Money primaryBase = campaign.getCampaignOptions().getBaseSalary(getPrimaryRole());
         primaryBase = primaryBase.multipliedBy(campaign.getCampaignOptions().getSalaryXpMultiplier(getExperienceLevel(false)));
         if (hasSkill(SkillType.S_ANTI_MECH) && (getPrimaryRole() == T_INFANTRY || getPrimaryRole() == T_BA)) {
