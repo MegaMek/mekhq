@@ -306,6 +306,7 @@ public class RATManager extends AbstractUnitGenerator implements IUnitGenerator 
                     MekHQ.getLogger().log(RATManager.class, METHOD_NAME, LogLevel.ERROR,
                             "While loading RAT info from " + f.getName() + ": "); //$NON-NLS-1$
                     MekHQ.getLogger().error(RATManager.class, METHOD_NAME, ex);
+                    continue;
                 }
                 Element elem = xmlDoc.getDocumentElement();
                 NodeList nl = elem.getChildNodes();
