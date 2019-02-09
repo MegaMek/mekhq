@@ -900,7 +900,7 @@ public class Campaign implements Serializable, ITechManager {
             if (null != prevForce && prevForce.getUnits().size() == 0) {
                 lances.remove(prevForce.getId());
             }
-            if (null == lances.get(id)) {
+            if (null == lances.get(id) && null != force) {
                 lances.put(id, new Lance(force.getId(), this));
             }
         }
