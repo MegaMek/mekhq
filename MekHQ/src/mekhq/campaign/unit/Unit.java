@@ -3078,20 +3078,21 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                         }
                     }
                     entity.getCrew().setOptions(cdrOptions);
+
+                    if(usesSoloPilot()) {
+                        if(!commander.isActive()) {
+                            entity.getCrew().setMissing(true, 0);
+                            return;
+                        }
+                        entity.getCrew().setHits(commander.getHits(), 0);
+                    }
                 }
 
-                if(usesSoloPilot()) {
-                    if(!commander.isActive()) {
-                        entity.getCrew().setMissing(true, 0);;
-                        return;
-                    }
-                    entity.getCrew().setHits(commander.getHits(), 0);
-                }
                 //There was a resetEngineer() here. We shouldn't need it as spacecraft and infantry are handled
                 //by the preceding block
 
                 //TODO: game option to use tactics as command and ind init bonus
-                if(commander.hasSkill(SkillType.S_TACTICS)) {
+                if (null != commander && commander.hasSkill(SkillType.S_TACTICS)) {
                     entity.getCrew().setCommandBonus(commander.getSkill(SkillType.S_TACTICS).getFinalSkillValue());
                 } else {
                     entity.getCrew().setCommandBonus(0);
