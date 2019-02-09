@@ -1655,7 +1655,7 @@ public class ResolveScenarioTracker {
             }
 
             if (printSellValue) {
-                return "<html><b>" + getName() + "</b><br> (" + unit.getSellValue().toAmountAndSymbolString() + "C-bills) <font color='" + color + "'>"+ status + "</font></html>";
+                return "<html><b>" + getName() + "</b><br> (" + unit.getSellValue().toAmountAndSymbolString() + ") <font color='" + color + "'>"+ status + "</font></html>";
             } else {
                 return "<html><b>" + getName() + "</b><br><font color='" + color + "'>"+ status + "</font></html>";
             }

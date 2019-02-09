@@ -99,7 +99,7 @@ public class AtBConfiguration implements Serializable {
         dsTable = new WeightedTable<>();
         jsTable = new WeightedTable<>();
         defaultProperties = ResourceBundle.getBundle("mekhq.resources.AtBConfigDefaults");
-        shipSearchCost = Money.of(100000.0);
+        shipSearchCost = Money.of(100000);
     }
 
     /**
@@ -182,7 +182,7 @@ public class AtBConfiguration implements Serializable {
                 }
                 break;
             case "shipSearchCost":
-                shipSearchCost = Money.of(Integer.parseInt(property));
+                shipSearchCost = Money.of(Double.parseDouble(property));
                 break;
             case "shipSearchLengthWeeks":
                 shipSearchLengthWeeks = Integer.parseInt(property);
@@ -531,7 +531,7 @@ public class AtBConfiguration implements Serializable {
             Node wn = nl.item(i);
             switch (wn.getNodeName()) {
             case "shipSearchCost":
-                shipSearchCost = Money.of(Integer.parseInt(wn.getTextContent()));
+                shipSearchCost = Money.of(Double.parseDouble(wn.getTextContent()));
                 break;
             case "shipSearchLengthWeeks":
                 shipSearchLengthWeeks = Integer.parseInt(wn.getTextContent());

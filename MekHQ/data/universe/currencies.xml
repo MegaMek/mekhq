@@ -30,7 +30,6 @@ defaultEnd - Indicates which year the currency ended being the default currency 
         <symbol>SL$</symbol>
         <startYear>2571</startYear>
         <endYear>2785</endYear>
-        <isDefault>true</isDefault>
     </currency>
     <currency>
         <name>ComStar bill</name>

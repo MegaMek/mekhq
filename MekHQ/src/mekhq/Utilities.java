@@ -1003,20 +1003,8 @@ public class Utilities {
         String[] values = node.getTextContent().split(",");
         Money[] result = new Money[values.length];
 
-        // Check the XML data version
-        if (node.hasAttributes()) {
-            Node attribute = node.getAttributes().getNamedItem("version");
-            if (attribute != null && attribute.getTextContent().trim().equals("2")) {
-                for (int i = 0; i < values.length; i++) {
-                    result[i] = Money.fromXmlString(values[i]);
-                }
-
-                return result;
-            }
-        }
-
         for (int i = 0; i < values.length; i++) {
-            result[i] = Money.of(Long.parseLong(values[i]));
+            result[i] = Money.fromXmlString(values[i]);
         }
 
         return result;

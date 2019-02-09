@@ -2482,7 +2482,7 @@ public class CampaignOptions implements Serializable {
                 + "</planetOutputAcquisitionBonus>");
         
         pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                    + "<salaryTypeBase version=\"2\">"
+                    + "<salaryTypeBase>"
                     + Utilities.printMoneyArray(salaryTypeBase)
                     + "</salaryTypeBase>");
         pw1.println(MekHqXmlUtil.indentStr(indent + 1)

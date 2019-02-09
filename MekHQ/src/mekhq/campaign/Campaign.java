@@ -664,8 +664,8 @@ public class Campaign implements Serializable, ITechManager {
         }
         StringBuilder report = new StringBuilder();
         if (getFinances().debit(getAtBConfig().shipSearchCostPerWeek(), Transaction.C_UNIT, "Ship search", getDate())) {
-            report.append(NumberFormat.getInstance().format(getAtBConfig().shipSearchCostPerWeek())
-                    + " C-bills deducted for ship search.");
+            report.append(getAtBConfig().shipSearchCostPerWeek().toAmountAndSymbolString()
+                    + " deducted for ship search.");
         } else {
             addReport("<font color=\"red\">Insufficient funds for ship search.</font>");
             shipSearchStart = null;
@@ -692,7 +692,8 @@ public class Campaign implements Serializable, ITechManager {
                     shipSearchExpiration = (Calendar) getCalendar().clone();
                     shipSearchExpiration.add(Calendar.DAY_OF_MONTH, 31);
                     report.append(shipSearchResult).append(" is available for purchase for ")
-                            .append(NumberFormat.getInstance().format(ms.getCost())).append(" C-bills until ")
+                            .append(Money.of(ms.getCost()).toAmountAndSymbolString())
+                            .append(" until ")
                             .append(df.format(shipSearchExpiration.getTime()));
                 } else {
                     report.append(" <font color=\"red\">Could not determine ship type.</font>");

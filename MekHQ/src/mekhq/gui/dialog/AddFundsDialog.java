@@ -70,9 +70,9 @@ public class AddFundsDialog extends JDialog implements FocusListener {
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT, 2, 2));
 
         fundsQuantityField = new JMoneyTextField(() ->  btnAddFundsActionPerformed(null));
-        fundsQuantityField.setText(resourceMap.getString("jFormattedTextFieldFundsQuantity.text")); // NOI18N
-        fundsQuantityField.setToolTipText(resourceMap.getString("jFormattedTextFieldFundsQuantity.toolTipText")); // NOI18N
-        fundsQuantityField.setName("jFormattedTextFieldFundsQuantity"); // NOI18N
+        fundsQuantityField.setText(resourceMap.getString("fundsQuantityField.text")); // NOI18N
+        fundsQuantityField.setToolTipText(resourceMap.getString("fundsQuantityField.toolTipText")); // NOI18N
+        fundsQuantityField.setName("fundsQuantityField"); // NOI18N
         fundsQuantityField.setColumns(10);
         panel.add(fundsQuantityField);
 
