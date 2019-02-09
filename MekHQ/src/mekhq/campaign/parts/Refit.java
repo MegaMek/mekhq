@@ -1847,16 +1847,19 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
                 // Errr, what should we do here?
                 MekHQ.getLogger().log(Refit.class, "processShoppingList(Refit,Node,Unit,Version)", LogLevel.ERROR, //$NON-NLS-1$
                         "Unknown node type not loaded in Part nodes: " + wn2.getNodeName()); //$NON-NLS-1$
-                continue;
-            }
-            Part p = Part.generateInstanceFromXML(wn2, version);
-            p.setUnit(u);
+				continue;
+			}
 
-            if (p != null) {
-                retVal.shoppingList.add(p);
-            }
-        }
-    }
+			Part p = Part.generateInstanceFromXML(wn2, version);
+			if (p != null) {
+				p.setUnit(u);
+				retVal.shoppingList.add(p);
+			} else {
+				MekHQ.getLogger().error(Refit.class, "processShoppingList()", 
+					u != null ? String.format("Unit %s has invalid parts in its refit shopping list", u.getId()) : "Invalid parts in shopping list");
+			}
+		}
+	}
 
     private static void processArmorSupplies(Refit retVal, Node wn, Version version) {
 
