@@ -33,6 +33,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.border.LineBorder;
@@ -113,6 +114,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
     JRadioButton btnUseSpecificMapTypes;
     JRadioButton btnUseLowAtmosphereMap;
     JComboBox<AtBScenarioModifier> modifierBox;
+    JList<String> selectedModifiersList;
     
     JPanel globalPanel;
     
@@ -752,7 +754,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         gbc.gridy = currentGridY;
         gbc.gridheight = GridBagConstraints.RELATIVE;
         lstAllowedTerrainTypes = new JList<>();
-        DefaultListModel<String> terrainTypeModel = new DefaultListModel<String>();
+        DefaultListModel<String> terrainTypeModel = new DefaultListModel<>();
         for(String terrainType : AtBScenario.terrainTypes) {
             terrainTypeModel.addElement(terrainType);
         }
@@ -769,11 +771,44 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         
         gbc.gridy++;
         modifierBox = new JComboBox<>();
-        for(AtBScenarioModifier modifier : AtBScenarioModifier.getScenarioModifiers()) {
+        for(AtBScenarioModifier modifier : AtBScenarioModifier.getScenarioModifiers().values()) {
             modifierBox.addItem(modifier);
         }
         globalPanel.add(modifierBox, gbc);
         
+        gbc.gridx++;
+        JButton btnAddModifier = new JButton("Add");
+        btnAddModifier.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                addModifierHandler();
+            } 
+        });
+        globalPanel.add(btnAddModifier, gbc);
+        
+        gbc.gridx--;
+        gbc.gridy++;
+        gbc.gridheight = 3;
+        
+        selectedModifiersList = new JList<>();
+        selectedModifiersList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        reloadSelectedModifiers();
+        
+        JScrollPane modifierScrollPane = new JScrollPane(selectedModifiersList);
+        modifierScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+        globalPanel.add(modifierScrollPane, gbc);
+
+        gbc.gridx++;
+        JButton btnRemoveModifier = new JButton("Remove");
+        btnRemoveModifier.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                removeModifierHandler();
+            } 
+        });
+        globalPanel.add(btnRemoveModifier, gbc);
+        
+        gbc.gridheight = 1;
         gbc.gridy = bottomGridY + 1;
     }
     
@@ -1314,6 +1349,35 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         } else if(e.getActionCommand() == LOAD_TEMPLATE_COMMAND) {
             loadTemplateButtonHandler();
         }
+    }
+    
+    /**
+     * Event handler for the "Add" button next to the fixed modifier dropdown.
+     */
+    public void addModifierHandler() {
+        scenarioTemplate.scenarioModifiers.add(modifierBox.getSelectedItem().toString());
+        reloadSelectedModifiers();
+    }
+    
+    /**
+     * Event handler for the "Remove" button next to the "selected modifiers" list.
+     */
+    public void removeModifierHandler() {
+        for(String selectedModifier : selectedModifiersList.getSelectedValuesList()) {
+            scenarioTemplate.scenarioModifiers.remove(selectedModifier);
+        }
+        reloadSelectedModifiers();
+    }
+    
+    /**
+     * Re-reads the data source for the "selected modifiers" list.
+     */
+    public void reloadSelectedModifiers() {
+        DefaultListModel<String> selectedModifierModel = new DefaultListModel<>();
+        for(String selectedModifier : scenarioTemplate.scenarioModifiers) {
+            selectedModifierModel.addElement(selectedModifier);
+        }
+        selectedModifiersList.setModel(selectedModifierModel);
     }
     
     /**

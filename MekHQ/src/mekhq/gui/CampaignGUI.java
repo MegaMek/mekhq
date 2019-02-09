@@ -348,6 +348,7 @@ public class CampaignGUI extends JPanel {
 
         addStandardTab(GuiTabType.TOE);
         addStandardTab(GuiTabType.BRIEFING);
+        addStandardTab(GuiTabType.STRATCON);
         addStandardTab(GuiTabType.MAP);
         addStandardTab(GuiTabType.PERSONNEL);
         addStandardTab(GuiTabType.HANGAR);

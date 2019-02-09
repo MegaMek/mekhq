@@ -3,6 +3,7 @@ package mekhq.campaign.mission;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,6 +41,7 @@ public class ScenarioTemplate {
     public String detailedBriefing;
     
     public ScenarioMapParameters mapParameters = new ScenarioMapParameters();
+    public List<String> scenarioModifiers = new ArrayList<>(); 
     
     @XmlElementWrapper(name="scenarioForces")
     @XmlElement(name="scenarioForce")

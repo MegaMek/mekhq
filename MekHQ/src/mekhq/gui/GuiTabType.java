@@ -41,7 +41,8 @@ public enum GuiTabType {
     MEKLAB(8, "panMekLab.TabConstraints.tabTitle"), //$NON-NLS-1$
     FINANCES(9, "panFinances.TabConstraints.tabTitle"), //$NON-NLS-1$
     OVERVIEW(10, "panOverview.TabConstraints.tabTitle"), //$NON-NLS-1$
-    CUSTOM(11, null);
+    CUSTOM(11, null),
+    STRATCON(12, "panStratcon.TabConstraints.tabTitle");
 
     private int defaultPos;
     private String name;
@@ -88,6 +89,8 @@ public enum GuiTabType {
             return new FinancesTab(gui, name);
         case OVERVIEW:
             return new OverviewTab(gui, name);
+        case STRATCON:
+            return new StratconTab(gui, name);
         default:
             return null;
 

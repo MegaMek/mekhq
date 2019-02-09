@@ -86,6 +86,13 @@ public class AtBDynamicScenarioFactory {
         scenario.setEffectiveOpforSkill(contract.getEnemySkill());
         scenario.setEffectiveOpforQuality(contract.getEnemyQuality());
         
+        // apply any fixed modifiers
+        for(String modifierName : template.scenarioModifiers) {
+            if(AtBScenarioModifier.getScenarioModifiers().containsKey(modifierName)) {
+                scenario.getScenarioModifiers().add(AtBScenarioModifier.getScenarioModifiers().get(modifierName));
+            }
+        }
+        
         boolean planetsideScenario = template.mapParameters.getMapLocation() == MapLocation.AllGroundTerrain ||
                 template.mapParameters.getMapLocation() == MapLocation.SpecificGroundTerrain;
         

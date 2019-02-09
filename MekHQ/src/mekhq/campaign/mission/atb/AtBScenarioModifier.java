@@ -3,7 +3,9 @@ package mekhq.campaign.mission.atb;
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -105,9 +107,9 @@ public class AtBScenarioModifier {
         return scenarioModifierManifest.fileNameList;
     }
     
-    private static List<AtBScenarioModifier> scenarioModifiers;
+    private static Map<String, AtBScenarioModifier> scenarioModifiers;
     
-    public static List<AtBScenarioModifier> getScenarioModifiers() {
+    public static Map<String, AtBScenarioModifier> getScenarioModifiers() {
         return scenarioModifiers;
     }
     
@@ -138,7 +140,7 @@ public class AtBScenarioModifier {
      * Loads the defined scenario modifiers from the manifest.
      */
     private static void loadScenarioModifiers() {
-        scenarioModifiers = new ArrayList<>();
+        scenarioModifiers = new HashMap<>();
         
         for(String fileName : scenarioModifierManifest.fileNameList) {
             String filePath = String.format("./data/ScenarioModifiers/%s", fileName);
@@ -152,7 +154,7 @@ public class AtBScenarioModifier {
                                 modifier.getEventTiming() == EventTiming.PreForceGeneration ? "Pre" : "Post"));
                     }
                     
-                    scenarioModifiers.add(modifier);
+                    scenarioModifiers.put(modifier.getModifierName(), modifier);
                 }
             }
             catch(Exception e) {
