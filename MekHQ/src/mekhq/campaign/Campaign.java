@@ -2242,6 +2242,7 @@ public class Campaign implements Serializable, ITechManager {
         //Edge reroll, if applicable
         if (roll < target.getValue()
                 && getCampaignOptions().useSupportEdge() 
+                && null != person
                 && person.getOptions().booleanOption(PersonnelOptions.EDGE_ADMIN_ACQUIRE_FAIL)
                 && person.getCurrentEdge() > 0) {
             person.setCurrentEdge(person.getCurrentEdge() - 1);
