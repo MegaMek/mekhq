@@ -943,8 +943,8 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 if (ccs.isDestroyed()) {
                     if ((type == CriticalSlot.TYPE_SYSTEM) && (ccs.getIndex() == index)) {
                         hits++;
-                    } else if ((type == CriticalSlot.TYPE_EQUIPMENT) && (m.equals(ccs.getMount()) || m.equals(ccs
-                                                                                                                      .getMount2()))) {
+                    } else if ((type == CriticalSlot.TYPE_EQUIPMENT)
+                        && (null != m) && (m.equals(ccs.getMount()) || m.equals(ccs.getMount2()))) {
                         hits++;
                     }
                 }
