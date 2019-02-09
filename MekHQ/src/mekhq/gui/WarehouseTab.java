@@ -666,7 +666,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         if ((null == selectedTech || getCampaign().getCampaignOptions().useResetToFirstTech())
                 && techTable.getRowCount() > 0) {
             techTable.setRowSelectionInterval(0, 0);
-        } else {
+        } else if (null != selectedTech) {
             // Or get the selected tech back
             for (int i = 0; i < techTable.getRowCount(); i++) {
                 Person p = techsModel.getTechAt(techTable.convertRowIndexToModel(i));
