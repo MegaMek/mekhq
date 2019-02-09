@@ -464,7 +464,8 @@ public class Bloodname implements Serializable {
 			DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
 			doc = db.parse(fis);
 		} catch (Exception ex) {
-			System.err.println(ex.getMessage());
+			MekHQ.getLogger().error(Bloodname.class, METHOD_NAME, "Could not parse bloodnames.xml", ex);
+			return;
 		}
 
 		Element bloodnameElement = doc.getDocumentElement();
@@ -625,7 +626,8 @@ class Clan {
 			DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
 			doc = db.parse(fis);
 		} catch (Exception ex) {
-			System.err.println(ex.getMessage());
+			MekHQ.getLogger().error(Bloodname.class, "loadClanData()", "Could not parse clans.xml", ex);
+			return;
 		}
 
 		Element clanElement = doc.getDocumentElement();
