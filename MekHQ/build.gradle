@@ -96,7 +96,7 @@ task mmJar (type: Jar, dependsOn: compileMM) {
     from "${mmDir}/megamek/build/classes/java/main"
     from "${mmDir}/megamek/build/resources/main"
     manifest {
-        attributes "Main-Class": mainClassName
+        attributes "Main-Class": 'megamek.MegaMek'
         attributes 'Class-Path' : (project.sourceSets.main.runtimeClasspath.files
             .findAll { it.name.endsWith(".jar") }.collect { "${lib}/${it.name}" }.join(' '))
     }
@@ -119,7 +119,7 @@ task mmlJar (type: Jar, dependsOn: compileMML) {
     from "${mmlDir}/build/classes/java/main"
     from "${mmlDir}/build/resources/main"
     manifest {
-        attributes "Main-Class": mainClassName
+        attributes "Main-Class": 'megameklab.com.MegaMekLab'
         attributes 'Class-Path' : "${mmJar.archiveName} " + (project.sourceSets.main.runtimeClasspath.files
             .findAll { it.name.endsWith(".jar") && !it.name.toLowerCase().startsWith("megamek")}
             .collect { "${lib}/${it.name}" }.join(' '))
@@ -347,7 +347,9 @@ distributions {
 createExe {
     description = 'Create Windows executable that wraps MekHQ jar'
     mainClassName = project.mainClassName
+    jar = 'lib/MekHQ.jar'
     icon = "${projectDir}/data/images/misc/mekhq.ico"
+    internalName = 'MekHQ'
     def inifile = outfile.replace('.exe', '.l4j.ini')
     outputs.file "${buildDir}/launch4j/${outfile}"
     outputs.file "${buildDir}/launch4j/${inifile}"
@@ -362,8 +364,8 @@ ${project.ext.jvmOptions.join('\n')}
 task createMMExe (type: edu.sc.seis.launch4j.tasks.Launch4jLibraryTask, dependsOn: mmJar) {
     description = 'Create Windows executable stub for MM jar'
     outfile = 'MegaMek.exe'
-    mainClassName = 'megamek.MegaMek'
-    jar = "${mmJar.jarLocation}"
+    mainClassName = 'megamek.Megamek'
+    jar = "lib/${mmJar.archiveName}"
     classpath = project.sourceSets.main.runtimeClasspath.files
             .findAll { it.name.endsWith(".jar") }.collect { "${lib}/${it.name}" }
     icon = "${mmDir}/megamek/data/images/misc/megamek.ico"
@@ -384,7 +386,7 @@ task createMMLExe (type: edu.sc.seis.launch4j.tasks.Launch4jLibraryTask, depends
     description = 'Create Windows executable stub for MML jar'
     outfile = 'MegaMekLab.exe'
     mainClassName = 'megameklab.com.MegaMekLab'
-    jar = "${mmlJar.jarLocation}"
+    jar = "lib/${mmlJar.archiveName}"
     classpath = project.sourceSets.main.runtimeClasspath.files
             .findAll { it.name.endsWith(".jar") }.collect { "${lib}/${it.name}" }
     icon = "${mmlDir}/data/images/misc/megameklab.ico"
