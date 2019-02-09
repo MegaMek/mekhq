@@ -727,6 +727,7 @@ public class Campaign implements Serializable, ITechManager {
             MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
                     "Unable to load unit: " + ms.getEntryName()); //$NON-NLS-1$
             MekHQ.getLogger().error(getClass(), METHOD_NAME, ex);
+            return;
         }
         Entity en = mechFileParser.getEntity();
 
