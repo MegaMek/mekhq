@@ -2284,11 +2284,11 @@ public class Campaign implements Serializable, ITechManager {
         if (null != person) {
             // The person should have their acquisitions incremented
             person.incrementAcquisition();
-        }
 
-        if (xpGained > 0) {
-            person.setXp(person.getXp() + xpGained);
-            report += " (" + xpGained + "XP gained) ";
+            if (xpGained > 0) {
+                person.setXp(person.getXp() + xpGained);
+                report += " (" + xpGained + "XP gained) ";
+            }
         }
 
         if (found) {
