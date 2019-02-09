@@ -62,7 +62,7 @@ public class JMoneyTextField extends JFormattedTextField implements FocusListene
     }
 
     public void setMoney(Money money) {
-       assert money != null;
+        assert money != null;
         this.setText(money.toAmountString());
     }
 
