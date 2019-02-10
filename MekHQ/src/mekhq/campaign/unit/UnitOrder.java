@@ -194,7 +194,7 @@ public class UnitOrder extends Unit implements IAcquisitionWork, MekHqXmlSeriali
 
     @Override
     public void resetDaysToWait() {
-        this.daysToWait = campaign.getCampaignOptions().getWaitingPeriod();
+        this.daysToWait = getCampaign().getCampaignOptions().getWaitingPeriod();
     }
 
     @Override
@@ -207,7 +207,7 @@ public class UnitOrder extends Unit implements IAcquisitionWork, MekHqXmlSeriali
     @Override
     public String find(int transitDays) {
         //TODO: probably get a duplicate entity
-        if(campaign.buyUnit((Entity)getNewEquipment(), transitDays)) {
+        if(getCampaign().buyUnit((Entity)getNewEquipment(), transitDays)) {
             return "<font color='green'><b> unit found</b>.</font> It will be delivered in " + transitDays + " days.";
         } else {
             return "<font color='red'><b> You cannot afford this unit. Transaction cancelled</b>.</font>";
@@ -226,11 +226,11 @@ public class UnitOrder extends Unit implements IAcquisitionWork, MekHqXmlSeriali
         if(!entity.isCanon()) {
             //TODO: custom job
         }
-        if(entity.isClan() && campaign.getCampaignOptions().getClanAcquisitionPenalty() > 0) {
-            target.addModifier(campaign.getCampaignOptions().getClanAcquisitionPenalty(), "clan-tech");
+        if(entity.isClan() && getCampaign().getCampaignOptions().getClanAcquisitionPenalty() > 0) {
+            target.addModifier(getCampaign().getCampaignOptions().getClanAcquisitionPenalty(), "clan-tech");
         }
-        else if(campaign.getCampaignOptions().getIsAcquisitionPenalty() > 0) {
-            target.addModifier(campaign.getCampaignOptions().getIsAcquisitionPenalty(), "Inner Sphere tech");
+        else if(getCampaign().getCampaignOptions().getIsAcquisitionPenalty() > 0) {
+            target.addModifier(getCampaign().getCampaignOptions().getIsAcquisitionPenalty(), "Inner Sphere tech");
         }
         //TODO: Fix weight classes
         //TODO: aero large craft
@@ -314,7 +314,7 @@ public class UnitOrder extends Unit implements IAcquisitionWork, MekHqXmlSeriali
         }
         //parts need to be initialized for this to work
         int avail = getAvailability();
-        if(this.isExtinctIn(campaign.getCalendar().get(Calendar.YEAR))) {
+        if(this.isExtinctIn(getCampaign().getCalendar().get(Calendar.YEAR))) {
         	avail = EquipmentType.RATING_X;
         }
         int availabilityMod = Availability.getAvailabilityModifier(avail);
@@ -325,7 +325,7 @@ public class UnitOrder extends Unit implements IAcquisitionWork, MekHqXmlSeriali
 
     @Override
     public int getAvailability() {
-        return calcYearAvailability(campaign.getGameYear(), campaign.useClanTechBase(), campaign.getTechFaction());
+        return calcYearAvailability(getCampaign().getGameYear(), getCampaign().useClanTechBase(), getCampaign().getTechFaction());
     }
     
     @Override
@@ -354,7 +354,7 @@ public class UnitOrder extends Unit implements IAcquisitionWork, MekHqXmlSeriali
     public void writeToXml(PrintWriter pw1, int indentLvl) {
         pw1.println(MekHqXmlUtil.indentStr(indentLvl) + "<unitOrder>");
 
-        pw1.println(MekHqXmlUtil.writeEntityToXmlString(getEntity(), indentLvl+1, campaign.getEntities()));
+        pw1.println(MekHqXmlUtil.writeEntityToXmlString(getEntity(), indentLvl+1, getCampaign().getEntities()));
         pw1.println(MekHqXmlUtil.indentStr(indentLvl+1)
                 +"<quantity>"
                 +quantity
@@ -370,7 +370,7 @@ public class UnitOrder extends Unit implements IAcquisitionWork, MekHqXmlSeriali
         final String METHOD_NAME = "generateInstanceFromXML(Node,Campaign,Version)"; //$NON-NLS-1$
 
         UnitOrder retVal = new UnitOrder();
-        retVal.campaign = c;
+        retVal.setCampaign(c);
         
         NodeList nl = wn.getChildNodes();
 
@@ -410,6 +410,6 @@ public class UnitOrder extends Unit implements IAcquisitionWork, MekHqXmlSeriali
      * @return TechConstants tech level
      */
     public int getTechLevel() {
-        return getSimpleTechLevel().getCompoundTechLevel(campaign.getFaction().isClan());
+        return getSimpleTechLevel().getCompoundTechLevel(getCampaign().getFaction().isClan());
     }
 }
