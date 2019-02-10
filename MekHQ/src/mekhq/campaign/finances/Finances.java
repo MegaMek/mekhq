@@ -473,12 +473,12 @@ public class Finances implements Serializable {
     public String exportFinances(String path, String format) {
         String report;
 
-		try {
-			BufferedWriter writer = Files.newBufferedWriter(Paths.get(path));
-			CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT.withHeader("Date", "Category", "Description", "Amount", "RunningTotal"));
-			SimpleDateFormat df = new SimpleDateFormat("MM/dd/yyyy");
-			
-			Money runningTotal = Money.zero();
+        try {
+            BufferedWriter writer = Files.newBufferedWriter(Paths.get(path));
+            CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT.withHeader("Date", "Category", "Description", "Amount", "RunningTotal"));
+            SimpleDateFormat df = new SimpleDateFormat("MM/dd/yyyy");
+
+            Money runningTotal = Money.zero();
             for (Transaction transaction : transactions) {
                 runningTotal = runningTotal.plus(transaction.getAmount());
                 csvPrinter.printRecord(
@@ -489,14 +489,14 @@ public class Finances implements Serializable {
                         runningTotal.toAmountAndNameString());
             }
 
-			csvPrinter.flush();
-			csvPrinter.close();
-	
-			report = transactions.size() + " " + resourceMap.getString("FinanceExport.text");
-		} catch(IOException ioe) {
+            csvPrinter.flush();
+            csvPrinter.close();
+
+            report = transactions.size() + " " + resourceMap.getString("FinanceExport.text");
+        } catch(IOException ioe) {
             MekHQ.getLogger().log(getClass(), "exportFinances", LogLevel.INFO, "Error exporting finances to " + format);
             report = "Error exporting finances. See log for details.";
-		}
+        }
 
         return report;
     }

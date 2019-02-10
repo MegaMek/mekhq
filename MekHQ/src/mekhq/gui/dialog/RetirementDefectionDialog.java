@@ -512,112 +512,112 @@ public class RetirementDefectionDialog extends JDialog {
 	};
 
 
-	private void initResults() {
-		/* Find unassigned units that can be stolen */
-		ArrayList<UUID> unassignedMechs = new ArrayList<UUID>();
-		ArrayList<UUID> unassignedASF = new ArrayList<UUID>();
-		ArrayList<UUID> availableUnits = new ArrayList<UUID>();
-		for (Unit u : hqView.getCampaign().getUnits()) {
-			if (!u.isAvailable() && !u.isMothballing() && !u.isMothballed()) {
-				continue;
-			}
-			availableUnits.add(u.getId());
-			if (UnitType.MEK == u.getEntity().getUnitType()) {
-				if (null == u.getCommander()) {
-					unassignedMechs.add(u.getId());
-				}
-			}
-			if (UnitType.AERO == u.getEntity().getUnitType()) {
-				if (null == u.getCommander()) {
-					unassignedASF.add(u.getId());
-				}
-			}
-		}
-		/* Defectors who steal a unit will take either the one they were
-		 * piloting or one of the unassigned units (50/50, unless there
-		 * is only one choice)
-		 */
-		for (UUID id : rdTracker.getRetirees(contract)) {
-			Person p = hqView.getCampaign().getPerson(id);
-			if (rdTracker.getPayout(id).hasStolenUnit()) {
-				boolean unassignedAvailable = (unassignedMechs.size() > 0 &&
-						p.getPrimaryRole() == Person.T_MECHWARRIOR) ||
-						(unassignedASF.size() > 0 &&
-								p.getPrimaryRole() == Person.T_AERO_PILOT);
-				/* If a unit has previously been assigned, check that it is still available
-				 * and either assigned to the current player or unassigned. If so, keep
-				 * the previous value.
-				 */
-				if (null != rdTracker.getPayout(id).getStolenUnitId() &&
-						null != hqView.getCampaign().getUnit(rdTracker.getPayout(id).getStolenUnitId()) &&
-						(null == hqView.getCampaign().getUnit(rdTracker.getPayout(id).getStolenUnitId()).getCommander() ||
-								p.getId() == hqView.getCampaign().getUnit(rdTracker.getPayout(id).getStolenUnitId()).getCommander().getId())) {
-					continue;
-				}
-				if (null != hqView.getCampaign().getPerson(id).getUnitId() &&
-						(Compute.d6() < 4 || !unassignedAvailable)) {
-					unitAssignments.put(id, p.getUnitId());
-				} else if (unassignedAvailable) {
-					if (p.getPrimaryRole() == Person.T_MECHWARRIOR) {
-						int roll = Compute.randomInt(unassignedMechs.size());
-						unitAssignments.put(id, unassignedMechs.get(roll));
-						rdTracker.getPayout(id).setStolenUnitId(unassignedMechs.get(roll));
-						availableUnits.remove(unassignedMechs.get(roll));
-						unassignedMechs.remove(roll);
-					}
-					if (p.getPrimaryRole() == Person.T_AERO_PILOT) {
-						int roll = Compute.randomInt(unassignedASF.size());
-						unitAssignments.put(id, unassignedASF.get(roll));
-						rdTracker.getPayout(id).setStolenUnitId(unassignedASF.get(roll));
-						availableUnits.remove(unassignedASF.get(roll));
-						unassignedASF.remove(roll);
-					}
-				}
-			}
-			/* Retirees who brought a unit will take the same unit when
-			 * they go if it is still around and has not been stolen.
-			 */
-			if (hqView.getCampaign().getCampaignOptions().getTrackOriginalUnit() &&
-					null != p.getOriginalUnitId() &&
-					!unitAssignments.values().contains(p.getOriginalUnitId()) &&
-					null != hqView.getCampaign().getUnit(p.getOriginalUnitId())) {
-				unitAssignments.put(id, p.getOriginalUnitId());
-				if (hqView.getCampaign().getCampaignOptions().getUseShareSystem()) {
-				    Money temp = rdTracker.getPayout(id).getPayoutAmount()
+    private void initResults() {
+        /* Find unassigned units that can be stolen */
+        ArrayList<UUID> unassignedMechs = new ArrayList<UUID>();
+        ArrayList<UUID> unassignedASF = new ArrayList<UUID>();
+        ArrayList<UUID> availableUnits = new ArrayList<UUID>();
+        for (Unit u : hqView.getCampaign().getUnits()) {
+            if (!u.isAvailable() && !u.isMothballing() && !u.isMothballed()) {
+                continue;
+            }
+            availableUnits.add(u.getId());
+            if (UnitType.MEK == u.getEntity().getUnitType()) {
+                if (null == u.getCommander()) {
+                    unassignedMechs.add(u.getId());
+                }
+            }
+            if (UnitType.AERO == u.getEntity().getUnitType()) {
+                if (null == u.getCommander()) {
+                    unassignedASF.add(u.getId());
+                }
+            }
+        }
+        /* Defectors who steal a unit will take either the one they were
+         * piloting or one of the unassigned units (50/50, unless there
+         * is only one choice)
+         */
+        for (UUID id : rdTracker.getRetirees(contract)) {
+            Person p = hqView.getCampaign().getPerson(id);
+            if (rdTracker.getPayout(id).hasStolenUnit()) {
+                boolean unassignedAvailable = (unassignedMechs.size() > 0 &&
+                        p.getPrimaryRole() == Person.T_MECHWARRIOR) ||
+                        (unassignedASF.size() > 0 &&
+                                p.getPrimaryRole() == Person.T_AERO_PILOT);
+                /* If a unit has previously been assigned, check that it is still available
+                 * and either assigned to the current player or unassigned. If so, keep
+                 * the previous value.
+                 */
+                if (null != rdTracker.getPayout(id).getStolenUnitId() &&
+                        null != hqView.getCampaign().getUnit(rdTracker.getPayout(id).getStolenUnitId()) &&
+                        (null == hqView.getCampaign().getUnit(rdTracker.getPayout(id).getStolenUnitId()).getCommander() ||
+                                p.getId() == hqView.getCampaign().getUnit(rdTracker.getPayout(id).getStolenUnitId()).getCommander().getId())) {
+                    continue;
+                }
+                if (null != hqView.getCampaign().getPerson(id).getUnitId() &&
+                        (Compute.d6() < 4 || !unassignedAvailable)) {
+                    unitAssignments.put(id, p.getUnitId());
+                } else if (unassignedAvailable) {
+                    if (p.getPrimaryRole() == Person.T_MECHWARRIOR) {
+                        int roll = Compute.randomInt(unassignedMechs.size());
+                        unitAssignments.put(id, unassignedMechs.get(roll));
+                        rdTracker.getPayout(id).setStolenUnitId(unassignedMechs.get(roll));
+                        availableUnits.remove(unassignedMechs.get(roll));
+                        unassignedMechs.remove(roll);
+                    }
+                    if (p.getPrimaryRole() == Person.T_AERO_PILOT) {
+                        int roll = Compute.randomInt(unassignedASF.size());
+                        unitAssignments.put(id, unassignedASF.get(roll));
+                        rdTracker.getPayout(id).setStolenUnitId(unassignedASF.get(roll));
+                        availableUnits.remove(unassignedASF.get(roll));
+                        unassignedASF.remove(roll);
+                    }
+                }
+            }
+            /* Retirees who brought a unit will take the same unit when
+             * they go if it is still around and has not been stolen.
+             */
+            if (hqView.getCampaign().getCampaignOptions().getTrackOriginalUnit() &&
+                    null != p.getOriginalUnitId() &&
+                    !unitAssignments.values().contains(p.getOriginalUnitId()) &&
+                    null != hqView.getCampaign().getUnit(p.getOriginalUnitId())) {
+                unitAssignments.put(id, p.getOriginalUnitId());
+                if (hqView.getCampaign().getCampaignOptions().getUseShareSystem()) {
+                    Money temp = rdTracker.getPayout(id).getPayoutAmount()
                             .minus(hqView.getCampaign().getUnit(p.getOriginalUnitId()).getBuyCost());
 
-				    if (temp.isNegative()) {
-				        temp = Money.zero();
+                    if (temp.isNegative()) {
+                        temp = Money.zero();
                     }
 
-					rdTracker.getPayout(id).setPayoutAmount(temp);
-				}
-			}
-			/* For infantry, the unit commander makes a retirement roll on behalf of the
-			 * entire unit. Unassigned infantry can retire individually.
-			 */
-			if (p.getUnitId() != null && (p.getPrimaryRole() == Person.T_INFANTRY ||
-					p.getPrimaryRole() == Person.T_BA)) {
-				unitAssignments.put(id, p.getUnitId());
-			}
-			((UnitAssignmentTableModel)unitAssignmentTable.getModel()).setData(availableUnits);
-		}
+                    rdTracker.getPayout(id).setPayoutAmount(temp);
+                }
+            }
+            /* For infantry, the unit commander makes a retirement roll on behalf of the
+             * entire unit. Unassigned infantry can retire individually.
+             */
+            if (p.getUnitId() != null && (p.getPrimaryRole() == Person.T_INFANTRY ||
+                    p.getPrimaryRole() == Person.T_BA)) {
+                unitAssignments.put(id, p.getUnitId());
+            }
+            ((UnitAssignmentTableModel)unitAssignmentTable.getModel()).setData(availableUnits);
+        }
 
-		ArrayList<UUID> retireeList = new ArrayList<>();
-		boolean showRecruitColumn = false;
-		for (UUID pid : rdTracker.getRetirees(contract)) {
-			retireeList.add(pid);
-			if (hqView.getCampaign().getRetirementDefectionTracker().getPayout(pid).getDependents() > 0 ||
-					hqView.getCampaign().getRetirementDefectionTracker().getPayout(pid).hasHeir() ||
-					hqView.getCampaign().getRetirementDefectionTracker().getPayout(pid).hasRecruit()) {
-				showRecruitColumn = true;
-			}
-		}
+        ArrayList<UUID> retireeList = new ArrayList<>();
+        boolean showRecruitColumn = false;
+        for (UUID pid : rdTracker.getRetirees(contract)) {
+            retireeList.add(pid);
+            if (hqView.getCampaign().getRetirementDefectionTracker().getPayout(pid).getDependents() > 0 ||
+                    hqView.getCampaign().getRetirementDefectionTracker().getPayout(pid).hasHeir() ||
+                    hqView.getCampaign().getRetirementDefectionTracker().getPayout(pid).hasRecruit()) {
+                showRecruitColumn = true;
+            }
+        }
         ((XTableColumnModel)retireeTable.getColumnModel()).setColumnVisible(retireeTable.getColumnModel().getColumn(retireeTable.convertColumnIndexToView(RetirementTableModel.COL_RECRUIT)), !showRecruitColumn);
-		((RetirementTableModel)retireeTable.getModel()).setData(retireeList, unitAssignments);
-		filterPersonnel(retireeSorter, cbGroupResults.getSelectedIndex(), true);
-		lblPayment.setText(totalPayout().toAmountAndSymbolString());
-	}
+        ((RetirementTableModel)retireeTable.getModel()).setData(retireeList, unitAssignments);
+        filterPersonnel(retireeSorter, cbGroupResults.getSelectedIndex(), true);
+        lblPayment.setText(totalPayout().toAmountAndSymbolString());
+    }
 
 	private void filterPersonnel(TableRowSorter<RetirementTableModel> sorter, int groupIndex, boolean resultsView) {
         final int nGroup = groupIndex;

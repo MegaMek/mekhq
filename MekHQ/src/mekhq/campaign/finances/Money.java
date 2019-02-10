@@ -97,6 +97,14 @@ public class Money {
         return this.wrapped.getAmount();
     }
 
+    public Money absolute() {
+        if (this.isPositiveOrZero()) {
+            return this;
+        } else {
+            return this.multipliedBy(-1);
+        }
+    }
+
     public Money plus(Money amount) {
         return new Money(this.wrapped.plus(amount.wrapped));
     }
@@ -131,6 +139,12 @@ public class Money {
 
     public Money dividedBy(double amount) {
         return new Money(this.wrapped.dividedBy(amount, RoundingMode.HALF_EVEN));
+    }
+
+    public Money dividedBy(Money money) {
+        return new Money(this.wrapped.dividedBy(
+                this.wrapped.getAmount(),
+                RoundingMode.HALF_EVEN));
     }
 
     public String toXmlString() {

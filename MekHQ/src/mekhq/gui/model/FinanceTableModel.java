@@ -74,7 +74,7 @@ public class FinanceTableModel extends DataTableModel {
         }
         if(col == COL_DEBIT) {
             if(amount.isNegative()) {
-                return amount.multipliedBy(-1).toAmountAndSymbolString();
+                return amount.absolute().toAmountAndSymbolString();
             } else {
                 return "";
             }

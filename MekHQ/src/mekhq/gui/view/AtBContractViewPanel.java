@@ -495,7 +495,7 @@ public class AtBContractViewPanel extends JPanel {
             int currentSalvagePct = 0;
             if (contract.getSalvagedByUnit().plus(contract.getSalvagedByEmployer()).isPositive()) {
                 currentSalvagePct = contract.getSalvagedByUnit()
-                        .dividedBy(contract.getSalvagedByUnit().plus(contract.getSalvagedByEmployer()).getAmount().doubleValue())
+                        .dividedBy(contract.getSalvagedByUnit().plus(contract.getSalvagedByEmployer()))
                         .multipliedBy(100)
                         .getAmount()
                         .intValue();

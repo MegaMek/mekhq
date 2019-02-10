@@ -1215,7 +1215,7 @@ public class ResolveScenarioTracker {
                 if (campaign.getCampaignOptions().payForRepairs()) {
                     for(Part p : unit.getParts()) {
                         if (p.needsFixing() && !(p instanceof Armor)) {
-                            repairBLC = repairBLC.plus(p.getStickerPrice().multipliedBy(2));
+                            repairBLC = repairBLC.plus(p.getStickerPrice().multipliedBy(0.2));
                         }
                     }
                 }

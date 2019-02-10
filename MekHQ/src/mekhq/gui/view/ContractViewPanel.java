@@ -382,7 +382,7 @@ public class ContractViewPanel extends JPanel {
             int currentSalvagePct = 0;
             if (contract.getSalvagedByUnit().plus(contract.getSalvagedByUnit()).isPositive()) {
                 currentSalvagePct = contract.getSalvagedByUnit()
-                        .dividedBy(contract.getSalvagedByUnit().plus(contract.getSalvagedByEmployer()).getAmount().doubleValue())
+                        .dividedBy(contract.getSalvagedByUnit().plus(contract.getSalvagedByEmployer()))
                         .multipliedBy(100)
                         .getAmount()
                         .intValue();

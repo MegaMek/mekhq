@@ -989,14 +989,14 @@ public class Utilities {
     }
 
     public static String printMoneyArray(Money[] array) {
-        String values = ""; //$NON-NLS-1$
+        StringBuilder values = new StringBuilder(); //$NON-NLS-1$
         for(int i = 0; i < array.length; i++) {
-            values += array[i].toXmlString();
+            values.append(array[i].toXmlString());
             if(i < (array.length-1)) {
-                values += ","; //$NON-NLS-1$
+                values.append(","); //$NON-NLS-1$
             }
         }
-        return values;
+        return values.toString();
     }
 
     public static Money[] readMoneyArray(Node node) {

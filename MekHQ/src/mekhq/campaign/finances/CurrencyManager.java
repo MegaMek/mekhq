@@ -76,7 +76,7 @@ public class CurrencyManager extends CurrencyUnitDataProvider {
                 "CSB",
                 -1,
                 0,
-                "ComStart bill",
+                "ComStar bill",
                 "C-Bill",
                 2835,
                 999999,
