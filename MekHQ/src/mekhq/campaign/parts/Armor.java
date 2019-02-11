@@ -46,8 +46,8 @@ import mekhq.campaign.work.WorkTime;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class Armor extends Part implements IAcquisitionWork {
-	private static final long serialVersionUID = 5275226057484468868L;
-	protected int type;
+    private static final long serialVersionUID = 5275226057484468868L;
+    protected int type;
     protected int amount;
     protected int amountNeeded;
     protected int location;
@@ -55,7 +55,7 @@ public class Armor extends Part implements IAcquisitionWork {
     protected boolean clan;
 
     public Armor() {
-    	this(0, 0, 0, -1, false, false, null);
+        this(0, 0, 0, -1, false, false, null);
     }
 
     public Armor(int tonnage, int t, int points, int loc, boolean r, boolean clan, Campaign c) {
@@ -68,28 +68,28 @@ public class Armor extends Part implements IAcquisitionWork {
         this.clan = clan;
         this.name = "Armor";
         if(type > -1) {
-        	this.name += " (" + EquipmentType.armorNames[type] + ")";
+            this.name += " (" + EquipmentType.armorNames[type] + ")";
         }
     }
 
     public Armor clone() {
-    	Armor clone = new Armor(0, type, amount, -1, false, clan, campaign);
+        Armor clone = new Armor(0, type, amount, -1, false, clan, campaign);
         clone.copyBaseData(this);
         return clone;
     }
 
     @Override
     public double getTonnage() {
-    	return amount / getArmorPointsPerTon();
+        return amount / getArmorPointsPerTon();
     }
 
     @Override
     public Money getCurrentValue() {
-    	return Money.of(getTonnage() * EquipmentType.getArmorCost(type));
+        return Money.of(getTonnage() * EquipmentType.getArmorCost(type));
     }
 
     public double getTonnageNeeded() {
-    	double armorPerTon = 16.0 * EquipmentType.getArmorPointMultiplier(type, isClanTechBase());
+        double armorPerTon = 16.0 * EquipmentType.getArmorPointMultiplier(type, isClanTechBase());
         if (type == EquipmentType.T_ARMOR_HARDENED) {
             armorPerTon = 8.0;
         }
@@ -97,13 +97,13 @@ public class Armor extends Part implements IAcquisitionWork {
     }
 
     public Money getValueNeeded() {
-    	return adjustCostsForCampaignOptions(Money.of(getTonnageNeeded() * EquipmentType.getArmorCost(type)));
+        return adjustCostsForCampaignOptions(Money.of(getTonnageNeeded() * EquipmentType.getArmorCost(type)));
     }
 
     @Override
     public Money getStickerPrice() {
-    	//always in 5-ton increments
-    	return Money.of(5 * EquipmentType.getArmorCost(type));
+        //always in 5-ton increments
+        return Money.of(5 * EquipmentType.getArmorCost(type));
     }
 
     @Override
@@ -112,66 +112,66 @@ public class Armor extends Part implements IAcquisitionWork {
     }
 
     public String getDesc() {
-    	if(isSalvaging()) {
-    		return super.getDesc();
-    	}
-		String bonus = getAllMods(null).getValueAsString();
-		if (getAllMods(null).getValue() > -1) {
-			bonus = "+" + bonus;
-		}
-		bonus = "(" + bonus + ")";
-		String toReturn = "<html><font size='2'";
+        if(isSalvaging()) {
+            return super.getDesc();
+        }
+        String bonus = getAllMods(null).getValueAsString();
+        if (getAllMods(null).getValue() > -1) {
+            bonus = "+" + bonus;
+        }
+        bonus = "(" + bonus + ")";
+        String toReturn = "<html><font size='2'";
 
-		String scheduled = "";
-		if (getTeamId() != null) {
-			scheduled = " (scheduled) ";
-		}
+        String scheduled = "";
+        if (getTeamId() != null) {
+            scheduled = " (scheduled) ";
+        }
 
-		toReturn += ">";
-		toReturn += "<b>Replace " + getName() + "</b><br/>";
-		toReturn += getDetails() + "<br/>";
-		if(getAmountAvailable() > 0) {
-			toReturn += "" + getTimeLeft() + " minutes" + scheduled;
-			if(!getCampaign().getCampaignOptions().isDestroyByMargin()) {
-			    toReturn += ", " + SkillType.getExperienceLevelName(getSkillMin());
-			}
-			toReturn += " " + bonus;
-		}
-		if (getMode() != WorkTime.NORMAL) {
-			toReturn += "<br/><i>" + getCurrentModeName() + "</i>";
-		}
-		toReturn += "</font></html>";
-		return toReturn;
-	}
+        toReturn += ">";
+        toReturn += "<b>Replace " + getName() + "</b><br/>";
+        toReturn += getDetails() + "<br/>";
+        if(getAmountAvailable() > 0) {
+            toReturn += "" + getTimeLeft() + " minutes" + scheduled;
+            if(!getCampaign().getCampaignOptions().isDestroyByMargin()) {
+                toReturn += ", " + SkillType.getExperienceLevelName(getSkillMin());
+            }
+            toReturn += " " + bonus;
+        }
+        if (getMode() != WorkTime.NORMAL) {
+            toReturn += "<br/><i>" + getCurrentModeName() + "</i>";
+        }
+        toReturn += "</font></html>";
+        return toReturn;
+    }
 
     @Override
-	public String getDetails() {
-		if(null != unit) {
-			String rearMount = "";
-			if(rear) {
-				rearMount = " (R)";
-			}
-			if(!isSalvaging()) {
-				String availability;
-				int amountAvailable = getAmountAvailable();
-				PartInventory inventories = campaign.getPartInventory(getNewPart());
-				
-	            String orderTransitString = getOrderTransitStringForDetails(inventories);
-				
-				if(amountAvailable == 0) {
-					availability = "<br><font color='red'>No armor " + orderTransitString + "</font>";
-				} else if(amountAvailable < amountNeeded) {
-					availability = "<br><font color='red'>Only " + amountAvailable + " available " + orderTransitString + "</font>";
-				} else {
-	                availability = "<br><font color='green'>" + amountAvailable + " available " + orderTransitString + "</font>";
-	            }
-				
-				return unit.getEntity().getLocationName(location) + rearMount + ", " + amountNeeded + " points" + availability;
-			}
-			return unit.getEntity().getLocationName(location) + rearMount + ", " + amount + " points";
-		}
-		return amount + " points";
-	}
+    public String getDetails() {
+        if(null != unit) {
+            String rearMount = "";
+            if(rear) {
+                rearMount = " (R)";
+            }
+            if(!isSalvaging()) {
+                String availability;
+                int amountAvailable = getAmountAvailable();
+                PartInventory inventories = campaign.getPartInventory(getNewPart());
+
+                String orderTransitString = getOrderTransitStringForDetails(inventories);
+
+                if(amountAvailable == 0) {
+                    availability = "<br><font color='red'>No armor " + orderTransitString + "</font>";
+                } else if(amountAvailable < amountNeeded) {
+                    availability = "<br><font color='red'>Only " + amountAvailable + " available " + orderTransitString + "</font>";
+                } else {
+                    availability = "<br><font color='green'>" + amountAvailable + " available " + orderTransitString + "</font>";
+                }
+
+                return unit.getEntity().getLocationName(location) + rearMount + ", " + amountNeeded + " points" + availability;
+            }
+            return unit.getEntity().getLocationName(location) + rearMount + ", " + amount + " points";
+        }
+        return amount + " points";
+    }
 
     public int getType() {
         return type;
@@ -182,23 +182,23 @@ public class Armor extends Part implements IAcquisitionWork {
     }
 
     public int getAmountNeeded() {
-    	return amountNeeded;
+        return amountNeeded;
     }
 
     public int getTotalAmount() {
-    	return amount + amountNeeded;
+        return amount + amountNeeded;
     }
 
     public int getLocation() {
-    	return location;
+        return location;
     }
 
     public String getLocationName() {
-    	return unit.getEntity().getLocationName(location);
+        return unit.getEntity().getLocationName(location);
     }
 
     public boolean isRearMounted() {
-    	return rear;
+        return rear;
     }
 
     public void setAmount(int amount) {
@@ -206,16 +206,16 @@ public class Armor extends Part implements IAcquisitionWork {
     }
 
     public void setAmountNeeded(int needed) {
-    	this.amountNeeded = needed;
+        this.amountNeeded = needed;
     }
 
     public boolean isSameType(Armor armor) {
-    	if(getType() == EquipmentType.T_ARMOR_STANDARD
-    			&& armor.getType() == EquipmentType.T_ARMOR_STANDARD) {
-    		//standard armor is compatible between clan and IS
-    		return true;
-    	}
-    	return getType() == armor.getType()  && isClanTechBase() == armor.isClanTechBase();
+        if(getType() == EquipmentType.T_ARMOR_STANDARD
+                && armor.getType() == EquipmentType.T_ARMOR_STANDARD) {
+            //standard armor is compatible between clan and IS
+            return true;
+        }
+        return getType() == armor.getType()  && isClanTechBase() == armor.isClanTechBase();
     }
 
     @Override
@@ -227,7 +227,7 @@ public class Armor extends Part implements IAcquisitionWork {
 
     @Override
     public boolean isSameStatus(Part part) {
-    	return this.getDaysToArrival() == part.getDaysToArrival();
+        return this.getDaysToArrival() == part.getDaysToArrival();
     }
 
     @Override
@@ -251,247 +251,247 @@ public class Armor extends Part implements IAcquisitionWork {
         return armorWeight;
     }
 
-	@Override
-	public void writeToXml(PrintWriter pw1, int indent) {
-		writeToXmlBegin(pw1, indent);
-		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<amount>"
-				+amount
-				+"</amount>");
-		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<type>"
-				+type
-				+"</type>");
-		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<location>"
-				+location
-				+"</location>");
-		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<rear>"
-				+rear
-				+"</rear>");
-		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<amountNeeded>"
-				+amountNeeded
-				+"</amountNeeded>");
-		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<clan>"
-				+clan
-				+"</clan>");
-		writeToXmlEnd(pw1, indent);
-	}
+    @Override
+    public void writeToXml(PrintWriter pw1, int indent) {
+        writeToXmlBegin(pw1, indent);
+        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"<amount>"
+                +amount
+                +"</amount>");
+        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"<type>"
+                +type
+                +"</type>");
+        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"<location>"
+                +location
+                +"</location>");
+        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"<rear>"
+                +rear
+                +"</rear>");
+        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"<amountNeeded>"
+                +amountNeeded
+                +"</amountNeeded>");
+        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"<clan>"
+                +clan
+                +"</clan>");
+        writeToXmlEnd(pw1, indent);
+    }
 
-	@Override
-	protected void loadFieldsFromXmlNode(Node wn) {
-		NodeList nl = wn.getChildNodes();
+    @Override
+    protected void loadFieldsFromXmlNode(Node wn) {
+        NodeList nl = wn.getChildNodes();
 
-		for (int x=0; x<nl.getLength(); x++) {
-			Node wn2 = nl.item(x);
+        for (int x=0; x<nl.getLength(); x++) {
+            Node wn2 = nl.item(x);
 
-			if (wn2.getNodeName().equalsIgnoreCase("amount")) {
-				amount = Integer.parseInt(wn2.getTextContent());
-			} else if (wn2.getNodeName().equalsIgnoreCase("type")) {
-				type = Integer.parseInt(wn2.getTextContent());
-			} else if (wn2.getNodeName().equalsIgnoreCase("location")) {
-				location = Integer.parseInt(wn2.getTextContent());
-			} else if (wn2.getNodeName().equalsIgnoreCase("amountNeeded")) {
-				amountNeeded = Integer.parseInt(wn2.getTextContent());
-			} else if (wn2.getNodeName().equalsIgnoreCase("rear")) {
+            if (wn2.getNodeName().equalsIgnoreCase("amount")) {
+                amount = Integer.parseInt(wn2.getTextContent());
+            } else if (wn2.getNodeName().equalsIgnoreCase("type")) {
+                type = Integer.parseInt(wn2.getTextContent());
+            } else if (wn2.getNodeName().equalsIgnoreCase("location")) {
+                location = Integer.parseInt(wn2.getTextContent());
+            } else if (wn2.getNodeName().equalsIgnoreCase("amountNeeded")) {
+                amountNeeded = Integer.parseInt(wn2.getTextContent());
+            } else if (wn2.getNodeName().equalsIgnoreCase("rear")) {
                 rear = wn2.getTextContent().equalsIgnoreCase("true");
-			} else if (wn2.getNodeName().equalsIgnoreCase("clan")) {
+            } else if (wn2.getNodeName().equalsIgnoreCase("clan")) {
                 clan = wn2.getTextContent().equalsIgnoreCase("true");
-			}
-		}
-	}
+            }
+        }
+    }
 
-	@Override
-	public void fix() {
-		int amountFound = Math.min(getAmountAvailable(), amountNeeded);
-		int fixAmount = Math.min(amount + amountFound, unit.getEntity().getOArmor(location, rear));
-		unit.getEntity().setArmor(fixAmount, location, rear);
-		changeAmountAvailable(-1 * amountFound);
-		updateConditionFromEntity(false);
-		skillMin = SkillType.EXP_GREEN;
-		shorthandedMod = 0;
-	}
+    @Override
+    public void fix() {
+        int amountFound = Math.min(getAmountAvailable(), amountNeeded);
+        int fixAmount = Math.min(amount + amountFound, unit.getEntity().getOArmor(location, rear));
+        unit.getEntity().setArmor(fixAmount, location, rear);
+        changeAmountAvailable(-1 * amountFound);
+        updateConditionFromEntity(false);
+        skillMin = SkillType.EXP_GREEN;
+        shorthandedMod = 0;
+    }
 
-	@Override
-	public String find(int transitDays) {
-	    Part newPart = getNewPart();
-	    newPart.setBrandNew(true);
+    @Override
+    public String find(int transitDays) {
+        Part newPart = getNewPart();
+        newPart.setBrandNew(true);
         newPart.setDaysToArrival(transitDays);
         if(campaign.buyPart(newPart, transitDays)) {
             return "<font color='green'><b> part found</b>.</font> It will be delivered in " + transitDays + " days.";
         } else {
             return "<font color='red'><b> You cannot afford this part. Transaction cancelled</b>.</font>";
         }
-	}
+    }
 
-	@Override
+    @Override
     public Object getNewEquipment() {
         return getNewPart();
     }
 
-	@Override
-	public String failToFind() {
-	    resetDaysToWait();
-		return "<font color='red'><b> part not found</b>.</font>";
-	}
+    @Override
+    public String failToFind() {
+        resetDaysToWait();
+        return "<font color='red'><b> part not found</b>.</font>";
+    }
 
-	@Override
-	public MissingPart getMissingPart() {
-		//no such thing
-		return null;
-	}
+    @Override
+    public MissingPart getMissingPart() {
+        //no such thing
+        return null;
+    }
 
-	@Override
+    @Override
     public IAcquisitionWork getAcquisitionWork() {
         return new Armor(0, type, (int)Math.round(5 * getArmorPointsPerTon()), -1, false, clan, campaign);
     }
 
-	@Override
-	public void remove(boolean salvage) {
-		unit.getEntity().setArmor(IArmorState.ARMOR_DESTROYED, location, rear);
-		if(salvage) {
-			changeAmountAvailable(amount);
-		}
-		updateConditionFromEntity(false);
-	}
-
-	public int getBaseTimeFor(Entity entity) {
-		if (null != entity) {
-			if (entity instanceof Tank) {
-				return 3;
-			}
-			//December 2017 errata, only large craft should return 15m/point.
-			else if (entity.hasETypeFlag(Entity.ETYPE_DROPSHIP) || entity.hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
-				return 15;
-			}
-		}
-		return 5;
-	}
-
-
-	@Override
-	public void updateConditionFromEntity(boolean checkForDestruction) {
-		if(isReservedForRefit()) {
-			return;
-		}
-		if(null == unit) {
-			return;
-		}
-		amount = unit.getEntity().getArmorForReal(location, rear);
-		if(amount < 0) {
-			amount = 0;
-		}
-		amountNeeded = unit.getEntity().getOArmor(location, rear) - amount;
-	}
-	
-	@Override 
-	public int getBaseTime() {
-		Entity entity = unit != null ? unit.getEntity() : null;
-		if (isSalvaging()) {
-			return getBaseTimeFor(entity) * amount;
-		}
-		return getBaseTimeFor(entity) * Math.min(amountNeeded, getAmountAvailable());
-	}
-	
-	@Override
-	public int getDifficulty() {
-		return -2;
-	}
-
-	@Override
-	public boolean isSalvaging() {
-		return super.isSalvaging() && amount > 0;
-	}
-
-	@Override
-	public boolean needsFixing() {
-		return amountNeeded > 0;
-	}
-
-	@Override
-	public void updateConditionFromPart() {
-		if(null != unit) {
-			int armor = Math.min(amount, unit.getEntity().getOArmor(location, rear));
-			if(armor == 0) {
-				armor = IArmorState.ARMOR_DESTROYED;
-			}
-			unit.getEntity().setArmor(armor, location, rear);
-		}
-	}
-
-	@Override
-	public String checkFixable() {
-		if(isSalvaging()) {
-			return null;
-		}
-		if(getAmountAvailable() == 0) {
-			return "No spare armor available";
-		}
-		if (isMountedOnDestroyedLocation()) {
-			return unit.getEntity().getLocationName(location) + " is destroyed.";
-		}
-		return null;
-	}
-
-	@Override
-	public boolean isMountedOnDestroyedLocation() {
-		return null != unit && unit.isLocationDestroyed(location);
-	}
-
-	@Override
-	public boolean onBadHipOrShoulder() {
-		return null != unit && unit.hasBadHipOrShoulder(location);
-	}
-
-	@Override
-	public String getAcquisitionDesc() {
-		String toReturn = "<html><font size='2'";
-
-		toReturn += ">";
-		toReturn += "<b>" + getAcquisitionDisplayName() + "</b> " + getAcquisitionBonus() + "<br/>";
-		toReturn += getAcquisitionExtraDesc() + "<br/>";
-		PartInventory inventories = campaign.getPartInventory(getAcquisitionPart());
-        toReturn += inventories.getTransitOrderedDetails() + "<br/>";
-		toReturn += adjustCostsForCampaignOptions(getStickerPrice()).toAmountAndSymbolString() + "<br/>";
-		toReturn += "</font></html>";
-		return toReturn;
-	}
-	
     @Override
-    public String getAcquisitionDisplayName() {
-    	return getName();
-    }    
-
-	@Override
-	public String getAcquisitionExtraDesc() {
-		return ((int)Math.round(getArmorPointsPerTon())) * 5 + " points (5 tons)";
-	}
-	
-	@Override
-	public String getAcquisitionName() {
-		return getName();
-	}
-
-	@Override
-    public String getAcquisitionBonus() {
-		String bonus = getAllAcquisitionMods().getValueAsString();
-		if(getAllAcquisitionMods().getValue() > -1) {
-			bonus = "+" + bonus;
-		}
-		
-		return "(" + bonus + ")";
+    public void remove(boolean salvage) {
+        unit.getEntity().setArmor(IArmorState.ARMOR_DESTROYED, location, rear);
+        if(salvage) {
+            changeAmountAvailable(amount);
+        }
+        updateConditionFromEntity(false);
     }
 
-	@Override
-	public Part getAcquisitionPart() {
-		return getNewPart();
-	}
+    public int getBaseTimeFor(Entity entity) {
+        if (null != entity) {
+            if (entity instanceof Tank) {
+                return 3;
+            }
+            //December 2017 errata, only large craft should return 15m/point.
+            else if (entity.hasETypeFlag(Entity.ETYPE_DROPSHIP) || entity.hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
+                return 15;
+            }
+        }
+        return 5;
+    }
 
-	@Override
-	public TargetRoll getAllAcquisitionMods() {
+
+    @Override
+    public void updateConditionFromEntity(boolean checkForDestruction) {
+        if(isReservedForRefit()) {
+            return;
+        }
+        if(null == unit) {
+            return;
+        }
+        amount = unit.getEntity().getArmorForReal(location, rear);
+        if(amount < 0) {
+            amount = 0;
+        }
+        amountNeeded = unit.getEntity().getOArmor(location, rear) - amount;
+    }
+
+    @Override
+    public int getBaseTime() {
+        Entity entity = unit != null ? unit.getEntity() : null;
+        if (isSalvaging()) {
+            return getBaseTimeFor(entity) * amount;
+        }
+        return getBaseTimeFor(entity) * Math.min(amountNeeded, getAmountAvailable());
+    }
+
+    @Override
+    public int getDifficulty() {
+        return -2;
+    }
+
+    @Override
+    public boolean isSalvaging() {
+        return super.isSalvaging() && amount > 0;
+    }
+
+    @Override
+    public boolean needsFixing() {
+        return amountNeeded > 0;
+    }
+
+    @Override
+    public void updateConditionFromPart() {
+        if(null != unit) {
+            int armor = Math.min(amount, unit.getEntity().getOArmor(location, rear));
+            if(armor == 0) {
+                armor = IArmorState.ARMOR_DESTROYED;
+            }
+            unit.getEntity().setArmor(armor, location, rear);
+        }
+    }
+
+    @Override
+    public String checkFixable() {
+        if(isSalvaging()) {
+            return null;
+        }
+        if(getAmountAvailable() == 0) {
+            return "No spare armor available";
+        }
+        if (isMountedOnDestroyedLocation()) {
+            return unit.getEntity().getLocationName(location) + " is destroyed.";
+        }
+        return null;
+    }
+
+    @Override
+    public boolean isMountedOnDestroyedLocation() {
+        return null != unit && unit.isLocationDestroyed(location);
+    }
+
+    @Override
+    public boolean onBadHipOrShoulder() {
+        return null != unit && unit.hasBadHipOrShoulder(location);
+    }
+
+    @Override
+    public String getAcquisitionDesc() {
+        String toReturn = "<html><font size='2'";
+
+        toReturn += ">";
+        toReturn += "<b>" + getAcquisitionDisplayName() + "</b> " + getAcquisitionBonus() + "<br/>";
+        toReturn += getAcquisitionExtraDesc() + "<br/>";
+        PartInventory inventories = campaign.getPartInventory(getAcquisitionPart());
+        toReturn += inventories.getTransitOrderedDetails() + "<br/>";
+        toReturn += adjustCostsForCampaignOptions(getStickerPrice()).toAmountAndSymbolString() + "<br/>";
+        toReturn += "</font></html>";
+        return toReturn;
+    }
+
+    @Override
+    public String getAcquisitionDisplayName() {
+        return getName();
+    }    
+
+    @Override
+    public String getAcquisitionExtraDesc() {
+        return ((int)Math.round(getArmorPointsPerTon())) * 5 + " points (5 tons)";
+    }
+
+    @Override
+    public String getAcquisitionName() {
+        return getName();
+    }
+
+    @Override
+    public String getAcquisitionBonus() {
+        String bonus = getAllAcquisitionMods().getValueAsString();
+        if(getAllAcquisitionMods().getValue() > -1) {
+            bonus = "+" + bonus;
+        }
+
+        return "(" + bonus + ")";
+    }
+
+    @Override
+    public Part getAcquisitionPart() {
+        return getNewPart();
+    }
+
+    @Override
+    public TargetRoll getAllAcquisitionMods() {
         TargetRoll target = new TargetRoll();
         // Faction and Tech mod
         if(isClanTechBase() && campaign.getCampaignOptions().getClanAcquisitionPenalty() > 0) {
@@ -507,83 +507,83 @@ public class Armor extends Part implements IAcquisitionWork {
         return target;
     }
 
-	public double getArmorPointsPerTon() {
-		//if(null != unit) {
-			// armor is checked for in 5-ton increments
-			//int armorType = unit.getEntity().getArmorType(location);
-	    double armorPerTon = 16.0 * EquipmentType.getArmorPointMultiplier(type, clan);
-	    if (type == EquipmentType.T_ARMOR_HARDENED) {
-	        armorPerTon = 8.0;
-	    }
-	    return armorPerTon;
-		//}
-		//return 0.0;
-	}
+    public double getArmorPointsPerTon() {
+        //if(null != unit) {
+            // armor is checked for in 5-ton increments
+            //int armorType = unit.getEntity().getArmorType(location);
+        double armorPerTon = 16.0 * EquipmentType.getArmorPointMultiplier(type, clan);
+        if (type == EquipmentType.T_ARMOR_HARDENED) {
+            armorPerTon = 8.0;
+        }
+        return armorPerTon;
+        //}
+        //return 0.0;
+    }
 
-	public Part getNewPart() {
-		return new Armor(0, type, (int)Math.round(5 * getArmorPointsPerTon()), -1, false, clan, campaign);
-	}
+    public Part getNewPart() {
+        return new Armor(0, type, (int)Math.round(5 * getArmorPointsPerTon()), -1, false, clan, campaign);
+    }
 
-	public boolean isEnoughSpareArmorAvailable() {
-		return getAmountAvailable() >= amountNeeded;
-	}
+    public boolean isEnoughSpareArmorAvailable() {
+        return getAmountAvailable() >= amountNeeded;
+    }
 
-	public int getAmountAvailable() {
-		for(Part part : campaign.getSpareParts()) {
-			if(part instanceof Armor) {
-				Armor a = (Armor)part;
-				if(isSameType(a) && !a.isReservedForRefit() && a.isPresent()) {
-					return a.getAmount();
-				}
-			}
-		}
-		return 0;
-	}
+    public int getAmountAvailable() {
+        for(Part part : campaign.getSpareParts()) {
+            if(part instanceof Armor) {
+                Armor a = (Armor)part;
+                if(isSameType(a) && !a.isReservedForRefit() && a.isPresent()) {
+                    return a.getAmount();
+                }
+            }
+        }
+        return 0;
+    }
 
-	public void changeAmountAvailable(int amount) {
-		Armor a = null;
-		for(Part part : campaign.getSpareParts()) {
-			if(part instanceof Armor && isSameType((Armor)part)
-					&& getRefitId() == part.getRefitId()
-					&& part.isPresent()) {
-				a = (Armor)part;
-				a.setAmount(a.getAmount() + amount);
-				break;
-			}
-		}
-		if(null != a && a.getAmount() <= 0) {
-			campaign.removePart(a);
-		} else if(null == a && amount > 0) {
-			campaign.addPart(new Armor(getUnitTonnage(), type, amount, -1, false, isClanTechBase(), campaign), 0);
-		}
-	}
+    public void changeAmountAvailable(int amount) {
+        Armor a = null;
+        for(Part part : campaign.getSpareParts()) {
+            if(part instanceof Armor && isSameType((Armor)part)
+                    && getRefitId() == part.getRefitId()
+                    && part.isPresent()) {
+                a = (Armor)part;
+                a.setAmount(a.getAmount() + amount);
+                break;
+            }
+        }
+        if(null != a && a.getAmount() <= 0) {
+            campaign.removePart(a);
+        } else if(null == a && amount > 0) {
+            campaign.addPart(new Armor(getUnitTonnage(), type, amount, -1, false, isClanTechBase(), campaign), 0);
+        }
+    }
 
-	@Override
-	public String fail(int rating) {
-		skillMin = ++rating;
-		timeSpent = 0;
-		shorthandedMod = 0;
-		//if we are impossible to fix now, we should scrap this amount of armor
-		//from spares and start over
-		String scrap = "";
-		if(skillMin > SkillType.EXP_ELITE) {
-			scrap = " Armor supplies lost!";
-			if(isSalvaging()) {
-				remove(false);
-			} else {
-				skillMin = SkillType.EXP_GREEN;
-				changeAmountAvailable(-1 * Math.min(amountNeeded, getAmountAvailable()));
-			}
-		}
-		return " <font color='red'><b> failed." + scrap + "</b></font>";
-	}
+    @Override
+    public String fail(int rating) {
+        skillMin = ++rating;
+        timeSpent = 0;
+        shorthandedMod = 0;
+        //if we are impossible to fix now, we should scrap this amount of armor
+        //from spares and start over
+        String scrap = "";
+        if(skillMin > SkillType.EXP_ELITE) {
+            scrap = " Armor supplies lost!";
+            if(isSalvaging()) {
+                remove(false);
+            } else {
+                skillMin = SkillType.EXP_GREEN;
+                changeAmountAvailable(-1 * Math.min(amountNeeded, getAmountAvailable()));
+            }
+        }
+        return " <font color='red'><b> failed." + scrap + "</b></font>";
+    }
 
-	@Override
-	public String scrap() {
-		remove(false);
-		skillMin = SkillType.EXP_GREEN;
-		return EquipmentType.armorNames[type] + " armor scrapped.";
-	}
+    @Override
+    public String scrap() {
+        remove(false);
+        skillMin = SkillType.EXP_GREEN;
+        return EquipmentType.armorNames[type] + " armor scrapped.";
+    }
 
     @Override
     public boolean isInSupply() {
@@ -631,18 +631,18 @@ public class Armor extends Part implements IAcquisitionWork {
         return true;
     }
 
-	public void changeType(int ty, boolean cl) {
-		this.type = ty;
-		this.clan = cl;
-		this.name = "Armor";
+    public void changeType(int ty, boolean cl) {
+        this.type = ty;
+        this.clan = cl;
+        this.name = "Armor";
         if(type > -1) {
-        	this.name += " (" + EquipmentType.armorNames[type] + ")";
+            this.name += " (" + EquipmentType.armorNames[type] + ")";
         }
-	}
-	
-	@Override
-	public int getMassRepairOptionType() {
-    	return Part.REPAIR_PART_TYPE.ARMOR;
+    }
+
+    @Override
+    public int getMassRepairOptionType() {
+        return Part.REPAIR_PART_TYPE.ARMOR;
     }
 
     @Override

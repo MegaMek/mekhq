@@ -24,7 +24,6 @@ package mekhq.campaign.unit;
 
 import java.io.PrintWriter;
 import java.math.BigInteger;
-import java.math.RoundingMode;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -579,11 +578,11 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     }
 
     private boolean isPartAvailableForRepairs(IPartWork partWork, boolean onlyNotBeingWorkedOn) {
-    	return (!onlyNotBeingWorkedOn || (onlyNotBeingWorkedOn && !partWork.isBeingWorkedOn()));
+        return (!onlyNotBeingWorkedOn || (onlyNotBeingWorkedOn && !partWork.isBeingWorkedOn()));
     }
     
     public ArrayList<IPartWork> getPartsNeedingFixing() {
-    	return getPartsNeedingFixing(false);
+        return getPartsNeedingFixing(false);
     }
 
     /**
@@ -622,7 +621,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
     }
 
     public ArrayList<IPartWork> getSalvageableParts() {
-    	return getSalvageableParts(false);
+        return getSalvageableParts(false);
     }
 
     /**
@@ -3732,7 +3731,7 @@ public class Unit implements MekHqXmlSerializable, ITechnology {
                 techOfficer = null;
             }
             if((null != engineer) && p.getId().equals(engineer.getId())) {
-            	engineer = null;
+                engineer = null;
             }
             resetPilotAndEntity();
             MekHQ.triggerEvent(new PersonCrewAssignmentEvent(p, this));

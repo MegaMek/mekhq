@@ -41,31 +41,31 @@ import mekhq.campaign.personnel.SkillType;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class MekCockpit extends Part {
-	private static final long serialVersionUID = -1989526319692474127L;
+    private static final long serialVersionUID = -1989526319692474127L;
 
-	private int type;
-	private boolean isClan;
-	
-	public MekCockpit() {
-		this(0, Mech.COCKPIT_STANDARD, false, null);
-	}
-	
-	public MekCockpit(int tonnage, int t, boolean isClan, Campaign c) {
+    private int type;
+    private boolean isClan;
+
+    public MekCockpit() {
+        this(0, Mech.COCKPIT_STANDARD, false, null);
+    }
+
+    public MekCockpit(int tonnage, int t, boolean isClan, Campaign c) {
         super(tonnage, c);
         this.type = t;
         this.name = Mech.getCockpitDisplayString(type);
         this.isClan = isClan;
     }
-	
-	public MekCockpit clone() {
-		MekCockpit clone = new MekCockpit(getUnitTonnage(), type, isClan, campaign);
+
+    public MekCockpit clone() {
+        MekCockpit clone = new MekCockpit(getUnitTonnage(), type, isClan, campaign);
         clone.copyBaseData(this);
-		return clone;
-	}
-	
-	@Override
-	public double getTonnage() {
-		switch (type) {
+        return clone;
+    }
+
+    @Override
+    public double getTonnage() {
+        switch (type) {
         case Mech.COCKPIT_SMALL:
             return 2;
         case Mech.COCKPIT_TORSO_MOUNTED:
@@ -83,12 +83,12 @@ public class MekCockpit extends Part {
             return 6;
         default:
             return 3;
-		}
-	}
-	
-	@Override
-	public Money getStickerPrice() {
-		switch (type) {
+        }
+    }
+
+    @Override
+    public Money getStickerPrice() {
+        switch (type) {
         case Mech.COCKPIT_COMMAND_CONSOLE:
             // 500000 for command console + 200000 for primary cockpit
             return Money.of(700000);
@@ -108,201 +108,201 @@ public class MekCockpit extends Part {
             return Money.of(375000);
         default:
             return Money.of(200000);
-		}
-	}
+        }
+    }
 
     @Override
     public boolean isSamePartType(Part part) {
         return part instanceof MekCockpit 
-        		&& ((MekCockpit)part).getType() == type;
+                && ((MekCockpit)part).getType() == type;
     }
     
     public int getType() {
-    	return type;
+        return type;
     }
     
-	@Override
-	public void writeToXml(PrintWriter pw1, int indent) {
-		writeToXmlBegin(pw1, indent);
-		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<type>"
-				+type
-				+"</type>");
-		writeToXmlEnd(pw1, indent);
-	}
+    @Override
+    public void writeToXml(PrintWriter pw1, int indent) {
+        writeToXmlBegin(pw1, indent);
+        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"<type>"
+                +type
+                +"</type>");
+        writeToXmlEnd(pw1, indent);
+    }
 
-	@Override
-	protected void loadFieldsFromXmlNode(Node wn) {
-		NodeList nl = wn.getChildNodes();
-		
-		for (int x=0; x<nl.getLength(); x++) {
-			Node wn2 = nl.item(x);
-			
-			if (wn2.getNodeName().equalsIgnoreCase("type")) {
-				type = Integer.parseInt(wn2.getTextContent());
-			}
-		}
-	}
+    @Override
+    protected void loadFieldsFromXmlNode(Node wn) {
+        NodeList nl = wn.getChildNodes();
 
-	@Override
-	public void fix() {
-		super.fix();
-		if(null != unit) {
-			unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_COCKPIT);
-		}
-	}
+        for (int x=0; x<nl.getLength(); x++) {
+            Node wn2 = nl.item(x);
 
-	@Override
-	public MissingPart getMissingPart() {
-		return new MissingMekCockpit(getUnitTonnage(), type, isClan, campaign);
-	}
+            if (wn2.getNodeName().equalsIgnoreCase("type")) {
+                type = Integer.parseInt(wn2.getTextContent());
+            }
+        }
+    }
 
-	@Override
-	public void remove(boolean salvage) {
-		if(null != unit) {
-			unit.destroySystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_COCKPIT);
-			Part spare = campaign.checkForExistingSparePart(this);
-			if(!salvage) {
-				campaign.removePart(this);
-			} else if(null != spare) {
-				spare.incrementQuantity();
-				campaign.removePart(this);
-			}
-			unit.removePart(this);
-			Part missing = getMissingPart();
-			unit.addPart(missing);
-			campaign.addPart(missing, 0);
-		}
-		setUnit(null);
-		updateConditionFromEntity(false);
-	}
+    @Override
+    public void fix() {
+        super.fix();
+        if(null != unit) {
+            unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_COCKPIT);
+        }
+    }
 
-	@Override
-	public void updateConditionFromEntity(boolean checkForDestruction) {
-		int priorHits = hits;
-		if(null != unit) {
-			Entity entity = unit.getEntity();
-			for (int i = 0; i < entity.locations(); i++) {
-				if (entity.getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_COCKPIT, i) > 0) {
-					//check for missing equipment as well
-					if (!unit.isSystemMissing(Mech.SYSTEM_COCKPIT, i)) {					
-						hits = entity.getDamagedCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_COCKPIT, i);	
-						break;
-					} else {
-						remove(false);
-						return;
-					}
-				}
-			}
-			if(checkForDestruction 
-					&& hits > priorHits 
-					&& Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
-				remove(false);
-			}
-		}
-	}
-	
-	@Override 
-	public int getBaseTime() {
-		if(isSalvaging()) {
-			return 300;
-		}
-		//TODO: These are made up values until the errata establish them
-		return 200;
-	}
-	
-	@Override
-	public int getDifficulty() {
-		if(isSalvaging()) {
-			return 0;
-		}
-		//TODO: These are made up values until the errata establish them
-		return 3;
-	}
+    @Override
+    public MissingPart getMissingPart() {
+        return new MissingMekCockpit(getUnitTonnage(), type, isClan, campaign);
+    }
 
-	@Override
-	public boolean needsFixing() {
-		return hits > 0;
-	}
-	
-	@Override
-	public void updateConditionFromPart() {
-		if(null != unit) {
-			if(hits == 0) {
-				unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_COCKPIT);
-			} else {
-				unit.damageSystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_COCKPIT, hits);
-			}
-		}
-	}
-	
-	@Override
+    @Override
+    public void remove(boolean salvage) {
+        if(null != unit) {
+            unit.destroySystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_COCKPIT);
+            Part spare = campaign.checkForExistingSparePart(this);
+            if(!salvage) {
+                campaign.removePart(this);
+            } else if(null != spare) {
+                spare.incrementQuantity();
+                campaign.removePart(this);
+            }
+            unit.removePart(this);
+            Part missing = getMissingPart();
+            unit.addPart(missing);
+            campaign.addPart(missing, 0);
+        }
+        setUnit(null);
+        updateConditionFromEntity(false);
+    }
+
+    @Override
+    public void updateConditionFromEntity(boolean checkForDestruction) {
+        int priorHits = hits;
+        if(null != unit) {
+            Entity entity = unit.getEntity();
+            for (int i = 0; i < entity.locations(); i++) {
+                if (entity.getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_COCKPIT, i) > 0) {
+                    //check for missing equipment as well
+                    if (!unit.isSystemMissing(Mech.SYSTEM_COCKPIT, i)) {
+                        hits = entity.getDamagedCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_COCKPIT, i);
+                        break;
+                    } else {
+                        remove(false);
+                        return;
+                    }
+                }
+            }
+            if(checkForDestruction
+                    && hits > priorHits
+                    && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
+                remove(false);
+            }
+        }
+    }
+
+    @Override
+    public int getBaseTime() {
+        if(isSalvaging()) {
+            return 300;
+        }
+        //TODO: These are made up values until the errata establish them
+        return 200;
+    }
+
+    @Override
+    public int getDifficulty() {
+        if(isSalvaging()) {
+            return 0;
+        }
+        //TODO: These are made up values until the errata establish them
+        return 3;
+    }
+
+    @Override
+    public boolean needsFixing() {
+        return hits > 0;
+    }
+
+    @Override
+    public void updateConditionFromPart() {
+        if(null != unit) {
+            if(hits == 0) {
+                unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_COCKPIT);
+            } else {
+                unit.damageSystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_COCKPIT, hits);
+            }
+        }
+    }
+
+    @Override
     public String checkFixable() {
-		if(null == unit) {
-			return null;
-		}
-		if(isSalvaging()) {
-			return null;
-		}
+        if(null == unit) {
+            return null;
+        }
+        if(isSalvaging()) {
+            return null;
+        }
         for(int i = 0; i < unit.getEntity().locations(); i++) {
             if(unit.getEntity().getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_COCKPIT, i) > 0) {
-            	if(unit.isLocationBreached(i)) {
-            		return unit.getEntity().getLocationName(i) + " is breached.";
-            	}
-            	if(unit.isLocationDestroyed(i)) {
-            		return unit.getEntity().getLocationName(i) + " is destroyed.";
-            	}
+                if(unit.isLocationBreached(i)) {
+                    return unit.getEntity().getLocationName(i) + " is breached.";
+                }
+                if(unit.isLocationDestroyed(i)) {
+                    return unit.getEntity().getLocationName(i) + " is destroyed.";
+                }
             }
         }
         return null;
     }
-	
-	@Override
-	public boolean isMountedOnDestroyedLocation() {
-		if(null == unit) {
-			return false;
-		}
-		for(int i = 0; i < unit.getEntity().locations(); i++) {
-			 if(unit.getEntity().getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_COCKPIT, i) > 0
-					 && unit.isLocationDestroyed(i)) {
-				 return true;
-			 }
-		 }
-		return false;
-	}
-	
-	 @Override
-	 public boolean isPartForEquipmentNum(int index, int loc) {
-		 return Mech.SYSTEM_COCKPIT == index;
-	 }
-	 
-	 @Override
-	 public boolean isRightTechType(String skillType) {
-		 return skillType.equals(SkillType.S_TECH_MECH);
-	 }
 
-	@Override
-	public String getLocationName() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public boolean isMountedOnDestroyedLocation() {
+        if(null == unit) {
+            return false;
+        }
+        for(int i = 0; i < unit.getEntity().locations(); i++) {
+             if(unit.getEntity().getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_COCKPIT, i) > 0
+                     && unit.isLocationDestroyed(i)) {
+                 return true;
+             }
+         }
+        return false;
+    }
 
-	@Override
-	public int getLocation() {
-		if(type == Mech.COCKPIT_TORSO_MOUNTED) {
-			return Mech.LOC_CT;
-		} else {
-			return Mech.LOC_HEAD;
-		}
-	}
+     @Override
+     public boolean isPartForEquipmentNum(int index, int loc) {
+         return Mech.SYSTEM_COCKPIT == index;
+     }
 
-	@Override
-	public TechAdvancement getTechAdvancement() {
-	    return Mech.getCockpitTechAdvancement(type);
-	}
-	
-	@Override
-	public int getMassRepairOptionType() {
-    	return Part.REPAIR_PART_TYPE.ELECTRONICS;
+     @Override
+     public boolean isRightTechType(String skillType) {
+         return skillType.equals(SkillType.S_TECH_MECH);
+     }
+
+    @Override
+    public String getLocationName() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public int getLocation() {
+        if(type == Mech.COCKPIT_TORSO_MOUNTED) {
+            return Mech.LOC_CT;
+        } else {
+            return Mech.LOC_HEAD;
+        }
+    }
+
+    @Override
+    public TechAdvancement getTechAdvancement() {
+        return Mech.getCockpitTechAdvancement(type);
+    }
+
+    @Override
+    public int getMassRepairOptionType() {
+        return Part.REPAIR_PART_TYPE.ELECTRONICS;
     }
 }

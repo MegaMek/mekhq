@@ -20,7 +20,6 @@
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
-import java.math.RoundingMode;
 
 import mekhq.campaign.finances.Money;
 import org.w3c.dom.Node;

@@ -229,12 +229,12 @@ public class CurrencyManager extends CurrencyUnitDataProvider {
                     // start/end dates of the factions that use it
                     for (Faction faction : Faction.getFactions()) {
                         if (faction.getCurrencyCode().equals(code)) {
-                            if (faction.getStart() < startYear) {
-                                startYear = faction.getStart();
+                            if (faction.getStartYear() < startYear) {
+                                startYear = faction.getStartYear();
                             }
 
-                            if (faction.getEnd() > endYear) {
-                                endYear = faction.getEnd();
+                            if (faction.getEndYear() > endYear) {
+                                endYear = faction.getEndYear();
                             }
                         }
                     }

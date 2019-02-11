@@ -242,11 +242,11 @@ public class Faction {
         return id;
     }
 
-    public int getStart() {
+    public int getStartYear() {
         return this.start;
     }
 
-    public int getEnd() {
+    public int getEndYear() {
         return this.end;
     }
 

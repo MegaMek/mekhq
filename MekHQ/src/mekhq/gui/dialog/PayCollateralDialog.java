@@ -122,7 +122,7 @@ public class PayCollateralDialog extends JDialog {
         Collection<Unit> units = campaign.getUnits();
         for(Unit u : units) {
             j++;
-            box = new JCheckBox(u.getName() + " (" + u.getSellValue().toAmountAndSymbolString());
+            box = new JCheckBox(u.getName() + " (" + u.getSellValue().toAmountAndSymbolString() + ")");
             box.setSelected(false);
             box.setEnabled(u.isPresent() && !u.isDeployed());
             box.addItemListener(evt -> updateAmount());
@@ -216,7 +216,7 @@ public class PayCollateralDialog extends JDialog {
         JPanel pnlAssets = new JPanel(new GridBagLayout());
         for(Asset a : campaign.getFinances().getAllAssets()) {
             j++;
-            box = new JCheckBox(a.getName() + " (" + a.getValue().toAmountAndSymbolString());
+            box = new JCheckBox(a.getName() + " (" + a.getValue().toAmountAndSymbolString() + ")");
             box.setSelected(false);
             box.addItemListener(evt -> updateAmount());
             assetBoxes.add(box);
@@ -294,7 +294,7 @@ public class PayCollateralDialog extends JDialog {
         if (loan.getCollateralAmount().isPositive()) {
             percent = amount
                     .multipliedBy(100)
-                    .dividedBy(loan.getCollateralAmount().getAmount().doubleValue())
+                    .dividedBy(loan.getCollateralAmount())
                     .getAmount().intValue();
         }
 

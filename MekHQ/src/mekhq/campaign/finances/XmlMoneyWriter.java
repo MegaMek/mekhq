@@ -35,7 +35,7 @@ import org.joda.money.format.MoneyPrinter;
  */
 class XmlMoneyWriter implements MoneyPrinter {
     @Override
-	public void print(MoneyPrintContext context, Appendable appendable, BigMoney money) throws IOException {
+    public void print(MoneyPrintContext context, Appendable appendable, BigMoney money) throws IOException {
         appendable.append(money.getAmount().toString());
         appendable.append(" ");
         appendable.append(money.getCurrencyUnit().getCode());

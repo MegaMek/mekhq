@@ -136,7 +136,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
             try{
                 CurrencyManager.getInstance().loadCurrencies();
             } catch (Exception ex) {
-                ex.printStackTrace();;
+                MekHQ.getLogger().error(DataLoadingDialog.class, METHOD_NAME, ex);
             }
             try {
             	Bloodname.loadBloodnameData();

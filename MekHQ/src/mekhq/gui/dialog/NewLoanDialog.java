@@ -42,6 +42,7 @@ import javax.swing.text.DefaultFormatterFactory;
 import javax.swing.text.NumberFormatter;
 
 import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Loan;
@@ -54,7 +55,7 @@ import mekhq.campaign.rating.IUnitRating;
 public class NewLoanDialog extends javax.swing.JDialog implements ActionListener, ChangeListener {
     private static final long serialVersionUID = -8038099101234445018L;
 
-    ResourceBundle resourceMap;
+    private ResourceBundle resourceMap;
     private NumberFormatter numberFormatter;
     private Frame frame;
     private Loan loan;
@@ -526,6 +527,7 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
     }
 
     private void refreshValues() {
+        final String METHOD_NAME = "refreshValues";
         try {
             txtPrincipal.setText(loan.getPrincipal().toAmountAndSymbolString());
             lblAPR.setText(loan.getInterestRate() + "%");
@@ -538,8 +540,8 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
             lblNPayment.setText(numberFormatter.valueToString(loan.getRemainingPayments()));
             lblTotalPayment.setText(loan.getRemainingValue().toAmountAndSymbolString());
             lblCollateralAmount.setText(loan.getCollateralAmount().toAmountAndSymbolString());
-        } catch (Exception ignored ){
-
+        } catch (Exception ex ){
+            MekHQ.getLogger().error(NewLoanDialog.class, METHOD_NAME, ex);
         }
     }
 

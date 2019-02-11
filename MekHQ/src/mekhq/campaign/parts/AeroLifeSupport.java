@@ -42,21 +42,21 @@ import mekhq.campaign.personnel.SkillType;
  */
 public class AeroLifeSupport extends Part {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -717866644605314883L;
+    /**
+     *
+     */
+    private static final long serialVersionUID = -717866644605314883L;
 
-	private Money cost;
-	private boolean fighter;
-	
-	static final TechAdvancement TECH_ADVANCEMENT = new TechAdvancement(TECH_BASE_ALL)
-	        .setAdvancement(DATE_ES, DATE_ES, DATE_ES).setTechRating(RATING_C)
-	        .setAvailability(RATING_C, RATING_C, RATING_C, RATING_C)
-	        .setStaticTechLevel(SimpleTechLevel.STANDARD);
-		
-	public AeroLifeSupport() {
-    	this(0, Money.zero(), false, null);
+    private Money cost;
+    private boolean fighter;
+
+    static final TechAdvancement TECH_ADVANCEMENT = new TechAdvancement(TECH_BASE_ALL)
+            .setAdvancement(DATE_ES, DATE_ES, DATE_ES).setTechRating(RATING_C)
+            .setAvailability(RATING_C, RATING_C, RATING_C, RATING_C)
+            .setStaticTechLevel(SimpleTechLevel.STANDARD);
+
+    public AeroLifeSupport() {
+        this(0, Money.zero(), false, null);
     }
     
     public AeroLifeSupport(int tonnage, Money cost, boolean f, Campaign c) {
@@ -65,37 +65,37 @@ public class AeroLifeSupport extends Part {
         this.name = "Fighter Life Support";
         this.fighter = f;
         if(!fighter) {
-        	this.name = "Spacecraft Life Support";
+            this.name = "Spacecraft Life Support";
         }
     }
     
     public AeroLifeSupport clone() {
-    	AeroLifeSupport clone = new AeroLifeSupport(getUnitTonnage(), cost, fighter, campaign);
+        AeroLifeSupport clone = new AeroLifeSupport(getUnitTonnage(), cost, fighter, campaign);
         clone.copyBaseData(this);
-    	return clone;
+        return clone;
     }
         
-	@Override
-	public void updateConditionFromEntity(boolean checkForDestruction) {
-		int priorHits = hits;
-		if(null != unit && unit.getEntity() instanceof Aero) {
-			 if(((Aero)unit.getEntity()).hasLifeSupport()) {
-				 hits = 0;
-			 } else { 
-				 hits = 1;
-			 }
-			 if(checkForDestruction 
-						&& hits > priorHits 
-						&& Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
-				 remove(false);
-			 }
-		}	
-	}
-	
-	@Override 
-	public int getBaseTime() {
-	    int time = 0;
-	    Entity e = unit.getEntity();
+    @Override
+    public void updateConditionFromEntity(boolean checkForDestruction) {
+        int priorHits = hits;
+        if(null != unit && unit.getEntity() instanceof Aero) {
+             if(((Aero)unit.getEntity()).hasLifeSupport()) {
+                 hits = 0;
+             } else {
+                 hits = 1;
+             }
+             if(checkForDestruction
+                        && hits > priorHits
+                        && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
+                 remove(false);
+             }
+        }
+    }
+
+    @Override
+    public int getBaseTime() {
+        int time = 0;
+        Entity e = unit.getEntity();
         if (campaign.getCampaignOptions().useAeroSystemHits()) {
             //Test of proposed errata for repair times
             if (isSalvaging()) {
@@ -121,138 +121,138 @@ public class AeroLifeSupport extends Part {
         } else {
             time = 120;
         }
-		return time;
-	}
-	
-	@Override
-	public int getDifficulty() {
-		if(isSalvaging()) {
-		    Entity e = unit.getEntity();
-		    if (e.hasETypeFlag(Entity.ETYPE_DROPSHIP) || e.hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
-	            return 0;
-	        } else {
-	            return -1;
-	        }
-		}
-		return 1;
-	}
+        return time;
+    }
 
-	@Override
-	public void updateConditionFromPart() {
-		if(null != unit && unit.getEntity() instanceof Aero) {
-			if(hits > 0) {
-				((Aero)unit.getEntity()).setLifeSupport(false);
-			} else {
-				((Aero)unit.getEntity()).setLifeSupport(true);
-			}
-		}
-		
-	}
+    @Override
+    public int getDifficulty() {
+        if(isSalvaging()) {
+            Entity e = unit.getEntity();
+            if (e.hasETypeFlag(Entity.ETYPE_DROPSHIP) || e.hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
+                return 0;
+            } else {
+                return -1;
+            }
+        }
+        return 1;
+    }
 
-	@Override
-	public void fix() {
-		super.fix();
-		if(null != unit && unit.getEntity() instanceof Aero) {
-			((Aero)unit.getEntity()).setLifeSupport(true);
-		}
-	}
+    @Override
+    public void updateConditionFromPart() {
+        if(null != unit && unit.getEntity() instanceof Aero) {
+            if(hits > 0) {
+                ((Aero)unit.getEntity()).setLifeSupport(false);
+            } else {
+                ((Aero)unit.getEntity()).setLifeSupport(true);
+            }
+        }
 
-	@Override
-	public void remove(boolean salvage) {
-		if(null != unit && unit.getEntity() instanceof Aero) {
-			((Aero)unit.getEntity()).setLifeSupport(false);
-			Part spare = campaign.checkForExistingSparePart(this);
-			if(!salvage) {
-				campaign.removePart(this);
-			} else if(null != spare) {
-				spare.incrementQuantity();
-				campaign.removePart(this);
-			}
-			unit.removePart(this);
-			Part missing = getMissingPart();
-			unit.addPart(missing);
-			campaign.addPart(missing, 0);
-		}
-		setUnit(null);
-		updateConditionFromEntity(false);
-	}
+    }
 
-	@Override
-	public MissingPart getMissingPart() {
-		return new MissingAeroLifeSupport(getUnitTonnage(), cost, fighter, campaign);
-	}
+    @Override
+    public void fix() {
+        super.fix();
+        if(null != unit && unit.getEntity() instanceof Aero) {
+            ((Aero)unit.getEntity()).setLifeSupport(true);
+        }
+    }
 
-	@Override
-	public String checkFixable() {
-		return null;
-	}
+    @Override
+    public void remove(boolean salvage) {
+        if(null != unit && unit.getEntity() instanceof Aero) {
+            ((Aero)unit.getEntity()).setLifeSupport(false);
+            Part spare = campaign.checkForExistingSparePart(this);
+            if(!salvage) {
+                campaign.removePart(this);
+            } else if(null != spare) {
+                spare.incrementQuantity();
+                campaign.removePart(this);
+            }
+            unit.removePart(this);
+            Part missing = getMissingPart();
+            unit.addPart(missing);
+            campaign.addPart(missing, 0);
+        }
+        setUnit(null);
+        updateConditionFromEntity(false);
+    }
 
-	@Override
-	public boolean needsFixing() {
-		return hits > 0;
-	}
+    @Override
+    public MissingPart getMissingPart() {
+        return new MissingAeroLifeSupport(getUnitTonnage(), cost, fighter, campaign);
+    }
 
-	@Override
-	public Money getStickerPrice() {
-		return cost;
-	}
-	
-	public void calculateCost() {
-		if(fighter) {
-			cost = Money.of(50000);
-		}
-		if(null != unit) {
-			cost = Money.of(5000.0 * (((Aero)unit.getEntity()).getNCrew() + ((Aero)unit.getEntity()).getNPassenger()));
-		}	
-	}
+    @Override
+    public String checkFixable() {
+        return null;
+    }
 
-	@Override
-	public double getTonnage() {
-		return 0;
-	}
+    @Override
+    public boolean needsFixing() {
+        return hits > 0;
+    }
 
-	public boolean isForFighter() {
-		return fighter;
-	}
-	
-	@Override
-	public boolean isSamePartType(Part part) {
-		return part instanceof AeroLifeSupport && fighter == ((AeroLifeSupport)part).isForFighter()
-				&& (getStickerPrice() == part.getStickerPrice());
-	}
-	
-	@Override
-	public void writeToXml(PrintWriter pw1, int indent) {
-		writeToXmlBegin(pw1, indent);
-		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<fighter>"
-				+fighter
-				+"</fighter>");
-		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<cost>"
-				+ cost.toXmlString()
-				+"</cost>");
-		writeToXmlEnd(pw1, indent);
-	}
+    @Override
+    public Money getStickerPrice() {
+        return cost;
+    }
 
-	@Override
-	protected void loadFieldsFromXmlNode(Node wn) {
-		NodeList nl = wn.getChildNodes();
-		
-		for (int x=0; x<nl.getLength(); x++) {
-			Node wn2 = nl.item(x);		
-			if (wn2.getNodeName().equalsIgnoreCase("fighter")) {
+    public void calculateCost() {
+        if(fighter) {
+            cost = Money.of(50000);
+        }
+        if(null != unit) {
+            cost = Money.of(5000.0 * (((Aero)unit.getEntity()).getNCrew() + ((Aero)unit.getEntity()).getNPassenger()));
+        }
+    }
+
+    @Override
+    public double getTonnage() {
+        return 0;
+    }
+
+    public boolean isForFighter() {
+        return fighter;
+    }
+
+    @Override
+    public boolean isSamePartType(Part part) {
+        return part instanceof AeroLifeSupport && fighter == ((AeroLifeSupport)part).isForFighter()
+                && (getStickerPrice() == part.getStickerPrice());
+    }
+
+    @Override
+    public void writeToXml(PrintWriter pw1, int indent) {
+        writeToXmlBegin(pw1, indent);
+        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"<fighter>"
+                +fighter
+                +"</fighter>");
+        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"<cost>"
+                + cost.toXmlString()
+                +"</cost>");
+        writeToXmlEnd(pw1, indent);
+    }
+
+    @Override
+    protected void loadFieldsFromXmlNode(Node wn) {
+        NodeList nl = wn.getChildNodes();
+
+        for (int x=0; x<nl.getLength(); x++) {
+            Node wn2 = nl.item(x);
+            if (wn2.getNodeName().equalsIgnoreCase("fighter")) {
                 fighter = wn2.getTextContent().trim().equalsIgnoreCase("true");
             } else if (wn2.getNodeName().equalsIgnoreCase("cost")) {
-				cost = Money.fromXmlString(wn2.getTextContent().trim());
-			} 
-		}
-	}
-	
-	@Override
-	public boolean isRightTechType(String skillType) {
-		return skillType.equals(SkillType.S_TECH_AERO);
-	}
+                cost = Money.fromXmlString(wn2.getTextContent().trim());
+            }
+        }
+    }
+
+    @Override
+    public boolean isRightTechType(String skillType) {
+        return skillType.equals(SkillType.S_TECH_AERO);
+    }
 
     @Override
     public String getLocationName() {
@@ -270,13 +270,13 @@ public class AeroLifeSupport extends Part {
         return Entity.LOC_NONE;
     }
     
-	@Override
-	public int getMassRepairOptionType() {
-    	return Part.REPAIR_PART_TYPE.ELECTRONICS;
+    @Override
+    public int getMassRepairOptionType() {
+        return Part.REPAIR_PART_TYPE.ELECTRONICS;
     }
-	
-	@Override
-	public TechAdvancement getTechAdvancement() {
-	    return TECH_ADVANCEMENT;
-	}
+
+    @Override
+    public TechAdvancement getTechAdvancement() {
+        return TECH_ADVANCEMENT;
+    }
 }

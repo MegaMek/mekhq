@@ -142,11 +142,12 @@ public class ManageAssetsDialog extends JDialog {
         ead.setTitle(resourceMap.getString("addAssetDialogTitle.text"));
         ead.setVisible(true);
         if(!ead.wasCancelled()) {
-            ead.dispose();
             campaign.getFinances().getAllAssets().add(a);
             MekHQ.triggerEvent(new AssetNewEvent(a));
             refreshTable();
         }
+
+        ead.dispose();
     }
     
     private void editAsset() {
