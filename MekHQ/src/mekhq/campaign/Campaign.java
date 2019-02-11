@@ -24,9 +24,7 @@ package mekhq.campaign;
 import java.io.File;
 import java.io.PrintWriter;
 import java.io.Serializable;
-import java.math.RoundingMode;
 import java.text.DateFormat;
-import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -7777,7 +7775,7 @@ public class Campaign implements Serializable, ITechManager {
                         case Part.QUALITY_F:
                             if (margin < -2) {
                                 p.decreaseQuality();
-                                if (margin < -6 && !campaignOptions.useUnofficalMaintenance()) {
+                                if (margin < -6 && !campaignOptions.useUnofficialMaintenance()) {
                                     partsToDamage.put(p.getId(), 1);
                                 }
                             }
@@ -7788,7 +7786,7 @@ public class Campaign implements Serializable, ITechManager {
                         case Part.QUALITY_E:
                             if (margin < -2) {
                                 p.decreaseQuality();
-                                if (margin < -5 && !campaignOptions.useUnofficalMaintenance()) {
+                                if (margin < -5 && !campaignOptions.useUnofficialMaintenance()) {
                                     partsToDamage.put(p.getId(), 1);
                                 }
                             }
@@ -7799,7 +7797,7 @@ public class Campaign implements Serializable, ITechManager {
                         case Part.QUALITY_D:
                             if (margin < -3) {
                                 p.decreaseQuality();
-                                if (margin < -4 && !campaignOptions.useUnofficalMaintenance()) {
+                                if (margin < -4 && !campaignOptions.useUnofficialMaintenance()) {
                                     partsToDamage.put(p.getId(), 1);
                                 }
                             }
@@ -7811,7 +7809,7 @@ public class Campaign implements Serializable, ITechManager {
                             if (margin < -4) {
                                 p.decreaseQuality();
                             }
-                            if (!campaignOptions.useUnofficalMaintenance()) {
+                            if (!campaignOptions.useUnofficialMaintenance()) {
                                 if (margin < -6) {
                                     partsToDamage.put(p.getId(), 2);
                                 } else if (margin < -3) {
@@ -7826,7 +7824,7 @@ public class Campaign implements Serializable, ITechManager {
                             if (margin < -5) {
                                 p.decreaseQuality();
                             }
-                            if (!campaignOptions.useUnofficalMaintenance()) {
+                            if (!campaignOptions.useUnofficialMaintenance()) {
                                 if (margin < -6) {
                                     partsToDamage.put(p.getId(), 2);
                                 } else if (margin < -2) {
@@ -7838,7 +7836,7 @@ public class Campaign implements Serializable, ITechManager {
                             }
                             break;
                         case Part.QUALITY_A:
-                            if (!campaignOptions.useUnofficalMaintenance()) {
+                            if (!campaignOptions.useUnofficialMaintenance()) {
                                 if (margin < -6) {
                                     partsToDamage.put(p.getId(), 4);
                                 } else if (margin < -4) {

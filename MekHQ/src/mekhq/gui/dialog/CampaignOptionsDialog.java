@@ -268,7 +268,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JSpinner spnMaintenanceDays;
     private JSpinner spnMaintenanceBonus;
     private JCheckBox useQualityMaintenance;
-    private JCheckBox useUnofficalMaintenance;
+    private JCheckBox useUnofficialMaintenance;
     private JCheckBox reverseQualityNames;
 
     private JRadioButton btnContractEquipment;
@@ -533,7 +533,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         useDamageMargin.setSelected(options.isDestroyByMargin());
         useAeroSystemHitsBox.setSelected(options.useAeroSystemHits());
         useQualityMaintenance.setSelected(options.useQualityMaintenance());
-        useUnofficalMaintenance.setSelected(options.useUnofficalMaintenance());
+        useUnofficialMaintenance.setSelected(options.useUnofficialMaintenance());
         checkMaintenance.setSelected(options.checkMaintenance());
         reverseQualityNames.setSelected(options.reverseQualityNames());
 
@@ -654,7 +654,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         useDamageMargin = new JCheckBox();
         useAeroSystemHitsBox = new JCheckBox();
         useQualityMaintenance = new JCheckBox();
-        useUnofficalMaintenance = new JCheckBox();
+        useUnofficialMaintenance = new JCheckBox();
         checkMaintenance = new JCheckBox();
         logMaintenance = new JCheckBox();
         reverseQualityNames = new JCheckBox();
@@ -952,13 +952,13 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
                 if (checkMaintenance.isSelected()) {
                     spnMaintenanceDays.setEnabled(true);
                     useQualityMaintenance.setEnabled(true);
-                    useUnofficalMaintenance.setEnabled(true);
+                    useUnofficialMaintenance.setEnabled(true);
                     spnMaintenanceBonus.setEnabled(true);
                     logMaintenance.setEnabled(true);
                 } else {
                     spnMaintenanceDays.setEnabled(false);
                     useQualityMaintenance.setEnabled(false);
-                    useUnofficalMaintenance.setEnabled(false);
+                    useUnofficialMaintenance.setEnabled(false);
                     spnMaintenanceBonus.setEnabled(false);
                     logMaintenance.setEnabled(false);
                 }
@@ -1024,8 +1024,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         panSubMaintenance.add(reverseQualityNames, gridBagConstraints);
 
 
-        useUnofficalMaintenance.setText(resourceMap.getString("useUnofficalMaintenance.text")); // NOI18N
-        useUnofficalMaintenance.setToolTipText(resourceMap.getString("useUnofficalMaintenance.toolTipText")); // NOI18N
+        useUnofficialMaintenance.setText(resourceMap.getString("useUnofficialMaintenance.text")); // NOI18N
+        useUnofficialMaintenance.setToolTipText(resourceMap.getString("useUnofficialMaintenance.toolTipText")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 5;
@@ -1033,7 +1033,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.weightx = 0.0;
         gridBagConstraints.weighty = 0.0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        panSubMaintenance.add(useUnofficalMaintenance, gridBagConstraints);
+        panSubMaintenance.add(useUnofficialMaintenance, gridBagConstraints);
 
         logMaintenance.setText(resourceMap.getString("logMaintenance.text")); // NOI18N
         logMaintenance.setToolTipText(resourceMap.getString("logMaintenance.toolTipText")); // NOI18N
@@ -4612,7 +4612,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setCheckMaintenance(checkMaintenance.isSelected());
         options.setUseQualityMaintenance(useQualityMaintenance.isSelected());
         options.setReverseQualityNames(reverseQualityNames.isSelected());
-        options.setUseUnofficialMaintenance(useUnofficalMaintenance.isSelected());
+        options.setUseUnofficialMaintenance(useUnofficialMaintenance.isSelected());
         options.setMaintenanceBonus((Integer) spnMaintenanceBonus.getModel().getValue());
         options.setMaintenanceCycleDays((Integer) spnMaintenanceDays.getModel().getValue());
         options.setInitBonus(useInitBonusBox.isSelected());
