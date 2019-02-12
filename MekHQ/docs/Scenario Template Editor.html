@@ -1,0 +1,77 @@
+<html>
+<h1>Scenario Template Editor</h1>
+
+<p>The Scenario Template Editor allows the user to configure scenario templates, which allow a user to create randomly-generated scenarios.</p>
+
+<p>Scenario Parameters:<br/>
+<ul>
+<li><b>Scenario Name</b> - the scenario name which will display in the briefing tab. Try to keep it short to avoid display issues.</li>
+<li><b>Short Briefing</b> - currently unused, but intended to be shown after the scenario is initialized but before the player has committed forces and triggered opfor generation and other such processes.</li>
+<li><b>Detailed Briefing</b> - a detailed briefing for the scenario, which should state any scenario objectives, and will show in the scenario details section of the briefing tab.</li>
+</ul>
+</p>
+
+<p>Force Generation Parameters (Participating Forces):<br/>
+These are parameters regarding the generation of a specific force.
+<ul>
+<li><b>Force Alignment</b> - this controls whether the force is to be player-controlled, bot-controlled and allied to the player, bot-controlled and hostile to the player or bot-controlled and on a "third team".</li>
+<li><b>Generation Method</b> - this controls how the force is generated. <b>Player Supplied</b> means that the player will need to assign units to the scenario. <b>BV Scaled</b> means that the force will be generated using a BV budget based on the BV of all forces that have been generated or supplied so far that contribute to BV. <b>Unit Count Scaled</b> means that the force will be generating based on how many units have been generated or supplied that contribute to unit count. <b>Fixed Unit Count</b> means that the force will have a fixed number of units.</li>
+<li><b>Scaling Multiplier</b> - For scaled generation methods, this will apply a multiplier to the unit count or BV budget prior to generating the force.</li>
+<li><b>Destination Zone</b> - The edge towards which this particular force will attempt to move after deployment. <b>Random</b> is just what it sounds like, while <b>Opposite Deployment Edge</b> will cause the force to attempt to move to the opposite edge from which it is deployed. For non-cardinal edges, this behavior is poorly defined.</li>
+<li><b>Retreat Threshold</b> - Currently unused, but will define, in the future, the point at which this force will declare a retreat and run for the nearest board edge.</li>
+<li><b>Reinforce Subsequent Scenarios</b> - Whether or not this force is able to reinforce scenarios linked to this one. Currently unused.</li>
+<li><b>Contributes to BV</b> - Whether or not this force contributes to the BV budget when generating subsequent forces using the <b>BV Scaled</b> generation method. Note that, when using AtB, player supplied units also have a difficulty multiplier applied to them.</li>
+<li><b>Contributes to Unit Count</b> - As <b>Contributes to BV</b> except for forces using the <b>Unit Count Scaled</b> generation method.</li>
+<li><b>Force ID</b> - A unique identifier for the force. Used for synchronized deployment and (in the future) force objectives. Note that this is used to drive synchronized deployment, so changing a force's ID may lead to unexpected behavior for other forces that synchronize deployment to this one.</li>
+<li><b>Synchronized Deployment</b> - Whether or not and how to synchronize deployment of this force with another force. Pick a synchronization method (same/opposite edge/arc) and the force with which to synchronize (which must have already been defined). This may form arbitrarily long chains, but it is required that the force at the beginning of the chain have an actual deployment zone selected.</li>
+<li><b>Possible Deployment Zones</b> - Lists the possible deployment zones. Multiple zones can be selected, and then the actual deployment zone will be picked randomly from the choices selected. <b>Narrow Edge</b> is a special case and will pick one of the narrower edges of the map (behavior picks arbitrary edge in case of square maps).</li>
+<li><b>Unit Type</b> - The unit type of which this force consists. <b>Standard AtB Mix</b> uses the AtB mech/vehicle table to generate the actual unit types, while <b>AtB Civilians</b> uses the AtB Civilian RATs. <b>AtB Aircraft Mix</b> will generate either conventional or aerospace fighters depending on whether the opfor owns the current planet and a random die roll. <b>Infantry</b> has a 33% chance of generating field gunners.</li>
+<li><b>Arrival Turn</b> - The turn on which this force will deploy. Special cases (unimplemented): <b>-1</b> is "staggered by lance", while "<b>-2</b>" is "staggered individual".</li>
+<li><b>Fixed Unit Count</b> - How many units to generate for forces using the fixed unit count generation method.</li>
+<li><b>Max Weight</b> - For those unit types that support standard weight classes, this is the maximum weight class of the units generated.</li>
+<li><b>Contributes to Map Size</b> - Whether or not this force contributes to the size of the map when the map size has a scaling component to it. </li>
+<li><b>Generation Order</b> - Governs when the force will be generated. When actually generating forces, the code will sort the forces into "buckets" based on the order number. Those forces with a lower number will be generated first, with forces having the same number generated without taking into account other forces with that number. Forces with higher numbers will be generated taking into account other forces with lower numbers that were previously generated.<br/><br/>
+The general convention for built-in scenarios and events is as follows:<br/>
+<ul>
+<li><b>1</b> - These are pre-generated forces that should not depend on the other forces for their generation parameters.</li>
+<li><b>2</b> - These are primary allied forces, which depend upon player forces for dynamic generation.</li>
+<li><b>3</b> - These are primary player-controlled or attached units, such as liaisons, which do not depend upon player forces for generation.</li>
+<li><b>4</b> - These are allied "objective" forces which depend upon the unit count or BV of all primary forces.</li>
+<li><b>5</b> - These are primary enemy forces, which depend upon unit count or BV of all primary and objective forces.</li>
+<li><b>6</b> - These are secondary enemy forces, which may or may not depend upon any properties of preceding forces.</li>
+<li><b>7</b> - These are "third party" forces.</li>
+</ul>
+</li>
+<li><b>Allow Aero Bombs</b> - If the force being generated is aerospace or conventional fighters, some of them will be loaded out with a random selection of bombs.</li>
+<li><b>Start Altitude</b> - On a ground or low-atmospheric map, this is the starting altitude for units in this force. It may be used to simulate hot drops for ground units or start air units on the ground.</li>
+<li><b>Is Artillery</b> - Attempt to generate tube (Thumper, Sniper, etc) artillery units, rather than standard ones. Likely to fail to generate anything if the unit type isn't tank or infantry.</li>
+<li><b>Deploy Offboard</b> - Useful in combination with the "Is Artillery" flag to allow artillery units to deploy off-board.</li>
+</ul>
+</p>
+
+<p>
+Map Parameters:<br/>
+<ul>
+<li><b>Base Width/Height</b> - The base x/y dimensions of the map, prior to any map size scaling.</li>
+<li><b>Scaled Width/Height Increment</b> - How much to increase the corresponding dimension of the map, based on approximate number of "lances" generated by the force generation process.</li>
+<li><b>Allow 90 degree rotation</b> - Allow the map dimensions to be randomly rotated by 90 degrees. Useful for allowing "long" or "wide" maps for chase scenarios.</li>
+<li><b>Use AtB Base Dimensions</b> - Generate the base width/heigh using the AtB Map Size table.</li>
+<li><b>Allowed Map Types</b> 
+	<ul>
+	<li><b>Allow All</b> - randomly picks from the AtB Terrain Types table.</li>
+	<li><b>Use Space Map</b> - just what it says.</li>
+	<li><b>Use Low Atmo Map</b> - low atmospheric map.</li>
+	<li><b>Specific Map Types</b> - A subset of map types. More than one may be selected, and is randomly picked from among the ones selected.</li>
+	</ul>
+</li>
+</ul>
+</p>
+
+<p>
+How to use this:
+<ol>
+<li>Open up any campaign. </li>
+<li>Go to Manage Campaign -> Scenario Template Editor. Define a scenario and some forces. Save.</li>
+<li>In the briefing tab (make sure you're on an AtB contract), click Add Scenario -> Generate From Template and pick the template you saved. Assign as many forces as you defined player-supplied forces. Right click on the scenario, edit -> finalize. There is also a new dropdown that has a set of scenario modifiers. Those that are marked "(pre)" should be applied prior to clicking "finalize". Those that are marked "(post)" can be applied after clicking "finalize". Set the date to "today". Enjoy.</li>
+</p>
+</html>

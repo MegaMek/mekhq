@@ -39,6 +39,7 @@ import mekhq.gui.BasicInfo;
         private Campaign campaign;
         private PersonnelMarket personnelMarket;
         private boolean loadAssignmentFromMarket;
+        private boolean groupByUnit;
         
         public final static int COL_RANK     =    0;
         public final static int COL_NAME     =    1;
@@ -84,6 +85,27 @@ import mekhq.gui.BasicInfo;
         public PersonnelTableModel(Campaign c) {
             data = new ArrayList<Person>();
             campaign = c;
+        }
+
+        /**
+         * Gets a value indicating whether or not the table model should
+         * group personnel by their unit.
+         * @return A value indicating whether or not the table model groups
+         *         users by their unit.
+         */
+        public boolean getGroupByUnit() {
+            return groupByUnit;
+        }
+
+        /**
+         * Determines whether to group personnel by their unit (if they have one).
+         * If enabled, a commanding officer's crew (or soldiers) will not be displayed
+         * in the table. Instead, an indicator will appear by the commander's name.
+         * @param groupByUnit true if personnel should be grouped under
+         *                    their commanding officer and not be displayed.
+         */
+        public void setGroupByUnit(boolean groupByUnit) {
+            this.groupByUnit = groupByUnit;
         }
 
         @Override
@@ -275,7 +297,46 @@ import mekhq.gui.BasicInfo;
                 return p.makeHTMLRank();
             }
             if(col == COL_NAME) {
-                return p.getName();
+                if (!getGroupByUnit()) {
+                    return p.getName();
+                } else {
+                    // If we're grouping by unit, determine the number of persons under
+                    // their command.
+                    UUID unitId = p.getUnitId();
+
+                    // If the personnel does not have a unit, return their name
+                    if (unitId == null) {
+                        return p.getName();
+                    }
+
+                    // Get the actual unit
+                    Unit u = getCampaign().getUnit(unitId);
+                    if (u == null) {
+                        // This should not happen, but if it does, just return their name
+                        return p.getName();
+                    }
+
+                    // Get the crew for the unit
+                    ArrayList<Person> crew = u.getCrew();
+
+                    // The crew count is the number of personnel under their charge,
+                    // excepting themselves.
+                    int crewCount = crew.size() - 1;
+                    if (crewCount <= 0) {
+                        // If there is only one crew member, just return their name
+                        return p.getName();
+                    }
+
+                    StringBuilder builder = new StringBuilder(p.getName());
+                    builder.append(" (+");
+                    builder.append(crewCount);
+                    if (u.usesSoldiers()) {
+                        builder.append(" soldiers)");
+                    } else {
+                        builder.append(" crew)");
+                    }
+                    return builder.toString();
+                }
             }
             if(col == COL_CALL) {
                 return p.getCallsign();
@@ -599,7 +660,30 @@ import mekhq.gui.BasicInfo;
         }
 
         public void refreshData() {
-            setData(new ArrayList<>(getCampaign().getPersonnel()));
+            if (!getGroupByUnit()) {
+                setData(new ArrayList<>(getCampaign().getPersonnel()));
+            } else {
+                Campaign c = getCampaign();
+                ArrayList<Person> commanders = new ArrayList<>();
+                for (Person p : c.getPersonnel()) {
+                    if (p.getUnitId() != null) {
+                        UUID unitId = p.getUnitId();
+                        Unit u = c.getUnit(unitId);
+                        if (u != null && u.getCommander() != p) {
+                            // this person is NOT the commander of their unit,
+                            // skip them.
+                            continue;
+                        }
+                    }
+
+                    // 1. If they don't have a unit, add them.
+                    // 2. If their unit doesn't have a commander, add them.
+                    // 3. If their unit doesn't exist (error?), add them.
+                    commanders.add(p);
+                }
+
+                setData(commanders);
+            }
         }
 
         public TableCellRenderer getRenderer(boolean graphic, IconPackage icons) {

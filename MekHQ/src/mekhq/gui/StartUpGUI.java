@@ -56,49 +56,6 @@ public class StartUpGUI extends javax.swing.JPanel {
         
         ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.StartUpDialog", new EncodeControl()); //$NON-NLS-1$
         
-        btnNewGame = new javax.swing.JButton(resourceMap.getString("btnNewGame.text"));
-        btnNewGame.setMinimumSize(new Dimension(200, 25));
-        btnNewGame.setPreferredSize(new Dimension(200, 25));
-        btnNewGame.setMaximumSize(new Dimension(200, 25));
-        btnNewGame.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-            	newCampaign();
-            }
-        });
-        btnLoadGame = new javax.swing.JButton(resourceMap.getString("btnLoadGame.text"));
-        btnLoadGame.setMinimumSize(new Dimension(200, 25));
-        btnLoadGame.setPreferredSize(new Dimension(200, 25));
-        btnLoadGame.setMaximumSize(new Dimension(200, 25));
-        btnLoadGame.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-            	File f = selectLoadCampaignFile();
-            	if(null != f) {
-                	loadCampaign(f);
-            	}
-            }
-        });
-        btnLastSave = new javax.swing.JButton(resourceMap.getString("btnLastSave.text"));
-        btnLastSave.setMinimumSize(new Dimension(200, 25));
-        btnLastSave.setPreferredSize(new Dimension(200, 25));
-        btnLastSave.setMaximumSize(new Dimension(200, 25));
-        if(null == lastSave) {
-        	btnLastSave.setEnabled(false);
-        }
-        btnLastSave.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-            	loadCampaign(lastSave);
-            }
-        });
-        btnQuit = new javax.swing.JButton(resourceMap.getString("btnQuit.text"));
-        btnQuit.setMinimumSize(new Dimension(200, 25));
-        btnQuit.setPreferredSize(new Dimension(200, 25));
-        btnQuit.setMaximumSize(new Dimension(200, 25));
-        btnQuit.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                System.exit(0);
-            }
-        });
-        
         // initialize splash image
         double maxWidth = app.calculateMaxScreenWidth();
         imgSplash = getToolkit().getImage(app.getIconPackage().getStartupScreenImage((int) maxWidth));
@@ -111,6 +68,58 @@ public class StartUpGUI extends javax.swing.JPanel {
         } catch (InterruptedException e) {
             // really should never come here
         }
+
+        // Determine if the splash screen image is "small"
+        // and if so switch to shorter text and smaller buttons
+        boolean shortText = false;
+        int buttonWidth = 200;
+        if (imgSplash.getWidth(null) < 840) {
+            shortText = true;
+            buttonWidth = 150;
+        }
+
+        btnNewGame = new javax.swing.JButton(resourceMap.getString(shortText ? "btnNewGame.text.short" : "btnNewGame.text"));
+        btnNewGame.setMinimumSize(new Dimension(buttonWidth, 25));
+        btnNewGame.setPreferredSize(new Dimension(buttonWidth, 25));
+        btnNewGame.setMaximumSize(new Dimension(buttonWidth, 25));
+        btnNewGame.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            	newCampaign();
+            }
+        });
+        btnLoadGame = new javax.swing.JButton(resourceMap.getString(shortText ? "btnLoadGame.text.short" : "btnLoadGame.text"));
+        btnLoadGame.setMinimumSize(new Dimension(buttonWidth, 25));
+        btnLoadGame.setPreferredSize(new Dimension(buttonWidth, 25));
+        btnLoadGame.setMaximumSize(new Dimension(buttonWidth, 25));
+        btnLoadGame.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            	File f = selectLoadCampaignFile();
+            	if(null != f) {
+                	loadCampaign(f);
+            	}
+            }
+        });
+        btnLastSave = new javax.swing.JButton(resourceMap.getString(shortText ? "btnLastSave.text.short" : "btnLastSave.text"));
+        btnLastSave.setMinimumSize(new Dimension(buttonWidth, 25));
+        btnLastSave.setPreferredSize(new Dimension(buttonWidth, 25));
+        btnLastSave.setMaximumSize(new Dimension(buttonWidth, 25));
+        if(null == lastSave) {
+        	btnLastSave.setEnabled(false);
+        }
+        btnLastSave.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            	loadCampaign(lastSave);
+            }
+        });
+        btnQuit = new javax.swing.JButton(resourceMap.getString("btnQuit.text"));
+        btnQuit.setMinimumSize(new Dimension(buttonWidth, 25));
+        btnQuit.setPreferredSize(new Dimension(buttonWidth, 25));
+        btnQuit.setMaximumSize(new Dimension(buttonWidth, 25));
+        btnQuit.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                System.exit(0);
+            }
+        });
         
         setLayout(new BorderLayout(1, 1));
         

@@ -1,0 +1,31 @@
+<AtBScenarioModifier>
+	<additionalBriefingText>This facility is defended by an additional flight of enemy aircraft.</additionalBriefingText>
+	<benefitsPlayer>false</benefitsPlayer>
+	<eventTiming>PreForceGeneration</eventTiming>
+	<forceDefinition>
+		<actualDeploymentZone>-1</actualDeploymentZone>
+<allowAeroBombs>false</allowAeroBombs>
+<allowedUnitType>-3</allowedUnitType>
+<arrivalTurn>0</arrivalTurn>
+<canReinforceLinked>false</canReinforceLinked>
+<contributesToBV>false</contributesToBV>
+<contributesToMapSize>true</contributesToMapSize>
+<contributesToUnitCount>false</contributesToUnitCount>
+<deployOffboard>false</deployOffboard>
+<deploymentZones>
+<deploymentZone>9</deploymentZone>
+</deploymentZones>
+<destinationZone>4</destinationZone>
+<fixedUnitCount>-1</fixedUnitCount>
+<forceAlignment>2</forceAlignment>
+<forceMultiplier>1.0</forceMultiplier>
+<forceName>Opfor Air Garrison</forceName>
+<generationMethod>3</generationMethod>
+<generationOrder>3</generationOrder>
+<maxWeightClass>4</maxWeightClass>
+<retreatThreshold>75</retreatThreshold>
+<startingAltitude>5</startingAltitude>
+<syncDeploymentType>None</syncDeploymentType>
+<useArtillery>false</useArtillery>
+	</forceDefinition>
+</AtBScenarioModifier>

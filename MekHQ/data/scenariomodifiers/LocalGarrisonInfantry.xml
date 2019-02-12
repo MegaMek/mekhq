@@ -1,0 +1,28 @@
+<AtBScenarioModifier>
+	<additionalBriefingText>Planetary garrison infantry have been reported in the area.</additionalBriefingText>
+	<benefitsPlayer>false</benefitsPlayer>
+	<eventTiming>PostForceGeneration</eventTiming>
+	<forceDefinition>
+		<actualDeploymentZone>-1</actualDeploymentZone>
+		<allowAeroBombs>false</allowAeroBombs>
+		<allowedUnitType>3</allowedUnitType>
+		<arrivalTurn>0</arrivalTurn>
+		<canReinforceLinked>false</canReinforceLinked>
+		<contributesToBV>false</contributesToBV>
+		<contributesToMapSize>false</contributesToMapSize>
+		<contributesToUnitCount>false</contributesToUnitCount>
+		<deploymentZones>
+			<deploymentZone>10</deploymentZone>
+		</deploymentZones>
+		<destinationZone>4</destinationZone>
+		<fixedUnitCount>0</fixedUnitCount>
+		<forceAlignment>4</forceAlignment>
+		<forceMultiplier>1.0</forceMultiplier>
+		<forceName>Local Infantry</forceName>
+		<generationMethod>2</generationMethod>
+		<generationOrder>2</generationOrder>
+		<maxWeightClass>4</maxWeightClass>
+		<retreatThreshold>50</retreatThreshold>
+		<syncDeploymentType>None</syncDeploymentType>
+	</forceDefinition>
+</AtBScenarioModifier>

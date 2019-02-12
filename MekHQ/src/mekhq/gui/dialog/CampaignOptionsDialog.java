@@ -104,6 +104,7 @@ import mekhq.campaign.GamePreset;
 import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.market.PersonnelMarket;
+import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Ranks;
@@ -329,7 +330,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JCheckBox chkLogConception;
     private JCheckBox chkUseTransfers;
     private JCheckBox chkUseTimeInService;
-
+    private JCheckBox chkShowOriginFaction;
 
     private JSpinner spnNDiceTransitTime;
     private JSpinner spnConstantTransitTime;
@@ -1820,6 +1821,11 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         chkUseTimeInService.setSelected(options.getUseTimeInService());
         gridBagConstraints.gridy = 23;
         panPersonnel.add(chkUseTimeInService, gridBagConstraints);
+
+        chkShowOriginFaction = new JCheckBox("Show Origin Faction"); // NOI18N
+        chkShowOriginFaction.setSelected(options.showOriginFaction());
+        gridBagConstraints.gridy = 24;
+        panPersonnel.add(chkShowOriginFaction, gridBagConstraints);
 
         JPanel panSalary = new JPanel(new GridBagLayout());
         panSalary.setBorder(BorderFactory.createTitledBorder("Salary"));
@@ -4056,9 +4062,11 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.gridy = 11;
         panSubAtBContract.add(lblIntensity, gridBagConstraints);
 
-        spnIntensity.setModel(new SpinnerNumberModel(options.getIntensity(), 0.1, 5.0, 0.1));
+        spnIntensity.setModel(new SpinnerNumberModel(options.getIntensity(), 0.0, 5.0, 0.1));
         spnIntensity.setToolTipText(resourceMap.getString("spnIntensity.toolTipText"));
         spnIntensity.setValue(options.getIntensity());
+        spnIntensity.setMinimumSize(new Dimension(60, 25));
+        spnIntensity.setPreferredSize(new Dimension(60, 25));
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 11;
         panSubAtBContract.add(spnIntensity, gridBagConstraints);
@@ -4784,6 +4792,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         options.setLogConception(chkLogConception.isSelected());
         options.setUseTransfers(chkUseTransfers.isSelected());
         options.setUseTimeInService(chkUseTimeInService.isSelected());
+        options.setShowOriginFaction(chkShowOriginFaction.isSelected());
         options.setDefaultPrisonerStatus(comboPrisonerStatus.getSelectedIndex());
 
         rskillPrefs.setOverallRecruitBonus((Integer) spnOverallRecruitBonus.getModel().getValue());
@@ -5175,11 +5184,18 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     }
 
     private void updateBattleChances() {
-    	double intensity = (Double)spnIntensity.getValue();
-    	lblFightPct.setText((int)(40.0 * intensity / (40.0 * intensity + 60.0) * 100.0 + 0.5) + "%");
-    	lblDefendPct.setText((int)(20.0 * intensity / (20.0 * intensity + 80.0) * 100.0 + 0.5) + "%");
-    	lblScoutPct.setText((int)(60.0 * intensity / (60.0 * intensity + 40.0) * 100.0 + 0.5) + "%");
-    	lblTrainingPct.setText((int)(10.0 * intensity / (10.0 * intensity + 90.0) * 100.0 + 0.5) + "%");
+        double intensity = (Double)spnIntensity.getValue();
+        if (intensity >= AtBContract.MINIMUM_INTENSITY) {
+            lblFightPct.setText((int)(40.0 * intensity / (40.0 * intensity + 60.0) * 100.0 + 0.5) + "%");
+            lblDefendPct.setText((int)(20.0 * intensity / (20.0 * intensity + 80.0) * 100.0 + 0.5) + "%");
+            lblScoutPct.setText((int)(60.0 * intensity / (60.0 * intensity + 40.0) * 100.0 + 0.5) + "%");
+            lblTrainingPct.setText((int)(10.0 * intensity / (10.0 * intensity + 90.0) * 100.0 + 0.5) + "%");            
+        } else {
+            lblFightPct.setText("Disabled");
+            lblDefendPct.setText("Disabled");
+            lblScoutPct.setText("Disabled");
+            lblTrainingPct.setText("Disabled");
+        }
     }
 
     /*

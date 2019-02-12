@@ -28,6 +28,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.UUID;
@@ -63,9 +64,10 @@ import mekhq.campaign.event.ScenarioChangedEvent;
 import mekhq.campaign.event.ScenarioNewEvent;
 import mekhq.campaign.event.ScenarioRemovedEvent;
 import mekhq.campaign.event.ScenarioResolvedEvent;
-import mekhq.campaign.force.Force;
 import mekhq.campaign.force.Lance;
 import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.AtBDynamicScenario;
+import mekhq.campaign.mission.AtBDynamicScenarioFactory;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
@@ -609,7 +611,8 @@ public final class BriefingTab extends CampaignGuiTab {
 
         for (UUID uid : uids) {
             Unit u = getCampaign().getUnit(uid);
-            if (null != u.getEntity()) {
+            if ((null != u) &&
+                    (null != u.getEntity())) {
                 if (null == u.checkDeployment()) {
                     // Make sure the unit's entity and pilot are fully up to
                     // date!
@@ -625,6 +628,11 @@ public final class BriefingTab extends CampaignGuiTab {
                 }
             }
         }
+        
+        if(scenario instanceof AtBDynamicScenario) {
+            AtBDynamicScenarioFactory.setPlayerDeploymentTurns((AtBDynamicScenario) scenario, getCampaign());
+            AtBDynamicScenarioFactory.finalizeStaggeredDeploymentTurns((AtBDynamicScenario) scenario, getCampaign());
+        }
 
         if (undeployed.length() > 0) {
             Object[] options = { "Continue", "Cancel" };
@@ -637,47 +645,27 @@ public final class BriefingTab extends CampaignGuiTab {
             }
         }
 
-        if (getCampaign().getCampaignOptions().getUseAtB() && scenario instanceof AtBScenario) {
-            ((AtBScenario) scenario).refresh(getCampaign());
-
-            /*
-             * For standard battles, any deployed unit not part of the lance
-             * assigned to the battle is assumed to be reinforcements.
-             */
-            if (null != ((AtBScenario) scenario).getLance(getCampaign())) {
-                int assignedForceId = ((AtBScenario) scenario).getLance(getCampaign()).getForceId();
-                int cmdrStrategy = 0;
-                Person commander = getCampaign().getPerson(Lance.findCommander(assignedForceId, getCampaign()));
-                if (null != commander && null != commander.getSkill(SkillType.S_STRATEGY)) {
-                    cmdrStrategy = commander.getSkill(SkillType.S_STRATEGY).getLevel();
-                }
-                for (Force f : scenario.getForces(getCampaign()).getSubForces()) {
-                    if (f.getId() != assignedForceId) {
-                        Vector<UUID> units = f.getAllUnits();
-                        int slowest = 12;
-                        for (UUID id : units) {
-                            if (chosen.contains(getCampaign().getUnit(id))) {
-                                int speed = getCampaign().getUnit(id).getEntity().getWalkMP();
-                                if (getCampaign().getUnit(id).getEntity().getJumpMP() > 0) {
-                                    if (getCampaign().getUnit(id).getEntity() instanceof megamek.common.Infantry) {
-                                        speed = getCampaign().getUnit(id).getEntity().getJumpMP();
-                                    } else {
-                                        speed++;
-                                    }
-                                }
-                                slowest = Math.min(slowest, speed);
-                            }
-                        }
-                        int deployRound = Math.max(0, 12 - slowest - cmdrStrategy);
-
-                        for (UUID id : units) {
-                            if (chosen.contains(getCampaign().getUnit(id))) {
-                                getCampaign().getUnit(id).getEntity().setDeployRound(deployRound);
-                            }
-                        }
-                    }
+        // code to support deployment of reinforcements for legacy ATB scenarios.
+        if((scenario instanceof AtBScenario) && !(scenario instanceof AtBDynamicScenario)) {
+            int assignedForceId = ((AtBScenario) scenario).getLance(getCampaign()).getForceId();
+            int cmdrStrategy = 0;
+            Person commander = getCampaign().getPerson(Lance.findCommander(assignedForceId, getCampaign()));
+            if (null != commander && null != commander.getSkill(SkillType.S_STRATEGY)) {
+                cmdrStrategy = commander.getSkill(SkillType.S_STRATEGY).getLevel();
+            }
+            List<Entity> reinforcementEntities = new ArrayList<>();
+            
+            for(Unit unit : chosen) {
+                if(unit.getForceId() != assignedForceId) {
+                    reinforcementEntities.add(unit.getEntity());
                 }
             }
+            
+            AtBDynamicScenarioFactory.setDeploymentTurnsForReinforcements(reinforcementEntities, cmdrStrategy);
+        }
+        
+        if (getCampaign().getCampaignOptions().getUseAtB() && scenario instanceof AtBScenario) {
+            ((AtBScenario) scenario).refresh(getCampaign());
         }
 
         if (chosen.size() > 0) {

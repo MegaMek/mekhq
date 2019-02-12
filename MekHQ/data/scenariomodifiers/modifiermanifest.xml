@@ -1,0 +1,149 @@
+<scenarioModifierManifest>
+	<modifiers>
+		<modifier>
+			EnemyAirSupport.xml
+		</modifier>
+		<modifier>
+			EnemyAirSupportBombers.xml
+		</modifier>
+		<modifier>
+			EnemyReinforcements.xml
+		</modifier>
+		<modifier>
+			EnemyArty.xml
+		</modifier>
+		<modifier>
+			LocalGarrisonInfantry.xml
+		</modifier>
+		<modifier>
+			LocalGarrisonTurrets.xml
+		</modifier>
+		<modifier>
+			Rookies.xml
+		</modifier>
+		<modifier>
+			Veterans.xml
+		</modifier>
+		<modifier>
+			BadEquipment.xml
+		</modifier>
+		<modifier>
+			GoodEquipment.xml
+		</modifier>
+		<!--modifier> 
+			Need ability to allow player to specifically deploy dropships
+			HotDrop.xml
+		</modifier-->
+		<modifier>
+			EnemyHotDrop.xml
+		</modifier>
+		<modifier>
+			EnemyDropship.xml
+		</modifier>
+		<modifier>
+			GroundedEnemyDropship.xml
+		</modifier>
+		<modifier>
+			GoodIntel.xml
+		</modifier>
+		<modifier>
+			BadIntel.xml
+		</modifier>
+		<!--modifier>
+			Need "special duel flag".
+			Duel.xml
+		</modifier-->
+		<!--modifier>
+			Need objective system
+			TrainingExercise.xml
+		</modifier-->
+		<modifier>
+			EnemyAmbush.xml
+		</modifier>
+		<modifier>
+			PlayerAmbush.xml
+		</modifier>
+		<modifier>
+			AlliedAirSupport.xml
+		</modifier>
+		<modifier>
+			AlliedAirSupportBombers.xml
+		</modifier>
+		<modifier>
+			AlliedGroundSupport.xml
+		</modifier>
+		<modifier>
+			AlliedArtySupport.xml
+		</modifier>
+		<!--modifier>
+			Need campaign state
+			Need way to change rat for opfor
+			AlliedTreachery.xml
+		</modifier-->
+		<modifier>
+			PreBattleDamage.xml
+		</modifier>
+		<!--modifier>
+			Need planetary condition adjustments
+			OffworldOperation.xml
+		</modifier-->
+		<!--modifier>
+			Need objectives
+			SearchAndRescue.xml
+		</modifier-->
+
+		<!-- Fixed scenario modifiers suitable for specific scenario types go here -->
+		<modifier>
+			AlliedMechGarrison.xml
+		</modifier>
+		<modifier>
+			AlliedTankGarrison.xml
+		</modifier>
+		<modifier>
+			AlliedAirGarrison.xml
+		</modifier>
+		<modifier>
+			AlliedArtyGarrison.xml
+		</modifier>
+		<modifier>
+			EnemyMechGarrison.xml
+		</modifier>
+		<modifier>
+			EnemyTankGarrison.xml
+		</modifier>
+		<modifier>
+			EnemyAirGarrison.xml
+		</modifier>
+		<modifier>
+			EnemyArtyGarrison.xml
+		</modifier>
+		<modifier>
+			ExtraGoodEvent.xml
+		</modifier>
+		<modifier>
+			ExtraBadEvent.xml
+		</modifier>
+		<!--modifier>
+			Need objective mechanism
+			Need campaign state
+			AddObjectiveEvent.xml
+		</modifier-->
+
+		<!-- Scenario modifiers that come from campaign state go here -->
+		<modifier>
+			IntegratedAllies.xml
+		</modifier>
+		<modifier>
+			HouseOfficer.xml
+		</modifier>
+		<modifier>
+			Liaison.xml
+		</modifier>
+		<modifier>
+			PrimaryAllies.xml
+		</modifier>
+		<modifier>
+			AlliedTrainees.xml
+		</modifier>
+	</modifiers>
+</scenarioModifierManifest>

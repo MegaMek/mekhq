@@ -3,10 +3,8 @@ package mekhq.gui.adapter;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
-import java.util.HashMap;
-import java.util.StringTokenizer;
-import java.util.UUID;
-import java.util.Vector;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -16,16 +14,22 @@ import javax.swing.JTree;
 import javax.swing.event.MouseInputAdapter;
 import javax.swing.tree.TreePath;
 
+import org.apache.commons.lang3.tuple.Pair;
+
 import megamek.client.ui.swing.util.MenuScroller;
+import megamek.common.Entity;
 import megamek.common.EntityWeightClass;
 import megamek.common.GunEmplacement;
 import megamek.common.UnitType;
 import mekhq.MekHQ;
+import mekhq.campaign.log.LogEntryController;
 import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.event.NetworkChangedEvent;
 import mekhq.campaign.event.OrganizationChangedEvent;
 import mekhq.campaign.event.PersonTechAssignmentEvent;
+import mekhq.campaign.event.UnitChangedEvent;
 import mekhq.campaign.force.Force;
+import mekhq.campaign.log.ServiceLogger;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
@@ -33,6 +37,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
+import mekhq.gui.dialog.CamoChoiceDialog;
 import mekhq.gui.dialog.ImageChoiceDialog;
 import mekhq.gui.dialog.TextAreaDialog;
 import mekhq.gui.utilities.StaticChecks;
@@ -118,24 +123,23 @@ ActionListener {
                     if (singleForce.getTechID() != null) {
                         Person oldTech = gui.getCampaign().getPerson(singleForce.getTechID());
                         oldTech.clearTechUnitIDs();
-                        oldTech.addLogEntry(gui.getCampaign().getDate(), "Removed from " + singleForce.getName());
+                        ServiceLogger.removedFrom(oldTech, gui.getCampaign().getDate(), singleForce.getName());
                     }
                     singleForce.setTechID(tech.getId());
-                    tech.addLogEntry(gui.getCampaign().getDate(), "Assigned to " + singleForce.getFullName());
+
+                    ServiceLogger.assignedTo(tech, gui.getCampaign().getDate(), singleForce.getName());
+
                     if (singleForce.getAllUnits() !=null) {
                         String cantTech = "";
                         for (UUID uuid : singleForce.getAllUnits()) {
                             Unit u = gui.getCampaign().getUnit(uuid);
                             if (u != null) {
-                                if (null != u.getTech()) {
-                                    Person oldTech = u.getTech();
-                                    oldTech.removeTechUnitId(u.getId());
-                                    u.removeTech();
-                                }
                                 if (tech.canTech(u.getEntity())) {
-                                    u.setTech(tech.getId());
-                                    tech.addTechUnitID(u.getId());
-                                    MekHQ.triggerEvent(new PersonTechAssignmentEvent(tech, u));
+                                    if (null != u.getTech()) {
+                                        u.removeTech();
+                                    }
+                                    
+                                    u.setTech(tech);
                                 } else {
                                     cantTech += tech.getName() + " cannot maintain " + u.getName() + "\n";
                                 }
@@ -193,6 +197,24 @@ ActionListener {
                     MekHQ.triggerEvent(new OrganizationChangedEvent(singleForce));
                 }
             }
+        } else if (command.contains("CHANGE_CAMO")) {
+            if (null != singleForce) {
+                CamoChoiceDialog ccd = getCamoChoiceDialogForForce(singleForce);
+                ccd.setLocationRelativeTo(gui.getFrame());
+                ccd.setVisible(true);
+    
+                if (ccd.clickedSelect() == true) {
+                    for (UUID id : singleForce.getAllUnits()) {
+                        Unit unit = gui.getCampaign().getUnit(id);
+                        if (null != unit) {
+                            unit.getEntity().setCamoCategory(ccd.getCategory());
+                            unit.getEntity().setCamoFileName(ccd.getFileName());
+                            MekHQ.triggerEvent(new UnitChangedEvent(unit));
+                        }
+                    }
+                    MekHQ.triggerEvent(new OrganizationChangedEvent(singleForce));
+                }
+            }
         } else if (command.contains("CHANGE_NAME")) {
             if (null != singleForce) {
                 String name = (String) JOptionPane.showInputDialog(null,
@@ -232,17 +254,14 @@ ActionListener {
             if (singleForce.getTechID() != null) {
                 Person oldTech = gui.getCampaign().getPerson(singleForce.getTechID());
                 oldTech.clearTechUnitIDs();
-                oldTech.addLogEntry(gui.getCampaign().getDate(), "Removed from " + singleForce.getName());
+
+                ServiceLogger.removedFrom(oldTech, gui.getCampaign().getDate(), singleForce.getName());
+
                 if (singleForce.getAllUnits() !=null) {
                     for (UUID uuid : singleForce.getAllUnits()) {
                         Unit u = gui.getCampaign().getUnit(uuid);
                         if (null != u.getTech()) {
-                            oldTech = u.getTech();
-                            oldTech.removeTechUnitId(u.getId());
-                            MekHQ.triggerEvent(new PersonTechAssignmentEvent(oldTech, u));
-                        }
-                        if (u != null) {
-                            u.setTech((UUID)null);
+                            u.removeTech();
                         }
                     }
                 }
@@ -256,9 +275,6 @@ ActionListener {
                         gui.getCampaign().removeUnitFromForce(unit);
                         if (null != parentForce.getTechID()) {
                             unit.removeTech();
-                            Person forceTech = gui.getCampaign().getPerson(parentForce.getTechID());
-                            forceTech.removeTechUnitId(unit.getId());
-                            MekHQ.triggerEvent(new PersonTechAssignmentEvent(forceTech, unit));
                         }
                     }
                     MekHQ.triggerEvent(new OrganizationChangedEvent(parentForce, unit));
@@ -867,6 +883,12 @@ ActionListener {
                     menuItem.addActionListener(this);
                     menuItem.setEnabled(true);
                     popup.add(menuItem);
+
+                    menuItem = new JMenuItem("Change Force Camo...");
+                    menuItem.setActionCommand("CHANGE_CAMO|FORCE|empty|" + forceIds);
+                    menuItem.addActionListener(this);
+                    menuItem.setEnabled(true);
+                    popup.add(menuItem);
                 }
                 if (StaticChecks.areAllForcesUndeployed(forces)) {
                     menu = new JMenu("Deploy Force");
@@ -1108,5 +1130,42 @@ ActionListener {
             }
             popup.show(e.getComponent(), e.getX(), e.getY());
         }
+    }
+
+    /**
+     * Creates a Camouflage choice dialog for a force, starting with
+     * the most used camouflage in the force; otherwise the campaign
+     * camouflage.
+     * @param force The force to create a camouflage choice dialog for.
+     * @return A CamoChoiceDialog for the given force.
+     */
+    private CamoChoiceDialog getCamoChoiceDialogForForce(Force force) {
+        String category = gui.getCampaign().getCamoCategory();
+        String fileName = gui.getCampaign().getCamoFileName();
+
+        // Gather the most used camo category/file name for the force
+        Optional<Pair<String, String>> used = force.getAllUnits().stream()
+            .map(id -> gui.getCampaign().getUnit(id))
+            .filter(u -> u != null)
+            .map(u -> u.getEntity())
+            .collect(
+                Collectors.collectingAndThen(
+                    Collectors.groupingBy(
+                        e -> Pair.of(e.getCamoCategory(), e.getCamoFileName()), 
+                        Collectors.counting()),
+                    m -> m.entrySet().stream().max(Map.Entry.comparingByValue()).map(o -> o.getKey())
+                )
+            );
+        if (used.isPresent()) {
+            // IF there is a camo category and its not blank...
+            if (used.get().getKey() != "" && used.get().getKey() != null) {
+                // ...use it as the category/fileName
+                category = used.get().getKey();
+                fileName = used.get().getValue();
+            }
+        }
+
+        return new CamoChoiceDialog(gui.getFrame(), true, category, fileName, 
+            gui.getCampaign().getColorIndex(), gui.getIconPackage().getCamos());
     }
 }

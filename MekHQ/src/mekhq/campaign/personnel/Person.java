@@ -23,28 +23,14 @@ package mekhq.campaign.personnel;
 
 import java.io.PrintWriter;
 import java.io.Serializable;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.EnumMap;
-import java.util.Enumeration;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
-import java.util.StringTokenizer;
-import java.util.UUID;
-import java.util.Vector;
+import java.util.*;
 import java.util.function.IntSupplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import mekhq.campaign.*;
+import mekhq.campaign.log.*;
 import org.joda.time.DateTime;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -76,10 +62,6 @@ import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
 import mekhq.Version;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.CampaignOptions;
-import mekhq.campaign.ExtraData;
-import mekhq.campaign.LogEntry;
 import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.mod.am.InjuryUtil;
 import mekhq.campaign.unit.Unit;
@@ -97,7 +79,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
     public static final int G_FEMALE = 1;
 
     /* If any new roles are added they should go at the end. They should also be accounted for
-     * in isCombatRole(int) or isSupportRole(int)
+     * in isCombatRole(int) or isSupportRole(int). You should also increase the value of T_NUM
+     * if you add new roles.
      */
     public static final int T_NONE = 0;
     public static final int T_MECHWARRIOR = 1;
@@ -127,6 +110,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
     public static final int T_ADMIN_HR = 25; // End of support roles
     public static final int T_LAM_PILOT = 26; // Not a separate type, but an alias for MW + Aero pilot
                                               // Does not count as either combat or support role
+
+    // This value should always be +1 of the last defined role
     public static final int T_NUM = 27;
 
     public static final int S_ACTIVE = 0;
@@ -171,9 +156,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     public static final int DESIG_GAMMA   = 13;
     public static final int DESIG_NUM     = 14;
     
-    public static final String LOGTYPE_MEDICAL = "med";
-    
-    private static final Map<Integer, Integer> MECHWARRIOR_AERO_RANSOM_VALUES; 
+    private static final Map<Integer, Integer> MECHWARRIOR_AERO_RANSOM_VALUES;
     private static final Map<Integer, Integer> OTHER_RANSOM_VALUES;
     
 
@@ -257,12 +240,16 @@ public class Person implements Serializable, MekHqXmlSerializable {
     boolean dependent;
     boolean commander;
     boolean isClanTech;
+    // Supports edge usage by a ship's engineer composite crewman
     int edgeUsedThisRound;
+    // To track how many edge points support personnel have left until next refresh
+    int currentEdge;
 
     //phenotype and background
     private int phenotype;
     private boolean clan;
     private String bloodname;
+    private Faction originFaction;
 
     //assignments
     private UUID unitId;
@@ -400,7 +387,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
         techUnitIds = new ArrayList<UUID>();
         salary = -1;
         phenotype = PHENOTYPE_NONE;
-        clan = Faction.getFaction(factionCode).isClan();
+        originFaction = Faction.getFaction(factionCode);
+        clan = originFaction.isClan();
         bloodname = "";
         primaryDesignator = DESIG_NONE;
         secondaryDesignator = DESIG_NONE;
@@ -439,6 +427,14 @@ public class Person implements Serializable, MekHqXmlSerializable {
 
     public void setBloodname(String bn) {
         bloodname = bn;
+    }
+
+    public Faction getOriginFaction() {
+        return originFaction;
+    }
+
+    public void setOriginFaction(Faction f) {
+        originFaction = f;
     }
 
     public boolean isCommander() {
@@ -1076,7 +1072,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
             baby.setAncestorsID(ancId);
             campaign.addReport(getHyperlinkedName() + " has given birth to " + baby.getHyperlinkedName() + ", a baby " + (baby.getGender() == G_MALE ? "boy!" : "girl!"));
             if (campaign.getCampaignOptions().logConception()) {
-                addLogEntry(campaign.getDate(), "Delivered a healthy baby " + (baby.getGender() == G_MALE ? "boy!" : "girl!"), Person.LOGTYPE_MEDICAL);
+                MedicalLogger.deliveredBaby(this, baby, campaign.getDate());
             }
             return baby;
         }).collect(Collectors.toList());
@@ -1113,14 +1109,11 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     String sizeString = (size < PREGNANCY_MULTIPLE_NAMES.length) ? PREGNANCY_MULTIPLE_NAMES[size] : null;
                     if(null == sizeString) {
                         campaign.addReport(getHyperlinkedName()+" has conceived");
-                        if (campaign.getCampaignOptions().logConception()) {
-                            addLogEntry(campaign.getDate(), "Has conceived", Person.LOGTYPE_MEDICAL);
-                        }
                     } else {
                         campaign.addReport(getHyperlinkedName()+" has conceived " + sizeString);
-                        if (campaign.getCampaignOptions().logConception()) {
-                            addLogEntry(campaign.getDate(), "Has conceived " + sizeString, Person.LOGTYPE_MEDICAL);
-                        }
+                    }
+                    if (campaign.getCampaignOptions().logConception()) {
+                        MedicalLogger.hasConceived(this, campaign.getDate(), sizeString);
                     }
                 }
             }
@@ -1139,14 +1132,11 @@ public class Person implements Serializable, MekHqXmlSerializable {
         String sizeString = (size < PREGNANCY_MULTIPLE_NAMES.length) ? PREGNANCY_MULTIPLE_NAMES[size] : null;
         if(null == sizeString) {
             campaign.addReport(getHyperlinkedName()+" has conceived");
-            if (campaign.getCampaignOptions().logConception()) {
-                addLogEntry(campaign.getDate(), "Has conceived", Person.LOGTYPE_MEDICAL);
-            }
         } else {
             campaign.addReport(getHyperlinkedName()+" has conceived " + sizeString);
-            if (campaign.getCampaignOptions().logConception()) {
-                addLogEntry(campaign.getDate(), "Has conceived " + sizeString, Person.LOGTYPE_MEDICAL);
-            }
+        }
+        if (campaign.getCampaignOptions().logConception()) {
+            MedicalLogger.hasConceived(this, campaign.getDate(), sizeString);
         }
     }
 
@@ -1309,6 +1299,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     + MekHqXmlUtil.escape(Boolean.toString(dependent))
                     + "</dependent>");
         pw1.println(MekHqXmlUtil.indentStr(indent + 1)
+                    + "<faction>"
+                    + originFaction.getShortName()
+                    + "</faction>");
+        pw1.println(MekHqXmlUtil.indentStr(indent + 1)
                     + "<clan>"
                     + clan
                     + "</clan>");
@@ -1469,6 +1463,13 @@ public class Person implements Serializable, MekHqXmlSerializable {
                         + "<edge>"
                         + String.valueOf(getOptionList("::", PilotOptions.EDGE_ADVANTAGES))
                         + "</edge>");
+            // For support personnel, write an available edge value
+            if (isSupport() || isEngineer()) {
+                pw1.println(MekHqXmlUtil.indentStr(indent + 1)
+                        + "<edgeAvailable>"
+                        + getCurrentEdge()
+                        + "</edgeAvailable>");
+            }
         }
         if (countOptions(PilotOptions.MD_ADVANTAGES) > 0) {
             pw1.println(MekHqXmlUtil.indentStr(indent + 1)
@@ -1572,6 +1573,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     retVal.commander = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("dependent")) {
                     retVal.dependent = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("faction")) {
+                    retVal.originFaction = Faction.getFaction(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("isClanTech")
                            || wn2.getNodeName().equalsIgnoreCase("clan")) {
                     retVal.clan = Boolean.parseBoolean(wn2.getTextContent().trim());
@@ -1686,6 +1689,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
                     advantages = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("edge")) {
                     edge = wn2.getTextContent();
+                } else if (wn2.getNodeName().equalsIgnoreCase("edgeAvailable")) {
+                    retVal.currentEdge = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("implants")) {
                     implants = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("toughness")) {
@@ -1725,8 +1730,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                                     "Unknown node type not loaded in techUnitIds nodes: " + wn3.getNodeName()); //$NON-NLS-1$
                             continue;
                         }
-                        retVal.techUnitIds.add(UUID.fromString(wn3.getTextContent()));
-
+                        retVal.addTechUnitID(UUID.fromString(wn3.getTextContent()));
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("personnelLog")) {
                     NodeList nl2 = wn2.getChildNodes();
@@ -1744,7 +1748,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                                     "Unknown node type not loaded in personnel log nodes: " + wn3.getNodeName()); //$NON-NLS-1$
                             continue;
                         }
-                        retVal.addLogEntry(LogEntry.generateInstanceFromXML(wn3));
+                        retVal.addLogEntry(LogEntryFactory.getInstance().generateInstanceFromXML(wn3));
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("awards")){
                     NodeList nl2 = wn2.getChildNodes();
@@ -2593,7 +2597,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     public Skill getSkill(String skillName) {
         return skills.get(skillName);
     }
-
+    
     public void addSkill(String skillName, int lvl, int bonus) {
         skills.put(skillName, new Skill(skillName, lvl, bonus));
     }
@@ -2815,6 +2819,30 @@ public class Person implements Serializable, MekHqXmlSerializable {
         }
     }
     
+    /**
+     * Resets support personnel edge points to the purchased level. Used for weekly refresh.
+     * 
+     */
+    public void resetCurrentEdge() {
+        setCurrentEdge(getEdge());
+    }
+    
+    /**
+     * Sets support personnel edge points to the value 'e'. Used for weekly refresh.
+     * @param e - integer used to track this person's edge points available for the current week
+     */
+    public void setCurrentEdge(int e) {
+        currentEdge = e;
+    }
+    
+    /**
+     *  Returns this person's currently available edge points. Used for weekly refresh.
+     * 
+     */
+    public int getCurrentEdge() {
+        return currentEdge;
+    }
+    
     public void setEdgeUsed(int e) {
         edgeUsedThisRound = e;
     }
@@ -2823,7 +2851,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return edgeUsedThisRound;
     }
 
-    /*
+    /**
      * This will set a specific edge trigger, regardless of the current status
      */
     public void setEdgeTrigger(String name, boolean status) {
@@ -3029,7 +3057,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
             return false;
         }
         for (Unit u : campaign.getUnits()) {
-            if (u.isMothballing() && u.getTechId().equals(id)) {
+            if (u.isMothballing() && u.getTech().getId().equals(id)) {
                 return true;
             }
         }
@@ -3048,8 +3076,10 @@ public class Person implements Serializable, MekHqXmlSerializable {
         techUnitIds.remove(i);
     }
 
-    public void addTechUnitID(UUID i) {
-        techUnitIds.add(i);
+    public void addTechUnitID(UUID id) {
+        if (!techUnitIds.contains(id)) {
+            techUnitIds.add(id);
+        }
     }
 
     public void clearTechUnitIDs() {
@@ -3429,16 +3459,6 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return personnelLog;
     }
 
-
-    
-    public void addLogEntry(Date d, String desc, String type) {
-        personnelLog.add(new LogEntry(d, desc, type));
-    }
-
-    public void addLogEntry(Date d, String desc) {
-        personnelLog.add(new LogEntry(d, desc));
-    }
-
     public void addLogEntry(LogEntry entry) {
         personnelLog.add(entry);
     }
@@ -3495,12 +3515,12 @@ public class Person implements Serializable, MekHqXmlSerializable {
         }
         Unit u = campaign.getUnit(getUnitId());
         if (status == Person.S_KIA) {
-            addLogEntry(campaign.getDate(), "Died from " + getGenderPronoun(PRONOUN_HISHER) + " wounds");
+            MedicalLogger.diedFromWounds(this, campaign.getDate());
             //set the deathday
             setDeathday((GregorianCalendar) campaign.getCalendar().clone());
         }
         if (status == Person.S_RETIRED) {
-            addLogEntry(campaign.getDate(), "Retired from active duty due to " + getGenderPronoun(PRONOUN_HISHER) + " wounds");
+            ServiceLogger.retireDueToWounds(this, campaign.getDate());
         }
         setStatus(status);
         if (status != Person.S_ACTIVE) {

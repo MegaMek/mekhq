@@ -1,0 +1,31 @@
+<AtBScenarioModifier>
+	<additionalBriefingText>This facility is defended by an additional force of enemy artillery who have been unable to clear the area.</additionalBriefingText>
+	<benefitsPlayer>false</benefitsPlayer>
+	<eventTiming>PreForceGeneration</eventTiming>
+	<forceDefinition>
+<actualDeploymentZone>-1</actualDeploymentZone>
+<allowAeroBombs>false</allowAeroBombs>
+<allowedUnitType>1</allowedUnitType>
+<arrivalTurn>0</arrivalTurn>
+<canReinforceLinked>false</canReinforceLinked>
+<contributesToBV>false</contributesToBV>
+<contributesToMapSize>true</contributesToMapSize>
+<contributesToUnitCount>false</contributesToUnitCount>
+<deployOffboard>false</deployOffboard>
+<deploymentZones>
+<deploymentZone>10</deploymentZone>
+</deploymentZones>
+<destinationZone>4</destinationZone>
+<fixedUnitCount>-1</fixedUnitCount>
+<forceAlignment>2</forceAlignment>
+<forceMultiplier>1.0</forceMultiplier>
+<forceName>Opfor Artillery Garrison</forceName>
+<generationMethod>3</generationMethod>
+<generationOrder>1</generationOrder>
+<maxWeightClass>4</maxWeightClass>
+<retreatThreshold>75</retreatThreshold>
+<startingAltitude>0</startingAltitude>
+<syncDeploymentType>None</syncDeploymentType>
+<useArtillery>true</useArtillery>
+	</forceDefinition>
+</AtBScenarioModifier>

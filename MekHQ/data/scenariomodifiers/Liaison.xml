@@ -1,0 +1,30 @@
+<AtBScenarioModifier>
+	<additionalBriefingText>The employer's liaison will deploy alongside your force in a battlemech, under your command. Keep them alive.</additionalBriefingText>
+	<benefitsPlayer>true</benefitsPlayer>
+	<eventTiming>PreForceGeneration</eventTiming>
+	<forceDefinition>
+<actualDeploymentZone>-1</actualDeploymentZone>
+<allowAeroBombs>false</allowAeroBombs>
+<allowedUnitType>0</allowedUnitType>
+<arrivalTurn>0</arrivalTurn>
+<canReinforceLinked>false</canReinforceLinked>
+<contributesToBV>false</contributesToBV>
+<contributesToMapSize>false</contributesToMapSize>
+<contributesToUnitCount>true</contributesToUnitCount>
+<deployOffboard>false</deployOffboard>
+<deploymentZones/>
+<destinationZone>4</destinationZone>
+<fixedUnitCount>1</fixedUnitCount>
+<forceAlignment>0</forceAlignment>
+<forceMultiplier>1.0</forceMultiplier>
+<forceName>Attached Liaison</forceName>
+<generationMethod>3</generationMethod>
+<generationOrder>1</generationOrder>
+<maxWeightClass>4</maxWeightClass>
+<retreatThreshold>0</retreatThreshold>
+<startingAltitude>0</startingAltitude>
+<syncDeploymentType>SameEdge</syncDeploymentType>
+<syncedForceName>Player</syncedForceName>
+<useArtillery>false</useArtillery>
+	</forceDefinition>
+</AtBScenarioModifier>

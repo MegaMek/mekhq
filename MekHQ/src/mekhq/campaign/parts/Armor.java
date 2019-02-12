@@ -367,12 +367,14 @@ public class Armor extends Part implements IAcquisitionWork {
 	}
 
 	public int getBaseTimeFor(Entity entity) {
-		if(entity instanceof Tank) {
-			return 3;
-		}
-		//December 2017 errata, only large craft should return 15m/point.
-		else if(entity.hasETypeFlag(Entity.ETYPE_DROPSHIP) || entity.hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
-			return 15;
+		if (null != entity) {
+			if (entity instanceof Tank) {
+				return 3;
+			}
+			//December 2017 errata, only large craft should return 15m/point.
+			else if (entity.hasETypeFlag(Entity.ETYPE_DROPSHIP) || entity.hasETypeFlag(Entity.ETYPE_JUMPSHIP)) {
+				return 15;
+			}
 		}
 		return 5;
 	}
@@ -395,10 +397,11 @@ public class Armor extends Part implements IAcquisitionWork {
 	
 	@Override 
 	public int getBaseTime() {
-		if(isSalvaging()) {
-			return getBaseTimeFor(unit.getEntity()) * amount;
+		Entity entity = unit != null ? unit.getEntity() : null;
+		if (isSalvaging()) {
+			return getBaseTimeFor(entity) * amount;
 		}
-		return getBaseTimeFor(unit.getEntity()) * Math.min(amountNeeded, getAmountAvailable());
+		return getBaseTimeFor(entity) * Math.min(amountNeeded, getAmountAvailable());
 	}
 	
 	@Override

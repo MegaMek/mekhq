@@ -48,6 +48,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import megamek.client.ratgenerator.FactionRecord;
+import megamek.client.ratgenerator.RATGenerator;
 import megamek.common.EquipmentType;
 import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
@@ -229,6 +231,10 @@ public class Faction {
         return validIn(time.getYear());
     }
 
+    public boolean validBetween(int startYear, int endYear) {
+        return (startYear <= end) && (endYear >= start);
+    }
+
     public Integer getId() {
         return id;
     }
@@ -277,6 +283,35 @@ public class Faction {
         return faction;
     }
 
+    /**
+     * Helper function that gets the faction record for the specified faction, or a fallback general faction record.
+     * Useful for RAT generator activity.
+     * @param faction The faction whose Megamek faction record to retrieve.
+     * @return Found faction record or null.
+     */
+    public static FactionRecord getFactionRecordOrFallback(String faction) {
+        FactionRecord fRec = RATGenerator.getInstance().getFaction(faction);
+        if (fRec == null) {
+            Faction f = Faction.getFaction(faction);
+            if (f != null) {
+                if (f.isPeriphery()) {
+                    fRec = RATGenerator.getInstance().getFaction("Periphery");
+                } else if (f.isClan()) {
+                    fRec = RATGenerator.getInstance().getFaction("CLAN");                   
+                } else {
+                    fRec = RATGenerator.getInstance().getFaction("IS");
+                }
+            }
+            
+            if (fRec == null) {
+                MekHQ.getLogger().log(RATGenerator.class, "getFactionRecordOrFallback", LogLevel.ERROR,
+                        "Could not locate faction record for " + faction); //$NON-NLS-1$
+            }
+        }
+        
+        return fRec;
+    }
+    
     public static String getFactionCode(int faction) {
         Faction f = factionIdMap.get(faction);
         return (null != f) ? f.getShortName() : "IND"; //$NON-NLS-1$
@@ -463,8 +498,17 @@ public class Faction {
         MERC,
         /** Major trading company */
         TRADER,
-        /** Faction is limited to a single star system, or potentially just a part of a planet */
+        /** Super Power: the Terran Hegemony, the First Star League, and the Federated Commonwealth. (CamOps p12) */
+        SUPER,
+        /**
+         * Major Power: e.g. Inner Sphere Great Houses, Republic of the Sphere, Terran Alliance,
+         * Second Star League, Inner Sphere Clans. (CamOps p12)
+         */
+        MAJOR,
+        /** Faction is limited to a single star system, or potentially just a part of a planet (CamOps p12) */
         MINOR,
+        /** Independent world or Small State (CamOps p12) */
+        SMALL,
         /** Faction is rebelling against the superior ("parent") faction */
         REBEL,
         /** Faction isn't overtly acting on the political/military scale; think ComStar before clan invasion */
@@ -476,6 +520,8 @@ public class Faction {
         /** Faction is campaign-specific, generated on the fly */
         GENERATED,
         /** Faction is hidden from view */
-        HIDDEN
+        HIDDEN,
+        /** Faction code is not intended to be for players */
+        SPECIAL
     }
 }

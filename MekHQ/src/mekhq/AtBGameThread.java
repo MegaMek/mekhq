@@ -38,7 +38,9 @@ import megamek.common.Player;
 import megamek.common.UnitType;
 import megamek.common.logging.LogLevel;
 import mekhq.campaign.force.Lance;
+import mekhq.campaign.mission.AtBDynamicScenario;
 import mekhq.campaign.mission.AtBScenario;
+import mekhq.campaign.mission.BotForce;
 import mekhq.campaign.unit.Unit;
 
 /**
@@ -49,14 +51,14 @@ import mekhq.campaign.unit.Unit;
  *
  */
 public class AtBGameThread extends GameThread {
-	
-	AtBScenario scenario;
 
-     public AtBGameThread(String name, Client c, MekHQ app, ArrayList<Unit> units, AtBScenario scenario) {
-    	 this(name, c, app, units, scenario, true);
-     }
-     
-     public AtBGameThread(String name, Client c, MekHQ app, ArrayList<Unit> units, AtBScenario scenario, boolean started) {
+    AtBScenario scenario;
+
+    public AtBGameThread(String name, Client c, MekHQ app, ArrayList<Unit> units, AtBScenario scenario) {
+        this(name, c, app, units, scenario, true);
+    }
+
+    public AtBGameThread(String name, Client c, MekHQ app, ArrayList<Unit> units, AtBScenario scenario, boolean started) {
         super(name, c, app, units, started);
         this.scenario = scenario;
     }
@@ -66,10 +68,10 @@ public class AtBGameThread extends GameThread {
         client.addCloseClientListener(this);
 
         if (swingGui != null) {
-        	for (Client client2 : swingGui.getBots().values()) {
-        		client2.die();
-        	}
-        	swingGui.getBots().clear();
+            for (Client client2 : swingGui.getBots().values()) {
+                client2.die();
+            }
+            swingGui.getBots().clear();
         }
         createController();
         swingGui = new ClientGUI(client, controller);
@@ -94,38 +96,50 @@ public class AtBGameThread extends GameThread {
             // phase
             for (int i = 0; (i < 1000) && (client.getGame().getPhase() == IGame.Phase.PHASE_UNKNOWN); i++) {
                 Thread.sleep(50);
-            	System.out.println("Thread in unknown stage" );
+                System.out.println("Thread in unknown stage" );
             }
 
             if (((client.getGame() != null) && (client.getGame().getPhase() == IGame.Phase.PHASE_LOUNGE))) {
-            	System.out.println("Thread in lounge" );
+                System.out.println("Thread in lounge" );
 
-            	client.getLocalPlayer().setCamoCategory(app.getCampaign().getCamoCategory());
+                client.getLocalPlayer().setCamoCategory(app.getCampaign().getCamoCategory());
                 client.getLocalPlayer().setCamoFileName(app.getCampaign().getCamoFileName());
                 client.getLocalPlayer().setColorIndex(app.getCampaign().getColorIndex());
-            	
+
                 if (started) {
-                	client.getGame().getOptions().loadOptions();
-                	client.sendGameOptions("", app.getCampaign().getGameOptionsVector());
-    				Thread.sleep(campaign.getCampaignOptions().getStartGameDelay());
+                    client.getGame().getOptions().loadOptions();
+                    client.sendGameOptions("", app.getCampaign().getGameOptionsVector());
+                    Thread.sleep(campaign.getCampaignOptions().getStartGameDelay());
                 }
 
                 MapSettings mapSettings = MapSettings.getInstance();
-                File mapgenFile = new File("data/mapgen/" + scenario.getMap() + ".xml");
-                try {
-                	mapSettings = MapSettings.getInstance(new FileInputStream(mapgenFile));
-                } catch (FileNotFoundException ex) {
-                    MekHQ.getLogger().log(getClass(), "run", LogLevel.ERROR, //$NON-NLS-1$
-                            "Could not load map file data/mapgen/" + scenario.getMap() + ".xml"); //$NON-NLS-1$
-                    MekHQ.getLogger().error(getClass(), "run", ex); //$NON-NLS-1$
+
+                // if the scenario is taking place in space, do space settings instead
+                if((scenario instanceof AtBScenario) &&
+                        scenario.getTerrainType() == AtBScenario.TER_SPACE) {
+                    mapSettings.setMedium(MapSettings.MEDIUM_SPACE);
+                } else {
+                    File mapgenFile = new File("data/mapgen/" + scenario.getMap() + ".xml");
+                    try {
+                        mapSettings = MapSettings.getInstance(new FileInputStream(mapgenFile));
+                    } catch (FileNotFoundException ex) {
+                        MekHQ.getLogger().log(getClass(), "run", LogLevel.ERROR, //$NON-NLS-1$
+                                "Could not load map file data/mapgen/" + scenario.getMap() + ".xml"); //$NON-NLS-1$
+                        MekHQ.getLogger().error(getClass(), "run", ex); //$NON-NLS-1$
+                    }
+
+                    if(scenario.getTerrainType() == AtBScenario.TER_LOW_ATMO) {
+                        mapSettings.setMedium(MapSettings.MEDIUM_ATMOSPHERE);
+                    }
                 }
+
                 mapSettings.setBoardSize(scenario.getMapX(), scenario.getMapY());
                 mapSettings.setMapSize(1,  1);
                 mapSettings.getBoardsSelectedVector().clear();
                 mapSettings.getBoardsSelectedVector().add(MapSettings.BOARD_GENERATED);
                 client.sendMapSettings(mapSettings);
-				Thread.sleep(campaign.getCampaignOptions().getStartGameDelay());
-                
+                Thread.sleep(campaign.getCampaignOptions().getStartGameDelay());
+
                 PlanetaryConditions planetaryConditions = new PlanetaryConditions(); 
                 planetaryConditions.setLight(scenario.getLight());
                 planetaryConditions.setWeather(scenario.getWeather());
@@ -134,134 +148,142 @@ public class AtBGameThread extends GameThread {
                 planetaryConditions.setAtmosphere(scenario.getAtmosphere());
                 planetaryConditions.setGravity(scenario.getGravity());
                 client.sendPlanetaryConditions(planetaryConditions);
-				Thread.sleep(campaign.getCampaignOptions().getStartGameDelay());
-                
+                Thread.sleep(campaign.getCampaignOptions().getStartGameDelay());
+
                 client.getLocalPlayer().setStartingPos(scenario.getStart());
                 client.getLocalPlayer().setTeam(1);
-                
+
                 /* If the player is making a combat drop (either required by scenario
                  * or player chose to deploy a DropShip), do not use deployment
                  * delay for slower scout units.
                  */
                 boolean useDropship = false;
                 if (scenario.getLanceRole() == Lance.ROLE_SCOUT) {
-	                for (Entity en : scenario.getAlliesPlayer()) {
-	                	if (en.getUnitType() == UnitType.DROPSHIP) {
-	                		useDropship = true;
-	                		break;
-	                	}
-	                }
-	                if (!useDropship) {
-		                for (Unit unit : units) {
-		                	if (unit.getEntity().getUnitType() == UnitType.DROPSHIP) {
-		                		useDropship = true;
-		                		break;
-		                	}
-		                }
-	                }
+                    for (Entity en : scenario.getAlliesPlayer()) {
+                        if (en.getUnitType() == UnitType.DROPSHIP) {
+                            useDropship = true;
+                            break;
+                        }
+                    }
+                    if (!useDropship) {
+                        for (Unit unit : units) {
+                            if (unit.getEntity().getUnitType() == UnitType.DROPSHIP) {
+                                useDropship = true;
+                                break;
+                            }
+                        }
+                    }
                 }
 
                 for (Unit unit : units) {
-                	// Get the Entity
-                	Entity entity = unit.getEntity();
-                	// Set the TempID for autoreporting
-                	entity.setExternalIdAsString(unit.getId().toString());
-                	// Set the owner
-                	entity.setOwner(client.getLocalPlayer()); 
-                	// Calculate deployment round
-            		int speed = entity.getWalkMP();
-            		if (entity.getJumpMP() > 0) {
-	            		if (entity instanceof megamek.common.Infantry) {
-	            			speed = entity.getJumpMP();
-	            		} else {
-	            			speed++;
-	            		}
-            		}
-            		/* Set scenario type-specific delay */
-                	int deploymentRound = Math.max(entity.getDeployRound(), scenario.getDeploymentDelay() - speed);
-                	/* Lances deployed in scout roles always deploy units in 6-walking speed turns */
-                	if ((scenario.getLanceRole() == Lance.ROLE_SCOUT)
-                	        && (scenario.getLance(campaign) != null)
-                			&& (scenario.getLance(campaign).getForceId() == scenario.getLanceForceId())
-                			&& !useDropship) {
-                		deploymentRound = Math.max(deploymentRound, 6 - speed);
-                	}
-                	entity.setDeployRound(Math.max(0, deploymentRound));
-                	// Add Mek to game
-                	client.sendAddEntity(entity);
-                	// Wait a few secs to not overuse bandwith
-                	Thread.sleep(campaign.getCampaignOptions().getStartGameDelay());
+                    // Get the Entity
+                    Entity entity = unit.getEntity();
+                    // Set the TempID for autoreporting
+                    entity.setExternalIdAsString(unit.getId().toString());
+                    // Set the owner
+                    entity.setOwner(client.getLocalPlayer()); 
+                    // Calculate deployment round
+                    int deploymentRound = entity.getDeployRound();
+                    if(!(scenario instanceof AtBDynamicScenario)) {
+                        int speed = entity.getWalkMP();
+                        if (entity.getJumpMP() > 0) {
+                            if (entity instanceof megamek.common.Infantry) {
+                                speed = entity.getJumpMP();
+                            } else {
+                                speed++;
+                            }
+                        }
+                        // Set scenario type-specific delay
+                        deploymentRound = Math.max(entity.getDeployRound(), scenario.getDeploymentDelay() - speed);
+                        // Lances deployed in scout roles always deploy units in 6-walking speed turns
+                        if ((scenario.getLanceRole() == Lance.ROLE_SCOUT)
+                                && (scenario.getLance(campaign) != null)
+                                && (scenario.getLance(campaign).getForceId() == scenario.getLanceForceId())
+                                && !useDropship) {
+                            deploymentRound = Math.max(deploymentRound, 6 - speed);
+                        }
+                    }
+                    entity.setDeployRound(deploymentRound);
+                    // Add Mek to game
+                    client.sendAddEntity(entity);
+                    // Wait a few secs to not overuse bandwith
+                    Thread.sleep(campaign.getCampaignOptions().getStartGameDelay());
                 }
 
                 /* Add player-controlled ally units */
                 for (Entity entity : scenario.getAlliesPlayer()) {
-                	if (null == entity) {
-                		continue;
-                	}
-                	entity.setOwner(client.getLocalPlayer());
-            		int speed = entity.getWalkMP();
-            		if (entity.getJumpMP() > 0) {
-	            		if (entity instanceof megamek.common.Infantry) {
-	            			speed = entity.getJumpMP();
-	            		} else {
-	            			speed++;
-	            		}
-            		}
-                	int deploymentRound = Math.max(entity.getDeployRound(), scenario.getDeploymentDelay() - speed);
-                	if (scenario.getLanceRole() == Lance.ROLE_SCOUT
-                			&& scenario.getLance(campaign).getForceId() == scenario.getLanceForceId()
-                			&& !useDropship) {
-                		deploymentRound = Math.max(deploymentRound, 6 - speed);
-                	}
-                	entity.setDeployRound(Math.max(0, deploymentRound));
-                	client.sendAddEntity(entity);
-                	Thread.sleep(campaign.getCampaignOptions().getStartGameDelay());
+                    if (null == entity) {
+                        continue;
+                    }
+                    entity.setOwner(client.getLocalPlayer());
+
+                    int deploymentRound = entity.getDeployRound();
+                    if(!(scenario instanceof AtBDynamicScenario)) {
+                        int speed = entity.getWalkMP();
+                        if (entity.getJumpMP() > 0) {
+                            if (entity instanceof megamek.common.Infantry) {
+                                speed = entity.getJumpMP();
+                            } else {
+                                speed++;
+                            }
+                        }
+                        deploymentRound = Math.max(entity.getDeployRound(), scenario.getDeploymentDelay() - speed);
+                        if (scenario.getLanceRole() == Lance.ROLE_SCOUT
+                                && scenario.getLance(campaign).getForceId() == scenario.getLanceForceId()
+                                && !useDropship) {
+                            deploymentRound = Math.max(deploymentRound, 6 - speed);
+                        }
+                    }
+
+                    entity.setDeployRound(deploymentRound);
+                    client.sendAddEntity(entity);
+                    Thread.sleep(campaign.getCampaignOptions().getStartGameDelay());
                 }
 
                 client.sendPlayerInfo();
-                
+
                 /* Add bots */
                 for (int i = 0; i < scenario.getNumBots(); i++) {
-                	AtBScenario.BotForce bf = scenario.getBotForce(i);
-                	String name = bf.getName();
-                	if (swingGui.getBots().containsKey(name)) {
-                		int append = 2;
-                		while (swingGui.getBots().containsKey(name + append)) {
-                			append++;
-                		}
-                		name += append;
-                	}
-                	Princess botClient = new Princess(name, client.getHost(), client.getPort(), LogLevel.ERROR);
-                	botClient.setBehaviorSettings(bf.getBehaviorSettings());
-                	try {
-                		botClient.connect();
-                	} catch (Exception e) {
+                    BotForce bf = scenario.getBotForce(i);
+                    String name = bf.getName();
+                    if (swingGui.getBots().containsKey(name)) {
+                        int append = 2;
+                        while (swingGui.getBots().containsKey(name + append)) {
+                            append++;
+                        }
+                        name += append;
+                    }
+                    Princess botClient = new Princess(name, client.getHost(), client.getPort(), LogLevel.ERROR);
+                    botClient.setBehaviorSettings(bf.getBehaviorSettings());
+                    try {
+                        botClient.connect();
+                    } catch (Exception e) {
                         MekHQ.getLogger().log(getClass(), "run", LogLevel.ERROR, //$NON-NLS-1$
                                 "Could not connect with Bot name " + bf.getName()); //$NON-NLS-1$
                         MekHQ.getLogger().error(getClass(), "run", e); //$NON-NLS-1$
-                	}
-                	swingGui.getBots().put(name, botClient);
-                	
-                	configureBot(botClient, bf);
+                    }
+                    swingGui.getBots().put(name, botClient);
+
+                    configureBot(botClient, bf);
                 }
 
             }
-            
+
             while(!stop) {
-            	Thread.sleep(50);
+                Thread.sleep(50);
             }
         } catch (Exception e) {
             MekHQ.getLogger().error(getClass(), "run", e); //$NON-NLS-1$
         }
         finally {
-	        client.die();
-	        client = null;
-	        swingGui = null;
-	        controller = null;
+            client.die();
+            client = null;
+            swingGui = null;
+            controller = null;
         }
-        
+
     }
- 
+
     /**
      * wait for the server to add the bot client, then send starting position,
      * camo, and entities
@@ -269,43 +291,43 @@ public class AtBGameThread extends GameThread {
      * @param botClient
      * @param botForce
      */
-    private void configureBot(BotClient botClient, AtBScenario.BotForce botForce) {
-		try {
-			/* Wait for the server to add the bot client, but allow a timeout
-			 * rather than blocking
-			 */
-			int retries = 50;
-			while (retries-- > 0 && null == botClient.getLocalPlayer()) {
-				sleep(50);
-			}
-			if (null == botClient.getLocalPlayer()) {
+    private void configureBot(BotClient botClient, BotForce botForce) {
+        try {
+            /* Wait for the server to add the bot client, but allow a timeout
+             * rather than blocking
+             */
+            int retries = 50;
+            while (retries-- > 0 && null == botClient.getLocalPlayer()) {
+                sleep(50);
+            }
+            if (null == botClient.getLocalPlayer()) {
                 MekHQ.getLogger().log(getClass(), "configureBot", LogLevel.ERROR, //$NON-NLS-1$
                         "Could not configure bot " + botClient.getName()); //$NON-NLS-1$
-			} else {
-				for (Entity entity : botForce.getEntityList()) {
-                	if (null == entity) {
-                		continue;
-                	}
-					entity.setOwner(botClient.getLocalPlayer());
-					botClient.sendAddEntity(entity);
-					Thread.sleep(campaign.getCampaignOptions().getStartGameDelay());
-				}
-				botClient.getLocalPlayer().setTeam(botForce.getTeam());
-				botClient.getLocalPlayer().setStartingPos(botForce.getStart());
+            } else {
+                for (Entity entity : botForce.getEntityList()) {
+                    if (null == entity) {
+                        continue;
+                    }
+                    entity.setOwner(botClient.getLocalPlayer());
+                    botClient.sendAddEntity(entity);
+                    Thread.sleep(campaign.getCampaignOptions().getStartGameDelay());
+                }
+                botClient.getLocalPlayer().setTeam(botForce.getTeam());
+                botClient.getLocalPlayer().setStartingPos(botForce.getStart());
 
-				if (botForce.getCamoCategory() == Player.NO_CAMO) {
-					if (botForce.getColorIndex() >= 0) {
-						botClient.getLocalPlayer().setColorIndex(botForce.getColorIndex());
-					}
-				} else {
-					botClient.getLocalPlayer().setCamoCategory(botForce.getCamoCategory());
-					botClient.getLocalPlayer().setCamoFileName(botForce.getCamoFileName());
-				}
+                if (botForce.getCamoCategory() == Player.NO_CAMO) {
+                    if (botForce.getColorIndex() >= 0) {
+                        botClient.getLocalPlayer().setColorIndex(botForce.getColorIndex());
+                    }
+                } else {
+                    botClient.getLocalPlayer().setCamoCategory(botForce.getCamoCategory());
+                    botClient.getLocalPlayer().setCamoFileName(botForce.getCamoFileName());
+                }
 
-				botClient.sendPlayerInfo();
-			}
-		} catch (Exception e) {
+                botClient.sendPlayerInfo();
+            }
+        } catch (Exception e) {
             MekHQ.getLogger().error(getClass(), "configureBot", e); //$NON-NLS-1$
-		}    	
+        }    	
     }
 }

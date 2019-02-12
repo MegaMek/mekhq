@@ -1,6 +1,42 @@
 VERSION HISTORY:
 ----------------
-v0.45.2-SNAPSHOT
+v0.45.4-SNAPSHOT
+
+v0.45.3 (2019-02-12 0500 UTC)
++ Issue #990: Feature: Add bulk confirm dialog if more than one unit is removed
++ PR #995: Speed up campaign load times by optimizing spare parts importing
++ PR #994: Fix exception seen during log entry updates
++ PR #998: Fix Mac OS X issue so the DateChooser dialog isn't hidden when you create a new campaign
++ PR #996: Feature: adds origin faction to a person's details and support for RAT roller in a person's GM menu
++ PR #997: Add weekly Support Personnel edge refresh and usage
++ PR #1006: Speed up calculation of jump paths
++ PR #999: Adds a GM hire button to new recruit dialog
++ PR #1017: Adds the list of missing units on campaign load to the log
++ Issue #1010: Battle Armor fails to load with StackOverflowException
++ Issue #991: Fix bug where loan collateral and total value is incorrect after save and load.
++ Issue #986: Fix bug where Retirement/Defection dialog doesn't show details for first row.
++ Issue #985: Fix bug where personnel could not be exported.
++ Issue #1022: Fix bug where failed acquisitions did not count against logistics person's limit
++ Issue #964: Do not raise UnitChangedEvent if there is no unit in GM Acquire Instantly
++ Issue #1009: Fix bug where default injury type wrong
++ Issue #976: Fix bug where techs without any minutes left may get stuck on overnight tasks
++ PR #1031: Fix bug where selected repair task moves when you change mode
++ Issue #1028: Fix bug where Mass Repair Options were not applied unless you clicked Save
++ Issue #1005: Allow fractional tons to be loaded in LargeCraftAmmoBins
++ Issue #825: Arbitrary contract score modifier now persists across save/load
++ Issue #970: Can now recruit multiple prisoners at a time
++ Issue #1036: Enable zero intensity level for AtB Scenario Generation
++ Issue #779: Fix AtB deployment nag before a contract has started
++ PR #1036: Make startup GUI show all four buttons at lower resolutions
++ PR #1041: Fix some unit/tech mismatches at CPNX load
++ Issue #772: Fix graphical display issues with multiple-day advancement
++ PR #1045: Crewed Unit Options Handling (SPA/Edge)
++ PR #1045: Resolve errata for reloading times of capital missile ammo (now 1 hour per missile)
++ Issue #1049: Warehouse tab may fail to properly render
++ PR #1053: Add a Change Camouflage context menu item to forces in the TOE
++ Issue #361: Adds assigned Force to the columns on the hangar tab
+
+v0.45.2 (2018-11-18 0200 UTC)
 + Switched build system from ant to gradle.
 + Issue #917: Hire Full Compliment Regularly Hires Bondsmen
 + Issue #919: Dropship Crewmembers/techs displayed as "Nobody" In Repair Bay
@@ -19,6 +55,12 @@ v0.45.2-SNAPSHOT
 + PR #882: Adds support for gzipped Campaign files (*.cpnx.gz).
 + Planets: Reunification War data for Outworlds Alliance + start of RWR 
 + PR #959: Fix for inability to repair damaged VTOL internal structure after loading campaign
++ Issue #967: Fix bug where acquired Units could never be bought
++ PR #971: Feature allowing grouping personnel by their unit on the Personnel tab
++ Issue #865: Changing Award Date Does Not Update Award Tooltip
++ Issue #973: No contracts are offered at the start of an AtB campaign.
++ Issue #949: Mechwarrior KO'ed at beginning of battle
++ Issue #981: Fixed bug where refits overcharged for armor or would perform excess moves
 
 v0.45.1 (2018-09-03 2300 UTC)
 + PR #864: Security - address XXE vulnerabilities in XML parsers

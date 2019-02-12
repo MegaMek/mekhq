@@ -83,6 +83,9 @@ public class Lance implements Serializable, MekHqXmlSerializable {
     public static final long ETYPE_GROUND = Entity.ETYPE_MECH |
             Entity.ETYPE_TANK | Entity.ETYPE_INFANTRY | Entity.ETYPE_PROTOMECH;
 
+    /** Indicates a lance has no assigned mission */
+    public static final int NO_MISSION = -1;
+
     private int forceId;
     private int missionId;
     private int role;
@@ -133,7 +136,7 @@ public class Lance implements Serializable, MekHqXmlSerializable {
 
     public void setContract(AtBContract c) {
         if (null == c) {
-            missionId = -1;
+            missionId = NO_MISSION;
         } else {
             missionId = c.getId();
         }
@@ -217,32 +220,8 @@ public class Lance implements Serializable, MekHqXmlSerializable {
          * weight class and decreasing the enemy force against vehicle/combined
          * lances.
          */
-        double weight = 0.0;
-        for (UUID id : c.getForce(forceId).getUnits()) {
-            Unit unit = c.getUnit(id);
-            if (null != unit) {
-                Entity entity = unit.getEntity();
-                if (null != entity) {
-                    if ((entity.getEntityType() & Entity.ETYPE_MECH) != 0 ||
-                            (entity.getEntityType() & Entity.ETYPE_PROTOMECH) != 0 ||
-                            (entity.getEntityType() & Entity.ETYPE_INFANTRY) != 0) {
-                        weight += entity.getWeight();
-                    } else if ((entity.getEntityType() & Entity.ETYPE_TANK) != 0) {
-                        if (c.getFaction().isClan() || c.getCampaignOptions().getAdjustPlayerVehicles()) {
-                            weight += entity.getWeight() * 0.5;
-                        } else {
-                            weight += entity.getWeight();
-                        }
-                    } else if ((entity.getEntityType() & Entity.ETYPE_AERO) != 0) {
-                        if (c.getFaction().isClan()) {
-                            weight += entity.getWeight() * 0.5;
-                        } else {
-                            weight += entity.getWeight();
-                        }
-                    }
-                }
-            }
-        }
+        double weight = calculateTotalWeight(c, forceId);
+                
         weight = weight * 4.0 / getStdLanceSize(c.getFaction());
         if (weight < 40) {
             return EntityWeightClass.WEIGHT_ULTRA_LIGHT;
@@ -329,6 +308,12 @@ public class Lance implements Serializable, MekHqXmlSerializable {
     }
 
     public AtBScenario checkForBattle(Campaign c) {
+        double intensity = c.getCampaignOptions().getIntensity();
+        if (intensity < AtBContract.MINIMUM_INTENSITY) {
+            // AtB Battle Generation disabled
+            return null;
+        }
+
         int noBattle;
         int roll;
         //thresholds are coded from charts with 1-100 range, so we add 1 to mod to adjust 0-based random int
@@ -336,7 +321,7 @@ public class Lance implements Serializable, MekHqXmlSerializable {
         battleTypeMod += getContract(c).getBattleTypeMod();
         switch (role) {
         case ROLE_FIGHT:
-            noBattle = (int)(60.0 / c.getCampaignOptions().getIntensity() + 0.5);
+            noBattle = (int)(60.0 / intensity + 0.5);
             roll = Compute.randomInt(40 + noBattle) + battleTypeMod;
             if (roll < 1) {
                 return AtBScenarioFactory.createScenario(c, this,
@@ -370,7 +355,7 @@ public class Lance implements Serializable, MekHqXmlSerializable {
                         getBattleDate(c.getCalendar()));
             }
         case Lance.ROLE_SCOUT:
-            noBattle = (int)(40.0 / c.getCampaignOptions().getIntensity() + 0.5);
+            noBattle = (int)(40.0 / intensity + 0.5);
             roll = Compute.randomInt(60 + noBattle) + battleTypeMod;
             if (roll < 1) {
                 return AtBScenarioFactory.createScenario(c, this,
@@ -404,7 +389,7 @@ public class Lance implements Serializable, MekHqXmlSerializable {
                         getBattleDate(c.getCalendar()));
             }
         case Lance.ROLE_DEFEND:
-            noBattle = (int)(80.0 / c.getCampaignOptions().getIntensity() + 0.5);
+            noBattle = (int)(80.0 / intensity + 0.5);
             roll = Compute.randomInt(20 + noBattle) + battleTypeMod;
             if (roll < 1) {
                 return AtBScenarioFactory.createScenario(c, this,
@@ -434,7 +419,7 @@ public class Lance implements Serializable, MekHqXmlSerializable {
                         getBattleDate(c.getCalendar()));
             }
         case Lance.ROLE_TRAINING:
-            noBattle = (int)(90.0 / c.getCampaignOptions().getIntensity() + 0.5);
+            noBattle = (int)(90.0 / intensity + 0.5);
             roll = Compute.randomInt(10 + noBattle) + battleTypeMod;
             if (roll < 1) {
                 return AtBScenarioFactory.createScenario(c, this,
@@ -521,5 +506,43 @@ public class Lance implements Serializable, MekHqXmlSerializable {
             MekHQ.getLogger().error(Lance.class, METHOD_NAME, ex);
         }
         return retVal;
+    }
+    
+    /** 
+     * Worker function that calculates the total weight of a force with the given ID
+     * @param c Campaign in which the force resides
+     * @param forceId Force for which to calculate weight
+     * @return Total force weight
+     */
+    public static double calculateTotalWeight(Campaign c, int forceId) {
+        double weight = 0.0;
+        
+        for (UUID id : c.getForce(forceId).getUnits()) {
+            Unit unit = c.getUnit(id);
+            if (null != unit) {
+                Entity entity = unit.getEntity();
+                if (null != entity) {
+                    if ((entity.getEntityType() & Entity.ETYPE_MECH) != 0 ||
+                            (entity.getEntityType() & Entity.ETYPE_PROTOMECH) != 0 ||
+                            (entity.getEntityType() & Entity.ETYPE_INFANTRY) != 0) {
+                        weight += entity.getWeight();
+                    } else if ((entity.getEntityType() & Entity.ETYPE_TANK) != 0) {
+                        if (c.getFaction().isClan() || c.getCampaignOptions().getAdjustPlayerVehicles()) {
+                            weight += entity.getWeight() * 0.5;
+                        } else {
+                            weight += entity.getWeight();
+                        }
+                    } else if ((entity.getEntityType() & Entity.ETYPE_AERO) != 0) {
+                        if (c.getFaction().isClan()) {
+                            weight += entity.getWeight() * 0.5;
+                        } else {
+                            weight += entity.getWeight();
+                        }
+                    }
+                }
+            }
+        }
+        
+        return weight;
     }
  }

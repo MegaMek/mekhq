@@ -429,22 +429,20 @@ public class FactionBorderTracker {
      * The task that checks all planets within the region and notes which are controlled by which factions
      * and which are within a certain distance of another faction's systems.
      */
-    private void rebuildBorderData() {
+    private synchronized void rebuildBorderData() {
         cancelTask = false;
         try {
             List<Planet> planetList = new ArrayList<>();
             Set<Faction> factionSet = new HashSet<>();
             Set<Faction> oldFactions = new HashSet<>(borders.keySet());
-            synchronized (this) {
-                for (Planet planet : getPlanetList()) {
-                    if ((regionHex.radius < 0)
-                            || regionHex.contains(planet.getX(), planet.getY())) {
-                        planetList.add(planet);
-                        factionSet.addAll(planet.getFactionSet(now));
-                    }
-                    if (cancelTask) {
-                        return;
-                    }
+            for (Planet planet : getPlanetList()) {
+                if ((regionHex.radius < 0)
+                        || regionHex.contains(planet.getX(), planet.getY())) {
+                    planetList.add(planet);
+                    factionSet.addAll(planet.getFactionSet(now));
+                }
+                if (cancelTask) {
+                    return;
                 }
             }
             for (Faction f : factionSet) {
@@ -472,19 +470,15 @@ public class FactionBorderTracker {
                     return;
                 }
             }
-            synchronized (this) {
-                if (cancelTask) {
-                    return;
-                }
-                lastUpdate = now;
+            if (cancelTask) {
+                return;
             }
+            lastUpdate = now;
         } catch (Exception ex) {
             MekHQ.getLogger().error(getClass(), "recalculate()", ex.getMessage());
         } finally {
-            synchronized (this) {
-                invalid = false;
-                notify();
-            }
+            invalid = false;
+            notify();
         }
     }
     

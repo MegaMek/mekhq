@@ -154,6 +154,7 @@ import mekhq.gui.dialog.PopupValueChoiceDialog;
 import mekhq.gui.dialog.RefitNameDialog;
 import mekhq.gui.dialog.ReportDialog;
 import mekhq.gui.dialog.RetirementDefectionDialog;
+import mekhq.gui.dialog.ScenarioTemplateEditorDialog;
 import mekhq.gui.dialog.ShipSearchDialog;
 import mekhq.gui.dialog.UnitCostReportDialog;
 import mekhq.gui.dialog.UnitMarketDialog;
@@ -1148,6 +1149,17 @@ public class CampaignGUI extends JPanel {
             }
         });
         menuManage.add(miBatchXP);
+        
+        JMenuItem miScenarioEditor = new JMenuItem("Scenario Template Editor");
+        miScenarioEditor.setEnabled(true);
+        miScenarioEditor.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent evt) {
+                ScenarioTemplateEditorDialog sted = new ScenarioTemplateEditorDialog(getFrame());
+                sted.setVisible(true);
+            }
+        });
+        menuManage.add(miScenarioEditor);
 
         menuBar.add(menuManage);
 
@@ -1706,7 +1718,7 @@ public class CampaignGUI extends JPanel {
         }
         if (atb != getCampaign().getCampaignOptions().getUseAtB()) {
             if (getCampaign().getCampaignOptions().getUseAtB()) {
-                getCampaign().initAtB();
+                getCampaign().initAtB(false);
                 //refresh lance assignment table
                 MekHQ.triggerEvent(new OrganizationChangedEvent(getCampaign().getForces()));
             }
@@ -1719,17 +1731,18 @@ public class CampaignGUI extends JPanel {
             miRetirementDefectionDialog.setVisible(getCampaign()
                     .getCampaignOptions().getUseAtB());
             if (getCampaign().getCampaignOptions().getUseAtB()) {
-                RandomFactionGenerator.getInstance().startup(getCampaign());
-                while (!RandomUnitGenerator.getInstance().isInitialized()) {
-                    //Sleep for up to one second.
+                int loops = 0;
+                while (!RandomUnitGenerator.getInstance().isInitialized()
+                    || !RandomNameGenerator.getInstance().isInitialized()) {
                     try {
                         Thread.sleep(50);
+                        if (++loops > 20) {
+                            // Wait for up to a second
+                            break;
+                        }
                     } catch (InterruptedException ignore) {
-
                     }
                 }
-                RandomNameGenerator.getInstance();
-                RandomFactionGenerator.getInstance().startup(getCampaign());
             } else {
                 getCampaign().shutdownAtB();
             }

@@ -789,6 +789,8 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
     }
 
     public void refreshTaskList() {
+        selectedRow = taskTable.getSelectedRow();
+        
         UUID uuid = null;
         if (null != getSelectedServicedUnit()) {
             uuid = getSelectedServicedUnit().getId();
@@ -855,12 +857,12 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         // If requested, switch to top entry
         if(getCampaign().getCampaignOptions().useResetToFirstTech() && techTable.getRowCount() > 0) {
             techTable.setRowSelectionInterval(0, 0);
-        } else {
+        } else if (selectedTech != null) {
             // Or get the selected tech back
             for (int i = 0; i < techTable.getRowCount(); i++) {
                 Person p = techsModel
                         .getTechAt(techTable.convertRowIndexToModel(i));
-                if (selectedTech.getId().equals(p.getId())) {
+                if (p != null && selectedTech.getId().equals(p.getId())) {
                     techTable.setRowSelectionInterval(i, i);
                     break;
                 }

@@ -26,6 +26,7 @@ import javax.swing.JFrame;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.mission.ScenarioTemplate;
 import mekhq.io.FileType;
 
 /**
@@ -56,7 +57,7 @@ public class FileDialogs {
      */
     public static Optional<File> savePersonnel(JFrame frame, Campaign campaign) {
 
-        String fileName = String.format( "%s%_ExportedPersonnel.prsx", //$NON-NLS-1$
+        String fileName = String.format( "%s%s_ExportedPersonnel.prsx", //$NON-NLS-1$
                                          campaign.getName(),
                                          campaign.getShortDateAsString() );
 
@@ -197,4 +198,32 @@ public class FileDialogs {
                                    FileType.CPNX );
     }
 
+    /**
+     * Displays a dialog window from which the user can select a scenario template file to open
+     *
+     * @return the file selected, if any
+     */
+    public static Optional<File> openScenarioTemplate(JFrame frame) {
+        return GUI.fileDialogOpen( frame,
+                                   "Load Scenario Template",
+                                   new File("."),
+                                   FileType.XML );
+    }
+
+    /**
+     * Displays a dialog window from which the user can select a scenario template file to save to.
+     *
+     * @return the file selected, if any
+     */
+    public static Optional<File> saveScenarioTemplate(JFrame frame, ScenarioTemplate template) {
+
+        String fileName = String.format( "%s.xml", //$NON-NLS-1$
+                                         template.name);
+
+        return GUI.fileDialogSave( frame,
+                                   "Save Scenario Template",
+                                   new File(".", fileName),
+                                   FileType.XML );
+    }
+    
 }

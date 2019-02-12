@@ -250,7 +250,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 
 	public void calculate() {
         final String METHOD_NAME = "calculate()"; //$NON-NLS-1$
-	    
+
 		Unit newUnit = new Unit(newEntity, oldUnit.campaign);
 		newUnit.initializeParts(false);
 		refitClass = NO_CHANGE;
@@ -278,7 +278,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 		    }
 		}
 
-		//Step 2: loop through the parts arraylist in the newUnit and attempt to find the
+		//Step 2a: loop through the parts arraylist in the newUnit and attempt to find the
 		//corresponding part of missing part in the parts arraylist we just created. Depending on
 		//what we find, we may have:
 		//a) An exact copy in the same location - we move the part from the oldunit parts to the
@@ -289,11 +289,68 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 		//c) We dont find the part in the oldunit part list.  That means this is a new part.  Add
 		//this to the newequipment arraylist from step 3.  Don't change anything in terms of refit
 		//stats yet, that will happen later.
+		List<Part> partsRemaining = new ArrayList<>();
 		for(Part part : newUnit.getParts()) {
 		    if (isOmniRefit && !part.isOmniPodded()) {
 		        continue;
-		    }
+			}
+
 			boolean partFound = false;
+			int i = -1;
+			for(int pid : oldUnitParts) {
+				i++;
+				Part oPart = oldUnit.campaign.getPart(pid);
+				if (isOmniRefit && !oPart.isOmniPodded()) {
+				    continue;
+				}
+				//FIXME: There have been instances of null oParts here. Save/load will fix these, but
+				//I would like to figure out the source. From experimentation, I think it has to do with
+				//cancelling a prior refit.
+				if ((oPart instanceof MissingPart && ((MissingPart)oPart).isAcceptableReplacement(part, true))
+						|| oPart.isSamePartType(part)
+						// We're not going to require replacing the life support system just because the
+						// number of bay personnel changes.
+						|| ((oPart instanceof AeroLifeSupport)
+						        && (part instanceof AeroLifeSupport)
+						        && (!crewSizeChanged()))) {
+					//need a special check for location and armor amount for armor
+					if(oPart instanceof Armor
+							&& (((Armor)oPart).getLocation() != ((Armor)part).getLocation()
+									|| ((Armor)oPart).getTotalAmount() != ((Armor)part).getTotalAmount())) {
+						continue;
+					}
+					if ((oPart instanceof VeeStabiliser)
+					        && (oPart.getLocation() != part.getLocation())) {
+					    continue;
+					}
+					if(part instanceof EquipmentPart) {
+						//check the location to see if this moved. If so, then don't break, but
+						//save this in case we fail to find equipment in the same location.
+						int loc = ((EquipmentPart)part).getLocation();
+						boolean rear = ((EquipmentPart)part).isRearFacing();
+						if((oPart instanceof EquipmentPart
+								&& (((EquipmentPart)oPart).getLocation() != loc || ((EquipmentPart)oPart).isRearFacing() != rear))
+								|| (oPart instanceof MissingEquipmentPart
+										&& (((MissingEquipmentPart)oPart).getLocation() != loc || ((MissingEquipmentPart)oPart).isRearFacing() != rear))) {
+							continue;
+						}
+					}
+					newUnitParts.add(pid);
+					partFound = true;
+					break;
+				}
+			}
+
+			if (partFound) {
+				oldUnitParts.remove(i);
+			} else {
+				// Address new and moved parts next
+				partsRemaining.add(part);	
+			}
+		}
+
+		// Step 2b: Find parts that moved or add them as new parts
+		for (Part part : partsRemaining) {
 			Part movedPart = null;
 			int moveIndex = 0;
 			int i = -1;
@@ -334,17 +391,14 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 										&& (((MissingEquipmentPart)oPart).getLocation() != loc || ((MissingEquipmentPart)oPart).isRearFacing() != rear))) {
 							movedPart = oPart;
 							moveIndex = i;
-							continue;
+							break;
 						}
 					}
-					newUnitParts.add(pid);
-					partFound = true;
-					break;
 				}
 			}
-			if(partFound) {
-				oldUnitParts.remove(i);
-			} else if(null != movedPart) {
+
+			// Actually move the part or add the new part
+			if(null != movedPart) {
 				newUnitParts.add(movedPart.getId());
 				oldUnitParts.remove(moveIndex);
 				if (movedPart.getLocation() >= 0) {
@@ -671,6 +725,8 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
 			}
 			if(oPart instanceof Armor && sameArmorType) {
 				recycledArmorPoints += ((Armor)oPart).getAmount();
+				// Refund the time we added above for the "new" armor that actually wasn't.
+				time -= ((Armor)oPart).getAmount() * ((Armor)oPart).getBaseTimeFor(oldUnit.getEntity());
 				continue;
 			}
 			boolean isSalvaging = oldUnit.isSalvage();
@@ -827,7 +883,7 @@ public class Refit extends Part implements IPartWork, IAcquisitionWork {
                 time = 40320;
             } else if (newEntity instanceof megamek.common.Dropship || newEntity instanceof megamek.common.Jumpship) {
                 time = 13440;
-            } else if (newEntity instanceof Mech || newEntity instanceof megamek.common.Aero || newEntity instanceof megamek.common.ConvFighter || newEntity instanceof megamek.common.SmallCraft) {
+            } else if (newEntity instanceof Mech || newEntity instanceof megamek.common.Aero) { // ConvFighter and SmallCraft are derived from Aero
                 time = 6720;
             } else if (newEntity instanceof BattleArmor || newEntity instanceof megamek.common.Tank || newEntity instanceof megamek.common.Protomech) {
                 time = 3360;

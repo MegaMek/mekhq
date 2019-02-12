@@ -9,6 +9,8 @@ import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.time.Duration;
 import java.util.GregorianCalendar;
 import java.util.ResourceBundle;
@@ -78,6 +80,15 @@ public class AdvanceDaysDialog extends JDialog implements ActionListener {
 
         logPanel = new DailyReportLogPanel(listener);
         getContentPane().add(logPanel, BorderLayout.CENTER);
+
+        addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent e) {
+                // We need to unregister here as unregistering in the actionPerformed
+                // method will lead to incorrect behaviour if the user tries to advance
+                // days again without exiting this dialog
+                MekHQ.unregisterHandler(this);
+            }
+        });
     }
 
     /* (non-Javadoc)
@@ -97,8 +108,9 @@ public class AdvanceDaysDialog extends JDialog implements ActionListener {
                         new java.util.GregorianCalendar(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH)+1, 1).getTime().toInstant());
                 days = Math.abs((int)duration.toDays());
             }
-            for (int numDays = days; numDays > 0; numDays--) {
-                spnDays.setValue(numDays);
+
+            int numDays;
+            for (numDays = days; numDays > 0; numDays--) {
                 if (gui.getCampaign().checkOverDueLoans()
                         || gui.nagShortMaintenance()
                         || (gui.getCampaign().getCampaignOptions().getUseAtB())
@@ -110,9 +122,9 @@ public class AdvanceDaysDialog extends JDialog implements ActionListener {
                     gui.showRetirementDefectionDialog();
                     break;
                 }
-               if(!gui.getCampaign().newDay()) {
-                   break;
-               }
+                if(!gui.getCampaign().newDay()) {
+                    break;
+                }
                 //String newLogString = logPanel.getLogText();
                 //newLogString = newLogString.concat(gui.getCampaign().getCurrentReportHTML());
                 if(firstDay) {
@@ -123,8 +135,13 @@ public class AdvanceDaysDialog extends JDialog implements ActionListener {
                     logPanel.appendLog(gui.getCampaign().fetchAndClearNewReports());
                 }
             }
-            MekHQ.unregisterHandler(this);
-            
+
+            // We couldn't advance all days for some reason,
+            // set the spinner to the number of remaining days
+            if (numDays > 0) {
+                this.spnDays.setValue(numDays);
+            }
+
             gui.refreshCalendar();
             gui.refreshLocation();
             gui.initReport();

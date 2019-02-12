@@ -21,6 +21,7 @@ package mekhq.campaign.personnel;
 
 import mekhq.MekHQ;
 import mekhq.campaign.event.PersonChangedEvent;
+import mekhq.campaign.log.AwardLogger;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -114,6 +115,7 @@ public class PersonAwardController {
         }
         person.setXp(person.getXp() + award.getXPReward());
         person.setEdge(person.getEdge() + award.getEdgeReward());
+        person.resetCurrentEdge(); //Reset the person's edge points
 
         award.addDate(date);
         logAward(award, date);
@@ -157,8 +159,8 @@ public class PersonAwardController {
             if(award.equals(setName, awardName)){
                 award.removeDate(date);
                 if(!award.hasDates()) awards.remove(award);
+                AwardLogger.removedAward(person, date, award);
                 MekHQ.triggerEvent(new PersonChangedEvent(person));
-                person.addLogEntry(person.getCampaign().getDate(), "Removed award " + award.getName());
                 return;
             }
         }
@@ -169,7 +171,7 @@ public class PersonAwardController {
      * @param award that was given.
      */
     public void logAward(Award award, Date date){
-        person.addLogEntry(date, "Awarded " + award.getName() + ": " + award.getDescription());
+        AwardLogger.award(person, date, award);
         MekHQ.triggerEvent(new PersonChangedEvent(person));
     }
 
@@ -178,10 +180,23 @@ public class PersonAwardController {
      * @param name String with the name of the award
      * @return the award
      */
-    private Award getAward(String set, String name){
+    public Award getAward(String set, String name){
         for(Award myAward : awards){
             if(name.equals(myAward.getName()) &&
                     set.equals(myAward.getSet())) return myAward;
+        }
+        return null;
+    }
+
+    /**
+     * Finds an award with a given name, without taking into account the set name. This is used for backward compatibility
+     * and should be avoided.
+     * @param name String with the name of the award
+     * @return the award
+     */
+    public Award getFirstAwardIgnoringSet(String name){
+        for(Award myAward : awards){
+            if(name.equals(myAward.getName())) return myAward;
         }
         return null;
     }
