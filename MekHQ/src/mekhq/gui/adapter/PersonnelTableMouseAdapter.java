@@ -1,3 +1,22 @@
+/*
+ * Copyright (c) 2019 The MegaMek Team. All rights reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package mekhq.gui.adapter;
 
 import java.awt.*;
@@ -72,10 +91,10 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
     private static final String CMD_CALLSIGN = "CALLSIGN"; //$NON-NLS-1$
     private static final String CMD_DEPENDENT = "DEPENDENT"; //$NON-NLS-1$
     private static final String CMD_COMMANDER = "COMMANDER"; //$NON-NLS-1$
-    private static final String CMD_EDIT_LOG_ENTRY = "LOG_SINGLE"; //$NON-NLS-1$
-    private static final String CMD_ADD_MISSION_ENTRY = "ADD_MISSION_ENTRY"; //$NON-NLS-1$
-    private static final String CMD_EDIT_MISSIONS_LOG = "MISSIONS_LOG"; //$NON-NLS-1$
     private static final String CMD_EDIT_PERSONNEL_LOG = "LOG"; //$NON-NLS-1$
+    private static final String CMD_EDIT_LOG_ENTRY = "LOG_SINGLE"; //$NON-NLS-1$
+    private static final String CMD_EDIT_MISSIONS_LOG = "MISSIONS_LOG"; //$NON-NLS-1$
+    private static final String CMD_ADD_MISSION_ENTRY = "ADD_MISSION_ENTRY"; //$NON-NLS-1$
     private static final String CMD_EDIT_KILL_LOG = "KILL_LOG"; //$NON-NLS-1$
     private static final String CMD_KILL = "KILL"; //$NON-NLS-1$
     private static final String CMD_BUY_EDGE = "EDGE_BUY"; //$NON-NLS-1$
@@ -968,9 +987,11 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                             Kill k = kill.clone();
                             k.setPilotId(person.getId());
                             gui.getCampaign().addKill(k);
+                            MekHQ.triggerEvent(new PersonLogEvent(person));
                         }
                     } else {
                         gui.getCampaign().addKill(kill);
+                        MekHQ.triggerEvent(new PersonLogEvent(selectedPerson));
                     }
                 }
                 break;
@@ -997,15 +1018,15 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 }
                 break;
             case CMD_EDIT_MISSIONS_LOG:
-                EditMissionLogDialog emld = new EditMissionLogDialog(gui.getFrame(), true, gui.getCampaign(), selectedPerson);
+                EditMissionsLogDialog emld = new EditMissionsLogDialog(gui.getFrame(), true, gui.getCampaign(), selectedPerson);
                 emld.setVisible(true);
                 MekHQ.triggerEvent(new MissionLogEvent(selectedPerson));
                 break;
             case CMD_ADD_MISSION_ENTRY:
-                EditMissionEntryDialog emed = new EditMissionEntryDialog(gui.getFrame(), true, new CustomLogEntry(gui.getCampaign().getDate(), ""), selectedPerson); //$NON-NLS-1$
+                EditMissionEntryDialog emed = new EditMissionEntryDialog(gui.getFrame(), true, selectedPerson, gui.getCampaign().getDate()); //$NON-NLS-1$
                 emed.setVisible(true);
                 Optional<LogEntry> missionEntry = emed.getEntry();
-                if (!missionEntry.isEmpty()) {
+                if (missionEntry.isPresent()) {
                     for (Person person : people) {
                         person.addMissionLogEntry(missionEntry.get().clone());
                         MekHQ.triggerEvent(new MissionLogEvent(selectedPerson));
@@ -2441,7 +2462,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             if (oneSelected) {
                 // Edit mission log
                 menuItem = new JMenuItem(resourceMap.getString("editMissionLog.text")); //$NON-NLS-1$
-                menuItem.setActionCommand(CMD_EDIT_MISSION_LOG);
+                menuItem.setActionCommand(CMD_EDIT_MISSIONS_LOG);
                 menuItem.addActionListener(this);
                 menuItem.setEnabled(true);
                 popup.add(menuItem);

@@ -21,6 +21,7 @@ package mekhq.gui.dialog;
 
 import megamek.common.util.EncodeControl;
 import mekhq.campaign.log.LogEntry;
+import mekhq.campaign.log.MissionLogEntry;
 import mekhq.campaign.personnel.Person;
 
 import javax.swing.*;
@@ -31,8 +32,15 @@ import java.util.GregorianCalendar;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
+/**
+ * Dialog used to add or edit mission entries.
+ */
 public class EditMissionEntryDialog extends JDialog {
+    private static final int ADD_OPERATION = 1;
+    private static final int EDIT_OPERATION = 2;
+
     private Frame frame;
+    private int operationType;
     private Person person;
     private LogEntry entry;
     private Date originalDate;
@@ -46,17 +54,25 @@ public class EditMissionEntryDialog extends JDialog {
     private JButton btnOK;
     private JButton btnClose;
 
-    /** Creates new form NewTeamDialog */
-    public EditMissionEntryDialog(Frame parent, boolean modal, LogEntry entry, Person person) {
+    public EditMissionEntryDialog(Frame parent, boolean modal, Person person, Date entryDate) {
+        this(parent, modal, ADD_OPERATION, person, new MissionLogEntry(entryDate, ""));
+    }
+
+    public EditMissionEntryDialog(Frame parent, boolean modal, Person person, MissionLogEntry entry) {
+        this(parent, modal, EDIT_OPERATION, person, entry);
+    }
+
+    private EditMissionEntryDialog(Frame parent, boolean modal, int operationType, Person person, MissionLogEntry entry) {
         super(parent, modal);
 
         this.frame = parent;
-        this.entry = entry;
+        this.operationType = operationType;
         this.person = person;
+        this.entry = entry;
 
         newDate = this.entry.getDate();
         originalDate = this.entry.getDate();
-        originalDescription = txtDesc.getText();
+        originalDescription = this.entry.getDesc();
 
         initComponents();
         setLocationRelativeTo(parent);
@@ -84,7 +100,11 @@ public class EditMissionEntryDialog extends JDialog {
 
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
-        setTitle(resourceMap.getString("Form.title"));
+        if (this.operationType == ADD_OPERATION) {
+            setTitle(resourceMap.getString("dialogAdd.title"));
+        } else {
+            setTitle(resourceMap.getString("dialogEdit.title"));
+        }
         getContentPane().setLayout(new BorderLayout());
         panMain.setLayout(new GridBagLayout());
         panBtn.setLayout(new GridLayout(0,2));
@@ -106,6 +126,8 @@ public class EditMissionEntryDialog extends JDialog {
         txtDesc.setName("txtDesc");
         txtDesc.setEditable(true);
         txtDesc.setColumns(30);
+        txtDesc.grabFocus();
+        txtDesc.addActionListener(this::btnOKActionPerformed);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -118,12 +140,12 @@ public class EditMissionEntryDialog extends JDialog {
 
         btnOK.setText(resourceMap.getString("btnOkay.text")); // NOI18N
         btnOK.setName("btnOK"); // NOI18N
-        btnOK.addActionListener(evt -> btnOKActionPerformed(evt));
+        btnOK.addActionListener(this::btnOKActionPerformed);
         panBtn.add(btnOK);
 
         btnClose.setText(resourceMap.getString("btnCancel.text")); // NOI18N
         btnClose.setName("btnClose"); // NOI18N
-        btnClose.addActionListener(evt -> btnCloseActionPerformed(evt));
+        btnClose.addActionListener(this::btnCloseActionPerformed);
         panBtn.add(btnClose);
 
         getContentPane().add(panMain, BorderLayout.CENTER);

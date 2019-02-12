@@ -129,6 +129,7 @@ public class PersonViewPanel extends JPanel {
         txtDesc = new JTextArea();
         pnlKills = new JPanel();
         pnlLog = new JPanel();
+        pnlMissionsLog = new JPanel();
         pnlInjuries = new JPanel();
         setLayout(new GridBagLayout());
         setBackground(Color.WHITE);
@@ -279,10 +280,13 @@ public class PersonViewPanel extends JPanel {
         }
 
         if(person.getMissionsLog().size() >0) {
-            pnlMissionsLog.setName("missionLog"); //$NON-NLS-1$
-            pnlMissionsLog.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("missionLog.title"))); //$NON-NLS-1$
-            pnlMissionsLog.setBackground(Color.WHITE);
             fillMissionsLog();
+
+            pnlMissionsLog.setName("missionsLog"); //$NON-NLS-1$
+            pnlMissionsLog.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createTitledBorder(resourceMap.getString("missionsLog.title")), //$NON-NLS-1$
+                    BorderFactory.createEmptyBorder(5,5,5,5)));
+            pnlMissionsLog.setBackground(Color.WHITE);
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = gridy;
@@ -981,9 +985,10 @@ public class PersonViewPanel extends JPanel {
     }
 
     private void fillMissionsLog() {
-        ArrayList<LogEntry> logs = person.getMissionsLog();
+        ArrayList<LogEntry> missionLog = person.getMissionsLog();
+        pnlMissionsLog.setLayout(new GridBagLayout());
 
-        JLabel lblRecord = new JLabel(String.format(resourceMap.getString("format.missions"), logs.size())); //$NON-NLS-1$
+        JLabel lblMissions = new JLabel(String.format(resourceMap.getString("format.missions"), missionLog.size())); //$NON-NLS-1$
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -991,17 +996,16 @@ public class PersonViewPanel extends JPanel {
         gridBagConstraints.insets = new Insets(0, 5, 0, 0);
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        pnlMissionsLog.add(lblRecord, gridBagConstraints);
+        pnlMissionsLog.add(lblMissions, gridBagConstraints);
 
-        pnlMissionsLog.setLayout(new GridBagLayout());
         PersonnelEventLogModel eventModel = new PersonnelEventLogModel();
-        eventModel.setData(logs);
-        JTable eventTable = new JTable(eventModel);
-        eventTable.setRowSelectionAllowed(false);
-        eventTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
+        eventModel.setData(missionLog);
+        JTable missionsTable = new JTable(eventModel);
+        missionsTable.setRowSelectionAllowed(false);
+        missionsTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
         TableColumn column;
         for(int i = 0; i < eventModel.getColumnCount(); ++ i) {
-            column = eventTable.getColumnModel().getColumn(i);
+            column = missionsTable.getColumnModel().getColumn(i);
             column.setCellRenderer(eventModel.getRenderer());
             column.setPreferredWidth(eventModel.getPreferredWidth(i));
             if(eventModel.hasConstantWidth(i)) {
@@ -1009,9 +1013,9 @@ public class PersonViewPanel extends JPanel {
                 column.setMaxWidth(eventModel.getPreferredWidth(i));
             }
         }
-        eventTable.setIntercellSpacing(new Dimension(0, 0));
-        eventTable.setShowGrid(false);
-        eventTable.setTableHeader(null);
+        missionsTable.setIntercellSpacing(new Dimension(0, 0));
+        missionsTable.setShowGrid(false);
+        missionsTable.setTableHeader(null);
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -1019,8 +1023,7 @@ public class PersonViewPanel extends JPanel {
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-
-        pnlLog.add(eventTable, gridBagConstraints);
+        pnlMissionsLog.add(missionsTable, gridBagConstraints);
     }
 
     private void fillInjuries() {
