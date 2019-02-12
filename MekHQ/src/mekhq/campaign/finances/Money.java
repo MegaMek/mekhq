@@ -143,7 +143,7 @@ public class Money {
 
     public Money dividedBy(Money money) {
         return new Money(this.wrapped.dividedBy(
-                this.wrapped.getAmount(),
+                money.wrapped.getAmount(),
                 RoundingMode.HALF_EVEN));
     }
 
