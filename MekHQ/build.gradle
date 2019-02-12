@@ -101,7 +101,7 @@ task mmJar (type: Jar, dependsOn: compileMM) {
         attributes "Main-Class": 'megamek.MegaMek'
         attributes 'Class-Path' : project.sourceSets.main.runtimeClasspath.files
             .findAll { it.name.endsWith(".jar") && !it.name.toLowerCase().startsWith("megamek") }
-            .collect { "lib/${it.name}" }.join(' ')
+            .collect { "${lib}/${it.name}" }.join(' ')
     }
     ext.jarLocation = "${buildDir}/libs/${archiveName}"
     inputs.dir "${mmDir}/build/classes/java/main"
@@ -136,8 +136,6 @@ task compileMML (type: GradleBuild) {
 }
 
 task mmlJar (type: Jar, dependsOn: compileMML) {
-    description = 'Builds a MegaMek jar from the current source'
-
     archiveName = "MegaMekLab.jar"
     from "${mmlDir}/build/classes/java/main"
     from "${mmlDir}/build/resources/main"
@@ -145,25 +143,7 @@ task mmlJar (type: Jar, dependsOn: compileMML) {
         attributes "Main-Class": 'megameklab.com.MegaMekLab'
         attributes 'Class-Path' : "${mmJar.archiveName} " + (project.sourceSets.main.runtimeClasspath.files
             .findAll { it.name.endsWith(".jar") && !it.name.toLowerCase().startsWith("megamek")}
-            .collect { "lib/${it.name}" }.join(' '))
-    }
-    ext.jarLocation = "${buildDir}/libs/${archiveName}"
-    inputs.dir "${mmlDir}/build/classes/java/main"
-    inputs.dir "${mmlDir}/build/resources/main"
-    outputs.file jarLocation
-}
-
-task mmlJarLibDir (type: Jar, dependsOn: compileMML) {
-    description = 'Builds a MegaMekLab jar from the current source, to be placed in the lib directory'
-
-    archiveName = "MegaMekLab.jar"
-    from "${mmlDir}/build/classes/java/main"
-    from "${mmlDir}/build/resources/main"
-    manifest {
-        attributes "Main-Class": 'megameklab.com.MegaMekLab'
-        attributes 'Class-Path' : "${mmJar.archiveName} " + (project.sourceSets.main.runtimeClasspath.files
-            .findAll { it.name.endsWith(".jar") && !it.name.toLowerCase().startsWith("megamek")}
-            .collect { it.name }.join(' '))
+            .collect { "${lib}/${it.name}" }.join(' '))
     }
     ext.jarLocation = "${buildDir}/libs/${archiveName}"
     inputs.dir "${mmlDir}/build/classes/java/main"
@@ -341,10 +321,10 @@ distributions {
                     .findAll { it.name.endsWith(".jar") && !it.name.toLowerCase().startsWith("megamek") }) {
                 into "${lib}"
             }
-            from (mmJarLibDir) {
+            from (mmJar) {
                 into "${lib}"
             }
-            from (mmlJarLibDir) {
+            from (mmlJar) {
                 into "${lib}"
             }
             duplicatesStrategy = 'exclude'
@@ -405,14 +385,14 @@ ${project.ext.jvmOptions.join('\n')}
     }
 }
 
-task createMMExe (type: edu.sc.seis.launch4j.tasks.Launch4jLibraryTask, dependsOn: mmJarLibDir) {
+task createMMExe (type: edu.sc.seis.launch4j.tasks.Launch4jLibraryTask, dependsOn: mmJar) {
     description = 'Create Windows executable stub for MM jar'
     outfile = 'MegaMek.exe'
-    mainClassName = 'megamek.Megamek'
+    mainClassName = 'megamek.MegaMek'
     jar = "lib/${mmJar.archiveName}"
 	classpath = project.sourceSets.main.runtimeClasspath.files
             .findAll { it.name.endsWith(".jar") && !it.name.toLowerCase().startsWith("megamek")}
-            .collect { "lib/${it.name}" }
+            .collect { "${lib}/${it.name}" }
     icon = "${mmDir}/megamek/data/images/misc/megamek.ico"
     internalName = 'MegaMek'
     dontWrapJar = true
@@ -427,14 +407,14 @@ ${project.ext.jvmOptions.join('\n')}
     }
 }
 
-task createMMLExe (type: edu.sc.seis.launch4j.tasks.Launch4jLibraryTask, dependsOn: mmlJarLibDir) {
+task createMMLExe (type: edu.sc.seis.launch4j.tasks.Launch4jLibraryTask, dependsOn: mmlJar) {
     description = 'Create Windows executable stub for MML jar'
     outfile = 'MegaMekLab.exe'
     mainClassName = 'megameklab.com.MegaMekLab'
     jar = "lib/${mmlJar.archiveName}"
 	classpath = ["lib/${mmJar.archiveName}"] + project.sourceSets.main.runtimeClasspath.files
             .findAll { it.name.endsWith(".jar") && !it.name.toLowerCase().startsWith("megamek")}
-            .collect { "lib/${it.name}" }
+            .collect { "${lib}/${it.name}" }
     icon = "${mmlDir}/data/images/misc/megameklab.ico"
     internalName = 'MegaMekLab'
     dontWrapJar = true
