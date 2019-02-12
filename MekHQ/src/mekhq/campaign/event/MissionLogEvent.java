@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 The MegaMek Team. All rights reserved.
+ * Copyright (c) 2019 The MegaMek Team. All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -16,17 +16,13 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package mekhq.campaign.event;
 
 import mekhq.campaign.personnel.Person;
 
-/**
- * Triggered when a personnel log is changed.
- *
- */
-public class PersonLogEvent extends PersonEvent {
-
-    public PersonLogEvent(Person person) {
+public class MissionLogEvent extends PersonEvent {
+    public MissionLogEvent(Person person) {
         super(person);
     }
 }

@@ -222,6 +222,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     protected GregorianCalendar deathday;
     protected GregorianCalendar recruitment;
     protected ArrayList<LogEntry> personnelLog;
+    protected ArrayList<LogEntry> missionsLog;
 
     private Hashtable<String, Skill> skills;
     private PersonnelOptions options = new PersonnelOptions();
@@ -376,7 +377,8 @@ public class Person implements Serializable, MekHqXmlSerializable {
         toughness = 0;
         biography = "";
         nTasks = 0;
-        personnelLog = new ArrayList<LogEntry>();
+        personnelLog = new ArrayList<>();
+        missionsLog = new ArrayList<>();
         idleMonths = -1;
         daysToWaitForHealing = 15;
         resetMinutesLeft();
@@ -1494,6 +1496,13 @@ public class Person implements Serializable, MekHqXmlSerializable {
             }
             pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "</personnelLog>");
         }
+        if (!missionsLog.isEmpty()) {
+            pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<missionsLog>");
+            for (LogEntry entry : missionsLog) {
+                entry.writeToXml(pw1, indent + 2);
+            }
+            pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "</missionsLog>");
+        }
         if (!awardController.getAwards().isEmpty()) {
             pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<awards>");
             for (Award award : awardController.getAwards()) {
@@ -1749,6 +1758,24 @@ public class Person implements Serializable, MekHqXmlSerializable {
                             continue;
                         }
                         retVal.addLogEntry(LogEntryFactory.getInstance().generateInstanceFromXML(wn3));
+                    }
+                } else if (wn2.getNodeName().equalsIgnoreCase("missionsLog")) {
+                    NodeList nl2 = wn2.getChildNodes();
+                    for (int y = 0; y < nl2.getLength(); y++) {
+                        Node wn3 = nl2.item(y);
+                        // If it's not an element node, we ignore it.
+                        if (wn3.getNodeType() != Node.ELEMENT_NODE) {
+                            continue;
+                        }
+
+                        if (!wn3.getNodeName().equalsIgnoreCase("logEntry")) {
+                            // Error condition of sorts!
+                            // Errr, what should we do here?
+                            MekHQ.getLogger().log(Person.class, METHOD_NAME, LogLevel.ERROR,
+                                    "Unknown node type not loaded in mission log nodes: " + wn3.getNodeName()); //$NON-NLS-1$
+                            continue;
+                        }
+                        retVal.addMissionLogEntry(LogEntryFactory.getInstance().generateInstanceFromXML(wn3));
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("awards")){
                     NodeList nl2 = wn2.getChildNodes();
@@ -3450,17 +3477,21 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public ArrayList<LogEntry> getPersonnelLog() {
-        Collections.sort(personnelLog, new Comparator<LogEntry>() {
-            @Override
-            public int compare(final LogEntry u1, final LogEntry u2) {
-                return u1.getDate().compareTo(u2.getDate());
-            }
-        });
+        Collections.sort(personnelLog, Comparator.comparing(LogEntry::getDate));
         return personnelLog;
+    }
+
+    public ArrayList<LogEntry> getMissionsLog() {
+        Collections.sort(missionsLog, Comparator.comparing(LogEntry::getDate));
+        return missionsLog;
     }
 
     public void addLogEntry(LogEntry entry) {
         personnelLog.add(entry);
+    }
+
+    public void addMissionLogEntry(LogEntry entry) {
+        missionsLog.add(entry);
     }
 
     /**

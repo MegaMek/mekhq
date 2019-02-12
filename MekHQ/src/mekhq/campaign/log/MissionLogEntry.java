@@ -1,11 +1,11 @@
 /*
- * Copyright (c) 2017 The MegaMek Team. All rights reserved.
+ * Copyright (C) 2019 MegaMek team
  *
  * This file is part of MekHQ.
  *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
+ * the Free Software Foundation, either version 2 of the License, or
  * (at your option) any later version.
  *
  * MekHQ is distributed in the hope that it will be useful,
@@ -16,17 +16,13 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.campaign.event;
 
-import mekhq.campaign.personnel.Person;
+package mekhq.campaign.log;
 
-/**
- * Triggered when a personnel log is changed.
- *
- */
-public class PersonLogEvent extends PersonEvent {
+import java.util.Date;
 
-    public PersonLogEvent(Person person) {
-        super(person);
+public class MissionLogEntry extends LogEntry {
+    public MissionLogEntry(Date date, String desc){
+        super(date, desc, LogEntryType.MISSION);
     }
 }

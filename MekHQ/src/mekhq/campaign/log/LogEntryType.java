@@ -26,4 +26,5 @@ public enum LogEntryType {
     PERSONAL,
     CUSTOM,
     HISTORICAL, //Used for historical daily log
+    MISSION,
 }

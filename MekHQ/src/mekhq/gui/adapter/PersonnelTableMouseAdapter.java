@@ -25,6 +25,7 @@ import megamek.common.options.PilotOptions;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.Utilities;
+import mekhq.campaign.event.MissionLogEvent;
 import mekhq.campaign.log.CustomLogEntry;
 import mekhq.campaign.log.PersonalLogger;
 import mekhq.campaign.personnel.Award;
@@ -36,18 +37,7 @@ import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.personnel.*;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
-import mekhq.gui.dialog.CustomizePersonDialog;
-import mekhq.gui.dialog.EditKillLogDialog;
-import mekhq.gui.dialog.EditLogEntryDialog;
-import mekhq.gui.dialog.EditPersonnelHitsDialog;
-import mekhq.gui.dialog.EditPersonnelInjuriesDialog;
-import mekhq.gui.dialog.EditPersonnelLogDialog;
-import mekhq.gui.dialog.GMToolsDialog;
-import mekhq.gui.dialog.ImageChoiceDialog;
-import mekhq.gui.dialog.KillDialog;
-import mekhq.gui.dialog.PopupValueChoiceDialog;
-import mekhq.gui.dialog.RetirementDefectionDialog;
-import mekhq.gui.dialog.TextAreaDialog;
+import mekhq.gui.dialog.*;
 import mekhq.gui.model.PersonnelTableModel;
 import mekhq.gui.utilities.MultiLineTooltip;
 import mekhq.gui.utilities.StaticChecks;
@@ -83,6 +73,8 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
     private static final String CMD_DEPENDENT = "DEPENDENT"; //$NON-NLS-1$
     private static final String CMD_COMMANDER = "COMMANDER"; //$NON-NLS-1$
     private static final String CMD_EDIT_LOG_ENTRY = "LOG_SINGLE"; //$NON-NLS-1$
+    private static final String CMD_ADD_MISSION_ENTRY = "ADD_MISSION_ENTRY"; //$NON-NLS-1$
+    private static final String CMD_EDIT_MISSIONS_LOG = "MISSIONS_LOG"; //$NON-NLS-1$
     private static final String CMD_EDIT_PERSONNEL_LOG = "LOG"; //$NON-NLS-1$
     private static final String CMD_EDIT_KILL_LOG = "KILL_LOG"; //$NON-NLS-1$
     private static final String CMD_KILL = "KILL"; //$NON-NLS-1$
@@ -782,7 +774,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             case CMD_SACK:
             {
                 boolean showDialog = false;
-                ArrayList<UUID> toRemove = new ArrayList<UUID>();
+                ArrayList<UUID> toRemove = new ArrayList<>();
                 for (Person person : people) {
                     if (gui.getCampaign().getRetirementDefectionTracker()
                             .removeFromCampaign(
@@ -1001,6 +993,22 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                     for (Person person : people) {
                         person.addLogEntry(entry.clone());
                         MekHQ.triggerEvent(new PersonLogEvent(selectedPerson));
+                    }
+                }
+                break;
+            case CMD_EDIT_MISSIONS_LOG:
+                EditMissionLogDialog emld = new EditMissionLogDialog(gui.getFrame(), true, gui.getCampaign(), selectedPerson);
+                emld.setVisible(true);
+                MekHQ.triggerEvent(new MissionLogEvent(selectedPerson));
+                break;
+            case CMD_ADD_MISSION_ENTRY:
+                EditMissionEntryDialog emed = new EditMissionEntryDialog(gui.getFrame(), true, new CustomLogEntry(gui.getCampaign().getDate(), ""), selectedPerson); //$NON-NLS-1$
+                emed.setVisible(true);
+                Optional<LogEntry> missionEntry = emed.getEntry();
+                if (!missionEntry.isEmpty()) {
+                    for (Person person : people) {
+                        person.addMissionLogEntry(missionEntry.get().clone());
+                        MekHQ.triggerEvent(new MissionLogEvent(selectedPerson));
                     }
                 }
                 break;
@@ -1921,7 +1929,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                             Unit u = gui.getCampaign().getUnit(person.getUnitId());
                             if (null != u) {
                                 JMenu specialistMenu = new JMenu(resourceMap.getString("weaponSpecialist.text")); //$NON-NLS-1$
-                                TreeSet<String> uniqueWeapons = new TreeSet<String>();
+                                TreeSet<String> uniqueWeapons = new TreeSet<>();
                                 for (int j = 0; j < u.getEntity().getWeaponList().size(); j++) {
                                     Mounted m = u.getEntity().getWeaponList().get(j);
                                     uniqueWeapons.add(m.getName());
@@ -2430,16 +2438,30 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             menuItem.addActionListener(this);
             menuItem.setEnabled(true);
             popup.add(menuItem);
-            if (oneSelected || StaticChecks.allHaveSameUnit(selected)) {
-                menuItem = new JMenuItem(resourceMap.getString("assignKill.text")); //$NON-NLS-1$
-                menuItem.setActionCommand(CMD_KILL);
+            if (oneSelected) {
+                // Edit mission log
+                menuItem = new JMenuItem(resourceMap.getString("editMissionLog.text")); //$NON-NLS-1$
+                menuItem.setActionCommand(CMD_EDIT_MISSION_LOG);
                 menuItem.addActionListener(this);
                 menuItem.setEnabled(true);
                 popup.add(menuItem);
             }
+            // Add one item to all personnel mission logs
+            menuItem = new JMenuItem(resourceMap.getString("addMissionEntry.text")); //$NON-NLS-1$
+            menuItem.setActionCommand(CMD_ADD_MISSION_ENTRY);
+            menuItem.addActionListener(this);
+            menuItem.setEnabled(true);
+            popup.add(menuItem);
             if (oneSelected) {
                 menuItem = new JMenuItem(resourceMap.getString("editKillLog.text")); //$NON-NLS-1$
                 menuItem.setActionCommand(CMD_EDIT_KILL_LOG);
+                menuItem.addActionListener(this);
+                menuItem.setEnabled(true);
+                popup.add(menuItem);
+            }
+            if (oneSelected || StaticChecks.allHaveSameUnit(selected)) {
+                menuItem = new JMenuItem(resourceMap.getString("assignKill.text")); //$NON-NLS-1$
+                menuItem.setActionCommand(CMD_KILL);
                 menuItem.addActionListener(this);
                 menuItem.setEnabled(true);
                 popup.add(menuItem);
