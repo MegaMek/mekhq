@@ -56,6 +56,9 @@ import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Faction.Tag;
+import mekhq.gui.control.EditKillLogControl;
+import mekhq.gui.control.EditMissionsLogControl;
+import mekhq.gui.control.EditPersonnelLogControl;
 
 /**
  *
@@ -657,6 +660,10 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         		|| campaign.getCampaignOptions().useImplants()) {
         	tabStats.addTab(resourceMap.getString("scrOptions.TabConstraints.tabTitle"),scrOptions); // NOI18N
         }
+        tabStats.add(resourceMap.getString("panLog.TabConstraints.tabTitle"), new EditPersonnelLogControl(frame, campaign, person));
+        tabStats.add(resourceMap.getString("panMissions.TabConstraints.tabTitle"), new EditMissionsLogControl(frame, campaign, person));
+        tabStats.add(resourceMap.getString("panKills.TabConstraints.tabTitle"), new EditKillLogControl(frame, campaign, person));
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
@@ -1041,7 +1048,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
             }
         }
     }
-    
+
     private String getDateAsString() {
         return dateFormat.format(birthdate.getTime());
     }
@@ -1160,10 +1167,8 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
     }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    
 
     public void optionClicked(DialogOptionComponent arg0, IOption arg1, boolean arg2) {
         //IMplement me!!
     }
-
 }

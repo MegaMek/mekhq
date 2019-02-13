@@ -60,6 +60,7 @@ import mekhq.Utilities;
 import mekhq.campaign.event.PersonBattleFinishedEvent;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.log.LogEntryController;
+import mekhq.campaign.log.MissionLogEntry;
 import mekhq.campaign.log.ServiceLogger;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
@@ -73,8 +74,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.FileDialogs;
-
-import javax.xml.ws.Service;
+import org.joda.time.DateTime;
 
 /**
  * This object will be the main workhorse for the scenario

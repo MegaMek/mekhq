@@ -1,5 +1,5 @@
 /*
- * EditLogEntryDialog.java
+ * AddOrEditPersonnelEntryDialog.java
  *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  *
@@ -29,61 +29,90 @@ import java.awt.GridLayout;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 import javax.swing.BorderFactory;
 
 import megamek.common.util.EncodeControl;
 import mekhq.campaign.log.LogEntry;
-import mekhq.campaign.personnel.Person;
+import mekhq.campaign.log.PersonalLogEntry;
 
 /**
  *
  * @author  Taharqa
  */
-public class EditLogEntryDialog extends javax.swing.JDialog {
+public class AddOrEditPersonnelEntryDialog extends javax.swing.JDialog {
 	private static final long serialVersionUID = -8038099101234445018L;
+    private static final int ADD_OPERATION = 1;
+    private static final int EDIT_OPERATION = 2;
+
     private Frame frame;
+    private int operationType;
     private LogEntry entry;
     private Date date;
     private Date originalDate;
     private String originalDescription;
-    private Person person;
-    
+
     private javax.swing.JButton btnClose;
     private javax.swing.JButton btnOK;
     private javax.swing.JTextArea txtDesc;
     private javax.swing.JButton btnDate;
     private javax.swing.JPanel panBtn;
     private javax.swing.JPanel panMain;
-    
-    /** Creates new form NewTeamDialog */
-    public EditLogEntryDialog(java.awt.Frame parent, boolean modal, LogEntry e, Person person) {
+
+    public AddOrEditPersonnelEntryDialog(Frame parent, boolean modal, Date entryDate) {
+        this(parent, modal, ADD_OPERATION, new PersonalLogEntry(entryDate, ""));
+    }
+
+    public AddOrEditPersonnelEntryDialog(Frame parent, boolean modal, LogEntry entry) {
+        this(parent, modal, EDIT_OPERATION, entry);
+    }
+
+    private AddOrEditPersonnelEntryDialog(Frame parent, boolean modal, int operationType, LogEntry entry) {
         super(parent, modal);
+
+        assert entry != null;
+
         this.frame = parent;
-        this.person = person;
-        entry = e;
-        date = e.getDate();
-        originalDate = e.getDate();
+        this.operationType = operationType;
+        this.entry = entry;
+
+        this.date = this.entry.getDate();
+        this.originalDate = this.entry.getDate();
+        this.originalDescription = this.entry.getDesc();
+
         initComponents();
-        originalDescription = txtDesc.getText();
         setLocationRelativeTo(parent);
     }
 
+    public Optional<LogEntry> getEntry() {
+        if (entry == null) {
+            return Optional.empty();
+        }
+
+        return Optional.of(entry);
+    }
+
     private void initComponents() {
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AddOrEditPersonnelEntryDialog", new EncodeControl()); //$NON-NLS-1$
     	java.awt.GridBagConstraints gridBagConstraints;
 
+        panMain = new javax.swing.JPanel();
+        btnDate = new javax.swing.JButton();
         txtDesc = new javax.swing.JTextArea();
+
+        panBtn = new javax.swing.JPanel();
         btnOK = new javax.swing.JButton();
         btnClose = new javax.swing.JButton();
-        btnDate = new javax.swing.JButton();
-        panBtn = new javax.swing.JPanel();
-        panMain = new javax.swing.JPanel();
-        
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditLogEntryDialog", new EncodeControl()); //$NON-NLS-1$
+
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
-        setTitle(resourceMap.getString("Form.title"));
+        if (this.operationType == ADD_OPERATION) {
+            setTitle(resourceMap.getString("dialogAdd.title"));
+        } else {
+            setTitle(resourceMap.getString("dialogEdit.title"));
+        }
         getContentPane().setLayout(new BorderLayout());
         panBtn.setLayout(new GridLayout(0,2));
         panMain.setLayout(new GridBagLayout());
@@ -123,12 +152,12 @@ public class EditLogEntryDialog extends javax.swing.JDialog {
         
         btnOK.setText(resourceMap.getString("btnOkay.text")); // NOI18N
         btnOK.setName("btnOK"); // NOI18N
-        btnOK.addActionListener(evt -> btnOKActionPerformed(evt));
+        btnOK.addActionListener(this::btnOKActionPerformed);
         panBtn.add(btnOK);
 
         btnClose.setText(resourceMap.getString("btnCancel.text")); // NOI18N
         btnClose.setName("btnClose"); // NOI18N
-        btnClose.addActionListener(evt -> btnCloseActionPerformed(evt));
+        btnClose.addActionListener(this::btnCloseActionPerformed);
         panBtn.add(btnClose);
 
         getContentPane().add(panMain, BorderLayout.CENTER);
@@ -139,7 +168,7 @@ public class EditLogEntryDialog extends javax.swing.JDialog {
     private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {
     	entry.setDate(date);
     	entry.setDesc(txtDesc.getText());
-    	entry.onLogEntryEdited(originalDate, date, originalDescription, txtDesc.getText(), person);
+    	entry.onLogEntryEdited(originalDate, date, originalDescription, txtDesc.getText(), null);
     	this.setVisible(false);
     }
 
@@ -147,11 +176,7 @@ public class EditLogEntryDialog extends javax.swing.JDialog {
     	entry = null;
     	this.setVisible(false);
     }
-    
-    public LogEntry getEntry() {
-    	return entry;
-    }
-    
+
     private void changeDate() {
     	GregorianCalendar cal = new GregorianCalendar();
     	cal.setTime(date);

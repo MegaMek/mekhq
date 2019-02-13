@@ -56,7 +56,6 @@ public class Kill implements Serializable {
 	private int oldPilotId = -1;
 	
 	public Kill() {
-	
 	}
 	
 	public Kill(UUID id, String kill, String killer, Date d) {

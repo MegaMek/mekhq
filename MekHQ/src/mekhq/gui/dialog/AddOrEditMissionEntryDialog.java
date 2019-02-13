@@ -35,7 +35,7 @@ import java.util.ResourceBundle;
 /**
  * Dialog used to add or edit mission entries.
  */
-public class EditMissionEntryDialog extends JDialog {
+public class AddOrEditMissionEntryDialog extends JDialog {
     private static final int ADD_OPERATION = 1;
     private static final int EDIT_OPERATION = 2;
 
@@ -54,20 +54,21 @@ public class EditMissionEntryDialog extends JDialog {
     private JButton btnOK;
     private JButton btnClose;
 
-    public EditMissionEntryDialog(Frame parent, boolean modal, Person person, Date entryDate) {
-        this(parent, modal, ADD_OPERATION, person, new MissionLogEntry(entryDate, ""));
+    public AddOrEditMissionEntryDialog(Frame parent, boolean modal, Date entryDate) {
+        this(parent, modal, ADD_OPERATION, new MissionLogEntry(entryDate, ""));
     }
 
-    public EditMissionEntryDialog(Frame parent, boolean modal, Person person, MissionLogEntry entry) {
-        this(parent, modal, EDIT_OPERATION, person, entry);
+    public AddOrEditMissionEntryDialog(Frame parent, boolean modal, LogEntry entry) {
+        this(parent, modal, EDIT_OPERATION, entry);
     }
 
-    private EditMissionEntryDialog(Frame parent, boolean modal, int operationType, Person person, MissionLogEntry entry) {
+    private AddOrEditMissionEntryDialog(Frame parent, boolean modal, int operationType, LogEntry entry) {
         super(parent, modal);
+
+        assert entry != null;
 
         this.frame = parent;
         this.operationType = operationType;
-        this.person = person;
         this.entry = entry;
 
         newDate = this.entry.getDate();
@@ -87,7 +88,7 @@ public class EditMissionEntryDialog extends JDialog {
     }
 
     private void initComponents() {
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditMissionEntryDialog", new EncodeControl()); //$NON-NLS-1$
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AddOrEditMissionEntryDialog", new EncodeControl()); //$NON-NLS-1$
         GridBagConstraints gridBagConstraints;
 
         panMain = new JPanel();
@@ -166,7 +167,7 @@ public class EditMissionEntryDialog extends JDialog {
     private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {
         entry.setDate(newDate);
         entry.setDesc(txtDesc.getText());
-        entry.onLogEntryEdited(originalDate, newDate, originalDescription, txtDesc.getText(), person);
+        entry.onLogEntryEdited(originalDate, newDate, originalDescription, txtDesc.getText(), null);
         this.setVisible(false);
     }
 

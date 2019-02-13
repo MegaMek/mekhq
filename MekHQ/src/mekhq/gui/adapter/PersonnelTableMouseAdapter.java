@@ -44,8 +44,6 @@ import megamek.common.options.PilotOptions;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.Utilities;
-import mekhq.campaign.event.MissionLogEvent;
-import mekhq.campaign.log.CustomLogEntry;
 import mekhq.campaign.log.PersonalLogger;
 import mekhq.campaign.personnel.Award;
 import mekhq.campaign.Kill;
@@ -92,11 +90,11 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
     private static final String CMD_DEPENDENT = "DEPENDENT"; //$NON-NLS-1$
     private static final String CMD_COMMANDER = "COMMANDER"; //$NON-NLS-1$
     private static final String CMD_EDIT_PERSONNEL_LOG = "LOG"; //$NON-NLS-1$
-    private static final String CMD_EDIT_LOG_ENTRY = "LOG_SINGLE"; //$NON-NLS-1$
+    private static final String CMD_ADD_LOG_ENTRY = "ADD_PERSONNEL_LOG_SINGLE"; //$NON-NLS-1$
     private static final String CMD_EDIT_MISSIONS_LOG = "MISSIONS_LOG"; //$NON-NLS-1$
     private static final String CMD_ADD_MISSION_ENTRY = "ADD_MISSION_ENTRY"; //$NON-NLS-1$
     private static final String CMD_EDIT_KILL_LOG = "KILL_LOG"; //$NON-NLS-1$
-    private static final String CMD_KILL = "KILL"; //$NON-NLS-1$
+    private static final String CMD_ADD_KILL = "ADD_KILL"; //$NON-NLS-1$
     private static final String CMD_BUY_EDGE = "EDGE_BUY"; //$NON-NLS-1$
     private static final String CMD_SET_EDGE = "EDGE_SET"; //$NON-NLS-1$
     private static final String CMD_SET_XP = "XP_SET"; //$NON-NLS-1$
@@ -968,20 +966,28 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 }
                 break;
             }
-            case CMD_KILL:
+            case CMD_ADD_KILL:
             {
-                KillDialog nkd;
+                AddOrEditKillEntryDialog nkd;
                 Unit unit = gui.getCampaign().getUnit(selectedPerson.getUnitId());
                 if (people.length > 1) {
-                    nkd = new KillDialog(gui.getFrame(), true, new Kill(null, QUESTION_MARK,
-                        unit != null ? unit.getName() : resourceMap.getString("bareHands.text"), gui.getCampaign().getDate()), resourceMap.getString("crew.text")); //$NON-NLS-1$ //$NON-NLS-2$
+                    nkd = new AddOrEditKillEntryDialog(
+                            gui.getFrame(),
+                            true,
+                            null,
+                            unit != null ? unit.getName() : resourceMap.getString("bareHands.text"),
+                            gui.getCampaign().getDate());
                 } else {
-                    nkd = new KillDialog(gui.getFrame(), true, new Kill(selectedPerson.getId(), QUESTION_MARK,
-                        unit != null ? unit.getName() : resourceMap.getString("bareHands.text"), gui.getCampaign().getDate()), selectedPerson.getFullName()); //$NON-NLS-1$
+                    nkd = new AddOrEditKillEntryDialog(
+                            gui.getFrame(),
+                            true,
+                            selectedPerson.getId(),
+                            unit != null ? unit.getName() : resourceMap.getString("bareHands.text"),
+                            gui.getCampaign().getDate());
                 }
                 nkd.setVisible(true);
-                if (!nkd.wasCancelled()) {
-                    Kill kill = nkd.getKill();
+                if (nkd.getKill().isPresent()) {
+                    Kill kill = nkd.getKill().get();
                     if (people.length > 1) {
                         for (Person person : people) {
                             Kill k = kill.clone();
@@ -1006,13 +1012,13 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 epld.setVisible(true);
                 MekHQ.triggerEvent(new PersonLogEvent(selectedPerson));
                 break;
-            case CMD_EDIT_LOG_ENTRY:
-                EditLogEntryDialog eeld = new EditLogEntryDialog(gui.getFrame(), true, new CustomLogEntry(gui.getCampaign().getDate(), ""), selectedPerson); //$NON-NLS-1$
-                eeld.setVisible(true);
-                LogEntry entry = eeld.getEntry();
-                if (null != entry) {
+            case CMD_ADD_LOG_ENTRY:
+                AddOrEditPersonnelEntryDialog addPersonnelLogDialog = new AddOrEditPersonnelEntryDialog(gui.getFrame(), true, gui.getCampaign().getDate()); //$NON-NLS-1$
+                addPersonnelLogDialog.setVisible(true);
+                Optional<LogEntry> personnelEntry = addPersonnelLogDialog.getEntry();
+                if (personnelEntry.isPresent()) {
                     for (Person person : people) {
-                        person.addLogEntry(entry.clone());
+                        person.addLogEntry(personnelEntry.get().clone());
                         MekHQ.triggerEvent(new PersonLogEvent(selectedPerson));
                     }
                 }
@@ -1020,16 +1026,16 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             case CMD_EDIT_MISSIONS_LOG:
                 EditMissionsLogDialog emld = new EditMissionsLogDialog(gui.getFrame(), true, gui.getCampaign(), selectedPerson);
                 emld.setVisible(true);
-                MekHQ.triggerEvent(new MissionLogEvent(selectedPerson));
+                MekHQ.triggerEvent(new PersonLogEvent(selectedPerson));
                 break;
             case CMD_ADD_MISSION_ENTRY:
-                EditMissionEntryDialog emed = new EditMissionEntryDialog(gui.getFrame(), true, selectedPerson, gui.getCampaign().getDate()); //$NON-NLS-1$
-                emed.setVisible(true);
-                Optional<LogEntry> missionEntry = emed.getEntry();
+                AddOrEditMissionEntryDialog addMissionDialog = new AddOrEditMissionEntryDialog(gui.getFrame(), true, gui.getCampaign().getDate()); //$NON-NLS-1$
+                addMissionDialog.setVisible(true);
+                Optional<LogEntry> missionEntry = addMissionDialog.getEntry();
                 if (missionEntry.isPresent()) {
                     for (Person person : people) {
                         person.addMissionLogEntry(missionEntry.get().clone());
-                        MekHQ.triggerEvent(new MissionLogEvent(selectedPerson));
+                        MekHQ.triggerEvent(new PersonLogEvent(selectedPerson));
                     }
                 }
                 break;
@@ -2455,7 +2461,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
 
             }
             menuItem = new JMenuItem(resourceMap.getString("addSingleLogEntry.text")); //$NON-NLS-1$
-            menuItem.setActionCommand(CMD_EDIT_LOG_ENTRY);
+            menuItem.setActionCommand(CMD_ADD_LOG_ENTRY);
             menuItem.addActionListener(this);
             menuItem.setEnabled(true);
             popup.add(menuItem);
@@ -2482,7 +2488,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
             }
             if (oneSelected || StaticChecks.allHaveSameUnit(selected)) {
                 menuItem = new JMenuItem(resourceMap.getString("assignKill.text")); //$NON-NLS-1$
-                menuItem.setActionCommand(CMD_KILL);
+                menuItem.setActionCommand(CMD_ADD_KILL);
                 menuItem.addActionListener(this);
                 menuItem.setEnabled(true);
                 popup.add(menuItem);

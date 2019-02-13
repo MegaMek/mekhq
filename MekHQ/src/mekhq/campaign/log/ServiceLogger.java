@@ -97,7 +97,11 @@ public class ServiceLogger {
 
     public static void participatedInMission(Person person, Date date, String scenarioName, String missionName){
         String message = logEntriesResourceMap.getString("participatedInMission.text");
-        person.addLogEntry(new ServiceLogEntry(date,
+        person.addLogEntry(new ServiceLogEntry(
+                date,
+                MessageFormat.format(message, scenarioName, missionName)));
+        person.addMissionLogEntry(new MissionLogEntry(
+                date,
                 MessageFormat.format(message, scenarioName, missionName)));
     }
 
