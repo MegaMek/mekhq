@@ -41,11 +41,9 @@ public class StartUpGUI extends javax.swing.JPanel {
 	   
 	public StartUpGUI(MekHQ app) {
         this.app = app;
-        lastSave = Utilities.lastFileModified(MekHQ.CAMPAIGN_DIRECTORY, new FilenameFilter() {
-            public boolean accept(File dir, String name) {
-                return name.toLowerCase().endsWith(".cpnx") || name.toLowerCase().endsWith(".xml");
-            }
-        });
+        lastSave = Utilities.lastFileModified(
+                MekHQ.getPreferences().getCampaignsDirectory(),
+                (dir, name) -> name.toLowerCase().endsWith(".cpnx") || name.toLowerCase().endsWith(".xml"));
         
         initComponents();
     }

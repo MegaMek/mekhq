@@ -174,10 +174,16 @@ public class FileDialogs {
      * @return the file selected, if any
      */
     public static Optional<File> openCampaign(JFrame frame) {
-        return GUI.fileDialogOpen( frame,
+        Optional<File> file = GUI.fileDialogOpen( frame,
                                    "Load Campaign",
-                                   new File(MekHQ.CAMPAIGN_DIRECTORY),
+                                   new File(MekHQ.getPreferences().getCampaignsDirectory()),
                                    FileType.CPNX );
+
+        if (file.isPresent()) {
+            MekHQ.getPreferences().setCampaignsDirectory(file.get().getParent());
+        }
+
+        return file;
     }
 
     /**
@@ -192,10 +198,16 @@ public class FileDialogs {
                                          campaign.getShortDateAsString(),
                                          campaign.getPreferGzippedOutput() ? "cpnx.gz" : "cpnx" );
 
-        return GUI.fileDialogSave( frame,
+        Optional<File> file = GUI.fileDialogSave(frame,
                                    "Save Campaign",
-                                   new File(MekHQ.CAMPAIGN_DIRECTORY, fileName),
+                                   new File(MekHQ.getPreferences().getCampaignsDirectory(), fileName),
                                    FileType.CPNX );
+
+        if (file.isPresent()) {
+            MekHQ.getPreferences().setCampaignsDirectory(file.get().getParent());
+        }
+
+        return file;
     }
 
     /**

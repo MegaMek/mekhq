@@ -1328,6 +1328,7 @@ public class CampaignGUI extends JPanel {
             public void run() {
                 try {
                     UIManager.setLookAndFeel(lafClassName);
+                    MekHQ.getPreferences().setLookAndFeel(lafClassName);
                     SwingUtilities.updateComponentTreeUI(frame);
                     refreshThemeChoices();
                 } catch (Exception exception) {

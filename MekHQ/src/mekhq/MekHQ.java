@@ -35,7 +35,6 @@ import java.io.PrintStream;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Properties;
 import java.util.ResourceBundle;
 
 import javax.swing.JOptionPane;
@@ -94,14 +93,14 @@ public class MekHQ implements GameListener {
 	// So it should be backed down to 1 for releases...
 	// It's intended for 1 to be critical, 3 to be typical, and 5 to be debug/informational.
 	public static int VERBOSITY_LEVEL = 5;
-	public static String CAMPAIGN_DIRECTORY = "./campaigns/";
 	public static String PROPERTIES_FILE = "mmconf/mekhq.properties";
 	public static String PRESET_DIR = "./mmconf/mhqPresets/";
 
 	private static final EventBus EVENT_BUS = new EventBus();
 
 	private static MMLogger logger = null;
-	
+    private static MekHqPreferences preferences = null;
+
 	//stuff related to MM games
     private Server myServer = null;
     private GameThread gameThread = null;
@@ -114,7 +113,6 @@ public class MekHQ implements GameListener {
 
     private IconPackage iconPackage = new IconPackage();
 
-	private Properties preferences;
 
 	/**
 	 * Converts the MekHQ {@link #VERBOSITY_LEVEL} to {@link LogLevel}.
@@ -211,13 +209,20 @@ public class MekHQ implements GameListener {
 	protected static MekHQ getInstance() {
 		return new MekHQ();
 	}
+
+	public static MekHqPreferences getPreferences() {
+        if (null == preferences) {
+            preferences = new MekHqPreferences();
+        }
+        return preferences;
+    }
 	
     /**
      * At startup create and show the main frame of the application.
      */
     protected void startup() {
         showInfo();
-        //read in preferences
+        //read in F
     	readPreferences();
     	setLookAndFeel();
     	initEventHandlers();
@@ -257,34 +262,13 @@ public class MekHQ implements GameListener {
         MekHQ.getInstance().startup();
     }
 
-    protected static Properties setDefaultPreferences() {
-    	Properties defaults = new Properties();
-    	defaults.setProperty("laf", UIManager.getSystemLookAndFeelClassName());
-    	return defaults;
+    protected static void readPreferences() {
+        preferences = new MekHqPreferences();
+        preferences.loadFromFile(PROPERTIES_FILE);
     }
 
-    protected void readPreferences() {
-    	preferences = new Properties(setDefaultPreferences());
-        try {
-            preferences.load(new FileInputStream(PROPERTIES_FILE));
-            MekHQ.logMessage("loading mekhq properties from " + PROPERTIES_FILE);
-        } catch (FileNotFoundException e) {
-            MekHQ.logMessage("No mekhq properties file found. Reverting to defaults.");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    protected void savePreferences() {
-    	preferences.setProperty("laf", UIManager.getLookAndFeel().getClass().getName());
-    	try {
-			preferences.store(new FileOutputStream(PROPERTIES_FILE), "MekHQ Preferences");
-		} catch (FileNotFoundException e) {
-			MekHQ.logMessage("could not save preferences to " + PROPERTIES_FILE);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+    protected static void savePreferences() {
+        preferences.saveToFile(PROPERTIES_FILE);
     }
     
     private void showInfo() {
@@ -321,7 +305,7 @@ public class MekHQ implements GameListener {
     protected void setLookAndFeel() {
     	//TODO: we can extend this with other look and feel options
     	try {
-    		UIManager.setLookAndFeel(preferences.getProperty("laf"));
+    		UIManager.setLookAndFeel(preferences.getLookAndFeel());
     	} catch (ClassNotFoundException e) {
     		e.printStackTrace();
     	} catch (InstantiationException e) {
