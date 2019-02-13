@@ -21,6 +21,8 @@
 
 package mekhq;
 
+import mekhq.gui.model.PersonnelTableModel;
+
 import javax.swing.*;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -34,9 +36,13 @@ import java.util.Properties;
 public class MekHqPreferences {
     private static final String LOOK_AND_FEEL = "laf";
     private static final String CAMPAIGNS_DIRECTORY = "CampaignsDirectory";
+    private static final String PERSONNEL_MARKET_SORT_COLUMN_INDEX = "PersonnelMarketSortColumnIndex";
+    private static final String PERSONNEL_MARKET_SORT_ORDER = "PersonnelMarketSortOrder";
 
     private static final String DEFAULT_LOOK_AND_FEEL = UIManager.getSystemLookAndFeelClassName();
     private static final String DEFAULT_CAMPAIGNS_DIRECTORY = "./campaigns/";
+    private static final String DEFAULT_PERSONNEL_MARKET_SORT_COLUMN_INDEX = Integer.toString(PersonnelTableModel.COL_SKILL);
+    private static final String DEFAULT_PERSONNEL_MARKET_SORT_ORDER = SortOrder.DESCENDING.toString();
 
     private Properties preferences;
 
@@ -46,6 +52,8 @@ public class MekHqPreferences {
         // Default values
         this.preferences.setProperty(LOOK_AND_FEEL, DEFAULT_LOOK_AND_FEEL);
         this.preferences.setProperty(CAMPAIGNS_DIRECTORY, DEFAULT_CAMPAIGNS_DIRECTORY);
+        this.preferences.setProperty(PERSONNEL_MARKET_SORT_COLUMN_INDEX, DEFAULT_PERSONNEL_MARKET_SORT_COLUMN_INDEX);
+        this.preferences.setProperty(PERSONNEL_MARKET_SORT_ORDER, DEFAULT_PERSONNEL_MARKET_SORT_ORDER);
     }
 
     public void loadFromFile(String file) {
@@ -116,5 +124,22 @@ public class MekHqPreferences {
     public void setCampaignsDirectory(String path) {
         assert path != null && path.trim().length() > 0;
         this.preferences.setProperty(CAMPAIGNS_DIRECTORY, path);
+    }
+
+    public int getPersonnelMarketSortColumn() {
+        return Integer.parseInt(this.preferences.getProperty(PERSONNEL_MARKET_SORT_COLUMN_INDEX));
+    }
+
+    public void setPersonnelMarketSortColumn(int columnIndex) {
+        assert columnIndex > -1 && columnIndex < PersonnelTableModel.N_COL;
+        this.preferences.setProperty(PERSONNEL_MARKET_SORT_COLUMN_INDEX, Integer.toString(columnIndex));
+    }
+
+    public SortOrder getPersonnelMarketSortOrder() {
+        return SortOrder.valueOf(this.preferences.getProperty(PERSONNEL_MARKET_SORT_ORDER));
+    }
+
+    public void setPersonnelMarketSortOrder(SortOrder sortOrder) {
+        this.preferences.setProperty(PERSONNEL_MARKET_SORT_ORDER, sortOrder.toString());
     }
 }

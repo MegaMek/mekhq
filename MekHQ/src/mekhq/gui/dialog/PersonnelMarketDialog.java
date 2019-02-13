@@ -9,6 +9,8 @@ package mekhq.gui.dialog;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Frame;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.ResourceBundle;
@@ -24,7 +26,6 @@ import javax.swing.JTable;
 import javax.swing.RowFilter;
 import javax.swing.RowSorter;
 import javax.swing.ScrollPaneConstants;
-import javax.swing.SortOrder;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
@@ -35,6 +36,8 @@ import megamek.common.Entity;
 import megamek.common.util.DirectoryItems;
 import megamek.common.util.EncodeControl;
 import megamek.common.util.StringUtil;
+import mekhq.MekHQ;
+import mekhq.MekHqPreferences;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.market.PersonnelMarket;
@@ -219,19 +222,17 @@ public class PersonnelMarketDialog extends JDialog {
         tablePersonnel.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         tablePersonnel.setColumnModel(new XTableColumnModel());
         tablePersonnel.createDefaultColumnsFromModel();
-        sorter = new TableRowSorter<PersonnelTableModel>(personnelModel);
+        sorter = new TableRowSorter<>(personnelModel);
         sorter.setComparator(PersonnelTableModel.COL_SKILL, new LevelSorter());
         sorter.setComparator(PersonnelTableModel.COL_SALARY, new FormattedNumberSorter());
         tablePersonnel.setRowSorter(sorter);
-        sortKeys = new ArrayList<RowSorter.SortKey>();
-        sortKeys.add(new RowSorter.SortKey(PersonnelTableModel.COL_SKILL, SortOrder.DESCENDING));
+        sortKeys = new ArrayList<>();
+        sortKeys.add(new RowSorter.SortKey(
+                MekHQ.getPreferences().getPersonnelMarketSortColumn(),
+                MekHQ.getPreferences().getPersonnelMarketSortOrder()));
         sorter.setSortKeys(sortKeys);
         tablePersonnel.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-        tablePersonnel.getSelectionModel().addListSelectionListener(new javax.swing.event.ListSelectionListener() {
-            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
-                personChanged(evt);
-            }
-        });
+        tablePersonnel.getSelectionModel().addListSelectionListener(this::personChanged);
         TableColumn column = null;
         for (int i = 0; i < PersonnelTableModel.N_COL; i++) {
             column = ((XTableColumnModel)tablePersonnel.getColumnModel()).getColumnByModelIndex(i);
@@ -247,6 +248,7 @@ public class PersonnelMarketDialog extends JDialog {
 
         tablePersonnel.setIntercellSpacing(new Dimension(0, 0));
         tablePersonnel.setShowGrid(false);
+        tablePersonnel.getTableHeader().addMouseListener(new PersonnelTableHeaderMouseAdapter());
         column.setCellRenderer(getRenderer());
         scrollTablePersonnel.setViewportView(tablePersonnel);
 
@@ -580,4 +582,18 @@ public class PersonnelMarketDialog extends JDialog {
         }
     }
 
+    private final class PersonnelTableHeaderMouseAdapter extends MouseAdapter {
+        @Override public void mouseClicked(MouseEvent aEvent) {
+            int uiIndex = tablePersonnel.getColumnModel().getColumnIndexAtX(aEvent.getX());
+            int modelIndex = tablePersonnel.getColumnModel().getColumn(uiIndex).getModelIndex();
+            MekHQ.getPreferences().setPersonnelMarketSortColumn(modelIndex);
+
+            for (RowSorter.SortKey key : tablePersonnel.getRowSorter().getSortKeys()) {
+                if (key.getColumn() == modelIndex) {
+                    MekHQ.getPreferences().setPersonnelMarketSortOrder(key.getSortOrder());
+                    break;
+                }
+            }
+        }
+    }
 }
