@@ -23,8 +23,6 @@ package mekhq.campaign;
 import mekhq.campaign.personnel.Person;
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
 import org.mockito.Mockito;
 
 import java.util.ArrayList;
@@ -35,9 +33,7 @@ import java.util.UUID;
  * @version %Id%
  * @since 6/10/14 10:23 AM
  */
-@RunWith(JUnit4.class)
 public class CampaignTest {
-
     @Test
     public void testGetTechs() {
         final UUID testId = UUID.fromString("c8682a91-346f-49b0-9f1f-28e669ee4e95");
@@ -107,5 +103,4 @@ public class CampaignTest {
         expected.add(mockTechNoTime);
         Assert.assertEquals(expected, testCampaign.getTechs(false, testId, false, false));
     }
-
 }

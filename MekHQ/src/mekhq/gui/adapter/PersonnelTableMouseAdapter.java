@@ -6,6 +6,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.util.*;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.swing.*;
 import javax.swing.event.MouseInputAdapter;
@@ -25,6 +26,7 @@ import megamek.common.options.PilotOptions;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.Utilities;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.log.CustomLogEntry;
 import mekhq.campaign.log.PersonalLogger;
 import mekhq.campaign.personnel.Award;
@@ -726,10 +728,8 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 break;
             case CMD_RANSOM:
                 // ask the user if they want to sell off their prisoners. If yes, then add a daily report entry, add the money and remove them all.
-                int total = 0;
-                for(Person person : people) {
-                    total += person.getRansomValue();
-                }
+                Money total = Money.zero();
+                total = total.plus(Arrays.stream(people).map(Person::getRansomValue).collect(Collectors.toList()));
                 
                 if (0 == JOptionPane.showConfirmDialog(
                         null,
@@ -1095,16 +1095,20 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 break;
             case CMD_EDIT_SALARY:
             {
-                PopupValueChoiceDialog pcvd = new PopupValueChoiceDialog(gui.getFrame(),
-                        true, resourceMap.getString("changeSalary.text"), //$NON-NLS-1$
-                        selectedPerson.getSalary(), -1, 100000);
+                PopupValueChoiceDialog pcvd = new PopupValueChoiceDialog(
+                        gui.getFrame(),
+                        true,
+                        resourceMap.getString("changeSalary.text"), //$NON-NLS-1$
+                        selectedPerson.getSalary().getAmount().intValue(),
+                        -1,
+                        100000);
                 pcvd.setVisible(true);
                 int salary = pcvd.getValue();
                 if (salary < -1) {
                     return;
                 }
                 for (Person person : people) {
-                    person.setSalary(salary);
+                    person.setSalary(Money.of(salary));
                     MekHQ.triggerEvent(new PersonChangedEvent(person));
                 }
                 break;
@@ -1921,7 +1925,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                             Unit u = gui.getCampaign().getUnit(person.getUnitId());
                             if (null != u) {
                                 JMenu specialistMenu = new JMenu(resourceMap.getString("weaponSpecialist.text")); //$NON-NLS-1$
-                                TreeSet<String> uniqueWeapons = new TreeSet<String>();
+                                TreeSet<String> uniqueWeapons = new TreeSet<>();
                                 for (int j = 0; j < u.getEntity().getWeaponList().size(); j++) {
                                     Mounted m = u.getEntity().getWeaponList().get(j);
                                     uniqueWeapons.add(m.getName());

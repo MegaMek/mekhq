@@ -23,6 +23,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import mekhq.campaign.finances.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -79,9 +80,9 @@ public class MotiveSystem extends Part {
 	}
 
 	@Override
-	public long getStickerPrice() {
+	public Money getStickerPrice() {
 		// TODO Auto-generated method stub
-		return 0;
+		return Money.zero();
 	}
 	
 	@Override
@@ -211,5 +212,4 @@ public class MotiveSystem extends Part {
 	public TechAdvancement getTechAdvancement() {
 	    return TankLocation.TECH_ADVANCEMENT;
 	}
-	
 }

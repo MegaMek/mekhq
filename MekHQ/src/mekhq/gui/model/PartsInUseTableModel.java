@@ -106,7 +106,7 @@ public class PartsInUseTableModel extends DataTableModel {
                     return EMPTY_CELL;
                 }
             case COL_COST:
-                return FORMATTER.format(piu.getCost());
+                return piu.getCost().toAmountAndSymbolString();
             case COL_BUTTON_BUY:
                 return resourceMap.getString("buy.text"); //$NON-NLS-1$
             case COL_BUTTON_BUY_BULK:
@@ -139,7 +139,7 @@ public class PartsInUseTableModel extends DataTableModel {
     }
     
     public void setData(Set<PartInUse> data) {
-        setData(new ArrayList<PartInUse>(data));
+        setData(new ArrayList<>(data));
     }
     
     @SuppressWarnings("unchecked")

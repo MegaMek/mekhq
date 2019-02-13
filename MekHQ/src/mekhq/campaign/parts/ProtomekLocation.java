@@ -23,6 +23,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import mekhq.campaign.finances.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -135,7 +136,7 @@ public class ProtomekLocation extends Part {
     }
 
     @Override
-    public long getStickerPrice() {
+    public Money getStickerPrice() {
         double nloc = 7.0;
         if(null != unit) {
             nloc = unit.getEntity().locations();
@@ -153,7 +154,7 @@ public class ProtomekLocation extends Part {
         if (loc == Protomech.LOC_TORSO) {
             cost += 575000;
         }
-        return (long) Math.round(cost);
+        return Money.of(cost);
     }
 
     public boolean forQuad() {
@@ -227,20 +228,11 @@ public class ProtomekLocation extends Part {
             } else if (wn2.getNodeName().equalsIgnoreCase("percent")) {
                 percent = Double.parseDouble(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("booster")) {
-                if (wn2.getTextContent().equalsIgnoreCase("true"))
-                    booster = true;
-                else
-                    booster = false;
+                booster = wn2.getTextContent().equalsIgnoreCase("true");
             } else if (wn2.getNodeName().equalsIgnoreCase("forQuad")) {
-                if (wn2.getTextContent().equalsIgnoreCase("true"))
-                    forQuad = true;
-                else
-                    forQuad = false;
+                forQuad = wn2.getTextContent().equalsIgnoreCase("true");
             } else if (wn2.getNodeName().equalsIgnoreCase("breached")) {
-                if (wn2.getTextContent().equalsIgnoreCase("true"))
-                    breached = true;
-                else
-                    breached = false;
+                breached = wn2.getTextContent().equalsIgnoreCase("true");
             }
         }
     }
@@ -346,7 +338,6 @@ public class ProtomekLocation extends Part {
             percent = ((double) unit.getEntity().getInternalForReal(loc)) / ((double) unit.getEntity().getOInternal(loc));
             if(percent <= 0.0) {
                 remove(false);
-                return;
             }
         }
     }

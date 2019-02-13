@@ -20,9 +20,7 @@
  */
 package mekhq.gui.model;
 
-
 import java.awt.Component;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 import javax.swing.JTable;
@@ -36,146 +34,142 @@ import mekhq.campaign.mission.Loot;
      * A table model for displaying loot for scenarios and missions
      */
 public class LootTableModel extends AbstractTableModel {
+    /**
+     *
+     */
+    private static final long serialVersionUID = -58915479895694545L;
+    protected String[] columnNames;
+    protected ArrayList<Loot> data;
 
-        /**
-         * 
-         */
-        private static final long serialVersionUID = -58915479895694545L;
-        protected String[] columnNames;
-        protected ArrayList<Loot> data;
+    public final static int COL_NAME    = 0;
+    public final static int COL_MONEY   = 1;
+    public final static int COL_MECHS   = 2;
+    public final static int COL_PARTS   = 3;
+    public final static int N_COL       = 4;
 
-        public final static int COL_NAME    = 0;
-        public final static int COL_MONEY   = 1;
-        public final static int COL_MECHS   = 2;
-        public final static int COL_PARTS   = 3;
-        public final static int N_COL       = 4;
-        
-        public LootTableModel(ArrayList<Loot> entries) {
-            data = entries;
-        }
-        
-        public int getRowCount() {
-            return data.size();
-        }
+    public LootTableModel(ArrayList<Loot> entries) {
+        data = entries;
+    }
 
-        public int getColumnCount() {
-            return N_COL;
-        }
+    public int getRowCount() {
+        return data.size();
+    }
 
-        @Override
-        public String getColumnName(int column) {
-            switch(column) {
-                case COL_NAME:
-                    return "Name";
-                case COL_MONEY:
-                    return "Money";
-                case COL_MECHS:
-                    return "# Units";
-                case COL_PARTS:
-                    return "# Parts";
-                default:
-                    return "?";
-            }
-        }
+    public int getColumnCount() {
+        return N_COL;
+    }
 
-        public Object getValueAt(int row, int col) {
-            Loot loot;
-            DecimalFormat formatter = new DecimalFormat();
-            if(data.isEmpty()) {
-                return "";
-            } else {
-                loot = getLootAt(row);
-            }
-            if(col == COL_NAME) {                
-                return loot.getName();
-            }
-            if(col == COL_MONEY) {                
-                return formatter.format(loot.getCash());
-            }
-            if(col == COL_MECHS) {
-                return loot.getUnits().size();
-            }
-            if(col == COL_PARTS) {
-                return loot.getParts().size();
-            }
-            return "?";
+    @Override
+    public String getColumnName(int column) {
+        switch(column) {
+            case COL_NAME:
+                return "Name";
+            case COL_MONEY:
+                return "money";
+            case COL_MECHS:
+                return "# Units";
+            case COL_PARTS:
+                return "# Parts";
+            default:
+                return "?";
         }
-        
-        @Override
-        public boolean isCellEditable(int row, int col) {
-            return false;
-        }
-        
-        @Override
-        public Class<? extends Object> getColumnClass(int c) {
-            return getValueAt(0, c).getClass();
-        }
+    }
 
-        public Loot getLootAt(int row) {
-            return (Loot) data.get(row);
+    public Object getValueAt(int row, int col) {
+        Loot loot;
+        if(data.isEmpty()) {
+            return "";
+        } else {
+            loot = getLootAt(row);
         }
-        
-        public void addLoot(Loot loot) {
-            data.add(loot);
-            fireTableDataChanged();
+        if(col == COL_NAME) {
+            return loot.getName();
         }
-        
-        public ArrayList<Loot> getAllLoot() {
-            return data;
+        if(col == COL_MONEY) {
+            return loot.getCash().toAmountAndSymbolString();
         }
-        
-         public int getColumnWidth(int c) {
-             switch(c) {
-             case COL_MONEY:
-             case COL_NAME:
-                 return 100;     
-             default:
-                 return 20;
-             }
+        if(col == COL_MECHS) {
+            return loot.getUnits().size();
+        }
+        if(col == COL_PARTS) {
+            return loot.getParts().size();
+        }
+        return "?";
+    }
+
+    @Override
+    public boolean isCellEditable(int row, int col) {
+        return false;
+    }
+
+    @Override
+    public Class<? extends Object> getColumnClass(int c) {
+        return getValueAt(0, c).getClass();
+    }
+
+    public Loot getLootAt(int row) {
+        return (Loot) data.get(row);
+    }
+
+    public void addLoot(Loot loot) {
+        data.add(loot);
+        fireTableDataChanged();
+    }
+
+    public ArrayList<Loot> getAllLoot() {
+        return data;
+    }
+
+     public int getColumnWidth(int c) {
+         switch(c) {
+         case COL_MONEY:
+         case COL_NAME:
+             return 100;
+         default:
+             return 20;
          }
-            
-         public int getAlignment(int col) {
-             return SwingConstants.LEFT;
-         }
+     }
 
-         public String getTooltip(int row, int col) {
-             switch(col) {
-             default:
-                 return null;
-             }
-         }
-            
-         //fill table with values
-         public void setData(ArrayList<Loot> loot) {
-             data = loot;
-             fireTableDataChanged();
-         }
-            
-         public LootTableModel.Renderer getRenderer() {
-             return new LootTableModel.Renderer();
-         }
+     public int getAlignment(int col) {
+         return SwingConstants.LEFT;
+     }
 
-         public class Renderer extends DefaultTableCellRenderer {
-             
-
-             /**
-             * 
-             */
-            private static final long serialVersionUID = -2888173457152182907L;
-
-            public Component getTableCellRendererComponent(JTable table,
-                     Object value, boolean isSelected, boolean hasFocus,
-                        int row, int column) {
-                    super.getTableCellRendererComponent(table, value, isSelected,
-                            hasFocus, row, column);
-                    setOpaque(true);
-                    int actualCol = table.convertColumnIndexToModel(column);
-                    int actualRow = table.convertRowIndexToModel(row);
-                    setHorizontalAlignment(getAlignment(actualCol));
-                    setToolTipText(getTooltip(actualRow, actualCol));
-                    
-                    return this;
-                }
-
+     public String getTooltip(int row, int col) {
+         switch(col) {
+         default:
+             return null;
          }
+     }
+
+     //fill table with values
+     public void setData(ArrayList<Loot> loot) {
+         data = loot;
+         fireTableDataChanged();
+     }
+
+     public LootTableModel.Renderer getRenderer() {
+         return new LootTableModel.Renderer();
+     }
+
+     public class Renderer extends DefaultTableCellRenderer {
+
+     /**
+     *
+     */
+    private static final long serialVersionUID = -2888173457152182907L;
+
+    public Component getTableCellRendererComponent(JTable table,
+             Object value, boolean isSelected, boolean hasFocus,
+                int row, int column) {
+            super.getTableCellRendererComponent(table, value, isSelected,
+                    hasFocus, row, column);
+            setOpaque(true);
+            int actualCol = table.convertColumnIndexToModel(column);
+            int actualRow = table.convertRowIndexToModel(row);
+            setHorizontalAlignment(getAlignment(actualCol));
+            setToolTipText(getTooltip(actualRow, actualCol));
+
+            return this;
+        }
+     }
 }

@@ -23,6 +23,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import mekhq.campaign.finances.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -47,13 +48,13 @@ public class FireControlSystem extends Part {
 	 */
 	private static final long serialVersionUID = -717866644605314883L;
 	
-	private long cost;
+	private Money cost;
 	
 	public FireControlSystem() {
-    	this(0, 0, null);
+    	this(0, Money.zero(), null);
     }
     
-    public FireControlSystem(int tonnage, long cost, Campaign c) {
+    public FireControlSystem(int tonnage, Money cost, Campaign c) {
         super(tonnage, c);
         this.cost = cost;
         this.name = "Fire Control System";
@@ -75,10 +76,8 @@ public class FireControlSystem extends Part {
 					&& (hits < 3 && !campaign.getCampaignOptions().useAeroSystemHits())
                     && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
 				remove(false);
-				return;
 			} else if (hits >= 3) {
                 remove(false);
-                return;
             }
 		}
 	}
@@ -188,7 +187,7 @@ public class FireControlSystem extends Part {
 	}
 
 	@Override
-	public long getStickerPrice() {
+	public Money getStickerPrice() {
 		calculateCost();
 		return cost;
 	}
@@ -196,10 +195,10 @@ public class FireControlSystem extends Part {
 	public void calculateCost() {
 		if(null != unit) {
 			if(unit.getEntity() instanceof SmallCraft) {
-				cost = 100000 + 10000 * ((SmallCraft)unit.getEntity()).getArcswGuns();
+				cost = Money.of(100000 + 10000 * ((SmallCraft)unit.getEntity()).getArcswGuns());
 			}
 			else if(unit.getEntity() instanceof Jumpship) {
-				cost = 100000 + 10000 * ((Jumpship)unit.getEntity()).getArcswGuns();
+				cost = Money.of(100000 + 10000 * ((Jumpship)unit.getEntity()).getArcswGuns());
 			}
 		}
 	}
@@ -224,7 +223,7 @@ public class FireControlSystem extends Part {
 		writeToXmlBegin(pw1, indent);
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<cost>"
-				+cost
+				+cost.toXmlString()
 				+"</cost>");
 		writeToXmlEnd(pw1, indent);
 	}
@@ -236,7 +235,7 @@ public class FireControlSystem extends Part {
 		for (int x=0; x<nl.getLength(); x++) {
 			Node wn2 = nl.item(x);		
 			if (wn2.getNodeName().equalsIgnoreCase("cost")) {
-				cost = Long.parseLong(wn2.getTextContent());
+				cost = Money.fromXmlString(wn2.getTextContent().trim());
 			} 
 		}
 	}

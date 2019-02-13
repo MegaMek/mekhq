@@ -39,6 +39,7 @@ import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.event.MarketNewPersonnelEvent;
 import mekhq.campaign.event.NewDayEvent;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
@@ -72,7 +73,7 @@ public class AtBEventProcessor {
         // TODO: move code from Campaign here
         if (campaign.getPersonnelMarket().getPaidRecruitment()
                 && campaign.getCalendar().get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY) {
-            if (campaign.getFinances().debit(100000, Transaction.C_MISC,
+            if (campaign.getFinances().debit(Money.of(100000), Transaction.C_MISC,
                     "Paid recruitment roll", campaign.getDate())) {
                 doPaidRecruitment();
             } else {
@@ -199,7 +200,7 @@ public class AtBEventProcessor {
                 weight = EntityWeightClass.WEIGHT_HEAVY;
             }
         }
-        Entity en = null;
+        Entity en;
 
         String faction = getRecruitFaction(campaign);
         
@@ -291,7 +292,7 @@ public class AtBEventProcessor {
     public static String getRecruitFaction(Campaign c) {
         if (c.getFactionCode().equals("MERC")) {
             if (c.getCalendar().get(Calendar.YEAR) > 3055 && Compute.randomInt(20) == 0) {
-                ArrayList<String> clans = new ArrayList<String>();
+                ArrayList<String> clans = new ArrayList<>();
                 for (String f : RandomFactionGenerator.getInstance().getCurrentFactions()) {
                     if (Faction.getFaction(f).isClan()) {
                         clans.add(f);

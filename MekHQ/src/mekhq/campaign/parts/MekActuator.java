@@ -22,9 +22,9 @@
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
-import java.text.DecimalFormat;
 import java.util.StringJoiner;
 
+import mekhq.campaign.finances.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -96,8 +96,8 @@ public class MekActuator extends Part {
     }
     
     @Override
-    public long getStickerPrice() {
-        long unitCost = 0;
+    public Money getStickerPrice() {
+        double unitCost = 0;
         switch (getType()) {
             case (Mech.ACTUATOR_UPPER_ARM) : {
                 unitCost = 100;
@@ -134,7 +134,7 @@ public class MekActuator extends Part {
                 break;
             }
         }
-        return getUnitTonnage() * unitCost;
+        return Money.of(getUnitTonnage() * unitCost);
     }
 
     @Override
@@ -230,7 +230,6 @@ public class MekActuator extends Part {
 					&& hits > priorHits 
 					&& Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
 				remove(false);
-				return;
 			}
 		}
 	}
@@ -264,9 +263,8 @@ public class MekActuator extends Part {
                 sj.add(getLocationName());
             }
             if (campaign.getCampaignOptions().payForRepairs()) {
-                int repairCost = (int) (getStickerPrice() * .2);
-                DecimalFormat numFormatter = new DecimalFormat();
-                sj.add(numFormatter.format(repairCost) + " C-bills to repair");
+                Money repairCost = getStickerPrice().multipliedBy(0.2);
+                sj.add(repairCost.toAmountAndSymbolString() + " to repair");
             }
             return sj.toString();
 		}

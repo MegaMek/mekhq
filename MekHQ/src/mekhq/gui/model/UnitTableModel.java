@@ -3,7 +3,6 @@ package mekhq.gui.model;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Image;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 import javax.swing.JTable;
@@ -196,7 +195,6 @@ public class UnitTableModel extends DataTableModel {
         }
         Entity e = u.getEntity();
         //PilotPerson pp = u.getPilot();
-        DecimalFormat format = new DecimalFormat();
         if(null == e) {
             return "?";
         }
@@ -213,7 +211,7 @@ public class UnitTableModel extends DataTableModel {
             return e.getWeightClassName();
         }
         if(col == COL_COST) {
-            return format.format(u.getSellValue());
+            return u.getSellValue().toAmountAndSymbolString();
         }
         if(col == COL_MAINTAIN) {
             return u.getMaintenanceCost();

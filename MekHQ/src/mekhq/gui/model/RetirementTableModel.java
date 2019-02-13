@@ -3,8 +3,6 @@ package mekhq.gui.model;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Image;
-import java.text.DecimalFormat;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
@@ -24,6 +22,7 @@ import megamek.common.UnitType;
 import mekhq.IconPackage;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.RetirementDefectionTracker;
@@ -63,20 +62,18 @@ public class RetirementTableModel extends AbstractTableModel {
     private HashMap<UUID, Integer> miscMods;
     private int generalMod;
     private HashMap<UUID, UUID> unitAssignments;
-    private HashMap<UUID, Integer> altPayout;
+    private HashMap<UUID, Money> altPayout;
     boolean editPayout;
-    private DecimalFormat formatter;
 
     public RetirementTableModel(Campaign c) {
         this.campaign = c;
-        data = new ArrayList<UUID>();
-        payBonus = new HashMap<UUID, Boolean>();
-        miscMods = new HashMap<UUID, Integer>();
+        data = new ArrayList<>();
+        payBonus = new HashMap<>();
+        miscMods = new HashMap<>();
         generalMod = 0;
-        unitAssignments = new HashMap<UUID, UUID>();
-        altPayout = new HashMap<UUID, Integer>();
+        unitAssignments = new HashMap<>();
+        altPayout = new HashMap<>();
         editPayout = false;
-        formatter = new DecimalFormat();
     }
 
     public void setData(ArrayList<UUID> list,
@@ -243,7 +240,7 @@ public class RetirementTableModel extends AbstractTableModel {
                     (payBonus.get(p.getId())?1:0) +
                     miscMods.get(p.getId()) + generalMod;
         case COL_BONUS_COST:
-            return formatter.format(RetirementDefectionTracker.getBonusCost(p));
+            return RetirementDefectionTracker.getBonusCost(p).toAmountAndSymbolString();
         case COL_PAY_BONUS:
             if (null == payBonus.get(p.getId())) {
                 return false;
@@ -261,9 +258,9 @@ public class RetirementTableModel extends AbstractTableModel {
                 return "";
             }
             if (altPayout.keySet().contains(p.getId())) {
-                return formatter.format(altPayout.get(p.getId()));
+                return altPayout.get(p.getId()).toAmountAndSymbolString();
             }
-            long payout = campaign.getRetirementDefectionTracker().getPayout(p.getId()).getCbills();
+            Money payout = campaign.getRetirementDefectionTracker().getPayout(p.getId()).getPayoutAmount();
             /* If no unit is required as part of the payout, the unit is part or all of the
              * final payout. If using the share system and tracking the original unit,
              * the payout is also reduced by the value of the unit.
@@ -274,18 +271,22 @@ public class RetirementTableModel extends AbstractTableModel {
                             campaign.getCampaignOptions().getTrackOriginalUnit() &&
                             p.getOriginalUnitId() == unitAssignments.get(p.getId()) &&
                                     null != campaign.getUnit(unitAssignments.get(p.getId())))) {
-                payout -= campaign.getUnit(unitAssignments.get(p.getId())).getBuyCost();
+                payout = payout.minus(campaign.getUnit(unitAssignments.get(p.getId())).getBuyCost());
             }
             if (null != unitAssignments.get(p.getId())) {
-                payout += RetirementDefectionDialog.getShortfallAdjustment(campaign.getRetirementDefectionTracker().getPayout(p.getId()).getWeightClass(),
-                        RetirementDefectionDialog.weightClassIndex(campaign.getUnit(unitAssignments.get(p.getId()))));
+                payout = payout.plus(RetirementDefectionDialog.getShortfallAdjustment(campaign.getRetirementDefectionTracker().getPayout(p.getId()).getWeightClass(),
+                        RetirementDefectionDialog.weightClassIndex(campaign.getUnit(unitAssignments.get(p.getId())))));
             }
             /* No payout if the pilot stole a unit */
             if (campaign.getRetirementDefectionTracker().getPayout(p.getId()).hasStolenUnit() &&
                     null != unitAssignments.get(p.getId())) {
-                payout = 0;
+                payout = Money.zero();
             }
-            return formatter.format(Math.max(payout, 0));
+            // If payout is negative then just make it zero
+            if (payout.isNegative()) {
+                payout = Money.zero();
+            }
+            return payout.toAmountAndSymbolString();
         case COL_UNIT:
             if (null == campaign.getRetirementDefectionTracker().getPayout(p.getId()) ||
                     null == unitAssignments) {
@@ -322,14 +323,15 @@ public class RetirementTableModel extends AbstractTableModel {
     @Override
     public void setValueAt(Object value, int row, int col) {
         if (col == COL_PAYOUT) {
-            Number payout;
             try {
-                payout = formatter.parse((String)value);
-            } catch (ParseException e1) {
+                if (value == null) {
+                    return;
+                }
+
+                Money payout = Money.of(Double.parseDouble(value.toString()));
+                altPayout.put(data.get(row), payout);
+            } catch (Exception e1) {
                 return;
-            }
-            if (null != payout) {
-                altPayout.put(data.get(row), payout.intValue());
             }
         } else if (col == COL_PAY_BONUS) {
             payBonus.put(data.get(row), (Boolean)value);
@@ -367,7 +369,7 @@ public class RetirementTableModel extends AbstractTableModel {
         fireTableDataChanged();
     }
 
-    public HashMap<UUID, Integer> getAltPayout() {
+    public HashMap<UUID, Money> getAltPayout() {
         return altPayout;
     }
 
