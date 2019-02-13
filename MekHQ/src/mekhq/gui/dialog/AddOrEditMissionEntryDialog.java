@@ -21,7 +21,7 @@ package mekhq.gui.dialog;
 
 import megamek.common.util.EncodeControl;
 import mekhq.campaign.log.LogEntry;
-import mekhq.campaign.log.MissionLogEntry;
+import mekhq.campaign.log.ServiceLogEntry;
 import mekhq.campaign.personnel.Person;
 
 import javax.swing.*;
@@ -55,7 +55,7 @@ public class AddOrEditMissionEntryDialog extends JDialog {
     private JButton btnClose;
 
     public AddOrEditMissionEntryDialog(Frame parent, boolean modal, Date entryDate) {
-        this(parent, modal, ADD_OPERATION, new MissionLogEntry(entryDate, ""));
+        this(parent, modal, ADD_OPERATION, new ServiceLogEntry(entryDate, ""));
     }
 
     public AddOrEditMissionEntryDialog(Frame parent, boolean modal, LogEntry entry) {
