@@ -46,8 +46,6 @@ import mekhq.campaign.universe.Faction;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -66,665 +64,172 @@ import static org.junit.Assert.*;
  * @since 9/28/13 11:20 AM
  */
 @SuppressWarnings("FieldCanBeLocal")
-@RunWith(JUnit4.class)
 public class CampaignOpsReputationTest {
 
-    private Campaign mockCampaign = mock(Campaign.class);
-    private ArrayList<Unit> unitList = new ArrayList<>();
-    private ArrayList<Person> personnelList = new ArrayList<>();
-    private ArrayList<Person> activePersonnelList = new ArrayList<>();
-    private ArrayList<Mission> missionList = new ArrayList<>();
+    private Campaign mockCampaign;
+    private ArrayList<Unit> unitList;
+    private ArrayList<Person> personnelList;
+    private ArrayList<Person> activePersonnelList;
+    private ArrayList<Mission> missionList;
 
     // Mothballed units.
-    private Unit mockMechMothballed = mock(Unit.class);
-    private Unit mockAeroMothballed = mock(Unit.class);
-    private Unit mockTankMothballed = mock(Unit.class);
+    private Unit mockMechMothballed;
+    private Unit mockAeroMothballed;
+    private Unit mockTankMothballed;
 
     // Mechs
-    private Skill mockMechGunnery = mock(Skill.class);
-    private Skill mockMechPilot = mock(Skill.class);
-    private Skill mockLeader = mock(Skill.class);
-    private Skill mockTactics = mock(Skill.class);
-    private Skill mockStrategy = mock(Skill.class);
-    private Skill mockNegotiation = mock(Skill.class);
-    private BipedMech mockThunderbolt1 = mock(BipedMech.class);
-    private Unit mockThunderboltUnit1 = mock(Unit.class);
-    private Person mockThunderbolt1Pilot = mock(Person.class);
-    private Person mockThunderbolt1Tech = mock(Person.class);
-    private BipedMech mockThunderbolt2 = mock(BipedMech.class);
-    private Unit mockThunderboltUnit2 = mock(Unit.class);
-    private Person mockThunderbolt2Pilot = mock(Person.class);
-    private Person mockThunderbolt2Tech = mock(Person.class);
-    private BipedMech mockGrasshopper1 = mock(BipedMech.class);
-    private Unit mockGrasshopperUnit1 = mock(Unit.class);
-    private Person mockGrasshopper1Pilot = mock(Person.class);
-    private Person mockGrasshopper1Tech = mock(Person.class);
-    private BipedMech mockGrasshopper2 = mock(BipedMech.class);
-    private Unit mockGrasshopperUnit2 = mock(Unit.class);
-    private Person mockGrasshopper2Pilot = mock(Person.class);
-    private Person mockGrasshopper2Tech = mock(Person.class);
+    private Skill mockMechGunnery;
+    private Skill mockMechPilot;
+    private Skill mockLeader ;
+    private Skill mockTactics;
+    private Skill mockStrategy;
+    private Skill mockNegotiation;
+    private BipedMech mockThunderbolt1;
+    private Unit mockThunderboltUnit1;
+    private Person mockThunderbolt1Pilot;
+    private Person mockThunderbolt1Tech;
+    private BipedMech mockThunderbolt2;
+    private Unit mockThunderboltUnit2;
+    private Person mockThunderbolt2Pilot;
+    private Person mockThunderbolt2Tech;
+    private BipedMech mockGrasshopper1;
+    private Unit mockGrasshopperUnit1;
+    private Person mockGrasshopper1Pilot;
+    private Person mockGrasshopper1Tech;
+    private BipedMech mockGrasshopper2;
+    private Unit mockGrasshopperUnit2;
+    private Person mockGrasshopper2Pilot;
+    private Person mockGrasshopper2Tech;
 
     // Tanks
-    private Skill mockTankGunnery = mock(Skill.class);
-    private Skill mockTankPilot = mock(Skill.class);
-    private Tank mockBulldog1 = mock(Tank.class);
-    private Unit mockBulldogUnit1 = mock(Unit.class);
-    private Person mockBulldog1Driver = mock(Person.class);
-    private Person mockBulldog1Gunner1 = mock(Person.class);
-    private Person mockBulldog1Gunner2 = mock(Person.class);
-    private Person mockBulldog1Gunner3 = mock(Person.class);
-    private Person mockBulldog1Tech = mock(Person.class);
-    private Tank mockBulldog2 = mock(Tank.class);
-    private Unit mockBulldogUnit2 = mock(Unit.class);
-    private Person mockBulldog2Driver = mock(Person.class);
-    private Person mockBulldog2Gunner1 = mock(Person.class);
-    private Person mockBulldog2Gunner2 = mock(Person.class);
-    private Person mockBulldog2Gunner3 = mock(Person.class);
-    private Person mockBulldog2Tech = mock(Person.class);
-    private Tank mockBulldog3 = mock(Tank.class);
-    private Unit mockBulldogUnit3 = mock(Unit.class);
-    private Person mockBulldog3Driver = mock(Person.class);
-    private Person mockBulldog3Gunner1 = mock(Person.class);
-    private Person mockBulldog3Gunner2 = mock(Person.class);
-    private Person mockBulldog3Gunner3 = mock(Person.class);
-    private Person mockBulldog3Tech = mock(Person.class);
-    private Tank mockBulldog4 = mock(Tank.class);
-    private Unit mockBulldogUnit4 = mock(Unit.class);
-    private Person mockBulldog4Driver = mock(Person.class);
-    private Person mockBulldog4Gunner1 = mock(Person.class);
-    private Person mockBulldog4Gunner2 = mock(Person.class);
-    private Person mockBulldog4Gunner3 = mock(Person.class);
-    private Person mockBulldog4Tech = mock(Person.class);
-    private Tank mockPackrat1 = mock(Tank.class);
-    private Unit mockPackratUnit1 = mock(Unit.class);
-    private Person mockPackrat1Driver = mock(Person.class);
-    private Person mockPackrat1Gunner = mock(Person.class);
-    private Person mockPackrat1Tech = mock(Person.class);
-    private Tank mockPackrat2 = mock(Tank.class);
-    private Unit mockPackratUnit2 = mock(Unit.class);
-    private Person mockPackrat2Driver = mock(Person.class);
-    private Person mockPackrat2Gunner = mock(Person.class);
-    private Person mockPackrat2Tech = mock(Person.class);
-    private Tank mockPackrat3 = mock(Tank.class);
-    private Unit mockPackratUnit3 = mock(Unit.class);
-    private Person mockPackrat3Driver = mock(Person.class);
-    private Person mockPackrat3Gunner = mock(Person.class);
-    private Person mockPackrat3Tech = mock(Person.class);
-    private Tank mockPackrat4 = mock(Tank.class);
-    private Unit mockPackratUnit4 = mock(Unit.class);
-    private Person mockPackrat4Driver = mock(Person.class);
-    private Person mockPackrat4Gunner = mock(Person.class);
-    private Person mockPackrat4Tech = mock(Person.class);
+    private Skill mockTankGunnery;
+    private Skill mockTankPilot;
+    private Tank mockBulldog1;
+    private Unit mockBulldogUnit1;
+    private Person mockBulldog1Driver;
+    private Person mockBulldog1Gunner1;
+    private Person mockBulldog1Gunner2;
+    private Person mockBulldog1Gunner3;
+    private Person mockBulldog1Tech;
+    private Tank mockBulldog2;
+    private Unit mockBulldogUnit2;
+    private Person mockBulldog2Driver;
+    private Person mockBulldog2Gunner1;
+    private Person mockBulldog2Gunner2;
+    private Person mockBulldog2Gunner3;
+    private Person mockBulldog2Tech;
+    private Tank mockBulldog3;
+    private Unit mockBulldogUnit3;
+    private Person mockBulldog3Driver;
+    private Person mockBulldog3Gunner1;
+    private Person mockBulldog3Gunner2;
+    private Person mockBulldog3Gunner3;
+    private Person mockBulldog3Tech;
+    private Tank mockBulldog4;
+    private Unit mockBulldogUnit4;
+    private Person mockBulldog4Driver;
+    private Person mockBulldog4Gunner1;
+    private Person mockBulldog4Gunner2;
+    private Person mockBulldog4Gunner3;
+    private Person mockBulldog4Tech;
+    private Tank mockPackrat1;
+    private Unit mockPackratUnit1;
+    private Person mockPackrat1Driver;
+    private Person mockPackrat1Gunner;
+    private Person mockPackrat1Tech;
+    private Tank mockPackrat2;
+    private Unit mockPackratUnit2;
+    private Person mockPackrat2Driver;
+    private Person mockPackrat2Gunner;
+    private Person mockPackrat2Tech;
+    private Tank mockPackrat3;
+    private Unit mockPackratUnit3;
+    private Person mockPackrat3Driver;
+    private Person mockPackrat3Gunner;
+    private Person mockPackrat3Tech;
+    private Tank mockPackrat4;
+    private Unit mockPackratUnit4;
+    private Person mockPackrat4Driver;
+    private Person mockPackrat4Gunner;
+    private Person mockPackrat4Tech;
 
     // Infantry
-    private Skill mockInfantryGunnery = mock(Skill.class);
-    private Infantry mockLaserPlatoon = mock(Infantry.class);
-    private Unit mockLaserPlatoonUnit = mock(Unit.class);
-    private Collection<Person> infantryPersonnel = new HashSet<>(28);
+    private Skill mockInfantryGunnery;
+    private Infantry mockLaserPlatoon;
+    private Unit mockLaserPlatoonUnit;
+    private Collection<Person> infantryPersonnel;
 
     // Fighters
-    private Skill mockAeroGunnery = mock(Skill.class);
-    private Skill mockAeroPilot = mock(Skill.class);
-    private Aero mockCorsair1 = mock(Aero.class);
-    private Unit mockCorsairUnit1 = mock(Unit.class);
-    private Person mockCorsair1Pilot = mock(Person.class);
-    private Person getMockCorsair1Tech = mock(Person.class);
-    private Aero mockCorsair2 = mock(Aero.class);
-    private Unit mockCorsairUnit2 = mock(Unit.class);
-    private Person mockCorsair2Pilot = mock(Person.class);
-    private Person getMockCorsair2Tech = mock(Person.class);
+    private Skill mockAeroGunnery;
+    private Skill mockAeroPilot;
+    private Aero mockCorsair1;
+    private Unit mockCorsairUnit1;
+    private Person mockCorsair1Pilot;
+    private Person mockCorsair1Tech;
+    private Aero mockCorsair2;
+    private Unit mockCorsairUnit2;
+    private Person mockCorsair2Pilot;
+    private Person mockCorsair2Tech;
 
     // Dropships
-    private Skill mockDropGunnery = mock(Skill.class);
-    private Skill mockDropPilot = mock(Skill.class);
-    private Dropship mockSeeker = mock(Dropship.class);
-    private Unit mockSeekerUnit = mock(Unit.class);
-    private Collection<Person> seekerCrew = new HashSet<>(20);
+    private Skill mockDropGunnery;
+    private Skill mockDropPilot;
+    private Dropship mockSeeker;
+    private Unit mockSeekerUnit;
+    private Collection<Person> seekerCrew;
 
     // Jumpships
-    private Skill mockJumpGunnery = mock(Skill.class);
-    private Skill mockJumpPilot = mock(Skill.class);
-    private Jumpship mockInvader = mock(Jumpship.class);
-    private Unit mockInvaderUnit = mock(Unit.class);
-    private Collection<Person> invaderCrew = new HashSet<>(24);
+    private Skill mockJumpGunnery;
+    private Skill mockJumpPilot;
+    private Jumpship mockInvader;
+    private Unit mockInvaderUnit;
+    private Collection<Person> invaderCrew;
 
     // Techs
-    private Skill mockMechTechSkillRegular = mock(Skill.class);
-    private Skill mockMechTechSkillElite = mock(Skill.class);
-    private Skill mockFighterTechSkill = mock(Skill.class);
-    private Skill mockFighterTechSkillElite = mock(Skill.class);
-    private Skill mockVeeTechSkill = mock(Skill.class);
-    private Collection<Person> regularAdmins = new HashSet<>(10);
+    private Skill mockMechTechSkillRegular;
+    private Skill mockMechTechSkillElite;
+    private Skill mockFighterTechSkill;
+    private Skill mockFighterTechSkillElite;
+    private Skill mockVeeTechSkill;
+    private Collection<Person> regularAdmins;
 
     // Finances
-    private Finances mockFinances = mock(Finances.class);
+    private Finances mockFinances;
 
-    private CampaignOpsReputation spyReputation = spy(new CampaignOpsReputation(mockCampaign));
+    private CampaignOpsReputation spyReputation;
 
     @Before
     public void setUp() {
-        int astechs = 0;
         mockCampaign = mock(Campaign.class);
         Faction mockFaction = mock(Faction.class);
         when(mockFaction.is(any())).thenReturn(true);
         when(mockCampaign.getFaction()).thenReturn(mockFaction);
-        
-        unitList = new ArrayList<>();
-        personnelList = new ArrayList<>();
-        activePersonnelList = new ArrayList<>();
-        missionList = new ArrayList<>();
-        infantryPersonnel = new HashSet<>(28);
-        seekerCrew = new HashSet<>(20);
-        invaderCrew = new HashSet<>(24);
-        regularAdmins = new HashSet<>(10);
         spyReputation = spy(new CampaignOpsReputation(mockCampaign));
 
-        when(mockMechMothballed.isMothballed()).thenReturn(true);
+        int astechs = 0;
+        unitList = new ArrayList<>();
+        personnelList = new ArrayList<>();
+        missionList = new ArrayList<>();
 
-        when(mockAeroMothballed.isMothballed()).thenReturn(true);
-
-        when(mockTankMothballed.isMothballed()).thenReturn(true);
-
-        when(mockMechGunnery.getLevel()).thenReturn(4);
-        when(mockMechPilot.getLevel()).thenReturn(5);
-        when(mockTankGunnery.getLevel()).thenReturn(4);
-        when(mockTankPilot.getLevel()).thenReturn(5);
-        when(mockInfantryGunnery.getLevel()).thenReturn(4);
-        when(mockAeroGunnery.getLevel()).thenReturn(4);
-        when(mockAeroPilot.getLevel()).thenReturn(5);
-        when(mockDropGunnery.getLevel()).thenReturn(4);
-        when(mockDropPilot.getLevel()).thenReturn(5);
-        when(mockJumpGunnery.getLevel()).thenReturn(4);
-        when(mockJumpPilot.getLevel()).thenReturn(5);
-        when(mockLeader.getLevel()).thenReturn(4);
-        when(mockTactics.getLevel()).thenReturn(2);
-        when(mockStrategy.getLevel()).thenReturn(2);
-        when(mockNegotiation.getLevel()).thenReturn(5);
-        when(mockMechTechSkillRegular.getLevel()).thenReturn(7);
-        when(mockMechTechSkillElite.getLevel()).thenReturn(5);
-        when(mockFighterTechSkill.getLevel()).thenReturn(7);
-        when(mockFighterTechSkillElite.getLevel()).thenReturn(5);
-        when(mockVeeTechSkill.getLevel()).thenReturn(7);
-
-        when(mockThunderbolt1.getEntityType()).thenReturn(Entity.ETYPE_MECH);
-        when(mockThunderbolt1.getUnitType()).thenCallRealMethod();
-        when(mockThunderboltUnit1.getEntity()).thenReturn(mockThunderbolt1);
-        when(mockThunderbolt1Pilot.isAdmin()).thenReturn(false);
-        when(mockThunderbolt1Pilot.getSkill(SkillType.S_GUN_MECH)).thenReturn(mockMechGunnery);
-        when(mockThunderbolt1Pilot.getSkill(SkillType.S_PILOT_MECH)).thenReturn(mockMechPilot);
-        personnelList.add(mockThunderbolt1Pilot);
-        mockThunderboltUnit1.addPilotOrSoldier(mockThunderbolt1Pilot);
-        ArrayList<Person> crew = new ArrayList<>(1);
-        crew.add(mockThunderbolt1Pilot);
-        when(mockThunderboltUnit1.getCrew()).thenReturn(crew);
-        Crew mockThunderboltCrew = mock(Crew.class);
-        doReturn(mockMechPilot.getLevel()).when(mockThunderboltCrew).getPiloting();
-        doReturn(mockMechGunnery.getLevel()).when(mockThunderboltCrew).getGunnery();
-        when(mockThunderbolt1.getCrew()).thenReturn(mockThunderboltCrew);
-        when(mockThunderbolt1Tech.isAdmin()).thenReturn(false);
-        when(mockThunderbolt1Tech.isTech()).thenReturn(true);
-        when(mockThunderbolt1Tech.isActive()).thenReturn(true);
-        when(mockThunderbolt1Tech.getSkill(SkillType.S_TECH_MECH)).thenReturn(mockMechTechSkillRegular);
-        personnelList.add(mockThunderbolt1Tech);
-        astechs += 6;
-
-        when(mockThunderbolt2.getEntityType()).thenReturn(Entity.ETYPE_MECH);
-        when(mockThunderbolt2.getUnitType()).thenCallRealMethod();
-        when(mockThunderboltUnit2.getEntity()).thenReturn(mockThunderbolt2);
-        when(mockThunderbolt2Pilot.isAdmin()).thenReturn(false);
-        when(mockThunderbolt2Pilot.getSkill(SkillType.S_GUN_MECH)).thenReturn(mockMechGunnery);
-        when(mockThunderbolt2Pilot.getSkill(SkillType.S_PILOT_MECH)).thenReturn(mockMechPilot);
-        personnelList.add(mockThunderbolt2Pilot);
-        mockThunderboltUnit2.addPilotOrSoldier(mockThunderbolt2Pilot);
-        crew = new ArrayList<>(1);
-        crew.add(mockThunderbolt2Pilot);
-        when(mockThunderboltUnit2.getCrew()).thenReturn(crew);
-        Crew mockThunderbolt2Crew = mock(Crew.class);
-        doReturn(mockMechPilot.getLevel()).when(mockThunderbolt2Crew).getPiloting();
-        doReturn(mockMechGunnery.getLevel()).when(mockThunderbolt2Crew).getGunnery();
-        when(mockThunderbolt2.getCrew()).thenReturn(mockThunderbolt2Crew);
-        when(mockThunderbolt2Tech.isAdmin()).thenReturn(false);
-        when(mockThunderbolt2Tech.isTech()).thenReturn(true);
-        when(mockThunderbolt2Tech.isActive()).thenReturn(true);
-        when(mockThunderbolt2Tech.getSkill(SkillType.S_TECH_MECH)).thenReturn(mockMechTechSkillRegular);
-        personnelList.add(mockThunderbolt2Tech);
-        astechs += 6;
-
-        when(mockGrasshopper1.getEntityType()).thenReturn(Entity.ETYPE_MECH);
-        when(mockGrasshopper1.getUnitType()).thenCallRealMethod();
-        when(mockGrasshopperUnit1.getEntity()).thenReturn(mockGrasshopper1);
-        when(mockGrasshopper1Pilot.isAdmin()).thenReturn(false);
-        when(mockGrasshopper1Pilot.getSkill(SkillType.S_GUN_MECH)).thenReturn(mockMechGunnery);
-        when(mockGrasshopper1Pilot.getSkill(SkillType.S_PILOT_MECH)).thenReturn(mockMechPilot);
-        personnelList.add(mockGrasshopper1Pilot);
-        mockGrasshopperUnit1.addPilotOrSoldier(mockGrasshopper1Pilot);
-        crew = new ArrayList<>(1);
-        crew.add(mockGrasshopper1Pilot);
-        when(mockGrasshopperUnit1.getCrew()).thenReturn(crew);
-        Crew mockGrasshopperCrew = mock(Crew.class);
-        doReturn(mockMechPilot.getLevel()).when(mockGrasshopperCrew).getPiloting();
-        doReturn(mockMechGunnery.getLevel()).when(mockGrasshopperCrew).getGunnery();
-        when(mockGrasshopper1.getCrew()).thenReturn(mockGrasshopperCrew);
-        when(mockGrasshopper1Tech.isAdmin()).thenReturn(false);
-        when(mockGrasshopper1Tech.isTech()).thenReturn(true);
-        when(mockGrasshopper1Tech.isActive()).thenReturn(true);
-        when(mockGrasshopper1Tech.getSkill(SkillType.S_TECH_MECH)).thenReturn(mockMechTechSkillRegular);
-        personnelList.add(mockGrasshopper1Tech);
-        astechs += 6;
-
-        when(mockGrasshopper2.getEntityType()).thenReturn(Entity.ETYPE_MECH);
-        when(mockGrasshopper2.getUnitType()).thenCallRealMethod();
-        when(mockGrasshopperUnit2.getEntity()).thenReturn(mockGrasshopper2);
-        when(mockGrasshopper2Pilot.isAdmin()).thenReturn(false);
-        when(mockGrasshopper2Pilot.getSkill(SkillType.S_GUN_MECH)).thenReturn(mockMechGunnery);
-        when(mockGrasshopper2Pilot.getSkill(SkillType.S_PILOT_MECH)).thenReturn(mockMechPilot);
-        when(mockGrasshopper2Pilot.getSkill(SkillType.S_LEADER)).thenReturn(mockLeader);
-        when(mockGrasshopper2Pilot.getSkill(SkillType.S_TACTICS)).thenReturn(mockTactics);
-        when(mockGrasshopper2Pilot.getSkill(SkillType.S_STRATEGY)).thenReturn(mockStrategy);
-        when(mockGrasshopper2Pilot.getSkill(SkillType.S_NEG)).thenReturn(mockNegotiation);
-        personnelList.add(mockGrasshopper2Pilot);
-        mockGrasshopperUnit2.addPilotOrSoldier(mockGrasshopper2Pilot);
-        crew = new ArrayList<>(1);
-        crew.add(mockGrasshopper2Pilot);
-        when(mockGrasshopperUnit2.getCrew()).thenReturn(crew);
-        Crew mockGrasshopper2Crew = mock(Crew.class);
-        doReturn(mockMechPilot.getLevel()).when(mockGrasshopper2Crew).getPiloting();
-        doReturn(mockMechGunnery.getLevel()).when(mockGrasshopper2Crew).getGunnery();
-        when(mockGrasshopper2.getCrew()).thenReturn(mockGrasshopper2Crew);
-        when(mockGrasshopper2Tech.isAdmin()).thenReturn(false);
-        when(mockGrasshopper2Tech.isTech()).thenReturn(true);
-        when(mockGrasshopper2Tech.isActive()).thenReturn(true);
-        when(mockGrasshopper2Tech.getSkill(SkillType.S_TECH_MECH)).thenReturn(mockMechTechSkillElite);
-        personnelList.add(mockGrasshopper2Tech);
-        astechs += 6;
-
-        when(mockBulldog1.getEntityType()).thenReturn(Entity.ETYPE_TANK);
-        when(mockBulldog1.getUnitType()).thenCallRealMethod();
-        when(mockBulldogUnit1.getEntity()).thenReturn(mockBulldog1);
-        when(mockBulldog1Driver.getSkill(SkillType.S_PILOT_GVEE)).thenReturn(mockTankPilot);
-        when(mockBulldog1Driver.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
-        when(mockBulldog1Gunner1.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
-        when(mockBulldog1Gunner2.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
-        when(mockBulldog1Gunner3.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
-        when(mockBulldog1Driver.isAdmin()).thenReturn(false);
-        when(mockBulldog1Gunner1.isAdmin()).thenReturn(false);
-        when(mockBulldog1Gunner2.isAdmin()).thenReturn(false);
-        when(mockBulldog1Gunner3.isAdmin()).thenReturn(false);
-        when(mockBulldog1Tech.isAdmin()).thenReturn(false);
-        when(mockBulldog1Tech.isTech()).thenReturn(true);
-        when(mockBulldog1Tech.isActive()).thenReturn(true);
-        when(mockBulldog1Tech.getSkill(SkillType.S_TECH_MECHANIC)).thenReturn(mockVeeTechSkill);
-        personnelList.add(mockBulldog1Driver);
-        personnelList.add(mockBulldog1Gunner1);
-        personnelList.add(mockBulldog2Gunner1);
-        personnelList.add(mockBulldog1Gunner3);
-        personnelList.add(mockBulldog1Tech);
-        mockBulldogUnit1.addPilotOrSoldier(mockBulldog1Driver);
-        mockBulldogUnit1.addPilotOrSoldier(mockBulldog1Gunner1);
-        mockBulldogUnit1.addPilotOrSoldier(mockBulldog1Gunner2);
-        mockBulldogUnit1.addPilotOrSoldier(mockBulldog1Gunner3);
-        crew = new ArrayList<>(4);
-        crew.add(mockBulldog1Driver);
-        crew.add(mockBulldog1Gunner1);
-        crew.add(mockBulldog1Gunner2);
-        crew.add(mockBulldog1Gunner3);
-        when(mockBulldogUnit1.getCrew()).thenReturn(crew);
-        Crew mockBulldog1Crew = mock(Crew.class);
-        doReturn(mockTankPilot.getLevel()).when(mockBulldog1Crew).getPiloting();
-        doReturn(mockTankGunnery.getLevel()).when(mockBulldog1Crew).getGunnery();
-        when(mockBulldog1.getCrew()).thenReturn(mockBulldog1Crew);
-        astechs += 6;
-
-        when(mockBulldog2.getEntityType()).thenReturn(Entity.ETYPE_TANK);
-        when(mockBulldog2.getUnitType()).thenCallRealMethod();
-        when(mockBulldog2Driver.getSkill(SkillType.S_PILOT_GVEE)).thenReturn(mockTankPilot);
-        when(mockBulldog2Driver.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
-        when(mockBulldog2Gunner1.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
-        when(mockBulldog2Gunner2.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
-        when(mockBulldog2Gunner3.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
-        when(mockBulldogUnit2.getEntity()).thenReturn(mockBulldog2);
-        when(mockBulldog2Driver.isAdmin()).thenReturn(false);
-        personnelList.add(mockBulldog2Driver);
-        when(mockBulldog2Gunner1.isAdmin()).thenReturn(false);
-        personnelList.add(mockBulldog2Gunner1);
-        when(mockBulldog2Gunner2.isAdmin()).thenReturn(false);
-        personnelList.add(mockBulldog2Gunner1);
-        when(mockBulldog2Gunner3.isAdmin()).thenReturn(false);
-        personnelList.add(mockBulldog2Gunner3);
-        when(mockBulldog2Tech.isAdmin()).thenReturn(false);
-        when(mockBulldog2Tech.isTech()).thenReturn(true);
-        when(mockBulldog2Tech.isActive()).thenReturn(true);
-        when(mockBulldog2Tech.getSkill(SkillType.S_TECH_MECHANIC)).thenReturn(mockVeeTechSkill);
-        personnelList.add(mockBulldog2Tech);
-        mockBulldogUnit2.addPilotOrSoldier(mockBulldog2Driver);
-        mockBulldogUnit2.addPilotOrSoldier(mockBulldog2Gunner1);
-        mockBulldogUnit2.addPilotOrSoldier(mockBulldog2Gunner2);
-        mockBulldogUnit2.addPilotOrSoldier(mockBulldog2Gunner3);
-        crew = new ArrayList<>(4);
-        crew.add(mockBulldog2Driver);
-        crew.add(mockBulldog2Gunner1);
-        crew.add(mockBulldog2Gunner2);
-        crew.add(mockBulldog2Gunner3);
-        when(mockBulldogUnit2.getCrew()).thenReturn(crew);
-        Crew mockBulldog2Crew = mock(Crew.class);
-        doReturn(mockTankPilot.getLevel()).when(mockBulldog2Crew).getPiloting();
-        doReturn(mockTankGunnery.getLevel()).when(mockBulldog2Crew).getGunnery();
-        when(mockBulldog2.getCrew()).thenReturn(mockBulldog2Crew);
-        astechs += 6;
-
-        when(mockBulldog3.getEntityType()).thenReturn(Entity.ETYPE_TANK);
-        when(mockBulldog3.getUnitType()).thenCallRealMethod();
-        when(mockBulldog3Driver.getSkill(SkillType.S_PILOT_GVEE)).thenReturn(mockTankPilot);
-        when(mockBulldog3Driver.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
-        when(mockBulldog3Gunner1.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
-        when(mockBulldog3Gunner2.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
-        when(mockBulldog3Gunner3.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
-        when(mockBulldogUnit3.getEntity()).thenReturn(mockBulldog3);
-        when(mockBulldog3Driver.isAdmin()).thenReturn(false);
-        personnelList.add(mockBulldog3Driver);
-        when(mockBulldog3Gunner1.isAdmin()).thenReturn(false);
-        personnelList.add(mockBulldog3Gunner1);
-        when(mockBulldog3Gunner2.isAdmin()).thenReturn(false);
-        personnelList.add(mockBulldog3Gunner1);
-        when(mockBulldog3Gunner3.isAdmin()).thenReturn(false);
-        personnelList.add(mockBulldog3Gunner3);
-        when(mockBulldog3Tech.isAdmin()).thenReturn(false);
-        when(mockBulldog3Tech.isTech()).thenReturn(true);
-        when(mockBulldog3Tech.isActive()).thenReturn(true);
-        when(mockBulldog3Tech.getSkill(SkillType.S_TECH_MECHANIC)).thenReturn(mockVeeTechSkill);
-        personnelList.add(mockBulldog3Tech);
-        mockBulldogUnit3.addPilotOrSoldier(mockBulldog3Driver);
-        mockBulldogUnit3.addPilotOrSoldier(mockBulldog3Gunner1);
-        mockBulldogUnit3.addPilotOrSoldier(mockBulldog3Gunner2);
-        mockBulldogUnit3.addPilotOrSoldier(mockBulldog3Gunner3);
-        crew = new ArrayList<>(4);
-        crew.add(mockBulldog3Driver);
-        crew.add(mockBulldog3Gunner1);
-        crew.add(mockBulldog3Gunner2);
-        crew.add(mockBulldog3Gunner3);
-        when(mockBulldogUnit3.getCrew()).thenReturn(crew);
-        Crew mockBulldog3Crew = mock(Crew.class);
-        doReturn(mockTankPilot.getLevel()).when(mockBulldog3Crew).getPiloting();
-        doReturn(mockTankGunnery.getLevel()).when(mockBulldog3Crew).getGunnery();
-        when(mockBulldog3.getCrew()).thenReturn(mockBulldog3Crew);
-        astechs += 6;
-
-        when(mockBulldog4.getEntityType()).thenReturn(Entity.ETYPE_TANK);
-        when(mockBulldog4.getUnitType()).thenCallRealMethod();
-        when(mockBulldog4Driver.getSkill(SkillType.S_PILOT_GVEE)).thenReturn(mockTankPilot);
-        when(mockBulldog4Driver.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
-        when(mockBulldog4Gunner1.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
-        when(mockBulldog4Gunner2.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
-        when(mockBulldog4Gunner3.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
-        when(mockBulldogUnit4.getEntity()).thenReturn(mockBulldog4);
-        when(mockBulldog4Driver.isAdmin()).thenReturn(false);
-        personnelList.add(mockBulldog4Driver);
-        when(mockBulldog4Gunner1.isAdmin()).thenReturn(false);
-        personnelList.add(mockBulldog4Gunner1);
-        when(mockBulldog4Gunner2.isAdmin()).thenReturn(false);
-        personnelList.add(mockBulldog4Gunner1);
-        when(mockBulldog4Gunner3.isAdmin()).thenReturn(false);
-        personnelList.add(mockBulldog4Gunner3);
-        when(mockBulldog4Tech.isAdmin()).thenReturn(false);
-        when(mockBulldog4Tech.isTech()).thenReturn(true);
-        when(mockBulldog4Tech.isActive()).thenReturn(true);
-        when(mockBulldog4Tech.getSkill(SkillType.S_TECH_MECHANIC)).thenReturn(mockVeeTechSkill);
-        personnelList.add(mockBulldog4Tech);
-        mockBulldogUnit4.addPilotOrSoldier(mockBulldog4Driver);
-        mockBulldogUnit4.addPilotOrSoldier(mockBulldog4Gunner1);
-        mockBulldogUnit4.addPilotOrSoldier(mockBulldog4Gunner2);
-        mockBulldogUnit4.addPilotOrSoldier(mockBulldog4Gunner3);
-        crew = new ArrayList<>(4);
-        crew.add(mockBulldog4Driver);
-        crew.add(mockBulldog4Gunner1);
-        crew.add(mockBulldog4Gunner2);
-        crew.add(mockBulldog4Gunner3);
-        when(mockBulldogUnit4.getCrew()).thenReturn(crew);
-        Crew mockBulldog4Crew = mock(Crew.class);
-        doReturn(mockTankPilot.getLevel()).when(mockBulldog4Crew).getPiloting();
-        doReturn(mockTankGunnery.getLevel()).when(mockBulldog4Crew).getGunnery();
-        when(mockBulldog4.getCrew()).thenReturn(mockBulldog4Crew);
-        astechs += 6;
-
-        when(mockPackrat1.getEntityType()).thenReturn(Entity.ETYPE_TANK);
-        when(mockPackrat1.getUnitType()).thenCallRealMethod();
-        when(mockPackrat1Driver.getSkill(SkillType.S_PILOT_GVEE)).thenReturn(mockTankPilot);
-        when(mockPackrat1Driver.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
-        when(mockPackrat1Gunner.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
-        when(mockPackratUnit1.getEntity()).thenReturn(mockPackrat1);
-        when(mockPackrat1Driver.isAdmin()).thenReturn(false);
-        personnelList.add(mockPackrat1Driver);
-        when(mockPackrat1Gunner.isAdmin()).thenReturn(false);
-        personnelList.add(mockPackrat1Gunner);
-        when(mockPackrat1Tech.isAdmin()).thenReturn(false);
-        when(mockPackrat1Tech.isTech()).thenReturn(true);
-        when(mockPackrat1Tech.isActive()).thenReturn(true);
-        when(mockPackrat1Tech.getSkill(SkillType.S_TECH_MECHANIC)).thenReturn(mockVeeTechSkill);
-        personnelList.add(mockPackrat1Tech);
-        mockPackratUnit1.addPilotOrSoldier(mockPackrat1Driver);
-        mockPackratUnit1.addPilotOrSoldier(mockPackrat1Gunner);
-        crew = new ArrayList<>(2);
-        crew.add(mockPackrat1Driver);
-        crew.add(mockPackrat1Gunner);
-        when(mockPackratUnit1.getCrew()).thenReturn(crew);
-        Crew mockPackrat1Crew = mock(Crew.class);
-        doReturn(mockTankPilot.getLevel()).when(mockPackrat1Crew).getPiloting();
-        doReturn(mockTankGunnery.getLevel()).when(mockPackrat1Crew).getGunnery();
-        when(mockPackrat1.getCrew()).thenReturn(mockPackrat1Crew);
-        astechs += 6;
-
-        when(mockPackrat2.getEntityType()).thenReturn(Entity.ETYPE_TANK);
-        when(mockPackrat2.getUnitType()).thenCallRealMethod();
-        when(mockPackrat2Driver.getSkill(SkillType.S_PILOT_GVEE)).thenReturn(mockTankPilot);
-        when(mockPackrat2Driver.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
-        when(mockPackrat2Gunner.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
-        when(mockPackratUnit2.getEntity()).thenReturn(mockPackrat2);
-        when(mockPackrat2Driver.isAdmin()).thenReturn(false);
-        personnelList.add(mockPackrat2Driver);
-        when(mockPackrat2Gunner.isAdmin()).thenReturn(false);
-        personnelList.add(mockPackrat2Gunner);
-        when(mockPackrat2Tech.isAdmin()).thenReturn(false);
-        when(mockPackrat2Tech.isTech()).thenReturn(true);
-        when(mockPackrat2Tech.isActive()).thenReturn(true);
-        when(mockPackrat2Tech.getSkill(SkillType.S_TECH_MECHANIC)).thenReturn(mockVeeTechSkill);
-        personnelList.add(mockPackrat2Tech);
-        mockPackratUnit2.addPilotOrSoldier(mockPackrat2Driver);
-        mockPackratUnit2.addPilotOrSoldier(mockPackrat2Gunner);
-        crew = new ArrayList<>(2);
-        crew.add(mockPackrat2Driver);
-        crew.add(mockPackrat2Gunner);
-        when(mockPackratUnit2.getCrew()).thenReturn(crew);
-        Crew mockPackrat2Crew = mock(Crew.class);
-        doReturn(mockTankPilot.getLevel()).when(mockPackrat2Crew).getPiloting();
-        doReturn(mockTankGunnery.getLevel()).when(mockPackrat2Crew).getGunnery();
-        when(mockPackrat2.getCrew()).thenReturn(mockPackrat2Crew);
-        astechs += 6;
-
-        when(mockPackrat3.getEntityType()).thenReturn(Entity.ETYPE_TANK);
-        when(mockPackrat3.getUnitType()).thenCallRealMethod();
-        when(mockPackrat3Driver.getSkill(SkillType.S_PILOT_GVEE)).thenReturn(mockTankPilot);
-        when(mockPackrat3Driver.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
-        when(mockPackrat3Gunner.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
-        when(mockPackratUnit3.getEntity()).thenReturn(mockPackrat3);
-        when(mockPackrat3Driver.isAdmin()).thenReturn(false);
-        personnelList.add(mockPackrat3Driver);
-        when(mockPackrat3Gunner.isAdmin()).thenReturn(false);
-        personnelList.add(mockPackrat3Gunner);
-        when(mockPackrat3Tech.isAdmin()).thenReturn(false);
-        when(mockPackrat3Tech.isTech()).thenReturn(true);
-        when(mockPackrat3Tech.isActive()).thenReturn(true);
-        when(mockPackrat3Tech.getSkill(SkillType.S_TECH_MECHANIC)).thenReturn(mockVeeTechSkill);
-        personnelList.add(mockPackrat3Tech);
-        mockPackratUnit3.addPilotOrSoldier(mockPackrat3Driver);
-        mockPackratUnit3.addPilotOrSoldier(mockPackrat3Gunner);
-        crew = new ArrayList<>(2);
-        crew.add(mockPackrat3Driver);
-        crew.add(mockPackrat3Gunner);
-        when(mockPackratUnit3.getCrew()).thenReturn(crew);
-        Crew mockPackrat3Crew = mock(Crew.class);
-        doReturn(mockTankPilot.getLevel()).when(mockPackrat3Crew).getPiloting();
-        doReturn(mockTankGunnery.getLevel()).when(mockPackrat3Crew).getGunnery();
-        when(mockPackrat3.getCrew()).thenReturn(mockPackrat3Crew);
-        astechs += 6;
-
-        when(mockPackrat4.getEntityType()).thenReturn(Entity.ETYPE_TANK);
-        when(mockPackrat4.getUnitType()).thenCallRealMethod();
-        when(mockPackrat4Driver.getSkill(SkillType.S_PILOT_GVEE)).thenReturn(mockTankPilot);
-        when(mockPackrat4Driver.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
-        when(mockPackrat4Gunner.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
-        when(mockPackratUnit4.getEntity()).thenReturn(mockPackrat4);
-        when(mockPackrat4Driver.isAdmin()).thenReturn(false);
-        personnelList.add(mockPackrat4Driver);
-        when(mockPackrat4Gunner.isAdmin()).thenReturn(false);
-        personnelList.add(mockPackrat4Gunner);
-        when(mockPackrat4Tech.isAdmin()).thenReturn(false);
-        when(mockPackrat4Tech.isTech()).thenReturn(true);
-        when(mockPackrat4Tech.isActive()).thenReturn(true);
-        when(mockPackrat4Tech.getSkill(SkillType.S_TECH_MECHANIC)).thenReturn(mockVeeTechSkill);
-        personnelList.add(mockPackrat4Tech);
-        mockPackratUnit4.addPilotOrSoldier(mockPackrat4Driver);
-        mockPackratUnit4.addPilotOrSoldier(mockPackrat4Gunner);
-        crew = new ArrayList<>(2);
-        crew.add(mockPackrat4Driver);
-        crew.add(mockPackrat4Gunner);
-        when(mockPackratUnit4.getCrew()).thenReturn(crew);
-        Crew mockPackrat4Crew = mock(Crew.class);
-        doReturn(mockTankPilot.getLevel()).when(mockPackrat4Crew).getPiloting();
-        doReturn(mockTankGunnery.getLevel()).when(mockPackrat4Crew).getGunnery();
-        when(mockPackrat4.getCrew()).thenReturn(mockPackrat4Crew);
-        astechs += 6;
-
-        when(mockLaserPlatoon.getEntityType()).thenReturn(Entity.ETYPE_INFANTRY);
-        when(mockLaserPlatoon.getUnitType()).thenCallRealMethod();
-        when(mockLaserPlatoon.getSquadSize()).thenReturn(7);
-        when(mockLaserPlatoon.getSquadN()).thenReturn(4);
-        when(mockLaserPlatoonUnit.getEntity()).thenReturn(mockLaserPlatoon);
-        crew = new ArrayList<>(28);
-        for (int i = 0; i < 28; i++) {
-            Person mockInfantry = mock(Person.class);
-            when(mockInfantry.isAdmin()).thenReturn(false);
-            when(mockInfantry.getSkill(SkillType.S_SMALL_ARMS)).thenReturn(mockInfantryGunnery);
-            infantryPersonnel.add(mockInfantry);
-            mockLaserPlatoonUnit.addPilotOrSoldier(mockInfantry);
-            crew.add(mockInfantry);
-        }
-        when(mockLaserPlatoonUnit.getCrew()).thenReturn(crew);
-        Crew mockLaserPlatoonCrew = mock(Crew.class);
-        doReturn(mockInfantryGunnery.getLevel()).when(mockLaserPlatoonCrew).getGunnery();
-        when(mockLaserPlatoon.getCrew()).thenReturn(mockLaserPlatoonCrew);
-        personnelList.addAll(infantryPersonnel);
-
-        when(mockCorsair1.getEntityType()).thenReturn(Entity.ETYPE_AERO);
-        when(mockCorsair1.getUnitType()).thenCallRealMethod();
-        when(mockCorsairUnit1.getEntity()).thenReturn(mockCorsair1);
-        when(mockCorsair1Pilot.isAdmin()).thenReturn(false);
-        when(mockCorsair1Pilot.getSkill(SkillType.S_GUN_AERO)).thenReturn(mockAeroGunnery);
-        when(mockCorsair1Pilot.getSkill(SkillType.S_PILOT_AERO)).thenReturn(mockAeroPilot);
-        personnelList.add(mockCorsair1Pilot);
-        mockCorsairUnit1.addPilotOrSoldier(mockCorsair1Pilot);
-        crew = new ArrayList<>(1);
-        crew.add(mockCorsair1Pilot);
-        when(mockCorsairUnit1.getCrew()).thenReturn(crew);
-        when(getMockCorsair1Tech.isAdmin()).thenReturn(false);
-        when(getMockCorsair1Tech.isTech()).thenReturn(true);
-        when(getMockCorsair1Tech.isActive()).thenReturn(true);
-        when(getMockCorsair1Tech.getSkill(SkillType.S_TECH_AERO)).thenReturn(mockFighterTechSkill);
-        personnelList.add(getMockCorsair1Tech);
-        Crew mockCorsair1Crew = mock(Crew.class);
-        doReturn(mockAeroPilot.getLevel()).when(mockCorsair1Crew).getPiloting();
-        doReturn(mockAeroGunnery.getLevel()).when(mockCorsair1Crew).getGunnery();
-        when(mockCorsair1.getCrew()).thenReturn(mockCorsair1Crew);
-        astechs += 6;
-
-        when(mockCorsair2.getEntityType()).thenReturn(Entity.ETYPE_AERO);
-        when(mockCorsair2.getUnitType()).thenCallRealMethod();
-        when(mockCorsairUnit2.getEntity()).thenReturn(mockCorsair2);
-        when(mockCorsair2Pilot.isAdmin()).thenReturn(false);
-        when(mockCorsair2Pilot.getSkill(SkillType.S_GUN_AERO)).thenReturn(mockAeroGunnery);
-        when(mockCorsair2Pilot.getSkill(SkillType.S_PILOT_AERO)).thenReturn(mockAeroPilot);
-        personnelList.add(mockCorsair2Pilot);
-        mockCorsairUnit2.addPilotOrSoldier(mockCorsair2Pilot);
-        crew = new ArrayList<>(1);
-        crew.add(mockCorsair2Pilot);
-        when(mockCorsairUnit2.getCrew()).thenReturn(crew);
-        when(getMockCorsair2Tech.isAdmin()).thenReturn(false);
-        when(getMockCorsair2Tech.isTech()).thenReturn(true);
-        when(getMockCorsair2Tech.isActive()).thenReturn(true);
-        when(getMockCorsair2Tech.getSkill(SkillType.S_TECH_AERO)).thenReturn(mockFighterTechSkillElite);
-        personnelList.add(getMockCorsair2Tech);
-        Crew mockCorsair2Crew = mock(Crew.class);
-        doReturn(mockAeroPilot.getLevel()).when(mockCorsair2Crew).getPiloting();
-        doReturn(mockAeroGunnery.getLevel()).when(mockCorsair2Crew).getGunnery();
-        when(mockCorsair2.getCrew()).thenReturn(mockCorsair2Crew);
-        astechs += 6;
-
-        when(mockSeeker.getEntityType()).thenReturn(Entity.ETYPE_DROPSHIP);
-        when(mockSeeker.getUnitType()).thenCallRealMethod();
-        when(mockSeekerUnit.getEntity()).thenReturn(mockSeeker);
-        Bay transportBay;
-        Vector<Bay> bayList = new Vector<>();
-        transportBay = new MechBay(4, 1, 1);
-        bayList.add(transportBay);
-        transportBay = new ASFBay(2, 0, 2);
-        bayList.add(transportBay);
-        transportBay = new LightVehicleBay(22, 0, 3);
-        bayList.add(transportBay);
-        transportBay = new InfantryBay(4.0, 0, 4, InfantryBay.PlatoonType.FOOT);
-        bayList.add(transportBay);
-        when(mockSeeker.getTransportBays()).thenReturn(bayList);
-        crew = new ArrayList<>(20);
-        for (int i = 0; i < 20; i++) {
-            Person mockCrew = mock(Person.class);
-            when(mockCrew.isAdmin()).thenReturn(false);
-            if (i == 0) {
-                when(mockCrew.getSkill(SkillType.S_PILOT_SPACE)).thenReturn(mockDropPilot);
-            } else {
-                when(mockCrew.getSkill(SkillType.S_GUN_SPACE)).thenReturn(mockDropGunnery);
-            }
-            seekerCrew.add(mockCrew);
-            mockSeekerUnit.addPilotOrSoldier(mockCrew);
-            crew.add(mockCrew);
-        }
-        personnelList.addAll(seekerCrew);
-        when(mockSeekerUnit.getCrew()).thenReturn(crew);
-        when(mockSeekerUnit.getActiveCrew()).thenReturn(crew);
-        when(mockSeekerUnit.getFullCrewSize()).thenReturn(20);
-        Crew mockSeekerCrew = mock(Crew.class);
-        doReturn(mockDropPilot.getLevel()).when(mockSeekerCrew).getPiloting();
-        doReturn(mockDropGunnery.getLevel()).when(mockSeekerCrew).getGunnery();
-        when(mockSeeker.getCrew()).thenReturn(mockSeekerCrew);
-
-        when(mockInvader.getEntityType()).thenReturn(Entity.ETYPE_JUMPSHIP);
-        when(mockInvader.getUnitType()).thenCallRealMethod();
-        when(mockInvaderUnit.getEntity()).thenReturn(mockInvader);
-        DockingCollar collar;
-        Vector<DockingCollar> collarList = new Vector<>(4);
-        for (int i = 0; i < 4; i++) {
-            collar = mock(DockingCollar.class);
-            collarList.add(collar);
-        }
-        when(mockInvader.getTransportBays()).thenReturn(new Vector<>(0));
-        when(mockInvader.getDockingCollars()).thenReturn(collarList);
-        crew = new ArrayList<>(24);
-        for (int i = 0; i < 24; i++) {
-            Person mockCrew = mock(Person.class);
-            when(mockCrew.isAdmin()).thenReturn(false);
-            when(mockCrew.getSkill(SkillType.S_GUN_SPACE)).thenReturn(mockJumpGunnery);
-            if (i == 0) {
-                when(mockCrew.getSkill(SkillType.S_PILOT_SPACE)).thenReturn(mockJumpPilot);
-            }
-            invaderCrew.add(mockCrew);
-            mockInvaderUnit.addPilotOrSoldier(mockCrew);
-            crew.add(mockCrew);
-        }
-        personnelList.addAll(invaderCrew);
-        when(mockInvaderUnit.getCrew()).thenReturn(crew);
-        when(mockInvaderUnit.getActiveCrew()).thenReturn(crew);
-        when(mockInvaderUnit.getFullCrewSize()).thenReturn(24);
-        Crew mockInvaderCrew = mock(Crew.class);
-        doReturn(mockJumpPilot.getLevel()).when(mockInvaderCrew).getPiloting();
-        doReturn(mockJumpGunnery.getLevel()).when(mockInvaderCrew).getGunnery();
-        when(mockInvader.getCrew()).thenReturn(mockInvaderCrew);
+        mockMothballed();
+        mockSkills();
+        astechs += mockThunderbolt1();
+        astechs += mockThunderbolt2();
+        astechs += mockGrasshopper1();
+        astechs += mockGrasshopper2();
+        astechs += mockBulldog1();
+        astechs += mockBulldog2();
+        astechs += mockBulldog3();
+        astechs += mockBulldog4();
+        astechs += mockPackrat1();
+        astechs += mockPackrat2();
+        astechs += mockPackrat3();
+        astechs += mockPackrat4();
+        mockLaserPlatoon();
+        astechs += mockCorsair1();
+        astechs += mockCorsair2();
+        mockSeeker();
+        mockInvader();
 
         unitList.add(mockThunderboltUnit1);
         unitList.add(mockThunderboltUnit2);
@@ -749,17 +254,24 @@ public class CampaignOpsReputationTest {
             when(u.hasPilot()).thenReturn(true);
         }
 
+        regularAdmins = new HashSet<>(10);
         for (int i = 0; i < 10; i++) {
             Person admin = mock(Person.class);
             when(admin.isAdmin()).thenReturn(true);
             when(admin.isActive()).thenReturn(true);
             regularAdmins.add(admin);
         }
+
         personnelList.addAll(regularAdmins);
+
+        activePersonnelList = new ArrayList<>();
         for (Person p : personnelList) {
-            if (p.isActive()) { activePersonnelList.add(p); }
+            if (p.isActive()) {
+                activePersonnelList.add(p);
+            }
         }
 
+        mockFinances = mock(Finances.class);
         when(mockFinances.isInDebt()).thenReturn(false);
 
         doReturn(unitList).when(mockCampaign).getCopyOfUnits();
@@ -779,7 +291,6 @@ public class CampaignOpsReputationTest {
 
     @Test
     public void testCalculateSupportNeeds() {
-
         // Test the example company.
         BigDecimal expectedTotalSkill = new BigDecimal("144.00");
         BigDecimal expectedAverageSkill = new BigDecimal("9.00");
@@ -1178,5 +689,672 @@ public class CampaignOpsReputationTest {
                    "    Has Warships?               No";
         doReturn(8).when(spyReputation).getHeavyVeeBayCount();
         assertEquals(expected, spyReputation.getTransportationDetails());
+    }
+
+    private void mockMothballed() {
+        mockMechMothballed = mock(Unit.class);
+        mockAeroMothballed = mock(Unit.class);
+        mockTankMothballed = mock(Unit.class);
+
+        when(mockMechMothballed.isMothballed()).thenReturn(true);
+        when(mockAeroMothballed.isMothballed()).thenReturn(true);
+        when(mockTankMothballed.isMothballed()).thenReturn(true);
+    }
+
+    private void mockSkills() {
+        mockMechGunnery = mock(Skill.class);
+        mockMechPilot = mock(Skill.class);
+        mockTankGunnery = mock(Skill.class);
+        mockTankPilot = mock(Skill.class);
+        mockInfantryGunnery = mock(Skill.class);
+        mockAeroGunnery = mock(Skill.class);
+        mockAeroPilot = mock(Skill.class);
+        mockDropGunnery = mock(Skill.class);
+        mockDropPilot = mock(Skill.class);
+        mockJumpGunnery = mock(Skill.class);
+        mockJumpPilot = mock(Skill.class);
+        mockLeader = mock(Skill.class);
+        mockTactics = mock(Skill.class);
+        mockStrategy = mock(Skill.class);
+        mockNegotiation = mock(Skill.class);
+        mockMechTechSkillRegular = mock(Skill.class);
+        mockMechTechSkillElite = mock(Skill.class);
+        mockFighterTechSkill = mock(Skill.class);
+        mockFighterTechSkillElite = mock(Skill.class);
+        mockVeeTechSkill = mock(Skill.class);
+
+        when(mockMechGunnery.getLevel()).thenReturn(4);
+        when(mockMechPilot.getLevel()).thenReturn(5);
+        when(mockTankGunnery.getLevel()).thenReturn(4);
+        when(mockTankPilot.getLevel()).thenReturn(5);
+        when(mockInfantryGunnery.getLevel()).thenReturn(4);
+        when(mockAeroGunnery.getLevel()).thenReturn(4);
+        when(mockAeroPilot.getLevel()).thenReturn(5);
+        when(mockDropGunnery.getLevel()).thenReturn(4);
+        when(mockDropPilot.getLevel()).thenReturn(5);
+        when(mockJumpGunnery.getLevel()).thenReturn(4);
+        when(mockJumpPilot.getLevel()).thenReturn(5);
+        when(mockLeader.getLevel()).thenReturn(4);
+        when(mockTactics.getLevel()).thenReturn(2);
+        when(mockStrategy.getLevel()).thenReturn(2);
+        when(mockNegotiation.getLevel()).thenReturn(5);
+        when(mockMechTechSkillRegular.getLevel()).thenReturn(7);
+        when(mockMechTechSkillElite.getLevel()).thenReturn(5);
+        when(mockFighterTechSkill.getLevel()).thenReturn(7);
+        when(mockFighterTechSkillElite.getLevel()).thenReturn(5);
+        when(mockVeeTechSkill.getLevel()).thenReturn(7);
+    }
+
+    private int mockThunderbolt1() {
+        mockThunderbolt1 = mock(BipedMech.class);
+        mockThunderboltUnit1 = mock(Unit.class);
+        mockThunderbolt1Pilot = mock(Person.class);
+        mockThunderbolt1Tech = mock(Person.class);
+
+        when(mockThunderbolt1.getEntityType()).thenReturn(Entity.ETYPE_MECH);
+        when(mockThunderbolt1.getUnitType()).thenCallRealMethod();
+        when(mockThunderboltUnit1.getEntity()).thenReturn(mockThunderbolt1);
+        when(mockThunderbolt1Pilot.isAdmin()).thenReturn(false);
+        when(mockThunderbolt1Pilot.getSkill(SkillType.S_GUN_MECH)).thenReturn(mockMechGunnery);
+        when(mockThunderbolt1Pilot.getSkill(SkillType.S_PILOT_MECH)).thenReturn(mockMechPilot);
+        personnelList.add(mockThunderbolt1Pilot);
+        mockThunderboltUnit1.addPilotOrSoldier(mockThunderbolt1Pilot);
+        ArrayList<Person> crew = new ArrayList<>(1);
+        crew.add(mockThunderbolt1Pilot);
+        when(mockThunderboltUnit1.getCrew()).thenReturn(crew);
+        Crew mockThunderboltCrew = mock(Crew.class);
+        doReturn(mockMechPilot.getLevel()).when(mockThunderboltCrew).getPiloting();
+        doReturn(mockMechGunnery.getLevel()).when(mockThunderboltCrew).getGunnery();
+        when(mockThunderbolt1.getCrew()).thenReturn(mockThunderboltCrew);
+        when(mockThunderbolt1Tech.isAdmin()).thenReturn(false);
+        when(mockThunderbolt1Tech.isTech()).thenReturn(true);
+        when(mockThunderbolt1Tech.isActive()).thenReturn(true);
+        when(mockThunderbolt1Tech.getSkill(SkillType.S_TECH_MECH)).thenReturn(mockMechTechSkillRegular);
+        personnelList.add(mockThunderbolt1Tech);
+
+        return 6; // astechs needed by Thunderbolt1
+    }
+
+    private int mockThunderbolt2() {
+        mockThunderbolt2 = mock(BipedMech.class);
+        mockThunderboltUnit2 = mock(Unit.class);
+        mockThunderbolt2Pilot = mock(Person.class);
+        mockThunderbolt2Tech = mock(Person.class);
+
+        when(mockThunderbolt2.getEntityType()).thenReturn(Entity.ETYPE_MECH);
+        when(mockThunderbolt2.getUnitType()).thenCallRealMethod();
+        when(mockThunderboltUnit2.getEntity()).thenReturn(mockThunderbolt2);
+        when(mockThunderbolt2Pilot.isAdmin()).thenReturn(false);
+        when(mockThunderbolt2Pilot.getSkill(SkillType.S_GUN_MECH)).thenReturn(mockMechGunnery);
+        when(mockThunderbolt2Pilot.getSkill(SkillType.S_PILOT_MECH)).thenReturn(mockMechPilot);
+        personnelList.add(mockThunderbolt2Pilot);
+        mockThunderboltUnit2.addPilotOrSoldier(mockThunderbolt2Pilot);
+        ArrayList<Person> crew = new ArrayList<>(1);
+        crew.add(mockThunderbolt2Pilot);
+        when(mockThunderboltUnit2.getCrew()).thenReturn(crew);
+        Crew mockThunderbolt2Crew = mock(Crew.class);
+        doReturn(mockMechPilot.getLevel()).when(mockThunderbolt2Crew).getPiloting();
+        doReturn(mockMechGunnery.getLevel()).when(mockThunderbolt2Crew).getGunnery();
+        when(mockThunderbolt2.getCrew()).thenReturn(mockThunderbolt2Crew);
+        when(mockThunderbolt2Tech.isAdmin()).thenReturn(false);
+        when(mockThunderbolt2Tech.isTech()).thenReturn(true);
+        when(mockThunderbolt2Tech.isActive()).thenReturn(true);
+        when(mockThunderbolt2Tech.getSkill(SkillType.S_TECH_MECH)).thenReturn(mockMechTechSkillRegular);
+        personnelList.add(mockThunderbolt2Tech);
+        return 6; // astechs needed by Thunderbolt2
+    }
+
+    private int mockGrasshopper1() {
+        mockGrasshopper1 = mock(BipedMech.class);
+        mockGrasshopperUnit1 = mock(Unit.class);
+        mockGrasshopper1Pilot = mock(Person.class);
+        mockGrasshopper1Tech = mock(Person.class);
+
+        when(mockGrasshopper1.getEntityType()).thenReturn(Entity.ETYPE_MECH);
+        when(mockGrasshopper1.getUnitType()).thenCallRealMethod();
+        when(mockGrasshopperUnit1.getEntity()).thenReturn(mockGrasshopper1);
+        when(mockGrasshopper1Pilot.isAdmin()).thenReturn(false);
+        when(mockGrasshopper1Pilot.getSkill(SkillType.S_GUN_MECH)).thenReturn(mockMechGunnery);
+        when(mockGrasshopper1Pilot.getSkill(SkillType.S_PILOT_MECH)).thenReturn(mockMechPilot);
+        personnelList.add(mockGrasshopper1Pilot);
+        mockGrasshopperUnit1.addPilotOrSoldier(mockGrasshopper1Pilot);
+        ArrayList<Person> crew = new ArrayList<>(1);
+        crew.add(mockGrasshopper1Pilot);
+        when(mockGrasshopperUnit1.getCrew()).thenReturn(crew);
+        Crew mockGrasshopperCrew = mock(Crew.class);
+        doReturn(mockMechPilot.getLevel()).when(mockGrasshopperCrew).getPiloting();
+        doReturn(mockMechGunnery.getLevel()).when(mockGrasshopperCrew).getGunnery();
+        when(mockGrasshopper1.getCrew()).thenReturn(mockGrasshopperCrew);
+        when(mockGrasshopper1Tech.isAdmin()).thenReturn(false);
+        when(mockGrasshopper1Tech.isTech()).thenReturn(true);
+        when(mockGrasshopper1Tech.isActive()).thenReturn(true);
+        when(mockGrasshopper1Tech.getSkill(SkillType.S_TECH_MECH)).thenReturn(mockMechTechSkillRegular);
+        personnelList.add(mockGrasshopper1Tech);
+        return 6; // astechs needed by Grasshopper1
+    }
+
+    private int mockGrasshopper2() {
+        mockGrasshopper2 = mock(BipedMech.class);
+        mockGrasshopperUnit2 = mock(Unit.class);
+        mockGrasshopper2Pilot = mock(Person.class);
+        mockGrasshopper2Tech = mock(Person.class);
+
+        when(mockGrasshopper2.getEntityType()).thenReturn(Entity.ETYPE_MECH);
+        when(mockGrasshopper2.getUnitType()).thenCallRealMethod();
+        when(mockGrasshopperUnit2.getEntity()).thenReturn(mockGrasshopper2);
+        when(mockGrasshopper2Pilot.isAdmin()).thenReturn(false);
+        when(mockGrasshopper2Pilot.getSkill(SkillType.S_GUN_MECH)).thenReturn(mockMechGunnery);
+        when(mockGrasshopper2Pilot.getSkill(SkillType.S_PILOT_MECH)).thenReturn(mockMechPilot);
+        when(mockGrasshopper2Pilot.getSkill(SkillType.S_LEADER)).thenReturn(mockLeader);
+        when(mockGrasshopper2Pilot.getSkill(SkillType.S_TACTICS)).thenReturn(mockTactics);
+        when(mockGrasshopper2Pilot.getSkill(SkillType.S_STRATEGY)).thenReturn(mockStrategy);
+        when(mockGrasshopper2Pilot.getSkill(SkillType.S_NEG)).thenReturn(mockNegotiation);
+        personnelList.add(mockGrasshopper2Pilot);
+        mockGrasshopperUnit2.addPilotOrSoldier(mockGrasshopper2Pilot);
+        ArrayList<Person> crew = new ArrayList<>(1);
+        crew.add(mockGrasshopper2Pilot);
+        when(mockGrasshopperUnit2.getCrew()).thenReturn(crew);
+        Crew mockGrasshopper2Crew = mock(Crew.class);
+        doReturn(mockMechPilot.getLevel()).when(mockGrasshopper2Crew).getPiloting();
+        doReturn(mockMechGunnery.getLevel()).when(mockGrasshopper2Crew).getGunnery();
+        when(mockGrasshopper2.getCrew()).thenReturn(mockGrasshopper2Crew);
+        when(mockGrasshopper2Tech.isAdmin()).thenReturn(false);
+        when(mockGrasshopper2Tech.isTech()).thenReturn(true);
+        when(mockGrasshopper2Tech.isActive()).thenReturn(true);
+        when(mockGrasshopper2Tech.getSkill(SkillType.S_TECH_MECH)).thenReturn(mockMechTechSkillElite);
+        personnelList.add(mockGrasshopper2Tech);
+        return 6; // astechs needed by Grasshopper1
+    }
+
+    private int mockBulldog1() {
+        mockBulldog1 = mock(Tank.class);
+        mockBulldogUnit1 = mock(Unit.class);
+        mockBulldog1Driver = mock(Person.class);
+        mockBulldog1Gunner1 = mock(Person.class);
+        mockBulldog1Gunner2 = mock(Person.class);
+        mockBulldog1Gunner3 = mock(Person.class);
+        mockBulldog1Tech = mock(Person.class);
+
+        when(mockBulldog1.getEntityType()).thenReturn(Entity.ETYPE_TANK);
+        when(mockBulldog1.getUnitType()).thenCallRealMethod();
+        when(mockBulldogUnit1.getEntity()).thenReturn(mockBulldog1);
+        when(mockBulldog1Driver.getSkill(SkillType.S_PILOT_GVEE)).thenReturn(mockTankPilot);
+        when(mockBulldog1Driver.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
+        when(mockBulldog1Gunner1.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
+        when(mockBulldog1Gunner2.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
+        when(mockBulldog1Gunner3.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
+        when(mockBulldog1Driver.isAdmin()).thenReturn(false);
+        when(mockBulldog1Gunner1.isAdmin()).thenReturn(false);
+        when(mockBulldog1Gunner2.isAdmin()).thenReturn(false);
+        when(mockBulldog1Gunner3.isAdmin()).thenReturn(false);
+        when(mockBulldog1Tech.isAdmin()).thenReturn(false);
+        when(mockBulldog1Tech.isTech()).thenReturn(true);
+        when(mockBulldog1Tech.isActive()).thenReturn(true);
+        when(mockBulldog1Tech.getSkill(SkillType.S_TECH_MECHANIC)).thenReturn(mockVeeTechSkill);
+        personnelList.add(mockBulldog1Driver);
+        personnelList.add(mockBulldog1Gunner1);
+        personnelList.add(mockBulldog1Gunner2);
+        personnelList.add(mockBulldog1Gunner3);
+        personnelList.add(mockBulldog1Tech);
+        mockBulldogUnit1.addPilotOrSoldier(mockBulldog1Driver);
+        mockBulldogUnit1.addPilotOrSoldier(mockBulldog1Gunner1);
+        mockBulldogUnit1.addPilotOrSoldier(mockBulldog1Gunner2);
+        mockBulldogUnit1.addPilotOrSoldier(mockBulldog1Gunner3);
+        ArrayList<Person> crew = new ArrayList<>(4);
+        crew.add(mockBulldog1Driver);
+        crew.add(mockBulldog1Gunner1);
+        crew.add(mockBulldog1Gunner2);
+        crew.add(mockBulldog1Gunner3);
+        when(mockBulldogUnit1.getCrew()).thenReturn(crew);
+        Crew mockBulldog1Crew = mock(Crew.class);
+        doReturn(mockTankPilot.getLevel()).when(mockBulldog1Crew).getPiloting();
+        doReturn(mockTankGunnery.getLevel()).when(mockBulldog1Crew).getGunnery();
+        when(mockBulldog1.getCrew()).thenReturn(mockBulldog1Crew);
+        return 6; // astechs needed by Bulldog1
+    }
+
+    private int mockBulldog2() {
+        mockBulldog2 = mock(Tank.class);
+        mockBulldogUnit2 = mock(Unit.class);
+        mockBulldog2Driver = mock(Person.class);
+        mockBulldog2Gunner1 = mock(Person.class);
+        mockBulldog2Gunner2 = mock(Person.class);
+        mockBulldog2Gunner3 = mock(Person.class);
+        mockBulldog2Tech = mock(Person.class);
+
+        when(mockBulldog2.getEntityType()).thenReturn(Entity.ETYPE_TANK);
+        when(mockBulldog2.getUnitType()).thenCallRealMethod();
+        when(mockBulldog2Driver.getSkill(SkillType.S_PILOT_GVEE)).thenReturn(mockTankPilot);
+        when(mockBulldog2Driver.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
+        when(mockBulldog2Gunner1.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
+        when(mockBulldog2Gunner2.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
+        when(mockBulldog2Gunner3.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
+        when(mockBulldogUnit2.getEntity()).thenReturn(mockBulldog2);
+        when(mockBulldog2Driver.isAdmin()).thenReturn(false);
+        personnelList.add(mockBulldog2Driver);
+        when(mockBulldog2Gunner1.isAdmin()).thenReturn(false);
+        personnelList.add(mockBulldog2Gunner1);
+        when(mockBulldog2Gunner2.isAdmin()).thenReturn(false);
+        personnelList.add(mockBulldog2Gunner2);
+        when(mockBulldog2Gunner3.isAdmin()).thenReturn(false);
+        personnelList.add(mockBulldog2Gunner3);
+        when(mockBulldog2Tech.isAdmin()).thenReturn(false);
+        when(mockBulldog2Tech.isTech()).thenReturn(true);
+        when(mockBulldog2Tech.isActive()).thenReturn(true);
+        when(mockBulldog2Tech.getSkill(SkillType.S_TECH_MECHANIC)).thenReturn(mockVeeTechSkill);
+        personnelList.add(mockBulldog2Tech);
+        mockBulldogUnit2.addPilotOrSoldier(mockBulldog2Driver);
+        mockBulldogUnit2.addPilotOrSoldier(mockBulldog2Gunner1);
+        mockBulldogUnit2.addPilotOrSoldier(mockBulldog2Gunner2);
+        mockBulldogUnit2.addPilotOrSoldier(mockBulldog2Gunner3);
+        ArrayList<Person> crew = new ArrayList<>(4);
+        crew.add(mockBulldog2Driver);
+        crew.add(mockBulldog2Gunner1);
+        crew.add(mockBulldog2Gunner2);
+        crew.add(mockBulldog2Gunner3);
+        when(mockBulldogUnit2.getCrew()).thenReturn(crew);
+        Crew mockBulldog2Crew = mock(Crew.class);
+        doReturn(mockTankPilot.getLevel()).when(mockBulldog2Crew).getPiloting();
+        doReturn(mockTankGunnery.getLevel()).when(mockBulldog2Crew).getGunnery();
+        when(mockBulldog2.getCrew()).thenReturn(mockBulldog2Crew);
+        return 6; // astechs needed by Bulldog1
+    }
+
+    private int mockBulldog3() {
+        mockBulldog3 = mock(Tank.class);
+        mockBulldogUnit3 = mock(Unit.class);
+        mockBulldog3Driver = mock(Person.class);
+        mockBulldog3Gunner1 = mock(Person.class);
+        mockBulldog3Gunner2 = mock(Person.class);
+        mockBulldog3Gunner3 = mock(Person.class);
+        mockBulldog3Tech = mock(Person.class);
+
+        when(mockBulldog3.getEntityType()).thenReturn(Entity.ETYPE_TANK);
+        when(mockBulldog3.getUnitType()).thenCallRealMethod();
+        when(mockBulldog3Driver.getSkill(SkillType.S_PILOT_GVEE)).thenReturn(mockTankPilot);
+        when(mockBulldog3Driver.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
+        when(mockBulldog3Gunner1.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
+        when(mockBulldog3Gunner2.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
+        when(mockBulldog3Gunner3.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
+        when(mockBulldogUnit3.getEntity()).thenReturn(mockBulldog3);
+        when(mockBulldog3Driver.isAdmin()).thenReturn(false);
+        personnelList.add(mockBulldog3Driver);
+        when(mockBulldog3Gunner1.isAdmin()).thenReturn(false);
+        personnelList.add(mockBulldog3Gunner1);
+        when(mockBulldog3Gunner2.isAdmin()).thenReturn(false);
+        personnelList.add(mockBulldog3Gunner2);
+        when(mockBulldog3Gunner3.isAdmin()).thenReturn(false);
+        personnelList.add(mockBulldog3Gunner3);
+        when(mockBulldog3Tech.isAdmin()).thenReturn(false);
+        when(mockBulldog3Tech.isTech()).thenReturn(true);
+        when(mockBulldog3Tech.isActive()).thenReturn(true);
+        when(mockBulldog3Tech.getSkill(SkillType.S_TECH_MECHANIC)).thenReturn(mockVeeTechSkill);
+        personnelList.add(mockBulldog3Tech);
+        mockBulldogUnit3.addPilotOrSoldier(mockBulldog3Driver);
+        mockBulldogUnit3.addPilotOrSoldier(mockBulldog3Gunner1);
+        mockBulldogUnit3.addPilotOrSoldier(mockBulldog3Gunner2);
+        mockBulldogUnit3.addPilotOrSoldier(mockBulldog3Gunner3);
+        ArrayList<Person> crew = new ArrayList<>(4);
+        crew.add(mockBulldog3Driver);
+        crew.add(mockBulldog3Gunner1);
+        crew.add(mockBulldog3Gunner2);
+        crew.add(mockBulldog3Gunner3);
+        when(mockBulldogUnit3.getCrew()).thenReturn(crew);
+        Crew mockBulldog3Crew = mock(Crew.class);
+        doReturn(mockTankPilot.getLevel()).when(mockBulldog3Crew).getPiloting();
+        doReturn(mockTankGunnery.getLevel()).when(mockBulldog3Crew).getGunnery();
+        when(mockBulldog3.getCrew()).thenReturn(mockBulldog3Crew);
+        return 6; // astechs needed by Bulldog1
+    }
+
+    private int mockBulldog4() {
+        mockBulldog4 = mock(Tank.class);
+        mockBulldogUnit4 = mock(Unit.class);
+        mockBulldog4Driver = mock(Person.class);
+        mockBulldog4Gunner1 = mock(Person.class);
+        mockBulldog4Gunner2 = mock(Person.class);
+        mockBulldog4Gunner3 = mock(Person.class);
+        mockBulldog4Tech = mock(Person.class);
+
+        when(mockBulldog4.getEntityType()).thenReturn(Entity.ETYPE_TANK);
+        when(mockBulldog4.getUnitType()).thenCallRealMethod();
+        when(mockBulldog4Driver.getSkill(SkillType.S_PILOT_GVEE)).thenReturn(mockTankPilot);
+        when(mockBulldog4Driver.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
+        when(mockBulldog4Gunner1.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
+        when(mockBulldog4Gunner2.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
+        when(mockBulldog4Gunner3.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
+        when(mockBulldogUnit4.getEntity()).thenReturn(mockBulldog4);
+        when(mockBulldog4Driver.isAdmin()).thenReturn(false);
+        personnelList.add(mockBulldog4Driver);
+        when(mockBulldog4Gunner1.isAdmin()).thenReturn(false);
+        personnelList.add(mockBulldog4Gunner1);
+        when(mockBulldog4Gunner2.isAdmin()).thenReturn(false);
+        personnelList.add(mockBulldog4Gunner1);
+        when(mockBulldog4Gunner3.isAdmin()).thenReturn(false);
+        personnelList.add(mockBulldog4Gunner3);
+        when(mockBulldog4Tech.isAdmin()).thenReturn(false);
+        when(mockBulldog4Tech.isTech()).thenReturn(true);
+        when(mockBulldog4Tech.isActive()).thenReturn(true);
+        when(mockBulldog4Tech.getSkill(SkillType.S_TECH_MECHANIC)).thenReturn(mockVeeTechSkill);
+        personnelList.add(mockBulldog4Tech);
+        mockBulldogUnit4.addPilotOrSoldier(mockBulldog4Driver);
+        mockBulldogUnit4.addPilotOrSoldier(mockBulldog4Gunner1);
+        mockBulldogUnit4.addPilotOrSoldier(mockBulldog4Gunner2);
+        mockBulldogUnit4.addPilotOrSoldier(mockBulldog4Gunner3);
+        ArrayList<Person> crew = new ArrayList<>(4);
+        crew.add(mockBulldog4Driver);
+        crew.add(mockBulldog4Gunner1);
+        crew.add(mockBulldog4Gunner2);
+        crew.add(mockBulldog4Gunner3);
+        when(mockBulldogUnit4.getCrew()).thenReturn(crew);
+        Crew mockBulldog4Crew = mock(Crew.class);
+        doReturn(mockTankPilot.getLevel()).when(mockBulldog4Crew).getPiloting();
+        doReturn(mockTankGunnery.getLevel()).when(mockBulldog4Crew).getGunnery();
+        when(mockBulldog4.getCrew()).thenReturn(mockBulldog4Crew);
+        return 6; // astechs needed by Bulldog1
+    }
+
+    private int mockPackrat1() {
+        mockPackrat1 = mock(Tank.class);
+        mockPackratUnit1 = mock(Unit.class);
+        mockPackrat1Driver = mock(Person.class);
+        mockPackrat1Gunner = mock(Person.class);
+        mockPackrat1Tech = mock(Person.class);
+
+        when(mockPackrat1.getEntityType()).thenReturn(Entity.ETYPE_TANK);
+        when(mockPackrat1.getUnitType()).thenCallRealMethod();
+        when(mockPackrat1Driver.getSkill(SkillType.S_PILOT_GVEE)).thenReturn(mockTankPilot);
+        when(mockPackrat1Driver.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
+        when(mockPackrat1Gunner.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
+        when(mockPackratUnit1.getEntity()).thenReturn(mockPackrat1);
+        when(mockPackrat1Driver.isAdmin()).thenReturn(false);
+        personnelList.add(mockPackrat1Driver);
+        when(mockPackrat1Gunner.isAdmin()).thenReturn(false);
+        personnelList.add(mockPackrat1Gunner);
+        when(mockPackrat1Tech.isAdmin()).thenReturn(false);
+        when(mockPackrat1Tech.isTech()).thenReturn(true);
+        when(mockPackrat1Tech.isActive()).thenReturn(true);
+        when(mockPackrat1Tech.getSkill(SkillType.S_TECH_MECHANIC)).thenReturn(mockVeeTechSkill);
+        personnelList.add(mockPackrat1Tech);
+        mockPackratUnit1.addPilotOrSoldier(mockPackrat1Driver);
+        mockPackratUnit1.addPilotOrSoldier(mockPackrat1Gunner);
+        ArrayList<Person> crew = new ArrayList<>(2);
+        crew.add(mockPackrat1Driver);
+        crew.add(mockPackrat1Gunner);
+        when(mockPackratUnit1.getCrew()).thenReturn(crew);
+        Crew mockPackrat1Crew = mock(Crew.class);
+        doReturn(mockTankPilot.getLevel()).when(mockPackrat1Crew).getPiloting();
+        doReturn(mockTankGunnery.getLevel()).when(mockPackrat1Crew).getGunnery();
+        when(mockPackrat1.getCrew()).thenReturn(mockPackrat1Crew);
+        return 6; // astechs needed for Packrat1
+    }
+
+    private int mockPackrat2() {
+        mockPackrat2 = mock(Tank.class);
+        mockPackratUnit2 = mock(Unit.class);
+        mockPackrat2Driver = mock(Person.class);
+        mockPackrat2Gunner = mock(Person.class);
+        mockPackrat2Tech = mock(Person.class);
+
+        when(mockPackrat2.getEntityType()).thenReturn(Entity.ETYPE_TANK);
+        when(mockPackrat2.getUnitType()).thenCallRealMethod();
+        when(mockPackrat2Driver.getSkill(SkillType.S_PILOT_GVEE)).thenReturn(mockTankPilot);
+        when(mockPackrat2Driver.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
+        when(mockPackrat2Gunner.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
+        when(mockPackratUnit2.getEntity()).thenReturn(mockPackrat2);
+        when(mockPackrat2Driver.isAdmin()).thenReturn(false);
+        personnelList.add(mockPackrat2Driver);
+        when(mockPackrat2Gunner.isAdmin()).thenReturn(false);
+        personnelList.add(mockPackrat2Gunner);
+        when(mockPackrat2Tech.isAdmin()).thenReturn(false);
+        when(mockPackrat2Tech.isTech()).thenReturn(true);
+        when(mockPackrat2Tech.isActive()).thenReturn(true);
+        when(mockPackrat2Tech.getSkill(SkillType.S_TECH_MECHANIC)).thenReturn(mockVeeTechSkill);
+        personnelList.add(mockPackrat2Tech);
+        mockPackratUnit2.addPilotOrSoldier(mockPackrat2Driver);
+        mockPackratUnit2.addPilotOrSoldier(mockPackrat2Gunner);
+        ArrayList<Person> crew = new ArrayList<>(2);
+        crew.add(mockPackrat2Driver);
+        crew.add(mockPackrat2Gunner);
+        when(mockPackratUnit2.getCrew()).thenReturn(crew);
+        Crew mockPackrat2Crew = mock(Crew.class);
+        doReturn(mockTankPilot.getLevel()).when(mockPackrat2Crew).getPiloting();
+        doReturn(mockTankGunnery.getLevel()).when(mockPackrat2Crew).getGunnery();
+        when(mockPackrat2.getCrew()).thenReturn(mockPackrat2Crew);
+        return 6; // astechs needed for Packrat2
+    }
+
+    private int mockPackrat3() {
+        mockPackrat3 = mock(Tank.class);
+        mockPackratUnit3 = mock(Unit.class);
+        mockPackrat3Driver = mock(Person.class);
+        mockPackrat3Gunner = mock(Person.class);
+        mockPackrat3Tech = mock(Person.class);
+
+        when(mockPackrat3.getEntityType()).thenReturn(Entity.ETYPE_TANK);
+        when(mockPackrat3.getUnitType()).thenCallRealMethod();
+        when(mockPackrat3Driver.getSkill(SkillType.S_PILOT_GVEE)).thenReturn(mockTankPilot);
+        when(mockPackrat3Driver.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
+        when(mockPackrat3Gunner.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
+        when(mockPackratUnit3.getEntity()).thenReturn(mockPackrat3);
+        when(mockPackrat3Driver.isAdmin()).thenReturn(false);
+        personnelList.add(mockPackrat3Driver);
+        when(mockPackrat3Gunner.isAdmin()).thenReturn(false);
+        personnelList.add(mockPackrat3Gunner);
+        when(mockPackrat3Tech.isAdmin()).thenReturn(false);
+        when(mockPackrat3Tech.isTech()).thenReturn(true);
+        when(mockPackrat3Tech.isActive()).thenReturn(true);
+        when(mockPackrat3Tech.getSkill(SkillType.S_TECH_MECHANIC)).thenReturn(mockVeeTechSkill);
+        personnelList.add(mockPackrat3Tech);
+        mockPackratUnit3.addPilotOrSoldier(mockPackrat3Driver);
+        mockPackratUnit3.addPilotOrSoldier(mockPackrat3Gunner);
+        ArrayList<Person> crew = new ArrayList<>(2);
+        crew.add(mockPackrat3Driver);
+        crew.add(mockPackrat3Gunner);
+        when(mockPackratUnit3.getCrew()).thenReturn(crew);
+        Crew mockPackrat3Crew = mock(Crew.class);
+        doReturn(mockTankPilot.getLevel()).when(mockPackrat3Crew).getPiloting();
+        doReturn(mockTankGunnery.getLevel()).when(mockPackrat3Crew).getGunnery();
+        when(mockPackrat3.getCrew()).thenReturn(mockPackrat3Crew);
+        return 6; // astechs needed for Packrat3
+    }
+
+    private int mockPackrat4() {
+        mockPackrat4 = mock(Tank.class);
+        mockPackratUnit4 = mock(Unit.class);
+        mockPackrat4Driver = mock(Person.class);
+        mockPackrat4Gunner = mock(Person.class);
+        mockPackrat4Tech = mock(Person.class);
+
+        when(mockPackrat4.getEntityType()).thenReturn(Entity.ETYPE_TANK);
+        when(mockPackrat4.getUnitType()).thenCallRealMethod();
+        when(mockPackrat4Driver.getSkill(SkillType.S_PILOT_GVEE)).thenReturn(mockTankPilot);
+        when(mockPackrat4Driver.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
+        when(mockPackrat4Gunner.getSkill(SkillType.S_GUN_VEE)).thenReturn(mockTankGunnery);
+        when(mockPackratUnit4.getEntity()).thenReturn(mockPackrat4);
+        when(mockPackrat4Driver.isAdmin()).thenReturn(false);
+        personnelList.add(mockPackrat4Driver);
+        when(mockPackrat4Gunner.isAdmin()).thenReturn(false);
+        personnelList.add(mockPackrat4Gunner);
+        when(mockPackrat4Tech.isAdmin()).thenReturn(false);
+        when(mockPackrat4Tech.isTech()).thenReturn(true);
+        when(mockPackrat4Tech.isActive()).thenReturn(true);
+        when(mockPackrat4Tech.getSkill(SkillType.S_TECH_MECHANIC)).thenReturn(mockVeeTechSkill);
+        personnelList.add(mockPackrat4Tech);
+        mockPackratUnit4.addPilotOrSoldier(mockPackrat4Driver);
+        mockPackratUnit4.addPilotOrSoldier(mockPackrat4Gunner);
+        ArrayList<Person> crew = new ArrayList<>(2);
+        crew.add(mockPackrat4Driver);
+        crew.add(mockPackrat4Gunner);
+        when(mockPackratUnit4.getCrew()).thenReturn(crew);
+        Crew mockPackrat4Crew = mock(Crew.class);
+        doReturn(mockTankPilot.getLevel()).when(mockPackrat4Crew).getPiloting();
+        doReturn(mockTankGunnery.getLevel()).when(mockPackrat4Crew).getGunnery();
+        when(mockPackrat4.getCrew()).thenReturn(mockPackrat4Crew);
+        return 6; // astechs needed for Packrat4
+    }
+
+    private void mockLaserPlatoon() {
+        infantryPersonnel = new HashSet<>(28);
+        mockLaserPlatoon = mock(Infantry.class);
+        mockLaserPlatoonUnit = mock(Unit.class);
+
+        when(mockLaserPlatoon.getEntityType()).thenReturn(Entity.ETYPE_INFANTRY);
+        when(mockLaserPlatoon.getUnitType()).thenCallRealMethod();
+        when(mockLaserPlatoon.getSquadSize()).thenReturn(7);
+        when(mockLaserPlatoon.getSquadN()).thenReturn(4);
+        when(mockLaserPlatoonUnit.getEntity()).thenReturn(mockLaserPlatoon);
+        ArrayList<Person> crew = new ArrayList<>(28);
+        for (int i = 0; i < 28; i++) {
+            Person mockInfantry = mock(Person.class);
+            when(mockInfantry.isAdmin()).thenReturn(false);
+            when(mockInfantry.getSkill(SkillType.S_SMALL_ARMS)).thenReturn(mockInfantryGunnery);
+            infantryPersonnel.add(mockInfantry);
+            mockLaserPlatoonUnit.addPilotOrSoldier(mockInfantry);
+            crew.add(mockInfantry);
+        }
+        when(mockLaserPlatoonUnit.getCrew()).thenReturn(crew);
+        Crew mockLaserPlatoonCrew = mock(Crew.class);
+        doReturn(mockInfantryGunnery.getLevel()).when(mockLaserPlatoonCrew).getGunnery();
+        when(mockLaserPlatoon.getCrew()).thenReturn(mockLaserPlatoonCrew);
+        personnelList.addAll(infantryPersonnel);
+    }
+
+    private int mockCorsair1() {
+        mockCorsair1 = mock(Aero.class);
+        mockCorsairUnit1 = mock(Unit.class);
+        mockCorsair1Pilot = mock(Person.class);
+        mockCorsair1Tech = mock(Person.class);
+
+        when(mockCorsair1.getEntityType()).thenReturn(Entity.ETYPE_AERO);
+        when(mockCorsair1.getUnitType()).thenCallRealMethod();
+        when(mockCorsairUnit1.getEntity()).thenReturn(mockCorsair1);
+        when(mockCorsair1Pilot.isAdmin()).thenReturn(false);
+        when(mockCorsair1Pilot.getSkill(SkillType.S_GUN_AERO)).thenReturn(mockAeroGunnery);
+        when(mockCorsair1Pilot.getSkill(SkillType.S_PILOT_AERO)).thenReturn(mockAeroPilot);
+        personnelList.add(mockCorsair1Pilot);
+        mockCorsairUnit1.addPilotOrSoldier(mockCorsair1Pilot);
+        ArrayList<Person> crew = new ArrayList<>(1);
+        crew.add(mockCorsair1Pilot);
+        when(mockCorsairUnit1.getCrew()).thenReturn(crew);
+        when(mockCorsair1Tech.isAdmin()).thenReturn(false);
+        when(mockCorsair1Tech.isTech()).thenReturn(true);
+        when(mockCorsair1Tech.isActive()).thenReturn(true);
+        when(mockCorsair1Tech.getSkill(SkillType.S_TECH_AERO)).thenReturn(mockFighterTechSkill);
+        personnelList.add(mockCorsair1Tech);
+        Crew mockCorsair1Crew = mock(Crew.class);
+        doReturn(mockAeroPilot.getLevel()).when(mockCorsair1Crew).getPiloting();
+        doReturn(mockAeroGunnery.getLevel()).when(mockCorsair1Crew).getGunnery();
+        when(mockCorsair1.getCrew()).thenReturn(mockCorsair1Crew);
+        return 6; // astechs for Corsair1
+    }
+
+    private int mockCorsair2() {
+        mockCorsair2 = mock(Aero.class);
+        mockCorsairUnit2 = mock(Unit.class);
+        mockCorsair2Pilot = mock(Person.class);
+        mockCorsair2Tech = mock(Person.class);
+
+        when(mockCorsair2.getEntityType()).thenReturn(Entity.ETYPE_AERO);
+        when(mockCorsair2.getUnitType()).thenCallRealMethod();
+        when(mockCorsairUnit2.getEntity()).thenReturn(mockCorsair2);
+        when(mockCorsair2Pilot.isAdmin()).thenReturn(false);
+        when(mockCorsair2Pilot.getSkill(SkillType.S_GUN_AERO)).thenReturn(mockAeroGunnery);
+        when(mockCorsair2Pilot.getSkill(SkillType.S_PILOT_AERO)).thenReturn(mockAeroPilot);
+        personnelList.add(mockCorsair2Pilot);
+        mockCorsairUnit2.addPilotOrSoldier(mockCorsair2Pilot);
+        ArrayList<Person> crew = new ArrayList<>(1);
+        crew.add(mockCorsair2Pilot);
+        when(mockCorsairUnit2.getCrew()).thenReturn(crew);
+        when(mockCorsair2Tech.isAdmin()).thenReturn(false);
+        when(mockCorsair2Tech.isTech()).thenReturn(true);
+        when(mockCorsair2Tech.isActive()).thenReturn(true);
+        when(mockCorsair2Tech.getSkill(SkillType.S_TECH_AERO)).thenReturn(mockFighterTechSkillElite);
+        personnelList.add(mockCorsair2Tech);
+        Crew mockCorsair2Crew = mock(Crew.class);
+        doReturn(mockAeroPilot.getLevel()).when(mockCorsair2Crew).getPiloting();
+        doReturn(mockAeroGunnery.getLevel()).when(mockCorsair2Crew).getGunnery();
+        when(mockCorsair2.getCrew()).thenReturn(mockCorsair2Crew);
+        return 6; // astechs for Corsair1
+    }
+
+    private void mockSeeker() {
+        seekerCrew = new HashSet<>(20);
+        mockSeeker = mock(Dropship.class);
+        mockSeekerUnit = mock(Unit.class);
+
+        when(mockSeeker.getEntityType()).thenReturn(Entity.ETYPE_DROPSHIP);
+        when(mockSeeker.getUnitType()).thenCallRealMethod();
+        when(mockSeekerUnit.getEntity()).thenReturn(mockSeeker);
+        Bay transportBay;
+        Vector<Bay> bayList = new Vector<>();
+        transportBay = new MechBay(4, 1, 1);
+        bayList.add(transportBay);
+        transportBay = new ASFBay(2, 0, 2);
+        bayList.add(transportBay);
+        transportBay = new LightVehicleBay(22, 0, 3);
+        bayList.add(transportBay);
+        transportBay = new InfantryBay(4.0, 0, 4, InfantryBay.PlatoonType.FOOT);
+        bayList.add(transportBay);
+        when(mockSeeker.getTransportBays()).thenReturn(bayList);
+        ArrayList<Person> crew = new ArrayList<>(20);
+        for (int i = 0; i < 20; i++) {
+            Person mockCrew = mock(Person.class);
+            when(mockCrew.isAdmin()).thenReturn(false);
+            if (i == 0) {
+                when(mockCrew.getSkill(SkillType.S_PILOT_SPACE)).thenReturn(mockDropPilot);
+            } else {
+                when(mockCrew.getSkill(SkillType.S_GUN_SPACE)).thenReturn(mockDropGunnery);
+            }
+            seekerCrew.add(mockCrew);
+            mockSeekerUnit.addPilotOrSoldier(mockCrew);
+            crew.add(mockCrew);
+        }
+        personnelList.addAll(seekerCrew);
+        when(mockSeekerUnit.getCrew()).thenReturn(crew);
+        when(mockSeekerUnit.getActiveCrew()).thenReturn(crew);
+        when(mockSeekerUnit.getFullCrewSize()).thenReturn(20);
+        Crew mockSeekerCrew = mock(Crew.class);
+        doReturn(mockDropPilot.getLevel()).when(mockSeekerCrew).getPiloting();
+        doReturn(mockDropGunnery.getLevel()).when(mockSeekerCrew).getGunnery();
+        when(mockSeeker.getCrew()).thenReturn(mockSeekerCrew);
+    }
+
+    private void mockInvader() {
+        invaderCrew = new HashSet<>(24);
+        mockInvader = mock(Jumpship.class);
+        mockInvaderUnit = mock(Unit.class);
+
+        when(mockInvader.getEntityType()).thenReturn(Entity.ETYPE_JUMPSHIP);
+        when(mockInvader.getUnitType()).thenCallRealMethod();
+        when(mockInvaderUnit.getEntity()).thenReturn(mockInvader);
+        DockingCollar collar;
+        Vector<DockingCollar> collarList = new Vector<>(4);
+        for (int i = 0; i < 4; i++) {
+            collar = mock(DockingCollar.class);
+            collarList.add(collar);
+        }
+        when(mockInvader.getTransportBays()).thenReturn(new Vector<>(0));
+        when(mockInvader.getDockingCollars()).thenReturn(collarList);
+        ArrayList<Person> crew = new ArrayList<>(24);
+        for (int i = 0; i < 24; i++) {
+            Person mockCrew = mock(Person.class);
+            when(mockCrew.isAdmin()).thenReturn(false);
+            when(mockCrew.getSkill(SkillType.S_GUN_SPACE)).thenReturn(mockJumpGunnery);
+            if (i == 0) {
+                when(mockCrew.getSkill(SkillType.S_PILOT_SPACE)).thenReturn(mockJumpPilot);
+            }
+            invaderCrew.add(mockCrew);
+            mockInvaderUnit.addPilotOrSoldier(mockCrew);
+            crew.add(mockCrew);
+        }
+        personnelList.addAll(invaderCrew);
+        when(mockInvaderUnit.getCrew()).thenReturn(crew);
+        when(mockInvaderUnit.getActiveCrew()).thenReturn(crew);
+        when(mockInvaderUnit.getFullCrewSize()).thenReturn(24);
+        Crew mockInvaderCrew = mock(Crew.class);
+        doReturn(mockJumpPilot.getLevel()).when(mockInvaderCrew).getPiloting();
+        doReturn(mockJumpGunnery.getLevel()).when(mockInvaderCrew).getGunnery();
+        when(mockInvader.getCrew()).thenReturn(mockInvaderCrew);
     }
 }

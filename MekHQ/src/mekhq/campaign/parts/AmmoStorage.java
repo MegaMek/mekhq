@@ -22,7 +22,9 @@
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
+import java.math.RoundingMode;
 
+import mekhq.campaign.finances.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -36,7 +38,6 @@ import megamek.common.TargetRoll;
 import megamek.common.TechAdvancement;
 import mekhq.MekHQ;
 import mekhq.MekHqXmlUtil;
-import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.personnel.Person;
@@ -83,11 +84,11 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
     }
     
     @Override
-    public long getStickerPrice() {
+    public Money getStickerPrice() {
     	//costs are a total nightmare
         //some costs depend on entity, but we can't do it that way
         //because spare parts don't have entities. If parts start on an entity
-        //thats fine, but this will become problematic when we set up a parts
+        //that's fine, but this will become problematic when we set up a parts
         //store. For now I am just going to pass in a null entity and attempt
     	//to catch any resulting NPEs
     	Entity en = null;
@@ -100,9 +101,9 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
             }
     	}
 
-        int itemCost = 0;      
+        Money itemCost = Money.zero();
         try {
-        	itemCost = (int) type.getCost(en, isArmored, -1);
+        	itemCost = itemCost.plus(type.getCost(en, isArmored, -1));
         } catch(NullPointerException ex) {
             MekHQ.getLogger().error(AmmoStorage.class, "getStickerPrice", ex);
         }
@@ -110,13 +111,19 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
     }
     
     @Override
-    public long getBuyCost() {
+    public Money getBuyCost() {
         return getStickerPrice();
     }
     
     @Override
-    public long getCurrentValue() {
-    	return (long)(getStickerPrice() * ((double)shots / ((AmmoType)type).getShots()));
+    public Money getCurrentValue() {
+        if (((AmmoType)type).getShots() <= 0) {
+            return Money.zero();
+        }
+
+    	return getStickerPrice()
+                .multipliedBy(shots)
+                .dividedBy(((AmmoType)type).getShots());
     }
 
     public int getShots() {
@@ -191,7 +198,6 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
 	@Override
 	public void fix() {
 		//nothing to fix
-		return;
 	}
 
 	@Override
@@ -214,13 +220,11 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
 	@Override
 	public void updateConditionFromEntity(boolean checkForDestruction) {
 		//nothing to do here
-		return;
 	}
 	
 	@Override
 	public void updateConditionFromPart() {
 		//nothing to do here
-		return;
 	}
 
 	@Override
@@ -306,7 +310,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
         toReturn += getAcquisitionExtraDesc() + "<br/>";
         PartInventory inventories = campaign.getPartInventory(getAcquisitionPart());
         toReturn += inventories.getTransitOrderedDetails() + "<br/>"; 
-        toReturn += Utilities.getCurrencyString(getStickerPrice()) + "<br/>";
+        toReturn += getStickerPrice().toAmountAndSymbolString() + "<br/>";
         toReturn += "</font></html>";
         return toReturn;
     }
@@ -390,7 +394,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
     }
     
     @Override
-    public boolean isPriceAdustedForAmount() {
+    public boolean isPriceAdjustedForAmount() {
         return true;
     }
 

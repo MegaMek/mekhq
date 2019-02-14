@@ -23,6 +23,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import mekhq.campaign.finances.Money;
 import org.w3c.dom.Node;
 
 import megamek.common.Aero;
@@ -78,14 +79,13 @@ public class LandingGear extends Part {
 					&& hits > priorHits 
 					&& Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
 				remove(false);
-				return;
 			}
 		}
 	}
 	
 	@Override 
 	public int getBaseTime() {
-	    int time = 0;
+	    int time;
 	    if (campaign.getCampaignOptions().useAeroSystemHits()) {
             //Test of proposed errata for repair times
             Entity e = unit.getEntity();
@@ -178,8 +178,8 @@ public class LandingGear extends Part {
 	}
 
 	@Override
-	public long getStickerPrice() {
-		return 10 * getUnitTonnage();
+	public Money getStickerPrice() {
+		return Money.of(10.0 * getUnitTonnage());
 	}
 
 	@Override

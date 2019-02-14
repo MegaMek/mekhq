@@ -28,7 +28,6 @@ import megamek.common.CriticalSlot;
 import megamek.common.EquipmentType;
 import megamek.common.Mounted;
 import mekhq.MekHQ;
-import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Part;
@@ -199,8 +198,7 @@ public class BattleArmorAmmoBin extends AmmoBin implements IAcquisitionWork {
 
     @Override
     public void remove(boolean salvage) {
-        //shouldnt be here
-        return;
+        //shouldn't be here
     }
     
     @Override
@@ -234,7 +232,7 @@ public class BattleArmorAmmoBin extends AmmoBin implements IAcquisitionWork {
         toReturn += getAcquisitionExtraDesc() + "<br/>";
         PartInventory inventories = campaign.getPartInventory(getAcquisitionPart());
         toReturn += inventories.getTransitOrderedDetails() + "<br/>"; 
-        toReturn += Utilities.getCurrencyString(getBuyCost()) + "<br/>";
+        toReturn += getBuyCost().toAmountAndSymbolString() + "<br/>";
         toReturn += "</font></html>";
         return toReturn;
     }
@@ -294,7 +292,7 @@ public class BattleArmorAmmoBin extends AmmoBin implements IAcquisitionWork {
         }
         
         
-        //fIXME, this is a crappy hack, but we want something along these lines
+        //FIXME, this is a crappy hack, but we want something along these lines
         //to make sure that BA ammo gets removed from all parts - It might be better to run
         //a check on the XML loading after restore - we also will need to to the same for proto
         //ammo but we can only do this if we have all the correct ammo rack sizes for the 

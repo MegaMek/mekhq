@@ -1,0 +1,128 @@
+<!--
+currencies.xml
+2/4/2019
+written by Vicente Cartas Espinel
+
+This file contains the different currencies used in MekHQ. Keep in mind that the currency codes are
+used by the factions.xml file and by CurrencyManager.java, so if you remove or change a currency here,
+you will need to do changes on those files.
+
+Here is a description of what goes in each currency tag
+
+name - Descriptive full name of the currency
+code - Unique three-letter upper-case currency code (ISO-4217)
+decimalPlaces - decimalPlaces  the number of decimal places that the currency
+                normally has, from 0 to 30 (normally 0, 2 or 3)
+symbol - Symbol used to represent the currency. Real currencies have their symbols
+         defined by the Locale (e.g. $ or US$), but because these are fictional
+         currencies we define the symbols ourselves.
+defaultStart - Indicates which year the currency started being the default currency for the IS.
+               Optional.
+defaultEnd - Indicates which year the currency ended being the default currency for the IS.
+             Mandatory if defaultStart is defined.
+-->
+
+<currencies>
+    <currency>
+        <name>Star League Dollar</name>
+        <code>SLD</code>
+        <decimalPlaces>2</decimalPlaces>
+        <symbol>SL$</symbol>
+        <startYear>2571</startYear>
+        <endYear>2785</endYear>
+    </currency>
+    <currency>
+        <name>ComStar bill</name>
+        <code>CSB</code>
+        <decimalPlaces>0</decimalPlaces>
+        <symbol>C-Bill</symbol>
+        <startYear>1</startYear>
+        <endYear>999999</endYear>
+        <isDefault>true</isDefault>
+        <isBackup>true</isBackup>
+    </currency>
+    <currency>
+        <name>Lyran Alliance Kroner</name>
+        <code>LAK</code>
+        <decimalPlaces>2</decimalPlaces>
+        <symbol>S-Bill</symbol>
+    </currency>
+    <currency>
+        <name>Lyran Commonwealth Kroner</name>
+        <code>LCK</code>
+        <decimalPlaces>2</decimalPlaces>
+        <symbol>S-Bill</symbol>
+    </currency>
+    <currency>
+        <name>Federated Suns Pound</name>
+        <code>FSP</code>
+        <decimalPlaces>2</decimalPlaces>
+        <symbol>D-Bill</symbol>
+    </currency>
+    <currency>
+        <name>Free Worlds League Eagle</name>
+        <code>FWE</code>
+        <decimalPlaces>2</decimalPlaces>
+        <symbol>M-Bill</symbol>
+    </currency>
+    <currency>
+        <name>Free Rasalhague Republic Krona</name>
+        <code>FRK</code>
+        <decimalPlaces>2</decimalPlaces>
+        <symbol>R-Bill</symbol>
+    </currency>
+    <currency>
+        <name>Rasalhague Dominion Bear-Krona</name>
+        <code>RDK</code>
+        <decimalPlaces>2</decimalPlaces>
+        <symbol>R-Bill</symbol>
+    </currency>
+    <currency>
+        <name>Capellan Confederation Yuan</name>
+        <code>CCY</code>
+        <decimalPlaces>2</decimalPlaces>
+        <symbol>L-Bill</symbol>
+    </currency>
+    <currency>
+        <name>Draconis Combine Ryu</name>
+        <code>DCR</code>
+        <decimalPlaces>2</decimalPlaces>
+        <symbol>K-Bill</symbol>
+    </currency>
+    <currency>
+        <name>Taurian Concordat Bull</name>
+        <code>TCB</code>
+        <decimalPlaces>2</decimalPlaces>
+        <symbol>TC-Bill</symbol>
+    </currency>
+    <currency>
+        <name>Calderon Protectorate Bull</name>
+        <code>CPB</code>
+        <decimalPlaces>2</decimalPlaces>
+        <symbol>CP-Bill</symbol>
+    </currency>
+    <currency>
+        <name>Magistracy of Canopus Dollar</name>
+        <code>MCD</code>
+        <decimalPlaces>2</decimalPlaces>
+        <symbol>MC$</symbol>
+    </currency>
+    <currency>
+        <name>Fronc Reaches Dollar</name>
+        <code>FRD</code>
+        <decimalPlaces>2</decimalPlaces>
+        <symbol>FR$</symbol>
+    </currency>
+    <currency>
+        <name>Outworlds Alliance Escudo</name>
+        <code>OAE</code>
+        <decimalPlaces>2</decimalPlaces>
+        <symbol>E-Bill</symbol>
+    </currency>
+    <currency>
+        <name>Raven Alliance Raven-Escudo</name>
+        <code>RAE</code>
+        <decimalPlaces>2</decimalPlaces>
+        <symbol>RE-Bill</symbol>
+    </currency>
+</currencies>

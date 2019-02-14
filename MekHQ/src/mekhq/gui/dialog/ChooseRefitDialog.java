@@ -58,7 +58,6 @@ import mekhq.campaign.parts.Refit;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
 
-
 /**
  *
  * @author  Taharqa
@@ -353,7 +352,6 @@ public class ChooseRefitDialog extends javax.swing.JDialog {
 
 		public Object getValueAt(int row, int col) {
 	        Refit r;
-        	DecimalFormat formatter = new DecimalFormat();
 	        if(data.isEmpty()) {
 	        	return "";
 	        } else {
@@ -375,7 +373,7 @@ public class ChooseRefitDialog extends javax.swing.JDialog {
 				return r.getShoppingList().size();
 			}
 			if(col == COL_COST) {
-				return formatter.format(r.getCost());
+				return r.getCost().toAmountAndSymbolString();
 			}
 			if(col == COL_TARGET) {
 			    return campaign.getTargetForAcquisition(r, campaign.getLogisticsPerson(), false).getValueAsString();
@@ -389,7 +387,7 @@ public class ChooseRefitDialog extends javax.swing.JDialog {
 		}
 		
 		@Override
-		public Class<? extends Object> getColumnClass(int c) {
+		public Class<?> getColumnClass(int c) {
 			return getValueAt(0, c).getClass();
 		}
 

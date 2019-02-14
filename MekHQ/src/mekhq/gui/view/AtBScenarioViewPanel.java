@@ -626,7 +626,7 @@ public class AtBScenarioViewPanel extends JPanel {
         gridBagConstraints.gridwidth = 1;
         panStats.add(lblGravity, gridBagConstraints);
 
-        lblGravityDesc.setText((new DecimalFormat()).format(scenario.getGravity()));
+        lblGravityDesc.setText(DecimalFormat.getInstance().format(scenario.getGravity()));
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = y++;
         panStats.add(lblGravityDesc, gridBagConstraints);

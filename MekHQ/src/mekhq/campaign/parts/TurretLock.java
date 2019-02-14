@@ -23,6 +23,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import mekhq.campaign.finances.Money;
 import org.w3c.dom.Node;
 
 import megamek.common.Entity;
@@ -63,8 +64,8 @@ public class TurretLock extends Part {
 	}
 	
 	@Override
-	public long getStickerPrice() {
-		return 0;
+	public Money getStickerPrice() {
+		return Money.zero();
 	}
 	
 	@Override

@@ -25,7 +25,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.DecimalFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -58,6 +57,7 @@ import megamek.common.logging.LogLevel;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.event.PersonBattleFinishedEvent;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.log.ServiceLogger;
 import mekhq.campaign.mission.AtBContract;
@@ -114,23 +114,23 @@ public class ResolveScenarioTracker {
         this.scenario = s;
         this.campaign = c;
         this.control = ctrl;
-        unitsStatus = new Hashtable<UUID, UnitStatus>();
-        salvageStatus = new Hashtable<UUID, UnitStatus>();
-        potentialSalvage = new ArrayList<TestUnit>();
-        alliedUnits = new ArrayList<TestUnit>(); // TODO: Make some use of this?
-        actualSalvage = new ArrayList<TestUnit>();
-        leftoverSalvage = new ArrayList<TestUnit>();
-        devastatedEnemyUnits = new ArrayList<TestUnit>();
-        pilots = new Hashtable<UUID, Crew>();
-        mia = new Hashtable<UUID, Crew>();
-        units = new ArrayList<Unit>();
+        unitsStatus = new Hashtable<>();
+        salvageStatus = new Hashtable<>();
+        potentialSalvage = new ArrayList<>();
+        alliedUnits = new ArrayList<>(); // TODO: Make some use of this?
+        actualSalvage = new ArrayList<>();
+        leftoverSalvage = new ArrayList<>();
+        devastatedEnemyUnits = new ArrayList<>();
+        pilots = new Hashtable<>();
+        mia = new Hashtable<>();
+        units = new ArrayList<>();
         potentialLoot = scenario.getLoot();
-        actualLoot = new ArrayList<Loot>();
-        peopleStatus = new Hashtable<UUID, PersonStatus>();
-        prisonerStatus = new Hashtable<UUID, PrisonerStatus>();
-        killCredits = new Hashtable<String, String>();
-        ejections = new Hashtable<UUID, EjectedCrew>();
-        enemyEjections = new Hashtable<UUID, EjectedCrew>();
+        actualLoot = new ArrayList<>();
+        peopleStatus = new Hashtable<>();
+        prisonerStatus = new Hashtable<>();
+        killCredits = new Hashtable<>();
+        ejections = new Hashtable<>();
+        enemyEjections = new Hashtable<>();
         for(UUID uid : scenario.getForces(campaign).getAllUnits()) {
             Unit u = campaign.getUnit(uid);
             if(null != u && null == u.checkDeployment()) {
@@ -426,7 +426,7 @@ public class ResolveScenarioTracker {
     }
 
     private List<Person> shuffleCrew(List<Person> source) {
-        List<Person> sortedList = new ArrayList<Person>();
+        List<Person> sortedList = new ArrayList<>();
         Random generator = new Random();
 
         while (source.size() > 0)
@@ -1168,25 +1168,24 @@ public class ResolveScenarioTracker {
         for(Unit unit : units) {
             UnitStatus ustatus = unitsStatus.get(unit.getId());
             if(null == ustatus) {
-                //shouldnt happen
+                //shouldn't happen
                 continue;
             }
             Entity en = ustatus.getEntity();
-            long unitValue = unit.getBuyCost();
+            Money unitValue = unit.getBuyCost();
             if(campaign.getCampaignOptions().useBLCSaleValue()) {
                 unitValue = unit.getSellValue();
             }
             if(ustatus.isTotalLoss()) {
                 //missing unit
                 if(blc > 0) {
-                    long value = (long)(blc * unitValue);
+                    Money value = unitValue.multipliedBy(blc);
                     campaign.getFinances().credit(value, Transaction.C_BLC, "Battle loss compensation for " + unit.getName(), campaign.getCalendar().getTime());
-                    DecimalFormat formatter = new DecimalFormat();
-                    campaign.addReport(formatter.format(value) + " in battle loss compensation for " + unit.getName() + " has been credited to your account.");
+                    campaign.addReport(value.toAmountAndSymbolString() + " in battle loss compensation for " + unit.getName() + " has been credited to your account.");
                 }
                 campaign.removeUnit(unit.getId());
             } else {
-                long currentValue = unit.getValueOfAllMissingParts();
+                Money currentValue = unit.getValueOfAllMissingParts();
                 campaign.clearGameData(en);
                 // FIXME: Need to implement a "fuel" part just like the "armor" part
                 if (en.isAero()) {
@@ -1203,29 +1202,28 @@ public class ResolveScenarioTracker {
                 }
                 campaign.addReport(unit.getHyperlinkedName() + " has been recovered.");
                 //check for BLC
-                long newValue = unit.getValueOfAllMissingParts();
-                long blcValue = newValue - currentValue;
-                long repairBLC = 0;
-                String blcString = "attle loss compensation (parts) for " + unit.getName();
+                Money newValue = unit.getValueOfAllMissingParts();
+                Money blcValue = newValue.minus(currentValue);
+                Money repairBLC = Money.zero();
+                String blcString = "battle loss compensation (parts) for " + unit.getName();
                 if(!unit.isRepairable()) {
                     //if the unit is not repairable, you should get BLC for it but we should subtract
                     //the value of salvageable parts
-                    blcValue = unitValue - unit.getSellValue();
-                    blcString = "attle loss compensation for " + unit.getName();
+                    blcValue = unitValue.minus(unit.getSellValue());
+                    blcString = "battle loss compensation for " + unit.getName();
                 }
                 if (campaign.getCampaignOptions().payForRepairs()) {
                     for(Part p : unit.getParts()) {
                         if (p.needsFixing() && !(p instanceof Armor)) {
-                            repairBLC += p.getStickerPrice() * .2;
+                            repairBLC = repairBLC.plus(p.getStickerPrice().multipliedBy(0.2));
                         }
                     }
                 }
-                blcValue += repairBLC;
-                if(blc > 0 && blcValue > 0) {
-                    long finalValue = (long)(blc * blcValue);
+                blcValue = blcValue.plus(repairBLC);
+                if(blc > 0 && blcValue.isPositive()) {
+                    Money finalValue = blcValue.multipliedBy(blc);
                     campaign.getFinances().credit(finalValue, Transaction.C_BLC, "B" + blcString, campaign.getCalendar().getTime());
-                    DecimalFormat formatter = new DecimalFormat();
-                    campaign.addReport(formatter.format(finalValue) + " in b" + blcString + " has been credited to your account.");
+                    campaign.addReport( finalValue.toAmountAndSymbolString() + " in b" + blcString + " has been credited to your account.");
                 }
             }
         }
@@ -1245,15 +1243,14 @@ public class ResolveScenarioTracker {
             }
         }
         if(getMission() instanceof Contract) {
-            long value = 0;
+            Money value = Money.zero();
             for(Unit salvageUnit : leftoverSalvage) {
-                value += salvageUnit.getSellValue();
+                value = value.plus(salvageUnit.getSellValue());
             }
             if(((Contract)getMission()).isSalvageExchange()) {
-                value = (long)((value) * (((Contract)getMission()).getSalvagePct()/100.0));
+                value = value.multipliedBy(((Contract)getMission()).getSalvagePct()).dividedBy(100);
                 campaign.getFinances().credit(value, Transaction.C_SALVAGE, "salvage exchange for " + scenario.getName(),  campaign.getCalendar().getTime());
-                DecimalFormat formatter = new DecimalFormat();
-                campaign.addReport(formatter.format(value) + " C-Bills have been credited to your account for salvage exchange.");
+                campaign.addReport(value.toAmountAndSymbolString() + " have been credited to your account for salvage exchange.");
             } else {
                 ((Contract)getMission()).addSalvageByEmployer(value);
             }
@@ -1287,7 +1284,7 @@ public class ResolveScenarioTracker {
     }
 
     public ArrayList<Person> getMissingPersonnel() {
-        ArrayList<Person> mia = new ArrayList<Person>();
+        ArrayList<Person> mia = new ArrayList<>();
         for(UUID pid : peopleStatus.keySet()) {
             PersonStatus status = peopleStatus.get(pid);
             if(status.isMissing()) {
@@ -1301,7 +1298,7 @@ public class ResolveScenarioTracker {
     }
 
     public ArrayList<Person> getDeadPersonnel() {
-        ArrayList<Person> kia = new ArrayList<Person>();
+        ArrayList<Person> kia = new ArrayList<>();
         for(UUID pid : peopleStatus.keySet()) {
             PersonStatus status = peopleStatus.get(pid);
             if(status.isDead()) {
@@ -1315,7 +1312,7 @@ public class ResolveScenarioTracker {
     }
 
     public ArrayList<Person> getRecoveredPersonnel() {
-        ArrayList<Person> recovered = new ArrayList<Person>();
+        ArrayList<Person> recovered = new ArrayList<>();
         for(UUID pid : peopleStatus.keySet()) {
             PersonStatus status = peopleStatus.get(pid);
             if(!status.isDead() && !status.isMissing()) {
@@ -1354,7 +1351,7 @@ public class ResolveScenarioTracker {
 
     public ArrayList<PersonStatus> getSortedPeople() {
         //put all the PersonStatuses in an ArrayList and sort by the unit name
-        ArrayList<PersonStatus> toReturn = new ArrayList<PersonStatus>();
+        ArrayList<PersonStatus> toReturn = new ArrayList<>();
         for(UUID id : getPeopleStatus().keySet()) {
             PersonStatus status = peopleStatus.get(id);
             if(null != status) {
@@ -1368,7 +1365,7 @@ public class ResolveScenarioTracker {
 
     public ArrayList<PrisonerStatus> getSortedPrisoners() {
         //put all the PersonStatuses in an ArrayList and sort by the unit name
-        ArrayList<PrisonerStatus> toReturn = new ArrayList<PrisonerStatus>();
+        ArrayList<PrisonerStatus> toReturn = new ArrayList<>();
         for(UUID id : getPrisonerStatus().keySet()) {
             PrisonerStatus status = prisonerStatus.get(id);
             if(null != status) {
@@ -1409,7 +1406,7 @@ public class ResolveScenarioTracker {
             hits = h;
             missing = false;
             xp = 0;
-            kills = new ArrayList<Kill>();
+            kills = new ArrayList<>();
             remove = false;
             pickedUp = false;
             personId = id;
@@ -1625,10 +1622,10 @@ public class ResolveScenarioTracker {
         }
 
         public String getDesc() {
-            return getDesc(null);
+            return getDesc(false);
         }
 
-        public String getDesc(DecimalFormat formatter) {
+        public String getDesc(boolean printSellValue) {
             if(null == entity) {
                 return "Whoops, No Entity";
             }
@@ -1656,11 +1653,12 @@ public class ResolveScenarioTracker {
                         break;
                 }
             }
-            String s = "<html><b>" + getName() + "</b><br><font color='" + color + "'>"+ status + "</font></html>";
-            if(null != formatter) {
-                s = "<html><b>" + getName() + "</b><br> (" + formatter.format(unit.getSellValue()) + "C-bills) <font color='" + color + "'>"+ status + "</font></html>";
+
+            if (printSellValue) {
+                return "<html><b>" + getName() + "</b><br> (" + unit.getSellValue().toAmountAndSymbolString() + ") <font color='" + color + "'>"+ status + "</font></html>";
+            } else {
+                return "<html><b>" + getName() + "</b><br><font color='" + color + "'>"+ status + "</font></html>";
             }
-            return s;
         }
 
         public boolean isLikelyCaptured() {

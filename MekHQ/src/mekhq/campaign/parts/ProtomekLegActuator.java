@@ -23,6 +23,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import mekhq.campaign.finances.Money;
 import org.w3c.dom.Node;
 
 import megamek.common.Compute;
@@ -64,8 +65,8 @@ public class ProtomekLegActuator extends Part {
     }
 
     @Override
-    public long getStickerPrice() {
-        return getUnitTonnage() * 540;
+    public Money getStickerPrice() {
+        return Money.of(getUnitTonnage() * 540);
     }
 
     @Override
@@ -133,10 +134,8 @@ public class ProtomekLegActuator extends Part {
 					&& hits > priorHits
 					&& Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
 				remove(false);
-				return;
 			}
         }
-
     }
 
     @Override

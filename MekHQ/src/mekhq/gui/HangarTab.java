@@ -187,7 +187,7 @@ public final class HangarTab extends CampaignGuiTab {
         XTableColumnModel unitColumnModel = new XTableColumnModel();
         unitTable.setColumnModel(unitColumnModel);
         unitTable.createDefaultColumnsFromModel();
-        unitSorter = new TableRowSorter<UnitTableModel>(unitModel);
+        unitSorter = new TableRowSorter<>(unitModel);
         unitSorter.setComparator(UnitTableModel.COL_STATUS, new UnitStatusSorter());
         unitSorter.setComparator(UnitTableModel.COL_TYPE, new UnitTypeSorter());
         unitSorter.setComparator(UnitTableModel.COL_WCLASS, new WeightClassSorter());

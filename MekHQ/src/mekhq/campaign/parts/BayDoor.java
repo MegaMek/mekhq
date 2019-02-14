@@ -20,6 +20,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import mekhq.campaign.finances.Money;
 import org.w3c.dom.Node;
 
 import megamek.common.Bay;
@@ -138,8 +139,8 @@ public class BayDoor extends Part {
     }
 
     @Override
-    public long getStickerPrice() {
-        return 1000;
+    public Money getStickerPrice() {
+        return Money.of(1000);
     }
 
     @Override
@@ -180,5 +181,4 @@ public class BayDoor extends Part {
                 .setAvailability(RATING_A, RATING_A, RATING_A, RATING_A)
                 .setStaticTechLevel(SimpleTechLevel.STANDARD);
     }
-
 }

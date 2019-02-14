@@ -23,6 +23,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import mekhq.campaign.finances.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -140,22 +141,22 @@ public class InfantryMotiveType extends Part {
 	}
 
 	@Override
-	public long getStickerPrice() {
+	public Money getStickerPrice() {
 		 switch (getMovementMode()){
 	        case INF_UMU:
-	            return 17888;
+	            return Money.of(17888);
 	        case INF_MOTORIZED:
-	        	return (long)(17888 * 0.6);
+	        	return Money.of(17888.0 * 0.6);
 	        case INF_JUMP:
-	        	return (long)(17888 * 1.6);
+	        	return Money.of(17888.0 * 1.6);
 	        case HOVER:
-	        	return (long)(17888 * 2.2 * 5);
+	        	return Money.of(17888.0 * 2.2 * 5);
 	        case WHEELED:
-	        	return (long)(17888 * 2.2 * 6);
+	        	return Money.of(17888.0 * 2.2 * 6);
 	        case TRACKED:
-	        	return (long)(17888 * 2.2 * 7);
+	        	return Money.of(17888.0 * 2.2 * 7);
 	        default:
-	            return 0;
+	            return Money.zero();
 		 }
 	}
 

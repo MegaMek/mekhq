@@ -35,6 +35,7 @@ import java.util.function.Function;
 
 import javax.xml.parsers.DocumentBuilder;
 
+import mekhq.campaign.finances.Money;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -83,7 +84,7 @@ public class AtBConfiguration implements Serializable {
     private ArrayList<DatedRecord<String>> hiringHalls;
 
     /* Personnel and unit markets */
-    private int shipSearchCost = 100000;
+    private Money shipSearchCost;
     private int shipSearchLengthWeeks = 4;
     private Integer dropshipSearchTarget;
     private Integer jumpshipSearchTarget;
@@ -94,10 +95,11 @@ public class AtBConfiguration implements Serializable {
     private ResourceBundle defaultProperties;
 
     private AtBConfiguration() {
-        hiringHalls = new ArrayList<DatedRecord<String>>();
+        hiringHalls = new ArrayList<>();
         dsTable = new WeightedTable<>();
         jsTable = new WeightedTable<>();
         defaultProperties = ResourceBundle.getBundle("mekhq.resources.AtBConfigDefaults");
+        shipSearchCost = Money.of(100000);
     }
 
     /**
@@ -180,7 +182,7 @@ public class AtBConfiguration implements Serializable {
                 }
                 break;
             case "shipSearchCost":
-                shipSearchCost = Integer.parseInt(property);
+                shipSearchCost = Money.of(Double.parseDouble(property));
                 break;
             case "shipSearchLengthWeeks":
                 shipSearchLengthWeeks = Integer.parseInt(property);
@@ -234,7 +236,7 @@ public class AtBConfiguration implements Serializable {
         if (botForceTables.containsKey(org)) {
             final List<WeightedTable<String>> botForceTable = botForceTables.get(org);
             int weightClassIndex = weightClassIndex(weightClass);
-            WeightedTable<String> table = null;
+            WeightedTable<String> table;
             if((weightClassIndex < 0) || (weightClassIndex >= botForceTable.size())) {
                 MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
                         String.format("Bot force tables for organization \"%s\" don't have an entry for weight class %d, limiting to valid values", org, weightClass)); //$NON-NLS-1$
@@ -308,7 +310,7 @@ public class AtBConfiguration implements Serializable {
                 && rec.fitsDate(date));
     }
 
-    public int getShipSearchCost() {
+    public Money getShipSearchCost() {
         return shipSearchCost;
     }
 
@@ -316,8 +318,12 @@ public class AtBConfiguration implements Serializable {
         return shipSearchLengthWeeks;
     }
 
-    public int shipSearchCostPerWeek() {
-        return shipSearchCost / shipSearchLengthWeeks;
+    public Money shipSearchCostPerWeek() {
+        if (shipSearchLengthWeeks <= 0) {
+            return Money.zero();
+        }
+
+        return shipSearchCost.dividedBy(shipSearchLengthWeeks);
     }
 
     public Integer getDropshipSearchTarget() {
@@ -371,6 +377,11 @@ public class AtBConfiguration implements Serializable {
         } else if (unitType == UnitType.DROPSHIP) {
             table = dsTable;
         }
+
+        if (table == null) {
+            return null;
+        }
+
         String shipName = table.select();
         if (shipName == null) {
             return null;
@@ -385,7 +396,7 @@ public class AtBConfiguration implements Serializable {
         MekHQ.getLogger().log(AtBConfiguration.class, METHOD_NAME, LogLevel.INFO,
                 "Starting load of AtB configuration data from XML..."); //$NON-NLS-1$
 
-        Document xmlDoc = null;
+        Document xmlDoc;
         try {
             FileInputStream fis = new FileInputStream("data/universe/atbconfig.xml");
             DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
@@ -489,13 +500,11 @@ public class AtBConfiguration implements Serializable {
         NodeList nl = node.getChildNodes();
         for (int i = 0; i < nl.getLength(); i++) {
             Node wn = nl.item(i);
-            switch (wn.getNodeName()) {
-            case "hiringHalls":
+            if (wn.getNodeName().equals("hiringHalls")) {
                 hiringHalls.clear();
                 for (int j = 0; j < wn.getChildNodes().getLength(); j++) {
                     Node wn2 = wn.getChildNodes().item(j);
-                    switch (wn2.getNodeName()) {
-                    case "hall":
+                    if (wn2.getNodeName().equals("hall")) {
                         Date start = null;
                         Date end = null;
                         try {
@@ -506,15 +515,12 @@ public class AtBConfiguration implements Serializable {
                                 end = new Date(df.parse(wn2.getAttributes().getNamedItem("end").getTextContent()).getTime());
                             }
                         } catch (ParseException ex) {
-                            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR,
-                                    "Error parsing date for hiring hall on " + wn2.getTextContent()); //$NON-NLS-1$
+                            MekHQ.getLogger().log(getClass(), METHOD_NAME, LogLevel.ERROR, "Error parsing date for hiring hall on " + wn2.getTextContent()); //$NON-NLS-1$
                             MekHQ.getLogger().error(getClass(), METHOD_NAME, ex);
                         }
-                        hiringHalls.add(new DatedRecord<String>(start, end, wn2.getTextContent()));
-                        break;
+                        hiringHalls.add(new DatedRecord<>(start, end, wn2.getTextContent()));
                     }
                 }
-                break;
             }
         }
     }
@@ -525,7 +531,7 @@ public class AtBConfiguration implements Serializable {
             Node wn = nl.item(i);
             switch (wn.getNodeName()) {
             case "shipSearchCost":
-                shipSearchCost = Integer.parseInt(wn.getTextContent());
+                shipSearchCost = Money.of(Double.parseDouble(wn.getTextContent()));
                 break;
             case "shipSearchLengthWeeks":
                 shipSearchLengthWeeks = Integer.parseInt(wn.getTextContent());
@@ -685,7 +691,7 @@ public class AtBConfiguration implements Serializable {
          * @return
          */
         public T select(float rollMod) {
-            int total = weights.stream().mapToInt(w -> w.intValue()).sum();
+            int total = weights.stream().mapToInt(Integer::intValue).sum();
             if (total > 0) {
                 int roll = Math.min(Compute.randomInt(total) + (int)(total * rollMod + 0.5f),
                         total - 1);
