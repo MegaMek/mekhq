@@ -583,7 +583,7 @@ public class CampaignXmlParser {
         // Okay, Units, need their pilot references fixed.
         for(Unit unit : retVal.getUnits()) {
             // Also, the unit should have its campaign set.
-            unit.campaign = retVal;
+            unit.setCampaign(retVal);
 
             // reset the pilot and entity, to reflect newly assigned personnel
             unit.resetPilotAndEntity();

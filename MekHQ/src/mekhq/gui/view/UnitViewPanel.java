@@ -332,7 +332,7 @@ public class UnitViewPanel extends javax.swing.JPanel {
 			return null;
 		}
         Image base = mt.imageFor(u.getEntity(), c, -1);
-        int tint = PlayerColors.getColorRGB(u.campaign.getColorIndex());
+        int tint = PlayerColors.getColorRGB(u.getCampaign().getColorIndex());
         EntityImage entityImage = new EntityImage(base, tint, getCamo(u), c);
         return entityImage.loadPreviewImage();
     }

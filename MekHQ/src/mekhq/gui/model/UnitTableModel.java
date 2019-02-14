@@ -240,7 +240,7 @@ public class UnitTableModel extends DataTableModel {
             }
         }
         if(col == COL_FORCE) {
-            Force force = u.campaign.getForce(u.getForceId());
+            Force force = u.getCampaign().getForce(u.getForceId());
             if(null == force) {
                 return "-";
             } else {
