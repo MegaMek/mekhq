@@ -37,7 +37,6 @@ import megamek.common.util.DirectoryItems;
 import megamek.common.util.EncodeControl;
 import megamek.common.util.StringUtil;
 import mekhq.MekHQ;
-import mekhq.MekHqPreferences;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.market.PersonnelMarket;
@@ -146,13 +145,14 @@ public class PersonnelMarketDialog extends JDialog {
         for (int i = 0; i < PersonnelTab.PG_RETIRE; i++) {
         	personTypeModel.addElement(getPersonnelGroupName(i));
         }
-        comboPersonType.setSelectedItem(0);
         comboPersonType.setModel(personTypeModel);
+        comboPersonType.setSelectedIndex(MekHQ.getPreferences().forPersonnelMarket().getFilterIndex());
         comboPersonType.setMinimumSize(new java.awt.Dimension(200, 27));
         comboPersonType.setName("comboUnitType"); // NOI18N
         comboPersonType.setPreferredSize(new java.awt.Dimension(200, 27));
         comboPersonType.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
+                MekHQ.getPreferences().forPersonnelMarket().setFilterIndex(comboPersonType.getSelectedIndex());
                 filterPersonnel();
             }
         });
@@ -228,8 +228,8 @@ public class PersonnelMarketDialog extends JDialog {
         tablePersonnel.setRowSorter(sorter);
         sortKeys = new ArrayList<>();
         sortKeys.add(new RowSorter.SortKey(
-                MekHQ.getPreferences().getPersonnelMarketSortColumn(),
-                MekHQ.getPreferences().getPersonnelMarketSortOrder()));
+                MekHQ.getPreferences().forPersonnelMarket().getSortColumn(),
+                MekHQ.getPreferences().forPersonnelMarket().getSortOrder()));
         sorter.setSortKeys(sortKeys);
         tablePersonnel.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
         tablePersonnel.getSelectionModel().addListSelectionListener(this::personChanged);
@@ -583,14 +583,15 @@ public class PersonnelMarketDialog extends JDialog {
     }
 
     private final class PersonnelTableHeaderMouseAdapter extends MouseAdapter {
-        @Override public void mouseClicked(MouseEvent aEvent) {
+        @Override
+        public void mouseClicked(MouseEvent aEvent) {
             int uiIndex = tablePersonnel.getColumnModel().getColumnIndexAtX(aEvent.getX());
             int modelIndex = tablePersonnel.getColumnModel().getColumn(uiIndex).getModelIndex();
-            MekHQ.getPreferences().setPersonnelMarketSortColumn(modelIndex);
+            MekHQ.getPreferences().forPersonnelMarket().setSortColumn(modelIndex);
 
             for (RowSorter.SortKey key : tablePersonnel.getRowSorter().getSortKeys()) {
                 if (key.getColumn() == modelIndex) {
-                    MekHQ.getPreferences().setPersonnelMarketSortOrder(key.getSortOrder());
+                    MekHQ.getPreferences().forPersonnelMarket().setSortOrder(key.getSortOrder());
                     break;
                 }
             }

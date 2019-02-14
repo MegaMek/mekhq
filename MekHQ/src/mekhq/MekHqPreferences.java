@@ -21,7 +21,8 @@
 
 package mekhq;
 
-import mekhq.gui.model.PersonnelTableModel;
+import mekhq.preferences.PersonnelMarketPreferences;
+import mekhq.preferences.UnitMarketPreferences;
 
 import javax.swing.*;
 import java.io.FileInputStream;
@@ -31,29 +32,30 @@ import java.io.IOException;
 import java.util.Properties;
 
 /**
- * Stores and gives typed access to all user preferences for MekHQ.
+ * Manages all user preferences related to MekHQ.
+ * Preferences are stored as string, but they are exposed as strongly typed.
  */
 public class MekHqPreferences {
     private static final String LOOK_AND_FEEL = "laf";
     private static final String CAMPAIGNS_DIRECTORY = "CampaignsDirectory";
-    private static final String PERSONNEL_MARKET_SORT_COLUMN_INDEX = "PersonnelMarketSortColumnIndex";
-    private static final String PERSONNEL_MARKET_SORT_ORDER = "PersonnelMarketSortOrder";
 
     private static final String DEFAULT_LOOK_AND_FEEL = UIManager.getSystemLookAndFeelClassName();
     private static final String DEFAULT_CAMPAIGNS_DIRECTORY = "./campaigns/";
-    private static final String DEFAULT_PERSONNEL_MARKET_SORT_COLUMN_INDEX = Integer.toString(PersonnelTableModel.COL_SKILL);
-    private static final String DEFAULT_PERSONNEL_MARKET_SORT_ORDER = SortOrder.DESCENDING.toString();
 
     private Properties preferences;
+    private PersonnelMarketPreferences personnelMarketPreferences;
+    private UnitMarketPreferences unitMarketPreferences;
 
     public MekHqPreferences() {
         this.preferences = new Properties();
 
-        // Default values
+        // Default values for top level preferences
         this.preferences.setProperty(LOOK_AND_FEEL, DEFAULT_LOOK_AND_FEEL);
         this.preferences.setProperty(CAMPAIGNS_DIRECTORY, DEFAULT_CAMPAIGNS_DIRECTORY);
-        this.preferences.setProperty(PERSONNEL_MARKET_SORT_COLUMN_INDEX, DEFAULT_PERSONNEL_MARKET_SORT_COLUMN_INDEX);
-        this.preferences.setProperty(PERSONNEL_MARKET_SORT_ORDER, DEFAULT_PERSONNEL_MARKET_SORT_ORDER);
+
+        // Create nested preferences
+        this.personnelMarketPreferences = new PersonnelMarketPreferences(this.preferences);
+        this.unitMarketPreferences = new UnitMarketPreferences(this.preferences);
     }
 
     public void loadFromFile(String file) {
@@ -108,6 +110,14 @@ public class MekHqPreferences {
         }
     }
 
+    public PersonnelMarketPreferences forPersonnelMarket() {
+        return this.personnelMarketPreferences;
+    }
+
+    public UnitMarketPreferences forUnitMarket() {
+        return this.unitMarketPreferences;
+    }
+
     public String getLookAndFeel() {
         return this.preferences.getProperty(LOOK_AND_FEEL);
     }
@@ -124,22 +134,5 @@ public class MekHqPreferences {
     public void setCampaignsDirectory(String path) {
         assert path != null && path.trim().length() > 0;
         this.preferences.setProperty(CAMPAIGNS_DIRECTORY, path);
-    }
-
-    public int getPersonnelMarketSortColumn() {
-        return Integer.parseInt(this.preferences.getProperty(PERSONNEL_MARKET_SORT_COLUMN_INDEX));
-    }
-
-    public void setPersonnelMarketSortColumn(int columnIndex) {
-        assert columnIndex > -1 && columnIndex < PersonnelTableModel.N_COL;
-        this.preferences.setProperty(PERSONNEL_MARKET_SORT_COLUMN_INDEX, Integer.toString(columnIndex));
-    }
-
-    public SortOrder getPersonnelMarketSortOrder() {
-        return SortOrder.valueOf(this.preferences.getProperty(PERSONNEL_MARKET_SORT_ORDER));
-    }
-
-    public void setPersonnelMarketSortOrder(SortOrder sortOrder) {
-        this.preferences.setProperty(PERSONNEL_MARKET_SORT_ORDER, sortOrder.toString());
     }
 }

@@ -28,9 +28,7 @@ import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
+import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.ResourceBundle;
@@ -86,12 +84,6 @@ public class UnitMarketDialog extends JDialog {
 	 */
 	private static final long serialVersionUID = -7668601227249317220L;
 
-	private static boolean showMeks = true;
-	private static boolean showVees = true;
-	private static boolean showAero = false;
-	private static boolean pctThreshold = false;
-	private static int threshold = 120;
-
 	private UnitMarketTableModel marketModel;
 	private Campaign campaign;
     private UnitMarket unitMarket;
@@ -146,7 +138,7 @@ public class UnitMarketDialog extends JDialog {
         chkShowAero = new JCheckBox();
         chkPctThreshold = new JCheckBox();
         lblPctThreshold = new JLabel();
-        spnThreshold = new JSpinner(new SpinnerNumberModel(threshold, 60, 130, 5));
+        spnThreshold = new JSpinner(new SpinnerNumberModel(MekHQ.getPreferences().forUnitMarket().getShowOnlyPercentage(), 60, 130, 5));
         lblBlackMarketWarning = new JLabel();
         panelOKBtns = new JPanel();
         btnPurchase = new JButton();
@@ -163,17 +155,18 @@ public class UnitMarketDialog extends JDialog {
         ItemListener checkboxListener = new ItemListener() {
 			@Override
 			public void itemStateChanged(ItemEvent arg0) {
-				showMeks = chkShowMeks.isSelected();
-				showAero = chkShowAero.isSelected();
-				showVees = chkShowVees.isSelected();
-				pctThreshold = chkPctThreshold.isSelected();
-				spnThreshold.setEnabled(chkPctThreshold.isSelected());
+			    MekHQ.getPreferences().forUnitMarket().setShowMeks(chkShowMeks.isSelected());
+			    MekHQ.getPreferences().forUnitMarket().setShowVehicles(chkShowVees.isSelected());
+			    MekHQ.getPreferences().forUnitMarket().setShowAerospace(chkShowAero.isSelected());
+			    MekHQ.getPreferences().forUnitMarket().setShowOnlyCheck(chkPctThreshold.isSelected());
+			    spnThreshold.setEnabled(chkPctThreshold.isSelected());
+
 				filterOffers();
 			}
         };
 
         chkShowMeks.setText(resourceMap.getString("chkShowMeks.text"));
-        chkShowMeks.setSelected(showMeks);
+        chkShowMeks.setSelected(MekHQ.getPreferences().forUnitMarket().getShowMeks());
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.weightx = 0.0;
@@ -183,7 +176,7 @@ public class UnitMarketDialog extends JDialog {
         chkShowMeks.addItemListener(checkboxListener);
 
         chkShowVees.setText(resourceMap.getString("chkShowVees.text"));
-        chkShowVees.setSelected(showVees);
+        chkShowVees.setSelected(MekHQ.getPreferences().forUnitMarket().getShowVehicles());
         gbc.gridx = 1;
         gbc.gridy = 0;
         gbc.weightx = 0.0;
@@ -193,7 +186,7 @@ public class UnitMarketDialog extends JDialog {
         chkShowVees.addItemListener(checkboxListener);
 
         chkShowAero.setText(resourceMap.getString("chkShowAero.text"));
-        chkShowAero.setSelected(showAero);
+        chkShowAero.setSelected(MekHQ.getPreferences().forUnitMarket().getShowAerospace());
         gbc.gridx = 2;
         gbc.gridy = 0;
         gbc.weightx = 1.0;
@@ -204,8 +197,8 @@ public class UnitMarketDialog extends JDialog {
 
         JPanel panel = new JPanel();
         chkPctThreshold.setText(resourceMap.getString("chkPctThreshold.text"));
-        chkPctThreshold.setSelected(pctThreshold);
-        spnThreshold.setEnabled(pctThreshold);
+        chkPctThreshold.setSelected(MekHQ.getPreferences().forUnitMarket().getShowOnlyCheck());
+        spnThreshold.setEnabled(MekHQ.getPreferences().forUnitMarket().getShowOnlyCheck());
         lblPctThreshold.setText(resourceMap.getString("lblPctThreshold.text"));
         panel.add(chkPctThreshold);
         panel.add(spnThreshold);
@@ -214,7 +207,7 @@ public class UnitMarketDialog extends JDialog {
         spnThreshold.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(ChangeEvent arg0) {
-				threshold = (Integer)spnThreshold.getValue();
+				MekHQ.getPreferences().forUnitMarket().setShowOnlyPercentage((Integer) spnThreshold.getValue());
 				filterOffers();
 			}
         });
@@ -257,7 +250,7 @@ public class UnitMarketDialog extends JDialog {
             }
         });
         TableColumn column = null;
-        for (int i = 0; i < UnitMarketTableModel.COL_NUM; i++) {
+        for (int i = 0; i < UnitMarketTableModel.N_COL; i++) {
             column = ((XTableColumnModel)tableUnits.getColumnModel()).getColumnByModelIndex(i);
             column.setPreferredWidth(marketModel.getColumnWidth(i));
             column.setCellRenderer(new DefaultTableCellRenderer() {
@@ -456,5 +449,21 @@ public class UnitMarketDialog extends JDialog {
     public void setVisible(boolean visible) {
         filterOffers();
          super.setVisible(visible);
+    }
+
+    private final class UnitTableHeaderMouseAdapter extends MouseAdapter {
+        @Override
+        public void mouseClicked(MouseEvent aEvent) {
+            int uiIndex = tableUnits.getColumnModel().getColumnIndexAtX(aEvent.getX());
+            int modelIndex = tableUnits.getColumnModel().getColumn(uiIndex).getModelIndex();
+            MekHQ.getPreferences().forUnitMarket().setSortColumn(modelIndex);
+
+            for (RowSorter.SortKey key : tableUnits.getRowSorter().getSortKeys()) {
+                if (key.getColumn() == modelIndex) {
+                    MekHQ.getPreferences().forUnitMarket().setSortOrder(key.getSortOrder());
+                    break;
+                }
+            }
+        }
     }
 }

@@ -52,7 +52,7 @@ public class UnitMarketTableModel extends DataTableModel {
 	public static final int COL_UNIT = 3;
 	public static final int COL_PRICE = 4;
 	public static final int COL_PERCENT = 5;
-	public static final int COL_NUM = 6;
+	public static final int N_COL = 6;
 	
 	private static final String[] colNames = {
 		"Market", "Type", "Weight Class", "Unit", "Price", "Percent"
@@ -64,7 +64,7 @@ public class UnitMarketTableModel extends DataTableModel {
 	
     @Override
     public int getColumnCount() {
-        return COL_NUM;
+        return N_COL;
     }
 
     @Override
