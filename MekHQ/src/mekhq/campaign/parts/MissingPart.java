@@ -29,8 +29,8 @@ import megamek.common.ITechnology;
 import megamek.common.TargetRoll;
 import mekhq.MekHqXmlSerializable;
 import mekhq.MekHqXmlUtil;
-import mekhq.Utilities;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
@@ -62,13 +62,13 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 	}
 	
 	@Override
-	public long getStickerPrice() {
+	public Money getStickerPrice() {
 		//missing parts aren't worth a thing
-		return 0;
+		return Money.zero();
 	}
 	
 	@Override
-	public long getBuyCost() {
+	public Money getBuyCost() {
 	    return getNewPart().getStickerPrice();
 	}
 	
@@ -281,7 +281,7 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 		    }
 		}
 		toReturn += "<br/>";
-		toReturn += Utilities.getCurrencyString(getBuyCost()) + "<br/>";
+		toReturn += getBuyCost().toAmountAndSymbolString() + "<br/>";
 		toReturn += "</font></html>";
 		return toReturn;
 	}

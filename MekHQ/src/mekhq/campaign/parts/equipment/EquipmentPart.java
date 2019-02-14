@@ -21,7 +21,9 @@
 package mekhq.campaign.parts.equipment;
 
 import java.io.PrintWriter;
+import java.math.RoundingMode;
 
+import mekhq.campaign.finances.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -55,10 +57,10 @@ import mekhq.campaign.unit.Unit;
 public class EquipmentPart extends Part {
 	private static final long serialVersionUID = 2892728320891712304L;
 
-	//crap equipmenttype is not serialized!
+	//crap EquipmentType is not serialized!
     protected transient EquipmentType type;
     protected String typeName;
-	protected int equipmentNum = -1;
+	protected int equipmentNum;
 	protected double equipTonnage;
 
     public EquipmentType getType() {
@@ -142,7 +144,6 @@ public class EquipmentPart extends Part {
             System.err
             .println("Mounted.restore: could not restore equipment type \""
                     + typeName + "\"");
-            return;
         }
     }
 
@@ -279,7 +280,6 @@ public class EquipmentPart extends Part {
 					&& hits > priorHits
 					&& Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
 				remove(false);
-				return;
 			}
 		}
 	}
@@ -472,7 +472,7 @@ public class EquipmentPart extends Part {
      *
      */
     @Override
-    public long getStickerPrice() {
+    public Money getStickerPrice() {
     	//OK, we cant use the resolveVariableCost methods from megamek, because they
     	//rely on entity which may be null if this is a spare part. So we use our
     	//own resolveVariableCost method
@@ -483,10 +483,11 @@ public class EquipmentPart extends Part {
     	// use that to determine how to add things to the parts store and to
     	// determine whether what can be used as a replacement
     	//why does all the proto ammo have no cost?
-    	Entity en = null;
+    	Entity en;
     	boolean isArmored = false;
-        double itemCost = type.getRawCost();
-        if (itemCost == EquipmentType.COST_VARIABLE) {
+        Money itemCost = Money.of(type.getRawCost());
+
+        if (itemCost.getAmount().intValue() == EquipmentType.COST_VARIABLE) {
             itemCost = resolveVariableCost(isArmored);
         }
     	if (unit != null) {
@@ -495,88 +496,86 @@ public class EquipmentPart extends Part {
             if(null != mounted) {
             	isArmored = mounted.isArmored();
             }
-            type.getCost(en, isArmored, getLocation());
+            itemCost = Money.of(type.getCost(en, isArmored, getLocation()));
     	}
         if (isOmniPodded()) {
-            itemCost *= 1.25;
+            itemCost = itemCost.multipliedBy(1.25);
         }
-    	int finalCost = (int)itemCost;
     	if (isArmored) {
             //need a getCriticals command - but how does this work?
             //finalCost += 150000 * getCriticals(entity);
         }
-        return finalCost;
+        return itemCost;
     }
 
-    private int resolveVariableCost(boolean isArmored) {
-    	double varCost = 0;
+    private Money resolveVariableCost(boolean isArmored) {
+    	Money varCost = Money.zero();
     	Entity en = null;
     	if (getUnit() != null) {
     		en = getUnit().getEntity();
     	}
     	if (en != null) {
-    		varCost = type.getCost(en, isArmored, getLocation());
+    		varCost = Money.of(type.getCost(en, isArmored, getLocation()));
     	} else if (type instanceof MiscType) {
         	if (type.hasFlag(MiscType.F_DRONE_CARRIER_CONTROL)) {
-                varCost = getTonnage() * 10000;
+                varCost = Money.of(getTonnage() * 10000);
             } else if (type.hasFlag(MiscType.F_OFF_ROAD)) {
-            	varCost = 10 * getTonnage() * getTonnage();
+                varCost = Money.of(10 * getTonnage() * getTonnage());
             } else if (type.hasFlag(MiscType.F_FLOTATION_HULL) || type.hasFlag(MiscType.F_VACUUM_PROTECTION) || type.hasFlag(MiscType.F_ENVIRONMENTAL_SEALING) || type.hasFlag(MiscType.F_OFF_ROAD)) {
                 //??
             } else if (type.hasFlag(MiscType.F_LIMITED_AMPHIBIOUS) || type.hasFlag((MiscType.F_FULLY_AMPHIBIOUS))) {
-                varCost = getTonnage() * 10000;
+                varCost = Money.of(getTonnage() * 10000);
             } else if (type.hasFlag(MiscType.F_DUNE_BUGGY)) {
-                varCost = 10 * getTonnage() * getTonnage();
+                varCost = Money.of(10 * getTonnage() * getTonnage());
             } else if (type.hasFlag(MiscType.F_MASC) && type.hasFlag(MiscType.F_BA_EQUIPMENT)) {
                 //TODO: handle this one differently
                 //costValue = entity.getRunMP() * 75000;
             } else if (type.hasFlag(MiscType.F_HEAD_TURRET) || type.hasFlag(MiscType.F_SHOULDER_TURRET) || type.hasFlag(MiscType.F_QUAD_TURRET)) {
-                varCost = getTonnage() * 10000;
+                varCost = Money.of(getTonnage() * 10000);
             } else if (type.hasFlag(MiscType.F_SPONSON_TURRET)) {
-                varCost = getTonnage() * 4000;
+                varCost = Money.of(getTonnage() * 4000);
             } else if (type.hasFlag(MiscType.F_PINTLE_TURRET)) {
-                varCost = getTonnage() * 1000;
+                varCost = Money.of(getTonnage() * 1000);
             } else if (type.hasFlag(MiscType.F_ARMORED_MOTIVE_SYSTEM)) {
                 //TODO: handle this through motive system part
-                varCost = getTonnage() * 100000;
+                varCost = Money.of(getTonnage() * 100000);
             } else if (type.hasFlag(MiscType.F_JET_BOOSTER)) {
                 //TODO: Handle this one through subtyping
                 //varCost = entity.getEngine().getRating() * 10000;
             } else if (type.hasFlag(MiscType.F_DRONE_OPERATING_SYSTEM)) {
-                varCost = (getTonnage() * 10000) + 5000;
+                varCost = Money.of((getTonnage() * 10000) + 5000);
             } else if (type.hasFlag(MiscType.F_TARGCOMP)) {
-                varCost = getTonnage() * 10000;
+                varCost = Money.of(getTonnage() * 10000);
             } else if (type.hasFlag(MiscType.F_CLUB) && (type.hasSubType(MiscType.S_HATCHET) || type.hasSubType(MiscType.S_MACE_THB))) {
-                varCost = getTonnage() * 5000;
+                varCost = Money.of(getTonnage() * 5000);
             } else if (type.hasFlag(MiscType.F_CLUB) && type.hasSubType(MiscType.S_SWORD)) {
-                varCost = getTonnage() * 10000;
+                varCost = Money.of(getTonnage() * 10000);
             } else if (type.hasFlag(MiscType.F_CLUB) && type.hasSubType(MiscType.S_RETRACTABLE_BLADE)) {
-                varCost = (1 + getTonnage()) * 10000;
+                varCost = Money.of((1 + getTonnage()) * 10000);
             } else if (type.hasFlag(MiscType.F_TRACKS)) {
                 //TODO: Handle this through subtyping
                 //varCost = (int) Math.ceil((500 * entity.getEngine().getRating() * entity.getWeight()) / 75);
             } else if (type.hasFlag(MiscType.F_TALON)) {
-                varCost = (int) Math.ceil(getTonnage() * 300);
+                varCost = Money.of(getTonnage() * 300);
             } else if (type.hasFlag(MiscType.F_SPIKES)) {
-                varCost = (int) Math.ceil(getTonnage() * 50);
+                varCost = Money.of(getTonnage() * 50);
             } else if (type.hasFlag(MiscType.F_PARTIAL_WING)) {
-                varCost = (int) Math.ceil(getTonnage() * 50000);
+                varCost = Money.of(getTonnage() * 50000);
             } else if (type.hasFlag(MiscType.F_ACTUATOR_ENHANCEMENT_SYSTEM)) {
                 //TODO: subtype this one
                 //int multiplier = entity.locationIsLeg(loc) ? 700 : 500;
                 //costValue = (int) Math.ceil(entity.getWeight() * multiplier);
             } else if (type.hasFlag(MiscType.F_HAND_WEAPON) && (type.hasSubType(MiscType.S_CLAW))) {
-                varCost = (int) Math.ceil(getUnitTonnage() * 200);
+                varCost = Money.of(getUnitTonnage() * 200);
             } else if (type.hasFlag(MiscType.F_CLUB) && (type.hasSubType(MiscType.S_LANCE))) {
-                varCost = (int) Math.ceil(getUnitTonnage() * 150);
+                varCost = Money.of(getUnitTonnage() * 150);
             }
-
         }
-        if (varCost == 0) {
+        if (varCost.isZero()) {
           // if we don't know what it is...
           MekHQ.getLogger().log(EquipmentPart.class, "resolveVariableCost", LogLevel.WARNING, "I don't know how much " + name + " costs.");
         }
-        return (int) Math.ceil(varCost);
+        return varCost;
     }
 
     /*

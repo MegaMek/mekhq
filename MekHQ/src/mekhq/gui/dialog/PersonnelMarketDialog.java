@@ -38,6 +38,7 @@ import megamek.common.util.EncodeControl;
 import megamek.common.util.StringUtil;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.mission.Mission;
@@ -67,7 +68,7 @@ public class PersonnelMarketDialog extends JDialog {
     Person selectedPerson = null;
     @SuppressWarnings("unused")
     private DirectoryItems portraits;
-    private long unitCost = 0;
+    private Money unitCost = Money.zero();
 
     private JButton btnAdd;
     private javax.swing.JButton btnHire;
@@ -111,10 +112,10 @@ public class PersonnelMarketDialog extends JDialog {
         tablePersonnel = new javax.swing.JTable();
         panelMain = new javax.swing.JPanel();
         panelFilterBtns = new javax.swing.JPanel();
-        comboPersonType = new javax.swing.JComboBox<String>();
+        comboPersonType = new javax.swing.JComboBox<>();
         radioNormalRoll = new javax.swing.JRadioButton();
         radioPaidRecruitment = new javax.swing.JRadioButton();
-        comboRecruitType = new javax.swing.JComboBox<String>();
+        comboRecruitType = new javax.swing.JComboBox<>();
         lblUnitCost = new javax.swing.JLabel();
         panelOKBtns = new javax.swing.JPanel();
         btnHire = new javax.swing.JButton();
@@ -141,7 +142,7 @@ public class PersonnelMarketDialog extends JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         panelFilterBtns.add(lblPersonChoice, gridBagConstraints);
 
-        DefaultComboBoxModel<String> personTypeModel = new DefaultComboBoxModel<String>();
+        DefaultComboBoxModel<String> personTypeModel = new DefaultComboBoxModel<>();
         for (int i = 0; i < PersonnelTab.PG_RETIRE; i++) {
         	personTypeModel.addElement(getPersonnelGroupName(i));
         }
@@ -150,11 +151,9 @@ public class PersonnelMarketDialog extends JDialog {
         comboPersonType.setMinimumSize(new java.awt.Dimension(200, 27));
         comboPersonType.setName("comboUnitType"); // NOI18N
         comboPersonType.setPreferredSize(new java.awt.Dimension(200, 27));
-        comboPersonType.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                MekHQ.getPreferences().forPersonnelMarket().setFilterIndex(comboPersonType.getSelectedIndex());
-                filterPersonnel();
-            }
+        comboPersonType.addActionListener(evt -> {
+            MekHQ.getPreferences().forPersonnelMarket().setFilterIndex(comboPersonType.getSelectedIndex());
+            filterPersonnel();
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -270,30 +269,18 @@ public class PersonnelMarketDialog extends JDialog {
 
         btnHire.setText("Hire");
         btnHire.setName("btnHire"); // NOI18N
-        btnHire.addActionListener(new java.awt.event.ActionListener() {
-        	public void actionPerformed(java.awt.event.ActionEvent evt) {
-        		hirePerson(evt);
-        	}
-        });
+        btnHire.addActionListener(this::hirePerson);
         panelOKBtns.add(btnHire, new java.awt.GridBagConstraints());
 
         btnAdd = new JButton("Add (GM)");
-        btnAdd.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                addPerson();
-            }
-        });
+        btnAdd.addActionListener(evt -> addPerson());
         btnAdd.setEnabled(campaign.isGM());
         panelOKBtns.add(btnAdd, new java.awt.GridBagConstraints());
 
 
         btnClose.setText(resourceMap.getString("btnClose.text")); // NOI18N
         btnClose.setName("btnClose"); // NOI18N
-        btnClose.addActionListener(new java.awt.event.ActionListener() {
-        	public void actionPerformed(java.awt.event.ActionEvent evt) {
-        		btnCloseActionPerformed(evt);
-        	}
-        });
+        btnClose.addActionListener(this::btnCloseActionPerformed);
         panelOKBtns.add(btnClose, new java.awt.GridBagConstraints());
 
         javax.swing.JPanel panel = new javax.swing.JPanel();
@@ -313,9 +300,9 @@ public class PersonnelMarketDialog extends JDialog {
 
 	private void hirePerson(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHireActionPerformed
 	    if(null != selectedPerson) {
-	    	if (campaign.getFunds() < unitCost +
-	    			(campaign.getCampaignOptions().payForRecruitment()?
-	    					selectedPerson.getSalary() * 2:0)) {
+	    	if (campaign.getFunds().isLessThan(
+                    (campaign.getCampaignOptions().payForRecruitment() ? selectedPerson.getSalary().multipliedBy(2) : Money.zero())
+                            .plus(unitCost))){
 				 campaign.addReport("<font color='red'><b>Insufficient funds. Transaction cancelled</b>.</font>");
 	    	} else {
 	    		/* Adding person to campaign changes pid; grab the old one to
@@ -457,15 +444,15 @@ public class PersonnelMarketDialog extends JDialog {
         selectedPerson = personnelModel.getPerson(tablePersonnel.convertRowIndexToModel(view));
     	Entity en =  personnelMarket.getAttachedEntity(selectedPerson);
     	if (null == en) {
-    		unitCost = 0;
+    		unitCost = Money.zero();
     	} else {
     		if (!campaign.getCampaignOptions().getUseShareSystem() &&
     				(en instanceof megamek.common.Mech ||
     						en instanceof megamek.common.Tank ||
     						en instanceof megamek.common.Aero)) {
-    			unitCost = (long)Math.ceil(en.getCost(false) / 2);
+    			unitCost = Money.of(en.getCost(false)).dividedBy(2.0);
     		} else {
-    			unitCost = 0;
+    			unitCost = Money.zero();
     		}
     	}
         refreshPersonView();
@@ -484,7 +471,7 @@ public class PersonnelMarketDialog extends JDialog {
          Entity en = personnelMarket.getAttachedEntity(selectedPerson);
          String unitText = "";
          
-    	 if (unitCost > 0) {
+    	 if (unitCost.isPositive()) {
     		 unitText = "Unit cost: " + new java.text.DecimalFormat().format(unitCost);
     	 }
 
@@ -516,11 +503,7 @@ public class PersonnelMarketDialog extends JDialog {
          }
  		//This odd code is to make sure that the scrollbar stays at the top
  		//I cant just call it here, because it ends up getting reset somewhere later
- 		javax.swing.SwingUtilities.invokeLater(new Runnable() {
- 			public void run() {
- 				scrollPersonnelView.getVerticalScrollBar().setValue(0);
- 			}
- 		});
+ 		javax.swing.SwingUtilities.invokeLater(() -> scrollPersonnelView.getVerticalScrollBar().setValue(0));
     }
 
     public JComboBox<String> getComboUnitType() {

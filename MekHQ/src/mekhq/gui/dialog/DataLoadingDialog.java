@@ -51,6 +51,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignFactory;
 import mekhq.campaign.GamePreset;
 import mekhq.campaign.event.OptionsChangedEvent;
+import mekhq.campaign.finances.CurrencyManager;
 import mekhq.campaign.mod.am.InjuryTypes;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.universe.Faction;
@@ -131,6 +132,11 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
             	Faction.generateFactions();
             } catch (Exception ex) {
     			ex.printStackTrace();
+            }
+            try{
+                CurrencyManager.getInstance().loadCurrencies();
+            } catch (Exception ex) {
+                MekHQ.getLogger().error(DataLoadingDialog.class, METHOD_NAME, ex);
             }
             try {
             	Bloodname.loadBloodnameData();

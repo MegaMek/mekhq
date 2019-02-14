@@ -2,7 +2,6 @@ package mekhq.gui.model;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
@@ -10,6 +9,7 @@ import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.Transaction;
 
 /**
@@ -61,12 +61,11 @@ public class FinanceTableModel extends DataTableModel {
 
     public Object getValueAt(int row, int col) {
         Transaction transaction = getTransaction(row);
-        long amount = transaction.getAmount();
-        long balance = 0;
+        Money amount = transaction.getAmount();
+        Money balance = Money.zero();
         for(int i = 0; i <= row; i++) {
-            balance += getTransaction(i).getAmount();
+            balance = balance.plus(getTransaction(i).getAmount());
         }
-        DecimalFormat formatter = new DecimalFormat();
         if(col == COL_CATEGORY) {
             return transaction.getCategoryName();
         }
@@ -74,21 +73,21 @@ public class FinanceTableModel extends DataTableModel {
             return transaction.getDescription();
         }
         if(col == COL_DEBIT) {
-            if(amount < 0) {
-                return formatter.format(-1 * amount);
+            if(amount.isNegative()) {
+                return amount.absolute().toAmountAndSymbolString();
             } else {
                 return "";
             }
         }
         if(col == COL_CREDIT) {
-            if(amount > 0) {
-                return formatter.format(amount);
+            if(amount.isPositive()) {
+                return amount.toAmountAndSymbolString();
             } else {
                 return "";
             }
         }
         if(col == COL_BALANCE) {
-            return formatter.format(balance);
+            return balance.toAmountAndSymbolString();
         }
         if(col == COL_DATE) {
             SimpleDateFormat shortDateFormat = new SimpleDateFormat("MM/dd/yyyy");

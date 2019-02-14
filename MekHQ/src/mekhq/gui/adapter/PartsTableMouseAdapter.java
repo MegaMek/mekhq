@@ -16,6 +16,7 @@ import megamek.common.TargetRoll;
 import mekhq.MekHQ;
 import mekhq.campaign.event.PartChangedEvent;
 import mekhq.campaign.event.PartModeChangedEvent;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Armor;
@@ -89,15 +90,15 @@ public class PartsTableMouseAdapter extends MouseInputAdapter implements ActionL
             }
         } else if (command.equalsIgnoreCase("CANCEL_ORDER")) {
             double refund = gui.getCampaign().getCampaignOptions().GetCanceledOrderReimbursement();
-            long refundAmount = 0;
+            Money refundAmount = Money.zero();
             for (Part p : parts) {
                 if (null != p) {
-                    refundAmount += (refund * p.getStickerPrice() * p.getQuantity());
+                    refundAmount = refundAmount.plus(p.getStickerPrice().multipliedBy(p.getQuantity()).multipliedBy(refund));
                     gui.getCampaign().removePart(p);
                 }
             }
             gui.getCampaign().getFinances().credit(refundAmount, Transaction.C_EQUIP,
-                    "refund for cancelled equipmemt sale", gui.getCampaign().getDate());
+                    "refund for cancelled equipment sale", gui.getCampaign().getDate());
         } else if (command.equalsIgnoreCase("ARRIVE")) {
             for (Part p : parts) {
                 if (null != p) {

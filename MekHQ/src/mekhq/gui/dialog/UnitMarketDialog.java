@@ -47,10 +47,7 @@ import javax.swing.RowFilter;
 import javax.swing.RowSorter;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SpinnerNumberModel;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
@@ -66,6 +63,7 @@ import megamek.common.logging.LogLevel;
 import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.market.UnitMarket;
 import mekhq.gui.model.UnitMarketTableModel;
@@ -152,17 +150,14 @@ public class UnitMarketDialog extends JDialog {
 
         panelFilterBtns.setLayout(new GridBagLayout());
 
-        ItemListener checkboxListener = new ItemListener() {
-			@Override
-			public void itemStateChanged(ItemEvent arg0) {
-			    MekHQ.getPreferences().forUnitMarket().setShowMeks(chkShowMeks.isSelected());
-			    MekHQ.getPreferences().forUnitMarket().setShowVehicles(chkShowVees.isSelected());
-			    MekHQ.getPreferences().forUnitMarket().setShowAerospace(chkShowAero.isSelected());
-			    MekHQ.getPreferences().forUnitMarket().setShowOnlyCheck(chkPctThreshold.isSelected());
-			    spnThreshold.setEnabled(chkPctThreshold.isSelected());
+        ItemListener checkboxListener = x -> {
+            MekHQ.getPreferences().forUnitMarket().setShowMeks(chkShowMeks.isSelected());
+            MekHQ.getPreferences().forUnitMarket().setShowVehicles(chkShowVees.isSelected());
+            MekHQ.getPreferences().forUnitMarket().setShowAerospace(chkShowAero.isSelected());
+            MekHQ.getPreferences().forUnitMarket().setShowOnlyCheck(chkPctThreshold.isSelected());
+            spnThreshold.setEnabled(chkPctThreshold.isSelected());
 
-				filterOffers();
-			}
+            filterOffers();
         };
 
         chkShowMeks.setText(resourceMap.getString("chkShowMeks.text"));
@@ -204,12 +199,9 @@ public class UnitMarketDialog extends JDialog {
         panel.add(spnThreshold);
         panel.add(lblPctThreshold);
         chkPctThreshold.addItemListener(checkboxListener);
-        spnThreshold.addChangeListener(new ChangeListener() {
-			@Override
-			public void stateChanged(ChangeEvent arg0) {
-				MekHQ.getPreferences().forUnitMarket().setShowOnlyPercentage((Integer) spnThreshold.getValue());
-				filterOffers();
-			}
+        spnThreshold.addChangeListener(x -> {
+            MekHQ.getPreferences().forUnitMarket().setShowOnlyPercentage((Integer) spnThreshold.getValue());
+            filterOffers();
         });
 
         gbc.gridx = 0;
@@ -230,25 +222,19 @@ public class UnitMarketDialog extends JDialog {
         tableUnits.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tableUnits.setColumnModel(new XTableColumnModel());
         tableUnits.createDefaultColumnsFromModel();
-        sorter = new TableRowSorter<UnitMarketTableModel>(marketModel);
+        sorter = new TableRowSorter<>(marketModel);
         sorter.setComparator(UnitMarketTableModel.COL_WEIGHTCLASS, new WeightClassSorter());
-        Comparator<String> numComparator = new Comparator<String>() {
-			public int compare(String arg0, String arg1) {
-				if (arg0.length() != arg1.length()) {
-					return arg0.length() - arg1.length();
-				}
-				return arg0.compareTo(arg1);
-			}
+        Comparator<String> numComparator = (arg0, arg1) -> {
+            if (arg0.length() != arg1.length()) {
+                return arg0.length() - arg1.length();
+            }
+            return arg0.compareTo(arg1);
         };
         sorter.setComparator(UnitMarketTableModel.COL_PRICE, numComparator);
         sorter.setComparator(UnitMarketTableModel.COL_PERCENT, numComparator);
         tableUnits.setRowSorter(sorter);
         tableUnits.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-        tableUnits.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
-                offerChanged(evt);
-            }
-        });
+        tableUnits.getSelectionModel().addListSelectionListener(evt -> offerChanged(evt));
         TableColumn column = null;
         for (int i = 0; i < UnitMarketTableModel.N_COL; i++) {
             column = ((XTableColumnModel)tableUnits.getColumnModel()).getColumnByModelIndex(i);
@@ -294,31 +280,19 @@ public class UnitMarketDialog extends JDialog {
 
         btnPurchase.setText(resourceMap.getString("btnPurchase.text"));
         btnPurchase.setName("btnPurchase"); // NOI18N
-        btnPurchase.addActionListener(new java.awt.event.ActionListener() {
-        	public void actionPerformed(java.awt.event.ActionEvent evt) {
-        		purchaseUnit(evt);
-        	}
-        });
+        btnPurchase.addActionListener(this::purchaseUnit);
         panelOKBtns.add(btnPurchase, new java.awt.GridBagConstraints());
         btnPurchase.setEnabled(null != selectedEntity);
 
         btnAdd = new JButton(resourceMap.getString("btnAdd.text"));
-        btnAdd.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                addUnit();
-            }
-        });
+        btnAdd.addActionListener(evt -> addUnit());
         btnAdd.setEnabled(null !=  selectedEntity);
         panelOKBtns.add(btnAdd, new java.awt.GridBagConstraints());
 
 
         btnClose.setText(resourceMap.getString("btnClose.text")); // NOI18N
         btnClose.setName("btnClose"); // NOI18N
-        btnClose.addActionListener(new java.awt.event.ActionListener() {
-        	public void actionPerformed(java.awt.event.ActionEvent evt) {
-        		btnCloseActionPerformed(evt);
-        	}
-        });
+        btnClose.addActionListener(this::btnCloseActionPerformed);
         panelOKBtns.add(btnClose, new java.awt.GridBagConstraints());
 
         getContentPane().add(panelOKBtns, BorderLayout.PAGE_END);
@@ -335,18 +309,18 @@ public class UnitMarketDialog extends JDialog {
 	    	int transitDays = campaign.getCampaignOptions().getInstantUnitMarketDelivery()?0:
 	    		campaign.calculatePartTransitTime(Compute.d6(2) - 2);
 			UnitMarket.MarketOffer offer = marketModel.getOffer(tableUnits.convertRowIndexToModel(tableUnits.getSelectedRow()));
-			long cost = (long)Math.ceil(offer.unit.getCost() * offer.pct / 100.0);
-			if (campaign.getFunds() < cost) {
+			Money cost = Money.of(offer.unit.getCost() * offer.pct / 100.0);
+			if (campaign.getFunds().isLessThan(cost)) {
 				 campaign.addReport("<font color='red'><b> You cannot afford this unit. Transaction cancelled</b>.</font>");
 				 return;
 			}
 
 			int roll = Compute.d6();
 			if (offer.market == UnitMarket.MARKET_BLACK && roll <= 2) {
-				campaign.getFinances().debit(cost / roll, Transaction.C_UNIT,
+				campaign.getFinances().debit(cost.dividedBy(roll), Transaction.C_UNIT,
 						"Purchased " + selectedEntity.getShortName() + " (lost on black market)",
 						campaign.getCalendar().getTime());
-				campaign.addReport("<font color='red'>Swindled! Money was paid, but no unit delivered.</font>");
+				campaign.addReport("<font color='red'>Swindled! money was paid, but no unit delivered.</font>");
 			} else {
 				campaign.getFinances().debit(cost, Transaction.C_UNIT,
 						"Purchased " + selectedEntity.getShortName(),
@@ -435,11 +409,7 @@ public class UnitMarketDialog extends JDialog {
 	    	 mechViewPanel.setMech(selectedEntity, true);
 	 		//This odd code is to make sure that the scrollbar stays at the top
 	 		//I cant just call it here, because it ends up getting reset somewhere later
-	 		javax.swing.SwingUtilities.invokeLater(new Runnable() {
-	 			public void run() {
-	 				scrollUnitView.getVerticalScrollBar().setValue(0);
-	 			}
-	 		});
+	 		javax.swing.SwingUtilities.invokeLater(() -> scrollUnitView.getVerticalScrollBar().setValue(0));
          }
          btnPurchase.setEnabled(null != selectedEntity);
          btnAdd.setEnabled(null != selectedEntity && campaign.isGM());

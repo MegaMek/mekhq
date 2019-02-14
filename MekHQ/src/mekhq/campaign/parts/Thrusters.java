@@ -23,6 +23,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import mekhq.campaign.finances.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -46,7 +47,7 @@ public class Thrusters extends Part {
 	 * 
 	 */
 	private static final long serialVersionUID = -336290094932539638L;
-	private boolean isLeftThrusters = false;
+	private boolean isLeftThrusters;
 
 	public Thrusters() {
     	this(0, null);
@@ -82,10 +83,8 @@ public class Thrusters extends Part {
 					&& (hits < 4 && !campaign.getCampaignOptions().useAeroSystemHits())
                     && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
 				remove(false);
-				return;
 			} else if (hits >= 4) {
                 remove(false);
-                return;
             }
 		}
 	}
@@ -223,8 +222,8 @@ public class Thrusters extends Part {
 	}
 
 	@Override
-	public long getStickerPrice() {
-		return 12500;
+	public Money getStickerPrice() {
+		return Money.of(12500);
 	}
 
 	@Override

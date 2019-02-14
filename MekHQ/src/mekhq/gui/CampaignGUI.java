@@ -40,7 +40,6 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.lang.reflect.Method;
-import java.text.NumberFormat;
 import java.util.Calendar;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -70,6 +69,7 @@ import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 import javax.xml.parsers.DocumentBuilder;
 
+import mekhq.campaign.finances.Money;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -1474,7 +1474,7 @@ public class CampaignGUI extends JPanel {
         if (!getCampaign().getCampaignOptions().checkMaintenance()) {
             return false;
         }
-        Vector<Unit> notMaintained = new Vector<Unit>();
+        Vector<Unit> notMaintained = new Vector<>();
         int totalAstechMinutesNeeded = 0;
         for (Unit u : getCampaign().getUnits()) {
             if (u.requiresMaintenance() && null == u.getTech()) {
@@ -1899,7 +1899,7 @@ public class CampaignGUI extends JPanel {
             r.setTeamId(engineer.getId());
         } else if (getCampaign().getTechs().size() > 0) {
             String name;
-            HashMap<String, Person> techHash = new HashMap<String, Person>();
+            HashMap<String, Person> techHash = new HashMap<>();
             String skillLvl = "Unknown";
             int TimePerDay = 0;
             for (Person tech : getCampaign().getTechs()) {
@@ -2043,7 +2043,7 @@ public class CampaignGUI extends JPanel {
      */
     public @Nullable UUID selectTech(Unit u, String desc, boolean ignoreMaintenance) {
         String name;
-        HashMap<String, Person> techHash = new HashMap<String, Person>();
+        HashMap<String, Person> techHash = new HashMap<>();
         for (Person tech : getCampaign().getTechs()) {
             if (tech.canTech(u.getEntity()) && !tech.isMothballing()) {
                 int time = tech.getMinutesLeft();
@@ -2820,14 +2820,15 @@ public class CampaignGUI extends JPanel {
     }
 
     private void refreshFunds() {
-        long funds = getCampaign().getFunds();
-        NumberFormat numberFormat = NumberFormat.getIntegerInstance();
+        Money funds = getCampaign().getFunds();
         String inDebt = "";
         if (getCampaign().getFinances().isInDebt()) {
             inDebt = " <font color='red'>(in Debt)</font>";
         }
-        String text = "<html><b>Funds:</b> " + numberFormat.format(funds)
-                + " C-Bills" + inDebt + "</html>";
+        String text = "<html><b>Funds:</b> "
+                + funds.toAmountAndSymbolString()
+                + inDebt
+                + "</html>";
         lblFunds.setText(text);
     }
 

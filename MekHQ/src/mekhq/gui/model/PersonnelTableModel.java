@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Image;
 import java.awt.Toolkit;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -287,7 +286,6 @@ import mekhq.gui.BasicInfo;
         @Override
         public Object getValueAt(int row, int col) {
             Person p;
-            DecimalFormat formatter = new DecimalFormat();
             if(data.isEmpty()) {
                 return "";
             } else {
@@ -647,7 +645,7 @@ import mekhq.gui.BasicInfo;
                 }
             }
             if(col == COL_SALARY) {
-                return formatter.format(p.getSalary());
+                return p.getSalary().toAmountAndSymbolString();
             }
             if(col == COL_KILLS) {
                 return Integer.toString(getCampaign().getKillsFor(p.getId()).size());
