@@ -48,6 +48,8 @@ public class EditPersonnelLogDialog extends javax.swing.JDialog {
     /** Creates new form EditPersonnelLogDialog */
     public EditPersonnelLogDialog(java.awt.Frame parent, boolean modal, Campaign c, Person p) {
         super(parent, modal);
+        assert campaign != null;
+        assert person != null;
 
         this.frame = parent;
         campaign = c;

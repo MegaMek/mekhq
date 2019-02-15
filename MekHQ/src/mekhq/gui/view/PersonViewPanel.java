@@ -11,7 +11,6 @@ import java.awt.Dialog.ModalityType;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.swing.BorderFactory;
@@ -279,12 +278,12 @@ public class PersonViewPanel extends JPanel {
             gridy++;
         }
 
-        if(person.getMissionsLog().size() >0) {
-            fillMissionsLog();
+        if(person.getMissionLog().size() >0) {
+            fillMissionLog();
 
-            pnlMissionsLog.setName("missionsLog"); //$NON-NLS-1$
+            pnlMissionsLog.setName("missionLog"); //$NON-NLS-1$
             pnlMissionsLog.setBorder(BorderFactory.createCompoundBorder(
-                    BorderFactory.createTitledBorder(resourceMap.getString("missionsLog.title")), //$NON-NLS-1$
+                    BorderFactory.createTitledBorder(resourceMap.getString("missionLog.title")), //$NON-NLS-1$
                     BorderFactory.createEmptyBorder(5,5,5,5)));
             pnlMissionsLog.setBackground(Color.WHITE);
             gridBagConstraints = new GridBagConstraints();
@@ -984,8 +983,8 @@ public class PersonViewPanel extends JPanel {
         pnlLog.add(eventTable, gridBagConstraints);
     }
 
-    private void fillMissionsLog() {
-        ArrayList<LogEntry> missionLog = person.getMissionsLog();
+    private void fillMissionLog() {
+        List<LogEntry> missionLog = person.getMissionLog();
         pnlMissionsLog.setLayout(new GridBagLayout());
 
         JLabel lblMissions = new JLabel(String.format(resourceMap.getString("format.missions"), missionLog.size())); //$NON-NLS-1$
@@ -1082,7 +1081,7 @@ public class PersonViewPanel extends JPanel {
         JTable killTable = new JTable(killModel);
         killTable.setRowSelectionAllowed(false);
         killTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
-        TableColumn column = null;
+        TableColumn column;
         for(int i = 0; i < killModel.getColumnCount(); ++ i) {
             column = killTable.getColumnModel().getColumn(i);
             column.setCellRenderer(killModel.getRenderer());

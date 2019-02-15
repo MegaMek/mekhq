@@ -22,25 +22,28 @@ package mekhq.gui.dialog;
 import megamek.common.util.EncodeControl;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
-import mekhq.gui.control.EditMissionsLogControl;
+import mekhq.gui.control.EditMissionLogControl;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.ResourceBundle;
 
-public class EditMissionsLogDialog extends JDialog {
+public class EditMissionLogDialog extends JDialog {
     private Frame frame;
     private Campaign campaign;
     private Person person;
 
-    private EditMissionsLogControl editMissionsControl;
+    private EditMissionLogControl editMissionsControl;
     private JButton btnOK;
 
     /**
      * Creates new form EditPersonnelLogDialog
      */
-    public EditMissionsLogDialog(Frame parent, boolean modal, Campaign campaign, Person person) {
+    public EditMissionLogDialog(Frame parent, boolean modal, Campaign campaign, Person person) {
         super(parent, modal);
+        assert campaign != null;
+        assert person != null;
+
         this.frame = parent;
         this.campaign = campaign;
         this.person = person;
@@ -50,14 +53,14 @@ public class EditMissionsLogDialog extends JDialog {
     }
 
     private void initComponents() {
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditMissionsLogDialog", new EncodeControl()); //$NON-NLS-1$
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditMissionLogDialog", new EncodeControl()); //$NON-NLS-1$
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName(resourceMap.getString("dialog.name")); // NOI18N
         setTitle(resourceMap.getString("dialog.title") + " " + person.getName());
         getContentPane().setLayout(new java.awt.BorderLayout());
 
-        editMissionsControl = new EditMissionsLogControl(frame, campaign, person);
+        editMissionsControl = new EditMissionLogControl(frame, campaign, person);
         getContentPane().add(editMissionsControl, BorderLayout.CENTER);
 
         btnOK = new JButton();

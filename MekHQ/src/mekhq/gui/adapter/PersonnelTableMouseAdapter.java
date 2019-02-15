@@ -46,7 +46,6 @@ import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.log.CustomLogEntry;
 import mekhq.campaign.log.PersonalLogger;
 import mekhq.campaign.personnel.Award;
 import mekhq.campaign.Kill;
@@ -1025,7 +1024,7 @@ public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
                 }
                 break;
             case CMD_EDIT_MISSIONS_LOG:
-                EditMissionsLogDialog emld = new EditMissionsLogDialog(gui.getFrame(), true, gui.getCampaign(), selectedPerson);
+                EditMissionLogDialog emld = new EditMissionLogDialog(gui.getFrame(), true, gui.getCampaign(), selectedPerson);
                 emld.setVisible(true);
                 MekHQ.triggerEvent(new PersonLogEvent(selectedPerson));
                 break;

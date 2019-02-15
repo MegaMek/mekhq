@@ -48,6 +48,9 @@ public class EditKillLogDialog extends javax.swing.JDialog {
 
     public EditKillLogDialog(java.awt.Frame parent, boolean modal, Campaign campaign, Person person) {
         super(parent, modal);
+        assert campaign != null;
+        assert person != null;
+
         this.frame = parent;
         this.campaign = campaign;
         this.person = person;

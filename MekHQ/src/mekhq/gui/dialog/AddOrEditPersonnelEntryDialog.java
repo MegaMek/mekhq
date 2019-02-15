@@ -87,11 +87,7 @@ public class AddOrEditPersonnelEntryDialog extends javax.swing.JDialog {
     }
 
     public Optional<LogEntry> getEntry() {
-        if (entry == null) {
-            return Optional.empty();
-        }
-
-        return Optional.of(entry);
+        return Optional.ofNullable(entry);
     }
 
     private void initComponents() {

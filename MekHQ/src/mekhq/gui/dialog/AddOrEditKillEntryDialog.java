@@ -72,11 +72,7 @@ public class AddOrEditKillEntryDialog extends javax.swing.JDialog {
     }
 
     public Optional<Kill> getKill() {
-        if (kill == null) {
-            return Optional.empty();
-        }
-
-        return Optional.of(kill);
+        return Optional.empty().ofNullable(kill);
     }
 
     private void initComponents() {

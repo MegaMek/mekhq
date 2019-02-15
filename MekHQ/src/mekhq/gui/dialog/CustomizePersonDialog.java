@@ -57,7 +57,7 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Faction.Tag;
 import mekhq.gui.control.EditKillLogControl;
-import mekhq.gui.control.EditMissionsLogControl;
+import mekhq.gui.control.EditMissionLogControl;
 import mekhq.gui.control.EditPersonnelLogControl;
 
 /**
@@ -661,7 +661,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         	tabStats.addTab(resourceMap.getString("scrOptions.TabConstraints.tabTitle"),scrOptions); // NOI18N
         }
         tabStats.add(resourceMap.getString("panLog.TabConstraints.tabTitle"), new EditPersonnelLogControl(frame, campaign, person));
-        tabStats.add(resourceMap.getString("panMissions.TabConstraints.tabTitle"), new EditMissionsLogControl(frame, campaign, person));
+        tabStats.add(resourceMap.getString("panMissions.TabConstraints.tabTitle"), new EditMissionLogControl(frame, campaign, person));
         tabStats.add(resourceMap.getString("panKills.TabConstraints.tabTitle"), new EditKillLogControl(frame, campaign, person));
 
         gridBagConstraints = new java.awt.GridBagConstraints();

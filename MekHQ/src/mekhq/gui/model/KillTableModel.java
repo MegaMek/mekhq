@@ -31,14 +31,14 @@ import java.util.ArrayList;
 public class KillTableModel extends AbstractTableModel {
     private static final long serialVersionUID = -58915479895694545L;
 
-    protected ArrayList<Kill> data;
+    protected java.util.List<Kill> data;
 
     public final static int COL_DATE    = 0;
     public final static int COL_KILLED  = 1;
     public final static int COL_KILLER  = 2;
     public final static int N_COL       = 3;
 
-    public KillTableModel(ArrayList<Kill> entries) {
+    public KillTableModel(java.util.List<Kill> entries) {
         assert entries != null;
         data = entries;
     }
@@ -119,7 +119,7 @@ public class KillTableModel extends AbstractTableModel {
         }
     }
 
-    public void setData(ArrayList<Kill> kills) {
+    public void setData(java.util.List<Kill> kills) {
         assert kills != null;
         data = kills;
         fireTableDataChanged();

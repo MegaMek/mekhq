@@ -25,6 +25,7 @@ import mekhq.campaign.log.ServiceLogEntry;
 import mekhq.campaign.personnel.Person;
 
 import javax.swing.*;
+import javax.swing.text.html.Option;
 import java.awt.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -80,11 +81,7 @@ public class AddOrEditMissionEntryDialog extends JDialog {
     }
 
     public Optional<LogEntry> getEntry() {
-        if (entry == null) {
-            return Optional.empty();
-        }
-
-        return Optional.of(entry);
+        return Optional.ofNullable(entry);
     }
 
     private void initComponents() {

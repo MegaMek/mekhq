@@ -222,7 +222,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     protected GregorianCalendar deathday;
     protected GregorianCalendar recruitment;
     protected ArrayList<LogEntry> personnelLog;
-    protected ArrayList<LogEntry> missionsLog;
+    protected List<LogEntry> missionLog;
 
     private Hashtable<String, Skill> skills;
     private PersonnelOptions options = new PersonnelOptions();
@@ -378,7 +378,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
         biography = "";
         nTasks = 0;
         personnelLog = new ArrayList<>();
-        missionsLog = new ArrayList<>();
+        missionLog = new ArrayList<>();
         idleMonths = -1;
         daysToWaitForHealing = 15;
         resetMinutesLeft();
@@ -1488,12 +1488,12 @@ public class Person implements Serializable, MekHqXmlSerializable {
             }
             pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "</personnelLog>");
         }
-        if (!missionsLog.isEmpty()) {
-            pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<missionsLog>");
-            for (LogEntry entry : missionsLog) {
+        if (!missionLog.isEmpty()) {
+            pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<missionLog>");
+            for (LogEntry entry : missionLog) {
                 entry.writeToXml(pw1, indent + 2);
             }
-            pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "</missionsLog>");
+            pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "</missionLog>");
         }
         if (!awardController.getAwards().isEmpty()) {
             pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<awards>");
@@ -1751,7 +1751,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
                         }
                         retVal.addLogEntry(LogEntryFactory.getInstance().generateInstanceFromXML(wn3));
                     }
-                } else if (wn2.getNodeName().equalsIgnoreCase("missionsLog")) {
+                } else if (wn2.getNodeName().equalsIgnoreCase("missionLog")) {
                     NodeList nl2 = wn2.getChildNodes();
                     for (int y = 0; y < nl2.getLength(); y++) {
                         Node wn3 = nl2.item(y);
@@ -3470,9 +3470,9 @@ public class Person implements Serializable, MekHqXmlSerializable {
         return personnelLog;
     }
 
-    public ArrayList<LogEntry> getMissionsLog() {
-        Collections.sort(missionsLog, Comparator.comparing(LogEntry::getDate));
-        return missionsLog;
+    public List<LogEntry> getMissionLog() {
+        Collections.sort(missionLog, Comparator.comparing(LogEntry::getDate));
+        return missionLog;
     }
 
     public void addLogEntry(LogEntry entry) {
@@ -3480,7 +3480,7 @@ public class Person implements Serializable, MekHqXmlSerializable {
     }
 
     public void addMissionLogEntry(LogEntry entry) {
-        missionsLog.add(entry);
+        missionLog.add(entry);
     }
 
     /**

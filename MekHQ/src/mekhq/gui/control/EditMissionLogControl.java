@@ -31,7 +31,7 @@ import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.util.ResourceBundle;
 
-public class EditMissionsLogControl extends JPanel {
+public class EditMissionLogControl extends JPanel {
     private Frame parent;
     private Campaign campaign;
     private Person person;
@@ -43,18 +43,18 @@ public class EditMissionsLogControl extends JPanel {
     private JTable logsTable;
     private JScrollPane scrollLogsTable;
 
-    public EditMissionsLogControl(Frame parent, Campaign campaign, Person person) {
+    public EditMissionLogControl(Frame parent, Campaign campaign, Person person) {
         this.parent = parent;
         this.campaign = campaign;
         this.person = person;
 
-        this.logModel = new LogTableModel(this.person.getMissionsLog());
+        this.logModel = new LogTableModel(this.person.getMissionLog());
 
         initComponents();
     }
 
     private void initComponents() {
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditMissionsLogControl", new EncodeControl()); //$NON-NLS-1$
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditMissionLogControl", new EncodeControl()); //$NON-NLS-1$
 
         setName(resourceMap.getString("control.name")); // NOI18N
         this.setLayout(new java.awt.BorderLayout());
@@ -126,13 +126,13 @@ public class EditMissionsLogControl extends JPanel {
     }
 
     private void deleteEntry() {
-        person.getMissionsLog().remove(logsTable.getSelectedRow());
+        person.getMissionLog().remove(logsTable.getSelectedRow());
         refreshTable();
     }
 
     private void refreshTable() {
         int selectedRow = logsTable.getSelectedRow();
-        logModel.setData(person.getMissionsLog());
+        logModel.setData(person.getMissionLog());
         if (selectedRow != -1) {
             if (logsTable.getRowCount() > 0) {
                 if (logsTable.getRowCount() == selectedRow) {

@@ -34,13 +34,13 @@ import java.util.ArrayList;
 public class LogTableModel extends AbstractTableModel {
     private static final long serialVersionUID = 534443424190075264L;
 
-    protected ArrayList<LogEntry> data;
+    protected java.util.List<LogEntry> data;
 
     public final static int COL_DATE    =    0;
     public final static int COL_DESC     =   1;
     public final static int N_COL          = 2;
 
-    public LogTableModel(ArrayList<LogEntry> entries) {
+    public LogTableModel(java.util.List<LogEntry> entries) {
         assert entries != null;
         data = entries;
     }
@@ -116,7 +116,7 @@ public class LogTableModel extends AbstractTableModel {
         }
     }
 
-    public void setData(ArrayList<LogEntry> entries) {
+    public void setData(java.util.List<LogEntry> entries) {
         assert entries != null;
         data = entries;
         fireTableDataChanged();
