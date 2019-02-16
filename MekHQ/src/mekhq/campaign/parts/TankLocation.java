@@ -207,7 +207,8 @@ public class TankLocation extends Part {
             if(IArmorState.ARMOR_DESTROYED == unit.getEntity().getInternal(loc)) {
                 remove(false);
             } else {
-                damage = unit.getEntity().getOInternal(loc) - unit.getEntity().getInternal(loc);
+                int internal = unit.getEntity().getInternal(loc);
+                damage = unit.getEntity().getOInternal(loc) - Math.max(internal, 0);
                 if(unit.isLocationBreached(loc)) {
                     breached = true;
                 }
