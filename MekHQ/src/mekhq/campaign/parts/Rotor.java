@@ -72,7 +72,9 @@ public class Rotor extends TankLocation {
     @Override
     public void fix() {
         super.fix();
-        damage--;
+        if (damage > 0) {
+            damage--;
+        }
         if(null != unit && unit.getEntity() instanceof VTOL) {
             int currIsVal = unit.getEntity().getInternal(VTOL.LOC_ROTOR);
             int maxIsVal = unit.getEntity().getOInternal(VTOL.LOC_ROTOR);
@@ -129,7 +131,7 @@ public class Rotor extends TankLocation {
 
     @Override
     public void updateConditionFromPart() {
-        if(null != unit && unit.getEntity() instanceof VTOL) {
+        if(null != unit && damage > 0 && unit.getEntity() instanceof VTOL) {
             unit.getEntity().setInternal(unit.getEntity().getOInternal(VTOL.LOC_ROTOR) - damage, VTOL.LOC_ROTOR);
         }
     }
