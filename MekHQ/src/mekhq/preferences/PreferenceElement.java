@@ -33,32 +33,41 @@ package mekhq.preferences;
  * This class is not thread-safe.
  */
 public abstract class PreferenceElement {
+    private String name;
     private boolean initialized = false;
 
-    /**
-     * Name for this preference.
-     * The name has to be unique for this node.
-     * @return the name of the preference.
-     */
-    public abstract String getElementName();
-
-    /**
-     * Gets the current value for the preference.
-     * @return the value of the preference.
-     */
-    public abstract String getCurrentValue();
+    protected PreferenceElement(String name) {
+        assert name != null && name.trim().length() > 0;
+        this.name = name;
+    }
 
     /**
      * Sets the initial value for the preference.
      * This method should only be called once during initialization.
      * @param value initial value.
      */
-    public void setInitialValue(String value) {
+    void setInitialValue(String value) {
+        assert value != null;
         assert !this.initialized;
 
         this.initialized = true;
         this.protectedSetInitialValue(value);
     }
+
+    /**
+     * Name for this preference.
+     * The name has to be unique for this node.
+     * @return the name of the preference.
+     */
+    String getName() {
+        return name;
+    }
+
+    /**
+     * Gets the current value for the preference.
+     * @return the value of the preference.
+     */
+    protected abstract String getValue();
 
     /**
      * Sets the initial value for the preference.

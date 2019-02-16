@@ -96,7 +96,7 @@ public class GUI {
     static {
         mhqPreferences = new Properties();
         try {
-            mhqPreferences.load(new FileInputStream(MekHQ.PROPERTIES_FILE));
+            mhqPreferences.load(new FileInputStream(MekHQ.PREFERENCES_FILE));
         } catch (@SuppressWarnings("unused") IOException e) {
             // ignored
         }

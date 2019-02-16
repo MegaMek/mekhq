@@ -50,22 +50,7 @@ import java.util.UUID;
 import java.util.Vector;
 import java.util.zip.GZIPOutputStream;
 
-import javax.swing.JButton;
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JSplitPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTable;
-import javax.swing.JToggleButton;
-import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
+import javax.swing.*;
 import javax.swing.UIManager.LookAndFeelInfo;
 import javax.xml.parsers.DocumentBuilder;
 
@@ -339,6 +324,7 @@ public class CampaignGUI extends JPanel {
         resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI", new EncodeControl()); //$NON-NLS-1$
 
         frame = new JFrame("MekHQ"); //$NON-NLS-1$
+        MekHQ.setWindow(frame);
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 
         tabMain = new JTabbedPane();
@@ -765,6 +751,7 @@ public class CampaignGUI extends JPanel {
         menuFile.add(menuOptionsMM);
 
         menuThemes = new JMenu("Themes");
+
         refreshThemeChoices();
         menuFile.add(menuThemes);
 
@@ -1322,41 +1309,22 @@ public class CampaignGUI extends JPanel {
     }
 
     private void changeTheme(java.awt.event.ActionEvent evt) {
-        final String lafClassName = evt.getActionCommand();
-        Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    UIManager.setLookAndFeel(lafClassName);
-                    SwingUtilities.updateComponentTreeUI(frame);
-                    refreshThemeChoices();
-                } catch (Exception exception) {
-                    JOptionPane.showMessageDialog(frame,
-                            "Can't change look and feel", "Invalid PLAF",
-                            JOptionPane.ERROR_MESSAGE);
-                }
-            }
-        };
-        SwingUtilities.invokeLater(runnable);
+        MekHQ.getSelectedTheme().setValue(evt.getActionCommand());
+        refreshThemeChoices();
     }
 
     private void refreshThemeChoices() {
         menuThemes.removeAll();
         JCheckBoxMenuItem miPlaf;
-        for (LookAndFeelInfo plaf : UIManager.getInstalledLookAndFeels()) {
-            miPlaf = new JCheckBoxMenuItem(plaf.getName());
-            if (plaf.getName().equalsIgnoreCase(
-                    UIManager.getLookAndFeel().getName())) {
+        for (LookAndFeelInfo laf : UIManager.getInstalledLookAndFeels()) {
+            miPlaf = new JCheckBoxMenuItem(laf.getName());
+            if (laf.getClassName().equalsIgnoreCase(MekHQ.getSelectedTheme().getValue())) {
                 miPlaf.setSelected(true);
             }
+
             menuThemes.add(miPlaf);
-            miPlaf.setActionCommand(plaf.getClassName());
-            miPlaf.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    changeTheme(evt);
-                }
-            });
+            miPlaf.setActionCommand(laf.getClassName());
+            miPlaf.addActionListener(evt -> changeTheme(evt));
         }
     }
     //TODO: trigger from event

@@ -21,26 +21,20 @@
 
 package mekhq;
 
-import java.awt.FileDialog;
-import java.awt.GraphicsDevice;
-import java.awt.GraphicsEnvironment;
-import java.awt.Rectangle;
+import java.awt.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.PrintStream;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Properties;
 import java.util.ResourceBundle;
 
-import javax.swing.JOptionPane;
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.*;
 
 import megamek.MegaMek;
 import megamek.client.Client;
@@ -85,6 +79,9 @@ import mekhq.gui.StartUpGUI;
 import mekhq.gui.dialog.LaunchGameDialog;
 import mekhq.gui.dialog.ResolveScenarioWizardDialog;
 import mekhq.gui.dialog.RetirementDefectionDialog;
+import mekhq.gui.preferences.StringPreference;
+import mekhq.gui.utilities.ObservableString;
+import mekhq.preferences.MekHqPreferences;
 
 /**
  * The main class of the application.
@@ -95,13 +92,17 @@ public class MekHQ implements GameListener {
 	// It's intended for 1 to be critical, 3 to be typical, and 5 to be debug/informational.
 	public static int VERBOSITY_LEVEL = 5;
 	public static String CAMPAIGN_DIRECTORY = "./campaigns/";
-	public static String PROPERTIES_FILE = "mmconf/mekhq.properties";
+	public static String PREFERENCES_FILE = "mmconf/mekhq.preferences";
 	public static String PRESET_DIR = "./mmconf/mhqPresets/";
 
 	private static final EventBus EVENT_BUS = new EventBus();
 
-	private static MMLogger logger = null;
-	
+	private static Frame window;
+    private static ObservableString selectedTheme;
+
+    private static MMLogger logger = null;
+	private static MekHqPreferences preferences = null;
+
 	//stuff related to MM games
     private Server myServer = null;
     private GameThread gameThread = null;
@@ -113,8 +114,6 @@ public class MekHQ implements GameListener {
     private CampaignGUI campaigngui;
 
     private IconPackage iconPackage = new IconPackage();
-
-	private Properties preferences;
 
 	/**
 	 * Converts the MekHQ {@link #VERBOSITY_LEVEL} to {@link LogLevel}.
@@ -160,6 +159,22 @@ public class MekHQ implements GameListener {
 		}
 		return logger;
 	}
+
+	public static MekHqPreferences getPreferences() {
+	    if (null == preferences) {
+	        preferences = new MekHqPreferences();
+        }
+
+	    return preferences;
+    }
+
+    public static void setWindow(Frame window) {
+	    MekHQ.window = window;
+    }
+
+    public static ObservableString getSelectedTheme() {
+	    return selectedTheme;
+    }
 
 	/**
 	 * Designed to centralize output and logging.
@@ -216,10 +231,17 @@ public class MekHQ implements GameListener {
      * At startup create and show the main frame of the application.
      */
     protected void startup() {
+        selectedTheme = new ObservableString("selectedTheme", "");
+        selectedTheme.addPropertyChangeListener(new MekHqPropertyChangedListener());
+
         showInfo();
-        //read in preferences
-    	readPreferences();
-    	setLookAndFeel();
+
+        //Setup user in preferences
+        getPreferences().loadFromFile(PREFERENCES_FILE);
+        getPreferences()
+                .forClass(MekHQ.class)
+                .manage(new StringPreference(selectedTheme));
+
     	initEventHandlers();
         //create a start up frame and display it
         StartUpGUI sud = new StartUpGUI(this);
@@ -236,7 +258,7 @@ public class MekHQ implements GameListener {
     		if(null != campaigngui) {
         		campaigngui.getFrame().dispose();
         	}
-    		savePreferences();
+    		getPreferences().saveToFile(PREFERENCES_FILE);
         	System.exit(0);
     	}
     }
@@ -256,37 +278,6 @@ public class MekHQ implements GameListener {
         redirectOutput();
         MekHQ.getInstance().startup();
     }
-
-    protected static Properties setDefaultPreferences() {
-    	Properties defaults = new Properties();
-    	defaults.setProperty("laf", UIManager.getSystemLookAndFeelClassName());
-    	return defaults;
-    }
-
-    protected void readPreferences() {
-    	preferences = new Properties(setDefaultPreferences());
-        try {
-            preferences.load(new FileInputStream(PROPERTIES_FILE));
-            MekHQ.logMessage("loading mekhq properties from " + PROPERTIES_FILE);
-        } catch (FileNotFoundException e) {
-            MekHQ.logMessage("No mekhq properties file found. Reverting to defaults.");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    protected void savePreferences() {
-    	preferences.setProperty("laf", UIManager.getLookAndFeel().getClass().getName());
-    	try {
-			preferences.store(new FileOutputStream(PROPERTIES_FILE), "MekHQ Preferences");
-		} catch (FileNotFoundException e) {
-			MekHQ.logMessage("could not save preferences to " + PROPERTIES_FILE);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-    }
-    
     private void showInfo() {
         final String METHOD_NAME = "showInfo";
         final long TIMESTAMP = new File(PreferenceManager
@@ -316,21 +307,6 @@ public class MekHQ implements GameListener {
         msg.append("\n\tTotal memory available to MegaMek: ")
             .append(NumberFormat.getInstance().format(maxMemory)).append(" kB"); //$NON-NLS-1$ //$NON-NLS-2$
         getLogger().log(getClass(), METHOD_NAME, LogLevel.INFO, msg.toString());
-    }
-
-    protected void setLookAndFeel() {
-    	//TODO: we can extend this with other look and feel options
-    	try {
-    		UIManager.setLookAndFeel(preferences.getProperty("laf"));
-    	} catch (ClassNotFoundException e) {
-    		e.printStackTrace();
-    	} catch (InstantiationException e) {
-    		e.printStackTrace();
-    	} catch (IllegalAccessException e) {
-    		e.printStackTrace();
-    	} catch (UnsupportedLookAndFeelException e) {
-        	e.printStackTrace();
-        }
     }
 
     /**
@@ -662,9 +638,34 @@ public class MekHQ implements GameListener {
 	static public void unregisterHandler(Object handler) {
 	    EVENT_BUS.unregister(handler);
 	}
-	
+
 	// TODO: This needs to be way more flexible, but it will do for now.
 	private void initEventHandlers() {
 	    EVENT_BUS.register(new XPHandler());
 	}
+
+    private static void setLookAndFeel(String themeName, Frame window) {
+        Runnable runnable = () -> {
+            try {
+                UIManager.setLookAndFeel(themeName);
+                if (window != null) {
+                    SwingUtilities.updateComponentTreeUI(window);
+                }
+            } catch (ClassNotFoundException |
+                    InstantiationException |
+                    IllegalAccessException |
+                    UnsupportedLookAndFeelException e) {
+                e.printStackTrace();
+            }
+        };
+        SwingUtilities.invokeLater(runnable);
+    }
+
+    private class MekHqPropertyChangedListener implements PropertyChangeListener {
+        public void propertyChange(PropertyChangeEvent evt) {
+            if (evt.getSource() == selectedTheme) {
+                setLookAndFeel((String)evt.getNewValue(), window);
+            }
+        }
+    }
 }

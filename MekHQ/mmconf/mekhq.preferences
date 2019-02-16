@@ -1,0 +1,9 @@
+{
+  "preferences" : [ {
+    "class" : "mekhq.MekHQ",
+    "elements" : [ {
+      "element" : "selectedTheme",
+      "value" : "com.sun.java.swing.plaf.windows.WindowsLookAndFeel"
+    } ]
+  } ]
+}

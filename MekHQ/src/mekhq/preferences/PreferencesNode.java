@@ -19,11 +19,14 @@
 
 package mekhq.preferences;
 
+import mekhq.MekHQ;
+
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- *
+ * Represents a group of @link PreferenceElement that are part of the same
+ * @link Class.
  *
  * This class is not thread-safe.
  */
@@ -35,7 +38,7 @@ public class PreferencesNode {
     private boolean initialized = false;
     private boolean finalized = false;
 
-    public PreferencesNode(Class node) {
+    PreferencesNode(Class node) {
         assert node != null;
 
         this.node = node;
@@ -43,8 +46,36 @@ public class PreferencesNode {
         this.elements = new HashMap<>();
     }
 
-    public Class getNode() {
-        return this.node;
+    /**
+     * Adds a new element to be managed by this node.
+     * If there are initial vales set for this node,
+     * we will try to set an initial value for this element.
+     * @param element element to manage.
+     */
+    public void manage(PreferenceElement element) {
+        final String METHOD_NAME = "manage";
+
+        if (this.elements.containsKey(element.getName())) {
+            MekHQ.getLogger().error(
+                    PreferencesNode.class,
+                    METHOD_NAME,
+                    "Trying to manage preference for Element " + element.getName() +  " which already exists in Node " + node.getName());
+            return;
+        }
+
+        this.elements.put(element.getName(), element);
+
+        if (this.initialValues.containsKey(element.getName())) {
+            element.setInitialValue(this.initialValues.get(element.getName()));
+        }
+    }
+
+    /**
+     * The class which preferences we are storing in this node.
+     * @return the class stored in this node.
+     */
+    String getNodeName() {
+        return this.node.getName();
     }
 
     /**
@@ -52,7 +83,7 @@ public class PreferencesNode {
      * This method should only be called once.
      * @param initialValues initial values for the elements.
      */
-    public void setInitialValues(Map<String, String> initialValues) {
+    void setInitialValues(Map<String, String> initialValues) {
         assert initialValues != null;
         assert !initialized;
 
@@ -65,30 +96,16 @@ public class PreferencesNode {
      * This method should only be called once.
      * @return
      */
-    public Map<String, String> getFinalValues() {
+    Map<String, String> getFinalValues() {
         assert !finalized;
 
         finalized = true;
         Map<String, String> finalValues = new HashMap<>(this.elements.size());
 
         for(PreferenceElement wrapper : this.elements.values()) {
-            finalValues.put(wrapper.getElementName(), wrapper.getCurrentValue());
+            finalValues.put(wrapper.getName(), wrapper.getValue());
         }
 
         return finalValues;
-    }
-
-    /**
-     * Adds a new element to be managed by this node.
-     * If there are initial vales set for this node,
-     * we will try to set an initial value for this element.
-     * @param element element to manage.
-     */
-    public void manage(PreferenceElement element) {
-        this.elements.put(element.getElementName(), element);
-
-        if (this.initialValues.containsKey(element.getElementName())) {
-            element.setInitialValue(this.initialValues.get(element.getElementName()));
-        }
     }
 }
