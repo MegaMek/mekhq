@@ -59,7 +59,7 @@ public abstract class PreferenceElement {
      * The name has to be unique for this node.
      * @return the name of the preference.
      */
-    String getName() {
+    protected String getName() {
         return name;
     }
 

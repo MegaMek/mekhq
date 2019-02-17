@@ -31,7 +31,6 @@ import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.ResourceBundle;
@@ -50,8 +49,6 @@ import javax.swing.RowFilter;
 import javax.swing.RowSorter;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SpinnerNumberModel;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -323,25 +320,25 @@ public class UnitMarketDialog extends JDialog {
     }
 
     private void setUserPreferences() {
-        PreferencesNode node = MekHQ.getPreferences().forClass(UnitMarketDialog.class);
+        PreferencesNode preferences = MekHQ.getPreferences().forClass(UnitMarketDialog.class);
 
         chkShowMeks.setName("showMeks");
-        node.manage(new JCheckBoxPreference(chkShowMeks));
+        preferences.manage(new JCheckBoxPreference(chkShowMeks));
 
         chkShowAero.setName("showAero");
-        node.manage(new JCheckBoxPreference(chkShowAero));
+        preferences.manage(new JCheckBoxPreference(chkShowAero));
 
         chkShowVees.setName("showVees");
-        node.manage(new JCheckBoxPreference(chkShowVees));
+        preferences.manage(new JCheckBoxPreference(chkShowVees));
 
         chkPctThreshold.setName("useThreshold");
-        node.manage(new JCheckBoxPreference(chkPctThreshold));
+        preferences.manage(new JCheckBoxPreference(chkPctThreshold));
 
         spnThreshold.setName("thresholdValue");
-        node.manage(new JNumberSpinnerPreference(spnThreshold));
+        preferences.manage(new JNumberSpinnerPreference(spnThreshold));
 
         tableUnits.setName("unitsTable"); // NOI18N
-        node.manage(new JTablePreference(tableUnits));
+        preferences.manage(new JTablePreference(tableUnits));
     }
 
     public Entity getUnit() {
