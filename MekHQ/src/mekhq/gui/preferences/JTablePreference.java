@@ -6,6 +6,7 @@ import javax.swing.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 
 public class JTablePreference extends PreferenceElement implements MouseListener {
     private WeakReference<JTable> weakRef;
@@ -47,8 +48,13 @@ public class JTablePreference extends PreferenceElement implements MouseListener
 
         JTable element = weakRef.get();
         if (element != null) {
-            this.columnIndex = Integer.parseInt(value.substring(0, value.indexOf("|")));
-            this.sortOrder = SortOrder.valueOf(value.substring(value.indexOf("|") + 1));
+            ArrayList<RowSorter.SortKey> sortKeys = new ArrayList<>();
+            sortKeys.add(new RowSorter.SortKey(
+                    Integer.parseInt(value.substring(0, value.indexOf("|"))),
+                    SortOrder.valueOf(value.substring(value.indexOf("|") + 1))));
+
+            element.getRowSorter().getSortKeys().clear();
+            element.getRowSorter().setSortKeys(sortKeys);
         }
     }
 

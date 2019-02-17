@@ -74,7 +74,11 @@ import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.market.UnitMarket;
 import mekhq.gui.model.UnitMarketTableModel;
 import mekhq.gui.model.XTableColumnModel;
+import mekhq.gui.preferences.JCheckBoxPreference;
+import mekhq.gui.preferences.JNumberSpinnerPreference;
+import mekhq.gui.preferences.JTablePreference;
 import mekhq.gui.sorter.WeightClassSorter;
+import mekhq.preferences.PreferencesNode;
 
 /**
  * Code copied heavily from PersonnelMarketDialog
@@ -213,12 +217,9 @@ public class UnitMarketDialog extends JDialog {
         panel.add(spnThreshold);
         panel.add(lblPctThreshold);
         chkPctThreshold.addItemListener(checkboxListener);
-        spnThreshold.addChangeListener(new ChangeListener() {
-			@Override
-			public void stateChanged(ChangeEvent arg0) {
-				threshold = (Integer)spnThreshold.getValue();
-				filterOffers();
-			}
+        spnThreshold.addChangeListener(arg0 -> {
+            threshold = (Integer)spnThreshold.getValue();
+            filterOffers();
         });
 
         gbc.gridx = 0;
@@ -235,19 +236,16 @@ public class UnitMarketDialog extends JDialog {
 
         gbc = new GridBagConstraints();
         tableUnits.setModel(marketModel);
-        tableUnits.setName("tableUnits"); // NOI18N
         tableUnits.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tableUnits.setColumnModel(new XTableColumnModel());
         tableUnits.createDefaultColumnsFromModel();
         sorter = new TableRowSorter<>(marketModel);
         sorter.setComparator(UnitMarketTableModel.COL_WEIGHTCLASS, new WeightClassSorter());
-        Comparator<String> numComparator = new Comparator<String>() {
-			public int compare(String arg0, String arg1) {
-				if (arg0.length() != arg1.length()) {
-					return arg0.length() - arg1.length();
-				}
-				return arg0.compareTo(arg1);
-			}
+        Comparator<String> numComparator = (arg0, arg1) -> {
+            if (arg0.length() != arg1.length()) {
+                return arg0.length() - arg1.length();
+            }
+            return arg0.compareTo(arg1);
         };
         sorter.setComparator(UnitMarketTableModel.COL_PRICE, numComparator);
         sorter.setComparator(UnitMarketTableModel.COL_PERCENT, numComparator);
@@ -320,10 +318,33 @@ public class UnitMarketDialog extends JDialog {
 
         getContentPane().add(panelOKBtns, BorderLayout.PAGE_END);
 
+        setUserPreferences();
         pack();
     }
 
-	public Entity getUnit() {
+    private void setUserPreferences() {
+        PreferencesNode node = MekHQ.getPreferences().forClass(UnitMarketDialog.class);
+
+        chkShowMeks.setName("showMeks");
+        node.manage(new JCheckBoxPreference(chkShowMeks));
+
+        chkShowAero.setName("showAero");
+        node.manage(new JCheckBoxPreference(chkShowAero));
+
+        chkShowVees.setName("showVees");
+        node.manage(new JCheckBoxPreference(chkShowVees));
+
+        chkPctThreshold.setName("useThreshold");
+        node.manage(new JCheckBoxPreference(chkPctThreshold));
+
+        spnThreshold.setName("thresholdValue");
+        node.manage(new JNumberSpinnerPreference(spnThreshold));
+
+        tableUnits.setName("unitsTable"); // NOI18N
+        node.manage(new JTablePreference(tableUnits));
+    }
+
+    public Entity getUnit() {
 	    return selectedEntity;
 	}
 
