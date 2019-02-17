@@ -49,6 +49,7 @@ import mekhq.gui.model.PersonnelTableModel;
 import mekhq.gui.model.XTableColumnModel;
 import mekhq.gui.preferences.JComboBoxPreference;
 import mekhq.gui.preferences.JTablePreference;
+import mekhq.gui.preferences.JToggleButtonPreference;
 import mekhq.gui.preferences.JWindowPreference;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.LevelSorter;
@@ -297,6 +298,15 @@ public class PersonnelMarketDialog extends JDialog {
 
         comboPersonType.setName("personType");
         preferences.manage(new JComboBoxPreference(comboPersonType));
+
+        radioNormalRoll.setName("normalRoll");
+        preferences.manage(new JToggleButtonPreference(radioNormalRoll));
+
+        radioPaidRecruitment.setName("paidRecruitment");
+        preferences.manage(new JToggleButtonPreference(radioPaidRecruitment));
+
+        comboRecruitType.setName("recruitType");
+        preferences.manage(new JComboBoxPreference(comboRecruitType));
 
         tablePersonnel.setName("unitsTable");
         preferences.manage(new JTablePreference(tablePersonnel));

@@ -26,21 +26,21 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.lang.ref.WeakReference;
 
-public class JCheckBoxPreference extends PreferenceElement implements ChangeListener {
-    private final WeakReference<JCheckBox>  weakRef;
+public class JToggleButtonPreference extends PreferenceElement implements ChangeListener {
+    private final WeakReference<JToggleButton>  weakRef;
     private boolean value;
 
-    public JCheckBoxPreference(JCheckBox checkBox){
-        super(checkBox.getName());
+    public JToggleButtonPreference(JToggleButton toggleButton){
+        super(toggleButton.getName());
 
-        this.value = checkBox.isSelected();
-        this.weakRef = new WeakReference<>(checkBox);
-        checkBox.addChangeListener(this);
+        this.value = toggleButton.isSelected();
+        this.weakRef = new WeakReference<>(toggleButton);
+        toggleButton.addChangeListener(this);
     }
 
     @Override
     public void stateChanged(ChangeEvent e) {
-        JCheckBox element = weakRef.get();
+        JToggleButton element = weakRef.get();
         if (element != null) {
             this.value = element.isSelected();
         }
@@ -55,7 +55,7 @@ public class JCheckBoxPreference extends PreferenceElement implements ChangeList
     protected void initialize(String value) {
         assert value != null && value.trim().length() > 0;
 
-        JCheckBox element = weakRef.get();
+        JToggleButton element = weakRef.get();
         if (element != null) {
             element.setSelected(Boolean.parseBoolean(value));
         }
@@ -63,7 +63,7 @@ public class JCheckBoxPreference extends PreferenceElement implements ChangeList
 
     @Override
     protected void dispose() {
-        JCheckBox element = weakRef.get();
+        JToggleButton element = weakRef.get();
         if (element != null) {
             element.removeChangeListener(this);
             weakRef.clear();

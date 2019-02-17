@@ -19,8 +19,6 @@
 
 package mekhq.preferences;
 
-import mekhq.MekHQ;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -53,12 +51,10 @@ public class PreferencesNode {
      * @param element element to manage.
      */
     public void manage(PreferenceElement element) {
-        final String METHOD_NAME = "manage";
-
         PreferenceElement actual = this.elements.get(element.getName());
         if (actual != null) {
             this.initialValues.put(actual.getName(), actual.getValue());
-            actual.clean();
+            actual.dispose();
         }
 
         this.elements.put(element.getName(), element);

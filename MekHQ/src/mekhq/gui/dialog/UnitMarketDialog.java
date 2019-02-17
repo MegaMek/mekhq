@@ -71,7 +71,7 @@ import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.market.UnitMarket;
 import mekhq.gui.model.UnitMarketTableModel;
 import mekhq.gui.model.XTableColumnModel;
-import mekhq.gui.preferences.JCheckBoxPreference;
+import mekhq.gui.preferences.JToggleButtonPreference;
 import mekhq.gui.preferences.JIntNumberSpinnerPreference;
 import mekhq.gui.preferences.JTablePreference;
 import mekhq.gui.preferences.JWindowPreference;
@@ -322,16 +322,16 @@ public class UnitMarketDialog extends JDialog {
         PreferencesNode preferences = MekHQ.getPreferences().forClass(UnitMarketDialog.class);
 
         chkShowMeks.setName("showMeks");
-        preferences.manage(new JCheckBoxPreference(chkShowMeks));
+        preferences.manage(new JToggleButtonPreference(chkShowMeks));
 
         chkShowAero.setName("showAero");
-        preferences.manage(new JCheckBoxPreference(chkShowAero));
+        preferences.manage(new JToggleButtonPreference(chkShowAero));
 
         chkShowVees.setName("showVees");
-        preferences.manage(new JCheckBoxPreference(chkShowVees));
+        preferences.manage(new JToggleButtonPreference(chkShowVees));
 
         chkPctThreshold.setName("useThreshold");
-        preferences.manage(new JCheckBoxPreference(chkPctThreshold));
+        preferences.manage(new JToggleButtonPreference(chkPctThreshold));
 
         spnThreshold.setName("thresholdValue");
         preferences.manage(new JIntNumberSpinnerPreference(spnThreshold));
