@@ -72,7 +72,7 @@ import mekhq.campaign.market.UnitMarket;
 import mekhq.gui.model.UnitMarketTableModel;
 import mekhq.gui.model.XTableColumnModel;
 import mekhq.gui.preferences.JCheckBoxPreference;
-import mekhq.gui.preferences.JNumberSpinnerPreference;
+import mekhq.gui.preferences.JIntNumberSpinnerPreference;
 import mekhq.gui.preferences.JTablePreference;
 import mekhq.gui.preferences.JWindowPreference;
 import mekhq.gui.sorter.WeightClassSorter;
@@ -334,7 +334,7 @@ public class UnitMarketDialog extends JDialog {
         preferences.manage(new JCheckBoxPreference(chkPctThreshold));
 
         spnThreshold.setName("thresholdValue");
-        preferences.manage(new JNumberSpinnerPreference(spnThreshold));
+        preferences.manage(new JIntNumberSpinnerPreference(spnThreshold));
 
         tableUnits.setName("unitsTable");
         preferences.manage(new JTablePreference(tableUnits));

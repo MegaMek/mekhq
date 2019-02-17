@@ -64,5 +64,5 @@ public abstract class PreferenceElement {
     /**
      * Cleans the preference resources.
      */
-    protected abstract void clean();
+    protected abstract void dispose();
 }

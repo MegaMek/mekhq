@@ -59,12 +59,15 @@ public class JComboBoxPreference extends PreferenceElement implements ItemListen
 
         JComboBox element = weakRef.get();
         if (element != null) {
-            element.setSelectedIndex(Integer.parseInt(value));
+            int index = Integer.parseInt(value);
+            if (index >= 0 && index < element.getItemCount()) {
+                element.setSelectedIndex(index);
+            }
         }
     }
 
     @Override
-    protected void clean() {
+    protected void dispose() {
         JComboBox element = weakRef.get();
         if (element != null) {
             element.removeItemListener(this);

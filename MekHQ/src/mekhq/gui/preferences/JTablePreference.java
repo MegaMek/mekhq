@@ -66,8 +66,7 @@ public class JTablePreference extends PreferenceElement implements MouseListener
 
     @Override
     protected String getValue() {
-        return this.columnIndex + "|" +
-                this.sortOrder.toString();
+        return String.format("%d|%s", this.columnIndex, this.sortOrder.toString());
     }
 
     @Override
@@ -87,7 +86,7 @@ public class JTablePreference extends PreferenceElement implements MouseListener
     }
 
     @Override
-    protected void clean() {
+    protected void dispose() {
         JTable element = weakRef.get();
         if (element != null) {
             element.removeMouseListener(this);

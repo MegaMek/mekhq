@@ -60,7 +60,7 @@ public class StringPreference extends PreferenceElement implements PropertyChang
     }
 
     @Override
-    protected void clean() {
+    protected void dispose() {
         ObservableString element = weakRef.get();
         if (element != null) {
             element.removePropertyChangeListener(this);

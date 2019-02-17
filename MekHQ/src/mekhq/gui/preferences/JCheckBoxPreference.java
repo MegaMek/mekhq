@@ -62,7 +62,7 @@ public class JCheckBoxPreference extends PreferenceElement implements ChangeList
     }
 
     @Override
-    protected void clean() {
+    protected void dispose() {
         JCheckBox element = weakRef.get();
         if (element != null) {
             element.removeChangeListener(this);

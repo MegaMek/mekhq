@@ -26,11 +26,11 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.lang.ref.WeakReference;
 
-public class JNumberSpinnerPreference extends PreferenceElement implements ChangeListener {
+public class JIntNumberSpinnerPreference extends PreferenceElement implements ChangeListener {
     private final WeakReference<JSpinner> weakRef;
     private int value;
 
-    public JNumberSpinnerPreference(JSpinner spinner){
+    public JIntNumberSpinnerPreference(JSpinner spinner){
         super (spinner.getName());
         assert spinner.getModel() instanceof SpinnerNumberModel;
 
@@ -58,12 +58,17 @@ public class JNumberSpinnerPreference extends PreferenceElement implements Chang
 
         JSpinner element = weakRef.get();
         if (element != null) {
-            element.setValue(Integer.parseInt(value));
+            int newValue = Integer.parseInt(value);
+            SpinnerNumberModel model = ((SpinnerNumberModel)element.getModel());
+            if ((Integer)model.getMinimum() <= newValue &&
+                    (Integer)model.getMaximum() >= newValue) {
+                element.setValue(newValue);
+            }
         }
     }
 
     @Override
-    protected void clean() {
+    protected void dispose() {
         JSpinner element = weakRef.get();
         if (element != null) {
             element.removeChangeListener(this);

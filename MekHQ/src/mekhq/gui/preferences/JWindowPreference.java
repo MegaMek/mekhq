@@ -78,11 +78,7 @@ public class JWindowPreference extends PreferenceElement implements WindowStateL
 
     @Override
     protected String getValue() {
-        return this.width + "|" +
-                this.height + "|" +
-                this.screenX + "|" +
-                this.screenY + "|" +
-                this.isMaximized;
+        return String.format("%d|%d|%d|%d|%s", this.width, this.height, this.screenX, this.screenY, this.isMaximized);
     }
 
     @Override
@@ -110,7 +106,7 @@ public class JWindowPreference extends PreferenceElement implements WindowStateL
     }
 
     @Override
-    protected void clean() {
+    protected void dispose() {
         Window element = weakRef.get();
         if (element != null) {
             element.removeWindowStateListener(this);
