@@ -82,7 +82,6 @@ public class JTablePreference extends PreferenceElement implements MouseListener
             ArrayList<RowSorter.SortKey> sortKeys = new ArrayList<>();
             sortKeys.add(new RowSorter.SortKey(Integer.parseInt(parts[0]), SortOrder.valueOf(parts[1])));
 
-            element.getRowSorter().getSortKeys().clear();
             element.getRowSorter().setSortKeys(sortKeys);
         }
     }

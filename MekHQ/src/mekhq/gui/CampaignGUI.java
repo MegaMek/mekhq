@@ -214,6 +214,7 @@ public class CampaignGUI extends JPanel {
     	standardTabs = new EnumMap<>(GuiTabType.class);
         initComponents();
         MekHQ.registerHandler(this);
+        setUserPreferences();
     }
 
     public void showAboutBox() {
@@ -322,7 +323,6 @@ public class CampaignGUI extends JPanel {
     }
 
     private void initComponents() {
-
         resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI", new EncodeControl()); //$NON-NLS-1$
 
         frame = new JFrame("MekHQ"); //$NON-NLS-1$
@@ -399,8 +399,6 @@ public class CampaignGUI extends JPanel {
         });
 
         mainPanel.setDividerLocation(0.75);
-
-        setUserPreferences();
     }
 
     private void setUserPreferences() {

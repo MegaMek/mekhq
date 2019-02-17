@@ -28,7 +28,6 @@ import java.lang.ref.WeakReference;
 
 public class JCheckBoxPreference extends PreferenceElement implements ChangeListener {
     private final WeakReference<JCheckBox>  weakRef;
-    private String name;
     private boolean value;
 
     public JCheckBoxPreference(JCheckBox checkBox){

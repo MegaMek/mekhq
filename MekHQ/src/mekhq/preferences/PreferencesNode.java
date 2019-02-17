@@ -81,7 +81,7 @@ public class PreferencesNode {
      * This method should only be called once.
      * @param initialValues initial values for the elements.
      */
-    void setInitialValues(Map<String, String> initialValues) {
+    void initialize(Map<String, String> initialValues) {
         assert initialValues != null;
         assert !initialized;
 
@@ -100,6 +100,13 @@ public class PreferencesNode {
         finalized = true;
         Map<String, String> finalValues = new HashMap<>(this.elements.size());
 
+        // Use the values we had stored from initialization
+        for(Map.Entry<String, String> initialValue : this.initialValues.entrySet()) {
+            finalValues.put(initialValue.getKey(), initialValue.getValue());
+        }
+
+        // Overwrite the initial values with values generated during this
+        // session
         for(PreferenceElement wrapper : this.elements.values()) {
             finalValues.put(wrapper.getName(), wrapper.getValue());
         }

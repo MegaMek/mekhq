@@ -204,7 +204,7 @@ public class MekHqPreferences {
 
         try {
             PreferencesNode node = new PreferencesNode(Class.forName(className));
-            node.setInitialValues(elements);
+            node.initialize(elements);
             nodes.put(node.getNodeName(), node);
         }
         catch (ClassNotFoundException e) {

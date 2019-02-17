@@ -22,53 +22,53 @@ package mekhq.gui.preferences;
 import mekhq.preferences.PreferenceElement;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.lang.ref.WeakReference;
 
-public class JNumberSpinnerPreference extends PreferenceElement implements ChangeListener {
-    private final WeakReference<JSpinner> weakRef;
-    private int value;
+public class JComboBoxPreference extends PreferenceElement implements ItemListener {
+    private final WeakReference<JComboBox> weakRef;
+    private int selectedIndex;
 
-    public JNumberSpinnerPreference(JSpinner spinner){
-        super (spinner.getName());
-        assert spinner.getModel() instanceof SpinnerNumberModel;
+    public JComboBoxPreference(JComboBox comboBox) {
+        super(comboBox.getName());
 
-        this.value = (Integer)spinner.getValue();
-        this.weakRef = new WeakReference<>(spinner);
-        spinner.addChangeListener(this);
+        this.selectedIndex = comboBox.getSelectedIndex();
+        this.weakRef = new WeakReference<>(comboBox);
+        comboBox.addItemListener(this);
     }
 
     @Override
-    public void stateChanged(ChangeEvent e) {
-        JSpinner element = weakRef.get();
-        if (element != null) {
-            this.value = (Integer)element.getValue();
+    public void itemStateChanged(ItemEvent e) {
+        if (e.getStateChange() == ItemEvent.SELECTED) {
+            JComboBox element = weakRef.get();
+            if (element != null) {
+                this.selectedIndex = element.getSelectedIndex();
+            }
         }
     }
 
     @Override
     protected String getValue() {
-        return Integer.toString(this.value);
+        return Integer.toString(this.selectedIndex);
     }
 
     @Override
     protected void initialize(String value) {
         assert value != null && value.trim().length() > 0;
 
-        JSpinner element = weakRef.get();
+        JComboBox element = weakRef.get();
         if (element != null) {
-            element.setValue(Integer.parseInt(value));
+            element.setSelectedIndex(Integer.parseInt(value));
         }
     }
 
     @Override
     protected void clean() {
-        JSpinner element = weakRef.get();
+        JComboBox element = weakRef.get();
         if (element != null) {
-            element.removeChangeListener(this);
+            element.removeItemListener(this);
             weakRef.clear();
         }
     }
 }
-
