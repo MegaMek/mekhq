@@ -98,7 +98,7 @@ public class JFramePreference extends PreferenceElement implements WindowStateLi
                     Integer.parseInt(parts[3]));
 
             if (Boolean.parseBoolean(parts[4])) {
-                element.setState(Frame.MAXIMIZED_BOTH);
+                element.setExtendedState(element.getExtendedState() | Frame.MAXIMIZED_BOTH);
             }
         }
     }

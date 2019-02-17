@@ -231,7 +231,7 @@ public class MekHQ implements GameListener {
      * At startup create and show the main frame of the application.
      */
     protected void startup() {
-        selectedTheme = new ObservableString("selectedTheme", "");
+        selectedTheme = new ObservableString("selectedTheme", UIManager.getLookAndFeel().getClass().getName());
         selectedTheme.addPropertyChangeListener(new MekHqPropertyChangedListener());
 
         showInfo();
